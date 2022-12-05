@@ -173,9 +173,24 @@ HELP;
                             $project->getTitle(),
                             $project->getId()
                         ));
-                    } else {
+                    } else if ($outcome->getNormalisedMark() && $outcome->getHumanReadableMark()) {
+                        /* Participants with a feedback(s) for this project
+                         */
                         $this->getLogger()->info(sprintf(
-                            'Persisting marks for %s (%s) in project %s (%s)',
+                            'Persisting [%s, %s] for %s (%s) in project %s (%s)',
+                            $outcome->getHumanReadableMark(),
+                            $outcome->getNormalisedMark(),
+                            $user->getFullname(),
+                            $user->getId(),
+                            $project->getTitle(),
+                            $project->getId()
+                        ));
+                    } else {
+                        /* Participants with no feedback(s) for this project
+                         * Their normalised- and human-readable marks are null
+                         */
+                        $this->getLogger()->info(sprintf(
+                            'No marks found for %s (%s) in project %s (%s)',
                             $user->getFullname(),
                             $user->getId(),
                             $project->getTitle(),
