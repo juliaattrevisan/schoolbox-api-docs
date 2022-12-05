@@ -70,7 +70,7 @@ class VisibilityTests extends TestCase
      * @param bool                $showClosed
      * @param Alaress_Date_Format $now
      * @param bool                $expected
-     * @dataProvider provider_isVisible
+     * @dataProvider providerIsVisible
      */
     public function testIsVisible(
         bool $isParticipant,
