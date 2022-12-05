@@ -700,7 +700,7 @@ class Report
          * is an HSC or Middle Years student
          */
         if ($attributes->isHsc()) {
-            if ($attributes->getYearLevel() === 11) {
+            if ($attributes->getCurriculumYearLevel() === 11) {
                 $this->loadAssessmentsAndParticipation($courseSpec, $workTypeIds, $attributes, $semester, $semester);
 
                 $nesa = new NesaScoreGraphHSC(
