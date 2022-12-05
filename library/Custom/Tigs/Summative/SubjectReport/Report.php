@@ -687,7 +687,7 @@ class Report
          * Truth table time
          * Note that Prod (PRD) and Staging (STG) can have different ids
          *
-         * HSC Students, Year 11, Semester 1: worktype is not relevant (no NESA data for this)
+         * HSC Students, Year 11, Semester 1: worktype is "NESA Report Grade" (STG 20)
          * HSC Students, Year 11, Semester 2: worktype is "NESA Report Grade" (STG 20)
          *
          * HSC Students, Year 12, Semester 1: worktype is not relevant (no NESA data for this)
@@ -700,29 +700,27 @@ class Report
          * is an HSC or Middle Years student
          */
         if ($attributes->isHsc()) {
-            if ($semester === 2) {
-                if ($attributes->getYearLevel() === 11) {
-                    $this->loadAssessmentsAndParticipation($courseSpec, $workTypeIds, $attributes, 2, 2);
+            if ($attributes->getYearLevel() === 11) {
+                $this->loadAssessmentsAndParticipation($courseSpec, $workTypeIds, $attributes, 2, 2);
 
-                    $nesa = new NesaScoreGraphHSC(
-                        $cohortUnitImpls,
-                        $student,
-                        $attributes,
-                        $this->visibility,
-                        $this->viewer,
-                        $workTypeIds[Config::_TIGS_WORK_TYPE_NESA_SCORE],
-                        $folder,
-                        $roleTypeOverride
-                    );
+                $nesa = new NesaScoreGraphHSC(
+                    $cohortUnitImpls,
+                    $student,
+                    $attributes,
+                    $this->visibility,
+                    $this->viewer,
+                    $workTypeIds[Config::_TIGS_WORK_TYPE_NESA_SCORE],
+                    $folder,
+                    $roleTypeOverride
+                );
 
-                    $context = $nesa->toContext($semester);
+                $context = $nesa->toContext($semester);
 
-                    if ($context !== null) {
-                        $reports['data'][$semester] = $context;
-                    }
+                if ($context !== null) {
+                    $reports['data'][$semester] = $context;
                 }
             } else {
-                // noop - no NESA graph for HSC students except Year 11 Semester 2 guys
+                // noop - no NESA graph for HSC students except Year 11 guys
                 return [];
             }
         } elseif ($attributes->isMiddleYear()) {
