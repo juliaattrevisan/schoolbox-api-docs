@@ -26,7 +26,6 @@ if (!isset($this)) {
 }
 
 $user    = $_SESSION['user'];
-(new \Schoolbox\External\User())->loadParents([$user]);
 $ownerId = $_POST['userId'];
 $owner   = UserMapper::getInstance()->findById($ownerId);
 $config  = new Loader();
