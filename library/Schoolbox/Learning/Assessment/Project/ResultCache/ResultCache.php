@@ -24,6 +24,18 @@ use Schoolbox\User;
 class ResultCache
 {
     /**
+     * In normal usage, $perform mode is intended to be true.
+     *
+     * Only in particular circumstances would you set this to false,
+     * such as in the cli context where the --perform flag is optional
+     * and you only wanted to preview what would be found.
+     *
+     * @var bool
+     */
+    private bool $perform = true;
+
+
+    /**
      * @param Mapper $mapper
      */
     public function __construct(
@@ -137,8 +149,21 @@ class ResultCache
             ->setHumanReadableMark($humanReadableMark)
             ->setNormalisedMark($normalisedMark);
 
-        $this->mapper->save($model);
+        if ($this->perform) {
+            $this->mapper->save($model);
+        }
 
         return $model;
+    }
+
+
+    /**
+     * @param bool $perform
+     * @return ResultCache
+     */
+    public function setPerform(bool $perform): self
+    {
+        $this->perform = $perform;
+        return $this;
     }
 }

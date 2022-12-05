@@ -132,9 +132,10 @@ HELP;
         $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
 
         /* ResultCache instance
+         * Decide the persistence mode
          */
         $projectResultCacheMapper = ResultCache\Mapper::getInstance();
-        $projectResultCache = new ResultCache\ResultCache($projectResultCacheMapper);
+        $projectResultCache = (new ResultCache\ResultCache($projectResultCacheMapper))->setPerform($this->perform());
 
         /* TEMPORARY MARKER GUY
          * TODO: What are we gonna do with multiple teachers marking parts of a project
@@ -203,6 +204,10 @@ HELP;
             /* Lock TTL expired; just leave politely
              */
             return;
+        }
+
+        if (!$this->perform()) {
+            $this->getLogger()->info('Planning finished.');
         }
     }
 
