@@ -65,7 +65,7 @@ This file is internal use and is not shipped to clients.
 * You can get your `aws_iam_key` and `aws_iam_secret` from the infrastructure team [#infrastructure-support](https://alaress.slack.com/archives/CTP55SURE)
 * In your schoolbox directory import your vagrant box and bring it up for the first time
 ```
-  vagrant box add ubuntu-1804-php74 https://s3-ap-southeast-2.amazonaws.com/schoolbox-data/ubuntu-1804-php74.box;
+  vagrant box add ubuntu-2204-php80 https://s3-ap-southeast-2.amazonaws.com/schoolbox-data/ubuntu-2204-php80.box;
   vagrant up;
   vagrant provision;
 ```
