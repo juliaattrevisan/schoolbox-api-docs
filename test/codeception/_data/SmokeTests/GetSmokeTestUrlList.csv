@@ -111,7 +111,6 @@ Admin,View Media Queue,https://vagrant.dev.schoolbox.cloud/adminv2/video
 Admin,Import users,https://vagrant.dev.schoolbox.cloud/adminv2/import/userAccount
 Admin,Import photos,https://vagrant.dev.schoolbox.cloud/adminv2/import/photos/upload
 Admin,Modules Home,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Modules
-Admin,Modules Board Leave,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Board+Leave
 Admin,Configure feature tours,https://vagrant.dev.schoolbox.cloud/adminv2/feature-tours
 Admin,Modules Package,https://vagrant.dev.schoolbox.cloud/adminv2/package
 Admin,Modules Pastoral Care,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Pastoral+Care
@@ -120,11 +119,6 @@ Admin,Import import pastoral,https://vagrant.dev.schoolbox.cloud/adminv2/import/
 Admin,Import timetable Structure,https://vagrant.dev.schoolbox.cloud/adminv2/import/timetableStructure
 Admin,Import timetable ,https://vagrant.dev.schoolbox.cloud/adminv2/import/timetable
 Admin,Import timetable enrolment,https://vagrant.dev.schoolbox.cloud/adminv2/import/timetableEnrolment
-Boarder Leave,View Boarder Leave,https://vagrant.dev.schoolbox.cloud/modules/leave
-Boarder Leave,Create Request,https://vagrant.dev.schoolbox.cloud/modules/leave/create
-Boarder Leave,View Requests,https://vagrant.dev.schoolbox.cloud/modules/leave/house/1
-Boarder Leave,View Leave Report,https://vagrant.dev.schoolbox.cloud/modules/leave/report/house/1
-Boarder Leave,View Catering Report,https://vagrant.dev.schoolbox.cloud/modules/leave/report/catering
 Calendar,View calendar,https://vagrant.dev.schoolbox.cloud/calendar
 Calendar,Export calendar,https://vagrant.dev.schoolbox.cloud/calendar/export.php?export=all&event_type=&token=baf8da85532750735975e1809
 Calendar,Create event,https://vagrant.dev.schoolbox.cloud/calendar/event/create?from=inline&returnTo=calendar&userId=1&allDay=0&date=02-09-2019+15%3A00&title=&type=1

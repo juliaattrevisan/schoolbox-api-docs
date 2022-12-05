@@ -13,7 +13,6 @@ declare(strict_types=1);
  */
 class External_Maze_Lk_User extends External_Maze_User
 {
-
     /**
      * @inheritDoc
      */

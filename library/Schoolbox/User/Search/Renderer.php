@@ -19,7 +19,6 @@ use Scrub;
 
 class Renderer extends Handler
 {
-
     /**
      * Type (e.g. 'link', 'blog', etc)
      *
@@ -85,7 +84,6 @@ class Renderer extends Handler
             $this->getPage()->setBlock('user', 'user_name_no_link', 'user_name_no_link_block');
             $this->getPage()->setBlock('user', 'position_title', 'position_title_block');
             $this->getPage()->setBlock('user', 'normal_title', 'normal_title_block');
-            $this->getPage()->setBlock('user', 'boarder_leave', 'boarder_leave_block');
             $this->getPage()->setBlock('user', 'academic_reports', 'academic_reports_block');
             $this->getPage()->setBlock('user', 'user_calendar', 'user_calendar_block');
 
@@ -125,7 +123,6 @@ class Renderer extends Handler
                 $this->getPage()->setVar('timetable_block');
                 $this->getPage()->setVar('pastoral_block');
                 $this->getPage()->setVar('eportfolio_block');
-                $this->getPage()->setVar('boarder_leave_block');
                 $this->getPage()->setVar('academic_reports_block');
                 $this->getPage()->setVar('tot_block');
 
@@ -221,17 +218,6 @@ class Renderer extends Handler
                 } elseif ($currentUserIsStaff && $resultIsStaff) {
                     // Show staff timetables to other staff
                     $this->getPage()->parse('timetable_block', 'timetable');
-                    $hasActions = true;
-                }
-
-                // Boarder Leave: only show to res house students if enabled
-                if (
-                    $resultIsStudent
-                    && $currentUserIsStaff
-                    && $user['residential_house_id']
-                    && Config::get('boarder_leave_enabled')
-                ) {
-                    $this->getPage()->parse('boarder_leave_block', 'boarder_leave');
                     $hasActions = true;
                 }
 

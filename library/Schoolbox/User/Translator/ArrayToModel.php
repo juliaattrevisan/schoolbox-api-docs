@@ -7,7 +7,6 @@ use Schoolbox\Application\Exception\Exception as SchoolboxException;
 
 class ArrayToModel extends Base
 {
-
     /**
      * @inheritDoc
      */
@@ -56,8 +55,6 @@ class ArrayToModel extends Base
                 $this->setScalar($value, 'enableTimetable', $model, 'setHideTimetable');
                 $this->setScalar($value, 'showSideNav', $model, 'setHideSidenav');
                 $this->setScalar($value, 'showNotificationsPanel', $model, 'setHideNotificationsTray');
-            } elseif ('isBoarder' === $label) {
-                $model->setBoardingStatus($value);
             } else {
                 if (method_exists($model, $function)) {
                     $this->setScalar([$label => $value], $label, $model, $function);

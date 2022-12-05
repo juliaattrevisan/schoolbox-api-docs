@@ -209,7 +209,6 @@ if ! INSTANCE_ID=vagrantx schoolbox-data-refresh.sh \
 --config amqp_user "'guest'" \
 --config amqp_pass "'guest'" \
 --config amqp_vhost "'/'" \
---config boarder_leave_enabled "'1'" \
 --config debug_show_stack_trace "'1'" \
 --config debug_templates "'1'" \
 --config eotc_enabled "'1'" \

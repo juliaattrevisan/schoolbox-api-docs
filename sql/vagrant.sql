@@ -17,7 +17,6 @@ WHERE name IN (
     'site_school_code',
     'debug_mode',
     'debug_xhprof',
-    'boarder_leave_enabled',
     'resource_booking_enabled',
     'push_notifications_enabled',
     'pastoral_enabled',

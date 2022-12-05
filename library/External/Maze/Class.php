@@ -14,7 +14,6 @@ use Schoolbox\Database\Factory;
 
 class External_Maze_Class implements External_ClassInterface
 {
-
     /**
      * An instance of MSSQL
      *
@@ -138,7 +137,6 @@ class External_Maze_Class implements External_ClassInterface
 
         return $studentList;
     }
-
 
     /**
      * @inheritdoc

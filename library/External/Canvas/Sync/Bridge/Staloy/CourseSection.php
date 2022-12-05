@@ -29,7 +29,6 @@ use function preg_replace;
  */
 class CourseSection extends \External\Canvas\Sync\Bridge\CourseSection
 {
-
     /**
      * @inheritDoc
      */

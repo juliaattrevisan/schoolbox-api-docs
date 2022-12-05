@@ -10,7 +10,6 @@ use Schoolbox\Config\Loader;
 
 class External_Ping implements External_PingInterface
 {
-
     /**
      * @var External_PingInterface
      */

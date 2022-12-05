@@ -21,7 +21,6 @@ use function strtotime;
  */
 class CourseSectionDates
 {
-
     /**
      * A relative date offset to apply to a UnitImpl dueDate to derive an openDate if one
      * cannot be derived from any explicit datum. eg '-1 year'

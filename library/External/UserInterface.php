@@ -15,7 +15,6 @@ use Schoolbox\User;
  */
 interface External_UserInterface extends External\IConnector
 {
-
     /* Student-specific
      */
 

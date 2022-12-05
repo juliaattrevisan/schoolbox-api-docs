@@ -80,7 +80,6 @@ class ConfigMapper extends Mapper
     public const TYPE_COLOURS       =  9;
     public const TYPE_3RD           = 10;
     public const TYPE_MODULES       = 11;
-    public const TYPE_BOARD         = 12;
     public const TYPE_WELCOME       = 13;
     public const TYPE_DEBUGGING     = 14;
     public const TYPE_LMS_POLICY    = 15;
@@ -98,7 +97,6 @@ class ConfigMapper extends Mapper
     public const _READ_MORE                      = 'read_more';
     public const _SAVE_FOR_LATER                 = 'save_for_later';
     public const _STAFF_CAN_POST_NEWS            = 'news_staff_post_enabled';
-    public const _BOARDER_LEAVE_ENABLED          = 'boarder_leave_enabled';
     public const _AUDIENCE_TO_FOLDER_TEACHERS    = 'audience_to_folder_users_teachers';
 //    public const _EXTERNAL_MS_SQL_SERVER_DRIVER  = 'external_ms_sql_server_driver';
     public const COMMS_COMMENTS_ENABLED          = 'comms_comments_enabled';

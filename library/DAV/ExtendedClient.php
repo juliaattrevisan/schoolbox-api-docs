@@ -11,7 +11,6 @@
  */
 class DAV_ExtendedClient extends Sabre\DAV\Client
 {
-
     /**
      * Uploads a file via a PUT request
      *

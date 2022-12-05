@@ -560,12 +560,6 @@ class Subnav
                         'children'    => [],
                         'description' => 'Control which features and modules are currently available in your system.',
                     ],
-                    '/adminv2/setting/Board%20Leave'   => [
-                        'name'        => 'Board Leave',
-                        'visible'     => count($enabledConfigs[ConfigMapper::TYPE_BOARD] ?? []) > 0,
-                        'children'    => [],
-                        'description' => 'Configure policy settings related to the boarding leave application system.',
-                    ],
                     '/adminv2/feature-tours'           => [
                         'name'        => 'Feature Tours',
                         'visible'     => true,

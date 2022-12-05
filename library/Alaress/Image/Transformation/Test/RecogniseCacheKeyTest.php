@@ -157,7 +157,6 @@ class RecogniseCacheKeyTest extends TestCase
             NSMapper::NS_FORUM,
             NSMapper::NS_NEWS,
             NSMapper::NS_CALENDAR,
-            NSMapper::NS_BOARDER_LEAVE,
             NSMapper::NS_WIKI,
             NSMapper::NS_GROUP,
             NSMapper::NS_CMS,

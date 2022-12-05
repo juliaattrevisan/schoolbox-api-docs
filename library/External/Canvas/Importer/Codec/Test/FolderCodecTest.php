@@ -20,7 +20,6 @@ use PHPUnit\Framework\TestCase;
 
 class FolderCodecTest extends TestCase
 {
-
     /**
      * @dataProvider providerFolderCode
      * @param int         $currentYear

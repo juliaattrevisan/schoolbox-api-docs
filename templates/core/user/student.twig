@@ -395,15 +395,6 @@
                                 {% endblock buttons_timetable %}
                             {% endif %}
 
-                            {% block buttons_boarderLeave %}
-                                {% if config.boarder_leave_enabled and user.residentialHouse %}
-                                    <li>
-                                        <a href="/modules/leave/student/{{ user.id }}"
-                                           class="icon-boarder-leave">Boarder Leave</a>
-                                    </li>
-                                {% endif %}
-                            {% endblock buttons_boarderLeave %}
-
                             {% block buttons_pastoralCare %}
                                 {% if isStaffWhoCanView and config.external_type == 'synergetic' and config.external_staff_portal %}
                                     <li>

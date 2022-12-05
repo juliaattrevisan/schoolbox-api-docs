@@ -17,7 +17,6 @@ use Schoolbox\External\Importer\Endpoint\Factory;
  */
 class External_Schoolbox_AttendanceLinkFactory
 {
-
     /**
      * Spawn one of the AttendanceLink instances suited to the current suds importer
      *

@@ -13,7 +13,6 @@ declare(strict_types=1);
  */
 class External_Pcschools_Cc_User extends External_Pcschools_User
 {
-
     /**
      * A special stored proc just for cornerstone
      * Every other PC School instance will break if clients use this

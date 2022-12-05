@@ -69,7 +69,6 @@ class ModelToArrayTest extends TestCase
             'positionTitle'    => null,
             'yearLevel'        => null,
             'isDeleted'        => false,
-            'isBoarder'        => false,
             'flags'            => [
                 'showWebmailTab'         => null,
                 'showContacts'           => true,
@@ -122,7 +121,6 @@ class ModelToArrayTest extends TestCase
             ->setYear((new YearLevel())
                 ->setId(1)
                 ->setName('Year 12'))
-            ->setBoardingStatus('Y')
             ->setWebmail(false)
             ->setHideContacts(true)
             ->setHideTimetable(true)
@@ -179,7 +177,6 @@ class ModelToArrayTest extends TestCase
                     'name' => 'Year 12',
                 ],
                 'isDeleted'        => false,
-                'isBoarder'        => true,
                 'flags'            => [
                     'showWebmailTab'         => false,
                     'showContacts'           => false,

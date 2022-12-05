@@ -16,7 +16,6 @@ use Schoolbox\Database\Factory;
  */
 class External_Doublefirst_Timetable implements External_TimetableInterface
 {
-
     /**
      * @var IConnector $database
      */

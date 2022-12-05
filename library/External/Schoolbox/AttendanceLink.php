@@ -17,12 +17,10 @@ use Schoolbox\IConfigLoader;
  */
 class External_Schoolbox_AttendanceLink implements External_AttendanceLinkInterface
 {
-
     /**
      * @var External_AttendanceLinkInterface
      */
     private External_AttendanceLinkInterface $attendanceLink;
-
 
     /**
      * Generate the link to the sis, using the parts provided
@@ -57,7 +55,6 @@ class External_Schoolbox_AttendanceLink implements External_AttendanceLinkInterf
         );
     }
 
-
     /**
      * Decide whether this should open in a new window or the current window
      *
@@ -69,7 +66,6 @@ class External_Schoolbox_AttendanceLink implements External_AttendanceLinkInterf
     {
         return $this->attendanceLink->getAttendanceLinkTarget();
     }
-
 
     /**
      * Set up all the dependencies that allow this external to function properly
@@ -93,7 +89,6 @@ class External_Schoolbox_AttendanceLink implements External_AttendanceLinkInterf
 
         $this->attendanceLink->init($config, $isStaff);
     }
-
 
     /**
      * Returns whether attendance link is enabled for this class

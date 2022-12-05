@@ -1,7 +1,7 @@
 /*
     The Sass file where all other Sass files are born
-    Essentially just imports all required files so can can reference 
-    the compiled core.css 
+    Essentially just imports all required files so can can reference
+    the compiled core.css
 */
 
 @charset "UTF-8";
@@ -135,9 +135,6 @@ $cdn-prefix: "../..";
 @import "components/editor/custom-styles";
 @import "components/editor/mejs";
 @import "components/editor/inline";
-
-// Boarder Leave
-@import "components/boarder-leave/boarder-leave";
 
 // Sports Fixtures
 @import "components/sportsfixtures/sportsfixtures";

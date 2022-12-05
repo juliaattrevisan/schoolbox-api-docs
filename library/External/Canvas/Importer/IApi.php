@@ -14,7 +14,6 @@ namespace External\Canvas\Importer;
  */
 interface IApi
 {
-
     /**
      * Access $route (an api endpoint) using $method (get, post, etc)
      *

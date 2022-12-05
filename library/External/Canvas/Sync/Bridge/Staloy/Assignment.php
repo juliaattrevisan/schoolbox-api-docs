@@ -14,7 +14,6 @@ use Schoolbox\Learning\Assessment\WorkType;
 
 class Assignment extends \External\Canvas\Sync\Bridge\Assignment
 {
-
     /**
      * @inheritDoc
      */

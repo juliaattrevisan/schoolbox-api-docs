@@ -13,7 +13,6 @@ use Schoolbox\Database\Factory;
  */
 class External_Doublefirst_Class implements External_ClassInterface
 {
-
     /**
      * @var IConnector $database
      */

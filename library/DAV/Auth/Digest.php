@@ -4,8 +4,7 @@
 
 class DAV_Auth_Digest extends Sabre\DAV\Auth\Backend\AbstractDigest
 {
-
-    function getDigestHash($realm, $username)
+    public function getDigestHash($realm, $username)
     {
         $userHandler = new User();
         $user = $userHandler->getByUsername($username);

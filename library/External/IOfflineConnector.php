@@ -17,5 +17,4 @@ namespace External;
  */
 interface IOfflineConnector extends IConnector
 {
-
 }

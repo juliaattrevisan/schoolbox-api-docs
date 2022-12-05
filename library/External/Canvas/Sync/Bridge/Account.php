@@ -22,7 +22,6 @@ use function preg_match;
  */
 class Account
 {
-
     /** @var IConnector */
     private $schoolboxDb;
 

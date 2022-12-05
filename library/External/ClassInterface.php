@@ -10,7 +10,6 @@
 
 interface External_ClassInterface extends External\IConnector
 {
-
     /**
      * Get a list of students in a particular $classCode
      *

@@ -15,7 +15,6 @@ use Schoolbox\Campus;
  */
 interface External_TimetableInterface extends External\IConnector
 {
-
     /**
      * Find a list of all the cycles that a user could choose from
      * and return it in a set of key-value pairs; use can choose

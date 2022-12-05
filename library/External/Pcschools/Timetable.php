@@ -18,7 +18,6 @@ use Schoolbox\UserMapper;
  */
 class External_Pcschools_Timetable implements External_TimetableInterface
 {
-
     /**
      * Name of stored proc to retrieve a timetable
      *

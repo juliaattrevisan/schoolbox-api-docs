@@ -130,7 +130,6 @@ class Mapper extends BaseMapper implements IExceptionGenerator
     const ERROR_SOCIAL_STREAM_MESSAGE = 157;
     const ERROR_SELECT_CAMPUS = 158;
     const ERROR_SUBJECT_NO_TASKS = 159;
-    const ERROR_LEAVE_REQUEST_TOO_SOON = 162;
     const ERROR_EVENT_NOT_FOUND = 160;
     const ERROR_RAMS_FILE = 161;
     const ERROR_EVENT_STATUS_UNKNOWN = 163;

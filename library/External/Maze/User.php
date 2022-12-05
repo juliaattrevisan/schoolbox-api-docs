@@ -18,7 +18,6 @@ use Schoolbox\User;
 
 class External_Maze_User implements External_UserInterface
 {
-
     protected const REPLACE_CHARACTERS_FROM_YEAR_LEVEL = "REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '')";
 
     /**

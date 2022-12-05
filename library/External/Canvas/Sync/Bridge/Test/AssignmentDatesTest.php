@@ -22,7 +22,6 @@ use function strcmp;
  */
 class AssignmentDatesTest extends TestCase
 {
-
     // Tests
 
     /**

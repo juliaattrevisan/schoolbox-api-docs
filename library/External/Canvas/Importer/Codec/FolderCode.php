@@ -27,7 +27,6 @@ namespace External\Canvas\Importer\Codec;
  */
 class FolderCode
 {
-
     /**
      * Return the folder code that should be associated with $canvasCourseCode
      * If $canvasCourseCode is invalid, returns null
