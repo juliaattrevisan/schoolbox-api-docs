@@ -113,6 +113,8 @@ HELP;
          * Let's get out of here
          */
         if (!$assessmentCount) {
+            $this->getLogger()->info('No project implementations found; exiting');
+
             return;
         }
 
