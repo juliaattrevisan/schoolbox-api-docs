@@ -12,6 +12,7 @@ use Schoolbox\Curriculum\Api\Translator\ArrayToModel;
 use Schoolbox\Curriculum\Api\Translator\ModelToArray;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
 
 /**
@@ -84,11 +85,43 @@ class Controller extends Base
             $resultsForAllKeywords = $resultsForAllKeywords->merge($resultsForKeyword);
         }
 
+        self::sortNodes($resultsForAllKeywords, 0);
+
         $this->response->content->set(
             $this->buildJsonOutput(
                 $resultsForAllKeywords->map(new ModelToArray($ancestorCount, $descendantCount))
             )
         );
+    }
+
+    /**
+     * Sort nodes by order, code, name, id
+     * @param Collection $nodes
+     * @param int        $depth
+     * @return void
+     */
+    private static function sortNodes(Collection $nodes, int $depth): void
+    {
+        if ($nodes->count() === 0 || $depth > self::MAX_LIMIT) {
+            return;
+        }
+        /** @var Node\Model $node */
+        foreach ($nodes as $node) {
+            $childNodes = $node->getChildren();
+            self::sortNodes($childNodes, $depth + 1);
+            $node->setChildren((new GenericCollection(Node\Model::class))->merge($childNodes));
+        }
+        $nodes->sortByCallback(static function (Node\Model $a, Node\Model $b) {
+            if ($a->getOrder() !== $b->getOrder()) {
+                return $a->getOrder() <=> $b->getOrder();
+            } elseif ($a->getCode() !== $b->getCode()) {
+                return $a->getCode() <=> $b->getCode();
+            } elseif ($a->getName() !== $b->getName()) {
+                return strnatcmp($a->getName(), $b->getName());
+            } else {
+                return $a->getId() <=> $b->getId();
+            }
+        });
     }
 
     /**

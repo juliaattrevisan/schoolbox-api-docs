@@ -291,8 +291,10 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
     protected function getDefaultOrderByParams(): array
     {
         return [
-            'name' => 'asc',
-            'id'   => 'asc',
+            'order' => 'asc',
+            'code'  => 'asc',
+            'name'  => 'asc',
+            'id'    => 'asc',
         ];
     }
 
