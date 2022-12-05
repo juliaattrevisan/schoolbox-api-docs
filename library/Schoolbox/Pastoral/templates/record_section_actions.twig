@@ -36,39 +36,60 @@
         const $toast = $('#pastoral-toast');
 
         /**
+         * Get the properties required to update the pastoral action status
+         *
+         * @param {HTMLInputElement} checkbox - the checkbox linked to the pastoral action
+         * @returns {FormData} - the form data to submit
+         */
+        function getFormData(checkbox) {
+            const formData = new FormData();
+            formData.append('recordActionId', checkbox.getAttribute('data-pastoral-action'));
+            formData.append('checked', checkbox.checked ? 1 : 0);
+            return formData;
+        }
+
+        /**
+         * Add/remove a strike through the pastoral action depending on whether its been completed
+         * Also if the action is marked as complete, display who marked it and when
+         *
+         * @param {number} actionId - the pastoral action id
+         * @param {object} action - the returned pastoral action object, containing the action details
+         */
+        function displayActionChange(actionId, action) {
+            const actionLabel = document.querySelector(`label[for="${actionId}"]`);
+            const actionStatus = document.querySelector(`[data-action-status-${action.id}]`);
+            if (action.completed) {
+                actionLabel.classList.add('strike');
+                if (actionStatus) {
+                    actionStatus.style.display = 'block';
+                }
+            } else {
+                actionLabel.classList.remove('strike');
+                if (actionStatus) {
+                    actionStatus.style.display = 'none';
+                }
+            }
+        }
+
+        /**
          * To complete / uncomplete a pastoral action
          *
          * @param {HTMLInputElement} checkbox - the checkbox linked to the pastoral action
          */
-        async function updateAction (checkbox) {
-            const actionId = checkbox.getAttribute('id');
+        async function submitActionChange(checkbox) {
             try {
-                const formData = new FormData();
-                formData.append('recordActionId', checkbox.getAttribute('data-pastoral-action'));
-                formData.append('checked', checkbox.checked ? 1 : 0);
                 const response = await fetch('{{ routeLookupIfAuthorized('pastoral.postActionUpdate', {recordId: record.id, record: record}) }}', {
                     method: 'POST',
-                    body: formData,
+                    body: getFormData(checkbox),
                 });
                 if (response.ok) {
                     const responseJson = await response.json();
-                    responseJson.recordActions.forEach((action) => {
-                        if (actionId !== `action-${action.id}`) {
+                    const actionId = checkbox.getAttribute('id');
+                    responseJson.recordActions.forEach((action) => { // all pastoral actions are returned
+                        if (actionId !== `action-${action.id}`) { // so we need to determine which was just changed
                             return;
                         }
-                        const actionLabel = document.querySelector(`label[for="${actionId}"]`);
-                        const actionStatus = document.querySelector(`[data-action-status-${action.id}]`);
-                        if (action.completed) {
-                            actionLabel.classList.add('strike');
-                            if (actionStatus) {
-                                actionStatus.style.display = 'block';
-                            }
-                        } else {
-                            actionLabel.classList.remove('strike');
-                            if (actionStatus) {
-                                actionStatus.style.display = 'none';
-                            }
-                        }
+                        displayActionChange(actionId, action);
                     });
                     $toast.toastTimeout({text: 'Action updated.', css: 'success'});
                 } else {
@@ -85,7 +106,7 @@
          */
         Array.from(document.querySelectorAll('[data-pastoral-action]')).forEach((checkbox) => {
             checkbox.addEventListener('change', () => {
-                updateAction(checkbox);
+                submitActionChange(checkbox);
             });
         });
 
