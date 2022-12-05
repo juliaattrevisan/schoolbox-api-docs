@@ -7,7 +7,6 @@ use Schoolbox\Application\Exception\Exception as SchoolboxException;
 
 class ArrayToModel extends Base
 {
-
     /**
      * @inheritDoc
      */
