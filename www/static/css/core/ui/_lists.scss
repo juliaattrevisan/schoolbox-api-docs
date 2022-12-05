@@ -430,3 +430,23 @@ ul.meta {
         }
     }
 }
+
+/*
+ * A list of pastoral actions on a pastoral record
+ */
+.pastoral-actions-list {
+    padding: 0;
+    .option-list {
+        margin: 0;
+    }
+    li {
+        border-bottom: 1px solid var(--body-background);
+        display: flex;
+        gap: 1rem;
+        justify-content: space-between;
+        padding: 0.5rem;
+    }
+    img {
+        margin-left: 0.5rem;
+    }
+}

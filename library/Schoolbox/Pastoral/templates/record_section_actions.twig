@@ -3,19 +3,25 @@
         <div class="small-12 medium-6 columns island">
             <h2 class="subheader">Actions</h2>
             <section>
-                <fieldset class="checklist">
+                <fieldset class="checklist pastoral-actions-list">
                     <ul class="option-list">
                         {% for recordAction in record.recordActions %}
                             <li>
-                                <input id="action-{{ recordAction.action.id }}" name="actions[]" type="checkbox"
-                                        {{ recordAction.completed ? 'checked="checked"' : '' }}
-                                       data-pastoral-action="{{ recordAction.id }}"/>
-                                <label for="action-{{ recordAction.action.id }}"
-                                        {{ recordAction.completed ? 'class="strike"' : '' }}>{{ recordAction.action.name }}</label>
+                                <div>
+                                    <input id="action-{{ recordAction.action.id }}" name="actions[]" type="checkbox"
+                                            {{ recordAction.completed ? 'checked="checked"' : '' }}
+                                        data-pastoral-action="{{ recordAction.id }}"/>
+                                    <label for="action-{{ recordAction.action.id }}"
+                                            {{ recordAction.completed ? 'class="strike"' : '' }}>{{ recordAction.action.name }}</label>
+                                </div>
                                 {% if recordAction.completed %}
-                                    <div data-action-status-{{ recordAction.action.id }}>Completed
-                                        by {{ recordAction.updatedBy.fullname }}
-                                        at {{ recordAction.updatedAt.local }}</div>
+                                <div data-action-status-{{ recordAction.action.id }}>
+                                    <span class="meta" title="{{ recordAction.updatedAt.local }}" >
+                                                    Completed <time>{{ recordAction.updatedAt.getRelativeTime }}</time></span>
+                                    <a href="/search/user/{{ recordAction.updatedBy.id }}" title="View user" class="profile-img">
+                                        <img src="/portrait.php?id={{ recordAction.updatedBy.id }}&amp;size=square32" alt="Profile photo of {{ recordAction.updatedBy.fullname }}" title="{{ recordAction.updatedBy.fullname }}" class="portrait">
+                                    </a>
+                                </div>
                                 {% endif %}
                             </li>
                         {% endfor %}
