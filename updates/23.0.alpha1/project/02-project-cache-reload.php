@@ -125,19 +125,6 @@ HELP;
             WHERE p.deleted_at IS NULL
         ");
 
-        /* Find all the users who *might* have participated
-         * in all these projects. If they're not participants
-         * then the persist() method will skip over them anyway.
-         *
-         * This saves us from digging out involved humans for
-         * every project instance that existed, which is bleagghh
-         *
-         * As for deleted users...not sure how they would ever see
-         * their marks, nor re-see them, once they've met such a fate
-         * so I suppose we can just ignore those
-         */
-        $users = \Schoolbox\UserMapper::getInstance()->findAll();
-
         /* I need this assessment mapper cache because of all the
          * participation insanity that we have manufactured
          */
@@ -165,9 +152,17 @@ HELP;
                     $project->getId()
                 ));
 
-                /* TODO Maybe find $users as the set of guys inside $project somehow
+                /* Find all the users who supposedly participated
+                 * in all these projects.
+                 *
+                 * As for deleted users...not sure how they would ever see
+                 * their marks, nor re-see them, once they've met such a fate
+                 * so I suppose we can just ignore those
                  */
-                foreach ($users as $user) {
+                $participants = $project->getAllParticipants();
+
+                foreach ($participants as $userId => $participant) {
+                    $user = $participant->getUser();
                     $outcome = $projectResultCache->persist($project, $user, $marker);
 
                     if (null === $outcome) {
