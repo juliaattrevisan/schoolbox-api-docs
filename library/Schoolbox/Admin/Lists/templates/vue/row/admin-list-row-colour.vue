@@ -58,6 +58,7 @@ export default {
                     {},
                     window.sbProps.spectrum,
                     {
+                        allowEmpty: true,
                         change: (color) => {this.$emit('input', color ? color.toHexString() : null);}
                     }
                 )
