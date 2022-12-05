@@ -157,6 +157,7 @@ HELP;
                 $this->refreshLock($lock);
 
                 $project = $assessmentMapperProxy->findByIdForReview($row['assessment_id']);
+
                 $this->getLogger()->info(sprintf(
                     'Examining project %s (%s)',
                     $project->getTitle(),
@@ -173,6 +174,8 @@ HELP;
                 $participants = $project->getAllParticipants();
 
                 foreach ($participants as $userId => $participant) {
+                    $this->refreshLock($lock);
+
                     $user = $participant->getUser();
                     $outcome = $projectResultCache->persist($project, $user, $marker);
 
