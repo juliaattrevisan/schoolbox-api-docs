@@ -80,7 +80,7 @@ class ValidCache
          * detect a change in the Grading Scheme
          */
         if ($assessment->getMarkScheme() instanceof LetterGrade) {
-            if ((int)$postData['gradingScheme'] !== (int)$assessment->getMarkScheme()?->getGradeGroup()?->getId()) {
+            if ((int)$postData['gradingScheme'] !== (int)$assessment->getMarkScheme()->getGradeGroup()?->getId()) {
                 $cacheValid = false;
             }
         }
