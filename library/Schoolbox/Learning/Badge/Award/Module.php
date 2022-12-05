@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Badge\Award;
 
+use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
@@ -17,6 +18,8 @@ use Closure;
 use Schoolbox\Filter\Mapper as FilterMapper;
 use Schoolbox\Filter\Selection\Mapper as FilterSelectionMapper;
 use Schoolbox\Learning\Badge\Mapper as BadgeMapper;
+use Schoolbox\Learning\Badge\Award\Mapper as BadgeAwardMapper;
+use Schoolbox\Learning\Badge\Award\Model as BadgeAward;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Role;
@@ -54,6 +57,32 @@ class Module extends BaseModule
                         UserMapper::getInstance(),
                         'userId'
                     )
+                ),
+            );
+        });
+
+        // Different from above, as not allowing parent
+        $postEvidence = new Rule\LazyCallback(function () {
+            return new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Rule\HasRole(Role::STAFF),
+                    new Rule\Callback(static function (array $params, User $user) {
+                        if (
+                            isset($params['award'])
+                            && $params['award'] instanceof BadgeAward
+                            && $params['award']->getRecipient()->getId() === $user->getId()
+                        ) {
+                            return true;
+                        } elseif (isset($params['awardId'])) {
+                            $award = BadgeAwardMapper::getInstance()->findById($params['awardId']);
+                            if ($award->getRecipient()->getId() === $user->getId()) {
+                                return true;
+                            }
+                        }
+                        throw new Unauthorized();
+                    })
                 ),
             );
         });
@@ -168,7 +197,7 @@ class Module extends BaseModule
             self::METHOD_GET,
             '/{awardId}/update',
             'getAwardUpdate',
-            $manageBadgesRule,
+            $postEvidence,
             Closure::fromCallable([$this, 'preloadAward'])
         );
 
@@ -178,7 +207,7 @@ class Module extends BaseModule
             self::METHOD_POST,
             '/{awardId}/update',
             'postAwardUpdate',
-            $manageBadgesRule,
+            $postEvidence,
             Closure::fromCallable([$this, 'preloadAward'])
         );
 

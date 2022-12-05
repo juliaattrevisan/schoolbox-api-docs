@@ -755,21 +755,35 @@ class Controller extends Base
     /**
      * For the $award given, update its properties
      *
-     * @api GET /learning/badge/award/{awardId}/update
      * @param \Schoolbox\Learning\Badge\Award\Model $award
      * @return void
+     * @api GET /learning/badge/award/{awardId}/update
      */
     public function getAwardUpdate(AwardModel $award): void
     {
         $badges          = $this->badgeMapper->createCollection()->add($award->getBadge());
         $badgeTranslator = $this->buildBadgeModelToArrayTranslator();
-        $returnUrl       =
-            $this->request->query->get(Redirect::RETURN_URL) ??
-            Redirect::encode(
+
+        if ($this->request->query->get(Redirect::RETURN_URL)) {
+            $returnUrl = $this->request->query->get(Redirect::RETURN_URL);
+        } elseif ($this->getAuthorizer()->isPathAuthorizedForUser(
+            'learningBadgeAward.getAwardWithEvidence',
+            [
+                'awardId' => $award->getId(),
+            ]
+        )) {
+            $returnUrl = Redirect::encode(
                 $this->router->generate('learningBadgeAward.getAwardWithEvidence', [
                     'awardId' => $award->getId(),
                 ])
             );
+        } else {
+            $returnUrl = Redirect::encode(
+                $this->router->generate('searchUser.getProfile', [
+                    'userId' => $award->getRecipient()->getId(),
+                ])
+            );
+        }
 
         $this->response->content->set(
             $this->buildHtmlOutput(
