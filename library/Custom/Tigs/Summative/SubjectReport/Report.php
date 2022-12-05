@@ -701,7 +701,7 @@ class Report
          */
         if ($attributes->isHsc()) {
             if ($attributes->getYearLevel() === 11) {
-                $this->loadAssessmentsAndParticipation($courseSpec, $workTypeIds, $attributes, 2, 2);
+                $this->loadAssessmentsAndParticipation($courseSpec, $workTypeIds, $attributes, $semester, $semester);
 
                 $nesa = new NesaScoreGraphHSC(
                     $cohortUnitImpls,
