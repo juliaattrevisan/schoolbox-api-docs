@@ -497,6 +497,7 @@ class Controller extends Base
             'g.group_type' => Role::STUDENT,
         ]);
         $this->externalUser->loadParents($duplicates);
+        $this->externalUser->loadParents([$record->getStudent()]);
 
         /** @var Role $roleCurrent */
         foreach ($allowedRoles as $roleCurrent) {
@@ -516,7 +517,6 @@ class Controller extends Base
             if ($allowParents && $roleCurrent->isParent()) {
                 $roles->add($roleCurrent);
                 if ($record->getStudent()) {
-                    $this->externalUser->loadParents([$record->getStudent()]);
                     foreach ($record->getStudent()->getParents() as $parent) {
                         if ($parent->getRole()->getId() == $roleCurrent->getId()) {
                             $rolesWithUsers[$roleCurrent->getId()] = true;

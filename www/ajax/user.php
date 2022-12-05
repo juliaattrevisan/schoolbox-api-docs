@@ -107,6 +107,7 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && (str
     if ($filterParents) {
         try {
             $student = $userMapper->findById($_GET["studentId"] ?? null);
+            $externalUser->loadParents([$student]);
         } catch (\Schoolbox\Mapper\Exception $e) {
             // noop
         }
@@ -126,7 +127,6 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && (str
                 $userSchoolbox = $userCollection->offsetGet($userId);
                 if ($userSchoolbox) {
                     if ($userSchoolbox->getRole()->isParent()) {
-                        $externalUser->loadParents([$student]);
                         if (!$userSchoolbox->isParentOf($student)) {
                             continue;
                         }
