@@ -218,7 +218,8 @@ Data:
                                         </p>
                                     </a>
                                 </div>
-                                {% set publishedHumanReadableMark = cachedProjectMarks[participant.user.id].humanReadableMark ?? null %}
+
+                                {% set publishedHumanReadableMark = participant.humanReadableMark(true) ?? null %}
 
                                 {% if publishedHumanReadableMark is not null %}
                                     <div class="grade {{ urgency.marks(assessment.normalisedMark(participant, true)) }}-bg">
