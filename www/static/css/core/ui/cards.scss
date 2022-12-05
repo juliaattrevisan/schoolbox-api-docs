@@ -388,6 +388,22 @@
   select {
     margin-bottom: rem-calc(calc($base-font-size / 2));
   }
+
+  /* 
+  Check out BEM for more info on the below class naming here. https://getbem.com/introduction/ 
+  Ideally rows for course builder items probably wouldn't inherit from the 'card' class. However,
+  .card is used in so many locations it will require a thorough audit and careful hand to rework.
+  In lieu of reworking the class, having a specifically named/scoped fix will have to do.
+  */
+  
+  &--course-builder-row{
+    display: flex;
+
+    & p:last-child{
+      margin-bottom: 0;
+    }
+  }
+
 }
 
 .v-card-list {
