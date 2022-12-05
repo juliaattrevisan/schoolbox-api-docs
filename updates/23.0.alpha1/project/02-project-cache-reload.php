@@ -76,7 +76,14 @@ are stored after they're derived from their constituent assessments.
 Every project that exists in project_assessment will get re-derived and
 stored into this caching table for rapid retrievals later.
 
-Usage: 02-project-cache-reload.php
+Planning mode gives you a preview of what marks were found by the tool
+and won't be persisted until --perform is specified.
+
+* This tool updates records already existing in project_result
+* This tool won't delete records from project_result
+* Non-participant users are ignored though you shouldn't encounter this
+
+Usage: 02-project-cache-reload.php [--perform]
 
 
 HELP;
