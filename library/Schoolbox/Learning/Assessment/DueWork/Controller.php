@@ -465,6 +465,8 @@ class Controller extends Assessment\Controller
             /** @var Submission $response */
             foreach ($participant->getSubmittedResponses() as $response) {
                 // If the response is a submission...
+                // TODO put Kami files here
+                // TODO extract out of controller
                 if ($response instanceof Submission) {
                     // ...iterate all files in that submission and add them to
                     // the ZIP archive downloaded from taskd
@@ -478,6 +480,24 @@ class Controller extends Assessment\Controller
                             ),
                             $urlBase->setPath('/storage/fetch.php')->setQuery(['hash' => $file->getHash()]),
                         );
+                        if ($file->getKami()) {
+                            $messageFactory = $messageFactory->addFileContent(
+                                sprintf(
+                                    "%s/%s/%s",
+                                    $baseFolderName,
+                                    $response->getSubmittedAt()->getUsingFormat('Ymd-His'),
+                                    $this->sanitizeForFilename($file->getBasename() . '.kami.pdf')
+                                ),
+                                $urlBase->setPath(
+                                    $this->router->generate(
+                                        'learningDueWorkResponse.getKamiExport',
+                                        [
+                                            'kamiId' => $file->getKami()->getId(),
+                                        ],
+                                    ),
+                                ),
+                            );
+                        }
                     }
                 }
             }
