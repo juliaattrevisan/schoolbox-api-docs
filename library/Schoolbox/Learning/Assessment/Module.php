@@ -426,7 +426,8 @@ class Module extends BaseModule
                     $this->injector->get('taskd.downloadPagesMessageFactory'),
                     (new \Schoolbox\Url\Factory($this->getConfig()))->buildFullyQualified(),
                     $this->injector->get('l10n'),
-                    $this->getRouter()
+                    $this->getRouter(),
+                    new User\Translator\Author\ModelToArray(),
                 );
                 return new Assessment\DueWork\Controller(
                     $userMapper,
@@ -448,7 +449,6 @@ class Module extends BaseModule
                     $courseSpecMapper,
                     $unitSpecMapper,
                     $replicator,
-                    $this->injector->get('taskd.downloadPagesMessageFactory'),
                     $this->injector->get('taskd.messageProducer'),
                     $this->getMapperFactory()->get(\Schoolbox\Learning\Turnitin\File\Mapper::class),
                     $this->injector->get('feedbackDataSource'),

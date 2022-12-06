@@ -19,6 +19,7 @@ use Schoolbox\TaskDaemon\Request\DownloadPages\MessageFactory as BaseMessageFact
 use Schoolbox\TaskDaemon\Request\Message;
 use Schoolbox\User;
 use Schoolbox\User\Translator\Author\ModelToArray;
+use Schoolbox\User\Translator\ModelToArray as UserTranslator;
 
 /**
  * Message factory for due work ZIP downloads.
@@ -37,12 +38,15 @@ class MessageFactory
      * @param UriInterface       $urlBase            Required for building URIs which point back to this instance
      * @param RosettaStone       $rosettaStone       Required for translating the term "due work" for this instance
      * @param Router             $router             Required for building routes to download various parts of due work
+     * @param UserTranslator     $userTranslator     Required for translating the viewer to an array representation for
+     *                                               inclusion within the sent message.
      */
     public function __construct(
         private BaseMessageFactory $baseMessageFactory,
         private UriInterface $urlBase,
         private RosettaStone $rosettaStone,
         private Router $router,
+        private UserTranslator $userTranslator,
     ) {
     }
 
@@ -63,7 +67,6 @@ class MessageFactory
     {
         // Generate list of files to fetch via taskd, and add to a ZIP
         $messageFactory = (clone $this->baseMessageFactory);
-        $userSerializer = new ModelToArray();
 
         // Iterate participants and get their responses
         foreach ($dueWork->getAllParticipants() as $participant) {
@@ -73,9 +76,7 @@ class MessageFactory
                 continue;
             }
 
-            // Get the users details and generate an appropriate folder name
-//            $users[$participant->getUser()->getId()]
-//                ??= $this->getUserMapper()->findByIdWithFallback($participant->getUser()->getId());
+            // Generate an appropriate folder name
             $participantUser = $participant->getUser();
             $baseFolderName  = sprintf(
                 "%s_%s_%d",
@@ -168,8 +169,8 @@ class MessageFactory
                     ->toString()
             )
             ->setCallbackParams([
-                'from'    => call_user_func($userSerializer, $viewer),
-                'to'      => call_user_func($userSerializer, $viewer),
+                'from'    => call_user_func($this->userTranslator, $viewer),
+                'to'      => call_user_func($this->userTranslator, $viewer),
                 'message' => sprintf(
                     'Feedback and submissions for %s "%s" are ready to download',
                     $this->rosettaStone->translate('dueWork'),
