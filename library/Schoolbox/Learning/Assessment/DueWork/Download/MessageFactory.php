@@ -12,7 +12,6 @@ namespace Schoolbox\Learning\Assessment\DueWork\Download;
 use Alaress_Date_Format;
 use Aura\Router\Router;
 use Laminas\Uri\UriInterface;
-use Schoolbox\Assessment\Component\SubmissionBox\SingleFile\Model;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as DueWorkResponseFile;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
@@ -35,6 +34,11 @@ use Schoolbox\User\Translator\ModelToArray as UserTranslator;
  */
 class MessageFactory
 {
+    /**
+     * Standard date format for files generated within the ZIP file.
+     */
+    private const STANDARD_DATE_FORMAT = 'Ymd-His';
+
     /**
      * Constructor
      *
@@ -93,6 +97,7 @@ class MessageFactory
                         $this->generateResponseFileUrl($file),
                     );
 
+                    // If there's a Kami file: add that too
                     if ($file->getKami()) {
                         $messageFactory = $messageFactory->addFileContent(
                             $this->generateResponseFileKamiName($participant, $response, $file),
@@ -103,51 +108,27 @@ class MessageFactory
             }
 
             // Add this participant's submission history
-            /** @noinspection PhpUnhandledExceptionInspection - this route always exists */
-            $submissionHistoryPath = $this->router->generate(
-                'learningAssessment.getSummary',
-                [
-                    'assessmentId' => $participant->getAssessable()->getId(),
-                    'studentId'    => $participant->getUser()->getId(),
-                ],
-            );
-            $messageFactory        = $messageFactory->addPdfContent(
-                sprintf("%s/submissionHistory.pdf", $this->generateParticipantFolderName($participant)),
-                $this->urlBase
-                    ->setPath($submissionHistoryPath)
-                    ->toString(),
+            $messageFactory = $messageFactory->addPdfContent(
+                $this->generateParticipantSubmissionHistoryFileName($participant),
+                $this->generateParticipantSubmissionHistoryUrl($participant),
             );
         }
 
-        // Send the entire request to taskd
-        $title = sprintf(
-            "%s-%s.zip",
-            $this->sanitizeForFilename($dueWork->getTitle()),
-            Alaress_Date_Format::now()->getUsingFormat('Ymd-His'),
-        );
+        // Build the message to send
+        $zipFilename = $this->generateZipFilename($dueWork);
         return $messageFactory
             ->setUser($viewer)
-            ->setCallbackUrl(
-                $this->urlBase
-                    ->setPath(
-                        $this->router->generate(
-                            'apiusernotify.apiUserNotify',
-                            ['userId' => $viewer->getId()]
-                        )
-                    )
-                    ->setQuery(null)
-                    ->toString()
-            )
+            ->setCallbackUrl($this->generateCallbackUrl($viewer))
             ->setCallbackParams([
                 'from'    => call_user_func($this->userTranslator, $viewer),
                 'to'      => call_user_func($this->userTranslator, $viewer),
                 'message' => sprintf(
                     'Feedback and submissions for %s "%s" are ready to download',
                     $this->rosettaStone->translate('dueWork'),
-                    $title,
+                    $zipFilename,
                 ),
             ])
-            ->build($title);
+            ->build($zipFilename);
     }
 
     /**
@@ -191,7 +172,7 @@ class MessageFactory
         return sprintf(
             "%s/%s",
             $this->generateParticipantFolderName($participant),
-            $response->getSubmittedAt()->getUsingFormat('Ymd-His'),
+            $response->getSubmittedAt()->getUsingFormat(self::STANDARD_DATE_FORMAT),
         );
     }
 
@@ -247,7 +228,7 @@ class MessageFactory
         return sprintf(
             "%s/%s",
             $this->generateResponseFolderName($participant, $response),
-            $this->sanitizeForFilename($responseFile->getBasename() . '.kami.pdf').
+            $this->sanitizeForFilename($responseFile->getBasename() . '.kami.pdf'),
         );
     }
 
@@ -268,5 +249,76 @@ class MessageFactory
         return $this->urlBase
             ->setPath($kamiRoutePath)
             ->toString();
+    }
+
+    /**
+     * Generates a file name for this participant's submission history in the
+     * generated ZIP file.
+     *
+     * @param Participant $participant
+     * @return string
+     */
+    private function generateParticipantSubmissionHistoryFileName(Participant $participant): string
+    {
+        return sprintf("%s/submissionHistory.pdf", $this->generateParticipantFolderName($participant));
+    }
+
+    /**
+     * Generate a download URL for this participant's submission history.
+     *
+     * @param Participant $participant
+     * @return string
+     * @noinspection PhpDocMissingThrowsInspection - this route always exists
+     */
+    private function generateParticipantSubmissionHistoryUrl(Participant $participant): string
+    {
+        /** @noinspection PhpUnhandledExceptionInspection - this route always exists */
+        $submissionHistoryPath = $this->router->generate(
+            'learningAssessment.getSummary',
+            [
+                'assessmentId' => $participant->getAssessable()->getId(),
+                'studentId'    => $participant->getUser()->getId(),
+            ],
+        );
+        return $this->urlBase
+            ->setPath($submissionHistoryPath)
+            ->toString();
+    }
+
+    /**
+     * Generates the callback URL for the task daemon request.
+     *
+     * The ZIP will be attached to the notification raised by this file.
+     *
+     * @param User $viewer
+     * @return string
+     * @noinspection PhpDocMissingThrowsInspection - this route always exists
+     */
+    private function generateCallbackUrl(User $viewer): string
+    {
+        /** @noinspection PhpUnhandledExceptionInspection - this route always exists */
+        $callbackPath = $this->router->generate(
+            'apiusernotify.apiUserNotify',
+            ['userId' => $viewer->getId()]
+        );
+        return $this->urlBase
+            ->setPath($callbackPath)
+            ->setQuery(null)
+            ->toString();
+    }
+
+    /**
+     * Generates a filename for the downloaded ZIP file.
+     *
+     * @param DueWork $dueWork
+     * @return string
+     */
+    private function generateZipFilename(DueWork $dueWork): string
+    {
+        return sprintf(
+            "%s-%s.zip",
+            $this->sanitizeForFilename($dueWork->getTitle()),
+            Alaress_Date_Format::now()->getUsingFormat(self::STANDARD_DATE_FORMAT),
+        );
     }
 }
