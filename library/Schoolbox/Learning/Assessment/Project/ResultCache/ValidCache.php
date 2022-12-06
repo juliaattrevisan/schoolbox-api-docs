@@ -29,12 +29,12 @@ class ValidCache
      *
      * Returns true when IAssessable is not a Project instance
      *
-     * @param \Traversable     $postData
-     * @param IAssessable|null $assessment
+     * @param \Traversable|array $postData
+     * @param IAssessable|null   $assessment
      * @return bool|null
      * @throws \InvalidArgumentException
      */
-    public function isSatisfiedByProject(\Traversable $postData, ?IAssessable $assessment = null): ?bool
+    public function isSatisfiedByProject(\Traversable|array $postData, ?IAssessable $assessment = null): ?bool
     {
         /* $assessment is null? Nothing to do
          */
@@ -96,11 +96,11 @@ class ValidCache
      * Returns true when IAssessable is not an activity that exists inside Projects.
      * Activities are: Due Work, Task, Quiz
      *
-     * @param \Traversable     $postData
-     * @param IAssessable|null $assessment
+     * @param \Traversable|array $postData
+     * @param IAssessable|null   $assessment
      * @return bool|null
      */
-    public function isSatisfiedByActivity(\Traversable $postData, ?IAssessable $assessment = null): ?bool
+    public function isSatisfiedByActivity(\Traversable|array $postData, ?IAssessable $assessment = null): ?bool
     {
         /* $assessment is null? Nothing to do
          */
