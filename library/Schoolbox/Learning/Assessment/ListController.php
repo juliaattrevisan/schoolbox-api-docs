@@ -647,9 +647,9 @@ class ListController extends Web\Controller\Base
             $projectResultCacheDetetor = new ValidCache();
 
             if ($assessment instanceof Project) {
-                $cacheValid = $projectResultCacheDetetor->isSatisifiedByProject($postData, $assessment);
+                $cacheValid = $projectResultCacheDetetor->isSatisfiedByProject($postData, $assessment);
             } else {
-                $cacheValid = $projectResultCacheDetetor->isSatisifiedByActivity($postData, $assessment);
+                $cacheValid = $projectResultCacheDetetor->isSatisfiedByActivity($postData, $assessment);
             }
 
             $assessmentFactory = new Factory($user, $postData, $postData['assessmentType'], $originalAssessment);

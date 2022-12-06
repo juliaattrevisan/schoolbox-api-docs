@@ -34,7 +34,7 @@ class ValidCache
      * @return bool|null
      * @throws \InvalidArgumentException
      */
-    public function isSatisifiedByProject(\Traversable $postData, ?IAssessable $assessment = null): ?bool
+    public function isSatisfiedByProject(\Traversable $postData, ?IAssessable $assessment = null): ?bool
     {
         /* $assessment is null? Nothing to do
          */
@@ -100,7 +100,7 @@ class ValidCache
      * @param IAssessable|null $assessment
      * @return bool|null
      */
-    public function isSatisifiedByActivity(\Traversable $postData, ?IAssessable $assessment = null): ?bool
+    public function isSatisfiedByActivity(\Traversable $postData, ?IAssessable $assessment = null): ?bool
     {
         /* $assessment is null? Nothing to do
          */
