@@ -30,7 +30,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
             source: function(id, filesystem) {
                 return '/cms/sendVideo.php?id=' + id + '&type=' + filesystem;
             },
-            thumbnail: '/static/images/core/component/audio-thumbnail-processing.gif',
+            thumbnail: window.cdnPrefix +'/images/core/component/audio-thumbnail-processing.gif?v=' + window.siteVersion,
             regex: /^\/cms\/sendVideo/
         },
 
