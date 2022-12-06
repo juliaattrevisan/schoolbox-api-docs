@@ -465,8 +465,6 @@ class Controller extends Assessment\Controller
             /** @var Submission $response */
             foreach ($participant->getSubmittedResponses() as $response) {
                 // If the response is a submission...
-                // TODO put Kami files here
-                // TODO extract out of controller
                 if ($response instanceof Submission) {
                     // ...iterate all files in that submission and add them to
                     // the ZIP archive downloaded from taskd
