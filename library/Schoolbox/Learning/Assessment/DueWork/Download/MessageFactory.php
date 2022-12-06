@@ -14,8 +14,10 @@ use Aura\Router\Router;
 use Laminas\Uri\UriInterface;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as DueWorkResponseFile;
 use Schoolbox\L10n\RosettaStone;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
+use Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkResponse;
+use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Resource\Storage\IStorage;
@@ -85,24 +87,38 @@ class MessageFactory
 
             // Iterate all their submitted responses
             foreach ($participant->getSubmittedResponses() as $response) {
-                // If somehow the response isn't a submission: skip
-                if (!$response instanceof Submission) {
+                // If somehow the response isn't a due work response: skip
+                if (!$response instanceof DueWorkResponse) {
                     continue;
                 }
 
-                // Iterate all files in that submission and add them to the ZIP
+                // Iterate all files in that response and add them to the ZIP
                 foreach ($response->getAllFiles() as $file) {
                     $messageFactory = $messageFactory->addFileContent(
                         $this->generateResponseFileName($participant, $response, $file),
                         $this->generateResponseFileUrl($file),
                     );
+                }
+            }
 
-                    // If there's a Kami file: add that too
-                    if ($file->getKami()) {
-                        $messageFactory = $messageFactory->addFileContent(
-                            $this->generateResponseFileKamiName($participant, $response, $file),
-                            $this->generateResponseFileKamiUrl($file),
-                        );
+            // Iterate all their published feedbacks
+            foreach ($participant->getPublishedFeedbacks() as $feedback) {
+                // If somehow the feedback isn't a due work response: skip
+                if (!$feedback instanceof DueWorkFeedback) {
+                    continue;
+                }
+
+                // If there's a response to this feedback:
+                // add any Kami files to the feedback folder
+                $feedbackResponse = $feedback->getResponse();
+                if ($feedbackResponse) {
+                    foreach ($feedbackResponse->getAllFiles() as $file) {
+                        if ($file->getKami()) {
+                            $messageFactory = $messageFactory->addFileContent(
+                                $this->generateResponseFileKamiName($participant, $feedback, $file),
+                                $this->generateResponseFileKamiUrl($file),
+                            );
+                        }
                     }
                 }
             }
@@ -170,9 +186,25 @@ class MessageFactory
     private function generateResponseFolderName(Participant $participant, IResponse $response): string
     {
         return sprintf(
-            "%s/%s",
+            "%s/%s-submission",
             $this->generateParticipantFolderName($participant),
             $response->getSubmittedAt()->getUsingFormat(self::STANDARD_DATE_FORMAT),
+        );
+    }
+
+    /**
+     * Generates a base folder name for this participant and response.
+     *
+     * @param Participant $participant
+     * @param IFeedback   $feedback
+     * @return string
+     */
+    private function generateFeedbackFolderName(Participant $participant, IFeedback $feedback): string
+    {
+        return sprintf(
+            "%s/%s-feedback",
+            $this->generateParticipantFolderName($participant),
+            $feedback->getPublishedAt()->getUsingFormat(self::STANDARD_DATE_FORMAT),
         );
     }
 
@@ -212,22 +244,22 @@ class MessageFactory
     }
 
     /**
-     * Generates a file name for this participant, response and Kami file in the
+     * Generates a file name for this participant, feedback and Kami file in the
      * generated ZIP file.
      *
      * @param Participant         $participant
-     * @param IResponse           $response
+     * @param IFeedback           $feedback
      * @param DueWorkResponseFile $responseFile
      * @return string
      */
     private function generateResponseFileKamiName(
         Participant $participant,
-        IResponse $response,
+        IFeedback $feedback,
         DueWorkResponseFile $responseFile,
     ): string {
         return sprintf(
             "%s/%s",
-            $this->generateResponseFolderName($participant, $response),
+            $this->generateFeedbackFolderName($participant, $feedback),
             $this->sanitizeForFilename($responseFile->getBasename() . '.kami.pdf'),
         );
     }
