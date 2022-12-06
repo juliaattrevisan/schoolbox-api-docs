@@ -257,10 +257,16 @@ class MessageFactory
         IFeedback $feedback,
         DueWorkResponseFile $responseFile,
     ): string {
+        // Does this basename have a .pdf extension already?
+        // If so, keep it: otherwise append .pdf
+        $basename = match (strtolower($responseFile->getExtension())) {
+            'pdf'   => $responseFile->getFilename(),
+            default => $responseFile->getBasename(),
+        };
         return sprintf(
-            "%s/%s",
+            "%s/kami/%s.pdf",
             $this->generateFeedbackFolderName($participant, $feedback),
-            $this->sanitizeForFilename($responseFile->getBasename() . '.kami.pdf'),
+            $this->sanitizeForFilename($basename),
         );
     }
 
