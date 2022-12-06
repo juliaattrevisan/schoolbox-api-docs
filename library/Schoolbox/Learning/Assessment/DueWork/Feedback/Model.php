@@ -19,11 +19,10 @@ use Schoolbox\Learning\Assessment\ISelfAssessableFeedback;
 use UnexpectedValueException;
 
 /**
- * @method DueWork\Response\Model getResponse()
+ * @method DueWork\Response\Model|null getResponse()
  */
 class Model extends AbstractFeedback implements ISelfAssessableFeedback
 {
-
     /**
      * All the Files that are part of the Feedback made by Teacher
      *
