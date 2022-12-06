@@ -1362,6 +1362,10 @@ class Controller extends Base
             return $recordActions;
         }
 
+        if (!is_array($post->get('actions') ?? [])) {
+            throw new SchoolboxException('actions need to be passed as an array');
+        }
+
         $postedActionIds = array_map('intval', array_filter($post->get('actions') ?? []));
 
         $actions =
