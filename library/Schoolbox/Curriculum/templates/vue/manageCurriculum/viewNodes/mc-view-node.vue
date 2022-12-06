@@ -222,7 +222,11 @@ const hasActions = computed(() => !store.isReadOnly && props.node.id !== UNSET_I
 
 <template>
     <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
-        <li v-if="showNode" ref="viewNodeEl">
+        <li
+            v-if="showNode"
+            ref="viewNodeEl"
+            data-test-node
+        >
             <div
                 class="buttons-container"
                 :data-enabled="props.node.enabled"
@@ -240,6 +244,7 @@ const hasActions = computed(() => !store.isReadOnly && props.node.id !== UNSET_I
                     :depth="props.depth"
                     :title="title"
                     :isUpdatingOrAdding="isUpdatingOrAdding"
+                    data-test-view-node-name
                 />
                 <mc-view-node-actions
                     v-if="hasActions"
@@ -262,6 +267,7 @@ const hasActions = computed(() => !store.isReadOnly && props.node.id !== UNSET_I
                     :key="node.id"
                     :node="node"
                     :depth="props.depth+1"
+                    data-test-view-node
                 />
             </ul>
         </li>

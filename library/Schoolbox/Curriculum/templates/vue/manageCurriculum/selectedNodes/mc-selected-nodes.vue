@@ -55,23 +55,45 @@ function onDeleteNodesSelected () {
 <template>
     <div class="small-12 island">
         <bottom-drawer :showDrawer="selectedNodesStore.hasNodes && !updateNodeStore.isOpen && !addSubsectionStore.isOpen">
-            <div v-if="selectedNodesStore.hasNodes" class="selected-nodes-container">
+            <div v-if="selectedNodesStore.hasNodes" class="selected-nodes-container" data-test-nodes-container>
                 <mc-selected-node
                     v-for="node in selectedNodesStore.nodes"
                     :key="node.id"
                     :node="node"
+                    data-test-node
                 />
             </div>
             <p v-if="selectedNodesStore.hasDisabledChildNodes && !selectedNodesStore.allNodesEnabled" class="meta">If you wish to re-enable disabled nodes, please enable the disabled parent.</p>
             <ul class="flex-list">
                 <li v-if="selectedNodesStore.allNodesEnabled">
-                    <button class="button icon-view-hollow" @click.prevent="onEnableNodesSelected(false)" @keyup.enter="onEnableNodesSelected(false)">Disable {{ selectedNodesSummary }}</button>
+                    <button
+                        class="button icon-view-hollow"
+                        data-test-disable-nodes
+                        @click.prevent="onEnableNodesSelected(false)"
+                        @keyup.enter="onEnableNodesSelected(false)"
+                    >
+                        Disable {{ selectedNodesSummary }}
+                    </button>
                 </li>
                 <li v-else-if="selectedNodesStore.allNodesDisabled">
-                    <button class="button icon-view" @click.prevent="onEnableNodesSelected(true)" @keyup.enter="onEnableNodesSelected(true)">Enable {{ selectedNodesSummary }}</button>
+                    <button
+                        class="button icon-view"
+                        data-test-enable-nodes
+                        @click.prevent="onEnableNodesSelected(true)"
+                        @keyup.enter="onEnableNodesSelected(true)"
+                >
+                    Enable {{ selectedNodesSummary }}
+                </button>
                 </li>
                 <li>
-                    <button class="button icon-delete alert" @click.prevent="onDeleteNodesSelected" @keyup.enter="onDeleteNodesSelected">Delete {{ selectedNodesSummary }}</button>
+                    <button
+                        class="button icon-delete alert"
+                        data-test-delete-nodes
+                        @click.prevent="onDeleteNodesSelected"
+                        @keyup.enter="onDeleteNodesSelected"
+                    >
+                        Delete {{ selectedNodesSummary }}
+                    </button>
                 </li>
             </ul>
         </bottom-drawer>

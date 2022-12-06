@@ -53,7 +53,7 @@ watch(() => selectedNodesStore.nodesIds, () => {
 </script>
 
 <template>
-    <div v-if="selectedNodesStore.hasNodes" class="selected-nodes-container" data-test-container>
+    <div v-if="selectedNodesStore.hasNodes" class="selected-nodes-container" data-test-nodes-container>
         <cs-selected-node
             v-for="node in selectedNodesStore.nodes"
             :key="node.id"
@@ -61,7 +61,7 @@ watch(() => selectedNodesStore.nodesIds, () => {
             data-test-node
         />
     </div>
-    <div v-else-if="selectedNodesStore.hasNoNodes && store.isReadOnly" class="selected-nodes-container" data-test-container>
+    <div v-else-if="selectedNodesStore.hasNoNodes && store.isReadOnly" class="selected-nodes-container">
         <aside class="meta no-codes-note">No Curriculum Codes have been selected</aside>
     </div>
     <input :id="store.formValueName" :name="store.formValueName" type="hidden" tabindex="-1" :value="ids" />

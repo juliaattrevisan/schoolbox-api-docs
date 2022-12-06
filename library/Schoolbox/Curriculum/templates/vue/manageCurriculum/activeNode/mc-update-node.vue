@@ -121,10 +121,25 @@ const isUpdateDisabled = computed(() => {
                 <div class="small-12 columns">
                     <ul class="flex-list">
                         <li>
-                            <button @click.prevent="onCancelSelected" @keyup.enter="onCancelSelected" class="button icon-close" :disabled="updateNodeStore.isProcessing">Cancel</button>
+                            <button
+                                class="button icon-close"
+                                :disabled="updateNodeStore.isProcessing"
+                                @click.prevent="onCancelSelected"
+                                @keyup.enter="onCancelSelected"
+                            >
+                                Cancel
+                            </button>
                         </li>
                         <li>
-                            <button @click.prevent="onUpdateSelected" @keyup.enter="onUpdateSelected" class="button icon-modify submit" :disabled="isUpdateDisabled">{{ updateButtonText }}</button>
+                            <button
+                                class="button icon-modify submit"
+                                :disabled="isUpdateDisabled"
+                                data-test-update-node
+                                @click.prevent="onUpdateSelected"
+                                @keyup.enter="onUpdateSelected"
+                            >
+                                {{ updateButtonText }}
+                            </button>
                         </li>
                     </ul>
                 </div>

@@ -39,14 +39,21 @@ watch(() => viewNodesStore.nodesWithSearch, () => {
 </script>
 
 <template>
-    <div class="small-12 columns">
+    <div class="small-12 columns" data-test-view-nodes>
         <div v-if="nodesStore.isLoading || searchStore.isLoading">
             <loading-table />
         </div>
         <div v-else-if="searchStore.hasNoResults" class="empty-state-flex-centered">
             <i class="icon-curriculum"></i>
             <p>No Curriculum matches your current search.</p>
-            <button @click.prevent="onClearSearchSelected" @keyup.enter="onClearSearchSelected" title="Clear the current search">Clear search</button>
+            <button
+                title="Clear the current search"
+                data-test-clear-search
+                @click.prevent="onClearSearchSelected"
+                @keyup.enter="onClearSearchSelected"
+            >
+                Clear search
+            </button>
         </div>
         <ul v-else ref="nodesContainerEl">
             <mc-view-node
@@ -54,6 +61,7 @@ watch(() => viewNodesStore.nodesWithSearch, () => {
                 :key="node.id"
                 :node="node"
                 :depth="depth"
+                data-test-view-node
             />
         </ul>
     </div>

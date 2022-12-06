@@ -120,10 +120,25 @@ const isAddDisabled = computed(() => {
                 <div class="small-12 columns">
                     <ul class="flex-list">
                         <li>
-                            <button @click.prevent="onCancelSelected" @keyup.enter="onCancelSelected" class="button icon-close" :disabled="addSubsectionStore.isProcessing">Cancel</button>
+                            <button
+                                class="button icon-close"
+                                :disabled="addSubsectionStore.isProcessing"
+                                @click.prevent="onCancelSelected"
+                                @keyup.enter="onCancelSelected"
+                            >
+                                Cancel
+                            </button>
                         </li>
                         <li>
-                            <button @click.prevent="onAddSubsectionSelected" @keyup.enter="onAddSubsectionSelected" class="button icon-add submit" :disabled="isAddDisabled">{{ addButtonText }}</button>
+                            <button
+                                class="button icon-add submit"
+                                data-test-add-subsection
+                                :disabled="isAddDisabled"
+                                @click.prevent="onAddSubsectionSelected"
+                                @keyup.enter="onAddSubsectionSelected"
+                            >
+                                {{ addButtonText }}
+                            </button>
                         </li>
                     </ul>
                 </div>
