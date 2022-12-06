@@ -77,7 +77,9 @@ class External_Synergetic_Tsc_User extends External_Synergetic_User
                         vStudentsAll.IndigenousFlag,
                         vStudentsAll.StudentTSIFlag,
                         $learningPlanQuery,
-                        uLECaseManager.LECaseManagerName
+                        uLECaseManager.LECaseManagerID,
+                        uLECaseManager.LECaseManagerName,
+                        uLECaseManager.*
             FROM        dbo.vStudentsAll vStudentsAll
             LEFT JOIN   CommunityAlerts ON
                             CommunityAlerts.ID = StudentID AND
@@ -134,6 +136,20 @@ class External_Synergetic_Tsc_User extends External_Synergetic_User
 
         if (!empty($student) && is_array($student['AlertMessage'])) {
             $student['AlertMessage'] = array_unique(array_filter($student['AlertMessage']));
+        }
+
+        /* Arbitrarily find the Learning Enrichment Case Manager via
+         * their external id so we can link them to a profile screen
+         * via their schoolbox user id
+         */
+        $student['LECaseManagerUserId'] = null;
+
+        if ('' !== trim((string)$student['LECaseManagerID'])) {
+            try {
+                $student['LECaseManagerUserId'] = \Schoolbox\UserMapper::getInstance()->findByExternalId($student['LECaseManagerID'])->getId();
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                // noop: schoolbox user doesn't exist with this external id
+            }
         }
 
         // Remove Synergetic's annoying 'Not Selected' default value for lookups
