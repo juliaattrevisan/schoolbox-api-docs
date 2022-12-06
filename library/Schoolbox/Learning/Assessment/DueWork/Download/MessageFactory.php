@@ -12,11 +12,14 @@ namespace Schoolbox\Learning\Assessment\DueWork\Download;
 use Alaress_Date_Format;
 use Aura\Router\Router;
 use Laminas\Uri\UriInterface;
+use Schoolbox\Assessment\Component\SubmissionBox\SingleFile\Model;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as DueWorkResponseFile;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\TaskDaemon\Request\DownloadPages\MessageFactory as BaseMessageFactory;
 use Schoolbox\TaskDaemon\Request\Message;
 use Schoolbox\User;
@@ -62,7 +65,6 @@ class MessageFactory
      * @param DueWork $dueWork The due work to build a message for.
      * @param User    $viewer  The user who is requesting the due work ZIP.
      * @return Message
-     * @noinspection PhpDocMissingThrowsInspection - routes added always exist
      */
     public function buildForAssessment(DueWork $dueWork, User $viewer): Message
     {
@@ -85,35 +87,16 @@ class MessageFactory
                 }
 
                 // Iterate all files in that submission and add them to the ZIP
-                // archive downloaded from taskd
-                $responseFolderName = $this->generateResponseFolderName($participant, $response);
                 foreach ($response->getAllFiles() as $file) {
                     $messageFactory = $messageFactory->addFileContent(
-                        sprintf(
-                            "%s/%s",
-                            $responseFolderName,
-                            $this->sanitizeForFilename($file->getBasename()),
-                        ),
-                        $this->urlBase
-                            ->setPath('/storage/fetch.php')
-                            ->setQuery(['hash' => $file->getHash()])
-                            ->toString(),
+                        $this->generateResponseFileName($participant, $response, $file),
+                        $this->generateResponseFileUrl($file),
                     );
+
                     if ($file->getKami()) {
-                        /** @noinspection PhpUnhandledExceptionInspection - this route always exists */
-                        $kamiRoutePath  = $this->router->generate(
-                            'learningDueWorkResponse.getKamiExport',
-                            ['kamiId' => $file->getKami()->getId(),],
-                        );
                         $messageFactory = $messageFactory->addFileContent(
-                            sprintf(
-                                "%s/%s",
-                                $responseFolderName,
-                                $this->sanitizeForFilename($file->getBasename() . '.kami.pdf')
-                            ),
-                            $this->urlBase
-                                ->setPath($kamiRoutePath)
-                                ->toString(),
+                            $this->generateResponseFileKamiName($participant, $response, $file),
+                            $this->generateResponseFileKamiUrl($file),
                         );
                     }
                 }
@@ -210,5 +193,80 @@ class MessageFactory
             $this->generateParticipantFolderName($participant),
             $response->getSubmittedAt()->getUsingFormat('Ymd-His'),
         );
+    }
+
+    /**
+     * Generates a file name for this participant, response and file in the
+     * generated ZIP file.
+     *
+     * @param Participant $participant
+     * @param IResponse   $response
+     * @param IStorage    $responseFile
+     * @return string
+     */
+    private function generateResponseFileName(
+        Participant $participant,
+        IResponse $response,
+        IStorage $responseFile,
+    ): string {
+        return sprintf(
+            "%s/%s",
+            $this->generateResponseFolderName($participant, $response),
+            $this->sanitizeForFilename($responseFile->getBasename()),
+        );
+    }
+
+    /**
+     * Generates a download URL for this file.
+     *
+     * @param IStorage $responseFile
+     * @return string
+     */
+    private function generateResponseFileUrl(IStorage $responseFile): string
+    {
+        return $this->urlBase
+            ->setPath('/storage/fetch.php')
+            ->setQuery(['hash' => $responseFile->getHash()])
+            ->toString();
+    }
+
+    /**
+     * Generates a file name for this participant, response and Kami file in the
+     * generated ZIP file.
+     *
+     * @param Participant         $participant
+     * @param IResponse           $response
+     * @param DueWorkResponseFile $responseFile
+     * @return string
+     */
+    private function generateResponseFileKamiName(
+        Participant $participant,
+        IResponse $response,
+        DueWorkResponseFile $responseFile,
+    ): string {
+        return sprintf(
+            "%s/%s",
+            $this->generateResponseFolderName($participant, $response),
+            $this->sanitizeForFilename($responseFile->getBasename() . '.kami.pdf').
+        );
+    }
+
+    /**
+     * Generate a download URL for this file's Kami annotation.
+     *
+     * @param DueWorkResponseFile $responseFile
+     * @return string
+     * @noinspection PhpDocMissingThrowsInspection - this route always exists
+     */
+    private function generateResponseFileKamiUrl(DueWorkResponseFile $responseFile): string
+    {
+        /** @noinspection PhpUnhandledExceptionInspection - this route always exists */
+        $kamiRoutePath  = $this->router->generate(
+            'learningDueWorkResponse.getKamiExport',
+            ['kamiId' => $responseFile->getKami()->getId(),],
+        );
+        return $this->urlBase
+            ->setPath($kamiRoutePath)
+            ->toString();
     }
 }
