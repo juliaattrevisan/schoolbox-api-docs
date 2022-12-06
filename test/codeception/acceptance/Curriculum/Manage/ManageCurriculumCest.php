@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ManageCurriculum;
+namespace Curriculum\Manage;
 
 use AcceptanceTester;
 use Page\Curriculum\Manage\ManageCurriculum;
