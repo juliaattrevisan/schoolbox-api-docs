@@ -149,6 +149,7 @@ function onBrowseSelected () {
             data-search-select-search-input
         />
         <button
+            type="button"
             v-if="store.hasLoadedOk"
             class="button icon-curriculum"
             title="Browse and select from the Curriculum"

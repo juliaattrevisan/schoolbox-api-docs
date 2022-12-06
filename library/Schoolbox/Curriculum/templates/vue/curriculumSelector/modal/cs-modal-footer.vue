@@ -49,8 +49,8 @@ const isSaveDisabled = computed(() => selectedNodesStore.hasNoNodes && modalSele
 
 <template>
     <ul class="flex-list buttons">
-        <li><button @click.prevent="onCancelled" class="button" :disabled="false">Cancel</button></li>
-        <li><button @click.prevent="onSelected" class="button submit" :disabled="isSaveDisabled">{{ saveText }}</button></li>
+        <li><button type="button" @click.prevent="onCancelled" class="button" :disabled="false">Cancel</button></li>
+        <li><button type="button" @click.prevent="onSelected" class="button submit" :disabled="isSaveDisabled">{{ saveText }}</button></li>
     </ul>
 </template>
 

@@ -142,6 +142,7 @@ function highlightSearchInElement (toHighlight) {
 
 <template>
     <button
+        type="button"
         v-if="isButton"
         class="button-name"
         :title="`View ${props.title}`"

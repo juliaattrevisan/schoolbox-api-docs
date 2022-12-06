@@ -56,6 +56,7 @@ function onRemoveSelected () {
 <template>
    <div class="selected-node">
         <button
+            type="button"
             class="title-button"
             :title="`View ${props.node.name}`"
             :disabled="isDisabled"
@@ -65,6 +66,7 @@ function onRemoveSelected () {
             {{ props.node.code }}
         </button>
         <button
+            type="button"
             v-if="!store.isReadOnly"
             class="remove-button icon-close"
             :title="`Remove ${props.node.name}`"
