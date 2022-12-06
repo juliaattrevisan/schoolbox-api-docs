@@ -144,18 +144,18 @@ class GDriveFetcher implements FetcherInterface
     {
         if ($refresh || empty($this->metaCache[$fileId])) {
             $params = [
-                'fields'            => implode(
+                'fields' => implode(
                     ',',
                     [
-                           'name',
-                           'capabilities',
-                           self::CONTEXT_EXPORTLINKS,
-                           'fileExtension',
-                           'mimeType',
-                           'id',
-                           'webViewLink',
-                           'originalFilename',
-                       ]
+                        'name',
+                        'capabilities',
+                        self::CONTEXT_EXPORTLINKS,
+                        'fileExtension',
+                        'mimeType',
+                        'id',
+                        'webViewLink',
+                        'originalFilename',
+                    ]
                 ),
                 'supportsAllDrives' => 'true',
             ];
@@ -264,15 +264,15 @@ class GDriveFetcher implements FetcherInterface
     private function callListPermissions(string $fileId, ?string $pageToken = null)
     {
         $params = [
-            'fields'            => implode(
+            'fields' => implode(
                 ',',
                 [
-                       'kind',
-                       'nextPageToken',
-                       'permissions/role',
-                       'permissions/emailAddress',
-                       'permissions/id',
-                   ]
+                    'kind',
+                    'nextPageToken',
+                    'permissions/role',
+                    'permissions/emailAddress',
+                    'permissions/id',
+                ]
             ),
             'supportsAllDrives' => 'true',
         ];
@@ -384,20 +384,40 @@ class GDriveFetcher implements FetcherInterface
             return null;
         }
 
-        if ($this->isPdfExportEnabled($metadata) && $metadata[self::CONTEXT_EXPORTLINKS]['application/pdf']) {
-            return $metadata[self::CONTEXT_EXPORTLINKS]['application/pdf'];
+        // Example of what to expect in $metadata[self::CONTEXT_EXPORTLINKS] if that array key exists.
+        // (The below example is from a var_export() obtained when trying to upload a spreadsheet file using a Google Drive file selector)
+        // More info here: https://developers.google.com/drive/api/v3/reference/files?hl=en
+        //  'exportLinks' =>
+        //  array (
+        //    'application/x-vnd.oasis.opendocument.spreadsheet' => 'https://docs.google.com/spreadsheets/export?id=1mlOx3qbEPhoNYNr6G3ArvmavHg1BTXQBizlyiyd23cA&exportFormat=ods',
+        //    'text/tab-separated-values' => 'https://docs.google.com/spreadsheets/export?id=1mlOx3qbEPhoNYNr6G3ArvmavHg1BTXQBizlyiyd23cA&exportFormat=tsv',
+        //    'application/pdf' => 'https://docs.google.com/spreadsheets/export?id=1mlOx3qbEPhoNYNr6G3ArvmavHg1BTXQBizlyiyd23cA&exportFormat=pdf',
+        //    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => 'https://docs.google.com/spreadsheets/export?id=1mlOx3qbEPhoNYNr6G3ArvmavHg1BTXQBizlyiyd23cA&exportFormat=xlsx',
+        //    'text/csv' => 'https://docs.google.com/spreadsheets/export?id=1mlOx3qbEPhoNYNr6G3ArvmavHg1BTXQBizlyiyd23cA&exportFormat=csv',
+        //    'application/zip' => 'https://docs.google.com/spreadsheets/export?id=1mlOx3qbEPhoNYNr6G3ArvmavHg1BTXQBizlyiyd23cA&exportFormat=zip',
+        //    'application/vnd.oasis.opendocument.spreadsheet' => 'https://docs.google.com/spreadsheets/export?id=1mlOx3qbEPhoNYNr6G3ArvmavHg1BTXQBizlyiyd23cA&exportFormat=ods',
+        //  )
+        $metadataExportLinks = $metadata[self::CONTEXT_EXPORTLINKS] ?? [];
+
+        if (!is_array($metadataExportLinks)) {
+            trigger_error("Metadata for key '" . self::CONTEXT_EXPORTLINKS . "' did not contain array.", E_USER_WARNING);
+            $metadataExportLinks = [];
+        }
+
+        if (array_key_exists('application/pdf', $metadataExportLinks) && $this->isPdfExportEnabled($metadata)) {
+            return $metadataExportLinks['application/pdf'];
         }
 
         $allowedFilesMime = isset(self::MIMETYPE_MAPPING[$metadata['mimeType']])
             ? self::MIMETYPE_MAPPING[$metadata['mimeType']][self::CONTEXT_EXPORT_MIMETYPE]
             : null;
 
-        if (($allowedFilesMime !== null) && $metadata[self::CONTEXT_EXPORTLINKS][$allowedFilesMime]) {
-            return $metadata[self::CONTEXT_EXPORTLINKS][$allowedFilesMime];
+        if ($allowedFilesMime !== null && array_key_exists($allowedFilesMime, $metadataExportLinks)) {
+            return $metadataExportLinks[$allowedFilesMime];
         }
 
-        if (is_array($metadata[self::CONTEXT_EXPORTLINKS]) && !empty($metadata[self::CONTEXT_EXPORTLINKS])) {
-            return array_shift($metadata[self::CONTEXT_EXPORTLINKS]);
+        if (count($metadataExportLinks) > 0) {
+            return array_shift($metadataExportLinks);
         }
 
         return self::GOOGLE_API . "/files/{$metadata['id']}?alt=media";
