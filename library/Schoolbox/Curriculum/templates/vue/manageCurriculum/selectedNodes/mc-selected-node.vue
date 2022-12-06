@@ -71,7 +71,8 @@ function onRemoveSelected () {
         class="selected-node"
         :data-enabled="props.node.enabled"
     >
-        <div
+        <button
+            type="button"
             class="title-button"
             :title="`View ${props.node.name}`"
             :disabled="isDisabled"
@@ -79,14 +80,15 @@ function onRemoveSelected () {
             @keyup.enter="onTitleSelected"
             data-test-title-button>
             {{ title }}
-        </div>
-        <div
+        </button>
+        <button
+            type="button"
             class="remove-button icon-close"
             :title="`Remove ${props.node.name}`"
             @click.prevent="onRemoveSelected"
             @keyup.enter="onRemoveSelected"
             data-test-remove-button>
-        </div>
+        </button>
     </div>
 </template>
 

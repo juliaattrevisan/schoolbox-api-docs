@@ -18,9 +18,7 @@ const modalSelectedNodesStore = useModalSelectedNodesStore();
  * Close the modal
  */
 function onCancelled () {
-    if(!isSaveDisabled) {
-        modalStore.cancel();
-    }
+    modalStore.cancel();
 }
 
 /**
@@ -51,15 +49,11 @@ const isSaveDisabled = computed(() => selectedNodesStore.hasNoNodes && modalSele
 
 <template>
     <ul class="flex-list buttons">
-        <li><div @click="onCancelled" class="button">Cancel</div></li>
-        <li><div @click="onSelected" class="button submit">{{ saveText }}</div></li>
+        <li><button type="button" @click.prevent="onCancelled" class="button" :disabled="false">Cancel</button></li>
+        <li><button type="button" @click.prevent="onSelected" class="button submit" :disabled="isSaveDisabled">{{ saveText }}</button></li>
     </ul>
 </template>
 
 <style scoped>
-.flex-list.buttons .button {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 0;
-}
+
 </style>

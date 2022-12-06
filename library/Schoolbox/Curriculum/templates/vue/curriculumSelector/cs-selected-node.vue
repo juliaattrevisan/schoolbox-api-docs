@@ -55,23 +55,25 @@ function onRemoveSelected () {
 
 <template>
    <div class="selected-node">
-        <div
+        <button
+            type="button"
             class="title-button"
             :title="`View ${props.node.name}`"
             :disabled="isDisabled"
-            @click="onTitleSelected"
+            @click.prevent="onTitleSelected"
             @keyup.enter="onTitleSelected"
             data-test-title-button>
             {{ props.node.code }}
-        </div>
-        <div
+        </button>
+        <button
+            type="button"
             v-if="!store.isReadOnly"
             class="remove-button icon-close"
             :title="`Remove ${props.node.name}`"
             @click.prevent="onRemoveSelected"
             @keyup.enter="onRemoveSelected"
             data-test-remove-button>
-        </div>
+        </button>
     </div>
 </template>
 
