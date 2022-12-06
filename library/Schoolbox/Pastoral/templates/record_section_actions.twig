@@ -55,39 +55,55 @@
          * @@param {object} action - the returned pastoral action object, containing the action details
          * @returns {string} - the html markup as string
          */
-        function getActionMarkup(action) {
+        function getDateAndUser(action) {
             return `
             <div data-action-status-${action.id}>
-                <span class="meta" title="${action.updatedAt}">
+                <span class="meta" title="${dayjs(action.updatedAt).format('DD/MM/YYYY h:ma')}">
                     Completed <time>${ dayjs(action.updatedAt).fromNow()}</time>
                 </span>
-                <a href="/search/user/${ action.updatedBy.id }" title="${ action.updatedBy.fullname }" class="profile-img">
-                    <img src="/portrait.php?id=${ action.updatedBy.id }&amp;size=square32" alt="Profile photo of ${ action.updatedBy.fullname }" class="portrait">
+                <a href="/search/user/${ action.updatedBy.id }" title="${ action.updatedBy.fullName }" class="profile-img">
+                    <img src="/portrait.php?id=${ action.updatedBy.id }&amp;size=square32" alt="Profile photo of ${ action.updatedBy.fullName }" class="portrait">
                 </a>
-            </div>`;
+            </div>`
+        }
+
+        /**
+         * Add/remove a strike through the pastoral action depending on whether its been completed
+         *
+         * @param {string} checkboxId - the checkbox id linked to the label to update
+         * @param {object} action - the returned pastoral action object, containing the action details
+         */
+        function updateStrike(checkboxId, action) {
+            const label = document.querySelector(`label[for="${checkboxId}"]`);
+            action.completed ? label.classList.add('strike') : label.classList.remove('strike');
+        }
+
+        /**
+         * Add/remove the date and user who completed the pastoral action
+         *
+         * @param {object} action - the returned pastoral action object, containing the action details
+         */
+        function updateDateAndUser(action) {
+            if (action.completed) {
+                const dateAndUser = getDateAndUser(action);
+                const listItem = document.querySelector(`[data-list-item-${action.id}]`);
+                listItem.insertAdjacentHTML('beforeend', dateAndUser);
+            } else {
+                const dateAndUser = document.querySelector(`[data-action-status-${action.id}]`);
+                dateAndUser.remove();
+            }
         }
 
         /**
          * Add/remove a strike through the pastoral action depending on whether its been completed
          * Also if the action is marked as complete, display who marked it and when
-         *
-         * @param {number} actionId - the pastoral action id
+
+         * @param {string} checkboxId - the checkbox id linked to the label to update
          * @param {object} action - the returned pastoral action object, containing the action details
          */
-        function displayActionChange(actionId, action) {
-            console.warn(action);
-            const actionLabel = document.querySelector(`label[for="${actionId}"]`);
-            action.completed ? actionLabel.classList.add('strike') : actionLabel.classList.remove('strike');
-
-            if (action.completed) {
-                const actionStatus = getActionMarkup(action);
-                const actionListItem = document.querySelector(`[data-list-item-${action.id}]`);
-                actionListItem.innerHTML += actionStatus;
-            } else {
-                const actionStatus = document.querySelector(`[data-action-status-${action.id}]`);
-                actionStatus.remove();
-            }
-
+        function displayChange(checkboxId, action) {
+            updateStrike(checkboxId, action);
+            updateDateAndUser(action);
         }
 
         /**
@@ -95,7 +111,7 @@
          *
          * @param {HTMLInputElement} checkbox - the checkbox linked to the pastoral action
          */
-        async function submitActionChange(checkbox) {
+        async function submitChange(checkbox) {
             try {
                 const response = await fetch('{{ routeLookupIfAuthorized('pastoral.postActionUpdate', {recordId: record.id, record: record}) }}', {
                     method: 'POST',
@@ -103,12 +119,12 @@
                 });
                 if (response.ok) {
                     const responseJson = await response.json();
-                    const actionId = checkbox.getAttribute('id');
+                    const checkboxId = checkbox.getAttribute('id');
                     responseJson.recordActions.forEach((action) => { // all pastoral actions are returned
-                        if (actionId !== `action-${action.id}`) { // so we need to determine which was just changed
+                        if (checkboxId !== `action-${action.id}`) { // so we need to determine which was just changed
                             return;
                         }
-                        displayActionChange(actionId, action);
+                        displayChange(checkboxId, action);
                     });
                     $toast.toastTimeout({text: 'Action updated.', css: 'success'});
                 } else {
@@ -125,7 +141,7 @@
          */
         Array.from(document.querySelectorAll('[data-pastoral-action]')).forEach((checkbox) => {
             checkbox.addEventListener('change', () => {
-                submitActionChange(checkbox);
+                submitChange(checkbox);
             });
         });
 
