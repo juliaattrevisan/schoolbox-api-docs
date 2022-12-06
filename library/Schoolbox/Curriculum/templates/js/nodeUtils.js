@@ -48,7 +48,7 @@ export function getEmptyNode () {
  *
  * @param { array }
  */
-export function sortByName (array, id) {
+export function sortNodes (array, id) {
     array.sort((a, b) => {
         return a.name.localeCompare(b.name, undefined, {
             numeric: true,

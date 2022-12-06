@@ -3,7 +3,7 @@
  */
 
 import { defineStore } from 'pinia';
-import { UNSET_ID, findById, sortByName, removeId, getBreadcrumbs } from '@schoolboxCurriculum/js/nodeUtils';
+import { UNSET_ID, findById, sortNodes, removeId, getBreadcrumbs } from '@schoolboxCurriculum/js/nodeUtils';
 import { useStore, apiEndpoint } from './manageCurriculumStore';
 import { useViewNodesStore } from '../viewNodes/store/mcViewNodesStore';
 import { useSelectedNodesStore } from '../selectedNodes/store/mcSelectedNodesStore';
@@ -195,7 +195,7 @@ export const useNodesStore = defineStore('mcNodes', {
          */
         addNewCurriculum (curriculum) {
             this.nodes.children.push(curriculum);
-            sortByName(this.nodes.children);
+            sortNodes(this.nodes.children);
         },
 
         /**
@@ -206,9 +206,9 @@ export const useNodesStore = defineStore('mcNodes', {
         nodeUpdated (node) {
             if (node.parent) { //sort via the parent node
                 const parentNode = findById(this.nodes.children, node.parent.id);
-                sortByName(parentNode.children);
+                sortNodes(parentNode.children);
             } else { //otherwise sort on the children
-                sortByName(this.nodes.children);
+                sortNodes(this.nodes.children);
             }
         },
 
