@@ -18,7 +18,6 @@ use Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
 use Schoolbox\TaskDaemon\Request\DownloadPages\MessageFactory as BaseMessageFactory;
 use Schoolbox\TaskDaemon\Request\Message;
 use Schoolbox\User;
-use Schoolbox\User\Translator\Author\ModelToArray;
 use Schoolbox\User\Translator\ModelToArray as UserTranslator;
 
 /**
@@ -61,7 +60,7 @@ class MessageFactory
      * @param DueWork $dueWork The due work to build a message for.
      * @param User    $viewer  The user who is requesting the due work ZIP.
      * @return Message
-     * @throws \Aura\Router\Exception\RouteNotFound
+     * @noinspection PhpDocMissingThrowsInspection - routes added always exist
      */
     public function buildForAssessment(DueWork $dueWork, User $viewer): Message
     {
@@ -106,6 +105,11 @@ class MessageFactory
                                 ->toString(),
                         );
                         if ($file->getKami()) {
+                            /** @noinspection PhpUnhandledExceptionInspection - this route always exists */
+                            $kamiRoutePath  = $this->router->generate(
+                                'learningDueWorkResponse.getKamiExport',
+                                ['kamiId' => $file->getKami()->getId(),],
+                            );
                             $messageFactory = $messageFactory->addFileContent(
                                 sprintf(
                                     "%s/%s/%s",
@@ -114,14 +118,7 @@ class MessageFactory
                                     $this->sanitizeForFilename($file->getBasename() . '.kami.pdf')
                                 ),
                                 $this->urlBase
-                                    ->setPath(
-                                        $this->router->generate(
-                                            'learningDueWorkResponse.getKamiExport',
-                                            [
-                                                'kamiId' => $file->getKami()->getId(),
-                                            ],
-                                        )
-                                    )
+                                    ->setPath($kamiRoutePath)
                                     ->toString(),
                             );
                         }
@@ -130,21 +127,18 @@ class MessageFactory
             }
 
             // Add this participant's submission history
-            $messageFactory = $messageFactory->addPdfContent(
-                sprintf(
-                    "%s/submissionHistory.pdf",
-                    $baseFolderName,
-                ),
+            /** @noinspection PhpUnhandledExceptionInspection - this route always exists */
+            $submissionHistoryPath = $this->router->generate(
+                'learningAssessment.getSummary',
+                [
+                    'assessmentId' => $participant->getAssessable()->getId(),
+                    'studentId'    => $participant->getUser()->getId(),
+                ],
+            );
+            $messageFactory        = $messageFactory->addPdfContent(
+                sprintf("%s/submissionHistory.pdf", $baseFolderName),
                 $this->urlBase
-                    ->setPath(
-                        $this->router->generate(
-                            'learningAssessment.getSummary',
-                            [
-                                'assessmentId' => $participant->getAssessable()->getId(),
-                                'studentId'    => $participant->getUser()->getId(),
-                            ],
-                        )
-                    )
+                    ->setPath($submissionHistoryPath)
                     ->toString(),
             );
         }
