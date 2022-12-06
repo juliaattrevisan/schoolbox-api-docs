@@ -61,9 +61,6 @@ class MessageFactory
      */
     public function buildForAssessment(DueWork $dueWork, User $viewer): Message
     {
-        /** @var User[] $users */
-        $users = [];
-
         // Generate list of files to fetch via taskd, and add to a ZIP
         $messageFactory = (clone $this->baseMessageFactory);
         $userSerializer = new ModelToArray();
@@ -171,14 +168,14 @@ class MessageFactory
                     ->toString()
             )
             ->setCallbackParams([
-                                    'message' => sprintf(
-                                        'Feedback and submissions for %s "%s" are ready to download',
-                                        $this->rosettaStone->translate('dueWork'),
-                                        $title,
-                                    ),
-                                    'from'    => call_user_func($userSerializer, $viewer),
-                                    'to'      => call_user_func($userSerializer, $viewer),
-                                ])
+                'from'    => call_user_func($userSerializer, $viewer),
+                'to'      => call_user_func($userSerializer, $viewer),
+                'message' => sprintf(
+                    'Feedback and submissions for %s "%s" are ready to download',
+                    $this->rosettaStone->translate('dueWork'),
+                    $title,
+                ),
+            ])
             ->build($title);
     }
 

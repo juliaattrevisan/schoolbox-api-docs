@@ -422,6 +422,12 @@ class Module extends BaseModule
                 );
 
             case Assessment\DueWork\Controller::class:
+                $dueWorkDownloadMessageFactory = new Assessment\DueWork\Download\MessageFactory(
+                    $this->injector->get('taskd.downloadPagesMessageFactory'),
+                    (new \Schoolbox\Url\Factory($this->getConfig()))->buildFullyQualified(),
+                    $this->injector->get('l10n'),
+                    $this->getRouter()
+                );
                 return new Assessment\DueWork\Controller(
                     $userMapper,
                     $errorMapper,
@@ -451,6 +457,7 @@ class Module extends BaseModule
                     $this->injector->get('filesystem.storageProxy'),
                     $stateMapper,
                     $this->injector->get('l10n'),
+                    $dueWorkDownloadMessageFactory,
                 );
 
             case Assessment\Project\Controller::class:

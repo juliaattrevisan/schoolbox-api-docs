@@ -125,6 +125,7 @@ class Controller extends Assessment\Controller
      * @param LatestViewMapper                  $latestViewMapper
      * @param FilesystemProxy                   $filesystemProxy
      * @param StateMapper                       $stateMapper
+     * @param Download\MessageFactory           $dueWorkDownloadMessageFactory
      */
     public function __construct(
         UserMapper $userMapper,
@@ -155,6 +156,7 @@ class Controller extends Assessment\Controller
         private FilesystemProxy $filesystemProxy,
         private StateMapper $stateMapper,
         private RosettaStone $rosettaStone,
+        private Download\MessageFactory $dueWorkDownloadMessageFactory,
     ) {
         parent::__construct(
             $userMapper,
@@ -433,120 +435,122 @@ class Controller extends Assessment\Controller
      */
     public function downloadSubmissions(IAssessable $assessment): void
     {
-        // Cache users
-        /** @var User[] $users */
-        $users = [];
+//        // Cache users
+//        /** @var User[] $users */
+//        $users = [];
+//
+//        // Generate list of files to fetch via taskd, and add to a ZIP
+//        $messageFactory = $this->messageFactory;
+//        $userSerializer = new ModelToArray();
+//        $urlBase        = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
+//
+//        // Iterate participants and get their responses
+//        foreach ($assessment->getAllParticipants() as $participant) {
+//            // Short-circuit if there's no interactions
+//            // (draft feedback does count, though)
+//            if (!$participant->hasSubmittedResponse() && $participant->getAllFeedbacks()->count() === 0) {
+//                continue;
+//            }
+//
+//            // Get the users details and generate an appropriate folder name
+//            $users[$participant->getUser()->getId()]
+//                ??= $this->getUserMapper()->findByIdWithFallback($participant->getUser()->getId());
+//            $participantUser = $users[$participant->getUser()->getId()];
+//            $baseFolderName  = sprintf(
+//                "%s_%s_%d",
+//                $this->sanitizeForFilename($participantUser->getLastname()),
+//                $this->sanitizeForFilename($participantUser->getFirstname()),
+//                $participantUser->getId(),
+//            );
+//
+//            // Iterate all their submitted responses
+//            /** @var Submission $response */
+//            foreach ($participant->getSubmittedResponses() as $response) {
+//                // If the response is a submission...
+//                if ($response instanceof Submission) {
+//                    // ...iterate all files in that submission and add them to
+//                    // the ZIP archive downloaded from taskd
+//                    foreach ($response->getAllFiles() as $file) {
+//                        $messageFactory = $messageFactory->addFileContent(
+//                            sprintf(
+//                                "%s/%s/%s",
+//                                $baseFolderName,
+//                                $response->getSubmittedAt()->getUsingFormat('Ymd-His'),
+//                                $this->sanitizeForFilename($file->getBasename())
+//                            ),
+//                            $urlBase->setPath('/storage/fetch.php')->setQuery(['hash' => $file->getHash()]),
+//                        );
+//                        if ($file->getKami()) {
+//                            $messageFactory = $messageFactory->addFileContent(
+//                                sprintf(
+//                                    "%s/%s/%s",
+//                                    $baseFolderName,
+//                                    $response->getSubmittedAt()->getUsingFormat('Ymd-His'),
+//                                    $this->sanitizeForFilename($file->getBasename() . '.kami.pdf')
+//                                ),
+//                                $urlBase->setPath(
+//                                    $this->router->generate(
+//                                        'learningDueWorkResponse.getKamiExport',
+//                                        [
+//                                            'kamiId' => $file->getKami()->getId(),
+//                                        ],
+//                                    ),
+//                                ),
+//                            );
+//                        }
+//                    }
+//                }
+//            }
+//
+//            // Add this participant's submission history
+//            $messageFactory = $messageFactory->addPdfContent(
+//                sprintf(
+//                    "%s/submissionHistory.pdf",
+//                    $baseFolderName,
+//                ),
+//                $urlBase->setPath(
+//                    $this->router->generate(
+//                        'learningAssessment.getSummary',
+//                        [
+//                            'assessmentId' => $participant->getAssessable()->getId(),
+//                            'studentId'    => $participant->getUser()->getId(),
+//                        ],
+//                    )
+//                ),
+//            );
+//        }
+//
+//        // Send the entire request to taskd
+//        $title = sprintf(
+//            "%s-%s.zip",
+//            $this->sanitizeForFilename($assessment->getTitle()),
+//            Alaress_Date_Format::now()->getUsingFormat('Ymd-His'),
+//        );
+//        $message = $messageFactory
+//            ->setUser($this->getUser())
+//            ->setCallbackUrl(
+//                $urlBase
+//                    ->setPath(
+//                        $this->router->generate(
+//                            'apiusernotify.apiUserNotify',
+//                            ['userId' => $this->getUser()->getId()]
+//                        )
+//                    )
+//                    ->setQuery(null)
+//                    ->toString()
+//            )
+//            ->setCallbackParams([
+//                'message' => sprintf(
+//                    'Feedback and submissions for %s "%s" are ready to download',
+//                    $this->rosettaStone->translate('dueWork'),
+//                    $title,
+//                ),
+//                'from'    => call_user_func($userSerializer, $this->getUser()),
+//                'to'      => call_user_func($userSerializer, $this->getUser()),
+//            ])
+//            ->build($title);
 
-        // Generate list of files to fetch via taskd, and add to a ZIP
-        $messageFactory = $this->messageFactory;
-        $userSerializer = new ModelToArray();
-        $urlBase        = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
-
-        // Iterate participants and get their responses
-        foreach ($assessment->getAllParticipants() as $participant) {
-            // Short-circuit if there's no interactions
-            // (draft feedback does count, though)
-            if (!$participant->hasSubmittedResponse() && $participant->getAllFeedbacks()->count() === 0) {
-                continue;
-            }
-
-            // Get the users details and generate an appropriate folder name
-            $users[$participant->getUser()->getId()]
-                ??= $this->getUserMapper()->findByIdWithFallback($participant->getUser()->getId());
-            $participantUser = $users[$participant->getUser()->getId()];
-            $baseFolderName  = sprintf(
-                "%s_%s_%d",
-                $this->sanitizeForFilename($participantUser->getLastname()),
-                $this->sanitizeForFilename($participantUser->getFirstname()),
-                $participantUser->getId(),
-            );
-
-            // Iterate all their submitted responses
-            /** @var Submission $response */
-            foreach ($participant->getSubmittedResponses() as $response) {
-                // If the response is a submission...
-                if ($response instanceof Submission) {
-                    // ...iterate all files in that submission and add them to
-                    // the ZIP archive downloaded from taskd
-                    foreach ($response->getAllFiles() as $file) {
-                        $messageFactory = $messageFactory->addFileContent(
-                            sprintf(
-                                "%s/%s/%s",
-                                $baseFolderName,
-                                $response->getSubmittedAt()->getUsingFormat('Ymd-His'),
-                                $this->sanitizeForFilename($file->getBasename())
-                            ),
-                            $urlBase->setPath('/storage/fetch.php')->setQuery(['hash' => $file->getHash()]),
-                        );
-                        if ($file->getKami()) {
-                            $messageFactory = $messageFactory->addFileContent(
-                                sprintf(
-                                    "%s/%s/%s",
-                                    $baseFolderName,
-                                    $response->getSubmittedAt()->getUsingFormat('Ymd-His'),
-                                    $this->sanitizeForFilename($file->getBasename() . '.kami.pdf')
-                                ),
-                                $urlBase->setPath(
-                                    $this->router->generate(
-                                        'learningDueWorkResponse.getKamiExport',
-                                        [
-                                            'kamiId' => $file->getKami()->getId(),
-                                        ],
-                                    ),
-                                ),
-                            );
-                        }
-                    }
-                }
-            }
-
-            // Add this participant's submission history
-            $messageFactory = $messageFactory->addPdfContent(
-                sprintf(
-                    "%s/submissionHistory.pdf",
-                    $baseFolderName,
-                ),
-                $urlBase->setPath(
-                    $this->router->generate(
-                        'learningAssessment.getSummary',
-                        [
-                            'assessmentId' => $participant->getAssessable()->getId(),
-                            'studentId'    => $participant->getUser()->getId(),
-                        ],
-                    )
-                ),
-            );
-        }
-
-        // Send the entire request to taskd
-        $title = sprintf(
-            "%s-%s.zip",
-            $this->sanitizeForFilename($assessment->getTitle()),
-            Alaress_Date_Format::now()->getUsingFormat('Ymd-His'),
-        );
-        $message = $messageFactory
-            ->setUser($this->getUser())
-            ->setCallbackUrl(
-                $urlBase
-                    ->setPath(
-                        $this->router->generate(
-                            'apiusernotify.apiUserNotify',
-                            ['userId' => $this->getUser()->getId()]
-                        )
-                    )
-                    ->setQuery(null)
-                    ->toString()
-            )
-            ->setCallbackParams([
-                'message' => sprintf(
-                    'Feedback and submissions for %s "%s" are ready to download',
-                    $this->rosettaStone->translate('dueWork'),
-                    $title,
-                ),
-                'from'    => call_user_func($userSerializer, $this->getUser()),
-                'to'      => call_user_func($userSerializer, $this->getUser()),
-            ])
-            ->build($title);
+        $message = $this->dueWorkDownloadMessageFactory->buildForAssessment($assessment, $this->getUser());
 
         // Send to taskd
         $this->producer->send($message);
