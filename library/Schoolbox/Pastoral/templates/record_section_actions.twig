@@ -3,10 +3,10 @@
         <div class="small-12 medium-6 columns island">
             <h2 class="subheader">Actions</h2>
             <section>
-                <fieldset class="checklist pastoral-actions-list">
-                    <ul class="option-list">
+                <fieldset class="checklist padding-none">
+                    <ul class="pastoral-actions-list">
                         {% for recordAction in record.recordActions %}
-                            <li data-list-item-{{ recordAction.action.id }}>
+                            <li class="pastoral-actions-list__item" data-list-item-{{ recordAction.action.id }}>
                                 <div>
                                     <input id="action-{{ recordAction.action.id }}" name="actions[]" type="checkbox"
                                             {{ recordAction.completed ? 'checked="checked"' : '' }}
@@ -15,7 +15,7 @@
                                             {{ recordAction.completed ? 'class="strike"' : '' }}>{{ recordAction.action.name }}</label>
                                 </div>
                                 {% if recordAction.completed %}
-                                <div data-action-status-{{ recordAction.action.id }}>
+                                <div data-action-status-{{ recordAction.action.id }} class="pastoral-actions-list__date-and-user">
                                     <span class="meta" title="{{ recordAction.updatedAt.local }}">
                                         Completed <time>{{ recordAction.updatedAt.getRelativeTime }}</time>
                                     </span>
@@ -50,9 +50,9 @@
         }
 
         /**
+         * Retrieve the date and user linked to the completed action to display in the DOM
          *
-         *
-         * @@param {object} action - the returned pastoral action object, containing the action details
+         * @param {object} action - the returned pastoral action object, containing the action details
          * @returns {string} - the html markup as string
          */
         function getDateAndUser(action) {
