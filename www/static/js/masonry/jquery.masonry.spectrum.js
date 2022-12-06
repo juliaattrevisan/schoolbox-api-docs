@@ -48,6 +48,7 @@
                 {},
                 window.sbProps.spectrum,
                 {
+                    allowEmpty: true,
                     change: function (colorObject) {mspec.onColorChange(this, colorObject);},
                     move: function (colorObject) {mspec.onColorChange(this, colorObject);},
                     showAlpha: true

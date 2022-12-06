@@ -65,7 +65,10 @@ console.info('hello');
         $.extend(
             {},
             window.sbProps.spectrum,
-            {showAlpha: true}
+            {
+                allowEmpty: true,
+                showAlpha: true
+            }
         )
     );
     $(COLOUR_PICKERS_SELECTOR).on('change.spectrum, move.spectrum', (event, colour) => {
