@@ -239,6 +239,9 @@ class Controller extends Base
      */
     private function respondWithNode(Node\Model $node, int $ancestorCount, int $descendantCount): void
     {
+        $childNodes = $node->getChildren();
+        self::sortNodes($childNodes, 0);
+        $node->setChildren($childNodes);
         $translator = new ModelToArray($ancestorCount, $descendantCount);
         $this->response->content->set(
             $this->buildJsonOutput($translator($node))
