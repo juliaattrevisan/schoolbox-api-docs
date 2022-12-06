@@ -15,6 +15,8 @@ use Laminas\Uri\UriInterface;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
+use Schoolbox\Learning\Assessment\IResponse;
+use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\TaskDaemon\Request\DownloadPages\MessageFactory as BaseMessageFactory;
 use Schoolbox\TaskDaemon\Request\Message;
 use Schoolbox\User;
@@ -75,53 +77,44 @@ class MessageFactory
                 continue;
             }
 
-            // Generate an appropriate folder name
-            $participantUser = $participant->getUser();
-            $baseFolderName  = sprintf(
-                "%s_%s_%d",
-                $this->sanitizeForFilename($participantUser->getLastname()),
-                $this->sanitizeForFilename($participantUser->getFirstname()),
-                $participantUser->getId(),
-            );
-
             // Iterate all their submitted responses
-            /** @var Submission $response */
             foreach ($participant->getSubmittedResponses() as $response) {
-                // If the response is a submission...
-                if ($response instanceof Submission) {
-                    // ...iterate all files in that submission and add them to
-                    // the ZIP archive downloaded from taskd
-                    foreach ($response->getAllFiles() as $file) {
+                // If somehow the response isn't a submission: skip
+                if (!$response instanceof Submission) {
+                    continue;
+                }
+
+                // Iterate all files in that submission and add them to the ZIP
+                // archive downloaded from taskd
+                $responseFolderName = $this->generateResponseFolderName($participant, $response);
+                foreach ($response->getAllFiles() as $file) {
+                    $messageFactory = $messageFactory->addFileContent(
+                        sprintf(
+                            "%s/%s",
+                            $responseFolderName,
+                            $this->sanitizeForFilename($file->getBasename()),
+                        ),
+                        $this->urlBase
+                            ->setPath('/storage/fetch.php')
+                            ->setQuery(['hash' => $file->getHash()])
+                            ->toString(),
+                    );
+                    if ($file->getKami()) {
+                        /** @noinspection PhpUnhandledExceptionInspection - this route always exists */
+                        $kamiRoutePath  = $this->router->generate(
+                            'learningDueWorkResponse.getKamiExport',
+                            ['kamiId' => $file->getKami()->getId(),],
+                        );
                         $messageFactory = $messageFactory->addFileContent(
                             sprintf(
-                                "%s/%s/%s",
-                                $baseFolderName,
-                                $response->getSubmittedAt()->getUsingFormat('Ymd-His'),
-                                $this->sanitizeForFilename($file->getBasename())
+                                "%s/%s",
+                                $responseFolderName,
+                                $this->sanitizeForFilename($file->getBasename() . '.kami.pdf')
                             ),
                             $this->urlBase
-                                ->setPath('/storage/fetch.php')
-                                ->setQuery(['hash' => $file->getHash()])
+                                ->setPath($kamiRoutePath)
                                 ->toString(),
                         );
-                        if ($file->getKami()) {
-                            /** @noinspection PhpUnhandledExceptionInspection - this route always exists */
-                            $kamiRoutePath  = $this->router->generate(
-                                'learningDueWorkResponse.getKamiExport',
-                                ['kamiId' => $file->getKami()->getId(),],
-                            );
-                            $messageFactory = $messageFactory->addFileContent(
-                                sprintf(
-                                    "%s/%s/%s",
-                                    $baseFolderName,
-                                    $response->getSubmittedAt()->getUsingFormat('Ymd-His'),
-                                    $this->sanitizeForFilename($file->getBasename() . '.kami.pdf')
-                                ),
-                                $this->urlBase
-                                    ->setPath($kamiRoutePath)
-                                    ->toString(),
-                            );
-                        }
                     }
                 }
             }
@@ -136,7 +129,7 @@ class MessageFactory
                 ],
             );
             $messageFactory        = $messageFactory->addPdfContent(
-                sprintf("%s/submissionHistory.pdf", $baseFolderName),
+                sprintf("%s/submissionHistory.pdf", $this->generateParticipantFolderName($participant)),
                 $this->urlBase
                     ->setPath($submissionHistoryPath)
                     ->toString(),
@@ -174,8 +167,6 @@ class MessageFactory
             ->build($title);
     }
 
-
-
     /**
      * Sanitize a string for use in filename
      *
@@ -187,5 +178,37 @@ class MessageFactory
     private function sanitizeForFilename(string $string): string
     {
         return preg_replace("/[^A-Za-z0-9\-. ]/", '_', $string);
+    }
+
+    /**
+     * Generate a base folder name for this participant.
+     *
+     * @param Participant $participant
+     * @return string
+     */
+    private function generateParticipantFolderName(Participant $participant): string
+    {
+        return sprintf(
+            "%s_%s_%d",
+            $this->sanitizeForFilename($participant->getUser()->getLastname()),
+            $this->sanitizeForFilename($participant->getUser()->getFirstname()),
+            $participant->getUser()->getId(),
+        );
+    }
+
+    /**
+     * Generates a base folder name for this participant and response.
+     *
+     * @param Participant $participant
+     * @param IResponse   $response
+     * @return string
+     */
+    private function generateResponseFolderName(Participant $participant, IResponse $response): string
+    {
+        return sprintf(
+            "%s/%s",
+            $this->generateParticipantFolderName($participant),
+            $response->getSubmittedAt()->getUsingFormat('Ymd-His'),
+        );
     }
 }
