@@ -26,6 +26,7 @@ use InvalidArgumentException;
 use LogicException;
 use PDOException;
 use Schoolbox\Application\Exception\Exception;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
 use Schoolbox\Learning\Assessment\Redirect;
@@ -415,9 +416,13 @@ class Controller extends Assessment\Controller
      */
     public function downloadSubmissions(IAssessable $assessment): void
     {
-        $message = $this->dueWorkDownloadMessageFactory->buildForAssessment($assessment, $this->getUser());
+        // Not a due work somehow? Raise a 404 if so
+        if (!$assessment instanceof Model) {
+            throw new NotFound();
+        }
 
-        // Send to taskd
+        // Generate message and send to taskd
+        $message = $this->dueWorkDownloadMessageFactory->buildForAssessment($assessment, $this->getUser());
         $this->producer->send($message);
 
         // Return whence we came,
