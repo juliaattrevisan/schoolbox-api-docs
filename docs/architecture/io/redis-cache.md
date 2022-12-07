@@ -19,3 +19,4 @@ The cache may store the following data:
 - process locks for CLI commands
   (thus preventing a process from running more than once for a given instance)
 - route and module cache
+- signal queues for daemon processes
