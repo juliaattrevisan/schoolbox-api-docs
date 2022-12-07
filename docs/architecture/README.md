@@ -53,8 +53,8 @@ bootstrapped, routed and processed:
 * [File Storage](io/file-storage/README.md)
   * [Local](io/file-storage/local.md)
   * [AWS S3](io/file-storage/s3.md)
-* Redis Cache
-* Redis Storage
+* [Redis Cache](io/redis-cache.md)
+* [Redis Storage](io/redis-storage.md)
 * Task Daemon
 * Mail Transport
 * Gotenberg (PDF generation)
