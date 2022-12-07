@@ -3,6 +3,9 @@
 Both the [cache](../io/redis-cache.md) and [storage](../io/redis-storage.md)
 Redis databases are communicated with via an adapter.
 
+> TODO mention how a cache vs. storage adapter is retrieved:
+> also talk about how they're fetched from DI
+
 This adapter uses the [Predis](https://github.com/predis/predis) library for
 communicating with Redis.
 

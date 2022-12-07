@@ -20,3 +20,6 @@ The cache may store the following data:
   (thus preventing a process from running more than once for a given instance)
 - route and module cache
 - signal queues for daemon processes
+
+Communication with the Redis cache is done via the
+[Redis adapter](../adapters/redis.md).

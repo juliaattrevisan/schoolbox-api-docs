@@ -14,3 +14,6 @@ The storage system may store the following data:
 - Sessions
 - Notification subsystem data
 - Access tokens for LTI tools
+
+Communication with the Redis store is done via the
+[Redis adapter](../adapters/redis.md).
