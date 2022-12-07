@@ -28,90 +28,36 @@ use Schoolbox\Mapper\Exception as MapperException;
 
 class Controller extends Base
 {
-    /** @var Pastoral\Group\Mapper $pastoralGroupMapper */
-    private $pastoralGroupMapper;
-
-    /** @var UserMapper $userMapper */
-    private $userMapper;
-
-    /**@var Mapper */
-    private $pastoralAudienceMapper;
-
-    /** @var RoleMapper */
-    private $roleMapper;
-
-    /** @var Pastoral\Type\Mapper */
-    private $pastoralTypeMapper;
-
-
-    /**
-     * @var Pastoral\SubType\Mapper
-     */
-    private Pastoral\SubType\Mapper $pastoralSubTypeMapper;
-
-    /**
-     * @var Pastoral\Action\Mapper
-     */
-    private Pastoral\Action\Mapper $pastoralActionMapper;
-
-    /**
-     * @var Pastoral\Access\Mapper
-     */
-    private Pastoral\Access\Mapper $pastoralAccessMapper;
-
-    /**
-     * Icon mapper: the list of icons is fetched from here.
-     */
-    private IconMapper $iconMapper;
-
-    /**
-     * @var RosettaStone
-     */
-    private RosettaStone $rosettaStone;
-
-    /**
-     * A factory object for creating color objects from form input.
-     */
-    private ColorFactory $colorFactory;
-
     /**
      * Constructor
      *
-     * @param UserMapper              $userMapper
-     * @param Pastoral\Group\Mapper   $pastoralGroupMapper
-     * @param Mapper                  $pastoralAudienceMapper
-     * @param RoleMapper              $roleMapper
-     * @param Pastoral\Type\Mapper    $pastoralTypeMapper
-     * @param Pastoral\SubType\Mapper $pastoralSubTypeMapper
-     * @param Pastoral\Action\Mapper  $pastoralActionMapper
-     * @param IconMapper              $iconMapper
-     * @param RosettaStone            $rosettaStone
-     * @param ColorFactory            $colorFactory
+     * @param UserMapper                 $userMapper
+     * @param Pastoral\Group\Mapper      $pastoralGroupMapper
+     * @param Mapper                     $pastoralAudienceMapper
+     * @param RoleMapper                 $roleMapper
+     * @param Pastoral\Type\Mapper       $pastoralTypeMapper
+     * @param Pastoral\SubType\Mapper    $pastoralSubTypeMapper
+     * @param Pastoral\Action\Mapper     $pastoralActionMapper
+     * @param Pastoral\TypeAction\Mapper $pastoralTypeActionMapper
+     * @param IconMapper                 $iconMapper
+     * @param RosettaStone               $rosettaStone
+     * @param ColorFactory               $colorFactory
+     * @param Pastoral\Access\Mapper     $pastoralAccessMapper
      */
     public function __construct(
-        UserMapper $userMapper,
-        Pastoral\Group\Mapper $pastoralGroupMapper,
-        Mapper $pastoralAudienceMapper,
-        RoleMapper $roleMapper,
-        Pastoral\Type\Mapper $pastoralTypeMapper,
-        Pastoral\SubType\Mapper $pastoralSubTypeMapper,
-        Pastoral\Action\Mapper $pastoralActionMapper,
-        IconMapper $iconMapper,
-        RosettaStone $rosettaStone,
-        ColorFactory $colorFactory,
-        Pastoral\Access\Mapper $pastoralAccessMapper
+        private UserMapper $userMapper,
+        private Pastoral\Group\Mapper $pastoralGroupMapper,
+        private Mapper $pastoralAudienceMapper,
+        private RoleMapper $roleMapper,
+        private Pastoral\Type\Mapper $pastoralTypeMapper,
+        private Pastoral\SubType\Mapper $pastoralSubTypeMapper,
+        private Pastoral\Action\Mapper $pastoralActionMapper,
+        private Pastoral\TypeAction\Mapper $pastoralTypeActionMapper,
+        private IconMapper $iconMapper,
+        private RosettaStone $rosettaStone,
+        private ColorFactory $colorFactory,
+        private Pastoral\Access\Mapper $pastoralAccessMapper
     ) {
-        $this->userMapper             = $userMapper;
-        $this->pastoralGroupMapper    = $pastoralGroupMapper;
-        $this->pastoralAudienceMapper = $pastoralAudienceMapper;
-        $this->roleMapper             = $roleMapper;
-        $this->pastoralTypeMapper     = $pastoralTypeMapper;
-        $this->pastoralSubTypeMapper  = $pastoralSubTypeMapper;
-        $this->pastoralActionMapper = $pastoralActionMapper;
-        $this->iconMapper             = $iconMapper;
-        $this->rosettaStone           = $rosettaStone;
-        $this->colorFactory           = $colorFactory;
-        $this->pastoralAccessMapper   = $pastoralAccessMapper;
     }
 
 
@@ -347,9 +293,6 @@ class Controller extends Base
             ? $this->pastoralAudienceMapper->findByColumnList(['subtype_id' => $currentType->getId()])
             : $this->pastoralAudienceMapper->findByColumnList(['type_id' => $currentType->getId()]);
 
-        /** @var Pastoral\TypeAction\Mapper $typeActionMapper */
-        $typeActionMapper = $this->pastoralTypeMapper->getJoinMapper('typeActions');
-
         // Fetch the exiting rules
         if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
             $actions          =
@@ -359,8 +302,8 @@ class Controller extends Base
             $defaultActionIds = is_array($post->get('defaultActions')) ? array_map('intval', array_filter($post->get('defaultActions'))) : [];
 
             // remove all the current actions
-            $typeActionMapper->deleteByColumn($isSubType ? 'subtype_id' : 'type_id', $currentType->getId());
-            $currentType->setTypeActions($typeActionMapper->createCollection());
+            $this->pastoralTypeActionMapper->deleteByColumn($isSubType ? 'subtype_id' : 'type_id', $currentType->getId());
+            $currentType->setTypeActions($this->pastoralTypeActionMapper->createCollection());
 
             /** @var Pastoral\Action\Model $action */
             foreach ($actions as $action) {
@@ -374,7 +317,7 @@ class Controller extends Base
                 }
                 $currentType->getTypeActions()->add($typeAction);
             }
-            $typeActionMapper->save($currentType->getTypeActions());
+            $this->pastoralTypeActionMapper->save($currentType->getTypeActions());
         }
 
         /* Save the "General Template" content

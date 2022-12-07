@@ -13,11 +13,15 @@ namespace Schoolbox\Pastoral\Type;
 use Schoolbox\GenericCollection;
 use Schoolbox\Pastoral;
 use DomainException;
+use Schoolbox\Pastoral\DocumentClassification\Model as DocumentClassification;
 
 class Model extends TypeAbstract
 {
     /** @var GenericCollection|Pastoral\SubType\Model[] */
     private GenericCollection $subTypes;
+
+    /** @var DocumentClassification|int|null */
+    protected int | DocumentClassification | null $documentClassification = null;
 
     public function __construct()
     {
@@ -42,5 +46,24 @@ class Model extends TypeAbstract
     {
         $this->subTypes->replaceWith($subTypes);
         return $this;
+    }
+
+    /**
+     * @param int|DocumentClassification|null $documentClassification
+     *
+     * @return self
+     */
+    public function setDocumentClassification(DocumentClassification | int | null $documentClassification): self
+    {
+        $this->documentClassification = $documentClassification;
+        return $this;
+    }
+
+    /**
+     * @return DocumentClassification|int|null
+     */
+    public function getDocumentClassification(): DocumentClassification | int | null
+    {
+        return $this->documentClassification;
     }
 }

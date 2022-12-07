@@ -204,7 +204,6 @@
                 actionSelectize[0].selectize.clear();
                 actionSelectize[0].selectize.clearOptions();
                 let currents = $('#pastoral-actions').val();
-                let refreshOptions = false;
                 result.forEach(function (item) {
                     actionSelectize[0].selectize.addOption(item);
                     // if item is in the current selected
@@ -214,13 +213,8 @@
                             || (currents.length === 0 && item['default'])
                     ) {
                         actionSelectize[0].selectize.addItem(item['id']);
-                    } else {
-                        refreshOptions = true;
                     }
                 });
-                if (refreshOptions) {
-                    actionSelectize[0].selectize.refreshOptions()
-                }
             })
             {% endif %}
         }

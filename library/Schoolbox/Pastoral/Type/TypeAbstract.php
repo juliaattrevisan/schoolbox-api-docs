@@ -62,9 +62,6 @@ abstract class TypeAbstract implements ISoftDeletable, Sequential, \JsonSerializ
      */
     protected ?string $icon = null;
 
-    /** @var DocumentClassification|int|null */
-    protected int | DocumentClassification | null $documentClassification = null;
-
     /**
      * Optional. Null if not linked to SIS
      *
@@ -89,26 +86,6 @@ abstract class TypeAbstract implements ISoftDeletable, Sequential, \JsonSerializ
     public function __construct()
     {
         $this->typeActions = new GenericCollection(Action::class);
-    }
-
-    /**
-     * @param int|DocumentClassification|null $documentClassification
-     *
-     * @return self
-     */
-    public function setDocumentClassification(DocumentClassification | int | null $documentClassification): self
-    {
-        $this->documentClassification = $documentClassification;
-
-        return $this;
-    }
-
-    /**
-     * @return DocumentClassification|int|null
-     */
-    public function getDocumentClassification(): DocumentClassification | int | null
-    {
-        return $this->documentClassification;
     }
 
     /**

@@ -118,9 +118,7 @@ class Mapper extends BaseMapper
 
             if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
                 $typeActions = $typeActionsMapper->findByColumn('type_id', $model->getId());
-                if ($typeActions->count() > 0) {
-                    $model->setTypeActions($typeActions);
-                }
+                $model->setTypeActions($typeActions);
             }
         }
         return $collection;
