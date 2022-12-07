@@ -8,6 +8,9 @@ Schoolbox allows for the upload of files within various contexts; for example:
 Whatever the context, all files will be stored within Schoolbox's file storage
 system.
 
+Communication with the file storage system is done via the
+[file storage adapter](../../adapters/file-storage.md).
+
 ## Operation
 
 Upon upload, Schoolbox takes a hash of the file's content; it then uses that to
