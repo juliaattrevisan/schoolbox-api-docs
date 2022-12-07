@@ -20,6 +20,13 @@ use UnexpectedValueException;
  */
 class Aggregator
 {
+    /**
+     * @param Project\ResultCache\Mapper $projectResultCacheMapper
+     */
+    public function __construct(private Project\ResultCache\Mapper $projectResultCacheMapper)
+    {
+    }
+
 
     /**
      * To maintain our interface methods, we need to insert a non-persisted plan and set of participant
@@ -48,7 +55,7 @@ class Aggregator
 
         // Add participant objects
         foreach ($project->getParticipantUsers() as $user) {
-            $participant                             = new Participant($user, $plan);
+            $participant                             = new Participant($user, $plan, $this->projectResultCacheMapper);
             $plan->getParticipants()[$user->getId()] = $participant;
         }
     }

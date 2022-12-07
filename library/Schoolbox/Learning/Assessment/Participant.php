@@ -12,8 +12,8 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Feedback\InstructorGivenFilter;
 use Schoolbox\Learning\Assessment\Feedback\PublishedFilter;
 use Schoolbox\Learning\Assessment\Feedback\SelfAssessmentFilter;
+use Schoolbox\Learning\Assessment\Project\ResultCache;
 use Schoolbox\Learning\Assessment\Project\ResultCache\Mapper;
-use Schoolbox\Learning\Assessment\Project\ResultCache\ResultCache;
 use Schoolbox\Learning\Assessment\Response\NotSubmittedFilter;
 use Schoolbox\Learning\Assessment\Response\SubmittedFilter;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
@@ -79,11 +79,12 @@ class Participant
     /**
      * Participant constructor.
      *
-     * @param User $user
-     * @param Plan $plan
+     * @param User   $user
+     * @param Plan   $plan
+     * @param Mapper $projectResultCacheMapper
      * @throws \UnexpectedValueException
      */
-    public function __construct(User $user, Plan $plan)
+    public function __construct(User $user, Plan $plan, private ResultCache\Mapper $projectResultCacheMapper)
     {
         $this->user         = $user;
         $this->plan         = $plan;
@@ -415,8 +416,8 @@ class Participant
      */
     public function getNormalisedMark($publishedOnly): ?float
     {
-        if ($this->plan->getAssessable() instanceof \Schoolbox\Learning\Assessment\Project) {
-            $cachedProjectMark = (new ResultCache(Mapper::getInstance()))->retrieve($this->plan->getAssessable(), $this->getUser());
+        if ($this->plan->getAssessable() instanceof Project) {
+            $cachedProjectMark = (new ResultCache\ResultCache($this->projectResultCacheMapper))->retrieve($this->plan->getAssessable(), $this->getUser());
 
             return $cachedProjectMark?->getNormalisedMark();
         }
@@ -438,8 +439,8 @@ class Participant
      */
     public function getHumanReadableMark($publishedOnly): ?string
     {
-        if ($this->plan->getAssessable() instanceof \Schoolbox\Learning\Assessment\Project) {
-            $cachedProjectMark = (new ResultCache(Mapper::getInstance()))->retrieve($this->plan->getAssessable(), $this->getUser());
+        if ($this->plan->getAssessable() instanceof Project) {
+            $cachedProjectMark = (new ResultCache\ResultCache($this->projectResultCacheMapper))->retrieve($this->plan->getAssessable(), $this->getUser());
 
             return $cachedProjectMark?->getHumanReadableMark();
         }

@@ -1333,12 +1333,13 @@ abstract class Kernel
             $di->lazyNew(
                 ParticipantDataSource::class,
                 [
-                    'externalDb'         => $di->lazyGet('externalClass'),
-                    'userAccessMapper'   => $mapperFactory->getLazy(UserAccessMapper::class),
-                    'userMapper'         => $mapperFactory->getLazy(UserMapper::class),
-                    'responseDataSource' => $di->lazyGet('responseDataSource'),
-                    'feedbackDataSource' => $di->lazyGet('feedbackDataSource'),
-                    'planMapper'         => $mapperFactory->getLazy(\Schoolbox\Assessment\Participant\Plan\Mapper::class)
+                    'externalDb'               => $di->lazyGet('externalClass'),
+                    'userAccessMapper'         => $mapperFactory->getLazy(UserAccessMapper::class),
+                    'userMapper'               => $mapperFactory->getLazy(UserMapper::class),
+                    'responseDataSource'       => $di->lazyGet('responseDataSource'),
+                    'feedbackDataSource'       => $di->lazyGet('feedbackDataSource'),
+                    'planMapper'               => $mapperFactory->getLazy(\Schoolbox\Assessment\Participant\Plan\Mapper::class),
+                    'projectResultCacheMapper' => $mapperFactory->getLazy(\Schoolbox\Learning\Assessment\Project\ResultCache\Mapper::class)
                 ]
             )
         );

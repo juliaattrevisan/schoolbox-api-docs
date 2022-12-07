@@ -459,6 +459,7 @@ class Module extends BaseModule
                     $stateMapper,
                     $this->injector->get('l10n'),
                     $dueWorkDownloadMessageFactory,
+                    $projectResultCacheMapper
                 );
 
             case Assessment\Project\Controller::class:

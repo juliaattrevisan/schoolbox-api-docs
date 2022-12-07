@@ -9,6 +9,7 @@
 namespace Schoolbox\Learning\Assessment\Participant;
 
 use External_ClassInterface;
+use Schoolbox\Assessment\Participant\Plan\Mapper;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Feedback\DataSource as FeedbackDataSource;
@@ -88,12 +89,13 @@ class DataSource
     /**
      * Constructor
      *
-     * @param External_ClassInterface $externalDb
-     * @param UserAccessMapper        $userAccessMapper
-     * @param UserMapper              $userMapper
-     * @param ResponseDataSource      $responseDataSource
-     * @param FeedbackDataSource      $feedbackDataSource
-     * @param Participant\Plan\Mapper $planMapper
+     * @param External_ClassInterface    $externalDb
+     * @param UserAccessMapper           $userAccessMapper
+     * @param UserMapper                 $userMapper
+     * @param ResponseDataSource         $responseDataSource
+     * @param FeedbackDataSource         $feedbackDataSource
+     * @param Mapper                     $planMapper
+     * @param Project\ResultCache\Mapper $projectResultCacheMapper
      */
     public function __construct(
         External_ClassInterface $externalDb,
@@ -101,7 +103,8 @@ class DataSource
         UserMapper $userMapper,
         ResponseDataSource $responseDataSource,
         FeedbackDataSource $feedbackDataSource,
-        Participant\Plan\Mapper $planMapper
+        Participant\Plan\Mapper $planMapper,
+        private Project\ResultCache\Mapper $projectResultCacheMapper
     ) {
         $this->externalDb         = $externalDb;
         $this->userAccessMapper   = $userAccessMapper;
@@ -110,7 +113,7 @@ class DataSource
         $this->feedbackDataSource = $feedbackDataSource;
         $this->planMapper         = $planMapper;
         $this->cacheForFolder     = new Collection();
-        $this->aggregator         = new Aggregator();
+        $this->aggregator         = new Aggregator($this->projectResultCacheMapper);
     }
 
 
@@ -279,7 +282,7 @@ class DataSource
                 // bypass findAllStudentsForAssessment and assume that $user is
                 // a participant of this plan
                 if (!$explicitParticipants->keyExists($user->getId())) {
-                    $dynamicPlan->getParticipants()[$user->getId()] = new ParticipantObject($user, $dynamicPlan);
+                    $dynamicPlan->getParticipants()[$user->getId()] = new ParticipantObject($user, $dynamicPlan, $this->projectResultCacheMapper);
                 }
             } else {
                 // It's acceptable to findAllStudents in a loop for now, because the list is cached
@@ -291,7 +294,7 @@ class DataSource
 
                     // If a user was provided: only load their participation
                     if (!$user || $user->getId() === $student->getId()) {
-                        $dynamicPlan->getParticipants()[$student->getId()] = new ParticipantObject($student, $dynamicPlan);
+                        $dynamicPlan->getParticipants()[$student->getId()] = new ParticipantObject($student, $dynamicPlan, $this->projectResultCacheMapper);
                     }
                 }
             }
@@ -568,7 +571,7 @@ class DataSource
                 }
 
                 // Create a Participant Domain object
-                $participantObject                             = new ParticipantObject($user, $planObject);
+                $participantObject                             = new ParticipantObject($user, $planObject, $this->projectResultCacheMapper);
                 $planObject->getParticipants()[$user->getId()] = $participantObject;
 
                 // Copy all attributes from data model to domain object

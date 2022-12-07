@@ -153,6 +153,7 @@ class Controller extends Assessment\Controller
         private StateMapper $stateMapper,
         private RosettaStone $rosettaStone,
         private Download\MessageFactory $dueWorkDownloadMessageFactory,
+        private Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
     ) {
         parent::__construct(
             $userMapper,
@@ -1394,7 +1395,7 @@ class Controller extends Assessment\Controller
         $participant = $dueWork->getParticipantIfExtant($student);
         if (!$participant) {
             $dynamicPlan = $dueWork->getDynamicPlan();
-            $participant = new Participant($student, $dynamicPlan);
+            $participant = new Participant($student, $dynamicPlan, $this->projectResultCacheMapper);
             /** @noinspection NullPointerExceptionInspection (because we can't have no participant without a dynamic plan) */
             $dynamicPlan->getParticipants()[$student->getId()] = $participant;
         }
