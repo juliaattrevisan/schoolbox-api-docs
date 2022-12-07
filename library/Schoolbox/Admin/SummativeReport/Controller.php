@@ -787,6 +787,8 @@ class Controller extends ConfigController
                  */
                 $this->externalUser->loadParents([$student]);
                 $parents = $student->getParents();
+                // make sure to load students of the parent, by default children are not populated for parents
+                $this->externalUser->loadChildren($parents);
                 if (!$parents->count()) {
                     $this->sendError(sprintf(
                         'Unable to generate report for student id %d (%s). No parents.',

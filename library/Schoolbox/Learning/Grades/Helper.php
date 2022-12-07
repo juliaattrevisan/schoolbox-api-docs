@@ -134,10 +134,6 @@ class Helper
     {
         $visibility                  = new Visibility($this->access);
         $workTypeAssessmentsByFolder = new Collection();
-        // make sure to load students, if $viewer is a parent and children is not populated
-        if ($viewer->getRole()->isParent() && !$viewer->getChildren()) {
-            $viewer->loadStudents();
-        }
 
         foreach ($assessments as $folderId => $folderAssessments) {
             $workTypeAssessments = new Collection();
