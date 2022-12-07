@@ -14,10 +14,13 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Course\Task\Completion as TaskCompletion;
 use Schoolbox\Cyberhound\Url\Translator;
 use Schoolbox\Error;
+use Schoolbox\Error\Mapper;
 use Schoolbox\Learning\Assessment;
+use Schoolbox\Learning\Assessment\Breadcrumb\Factory;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Participant\DataSource;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Assessment\Task\Response\MapperProxy as TaskResponseDataSource;
 use Schoolbox\Learning\Assessment\Redirect;
@@ -54,20 +57,21 @@ class Controller extends Assessment\Controller
     /**
      * Constructor
      *
-     * @param UserMapper                    $userMapper
-     * @param Error\Mapper                  $errorMapper
-     * @param MapperProxy                   $assessmentMapper
-     * @param WorkTypeMapper                $workTypeMapper
-     * @param Access                        $access
-     * @param Transactor                    $transactor
-     * @param Assessment\Breadcrumb\Factory $bakery
-     * @param TaskResponseDataSource        $taskResponseDataSource
-     * @param Term\Mapper                   $termMapper
-     * @param Participant\DataSource        $participantDataSource
-     * @param CourseSpecificationMapper     $courseSpecificationMapper
-     * @param UnitSpecificationMapper       $unitSpecificationMapper
-     * @param Replicator                    $replicator
-     * @param LatestViewMapper              $latestViewMapper
+     * @param UserMapper                            $userMapper
+     * @param Mapper                                $errorMapper
+     * @param MapperProxy                           $assessmentMapper
+     * @param WorkTypeMapper                        $workTypeMapper
+     * @param Access                                $access
+     * @param Transactor                            $transactor
+     * @param Factory                               $bakery
+     * @param TaskResponseDataSource                $taskResponseDataSource
+     * @param Term\Mapper                           $termMapper
+     * @param DataSource                            $participantDataSource
+     * @param CourseSpecificationMapper             $courseSpecificationMapper
+     * @param UnitSpecificationMapper               $unitSpecificationMapper
+     * @param Replicator                            $replicator
+     * @param LatestViewMapper                      $latestViewMapper
+     * @param Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -83,7 +87,8 @@ class Controller extends Assessment\Controller
         CourseSpecificationMapper $courseSpecificationMapper,
         UnitSpecificationMapper $unitSpecificationMapper,
         Replicator $replicator,
-        LatestViewMapper $latestViewMapper
+        LatestViewMapper $latestViewMapper,
+        protected Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
     ) {
         parent::__construct(
             $userMapper,
@@ -98,7 +103,8 @@ class Controller extends Assessment\Controller
             $courseSpecificationMapper,
             $unitSpecificationMapper,
             $replicator,
-            $latestViewMapper
+            $latestViewMapper,
+            $projectResultCacheMapper
         );
         $this->taskResponseDataSource = $taskResponseDataSource;
     }

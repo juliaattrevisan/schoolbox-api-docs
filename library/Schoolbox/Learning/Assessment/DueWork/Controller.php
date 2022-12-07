@@ -153,7 +153,7 @@ class Controller extends Assessment\Controller
         private StateMapper $stateMapper,
         private RosettaStone $rosettaStone,
         private Download\MessageFactory $dueWorkDownloadMessageFactory,
-        private Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
+        protected Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
     ) {
         parent::__construct(
             $userMapper,
@@ -168,7 +168,8 @@ class Controller extends Assessment\Controller
             $courseSpecificationMapper,
             $unitSpecificationMapper,
             $replicator,
-            $latestViewMapper
+            $latestViewMapper,
+            $this->projectResultCacheMapper
         );
     }
 
