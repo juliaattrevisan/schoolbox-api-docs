@@ -96,9 +96,11 @@ class Visibility
         if ($this->isVisibleToUser($assessment, $viewer, $showClosed, $now, $respectSivo)) {
             return true;
         }
-        foreach ($viewer->getChildren() as $child) {
-            if ($this->isVisibleToUser($assessment, $child, $showClosed, $now, $respectSivo)) {
-                return true;
+        if ($viewer->getRole()->isParent()) {
+            foreach ($viewer->getChildren() as $child) {
+                if ($this->isVisibleToUser($assessment, $child, $showClosed, $now, $respectSivo)) {
+                    return true;
+                }
             }
         }
         return false;
