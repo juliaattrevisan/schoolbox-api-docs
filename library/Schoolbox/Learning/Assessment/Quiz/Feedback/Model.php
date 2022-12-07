@@ -15,7 +15,7 @@ use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
 
 /**
- * @method QuizAttempt getResponse()
+ * @method QuizAttempt|null getResponse()
  */
 class Model extends AbstractFeedback
 {

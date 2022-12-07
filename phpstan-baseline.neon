@@ -4761,11 +4761,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DueWork/Feedback/Factory.php
 
 		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Feedback/Model.php
-
-		-
 			message: "#^Strict comparison using \\=\\=\\= between string and null will always evaluate to false\\.$#"
 			count: 2
 			path: library/Schoolbox/Learning/Assessment/DueWork/Feedback/Model.php

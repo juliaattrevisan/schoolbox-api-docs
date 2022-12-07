@@ -20,7 +20,7 @@ use Schoolbox\Learning\MarkScheme\Completion;
 use Schoolbox\User;
 
 /**
- * @method TaskResponse getResponse()
+ * @method TaskResponse|null getResponse()
  */
 class Model extends AbstractFeedback
 {
