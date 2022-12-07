@@ -92,15 +92,14 @@ class Office365 extends AbstractProvider
 
     protected function checkResponse(ResponseInterface $response, $data)
     {
-        //check $response status is a failure.
-        if (200 !== $response->getStatusCode()) {
-            //check if there is an error message, display it
-            if (isset($data['error'], $data['error_description'])) {
-                throw new SchoolboxException("Office365 Error: {$data['error']}:\n{$data['error_description']}");
-            }
-            //else just say we had an issue...
-            throw new SchoolboxException("Something went wrong");
+        /* check if there are errors
+         * using similar system to \League\OAuth2\Client\Provider\GenericProvider::checkResponse
+        */
+        if (isset($data['error'], $data['error_description'])) {
+            throw new SchoolboxException("Office365 Error: {$data['error']}:\n{$data['error_description']}");
         }
+        //else just say we had an issue...
+        throw new SchoolboxException("Something went wrong");
     }
 
     protected function createResourceOwner(array $response, AccessToken $token)
