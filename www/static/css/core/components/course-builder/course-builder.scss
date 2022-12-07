@@ -1,0 +1,27 @@
+/* TODO - Go through the styling for the course builder component 
+and encapsulate all of the styling in here. 
+
+This file uses BEM notation. Read more here -> https://getbem.com/
+*/
+
+.course-builder{
+
+    .breadcrumb ~ &{
+        margin-bottom: $whitespace-m;
+    }
+
+    &__list{
+        & .card{
+            padding-top: $whitespace-xs;
+            padding-bottom: $whitespace-xs;
+            display: flex;
+    
+            & p{
+                &:last-child{
+                    margin-bottom: 0;
+                }
+            }
+        }
+    }
+
+}
