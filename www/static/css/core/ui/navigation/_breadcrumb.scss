@@ -144,7 +144,7 @@ $breadcrumb-noclick-bg-color: css-scale-color($breadcrumb-bg-color, $lightness: 
 *  These sit at the top of the page
 */
 .breadcrumb {
-  margin: 0 0 $whitespace-m;
+  margin: 0 0 var(--whitespace-m);
   list-style: none;
   overflow: hidden;
   li {

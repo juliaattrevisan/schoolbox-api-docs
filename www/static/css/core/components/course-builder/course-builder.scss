@@ -7,13 +7,13 @@ This file uses BEM notation. Read more here -> https://getbem.com/
 .course-builder{
 
     .breadcrumb ~ &{
-        margin-bottom: $whitespace-m;
+        margin-bottom: var(--whitespace-m);
     }
 
     &__list{
         & .card{
-            padding-top: $whitespace-xs;
-            padding-bottom: $whitespace-xs;
+            padding-top: var(--whitespace-xs);
+            padding-bottom: var(--whitespace-xs);
             display: flex;
     
             & p{
