@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Badge\Award;
 
-use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
@@ -17,13 +16,12 @@ use Alaress\Web\Controller\Base;
 use Closure;
 use Schoolbox\Filter\Mapper as FilterMapper;
 use Schoolbox\Filter\Selection\Mapper as FilterSelectionMapper;
+use Schoolbox\Learning\Badge\Authorizer\Rule\IsAwardGoal;
+use Schoolbox\Learning\Badge\Authorizer\Rule\IsRecipient;
 use Schoolbox\Learning\Badge\Mapper as BadgeMapper;
-use Schoolbox\Learning\Badge\Award\Mapper as BadgeAwardMapper;
-use Schoolbox\Learning\Badge\Award\Model as BadgeAward;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Role;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 class Module extends BaseModule
@@ -68,21 +66,10 @@ class Module extends BaseModule
                 new Rule\Any(
                     new Rule\IsSuperuser(),
                     new Rule\HasRole(Role::STAFF),
-                    new Rule\Callback(static function (array $params, User $user) {
-                        if (
-                            isset($params['award'])
-                            && $params['award'] instanceof BadgeAward
-                            && $params['award']->getRecipient()->getId() === $user->getId()
-                        ) {
-                            return true;
-                        } elseif (isset($params['awardId'])) {
-                            $award = BadgeAwardMapper::getInstance()->findById($params['awardId']);
-                            if ($award->getRecipient()->getId() === $user->getId()) {
-                                return true;
-                            }
-                        }
-                        throw new Unauthorized();
-                    })
+                    new Rule\All(
+                        new IsAwardGoal(),
+                        new IsRecipient(),
+                    )
                 ),
             );
         });
@@ -301,23 +288,6 @@ class Module extends BaseModule
 
 
     /**
-     * Authorizes that the only user in the URL is the current user.
-     *
-     * @param array $params
-     * @param User  $currentUser
-     */
-    private function authorizeOnlyUserIsSelf(array $params, User $currentUser): void
-    {
-        $isUserRule = new Rule\IsUser('userId');
-        // Coalesce to empty list as the preloader may have returned not found,
-        // and thus not populated $params['users']
-        foreach ($params['users'] ?? [] as $user) {
-            $isUserRule->authorize(['userId' => $user->getId()], $currentUser);
-        }
-    }
-
-
-    /**
      * Preload the requested student
      *
      * @param array $params
@@ -387,15 +357,19 @@ class Module extends BaseModule
      */
     private function preloadAward(array $params): array
     {
-        try {
-            $award = $this->getMapperFactory()
-                          ->get(Mapper::class)
-                          ->findById($params['awardId']);
-        } catch (MapperException $e) {
-            throw new \Schoolbox\Application\Exception\NotFound("No award found for id: {$params['awardId']}");
+        if (($params['award'] ?? null) instanceof Model) {
+            $award = $params['award'];
+        } else {
+            try {
+                $award = $this->getMapperFactory()
+                              ->get(Mapper::class)
+                              ->findById($params['awardId']);
+            } catch (MapperException $e) {
+                throw new \Schoolbox\Application\Exception\NotFound("No award found for id: {$params['awardId']}");
+            }
         }
         return [
-            'award' => $award,
+            'award'  => $award,
             'userId' => $award->getRecipient()->getId(),
         ];
     }

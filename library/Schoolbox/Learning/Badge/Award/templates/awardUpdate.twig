@@ -2,10 +2,10 @@
 <script src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(
-    [ award.recipient.fullname, routeLookupIfAuthorized('searchUser.getProfile', {userId: award.recipient.id}) ],
+    [ award.recipient.fullname, routeLookupIfAuthorized('searchUser.getProfile', {userId: award.recipient.id, user: award.recipient}) ],
     [ (award.status | capitalize) ~ ' Evidence']
 ) }}
-{% set awardedByRoute = routeLookupIfAuthorized('searchUser.getProfile', {userId: award.awardedBy.id}) %}
+{% set awardedByRoute = routeLookupIfAuthorized('searchUser.getProfile', {userId: award.awardedBy.id, user: award.awardedBy}) %}
 <div class="row">
     <div class="small-12 columns">
         <h1>{{ award.status | capitalize }} Evidence</h1>
@@ -31,7 +31,7 @@
     with {badges: badges, isGoal: award.isGoal} only %}
 {% include '@learningBadgeAward/reasonForm.twig'
     with {
-    postRoute: routeLookupIfAuthorized('learningBadgeAward.postAwardUpdate', {awardId: award.id})~ '?returnUrl=' ~ returnUrl,
+    postRoute: routeLookupIfAuthorized('learningBadgeAward.postAwardUpdate', {awardId: award.id, award: award})~ '?returnUrl=' ~ returnUrl,
     isGoal : award.isGoal,
     reason : award.reason,
     submitLabel: 'Save',
