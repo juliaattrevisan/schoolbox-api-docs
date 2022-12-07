@@ -220,6 +220,16 @@ Usage:
                      * injection of the new html (hasUnits returns 0 too quickly)
                      */
                     toggleSaveCourse();
+
+                    {# This validation was triggering even though it was okay to be empty
+                     # That condition exists when you want to save the course without
+                     # creating a new unit; as usual, solve the problem by deleting the problem
+                     #}
+                    if ($('[data-unit-spec]').length) {
+                        $mageSaveCourseButton.on('click', function () {
+                            $('[data-new-unit]').remove();
+                        });
+                    }
                 });
                 newDOM.find('[data-collapser]').collapsable();
                 //I'm not sure what's going on in here, but a new version of jQuery has added a
