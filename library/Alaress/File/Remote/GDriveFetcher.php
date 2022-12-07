@@ -455,13 +455,14 @@ class GDriveFetcher implements FetcherInterface
         try {
             $this->client->get($url, [RequestOptions::SINK => $fp]);
         } catch (GuzzleException $e) {
-            throw new DomainException("Failed to download {$fileId}", 0, $e);
+            throw new DomainException('Could not fetch file. ' . $e->getMessage(), 0, $e);
         }
 
         if (mime_content_type($destination) === 'application/json') {
             // for some reason, Google output error in the downloaded file
             $fetchedData  = file_get_contents($destination);
             $errorMessage = $this->getErrorMessage(json_decode($fetchedData, true));
+
             if (!empty($errorMessage)) {
                 throw new DomainException($errorMessage);
             }
