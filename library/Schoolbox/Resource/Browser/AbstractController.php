@@ -15,7 +15,6 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Attachment\GenericZone;
 use Schoolbox\Resource\File\IFile as FileInterface;
 use Schoolbox\Resource\Folder\IFolder as FolderInterface;
@@ -83,8 +82,6 @@ abstract class AbstractController extends BaseController
      */
     protected $tab = 'resources';
 
-    private ?UserAccessMapper $userAccessMapper = null;
-
     /**
      *
      * Note this is an abstract method and should only be used for abstract implementation
@@ -106,20 +103,6 @@ abstract class AbstractController extends BaseController
         // retrieve folder data
         $folder = $this->getFolder($folderId);
 
-        $groupAccess = null;
-        try {
-            $groupAccessObj = $this->userAccessMapper->findOneByColumnList(
-                [
-                    'uid' => $this->getUser()->getId(),
-                    'sid' => $folderId,
-                    'service' => UserAccess::SERVICE_HOMEPAGE,
-                ]
-            );
-            $groupAccess = $groupAccessObj->getAccessLevel();
-        } catch (Mapper\Exception $e) {
-            // noop
-        }
-
         try {
             // attempt to compile an ancestry for this folder, but if it doesn't work, that's ok
             $tree = $folder->getParent() instanceof IFolder ? $this->getBreadcrumbs($folder->getParent()) : [];
@@ -132,7 +115,6 @@ abstract class AbstractController extends BaseController
             'folder'    => $folder,
             'nodeType'  => $this->treeBuilder->getNodeType($folder),
             'access'    => $access,
-            'groupAccess' => $groupAccess,
             'user'      => $this->getUser(),
             'conf'      => $this->conf,
             'namespace' => $this->namespace,
@@ -645,15 +627,6 @@ abstract class AbstractController extends BaseController
     public function setFilesystemProxy(Resource\Storage\FilesystemProxy $filesystemProxy): self
     {
         $this->filesystemProxy = $filesystemProxy;
-        return $this;
-    }
-
-    /**
-     * @return self
-     */
-    public function setUserAccessMapper(UserAccessMapper $userAccessMapper)
-    {
-        $this->userAccessMapper = $userAccessMapper;
         return $this;
     }
 }
