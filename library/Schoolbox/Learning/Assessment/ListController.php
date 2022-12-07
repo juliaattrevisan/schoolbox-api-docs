@@ -644,12 +644,12 @@ class ListController extends Web\Controller\Base
             /* Decide whether we have to invalidate project_result cache
              * Have to compare $postData and $assessment -before- it's transacted/updated
              */
-            $projectResultCacheDetetor = new ValidCache();
+            $projectResultCacheDetector = new ValidCache();
 
             if ($assessment instanceof Project) {
-                $cacheValid = $projectResultCacheDetetor->isSatisfiedByProject($postData, $assessment);
+                $cacheValid = $projectResultCacheDetector->isSatisfiedByProject($postData, $assessment);
             } else {
-                $cacheValid = $projectResultCacheDetetor->isSatisfiedByActivity($postData, $assessment);
+                $cacheValid = $projectResultCacheDetector->isSatisfiedByActivity($postData, $assessment);
             }
 
             $assessmentFactory = new Factory($user, $postData, $postData['assessmentType'], $originalAssessment);
