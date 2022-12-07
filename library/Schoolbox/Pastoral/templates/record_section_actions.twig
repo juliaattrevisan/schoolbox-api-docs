@@ -16,7 +16,7 @@
                                 </div>
                                 {% if recordAction.completed %}
                                 <div data-action-status-{{ recordAction.action.id }} class="pastoral-actions-list__date-and-user">
-                                    <span class="meta" title="{{ recordAction.updatedAt.local }}">
+                                    <span class="meta" title="{{ recordAction.updatedAt.long }}">
                                         Completed <time>{{ recordAction.updatedAt.getRelativeTime }}</time>
                                     </span>
                                     <a href="/search/user/{{ recordAction.updatedBy.id }}" title="{{ recordAction.updatedBy.fullname }}" class="profile-img">
