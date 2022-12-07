@@ -430,3 +430,30 @@ ul.meta {
         }
     }
 }
+
+/*
+ * A list of pastoral actions on a pastoral record
+ */
+.pastoral-actions-list {
+    margin: 0;
+    &__item {
+        border-bottom: 1px solid var(--body-background);
+        display: flex;
+        justify-content: space-between; // checkbox/label on the left, date and user on the far right
+        padding: 0.5rem;
+    }
+    &__date-and-user {
+        align-items: baseline;
+        display: flex;
+        gap: 0.5rem;
+    }
+    @media #{$large-down} {
+        &__item {
+            flex-direction: column;
+        }
+        &__date-and-user { // is now put below the checkbox/label and user is first, rather than date
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+        }
+    }
+}

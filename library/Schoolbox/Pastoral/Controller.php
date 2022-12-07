@@ -1444,6 +1444,7 @@ class Controller extends Base
             $recordAction->setCompleted($checked)
                          ->setUpdatedBy($this->getUser());
             $this->pastoralRecordActionMapper->save($recordAction);
+            $data = ($this->pastoralTranslator)($recordAction->getPastoral());
         } catch (MapperException $e) {
             $data['error'] = $e->getMessage();
             $this->getResponse()->status->setCode(400);
