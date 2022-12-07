@@ -30,12 +30,11 @@ class Mapper extends BaseMapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('external_id', self::TYPE_STRING);
         $this->uses('completed', self::TYPE_BOOLEAN);
-        $this->uses('updated_by', self::TYPE_INTEGER);
+        $this->joins('updated_by', UserMapper::class, 'id', null, null, 'updatedBy', 'updatedBy');
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
         $this->joins('action_id', \Schoolbox\Pastoral\Action\Mapper::class, 'id', null, null, 'action', 'action');
         $this->joins('pastoral_id', \Schoolbox\Pastoral\Mapper::class, 'id', null, null, 'pastoral', 'pastoral');
-        $this->joins('updated_by', UserMapper::class, 'id', null, null, 'updatedBy', 'updatedBy');
     }
 
     /**
