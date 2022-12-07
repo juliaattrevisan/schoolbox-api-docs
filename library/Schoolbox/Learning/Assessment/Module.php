@@ -500,6 +500,7 @@ class Module extends BaseModule
                     $replicator,
                     $folderMapper,
                     $viewLatestMapper,
+                    $projectResultCacheMapper
                 );
 
             case Assessment\Task\Controller::class:
@@ -518,6 +519,7 @@ class Module extends BaseModule
                     $unitSpecMapper,
                     $replicator,
                     $viewLatestMapper,
+                    $projectResultCacheMapper
                 );
 
             case Assessment\Lti\Controller::class:
@@ -541,6 +543,7 @@ class Module extends BaseModule
                     $this->injector->get('instance'),
                     $this->injector->get('lti.userCodec'),
                     $viewLatestMapper,
+                    $projectResultCacheMapper
                 );
 
             default:

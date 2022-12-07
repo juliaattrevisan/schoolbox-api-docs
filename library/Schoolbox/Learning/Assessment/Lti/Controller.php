@@ -12,15 +12,17 @@ namespace Schoolbox\Learning\Assessment\Lti;
 use Alaress_Date_Format;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
-use Psr\Cache\CacheItemPoolInterface;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Error;
+use Schoolbox\Error\Mapper;
 use Schoolbox\Instance;
 use Schoolbox\Learning\Assessment;
+use Schoolbox\Learning\Assessment\Breadcrumb\Factory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Participant\DataSource;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Assessment\Transactor;
@@ -78,25 +80,26 @@ class Controller extends Assessment\Controller
     /**
      * Constructor
      *
-     * @param UserMapper                      $userMapper
-     * @param Error\Mapper                    $errorMapper
-     * @param MapperProxy                     $assessmentMapper
-     * @param WorkTypeMapper                  $workTypeMapper
-     * @param Access                          $access
-     * @param Transactor                      $transactor
-     * @param Assessment\Breadcrumb\Factory   $bakery
-     * @param Term\Mapper                     $termMapper
-     * @param Participant\DataSource          $participantDataSource
-     * @param CourseSpecificationMapper       $courseSpecificationMapper
-     * @param UnitSpecificationMapper         $unitSpecificationMapper
-     * @param Replicator                      $replicator
-     * @param LtiTool\Mapper                  $ltiToolMapper
-     * @param LtiAssessment\Mapper            $ltiAssessmentMapper
-     * @param LtiAssessmentScore\Mapper       $ltiAssessmentScoreMapper
-     * @param RegistrationRepositoryInterface $registrations
-     * @param Instance                        $instance
-     * @param UserCodec                       $userCodec
-     * @param LatestViewMapper                $latestViewMapper
+     * @param UserMapper                            $userMapper
+     * @param Mapper                                $errorMapper
+     * @param MapperProxy                           $assessmentMapper
+     * @param WorkTypeMapper                        $workTypeMapper
+     * @param Access                                $access
+     * @param Transactor                            $transactor
+     * @param Factory                               $bakery
+     * @param Term\Mapper                           $termMapper
+     * @param DataSource                            $participantDataSource
+     * @param CourseSpecificationMapper             $courseSpecificationMapper
+     * @param UnitSpecificationMapper               $unitSpecificationMapper
+     * @param Replicator                            $replicator
+     * @param LtiTool\Mapper                        $ltiToolMapper
+     * @param LtiAssessment\Mapper                  $ltiAssessmentMapper
+     * @param LtiAssessmentScore\Mapper             $ltiAssessmentScoreMapper
+     * @param RegistrationRepositoryInterface       $registrations
+     * @param Instance                              $instance
+     * @param UserCodec                             $userCodec
+     * @param LatestViewMapper                      $latestViewMapper
+     * @param Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -117,7 +120,8 @@ class Controller extends Assessment\Controller
         RegistrationRepositoryInterface $registrations,
         Instance $instance,
         UserCodec $userCodec,
-        LatestViewMapper $latestViewMapper
+        LatestViewMapper $latestViewMapper,
+        protected Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
     ) {
         parent::__construct(
             $userMapper,
@@ -132,7 +136,8 @@ class Controller extends Assessment\Controller
             $courseSpecificationMapper,
             $unitSpecificationMapper,
             $replicator,
-            $latestViewMapper
+            $latestViewMapper,
+            $this->projectResultCacheMapper
         );
         $this->ltiToolMapper            = $ltiToolMapper;
         $this->ltiAssessmentMapper      = $ltiAssessmentMapper;

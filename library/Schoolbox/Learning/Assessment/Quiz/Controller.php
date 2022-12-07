@@ -16,12 +16,15 @@ use External\Canvas\Importer\CanvasDb;
 use PDOException;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Assessment\Term\Mapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Participant\DataSource;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
@@ -78,25 +81,28 @@ class Controller extends Assessment\Controller
      */
     private \Schoolbox\Resource\Folder\Mapper $folderMapper;
 
+
     /**
      * Controller constructor.
      *
-     * @param UserMapper                $userMapper
-     * @param ErrorMapper               $errorMapper
-     * @param DataModel\MapperProxy     $assessmentMapper
-     * @param WorkTypeMapper            $workTypeMapper
-     * @param Access                    $access
-     * @param Transactor                $transactor
-     * @param BreadcrumbFactory         $bakery
-     * @param QuizMapper                $quizMapper
-     * @param QuizSectionMapper         $quizSectionMapper
-     * @param QuizAttemptMapper         $quizAttemptMapper
-     * @param Term\Mapper               $termMapper
-     * @param Participant\DataSource    $participantDataSource
-     * @param CourseSpecificationMapper $courseSpecificationMapper
-     * @param UnitSpecificationMapper   $unitSpecificationMapper
-     * @param Replicator                $replicator
-     * @param LatestViewMapper          $latestViewMapper
+     * @param UserMapper                            $userMapper
+     * @param ErrorMapper                           $errorMapper
+     * @param MapperProxy                           $assessmentMapper
+     * @param WorkTypeMapper                        $workTypeMapper
+     * @param Access                                $access
+     * @param Transactor                            $transactor
+     * @param BreadcrumbFactory                     $bakery
+     * @param QuizMapper                            $quizMapper
+     * @param QuizSectionMapper                     $quizSectionMapper
+     * @param QuizAttemptMapper                     $quizAttemptMapper
+     * @param Mapper                                $termMapper
+     * @param DataSource                            $participantDataSource
+     * @param CourseSpecificationMapper             $courseSpecificationMapper
+     * @param UnitSpecificationMapper               $unitSpecificationMapper
+     * @param Replicator                            $replicator
+     * @param \Schoolbox\Resource\Folder\Mapper     $folderMapper
+     * @param LatestViewMapper                      $latestViewMapper
+     * @param Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -115,7 +121,8 @@ class Controller extends Assessment\Controller
         UnitSpecificationMapper $unitSpecificationMapper,
         Replicator $replicator,
         \Schoolbox\Resource\Folder\Mapper $folderMapper,
-        LatestViewMapper $latestViewMapper
+        LatestViewMapper $latestViewMapper,
+        protected Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
     ) {
         parent::__construct(
             $userMapper,
@@ -130,7 +137,8 @@ class Controller extends Assessment\Controller
             $courseSpecificationMapper,
             $unitSpecificationMapper,
             $replicator,
-            $latestViewMapper
+            $latestViewMapper,
+            $this->projectResultCacheMapper
         );
         $this->quizMapper        = $quizMapper;
         $this->quizSectionMapper = $quizSectionMapper;
