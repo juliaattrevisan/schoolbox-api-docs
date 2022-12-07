@@ -15,6 +15,12 @@
 {% block details_coordTeacher %}
     {% if externalUser.LECaseManagerName ?? false %}
         <dt class="no-margin small-6 medium-3">Learning Enrichment Case Manager:</dt>
-        <dd class="no-margin small-6 medium-9">{{ externalUser.LECaseManagerName }}</dd>
+        <dd class="no-margin small-6 medium-9">
+            {% if externalUser.LECaseManagerUserId %}
+                <a href="/search/user/{{ externalUser.LECaseManagerUserId }}">{{ externalUser.LECaseManagerName }}</a>
+            {% else %}
+                {{ externalUser.LECaseManagerName }}
+            {% endif %}
+        </dd>
     {% endif %}
 {% endblock details_coordTeacher %}
