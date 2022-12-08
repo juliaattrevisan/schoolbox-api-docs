@@ -35,6 +35,10 @@ export default {
         siteVersion: {
             type: String,
             required: true
+        },
+        configGradeGradientEnabled: {
+            type: Boolean,
+            required: true
         }
     },
     data() {
@@ -248,6 +252,11 @@ export default {
             return dayjs(date).format(format);
         },
 
+        gradient(data) {
+            let gradientLevel = this.configGradeGradientEnabled ? (parseInt(data) / 10).toFixed() : 'none';
+            return `gradient-${gradientLevel}-bg`;
+        },
+
         /**
          * to open up the node details modal
          *
@@ -304,7 +313,7 @@ export default {
                                         <time class="pipe meta"
                                               :datetime="formatDate(evidence.object.createdAt)"
                                               :title="formatDate(evidence.object.createdAt, dateDisplayFormats.dayjsDatetime)"
-                                        >{{ formatDate(evidence.object.createdAt, dateDisplayFormats.dayjsTime) }}</time>
+                                        >{{ formatDate(evidence.object.createdAt, dateDisplayFormats.dayjsDatetime) }}</time>
                                     </a>
                                 </div>
                                 <nav v-if="hasMenu(evidence.object)">
@@ -372,7 +381,33 @@ export default {
                                     </p>
                                 </a>
                             </div>
-
+                        </template>
+                        <template v-if="evidence.discriminator === 'dueWorkFeedback'">
+                            <div class="flex-grade">
+                                <div class="small-12 card columns">
+                                    <a :href="evidence.object._links.summary">
+                                        <span class="icon-due-work"></span>
+                                        <p>{{ evidence.object.assessment.title }}</p>
+                                    </a>
+                                    <p class="meta">
+                                        Reviewed by {{ evidence.object.instructor.fullName }}
+                                        |
+                                        <time class="meta" :datetime="formatDate(evidence.object.publishedAt)"
+                                              :title="formatDate(evidence.object.publishedAt, dateDisplayFormats.dayjsDatetime)">
+                                            {{ formatDate(evidence.object.publishedAt, dateDisplayFormats.dayjsDateTime) }}
+                                        </time>
+                                    </p>
+                                </div>
+                                <div v-if="evidence.object.normalisedMark" :class="`grade ${gradient(evidence.object.normalisedMark)}` ">
+                                    <span>{{ evidence.object.mark }}</span>
+                                </div>
+                            </div>
+                            <div class="content">
+                                <blockquote v-if="evidence.object.comment">{{ evidence.object.comment }}<br>
+                                </blockquote>
+                                <a :href="evidence.object._links.summary">
+                                    View assessment details</a>
+                            </div>
                         </template>
                     </li>
                 </ul>

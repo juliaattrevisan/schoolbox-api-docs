@@ -11,9 +11,12 @@ namespace Schoolbox\Learning\Moment\Feed;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
-use Alaress_Date_Format;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\MapperProxy as DueWorkFeedbackMapperProxy;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\Translator\ModelToArray\Factory;
+use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Badge\Award\Mapper as BadgeAwardMapper;
 use Schoolbox\Learning\Badge\Award\Translator\ModelToArray\Factory as BadgeAwardTranslatorFactory;
 use Schoolbox\Learning\Moment\Evidence\Mapper as EvidenceMapper;
@@ -30,7 +33,6 @@ use Schoolbox\User;
  */
 class Controller extends Base
 {
-
     /**
      * Number of feed items to display before prompting user
      * with Load More button
@@ -45,47 +47,25 @@ class Controller extends Base
 
 
     /**
-     * Mapper used to retrieve learning moment evidence.
-     */
-    private EvidenceMapper $evidenceMapper;
-
-
-    /**
-     * Mapper used to retrieve badge awards.
-     */
-    private BadgeAwardMapper $badgeAwardMapper;
-
-
-    /**
-     * Mapper used to retrieve comments on learning moments.
-     */
-    private CommentMapper $commentMapper;
-
-
-    /**
-     * Database connector, required for the feed's cursor.
-     */
-    private IConnector $database;
-
-
-    /**
      * Constructor
      *
-     * @param EvidenceMapper   $evidenceMapper
-     * @param BadgeAwardMapper $badgeAwardMapper
-     * @param CommentMapper    $commentMapper
-     * @param IConnector       $database
+     * @param EvidenceMapper             $evidenceMapper
+     * @param BadgeAwardMapper           $badgeAwardMapper
+     * @param CommentMapper              $commentMapper
+     * @param IConnector                 $database
+     * @param DueWorkFeedbackMapperProxy $returnDataSource
+     * @param AssessmentMapperProxy      $assessmentDataSource
+     * @param Visibility                 $visibility
      */
     public function __construct(
-        EvidenceMapper $evidenceMapper,
-        BadgeAwardMapper $badgeAwardMapper,
-        CommentMapper $commentMapper,
-        IConnector $database
+        private EvidenceMapper $evidenceMapper,
+        private BadgeAwardMapper $badgeAwardMapper,
+        private CommentMapper $commentMapper,
+        private IConnector $database,
+        private DueWorkFeedbackMapperProxy $returnDataSource,
+        private AssessmentMapperProxy $assessmentDataSource,
+        private Visibility $visibility
     ) {
-        $this->evidenceMapper   = $evidenceMapper;
-        $this->badgeAwardMapper = $badgeAwardMapper;
-        $this->commentMapper    = $commentMapper;
-        $this->database         = $database;
     }
 
 
@@ -99,8 +79,8 @@ class Controller extends Base
      */
     public function getFeedForUser(User $user): void
     {
-        $encodedCursor   = $this->request->query->get('cursor');
-        $cursor          = new Cursor(
+        $encodedCursor = $this->request->query->get('cursor');
+        $cursor        = new Cursor(
             $this->database,
             $user,
             $this->getUser(),
@@ -108,7 +88,15 @@ class Controller extends Base
             self::FEED_ITEMS_PER_PAGE,
             $this->getConfigLoader(),
         );
-        $hydrator        = new Hydrator($this->evidenceMapper, $this->badgeAwardMapper);
+
+        $hydrator        = new Hydrator(
+            $this->evidenceMapper,
+            $this->badgeAwardMapper,
+            $this->returnDataSource,
+            $this->assessmentDataSource,
+            $this->visibility,
+            $this->getUser()
+        );
         $prefixGenerator = new PrefixGenerator($this->getConfigLoader());
         $translator      = new ModelToArray(
             (new EvidenceTranslatorFactory(
@@ -123,26 +111,33 @@ class Controller extends Base
                 $this->authorizer,
                 $this->getUser(),
                 $prefixGenerator,
+            ))->build(),
+            (new Factory(
+                $this->router,
+                $this->authorizer,
+                $this->getUser(),
             ))->build()
         );
 
-        $data       = $cursor->retrieveResults($encodedCursor);
+        $data = $cursor->retrieveResults($encodedCursor);
 
         $mappedData = $hydrator->hydrateResults($data)
-            ->map($translator)
-            ->reindex();
+                               ->map($translator)
+                               ->reindex();
 
         $this->response->content->set(
-            $this->buildJsonOutput([
-                'data'     => $mappedData,
-                'metadata' => [
-                    'count'  => $cursor->retrieveResultCount(),
-                    'cursor' => [
-                        'current' => $encodedCursor ?? $cursor->current($data),
-                        'next'    => $cursor->next($data),
+            $this->buildJsonOutput(
+                [
+                    'data'     => $mappedData,
+                    'metadata' => [
+                        'count'  => $cursor->retrieveResultCount(),
+                        'cursor' => [
+                            'current' => $encodedCursor ?? $cursor->current($data),
+                            'next'    => $cursor->next($data),
+                        ],
                     ],
-                ],
-            ])
+                ]
+            )
         );
     }
 }

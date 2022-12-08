@@ -14,9 +14,11 @@ use Alaress\Codec\Json\Base64;
 use Alaress\Database\Connector\IConnector;
 use Alaress_Date_Format;
 use Schoolbox\API\Cursor\ICursor;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\User;
 
 /**
@@ -39,37 +41,11 @@ class Cursor implements ICursor
      */
     public const DISCRIMINATOR_BADGE_AWARD = 'badgeAward';
 
-
     /**
-     * A connection to a database from which the result is retrieved.
+     * Discriminator value for identifying that a retrieved result points to a
+     * duework feedback.
      */
-    private IConnector $database;
-
-
-    /**
-     * A user to retrieve the learning moment feed for.
-     *
-     * Usually, but not always, a student.
-     */
-    private User $user;
-
-
-    /**
-     * If provided: don't fetch any badge awards which expire before this date.
-     */
-    private ?Alaress_Date_Format $expiryDate;
-
-
-    /**
-     * The maximum number of results to fetch in one query.
-     */
-    private int $limit;
-
-
-    /**
-     * The codec for encoding/decoding a cursor.
-     */
-    private ICodec $codec;
+    public const DISCRIMINATOR_DUE_WORK_FEEDBACK = 'dueWorkFeedback';
 
 
     /**
@@ -83,6 +59,7 @@ class Cursor implements ICursor
      */
     private bool $badgesEnabled;
 
+    private bool $lmsEnabled;
 
     /**
      * Constructor
@@ -90,29 +67,27 @@ class Cursor implements ICursor
      * @param IConnector               $database
      * @param User                     $viewee
      * @param User                     $viewer
-     * @param Alaress_Date_Format|null $expiryDate
-     * @param int                      $limit
+     * @param Alaress_Date_Format|null $expiryDate If provided: don't fetch any badge awards which expire before this date.
+     * @param int                      $limit      The maximum number of results to fetch in one query.
      * @param IConfigLoader            $config
-     * @param ICodec|null              $codec
+     * @param ICodec|null              $codec      The codec for encoding/decoding a cursor.
      */
     public function __construct(
-        IConnector $database,
-        User $viewee,
-        User $viewer,
-        ?Alaress_Date_Format $expiryDate,
-        int $limit,
+        private IConnector $database,
+        private User $viewee,
+        private User $viewer,
+        private ?Alaress_Date_Format $expiryDate,
+        private int $limit,
         IConfigLoader $config,
-        ?ICodec $codec = null
+        private ?ICodec $codec = null
     ) {
-        $this->database               = $database;
-        $this->user                   = $viewee;
-        $this->expiryDate             = $expiryDate;
-        $this->limit                  = $limit;
         $this->codec                  = $codec ?? new Base64();
         $this->learningMomentsEnabled = $config->get(ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED)
             && $viewee->getLearningMomentsEnabled()
             && (!$viewer->getRole()->isStaff() || $viewer->getRole()->getAccessEvidence());
         $this->badgesEnabled          = $config->get(ConfigMapper::NAME_BADGES_ENABLED);
+        $this->lmsEnabled             = $config->get(ConfigMapper::NAME_LMS_ENABLED)
+            && (!$viewer->getRole()->isStaff() || $viewer->getRole()->getViewStudentGrades());
     }
 
 
@@ -154,17 +129,21 @@ class Cursor implements ICursor
         if ($this->learningMomentsEnabled) {
             $countQueries[] = $this->database->executeQuery(
                 "SELECT COUNT(*) FROM evidence WHERE user_id = ? AND deleted_at IS NULL",
-                [$this->user->getId()]
+                [$this->viewee->getId()]
             );
         }
         if ($this->badgesEnabled) {
             $badgeCountQuery  = "SELECT COUNT(*) FROM badge_user WHERE recipient_id = ? AND deleted_at IS NULL";
-            $badgeCountParams = [$this->user->getId()];
+            $badgeCountParams = [$this->viewee->getId()];
             if ($this->expiryDate) {
                 $badgeCountQuery    .= ' AND (expires_at IS NULL OR expires_at >= ?)';
-                $badgeCountParams[] =  $this->expiryDate->getDatabaseDate();
+                $badgeCountParams[] = $this->expiryDate->getDatabaseDate();
             }
             $countQueries[] = $this->database->executeQuery($badgeCountQuery, $badgeCountParams);
+        }
+        if ($this->lmsEnabled) {
+            [$dueWorkFeedbackCountQuery, $dueWorkFeedbackCountParams] = $this->getDueWorkFeedbackQuery([], countOnly: true);
+            $countQueries[] = $this->database->executeQuery($dueWorkFeedbackCountQuery, $dueWorkFeedbackCountParams);
         }
 
         foreach ($countQueries as $countQuery) {
@@ -219,7 +198,7 @@ class Cursor implements ICursor
                 WHERE user_id = :userIdEvidence AND deleted_at IS NULL
             ';
             $params['discriminatorEvidence'] = self::DISCRIMINATOR_EVIDENCE;
-            $params['userIdEvidence']        = $this->user->getId();
+            $params['userIdEvidence']        = $this->viewee->getId();
         }
         if ($this->badgesEnabled) {
             $badgeQuery                        = '
@@ -231,13 +210,17 @@ class Cursor implements ICursor
                 WHERE recipient_id = :userIdBadgeAward AND deleted_at IS NULL
             ';
             $params['discriminatorBadgeAward'] = self::DISCRIMINATOR_BADGE_AWARD;
-            $params['userIdBadgeAward']        = $this->user->getId();
+            $params['userIdBadgeAward']        = $this->viewee->getId();
 
             if ($this->expiryDate) {
                 $badgeQuery                 .= ' AND (expires_at IS NULL OR expires_at >= :expiryBadgeAward)';
-                $params['expiryBadgeAward'] =  $this->expiryDate->getDatabaseDate();
+                $params['expiryBadgeAward'] = $this->expiryDate->getDatabaseDate();
             }
             $queries[] = $badgeQuery;
+        }
+        if ($this->lmsEnabled) {
+            [$dueWorkFeedbackQuery, $params] = $this->getDueWorkFeedbackQuery($params, countOnly: false);
+            $queries[] = $dueWorkFeedbackQuery;
         }
 
         if (count($queries) === 0) {
@@ -256,5 +239,65 @@ class Cursor implements ICursor
         return new Collection(
             $this->database->executeQuery($query, $params)->fetchAll()
         );
+    }
+
+
+    /**
+     * Returns query to get due work feedback
+     * @param array $params
+     * @param bool  $countOnly
+     * @return array
+     */
+    private function getDueWorkFeedbackQuery(array $params, bool $countOnly): array
+    {
+        // check work type
+        $filterWorkType = false;
+        // check mark_visibility
+        if ($this->viewer->getRole()->isStaff()) {
+            $visibility = IAssessable::MARK_VISIBILITY_PRIVATE;
+        } elseif ($this->viewer->getRole()->isStudent()) {
+            $visibility     = IAssessable::MARK_VISIBILITY_STUDENT;
+            $filterWorkType = true;
+        } elseif ($this->viewer->getRole()->isParent()) {
+            $visibility     = IAssessable::MARK_VISIBILITY_PARENT_STUDENT;
+            $filterWorkType = true;
+        } else {
+            throw new \UnexpectedValueException('Unexpected User: ' . $this->viewer->getId());
+        }
+
+        if ($countOnly) {
+            $dueWorkFeedbackQuery = ' SELECT COUNT(*) ';
+        } else {
+            $dueWorkFeedbackQuery                   = '
+                SELECT `submission_return`.`id` AS id,
+                       :discriminatorDueWorkFeedback AS discriminator,
+                       `submission_return`.`published_at` AS date ';
+            $params['discriminatorDueWorkFeedback'] = self::DISCRIMINATOR_DUE_WORK_FEEDBACK;
+        }
+
+        $dueWorkFeedbackQuery .= '
+                FROM `submission_return`
+                    JOIN `submission_box` ON `submission_return`.`box_id` = `submission_box`.`id`
+                    JOIN `assessment` ON `assessment`.`id` = `submission_box`.`assessment_id`
+                WHERE `review_route` = :reviewRoute
+                  AND `submission_return`.`published_at` IS NOT NULL
+                  AND `submission_return`.`owner` = :userIdDueWorkFeedback
+                  AND `submission_box`.`mark_visibility` >= :markVisibility
+                  AND `submission_return`.`deleted_at` IS NULL
+                  AND `assessment`.`deleted_at` IS NULL
+            ';
+
+        if ($filterWorkType) {
+            $dueWorkFeedbackQuery .= '
+                AND `assessment`.`work_type_id`
+                 IN (SELECT `id` FROM `lu_work_type`
+                                WHERE `staff_or_instructor_visible_only` = 0
+                                  AND `deleted_at` IS NULL)';
+        }
+
+        $params['userIdDueWorkFeedback'] = $this->viewee->getId();
+        $params['markVisibility']        = $visibility;
+        $params['reviewRoute']           = ReturnedWork::REVIEW_ROUTE_INSTRUCTOR;
+        return [$dueWorkFeedbackQuery, $params];
     }
 }

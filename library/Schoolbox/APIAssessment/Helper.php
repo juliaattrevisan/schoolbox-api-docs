@@ -368,7 +368,7 @@ WHERE
         'submission_return'  AS `feedback_table`,
         max(`sr1`.`id`)      AS `feedback_id`,
         `sr1`.`owner`        AS `student_id`,
-        `sr1`.`created_at`   AS `completionDate`,
+        `sr1`.`published_at` AS `completionDate`,
         `sr1`.`comment`      AS `comment`,
         `sr1`.`mark`         AS `mark`,
         `sr1`.`norm_mark`    AS `norm_mark`,

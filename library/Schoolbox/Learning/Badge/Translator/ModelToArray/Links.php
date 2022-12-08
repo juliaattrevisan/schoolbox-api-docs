@@ -9,50 +9,14 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Badge\Translator\ModelToArray;
 
-use Alaress\Authorizer\Authorizer;
-use Aura\Router\Router;
+use Schoolbox\Api\Translator\AbstractLinks;
 use Schoolbox\Learning\Badge\Model;
-use Schoolbox\User;
 
 /**
  * Translator for loading links for the badge.
  */
-class Links
+class Links extends AbstractLinks
 {
-    /**
-     * The router object, as required to generate a link to content.
-     */
-    private Router $router;
-
-
-    /**
-     * The authorizer object, as required to determine whether a user is
-     * authorized to access a link.
-     */
-    private Authorizer $authorizer;
-
-
-    /**
-     * The user who is being authorized to access a link.
-     */
-    private User $currentUser;
-
-
-    /**
-     * Constructor
-     *
-     * @param Router     $router
-     * @param Authorizer $authorizer
-     * @param User       $currentUser
-     */
-    public function __construct(Router $router, Authorizer $authorizer, User $currentUser)
-    {
-        $this->router      = $router;
-        $this->authorizer  = $authorizer;
-        $this->currentUser = $currentUser;
-    }
-
-
     /**
      * @param Model $badge
      * @return array
@@ -99,23 +63,5 @@ class Links
 
 
         return $translation;
-    }
-
-
-    /**
-     * Helper function for outputting a route, only if it is authorized.
-     *
-     * @param string $route
-     * @param array  $params
-     * @return string|null
-     * @noinspection PhpDocMissingThrowsInspection Should never happen as `$route` should never not be defined
-     */
-    private function getRouteIfAuthorized(string $route, array $params): ?string
-    {
-        if ($this->authorizer->isPathAuthorizedForUser($route, $params, $this->currentUser)) {
-            /** @noinspection PhpUnhandledExceptionInspection */
-            return $this->router->generate($route, $params);
-        }
-        return null;
     }
 }
