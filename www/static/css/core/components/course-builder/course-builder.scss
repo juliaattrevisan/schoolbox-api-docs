@@ -1,17 +1,15 @@
-/* TODO - Go through the styling for the course builder component 
-and encapsulate all of the styling in here. 
-
-This file uses BEM notation. Read more here -> https://getbem.com/
+/* TODO - Go through the other stylesheets that include course builder 
+styling and move all the code in here.
 */
 
-.course-builder{
+.course-builder {
 
-    .breadcrumb ~ &{
+    .breadcrumb ~ & {
         margin-bottom: var(--whitespace-m);
     }
 
-    &__list{
-        & .card{
+    .information-list--course-builder {
+        & .card {
             display: flex;
             padding-bottom: var(--whitespace-xs);
             padding-top: var(--whitespace-xs);
