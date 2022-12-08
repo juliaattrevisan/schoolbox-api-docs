@@ -498,7 +498,6 @@
                     let toastMsg = {
                         css: 'alert',
                         duration: 5000,
-                        // NOTE: responseText sometimes has extraneous brackets and quotes, so we must remove them.
                         text: errorMessages.join(' | ')
                     };
                     $toaster.toastActivate(toastMsg);
@@ -512,7 +511,6 @@
                 });
 
                 // Trigger attachzone success event
-
                 $(self.element).trigger('success.attachzone', [message]);
             }
         });
