@@ -115,6 +115,12 @@ class Controller extends Base
             if ($a->getOrder() !== $b->getOrder()) {
                 return $a->getOrder() <=> $b->getOrder();
             } elseif ($a->getCode() !== $b->getCode()) {
+                // space comes later
+                if ($a->getCode() === '') {
+                    return 1;
+                } elseif ($b->getCode() === '') {
+                    return -1;
+                }
                 return $a->getCode() <=> $b->getCode();
             } elseif ($a->getName() !== $b->getName()) {
                 return strnatcmp($a->getName(), $b->getName());
