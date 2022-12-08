@@ -5,6 +5,7 @@
     {% set action = routeLookupIfAuthorized('pastoralAudience.postAudienceSubTypeModify', {subtype: subtype, subtypeId: subtype.id}) %}
     {% set title = type.name ~ ': ' ~ subtype.name %}
 {% endif %}
+{% set getActionsRoute = routeLookup('pastoral.getActions') %}
 
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
@@ -83,16 +84,30 @@
                     <fieldset class="content">
                         <div class="small-12 columns">
                             <label for="template">Available Actions</label>
+                            <p class="meta">
+                                These actions will be available to be optionally added to pastoral records of this type.
+                            </p>
                             <script type="text/javascript"
                                     src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
                             <script type="text/javascript"
                                     src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
                             <select data-actions name="actions[]" id="pastoral-actions" multiple></select>
                         </div>
+                        <div class="small-12 columns">
+                            <label for="template">Default Actions</label>
+                            <p class="meta">
+                                These actions will be automatically appended on creation of the pastoral record.
+                            </p>
+                            <script type="text/javascript"
+                                    src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
+                            <script type="text/javascript"
+                                    src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
+                            <select data-default-actions name="defaultActions[]" id="pastoral-default-actions" multiple></select>
+                        </div>
                         <script type="text/javascript">
                             {% autoescape 'js' %}
 
-                            $('#pastoral-actions').selectizeSelector({
+                            let actionSelectize = $('#pastoral-actions').selectizeSelector({
                                 multiple: true,
                                 selectize: {
                                     create: false,
@@ -102,8 +117,8 @@
                                     hideSelected: true,
                                     load: function (query, callback) {
                                         $.ajax({
-                                    url: '{{ routeLookup('pastoral.getActions') }}',
-                                    type:     'GET',
+                                            url: '{{ getActionsRoute }}',
+                                            type: 'GET',
                                             dataType: 'json',
                                             data: {query: query}
                                         }).done(function (result) {
@@ -115,9 +130,40 @@
                                 },
                                 value: [
                                     {% for action in typeActions %}
-                                    {'id': '{{ action.id }}', 'name': '{{ action.name | escape('js') }}'},
+                                    {'id': '{{ action.action.id }}', 'name': '{{ action.action.name | escape('js') }}'},
                                     {% endfor %}
                                 ]
+                            }).on('selectize.item_remove', function (e, value){
+                                defaultActionSelectize[0].selectize.removeItem(value);
+                            });
+                            let defaultActionSelectize = $('#pastoral-default-actions').selectizeSelector({
+                                multiple: true,
+                                selectize: {
+                                    create: false,
+                                    placeholder: 'Search Actions',
+                                    preload: true,
+                                    persist: true,
+                                    hideSelected: true,
+                                    load: function (query, callback) {
+                                        $.ajax({
+                                            url: '{{ getActionsRoute }}',
+                                            type: 'GET',
+                                            dataType: 'json',
+                                            data: {query: query}
+                                        }).done(function (result) {
+                                            callback(result)
+                                        }).fail(function () {
+                                            callback()
+                                        })
+                                    }
+                                },
+                                value: [
+                                    {% for action in typeActions | filter (action => action.default) %}
+                                    {'id': '{{ action.action.id }}', 'name': '{{ action.action.name | escape('js') }}'},
+                                    {% endfor %}
+                                ]
+                            }).on('selectize.item_add', function (e, value){
+                                actionSelectize[0].selectize.addItem(value);
                             });
                             {% endautoescape %}
                         </script>

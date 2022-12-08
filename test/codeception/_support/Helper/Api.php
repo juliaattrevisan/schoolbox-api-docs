@@ -10,14 +10,13 @@ namespace Helper;
 use Codeception\Exception\ModuleException;
 use Codeception\Module\Db;
 use Codeception\TestInterface;
-use Payload\Request;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\Application\CliTool\Kernel;
 use Schoolbox\CampusMapper;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Action\Mapper as PastoralActionMapper;
+use Schoolbox\Pastoral\TypeAction\Mapper as PastoralTypeActionMapper;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\SubType\Mapper as PastoralSubtypeMapper;
 use Schoolbox\Pastoral\SubType\Model;
@@ -208,10 +207,11 @@ class Api extends \Codeception\Module
      */
     public function preparePastoralActions(): GenericCollection
     {
-        $pastoralActionMapper  = PastoralActionMapper::getInstance();
-        $pastoralSubtypeMapper = PastoralSubtypeMapper::getInstance();
-        $pastoralTypeMapper    = PastoralTypeMapper::getInstance();
-        $actions               = $pastoralActionMapper->findAll();
+        $pastoralActionMapper     = PastoralActionMapper::getInstance();
+        $pastoralSubtypeMapper    = PastoralSubtypeMapper::getInstance();
+        $pastoralTypeMapper       = PastoralTypeMapper::getInstance();
+        $pastoralTypeActionMapper = PastoralTypeActionMapper::getInstance();
+        $actions                  = $pastoralActionMapper->findAll();
 
         if ($actions->count() === 0) {
             for ($i = 0; $i < 5; $i++) {
@@ -227,11 +227,19 @@ class Api extends \Codeception\Module
         foreach ($types as $type) {
             if ($type->getSubTypes()->count()) {
                 /** @var Model $subType */
-                $subType = $type->getSubTypes()->first();
-                $subType->setActions($pastoralActionMapper->createCollection()->add($actions->first()));
+                $subType    = $type->getSubTypes()->first();
+                $typeAction = $pastoralTypeActionMapper->createModel()
+                                                       ->setAction($actions->first())
+                                                       ->setDefault(false)
+                                                       ->setSubTypeId($subType->getId());
+                $subType->setTypeActions($pastoralTypeActionMapper->createCollection()->add($typeAction));
                 $pastoralSubtypeMapper->save($subType);
             } else {
-                $type->setActions($pastoralActionMapper->createCollection()->add($actions->last()));
+                $typeAction = $pastoralTypeActionMapper->createModel()
+                                                       ->setAction($actions->last())
+                                                       ->setDefault(false)
+                                                       ->setTypeId($type->getId());
+                $type->setTypeActions($pastoralTypeActionMapper->createCollection()->add($typeAction));
                 $pastoralTypeMapper->save($type);
             }
         }

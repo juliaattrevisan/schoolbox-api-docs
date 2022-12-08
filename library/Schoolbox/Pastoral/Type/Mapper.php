@@ -9,10 +9,10 @@
 namespace Schoolbox\Pastoral\Type;
 
 use PDOStatement;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Pastoral;
-use Schoolbox\Pastoral\Action\Mapper as PastoralActionMapper;
 use Schoolbox\Pastoral\DocumentClassification\Mapper as DocumentClassificationMapper;
 
 /**
@@ -46,7 +46,7 @@ class Mapper extends BaseMapper
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
         $this->joinsReverseMulti('pastoral_type_id', Pastoral\SubType\Mapper::class, 'subTypes', 'subTypes');
-        $this->joinsVia('pastoral_type_action', PastoralActionMapper::class, 'id', 'action_id', 'type_id', null, null, null, 'actions');
+        $this->joinsReverseMulti('type_id', Pastoral\TypeAction\Mapper::class, 'typeActions', 'typeActions');
 
 //        $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteCheckPastoralSubtypes']);
 //        $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteCheckPastoralRecords']);
@@ -63,7 +63,7 @@ class Mapper extends BaseMapper
         return "
             SELECT {$this->getColumnString()},
                    {$this->getJoinColumnString('subTypes', 'st')},
-                   {$this->getJoinColumnString('pastoral_type_action', 'actions')}
+                   {$this->getJoinColumnString('typeActions', 'typeActions')}
         ";
     }
 
@@ -76,7 +76,7 @@ class Mapper extends BaseMapper
         return "
             FROM      {$this->getTable()}
             LEFT JOIN {$this->getJoinSql('subTypes', '', 'st')}
-            LEFT JOIN {$this->getJoinSql('pastoral_type_action', '', 'actions')}
+            LEFT JOIN {$this->getJoinSql('typeActions', '', 'typeActions')}
         ";
     }
 
@@ -95,10 +95,10 @@ class Mapper extends BaseMapper
         $subTypeMapper = $this->getJoinMapper('subTypes');
 
 
-        /* Pastoral Actions need to be part of findById() in Admin Lists controller
+        /* Pastoral typeActions need to be part of findById() in Admin Lists controller
          * otherwise you lose their relationships when you change a Type's details
          */
-        $actionsMapper = $this->getJoinMapper('pastoral_type_action');
+        $typeActionsMapper = $this->getJoinMapper('typeActions');
 
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
@@ -116,12 +116,9 @@ class Mapper extends BaseMapper
                 $model->getSubTypes()[$subType->getId()] = $subType;
             }
 
-            /* Hydrate pastoral actions, if there are any associated
-             */
-            $action = $actionsMapper->hydrate($row, 'actions');
-
-            if (null !== $action) {
-                $model->getActions()->add($action);
+            if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
+                $typeActions = $typeActionsMapper->findByColumn('type_id', $model->getId());
+                $model->setTypeActions($typeActions);
             }
         }
         return $collection;

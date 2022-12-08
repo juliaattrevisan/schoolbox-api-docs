@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Pastoral\SubType;
 
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Pastoral;
@@ -44,18 +45,7 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
-
-        $this->joinsVia(
-            'pastoral_type_action',
-            \Schoolbox\Pastoral\Action\Mapper::class,
-            'id',
-            'action_id',
-            'subtype_id',
-            null,
-            null,
-            null,
-            'actions'
-        );
+        $this->joinsReverseMulti('subtype_id', Pastoral\TypeAction\Mapper::class, 'typeActions', 'typeActions');
 
 //        $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteCheckPastoralRecords']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deletePastoralAudiences']);
@@ -70,7 +60,7 @@ class Mapper extends BaseMapper
         return "
             SELECT {$this->getColumnString()},
                    {$this->getJoinColumnString('pastoralType', 't')},
-                   {$this->getJoinColumnString('pastoral_type_action', 'actions')}
+                   {$this->getJoinColumnString('typeActions', 'typeActions')}
         ";
     }
 
@@ -83,7 +73,7 @@ class Mapper extends BaseMapper
         return "
             FROM        {$this->getTable()}
             INNER JOIN  {$this->getJoinSql('pastoralType', '', 't', true)}
-            LEFT JOIN {$this->getJoinSql('pastoral_type_action', '', 'actions')}
+            LEFT JOIN {$this->getJoinSql('typeActions', '', 'typeActions')}
         ";
     }
 
@@ -100,10 +90,10 @@ class Mapper extends BaseMapper
         /** @var Pastoral\Type\Mapper $typeMapper */
         $typeMapper = $this->getJoinMapper('pastoralType');
 
-        /* Pastoral Actions need to be part of findById() in Admin Lists controller
+        /* Pastoral typeActions need to be part of findById() in Admin Lists controller
          * otherwise you lose their relationships when you change a Subtype's details
          */
-        $actionsMapper = $this->getJoinMapper('pastoral_type_action');
+        $typeActionsMapper = $this->getJoinMapper('typeActions');
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $modelId = $row[$this->getIdentifierColumn()];
@@ -117,12 +107,13 @@ class Mapper extends BaseMapper
 
             $type = $typeMapper->hydrate($row, 't');
 
-            /* Hydrate pastoral actions, if there are any associated
+            /* Hydrate pastoral typeActions, if there are any associated
              */
-            $action = $actionsMapper->hydrate($row, 'actions');
-
-            if (null !== $action) {
-                $model->getActions()->add($action);
+            if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
+                $typeActions = $typeActionsMapper->findByColumn('subtype_id', $model->getId());
+                if ($typeActions->count() > 0) {
+                    $model->setTypeActions($typeActions);
+                }
             }
 
             $model->setPastoralType($type);

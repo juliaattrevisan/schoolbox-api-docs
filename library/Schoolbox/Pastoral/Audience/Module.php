@@ -80,6 +80,7 @@ class Module extends AlaressModule\Module
             $this->getMapperFactory()->get(Pastoral\Type\Mapper::class),
             $this->getMapperFactory()->get(Pastoral\SubType\Mapper::class),
             $this->getMapperFactory()->get(Pastoral\Action\Mapper::class),
+            $this->getMapperFactory()->get(Pastoral\TypeAction\Mapper::class),
             $this->getMapperFactory()->get(IconMapper::class),
             $this->injector->get('l10n'),
             new ColorFactory(),
