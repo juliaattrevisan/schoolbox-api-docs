@@ -114,8 +114,7 @@ class GDriveFetcher implements FetcherInterface
         $this->client                       = new Client(
             [
                 RequestOptions::HEADERS => ['Authorization' => $httpAuth],
-                'curl'                  => $proxy->buildCurlOptions(),
-                'timeout'               => 10,
+                'curl'                  => $proxy->buildCurlOptions()
             ]
         );
         $this->httpHeaders['Authorization'] = $httpAuth;
