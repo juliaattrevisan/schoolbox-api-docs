@@ -12,10 +12,10 @@ This file uses BEM notation. Read more here -> https://getbem.com/
 
     &__list{
         & .card{
-            padding-top: var(--whitespace-xs);
-            padding-bottom: var(--whitespace-xs);
             display: flex;
-    
+            padding-bottom: var(--whitespace-xs);
+            padding-top: var(--whitespace-xs);
+
             & p{
                 &:last-child{
                     margin-bottom: 0;
