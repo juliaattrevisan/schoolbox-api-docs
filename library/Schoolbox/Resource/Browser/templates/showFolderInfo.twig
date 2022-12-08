@@ -125,7 +125,7 @@
                             .done(function (data) {
                                 let nFilesAdded = addNewFilesToTree(data);
                                 clearDropZone();
-                                $toast.toastTimeout( { text: nFilesAdded + ' file(s) added to resources', css: 'success' } );
+                                $toast.toastTimeout( { text: nFilesAdded + ' file(s) added to resources', css: 'success', duration: 5000 } );
                             })
                             .fail(function () {
                                 $toast.toastTimeout( { text: 'Unable to update resources', css: 'error' } );

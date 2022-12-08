@@ -538,7 +538,9 @@
      * @param event
      */
     ResourceAttach.prototype.reopenParentReveal = function (event) {
-        $('#resource-browser-toast').toastTimeout({duration: 0});
+        let $toaster = $('#resource-browser-toast');
+        $toaster.toastTimeout({text: $toaster.text(), duration: 5000}); // Hide the toast after an interval, but keep displaying whatever text is already in it.
+
         // compensate for event double-fire: see https://github.com/zurb/foundation/issues/5482
         if (event) {
             if (event.namespace !== 'fndtn.reveal' || $('[data-reveal].open').length > 0) {
