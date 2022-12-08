@@ -182,4 +182,30 @@ class ManageCurriculumCest
         $i->waitForElementNotVisible('[data-test-node]', 1); // waiting for the animation to hide the disabled nodes
         $searchNodes->seeResultsMatch(0);
     }
+
+    /**
+     * @param AcceptanceTester $i
+     * @throws Exception
+     *
+     * on https://vagrant.dev.schoolbox.cloud/curriculum
+     */
+    public function checkNodeSort(AcceptanceTester $i)
+    {
+        $i->amGoingTo('check nodes are sorted by order, code, then name');
+        $i->amGoingTo('add order: 1 to Year 4 History so it appears at the top of the list');
+        $i->updateInDatabase('curriculum_node', array('order' => '1'), array('name' => 'Year 4 History'));
+        $i->reloadPage();
+        $expectedOrder = array(
+            'Year 4 History',
+            '[9AH] Year 9 Ancient History',
+            '[PT] Party Town',
+            'English',
+            'Years 9 and 10 French'
+        );
+        $i->amGoingTo('loop through the Curricula children, ensuring the correct order');
+        $nodeList = $i->grabMultiple('[data-test-view-node-name]');
+        for ($index = 1; $index <= count($nodeList)-1; $index++) {
+            $i->assertStringContainsString($expectedOrder[$index-1], $nodeList[$index]);
+        }
+    }
 }
