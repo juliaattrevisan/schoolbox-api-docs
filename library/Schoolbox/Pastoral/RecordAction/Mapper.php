@@ -44,7 +44,8 @@ class Mapper extends BaseMapper
     {
         return "
             SELECT      {$this->getColumnString()},
-                        {$this->getJoinColumnString('action', 'a')}
+                        {$this->getJoinColumnString('action', 'a')},
+                        {$this->getJoinColumnString('updatedBy', 'ub')}
         ";
     }
 
@@ -56,6 +57,7 @@ class Mapper extends BaseMapper
         return "
             FROM        {$this->getTable()}
             INNER JOIN  {$this->getJoinSql('action', '', 'a')}
+            LEFT JOIN   {$this->getJoinSql('updatedBy', '', 'ub', true)}
         ";
     }
 
@@ -64,6 +66,9 @@ class Mapper extends BaseMapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
+        /** @var UserMapper $userMapper */
+        $userMapper = $this->getJoinMapper('updatedBy');
+
         $collection = $this->createCollection();
 
         foreach ($statement as $row) {
@@ -72,6 +77,8 @@ class Mapper extends BaseMapper
             /** @var \Schoolbox\Pastoral\Action\Model $action */
             $action = $this->hydrateJoin($row, 'action', 'a');
             $reportAction->setAction($action);
+
+            $reportAction->setUpdatedBy($userMapper->hydrate($row, 'ub'));
             $collection->add($reportAction);
         }
 

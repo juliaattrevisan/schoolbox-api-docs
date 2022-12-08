@@ -358,7 +358,7 @@ class Controller extends Base
      * @throws Exception
      * @api /pastoral/student/{studentId:\d+}/record/{recordId:\d+}
      */
-    public function getStudentRecord($record, $student): void
+    public function getStudentRecord(Model $record, User $student): void
     {
         // They've manually put an ID number they don't have access to- so the record doesn't get hydrated in preload
 
