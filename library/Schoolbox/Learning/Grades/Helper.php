@@ -107,6 +107,10 @@ class Helper
             }
         }
 
+        $markbooks->map(function (Markbook $markbook) {
+            return $markbook->sortAssessables();
+        });
+
         // remove folders without assessments
         $folders = $folders->filter(
             static function (Folder $folder) use ($assessmentsPerFolder) {
