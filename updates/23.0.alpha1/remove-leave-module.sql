@@ -28,3 +28,5 @@ DELETE
 FROM error
 WHERE id = 162; -- Expected error message: 'Leave request commences too soon.'
 
+-- Delete boarder leave options from side menu.
+UPDATE menu_side SET deleted_at=NOW() WHERE deleted_at IS NULL AND url LIKE "/modules/leave/%";
