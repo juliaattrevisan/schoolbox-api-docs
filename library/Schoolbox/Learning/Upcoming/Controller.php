@@ -210,7 +210,6 @@ class Controller extends Base
                 }
             }
         }
-        (new \Schoolbox\External\User())->loadChildren([$this->getUser()]);
         $data = [
             'student'         => $student,
             'date'            => $date,
