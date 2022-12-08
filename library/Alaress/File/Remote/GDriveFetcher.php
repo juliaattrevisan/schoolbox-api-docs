@@ -505,7 +505,7 @@ class GDriveFetcher implements FetcherInterface
          * If the metadata field "fileExtension" contains text, investigate the contents of
          * "originalFilename" and "fileExtension"
          */
-        if ('' !== (string)$metadata['fileExtension']) {
+        if (array_key_exists('fileExtension', $metadata) && '' !== (string)$metadata['fileExtension']) {
             /* "originalFilename" might already contain the extension if you uploaded a file
              * If the last characters of "originalFilename" are the same as "fileExtension"
              * then just return "originalFilename" with no alterations required

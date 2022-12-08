@@ -76,10 +76,15 @@ foreach ($_POST['docs'] as $doc) {
         $errors[] = $errorMessage;
         continue;
     } catch (Mapper\Exception $e) {
-        /* noop: unknown file extension: silently disregard for now
-         * because deriveFileName() couldn't figure out the extension
-         */
-        $errors[] = ['err' => 'Could not upload google drive file (2): ' . $e->getMessage()];
+        // Sanitise error message.
+        $errorMessage = $e->getMessage();
+        if (str_contains($errorMessage, 'nknown file extension')) {
+            $errorMessage = 'Could not determine file type from extension';
+        } else {
+            $errorMessage = 'Could not upload google drive file (2).';
+        }
+
+        $errors[] = $errorMessage;
         continue;
     }
 

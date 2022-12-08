@@ -480,20 +480,29 @@
                 message = e.originalEvent.data;
             }
 
+            let $toaster = $('#resource-browser-toast');
+
             if (message.text) {
+                $toaster.toastActivate({text: message.text});
                 explorer.attr('data-text', message.text);
             } else if (message.data) {
 
-                if (message.data.statusText === 'error') {
-                    let errorMessages = JSON.parse(message.data.responseText);
+                if (message.data.status === 400) {
+                    let errorMessages = [];
+                    try {
+                        errorMessages = JSON.parse(message.data.responseText);
+                    } catch (e) {
+                        errorMessages = ['Could not upload file.'];
+                    }
+
                     let toastMsg = {
                         css: 'alert',
                         duration: 5000,
                         // NOTE: responseText sometimes has extraneous brackets and quotes, so we must remove them.
                         text: errorMessages.join(' | ')
                     };
-                    $('#resource-browser-toast').toastActivate(toastMsg);
-                    $('#resource-browser-toast').toastTimeout(toastMsg);
+                    $toaster.toastActivate(toastMsg);
+                    $toaster.toastTimeout(toastMsg);
                 }
 
                 explorer.removeAttr('data-text');
@@ -529,6 +538,7 @@
      * @param event
      */
     ResourceAttach.prototype.reopenParentReveal = function (event) {
+        $('#resource-browser-toast').hide();
         // compensate for event double-fire: see https://github.com/zurb/foundation/issues/5482
         if (event) {
             if (event.namespace !== 'fndtn.reveal' || $('[data-reveal].open').length > 0) {

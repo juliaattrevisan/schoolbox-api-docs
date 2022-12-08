@@ -123,9 +123,9 @@
                         $toast.toastActivate( { text: 'Updating resources...' } );
                         $.ajax(getAjaxParams())
                             .done(function (data) {
-                                addNewFilesToTree(data);
+                                let nFilesAdded = addNewFilesToTree(data);
                                 clearDropZone();
-                                $toast.toastTimeout( { text: 'File(s) added to resources', css: 'success' } );
+                                $toast.toastTimeout( { text: nFilesAdded + ' file(s) added to resources', css: 'success' } );
                             })
                             .fail(function () {
                                 $toast.toastTimeout( { text: 'Unable to update resources', css: 'error' } );
@@ -145,13 +145,17 @@
                     // The response contains all items in the folder.
                     // Add any new ones.
                     function addNewFilesToTree (data) {
-                        var jstree = $('#tree').jstree(true);
+                        let jstree = $('#tree').jstree(true);
+                        let nFilesAdded = 0;
                         data.forEach(function (item) {
                             var existingNode = jstree.get_node(item.id);
                             if (!existingNode) {
                                 jstree.create_node(item.parent, item);
+                                ++nFilesAdded;
                             }
                         });
+
+                        return nFilesAdded;
                     }
 
                     // Then remove all the files just uploaded
