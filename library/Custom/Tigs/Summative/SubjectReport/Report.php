@@ -701,25 +701,43 @@ class Report
          */
         if ($attributes->isHsc()) {
             if ($attributes->getCurriculumYearLevel() === 11) {
-                $this->loadAssessmentsAndParticipation($courseSpec, $workTypeIds, $attributes, $semester, $semester);
+                $this->loadAssessmentsAndParticipation($courseSpec, $workTypeIds, $attributes, 1, 2);
+                foreach ([1, $semester] as $reportSemester) {
+                    // Year 11 Semester 1 and 2 NESA data is calculated
+                    // differently:
+                    // * Semester 1 NESA is in letter grades A-E
+                    // * Semester 2 NESA is in a rubric "NESA/Grade" with
+                    //   descriptors A-E (like the middle years data)
+                    if ($reportSemester === 1) {
+                        $nesa = new NesaScoreGraphHSC(
+                            $cohortUnitImpls,
+                            $student,
+                            $attributes,
+                            $this->visibility,
+                            $this->viewer,
+                            $workTypeIds[Config::_TIGS_WORK_TYPE_NESA_SCORE],
+                            $folder,
+                            $roleTypeOverride
+                        );
+                    } else {
+                        $nesa = new NesaScoreGraphMiddleYears(
+                            $cohortUnitImpls,
+                            $student,
+                            $attributes,
+                            $this->visibility,
+                            $this->viewer,
+                            $workTypeIds[Config::_TIGS_WORK_TYPE_NESA_REPORT_GRADE_AND_REPORT_MARK],
+                            $folder,
+                            $reportSemester,
+                            $this->rubricMapper,
+                            $roleTypeOverride
+                        );
+                    }
 
-                $nesa = new NesaScoreGraphHSC(
-                    $cohortUnitImpls,
-                    $student,
-                    $attributes,
-                    $this->visibility,
-                    $this->viewer,
-                    $semester === 1
-                        ? $workTypeIds[Config::_TIGS_WORK_TYPE_NESA_SCORE]
-                        : $workTypeIds[Config::_TIGS_WORK_TYPE_NESA_REPORT_GRADE_AND_REPORT_MARK],
-                    $folder,
-                    $roleTypeOverride
-                );
-
-                $context = $nesa->toContext($semester);
-
-                if ($context !== null) {
-                    $reports['data'][$semester] = $context;
+                    $context = $nesa->toContext($reportSemester);
+                    if ($context !== null) {
+                        $reports['data'][$reportSemester] = $context;
+                    }
                 }
             } else {
                 // noop - no NESA graph for HSC students except Year 11 guys
