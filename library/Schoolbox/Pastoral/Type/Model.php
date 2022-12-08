@@ -6,8 +6,6 @@
  * @link        https://schoolbox.com.au/
  */
 
-declare(strict_types=1);
-
 namespace Schoolbox\Pastoral\Type;
 
 use Schoolbox\GenericCollection;
@@ -20,7 +18,10 @@ class Model extends TypeAbstract
     /** @var GenericCollection|Pastoral\SubType\Model[] */
     private GenericCollection $subTypes;
 
-    /** @var DocumentClassification|int|null */
+    /**
+     * TODO: this should accept DocumentClassification only - SA-14908
+     * @var DocumentClassification|int|null
+     */
     protected int | DocumentClassification | null $documentClassification = null;
 
     public function __construct()
