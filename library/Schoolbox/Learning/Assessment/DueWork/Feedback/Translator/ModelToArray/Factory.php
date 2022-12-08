@@ -10,8 +10,12 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\DueWork\Feedback\Translator\ModelToArray;
 
 use Alaress\Authorizer\Authorizer;
+use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Aura\Router\Router;
+use Schoolbox\Json\Decorator\LinkDecorator;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Translator\ModelToArray;
+use Schoolbox\Learning\Assessment\Translator\AssessmentForFeed;
+use Schoolbox\Learning\Assessment\Translator\Links;
 use Schoolbox\User;
 
 /**
@@ -29,13 +33,15 @@ class Factory
     public function build(): ModelToArray
     {
         return new ModelToArray(
-            new \Schoolbox\Learning\Assessment\ModelToArray(),
-            new \Schoolbox\User\Translator\Author\ModelToArray(),
-            new \Schoolbox\Learning\Assessment\Translator\Links(
+            new AssessmentForFeed(),
+            new User\Translator\Author\ModelToArray(),
+            new Links(
                 $this->router,
                 $this->authorizer,
                 $this->user
-            )
+            ),
+            new LinkDecorator($this->router, $this->authorizer, $this->user),
+            new ScrubAdapter()
         );
     }
 }

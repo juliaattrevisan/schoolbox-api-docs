@@ -390,11 +390,11 @@ export default {
                                         <p>{{ evidence.object.assessment.title }}</p>
                                     </a>
                                     <p class="meta">
-                                        Reviewed by {{ evidence.object.instructor.fullName }}
+                                        Reviewed by <a :href="evidence.object.instructor._links.profile" title="View Profile">{{ evidence.object.instructor.fullName }}</a>
                                         |
                                         <time class="meta" :datetime="formatDate(evidence.object.publishedAt)"
                                               :title="formatDate(evidence.object.publishedAt, dateDisplayFormats.dayjsDatetime)">
-                                            {{ formatDate(evidence.object.publishedAt, dateDisplayFormats.dayjsDateTime) }}
+                                            {{ formatDate(evidence.object.publishedAt, dateDisplayFormats.dayjsDateLong) }}
                                         </time>
                                     </p>
                                 </div>

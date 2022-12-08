@@ -9,8 +9,12 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\DueWork\Feedback\Translator;
 
+use Alaress\HTMLPurifier\IPurifier;
 use Error;
+use Schoolbox\Json\Decorator\LinkDecorator;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model;
+use Schoolbox\Learning\Assessment\Translator\AssessmentForFeed;
+use Schoolbox\Learning\Assessment\Translator\Links;
 
 /**
  * Translator for converting DueWork Feedback to an array representation, for
@@ -19,50 +23,18 @@ use Schoolbox\Learning\Assessment\DueWork\Feedback\Model;
 class ModelToArray
 {
     /**
-     * Translator for converting a user within the Award model.
-     *
-     * This applies to the person tho received the award and the person
-     * who gave the award
-     *
-     * (callable isn't a valid typedef)
-     *
-     * @var callable
+     * @param AssessmentForFeed                              $assessmentTranslator
+     * @param \Schoolbox\User\Translator\Author\ModelToArray $userTranslator
+     * @param Links                                          $linkTranslator
+     * @param LinkDecorator                                  $linkDecorator
      */
-    private $assessmentTranslator;
-
-
-    /**
-     * Translator for converting a Badge instance.
-     *
-     * (callable isn't a valid typedef)
-     *
-     * @var callable
-     */
-    private $userTranslator;
-
-
-    /**
-     * Translator for generating urls relevant to an Award
-     *
-     * (callable isn't a valid typedef)
-     *
-     * @var callable
-     */
-    private $linkTranslator;
-
-
-    /**
-     * Constructor
-     *
-     * @param callable $assessmentTranslator
-     * @param callable $userTranslator
-     * @param callable $linkTranslator
-     */
-    public function __construct(callable $assessmentTranslator, callable $userTranslator, callable $linkTranslator)
-    {
-        $this->assessmentTranslator = $assessmentTranslator;
-        $this->userTranslator       = $userTranslator;
-        $this->linkTranslator       = $linkTranslator;
+    public function __construct(
+        private AssessmentForFeed $assessmentTranslator,
+        private \Schoolbox\User\Translator\Author\ModelToArray $userTranslator,
+        private Links $linkTranslator,
+        private LinkDecorator $linkDecorator,
+        private IPurifier $purifier,
+    ) {
     }
 
 
@@ -77,13 +49,14 @@ class ModelToArray
         } catch (Error $e) {
             $assessment = null;
         }
+        $this->linkDecorator->decorate([], $model->getReviewer());
 
         return [
             'id'             => $model->getId(),
             'mark'           => $model->getHumanReadableMark(),
             'normalisedMark' => $model->getNormalisedMark(),
-            'comment'        => $model->getComment(),
-            'publishedAt'    => $model->getPublishedAt()->getDatabase(),
+            'comment'        => $this->purifier->purify($model->getComment()),
+            'publishedAt'    => $model->getPublishedAt()->getUsingFormat(DATE_ATOM),
             'instructor'     => call_user_func($this->userTranslator, $model->getReviewer()),
             'assessment'     => $assessment,
             '_links'         => call_user_func($this->linkTranslator, $model->getAssessable(), $model->getReviewee()),
