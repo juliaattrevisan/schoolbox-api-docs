@@ -439,21 +439,30 @@ ul.meta {
     &__item {
         border-bottom: 1px solid var(--body-background);
         display: flex;
+        gap: 0.5rem;
         justify-content: space-between; // checkbox/label on the left, date and user on the far right
         padding: 0.5rem;
-    }
-    &__date-and-user {
-        align-items: baseline;
-        display: flex;
-        gap: 0.5rem;
     }
     @media #{$large-down} {
         &__item {
             flex-direction: column;
         }
-        &__date-and-user { // is now put below the checkbox/label and user is first, rather than date
-            flex-direction: row-reverse;
-            justify-content: flex-end;
-        }
+    }
+}
+
+.pastoral-action-checkbox-and-label {
+    flex: 1;
+}
+
+.pastoral-action-date-and-user {
+    align-items: baseline;
+    display: flex;
+    gap: 0.5rem;
+    .profile-img {
+        flex: 0 0 2rem;
+    }
+    @media #{$large-down} {
+        flex-direction: row-reverse;
+        justify-content: flex-end;
     }
 }
