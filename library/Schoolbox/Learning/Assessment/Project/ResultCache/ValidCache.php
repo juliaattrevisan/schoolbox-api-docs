@@ -108,15 +108,11 @@ class ValidCache
             return true;
         }
 
-        $isDueWork = $assessment instanceof \Schoolbox\Learning\Assessment\DueWork\Model;
-        $isTask = $assessment instanceof \Schoolbox\Learning\Assessment\Task\Model;
-        $isQuiz = $assessment instanceof \Schoolbox\Learning\Assessment\Quiz\Model;
-
         /* Not an Activity instance?
          * (You probably gave this a Project, not an Activity)
          * Project cache is still valid, no matter what we do here.
          */
-        if (!$isDueWork && !$isTask && !$isQuiz) {
+        if ($assessment instanceof \Schoolbox\Learning\Assessment\Project\Model) {
             return true;
         }
 
