@@ -480,7 +480,7 @@
                 message = e.originalEvent.data;
             }
 
-            let $toast = $('#resource-browser-toast');
+            const $toast = $('#resource-browser-toast');
 
             if (message.text) {
                 $toast.toastActivate({text: message.text});
@@ -536,7 +536,7 @@
      * @param event
      */
     ResourceAttach.prototype.reopenParentReveal = function (event) {
-        let $toast = $('#resource-browser-toast');
+        const $toast = $('#resource-browser-toast');
         $toast.toastTimeout({text: $toast.text(), duration: 5000}); // Hide the toast after an interval, but keep displaying whatever text is already in it.
 
         // compensate for event double-fire: see https://github.com/zurb/foundation/issues/5482
