@@ -170,6 +170,24 @@ HELP;
                     $this->refreshLock($lock);
 
                     $user = $participant->getUser();
+
+                    /* Remember to ignore Excluded participants
+                     *
+                     * For some reason the proliferation of this is something
+                     * you need to *just know* to do
+                     */
+                    if ($participant->isExcluded()) {
+                        $this->getLogger()->debug(sprintf(
+                            '%s (%s) was not a participant in project %s (%s) - they were excluded',
+                            $user->getFullname(),
+                            $user->getId(),
+                            $project->getTitle(),
+                            $project->getId()
+                        ));
+
+                        continue;
+                    }
+
                     $outcome = $projectResultCache->persist($project, $user, $marker);
 
                     if (null === $outcome) {
