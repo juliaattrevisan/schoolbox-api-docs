@@ -60,7 +60,6 @@ function getSelectedColumnCheckboxes () {
  * Initiate the colour pickers
  */
 function initColourPickers () {
-console.info('hello');
     $(COLOUR_PICKERS_SELECTOR).spectrum(
         $.extend(
             {},
