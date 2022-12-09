@@ -110,7 +110,7 @@ class ValidCache
          * (You probably gave this a Project, not an Activity)
          * Project cache is still valid, no matter what we do here.
          */
-        if ($assessment instanceof \Schoolbox\Learning\Assessment\Project\Model) {
+        if ($assessment instanceof Project) {
             return true;
         }
 
