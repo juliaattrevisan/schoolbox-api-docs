@@ -51,29 +51,27 @@ class ValidCache
 
         /* Decide whether we have to invalidate project_result cache
          * Have to compare $postData and $assessment -before- it's transacted/updated
-         */
-        $cacheValid = true;
-
-        /* Any one of the following changes invalidates the project result cache since
+         *
+         * Any one of the following changes invalidates the project result cache since
          * they alter the summation outcome and the normalised- and human-readable mark
          */
 
         /* 1. Change in Summator
          */
         if ($postData['summator'] !== (new Mapping())->decompose($assessment->getSummator())) {
-            $cacheValid = false;
+            return false;
         }
 
         /* 2. Change in "Require All Activities"
          */
         if ((bool)($postData['requireAllActivities'] ?? false) !== $assessment->getRequireAllActivities()) {
-            $cacheValid = false;
+            return false;
         }
 
         /* 3. Change in Mark Type
          */
         if ((int)$postData['markType'] !== $assessment->getMarkType()->getId()) {
-            $cacheValid = false;
+            return false;
         }
 
         /* 4. If you're using Letter Grade,
@@ -81,11 +79,11 @@ class ValidCache
          */
         if ($assessment->getMarkScheme() instanceof LetterGrade) {
             if ((int)$postData['gradingScheme'] !== (int)$assessment->getMarkScheme()->getGradeGroup()->getId()) {
-                $cacheValid = false;
+                return false;
             }
         }
 
-        return $cacheValid;
+        return true;
     }
 
 
