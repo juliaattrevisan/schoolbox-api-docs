@@ -16,7 +16,8 @@ use Alaress\Json\SerializeTrait;
 use Alaress\Json\Serializable;
 use House;
 use HouseResidential;
-use Schoolbox\Config\Loader as ConfigLoader;
+use Config;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External\Subject;
 use Schoolbox\External\SubjectCollection;
 use Schoolbox\Json\Api\SitePageLink;
@@ -26,7 +27,6 @@ use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Resource\Folder\Code\ClassCodeMatchFactory;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Pastoral;
 
@@ -235,14 +235,6 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     private $boardingStatus;
 
     /**
-     *
-     * @var IConfigLoader
-     * @deprecated Don't use this in new code, models should not have dependencies on services
-     * @todo Remove this from this model
-     */
-    protected $config_loader;
-
-    /**
      * Collection of parents, used for identifying relationships the user has.
      *
      * If this is null you will need to hydrate with the return of \Schoolbox\External\User::loadParents
@@ -273,8 +265,6 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     public function __construct()
     {
         $this->role = new Role();
-        // TODO SA-8354: destroy this
-        $this->config_loader = new ConfigLoader();
     }
 
 
@@ -351,7 +341,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     public function getEmail()
     {
         if ($this->localEmail == true) {
-            return $this->username . '@' . $this->config_loader->get('mail_address');
+            return $this->username . '@' . Config::get(ConfigMapper::NAME_MAIL_ADDRESS);
         }
         return $this->altEmail;
     }
@@ -402,7 +392,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     {
         // Check for custom format
         $formatter = empty($format)
-            ? (new User\Formatter\Factory())->buildFromConfig($this->getConfigLoader())
+            ? (new User\Formatter\Factory())->buildFromNothing()
             : new User\Formatter\Formatter($format);
         return $formatter->formatObject($this);
     }
@@ -1043,18 +1033,6 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
         return $this->subject_collection;
     }
 
-
-    /**
-     * @param IConfigLoader $config_loader
-     *
-     * @return self
-     */
-    public function setConfigLoader(IConfigLoader $config_loader)
-    {
-        $this->config_loader = $config_loader;
-        return $this;
-    }
-
     /**
      * @param  GenericCollection|UserAccess[] $accessList
      *
@@ -1077,14 +1055,6 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
         }
 
         return $this->accessList;
-    }
-
-    /**
-     * @return IConfigLoader
-     */
-    public function getConfigLoader()
-    {
-        return $this->config_loader;
     }
 
     /**
