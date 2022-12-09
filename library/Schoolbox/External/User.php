@@ -75,6 +75,13 @@ class User
                 continue;
             }
             $parents = new GenericCollection(\Schoolbox\User::class);
+            /* if the student does not have an externalID
+             * set an empty array and continue
+             */
+            if ('' === trim((string)$student->getExternalId())) {
+                $student->setParents($parents);
+                continue;
+            }
 
             $allParents = $this->externalUser->getStudentContactList([$student->getExternalId()]);
 
@@ -166,6 +173,14 @@ class User
                 continue;
             }
             $children = new GenericCollection(\Schoolbox\User::class);
+            /* if the parent does not have an externalID
+             * set an empty array and continue
+             */
+            if ('' === trim((string)$parent->getExternalId())) {
+                $parent->setChildren($children);
+                continue;
+            }
+
             $enrolments                             = $this->externalUser->getEnrolledStudents($parent->getExternalId());
             foreach ($enrolments as $child) {
                 try {
