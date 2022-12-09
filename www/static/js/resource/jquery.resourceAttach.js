@@ -480,10 +480,10 @@
                 message = e.originalEvent.data;
             }
 
-            let $toaster = $('#resource-browser-toast');
+            let $toast = $('#resource-browser-toast');
 
             if (message.text) {
-                $toaster.toastActivate({text: message.text});
+                $toast.toastActivate({text: message.text});
                 explorer.attr('data-text', message.text);
             } else if (message.data) {
 
@@ -495,13 +495,13 @@
                         errorMessages = ['Could not upload file.'];
                     }
 
-                    let toastMsg = {
+                    const toastMsg = {
                         css: 'alert',
                         duration: 5000,
                         text: errorMessages.join(' | ')
                     };
-                    $toaster.toastActivate(toastMsg);
-                    $toaster.toastTimeout(toastMsg);
+                    $toast.toastActivate(toastMsg);
+                    $toast.toastTimeout(toastMsg);
                 }
 
                 explorer.removeAttr('data-text');
@@ -536,8 +536,8 @@
      * @param event
      */
     ResourceAttach.prototype.reopenParentReveal = function (event) {
-        let $toaster = $('#resource-browser-toast');
-        $toaster.toastTimeout({text: $toaster.text(), duration: 5000}); // Hide the toast after an interval, but keep displaying whatever text is already in it.
+        let $toast = $('#resource-browser-toast');
+        $toast.toastTimeout({text: $toast.text(), duration: 5000}); // Hide the toast after an interval, but keep displaying whatever text is already in it.
 
         // compensate for event double-fire: see https://github.com/zurb/foundation/issues/5482
         if (event) {
