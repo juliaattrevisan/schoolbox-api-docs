@@ -129,8 +129,8 @@ class Notifier extends AbstractModuleNotifier
         try {
             $pastoral = $this->mapper->findById($model->getId());
             $student  = $this->userMapper->findById($pastoral->getStudent()->getId());
-            $student->loadParents();
-            $student->loadTeachers();
+            $this->externalUser->loadParents([$student]);
+            $this->externalUser->loadTeachers([$student]);
             $pastoral->setStudent($student);
         } catch (MapperException $e) {
             $this->log->error("Error: Unable to send pastoral comment {$method} notification. {$e->getMessage()}", ['exception' => $e]);
@@ -266,7 +266,13 @@ class Notifier extends AbstractModuleNotifier
         try {
             $pastoral = $this->mapper->findById($model->getId());
             $student  = $this->userMapper->findById($pastoral->getStudent()->getId());
-            $student->loadTeachers();
+            /* Load relationships into $student,
+             * for `\Schoolbox\Pastoral\NotifierHelper::buildTargetUsersForRole`
+             * which is called by `\Schoolbox\Pastoral\NotifierHelper::buildTargetUsers`
+             * as that requires these to be loaded for `$student->getParents()` and `$student->getTeacherCollection()`
+             */
+            $this->externalUser->loadParents([$student]);
+            $this->externalUser->loadTeachers([$student]);
             $pastoral->setStudent($student);
         } catch (MapperException $e) {
             $this->log->error("Error: Unable to send pastoral addedToReport notification. {$e->getMessage()}", ['exception' => $e]);

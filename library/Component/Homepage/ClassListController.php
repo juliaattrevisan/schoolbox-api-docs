@@ -138,7 +138,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
             $staffPhotoVisibility = $this->getConfigLoader()->get('protect_teacher_photo');
 
             $viewer = $this->getUser();
-
+            (new \Schoolbox\External\User())->loadChildren([$viewer]);
             foreach ($allStudents as $currentStudent) {
                 try {
                     $user = $userMapper->findByExternalId($currentStudent['synergy_id'], Role::STUDENT);
@@ -172,7 +172,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
                     //Hide Student Photo
                     if ($viewer->getRole()->isStudent() && $studentPhotoHidden) {
                         $this->setVar('photo_block', '');
-                    } elseif ($viewer->getRole()->isParent() && !$viewer->isParentOf($user->loadParents())) {
+                    } elseif ($viewer->getRole()->isParent() && !$viewer->isParentOf($user)) {
                         $this->setVar('photo_block', '');
                     } else {
                         $this->parse('photo_block', 'photo');

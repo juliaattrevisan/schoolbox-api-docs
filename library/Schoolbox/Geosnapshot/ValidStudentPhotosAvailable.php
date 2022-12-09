@@ -21,7 +21,6 @@ use Schoolbox\User;
  */
 class ValidStudentPhotosAvailable extends ValidGeosnapshotAvailable
 {
-
     /**
      * Geosnapshot integration is decided by two config vars and two users
      * (the one doing the viewing and the one being viewed)

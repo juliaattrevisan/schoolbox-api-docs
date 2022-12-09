@@ -17,7 +17,6 @@ use Schoolbox\User;
  */
 class ParentCanViewFeedback extends AbstractCanViewFeedback
 {
-
     /**
      * @inheritdoc
      * @throws \InvalidArgumentException
@@ -30,7 +29,7 @@ class ParentCanViewFeedback extends AbstractCanViewFeedback
         }
 
         $assessment = $this->findAssessable($params);
-        $student    = $this->findStudent($params)->loadParents();
+        $student    = $this->findStudent($params);
 
         // If there's feedback, check it's published
         try {
@@ -42,6 +41,8 @@ class ParentCanViewFeedback extends AbstractCanViewFeedback
             // Let this continue, in case the only thing being checked here is a Kami doc
         }
 
+        //hydrate parents of student
+        (new \Schoolbox\External\User())->loadParents([$student]);
         if (!$user->isParentOf($student)) {
             throw new Unauthorized('Current user is not a parent of the specified student');
         }

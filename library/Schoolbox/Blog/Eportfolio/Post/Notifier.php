@@ -35,7 +35,6 @@ use Schoolbox\Mapper\Exception;
 
 class Notifier extends AbstractModuleNotifier
 {
-
     const TRIGGER_POSTED = 'posted';
     // This is to support ePortfolio for staff and parent
     const TRIGGER_BLOG_POSTED = 'blogPosted';
@@ -122,7 +121,8 @@ class Notifier extends AbstractModuleNotifier
             }
 
             // Send it to all their teachers (across all subjects)
-            $audience = $owner->loadTeachers()->getTeacherCollection();
+            $this->externalUser->loadTeachers([$owner]);
+            $audience = $owner->getTeacherCollection();
 
             return $this->notifyPosted($post, $owner, $effector, $audience, Role::STAFF);
         } catch (Exception $e) {
@@ -232,12 +232,15 @@ class Notifier extends AbstractModuleNotifier
             return new Envelope();
         }
 
-        // Send it to all their parents
-        $parents = $owner->loadParents()->getParents();
         $audience = $this->userMapper->createCollection();
         // Need to explicitly set page owner
         $post->getPage()->setOwner($owner);
 
+        // Send it to all their parents
+        //hit the external db, and hit it again for good measure
+        $this->externalUser->loadParents([$owner]);
+        $parents = $owner->getParents();
+        $this->externalUser->loadChildren($parents);
         foreach ($parents as $parent) {
             try {
                 if ($this->access->userCanView($post, $parent)) {
@@ -267,20 +270,10 @@ class Notifier extends AbstractModuleNotifier
     {
         $envelope = new Envelope();
 
-        // Are we targeting parents?
-        if (Role::PARENT === $roleType) {
-            // Load parents so we can display just their child's first name
-            $effector->loadParents();
-            if ($effector->getId() !== $owner->getId()) {
-                $owner->loadParents();
-            }
-        }
-
+        //hit the db and load all parents for the audience members
+        $this->externalUser->loadChildren($audience);
         foreach ($audience as $target) {
             /** @var User $target */
-            if (!$target->getChildren()) {
-                $target->setChildren(User::createCollection());
-            }
             // Just first name if advising parent of child's action
             $effectorParam = Role::PARENT === $roleType && $target->isParentOf($effector)
                 ? new ChildParam($effector)

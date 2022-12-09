@@ -35,7 +35,6 @@ use UnexpectedValueException;
  */
 class Access
 {
-
     /**
      * @var FolderAccess
      */
@@ -151,7 +150,7 @@ class Access
          */
         if ($accessLevel === Event::ACCESS_PERSONAL) {
             if ($owner->getRole()->isStudent() && $effector->getRole()->isParent()) {
-                $isParentOfOwner = $owner->loadParents()->isChildOf($effector);
+                $isParentOfOwner = $owner->isChildOf($effector);
             } else {
                 $isParentOfOwner = false;
             }

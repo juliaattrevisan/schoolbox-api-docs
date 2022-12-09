@@ -70,6 +70,13 @@ class Module extends BaseModule
             if (!$user->getRole()->isStudent()) {
                 throw new NotFound();
             }
+            //hydrate parents on the $user so we can get them later
+            (new \Schoolbox\External\User(
+                $this->getConfig()->get('external_type'),
+                new \External_Class(),
+                new \External_User(),
+                $this->getUserMapper()
+            ))->loadParents([$user]);
         } catch (MapperException $e) {
             /* User doesn't really exist
              */

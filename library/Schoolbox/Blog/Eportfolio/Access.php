@@ -19,7 +19,6 @@ use Schoolbox\User;
 
 class Access
 {
-
     /** @var PermissionMapper */
     private $permissionMapper;
 

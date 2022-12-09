@@ -25,7 +25,6 @@ use Schoolbox\UserMapper;
  */
 class Module extends BaseModule
 {
-
     /**
      * @inheritdoc
      */
@@ -87,6 +86,8 @@ class Module extends BaseModule
             /* Check that the selected user exists in external db
              */
             $externalUser = $this->getExternalUser()->getStudent($params['externalUserId']);
+            //load the external users children, assume they are a parent...
+            (new \Schoolbox\External\User())->loadChildren([$externalUser]);
 
             /* Check that the selected user exists in schoolbox
              */
@@ -135,7 +136,7 @@ class Module extends BaseModule
 
 
     /**
-     * @return Mapper|UserMapper
+     * @return UserMapper
      * @throws InvalidArgumentException If cannot find mapper class
      */
     protected function getUserMapper()

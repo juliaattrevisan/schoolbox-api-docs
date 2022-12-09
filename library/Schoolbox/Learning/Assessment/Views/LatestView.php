@@ -12,7 +12,6 @@ namespace Schoolbox\Learning\Assessment\Views;
 
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\User;
 
@@ -24,13 +23,17 @@ class LatestView
      */
     private Mapper $mapper;
 
+    private \Schoolbox\External\User $externalUser;
+
     /**
      * Constructor
      * @param Mapper $mapper
+     * @param \Schoolbox\External\User $externalUser
      */
-    public function __construct(Mapper $mapper)
+    public function __construct(Mapper $mapper, \Schoolbox\External\User $externalUser)
     {
         $this->mapper = $mapper;
+        $this->externalUser = $externalUser;
     }
 
     /**
@@ -67,8 +70,9 @@ class LatestView
         /**
          * check if use is either that student or the parents, then save
          */
+        $this->externalUser->loadParents([$participant]);
         if (
-            (null !== $user->getChildren() && $user->getChildren()->getBy('id', $participant->getId())) ||
+            ($user->isParentOf($participant)) ||
              $participant->getId() === $user->getId()
         ) {
             /**
@@ -150,8 +154,8 @@ class LatestView
          * parent's now
          * check status of parent's lasts views, and set the status'
          */
-        $parentList = $participant->getUser()->loadParents()->getParents();
-        foreach ($parentList as $parent) {
+        $this->externalUser->loadParents([$participant->getUser()]);
+        foreach ($participant->getUser()->getParents() as $parent) {
             /**
              * set basic data
              */

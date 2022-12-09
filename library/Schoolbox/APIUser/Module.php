@@ -105,6 +105,9 @@ class Module extends BaseModule
         } catch (MapperException $e) {
             throw new SchoolboxException('User Does not Exist', 404, null, 404);
         }
+        //preload parents / children for the user
+        $this->getRelationshipHydrator()->loadChildren([$user]);
+        $this->getRelationshipHydrator()->loadParents([$user]);
 
         return [
             'user' => $user,
@@ -126,5 +129,20 @@ class Module extends BaseModule
     protected function getGroupMapper(): GroupMapper
     {
         return $this->getMapperFactory()->get(GroupMapper::class);
+    }
+
+    /**
+     * Quick call to build the external user relationship hydrator
+     *
+     * @return \Schoolbox\External\User
+     */
+    protected function getRelationshipHydrator()
+    {
+        return new \Schoolbox\External\User(
+            $this->getConfig()->get('external_type'),
+            new \External_Class(),
+            new \External_User(),
+            $this->getUserMapper()
+        );
     }
 }

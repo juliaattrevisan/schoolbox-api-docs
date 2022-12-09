@@ -75,20 +75,8 @@ class IsParentOfUser implements IAuthorizationRule
         if ($user) {
             // May need to load children into user, as they are not guaranteed
             // to be within the current user
-            if (!$user->getChildren()) {
-                $children = $this->userMapper->createCollection();
-                foreach ($this->externalDb->getEnrolledStudents($user->getExternalId()) as $externalChild) {
-                    try {
-                        $child                     = $this->userMapper->findByExternalId($externalChild['RelatedID']);
-                        $children[$child->getId()] = $child;
-                    } catch (MapperException $e) {
-                        // Child doesn't exist in Schoolbox: not much to do here
-                        continue;
-                    }
-                }
-                $user->setChildren($children);
-            }
-
+            $externalUser = new \Schoolbox\External\User();
+            $externalUser->loadChildren([$user]);
             // Test each child against the user authorizer:
             // if any child passes that authorizer, pass this authorizer
             foreach ($user->getChildren() as $child) {

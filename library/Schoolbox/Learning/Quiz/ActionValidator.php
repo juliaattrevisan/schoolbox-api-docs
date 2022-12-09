@@ -13,7 +13,6 @@ namespace Schoolbox\Learning\Quiz;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Permission\Access\Access;
 use Alaress_Date_Format;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Schoolbox\Learning\Assessment\Quiz;
 
@@ -30,7 +29,6 @@ use Schoolbox\Learning\Assessment\Quiz;
  */
 class ActionValidator
 {
-
     /** @var \Alaress_Date_Format */
     private $now;
 
@@ -39,7 +37,6 @@ class ActionValidator
 
     /** @var Visibility */
     private $visibility;
-
 
     /**
      * @param Alaress_Date_Format $now

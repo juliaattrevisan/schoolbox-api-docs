@@ -43,10 +43,6 @@ class Conversation
         $this->participants = new Collection();
 
         if ($config->get('grade_comments_enable')) {
-            /* Find the parents of this particular student
-             */
-            $student->loadParents();
-
             /* Generate participants: the student, their parent(s), and the category teacher(s)
              *
              * Email recipients are not necessarily participants in the conversation,
@@ -54,6 +50,8 @@ class Conversation
              * list of participants
              */
 
+            //hit the external db and load the parents
+            (new \Schoolbox\External\User())->loadParents([$student]);
             $this->participants = $this->participants->add($student)
                 ->merge($student->getParents())
                 ->merge($subject->getTeachers());

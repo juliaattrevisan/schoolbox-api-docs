@@ -283,6 +283,12 @@ class Module extends BaseModule
                 new ScrubAdapter(),
             ),
             $this->injector->get('filesystem.storageProxy'),
+            new \Schoolbox\External\User(
+                $this->injector->get('config')->get('external_type'),
+                new \External_Class(),
+                new \External_User(),
+                $this->getMapperFactory()->get(UserMapper::class)
+            )
         );
     }
 
@@ -310,8 +316,8 @@ class Module extends BaseModule
                     $userMapper = $this->getMapperFactory()->get(UserMapper::class);
 
                     $student = $userMapper->findWithSubjects($params['studentId']);
-                    $student->loadTeachers();
-                    $student->loadParents();
+                    $this->getRelationshipHydrator()->loadTeachers([$student]);
+                    $this->getRelationshipHydrator()->loadParents([$student]);
 
                     $injectedValues['student'] = $student;
                 } catch (MapperException $e) {
@@ -329,8 +335,8 @@ class Module extends BaseModule
                     }
 
                     $student = $userMapper->findWithSubjects($params['linkedStudentId']);
-                    $student->loadTeachers();
-                    $student->loadParents();
+                    $this->getRelationshipHydrator()->loadTeachers([$student]);
+                    $this->getRelationshipHydrator()->loadParents([$student]);
 
                     $injectedValues['linkedStudent'] = $student;
                 } catch (MapperException $e) {
@@ -422,5 +428,19 @@ class Module extends BaseModule
         /** @var ErrorMapper $errorMapper */
         $errorMapper = $this->getMapperFactory()->get(ErrorMapper::class);
         return $errorMapper->generateException($errorCode);
+    }
+    /**
+     * Quick call to build the external user relationship hydrator
+     *
+     * @return \Schoolbox\External\User
+     */
+    protected function getRelationshipHydrator()
+    {
+        return new \Schoolbox\External\User(
+            $this->getConfig()->get('external_type'),
+            new \External_Class(),
+            new \External_User(),
+            $this->getMapperFactory()->get(UserMapper::class)
+        );
     }
 }

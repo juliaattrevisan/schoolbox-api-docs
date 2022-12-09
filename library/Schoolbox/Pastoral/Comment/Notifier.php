@@ -21,14 +21,11 @@ use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Access\Model as PastoralAccess;
 use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
-use Schoolbox\Pastoral\Group\Member\Model as PastoralGroupMember;
-use Schoolbox\Pastoral\Model as Pastoral;
 use Schoolbox\Pastoral\NotifierHelper;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
-use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -111,8 +108,8 @@ class Notifier extends AbstractModuleNotifier
             $pastoral = $this->pastoralMapper->findById($model->getPastoral()->getId());
             $owner    = $this->userMapper->findById($model->getOwner()->getId());
             $student  = $this->userMapper->findById($pastoral->getStudent()->getId());
-            $student->loadParents();
-            $student->loadTeachers();
+            $this->externalUser->loadParents([$student]);
+            $this->externalUser->loadTeachers([$student]);
             $pastoral->setStudent($student);
         } catch (MapperException $e) {
             $this->log->error("Error: Unable to send pastoral comment {$method} notification. {$e->getMessage()}", ['exception' => $e]);

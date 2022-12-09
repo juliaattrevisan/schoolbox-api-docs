@@ -71,6 +71,12 @@ class Module extends BaseModule
                         $event = $params['event'];
 
                         $loggedInUser = $this->getAuthorizer()->getUser();
+                        (new \Schoolbox\External\User(
+                            $this->getConfig()->get('external_type'),
+                            new \External_Class(),
+                            new \External_User(),
+                            $this->getMapperFactory()->get(UserMapper::class)
+                        ))->loadChildren([$loggedInUser]);
 
                         /**
                          * Personal Event: owner, parent of owner, staff, or invited guest, can see event
@@ -80,7 +86,7 @@ class Module extends BaseModule
                         if ($event->isPersonalLevel()) {
                             $isStaff        = $loggedInUser->getRole()->isStaff();
                             $isOwner        = $event->getOwner()->getId() === $loggedInUser->getId();
-                            $isParentOfUser = $loggedInUser->isParentOf($event->getAuthor()->loadParents());
+                            $isParentOfUser = $loggedInUser->isParentOf($event->getAuthor());
 
                             /* I suppose if you're on the invited list,
                              * you should be able to see it
@@ -156,7 +162,8 @@ class Module extends BaseModule
                     new Callback(function (array $params) {
                         try {
                             $event = $this->getEventMapper()->findById($params['eventId']);
-
+                            //hydrate parents for further permission checks
+                            $this->getRelationshipHydrator()->loadParents([$event->getOwner()]);
                             if ((new Event\Access(Access::getInstance()))->checkExisting($this->getAuthorizer()->getUser(), $event)) {
                                 return true;
                             }
@@ -213,7 +220,11 @@ class Module extends BaseModule
      */
     private function preloadEvent(array $params): array
     {
-        return ['event' => $this->getEventMapper()->findById($params['eventId'])];
+        $event = $this->getEventMapper()->findById($params['eventId']);
+        //hydrate parents for further permission checks
+        $this->getRelationshipHydrator()->loadParents([$event->getOwner()]);
+
+        return ['event' => $event];
     }
 
     /**
@@ -223,5 +234,20 @@ class Module extends BaseModule
     private function getEventMapper(): EventMapper
     {
         return $this->getMapperFactory()->get(EventMapper::class);
+    }
+
+    /**
+     * Quick call to build the external user relationship hydrator
+     *
+     * @return \Schoolbox\External\User
+     */
+    protected function getRelationshipHydrator()
+    {
+        return new \Schoolbox\External\User(
+            $this->getConfig()->get('external_type'),
+            new \External_Class(),
+            new \External_User(),
+            $this->getMapperFactory()->get(UserMapper::class)
+        );
     }
 }

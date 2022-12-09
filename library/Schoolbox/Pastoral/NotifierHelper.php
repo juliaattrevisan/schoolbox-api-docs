@@ -147,7 +147,6 @@ class NotifierHelper
         $targetUsers = [];
         if ($role->isStaff() && $role->getAccessPastoral()) {
             // Only notify staff if they are a teacher of the student
-            $student->loadTeachers();
             foreach ($student->getTeacherCollection() as $teacher) {
                 if ($teacher->getRole()->getId() === $role->getId()) {
                     $targetUsers[$teacher->getId()] = $teacher;
@@ -155,7 +154,6 @@ class NotifierHelper
             }
         } elseif ($role->isParent() && $parentAccessEnabled) {
             // Only send to parents if pastoral parent access is enabled
-            $student->loadParents();
             foreach ($student->getParents() as $parent) {
                 if ($parent->getRole()->getId() === $role->getId()) {
                     $targetUsers[$parent->getId()] = $parent;

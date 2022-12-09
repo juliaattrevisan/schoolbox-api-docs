@@ -17,7 +17,6 @@ use Alaress_Date_Format;
 
 class CanViewAssessable extends AbstractAssessableRule
 {
-
     /** @var Visibility */
     private $visibility;
 
@@ -60,6 +59,8 @@ class CanViewAssessable extends AbstractAssessableRule
 
         // Can the user see the assessment because their child can?
         if ($user->getRole()->isParent()) {
+            //hydrate children for $user
+            (new \Schoolbox\External\User())->loadChildren([$user]);
             foreach ($user->getChildren() as $child) {
                 if ($this->visibility->isVisibleToUser($assessable, $child, $this->showClosed, $this->now)) {
                     return;

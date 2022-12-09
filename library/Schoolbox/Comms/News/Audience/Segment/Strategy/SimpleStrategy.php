@@ -28,7 +28,6 @@ use function count;
  */
 abstract class SimpleStrategy implements ISimpleStrategy
 {
-
     /** @var UserAccessMapper */
     protected UserAccessMapper $userAccessMapper;
 
@@ -147,7 +146,11 @@ abstract class SimpleStrategy implements ISimpleStrategy
                 if (!$user->getRole()->isParent()) {
                     return false;
                 }
-                if ($user->getChildren() === null) {
+                /* Must not hit the DB... ummm is there a different way of doing this?
+                 * should we put the parents children back into the session/ user object? or cache this somewhere???
+                */
+                (new \Schoolbox\External\User())->loadChildren([$user]);
+                if ($user->getChildren()->count() === 0) {
                     return null;
                 }
                 return count(array_intersect($this->getValues($user->getChildren()), $entityValues)) > 0;

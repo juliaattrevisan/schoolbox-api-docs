@@ -90,6 +90,7 @@ class Controller extends Base
      * @param Comment\Translator\ModelToArray $pastoralCommentTranslator
      * @param Translator\ModelToArray         $pastoralTranslator
      * @param FilesystemProxy                 $filesystemProxy
+     * @param \Schoolbox\External\User        $externalUser
      */
     public function __construct(
         private IConfigLoader $config,
@@ -115,6 +116,7 @@ class Controller extends Base
         private Comment\Translator\ModelToArray $pastoralCommentTranslator,
         private Translator\ModelToArray $pastoralTranslator,
         private FilesystemProxy $filesystemProxy,
+        private \Schoolbox\External\User $externalUser
     ) {
     }
 
@@ -494,6 +496,8 @@ class Controller extends Base
             'id'           => $duplicateIds,
             'g.group_type' => Role::STUDENT,
         ]);
+        $this->externalUser->loadParents($duplicates);
+        $this->externalUser->loadParents([$record->getStudent()]);
 
         /** @var Role $roleCurrent */
         foreach ($allowedRoles as $roleCurrent) {
@@ -524,7 +528,6 @@ class Controller extends Base
                     if ($rolesWithUsers[$roleCurrent->getId()]) {
                         break;
                     }
-                    $duplicateStudent->loadParents();
                     foreach ($duplicateStudent->getParents() as $parent) {
                         if ($parent->getRole()->getId() == $roleCurrent->getId()) {
                             $rolesWithUsers[$roleCurrent->getId()] = true;

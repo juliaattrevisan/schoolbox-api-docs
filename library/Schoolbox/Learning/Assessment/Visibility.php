@@ -15,7 +15,6 @@ use Alaress_Date_Format;
 
 class Visibility
 {
-
     /**
      * @var Access
      */
@@ -67,8 +66,8 @@ class Visibility
             if ($this->isVisibleToInstructor($assessment, $viewer, $showClosed, $now)) {
                 return true;
             }
-        } // Not an instructor. Can they see due to their participation?
-        elseif ($this->isVisibleToNonInstructor($assessment, $viewer, $showClosed, $now, $respectSivo)) {
+        } elseif ($this->isVisibleToNonInstructor($assessment, $viewer, $showClosed, $now, $respectSivo)) {
+            // Not an instructor. Can they see due to their participation?
             return true;
         }
 

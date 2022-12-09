@@ -44,7 +44,6 @@ use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
  */
 class Controller extends Assessment\Controller
 {
-
     /**
      * @var TaskResponseDataSource
      */
@@ -212,7 +211,15 @@ class Controller extends Assessment\Controller
         /**
          * record view
          */
-        $lastView = new Assessment\Views\LatestView($this->latestViewMapper);
+        $lastView = new Assessment\Views\LatestView(
+            $this->latestViewMapper,
+            new \Schoolbox\External\User(
+                $this->getConfigLoader()->get('external_type'),
+                new \External_Class(),
+                new \External_User(),
+                $this->getUserMapper()
+            )
+        );
         $lastView->addNewView($assessment, $student, $this->getUser());
 
         $twigData = [

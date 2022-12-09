@@ -185,7 +185,7 @@ class Notifier extends AbstractModuleNotifier
         // This is just to reduce work load of scheduled and routed.
         switch ($roleType) {
             case Role::STAFF:
-                $student->loadTeachers();
+                (new \Schoolbox\External\User())->loadTeachers([$student]);
                 /** @var User $teacher */
                 foreach ($student->getTeacherCollection() as $teacher) {
                     if (!$teacher->getRole()->getAccessEvidence()) {

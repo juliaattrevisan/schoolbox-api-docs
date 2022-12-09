@@ -38,7 +38,6 @@ use InvalidArgumentException;
  */
 class Notifier extends AbstractModuleNotifier
 {
-
     const TRIGGER_CREATED = 'created';
     const TRIGGER_COMMENTED = 'commented';
     // this is to support ePortfolio for staff and parent
@@ -152,7 +151,8 @@ class Notifier extends AbstractModuleNotifier
         }
 
         // Send it to all their teachers (across all subjects)
-        $audience = $owner->loadTeachers()->getTeacherCollection();
+        $this->externalUser->loadTeachers([$owner]);
+        $audience = $owner->getTeacherCollection();
 
         return $this->notifyCommented($comment, $effector, $audience, Role::STAFF);
     }
@@ -242,7 +242,7 @@ class Notifier extends AbstractModuleNotifier
     public function notifyParentCommented(Model $comment, User $effector): Envelope
     {
         $post  = $this->postMapper->findById($comment->getBlog()->getId());
-        $owner = $this->userMapper->findById($post->getPage()->getOwner()->getId())->loadParents();
+        $owner = $this->userMapper->findById($post->getPage()->getOwner()->getId());
         $post->getPage()->setOwner($owner);
 
         // Only care about student
@@ -252,6 +252,9 @@ class Notifier extends AbstractModuleNotifier
 
         $audience = $this->userMapper->createCollection();
 
+        //make it easier, hit the db here and here again...
+        $this->externalUser->loadParents([$owner]);
+        $this->externalUser->loadParents($owner->getParents());
         foreach ($owner->getParents() as $parent) {
             try {
                 if ($this->access->userCanView($post, $parent)) {
@@ -296,7 +299,9 @@ class Notifier extends AbstractModuleNotifier
     {
         $post     = $this->postMapper->findById($comment->getBlog()->getId());
         $audience = $this->userMapper->createCollection();
-        foreach ($this->getOtherCommentAuthors($comment, Role::STUDENT) as $student) {
+        $studentAuthors = $this->getOtherCommentAuthors($comment, Role::STUDENT);
+        $this->externalUser->loadParents($studentAuthors);
+        foreach ($studentAuthors as $student) {
             if ($this->access->userCanView($post, $student)) {
                 $audience[$student->getId()] = $student;
             }
@@ -318,10 +323,12 @@ class Notifier extends AbstractModuleNotifier
     public function notifyParentFollowed(Model $comment, User $effector): Envelope
     {
         $post = $this->postMapper->findById($comment->getBlog()->getId());
-        $post->getPage()->setOwner($this->userMapper->findById($post->getPage()->getOwner()->getId())->loadParents());
+        $post->getPage()->setOwner($this->userMapper->findById($post->getPage()->getOwner()->getId()));
 
         $audience = $this->userMapper->createCollection();
-        foreach ($this->getOtherCommentAuthors($comment, Role::PARENT) as $parent) {
+        $parentAuthors = $this->getOtherCommentAuthors($comment, Role::PARENT);
+        $this->externalUser->loadChildren($parentAuthors);
+        foreach ($parentAuthors as $parent) {
             if ($this->access->userCanView($post, $parent)) {
                 $audience[$parent->getId()] = $parent;
             }
@@ -429,23 +436,12 @@ class Notifier extends AbstractModuleNotifier
     ): Envelope {
         $envelope = new Envelope();
         $post     = $this->postMapper->findById($comment->getBlog()->getId());
-        $owner    = $this->userMapper->findById($post->getPage()->getOwner()->getId())->loadParents();
+        $owner    = $this->userMapper->findById($post->getPage()->getOwner()->getId());
 
-        // Are we targeting parents?
-        if (Role::PARENT === $roleType) {
-            // Load parents so we can display just their child's first name
-            $effector->loadParents();
-            if ($effector->getId() !== $owner->getId()) {
-                $owner->loadParents();
-            }
-        }
-
+        $this->externalUser->loadChildren($audience);
         foreach ($audience as $target) {
             // Just first name if advising parent of child's action
             /** @var User $target */
-            if (!$target->getChildren()) {
-                $target->setChildren(User::createCollection());
-            }
             $effectorParam = Role::PARENT === $roleType && $target->isParentOf($effector)
                 ? new ChildParam($effector)
                 : new UserParam($effector);

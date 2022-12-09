@@ -67,6 +67,9 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                 ['lastname' => 'asc']
             );
         }
+        //load all parents for the students once, not for each call
+        $externalUser = new \Schoolbox\External\User();
+        $externalUser->loadParents($userList);
 
         if (count($userList) === 0) {
             $this->setBlock('empty_state', 'empty_class', 'empty_class_block');
@@ -210,7 +213,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                         if ($user->getRole()->isStudent()) {
                             if ($viewer->getRole()->isStudent() && $studentPhotoHidden) {
                                 $this->setVar('photo_block', '');
-                            } elseif ($viewer->getRole()->isParent() && !$viewer->isParentOf($user->loadParents())) {
+                            } elseif ($viewer->getRole()->isParent() && !$viewer->isParentOf($user)) {
                                 $this->setVar('photo_block', '');
                             } else {
                                 $this->parse('photo_block', 'photo');

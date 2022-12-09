@@ -99,10 +99,6 @@ class Controller extends Base
         $apiGroups = $this->groupsHelper->getCurrentGroups($user);
         $groupsArr = $apiGroups->map(new ModelToArray());
 
-        //load parents and students / children for export.
-        $user->loadParents()
-             ->loadStudents();
-
         /**
          * build the whole thing
          */
@@ -447,10 +443,6 @@ class Controller extends Base
         foreach ($users as $user) {
             $apiGroups = $this->groupsHelper->getCurrentGroups($user);
             $groupsArr = $apiGroups->map(new ModelToArray());
-
-            //load parents and students / children for export.
-            $user->loadParents()
-                 ->loadStudents();
 
             /**
              * build the whole thing

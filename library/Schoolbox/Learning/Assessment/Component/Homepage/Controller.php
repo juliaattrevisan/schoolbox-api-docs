@@ -90,7 +90,6 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
             $options['closed_before'] = $now;
         }
 
-        // If a parent, we need to hydrate all participants so we can check parent visibility via child participation
         $user    = $this->getUser();
         $mutator = new AssessmentListMutator($this->getUser(), new Visibility($this->getAccess()), $now, $showClosed);
         $this->assessments = $this->getAssessmentMapper()

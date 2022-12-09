@@ -16,7 +16,8 @@ use Alaress\Json\SerializeTrait;
 use Alaress\Json\Serializable;
 use House;
 use HouseResidential;
-use Schoolbox\Config\Loader as ConfigLoader;
+use Config;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External\Subject;
 use Schoolbox\External\SubjectCollection;
 use Schoolbox\Json\Api\SitePageLink;
@@ -26,7 +27,6 @@ use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Resource\Folder\Code\ClassCodeMatchFactory;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Pastoral;
 
@@ -194,14 +194,6 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
      */
     protected $subject_collection;
 
-    /** @var Collection */
-    protected $parents;
-
-    /**
-     * Determines if parent collection has been loaded
-     * @var bool
-     */
-    private $parentsLoaded = false;
 
     /** @var Collection|UserAccess[] */
     protected $accessList;
@@ -243,34 +235,28 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     private $boardingStatus;
 
     /**
+     * Collection of parents, used for identifying relationships the user has.
      *
-     * @var IConfigLoader
-     * @deprecated Don't use this in new code, models should not have dependencies on services
-     * @todo Remove this from this model
+     * If this is null you will need to hydrate with the return of \Schoolbox\External\User::loadParents
+     * @var Collection|User[]|null
      */
-    protected $config_loader;
+    protected $parents;
 
     /**
-     * @var Collection|User[]
+     * Collection of teachers, used for identifying relationships the user has.
+     *
+     * If this is null you will need to hydrate with the return of \Schoolbox\External\User::loadTeachers
+     * @var Collection|User[]|null
      */
-    protected $teacherCollection;
+    protected $teacherCollection = null;
 
     /**
-     * Determines if teacher collection has been loaded
-     * @var bool
+     * Collection of children, used for identifying relationships the user has.
+     *
+     * If this is null you will need to hydrate with the return of \Schoolbox\External\User::loadChildren
+     * @var GenericCollection|User[]|null
      */
-    private $teachersLoaded = false;
-
-    /**
-     * @var GenericCollection|User[]
-     */
-    private $children;
-
-    /**
-     * Determines if children collection has been loaded
-     * @var bool
-     */
-    private $childrenLoaded = false;
+    private $children = null;
 
     /** @var GenericCollection|Pastoral\Group\Member\Model[] */
     private $pastoralGroupsMemberships;
@@ -279,8 +265,6 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     public function __construct()
     {
         $this->role = new Role();
-        // TODO SA-8354: destroy this
-        $this->config_loader = new ConfigLoader();
     }
 
 
@@ -357,7 +341,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     public function getEmail()
     {
         if ($this->localEmail == true) {
-            return $this->username . '@' . $this->config_loader->get('mail_address');
+            return $this->username . '@' . Config::get(ConfigMapper::NAME_MAIL_ADDRESS);
         }
         return $this->altEmail;
     }
@@ -408,7 +392,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     {
         // Check for custom format
         $formatter = empty($format)
-            ? (new User\Formatter\Factory())->buildFromConfig($this->getConfigLoader())
+            ? (new User\Formatter\Factory())->buildFromNothing()
             : new User\Formatter\Formatter($format);
         return $formatter->formatObject($this);
     }
@@ -1049,18 +1033,6 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
         return $this->subject_collection;
     }
 
-
-    /**
-     * @param IConfigLoader $config_loader
-     *
-     * @return self
-     */
-    public function setConfigLoader(IConfigLoader $config_loader)
-    {
-        $this->config_loader = $config_loader;
-        return $this;
-    }
-
     /**
      * @param  GenericCollection|UserAccess[] $accessList
      *
@@ -1083,14 +1055,6 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
         }
 
         return $this->accessList;
-    }
-
-    /**
-     * @return IConfigLoader
-     */
-    public function getConfigLoader()
-    {
-        return $this->config_loader;
     }
 
     /**
@@ -1143,129 +1107,6 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
         return $parent->isParentOf($this);
     }
 
-
-    /**
-     * Load teachers into object from external db
-     * @return $this
-     */
-    public function loadTeachers()
-    {
-        if (!$this->teachersLoaded) {
-            $codeMatcher       = (new ClassCodeMatchFactory())->build($this->getConfigLoader()->get('external_type'));
-            $teacherCollection = new Collection();
-
-            // TODO remove handler dependency
-            $externalUser = new \External_User();
-            $externalClass = new \External_Class();
-
-            // Get all of the students subjects
-
-            $found = [];
-            $subjects = $externalUser->getSubjectList($this);
-
-            // Iterate and find teachers associated with each subject
-            if (is_array($subjects)) {
-                foreach ($subjects as $subject) {
-                    $teachers = $externalClass->getTeachers($codeMatcher::generateFolderCode($subject['campusCode'], $subject['code']));
-
-                    foreach ($teachers as $teacher) {
-                        // If we haven't already, add this teacher to their collection
-
-                        if (!isset($found[$teacher])) {
-                            try {
-                                $teacherCollection->add(
-                                    UserMapper::getInstance()->findByExternalId($teacher, Role::STAFF)
-                                );
-
-                                $found[$teacher] = 1;
-                            } catch (\Schoolbox\Mapper\Exception $e) {
-                                // Schoolbox user not found, lets not try and notify
-                            }
-                        }
-                    }
-                }
-            }
-
-            $this->setTeacherCollection($teacherCollection);
-            $this->teachersLoaded = true;
-        }
-
-        return $this;
-    }
-
-    /**
-     * Load parents into object from external db
-     * @return self
-     */
-    public function loadParents(): self
-    {
-        if ($this->parentsLoaded) {
-            return $this;
-        }
-        $this->parents = new GenericCollection(self::class);
-        if (null === $this->externalId) {
-            return $this;
-        }
-        $DEPRECATED_EXTERNAL_USER = new \External_User();
-        $allParents               = $DEPRECATED_EXTERNAL_USER->getStudentContactList([$this->externalId]);
-
-        foreach ($allParents as $currentParent) {
-            /* Add parent
-             */
-            if (!empty($currentParent['StudentContactID'])) {
-                try {
-                    $parent = UserMapper::getInstance()->findByExternalId($currentParent['StudentContactID'], Role::PARENT);
-                    $this->parents->add($parent);
-                } catch (Mapper\Exception $e) {
-                    //noop
-                }
-            }
-            /* Add speece
-             */
-            if (!empty($currentParent['StudentContactSpouseID'])) {
-                try {
-                    $spouse = UserMapper::getInstance()->findByExternalId($currentParent['StudentContactSpouseID'], Role::PARENT);
-                    $this->parents->add($spouse);
-                } catch (Mapper\Exception $e) {
-                    //noop
-                }
-            }
-        }
-
-        $this->parentsLoaded = true;
-
-        return $this;
-    }
-
-    /**
-     * Load students / children into object from external db
-     * @return self
-     */
-    public function loadStudents(): self
-    {
-        if ($this->childrenLoaded) {
-            return $this;
-        }
-        $externalUser = new \External_User();
-        $userMapper = UserMapper::getInstance();
-        $this->children = new GenericCollection(self::class);
-        if (null === $this->externalId) {
-            return $this;
-        }
-        if ($this->getExternalId()) {
-            $enrolments = $externalUser->getEnrolledStudents($this->getExternalId());
-            foreach ($enrolments as $child) {
-                try {
-                    $this->children->add($userMapper->findByExternalId($child['RelatedID']));
-                } catch (Mapper\Exception $e) {
-                    // noop
-                }
-            }
-        }
-        $this->childrenLoaded = true;
-        return $this;
-    }
-
     /**
      * @param GenericCollection<User> $parents
      * @return User
@@ -1281,7 +1122,9 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     /**
      * Get the parents associated with this user
      *
-     * @return Collection|self[]
+     * If this is null you will need to hydrate with the return of \Schoolbox\External\User::loadParents
+     *
+     * @return Collection|self[]|null
      */
     public function getParents()
     {
@@ -1405,7 +1248,10 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     }
 
     /**
-     * @return Collection<User>
+     * Collection of teachers, used for identifying relationships the user has.
+     *
+     * If this is null you will need to hydrate with the return of \Schoolbox\External\User::loadTeachers
+     * @return Collection<User>|null
      */
     public function getTeacherCollection()
     {
@@ -1424,6 +1270,9 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
 
 
     /**
+     * Collection of children, used for identifying relationships the user has.
+     *
+     * If this is null you will need to hydrate with the return of \Schoolbox\External\User::loadChildren
      * @return GenericCollection<User>|null
      */
     public function getChildren()

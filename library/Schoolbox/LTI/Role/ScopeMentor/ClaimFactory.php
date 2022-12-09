@@ -71,6 +71,8 @@ class ClaimFactory
                 }
             }
         } elseif ($user->getRole()->isParent()) {
+            //load the children from the external DB
+            (new \Schoolbox\External\User())->loadChildren([$user]);
             foreach ($user->getChildren() as $child) {
                 $participant = $assessment->getParticipantIfExtant($child);
                 if ($participant && !$participant->isExcluded()) {
