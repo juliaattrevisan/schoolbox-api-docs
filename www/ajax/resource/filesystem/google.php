@@ -63,19 +63,28 @@ foreach ($_POST['docs'] as $doc) {
 
         $dest = $grive->fetchToFile($doc['id']);
     } catch (DomainException $e) {
-        /* - Some mysterious error - skip this file, leave a bootprint in sentry
-         *
-         * - Someone tried to access a restricted file, leave a bootprint in sentry
-         *   because we can't inform the user via the ui atm
-         */
-        //  trigger_error('Could not upload google drive file: ' . $e->getMessage(), E_USER_WARNING);
-        $errors[] = 'Could not upload google drive file: ' . $e->getMessage();
+        // Sanitise error message.
+        $errorMessage = $e->getMessage();
+        if (str_contains($errorMessage, 'timed out')) {
+            $errorMessage = 'The upload timed out.  Maybe the file is too big?';
+        } else {
+            // Unknown error.  Log full error message, but do not show to user.
+            trigger_error("Could not upload google drive file (1).  $errorMessage", E_USER_WARNING);
+            $errorMessage = 'Could not upload google drive file (1).';
+        }
+
+        $errors[] = $errorMessage;
         continue;
     } catch (Mapper\Exception $e) {
-        /* noop: unknown file extension: silently disregard for now
-         * because deriveFileName() couldn't figure out the extension
-         */
-        $errors[] = ['err' => 'Could not upload google drive file: ' . $e->getMessage()];
+        // Sanitise error message.
+        $errorMessage = $e->getMessage();
+        if (str_contains($errorMessage, 'nknown file extension')) {
+            $errorMessage = 'Could not determine file type from extension';
+        } else {
+            $errorMessage = 'Could not upload google drive file (2).';
+        }
+
+        $errors[] = $errorMessage;
         continue;
     }
 
