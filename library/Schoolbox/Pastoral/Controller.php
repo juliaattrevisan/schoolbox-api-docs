@@ -1051,21 +1051,21 @@ class Controller extends Base
             // If type was deleted, allow it to be saved only when it's not changed.
             if ($type->isDeleted() && ($record->getType()->getId() !== $type->getId())) {
                 $db->rollback();
-                throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
+                throw new SchoolboxException("Pastoral type with ID {$type->getId()} cannot be found");
             }
             $record->setType($type);
 
             // If subtype was deleted, allow it to be saved only when it's not changed.
             if ($subtype && $subtype->isDeleted() && ($record->getSubType()->getId() !== $subtype->getId())) {
                 $db->rollback();
-                throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
+                throw new SchoolboxException("Pastoral subtype with ID {$subtype->getId()} cannot be found");
             }
             $record->setSubType($subtype);
 
             // If severity was deleted, allow it to be saved only when it's not changed.
             if ($severity && $severity->isDeleted() && (!$record->getSeverity() || $record->getSeverity()->getId() !== $severity->getId())) {
                 $db->rollback();
-                throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
+                throw new SchoolboxException("Pastoral severity with ID {$severity->getId()} cannot be found");
             }
             $record->setSeverity($severity);
             $record->setModifiedBy($this->getUser());
