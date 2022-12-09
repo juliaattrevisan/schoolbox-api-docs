@@ -210,6 +210,7 @@ class Controller extends Base
                 }
             }
         }
+
         $data = [
             'student'         => $student,
             'date'            => $date,

@@ -241,8 +241,6 @@ class Controller extends Assessment\Controller
         // Can I attempt this?
         // TODO this should eventually be route permission based
         $actionValidator = new ActionValidator($now, $this->getAccess());
-        //load children for checks in ActionValidator
-        (new \Schoolbox\External\User())->loadChildren([$this->getUser()]);
 
         // TODO this will produce a false-positive if there is an attempt unfinished but the time limit on it has expired
         $canAttempt = $quiz->hasQuestions() && $student->getId() === $this->getUser()->getId()

@@ -16,7 +16,6 @@ use Custom\Vist\TravelLog\Renderer;
 class Component_Dashboard_ChildSubjectController extends Component_Dashboard_ControllerAbstract
 {
     private $children;
-    private \Schoolbox\External\User $externalUser;
 
     /**
      * Prepares data for the render function. Business logic.
@@ -27,8 +26,6 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
     {
         if (isset($_SESSION['children']) && is_array($_SESSION['children'])) {
             $this->children = $_SESSION['children'];
-            $this->externalUser = new Schoolbox\External\User();
-            $this->externalUser->loadChildren([$this->getUser()]);
             return true;
         }
         return false;

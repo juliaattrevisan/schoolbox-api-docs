@@ -30,9 +30,6 @@ class Component_Homepage_FeedController extends Component_Homepage_ControllerAbs
         if (!$this->isSourceRenderable() && !$this->hasContextWriteAccess()) {
             return false;
         }
-        if ($this->getUser()->getRole()->isParent()) {
-            (new \Schoolbox\External\User())->loadChildren([$this->getUser()]);
-        }
 
         $this->feed = new StandardFeed(
             $this->getConfigLoader(),

@@ -193,12 +193,6 @@ class Controller extends Assessment\Controller
         // filter out any sub-activities that have not yet been published
         $visibility    = new Assessment\Visibility($this->getAccess());
         $now           = Alaress_Date_Format::now();
-        // I might be a learner (or parent of learner):
-        // If a parent, we need to hydrate all participants so we can
-        // check parent visibility via child participation.
-        if ($this->getUser()->getRole()->isParent()) {
-            (new \Schoolbox\External\User())->loadChildren([$this->getUser()]);
-        }
         $mutator       = new Participant\AssessmentListMutator($this->getUser(), $visibility, $now, true);
         $classFolder          = $assessment->getBaseContext()->getFolder();
         $isViewerAnInstructor = $this->getAccess()->isInstructor($this->getUser(), $classFolder);

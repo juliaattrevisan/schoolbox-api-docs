@@ -166,7 +166,7 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
             $staffPhotoVisibility = $this->getConfigLoader()->get('protect_teacher_photo');
             $studentPhotoHidden   = $this->getConfigLoader()->get('protect_student_photo');
             $viewer               = $this->getUser();
-            (new \Schoolbox\External\User())->loadChildren($viewer);
+
             $i = 0;
             $emailAll = [];
 
