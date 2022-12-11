@@ -7,7 +7,6 @@
 {% set modifyRoute = routeLookupIfAuthorized('learningBadgeAward.getAwardUpdate', {awardId: award.id, award: award}) %}
 {% set postRoute = routeLookupIfAuthorized('learningBadgeAward.postAwardUpdate', {awardId: award.id, award: award}) %}
 {% set awardRoute = routeLookupIfAuthorized('learningBadgeAward.postAwardAchieve', {awardId: award.id, award: award}) %}
-{% set reasonedByRoute = award.reasonedBy ? routeLookupIfAuthorized('searchUser.getProfile', {userId: award.reasonedBy.id, user: award.reasonedBy}) : null %}
 <script>
     $(function () {
         $('[data-delete-evidence]').click(function (e) {
@@ -61,21 +60,6 @@
                 <div class="small-12 columns">
                     <h2 class="subheader">Evidence</h2>
                 </div>
-                {% if award.reason is not empty and award.reasonedBy is not empty %}
-                <div class="small-12 columns">
-                    <ul class="meta">
-                        <li class="icon-modify">Set
-                            <time title="{{ award.reasonedAt.local }}">{{ award.reasonedAt.relativeTime }}</time>
-                            by
-                            {% if reasonedByRoute %}
-                                <a href="{{ reasonedByRoute }}">{{ award.reasonedBy.fullname }}</a>
-                            {% else %}
-                                {{ award.reasonedBy.fullname }}
-                            {% endif %}
-                        </li>
-                    </ul>
-                </div>
-                {% endif %}
             </div>
             {% if modifyRoute or postRoute %}
             <nav>
