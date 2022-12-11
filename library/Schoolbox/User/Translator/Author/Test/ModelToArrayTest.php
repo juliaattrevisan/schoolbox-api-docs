@@ -16,6 +16,7 @@ use Schoolbox\Campus;
 use Schoolbox\Config\TestLoader;
 use Schoolbox\GenericCollection;
 use Schoolbox\Role;
+use Schoolbox\Test\TestUser;
 use Schoolbox\User;
 use Schoolbox\User\Translator\Author\ModelToArray;
 use Schoolbox\YearLevel\Model as YearLevel;
@@ -39,10 +40,9 @@ class ModelToArrayTest extends TestCase
             'name_format'  => '{title} {firstname} {lastname}',
         ]);
 
-        $emptyUser = (new User())
+        $emptyUser = (new TestUser())
         ->setFirstname(null)
-        ->setLastname(null)
-        ->setConfigLoader($configLoader);
+        ->setLastname(null);
 
         $emptyResponse = [
             'id'            => null,
@@ -59,8 +59,7 @@ class ModelToArrayTest extends TestCase
             $emptyResponse,
         ];
 
-        $populatedUser = (new User())
-            ->setConfigLoader($configLoader)
+        $populatedUser = (new TestUser())
             ->setId(1)
             ->setCampusCollection(
                 (new GenericCollection(Campus::class))
