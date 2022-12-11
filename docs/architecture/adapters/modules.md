@@ -18,11 +18,11 @@ The module itself defines:
 All modules extend the base class `\Alaress\Module\Module`.
 
 ```php
+declare(strict_types=1);
 
-use Alaress\Authorizer\Rule;
-use Schoolbox\UserMapper;
+namespace Schoolbox\MyModule;
 
-class MyModule extends \Alaress\Module\Module
+class Module extends \Alaress\Module\Module
 {
     /**
      * The basename is used internally by Schoolbox's route registrations:
@@ -60,7 +60,7 @@ class MyModule extends \Alaress\Module\Module
         $preload = function (array $params) {
             if (isset($params['userId'])) {
                 $params['user'] = $this->getMapperFactory()
-                    ->get(UserMapper::class)
+                    ->get(\Schoolbox\UserMapper::class)
                     ->findById();
             }
             return $params;
@@ -70,9 +70,9 @@ class MyModule extends \Alaress\Module\Module
         // request this route.
         // In this case, the user must be a superuser:
         // all other users will be rejected.
-        $permissions = new Rule\All(
-            new Rule\IsLoggedIn(),
-            new Rule\IsSuperuser()
+        $permissions = new \Alaress\Authorizer\Rule\All(
+            new \Alaress\Authorizer\Rule\IsLoggedIn(),
+            new \Alaress\Authorizer\Rule\IsSuperuser()
         );
 
         // The name of the method within the controller which handles requests
@@ -116,3 +116,33 @@ class MyModule extends \Alaress\Module\Module
     }
 }
 ```
+
+## Instantiation
+
+Modules will only ever be instantiated in a class within `conf/modules`, defined
+thus:
+
+```php
+declare(strict_types=1);
+
+namespace Config\Modules;
+
+class MyModule extends \Config\ModuleLoader
+{
+    /**
+     * Load modules here, along with their base paths.
+     */
+    public function configure(\Psr\Container\ContainerInterface $di): void
+    {
+        $this->loadModule(
+            $di,
+            \Schoolbox\MyModule\Module::class,
+            '/my-module',
+        );
+    }
+```
+
+## Usage
+
+Modules aren't something which a developer needs to know how to be able to use:
+they'll only need to know how to define one.
