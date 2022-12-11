@@ -16,11 +16,12 @@ order to receive signals: subscription uses the
 In addition, the daemon kernel uses the `\Alaress\Redis\Async\Client` class to
 abstract the details of queue subscription.
 
-## Usage
+## Instantiation
 
 The Redis adapter variants may be fetched via the DI container:
 
 ```php
+/** @var \Psr\Container\ContainerInterface $di */
 /** @var \Predis\ClientInterface $redisStorage */
 $redisStorage = $di->get('redis.storage');
 
@@ -35,7 +36,7 @@ $redisSignalQueuePub = $di->get('redis.signalQueue.pub');
 $redisSignalQueueSub = $di->get('redis.signalQueue.sub');
 ```
 
-Alternately, synchronous instances of the Redis adapter are accessible as
+Less desirably, synchronous instances of the Redis adapter are accessible as
 singletons:
 
 ```php
@@ -53,8 +54,53 @@ The `\Alaress\Redis` class also allows access to wrapped versions of these
 instances, which allow function calls to be cached:
 
 ```php
-// A wrapper around the Redis container: currently used only for caching
-// function calls.
+$redisWrapper = \Alaress\Redis::getCacheInstance();
+$redisCache   = $redisWrapper->getClient();
+```
+
+## Usage
+
+The Redis adapters have access to all Predis methods:
+
+```php
+/** @var \Predis\ClientInterface $redisStorage */
+
+// Setting a value
+$redisStorage->set($key, $value);
+
+// Getting a value
+$value = $redisStorage->get($key);
+
+// Iterating a set of keys which match a filter
+$keyspace = new \Predis\Collection\Iterator\Keyspace($redisStorage, "*");
+foreach ($keyspace as $key) {
+    ...
+}
+
+// Transactions
+$responses = $redisStorage->transaction(
+    function (\Predis\Transaction\MultiExec $tx) {
+        ...
+    }
+);
+```
+
+The queue subscription allows access to Redis'
+[pub-sub commands](https://redis.io/commands/?group=pubsub):
+
+```php
+$eventListener = new class implements \Alaress\Redis\Async\EventListener {...}
+
+/** @var \Alaress\Redis\Async\Client $redisSignalQueueSub */
+$redisSignalQueueSub->subscribe($channel, $eventListener);
+$redisSignalQueueSub->unsubscribe($channel);
+$redisSignalQueueSub->psubscribe($pattern, $eventListener);
+$redisSignalQueueSub->punsubscribe($pattern);
+```
+
+Function call caches use the `\Alaress\Redis` wrapper:
+
+```php
 $redisWrapper = \Alaress\Redis::getCacheInstance();
 $result       = $redisWrapper->cacheFunctionCall(
     $key,
