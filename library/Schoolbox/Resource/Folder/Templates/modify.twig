@@ -46,7 +46,9 @@
                 window.sbProps.spectrum,
                 {
                     allowEmpty: true,
-                    change: function (color) {$(this).val(color.toRgbString());},
+                    change: function (color) {
+                        if (color !== null) {$(this).val(color.toRgbString());}
+                    },
                     preferredFormat: 'rgb'
                 }
             )
