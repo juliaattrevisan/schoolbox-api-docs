@@ -2,7 +2,6 @@ const path = require('path');
 const webpack = require('webpack');
 const {VueLoaderPlugin} = require('vue-loader');
 const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts'); // https://www.npmjs.com/package/webpack-remove-empty-scripts
-// const ESLintPlugin = require('eslint-webpack-plugin'); // https://www.npmjs.com/package/eslint-webpack-plugin
 
 const babelOptions = {
     presets: [
@@ -427,14 +426,5 @@ module.exports = {
         }),
         new VueLoaderPlugin(), // to handle .vue files
         new RemoveEmptyScriptsPlugin(),
-        /**
-         * As we are only just starting to implement TypeScript, we'll leave this off for now
-         * otherwise our build log will be bombarded with warning/error messages that make it
-         * hard to find actual BUILD errors. I may look to add this in once we've become more
-         * familiar with TypeScript.
-         */
-        // new ESLintPlugin({
-        //     extensions: 'ts'
-        // }), // This plugin uses eslint to find and fix problems in your TypeScript code
     ],
 };

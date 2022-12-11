@@ -15,7 +15,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-
+const maxNameLength = 50;
 const viewNodesStore = useViewNodesStore();
 
 /**
