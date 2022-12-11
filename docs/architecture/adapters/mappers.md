@@ -15,3 +15,47 @@ This class provides the following core methods:
 - `count` methods, for fetching a count of records which match a set
 - `save`, for creating new and updating existing records
 - `delete`, for deleting already created records
+
+## Instantiation
+
+Mappers may be retrieved using the `\Schoolbox\MapperFactory` class:
+
+```php
+/** @var \Psr\Container\ContainerInterface $di */
+/** @var \Schoolbox\MapperFactory $mapperFactory */
+$mapperFactory = $di->get('mapperFactory');
+
+$userMapper = $mapperFactory->get(\Schoolbox\UserMapper::class);
+```
+
+Less desirably, mappers are also accessible as singletons:
+```php
+$userMapper = \Schoolbox\UserMapper::getInstance();
+```
+
+## Usage
+
+```php
+/** @var \Schoolbox\UserMapper $userMapper **/
+
+// Create a new user
+$newUser = $userMapper->createModel();
+$newUser->setFirstname('Test');
+$userMapper->save($newUser);
+
+// Fetch a single user and save
+$existingUser = $userMapper->findById(1);
+$existingUser->setFirstname('Test');
+$userMapper->save($existingUser);
+
+// Fetch multiple users and save
+$userList = $userMapper->findByColumn('first_name', 'Test');
+foreach ($userList as $user) {
+    $user->setFirstname('Test2');
+}
+$userMapper->save($userList);
+
+// Delete users
+$userList = $userMapper->findByColumn('last_name', 'Test');
+$userMapper->delete($userList);
+```
