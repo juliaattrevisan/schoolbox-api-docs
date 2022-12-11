@@ -5056,11 +5056,6 @@ parameters:
 			path: library/Schoolbox/Learning/Authorizer/Rule/CanPreview.php
 
 		-
-			message: "#^Method Schoolbox\\\\Learning\\\\Badge\\\\Award\\\\Module\\:\\:authorizeOnlyUserIsSelf\\(\\) is unused\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Badge/Award/Module.php
-
-		-
 			message: "#^Method Schoolbox\\\\Learning\\\\Badge\\\\Award\\\\Notifier\\:\\:notifyGoalset\\(\\) is unused\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Badge/Award/Notifier.php
