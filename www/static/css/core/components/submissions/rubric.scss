@@ -310,8 +310,18 @@ table.rb {
     }
 }
 .rb-blank {
-    background-color: #FFEFEB !important;
+    //Background stripes for blank rubric
+    background-image: repeating-linear-gradient(
+        135deg, 
+        var(--content-ui-foreground) 0px,
+        var(--content-ui-foreground) 5px,
+        #FFF 5px,
+        #FFF 20px
+    );
+    //no-repeat is here to stop a visual bug. Check the ticket SA-14840 for the explanation.
+    background-repeat: no-repeat;
     color: calc-text-color(#FFEFEB);
+    opacity: 0.25;
 }
 .rb-final-summary {
     background-color: $input-border-color !important;
