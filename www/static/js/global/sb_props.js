@@ -8,7 +8,7 @@ window.sbProps = {
     spectrum: {
         allowEmpty: false,
         clickoutFiresChange: true,
-        preferredFormat: 'hex',
+        preferredFormat: 'hex', // NOTE: 'hex' is compatible with showAlpha:true.  In that case when the alpha slider moves from zero to non-zero, the displayed format changes from hex to rgba.
         showAlpha: false,
         showButtons: false,
         showInitial: true,
