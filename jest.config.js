@@ -12,8 +12,9 @@ module.exports = {
         '<rootDir>/node_modules/jest-serializer-vue'
     ],
     transform: { // A map from regular expressions to paths to transformers.
-        '^.+\\.vue$': 'vue-jest',
-        '^.+\\js$': 'babel-jest'
+        '^.+\\.vue$': '@vue/vue3-jest',
+        '^.+\\js$': 'babel-jest',
+        '^.+\\.tsx?$': 'ts-jest',
     },
     transformIgnorePatterns: ['node_modules/(?!(gsap|vue3-resize)/)'], // which files shall be transformed by Babel: https://jestjs.io/docs/tutorial-react-native#transformignorepatterns-customization
     verbose: true, // Indicates whether each individual test should be reported during the run. All errors will also still be shown on the bottom after execution. Note that if there is only one test file being run it will default to true.
