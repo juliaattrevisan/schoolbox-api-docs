@@ -138,9 +138,7 @@ class Controller extends Base
                 /* You're forced to require participants/participation hydrated here
                  * That Is Unfortunate
                  */
-                $project = $this->assessmentDataSource->findByIdForReview($assessment->getContext()->getId());
-
-                (new Project\ResultCache\ResultCache($this->resultCacheMapper))->persist($project, $student, null);
+                (new Project\ResultCache\ResultCache($this->resultCacheMapper))->refresh($this->assessmentDataSource, $assessment, $student);
             }
         } catch (RangeException $e) {
             $this->sendError('Invalid mark provided' . $e->getMessage() . $e->getTraceAsString());
@@ -275,9 +273,7 @@ class Controller extends Base
                 /* You're forced to require participants/participation hydrated here
                  * That Is Unfortunate
                  */
-                $project = $this->assessmentDataSource->findByIdForReview($assessment->getContext()->getId());
-
-                (new Project\ResultCache\ResultCache($this->resultCacheMapper))->persist($project, $student, null);
+                (new Project\ResultCache\ResultCache($this->resultCacheMapper))->refresh($this->assessmentDataSource, $assessment, $student);
             }
         } catch (RangeException $e) {
             $this->sendError('Invalid mark provided');

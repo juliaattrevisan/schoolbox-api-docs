@@ -685,17 +685,7 @@ class ListController extends Web\Controller\Base
          */
         if (!$cacheValid) {
             $projectResultCache = (new Project\ResultCache\ResultCache($this->projectResultCacheMapper));
-
-            if ($assessment instanceof Project) {
-                $project = $assessment;
-            } else {
-                $project = $this->assessmentMapper->findByIdForReview($assessment->getContext()->getId());
-            }
-
-            foreach ($project->getAllParticipants() as $userId => $participant) {
-                $user = $participant->getUser();
-                $projectResultCache->persist($project, $user, null);
-            }
+            $projectResultCache->refresh($this->assessmentMapper, $assessment);
         }
 
         return $transactionSummary;
