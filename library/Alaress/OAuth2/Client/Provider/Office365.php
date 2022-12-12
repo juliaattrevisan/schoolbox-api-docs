@@ -95,7 +95,7 @@ class Office365 extends AbstractProvider
          * using similar system to \League\OAuth2\Client\Provider\GenericProvider::checkResponse
         */
         if (isset($data['error'], $data['error_description'])) {
-            throw new SchoolboxException("Office365 Error: {$data['error']}:\n{$data['error_description']}");
+            throw new SchoolboxException("Office365 Error: {$data['error']}", information: $data['error_description']);
         }
         //else just say we had an issue...
         throw new SchoolboxException("Something went wrong");

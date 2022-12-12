@@ -23,6 +23,11 @@ class Exception extends \RuntimeException
      */
     protected $httpStatusCode = 400;
 
+    /**
+     * Extra HTTP information related to the exception.
+     */
+    protected string $information = '';
+
 
     /**
      * Constructor
@@ -32,11 +37,14 @@ class Exception extends \RuntimeException
      * @param Throwable|null $previous
      * @param int|null       $httpStatusCode
      */
-    public function __construct(string $message = "", ?int $code = 0, Throwable $previous = null, ?int $httpStatusCode = null)
+    public function __construct(string $message = "", ?int $code = 0, Throwable $previous = null, ?int $httpStatusCode = null, string $information = '')
     {
         parent::__construct($message, $code, $previous);
         if ($httpStatusCode !== null) {
             $this->httpStatusCode = $httpStatusCode;
+        }
+        if ('' !== $information) {
+            $this->information = $information;
         }
     }
 
@@ -47,5 +55,13 @@ class Exception extends \RuntimeException
     public function getHttpStatusCode(): int
     {
         return $this->httpStatusCode;
+    }
+
+    /**
+     * @return string
+     */
+    public function getInformation(): string
+    {
+        return $this->information;
     }
 }

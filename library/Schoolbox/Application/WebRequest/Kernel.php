@@ -231,7 +231,7 @@ class Kernel extends WebKernelAbstract
              * db call to retrieve the content, so error() doesn't
              * need to do it itself. It just renders the content.
              */
-            $this->outputError($e, $e->getMessage(), '', [], $e->getHttpStatusCode());
+            $this->outputError($e, $e->getMessage(), $e->getInformation(), [], $e->getHttpStatusCode());
         } catch (InvalidPath $e) {
             $this->outputError($e, $e->getMessage(), '', [], 400);
         }
