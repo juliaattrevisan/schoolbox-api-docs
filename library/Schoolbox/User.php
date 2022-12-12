@@ -82,8 +82,6 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     /** @var string */
     private $positionTitle;
 
-    /** @var bool */
-    private $webmail;
 
     /** @var string */
     private $username;
@@ -526,24 +524,6 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
         } else {
             return '';
         }
-    }
-
-    /**
-     * @param bool $webmail
-     * @return self
-     */
-    public function setWebmail($webmail)
-    {
-        $this->webmail = $webmail;
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getWebmail()
-    {
-        return $this->webmail;
     }
 
 

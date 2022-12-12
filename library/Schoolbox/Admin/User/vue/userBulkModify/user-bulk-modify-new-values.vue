@@ -61,7 +61,6 @@ export default {
                 ePortfolio: -1,
                 emailFromUserName: -1,
                 externalMailClient: -1,
-                webmail: -1,
                 accountEnabled: -1,
                 hideContacts: -1,
                 hideTimetable: -1,
@@ -251,12 +250,6 @@ export default {
                     <label for="apply_externalmailclient">Use External Mail Client</label>
                     <select id="apply_externalmailclient" name="apply_externalmailclient"
                             v-model="updateFields.externalMailClient">
-                        <option value="-1">Unchanged</option>
-                        <option value="1">Enabled</option>
-                        <option value="0">Disabled</option>
-                    </select>
-                    <label for="apply_webmail">Enable Webmail Tab</label>
-                    <select id="apply_webmail" name="apply_webmail" v-model="updateFields.webmail">
                         <option value="-1">Unchanged</option>
                         <option value="1">Enabled</option>
                         <option value="0">Disabled</option>

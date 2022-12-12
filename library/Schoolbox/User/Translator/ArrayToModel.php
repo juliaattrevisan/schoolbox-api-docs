@@ -31,7 +31,6 @@ class ArrayToModel extends Base
                 $model->setYear($value);
             } elseif ('flags' === $label) {
                 //set all the flags... if they exist
-                $this->setScalar($value, 'showWebmailTab', $model, 'setWebmail');
                 $this->setScalar($value, 'showGradeGraph', $model, 'setDisplayGradeGraph');
                 $this->setScalar($value, 'enableEportfolio', $model, 'setEportfolioEnable');
                 $this->setScalar($value, 'useInternalMail', $model, 'setUseInternalMail');

@@ -30,7 +30,6 @@ Scenario: Create, login and modify a new user
   And	I check "eportfolio"
   And	I uncheck "local_email"
   And	I uncheck "mail_handler"
-  And	I check "webmail"
   And	I uncheck "superuser"
   And	I press "Add User"
   Then	I should see "Prof Steve Test"
@@ -50,7 +49,6 @@ Scenario: Create, login and modify a new user
   Then  I should see "Remember Me"
   When	log in as "stevetest" with password "password2"
   Then	I should see ", Prof Steve Test"
-  And	I should see "Webmail"
 
 Scenario: Disable a user
   When  I go to "/logout.php"

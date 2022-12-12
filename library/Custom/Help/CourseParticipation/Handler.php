@@ -264,7 +264,6 @@ class Handler
                     ->setRole($participantRole)
                     ->setCampusCollection($participantCampuses)
                     ->setLocalEmail(false)
-                    ->setWebmail(false)
                     ->setUseInternalMail(false)
                     ->setEportfolioEnable(true)
                 ;

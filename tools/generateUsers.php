@@ -36,7 +36,6 @@ $app = new class extends CliTool\App {
                                    ->setFirstname(ucfirst($role->getName() . $j))
                                    ->setRole($role)
                     ->setLocalEmail(true)
-                    ->setWebmail(false)
                     ->setUseInternalMail(true)
                     ->setEportfolioEnable(false)
                                    ->setCampusCollection($campuses);

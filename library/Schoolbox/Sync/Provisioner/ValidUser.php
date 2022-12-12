@@ -59,7 +59,6 @@ class ValidUser
         $this->userMapper->verifyHasCampus($internalUser);
         $this->userMapper->verifyValidFirstName($internalUser);
         $this->userMapper->verifyValidLocalEmail($internalUser);
-        $this->userMapper->verifyValidWebmail($internalUser);
         $this->userMapper->verifyValidInternalMail($internalUser);
         $this->userMapper->verifyValidEportfolioEnabled($internalUser);
     }

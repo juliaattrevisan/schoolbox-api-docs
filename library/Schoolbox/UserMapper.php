@@ -104,7 +104,6 @@ class UserMapper extends Mapper
         $this->uses('lastname', self::TYPE_STRING);
         $this->uses('local_email', self::TYPE_BOOLEAN);
         $this->uses('alt_email', self::TYPE_STRING);
-        $this->uses('webmail', self::TYPE_BOOLEAN);
         $this->uses('hash', self::TYPE_STRING);
         $this->uses('position_title', self::TYPE_STRING);
         $this->uses('key', self::TYPE_STRING);
@@ -148,7 +147,6 @@ class UserMapper extends Mapper
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyHasCampus']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidFirstName']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidLocalEmail']);
-        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidWebmail']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidInternalMail']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidEportfolioEnabled']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'updateKey']);
@@ -940,23 +938,6 @@ class UserMapper extends Mapper
     {
         if ($user->getLocalEmail() === null) {
             throw new UnexpectedValueException('Email Address from Username cannot be null');
-        }
-
-        return true;
-    }
-
-
-    /**
-     * Pre-save callback for ensuring a user's webmail flag is not null
-     *
-     * @param  User $user
-     * @return bool Always true, as long as it doesn't throw
-     * @throws UnexpectedValueException if webmail flag is null
-     */
-    public function verifyValidWebmail(User $user)
-    {
-        if ($user->getWebmail() === null) {
-            throw new UnexpectedValueException('Webmail flag cannot be null');
         }
 
         return true;

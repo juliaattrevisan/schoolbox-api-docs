@@ -125,7 +125,6 @@ class Session
             $_SESSION['year']               = $user->getYear();
             $_SESSION['local_email']        = $user->getLocalEmail();
             $_SESSION['alt_email']          = $user->getAltEmail();
-            $_SESSION['webmail']            = $user->getWebmail();
             $_SESSION['key']                = $user->getKey();
             $_SESSION['lasttime']           = time();
             $_SESSION['username']           = $user->getUsername();

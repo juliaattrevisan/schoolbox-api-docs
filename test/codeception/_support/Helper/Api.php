@@ -149,7 +149,6 @@ class Api extends \Codeception\Module
                                  ->setRole($this->getRole($roleType))
                                  ->setCampusCollection($this->getCampuses())
                                  ->setLocalEmail(false)
-                                 ->setWebmail(false)
                                  ->setUseInternalMail(false)
                                  ->setEportfolioEnable(false)
                                  ->setEnabled(true)

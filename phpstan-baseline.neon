@@ -5450,17 +5450,6 @@ parameters:
 			count: 1
 			path: library/Schoolbox/Mapper/RecursiveUndeleterCli.php
 
-		-
-			message: "#^Method Schoolbox\\\\Menu\\\\Top\\\\Model\\:\\:getWebmail\\(\\) should return string but returns bool\\.$#"
-			count: 1
-			path: library/Schoolbox/Menu/Top/Model.php
-
-		-
-			message: "#^Property Schoolbox\\\\Menu\\\\Top\\\\Model\\:\\:\\$webmail \\(bool\\) does not accept string\\.$#"
-			count: 1
-			path: library/Schoolbox/Menu/Top/Model.php
-
-		-
 			message: "#^Method Schoolbox\\\\Module\\\\RestfulModule\\:\\:findById\\(\\) should return object but returns null\\.$#"
 			count: 1
 			path: library/Schoolbox/Module/RestfulModule.php

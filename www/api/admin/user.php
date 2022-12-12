@@ -141,7 +141,6 @@ if (empty($_GET['key']) || Config::get('api_key') != $_GET['key']) {
 
         // Enable new user by default
         $user = $setUserFields($userMapper->createModel()->setCampusCollection($campusMapper->createCollection()), $_GET)
-            ->setWebmail(false)
             ->setUseInternalMail(false)
             ->setEnabled(true);
 

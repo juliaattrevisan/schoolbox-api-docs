@@ -73,7 +73,6 @@ class ModelToArray
             'yearLevel'      => $this->convertYearLevel($user->getYear()),
             'isDeleted'      => $user->isDeleted(),
             'flags'          => [
-                'showWebmailTab'         => $user->getWebmail(),
                 'showContacts'           => !$user->getHideContacts(),
                 'enableTimetable'        => !$user->getHideTimetable(),
                 'showSideNav'            => !$user->getHideSidenav(),

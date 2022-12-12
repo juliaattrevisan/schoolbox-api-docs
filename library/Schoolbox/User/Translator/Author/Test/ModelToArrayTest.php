@@ -94,7 +94,6 @@ class ModelToArrayTest extends TestCase
             ->setYear((new YearLevel())
                 ->setId(1)
                 ->setName('Year 12'))
-            ->setWebmail(false)
             ->setHideContacts(true)
             ->setHideTimetable(true)
             ->setHideSidenav(true)

@@ -171,7 +171,6 @@ class Controller extends Base
         $newUser->setEnabled(true)
             ->setSuperuser(false)
             ->setLocalEmail(false)
-            ->setWebmail(false)
             ->setUseInternalMail(false)
             ->setEportfolioEnable(false);
 
