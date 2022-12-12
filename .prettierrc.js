@@ -5,5 +5,4 @@
  */
 module.exports = {
     tabWidth: 4, // its likely your IDE has this already set up, but just in case
-    singleQuote: true,
 };
