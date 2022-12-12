@@ -15,7 +15,6 @@ namespace Schoolbox\Sync\Provisioner;
  */
 class ValidUser
 {
-
     /**
      * @var \Schoolbox\UserMapper
      */

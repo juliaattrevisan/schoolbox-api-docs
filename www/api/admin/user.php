@@ -165,10 +165,7 @@ if (empty($_GET['key']) || Config::get('api_key') != $_GET['key']) {
 
         // TODO add response codes
         echo $response;
-    }
-
-    /* Update operation */
-    elseif ($action == 'update') {
+    } elseif ($action == 'update') {    /* Update operation */
         try {
             if (!empty($_GET['user_id'])) {
                 $user = $userMapper->findById($_GET['user_id']);
@@ -211,10 +208,7 @@ if (empty($_GET['key']) || Config::get('api_key') != $_GET['key']) {
         }
 
         echo $response;
-    }
-
-    /* Delete operation */
-    elseif ($action == 'delete') {
+    } elseif ($action == 'delete') {    /* Delete operation */
         try {
             if (!empty($_GET['user_id'])) {
                 $user = $userMapper->findById($_GET['user_id']);
