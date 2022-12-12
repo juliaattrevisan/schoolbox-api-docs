@@ -15,14 +15,18 @@ use Alaress\Web\Controller\Base as BaseController;
 use Alaress\Web\Controller\Exception as ControllerException;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Filter\BrokenFilterException;
+use Schoolbox\Filter\Filters\Assessment\IdFinder;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpecification;
+use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Replicator;
@@ -68,18 +72,20 @@ class Controller extends BaseController
     /**
      * Constructor
      *
-     * @param Access                    $access
-     * @param AssessmentDataSource      $assessmentDataSource
-     * @param UnitImplementation\Mapper $unitImplementationMapper
-     * @param Replicator                $replicator
-     * @param AssessmentFilter\IdFinder $assessmentIdFinder
+     * @param Access                     $access
+     * @param AssessmentDataSource       $assessmentDataSource
+     * @param Mapper                     $unitImplementationMapper
+     * @param Replicator                 $replicator
+     * @param IdFinder                   $assessmentIdFinder
+     * @param Project\ResultCache\Mapper $projectResultCacheMapper
      */
     public function __construct(
         Access $access,
         AssessmentDataSource $assessmentDataSource,
         UnitImplementation\Mapper $unitImplementationMapper,
         Replicator $replicator,
-        AssessmentFilter\IdFinder $assessmentIdFinder
+        AssessmentFilter\IdFinder $assessmentIdFinder,
+        private \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
     ) {
         $this->access                   = $access;
         $this->assessmentDataSource     = $assessmentDataSource;
@@ -337,6 +343,11 @@ class Controller extends BaseController
         $assessmentImpl = $this->replicator->replicateInNewContext($assessmentSpec, $context, $this->getUser(), $sequence);
         $this->assessmentDataSource->getNotifier()->notify($assessmentImpl, $this->getUser(), []);
 
+        /* A specific usage where creating projects and activities
+         * always invalidates the project result cache
+         */
+        $this->refreshProjectResultCache($assessmentImpl);
+
         // Recursive case
         if ($assessmentSpec instanceof Project) {
             foreach ($assessmentSpec->getAssessables() as $subAssessmentSpec) {
@@ -348,10 +359,50 @@ class Controller extends BaseController
                 $subAssessmentImpl = $this->exportToNewContext($subAssessmentSpec, $assessmentImpl);
 
                 $assessmentImpl->getAssessables()->add($subAssessmentImpl);
+
+                /* A specific usage where creating projects and activities
+                 * always invalidates the project result cache
+                 */
+                $this->refreshProjectResultCache($subAssessmentImpl);
             }
         }
 
         return $assessmentImpl;
+    }
+
+
+    /**
+     * Decide whether we have to invalidate project_result cache
+     * Have to compare $postData and $assessment -before- it's transacted/updated
+     *
+     * @param IAssessable $assessment
+     * @return void
+     * @throws MapperException
+     * @throws Deleted
+     * @throws \UnexpectedValueException
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @throws \PDOException
+     * @throws DefinitionException
+     */
+    private function refreshProjectResultCache(IAssessable $assessment): void
+    {
+        /* Reprocess project marks if its cache is invalid
+         * Similar to the cli tool's algorithm
+         */
+        $projectResultCache = (new Project\ResultCache\ResultCache($this->projectResultCacheMapper));
+
+        if ($assessment instanceof Project) {
+            $project = $assessment;
+        } else {
+            $project = $this->assessmentDataSource->findByIdForReview($assessment->getContext()->getId());
+        }
+
+        foreach ($project->getAllParticipants() as $userId => $participant) {
+            $user = $participant->getUser();
+            $projectResultCache->persist($project, $user, null);
+        }
     }
 
 
