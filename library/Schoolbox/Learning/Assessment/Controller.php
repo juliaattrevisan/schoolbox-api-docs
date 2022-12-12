@@ -453,6 +453,15 @@ abstract class Controller extends ListController implements IAssessmentControlle
      */
     public function postDeleteAssessment(IAssessable $assessment): void
     {
+        /* Deleting assessments from inside a project always affects
+         * its outcome; update the cache accordingly
+         */
+        $cacheValid = true;
+
+        if ($assessment->getContext() instanceof Project) {
+            $cacheValid = false;
+        }
+
         // If not already deleted?
         if (!$assessment->isDeleted()) {
             $notifier = $this->getAssessmentMapper()->getNotifier();
@@ -465,6 +474,14 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $postReturnUrl = $this->getRequest()->query->get(Redirect::RETURN_URL);
 
         $returnUrl = $this->determineRedirect($assessment, $postReturnUrl, "/homepage/{$folder->getId()}");
+
+        /* Deleting assessments from inside a project always affects
+         * its outcome; update the cache accordingly
+         */
+        if (!$cacheValid) {
+            $projectResultCache = new Project\ResultCache\ResultCache($this->projectResultCacheMapper);
+            $projectResultCache->refresh($this->getAssessmentMapper(), $assessment);
+        }
 
         if ($this->getRequest()->isXhr()) {
             $this->getResponse()->content->set($this->buildJsonOutput([
