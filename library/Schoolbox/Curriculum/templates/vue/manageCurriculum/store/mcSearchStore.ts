@@ -53,13 +53,6 @@ export const useSearchStore = defineStore(`mcSearch`, () => {
     });
 
     /**
-     * to pass through as a url parameter when searching
-     *
-     * @returns { string }
-     */
-    const enabled = computed<string>(() => (useViewNodesStore().showDisabled ? '' : '&enabled=1'));
-
-    /**
      * when the search isActive, we should display the loading prompt straight away,
      * but the debounce holds on calling search() until we assume the user has stopped typing
      */
@@ -73,9 +66,10 @@ export const useSearchStore = defineStore(`mcSearch`, () => {
     async function search() {
         try {
             const viewNodesStore = useViewNodesStore();
+            const enabled = viewNodesStore.showDisabled ? '' : '&enabled=1';
             const response = await fetch(
                 `${useStore().getApiEndpoint()}?parentId=${viewNodesStore.current.id}&query=${query.value}&limit=50${
-                    enabled.value
+                    enabled
                 }`,
                 {
                     method: 'GET',
@@ -109,7 +103,6 @@ export const useSearchStore = defineStore(`mcSearch`, () => {
         filteredResults,
         queryWordList,
         hasNoResults,
-        enabled,
         enableSearch,
         search,
         clear,
