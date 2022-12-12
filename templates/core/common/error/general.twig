@@ -13,12 +13,13 @@
 
                     <h2>Sorry, we are unable to complete this request </h2>
 
-                    {% if url is defined %}
-                        <p>{{ url }}</p>
-                    {% endif %}
-
                     {% if info is defined %}
                         <p>{{ info }}</p>
+                    {% endif %}
+
+
+                    {% if url is defined %}
+                        <p>{{ url }}</p>
                     {% endif %}
 
                     <p>Issue occurred at {{ date.long }}, further information may have been logged.</p>

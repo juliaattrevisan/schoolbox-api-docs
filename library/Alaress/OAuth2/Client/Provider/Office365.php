@@ -12,10 +12,10 @@ namespace Alaress\OAuth2\Client\Provider;
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Token\AccessToken;
 use Psr\Http\Message\ResponseInterface;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 
 class Office365 extends AbstractProvider
 {
-
     /**
      * Get the URL that this provider uses to begin authorization.
      *
@@ -91,7 +91,13 @@ class Office365 extends AbstractProvider
 
     protected function checkResponse(ResponseInterface $response, $data)
     {
-        // Don't think there is any response checking?
+        /* check if there are errors
+         * using similar system to \League\OAuth2\Client\Provider\GenericProvider::checkResponse
+        */
+        if (isset($data['error'], $data['error_description'])) {
+            throw new SchoolboxException("Office365 Error: {$data['error']}", information: $data['error_description']);
+        }
+        //if no error... please proceed...
     }
 
     protected function createResourceOwner(array $response, AccessToken $token)
