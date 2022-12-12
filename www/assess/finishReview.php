@@ -73,6 +73,19 @@ if ($assess->getUser()->getId() != $sessionUser->getId() && $groupHandler->getPe
 }
 
 $attemptMapper->finalizeReview($attempt, $sessionUser);
+
+/* Potentially invalidates a project result cache since a Quiz Feedback
+ * changes a project's outcome; update the cache accordingly
+ *
+ * Specifically avoid mapper cache, otherwise it knows all the attempts
+ * except the one you just finalised and summates those, which isn't what
+ * we want. We need the latest.
+ */
+if ($quiz->getContext() instanceof \Schoolbox\Learning\Assessment\Project) {
+    $projectResultCache = new \Schoolbox\Learning\Assessment\Project\ResultCache\ResultCache(\Schoolbox\Learning\Assessment\Project\ResultCache\Mapper::getInstance());
+    $projectResultCache->refresh($assessmentMapperProxy, $quiz);
+}
+
 $assessmentId = $assess->getAssessmentModel()->getId();
 $this->localRedir($this->routeLookup('learningAssessment.getStatus', [ 'assessmentId' => $assessmentId ]));
 die();

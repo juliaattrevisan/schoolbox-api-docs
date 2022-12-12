@@ -190,8 +190,18 @@ class ResultCache
     ): void {
         if ($assessment instanceof Project) {
             $project = $assessment;
+        } elseif ($assessment->getContext() instanceof Project) {
+            /* Dodge the mapper maybe. ffs
+             * Take the performance hit right between the eyes
+             */
+            $project = $assessmentMapperProxy->findOneByColumn('id', $assessment->getContext()->getId(), true, null, ['cache' => false]);
         } else {
-            $project = $assessmentMapperProxy->findByIdForReview($assessment->getContext()->getId());
+            /* noop
+             *
+             * $assessment is neither a Project, nor a Project's Activity
+             * It's some random assessment somewhere
+             */
+            return;
         }
 
         foreach ($project->getAllParticipants() as $userId => $participant) {
