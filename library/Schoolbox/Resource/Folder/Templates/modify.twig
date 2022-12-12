@@ -40,17 +40,18 @@
 <script type="text/javascript">
     $(function() {
 
-        $("[data-colour-picker]").spectrum({
-            allowEmpty: true,
-            showAlpha: false,
-            showInput: true,
-            preferredFormat: 'rgb',
-            clickoutFiresChange: true,
-            showInitial: true,
-            change: function(color) {
-                $(this).val(color.toRgbString());
-            }
-        });
+        $("[data-colour-picker]").spectrum(
+            $.extend(
+                {},
+                window.sbProps.spectrum,
+                {
+                    allowEmpty: true,
+                    change: function (color) {if (color !== null) {$(this).val(color.toRgbString());}},
+                    hide: function (color) {if (color !== null) {$(this).val(color.toRgbString());}},
+                    preferredFormat: 'rgb'
+                }
+            )
+        );
 
         var writePermission = {{ write }};
 

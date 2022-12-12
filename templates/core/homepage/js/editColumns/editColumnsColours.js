@@ -60,21 +60,19 @@ function getSelectedColumnCheckboxes () {
  * Initiate the colour pickers
  */
 function initColourPickers () {
-    $(COLOUR_PICKERS_SELECTOR).spectrum({
-        showPalette: false,
-        showSelectionPalette: false,
-        showButtons: false,
-        showAlpha: true,
-        showInitial: true,
-        showInput: true,
-        clickoutFiresChange: true,
-        preferredFormat: 'hex',
-        replacerClassName: 'colorBox',
-        allowEmpty: true,
-    });
+    $(COLOUR_PICKERS_SELECTOR).spectrum(
+        $.extend(
+            {},
+            window.sbProps.spectrum,
+            {
+                allowEmpty: true,
+                showAlpha: true
+            }
+        )
+    );
     $(COLOUR_PICKERS_SELECTOR).on('change.spectrum, move.spectrum', (event, colour) => {
-        //apply when there's a colour selected, otherwise set the colour as black transparent,
-        //as the 'Clear Color Selection' button has been seleced
+        // Apply when there's a colour selected, otherwise set the colour as black transparent,
+        // as the 'Clear Color Selection' button has been selected.
         const colourAsRGB = colour instanceof tinycolor ? colour.toRgbString() : 'rgba(0, 0, 0, 0)';
         onColourChange(event.currentTarget, colourAsRGB);
     });

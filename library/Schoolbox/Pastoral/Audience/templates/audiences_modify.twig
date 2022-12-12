@@ -196,14 +196,7 @@
                                     let colorInput = document.getElementById('pastoralColor'),
                                             iconSelect = document.getElementById('pastoralIcon'),
                                             flagPreview = document.getElementById('pastoralFlagPreview');
-                                    $(colorInput).spectrum({
-                                        allowEmpty: false,
-                                        showAlpha: false,
-                                        showInput: true,
-                                        preferredFormat: 'hex',
-                                        clickoutFiresChange: true,
-                                        showInitial: true,
-                                    });
+                                    $(colorInput).spectrum(window.sbProps.spectrum);
 
                                     $().add(colorInput).add(iconSelect).on('change', function () {
                                         let color = colorInput.value,

@@ -53,18 +53,17 @@ export default {
          * Set up the jQuery spectrum colour picker and emit changes
          */
         initColourPicker () {
-            $(this.$el).spectrum({
-                allowEmpty: true,
-                clickoutFiresChange: true,
-                preferredFormat: 'hex',
-                showAlpha: false,
-                showButtons: false,
-                showInitial: true,
-                showInput: true,
-                change: (color) => {
-                    this.$emit('input', color ? color.toHexString() : null)
-                }
-            });
+            $(this.$el).spectrum(
+                $.extend(
+                    {},
+                    window.sbProps.spectrum,
+                    {
+                        allowEmpty: true,
+                        change: (color) => {this.$emit('input', color ? color.toHexString() : null);},
+                        hide: (color) => {this.$emit('input', color ? color.toHexString() : null);}
+                    }
+                )
+            );
         }
 
     }

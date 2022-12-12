@@ -45,21 +45,21 @@
             currentHighlightedElement = checkForAdminSearchHighlight();
         });
 
-
         let settingsForm = $('#settings');
 
         {% if hasColourPicker %}
-        $("[data-colour-picker]").spectrum({
-            allowEmpty: false,
-            showAlpha: true,
-            showInput: true,
-            preferredFormat: 'rgb',
-            clickoutFiresChange: true,
-            showInitial: true,
-            change: function(color) {
-                $(this).val(color.toRgbString());
-            }
-        });
+        $("[data-colour-picker]").spectrum(
+            $.extend(
+                {},
+                window.sbProps.spectrum,
+                {
+                    change: function (color) {if (color !== null) {$(this).val(color.toRgbString());}},
+                    hide: function (color) {if (color !== null) {$(this).val(color.toRgbString());}},
+                    preferredFormat: 'rgb',
+                    showAlpha: true
+                }
+            )
+        );
         {% endif %}
 
         {% if hasHtmlEditor %}
