@@ -14,22 +14,38 @@ use Schoolbox\User;
 
 class UserTest extends TestCase
 {
-    /**
-     * @var User
-     */
     protected $object;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->object = new TestUser();
+
+        // Overriding functions which uses config
+        $this->object = new class extends User
+        {
+            public const NAME_FORMAT  = '{title} {firstname} {lastname}';
+            public const EMAIL_DOMAIN = 'test.schoolbox.com.au';
+
+            public function formatName($format = null)
+            {
+                return parent::formatName(self::NAME_FORMAT);
+            }
+
+            public function getEmail()
+            {
+                if ($this->getLocalEmail() == true) {
+                    return $this->getUsername() . '@' . self::EMAIL_DOMAIN;
+                }
+                return $this->getAltEmail();
+            }
+        };
     }
 
     public function testLocalEmailAddress()
     {
         $this->object->setLocalEmail(true);
         $this->object->setUsername('testuser');
-        $expected = $this->object->getUsername() . '@' . TestUser::EMAIL_DOMAIN;
+        $expected = $this->object->getUsername() . '@' . $this->object::EMAIL_DOMAIN;
         $this->assertEquals($expected, $this->object->getEmail());
     }
 
