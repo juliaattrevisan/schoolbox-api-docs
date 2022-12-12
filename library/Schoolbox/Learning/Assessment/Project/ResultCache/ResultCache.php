@@ -111,6 +111,10 @@ class ResultCache
      * to be aggregated and persisted to the db, overwriting (potentially)
      * anyone else who might have done the same, at some point in the past
      *
+     * Note: The only public usage of persist() is the Cli Reloader tool
+     * which dumps some diagnostic info at you when you use it. You should
+     * prefer using refresh() first.
+     *
      * @param IAssessable $project
      * @param User        $user
      * @param User|null   $marker
