@@ -14,9 +14,9 @@ use House;
 use HouseResidential;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Campus;
+use Schoolbox\Config\TestLoader;
 use Schoolbox\GenericCollection;
 use Schoolbox\Role;
-use Schoolbox\Test\TestUser;
 use Schoolbox\User;
 use Schoolbox\YearLevel\Model as YearLevel;
 
@@ -34,9 +34,15 @@ class ModelToArrayTest extends TestCase
      */
     public function getTestInvokeData(): iterable
     {
-        $emptyUser = (new TestUser())
+        $configLoader = new TestLoader([
+            'mail_address' => 'test.schoolbox.com.au',
+            'name_format'  => '{title} {firstname} {lastname}',
+        ]);
+
+        $emptyUser = (new User())
         ->setFirstname(null)
-        ->setLastname(null);
+        ->setLastname(null)
+        ->setConfigLoader($configLoader);
 
         $emptyResponse = [
             'id'               => null,
@@ -80,7 +86,8 @@ class ModelToArrayTest extends TestCase
             $emptyResponse,
         ];
 
-        $populatedUser = (new TestUser())
+        $populatedUser = (new User())
+            ->setConfigLoader($configLoader)
             ->setId(1)
             ->setCampusCollection(
                 (new GenericCollection(Campus::class))

@@ -14,22 +14,29 @@ use Schoolbox\User;
 
 class UserTest extends TestCase
 {
+
     /**
      * @var User
      */
     protected $object;
 
+    protected $config_vars = [
+        ['site_domain', 'localhost'],
+        ['mail_address', 'localhost'],
+    ];
+
     public function setUp(): void
     {
         parent::setUp();
-        $this->object = new TestUser();
+        $this->object = new User();
+        $this->object->setConfigLoader($this->mock_config);
     }
 
     public function testLocalEmailAddress()
     {
         $this->object->setLocalEmail(true);
         $this->object->setUsername('testuser');
-        $expected = $this->object->getUsername() . '@' . TestUser::EMAIL_DOMAIN;
+        $expected = $this->object->getUsername() . '@' . $this->mock_config->get('site_domain');
         $this->assertEquals($expected, $this->object->getEmail());
     }
 
