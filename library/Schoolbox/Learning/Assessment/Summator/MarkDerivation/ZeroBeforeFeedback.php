@@ -12,6 +12,7 @@ namespace Schoolbox\Learning\Assessment\Summator\MarkDerivation;
 use Schoolbox\Assessment\Course\Task\Completion;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Task\Model as TaskModel;
+use Schoolbox\Learning\Assessment\Task\Response\Model;
 
 /**
  * Strategy for deriving the normalised mark for a participant:
@@ -38,7 +39,9 @@ class ZeroBeforeFeedback implements IStrategy
          * else the task was not marked complete by the instructor so return 0.0 (incomplete)
          */
         if ($participant->getAssessable() instanceof TaskModel) {
-            if (Completion::STATUS_TEACHER_ASSESSED_COMPLETE === $participant->findMostRecentResponse()?->getCompletionStatus()) {
+            /** @var Null|Model $latestResponse */
+            $latestResponse = $participant->findMostRecentResponse();
+            if (Completion::STATUS_TEACHER_ASSESSED_COMPLETE === $latestResponse?->getCompletionStatus()) {
                 return 100.0;
             } else {
                 return 0.0;
