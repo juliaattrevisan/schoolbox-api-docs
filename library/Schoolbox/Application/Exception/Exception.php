@@ -32,10 +32,11 @@ class Exception extends \RuntimeException
     /**
      * Constructor
      *
-     * @param string         $message
-     * @param int|null            $code
+     * @param string         $message // the title of the error (inside the < h1 >)
+     * @param int|null       $code
      * @param Throwable|null $previous
      * @param int|null       $httpStatusCode
+     * @param string         $information // Extra information to be displayed on the error page (inside a < p >)
      */
     public function __construct(string $message = "", ?int $code = 0, Throwable $previous = null, ?int $httpStatusCode = null, string $information = '')
     {
