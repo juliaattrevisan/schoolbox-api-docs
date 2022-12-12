@@ -5450,8 +5450,7 @@ parameters:
 			count: 1
 			path: library/Schoolbox/Mapper/RecursiveUndeleterCli.php
 
-        -
-
+		-
 			message: "#^Method Schoolbox\\\\Module\\\\RestfulModule\\:\\:findById\\(\\) should return object but returns null\\.$#"
 			count: 1
 			path: library/Schoolbox/Module/RestfulModule.php
