@@ -10,8 +10,13 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\Project\ResultCache;
 
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\User;
 
 /**
@@ -154,6 +159,45 @@ class ResultCache
         }
 
         return $model;
+    }
+
+
+    /**
+     * Decide whether we have to invalidate project_result cache
+     * Have to compare $postData and $assessment -before- it's transacted/updated
+     *
+     * Updates the Project Result Cache whenever you do things like
+     * Export To Classes, Import a Course, etc. through the app's gui
+     *
+     * Typically these are creational steps which should always invalidate
+     * a Project Result Cache
+     *
+     * @param MapperProxy $assessmentMapperProxy
+     * @param IAssessable $assessment
+     * @return void
+     * @throws DefinitionException
+     * @throws Deleted
+     * @throws MapperException
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
+     */
+    public function refresh(
+        \Schoolbox\Learning\Assessment\DataModel\MapperProxy $assessmentMapperProxy,
+        IAssessable $assessment
+    ): void {
+        if ($assessment instanceof Project) {
+            $project = $assessment;
+        } else {
+            $project = $assessmentMapperProxy->findByIdForReview($assessment->getContext()->getId());
+        }
+
+        foreach ($project->getAllParticipants() as $userId => $participant) {
+            $user = $participant->getUser();
+            $this->persist($project, $user, null);
+        }
     }
 
 

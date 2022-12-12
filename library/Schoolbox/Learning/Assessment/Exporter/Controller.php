@@ -346,7 +346,8 @@ class Controller extends BaseController
         /* A specific usage where creating projects and activities
          * always invalidates the project result cache
          */
-        $this->refreshProjectResultCache($assessmentImpl);
+        $projectResultCache = new Project\ResultCache\ResultCache($this->projectResultCacheMapper);
+        $projectResultCache->refresh($this->assessmentDataSource, $assessmentImpl);
 
         // Recursive case
         if ($assessmentSpec instanceof Project) {
@@ -363,46 +364,11 @@ class Controller extends BaseController
                 /* A specific usage where creating projects and activities
                  * always invalidates the project result cache
                  */
-                $this->refreshProjectResultCache($subAssessmentImpl);
+                $projectResultCache->refresh($this->assessmentDataSource, $assessmentImpl);
             }
         }
 
         return $assessmentImpl;
-    }
-
-
-    /**
-     * Decide whether we have to invalidate project_result cache
-     * Have to compare $postData and $assessment -before- it's transacted/updated
-     *
-     * @param IAssessable $assessment
-     * @return void
-     * @throws MapperException
-     * @throws Deleted
-     * @throws \UnexpectedValueException
-     * @throws \DomainException
-     * @throws \InvalidArgumentException
-     * @throws \LogicException
-     * @throws \PDOException
-     * @throws DefinitionException
-     */
-    private function refreshProjectResultCache(IAssessable $assessment): void
-    {
-        /* Reprocess project marks if its cache is invalid
-         * Similar to the cli tool's algorithm
-         */
-        $projectResultCache = (new Project\ResultCache\ResultCache($this->projectResultCacheMapper));
-
-        if ($assessment instanceof Project) {
-            $project = $assessment;
-        } else {
-            $project = $this->assessmentDataSource->findByIdForReview($assessment->getContext()->getId());
-        }
-
-        foreach ($project->getAllParticipants() as $userId => $participant) {
-            $user = $participant->getUser();
-            $projectResultCache->persist($project, $user, null);
-        }
     }
 
 
