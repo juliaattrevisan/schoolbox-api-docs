@@ -313,7 +313,7 @@ export default {
                                         <time class="pipe meta"
                                               :datetime="formatDate(evidence.object.createdAt)"
                                               :title="formatDate(evidence.object.createdAt, dateDisplayFormats.dayjsDatetime)"
-                                        >{{ formatDate(evidence.object.createdAt, dateDisplayFormats.dayjsDatetime) }}</time>
+                                        >{{ formatDate(evidence.object.createdAt, dateDisplayFormats.dayjsTime) }}</time>
                                     </a>
                                 </div>
                                 <nav v-if="hasMenu(evidence.object)">
@@ -394,7 +394,7 @@ export default {
                                         |
                                         <time class="meta" :datetime="formatDate(evidence.object.publishedAt)"
                                               :title="formatDate(evidence.object.publishedAt, dateDisplayFormats.dayjsDatetime)">
-                                            {{ formatDate(evidence.object.publishedAt, dateDisplayFormats.dayjsDateLong) }}
+                                            {{ formatDate(evidence.object.publishedAt, dateDisplayFormats.dayjsTime) }}
                                         </time>
                                     </p>
                                 </div>
