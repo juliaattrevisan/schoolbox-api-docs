@@ -348,7 +348,8 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     {
         if ($this->localEmail == true) {
             return sprintf(
-                "%s@%s", $this->username,
+                "%s@%s",
+                $this->username,
                 $this->emailDomain ?: Config::get(ConfigMapper::NAME_MAIL_ADDRESS)
             );
         }

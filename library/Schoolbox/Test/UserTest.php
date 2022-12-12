@@ -15,7 +15,6 @@ use Schoolbox\User;
 
 class UserTest extends TestCase
 {
-
     /**
      * @var User
      */
