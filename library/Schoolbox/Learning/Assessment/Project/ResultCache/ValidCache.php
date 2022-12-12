@@ -36,7 +36,9 @@ class ValidCache
      */
     public function isSatisfiedByProject(\Traversable|array $postData, ?IAssessable $assessment = null): ?bool
     {
-        /* $assessment is null? Nothing to do
+        /* $assessment is null?
+         * This means $assessment is being created for the first time
+         * and might require a project result cache invalidation
          */
         if (null === $assessment) {
             return true;
