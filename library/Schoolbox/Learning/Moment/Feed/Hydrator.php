@@ -10,9 +10,15 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Moment\Feed;
 
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\MapperProxy as DueWorkFeedbackMapperProxy;
+use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Badge\Award\Mapper as BadgeAwardMapper;
-use Schoolbox\Learning\Badge\Award\Model as BadgeAwardModel;
 use Schoolbox\Learning\Moment\Evidence\Mapper as EvidenceMapper;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
+use Schoolbox\User;
 
 /**
  * Hydrator for the list of IDs retrieved by `\Schoolbox\Learning\Moment\Feed\Cursor`.
@@ -20,29 +26,24 @@ use Schoolbox\Learning\Moment\Evidence\Mapper as EvidenceMapper;
 class Hydrator
 {
     /**
-     * Mapper for retrieving evidence.
-     */
-    private EvidenceMapper $evidenceMapper;
-
-
-    /**
-     * Mapper for retrieving badge awards.
-     */
-    private BadgeAwardMapper $badgeAwardMapper;
-
-
-    /**
      * Constructor
      *
-     * @param EvidenceMapper   $evidenceMapper
-     * @param BadgeAwardMapper $badgeAwardMapper
+     * @param EvidenceMapper             $evidenceMapper
+     * @param BadgeAwardMapper           $badgeAwardMapper
+     * @param DueWorkFeedbackMapperProxy $returnDataSource
+     * @param MapperProxy                $assessmentDataSource
+     * @param Visibility                 $visibility
+     * @param User                       $viewer
      */
-    public function __construct(EvidenceMapper $evidenceMapper, BadgeAwardMapper $badgeAwardMapper)
-    {
-        $this->evidenceMapper   = $evidenceMapper;
-        $this->badgeAwardMapper = $badgeAwardMapper;
+    public function __construct(
+        private EvidenceMapper $evidenceMapper,
+        private BadgeAwardMapper $badgeAwardMapper,
+        private DueWorkFeedbackMapperProxy $returnDataSource,
+        private MapperProxy $assessmentDataSource,
+        private Visibility $visibility,
+        private User $viewer,
+    ) {
     }
-
 
     /**
      * Hydrates the results from `\Schoolbox\Learning\Moment\Feed\Cursor::retrieveResults`
@@ -63,6 +64,8 @@ class Hydrator
         $badgeAwardPb   = $this->badgeAwardMapper->getPredicateBuilder();
         $hasBadgeAwards = false;
 
+        $dueWorkFeedbackIds = [];
+
         // Build predicate builders
         foreach ($results as $result) {
             switch ($result['discriminator'] ?? null) {
@@ -70,8 +73,8 @@ class Hydrator
                     $hasEvidence = true;
                     $evidencePb->all(
                         $this->evidenceMapper->getPredicateBuilder()
-                            ->equals('id', $result['id'])
-                            ->isNull('deleted_at')
+                                             ->equals('id', $result['id'])
+                                             ->isNull('deleted_at')
                     );
                     break;
 
@@ -79,9 +82,13 @@ class Hydrator
                     $hasBadgeAwards = true;
                     $badgeAwardPb->all(
                         $this->badgeAwardMapper->getPredicateBuilder()
-                            ->equals('id', $result['id'])
-                            ->isNull('deleted_at')
+                                               ->equals('id', $result['id'])
+                                               ->isNull('deleted_at')
                     );
+                    break;
+
+                case Cursor::DISCRIMINATOR_DUE_WORK_FEEDBACK:
+                    $dueWorkFeedbackIds[] = $result['id'];
                     break;
 
                 default:
@@ -103,8 +110,16 @@ class Hydrator
                 $this->badgeAwardMapper->getPredicateBuilder()->any($badgeAwardPb)
             )
             : $this->badgeAwardMapper->createCollection();
-
         $badgeAwardResults = $badgeAwardResults->indexBy('id');
+
+        $dueWorkFeedbackResults = !empty($dueWorkFeedbackIds)
+            ? $this->returnDataSource->findByColumnList(['id' => $dueWorkFeedbackIds])->indexBy('id')
+            : new GenericCollection(DueWorkFeedback::class);
+        $assessmentIds          = $dueWorkFeedbackResults->map(static function (DueWorkFeedback $feedback) {
+            return $feedback->getAssessable()->getId();
+        });
+        $assessments            = $this->assessmentDataSource->findAllByIds($assessmentIds->getAll())->indexBy('id');
+        $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($assessments);
 
         // Insert matching results into the collection
         $return = new Collection();
@@ -124,6 +139,26 @@ class Hydrator
                     $return[$i] = [
                         'discriminator' => $result['discriminator'],
                         'object'        => $badgeAwardResults[(int)$result['id']],
+                    ];
+                    break;
+
+                case Cursor::DISCRIMINATOR_DUE_WORK_FEEDBACK:
+                    /** @var DueWorkFeedback $dueWorkFeedback */
+                    $dueWorkFeedback = $dueWorkFeedbackResults->offsetGet((int)$result['id']);
+                    /** @var IAssessable|null $assessment */
+                    $assessment = $assessments->offsetGet($dueWorkFeedback->getAssessable()->getId());
+                    if (
+                        !$assessment
+                        || !$this->visibility->isVisibleToUserOrChildOfUser($assessment, $this->viewer, true, null, true)
+                        || !$assessment->isFeedbackVisibleToUser($this->viewer)
+                    ) {
+                        break;
+                    }
+                    // hydrate assessment
+                    $dueWorkFeedback->setAssessable($assessment);
+                    $return[$i] = [
+                        'discriminator' => $result['discriminator'],
+                        'object'        => $dueWorkFeedback,
                     ];
                     break;
 

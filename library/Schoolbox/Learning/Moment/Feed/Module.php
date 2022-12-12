@@ -1,7 +1,8 @@
 <?php
 
 /**
-*
+ * @copyright Copyright 2022, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
 
 declare(strict_types=1);
@@ -13,8 +14,10 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Closure;
 use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
+use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Badge\Award\Mapper as BadgeAwardMapper;
 use Schoolbox\Learning\Moment\Evidence\Mapper as EvidenceMapper;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
 
@@ -71,6 +74,9 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(BadgeAwardMapper::class),
             $this->getMapperFactory()->get(CommentMapper::class),
             $this->injector->get('databaseInternal'),
+            $this->injector->get('returnDataSource'),
+            $this->injector->get('assessmentDataSource'),
+            new Visibility($this->getMapperFactory()->get(Access::class))
         );
     }
 

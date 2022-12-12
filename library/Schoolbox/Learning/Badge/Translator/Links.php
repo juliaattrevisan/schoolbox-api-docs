@@ -11,6 +11,7 @@ namespace Schoolbox\Learning\Badge\Translator;
 
 use Alaress\Authorizer\Authorizer;
 use Aura\Router\Router;
+use Schoolbox\Api\Translator\AbstractLinks;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Learning\Badge;
 use Schoolbox\User;
@@ -23,28 +24,8 @@ use Schoolbox\User;
  *
  * @package Schoolbox\Learning\Badge\Award\Translator
  */
-class Links
+class Links extends AbstractLinks
 {
-
-    /**
-     * The router object, as required to generate a link to content.
-     */
-    private Router $router;
-
-
-    /**
-     * The authorizer object, as required to determine whether a user is
-     * authorized to access a link.
-     */
-    private Authorizer $authorizer;
-
-
-    /**
-     * The user who is being authorized to access a link.
-     */
-    private User $currentUser;
-
-
     /**
      * Prefix generator: for attaching a prefix to the badge image link.
      */
@@ -65,9 +46,7 @@ class Links
         User $currentUser,
         PrefixGenerator $prefixGenerator
     ) {
-        $this->router          = $router;
-        $this->authorizer      = $authorizer;
-        $this->currentUser     = $currentUser;
+        parent::__construct($router, $authorizer, $currentUser);
         $this->prefixGenerator = $prefixGenerator;
     }
 
@@ -142,23 +121,5 @@ class Links
 
 
         return $translation;
-    }
-
-
-    /**
-     * Helper function for outputting a route, only if it is authorized.
-     *
-     * @param string $route
-     * @param array  $params
-     * @return string|null
-     * @noinspection PhpDocMissingThrowsInspection Should never happen as `$route` should never not be defined
-     */
-    private function getRouteIfAuthorized(string $route, array $params): ?string
-    {
-        if ($this->authorizer->isPathAuthorizedForUser($route, $params, $this->currentUser)) {
-            /** @noinspection PhpUnhandledExceptionInspection */
-            return $this->router->generate($route, $params);
-        }
-        return null;
     }
 }
