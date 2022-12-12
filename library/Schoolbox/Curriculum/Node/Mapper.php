@@ -10,8 +10,7 @@ namespace Schoolbox\Curriculum\Node;
 
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
-use Schoolbox\Curriculum\LearningArea;
-use Schoolbox\Curriculum\LearningLevel;
+use Schoolbox\Curriculum\Node;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -26,6 +25,9 @@ use Schoolbox\Mapper\Exception as MapperException;
  */
 class Mapper extends BaseMapper implements BaseMapper\Searchable
 {
+    /** @var int limit depth to recursively sort nodes */
+    private const SORT_MAX_DEPTH = 50;
+
     public function mapping()
     {
         $this->hasTable('curriculum_node');
@@ -395,5 +397,41 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
             }
         }
         return $result;
+    }
+
+    /**
+     * Sort nodes by order, code, name, id
+     * @param Collection $nodes
+     * @param int        $depth
+     * @return void
+     */
+    public static function sortNodes(Collection $nodes, int $depth): void
+    {
+        if ($nodes->count() === 0 || $depth > self::SORT_MAX_DEPTH) {
+            return;
+        }
+        /** @var Node\Model $node */
+        foreach ($nodes as $node) {
+            $childNodes = $node->getChildren();
+            self::sortNodes($childNodes, $depth + 1);
+            $node->setChildren((new GenericCollection(Node\Model::class))->merge($childNodes));
+        }
+        $nodes->sortByCallback(static function (Node\Model $a, Node\Model $b) {
+            if ($a->getOrder() !== $b->getOrder()) {
+                return $a->getOrder() <=> $b->getOrder();
+            } elseif ($a->getCode() !== $b->getCode()) {
+                // space comes later
+                if ($a->getCode() === '') {
+                    return 1;
+                } elseif ($b->getCode() === '') {
+                    return -1;
+                }
+                return $a->getCode() <=> $b->getCode();
+            } elseif ($a->getName() !== $b->getName()) {
+                return strnatcmp($a->getName(), $b->getName());
+            } else {
+                return $a->getId() <=> $b->getId();
+            }
+        });
     }
 }
