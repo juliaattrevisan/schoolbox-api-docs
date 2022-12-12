@@ -16,7 +16,6 @@ use Schoolbox\Application\Exception\Exception as SchoolboxException;
 
 class Office365 extends AbstractProvider
 {
-
     /**
      * Get the URL that this provider uses to begin authorization.
      *
