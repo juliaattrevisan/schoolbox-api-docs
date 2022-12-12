@@ -172,8 +172,11 @@ class ResultCache
      * Typically these are creational steps which should always invalidate
      * a Project Result Cache
      *
+     * Optionally provide a user id to only update their project result.
+     *
      * @param MapperProxy $assessmentMapperProxy
      * @param IAssessable $assessment
+     * @param User|null   $student
      * @return void
      * @throws DefinitionException
      * @throws Deleted
@@ -186,7 +189,8 @@ class ResultCache
      */
     public function refresh(
         \Schoolbox\Learning\Assessment\DataModel\MapperProxy $assessmentMapperProxy,
-        IAssessable $assessment
+        IAssessable $assessment,
+        ?\Schoolbox\User $student = null
     ): void {
         if ($assessment instanceof Project) {
             $project = $assessment;
@@ -204,9 +208,26 @@ class ResultCache
             return;
         }
 
-        foreach ($project->getAllParticipants() as $userId => $participant) {
-            $user = $participant->getUser();
-            $this->persist($project, $user, null);
+        /* Decide how much data to update
+         */
+        if (null !== $student) {
+            /* Only update one particular dude's result
+             *
+             * If $student is not a participant, or deleted, etc.
+             * just exit without doing anything
+             */
+            $participant = $project->getParticipantIfExtant($student);
+
+            if ($participant) {
+                $this->persist($project, $participant->getUser(), null);
+            }
+        } else {
+            /* Update everyone associated with this assessment
+             */
+            foreach ($project->getAllParticipants() as $userId => $participant) {
+                $user = $participant->getUser();
+                $this->persist($project, $user, null);
+            }
         }
     }
 

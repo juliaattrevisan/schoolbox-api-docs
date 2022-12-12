@@ -83,7 +83,7 @@ $attemptMapper->finalizeReview($attempt, $sessionUser);
  */
 if ($quiz->getContext() instanceof \Schoolbox\Learning\Assessment\Project) {
     $projectResultCache = new \Schoolbox\Learning\Assessment\Project\ResultCache\ResultCache(\Schoolbox\Learning\Assessment\Project\ResultCache\Mapper::getInstance());
-    $projectResultCache->refresh($assessmentMapperProxy, $quiz);
+    $projectResultCache->refresh($assessmentMapperProxy, $quiz, $attempt->getUser());
 }
 
 $assessmentId = $assess->getAssessmentModel()->getId();
