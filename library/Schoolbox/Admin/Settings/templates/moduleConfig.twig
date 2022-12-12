@@ -52,7 +52,11 @@
             $.extend(
                 {},
                 window.sbProps.spectrum,
-                {showAlpha: true}
+                {
+                    change: function (color) {if (color !== null) {$(this).val(color.toRgbString());}},
+                    preferredFormat: 'rgb',
+                    showAlpha: true
+                }
             )
         );
         {% endif %}
