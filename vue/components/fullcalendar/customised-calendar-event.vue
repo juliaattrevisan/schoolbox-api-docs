@@ -154,6 +154,8 @@ export default {
 //updating directly via the event might be a nice feature in future
 .checkbox {
     pointer-events: none;
+    //Make the checkbox bottom aligned to our text instead of floating above it
+    vertical-align: text-bottom;
 }
 
 //to show that the user has rejected the attedence
