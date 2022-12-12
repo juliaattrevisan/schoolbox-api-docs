@@ -13,6 +13,7 @@ use Alaress_Date_Format;
 use House;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Campus;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Config\TestLoader;
 use Schoolbox\GenericCollection;
 use Schoolbox\Role;
@@ -35,14 +36,15 @@ class ModelToArrayTest extends TestCase
     public function getTestInvokeData(): iterable
     {
         $configLoader = new TestLoader([
-            'mail_address' => 'test.schoolbox.com.au',
-            'name_format'  => '{title} {firstname} {lastname}',
+            ConfigMapper::NAME_MAIL_ADDRESS => 'test.schoolbox.com.au',
+            ConfigMapper::NAME_NAME_FORMAT  => '{title} {firstname} {lastname}',
         ]);
 
         $emptyUser = (new User())
         ->setFirstname(null)
         ->setLastname(null)
-        ->setConfigLoader($configLoader);
+        ->setEmailDomain($configLoader->get(ConfigMapper::NAME_MAIL_ADDRESS))
+        ->setNameFormat($configLoader->get(ConfigMapper::NAME_NAME_FORMAT));
 
         $emptyResponse = [
             'id'            => null,
@@ -60,7 +62,8 @@ class ModelToArrayTest extends TestCase
         ];
 
         $populatedUser = (new User())
-            ->setConfigLoader($configLoader)
+            ->setEmailDomain($configLoader->get(ConfigMapper::NAME_MAIL_ADDRESS))
+            ->setNameFormat($configLoader->get(ConfigMapper::NAME_NAME_FORMAT))
             ->setId(1)
             ->setCampusCollection(
                 (new GenericCollection(Campus::class))

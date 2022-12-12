@@ -261,6 +261,12 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     /** @var GenericCollection|Pastoral\Group\Member\Model[] */
     private $pastoralGroupsMemberships;
 
+    /** If set, it'll be used to build email address, instead of Config option */
+    private ?string $emailDomain = null;
+
+    /** If set, it'll be used to format name, instead of Config option */
+    private ?string $nameFormat = null;
+
 
     public function __construct()
     {
@@ -341,9 +347,25 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     public function getEmail()
     {
         if ($this->localEmail == true) {
-            return $this->username . '@' . Config::get(ConfigMapper::NAME_MAIL_ADDRESS);
+            return sprintf(
+                "%s@%s", $this->username,
+                $this->emailDomain ?: Config::get(ConfigMapper::NAME_MAIL_ADDRESS)
+            );
         }
         return $this->altEmail;
+    }
+
+
+    /**
+     * Explicitly sets domain name for email address
+     * This overrides mail_address config
+     * @param string $emailDomain
+     * @return static
+     */
+    public function setEmailDomain(string $emailDomain): self
+    {
+        $this->emailDomain = $emailDomain;
+        return $this;
     }
 
 
@@ -391,11 +413,26 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     public function formatName($format = null)
     {
         // Check for custom format
+        $format = $format ?: $this->nameFormat;
         $formatter = empty($format)
             ? (new User\Formatter\Factory())->buildFromNothing()
             : new User\Formatter\Formatter($format);
         return $formatter->formatObject($this);
     }
+
+
+    /**
+     * Explicitly sets name format for full name
+     * This overrides name_format config
+     * @param string $nameFormat
+     * @return static
+     */
+    public function setNameFormat(string $nameFormat): self
+    {
+        $this->nameFormat = $nameFormat;
+        return $this;
+    }
+
 
     /**
      * Outputs a metadata line for this student.
