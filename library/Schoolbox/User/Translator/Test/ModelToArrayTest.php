@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Schoolbox\Campus;
 use Schoolbox\GenericCollection;
 use Schoolbox\Role;
+use Schoolbox\Test\TestUser;
 use Schoolbox\User;
 use Schoolbox\YearLevel\Model as YearLevel;
 
@@ -33,27 +34,7 @@ class ModelToArrayTest extends TestCase
      */
     public function getTestInvokeData(): iterable
     {
-        // Overriding functions which uses config
-        $baseUser = new class extends User
-        {
-            public const NAME_FORMAT  = '{title} {firstname} {lastname}';
-            public const EMAIL_DOMAIN = 'test.schoolbox.com.au';
-
-            public function formatName($format = null)
-            {
-                return parent::formatName(self::NAME_FORMAT);
-            }
-
-            public function getEmail()
-            {
-                if ($this->getLocalEmail() == true) {
-                    return $this->getUsername() . '@' . self::EMAIL_DOMAIN;
-                }
-                return $this->getAltEmail();
-            }
-        };
-
-        $emptyUser = (clone $baseUser)
+        $emptyUser = (new TestUser())
         ->setFirstname(null)
         ->setLastname(null);
 
@@ -99,7 +80,7 @@ class ModelToArrayTest extends TestCase
             $emptyResponse,
         ];
 
-        $populatedUser = (clone $baseUser)
+        $populatedUser = (new TestUser())
             ->setId(1)
             ->setCampusCollection(
                 (new GenericCollection(Campus::class))
