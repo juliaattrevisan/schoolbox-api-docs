@@ -10,33 +10,33 @@
 
 namespace Schoolbox\Test;
 
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\User;
 
 class UserTest extends TestCase
 {
-
     /**
      * @var User
      */
     protected $object;
 
     protected $config_vars = [
-        ['site_domain', 'localhost'],
-        ['mail_address', 'localhost'],
+        [ConfigMapper::NAME_SITE_DOMAIN, 'localhost'],
+        [ConfigMapper::NAME_MAIL_ADDRESS, 'localhost'],
     ];
 
     public function setUp(): void
     {
         parent::setUp();
         $this->object = new User();
-        $this->object->setConfigLoader($this->mock_config);
+        $this->object->setEmailDomain($this->mock_config->get(ConfigMapper::NAME_MAIL_ADDRESS));
     }
 
     public function testLocalEmailAddress()
     {
         $this->object->setLocalEmail(true);
         $this->object->setUsername('testuser');
-        $expected = $this->object->getUsername() . '@' . $this->mock_config->get('site_domain');
+        $expected = $this->object->getUsername() . '@' . $this->mock_config->get(ConfigMapper::NAME_MAIL_ADDRESS);
         $this->assertEquals($expected, $this->object->getEmail());
     }
 
