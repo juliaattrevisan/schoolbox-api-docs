@@ -55,7 +55,7 @@ bootstrapped, routed and processed:
   * [AWS S3](io/file-storage/s3.md)
 * [Redis Cache](io/redis-cache.md)
 * [Redis Storage](io/redis-storage.md)
-* Task Daemon
-* Mail Transport
+* [Task Daemon](io/task-daemon.md)
+* [Mail Transport](io/mail-transport.md)
 * Gotenberg (PDF generation)
 * Notification Subsystem
