@@ -418,6 +418,12 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
         }
         $nodes->sortByCallback(static function (Node\Model $a, Node\Model $b) {
             if ($a->getOrder() !== $b->getOrder()) {
+                // order with 0 comes later
+                if ($a->getOrder() === 0) {
+                    return 1;
+                } elseif ($b->getOrder() === 0) {
+                    return -1;
+                }
                 return $a->getOrder() <=> $b->getOrder();
             } elseif ($a->getCode() !== $b->getCode()) {
                 // space comes later
