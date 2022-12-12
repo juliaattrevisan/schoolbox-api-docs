@@ -56,7 +56,9 @@
 {% set showGroups = showDetails and groups is not empty %}
 {% set showTitle = user.hasPositionTitle() %}
 
-{% set showActivityFeed = ((config.learning_moments_enabled and user.learningMomentsEnabled) or config.badges_enabled) and (isStaffWhoCanView or isSelf or isParentOfStudent) %}
+{% set showActivityFeed =
+    ((config.learning_moments_enabled and user.learningMomentsEnabled) or config.badges_enabled or config.grades_enabled)
+    and (isStaffWhoCanView or isSelf or isParentOfStudent) %}
 {% set showAchievementsTab = config.badges_enabled and (isStaffWhoCanView or isSelf or isParentOfStudent) %}
 {% set shareLearningMomentUrl = routeLookupIfAuthorized(
     'learningMomentEvidence.getCreateForm',

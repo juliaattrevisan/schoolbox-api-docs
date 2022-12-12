@@ -59,7 +59,7 @@ class Cursor implements ICursor
      */
     private bool $badgesEnabled;
 
-    private bool $lmsEnabled;
+    private bool $gradesEnabled;
 
     /**
      * Constructor
@@ -86,7 +86,7 @@ class Cursor implements ICursor
             && $viewee->getLearningMomentsEnabled()
             && (!$viewer->getRole()->isStaff() || $viewer->getRole()->getAccessEvidence());
         $this->badgesEnabled          = $config->get(ConfigMapper::NAME_BADGES_ENABLED);
-        $this->lmsEnabled             = $config->get(ConfigMapper::NAME_LMS_ENABLED)
+        $this->gradesEnabled          = $config->get(ConfigMapper::NAME_GRADES_ENABLED)
             && (!$viewer->getRole()->isStaff() || $viewer->getRole()->getViewStudentGrades());
     }
 
@@ -141,7 +141,7 @@ class Cursor implements ICursor
             }
             $countQueries[] = $this->database->executeQuery($badgeCountQuery, $badgeCountParams);
         }
-        if ($this->lmsEnabled) {
+        if ($this->gradesEnabled) {
             [$dueWorkFeedbackCountQuery, $dueWorkFeedbackCountParams] = $this->getDueWorkFeedbackQuery([], countOnly: true);
             $countQueries[] = $this->database->executeQuery($dueWorkFeedbackCountQuery, $dueWorkFeedbackCountParams);
         }
@@ -218,7 +218,7 @@ class Cursor implements ICursor
             }
             $queries[] = $badgeQuery;
         }
-        if ($this->lmsEnabled) {
+        if ($this->gradesEnabled) {
             [$dueWorkFeedbackQuery, $params] = $this->getDueWorkFeedbackQuery($params, countOnly: false);
             $queries[] = $dueWorkFeedbackQuery;
         }
