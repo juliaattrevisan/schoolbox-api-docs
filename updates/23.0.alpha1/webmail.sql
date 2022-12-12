@@ -1,4 +1,4 @@
-#depercrate webmail db columns
+# Deprecate webmail db columns
 
 alter table menu_top
     change webmail _webmail tinyint default 0 null;
