@@ -397,7 +397,7 @@ class Controller extends Base
             !$user->getHideTimetable(),
             UserAccess::ACCESS_READ,
             false,
-            true
+            false
         );
 
         foreach ($folders as $folder) {
