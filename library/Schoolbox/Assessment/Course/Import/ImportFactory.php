@@ -11,7 +11,11 @@ namespace Schoolbox\Assessment\Course\Import;
 use Alaress\Database\Predicate\Builder;
 use Alaress\IDatabase;
 use Alaress_Date_Format;
+use Schoolbox\Learning\Assessment\Project\ResultCache\ValidCache;
+use Schoolbox\Learning\Assessment\Summator\Mapping;
 use Schoolbox\Learning\AssessmentContext;
+use Schoolbox\Mapper\DefinitionException;
+use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\User;
 use UnexpectedValueException;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as IndicatorMapper;
@@ -80,7 +84,8 @@ class ImportFactory
         UnitImplementationMapper $unitImplementationMapper,
         \Component_InstanceMapper $componentInstanceMapper,
         \Component_ConfigDefinitionMapper $componentConfigDefinitionMapper,
-        \Component_ConfigMapper $componentConfigInstanceMapper
+        \Component_ConfigMapper $componentConfigInstanceMapper,
+        private \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
     ) {
         $this->assessmentMapperProxy           = $assessmentMapperProxy;
         $this->replicator                      = $replicator;
@@ -1044,14 +1049,56 @@ class ImportFactory
             // INSERT - Create Impl from Spec
             $newAssessment = $this->replicator->replicateInNewContext($specAssessment, $context, $user);
             $notifier->notify($newAssessment, $user, $before);
+
+            /* A specific usage where creating projects and activities
+             * always invalidates the project result cache
+             */
+            $this->refreshProjectResultCache($newAssessment);
         } else {
             // UPDATE
             $newAssessment = null;
             $this->assessmentMapperProxy->save($specAssessment, $user);
             $notifier->notify($specAssessment, $user, $before);
         }
+
         return $newAssessment ?: $specAssessment;
     }
+
+
+    /**
+     * Decide whether we have to invalidate project_result cache
+     * Have to compare $postData and $assessment -before- it's transacted/updated
+     *
+     * @param IAssessable $assessment
+     * @return void
+     * @throws MapperException
+     * @throws Deleted
+     * @throws UnexpectedValueException
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @throws \PDOException
+     * @throws DefinitionException
+     */
+    private function refreshProjectResultCache(IAssessable $assessment): void
+    {
+        /* Reprocess project marks if its cache is invalid
+         * Similar to the cli tool's algorithm
+         */
+        $projectResultCache = (new Project\ResultCache\ResultCache($this->projectResultCacheMapper));
+
+        if ($assessment instanceof Project) {
+            $project = $assessment;
+        } else {
+            $project = $this->assessmentMapperProxy->findByIdForReview($assessment->getContext()->getId());
+        }
+
+        foreach ($project->getAllParticipants() as $userId => $participant) {
+            $user = $participant->getUser();
+            $projectResultCache->persist($project, $user, null);
+        }
+    }
+
 
     /**
      * Apply date strings from an array to the specified Assessment

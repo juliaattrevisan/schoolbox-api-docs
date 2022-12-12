@@ -78,6 +78,7 @@ class Module extends BaseModule
                 $this->getMapperFactory()->get(Component_InstanceMapper::class),
                 $this->getMapperFactory()->get(Component_ConfigDefinitionMapper::class),
                 $this->getMapperFactory()->get(Component_ConfigMapper::class),
+                $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\Project\ResultCache\Mapper::class),
             ),
             $assessmentDataSource,
             $this->getMapperFactory()->get(ErrorMapper::class),

@@ -97,6 +97,7 @@ class Module extends \Alaress\Module\Module
             $this->getMapperFactory()->get(Component_InstanceMapper::class),
             $this->getMapperFactory()->get(Component_ConfigDefinitionMapper::class),
             $this->getMapperFactory()->get(Component_ConfigMapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\Project\ResultCache\Mapper::class),
         );
         return new Controller(
             $this->getMapperFactory()->get(UnitSpecificationMapper::class),

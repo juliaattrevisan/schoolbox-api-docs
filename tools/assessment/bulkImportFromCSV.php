@@ -126,7 +126,8 @@ HELP;
                 UnitImplementationMapper::getInstance(),
                 Component_InstanceMapper::getInstance(),
                 Component_ConfigDefinitionMapper::getInstance(),
-                Component_ConfigMapper::getInstance()
+                Component_ConfigMapper::getInstance(),
+                \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper::getInstance()
             ),
             $this->getDi()->get('assessmentDataSource')
         ))->import(fopen($file, 'r'), $defaultDueTime, $this->perform());
