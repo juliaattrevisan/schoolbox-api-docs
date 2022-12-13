@@ -14,7 +14,9 @@ includes:
   interface
 - `\Schoolbox\TaskDaemon\Request\MessageFactory` for building
   `\Schoolbox\TaskDaemon\Request\Message` instances
-  - child classes may provide more refined interfaces for building messages
+  - child classes may provide more refined interfaces for building messages,
+    e.g. `\Schoolbox\TaskDaemon\Request\DownloadPages\MessageFactory` for
+    building a message for requesting to download a set of pages as a PDF
 - `\Schoolbox\TaskDaemon\Request\Message`: for enforcing a minimum set of data
   which a message sent to the task daemon must provide
 - `\Schoolbox\TaskDaemon\Request\MessageSerializer`: for converting a message
