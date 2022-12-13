@@ -91,7 +91,7 @@ export const useSelectedNodesStore = defineStore("mcSelectedNodes", () => {
                     const parentNode: Node = findById(nodesStore.nodes.children as Node[], node.parent.id) as Node; // as we checked node.parent, we can be sure parentNode will be found
                     return parentNode.enabled;
                 }
-                return node.enabled;
+                return !node.enabled;
             });
             hasDisabledChildNodes.value = noChildEnabledNodes.length !== enabledNodes.length; // show a note in the the UI that enabling child nodes of disabled parents is not possible
             return noChildEnabledNodes.length === nodes.value.length;
