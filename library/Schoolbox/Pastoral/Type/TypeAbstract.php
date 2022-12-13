@@ -13,7 +13,6 @@ use Alaress\Color\Color;
 use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
-use Schoolbox\Pastoral\DocumentClassification\Model as DocumentClassification;
 use Schoolbox\Pastoral\TypeAction\Model as Action;
 use Schoolbox\Sequential;
 

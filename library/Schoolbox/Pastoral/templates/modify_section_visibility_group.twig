@@ -47,10 +47,10 @@
                                value="2" {{ checkedPrivate }}>
                         <label class="radio-label" for="groupPrivate{{ userAccess.group.id }}"></label>
                     </td>
-                    {% if not reportPage and not managePage %}
+                    {% if not reportPage %}
                     <td class="small-2 checklist">
                         <input type="checkbox" name="groupComment{{ userAccess.group.id }}" id="groupComment{{ userAccess.group.id }}"
-                               value="1" checked="checked" readonly="readonly">
+                               value="1" checked="checked" readonly="readonly" data-always-read-only="1">
                         <label class="checkbox-label" for="groupComment{{ userAccess.group.id }}"></label>
                     </td>
                     {% endif %}
@@ -178,16 +178,17 @@
 
                     window.groupsAdded[groupId] = true;
 
-                    var permissionListGroups = $('#permission-groups');
+                    let permissionListGroups = $('#permission-groups');
                     permissionListGroups.html(permissionListGroups.html() + html);
 
                     let commentCheckbox = $('#groupComment' + groupId);
                     commentCheckbox.attr('checked', 'checked');
                     commentCheckbox.attr('readonly', 'readonly');
+                    html.replace(/{ALWAYS_READONLY}/g, 1);
 
                     applyLock(['groups'], locked);
                     //Check the correct box
-                    var selector = 'input[name = "group['+groupId+']"][value ="'+permission+'"]';
+                    let selector = 'input[name = "group['+groupId+']"][value ="'+permission+'"]';
                     $(permissionListGroups).find(selector).attr("checked", "checked");
                 }
 
@@ -201,12 +202,12 @@
             $('[data-group-add]').click(function(e) {
                 e.preventDefault();
 
-                var groupId = $(this).attr('data-group-add');
-                var groupName = $(this).attr('data-group-name');
+                let groupId = $(this).attr('data-group-add');
+                let groupName = $(this).attr('data-group-name');
 
                 addGroup(groupId, groupName, 1, false);
 
-                var remaining = 0;
+                let remaining = 0;
 
                 $("[data-group-add]").each(function() {
                     if (!$(this).hasClass('hide')) {

@@ -47,10 +47,11 @@
                         <input type="radio" name="user[{{ userAccess.user.id }}]" id="userPrivate{{ userAccess.user.id }}" value="2" {{ checkedPrivate }}>
                         <label class="radio-label" for="userPrivate{{ userAccess.user.id }}"></label>
                     </td>
-                    {% if not reportPage and not managePage %}
+                    {% if not reportPage %}
                     <td class="small-2 checklist">
                         <input type="checkbox" name="userComment{{ userAccess.user.id }}" id="userComment{{ userAccess.user.id }}"
-                               value="1" {{ userAccess.commentsAllowed ? 'checked' : '' }} {{ userAccess.user.role.isParent or userAccess.user.role.isStudent ? '' : 'readonly' }}>
+                               value="1" {{ userAccess.commentsAllowed ? 'checked' : '' }} {{ userAccess.user.role.isParent or userAccess.user.role.isStudent ? '' : 'readonly' }}
+                               data-always-read-only="{{ userAccess.user.role.isParent or userAccess.user.role.isStudent ? 0 : 1 }}" >
                         <label class="checkbox-label" for="userComment{{ userAccess.user.id }}"></label>
                     </td>
                     {% endif %}
@@ -82,7 +83,7 @@
 
             {# Callback when user added from modal #}
 
-            window.modalUserAdded = function (user, permission, locked) {
+            window.modalUserAdded = function (user, permission, commentsAllowed, locked) {
 
                 // this line will check if the argument is undefined
                 // if so set it to 1, otherwise set it to it's original value
@@ -105,17 +106,21 @@
                         .replace(/{ID}/g, user.id)
                         .replace(/{ROLE}/g, user.role);
 
-                    var permissionListUsers = $('#permission-users');
+                    let permissionListUsers = $('#permission-users');
                     permissionListUsers.html(permissionListUsers.html() + html);
 
+                    let commentCheckbox = $('#userComment' + user.id);
                     if (user.roleType !== 'parent' && user.roleType !== 'student') {
-                        let commentCheckbox = $('#userComment' + user.id);
                         commentCheckbox.attr('checked', 'checked');
                         commentCheckbox.attr('readonly', 'readonly');
+                        html.replace(/{ALWAYS_READONLY}/g, 1);
+                    } else if (commentsAllowed) {
+                        commentCheckbox.attr('checked', 'checked');
+                        html.replace(/{ALWAYS_READONLY}/g, 0);
                     }
 
                     //Check the correct box
-                    var selector = 'input[name = "user['+user.id+']"][value ="'+permission+'"]';
+                    let selector = 'input[name = "user['+user.id+']"][value ="'+permission+'"]';
                     $(permissionListUsers).find(selector).attr("checked", "checked");
                     applyLock(['users'], locked);
                 }
@@ -133,8 +138,8 @@
                 {# check attribute in the DOM for all radio buttons in the clicked group #}
 
                 $('#table-permission').find('.radio-label').click(function() {
-                    var clickedElement = $("#" + $(this).attr('for'));
-                    var radioGroupSelector = 'input[name*="' + clickedElement.attr('name') + '"]';
+                    let clickedElement = $("#" + $(this).attr('for'));
+                    let radioGroupSelector = 'input[name*="' + clickedElement.attr('name') + '"]';
 
                     {# Uncheck all radio buttons in the group #}
 
@@ -148,8 +153,8 @@
                 $('[data-delete-visibility="user"]').click(function (e) {
                     e.preventDefault();
 
-                    var row = $(this).closest('tr');
-                    var userId = $(row).attr('data-user-id');
+                    let row = $(this).closest('tr');
+                    let userId = $(row).attr('data-user-id');
 
                     $('[data-reveal]').hide();
 

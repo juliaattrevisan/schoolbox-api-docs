@@ -47,6 +47,7 @@ use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
 use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Pastoral\Tag\Model as PastoralTagsModel;
 use Schoolbox\Pastoral\Action\Mapper as PastoralActionMapper;
+use Schoolbox\Pastoral\Translator\VisibilityTranslator;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
@@ -747,95 +748,6 @@ class Controller extends Base
     }
 
     /**
-     * @param RequestValues $post
-     * @return GenericCollection
-     * @throws MapperException
-     */
-    private function prepareAccesses(RequestValues $post): GenericCollection
-    {
-        // Save system role permissions, de-duplicating as we go
-        $accesses = $this->pastoralAccessMapper->createCollection();
-
-        if (is_array($post->get("role"))) {
-            $allowedRoles     = $this->pastoralAccessMapper->determineAllowedRoles();
-            $allowedRoleTypes = $this->pastoralAccessMapper->determineAllowedRoleTypes();
-            foreach ($post->get("role") as $roleId => $accessLevel) {
-                if (!in_array($accessLevel, Access\Mapper::ACCESSES)) {
-                    throw new SchoolboxException(sprintf("Invalid access provided for role %s: %s", $roleId, $accessLevel));
-                }
-                $access = $this->pastoralAccessMapper->createModel();
-                $access->setAccess($accessLevel);
-                $access->setCommentsAllowed($post->getBool("roleComment{$roleId}", false));
-
-                // Is this a role or a role type?
-                if (preg_match('/^role-type-(?P<roleType>.*)$/', (string)$roleId, $matches)) {
-                    if (!in_array($matches['roleType'], $allowedRoleTypes)) {
-                        throw new SchoolboxException("Invalid role type: {$matches['roleType']}");
-                    }
-                    $access->setRoleType($matches['roleType']);
-                } else {
-                    $role = $allowedRoles[$roleId] ?? null;
-                    if ($role) {
-                        $access->setRole($role);
-                    } else {
-                        throw new SchoolboxException("Invalid role id: $roleId");
-                    }
-                }
-                if ($post->getInt("roleAccessId{$roleId}")) {
-                    $access->setId($post->getInt("roleAccessId{$roleId}"));
-                }
-                $accesses->add($access);
-            }
-        }
-
-        // Save pastoral group permissions, de-duplicating as we go
-        if (is_array($post->get("group"))) {
-            foreach ($post->get("group") as $groupId => $accessLevel) {
-                if (!in_array($accessLevel, Access\Mapper::ACCESSES)) {
-                    throw new SchoolboxException(sprintf("Invalid access provided for pastoral group %s: %s", $groupId, $accessLevel));
-                }
-                try {
-                    $group = $this->pastoralGroupMapper->findById($groupId);
-                } catch (MapperException $e) {
-                    throw new SchoolboxException("Invalid pastoral group id: $groupId");
-                }
-                $access = $this->pastoralAccessMapper->createModel();
-                $access->setAccess($accessLevel);
-                $access->setGroup($group);
-                $access->setCommentsAllowed($post->getBool("groupComment{$groupId}", false));
-                if ($post->getInt("groupAccessId{$groupId}")) {
-                    $access->setId($post->getInt("groupAccessId{$groupId}"));
-                }
-                $accesses->add($access);
-            }
-        }
-
-        // Save individual user permissions, de-duplicating as we go
-        if (is_array($post->get("user"))) {
-            foreach ($post->get("user") as $userId => $accessLevel) {
-                if (!in_array($accessLevel, Access\Mapper::ACCESSES)) {
-                    throw new SchoolboxException(sprintf("Invalid access provided for pastoral user %s: %s", $userId, $accessLevel));
-                }
-                try {
-                    $user = $this->userMapper->findById($userId);
-                } catch (MapperException $e) {
-                    throw new SchoolboxException("Invalid user id: $userId");
-                }
-                $access = $this->pastoralAccessMapper->createModel();
-                $access->setAccess($accessLevel);
-                $access->setCommentsAllowed($post->getBool("userComment{$userId}", false));
-                $access->setUser($user);
-                if ($post->getInt("userAccessId{$userId}")) {
-                    $access->setId($post->getInt("userAccessId{$userId}"));
-                }
-                $accesses->add($access);
-            }
-        }
-
-        return $accesses;
-    }
-
-    /**
      * Insert a pastoral care record
      *
      * @throws RouteNotFound
@@ -1010,7 +922,12 @@ class Controller extends Base
         }
 
         // Prepare access. No database change yet.
-        $accesses = $this->prepareAccesses($post);
+        $accesses = (new VisibilityTranslator(
+            $this->pastoralAccessMapper,
+            $this->pastoralGroupMapper,
+            $this->userMapper,
+            \Schoolbox\Pastoral\Access\Model::class
+        ))->prepareAccesses($post, $subtype ?? $type);
 
         // Prepare attachments. No database change yet.
         $newAttachments = $this->prepareAttachments($post);

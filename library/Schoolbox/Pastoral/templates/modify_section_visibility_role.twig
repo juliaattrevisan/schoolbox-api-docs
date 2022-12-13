@@ -13,12 +13,14 @@
                     {% set roleId = 'role-type-' ~ userAccess.roleType %}
                     {% set roleName = userAccess.roleType | capitalize %}
                     {% set readonly = '' %}
-                    {% set checkedComment = (not managePage and userAccess.commentsAllowed) ? 'checked="checked"' : '' %}
+                    {% set alwaysReadOnly = 0 %}
+                    {% set checkedComment = userAccess.commentsAllowed ? 'checked="checked"' : '' %}
                 {% elseif userAccess.role %}
                     {% set roleId = userAccess.role.id %}
                     {% set roleName = userAccess.role.name %}
-                    {% set readonly = 'readonly' %}
-                    {% set checkedComment = (not managePage and userAccess.role.type == 'staff') ? 'checked="checked"' : '' %}
+                    {% set readonly = userAccess.role.type == 'staff' ? 'readonly' : '' %}
+                    {% set alwaysReadOnly = userAccess.role.type == 'staff' ? 1 : 0 %}
+                    {% set checkedComment = userAccess.role.type == 'staff' ? 'checked="checked"' : '' %}
                 {% endif %}
 
                 {% if roleId %}
@@ -58,13 +60,11 @@
                                    value="2" {{ checkedPrivate }}>
                             <label class="radio-label" for="rolePrivate{{ roleId }}"></label>
                         </td>
-                        {% if not managePage %}
                         <td class="small-2 checklist">
                             <input type="checkbox" name="roleComment{{ roleId }}" id="roleComment{{ roleId }}"
-                                   value="1" {{ checkedComment }} {{ readonly }}>
+                                   value="1" {{ checkedComment }} {{ readonly }} data-always-read-only="{{ alwaysReadOnly }}">
                             <label class="checkbox-label" for="roleComment{{ roleId }}"></label>
                         </td>
-                        {% endif %}
                         <td class="text-right small-1">
                             <a href="#" data-delete-visibility="role" class="icon-delete"></a>
                         </td>
@@ -222,7 +222,7 @@
 
             {# Add role to table #}
 
-            window.addRole = function(roleId, roleName, permission, locked) {
+            window.addRole = function(roleId, roleName, permission, commentsAllowed, locked) {
 
                 // this line will check if the argument is undefined
                 // if so set it to 1, otherwise set it to it's original value
@@ -238,19 +238,23 @@
 
                     window.rolesAdded.push(roleId);
 
-                    var permissionListRoles = $('#permission-roles');
+                    let permissionListRoles = $('#permission-roles');
                     permissionListRoles.html(permissionListRoles.html() + html);
 
                     // enable comment checkbox only for student and parent role type
+                    let commentCheckbox = $('#roleComment' + roleId);
                     if (roleId !== 'role-type-parent' && roleId !== 'role-type-student') {
-                        let commentCheckbox = $('#roleComment' + roleId);
                         commentCheckbox.attr('checked', 'checked');
                         commentCheckbox.attr('readonly', 'readonly');
+                        html.replace(/{ALWAYS_READONLY}/g, 1);
+                    } else if (commentsAllowed) {
+                        commentCheckbox.attr('checked', 'checked');
+                        html.replace(/{ALWAYS_READONLY}/g, 0);
                     }
 
                     //Check the correct box
-                    var selector = 'input[name = "role['+roleId+']"][value ="'+permission+'"]';
-                    $(permissionListRoles).find(selector).attr("checked", "checked");
+                    let selector = 'input[name = "role['+roleId+']"][value ="'+permission+'"]';
+                    permissionListRoles.find(selector).attr("checked", "checked");
                     applyLock(['roles'], locked);
                 }
 
@@ -264,12 +268,12 @@
             $('[data-role-add]').click(function (e) {
                 e.preventDefault();
 
-                var roleId = $(this).attr('data-role-add');
-                var roleName = $(this).attr('data-role-name');
+                let roleId = $(this).attr('data-role-add');
+                let roleName = $(this).attr('data-role-name');
 
                 addRole(roleId, roleName);
 
-                var remaining = 0;
+                let remaining = 0;
 
                 $("[data-role-add]").each(function () {
                     if (!$(this).hasClass('hide')) {

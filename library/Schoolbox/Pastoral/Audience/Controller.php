@@ -19,12 +19,14 @@ use Schoolbox\GenericCollection;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Menu\Icon\Mapper as IconMapper;
 use Schoolbox\Pastoral;
+use Schoolbox\Pastoral\Translator\VisibilityTranslator;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\Submenu\Flyout;
 use Schoolbox\UserMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Pastoral\Audience\Model as PastoralAudience;
 
 class Controller extends Base
 {
@@ -289,10 +291,6 @@ class Controller extends Base
         $currentType = $currentType ?? $type;
         $isSubType   = $currentType instanceof Pastoral\SubType\Model;
 
-        $existing = $isSubType
-            ? $this->pastoralAudienceMapper->findByColumnList(['subtype_id' => $currentType->getId()])
-            : $this->pastoralAudienceMapper->findByColumnList(['type_id' => $currentType->getId()]);
-
         // Fetch the exiting rules
         if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
             $actions          =
@@ -348,81 +346,34 @@ class Controller extends Base
             ]);
 
         // Build the posted rules
-        $posted = $this->pastoralAudienceMapper->createCollection();
+        $postedAudiences = (new VisibilityTranslator(
+            $this->pastoralAccessMapper,
+            $this->pastoralGroupMapper,
+            $this->userMapper,
+            PastoralAudience::class
+        ))->prepareAccesses($post, $currentType);
 
-        // Build role and roletype-based rules
-        foreach ($post["role"] ?? [] as $roleId => $accessLevel) {
-            $audience = $this->getAudience($currentType, $accessLevel);
-            if (preg_match('/^role-type-(?P<roleType>.*)$/', (string)$roleId, $matches)) {
-                $audience->setRoleType($matches['roleType']);
-            } else {
-                $audience->setRole($this->roleMapper->findById($roleId));
+        // Save audiences
+        $existingAudiences = $isSubType
+            ? $this->pastoralAudienceMapper->findByColumnList(['subtype_id' => $currentType->getId()])->indexBy('id')
+            : $this->pastoralAudienceMapper->findByColumnList(['type_id' => $currentType->getId()])->indexBy('id');
+        $keptAudienceIds   = [];
+        /** @var PastoralAudience $audience */
+        foreach ($postedAudiences as $audience) {
+            if ($existingAudiences->offsetExists($audience->getId())) {
+                $keptAudienceIds[] = $audience->getId();
             }
-
-            $posted->add($audience);
+            $newAudience = clone $audience;
+            $this->pastoralAudienceMapper->save($newAudience);
         }
-
-        // Build pastoralGroup-based rules
-        foreach ($post["group"] ?? [] as $groupId => $accessLevel) {
-            $group    = $this->pastoralGroupMapper->findById($groupId);
-            $audience = $this->getAudience($currentType, $accessLevel);
-            $audience->setGroup($group);
-            $posted->add($audience);
-        }
-
-        // Build user-based rules
-        foreach ($post["user"] ?? [] as $userId => $accessLevel) {
-            $user     = $this->userMapper->findById($userId);
-            $audience = $this->getAudience($currentType, $accessLevel);
-            $audience->setUser($user);
-            $posted->add($audience);
-        }
-
-        $rulesToDelete = $this->pastoralAudienceMapper->createCollection();  // removed entityType+entityId
-        $rulesToAdd    = $this->pastoralAudienceMapper->createCollection();  // new     entityType+entityId
-        $rulesToUpdate = $this->pastoralAudienceMapper->createCollection();  // same    entityType+entityId, accessLevel has changed
-
-        // New Rules
-        foreach ($posted as $postedRule) {
-            $found = false;
-            foreach ($existing as $existingRule) {
-                if ($postedRule->equals($existingRule, true)) {
-                    $found = true;
-                    break;
-                }
+        // Delete audiences no longer exists
+        $removingAudiences = $existingAudiences->filter(
+            static function ($audience) use ($keptAudienceIds) {
+                /** @var PastoralAudience $audience */
+                return !in_array($audience->getId(), $keptAudienceIds);
             }
-            if (!$found) {
-                $rulesToAdd->add($postedRule);
-            }
-        }
-
-        // Updated Rules
-        foreach ($posted as $postedRule) {
-            foreach ($existing as $existingRule) {
-                if ($postedRule->equals($existingRule, true) && $postedRule->getAccess() !== $existingRule->getAccess()) {
-                    $rulesToUpdate->add($existingRule->setAccess($postedRule->getAccess()));
-                    break;
-                }
-            }
-        }
-
-        // Deleted Rules
-        foreach ($existing as $existingRule) {
-            $found = false;
-            foreach ($posted as $postedRule) {
-                if ($postedRule->equals($existingRule, true)) {
-                    $found = true;
-                    break;
-                }
-            }
-            if (!$found) {
-                $rulesToDelete->add($existingRule);
-            }
-        }
-
-        $this->pastoralAudienceMapper->delete($rulesToDelete);
-        $this->pastoralAudienceMapper->save($rulesToAdd);
-        $this->pastoralAudienceMapper->save($rulesToUpdate);
+        );
+        $this->pastoralAudienceMapper->delete($removingAudiences);
 
         $this->pastoralTypeMapper->getDatabase()->commit();
 
@@ -448,25 +399,5 @@ class Controller extends Base
         $pb = $this->pastoralAudienceMapper->getPredicateBuilder();
         $subtype ? $pb->equals('subtype_id', $subtype->getId()) : $pb->equals('type_id', $type->getId());
         return $this->pastoralAudienceMapper->findByPredicates($pb)->filter($this->pastoralAudienceMapper->getPermissionCallback());
-    }
-
-    /**
-     * @param Pastoral\Type\TypeAbstract $currentType
-     * @param mixed                      $accessLevel
-     * @return Model
-     * @throws MapperException
-     */
-    private function getAudience(Pastoral\Type\TypeAbstract $currentType, mixed $accessLevel): Model
-    {
-        $audience = $this->pastoralAudienceMapper->createModel();
-        if ($currentType instanceof Pastoral\SubType\Model) {
-            $audience->setSubtype($currentType);
-        } elseif ($currentType instanceof Pastoral\Type\Model) {
-            $audience->setType($currentType);
-        } else {
-            throw new \UnexpectedValueException('Invalid pastoral type');
-        }
-        $audience->setAccess((int)$accessLevel);
-        return $audience;
     }
 }

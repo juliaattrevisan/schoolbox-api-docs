@@ -15,12 +15,13 @@ use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Pastoral\Group\Model as PastoralGroup;
+use Schoolbox\Pastoral\IPastoralAccess;
 use Schoolbox\Pastoral\SubType\Model as SubType;
 use Schoolbox\Pastoral\Type\Model as Type;
 use Schoolbox\Role;
 use Schoolbox\User;
 
-class Model implements ISoftDeletable
+class Model implements ISoftDeletable, IPastoralAccess
 {
     use Id;
     use CreatedAtDate;
@@ -28,13 +29,13 @@ class Model implements ISoftDeletable
     use DeletedAtDate;
 
     /** @var null|User */
-    private $user;
+    private ?User $user = null;
 
     /** @var null|PastoralGroup */
-    private $group;
+    private ?PastoralGroup $group = null;
 
     /** @var null|Role  */
-    private $role;
+    private ?Role $role = null;
 
     /**
      * The role type for this pastoral care access, if any.
@@ -42,60 +43,24 @@ class Model implements ISoftDeletable
     private ?string $roleType = null;
 
     /** @var null|Type */
-    private $type;
+    private ?Type $type = null;
 
     /** @var null|SubType */
-    private $subtype;
+    private ?SubType $subtype = null;
 
     /** @var integer */
-    private $access;
+    private int $access;
+
+    private bool $commentsAllowed = false;
 
 
     /**
-     * Returns whether this AudienceRule is equal to some other AudienceRule
-     *
-     * @param self $other
-     * @param bool $ignoreAccess If true, consider rules equal if they differ only by accessLevel
-     * @return bool
-     */
-    public function equals(Model $other, bool $ignoreAccess = false): bool
-    {
-        // TODO remove explicit type-coercion once model hydration is fixed SA-4539
-        if (($this->user xor $other->user) || ($this->user && (int)$this->user->getId() !== (int)$other->user->getId())) {
-            return false;
-        }
-
-        if (($this->role xor $other->role) || ($this->role && (int)$this->role->getId() !== (int)$other->role->getId())) {
-            return false;
-        }
-
-        if ($this->roleType !== $other->roleType) {
-            return false;
-        }
-
-        if (($this->group xor $other->group) || ($this->group && (int)$this->group->getId() !== (int)$other->group->getId())) {
-            return false;
-        }
-
-        if (($this->type xor $other->type) || ($this->type && (int)$this->type->getId() !== (int)$other->type->getId())) {
-            return false;
-        }
-
-        if (($this->subtype xor $other->subtype) || ($this->subtype && (int)$this->subtype->getId() !== (int)$other->subtype->getId())) {
-            return false;
-        }
-
-        return $ignoreAccess || $this->access === $other->access;
-    }
-
-
-    /**
-     * @param PastoralGroup|null $pastoralGroup
+     * @param PastoralGroup|null $group
      * @return $this
      */
-    public function setGroup(?PastoralGroup $pastoralGroup): self
+    public function setGroup(?PastoralGroup $group): self
     {
-        $this->group = $pastoralGroup;
+        $this->group = $group;
 
         return $this;
     }
@@ -218,6 +183,24 @@ class Model implements ISoftDeletable
     public function setAccess(int $access): self
     {
         $this->access = $access;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getCommentsAllowed(): bool
+    {
+        return $this->commentsAllowed;
+    }
+
+    /**
+     * @param bool $commentsAllowed
+     * @return static
+     */
+    public function setCommentsAllowed(bool $commentsAllowed): self
+    {
+        $this->commentsAllowed = $commentsAllowed;
         return $this;
     }
 }

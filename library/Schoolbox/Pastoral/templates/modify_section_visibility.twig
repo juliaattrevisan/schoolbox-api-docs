@@ -43,9 +43,7 @@
                     <th class="small-2">Deny</th>
                     <th class="small-2">General</th>
                     <th class="small-2">General + {{ locale.pastoralPrivate.proper }}</th>
-                    {% if not managePage %}
                     <th class="small-2">Comments<span class='hint has-tip tip-top' title="If checked, these users will be able to read and post comments on this record" data-tooltip>?</span></th>
-                    {% endif %}
                 {% endif %}
                 <th class="text-right small-1">Delete</th>
             </tr>
@@ -93,6 +91,9 @@
                     $(permList).find('input[type=radio]').each(function () {
                         $(this).attr('readonly', 'readonly');
                     })
+                    $(permList).find('input[type=checkbox]').each(function () {
+                        $(this).attr('readonly', 'readonly');
+                    })
                     $(permList).find('label.radio-label').each(function () {
                         $(this).attr('for', $(this).attr('for') + '-locked');
                     })
@@ -100,6 +101,9 @@
                     $('.icon-delete').addClass('hide');
                 } else {
                     $(permList).find('input[type=radio]').each(function () {
+                        $(this).removeAttr('readonly');
+                    })
+                    $(permList).find('input[type=checkbox] [data-always-read-only="1"]').each(function () {
                         $(this).removeAttr('readonly');
                     })
                     $(permList).find('label.radio-label').each(function () {
@@ -225,9 +229,9 @@
                 <input type="radio" name="{{ accessType }}[{ID}]" id="{{ accessType }}Private{ID}" value="2">
                 <label class="radio-label" for="{{ accessType }}Private{ID}"></label>
             </td>
-            {% if not reportPage and not managePage %}
+            {% if not reportPage %}
             <td class="small-{{ colsize }} checklist">
-                <input type="checkbox" name="{{ accessType }}Comment{ID}" id="{{ accessType }}Comment{ID}" value="1">
+                <input type="checkbox" name="{{ accessType }}Comment{ID}" id="{{ accessType }}Comment{ID}" value="1" data-always-read-only="{ALWAYS_READONLY}">
                 <label class="checkbox-label" for="{{ accessType }}Comment{ID}"></label>
             </td>
             {% endif %}
