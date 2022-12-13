@@ -10,6 +10,11 @@
 export const UNSET_ID = 0;
 
 /**
+ * To sort the nodes, we store collator to for faster performance
+ */
+const collator = new Intl.Collator('en', { numeric: true, sensitivity: 'base' });
+
+/**
  * return an empty node, usually used to indicate there's currently
  * nothing to display
  *
@@ -44,17 +49,40 @@ export function getEmptyNode () {
 }
 
 /**
- * Sort the passed through curriculum nodes by their .name property
+ * Node with a code take priority, then followed by those without, the name is used
+ *
+ * @param { object }
+ * @param { object }
+ */
+ function sortNodesByCodeThenName (aNode, bNode) {
+    const aHasCode = aNode.code !== '';
+    const bHasCode = bNode.code !== '';
+    if (aHasCode && bHasCode) { // if both have codes, sort by the code
+        return collator.compare(aNode.code, bNode.code);
+    }
+    if (!aHasCode && !bHasCode) { // if both have no code, just sort by name
+        return collator.compare(aNode.name, bNode.name);
+    }
+    return aHasCode ? -1 : bHasCode ? 1 : 0; // those with a code take precendence over those without
+}
+
+/**
+ * Return the nodes sorted first by order, then code, then name
  *
  * @param { array }
+ * @returns { array }
  */
-export function sortByName (array, id) {
-    array.sort((a, b) => {
-        return a.name.localeCompare(b.name, undefined, {
-            numeric: true,
-            sensitivity: 'base'
-        });
-    });
+export function sortNodes (nodes) {
+    const nodesWithOrder = nodes.filter((node) => node.order !== 0); // to prioritise nodes with order
+    if (nodesWithOrder.length > 0) {
+        nodesWithOrder.sort((aNode, bNode) => aNode.order - bNode.order); // sort ascending
+    }
+    const nodesWithoutOrder = nodes.filter((node) => node.order === 0); // then those without order follow
+    if (nodesWithoutOrder.length > 0) {
+        nodesWithoutOrder.sort(sortNodesByCodeThenName); // sorted by code then name
+    }
+    const sortedChildNodes = nodesWithOrder.concat(nodesWithoutOrder); // nodes with order, then the others
+    return sortedChildNodes;
 }
 
 /**

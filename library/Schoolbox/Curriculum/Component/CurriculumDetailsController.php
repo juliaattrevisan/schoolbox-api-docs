@@ -72,6 +72,7 @@ class CurriculumDetailsController extends Component_Homepage_ControllerAbstract
             return false;
         }
 
+        Node\Mapper::sortNodes($this->curriculumNodes, 0);
         return true;
     }
 

@@ -12,6 +12,7 @@ use Schoolbox\Curriculum\Api\Translator\ArrayToModel;
 use Schoolbox\Curriculum\Api\Translator\ModelToArray;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
 
 /**
@@ -83,6 +84,8 @@ class Controller extends Base
 
             $resultsForAllKeywords = $resultsForAllKeywords->merge($resultsForKeyword);
         }
+
+        Node\Mapper::sortNodes($resultsForAllKeywords, 0);
 
         $this->response->content->set(
             $this->buildJsonOutput(
@@ -206,6 +209,9 @@ class Controller extends Base
      */
     private function respondWithNode(Node\Model $node, int $ancestorCount, int $descendantCount): void
     {
+        $childNodes = $node->getChildren();
+        Node\Mapper::sortNodes($childNodes, 0);
+        $node->setChildren($childNodes);
         $translator = new ModelToArray($ancestorCount, $descendantCount);
         $this->response->content->set(
             $this->buildJsonOutput($translator($node))

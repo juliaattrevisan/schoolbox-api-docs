@@ -9,7 +9,7 @@
 
 import { defineStore } from 'pinia';
 import { useNodesStore } from '../../store/mcNodesStore';
-import { sortByName } from '@schoolboxCurriculum/js/nodeUtils';
+import { sortNodes } from '@schoolboxCurriculum/js/nodeUtils';
 import { useViewNodesStore } from '../../viewNodes/store/mcViewNodesStore';
 
 
@@ -66,7 +66,6 @@ export const useActiveNodeStore = defineStore('mcActiveNode', {
         update (node) {
             if (node.name !== this.node.name) {
                 this.node.name = node.name;
-                useNodesStore().nodeUpdated(this.node); //notify to prompt a sort
             }
             if (node.code !== this.node.code) {
                 this.node.code = node.code.trim();
@@ -74,6 +73,7 @@ export const useActiveNodeStore = defineStore('mcActiveNode', {
             if (node.description !== this.node.description) {
                 this.node.description = node.description;
             }
+            useNodesStore().nodeUpdated(this.node); //notify to prompt a sort
         },
 
         /**
@@ -86,7 +86,7 @@ export const useActiveNodeStore = defineStore('mcActiveNode', {
                 await useNodesStore().loadNextChildren(this.node.id);
             } else { //otherwise we need to push the newNode in as the children are already loaded
                 this.node.children.push(newNode);
-                sortByName(this.node.children); //and sort again with the new node added
+                this.node.children = sortNodes(this.node.children); // and sort again with the new node added
             }
             const viewNodesStore = useViewNodesStore();
             if (viewNodesStore.current.id !== newNode.parent.id) { //if we aren't on the new nodes level move down so we can see the new node
