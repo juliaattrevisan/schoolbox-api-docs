@@ -40,12 +40,13 @@ bootstrapped, routed and processed:
 * [CLI request](io/requests/cli.md)
 * [Daemon request](io/requests/daemon.md)
 
+## Standard outputs
+
+* [HTTP responses](io/stdout/http-response.md)
+* [Logs](io/stdout/log.md)
 
 ## Other inputs and outputs
 
-* Standard output
-  * HTTP responses
-  * Logs
 * [Schoolbox Database](io/schoolbox-database.md)
 * [SIS Database](io/sis-database/README.md)
   * [External](io/sis-database/external.md)
