@@ -58,4 +58,4 @@ bootstrapped, routed and processed:
 * [Task Daemon](io/task-daemon.md)
 * [Mail Transport](io/mail-transport.md)
 * [PDF Generator](io/pdf-generator.md)
-* Notification Subsystem
+* [Notification Subsystem](io/notification-subsystem.md)
