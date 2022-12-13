@@ -56,6 +56,7 @@ bootstrapped, routed and processed:
 * [Redis Cache](io/redis-cache.md)
 * [Redis Storage](io/redis-storage.md)
 * [Task Daemon](io/task-daemon.md)
+* [HTTP Request/Response](io/http-request-response.md)
 * [Mail Transport](io/mail-transport.md)
 * [PDF Generator](io/pdf-generator.md)
 * [Notification Subsystem](io/notification-subsystem.md)
