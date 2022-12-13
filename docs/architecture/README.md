@@ -57,5 +57,5 @@ bootstrapped, routed and processed:
 * [Redis Storage](io/redis-storage.md)
 * [Task Daemon](io/task-daemon.md)
 * [Mail Transport](io/mail-transport.md)
-* Gotenberg (PDF generation)
+* [PDF Generator](io/pdf-generator.md)
 * Notification Subsystem
