@@ -1,6 +1,7 @@
 # Web Kernel (Basic)
 
-This web request is designed for when there is no user interface to display.
+This web request class `\Schoolbox\Application\BasicRequest\Kernel` is designed
+for when there is no user interface to display.
 
 It is the same as the standard web request kernel, except its dependency
 injection container does not set up UI dependencies (e.g. Twig).
