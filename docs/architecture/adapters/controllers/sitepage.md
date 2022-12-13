@@ -22,5 +22,8 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 ```
 
 As with Aura controllers: Sitepage controllers should pass off actions to other
-components, which should be able to interact with one or more
-[other inputs and outputs](../../README.md#other-inputs-and-outputs).
+components, which:
+- may interact with
+  [other inputs and outputs](../../README.md#other-inputs-and-outputs)
+- will create some sort of [HTTP response](../stdout/http-response/README.md)
+  output
