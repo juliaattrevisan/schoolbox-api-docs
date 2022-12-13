@@ -335,23 +335,13 @@ class Controller extends Base
     /**
      * Builds the context data for the Disaster Report
      *
-     * @param bool $bucketSizeOnly True to get bucket size
+     * @param bool $bucketSizeOnly True to only get bucket size without DR context.
      * @return array
      * @throws InvalidArgumentException
      */
     private function buildDisasterRecoveryContext(bool $bucketSizeOnly = false): array
     {
         $enabledData = [];
-
-        $enabledData['mostRecentSyncStatus'] = $this->getConfigLoader()->get(DisasterRecovery::CONFIG_DR_SYNC_STATUS);
-        $enabledData['fqdn']                 = "{$this->getConfigLoader()->get('site_hostname')}.{$this->getConfigLoader()->get('site_domain')}";
-        try {
-            $domainTtl                = (new TtlFetcher())->getTtl($enabledData['fqdn']);
-            $enabledData['domainTtl'] = $domainTtl;
-        } catch (UnexpectedValueException $e) {
-            // We want to know about this, but continue to render the rest of the page.
-            $this->captureException($e);
-        }
 
         $s3AccessKey = trim($this->getConfigLoader()->get('otfs_s3_cred_key') ?? "");
         $s3SecretKey = trim($this->getConfigLoader()->get('otfs_s3_cred_secret') ?? "");
@@ -371,18 +361,6 @@ class Controller extends Base
             $enabledData['errors'][] = 'AWS S3 credentials are invalid';
             return $enabledData;
         }
-
-        $s3Client = new S3Client([
-            'credentials' => [
-                'key'    => $s3AccessKey,
-                'secret' => $s3SecretKey,
-            ],
-            'region'      => $s3Region,
-            'version'     => $s3Version,
-            'http'    => [
-                GuzzleHttp\RequestOptions::CONNECT_TIMEOUT => FilesystemFactory::getConnectTimeout(),
-            ],
-        ]);
 
         $cloudWatchClient = new CloudWatchClient([
             'credentials' => [
@@ -416,13 +394,37 @@ class Controller extends Base
         foreach ($storageTypes as $storageType) {
             $bucketSize += (new CloudWatchMetrics($cloudWatchClient))->getBucketSize($s3Bucket, $storageType);
         }
-
+        $enabledData['bucketSize'] = Alaress_Byte_Format::bytesToString($bucketSize);
 
         if ($bucketSizeOnly) {
-            return ['bucketSize' => Alaress_Byte_Format::bytesToString($bucketSize)];
+            return $enabledData;
         }
+
+        $enabledData['mostRecentSyncStatus'] = $this->getConfigLoader()->get(DisasterRecovery::CONFIG_DR_SYNC_STATUS);
+        $enabledData['fqdn']                 = "{$this->getConfigLoader()->get('site_hostname')}.{$this->getConfigLoader()->get('site_domain')}";
+        try {
+            $domainTtl                = (new TtlFetcher())->getTtl($enabledData['fqdn']);
+            $enabledData['domainTtl'] = $domainTtl;
+        } catch (UnexpectedValueException $e) {
+            // We want to know about this, but continue to render the rest of the page.
+            $this->captureException($e);
+        }
+
         $objectCount = (new CloudWatchMetrics($cloudWatchClient))->getNumberOfObjects($s3Bucket);
 
+        $s3Client = new S3Client(
+            [
+                'credentials' => [
+                    'key'    => $s3AccessKey,
+                    'secret' => $s3SecretKey,
+                ],
+                'region'      => $s3Region,
+                'version'     => $s3Version,
+                'http'        => [
+                    GuzzleHttp\RequestOptions::CONNECT_TIMEOUT => FilesystemFactory::getConnectTimeout(),
+                ],
+            ]
+        );
         $objects = $s3Client->getIterator('ListObjects', [
             'Bucket' => $s3Bucket,
             'Prefix' => DisasterRecovery::PREFIX_BACKUPS,
@@ -479,7 +481,6 @@ class Controller extends Base
 
 
         // Count of storage files is equal to total objects minus backups
-        $enabledData['bucketSize']       = Alaress_Byte_Format::bytesToString($bucketSize);
         $enabledData['storageFileCount'] = $objectCount - $backupFileCount;
         $enabledData['storageFileUsage'] = Alaress_Byte_Format::bytesToString($bucketSize - $backupFileUsage);
 
