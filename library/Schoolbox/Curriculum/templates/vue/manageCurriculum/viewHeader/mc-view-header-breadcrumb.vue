@@ -6,7 +6,7 @@
  */
 
 import { shortenLength } from '@js/util/stringUtils';
-import { useViewNodesStore } from '../viewNodes/store/mcViewNodesStore';
+import { useViewNodesStore } from '@schoolboxCurriculum/vue/manageCurriculum/viewNodes/store/mcViewNodesStore';
 import type { Breadcrumb } from '@schoolboxCurriculum/types/Breadcrumb';
 
 interface Props {
@@ -22,7 +22,7 @@ const viewNodesStore = useViewNodesStore();
  * to display the just selected node
  */
 function onSelected () {
-    viewNodesStore.setSelected(props.breadcrumb.depth, props.breadcrumb.id);
+    viewNodesStore.setSelected(props.breadcrumb.depth as number, props.breadcrumb.id);
 }
 
 </script>
@@ -32,7 +32,8 @@ function onSelected () {
         <span v-if="props.isDisabled">
             {{ shortenLength(props.breadcrumb.name as string, maxNameLength) }}
         </span>
-        <a v-else
+        <a
+            v-else
             :href="`/curricululm/${props.breadcrumb.id}`"
             :title="`View ${props.breadcrumb.name}`"
             @click.prevent="onSelected()"

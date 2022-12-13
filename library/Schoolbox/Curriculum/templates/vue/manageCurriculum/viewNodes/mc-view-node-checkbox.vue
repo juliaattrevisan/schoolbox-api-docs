@@ -5,39 +5,21 @@
  */
 
 import { computed } from 'vue';
-import { useSelectedNodesStore } from '../selectedNodes/store/mcSelectedNodesStore';
+import { useSelectedNodesStore } from '@schoolboxCurriculum/vue/manageCurriculum/selectedNodes/store/mcSelectedNodesStore';
+import type { Node } from '@schoolboxCurriculum/types/Node';
 
+interface Props {
+    node: Node; // the assigned node to display
+    isUpdatingOrAdding: boolean; // to disable certain events when editing is taking place
+}
 
-const props = defineProps({
-    /**
-     * the assigned node to display
-     */
-    node: {
-        type: Object,
-        required: true,
-        default() {
-            return {
-                id: '0',
-                name: '-',
-                children: [],
-            }
-        }
-    },
-    /**
-     * to disable certain events when any editing is taking place
-     */
-    isUpdatingOrAdding: {
-        type: Boolean,
-        required: true,
-    },
-});
-
+const props = defineProps<Props>();
 const selectedNodesStore = useSelectedNodesStore();
 
 /**
  * if the node is a child of one that's selected it should be disabled
  *
- * @returns { Boolean }
+ * @returns { boolean } whether the checkbox should be disabled
  */
 const isDisabled = computed(() => {
     return selectedNodesStore.childNodesIds.includes(props.node.id) || props.isUpdatingOrAdding;
@@ -46,7 +28,7 @@ const isDisabled = computed(() => {
 /**
  * Update the status of the checkbox based on whether it's selected or not
  *
- * @returns { Boolean }
+ * @returns { boolean }
  */
 const isChecked = computed(() => {
     return selectedNodesStore.nodesIds.includes(props.node.id) || selectedNodesStore.childNodesIds.includes(props.node.id);
@@ -55,10 +37,10 @@ const isChecked = computed(() => {
 /**
  * add or remove based on the current status
  *
- * @param { boolean } isChecked - whether the Node is selected or not
+ * @param { boolean } isCheckedChange - whether the Node is selected or not
  */
-function onChange (isChecked: boolean) {
-    selectedNodesStore.switchNode(props.node, isChecked);
+function onChange (isCheckedChange: boolean) {
+    selectedNodesStore.switchNode(props.node, isCheckedChange);
 }
 
 </script>
