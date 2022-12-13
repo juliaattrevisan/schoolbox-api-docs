@@ -2,16 +2,16 @@
  * Handles the load of the curriculum data
  */
 
-import { ref, computed } from 'vue';
-import { defineStore } from 'pinia';
-import { UNSET_ID } from '@schoolboxCurriculum/js/nodeUtils';
-import { useNodesStore } from '@schoolboxCurriculum/vue/manageCurriculum/store/mcNodesStore';
-import { useViewNodesStore } from '@schoolboxCurriculum/vue/manageCurriculum/viewNodes/store/mcViewNodesStore';
-import { useActiveNodeStore } from '@schoolboxCurriculum/vue/manageCurriculum/activeNode/store/mcActiveNodeStore';
-import Toast from '@schoolboxVue/components/toast.vue';
+import { ref, computed } from "vue";
+import { defineStore } from "pinia";
+import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
+import { useNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/mcNodesStore";
+import { useViewNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/viewNodes/store/mcViewNodesStore";
+import { useActiveNodeStore } from "@schoolboxCurriculum/vue/manageCurriculum/activeNode/store/mcActiveNodeStore";
+import Toast from "@schoolboxVue/components/toast.vue";
 
-export const useStore = defineStore('manageCurriculum', () => {
-    let apiEndpoint = ''; // where to load the curriculum api from
+export const useStore = defineStore("manageCurriculum", () => {
+    let apiEndpoint = ""; // where to load the curriculum api from
     const isLoading = ref(true); // to display loading note
     const hasLoadError = ref(false); // to display loading error
     const isProcessing = ref(false); // to notify that an action is taking place, like updating a member access
@@ -43,7 +43,7 @@ export const useStore = defineStore('manageCurriculum', () => {
     function checkForNodeHash() {
         const documentURL = document.URL;
         const hashCount = (documentURL.match(/#/g) || []).length; // the number of # found in the url
-        const idHash = Number(documentURL.substring(documentURL.indexOf('#') + 1, documentURL.length));
+        const idHash = Number(documentURL.substring(documentURL.indexOf("#") + 1, documentURL.length));
         const isIdNumber = Number.isInteger(idHash);
         if (hashCount === 1 && isIdNumber && idHash !== UNSET_ID) {
             // we check if there's an #, and the string proceeding it is a number
@@ -57,7 +57,7 @@ export const useStore = defineStore('manageCurriculum', () => {
      * as they persist between the stories otherwise
      */
     function checkForStorybook() {
-        if (typeof window.STORYBOOK_ENV !== 'undefined') {
+        if (typeof window.STORYBOOK_ENV !== "undefined") {
             $reset();
             useViewNodesStore().$reset();
             useActiveNodeStore().$reset();
@@ -76,7 +76,7 @@ export const useStore = defineStore('manageCurriculum', () => {
         checkForStorybook();
         isReadOnly.value = $isReadOnly;
         toastEl.value = toastElement;
-        if (dataEndpoint !== '') {
+        if (dataEndpoint !== "") {
             // only load when we need to
             apiEndpoint = dataEndpoint;
             await useNodesStore().load(); // load the top level curricula

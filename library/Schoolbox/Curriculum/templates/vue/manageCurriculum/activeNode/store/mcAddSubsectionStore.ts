@@ -2,12 +2,12 @@
  * Handles the store add a new subsection to an existing node
  */
 
-import { ref } from 'vue';
-import { defineStore } from 'pinia';
-import { useStore } from '@schoolboxCurriculum/vue/manageCurriculum/store/manageCurriculumStore';
-import { useActiveNodeStore } from '@schoolboxCurriculum/vue/manageCurriculum/activeNode/store/mcActiveNodeStore';
-import { useSelectedNodesStore } from '@schoolboxCurriculum/vue/manageCurriculum/selectedNodes/store/mcSelectedNodesStore';
-import { Node } from '@schoolboxCurriculum/types/Node';
+import { ref } from "vue";
+import { defineStore } from "pinia";
+import { useStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/manageCurriculumStore";
+import { useActiveNodeStore } from "@schoolboxCurriculum/vue/manageCurriculum/activeNode/store/mcActiveNodeStore";
+import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/selectedNodes/store/mcSelectedNodesStore";
+import { Node } from "@schoolboxCurriculum/types/Node";
 
 const UNSET_ID = -1;
 
@@ -18,9 +18,9 @@ const UNSET_ID = -1;
  */
 function getSubsection(): Partial<Node> {
     return {
-        name: '',
-        code: '',
-        description: '',
+        name: "",
+        code: "",
+        description: "",
     };
 }
 
@@ -40,7 +40,7 @@ function getFormData(subsection: Partial<Node>, node: Node) {
     });
 }
 
-export const useAddSubsectionStore = defineStore('mcAddSubsection', () => {
+export const useAddSubsectionStore = defineStore("mcAddSubsection", () => {
     const isProcessing = ref(false);
     const isOpen = ref(false); // to notify that the prompt is opened / closed
     const subsection = ref<Partial<Node>>(getSubsection());
@@ -73,9 +73,9 @@ export const useAddSubsectionStore = defineStore('mcAddSubsection', () => {
         try {
             isProcessing.value = true;
             const response = await fetch(`${useStore().getApiEndpoint()}/${activeNodeStore.node.id}`, {
-                method: 'POST',
+                method: "POST",
                 headers: {
-                    'Content-Type': 'application/json',
+                    "Content-Type": "application/json",
                 },
                 body: getFormData(subsection.value, activeNodeStore.node),
             });
@@ -86,7 +86,7 @@ export const useAddSubsectionStore = defineStore('mcAddSubsection', () => {
                 useSelectedNodesStore().checkIfSelected(newNode); // the parent node could be selected, so this node will need to be selected as well
                 await activeNodeStore.addSubsection(newNode);
                 cancel();
-                return { id: newNode.id, message: 'Subsection successfully added' };
+                return { id: newNode.id, message: "Subsection successfully added" };
             }
             throw new Error(responseJson.title, { ...responseJson });
         } catch (error) {

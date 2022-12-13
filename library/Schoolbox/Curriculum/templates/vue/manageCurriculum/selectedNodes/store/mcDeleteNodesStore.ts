@@ -2,13 +2,13 @@
  * Delete the currently selected nodes
  */
 
-import { ref } from 'vue';
-import { defineStore } from 'pinia';
-import { capitalizeFirstLetter } from '@js/util/stringUtils';
-import { useStore } from '../../store/manageCurriculumStore';
-import { useSelectedNodesStore } from './mcSelectedNodesStore';
+import { ref } from "vue";
+import { defineStore } from "pinia";
+import { capitalizeFirstLetter } from "@js/util/stringUtils";
+import { useStore } from "../../store/manageCurriculumStore";
+import { useSelectedNodesStore } from "./mcSelectedNodesStore";
 
-export const useDeleteNodesStore = defineStore('mcDeleteNodes', () => {
+export const useDeleteNodesStore = defineStore("mcDeleteNodes", () => {
     const isProcessing = ref(false);
     const isOpen = ref(false); // to notify that the prompt is opened / closed
 
@@ -31,9 +31,9 @@ export const useDeleteNodesStore = defineStore('mcDeleteNodes', () => {
         selectedNodesStore.nodes.forEach((node) => {
             fetchList.push(
                 fetch(`${useStore().getApiEndpoint()}/${node.id}`, {
-                    method: 'DELETE',
+                    method: "DELETE",
                     headers: {
-                        'Content-Type': 'application/json',
+                        "Content-Type": "application/json",
                     },
                 })
             );

@@ -6,14 +6,14 @@
  * which is used to update or add a subsection to a SINGLE node.
  */
 
-import { ref, computed } from 'vue';
-import { defineStore } from 'pinia';
-import { useNodesStore } from '@schoolboxCurriculum/vue/manageCurriculum/store/mcNodesStore';
-import { UNSET_ID, findById, getEmptyNode } from '@schoolboxCurriculum/js/nodeUtils';
-import { useEnableNodesStore } from '@schoolboxCurriculum/vue/manageCurriculum/selectedNodes/store/mcEnableNodesStore';
-import { Node } from '@schoolboxCurriculum/types/Node';
+import { ref, computed } from "vue";
+import { defineStore } from "pinia";
+import { useNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/mcNodesStore";
+import { UNSET_ID, findById, getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
+import { useEnableNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/selectedNodes/store/mcEnableNodesStore";
+import { Node } from "@schoolboxCurriculum/types/Node";
 
-export const useSelectedNodesStore = defineStore('mcSelectedNodes', () => {
+export const useSelectedNodesStore = defineStore("mcSelectedNodes", () => {
     const nodes = ref<Node[]>([]); // the currently selected nodes
     const childNodes = ref<Node[]>([]); // any children of currently selected nodes
     const activeNode = ref(getEmptyNode()); // to show extra info on a selected code in a modal
@@ -45,7 +45,7 @@ export const useSelectedNodesStore = defineStore('mcSelectedNodes', () => {
      *
      * @returns { string }
      */
-    const singleOrPlural = computed(() => (count.value > 1 ? 'nodes' : 'node'));
+    const singleOrPlural = computed(() => (count.value > 1 ? "nodes" : "node"));
 
     /**
      * just return an array of ids, used to compare if a node is selected or not

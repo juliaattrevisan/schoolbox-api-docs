@@ -2,12 +2,12 @@
  * Add a new curriculum
  */
 
-import { ref } from 'vue';
-import { defineStore } from 'pinia';
-import { useStore } from '@schoolboxCurriculum/vue/manageCurriculum/store/manageCurriculumStore';
-import { useNodesStore } from '@schoolboxCurriculum/vue/manageCurriculum/store/mcNodesStore';
-import { useViewNodesStore } from '@schoolboxCurriculum/vue/manageCurriculum/viewNodes/store/mcViewNodesStore';
-import { Node } from '@schoolboxCurriculum/types/Node';
+import { ref } from "vue";
+import { defineStore } from "pinia";
+import { useStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/manageCurriculumStore";
+import { useNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/mcNodesStore";
+import { useViewNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/viewNodes/store/mcViewNodesStore";
+import { Node } from "@schoolboxCurriculum/types/Node";
 
 const UNSET_ID = -1;
 
@@ -18,9 +18,9 @@ const UNSET_ID = -1;
  */
 function getCurriculum(): Partial<Node> {
     return {
-        name: '',
-        code: '',
-        description: '',
+        name: "",
+        code: "",
+        description: "",
     };
 }
 
@@ -38,7 +38,7 @@ function getFormData(node: Partial<Node>) {
     });
 }
 
-export const useAddCurriculumStore = defineStore('mcAddCurriculum', () => {
+export const useAddCurriculumStore = defineStore("mcAddCurriculum", () => {
     const isProcessing = ref(false);
     const isOpen = ref(false); // to notify that the prompt is opened / closed
     const curriculum = ref<Partial<Node>>(getCurriculum());
@@ -66,9 +66,9 @@ export const useAddCurriculumStore = defineStore('mcAddCurriculum', () => {
         try {
             isProcessing.value = true;
             const response = await fetch(`${useStore().getApiEndpoint()}/`, {
-                method: 'POST',
+                method: "POST",
                 headers: {
-                    'Content-Type': 'application/json',
+                    "Content-Type": "application/json",
                 },
                 body: getFormData(curriculum.value as Partial<Node>),
             });
@@ -81,7 +81,7 @@ export const useAddCurriculumStore = defineStore('mcAddCurriculum', () => {
                 useViewNodesStore().setSelected(0);
                 isProcessing.value = false;
                 cancel();
-                return { id: newCurriculum.id, message: 'Curriculum successfully added' };
+                return { id: newCurriculum.id, message: "Curriculum successfully added" };
             }
             throw new Error(responseJson.title, { ...responseJson });
         } catch (error) {

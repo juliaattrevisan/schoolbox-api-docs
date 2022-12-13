@@ -6,8 +6,8 @@
  * It's linked specifically to description as we are removing embed media buttons which is currently specific just to these description fields
  */
 
-import { ref, onMounted } from 'vue';
-import { isScriptAdded, injectScript } from '@js/util/domUtils';
+import { ref, onMounted } from "vue";
+import { isScriptAdded, injectScript } from "@js/util/domUtils";
 
 /**
  * Initialise the composable
@@ -27,12 +27,12 @@ export function useDescriptionEditor($initialValue: string, $ckeditorInstance: s
      * @param { HTMLElement } ckeditor - the ckeditor instance in the DOM
      */
     function removeMediaEmbedButtons(ckeditor: HTMLElement) {
-        const videoAudioButton = ckeditor.querySelector('.cke_button__schoolboxresourcemedia') as HTMLElement;
-        videoAudioButton.style.display = 'none';
-        const imageButton = ckeditor.querySelector('.cke_button__schoolboxresourceimage') as HTMLElement;
-        imageButton.style.display = 'none';
-        const eqnEditorButton = ckeditor.querySelector('.cke_button__eqneditor') as HTMLElement;
-        eqnEditorButton.style.display = 'none';
+        const videoAudioButton = ckeditor.querySelector(".cke_button__schoolboxresourcemedia") as HTMLElement;
+        videoAudioButton.style.display = "none";
+        const imageButton = ckeditor.querySelector(".cke_button__schoolboxresourceimage") as HTMLElement;
+        imageButton.style.display = "none";
+        const eqnEditorButton = ckeditor.querySelector(".cke_button__eqneditor") as HTMLElement;
+        eqnEditorButton.style.display = "none";
     }
 
     /**

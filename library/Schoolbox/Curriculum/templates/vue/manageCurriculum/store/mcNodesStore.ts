@@ -2,8 +2,8 @@
  * Stores all the curriculum codes and determines display of nodes
  */
 
-import { ref, computed } from 'vue';
-import { defineStore } from 'pinia';
+import { ref, computed } from "vue";
+import { defineStore } from "pinia";
 import {
     UNSET_ID,
     findById,
@@ -11,14 +11,14 @@ import {
     removeId,
     getBreadcrumbs,
     getEmptyNode,
-} from '@schoolboxCurriculum/js/nodeUtils';
-import { useStore } from '@schoolboxCurriculum/vue/manageCurriculum/store/manageCurriculumStore';
-import { useViewNodesStore } from '@schoolboxCurriculum/vue/manageCurriculum/viewNodes/store/mcViewNodesStore';
-import { useSelectedNodesStore } from '@schoolboxCurriculum/vue/manageCurriculum/selectedNodes/store/mcSelectedNodesStore';
-import { Node } from '@schoolboxCurriculum/types/Node';
-import { Breadcrumb } from '@schoolboxCurriculum/types/Breadcrumb';
+} from "@schoolboxCurriculum/js/nodeUtils";
+import { useStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/manageCurriculumStore";
+import { useViewNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/viewNodes/store/mcViewNodesStore";
+import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/selectedNodes/store/mcSelectedNodesStore";
+import { Node } from "@schoolboxCurriculum/types/Node";
+import { Breadcrumb } from "@schoolboxCurriculum/types/Breadcrumb";
 
-export const useNodesStore = defineStore('mcNodes', () => {
+export const useNodesStore = defineStore("mcNodes", () => {
     const nodes = ref<Node>(getEmptyNode()); // all the nodes currently loaded
     const isLoading = ref(false); // to display loading note
     const hasLoadError = ref(false); // to display loading error
@@ -52,7 +52,7 @@ export const useNodesStore = defineStore('mcNodes', () => {
             enabled: true,
             id: UNSET_ID,
             parent: null,
-            name: 'Curricula',
+            name: "Curricula",
         };
         $nodes.forEach((node) => useSelectedNodesStore().checkIfSelected(node)); // ensure isSelected is kept up to date
     }
@@ -90,18 +90,21 @@ export const useNodesStore = defineStore('mcNodes', () => {
         const breadcrumbs = getBreadcrumbs(node, []);
         breadcrumbs.push({ id: node.id, name: node.name }); // add in the actual node as the last
         const viewNodesStore = useViewNodesStore();
-        const activeBreadcrumbs: Breadcrumb[] = [...viewNodesStore.breadcrumbs, { id: viewNodesStore.current.id }];
+        const activeBreadcrumbs: Breadcrumb[] = [
+            ...viewNodesStore.breadcrumbs,
+            { id: viewNodesStore.current.id, name: viewNodesStore.current.name },
+        ];
         const onlyInactiveBreadcrumbs = breadcrumbs.filter((newBreadcrumb: Breadcrumb) =>
             isActiveBreadcrumb(activeBreadcrumbs, newBreadcrumb)
         );
-        for (let i = 0; i < onlyInactiveBreadcrumbs.length; i++) {
+        for (let i = 0; i < onlyInactiveBreadcrumbs.length; i += 1) {
             // recursively load in each node and traverse down
             await useViewNodesStore().setNextSelected(onlyInactiveBreadcrumbs[i].id);
         }
     }
 
     /**
-     * load the node, retrieving all its parents so we can traverse directly to it
+     * load the node, retrieving all its parents, so we can traverse directly to it
      *
      * @param { number } id - the id of the Node to load
      */
@@ -155,7 +158,7 @@ export const useNodesStore = defineStore('mcNodes', () => {
         try {
             const response = await fetch(`${store.getApiEndpoint()}/?topLevelOnly=1&descendants=1&limit=50`, {
                 headers: {
-                    'Content-Type': 'application/json',
+                    "Content-Type": "application/json",
                 },
             });
             if (response.ok) {
@@ -181,14 +184,14 @@ export const useNodesStore = defineStore('mcNodes', () => {
             isLoading.value = true;
             const response = await fetch(`${useStore().getApiEndpoint()}/${id}?descendants=2&limit=50`, {
                 headers: {
-                    'Content-Type': 'application/json',
+                    "Content-Type": "application/json",
                 },
             });
             const responseJson = await response.json();
             if (response.ok) {
-                const newNode = responseJson;
-                newNode.children.forEach((node: Node) => useSelectedNodesStore().checkIfSelected(node));
-                const oldNode = findById(nodes.value?.children, id); // grab the old node to update
+                const newNode = responseJson as Node;
+                newNode.children?.forEach((node: Node) => useSelectedNodesStore().checkIfSelected(node));
+                const oldNode = findById(nodes.value?.children as Node[], id) as Node; // grab the old node to update
                 useSelectedNodesStore().checkIfSelected(oldNode);
                 oldNode.children = newNode.children; // we just grab the loaded children and overwrite the old property
             } else {

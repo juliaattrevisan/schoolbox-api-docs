@@ -2,18 +2,18 @@
  * Store the current search results when searcing from mc-view-header-search-input
  */
 
-import { ref, computed } from 'vue';
-import { defineStore } from 'pinia';
-import { useStore } from '@schoolboxCurriculum/vue/manageCurriculum/store/manageCurriculumStore';
-import { useViewNodesStore } from '@schoolboxCurriculum/vue/manageCurriculum/viewNodes/store/mcViewNodesStore';
-import { Node } from '@schoolboxCurriculum/types/Node';
+import { ref, computed } from "vue";
+import { defineStore } from "pinia";
+import { useStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/manageCurriculumStore";
+import { useViewNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/viewNodes/store/mcViewNodesStore";
+import { Node } from "@schoolboxCurriculum/types/Node";
 
 const MIN_QUERY_LENGTH = 2; // the amount of characters typed before the search becomes active
 export const DEBOUNCE_AMOUNT = 350; // the amount in ms to hold off on searching, to allow the user to keep typing
 
 export const useSearchStore = defineStore(`mcSearch`, () => {
     const isLoading = ref(false); // to notify that an action is taking place,
-    const query = ref(''); // current search term to filter the active nodes
+    const query = ref(""); // current search term to filter the active nodes
     const results = ref<Node[]>([]); // nodes returned in the current search results
 
     /**
@@ -66,15 +66,15 @@ export const useSearchStore = defineStore(`mcSearch`, () => {
     async function search() {
         try {
             const viewNodesStore = useViewNodesStore();
-            const enabled = viewNodesStore.showDisabled ? '' : '&enabled=1';
+            const enabled = viewNodesStore.showDisabled ? "" : "&enabled=1";
             const response = await fetch(
-                `${useStore().getApiEndpoint()}?parentId=${viewNodesStore.current.id}&query=${query.value}&limit=50${
-                    enabled
-                }`,
+                `${useStore().getApiEndpoint()}?parentId=${viewNodesStore.current.id}&query=${
+                    query.value
+                }&limit=50${enabled}`,
                 {
-                    method: 'GET',
+                    method: "GET",
                     headers: {
-                        'Content-Type': 'application/json',
+                        "Content-Type": "application/json",
                     },
                 }
             );
@@ -90,7 +90,7 @@ export const useSearchStore = defineStore(`mcSearch`, () => {
      * clear the current search
      */
     function clear() {
-        query.value = '';
+        query.value = "";
         results.value = [];
         isLoading.value = false;
     }

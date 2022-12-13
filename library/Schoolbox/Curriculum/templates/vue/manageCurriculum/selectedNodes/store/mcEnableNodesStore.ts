@@ -2,12 +2,12 @@
  * Enable/disable the currently selected nodes
  */
 
-import { ref } from 'vue';
-import { defineStore } from 'pinia';
-import { useStore } from '@schoolboxCurriculum/vue/manageCurriculum/store/manageCurriculumStore';
-import { useSelectedNodesStore } from '@schoolboxCurriculum/vue/manageCurriculum/selectedNodes/store/mcSelectedNodesStore';
+import { ref } from "vue";
+import { defineStore } from "pinia";
+import { useStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/manageCurriculumStore";
+import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/selectedNodes/store/mcSelectedNodesStore";
 
-export const useEnableNodesStore = defineStore('mcEnableNodes', () => {
+export const useEnableNodesStore = defineStore("mcEnableNodes", () => {
     const isProcessing = ref(false);
     const isOpen = ref(false); // to notify that the prompt is opened / closed
     const enabled = ref(false); // to set what enabled status the current selection is being set to
@@ -66,9 +66,9 @@ export const useEnableNodesStore = defineStore('mcEnableNodes', () => {
         selectedNodesStore.nodes.forEach((node) => {
             fetchList.push(
                 fetch(`${useStore().getApiEndpoint()}/${node.id}`, {
-                    method: 'PATCH',
+                    method: "PATCH",
                     headers: {
-                        'Content-Type': 'application/json',
+                        "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
                         enabled: enabled.value,
@@ -82,12 +82,12 @@ export const useEnableNodesStore = defineStore('mcEnableNodes', () => {
     /**
      * To notify the user of success status
      *
-     * @returns { string }
+     * @returns { string } the success message
      */
     function getSuccessMessage() {
         const selectedNodesStore = useSelectedNodesStore();
-        const nodeSingleOrPlural = `Node${selectedNodesStore.count > 1 ? 's' : ''}`;
-        const enabledOrDisabled = `${selectedNodesStore.nodes[0].enabled ? 'disabled' : 'enabled'}`;
+        const nodeSingleOrPlural = `Node${selectedNodesStore.count > 1 ? "s" : ""}`;
+        const enabledOrDisabled = `${selectedNodesStore.nodes[0].enabled ? "disabled" : "enabled"}`;
         return `${nodeSingleOrPlural} successfully ${enabledOrDisabled}`;
     }
 

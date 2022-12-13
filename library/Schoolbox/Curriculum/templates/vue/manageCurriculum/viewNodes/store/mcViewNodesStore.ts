@@ -3,20 +3,20 @@
  * those filtered by both <select> and also the search <input>
  */
 
-import { ref, computed } from 'vue';
-import { defineStore } from 'pinia';
-import { useNodesStore } from '@schoolboxCurriculum/vue/manageCurriculum/store/mcNodesStore';
-import { useSearchStore } from '@schoolboxCurriculum/vue/manageCurriculum/store/mcSearchStore';
-import { UNSET_ID, findById } from '@schoolboxCurriculum/js/nodeUtils';
-import { Node } from '@schoolboxCurriculum/types/Node';
-import { Breadcrumb } from '@schoolboxCurriculum/types/Breadcrumb';
+import { ref, computed } from "vue";
+import { defineStore } from "pinia";
+import { useNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/mcNodesStore";
+import { useSearchStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/mcSearchStore";
+import { UNSET_ID, findById } from "@schoolboxCurriculum/js/nodeUtils";
+import { Node } from "@schoolboxCurriculum/types/Node";
+import { Breadcrumb } from "@schoolboxCurriculum/types/Breadcrumb";
 
 export const DIRECTION = {
-    FORWARDS: 'forwards',
-    BACKWARDS: 'backwards',
+    FORWARDS: "forwards",
+    BACKWARDS: "backwards",
 };
 
-export const useViewNodesStore = defineStore('mcViewNodes', () => {
+export const useViewNodesStore = defineStore("mcViewNodes", () => {
     const idList = ref<number[]>([]); // ids of the selected nodes
     const currentDepth = ref(0); // track how far down the tree we are
     const currentDirection = ref(DIRECTION.FORWARDS); // which direction we are currently travelling in the tree
@@ -112,9 +112,9 @@ export const useViewNodesStore = defineStore('mcViewNodes', () => {
      */
     function updateHash() {
         if (current.value.id === UNSET_ID) {
-            window.history.replaceState(undefined, '', '#');
+            window.history.replaceState(undefined, "", "#");
         } else {
-            window.history.replaceState(undefined, '', `#${current.value.id}`);
+            window.history.replaceState(undefined, "", `#${current.value.id}`);
         }
     }
 

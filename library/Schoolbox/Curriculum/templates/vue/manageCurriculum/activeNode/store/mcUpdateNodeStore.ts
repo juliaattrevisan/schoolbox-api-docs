@@ -2,11 +2,11 @@
  * Handles the store to disband the group
  */
 
-import { ref } from 'vue';
-import { defineStore } from 'pinia';
-import { useStore } from '@schoolboxCurriculum/vue/manageCurriculum/store/manageCurriculumStore';
-import { useActiveNodeStore } from '@schoolboxCurriculum/vue/manageCurriculum/activeNode/store/mcActiveNodeStore';
-import { Node, NodeToUpdate } from '@schoolboxCurriculum/types/Node';
+import { ref } from "vue";
+import { defineStore } from "pinia";
+import { useStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/manageCurriculumStore";
+import { useActiveNodeStore } from "@schoolboxCurriculum/vue/manageCurriculum/activeNode/store/mcActiveNodeStore";
+import { Node, NodeToUpdate } from "@schoolboxCurriculum/types/Node";
 
 /**
  * Create a copy so the data is only updated once actually saved
@@ -36,10 +36,10 @@ function getFormData(node: NodeToUpdate) {
     });
 }
 
-export const useUpdateNodeStore = defineStore('mcUpdateNode', () => {
+export const useUpdateNodeStore = defineStore("mcUpdateNode", () => {
     const isProcessing = ref(false);
     const isOpen = ref(false); // to notify that the prompt is opened / closed
-    const activeNodeCopy = ref<NodeToUpdate>({ name: '', description: null, code: null }); // hold a copy of the changes, only update once we confirm the changes
+    const activeNodeCopy = ref<NodeToUpdate>({ name: "", description: null, code: null }); // hold a copy of the changes, only update once we confirm the changes
 
     /**
      * to display a prompt to update a nodes details
@@ -69,9 +69,9 @@ export const useUpdateNodeStore = defineStore('mcUpdateNode', () => {
             const activeNodeStore = useActiveNodeStore();
             const nodeId: number = activeNodeStore.node.id;
             const response = await fetch(`${useStore().getApiEndpoint()}/${nodeId}`, {
-                method: 'PATCH',
+                method: "PATCH",
                 headers: {
-                    'Content-Type': 'application/json',
+                    "Content-Type": "application/json",
                 },
                 body: getFormData(activeNodeCopy.value),
             });
@@ -80,7 +80,7 @@ export const useUpdateNodeStore = defineStore('mcUpdateNode', () => {
                 activeNodeStore.update(activeNodeCopy.value);
                 isProcessing.value = false;
                 cancel();
-                return { id: nodeId, message: 'Node successfully updated' };
+                return { id: nodeId, message: "Node successfully updated" };
             }
             throw new Error(responseJson.title, { ...responseJson });
         } catch (error) {
