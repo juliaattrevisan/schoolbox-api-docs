@@ -164,6 +164,12 @@ class UserPayload
         return array_values($stack);
     }
 
+    /**
+     * Historic old query
+     * Since IST-1864 kills mysql statements that take longer than 30sec, we need to break this up so we can find the specific problem query.
+     * in the same thought, breaking it up might also slip under the 30sec timeout.
+     * @return array
+     */
     public function oldQuery(): array
     {
         $query = "
@@ -218,7 +224,13 @@ class UserPayload
 
         return $stack;
     }
-    private function getFile()
+
+    /**
+     * Get the file table storage usage by userId
+     * this will ignore files that have been deleted in the file table (Resource Browser)
+     * @return \Alaress\Database\Statement\Query\Base|\Alaress\Database\Statement\Query\IQuery
+     */
+    private function getFile(): \Alaress\Database\Statement\Query\IQuery|\Alaress\Database\Statement\Query\Base
     {
         $query = "SELECT owner AS userId, SUM(`s`.`filesize`) AS size
                  FROM `file` `f`
@@ -229,7 +241,12 @@ class UserPayload
         return $this->database->executeQuery($query);
     }
 
-    private function getMyFile()
+    /**
+     * Get the myFile table storage usage by userId
+     * this will ignore files that have been deleted in the MyFile table (My Files)
+     * @return \Alaress\Database\Statement\Query\Base|\Alaress\Database\Statement\Query\IQuery
+     */
+    private function getMyFile(): \Alaress\Database\Statement\Query\IQuery|\Alaress\Database\Statement\Query\Base
     {
         $query = "SELECT owner AS userId, SUM(`s`.`filesize`) AS size
                  FROM `myFile` `f`
@@ -240,25 +257,39 @@ class UserPayload
         return $this->database->executeQuery($query);
     }
 
-    private function getStudentSubmission()
+    /**
+     * Get the student_submission_file table storage usage by userId
+     * this will ignore files that have been deleted in the student_submission_file table (Due Work Submission)
+     * @return \Alaress\Database\Statement\Query\Base|\Alaress\Database\Statement\Query\IQuery
+     */
+    private function getStudentSubmission(): \Alaress\Database\Statement\Query\IQuery|\Alaress\Database\Statement\Query\Base
     {
         $query = "SELECT owner AS userId, SUM(`s`.`filesize`) AS size
                  FROM `student_submission` `f`
-                   INNER JOIN `student_submission_file` ON (`student_submission_file`.student_submission_id = `f`.id and `student_submission_file`.deleted_at IS NULL)
+                   INNER JOIN `student_submission_file` ON (
+                       `student_submission_file`.student_submission_id = `f`.id AND
+                       `student_submission_file`.deleted_at IS NULL
+                       )
                    INNER JOIN `storage` `s` ON `student_submission_file`.`hash` = `s`.`hash`
-
                  GROUP BY `f`.`owner`";
 
         return $this->database->executeQuery($query);
     }
 
-    private function getSubmissionReturn()
+    /**
+     * Get the submission_return_file table storage usage by userId
+     * this will ignore files that have been deleted in the submission_return_file table (Due Work Submission Response)
+     * @return \Alaress\Database\Statement\Query\Base|\Alaress\Database\Statement\Query\IQuery
+     */
+    private function getSubmissionReturn(): \Alaress\Database\Statement\Query\IQuery|\Alaress\Database\Statement\Query\Base
     {
         $query = "SELECT owner AS userId, SUM(`s`.`filesize`) AS size
                  FROM `submission_return` `f`
-                   INNER JOIN `submission_return_file` ON `submission_return_file`.submission_return_id = `f`.id
+                   INNER JOIN `submission_return_file` ON (
+                       `submission_return_file`.submission_return_id = `f`.id AND
+                       `submission_return_file`.`deleted_at` IS NULL
+                       )
                    INNER JOIN `storage` `s` ON `submission_return_file`.`hash` = `s`.`hash`
-                 WHERE `submission_return_file`.`deleted_at` IS NULL
                  GROUP BY `f`.`owner`";
 
         return $this->database->executeQuery($query);
@@ -268,7 +299,7 @@ class UserPayload
      * get all users, for caching purposes, just get them all
      * @return array
      */
-    private function getUsers()
+    private function getUsers(): array
     {
         $stack = [];
         $query = "SELECT
