@@ -244,9 +244,9 @@ class UserPayload
     {
         $query = "SELECT owner AS userId, SUM(`s`.`filesize`) AS size
                  FROM `student_submission` `f`
-                   INNER JOIN `student_submission_file` ON `student_submission_file`.student_submission_id = `f`.id
+                   INNER JOIN `student_submission_file` ON (`student_submission_file`.student_submission_id = `f`.id and `student_submission_file`.deleted_at IS NULL)
                    INNER JOIN `storage` `s` ON `student_submission_file`.`hash` = `s`.`hash`
-                   WHERE `student_submission_file`.deleted_at IS NULL
+
                  GROUP BY `f`.`owner`";
 
         return $this->database->executeQuery($query);
