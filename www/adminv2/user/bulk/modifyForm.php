@@ -67,7 +67,8 @@ if (isset($_POST['updateUsers'])) {
         (int)$_POST['apply_hidecontacts'],
         (int)$_POST['apply_hidetimetable'],
         $_POST['apply_position_title'],
-        (int)$_POST['apply_displaygradegraph']
+        (int)$_POST['apply_displaygradegraph'],
+        (int)$_POST['apply_revokeToken']
     ))->update();
 } else {
     if (isset($_POST['deleteUsers'])) {
