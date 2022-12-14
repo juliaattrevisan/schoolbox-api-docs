@@ -299,4 +299,34 @@ class Redis
         }
         return $result;
     }
+
+    /**
+     * clears the results of a function call in Redis.
+     *
+     * clears data created by \Alaress\Redis::cacheFunctionCall
+     *
+     * @param string   $base_key The base of the key to store the result in.
+     * @param mixed    $params   A parameter to pass to $callback. This is also
+     *                           used to generate the cache key.
+     *
+     * @return int (The number of keys that were removed)
+     */
+    public function dropKeyCache(string $base_key, mixed $params): int
+    {
+        $redis = $this->client;
+        $key   = sprintf(
+            '%s:%s:%s:%s',
+            self::FUNCTION_CALL_CACHE_PREFIX,
+            $this->instanceId,
+            $base_key,
+            hash('sha256', serialize($params)),
+        );
+
+        try {
+            return $redis->del($key);
+        } catch (Predis\PredisException $e) {
+            trigger_error(sprintf('Redis exception: "%s"', $e->getMessage()), E_USER_WARNING);
+        }
+        return 0;
+    }
 }
