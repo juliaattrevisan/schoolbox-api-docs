@@ -70,8 +70,8 @@
                 dataType: 'script',
                 cache: true
             }).then(function () {
-                if (config.modules.length === 0) {
-                    config.modules = ['client']; // NOTE: gapi.client (used below) will not exist unless we load the 'config' module.
+                if (!config.modules.includes('client')) {
+                    config.modules.push('client'); // NOTE: gapi.client (used below) will not exist unless we load the 'config' module.
                 }
 
                 for (let i = 0, j = 0; i < config.modules.length; ++i) {
