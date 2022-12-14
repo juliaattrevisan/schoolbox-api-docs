@@ -30,7 +30,7 @@
                 /* Scope
                  * List of scopes: https://developers.google.com/identity/protocols/oauth2/scopes
                  */
-                scope: 'https://www.googleapis.com/auth/drive',
+                scope: 'https://www.googleapis.com/auth/drive', // See, edit, create, and delete all of your Google Drive files (see https://developers.google.com/identity/protocols/oauth2/scopes).
 
                 /* The url to google's api.js file
                  * We need to load their js asynchronously, which gives us access to the
@@ -60,8 +60,9 @@
             // The google.accounts.oauth2 variable comes from https://accounts.google.com/gsi/client (included in templates/core/homepage/index.html).
             window.googleClientToken = google.accounts.oauth2.initTokenClient({
                 client_id: config.clientId,
-                scope: 'https://www.googleapis.com/auth/drive', // See, edit, create, and delete all of your Google Drive files (see https://developers.google.com/identity/protocols/oauth2/scopes).
-                callback: (response) => {},
+                scope: config.scope,
+                callback: (response) => {
+                },
             });
 
             $.ajax({
@@ -69,9 +70,11 @@
                 dataType: 'script',
                 cache: true
             }).then(function () {
-                let i, j;
+                if (config.modules.length === 0) {
+                    config.modules = ['client']; // NOTE: gapi.client (used below) will not exist unless we load the 'config' module.
+                }
 
-                for (i = 0, j = 0; i < config.modules.length; ++i) {
+                for (let i = 0, j = 0; i < config.modules.length; ++i) {
                     gapi.load(config.modules[i], function () {
                         /* run gapi.load() on every config.module element, but only execute the callback
                          * when you're at the last config.module element; this causes callback() to occur
@@ -82,14 +85,12 @@
                          */
                         if (++j === config.modules.length && config.callback && config.clientId.length) {
                             // Not sure whether this is still needed after all uses of the 'client:auth2' module were removed in SA-14475.
-                            if (gapi.client !== undefined) {
-                                gapi.client.init({
-                                    'client_id': config.clientId,
-                                    'scope': config.scope
-                                }).then(function () {
-                                    config.callback();
-                                });
-                            }
+                            gapi.client.init({
+                                'client_id': config.clientId,
+                                'scope': config.scope
+                            }).then(function () {
+                                config.callback();
+                            });
                         }
                     });
                 }

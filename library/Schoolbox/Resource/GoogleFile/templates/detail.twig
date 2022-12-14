@@ -23,7 +23,7 @@
     $(function () {
         $.fn.setupGapi({
             clientId: '{{ config.googleapps_client_id }}',
-            modules: ['client:auth2'],
+            modules: ['client'], // NOTE: gapi.client will not exist unless we load the 'client' module.
             callback: function () {
                 $('#google-file-content').googlePicker({
                     listener: false,

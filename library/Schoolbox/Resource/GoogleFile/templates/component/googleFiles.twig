@@ -142,7 +142,7 @@ window.googleClientToken = null; // To be filled by apiloader.js script.
     <script type="text/javascript">
         $.fn.setupGapi({
             clientId: '{{ config.googleapps_client_id }}',
-            modules: ['picker']
+            modules: ['client:picker']
         });
     </script>
 {% endif %}
