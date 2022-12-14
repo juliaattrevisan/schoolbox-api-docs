@@ -45,7 +45,8 @@ All kernels will need to set up a dependency injection container: this container
 is used to define the dependencies of the various objects which Schoolbox is
 able to make use of.
 
-These are set up in `installDependencies`.
+These are set up in `installDependencies`: more information may be found in
+the [dependency injection](dependency-injection.md) documentation.
 
 
 ### Set up post-injection dependencies
