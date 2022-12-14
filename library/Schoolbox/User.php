@@ -81,7 +81,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
 
     /** @var string */
     private $positionTitle;
-    
+
     /** @var string */
     private $username;
 
