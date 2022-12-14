@@ -57,32 +57,20 @@
          * Set up the gapi global object
          */
         function setup() {
+            // The google.accounts.oauth2 variable comes from https://accounts.google.com/gsi/client (included in templates/core/homepage/index.html).
+            window.googleClientToken = google.accounts.oauth2.initTokenClient({
+                client_id: config.clientId,
+                scope: 'https://www.googleapis.com/auth/drive', // See, edit, create, and delete all of your Google Drive files (see https://developers.google.com/identity/protocols/oauth2/scopes).
+                callback: (response) => {},
+            });
+
             $.ajax({
                 url: config.url,
                 dataType: 'script',
                 cache: true
             }).then(function () {
-                let i, j;
-
-                for (i = 0, j = 0; i < config.modules.length; ++i) {
-                    gapi.load(config.modules[i], function () {
-
-                        /* run gapi.load() on every config.module element, but only execute the callback
-                         * when you're at the last config.module element; this causes callback() to occur
-                         * only once, and after gapi.load() commences
-                         *
-                         * but how do you know the first one finished loading when the last module has
-                         * also finished loading? You can't assert that from here...
-                         */
-                        if (++j === config.modules.length && config.callback && config.clientId.length) {
-                            gapi.client.init({
-                                'client_id': config.clientId,
-                                'scope': config.scope
-                            }).then(function () {
-                                config.callback();
-                            });
-                        }
-                    });
+                for (let i = 0; i < config.modules.length; ++i) {
+                    gapi.load(config.modules[i], function () {});
                 }
             });
         }

@@ -15,6 +15,8 @@
 <div class="small-12 island">
     <div id="google-authenticate" class="button hide">Authorize Google account to view document</div>
 </div>
+<!-- Google Identity Service see https://developers.google.com/identity/oauth2/web/guides/migration-to-gis#gis-and-gapi -->
+<script src="https://accounts.google.com/gsi/client"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/google/apiloader.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/google/picker.js?v={{ config.site_version }}"></script>
 <script type="text/javascript">

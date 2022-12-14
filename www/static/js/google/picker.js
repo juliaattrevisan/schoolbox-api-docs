@@ -1,5 +1,4 @@
 (function () {
-
     /**
      * Google Picker
      *
@@ -87,22 +86,26 @@
          */
         function authorize() {
             let showBtn = config.authBtn && $(config.authBtn).hasClass('hide');
-            let gAuth = gapi.auth2.getAuthInstance();
-            let gUser = gAuth.currentUser.get();
-            if (gUser.isSignedIn()) {
-                authResult = gUser.getAuthResponse();
-                handleAuthResult();
-            } else if (showBtn) {
+            if (showBtn) {
                 $(config.authBtn).removeClass('hide');
+            }
+
+            // This function will run when a response is received from from window.googleClientToken.requestAccessToken().
+            window.googleClientToken.callback = async (response) => {
+                authResult = response;
+                if (authResult.error !== undefined) {
+                    throw (authResult);
+                }
+                window.googleClientToken = authResult.access_token;
+                handleAuthResult();
+            };
+
+            if (window.googleClientToken === null) {
+                // When establishing a new session, prompt the user to select a Google Account and ask for consent to share their data.
+                window.googleClientToken.requestAccessToken({prompt: 'consent'});
             } else {
-                gAuth.signIn({'prompt': 'select_account'}).then(
-                    function () {
-                        // reset authResult
-                        gUser = gAuth.currentUser.get();
-                        authResult = gUser.getAuthResponse();
-                        handleAuthResult();
-                    }
-                );
+                // When using an existing session, prompt the user to select a Google Account but no need to ask for consent to share their data.
+                window.googleClientToken.requestAccessToken({prompt: ''});
             }
         }
 
@@ -122,7 +125,6 @@
             }
         }
 
-
         // Create and render a Picker object for searching images.
         // Visit here to find all the view ids:
         //   https://developers.google.com/picker/docs/reference#view-id
@@ -138,12 +140,12 @@
             let views = config.views.length > 0 ? config.views : getDefaultViews();
 
             // Enable selected features.
-            for (i = 0; i < features.length; ++i) {
+            for (let i = 0; i < features.length; ++i) {
                 builder.enableFeature(features[i]);
             }
 
             // Enabled selected views.
-            for (i = 0; i < views.length; ++i) {
+            for (let i = 0; i < views.length; ++i) {
                 builder.addView(views[i]);
             }
 
