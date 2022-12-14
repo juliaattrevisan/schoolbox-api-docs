@@ -85,27 +85,24 @@
          * Ask google to setup picker
          */
         function authorize() {
-            let showBtn = config.authBtn && $(config.authBtn).hasClass('hide');
-            if (showBtn) {
-                $(config.authBtn).removeClass('hide');
-            }
-
             // This function will run when a response is received from from window.googleClientToken.requestAccessToken().
             window.googleClientToken.callback = async (response) => {
                 authResult = response;
                 if (authResult.error !== undefined) {
                     throw (authResult);
                 }
-                window.googleClientToken = authResult.access_token;
                 handleAuthResult();
             };
 
-            if (window.googleClientToken === null) {
-                // When establishing a new session, prompt the user to select a Google Account and ask for consent to share their data.
-                window.googleClientToken.requestAccessToken({prompt: 'consent'});
-            } else {
-                // When using an existing session, prompt the user to select a Google Account but no need to ask for consent to share their data.
+            if (authResult !== null) {
+                // If authorisation has already been given, prompt the user to select a Google Account only.
+                // This will happen if the Google File Selector is opened a second or subsequent time while the parent window has not been refreshed.
                 window.googleClientToken.requestAccessToken({prompt: ''});
+            } else if (config.authBtn && $(config.authBtn).hasClass('hide')) {
+                $(config.authBtn).removeClass('hide');
+            } else {
+                // If authorisation has not yet been given, prompt the user to select a Google Account and ask for consent to share their data.
+                window.googleClientToken.requestAccessToken({prompt: 'consent'});
             }
         }
 
