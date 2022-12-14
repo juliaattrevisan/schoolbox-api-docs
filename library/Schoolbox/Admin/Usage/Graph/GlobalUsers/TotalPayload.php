@@ -18,7 +18,6 @@ use Alaress\Database\Connector\IConnector;
  */
 class TotalPayload
 {
-
     /**
      * @var IConnector
      */

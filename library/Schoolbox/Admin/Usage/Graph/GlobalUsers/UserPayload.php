@@ -20,7 +20,6 @@ use Alaress\Database\Connector\IConnector;
  */
 class UserPayload
 {
-
     /**
      * @var IConnector
      */
