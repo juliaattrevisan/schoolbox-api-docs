@@ -3,6 +3,9 @@
 Aura controllers will use the [Twig](https://twig.symfony.com/) template engine
 to generate HTML content.
 
+The [MVC View](../../../../mvc/06-view.md) docs are a good place to learn more
+detailed information.
+
 ## Instantiation
 
 Usually, developers will not need access to the Twig environment directly: it is
