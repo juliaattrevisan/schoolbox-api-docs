@@ -81,6 +81,7 @@
                          * also finished loading? You can't assert that from here...
                          */
                         if (++j === config.modules.length && config.callback && config.clientId.length) {
+                            // Not sure whether this is still needed after all uses of the 'client:auth2' module were removed in SA-14475.
                             if (gapi.client !== undefined) {
                                 gapi.client.init({
                                     'client_id': config.clientId,
