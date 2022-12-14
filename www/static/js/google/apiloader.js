@@ -69,8 +69,21 @@
                 dataType: 'script',
                 cache: true
             }).then(function () {
-                for (let i = 0; i < config.modules.length; ++i) {
-                    gapi.load(config.modules[i], function () {});
+                let i, j;
+
+                for (i = 0, j = 0; i < config.modules.length; ++i) {
+                    gapi.load(config.modules[i], function () {
+                        /* run gapi.load() on every config.module element, but only execute the callback
+                         * when you're at the last config.module element; this causes callback() to occur
+                         * only once, and after gapi.load() commences
+                         *
+                         * but how do you know the first one finished loading when the last module has
+                         * also finished loading? You can't assert that from here...
+                         */
+                        if (++j === config.modules.length && config.callback && config.clientId.length) {
+                            config.callback();
+                        }
+                    });
                 }
             });
         }
