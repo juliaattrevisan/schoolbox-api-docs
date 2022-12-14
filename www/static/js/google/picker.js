@@ -85,11 +85,11 @@
          * Ask google to setup picker
          */
         function authorize() {
-            // This function will run when a response is received from from window.googleClientToken.requestAccessToken().
+            // This function will run when a response is received from window.googleClientToken.requestAccessToken().
             window.googleClientToken.callback = async (response) => {
                 authResult = response;
                 if (authResult.error !== undefined) {
-                    throw (authResult);
+                    throw authResult.error;
                 }
                 handleAuthResult();
             };
