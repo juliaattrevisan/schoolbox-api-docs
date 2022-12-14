@@ -76,7 +76,7 @@ class SystemPayload
                 'Tiles' AS label,
                 COALESCE(SUM(storage.filesize), 0) AS size
             FROM storage
-            WHERE hash in (SELECT DISTINCT background_image_hash AS hash FROM tile)";
+            WHERE hash in (SELECT background_image_hash AS hash FROM tile)";
 
         $result = $this->database->executeQuery($query);
         return $result->fetch();
@@ -88,7 +88,7 @@ class SystemPayload
                 'My Files' AS label,
                 COALESCE(SUM(storage.filesize), 0) AS size
             FROM storage
-            WHERE hash in (SELECT DISTINCT hash FROM myFile)";
+            WHERE hash in (SELECT hash FROM myFile)";
         $result = $this->database->executeQuery($query);
         return $result->fetch();
     }
@@ -98,7 +98,7 @@ class SystemPayload
                 'Pastoral' AS label,
                 COALESCE(SUM(storage.filesize), 0) AS size
             FROM storage
-            WHERE hash IN (SELECT DISTINCT hash FROM pastoral_attachment)";
+            WHERE hash IN (SELECT hash FROM pastoral_attachment)";
         $result = $this->database->executeQuery($query);
         return $result->fetch();
     }
@@ -130,7 +130,7 @@ class SystemPayload
                 'Due Work' AS label,
                 COALESCE(SUM(storage.filesize), 0) AS size
             FROM storage
-            WHERE hash IN (SELECT DISTINCT storage_id FROM submission_box_file)";
+            WHERE hash IN (SELECT storage_id FROM submission_box_file)";
         $result = $this->database->executeQuery($query);
         return $result->fetch();
     }
@@ -141,7 +141,7 @@ class SystemPayload
                 'Tasks' AS label,
                 COALESCE(SUM(storage.filesize), 0) AS size
             FROM storage
-            WHERE hash IN (SELECT DISTINCT storage_id AS hash FROM task_file)";
+            WHERE hash IN (SELECT storage_id AS hash FROM task_file)";
         $result = $this->database->executeQuery($query);
         return $result->fetch();
     }
@@ -152,7 +152,7 @@ class SystemPayload
                 'Submission Returns' AS label,
                 COALESCE(SUM(storage.filesize), 0) AS size
             FROM storage
-            WHERE hash in (SELECT DISTINCT hash FROM submission_return_file)";
+            WHERE hash in (SELECT hash FROM submission_return_file)";
         $result = $this->database->executeQuery($query);
         return $result->fetch();
     }
@@ -163,7 +163,7 @@ class SystemPayload
                 'Student Submissions' AS label,
                 COALESCE(SUM(storage.filesize), 0) AS size
             FROM storage
-            WHERE hash IN (SELECT DISTINCT hash FROM student_submission_file)";
+            WHERE hash IN (SELECT hash FROM student_submission_file)";
         $result = $this->database->executeQuery($query);
         return $result->fetch();
     }
@@ -174,7 +174,7 @@ class SystemPayload
                 'CMS Resources' AS label,
                 COALESCE(SUM(storage.filesize), 0) AS size
             FROM storage
-            WHERE hash IN (SELECT DISTINCT hash FROM file)";
+            WHERE hash IN (SELECT hash FROM file)";
         $result = $this->database->executeQuery($query);
         return $result->fetch();
     }
