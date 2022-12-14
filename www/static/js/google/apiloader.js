@@ -81,7 +81,14 @@
                          * also finished loading? You can't assert that from here...
                          */
                         if (++j === config.modules.length && config.callback && config.clientId.length) {
-                            config.callback();
+                            if (gapi.client !== undefined) {
+                                gapi.client.init({
+                                    'client_id': config.clientId,
+                                    'scope': config.scope
+                                }).then(function () {
+                                    config.callback();
+                                });
+                            }
                         }
                     });
                 }
