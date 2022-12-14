@@ -22,3 +22,5 @@ In other words: controllers should pass off actions to other components, which:
   [other inputs and outputs](../../README.md#other-inputs-and-outputs)
 - will create some sort of [HTTP response](../stdout/http-response/README.md)
   output
+  - instead of using `echo` directly, a controller action will set the
+    controller's `response` property
