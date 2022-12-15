@@ -2,8 +2,8 @@
  * Various utils related to managing curriculum nodes
  */
 
-import { Node } from '@schoolboxCurriculum/types/Node';
-import { Breadcrumb } from '@schoolboxCurriculum/types/Breadcrumb';
+import type { Node } from "@schoolboxCurriculum/types/Node";
+import type { Breadcrumb } from "@schoolboxCurriculum/types/Breadcrumb";
 
 /**
  * To indicate that a node should be invalid and unset
@@ -15,7 +15,7 @@ export const UNSET_ID = 0;
 /**
  * To sort the nodes, we store collator to for faster performance
  */
-const collator = new Intl.Collator('en', { numeric: true, sensitivity: 'base' });
+const collator = new Intl.Collator("en", { numeric: true, sensitivity: "base" });
 
 /**
  * return an empty node, usually used to indicate there's currently
@@ -30,8 +30,9 @@ export function getEmptyNode(): Node {
         description: null,
         enabled: true,
         id: UNSET_ID,
+        order: 0,
         parent: null,
-        name: '',
+        name: "",
     };
 }
 
@@ -45,7 +46,7 @@ export function getEmptyNode(): Node {
  * @returns { Node | undefined } - the found Node
  */
 export function findById(array: Node[], id: number): Node | undefined {
-    let node: Node;
+    let node: Node | undefined = undefined;
     array.forEach((item) => {
         if (item.id === id) {
             node = item;
@@ -63,15 +64,16 @@ export function findById(array: Node[], id: number): Node | undefined {
 /**
  * Node with a code take priority, then followed by those without, the name is used
  *
- * @param { object }
- * @param { object }
+ * @param { Node } aNode - the first node to compare
+ * @param { Node } bNode - the second node to compare
+ * @returns { number }
  */
-function sortNodesByCodeThenName(aNode, bNode) {
-    const aHasCode = aNode.code !== '';
-    const bHasCode = bNode.code !== '';
+function sortNodesByCodeThenName(aNode: Node, bNode: Node): number {
+    const aHasCode = aNode.code !== "";
+    const bHasCode = bNode.code !== "";
     if (aHasCode && bHasCode) {
         // if both have codes, sort by the code
-        return collator.compare(aNode.code, bNode.code);
+        return collator.compare(aNode.code as string, bNode.code as string);
     }
     if (!aHasCode && !bHasCode) {
         // if both have no code, just sort by name
@@ -83,10 +85,10 @@ function sortNodesByCodeThenName(aNode, bNode) {
 /**
  * Return the nodes sorted first by order, then code, then name
  *
- * @param { array }
- * @returns { array }
+ * @param { Node[] } nodes - the nodes to sort
+ * @returns { Node[] }
  */
-export function sortNodes(nodes) {
+export function sortNodes(nodes: Node[]): Node[] {
     const nodesWithOrder = nodes.filter((node) => node.order !== 0); // to prioritise nodes with order
     if (nodesWithOrder.length > 0) {
         nodesWithOrder.sort((aNode, bNode) => aNode.order - bNode.order); // sort ascending
@@ -111,7 +113,7 @@ export function sortNodes(nodes) {
 export function removeId(children: Node[], id: number): Node[] {
     if (children !== null) {
         // .children wont always be available if the node hasn't been loaded yet
-        return children.reduce((previousValue, currentValue) => {
+        return children.reduce((previousValue: Node[], currentValue) => {
             if (currentValue.id !== id) {
                 previousValue.push({ ...currentValue, children: removeId(currentValue.children as Node[], id) });
             }

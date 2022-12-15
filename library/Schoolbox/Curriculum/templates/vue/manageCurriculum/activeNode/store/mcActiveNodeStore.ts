@@ -12,7 +12,7 @@ import { defineStore } from "pinia";
 import { useNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/mcNodesStore";
 import { UNSET_ID, getEmptyNode, sortNodes } from "@schoolboxCurriculum/js/nodeUtils";
 import { useViewNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/viewNodes/store/mcViewNodesStore";
-import { Node, NodeToUpdate } from "@schoolboxCurriculum/types/Node";
+import type { Node, NodeToUpdate } from "@schoolboxCurriculum/types/Node";
 
 export const useActiveNodeStore = defineStore("mcActiveNode", () => {
     const node = ref<Node>(getEmptyNode()); // the currently selected node
@@ -81,9 +81,9 @@ export const useActiveNodeStore = defineStore("mcActiveNode", () => {
             sortNodes(node.value.children); // and sort again with the new node added
         }
         const viewNodesStore = useViewNodesStore();
-        if (viewNodesStore.current.id !== newNode.parent.id) {
+        if (viewNodesStore.current.id !== newNode.parent?.id) {
             // if we aren't on the new nodes level move down so we can see the new node
-            viewNodesStore.setNextSelected(newNode.parent.id);
+            viewNodesStore.setNextSelected(newNode.parent?.id as number);
         }
     }
 
