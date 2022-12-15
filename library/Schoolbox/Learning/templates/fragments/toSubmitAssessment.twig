@@ -51,8 +51,32 @@
                 <p class="meta" data-due-date>{{ dueDate.forAssessment(assessment) }}</p>
             </div>
         </div>
-        <div class="card small-4 hide-for-small-only">
-            <div
+        <!--<div class="card small-4 hide-for-small-only">-->
+        <div class="card medium-6">
+            <div class="progress-bar"
+                data-progress
+                title="{{ stats.countParticipants - stats.countResponseRequired }} of {{ stats.countParticipants }} students have {{ submitTitleSuffix }}"
+                data-title-suffix="{{ submitTitleSuffix }}"
+                data-count-total="{{ stats.countParticipants }}"
+                data-count-response-required="{{ stats.countResponseRequired }}"
+                data-count-feedback-required="{{ stats.countFeedbackRequired }}"
+                data-count-review-complete="{{ stats.countReviewComplete }}"
+            />
+                <div class="bar">
+                    <div class="meter warning" style="width: {{100 - stats.percentageResponseRequired }}%;">
+                        <div>{{100 - stats.percentageResponseRequired}}%</div>
+                    </div>
+                    <div class="meter success" style="width: {{stats.percentageReviewComplete}}%;">
+                        <div>{{stats.percentageReviewComplete}}%</div>
+                    </div>
+                </div>
+                <div class="tokens">
+                    <div class="token success">{{ stats.countReviewComplete }} MARKED</div>
+                    <div class="token neutral"> {{ stats.countParticipants - stats.countResponseRequired }} OF {{ stats.countParticipants }} {{ submitTitleSuffix }}</div>
+                    <div class="token warning"> {{ stats.countFeedbackRequired }} REQUIRE {{ markedTitleSuffix }}</div>
+                </div>
+            </div>
+            <!-- <div
                     class="progress"
                     data-progress
                     title="{{ stats.countParticipants - stats.countResponseRequired}} of {{ stats.countParticipants }} students have {{ submitTitleSuffix }}"
@@ -64,11 +88,11 @@
             >
                 <span class="meter slow" data-meter style="width:{{ 100 - stats.percentageResponseRequired }}%"></span>
                 <span class="pipe-meter slow" data-pipe style="left: {{ stats.percentageReviewComplete }}%" title="{{ stats.countFeedbackRequired }} of {{ stats.countParticipants }} students require {{ markedTitleSuffix }}" data-title-suffix="{{ markedTitleSuffix }}"></span>
-            </div>
+            </div> -->
         </div>
-        <div class="small-4 medium-2 columns text-right">
+        <!--<div class="small-4 medium-2 columns text-right">
             <p data-count-to-chase title="{{ stats.countResponseRequired }} of {{ stats.countParticipants }} students have not {{ noResultsTitleSuffix }}" data-title-suffix="{{ noResultsTitleSuffix }}"><span data-user-count>{{ stats.countResponseRequired }}</span> {{ state }}</p>
-        </div>
+        </div>-->
     </div>
     <div class="content collapsible hide" data-participant-list data-collapsable="to-chase-{{ assessment.id }}" data-collapse-state="collapsed">
         <ul class="information-list">
