@@ -23,10 +23,6 @@
             let defaults = {
                 element: element,
 
-                /* From googleapps_client_id
-                 */
-                clientId: '',
-
                 /* The url to google's api.js file
                  * We need to load their js asynchronously, which gives us access to the
                  * object "gapi" that's used everywhere else
@@ -47,7 +43,6 @@
             return $.extend(defaults, options);
         }
 
-
         /**
          * Set up the gapi global object
          */
@@ -57,16 +52,13 @@
                 dataType: 'script',
                 cache: true
             }).then(function () {
-                for (let i = 0, j = 0; i < config.modules.length; ++i) {
+                let nModulesLoaded = 0;
+                for (let i = 0; i < config.modules.length; ++i) {
                     gapi.load(config.modules[i], function () {
-                        /* run gapi.load() on every config.module element, but only execute the callback
-                         * when you're at the last config.module element; this causes callback() to occur
-                         * only once, and after gapi.load() commences
-                         *
-                         * but how do you know the first one finished loading when the last module has
-                         * also finished loading? You can't assert that from here...
+                        /* Run gapi.load() for every config.module, but only execute the callback after the last
+                         * module has loaded.  This causes callback() to be run only once.
                          */
-                        if (++j === config.modules.length && config.callback && config.clientId.length) {
+                        if (++nModulesLoaded === config.modules.length && config.callback) {
                             config.callback();
                         }
                     });
