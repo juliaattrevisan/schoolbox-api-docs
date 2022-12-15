@@ -142,7 +142,8 @@ window.googleClientToken = null; // To be filled by apiloader.js script.
     <script type="text/javascript">
         $.fn.setupGapi({
             clientId: '{{ config.googleapps_client_id }}',
-            modules: ['client:picker']
+            modules: ['client:picker'],
+            scope: 'https://www.googleapis.com/auth/drive', // See, edit, create, and delete all of your Google Drive files (see https://developers.google.com/identity/protocols/oauth2/scopes).
         });
     </script>
 {% endif %}
