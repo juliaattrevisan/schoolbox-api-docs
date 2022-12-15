@@ -12,8 +12,12 @@ use Codeception\Module\Db;
 use Codeception\TestInterface;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\Application\CliTool\Kernel;
+use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\CampusMapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Action\Mapper as PastoralActionMapper;
 use Schoolbox\Pastoral\TypeAction\Mapper as PastoralTypeActionMapper;
@@ -22,6 +26,7 @@ use Schoolbox\Pastoral\SubType\Mapper as PastoralSubtypeMapper;
 use Schoolbox\Pastoral\SubType\Model;
 use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
@@ -246,6 +251,35 @@ class Api extends \Codeception\Module
         $test = $this->getMaxValue('lu_pastoral_action', 'id');
 
         return $pastoralActionMapper->findAll();
+    }
+
+    public function createAssessment()
+    {
+        $assessmentDataSource = $this->cliKernel->get('assessmentDataSource');
+        $folderMapper         = FolderMapper::getInstance();
+        $classFolder          = $folderMapper->findByCode('DEMO1');
+        $classFolder->loadTeachers();
+        $staff   = $classFolder->getTeachers()->first();
+        $dueWork = new DueWork();
+        $dueWork
+            ->setContext($classFolder)
+            ->setTitle('Class assessment ' . $this->generateText(6))
+            ->setDescription($this->generateText(100))
+            ->setWeight(0)
+            ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_NONE)
+            ->setCreator($staff)
+            ->setMarkScheme(new Percentage())
+            ->setPublishAt(\Alaress_Date_Format::now())
+            ->setDueAt(\Alaress_Date_Format::now()->addDays(10))
+            ->setMarkVisibility(SubmissionBox::MARK_VISIBILITY_STAFF_STUDENT_PARENT);
+
+        return $assessmentDataSource->save($dueWork, $staff);
+    }
+
+    public function addReview(IAssessable $assessment)
+    {
+        $feedbackDataSource = $this->cliKernel->get('feedbackDataSource');
+
     }
 
     /**

@@ -25,7 +25,7 @@ interface IPastoralAccess
 
     public function setRole(Role $role);
 
-    public function SetGroup(\Schoolbox\Pastoral\Group\Model $group);
+    public function setGroup(\Schoolbox\Pastoral\Group\Model $group);
 
     public function setUser(User $user);
 }
