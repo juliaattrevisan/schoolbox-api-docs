@@ -63,6 +63,18 @@ class Model implements ISoftDeletable
 
 
     /**
+     * @var User|null
+     */
+    private ?User $reasonedBy = null;
+
+
+    /**
+     * @var Alaress_Date_Format|null
+     */
+    private ?Alaress_Date_Format $reasonedAt = null;
+
+
+    /**
      * @var User
      */
     private User $awardedBy;
@@ -193,6 +205,46 @@ class Model implements ISoftDeletable
     public function setReason(?string $reason): self
     {
         $this->reason = $reason;
+        return $this;
+    }
+
+
+    /**
+     * @return User|null
+     */
+    public function getReasonedBy(): ?User
+    {
+        return $this->reasonedBy;
+    }
+
+
+    /**
+     * @param User|null $reasonedBy
+     * @return static
+     */
+    public function setReasonedBy(?User $reasonedBy): self
+    {
+        $this->reasonedBy = $reasonedBy;
+        return $this;
+    }
+
+
+    /**
+     * @return Alaress_Date_Format|null
+     */
+    public function getReasonedAt(): ?Alaress_Date_Format
+    {
+        return $this->reasonedAt;
+    }
+
+
+    /**
+     * @param Alaress_Date_Format|null $reasonedAt
+     * @return static
+     */
+    public function setReasonedAt(?Alaress_Date_Format $reasonedAt): self
+    {
+        $this->reasonedAt = $reasonedAt;
         return $this;
     }
 

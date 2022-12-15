@@ -365,11 +365,13 @@ class Controller extends Base
         $badgeTranslator = $this->buildBadgeModelToArrayTranslator();
         $returnUrl       = $this->router->generate('learningBadgeAward.getAwardWithEvidence', [
             'awardId' => $award->getId(),
+            'award'   => $award,
         ]);
         $cancelUrl       = $this->request->query->get(Redirect::RETURN_URL)
             ? Redirect::decode($this->request->query->get(Redirect::RETURN_URL))
             : $this->router->generate('searchUser.getProfile', [
                 'userId' => $award->getRecipient()->getId(),
+                'user'   => $award->getRecipient(),
             ]);
 
         $this->response->content->set(
@@ -562,6 +564,7 @@ class Controller extends Base
         $userIds = $users->getPropertyValues('id');
         $histories = $this->mapper->findHistories($userIds, $badge);
         $tokenReplacer = new TokenReplacer\Student(new TokenReplacer\Simple());
+        $now = Alaress_Date_Format::now();
 
         foreach ($users as $user) {
             $award = $this->mapper->createModel()
@@ -569,8 +572,10 @@ class Controller extends Base
                 ->setBadge($badge)
                 ->setStatus($status)
                 ->setReason($tokenReplacer->replace($reason, $user))
+                ->setReasonedAt($now)
+                ->setReasonedBy($this->getUser())
                 ->setAwardedBy($this->getUser())
-                ->setAwardedAt(Alaress_Date_Format::now());
+                ->setAwardedAt($now);
             $award = $award->setExpiresAt((new ExpiryHelper())->determineExpiry($award));
 
             $history = $histories[$user->getId()];
@@ -755,21 +760,33 @@ class Controller extends Base
     /**
      * For the $award given, update its properties
      *
-     * @api GET /learning/badge/award/{awardId}/update
      * @param \Schoolbox\Learning\Badge\Award\Model $award
      * @return void
+     * @throws RouteNotFound
+     * @api GET /learning/badge/award/{awardId}/update
      */
     public function getAwardUpdate(AwardModel $award): void
     {
         $badges          = $this->badgeMapper->createCollection()->add($award->getBadge());
         $badgeTranslator = $this->buildBadgeModelToArrayTranslator();
-        $returnUrl       =
-            $this->request->query->get(Redirect::RETURN_URL) ??
-            Redirect::encode(
+
+        if ($this->request->query->get(Redirect::RETURN_URL)) {
+            $returnUrl = $this->request->query->get(Redirect::RETURN_URL);
+        } elseif ($this->getAuthorizer()->isPathAuthorizedForUser('learningBadgeAward.getAwardWithEvidence', ['awardId' => $award->getId()])) {
+            $returnUrl = Redirect::encode(
                 $this->router->generate('learningBadgeAward.getAwardWithEvidence', [
+                    'award'   => $award,
                     'awardId' => $award->getId(),
                 ])
             );
+        } else {
+            $returnUrl = Redirect::encode(
+                $this->router->generate('searchUser.getProfile', [
+                    'user'   => $award->getRecipient(),
+                    'userId' => $award->getRecipient()->getId(),
+                ])
+            );
+        }
 
         $this->response->content->set(
             $this->buildHtmlOutput(
@@ -803,7 +820,9 @@ class Controller extends Base
         $student       = $this->userMapper->findById($award->getRecipient()->getId());
         $tokenReplacer = new TokenReplacer\Student(new TokenReplacer\Simple());
         $reason        = trim($this->request->post->get('reason') ?? '');
-        $award->setReason($tokenReplacer->replace($reason, $student));
+        $award->setReason($tokenReplacer->replace($reason, $student))
+              ->setReasonedBy($this->getUser())
+              ->setReasonedAt(Alaress_Date_Format::now());
 
         $this->mapper->save($award);
 
@@ -814,6 +833,7 @@ class Controller extends Base
          */
         $redirectUrl = $this->router->generate('searchUser.getProfile', [
             'userId' => $award->getRecipient()->getId(),
+            'user'   => $award->getRecipient(),
         ]);
         if (null !== $this->request->query->get(Redirect::RETURN_URL)) {
             $redirectUrl = Redirect::decode($this->request->query->get(Redirect::RETURN_URL));
@@ -845,6 +865,8 @@ class Controller extends Base
                                     ->setRecipient($award->getRecipient())
                                     ->setBadge($award->getBadge())
                                     ->setReason($award->getReason())
+                                    ->setReasonedBy($award->getReasonedBy())
+                                    ->setReasonedAt($award->getReasonedAt())
                                     ->setStatus(AwardModel::AWARD_STATUS_ACHIEVEMENT)
                                     ->setAwardedBy($this->getUser())
                                     ->setAwardedAt(Alaress_Date_Format::now());
@@ -856,7 +878,10 @@ class Controller extends Base
         $this->mapper->save($award);
 
         $translator      = $this->buildBadgeAwardModelToArrayTranslator();
-        $data['viewUrl'] = $this->router->generate('learningBadgeAward.getAwardWithEvidence', ['awardId' => $achievement->getId()]);
+        $data['viewUrl'] = $this->router->generate('learningBadgeAward.getAwardWithEvidence', [
+            'award'   => $achievement,
+            'awardId' => $achievement->getId(),
+        ]);
         $this->response->status->setCode(201);
         $this->response->content->set(
             $this->buildJsonOutput(array_merge($translator($achievement), $data))

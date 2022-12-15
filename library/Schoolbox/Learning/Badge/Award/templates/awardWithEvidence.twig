@@ -1,12 +1,12 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(
-    [ award.recipient.fullname, routeLookupIfAuthorized('searchUser.getProfile', {userId: award.recipient.id}) ],
+    [ award.recipient.fullname, routeLookupIfAuthorized('searchUser.getProfile', {userId: award.recipient.id, uesr: award.recipient}) ],
     [ award.status | capitalize ~ ' Evidence']
 ) }}
-{% set awardedByRoute = routeLookupIfAuthorized('searchUser.getProfile', {userId: award.awardedBy.id}) %}
-{% set modifyRoute = routeLookupIfAuthorized('learningBadgeAward.getAwardUpdate', {awardId: award.id}) %}
-{% set postRoute = routeLookupIfAuthorized('learningBadgeAward.postAwardUpdate', {awardId: award.id}) %}
-{% set awardRoute = routeLookupIfAuthorized('learningBadgeAward.postAwardAchieve', {awardId: award.id}) %}
+{% set awardedByRoute = routeLookupIfAuthorized('searchUser.getProfile', {userId: award.awardedBy.id, user: award.awardedBy}) %}
+{% set modifyRoute = routeLookupIfAuthorized('learningBadgeAward.getAwardUpdate', {awardId: award.id, award: award}) %}
+{% set postRoute = routeLookupIfAuthorized('learningBadgeAward.postAwardUpdate', {awardId: award.id, award: award}) %}
+{% set awardRoute = routeLookupIfAuthorized('learningBadgeAward.postAwardAchieve', {awardId: award.id, award: award}) %}
 <script>
     $(function () {
         $('[data-delete-evidence]').click(function (e) {

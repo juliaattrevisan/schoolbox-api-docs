@@ -62,7 +62,8 @@ class Links extends AbstractLinks
         $translation['awardUpdate'] = $this->getRouteIfAuthorized(
             'learningBadgeAward.getAwardUpdate',
             [
-                'awardId' => $award->getId()
+                'awardId' => $award->getId(),
+                'award'   => $award,
             ]
         );
 

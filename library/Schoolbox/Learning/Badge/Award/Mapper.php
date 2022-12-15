@@ -49,6 +49,8 @@ class Mapper extends \Schoolbox\Mapper
         $this->joins('badge_id', \Schoolbox\Learning\Badge\Mapper::class, 'id', null, null, 'badge', 'badge');
         $this->uses('status', self::TYPE_STRING);
         $this->uses('reason', self::TYPE_STRING);
+        $this->joins('reasoned_by', UserMapper::class, 'id', null, null, 'reasonedBy', 'reasonedBy');
+        $this->uses('reasoned_at', self::TYPE_DATETIME);
         $this->joins('awarded_by', UserMapper::class, 'id', null, null, 'awardedBy', 'awardedBy');
         $this->uses('awarded_at', self::TYPE_DATETIME);
         $this->uses('expires_at', self::TYPE_DATE);

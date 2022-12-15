@@ -16,11 +16,12 @@ use Alaress\Web\Controller\Base;
 use Closure;
 use Schoolbox\Filter\Mapper as FilterMapper;
 use Schoolbox\Filter\Selection\Mapper as FilterSelectionMapper;
+use Schoolbox\Learning\Badge\Authorizer\Rule\IsAwardGoal;
+use Schoolbox\Learning\Badge\Authorizer\Rule\IsRecipient;
 use Schoolbox\Learning\Badge\Mapper as BadgeMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Role;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 class Module extends BaseModule
@@ -53,6 +54,21 @@ class Module extends BaseModule
                         $this->getExternalUser(),
                         UserMapper::getInstance(),
                         'userId'
+                    )
+                ),
+            );
+        });
+
+        // Different from above, as not allowing parent
+        $postEvidence = new Rule\LazyCallback(function () {
+            return new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Rule\HasRole(Role::STAFF),
+                    new Rule\All(
+                        new IsAwardGoal(),
+                        new IsRecipient(),
                     )
                 ),
             );
@@ -168,7 +184,7 @@ class Module extends BaseModule
             self::METHOD_GET,
             '/{awardId}/update',
             'getAwardUpdate',
-            $manageBadgesRule,
+            $postEvidence,
             Closure::fromCallable([$this, 'preloadAward'])
         );
 
@@ -178,7 +194,7 @@ class Module extends BaseModule
             self::METHOD_POST,
             '/{awardId}/update',
             'postAwardUpdate',
-            $manageBadgesRule,
+            $postEvidence,
             Closure::fromCallable([$this, 'preloadAward'])
         );
 
@@ -272,23 +288,6 @@ class Module extends BaseModule
 
 
     /**
-     * Authorizes that the only user in the URL is the current user.
-     *
-     * @param array $params
-     * @param User  $currentUser
-     */
-    private function authorizeOnlyUserIsSelf(array $params, User $currentUser): void
-    {
-        $isUserRule = new Rule\IsUser('userId');
-        // Coalesce to empty list as the preloader may have returned not found,
-        // and thus not populated $params['users']
-        foreach ($params['users'] ?? [] as $user) {
-            $isUserRule->authorize(['userId' => $user->getId()], $currentUser);
-        }
-    }
-
-
-    /**
      * Preload the requested student
      *
      * @param array $params
@@ -358,15 +357,19 @@ class Module extends BaseModule
      */
     private function preloadAward(array $params): array
     {
-        try {
-            $award = $this->getMapperFactory()
-                          ->get(Mapper::class)
-                          ->findById($params['awardId']);
-        } catch (MapperException $e) {
-            throw new \Schoolbox\Application\Exception\NotFound("No award found for id: {$params['awardId']}");
+        if (($params['award'] ?? null) instanceof Model) {
+            $award = $params['award'];
+        } else {
+            try {
+                $award = $this->getMapperFactory()
+                              ->get(Mapper::class)
+                              ->findById($params['awardId']);
+            } catch (MapperException $e) {
+                throw new \Schoolbox\Application\Exception\NotFound("No award found for id: {$params['awardId']}");
+            }
         }
         return [
-            'award' => $award,
+            'award'  => $award,
             'userId' => $award->getRecipient()->getId(),
         ];
     }
