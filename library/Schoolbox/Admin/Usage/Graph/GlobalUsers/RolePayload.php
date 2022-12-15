@@ -56,8 +56,9 @@ class RolePayload
             //if the role name does not exist, create it
             if (!isset($stack[$row['name']])) {
                 $stack[$row['name']] = [
-                    'label' => $row['name'],
-                    'size'  => 0
+                    'label'     => $row['name'],
+                    'size'      => 0,
+                    'sequence'  => $row['sequence']
                 ];
             }
             //increment the group size by the row value
@@ -69,8 +70,9 @@ class RolePayload
             //if the role name does not exist, create it
             if (!isset($stack[$row['name']])) {
                 $stack[$row['name']] = [
-                    'label' => $row['name'],
-                    'size'  => 0
+                    'label'     => $row['name'],
+                    'size'      => 0,
+                    'sequence'  => $row['sequence']
                 ];
             }
             //increment the group size by the row value
@@ -82,8 +84,9 @@ class RolePayload
             //if the role name does not exist, create it
             if (!isset($stack[$row['name']])) {
                 $stack[$row['name']] = [
-                    'label' => $row['name'],
-                    'size'  => 0
+                    'label'     => $row['name'],
+                    'size'      => 0,
+                    'sequence'  => $row['sequence']
                 ];
             }
             //increment the group size by the row value
@@ -95,13 +98,18 @@ class RolePayload
             //if the role name does not exist, create it
             if (!isset($stack[$row['name']])) {
                 $stack[$row['name']] = [
-                    'label' => $row['name'],
-                    'size'  => 0
+                    'label'     => $row['name'],
+                    'size'      => 0,
+                    'sequence'  => $row['sequence']
                 ];
             }
             //increment the group size by the row value
             $stack[$row['name']]['size'] += $row['size'];
         }
+        //sort by role sequence
+        usort($stack, function ($a, $b) {
+            return $a['sequence'] <=> $b['sequence'];
+        });
         //remove the helper labels
         return array_values($stack);
     }
@@ -165,7 +173,7 @@ class RolePayload
 
     private function getFile()
     {
-        $query = "SELECT `groups`.id, `groups`.name, SUM(`storage`.`filesize`) AS size
+        $query = "SELECT `groups`.id, `groups`.name, `groups`.sequence, SUM(`storage`.`filesize`) AS size
                  FROM `file`
                    INNER JOIN `user` ON `user`.id = `file`.owner
                    INNER JOIN `groups` ON `user`.group_id = `groups`.id
@@ -178,7 +186,7 @@ class RolePayload
 
     private function getMyFile()
     {
-        $query = "SELECT `groups`.id, `groups`.name, SUM(`storage`.`filesize`) AS size
+        $query = "SELECT `groups`.id, `groups`.name, `groups`.sequence, SUM(`storage`.`filesize`) AS size
                  FROM `myFile`
                    INNER JOIN `user` ON `user`.id = `myFile`.owner
                    INNER JOIN `groups` ON `user`.group_id = `groups`.id
@@ -191,7 +199,7 @@ class RolePayload
 
     private function getSubmissionBox()
     {
-        $query = "SELECT `groups`.id, `groups`.name, SUM(`storage`.`filesize`) AS size
+        $query = "SELECT `groups`.id, `groups`.name, `groups`.sequence, SUM(`storage`.`filesize`) AS size
                  FROM `submission_box`
                    INNER JOIN `user` ON `user`.id = `submission_box`.owner
                    INNER JOIN `groups` ON `user`.group_id = `groups`.id
@@ -204,7 +212,7 @@ class RolePayload
 
     private function getSubmissionReturn()
     {
-        $query = "SELECT `groups`.id, `groups`.name, SUM(`storage`.`filesize`) AS size
+        $query = "SELECT `groups`.id, `groups`.name, `groups`.sequence, SUM(`storage`.`filesize`) AS size
                  FROM `submission_return`
                    INNER JOIN `user` ON `user`.id = `submission_return`.owner
                    INNER JOIN `groups` ON `user`.group_id = `groups`.id
