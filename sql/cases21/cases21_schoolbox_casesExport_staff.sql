@@ -15,7 +15,6 @@ SELECT
 'Hide Timetable?' AS 'Hide Timetable?',
 'Email Address From Username?' AS 'Email Address From Username?',
 'Use External Mail Client?' AS 'Use External Mail Client?',
-'Enable Webmail Tab?' AS 'Enable Webmail Tab?',
 'Display Graph on Student Grade Card?' AS 'Display Graph on Student Grade Card?',
 'Account Enabled?' AS 'Account Enabled?',
 'Date of Birth' AS 'Date of Birth'
@@ -44,7 +43,6 @@ SF.E_MAIL AS 'Alt Email',
 '0' AS 'Hide Timetable?',
 '0' AS 'Email Address From Username?',
 '0' AS 'Use External Mail Client?',
-'0' AS 'Enable Webmail Tab?',
 '1' AS 'Display Graph on Student Grade Card?',
 '1' AS 'Account Enabled?',
 '' AS 'Date of Birth'

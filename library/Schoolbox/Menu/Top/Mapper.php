@@ -23,7 +23,6 @@ class Mapper extends BaseMapper
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('sort_order', self::TYPE_INTEGER);
-        $this->uses('webmail', self::TYPE_BOOLEAN);
         $this->uses('title', self::TYPE_STRING);
         $this->uses('text', self::TYPE_STRING);
         $this->uses('token', self::TYPE_STRING);
@@ -55,12 +54,6 @@ class Mapper extends BaseMapper
             throw new MapperException('User has no campus, and therefore has no menu');
         }
 
-        $webmail = '';
-
-        if (!$user->getWebmail()) {
-            $webmail = "AND menu_top.webmail = 0";
-        }
-
         $eportfolio = '';
 
         if (!$user->getEportfolioEnable()) {
@@ -76,7 +69,6 @@ class Mapper extends BaseMapper
                 AND menu_top_role.role_id = :roleId
                 AND menu_top.deleted_at IS NULL
                 AND menu_top.plan_hide = 0
-                {$webmail}
                 {$eportfolio}
                 ORDER BY sort_order ASC
         ";

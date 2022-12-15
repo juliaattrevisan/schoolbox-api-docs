@@ -730,7 +730,6 @@ class Controller extends Base
         $user->setHideTimetable(!empty($post['hide_timetable']));
         $user->setLocalEmail(!empty($post['local_email']));
         $user->setUseInternalMail(!empty($post['mail_handler']));
-        $user->setWebmail(!empty($post['webmail']));
         $user->setDisplayGradeGraph(!empty($post['display_grade_graph']));
         $user->setSuperuser(isset($post['superuser']));
         $user->setUsername($post['modusername']);

@@ -15,7 +15,6 @@ use Schoolbox\UserMapper;
 require __DIR__ . '/../conf/core/require.php';
 
 $app = new class extends CliTool\App {
-
     private const NUM_RECORDS = 20000;
 
     /** @inheritDoc */
@@ -36,7 +35,6 @@ $app = new class extends CliTool\App {
                                    ->setFirstname(ucfirst($role->getName() . $j))
                                    ->setRole($role)
                     ->setLocalEmail(true)
-                    ->setWebmail(false)
                     ->setUseInternalMail(true)
                     ->setEportfolioEnable(false)
                                    ->setCampusCollection($campuses);

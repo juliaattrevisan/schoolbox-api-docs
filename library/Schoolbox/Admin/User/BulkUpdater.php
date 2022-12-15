@@ -100,12 +100,6 @@ class BulkUpdater
     /**
      * @var int
      */
-    private int $webmail;
-
-
-    /**
-     * @var int
-     */
     private int $accountEnabled;
 
 
@@ -147,7 +141,6 @@ class BulkUpdater
      * @param int            $eportfolioEnabled
      * @param int            $emailFromUsername
      * @param int            $externalMailClient
-     * @param int            $webmail
      * @param int            $accountEnabled
      * @param int            $hideContacts
      * @param int            $hideTimetable
@@ -166,7 +159,6 @@ class BulkUpdater
         int $eportfolioEnabled,
         int $emailFromUsername,
         int $externalMailClient,
-        int $webmail,
         int $accountEnabled,
         int $hideContacts,
         int $hideTimetable,
@@ -203,7 +195,6 @@ class BulkUpdater
         $this->eportfolioEnabled  = $eportfolioEnabled;
         $this->emailFromUsername  = $emailFromUsername;
         $this->externalMailClient = $externalMailClient;
-        $this->webmail            = $webmail;
         $this->accountEnabled     = $accountEnabled;
         $this->hideContacts       = $hideContacts;
         $this->hideTimetable      = $hideTimetable;
@@ -490,11 +481,6 @@ class BulkUpdater
         if ($this->externalMailClient !== self::UNCHANGED) {
             $updatePlaceholder[]                    = 'mail_handler = :externalMailClient';
             $userUpdateParams['externalMailClient'] = $this->externalMailClient;
-        }
-
-        if ($this->webmail !== self::UNCHANGED) {
-            $updatePlaceholder[]         = 'webmail = :webmail';
-            $userUpdateParams['webmail'] = $this->webmail;
         }
 
         if ($this->accountEnabled !== self::UNCHANGED) {

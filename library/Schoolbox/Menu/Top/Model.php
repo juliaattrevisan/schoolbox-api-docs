@@ -35,9 +35,6 @@ class Model implements ISoftDeletable
     /** @var string */
     protected $url;
 
-    /** @var boolean */
-    protected $webmail;
-
     /** @var string */
     protected $target;
 
@@ -133,24 +130,6 @@ class Model implements ISoftDeletable
     public function getUrl()
     {
         return $this->url;
-    }
-
-    /**
-     * @param string $webmail
-     * @return self
-     */
-    public function setWebmail($webmail)
-    {
-        $this->webmail = $webmail;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getWebmail()
-    {
-        return $this->webmail;
     }
 
     /**

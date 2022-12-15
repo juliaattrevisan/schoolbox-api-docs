@@ -123,7 +123,6 @@ class User extends AbstractImporter
             'Hide Timetable?'                      => '',
             'Email Address From Username?'         => '',
             'Use External Mail Client?'            => '',
-            'Enable Webmail Tab?'                  => '',
             'Display Graph on Student Grade Card?' => '',
             'Superuser?'                           => '',
             'Account Enabled?'                     => '',
@@ -188,7 +187,6 @@ class User extends AbstractImporter
         $this->userHydrators[] = new User\Hydrator\ToggleField('Email Address From Username?', 'setLocalEmail');
         // This one might have to be inverted
         $this->userHydrators[] = new User\Hydrator\ToggleField('Use External Mail Client?', 'setUseInternalMail');
-        $this->userHydrators[] = new User\Hydrator\ToggleField('Enable Webmail Tab?', 'setWebmail');
         $this->userHydrators[] = new User\Hydrator\ToggleField('Display Graph on Student Grade Card?', 'setDisplayGradeGraph');
         // Not sure if superuser should be settable
         $this->userHydrators[] = new User\Hydrator\ToggleField('Superuser?', 'setSuperuser');

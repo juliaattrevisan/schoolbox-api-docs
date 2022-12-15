@@ -173,7 +173,6 @@ class Controller extends Base
                 (int)$params->get('ePortfolio'),
                 (int)$params->get('emailFromUserName'),
                 (int)$params->get('externalMailClient'),
-                (int)$params->get('webmail'),
                 (int)$params->get('accountEnabled'),
                 (int)$params->get('hideContacts'),
                 (int)$params->get('hideTimetable'),

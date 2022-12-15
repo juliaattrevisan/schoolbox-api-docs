@@ -74,7 +74,7 @@ class Factory
         'localEmail' => 'Email Address from Username',
         'useInternalMail' => 'Use External Mail Client',
         'enabled' => 'Schoolbox Account Enabled',
-        'webmail' => 'Enable Webmail Tab',
+
         'eportfolioEnable' => 'E-Portfolio Enabled',
         'hideContacts' => 'Hide Contact Details',
         'hideTimetable' => 'Hide Timetable',

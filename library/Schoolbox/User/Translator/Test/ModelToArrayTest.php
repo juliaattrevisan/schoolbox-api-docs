@@ -72,7 +72,6 @@ class ModelToArrayTest extends TestCase
             'yearLevel'        => null,
             'isDeleted'        => false,
             'flags'            => [
-                'showWebmailTab'         => null,
                 'showContacts'           => true,
                 'enableTimetable'        => true,
                 'showSideNav'            => true,
@@ -124,7 +123,6 @@ class ModelToArrayTest extends TestCase
             ->setYear((new YearLevel())
                 ->setId(1)
                 ->setName('Year 12'))
-            ->setWebmail(false)
             ->setHideContacts(true)
             ->setHideTimetable(true)
             ->setHideSidenav(true)
@@ -181,7 +179,6 @@ class ModelToArrayTest extends TestCase
                 ],
                 'isDeleted'        => false,
                 'flags'            => [
-                    'showWebmailTab'         => false,
                     'showContacts'           => false,
                     'enableTimetable'        => false,
                     'showSideNav'            => false,
@@ -197,7 +194,6 @@ class ModelToArrayTest extends TestCase
         // Test some individual fields
         $inverseFlags          = $emptyResponse;
         $inverseFlags['flags'] = [
-            'showWebmailTab'         => true,
             'showContacts'           => true,
             'enableTimetable'        => true,
             'showSideNav'            => true,
@@ -209,7 +205,6 @@ class ModelToArrayTest extends TestCase
         ];
         yield 'inverse flags' => [
             (clone $emptyUser)
-                ->setWebmail(true)
                 ->setHideContacts(false)
                 ->setHideTimetable(false)
                 ->setHideSidenav(false)
