@@ -6,7 +6,7 @@ import { ref, computed } from "vue";
 import { defineStore } from "pinia";
 import { useStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/manageCurriculumStore";
 import { useViewNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/viewNodes/store/mcViewNodesStore";
-import { Node } from "@schoolboxCurriculum/types/Node";
+import type { Node } from "@schoolboxCurriculum/types/Node";
 
 const MIN_QUERY_LENGTH = 2; // the amount of characters typed before the search becomes active
 export const DEBOUNCE_AMOUNT = 350; // the amount in ms to hold off on searching, to allow the user to keep typing

@@ -7,7 +7,7 @@ import { defineStore } from "pinia";
 import { useStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/manageCurriculumStore";
 import { useNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/mcNodesStore";
 import { useViewNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/viewNodes/store/mcViewNodesStore";
-import { Node } from "@schoolboxCurriculum/types/Node";
+import type { Node } from "@schoolboxCurriculum/types/Node";
 
 const UNSET_ID = -1;
 

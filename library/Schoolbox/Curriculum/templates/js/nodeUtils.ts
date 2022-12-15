@@ -46,7 +46,7 @@ export function getEmptyNode(): Node {
  * @returns { Node | undefined } - the found Node
  */
 export function findById(array: Node[], id: number): Node | undefined {
-    let node: Node | undefined = undefined;
+    let node: Node | undefined;
     array.forEach((item) => {
         if (item.id === id) {
             node = item;
@@ -66,7 +66,7 @@ export function findById(array: Node[], id: number): Node | undefined {
  *
  * @param { Node } aNode - the first node to compare
  * @param { Node } bNode - the second node to compare
- * @returns { number }
+ * @returns { number } - the number to determine sorting
  */
 function sortNodesByCodeThenName(aNode: Node, bNode: Node): number {
     const aHasCode = aNode.code !== "";
@@ -79,14 +79,20 @@ function sortNodesByCodeThenName(aNode: Node, bNode: Node): number {
         // if both have no code, just sort by name
         return collator.compare(aNode.name, bNode.name);
     }
-    return aHasCode ? -1 : bHasCode ? 1 : 0; // those with a code take precendence over those without
+    if (aHasCode) {
+        return -1;
+    }
+    if (bHasCode) {
+        return 1;
+    }
+    return 0;
 }
 
 /**
  * Return the nodes sorted first by order, then code, then name
  *
  * @param { Node[] } nodes - the nodes to sort
- * @returns { Node[] }
+ * @returns { Node[] } - the sorted nodes
  */
 export function sortNodes(nodes: Node[]): Node[] {
     const nodesWithOrder = nodes.filter((node) => node.order !== 0); // to prioritise nodes with order
@@ -118,7 +124,7 @@ export function removeId(children: Node[], id: number): Node[] {
                 previousValue.push({ ...currentValue, children: removeId(currentValue.children as Node[], id) });
             }
             return previousValue;
-        }, []) as Node[];
+        }, []);
     }
     return children;
 }
@@ -134,7 +140,8 @@ export function getBreadcrumbs(node: Node, currentBreadcrumbs: Breadcrumb[]): Br
     if (node.parent !== null) {
         // if there's a parent to use as a breadcrumb
         let breadcrumbs = [{ id: node.parent.id, name: node.parent.name }, ...currentBreadcrumbs]; // add it in to the front of the list
-        return (breadcrumbs = getBreadcrumbs(node.parent, breadcrumbs)); // and then check the next node up the list
+        breadcrumbs = getBreadcrumbs(node.parent, breadcrumbs);
+        return breadcrumbs; // and then check the next node up the list
     }
     // otherwise we must be at the top of the breadcrumb list
     return currentBreadcrumbs; // so we can return now

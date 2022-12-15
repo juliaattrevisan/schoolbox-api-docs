@@ -30,31 +30,6 @@ export const useEnableNodesStore = defineStore("mcEnableNodes", () => {
     }
 
     /**
-     * node enable/disable has been confirmed so notify the backend
-     * and update the frontend to match
-     *
-     * @todo - more extensive error checking needs to occur
-     */
-    async function enable() {
-        try {
-            isProcessing.value = true;
-            const nodeEnables = await Promise.all(getFetches());
-            const enableResponses = nodeEnables.map((response) => response.ok);
-            const isAllResponsesOk = enableResponses.every((response) => response === true);
-            if (isAllResponsesOk) {
-                const successMessage = getSuccessMessage();
-                useSelectedNodesStore().enableNodes();
-                isProcessing.value = false;
-                cancel();
-                return successMessage;
-            }
-            throw new Error();
-        } catch (error) {
-            console.warn(error);
-        }
-    }
-
-    /**
      * To delete all the marked nodes in parallel
      * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all
      *
@@ -89,6 +64,31 @@ export const useEnableNodesStore = defineStore("mcEnableNodes", () => {
         const nodeSingleOrPlural = `Node${selectedNodesStore.count > 1 ? "s" : ""}`;
         const enabledOrDisabled = `${selectedNodesStore.nodes[0].enabled ? "disabled" : "enabled"}`;
         return `${nodeSingleOrPlural} successfully ${enabledOrDisabled}`;
+    }
+
+    /**
+     * node enable/disable has been confirmed so notify the backend
+     * and update the frontend to match
+     *
+     * @todo - more extensive error checking needs to occur
+     */
+    async function enable() {
+        try {
+            isProcessing.value = true;
+            const nodeEnables = await Promise.all(getFetches());
+            const enableResponses = nodeEnables.map((response) => response.ok);
+            const isAllResponsesOk = enableResponses.every((response) => response === true);
+            if (isAllResponsesOk) {
+                const successMessage = getSuccessMessage();
+                useSelectedNodesStore().enableNodes();
+                isProcessing.value = false;
+                cancel();
+                return successMessage;
+            }
+            throw new Error();
+        } catch (error) {
+            console.warn(error);
+        }
     }
 
     return {

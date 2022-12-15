@@ -83,7 +83,7 @@ export const useActiveNodeStore = defineStore("mcActiveNode", () => {
         const viewNodesStore = useViewNodesStore();
         if (viewNodesStore.current.id !== newNode.parent?.id) {
             // if we aren't on the new nodes level move down so we can see the new node
-            viewNodesStore.setNextSelected(newNode.parent?.id as number);
+            await viewNodesStore.setNextSelected(newNode.parent?.id as number);
         }
     }
 
