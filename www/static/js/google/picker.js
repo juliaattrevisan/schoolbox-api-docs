@@ -153,7 +153,7 @@
                 .build();
             picker.setVisible(true);
 
-            if (config.containerID) { // If the container exists, move the picker into the empty container and ensure the picker sits at the top left.
+            if (config.containerID && picker.De !== undefined) { // If the container exists, move the picker into the empty container and ensure the picker sits at the top left.
                 picker.De.style.left = '0px';
                 picker.De.style.top = '0px';
                 picker.De.style.width = '100%'; // Ensure it sits within the boundaries of the parent modal.
