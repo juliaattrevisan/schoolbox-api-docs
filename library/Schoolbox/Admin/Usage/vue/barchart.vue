@@ -195,7 +195,7 @@ export default {
         </template>
         <template v-else>
             <highcharts :options="chartOptions"></highcharts>
-            <div>Last Generated: {{ this.allData.time }}</div>
+            <div class="meta"> ^ Last Generated: {{ this.allData.time }}</div>
         </template>
     </div>
 </template>
