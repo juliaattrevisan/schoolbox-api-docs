@@ -131,6 +131,10 @@ export default {
      */
     methods: {
 
+        lastGen() {
+            return dayjs.unix(this.allData.time).fromNow();
+        },
+
         /**
          * Fetch payload asynchronously
          *
@@ -206,7 +210,7 @@ export default {
                 </template>
                 <template #afterTable>
                     <div class="VueTables__table-footer" ref="tableFooter"></div>
-                    <div class="meta"> ^ Last Generated: {{ this.allData.time }}</div>
+                    <div class="meta"> ^ Last Generated: {{ lastGen() }}</div>
                 </template>
             </v-client-table>
         </template>

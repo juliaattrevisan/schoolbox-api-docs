@@ -85,6 +85,9 @@ export default {
      * other ordinary javascript that you might have written before.
      */
     methods: {
+        lastGen() {
+            return dayjs.unix(this.allData.time).fromNow();
+        },
 
         /**
          * Display the chart once the data has been loaded
@@ -195,7 +198,7 @@ export default {
         </template>
         <template v-else>
             <highcharts :options="chartOptions"></highcharts>
-            <div class="meta"> ^ Last Generated: {{ this.allData.time }}</div>
+            <div class="meta"> ^ Last Generated: {{ lastGen() }}</div>
         </template>
     </div>
 </template>
