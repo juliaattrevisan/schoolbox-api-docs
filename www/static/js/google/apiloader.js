@@ -27,11 +27,6 @@
                  */
                 clientId: '',
 
-                /* Scope
-                 * List of scopes: https://developers.google.com/identity/protocols/oauth2/scopes
-                 */
-                scope: '',
-
                 /* The url to google's api.js file
                  * We need to load their js asynchronously, which gives us access to the
                  * object "gapi" that's used everywhere else

@@ -24,7 +24,6 @@
         $.fn.setupGapi({
             clientId: '{{ config.googleapps_client_id }}',
             modules: ['client'], // NOTE: gapi.client will not exist unless we load the 'client' module.
-            scope: 'https://www.googleapis.com/auth/drive', // See, edit, create, and delete all of your Google Drive files (see https://developers.google.com/identity/protocols/oauth2/scopes).
             callback: function () {
                 $('#google-file-content').googlePicker({
                     clientId: '{{ config.googleapps_client_id }}',
