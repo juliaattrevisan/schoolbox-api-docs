@@ -15,7 +15,7 @@ use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\MapperProxy as DueWorkFeedbackMapperProxy;
-use Schoolbox\Learning\Assessment\DueWork\Feedback\Translator\ModelToArray\Factory;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\Translator\ModelToArray\Factory as DueWorkFeedbackTranslatorFactory;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Badge\Award\Mapper as BadgeAwardMapper;
 use Schoolbox\Learning\Badge\Award\Translator\ModelToArray\Factory as BadgeAwardTranslatorFactory;
@@ -112,7 +112,7 @@ class Controller extends Base
                 $this->getUser(),
                 $prefixGenerator,
             ))->build(),
-            (new Factory(
+            (new DueWorkFeedbackTranslatorFactory(
                 $this->router,
                 $this->authorizer,
                 $this->getUser(),

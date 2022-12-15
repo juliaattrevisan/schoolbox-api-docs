@@ -25,13 +25,13 @@ class AssessmentForFeed
         return [
             'id'               => $assessment->getId(),
             'title'            => $assessment->getTitle(),
-            'publishedAt'      => $assessment->getPublishAt()->getUsingFormat(DATE_ATOM),
-            'openAt'           => $assessment->getOpenAt()->getUsingFormat(DATE_ATOM),
-            'dueAt'            => $assessment->getDueAt()->getUsingFormat(DATE_ATOM),
-            'closeAt'          => $assessment->getCloseAt()->getUsingFormat(DATE_ATOM),
+            'publishedAt'      => $assessment->getPublishAt()?->getUsingFormat(DATE_ATOM),
+            'openAt'           => $assessment->getOpenAt()?->getUsingFormat(DATE_ATOM),
+            'dueAt'            => $assessment->getDueAt()?->getUsingFormat(DATE_ATOM),
+            'closeAt'          => $assessment->getCloseAt()?->getUsingFormat(DATE_ATOM),
             'weight'           => $assessment->getWeight(),
             'sequence'         => $assessment->getSequence(),
-            'workType'         => $assessment->getWorkType()->getName(),
+            'workType'         => $assessment->getWorkType()?->getName(),
         ];
     }
 }

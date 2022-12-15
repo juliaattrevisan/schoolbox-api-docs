@@ -289,10 +289,14 @@ class Cursor implements ICursor
 
         if ($filterWorkType) {
             $dueWorkFeedbackQuery .= '
-                AND `assessment`.`work_type_id`
+                AND (
+                 `assessment`.`work_type_id` IS NULL
+                 OR
+                 `assessment`.`work_type_id`
                  IN (SELECT `id` FROM `lu_work_type`
                                 WHERE `staff_or_instructor_visible_only` = 0
-                                  AND `deleted_at` IS NULL)';
+                                  AND `deleted_at` IS NULL)
+                )';
         }
 
         $params['userIdDueWorkFeedback'] = $this->viewee->getId();
