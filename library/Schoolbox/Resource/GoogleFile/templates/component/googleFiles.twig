@@ -9,9 +9,6 @@
  # @param Folder\Model $folder  The current homepage instance
 #}
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/google/apiloader.js?v={{ config.site_version }}"></script>
-<script type="text/javascript">
-window.googleClientToken = null; // To be filled by apiloader.js script.
-</script>
 {% if googleFiles is empty %}
     <div class="empty-state">
         <i class="icon-google-drive"></i>

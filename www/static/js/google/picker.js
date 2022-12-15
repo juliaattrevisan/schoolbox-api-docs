@@ -85,8 +85,16 @@
          * Ask google to setup picker
          */
         function authorize() {
+            // The google.accounts.oauth2 variable comes from https://accounts.google.com/gsi/client.
+            let googleClientToken = window.google.accounts.oauth2.initTokenClient({
+                client_id: '9783556777-4tkb8q7q2vm6bafk2cul5gaofdcvis2a.apps.googleusercontent.com',
+                scope: 'https://www.googleapis.com/auth/drive', // See, edit, create, and delete all of your Google Drive files (see https://developers.google.com/identity/protocols/oauth2/scopes).
+                callback: (response) => {
+                },
+            });
+
             // This function will run when a response is received from window.googleClientToken.requestAccessToken().
-            window.googleClientToken.callback = async (response) => {
+            googleClientToken.callback = async (response) => {
                 authResult = response;
                 if (authResult.error !== undefined) {
                     throw authResult.error;
@@ -98,7 +106,7 @@
                 // If the auth button is hidden, show the button so the user can click to authorise access to Google files.
                 $(config.authBtn).removeClass('hide');
             } else {
-                window.googleClientToken.requestAccessToken({prompt: ''}); // Setting prompt to blank tells Google to prompt for authorisation only if necessary.
+                googleClientToken.requestAccessToken({prompt: ''}); // Setting prompt to blank tells Google to prompt for authorisation only if necessary.
             }
         }
 

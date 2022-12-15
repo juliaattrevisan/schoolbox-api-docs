@@ -57,14 +57,6 @@
          * Set up the gapi global object
          */
         function setup() {
-            // The google.accounts.oauth2 variable comes from https://accounts.google.com/gsi/client (included in templates/core/homepage/index.html).
-            window.googleClientToken = google.accounts.oauth2.initTokenClient({
-                client_id: config.clientId,
-                scope: config.scope,
-                callback: (response) => {
-                },
-            });
-
             $.ajax({
                 url: config.url,
                 dataType: 'script',

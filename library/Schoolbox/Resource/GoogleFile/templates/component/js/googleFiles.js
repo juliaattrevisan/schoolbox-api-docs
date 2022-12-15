@@ -45,6 +45,7 @@ $('#find-files').on('click', function () {
 });
 
 $('#find-files').googlePicker({
+    clientId: $('#googleFiles').attr('data-client-id'),
     containerID: '#gfile-step0',
     mimeTypes: [
         'application/msword',
@@ -158,6 +159,7 @@ $(`#component${componentId} [data-action="delete"]`).on('click', function (event
     });
 });
 $(`#component${componentId} [data-action="permission"]`).googlePicker({
+    clientId: $('#googleFiles').attr('data-client-id'),
     onAuth: function () {
         $('[data-action="continue"]').removeAttr('disabled');
         $('[data-action="share"]').removeAttr('disabled');
