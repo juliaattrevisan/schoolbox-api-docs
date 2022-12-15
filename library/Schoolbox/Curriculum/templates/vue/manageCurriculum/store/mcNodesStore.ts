@@ -212,7 +212,7 @@ export const useNodesStore = defineStore("mcNodes", () => {
      */
     function addNewCurriculum(curriculum: Node) {
         nodes.value?.children?.push(curriculum);
-        sortNodes(nodes.value?.children as Node[]);
+        nodes.value.children = sortNodes(nodes.value.children as Node[]);
     }
 
     /**
@@ -224,10 +224,10 @@ export const useNodesStore = defineStore("mcNodes", () => {
         if (node.parent) {
             // sort via the parent node
             const parentNode = findById(nodes.value?.children as Node[], node.parent.id) as Node;
-            sortNodes(parentNode.children as Node[]);
+            parentNode.children = sortNodes(parentNode.children as Node[]);
         } else {
             // otherwise sort on the children
-            sortNodes(nodes.value?.children as Node[]);
+            nodes.value.children = sortNodes(nodes.value.children as Node[]);
         }
     }
 
