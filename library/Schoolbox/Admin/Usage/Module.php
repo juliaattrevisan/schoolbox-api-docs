@@ -62,6 +62,7 @@ class Module extends BaseModule
         $this->register('GET', '/total', 'getTotalPayload', $getPerms);
         $this->register('GET', '/user', 'getUserPayload', $getPerms);
         $this->register('GET', '/type', 'getFileTypePayload', $getPerms);
+        $this->register('POST', '/regenerate', 'postRegenerateUsage', $getPerms);
 
         /* Specific Usage payload endpoints
          */
