@@ -179,6 +179,33 @@
             }
         }
 
+       {# There is an annoying glitch that clicking a checkbox doesn't actually update the 'checked' markup #}
+       {# and so when we add a new role to the table some Javascript somewhere goes and updates the state #}
+       {# of the radio buttons to whichever value was 'checked' on page load. So, we need to update the #}
+       {# check attribute in the DOM for all radio buttons in the clicked group #}
+        function updateRadioButtons (row) {
+            $(row).find('.radio-label').click(function () {
+                let clickedElement = $("#" + $(this).attr('for'));
+                let radioGroupSelector = 'input[name*="' + clickedElement.attr('name') + '"]';
+                {# Uncheck all radio buttons in the group #}
+                $(radioGroupSelector).removeAttr('checked');
+                {# Check the one that was clicked #}
+                clickedElement.attr('checked', 'true');
+                // hide comment box for denied permission
+                let commentCheckBoxLabel = clickedElement.closest('tr').find('.checkbox-label');
+                if (clickedElement.val() === '0') {
+                    commentCheckBoxLabel.hide();
+                    $('#'+commentCheckBoxLabel.attr('for')).prop('checked', false);
+                } else {
+                    commentCheckBoxLabel.show();
+                    if (commentCheckBoxLabel.hasClass('hide')) {
+                        commentCheckBoxLabel.removeClass('hide');
+                    }
+                }
+            });
+        }
+
+        updateRadioButtons('#table-permission');
         updateVisibility();
     </script>
 

@@ -51,7 +51,7 @@
                     <td class="small-2 checklist">
                         <input type="checkbox" name="groupComment{{ userAccess.group.id }}" id="groupComment{{ userAccess.group.id }}"
                                value="1" checked="checked" readonly="readonly" data-always-read-only="1">
-                        <label class="checkbox-label" for="groupComment{{ userAccess.group.id }}"></label>
+                        <label class="checkbox-label {{ userAccess.access == 0 ? 'hide' : ''}}" for="groupComment{{ userAccess.group.id }}"></label>
                     </td>
                     {% endif %}
                     <td class="text-right small-1">
@@ -91,24 +91,6 @@
             {# Setup click events #}
 
             function updateGroupPermissionsClick() {
-                {# There is an annoying glitch that clicking a checkbox doesn't actually update the 'checked' markup #}
-                {# and so when we add a new role to the table some Javascript somewhere goes and updates the state #}
-                {# of the radio buttons to whichever value was 'checked' on page load. So, we need to update the #}
-                {# check attribute in the DOM for all radio buttons in the clicked group #}
-
-                $('#table-permission').find('.radio-label').click(function() {
-                    var clickedElement = $("#" + $(this).attr('for'));
-                    var radioGroupSelector = 'input[name*="' + clickedElement.attr('name') + '"]';
-
-                    {# Uncheck all radio buttons in the group #}
-
-                    $(radioGroupSelector).removeAttr('checked');
-
-                    {# Check the one that was clicked #}
-
-                    $(clickedElement).attr('checked', 'true');
-                });
-
                 $('[data-delete-visibility="group"]').click(function (e) {
                     e.preventDefault();
 
@@ -186,6 +168,7 @@
                     commentCheckbox.attr('readonly', 'readonly');
                     html.replace(/{ALWAYS_READONLY}/g, 1);
 
+                    updateRadioButtons('[data-group-id="' + groupId + '"]');
                     applyLock(['groups'], locked);
                     //Check the correct box
                     let selector = 'input[name = "group['+groupId+']"][value ="'+permission+'"]';

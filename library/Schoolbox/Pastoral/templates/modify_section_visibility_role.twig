@@ -63,7 +63,7 @@
                         <td class="small-2 checklist">
                             <input type="checkbox" name="roleComment{{ roleId }}" id="roleComment{{ roleId }}"
                                    value="1" {{ checkedComment }} {{ readonly }} data-always-read-only="{{ alwaysReadOnly }}">
-                            <label class="checkbox-label" for="roleComment{{ roleId }}"></label>
+                            <label class="checkbox-label {{ userAccess.access == 0 ? 'hide' : ''}}" for="roleComment{{ roleId }}"></label>
                         </td>
                         <td class="text-right small-1">
                             <a href="#" data-delete-visibility="role" class="icon-delete"></a>
@@ -147,25 +147,6 @@
             {# Setup click events #}
 
             function updateRolePermissionsClick() {
-
-                {# There is an annoying glitch that clicking a checkbox doesn't actually update the 'checked' markup #}
-                {# and so when we add a new role to the table some Javascript somewhere goes and updates the state #}
-                {# of the radio buttons to whichever value was 'checked' on page load. So, we need to update the #}
-                {# check attribute in the DOM for all radio buttons in the clicked group #}
-
-                $('#table-permission').find('.radio-label').click(function() {
-                    var clickedElement = $("#" + $(this).attr('for'));
-                    var radioGroupSelector = 'input[name*="' + clickedElement.attr('name') + '"]';
-
-                    {# Uncheck all radio buttons in the group #}
-
-                    $(radioGroupSelector).removeAttr('checked');
-
-                    {# Check the one that was clicked #}
-
-                    $(clickedElement).attr('checked', 'true');
-                });
-
                 $('[data-delete-visibility="role"]').click(function (e) {
                     e.preventDefault();
 
@@ -235,7 +216,11 @@
                         .replace(/{TYPE_NAME}/g, 'Role')
                         .replace(/{NAME}/g, roleName)
                         .replace(/{ID}/g, roleId);
-
+                    if (roleId !== 'role-type-parent' && roleId !== 'role-type-student') {
+                        html.replace(/{ALWAYS_READONLY}/g, 1);
+                    } else {
+                        html.replace(/{ALWAYS_READONLY}/g, 0);
+                    }
                     window.rolesAdded.push(roleId);
 
                     let permissionListRoles = $('#permission-roles');
@@ -246,15 +231,14 @@
                     if (roleId !== 'role-type-parent' && roleId !== 'role-type-student') {
                         commentCheckbox.attr('checked', 'checked');
                         commentCheckbox.attr('readonly', 'readonly');
-                        html.replace(/{ALWAYS_READONLY}/g, 1);
                     } else if (commentsAllowed) {
                         commentCheckbox.attr('checked', 'checked');
-                        html.replace(/{ALWAYS_READONLY}/g, 0);
                     }
 
                     //Check the correct box
                     let selector = 'input[name = "role['+roleId+']"][value ="'+permission+'"]';
                     permissionListRoles.find(selector).attr("checked", "checked");
+                    updateRadioButtons('[data-role-id="' + roleId + '"]', commentCheckbox);
                     applyLock(['roles'], locked);
                 }
 

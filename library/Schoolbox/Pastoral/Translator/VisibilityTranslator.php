@@ -39,6 +39,9 @@ class VisibilityTranslator
         $className   = $this->class;
         $accesses    = new GenericCollection($className);
         $emptyAccess = new $className();
+        if (!$emptyAccess instanceof IPastoralAccess) {
+            throw new \UnexpectedValueException('Only IPastoralAccess is supported');
+        }
         if ($emptyAccess instanceof PastoralAudience) {
             if ($type instanceof \Schoolbox\Pastoral\Type\Model) {
                 $emptyAccess->setType($type);
@@ -51,16 +54,12 @@ class VisibilityTranslator
             $allowedRoles     = $this->pastoralAccessMapper->determineAllowedRoles();
             $allowedRoleTypes = $this->pastoralAccessMapper->determineAllowedRoleTypes();
             foreach ($post->get('role') as $roleId => $accessLevel) {
-                $accessLevel = (int)$accessLevel;
-                if (!in_array($accessLevel, $this->pastoralAccessMapper::ACCESSES)) {
-                    throw new SchoolboxException(sprintf("Invalid access provided for role %s: %s", $roleId, $accessLevel));
-                }
-                $access = clone $emptyAccess;
-                if (!$access instanceof IPastoralAccess) {
-                    throw new \UnexpectedValueException('Only IPastoralAccess is supported');
-                }
-                $access->setAccess($accessLevel);
-                $access->setCommentsAllowed($post->getBool("roleComment{$roleId}", false));
+                $access = self::getBaseAccess(
+                    $emptyAccess,
+                    $post->getInt("roleAccessId{$roleId}"),
+                    (int)$accessLevel,
+                    $post->getBool("roleComment{$roleId}", false)
+                );
 
                 // Is this a role or a role type?
                 if (preg_match('/^role-type-(?P<roleType>.*)$/', (string)$roleId, $matches)) {
@@ -76,9 +75,6 @@ class VisibilityTranslator
                         throw new SchoolboxException("Invalid role id: $roleId");
                     }
                 }
-                if ($post->getInt("roleAccessId{$roleId}")) {
-                    $access->setId($post->getInt("roleAccessId{$roleId}"));
-                }
                 $accesses->add($access);
             }
         }
@@ -87,20 +83,16 @@ class VisibilityTranslator
         if (is_array($post->get('group'))) {
             $groups = $this->pastoralGroupMapper->findByColumn('id', array_keys($post->get('group')))->indexBy('id');
             foreach ($post->get('group') as $groupId => $accessLevel) {
-                $accessLevel = (int)$accessLevel;
-                if (!in_array($accessLevel, $this->pastoralAccessMapper::ACCESSES)) {
-                    throw new SchoolboxException(sprintf('Invalid access provided for pastoral group %s: %s', $groupId, $accessLevel));
-                }
                 if (!isset($groups[$groupId])) {
                     throw new SchoolboxException("Invalid pastoral group id: $groupId");
                 }
-                $access = clone $emptyAccess;
-                $access->setAccess($accessLevel);
+                $access = self::getBaseAccess(
+                    $emptyAccess,
+                    $post->getInt("groupAccessId{$groupId}"),
+                    (int)$accessLevel,
+                    $post->getBool("groupComment{$groupId}", false)
+                );
                 $access->setGroup($groups[$groupId]);
-                $access->setCommentsAllowed($post->getBool("groupComment{$groupId}", false));
-                if ($post->getInt("groupAccessId{$groupId}")) {
-                    $access->setId($post->getInt("groupAccessId{$groupId}"));
-                }
                 $accesses->add($access);
             }
         }
@@ -109,24 +101,41 @@ class VisibilityTranslator
         if (is_array($post->get('user'))) {
             $users = $this->userMapper->findByColumn('id', array_keys($post->get('user')))->indexBy('id');
             foreach ($post->get('user') as $userId => $accessLevel) {
-                $accessLevel = (int)$accessLevel;
-                if (!in_array($accessLevel, $this->pastoralAccessMapper::ACCESSES)) {
-                    throw new SchoolboxException(sprintf("Invalid access provided for pastoral user %s: %s", $userId, $accessLevel));
-                }
                 if (!isset($users[$userId])) {
                     throw new SchoolboxException("Invalid user id: $userId");
                 }
-                $access = clone $emptyAccess;
-                $access->setAccess($accessLevel);
-                $access->setCommentsAllowed($post->getBool("userComment{$userId}", false));
+                $access = self::getBaseAccess(
+                    $emptyAccess,
+                    $post->getInt("userAccessId{$userId}"),
+                    (int)$accessLevel,
+                    $post->getBool("userComment{$userId}", false)
+                );
                 $access->setUser($users[$userId]);
-                if ($post->getInt("userAccessId{$userId}")) {
-                    $access->setId($post->getInt("userAccessId{$userId}"));
-                }
                 $accesses->add($access);
             }
         }
 
         return $accesses;
+    }
+
+    /**
+     * @param IPastoralAccess $emptyAccess
+     * @param int|null        $id
+     * @param int             $accessLevel
+     * @param bool            $commentAllowed
+     * @return IPastoralAccess
+     */
+    private static function getBaseAccess(IPastoralAccess $emptyAccess, ?int $id, int $accessLevel, bool $commentAllowed): IPastoralAccess
+    {
+        if (!in_array($accessLevel, Mapper::ACCESSES)) {
+            throw new SchoolboxException(sprintf("Invalid access %s provided", $accessLevel));
+        }
+        $access = clone $emptyAccess;
+        $access->setAccess($accessLevel);
+        $access->setCommentsAllowed($accessLevel === Mapper::ACCESS_DENY ? false : $commentAllowed);
+        if ($id) {
+            $access->setId($id);
+        }
+        return $access;
     }
 }
