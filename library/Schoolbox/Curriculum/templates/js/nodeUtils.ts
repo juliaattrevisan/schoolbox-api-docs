@@ -79,7 +79,7 @@ function sortNodesByCodeThenName(aNode: Node, bNode: Node): number {
         // if both have no code, just sort by name
         return collator.compare(aNode.name, bNode.name);
     }
-    return aHasCode ? -1 : bHasCode ? 1 : 0; // those with a code take precendence over those without
+    // those with a code take precendence over those without
     if (aHasCode) {
         return -1;
     }
