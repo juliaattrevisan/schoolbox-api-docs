@@ -214,7 +214,8 @@ class Controller extends Base
     }
 
     /**
-     *
+     * clear the current usage cache and regenerate the cache
+     * no response data... unless there are exceptions
      */
     public function postRegenerateUsage(): void
     {
