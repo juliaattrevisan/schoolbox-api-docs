@@ -133,11 +133,11 @@
 
         function updateVisibility() {
 
-            var found = 0;
+            let found = 0;
 
             {# Roles #}
 
-            var tableRoles = $("#permission-roles");
+            let tableRoles = $("#permission-roles");
 
             if (tableRoles.find('tr').length === 0) {
                 tableRoles.addClass('hide');
@@ -148,7 +148,7 @@
 
             {# Groups #}
 
-            var tableGroups = $("#permission-groups");
+            let tableGroups = $("#permission-groups");
 
             if (tableGroups.find('tr').length === 0) {
                 tableGroups.addClass('hide');
@@ -159,7 +159,7 @@
 
             {# Users #}
 
-            var tableUsers = $("#permission-users");
+            let tableUsers = $("#permission-users");
 
             if (tableUsers.find('tr').length === 0) {
                 tableUsers.addClass('hide');
@@ -179,11 +179,39 @@
             }
         }
 
+        /**
+         * @param commentCheckbox element - Checkbox element
+         * @param alwaysReadOnly bool - Whether always read only - true for staff
+         * @param commentsAllowed bool - Whether comments allowed
+         * @param permission int - Deny, General, General + Confidential
+         */
+        function initCommentCheckbox(commentCheckbox, alwaysReadOnly, commentsAllowed, permission)
+        {
+            let commentCheckboxLabel = $("label[for='" + commentCheckbox.attr('id') +"']");
+            if (alwaysReadOnly) {
+                commentCheckbox.attr('checked', 'checked');
+                commentCheckbox.attr('readonly', 'readonly');
+                commentCheckbox.attr('data-always-read-only', 1);
+                if (permission === '0') {
+                    commentCheckboxLabel.hide();
+                }
+            } else {
+                if (commentsAllowed) {
+                    commentCheckbox.attr('checked', 'checked');
+                }
+                commentCheckbox.attr('data-always-read-only', 0);
+                if (permission === '0') {
+                    commentCheckbox.prop('checked', false);
+                    commentCheckboxLabel.hide();
+                }
+            }
+        }
+
        {# There is an annoying glitch that clicking a checkbox doesn't actually update the 'checked' markup #}
        {# and so when we add a new role to the table some Javascript somewhere goes and updates the state #}
        {# of the radio buttons to whichever value was 'checked' on page load. So, we need to update the #}
        {# check attribute in the DOM for all radio buttons in the clicked group #}
-        function updateRadioButtons (row) {
+        function setRadioButtonListener (row) {
             $(row).find('.radio-label').click(function () {
                 let clickedElement = $("#" + $(this).attr('for'));
                 let radioGroupSelector = 'input[name*="' + clickedElement.attr('name') + '"]';
@@ -192,20 +220,23 @@
                 {# Check the one that was clicked #}
                 clickedElement.attr('checked', 'true');
                 // hide comment box for denied permission
-                let commentCheckBoxLabel = clickedElement.closest('tr').find('.checkbox-label');
+                let commentCheckboxLabel = clickedElement.closest('tr').find('.checkbox-label');
+                let commentCheckbox = $('#' + commentCheckboxLabel.attr('for'));
                 if (clickedElement.val() === '0') {
-                    commentCheckBoxLabel.hide();
-                    $('#'+commentCheckBoxLabel.attr('for')).prop('checked', false);
+                    commentCheckboxLabel.hide();
+                    if (commentCheckbox.attr('data-always-read-only') === '0') {
+                        commentCheckbox.prop('checked', false);
+                    }
                 } else {
-                    commentCheckBoxLabel.show();
-                    if (commentCheckBoxLabel.hasClass('hide')) {
-                        commentCheckBoxLabel.removeClass('hide');
+                    commentCheckboxLabel.show();
+                    if (commentCheckboxLabel.hasClass('hide')) {
+                        commentCheckboxLabel.removeClass('hide');
                     }
                 }
             });
         }
 
-        updateRadioButtons('#table-permission');
+        setRadioButtonListener('#table-permission');
         updateVisibility();
     </script>
 
@@ -258,7 +289,7 @@
             </td>
             {% if not reportPage %}
             <td class="small-{{ colsize }} checklist">
-                <input type="checkbox" name="{{ accessType }}Comment{ID}" id="{{ accessType }}Comment{ID}" value="1" data-always-read-only="{ALWAYS_READONLY}">
+                <input type="checkbox" name="{{ accessType }}Comment{ID}" id="{{ accessType }}Comment{ID}" value="1">
                 <label class="checkbox-label" for="{{ accessType }}Comment{ID}"></label>
             </td>
             {% endif %}

@@ -107,22 +107,20 @@
                         .replace(/{ROLE}/g, user.role);
 
                     let permissionListUsers = $('#permission-users');
-                    permissionListUsers.html(permissionListUsers.html() + html);
+                    permissionListUsers.append(html);
 
                     let commentCheckbox = $('#userComment' + user.id);
-                    if (user.roleType !== 'parent' && user.roleType !== 'student') {
-                        commentCheckbox.attr('checked', 'checked');
-                        commentCheckbox.attr('readonly', 'readonly');
-                        html.replace(/{ALWAYS_READONLY}/g, 1);
-                    } else if (commentsAllowed) {
-                        commentCheckbox.attr('checked', 'checked');
-                        html.replace(/{ALWAYS_READONLY}/g, 0);
-                    }
+                    initCommentCheckbox(
+                            commentCheckbox,
+                            user.roleType === 'staff',
+                            commentsAllowed,
+                            permission
+                    );
 
                     //Check the correct box
                     let selector = 'input[name = "user['+user.id+']"][value ="'+permission+'"]';
                     $(permissionListUsers).find(selector).attr("checked", "checked");
-                    updateRadioButtons('[data-user-id="' + user.id + '"]');
+                    setRadioButtonListener('[data-user-id="' + user.id + '"]');
                     applyLock(['users'], locked);
                 }
 

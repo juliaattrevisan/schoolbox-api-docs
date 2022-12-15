@@ -150,8 +150,8 @@
                 $('[data-delete-visibility="role"]').click(function (e) {
                     e.preventDefault();
 
-                    var row = $(this).closest('tr');
-                    var roleId = $(row).attr('data-role-id');
+                    let row = $(this).closest('tr');
+                    let roleId = $(row).attr('data-role-id');
 
                     $('[data-reveal]').hide();
 
@@ -159,7 +159,7 @@
                         text: 'Are you sure you wish to remove the pastoral roles visibility record?',
                         confirmEvent: function () {
                             // Remove from window.rolesAdded
-                            var index = window.rolesAdded.indexOf(roleId);
+                            let index = window.rolesAdded.indexOf(roleId);
                             window.rolesAdded.splice(index, 1);
 
                             row.remove();
@@ -174,13 +174,13 @@
             {# Enable/Disable add pastoral role button depending on if there are any more roles available to add #}
 
             function updateRolesModal() {
-                var tableRolesAdded = $('[data-role-id]');
+                let tableRolesAdded = $('[data-role-id]');
 
                 $("[data-role-add]").removeClass('hide');
 
                 if (tableRolesAdded.length > 1) {
                     tableRolesAdded.each(function () {
-                        var roleId = $(this).attr('data-role-id');
+                        let roleId = $(this).attr('data-role-id');
 
                         if (roleId !== '{ID}') {
                             if (window.rolesAdded.indexOf(roleId) !== -1) {
@@ -192,7 +192,7 @@
                     });
                 }
 
-                var roleModalButtons = $("[data-reveal-id='modal-role']");
+                let roleModalButtons = $("[data-reveal-id='modal-role']");
 
                 if ($("[data-role-add]:not(.hide)").length === 0) {
                     roleModalButtons.attr('disabled', 'true');
@@ -216,29 +216,24 @@
                         .replace(/{TYPE_NAME}/g, 'Role')
                         .replace(/{NAME}/g, roleName)
                         .replace(/{ID}/g, roleId);
-                    if (roleId !== 'role-type-parent' && roleId !== 'role-type-student') {
-                        html.replace(/{ALWAYS_READONLY}/g, 1);
-                    } else {
-                        html.replace(/{ALWAYS_READONLY}/g, 0);
-                    }
                     window.rolesAdded.push(roleId);
 
                     let permissionListRoles = $('#permission-roles');
-                    permissionListRoles.html(permissionListRoles.html() + html);
+                    permissionListRoles.append(html);
 
                     // enable comment checkbox only for student and parent role type
                     let commentCheckbox = $('#roleComment' + roleId);
-                    if (roleId !== 'role-type-parent' && roleId !== 'role-type-student') {
-                        commentCheckbox.attr('checked', 'checked');
-                        commentCheckbox.attr('readonly', 'readonly');
-                    } else if (commentsAllowed) {
-                        commentCheckbox.attr('checked', 'checked');
-                    }
+                    initCommentCheckbox(
+                            commentCheckbox,
+                            roleId !== 'role-type-parent' && roleId !== 'role-type-student',
+                            commentsAllowed,
+                            permission
+                    );
 
                     //Check the correct box
                     let selector = 'input[name = "role['+roleId+']"][value ="'+permission+'"]';
                     permissionListRoles.find(selector).attr("checked", "checked");
-                    updateRadioButtons('[data-role-id="' + roleId + '"]', commentCheckbox);
+                    setRadioButtonListener('[data-role-id="' + roleId + '"]', commentCheckbox);
                     applyLock(['roles'], locked);
                 }
 

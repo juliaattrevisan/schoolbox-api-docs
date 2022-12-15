@@ -94,8 +94,8 @@
                 $('[data-delete-visibility="group"]').click(function (e) {
                     e.preventDefault();
 
-                    var row = $(this).closest('tr');
-                    var groupId = $(row).attr('data-group-id');
+                    let row = $(this).closest('tr');
+                    let groupId = $(row).attr('data-group-id');
 
                     $('[data-reveal]').hide();
 
@@ -116,13 +116,13 @@
 
             function updateGroupsModal()
             {
-                var tableGroupsAdded = $('[data-group-id]');
+                let tableGroupsAdded = $('[data-group-id]');
 
                 $("[data-group-add]").removeClass('hide');
 
                 if (tableGroupsAdded.length > 1) {
                     tableGroupsAdded.each(function () {
-                        var groupId = $(this).attr('data-group-id');
+                        let groupId = $(this).attr('data-group-id');
 
                         if (groupId !== '{ID}') {
                             if (window.groupsAdded[groupId] === true) {
@@ -134,7 +134,7 @@
                     });
                 }
 
-                var groupModalButtons = $("[data-reveal-id='modal-group']");
+                let groupModalButtons = $("[data-reveal-id='modal-group']");
 
                 {# Subtracting one for the dummy clone row #}
 
@@ -161,14 +161,12 @@
                     window.groupsAdded[groupId] = true;
 
                     let permissionListGroups = $('#permission-groups');
-                    permissionListGroups.html(permissionListGroups.html() + html);
+                    permissionListGroups.append(html);
 
                     let commentCheckbox = $('#groupComment' + groupId);
-                    commentCheckbox.attr('checked', 'checked');
-                    commentCheckbox.attr('readonly', 'readonly');
-                    html.replace(/{ALWAYS_READONLY}/g, 1);
+                    initCommentCheckbox(commentCheckbox, true, true, permission);
 
-                    updateRadioButtons('[data-group-id="' + groupId + '"]');
+                    setRadioButtonListener('[data-group-id="' + groupId + '"]');
                     applyLock(['groups'], locked);
                     //Check the correct box
                     let selector = 'input[name = "group['+groupId+']"][value ="'+permission+'"]';
