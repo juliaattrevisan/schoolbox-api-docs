@@ -93,7 +93,10 @@ class Controller extends Base
     {
         //get redis cache result for Regenerate::CACHE_USAGE_SYSTEM, serve to user
         $callback = function ($database) {
-            return (new Graph\GlobalUsers\SystemPayload($database))->generate();
+            return [
+                'time' => time(),
+                'data' => (new Graph\GlobalUsers\SystemPayload($database))->generate()
+            ];
         };
         $payload = $this->cache->cacheFunctionCall(Regenerate::CACHE_USAGE_SYSTEM, $callback, $this->database, Regenerate::CACHE_TIMEOUT);
 
@@ -108,7 +111,10 @@ class Controller extends Base
     {
         //get redis cache result for Regenerate::CACHE_USAGE_ROLE, serve to user
         $callback = function ($database) {
-            return (new Graph\GlobalUsers\RolePayload($database))->generate();
+            return [
+                'time' => time(),
+                'data' => (new Graph\GlobalUsers\RolePayload($database))->generate()
+            ];
         };
         $payload = $this->cache->cacheFunctionCall(Regenerate::CACHE_USAGE_ROLE, $callback, $this->database, Regenerate::CACHE_TIMEOUT);
 
@@ -134,7 +140,10 @@ class Controller extends Base
     {
         //get redis cache result for Regenerate::CACHE_USAGE_USER, serve to user
         $callback = function ($database) {
-            return (new Graph\GlobalUsers\UserPayload($database))->generate();
+            return [
+                'time' => time(),
+                'data' => (new Graph\GlobalUsers\UserPayload($database))->generate()
+            ];
         };
         $payload = $this->cache->cacheFunctionCall(Regenerate::CACHE_USAGE_USER, $callback, $this->database, Regenerate::CACHE_TIMEOUT);
 
@@ -149,7 +158,10 @@ class Controller extends Base
     {
         //get redis cache result for Regenerate::CACHE_USAGE_FILETYPE, serve to user
         $callback = function ($database) {
-            return (new Graph\GlobalUsers\FileTypePayload($database))->generate();
+            return [
+                'time' => time(),
+                'data' => (new Graph\GlobalUsers\FileTypePayload($database))->generate()
+            ];
         };
         $payload = $this->cache->cacheFunctionCall(Regenerate::CACHE_USAGE_FILETYPE, $callback, $this->database, Regenerate::CACHE_TIMEOUT);
 

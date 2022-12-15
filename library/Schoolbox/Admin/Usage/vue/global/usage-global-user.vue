@@ -30,7 +30,7 @@ export default {
      */
     props: {
         endpoint: {
-           type: String, 
+           type: String,
            required: true
         }
     },
@@ -75,9 +75,9 @@ export default {
                 },
                 orderBy: {
                     ascending: true,
-                    column: 'lastname' 
+                    column: 'lastname'
                 },
-                perPage: 50, 
+                perPage: 50,
                 perPageValues: [50, 100, 200],
                 debounce: 100, //faster debouce as data is stored on the client side,
                 resizableColumns: false,
@@ -149,7 +149,7 @@ export default {
 
         /**
          * To update the table to show the UI in the footer
-         * 
+         *
          */
         onLoaded () {
             this.$nextTick(() => this.footerUI_update());
@@ -157,9 +157,9 @@ export default {
 
         /**
          * To convert the bytes into a more readable string
-         * 
+         *
          * @param { Number } - 214430838
-         * 
+         *
          * @returns { String } - 204.5 MB
          */
         getHumanReadableFilesize (value) {
@@ -189,26 +189,26 @@ export default {
             </table>
         </template>
         <template v-else>
-            <v-client-table 
-                :data="allData" 
-                :columns="columns" 
-                :options="options" 
+            <v-client-table
+                :data="allData.data"
+                :columns="columns"
+                :options="options"
                 @loaded="onLoaded"
             >
-                <template #firstname="props"> 
+                <template #firstname="props">
                     <a :href="`/adminv2/usage/specific/${props.row.userId}`" :title="props.row.fullname">{{ props.row.firstname }}</a>
                 </template>
-                <template #lastname="props"> 
+                <template #lastname="props">
                     <a :href="`/adminv2/usage/specific/${props.row.userId}`" :title="props.row.fullname">{{ props.row.lastname }}</a>
                 </template>
-                <template #size="props"> 
+                <template #size="props">
                     {{ getHumanReadableFilesize(props.row.size) }}
                 </template>
                 <template #afterTable>
                     <div class="VueTables__table-footer" ref="tableFooter"></div>
                 </template>
             </v-client-table>
-            
+            <div>Last Generated: {{ this.allData.time }}</div>
         </template>
     </div>
 </template>

@@ -98,8 +98,8 @@ export default {
                     },
                 });
                 this.allData = await response.json();
-                const values = this.allData.map((item) => parseInt(item.size));
-                const categories = this.allData.map((item) => item.label);
+                const values = this.allData.data.map((item) => parseInt(item.size));
+                const categories = this.allData.data.map((item) => item.label);
                 this.chartOptions = this.getChartOptions(values, categories);
             } catch (error) {
                 console.warn(error);
@@ -110,10 +110,10 @@ export default {
 
         /**
          * To setup the HighCharts config options
-         * 
+         *
          * @param { Array }
          * @param { Array }
-         * 
+         *
          * @returns { Object }
          */
         getChartOptions (values, categories) {
@@ -195,6 +195,7 @@ export default {
         </template>
         <template v-else>
             <highcharts :options="chartOptions"></highcharts>
+            <div>Last Generated: {{ this.allData.time }}</div>
         </template>
     </div>
 </template>

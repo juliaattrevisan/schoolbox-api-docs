@@ -43,28 +43,40 @@ class Regenerate
         //SystemPayload
         $logger?->info("Generating SystemPayload");
         $callback = function ($database) {
-            return (new Graph\GlobalUsers\SystemPayload($database))->generate();
+            return [
+                'time' => time(),
+                'data' => (new Graph\GlobalUsers\SystemPayload($database))->generate()
+                ];
         };
         $payload = $this->cache->cacheFunctionCall(self::CACHE_USAGE_SYSTEM, $callback, $this->database, self::CACHE_TIMEOUT);
 
         //RolePayload
         $logger?->info("Generating RolePayload");
         $callback = function ($database) {
-            return (new Graph\GlobalUsers\RolePayload($database))->generate();
+            return [
+                'time' => time(),
+                'data' => (new Graph\GlobalUsers\RolePayload($database))->generate()
+                ];
         };
         $payload = $this->cache->cacheFunctionCall(self::CACHE_USAGE_ROLE, $callback, $this->database, self::CACHE_TIMEOUT);
 
         //UserPayload
         $logger?->info("Generating UserPayload");
         $callback = function ($database) {
-            return (new Graph\GlobalUsers\UserPayload($database))->generate();
+            return [
+                'time' => time(),
+                'data' => (new Graph\GlobalUsers\UserPayload($database))->generate()
+                ];
         };
         $payload = $this->cache->cacheFunctionCall(self::CACHE_USAGE_USER, $callback, $this->database, self::CACHE_TIMEOUT);
 
         //FileTypePayload
         $logger?->info("Generating FileTypePayload");
         $callback = function ($database) {
-            return (new Graph\GlobalUsers\FileTypePayload($database))->generate();
+            return [
+                'time' => time(),
+                'data' => (new Graph\GlobalUsers\FileTypePayload($database))->generate()
+                ];
         };
         $payload = $this->cache->cacheFunctionCall(self::CACHE_USAGE_FILETYPE, $callback, $this->database, self::CACHE_TIMEOUT);
         $logger?->info("All Complete");
