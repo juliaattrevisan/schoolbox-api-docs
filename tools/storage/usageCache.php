@@ -63,7 +63,6 @@ HELP;
 
             $regenerate = new Regenerate(Redis::getCacheInstance(), $database);
             $regenerate->regenerateUsage($this->getLogger());
-
         }
     }
 };
