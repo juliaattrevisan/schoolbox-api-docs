@@ -26,21 +26,6 @@ use Schoolbox\User;
  */
 class Controller extends Base
 {
-    const CACHE_TIMEOUT = 86400; //24hrs in seconds
-    const CACHE_USAGE_SYSTEM = 'system_usage_system';
-    const CACHE_USAGE_ROLE = 'system_usage_role';
-    const CACHE_USAGE_TOTAL = 'system_usage_total';
-    const CACHE_USAGE_USER = 'system_usage_user';
-    const CACHE_USAGE_FILETYPE = 'system_usage_fileType';
-    const CACHED_QUERIES = [
-        self::CACHE_USAGE_SYSTEM,
-        self::CACHE_USAGE_ROLE,
-        self::CACHE_USAGE_TOTAL,
-        self::CACHE_USAGE_USER,
-        self::CACHE_USAGE_FILETYPE,
-
-    ];
-
     /**
      * Controller constructor.
      *
@@ -49,6 +34,7 @@ class Controller extends Base
      */
     public function __construct(
         private ErrorMapper $errorMapper,
+        private IConnector $database,
         private Redis $cache
     ) {
     }
@@ -105,14 +91,11 @@ class Controller extends Base
      */
     public function getSystemPayload(): void
     {
-        /** @var IConnector $database */
-        $database = $this->getDi()->get('databaseInternal');
-
-        //get redis cache result for self::CACHE_USAGE_SYSTEM, serve to user
+        //get redis cache result for Regenerate::CACHE_USAGE_SYSTEM, serve to user
         $callback = function ($database) {
             return (new Graph\GlobalUsers\SystemPayload($database))->generate();
         };
-        $payload = $this->cache->cacheFunctionCall(self::CACHE_USAGE_SYSTEM, $callback, $database, self::CACHE_TIMEOUT);
+        $payload = $this->cache->cacheFunctionCall(Regenerate::CACHE_USAGE_SYSTEM, $callback, $this->database, Regenerate::CACHE_TIMEOUT);
 
         $this->getResponse()->content->set($this->buildJsonOutput($payload));
     }
@@ -123,14 +106,11 @@ class Controller extends Base
      */
     public function getRolePayload(): void
     {
-        /** @var IConnector $database */
-        $database = $this->getDi()->get('databaseInternal');
-
-        //get redis cache result for self::CACHE_USAGE_ROLE, serve to user
+        //get redis cache result for Regenerate::CACHE_USAGE_ROLE, serve to user
         $callback = function ($database) {
             return (new Graph\GlobalUsers\RolePayload($database))->generate();
         };
-        $payload = $this->cache->cacheFunctionCall(self::CACHE_USAGE_ROLE, $callback, $database, self::CACHE_TIMEOUT);
+        $payload = $this->cache->cacheFunctionCall(Regenerate::CACHE_USAGE_ROLE, $callback, $this->database, Regenerate::CACHE_TIMEOUT);
 
         $this->getResponse()->content->set($this->buildJsonOutput($payload));
     }
@@ -141,14 +121,7 @@ class Controller extends Base
      */
     public function getTotalPayload(): void
     {
-        /** @var IConnector $database */
-        $database = $this->getDi()->get('databaseInternal');
-
-        //get redis cache result for self::CACHE_USAGE_TOTAL, serve to user
-        $callback = function ($database) {
-            return (new Graph\GlobalUsers\TotalPayload($database, $this->getConfigLoader()->get('storage_dir')))->generate();
-        };
-        $payload = $this->cache->cacheFunctionCall(self::CACHE_USAGE_TOTAL, $callback, $database, self::CACHE_TIMEOUT);
+        $payload = (new Graph\GlobalUsers\TotalPayload($this->database, $this->getConfigLoader()->get('storage_dir')))->generate();
 
         $this->getResponse()->content->set($this->buildJsonOutput($payload));
     }
@@ -159,14 +132,11 @@ class Controller extends Base
      */
     public function getUserPayload(): void
     {
-        /** @var IConnector $database */
-        $database = $this->getDi()->get('databaseInternal');
-
-        //get redis cache result for self::CACHE_USAGE_USER, serve to user
+        //get redis cache result for Regenerate::CACHE_USAGE_USER, serve to user
         $callback = function ($database) {
             return (new Graph\GlobalUsers\UserPayload($database))->generate();
         };
-        $payload = $this->cache->cacheFunctionCall(self::CACHE_USAGE_USER, $callback, $database, self::CACHE_TIMEOUT);
+        $payload = $this->cache->cacheFunctionCall(Regenerate::CACHE_USAGE_USER, $callback, $this->database, Regenerate::CACHE_TIMEOUT);
 
         $this->getResponse()->content->set($this->buildJsonOutput($payload));
     }
@@ -177,16 +147,12 @@ class Controller extends Base
      */
     public function getFileTypePayload(): void
     {
-        /** @var IConnector $database */
-        $database = $this->getDi()->get('databaseInternal');
-
-        //get redis cache result for self::CACHE_USAGE_FILETYPE, serve to user
+        //get redis cache result for Regenerate::CACHE_USAGE_FILETYPE, serve to user
         $callback = function ($database) {
             return (new Graph\GlobalUsers\FileTypePayload($database))->generate();
         };
-        $payload = $this->cache->cacheFunctionCall(self::CACHE_USAGE_FILETYPE, $callback, $database, self::CACHE_TIMEOUT);
+        $payload = $this->cache->cacheFunctionCall(Regenerate::CACHE_USAGE_FILETYPE, $callback, $this->database, Regenerate::CACHE_TIMEOUT);
 
-        $deleted = $this->cache->dropKeyCache('system_usage_fileType', $database);
         $this->getResponse()->content->set($this->buildJsonOutput($payload));
     }
 
@@ -199,10 +165,7 @@ class Controller extends Base
      */
     public function getSpecificUserSystemPayload(User $user): void
     {
-        /** @var IConnector $database */
-        $database = $this->getDi()->get('databaseInternal');
-
-        $payload = (new Graph\SpecificUser\SystemPayload($database))->generate($user);
+        $payload = (new Graph\SpecificUser\SystemPayload($this->database))->generate($user);
 
         $this->getResponse()->content->set($this->buildJsonOutput($payload));
     }
@@ -216,10 +179,7 @@ class Controller extends Base
      */
     public function getSpecificUserTotalPayload(User $user): void
     {
-        /** @var IConnector $database */
-        $database = $this->getDi()->get('databaseInternal');
-
-        $payload = (new Graph\SpecificUser\TotalPayload($database))->generate($user);
+        $payload = (new Graph\SpecificUser\TotalPayload($this->database))->generate($user);
 
         $this->getResponse()->content->set($this->buildJsonOutput($payload));
     }
@@ -234,10 +194,7 @@ class Controller extends Base
      */
     public function getSpecificUserFilePayload(User $user): void
     {
-        /** @var IConnector $database */
-        $database = $this->getDi()->get('databaseInternal');
-
-        $payload = (new Graph\SpecificUser\FilePayload($database))->generate($user);
+        $payload = (new Graph\SpecificUser\FilePayload($this->database))->generate($user);
 
         $this->getResponse()->content->set($this->buildJsonOutput($payload));
     }
@@ -251,10 +208,7 @@ class Controller extends Base
      */
     public function getSpecificUserFileTypePayload(User $user): void
     {
-        /** @var IConnector $database */
-        $database = $this->getDi()->get('databaseInternal');
-
-        $payload = (new Graph\SpecificUser\FileTypePayload($database))->generate($user);
+        $payload = (new Graph\SpecificUser\FileTypePayload($this->database))->generate($user);
 
         $this->getResponse()->content->set($this->buildJsonOutput($payload));
     }
@@ -264,43 +218,7 @@ class Controller extends Base
      */
     public function postRegenerateUsage(): void
     {
-        /** @var IConnector $database */
-        $database = $this->getDi()->get('databaseInternal');
-
-        //clear the cache for all cached queries
-        foreach (self::CACHED_QUERIES as $cachedQuery) {
-            $this->cache->dropKeyCache($cachedQuery, $database);
-        }
-
-        //regenerate all queries
-        //SystemPayload
-        $callback = function ($database) {
-            return (new Graph\GlobalUsers\SystemPayload($database))->generate();
-        };
-        $payload = $this->cache->cacheFunctionCall(self::CACHE_USAGE_SYSTEM, $callback, $database, self::CACHE_TIMEOUT);
-
-        //RolePayload
-        $callback = function ($database) {
-            return (new Graph\GlobalUsers\RolePayload($database))->generate();
-        };
-        $payload = $this->cache->cacheFunctionCall(self::CACHE_USAGE_ROLE, $callback, $database, self::CACHE_TIMEOUT);
-
-        //TotalPayload
-        $callback = function ($database) {
-            return (new Graph\GlobalUsers\TotalPayload($database, $this->getConfigLoader()->get('storage_dir')))->generate();
-        };
-        $payload = $this->cache->cacheFunctionCall(self::CACHE_USAGE_TOTAL, $callback, $database, self::CACHE_TIMEOUT);
-
-        //UserPayload
-        $callback = function ($database) {
-            return (new Graph\GlobalUsers\UserPayload($database))->generate();
-        };
-        $payload = $this->cache->cacheFunctionCall(self::CACHE_USAGE_USER, $callback, $database, self::CACHE_TIMEOUT);
-
-        //FileTypePayload
-        $callback = function ($database) {
-            return (new Graph\GlobalUsers\FileTypePayload($database))->generate();
-        };
-        $payload = $this->cache->cacheFunctionCall(self::CACHE_USAGE_FILETYPE, $callback, $database, self::CACHE_TIMEOUT);
+        $regenerate = new Regenerate($this->cache, $this->database);
+        $regenerate->regenerateUsage();
     }
 }
