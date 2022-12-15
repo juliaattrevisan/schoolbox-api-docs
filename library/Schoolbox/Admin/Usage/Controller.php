@@ -26,8 +26,7 @@ use Schoolbox\User;
  */
 class Controller extends Base
 {
-
-    const CACHE_TIMEOUT = 86400;
+    const CACHE_TIMEOUT = 86400; //24hrs in seconds
     /**
      * Controller constructor.
      *
@@ -37,8 +36,8 @@ class Controller extends Base
     public function __construct(
         private ErrorMapper $errorMapper,
         private Redis $cache
-    )
-    {}
+    ) {
+    }
 
 
     /**
