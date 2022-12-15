@@ -432,7 +432,7 @@ class Mapper extends BaseMapper implements BaseMapper\Searchable
                 } elseif ($b->getCode() === '') {
                     return -1;
                 }
-                return $a->getCode() <=> $b->getCode();
+                return strnatcmp($a->getCode(), $b->getCode());
             } elseif ($a->getName() !== $b->getName()) {
                 return strnatcmp($a->getName(), $b->getName());
             } else {

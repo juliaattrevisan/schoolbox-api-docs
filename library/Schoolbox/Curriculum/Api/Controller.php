@@ -12,7 +12,6 @@ use Schoolbox\Curriculum\Api\Translator\ArrayToModel;
 use Schoolbox\Curriculum\Api\Translator\ModelToArray;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\Collection;
-use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
 
 /**
