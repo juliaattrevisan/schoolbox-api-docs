@@ -70,10 +70,6 @@
                 dataType: 'script',
                 cache: true
             }).then(function () {
-                if (!config.modules.includes('client')) {
-                    config.modules.push('client'); // NOTE: gapi.client (used below) will not exist unless we load the 'config' module.
-                }
-
                 for (let i = 0, j = 0; i < config.modules.length; ++i) {
                     gapi.load(config.modules[i], function () {
                         /* run gapi.load() on every config.module element, but only execute the callback
@@ -84,13 +80,7 @@
                          * also finished loading? You can't assert that from here...
                          */
                         if (++j === config.modules.length && config.callback && config.clientId.length) {
-                            // Not sure whether this is still needed after all uses of the 'client:auth2' module were removed in SA-14475.
-                            gapi.client.init({
-                                'client_id': config.clientId,
-                                'scope': config.scope
-                            }).then(function () {
-                                config.callback();
-                            });
+                            config.callback();
                         }
                     });
                 }
