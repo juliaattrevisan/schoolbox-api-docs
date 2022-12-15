@@ -206,9 +206,9 @@ export default {
                 </template>
                 <template #afterTable>
                     <div class="VueTables__table-footer" ref="tableFooter"></div>
+                    <div class="meta"> ^ Last Generated: {{ this.allData.time }}</div>
                 </template>
             </v-client-table>
-            <div>Last Generated: {{ this.allData.time }}</div>
         </template>
     </div>
 </template>
