@@ -98,7 +98,7 @@
                 // If the auth button is hidden, show the button so the user can click to authorise access to Google files.
                 $(config.authBtn).removeClass('hide');
             } else {
-                window.googleClientToken.requestAccessToken({prompt: ''});
+                window.googleClientToken.requestAccessToken({prompt: ''}); // Setting prompt to blank tells Google to prompt for authorisation only if necessary.
             }
         }
 
