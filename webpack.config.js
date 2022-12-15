@@ -1,7 +1,8 @@
 const path = require('path');
 const webpack = require('webpack');
 const {VueLoaderPlugin} = require('vue-loader');
-const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts'); // https://www.npmjs.com/package/webpack-remove-empty-scripts
+const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts'); //https://www.npmjs.com/package/webpack-remove-empty-scripts
+const { styles } = require( '@ckeditor/ckeditor5-dev-utils' );
 
 const babelOptions = {
     presets: [
@@ -267,7 +268,10 @@ module.exports = {
         // Temporary Typescript testing playground, to be deleted in future
         typescriptTest: './library/Schoolbox/Greenhouse/templates/ts/typescriptTest.ts',
 
-        // Sass
+        //Temporary CKEditor tester
+        helloCKEditor: './library/Schoolbox/Greenhouse/templates/ts/helloCKEditor.ts',
+
+        //Sass
         core: './www/static/css/core/core.scss',
         editor: './www/static/css/core/editor.scss',
 
@@ -400,6 +404,36 @@ module.exports = {
                                 },
                             }
                         ]
+                    }
+                ]
+            },
+            {
+                test: /ckeditor5-[^/\\]+[/\\]theme[/\\]icons[/\\][^/\\]+\.svg$/,
+                use: [ 'raw-loader' ]
+            },
+            {
+                test: /ckeditor5-[^/\\]+[/\\]theme[/\\].+\.css$/,
+                use: [
+                    {
+                        loader: 'style-loader',
+                        options: {
+                            injectType: 'singletonStyleTag',
+                            attributes: {
+                                'data-cke': true
+                            }
+                        }
+                    },
+                    'css-loader',
+                    {
+                        loader: 'postcss-loader',
+                        options: {
+                            postcssOptions: styles.getPostCssConfig( {
+                                themeImporter: {
+                                    themePath: require.resolve( '@ckeditor/ckeditor5-theme-lark' )
+                                },
+                                minify: true
+                            } )
+                        }
                     }
                 ]
             }
