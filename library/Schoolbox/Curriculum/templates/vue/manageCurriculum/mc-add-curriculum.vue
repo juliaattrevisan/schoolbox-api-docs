@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 
 /**
  * to show further info in a modal on a code that's been selected
@@ -24,12 +24,12 @@ const ckeditorInstance = computed(() => `new-curriculum`);
 /**
  * Use a customised ckeditor for the description field
  */
-const descriptionField = useDescriptionEditor(addCurriculumStore.curriculum.description, ckeditorInstance.value);
+const descriptionField = useDescriptionEditor(addCurriculumStore.curriculum?.description as string, ckeditorInstance.value);
 
 /**
  * And watch for changes on this field so we can update the description in the store
  */
-watch(descriptionField, (newValue) => {
+watch(descriptionField, (newValue: string) => {
     addCurriculumStore.curriculum.description = newValue;
 });
 
@@ -53,13 +53,13 @@ function onAddSubsectionSelected () {
  */
 addCurriculumStore.$onAction(({ name, after, onError }) => {
     if (name === 'add') {
-        store.toastEl.activate('Adding...');
+        store.toastEl.value.activate('Adding...');
         after((result) => {
-            store.toastEl.timeout(result.message, true, 5000);
+            store.toastEl.value.timeout(result.message, true, 5000);
         });
         onError((error) => {
             console.warn(error);
-            store.toastEl.timeout('Unable to add Curriculum', false, 5000);
+            store.toastEl.value.timeout('Unable to add Curriculum', false, 5000);
         });
     }
 });
@@ -77,7 +77,10 @@ function onCancelSelected () {
  * @returns { Boolean }
  */
 const isAddDisabled = computed(() => {
-    return addCurriculumStore.curriculum.name.trim().length === 0 || addCurriculumStore.isProcessing;
+    if (typeof addCurriculumStore.curriculum.name === 'string') {
+        return addCurriculumStore.curriculum?.name.trim().length === 0 || addCurriculumStore.isProcessing;
+    }
+    return false;
 });
 
 </script>

@@ -1,7 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const {VueLoaderPlugin} = require('vue-loader');
-const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts'); //https://www.npmjs.com/package/webpack-remove-empty-scripts
+const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts'); // https://www.npmjs.com/package/webpack-remove-empty-scripts
 
 const babelOptions = {
     presets: [
@@ -27,7 +27,7 @@ const babelOptions = {
 }
 
 module.exports = {
-    entry: { //https://webpack.js.org/configuration/entry-context/
+    entry: { // https://webpack.js.org/configuration/entry-context/
 
         main: [
 
@@ -158,20 +158,20 @@ module.exports = {
                 './www/static/js/masonry/jquery.masonry.js',
                 './www/static/js/masonry/jquery.masonry.spectrum.js',
             ],
-            dependOn: 'main' //ensures jQuery is loaded prior
+            dependOn: 'main' // ensures jQuery is loaded prior
         },
         mage: {
             import: [
                 './www/static/js/form/jquery.mage.js',
             ],
-            dependOn: 'main' //ensures jQuery is loaded prior
+            dependOn: 'main' // ensures jQuery is loaded prior
         },
         dataTables: {
             import: [
                 './node_modules/datatables.net/js/jquery.dataTables.js',
                 './node_modules/datatables.net-fixedcolumns/js/dataTables.fixedColumns.js',
             ],
-            dependOn: 'main' //ensures jQuery is loaded prior
+            dependOn: 'main' // ensures jQuery is loaded prior
         },
 
         // Libraries
@@ -180,10 +180,10 @@ module.exports = {
         highcharts: './www/static/js/vendors/highcharts/highcharts.js',
         highchartsMore: './www/static/js/vendors/highcharts/highchartsMore.js',
 
-        //Search Bar
+        // Search Bar
         searchBar: './vue/components/searchBar/searchBar.js',
 
-        //Calendars
+        // Calendars
         sbFullCalendar: './library/Schoolbox/Calendar/vue/sbFullCalendar.js',
         timetableCalendar: './library/Schoolbox/Calendar/vue/timetableCalendar.js',
         assessmentCalendar: './library/Schoolbox/Learning/Assessment/Calendar/vue/assessmentCalendar.js',
@@ -193,7 +193,7 @@ module.exports = {
         calendarComponent: './library/Schoolbox/Calendar/vue/calendarComponent.js',
         calendarEventDetails: './library/Schoolbox/Calendar/Event/templates/vue/calendarEventDetails.js',
 
-        //News related
+        // News related
         visitationListFull: './library/Schoolbox/Comms/News/Statistics/templates/visitation/visitationListFull.js',
         articleList: './library/Schoolbox/Comms/News/templates/vue/articleList.js',
         articleThreads: './library/Schoolbox/Comms/News/templates/vue/articleThreads.js',
@@ -203,7 +203,7 @@ module.exports = {
         newsItemFormActions: './library/Schoolbox/Comms/News/vue/newsItemFormActions.js',
         newsRssLink: './library/Schoolbox/Comms/News/vue/newsRssLink.js',
 
-        //Learning
+        // Learning
         learningMomentsEvidenceDetail: './library/Schoolbox/Learning/Moment/Evidence/vue/learningMomentsEvidenceDetail.js',
         userProfileFeeds: './library/Schoolbox/Learning/vue/user-profile/userProfileFeeds.js',
         badgeList: './library/Schoolbox/Learning/Badge/vue/badgeList.js',
@@ -217,7 +217,7 @@ module.exports = {
         // Textboxes
         textboxList: './library/Schoolbox/Resource/Textbox/vue/textboxList.js',
 
-        //Admin
+        // Admin
         adminGrades: './library/Schoolbox/Admin/Grades/vue/adminGrades.js',
         adminSettingsSearch: './library/Schoolbox/Admin/Navigation/vue/adminSettingsSearch.js',
         staleUsersReport: './library/Schoolbox/Admin/User/vue/staleUsersReports/staleUsersReport.js',
@@ -229,7 +229,7 @@ module.exports = {
         usageSpecific: './library/Schoolbox/Admin/Usage/vue/specific/usageSpecific.js',
         emailDkim: './library/Schoolbox/Admin/EmailDKIM/vue/emailDkim.js',
 
-        //Record Media Modal
+        // Record Media Modal
         recordMediaModal: './templates/core/resources/filesystem/vue/recordMediaModal.js',
 
         // Class
@@ -240,7 +240,7 @@ module.exports = {
         manageGroups: './library/Schoolbox/Group/vue/manageGroups.js',
         manageGroup: './library/Schoolbox/Group/Manage/vue/manageGroup.js',
 
-        //Curriculum
+        // Curriculum
         manageCurriculum: './library/Schoolbox/Curriculum/templates/vue/manageCurriculum/manageCurriculum.js',
         curriculumSelector: './library/Schoolbox/Curriculum/templates/vue/curriculumSelector/curriculumSelector.js',
         assessmentCodes: './library/Schoolbox/Curriculum/templates/vue/assessmentCodes/assessmentCodes.js',
@@ -254,20 +254,20 @@ module.exports = {
         pastoralRecordCommentsPrivate: './library/Schoolbox/Pastoral/templates/vue/pastoralRecordCommentsPrivate.js',
         pastoralClassReport: './library/Schoolbox/Pastoral/ClassReport/vue/pastoralClassReport.js',
 
-        //Resource
+        // Resource
         googleFiles: './library/Schoolbox/Resource/GoogleFile/templates/component/js/googleFiles.js',
         viewAllFiles: './library/Schoolbox/Resource/Browser/templates/vue/viewAllFiles.js',
 
-        //Most functionality for a home page
+        // Most functionality for a home page
         updateHomepage: './templates/core/homepage/js/updateHomepage.js',
 
-        //Canvas
+        // Canvas
         canvasAssignments: './library/Schoolbox/Canvas/templates/vue/canvasAssignments.js',
 
-        //Temporary Typescript testing playground, to be deleted in future
+        // Temporary Typescript testing playground, to be deleted in future
         typescriptTest: './library/Schoolbox/Greenhouse/templates/ts/typescriptTest.ts',
 
-        //Sass
+        // Sass
         core: './www/static/css/core/core.scss',
         editor: './www/static/css/core/editor.scss',
 
@@ -278,11 +278,11 @@ module.exports = {
         publicPath: '/static/js/bundle/',
         filename: '[name].js'
     },
-    module: { //https://webpack.js.org/configuration/module/
+    module: { // https://webpack.js.org/configuration/module/
         rules: [
             {
                 test: require.resolve('jquery'),
-                loader: 'expose-loader', //see https://webpack.js.org/loaders/expose-loader/ - expose these to the glocal scope, allowing access to the properties in twig / other JS files
+                loader: 'expose-loader', // see https://webpack.js.org/loaders/expose-loader/ - expose these to the glocal scope, allowing access to the properties in twig / other JS files
                 options: {
                     exposes: [
                         { globalName: '$', override: true },
@@ -322,12 +322,12 @@ module.exports = {
                 test: /\.js$/,
                 exclude: /node_modules/,
                 use: {
-                    loader: 'babel-loader', //to transpile JS code to ensure everything is compatiable with all targeted browsers
+                    loader: 'babel-loader', // to transpile JS code to ensure everything is compatiable with all targeted browsers
                     options: babelOptions,
                 },
             },
             {
-                test: /\.ts(x?)$/, //typescript uses the same babel setup as JS files, but also uses ts-loader to convert the ts to js
+                test: /\.ts(x?)$/, // typescript uses the same babel setup as JS files, but also uses ts-loader to convert the ts to js
                 exclude: /node_modules/,
                 use: [
                     {
@@ -335,13 +335,17 @@ module.exports = {
                         options: babelOptions,
                     },
                     {
-                        loader: 'ts-loader'
+                        loader: 'ts-loader',
+                        options: {
+                            appendTsSuffixTo: [/\.vue$/],
+                            transpileOnly: true,
+                        }
                     }
                 ]
             },
             {
                 test: /\.vue$/,
-                loader: 'vue-loader', //to handle .vue files
+                loader: 'vue-loader', // to handle .vue files
                 options: {
                     appendTsSuffixTo: [/\.vue$/],
                     compilerOptions: {
@@ -355,7 +359,7 @@ module.exports = {
             },
             {
                 test: /\.scss$/,
-                oneOf: [ //this allows us to only perform the below on vue files, then other scss files follow the following
+                oneOf: [ // this allows us to only perform the below on vue files, then other scss files follow the following
                     {
                         resourceQuery: /^\?vue/,
                         use: [
@@ -363,7 +367,7 @@ module.exports = {
                             {
                                 loader: 'css-loader',
                                 options: {
-                                    url: false, //don't validate image urls as they error, so we trust rely on checking in browser
+                                    url: false, // don't validate image urls as they error, so we trust rely on checking in browser
                                 }
                             },
                             { loader: 'sass-loader' },
@@ -372,7 +376,7 @@ module.exports = {
                     {
                         use: [
                             {
-                                loader: 'file-loader', //to emit the css `main` and `editor` into the /core directory
+                                loader: 'file-loader', // to emit the css `main` and `editor` into the /core directory
                                 options: {
                                     name: '[name].css',
                                     outputPath: '../../css/core/'
@@ -382,16 +386,16 @@ module.exports = {
                             {
                                 loader: 'css-loader',
                                 options: {
-                                    url: false, //don't validate image urls as they error, so we trust rely on checking in browser
-                                    modules: false //disable css modules for all files: https://github.com/css-modules/css-modules
+                                    url: false, // don't validate image urls as they error, so we trust rely on checking in browser
+                                    modules: false // disable css modules for all files: https://github.com/css-modules/css-modules
                                 }
                             },
                             {
-                                loader: 'sass-loader', //to load the sass and export it to css
+                                loader: 'sass-loader', // to load the sass and export it to css
                                 options: {
                                     sassOptions: {
                                         indentWidth: 4,
-                                        includePaths: ['../../css/core/'], //where our base css file is loaded
+                                        includePaths: ['../../css/core/'], // where our base css file is loaded
                                     },
                                 },
                             }
@@ -401,7 +405,7 @@ module.exports = {
             }
         ]
     },
-    resolve: { //https://webpack.js.org/configuration/resolve/
+    resolve: { // https://webpack.js.org/configuration/resolve/
         alias: {
             'vue$': 'vue/dist/vue.esm-bundler.js',
             '@schoolboxLibrary': path.resolve(__dirname, 'library/Schoolbox'),
@@ -415,12 +419,12 @@ module.exports = {
         },
         extensions: ['*', '.js', '.vue', '.json', '.ts']
     },
-    plugins: [ //https://webpack.js.org/configuration/plugins/
-        new webpack.DefinePlugin({ //to enable bundler feature flags, to enable build when compiling in production:
+    plugins: [ // https://webpack.js.org/configuration/plugins/
+        new webpack.DefinePlugin({ // to enable bundler feature flags, to enable build when compiling in production:
             __VUE_OPTIONS_API__: true,
             __VUE_PROD_DEVTOOLS__: false,
         }),
-        new VueLoaderPlugin(), //to handle .vue files
+        new VueLoaderPlugin(), // to handle .vue files
         new RemoveEmptyScriptsPlugin(),
     ],
 };

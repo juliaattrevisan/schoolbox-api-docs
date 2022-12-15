@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 
 /**
  * A selected Curriculum node, it can be deleted and

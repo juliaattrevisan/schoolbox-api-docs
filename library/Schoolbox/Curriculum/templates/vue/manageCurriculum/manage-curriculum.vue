@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 
 /**
  * To manage Curriculum nodes, being able to view the entire node tree and
@@ -40,13 +40,13 @@ const props = defineProps({
 
 const store = useStore();
 const selectedNodesStore = useSelectedNodesStore();
-const toastEl = ref(null);
+const toastEl = ref<typeof Toast | null>(null);
 
 /**
  * Start loading the curriculum data
  */
 onMounted(() => {
-    store.init(props, toastEl);
+    store.init(props.dataEndpoint, props.isReadOnly, toastEl);
     if (store.hasId) {
         initErrorListener();
     }
@@ -60,8 +60,8 @@ function initErrorListener () {
         if (name === 'loadId') {
             onError((error) => {
                 console.warn(error.message);
-                store.toastEl.activate();
-                store.toastEl.timeout(error.message, false, 5000);
+                store.toastEl?.activate();
+                store.toastEl?.timeout(error.message, false, 5000);
             });
         }
     });

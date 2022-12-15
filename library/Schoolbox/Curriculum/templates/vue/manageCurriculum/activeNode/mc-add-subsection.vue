@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 
 /**
  * to show further info in a modal on a code that's been selected
@@ -71,13 +71,13 @@ function onAddSubsectionSelected () {
  */
  addSubsectionStore.$onAction(({ name, after, onError }) => {
     if (name === 'add') {
-        store.toastEl.activate('Adding...');
+        store.toastEl.value.activate('Adding...');
         after((result) => {
-            store.toastEl.timeout(result.message, true, 5000);
+            store.toastEl.value.timeout(result.message, true, 5000);
         });
         onError((error) => {
             console.warn(error);
-            store.toastEl.timeout('Unable to add subsection', false, 5000);
+            store.toastEl.value.timeout('Unable to add subsection', false, 5000);
         });
     }
 });

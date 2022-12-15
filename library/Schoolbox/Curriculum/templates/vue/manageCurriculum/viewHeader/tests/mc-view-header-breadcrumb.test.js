@@ -1,6 +1,5 @@
-
 import { mount } from '@vue/test-utils';
-import McViewHeaderBreadcrumb from '../mc-view-header-breadcrumb';
+import McViewHeaderBreadcrumb from '../mc-view-header-breadcrumb.vue';
 import { createTestingPinia } from '@pinia/testing';
 
 let wrapper; // so we don't need to pass it into every test

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 
 /**
  * To indicate progress through the node tree and to be able to

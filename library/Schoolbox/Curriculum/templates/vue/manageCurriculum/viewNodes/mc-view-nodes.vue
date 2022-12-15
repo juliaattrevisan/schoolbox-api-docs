@@ -1,11 +1,11 @@
-<script setup>
+<script setup lang="ts">
 
 /**
  * The filtered results from using the <selects> or search <input>
  * From here curriclum codes can be selected for further travesal or editing
  */
 
-import { ref, computed, watch } from 'vue';
+import { ref, watch } from 'vue';
 import { useNodesStore } from '../store/mcNodesStore';
 import { useViewNodesStore } from './store/mcViewNodesStore';
 import { useSearchStore } from '../store/mcSearchStore';
@@ -17,7 +17,7 @@ const nodesStore = useNodesStore();
 const viewNodesStore = useViewNodesStore();
 const searchStore = useSearchStore();
 const depth = ref(0); //to increment each time we go down the node tree to visually indicate children
-const nodesContainerEl = ref(null); //to scroll back to top on any selection change
+const nodesContainerEl = ref<HTMLDivElement | null>(null); //to scroll back to top on any selection change
 
 /**
  * Clear the current search query

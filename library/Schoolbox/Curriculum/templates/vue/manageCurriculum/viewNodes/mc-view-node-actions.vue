@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 
 /**
  * To edit an existing node or add a new subsection to a node

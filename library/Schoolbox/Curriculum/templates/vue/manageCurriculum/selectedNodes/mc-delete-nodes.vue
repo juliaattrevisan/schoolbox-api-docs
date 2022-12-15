@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 
 /**
  * To be able to delete a node on confirmation
@@ -27,7 +27,7 @@ watch(() => deleteNodesStore.isOpen, (isOpen) => {
  * delete the node when confirmed
  */
 function onDeleteSelected () {
-    deleteNodesStore.delete();
+    deleteNodesStore.deleteNodes();
 }
 
 /**
@@ -35,14 +35,14 @@ function onDeleteSelected () {
  * and update the UI accordingly
  */
 deleteNodesStore.$onAction(({ name, after, onError }) => {
-    if (name === 'delete') {
-        store.toastEl.activate('Deleting...');
+    if (name === 'deleteNodes') {
+        store.toastEl.value.activate('Deleting...');
         after((result) => {
-            store.toastEl.timeout(result, true, 5000);
+            store.toastEl.value.timeout(result, true, 5000);
         });
         onError((error) => {
             console.warn(error);
-            // store.toastEl.timeout('Unable to delete node', false, 5000);
+            // store.toastEl.value.timeout('Unable to delete node', false, 5000);
         });
     }
 });

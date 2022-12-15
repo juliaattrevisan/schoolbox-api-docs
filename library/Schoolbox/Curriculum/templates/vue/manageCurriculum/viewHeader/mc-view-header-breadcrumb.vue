@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 
 /**
  * To indicate progress through the node tree and to be able to
@@ -6,41 +6,23 @@
  */
 
 import { shortenLength } from '@js/util/stringUtils';
-import { useViewNodesStore } from '../viewNodes/store/mcViewNodesStore';
+import { useViewNodesStore } from '@schoolboxCurriculum/vue/manageCurriculum/viewNodes/store/mcViewNodesStore';
+import type { Breadcrumb } from '@schoolboxCurriculum/types/Breadcrumb';
 
+interface Props {
+    breadcrumb: Breadcrumb; // the relevant breadcrumb
+    isDisabled: boolean; // to disable certain events when editing is taking place
+}
 
-const props = defineProps({
-    /**
-     * the relevant breadcrumb
-     */
-    breadcrumb: {
-        type: Object,
-        required: true,
-    },
-    /**
-     * to disable certain events when editing is taking place
-     */
-    isDisabled: {
-        type: Boolean,
-        required: true,
-    },
-    /**
-     * to shorten names that exceed a specified length
-     */
-    maxNameLength: {
-        type: Number,
-        required: false,
-        default: 50,
-    },
-});
-
+const props = defineProps<Props>();
+const maxNameLength = 50;
 const viewNodesStore = useViewNodesStore();
 
 /**
  * to display the just selected node
  */
 function onSelected () {
-    viewNodesStore.setSelected(props.breadcrumb.depth, parseInt(props.breadcrumb.id));
+    viewNodesStore.setSelected(props.breadcrumb.depth as number, props.breadcrumb.id);
 }
 
 </script>
@@ -48,15 +30,16 @@ function onSelected () {
 <template>
     <li>
         <span v-if="props.isDisabled">
-            {{ shortenLength(props.breadcrumb.name, props.maxNameLength) }}
+            {{ shortenLength(props.breadcrumb.name as string, maxNameLength) }}
         </span>
-        <a v-else
+        <a
+            v-else
             :href="`/curricululm/${props.breadcrumb.id}`"
             :title="`View ${props.breadcrumb.name}`"
             @click.prevent="onSelected()"
             @keyup.enter="onSelected()"
         >
-            {{ shortenLength(props.breadcrumb.name, props.maxNameLength) }}
+            {{ shortenLength(props.breadcrumb.name as string, maxNameLength) }}
         </a>
     </li>
 </template>

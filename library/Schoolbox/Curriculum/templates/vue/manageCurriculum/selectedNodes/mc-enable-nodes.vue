@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 
 /**
  * To be able to enabled a node on confirmation
@@ -36,13 +36,13 @@ function onEnableSelected () {
  */
 enableNodesStore.$onAction(({ name, after, onError }) => {
     if (name === 'enable') {
-        store.toastEl.activate('Processing...');
+        store.toastEl.value.activate('Processing...');
         after((result) => {
-            store.toastEl.timeout(result, true, 5000);
+            store.toastEl.value.timeout(result, true, 5000);
         });
         onError((error) => {
             console.warn(error);
-            // store.toastEl.timeout('Unable to enabled node', false, 5000);
+            // store.toastEl.value.timeout('Unable to enabled node', false, 5000);
         });
     }
 });
