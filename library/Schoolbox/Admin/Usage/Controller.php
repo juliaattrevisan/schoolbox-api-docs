@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Usage;
 
 use Alaress\Database\Connector\IConnector;
+use Alaress\Redis;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Config\ConfigMapper;
@@ -26,21 +27,18 @@ use Schoolbox\User;
 class Controller extends Base
 {
 
-    /**
-     * @var ErrorMapper
-     */
-    private $errorMapper;
-
-
+    const CACHE_TIMEOUT = 86400;
     /**
      * Controller constructor.
      *
      * @param ErrorMapper $errorMapper
+     * @param Redis $cache
      */
-    public function __construct(ErrorMapper $errorMapper)
-    {
-        $this->errorMapper = $errorMapper;
-    }
+    public function __construct(
+        private ErrorMapper $errorMapper,
+        private Redis $cache
+    )
+    {}
 
 
     /**
@@ -97,7 +95,11 @@ class Controller extends Base
         /** @var IConnector $database */
         $database = $this->getDi()->get('databaseInternal');
 
-        $payload = (new Graph\GlobalUsers\SystemPayload($database))->generate();
+        //get redis cache result, serve to user
+        $callback = function ($database) {
+            return (new Graph\GlobalUsers\SystemPayload($database))->generate();
+        };
+        $payload = $this->cache->cacheFunctionCall('system_usage_system', $callback, $database, self::CACHE_TIMEOUT);
 
         $this->getResponse()->content->set($this->buildJsonOutput($payload));
     }
@@ -111,7 +113,11 @@ class Controller extends Base
         /** @var IConnector $database */
         $database = $this->getDi()->get('databaseInternal');
 
-        $payload = (new Graph\GlobalUsers\RolePayload($database))->generate();
+        //get redis cache result, serve to user
+        $callback = function ($database) {
+            return (new Graph\GlobalUsers\RolePayload($database))->generate();
+        };
+        $payload = $this->cache->cacheFunctionCall('system_usage_role', $callback, $database, self::CACHE_TIMEOUT);
 
         $this->getResponse()->content->set($this->buildJsonOutput($payload));
     }
@@ -125,7 +131,11 @@ class Controller extends Base
         /** @var IConnector $database */
         $database = $this->getDi()->get('databaseInternal');
 
-        $payload = (new Graph\GlobalUsers\TotalPayload($database, $this->getConfigLoader()->get('storage_dir')))->generate();
+        //get redis cache result, serve to user
+        $callback = function ($database) {
+            return (new Graph\GlobalUsers\TotalPayload($database, $this->getConfigLoader()->get('storage_dir')))->generate();
+        };
+        $payload = $this->cache->cacheFunctionCall('system_usage_total', $callback, $database, self::CACHE_TIMEOUT);
 
         $this->getResponse()->content->set($this->buildJsonOutput($payload));
     }
@@ -139,7 +149,11 @@ class Controller extends Base
         /** @var IConnector $database */
         $database = $this->getDi()->get('databaseInternal');
 
-        $payload = (new Graph\GlobalUsers\UserPayload($database))->generate();
+        //get redis cache result, serve to user
+        $callback = function ($database) {
+            return (new Graph\GlobalUsers\UserPayload($database))->generate();
+        };
+        $payload = $this->cache->cacheFunctionCall('system_usage_user', $callback, $database, self::CACHE_TIMEOUT);
 
         $this->getResponse()->content->set($this->buildJsonOutput($payload));
     }
@@ -153,8 +167,13 @@ class Controller extends Base
         /** @var IConnector $database */
         $database = $this->getDi()->get('databaseInternal');
 
-        $payload = (new Graph\GlobalUsers\FileTypePayload($database))->generate();
+        //get redis cache result, serve to user
+        $callback = function ($database) {
+            return (new Graph\GlobalUsers\FileTypePayload($database))->generate();
+        };
+        $payload = $this->cache->cacheFunctionCall('system_usage_fileType', $callback, $database, self::CACHE_TIMEOUT);
 
+        $deleted = $this->cache->dropKeyCache('system_usage_fileType', $database);
         $this->getResponse()->content->set($this->buildJsonOutput($payload));
     }
 

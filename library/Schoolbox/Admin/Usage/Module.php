@@ -12,6 +12,7 @@ namespace Schoolbox\Admin\Usage;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
+use Alaress\Redis;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
@@ -98,7 +99,10 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
-        return new Controller($this->getMapperFactory()->get(ErrorMapper::class));
+        return new Controller(
+            $this->getMapperFactory()->get(ErrorMapper::class),
+            Redis::getCacheInstance()
+        );
     }
 
 
