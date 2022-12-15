@@ -11,7 +11,7 @@ import { defineStore } from "pinia";
 import { useNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/mcNodesStore";
 import { UNSET_ID, findById, getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
 import { useEnableNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/selectedNodes/store/mcEnableNodesStore";
-import { Node } from "@schoolboxCurriculum/types/Node";
+import type { Node } from "@schoolboxCurriculum/types/Node";
 
 export const useSelectedNodesStore = defineStore("mcSelectedNodes", () => {
     const nodes = ref<Node[]>([]); // the currently selected nodes

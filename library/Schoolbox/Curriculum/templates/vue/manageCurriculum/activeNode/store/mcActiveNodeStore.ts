@@ -55,8 +55,7 @@ export const useActiveNodeStore = defineStore("mcActiveNode", () => {
      */
     function update(newNode: NodeToUpdate) {
         if (newNode.name !== node.value.name) {
-            node.value.name = newNode.name;
-            useNodesStore().nodeUpdated(node.value); // notify to prompt a sort
+            node.value.name = newNode.name.trim();
         }
         if (typeof newNode.code === "string" && newNode.code !== node.value.code) {
             node.value.code = newNode.code.trim();
@@ -64,6 +63,7 @@ export const useActiveNodeStore = defineStore("mcActiveNode", () => {
         if (newNode.description !== node.value.description) {
             node.value.description = newNode.description;
         }
+        useNodesStore().nodeUpdated(node.value); // notify to prompt a sort
     }
 
     /**
@@ -78,12 +78,12 @@ export const useActiveNodeStore = defineStore("mcActiveNode", () => {
         } else {
             // otherwise we need to push the newNode in as the children are already loaded
             node.value.children.push(newNode);
-            sortNodes(node.value.children); // and sort again with the new node added
+            node.value.children = sortNodes(node.value.children); // and sort again with the new node added
         }
         const viewNodesStore = useViewNodesStore();
         if (viewNodesStore.current.id !== newNode.parent?.id) {
             // if we aren't on the new nodes level move down so we can see the new node
-            viewNodesStore.setNextSelected(newNode.parent?.id as number);
+            await viewNodesStore.setNextSelected(newNode.parent?.id as number);
         }
     }
 

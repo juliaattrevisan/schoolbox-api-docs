@@ -44,7 +44,7 @@ export const useDeleteNodesStore = defineStore("mcDeleteNodes", () => {
     /**
      * To notify the user of success status
      *
-     * @returns { string }
+     * @returns { string } - the success message
      */
     function getSuccessMessage() {
         const nodeSingleOrPlural = capitalizeFirstLetter(useSelectedNodesStore().singleOrPlural);
@@ -62,7 +62,7 @@ export const useDeleteNodesStore = defineStore("mcDeleteNodes", () => {
      * node removal has been confirmed so notify the backend
      * and then pull it out of the nodes if successful
      *
-     * @TODO - more extensive error checking needs to occur
+     * @todo - more extensive error checking needs to occur
      */
     async function deleteNodes() {
         try {

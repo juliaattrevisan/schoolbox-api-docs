@@ -7,7 +7,7 @@ import { defineStore } from "pinia";
 import {
     UNSET_ID,
     findById,
-    sortByName,
+    sortNodes,
     removeId,
     getBreadcrumbs,
     getEmptyNode,
@@ -15,8 +15,8 @@ import {
 import { useStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/manageCurriculumStore";
 import { useViewNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/viewNodes/store/mcViewNodesStore";
 import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/selectedNodes/store/mcSelectedNodesStore";
-import { Node } from "@schoolboxCurriculum/types/Node";
-import { Breadcrumb } from "@schoolboxCurriculum/types/Breadcrumb";
+import type { Node } from "@schoolboxCurriculum/types/Node";
+import type { Breadcrumb } from "@schoolboxCurriculum/types/Breadcrumb";
 
 export const useNodesStore = defineStore("mcNodes", () => {
     const nodes = ref<Node>(getEmptyNode()); // all the nodes currently loaded
@@ -51,6 +51,7 @@ export const useNodesStore = defineStore("mcNodes", () => {
             description: null,
             enabled: true,
             id: UNSET_ID,
+            order: 0,
             parent: null,
             name: "Curricula",
         };
@@ -211,7 +212,7 @@ export const useNodesStore = defineStore("mcNodes", () => {
      */
     function addNewCurriculum(curriculum: Node) {
         nodes.value?.children?.push(curriculum);
-        sortByName(nodes.value?.children as Node[]);
+        nodes.value.children = sortNodes(nodes.value.children as Node[]);
     }
 
     /**
@@ -223,10 +224,10 @@ export const useNodesStore = defineStore("mcNodes", () => {
         if (node.parent) {
             // sort via the parent node
             const parentNode = findById(nodes.value?.children as Node[], node.parent.id) as Node;
-            sortByName(parentNode.children as Node[]);
+            parentNode.children = sortNodes(parentNode.children as Node[]);
         } else {
             // otherwise sort on the children
-            sortByName(nodes.value?.children as Node[]);
+            nodes.value.children = sortNodes(nodes.value.children as Node[]);
         }
     }
 
