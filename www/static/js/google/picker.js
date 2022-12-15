@@ -94,15 +94,11 @@
                 handleAuthResult();
             };
 
-            if (authResult !== null) {
-                // If authorisation has already been given, prompt the user to select a Google Account only.
-                // This will happen if the Google File Selector is opened a second or subsequent time while the parent window has not been refreshed.
-                window.googleClientToken.requestAccessToken({prompt: ''});
-            } else if (config.authBtn && $(config.authBtn).hasClass('hide')) {
+            if (config.authBtn && $(config.authBtn).hasClass('hide')) {
+                // If the auth button is hidden, show the button so the user can click to authorise access to Google files.
                 $(config.authBtn).removeClass('hide');
             } else {
-                // If authorisation has not yet been given, prompt the user to select a Google Account and ask for consent to share their data.
-                window.googleClientToken.requestAccessToken({prompt: 'consent'});
+                window.googleClientToken.requestAccessToken({prompt: ''});
             }
         }
 
