@@ -35,6 +35,7 @@ use InvalidArgumentException;
  */
 class Mapper extends BaseMapper
 {
+
     /**
      * Setup mapper
      *
