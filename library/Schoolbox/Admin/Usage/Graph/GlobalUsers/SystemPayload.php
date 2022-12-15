@@ -70,6 +70,10 @@ class SystemPayload
         return $stack;
     }
 
+    /**
+     * Calculate the size of images used in the Tiles component
+     * @return array|mixed
+     */
     private function getTiles()
     {
         $query = "SELECT
@@ -82,6 +86,10 @@ class SystemPayload
         return $result->fetch();
     }
 
+    /**
+     * Calculate the size of files within MyFiles
+     * @return array|mixed
+     */
     private function getMyFiles()
     {
         $query = "SELECT
@@ -92,6 +100,11 @@ class SystemPayload
         $result = $this->database->executeQuery($query);
         return $result->fetch();
     }
+
+    /**
+     * Calculate the size of files attached to Pastoral items
+     * @return array|mixed
+     */
     private function getPastoral()
     {
         $query = "SELECT
@@ -103,6 +116,10 @@ class SystemPayload
         return $result->fetch();
     }
 
+    /**
+     * Calculate the size of attachments and feature images within News
+     * @return array|mixed
+     */
     private function getNews()
     {
         $query = "SELECT
@@ -124,6 +141,10 @@ class SystemPayload
         return $result->fetch();
     }
 
+    /**
+     * Calculate the size of files within Due Work
+     * @return array|mixed
+     */
     private function getDueWork()
     {
         $query = "SELECT
@@ -135,6 +156,10 @@ class SystemPayload
         return $result->fetch();
     }
 
+    /**
+     * Calculate the size of files within Tasks
+     * @return array|mixed
+     */
     private function getTasks()
     {
         $query = "SELECT
@@ -146,6 +171,10 @@ class SystemPayload
         return $result->fetch();
     }
 
+    /**
+     * Calculate the size of files within Due Work (Submission Response)
+     * @return array|mixed
+     */
     private function getSubmissionReturns()
     {
         $query = "SELECT
@@ -157,6 +186,10 @@ class SystemPayload
         return $result->fetch();
     }
 
+    /**
+     * Calculate the size of files within Due Work (Student Submissions)
+     * @return array|mixed
+     */
     private function getStudentSubmissions()
     {
         $query = "SELECT
@@ -168,6 +201,10 @@ class SystemPayload
         return $result->fetch();
     }
 
+    /**
+     * Calculate the size of files within the Resource Browser (CMS)
+     * @return array|mixed
+     */
     private function getCMSResources()
     {
         $query = "SELECT

@@ -171,6 +171,11 @@ class RolePayload
         return $stack;
     }
 
+    /**
+     * Get the file table storage usage by role
+     * this will ignore files that have been deleted in the file table (Resource Browser)
+     * @return \Alaress\Database\Statement\Query\Base|\Alaress\Database\Statement\Query\IQuery
+     */
     private function getFile()
     {
         $query = "SELECT `groups`.id, `groups`.name, `groups`.sequence, SUM(`storage`.`filesize`) AS size
@@ -184,6 +189,11 @@ class RolePayload
         return $this->database->executeQuery($query);
     }
 
+    /**
+     * Get the myFile table storage usage by role
+     * this will ignore files that have been deleted in the MyFile table (My Files)
+     * @return \Alaress\Database\Statement\Query\Base|\Alaress\Database\Statement\Query\IQuery
+     */
     private function getMyFile()
     {
         $query = "SELECT `groups`.id, `groups`.name, `groups`.sequence, SUM(`storage`.`filesize`) AS size
@@ -197,6 +207,11 @@ class RolePayload
         return $this->database->executeQuery($query);
     }
 
+    /**
+     * Get the student_submission_file table storage usage by role
+     * this will ignore files that have been deleted in the student_submission_file table (Due Work Submission)
+     * @return \Alaress\Database\Statement\Query\Base|\Alaress\Database\Statement\Query\IQuery
+     */
     private function getSubmissionBox()
     {
         $query = "SELECT `groups`.id, `groups`.name, `groups`.sequence, SUM(`storage`.`filesize`) AS size
@@ -210,6 +225,11 @@ class RolePayload
         return $this->database->executeQuery($query);
     }
 
+    /**
+     * Get the submission_return_file table storage usage by role
+     * this will ignore files that have been deleted in the submission_return_file table (Due Work Submission Response)
+     * @return \Alaress\Database\Statement\Query\Base|\Alaress\Database\Statement\Query\IQuery
+     */
     private function getSubmissionReturn()
     {
         $query = "SELECT `groups`.id, `groups`.name, `groups`.sequence, SUM(`storage`.`filesize`) AS size

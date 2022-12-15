@@ -45,7 +45,7 @@ $app = new class extends CliTool\App {
     {
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
-Re Calculates the storage usage
+Re Calculates the storage usage and stores the calculations in redis
 
 Usage: tools/usageCache.php [-v] [-p]
         -p Actually generate the cache

@@ -128,6 +128,10 @@ class FileTypePayload
         return $stack;
     }
 
+    /**
+     * Calculates the storage used by mime image/*
+     * @return array|mixed
+     */
     private function getImage()
     {
         $query = "SELECT
@@ -141,6 +145,10 @@ class FileTypePayload
         return $result->fetch();
     }
 
+    /**
+     * Calculates the storage used by mime video/*
+     * @return array|mixed
+     */
     private function getVideo()
     {
         $query = "SELECT
@@ -154,6 +162,10 @@ class FileTypePayload
         return $result->fetch();
     }
 
+    /**
+     * Calculates the storage used by mime application/*
+     * @return array|mixed
+     */
     private function getApplication()
     {
         $query = "SELECT
@@ -167,6 +179,10 @@ class FileTypePayload
         return $result->fetch();
     }
 
+    /**
+     * Calculates the storage used by mime audio/*
+     * @return array|mixed
+     */
     private function getAudio()
     {
         $query = "SELECT
@@ -180,6 +196,10 @@ class FileTypePayload
         return $result->fetch();
     }
 
+    /**
+     * Calculates the storage used by mime text/*
+     * @return array|mixed
+     */
     private function getText()
     {
         $query = "SELECT
@@ -193,6 +213,10 @@ class FileTypePayload
         return $result->fetch();
     }
 
+    /**
+     * Calculates the storage used by files with no extension listed in the allowed files table
+     * @return array|mixed
+     */
     private function getOther()
     {
         $query = "SELECT

@@ -8,7 +8,10 @@ use Psr\Log\LoggerInterface;
 
 class Regenerate
 {
-    const CACHE_TIMEOUT = 86400; //24hrs in seconds
+    /**
+     * Cache the usage calculations for 24hrs
+    */
+    const CACHE_TIMEOUT = 86400;
     const CACHE_USAGE_SYSTEM = 'system_usage_system';
     const CACHE_USAGE_ROLE = 'system_usage_role';
     const CACHE_USAGE_USER = 'system_usage_user';
@@ -29,9 +32,16 @@ class Regenerate
     ) {
     }
 
+    /**
+     * Deletes all caches for the storage system calculation screen from within redis,
+     * Then will re calculate the storage and store that result in redis
+     *
+     * @param LoggerInterface|null $logger //used for the cli script tools/storage/usageCache.php
+     * @return void
+     */
     public function regenerateUsage(LoggerInterface $logger = null): void
     {
-        $logger?->info("Clearing all cache's");
+        $logger?->notice("Clearing all cache's");
         //clear the cache for all cached queries
         foreach (self::CACHED_QUERIES as $cachedQuery) {
             $logger?->debug("Removing cache: {$cachedQuery}");
@@ -79,6 +89,6 @@ class Regenerate
                 ];
         };
         $payload = $this->cache->cacheFunctionCall(self::CACHE_USAGE_FILETYPE, $callback, $this->database, self::CACHE_TIMEOUT);
-        $logger?->info("All Complete");
+        $logger?->notice("Calculation of storage complete");
     }
 }
