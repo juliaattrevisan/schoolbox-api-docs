@@ -35,7 +35,8 @@ class Regenerate
         //clear the cache for all cached queries
         foreach (self::CACHED_QUERIES as $cachedQuery) {
             $logger?->debug("Removing cache: {$cachedQuery}");
-            $this->cache->dropKeyCache($cachedQuery, $this->database);
+            $count = $this->cache->dropKeyCache($cachedQuery, $this->database);
+            $logger?->debug("Removed: #{$count} instances of: {$cachedQuery}");
         }
 
         //regenerate all queries
