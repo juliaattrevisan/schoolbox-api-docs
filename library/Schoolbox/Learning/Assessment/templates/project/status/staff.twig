@@ -222,7 +222,7 @@ Data:
                                 {% set publishedHumanReadableMark = participant.humanReadableMark(true) ?? null %}
 
                                 {% if publishedHumanReadableMark is not null %}
-                                    <div class="grade {{ urgency.marks(assessment.normalisedMark(participant, true)) }}-bg">
+                                    <div class="grade {{ urgency.marks( participant.normalisedMark(true)) }}-bg">
                                         <span>{{ publishedHumanReadableMark }}</span>
                                     </div>
                                 {% endif %}
