@@ -31,6 +31,7 @@ $assessHandler   = new Assess_Main();
 $attemptHandler  = new Assess_Attempt();
 $responseHandler = new Assess_Response();
 $groupHandler    = new Group();
+
 $getAttempt = function ($attemptId) use ($assessmentDataSource, $attemptHandler, $assessHandler, $groupHandler) {
 
     if (!is_numeric($attemptId)) {
@@ -69,6 +70,12 @@ $getAttempt = function ($attemptId) use ($assessmentDataSource, $attemptHandler,
         $this->pageNotFound();
     }
 
+    /* Arbitrarily hijack this array a little bit so we know the context of this attempt's quiz.
+     * If the context is a project, we need to invalidate its result cache
+     */
+    $attempt['quiz'] = $quiz;
+    $attempt['user'] = $user;
+
     return $attempt;
 };
 $deleteAttempt = function (array $attempt) use ($responseHandler, $attemptHandler) {
@@ -79,6 +86,8 @@ $deleteAttempt = function (array $attempt) use ($responseHandler, $attemptHandle
         'deleted_at' => 'NOW()'
     ));
 };
+
+
 if (isset($_POST['userIds']) && isset($_POST['assessmentId'])) {
     $quiz = Schoolbox\Learning\Quiz\Mapper::getInstance()->findOneByColumn('assessment_id', $_POST['assessmentId']);
     $userAttemptIds = Schoolbox\Learning\Quiz\Attempt\Mapper::getInstance()->findIdsByColumnList([
@@ -99,6 +108,9 @@ foreach ($_POST['attemptIds'] as $attemptId) {
  */
 foreach ($attemptsToDelete as $currentAttempt) {
     $deleteAttempt($currentAttempt);
+
+    $projectResultCache = new \Schoolbox\Learning\Assessment\Project\ResultCache\ResultCache(\Schoolbox\Learning\Assessment\Project\ResultCache\Mapper::getInstance());
+    $projectResultCache->refresh($assessmentDataSource, $currentAttempt['quiz'], $currentAttempt['user']);
 }
 
 SitePage::backToTheFuture(1);
