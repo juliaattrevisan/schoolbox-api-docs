@@ -286,7 +286,7 @@ module.exports = {
         rules: [
             {
                 test: require.resolve("jquery"),
-                loader: "expose-loader", // see https://webpack.js.org/loaders/expose-loader/ - expose these to the glocal scope, allowing access to the properties in twig / other JS files
+                loader: "expose-loader", // see https://webpack.js.org/loaders/expose-loader/ - expose these to the global scope, allowing access to the properties in twig / other JS files
                 options: {
                     exposes: [
                         { globalName: "$", override: true },
@@ -359,7 +359,7 @@ module.exports = {
             },
             {
                 test: /\.css$/,
-                exclude: /ckeditor5-[^/\\]+[/\\]theme[/\\].+\.css$/, // ensure ckeditor5 related styling setup below isn"t applied elsewhere
+                exclude: /ckeditor5-[^/\\]+[/\\]theme[/\\].+\.css$/, // ensure ckeditor5 related styling setup below isn't applied elsewhere
                 use: ["vue-style-loader", "style-loader", "css-loader"],
             },
             {
@@ -398,7 +398,7 @@ module.exports = {
                             {
                                 loader: "css-loader",
                                 options: {
-                                    url: false, // don"t validate image urls as they error, so we trust rely on checking in browser
+                                    url: false, // don't validate image urls as they error, so we trust rely on checking in browser
                                 }
                             },
                             { loader: "sass-loader" },
@@ -417,7 +417,7 @@ module.exports = {
                             {
                                 loader: "css-loader",
                                 options: {
-                                    url: false, // don't validate image urls as they error, so we trust rely on checking in browser
+                                    url: false, // don't validate image urls as they error, so we just rely on checking in browser
                                     modules: false // disable css modules for all files: https://github.com/css-modules/css-modules
                                 }
                             },
@@ -436,7 +436,7 @@ module.exports = {
             },
             {
                 test: /ckeditor5-[^/\\]+[/\\]theme[/\\]icons[/\\][^/\\]+\.svg$/,
-                use: [ "raw-loader" ]
+                use: ["raw-loader"]
             },
         ]
     },
