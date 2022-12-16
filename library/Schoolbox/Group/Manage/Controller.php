@@ -382,11 +382,19 @@ class Controller extends Base
      */
     public function searchUsers()
     {
-        $query    = trim($this->request->query->get('query'));
-        $searches = $query ? array_map('trim', explode(',', $query)) : [];
-        $users    = $this->userMapper->findByColumnList(['synergy_id' => $searches]);
-        $users    = $users->mergeUnique($this->userMapper->findByColumnList(['username' => $searches]), 'id');
-        $return   = [];
+        $query = trim($this->request->query->get('query'));
+
+        if (str_contains($query, ',')) {
+            $searches = array_map('trim', explode(',', $query));
+        } elseif (str_contains($query, ' ')) {
+            $searches = array_map('trim', explode(' ', $query));
+        } else {
+            $searches = [$query];
+        }
+
+        $users  = $this->userMapper->findByColumnList(['synergy_id' => $searches]);
+        $users  = $users->mergeUnique($this->userMapper->findByColumnList(['username' => $searches]), 'id');
+        $return = [];
 
         $excludeRoles = [];
         if ($this->getUser()->getRole()->isGuest()) {
