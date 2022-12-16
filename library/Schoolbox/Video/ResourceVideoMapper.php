@@ -28,7 +28,6 @@ use Schoolbox\Resource\Storage\Mapper as StorageMapper;
  */
 class ResourceVideoMapper extends Mapper
 {
-
     /**
      * @return void
      * @throws Mapper\DefinitionException
