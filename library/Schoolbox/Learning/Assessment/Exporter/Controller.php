@@ -343,12 +343,6 @@ class Controller extends BaseController
         $assessmentImpl = $this->replicator->replicateInNewContext($assessmentSpec, $context, $this->getUser(), $sequence);
         $this->assessmentDataSource->getNotifier()->notify($assessmentImpl, $this->getUser(), []);
 
-        /* A specific usage where creating projects and activities
-         * always invalidates the project result cache
-         */
-        $projectResultCache = new Project\ResultCache\ResultCache($this->projectResultCacheMapper);
-        $projectResultCache->refresh($this->assessmentDataSource, $assessmentImpl);
-
         // Recursive case
         if ($assessmentSpec instanceof Project) {
             foreach ($assessmentSpec->getAssessables() as $subAssessmentSpec) {
@@ -360,12 +354,24 @@ class Controller extends BaseController
                 $subAssessmentImpl = $this->exportToNewContext($subAssessmentSpec, $assessmentImpl);
 
                 $assessmentImpl->getAssessables()->add($subAssessmentImpl);
-
-                /* A specific usage where creating projects and activities
-                 * always invalidates the project result cache
-                 */
-                $projectResultCache->refresh($this->assessmentDataSource, $assessmentImpl);
             }
+
+            /* A specific usage where creating projects and activities
+             * always invalidates the project result cache
+             *
+             * This algorithm occurs when you export a whole project to a class
+             */
+            $projectResultCache = new Project\ResultCache\ResultCache($this->projectResultCacheMapper);
+            $projectResultCache->refresh($this->assessmentDataSource, $assessmentImpl);
+        } elseif ($assessmentSpec->getContext() instanceof Project) {
+            /* A specific usage where creating projects and activities
+             * always invalidates the project result cache
+             *
+             * This algorithm occurs when you use Export To Classes on a non-project assessment
+             * even if that assessment was already inside a project
+             */
+            $projectResultCache = new Project\ResultCache\ResultCache($this->projectResultCacheMapper);
+            $projectResultCache->refresh($this->assessmentDataSource, $assessmentImpl);
         }
 
         return $assessmentImpl;

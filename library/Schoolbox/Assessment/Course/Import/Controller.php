@@ -78,7 +78,8 @@ class Controller extends Base\Base
         Component_InstanceMapper $componentInstanceMapper,
         Access $access,
         ImportFactory $importFactory,
-        Assessment\MapperProxy $assessmentMapperProxy
+        Assessment\MapperProxy $assessmentMapperProxy,
+        private \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
     ) {
         $this->unitSpecificationMapper         = $unitSpecificationMapper;
         $this->unitImplementationMapper        = $unitImplementationMapper;
@@ -546,6 +547,14 @@ class Controller extends Base\Base
                 $project = $assessment;
                 $this->parseAssessmentForm($project, $subDatum);
             }
+        }
+
+        /* A specific usage where creating projects and activities
+         * always invalidates the project result cache
+         */
+        if ($assessment instanceof Project) {
+            $projectResultCache = new Project\ResultCache\ResultCache($this->projectResultCacheMapper);
+            $projectResultCache->refresh($this->assessmentMapperProxy, $assessment);
         }
     }
 

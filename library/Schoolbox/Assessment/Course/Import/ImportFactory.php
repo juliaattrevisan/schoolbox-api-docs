@@ -11,11 +11,7 @@ namespace Schoolbox\Assessment\Course\Import;
 use Alaress\Database\Predicate\Builder;
 use Alaress\IDatabase;
 use Alaress_Date_Format;
-use Schoolbox\Learning\Assessment\Project\ResultCache\ValidCache;
-use Schoolbox\Learning\Assessment\Summator\Mapping;
 use Schoolbox\Learning\AssessmentContext;
-use Schoolbox\Mapper\DefinitionException;
-use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\User;
 use UnexpectedValueException;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as IndicatorMapper;
@@ -84,8 +80,7 @@ class ImportFactory
         UnitImplementationMapper $unitImplementationMapper,
         \Component_InstanceMapper $componentInstanceMapper,
         \Component_ConfigDefinitionMapper $componentConfigDefinitionMapper,
-        \Component_ConfigMapper $componentConfigInstanceMapper,
-        private \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
+        \Component_ConfigMapper $componentConfigInstanceMapper
     ) {
         $this->assessmentMapperProxy           = $assessmentMapperProxy;
         $this->replicator                      = $replicator;
@@ -1049,12 +1044,6 @@ class ImportFactory
             // INSERT - Create Impl from Spec
             $newAssessment = $this->replicator->replicateInNewContext($specAssessment, $context, $user);
             $notifier->notify($newAssessment, $user, $before);
-
-            /* A specific usage where creating projects and activities
-             * always invalidates the project result cache
-             */
-            $projectResultCache = new Project\ResultCache\ResultCache($this->projectResultCacheMapper);
-            $projectResultCache->refresh($this->assessmentMapperProxy, $newAssessment);
         } else {
             // UPDATE
             $newAssessment = null;
