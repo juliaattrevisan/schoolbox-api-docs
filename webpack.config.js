@@ -358,6 +358,11 @@ module.exports = {
                 }
             },
             {
+                test: /\.css$/,
+                exclude: /ckeditor5-[^/\\]+[/\\]theme[/\\].+\.css$/, // ensure ckeditor5 related styling setup below isn't applied elsewhere
+                use: ['vue-style-loader', 'style-loader', 'css-loader'],
+            },
+            {
                 test: /ckeditor5-[^/\\]+[/\\]theme[/\\].+\.css$/,
                 use: [
                     {
@@ -383,44 +388,6 @@ module.exports = {
                     }
                 ]
             },
-            {
-                test: /\.css$/,
-                use: ['vue-style-loader', 'style-loader', 'css-loader'],
-            },
-            // {
-            //     test: /\.css$/,
-            //     oneOf: [ // this allows us to only perform the below on ckeditor 5 css files, then other css files follow the following
-            //         {
-            //             resourceQuery: /ckeditor5-[^/\\]+[/\\]theme[/\\].+\.css$/,
-            //             use: [
-            //                 {
-            //                     loader: 'style-loader',
-            //                     options: {
-            //                         injectType: 'singletonStyleTag',
-            //                         attributes: {
-            //                             'data-cke': true
-            //                         }
-            //                     }
-            //                 },
-            //                 'css-loader',
-            //                 {
-            //                     loader: 'postcss-loader',
-            //                     options: {
-            //                         postcssOptions: styles.getPostCssConfig( {
-            //                             themeImporter: {
-            //                                 themePath: require.resolve( '@ckeditor/ckeditor5-theme-lark' )
-            //                             },
-            //                             minify: true
-            //                         } )
-            //                     }
-            //                 }
-            //             ]
-            //         },
-            //         {
-            //             use: ['vue-style-loader', 'style-loader', 'css-loader'],
-            //         }
-            //     ]
-            // },
             {
                 test: /\.scss$/,
                 oneOf: [ // this allows us to only perform the below on vue files, then other scss files follow the following

@@ -14,7 +14,3 @@ ClassicEditor.create(document.querySelector("#editor"), {
     .catch((error) => {
         console.error(error.stack);
     });
-
-const myString = "HAI THERE";
-
-console.warn(myString.toLocaleLowerCase());
