@@ -41,6 +41,10 @@
                  */
                 element: element,
 
+                /* Google Apps Client ID (googlapps_client_id in config database table).
+                 */
+                clientId: element,
+
                 /* Our modal. The google modal appears on top of this or inside of this with containerID set
                  */
                 modalId: '#gfile',
@@ -88,7 +92,7 @@
         function authorize() {
             // The google.accounts.oauth2 variable comes from https://accounts.google.com/gsi/client.
             let googleClientToken = window.google.accounts.oauth2.initTokenClient({
-                client_id: '9783556777-4tkb8q7q2vm6bafk2cul5gaofdcvis2a.apps.googleusercontent.com',
+                client_id: config.clientId,
                 scope: 'https://www.googleapis.com/auth/drive', // See, edit, create, and delete all of your Google Drive files (see https://developers.google.com/identity/protocols/oauth2/scopes).
                 callback: (response) => {
                 },
