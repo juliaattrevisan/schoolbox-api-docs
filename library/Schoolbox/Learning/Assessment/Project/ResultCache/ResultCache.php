@@ -203,7 +203,7 @@ class ResultCache
              * If you aren't careful you'll operate on a cached version of $assessment,
              * participations and all, leading to calculating wrong values
              */
-            $project = $assessmentMapperProxy->findOneByColumn('id', $assessment->getId(), true, null, ['cache' => false]);
+            $project = $assessmentMapperProxy->findOneByColumn('id', $assessment->getId(), true, $student, ['cache' => false]);
         } elseif ($assessment->getContext() instanceof Project) {
             /* Dodge the mapper cache maybe. ffs
              * Take the performance hit right between the eyes
@@ -211,7 +211,7 @@ class ResultCache
              * If you aren't careful you'll operate on a cached version of $assessment's context,
              * participations and all, leading to calculating wrong values
              */
-            $project = $assessmentMapperProxy->findOneByColumn('id', $assessment->getContext()->getId(), true, null, ['cache' => false]);
+            $project = $assessmentMapperProxy->findOneByColumn('id', $assessment->getContext()->getId(), true, $student, ['cache' => false]);
         } else {
             /* noop
              *
