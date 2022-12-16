@@ -85,14 +85,19 @@ class ResourceVideoMapper extends Mapper
             SELECT    {$this->getJoinMapper('file')->getColumnString('f')},
                       {$this->getColumnString('vq')},
                       {$fileMapper->getJoinMapper('owner')->getColumnString('u')}
-            FROM      `{$this->getTable()}` vq
-            JOIN      {$this->getJoinSQL('file', 'vq', 'f')}
+            FROM      {$this->getJoinMapper('file')->getTable()} f
+            JOIN      (
+                        SELECT MAX(video_queue_id) AS video_queue_id, `hash`, `type`, `uploaded_by`, `status`, `message`, `duration`, `createdOn`, `modifiedOn`
+                        FROM `video_queue`
+                        WHERE `status` != 'failed'
+                        GROUP BY `hash`
+                      ) vq ON f.`hash` = vq.`hash`
             LEFT JOIN {$fileMapper->getJoinSQL('owner', 'f', 'u', true)}
             JOIN      storage s ON s.hash = f.hash
             JOIN      allowedFileExtension e ON s.ext = e.extension
-            JOIN      allowedFileTypes ft ON ft.fileTypeID = e.fileTypeID
-            WHERE     category = :cat AND
-                      vq.status != 'failed' AND
+            JOIN      allowedFileTypes ft ON ft.fileTypeID = e.fileTypeID AND ft.deleted = 0
+            WHERE     f.deleted_at IS NULL AND
+                      category = :cat AND
                       ft.mime like :mime
         ";
 
@@ -132,8 +137,8 @@ class ResourceVideoMapper extends Mapper
         $statement->bindParam(':cat', $category);
         $statement->bindParam(':mime', $mime);
 
-        if ($limit != false) {
-            $statement->bindParam(':lim', intval($limit), \PDO::PARAM_INT);
+        if ($limit) {
+            $statement->bindParam(':lim', $limit, \PDO::PARAM_INT);
         }
 
         $statement->execute();
@@ -147,7 +152,9 @@ class ResourceVideoMapper extends Mapper
             } else {
                 $video->getFile()->setOwner($fileMapper->getJoinMapper('owner')->getUnknownUser());
             }
-            $videoList->add($video);
+            // cloning to avoid hydration overriding existing file object
+            $currentVideo = clone $video;
+            $videoList->add($currentVideo);
         }
 
         return $videoList;
