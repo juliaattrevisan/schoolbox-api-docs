@@ -15,6 +15,6 @@
 //         console.error(error.stack);
 //     });
 
-const myString: string = "HAI THERE";
+const myString = "HAI THERE";
 
 console.warn(myString.toLocaleLowerCase());

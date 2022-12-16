@@ -359,7 +359,37 @@ module.exports = {
             },
             {
                 test: /\.css$/,
-                use: ['vue-style-loader', 'style-loader', 'css-loader'],
+                oneOf: [ // this allows us to only perform the below on ckeditor 5 css files, then other css files follow the following
+                    {
+                        resourceQuery: /ckeditor5-[^/\\]+[/\\]theme[/\\].+\.css$/,
+                        use: [
+                            {
+                                loader: 'style-loader',
+                                options: {
+                                    injectType: 'singletonStyleTag',
+                                    attributes: {
+                                        'data-cke': true
+                                    }
+                                }
+                            },
+                            'css-loader',
+                            {
+                                loader: 'postcss-loader',
+                                options: {
+                                    postcssOptions: styles.getPostCssConfig( {
+                                        themeImporter: {
+                                            themePath: require.resolve( '@ckeditor/ckeditor5-theme-lark' )
+                                        },
+                                        minify: true
+                                    } )
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        use: ['vue-style-loader', 'style-loader', 'css-loader'],
+                    }
+                ]
             },
             {
                 test: /\.scss$/,
@@ -411,32 +441,6 @@ module.exports = {
                 test: /ckeditor5-[^/\\]+[/\\]theme[/\\]icons[/\\][^/\\]+\.svg$/,
                 use: [ 'raw-loader' ]
             },
-            {
-                test: /ckeditor5-[^/\\]+[/\\]theme[/\\].+\.css$/,
-                use: [
-                    {
-                        loader: 'style-loader',
-                        options: {
-                            injectType: 'singletonStyleTag',
-                            attributes: {
-                                'data-cke': true
-                            }
-                        }
-                    },
-                    'css-loader',
-                    {
-                        loader: 'postcss-loader',
-                        options: {
-                            postcssOptions: styles.getPostCssConfig( {
-                                themeImporter: {
-                                    themePath: require.resolve( '@ckeditor/ckeditor5-theme-lark' )
-                                },
-                                minify: true
-                            } )
-                        }
-                    }
-                ]
-            }
         ]
     },
     resolve: { // https://webpack.js.org/configuration/resolve/
