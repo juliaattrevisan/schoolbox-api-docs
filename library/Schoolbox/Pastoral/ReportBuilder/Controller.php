@@ -435,7 +435,7 @@ class Controller extends Base
         return [
             'Pastoral ID'  => $record->getId(),
             'Student Name' => $record->getStudent()->getFullName(),
-            'Student ID'   => $record->getStudent()->getId(),
+            'Student ID'   => $record->getStudent()->getExternalId() ?? '',
             'House'        => $record->getStudent()->getSchoolHouse() ? $record->getStudent()->getSchoolHouse()->getHouse() : '',
             'Campus'       => implode(',', $record->getStudent()->getCampusCollection()->getPropertyValues('name')),
             'Year'         => $record->getStudent()->getYear() ? $record->getStudent()->getYear()->getName() : '',
