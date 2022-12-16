@@ -66,7 +66,7 @@ class Controller extends Base
      * @param UserMapper            $userMapper
      * @param RubricDataSource      $rubricMapper
      * @param ReturnedWorkMapper    $returnedWorkMapper
-     * @param Mapper                $resultCacheMapper
+     * @param Mapper                $projectResultCacheMapper
      */
     public function __construct(
         IFeedbackDataSource $feedbackDataSource,
@@ -76,7 +76,7 @@ class Controller extends Base
         UserMapper $userMapper,
         RubricDataSource $rubricMapper,
         ReturnedWorkMapper $returnedWorkMapper,
-        private Project\ResultCache\Mapper $resultCacheMapper
+        private Project\ResultCache\Mapper $projectResultCacheMapper
     ) {
         $this->feedbackDataSource    = $feedbackDataSource;
         $this->participantDataSource = $participantDataSource;
@@ -138,7 +138,7 @@ class Controller extends Base
                 /* You're forced to require participants/participation hydrated here
                  * That Is Unfortunate
                  */
-                (new Project\ResultCache\ResultCache($this->resultCacheMapper))->refresh($this->assessmentDataSource, $assessment, $student);
+                (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))->refresh($this->assessmentDataSource, $assessment, $student);
             }
         } catch (RangeException $e) {
             $this->sendError('Invalid mark provided' . $e->getMessage() . $e->getTraceAsString());
@@ -273,7 +273,7 @@ class Controller extends Base
                 /* You're forced to require participants/participation hydrated here
                  * That Is Unfortunate
                  */
-                (new Project\ResultCache\ResultCache($this->resultCacheMapper))->refresh($this->assessmentDataSource, $assessment, $student);
+                (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))->refresh($this->assessmentDataSource, $assessment, $student);
             }
         } catch (RangeException $e) {
             $this->sendError('Invalid mark provided');
@@ -369,6 +369,10 @@ class Controller extends Base
 
         try {
             $this->getFeedbackDataSource()->delete($feedback);
+
+            if ($feedback->getAssessable()->getContext() instanceof Project) {
+                (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))->refresh($this->assessmentDataSource, $feedback->getAssessable(), $feedback->getReviewee());
+            }
         } catch (MapperException $e) {
             $code = 400;
             $data = $e->getMessage();
