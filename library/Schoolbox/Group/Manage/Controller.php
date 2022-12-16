@@ -384,16 +384,12 @@ class Controller extends Base
     {
         $query = trim($this->request->query->get('query'));
 
-        if ($query === null) {
-            $searches = [];
+        if (str_contains($query, ',')) {
+            $searches = array_map('trim', explode(',', $query));
+        } elseif (str_contains($query, ' ')) {
+            $searches = array_map('trim', explode(' ', $query));
         } else {
-            if (str_contains($query, ',')) {
-                $searches = array_map('trim', explode(',', $query));
-            } elseif (str_contains($query, ' ')) {
-                $searches = array_map('trim', explode(' ', $query));
-            } else {
-                $searches = [$query];
-            }
+            $searches = [$query];
         }
 
         $users  = $this->userMapper->findByColumnList(['synergy_id' => $searches]);
