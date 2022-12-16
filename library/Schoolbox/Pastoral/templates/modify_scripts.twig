@@ -256,17 +256,17 @@
                 window.addGroup("{{ audience.group.id }}", "{{ audience.group.name }}", "{{ audience.access }}", visibilityLocked);
                 {% endif %}
                 {% if audience.role %}
-                window.addRole("{{ audience.role.id }}", "{{ audience.role.name }}", "{{ audience.access }}", visibilityLocked);
+                window.addRole("{{ audience.role.id }}", "{{ audience.role.name }}", "{{ audience.access }}", "{{ audience.commentsAllowed }}", visibilityLocked);
                 {% endif %}
                 {% if audience.roleType %}
-                window.addRole("role-type-{{ audience.roleType }}", "{{ audience.roleType | capitalize }}", "{{ audience.access }}", visibilityLocked);
+                window.addRole("role-type-{{ audience.roleType }}", "{{ audience.roleType | capitalize }}", "{{ audience.access }}", "{{ audience.commentsAllowed }}", visibilityLocked);
                 {% endif %}
                 {% if audience.user %}
                 window.modalUserAdded({
                     'id': {{ audience.user.id }},
                     'full_name': "{{ audience.user.fullName }}",
                     'role': "{{ audience.user.role.name }}",
-                }, "{{ audience.access }}", visibilityLocked);
+                }, "{{ audience.access }}", "{{ audience.commentsAllowed }}", visibilityLocked);
                 {% endif %}
                 {% endfor %}
             }

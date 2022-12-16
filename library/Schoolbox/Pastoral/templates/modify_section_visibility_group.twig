@@ -47,11 +47,11 @@
                                value="2" {{ checkedPrivate }}>
                         <label class="radio-label" for="groupPrivate{{ userAccess.group.id }}"></label>
                     </td>
-                    {% if not reportPage and not managePage %}
+                    {% if not reportPage %}
                     <td class="small-2 checklist">
                         <input type="checkbox" name="groupComment{{ userAccess.group.id }}" id="groupComment{{ userAccess.group.id }}"
-                               value="1" checked="checked" readonly="readonly">
-                        <label class="checkbox-label" for="groupComment{{ userAccess.group.id }}"></label>
+                               value="1" checked="checked" readonly="readonly" data-always-read-only="1">
+                        <label class="checkbox-label {{ userAccess.access == 0 ? 'hide' : ''}}" for="groupComment{{ userAccess.group.id }}"></label>
                     </td>
                     {% endif %}
                     <td class="text-right small-1">
@@ -91,29 +91,11 @@
             {# Setup click events #}
 
             function updateGroupPermissionsClick() {
-                {# There is an annoying glitch that clicking a checkbox doesn't actually update the 'checked' markup #}
-                {# and so when we add a new role to the table some Javascript somewhere goes and updates the state #}
-                {# of the radio buttons to whichever value was 'checked' on page load. So, we need to update the #}
-                {# check attribute in the DOM for all radio buttons in the clicked group #}
-
-                $('#table-permission').find('.radio-label').click(function() {
-                    var clickedElement = $("#" + $(this).attr('for'));
-                    var radioGroupSelector = 'input[name*="' + clickedElement.attr('name') + '"]';
-
-                    {# Uncheck all radio buttons in the group #}
-
-                    $(radioGroupSelector).removeAttr('checked');
-
-                    {# Check the one that was clicked #}
-
-                    $(clickedElement).attr('checked', 'true');
-                });
-
                 $('[data-delete-visibility="group"]').click(function (e) {
                     e.preventDefault();
 
-                    var row = $(this).closest('tr');
-                    var groupId = $(row).attr('data-group-id');
+                    let row = $(this).closest('tr');
+                    let groupId = $(row).attr('data-group-id');
 
                     $('[data-reveal]').hide();
 
@@ -134,13 +116,13 @@
 
             function updateGroupsModal()
             {
-                var tableGroupsAdded = $('[data-group-id]');
+                let tableGroupsAdded = $('[data-group-id]');
 
                 $("[data-group-add]").removeClass('hide');
 
                 if (tableGroupsAdded.length > 1) {
                     tableGroupsAdded.each(function () {
-                        var groupId = $(this).attr('data-group-id');
+                        let groupId = $(this).attr('data-group-id');
 
                         if (groupId !== '{ID}') {
                             if (window.groupsAdded[groupId] === true) {
@@ -152,7 +134,7 @@
                     });
                 }
 
-                var groupModalButtons = $("[data-reveal-id='modal-group']");
+                let groupModalButtons = $("[data-reveal-id='modal-group']");
 
                 {# Subtracting one for the dummy clone row #}
 
@@ -178,16 +160,16 @@
 
                     window.groupsAdded[groupId] = true;
 
-                    var permissionListGroups = $('#permission-groups');
-                    permissionListGroups.html(permissionListGroups.html() + html);
+                    let permissionListGroups = $('#permission-groups');
+                    permissionListGroups.append(html);
 
                     let commentCheckbox = $('#groupComment' + groupId);
-                    commentCheckbox.attr('checked', 'checked');
-                    commentCheckbox.attr('readonly', 'readonly');
+                    initCommentCheckbox(commentCheckbox, true, true, permission);
 
+                    setRadioButtonListener('[data-group-id="' + groupId + '"]');
                     applyLock(['groups'], locked);
                     //Check the correct box
-                    var selector = 'input[name = "group['+groupId+']"][value ="'+permission+'"]';
+                    let selector = 'input[name = "group['+groupId+']"][value ="'+permission+'"]';
                     $(permissionListGroups).find(selector).attr("checked", "checked");
                 }
 
@@ -201,12 +183,12 @@
             $('[data-group-add]').click(function(e) {
                 e.preventDefault();
 
-                var groupId = $(this).attr('data-group-add');
-                var groupName = $(this).attr('data-group-name');
+                let groupId = $(this).attr('data-group-add');
+                let groupName = $(this).attr('data-group-name');
 
                 addGroup(groupId, groupName, 1, false);
 
-                var remaining = 0;
+                let remaining = 0;
 
                 $("[data-group-add]").each(function() {
                     if (!$(this).hasClass('hide')) {

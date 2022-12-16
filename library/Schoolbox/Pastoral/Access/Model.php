@@ -25,7 +25,7 @@ use Schoolbox\User;
  *
  * @package Schoolbox\Pastoral\Access
  */
-class Model implements ISoftDeletable
+class Model implements ISoftDeletable, Pastoral\IPastoralAccess
 {
     use Id;
     use CreatedAtDate;
@@ -284,7 +284,7 @@ class Model implements ISoftDeletable
      *
      * @return self
      */
-    public function setAccess($access): self
+    public function setAccess(int $access): self
     {
         $this->access = $access;
 
