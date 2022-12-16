@@ -60,6 +60,7 @@
                 onAuth: function (e) {
                     if (config.modalId) {
                         $(config.modalId).foundation('reveal', 'open');
+                        $(config.modalId).hide(); // Hide the second modal until a file has been picked.
                     }
                     createPicker(e);
                 },
@@ -231,6 +232,7 @@
             var elem = $(this.element);
 
             if (data[google.picker.Response.ACTION] === google.picker.Action.PICKED) {
+                $(config.modalId).show(); // Reveal the second modal now that a file has been picked.
                 config.onSelect.call(elem, data.docs, authResult);
                 return;
             }
