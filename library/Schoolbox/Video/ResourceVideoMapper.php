@@ -28,7 +28,6 @@ use Schoolbox\Resource\Storage\Mapper as StorageMapper;
  */
 class ResourceVideoMapper extends Mapper
 {
-
     /**
      * @return void
      * @throws Mapper\DefinitionException
@@ -132,8 +131,8 @@ class ResourceVideoMapper extends Mapper
         $statement->bindParam(':cat', $category);
         $statement->bindParam(':mime', $mime);
 
-        if ($limit != false) {
-            $statement->bindParam(':lim', intval($limit), \PDO::PARAM_INT);
+        if ($limit) {
+            $statement->bindParam(':lim', $limit, \PDO::PARAM_INT);
         }
 
         $statement->execute();
@@ -147,7 +146,9 @@ class ResourceVideoMapper extends Mapper
             } else {
                 $video->getFile()->setOwner($fileMapper->getJoinMapper('owner')->getUnknownUser());
             }
-            $videoList->add($video);
+            // cloning to avoid hydration overriding existing file object
+            $currentVideo = clone $video;
+            $videoList->add($currentVideo);
         }
 
         return $videoList;

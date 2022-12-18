@@ -127,14 +127,24 @@ class Mapper extends BaseMapper implements IReceiver
 
     /**
      * @param Model $storage
-     *
-     * @return true
+     * @return bool
+     * @throws MapperException
      */
-    protected function postSave(Model $storage)
+    protected function postSave(Model $storage): bool
     {
         // Ram media files into Video Queue table for transcoding
         if ($storage->getMimetype()->isVideo() || $storage->getMimetype()->isAudio()) {
             $mapper = QueueMapper::getInstance();
+            // check whether the same hash already exists
+            $queues = $mapper->findByColumnList(['hash' => $storage->getHash()]);
+            /** @var Schoolbox\Video\Queue $queue */
+            foreach ($queues as $queue) {
+                // if there's one with not failed status, no need to create video queue
+                if (!$queue->isFailed()) {
+                    return true;
+                }
+            }
+
             $videoQ = $mapper->createModel();
             $videoQ->setStorage($storage);
             $videoQ->setStatus(QueueMapper::STATUS_PENDING);
