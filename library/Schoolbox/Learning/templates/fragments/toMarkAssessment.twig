@@ -50,20 +50,6 @@
                 {% set submitTitleSuffix = '' -%}
                 {% set markedTitleSuffix = '' -%}
             {%- endif -%}
-
-            <!--<div
-                    class="progress"
-                    data-progress
-                    title="{{ stats.countParticipants - stats.countResponseRequired }} of {{ stats.countParticipants }} students have {{ submitTitleSuffix }}"
-                    data-title-suffix="{{ submitTitleSuffix }}"
-                    data-count-total="{{ stats.countParticipants }}"
-                    data-count-response-required="{{ stats.countResponseRequired }}"
-                    data-count-feedback-required="{{ stats.countFeedbackRequired }}"
-                    data-count-review-complete="{{ stats.countReviewComplete }}"
-            >
-                <span class="meter slow" data-meter style="width:{{ 100 - stats.percentageResponseRequired }}%"></span>
-                <span class="pipe-meter slow" data-pipe style="left: {{ stats.percentageReviewComplete }}%" title="{{ stats.countFeedbackRequired }} of {{ stats.countParticipants }} students require {{ markedTitleSuffix }}" data-title-suffix="{{ markedTitleSuffix }}"></span>
-            </div> -->
             <div class="progress-bar"
                 data-progress
                 title="{{ stats.countParticipants - stats.countResponseRequired }} of {{ stats.countParticipants }} students have {{ submitTitleSuffix }}"
@@ -88,9 +74,6 @@
                 </div>
             </div>
         </div>
-        <!-- <div class="small-4 medium-2 columns text-right">
-            <p data-count-to-mark title="{{ stats.countFeedbackRequired }} of {{ stats.countParticipants }} students require marking"><span data-user-count>{{ stats.countFeedbackRequired }}</span> unmarked</p>
-        </div> -->
     </div>
     <div class="content collapsible hide" data-participant-list data-collapsable="to-mark-{{ assessment.id }}" data-collapse-state="collapsed">
         <ul class="information-list">
