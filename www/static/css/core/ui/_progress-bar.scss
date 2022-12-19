@@ -1,5 +1,9 @@
 /*  
     progress-bar.scss
+
+    This is a class for custom styling of progress bars. Yes, there is also
+    a _progress-bars.scss file, but that file is legacy styling and is part
+    of ZURB / Foundation. This class 
         
     TODO - Return when the PR with whitespace variables is merged in and
     make this class use it.
@@ -11,58 +15,55 @@
     -webkit-user-select: none;
     user-select: none;
 
-    .tokens {
+    /* Add a margin to thep top when we're moved into column display (mobile) */
+    @media screen and (max-width: 640px){
+        margin-top: 0.5rem;
+    }
+
+    .legend{
         display: inline-flex;
         flex-wrap: wrap;
-        gap: 0.25rem;
+        font-weight: 700;
+        font-size: 0.75rem;
+        gap: 0.25rem 1rem;
         margin-bottom: 0.5rem;
+        text-transform: uppercase;
         width: 100%;
 
+        &-item{
+            color: black;
 
-        .token {
-            align-items: center;
-            background-color: $neutral-color;
-            border-radius: 1rem;
-            box-sizing: border-box;
-            color: white;
-            display: flex;
-            font-size: 0.75rem;
-            font-weight: 600;
-            padding: 0.25rem 0.5rem;
-            text-transform: uppercase;
-
-            div {
-                background-color: rgba(0, 0, 0, 0.25);
-                border-radius: 1rem;  
-                color: white;
-                margin-right: 0.25rem;
-                min-width: 1rem;
-                padding: 0 0.25rem;
-            }
-
-            &:last-child {
-                margin-right: 0;
-            }
-
-            &.neutral {
-                background-color: $neutral-color;
-                color: $neutral-foreground;
-            }
-
-            &.info {
-                background-color: var(--accent-background);
-                color: var(--accent-foreground);
-            }
-
-            &.success {
+            &.success:before {
                 background-color: $success-color;
             }
 
-            &.warning {
+            &.info:before {
+                background-color: var(--accent-background);
+            }
+
+            &.neutral:before {
+                background-color: $neutral-color;
+            }
+
+            &.alert:before{
+                background-color: $alert-color;
+            }
+
+            &.warning:before {
                 background-color: $warning-color;
+            }   
+            
+
+            &:before {
+                background-color: black;
+                border-radius: 1rem;
+                content: '';
+                display: inline-block;
+                height: 0.5rem;
+                margin-right: 0.5rem; 
+                width: 0.5rem;
             }
         }
-        
     }
 
     .bar {

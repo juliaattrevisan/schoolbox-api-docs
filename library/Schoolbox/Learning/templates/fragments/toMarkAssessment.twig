@@ -35,21 +35,31 @@
                 <p class="meta" data-due-date>{{ dueDate.forAssessment(assessment) }}</p>
             </div>
         </div>
-        <!-- <div class="card small-4 hide-for-small-only"> -->
         <div class="card medium-6">
             {%- if isQuiz -%}
                 {%- set submitTitleSuffix = 'attempted this quiz' -%}
                 {%- set markedTitleSuffix = 'review' -%}
+                {% set markedPastTense = 'reviewed' %}
             {%- elseif isDueWork %}
                 {%- set submitTitleSuffix = 'submitted work' -%}
                 {%- set markedTitleSuffix = 'marking' -%}
+                {% set markedPastTense = 'marked' %}
             {%- elseif isTask -%}
                 {% set submitTitleSuffix = 'completed this task' -%}
                 {% set markedTitleSuffix = 'teacher assessment' -%}
+                {% set markedPastTense = 'assessed' %}
             {%- else -%}
                 {% set submitTitleSuffix = '' -%}
                 {% set markedTitleSuffix = '' -%}
+                {% set markedPastTense = '' %}
             {%- endif -%}
+
+
+            {# Round the percentage values to prevent things like '66.666666%' being displayed. #}
+            {% set displayPercentageResponseRequired = (100 - stats.percentageResponseRequired) | round %}
+            {% set displayPercentageReviewComplete = stats.percentageReviewComplete | round %}
+            
+
             <div class="progress-bar"
                 data-progress
                 title="{{ stats.countParticipants - stats.countResponseRequired }} of {{ stats.countParticipants }} students have {{ submitTitleSuffix }}"
@@ -60,17 +70,21 @@
                 data-count-review-complete="{{ stats.countReviewComplete }}"
             />
                 <div class="bar">
-                    <div class="meter warning" style="width: {{100 - stats.percentageResponseRequired }}%;">
-                        <div>{{100 - stats.percentageResponseRequired}}%</div>
+                    <div class="meter warning" style="width: {{ (100 - stats.percentageResponseRequired) }}%;">
+                        <div>{{ displayPercentageResponseRequired }}%</div>
                     </div>
-                    <div class="meter success" style="width: {{stats.percentageReviewComplete}}%;">
-                        <div>{{stats.percentageReviewComplete}}%</div>
+                    <div 
+                        class="meter success" 
+                        title="{{stats.countReviewComplete}} of {{stats.countParticipants}} students {{ markedPastTense }}" 
+                        style="width: {{ stats.percentageReviewComplete }}%;"
+                    >
+                        <div>{{ displayPercentageReviewComplete }}%</div>
                     </div>
                 </div>
-                <div class="tokens">
-                    <div class="token success">{{ stats.countReviewComplete }} MARKED</div>
-                    <div class="token neutral"> {{ stats.countParticipants - stats.countResponseRequired }} OF {{ stats.countParticipants }} {{ submitTitleSuffix }}</div>
-                    <div class="token warning"> {{ stats.countFeedbackRequired }} REQUIRE {{ markedTitleSuffix }}</div>
+                <div class="legend">
+                    <div class="legend-item success">{{ stats.countReviewComplete }} {{ markedPastTense }}</div>
+                    <div class="legend-item">{{ stats.countParticipants - stats.countResponseRequired }} OF {{ stats.countParticipants }} {{ submitTitleSuffix }}</div>
+                    <div class="legend-item warning">{{ stats.countFeedbackRequired }} REQUIRE {{ markedTitleSuffix }}</div>
                 </div>
             </div>
         </div>
