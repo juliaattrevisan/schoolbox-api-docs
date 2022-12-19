@@ -5,23 +5,16 @@
         $('[data-perform-update]').click(function (e) {
             e.preventDefault();
 
-            $(this).confirmDialog({
-                header: 'Warning! Re Calculation of Storage.',
-                format: 'html',
-                text: '<div class="alert-box warning">You have selected to a regeneration of the system storage. This may take a while. </div>',
-                confirmEvent: function () {
-                    var toaster = $('#toast');
-                    toaster.toastActivate({ text: 'Calculating Data' });
-                    $.post('{{ routeLookup('adminUsage.postRegenerateUsage') }}', {
-                    }).done(function () {
+            var toaster = $('#toast');
+            toaster.toastActivate({ text: 'Reload Usage Data...' });
+            $.post('{{ routeLookup('adminUsage.postRegenerateUsage') }}', {
+            }).done(function () {
 
-                        toaster.toastTimeout({ text: 'Calculation Success', css: 'success' });
-                        window.location.reload();
+                toaster.toastTimeout({ text: 'Reload Usage Successful', css: 'success' });
+                window.location.reload();
 
-                    }).fail(function () {
-                        toaster.toastTimeout({ text: 'Failed to re Calculate Storage, Try Again..', css: 'alert' });
-                    });
-                }
+            }).fail(function () {
+                toaster.toastTimeout({ text: 'Failed to Reload Usage Data, Try Again..', css: 'alert' });
             });
         });
     });
@@ -42,7 +35,7 @@
                     <a class="icon-more" title="Actions" data-dropdown="usage-options"></a>
                 </nav>
                 <ul id="usage-options" class="f-dropdown" data-dropdown-content>
-                    <li><a data-perform-update href='#' class="icon-export" title="Perform re Calculation">Perform re Calculation</a></li>
+                    <li><a data-perform-update href='#' class="icon-refresh" title="Reload Usage Data">Reload Usage Data</a></li>
                 </ul>
         </div>
         <div id="usage-global-container">
