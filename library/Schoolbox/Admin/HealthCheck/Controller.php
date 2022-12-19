@@ -156,6 +156,7 @@ class Controller extends Base
                     $this->taskDHelper->addSource('', 'svaHomepageViewsForProfessionalReadingPage');
                     $this->taskDHelper->addSource('', 'svaHomepageViewsForEvaluationPage');
                     $this->taskDHelper->addSource('', 'svaHomepageViewsForActiveAlumniPage');
+                    $this->taskDHelper->addSource('', 'svaHomepageViewsForRrrHubSchoolsPage');
                     break;
                 default:
                     throw new SchoolboxException("Report '{$report}' Does not exist.");
@@ -1299,6 +1300,40 @@ class Controller extends Base
         $statement->execute();
         $help = new Helper();
         $help->queryToCSV($statement, 'svaHomepageViewsForActiveAlumniPage.csv');
+    }
+    /**
+     * SVA
+     * svaHomepageViewsForRrrHubSchoolsPage.csv
+     */
+    public function svaHomepageViewsForRrrHubSchoolsPage()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            g.name as 'Role',
+            concat(f.name,' (',f.id,')') as 'Homepage',
+            concat((MONTHNAME(hv.date)),' ',(YEAR(hv.date))) AS Month,
+            SUM(hv.hitcount) as 'Sum Hitcount'
+        FROM
+            homepage_visits hv
+        JOIN
+            groups g on hv.user_group_id = g.id
+        JOIN
+            folder f on hv.category_id = f.id
+        WHERE
+            (
+            f.id = 383
+            OR
+            f.parent = 383
+            )
+        GROUP BY
+            concat((MONTHNAME(hv.date)),' ',(YEAR(hv.date))),hv.user_group_id,hv.category_id
+        ORDER BY
+            hv.user_group_id,hv.category_id,hv.date;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'svaHomepageViewsForRrrHubSchoolsPage.csv');
     }
     // ===============================================================================================
     // ==================================== END SVA REPORTS ==========================================
