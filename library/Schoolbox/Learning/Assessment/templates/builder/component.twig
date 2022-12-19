@@ -29,7 +29,7 @@ $data = [
     {% endif %}
 
     <div class="course-builder" data-unit-spec="{{ unitSpec.id }}">
-        <ul class="information-list information-list--course-builder sortable"
+        <ul class="information-list sortable"
             data-sortable
             data-assessment-list
             data-action="{{ routeLookup('learningAssessment.postReorderAssessments', {contextType: 'unitspecs', contextId: unitSpec.id, context: unitSpec}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">

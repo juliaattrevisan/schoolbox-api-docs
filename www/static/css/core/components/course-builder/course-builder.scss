@@ -8,18 +8,18 @@ styling and move all the code in here.
         margin-bottom: var(--whitespace-m);
     }
 
-    .information-list--course-builder {
+    .information-list{
         & .card {
             display: flex;
             padding-bottom: var(--whitespace-xs);
             padding-top: var(--whitespace-xs);
 
-            & p{
+            & p {
                 &:last-child{
                     margin-bottom: 0;
                 }
             }
         }
     }
-
+    
 }
