@@ -19,7 +19,6 @@ use Psr\Http\Message\ResponseInterface;
  */
 class Api
 {
-
     /**
      * Endpoint used to test the connectivity
      *
