@@ -155,7 +155,8 @@ class Controller extends Base
                     $this->taskDHelper->addSource('', 'svaHomepageViewsForEvaluationPage');
                     $this->taskDHelper->addSource('', 'svaHomepageViewsForActiveAlumniPage');
                     $this->taskDHelper->addSource('', 'svaHomepageViewsForRrrHubSchoolsPage');
-                    $this->taskDHelper->addSource('', 'svaHomepageViewsForForumThreads');
+                    $this->taskDHelper->addSource('', 'svaForumThreadsViews');
+                    $this->taskDHelper->addSource('', 'svaForumRepliesViews');
                     break;
                 default:
                     throw new SchoolboxException("Report '{$report}' Does not exist.");
@@ -1336,9 +1337,9 @@ class Controller extends Base
     }
     /**
      * SVA
-     * svaHomepageViewsForForumThreads.csv
+     * svaForumThreadsViews.csv
      */
-    public function svaHomepageViewsForForumThreads()
+    public function svaForumThreadsViews()
     {
         $database = FolderMapper::getInstance()->getDatabase();
         $statement = $database->prepare("
@@ -1357,7 +1358,33 @@ class Controller extends Base
         ");
         $statement->execute();
         $help = new Helper();
-        $help->queryToCSV($statement, 'svaHomepageViewsForForumThreads.csv');
+        $help->queryToCSV($statement, 'svaForumThreadsViews.csv');
+    }
+    /**
+     * SVA
+     * svaForumReplies.csv
+     */
+    public function svaForumReplies()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            ft.threadID as 'Thread ID',
+            ft.title as 'Thread Name',
+            concat((MONTHNAME(fp.date)),' ',(YEAR(fp.date))) AS Month,
+            count(*) as 'Forum Reply Count'
+        FROM
+            forumPost fp
+        JOIN
+            forumThread ft on fp.threadID = ft.threadID
+        GROUP BY
+            ft.title,month(fp.date)
+        ORDER BY
+            ft.threadID,ft.date;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'svaForumReplies.csv');
     }
     // ===============================================================================================
     // ==================================== END SVA REPORTS ==========================================
