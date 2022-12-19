@@ -1,16 +1,11 @@
 /*
-    progress-bar.scss
+    rounded-progress-bar.scss
 
     This is a class for custom styling of progress bars. Yes, there is also
     a _progress-bars.scss file, but that file is legacy styling and is part
     of ZURB / Foundation. This class solely deals with the custom styled
     progress bars which, at the time of writing, only exist within the
     pending assessments page.
-
-    TODO - Return when the PR with whitespace variables is merged in and
-    make this class use it.
-    TODO - Overwrite the values in the _progress-bars.scss class. This
-    will eventually replace that implementation.
 */
 
 .progress-bar {
