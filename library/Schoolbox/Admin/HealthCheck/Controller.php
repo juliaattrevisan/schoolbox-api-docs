@@ -68,7 +68,9 @@ class Controller extends Base
     public function getAudit()
     {
         //list of queries to run, if the request does not include one of these, error out.
-        $validReports = ['assessment', 'uxui', 'user', 'lms', 'community'];
+        $validReports = ['assessment', 'uxui', 'user', 'lms', 'community','sva'];
+        //all reports exists because we don't want the SVA speciifc reports to be part of 'all'
+        $allReports = ['assessment', 'uxui', 'user', 'lms', 'community'];
         $query = $this->getRequest()->query->get('report');
         if ('' === trim((string)$query)) {
             //if no value was handed, just assume the user was after everything
@@ -79,7 +81,7 @@ class Controller extends Base
         $reports = explode(',', $query);
         //if query is 'all' lets add all options in
         if ('all' === $query) {
-            $reports = $validReports;
+            $reports = $allReports;
         }
         //loop through all reports and build the sources / routes for all of them.
         foreach ($reports as $report) {
@@ -136,6 +138,15 @@ class Controller extends Base
                     $this->taskDHelper->addSource('community', 'calendarServicePermissions');
                     $this->taskDHelper->addSource('community', 'parentNewsNotifications');
                     $this->taskDHelper->addSource('community', 'homepageTemplates');
+                    break;
+                case 'sva':
+                    /**
+                     * list of reports for sva
+                     */
+                    $this->taskDHelper->addSource('', 'topMenuReport');
+                    $this->taskDHelper->addSource('', 'sideMenuReport');
+                    $this->taskDHelper->addSource('', 'resourceBrowser');
+                    $this->taskDHelper->addSource('', 'homepageTemplates');
                     break;
                 default:
                     throw new SchoolboxException("Report '{$report}' Does not exist.");
