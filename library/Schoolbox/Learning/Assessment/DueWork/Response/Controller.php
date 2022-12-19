@@ -512,7 +512,7 @@ class Controller extends Base
     public function getTurnitinExport(Turnitin\File\Model $turnitin): void
     {
         $turnitinFileApi = $this->buildTurnitinFileApi();
-        $pdfId           = $turnitinFileApi->generatePdfRequest($turnitin)['id'] ?? null;
+        $pdfId           = $turnitinFileApi->generatePdfRequest($turnitin);
 
         // Wait a bunch of time for the PDF
         if (isset($pdfId)) {

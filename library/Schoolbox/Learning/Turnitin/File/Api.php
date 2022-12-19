@@ -105,21 +105,23 @@ class Api
      * Request a PDF of a Turnitin document.
      *
      * This doesn't return a PDF: it simply queues the generation of one. Use
-     * `generatePdfStatusRequest` to fetch the status of the generation, and
-     * `downloadPdf` to download it.
+     * `downloadPdf` to download it, whilst waiting for t.
      *
      * @param Model $turnitin
-     * @return array{id: string}|null
+     * @return string|null
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \JsonException
      */
-    public function generatePdfRequest(Model $turnitin): ?array
+    public function generatePdfRequest(Model $turnitin): ?string
     {
-        return $this->baseApi->retrieve(
+        $result = $this->baseApi->retrieve(
             'POST',
             sprintf(self::REQUEST_PDF_URL, $turnitin->getTurnitinSubmissionId()),
             [],
         );
+        return isset($result['id'])
+            ? (string)$result['id']
+            : null;
     }
 
     /**
