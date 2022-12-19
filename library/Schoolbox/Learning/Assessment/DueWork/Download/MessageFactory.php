@@ -20,6 +20,8 @@ use Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkResponse;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Turnitin\File\Process\Report;
+use Schoolbox\Learning\Turnitin\File\ViewerUrlGenerator;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\TaskDaemon\Request\DownloadPages\MessageFactory as BaseMessageFactory;
 use Schoolbox\TaskDaemon\Request\Message;
@@ -44,12 +46,12 @@ class MessageFactory
     /**
      * Constructor
      *
-     * @param BaseMessageFactory $baseMessageFactory Required for actually building messages
-     * @param UriInterface       $urlBase            Required for building URIs which point back to this instance
-     * @param RosettaStone       $rosettaStone       Required for translating the term "due work" for this instance
-     * @param Router             $router             Required for building routes to download various parts of due work
-     * @param UserTranslator     $userTranslator     Required for translating the viewer to an array representation for
-     *                                               inclusion within the sent message.
+     * @param BaseMessageFactory      $baseMessageFactory Required to actually build messages
+     * @param UriInterface            $urlBase            Required to build URIs which point back to this instance
+     * @param RosettaStone            $rosettaStone       Required to translate the term "due work" for this instance
+     * @param Router                  $router             Required to build routes to download various due work parts
+     * @param UserTranslator          $userTranslator     Required to translate the viewer to an array representation
+     *                                                    for inclusion within the sent message.
      */
     public function __construct(
         private BaseMessageFactory $baseMessageFactory,
@@ -68,11 +70,13 @@ class MessageFactory
      * * All files in each participant's responses to the due work
      * * All Kami feedback for each participant
      *
-     * @param DueWork $dueWork The due work to build a message for.
-     * @param User    $viewer  The user who is requesting the due work ZIP.
+     * @param DueWork                 $dueWork            The due work to build a message for.
+     * @param User                    $viewer             The user who is requesting the due work ZIP.
+     * @param ViewerUrlGenerator|null $viewerUrlGenerator Optional: if provided, used to generate Turnitin viewer URLs
+     *                                                    to be downloaded by the task daemon.
      * @return Message
      */
-    public function buildForAssessment(DueWork $dueWork, User $viewer): Message
+    public function buildForAssessment(DueWork $dueWork, User $viewer, ?ViewerUrlGenerator $viewerUrlGenerator): Message
     {
         // Generate list of files to fetch via taskd, and add to a ZIP
         $messageFactory = (clone $this->baseMessageFactory);
@@ -112,6 +116,7 @@ class MessageFactory
                 // add any Kami files to the feedback folder
                 $feedbackResponse = $feedback->getResponse();
                 if ($feedbackResponse) {
+                    // add Kami + Turnitin files
                     foreach ($feedbackResponse->getAllFiles() as $file) {
                         if ($file->getKami()) {
                             $messageFactory = $messageFactory->addFileContent(
@@ -119,7 +124,16 @@ class MessageFactory
                                 $this->generateResponseFileKamiUrl($file),
                             );
                         }
+                        if ($viewerUrlGenerator && $file->getTurnItIn()) {
+                            $viewerUrlGenerator->generateViewerUrl(
+                                $file->getTurnItIn(),
+                                $viewer,
+                                Report::VIEWER_PERMISSION_SET_STAFF,
+                                false,
+                            );
+                        }
                     }
+
                     //if the feedback was not created by an instructor, don't save it to the zip
                     if (true === !$feedback->isInstructorGiven()) {
                         continue;
