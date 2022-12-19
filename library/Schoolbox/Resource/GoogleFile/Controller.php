@@ -165,6 +165,11 @@ class Controller extends Base
             try {
                 // provide access to google doc via api
                 foreach ($email2accessRoleMap as $email => $accessRole) {
+                    if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
+                        // Skip invalid email addresses because attempting to set permissions on these will result in error.
+                        continue;
+                    }
+
                     try {
                         $gDriveFetcher->setPermission(
                             $selectedFile['id'],
