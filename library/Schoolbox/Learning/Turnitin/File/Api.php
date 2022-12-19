@@ -47,7 +47,7 @@ class Api
      *                                    constants
      * @param bool   $allowSaveChanges    May the user save changes to the
      *                                    report?
-     * @return array{viewer_url: string}|null
+     * @return string|null
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \JsonException
      */
@@ -56,7 +56,7 @@ class Api
         User $viewer,
         string $viewerPermissionSet,
         bool $allowSaveChanges,
-    ): ?array {
+    ): ?string {
         /* Choose a viewer permission set based on your role
          * Staff members get a different set than students or parents
          *
@@ -91,11 +91,14 @@ class Api
         /* TODO Apparently localisation is a thing, set via locale tuple;
          *  but I have assumed en for now
          */
-        return $this->baseApi->retrieve(
+        $result = $this->baseApi->retrieve(
             'POST',
             sprintf(self::VIEWER_URL, $turnitin->getTurnitinSubmissionId()),
             $payload,
         );
+        return isset($result['viewer_url'])
+            ? (string)$result['viewer_url']
+            : null;
     }
 
     /**

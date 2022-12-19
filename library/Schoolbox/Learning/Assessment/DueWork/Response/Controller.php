@@ -482,7 +482,7 @@ class Controller extends Base
         $viewerUrl = $this->determineTurnitinViewerUrl($assessment, $turnitin);
         if (null !== $viewerUrl) {
             $data = [
-                'url' => $viewerUrl['viewer_url'],
+                'url' => $viewerUrl,
                 'turnitin' => $turnitin,
                 'assessment' => $assessment,
                 'response' => $response,
@@ -600,7 +600,7 @@ class Controller extends Base
      * @param IAssessable         $assessment The assessment in which the TII
      *                                        report was created.
      * @param Turnitin\File\Model $turnitin   The TII report model.
-     * @return array|null
+     * @return string|null
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \JsonException
      * @throws \Schoolbox\Mapper\Exception
@@ -608,7 +608,7 @@ class Controller extends Base
     private function determineTurnitinViewerUrl(
         IAssessable $assessment,
         Turnitin\File\Model $turnitin,
-    ): ?array {
+    ): ?string {
         $turnitinFileApi = $this->buildTurnitinFileApi();
         $isInstructor    = $this->access->isInstructor($this->getUser(), $assessment->getContext()->getFolder());
         return $turnitinFileApi->generateViewerUrl(
