@@ -67,9 +67,7 @@ class Controller extends Base
      */
     public function getAudit()
     {
-        //list of queries to run, if the request does not include one of these, error out.
-        $validReports = ['assessment', 'uxui', 'user', 'lms', 'community','sva'];
-        //all reports exists because we don't want the SVA speciifc reports to be part of 'all'
+        // Reports to be included in "all" reports
         $allReports = ['assessment', 'uxui', 'user', 'lms', 'community'];
         $query = $this->getRequest()->query->get('report');
         if ('' === trim((string)$query)) {
