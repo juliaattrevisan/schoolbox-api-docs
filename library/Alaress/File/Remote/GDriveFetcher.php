@@ -327,7 +327,7 @@ class GDriveFetcher implements FetcherInterface
                 $error = $e->getResponse()->getBody()->getContents();
                 return json_decode($error, true);
             }
-            throw new DomainException("Failed to list permission for {$fileId}", 0, $e);
+            throw new DomainException("Failed to set permission for {$fileId}", 0, $e);
         }
     }
 
