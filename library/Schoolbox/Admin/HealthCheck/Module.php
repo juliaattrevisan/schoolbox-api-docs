@@ -48,6 +48,8 @@ class Module extends BaseModule
         // Common Audits
         $this->register('GET', '/audit/homepageTemplates', 'homepageTemplates', $isAlaress);
         $this->register('GET', '/audit/resourceBrowser', 'resourceBrowser', $isAlaress);
+        // SVA REPORTS
+        $this->register('GET', '/audit/svaMonthlyLogins', 'svaMonthlyLogins', $isAlaress);
     }
 
     /**
