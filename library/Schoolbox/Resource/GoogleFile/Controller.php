@@ -165,11 +165,27 @@ class Controller extends Base
             try {
                 // provide access to google doc via api
                 foreach ($email2accessRoleMap as $email => $accessRole) {
-                    $gDriveFetcher->setPermission(
-                        $selectedFile['id'],
-                        $accessRole,
-                        $email
-                    );
+                    try {
+                        $gDriveFetcher->setPermission(
+                            $selectedFile['id'],
+                            $accessRole,
+                            $email
+                        );
+                    } catch (\DomainException $e) {
+                        if (str_contains($e->getMessage(), 'specified emailAddress is invalid')) {
+                            // This error will occur if an email address containing illegal characters is encountered.
+                            // Eg. 'non_existent_email_address_asdfaskjh1;32451@asldfasjdl.com'.
+                            continue;
+                        } elseif (str_contains($e->getMessage(), 'Failed to set permission for gmail address')) {
+                            // Assume the gmail address does not exist, and continue.
+                            continue;
+                        }
+                        trigger_error(
+                            "Could not set permissions for email '$email'.  Maybe this email address doesn't exist?" .
+                            '  Details: ' . $e->getMessage(), E_USER_WARNING
+                        );
+                        continue;
+                    }
                 }
                 $meta = $gDriveFetcher->fetchMetaData($selectedFile['id']);
                 $googleFile
