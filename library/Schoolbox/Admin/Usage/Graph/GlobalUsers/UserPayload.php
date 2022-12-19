@@ -49,7 +49,7 @@ class UserPayload
      *     array{
      *      userId: int|null,
      *      lastname: string|null,
-     *      firstName: string|null,
+     *      firstname: string|null,
      *      fullname: string|null,
      *      role: string|null,
      *      label: int|null,
