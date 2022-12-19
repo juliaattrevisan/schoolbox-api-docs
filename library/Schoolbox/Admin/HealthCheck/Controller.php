@@ -152,6 +152,7 @@ class Controller extends Base
                     $this->taskDHelper->addSource('', 'svaHomepageViewsByKSC');
                     $this->taskDHelper->addSource('', 'svaHomepageViewsByAllPerRolePerMonth');
                     $this->taskDHelper->addSource('', 'svaHomepageViewsForCommunityForumsPage');
+                    $this->taskDHelper->addSource('', 'svaHomepageViewsForOpportunitiesPage');
                     break;
                 default:
                     throw new SchoolboxException("Report '{$report}' Does not exist.");
@@ -1171,6 +1172,36 @@ class Controller extends Base
         $statement->execute();
         $help = new Helper();
         $help->queryToCSV($statement, 'svaHomepageViewsForCommunityForumsPage.csv');
+    }
+    /**
+     * SVA
+     * svaHomepageViewsForOpportunitiesPage.csv
+     */
+    public function svaHomepageViewsForOpportunitiesPage()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            concat((MONTHNAME(hv.date)),' ',(YEAR(hv.date))) AS Month,
+            f.name as 'Homepage',
+            g.name as 'Role',
+            SUM(hv.hitcount) as 'Sum Hitcount'
+        FROM
+            homepage_visits hv
+        JOIN
+            groups g on hv.user_group_id = g.id
+        JOIN
+            folder f on hv.category_id = f.id
+        WHERE
+            hv.category_id = '18'
+        GROUP BY
+            concat((MONTHNAME(hv.date)),' ',(YEAR(hv.date))),hv.user_group_id,hv.category_id
+        ORDER BY
+            hv.date,hv.category_id,hv.user_group_id;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'svaHomepageViewsForOpportunitiesPage.csv');
     }
     // ===============================================================================================
     // ==================================== END SVA REPORTS ==========================================
