@@ -406,6 +406,7 @@ class Controller extends Base
             'Title'        => 'Title',
             'Type'         => 'Type',
             'Sub-Type'     => 'Sub-Type',
+            'Occurred On'  => 'Occurred On',
         ];
         if ($this->getConfigLoader()->get('pastoral_severity')) {
             $headings['Severity'] = 'Severity';
@@ -442,6 +443,7 @@ class Controller extends Base
             'Title'        => $record->getHeading(),
             'Type'         => $record->getType() ? $record->getType()->getName() : '',
             'Sub-Type'     => $record->getSubType() ? $record->getSubType()->getName() : '',
+            'Occurred On'  => $record->getOccurredOn()?->getDatabase(),
             'Tags'         => implode(',', $record->getTags()->getPropertyValues('name')),
             'Points'       => $record->getPoints() ?: '',
             'Severity'     => $record->getSeverity() ? $record->getSeverity()->getName() : '',

@@ -8,7 +8,7 @@
 
 namespace Schoolbox\Pastoral\Revision;
 
-use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Pastoral\AccessLevelCensor;
 use Schoolbox\Pastoral\Model as Pastoral;
 use Schoolbox\User;
@@ -24,24 +24,13 @@ use Schoolbox\User;
 class DataSource
 {
     /**
-     * @var Mapper
-     */
-    private $mapper;
-
-    /** @var AccessLevelCensor */
-    private $accessLevelCensor;
-
-
-    /**
      * Constructor
      *
      * @param Mapper            $mapper
      * @param AccessLevelCensor $accessLevelCensor
      */
-    public function __construct(Mapper $mapper, AccessLevelCensor $accessLevelCensor)
+    public function __construct(private Mapper $mapper, private AccessLevelCensor $accessLevelCensor)
     {
-        $this->mapper            = $mapper;
-        $this->accessLevelCensor = $accessLevelCensor;
     }
 
     /**
@@ -49,9 +38,9 @@ class DataSource
      *
      * @param User     $currentUser
      * @param Pastoral $record
-     * @return Collection|Model[]
+     * @return GenericCollection<Model>
      */
-    public function findForRecord(User $currentUser, Pastoral $record): Collection
+    public function findForRecord(User $currentUser, Pastoral $record): GenericCollection
     {
         return $this->accessLevelCensor->filterRecordsForUser($this->mapper->findForRecord($record), $currentUser);
     }

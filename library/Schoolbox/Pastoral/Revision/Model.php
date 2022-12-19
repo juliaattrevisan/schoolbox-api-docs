@@ -6,6 +6,8 @@
  * @link        https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Schoolbox\Pastoral\Revision;
 
 use Schoolbox\Pastoral\Model as Pastoral;
@@ -13,14 +15,14 @@ use Schoolbox\Pastoral\Model as Pastoral;
 class Model extends Pastoral
 {
     /** @var int $rootId */
-    private $rootId;
+    private int $rootId;
 
     /**
      * @param int $rootId
      *
      * @return self
      */
-    public function setRootId($rootId)
+    public function setRootId(int $rootId): self
     {
         $this->rootId = $rootId;
 
@@ -30,7 +32,7 @@ class Model extends Pastoral
     /**
      * @return int
      */
-    public function getRootId()
+    public function getRootId(): int
     {
         return $this->rootId;
     }

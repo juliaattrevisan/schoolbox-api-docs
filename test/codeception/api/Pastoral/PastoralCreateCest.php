@@ -172,6 +172,7 @@ class PastoralCreateCest
                 'student_id'          => $this->student->getId(),
                 'duplicateIds'        => null,
                 'heading'             => 'Cest nullable ' . time(),
+                'occurredOn'          => null,
                 'typeId'              => $pastoralType->getId(),
                 'subtypeId'           => $pastoralType->getSubTypes()->first()?->getId(),
                 // TODO: config
@@ -199,6 +200,7 @@ class PastoralCreateCest
 01234567890123456789012345678901234567890123456789
 01234567890123456789012345678901234567890123456789
                 ',
+                'occurredOn'          => \Alaress_Date_Format::now()->getLocalShort(),
                 'typeId'              => $pastoralType->getId(),
                 //        'subtypeId' => $record->getSubType()?->getId();
                 'subtypeId'           => $pastoralType->getSubTypes()->first()?->getId(),

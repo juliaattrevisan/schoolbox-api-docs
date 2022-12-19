@@ -3,22 +3,28 @@
     <fieldset class="content">
         <div class="small-12 columns">
             <label class="required" for="heading">Title</label>
-            <input type="text" name="heading" id="heading" size="35" maxlength="100" value="{{ record.heading }}" required />
+            <input type="text" name="heading" id="heading" size="35" maxlength="100" value="{{ record.id ? record.heading : '' }}" required />
         </div>
     </fieldset>
     <fieldset class="content">
+        <div class="small-12 medium-12 columns">
+            <label for="occurredOn">
+                Occurred On
+            </label>
+            <input type="text" name="occurredOn" id="occurredOn" data-datepicker maxlength="50" value="{{ record.occurredOn ? record.occurredOn.localShort : null }}" />
+        </div>
         <div class="small-12 medium-6 columns">
             <label for="typeId" class="required">Type</label>
                 <select name="typeId" id="typeId" required>
                     {# Is this record's type deleted? #}
-                    {% if record.type.deleted ?? false %}
+                    {% if isModify and record.type.deleted ?? false %}
                         <option selected value="{{ record.type.id }}">{{ record.type.name }} (deleted)</option>
                     {% endif %}
-                    {% if record.type.id is not defined %}
+                    {% if not isModify or record.type.id is not defined %}
                         <option disabled selected>Please select a type</option>
                     {% endif %}
                     {% for type in types %}
-                        <option {% if type.id == record.type.id ?? '' %}selected{% endif %}
+                        <option {% if isModify and type.id == record.type.id ?? '' %}selected{% endif %}
                                 value="{{ type.id }}" {% if not moderator %}data-visibility-locked="{{ type.visibilityLocked }}"{% endif %}>{{ type.name }}</option>
                     {% endfor %}
                 </select>
@@ -26,7 +32,7 @@
         <div class="small-12 medium-6 columns">
             <label> Sub-Type <select name="subtypeId" id="subtypeId">
                     {# Is this record's subtype deleted? #}
-                    {% if record.subtype.deleted ?? false %}
+                    {% if isModify and record.subtype.deleted ?? false %}
                         <option data-chained="{{ record.subtype.pastoralType.id }}"
                                 class="{{ record.subtype.pastoralType.id }}"
                                 selected
@@ -34,7 +40,7 @@
                     {% endif %}
                     {% for subtype in subTypes %}
                         <option data-chained="{{ subtype.pastoralType.id }}" class="{{ subtype.pastoralType.id }}"
-                                {% if subtype.id == record.subtype.id ?? '' %}selected{% endif %} value="{{ subtype.id }}"
+                                {% if isModify and subtype.id == record.subtype.id ?? '' %}selected{% endif %} value="{{ subtype.id }}"
                                 {% if not moderator %}data-visibility-locked="{{ subtype.visibilityLocked }}"{% endif %}>{{ subtype.name }}</option>
                     {% endfor %}
                 </select> </label>
@@ -43,11 +49,11 @@
             {% if severities | length %}
                 <label for="severityId">{{ locale.severity.proper }}</label>
                 <select name="severityId" id="severityId">
-                    {% if record.severity.deleted ?? false %}
+                    {% if isModify and record.severity.deleted ?? false %}
                         <option selected value="{{ record.severity.id }}">{{ record.severity.name }} (deleted)</option>
                     {% endif %}
                     {% for severity in severities %}
-                        <option {% if severity.id == record.severity.id ?? '' %}selected{% endif %} value="{{ severity.id }}">{{ severity.name }}</option>
+                        <option {% if isModify and severity.id == record.severity.id ?? '' %}selected{% endif %} value="{{ severity.id }}">{{ severity.name }}</option>
                     {% endfor %}
                 </select>
             {% endif %}

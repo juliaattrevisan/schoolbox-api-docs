@@ -81,6 +81,7 @@ class Mapper extends BaseMapper
         $this->uses('points', self::TYPE_DECIMAL);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
+        $this->uses('occurred_on', self::TYPE_DATETIME);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->joinsReverseMulti('pastoral_id', PastoralAccessMapper::class, 'access', 'access');

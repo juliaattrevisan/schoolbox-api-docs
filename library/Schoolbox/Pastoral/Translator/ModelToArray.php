@@ -93,6 +93,7 @@ class ModelToArray
                     'color'    => $model->getSeverity()->getColor(),
                 ]
                 : null,
+            'occurredOn'         => $model->getOccurredOn()?->toRfc3339String(),
             'points'             => $model->getPoints(),
             'tags'               => $model->getTags()->map(
                 function (Tag $tag) {
