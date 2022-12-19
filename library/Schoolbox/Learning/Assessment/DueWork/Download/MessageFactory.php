@@ -117,6 +117,16 @@ class MessageFactory
                     continue;
                 }
 
+                // current feedback was created by an instructor
+                // loop through the list of file
+                foreach ($feedback->getAllFiles() as $feedbackFile) {
+                    // attach the files to the taskd download object
+                    $messageFactory = $messageFactory->addFileContent(
+                        $this->generateResponseFileFeedbackName($participant, $feedback, $feedbackFile),
+                        $this->generateResponseFileUrl($feedbackFile),
+                    );
+                }
+
                 // If there's a response to this feedback:
                 // add any Kami files to the feedback folder
                 $feedbackResponse = $feedback->getResponse();
@@ -143,16 +153,6 @@ class MessageFactory
                                 );
                             }
                         }
-                    }
-
-                    // current feedback was created by an instructor
-                    // loop through the list of file
-                    foreach ($feedback->getAllFiles() as $feedbackFile) {
-                        // attach the files to the taskd download object
-                        $messageFactory = $messageFactory->addFileContent(
-                            $this->generateResponseFileFeedbackName($participant, $feedback, $feedbackFile),
-                            $this->generateResponseFileUrl($feedbackFile),
-                        );
                     }
                 }
             }
