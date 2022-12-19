@@ -146,6 +146,7 @@ class Controller extends Base
                     $this->taskDHelper->addSource('', 'svaMonthlyLogins');
                     $this->taskDHelper->addSource('', 'svaNewsArticleViews');
                     $this->taskDHelper->addSource('', 'svaNewsArticleViewsPerRolePerArticle');
+                    $this->taskDHelper->addSource('', 'svaNewsArticleViewsPerMonthBySKC');
                     break;
                 default:
                     throw new SchoolboxException("Report '{$report}' Does not exist.");
@@ -966,6 +967,43 @@ class Controller extends Base
         $statement->execute();
         $help = new Helper();
         $help->queryToCSV($statement, 'svaNewsArticleViewsPerRolePerArticle.csv');
+    }
+    /**
+     * SVA
+     * svaNewsArticleViewsPerMonthBySKC.csv
+     */
+    public function svaNewsArticleViewsPerMonthBySKC()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            article_id as 'News ID',
+            cna.title as 'News Title',
+            coalesce((SELECT
+            group_concat(nt.name)
+        FROM
+            newsTopic nt
+        JOIN
+            comms_news_article_topic cnat on nt.newsTopicID = cnat.topic_id
+        WHERE
+            cnat.article_id = cna.id),'No Topic Listed') as 'Topics',
+            concat((MONTHNAME(cnas.created_at)),' ',(YEAR(cnas.created_at))) AS Month,
+            count(DISTINCT user_id) as 'View Count',
+            cna.publish_at as 'Publish Date'
+        FROM
+            comms_news_article_statistics cnas
+        JOIN
+            user u on cnas.user_id = u.id
+        JOIN
+            comms_news_article cna on cnas.article_id = cna.id
+        WHERE
+            u.group_id = '5'
+        GROUP BY
+            cnas.article_id, month;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'svaNewsArticleViewsPerMonthBySKC.csv');
     }
     // ===============================================================================================
     // ==================================== END SVA REPORTS ==========================================
