@@ -68,8 +68,6 @@ use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\Learning\InlineGrader\StudentCarousel;
 use Schoolbox\Learning\Turnitin;
 use Schoolbox\Learning\Turnitin\Api;
-use Schoolbox\Learning\Turnitin\Api as TurnitinApi;
-use Schoolbox\Learning\Turnitin\Helper;
 use Schoolbox\Learning\Turnitin\Helper as TurnitinHelper;
 use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
 use Schoolbox\Mapper\DefinitionException;
@@ -432,19 +430,9 @@ class Controller extends Assessment\Controller
         }
 
         // Generate message and send to taskd
-        $urlGenerator = null;
-        if ((new Helper($this->getConfigLoader()))->isConfigured()) {
-            $turnitinApi = new TurnitinApi(
-                $this->getConfigLoader()->get('site_version'),
-                $this->getConfigLoader()->get('turnitin_api_host'),
-                $this->getConfigLoader()->get('turnitin_api_key')
-            );
-            $urlGenerator = new Turnitin\File\Api($turnitinApi);
-        }
         $message = $this->dueWorkDownloadMessageFactory->buildForAssessment(
             $assessment,
             $this->getUser(),
-            $urlGenerator,
         );
         $this->producer->send($message);
 

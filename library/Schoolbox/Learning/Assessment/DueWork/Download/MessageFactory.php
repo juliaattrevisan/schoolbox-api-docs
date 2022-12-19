@@ -20,7 +20,6 @@ use Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkResponse;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
-use Schoolbox\Learning\Turnitin\File\Process\Report;
 use Schoolbox\Learning\Turnitin\File\Api;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\TaskDaemon\Request\DownloadPages\MessageFactory as BaseMessageFactory;
@@ -46,12 +45,13 @@ class MessageFactory
     /**
      * Constructor
      *
-     * @param BaseMessageFactory      $baseMessageFactory Required to actually build messages
-     * @param UriInterface            $urlBase            Required to build URIs which point back to this instance
-     * @param RosettaStone            $rosettaStone       Required to translate the term "due work" for this instance
-     * @param Router                  $router             Required to build routes to download various due work parts
-     * @param UserTranslator          $userTranslator     Required to translate the viewer to an array representation
-     *                                                    for inclusion within the sent message.
+     * @param BaseMessageFactory $baseMessageFactory Required to actually build messages.
+     * @param UriInterface       $urlBase            Required to build URIs which point back to this instance.
+     * @param RosettaStone       $rosettaStone       Required to translate the term "due work" for this instance.
+     * @param Router             $router             Required to build routes to download various due work parts.
+     * @param UserTranslator     $userTranslator     Required to translate the viewer to an array representation for
+     *                                               inclusion within the sent message.
+     * @param bool               $turnitinEnabled    Is Turnitin enabled for this instance? If so, download TII reports.
      */
     public function __construct(
         private BaseMessageFactory $baseMessageFactory,
@@ -59,6 +59,7 @@ class MessageFactory
         private RosettaStone $rosettaStone,
         private Router $router,
         private UserTranslator $userTranslator,
+        private bool $turnitinEnabled,
     ) {
     }
 
@@ -70,13 +71,11 @@ class MessageFactory
      * * All files in each participant's responses to the due work
      * * All Kami feedback for each participant
      *
-     * @param DueWork  $dueWork                           The due work to build a message for.
-     * @param User     $viewer                            The user who is requesting the due work ZIP.
-     * @param Api|null $viewerUrlGenerator                Optional: if provided, used to generate Turnitin viewer URLs
-     *                                                    to be downloaded by the task daemon.
+     * @param DueWork  $dueWork The due work to build a message for.
+     * @param User     $viewer  The user who is requesting the due work ZIP.
      * @return Message
      */
-    public function buildForAssessment(DueWork $dueWork, User $viewer, ?Api $viewerUrlGenerator): Message
+    public function buildForAssessment(DueWork $dueWork, User $viewer): Message
     {
         // Generate list of files to fetch via taskd, and add to a ZIP
         $messageFactory = (clone $this->baseMessageFactory);
@@ -139,7 +138,7 @@ class MessageFactory
                                 $this->generateResponseFileKamiUrl($file),
                             );
                         }
-                        if ($viewerUrlGenerator && $file->getTurnItIn()) {
+                        if ($this->turnitinEnabled && $file->getTurnItIn()) {
                             $messageFactory = $messageFactory->addFileContent(
                                 $this->generateResponseFileTurnitinName($participant, $feedback, $file),
                                 $this->generateResponseFileTurnitinUrl($participant, $response, $file),
