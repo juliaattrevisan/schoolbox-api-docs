@@ -45,7 +45,17 @@ class UserPayload
      * Student Submissions
      * Submission Returns
      *
-     * @return array
+     * @return array<int,
+     *     array{
+     *      userId: int|null,
+     *      lastname: string|null,
+     *      firstName: string|null,
+     *      fullname: string|null,
+     *      role: string|null,
+     *      label: int|null,
+     *      size: int
+     *     }
+     *  >
      * @throws \Alaress\Database\Exception
      */
     public function generate(): array

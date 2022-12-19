@@ -40,8 +40,12 @@ class RolePayload
     /**
      * Generate usage occupied by each of the Roles
      *
-     * expected payload: [{'label':'value'}]
-     * @return array
+     * @return array<int, array{
+     *      label: string,
+     *      size: int,
+     *      sequence: int
+     *     }
+     * >
      * @throws \Alaress\Database\Exception
      */
     public function generate(): array
@@ -120,7 +124,7 @@ class RolePayload
             SELECT
                 `groups`.name AS label,
                 COALESCE(SUM(size), 0) AS size
-            FROM groups
+            FROM `groups`
               LEFT JOIN
               (
                 (SELECT `groups`.id, `groups`.name, SUM(`storage`.`filesize`) AS size

@@ -40,7 +40,11 @@ class FileTypePayload
     /**
      * Generate usage occupied by each mime type in storage
      *
-     * @return array
+     * @return array<int,array{
+     *      label: string,
+     *      size: int
+     *      }
+     * >
      * @throws \Alaress\Database\Exception
      */
     public function generate(): array
@@ -130,9 +134,12 @@ class FileTypePayload
 
     /**
      * Calculates the storage used by mime image/*
-     * @return array|mixed
+     * @return array{
+     *     label: string,
+     *     size: int
+     * }
      */
-    private function getImage()
+    private function getImage(): array
     {
         $query = "SELECT
                 'Image' AS label,
@@ -147,9 +154,12 @@ class FileTypePayload
 
     /**
      * Calculates the storage used by mime video/*
-     * @return array|mixed
+     * @return array{
+     *     label: string,
+     *     size: int
+     * }
      */
-    private function getVideo()
+    private function getVideo(): array
     {
         $query = "SELECT
                 'Video' AS label,
@@ -164,9 +174,12 @@ class FileTypePayload
 
     /**
      * Calculates the storage used by mime application/*
-     * @return array|mixed
+     * @return array{
+     *     label: string,
+     *     size: int
+     * }
      */
-    private function getApplication()
+    private function getApplication(): array
     {
         $query = "SELECT
                 'Application' AS label,
@@ -181,9 +194,12 @@ class FileTypePayload
 
     /**
      * Calculates the storage used by mime audio/*
-     * @return array|mixed
+     * @return array{
+     *     label: string,
+     *     size: int
+     * }
      */
-    private function getAudio()
+    private function getAudio(): array
     {
         $query = "SELECT
                 'Audio' AS label,
@@ -198,9 +214,12 @@ class FileTypePayload
 
     /**
      * Calculates the storage used by mime text/*
-     * @return array|mixed
+     * @return array{
+     *     label: string,
+     *     size: int
+     * }
      */
-    private function getText()
+    private function getText(): array
     {
         $query = "SELECT
                 'Text' AS label,
@@ -215,9 +234,12 @@ class FileTypePayload
 
     /**
      * Calculates the storage used by files with no extension listed in the allowed files table
-     * @return array|mixed
+     * @return array{
+     *     label: string,
+     *     size: int
+     * }
      */
-    private function getOther()
+    private function getOther(): array
     {
         $query = "SELECT
                 'Other' AS label,

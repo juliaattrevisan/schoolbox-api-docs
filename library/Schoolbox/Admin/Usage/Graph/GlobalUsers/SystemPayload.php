@@ -53,6 +53,11 @@ class SystemPayload
      *
      * Note that some tables such as task_files can have multiple occurrences
      * of a file hash (ie. a file gets uploaded multiple times with different names)
+     * @return array<int,array{
+     *      label: string,
+     *      size: int
+     *      }
+     * >
      */
     public function generate(): array
     {
@@ -72,7 +77,10 @@ class SystemPayload
 
     /**
      * Calculate the size of images used in the Tiles component
-     * @return array|mixed
+     * @return array{
+     *     label: string,
+     *     size: int
+     * }
      */
     private function getTiles()
     {
@@ -88,9 +96,12 @@ class SystemPayload
 
     /**
      * Calculate the size of files within MyFiles
-     * @return array|mixed
+     * @return array{
+     *     label: string,
+     *     size: int
+     * }
      */
-    private function getMyFiles()
+    private function getMyFiles(): array
     {
         $query = "SELECT
                 'My Files' AS label,
@@ -103,9 +114,12 @@ class SystemPayload
 
     /**
      * Calculate the size of files attached to Pastoral items
-     * @return array|mixed
+     * @return array{
+     *     label: string,
+     *     size: int
+     * }
      */
-    private function getPastoral()
+    private function getPastoral(): array
     {
         $query = "SELECT
                 'Pastoral' AS label,
@@ -118,9 +132,12 @@ class SystemPayload
 
     /**
      * Calculate the size of attachments and feature images within News
-     * @return array|mixed
+     * @return array{
+     *     label: string,
+     *     size: int
+     * }
      */
-    private function getNews()
+    private function getNews(): array
     {
         $query = "SELECT
                 'News' AS label,
@@ -143,9 +160,12 @@ class SystemPayload
 
     /**
      * Calculate the size of files within Due Work
-     * @return array|mixed
+     * @return array{
+     *     label: string,
+     *     size: int
+     * }
      */
-    private function getDueWork()
+    private function getDueWork(): array
     {
         $query = "SELECT
                 'Due Work' AS label,
@@ -158,9 +178,12 @@ class SystemPayload
 
     /**
      * Calculate the size of files within Tasks
-     * @return array|mixed
+     * @return array{
+     *     label: string,
+     *     size: int
+     * }
      */
-    private function getTasks()
+    private function getTasks(): array
     {
         $query = "SELECT
                 'Tasks' AS label,
@@ -173,9 +196,12 @@ class SystemPayload
 
     /**
      * Calculate the size of files within Due Work (Submission Response)
-     * @return array|mixed
+     * @return array{
+     *     label: string,
+     *     size: int
+     * }
      */
-    private function getSubmissionReturns()
+    private function getSubmissionReturns(): array
     {
         $query = "SELECT
                 'Submission Returns' AS label,
@@ -188,9 +214,12 @@ class SystemPayload
 
     /**
      * Calculate the size of files within Due Work (Student Submissions)
-     * @return array|mixed
+     * @return array{
+     *     label: string,
+     *     size: int
+     * }
      */
-    private function getStudentSubmissions()
+    private function getStudentSubmissions(): array
     {
         $query = "SELECT
                 'Student Submissions' AS label,
@@ -203,9 +232,12 @@ class SystemPayload
 
     /**
      * Calculate the size of files within the Resource Browser (CMS)
-     * @return array|mixed
+     * @return array{
+     *     label: string,
+     *     size: int
+     * }
      */
-    private function getCMSResources()
+    private function getCMSResources(): array
     {
         $query = "SELECT
                 'CMS Resources' AS label,
