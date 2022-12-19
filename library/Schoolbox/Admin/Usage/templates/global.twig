@@ -23,33 +23,39 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
 
-<div class="admin-container usage-charts row">
+<div class="admin-container row">
 
     {# Shared navigation menu #}
     {{ renderAdminNavigation(pageCurrent) }}
 
     <div class="admin-content">
 
-        <div class="actions-small-1 row">
-                <nav>
-                    <a class="icon-more" title="Actions" data-dropdown="usage-options"></a>
-                </nav>
-                <ul id="usage-options" class="f-dropdown" data-dropdown-content>
-                    <li><a data-perform-update href='#' class="icon-refresh" title="Reload Usage Data">Reload Usage Data</a></li>
-                </ul>
+        <div id='option-container'>
+            <div class="small-12 columns">
+                <div class="actions-small-1">
+                    <h2 class="subheader">&nbsp;</h2>
+                    <nav>
+                        <a class="icon-more" title="Actions" data-dropdown="suds-options"></a>
+                    </nav>
+                    <ul id="suds-options" class="f-dropdown" data-dropdown-content>
+                        <li><a data-perform-update href='#' class="icon-refresh" title="Reload Usage Data">Reload Usage Data</a></li>
+                    </ul>
+                </div>
+            </div>
         </div>
-        <div id="usage-global-container">
-            <usage-global
-                :endpoint-total-payload="'{{ routeLookupIfAuthorized('adminUsage.getTotalPayload') }}'"
-                :endpoint-system-payload="'{{ routeLookupIfAuthorized('adminUsage.getSystemPayload') }}'"
-                :endpoint-file-type-payload="'{{ routeLookupIfAuthorized('adminUsage.getFileTypePayload') }}'"
-                :endpoint-role-payload="'{{ routeLookupIfAuthorized('adminUsage.getRolePayload') }}'"
-                :endpoint-user-payload="'{{ routeLookupIfAuthorized('adminUsage.getUserPayload') }}'"
-                :is-s3-adapter="{{ isS3Adapter ? 'true' : 'false' }}"
-            />
+        <div class="usage-charts">
+            <div id="usage-global-container">
+                <usage-global
+                    :endpoint-total-payload="'{{ routeLookupIfAuthorized('adminUsage.getTotalPayload') }}'"
+                    :endpoint-system-payload="'{{ routeLookupIfAuthorized('adminUsage.getSystemPayload') }}'"
+                    :endpoint-file-type-payload="'{{ routeLookupIfAuthorized('adminUsage.getFileTypePayload') }}'"
+                    :endpoint-role-payload="'{{ routeLookupIfAuthorized('adminUsage.getRolePayload') }}'"
+                    :endpoint-user-payload="'{{ routeLookupIfAuthorized('adminUsage.getUserPayload') }}'"
+                    :is-s3-adapter="{{ isS3Adapter ? 'true' : 'false' }}"
+                />
+            </div>
+            <script src="{{ CDN_PREFIX }}/js/bundle/usageGlobal.js?v={{ config.site_version }}"></script>
         </div>
-        <script src="{{ CDN_PREFIX }}/js/bundle/usageGlobal.js?v={{ config.site_version }}"></script>
-
     </div>
 
 </div>
