@@ -479,59 +479,7 @@ class Controller extends Base
      */
     public function getTurnitinReport(IAssessable $assessment, IResponse $response, Turnitin\File\Model $turnitin, Participant $participant): void
     {
-        /* Check if turnitin is configured sufficiently
-         */
-        if (!(new Helper($this->getConfigLoader()))->isConfigured()) {
-            throw new \DomainException('Turnitin configuration invalid.');
-        }
-
-        /* We need this api
-         */
-        $api = new TurnitinApi(
-            $this->getConfigLoader()->get('site_version'),
-            $this->getConfigLoader()->get('turnitin_api_host'),
-            $this->getConfigLoader()->get('turnitin_api_key')
-        );
-
-        /* A specially-hardcoded value to have programmatically accepted the eula
-         * It's part of our T&C with turnitin
-         */
-        $eulaAcceptance = '2021-01-01T00:00:00.000Z';
-
-        /* Choose a viewer permission set based on your role
-         * Staff members get a different set than students or parents
-         *
-         * Start with the lowest-permission settings
-         */
-        $payload = [
-            'viewer_user_id' => $this->getUser()->getId(),
-            'locale' => 'en',
-            'viewer_default_permission_set' => Turnitin\File\Process\Report::VIEWER_PERMISSION_SET_STUDENT,
-            'eula' => [
-                'version' => 'v1beta',
-                'accepted_timestamp' => $eulaAcceptance,
-                'language' => 'en-US'
-            ],
-        ];
-
-        /* Then decide if you're a staff and you need more stuff
-         */
-        if ($this->access->isInstructor($this->getUser(), $assessment->getContext()->getFolder())) {
-            $payload = array_merge($payload, [
-                'viewer_default_permission_set' => Turnitin\File\Process\Report::VIEWER_PERMISSION_SET_STAFF,
-                'similarity' => [
-                    'view_settings' => [
-                        'save_changes' => true
-                    ]
-                ]
-            ]);
-        }
-
-        /* TODO Apparently localisation is a thing, set via locale tuple;
-         *  but I have assumed en for now
-         */
-        $viewerUrl = $api->retrieve('POST', "/api/v1/submissions/{$turnitin->getTurnitinSubmissionId()}/viewer-url", $payload);
-
+        $viewerUrl = $this->determineTurnitinViewerUrl($assessment, $turnitin);
         if (null !== $viewerUrl) {
             $data = [
                 'url' => $viewerUrl['viewer_url'],
@@ -590,5 +538,79 @@ class Controller extends Base
         ];
 
         $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningDueWorkResponse/plagscan/contents.twig', $data));
+    }
+
+
+    /**
+     * Determine the URL via which the current user may view a TII report.
+     *
+     * @param IAssessable         $assessment The assessment in which the TII
+     *                                        report was created.
+     * @param Turnitin\File\Model $turnitin   The TII report model.
+     * @return array|null
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \JsonException
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    private function determineTurnitinViewerUrl(
+        IAssessable $assessment,
+        Turnitin\File\Model $turnitin,
+    ): ?array {
+        /* Check if turnitin is configured sufficiently
+         */
+        if (!(new Helper($this->getConfigLoader()))->isConfigured()) {
+            throw new \DomainException('Turnitin configuration invalid.');
+        }
+
+        /* We need this api
+         */
+        $api = new TurnitinApi(
+            $this->getConfigLoader()->get('site_version'),
+            $this->getConfigLoader()->get('turnitin_api_host'),
+            $this->getConfigLoader()->get('turnitin_api_key')
+        );
+
+        /* A specially-hardcoded value to have programmatically accepted the eula
+         * It's part of our T&C with turnitin
+         */
+        $eulaAcceptance = '2021-01-01T00:00:00.000Z';
+
+        /* Choose a viewer permission set based on your role
+         * Staff members get a different set than students or parents
+         *
+         * Start with the lowest-permission settings
+         */
+        $payload = [
+            'viewer_user_id'                => $this->getUser()->getId(),
+            'locale'                        => 'en',
+            'viewer_default_permission_set' => Turnitin\File\Process\Report::VIEWER_PERMISSION_SET_STUDENT,
+            'eula'                          => [
+                'version'            => 'v1beta',
+                'accepted_timestamp' => $eulaAcceptance,
+                'language'           => 'en-US'
+            ],
+        ];
+
+        /* Then decide if you're a staff and you need more stuff
+         */
+        if ($this->access->isInstructor($this->getUser(), $assessment->getContext()->getFolder())) {
+            $payload = array_merge($payload, [
+                'viewer_default_permission_set' => Turnitin\File\Process\Report::VIEWER_PERMISSION_SET_STAFF,
+                'similarity'                    => [
+                    'view_settings' => [
+                        'save_changes' => true
+                    ]
+                ]
+            ]);
+        }
+
+        /* TODO Apparently localisation is a thing, set via locale tuple;
+         *  but I have assumed en for now
+         */
+        return $api->retrieve(
+            'POST',
+            "/api/v1/submissions/{$turnitin->getTurnitinSubmissionId()}/viewer-url",
+            $payload,
+        );
     }
 }
