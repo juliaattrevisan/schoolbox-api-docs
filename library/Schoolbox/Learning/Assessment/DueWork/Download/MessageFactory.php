@@ -112,6 +112,11 @@ class MessageFactory
                     continue;
                 }
 
+                // if the feedback was not created by an instructor, don't save it to the zip
+                if (true === !$feedback->isInstructorGiven()) {
+                    continue;
+                }
+
                 // If there's a response to this feedback:
                 // add any Kami files to the feedback folder
                 $feedbackResponse = $feedback->getResponse();
@@ -140,10 +145,6 @@ class MessageFactory
                         }
                     }
 
-                    //if the feedback was not created by an instructor, don't save it to the zip
-                    if (true === !$feedback->isInstructorGiven()) {
-                        continue;
-                    }
                     // current feedback was created by an instructor
                     // loop through the list of file
                     foreach ($feedback->getAllFiles() as $feedbackFile) {
