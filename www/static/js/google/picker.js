@@ -45,13 +45,9 @@
                  */
                 clientId: element,
 
-                /* Our modal. The google modal appears on top of this or inside of this with containerID set
+                /* Our modal. The google modal appears on top of this.
                  */
                 modalId: '#gfile',
-
-                /* To insert the Google Picker directly into a specific container within modalId, for when the picker is part of step by step process
-                 */
-                containerID: '',
 
                 postGoogleFileUrl: '',
                 features: [],
@@ -162,37 +158,16 @@
                 .build();
             picker.setVisible(true);
 
-            if (config.containerID && picker.De !== undefined) { // If the container exists, move the picker into the empty container and ensure the picker sits at the top left.
-                picker.De.style.left = '0px';
-                picker.De.style.top = '0px';
-                picker.De.style.width = '100%'; // Ensure it sits within the boundaries of the parent modal.
-                $(config.containerID).append(picker.De);
-                window.addEventListener('resize', resizeGooglePicker);
-            }
-
             /* Shut google picker modal when we shut our modal
              * https://stackoverflow.com/questions/13745505/how-to-use-zurb-foundation-reveal-with-open-opened-close-closed-callback-func
              */
             $(document).on('close.fndtn.reveal', config.modalId, onClosePicker);
 
             /**
-             * Google has its own resize listener, so we need to overwrite it to ensure the picker stays within the
-             * boundaries of its parent modal.
-             */
-            function resizeGooglePicker () {
-                picker.De.style.width = '100%';
-            }
-
-            /**
              * Clean up after the picker modal has been closed.
              */
             function onClosePicker() {
                 picker.setVisible(false);
-                if (config.containerID) { // If the container exists, return it to the state it was in before the call to createPicker().
-                    window.removeEventListener('resize', resizeGooglePicker);
-                    $(config.containerID).empty();
-                }
-
                 $(document).off('close.fndtn.reveal', config.modalId, onClosePicker);
             }
         }
@@ -244,9 +219,6 @@
             if (data[google.picker.Response.ACTION] === google.picker.Action.CANCEL) {
                 if (config.modalId) {
                     $(config.modalId).foundation('reveal', 'close');
-                }
-                if (config.containerID) { //empty on close
-                    $(config.containerID).empty();
                 }
             }
         }

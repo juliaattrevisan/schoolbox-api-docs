@@ -4,7 +4,6 @@
 
 import { gsap } from 'gsap/all';
 
-
 const googleFiles = document.getElementById('googleFiles');
 const levels = googleFiles.dataset.levels;
 const saveRoute = googleFiles.dataset.saveRoute;
@@ -46,7 +45,6 @@ $('#find-files').on('click', function () {
 
 $('#find-files').googlePicker({
     clientId: $('#googleFiles').attr('data-client-id'),
-    containerID: '#gfile-step0',
     mimeTypes: [
         'application/msword',
         'application/vnd.ms-powerpoint',
@@ -86,6 +84,7 @@ function clearSelections () {
 $step1.on('click', '[data-gfile-edit]', function (e) {
     $('[data-action="continue"]').removeAttr('disabled');
 });
+
 $step1.on('click', 'a[data-action]', function (e) {
     e.preventDefault();
     $step1.css( { display: 'none' } );
@@ -111,9 +110,11 @@ $step1.on('click', 'a[data-action]', function (e) {
             break;
     }
 });
+
 $step2.on('click', '[data-gfile-comment]', function (e) {
     $('[data-action="share"]').removeAttr('disabled');
 });
+
 $step2.on('click', 'a[data-action]', function (e) {
     e.preventDefault();
     switch ($(this).data('action')) {
@@ -141,6 +142,7 @@ $step2.on('click', 'a[data-action]', function (e) {
             break;
     }
 });
+
 $(`#component${componentId} [data-action="delete"]`).on('click', function (event) {
     event.preventDefault();
     $(this).confirmDialog({
@@ -154,10 +156,10 @@ $(`#component${componentId} [data-action="delete"]`).on('click', function (event
                     window.location.href = `/homepage/${folderId}`;
                 },
             });
-
         }
     });
 });
+
 $(`#component${componentId} [data-action="permission"]`).googlePicker({
     clientId: $('#googleFiles').attr('data-client-id'),
     onAuth: function () {
