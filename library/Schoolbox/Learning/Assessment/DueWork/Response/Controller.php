@@ -514,16 +514,30 @@ class Controller extends Base
             $sleep     = 500000; // 0.5 seconds initial back-off
             $pollCount = 0;
             while (true) {
-                $pdf = $viewerUrlGenerator->downloadPdf($turnitin, $pdfId);
-
+                $pdfStatus = $viewerUrlGenerator->generatePdfStatusRequest($turnitin, $pdfId);
+                $pdfStatus = $pdfStatus['status'] ?? null;
+                if ($pdfStatus === 'SUCCESS') {
+                    break;
+                }
+                if ($pdfStatus === 'FAILED') {
+                    // raise some error
+                    throw new Turnitin\Exception\Exception('Failed to generate PDF');
+                }
                 // just dump this PDF out?
                 if ($pollCount >= $maxPolls) {
-                    break;
+                    throw new Turnitin\Exception\Exception(
+                        sprintf('Could not generate PDF after %d attempts', $maxPolls)
+                    );
                 }
                 usleep($sleep);
                 $sleep  *= $exponent; // exponential back-off.
                 $pollCount++;
             }
+
+            // Now return the actual PDF
+            $this->populateResponseFromPsr7Response(
+                $viewerUrlGenerator->downloadPdf($turnitin, $pdfId)
+            );
         }
     }
 

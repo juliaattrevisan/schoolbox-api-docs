@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Turnitin\File;
 
+use Psr\Http\Message\ResponseInterface;
 use Schoolbox\Learning\Turnitin\Api as TurnitinApi;
 use Schoolbox\User;
 
@@ -115,9 +116,9 @@ class ViewerUrlGenerator
             [],
         );
     }
-    public function downloadPdf(Model $turnitin, string $id): ?array
+    public function downloadPdf(Model $turnitin, string $id): ResponseInterface
     {
-        return $this->api->retrieve(
+        return $this->api->retrieveRawResponse(
             'GET',
             sprintf(self::DOWNLOAD_PDF_URL, $turnitin->getTurnitinSubmissionId(), $id),
             [],
