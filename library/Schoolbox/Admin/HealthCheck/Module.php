@@ -55,6 +55,7 @@ class Module extends BaseModule
         $this->register('GET', '/audit/svaNewsArticleViewsPerMonthBySKC', 'svaNewsArticleViewsPerMonthBySKC', $isAlaress);
         $this->register('GET', '/audit/svaNewsArticleViewsPerMonthByActiveAlumni', 'svaNewsArticleViewsPerMonthByActiveAlumni', $isAlaress);
         $this->register('GET', '/audit/svaNewsCreatedBySVATeam', 'svaNewsCreatedBySVATeam', $isAlaress);
+        $this->register('GET', '/audit/svaHomepageViewsByKSC', 'svaHomepageViewsByKSC', $isAlaress);
     }
 
     /**
