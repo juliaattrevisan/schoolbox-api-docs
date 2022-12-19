@@ -120,6 +120,19 @@ class MessageFactory
                             );
                         }
                     }
+                    //if the feedback was not created by an instructor, don't save it to the zip
+                    if (true === !$feedback->isInstructorGiven()) {
+                        continue;
+                    }
+                    // current feedback was created by an instructor
+                    // loop through the list of file
+                    foreach ($feedback->getAllFiles() as $feedbackFile) {
+                        // attach the files to the taskd download object
+                        $messageFactory = $messageFactory->addFileContent(
+                            $this->generateResponseFileFeedbackName($participant, $feedback, $feedbackFile),
+                            $this->generateResponseFileUrl($feedbackFile),
+                        );
+                    }
                 }
             }
 
@@ -357,6 +370,28 @@ class MessageFactory
             "%s-%s.zip",
             $this->sanitizeForFilename($dueWork->getTitle()),
             Alaress_Date_Format::now()->getUsingFormat(self::STANDARD_DATE_FORMAT),
+        );
+    }
+
+    /**
+     * Generates the filename for the instructor feedback response file in the
+     * generated ZIP file.
+     *
+     * @param Participant         $participant
+     * @param IFeedback           $feedback
+     * @param \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile\Model $responseFile
+     * @return string
+     */
+    private function generateResponseFileFeedbackName(
+        Participant $participant,
+        IFeedback $feedback,
+        \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile\Model $responseFile,
+    ): string {
+        //these are all files, so should be fine...
+        return sprintf(
+            "%s/%s",
+            $this->generateFeedbackFolderName($participant, $feedback),
+            $this->sanitizeForFilename($responseFile->getBasename()),
         );
     }
 }
