@@ -9,7 +9,7 @@
 namespace Schoolbox\Learning\Assessment\DueWork\Response;
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\Learning\Turnitin\Api as TurnitinApi;
+use DomainException;
 use Schoolbox\Learning\DueWork\StateMapper;
 use GuzzleHttp\Client;
 use Schoolbox\Application\Exception as ApplicationException;
@@ -73,14 +73,15 @@ class Controller extends Base
     /**
      * Controller constructor.
      *
-     * @param ErrorMapper       $errorMapper
-     * @param DataSource        $responseDataSource
-     * @param BreadcrumbFactory $bakery
-     * @param Term\Mapper       $termMapper
-     * @param Kami\Mapper       $kamiMapper
-     * @param Kami\Connector    $kamiConnector
-     * @param Access            $access
-     * @param FilesystemProxy   $filesystemProxy
+     * @param ErrorMapper            $errorMapper
+     * @param DataSource             $responseDataSource
+     * @param BreadcrumbFactory      $bakery
+     * @param Term\Mapper            $termMapper
+     * @param Kami\Mapper            $kamiMapper
+     * @param Kami\Connector         $kamiConnector
+     * @param Access                 $access
+     * @param FilesystemProxy        $filesystemProxy
+     * @param Turnitin\File\Api|null $turnitinFileApi Null if TII isn't configured
      */
     public function __construct(
         ErrorMapper $errorMapper,
@@ -91,6 +92,7 @@ class Controller extends Base
         Kami\Connector $kamiConnector,
         Access $access,
         private FilesystemProxy $filesystemProxy,
+        private ?Turnitin\File\Api $turnitinFileApi,
     ) {
         $this->errorMapper        = $errorMapper;
         $this->responseDataSource = $responseDataSource;
@@ -471,7 +473,7 @@ class Controller extends Base
      * @throws BadEndpoint
      * @throws Credentials
      * @throws \Aura\Router\Exception\RouteNotFound
-     * @throws \DomainException
+     * @throws DomainException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \GuzzleHttp\Exception\InvalidArgumentException
      * @throws \JsonException
@@ -511,10 +513,12 @@ class Controller extends Base
      */
     public function getTurnitinExport(Turnitin\File\Model $turnitin): void
     {
-        $turnitinFileApi = $this->buildTurnitinFileApi();
-        $pdfId           = $turnitinFileApi->generatePdfRequest($turnitin);
+        if (!$this->turnitinFileApi) {
+            throw new DomainException('Turnitin configuration invalid.');
+        }
+        $pdfId = $this->turnitinFileApi->generatePdfRequest($turnitin);
         $this->populateResponseFromPsr7Response(
-            $turnitinFileApi->downloadPdf($turnitin, $pdfId, 10, 5000),
+            $this->turnitinFileApi->downloadPdf($turnitin, $pdfId, 10, 5000),
         );
     }
 
@@ -574,9 +578,11 @@ class Controller extends Base
         IAssessable $assessment,
         Turnitin\File\Model $turnitin,
     ): ?string {
-        $turnitinFileApi = $this->buildTurnitinFileApi();
-        $isInstructor    = $this->access->isInstructor($this->getUser(), $assessment->getContext()->getFolder());
-        return $turnitinFileApi->generateViewerUrl(
+        if (!$this->turnitinFileApi) {
+            throw new DomainException('Turnitin configuration invalid.');
+        }
+        $isInstructor = $this->access->isInstructor($this->getUser(), $assessment->getContext()->getFolder());
+        return $this->turnitinFileApi->generateViewerUrl(
             $turnitin,
             $this->getUser(),
             $isInstructor
@@ -584,27 +590,5 @@ class Controller extends Base
                 : Turnitin\File\Process\Report::VIEWER_PERMISSION_SET_STUDENT,
             $isInstructor,
         );
-    }
-
-    /**
-     * Build an instance of the specialised Turnitin file download API.
-     *
-     * @return Turnitin\File\Api
-     */
-    private function buildTurnitinFileApi(): Turnitin\File\Api
-    {
-        if (!(new Helper($this->getConfigLoader()))->isConfigured()) {
-            throw new \DomainException('Turnitin configuration invalid.');
-        }
-
-        /* We need this api
-         */
-        $api = new TurnitinApi(
-            $this->getConfigLoader()->get('site_version'),
-            $this->getConfigLoader()->get('turnitin_api_host'),
-            $this->getConfigLoader()->get('turnitin_api_key')
-        );
-
-        return new Turnitin\File\Api($api);
     }
 }
