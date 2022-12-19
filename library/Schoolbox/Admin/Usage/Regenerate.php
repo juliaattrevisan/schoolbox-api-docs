@@ -55,40 +55,40 @@ class Regenerate
         $callback = function ($database) {
             return [
                 'time' => time(),
-                'data' => (new Graph\GlobalUsers\SystemPayload($database))->generate()
+                'data' => (new Graph\GlobalUsers\SystemPayload($this->database))->generate()
                 ];
         };
-        $payload = $this->cache->cacheFunctionCall(self::CACHE_USAGE_SYSTEM, $callback, $this->database, self::CACHE_TIMEOUT);
+        $payload = $this->cache->cacheFunctionCall(self::CACHE_USAGE_SYSTEM, $callback, self::CACHE_TIMEOUT);
 
         //RolePayload
         $logger?->info("Generating RolePayload");
         $callback = function ($database) {
             return [
                 'time' => time(),
-                'data' => (new Graph\GlobalUsers\RolePayload($database))->generate()
+                'data' => (new Graph\GlobalUsers\RolePayload($this->database))->generate()
                 ];
         };
-        $payload = $this->cache->cacheFunctionCall(self::CACHE_USAGE_ROLE, $callback, $this->database, self::CACHE_TIMEOUT);
+        $payload = $this->cache->cacheFunctionCall(self::CACHE_USAGE_ROLE, $callback, self::CACHE_TIMEOUT);
 
         //UserPayload
         $logger?->info("Generating UserPayload");
         $callback = function ($database) {
             return [
                 'time' => time(),
-                'data' => (new Graph\GlobalUsers\UserPayload($database))->generate()
+                'data' => (new Graph\GlobalUsers\UserPayload($this->database))->generate()
                 ];
         };
-        $payload = $this->cache->cacheFunctionCall(self::CACHE_USAGE_USER, $callback, $this->database, self::CACHE_TIMEOUT);
+        $payload = $this->cache->cacheFunctionCall(self::CACHE_USAGE_USER, $callback, self::CACHE_TIMEOUT);
 
         //FileTypePayload
         $logger?->info("Generating FileTypePayload");
         $callback = function ($database) {
             return [
                 'time' => time(),
-                'data' => (new Graph\GlobalUsers\FileTypePayload($database))->generate()
+                'data' => (new Graph\GlobalUsers\FileTypePayload($this->database))->generate()
                 ];
         };
-        $payload = $this->cache->cacheFunctionCall(self::CACHE_USAGE_FILETYPE, $callback, $this->database, self::CACHE_TIMEOUT);
+        $payload = $this->cache->cacheFunctionCall(self::CACHE_USAGE_FILETYPE, $callback, self::CACHE_TIMEOUT);
         $logger?->notice("Calculation of storage complete");
     }
 }
