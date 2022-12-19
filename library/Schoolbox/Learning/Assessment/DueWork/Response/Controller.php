@@ -503,14 +503,16 @@ class Controller extends Base
     /**
      * Export a PDF for a Turnitin file.
      *
+     * @api   GET /learning/similarity/{assessmentId}/{responseId}/{turnitinSubId}
+     * @since 23.0
+     *
      * @param Turnitin\File\Model $turnitin
      * @return void
      */
     public function getTurnitinExport(Turnitin\File\Model $turnitin): void
     {
         $viewerUrlGenerator = $this->buildViewerUrlGenerator();
-        $pdfId = $viewerUrlGenerator->generatePdfRequest($turnitin);
-        $pdfId = $pdfId['id'] ?? null;
+        $pdfId              = $viewerUrlGenerator->generatePdfRequest($turnitin)['id'] ?? null;
 
         // Wait a bunch of time for the PDF
         if (isset($pdfId)) {
@@ -519,16 +521,23 @@ class Controller extends Base
             $sleep     = 500000; // 0.5 seconds initial back-off
             $pollCount = 0;
             while (true) {
-                $pdfStatus = $viewerUrlGenerator->generatePdfStatusRequest($turnitin, $pdfId);
-                $pdfStatus = $pdfStatus['status'] ?? null;
-                if ($pdfStatus === 'SUCCESS') {
+                $pdfResponse       = $viewerUrlGenerator->downloadPdf($turnitin, $pdfId);
+                $pdfResponseStatus = $pdfResponse->getStatusCode();
+                if ($pdfResponseStatus === 200) {
+                    // PDF is generated and part of the response: break
                     break;
                 }
-                if ($pdfStatus === 'FAILED') {
-                    // raise some error
-                    throw new Turnitin\Exception\Exception('Failed to generate PDF');
+
+                if ($pdfResponseStatus === 202) {
+                    // PDF is being processed
+                    $body      = json_decode($pdfResponse->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
+                    $pdfStatus = $body['status'] ?? null;
+                    if ($pdfStatus === 'FAILED') {
+                        // raise some error
+                        throw new Turnitin\Exception\Exception('Failed to generate PDF');
+                    }
                 }
-                // just dump this PDF out?
+
                 if ($pollCount >= $maxPolls) {
                     throw new Turnitin\Exception\Exception(
                         sprintf('Could not generate PDF after %d attempts', $maxPolls)
@@ -540,9 +549,7 @@ class Controller extends Base
             }
 
             // Now return the actual PDF
-            $this->populateResponseFromPsr7Response(
-                $viewerUrlGenerator->downloadPdf($turnitin, $pdfId)
-            );
+            $this->populateResponseFromPsr7Response($pdfResponse);
         }
     }
 
