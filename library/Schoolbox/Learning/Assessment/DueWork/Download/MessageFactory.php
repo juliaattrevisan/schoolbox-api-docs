@@ -125,12 +125,18 @@ class MessageFactory
                             );
                         }
                         if ($viewerUrlGenerator && $file->getTurnItIn()) {
-                            $viewerUrlGenerator->generateViewerUrl(
+                            $viewerUrl = $viewerUrlGenerator->generateViewerUrl(
                                 $file->getTurnItIn(),
                                 $viewer,
                                 Report::VIEWER_PERMISSION_SET_STAFF,
                                 false,
                             );
+                            if ($viewerUrl['viewer_url'] ?? null) {
+                                $messageFactory = $messageFactory->addPdfContent(
+                                    $this->generateResponseFileTurnitinName($participant, $feedback, $file),
+                                    $viewerUrl['viewer_url'],
+                                );
+                            }
                         }
                     }
 
@@ -314,6 +320,33 @@ class MessageFactory
         return $this->urlBase
             ->setPath($kamiRoutePath)
             ->toString();
+    }
+
+    /**
+     * Generates a file name for this participant, feedback and Turnitin file in
+     * the generated ZIP file.
+     *
+     * @param Participant         $participant
+     * @param IFeedback           $feedback
+     * @param DueWorkResponseFile $responseFile
+     * @return string
+     */
+    private function generateResponseFileTurnitinName(
+        Participant $participant,
+        IFeedback $feedback,
+        DueWorkResponseFile $responseFile,
+    ): string {
+        // Does this basename have a .pdf extension already?
+        // If so, keep it: otherwise append .pdf
+        $basename = match (strtolower($responseFile->getExtension())) {
+            'pdf'   => $responseFile->getFilename(),
+            default => $responseFile->getBasename(),
+        };
+        return sprintf(
+            "%s/turnitin/%s.pdf",
+            $this->generateFeedbackFolderName($participant, $feedback),
+            $this->sanitizeForFilename($basename),
+        );
     }
 
     /**

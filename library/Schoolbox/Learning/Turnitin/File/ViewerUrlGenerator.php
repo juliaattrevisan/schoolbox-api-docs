@@ -41,7 +41,7 @@ class ViewerUrlGenerator
      *                                    constants
      * @param bool   $allowSaveChanges    May the user save changes to the
      *                                    report?
-     * @return array|null
+     * @return array{viewer_url: string}|null
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \JsonException
      */
