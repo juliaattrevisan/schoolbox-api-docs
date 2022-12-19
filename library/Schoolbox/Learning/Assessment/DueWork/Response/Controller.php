@@ -570,47 +570,15 @@ class Controller extends Base
             $this->getConfigLoader()->get('turnitin_api_key')
         );
 
-        /* A specially-hardcoded value to have programmatically accepted the eula
-         * It's part of our T&C with turnitin
-         */
-        $eulaAcceptance = '2021-01-01T00:00:00.000Z';
-
-        /* Choose a viewer permission set based on your role
-         * Staff members get a different set than students or parents
-         *
-         * Start with the lowest-permission settings
-         */
-        $payload = [
-            'viewer_user_id'                => $this->getUser()->getId(),
-            'locale'                        => 'en',
-            'viewer_default_permission_set' => Turnitin\File\Process\Report::VIEWER_PERMISSION_SET_STUDENT,
-            'eula'                          => [
-                'version'            => 'v1beta',
-                'accepted_timestamp' => $eulaAcceptance,
-                'language'           => 'en-US'
-            ],
-        ];
-
-        /* Then decide if you're a staff and you need more stuff
-         */
-        if ($this->access->isInstructor($this->getUser(), $assessment->getContext()->getFolder())) {
-            $payload = array_merge($payload, [
-                'viewer_default_permission_set' => Turnitin\File\Process\Report::VIEWER_PERMISSION_SET_STAFF,
-                'similarity'                    => [
-                    'view_settings' => [
-                        'save_changes' => true
-                    ]
-                ]
-            ]);
-        }
-
-        /* TODO Apparently localisation is a thing, set via locale tuple;
-         *  but I have assumed en for now
-         */
-        return $api->retrieve(
-            'POST',
-            "/api/v1/submissions/{$turnitin->getTurnitinSubmissionId()}/viewer-url",
-            $payload,
+        $viewerUrlGenerator = new Turnitin\File\ViewerUrlGenerator($api);
+        $isInstructor       = $this->access->isInstructor($this->getUser(), $assessment->getContext()->getFolder());
+        return $viewerUrlGenerator->generateViewerUrl(
+            $turnitin,
+            $this->getUser(),
+            $isInstructor
+                ? Turnitin\File\Process\Report::VIEWER_PERMISSION_SET_STAFF
+                : Turnitin\File\Process\Report::VIEWER_PERMISSION_SET_STUDENT,
+            $isInstructor,
         );
     }
 }
