@@ -60,6 +60,7 @@ class Module extends BaseModule
         $this->register('GET', '/audit/svaHomepageViewsForCommunityForumsPage', 'svaHomepageViewsForCommunityForumsPage', $isAlaress);
         $this->register('GET', '/audit/svaHomepageViewsForOpportunitiesPage', 'svaHomepageViewsForOpportunitiesPage', $isAlaress);
         $this->register('GET', '/audit/svaHomepageViewsForProfessionalReadingPage', 'svaHomepageViewsForProfessionalReadingPage', $isAlaress);
+        $this->register('GET', '/audit/svaHomepageViewsForEvaluationPage', 'svaHomepageViewsForEvaluationPage', $isAlaress);
     }
 
     /**
