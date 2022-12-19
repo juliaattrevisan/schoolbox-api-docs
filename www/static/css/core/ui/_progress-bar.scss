@@ -1,10 +1,12 @@
-/*  
+/*
     progress-bar.scss
 
     This is a class for custom styling of progress bars. Yes, there is also
     a _progress-bars.scss file, but that file is legacy styling and is part
-    of ZURB / Foundation. This class 
-        
+    of ZURB / Foundation. This class solely deals with the custom styled
+    progress bars which, at the time of writing, only exist within the
+    pending assessments page.
+
     TODO - Return when the PR with whitespace variables is merged in and
     make this class use it.
     TODO - Overwrite the values in the _progress-bars.scss class. This
@@ -16,11 +18,11 @@
     user-select: none;
 
     /* Add a margin to thep top when we're moved into column display (mobile) */
-    @media screen and (max-width: 640px){
+    @media screen and (max-width: 640px) {
         margin-top: 0.5rem;
     }
 
-    .legend{
+    .legend {
         display: inline-flex;
         flex-wrap: wrap;
         font-weight: 700;
@@ -30,7 +32,7 @@
         text-transform: uppercase;
         width: 100%;
 
-        &-item{
+        &-item {
             color: black;
 
             &.success:before {
@@ -45,14 +47,14 @@
                 background-color: $neutral-color;
             }
 
-            &.alert:before{
+            &.alert:before {
                 background-color: $alert-color;
             }
 
             &.warning:before {
                 background-color: $warning-color;
-            }   
-            
+            }
+
 
             &:before {
                 background-color: black;
@@ -60,7 +62,7 @@
                 content: '';
                 display: inline-block;
                 height: 0.5rem;
-                margin-right: 0.5rem; 
+                margin-right: 0.5rem;
                 width: 0.5rem;
             }
         }
@@ -87,7 +89,7 @@
         position: absolute;
 
 
-        &.slow{
+        &.slow {
             transition: left 1s;
         }
 
@@ -112,7 +114,7 @@
             background-color: $success-color;
         }
 
-        div{
+        div {
             background-color: rgba(0, 0, 0, 0.25);
             border-radius: 1rem;
             color: white;
@@ -122,11 +124,10 @@
             padding: 0 0.25rem;
         }
 
-        &:hover{
+        &:hover {
             z-index: 2;
             filter: brightness(1.15);
         }
     }
 
 }
-
