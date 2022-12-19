@@ -48,22 +48,18 @@ $app = new class extends CliTool\App {
 Re Calculates the storage usage and stores the calculations in redis
 
 Usage: tools/usageCache.php [-v] [-p]
-        -p Actually generate the cache
         -v Verbose mode (may be provided up to 3 times for increasing verbosity)
 
 HELP;
             exit;
         }
 
-        if (!$this->perform()) {
-            $this->getLogger()->alert("Not Running");
-        } else {
-            /** @var IConnector $database */
-            $database = $this->getDi()->get('databaseInternal');
 
-            $regenerate = new Regenerate(Redis::getCacheInstance(), $database);
-            $regenerate->regenerateUsage($this->getLogger());
-        }
+        /** @var IConnector $database */
+        $database = $this->getDi()->get('databaseInternal');
+
+        $regenerate = new Regenerate(Redis::getCacheInstance(), $database);
+        $regenerate->regenerateUsage($this->getLogger());
     }
 };
 
