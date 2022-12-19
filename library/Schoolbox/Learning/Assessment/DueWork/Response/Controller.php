@@ -513,44 +513,9 @@ class Controller extends Base
     {
         $turnitinFileApi = $this->buildTurnitinFileApi();
         $pdfId           = $turnitinFileApi->generatePdfRequest($turnitin);
-
-        // Wait a bunch of time for the PDF
-        if (isset($pdfId)) {
-            $maxPolls  = 10;
-            $exponent  = 2;
-            $sleep     = 500000; // 0.5 seconds initial back-off
-            $pollCount = 0;
-            while (true) {
-                $pdfResponse       = $turnitinFileApi->downloadPdf($turnitin, $pdfId);
-                $pdfResponseStatus = $pdfResponse->getStatusCode();
-                if ($pdfResponseStatus === 200) {
-                    // PDF is generated and part of the response: break
-                    break;
-                }
-
-                if ($pdfResponseStatus === 202) {
-                    // PDF is being processed
-                    $body      = json_decode($pdfResponse->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
-                    $pdfStatus = $body['status'] ?? null;
-                    if ($pdfStatus === 'FAILED') {
-                        // raise some error
-                        throw new Turnitin\Exception\Exception('Failed to generate PDF');
-                    }
-                }
-
-                if ($pollCount >= $maxPolls) {
-                    throw new Turnitin\Exception\Exception(
-                        sprintf('Could not generate PDF after %d attempts', $maxPolls)
-                    );
-                }
-                usleep($sleep);
-                $sleep  *= $exponent; // exponential back-off.
-                $pollCount++;
-            }
-
-            // Now return the actual PDF
-            $this->populateResponseFromPsr7Response($pdfResponse);
-        }
+        $this->populateResponseFromPsr7Response(
+            $turnitinFileApi->downloadPdf($turnitin, $pdfId, 10, 5000),
+        );
     }
 
     /**
