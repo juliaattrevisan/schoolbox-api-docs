@@ -22,6 +22,11 @@ class ViewerUrlGenerator
      */
     private const EULA_ACCEPTANCE_DATE = '2021-01-01T00:00:00.000Z';
 
+    private const VIEWER_URL = '/api/v1/submissions/%s/viewer-url';
+    private const REQUEST_PDF_URL = '/api/v1/submissions/%s/similarity/pdf';
+    private const DOWNLOAD_PDF_URL = '/api/v1/submissions/%s/similarity/pdf/%s';
+    private const REQUEST_PDF_STATUS_URL = '/api/v1/submissions/%s/similarity/pdf/%s/status';
+
     /**
      * Constructor
      *
@@ -51,8 +56,6 @@ class ViewerUrlGenerator
         string $viewerPermissionSet,
         bool $allowSaveChanges,
     ): ?array {
-        $api = $this->api;
-
         /* Choose a viewer permission set based on your role
          * Staff members get a different set than students or parents
          *
@@ -87,10 +90,37 @@ class ViewerUrlGenerator
         /* TODO Apparently localisation is a thing, set via locale tuple;
          *  but I have assumed en for now
          */
-        return $api->retrieve(
+        return $this->api->retrieve(
             'POST',
-            "/api/v1/submissions/{$turnitin->getTurnitinSubmissionId()}/viewer-url",
+            sprintf(self::VIEWER_URL, $turnitin->getTurnitinSubmissionId()),
             $payload,
+        );
+    }
+
+
+    public function generatePdfRequest(Model $turnitin): ?array
+    {
+        return $this->api->retrieve(
+            'POST',
+            sprintf(self::REQUEST_PDF_URL, $turnitin->getTurnitinSubmissionId()),
+            [],
+        );
+    }
+
+    public function generatePdfStatusRequest(Model $turnitin, string $id): ?array
+    {
+        return $this->api->retrieve(
+            'GET',
+            sprintf(self::REQUEST_PDF_STATUS_URL, $turnitin->getTurnitinSubmissionId(), $id),
+            [],
+        );
+    }
+    public function downloadPdf(Model $turnitin, string $id): ?array
+    {
+        return $this->api->retrieve(
+            'GET',
+            sprintf(self::DOWNLOAD_PDF_URL, $turnitin->getTurnitinSubmissionId(), $id),
+            [],
         );
     }
 }

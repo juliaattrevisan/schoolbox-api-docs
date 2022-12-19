@@ -500,6 +500,33 @@ class Controller extends Base
          */
     }
 
+
+    public function getTurnitinExport(Turnitin\File\Model $turnitin): void
+    {
+        $viewerUrlGenerator = $this->buildViewerUrlGenerator();
+        $pdfId = $viewerUrlGenerator->generatePdfRequest($turnitin);
+        $pdfId = $pdfId['id'] ?? null;
+
+        // Wait a bunch of time for the PDF
+        if (isset($pdfId)) {
+            $maxPolls  = 10;
+            $exponent  = 2;
+            $sleep     = 500000; // 0.5 seconds initial back-off
+            $pollCount = 0;
+            while (true) {
+                $pdf = $viewerUrlGenerator->downloadPdf($turnitin, $pdfId);
+
+                // just dump this PDF out?
+                if ($pollCount >= $maxPolls) {
+                    break;
+                }
+                usleep($sleep);
+                $sleep  *= $exponent; // exponential back-off.
+                $pollCount++;
+            }
+        }
+    }
+
     /**
      * Dump out a plagscan report
      *
@@ -558,6 +585,23 @@ class Controller extends Base
     ): ?array {
         /* Check if turnitin is configured sufficiently
          */
+        $viewerUrlGenerator = $this->buildViewerUrlGenerator();
+        $isInstructor       = $this->access->isInstructor($this->getUser(), $assessment->getContext()->getFolder());
+        return $viewerUrlGenerator->generateViewerUrl(
+            $turnitin,
+            $this->getUser(),
+            $isInstructor
+                ? Turnitin\File\Process\Report::VIEWER_PERMISSION_SET_STAFF
+                : Turnitin\File\Process\Report::VIEWER_PERMISSION_SET_STUDENT,
+            $isInstructor,
+        );
+    }
+
+    /**
+     * @return Turnitin\File\ViewerUrlGenerator
+     */
+    private function buildViewerUrlGenerator(): Turnitin\File\ViewerUrlGenerator
+    {
         if (!(new Helper($this->getConfigLoader()))->isConfigured()) {
             throw new \DomainException('Turnitin configuration invalid.');
         }
@@ -570,15 +614,6 @@ class Controller extends Base
             $this->getConfigLoader()->get('turnitin_api_key')
         );
 
-        $viewerUrlGenerator = new Turnitin\File\ViewerUrlGenerator($api);
-        $isInstructor       = $this->access->isInstructor($this->getUser(), $assessment->getContext()->getFolder());
-        return $viewerUrlGenerator->generateViewerUrl(
-            $turnitin,
-            $this->getUser(),
-            $isInstructor
-                ? Turnitin\File\Process\Report::VIEWER_PERMISSION_SET_STAFF
-                : Turnitin\File\Process\Report::VIEWER_PERMISSION_SET_STUDENT,
-            $isInstructor,
-        );
+        return new Turnitin\File\ViewerUrlGenerator($api);
     }
 }

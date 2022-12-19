@@ -126,6 +126,7 @@ class Module extends BaseModule
 
         $this->register('GET', $turnitinPattern, 'getTurnitinReport', $hasSimilarityAccess, $preloadTurnitinWithAss); // a || r
         $this->register('GET', $turnitinPattern . '/iframe', 'getTurnitinReportContents', $hasSimilarityAccess, $preloadTurnitinWithAss); // a || r
+        $this->register('GET', $turnitinPattern . '/export', 'getTurnitinExport', $hasSimilarityAccess, $preloadTurnitinWithAss); // a || r
 
         $this->register('GET', $plagscanPattern, 'getPlagscanReport', $hasSimilarityAccess, $preloadPlagscanWithAss); // a || r
         $this->register('GET', $plagscanPattern . '/iframe', 'getPlagscanReportContents', $hasSimilarityAccess, $preloadPlagscanWithAss); // a || r
