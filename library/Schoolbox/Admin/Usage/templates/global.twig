@@ -9,10 +9,8 @@
             toaster.toastActivate({ text: 'Reload Usage Data...' });
             $.post('{{ routeLookup('adminUsage.postRegenerateUsage') }}', {
             }).done(function () {
-
                 toaster.toastTimeout({ text: 'Reload Usage Successful', css: 'success' });
                 window.location.reload();
-
             }).fail(function () {
                 toaster.toastTimeout({ text: 'Failed to Reload Usage Data, Try Again..', css: 'alert' });
             });

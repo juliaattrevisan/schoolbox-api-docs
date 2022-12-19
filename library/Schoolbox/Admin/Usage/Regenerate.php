@@ -45,7 +45,7 @@ class Regenerate
         //clear the cache for all cached queries
         foreach (self::CACHED_QUERIES as $cachedQuery) {
             $logger?->debug("Removing cache: {$cachedQuery}");
-            $count = $this->cache->dropKeyCache($cachedQuery, $this->database);
+            $count = $this->cache->dropKeyCache($cachedQuery, '');
             $logger?->debug("Removed: #{$count} instances of: {$cachedQuery}");
         }
 
@@ -58,7 +58,7 @@ class Regenerate
                 'data' => (new Graph\GlobalUsers\SystemPayload($this->database))->generate()
                 ];
         };
-        $payload = $this->cache->cacheFunctionCall(self::CACHE_USAGE_SYSTEM, $callback, self::CACHE_TIMEOUT);
+        $payload = $this->cache->cacheFunctionCall(self::CACHE_USAGE_SYSTEM, $callback, '', self::CACHE_TIMEOUT);
 
         //RolePayload
         $logger?->info("Generating RolePayload");
@@ -68,7 +68,7 @@ class Regenerate
                 'data' => (new Graph\GlobalUsers\RolePayload($this->database))->generate()
                 ];
         };
-        $payload = $this->cache->cacheFunctionCall(self::CACHE_USAGE_ROLE, $callback, self::CACHE_TIMEOUT);
+        $payload = $this->cache->cacheFunctionCall(self::CACHE_USAGE_ROLE, $callback, '', self::CACHE_TIMEOUT);
 
         //UserPayload
         $logger?->info("Generating UserPayload");
@@ -78,7 +78,7 @@ class Regenerate
                 'data' => (new Graph\GlobalUsers\UserPayload($this->database))->generate()
                 ];
         };
-        $payload = $this->cache->cacheFunctionCall(self::CACHE_USAGE_USER, $callback, self::CACHE_TIMEOUT);
+        $payload = $this->cache->cacheFunctionCall(self::CACHE_USAGE_USER, $callback, '', self::CACHE_TIMEOUT);
 
         //FileTypePayload
         $logger?->info("Generating FileTypePayload");
@@ -88,7 +88,7 @@ class Regenerate
                 'data' => (new Graph\GlobalUsers\FileTypePayload($this->database))->generate()
                 ];
         };
-        $payload = $this->cache->cacheFunctionCall(self::CACHE_USAGE_FILETYPE, $callback, self::CACHE_TIMEOUT);
+        $payload = $this->cache->cacheFunctionCall(self::CACHE_USAGE_FILETYPE, $callback, '', self::CACHE_TIMEOUT);
         $logger?->notice("Calculation of storage complete");
     }
 }

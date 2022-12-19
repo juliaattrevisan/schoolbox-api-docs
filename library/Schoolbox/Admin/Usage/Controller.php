@@ -98,7 +98,7 @@ class Controller extends Base
                 'data' => (new Graph\GlobalUsers\SystemPayload($this->database))->generate()
             ];
         };
-        $payload = $this->cache->cacheFunctionCall(Regenerate::CACHE_USAGE_SYSTEM, $callback, Regenerate::CACHE_TIMEOUT);
+        $payload = $this->cache->cacheFunctionCall(Regenerate::CACHE_USAGE_SYSTEM, $callback, '', Regenerate::CACHE_TIMEOUT);
 
         $this->getResponse()->content->set($this->buildJsonOutput($payload));
     }
@@ -116,7 +116,7 @@ class Controller extends Base
                 'data' => (new Graph\GlobalUsers\RolePayload($this->database))->generate()
             ];
         };
-        $payload = $this->cache->cacheFunctionCall(Regenerate::CACHE_USAGE_ROLE, $callback, Regenerate::CACHE_TIMEOUT);
+        $payload = $this->cache->cacheFunctionCall(Regenerate::CACHE_USAGE_ROLE, $callback, '', Regenerate::CACHE_TIMEOUT);
 
         $this->getResponse()->content->set($this->buildJsonOutput($payload));
     }
@@ -145,7 +145,7 @@ class Controller extends Base
                 'data' => (new Graph\GlobalUsers\UserPayload($this->database))->generate()
             ];
         };
-        $payload = $this->cache->cacheFunctionCall(Regenerate::CACHE_USAGE_USER, $callback, Regenerate::CACHE_TIMEOUT);
+        $payload = $this->cache->cacheFunctionCall(Regenerate::CACHE_USAGE_USER, $callback, '', Regenerate::CACHE_TIMEOUT);
 
         $this->getResponse()->content->set($this->buildJsonOutput($payload));
     }
@@ -163,7 +163,7 @@ class Controller extends Base
                 'data' => (new Graph\GlobalUsers\FileTypePayload($this->database))->generate()
             ];
         };
-        $payload = $this->cache->cacheFunctionCall(Regenerate::CACHE_USAGE_FILETYPE, $callback, Regenerate::CACHE_TIMEOUT);
+        $payload = $this->cache->cacheFunctionCall(Regenerate::CACHE_USAGE_FILETYPE, $callback, '', Regenerate::CACHE_TIMEOUT);
 
         $this->getResponse()->content->set($this->buildJsonOutput($payload));
     }
