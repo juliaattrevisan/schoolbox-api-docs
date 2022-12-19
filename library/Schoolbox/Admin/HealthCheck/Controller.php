@@ -155,6 +155,7 @@ class Controller extends Base
                     $this->taskDHelper->addSource('', 'svaHomepageViewsForEvaluationPage');
                     $this->taskDHelper->addSource('', 'svaHomepageViewsForActiveAlumniPage');
                     $this->taskDHelper->addSource('', 'svaHomepageViewsForRrrHubSchoolsPage');
+                    $this->taskDHelper->addSource('', 'svaHomepageViewsForForumThreads');
                     break;
                 default:
                     throw new SchoolboxException("Report '{$report}' Does not exist.");
@@ -1332,6 +1333,31 @@ class Controller extends Base
         $statement->execute();
         $help = new Helper();
         $help->queryToCSV($statement, 'svaHomepageViewsForRrrHubSchoolsPage.csv');
+    }
+    /**
+     * SVA
+     * svaHomepageViewsForForumThreads.csv
+     */
+    public function svaHomepageViewsForForumThreads()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            concat(f.name,' (',f.id,')') as 'Homepage',
+            concat((MONTHNAME(ft.date)),' ',(YEAR(ft.date))) AS Month,
+            count(*) as 'Forum Thread Count'
+        FROM
+            forumThread ft
+        JOIN
+            folder f on ft.categoryID = f.id
+        GROUP BY
+            f.name,month(ft.date)
+        ORDER BY
+            f.name,ft.date;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'svaHomepageViewsForForumThreads.csv');
     }
     // ===============================================================================================
     // ==================================== END SVA REPORTS ==========================================
