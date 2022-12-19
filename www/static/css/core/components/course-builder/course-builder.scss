@@ -1,0 +1,25 @@
+/* TODO - Go through the other stylesheets that include course builder 
+styling and move all the code in here.
+*/
+
+.course-builder {
+
+    .breadcrumb ~ & {
+        margin-bottom: var(--whitespace-m);
+    }
+
+    .information-list{
+        & .card {
+            display: flex;
+            padding-bottom: var(--whitespace-xs);
+            padding-top: var(--whitespace-xs);
+
+            & p {
+                &:last-child{
+                    margin-bottom: 0;
+                }
+            }
+        }
+    }
+    
+}

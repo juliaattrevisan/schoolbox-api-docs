@@ -33,6 +33,7 @@ $cdn-prefix: "../..";
 @import "layout/container";
 @import "layout/login";
 @import "layout/flex";
+@import "layout/whitespace-measurements";
 
 // Shared user interface
 @import "ui/icons";
@@ -135,6 +136,9 @@ $cdn-prefix: "../..";
 @import "components/editor/custom-styles";
 @import "components/editor/mejs";
 @import "components/editor/inline";
+
+//Course Builder
+@import "components/course-builder/course-builder";
 
 // Sports Fixtures
 @import "components/sportsfixtures/sportsfixtures";
