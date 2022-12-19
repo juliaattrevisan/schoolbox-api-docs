@@ -127,9 +127,12 @@
             }
         }
 
-        // Create and render a Picker object for searching images.
-        // Visit here to find all the view ids:
-        //   https://developers.google.com/picker/docs/reference#view-id
+
+        /**
+         * Create and render a Picker object for searching images.
+         * Visit here to find all the view ids:
+         *   https://developers.google.com/picker/docs/reference#view-id
+         */
         function createPicker() {
             let builder = new google.picker.PickerBuilder();
 
