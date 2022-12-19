@@ -50,6 +50,7 @@ class Module extends BaseModule
         $this->register('GET', '/audit/resourceBrowser', 'resourceBrowser', $isAlaress);
         // SVA REPORTS
         $this->register('GET', '/audit/svaMonthlyLogins', 'svaMonthlyLogins', $isAlaress);
+        $this->register('GET', '/audit/svaNewsArticleViews', 'svaNewsArticleViews', $isAlaress);
     }
 
     /**

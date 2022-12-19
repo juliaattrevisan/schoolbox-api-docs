@@ -144,6 +144,7 @@ class Controller extends Base
                      * list of reports for sva
                      */
                     $this->taskDHelper->addSource('', 'svaMonthlyLogins');
+                    $this->taskDHelper->addSource('', 'svaNewsArticleViews');
                     break;
                 default:
                     throw new SchoolboxException("Report '{$report}' Does not exist.");
@@ -900,6 +901,35 @@ class Controller extends Base
         $statement->execute();
         $help = new Helper();
         $help->queryToCSV($statement, 'svaMonthlyLogins.csv');
+    }
+
+    /**
+     * SVA
+     * svaNewsArticleViews.csv
+     */
+    public function svaNewsArticleViews()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            ll.username as 'Username',
+            g.name as 'Role',
+            concat((MONTHNAME(ll.date)),'',(YEAR(ll.date))) AS Month,
+            count(*) as 'Login Count'
+        FROM
+            login_log ll
+        JOIN
+            user u on ll.username = u.username
+        JOIN
+            groups g on u.group_id = g.id
+        GROUP BY
+            username,month
+        ORDER BY
+            ll.username,month;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'svaNewsArticleViews.csv');
     }
 
     // ===============================================================================================
