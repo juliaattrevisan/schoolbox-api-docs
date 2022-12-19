@@ -141,7 +141,7 @@ class MessageFactory
                         if ($this->turnitinEnabled && $file->getTurnItIn()) {
                             $messageFactory = $messageFactory->addFileContent(
                                 $this->generateResponseFileTurnitinName($participant, $feedback, $file),
-                                $this->generateResponseFileTurnitinUrl($participant, $response, $file),
+                                $this->generateResponseFileTurnitinUrl($participant, $feedbackResponse, $file),
                             );
                         }
                     }
