@@ -101,4 +101,7 @@ MAILTO="support@schoolbox.com.au"
 # Login Log Prune - 1st day of month, 2am
 3 2 1 * * www-data php /usr/share/schoolbox/tools/schema/loginlog.php --perform
 
+# System Usage re calculate usage Nightly 5:26am
+26 5 * * * www-data php /usr/share/schoolbox/tools/storage/usageCache.php
+
 # End of file - do not delete

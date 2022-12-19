@@ -261,13 +261,7 @@ class Redis
         }
 
         $redis = $this->client;
-        $key   = sprintf(
-            '%s:%s:%s:%s',
-            self::FUNCTION_CALL_CACHE_PREFIX,
-            $this->instanceId,
-            $base_key,
-            hash('sha256', serialize($params)),
-        );
+        $key   = $this->getRedisKey($base_key, $params);
 
         // Would use Redis hashes, but individual keys don't have expiry.
         $is_result_called = false;
@@ -298,5 +292,49 @@ class Redis
             }
         }
         return $result;
+    }
+
+    /**
+     * clears the results of a function call in Redis.
+     *
+     * clears data created by \Alaress\Redis::cacheFunctionCall
+     *
+     * @param string   $base_key The base of the key to store the result in.
+     * @param mixed    $params   A parameter to pass to $callback. This is also
+     *                           used to generate the cache key.
+     *
+     * @return int (The number of keys that were removed)
+     */
+    public function dropKeyCache(string $base_key, mixed $params): int
+    {
+        $redis = $this->client;
+        $key   = $this->getRedisKey($base_key, $params);
+
+        try {
+            return $redis->del($key);
+        } catch (Predis\PredisException $e) {
+            trigger_error(sprintf('Redis exception: "%s"', $e->getMessage()), E_USER_WARNING);
+        }
+        return 0;
+    }
+
+    /**
+     * Build a common redis key for inserting and returning cached data
+     *
+     * @param string   $base_key The base of the key to store the result in.
+     * @param mixed    $params   A parameter to pass to $callback. This is also
+     *                           used to generate the cache key.
+     *
+     * @return string The redis key to either extract or insert data into redis
+     */
+    private function getRedisKey(string $base_key, mixed $params): string
+    {
+        return sprintf(
+            '%s:%s:%s:%s',
+            self::FUNCTION_CALL_CACHE_PREFIX,
+            $this->instanceId,
+            $base_key,
+            hash('sha256', serialize($params)),
+        );
     }
 }

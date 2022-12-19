@@ -1,25 +1,60 @@
+<script type="application/javascript">
+    $(function() {
+        /* Re Generation of data usage
+         */
+        $('[data-perform-update]').click(function (e) {
+            e.preventDefault();
+
+            var toaster = $('#toast');
+            toaster.toastActivate({ text: 'Reload Usage Data...' });
+            $.post('{{ routeLookup('adminUsage.postRegenerateUsage') }}', {
+            }).done(function () {
+                toaster.toastTimeout({ text: 'Reload Usage Successful', css: 'success' });
+                window.location.reload();
+            }).fail(function () {
+                toaster.toastTimeout({ text: 'Failed to Reload Usage Data, Try Again..', css: 'alert' });
+            });
+        });
+    });
+</script>
+
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
 
-<div class="admin-container usage-charts row">
+<div class="admin-container row">
 
     {# Shared navigation menu #}
     {{ renderAdminNavigation(pageCurrent) }}
 
     <div class="admin-content">
 
-        <div id="usage-global-container">
-            <usage-global 
-                :endpoint-total-payload="'{{ routeLookupIfAuthorized('adminUsage.getTotalPayload') }}'" 
-                :endpoint-system-payload="'{{ routeLookupIfAuthorized('adminUsage.getSystemPayload') }}'" 
-                :endpoint-file-type-payload="'{{ routeLookupIfAuthorized('adminUsage.getFileTypePayload') }}'" 
-                :endpoint-role-payload="'{{ routeLookupIfAuthorized('adminUsage.getRolePayload') }}'" 
-                :endpoint-user-payload="'{{ routeLookupIfAuthorized('adminUsage.getUserPayload') }}'" 
-                :is-s3-adapter="{{ isS3Adapter ? 'true' : 'false' }}"
-            />
+        <div id='option-container'>
+            <div class="small-12 columns">
+                <div class="actions-small-1">
+                    <h2 class="subheader">&nbsp;</h2>
+                    <nav>
+                        <a class="icon-more" title="Actions" data-dropdown="suds-options"></a>
+                    </nav>
+                    <ul id="suds-options" class="f-dropdown" data-dropdown-content>
+                        <li><a data-perform-update href='#' class="icon-refresh" title="Reload Usage Data">Reload Usage Data</a></li>
+                    </ul>
+                </div>
+            </div>
         </div>
-        <script src="{{ CDN_PREFIX }}/js/bundle/usageGlobal.js?v={{ config.site_version }}"></script>
-
+        <div class="usage-charts">
+            <div id="usage-global-container">
+                <usage-global
+                    :endpoint-total-payload="'{{ routeLookupIfAuthorized('adminUsage.getTotalPayload') }}'"
+                    :endpoint-system-payload="'{{ routeLookupIfAuthorized('adminUsage.getSystemPayload') }}'"
+                    :endpoint-file-type-payload="'{{ routeLookupIfAuthorized('adminUsage.getFileTypePayload') }}'"
+                    :endpoint-role-payload="'{{ routeLookupIfAuthorized('adminUsage.getRolePayload') }}'"
+                    :endpoint-user-payload="'{{ routeLookupIfAuthorized('adminUsage.getUserPayload') }}'"
+                    :is-s3-adapter="{{ isS3Adapter ? 'true' : 'false' }}"
+                />
+            </div>
+            <script src="{{ CDN_PREFIX }}/js/bundle/usageGlobal.js?v={{ config.site_version }}"></script>
+        </div>
     </div>
 
 </div>
+<div id="toast" class="toast"></div>

@@ -18,7 +18,6 @@ use Alaress\Database\Connector\IConnector;
  */
 class TotalPayload
 {
-
     /**
      * @var IConnector
      */
@@ -48,7 +47,12 @@ class TotalPayload
      * Find out how much space was used out of what could be used,
      * expressed as a percentage
      *
-     * @return array
+     * @return array<int,
+     *     array{
+     *     label: string,
+     *     size: float
+     *   }
+     * >
      */
     public function generate(): array
     {

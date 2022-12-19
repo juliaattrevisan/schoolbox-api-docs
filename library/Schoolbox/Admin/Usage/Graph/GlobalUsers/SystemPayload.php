@@ -30,7 +30,6 @@ use Alaress\Database\Connector\IConnector;
  */
 class SystemPayload
 {
-
     /**
      * @var IConnector
      */
@@ -54,55 +53,97 @@ class SystemPayload
      *
      * Note that some tables such as task_files can have multiple occurrences
      * of a file hash (ie. a file gets uploaded multiple times with different names)
+     * @return array<int,array{
+     *      label: string,
+     *      size: int
+     *      }
+     * >
      */
     public function generate(): array
     {
-        $query = "
-            SELECT
-                'CMS Resources' AS label,
-                COALESCE(SUM(storage.filesize), 0) AS size
-            FROM (SELECT DISTINCT hash FROM file) f   
-            INNER JOIN storage ON f.hash = storage.hash
-            
-            UNION
-            
-            SELECT
-                'Student Submissions' AS label,
-                COALESCE(SUM(storage.filesize), 0) AS size
-            FROM (SELECT DISTINCT hash FROM student_submission_file) f   
-            INNER JOIN storage ON f.hash = storage.hash
-            
-            UNION
-            
-            SELECT
-                'Submission Returns' AS label,
-                COALESCE(SUM(storage.filesize), 0) AS size
-            FROM (SELECT DISTINCT hash FROM submission_return_file) f   
-            INNER JOIN storage ON f.hash = storage.hash
-            
-            UNION
-            
-            SELECT
-                'Tasks' AS label,
-                COALESCE(SUM(storage.filesize), 0) AS size
-            FROM (SELECT DISTINCT storage_id AS hash FROM task_file) f   
-            INNER JOIN storage ON f.hash = storage.hash
-            
-            UNION
+        $stack = [
+            $this->getCMSResources(),
+            $this->getStudentSubmissions(),
+            $this->getSubmissionReturns(),
+            $this->getTasks(),
+            $this->getDueWork(),
+            $this->getNews(),
+            $this->getPastoral(),
+            $this->getMyFiles(),
+            $this->getTiles(),
+        ];
+        return $stack;
+    }
 
-            SELECT
-                'Due Work' AS label,
+    /**
+     * Calculate the size of images used in the Tiles component
+     * @return array{
+     *     label: string,
+     *     size: int
+     * }
+     */
+    private function getTiles()
+    {
+        $query = "SELECT
+                'Tiles' AS label,
                 COALESCE(SUM(storage.filesize), 0) AS size
-            FROM (SELECT DISTINCT storage_id FROM submission_box_file) f
-            INNER JOIN storage ON f.storage_id = storage.hash
+            FROM storage
+            WHERE hash in (SELECT background_image_hash AS hash FROM tile)";
 
-            UNION
-            
-            SELECT
+        $result = $this->database->executeQuery($query);
+        return $result->fetch();
+    }
+
+    /**
+     * Calculate the size of files within MyFiles
+     * @return array{
+     *     label: string,
+     *     size: int
+     * }
+     */
+    private function getMyFiles(): array
+    {
+        $query = "SELECT
+                'My Files' AS label,
+                COALESCE(SUM(storage.filesize), 0) AS size
+            FROM storage
+            WHERE hash in (SELECT hash FROM myFile)";
+        $result = $this->database->executeQuery($query);
+        return $result->fetch();
+    }
+
+    /**
+     * Calculate the size of files attached to Pastoral items
+     * @return array{
+     *     label: string,
+     *     size: int
+     * }
+     */
+    private function getPastoral(): array
+    {
+        $query = "SELECT
+                'Pastoral' AS label,
+                COALESCE(SUM(storage.filesize), 0) AS size
+            FROM storage
+            WHERE hash IN (SELECT hash FROM pastoral_attachment)";
+        $result = $this->database->executeQuery($query);
+        return $result->fetch();
+    }
+
+    /**
+     * Calculate the size of attachments and feature images within News
+     * @return array{
+     *     label: string,
+     *     size: int
+     * }
+     */
+    private function getNews(): array
+    {
+        $query = "SELECT
                 'News' AS label,
                 COALESCE(SUM(storage.filesize), 0) AS size
             FROM (
-                SELECT DISTINCT subquery.hash 
+                SELECT DISTINCT subquery.hash
                 FROM
                     ((SELECT DISTINCT feature_image_hash AS hash
                     FROM comms_news_article
@@ -111,42 +152,99 @@ class SystemPayload
                     (SELECT DISTINCT storage_id AS hash
                     FROM comms_news_article_file
                     WHERE storage_id IS NOT NULL)) subquery
-            ) f   
-            INNER JOIN storage ON f.hash = storage.hash
-            
-            UNION
-            
-            SELECT
-                'Pastoral' AS label,
-                COALESCE(SUM(storage.filesize), 0) AS size
-            FROM (SELECT DISTINCT hash FROM pastoral_attachment) f   
-            INNER JOIN storage ON f.hash = storage.hash
-            
-            UNION
-            
-            SELECT
-                'My Files' AS label,
-                COALESCE(SUM(storage.filesize), 0) AS size
-            FROM (SELECT DISTINCT hash FROM myFile) f   
-            INNER JOIN storage ON f.hash = storage.hash
-            
-            UNION
-            
-            SELECT
-                'Tiles' AS label,
-                COALESCE(SUM(storage.filesize), 0) AS size
-            FROM (SELECT DISTINCT background_image_hash AS hash FROM tile) f   
-            INNER JOIN storage ON f.hash = storage.hash  
-        ";
-
+            ) f
+            INNER JOIN storage ON f.hash = storage.hash";
         $result = $this->database->executeQuery($query);
+        return $result->fetch();
+    }
 
-        $stack = [];
+    /**
+     * Calculate the size of files within Due Work
+     * @return array{
+     *     label: string,
+     *     size: int
+     * }
+     */
+    private function getDueWork(): array
+    {
+        $query = "SELECT
+                'Due Work' AS label,
+                COALESCE(SUM(storage.filesize), 0) AS size
+            FROM storage
+            WHERE hash IN (SELECT storage_id FROM submission_box_file)";
+        $result = $this->database->executeQuery($query);
+        return $result->fetch();
+    }
 
-        while ($row = $result->fetch(\PDO::FETCH_ASSOC)) {
-            $stack[] = $row;
-        }
+    /**
+     * Calculate the size of files within Tasks
+     * @return array{
+     *     label: string,
+     *     size: int
+     * }
+     */
+    private function getTasks(): array
+    {
+        $query = "SELECT
+                'Tasks' AS label,
+                COALESCE(SUM(storage.filesize), 0) AS size
+            FROM storage
+            WHERE hash IN (SELECT storage_id AS hash FROM task_file)";
+        $result = $this->database->executeQuery($query);
+        return $result->fetch();
+    }
 
-        return $stack;
+    /**
+     * Calculate the size of files within Due Work (Submission Response)
+     * @return array{
+     *     label: string,
+     *     size: int
+     * }
+     */
+    private function getSubmissionReturns(): array
+    {
+        $query = "SELECT
+                'Submission Returns' AS label,
+                COALESCE(SUM(storage.filesize), 0) AS size
+            FROM storage
+            WHERE hash in (SELECT hash FROM submission_return_file)";
+        $result = $this->database->executeQuery($query);
+        return $result->fetch();
+    }
+
+    /**
+     * Calculate the size of files within Due Work (Student Submissions)
+     * @return array{
+     *     label: string,
+     *     size: int
+     * }
+     */
+    private function getStudentSubmissions(): array
+    {
+        $query = "SELECT
+                'Student Submissions' AS label,
+                COALESCE(SUM(storage.filesize), 0) AS size
+            FROM storage
+            WHERE hash IN (SELECT hash FROM student_submission_file)";
+        $result = $this->database->executeQuery($query);
+        return $result->fetch();
+    }
+
+    /**
+     * Calculate the size of files within the Resource Browser (CMS)
+     * @return array{
+     *     label: string,
+     *     size: int
+     * }
+     */
+    private function getCMSResources(): array
+    {
+        $query = "SELECT
+                'CMS Resources' AS label,
+                COALESCE(SUM(storage.filesize), 0) AS size
+            FROM storage
+            WHERE hash IN (SELECT hash FROM file)";
+        $result = $this->database->executeQuery($query);
+        return $result->fetch();
     }
 }

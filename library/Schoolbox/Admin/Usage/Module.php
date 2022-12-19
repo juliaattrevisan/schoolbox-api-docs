@@ -12,6 +12,7 @@ namespace Schoolbox\Admin\Usage;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
+use Alaress\Redis;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
@@ -61,6 +62,7 @@ class Module extends BaseModule
         $this->register('GET', '/total', 'getTotalPayload', $getPerms);
         $this->register('GET', '/user', 'getUserPayload', $getPerms);
         $this->register('GET', '/type', 'getFileTypePayload', $getPerms);
+        $this->register('POST', '/regenerate', 'postRegenerateUsage', $getPerms);
 
         /* Specific Usage payload endpoints
          */
@@ -98,7 +100,11 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
-        return new Controller($this->getMapperFactory()->get(ErrorMapper::class));
+        return new Controller(
+            $this->getMapperFactory()->get(ErrorMapper::class),
+            $this->injector->get('databaseInternal'),
+            Redis::getCacheInstance()
+        );
     }
 
 
