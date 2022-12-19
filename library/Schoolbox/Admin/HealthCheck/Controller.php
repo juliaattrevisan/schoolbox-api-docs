@@ -145,6 +145,7 @@ class Controller extends Base
                      */
                     $this->taskDHelper->addSource('', 'svaMonthlyLogins');
                     $this->taskDHelper->addSource('', 'svaNewsArticleViews');
+                    $this->taskDHelper->addSource('', 'svaNewsArticleViewsPerRolePerArticle');
                     break;
                 default:
                     throw new SchoolboxException("Report '{$report}' Does not exist.");
@@ -931,7 +932,41 @@ class Controller extends Base
         $help = new Helper();
         $help->queryToCSV($statement, 'svaNewsArticleViews.csv');
     }
-
+    /**
+     * SVA
+     * svaNewsArticleViewsPerRolePerArticle.csv
+     */
+    public function svaNewsArticleViewsPerRolePerArticle()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            article_id as 'News ID',
+            cna.title as 'News Title',
+            coalesce((SELECT
+            group_concat(nt.name)
+        FROM
+            newsTopic nt
+        JOIN
+            comms_news_article_topic cnat on nt.newsTopicID = cnat.topic_id
+        WHERE
+            cnat.article_id = cna.id),'No Topic Listed') as 'Topics',
+            g.name as 'Role',
+            count(*) as 'Total Views',
+            cna.publish_at as 'Publish Date'
+        FROM
+            comms_news_article_statistics cnas
+        JOIN
+            groups g on cnas.role_id = g.id
+        JOIN
+            comms_news_article cna on cnas.article_id = cna.id
+        GROUP BY
+            article_id,role_id;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'svaNewsArticleViewsPerRolePerArticle.csv');
+    }
     // ===============================================================================================
     // ==================================== END SVA REPORTS ==========================================
     // ===============================================================================================
