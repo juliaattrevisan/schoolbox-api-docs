@@ -140,18 +140,10 @@ class MessageFactory
                             );
                         }
                         if ($viewerUrlGenerator && $file->getTurnItIn()) {
-                            $viewerUrl = $viewerUrlGenerator->generateViewerUrl(
-                                $file->getTurnItIn(),
-                                $viewer,
-                                Report::VIEWER_PERMISSION_SET_STAFF,
-                                false,
+                            $messageFactory = $messageFactory->addFileContent(
+                                $this->generateResponseFileTurnitinName($participant, $feedback, $file),
+                                $this->generateResponseFileTurnitinUrl($participant, $response, $file),
                             );
-                            if ($viewerUrl['viewer_url'] ?? null) {
-                                $messageFactory = $messageFactory->addPdfContent(
-                                    $this->generateResponseFileTurnitinName($participant, $feedback, $file),
-                                    $viewerUrl['viewer_url'],
-                                );
-                            }
                         }
                     }
                 }
@@ -348,6 +340,34 @@ class MessageFactory
             $this->generateFeedbackFolderName($participant, $feedback),
             $this->sanitizeForFilename($basename),
         );
+    }
+
+    /**
+     * Generate a download URL for this file's Turnitin annotation.
+     *
+     * @param Participant         $participant
+     * @param IResponse           $response
+     * @param DueWorkResponseFile $responseFile
+     * @return string
+     * @noinspection PhpDocMissingThrowsInspection - this route always exists
+     */
+    private function generateResponseFileTurnitinUrl(
+        Participant $participant,
+        IResponse $response,
+        DueWorkResponseFile $responseFile,
+    ): string {
+        /** @noinspection PhpUnhandledExceptionInspection - this route always exists */
+        $tiiRoutePath = $this->router->generate(
+            'learningDueWorkResponse.getTurnitinExport',
+            [
+                'assessmentId'  => $participant->getAssessable()->getId(),
+                'responseId'    => $response->getId(),
+                'turnitinSubId' => $responseFile->getTurnItIn()->getTurnitinSubmissionId(),
+            ],
+        );
+        return $this->urlBase
+            ->setPath($tiiRoutePath)
+            ->toString();
     }
 
     /**
