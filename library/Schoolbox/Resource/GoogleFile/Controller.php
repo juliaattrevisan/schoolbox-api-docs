@@ -181,8 +181,7 @@ class Controller extends Base
                             continue;
                         }
                         trigger_error(
-                            "Could not set permissions for email '$email'.  Maybe this email address doesn't exist?" .
-                            '  Details: ' . $e->getMessage(),
+                            "Could not set permissions for email '$email' for unknown reasons.  Details: " . $e->getMessage(),
                             E_USER_WARNING
                         );
                         continue;
