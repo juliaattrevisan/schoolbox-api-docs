@@ -21,7 +21,7 @@ use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Turnitin\File\Process\Report;
-use Schoolbox\Learning\Turnitin\File\ViewerUrlGenerator;
+use Schoolbox\Learning\Turnitin\File\Api;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\TaskDaemon\Request\DownloadPages\MessageFactory as BaseMessageFactory;
 use Schoolbox\TaskDaemon\Request\Message;
@@ -70,13 +70,13 @@ class MessageFactory
      * * All files in each participant's responses to the due work
      * * All Kami feedback for each participant
      *
-     * @param DueWork                 $dueWork            The due work to build a message for.
-     * @param User                    $viewer             The user who is requesting the due work ZIP.
-     * @param ViewerUrlGenerator|null $viewerUrlGenerator Optional: if provided, used to generate Turnitin viewer URLs
+     * @param DueWork  $dueWork                           The due work to build a message for.
+     * @param User     $viewer                            The user who is requesting the due work ZIP.
+     * @param Api|null $viewerUrlGenerator                Optional: if provided, used to generate Turnitin viewer URLs
      *                                                    to be downloaded by the task daemon.
      * @return Message
      */
-    public function buildForAssessment(DueWork $dueWork, User $viewer, ?ViewerUrlGenerator $viewerUrlGenerator): Message
+    public function buildForAssessment(DueWork $dueWork, User $viewer, ?Api $viewerUrlGenerator): Message
     {
         // Generate list of files to fetch via taskd, and add to a ZIP
         $messageFactory = (clone $this->baseMessageFactory);

@@ -439,7 +439,7 @@ class Controller extends Assessment\Controller
                 $this->getConfigLoader()->get('turnitin_api_host'),
                 $this->getConfigLoader()->get('turnitin_api_key')
             );
-            $urlGenerator = new Turnitin\File\ViewerUrlGenerator($turnitinApi);
+            $urlGenerator = new Turnitin\File\Api($turnitinApi);
         }
         $message = $this->dueWorkDownloadMessageFactory->buildForAssessment(
             $assessment,

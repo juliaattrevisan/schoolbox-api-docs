@@ -511,8 +511,8 @@ class Controller extends Base
      */
     public function getTurnitinExport(Turnitin\File\Model $turnitin): void
     {
-        $viewerUrlGenerator = $this->buildViewerUrlGenerator();
-        $pdfId              = $viewerUrlGenerator->generatePdfRequest($turnitin)['id'] ?? null;
+        $turnitinFileApi = $this->buildTurnitinFileApi();
+        $pdfId           = $turnitinFileApi->generatePdfRequest($turnitin)['id'] ?? null;
 
         // Wait a bunch of time for the PDF
         if (isset($pdfId)) {
@@ -521,7 +521,7 @@ class Controller extends Base
             $sleep     = 500000; // 0.5 seconds initial back-off
             $pollCount = 0;
             while (true) {
-                $pdfResponse       = $viewerUrlGenerator->downloadPdf($turnitin, $pdfId);
+                $pdfResponse       = $turnitinFileApi->downloadPdf($turnitin, $pdfId);
                 $pdfResponseStatus = $pdfResponse->getStatusCode();
                 if ($pdfResponseStatus === 200) {
                     // PDF is generated and part of the response: break
@@ -609,11 +609,9 @@ class Controller extends Base
         IAssessable $assessment,
         Turnitin\File\Model $turnitin,
     ): ?array {
-        /* Check if turnitin is configured sufficiently
-         */
-        $viewerUrlGenerator = $this->buildViewerUrlGenerator();
-        $isInstructor       = $this->access->isInstructor($this->getUser(), $assessment->getContext()->getFolder());
-        return $viewerUrlGenerator->generateViewerUrl(
+        $turnitinFileApi = $this->buildTurnitinFileApi();
+        $isInstructor    = $this->access->isInstructor($this->getUser(), $assessment->getContext()->getFolder());
+        return $turnitinFileApi->generateViewerUrl(
             $turnitin,
             $this->getUser(),
             $isInstructor
@@ -624,9 +622,11 @@ class Controller extends Base
     }
 
     /**
-     * @return Turnitin\File\ViewerUrlGenerator
+     * Build an instance of the specialised Turnitin file download API.
+     *
+     * @return Turnitin\File\Api
      */
-    private function buildViewerUrlGenerator(): Turnitin\File\ViewerUrlGenerator
+    private function buildTurnitinFileApi(): Turnitin\File\Api
     {
         if (!(new Helper($this->getConfigLoader()))->isConfigured()) {
             throw new \DomainException('Turnitin configuration invalid.');
@@ -640,6 +640,6 @@ class Controller extends Base
             $this->getConfigLoader()->get('turnitin_api_key')
         );
 
-        return new Turnitin\File\ViewerUrlGenerator($api);
+        return new Turnitin\File\Api($api);
     }
 }
