@@ -500,7 +500,12 @@ class Controller extends Base
          */
     }
 
-
+    /**
+     * Export a PDF for a Turnitin file.
+     *
+     * @param Turnitin\File\Model $turnitin
+     * @return void
+     */
     public function getTurnitinExport(Turnitin\File\Model $turnitin): void
     {
         $viewerUrlGenerator = $this->buildViewerUrlGenerator();

@@ -126,6 +126,15 @@ class Api
         return $this->retrieve('GET', self::TEST_ENDPOINT, []);
     }
 
+    /**
+     * Retrieve a raw response object for the method and endpoint provided.
+     *
+     * @param string $method
+     * @param string $endpoint
+     * @param array  $params
+     * @return ResponseInterface
+     * @throws GuzzleException
+     */
     public function retrieveRawResponse(string $method, string $endpoint, array $params): ResponseInterface
     {
         $endpoint = "{$this->host}{$endpoint}";
