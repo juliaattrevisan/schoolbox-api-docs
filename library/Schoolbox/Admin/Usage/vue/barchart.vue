@@ -86,7 +86,11 @@ export default {
      */
     methods: {
         lastGen() {
-            return dayjs.unix(this.allData.time).fromNow();
+            if (this.allData.time ?? null) {
+                return dayjs.unix(this.allData.time).fromNow();
+            } else {
+                return false;
+            }
         },
 
         /**
@@ -100,9 +104,17 @@ export default {
                         'Content-Type': 'application/json',
                     },
                 });
+                let values = [], categories = [];
                 this.allData = await response.json();
-                const values = this.allData.data.map((item) => parseInt(item.size));
-                const categories = this.allData.data.map((item) => item.label);
+                //check if we have a data value in the response object
+                if ('undefined' !== typeof this.allData.data) {
+                    values = this.allData.data.map((item) => parseInt(item.size));
+                    categories = this.allData.data.map((item) => item.label);
+                } else {
+                    //no data value in the response object, single user endpoint (no caching)
+                    values = this.allData.map((item) => parseInt(item.size));
+                    categories = this.allData.map((item) => item.label);
+                }
                 this.chartOptions = this.getChartOptions(values, categories);
             } catch (error) {
                 console.warn(error);
@@ -198,7 +210,7 @@ export default {
         </template>
         <template v-else>
             <highcharts :options="chartOptions"></highcharts>
-            <div class="meta"> ^ Last Generated: {{ lastGen() }}</div>
+            <div v-if="lastGen()" class="meta"> ^ Last Generated: {{ lastGen() }}</div>
         </template>
     </div>
 </template>
