@@ -35,8 +35,7 @@ class Controller extends Base
      */
     public function __construct(
         private \Schoolbox\Learning\Assessment\Views\Mapper $assessmentViewMapper
-    )
-    {
+    ) {
     }
 
 
