@@ -105,12 +105,7 @@
                 handleAuthResult(true);
             };
 
-// Temporary code to disable use of token retrieved from PHP session.
-config.googleAccessToken = '';
-config.googleAccessTokenType = '';
-
             if (config.googleAccessToken !== '' && config.googleAccessTokenType !== '') {
-console.info('picker.js authorize() already have Google access token');
                 // We already have the googleAccessToken (retrieved from the PHP session), so mimic a successful
                 // response to googleClientToken.requestAccessToken().
                 authResult = {
