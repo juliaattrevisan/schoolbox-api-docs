@@ -9,6 +9,13 @@
  # @param Folder\Model $folder  The current homepage instance
 #}
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/google/apiloader.js?v={{ config.site_version }}"></script>
+<script type="text/javascript">
+    window.googleAccessToken = '{{ googleAccessToken }}';
+    window.googleAccessTokenType = '{{ googleAccessTokenType }}';
+    $.fn.setupGapi({modules: ['client:picker']});
+</script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/google/picker.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/googleFiles.js?v={{ config.site_version }}"></script>
 {% if googleFiles is empty %}
     <div class="empty-state">
         <i class="icon-google-drive"></i>
@@ -134,11 +141,4 @@
     data-folder-id="{{ folder.id }}"
 >
 </div>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/google/picker.js?v={{ config.site_version }}"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/googleFiles.js?v={{ config.site_version }}"></script>
-<script type="text/javascript">
-    window.googleAccessToken = '{{ googleAccessToken }}';
-    window.googleAccessTokenType = '{{ googleAccessTokenType }}';
-    $.fn.setupGapi({modules: ['client:picker']});
-</script>
 {% endif %}
