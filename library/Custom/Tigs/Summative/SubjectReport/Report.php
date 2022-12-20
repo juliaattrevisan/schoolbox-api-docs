@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Custom\Tigs\Summative\SubjectReport;
 
+use Alaress\Authorizer\Authorizer;
 use Alaress\Database;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate;
@@ -16,6 +17,7 @@ use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web;
 use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
+use Aura\Router\Router;
 use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\StudentAttributes;
 use Custom\Tigs\Summative\SubjectReport\Components\AcademicAchievementMatrix;
@@ -43,22 +45,19 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\Role;
 use Schoolbox\User;
 use External_UserInterface;
+use PDO;
+use Schoolbox\Filter\Filters;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\Resource\Textbox;
 use Schoolbox\UserMapper;
 use UnderflowException;
+use UnexpectedValueException;
 
 use function strnatcasecmp;
-
-use UnexpectedValueException;
-use Schoolbox\Filter\Filters;
-use PDO;
-use Schoolbox\Resource\Textbox;
-use Aura\Router\Router;
-use Alaress\Authorizer\Authorizer;
 
 class Report
 {
