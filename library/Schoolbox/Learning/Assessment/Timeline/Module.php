@@ -19,9 +19,11 @@ use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Authorizer\Rule\IsInstructor;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\UserMapper;
 
 class Module extends BaseModule
@@ -43,7 +45,14 @@ class Module extends BaseModule
          */
         $fulltimelinePerms = new Rule\Any(
             new Rule\IsSuperuser(),
-            new IsInstructor(Access::getInstance())
+            new IsInstructor(Access::getInstance(),
+                static function (array $params): FolderModel {
+                    if (isset($params['assessment']) && $params['assessment'] instanceof IAssessable) {
+                        return $params['assessment']->getBaseContext()->getFolder();
+                    }
+                    throw new NotFound('No context preloaded');
+                }
+            )
         );
 
         $preloadAssessmentUser = function ($params) {
