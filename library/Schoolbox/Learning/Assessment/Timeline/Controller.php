@@ -60,8 +60,8 @@ class Controller extends Base
         /* null participants return empty set
          */
         if (null !== $participant) {
-            /* A list of Responses and Feedbacks, as per the Submission History
-                     */
+            /* A list of Responses and Floating Feedbacks, as per the Submission History
+             */
             $timeline = (new Full($participant))->getForTeacher();
 
             foreach ($timeline as $interaction) {
@@ -98,6 +98,29 @@ class Controller extends Base
                 }
             }
 
+            /* Dig out all the Associated Feedbacks
+             */
+            foreach ($participant->getAllResponses() as $response) {
+                foreach ($response->getAllFeedback() as $interaction) {
+                    $stack[] = [
+                        'type' => self::INTERACTION_FEEDBACK,
+                        'instructor' => [
+                            'id' => $interaction->getReviewer()->getId(),
+                            'name' => $interaction->getReviewer()->getFullname(),
+                        ],
+                        'learner' => [
+                            'id' => $interaction->getReviewee()->getId(),
+                            'name' => $interaction->getReviewee()->getFullname()
+                        ],
+                        'date' => [
+                            'datetime' => $interaction->getPublishedAt()->getDatabase(),
+                            'short' => $interaction->getPublishedAt()->getShort(),
+                            'relative' => $interaction->getPublishedAt()->getRelativeTime(),
+                        ]
+                    ];
+                }
+            }
+
             /* A list of Views, which aren't really part of the Submission History
              * but we want to show them anyway. Shank them right in
              */
@@ -122,7 +145,8 @@ class Controller extends Base
             }
 
             /* Reverse chronologically sort that array stack again,
-             * due to the shanking of Assessment Views
+             * due to the shanking of Assessment Views and unfolding
+             * of Associated Feedbacks
              */
             usort($stack, static function (array $a, array $b): int {
                 return strtotime($b['date']['datetime']) <=> strtotime($a['date']['datetime']);
