@@ -105,8 +105,9 @@
                 handleAuthResult(true);
             };
 
-            config.googleAccessToken = '';
-            config.googleAccessTokenType = '';
+// Temporary code to disable use of token retrieved from PHP session.
+config.googleAccessToken = '';
+config.googleAccessTokenType = '';
 
             if (config.googleAccessToken !== '' && config.googleAccessTokenType !== '') {
                 // We already have the googleAccessToken (retrieved from the PHP session), so mimic a successful
