@@ -25,15 +25,26 @@
     {%- set submitTitleSuffix    = 'attempted this quiz' -%}
     {%- set markedTitleSuffix    = 'review' -%}
     {%- set noResultsTitleSuffix = 'attempted this quiz' -%}
+    {% set markedPastTense = 'reviewed' %}
 {%- elseif isDueWork %}
     {%- set submitTitleSuffix    = 'submitted work' -%}
     {%- set markedTitleSuffix    = 'marking' -%}
     {%- set noResultsTitleSuffix = 'submitted work or been marked' -%}
+    {% set markedPastTense = 'marked' %}
 {%- elseif isTask %}
     {%- set submitTitleSuffix    = 'completed this task' -%}
     {%- set markedTitleSuffix    = 'teacher assessment' -%}
     {%- set noResultsTitleSuffix = 'completed this task' -%}
+    {% set markedPastTense = 'assessed' %}
+{%- else -%}
+    {% set submitTitleSuffix = '' -%}
+    {% set markedTitleSuffix = '' -%}
+    {% set markedPastTense = '' %}
 {%- endif -%}
+
+{# Round the percentage values to prevent things like '66.666666%' being displayed. #}
+    {% set displayPercentageResponseRequired = (100 - stats.percentageResponseRequired) | round %}
+    {% set displayPercentageReviewComplete = stats.percentageReviewComplete | round %}
 
 <section data-assessment="{{ assessment.id }}" data-due-timestamp="{{ assessment.dueAt.unixTimeStamp }}">
     <div class="content collapsible">
@@ -51,23 +62,34 @@
                 <p class="meta" data-due-date>{{ dueDate.forAssessment(assessment) }}</p>
             </div>
         </div>
-        <div class="card small-4 hide-for-small-only">
-            <div
-                    class="progress"
-                    data-progress
-                    title="{{ stats.countParticipants - stats.countResponseRequired}} of {{ stats.countParticipants }} students have {{ submitTitleSuffix }}"
-                    data-title-suffix="{{ submitTitleSuffix }}"
-                    data-count-total="{{ stats.countParticipants }}"
-                    data-count-response-required="{{ stats.countResponseRequired }}"
-                    data-count-feedback-required="{{ stats.countFeedbackRequired }}"
-                    data-count-review-complete="{{ stats.countReviewComplete }}"
-            >
-                <span class="meter slow" data-meter style="width:{{ 100 - stats.percentageResponseRequired }}%"></span>
-                <span class="pipe-meter slow" data-pipe style="left: {{ stats.percentageReviewComplete }}%" title="{{ stats.countFeedbackRequired }} of {{ stats.countParticipants }} students require {{ markedTitleSuffix }}" data-title-suffix="{{ markedTitleSuffix }}"></span>
+        <div class="card medium-6">
+            <div class="rounded-progress-bar"
+                data-progress
+                title="{{ stats.countParticipants - stats.countResponseRequired }} of {{ stats.countParticipants }} students have {{ submitTitleSuffix }}"
+                data-title-suffix="{{ submitTitleSuffix }}"
+                data-count-total="{{ stats.countParticipants }}"
+                data-count-response-required="{{ stats.countResponseRequired }}"
+                data-count-feedback-required="{{ stats.countFeedbackRequired }}"
+                data-count-review-complete="{{ stats.countReviewComplete }}"
+            />
+                <div class="bar">
+                    <div class="meter warning" style="width: {{ (100 - stats.percentageResponseRequired) }}%;">
+                        <div>{{ displayPercentageResponseRequired }}%</div>
+                    </div>
+                    <div
+                        class="meter success"
+                        title="{{stats.countReviewComplete}} of {{stats.countParticipants}} students {{ markedPastTense }}"
+                        style="width: {{ stats.percentageReviewComplete }}%;"
+                    >
+                        <div>{{ displayPercentageReviewComplete }}%</div>
+                    </div>
+                </div>
+                <div class="legend">
+                    <div class="legend-item success">{{ stats.countReviewComplete }} {{ markedPastTense }}</div>
+                    <div class="legend-item warning">{{ stats.countFeedbackRequired }} require {{ markedTitleSuffix }}</div>
+                    <div class="legend-item">{{ stats.countParticipants - stats.countResponseRequired }} of {{ stats.countParticipants }} {{ submitTitleSuffix }}</div>
+                </div>
             </div>
-        </div>
-        <div class="small-4 medium-2 columns text-right">
-            <p data-count-to-chase title="{{ stats.countResponseRequired }} of {{ stats.countParticipants }} students have not {{ noResultsTitleSuffix }}" data-title-suffix="{{ noResultsTitleSuffix }}"><span data-user-count>{{ stats.countResponseRequired }}</span> {{ state }}</p>
         </div>
     </div>
     <div class="content collapsible hide" data-participant-list data-collapsable="to-chase-{{ assessment.id }}" data-collapse-state="collapsed">

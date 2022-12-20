@@ -1,0 +1,136 @@
+/*
+    rounded-progress-bar.scss
+
+    This is a class for custom styling of progress bars. Yes, there is also
+    a _progress-bars.scss file, but that file is legacy styling and is part
+    of ZURB / Foundation. This class solely deals with the custom styled
+    progress bars which, at the time of writing, only exist within the
+    pending assessments page.
+*/
+
+.rounded-progress-bar {
+    -webkit-user-select: none;
+    user-select: none;
+
+    /* Add a margin to thep top when we're moved into column display (mobile) */
+    @media screen and (max-width: 640px) {
+        margin-top: 0.5rem;
+    }
+
+    .legend {
+        display: inline-flex;
+        font-size: 13px;
+        gap: 0.25rem 1rem;
+        margin-bottom: 0.5rem;
+        padding: 0 0.5rem;
+        text-transform: lowercase;
+        font-style: italic;
+        width: 100%;
+
+        &-item {
+            color: var(--body-foreground);
+
+            &:last-child {
+                margin-left: auto;
+
+                &:before {
+                    content: none;
+                }
+            }
+
+            &.success:before {
+                background-color: $gradient-8;
+            }
+
+            &.info:before {
+                background-color: var(--accent-background);
+            }
+
+            &.neutral:before {
+                background-color: $neutral-color;
+            }
+
+            &.alert:before {
+                background-color: $alert-color;
+
+            }
+
+            &.warning:before {
+                background-color: $gradient-2;
+            }
+
+            &:before {
+                background-color: var(--body-foreground);
+                border-radius: 1rem;
+                content: '';
+                display: inline-block;
+                height: 0.5rem;
+                margin-right: 0.5rem;
+                width: 0.5rem;
+            }
+        }
+    }
+
+    .bar {
+        background-color: var(--accent-background);
+        border-radius: 1rem;
+        height: 1.5rem;
+        margin-bottom: 0.5rem;
+        position: relative;
+    }
+
+    .meter {
+
+        align-items: center;
+        background-color: $neutral-color;
+        border-radius: 1rem;
+        box-sizing: border-box;
+        display: flex;
+        height: 100%;
+        justify-content: flex-end;
+        overflow: hidden;
+        position: absolute;
+
+
+        &.slow {
+            transition: left 1s;
+        }
+
+        &.neutral {
+            background-color: $neutral-color;
+        }
+
+        &.info {
+            background-color: var(--accent-background);
+            color: var(--accent-foreground);
+        }
+
+        &.alert {
+            background-color: $alert-color;
+        }
+
+        &.warning{
+            background-color: $gradient-2;
+        }
+
+        &.success {
+            background-color: $gradient-8;
+        }
+
+        div {
+            background-color: rgba(0, 0, 0, 0.25);
+            border-radius: 1rem;
+            color: white;
+            font-weight: 600;
+            font-size: 0.75rem;
+            margin: 0 0.25rem;
+            padding: 0 0.25rem;
+            opacity: 1;
+        }
+
+        &:hover {
+            z-index: 2;
+        }
+    }
+
+}
