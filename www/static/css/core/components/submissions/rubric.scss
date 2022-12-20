@@ -68,8 +68,9 @@ table.rb {
 
                 &:hover {
                     // DONE use CSS lighten
-                    background-color: css-lighten($content-ui-selected, 3%);
-                    cursor: pointer;
+                    background-color: css-lighten($content-ui-hover, 3%);
+                    color: var(--content-ui-hover-contrast);
+                    cursor: pointer; 
                 }
             }
         }
