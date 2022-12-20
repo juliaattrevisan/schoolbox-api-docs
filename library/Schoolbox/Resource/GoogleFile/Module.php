@@ -41,8 +41,8 @@ class Module extends BaseModule
     {
         $this->register(
             self::METHOD_POST,
-            '/saveAccessTokenToCookie',
-            'saveAccessTokenToCookie',
+            '/saveAccessTokenToSession',
+            'saveAccessTokenToSession',
             new All(
                 new IsLoggedIn(),
                 new IsConfigOn(ConfigMapper::NAME_GOOGLEDRIVE_ENABLED, $this->getConfig()),

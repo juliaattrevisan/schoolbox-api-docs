@@ -131,7 +131,7 @@
                     data: {accessToken: authResult.access_token, tokenType: authResult.token_type},
                     dataType: 'json',
                     method: 'post',
-                    url: '/googleFile/saveAccessTokenToCookie',
+                    url: '/googleFile/saveAccessTokenToSession',
                     success: function (response) {
                         console.info('picker.js handleAuthResult() save cookie success!  response: ', response);
                     }

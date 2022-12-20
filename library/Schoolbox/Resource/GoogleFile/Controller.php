@@ -67,40 +67,19 @@ class Controller extends Base
 
 
     /**
-     * @return string
+     * @return void
      */
-    public function saveAccessTokenToCookie(): void
+    public function saveAccessTokenToSession(): void
     {
         $success = true;
         $message = '';
 
         try {
-            $tokenDataJson = json_encode(
-                [
-                   'accessToken' => $this->request->post->get('accessToken'),
-                   'tokenType'   => $this->request->post->get('tokenType')
-                ],
-                JSON_THROW_ON_ERROR
-            );
-        } catch (\JsonException $e) {
-            $message = 'Could not encode JSON Google access token data.';
+            $_SESSION['googleAccessToken'] = $this->request->post->get('accessToken');
+            $_SESSION['googleAccessTokenType'] = $this->request->post->get('tokenType');
+        } catch (Exception) {
             $success = false;
-        }
-
-        if ($success) {
-            $success = setcookie(
-                'googleAccessTokenJson',
-                $tokenDataJson,
-                time() + 3600, // Expire one hour from now.
-                '',
-                '',
-                true // Only transmit over a secure HTTPS connection.
-            );
-
-            if ($success === false) {
-                $message = "Could set cookie 'googleAccessTokenJson'.";
-                $success = false;
-            }
+            $message = 'Could not store Google Access Token data.';
         }
 
         $this->getResponse()->status->set(200);
@@ -128,12 +107,17 @@ class Controller extends Base
     {
         $folder = $this->folderMapper->findById($googleFile->getFolderId());
 
+        $googleAccessToken = '';
+        $googleAccessTokenType = '';
+
         $this->response->content->set(
             $this->buildHtmlOutput(
                 '@googleFile/detail.twig',
                 [
                     'googleFile' => $googleFile,
-                    'folder'     => $folder,
+                    'googleAccessToken' => $googleAccessToken,
+                    'googleAccessTokenType' => $googleAccessTokenType,
+                    'folder' => $folder,
                 ],
                 'Google File'
             )
