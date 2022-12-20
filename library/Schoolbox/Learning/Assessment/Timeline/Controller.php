@@ -33,7 +33,9 @@ class Controller extends Base
     /**
      * Controller constructor.
      */
-    public function __construct()
+    public function __construct(
+        private \Schoolbox\Learning\Assessment\Views\Mapper $assessmentViewMapper
+    )
     {
     }
 
@@ -97,7 +99,7 @@ class Controller extends Base
         /* A list of Views, which aren't really part of the Submission History
          * but we want to show them anyway. Shank them right in
          */
-        $views = \Schoolbox\Learning\Assessment\Views\Mapper::getInstance()->findByColumnList([
+        $views = $this->assessmentViewMapper->findByColumnList([
             'assessment_id' => $assessment->getId(),
             'participant_id' => $student->getId(),
         ]);
