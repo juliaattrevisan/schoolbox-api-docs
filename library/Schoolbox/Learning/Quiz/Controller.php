@@ -12,6 +12,7 @@ use Schoolbox\Application\WebRequest\RequestUriParser;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Alaress\Web\Controller\Exception as ControllerException;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
 use Schoolbox\Learning\Quiz\Section\Question\Mapper as QuizQuestionMapper;
@@ -45,13 +46,15 @@ class Controller extends AbstractController
 
 
     /**
-     * @param Mapper $quizMapper
-     * @param ErrorMapper $errorMapper
-     * @param QuizSectionMapper $quizSectionMapper
-     * @param QuizQuestionMapper $quizQuestionMapper
-     * @param QuizSolutionMapper $quizSolutionMapper
-     * @param QuizAttemptMapper $quizAttemptMapper
-     * @param QuizAnswerMapper $quizAnswerMapper
+     * @param Mapper                                                    $quizMapper
+     * @param ErrorMapper                                               $errorMapper
+     * @param QuizSectionMapper                                         $quizSectionMapper
+     * @param QuizQuestionMapper                                        $quizQuestionMapper
+     * @param QuizSolutionMapper                                        $quizSolutionMapper
+     * @param QuizAttemptMapper                                         $quizAttemptMapper
+     * @param QuizAnswerMapper                                          $quizAnswerMapper
+     * @param MapperProxy                                               $assessmentMapperProxy
+     * @param \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
      */
     public function __construct(
         Mapper $quizMapper,
@@ -60,7 +63,9 @@ class Controller extends AbstractController
         QuizQuestionMapper $quizQuestionMapper,
         QuizSolutionMapper $quizSolutionMapper,
         QuizAttemptMapper $quizAttemptMapper,
-        QuizAnswerMapper $quizAnswerMapper
+        QuizAnswerMapper $quizAnswerMapper,
+        private \Schoolbox\Learning\Assessment\DataModel\MapperProxy $assessmentMapperProxy,
+        private \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
     ) {
         parent::__construct($quizMapper);
         $this->errorMapper = $errorMapper;
@@ -365,6 +370,13 @@ class Controller extends AbstractController
         try {
             $attempt = $this->quizAttemptMapper->findById($this->getRequest()->post['attemptId']);
             $this->quizAttemptMapper->delete($attempt);
+
+            /* Invalidate project result cache if this quiz is in a project
+             * (This is what I have to do here...you've gotta be kidding me)
+             */
+            $assessment = $this->assessmentMapperProxy->findById($attempt->getQuiz()->getAssessmentModel()->getId());
+
+            (new \Schoolbox\Learning\Assessment\Project\ResultCache\ResultCache($this->projectResultCacheMapper))->refresh($this->assessmentMapperProxy, $assessment, $attempt->getUser());
         } catch (MapperException $e) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_ATTEMPT_NOT_FOUND);
         }

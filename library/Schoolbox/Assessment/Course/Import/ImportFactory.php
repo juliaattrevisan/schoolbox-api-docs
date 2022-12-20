@@ -1050,8 +1050,10 @@ class ImportFactory
             $this->assessmentMapperProxy->save($specAssessment, $user);
             $notifier->notify($specAssessment, $user, $before);
         }
+
         return $newAssessment ?: $specAssessment;
     }
+
 
     /**
      * Apply date strings from an array to the specified Assessment

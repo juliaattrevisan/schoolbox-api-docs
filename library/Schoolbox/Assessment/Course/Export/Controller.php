@@ -14,12 +14,16 @@ use Schoolbox\Learning\Assessment\Overwriter;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\AssessmentContext;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Mapper\Exception as MapperException;
 
 /**
  * Controller for exporting assessments into courses.
+ *
+ * Schools wanted the ability to copy assessments from an imported course back into the course spec
+ * Teachers were customising their Implementations after they were imported, making improvements
+ * and corrections which can be written back to the original Course Specification so that others
+ * can benefit from such amendments.
  */
 class Controller extends Base
 {

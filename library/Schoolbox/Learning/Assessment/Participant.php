@@ -12,6 +12,8 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Feedback\InstructorGivenFilter;
 use Schoolbox\Learning\Assessment\Feedback\PublishedFilter;
 use Schoolbox\Learning\Assessment\Feedback\SelfAssessmentFilter;
+use Schoolbox\Learning\Assessment\Project\ResultCache;
+use Schoolbox\Learning\Assessment\Project\ResultCache\Mapper;
 use Schoolbox\Learning\Assessment\Response\NotSubmittedFilter;
 use Schoolbox\Learning\Assessment\Response\SubmittedFilter;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
@@ -77,11 +79,12 @@ class Participant
     /**
      * Participant constructor.
      *
-     * @param User $user
-     * @param Plan $plan
+     * @param User   $user
+     * @param Plan   $plan
+     * @param Mapper $projectResultCacheMapper
      * @throws \UnexpectedValueException
      */
-    public function __construct(User $user, Plan $plan)
+    public function __construct(User $user, Plan $plan, private ResultCache\Mapper $projectResultCacheMapper)
     {
         $this->user         = $user;
         $this->plan         = $plan;
@@ -367,12 +370,12 @@ class Participant
 
 
     /**
-     * Return authoritative normalised mark - optionally filtered to just published marks.
+     * Calculate the authoritative normalised mark - optionally filtered to just published marks.
      *
      * @param bool $publishedOnly Should we ignore draft marks?
      * @return null|float
      */
-    public function getNormalisedMark($publishedOnly)
+    public function generateNormalisedMark($publishedOnly)
     {
         try {
             return $this->plan->getAssessable()->getNormalisedMark($this, $publishedOnly);
@@ -385,12 +388,12 @@ class Participant
 
 
     /**
-     * Return authoritative human-readable mark - optionally filtered to just published marks.
+     * Calculate the authoritative human-readable mark - optionally filtered to just published marks.
      *
      * @param bool $publishedOnly Should we ignore draft marks?
      * @return null|string
      */
-    public function getHumanReadableMark($publishedOnly)
+    public function generateHumanReadableMark($publishedOnly)
     {
         try {
             return $this->plan->getAssessable()->getHumanReadableMark($this, $publishedOnly);
@@ -399,6 +402,52 @@ class Participant
             trigger_error($e->getMessage(), E_USER_WARNING);
             return null;
         }
+    }
+
+
+    /**
+     * Retrieve authoritative normalised mark - optionally filtered to just published marks.
+     *
+     * For projects, it reads from a special schema table, project_results (to save you
+     * re-deriving it at runtime, we can recall an answer we calculated earlier)
+     *
+     * @param bool $publishedOnly Should we ignore draft marks?
+     * @return null|float
+     */
+    public function getNormalisedMark($publishedOnly): ?float
+    {
+        if ($this->plan->getAssessable() instanceof Project) {
+            $cachedProjectMark = (new ResultCache\ResultCache($this->projectResultCacheMapper))->retrieve($this->plan->getAssessable(), $this->getUser());
+
+            return $cachedProjectMark?->getNormalisedMark();
+        }
+
+        /* Non-projects just derive it the usual way it always did
+         */
+        return $this->generateNormalisedMark($publishedOnly);
+    }
+
+
+    /**
+     * Retrieve authoritative human-readable mark - optionally filtered to just published marks.
+     *
+     * For projects, it reads from a special schema table, project_results (to save you
+     * re-deriving it at runtime, we can recall an answer we calculated earlier)
+     *
+     * @param bool $publishedOnly Should we ignore draft marks?
+     * @return null|string
+     */
+    public function getHumanReadableMark($publishedOnly): ?string
+    {
+        if ($this->plan->getAssessable() instanceof Project) {
+            $cachedProjectMark = (new ResultCache\ResultCache($this->projectResultCacheMapper))->retrieve($this->plan->getAssessable(), $this->getUser());
+
+            return $cachedProjectMark?->getHumanReadableMark();
+        }
+
+        /* Non-projects just derive it the usual way it always did
+         */
+        return $this->generateHumanReadableMark($publishedOnly);
     }
 
 

@@ -19,8 +19,7 @@
     {% include '@learning/fragments/meta/curriculumCodes.twig' %}
     {# joining student name with lastView data #}
     {% if student is defined and student.id != USER.id %}
-        <li class="icon-staff-students" title="{% if lastViews.student.date is defined and lastViews.student.date is not null %}{{ lastViews.student.date }}{% endif %}">
-            <a href="/search/user/{{ student.id }}">{{ student.fullname }}</a>
+        <li class="icon-staff-students" title="{% if lastViews.student.date is defined and lastViews.student.date is not null %}{{ lastViews.student.date }}{% endif %}"><a href="/search/user/{{ student.id }}">{{ student.fullname }}</a>
             {% if lastViews is not empty %}
                 {{ lastViews.student.status }}
                 {% if 'assessment' is same as(lastViews.student.object) %} this {{ locale.assessment }}{% else %} the feedback {% endif %}

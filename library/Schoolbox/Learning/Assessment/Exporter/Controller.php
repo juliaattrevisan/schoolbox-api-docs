@@ -15,14 +15,18 @@ use Alaress\Web\Controller\Base as BaseController;
 use Alaress\Web\Controller\Exception as ControllerException;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Filter\BrokenFilterException;
+use Schoolbox\Filter\Filters\Assessment\IdFinder;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpecification;
+use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Replicator;
@@ -68,18 +72,20 @@ class Controller extends BaseController
     /**
      * Constructor
      *
-     * @param Access                    $access
-     * @param AssessmentDataSource      $assessmentDataSource
-     * @param UnitImplementation\Mapper $unitImplementationMapper
-     * @param Replicator                $replicator
-     * @param AssessmentFilter\IdFinder $assessmentIdFinder
+     * @param Access                     $access
+     * @param AssessmentDataSource       $assessmentDataSource
+     * @param Mapper                     $unitImplementationMapper
+     * @param Replicator                 $replicator
+     * @param IdFinder                   $assessmentIdFinder
+     * @param Project\ResultCache\Mapper $projectResultCacheMapper
      */
     public function __construct(
         Access $access,
         AssessmentDataSource $assessmentDataSource,
         UnitImplementation\Mapper $unitImplementationMapper,
         Replicator $replicator,
-        AssessmentFilter\IdFinder $assessmentIdFinder
+        AssessmentFilter\IdFinder $assessmentIdFinder,
+        private \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
     ) {
         $this->access                   = $access;
         $this->assessmentDataSource     = $assessmentDataSource;
@@ -349,6 +355,23 @@ class Controller extends BaseController
 
                 $assessmentImpl->getAssessables()->add($subAssessmentImpl);
             }
+
+            /* A specific usage where creating projects and activities
+             * always invalidates the project result cache
+             *
+             * This algorithm occurs when you export a whole project to a class
+             */
+            $projectResultCache = new Project\ResultCache\ResultCache($this->projectResultCacheMapper);
+            $projectResultCache->refresh($this->assessmentDataSource, $assessmentImpl);
+        } elseif ($assessmentSpec->getContext() instanceof Project) {
+            /* A specific usage where creating projects and activities
+             * always invalidates the project result cache
+             *
+             * This algorithm occurs when you use Export To Classes on a non-project assessment
+             * even if that assessment was already inside a project
+             */
+            $projectResultCache = new Project\ResultCache\ResultCache($this->projectResultCacheMapper);
+            $projectResultCache->refresh($this->assessmentDataSource, $assessmentImpl);
         }
 
         return $assessmentImpl;

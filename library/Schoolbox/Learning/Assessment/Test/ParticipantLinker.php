@@ -13,6 +13,7 @@ namespace Schoolbox\Learning\Assessment\Test;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Plan;
+use Schoolbox\Learning\Assessment\Project\ResultCache;
 use Schoolbox\User;
 
 /**
@@ -21,7 +22,6 @@ use Schoolbox\User;
  */
 class ParticipantLinker
 {
-
     /**
      * Create a participant in the specified plan, and link them all up
      *
@@ -31,7 +31,9 @@ class ParticipantLinker
      */
     public function createAndLinkParticipant(User $user, Plan $plan): Participant
     {
-        $participant                             = new Participant($user, $plan);
+        $resultCacheMapper = ResultCache\Mapper::getInstance();
+
+        $participant                             = new Participant($user, $plan, $resultCacheMapper);
         $plan->getParticipants()[$user->getId()] = $participant;
         return $participant;
     }

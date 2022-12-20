@@ -24,6 +24,8 @@ use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
+use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Learning\Assessment\Project\ResultCache\Mapper;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
@@ -32,7 +34,6 @@ use UnexpectedValueException;
 
 class Controller extends Base
 {
-
     /** @var IFeedbackDataSource */
     protected $feedbackDataSource;
 
@@ -54,6 +55,7 @@ class Controller extends Base
     /** @var ReturnedWorkMapper */
     private $returnedWorkMapper;
 
+
     /**
      * Controller constructor.
      *
@@ -64,6 +66,7 @@ class Controller extends Base
      * @param UserMapper            $userMapper
      * @param RubricDataSource      $rubricMapper
      * @param ReturnedWorkMapper    $returnedWorkMapper
+     * @param Mapper                $projectResultCacheMapper
      */
     public function __construct(
         IFeedbackDataSource $feedbackDataSource,
@@ -72,7 +75,8 @@ class Controller extends Base
         ResponseDataSource $responseDataSource,
         UserMapper $userMapper,
         RubricDataSource $rubricMapper,
-        ReturnedWorkMapper $returnedWorkMapper
+        ReturnedWorkMapper $returnedWorkMapper,
+        private Project\ResultCache\Mapper $projectResultCacheMapper
     ) {
         $this->feedbackDataSource    = $feedbackDataSource;
         $this->participantDataSource = $participantDataSource;
@@ -126,6 +130,15 @@ class Controller extends Base
                 ) {
                     $this->rubricMapper->copySelections($mostRecentFeedback->getId(), $feedback->getId());
                 }
+            }
+
+            /* Save it to the project result caching place for sharpish retrieval later
+             */
+            if ($assessment->getContext() instanceof Project && $feedback->isPublished()) {
+                /* You're forced to require participants/participation hydrated here
+                 * That Is Unfortunate
+                 */
+                (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))->refresh($this->assessmentDataSource, $assessment, $student);
             }
         } catch (RangeException $e) {
             $this->sendError('Invalid mark provided' . $e->getMessage() . $e->getTraceAsString());
@@ -253,6 +266,15 @@ class Controller extends Base
         try {
             $feedback = $this->processFeedback($participant, $post, $reviewRoute, $mostRecentFeedback, $response);
             $this->processRubric($participant, $post, $feedback);
+
+            /* Save it to the project result caching place for sharpish retrieval later
+             */
+            if ($assessment->getContext() instanceof Project && $feedback->isPublished()) {
+                /* You're forced to require participants/participation hydrated here
+                 * That Is Unfortunate
+                 */
+                (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))->refresh($this->assessmentDataSource, $assessment, $student);
+            }
         } catch (RangeException $e) {
             $this->sendError('Invalid mark provided');
             return;
@@ -347,6 +369,10 @@ class Controller extends Base
 
         try {
             $this->getFeedbackDataSource()->delete($feedback);
+
+            if ($feedback->getAssessable()->getContext() instanceof Project) {
+                (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))->refresh($this->assessmentDataSource, $feedback->getAssessable(), $feedback->getReviewee());
+            }
         } catch (MapperException $e) {
             $code = 400;
             $data = $e->getMessage();

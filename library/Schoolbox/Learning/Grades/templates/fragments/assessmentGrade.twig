@@ -48,14 +48,14 @@
     </div>
 
     {% if participant and assessment.isFeedbackVisibleToUser(USER) %}
-        {% set grade = assessment.humanReadableMark(participant, true) %}
+        {% set grade = participant.humanReadableMark(true) %}
         {% if assessment is task %}
             {% include '@learningAssessment/fragments/progressTick.twig' with {
                 assessment: assessment,
                 student:    student
             } only %}
         {% elseif grade %}
-            <div class="grade {{ urgency.marks(assessment.normalisedMark(participant, true)) }}-bg">
+            <div class="grade {{ urgency.marks(participant.normalisedMark(true)) }}-bg">
                 <span>{{ grade }}</span>
             </div>
         {% endif %}

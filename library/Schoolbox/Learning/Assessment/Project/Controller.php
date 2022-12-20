@@ -56,6 +56,7 @@ class Controller extends Assessment\Controller
         UnitSpecificationMapper $unitSpecificationMapper,
         Replicator $replicator,
         LatestViewMapper $latestViewMapper,
+        protected Project\ResultCache\Mapper $projectResultCacheMapper
     ) {
         parent::__construct(
             $userMapper,
@@ -71,6 +72,7 @@ class Controller extends Assessment\Controller
             $unitSpecificationMapper,
             $replicator,
             $latestViewMapper,
+            $this->projectResultCacheMapper
         );
     }
 
@@ -159,12 +161,12 @@ class Controller extends Assessment\Controller
         }
 
         $twigData = [
-            'breadcrumbs'       => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle()]),
-            'baseContext'       => $assessment->getBaseContext(),
-            'assessment'        => $assessment,
-            'assessmentStats'   => $assessmentStats,
-            'participantStats'  => $participantStats,
-            'returnUrl'         => Redirect::decode($this->getRequest()->query->get(Redirect::RETURN_URL))
+            'breadcrumbs'        => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle()]),
+            'baseContext'        => $assessment->getBaseContext(),
+            'assessment'         => $assessment,
+            'assessmentStats'    => $assessmentStats,
+            'participantStats'   => $participantStats,
+            'returnUrl'          => Redirect::decode($this->getRequest()->query->get(Redirect::RETURN_URL))
         ];
 
         $this->getResponse()->content->set(

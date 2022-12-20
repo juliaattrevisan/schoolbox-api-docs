@@ -1,6 +1,6 @@
 {% macro outputCurriculumNode(node) %}
     <li class="row">
-        <div class="twelve-column">
+        <div class="content">
             {% if node.code %}
                 [<a title="View curriculum node details" href="#{{ node.id }}" data-display-node>{{ node.code }}</a>]
             {% endif %}
@@ -22,33 +22,26 @@
 
 
 {% if nodes | length > 0 %}
-    {% for node in nodes %}
-    <div class="content">
-        <ul class="information-list">
-            {{ macros.outputCurriculumNode(node) }}
-        </ul>
-    </div>
-        {% if not loop.last %}
-            <hr>
-        {% endif %}
-    {% endfor %}
+    <ul class="information-list">
+        {% for node in nodes %}
+        {{ macros.outputCurriculumNode(node) }}
+        {% endfor %}
+    </ul>
 {% else %}
-
     <div class="empty-state">
         <i class="icon-curriculum"></i>
-            {% if not curriculumTagging %}
+        {% if not curriculumTagging %}
 
-                {% if USER.isSuperuser %}
-                    <p><a href="/adminv2/setting/LMS+Policy">Turn on the Enable Curriculum Tagging toggle</a> in the Administration system to use this feature.</p>
-                {% else %}
-                    <p>Ask your System Administrator to enable curriculum mapping to use this feature.</p>
-                {% endif %}
-
+            {% if USER.isSuperuser %}
+                <p><a href="/adminv2/setting/LMS+Policy">Turn on the Enable Curriculum Tagging toggle</a> in the Administration system to use this feature.</p>
             {% else %}
-                <p><a href="{{ routeLookup('folder.getFolderModify', {id: context.id}) }}#curriculum-codes">Map a curriculum code</a> to your course or {{ locale.unit }} page to display a list of all of the curriculum codes and matching skill descriptors covered in this area of the curriculum.</p>
+                <p>Ask your System Administrator to enable curriculum mapping to use this feature.</p>
             {% endif %}
-    </div>
 
+        {% else %}
+            <p><a href="{{ routeLookup('folder.getFolderModify', {id: context.id}) }}#curriculum-codes">Map a curriculum code</a> to your course or {{ locale.unit }} page to display a list of all of the curriculum codes and matching skill descriptors covered in this area of the curriculum.</p>
+        {% endif %}
+    </div>
 {% endif %}
 
 <div data-overview-component>

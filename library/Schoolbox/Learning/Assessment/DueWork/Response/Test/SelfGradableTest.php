@@ -18,6 +18,7 @@ use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfGradable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Plan;
+use Schoolbox\Learning\Assessment\Project\ResultCache;
 use Schoolbox\Learning\Assessment\Quiz;
 use Schoolbox\Learning\Assessment\Task;
 use Schoolbox\User;
@@ -25,9 +26,8 @@ use UnexpectedValueException;
 
 class SelfGradableTest extends TestCase
 {
-
     /**
-     * @dataProvider provider_validSelfAssessable
+     * @dataProvider providerValidSelfAssessable
      * @param User        $currentUser The user currently "logged in"
      * @param Participant $participant The user whose trying to start self-assessment
      * @param int         $expected
@@ -45,7 +45,7 @@ class SelfGradableTest extends TestCase
      *
      * @return array
      */
-    public function provider_validSelfAssessable(): array
+    public function providerValidSelfAssessable(): array
     {
         $student = (new User())->setId(230);
         $otherStudent = (new User())->setId(999);
@@ -63,6 +63,8 @@ class SelfGradableTest extends TestCase
         $incorrectAssessment2 = (new DueWork\Model())
             ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_NONE);
 
+        $resultCacheMapper = ResultCache\Mapper::getInstance();
+
         /* Test everything
          */
         return [
@@ -70,7 +72,7 @@ class SelfGradableTest extends TestCase
              */
             'Valid: Student starting their own self-assessment' => [
                 $student,
-                new Participant($student, new Plan($correctAssessment)),
+                new Participant($student, new Plan($correctAssessment), $resultCacheMapper),
                 true
             ],
 
@@ -79,7 +81,7 @@ class SelfGradableTest extends TestCase
              */
             'Invalid: Student starting someone else\'s self-assessment' => [
                 $student,
-                new Participant($otherStudent, new Plan($correctAssessment)),
+                new Participant($otherStudent, new Plan($correctAssessment), $resultCacheMapper),
                 false
             ],
 
@@ -90,25 +92,25 @@ class SelfGradableTest extends TestCase
              */
             'Invalid: Student starting an improperly-configured self-assessment (1)' => [
                 $student,
-                new Participant($student, new Plan($incorrectAssessment1)),
+                new Participant($student, new Plan($incorrectAssessment1), $resultCacheMapper),
                 false
             ],
 
             'Invalid: Student starting an improperly-configured self-assessment (2)' => [
                 $student,
-                new Participant($student, new Plan($incorrectAssessment2)),
+                new Participant($student, new Plan($incorrectAssessment2), $resultCacheMapper),
                 false
             ],
 
             'Invalid: Student starting an improperly-configured self-assessment for someone else (1)' => [
                 $student,
-                new Participant($otherStudent, new Plan($incorrectAssessment1)),
+                new Participant($otherStudent, new Plan($incorrectAssessment1), $resultCacheMapper),
                 false
             ],
 
             'Invalid: Student starting an improperly-configured self-assessment for someone else (2)' => [
                 $student,
-                new Participant($otherStudent, new Plan($incorrectAssessment2)),
+                new Participant($otherStudent, new Plan($incorrectAssessment2), $resultCacheMapper),
                 false
             ],
 
@@ -116,13 +118,13 @@ class SelfGradableTest extends TestCase
              */
             'Invalid: Wrong assessment type (1)' => [
                 $student,
-                new Participant($student, new Plan(new Quiz\Model())),
+                new Participant($student, new Plan(new Quiz\Model()), $resultCacheMapper),
                 false
             ],
 
             'Invalid: Wrong assessment type (2)' => [
                 $student,
-                new Participant($student, new Plan(new Task\Model())),
+                new Participant($student, new Plan(new Task\Model()), $resultCacheMapper),
                 false
             ],
         ];

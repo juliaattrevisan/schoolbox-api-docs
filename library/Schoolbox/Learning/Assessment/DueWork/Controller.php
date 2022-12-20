@@ -78,9 +78,7 @@ use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\TaskDaemon\Producer;
-use Schoolbox\TaskDaemon\Request\DownloadPages\MessageFactory;
 use Schoolbox\User;
-use Schoolbox\User\Translator\Author\ModelToArray;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
 use Url;
@@ -123,6 +121,7 @@ class Controller extends Assessment\Controller
      * @param FilesystemProxy                   $filesystemProxy
      * @param StateMapper                       $stateMapper
      * @param Download\MessageFactory           $dueWorkDownloadMessageFactory
+     * @param Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -153,6 +152,7 @@ class Controller extends Assessment\Controller
         private StateMapper $stateMapper,
         private RosettaStone $rosettaStone,
         private Download\MessageFactory $dueWorkDownloadMessageFactory,
+        protected Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
     ) {
         parent::__construct(
             $userMapper,
@@ -167,7 +167,8 @@ class Controller extends Assessment\Controller
             $courseSpecificationMapper,
             $unitSpecificationMapper,
             $replicator,
-            $latestViewMapper
+            $latestViewMapper,
+            $this->projectResultCacheMapper
         );
     }
 
@@ -1402,7 +1403,7 @@ class Controller extends Assessment\Controller
         $participant = $dueWork->getParticipantIfExtant($student);
         if (!$participant) {
             $dynamicPlan = $dueWork->getDynamicPlan();
-            $participant = new Participant($student, $dynamicPlan);
+            $participant = new Participant($student, $dynamicPlan, $this->projectResultCacheMapper);
             /** @noinspection NullPointerExceptionInspection (because we can't have no participant without a dynamic plan) */
             $dynamicPlan->getParticipants()[$student->getId()] = $participant;
         }

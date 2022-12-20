@@ -25,6 +25,8 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Feedback\Visibility as FeedbackVisibility;
+use Schoolbox\Learning\Assessment\Participant\DataSource;
+use Schoolbox\Learning\Assessment\Project\ResultCache\ValidCache;
 use Schoolbox\Learning\Assessment\Seb\Payload;
 use Schoolbox\Learning\Assessment\Seb\Payload as SebPayload;
 use Schoolbox\Learning\AssessmentContext;
@@ -101,13 +103,14 @@ class ListController extends Web\Controller\Base
 
 
     /**
-     * @param UserMapper              $userMapper
-     * @param Error\Mapper            $errorMapper
-     * @param MapperProxy             $assessmentMapper
-     * @param Access                  $access
-     * @param Transactor              $transactor
-     * @param Participant\DataSource  $participantDataSource
-     * @param UnitSpecificationMapper $unitSpecificationMapper
+     * @param UserMapper                 $userMapper
+     * @param Error\Mapper               $errorMapper
+     * @param MapperProxy                $assessmentMapper
+     * @param Access                     $access
+     * @param Transactor                 $transactor
+     * @param DataSource                 $participantDataSource
+     * @param UnitSpecificationMapper    $unitSpecificationMapper
+     * @param Project\ResultCache\Mapper $projectResultCacheMapper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -116,7 +119,8 @@ class ListController extends Web\Controller\Base
         Access $access,
         Transactor $transactor,
         Participant\DataSource $participantDataSource,
-        UnitSpecificationMapper $unitSpecificationMapper
+        UnitSpecificationMapper $unitSpecificationMapper,
+        protected \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
     ) {
         $this->setUserMapper($userMapper);
         $this->setErrorMapper($errorMapper);
@@ -617,6 +621,7 @@ class ListController extends Web\Controller\Base
          * Controller must return early for that to happen
          */
         $db = $this->getUserMapper()->getDatabase();
+
         try {
             $db->beginTransaction();
             // Create a notifier proxy so that I may notify about assessment changes
@@ -634,6 +639,17 @@ class ListController extends Web\Controller\Base
                 $postData['context'] = $relocatedContext;
                 $originalAssessment  = $assessment;
                 $assessment          = null;
+            }
+
+            /* Decide whether we have to invalidate project_result cache
+             * Have to compare $postData and $assessment -before- it's transacted/updated
+             */
+            $projectResultCacheDetector = new ValidCache();
+
+            if ($assessment instanceof Project) {
+                $cacheValid = $projectResultCacheDetector->isSatisfiedByProject($postData, $assessment);
+            } else {
+                $cacheValid = $projectResultCacheDetector->isSatisfiedByActivity($postData, $assessment);
             }
 
             $assessmentFactory = new Factory($user, $postData, $postData['assessmentType'], $originalAssessment);
@@ -663,6 +679,14 @@ class ListController extends Web\Controller\Base
 
         // And send notifications
         $notifier->notify($assessment, $this->getUser(), $before);
+
+        /* Reprocess project marks if its cache is invalid
+         * Similar to the cli tool's algorithm
+         */
+        if (!$cacheValid) {
+            $projectResultCache = (new Project\ResultCache\ResultCache($this->projectResultCacheMapper));
+            $projectResultCache->refresh($this->assessmentMapper, $assessment);
+        }
 
         return $transactionSummary;
     }

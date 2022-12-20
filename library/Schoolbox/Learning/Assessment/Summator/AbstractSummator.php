@@ -71,6 +71,7 @@ abstract class AbstractSummator implements ISummator
             $participant = $currentAssessable->getParticipantIfExtant($user);
             if ($participant) {
                 $normMark = $this->deriveNormalisedMark($participant, $publishedOnly);
+
                 if (null !== $normMark) {
                     $this->aggregate($normMark, $currentAssessable->getWeight());
                 }
@@ -79,6 +80,7 @@ abstract class AbstractSummator implements ISummator
 
         return $this->finalise();
     }
+
 
     /**
      * Derive the normalised mark to use for this participant in an assessment.
@@ -91,6 +93,7 @@ abstract class AbstractSummator implements ISummator
     {
         return $this->markDerivationStrategy->deriveNormalisedMark($participant, $publishedOnly);
     }
+
 
     /**
      * @inheritdoc
@@ -108,6 +111,7 @@ abstract class AbstractSummator implements ISummator
         $this->reset();
         foreach ($assessable->getAllParticipants() as $participant) {
             $normMark = $this->deriveNormalisedMark($participant, $publishedOnly);
+
             if (null !== $normMark) {
                 // Weight doesn't matter within the context of a single assessment
                 $this->aggregate($normMark, $assessable->getWeight());

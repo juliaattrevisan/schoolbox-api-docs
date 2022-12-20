@@ -15,6 +15,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Participant\AssessmentListMutator;
 use Schoolbox\Learning\Assessment\Plan;
+use Schoolbox\Learning\Assessment\Project\ResultCache;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\User;
 
@@ -40,6 +41,8 @@ class AssessmentListMutatorTest extends TestCase
      */
     public function setUp(): void
     {
+        $resultCacheMapper = ResultCache\Mapper::getInstance();
+
         $this->student = (new User())->setId(9)->setChildren(new GenericCollection(User::class));
         $this->parent  = (new User())->setId(10)->setChildren(new GenericCollection(User::class));
         $this->parent->getChildren()->setOffset($this->student->getId(), $this->student);
@@ -48,7 +51,7 @@ class AssessmentListMutatorTest extends TestCase
         $assessment1 = new DueWork\Model();
         $plan1       = new Plan($assessment1);
         $plan1->getParticipants()
-              ->setOffset($this->student->getId(), new Participant($this->student, $plan1));
+              ->setOffset($this->student->getId(), new Participant($this->student, $plan1, $resultCacheMapper));
         $assessment1
             ->setId(1)
             ->getPlans()->add($plan1)
@@ -56,7 +59,7 @@ class AssessmentListMutatorTest extends TestCase
         $assessment2 = new DueWork\Model();
         $plan2       = new Plan($assessment2);
         $plan2->getParticipants()
-              ->setOffset($this->student->getId(), new Participant($this->student, $plan2));
+              ->setOffset($this->student->getId(), new Participant($this->student, $plan2, $resultCacheMapper));
         $assessment2
             ->setId(2)
             ->getPlans()->add($plan2)

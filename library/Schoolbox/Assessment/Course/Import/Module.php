@@ -108,7 +108,8 @@ class Module extends \Alaress\Module\Module
             // not a mapper, but has getInstance, so does work
             $this->getMapperFactory()->get(Access::class),
             $importFactory,
-            $this->injector->get('assessmentDataSource')
+            $this->injector->get('assessmentDataSource'),
+            $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\Project\ResultCache\Mapper::class),
         );
     }
 
