@@ -104,7 +104,8 @@ class ScheduleCompiler
      */
     public function findSubject(string $setCode): array
     {
-        $node = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/TeachingManager/Sets/Set[SetCode[text()='{$setCode}']]")[0];
+        $node = $this->api[DSN::MODULE_BATCHXML]->fetchXml("/iSAMS/TeachingManager/Sets/Set[SetCode[text()='{$setCode}']]")[0] ?? [];
+        //null coalesce fetchXml()[0] as that field might not exist... but don't throw warnings either
 
         /* TODO There is a <Teachers> node here, but there's always been
          *  exactly one <Teacher> node contained inside. If multiple teachers
