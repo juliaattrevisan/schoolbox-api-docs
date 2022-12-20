@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Custom\Tigs\Summative\SubjectReport;
 
+use Alaress\Authorizer\Authorizer;
 use Alaress\Database;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate;
@@ -16,6 +17,7 @@ use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web;
 use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
+use Aura\Router\Router;
 use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\StudentAttributes;
 use Custom\Tigs\Summative\SubjectReport\Components\AcademicAchievementMatrix;
@@ -43,22 +45,19 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\Role;
 use Schoolbox\User;
 use External_UserInterface;
+use PDO;
+use Schoolbox\Filter\Filters;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\Resource\Textbox;
 use Schoolbox\UserMapper;
 use UnderflowException;
+use UnexpectedValueException;
 
 use function strnatcasecmp;
-
-use UnexpectedValueException;
-use Schoolbox\Filter\Filters;
-use PDO;
-use Schoolbox\Resource\Textbox;
-use Aura\Router\Router;
-use Alaress\Authorizer\Authorizer;
 
 class Report
 {
@@ -687,8 +686,8 @@ class Report
          * Truth table time
          * Note that Prod (PRD) and Staging (STG) can have different ids
          *
-         * HSC Students, Year 11, Semester 1: worktype is not relevant (no NESA data for this)
-         * HSC Students, Year 11, Semester 2: worktype is "NESA Report Grade" (STG 20)
+         * HSC Students, Year 11, Semester 1: worktype is "NESA Report Grade" (STG 20)
+         * HSC Students, Year 11, Semester 2: worktype is "NESA Report Grade & Report Mark" (STG 22)
          *
          * HSC Students, Year 12, Semester 1: worktype is not relevant (no NESA data for this)
          * HSC Students, Year 12, Semester 2: worktype is not relevant (no NESA data for this)
@@ -700,29 +699,47 @@ class Report
          * is an HSC or Middle Years student
          */
         if ($attributes->isHsc()) {
-            if ($semester === 2) {
-                if ($attributes->getYearLevel() === 11) {
-                    $this->loadAssessmentsAndParticipation($courseSpec, $workTypeIds, $attributes, 2, 2);
+            if ($attributes->getCurriculumYearLevel() === 11) {
+                $this->loadAssessmentsAndParticipation($courseSpec, $workTypeIds, $attributes, 1, 2);
+                foreach ([1, $semester] as $reportSemester) {
+                    // Year 11 Semester 1 and 2 NESA data is calculated
+                    // differently:
+                    // * Semester 1 NESA is in letter grades A-E
+                    // * Semester 2 NESA is in a rubric "NESA/Grade" with
+                    //   descriptors A-E (like the middle years data)
+                    if ($reportSemester === 1) {
+                        $nesa = new NesaScoreGraphHSC(
+                            $cohortUnitImpls,
+                            $student,
+                            $attributes,
+                            $this->visibility,
+                            $this->viewer,
+                            $workTypeIds[Config::_TIGS_WORK_TYPE_NESA_SCORE],
+                            $folder,
+                            $roleTypeOverride
+                        );
+                    } else {
+                        $nesa = new NesaScoreGraphMiddleYears(
+                            $cohortUnitImpls,
+                            $student,
+                            $attributes,
+                            $this->visibility,
+                            $this->viewer,
+                            $workTypeIds[Config::_TIGS_WORK_TYPE_NESA_REPORT_GRADE_AND_REPORT_MARK],
+                            $folder,
+                            $reportSemester,
+                            $this->rubricMapper,
+                            $roleTypeOverride
+                        );
+                    }
 
-                    $nesa = new NesaScoreGraphHSC(
-                        $cohortUnitImpls,
-                        $student,
-                        $attributes,
-                        $this->visibility,
-                        $this->viewer,
-                        $workTypeIds[Config::_TIGS_WORK_TYPE_NESA_SCORE],
-                        $folder,
-                        $roleTypeOverride
-                    );
-
-                    $context = $nesa->toContext($semester);
-
+                    $context = $nesa->toContext($reportSemester);
                     if ($context !== null) {
-                        $reports['data'][$semester] = $context;
+                        $reports['data'][$reportSemester] = $context;
                     }
                 }
             } else {
-                // noop - no NESA graph for HSC students except Year 11 Semester 2 guys
+                // noop - no NESA graph for HSC students except Year 11 guys
                 return [];
             }
         } elseif ($attributes->isMiddleYear()) {
