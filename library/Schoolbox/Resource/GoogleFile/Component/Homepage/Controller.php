@@ -18,7 +18,6 @@ use SitePage;
 
 class Controller extends Component_Homepage_ControllerAbstract
 {
-
     /**
      * Has this component been properly configured?
      * Assume yes to begin with

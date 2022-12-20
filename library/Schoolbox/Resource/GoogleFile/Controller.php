@@ -77,7 +77,7 @@ class Controller extends Base
         try {
             $_SESSION['googleAccessToken'] = $this->request->post->get('accessToken');
             $_SESSION['googleAccessTokenType'] = $this->request->post->get('tokenType');
-        } catch (Exception) {
+        } catch (\Exception) {
             $success = false;
             $message = 'Could not store Google Access Token data.';
         }
