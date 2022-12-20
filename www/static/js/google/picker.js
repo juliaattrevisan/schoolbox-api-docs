@@ -37,7 +37,7 @@
         function init(options, element) {
             let defaults = {
 
-                /* The link which activates the google picker
+                /* The link which activates the Google picker
                  */
                 element: element,
 
@@ -45,11 +45,11 @@
                  */
                 clientId: element,
 
-                /* Our modal. The google modal appears on top of this.
+                /* Our modal. The Google modal appears on top of this.
                  */
                 modalId: '#gfile',
 
-                postGoogleFileUrl: '',
+                postGoogleFileUrl: '', // TODO: Remove this (and from comment in googleFiles.twig)?
                 features: [],
                 views: [],
                 mimeTypes: [],
@@ -83,7 +83,7 @@
 
 
         /**
-         * Ask google to setup picker
+         * Ask Google to setup picker
          */
         function authorize() {
             // The google.accounts.oauth2 variable comes from https://accounts.google.com/gsi/client.
@@ -113,8 +113,8 @@
 
 
         /**
-         * Respond to google when you get past the authentication request
-         * Spawn our modal and detect when we close the google modal; react accordingly
+         * Respond to Google when you get past the authentication request
+         * Spawn our modal and detect when we close the Google modal; react accordingly
          */
         function handleAuthResult() {
             if (authResult && !authResult.error) {
@@ -124,6 +124,18 @@
                 $('#gfile-access-token').val(authResult.access_token);
                 $('#gfile-token-type').val(authResult.token_type);
                 config.onAuth.call($(this.element), authResult.access_token);
+
+                // Store authResult.access_token and authResult.token_type in a cookie so that repeated use of the
+                // Google picker will not require repeated authorisation.
+                $.ajax({
+                    data: {accessToken: authResult.access_token, tokenType: authResult.token_type},
+                    dataType: 'json',
+                    method: 'post',
+                    url: '/googleFile/saveAccessTokenToCookie',
+                    success: function (response) {
+                        console.info('picker.js handleAuthResult() save cookie success!  response: ', response);
+                    }
+                });
             }
         }
 
@@ -161,7 +173,7 @@
                 .build();
             picker.setVisible(true);
 
-            /* Shut google picker modal when we shut our modal
+            /* Shut Google picker modal when we shut our modal
              * https://stackoverflow.com/questions/13745505/how-to-use-zurb-foundation-reveal-with-open-opened-close-closed-callback-func
              */
             $(document).on('close.fndtn.reveal', config.modalId, onClosePicker);

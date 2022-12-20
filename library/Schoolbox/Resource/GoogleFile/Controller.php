@@ -65,6 +65,56 @@ class Controller extends Base
         $this->folderMapper     = $folderMapper;
     }
 
+
+    /**
+     * @return string
+     */
+    public function saveAccessTokenToCookie(): void
+    {
+        $success = true;
+        $message = '';
+
+        try {
+            $tokenDataJson = json_encode(
+                [
+                   'accessToken' => $this->request->post->get('accessToken'),
+                   'tokenType'   => $this->request->post->get('tokenType')
+                ],
+                JSON_THROW_ON_ERROR
+            );
+        } catch (\JsonException $e) {
+            $message = 'Could not encode JSON Google access token data.';
+            $success = false;
+        }
+
+        if ($success) {
+            $success = setcookie(
+                'googleAccessTokenJson',
+                $tokenDataJson,
+                time() + 3600, // Expire one hour from now.
+                '',
+                '',
+                true // Only transmit over a secure HTTPS connection.
+            );
+
+            if ($success === false) {
+                $message = "Could set cookie 'googleAccessTokenJson'.";
+                $success = false;
+            }
+        }
+
+        $this->getResponse()->status->set(200);
+        $this->getResponse()->content->set(
+            $this->buildJsonOutput(
+                [
+                    'success' => $success,
+                    'message' => $message
+                ]
+            )
+        );
+    }
+
+
     /**
      * Displays a google file in a dedicated page
      *

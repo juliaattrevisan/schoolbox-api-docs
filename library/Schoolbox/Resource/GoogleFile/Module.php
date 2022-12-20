@@ -40,6 +40,16 @@ class Module extends BaseModule
     public function registerRoutes(): void
     {
         $this->register(
+            self::METHOD_POST,
+            '/saveAccessTokenToCookie',
+            'saveAccessTokenToCookie',
+            new All(
+                new IsLoggedIn(),
+                new IsConfigOn(ConfigMapper::NAME_GOOGLEDRIVE_ENABLED, $this->getConfig()),
+            )
+        );
+
+        $this->register(
             self::METHOD_GET,
             '/{googleFileId:\d+}',
             'getGoogleFile',
