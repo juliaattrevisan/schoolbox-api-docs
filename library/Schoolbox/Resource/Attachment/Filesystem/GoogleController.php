@@ -96,6 +96,7 @@ class GoogleController extends AbstractController
         }
     }
 
+
     /**
      * @param SitePage $page
      * @return void
@@ -108,10 +109,12 @@ class GoogleController extends AbstractController
 
         $page->setVar(
             [
-                'API_KEY'   => $this->gAppsApiKey,
-                'CLIENT_ID' => $this->gAppsClientId,
-                'VIEWS'     => implode(',', array_keys($this->views)),
-                'FEATURES'  => implode(',', array_keys($this->features)),
+                'API_KEY'                  => $this->gAppsApiKey,
+                'CLIENT_ID'                => $this->gAppsClientId,
+                'GOOGLE_ACCESS_TOKEN'      => $_SESSION['googleAccessToken'] ?? '',
+                'GOOGLE_ACCESS_TOKEN_TYPE' => $_SESSION['googleAccessTokenType'] ?? '',
+                'VIEWS'                    => implode(',', array_keys($this->views)),
+                'FEATURES'                 => implode(',', array_keys($this->features)),
             ]
         );
     }
