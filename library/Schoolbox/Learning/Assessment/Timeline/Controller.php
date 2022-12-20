@@ -22,6 +22,15 @@ use Schoolbox\User;
 class Controller extends Base
 {
     /**
+     * These denote the kind of interaction one might encounter
+     * when parsing the payloads. There are three types.
+     */
+    private const INTERACTION_RESPONSE = 'response';
+    private const INTERACTION_FEEDBACK = 'feedback';
+    private const INTERACTION_VIEW = 'view';
+
+
+    /**
      * Controller constructor.
      */
     public function __construct()
@@ -32,6 +41,10 @@ class Controller extends Base
     /**
      * Dump the full timeline of $assessment for $user
      *
+     * There's a shanking of Assessment Views which isn't part of the Timeline
+     * usually; a future improvement would be to incorporate that optionally
+     * into the Full Timeline
+     *
      * @param User        $student
      * @param IAssessable $assessment
      */
@@ -39,6 +52,8 @@ class Controller extends Base
     {
         $participant = $assessment->getParticipantIfExtant($student);
 
+        /* A list of Responses and Feedbacks, as per the Submission History
+         */
         $timeline = (new Full($participant))->getForTeacher();
 
         /* Convert this into a struct specifically for the ui
@@ -78,6 +93,36 @@ class Controller extends Base
                 ];
             }
         }
+
+        /* A list of Views, which aren't really part of the Submission History
+         * but we want to show them anyway. Shank them right in
+         */
+        $views = \Schoolbox\Learning\Assessment\Views\Mapper::getInstance()->findByColumnList([
+            'assessment_id' => $assessment->getId(),
+            'participant_id' => $student->getId(),
+        ]);
+
+        foreach ($views as $interaction) {
+            $stack[] = [
+                'type' => 'view',
+                'viewer' => [
+                    'id' => $interaction->getUser()->getId(),
+                    'name' => $interaction->getUser()->getFullName(),
+                ],
+                'date' => [
+                    'datetime' => $interaction->getLastVisit()->getDatabase(),
+                    'short' => $interaction->getLastVisit()->getShort(),
+                    'relative' => $interaction->getLastVisit()->getRelativeTime(),
+                ]
+            ];
+        }
+
+        /* Reverse chronologically sort that array stack again,
+         * due to the shanking of Assessment Views
+         */
+        usort($stack, static function (array $a, array $b): int {
+            return strtotime($b['date']['datetime']) <=> strtotime($a['date']['datetime']);
+        });
 
         $this->getResponse()->content->set(
             $this->buildJsonOutput($stack)
