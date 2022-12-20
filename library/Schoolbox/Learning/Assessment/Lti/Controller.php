@@ -312,6 +312,12 @@ class Controller extends Assessment\Controller
         // Save
         $this->ltiAssessmentScoreMapper->save($scoreModel);
 
+        // Is feedback? Update project if so
+        if ($scoreModel->getIsFeedback()) {
+            (new Assessment\Project\ResultCache\ResultCache($this->projectResultCacheMapper))
+                ->refresh($this->getAssessmentMapper(), $assessment, $student);
+        }
+
         // Then redir to the return URL, or the assessment's folder
         $encodedReturnUrl = $this->request->query->get(Redirect::RETURN_URL);
         $this->response->redirect->afterPost(
