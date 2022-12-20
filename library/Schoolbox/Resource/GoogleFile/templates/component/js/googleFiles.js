@@ -148,8 +148,6 @@ $step2.on('click', 'a[data-action]', function (e) {
 $(`#component${componentId} [data-action="delete"]`).on('click', function (event) {
     event.preventDefault();
     $(this).confirmDialog({
-        googleAccessToken: window.googleAccessToken,
-        googleAccessTokenType: window.googleAccessTokenType,
         text: 'Are you sure you want to delete this google file?',
         confirmLabel: 'Delete',
         confirmEvent: function () {
