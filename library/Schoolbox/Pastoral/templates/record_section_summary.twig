@@ -7,6 +7,27 @@
         </div>
         <div class="small-12 medium-10 large-11 columns">
             <dl class="profile">
+                <dt class="small-4 medium-3 columns">Type:</dt>
+                <dd class="small-8 medium-9 columns">{{ record.type.name }}</dd>
+
+                {% if record.subtype.name ?? '' is not empty %}
+                    <dt class="small-4 medium-3 columns">Sub-Type:</dt>
+                    <dd class="small-8 medium-9 columns">{{ record.subtype.name }}</dd>
+                {% endif %}
+                {% if record.severity and config.pastoral_severity %}
+                    <dt class="small-4 medium-3 columns">{{ locale.severity.proper }}:</dt>
+                    <dd class="small-8 medium-9 columns">
+                        {% if severityColor %}
+                            <span class="label" style="background-color:{{ record.severity.color }};color:{{ severityColor }}">{{ record.severity.name }}</span>
+                        {% else %}
+                            {{ record.severity.name }}
+                        {% endif %}
+                    </dd>
+                {% endif %}
+                {% if record.occurredOn is not empty %}
+                    <dt class="small-4 medium-3 columns">Occurred On:</dt>
+                    <dd class="small-8 medium-9 columns">{{ record.occurredOn.localShort }}</dd>
+                {% endif %}
                 <dt class="small-4 medium-3 columns">Created By:</dt>
                 <dd class="small-8 medium-9 columns">
                     {% if not record.owner.deletedAt %}
@@ -29,24 +50,7 @@
                     <dd class="small-8 medium-9 columns">{{ record.updatedAtDisplay.long }}</dd>
                 {% endif %}
 
-                {% if record.severity and config.pastoral_severity %}
-                    <dt class="small-4 medium-3 columns">{{ locale.severity.proper }}:</dt>
-                    <dd class="small-8 medium-9 columns">
-                        {% if severityColor %}
-                            <span class="label" style="background-color:{{ record.severity.color }};color:{{ severityColor }}">{{ record.severity.name }}</span>
-                        {% else %}
-                            {{ record.severity.name }}
-                        {% endif %}
-                    </dd>
-                {% endif %}
 
-                <dt class="small-4 medium-3 columns">Type:</dt>
-                <dd class="small-8 medium-9 columns">{{ record.type.name }}</dd>
-
-                {% if record.subtype.name ?? '' is not empty %}
-                    <dt class="small-4 medium-3 columns">Sub-Type:</dt>
-                    <dd class="small-8 medium-9 columns">{{ record.subtype.name }}</dd>
-                {% endif %}
 
                 {% if record.points is not empty %}
                     <dt class="small-4 medium-3 columns">Points:</dt>

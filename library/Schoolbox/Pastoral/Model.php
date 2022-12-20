@@ -6,10 +6,11 @@
  * @link        https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Schoolbox\Pastoral;
 
 use Alaress_Date_Format;
-use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\IModel;
 use Schoolbox\ISoftDeletable;
@@ -33,41 +34,41 @@ class Model implements ISoftDeletable, IModel
     use DeletedAtDate;
     use CreateCollection;
 
-    /** @var Alaress_Date_Format $updatedAtDisplay The date this record, or any of its accessible comments were last updated */
-    private $updatedAtDisplay;
+    /** @var Alaress_Date_Format|null $updatedAtDisplay The date this record, or any of its accessible comments were last updated */
+    private ?Alaress_Date_Format $updatedAtDisplay = null;
 
     /** @var null|int Identifier of corresponding SIS record. NULL if none. */
-    private $externalId;
+    private ?int $externalId;
 
     /** @var null|Model Null if does not have a parent. */
-    private $parent;
+    private ?Model $parent = null;
 
     /**@var PastoralType */
-    protected $type;
+    protected PastoralType $type;
 
     /** @var null|PastoralSubType Optional */
-    private $subtype;
+    private ?PastoralSubType $subtype = null;
 
     /** @var null|PastoralSeverity Optional. Will be NULL if admin has configured 'pastoral_severity' to off. */
-    private $severity;
+    private ?PastoralSeverity $severity = null;
 
-    /** @var User */
-    protected $student;
+    /** @var User|null - Null if record is created from class list */
+    protected ?User $student;
 
     /** @var string */
-    protected $heading;
+    protected string $heading;
 
     /** @var bool */
-    protected $private;
+    protected bool $private;
 
-    /** @var string */
-    protected $bodyPrivate;
+    /** @var string|null */
+    protected ?string $bodyPrivate = null;
 
-    /** @var string */
-    protected $bodyPublic;
+    /** @var string|null */
+    protected ?string $bodyPublic = null;
 
     /** @var null|float */
-    protected $points;
+    protected ?float $points = null;
 
     /**
      * The user who created the record.
@@ -77,40 +78,40 @@ class Model implements ISoftDeletable, IModel
     private User $modifiedBy;
 
     /** @var GenericCollection<Access\Model>|null */
-    private $access;
+    private ?GenericCollection $access;
 
-    /** @var Collection|Comment\Model[] */
-    private $comments;
+    /** @var GenericCollection<Comment\Model> */
+    private GenericCollection $comments;
 
-    /** @var Collection|Attachment\Model[] */
-    private $attachments;
+    /** @var GenericCollection<Attachment\Model> */
+    private GenericCollection $attachments;
 
-    /** @var Collection|Tag\Model[] */
-    private $tags;
+    /** @var GenericCollection<Tag\Model> */
+    private GenericCollection $tags;
 
-    /** @var Collection|RecordAction\Model[] */
-    private $recordActions;
+    /** @var GenericCollection<RecordAction\Model> */
+    private GenericCollection $recordActions;
 
-    /** @var Collection|Model[] */
-    private $relatedRecords;
+    /** @var GenericCollection<Model> */
+    private GenericCollection $relatedRecords;
 
-    /** @var Collection|PastoralRevision[] */
-    private $revisions;
+    /** @var GenericCollection<PastoralRevision> */
+    private GenericCollection $revisions;
 
+    private ?Alaress_Date_Format $occurredOn = null;
 
     /**
      * Model constructor
      */
     public function __construct()
     {
-        // TODO tighten collection types
-        $this->access                = new GenericCollection(Access\Model::class);
-        $this->comments              = new Collection();
-        $this->attachments           = new Collection();
-        $this->tags                  = new Collection();
-        $this->recordActions         = new Collection();
-        $this->relatedRecords        = new Collection();
-        $this->revisions             = new Collection();
+        $this->access         = new GenericCollection(Access\Model::class);
+        $this->comments       = new GenericCollection(Comment\Model::class);
+        $this->attachments    = new GenericCollection(Attachment\Model::class);
+        $this->tags           = new GenericCollection(Tag\Model::class);
+        $this->recordActions  = new GenericCollection(RecordAction\Model::class);
+        $this->relatedRecords = new GenericCollection(Model::class);
+        $this->revisions      = new GenericCollection(PastoralRevision::class);
     }
 
     /**
@@ -118,7 +119,7 @@ class Model implements ISoftDeletable, IModel
      *
      * @return self
      */
-    public function setAccess(Collection $access)
+    public function setAccess(GenericCollection $access): self
     {
         $this->access = $access;
 
@@ -128,16 +129,16 @@ class Model implements ISoftDeletable, IModel
     /**
      * @return GenericCollection<Access\Model>|null
      */
-    public function getAccess()
+    public function getAccess(): ?GenericCollection
     {
         return $this->access;
     }
 
     /**
      * Returns access with role based permission
-     * @return Collection|Access\Model[]
+     * @return GenericCollection<Access\Model>
      */
-    public function getAccessWithPermission()
+    public function getAccessWithPermission(): GenericCollection
     {
         $accessWithPermission = clone $this->access;
         foreach ($accessWithPermission as $key => $access) {
@@ -153,11 +154,11 @@ class Model implements ISoftDeletable, IModel
     }
 
     /**
-     * @param Collection|Tag\Model[] $tags
+     * @param GenericCollection<Tag\Model> $tags
      *
      * @return self
      */
-    public function setTags(Collection $tags)
+    public function setTags(GenericCollection $tags): self
     {
         $this->tags = $tags;
 
@@ -165,19 +166,19 @@ class Model implements ISoftDeletable, IModel
     }
 
     /**
-     * @return Collection|Tag\Model[]
+     * @return GenericCollection<Tag\Model>
      */
-    public function getTags()
+    public function getTags(): GenericCollection
     {
         return $this->tags;
     }
 
     /**
-     * @param Collection|RecordAction\Model[] $recordActions
+     * @param GenericCollection<RecordAction\Model> $recordActions
      *
      * @return self
      */
-    public function setRecordActions(Collection $recordActions): self
+    public function setRecordActions(GenericCollection $recordActions): self
     {
         $this->recordActions = $recordActions;
 
@@ -185,9 +186,9 @@ class Model implements ISoftDeletable, IModel
     }
 
     /**
-     * @return Collection|RecordAction\Model[]
+     * @return GenericCollection<RecordAction\Model>
      */
-    public function getRecordActions()
+    public function getRecordActions(): GenericCollection
     {
         return $this->recordActions;
     }
@@ -206,7 +207,7 @@ class Model implements ISoftDeletable, IModel
      *
      * @return self
      */
-    public function setBodyPrivate($bodyPrivate)
+    public function setBodyPrivate(?string $bodyPrivate): self
     {
         $this->bodyPrivate = $bodyPrivate;
 
@@ -216,7 +217,7 @@ class Model implements ISoftDeletable, IModel
     /**
      * @return string|null
      */
-    public function getBodyPrivate()
+    public function getBodyPrivate(): ?string
     {
         return $this->bodyPrivate;
     }
@@ -226,7 +227,7 @@ class Model implements ISoftDeletable, IModel
      *
      * @return self
      */
-    public function setBodyPublic($bodyPublic)
+    public function setBodyPublic(?string $bodyPublic): self
     {
         $this->bodyPublic = $bodyPublic;
 
@@ -236,7 +237,7 @@ class Model implements ISoftDeletable, IModel
     /**
      * @return string|null
      */
-    public function getBodyPublic()
+    public function getBodyPublic(): ?string
     {
         return $this->bodyPublic;
     }
@@ -246,7 +247,7 @@ class Model implements ISoftDeletable, IModel
      *
      * @return self
      */
-    public function setHeading($heading)
+    public function setHeading(string $heading): self
     {
         $this->heading = $heading;
 
@@ -256,17 +257,17 @@ class Model implements ISoftDeletable, IModel
     /**
      * @return string
      */
-    public function getHeading()
+    public function getHeading(): string
     {
         return $this->heading;
     }
 
     /**
-     * @param float $points
+     * @param float|null $points
      *
      * @return self
      */
-    public function setPoints($points)
+    public function setPoints(?float $points): self
     {
         $this->points = $points;
 
@@ -274,19 +275,19 @@ class Model implements ISoftDeletable, IModel
     }
 
     /**
-     * @return float
+     * @return float|null
      */
-    public function getPoints()
+    public function getPoints(): ?float
     {
         return $this->points;
     }
 
     /**
-     * @param Collection|Comment\Model[] $comments
+     * @param GenericCollection<Comment\Model> $comments
      *
      * @return self
      */
-    public function setComments(Collection $comments)
+    public function setComments(GenericCollection $comments): self
     {
         $this->comments = $comments;
 
@@ -294,27 +295,27 @@ class Model implements ISoftDeletable, IModel
     }
 
     /**
-     * @return Collection|Comment\Model[]
+     * @return GenericCollection<Comment\Model>
      */
-    public function getComments()
+    public function getComments(): GenericCollection
     {
         return $this->comments;
     }
 
     /**
-     * @return Collection|Attachment\Model[]
+     * @return GenericCollection<Attachment\Model>
      */
-    public function getAttachments()
+    public function getAttachments(): GenericCollection
     {
         return $this->attachments;
     }
 
     /**
-     * @param Collection|Attachment\Model[] $attachments
+     * @param GenericCollection<Attachment\Model> $attachments
      *
      * @return self
      */
-    public function setAttachments(Collection $attachments)
+    public function setAttachments(GenericCollection $attachments): self
     {
         $this->attachments = $attachments;
 
@@ -322,11 +323,11 @@ class Model implements ISoftDeletable, IModel
     }
 
     /**
-     * @param null|int $externalId
+     * @param int|null $externalId
      *
      * @return self
      */
-    public function setExternalId($externalId)
+    public function setExternalId(?int $externalId): self
     {
         $this->externalId = $externalId;
 
@@ -336,7 +337,7 @@ class Model implements ISoftDeletable, IModel
     /**
      * @return null|int
      */
-    public function getExternalId()
+    public function getExternalId(): ?int
     {
         return $this->externalId;
     }
@@ -346,7 +347,7 @@ class Model implements ISoftDeletable, IModel
      *
      * @return self
      */
-    public function setType(PastoralType $type)
+    public function setType(PastoralType $type): self
     {
         $this->type = $type;
 
@@ -356,7 +357,7 @@ class Model implements ISoftDeletable, IModel
     /**
      * @return null|PastoralType
      */
-    public function getType()
+    public function getType(): ?PastoralType
     {
         return $this->type;
     }
@@ -366,7 +367,7 @@ class Model implements ISoftDeletable, IModel
      *
      * @return self
      */
-    public function setSubType(PastoralSubType $subtype = null)
+    public function setSubType(PastoralSubType $subtype = null): self
     {
         $this->subtype = $subtype;
 
@@ -376,7 +377,7 @@ class Model implements ISoftDeletable, IModel
     /**
      * @return null|PastoralSubType
      */
-    public function getSubType()
+    public function getSubType(): ?PastoralSubType
     {
         return $this->subtype;
     }
@@ -386,7 +387,7 @@ class Model implements ISoftDeletable, IModel
      *
      * @return self
      */
-    public function setParent(Model $parent = null)
+    public function setParent(Model $parent = null): self
     {
         $this->parent = $parent;
 
@@ -396,7 +397,7 @@ class Model implements ISoftDeletable, IModel
     /**
      * @return null|Model
      */
-    public function getParent()
+    public function getParent(): ?Model
     {
         return $this->parent;
     }
@@ -406,7 +407,7 @@ class Model implements ISoftDeletable, IModel
      *
      * @return self
      */
-    public function setSeverity(PastoralSeverity $severity = null)
+    public function setSeverity(PastoralSeverity $severity = null): self
     {
         $this->severity = $severity;
 
@@ -416,17 +417,17 @@ class Model implements ISoftDeletable, IModel
     /**
      * @return null|PastoralSeverity
      */
-    public function getSeverity()
+    public function getSeverity(): ?PastoralSeverity
     {
         return $this->severity;
     }
 
     /**
-     * @param User $student
+     * @param User|null $student
      *
      * @return self
      */
-    public function setStudent(User $student)
+    public function setStudent(?User $student): self
     {
         $this->student = $student;
 
@@ -436,7 +437,7 @@ class Model implements ISoftDeletable, IModel
     /**
      * @return User|null
      */
-    public function getStudent()
+    public function getStudent(): ?User
     {
         return $this->student;
     }
@@ -446,7 +447,7 @@ class Model implements ISoftDeletable, IModel
      *
      * @return self
      */
-    public function setOwner(User $owner)
+    public function setOwner(User $owner): self
     {
         $this->owner = $owner;
 
@@ -456,7 +457,7 @@ class Model implements ISoftDeletable, IModel
     /**
      * @return User
      */
-    public function getOwner()
+    public function getOwner(): User
     {
         return $this->owner;
     }
@@ -466,7 +467,7 @@ class Model implements ISoftDeletable, IModel
      *
      * @return self
      */
-    public function setUpdatedAtDisplay(Alaress_Date_Format $updatedAtDisplay)
+    public function setUpdatedAtDisplay(Alaress_Date_Format $updatedAtDisplay): self
     {
         $this->updatedAtDisplay = $updatedAtDisplay;
 
@@ -476,7 +477,7 @@ class Model implements ISoftDeletable, IModel
     /**
      * @return Alaress_Date_Format
      */
-    public function getUpdatedAtDisplay()
+    public function getUpdatedAtDisplay(): Alaress_Date_Format
     {
         // If this has not been calculated fall back to the records updated_at date
 
@@ -508,11 +509,11 @@ class Model implements ISoftDeletable, IModel
     }
 
     /**
-     * @param Collection|Model[] $relatedRecords
+     * @param GenericCollection<Model> $relatedRecords
      *
      * @return self
      */
-    public function setRelatedRecords(Collection $relatedRecords)
+    public function setRelatedRecords(GenericCollection $relatedRecords): self
     {
         $this->relatedRecords = $relatedRecords;
 
@@ -520,30 +521,48 @@ class Model implements ISoftDeletable, IModel
     }
 
     /**
-     * @return Collection|Model[]
+     * @return GenericCollection<Model>
      */
-    public function getRelatedRecords()
+    public function getRelatedRecords(): GenericCollection
     {
         return $this->relatedRecords;
     }
 
     /**
-     * @return Collection
+     * @return GenericCollection<PastoralRevision>
      */
-    public function getRevisions()
+    public function getRevisions(): GenericCollection
     {
         return $this->revisions;
     }
 
     /**
-     * @param Collection|PastoralRevision[] $revisions
+     * @param GenericCollection<PastoralRevision> $revisions
      *
      * @return self
      */
-    public function setRevisions(Collection $revisions)
+    public function setRevisions(GenericCollection $revisions): self
     {
         $this->revisions = $revisions;
 
+        return $this;
+    }
+
+    /**
+     * @return Alaress_Date_Format|null
+     */
+    public function getOccurredOn(): ?Alaress_Date_Format
+    {
+        return $this->occurredOn;
+    }
+
+    /**
+     * @param Alaress_Date_Format|null $occurredOn
+     * @return static
+     */
+    public function setOccurredOn(?Alaress_Date_Format $occurredOn): self
+    {
+        $this->occurredOn = $occurredOn;
         return $this;
     }
 }

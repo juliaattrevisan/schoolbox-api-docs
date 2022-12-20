@@ -166,6 +166,8 @@ class AccessLevelCensorTest extends TestCase
             ->setOwner($ownerX)
             ->setModifiedBy($ownerX)
             ->setStudent($studentX)
+            ->setType((new Pastoral\Type\Model())->setId(1)->setName('type'))
+            ->setExternalId(null)
         ;
         $recordXPublic = $this->filterPrivate($recordX);
 
@@ -241,6 +243,8 @@ class AccessLevelCensorTest extends TestCase
             ->setHeading($name)
             ->setId($this->guid++)
             ->setOwner($owner)
+            ->setType((new Pastoral\Type\Model())->setId(1)->setName('type'))
+            ->setExternalId(null)
             ->setModifiedBy($owner)
             ->setStudent($student)
             ->setBodyPrivate('Private Body')

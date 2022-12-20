@@ -7,24 +7,34 @@
     {% set saveRoute = routeLookup('pastoral.postRecordUpdate', {recordId: record.id}) %}
     {% set pageTitle = 'Update ' ~ locale.pastoral.proper ~ ' Record' %}
     {% set visibilityLocked = record.subtype ? record.subtype.visibilityLocked : record.type.visibilityLocked %}
+    {% set isModify = true %}
 {% else %}
     {% set saveRoute = routeLookup('pastoral.postRecordInsert') %}
     {% set pageTitle = 'Add ' ~ locale.pastoral.proper ~ ' Record' %}
     {% set visibilityLocked = false %}
+    {% set isModify = false %}
 {% endif %}
 {% set bulkCreate = record.student is null %}
 {% if bulkCreate %}
     {{ bread.crumbs(
-        [ locale.pastoralCare.proper,   routeLookup('pastoral.getIndex') ],
+        [ locale.pastoralCare.proper, routeLookup('pastoral.getIndex') ],
         [ pageTitle ]
     ) }}
 {% else %}
-    {{ bread.crumbs(
-        [ locale.pastoralCare.proper,   routeLookup('pastoral.getIndex') ],
-        [ record.student.fullName,      routeLookup('pastoral.getStudent', {studentId: record.student.id}) ],
-        [ record.heading,               routeLookup('pastoral.getStudentRecord', {studentId: record.student.id, recordId: record.id}) ],
-        [ pageTitle ]
-    ) }}
+    {% if isModify %}
+        {{ bread.crumbs(
+            [ locale.pastoralCare.proper, routeLookup('pastoral.getIndex') ],
+            [ record.student.fullName,    routeLookup('pastoral.getStudent', {studentId: record.student.id}) ],
+            [ record.heading,             routeLookup('pastoral.getStudentRecord', {studentId: record.student.id, recordId: record.id}) ],
+            [ pageTitle ]
+        ) }}
+    {% else %}
+        {{ bread.crumbs(
+            [ locale.pastoralCare.proper, routeLookup('pastoral.getIndex') ],
+            [ record.student.fullName,    routeLookup('pastoral.getStudent', {studentId: record.student.id}) ],
+            [ pageTitle ]
+        ) }}
+    {% endif %}
     <div class="row">
         <div>
             <div class="small-12 column">
@@ -42,7 +52,7 @@
                     <h2 class="subheader">{{ pageTitle }}</h2>
                 </div>
             </div>
-            {% if record.id is not empty and isRouteAuthorized('pastoral.postDelete', {record: record}) %}
+            {% if isModify and isRouteAuthorized('pastoral.postDelete', {record: record}) %}
                 <nav class="hide" id="formPastoralDelete">
                     <a href="#" data-delete class="icon-delete" title="Delete {{ locale.pastoral.proper }} Record"></a>
                 </nav>

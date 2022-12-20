@@ -206,7 +206,7 @@ class Controller extends Base
      * @throws MapperException
      * @throws RouteNotFound
      */
-    public function getStudent($student): void
+    public function getStudent(User $student): void
     {
         $get = $this->getRequest()->query;
 
@@ -278,7 +278,7 @@ class Controller extends Base
      * @param User $linkedStudent
      * @throws MapperException
      */
-    public function getLinked($student, $linkedStudent): void
+    public function getLinked(User $student, User $linkedStudent): void
     {
         $get = $this->getRequest()->query;
 
@@ -363,12 +363,6 @@ class Controller extends Base
      */
     public function getStudentRecord(Model $record, User $student): void
     {
-        // They've manually put an ID number they don't have access to- so the record doesn't get hydrated in preload
-
-        if (!$record instanceof Model) {
-            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
-        }
-
         // Create an audit record
 
         $auditRecord = $this->pastoralAuditMapper->createModel();
@@ -444,6 +438,7 @@ class Controller extends Base
      * Insert pastoral care record
      *
      * @param User|null $student // can be null, if requested from classlist
+     * @return void
      * @throws MapperException
      */
     public function getStudentRecordInsertForm(?User $student): void
@@ -453,7 +448,13 @@ class Controller extends Base
         $record = $this->pastoralDataSource->createModel();
         if ($student) {
             $record->setStudent($student);
+            $this->externalUser->loadParents([$record->getStudent()]);
+        } else {
+            // bulk modify
+            $record->setStudent(null);
         }
+        // set default occurred on
+        $record->setOccurredOn(\Alaress_Date_Format::now()->startOfDay());
 
         $this->getStudentRecordUpdateForm($record);
     }
@@ -463,10 +464,10 @@ class Controller extends Base
      * Update pastoral care record
      *
      * @param Model $record
-     *
-     * @throws \JsonException
+     * @return void
+     * @throws MapperException
      */
-    public function getStudentRecordUpdateForm($record): void
+    public function getStudentRecordUpdateForm(Model $record): void
     {
         if (!$this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_SEVERITY_ENABLED)) {
             $severities = [];
@@ -498,7 +499,6 @@ class Controller extends Base
             'g.group_type' => Role::STUDENT,
         ]);
         $this->externalUser->loadParents($duplicates);
-        $this->externalUser->loadParents([$record->getStudent()]);
 
         /** @var Role $roleCurrent */
         foreach ($allowedRoles as $roleCurrent) {
@@ -640,7 +640,7 @@ class Controller extends Base
      * @param PastoralComment $comment
      * @throws MapperException
      */
-    public function postCommentDelete($comment): void
+    public function postCommentDelete(PastoralComment $comment): void
     {
         // Delete from internal database
 
@@ -704,10 +704,10 @@ class Controller extends Base
      *
      * @param string $tagIdCsv
      * @param string $tagNameCsv
-     * @return Collection
+     * @return GenericCollection
      * @throws MapperException
      */
-    private function prepareTags(string $tagIdCsv, string $tagNameCsv): Collection
+    private function prepareTags(string $tagIdCsv, string $tagNameCsv): GenericCollection
     {
         $tagNames = array_map('trim', array_filter(explode(',', $tagNameCsv)));
         // remove new tags set as string starting from 'new-'
@@ -850,7 +850,7 @@ class Controller extends Base
     /**
      * Create/update student records
      *
-     * @param int                $primaryStudentId    The primary records student ID
+     * @param int                $primaryStudentId    The primary record's student ID
      * @param RequestValues      $post                POST parameters passed by the create/update form
      * @param array              $duplicateStudentIds List of students the primary record should be duplicated on
      * @param PastoralModel|null $parent              Parent record (if we are updating an existing record)
@@ -990,6 +990,19 @@ class Controller extends Base
             $record->setSeverity($severity);
             $record->setModifiedBy($this->getUser());
             $record->setHeading($heading);
+            if ($post->offsetExists('occurredOn')) {
+                if ((string)$post->get('occurredOn') === '') {
+                    $record->setOccurredOn(null);
+                } else {
+                    try {
+                        $occurredOn = \Alaress_Date_Format::newLocalShort($post->get('occurredOn'))->startOfDay();
+                        $record->setOccurredOn($occurredOn);
+                    } catch (\Exception $e) {
+                        $locale = new \Alaress_Date_Locale_Config();
+                        throw new SchoolboxException("occurredOn must be in the format of {$locale->localShortFormat()}");
+                    }
+                }
+            }
             if ($post->get('points')) {
                 $points = $post->getFloat('points');
                 if (!is_numeric($post->get('points')) || $points < -1000000 || $points > 1000000) {
@@ -1018,6 +1031,7 @@ class Controller extends Base
             if (!$record->getId()) {
                 $record->setOwner($this->getUser());
             }
+            $record->setExternalId(null);
             $this->pastoralDataSource->save($record);
 
             // Store the first records ID for use as parent for subsequent copies
@@ -1159,12 +1173,12 @@ class Controller extends Base
     /**
      * Insert an attach zone into the template
      *
-     * @param string        $name   Name of attachzone on page
-     * @param PastoralModel $record Pastoral record from which to load existing attachments
+     * @param string             $name   Name of attachzone on page
+     * @param PastoralModel|null $record Pastoral record from which to load existing attachments
      *
      * @return array
      */
-    private function getAttachZone($name, $record = null): array
+    private function getAttachZone(string $name, ?PastoralModel $record = null): array
     {
         $zone = new Zone($name);
         $zone

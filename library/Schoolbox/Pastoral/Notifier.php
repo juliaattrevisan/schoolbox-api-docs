@@ -49,6 +49,7 @@ class Notifier extends AbstractModuleNotifier
         'heading',
         'bodyPrivate',
         'bodyPublic',
+        'occurredOn',
         'points',
         'attachmentsPrivate',
         'attachmentsPublic',
