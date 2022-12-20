@@ -53,77 +53,81 @@ class Controller extends Base
     {
         $participant = $assessment->getParticipantIfExtant($student);
 
-        /* A list of Responses and Feedbacks, as per the Submission History
-         */
-        $timeline = (new Full($participant))->getForTeacher();
-
         /* Convert this into a struct specifically for the ui
          */
         $stack = [];
 
-        foreach ($timeline as $interaction) {
-            if ($interaction instanceof AbstractFeedback) {
+        /* null participants return empty set
+         */
+        if (null !== $participant) {
+            /* A list of Responses and Feedbacks, as per the Submission History
+                     */
+            $timeline = (new Full($participant))->getForTeacher();
+
+            foreach ($timeline as $interaction) {
+                if ($interaction instanceof AbstractFeedback) {
+                    $stack[] = [
+                        'type' => self::INTERACTION_FEEDBACK,
+                        'instructor' => [
+                            'id' => $interaction->getReviewer()->getId(),
+                            'name' => $interaction->getReviewer()->getFullname(),
+                        ],
+                        'learner' => [
+                            'id' => $interaction->getReviewee()->getId(),
+                            'name' => $interaction->getReviewee()->getFullname()
+                        ],
+                        'date' => [
+                            'datetime' => $interaction->getPublishedAt()->getDatabase(),
+                            'short' => $interaction->getPublishedAt()->getShort(),
+                            'relative' => $interaction->getPublishedAt()->getRelativeTime(),
+                        ]
+                    ];
+                } elseif ($interaction instanceof AbstractResponse) {
+                    $stack[] = [
+                        'type' => self::INTERACTION_RESPONSE,
+                        'learner' => [
+                            'id' => $interaction->getSubmittedOnBehalfOf()->getId(),
+                            'name' => $interaction->getSubmittedOnBehalfOf()->getFullname()
+                        ],
+                        'date' => [
+                            'datetime' => $interaction->getSubmittedAt()->getDatabase(),
+                            'short' => $interaction->getSubmittedAt()->getShort(),
+                            'relative' => $interaction->getSubmittedAt()->getRelativeTime(),
+                        ]
+                    ];
+                }
+            }
+
+            /* A list of Views, which aren't really part of the Submission History
+             * but we want to show them anyway. Shank them right in
+             */
+            $views = $this->assessmentViewMapper->findByColumnList([
+                'assessment_id' => $assessment->getId(),
+                'participant_id' => $student->getId(),
+            ]);
+
+            foreach ($views as $interaction) {
                 $stack[] = [
-                    'type' => self::INTERACTION_FEEDBACK,
-                    'instructor' => [
-                        'id' => $interaction->getReviewer()->getId(),
-                        'name' => $interaction->getReviewer()->getFullname(),
-                    ],
-                    'learner' => [
-                        'id' => $interaction->getReviewee()->getId(),
-                        'name' => $interaction->getReviewee()->getFullname()
+                    'type' => self::INTERACTION_VIEW,
+                    'viewer' => [
+                        'id' => $interaction->getUser()->getId(),
+                        'name' => $interaction->getUser()->getFullName(),
                     ],
                     'date' => [
-                        'datetime' => $interaction->getPublishedAt()->getDatabase(),
-                        'short' => $interaction->getPublishedAt()->getShort(),
-                        'relative' => $interaction->getPublishedAt()->getRelativeTime(),
-                    ]
-                ];
-            } elseif ($interaction instanceof AbstractResponse) {
-                $stack[] = [
-                    'type' => self::INTERACTION_RESPONSE,
-                    'learner' => [
-                        'id' => $interaction->getSubmittedOnBehalfOf()->getId(),
-                        'name' => $interaction->getSubmittedOnBehalfOf()->getFullname()
-                    ],
-                    'date' => [
-                        'datetime' => $interaction->getSubmittedAt()->getDatabase(),
-                        'short' => $interaction->getSubmittedAt()->getShort(),
-                        'relative' => $interaction->getSubmittedAt()->getRelativeTime(),
+                        'datetime' => $interaction->getLastVisit()->getDatabase(),
+                        'short' => $interaction->getLastVisit()->getShort(),
+                        'relative' => $interaction->getLastVisit()->getRelativeTime(),
                     ]
                 ];
             }
+
+            /* Reverse chronologically sort that array stack again,
+             * due to the shanking of Assessment Views
+             */
+            usort($stack, static function (array $a, array $b): int {
+                return strtotime($b['date']['datetime']) <=> strtotime($a['date']['datetime']);
+            });
         }
-
-        /* A list of Views, which aren't really part of the Submission History
-         * but we want to show them anyway. Shank them right in
-         */
-        $views = $this->assessmentViewMapper->findByColumnList([
-            'assessment_id' => $assessment->getId(),
-            'participant_id' => $student->getId(),
-        ]);
-
-        foreach ($views as $interaction) {
-            $stack[] = [
-                'type' => self::INTERACTION_VIEW,
-                'viewer' => [
-                    'id' => $interaction->getUser()->getId(),
-                    'name' => $interaction->getUser()->getFullName(),
-                ],
-                'date' => [
-                    'datetime' => $interaction->getLastVisit()->getDatabase(),
-                    'short' => $interaction->getLastVisit()->getShort(),
-                    'relative' => $interaction->getLastVisit()->getRelativeTime(),
-                ]
-            ];
-        }
-
-        /* Reverse chronologically sort that array stack again,
-         * due to the shanking of Assessment Views
-         */
-        usort($stack, static function (array $a, array $b): int {
-            return strtotime($b['date']['datetime']) <=> strtotime($a['date']['datetime']);
-        });
 
         $this->getResponse()->content->set(
             $this->buildJsonOutput($stack)
