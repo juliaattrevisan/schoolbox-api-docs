@@ -63,7 +63,7 @@ class Controller extends Base
         foreach ($timeline as $interaction) {
             if ($interaction instanceof AbstractFeedback) {
                 $stack[] = [
-                    'type' => 'feedback',
+                    'type' => self::INTERACTION_FEEDBACK,
                     'instructor' => [
                         'id' => $interaction->getReviewer()->getId(),
                         'name' => $interaction->getReviewer()->getFullname(),
@@ -80,7 +80,7 @@ class Controller extends Base
                 ];
             } elseif ($interaction instanceof AbstractResponse) {
                 $stack[] = [
-                    'type' => 'response',
+                    'type' => self::INTERACTION_RESPONSE,
                     'learner' => [
                         'id' => $interaction->getSubmittedOnBehalfOf()->getId(),
                         'name' => $interaction->getSubmittedOnBehalfOf()->getFullname()
@@ -104,7 +104,7 @@ class Controller extends Base
 
         foreach ($views as $interaction) {
             $stack[] = [
-                'type' => 'view',
+                'type' => self::INTERACTION_VIEW,
                 'viewer' => [
                     'id' => $interaction->getUser()->getId(),
                     'name' => $interaction->getUser()->getFullName(),
