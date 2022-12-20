@@ -306,7 +306,7 @@ class CommandLineTool extends App
                     'mimetype'    => $storage->getMime(),
                     'filename'    => $filename,
                     'filemtime'   => $file['filemtime'],
-                    'path'        => sprintf('%s/%s_Evidence_%d_%s', $yearLevel, $externalId, $j + 1, $filename),
+                    'path'        => sprintf('%s/%s_ACADEMIC_NCCD TEACHER EVIDENCE_%d.%s', $yearLevel, $externalId, $j + 1, $storage->getExtension()),
                 ];
                 $comment = $file['comment'] ?? '';
                 if ($comment !== '') {
@@ -317,7 +317,7 @@ class CommandLineTool extends App
                         'mimetype'    => 'text/html',
                         'filename'    => $filename,
                         'filemtime'   => $file['filemtime'],
-                        'path'        => sprintf('%s/%s_Evidence_%d_%s', $yearLevel, $externalId, $j + 1, $filename),
+                        'path'        => sprintf('%s/%s_ACADEMIC_NCCD TEACHER EVIDENCE_%d_comment.html', $yearLevel, $externalId, $j + 1),
                     ];
                 }
             }
