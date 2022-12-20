@@ -58,7 +58,7 @@
             {# Round the percentage values to prevent things like '66.666666%' being displayed. #}
             {% set displayPercentageResponseRequired = (100 - stats.percentageResponseRequired) | round %}
             {% set displayPercentageReviewComplete = stats.percentageReviewComplete | round %}
-            
+
 
             <div class="progress-bar"
                 data-progress
@@ -73,9 +73,9 @@
                     <div class="meter warning" style="width: {{ (100 - stats.percentageResponseRequired) }}%;">
                         <div>{{ displayPercentageResponseRequired }}%</div>
                     </div>
-                    <div 
-                        class="meter success" 
-                        title="{{stats.countReviewComplete}} of {{stats.countParticipants}} students {{ markedPastTense }}" 
+                    <div
+                        class="meter success"
+                        title="{{stats.countReviewComplete}} of {{stats.countParticipants}} students {{ markedPastTense }}"
                         style="width: {{ stats.percentageReviewComplete }}%;"
                     >
                         <div>{{ displayPercentageReviewComplete }}%</div>
@@ -83,8 +83,8 @@
                 </div>
                 <div class="legend">
                     <div class="legend-item success">{{ stats.countReviewComplete }} {{ markedPastTense }}</div>
-                    <div class="legend-item">{{ stats.countParticipants - stats.countResponseRequired }} OF {{ stats.countParticipants }} {{ submitTitleSuffix }}</div>
-                    <div class="legend-item warning">{{ stats.countFeedbackRequired }} REQUIRE {{ markedTitleSuffix }}</div>
+                    <div class="legend-item warning">{{ stats.countFeedbackRequired }} require {{ markedTitleSuffix }}</div>
+                    <div class="legend-item">{{ stats.countParticipants - stats.countResponseRequired }} of {{ stats.countParticipants }} {{ submitTitleSuffix }}</div>
                 </div>
             </div>
         </div>

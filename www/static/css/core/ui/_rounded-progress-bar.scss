@@ -19,19 +19,28 @@
 
     .legend {
         display: inline-flex;
-        flex-wrap: wrap;
-        font-weight: 700;
-        font-size: 0.75rem;
+        font-size: 13px;
         gap: 0.25rem 1rem;
         margin-bottom: 0.5rem;
-        text-transform: uppercase;
+        padding: 0 0.5rem;
+        text-transform: lowercase;
+        font-style: italic;
         width: 100%;
 
         &-item {
-            color: black;
+            color: var(--body-foreground);
+
+            &:last-child {
+                margin-left: auto;
+
+                &:before {
+                    content: none;
+                }
+            }
 
             &.success:before {
                 background-color: $success-color;
+                background-color: hsl(106.7783985102deg, 42.3208729442%, 49.8692810458%);
             }
 
             &.info:before {
@@ -44,15 +53,16 @@
 
             &.alert:before {
                 background-color: $alert-color;
+
             }
 
             &.warning:before {
                 background-color: $warning-color;
+                background-color: hsl(27.4487895717deg, 81.6119642678%, 59.6732026144%)
             }
 
-
             &:before {
-                background-color: black;
+                background-color: var(--body-foreground);
                 border-radius: 1rem;
                 content: '';
                 display: inline-block;
@@ -103,10 +113,12 @@
 
         &.warning{
             background-color: $warning-color;
+            background-color: hsl(27.4487895717deg, 81.6119642678%, 59.6732026144%)
         }
 
         &.success {
             background-color: $success-color;
+            background-color: hsl(106.7783985102deg, 42.3208729442%, 49.8692810458%);
         }
 
         div {
@@ -117,11 +129,12 @@
             font-size: 0.75rem;
             margin: 0 0.25rem;
             padding: 0 0.25rem;
+            opacity: 1;
         }
 
         &:hover {
             z-index: 2;
-            filter: brightness(1.15);
+            //filter: brightness(1.15);
         }
     }
 
