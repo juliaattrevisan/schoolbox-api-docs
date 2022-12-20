@@ -60,7 +60,7 @@
             {% set displayPercentageReviewComplete = stats.percentageReviewComplete | round %}
 
 
-            <div class="progress-bar"
+            <div class="rounded-progress-bar"
                 data-progress
                 title="{{ stats.countParticipants - stats.countResponseRequired }} of {{ stats.countParticipants }} students have {{ submitTitleSuffix }}"
                 data-title-suffix="{{ submitTitleSuffix }}"

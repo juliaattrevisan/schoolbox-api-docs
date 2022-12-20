@@ -8,7 +8,7 @@
     pending assessments page.
 */
 
-.progress-bar {
+.rounded-progress-bar {
     -webkit-user-select: none;
     user-select: none;
 
@@ -39,8 +39,7 @@
             }
 
             &.success:before {
-                background-color: $success-color;
-                background-color: hsl(106.7783985102deg, 42.3208729442%, 49.8692810458%);
+                background-color: $gradient-8;
             }
 
             &.info:before {
@@ -57,8 +56,7 @@
             }
 
             &.warning:before {
-                background-color: $warning-color;
-                background-color: hsl(27.4487895717deg, 81.6119642678%, 59.6732026144%)
+                background-color: $gradient-2;
             }
 
             &:before {
@@ -112,13 +110,11 @@
         }
 
         &.warning{
-            background-color: $warning-color;
-            background-color: hsl(27.4487895717deg, 81.6119642678%, 59.6732026144%)
+            background-color: $gradient-2;
         }
 
         &.success {
-            background-color: $success-color;
-            background-color: hsl(106.7783985102deg, 42.3208729442%, 49.8692810458%);
+            background-color: $gradient-8;
         }
 
         div {
@@ -134,7 +130,6 @@
 
         &:hover {
             z-index: 2;
-            //filter: brightness(1.15);
         }
     }
 
