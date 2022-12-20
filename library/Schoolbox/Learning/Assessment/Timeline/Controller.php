@@ -50,6 +50,8 @@ class Controller extends Base
          */
         if (null !== $participant) {
             $stack = (new FullWithViews($participant, $this->assessmentViewMapper))->getForTeacher($assessment, $student);
+
+            new \Alaress_Probe($stack);
         }
 
         $this->getResponse()->content->set(

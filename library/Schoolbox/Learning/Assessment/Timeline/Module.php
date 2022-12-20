@@ -45,7 +45,8 @@ class Module extends BaseModule
          */
         $fulltimelinePerms = new Rule\Any(
             new Rule\IsSuperuser(),
-            new IsInstructor(Access::getInstance(),
+            new IsInstructor(
+                Access::getInstance(),
                 static function (array $params): FolderModel {
                     if (isset($params['assessment']) && $params['assessment'] instanceof IAssessable) {
                         return $params['assessment']->getBaseContext()->getFolder();
