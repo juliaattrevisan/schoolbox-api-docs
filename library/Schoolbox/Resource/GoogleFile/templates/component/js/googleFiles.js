@@ -45,6 +45,8 @@ $('#find-files').on('click', function () {
 
 $('#find-files').googlePicker({
     clientId: $('#googleFiles').attr('data-client-id'),
+    googleAccessToken: window.googleAccessToken,
+    googleAccessTokenType: window.googleAccessTokenType,
     mimeTypes: [
         'application/msword',
         'application/vnd.ms-powerpoint',
@@ -146,6 +148,8 @@ $step2.on('click', 'a[data-action]', function (e) {
 $(`#component${componentId} [data-action="delete"]`).on('click', function (event) {
     event.preventDefault();
     $(this).confirmDialog({
+        googleAccessToken: window.googleAccessToken,
+        googleAccessTokenType: window.googleAccessTokenType,
         text: 'Are you sure you want to delete this google file?',
         confirmLabel: 'Delete',
         confirmEvent: function () {
@@ -162,6 +166,8 @@ $(`#component${componentId} [data-action="delete"]`).on('click', function (event
 
 $(`#component${componentId} [data-action="permission"]`).googlePicker({
     clientId: $('#googleFiles').attr('data-client-id'),
+    googleAccessToken: window.googleAccessToken,
+    googleAccessTokenType: window.googleAccessTokenType,
     onAuth: function () {
         $('[data-action="continue"]').removeAttr('disabled');
         $('[data-action="share"]').removeAttr('disabled');

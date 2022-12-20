@@ -57,6 +57,8 @@
           callback: function () {
               $('#content').googlePicker({
                   clientId: '{CLIENT_ID}',
+                  googleAccessToken: '{{ config.googleAccessToken }}',
+                  googleAccessTokenType: '{{ config.googleAccessTokenType }}',
                   listener: false,
                   modalId: null,
                   views: [{VIEWS}],

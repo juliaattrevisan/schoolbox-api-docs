@@ -36,6 +36,8 @@
          */
         function init(options, element) {
             let defaults = {
+                googleAccessToken: '',
+                googleAccessTokenType: '',
 
                 /* The link which activates the Google picker
                  */
@@ -100,10 +102,21 @@
                 if (authResult.error !== undefined) {
                     throw authResult.error;
                 }
-                handleAuthResult();
+                handleAuthResult(true);
             };
 
-            if (config.authBtn && $(config.authBtn).hasClass('hide')) {
+            config.googleAccessToken = '';
+            config.googleAccessTokenType = '';
+
+            if (config.googleAccessToken !== '' && config.googleAccessTokenType !== '') {
+                // We already have the googleAccessToken (retrieved from the PHP session), so mimic a successful
+                // response to googleClientToken.requestAccessToken().
+                authResult = {
+                    access_token: config.googleAccessToken,
+                    token_type: config.googleAccessTokenType
+                };
+                handleAuthResult(false); // Do not send the token to the server, because that's where it came from.
+            } else if (config.authBtn && $(config.authBtn).hasClass('hide')) {
                 // If the auth button is hidden, show the button so the user can click to authorise access to Google files.
                 $(config.authBtn).removeClass('hide');
             } else {
@@ -116,7 +129,7 @@
          * Respond to Google when you get past the authentication request
          * Spawn our modal and detect when we close the Google modal; react accordingly
          */
-        function handleAuthResult() {
+        function handleAuthResult(sendAccessTokenToServer) {
             if (authResult && !authResult.error) {
                 if (config.authBtn && !$(config.authBtn).hasClass('hide')) {
                     $(config.authBtn).addClass('hide');
@@ -125,17 +138,18 @@
                 $('#gfile-token-type').val(authResult.token_type);
                 config.onAuth.call($(this.element), authResult.access_token);
 
-                // Store authResult.access_token and authResult.token_type in a cookie so that repeated use of the
-                // Google picker will not require repeated authorisation.
-                $.ajax({
-                    data: {accessToken: authResult.access_token, tokenType: authResult.token_type},
-                    dataType: 'json',
-                    method: 'post',
-                    url: '/googleFile/saveAccessTokenToSession',
-                    success: function (response) {
-                        console.info('picker.js handleAuthResult() save cookie success!  response: ', response);
-                    }
-                });
+                if (sendAccessTokenToServer) {
+                    // Store authResult.access_token and authResult.token_type to a PHP session so that repeated use of the
+                    // Google picker will not require repeated authorisation.
+                    // This happens in the background, so we don't need to do anything in response to ajax success or error.
+                    // If case of error, the user will just have to re-authorise every time they open the Google picker.
+                    $.ajax({
+                        data: {accessToken: authResult.access_token, tokenType: authResult.token_type},
+                        dataType: 'json',
+                        method: 'post',
+                        url: '/googleFile/saveAccessTokenToSession'
+                    });
+                }
             }
         }
 

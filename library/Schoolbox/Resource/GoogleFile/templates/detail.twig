@@ -25,9 +25,11 @@
             modules: ['client'], // NOTE: gapi.client will not exist unless we load the 'client' module.
             callback: function () {
                 $('#google-file-content').googlePicker({
-                    clientId: '{{ config.googleapps_client_id }}',
-                    listener: false,
                     authBtn: '#google-authenticate',
+                    clientId: '{{ config.googleapps_client_id }}',
+                    googleAccessToken: '{{ googleAccessToken }}',
+                    googleAccessTokenType: '{{ googleAccessTokenType }}',
+                    listener: false,
                     onAuth: function () {
                         gapi.client.load('drive', 'v3', function () {
                             let getViewLink = gapi.client.drive.files.get({
