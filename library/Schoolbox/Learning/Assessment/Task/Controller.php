@@ -418,6 +418,10 @@ class Controller extends Assessment\Controller
         // And save (no need to save a feedback - it will be built automatically from this response on DB retrieval)
         $this->taskResponseDataSource->save($taskResponse);
 
+        // Update project
+        (new Assessment\Project\ResultCache\ResultCache($this->projectResultCacheMapper))
+            ->refresh($this->getAssessmentMapper(), $assessment, $student);
+
         return $taskResponse;
     }
 }
