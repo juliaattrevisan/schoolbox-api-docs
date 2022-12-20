@@ -63,13 +63,9 @@ class FullWithViews
             if ($interaction instanceof AbstractFeedback) {
                 $stack[] = [
                     'type' => self::INTERACTION_FEEDBACK,
-                    'instructor' => [
+                    'effector' => [
                         'id' => $interaction->getReviewer()->getId(),
                         'name' => $interaction->getReviewer()->getFullname(),
-                    ],
-                    'learner' => [
-                        'id' => $interaction->getReviewee()->getId(),
-                        'name' => $interaction->getReviewee()->getFullname()
                     ],
                     'date' => [
                         'datetime' => $interaction->getPublishedAt()->getDatabase(),
@@ -80,7 +76,7 @@ class FullWithViews
             } elseif ($interaction instanceof AbstractResponse) {
                 $stack[] = [
                     'type' => self::INTERACTION_RESPONSE,
-                    'learner' => [
+                    'effector' => [
                         'id' => $interaction->getSubmittedOnBehalfOf()->getId(),
                         'name' => $interaction->getSubmittedOnBehalfOf()->getFullname()
                     ],
@@ -99,13 +95,9 @@ class FullWithViews
             foreach ($response->getAllFeedback() as $interaction) {
                 $stack[] = [
                     'type' => self::INTERACTION_FEEDBACK,
-                    'instructor' => [
+                    'effector' => [
                         'id' => $interaction->getReviewer()->getId(),
                         'name' => $interaction->getReviewer()->getFullname(),
-                    ],
-                    'learner' => [
-                        'id' => $interaction->getReviewee()->getId(),
-                        'name' => $interaction->getReviewee()->getFullname()
                     ],
                     'date' => [
                         'datetime' => $interaction->getPublishedAt()->getDatabase(),
@@ -127,7 +119,7 @@ class FullWithViews
         foreach ($views as $interaction) {
             $stack[] = [
                 'type' => self::INTERACTION_VIEW,
-                'viewer' => [
+                'effector' => [
                     'id' => $interaction->getUser()->getId(),
                     'name' => $interaction->getUser()->getFullName(),
                 ],
