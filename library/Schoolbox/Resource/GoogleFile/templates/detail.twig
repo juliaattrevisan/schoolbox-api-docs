@@ -31,6 +31,7 @@
                     googleAccessTokenType: '{{ googleAccessTokenType }}',
                     listener: false,
                     onAuth: function () {
+                        gapi.client.setToken({access_token: '{{ googleAccessToken }}'});
                         gapi.client.load('drive', 'v3', function () {
                             let getViewLink = gapi.client.drive.files.get({
                                 'fields': 'webViewLink',
