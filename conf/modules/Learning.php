@@ -19,6 +19,7 @@ use Schoolbox\Learning\Assessment\DueWork\Feedback\Module as DueworkFeedbackModu
 use Schoolbox\Learning\Assessment\DueWork\Response\Module as DueworkResponseModule;
 use Schoolbox\Learning\Assessment\Exporter\Module as AssessmentExporterModule;
 use Schoolbox\Learning\Assessment\Module as AssessmentModule;
+use Schoolbox\Learning\Assessment\Timeline\Module as TimelineModule;
 use Schoolbox\Learning\Badge\Award\Module as BadgeAwardModule;
 use Schoolbox\Learning\Badge\Module as BadgeModule;
 use Schoolbox\Learning\Grades;
@@ -112,5 +113,9 @@ class Learning extends ModuleLoader
          * dupe of the student my classes page, but for courses
          */
         $this->loadModule($di, StudentCourseModule::class, "/{$namespace}/courses/student");
+
+        /* Assessment Timelines, accessed asynchronously
+         */
+        $this->loadModule($di, TimelineModule::class, "/{$namespace}/assessment/timeline");
     }
 }
