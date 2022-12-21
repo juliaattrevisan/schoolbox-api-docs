@@ -36,7 +36,7 @@ class Mapper extends \Schoolbox\Mapper
 
         /* TODO Misleading naming SA-14957
          */
-        $this->joins('participant_id', UserMapper::class, 'id', null, null,  'participant', 'participant');
+        $this->joins('participant_id', UserMapper::class, 'id', null, null, 'participant', 'participant');
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
 
         $this->uses('last_visit', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
