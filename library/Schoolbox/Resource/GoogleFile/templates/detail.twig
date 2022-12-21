@@ -24,6 +24,9 @@
         $.fn.setupGapi({
             modules: ['client'], // NOTE: gapi.client will not exist unless we load the 'client' module.
             callback: function () {
+                // TODO: I suspect that the Google Picker module is not actually required here.  I think we only need the Google Drive module.
+                //       So possibly the code below can be simplified.  Or maybe the code pertaining to authorisation should be removed
+                //       from the googlePicker() function, since it is required for both the Google Picker and the Google Drive.
                 $('#google-file-content').googlePicker({
                     authBtn: '#google-authenticate',
                     clientId: '{{ config.googleapps_client_id }}',
