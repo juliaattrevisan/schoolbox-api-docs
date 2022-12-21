@@ -80,6 +80,7 @@ class FullWithViews
                         'id' => $interaction->getSubmittedOnBehalfOf()->getId(),
                         'name' => $interaction->getSubmittedOnBehalfOf()->getFullname()
                     ],
+                    'submittedOnTime' => $interaction->isSubmittedOnTime(),
                     'date' => [
                         'datetime' => $interaction->getSubmittedAt()->getDatabase(),
                         'short' => $interaction->getSubmittedAt()->getShort(),
