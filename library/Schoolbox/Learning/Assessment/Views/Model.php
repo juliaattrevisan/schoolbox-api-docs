@@ -28,6 +28,8 @@ class Model
      */
     private int $participantId;
 
+    private User $participant;
+
     /**
      * User
      */
@@ -80,15 +82,24 @@ class Model
 
 
     /**
+     * @return User
+     */
+    public function getParticipant(): User
+    {
+        return $this->participant;
+    }
+
+
+    /**
      * @param User $participant
      * @return $this
-     *
      */
     public function setParticipant(User $participant): self
     {
-        $this->participantId = $participant->getId();
+        $this->participant = $participant;
         return $this;
     }
+
 
     /**
      * @param int $participantId
