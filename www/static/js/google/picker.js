@@ -85,7 +85,9 @@
 
 
         /**
-         * Ask Google to setup picker
+         * TODO:
+         * Maybe code pertaining to authorisation should be removed from the googlePicker() function, since it is not specific to the Google Picker.
+         * (it is required for the Google Drive module also.  @See library/Schoolbox/Resource/GoogleFile/templates/detail.twig).
          */
         function authorize() {
             // The google.accounts.oauth2 variable comes from https://accounts.google.com/gsi/client.
