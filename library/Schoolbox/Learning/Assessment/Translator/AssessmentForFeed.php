@@ -23,15 +23,17 @@ class AssessmentForFeed
     public function __invoke(IAssessable $assessment): array
     {
         return [
-            'id'               => $assessment->getId(),
-            'title'            => $assessment->getTitle(),
-            'publishedAt'      => $assessment->getPublishAt()?->getUsingFormat(DATE_ATOM),
-            'openAt'           => $assessment->getOpenAt()?->getUsingFormat(DATE_ATOM),
-            'dueAt'            => $assessment->getDueAt()?->getUsingFormat(DATE_ATOM),
-            'closeAt'          => $assessment->getCloseAt()?->getUsingFormat(DATE_ATOM),
-            'weight'           => $assessment->getWeight(),
-            'sequence'         => $assessment->getSequence(),
-            'workType'         => $assessment->getWorkType()?->getName(),
+            'id'          => $assessment->getId(),
+            'title'       => $assessment->getTitle(),
+            'publishedAt' => $assessment->getPublishAt()?->getUsingFormat(DATE_ATOM),
+            'openAt'      => $assessment->getOpenAt()?->getUsingFormat(DATE_ATOM),
+            'dueAt'       => $assessment->getDueAt()?->getUsingFormat(DATE_ATOM),
+            'closeAt'     => $assessment->getCloseAt()?->getUsingFormat(DATE_ATOM),
+            'weight'      => $assessment->getWeight(),
+            'sequence'    => $assessment->getSequence(),
+            'workType'    => $assessment->getWorkType()?->getName(),
+            'folderId'    => $assessment->getContext()->getFolder()->getId(),
+            'folderTitle' => $assessment->getContext()->getFolder()->getNameWithCodes(),
         ];
     }
 }
