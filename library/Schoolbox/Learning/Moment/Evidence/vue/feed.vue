@@ -385,10 +385,10 @@ export default {
                         <template v-if="evidence.discriminator === 'dueWorkFeedback'">
                             <div class="flex-grade">
                                 <div class="small-12 card columns">
-                                    <a :href="evidence.object._links.summary">
+                                    <div>
                                         <span class="icon-due-work"></span>
-                                        <p>{{ evidence.object.assessment.title }}</p>
-                                    </a>
+                                        {{ evidence.object.assessment.folderTitle }} - <a :href="evidence.object._links.summary">{{ evidence.object.assessment.title }}</a>
+                                    </div>
                                     <p class="meta">
                                         Reviewed by <a :href="evidence.object.instructor._links.profile" title="View Profile">{{ evidence.object.instructor.fullName }}</a>
                                         |

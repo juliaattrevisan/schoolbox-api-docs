@@ -321,7 +321,7 @@ class MessageFactory
      * the generated ZIP file.
      *
      * @param Participant         $participant
-     * @param IFeedback           $feedback
+     * @param IResponse           $response
      * @param DueWorkResponseFile $responseFile
      * @return string
      */
