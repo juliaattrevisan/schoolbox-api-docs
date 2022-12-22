@@ -101,6 +101,13 @@ class MessageFactory
                         $this->generateResponseFileName($participant, $response, $file),
                         $this->generateResponseFileUrl($file),
                     );
+
+                    if ($this->turnitinEnabled && $file->getTurnItIn()) {
+                        $messageFactory = $messageFactory->addFileContent(
+                            $this->generateResponseFileTurnitinName($participant, $response, $file),
+                            $this->generateResponseFileTurnitinUrl($participant, $response, $file),
+                        );
+                    }
                 }
             }
 
@@ -138,12 +145,7 @@ class MessageFactory
                                 $this->generateResponseFileKamiUrl($file),
                             );
                         }
-                        if ($this->turnitinEnabled && $file->getTurnItIn()) {
-                            $messageFactory = $messageFactory->addFileContent(
-                                $this->generateResponseFileTurnitinName($participant, $feedback, $file),
-                                $this->generateResponseFileTurnitinUrl($participant, $feedbackResponse, $file),
-                            );
-                        }
+
                     }
                 }
             }
@@ -289,7 +291,7 @@ class MessageFactory
             default => $responseFile->getBasename(),
         };
         return sprintf(
-            "%s/kami/%s.pdf",
+            "%s/annotated/%s.pdf",
             $this->generateFeedbackFolderName($participant, $feedback),
             $this->sanitizeForFilename($basename),
         );
@@ -325,7 +327,7 @@ class MessageFactory
      */
     private function generateResponseFileTurnitinName(
         Participant $participant,
-        IFeedback $feedback,
+        IResponse $response,
         DueWorkResponseFile $responseFile,
     ): string {
         // Does this basename have a .pdf extension already?
@@ -335,8 +337,8 @@ class MessageFactory
             default => $responseFile->getBasename(),
         };
         return sprintf(
-            "%s/turnitin/%s.pdf",
-            $this->generateFeedbackFolderName($participant, $feedback),
+            "%s/similarity-report/%s.pdf",
+            $this->generateResponseFolderName($participant, $response),
             $this->sanitizeForFilename($basename),
         );
     }
