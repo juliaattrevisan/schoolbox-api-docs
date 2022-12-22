@@ -33,7 +33,7 @@ class AssessmentForFeed
             'sequence'    => $assessment->getSequence(),
             'workType'    => $assessment->getWorkType()?->getName(),
             'folderId'    => $assessment->getContext()->getFolder()->getId(),
-            'folderTitle' => $assessment->getContext()->getFolder()->getNameWithCodes(),
+            'folderName'  => $assessment->getContext()->getFolder()->getName(),
         ];
     }
 }

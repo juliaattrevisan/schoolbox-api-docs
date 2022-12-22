@@ -386,12 +386,11 @@ export default {
                             <div class="flex-grade">
                                 <div class="small-12 card columns">
                                     <div>
-                                        <span class="icon-due-work"></span>
-                                        {{ evidence.object.assessment.folderTitle }} - <a :href="evidence.object._links.summary">{{ evidence.object.assessment.title }}</a>
+                                        <span class="icon-due-work"></span><a :href="evidence.object._links.summary">{{ evidence.object.assessment.title }}</a>
                                     </div>
                                     <p class="meta">
                                         Reviewed by <a :href="evidence.object.instructor._links.profile" title="View Profile">{{ evidence.object.instructor.fullName }}</a>
-                                        |
+                                        in {{ evidence.object.assessment.folderName }} |
                                         <time class="meta" :datetime="formatDate(evidence.object.publishedAt)"
                                               :title="formatDate(evidence.object.publishedAt, dateDisplayFormats.dayjsDatetime)">
                                             {{ formatDate(evidence.object.publishedAt, dateDisplayFormats.dayjsTime) }}
