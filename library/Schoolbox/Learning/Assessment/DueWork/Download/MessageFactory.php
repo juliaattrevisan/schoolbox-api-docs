@@ -102,6 +102,7 @@ class MessageFactory
                         $this->generateResponseFileUrl($file),
                     );
 
+                    // Add turnitin report alongside student submitted files
                     if ($this->turnitinEnabled && $file->getTurnItIn()) {
                         $messageFactory = $messageFactory->addFileContent(
                             $this->generateResponseFileTurnitinName($participant, $response, $file),
@@ -137,7 +138,7 @@ class MessageFactory
                 // add any Kami files to the feedback folder
                 $feedbackResponse = $feedback->getResponse();
                 if ($feedbackResponse) {
-                    // add Kami + Turnitin files
+                    // add Kami files
                     foreach ($feedbackResponse->getAllFiles() as $file) {
                         if ($file->getKami()) {
                             $messageFactory = $messageFactory->addFileContent(
@@ -145,7 +146,6 @@ class MessageFactory
                                 $this->generateResponseFileKamiUrl($file),
                             );
                         }
-
                     }
                 }
             }
