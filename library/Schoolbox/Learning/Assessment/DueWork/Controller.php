@@ -431,7 +431,10 @@ class Controller extends Assessment\Controller
         }
 
         // Generate message and send to taskd
-        $message = $this->dueWorkDownloadMessageFactory->buildForAssessment($assessment, $this->getUser());
+        $message = $this->dueWorkDownloadMessageFactory->buildForAssessment(
+            $assessment,
+            $this->getUser(),
+        );
         $this->producer->send($message);
 
         // Return whence we came,

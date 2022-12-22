@@ -126,6 +126,7 @@ class Module extends BaseModule
 
         $this->register('GET', $turnitinPattern, 'getTurnitinReport', $hasSimilarityAccess, $preloadTurnitinWithAss); // a || r
         $this->register('GET', $turnitinPattern . '/iframe', 'getTurnitinReportContents', $hasSimilarityAccess, $preloadTurnitinWithAss); // a || r
+        $this->register('GET', $turnitinPattern . '/export', 'getTurnitinExport', $hasSimilarityAccess, $preloadTurnitinWithAss); // a || r
 
         $this->register('GET', $plagscanPattern, 'getPlagscanReport', $hasSimilarityAccess, $preloadPlagscanWithAss); // a || r
         $this->register('GET', $plagscanPattern . '/iframe', 'getPlagscanReportContents', $hasSimilarityAccess, $preloadPlagscanWithAss); // a || r
@@ -430,6 +431,19 @@ class Module extends BaseModule
             $this->getAuthorizer(),
             $this->getMapperFactory()->get(Access::class),
         );
+
+        // build TII file API
+        $turnitinFileApi = null;
+        if ((new Turnitin\Helper($this->getConfigLoader()))->isConfigured()) {
+            $turnitinFileApi = new Turnitin\File\Api(
+                new Turnitin\Api(
+                    $this->getConfigLoader()->get('site_version'),
+                    $this->getConfigLoader()->get('turnitin_api_host'),
+                    $this->getConfigLoader()->get('turnitin_api_key')
+                ),
+            );
+        }
+
         return new Controller(
             $this->getMapperFactory()->get(Error\Mapper::class),
             $this->injector->get('responseDataSource'),
@@ -439,6 +453,7 @@ class Module extends BaseModule
             $this->injector->get('kamiConnector'),
             $this->getMapperFactory()->get(Access::class),
             $this->injector->get('filesystem.storageProxy'),
+            $turnitinFileApi,
         );
     }
 

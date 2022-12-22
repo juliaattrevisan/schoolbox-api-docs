@@ -20,6 +20,7 @@ use Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkResponse;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Turnitin\File\Api;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\TaskDaemon\Request\DownloadPages\MessageFactory as BaseMessageFactory;
 use Schoolbox\TaskDaemon\Request\Message;
@@ -44,12 +45,13 @@ class MessageFactory
     /**
      * Constructor
      *
-     * @param BaseMessageFactory $baseMessageFactory Required for actually building messages
-     * @param UriInterface       $urlBase            Required for building URIs which point back to this instance
-     * @param RosettaStone       $rosettaStone       Required for translating the term "due work" for this instance
-     * @param Router             $router             Required for building routes to download various parts of due work
-     * @param UserTranslator     $userTranslator     Required for translating the viewer to an array representation for
+     * @param BaseMessageFactory $baseMessageFactory Required to actually build messages.
+     * @param UriInterface       $urlBase            Required to build URIs which point back to this instance.
+     * @param RosettaStone       $rosettaStone       Required to translate the term "due work" for this instance.
+     * @param Router             $router             Required to build routes to download various due work parts.
+     * @param UserTranslator     $userTranslator     Required to translate the viewer to an array representation for
      *                                               inclusion within the sent message.
+     * @param bool               $turnitinEnabled    Is Turnitin enabled for this instance? If so, download TII reports.
      */
     public function __construct(
         private BaseMessageFactory $baseMessageFactory,
@@ -57,6 +59,7 @@ class MessageFactory
         private RosettaStone $rosettaStone,
         private Router $router,
         private UserTranslator $userTranslator,
+        private bool $turnitinEnabled,
     ) {
     }
 
@@ -68,8 +71,8 @@ class MessageFactory
      * * All files in each participant's responses to the due work
      * * All Kami feedback for each participant
      *
-     * @param DueWork $dueWork The due work to build a message for.
-     * @param User    $viewer  The user who is requesting the due work ZIP.
+     * @param DueWork  $dueWork The due work to build a message for.
+     * @param User     $viewer  The user who is requesting the due work ZIP.
      * @return Message
      */
     public function buildForAssessment(DueWork $dueWork, User $viewer): Message
@@ -98,6 +101,14 @@ class MessageFactory
                         $this->generateResponseFileName($participant, $response, $file),
                         $this->generateResponseFileUrl($file),
                     );
+
+                    // Add turnitin report alongside student submitted files
+                    if ($this->turnitinEnabled && $file->getTurnItIn()) {
+                        $messageFactory = $messageFactory->addFileContent(
+                            $this->generateResponseFileTurnitinName($participant, $response, $file),
+                            $this->generateResponseFileTurnitinUrl($participant, $response, $file),
+                        );
+                    }
                 }
             }
 
@@ -108,10 +119,26 @@ class MessageFactory
                     continue;
                 }
 
+                // if the feedback was not created by an instructor, don't save it to the zip
+                if (true === !$feedback->isInstructorGiven()) {
+                    continue;
+                }
+
+                // current feedback was created by an instructor
+                // loop through the list of file
+                foreach ($feedback->getAllFiles() as $feedbackFile) {
+                    // attach the files to the taskd download object
+                    $messageFactory = $messageFactory->addFileContent(
+                        $this->generateResponseFileFeedbackName($participant, $feedback, $feedbackFile),
+                        $this->generateResponseFileUrl($feedbackFile),
+                    );
+                }
+
                 // If there's a response to this feedback:
                 // add any Kami files to the feedback folder
                 $feedbackResponse = $feedback->getResponse();
                 if ($feedbackResponse) {
+                    // add Kami files
                     foreach ($feedbackResponse->getAllFiles() as $file) {
                         if ($file->getKami()) {
                             $messageFactory = $messageFactory->addFileContent(
@@ -119,19 +146,6 @@ class MessageFactory
                                 $this->generateResponseFileKamiUrl($file),
                             );
                         }
-                    }
-                    //if the feedback was not created by an instructor, don't save it to the zip
-                    if (true === !$feedback->isInstructorGiven()) {
-                        continue;
-                    }
-                    // current feedback was created by an instructor
-                    // loop through the list of file
-                    foreach ($feedback->getAllFiles() as $feedbackFile) {
-                        // attach the files to the taskd download object
-                        $messageFactory = $messageFactory->addFileContent(
-                            $this->generateResponseFileFeedbackName($participant, $feedback, $feedbackFile),
-                            $this->generateResponseFileUrl($feedbackFile),
-                        );
                     }
                 }
             }
@@ -277,7 +291,7 @@ class MessageFactory
             default => $responseFile->getBasename(),
         };
         return sprintf(
-            "%s/kami/%s.pdf",
+            "%s/annotated/%s.pdf",
             $this->generateFeedbackFolderName($participant, $feedback),
             $this->sanitizeForFilename($basename),
         );
@@ -299,6 +313,61 @@ class MessageFactory
         );
         return $this->urlBase
             ->setPath($kamiRoutePath)
+            ->toString();
+    }
+
+    /**
+     * Generates a file name for this participant, feedback and Turnitin file in
+     * the generated ZIP file.
+     *
+     * @param Participant         $participant
+     * @param IFeedback           $feedback
+     * @param DueWorkResponseFile $responseFile
+     * @return string
+     */
+    private function generateResponseFileTurnitinName(
+        Participant $participant,
+        IResponse $response,
+        DueWorkResponseFile $responseFile,
+    ): string {
+        // Does this basename have a .pdf extension already?
+        // If so, keep it: otherwise append .pdf
+        $basename = match (strtolower($responseFile->getExtension())) {
+            'pdf'   => $responseFile->getFilename(),
+            default => $responseFile->getBasename(),
+        };
+        return sprintf(
+            "%s/similarity-report/%s.pdf",
+            $this->generateResponseFolderName($participant, $response),
+            $this->sanitizeForFilename($basename),
+        );
+    }
+
+    /**
+     * Generate a download URL for this file's Turnitin annotation.
+     *
+     * @param Participant         $participant
+     * @param IResponse           $response
+     * @param DueWorkResponseFile $responseFile
+     * @return string
+     * @noinspection PhpDocMissingThrowsInspection - this route always exists
+     */
+    private function generateResponseFileTurnitinUrl(
+        Participant $participant,
+        IResponse $response,
+        DueWorkResponseFile $responseFile,
+    ): string {
+        /** @noinspection PhpUnhandledExceptionInspection - this route always exists */
+        $tiiRoutePath = $this->router->generate(
+            'learningDueWorkResponse.getTurnitinExport',
+            [
+                'assessmentId'  => $participant->getAssessable()->getId(),
+                'responseId'    => $response->getId(),
+                'turnitinSubId' => $responseFile->getTurnItIn()->getTurnitinSubmissionId(),
+            ],
+        );
+        return $this->urlBase
+            ->setPath($tiiRoutePath)
             ->toString();
     }
 

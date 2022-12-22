@@ -12,13 +12,13 @@ namespace Schoolbox\Learning\Turnitin;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Establish connectivity to Turnitin
  */
 class Api
 {
-
     /**
      * Endpoint used to test the connectivity
      *
@@ -125,6 +125,62 @@ class Api
         return $this->retrieve('GET', self::TEST_ENDPOINT, []);
     }
 
+    /**
+     * Retrieve a raw response object for the method and endpoint provided.
+     *
+     * @param string $method
+     * @param string $endpoint
+     * @param array  $params
+     * @return ResponseInterface
+     * @throws GuzzleException
+     */
+    public function retrieveRawResponse(string $method, string $endpoint, array $params): ResponseInterface
+    {
+        $endpoint = "{$this->host}{$endpoint}";
+
+        /* Generate a standard header set
+         */
+        $headers = $this->generateDefaultHeaders();
+
+        /* Send it to the endpoint and see what comes back
+         */
+        switch ($method) {
+            /* TODO Uploading a binary specifically
+             *  Uses a special content-type header value
+             */
+            case 'UPLOAD':
+                /* Add some extra fields and values, specific to purpose
+                 */
+                $filename = urlencode($params['filename']);
+
+                $headers = array_merge($headers, [
+                    'Content-Type'        => 'binary/octet-stream',
+                    'Content-Disposition' => "inline; filename=\"{$filename}\""
+                ]);
+
+                /* This is actually a PUT request under the hood
+                 * A special payload struct to facilitate this unique endpoint
+                 */
+                $result = $this->client->request('PUT', $endpoint, [
+                    'headers'            => $headers,
+                    RequestOptions::BODY => $params['contents']
+                ]);
+
+                break;
+
+            /* Default case: assume standard headers
+             * These seem sufficient for GET PUT POST types
+             */
+            default:
+                $result = $this->client->request($method, $endpoint, [
+                    'headers'            => $headers,
+                    RequestOptions::JSON => $params
+                ]);
+
+                break;
+        }
+        return $result;
+    }
 
     /**
      * Access the $endpoint provided
@@ -146,49 +202,7 @@ class Api
      */
     public function retrieve(string $method, string $endpoint, array $params): ?array
     {
-        $endpoint = "{$this->host}{$endpoint}";
-
-        /* Generate a standard header set
-         */
-        $headers = $this->generateDefaultHeaders();
-
-        /* Send it to the endpoint and see what comes back
-         */
-        switch ($method) {
-            /* TODO Uploading a binary specifically
-             *  Uses a special content-type header value
-             */
-            case 'UPLOAD':
-                /* Add some extra fields and values, specific to purpose
-                 */
-                $filename = urlencode($params['filename']);
-
-                $headers = array_merge($headers, [
-                    'Content-Type' => 'binary/octet-stream',
-                    'Content-Disposition' => "inline; filename=\"{$filename}\""
-                ]);
-
-                /* This is actually a PUT request under the hood
-                 * A special payload struct to facilitate this unique endpoint
-                 */
-                $result = $this->client->request('PUT', $endpoint, [
-                    'headers' => $headers,
-                    RequestOptions::BODY => $params['contents']
-                ]);
-
-                break;
-
-            /* Default case: assume standard headers
-             * These seem sufficient for GET PUT POST types
-             */
-            default:
-                $result = $this->client->request($method, $endpoint, [
-                    'headers' => $headers,
-                    RequestOptions::JSON => $params
-                ]);
-
-                break;
-        }
+        $result = $this->retrieveRawResponse($method, $endpoint, $params);
 
         /* Check errors; if anything went wrong throw special types of exceptions
          * according to what happened. I found that in suds, we kind of started to

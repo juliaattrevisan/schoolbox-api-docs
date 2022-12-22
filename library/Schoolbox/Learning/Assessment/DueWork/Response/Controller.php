@@ -9,7 +9,7 @@
 namespace Schoolbox\Learning\Assessment\DueWork\Response;
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\Learning\Turnitin\Api as TurnitinApi;
+use DomainException;
 use Schoolbox\Learning\DueWork\StateMapper;
 use GuzzleHttp\Client;
 use Schoolbox\Application\Exception as ApplicationException;
@@ -73,14 +73,15 @@ class Controller extends Base
     /**
      * Controller constructor.
      *
-     * @param ErrorMapper       $errorMapper
-     * @param DataSource        $responseDataSource
-     * @param BreadcrumbFactory $bakery
-     * @param Term\Mapper       $termMapper
-     * @param Kami\Mapper       $kamiMapper
-     * @param Kami\Connector    $kamiConnector
-     * @param Access            $access
-     * @param FilesystemProxy   $filesystemProxy
+     * @param ErrorMapper            $errorMapper
+     * @param DataSource             $responseDataSource
+     * @param BreadcrumbFactory      $bakery
+     * @param Term\Mapper            $termMapper
+     * @param Kami\Mapper            $kamiMapper
+     * @param Kami\Connector         $kamiConnector
+     * @param Access                 $access
+     * @param FilesystemProxy        $filesystemProxy
+     * @param Turnitin\File\Api|null $turnitinFileApi Null if TII isn't configured
      */
     public function __construct(
         ErrorMapper $errorMapper,
@@ -91,6 +92,7 @@ class Controller extends Base
         Kami\Connector $kamiConnector,
         Access $access,
         private FilesystemProxy $filesystemProxy,
+        private ?Turnitin\File\Api $turnitinFileApi,
     ) {
         $this->errorMapper        = $errorMapper;
         $this->responseDataSource = $responseDataSource;
@@ -471,7 +473,7 @@ class Controller extends Base
      * @throws BadEndpoint
      * @throws Credentials
      * @throws \Aura\Router\Exception\RouteNotFound
-     * @throws \DomainException
+     * @throws DomainException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \GuzzleHttp\Exception\InvalidArgumentException
      * @throws \JsonException
@@ -479,62 +481,10 @@ class Controller extends Base
      */
     public function getTurnitinReport(IAssessable $assessment, IResponse $response, Turnitin\File\Model $turnitin, Participant $participant): void
     {
-        /* Check if turnitin is configured sufficiently
-         */
-        if (!(new Helper($this->getConfigLoader()))->isConfigured()) {
-            throw new \DomainException('Turnitin configuration invalid.');
-        }
-
-        /* We need this api
-         */
-        $api = new TurnitinApi(
-            $this->getConfigLoader()->get('site_version'),
-            $this->getConfigLoader()->get('turnitin_api_host'),
-            $this->getConfigLoader()->get('turnitin_api_key')
-        );
-
-        /* A specially-hardcoded value to have programmatically accepted the eula
-         * It's part of our T&C with turnitin
-         */
-        $eulaAcceptance = '2021-01-01T00:00:00.000Z';
-
-        /* Choose a viewer permission set based on your role
-         * Staff members get a different set than students or parents
-         *
-         * Start with the lowest-permission settings
-         */
-        $payload = [
-            'viewer_user_id' => $this->getUser()->getId(),
-            'locale' => 'en',
-            'viewer_default_permission_set' => Turnitin\File\Process\Report::VIEWER_PERMISSION_SET_STUDENT,
-            'eula' => [
-                'version' => 'v1beta',
-                'accepted_timestamp' => $eulaAcceptance,
-                'language' => 'en-US'
-            ],
-        ];
-
-        /* Then decide if you're a staff and you need more stuff
-         */
-        if ($this->access->isInstructor($this->getUser(), $assessment->getContext()->getFolder())) {
-            $payload = array_merge($payload, [
-                'viewer_default_permission_set' => Turnitin\File\Process\Report::VIEWER_PERMISSION_SET_STAFF,
-                'similarity' => [
-                    'view_settings' => [
-                        'save_changes' => true
-                    ]
-                ]
-            ]);
-        }
-
-        /* TODO Apparently localisation is a thing, set via locale tuple;
-         *  but I have assumed en for now
-         */
-        $viewerUrl = $api->retrieve('POST', "/api/v1/submissions/{$turnitin->getTurnitinSubmissionId()}/viewer-url", $payload);
-
+        $viewerUrl = $this->determineTurnitinViewerUrl($assessment, $turnitin);
         if (null !== $viewerUrl) {
             $data = [
-                'url' => $viewerUrl['viewer_url'],
+                'url' => $viewerUrl,
                 'turnitin' => $turnitin,
                 'assessment' => $assessment,
                 'response' => $response,
@@ -550,6 +500,26 @@ class Controller extends Base
         /* TODO You might error out here when json_decode returns null
          *  in odd circumstances; but what do we display in that case?
          */
+    }
+
+    /**
+     * Export a PDF for a Turnitin file.
+     *
+     * @api   GET /learning/similarity/{assessmentId}/{responseId}/{turnitinSubId}
+     * @since 23.0
+     *
+     * @param Turnitin\File\Model $turnitin
+     * @return void
+     */
+    public function getTurnitinExport(Turnitin\File\Model $turnitin): void
+    {
+        if (!$this->turnitinFileApi) {
+            throw new DomainException('Turnitin configuration invalid.');
+        }
+        $pdfId = $this->turnitinFileApi->generatePdfRequest($turnitin);
+        $this->populateResponseFromPsr7Response(
+            $this->turnitinFileApi->downloadPdf($turnitin, $pdfId, 10, 5000),
+        );
     }
 
     /**
@@ -590,5 +560,35 @@ class Controller extends Base
         ];
 
         $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningDueWorkResponse/plagscan/contents.twig', $data));
+    }
+
+
+    /**
+     * Determine the URL via which the current user may view a TII report.
+     *
+     * @param IAssessable         $assessment The assessment in which the TII
+     *                                        report was created.
+     * @param Turnitin\File\Model $turnitin   The TII report model.
+     * @return string|null
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \JsonException
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    private function determineTurnitinViewerUrl(
+        IAssessable $assessment,
+        Turnitin\File\Model $turnitin,
+    ): ?string {
+        if (!$this->turnitinFileApi) {
+            throw new DomainException('Turnitin configuration invalid.');
+        }
+        $isInstructor = $this->access->isInstructor($this->getUser(), $assessment->getContext()->getFolder());
+        return $this->turnitinFileApi->generateViewerUrl(
+            $turnitin,
+            $this->getUser(),
+            $isInstructor
+                ? Turnitin\File\Process\Report::VIEWER_PERMISSION_SET_STAFF
+                : Turnitin\File\Process\Report::VIEWER_PERMISSION_SET_STUDENT,
+            $isInstructor,
+        );
     }
 }
