@@ -86,7 +86,9 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
             return false;
         }
 
-        Node\Mapper::sortNodes($this->curriculumNodes, 0);
+        if ($this->curriculumNodes && $this->curriculumNodes->count()) {
+            Node\Mapper::sortNodes($this->curriculumNodes, 0);
+        }
         return true;
     }
 
