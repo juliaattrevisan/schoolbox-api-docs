@@ -443,7 +443,7 @@ class Controller extends Base
             'Title'        => $record->getHeading(),
             'Type'         => $record->getType() ? $record->getType()->getName() : '',
             'Sub-Type'     => $record->getSubType() ? $record->getSubType()->getName() : '',
-            'Occurred On'  => $record->getOccurredOn()?->getDatabase(),
+            'Occurred On'  => $record->getOccurredOn()?->getDatabaseDate(),
             'Tags'         => implode(',', $record->getTags()->getPropertyValues('name')),
             'Points'       => $record->getPoints() ?: '',
             'Severity'     => $record->getSeverity() ? $record->getSeverity()->getName() : '',
