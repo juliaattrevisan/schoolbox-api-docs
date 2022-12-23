@@ -598,21 +598,19 @@ class Queue extends ResourceVideo
             //
             // @see SA-14822.
             [$videoWidth, $videoHeight] = $this->contain([$width, $height], [1280, 720]);
-            [$thumbWidth, $thumbHeight] = $this->cover([$width, $height], [64, 64]);
             if ($width < $height) {
                 $videoWidthForScaleCommand  = $videoWidth;
-                $thumbWidthForScaleCommand  = $thumbWidth;
                 $videoHeightForScaleCommand = -2; // See comment 'Special ffmpeg scale values' above.
-                $thumbHeightForScaleCommand = -2; // See comment 'Special ffmpeg scale values' above.
             } else {
                 $videoWidthForScaleCommand  = -2; // See comment 'Special ffmpeg scale values' above.
-                $thumbWidthForScaleCommand  = -2; // See comment 'Special ffmpeg scale values' above.
                 $videoHeightForScaleCommand = $videoHeight;
-                $thumbHeightForScaleCommand = $thumbHeight;
             }
 
             $videoScale = sprintf("-vf scale=%d:%d", $videoWidthForScaleCommand, $videoHeightForScaleCommand);
-            $thumbScale = sprintf("scale=%d:%d,", $thumbWidthForScaleCommand, $thumbHeightForScaleCommand);
+
+            // NOTE: The thumb scale command is to produce an image, not a video.  So the problem described above does not apply.
+            [$thumbWidth, $thumbHeight] = $this->cover([$width, $height], [64, 64]);
+            $thumbScale = sprintf("scale=%d:%d,", $thumbWidth, $thumbHeight);
         }
 
         return [
