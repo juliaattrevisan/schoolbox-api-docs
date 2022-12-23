@@ -564,11 +564,55 @@ class Queue extends ResourceVideo
 
 
         if ($width && $height) {
-            [$containedWidth, $containedHeight] = $this->contain([$width, $height], [1280, 720]);
-            $videoScale = sprintf("-vf scale=%d:%d", $containedWidth, $containedHeight);
-
+            // Dealing with rotations requested in video file metadata
+            // -------------------------------------------------------
+            // Sometimes videos whose dimensions suggest they are in portrait orientation are actually in landscape
+            // orientation (and vice-versa).  This happens because some recording devices (eg. particular iPhones),
+            // always produce a file in one aspect ratio (eg. 16:9), but then add metadata to indicate if the video
+            // should be rotated before it is viewed.
+            //
+            // Ffmpeg deals with this situation during its 'scale' operation, by automatically rotating the pixel data
+            // for the video, if it finds metadata indicating that a rotation is needed.  For example, a video in
+            // portrait orientation might have dimensions 1920x1080, and metadata saying 'rotate 90 degrees'.  Ffmpeg
+            // will read this metadata and rotate the pixel data, producing a video with dimensions 1080x1920 (and no
+            // rotation metadata).
+            //
+            // If we then scale this auto-rotated video to our container dimensions of 1280x720, we will find that the
+            // video has been stretched horizontally.
+            //
+            // The solution is to trust ffmpeg to deal with the rotation, and then just ensure that the dimensions we
+            // request in the scale command will not change the aspect ratio of the video.  We can do this because the
+            // ffmpeg ‘scale’ command allows us to only set one dimension, and have ffmpeg automatically calculate the
+            // other dimension, keeping the aspect ratio the same.
+            //
+            // To prevent the number of pixels per frame from increasing, we keep the smaller number from the container
+            // dimensions constant and ask ffmpeg to calculate the other value while keeping the aspect ratio the same
+            // as in the original video (after any autorotation adjustments).
+            //
+            // Special ffmpeg scale values
+            // ---------------------------
+            // If one and only one of the values is -n with n >= 1, the scale filter will use a value that maintains
+            // the aspect ratio of the input image, calculated from the other specified dimension. After that it will,
+            // however, make sure that the calculated dimension is divisible by n and adjust the value if necessary.
+            // Reference: http://ffmpeg.org/ffmpeg-filters.html#scale
+            //
+            // @see SA-14822.
+            [$videoWidth, $videoHeight] = $this->contain([$width, $height], [1280, 720]);
             [$thumbWidth, $thumbHeight] = $this->cover([$width, $height], [64, 64]);
-            $thumbScale = sprintf("scale=%d:%d,", $thumbWidth, $thumbHeight);
+            if ($width < $height) {
+                $videoWidthForScaleCommand  = $videoWidth;
+                $thumbWidthForScaleCommand  = $thumbWidth;
+                $videoHeightForScaleCommand = -2; // See comment 'Special ffmpeg scale values' above.
+                $thumbHeightForScaleCommand = -2; // See comment 'Special ffmpeg scale values' above.
+            } else {
+                $videoWidthForScaleCommand  = -2; // See comment 'Special ffmpeg scale values' above.
+                $thumbWidthForScaleCommand  = -2; // See comment 'Special ffmpeg scale values' above.
+                $videoHeightForScaleCommand = $videoHeight;
+                $thumbHeightForScaleCommand = $thumbHeight;
+            }
+
+            $videoScale = sprintf("-vf scale=%d:%d", $videoWidthForScaleCommand, $videoHeightForScaleCommand);
+            $thumbScale = sprintf("scale=%d:%d,", $thumbWidthForScaleCommand, $thumbHeightForScaleCommand);
         }
 
         return [
@@ -587,18 +631,18 @@ class Queue extends ResourceVideo
      * @param array $maxDimensions [maxWidth, maxHeight]
      * @return array [containedWidth, containedHeight]
      */
-    private function contain($dimensions, $maxDimensions)
+    private function contain(array $dimensions, array $maxDimensions): array
     {
         [$width, $height] = $dimensions;
         [$maxWidth, $maxHeight] = $maxDimensions;
 
         if ($maxWidth > 0 && $width > $maxWidth) {
-            $height = $height * ($maxWidth / $width);
+            $height *= ($maxWidth / $width);
             $width  = $maxWidth;
         }
 
         if ($maxHeight > 0 && $height > $maxHeight) {
-            $width  = $width * ($maxHeight / $height);
+            $width  *= ($maxHeight / $height);
             $height = $maxHeight;
         }
 
@@ -614,7 +658,7 @@ class Queue extends ResourceVideo
      *
      * @return array [coveredWidth, coveredHeight]
      */
-    private function cover($dimensions, $coverDimensions)
+    private function cover(array $dimensions, array $coverDimensions): array
     {
         // Expand dimensions, and contain to coverDimensions
 
