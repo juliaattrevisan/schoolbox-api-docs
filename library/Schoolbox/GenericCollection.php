@@ -9,16 +9,13 @@
 namespace Schoolbox;
 
 use TypeError;
-
-use function class_exists;
-
 use DomainException;
-
-use function is_a;
-
 use ReflectionClass;
 use ReflectionException;
 use UnexpectedValueException;
+
+use function is_a;
+use function class_exists;
 
 /**
  * Class GenericCollection
@@ -31,8 +28,8 @@ use UnexpectedValueException;
  */
 class GenericCollection extends Collection
 {
-    /** @var string|null $elementType What type the elements in this Collection are allowed to be. Class/interface name */
-    private $elementType = null;
+    /** @var string $elementType What type the elements in this Collection are allowed to be. Class/interface name */
+    private string $elementType;
 
     /**
      * Constructor
@@ -50,7 +47,9 @@ class GenericCollection extends Collection
         } elseif (is_object($elementType)) {
             $this->elementType = get_class($elementType);
         } else {
-            throw new UnexpectedValueException('Element Type must be a class or interface name, or object. Found: ' . gettype($elementType));
+            throw new UnexpectedValueException(
+                'Element Type must be a class or interface name, or object. Found: ' . gettype($elementType)
+            );
         }
 
         parent::__construct($stack);
@@ -62,7 +61,7 @@ class GenericCollection extends Collection
      * @return static
      * @throws UnexpectedValueException
      */
-    public function emptyClone()
+    public function emptyClone(): GenericCollection
     {
         return new static($this->getElementClass());
     }
@@ -74,7 +73,7 @@ class GenericCollection extends Collection
      * @return self
      * @throws UnexpectedValueException
      */
-    protected function setStack($stack)
+    protected function setStack(array $stack): self
     {
         foreach ($stack as $item) {
             $this->checkType($item);
@@ -90,7 +89,7 @@ class GenericCollection extends Collection
      * @return static
      * @throws UnexpectedValueException
      */
-    public function add($element)
+    public function add($element): self
     {
         $this->checkType($element);
         parent::add($element);
@@ -104,7 +103,7 @@ class GenericCollection extends Collection
      * @return static
      * @throws UnexpectedValueException
      */
-    public function prepend($element)
+    public function prepend($element): self
     {
         $this->checkType($element);
         parent::prepend($element);
@@ -119,7 +118,7 @@ class GenericCollection extends Collection
      * @return static
      * @throws UnexpectedValueException
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): self
     {
         $this->checkType($value);
         parent::offsetSet($offset, $value);
@@ -135,7 +134,7 @@ class GenericCollection extends Collection
      * @return static
      * @throws UnexpectedValueException If $value is of an invalid type
      */
-    public function setOffset($index, $value)
+    public function setOffset($index, $value): self
     {
         $this->checkType($value);
         parent::offsetSet($index, $value);
@@ -147,7 +146,7 @@ class GenericCollection extends Collection
      *
      * @return string
      */
-    public function getElementClass()
+    public function getElementClass(): string
     {
         return $this->elementType;
     }
@@ -228,7 +227,7 @@ class GenericCollection extends Collection
      * @param mixed $item
      * @throws UnexpectedValueException if $item is not a valid element for this Collection
      */
-    protected function checkType($item)
+    protected function checkType($item): void
     {
         $type = gettype($item);
 
@@ -237,7 +236,9 @@ class GenericCollection extends Collection
         }
 
         if (!$item instanceof $this->elementType) {
-            throw new UnexpectedValueException("Invalid type. Expected: {$this->elementType}, Actual: " . get_class($item));
+            throw new UnexpectedValueException(
+                "Invalid type. Expected: {$this->elementType}, Actual: " . get_class($item)
+            );
         }
     }
 
@@ -249,10 +250,11 @@ class GenericCollection extends Collection
      * @return static
      * @throws DomainException If collection has wrong member-item type
      */
-    public function replaceWith(Collection $collection)
+    public function replaceWith(Collection $collection): self
     {
         // Short-circuit via generics if we can
-        if ($collection instanceof static && $this->assertSameItemClass($collection)) {
+        if ($collection instanceof static) {
+            $this->assertSameItemClass($collection);
             parent::setStack($collection->getStack());
         } else {
             // Test every item individually
@@ -268,7 +270,7 @@ class GenericCollection extends Collection
      * @param GenericCollection $newCollection
      * @throws DomainException if the new Collection has a different item-type to this Collection
      */
-    protected function assertSameItemClass(GenericCollection $newCollection)
+    protected function assertSameItemClass(GenericCollection $newCollection): void
     {
         $thisItemClass  = $this->getElementClass();
         $otherItemClass = $newCollection->getElementClass();

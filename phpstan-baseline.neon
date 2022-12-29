@@ -4146,11 +4146,6 @@ parameters:
 			path: library/Schoolbox/Forum/ThreadNotifier.php
 
 		-
-			message: "#^Instanceof between mixed and string\\|null results in an error\\.$#"
-			count: 1
-			path: library/Schoolbox/GenericCollection.php
-
-		-
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/GenericCollection.php
