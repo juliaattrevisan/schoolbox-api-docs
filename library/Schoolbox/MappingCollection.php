@@ -21,7 +21,6 @@ use function array_key_exists;
  */
 class MappingCollection extends Collection
 {
-
     /**
      * Reverse map of columns to properties for efficient by-column lookup
      *
