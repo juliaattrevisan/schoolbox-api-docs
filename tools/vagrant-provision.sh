@@ -95,7 +95,7 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Updating timezone data";
 mysql_tzinfo_to_sql /usr/share/zoneinfo 2>/dev/null | mysql --defaults-extra-file=/root/.my.cnf mysql 2>/dev/null;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Creating Schoolbox MySQL schema";
-mysql --defaults-extra-file=/root/.my.cnf -e "CREATE DATABASE schoolbox CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_general_ci';";
+mysql --defaults-extra-file=/root/.my.cnf -e "CREATE DATABASE schoolbox CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci';";
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Creating Schoolbox MySQL user";
 mysql --defaults-extra-file=/root/.my.cnf schoolbox -e "CREATE USER 'schoolboxvagrant'@'localhost' IDENTIFIED BY 'abc123'";
