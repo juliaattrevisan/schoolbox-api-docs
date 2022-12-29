@@ -227,7 +227,7 @@ class GenericCollection extends Collection
      * @param mixed $item
      * @throws UnexpectedValueException if $item is not a valid element for this Collection
      */
-    protected function checkType($item)
+    protected function checkType($item): void
     {
         $type = gettype($item);
 
@@ -269,7 +269,7 @@ class GenericCollection extends Collection
      * @param GenericCollection $newCollection
      * @throws DomainException if the new Collection has a different item-type to this Collection
      */
-    protected function assertSameItemClass(GenericCollection $newCollection)
+    protected function assertSameItemClass(GenericCollection $newCollection): void
     {
         $thisItemClass  = $this->getElementClass();
         $otherItemClass = $newCollection->getElementClass();
