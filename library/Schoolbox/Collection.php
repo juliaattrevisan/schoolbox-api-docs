@@ -307,7 +307,7 @@ class Collection implements ICollection, Serializable, ArrayAccess
      *
      * @return string
      */
-    protected function getGetMethodName($property): string
+    protected function getGetMethodName(string $property): string
     {
         return 'get' . ucfirst($property);
     }
@@ -630,13 +630,13 @@ class Collection implements ICollection, Serializable, ArrayAccess
      * items from the other collection not found in this collection.
      *
      * @param Collection $other - the second collection
-     * @param string $column - a column on which to test uniqueness (ie. an ID)
+     * @param string|null $column - a column on which to test uniqueness (ie. an ID)
      *                         If omitted, the entire object will be tested and may return an error
      *                         "Fatal error: Nesting level too deep - recursive dependency?"
      *
      * @return static
      */
-    public function mergeUnique(Collection $other, string $column = null): Collection
+    public function mergeUnique(Collection $other, ?string $column = null): Collection
     {
         $merged = clone $this;
         if ($column) {
@@ -769,13 +769,13 @@ class Collection implements ICollection, Serializable, ArrayAccess
      * Returns a new collection containing items that are in $this, but not in
      * $otherCollection.
      *
-     * @param  Collection $otherCollection
-     * @param  callable $diffMethod The callback method to use for deciding
-     *                                whether two items are the same.
-     *                                Defaults to == comparison.
+     * @param  Collection                    $otherCollection
+     * @param  callable(mixed, mixed): bool|null $diffMethod The callback method to use for deciding
+     *                                                   whether two items are the same.
+     *                                                   Defaults to == comparison.
      * @return static
      */
-    public function diff(Collection $otherCollection, $diffMethod = null): Collection
+    public function diff(Collection $otherCollection, ?callable $diffMethod = null): Collection
     {
         $diff = $this->emptyClone();
 
@@ -806,7 +806,7 @@ class Collection implements ICollection, Serializable, ArrayAccess
      * $otherCollection.
      *
      * @param Collection    $otherCollection
-     * @param callable|null $compare The callback method to use for deciding
+     * @param ?callable(mixed,mixed): bool $compare The callback method to use for deciding
      *                               whether two items are the same.
      *                               Defaults to == comparison.
      * @return Collection
@@ -856,7 +856,7 @@ class Collection implements ICollection, Serializable, ArrayAccess
      * Filters out items that don't match $callable, and returns a new
      * collection with the result.
      *
-     * @param  callable $callback
+     * @param  callable(mixed,mixed): bool $callback
      * @return static
      */
     public function filter(callable $callback)
@@ -907,7 +907,7 @@ class Collection implements ICollection, Serializable, ArrayAccess
      * @param  string $field The field to search by.
      * @return Collection|static[] @see $this->groupByCallback()
      */
-    public function groupBy($field)
+    public function groupBy(string $field)
     {
         $get_method = $this->getGetMethodName($field);
         return $this->groupByCallback(
@@ -949,12 +949,12 @@ class Collection implements ICollection, Serializable, ArrayAccess
      *
      * Does NOT mutate the original, enabling the caller to cut multiple slices from a Collection.
      *
-     * @param int $offset
-     * @param int $count
-     * @param bool $preserve_keys Whether to preserver array keys or re-index from 0
+     * @param int      $offset
+     * @param int|null $count
+     * @param bool     $preserve_keys Whether to preserver array keys or re-index from 0
      * @return static
      */
-    public function slice($offset, $count = null, $preserve_keys = false)
+    public function slice(int $offset, ?int $count = null, bool $preserve_keys = false)
     {
         $copy = $this->emptyClone();
         $copy->stack = array_slice($this->stack, $offset, $count, $preserve_keys);
@@ -967,7 +967,7 @@ class Collection implements ICollection, Serializable, ArrayAccess
      * @param mixed $value
      * @return static
      */
-    public function filterBy($field, $value)
+    public function filterBy(string $field, $value)
     {
         $getField = $this->getGetMethodName($field);
         return $this->filter(
@@ -986,7 +986,7 @@ class Collection implements ICollection, Serializable, ArrayAccess
      * @param string $column
      * @return $this
      */
-    public function indexBy($column)
+    public function indexBy(string $column)
     {
         $callback = function ($item) use ($column) {
             return call_user_func([$item, $this->getGetMethodName($column)]);
