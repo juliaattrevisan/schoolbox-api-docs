@@ -253,7 +253,8 @@ class GenericCollection extends Collection
     public function replaceWith(Collection $collection): self
     {
         // Short-circuit via generics if we can
-        if ($collection instanceof static && $this->assertSameItemClass($collection)) {
+        if ($collection instanceof static) {
+            $this->assertSameItemClass($collection);
             parent::setStack($collection->getStack());
         } else {
             // Test every item individually
