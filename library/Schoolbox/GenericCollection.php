@@ -47,7 +47,9 @@ class GenericCollection extends Collection
         } elseif (is_object($elementType)) {
             $this->elementType = get_class($elementType);
         } else {
-            throw new UnexpectedValueException('Element Type must be a class or interface name, or object. Found: ' . gettype($elementType));
+            throw new UnexpectedValueException(
+                'Element Type must be a class or interface name, or object. Found: ' . gettype($elementType)
+            );
         }
 
         parent::__construct($stack);
@@ -234,7 +236,9 @@ class GenericCollection extends Collection
         }
 
         if (!$item instanceof $this->elementType) {
-            throw new UnexpectedValueException("Invalid type. Expected: {$this->elementType}, Actual: " . get_class($item));
+            throw new UnexpectedValueException(
+                "Invalid type. Expected: {$this->elementType}, Actual: " . get_class($item)
+            );
         }
     }
 

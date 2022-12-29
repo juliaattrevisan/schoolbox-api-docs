@@ -129,11 +129,7 @@ class Collection implements ICollection, Serializable, ArrayAccess
      */
     public function offsetGet($offset)
     {
-        if (isset($this->stack[$offset])) {
-            return $this->stack[$offset];
-        } else {
-            return null;
-        }
+        return $this->stack[$offset] ?? null;
     }
 
     /**
@@ -226,9 +222,9 @@ class Collection implements ICollection, Serializable, ArrayAccess
     /**
      * Key
      *
-     * @return mixed
+     * @return int
      */
-    public function key()
+    public function key(): int
     {
         return $this->position;
     }
@@ -379,7 +375,7 @@ class Collection implements ICollection, Serializable, ArrayAccess
      * @param string $property
      * @return mixed[]|array
      */
-    public function getPropertyValues(string $property)
+    public function getPropertyValues(string $property): array
     {
         $parts = [];
         $methodName = $this->getGetMethodName($property);
@@ -635,7 +631,8 @@ class Collection implements ICollection, Serializable, ArrayAccess
      *
      * @param Collection $other - the second collection
      * @param string $column - a column on which to test uniqueness (ie. an ID)
-     *                         If omitted, the entire object will be tested and may return an error "Fatal error: Nesting level too deep - recursive dependency?"
+     *                         If omitted, the entire object will be tested and may return an error
+     *                         "Fatal error: Nesting level too deep - recursive dependency?"
      *
      * @return static
      */
