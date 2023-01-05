@@ -740,7 +740,7 @@ if ! mysqldump --allow-keywords --default-character-set=utf8mb4 -i -e -q -a --sk
 fi
 ## Drop existing DB and reload just config table
 mysql -u $sqluser -p$sqlpasswd -h $sqlhost -e "SET MAX_STATEMENT_TIME=0; DROP DATABASE $sqldb;";
-mysql -u $sqluser -p$sqlpasswd -h $sqlhost -e "CREATE DATABASE $sqldb CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_general_ci';";
+mysql -u $sqluser -p$sqlpasswd -h $sqlhost -e "CREATE DATABASE $sqldb CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci';";
 mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb < /tmp/$sqldb-config-`date -I`.sql;
 ## Unpack if gzipped
 gzipdb=`echo "$sourcedb" | grep '.gz' | wc -l`;

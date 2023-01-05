@@ -34,7 +34,7 @@ mysql -B -N -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "$QUERY" | awk "$AWKS
 
 # now doublecheck for any remnant non-default fields
 #QUERY="SELECT TABLE_NAME, COLUMN_NAME, COLUMN_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '$sqldb' AND CHARACTER_SET_NAME LIKE 'utf8'"
-#AWKST='{print "SET foreign_key_checks = 0; ALTER TABLE", $1, "MODIFY", $2, $3, "CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci; SET foreign_key_checks = 1; "}'
+#AWKST='{print "SET foreign_key_checks = 0; ALTER TABLE", $1, "MODIFY", $2, $3, "CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; SET foreign_key_checks = 1; "}'
 
 # log intention
 #mysql -B -N -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "$QUERY" | awk "$AWKST"
