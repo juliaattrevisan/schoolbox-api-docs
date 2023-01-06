@@ -272,16 +272,16 @@ switch ($_POST['module']) {
             ];
         break;
     case 'ssl_cert':
-        if(!exec(sprintf("INSTANCE_ID=%s schoolbox-read-instances --option hostnames", INSTANCE_ID), $execOutput, $resultCode)){
+        if (!exec(sprintf("INSTANCE_ID=%s schoolbox-read-instances --option hostnames", INSTANCE_ID), $execOutput, $resultCode)) {
             $output = [
                 'error_code'    => 1,
                 'error_message' => "Unable to derive instance hostnames",
             ];
         } else {
             $output = [];
-            foreach($execOutput as $host){
+            foreach ($execOutput as $host) {
                 // Is this an IP address rather than hostname?
-                if(preg_match("/^\d+\.\d+\.\d+\.\d+$/", $host)){
+                if (preg_match("/^\d+\.\d+\.\d+\.\d+$/", $host)) {
                     continue;
                 }
                 $streamContext = stream_context_create(

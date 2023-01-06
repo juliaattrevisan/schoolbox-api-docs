@@ -542,7 +542,7 @@ class Controller extends Base
     private function instanceHostnames(): array
     {
         exec(sprintf("INSTANCE_ID=%s schoolbox-read-instances --option hostnames", escapeshellarg(INSTANCE_ID)), $execOutput);
-        $filtered = array_filter($execOutput, static function(string $hostname): bool {
+        $filtered = array_filter($execOutput, static function (string $hostname): bool {
             return !preg_match("/^\d+\.\d+\.\d+\.\d+$/", $hostname);
         });
         return array_values($filtered);
