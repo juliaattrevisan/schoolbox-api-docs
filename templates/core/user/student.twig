@@ -592,15 +592,37 @@
 
         <div class="profile-tabs tabs-content">
             {% if showActivityFeed %}
-            <div class="content no-pad {% if activeTab == 'activity' %}active{% endif %}" id="tab-activity">
-                <div id="activity-feed">
-                    <activity-feed
-                        cdn-prefix="{{ CDN_PREFIX }}"
-                        site-version="{{ config.site_version }}"
-                        config-grade-gradient-enabled="{{ config.grade_gradient_enable }}"
-                    />
+                {% set activityFeedId = 'activity-feed' %}
+                {% autoescape 'js' %}
+                <script type="text/javascript">
+                    $(function () {
+                        // Filtered content has been [re]loaded
+                        $('#{{ activityFeedId }}').on('filterContentLoaded', function (event, selectedFilters) {
+                            document.dispatchEvent(new CustomEvent('pastoral-class-report__onFilterChange', {
+                                detail: {
+                                    selectedFilters
+                                }
+                            }));
+                        });
+                    });
+                </script>
+                {% endautoescape %}
+                <div class="content no-pad {% if activeTab == 'activity' %}active{% endif %}" id="tab-activity">
+                    <div>
+                        {% include '@filters/panel.twig' with {
+                            contentId: activityFeedId,
+                            panel:     filterPanel,
+                            quickload: true
+                        } only %}
+                    </div>
+                    <div id="activity-feed">
+                        <activity-feed
+                            cdn-prefix="{{ CDN_PREFIX }}"
+                            site-version="{{ config.site_version }}"
+                            config-grade-gradient-enabled="{{ config.grade_gradient_enable }}"
+                        />
+                    </div>
                 </div>
-            </div>
             {% endif %}
 
             {% if showAchievementsTab %}

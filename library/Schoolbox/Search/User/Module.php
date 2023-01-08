@@ -13,7 +13,9 @@ use Alaress\Authorizer\Rule\IsLoggedIn;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Filter;
 use Schoolbox\Mapper;
+use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
@@ -48,6 +50,12 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
+        $filterHelper = new FilterHelper(
+            $this->getMapperFactory()->get(PastoralMapper::class),
+            $this->injector->get('filters.factoryFactory'),
+            $this->getMapperFactory()->get(Filter\Mapper::class),
+            $this->getMapperFactory()->get(Filter\Selection\Mapper::class),
+        );
         return new Controller(
             $this->getMapperFactory()->get(UserMapper::class),
             $this->getMapperFactory()->get(RoleMapper::class),
@@ -62,6 +70,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(\Schoolbox\Pastoral\SubType\Mapper::class),
             $this->injector->get('pastoralDataSource'),
             $this->getMapperFactory()->get(\Schoolbox\Assessment\Term\Mapper::class),
+            $filterHelper,
             new \Schoolbox\External\User(
                 $this->injector->get('config')->get('external_type'),
                 new \External_Class(),
