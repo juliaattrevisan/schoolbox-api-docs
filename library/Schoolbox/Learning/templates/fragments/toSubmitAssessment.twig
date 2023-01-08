@@ -85,8 +85,12 @@
                     </div>
                 </div>
                 <div class="legend">
-                    <div class="legend-item success">{{ stats.countReviewComplete }} {{ markedPastTense }}</div>
-                    <div class="legend-item warning">{{ stats.countFeedbackRequired }} require {{ markedTitleSuffix }}</div>
+                    {% if stats.countReviewComplete > 0 %}
+                        <div class="legend-item success">{{ stats.countReviewComplete }} {{ markedPastTense }}</div>
+                    {% endif %}
+                    {% if stats.countFeedbackRequired > 0 %}
+                        <div class="legend-item warning">{{ stats.countFeedbackRequired }} require {{ markedTitleSuffix }}</div>
+                    {% endif %}
                     <div class="legend-item">{{ stats.countParticipants - stats.countResponseRequired }} of {{ stats.countParticipants }} {{ submitTitleSuffix }}</div>
                 </div>
             </div>
