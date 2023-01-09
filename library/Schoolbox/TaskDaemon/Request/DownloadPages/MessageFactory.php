@@ -179,6 +179,20 @@ class MessageFactory
     }
 
     /**
+     * Add a Kami document to the downloaded ZIP.
+     *
+     * @param string $filename       The name of the file in the downloaded ZIP.
+     * @param string $kamiDocumentId The ID of the Kami document.
+     * @return $this
+     */
+    public function addKamiContent(string $filename, string $kamiDocumentId): self
+    {
+        $clone = clone $this;
+        $clone->content[] = ['filename' => $filename, 'kamiDocumentId' => $kamiDocumentId];
+        return $clone;
+    }
+
+    /**
      * Clear all files from the downloaded ZIP.
      *
      * @return self

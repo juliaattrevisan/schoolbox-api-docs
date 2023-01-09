@@ -141,9 +141,9 @@ class MessageFactory
                     // add Kami files
                     foreach ($feedbackResponse->getAllFiles() as $file) {
                         if ($file->getKami()) {
-                            $messageFactory = $messageFactory->addFileContent(
+                            $messageFactory = $messageFactory->addKamiContent(
                                 $this->generateResponseFileKamiName($participant, $feedback, $file),
-                                $this->generateResponseFileKamiUrl($file),
+                                $file->getKami()->getKamiDocumentId(),
                             );
                         }
                     }
