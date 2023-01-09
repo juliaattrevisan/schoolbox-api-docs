@@ -103,11 +103,14 @@ class MessageFactory
                     );
 
                     // Add turnitin report alongside student submitted files
-                    if ($this->turnitinEnabled && $file->getTurnItIn()) {
-                        $messageFactory = $messageFactory->addFileContent(
-                            $this->generateResponseFileTurnitinName($participant, $response, $file),
-                            $this->generateResponseFileTurnitinUrl($participant, $response, $file),
-                        );
+                    if ($this->turnitinEnabled) {
+                        $turnitinSubmissionId = $file->getTurnItIn()?->getTurnitinSubmissionId();
+                        if (isset($turnitinSubmissionId)) {
+                            $messageFactory = $messageFactory->addTurnitinContent(
+                                $this->generateResponseFileTurnitinName($participant, $response, $file),
+                                $turnitinSubmissionId,
+                            );
+                        }
                     }
                 }
             }

@@ -197,6 +197,20 @@ class MessageFactory
     }
 
     /**
+     * Add a Turnitin submission to the downloaded ZIP.
+     *
+     * @param string $filename             The name of the file in the downloaded ZIP.
+     * @param string $turnitinSubmissionId The ID of the Turnitin submission.
+     * @return $this
+     */
+    public function addTurnitinContent(string $filename, string $turnitinSubmissionId): self
+    {
+        $clone = clone $this;
+        $clone->content[] = ['filename' => $filename, 'turnitinSubmissionId' => $turnitinSubmissionId];
+        return $clone;
+    }
+
+    /**
      * Clear all files from the downloaded ZIP.
      *
      * @return self
