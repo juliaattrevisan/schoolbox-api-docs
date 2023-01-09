@@ -503,26 +503,6 @@ class Controller extends Base
     }
 
     /**
-     * Export a PDF for a Turnitin file.
-     *
-     * @api   GET /learning/similarity/{assessmentId}/{responseId}/{turnitinSubId}
-     * @since 23.0
-     *
-     * @param Turnitin\File\Model $turnitin
-     * @return void
-     */
-    public function getTurnitinExport(Turnitin\File\Model $turnitin): void
-    {
-        if (!$this->turnitinFileApi) {
-            throw new DomainException('Turnitin configuration invalid.');
-        }
-        $pdfId = $this->turnitinFileApi->generatePdfRequest($turnitin);
-        $this->populateResponseFromPsr7Response(
-            $this->turnitinFileApi->downloadPdf($turnitin, $pdfId, 10, 5000),
-        );
-    }
-
-    /**
      * Dump out a plagscan report
      *
      * @param IAssessable $assessment
