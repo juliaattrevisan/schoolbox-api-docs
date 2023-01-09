@@ -65,6 +65,7 @@ class MessageFactory
      * @param string|null $gotenbergUrl        The URL of the Gotenberg container.
      * @param string|null $gotenbergKey        The API key which the Gotenberg container requires, if any.
      * @param string|null $gotenbergHttpHeader The header in which `$gotenbergKey` will be passed.
+     * @param string|null $kamiApiKey          The API key used to authenticate with Kami.
      */
     public function __construct(
         private Instance $instance,
@@ -72,6 +73,7 @@ class MessageFactory
         private ?string $gotenbergUrl,
         private ?string $gotenbergKey,
         private ?string $gotenbergHttpHeader,
+        private ?string $kamiApiKey,
     ) {
     }
 
@@ -213,6 +215,9 @@ class MessageFactory
                     : null,
                 'footer' => $this->pdfFooter,
             ];
+        }
+        if (isset($this->kamiApiKey)) {
+            $params['kami']['apiKey'] = $this->kamiApiKey;
         }
         return new Message(
             self::TASK,
