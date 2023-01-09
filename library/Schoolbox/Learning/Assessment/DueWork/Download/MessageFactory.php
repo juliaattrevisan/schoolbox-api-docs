@@ -143,10 +143,11 @@ class MessageFactory
                 if ($feedbackResponse) {
                     // add Kami files
                     foreach ($feedbackResponse->getAllFiles() as $file) {
-                        if ($file->getKami()) {
+                        $kamiDocumentId = $file->getKami()?->getKamiDocumentId();
+                        if (isset($kamiDocumentId)) {
                             $messageFactory = $messageFactory->addKamiContent(
                                 $this->generateResponseFileKamiName($participant, $feedback, $file),
-                                $file->getKami()->getKamiDocumentId(),
+                                $kamiDocumentId,
                             );
                         }
                     }
