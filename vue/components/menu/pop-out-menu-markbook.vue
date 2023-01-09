@@ -1,55 +1,124 @@
 <script setup lang="ts">
 
-import { reactive } from 'vue';
-
+import { onMounted, reactive } from 'vue';
 import PopOut from '../popOut/pop-out.vue';
 import SmallCard from '../card/small-card.vue';
 import MenuItem from './pop-out-menu-item.vue';
 import MenuDivider from './pop-out-menu-divider.vue';
 import UserPhoto from '../userPhoto/user-photo.vue';
+import { createReadStream } from 'fs';
+
 
 /**
  * TODO
+ * - Make call for data
  * - Don't generate cards from props, generate from
  *   elsewhere
- * - Have menu items become dynamic (v-for) ?
- * - Disable menu options if no feedback etc
+ * - Have menu items become dynamic (v-for)
  */
+
+const props = defineProps({
+dataEndpoint: {
+    type: String,
+    required: true,
+},
+updateRoute: {
+    type: String,
+    required: true,
+},
+reviewRoute: {
+    type: String,
+    required: true,
+},
+publishRoute: {
+    type: String,
+    required: true,
+},
+excludeRoute: {
+    type: String,
+    required: true,
+},
+historyRoute: {
+    type: String,
+    required: true,
+}
+});
+
 const data = reactive({
-    disableExpansion: false as Boolean,
-    isExpanded: false as Boolean,
-    viewAllText: getViewAllText(false)
+    disableExpansion: false as boolean,
+    isExpanded: false as boolean,
+    viewAllText: setViewAllText({isExpanded: false}),
+    cards: [],
 });
 
 /**
- *  Yes, you're wrapping basically a ternary, but that
- *  means if you want to change the wording you don't
- *  have to do it in two places at once now.
+ * The MenuItem is expecting a function to be passed to it to
+ * be called when clicked on - as we have five menu items that
+ * are just links, we can easily generate 'navigate to page'
+ * functions for these items by calling this.
+ *
+ * @param {string} target  - The URL we want to navigate to.
+ * @returns {Function} - A function redirecting the window to another page.
  */
-function getViewAllText(isExpanded:Boolean){
-    if(props.historyItems.length <= 0){
-        return 'No recent activity';
+function getClickFunction(target:string){
+    return () => {
+        window.location.href = target;
+    };
+}
+
+function fetchRecentActivity() {
+    fetch(routes.dataEndpoint, {
+        headers: {
+            'Accept': 'application/json',
+        }
+    })
+    .then (response => response.json())
+        .then (payload => {
+            data.cards = generateCards(payload);
+            if (payload.length <= 1){
+                data.disableExpansion = true;
+            }
+            else {
+                data.disableExpansion = false;
+            }
+            setViewAllText({
+                    isExpanded: data.disableExpansion,
+                    cardCount: data.cards.length
+                }
+            );
+        })
+        .catch(e => {});
+};
+
+/**
+ * TODO use is disabled to figure out the text to display
+ */
+function setViewAllText({ isExpanded, cardCount }){
+    if (typeof cardCount !== 'undefined' && cardCount < 2){
+        if (cardCount === 0)
+            return 'No recent activity found';
+        if(cardCount === 1)
+            return 'No additional recent activity';
     }
-    else if(isExpanded) {
+
+    if (isExpanded) {
         return 'Hide recent activity'
     }
-    else {
-        return 'View more recent activity'
-    }
+    return 'View more recent activity'
 }
 
 function toggleExpanded(){
     data.isExpanded = !data.isExpanded;
-    data.viewAllText = getViewAllText(data.isExpanded);
+    data.viewAllText = setViewAllText({ isExpanded: data.isExpanded });
 }
 
 /**
  *  Translate types into more human-readable 'action' format.
  */
-function getAction(type:String){
+function getAction(type:string){
     const translations = {
-        feedback: 'submitted on time',
-        response: 'provided feedback',
+        feedback: 'provided feedback',
+        response: 'submitted on time',
         view: 'viewed the feedback'
     };
 
@@ -57,13 +126,16 @@ function getAction(type:String){
     return translations[type] || '';
 }
 
-const props = defineProps({
-    historyItems: {
-        type: Array,
-        required: true,
-        default: [],
-    },
-});
+const routes = {
+    dataEndpoint: props.dataEndpoint,
+    updateRoute: props.updateRoute,
+    reviewRoute: props.reviewRoute,
+    publishRoute: props.publishRoute,
+    excludeRoute: props.excludeRoute,
+    historyRoute: props.historyRoute
+}
+
+fetchRecentActivity();
 
 /**
  *  Create our cards. We iterate through the cards we've received,
@@ -71,40 +143,40 @@ const props = defineProps({
  *  is to handle things like creating an image url and formatting
  *  the 'type' action into something more human-readable.
  */
-const cards = props.historyItems.map(item => {
-    return {
-        type: item.type,
-        name: item.effector.name,
-        action: getAction(item.type),
-        shortTime: item.date.short,
-        relativeTime: item.date.relative,
-        img: {
-            src: `/profile.php?id=${item.effector.id}&size=square32`,
-            size: 32,
+function generateCards(payload){
+    return payload.map(item => {
+        return {
+            vueKey: `${item.date.datetime.replaceAll(' ', '_')}_${item.effector.name.replaceAll(' ').toLowerCase()}`,
+            type: item.type,
+            name: item.effector.name,
+            action: getAction(item.type),
+            shortTime: item.date.short,
+            relativeTime: item.date.relative,
+            img: {
+                src: `/portrait.php?id=${item.effector.id}&size=square32`,
+                size: 32,
+            }
         }
-    }
-});
-
-/*  If we have no recent activity to view or less than one item to expand,
-then we should disable the view more activity option */
-if(cards.length <= 1){
-    data.disableExpansion = true;
+    });
 }
 
 </script>
 
 <template>
-    <PopOut class="c-pop-out-menu" :class="{ 'is-expanded': data.isExpanded }">
-        <div class="s-collapsible">
-            <SmallCard v-for="item in cards">
+    <PopOut
+        class="c-pop-out-menu"
+        :class="{ 'is-expanded': data.isExpanded }"
+    >
+        <div className="s-collapsible">
+            <SmallCard v-for="item in data.cards">
                 <UserPhoto v-bind="item.img"></UserPhoto>
-                <div class="c-card__details">
-                    <div class="c-card__text">{{ item.name }} {{ item.action }}</div>
-                    <div class="c-card__subtext">{{ item.shortTime }}</div>
+                <div className="c-card__details">
+                    <div className="c-card__text">{{ item.name }} {{ item.action }}</div>
+                    <div className="c-card__subtext">{{ item.shortTime }}</div>
                 </div>
             </SmallCard>
         </div>
-        <div class="c-pop-out-menu__options">
+        <div className="c-pop-out-menu__options">
             <MenuItem
                 @click="toggleExpanded();"
                 :class="{ 'is-disabled': data.disableExpansion }"
@@ -112,11 +184,36 @@ if(cards.length <= 1){
                 {{ data.viewAllText }}
             </MenuItem>
             <MenuDivider />
-            <MenuItem>Update feedback</MenuItem>
-            <MenuItem>Review submission</MenuItem>
-            <MenuItem>Publish feedback</MenuItem>
-            <MenuItem>Exclude student</MenuItem>
-            <MenuItem>Submission history</MenuItem>
+            <MenuItem
+                :class="{ 'is-disabled': !routes.updateRoute }"
+                :on-click-action="getClickFunction(routes.updateRoute)"
+            >
+                Update feedback
+            </MenuItem>
+            <MenuItem
+                :class="{ 'is-disabled': !routes.reviewRoute }"
+                :on-click-action="getClickFunction(routes.reviewRoute)"
+            >
+                Review submission
+            </MenuItem>
+            <MenuItem
+                :class="{ 'is-disabled': !routes.publishRoute }"
+                :on-click-action="getClickFunction(routes.publishRoute)"
+            >
+                Publish feedback
+            </MenuItem>
+            <MenuItem
+                :class="{ 'is-disabled': !routes.excludeRoute }"
+                :on-click-action="getClickFunction(routes.excludeRoute)"
+            >
+                Exclude student
+            </MenuItem>
+            <MenuItem
+                :class="{ 'is-disabled': !routes.historyRoute }"
+                :on-click-action="getClickFunction(routes.historyRoute)"
+            >
+                Submission history
+            </MenuItem>
         </div>
     </PopOut>
 </template>

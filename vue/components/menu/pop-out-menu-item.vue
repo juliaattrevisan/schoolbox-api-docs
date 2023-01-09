@@ -1,7 +1,16 @@
 <script setup lang="ts">
 
 const props = defineProps({
-    iconText: String
+    iconText: {
+        type: String,
+        required: false,
+        default: '',
+    },
+    onClickAction: {
+        type: Function,
+        required: false,
+        default: () => {}
+    }
 });
 
 /**
@@ -23,7 +32,7 @@ classes[iconClass] = props.iconText;
 </script>
 
 <template>
-    <div class="c-menu-item">
+    <div class="c-menu-item" @click="props.onClickAction">
         <slot></slot>
         <div
             class="c-menu-item__icon"

@@ -6,7 +6,7 @@ defineProps<{
     src: {
         type: String,
         required: true,
-        default: 'https://placedog.net/122/112',
+        default: '',
     },
     size: {
         type: Number,

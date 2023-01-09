@@ -79,8 +79,11 @@ class FullWithViews
                         'id' => $interaction->getReviewer()->getId(),
                         'name' => $interaction->getReviewer()->getFullname(),
                     ],
-                    'published' => $interaction->isPublished(),
-                    'date' => $date
+                    'date' => [
+                        'datetime' => $interaction->getPublishedAt()?->getDatabase(),
+                        'short' => $interaction->getPublishedAt()?->getShort(),
+                        'relative' => $interaction->getPublishedAt()?->getRelativeTime(),
+                    ]
                 ];
             } elseif ($interaction instanceof AbstractResponse) {
                 if ($interaction->isSubmitted()) {
@@ -125,8 +128,11 @@ class FullWithViews
                         'id' => $interaction->getReviewer()->getId(),
                         'name' => $interaction->getReviewer()->getFullname(),
                     ],
-                    'published' => $interaction->isPublished(),
-                    'date' => $date,
+                    'date' => [
+                        'datetime' => $interaction->getPublishedAt()?->getDatabase(),
+                        'short' => $interaction->getPublishedAt()?->getShort(),
+                        'relative' => $interaction->getPublishedAt()?->getRelativeTime(),
+                    ]
                 ];
             }
         }
@@ -159,7 +165,7 @@ class FullWithViews
          * of Associated Feedbacks
          */
         usort($stack, static function (array $a, array $b): int {
-            return strtotime($b['date']['datetime']) <=> strtotime($a['date']['datetime']);
+            return strtotime($b['date']['datetime'] ?? '') <=> strtotime($a['date']['datetime'] ?? '');
         });
 
         return $stack;

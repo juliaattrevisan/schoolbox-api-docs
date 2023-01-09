@@ -19,6 +19,7 @@
         min-height: 4rem;
         padding: 0.5rem 0;
         position: absolute;
+        z-index: 100001;
 
         &__divider {
             border: 1px solid rgba(255, 0, 0, 0.15);

@@ -183,12 +183,12 @@
                     {# Regardless of which term is being filtered to, link to default term grades page (ie empty termCode) #}
                     <a class="{{ draftsOffClass }}"
                        href="{{ gradesRoute }}" {% if draftWeightedMean %}data-actual-mark{% endif %}
-                       title="View students {{ locale.grades.plural }}"> {{ studentMean | default('–') }}
+                       title="View students {{ locale.grades.plural }}"> {{ studentMean | default('-') }}
                     </a>
                     {% if draftWeightedMean %}
                         <a class="{{ draftsOnClass }}"
                            href="{{ gradesRoute }}" data-draft-mark style="display: none"
-                           title="View student draft {{ locale.grades.plural }}"> {{ draftWeightedMean | default('–') }}
+                           title="View student draft {{ locale.grades.plural }}"> {{ draftWeightedMean | default('-') }}
                         </a>
                     {% endif %}
                 </td>
@@ -205,7 +205,7 @@
 
                 {% for assessment in markbook.assessments %}
                     {% set participant = assessment.getParticipantIfExtant(student) %}
-                    <td class="column-{{ assessment.id }}{% if not participant or participant.isExcluded %} excluded{% endif %} student-grade-cell" data-assessment="{{ assessment.id }}">
+                    <td class="column-{{ assessment.id }}{% if not participant or participant.isExcluded %} excluded{% endif %} student-grade-cell"  data-assessment="{{ assessment.id }}">
                         {% if participant and not participant.isExcluded %}
                             {% if assessment is task %}
                                 {# An icon that shows if the student has attempted the task or not #}
@@ -251,6 +251,18 @@
                                     <span class="individualisation has-tip tip-top" data-tooltip title="{{ participant.plan.name }} ({{ participant.plan.duedate.short }})">i</span>
                                 {% endif %}
                             {% endif %}
+                        {% endif %}
+                        {% if assessment.getDefaultTypeName == 'Due Work' %}
+                            <div data-markbook-pop-out>
+                                <markbook-pop-out
+                                        data-endpoint="{{ routeLookupIfAuthorized('learningAssessmentTimeline.getFullTimeline', {assessment: assessment, assessmentId: assessment.id, userId: student.id }) }}"
+                                        update-route="{{ routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
+                                        review-route="{{ routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
+                                        publish-route="{{ routeLookupIfAuthorized('learningAssessment.getSummary', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
+                                        exclude-route="{{ routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessment: assessment, assessmentId:assessment.id }) }}"
+                                        history-route="{{ routeLookupIfAuthorized('learningAssessment.getSummary', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
+                                />
+                            </div>
                         {% endif %}
                     </td>
                 {% endfor %}
