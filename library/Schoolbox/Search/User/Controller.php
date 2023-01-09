@@ -67,7 +67,6 @@ class Controller extends BaseController
      * @param PastoralSubTypeMapper         $pastoralSubTypeMapper
      * @param PastoralDataSource            $pastoralDataSource
      * @param TermMapper                    $termMapper
-     * @param FilterHelper                  $filterHelper
      * @param \Schoolbox\External\User      $userRelationHydrator
      */
     public function __construct(
@@ -84,7 +83,6 @@ class Controller extends BaseController
         private PastoralSubTypeMapper $pastoralSubTypeMapper,
         private PastoralDataSource $pastoralDataSource,
         private TermMapper $termMapper,
-        private FilterHelper $filterHelper,
         protected \Schoolbox\External\User $userRelationHydrator
     ) {
     }
@@ -213,6 +211,7 @@ class Controller extends BaseController
         $subjectColorManager = new Timetable_ColourManager($colors);
         $groupColorManager   = new Timetable_ColourManager($colors);
 
+
         // Load the list of subjects, and their teacher.
         // Then group by subject type?
         $subjects      = [];
@@ -308,6 +307,7 @@ class Controller extends BaseController
             $group['name']   = $groupFolder->getName();
             $group['perms']  = $this->access->getFolderAccess($this->getUser(), $groupFolder->getId());
             $group['folder'] = $groupFolder;
+
 
             /* Decide whether the currently logged in user can see a link
              * to this group's folder; link availability is dependent
@@ -585,11 +585,6 @@ class Controller extends BaseController
             $pastoralCounts      = $pastoralCountHelper->countStudentEventsByTypes($this->getUser(), $student, null, null, false, $pastoralCountHelper->getStartDate((int)$this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_FLAG_COUNT_PERIOD)));
         }
 
-        $filterPanel = $this->filterHelper->buildFilterPanel(
-            $this->getUser(),
-            $this->request->query->getArrayCopy(),
-        );
-
         $this->response->content->set(
             $this->buildHtmlOutput(
                 'user/student.twig',
@@ -624,7 +619,6 @@ class Controller extends BaseController
                     'learningMomentCanComment' => $learningMomentCanComment,
                     'isGeosnapshotAvailable'   => $isGeosnapshotAvailable,
                     'canEmailStaff'            => $canEmailStaff,
-                    'filterPanel'              => $filterPanel
                 ]
             )
         );
