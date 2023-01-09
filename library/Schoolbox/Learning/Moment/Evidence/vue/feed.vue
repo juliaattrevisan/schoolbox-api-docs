@@ -248,11 +248,38 @@ export default {
         /**
          * to open up the node details modal
          *
-         * @pararm { object }
+         * @param { Object }
          */
         onCodeSelected(node) {
             this.selectedNode = node;
             this.$refs.nodeDetailsModal.open();
+        },
+
+        /**
+         * @param { String } filterClicked
+         */
+        applyFilters(filterToChange) {
+            $("#filter-" + filterClicked).prop("checked", true);
+
+            let filterNames = ["achievements", "goals", "learning-moments"];
+            let checkedFilters = [];
+
+            for (let i = 0; i < filterNames.length; ++i) {
+                let filterName = filterNames[i];
+                if ($("#filter-" + filterName).prop("checked")) {
+                    checkedFilters.push(filterName);
+                }
+            }
+
+            let url = window.location.href;
+            let chopPos = url.indexOf("?filtersJson");
+
+            if (chopPos !== -1) {
+                // Chop filtersJson parameter from URL.
+                url = url.substring(0, chopPos);
+            }
+
+            window.location.href = url + "?filtersJson=" + JSON.stringify(checkedFilters);
         },
     },
 };
@@ -260,6 +287,32 @@ export default {
 
 <template>
     <div>
+        <div class="feed">
+            <div class="feed-column left"></div>
+            <section class="activity-feed">
+                <div id="activity-feed-filters">
+                    Show:
+                    <label for="filter-achievements" @click.prevent="applyFilters('achievements')">
+                        <input type="checkbox" class="plain" id="filter-achievements" name="includeAchievements" />
+                        Achievements
+                    </label>
+                    <label for="filter-goals" @click.prevent="applyFilters('goals')">
+                        <input type="checkbox" class="plain" id="filter-goals" name="includeGoals" />
+                        Goals
+                    </label>
+                    <label for="filter-learning-moments" @click.prevent="applyFilters('learning-moments')">
+                        <input
+                            type="checkbox"
+                            class="plain"
+                            id="filter-learning-moments"
+                            name="includeLearningMoments"
+                        />
+                        Learning Moments
+                    </label>
+                </div>
+            </section>
+            <div class="feed-column right"></div>
+        </div>
         <div class="feed" v-for="(evidenceGroup, index) in groupedEvidence" :key="index">
             <div class="feed-column left"></div>
             <section class="activity-feed">
