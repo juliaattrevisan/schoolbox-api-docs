@@ -409,11 +409,8 @@ done
 
 sshlist=`grep 'Host ' /root/.ssh/config 2>/dev/null | sed 's/Host\ //g'`;
 echo -e "\nRemote installs \c";
-for host in $sshlist;
-do
-	ssh -o ConnectTimeout=3 -o ConnectionAttempts=1 $host exit >/dev/null 2>&1;
-	if [ $? -eq 0 ];
-	then
+for host in $sshlist; do
+	if ssh -o ConnectTimeout=3 -o ConnectionAttempts=1 $host exit >/dev/null 2>&1; then
     # remote may be at current or older arch
     remote_found=0
     # First try current conf arch.
@@ -442,9 +439,12 @@ do
         tempdatadirlist=`ssh $host "ls -1 $tempfiledir/../{*-*-*-*_*-*-*.sql,backups/*/*/schoolbox_*-*-*.sql.gz} 2>/dev/null"`;
         for i in $tempdatadirlist; do
           echo -e ".\c";
-          checki=`ssh $host "readlink -f $i"`;
-          echo "[R],[D],$host,$x,$checki" >> $sbrl;
-          echo "[R],[A],$host,$x,$checki" >> $sbrl;
+          if checki=$(ssh $host "readlink -f $i"); then
+            echo "[R],[D],$host,$checki" >> $sbrl;
+            echo "[R],[A],$host,$checki" >> $sbrl;
+          else
+            echo "Failed to fetch remote backup path" >&2
+          fi
         done
       fi
     fi
