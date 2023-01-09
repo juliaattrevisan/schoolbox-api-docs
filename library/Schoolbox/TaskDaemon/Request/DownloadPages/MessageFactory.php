@@ -66,6 +66,8 @@ class MessageFactory
      * @param string|null $gotenbergKey        The API key which the Gotenberg container requires, if any.
      * @param string|null $gotenbergHttpHeader The header in which `$gotenbergKey` will be passed.
      * @param string|null $kamiApiKey          The API key used to authenticate with Kami.
+     * @param string|null $turnitinApiKey      The API key used to authenticate with Turnitin.
+     * @param string|null $turnitinApiHost     The host name of this instance's Turnitin instance.
      */
     public function __construct(
         private Instance $instance,
@@ -74,6 +76,8 @@ class MessageFactory
         private ?string $gotenbergKey,
         private ?string $gotenbergHttpHeader,
         private ?string $kamiApiKey,
+        private ?string $turnitinApiKey,
+        private ?string $turnitinApiHost,
     ) {
     }
 
@@ -232,6 +236,12 @@ class MessageFactory
         }
         if (isset($this->kamiApiKey)) {
             $params['kami']['apiKey'] = $this->kamiApiKey;
+        }
+        if (isset($this->turnitinApiKey, $this->turnitinApiHost)) {
+            $params['turnitin'] = [
+                'apiKey' => $this->turnitinApiKey,
+                'host'   => $this->turnitinApiHost,
+            ];
         }
         return new Message(
             self::TASK,

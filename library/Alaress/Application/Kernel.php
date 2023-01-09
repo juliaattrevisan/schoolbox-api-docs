@@ -471,6 +471,8 @@ abstract class Kernel
                     'gotenbergKey'        => $config->get(ConfigMapper::NAME_GOTENBERG_API_KEY),
                     'gotenbergHttpHeader' => RequestFactory::AUTH_HTTP_HEADER,
                     'kamiApiKey'          => $config->get('kami_api_key'),
+                    'turnitinApiKey'      => $config->get('turnitin_api_key'),
+                    'turnitinApiHost'     => $config->get('turnitin_api_host'),
                 ],
             )
         );
