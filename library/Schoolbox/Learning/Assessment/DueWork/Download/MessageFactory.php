@@ -302,25 +302,6 @@ class MessageFactory
     }
 
     /**
-     * Generate a download URL for this file's Kami annotation.
-     *
-     * @param DueWorkResponseFile $responseFile
-     * @return string
-     * @noinspection PhpDocMissingThrowsInspection - this route always exists
-     */
-    private function generateResponseFileKamiUrl(DueWorkResponseFile $responseFile): string
-    {
-        /** @noinspection PhpUnhandledExceptionInspection - this route always exists */
-        $kamiRoutePath  = $this->router->generate(
-            'learningDueWorkResponse.getKamiExport',
-            ['kamiId' => $responseFile->getKami()->getId(),],
-        );
-        return $this->urlBase
-            ->setPath($kamiRoutePath)
-            ->toString();
-    }
-
-    /**
      * Generates a file name for this participant, feedback and Turnitin file in
      * the generated ZIP file.
      *
@@ -345,34 +326,6 @@ class MessageFactory
             $this->generateResponseFolderName($participant, $response),
             $this->sanitizeForFilename($basename),
         );
-    }
-
-    /**
-     * Generate a download URL for this file's Turnitin annotation.
-     *
-     * @param Participant         $participant
-     * @param IResponse           $response
-     * @param DueWorkResponseFile $responseFile
-     * @return string
-     * @noinspection PhpDocMissingThrowsInspection - this route always exists
-     */
-    private function generateResponseFileTurnitinUrl(
-        Participant $participant,
-        IResponse $response,
-        DueWorkResponseFile $responseFile,
-    ): string {
-        /** @noinspection PhpUnhandledExceptionInspection - this route always exists */
-        $tiiRoutePath = $this->router->generate(
-            'learningDueWorkResponse.getTurnitinExport',
-            [
-                'assessmentId'  => $participant->getAssessable()->getId(),
-                'responseId'    => $response->getId(),
-                'turnitinSubId' => $responseFile->getTurnItIn()->getTurnitinSubmissionId(),
-            ],
-        );
-        return $this->urlBase
-            ->setPath($tiiRoutePath)
-            ->toString();
     }
 
     /**
