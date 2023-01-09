@@ -28,7 +28,7 @@ function onSelected (depth, id) {
     <TransitionGroup name="list" class="breadcrumb" tag="ul">
         <li v-for="(breadcrumb) in modalActiveNodesStore.breadcrumbs" :key="breadcrumb.id">
             <a
-                :href="`/curricululm/${breadcrumb.id}`"
+                :href="`/curriculum/#${breadcrumb.id}`"
                 :title="`View ${breadcrumb.name}`"
                 @click.prevent="onSelected(breadcrumb.depth, breadcrumb.id)"
                 @keyup.enter="onSelected(breadcrumb.depth, breadcrumb.id)"
