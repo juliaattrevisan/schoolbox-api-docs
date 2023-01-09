@@ -34,7 +34,7 @@ function onSelected () {
         </span>
         <a
             v-else
-            :href="`/curricululm/${props.breadcrumb.id}`"
+            :href="`/curriculum/#${props.breadcrumb.id}`"
             :title="`View ${props.breadcrumb.name}`"
             @click.prevent="onSelected()"
             @keyup.enter="onSelected()"
