@@ -85,8 +85,14 @@ export default {
             if (cursor) {
                 params.cursor = cursor;
             }
+
+            params.filters = this.getFiltersData();
+
             try {
+                console.info("params: ", params);
+                console.info("Calling fetch() with: ", this.config.routes.getFeed + "?" + new URLSearchParams(params));
                 const response = await fetch(this.config.routes.getFeed + "?" + new URLSearchParams(params));
+                console.info("response: ", response);
                 const responseData = await response.json();
                 this.data = this.data.concat(responseData.data ? responseData.data : []);
                 this.metadata.count = responseData.metadata?.count ? responseData.metadata.count : 0;
@@ -256,11 +262,17 @@ export default {
         },
 
         /**
-         * @param { String } filterClicked
+         * @param { String } clickedFilterName
          */
-        applyFilters(filterToChange) {
-            $("#filter-" + filterClicked).prop("checked", true);
+        applyFilters(clickedFilterName) {
+            let clickedFilter = $("#filter-" + clickedFilterName);
+            clickedFilter.prop("checked", clickedFilter.prop("checked") ? false : true);
 
+            $("div.feed:not(*.filter-container)").remove();
+            this.load();
+        },
+
+        getFiltersData() {
             let filterNames = ["achievements", "goals", "learning-moments"];
             let checkedFilters = [];
 
@@ -271,15 +283,7 @@ export default {
                 }
             }
 
-            let url = window.location.href;
-            let chopPos = url.indexOf("?filtersJson");
-
-            if (chopPos !== -1) {
-                // Chop filtersJson parameter from URL.
-                url = url.substring(0, chopPos);
-            }
-
-            window.location.href = url + "?filtersJson=" + JSON.stringify(checkedFilters);
+            return checkedFilters;
         },
     },
 };
@@ -287,7 +291,7 @@ export default {
 
 <template>
     <div>
-        <div class="feed">
+        <div class="feed filter-container">
             <div class="feed-column left"></div>
             <section class="activity-feed">
                 <div id="activity-feed-filters">
