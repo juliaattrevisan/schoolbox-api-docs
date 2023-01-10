@@ -25,6 +25,13 @@ use Schoolbox\User;
  * Feed for a user's learning moment feed.
  *
  * This combines evidence and badges into the one cursored result.
+ *
+ * The purpose of a cursor
+ * -----------------------
+ * A call to Cursor->retrieveResults() will return a list of items that are either 'evidence', 'badgeAward', or
+ * 'dueWorkFeedback', sorted into buckets according to date.  The purpose of the cursor is to uniquely identify a
+ * position in this sorted list.  Since each type of item has its own set of IDs, ID alone is not enough information.
+ * We need the date/time, the type of object, and the object's ID.  For more info see the comments in the ICursor class.
  */
 class Cursor implements ICursor
 {
@@ -33,7 +40,6 @@ class Cursor implements ICursor
      * evidence record.
      */
     public const DISCRIMINATOR_EVIDENCE = 'evidence';
-
 
     /**
      * Discriminator value for identifying that a retrieved result points to a
@@ -47,12 +53,10 @@ class Cursor implements ICursor
      */
     public const DISCRIMINATOR_DUE_WORK_FEEDBACK = 'dueWorkFeedback';
 
-
     /**
      * Whether the learning moments module is enabled
      */
     private bool $learningMomentsEnabled;
-
 
     /**
      * Whether the badges module is enabled
@@ -67,6 +71,7 @@ class Cursor implements ICursor
      * @param IConnector               $database
      * @param User                     $viewee
      * @param User                     $viewer
+     * @param Array                    $filterInfo
      * @param Alaress_Date_Format|null $expiryDate If provided: don't fetch any badge awards which expire before this date.
      * @param int                      $limit      The maximum number of results to fetch in one query.
      * @param IConfigLoader            $config
@@ -76,6 +81,7 @@ class Cursor implements ICursor
         private IConnector $database,
         private User $viewee,
         private User $viewer,
+        private $filterInfo,
         private ?Alaress_Date_Format $expiryDate,
         private int $limit,
         IConfigLoader $config,
@@ -89,7 +95,6 @@ class Cursor implements ICursor
         $this->gradesEnabled          = $config->get(ConfigMapper::NAME_GRADES_ENABLED)
             && (!$viewer->getRole()->isStaff() || $viewer->getRole()->getViewStudentGrades());
     }
-
 
     /**
      * @inheritdoc
@@ -106,7 +111,6 @@ class Cursor implements ICursor
         return $this->codec->encode($collection->last());
     }
 
-
     /**
      * This returns null for now, until there's a need for the current cursor.
      *
@@ -118,7 +122,6 @@ class Cursor implements ICursor
         return null;
     }
 
-
     /**
      * @inheritdoc
      */
@@ -127,12 +130,14 @@ class Cursor implements ICursor
         $count        = 0;
         $countQueries = [];
         if ($this->learningMomentsEnabled) {
+            // TODO: Use $this->filterInfo here.
             $countQueries[] = $this->database->executeQuery(
                 "SELECT COUNT(*) FROM evidence WHERE user_id = ? AND deleted_at IS NULL",
                 [$this->viewee->getId()]
             );
         }
         if ($this->badgesEnabled) {
+            // TODO: Use $this->filterInfo here.
             $badgeCountQuery  = "SELECT COUNT(*) FROM badge_user WHERE recipient_id = ? AND deleted_at IS NULL";
             $badgeCountParams = [$this->viewee->getId()];
             if ($this->expiryDate) {
@@ -142,6 +147,7 @@ class Cursor implements ICursor
             $countQueries[] = $this->database->executeQuery($badgeCountQuery, $badgeCountParams);
         }
         if ($this->gradesEnabled) {
+            // TODO: Use $this->filterInfo here.
             [$dueWorkFeedbackCountQuery, $dueWorkFeedbackCountParams] = $this->getDueWorkFeedbackQuery([], countOnly: true);
             $countQueries[] = $this->database->executeQuery($dueWorkFeedbackCountQuery, $dueWorkFeedbackCountParams);
         }
@@ -151,7 +157,6 @@ class Cursor implements ICursor
         }
         return $count;
     }
-
 
     /**
      * @inheritdoc
@@ -189,6 +194,7 @@ class Cursor implements ICursor
         $queries = [];
 
         if ($this->learningMomentsEnabled) {
+            // TODO: Use $this->filterInfo here.
             $queries[]                       = '
                 SELECT
                     id,
@@ -201,6 +207,7 @@ class Cursor implements ICursor
             $params['userIdEvidence']        = $this->viewee->getId();
         }
         if ($this->badgesEnabled) {
+            // TODO: Use $this->filterInfo here.
             $badgeQuery                        = '
                 SELECT
                     id                       AS id,
@@ -219,6 +226,7 @@ class Cursor implements ICursor
             $queries[] = $badgeQuery;
         }
         if ($this->gradesEnabled) {
+            // TODO: Use $this->filterInfo here.
             [$dueWorkFeedbackQuery, $params] = $this->getDueWorkFeedbackQuery($params, countOnly: false);
             $queries[] = $dueWorkFeedbackQuery;
         }
@@ -240,7 +248,6 @@ class Cursor implements ICursor
             $this->database->executeQuery($query, $params)->fetchAll()
         );
     }
-
 
     /**
      * Returns query to get due work feedback
@@ -280,22 +287,24 @@ class Cursor implements ICursor
                     JOIN `submission_box` ON `submission_return`.`box_id` = `submission_box`.`id`
                     JOIN `assessment` ON `assessment`.`id` = `submission_box`.`assessment_id`
                 WHERE `review_route` = :reviewRoute
-                  AND `submission_return`.`published_at` IS NOT NULL
-                  AND `submission_return`.`owner` = :userIdDueWorkFeedback
-                  AND `submission_box`.`mark_visibility` >= :markVisibility
-                  AND `submission_return`.`deleted_at` IS NULL
-                  AND `assessment`.`deleted_at` IS NULL
+                    AND `submission_return`.`published_at` IS NOT NULL
+                    AND `submission_return`.`owner` = :userIdDueWorkFeedback
+                    AND `submission_box`.`mark_visibility` >= :markVisibility
+                    AND `submission_return`.`deleted_at` IS NULL
+                    AND `assessment`.`deleted_at` IS NULL
             ';
 
         if ($filterWorkType) {
             $dueWorkFeedbackQuery .= '
                 AND (
-                 `assessment`.`work_type_id` IS NULL
-                 OR
-                 `assessment`.`work_type_id`
-                 IN (SELECT `id` FROM `lu_work_type`
-                                WHERE `staff_or_instructor_visible_only` = 0
-                                  AND `deleted_at` IS NULL)
+                    `assessment`.`work_type_id` IS NULL
+                    OR
+                    `assessment`.`work_type_id`
+                    IN (
+                        SELECT `id` FROM `lu_work_type`
+                        WHERE `staff_or_instructor_visible_only` = 0
+                        AND `deleted_at` IS NULL
+                    )
                 )';
         }
 
