@@ -17,7 +17,6 @@ use Schoolbox\Resource\Folder\Model as Folder;
  */
 class Component_Homepage_BreadcrumbController extends Component_Homepage_ControllerAbstract
 {
-
     /**
      * Renders the data into the SitePage. Presentation logic.
      *
