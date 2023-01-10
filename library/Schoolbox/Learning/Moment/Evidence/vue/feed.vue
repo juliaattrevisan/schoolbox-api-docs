@@ -297,8 +297,17 @@ export default {
 
             let filtersDescription =
                 "Showing " +
-                (checkedFeedItemTypes.length === 4 ? "all items" : checkedFeedItemTypes.join(", ").replace("-", " ")) +
-                (this.selectedTag === null ? "" : ', with tag "' + this.selectedTag + '"');
+                (checkedFeedItemTypes.length === feedItemTypes.length
+                    ? "all items"
+                    : checkedFeedItemTypes.join(", ").replace("-", " ")) +
+                (this.selectedTag === null
+                    ? ""
+                    : (checkedFeedItemTypes.length === feedItemTypes.length || checkedFeedItemTypes.length === 1
+                          ? ""
+                          : ",") +
+                      ' with tag "' +
+                      this.selectedTag +
+                      '"');
 
             $("#filters-description").html(filtersDescription);
 
@@ -314,7 +323,7 @@ export default {
             <div class="feed-column left"></div>
             <section class="activity-feed">
                 <div id="activity-feed-filters">
-                    Show:
+                    Filter:
                     <label for="filter-assessments" @click.prevent="applyFilters('assessments', null)">
                         <input type="checkbox" class="plain" id="filter-assessments" name="includeAssessments" />
                         Assessments
