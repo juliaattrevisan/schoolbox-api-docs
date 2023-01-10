@@ -156,15 +156,15 @@ class Cursor implements ICursor
     {
         $count        = 0;
         $countQueries = [];
-        if ($this->learningMomentsEnabled) {
+        if (
+            $this->learningMomentsEnabled &&
             // Only include if $this->filters is empty or feedItemType 'evidence' is specified in at least one filter.
-            [$includeEvidence] = $this->getFilterInfoForEvidenceQuery($this->filters);
-            if ($includeEvidence) {
-                $countQueries[] = $this->database->executeQuery(
-                    "SELECT COUNT(*) FROM evidence WHERE user_id = ? AND deleted_at IS NULL",
-                    [$this->viewee->getId()]
-                );
-            }
+            $this->evidenceIsIncludedAccordingToFilters($this->filters)
+        ) {
+            $countQueries[] = $this->database->executeQuery(
+                "SELECT COUNT(*) FROM evidence WHERE user_id = ? AND deleted_at IS NULL",
+                [$this->viewee->getId()]
+            );
         }
         if ($this->badgesEnabled) {
             // Only include if $this->filters is empty or feedItemType 'badgeAward' is specified in at least one filter.
@@ -235,21 +235,21 @@ class Cursor implements ICursor
 
         $queries = [];
 
-        if ($this->learningMomentsEnabled) {
+        if (
+            $this->learningMomentsEnabled &&
             // Only include if $this->filters is empty or feedItemType 'evidence' is specified in at least one filter.
-            [$includeEvidence] = $this->getFilterInfoForEvidenceQuery($this->filters);
-            if ($includeEvidence) {
-                $queries[] = (
-                   'SELECT
-                        id,
-                        :discriminatorEvidence AS discriminator,
-                        created_at             AS date
-                    FROM evidence
-                    WHERE user_id = :userIdEvidence AND deleted_at IS NULL'
-                );
-                $params['discriminatorEvidence'] = self::DISCRIMINATOR_EVIDENCE;
-                $params['userIdEvidence']        = $this->viewee->getId();
-            }
+            $this->evidenceIsIncludedAccordingToFilters($this->filters)
+        ) {
+            $queries[] = (
+               'SELECT
+                    id,
+                    :discriminatorEvidence AS discriminator,
+                    created_at             AS date
+                FROM evidence
+                WHERE user_id = :userIdEvidence AND deleted_at IS NULL'
+            );
+            $params['discriminatorEvidence'] = self::DISCRIMINATOR_EVIDENCE;
+            $params['userIdEvidence']        = $this->viewee->getId();
         }
         if ($this->badgesEnabled) {
             // Only include if $this->filters is empty or feedItemType 'badgeAward' is specified in at least one filter.
@@ -384,7 +384,6 @@ class Cursor implements ICursor
      * Return info for use in queries involving filters and the badge_user table.
      * Records from badge_user should only be included if one or more filters reference feedItemType 'badgeAward'.
      *
-     * @see $this->getFilterInfoForEvidenceQuery().
      * @param array $filters
      * @return array
      */
@@ -415,14 +414,12 @@ class Cursor implements ICursor
     }
 
     /**
-     * Return info for use in queries involving filters and the evidence table.
      * Records from evidence should only be included if one or more filters reference feedItemType 'evidence'.
      *
-     * @see $this->getFilterInfoForBadgesQuery().
      * @param array $filters
-     * @return array
+     * @return bool
      */
-    private function getFilterInfoForEvidenceQuery(array $filters): array
+    private function evidenceIsIncludedAccordingToFilters(array $filters): bool
     {
         $includeEvidence = (count($filters) === 0);
 
@@ -432,6 +429,6 @@ class Cursor implements ICursor
             }
         }
 
-        return [$includeEvidence];
+        return $includeEvidence;
     }
 }
