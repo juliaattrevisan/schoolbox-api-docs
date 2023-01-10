@@ -12,6 +12,7 @@ import Toast from "@schoolboxVue/components/toast.vue";
 
 export const useStore = defineStore("manageCurriculum", () => {
     let apiEndpoint = ""; // where to load the curriculum api from
+    let uiLimit = 0;
     const isLoading = ref(true); // to display loading note
     const hasLoadError = ref(false); // to display loading error
     const isProcessing = ref(false); // to notify that an action is taking place, like updating a member access
@@ -21,19 +22,28 @@ export const useStore = defineStore("manageCurriculum", () => {
     const toastEl = ref<typeof Toast | null>(null); // so we don't need to pass it all around as a prop
 
     /**
-     * When load is complete and and was a success
+     * When load is complete and was a success
      *
      * @returns { boolean } whether the nodes have loaded
      */
     const hasLoadedOk = computed(() => !isLoading.value && !hasLoadError.value);
 
     /**
-     * When load is complete and and was a success
+     * Get the url of the curriculum api
      *
      * @returns { string } the url of the curriculum api
      */
     function getApiEndpoint(): string {
         return apiEndpoint;
+    }
+
+    /**
+     * Get default number of nodes to retrieve using the api
+     *
+     * @returns { number }
+     */
+    function getUILimit(): number {
+        return uiLimit;
     }
 
     /**
@@ -69,9 +79,10 @@ export const useStore = defineStore("manageCurriculum", () => {
      *
      * @param { string } dataEndpoint - the curriculum api url
      * @param { boolean } $isReadOnly - whether the current user can edit the curriculum
+     * @param { number } uiLimit - the number of nodes to retrieve using the api
      * @param { ref } toastElement -
      */
-    async function init(dataEndpoint: string, $isReadOnly: boolean, toastElement: typeof Toast): Promise<void> {
+    async function init(dataEndpoint: string, $isReadOnly: boolean, dataUiLimit: number, toastElement: typeof Toast): Promise<void> {
         checkForNodeHash();
         checkForStorybook();
         isReadOnly.value = $isReadOnly;
@@ -79,6 +90,7 @@ export const useStore = defineStore("manageCurriculum", () => {
         if (dataEndpoint !== "") {
             // only load when we need to
             apiEndpoint = dataEndpoint;
+            uiLimit = dataUiLimit;
             await useNodesStore().load(); // load the top level curricula
         }
     }
@@ -93,6 +105,7 @@ export const useStore = defineStore("manageCurriculum", () => {
         toastEl,
         hasLoadedOk,
         getApiEndpoint,
+        getUILimit,
         init,
         checkForStorybook,
     };

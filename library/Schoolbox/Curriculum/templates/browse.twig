@@ -2,6 +2,7 @@
     <manage-curriculum
         data-endpoint="{{ routeLookup('curriculumApi.searchNode') }}"
         :is-read-only="{{ readonly ? 'true' : 'false' }}"
+        :ui-limit="{{ uiLimit }}"
     />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/manageCurriculum.js?v={{ config.site_version }}"></script>
