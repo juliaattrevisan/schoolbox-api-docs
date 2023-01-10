@@ -96,6 +96,6 @@ class Alaress_Rss_Strategy_Rss20 implements Alaress_Rss_Strategy_Interface
      */
     public function getLink(Xml $input): string
     {
-        return $input->xml->channel->link;
+        return $input->xml->channel->link ?? '';
     }
 }
