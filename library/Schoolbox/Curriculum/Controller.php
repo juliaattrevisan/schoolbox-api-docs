@@ -33,7 +33,7 @@ class Controller extends Base
      * This is used when retrieving nodes from Curriculum UI, using api endpoint
      * The default values for API are defined in Curriculum/API/Controller
      */
-    private const DEFAULT_UI_LIMIT   = 1000;
+    private const DEFAULT_UI_LIMIT = 1000;
 
     /**
      * Constructor
