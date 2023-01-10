@@ -5,7 +5,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Schoolbox\GenericCollection;
+use League\Flysystem\FilesystemException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Notifactory;
@@ -301,10 +301,14 @@ class Session
                     $ldapCaCert->getHash()
                 );
                 if (!file_exists($ldapCaCertPath)) {
-                    file_put_contents($ldapCaCertPath, $filesystemProxy->read($ldapCaCert));
+                    try {
+                        file_put_contents($ldapCaCertPath, $filesystemProxy->read($ldapCaCert));
+                        ldap_set_option(null, LDAP_OPT_X_TLS_CACERTDIR, dirname($ldapCaCertPath));
+                        ldap_set_option(null, LDAP_OPT_X_TLS_CACERTFILE, $ldapCaCertPath);
+                    } catch (FilesystemException $e) {
+                        //can't read cert, just continue without the certificate
+                    }
                 }
-                ldap_set_option(null, LDAP_OPT_X_TLS_CACERTDIR, dirname($ldapCaCertPath));
-                ldap_set_option(null, LDAP_OPT_X_TLS_CACERTFILE, $ldapCaCertPath);
             }
             $ds = ldap_connect($host);
             if ($ds) {
@@ -381,7 +385,6 @@ class Session
                                 case '532': // PASSWORD_EXPIRED
                                     // do not fall back. Soft-redirect to password reset function.
                                     throw new SchoolboxPasswordExpiredException('Your password has expired and needs to be reset before you can log in.');
-                                    break;
 
                                 case '52e': // INVALID_CREDENTIALS
                                 case '49': // INVALID_CREDENTIALS
