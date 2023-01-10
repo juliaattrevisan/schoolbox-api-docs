@@ -13,7 +13,12 @@
             <ul class="breadcrumb">
                 <!-- BEGIN category_breadcrumb -->
                 <li class="{BREADCRUMB_CATEGORY_CLASS}">
+                    <!-- BEGIN category_with_link -->
                     <a href="/homepage/{BREADCRUMB_CATEGORY_ID}/" >{BREADCRUMB_CATEGORY_NAME}</a>
+                    <!-- END category_with_link -->
+                    <!-- BEGIN category_no_link -->
+                    <span>{BREADCRUMB_CATEGORY_NAME}</span>
+                    <!-- END category_no_link -->
                 </li>
                 <!-- END category_breadcrumb -->
             </ul>
