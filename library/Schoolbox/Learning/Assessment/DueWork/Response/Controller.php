@@ -184,6 +184,10 @@ class Controller extends Base
                 throw $this->errorMapper->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
             }
 
+            // Sort the files in a standard method (filename ASC)
+            /** @var Model $response */
+            $response->getAllFiles()->sortBy('filename', 'asc');
+
             // The file that's being reviewed
             $file = $this->getFile($response, $this->getRequest()->query->get('hash'));
 
@@ -395,8 +399,8 @@ class Controller extends Base
                 // no op. Silently fall back to first file if invalid hash given
             }
         }
-        // Sort files alphabetically
-        return $response->getAllFiles()->sortBy('filename', 'asc')->first();
+        // Files have been sorted, just get the first one
+        return $response->getAllFiles()->first();
     }
 
 
