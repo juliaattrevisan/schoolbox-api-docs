@@ -54,6 +54,7 @@ class Notifier extends AbstractModuleNotifier
         'attachmentsPrivate',
         'attachmentsPublic',
         'tags',
+        'access',
     ];
 
     /** @var Mapper */
