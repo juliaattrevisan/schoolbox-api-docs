@@ -226,6 +226,7 @@ class ConfigMapper extends Mapper
         'feedback_url',
         'feedback_text',
         self::NAME_MAIL_FORCE_FROM_SYSTEM,
+        self::NAME_MAIL_ENABLED
     ];
 
     /**
