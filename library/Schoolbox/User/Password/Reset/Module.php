@@ -10,7 +10,6 @@ namespace Schoolbox\User\Password\Reset;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule\Callback;
-use Alaress\Authorizer\Rule\LazyCallback;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Password\Service as PasswordService;
 use Alaress\Web\Controller\Base;
