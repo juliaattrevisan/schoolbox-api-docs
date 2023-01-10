@@ -45,7 +45,8 @@ export default {
             },
             showSkeletonLoader: true,
             currentlyDeletingEvidence: null,
-            selectedNode: getEmptyNode(), //the selected curriculum code to display further details for
+            selectedNode: getEmptyNode(), // The selected curriculum code to display further details for.
+            selectedTag: null, // The tag clicked by the user in order to filter to items having that tag.
         };
     },
     computed: {
@@ -83,17 +84,13 @@ export default {
         async append(cursor) {
             const params = {};
             if (cursor) {
-                console.info("cursor: ", cursor);
                 params.cursor = cursor;
             }
 
             params.filter = JSON.stringify(this.getFiltersData());
 
             try {
-                console.info("params: ", params);
-                console.info("Calling fetch() with: ", this.config.routes.getFeed + "?" + new URLSearchParams(params));
                 const response = await fetch(this.config.routes.getFeed + "?" + new URLSearchParams(params));
-                console.info("response: ", response);
                 const responseData = await response.json();
                 this.data = this.data.concat(responseData.data ? responseData.data : []);
                 this.metadata.count = responseData.metadata?.count ? responseData.metadata.count : 0;
@@ -263,11 +260,14 @@ export default {
         },
 
         /**
-         * @param { String } clickedFeedItemType
+         * @param { ?String } clickedFeedItemType
+         * @param { ?String } tag
          */
-        applyFilters(clickedFeedItemType) {
+        applyFilters(clickedFeedItemType, tag) {
             let $checkbox = $("#filter-" + clickedFeedItemType);
             $checkbox.prop("checked", $checkbox.prop("checked") ? false : true);
+
+            this.selectedTag = tag; // Remember selected tag for later.
 
             $("div.feed:not(*.filter-container)").remove(); // Clear feed except filter checkboxes.
             this.load();
@@ -284,7 +284,25 @@ export default {
                 }
             }
 
-            return { feedItemTypes: checkedFeedItemTypes, tags: [] };
+            if (checkedFeedItemTypes.length === 0) {
+                // If no filters are selected, behave as if all filters are selected.
+                checkedFeedItemTypes = feedItemTypes;
+            }
+
+            let selectedTags = [];
+
+            if (this.selectedTag !== null) {
+                selectedTags = [this.selectedTag];
+            }
+
+            let filtersDescription =
+                "Showing " +
+                (checkedFeedItemTypes.length === 4 ? "all items" : checkedFeedItemTypes.join(", ")) +
+                (this.selectedTag === null ? "" : ' with tag "' + this.selectedTag + '"');
+
+            $("#filters-description").html(filtersDescription);
+
+            return { feedItemTypes: checkedFeedItemTypes, tags: selectedTags };
         },
     },
 };
@@ -297,19 +315,19 @@ export default {
             <section class="activity-feed">
                 <div id="activity-feed-filters">
                     Show:
-                    <label for="filter-assessments" @click.prevent="applyFilters('assessments')">
+                    <label for="filter-assessments" @click.prevent="applyFilters('assessments', null)">
                         <input type="checkbox" class="plain" id="filter-assessments" name="includeAssessments" />
                         Assessments
                     </label>
-                    <label for="filter-achievements" @click.prevent="applyFilters('achievements')">
+                    <label for="filter-achievements" @click.prevent="applyFilters('achievements', null)">
                         <input type="checkbox" class="plain" id="filter-achievements" name="includeAchievements" />
                         Achievements
                     </label>
-                    <label for="filter-goals" @click.prevent="applyFilters('goals')">
+                    <label for="filter-goals" @click.prevent="applyFilters('goals', null)">
                         <input type="checkbox" class="plain" id="filter-goals" name="includeGoals" />
                         Goals
                     </label>
-                    <label for="filter-learning-moments" @click.prevent="applyFilters('learning-moments')">
+                    <label for="filter-learning-moments" @click.prevent="applyFilters('learning-moments', null)">
                         <input
                             type="checkbox"
                             class="plain"
@@ -318,6 +336,7 @@ export default {
                         />
                         Learning Moments
                     </label>
+                    <div id="filters-description"></div>
                 </div>
             </section>
             <div class="feed-column right"></div>
@@ -487,7 +506,13 @@ export default {
                                             v-for="(tag, index) in evidence.object.tags"
                                             :key="`${index}-${tag.name}`"
                                         >
-                                            <template v-if="index !== 0">, </template><span>{{ tag.name }}</span>
+                                            <template v-if="index !== 0">, </template>
+                                            <span
+                                                class="anchor-style"
+                                                v-on:click="applyFilters(null, tag.name)"
+                                                title="Click to only show items with this tag."
+                                                >{{ tag.name }}</span
+                                            >
                                         </template>
                                     </p>
                                 </div>
