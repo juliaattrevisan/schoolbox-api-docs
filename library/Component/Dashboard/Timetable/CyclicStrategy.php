@@ -315,8 +315,8 @@ class Component_Dashboard_Timetable_CyclicStrategy implements Component_Dashboar
         if ($this->externalAttendanceLink->isEnabled((string)$class['code'], !empty($class['AttendanceEnabled']), $now)) {
             $classContext['attendance'] = [
                 'link'   => $this->externalAttendanceLink->getAttendanceLink(
-                    $class['code'],
-                    $class['campus'],
+                    (string)$class['code'],
+                    (string)$class['campus'],
                     $class['FileType'] ?? null,
                     $class['AttendancePeriods'] ?? [],
                     $period['periodNumber'],
