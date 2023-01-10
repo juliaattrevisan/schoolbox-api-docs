@@ -274,7 +274,7 @@ export default {
         },
 
         getFiltersData() {
-            let feedItemTypes = ["achievements", "goals", "learning-moments"];
+            let feedItemTypes = ["assessments", "achievements", "goals", "learning-moments"];
             let checkedFeedItemTypes = [];
 
             for (let i = 0; i < feedItemTypes.length; ++i) {
@@ -297,6 +297,10 @@ export default {
             <section class="activity-feed">
                 <div id="activity-feed-filters">
                     Show:
+                    <label for="filter-assessments" @click.prevent="applyFilters('assessments')">
+                        <input type="checkbox" class="plain" id="filter-assessments" name="includeAssessments" />
+                        Assessments
+                    </label>
                     <label for="filter-achievements" @click.prevent="applyFilters('achievements')">
                         <input type="checkbox" class="plain" id="filter-achievements" name="includeAchievements" />
                         Achievements
