@@ -522,20 +522,6 @@ class Classes implements IStrategy
          */
         $timetableCalendar = $this->fetchTimetableCalendar($timetable['TT_ID']);
 
-        /* Decide if $timetableCalendar is one that's relevant to $now
-         *
-         * The endpoints getStudentTimetable/getTeacherTimetable have the potential to
-         * return multiple elements, only some of which are appropriate to $now
-         */
-        if (!(new ValidActiveTtid($timetableCalendar))->isActive()) {
-            $this->log->debug(sprintf(
-                'timetableCalendar %s is not relevant to today; skipping',
-                $timetable['TT_ID']
-            ));
-
-            return;
-        }
-
         /* For logging
          */
         $name = trim("{$person['firstname']} {$person['lastname']}");
