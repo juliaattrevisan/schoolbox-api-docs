@@ -83,10 +83,11 @@ export default {
         async append(cursor) {
             const params = {};
             if (cursor) {
+                console.info("cursor: ", cursor);
                 params.cursor = cursor;
             }
 
-            params.filters = this.getFiltersData();
+            params.filters = JSON.stringify(this.getFiltersData());
 
             try {
                 console.info("params: ", params);
@@ -262,28 +263,28 @@ export default {
         },
 
         /**
-         * @param { String } clickedFilterName
+         * @param { String } clickedFeedItemType
          */
-        applyFilters(clickedFilterName) {
-            let clickedFilter = $("#filter-" + clickedFilterName);
-            clickedFilter.prop("checked", clickedFilter.prop("checked") ? false : true);
+        applyFilters(clickedFeedItemType) {
+            let $checkbox = $("#filter-" + clickedFeedItemType);
+            $checkbox.prop("checked", $checkbox.prop("checked") ? false : true);
 
-            $("div.feed:not(*.filter-container)").remove();
+            $("div.feed:not(*.filter-container)").remove(); // Clear feed except filter checkboxes.
             this.load();
         },
 
         getFiltersData() {
-            let filterNames = ["achievements", "goals", "learning-moments"];
-            let checkedFilters = [];
+            let feedItemTypes = ["achievements", "goals", "learning-moments"];
+            let checkedFeedItemTypes = [];
 
-            for (let i = 0; i < filterNames.length; ++i) {
-                let filterName = filterNames[i];
-                if ($("#filter-" + filterName).prop("checked")) {
-                    checkedFilters.push(filterName);
+            for (let i = 0; i < feedItemTypes.length; ++i) {
+                let feedItemType = feedItemTypes[i];
+                if ($("#filter-" + feedItemType).prop("checked")) {
+                    checkedFeedItemTypes.push(feedItemType);
                 }
             }
 
-            return checkedFilters;
+            return { feedItemTypes: checkedFeedItemTypes, tags: [] };
         },
     },
 };
