@@ -297,8 +297,8 @@ export default {
 
             let filtersDescription =
                 "Showing " +
-                (checkedFeedItemTypes.length === 4 ? "all items" : checkedFeedItemTypes.join(", ")) +
-                (this.selectedTag === null ? "" : ' with tag "' + this.selectedTag + '"');
+                (checkedFeedItemTypes.length === 4 ? "all items" : checkedFeedItemTypes.join(", ").replace("-", " ")) +
+                (this.selectedTag === null ? "" : ', with tag "' + this.selectedTag + '"');
 
             $("#filters-description").html(filtersDescription);
 
