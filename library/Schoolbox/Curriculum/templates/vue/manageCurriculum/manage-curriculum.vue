@@ -42,7 +42,7 @@ const props = defineProps({
     uiLimit: {
         type: Number,
         required: true,
-        default: 11
+        default: 0
     }
 });
 
