@@ -76,15 +76,15 @@ class Module extends BaseModule
     public function initRoutePermissions(Authorizer $authorizer)
     {
         $this->addRoutePermission(
-            $authorizer, '.*',
+            $authorizer,
+            '.*',
             new Callback(function () {
                 try {
                     new Address($this->getConfig()->get(ConfigMapper::NAME_MAIL_PASSWORD_CHANGE_FROM));
                 } catch (RfcComplianceException | LogicException) {
                     throw new Exception('This service is currently unavailable.');
                 }
-            }
-            )
+            })
         );
     }
 
