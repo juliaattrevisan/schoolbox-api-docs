@@ -87,7 +87,7 @@ export default {
                 params.cursor = cursor;
             }
 
-            params.filters = JSON.stringify(this.getFiltersData());
+            params.filter = JSON.stringify(this.getFiltersData());
 
             try {
                 console.info("params: ", params);
