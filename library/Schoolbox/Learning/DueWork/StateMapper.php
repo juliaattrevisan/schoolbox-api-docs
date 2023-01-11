@@ -122,7 +122,7 @@ class StateMapper extends Mapper
         if ($object->getNormaliseAs() < 0 || $object->getNormaliseAs() > 100) {
             throw new \Schoolbox\Mapper\Exception(
                 sprintf(
-                    'Invalid Normalised Mark: %s. Normalised Mark must be empty or between 0-100.',
+                    'Invalid normalised mark: %s. Normalised mark must be empty or between 0-100.',
                     $object->getNormaliseAs()
                 )
             );
