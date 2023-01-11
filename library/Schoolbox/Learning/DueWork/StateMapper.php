@@ -22,7 +22,6 @@ use Schoolbox\Mapper;
  */
 class StateMapper extends Mapper
 {
-
     protected function mapping()
     {
         $this->hasTable('submission_errors');
@@ -38,6 +37,7 @@ class StateMapper extends Mapper
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyUniqueCode']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyNormaliseAs']);
     }
 
 
@@ -107,5 +107,26 @@ class StateMapper extends Mapper
             $existing->getDisplayAs(),
             $existing->getCode()
         ));
+    }
+
+    /**
+     * @param State $object
+     * @return bool
+     * @throws Mapper\Exception
+     */
+    public function verifyNormaliseAs(State $object): bool
+    {
+        if (null === $object->getNormaliseAs()) {
+            return true;
+        }
+        if ($object->getNormaliseAs() < 0 || $object->getNormaliseAs() > 100) {
+            throw new \Schoolbox\Mapper\Exception(
+                sprintf(
+                    'Invalid normalised mark: %s. Normalised mark must be empty or between 0-100.',
+                    $object->getNormaliseAs()
+                )
+            );
+        }
+        return true;
     }
 }
