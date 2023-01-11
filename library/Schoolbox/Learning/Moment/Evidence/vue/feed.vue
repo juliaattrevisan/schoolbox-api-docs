@@ -267,6 +267,16 @@ export default {
             let $checkbox = $("#filter-" + clickedFeedItemType);
             $checkbox.prop("checked", $checkbox.prop("checked") ? false : true);
 
+            if (tag !== null) {
+                // Since the user has asked to show only items with a particular tag,
+                //  * check all checkboxes pertaining to feed items that can have tags, and
+                //  * uncheck all checkboxes pertaining to feed items that cannot have tags.
+                $("#filter-learning-moments").prop("checked", true);
+                $("#filter-assessments").prop("checked", false);
+                $("#filter-achievements").prop("checked", false);
+                $("#filter-goals").prop("checked", false);
+            }
+
             this.selectedTag = tag; // Remember selected tag for later.
 
             $("div.feed:not(*.filter-container)").remove(); // Clear feed except filter checkboxes.
@@ -289,13 +299,6 @@ export default {
                 checkedFeedItemTypes = feedItemTypes;
             }
 
-<<<<<<< HEAD
-            let selectedTags = [];
-
-            if (this.selectedTag !== null) {
-                selectedTags = [this.selectedTag];
-            }
-
             let filtersDescription =
                 "Showing " +
                 (checkedFeedItemTypes.length === feedItemTypes.length
@@ -312,25 +315,8 @@ export default {
 
             $("#filters-description").html(filtersDescription);
 
-            return { feedItemTypes: checkedFeedItemTypes, tags: selectedTags };
+            return { feedItemTypes: checkedFeedItemTypes, tag: this.selectedTag === null ? "" : this.selectedTag };
         },
-=======
-            let filtersDescription = (
-                'Showing ' + (
-                    (checkedFeedItemTypes.length === feedItemTypes.length)? 'all items':
-                    checkedFeedItemTypes.join(', ').replace('-', ' ')
-                ) + (
-                    (this.selectedTag === null)? '':
-                    ((checkedFeedItemTypes.length === feedItemTypes.length || checkedFeedItemTypes.length === 1)? '': ',') +
-                    ' with tag "' + this.selectedTag + '"'
-                )
-            );
-
-            $('#filters-description').html(filtersDescription);
-
-            return {feedItemTypes: checkedFeedItemTypes, tag: ((this.selectedTag === null)? '': this.selectedTag)};
-        }
->>>>>>> 898c3f5bb26... Remove support for multiple tags - decided was confusing to add this feature because not clear whether a mulitple tag filter should be ANDed or ORed [SA-14750]
     },
 };
 </script>
