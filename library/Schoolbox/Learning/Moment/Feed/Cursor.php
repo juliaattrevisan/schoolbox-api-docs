@@ -431,6 +431,7 @@ class Cursor implements ICursor
     /**
      * Return info for use in queries involving filters and the evidence table.
      * Records from evidence should only be included if one or more filters reference feedItemType 'evidence'.
+     * Also if the filter specifies tags, then evidence records should only be included if they link to a matching tag.
      *
      * @param array $filters
      * @return array
@@ -448,12 +449,27 @@ class Cursor implements ICursor
                     $selectedTags = $filter['tags'];
 
                     if (count($selectedTags) > 0) {
-                        $sqlWhereCondition = 'luet.name IN ("' . implode('", "', $selectedTags) . '")';
+                        $sqlWhereCondition = 'luet.name IN (' . implode(', ', $this->quoteArrayOfStrings($selectedTags)) . ')';
                     }
                 }
             }
         }
 
         return [$includeEvidence, $sqlWhereCondition];
+    }
+
+    /**
+     * @param array $strings
+     * @return array
+     */
+    private function quoteArrayOfStrings(array $strings): array
+    {
+        $stringsQuoted = [];
+
+        foreach ($strings as $string) {
+            $stringsQuoted[] = $this->database->legacyQuote($string);
+        }
+
+        return $stringsQuoted;
     }
 }
