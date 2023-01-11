@@ -128,6 +128,7 @@ class Controller extends Base
 
         $mapper_name     = $tableData[$tableKey]['mapper'];
 
+        /** @var Mapper $mapper */
         $mapper = $this->mapperFactory->get($mapper_name);
 
         $ids    = [];
@@ -154,7 +155,11 @@ class Controller extends Base
                 $oldModel = clone $model;
             } else {
                 // Create new record
+                $setId = $mapper->getSetIdentifierMethodName();
                 $model = $mapper->createModel();
+                if (method_exists($model, $setId)) {
+                    $model->$setId(0);
+                }
                 $oldModel = null;
             }
 

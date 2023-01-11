@@ -22,97 +22,97 @@ class State implements Sequential, ISoftDeletable
     use ModelTrait\DeletedAtDate;
 
     /**
-     * @var int
+     * @var int|null
      */
-    protected $id;
+    protected ?int $id;
 
     /**
-     * @var string
+     * @var string|null
      */
-    protected $code;
+    protected ?string $code = null;
 
     /**
-     * @var string
+     * @var string|null
      */
-    protected $displayAs;
+    protected ?string $displayAs = null;
 
     /**
-     * @var float
+     * @var float|null
      */
-    protected $normaliseAs;
+    protected ?float $normaliseAs = null;
 
     /**
-     * @param  string $code
+     * @param string|null $code
      *
-     * @return $this
+     * @return self
      */
-    public function setCode($code)
+    public function setCode(?string $code): self
     {
         $this->code = $code;
         return $this;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getCode()
+    public function getCode(): ?string
     {
         return $this->code;
     }
 
     /**
-     * @param  string $displayAs
+     * @param string|null $displayAs
      *
-     * @return $this
+     * @return static
      */
-    public function setDisplayAs($displayAs)
+    public function setDisplayAs(?string $displayAs): self
     {
         $this->displayAs = $displayAs;
         return $this;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getDisplayAs()
+    public function getDisplayAs(): ?string
     {
         return $this->displayAs;
     }
 
     /**
-     * @param  int $id
+     * @param int|null $id
      *
-     * @return $this
+     * @return static
      */
-    public function setId($id)
+    public function setId(?int $id): self
     {
         $this->id = $id;
         return $this;
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
     /**
-     * @param  float $normaliseAs
+     * @param float|null $normaliseAs
      *
-     * @return $this
+     * @return static
      */
-    public function setNormaliseAs($normaliseAs)
+    public function setNormaliseAs(?float $normaliseAs): self
     {
         $this->normaliseAs = $normaliseAs;
         return $this;
     }
 
     /**
-     * @return float
+     * @return float|null
      */
-    public function getNormaliseAs()
+    public function getNormaliseAs(): ?float
     {
         return $this->normaliseAs;
     }
