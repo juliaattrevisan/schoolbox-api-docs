@@ -1563,6 +1563,10 @@ abstract class Mapper implements IMapper, Serializable
         }
         $this->database->commit();
 
+        // Deletion causes the DB state to change:
+        // therefore, clear caches
+        $this->clearCaches();
+
         // Post-delete callbacks
         foreach ($collection as $model) {
             $this->triggerCallbacks(self::CALLBACK_POSTDELETE, $model);
@@ -1652,6 +1656,10 @@ abstract class Mapper implements IMapper, Serializable
 
         // execute with predicate params
         $statement = $this->getDatabase()->query($query, $predicate->getParams());
+
+        // Deletion causes the DB state to change:
+        // therefore, clear caches
+        $this->clearCaches();
 
         // Call post-delete hooks
         foreach ($deletedItems as $model) {
@@ -1780,6 +1788,10 @@ abstract class Mapper implements IMapper, Serializable
             }
         }
         $this->database->commit();
+
+        // Update causes the DB state to change:
+        // therefore, clear caches
+        $this->clearCaches();
 
         // Trigger the post-trigger, if there is one.
         if (isset($post_trigger)) {
@@ -3056,6 +3068,11 @@ abstract class Mapper implements IMapper, Serializable
             throw $e;
         }
         $this->database->commit();
+
+        // Save causes the DB state to change:
+        // therefore, clear caches
+        $this->clearCaches();
+
         foreach ($collection as $i => $model) {
             $previous = null;
 
@@ -4392,5 +4409,20 @@ abstract class Mapper implements IMapper, Serializable
         $otherMapper = $otherMapper instanceof IMapper ? $otherMapper : $otherMapper::getInstance();
         $otherColumn = $joinDef['other_key'];
         return $otherMapper->getColumnScalarHydrator($otherColumn, $depth + 1);
+    }
+
+    /**
+     * Clears the select and local body caches for this mapper.
+     *
+     * This should be called after an `INSERT`, `UPDATE` or `DELETE` operation,
+     * because those operations change the database's state; thus
+     * desynchronising the cache's state from the database's.
+     *
+     * @return void
+     */
+    private function clearCaches(): void
+    {
+        $this->selectCache->clear();
+        $this->localBodyCache->clear();
     }
 }
