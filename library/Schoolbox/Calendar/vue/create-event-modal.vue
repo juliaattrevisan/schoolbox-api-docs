@@ -1,6 +1,7 @@
 <script>
 
 import RevealModal from '@schoolboxVue/components/reveal-modal'
+import Toast from '@schoolboxVue/components/toast.vue'
 import axios from 'axios'
 import debounce from 'lodash/debounce';
 import { ENDPOINTS } from '@schoolboxCalendarEvent/endpoints';
@@ -25,6 +26,7 @@ export default {
 
     components: {
         RevealModal,
+        Toast,
         vSelect
     },
 
@@ -171,7 +173,9 @@ export default {
          */
         async createNewEvent (form) {
             this.isProcessing = true;
-            this.$refs.modal.close();
+
+            this.$refs.toast.activate('Saving...');
+
             try {
                 const response = await axios.request({
                     url:          form.action,
@@ -179,8 +183,18 @@ export default {
                     method:       form.method,
                     responseType: 'json',
                 });
-                this.$emit(EVENT_CREATED, response.data);
+                if (200 === response.status) {
+                    this.$refs.modal.close();
+                    this.$emit(EVENT_CREATED, response.data);
+                    this.$refs.toast.timeout('Created', true, 2000);
+                } else {
+                    this.$refs.toast.timeout('Unable to create event / task. ' + err.response.data.message, false, 3000);
+                    submit.prop('disabled', false);
+                }
+
             } catch (error) {
+                this.$refs.toast.timeout('Unable to create event / task. ' + error.response.data.message, false, 3000);
+                submit.prop('disabled', false);
                 console.warn(error);
             } finally {
                 this.isProcessing = false;
@@ -204,6 +218,7 @@ export default {
 </script>
 
 <template>
+    <toast ref="toast"></toast>
     <reveal-modal ref="modal">
         <!-- create a tab Vue component? Currently they just work magically -->
         <dl class="tabs" data-tab>
