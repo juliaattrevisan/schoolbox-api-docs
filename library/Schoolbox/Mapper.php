@@ -3456,7 +3456,7 @@ abstract class Mapper implements IMapper, Serializable
             }
         }
 
-        return $this->performHydration($this->localBodyCache, $this, $row, $alias, $callback);
+        return $this->performHydration($row, $alias, $callback);
     }
 
     /**
@@ -3493,32 +3493,33 @@ abstract class Mapper implements IMapper, Serializable
 
 
     /**
-     * Actually performs hydration via the cache given
+     * Actually performs hydration using the local body cache and this mapper.
      *
-     * @param Cache    $cache
-     * @param Mapper   $mapper
      * @param array    $row
      * @param string   $alias
      * @param callable $callback
      * @return object|null
      */
-    private function performHydration(Cache $cache, Mapper $mapper, array $row, $alias = '', $callback = null)
+    private function performHydration(array $row, $alias = '', $callback = null)
     {
         // courtesy of late static bindings, this private var is accessible even if you're in a different mapper
         // however, it is not accessible to subclasses
         // Always bypass the cache if within CLI/daemon context.
         // This is because database contents will change before the process dies.
-        if (!$mapper->isCacheEnabled() || $mapper->localBodyCacheBypass) {
+        if (!$this->isCacheEnabled() || $this->localBodyCacheBypass) {
             // fetch direct
-            $model = $cache->fetch([ $mapper, $row, $alias ]);
+            $model = $this->localBodyCache->fetch([ $this, $row, $alias ]);
         } else {
             // use cached value if available
-            $model = $cache->get($this->getLocalObjectCacheKey($mapper, $row, $alias), [ $mapper, $row, $alias ]);
+            $model = $this->localBodyCache->get(
+                $this->getLocalObjectCacheKey($this, $row, $alias),
+                [ $this, $row, $alias ]
+            );
         }
 
         // we don't cache this part
         if (is_callable($callback)) {
-            $model = call_user_func($callback, $mapper, $model, $row);
+            $model = call_user_func($callback, $this, $model, $row);
         }
 
         return $model;
