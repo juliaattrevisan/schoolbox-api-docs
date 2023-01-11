@@ -17,7 +17,6 @@ use Schoolbox\Resource\Folder\Model as Folder;
  */
 class Component_Homepage_BreadcrumbController extends Component_Homepage_ControllerAbstract
 {
-
     /**
      * Renders the data into the SitePage. Presentation logic.
      *
@@ -51,20 +50,37 @@ class Component_Homepage_BreadcrumbController extends Component_Homepage_Control
         }
 
         $this->setBlock('source_folder_exists', 'category_breadcrumb', 'category_breadcrumb_block');
+        $this->setBlock('category_breadcrumb', 'category_with_link', 'category_with_link_block');
+        $this->setBlock('category_breadcrumb', 'category_no_link', 'category_no_link_block');
         $this->setVar('category_breadcrumb_block', '');
         $this->setVar('source_folder_deleted_block', '');
 
+        /** @var Folder $parent */
         foreach ($this->getFolderMapper()->findParents($this->getSource(), null, true) as $parent) {
+            try {
+                $access = $this->getAccess()->getFolderAccess($this->getUser(), $parent->getId()) >= UserAccess::ACCESS_READ;
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $access = false;
+            }
             /** @var Folder $parent */
-            $this->setVar('BREADCRUMB_CATEGORY_ID', $parent->getId());
             $this->setVar('BREADCRUMB_CATEGORY_NAME', Scrub::text($parent->getName()));
             $this->setVar('BREADCRUMB_CATEGORY_CLASS', '');
+            if ($access) {
+                $this->setVar('BREADCRUMB_CATEGORY_ID', $parent->getId());
+                $this->parse('category_with_link_block', 'category_with_link');
+                $this->setVar('category_no_link_block', '');
+            } else {
+                $this->parse('category_no_link_block', 'category_no_link');
+                $this->setVar('category_with_link_block', '');
+            }
             $this->parse('category_breadcrumb_block', 'category_breadcrumb', true);
         }
 
         $this->setVar('BREADCRUMB_CATEGORY_ID', $this->getSource()->getId());
         $this->setVar('BREADCRUMB_CATEGORY_NAME', Scrub::text($this->getSource()->getName()));
         $this->setVar('BREADCRUMB_CATEGORY_CLASS', 'last');
+        $this->parse('category_with_link_block', 'category_with_link');
+        $this->setVar('category_no_link_block', '');
         $this->parse('category_breadcrumb_block', 'category_breadcrumb', true);
         $this->parse('source_folder_exists_block', 'source_folder_exists');
 
