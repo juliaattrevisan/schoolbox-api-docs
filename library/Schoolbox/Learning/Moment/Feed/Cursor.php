@@ -382,7 +382,10 @@ class Cursor implements ICursor
 
         foreach ($filters as $filter) {
             if ($filter['feedItemType'] === 'evidence' && array_key_exists('tags', $filter) && count($filter['tags']) > 0) {
-                $sqlWhereCondition = 'luet.name IN (' . implode(', ', $this->quoteArrayOfStrings($filter['tags'])) . ')';
+                $pb = $this->database->buildPredicateBuilder('luet');
+                $pb->in('name', $filter['tags']);
+                $sqlWhereCondition = implode('AND', $pb->getWhere());
+                $params = array_merge($params, $pb->getParams());
             }
         }
 
@@ -459,20 +462,5 @@ class Cursor implements ICursor
         }
 
         return [$badgeAwardsQuery, $params];
-    }
-
-    /**
-     * @param array $strings
-     * @return array
-     */
-    private function quoteArrayOfStrings(array $strings): array
-    {
-        $stringsQuoted = [];
-
-        foreach ($strings as $string) {
-            $stringsQuoted[] = $this->database->legacyQuote($string);
-        }
-
-        return $stringsQuoted;
     }
 }
