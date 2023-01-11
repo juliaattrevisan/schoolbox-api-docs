@@ -120,6 +120,13 @@
     {% include '@learningAssessment/fragments/participation.twig' %}
 {% endif %}
 
+{# ----------------------------------------------------------- #}
+{# Curriculum #}
+{# ----------------------------------------------------------- #}
+{% include '@learningAssessment/fragments/curriculumCodes.twig' with {
+    entityType: 'Task',
+    courseManagedReadonly: courseManaged.isReadonly
+} %}
 
 {# ----------------------------------------------------------- #}
 {# Submit #}
