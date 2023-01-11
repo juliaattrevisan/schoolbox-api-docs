@@ -6,6 +6,7 @@
  */
 
 use League\Flysystem\FilesystemException;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Notifactory;
