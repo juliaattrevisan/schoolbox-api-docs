@@ -532,7 +532,7 @@ abstract class Mapper implements IMapper, Serializable
 
             $key = trim("$alias.{$mapper->getIdentifierColumn()}", '.');
 
-            if (array_key_exists($key, $row) && $this->localBodyCacheBypass) {
+            if (array_key_exists($key, $row) && !$this->localBodyCacheBypass) {
                 $id = $row[$key];
 
                 // If the identifier is null, just return scalar NULL.
