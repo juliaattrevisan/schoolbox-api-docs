@@ -445,14 +445,10 @@ class Cursor implements ICursor
             }
         }
 
-        $sqlWhereCondition = (
-            (count($filterOrClauses) === 0)? 'TRUE': '(' . implode(' OR ', $filterOrClauses) . ')'
-        );
-
         $badgeAwardsQuery .= (
-            "FROM badge_user
-             WHERE $sqlWhereCondition
-             AND recipient_id = :userIdBadgeAward AND deleted_at IS NULL"
+            'FROM badge_user
+             WHERE ' . ((count($filterOrClauses) === 0)? 'TRUE': '(' . implode(' OR ', $filterOrClauses) . ')') . '
+             AND recipient_id = :userIdBadgeAward AND deleted_at IS NULL'
         );
 
         $params['userIdBadgeAward'] = $this->viewee->getId();
