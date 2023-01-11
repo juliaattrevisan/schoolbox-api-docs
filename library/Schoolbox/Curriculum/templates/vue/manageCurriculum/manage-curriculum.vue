@@ -36,6 +36,14 @@ const props = defineProps({
         required: true,
         default: true,
     },
+    /**
+     * number of nodes to retrieve from the endpoint
+     */
+    uiLimit: {
+        type: Number,
+        required: true,
+        default: 0
+    }
 });
 
 const store = useStore();
@@ -46,7 +54,7 @@ const toastEl = ref<typeof Toast | null>(null);
  * Start loading the curriculum data
  */
 onMounted(() => {
-    store.init(props.dataEndpoint, props.isReadOnly, toastEl);
+    store.init(props.dataEndpoint, props.isReadOnly, props.uiLimit, toastEl);
     if (store.hasId) {
         initErrorListener();
     }

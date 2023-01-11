@@ -23,7 +23,7 @@ class Controller extends Base
     private const MAX_DESCENDANTS = 50;
     private const MIN_LIMIT       = 1;
     private const DEFAULT_LIMIT   = 10;
-    private const MAX_LIMIT       = 50;
+    private const MAX_LIMIT       = 1000;
 
     /**
      * Constructor

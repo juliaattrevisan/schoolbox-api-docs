@@ -157,7 +157,7 @@ export const useNodesStore = defineStore("mcNodes", () => {
     async function load() {
         const store = useStore();
         try {
-            const response = await fetch(`${store.getApiEndpoint()}/?topLevelOnly=1&descendants=1&limit=50`, {
+            const response = await fetch(`${store.getApiEndpoint()}/?topLevelOnly=1&descendants=1&limit=${store.getUILimit()}`, {
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -183,7 +183,7 @@ export const useNodesStore = defineStore("mcNodes", () => {
     async function loadNextChildren(id: number) {
         try {
             isLoading.value = true;
-            const response = await fetch(`${useStore().getApiEndpoint()}/${id}?descendants=2&limit=50`, {
+            const response = await fetch(`${useStore().getApiEndpoint()}/${id}?descendants=2&limit=${useStore().getUILimit()}`, {
                 headers: {
                     "Content-Type": "application/json",
                 },
