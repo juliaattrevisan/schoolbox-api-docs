@@ -61,10 +61,6 @@
 
                             {# Show article body #}
                             <div class="content">
-                                {% if record.bodyPrivate is not empty %}
-                                    {{ record.bodyPrivate | purify }}
-                                {% endif %}
-
                                 {% if record.bodyPublic is not empty %}
                                     {{ record.bodyPublic | purify }}
                                 {% endif %}
@@ -100,7 +96,7 @@
 
                                 {# Show all comments for this record #}
                                  <ul class="information-list reply">
-                                {% for comment in record.comments %}
+                                {% for comment in record.comments | filter(comment => not comment.private) %}
                                         <li>
                                             <div class="card compact small-12">
                                             {# Comment author photo #}
