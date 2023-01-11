@@ -469,15 +469,18 @@ abstract class Mapper implements IMapper, Serializable
         $this->selectCache = new Cache(function (PDOStatement $statement, $bypassCache = false) {
             $statement->execute();
 
-            // bypass the local body cache if necessary
-            $this->localBodyCacheBypass = $bypassCache;
+            // Bypass cache if requested, and cache isn't already being bypassed
+            $previousLocalBodyCacheBypass = $this->localBodyCacheBypass;
+            if (!$this->localBodyCacheBypass) {
+                $this->localBodyCacheBypass = $bypassCache;
+            }
 
-            $collection = $this->hydrateSelect($statement);
-
-            // turn that cache back on!
-            $this->localBodyCacheBypass = false;
-
-            return $collection;
+            // set the cache bypass setting back to what it was once done
+            try {
+                return $this->hydrateSelect($statement);
+            } finally {
+                $this->localBodyCacheBypass = $previousLocalBodyCacheBypass;
+            }
         });
 
         // a cache of join mappers (for some reason this method is expensive)
@@ -529,7 +532,7 @@ abstract class Mapper implements IMapper, Serializable
 
             $key = trim("$alias.{$mapper->getIdentifierColumn()}", '.');
 
-            if (array_key_exists($key, $row) && $this->localBodyCacheBypass == false) {
+            if (array_key_exists($key, $row) && $this->localBodyCacheBypass) {
                 $id = $row[$key];
 
                 // If the identifier is null, just return scalar NULL.
@@ -3495,7 +3498,7 @@ abstract class Mapper implements IMapper, Serializable
     {
         $foreignMapper = $this->getJoinMapper($join);
 
-        // Bypass join mapper's cache if bypassing this mapper's cache?
+        // Bypass join mapper's cache if bypassing this mapper's cache
         $previousForeignBodyCacheBypass = $foreignMapper->localBodyCacheBypass;
         if ($this->localBodyCacheBypass) {
             $foreignMapper->localBodyCacheBypass = $this->localBodyCacheBypass;
