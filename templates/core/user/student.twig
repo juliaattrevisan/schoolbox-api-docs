@@ -419,7 +419,7 @@
                             {% endblock buttons_documents %}
 
                             {% block buttons_email_all_staff %}
-                                {% if isStaffWhoCanView and config.email_all_staff and session.user.email %}
+                                {% if config.mail_enable and isStaffWhoCanView and config.email_all_staff and session.user.email %}
                                     <li>
                                         <a class="icon-email" id="email-all-staff" title="Includes all teachers, year coordinator, head of house, tutor and coach.">Email All Teachers</a>
                                         <form id="email-all-form" action="{{ routeLookupIfAuthorized('mail.postCreateMail') }}" class="hide" method="post">
@@ -433,7 +433,7 @@
                             {% endblock  buttons_email_all_staff  %}
 
                             {% block buttons_email_parents %}
-                                {% if isStaffWhoCanView and config.email_all_parents and session.user.email and not hideContacts %}
+                                {% if config.mail_enable and isStaffWhoCanView and config.email_all_parents and session.user.email and not hideContacts %}
                                     <li>
                                         <a class="icon-email" id="email-all-parents" title="Emails the parents that have email addresses and can be contacted">Email Parents</a>
                                         <form action="{{ routeLookupIfAuthorized('mail.postCreateMail') }}" method="post" class="no-margin" id="email-contacts-form">
