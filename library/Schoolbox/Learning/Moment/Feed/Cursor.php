@@ -66,60 +66,33 @@ class Cursor implements ICursor
 
     private bool $gradesEnabled;
 
+    private array $filters;
+
     /**
      * Constructor
      *
      * @param IConnector               $database
      * @param User                     $viewee
      * @param User                     $viewer
-     * @param Alaress_Date_Format|null $expiryDate If provided: don't fetch any badge awards which expire before this date.
-     * @param int                      $limit      The maximum number of results to fetch in one query.
+     * @param Alaress_Date_Format|null $expiryDate      If provided: don't fetch any badge awards which expire before this date.
+     * @param int                      $limit           The maximum number of results to fetch in one query.
      * @param IConfigLoader            $config
-     * @param ICodec|null              $codec      The codec for encoding/decoding a cursor.
-     *
-     * @param array $filters
-     *     Array of conditions to be met for records to be included.
-     *     If the filters array is empty, then all records should be included.
-     *     If the filters array is non-empty, then only records that match one or more filters should be included.
-     *     The format expected for each condition depends on the feedItemType.  See examples below.
-     *
-     *     Eg. $filters = [
-     *         ['feedItemType' => 'dueWorkFeedback'],                            // Filter 1 (for assessments     ).
-     *         ['feedItemType' => 'badgeAward', 'badgeStatus' => 'achievement'], // Filter 2 (for achievements    ).
-     *         ['feedItemType' => 'badgeAward', 'badgeStatus' => 'goal'],        // Filter 3 (for goals           ).
-     *         ['feedItemType' => 'evidence', 'tag' => 'Tag 1'],                 // Filter 4 (for learning moments).
-     *     ];
-     *     The filters array above should be interpreted like so:
-     *         $result =
-     *             SELECT * FROM submission_return                      // Due to Filter 1.
-     *             UNION
-     *             SELECT * FROM badge_user  WHERE (
-     *                 status='achievement' OR                          // Due to Filter 2.
-     *                 status='goal'                                    // Due to Filter 3.
-     *             )
-     *             UNION
-     *             SELECT *
-     *             FROM evidence        AS e
-     *             JOIN evidence_tag    AS et ON et.evidence_id=e.id
-     *             JOIN lu_evidence_tag AS luet ON luet.id=et.tag_id
-     *             WHERE luet.name = 'Tag 1'                            // Due to Filter 4.
-     *
-     *     Notes:
-     *      * If the $filters array is non-empty, but no filter with 'feedItemType'='badgeAward' exists, no records
-     *        from badge_user should be included.  Likewise for the other feedItemTypes and corresponding tables.
-     *      * Where conditions not relevant to filters have been left out of the example query (eg. deleted_at=NULL, etc.)
+     * @param ICodec|null              $codec           The codec for encoding/decoding a cursor.
+     * @param string                   $encodedFilters  Base64 encoded JSON encoded Javascript array.
      */
     public function __construct(
         private IConnector $database,
         private User $viewee,
         private User $viewer,
-        private Array $filters,
+        private string $encodedFilters,
         private ?Alaress_Date_Format $expiryDate,
         private int $limit,
         IConfigLoader $config,
         private ?ICodec $codec = null
     ) {
-        $this->codec                  = $codec ?? new Base64();
+        $this->codec = $codec ?? new Base64();
+        $this->filters = $this->translateClientSideFilterSpecToServerSideFilterSpec($this->codec->decode($encodedFilters));
+
         $this->learningMomentsEnabled = $config->get(ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED)
             && $viewee->getLearningMomentsEnabled()
             && (!$viewer->getRole()->isStaff() || $viewer->getRole()->getAccessEvidence());
@@ -464,5 +437,115 @@ class Cursor implements ICursor
         }
 
         return [$badgeAwardsQuery, $params];
+    }
+
+    /**
+     * @param array $filter
+     * @return array
+     *
+     * Overview
+     * --------
+     * A translation between client-side specification and server-side specification is needed because the client and
+     * server user different terminology.  For example, what is referred to by the client as an 'achievement', is
+     * a row of the badge_user database table whose value for the `status` column is 'achievement'.  The server-side
+     * specification is a closer match to the schoolbox database schema than the client-side specification.
+     *
+     * Client-side filter specification
+     * --------------------------------
+     * [
+     *     'feedItemTypes' => string[], // One or more of ['assessments', 'achievements', 'goals', 'learning-moments'].
+     *     'tag'           => string    // Free-form string.  Blank string indicates 'ignore the tag filter'.
+     * ]                                // Note that tag is only applicable to learning-moments.
+     *
+     * Examples:
+     *  1. Return all feed items that are assessments.
+     *     ['feedItemTypes' => ['assessments'], 'tag' => '']
+     *  2. Return all feed items that are either assessments or achievements.
+     *     ['feedItemTypes' => ['assessments', 'achievements'], 'tag' => '']
+     *  3. Return all feed items that are either or assessments, or learning moments with tag 'Class Work'.
+     *     ['feedItemTypes' => ['assessments', 'learning-moments'], 'tag' => 'Class Work']
+     *
+     * Server-side filter specification
+     * --------------------------------
+     * Array of conditions to be met for records to be included.
+     * If the filters array is empty, then all records should be included.
+     * If the filters array is non-empty, then only records that match one or more filters should be included.
+     * The format expected for each condition depends on the feedItemType.  See examples below.
+     *
+     * Example:
+     *  1. Return all feed items that are assessments.
+     *     $filters = [
+     *         ['feedItemType' => 'dueWorkFeedback']
+     *     ]
+     *  2. Return all feed items that are either assessments or achievements.
+     *     $filters = [
+     *         ['feedItemType' => 'dueWorkFeedback'],
+     *         ['feedItemType' => 'badgeAward', 'badgeStatus' => 'achievement']
+     *     ]
+     *  3. (This example shows all possible feedItemTypes).
+     *     Return all feed items that are either assessments, achievements, goals, or learning-moments with tag 'Tag 1'.
+     *     $filters = [
+     *         ['feedItemType' => 'dueWorkFeedback'],                            // Filter 1 (for assessments     ).
+     *         ['feedItemType' => 'badgeAward', 'badgeStatus' => 'achievement'], // Filter 2 (for achievements    ).
+     *         ['feedItemType' => 'badgeAward', 'badgeStatus' => 'goal'],        // Filter 3 (for goals           ).
+     *         ['feedItemType' => 'evidence', 'tag' => 'Tag 1'],                 // Filter 4 (for learning-moments).
+     *     ];
+     *     The filters array above should be interpreted like so:
+     *     $result =
+     *         SELECT * FROM submission_return                      // Due to Filter 1.
+     *         UNION
+     *         SELECT * FROM badge_user  WHERE (
+     *             status='achievement' OR                          // Due to Filter 2.
+     *             status='goal'                                    // Due to Filter 3.
+     *         )
+     *         UNION
+     *         SELECT *
+     *         FROM evidence        AS e
+     *         JOIN evidence_tag    AS et ON et.evidence_id=e.id
+     *         JOIN lu_evidence_tag AS luet ON luet.id=et.tag_id
+     *         WHERE luet.name = 'Tag 1'                            // Due to Filter 4.
+     *
+     *     Notes:
+     *      * If the $filters array is non-empty, but no filter with 'feedItemType'='badgeAward' exists, no records
+     *        from badge_user should be included.  Likewise for the other feedItemTypes and corresponding tables.
+     *      * Where conditions not relevant to filters have been left out of the example query (eg. deleted_at=NULL, etc.)
+     */
+    private function translateClientSideFilterSpecToServerSideFilterSpec(array $filter): array
+    {
+        // Validate $filter array.
+        if (
+            !array_key_exists('feedItemTypes', $filter) ||
+            !array_key_exists('tag', $filter) ||
+            !is_array($filter['feedItemTypes']) ||
+            !is_string($filter['tag'])
+        ) {
+            throw new \InvalidArgumentException("Invalid value for 'filter' parameter.");
+        }
+
+        $serverFilters = [];
+
+        // Feed item types in the $filter array are those displayed in the UI:
+        //   {'assessments', 'achievements', 'goals', 'learning-moments'}.
+        // These must be translated into filters that will be understood by the Cursor.
+        foreach ($filter['feedItemTypes'] as $feedItemType) {
+            switch ($feedItemType) {
+                case 'assessments':
+                    $serverFilters[] = ['feedItemType' => 'dueWorkFeedback'];
+                    break;
+                case 'achievements':
+                    $serverFilters[] = ['feedItemType' => 'badgeAward', 'badgeStatus' => 'achievement'];
+                    break;
+                case 'goals':
+                    $serverFilters[] = ['feedItemType' => 'badgeAward', 'badgeStatus' => 'goal'];
+                    break;
+                case 'learning-moments':
+                    $serverFilters[] = ['feedItemType' => 'evidence', 'tag' => $filter['tag']];
+                    break;
+                default:
+                    // Do nothing.
+            }
+        }
+
+        return $serverFilters;
     }
 }

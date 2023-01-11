@@ -80,48 +80,12 @@ class Controller extends Base
     public function getFeedForUser(User $user): void
     {
         $encodedFilters = $this->request->query->get('filter');
-        $filter = json_decode($encodedFilters, true);
-
-        // Validate $filter array.
-        if (
-            !array_key_exists('feedItemTypes', $filter) ||
-            !array_key_exists('tag', $filter) ||
-            !is_array($filter['feedItemTypes']) ||
-            !is_string($filter['tag'])
-        ) {
-            throw new \InvalidArgumentException("Invalid value for 'filter' parameter.");
-        }
-
-        $filtersForCursor = [];
-
-        // Feed item types in the $filter array are those displayed in the UI:
-        //   {'assessments', 'achievements', 'goals', 'learning-moments'}.
-        // These must be translated into filters that will be understood by the Cursor.
-        foreach ($filter['feedItemTypes'] as $feedItemType) {
-            switch ($feedItemType) {
-                case 'assessments':
-                    $filtersForCursor[] = ['feedItemType' => 'dueWorkFeedback'];
-                    break;
-                case 'achievements':
-                    $filtersForCursor[] = ['feedItemType' => 'badgeAward', 'badgeStatus' => 'achievement'];
-                    break;
-                case 'goals':
-                    $filtersForCursor[] = ['feedItemType' => 'badgeAward', 'badgeStatus' => 'goal'];
-                    break;
-                case 'learning-moments':
-                    $filtersForCursor[] = ['feedItemType' => 'evidence', 'tag' => $filter['tag']];
-                    break;
-                default:
-                    // Do nothing.
-            }
-        }
-
         $encodedCursor  = $this->request->query->get('cursor');
         $cursor         = new Cursor(
             $this->database,
             $user,
             $this->getUser(),
-            $filtersForCursor,
+            $encodedFilters,
             null,
             self::FEED_ITEMS_PER_PAGE,
             $this->getConfigLoader(),

@@ -87,7 +87,7 @@ export default {
                 params.cursor = cursor;
             }
 
-            params.filter = JSON.stringify(this.getFiltersData());
+            params.filter = btoa(JSON.stringify(this.getFiltersData()));
 
             try {
                 const response = await fetch(this.config.routes.getFeed + "?" + new URLSearchParams(params));
