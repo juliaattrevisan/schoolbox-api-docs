@@ -66,7 +66,7 @@ class Cursor implements ICursor
 
     private bool $gradesEnabled;
 
-    private array $filters;
+    private array $filter;
 
     /**
      * Constructor
@@ -74,29 +74,29 @@ class Cursor implements ICursor
      * @param IConnector               $database
      * @param User                     $viewee
      * @param User                     $viewer
-     * @param Alaress_Date_Format|null $expiryDate      If provided: don't fetch any badge awards which expire before this date.
-     * @param int                      $limit           The maximum number of results to fetch in one query.
+     * @param Alaress_Date_Format|null $expiryDate     If provided: don't fetch any badge awards which expire before this date.
+     * @param int                      $limit          The maximum number of results to fetch in one query.
      * @param IConfigLoader            $config
-     * @param ICodec|null              $codec           The codec for encoding/decoding a cursor.
-     * @param string                   $encodedFilters  Base64 encoded JSON encoded Javascript array.
+     * @param ICodec|null              $codec          The codec for encoding/decoding a cursor.
+     * @param string                   $encodedFilter  Base64 encoded JSON encoded Javascript array.
      */
     public function __construct(
         private IConnector $database,
         private User $viewee,
         private User $viewer,
-        private string $encodedFilters,
+        private string $encodedFilter,
         private ?Alaress_Date_Format $expiryDate,
         private int $limit,
         IConfigLoader $config,
         private ?ICodec $codec = null
     ) {
         $this->codec = $codec ?? new Base64();
-        $this->filters = $this->translateClientSideFilterSpecToServerSideFilterSpec($this->codec->decode($encodedFilters));
+        $this->filter = $this->codec->decode($encodedFilter);
 
         $this->learningMomentsEnabled = $config->get(ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED)
             && $viewee->getLearningMomentsEnabled()
             && (!$viewer->getRole()->isStaff() || $viewer->getRole()->getAccessEvidence());
-        $this->badgeAwardsEnabled          = $config->get(ConfigMapper::NAME_BADGES_ENABLED);
+        $this->badgeAwardsEnabled     = $config->get(ConfigMapper::NAME_BADGES_ENABLED);
         $this->gradesEnabled          = $config->get(ConfigMapper::NAME_GRADES_ENABLED)
             && (!$viewer->getRole()->isStaff() || $viewer->getRole()->getViewStudentGrades());
     }
@@ -136,21 +136,21 @@ class Cursor implements ICursor
         $countQueries = [];
 
         if ($this->learningMomentsEnabled) {
-            [$evidenceCountQuery, $evidenceCountParams] = $this->getEvidenceQuery([], $this->filters, countOnly: true);
+            [$evidenceCountQuery, $evidenceCountParams] = $this->getEvidenceQuery([], countOnly: true);
             if ($evidenceCountQuery !== null) {
                 $countQueries[] = $this->database->executeQuery($evidenceCountQuery, $evidenceCountParams);
             }
         }
 
         if ($this->badgeAwardsEnabled) {
-            [$badgeAwardsCountQuery, $badgeAwardsCountParams] = $this->getBadgeAwardsQuery([], $this->filters, countOnly: true);
+            [$badgeAwardsCountQuery, $badgeAwardsCountParams] = $this->getBadgeAwardsQuery([], countOnly: true);
             if ($badgeAwardsCountQuery !== null) {
                 $countQueries[] = $this->database->executeQuery($badgeAwardsCountQuery, $badgeAwardsCountParams);
             }
         }
 
         if ($this->gradesEnabled) {
-            [$dueWorkFeedbackCountQuery, $dueWorkFeedbackCountParams] = $this->getDueWorkFeedbackQuery([], $this->filters, countOnly: true);
+            [$dueWorkFeedbackCountQuery, $dueWorkFeedbackCountParams] = $this->getDueWorkFeedbackQuery([], countOnly: true);
             if ($dueWorkFeedbackCountQuery !== null) {
                 $countQueries[] = $this->database->executeQuery($dueWorkFeedbackCountQuery, $dueWorkFeedbackCountParams);
             }
@@ -199,21 +199,21 @@ class Cursor implements ICursor
         $queries = [];
 
         if ($this->learningMomentsEnabled) {
-            [$evidenceQuery, $params] = $this->getEvidenceQuery($params, $this->filters, countOnly: false);
+            [$evidenceQuery, $params] = $this->getEvidenceQuery($params, countOnly: false);
             if ($evidenceQuery !== null) {
                 $queries[] = $evidenceQuery;
             }
         }
 
         if ($this->badgeAwardsEnabled) {
-            [$badgeAwardsQuery, $params] = $this->getBadgeAwardsQuery($params, $this->filters, countOnly: false);
+            [$badgeAwardsQuery, $params] = $this->getBadgeAwardsQuery($params, countOnly: false);
             if ($badgeAwardsQuery !== null) {
                 $queries[] = $badgeAwardsQuery;
             }
         }
 
         if ($this->gradesEnabled) {
-            [$dueWorkFeedbackQuery, $params] = $this->getDueWorkFeedbackQuery($params, $this->filters, countOnly: false);
+            [$dueWorkFeedbackQuery, $params] = $this->getDueWorkFeedbackQuery($params, countOnly: false);
             if ($dueWorkFeedbackQuery !== null) {
                 $queries[] = $dueWorkFeedbackQuery;
             }
@@ -238,21 +238,115 @@ class Cursor implements ICursor
     }
 
     /**
-     * Returns query to get due work feedback.
+     * Returns query to get evidence.
      * @param array $params
-     * @param array $filters
      * @param bool  $countOnly
      * @return array
      */
-    private function getDueWorkFeedbackQuery(array $params, array $filters, bool $countOnly): array
+    private function getEvidenceQuery(array $params, bool $countOnly): array
     {
-        // Only include if $this->filters is empty or 'dueWorkFeedback' is specified in at least one filter.
-        $includeDueWorkFeedback = (count($filters) === 0);
-        foreach ($filters as $filter) {
-            if ($filter['feedItemType'] === 'dueWorkFeedback') {
-                $includeDueWorkFeedback = true;
-            }
+        $includeEvidence = (
+            count($this->filter['feedItemTypes']) === 0 ||
+            in_array('learning-moments', $this->filter['feedItemTypes'], true)
+        );
+
+        if (!$includeEvidence) {
+            return [null, $params]; // This indicates that the query should not be run because we know that no results will be returned.
+        }                           // NOTE: $params must be returned unchanged.
+
+        if ($countOnly) {
+            $evidenceQuery = ' SELECT COUNT(*) ';
+        } else {
+            $evidenceQuery = (
+                'SELECT
+                 e.id                   AS id,
+                 :discriminatorEvidence AS discriminator,
+                 e.created_at           AS date '
+            );
+            $params['discriminatorEvidence'] = self::DISCRIMINATOR_EVIDENCE;
         }
+
+        $sqlWhereCondition = 'TRUE';
+
+        if (trim($this->filter['tag']) !== '') {
+            $sqlWhereCondition = 'luet.name = :tagEvidence';
+            $params['tagEvidence'] = $this->filter['tag'];
+        }
+
+        $evidenceQuery .= (
+            "FROM evidence        AS e
+             JOIN evidence_tag    AS et   ON et.evidence_id=e.id
+             JOIN lu_evidence_tag AS luet ON luet.id=et.tag_id
+             WHERE e.user_id = :userIdEvidence
+             AND e.deleted_at IS NULL
+             AND $sqlWhereCondition"
+        );
+
+        $params['userIdEvidence'] = $this->viewee->getId();
+
+        return [$evidenceQuery, $params];
+    }
+
+    /**
+     * Returns query to get badgeAwards.
+     * @param array $params
+     * @param bool  $countOnly
+     * @return array
+     */
+    private function getBadgeAwardsQuery(array $params, bool $countOnly): array
+    {
+        $includeAchievements = in_array('achievements', $this->filter['feedItemTypes'], true); // Achievements are badges with status 'achievement'.
+        $includeGoals        = in_array('goals'       , $this->filter['feedItemTypes'], true); // Goals are badges with status 'goal'.
+        $includeBadgeAwards  = (count($this->filter['feedItemTypes']) === 0 || $includeAchievements || $includeGoals);
+
+        if (!$includeBadgeAwards) {
+            return [null, $params]; // This indicates that the query should not be run because we know that no results will be returned.
+        }                           // NOTE: $params must be returned unchanged.
+
+        if ($countOnly) {
+            $badgeAwardsQuery = ' SELECT COUNT(*) ';
+        } else {
+            $badgeAwardsQuery = (
+                'SELECT
+                 id                       AS id,
+                 :discriminatorBadgeAward AS discriminator,
+                 awarded_at               AS date '
+            );
+            $params['discriminatorBadgeAward'] = self::DISCRIMINATOR_BADGE_AWARD;
+        }
+
+        $filterOrClauses = [];
+        if ($includeAchievements) {$filterOrClauses[] = "status = 'achievement'";}
+        if ($includeGoals       ) {$filterOrClauses[] = "status = 'goal'"       ;}
+
+        $badgeAwardsQuery .= (
+            'FROM badge_user
+             WHERE (' . implode(' OR ', $filterOrClauses) . ')
+             AND recipient_id = :userIdBadgeAward AND deleted_at IS NULL'
+        );
+
+        $params['userIdBadgeAward'] = $this->viewee->getId();
+
+        if ($this->expiryDate) {
+            $badgeAwardsQuery .= ' AND (expires_at IS NULL OR expires_at >= :expiryBadgeAward)';
+            $params['expiryBadgeAward'] = $this->expiryDate->getDatabaseDate();
+        }
+
+        return [$badgeAwardsQuery, $params];
+    }
+
+    /**
+     * Returns query to get due work feedback.
+     * @param array $params
+     * @param bool  $countOnly
+     * @return array
+     */
+    private function getDueWorkFeedbackQuery(array $params, bool $countOnly): array
+    {
+        $includeDueWorkFeedback = (
+            count($this->filter['feedItemTypes']) === 0 ||
+            in_array('assessments', $this->filter['feedItemTypes'], true)
+        );
 
         if (!$includeDueWorkFeedback) {
             return [null, $params]; // This indicates that the query should not be run because we know that no results will be returned.
@@ -276,10 +370,10 @@ class Cursor implements ICursor
             $dueWorkFeedbackQuery = ' SELECT COUNT(*) ';
         } else {
             $dueWorkFeedbackQuery = (
-                'SELECT
-                 submission_return.id           AS id,
-                 :discriminatorDueWorkFeedback  AS discriminator,
-                 submission_return.published_at AS date '
+            'SELECT
+             submission_return.id           AS id,
+             :discriminatorDueWorkFeedback  AS discriminator,
+             submission_return.published_at AS date '
             );
             $params['discriminatorDueWorkFeedback'] = self::DISCRIMINATOR_DUE_WORK_FEEDBACK;
         }
@@ -299,15 +393,13 @@ class Cursor implements ICursor
         if ($filterWorkType) {
             $dueWorkFeedbackQuery .= (
                 'AND (
-                     `assessment`.`work_type_id` IS NULL
-                     OR
-                     `assessment`.`work_type_id`
-                     IN (
-                         SELECT `id` FROM `lu_work_type`
-                         WHERE `staff_or_instructor_visible_only` = 0
-                         AND `deleted_at` IS NULL
-                     )
-                 )'
+                    assessment.work_type_id IS NULL OR
+                    assessment.work_type_id IN (
+                        SELECT `id` FROM `lu_work_type`
+                        WHERE `staff_or_instructor_visible_only` = 0
+                        AND `deleted_at` IS NULL
+                    )
+                )'
             );
         }
 
@@ -316,236 +408,5 @@ class Cursor implements ICursor
         $params['reviewRoute']           = ReturnedWork::REVIEW_ROUTE_INSTRUCTOR;
 
         return [$dueWorkFeedbackQuery, $params];
-    }
-
-    /**
-     * Returns query to get evidence.
-     * @param array $params
-     * @param array $filters
-     * @param bool  $countOnly
-     * @return array
-     */
-    private function getEvidenceQuery(array $params, array $filters, bool $countOnly): array
-    {
-        // Only include if $this->filters is empty or 'evidence' is specified in at least one filter.
-        $includeEvidence = (count($filters) === 0);
-        foreach ($filters as $filter) {
-            if ($filter['feedItemType'] === 'evidence') {
-                $includeEvidence = true;
-            }
-        }
-
-        if (!$includeEvidence) {
-            return [null, $params]; // This indicates that the query should not be run because we know that no results will be returned.
-        }                           // NOTE: $params must be returned unchanged.
-
-        if ($countOnly) {
-            $evidenceQuery = ' SELECT COUNT(*) ';
-        } else {
-            $evidenceQuery = (
-                'SELECT
-                 e.id                   AS id,
-                 :discriminatorEvidence AS discriminator,
-                 e.created_at           AS date '
-            );
-            $params['discriminatorEvidence'] = self::DISCRIMINATOR_EVIDENCE;
-        }
-
-        $sqlWhereCondition = 'TRUE';
-
-        foreach ($filters as $filter) {
-            if (
-                $filter['feedItemType'] === 'evidence' &&
-                array_key_exists('tag', $filter) &&
-                trim($filter['tag']) !== ''
-            ) {
-                $sqlWhereCondition = 'luet.name = :tagEvidence';
-                $params['tagEvidence'] = $filter['tag'];
-            }
-        }
-
-        $evidenceQuery .= (
-            "FROM evidence        AS e
-             JOIN evidence_tag    AS et   ON et.evidence_id=e.id
-             JOIN lu_evidence_tag AS luet ON luet.id=et.tag_id
-             WHERE e.user_id = :userIdEvidence
-             AND e.deleted_at IS NULL
-             AND $sqlWhereCondition"
-        );
-
-        $params['userIdEvidence'] = $this->viewee->getId();
-
-        return [$evidenceQuery, $params];
-    }
-
-    /**
-     * Returns query to get badgeAwards.
-     * @param array $params
-     * @param array $filters
-     * @param bool  $countOnly
-     * @return array
-     */
-    private function getBadgeAwardsQuery(array $params, array $filters, bool $countOnly): array
-    {
-        // Only include if $this->filters is empty or 'badgeAwards' is specified in at least one filter.
-        $includeBadgeAwards = (count($filters) === 0);
-        foreach ($filters as $filter) {
-            if ($filter['feedItemType'] === 'badgeAward') {
-                $includeBadgeAwards = true;
-            }
-        }
-
-        if (!$includeBadgeAwards) {
-            return [null, $params]; // This indicates that the query should not be run because we know that no results will be returned.
-        }                           // NOTE: $params must be returned unchanged.
-
-        if ($countOnly) {
-            $badgeAwardsQuery = ' SELECT COUNT(*) ';
-        } else {
-            $badgeAwardsQuery = (
-                'SELECT
-                 id                       AS id,
-                 :discriminatorBadgeAward AS discriminator,
-                 awarded_at               AS date '
-            );
-            $params['discriminatorBadgeAward'] = self::DISCRIMINATOR_BADGE_AWARD;
-        }
-
-        $filterOrClauses = [];
-
-        foreach ($filters as $filter) {
-            if ($filter['feedItemType'] === 'badgeAward') {
-                switch ($filter['badgeStatus']) {
-                    case 'achievement': $filterOrClauses[] = "status = 'achievement'"; break;
-                    case 'goal':        $filterOrClauses[] = "status = 'goal'"; break;
-                    default: // Do nothing.
-                }
-            }
-        }
-
-        $badgeAwardsQuery .= (
-            'FROM badge_user
-             WHERE ' . ((count($filterOrClauses) === 0)? 'TRUE': '(' . implode(' OR ', $filterOrClauses) . ')') . '
-             AND recipient_id = :userIdBadgeAward AND deleted_at IS NULL'
-        );
-
-        $params['userIdBadgeAward'] = $this->viewee->getId();
-
-        if ($this->expiryDate) {
-            $badgeAwardsQuery .= ' AND (expires_at IS NULL OR expires_at >= :expiryBadgeAward)';
-            $params['expiryBadgeAward'] = $this->expiryDate->getDatabaseDate();
-        }
-
-        return [$badgeAwardsQuery, $params];
-    }
-
-    /**
-     * @param array $filter
-     * @return array
-     *
-     * Overview
-     * --------
-     * A translation between client-side specification and server-side specification is needed because the client and
-     * server user different terminology.  For example, what is referred to by the client as an 'achievement', is
-     * a row of the badge_user database table whose value for the `status` column is 'achievement'.  The server-side
-     * specification is a closer match to the schoolbox database schema than the client-side specification.
-     *
-     * Client-side filter specification
-     * --------------------------------
-     * [
-     *     'feedItemTypes' => string[], // One or more of ['assessments', 'achievements', 'goals', 'learning-moments'].
-     *     'tag'           => string    // Free-form string.  Blank string indicates 'ignore the tag filter'.
-     * ]                                // Note that tag is only applicable to learning-moments.
-     *
-     * Examples:
-     *  1. Return all feed items that are assessments.
-     *     ['feedItemTypes' => ['assessments'], 'tag' => '']
-     *  2. Return all feed items that are either assessments or achievements.
-     *     ['feedItemTypes' => ['assessments', 'achievements'], 'tag' => '']
-     *  3. Return all feed items that are either or assessments, or learning moments with tag 'Class Work'.
-     *     ['feedItemTypes' => ['assessments', 'learning-moments'], 'tag' => 'Class Work']
-     *
-     * Server-side filter specification
-     * --------------------------------
-     * Array of conditions to be met for records to be included.
-     * If the filters array is empty, then all records should be included.
-     * If the filters array is non-empty, then only records that match one or more filters should be included.
-     * The format expected for each condition depends on the feedItemType.  See examples below.
-     *
-     * Example:
-     *  1. Return all feed items that are assessments.
-     *     $filters = [
-     *         ['feedItemType' => 'dueWorkFeedback']
-     *     ]
-     *  2. Return all feed items that are either assessments or achievements.
-     *     $filters = [
-     *         ['feedItemType' => 'dueWorkFeedback'],
-     *         ['feedItemType' => 'badgeAward', 'badgeStatus' => 'achievement']
-     *     ]
-     *  3. (This example shows all possible feedItemTypes).
-     *     Return all feed items that are either assessments, achievements, goals, or learning-moments with tag 'Tag 1'.
-     *     $filters = [
-     *         ['feedItemType' => 'dueWorkFeedback'],                            // Filter 1 (for assessments     ).
-     *         ['feedItemType' => 'badgeAward', 'badgeStatus' => 'achievement'], // Filter 2 (for achievements    ).
-     *         ['feedItemType' => 'badgeAward', 'badgeStatus' => 'goal'],        // Filter 3 (for goals           ).
-     *         ['feedItemType' => 'evidence', 'tag' => 'Tag 1'],                 // Filter 4 (for learning-moments).
-     *     ];
-     *     The filters array above should be interpreted like so:
-     *     $result =
-     *         SELECT * FROM submission_return                      // Due to Filter 1.
-     *         UNION
-     *         SELECT * FROM badge_user  WHERE (
-     *             status='achievement' OR                          // Due to Filter 2.
-     *             status='goal'                                    // Due to Filter 3.
-     *         )
-     *         UNION
-     *         SELECT *
-     *         FROM evidence        AS e
-     *         JOIN evidence_tag    AS et ON et.evidence_id=e.id
-     *         JOIN lu_evidence_tag AS luet ON luet.id=et.tag_id
-     *         WHERE luet.name = 'Tag 1'                            // Due to Filter 4.
-     *
-     *     Notes:
-     *      * If the $filters array is non-empty, but no filter with 'feedItemType'='badgeAward' exists, no records
-     *        from badge_user should be included.  Likewise for the other feedItemTypes and corresponding tables.
-     *      * Where conditions not relevant to filters have been left out of the example query (eg. deleted_at=NULL, etc.)
-     */
-    private function translateClientSideFilterSpecToServerSideFilterSpec(array $filter): array
-    {
-        // Validate $filter array.
-        if (
-            !array_key_exists('feedItemTypes', $filter) ||
-            !array_key_exists('tag', $filter) ||
-            !is_array($filter['feedItemTypes']) ||
-            !is_string($filter['tag'])
-        ) {
-            throw new \InvalidArgumentException("Invalid value for 'filter' parameter.");
-        }
-
-        $serverFilters = [];
-
-        // Feed item types in the $filter array are those displayed in the UI:
-        //   {'assessments', 'achievements', 'goals', 'learning-moments'}.
-        // These must be translated into filters that will be understood by the Cursor.
-        foreach ($filter['feedItemTypes'] as $feedItemType) {
-            switch ($feedItemType) {
-                case 'assessments':
-                    $serverFilters[] = ['feedItemType' => 'dueWorkFeedback'];
-                    break;
-                case 'achievements':
-                    $serverFilters[] = ['feedItemType' => 'badgeAward', 'badgeStatus' => 'achievement'];
-                    break;
-                case 'goals':
-                    $serverFilters[] = ['feedItemType' => 'badgeAward', 'badgeStatus' => 'goal'];
-                    break;
-                case 'learning-moments':
-                    $serverFilters[] = ['feedItemType' => 'evidence', 'tag' => $filter['tag']];
-                    break;
-                default:
-                    // Do nothing.
-            }
-        }
-
-        return $serverFilters;
     }
 }
