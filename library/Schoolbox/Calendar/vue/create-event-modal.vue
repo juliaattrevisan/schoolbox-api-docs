@@ -163,11 +163,11 @@ export default {
 
         /**
          * Post the event creation form.
-         * 
+         *
          * TODO consider whether this should be in the base FullCalendar component
-         * 
+         *
          * @param form The form that's being submitted
-         * 
+         *
          */
         async createNewEvent (form) {
             this.isProcessing = true;
@@ -291,7 +291,7 @@ export default {
                         <label class="required" for="createTaskBubbleTitle">
                             Task
                         </label>
-                        <input id="createTaskBubbleTitle" name="title" type="text" v-model.trim="event.title" />
+                        <input id="createTaskBubbleTitle" name="title" maxlength="250" type="text" v-model.trim="event.title" />
 
                         <label>
                             Type
