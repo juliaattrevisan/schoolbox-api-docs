@@ -259,9 +259,6 @@ abstract class Mapper implements IMapper, Serializable
     /** @var Cache */
     private $joinMapperCache;
 
-//    /** @var Cache */
-//    protected $foreignBodyCache;
-
     /** @var Cache */
     protected $localBodyCache;
 
@@ -508,12 +505,6 @@ abstract class Mapper implements IMapper, Serializable
 
             return $mapper->getJoinMapper(array_shift($parts));
         });
-
-//        // cache of foreign entities retrieved via this mapper
-//        // they SHOULD be the same object in memory as those found in local on the equivalent sub-mapper
-//        $this->foreignBodyCache = new Cache(function (Mapper $foreignMapper, array $row, $alias = '') {
-//            return $foreignMapper->hydrate($row, $alias);
-//        });
 
         // cache of local entities
         $this->localBodyCache = new Cache(function (Mapper $mapper, array $row, $alias = '') {
@@ -3509,15 +3500,15 @@ abstract class Mapper implements IMapper, Serializable
         if ($this->localBodyCacheBypass) {
             $foreignMapper->localBodyCacheBypass = $this->localBodyCacheBypass;
         }
+
+        // Hydrate joined model:
+        // set the joined mapper's cache bypass setting back to what it was
+        // once done
         try {
             return $this->getJoinMapper($join)->hydrate($row, $alias, $callback);
         } finally {
             $foreignMapper->localBodyCacheBypass = $previousForeignBodyCacheBypass;
         }
-
-//        $foreignMapper = $this->getJoinMapper($join);
-//
-//        return $this->performHydration($this->foreignBodyCache, $foreignMapper, $row, $alias, $callback);
     }
 
 
