@@ -217,10 +217,10 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
                         // has periods to mark.
                         $event->setHasAttendance(false);
 
-                        if ($showAttendance && $externalAttendanceLink->isEnabled($period['code'], $period['AttendanceEnabled'] ?? false, $event->getStartTime())) {
+                        if ($showAttendance && $externalAttendanceLink->isEnabled((string)$period['code'], $period['AttendanceEnabled'] ?? false, $event->getStartTime())) {
                             $attendanceLink = $externalAttendanceLink->getAttendanceLink(
-                                $period['code'],
-                                $period['campus'],
+                                (string)$period['code'],
+                                (string)$period['campus'],
                                 $period['FileType'] ?? '',
                                 $period['AttendancePeriods'] ?? [],
                                 $period['periodNumber'],
