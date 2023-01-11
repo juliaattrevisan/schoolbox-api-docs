@@ -642,9 +642,10 @@ class Controller extends Base
             $untilDate = (clone $endDate)->endOfDay();
         }
         /**
-         * the repeat until date must be after the event end date, or set in the future, if it is not, just set it to the event end date
+         * the repeat until date must be after the event end date:
+         * If it is not, just set it to the event end date
          */
-        if (($untilDate < $endDate) || $untilDate->isPast()) {
+        if ($untilDate->lt($endDate)) {
             $untilDate = $endDate;
         }
 
