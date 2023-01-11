@@ -22,7 +22,6 @@ use Schoolbox\Mapper;
  */
 class StateMapper extends Mapper
 {
-
     protected function mapping()
     {
         $this->hasTable('submission_errors');
