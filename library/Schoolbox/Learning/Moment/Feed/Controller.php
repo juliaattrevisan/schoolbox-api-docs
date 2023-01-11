@@ -109,7 +109,7 @@ class Controller extends Base
                     $filtersForCursor[] = ['feedItemType' => 'badgeAward', 'badgeStatus' => 'goal'];
                     break;
                 case 'learning-moments':
-                    $filtersForCursor[] = ['feedItemType' => 'evidence'];
+                    $filtersForCursor[] = ['feedItemType' => 'evidence', 'tags' => $filter['tags']];
                     break;
                 default:
                     // Do nothing.

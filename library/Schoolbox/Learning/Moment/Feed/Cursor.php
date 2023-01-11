@@ -87,22 +87,27 @@ class Cursor implements ICursor
      *         ['feedItemType' => 'dueWorkFeedback'],                            // Filter 1 (for assessments     ).
      *         ['feedItemType' => 'badgeAward', 'badgeStatus' => 'achievement'], // Filter 2 (for achievements    ).
      *         ['feedItemType' => 'badgeAward', 'badgeStatus' => 'goal'],        // Filter 3 (for goals           ).
-     *         ['feedItemType' => 'evidence'],                                   // Filter 4 (for learning moments).
+     *         ['feedItemType' => 'evidence', 'tags' => ['Tag 1', 'Tag 2']],     // Filter 4 (for learning moments).
      *     ];
      *     The filters array above should be interpreted like so:
      *         $result =
-     *             SELECT * FROM submission_return // Due to Filter 1.
+     *             SELECT * FROM submission_return                      // Due to Filter 1.
      *             UNION
      *             SELECT * FROM badge_user  WHERE (
-     *                 status='achievement' OR // Due to Filter 2.
-     *                 status='goal'           // Due to Filter 3.
+     *                 status='achievement' OR                          // Due to Filter 2.
+     *                 status='goal'                                    // Due to Filter 3.
      *             )
      *             UNION
-     *             SELECT * FROM evidence // Due to Filter 4.
+     *             SELECT *
+     *             FROM evidence        AS e
+     *             JOIN evidence_tag    AS et ON et.evidence_id=e.id
+     *             JOIN lu_evidence_tag AS luet ON luet.id=et.tag_id
+     *             WHERE luet.name IN ('Tag 1', 'Tag 2')                // Due to Filter 4.
      *
      *     Notes:
      *      * If the $filters array is non-empty, but no filter with 'feedItemType'='badgeAward' exists, no records
      *        from badge_user should be included.  Likewise for the other feedItemTypes and corresponding tables.
+     *      * Where conditions not relevant to filters have been left out of the example query (eg. deleted_at=NULL, etc.)
      */
     public function __construct(
         private IConnector $database,
@@ -158,10 +163,16 @@ class Cursor implements ICursor
         $countQueries = [];
         if ($this->learningMomentsEnabled) {
             // Only include if $this->filters is empty or feedItemType 'evidence' is specified in at least one filter.
-            [$includeEvidence] = $this->getFilterInfoForEvidenceQuery($this->filters);
+            [$includeEvidence, $sqlWhereCondition] = $this->getFilterInfoForEvidenceQuery($this->filters);
             if ($includeEvidence) {
                 $countQueries[] = $this->database->executeQuery(
-                    "SELECT COUNT(*) FROM evidence WHERE user_id = ? AND deleted_at IS NULL",
+                    "SELECT COUNT(*)
+                    FROM evidence        AS e
+                    JOIN evidence_tag    AS et   ON et.evidence_id=e.id
+                    JOIN lu_evidence_tag AS luet ON luet.id=et.tag_id
+                    WHERE e.user_id = ?
+                    AND e.deleted_at IS NULL
+                    AND $sqlWhereCondition",
                     [$this->viewee->getId()]
                 );
             }
@@ -237,15 +248,19 @@ class Cursor implements ICursor
 
         if ($this->learningMomentsEnabled) {
             // Only include if $this->filters is empty or feedItemType 'evidence' is specified in at least one filter.
-            [$includeEvidence] = $this->getFilterInfoForEvidenceQuery($this->filters);
+            [$includeEvidence, $sqlWhereCondition] = $this->getFilterInfoForEvidenceQuery($this->filters);
             if ($includeEvidence) {
                 $queries[] = (
-                   'SELECT
-                        id,
-                        :discriminatorEvidence AS discriminator,
-                        created_at             AS date
-                    FROM evidence
-                    WHERE user_id = :userIdEvidence AND deleted_at IS NULL'
+                   "SELECT
+                    e.id,
+                    :discriminatorEvidence AS discriminator,
+                    e.created_at           AS date
+                    FROM evidence        AS e
+                    JOIN evidence_tag    AS et   ON et.evidence_id=e.id
+                    JOIN lu_evidence_tag AS luet ON luet.id=et.tag_id
+                    WHERE e.user_id = :userIdEvidence
+                    AND e.deleted_at IS NULL
+                    AND $sqlWhereCondition"
                 );
                 $params['discriminatorEvidence'] = self::DISCRIMINATOR_EVIDENCE;
                 $params['userIdEvidence']        = $this->viewee->getId();
@@ -257,9 +272,9 @@ class Cursor implements ICursor
             if ($includeBadges) {
                 $badgeQuery = (
                    "SELECT
-                        id                       AS id,
-                        :discriminatorBadgeAward AS discriminator,
-                        awarded_at               AS date
+                    id                       AS id,
+                    :discriminatorBadgeAward AS discriminator,
+                    awarded_at               AS date
                     FROM badge_user
                     WHERE $sqlWhereCondition
                     AND recipient_id = :userIdBadgeAward AND deleted_at IS NULL"
@@ -384,7 +399,6 @@ class Cursor implements ICursor
      * Return info for use in queries involving filters and the badge_user table.
      * Records from badge_user should only be included if one or more filters reference feedItemType 'badgeAward'.
      *
-     * @see $this->getFilterInfoForEvidenceQuery().
      * @param array $filters
      * @return array
      */
@@ -418,20 +432,28 @@ class Cursor implements ICursor
      * Return info for use in queries involving filters and the evidence table.
      * Records from evidence should only be included if one or more filters reference feedItemType 'evidence'.
      *
-     * @see $this->getFilterInfoForBadgesQuery().
      * @param array $filters
      * @return array
      */
     private function getFilterInfoForEvidenceQuery(array $filters): array
     {
         $includeEvidence = (count($filters) === 0);
+        $sqlWhereCondition = 'TRUE';
 
         foreach ($filters as $filter) {
             if ($filter['feedItemType'] === 'evidence') {
                 $includeEvidence = true;
+
+                if (array_key_exists('tags', $filter)) {
+                    $selectedTags = $filter['tags'];
+
+                    if (count($selectedTags) > 0) {
+                        $sqlWhereCondition = 'luet.name IN ("' . implode('", "', $selectedTags) . '")';
+                    }
+                }
             }
         }
 
-        return [$includeEvidence];
+        return [$includeEvidence, $sqlWhereCondition];
     }
 }
