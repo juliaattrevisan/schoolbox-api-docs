@@ -675,6 +675,7 @@ console.log(data);
                        :value="event.title"
                        @change="updateFormSubmittable"
                        @keyup="updateFormSubmittable"
+                       maxlength="250"
                 />
 
                 <label class="detail">
