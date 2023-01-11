@@ -3525,10 +3525,8 @@ abstract class Mapper implements IMapper, Serializable
      */
     private function performHydration(array $row, $alias = '', $callback = null)
     {
-        // courtesy of late static bindings, this private var is accessible even if you're in a different mapper
-        // however, it is not accessible to subclasses
-        // Always bypass the cache if within CLI/daemon context.
-        // This is because database contents will change before the process dies.
+        // Always bypass the cache if within CLI/daemon context:
+        // database contents will change before the process dies.
         if (!$this->isCacheEnabled() || $this->localBodyCacheBypass) {
             // fetch direct
             $model = $this->localBodyCache->fetch([ $this, $row, $alias ]);
