@@ -26,7 +26,6 @@ use function is_scalar;
  */
 class Cache
 {
-
     /** @var callable */
     private $fetch;
 
