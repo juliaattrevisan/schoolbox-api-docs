@@ -144,7 +144,7 @@ class External_Synergetic_Tsc_User extends External_Synergetic_User
          */
         $student['LECaseManagerUserId'] = null;
 
-        if ('' !== trim((string)$student['LECaseManagerID'])) {
+        if ('' !== trim((string)($student['LECaseManagerID'] ?? ''))) {
             try {
                 $student['LECaseManagerUserId'] = \Schoolbox\UserMapper::getInstance()->findByExternalId($student['LECaseManagerID'])->getId();
             } catch (\Schoolbox\Mapper\Exception $e) {
