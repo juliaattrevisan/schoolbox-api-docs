@@ -85,9 +85,9 @@ class Controller extends Base
         // Validate $filter array.
         if (
             !array_key_exists('feedItemTypes', $filter) ||
-            !array_key_exists('tags', $filter) ||
+            !array_key_exists('tag', $filter) ||
             !is_array($filter['feedItemTypes']) ||
-            !is_array($filter['tags'])
+            !is_string($filter['tag'])
         ) {
             throw new \InvalidArgumentException("Invalid value for 'filter' parameter.");
         }
@@ -109,7 +109,7 @@ class Controller extends Base
                     $filtersForCursor[] = ['feedItemType' => 'badgeAward', 'badgeStatus' => 'goal'];
                     break;
                 case 'learning-moments':
-                    $filtersForCursor[] = ['feedItemType' => 'evidence', 'tags' => $filter['tags']];
+                    $filtersForCursor[] = ['feedItemType' => 'evidence', 'tag' => $filter['tag']];
                     break;
                 default:
                     // Do nothing.

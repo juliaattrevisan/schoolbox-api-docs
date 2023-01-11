@@ -87,7 +87,7 @@ class Cursor implements ICursor
      *         ['feedItemType' => 'dueWorkFeedback'],                            // Filter 1 (for assessments     ).
      *         ['feedItemType' => 'badgeAward', 'badgeStatus' => 'achievement'], // Filter 2 (for achievements    ).
      *         ['feedItemType' => 'badgeAward', 'badgeStatus' => 'goal'],        // Filter 3 (for goals           ).
-     *         ['feedItemType' => 'evidence', 'tags' => ['Tag 1', 'Tag 2']],     // Filter 4 (for learning moments).
+     *         ['feedItemType' => 'evidence', 'tag' => 'Tag 1'],                 // Filter 4 (for learning moments).
      *     ];
      *     The filters array above should be interpreted like so:
      *         $result =
@@ -102,7 +102,7 @@ class Cursor implements ICursor
      *             FROM evidence        AS e
      *             JOIN evidence_tag    AS et ON et.evidence_id=e.id
      *             JOIN lu_evidence_tag AS luet ON luet.id=et.tag_id
-     *             WHERE luet.name IN ('Tag 1', 'Tag 2')                // Due to Filter 4.
+     *             WHERE luet.name = 'Tag 1'                            // Due to Filter 4.
      *
      *     Notes:
      *      * If the $filters array is non-empty, but no filter with 'feedItemType'='badgeAward' exists, no records
@@ -381,11 +381,13 @@ class Cursor implements ICursor
         $sqlWhereCondition = 'TRUE';
 
         foreach ($filters as $filter) {
-            if ($filter['feedItemType'] === 'evidence' && array_key_exists('tags', $filter) && count($filter['tags']) > 0) {
-                $pb = $this->database->buildPredicateBuilder('luet');
-                $pb->in('name', $filter['tags']);
-                $sqlWhereCondition = implode('AND', $pb->getWhere());
-                $params = array_merge($params, $pb->getParams());
+            if (
+                $filter['feedItemType'] === 'evidence' &&
+                array_key_exists('tag', $filter) &&
+                trim($filter['tag']) !== ''
+            ) {
+                $sqlWhereCondition = 'luet.name = :tagEvidence';
+                $params['tagEvidence'] = $filter['tag'];
             }
         }
 

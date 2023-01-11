@@ -289,6 +289,7 @@ export default {
                 checkedFeedItemTypes = feedItemTypes;
             }
 
+<<<<<<< HEAD
             let selectedTags = [];
 
             if (this.selectedTag !== null) {
@@ -313,6 +314,23 @@ export default {
 
             return { feedItemTypes: checkedFeedItemTypes, tags: selectedTags };
         },
+=======
+            let filtersDescription = (
+                'Showing ' + (
+                    (checkedFeedItemTypes.length === feedItemTypes.length)? 'all items':
+                    checkedFeedItemTypes.join(', ').replace('-', ' ')
+                ) + (
+                    (this.selectedTag === null)? '':
+                    ((checkedFeedItemTypes.length === feedItemTypes.length || checkedFeedItemTypes.length === 1)? '': ',') +
+                    ' with tag "' + this.selectedTag + '"'
+                )
+            );
+
+            $('#filters-description').html(filtersDescription);
+
+            return {feedItemTypes: checkedFeedItemTypes, tag: ((this.selectedTag === null)? '': this.selectedTag)};
+        }
+>>>>>>> 898c3f5bb26... Remove support for multiple tags - decided was confusing to add this feature because not clear whether a mulitple tag filter should be ANDed or ORed [SA-14750]
     },
 };
 </script>
