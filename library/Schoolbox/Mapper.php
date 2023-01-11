@@ -3485,9 +3485,10 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function hydrateJoin($row, $join, $alias = '', $callback = null)
     {
-        $foreignMapper = $this->getJoinMapper($join);
-
-        return $this->performHydration($this->foreignBodyCache, $foreignMapper, $row, $alias, $callback);
+        return $this->getJoinMapper($join)->hydrate($row, $alias, $callback);
+//        $foreignMapper = $this->getJoinMapper($join);
+//
+//        return $this->performHydration($this->foreignBodyCache, $foreignMapper, $row, $alias, $callback);
     }
 
 
