@@ -209,10 +209,12 @@ class Cursor implements ICursor
             // fetch items from before the last item's date, as well as ones
             // which match the last item's date and whose other fields are less
             // than the current field
-            $whereParts[]             = '(date < :date1)';
-            $whereParts[]             = '(date = :date2 AND discriminator > :discriminator2)';
-            $whereParts[]             = '(date = :date3 AND discriminator = :discriminator3 AND id < :id3)';
-            $wherePart                = 'WHERE ' . implode(' OR ', $whereParts);
+            $wherePart = (
+                'WHERE
+                 (date < :date1) OR
+                 (date = :date2 AND discriminator > :discriminator2) OR
+                 (date = :date3 AND discriminator = :discriminator3 AND id < :id3)'
+            );
             $params['date1']          = $cursor['date'];
             $params['date2']          = $cursor['date'];
             $params['date3']          = $cursor['date'];
