@@ -345,21 +345,42 @@ console.log(data);
                     data:         qs.stringify(data),
                     method:       form.method,
                     responseType: 'json',
-                };
+                },
+                toast = this.jQuery('[data-toast]');
+            toast.toastActivate({
+                text: 'Saving...'
+            });
+
             axios
                 .request(request)
                 .then(function (response) {
-                    // Assign updated values into existing event
-                    let eventData = Object.assign({}, self.event?.extendedProps?.data || {});
-                    if (typeof eventData?.meta === 'object') {
-                        eventData.meta.completed = Boolean(response?.data?.data?.meta?.completed);
-                        eventData.meta.detail    = response?.data?.data?.meta?.detail;
+                    if (200 === response.status) {
+                        // Assign updated values into existing event
+                        let eventData = Object.assign({}, self.event?.extendedProps?.data || {});
+                        if (typeof eventData?.meta === 'object') {
+                            eventData.meta.completed = Boolean(response?.data?.data?.meta?.completed);
+                            eventData.meta.detail = response?.data?.data?.meta?.detail;
+                        }
+                        self.event.setExtendedProp('data', eventData);
+                        self.event.setProp('title', response?.data?.title);
+                        self.$refs.modal.close();
+                        toast.toastTimeout({
+                            text: 'Saved.',
+                            css: 'success'
+                        });
+                    } else {
+                        throw new Error('Unable to process AJAX payload: ' + response.message, {cause: {status: response.status, message: response.message, title: response.title}});
                     }
-                    self.event.setExtendedProp('data', eventData);
-                    self.event.setProp('title', response?.data?.title);
+                })
+                .catch((err) => {
+                    toast.toastTimeout({
+                        text: 'Unable to update task. ' + err.response.data.message,
+                        css: 'alert'
+                    });
+                    submit.prop('disabled', false);
                 })
                 .finally(function () {
-                    self.$refs.modal.close();
+
                 });
         },
 
