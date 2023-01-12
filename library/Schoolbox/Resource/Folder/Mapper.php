@@ -1745,8 +1745,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     public function findCheaplyById($folderId): Model
     {
         // First, check the local body cache to see if we've already loaded this folder
-        if ($this->isCacheEnabled() && $this->localBodyCache->contains($this->getLocalKeyString($this, $folderId))) {
-            $folder = $this->localBodyCache->get($this->getLocalKeyString($this, $folderId));
+        if ($this->isCacheEnabled() && $this->hydrateCache->contains($this->getLocalKeyString($this, $folderId))) {
+            $folder = $this->hydrateCache->get($this->getLocalKeyString($this, $folderId));
         } else {
             // special case: 0 == root, but not in db
             if ($folderId === Model::ROOT_ID || $folderId === (string)Model::ROOT_ID) {

@@ -253,14 +253,22 @@ abstract class Mapper implements IMapper, Serializable
      */
     protected $sessionData = [];
 
-    /** @var Cache|GenericCollection[] */
-    private $selectCache;
+    /**
+     * A cache of the results of `SELECT` statements which this mapper executes.
+     */
+    private Cache $selectCache;
 
-    /** @var Cache */
-    private $joinMapperCache;
+    /**
+     * A cache of mappers which are related to this mapper via a join.
+     *
+     * (Mapper creation is expensive, thus these are cached.)
+     */
+    private Cache $joinMapperCache;
 
-    /** @var Cache */
-    protected $localBodyCache;
+    /**
+     * A cache of the hydrated models which this mapper may produce.
+     */
+    protected Cache $hydrateCache;
 
     /** @var IMonitor */
     protected $monitor;
@@ -510,7 +518,7 @@ abstract class Mapper implements IMapper, Serializable
         });
 
         // cache of local entities
-        $this->localBodyCache = new Cache(function (Mapper $mapper, array $row, $alias = '') {
+        $this->hydrateCache = new Cache(function (Mapper $mapper, array $row, $alias = '') {
 
             // Does this model lack an identifier?
             if (!$this->hasIdentifier()) {
@@ -3478,7 +3486,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function invalidateHydrateCache(array $row, $alias = '')
     {
-        $this->localBodyCache->invalidate($this->getLocalObjectCacheKey($this, $row, $alias));
+        $this->hydrateCache->invalidate($this->getLocalObjectCacheKey($this, $row, $alias));
     }
 
     /**
@@ -3529,10 +3537,10 @@ abstract class Mapper implements IMapper, Serializable
         // database contents will change before the process dies.
         if (!$this->isCacheEnabled() || $this->localBodyCacheBypass) {
             // fetch direct
-            $model = $this->localBodyCache->fetch([ $this, $row, $alias ]);
+            $model = $this->hydrateCache->fetch([$this, $row, $alias ]);
         } else {
             // use cached value if available
-            $model = $this->localBodyCache->get(
+            $model = $this->hydrateCache->get(
                 $this->getLocalObjectCacheKey($this, $row, $alias),
                 [ $this, $row, $alias ]
             );
@@ -4415,6 +4423,6 @@ abstract class Mapper implements IMapper, Serializable
     private function clearCaches(): void
     {
         $this->selectCache->clear();
-        $this->localBodyCache->clear();
+        $this->hydrateCache->clear();
     }
 }
