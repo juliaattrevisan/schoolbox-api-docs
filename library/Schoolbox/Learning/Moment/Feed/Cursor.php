@@ -92,10 +92,10 @@ class Cursor implements ICursor
     ) {
         $this->codec = $codec ?? new Base64();
         $this->filter = (
-            ($encodedFilter === null)? [
+            ($encodedFilter === null) ? [
                 'feedItemTypes' => [],
                 'tag' => ''
-            ]:
+            ] :
             $this->codec->decode($encodedFilter)
         );
 
