@@ -251,8 +251,10 @@ class Controller extends Base
         $rows        = json_decode($data, true);
         foreach ($rows as $row) {
             foreach ($fieldNames as $fieldName) {
+                // if current field is nullable (defined in getTableData)
+                // and the value passed in is empty string, convert it to null
                 $fieldValues[$fieldName][] =
-                    isset($row[$fieldName]) && ($row[$fieldName] !== '' || !$fields[$fieldName]['nullable'])
+                    isset($row[$fieldName]) && ($row[$fieldName] !== '' || !($fields[$fieldName]['nullable'] ?? false))
                         ? $row[$fieldName]
                         : null;
             }
