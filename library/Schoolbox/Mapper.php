@@ -1965,18 +1965,24 @@ abstract class Mapper implements IMapper, Serializable
 
     /**
      * Enables cache for this mapper.
+     *
+     * @return $this
      */
-    public function enableCache()
+    public function enableCache(): self
     {
         $this->cacheEnabled = true;
+        return $this;
     }
 
     /**
      * Disables cache for this mapper.
+     *
+     * @return $this
      */
-    public function disableCache()
+    public function disableCache(): self
     {
         $this->cacheEnabled = false;
+        return $this;
     }
 
     /**
