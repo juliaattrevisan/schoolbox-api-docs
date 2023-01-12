@@ -28,7 +28,6 @@ use UnderflowException;
  */
 class Decorator extends NotificationBundle
 {
-
     /**
      * How many params can be appended before they get slid under "and n others"
      */
@@ -121,8 +120,8 @@ class Decorator extends NotificationBundle
                 case NSMapper::NS_ONLINE_ASSESS:
                     $ns = 'work';
                     break;
+                // using news template only for posted/updated news notif
                 case NSMapper::NS_NEWS:
-                    // using news template only for posted/updated news notif
                     if (isset($msg['meta']['title']) && !empty($msg['meta']['title'])) {
                         $ns = 'news';
                         break;
