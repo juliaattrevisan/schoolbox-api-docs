@@ -8,15 +8,22 @@
 
 namespace Schoolbox\User\Password\Reset;
 
+use Alaress\Authorizer\Authorizer;
+use Alaress\Authorizer\Failure\Forbidden;
+use Alaress\Authorizer\Rule\Callback;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Password\Service as PasswordService;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Router\Router;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User\Password\MailService;
 use Schoolbox\UserMapper;
 use Alaress\Twig\Loader\IChainLoader;
+use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Exception\LogicException;
+use Symfony\Component\Mime\Exception\RfcComplianceException;
 
 /**
  * Module for password resets
@@ -60,6 +67,24 @@ class Module extends BaseModule
                 }
                 return ['reset' => $token,];
             }
+        );
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function initRoutePermissions(Authorizer $authorizer)
+    {
+        $this->addRoutePermission(
+            $authorizer,
+            '.*',
+            new Callback(function () {
+                try {
+                    new Address($this->getConfig()->get(ConfigMapper::NAME_MAIL_PASSWORD_CHANGE_FROM));
+                } catch (RfcComplianceException | LogicException) {
+                    throw new Forbidden('This service is currently unavailable.');
+                }
+            })
         );
     }
 

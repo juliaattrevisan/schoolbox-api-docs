@@ -16,6 +16,8 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Exception\LogicException;
+use Symfony\Component\Mime\Exception\RfcComplianceException;
 
 /**
  * Class MailService
@@ -242,7 +244,12 @@ class MailService
     private function getFrom()
     {
         if (!$this->from) {
-            $this->from = new Address($this->config->get(ConfigMapper::NAME_MAIL_PASSWORD_CHANGE_FROM), $this->config->get(ConfigMapper::NAME_MAIL_FROM_NAME));
+            try {
+                $this->from = new Address($this->config->get(ConfigMapper::NAME_MAIL_PASSWORD_CHANGE_FROM), $this->config->get(ConfigMapper::NAME_MAIL_FROM_NAME));
+            } catch (RfcComplianceException | LogicException) {
+                // If invalid email is set as password change from address, fall back to Email From Address
+                $this->from = new Address($this->config->get(ConfigMapper::NAME_MAIL_FROM_ADDRESS), $this->config->get(ConfigMapper::NAME_MAIL_FROM_NAME));
+            }
         }
         return $this->from;
     }
