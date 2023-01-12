@@ -60,6 +60,7 @@ class Mapper extends BaseMapper
         $this->uses('years', self::TYPE_STRING, null, 'yearsCsv');
         $this->uses('houses', self::TYPE_STRING, null, 'housesCsv');
         $this->uses('campuses', self::TYPE_STRING, null, 'campusesCsv');
+        $this->uses('folders', self::TYPE_STRING, null, 'foldersCsv');
         $this->uses('actions', self::TYPE_STRING, null, 'actionsCsv');
 
         // Are students with no year or house included?
@@ -164,6 +165,7 @@ class Mapper extends BaseMapper
             if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
                 $model->setActions($this->getCollection(\Schoolbox\Pastoral\Action\Mapper::getInstance(), $row['actions']));
             }
+            $model->setFolders($this->getCollection(\Schoolbox\Resource\Folder\Mapper::getInstance(), $row['folders']));
             $collection->add($model);
         }
 
@@ -325,6 +327,23 @@ class Mapper extends BaseMapper
             $params["campusLike$i"] = "%,{$campus->getId()},%";
         }
         $wheres[] = sprintf("(%s)", implode(' OR ', $campusWheres));
+
+        // Folder
+        $folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
+        $folderIds = $folderMapper->findFolderIdsForUser(
+            $pastoral->getStudent(),
+            true,
+            UserAccess::ACCESS_READ,
+            false,
+            false
+        );
+
+        $folderWheres = ["`folders` IS NULL"];
+        foreach ($folderIds as $i => $folderId) {
+            $folderWheres[]         = "CONCAT(',', `folders`, ',') LIKE :folderLike$i";
+            $params["folderLike$i"] = "%,{$folderId},%";
+        }
+        $wheres[] = sprintf("(%s)", implode(' OR ', $folderWheres));
 
         // Action
         if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {

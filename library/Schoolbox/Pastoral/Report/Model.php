@@ -24,6 +24,7 @@ use Schoolbox\Pastoral\Severity\Model as PastoralSeverity;
 use Schoolbox\Pastoral\Tag as PastoralTag;
 use Schoolbox\Pastoral\Type as PastoralType;
 use Schoolbox\Pastoral\Action\Model as Action;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 use House;
 
@@ -101,6 +102,9 @@ class Model implements ISoftDeletable
     /** @var string|null $campusesCsv */
     private ?string $campusesCsv;
 
+    /** Folders CSV */
+    private ?string $foldersCsv;
+
     /** Actions CSV */
     private ?string $actionsCsv = null;
 
@@ -144,6 +148,9 @@ class Model implements ISoftDeletable
 
     /** @var GenericCollection $campuses */
     private GenericCollection $campuses;
+
+    /** Folders */
+    private GenericCollection $folders;
 
     /** Actions */
     private GenericCollection $actions;
@@ -202,6 +209,7 @@ class Model implements ISoftDeletable
         $this->subTypes = new GenericCollection(PastoralSubType\Model::class);
         $this->houses   = new GenericCollection(House::class);
         $this->campuses = new GenericCollection(Campus::class);
+        $this->folders = new GenericCollection(Folder::class);
         $this->actions  = new GenericCollection(Action::class);
         $this->years    = new GenericCollection(\Schoolbox\YearLevel\Model::class);
 
@@ -944,5 +952,41 @@ class Model implements ISoftDeletable
             $userIds[] = $this->getOwner()->getId();
         }
         return $userIds;
+    }
+
+    /**
+     * @return GenericCollection
+     */
+    public function getFolders(): GenericCollection
+    {
+        return $this->folders;
+    }
+
+    /**
+     * @param GenericCollection $folders
+     * @return static
+     */
+    public function setFolders(GenericCollection $folders): self
+    {
+        $this->folders = $folders;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getFoldersCsv(): ?string
+    {
+        return $this->foldersCsv;
+    }
+
+    /**
+     * @param string|null $foldersCsv
+     * @return static
+     */
+    public function setFoldersCsv(?string $foldersCsv): self
+    {
+        $this->foldersCsv = $foldersCsv;
+        return $this;
     }
 }

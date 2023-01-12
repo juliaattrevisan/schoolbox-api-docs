@@ -263,9 +263,10 @@ Usages:
                     </div>
                     <div class="small-5 medium-5 large-8 columns">
                         <div id="class-selector-container">
-                            <class-selector 
+                            <class-selector
                                 endpoint="{{ routeLookup('courseImport.searchClasses') }}"
                                 :previously-selected-class="{{ destinations|json_encode }}"
+                                :required="true"
                             />
                         </div>
                         <script src="{{CDN_PREFIX}}/js/bundle/classSelector.js?v={{ config.site_version }}"></script>

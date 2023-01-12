@@ -21,21 +21,37 @@ const props = defineProps({
         required: true,
     },
     /**
-     * for the Modify Course page, the class-selector will be disabled but it should contain the 
+     * for the Modify Course page, the class-selector will be disabled but it should contain the
      * Class that was previously selected. The class will be one we have access the Modify Course page from
      */
-    previouslySelectedClass: { 
+    previouslySelectedClass: {
         type: Object,
         required: false,
         default: {},
     },
+    /**
+     * multiple preselected classes with the class-selector enabled
+     * expecting array of folders ['id' => folderId, 'name' => folderTitle]
+     */
+    preselectedClasses: {
+        type: Array,
+        required: false,
+        default: []
+    },
+    /**
+     * whether this field is required for this page
+     */
+    required: {
+        type: Boolean,
+        required: true,
+    }
 });
 
 
 /*****************************************************************
- * 
+ *
  * Load all the classes
- * 
+ *
  ****************************************************************/
 
 const isLoading = ref(true);
@@ -46,17 +62,17 @@ const classes = ref([]); //all the classes data
 /**
  * a class has already been previously selected, so the class-selector is not enabled
  * It's disabled from outside the Vue component within library/Schoolbox/Assessment/Course/templates/import.twig
- * 
- * @returns { Boolean } 
+ *
+ * @returns { Boolean }
  */
 const hasPreviouslySelectedClass = computed(() => {
     return props.previouslySelectedClass.id !== undefined;
 });
 
 /**
- * 
- * 
- * @returns { Boolean } 
+ *
+ *
+ * @returns { Boolean }
  */
 const isClassSelectorActive = computed(() => {
     return props.previouslySelectedClass.id === undefined;
@@ -64,8 +80,8 @@ const isClassSelectorActive = computed(() => {
 
 /**
  * to notify whether still loading the results or not
- * 
- * @returns { String } 
+ *
+ * @returns { String }
  */
 const inputPlaceholder = computed(() => {
     if (isLoading.value) {
@@ -74,7 +90,7 @@ const inputPlaceholder = computed(() => {
         return 'Unable to load classes. Please contact your IT support.';
     } else {
         return 'Search for classes or manually enter comma-separated classes...';
-    } 
+    }
 });
 
 onMounted(() => {
@@ -100,9 +116,16 @@ async function loadClassList () {
         const response = await fetch(props.endpoint);
         const responseJson = await response.json();
         classes.value = responseJson;
-        classes.value.forEach((classItem) => { //add in additional data to help track selection status
-            classItem = { ...classItem, isSelected: false };
+        let preselectedIds = [];
+        props.preselectedClasses.forEach((preselected) => {
+            preselectedIds.push(preselected.id);
         });
+        // if there are preselected classes, select them
+        if (preselectedIds.length > 0) {
+            classes.value.forEach((classItem) => classItem.isSelected = preselectedIds.includes(classItem.id));
+            props.preselectedClasses.forEach((preselectedClass) => preselectedClass.isSelected = true);
+            selectedClasses.value = [...props.preselectedClasses];
+        }
     } catch (error) {
         console.warn(error);
         isLoading.value = false;
@@ -114,14 +137,14 @@ async function loadClassList () {
 
 
 /*****************************************************************
- * 
+ *
  * Search for classes
- * 
+ *
  ****************************************************************/
 
 const query = ref(''); //the search string to match against
-const queryInputEl = ref(null); 
-const minQueryLength = 1; //should be able to search for just '3', if we want all of Grade 3  
+const queryInputEl = ref(null);
+const minQueryLength = 1; //should be able to search for just '3', if we want all of Grade 3
 const CAPPED_RESULTS_LENGTH = 100; //the maximum amount of results to show
 const isResultsCapped = ref(false); //to show a 'refine your search' note
 const resultsNotShownCount = ref(0); //a total of the results not visible in the list
@@ -139,16 +162,16 @@ const queryWordList = computed(() => {
 });
 
 /**
- * the classes found relevant to the search input, capped to the maximum 
+ * the classes found relevant to the search input, capped to the maximum
  * amount of results to be shown
- * 
+ *
  * @returns { Array } all relevant search results, once we've reached the minQueryLength
  */
 const results = computed(() => {
     isResultsCapped.value = false;
     if (query.value.length < minQueryLength) {
         return [];
-    } else if (classes.value.filter(searchForName).length > 0) { 
+    } else if (classes.value.filter(searchForName).length > 0) {
         const fullResults = classes.value.filter(searchForName);
         if (fullResults.length > CAPPED_RESULTS_LENGTH) { //too many results, so cap them
             isResultsCapped.value = true; //to display the results are capped note
@@ -163,10 +186,10 @@ const results = computed(() => {
 });
 
 /**
- * show select all option for adding / removing classes only if there's 
+ * show select all option for adding / removing classes only if there's
  * more than one search result
- * 
- * @returns { Boolean } 
+ *
+ * @returns { Boolean }
  */
 const showSelectAll = computed(() => {
     return results.value.length > 1;
@@ -192,9 +215,9 @@ function searchForName (classItem) {
 
 
 /*****************************************************************
- * 
+ *
  * Keyboard / Mouse events
- * 
+ *
  ****************************************************************/
 
 onMounted(() => {
@@ -224,7 +247,7 @@ function initKeyboardEvents () {
 }
 
 /**
- * enter the manual entry or select the currently 
+ * enter the manual entry or select the currently
  * highlighted search result
  */
 function onEnterKeySelected () {
@@ -232,7 +255,7 @@ function onEnterKeySelected () {
     clearInput();
 }
 
-const classSelectorEl = ref(null); 
+const classSelectorEl = ref(null);
 
 /**
  * to be able to close the search results
@@ -255,16 +278,16 @@ function clearInput () {
 
 
 /*****************************************************************
- * 
- * Adding / Removing classes 
- * 
+ *
+ * Adding / Removing classes
+ *
  ****************************************************************/
 
 const selectedClasses = ref([]); //the classes currently selected
 
 /**
  * determine display of elements based on whether any classes are selected
- * 
+ *
  * @returns { Boolean } all relevant search results, once we've reached the minQueryLength
  */
 const hasSelectedClasses = computed(() => {
@@ -273,8 +296,8 @@ const hasSelectedClasses = computed(() => {
 
 /**
  * To determine the behaviour of the 'Select all classes' button
- * 
- * @returns { String } 
+ *
+ * @returns { String }
  */
 const selectedClassIds = computed(() => {
     const selectedClassIdList = selectedClasses.value.map((selectedClasss) => selectedClasss.id);
@@ -283,7 +306,7 @@ const selectedClassIds = computed(() => {
 
 /**
  * a result has been selected via #class-selector-search-result
- * 
+ *
  * @param { Object }
  * @param { Boolean }
  */
@@ -293,7 +316,7 @@ function onSelectResult (toggledClass) {
 
 /**
  * add the class to the selected list
- * 
+ *
  * @param { Object }
  * @param { Boolean }
  */
@@ -309,8 +332,8 @@ function toggleResult (toggledClass) {
 
 /**
  * To determine the behaviour of the 'Select all classes' button
- * 
- * @returns { Boolean } 
+ *
+ * @returns { Boolean }
  */
 const isAllResultsSelected = computed(() => {
     if (selectedClasses.value.length > 0) {
@@ -323,8 +346,8 @@ const isAllResultsSelected = computed(() => {
 
 /**
  * To add the 'indeterminate' class to the select all checkbox
- * 
- * @returns { Boolean } 
+ *
+ * @returns { Boolean }
  */
 const isSomeResultsSelected = computed(() => {
     if (selectedClasses.value.length > 0) {
@@ -347,18 +370,18 @@ function onSelectAllResults () {
 }
 
 /**
- * pull all results out 
+ * pull all results out
  */
 function removeAllResults () {
     const matchedSelectedClasses = results.value.filter((matchedSelectedClass) => { //check if the class is in the list already
         return selectedClasses.value.some((selectedClass) => selectedClass.id === matchedSelectedClass.id); //add in those that match
     });
     matchedSelectedClasses.forEach((matchedSelectedClass) => matchedSelectedClass.isSelected = false); //set false on all
-    selectedClasses.value = selectedClasses.value.filter((selectedClass) => selectedClass.isSelected); //and then remove those there were just unset  
+    selectedClasses.value = selectedClasses.value.filter((selectedClass) => selectedClass.isSelected); //and then remove those there were just unset
 }
 
 /**
- * add all results in 
+ * add all results in
  */
 function addAllResults () {
     const newSelectedClasses = results.value.filter((newSelectedClass) => { //check if the class isn't in the list already
@@ -370,7 +393,7 @@ function addAllResults () {
 
 /**
  * to remove a class from selection
- * 
+ *
  * @param { Object }
  */
 function onRemoveClassSelected (removedClass) {
@@ -390,7 +413,7 @@ function onClearAllSelected () {
 
 <template>
     <div class="class-selector" ref="classSelectorEl">
-        <label class="required">Class(es)</label>
+        <label :class="{'required': props.required}">Class(es)</label>
         <input id="import_folders" name="import_folders" type="hidden" tabindex="-1" :value="selectedClassIds" />
         <input
             v-if="isClassSelectorActive"
@@ -426,12 +449,12 @@ function onClearAllSelected () {
             </div><!-- .search-results -->
         </div><!-- .search-results-container -->
         <div v-if="hasSelectedClasses" :class="[{ 'selected-classes-container__disabled': hasPreviouslySelectedClass }, 'selected-classes-container']">
-            <class-selector-selected-class 
-                v-for="selectedClass in selectedClasses" 
-                :key="selectedClass.id"  
+            <class-selector-selected-class
+                v-for="selectedClass in selectedClasses"
+                :key="selectedClass.id"
                 :class-item="selectedClass"
                 :is-class-selector-active="isClassSelectorActive"
-                @remove="onRemoveClassSelected"  
+                @remove="onRemoveClassSelected"
             />
         </div><!-- .selected-classes-container -->
         <div class="extra-actions-container">
