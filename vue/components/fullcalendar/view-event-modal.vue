@@ -331,7 +331,7 @@ console.log(data);
          *
          * TODO consider whether this should be in the base FullCalendar component
          */
-        updateEvent() {
+        async updateEvent() {
             let self = this,
                 form = self.$refs.updateForm,
                 data = {
@@ -340,48 +340,55 @@ console.log(data);
                     title:     this.$refs.eventTitleInput.value.trim(),
                     detail:    this.$refs.eventDetailInput.value,
                 },
-                request = {
-                    url:          form.action,
-                    data:         qs.stringify(data),
-                    method:       form.method,
-                    responseType: 'json',
-                },
                 toast = this.jQuery('[data-toast]');
+
+            const formData = new FormData();
+            formData.append('eventId', data.eventId);
+            formData.append('completed', data.completed);
+            formData.append('title', data.title);
+            formData.append('detail', data.detail);
+
             toast.toastActivate({
                 text: 'Saving...'
             });
 
-            axios
-                .request(request)
-                .then(function (response) {
-                    if (200 === response.status) {
-                        // Assign updated values into existing event
-                        let eventData = Object.assign({}, self.event?.extendedProps?.data || {});
-                        if (typeof eventData?.meta === 'object') {
-                            eventData.meta.completed = Boolean(response?.data?.data?.meta?.completed);
-                            eventData.meta.detail = response?.data?.data?.meta?.detail;
-                        }
-                        self.event.setExtendedProp('data', eventData);
-                        self.event.setProp('title', response?.data?.title);
-                        self.$refs.modal.close();
-                        toast.toastTimeout({
-                            text: 'Saved.',
-                            css: 'success'
-                        });
-                    } else {
-                        throw new Error('Unable to process AJAX payload: ' + response.message, {cause: {status: response.status, message: response.message, title: response.title}});
+            try {
+                const response = await fetch(form.action, {
+                    method: form.method,
+                    body: formData,
+                    responseType: 'json',
+                    headers: {
+                        'Accept': 'application/json',
                     }
-                })
-                .catch((err) => {
+                });
+                const responseData = await response.json();
+                if (response.ok) {
+                    let eventData = Object.assign({}, self.event?.extendedProps?.data || {});
+                    if (typeof eventData?.meta === 'object') {
+                        eventData.meta.completed = Boolean(responseData?.data?.meta?.completed);
+                        eventData.meta.detail = response?.data?.data?.meta?.detail;
+                    }
+                    self.event.setExtendedProp('data', eventData);
+                    self.event.setProp('title', responseData?.title);
+                    self.$refs.modal.close();
                     toast.toastTimeout({
-                        text: 'Unable to update task. ' + err.response.data.message,
+                        text: 'Saved.',
+                        css: 'success'
+                    });
+                } else {
+                    toast.toastTimeout({
+                        text: 'Unable to update task. ' + responseData.message,
                         css: 'alert'
                     });
-                    submit.prop('disabled', false);
-                })
-                .finally(function () {
-
+                }
+            } catch (error) {
+                console.warn(error);
+                toast.toastTimeout({
+                    text: 'Failed - ' + error.message,
+                    css: 'alert'
                 });
+                submit.prop('disabled', false);
+            }
         },
 
         /**
