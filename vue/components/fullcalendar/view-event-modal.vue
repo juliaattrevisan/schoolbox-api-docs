@@ -3,8 +3,6 @@
 import RevealModal        from '@schoolboxVue/components/reveal-modal'
 import MetaList           from '@schoolboxVue/components/meta/list'
 import MetaItem           from '@schoolboxVue/components/meta/item'
-import axios              from 'axios';
-import qs                 from 'qs';
 import fullCalendarHelper from '@schoolboxVue/components/fullcalendar/mixinFullCalendarHelper';
 
 /* Path aliases like @schoolboxCalendarEvent are defined in webpack.config.js
@@ -279,39 +277,37 @@ console.log(data);
                 text: 'Updating invitation...'
             });
 
-            axios.request(request)
-                    .then(function (response) {
+            fetch(request)
+                .then(response => {
+                    if(response.ok){
+                        return response.json()
+                    } else {
+                        throw new Error(response.statusText);
+                    }
+                })
+                .then(data => {
+                    self.payload.currentUser.status = status;
+                    self.payload.attendees = data.attendees;
 
-                        /* Update data with the result from async request
-                            */
-                        self.payload.currentUser.status = status;
-                        self.payload.attendees = response.data.attendees;
-
-                        // Update event's status so its rendering updates
-                        if (typeof self?.event?.extendedProps?.data?.attendance?.status === 'object') {
-                            self.event.extendedProps.data.attendance.status.current = status;
-                            self.event.setExtendedProp('data', self.event.extendedProps.data);
-                        }
-
-                        toast.toastTimeout({
-                            text: 'Invitation successfully updated',
-                            css: 'success'
-                        });
-                    })
-                    .catch(error => {
-                        if (error.response) {
-                            toast.toastTimeout({
-                                text: 'Unable to update invitation. ' + error.response.data.message,
-                                css: 'alert'
-                            });
-                        }
-                    })
-                    .finally(function () {
-
-                        /* Reset flag
-                            */
-                        self.isTransacting = false;
+                    if (typeof self?.event?.extendedProps?.data?.attendance?.status === 'object') {
+                        self.event.extendedProps.data.attendance.status.current = status;
+                        self.event.setExtendedProp('data', self.event.extendedProps.data);
+                    }
+                    toast.toastTimeout({
+                        text: 'Invitation successfully updated',
+                        css: 'success'
                     });
+                })
+                .catch(error => {
+                    toast.toastTimeout({
+                        text: 'Unable to update invitation. ' + error.response.data.message,
+                        css: 'alert'
+                    });
+                })
+                .finally(function () {
+                    self.isTransacting = false;
+                });
+
         },
 
 
@@ -433,18 +429,24 @@ console.log(data);
                 responseType: 'json'
             }
 
-            axios.request(request)
-                    .then(function (response) {
-                        self.payload = response.data;
-                    })
-                    .catch(function(error) {
-
-                        /* Attendance won't be available for some events such as those
-                            * streamed from a third party source, or a sis; looking for their
-                            * identifying hashes will result in 404 because they won't exist
-                            * in our local db
-                            */
-                    });
+            fetch(request)
+                .then(response => {
+                    if(response.ok){
+                        return response.json()
+                    } else {
+                        throw new Error(response.statusText);
+                    }
+                })
+                .then(data => {
+                    self.payload = data;
+                })
+                .catch(error => {
+                    /* Attendance won't be available for some events such as those
+                         * streamed from a third party source, or a sis; looking for their
+                         * identifying hashes will result in 404 because they won't exist
+                         * in our local db
+                         */
+                });
         },
 
         /**
@@ -598,10 +600,25 @@ console.log(data);
                 action: 'Delete',
                 efficacy: efficacy,
             };
-            return axios
-                .post(this.eventExtendedProps.links.delete, qs.stringify(data))
+            fetch(this.eventExtendedProps.links.delete, {
+                method: 'POST',
+                body: JSON.stringify(data),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => {
+                    if(response.ok){
+                        return response;
+                    }else {
+                        throw new Error(response.statusText);
+                    }
+                })
                 .then(() => this.event.remove())
-                .then(() => this.$emit(EVENT_DELETED, this.event));
+                .then(() => this.$emit(EVENT_DELETED, this.event))
+                .catch(error => {
+                    console.error(error);
+                });
         },
 
         /**
@@ -616,11 +633,27 @@ console.log(data);
             this.$refs.bookingDeleteModal.close();
             let data = {
                 efficacy: efficacy,
-            };
-            return axios
-                .post(this.eventExtendedProps.booking.actions.find(action => action.action === 'cancel').href, qs.stringify(data))
+            }, cancelActionUrl = this.eventExtendedProps.booking.actions.find(action => action.action === 'cancel').href;
+            fetch(cancelActionUrl, {
+                method: 'POST',
+                body: JSON.stringify(data),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => {
+                    if(response.ok){
+                        return response;
+                    }else {
+                        throw new Error(response.statusText);
+                    }
+                })
                 .then(() => this.event.remove())
-                .then(() => this.$emit(EVENT_DELETED, this.event));
+                .then(() => this.$emit(EVENT_DELETED, this.event))
+                .catch(error => {
+                    console.error(error);
+                });
+
         },
 
         /**
@@ -635,11 +668,27 @@ console.log(data);
             this.$refs.bookingApproveSeriesModal.close();
             let data = {
                 efficacy: efficacy,
-            };
-            return axios
-                .post(this.eventExtendedProps.booking.actions.find(action => action.action === 'approve').href, qs.stringify(data))
+            }, approveActionUrl = this.eventExtendedProps.booking.actions.find(action => action.action === 'approve').href;
+            fetch(approveActionUrl, {
+                method: 'POST',
+                body: JSON.stringify(data),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => {
+                    if(response.ok){
+                        return response;
+                    }else {
+                        throw new Error(response.statusText);
+                    }
+                })
                 .then(() => this.event.remove())
-                .then(() => this.$emit(EVENT_MODIFIED, this.event));
+                .then(() => this.$emit(EVENT_MODIFIED, this.event))
+                .catch(error => {
+                    console.error(error);
+                });
+
         },
 
         /**
@@ -654,11 +703,27 @@ console.log(data);
             this.$refs.bookingRejectSeriesModal.close();
             let data = {
                 efficacy: efficacy,
-            };
-            return axios
-                .post(this.eventExtendedProps.booking.actions.find(action => action.action === 'reject').href, qs.stringify(data))
+            }, rejectActionUrl = this.eventExtendedProps.booking.actions.find(action => action.action === 'reject').href;
+            fetch(rejectActionUrl, {
+                method: 'POST',
+                body: JSON.stringify(data),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => {
+                    if(response.ok){
+                        return response;
+                    }else {
+                        throw new Error(response.statusText);
+                    }
+                })
                 .then(() => this.event.remove())
-                .then(() => this.$emit(EVENT_MODIFIED, this.event));
+                .then(() => this.$emit(EVENT_MODIFIED, this.event))
+                .catch(error => {
+                    console.error(error);
+                });
+
         },
     },
 }

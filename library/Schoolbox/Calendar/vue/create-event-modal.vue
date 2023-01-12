@@ -2,7 +2,6 @@
 
 import RevealModal from '@schoolboxVue/components/reveal-modal'
 import Toast from '@schoolboxVue/components/toast.vue'
-import axios from 'axios'
 import debounce from 'lodash/debounce';
 import { ENDPOINTS } from '@schoolboxCalendarEvent/endpoints';
 
@@ -150,16 +149,17 @@ export default {
          * Perform async request and load results into component
          */
         search: debounce(function(loading, query, vm) {
-            axios.get(ENDPOINTS.URL_SELECTIZE, {
-                params: {
-                    query: query,
-                    groupID: 0
-                }
-            })
-            .then(function(response) {
-                vm.options = response.data;
-                loading(false);
-            });
+            const queryParams = new URLSearchParams();
+            queryParams.append('query', query);
+            queryParams.append('groupID', 0);
+
+            fetch(`${ENDPOINTS.URL_SELECTIZE}?${queryParams.toString()}`)
+                .then(response => response.json())
+                .then(data => {
+                    vm.options = data;
+                    loading(false);
+                })
+                .catch(error => console.log(error))
         }, 350),
 
 
