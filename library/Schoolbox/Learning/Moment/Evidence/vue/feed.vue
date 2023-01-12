@@ -264,9 +264,6 @@ export default {
          * @param { ?String } tag
          */
         applyFilters(clickedFeedItemType, tag) {
-            let $checkbox = $("#filter-" + clickedFeedItemType);
-            $checkbox.prop("checked", $checkbox.prop("checked") ? false : true);
-
             if (tag !== null) {
                 // Since the user has asked to show only items with a particular tag,
                 //  * check all checkboxes pertaining to feed items that can have tags, and
@@ -328,24 +325,43 @@ export default {
             <section class="activity-feed">
                 <div id="activity-feed-filters">
                     Filter:
-                    <label for="filter-assessments" @click.prevent="applyFilters('assessments', null)">
-                        <input type="checkbox" class="plain" id="filter-assessments" name="includeAssessments" />
+                    <label for="filter-assessments">
+                        <input
+                            type="checkbox"
+                            class="plain"
+                            id="filter-assessments"
+                            name="includeAssessments"
+                            @click="applyFilters('assessments', null)"
+                        />
                         Assessments
                     </label>
-                    <label for="filter-achievements" @click.prevent="applyFilters('achievements', null)">
-                        <input type="checkbox" class="plain" id="filter-achievements" name="includeAchievements" />
+                    <label for="filter-achievements">
+                        <input
+                            type="checkbox"
+                            class="plain"
+                            id="filter-achievements"
+                            name="includeAchievements"
+                            @click="applyFilters('achievements', null)"
+                        />
                         Achievements
                     </label>
-                    <label for="filter-goals" @click.prevent="applyFilters('goals', null)">
-                        <input type="checkbox" class="plain" id="filter-goals" name="includeGoals" />
+                    <label for="filter-goals">
+                        <input
+                            type="checkbox"
+                            class="plain"
+                            id="filter-goals"
+                            name="includeGoals"
+                            @click="applyFilters('goals', null)"
+                        />
                         Goals
                     </label>
-                    <label for="filter-learning-moments" @click.prevent="applyFilters('learning-moments', null)">
+                    <label for="filter-learning-moments">
                         <input
                             type="checkbox"
                             class="plain"
                             id="filter-learning-moments"
                             name="includeLearningMoments"
+                            @click="applyFilters('learning-moments', null)"
                         />
                         Learning Moments
                     </label>
@@ -522,7 +538,7 @@ export default {
                                             <template v-if="index !== 0">, </template>
                                             <span
                                                 class="anchor-style"
-                                                v-on:click="applyFilters(null, tag.name)"
+                                                @click="applyFilters(null, tag.name)"
                                                 title="Click to only show items with this tag."
                                                 >{{ tag.name }}</span
                                             >
@@ -747,7 +763,7 @@ export default {
             </div>
 
             <div class="feed-load-more content" v-else-if="metadata.cursor.next && metadata.count > data.length">
-                <button class="load-more expand" @click.prevent="append(metadata.cursor.next)" title="Load more">
+                <button class="load-more expand" @click="append(metadata.cursor.next)" title="Load more">
                     Load more
                 </button>
             </div>
