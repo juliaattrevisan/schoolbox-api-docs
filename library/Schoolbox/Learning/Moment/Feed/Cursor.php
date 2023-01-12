@@ -247,8 +247,9 @@ class Cursor implements ICursor
 
     /**
      * Returns query to get evidence.
-     * @param array $params
-     * @param bool  $countOnly
+     * @param array $params This allows the returned query to be used as part of a larger query.
+     *                      Pass the params already needed in the larger query, or an empty array.
+     * @param bool  $countOnly containing query and associated params (including given params).
      * @return array
      */
     private function getEvidenceQuery(array $params, bool $countOnly): array
@@ -297,9 +298,10 @@ class Cursor implements ICursor
 
     /**
      * Returns query to get badgeAwards.
-     * @param array $params
+     * @param array $params This allows the returned query to be used as part of a larger query.
+     *                      Pass the params already needed in the larger query, or an empty array.
      * @param bool  $countOnly
-     * @return array
+     * @return array containing query and associated params (including given params).
      */
     private function getBadgeAwardsQuery(array $params, bool $countOnly): array
     {
@@ -348,9 +350,10 @@ class Cursor implements ICursor
 
     /**
      * Returns query to get due work feedback.
-     * @param array $params
+     * @param array $params This allows the returned query to be used as part of a larger query.
+     *                      Pass the params already needed in the larger query, or an empty array.
      * @param bool  $countOnly
-     * @return array
+     * @return array containing query and associated params (including given params).
      */
     private function getDueWorkFeedbackQuery(array $params, bool $countOnly): array
     {
