@@ -86,10 +86,12 @@ class Mapper extends BaseMapper
             SELECT      {$this->getColumnString()},
                         {$this->getJoinColumnString('role', 'r')},
                         {$this->getJoinColumnString('user', 'u')},
+                        {$this->getJoinColumnString('user.role', 'ur')},
                         {$this->getJoinColumnString('group', 'g')}
             FROM        {$this->getTable()}
             LEFT JOIN   {$this->getJoinSql('role', '', 'r')}
             LEFT JOIN   {$this->getJoinSql('user', '', 'u')}
+            LEFT JOIN   {$this->getJoinSql('user.role', 'u', 'ur')}
             LEFT JOIN   {$this->getJoinSql('group', '', 'g')}
         ";
     }
@@ -103,9 +105,6 @@ class Mapper extends BaseMapper
     protected function hydrateSelect(PDOStatement $statement)
     {
         $results = $this->createCollection();
-
-        // get roles in advance to hydrate user roles
-        $roles = $this->getJoinMapper('role')->findAll(['deleted' => true])->indexBy('id');
 
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             // The record must have a user, role, role type or group specified
@@ -121,7 +120,9 @@ class Mapper extends BaseMapper
             if (!empty($row['u.id'])) {
                 /** @var User $user */
                 $user = $this->hydrateJoin($row, 'user', 'u');
-                $user->setRole($roles->offsetGet($user->getRole()->getId()));
+                /** @var Role $userRole */
+                $userRole = $this->hydrateJoin($row, 'user.role', 'ur');
+                $user->setRole($userRole);
                 $access->setUser($user);
             }
 
