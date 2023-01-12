@@ -119,9 +119,8 @@ class Controller extends Base
         }
 
         // Reformat to rows to field -> values
-        $fields = $tableData[$tableKey]['fields'];
         if ($this->getRequest()->post['rows']) {
-            $fieldValues = $this->processRows(array_keys($tableData[$tableKey]['fields']), $this->getRequest()->post['rows']);
+            $fieldValues = $this->processRows($tableData[$tableKey]['fields'], $this->getRequest()->post['rows']);
         } else {
             $fieldValues = $this->getRequest()->post;
         }
@@ -233,12 +232,14 @@ class Controller extends Base
     }
 
     /**
-     * @param array  $fieldNames
+     * @param array  $fields
      * @param string $data
      * @return array
      */
-    private function processRows(array $fieldNames, string $data): array
+    private function processRows(array $fields, string $data): array
     {
+        $fieldNames = array_keys($fields);
+
         // add "id" as it's not in fields
         if (!in_array('id', $fieldNames)) {
             $fieldNames[] = 'id';
@@ -250,7 +251,10 @@ class Controller extends Base
         $rows        = json_decode($data, true);
         foreach ($rows as $row) {
             foreach ($fieldNames as $fieldName) {
-                $fieldValues[$fieldName][] = $row[$fieldName] ?? null;
+                $fieldValues[$fieldName][] =
+                    isset($row[$fieldName]) && ($row[$fieldName] !== '' || !$fields[$fieldName]['nullable'])
+                        ? $row[$fieldName]
+                        : null;
             }
         }
         return $fieldValues;
@@ -579,6 +583,7 @@ class Controller extends Base
                     'timetableDay'  => [
                         'caption'   => 'Timetable Days',
                         'width'     => 1,
+                        'nullable'  => true,
                         'default'   => null,
                     ]
                 ]
@@ -697,7 +702,7 @@ class Controller extends Base
                         'tooltip'   => 'Can be left blank if a mark does not apply',
                         'nullable'  => true,
                         'width'     => 2,
-                        'default'   => '',
+                        'default'   => null,
                     ],
                 ]
             ],
