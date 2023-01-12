@@ -72,7 +72,10 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Return the first part of the string required to select from this mapper
+     * Select:
+     * * role
+     * * user and their role
+     * * group
      *
      * @throws BaseMapper\DefinitionException
      * @return string
@@ -88,6 +91,21 @@ class Mapper extends BaseMapper
                         {$this->getJoinColumnString('user', 'u')},
                         {$this->getJoinColumnString('user.role', 'ur')},
                         {$this->getJoinColumnString('group', 'g')}
+        ";
+    }
+
+    /**
+     * Join onto:
+     * * role
+     * * user and their role
+     * * group
+     *
+     * @throws BaseMapper\DefinitionException
+     * @return string
+     */
+    protected function getFromString()
+    {
+        return "
             FROM        {$this->getTable()}
             LEFT JOIN   {$this->getJoinSql('role', '', 'r')}
             LEFT JOIN   {$this->getJoinSql('user', '', 'u')}
