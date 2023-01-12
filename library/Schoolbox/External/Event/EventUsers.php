@@ -64,8 +64,8 @@ class EventUsers
         $this->eventMapper = $eventMapper;
         $this->campusMapper = $campusMapper;
         $this->roletypeMapper = $roletypeMapper;
-        $this->folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
-        $this->folderCodeMapper = \Schoolbox\Resource\Folder\Code\Mapper::getInstance();
+        $this->folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance()->disableCache();
+        $this->folderCodeMapper = \Schoolbox\Resource\Folder\Code\Mapper::getInstance()->disableCache();
     }
 
 
@@ -148,7 +148,7 @@ class EventUsers
         $query = "
             SELECT DISTINCT
                 {$this->eventMapper->getColumnString('se')},
-                {$folderColumnString}, 
+                {$folderColumnString},
                 {$folderCodeColumnString}
             FROM {$this->eventMapper->getTable()} se
             LEFT JOIN {$this->campusMapper->getTable()} sec ON se.id = sec.event_id
@@ -159,12 +159,12 @@ class EventUsers
             AND se.classification = :classification
             AND se.start_at >= :startDatetime
             AND se.finish_at <= :finishDatetime
-            
+
             UNION
-            
+
             SELECT DISTINCT
                 {$this->eventMapper->getColumnString('se')},
-                {$folderColumnString}, 
+                {$folderColumnString},
                 {$folderCodeColumnString}
             FROM {$this->eventMapper->getTable()} se
             INNER JOIN sis_event_user seu ON se.id = seu.event_id

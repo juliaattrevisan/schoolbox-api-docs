@@ -55,12 +55,12 @@ class Factory
             ->add(new Prepare(
                 $log,
                 $perform,
-                \Schoolbox\External\Event\Mapper::getInstance(),
-                \Schoolbox\External\ClassEntryMapper::getInstance(),
-                \Schoolbox\External\ClassInvolvementMapper::getInstance(),
-                \Schoolbox\External\ClassPeriodMapper::getInstance(),
-                \Schoolbox\External\TimetablePeriodMapper::getInstance(),
-                \Schoolbox\External\Event\Overrides\Mapper::getInstance()
+                \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
+                \Schoolbox\External\ClassEntryMapper::getInstance()->disableCache(),
+                \Schoolbox\External\ClassInvolvementMapper::getInstance()->disableCache(),
+                \Schoolbox\External\ClassPeriodMapper::getInstance()->disableCache(),
+                \Schoolbox\External\TimetablePeriodMapper::getInstance()->disableCache(),
+                \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache()
             ))
             ->add(new Classes(
                 $log,
@@ -68,10 +68,10 @@ class Factory
                 $defaultType,
                 $exclusions,
                 $teacherIdentifier,
-                \Schoolbox\External\Event\Mapper::getInstance(),
-                \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
-                \Schoolbox\External\ClassEntryMapper::getInstance(),
-                \Schoolbox\External\ClassInvolvementMapper::getInstance(),
+                \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
+                \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache(),
+                \Schoolbox\External\ClassEntryMapper::getInstance()->disableCache(),
+                \Schoolbox\External\ClassInvolvementMapper::getInstance()->disableCache(),
                 $message
             ))
             ->add(new Cleanup(
