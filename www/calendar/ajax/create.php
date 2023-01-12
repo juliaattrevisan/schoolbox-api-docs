@@ -40,7 +40,7 @@ if (is_numeric($_POST['type'])) {
 
 //trust no one, char length should match the front end validation
 if (mb_strlen($_POST['title'] ?? '', 'UTF-8') > 250) {
-    throw new Schoolbox\Application\Exception\Exception("Event / Task Title must not be longer than 250 characters");
+    throw new Schoolbox\Application\Exception\Exception("Title must not be longer than 250 characters");
 }
 
 /* Persist event attendances
