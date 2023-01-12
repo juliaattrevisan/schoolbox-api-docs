@@ -84,14 +84,20 @@ class Cursor implements ICursor
         private IConnector $database,
         private User $viewee,
         private User $viewer,
-        string $encodedFilter,
+        ?string $encodedFilter,
         private ?Alaress_Date_Format $expiryDate,
         private int $limit,
         IConfigLoader $config,
         private ?ICodec $codec = null
     ) {
         $this->codec = $codec ?? new Base64();
-        $this->filter = $this->codec->decode($encodedFilter);
+        $this->filter = (
+            ($encodedFilter === null)? [
+                'feedItemTypes' => [],
+                'tag' => ''
+            ]:
+            $this->codec->decode($encodedFilter)
+        );
 
         $this->learningMomentsEnabled = $config->get(ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED)
             && $viewee->getLearningMomentsEnabled()
