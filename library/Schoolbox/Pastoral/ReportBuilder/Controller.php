@@ -36,6 +36,9 @@ use Schoolbox\Pastoral\Action\Mapper as ActionMapper;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\YearLevel;
@@ -84,6 +87,7 @@ class Controller extends Base
      * @param ReportAccessMapper            $reportAccessMapper
      * @param UserMapper                    $userMapper
      * @param RoleMapper                    $roleMapper
+     * @param UserAccessMapper              $userAccessMapper
      */
     public function __construct(
         private ErrorMapper $errorMapper,
@@ -103,6 +107,7 @@ class Controller extends Base
         private ReportAccessMapper $reportAccessMapper,
         private UserMapper $userMapper,
         private RoleMapper $roleMapper,
+        private UserAccessMapper $userAccessMapper,
     ) {
     }
 
@@ -205,6 +210,16 @@ class Controller extends Base
             ];
         }
 
+        // Folders
+        $foldersSelected = $report->getFolders()->map(
+            static function (Folder $folder) {
+                return [
+                    'id' => $folder->getId(),
+                    'name' => $folder->getTitle(),
+                ];
+            }
+        )->getAll();
+
         // Actions
 
         $actionsSelected  = [];
@@ -298,6 +313,7 @@ class Controller extends Base
                     'authorsSelected'      => $authorsSelected,
                     'tagsSelected'         => $tagsSelected,
                     'actionsSelected'      => $actionsSelected,
+                    'foldersSelected'      => $foldersSelected,
                     'report'               => $report,
                     'datePresets'          => self::RELATIVE_DATE_PRESETS,
                     'selectedRelativeDate' => $report->getRelativeDateString(),
@@ -477,6 +493,26 @@ class Controller extends Base
             $afterDate  = $report->getAfterDate();
         }
 
+        $students = $report->getStudents();
+        foreach ($report->getFolders() as $folder) {
+            try {
+                $folderUsers = $this->userAccessMapper->findUsersInCategory(
+                    $folder,
+                    Role::STUDENT,
+                    UserAccess::ACCESS_READ,
+                    true,
+                    false
+                );
+                $students    = $students->mergeUnique($folderUsers, 'id');
+            } catch (MapperException $e) {
+            }
+        }
+
+        // if folder is set, but no users returned, we should not return any records
+        if (($report->getFolders()->count() > 0) && ($students->count() === 0)) {
+            return $this->pastoralDataSource->createCollection();
+        }
+
         return $this->pastoralDataSource->getReportData(
             $this->getUser(),
             $beforeDate,
@@ -485,7 +521,7 @@ class Controller extends Base
             $report->getTypes(),
             $report->getSubTypes(),
             $report->getAuthors(),
-            $report->getStudents(),
+            $students,
             $report->getTags(),
             $report->getOrder(),
             $report->getInvolved(),
@@ -588,6 +624,7 @@ class Controller extends Base
         $report->setYearsCsv($this->getCsv($post->get('years')));
         $report->setHousesCsv($this->getCsv($post->get('houses')));
         $report->setCampusesCsv($this->getCsv($post->get('campuses')));
+        $report->setFoldersCsv(empty($post->get('import_folders')) ? null : $post->get('import_folders'));
 
         $report->setIncludeStudentsWithoutYear($includeStudentsWithoutYear);
         $report->setIncludeStudentsWithoutHouse($includeStudentsWithoutHouse);

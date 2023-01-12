@@ -26,6 +26,7 @@ use Schoolbox\Pastoral\Report\Mapper as PastoralReportMapper;
 use Schoolbox\Pastoral\Report\Model as PastoralReport;
 use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Role;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\RoleMapper;
@@ -128,6 +129,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(\Schoolbox\Pastoral\Report\Access\Mapper::class),
             $this->getMapperFactory()->get(UserMapper::class),
             $this->getMapperFactory()->get(RoleMapper::class),
+            $this->getMapperFactory()->get(UserAccessMapper::class),
         );
     }
 
