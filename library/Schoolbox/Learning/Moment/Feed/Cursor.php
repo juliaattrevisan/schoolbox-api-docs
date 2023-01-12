@@ -84,7 +84,7 @@ class Cursor implements ICursor
         private IConnector $database,
         private User $viewee,
         private User $viewer,
-        private string $encodedFilter,
+        string $encodedFilter,
         private ?Alaress_Date_Format $expiryDate,
         private int $limit,
         IConfigLoader $config,
