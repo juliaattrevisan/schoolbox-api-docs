@@ -1964,23 +1964,17 @@ abstract class Mapper implements IMapper, Serializable
     }
 
     /**
-     * Enables cache
-     *
-     * Intentionally not exposed, this should be controlled by `setup()` or
-     * `postSetup()`.
+     * Enables cache for this mapper.
      */
-    protected function enableCache()
+    public function enableCache()
     {
         $this->cacheEnabled = true;
     }
 
     /**
-     * Disables cache
-     *
-     * Intentionally not exposed, this should be controlled by `setup()` or
-     * `postSetup()`.
+     * Disables cache for this mapper.
      */
-    protected function disableCache()
+    public function disableCache()
     {
         $this->cacheEnabled = false;
     }
