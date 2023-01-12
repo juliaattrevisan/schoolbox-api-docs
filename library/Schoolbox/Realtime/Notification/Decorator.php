@@ -120,12 +120,12 @@ class Decorator extends NotificationBundle
                 case NSMapper::NS_ONLINE_ASSESS:
                     $ns = 'work';
                     break;
-                // using news template only for posted/updated news notif
                 case NSMapper::NS_NEWS:
                     if (isset($msg['meta']['title']) && !empty($msg['meta']['title'])) {
                         $ns = 'news';
                         break;
                     }
+                    // using news template only for posted/updated news notif
                 default:
                     $ns = 'activity';
                     break;
