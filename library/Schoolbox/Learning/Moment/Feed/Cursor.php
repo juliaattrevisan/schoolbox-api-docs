@@ -174,13 +174,37 @@ class Cursor implements ICursor
      */
     public function retrieveResults(?string $encodedCursor): Collection
     {
-        // Don't need to know the details of the badge:
-        // just what it points to
-        // There's a possible issue in that `badge_user.badge_id` is not unique
-        $params    = ['limit' => $this->limit,];
+        $queriesToBeUnioned = [];
+        $params = [];
+
+        if ($this->learningMomentsEnabled) {
+            [$evidenceQuery, $params] = $this->getEvidenceQuery($params, countOnly: false);
+            if ($evidenceQuery !== null) {
+                $queriesToBeUnioned[] = $evidenceQuery;
+            }
+        }
+
+        if ($this->badgeAwardsEnabled) {
+            [$badgeAwardsQuery, $params] = $this->getBadgeAwardsQuery($params, countOnly: false);
+            if ($badgeAwardsQuery !== null) {
+                $queriesToBeUnioned[] = $badgeAwardsQuery;
+            }
+        }
+
+        if ($this->gradesEnabled) {
+            [$dueWorkFeedbackQuery, $params] = $this->getDueWorkFeedbackQuery($params, countOnly: false);
+            if ($dueWorkFeedbackQuery !== null) {
+                $queriesToBeUnioned[] = $dueWorkFeedbackQuery;
+            }
+        }
+
+        if (count($queriesToBeUnioned) === 0) {
+            return new Collection();
+        }
+
         $wherePart = '';
 
-        if (isset($encodedCursor)) {
+        if ($encodedCursor !== null) {
             // the cursor contains 'date', 'id', 'discriminator' fields
             $cursor = $this->codec->decode($encodedCursor);
 
@@ -202,41 +226,19 @@ class Cursor implements ICursor
             $params['id3']            = $cursor['id'];
         }
 
-        $queries = [];
-
-        if ($this->learningMomentsEnabled) {
-            [$evidenceQuery, $params] = $this->getEvidenceQuery($params, countOnly: false);
-            if ($evidenceQuery !== null) {
-                $queries[] = $evidenceQuery;
-            }
-        }
-
-        if ($this->badgeAwardsEnabled) {
-            [$badgeAwardsQuery, $params] = $this->getBadgeAwardsQuery($params, countOnly: false);
-            if ($badgeAwardsQuery !== null) {
-                $queries[] = $badgeAwardsQuery;
-            }
-        }
-
-        if ($this->gradesEnabled) {
-            [$dueWorkFeedbackQuery, $params] = $this->getDueWorkFeedbackQuery($params, countOnly: false);
-            if ($dueWorkFeedbackQuery !== null) {
-                $queries[] = $dueWorkFeedbackQuery;
-            }
-        }
-
-        if (count($queries) === 0) {
-            return new Collection();
-        }
-
         $query = (
             'SELECT id, discriminator, date FROM (
-                 ' . implode(' UNION ALL ', $queries) . "
+                 ' . implode(' UNION ALL ', $queriesToBeUnioned) . "
              ) AS combined
              $wherePart
              ORDER BY date desc, discriminator asc, id desc
              LIMIT :limit"
         );
+
+        // Don't need to know the details of the badge:
+        // just what it points to
+        // There's a possible issue in that `badge_user.badge_id` is not unique
+        $params['limit'] = $this->limit;
 
         return new Collection(
             $this->database->executeQuery($query, $params)->fetchAll()
