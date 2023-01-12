@@ -173,28 +173,29 @@ export default {
          */
         async createNewEvent (form) {
             this.isProcessing = true;
-
+            const formContent = new FormData(form);
             this.$refs.toast.activate('Saving...');
 
             try {
-                const response = await axios.request({
-                    url:          form.action,
-                    data:         $(form).serialize(),
-                    method:       form.method,
+                const response = await fetch(form.action, {
+                    method: form.method,
+                    body: formContent,
                     responseType: 'json',
+                    headers: {
+                        'Accept': 'application/json',
+                    }
                 });
-                if (200 === response.status) {
+                const responseData = await response.json();
+                if (response.ok) {
                     this.$refs.modal.close();
-                    this.$emit(EVENT_CREATED, response.data);
+                    this.$emit(EVENT_CREATED, responseData);
                     this.$refs.toast.timeout('Created', true, 2000);
                 } else {
-                    this.$refs.toast.timeout('Unable to create event / task. ' + err.response.data.message, false, 3000);
-                    submit.prop('disabled', false);
+                    this.$refs.toast.timeout('Unable to create event / task. ' + responseData.message, false, 3000);
                 }
 
             } catch (error) {
-                this.$refs.toast.timeout('Unable to create event / task. ' + error.response.data.message, false, 3000);
-                submit.prop('disabled', false);
+                this.$refs.toast.timeout('Unable to create event / task. ' + error.message, false, 3000);
                 console.warn(error);
             } finally {
                 this.isProcessing = false;
