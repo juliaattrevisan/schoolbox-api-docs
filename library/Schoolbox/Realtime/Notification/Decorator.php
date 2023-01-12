@@ -377,7 +377,7 @@ class Decorator extends NotificationBundle
                 foreach ($params as $p) {
                     $others[] = $p->getText();
                 }
-                $bits[] = sprintf('<a data-others="%s">%s others</a>', implode(';', $others), count($params));
+                $bits[] = sprintf('<strong title="%s">%s others</strong>', implode(';', $others), count($params));
                 break;
         }
 
