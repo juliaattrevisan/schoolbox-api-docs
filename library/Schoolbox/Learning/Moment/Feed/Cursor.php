@@ -32,7 +32,7 @@ use UnexpectedValueException;
  * A call to Cursor->retrieveResults() will return a list of items that are either 'evidence', 'badgeAward', or
  * 'dueWorkFeedback', sorted into buckets according to date.  The purpose of the cursor is to uniquely identify a
  * position in this sorted list.  Since each type of item has its own set of IDs, ID alone is not enough information.
- * We need the date/time, the type of object, and the object's ID.  For more info see the comments in the ICursor class.
+ * We need the date, the type of object, and the object's ID.  For more info see the comments in the ICursor class.
  */
 class Cursor implements ICursor
 {
