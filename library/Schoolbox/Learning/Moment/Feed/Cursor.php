@@ -296,10 +296,9 @@ class Cursor implements ICursor
     private function getBadgeAwardsQuery(array $params, bool $countOnly): array
     {
         $includeAchievements = in_array('achievements', $this->filter['feedItemTypes'], true); // Achievements are badges with status 'achievement'.
-        $includeGoals        = in_array('goals'       , $this->filter['feedItemTypes'], true); // Goals are badges with status 'goal'.
-        $includeBadgeAwards  = (count($this->filter['feedItemTypes']) === 0 || $includeAchievements || $includeGoals);
+        $includeGoals        = in_array('goals', $this->filter['feedItemTypes'], true); // Goals are badges with status 'goal'.
 
-        if (!$includeBadgeAwards) {
+        if (!$includeAchievements && !$includeGoals) {
             return [null, $params]; // This indicates that the query should not be run because we know that no results will be returned.
         }                           // NOTE: $params must be returned unchanged.
 
@@ -316,8 +315,12 @@ class Cursor implements ICursor
         }
 
         $filterOrClauses = [];
-        if ($includeAchievements) {$filterOrClauses[] = "status = 'achievement'";}
-        if ($includeGoals       ) {$filterOrClauses[] = "status = 'goal'"       ;}
+        if ($includeAchievements) {
+            $filterOrClauses[] = "status = 'achievement'";
+        }
+        if ($includeGoals) {
+            $filterOrClauses[] = "status = 'goal'";
+        }
 
         $badgeAwardsQuery .= (
             'FROM badge_user
