@@ -9,15 +9,16 @@
 
 namespace Schoolbox\External\Connector\Edumate\Base;
 
-use Alaress\Database\Iterator\Base as Iterator;
+use Schoolbox\External\Connector\Base;
+use Schoolbox\External\Connector\IExternalEvents;
 use Schoolbox\User;
 
-class ExternalEvents extends \Schoolbox\External\Connector\Offline\Base\ExternalEvents
+class ExternalEvents extends Base implements IExternalEvents
 {
     public function getExternalEvents(User $user, $startDate, $endDate)
     {
         if(empty($user->getExternalId())) {
-            return parent::getExternalEvents($user, $startDate, $endDate);
+            throw new InvalidArgumentException("External ID is not a Number");
         }
 
         if($user->getRole()->isStudent()) {
@@ -72,7 +73,7 @@ class ExternalEvents extends \Schoolbox\External\Connector\Offline\Base\External
 
         }
         else {
-            return parent::getExternalEvents($user, $startDate, $endDate);
+            throw new InvalidArgumentException("Only students and staff are supported");
         }
 
         return $this->databaseExternal->getQueryIterator(
