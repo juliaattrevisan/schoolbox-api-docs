@@ -129,11 +129,12 @@ class Controller extends Base
         $resultIterator = $this->getDatabase()->getIterator($query);
 
         // Should be a single result
-        try {
-            $resultIterator->rewind();
-        } catch (OutOfBoundsException $e) {
+        $resultIterator->rewind();
+
+        if (!$resultIterator->valid()) {
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_FILE_NOT_FOUND);
         }
+
         $row      = $resultIterator->current();
         $content  = $row['Document'];
         $fileName = "{$row['Description']}.pdf";
