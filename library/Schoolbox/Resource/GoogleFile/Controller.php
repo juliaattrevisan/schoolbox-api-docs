@@ -65,6 +65,35 @@ class Controller extends Base
         $this->folderMapper     = $folderMapper;
     }
 
+
+    /**
+     * @return void
+     */
+    public function saveAccessTokenToSession(): void
+    {
+        $success = true;
+        $message = '';
+
+        try {
+            $_SESSION['googleAccessToken'] = $this->request->post->get('accessToken');
+            $_SESSION['googleAccessTokenType'] = $this->request->post->get('tokenType');
+        } catch (\Exception) {
+            $success = false;
+            $message = 'Could not store Google Access Token data.';
+        }
+
+        $this->getResponse()->status->set(200);
+        $this->getResponse()->content->set(
+            $this->buildJsonOutput(
+                [
+                    'success' => $success,
+                    'message' => $message
+                ]
+            )
+        );
+    }
+
+
     /**
      * Displays a google file in a dedicated page
      *
@@ -83,7 +112,9 @@ class Controller extends Base
                 '@googleFile/detail.twig',
                 [
                     'googleFile' => $googleFile,
-                    'folder'     => $folder,
+                    'googleAccessToken' => $_SESSION['googleAccessToken'] ?? '',
+                    'googleAccessTokenType' => $_SESSION['googleAccessTokenType'] ?? '',
+                    'folder' => $folder,
                 ],
                 'Google File'
             )
@@ -165,11 +196,32 @@ class Controller extends Base
             try {
                 // provide access to google doc via api
                 foreach ($email2accessRoleMap as $email => $accessRole) {
-                    $gDriveFetcher->setPermission(
-                        $selectedFile['id'],
-                        $accessRole,
-                        $email
-                    );
+                    if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
+                        // Skip invalid email addresses because attempting to set permissions on these will result in error.
+                        continue;
+                    }
+
+                    try {
+                        $gDriveFetcher->setPermission(
+                            $selectedFile['id'],
+                            $accessRole,
+                            $email
+                        );
+                    } catch (\DomainException $e) {
+                        if (str_contains($e->getMessage(), 'specified emailAddress is invalid')) {
+                            // This error will occur if an email address containing illegal characters is encountered.
+                            // Eg. 'non_existent_email_address_asdfaskjh1;32451@asldfasjdl.com'.
+                            continue;
+                        } elseif (str_contains($e->getMessage(), 'Failed to set permission for gmail address')) {
+                            // Assume the gmail address does not exist, and continue.
+                            continue;
+                        }
+                        trigger_error(
+                            "Could not set permissions for email '$email' for unknown reasons.  Details: " . $e->getMessage(),
+                            E_USER_WARNING
+                        );
+                        continue;
+                    }
                 }
                 $meta = $gDriveFetcher->fetchMetaData($selectedFile['id']);
                 $googleFile

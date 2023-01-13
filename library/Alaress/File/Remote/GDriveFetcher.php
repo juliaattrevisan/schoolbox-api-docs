@@ -326,8 +326,14 @@ class GDriveFetcher implements FetcherInterface
             if ($e instanceof ClientException) {
                 $error = $e->getResponse()->getBody()->getContents();
                 return json_decode($error, true);
+            } elseif (str_ends_with($email, '@gmail.com') && str_contains($e->getMessage(), '500 Internal Server Error')) {
+                // A '500 Internal Server Error' is returned if the request is for a '@gmail.com' address that does not exist.
+                // Note that non-existent email addresses that do not end in '@gmail.com' do not cause an error.  Presumably
+                // this is because Google knows which gmail addresses don't exist, but cannot tell which non-gmail addresses
+                // don't exist and so assumes that they do exist.
+                throw new DomainException("Failed to set permission for gmail address {$fileId}", 0, $e);
             }
-            throw new DomainException("Failed to list permission for {$fileId}", 0, $e);
+            throw new DomainException("Failed to set permission for {$fileId}", 0, $e);
         }
     }
 

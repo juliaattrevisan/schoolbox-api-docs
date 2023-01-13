@@ -18,7 +18,6 @@ use SitePage;
 
 class Controller extends Component_Homepage_ControllerAbstract
 {
-
     /**
      * Has this component been properly configured?
      * Assume yes to begin with
@@ -104,12 +103,14 @@ class Controller extends Component_Homepage_ControllerAbstract
     {
         $twigTemplate = '@googleFile/component/googleFiles.twig';
         $twigData     = [
-            'folder'       => $this->getContext(),
-            'googleFile'   => new Model(),
-            'googleFiles'  => $this->googleFiles,
-            'hasError'     => $this->hasError,
-            'writeAccess'  => $this->hasWriteAccess(),
-            'component_id' => $this->getInstance()->getId(),
+            'folder'                => $this->getContext(),
+            'googleAccessToken'     => $_SESSION['googleAccessToken'] ?? '',
+            'googleAccessTokenType' => $_SESSION['googleAccessTokenType'] ?? '',
+            'googleFile'            => new Model(),
+            'googleFiles'           => $this->googleFiles,
+            'hasError'              => $this->hasError,
+            'writeAccess'           => $this->hasWriteAccess(),
+            'component_id'          => $this->getInstance()->getId(),
         ];
 
         /* Decide whether to show Component Title using showComponentTitle

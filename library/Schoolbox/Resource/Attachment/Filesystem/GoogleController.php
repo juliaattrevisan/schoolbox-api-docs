@@ -21,12 +21,8 @@ use SitePage;
  */
 class GoogleController extends AbstractController
 {
-    const SCOPE_PREFIX   = 'https://www.googleapis.com/auth/';
     const VIEW_PREFIX    = 'google.picker.ViewId.';
     const FEATURE_PREFIX = 'google.picker.Feature.';
-
-    /** @var array */
-    protected array $scopes = [];
 
     /** @var array */
     protected array $views = [];
@@ -53,9 +49,8 @@ class GoogleController extends AbstractController
     public function __construct($multi, $mimeFilter = null, $conf = null)
     {
         parent::__construct($multi, $mimeFilter);
-        $this->addScope('drive.readonly')
-             ->addFeature('SUPPORT_TEAM_DRIVES');
 
+        $this->addFeature('SUPPORT_TEAM_DRIVES');
         $this->setViewsFromMimeFilter($mimeFilter);
 
         if ($conf) {
@@ -101,6 +96,7 @@ class GoogleController extends AbstractController
         }
     }
 
+
     /**
      * @param SitePage $page
      * @return void
@@ -113,24 +109,14 @@ class GoogleController extends AbstractController
 
         $page->setVar(
             [
-                'API_KEY'   => $this->gAppsApiKey,
-                'CLIENT_ID' => $this->gAppsClientId,
-                'SCOPES'    => implode("','", array_keys($this->scopes)),
-                'VIEWS'     => implode(',', array_keys($this->views)),
-                'FEATURES'  => implode(',', array_keys($this->features)),
+                'API_KEY'                  => $this->gAppsApiKey,
+                'CLIENT_ID'                => $this->gAppsClientId,
+                'GOOGLE_ACCESS_TOKEN'      => $_SESSION['googleAccessToken'] ?? '',
+                'GOOGLE_ACCESS_TOKEN_TYPE' => $_SESSION['googleAccessTokenType'] ?? '',
+                'VIEWS'                    => implode(',', array_keys($this->views)),
+                'FEATURES'                 => implode(',', array_keys($this->features)),
             ]
         );
-    }
-
-
-    /**
-     * @param string $scope
-     * @return self
-     */
-    private function addScope(string $scope): self
-    {
-        $this->scopes[self::SCOPE_PREFIX . $scope] = true;
-        return $this;
     }
 
 

@@ -15,18 +15,26 @@
 <div class="small-12 island">
     <div id="google-authenticate" class="button hide">Authorize Google account to view document</div>
 </div>
+<!-- Google Identity Service see https://developers.google.com/identity/oauth2/web/guides/migration-to-gis#gis-and-gapi -->
+<script src="https://accounts.google.com/gsi/client"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/google/apiloader.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/google/picker.js?v={{ config.site_version }}"></script>
 <script type="text/javascript">
     $(function () {
         $.fn.setupGapi({
-            clientId: '{{ config.googleapps_client_id }}',
-            modules: ['client:auth2'],
+            modules: ['client'], // NOTE: gapi.client will not exist unless we load the 'client' module.
             callback: function () {
+                // TODO: I suspect that the Google Picker module is not actually required here.  I think we only need the Google Drive module.
+                //       So possibly the code below can be simplified.  Or maybe the code pertaining to authorisation should be removed
+                //       from the googlePicker() function, since it is required for both the Google Picker and the Google Drive.
                 $('#google-file-content').googlePicker({
-                    listener: false,
                     authBtn: '#google-authenticate',
-                    onAuth: function () {
+                    clientId: '{{ config.googleapps_client_id }}',
+                    googleAccessToken: '{{ googleAccessToken }}', // We use the twig template variable here (from $_SESSION).  If we don't have the token yet, this will be a blank string.
+                    googleAccessTokenType: '{{ googleAccessTokenType }}',
+                    listener: false,
+                    onAuth: function (googleAccessToken) { // Here we have the actual token, so we don't use the twig template variable.
+                        gapi.client.setToken({access_token: googleAccessToken});
                         gapi.client.load('drive', 'v3', function () {
                             let getViewLink = gapi.client.drive.files.get({
                                 'fields': 'webViewLink',
