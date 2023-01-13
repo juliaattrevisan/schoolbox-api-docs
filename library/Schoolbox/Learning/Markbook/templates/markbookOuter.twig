@@ -38,6 +38,10 @@
 
 <div id="{{ reportContentId }}" class="row"></div>
 
+<div id="menu_pop_out">
+
+</div>
+
 {% autoescape 'js' %}
 <script type="text/javascript">
     $(function() {
@@ -86,6 +90,63 @@
             });
         }
 
+        /**
+         *  Handle creation of our base Popout menu.
+         *
+         *  TODO
+         *  -
+         *  - Get information about the object we're clicking on
+         *  - Pass this information into our onClick menu
+         *  - Make menu vanish when clicked off.
+         */
+
+        //Locate the report_content container, which we will bind our event listener to.
+        const report_content = document.querySelector('#report_content');
+        report_content.addEventListener('click', (e) => {
+            /* If we haven't clicked on a student grade cell, or we have but we've
+            *  clicked on something /within/ the cell (such as an <a>), exit
+            */
+            if(!e.target.closest('.js-menu-clickable') || e.target.closest('a')) return;
+            const target = e.target.closest('.js-menu-clickable');
+            const routes = {
+                dataEndpoint : target.dataset.endpoint,
+                updateRoute : target.dataset.updateRoute,
+                reviewRoute : target.dataset.reviewRoute,
+                publishRoute : target.dataset.publishRoute,
+                excludeRoute : target.dataset.excludeRoute,
+                historyRoute : target.dataset.historyRoute
+            };
+
+            const vueString = `
+                <div data-markbook-pop-out>
+                    <markbook-pop-out
+                        data-endpoint="${routes.dataEndpoint}"
+                        update-route="${routes.updateRoute}"
+                        review-route="${routes.reviewRoute}"
+                        publish-route="${routes.publishRoute}"
+                        exclude-route="${routes.excludeRoute}"
+                        history-route="${routes.historyRoute}"
+                    />
+                </div>
+            `;
+
+            /* TODO - Remove temporary styling code once positioning handled by external library */
+            const menuPopoutContainer = document.querySelector('#menu_pop_out');
+            menuPopoutContainer.innerHTML = vueString;
+            menuPopoutContainer.style.position = 'absolute';
+            menuPopoutContainer.style.top = '500px';
+            menuPopoutContainer.style.left = '100px';
+
+            /* Is there a more efficient way to do this rather than just slapping
+            Vue scripts into our document? Will need to try and remove this scripts
+            after every click at least. */
+
+            const scriptElement = document.createElement('script');
+            scriptElement.src = '{{ CDN_PREFIX }}/js/bundle/markbookPopOut.js?v={{ config.site_version }}';
+            document.head.appendChild(scriptElement);
+        });
+
+
         $('#{{ reportContentId }}').on('filterContentLoaded', function() {
             // Use datatables to do fixed headers and left column
             // Only do this on small up
@@ -117,12 +178,12 @@
             // Enable the download report menu
             // $('#report_actions').foundation();     // Seems like something else is handling this now, a listener higher up in the DOM delegating?
             // spawn the markbook popout menus...
-            function loadMarkbookPopoutMenu () {
+            /* function loadMarkbookPopoutMenu () {
                 const scriptElement = document.createElement('script');
                 scriptElement.src = '{{ CDN_PREFIX }}/js/bundle/markbookPopOut.js?v={{ config.site_version }}';
                 document.head.appendChild(scriptElement);
             }
-            loadMarkbookPopoutMenu();
+            loadMarkbookPopoutMenu();*/
         }).progressTickForm({
             // Save form for task completion: apply only to report content,
             // allow content to handle save

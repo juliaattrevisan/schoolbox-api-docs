@@ -25,7 +25,9 @@ defineProps<{
     .user-photo{
         border-radius: 50%;
         width: 32px;
+        min-width: 32px;
         height: 32px;
+        min-height: 32px;
         background-color: #EEEEEE;
         background-size: cover;
         background-position: center center;

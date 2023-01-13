@@ -205,7 +205,20 @@
 
                 {% for assessment in markbook.assessments %}
                     {% set participant = assessment.getParticipantIfExtant(student) %}
-                    <td class="column-{{ assessment.id }}{% if not participant or participant.isExcluded %} excluded{% endif %} student-grade-cell"  data-assessment="{{ assessment.id }}">
+                    <td
+                        class="column-{{ assessment.id }}
+                            {% if not participant or participant.isExcluded %} excluded
+                            {% else %} js-menu-clickable
+                            {% endif %} student-grade-cell"
+                            data-assessment="{{ assessment.id }}"
+                            data-endpoint="{{ routeLookupIfAuthorized('learningAssessmentTimeline.getFullTimeline', {assessment: assessment, assessmentId: assessment.id, userId: student.id }) }}"
+                            data-update-route="{{ routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
+                            data-review-route="{{ routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
+                            data-publish-route="{{ routeLookupIfAuthorized('learningAssessment.getSummary', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
+                            data-exclude-route="{{ routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessment: assessment, assessmentId:assessment.id }) }}"
+                            data-history-route="{{ routeLookupIfAuthorized('learningAssessment.getSummary', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
+                    >
+                    <!-- Add data for the popup menu above -->
                         {% if participant and not participant.isExcluded %}
                             {% if assessment is task %}
                                 {# An icon that shows if the student has attempted the task or not #}
@@ -253,7 +266,7 @@
                             {% endif %}
                         {% endif %}
                         {% if assessment.getDefaultTypeName == 'Due Work' %}
-                            <div data-markbook-pop-out>
+                            <!-- <div data-markbook-pop-out>
                                 <markbook-pop-out
                                         data-endpoint="{{ routeLookupIfAuthorized('learningAssessmentTimeline.getFullTimeline', {assessment: assessment, assessmentId: assessment.id, userId: student.id }) }}"
                                         update-route="{{ routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
@@ -262,7 +275,7 @@
                                         exclude-route="{{ routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessment: assessment, assessmentId:assessment.id }) }}"
                                         history-route="{{ routeLookupIfAuthorized('learningAssessment.getSummary', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
                                 />
-                            </div>
+                            </div> -->
                         {% endif %}
                     </td>
                 {% endfor %}
