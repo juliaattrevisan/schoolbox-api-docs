@@ -28,7 +28,6 @@ use UnderflowException;
  */
 class Decorator extends NotificationBundle
 {
-
     /**
      * How many params can be appended before they get slid under "and n others"
      */
@@ -122,11 +121,11 @@ class Decorator extends NotificationBundle
                     $ns = 'work';
                     break;
                 case NSMapper::NS_NEWS:
-                    // using news template only for posted/updated news notif
                     if (isset($msg['meta']['title']) && !empty($msg['meta']['title'])) {
                         $ns = 'news';
                         break;
                     }
+                    // using news template only for posted/updated news notif
                 default:
                     $ns = 'activity';
                     break;
@@ -377,7 +376,7 @@ class Decorator extends NotificationBundle
                 foreach ($params as $p) {
                     $others[] = $p->getText();
                 }
-                $bits[] = sprintf('<a data-others="%s">%s others</a>', implode(';', $others), count($params));
+                $bits[] = sprintf('<strong title="%s">%s others</strong>', implode(';', $others), count($params));
                 break;
         }
 
