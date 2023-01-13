@@ -65,6 +65,9 @@ class MessageFactory
      * @param string|null $gotenbergUrl        The URL of the Gotenberg container.
      * @param string|null $gotenbergKey        The API key which the Gotenberg container requires, if any.
      * @param string|null $gotenbergHttpHeader The header in which `$gotenbergKey` will be passed.
+     * @param string|null $kamiApiKey          The API key used to authenticate with Kami.
+     * @param string|null $turnitinApiKey      The API key used to authenticate with Turnitin.
+     * @param string|null $turnitinApiHost     The host name of this instance's Turnitin instance.
      */
     public function __construct(
         private Instance $instance,
@@ -72,6 +75,9 @@ class MessageFactory
         private ?string $gotenbergUrl,
         private ?string $gotenbergKey,
         private ?string $gotenbergHttpHeader,
+        private ?string $kamiApiKey,
+        private ?string $turnitinApiKey,
+        private ?string $turnitinApiHost,
     ) {
     }
 
@@ -177,6 +183,34 @@ class MessageFactory
     }
 
     /**
+     * Add a Kami document to the downloaded ZIP.
+     *
+     * @param string $filename       The name of the file in the downloaded ZIP.
+     * @param string $kamiDocumentId The ID of the Kami document.
+     * @return $this
+     */
+    public function addKamiContent(string $filename, string $kamiDocumentId): self
+    {
+        $clone = clone $this;
+        $clone->content[] = ['filename' => $filename, 'kamiDocumentId' => $kamiDocumentId];
+        return $clone;
+    }
+
+    /**
+     * Add a Turnitin submission to the downloaded ZIP.
+     *
+     * @param string $filename             The name of the file in the downloaded ZIP.
+     * @param string $turnitinSubmissionId The ID of the Turnitin submission.
+     * @return $this
+     */
+    public function addTurnitinContent(string $filename, string $turnitinSubmissionId): self
+    {
+        $clone = clone $this;
+        $clone->content[] = ['filename' => $filename, 'turnitinSubmissionId' => $turnitinSubmissionId];
+        return $clone;
+    }
+
+    /**
      * Clear all files from the downloaded ZIP.
      *
      * @return self
@@ -212,6 +246,15 @@ class MessageFactory
                     ? ['key' => $this->gotenbergKey, 'header' => $this->gotenbergHttpHeader]
                     : null,
                 'footer' => $this->pdfFooter,
+            ];
+        }
+        if (isset($this->kamiApiKey)) {
+            $params['kami']['apiKey'] = $this->kamiApiKey;
+        }
+        if (isset($this->turnitinApiKey, $this->turnitinApiHost)) {
+            $params['turnitin'] = [
+                'apiKey' => $this->turnitinApiKey,
+                'host'   => $this->turnitinApiHost,
             ];
         }
         return new Message(
