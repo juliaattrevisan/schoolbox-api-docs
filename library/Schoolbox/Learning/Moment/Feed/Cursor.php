@@ -422,4 +422,3 @@ class Cursor implements ICursor
         return [$query, $params];
     }
 }
-
