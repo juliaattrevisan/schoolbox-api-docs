@@ -335,12 +335,12 @@ class Cursor implements ICursor
         $query .= (
             'FROM badge_user
              WHERE (' . implode(' OR ', $filterOrClauses) . ')
-             AND recipient_id = :userIdBadgeAward AND deleted_at IS NULL'
+             AND recipient_id = :userIdBadgeAward AND deleted_at IS NULL '
         );
         $params['userIdBadgeAward'] = $this->viewee->getId();
 
         if ($this->expiryDate) {
-            $query .= ' AND (expires_at IS NULL OR expires_at >= :expiryBadgeAward)';
+            $query .= 'AND (expires_at IS NULL OR expires_at >= :expiryBadgeAward)';
             $params['expiryBadgeAward'] = $this->expiryDate->getDatabaseDate();
         }
 
@@ -400,7 +400,7 @@ class Cursor implements ICursor
              AND `submission_return`.`owner` = :userIdDueWorkFeedback
              AND `submission_box`.`mark_visibility` >= :markVisibility
              AND `submission_return`.`deleted_at` IS NULL
-             AND `assessment`.`deleted_at` IS NULL'
+             AND `assessment`.`deleted_at` IS NULL '
         );
         $params['userIdDueWorkFeedback'] = $this->viewee->getId();
         $params['markVisibility']        = $visibility;
