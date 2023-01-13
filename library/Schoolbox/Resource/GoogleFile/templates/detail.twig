@@ -30,11 +30,11 @@
                 $('#google-file-content').googlePicker({
                     authBtn: '#google-authenticate',
                     clientId: '{{ config.googleapps_client_id }}',
-                    googleAccessToken: '{{ googleAccessToken }}',
+                    googleAccessToken: '{{ googleAccessToken }}', // We use the twig template variable here (from $_SESSION).  If we don't have the token yet, this will be a blank string.
                     googleAccessTokenType: '{{ googleAccessTokenType }}',
                     listener: false,
-                    onAuth: function () {
-                        gapi.client.setToken({access_token: '{{ googleAccessToken }}'});
+                    onAuth: function (googleAccessToken) { // Here we have the actual token, so we don't use the twig template variable.
+                        gapi.client.setToken({access_token: googleAccessToken});
                         gapi.client.load('drive', 'v3', function () {
                             let getViewLink = gapi.client.drive.files.get({
                                 'fields': 'webViewLink',

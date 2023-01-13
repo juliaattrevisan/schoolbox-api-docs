@@ -141,20 +141,14 @@
                     // Store authResult.access_token and authResult.token_type to a PHP session so that repeated use of the
                     // Google picker will not require repeated authorisation.
                     // This happens in the background, so we don't need to do anything in response to ajax success or error.
-                    // If case of error, the user will just have to re-authorise every time they open the Google picker.
+                    // If case of error, the user will just have to re-authorise every time they visit a new page and try to
+                    // use the Google Picker (since the token will not exist in $_SESSION at the server, and so it will not
+                    // have been passed to the client during page generation).
                     $.ajax({
                         data: {accessToken: authResult.access_token, tokenType: authResult.token_type},
                         dataType: 'json',
                         method: 'post',
-                        url: '/googleFile/saveAccessTokenToSession',
-                        success: function () {
-                            if (window.location.href.includes('/googleFile/')) {
-                                // If we are on the 'googleFile' page, we need to refresh the page in order to try again
-                                // to load the document.  We expect the attempt to work the second time, because now the
-                                // user is logged in to Google.
-                                window.location.reload();
-                            }
-                        }
+                        url: '/googleFile/saveAccessTokenToSession'
                     });
                 }
             }
