@@ -138,32 +138,30 @@ class Cursor implements ICursor
      */
     public function retrieveResultCount(): ?int
     {
-        $count        = 0;
-        $countQueries = [];
+        $count = 0;
 
         if ($this->learningMomentsEnabled) {
-            [$evidenceCountQuery, $evidenceCountParams] = $this->getEvidenceQuery([], countOnly: true);
+            [$evidenceCountQuery, $evidenceCountParams] = $this->getEvidenceQueryAndParams(countOnly: true);
             if ($evidenceCountQuery !== null) {
-                $countQueries[] = $this->database->executeQuery($evidenceCountQuery, $evidenceCountParams);
+                $result = $this->database->executeQuery($evidenceCountQuery, $evidenceCountParams);
+                $count += (int)$result->fetchColumn();
             }
         }
 
         if ($this->badgeAwardsEnabled) {
-            [$badgeAwardsCountQuery, $badgeAwardsCountParams] = $this->getBadgeAwardsQuery([], countOnly: true);
+            [$badgeAwardsCountQuery, $badgeAwardsCountParams] = $this->getBadgeAwardsQueryAndParams(countOnly: true);
             if ($badgeAwardsCountQuery !== null) {
-                $countQueries[] = $this->database->executeQuery($badgeAwardsCountQuery, $badgeAwardsCountParams);
+                $result = $this->database->executeQuery($badgeAwardsCountQuery, $badgeAwardsCountParams);
+                $count += (int)$result->fetchColumn();
             }
         }
 
         if ($this->gradesEnabled) {
-            [$dueWorkFeedbackCountQuery, $dueWorkFeedbackCountParams] = $this->getDueWorkFeedbackQuery([], countOnly: true);
+            [$dueWorkFeedbackCountQuery, $dueWorkFeedbackCountParams] = $this->getDueWorkFeedbackQueryAndParams(countOnly: true);
             if ($dueWorkFeedbackCountQuery !== null) {
-                $countQueries[] = $this->database->executeQuery($dueWorkFeedbackCountQuery, $dueWorkFeedbackCountParams);
+                $result = $this->database->executeQuery($dueWorkFeedbackCountQuery, $dueWorkFeedbackCountParams);
+                $count += (int)$result->fetchColumn();
             }
-        }
-
-        foreach ($countQueries as $countQuery) {
-            $count += (int)$countQuery->fetchColumn();
         }
 
         return $count;
@@ -178,23 +176,26 @@ class Cursor implements ICursor
         $params = [];
 
         if ($this->learningMomentsEnabled) {
-            [$evidenceQuery, $params] = $this->getEvidenceQuery($params, countOnly: false);
+            [$evidenceQuery, $evidenceParams] = $this->getEvidenceQueryAndParams(countOnly: false);
             if ($evidenceQuery !== null) {
                 $queriesToBeUnioned[] = $evidenceQuery;
+                $params = array_merge($params, $evidenceParams);
             }
         }
 
         if ($this->badgeAwardsEnabled) {
-            [$badgeAwardsQuery, $params] = $this->getBadgeAwardsQuery($params, countOnly: false);
+            [$badgeAwardsQuery, $badgeAwardsParams] = $this->getBadgeAwardsQueryAndParams(countOnly: false);
             if ($badgeAwardsQuery !== null) {
                 $queriesToBeUnioned[] = $badgeAwardsQuery;
+                $params = array_merge($params, $badgeAwardsParams);
             }
         }
 
         if ($this->gradesEnabled) {
-            [$dueWorkFeedbackQuery, $params] = $this->getDueWorkFeedbackQuery($params, countOnly: false);
+            [$dueWorkFeedbackQuery, $dueWorkFeedbackParams] = $this->getDueWorkFeedbackQueryAndParams(countOnly: false);
             if ($dueWorkFeedbackQuery !== null) {
                 $queriesToBeUnioned[] = $dueWorkFeedbackQuery;
+                $params = array_merge($params, $dueWorkFeedbackParams);
             }
         }
 
@@ -247,12 +248,10 @@ class Cursor implements ICursor
 
     /**
      * Returns query to get evidence.
-     * @param array $params This allows the returned query to be used as part of a larger query.
-     *                      Pass the params already needed in the larger query, or an empty array.
-     * @param bool  $countOnly containing query and associated params (including given params).
-     * @return array
+     * @param bool  $countOnly
+     * @return array containing query and associated params.
      */
-    private function getEvidenceQuery(array $params, bool $countOnly): array
+    private function getEvidenceQueryAndParams(bool $countOnly): array
     {
         $includeEvidence = (
             count($this->filter['feedItemTypes']) === 0 ||
@@ -260,15 +259,17 @@ class Cursor implements ICursor
         );
 
         if (!$includeEvidence) {
-            return [null, $params]; // This indicates that the query should not be run because we know that no results will be returned.
-        }                           // NOTE: $params must be returned unchanged.
+            return [null, []]; // This indicates that the query should not be run because we know that no results will be returned.
+        }
+
+        $query = 'SELECT ';
+        $params = [];
 
         if ($countOnly) {
-            $evidenceQuery = ' SELECT COUNT(*) ';
+            $query .= 'COUNT(*) ';
         } else {
-            $evidenceQuery = (
-                'SELECT
-                 e.id                   AS id,
+            $query .= (
+                'e.id                   AS id,
                  :discriminatorEvidence AS discriminator,
                  e.created_at           AS date '
             );
@@ -282,7 +283,7 @@ class Cursor implements ICursor
             $params['tagEvidence'] = $this->filter['tag'];
         }
 
-        $evidenceQuery .= (
+        $query .= (
             "FROM evidence        AS e
              JOIN evidence_tag    AS et   ON et.evidence_id=e.id
              JOIN lu_evidence_tag AS luet ON luet.id=et.tag_id
@@ -290,34 +291,33 @@ class Cursor implements ICursor
              AND e.deleted_at IS NULL
              AND $sqlWhereCondition"
         );
-
         $params['userIdEvidence'] = $this->viewee->getId();
 
-        return [$evidenceQuery, $params];
+        return [$query, $params];
     }
 
     /**
      * Returns query to get badgeAwards.
-     * @param array $params This allows the returned query to be used as part of a larger query.
-     *                      Pass the params already needed in the larger query, or an empty array.
      * @param bool  $countOnly
-     * @return array containing query and associated params (including given params).
+     * @return array containing query and associated params.
      */
-    private function getBadgeAwardsQuery(array $params, bool $countOnly): array
+    private function getBadgeAwardsQueryAndParams(bool $countOnly): array
     {
         $includeAchievements = in_array('achievements', $this->filter['feedItemTypes'], true); // Achievements are badges with status 'achievement'.
         $includeGoals        = in_array('goals', $this->filter['feedItemTypes'], true); // Goals are badges with status 'goal'.
 
         if (!$includeAchievements && !$includeGoals) {
-            return [null, $params]; // This indicates that the query should not be run because we know that no results will be returned.
-        }                           // NOTE: $params must be returned unchanged.
+            return [null, []]; // This indicates that the query should not be run because we know that no results will be returned.
+        }
+
+        $query = 'SELECT ';
+        $params = [];
 
         if ($countOnly) {
-            $badgeAwardsQuery = ' SELECT COUNT(*) ';
+            $query .= 'COUNT(*) ';
         } else {
-            $badgeAwardsQuery = (
-                'SELECT
-                 id                       AS id,
+            $query .= (
+                'id                       AS id,
                  :discriminatorBadgeAward AS discriminator,
                  awarded_at               AS date '
             );
@@ -332,30 +332,27 @@ class Cursor implements ICursor
             $filterOrClauses[] = "status = 'goal'";
         }
 
-        $badgeAwardsQuery .= (
+        $query .= (
             'FROM badge_user
              WHERE (' . implode(' OR ', $filterOrClauses) . ')
              AND recipient_id = :userIdBadgeAward AND deleted_at IS NULL'
         );
-
         $params['userIdBadgeAward'] = $this->viewee->getId();
 
         if ($this->expiryDate) {
-            $badgeAwardsQuery .= ' AND (expires_at IS NULL OR expires_at >= :expiryBadgeAward)';
+            $query .= ' AND (expires_at IS NULL OR expires_at >= :expiryBadgeAward)';
             $params['expiryBadgeAward'] = $this->expiryDate->getDatabaseDate();
         }
 
-        return [$badgeAwardsQuery, $params];
+        return [$query, $params];
     }
 
     /**
      * Returns query to get due work feedback.
-     * @param array $params This allows the returned query to be used as part of a larger query.
-     *                      Pass the params already needed in the larger query, or an empty array.
      * @param bool  $countOnly
-     * @return array containing query and associated params (including given params).
+     * @return array containing query and associated params.
      */
-    private function getDueWorkFeedbackQuery(array $params, bool $countOnly): array
+    private function getDueWorkFeedbackQueryAndParams(bool $countOnly): array
     {
         $includeDueWorkFeedback = (
             count($this->filter['feedItemTypes']) === 0 ||
@@ -363,8 +360,8 @@ class Cursor implements ICursor
         );
 
         if (!$includeDueWorkFeedback) {
-            return [null, $params]; // This indicates that the query should not be run because we know that no results will be returned.
-        }                           // NOTE: $params must be returned unchanged.
+            return [null, []]; // This indicates that the query should not be run because we know that no results will be returned.
+        }
 
         // Determine work type and mark visibility.
         $filterWorkType = false;
@@ -380,19 +377,21 @@ class Cursor implements ICursor
             throw new UnexpectedValueException('Unexpected User: ' . $this->viewer->getId());
         }
 
+        $query = 'SELECT ';
+        $params = [];
+
         if ($countOnly) {
-            $dueWorkFeedbackQuery = ' SELECT COUNT(*) ';
+            $query .= 'COUNT(*) ';
         } else {
-            $dueWorkFeedbackQuery = (
-            'SELECT
-             submission_return.id           AS id,
-             :discriminatorDueWorkFeedback  AS discriminator,
-             submission_return.published_at AS date '
+            $query .= (
+                'submission_return.id           AS id,
+                 :discriminatorDueWorkFeedback  AS discriminator,
+                 submission_return.published_at AS date '
             );
             $params['discriminatorDueWorkFeedback'] = self::DISCRIMINATOR_DUE_WORK_FEEDBACK;
         }
 
-        $dueWorkFeedbackQuery .= (
+        $query .= (
             'FROM `submission_return`
              JOIN `submission_box` ON `submission_return`.`box_id` = `submission_box`.`id`
              JOIN `assessment` ON `assessment`.`id` = `submission_box`.`assessment_id`
@@ -403,9 +402,12 @@ class Cursor implements ICursor
              AND `submission_return`.`deleted_at` IS NULL
              AND `assessment`.`deleted_at` IS NULL'
         );
+        $params['userIdDueWorkFeedback'] = $this->viewee->getId();
+        $params['markVisibility']        = $visibility;
+        $params['reviewRoute']           = ReturnedWork::REVIEW_ROUTE_INSTRUCTOR;
 
         if ($filterWorkType) {
-            $dueWorkFeedbackQuery .= (
+            $query .= (
                 'AND (
                     assessment.work_type_id IS NULL OR
                     assessment.work_type_id IN (
@@ -417,10 +419,6 @@ class Cursor implements ICursor
             );
         }
 
-        $params['userIdDueWorkFeedback'] = $this->viewee->getId();
-        $params['markVisibility']        = $visibility;
-        $params['reviewRoute']           = ReturnedWork::REVIEW_ROUTE_INSTRUCTOR;
-
-        return [$dueWorkFeedbackQuery, $params];
+        return [$query, $params];
     }
 }
