@@ -210,6 +210,16 @@ class Controller extends Base
             }
         }
 
+        if ($this->isJsonRequest()) {
+            if (!empty($errors)) {
+                $this->response->status->setCode(400);
+            } else {
+                $this->response->status->setCode(200);
+            }
+            $this->response->content->set($this->buildJsonOutput([$errors, $logs]));
+            return;
+        }
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportProfile/log.twig', [
             'allBreadcrumbs' => $this->navigation->buildBreadcrumbs($this->getRouter()),
             'allNavigation' => $this->navigation->buildNavigation($this->getRouter(), 'adminImportProfile')->getAllNodes(),
