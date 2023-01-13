@@ -146,7 +146,15 @@
                         data: {accessToken: authResult.access_token, tokenType: authResult.token_type},
                         dataType: 'json',
                         method: 'post',
-                        url: '/googleFile/saveAccessTokenToSession'
+                        url: '/googleFile/saveAccessTokenToSession',
+                        success: function () {
+                            if (window.location.href.includes('/googleFile/')) {
+                                // If we are on the 'googleFile' page, we need to refresh the page in order to try again
+                                // to load the document.  We expect the attempt to work the second time, because now the
+                                // user is logged in to Google.
+                                window.location.reload();
+                            }
+                        }
                     });
                 }
             }
