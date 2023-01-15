@@ -68,7 +68,7 @@ class OidcAuthenticationRequestFactory
         return (new OidcAuthenticator(
             $this->registrationRepository,
             $this->userAuthenticator,
-            new MessagePayloadBuilder(new PassthroughNonceGenerator((string)$nonce)),
+            new MessagePayloadBuilder(new NoncePassthrough((string)$nonce)),
         ))->authenticate((new ServerRequestFactory())->build($request));
     }
 }

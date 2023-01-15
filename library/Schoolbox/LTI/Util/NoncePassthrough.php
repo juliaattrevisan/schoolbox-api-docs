@@ -15,7 +15,9 @@ use OAT\Library\Lti1p3Core\Security\Nonce\NonceGeneratorInterface;
 use OAT\Library\Lti1p3Core\Security\Nonce\NonceInterface;
 
 /**
- * Nonce "generator" for use within responses to OIDC authentication requests.
+ * Nonce "generator" for use within responses to OIDC authentication requests:
+ * simply passes through the nonce value already provided within the
+ * authentication request.
  *
  * https://www.imsglobal.org/spec/security/v1p0/#step-2-authentication-request
  * states that the nonce value is supposed to be passed from the authentication
@@ -32,12 +34,12 @@ use OAT\Library\Lti1p3Core\Security\Nonce\NonceInterface;
  * Anyway. This just generates a nonce with the value `$nonce`, and an optional
  * TTL value.
  */
-class PassthroughNonceGenerator implements NonceGeneratorInterface
+class NoncePassthrough implements NonceGeneratorInterface
 {
     /**
      * Constructor
      *
-     * @param string $nonce The value to add to the nonce built by `$this->generate`.
+     * @param string $nonce The nonce from the authentication request.
      * @param int    $ttl   The TTL for the nonce: default to the interface's default.
      */
     public function __construct(private string $nonce, private int $ttl = self::TTL)
@@ -45,7 +47,7 @@ class PassthroughNonceGenerator implements NonceGeneratorInterface
     }
 
     /**
-     * Generate the nonce.
+     * Create the nonce object.
      *
      * @param int|null $ttl If provided, use this TTL instead of `$this->ttl`.
      * @return NonceInterface
