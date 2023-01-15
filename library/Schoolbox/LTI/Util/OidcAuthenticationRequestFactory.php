@@ -14,9 +14,6 @@ use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Builder\MessagePayloadBuilder;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
-use OAT\Library\Lti1p3Core\Security\Nonce\Nonce;
-use OAT\Library\Lti1p3Core\Security\Nonce\NonceGeneratorInterface;
-use OAT\Library\Lti1p3Core\Security\Nonce\NonceInterface;
 use OAT\Library\Lti1p3Core\Security\Oidc\OidcAuthenticator;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
 
@@ -58,19 +55,20 @@ class OidcAuthenticationRequestFactory
      */
     public function build(Request $request): LtiMessageInterface
     {
+        // Nonce may be in either $_GET or $_POST
+        if ($request->method->isGet()) {
+            $nonce = $request->query->get('nonce', '');
+        } elseif ($request->method->isPost()) {
+            $nonce = $request->post->get('nonce', '');
+        } else {
+            // No nonce: pass nothing, I guess?
+            $nonce = '';
+        }
+
         return (new OidcAuthenticator(
             $this->registrationRepository,
             $this->userAuthenticator,
-            new MessagePayloadBuilder(new class ($request) implements NonceGeneratorInterface {
-
-                public function __construct(private Request $request) {}
-                public function generate(?int $ttl = null): NonceInterface
-                {
-                    return new Nonce(
-                        $this->request->query->get('nonce'),
-                    );
-                }
-            })
+            new MessagePayloadBuilder(new PassthroughNonceGenerator((string)$nonce)),
         ))->authenticate((new ServerRequestFactory())->build($request));
     }
 }
