@@ -56,19 +56,21 @@ class OidcAuthenticationRequestFactory
     public function build(Request $request): LtiMessageInterface
     {
         // Nonce may be in either $_GET or $_POST
+        // If it's not there: use the default nonce generator, I guess
         if ($request->method->isGet()) {
-            $nonce = $request->query->get('nonce', '');
+            $nonce = $request->query->get('nonce');
         } elseif ($request->method->isPost()) {
-            $nonce = $request->post->get('nonce', '');
+            $nonce = $request->post->get('nonce');
         } else {
-            // No nonce: pass nothing, I guess?
-            $nonce = '';
+            $nonce = null;
         }
 
         return (new OidcAuthenticator(
             $this->registrationRepository,
             $this->userAuthenticator,
-            new MessagePayloadBuilder(new NoncePassthrough((string)$nonce)),
+            new MessagePayloadBuilder(
+                isset($nonce) ? new NoncePassthrough((string)$nonce) : null,
+            ),
         ))->authenticate((new ServerRequestFactory())->build($request));
     }
 }
