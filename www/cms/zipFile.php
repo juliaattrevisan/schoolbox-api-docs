@@ -1,6 +1,10 @@
 <?php
 
 // not in SitePage context?
+
+use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Mapper\Exception as MapperException;
+
 if (!isset($this)) {
     http_response_code(404);
     die('No direct access permitted');
@@ -18,7 +22,8 @@ if (($isSuperuser || $isAllowedTeacher) && is_numeric($this->arg[0])) {
 
     try {
         $folder = $folderMapper->findById($this->arg[0]);
-    } catch (\Exception $e) {
+    } catch (MapperException\Deleted $e) {
+        throw new NotFound;
     }
 
     $this->setVar(array(
