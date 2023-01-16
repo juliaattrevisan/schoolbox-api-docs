@@ -1,12 +1,12 @@
 <script setup lang="ts">
 
-import { ref } from 'vue';
-import type { Ref } from 'vue'
-import PopOut from '../popOut/pop-out.vue';
-import SmallCard from '../card/small-card.vue';
-import PopOutMenuItem from './pop-out-menu-item.vue';
-import PopOutMenuDivider from './pop-out-menu-divider.vue';
-import UserPhoto from '../userPhoto/user-photo.vue';
+import { ref } from "vue";
+import type { Ref } from "vue"
+import PopOut from "../popOut/pop-out.vue";
+import SmallCard from "../card/small-card.vue";
+import PopOutMenuItem from "./pop-out-menu-item.vue";
+import PopOutMenuDivider from "./pop-out-menu-divider.vue";
+import UserPhoto from "../userPhoto/user-photo.vue";
 
 /**
  * TODO
@@ -15,10 +15,11 @@ import UserPhoto from '../userPhoto/user-photo.vue';
  * Handle having new data passed in (one markbook popout, load new data and reuse?)
  */
 
+const isActive = ref(false);
 const isRecentActivityEmpty = ref(false);
 const disableExpansion = ref(true);
 const isExpanded = ref(false);
-const viewAllText = ref('There has been no activity yet, you may create feedback or exclude this student from this activity');
+const viewAllText = ref("There has been no activity yet, you may create feedback or exclude this student from this activity");
 const cards = ref([]);
 
 //  Call this afterwards as it relies on the existence of cards
@@ -27,12 +28,12 @@ const cards = ref([]);
 /**
  * The PopOutMenuItem is expecting a function to be passed to it to
  * be called when clicked on - as we have five menu items that
- * are just links, we can easily generate 'navigate to page'
+ * are just links, we can easily generate "navigate to page"
  * functions for these items by calling getClickFunction.
  *
  * PopOutMenuItems are written this way for reusability - maybe in
  * future we want a PopOutMenuItem that does something other than just
- * redirect a user. We're able to do this now without modifying
+ * redirect a user. We"re able to do this now without modifying
  * the PopOutMenuItem Vue class.
  *
  * @param {string} target  - The URL we want to navigate to.
@@ -48,51 +49,54 @@ function getClickFunction(target:string){
  *  Fetches an array from the routes.dataEndpoint, which should return a
  *  an array of items corresponding to recent activity events. Also has
  *  logic to determine if we have enough activity items to warrant enabling
- *  the 'view more activity' button.
+ *  the "view more activity" button.
  *
  *  TODO - Better handling of error state when fetch fails.
  */
-function fetchRecentActivity() {
-    fetch(routes.dataEndpoint, {
-        headers: {
-            'Accept': 'application/json',
+async function fetchRecentActivity() {
+    try {
+        const response = await fetch(routes.value.dataEndpoint, {
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+            }
+        });
+        const payload = await response.json() as [];
+        if (payload.length === 0){
+            isRecentActivityEmpty.value = true;
         }
-    })
-    .then (response => response.json())
-        .then (payload => {
-            if(payload.length === 0){
-                isRecentActivityEmpty.value = true;
-            }
-            else if (payload.length === 1){
-                disableExpansion.value = true;
-            }
-            else {
-                disableExpansion.value = false;
-            }
-            cards.value = generateCards(payload);
-            setViewAllText();
-        })
-        .catch(e => {});
+        else if (payload.length === 1){
+            disableExpansion.value = true;
+        }
+        else {
+            disableExpansion.value = false;
+        }
+        cards.value = generateCards(payload);
+        setViewAllText();
+        isActive.value = true;
+    } catch (error) {
+        console.warn(error);
+    }
 };
 
 /**
- *  Used to determine the text shown on the 'recent activity' menu
+ *  Used to determine the text shown on the "recent activity" menu
  *  item and provide more context to users. If our button is disabled,
  *  /why/ is it disabled? Helps users answer the question of why
- *  the activity they're expecting to see might not be there.
+ *  the activity they"re expecting to see might not be there.
  */
 function setViewAllText(){
     if (cards.value.length === 0){
-        viewAllText.value = 'There has been no activity yet, you may create feedback or exclude this student from this activity';
+        viewAllText.value = "There has been no activity yet, you may create feedback or exclude this student from this activity";
     }
     else if (cards.value.length === 1){
-        viewAllText.value = 'No additional recent activity';
+        viewAllText.value = "No additional recent activity";
     }
     else if (isExpanded.value){
-        viewAllText.value = 'Hide recent activity';
+        viewAllText.value = "Hide recent activity";
     }
     else {
-        viewAllText.value = 'View more recent activity';
+        viewAllText.value = "View more recent activity";
     }
 }
 
@@ -102,45 +106,46 @@ function toggleExpanded(){
 }
 
 /**
- *  Translate types into more human-readable 'action' format.
+ * Translate types into more human-readable "action" format.
+ *
+ * @param { object } item - the item to check the action on
+ * @returns { string } - the string to return
  */
 function getAction(item){
-    let returnString = '';
-
+    let returnString = "";
     switch(item.type){
-        case 'feedback':
-            returnString = 'provided feedback';
+        case "feedback":
+            returnString = "provided feedback";
             break;
-        case 'response':
+        case "response":
             //  Check if an item was submitted late, adjust text accordingly
-            returnString = `submitted ${item.submittedOnTime ? ' on time' : 'late'}`;
+            returnString = `submitted ${item.submittedOnTime ? " on time" : "late"}`;
             break;
-        case 'view':
-            returnString = 'viewed the feedback'
+        case "view":
+            returnString = "viewed the feedback"
             break;
         default:
             break;
     }
-
     return returnString;
 }
 
 /**
- *  Create our cards. We iterate through the cards we've received,
+ *  Create our cards. We iterate through the cards we"ve received,
  *  reformatting some of the data into the expected format. This
  *  is to handle things like creating an image url and formatting
- *  the 'type' action into something more human-readable, which
- *  isn't provided to us in the raw response blob.
+ *  the "type" action into something more human-readable, which
+ *  isn"t provided to us in the raw response blob.
  *
  *  @param {object} payload - the response from fetchRecentActivity,
  *  aka an array of recent activity events.
  *  @returns {object} - A collection of objects containing recent
  *  activity events for our SmallCard components.
  */
-function generateCards(payload){
-    return payload.map(item => {
+function generateCards(payload: []){
+    return payload.map((item) => {
         return {
-            vueKey: `${item.date.datetime.replaceAll(' ', '_')}_${item.effector.name.replaceAll(' ','').toLowerCase()}`,
+            vueKey: `${item.date.datetime.replaceAll(" ", "_")}_${item.effector.name.replaceAll(" ","").toLowerCase()}`,
             type: item.type,
             name: item.effector.name,
             action: getAction(item),
@@ -156,16 +161,16 @@ function generateCards(payload){
 
 type Routes = {
     dataEndpoint: string;
-    updateRoute: string;
-    reviewRoute: string;
-    publishRoute: string;
-    excludeRoute: string;
-    historyRoute: string;
+    updateRoute: string | undefined;
+    reviewRoute: string | undefined;
+    publishRoute: string | undefined;
+    excludeRoute: string | undefined;
+    historyRoute: string | undefined;
 }
 
 const routes: Ref<Routes | undefined> = ref();
 
-document.addEventListener('pop-out-menu-markbook__selected', (event) => {
+document.addEventListener("pop-out-menu-markbook__selected", (event) => {
     const eventRoutes: Routes = event.detail.routes as Routes;
     routes.value = {
         dataEndpoint: eventRoutes.dataEndpoint,
@@ -182,6 +187,7 @@ document.addEventListener('pop-out-menu-markbook__selected', (event) => {
 
 <template>
     <pop-out
+        v-if="isActive"
         class="c-pop-out-menu"
         :class="{ 'is-expanded': isExpanded }"
     >
