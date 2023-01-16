@@ -13,6 +13,7 @@ use Alaress\Codec\ICodec;
 use Alaress\Codec\Json\Base64;
 use Alaress\Database\Connector\IConnector;
 use Alaress_Date_Format;
+use InvalidArgumentException;
 use Schoolbox\API\Cursor\ICursor;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Collection;
@@ -98,6 +99,8 @@ class Cursor implements ICursor
             ] :
             $this->codec->decode($encodedFilter)
         );
+
+        self::validateFilter($this->filter);
 
         $this->learningMomentsEnabled = $config->get(ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED)
             && $viewee->getLearningMomentsEnabled()
@@ -420,5 +423,32 @@ class Cursor implements ICursor
         }
 
         return [$query, $params];
+    }
+
+    /**
+     * Validate that parameter 'filter' meets the API spec: https://api.schoolbox.com.au/#post-/api/register/-provider-
+     *
+     * @param array $filter
+     * @return void
+     */
+    private static function validateFilter(array $filter): void
+    {
+        if (!array_key_exists('feedItemTypes', $filter) || !is_array($filter['feedItemTypes'])) {
+            throw new InvalidArgumentException("Filter object must contain key 'feedItemTypes'.");
+        }
+
+        foreach ($filter['feedItemTypes'] as $feedItemType) {
+            $expectedFeedItemTypes = ['assessments', 'achievements', 'goals', 'learning-moments'];
+            if (!in_array($feedItemType, $expectedFeedItemTypes, true)) {
+                throw new InvalidArgumentException(
+                    "Filter 'feedItemTypes' array should only contain strings from" .
+                    ' {' . implode(', ', $expectedFeedItemTypes) . '}'
+                );
+            }
+        }
+
+        if (!array_key_exists('tag', $filter) || !is_string($filter['tag'])) {
+            throw new InvalidArgumentException("Filter object must contain 'tag'.");
+        }
     }
 }
