@@ -208,8 +208,8 @@
                     <td
                         class="column-{{ assessment.id }}
                             {% if not participant or participant.isExcluded %} excluded
-                            {% else %} js-menu-clickable
                             {% endif %} student-grade-cell"
+                            {% if participant and not participant.isExcluded %} data-pop-out-menu {% endif %}
                             data-assessment="{{ assessment.id }}"
                             data-endpoint="{{ routeLookupIfAuthorized('learningAssessmentTimeline.getFullTimeline', {assessment: assessment, assessmentId: assessment.id, userId: student.id }) }}"
                             data-update-route="{{ routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"

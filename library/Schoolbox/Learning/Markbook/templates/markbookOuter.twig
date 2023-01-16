@@ -102,12 +102,13 @@
 
         //Locate the report_content container, which we will bind our event listener to.
         const report_content = document.querySelector('#report_content');
+        const popOutMenuSelector = '[data-pop-out-menu]';
         report_content.addEventListener('click', (e) => {
             /* If we haven't clicked on a student grade cell, or we have but we've
             *  clicked on something /within/ the cell (such as an <a>), exit
             */
-            if(!e.target.closest('.js-menu-clickable') || e.target.closest('a')) return;
-            const target = e.target.closest('.js-menu-clickable');
+            if(!e.target.closest(popOutMenuSelector) || e.target.closest('a')) return;
+            const target = e.target.closest(popOutMenuSelector);
             const routes = {
                 dataEndpoint : target.dataset.endpoint,
                 updateRoute : target.dataset.updateRoute,
