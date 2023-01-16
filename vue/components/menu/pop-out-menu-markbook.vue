@@ -1,6 +1,7 @@
 <script setup lang="ts">
 
 import { ref } from 'vue';
+import type { Ref } from 'vue'
 import PopOut from '../popOut/pop-out.vue';
 import SmallCard from '../card/small-card.vue';
 import PopOutMenuItem from './pop-out-menu-item.vue';
@@ -153,16 +154,26 @@ function generateCards(payload){
     });
 }
 
-const routes = ref({});
+type Routes = {
+    dataEndpoint: string;
+    updateRoute: string;
+    reviewRoute: string;
+    publishRoute: string;
+    excludeRoute: string;
+    historyRoute: string;
+}
+
+const routes: Ref<Routes | undefined> = ref();
 
 document.addEventListener('pop-out-menu-markbook__selected', (event) => {
+    const eventRoutes: Routes = event.detail.routes as Routes;
     routes.value = {
-        dataEndpoint: event.detail.routes.dataEndpoint,
-        updateRoute: event.detail.routes.updateRoute,
-        reviewRoute: event.detail.routes.reviewRoute,
-        publishRoute: event.detail.routes.publishRoute,
-        excludeRoute: event.detail.routes.excludeRoute,
-        historyRoute: event.detail.routes.historyRoute,
+        dataEndpoint: eventRoutes.dataEndpoint,
+        updateRoute: eventRoutes.updateRoute,
+        reviewRoute: eventRoutes.reviewRoute,
+        publishRoute: eventRoutes.publishRoute,
+        excludeRoute: eventRoutes.excludeRoute,
+        historyRoute: eventRoutes.historyRoute,
     }
     fetchRecentActivity();
 });
