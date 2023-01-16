@@ -101,65 +101,33 @@
          *  - Make menu vanish when clicked off.
          */
 
-        //Locate the report_content container, which we will bind our event listener to.
+        // Locate the report_content container, which we will bind our event listener to.
         const reportContent = document.getElementById('report_content');
         reportContent.addEventListener('click', (event) => {
 
             const popOutMenuSelector = '[data-pop-out-menu]';
 
-            /* If we haven't clicked on a student grade cell, or we have but we've
-            *  clicked on something /within/ the cell (such as an <a>), exit
-            */
+            /**
+             * If we haven't clicked on a student grade cell, or we have but we've
+             * clicked on something /within/ the cell (such as an <a>), exit
+             */
             if(!event.target.closest(popOutMenuSelector) || event.target.closest('a')) return;
 
-            const target = e.target.closest(popOutMenuSelector);
-
-            const routes = {
-                dataEndpoint : target.dataset.endpoint,
-                updateRoute : target.dataset.updateRoute,
-                reviewRoute : target.dataset.reviewRoute,
-                publishRoute : target.dataset.publishRoute,
-                excludeRoute : target.dataset.excludeRoute,
-                historyRoute : target.dataset.historyRoute
-            };
+            const target = event.target.closest(popOutMenuSelector);
 
             document.dispatchEvent(new CustomEvent('pop-out-menu-markbook__selected', {
                 detail: {
-                    routes: routes,
+                    routes: {
+                        dataEndpoint: target.dataset.endpoint,
+                        updateRoute: target.dataset.updateRoute,
+                        reviewRoute: target.dataset.reviewRoute,
+                        publishRoute: target.dataset.publishRoute,
+                        excludeRoute: target.dataset.excludeRoute,
+                        historyRoute: target.dataset.historyRoute,
+                    },
                 }
             }));
 
-            /*
-            const vueString = `
-                <div data-markbook-pop-out>
-                    <markbook-pop-out
-                        data-endpoint="${routes.dataEndpoint}"
-                        update-route="${routes.updateRoute}"
-                        review-route="${routes.reviewRoute}"
-                        publish-route="${routes.publishRoute}"
-                        exclude-route="${routes.excludeRoute}"
-                        history-route="${routes.historyRoute}"
-                    />
-                </div>
-            `;
-            */
-
-            /* TODO - Remove temporary styling code once positioning handled by external library */
-            /*
-            const menuPopoutContainer = document.querySelector('#pop-out-menu-container');
-            menuPopoutContainer.innerHTML = vueString;
-            menuPopoutContainer.style.position = 'absolute';
-            menuPopoutContainer.style.top = '500px';
-            menuPopoutContainer.style.left = '100px';
-            */
-            /* Is there a more efficient way to do this rather than just slapping
-            Vue scripts into our document? Will need to try and remove this scripts
-            after every click at least. */
-            /*
-            const scriptElement = document.createElement('script');
-            scriptElement.src = '{{ CDN_PREFIX }}/js/bundle/popOutMenuMarkbook.js?v={{ config.site_version }}';
-            document.head.appendChild(scriptElement);
-            */
         });
 
 

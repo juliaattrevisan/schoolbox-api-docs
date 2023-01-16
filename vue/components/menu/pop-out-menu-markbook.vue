@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { reactive } from 'vue';
+import { ref, reactive } from 'vue';
 import PopOut from '../popOut/pop-out.vue';
 import SmallCard from '../card/small-card.vue';
 import MenuItem from './pop-out-menu-item.vue';
@@ -14,43 +14,14 @@ import UserPhoto from '../userPhoto/user-photo.vue';
  * Handle having new data passed in (one markbook popout, load new data and reuse?)
  */
 
-// const props = defineProps({
-// dataEndpoint: {
-//     type: String,
-//     required: true,
-// },
-// updateRoute: {
-//     type: String,
-//     required: true,
-// },
-// reviewRoute: {
-//     type: String,
-//     required: true,
-// },
-// publishRoute: {
-//     type: String,
-//     required: true,
-// },
-// excludeRoute: {
-//     type: String,
-//     required: true,
-// },
-// historyRoute: {
-//     type: String,
-//     required: true,
-// }
-// });
+const isRecentActivityEmpty = ref(false);
+const disableExpansion = ref(true);
+const isExpanded = ref(false);
+const viewAllText = ref('There has been no activity yet, you may create feedback or exclude this student from this activity');
+const cards = ref([]);
 
-const data = reactive({
-    zeroState: false as boolean,
-    disableExpansion: true as boolean,
-    isExpanded: false as boolean,
-    viewAllText: 'There has been no activity yet, you may create feedback or exclude this student from this activity',
-    cards: [],
-});
-
-//  Call this afterwards as it relies on the existence of data.cards
-setViewAllText();
+//  Call this afterwards as it relies on the existence of cards
+// setViewAllText();
 
 /**
  * The MenuItem is expecting a function to be passed to it to
@@ -89,15 +60,15 @@ function fetchRecentActivity() {
     .then (response => response.json())
         .then (payload => {
             if(payload.length === 0){
-                data.zeroState = true;
+                isRecentActivityEmpty.value = true;
             }
             else if (payload.length === 1){
-                data.disableExpansion = true;
+                disableExpansion.value = true;
             }
             else {
-                data.disableExpansion = false;
+                disableExpansion.value = false;
             }
-            data.cards = generateCards(payload);
+            cards.value = generateCards(payload);
             setViewAllText();
         })
         .catch(e => {});
@@ -110,22 +81,22 @@ function fetchRecentActivity() {
  *  the activity they're expecting to see might not be there.
  */
 function setViewAllText(){
-    if (data.cards.length === 0){
-        data.viewAllText = 'There has been no activity yet, you may create feedback or exclude this student from this activity';
+    if (cards.value.length === 0){
+        viewAllText.value = 'There has been no activity yet, you may create feedback or exclude this student from this activity';
     }
-    else if (data.cards.length === 1){
-        data.viewAllText = 'No additional recent activity';
+    else if (cards.value.length === 1){
+        viewAllText.value = 'No additional recent activity';
     }
-    else if (data.isExpanded){
-        data.viewAllText = 'Hide recent activity';
+    else if (isExpanded.value){
+        viewAllText.value = 'Hide recent activity';
     }
     else {
-        data.viewAllText = 'View more recent activity';
+        viewAllText.value = 'View more recent activity';
     }
 }
 
 function toggleExpanded(){
-    data.isExpanded = !data.isExpanded;
+    isExpanded.value = !isExpanded.value;
     setViewAllText();
 }
 
@@ -152,17 +123,6 @@ function getAction(item){
 
     return returnString;
 }
-
-// const routes = {
-//     dataEndpoint: props.dataEndpoint,
-//     updateRoute: props.updateRoute,
-//     reviewRoute: props.reviewRoute,
-//     publishRoute: props.publishRoute,
-//     excludeRoute: props.excludeRoute,
-//     historyRoute: props.historyRoute
-// }
-
-fetchRecentActivity();
 
 /**
  *  Create our cards. We iterate through the cards we've received,
@@ -193,15 +153,29 @@ function generateCards(payload){
     });
 }
 
+const routes = ref({});
+
+document.addEventListener('pop-out-menu-markbook__selected', (event) => {
+    routes.value = {
+        dataEndpoint: event.detail.routes.dataEndpoint,
+        updateRoute: event.detail.routes.updateRoute,
+        reviewRoute: event.detail.routes.reviewRoute,
+        publishRoute: event.detail.routes.publishRoute,
+        excludeRoute: event.detail.routes.excludeRoute,
+        historyRoute: event.detail.routes.historyRoute,
+    }
+    fetchRecentActivity();
+});
+
 </script>
 
 <template>
     <PopOut
         class="c-pop-out-menu"
-        :class="{ 'is-expanded': data.isExpanded }"
+        :class="{ 'is-expanded': isExpanded }"
     >
         <div className="s-collapsible">
-            <SmallCard v-for="item in data.cards">
+            <SmallCard v-for="item in cards">
                 <UserPhoto v-bind="item.img"></UserPhoto>
                 <div className="c-card__details">
                     <div className="c-card__text">{{ item.name }} {{ item.action }}</div>
@@ -212,9 +186,9 @@ function generateCards(payload){
         <div className="c-pop-out-menu__options">
             <MenuItem
                 @click="toggleExpanded();"
-                :class="{ 'is-disabled': data.disableExpansion || data.zeroState }"
+                :class="{ 'is-disabled': disableExpansion || isRecentActivityEmpty }"
             >
-                {{ data.viewAllText }}
+                {{ viewAllText }}
             </MenuItem>
             <MenuDivider />
             <MenuItem
@@ -224,13 +198,13 @@ function generateCards(payload){
                 Update feedback
             </MenuItem>
             <MenuItem
-                :class="{ 'is-disabled': !routes.reviewRoute || data.zeroState }"
+                :class="{ 'is-disabled': !routes.reviewRoute || isRecentActivityEmpty }"
                 :on-click-action="getClickFunction(routes.reviewRoute)"
             >
                 Review submission
             </MenuItem>
             <MenuItem
-                :class="{ 'is-disabled': !routes.publishRoute || data.zeroState }"
+                :class="{ 'is-disabled': !routes.publishRoute || isRecentActivityEmpty }"
                 :on-click-action="getClickFunction(routes.publishRoute)"
             >
                 Publish feedback
@@ -242,7 +216,7 @@ function generateCards(payload){
                 Exclude student
             </MenuItem>
             <MenuItem
-                :class="{ 'is-disabled': !routes.historyRoute || data.zeroState }"
+                :class="{ 'is-disabled': !routes.historyRoute || isRecentActivityEmpty }"
                 :on-click-action="getClickFunction(routes.historyRoute)"
             >
                 Submission history
@@ -253,6 +227,10 @@ function generateCards(payload){
 
 <style lang="scss">
 .c-pop-out-menu{
+    /* TODO - Remove temporary styling code once positioning handled by external library */
+    left: 200px;
+    position: absolute;
+    top: 500px;
     white-space: normal;
     width: 16rem;
 }
