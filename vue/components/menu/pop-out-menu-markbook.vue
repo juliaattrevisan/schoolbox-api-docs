@@ -14,32 +14,32 @@ import UserPhoto from '../userPhoto/user-photo.vue';
  * Handle having new data passed in (one markbook popout, load new data and reuse?)
  */
 
-const props = defineProps({
-dataEndpoint: {
-    type: String,
-    required: true,
-},
-updateRoute: {
-    type: String,
-    required: true,
-},
-reviewRoute: {
-    type: String,
-    required: true,
-},
-publishRoute: {
-    type: String,
-    required: true,
-},
-excludeRoute: {
-    type: String,
-    required: true,
-},
-historyRoute: {
-    type: String,
-    required: true,
-}
-});
+// const props = defineProps({
+// dataEndpoint: {
+//     type: String,
+//     required: true,
+// },
+// updateRoute: {
+//     type: String,
+//     required: true,
+// },
+// reviewRoute: {
+//     type: String,
+//     required: true,
+// },
+// publishRoute: {
+//     type: String,
+//     required: true,
+// },
+// excludeRoute: {
+//     type: String,
+//     required: true,
+// },
+// historyRoute: {
+//     type: String,
+//     required: true,
+// }
+// });
 
 const data = reactive({
     zeroState: false as boolean,
@@ -153,14 +153,14 @@ function getAction(item){
     return returnString;
 }
 
-const routes = {
-    dataEndpoint: props.dataEndpoint,
-    updateRoute: props.updateRoute,
-    reviewRoute: props.reviewRoute,
-    publishRoute: props.publishRoute,
-    excludeRoute: props.excludeRoute,
-    historyRoute: props.historyRoute
-}
+// const routes = {
+//     dataEndpoint: props.dataEndpoint,
+//     updateRoute: props.updateRoute,
+//     reviewRoute: props.reviewRoute,
+//     publishRoute: props.publishRoute,
+//     excludeRoute: props.excludeRoute,
+//     historyRoute: props.historyRoute
+// }
 
 fetchRecentActivity();
 
