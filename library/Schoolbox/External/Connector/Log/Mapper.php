@@ -14,6 +14,7 @@ use Schoolbox\GenericCollection;
 
 /**
  * @method Model createModel($idValue = null)
+ * @method GenericCollection|Model[] findAll($options = [])
  * @method Model findById($identifierValue)
  * @method Model findOneByColumn($columnName, $columnValue, array $options = [])
  */
@@ -68,8 +69,8 @@ class Mapper extends \Schoolbox\Mapper
             FROM {$this->getTable()}
             WHERE run_id = (
                 SELECT run_id
-                FROM {$this->getTable()}                
-                ORDER BY id DESC 
+                FROM {$this->getTable()}
+                ORDER BY id DESC
                 LIMIT 1
             )
             AND {$where}
@@ -108,7 +109,7 @@ class Mapper extends \Schoolbox\Mapper
             $duration = null;
             $durationHms = null;
 
-            if (!$log->getFinishAt()->isNull()) {
+            if ($log->getFinishAt()) {
                 $duration = $log->getFinishAt()->diffInSeconds($log->getStartAt());
                 $durationHms = (new \Alaress\Date\Interval($duration))->hms();
             }
@@ -204,7 +205,7 @@ class Mapper extends \Schoolbox\Mapper
         $threshold = \Alaress_Date_Format::now()->addDays(-1 * self::EXPIRY_THRESHOLD)->getDatabase();
 
         $query = "
-            DELETE FROM {$this->getTable()} 
+            DELETE FROM {$this->getTable()}
             WHERE created_at < :threshold
         ";
 
