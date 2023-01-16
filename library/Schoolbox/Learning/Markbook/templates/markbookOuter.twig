@@ -38,7 +38,7 @@
 
 <div id="{{ reportContentId }}" class="row"></div>
 
-<div id="menu_pop_out">
+<div id="pop-out-menu-container">
 
 </div>
 
@@ -131,8 +131,14 @@
                 </div>
             `;
 
+            document.dispatchEvent(new CustomEvent('pop-out-menu-markbook__selected', {
+                detail: {
+                    routes: routes,
+                }
+            }));
+
             /* TODO - Remove temporary styling code once positioning handled by external library */
-            const menuPopoutContainer = document.querySelector('#menu_pop_out');
+            const menuPopoutContainer = document.querySelector('#pop-out-menu-container');
             menuPopoutContainer.innerHTML = vueString;
             menuPopoutContainer.style.position = 'absolute';
             menuPopoutContainer.style.top = '500px';
