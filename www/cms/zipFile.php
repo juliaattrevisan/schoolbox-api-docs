@@ -23,7 +23,7 @@ if (($isSuperuser || $isAllowedTeacher) && is_numeric($this->arg[0])) {
     try {
         $folder = $folderMapper->findById($this->arg[0]);
     } catch (MapperException\Deleted $e) {
-        throw new NotFound;
+        throw new NotFound();
     }
 
     $this->setVar(array(
