@@ -253,10 +253,12 @@ class Controller extends Base
             foreach ($fieldNames as $fieldName) {
                 // if current field is nullable (defined in getTableData)
                 // and the value passed in is empty string, convert it to null
-                $fieldValues[$fieldName][] =
-                    isset($row[$fieldName]) && ($row[$fieldName] !== '' || !($fields[$fieldName]['nullable'] ?? false))
-                        ? $row[$fieldName]
-                        : null;
+                $nullable   = $fields[$fieldName]['nullable'] ?? false;
+                $fieldValue = $row[$fieldName] ?? null;
+                if ($nullable && $fieldValue === '') {
+                    $fieldValue = null;
+                }
+                $fieldValues[$fieldName][] = $fieldValue;
             }
         }
         return $fieldValues;
