@@ -26,23 +26,12 @@ const cards = ref([]);
 // setViewAllText();
 
 /**
- * The PopOutMenuItem is expecting a function to be passed to it to
- * be called when clicked on - as we have five menu items that
- * are just links, we can easily generate "navigate to page"
- * functions for these items by calling getClickFunction.
- *
- * PopOutMenuItems are written this way for reusability - maybe in
- * future we want a PopOutMenuItem that does something other than just
- * redirect a user. We"re able to do this now without modifying
- * the PopOutMenuItem Vue class.
+ * Navigate to a new page
  *
  * @param {string} target  - The URL we want to navigate to.
- * @returns {Function} - A function redirecting the window to another page.
  */
 function onMenuItemSelected(target:string){
-    return () => {
-        window.location.href = target;
-    };
+    window.location.href = target;
 }
 
 /**
@@ -61,17 +50,17 @@ async function fetchRecentActivity() {
                 "Accept": "application/json",
             }
         });
-        const payload = await response.json() as [];
-        if (payload.length === 0){
+        const activityItems = await response.json() as ActivityItem[];
+        if (activityItems.length === 0){
             isRecentActivityEmpty.value = true;
         }
-        else if (payload.length === 1){
+        else if (activityItems.length === 1){
             disableExpansion.value = true;
         }
         else {
             disableExpansion.value = false;
         }
-        cards.value = generateCards(payload);
+        cards.value = generateCards(activityItems);
         setViewAllText();
         isActive.value = true;
     } catch (error) {
@@ -130,6 +119,23 @@ function getAction(item){
     return returnString;
 }
 
+type ActivityItemDates = {
+    datetime: string;
+    short: string;
+    relative: string;
+}
+
+type ActivityItemEffector = {
+    id: number;
+    name: string;
+}
+
+type ActivityItem = {
+    type: string;
+    date: ActivityItemDates;
+    effector: ActivityItemEffector;
+}
+
 /**
  *  Create our cards. We iterate through the cards we"ve received,
  *  reformatting some of the data into the expected format. This
@@ -137,22 +143,22 @@ function getAction(item){
  *  the "type" action into something more human-readable, which
  *  isn"t provided to us in the raw response blob.
  *
- *  @param {object} payload - the response from fetchRecentActivity,
+ *  @param {object} activityItems - the response from fetchRecentActivity,
  *  aka an array of recent activity events.
  *  @returns {object} - A collection of objects containing recent
  *  activity events for our SmallCard components.
  */
-function generateCards(payload: []){
-    return payload.map((item) => {
+function generateCards(activityItems: ActivityItem[]){
+    return activityItems.map((activityItem: ActivityItem) => {
         return {
-            vueKey: `${item.date.datetime.replaceAll(" ", "_")}_${item.effector.name.replaceAll(" ","").toLowerCase()}`,
-            type: item.type,
-            name: item.effector.name,
-            action: getAction(item),
-            shortTime: item.date.short,
-            relativeTime: item.date.relative,
+            // vueKey: `${activityItem.date.datetime.replaceAll(" ", "_")}_${activityItem.effector.name.replaceAll(" ","").toLowerCase()}`,
+            type: activityItem.type,
+            name: activityItem.effector.name,
+            // action: getAction(item),
+            shortTime: activityItem.date.short,
+            relativeTime: activityItem.date.relative,
             img: {
-                src: `/portrait.php?id=${item.effector.id}&size=square32`,
+                src: `/portrait.php?id=${activityItem.effector.id}&size=square32`,
                 size: 32,
             }
         }

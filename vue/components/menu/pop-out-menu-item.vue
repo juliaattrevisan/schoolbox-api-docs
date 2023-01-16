@@ -24,13 +24,13 @@ const iconClass = props.iconText === 'marker' ? 'c-menu-item__icon--marker' : `i
 const classes = {};
 classes[iconClass] = props.iconText;
 
-const emit = defineEmits(['selected'])
+const emit = defineEmits(["selected"])
 
 /**
  * Dispatch to notify of selection
  */
 function onSelected() {
-    emit('selected');
+    emit("selected");
 }
 
 </script>
