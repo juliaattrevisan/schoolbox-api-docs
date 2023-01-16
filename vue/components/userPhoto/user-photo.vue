@@ -1,24 +1,23 @@
 <script setup lang="ts">
 /**
- *
+ * To display a users profile photo,
+ * we pass through the src as well as a size
  */
-defineProps<{
-    src: {
-        type: String,
-        required: true,
-        default: '',
-    },
-    size: {
-        type: Number,
-        required: false,
-        default: 24
-    },
-}>();
+
+type Props = {
+    src?: string;
+    size?: number;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    src: "",
+    size: 24,
+})
 
 </script>
 
 <template>
-    <div class="user-photo" v-bind:style="{ backgroundImage: `url(${src})`}" ></div>
+    <div class="user-photo" :style="{ backgroundImage: `url(${props.src})`}"></div>
 </template>
 
 <style scoped lang="scss">

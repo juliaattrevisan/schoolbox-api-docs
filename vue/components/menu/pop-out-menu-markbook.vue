@@ -199,7 +199,7 @@ document.addEventListener("pop-out-menu-markbook__selected", (event) => {
     >
         <div className="s-collapsible">
             <small-card v-for="item in cards">
-                <user-photo v-bind="item.img"></user-photo>
+                <user-photo :src="item.img.src" :size="item.img.size"></user-photo>
                 <div className="c-card__details">
                     <div className="c-card__text">{{ item.name }} {{ item.action }}</div>
                     <div className="c-card__subtext">{{ item.shortTime }}</div>
