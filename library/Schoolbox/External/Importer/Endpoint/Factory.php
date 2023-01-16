@@ -166,20 +166,20 @@ class Factory implements IFactory
                     $file,
                     /* Profile pieces
                      */
-                    UserProfile\Mapper::getInstance(),
-                    UserProfile\Student\Mapper::getInstance(),
-                    UserProfile\Parent\Mapper::getInstance(),
-                    UserProfile\Staff\Mapper::getInstance(),
-                    UserProfile\Relationship\Mapper::getInstance(),
-                    StorageMapper::getInstance(),
+                    UserProfile\Mapper::getInstance()->disableCache(),
+                    UserProfile\Student\Mapper::getInstance()->disableCache(),
+                    UserProfile\Parent\Mapper::getInstance()->disableCache(),
+                    UserProfile\Staff\Mapper::getInstance()->disableCache(),
+                    UserProfile\Relationship\Mapper::getInstance()->disableCache(),
+                    StorageMapper::getInstance()->disableCache(),
                     /* Timetable pieces
                      */
-                    \Schoolbox\External\Event\Mapper::getInstance(),
-                    ClassEntryMapper::getInstance(),
-                    ClassInvolvementMapper::getInstance(),
-                    ClassPeriodMapper::getInstance(),
-                    TimetablePeriodMapper::getInstance(),
-                    \Schoolbox\External\Event\Overrides\Mapper::getInstance()
+                    \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
+                    ClassEntryMapper::getInstance()->disableCache(),
+                    ClassInvolvementMapper::getInstance()->disableCache(),
+                    ClassPeriodMapper::getInstance()->disableCache(),
+                    TimetablePeriodMapper::getInstance()->disableCache(),
+                    \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache()
                 ))->produce();
 
             /* We never reach out to kamar so we technically don't need the $file option
@@ -193,18 +193,18 @@ class Factory implements IFactory
                     Loader::getInstance()->get('stream_dir'),
                     /* Profile pieces
                      */
-                    UserProfile\Mapper::getInstance(),
-                    UserProfile\Student\Mapper::getInstance(),
-                    UserProfile\Parent\Mapper::getInstance(),
-                    UserProfile\Staff\Mapper::getInstance(),
-                    UserProfile\Relationship\Mapper::getInstance(),
+                    UserProfile\Mapper::getInstance()->disableCache(),
+                    UserProfile\Student\Mapper::getInstance()->disableCache(),
+                    UserProfile\Parent\Mapper::getInstance()->disableCache(),
+                    UserProfile\Staff\Mapper::getInstance()->disableCache(),
+                    UserProfile\Relationship\Mapper::getInstance()->disableCache(),
                     /* Timetable pieces
                      */
-                    TimetableCycleMapper::getInstance(),
-                    TimetablePeriodMapper::getInstance(),
-                    ClassEntryMapper::getInstance(),
-                    ClassInvolvementMapper::getInstance(),
-                    ClassPeriodMapper::getInstance()
+                    TimetableCycleMapper::getInstance()->disableCache(),
+                    TimetablePeriodMapper::getInstance()->disableCache(),
+                    ClassEntryMapper::getInstance()->disableCache(),
+                    ClassInvolvementMapper::getInstance()->disableCache(),
+                    ClassPeriodMapper::getInstance()->disableCache()
                 ))->produce();
 
             case self::SENTRAL:
@@ -217,19 +217,19 @@ class Factory implements IFactory
                     $this->watchlist,
                     /* Profile pieces
                      */
-                    UserProfile\Mapper::getInstance(),
-                    UserProfile\Student\Mapper::getInstance(),
-                    UserProfile\Parent\Mapper::getInstance(),
-                    UserProfile\Staff\Mapper::getInstance(),
-                    UserProfile\Relationship\Mapper::getInstance(),
+                    UserProfile\Mapper::getInstance()->disableCache(),
+                    UserProfile\Student\Mapper::getInstance()->disableCache(),
+                    UserProfile\Parent\Mapper::getInstance()->disableCache(),
+                    UserProfile\Staff\Mapper::getInstance()->disableCache(),
+                    UserProfile\Relationship\Mapper::getInstance()->disableCache(),
                     /* Timetable pieces
                      */
-                    \Schoolbox\External\Event\Mapper::getInstance(),
-                    ClassEntryMapper::getInstance(),
-                    ClassInvolvementMapper::getInstance(),
-                    ClassPeriodMapper::getInstance(),
-                    TimetablePeriodMapper::getInstance(),
-                    \Schoolbox\External\Event\Overrides\Mapper::getInstance()
+                    \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
+                    ClassEntryMapper::getInstance()->disableCache(),
+                    ClassInvolvementMapper::getInstance()->disableCache(),
+                    ClassPeriodMapper::getInstance()->disableCache(),
+                    TimetablePeriodMapper::getInstance()->disableCache(),
+                    \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache()
                 ))->produce();
 
             case self::TASS_API:
@@ -250,20 +250,20 @@ class Factory implements IFactory
                     trim((string)Loader::getInstance()->get('external_tass_commrules_typecode')),
                     /* Profile pieces
                      */
-                    UserProfile\Mapper::getInstance(),
-                    UserProfile\Student\Mapper::getInstance(),
-                    UserProfile\Parent\Mapper::getInstance(),
-                    UserProfile\Staff\Mapper::getInstance(),
-                    UserProfile\Relationship\Mapper::getInstance(),
-                    StorageMapper::getInstance(),
+                    UserProfile\Mapper::getInstance()->disableCache(),
+                    UserProfile\Student\Mapper::getInstance()->disableCache(),
+                    UserProfile\Parent\Mapper::getInstance()->disableCache(),
+                    UserProfile\Staff\Mapper::getInstance()->disableCache(),
+                    UserProfile\Relationship\Mapper::getInstance()->disableCache(),
+                    StorageMapper::getInstance()->disableCache(),
                     /* Timetable pieces
                      */
-                    \Schoolbox\External\Event\Mapper::getInstance(),
-                    ClassEntryMapper::getInstance(),
-                    ClassInvolvementMapper::getInstance(),
-                    ClassPeriodMapper::getInstance(),
-                    TimetablePeriodMapper::getInstance(),
-                    \Schoolbox\External\Event\Overrides\Mapper::getInstance()
+                    \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
+                    ClassEntryMapper::getInstance()->disableCache(),
+                    ClassInvolvementMapper::getInstance()->disableCache(),
+                    ClassPeriodMapper::getInstance()->disableCache(),
+                    TimetablePeriodMapper::getInstance()->disableCache(),
+                    \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache()
                 ))->produce();
 
             case self::COMPASS:
@@ -276,20 +276,20 @@ class Factory implements IFactory
                     Loader::getInstance()->get('photo_sis_import'),
                     /* Profile pieces
                      */
-                    UserProfile\Mapper::getInstance(),
-                    UserProfile\Student\Mapper::getInstance(),
-                    UserProfile\Parent\Mapper::getInstance(),
-                    UserProfile\Staff\Mapper::getInstance(),
-                    UserProfile\Relationship\Mapper::getInstance(),
-                    StorageMapper::getInstance(),
+                    UserProfile\Mapper::getInstance()->disableCache(),
+                    UserProfile\Student\Mapper::getInstance()->disableCache(),
+                    UserProfile\Parent\Mapper::getInstance()->disableCache(),
+                    UserProfile\Staff\Mapper::getInstance()->disableCache(),
+                    UserProfile\Relationship\Mapper::getInstance()->disableCache(),
+                    StorageMapper::getInstance()->disableCache(),
                     /* Timetable pieces
                      */
-                    \Schoolbox\External\Event\Mapper::getInstance(),
-                    ClassEntryMapper::getInstance(),
-                    ClassInvolvementMapper::getInstance(),
-                    ClassPeriodMapper::getInstance(),
-                    TimetablePeriodMapper::getInstance(),
-                    \Schoolbox\External\Event\Overrides\Mapper::getInstance()
+                    \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
+                    ClassEntryMapper::getInstance()->disableCache(),
+                    ClassInvolvementMapper::getInstance()->disableCache(),
+                    ClassPeriodMapper::getInstance()->disableCache(),
+                    TimetablePeriodMapper::getInstance()->disableCache(),
+                    \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache()
                 ))->produce();
 
             case self::WONDE:
@@ -302,19 +302,19 @@ class Factory implements IFactory
                     Loader::getInstance()->get('date_timezone'),
                     /* Profile pieces
                      */
-                    UserProfile\Mapper::getInstance(),
-                    UserProfile\Student\Mapper::getInstance(),
-                    UserProfile\Parent\Mapper::getInstance(),
-                    UserProfile\Staff\Mapper::getInstance(),
-                    UserProfile\Relationship\Mapper::getInstance(),
+                    UserProfile\Mapper::getInstance()->disableCache(),
+                    UserProfile\Student\Mapper::getInstance()->disableCache(),
+                    UserProfile\Parent\Mapper::getInstance()->disableCache(),
+                    UserProfile\Staff\Mapper::getInstance()->disableCache(),
+                    UserProfile\Relationship\Mapper::getInstance()->disableCache(),
                     /* Timetable pieces
                      */
-                    \Schoolbox\External\Event\Mapper::getInstance(),
-                    ClassEntryMapper::getInstance(),
-                    ClassInvolvementMapper::getInstance(),
-                    ClassPeriodMapper::getInstance(),
-                    TimetablePeriodMapper::getInstance(),
-                    \Schoolbox\External\Event\Overrides\Mapper::getInstance()
+                    \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
+                    ClassEntryMapper::getInstance()->disableCache(),
+                    ClassInvolvementMapper::getInstance()->disableCache(),
+                    ClassPeriodMapper::getInstance()->disableCache(),
+                    TimetablePeriodMapper::getInstance()->disableCache(),
+                    \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache()
                 ))->produce();
 
             default:

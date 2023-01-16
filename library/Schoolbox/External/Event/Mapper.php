@@ -43,8 +43,8 @@ class Mapper extends \Schoolbox\Mapper
     {
         parent::__construct();
 
-        $this->folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
-        $this->folderCodeMapper = \Schoolbox\Resource\Folder\Code\Mapper::getInstance();
+        $this->folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance()->disableCache();
+        $this->folderCodeMapper = \Schoolbox\Resource\Folder\Code\Mapper::getInstance()->disableCache();
     }
 
 

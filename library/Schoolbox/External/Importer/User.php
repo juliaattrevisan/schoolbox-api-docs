@@ -140,31 +140,31 @@ class User extends AbstractImporter
         $this->userMapper         = new UserMapper();
 
         // Role list
-        foreach (RoleMapper::getInstance()->findAll() as $role) {
+        foreach (RoleMapper::getInstance()->disableCache()->findAll() as $role) {
             /** @var RoleModel $role */
             $this->roleList[$role->getName()] = $role;
         }
 
         // Year Level list
-        foreach (YearLevel\Mapper::getInstance()->findAll() as $yearLevel) {
+        foreach (YearLevel\Mapper::getInstance()->disableCache()->findAll() as $yearLevel) {
             /** @var YearLevel\Model $yearLevel */
             $this->yearLevelList[$yearLevel->getName()] = $yearLevel;
         }
 
         // Campus list
-        foreach (CampusMapper::getInstance()->findAll() as $campus) {
+        foreach (CampusMapper::getInstance()->disableCache()->findAll() as $campus) {
             /** @var CampusModel $campus */
             $this->campusList[$campus->getName()] = $campus;
         }
 
         // House list
-        foreach (HouseMapper::getInstance()->findAll() as $house) {
+        foreach (HouseMapper::getInstance()->disableCache()->findAll() as $house) {
             /** @var HouseModel $house */
             $this->houseList[$house->getHouse()] = $house;
         }
 
         // Residential House list
-        foreach (\HouseResidentialMapper::getInstance()->findAll() as $boardingHouse) {
+        foreach (\HouseResidentialMapper::getInstance()->disableCache()->findAll() as $boardingHouse) {
             /** @var HouseResidentialModel $boardingHouse */
             $this->residentialHouseList[$boardingHouse->getHouse()] = $boardingHouse;
         }

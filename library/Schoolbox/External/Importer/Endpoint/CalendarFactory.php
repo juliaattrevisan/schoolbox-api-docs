@@ -100,15 +100,15 @@ class CalendarFactory implements IFactory
                     $this->perform,
                     $this->host,
                     $this->key,
-                    \Schoolbox\External\Profile\Student\Mapper::getInstance(),
-                    \Schoolbox\External\Profile\Staff\Mapper::getInstance(),
-                    \Schoolbox\CampusMapper::getInstance(),
-                    \Schoolbox\Calendar\EventTypeMapper::getInstance(),
-                    \Schoolbox\External\Event\Mapper::getInstance(),
-                    \Schoolbox\External\Event\Roletype\Mapper::getInstance(),
-                    \Schoolbox\External\Event\Campus\Mapper::getInstance(),
-                    \Schoolbox\External\Event\User\Mapper::getInstance(),
-                    RoleMapper::getInstance()
+                    \Schoolbox\External\Profile\Student\Mapper::getInstance()->disableCache(),
+                    \Schoolbox\External\Profile\Staff\Mapper::getInstance()->disableCache(),
+                    \Schoolbox\CampusMapper::getInstance()->disableCache(),
+                    \Schoolbox\Calendar\EventTypeMapper::getInstance()->disableCache(),
+                    \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
+                    \Schoolbox\External\Event\Roletype\Mapper::getInstance()->disableCache(),
+                    \Schoolbox\External\Event\Campus\Mapper::getInstance()->disableCache(),
+                    \Schoolbox\External\Event\User\Mapper::getInstance()->disableCache(),
+                    RoleMapper::getInstance()->disableCache()
                 ))->produce();
 
             case self::COMPASS:
@@ -117,8 +117,8 @@ class CalendarFactory implements IFactory
                     $this->perform,
                     $this->host,
                     $this->key,
-                    \Schoolbox\External\Event\Mapper::getInstance(),
-                    \Schoolbox\External\Event\User\Mapper::getInstance()
+                    \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
+                    \Schoolbox\External\Event\User\Mapper::getInstance()->disableCache()
                 ))->produce();
 
             default:

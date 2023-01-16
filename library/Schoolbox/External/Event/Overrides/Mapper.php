@@ -71,8 +71,8 @@ class Mapper extends \Schoolbox\Mapper
          * Therefore save external_id as a string and manually handcraft User instances
          * on their way out
          */
-        $this->userMapper = \Schoolbox\UserMapper::getInstance();
-        $this->roleMapper = \Schoolbox\RoleMapper::getInstance();
+        $this->userMapper = \Schoolbox\UserMapper::getInstance()->disableCache();
+        $this->roleMapper = \Schoolbox\RoleMapper::getInstance()->disableCache();
     }
 
 
@@ -97,7 +97,7 @@ class Mapper extends \Schoolbox\Mapper
                 {$rColumnString}
             FROM {$this->getTable()}
             LEFT JOIN `user` u ON external_id = u.synergy_id
-            LEFT JOIN `groups` r ON u.group_id = r.id 
+            LEFT JOIN `groups` r ON u.group_id = r.id
                 AND r.group_type IN ('{$staff}', '{$student}')
         ";
     }
