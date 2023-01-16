@@ -1,10 +1,10 @@
 <script setup lang="ts">
 
-import { ref, reactive } from 'vue';
+import { ref } from 'vue';
 import PopOut from '../popOut/pop-out.vue';
 import SmallCard from '../card/small-card.vue';
-import MenuItem from './pop-out-menu-item.vue';
-import MenuDivider from './pop-out-menu-divider.vue';
+import PopOutMenuItem from './pop-out-menu-item.vue';
+import PopOutMenuDivider from './pop-out-menu-divider.vue';
 import UserPhoto from '../userPhoto/user-photo.vue';
 
 /**
@@ -24,15 +24,15 @@ const cards = ref([]);
 // setViewAllText();
 
 /**
- * The MenuItem is expecting a function to be passed to it to
+ * The PopOutMenuItem is expecting a function to be passed to it to
  * be called when clicked on - as we have five menu items that
  * are just links, we can easily generate 'navigate to page'
  * functions for these items by calling getClickFunction.
  *
- * MenuItems are written this way for reusability - maybe in
- * future we want a MenuItem that does something other than just
+ * PopOutMenuItems are written this way for reusability - maybe in
+ * future we want a PopOutMenuItem that does something other than just
  * redirect a user. We're able to do this now without modifying
- * the MenuItem Vue class.
+ * the PopOutMenuItem Vue class.
  *
  * @param {string} target  - The URL we want to navigate to.
  * @returns {Function} - A function redirecting the window to another page.
@@ -170,59 +170,59 @@ document.addEventListener('pop-out-menu-markbook__selected', (event) => {
 </script>
 
 <template>
-    <PopOut
+    <pop-out
         class="c-pop-out-menu"
         :class="{ 'is-expanded': isExpanded }"
     >
         <div className="s-collapsible">
-            <SmallCard v-for="item in cards">
-                <UserPhoto v-bind="item.img"></UserPhoto>
+            <small-card v-for="item in cards">
+                <user-photo v-bind="item.img"></user-photo>
                 <div className="c-card__details">
                     <div className="c-card__text">{{ item.name }} {{ item.action }}</div>
                     <div className="c-card__subtext">{{ item.shortTime }}</div>
                 </div>
-            </SmallCard>
+            </small-card>
         </div>
         <div className="c-pop-out-menu__options">
-            <MenuItem
-                @click="toggleExpanded();"
+            <pop-out-menu-item
                 :class="{ 'is-disabled': disableExpansion || isRecentActivityEmpty }"
+                @click="toggleExpanded();"
             >
                 {{ viewAllText }}
-            </MenuItem>
-            <MenuDivider />
-            <MenuItem
+            </pop-out-menu-item>
+            <pop-out-menu-divider />
+            <pop-out-menu-item
                 :class="{ 'is-disabled': !routes.updateRoute }"
                 :on-click-action="getClickFunction(routes.updateRoute)"
             >
                 Update feedback
-            </MenuItem>
-            <MenuItem
+            </pop-out-menu-item>
+            <pop-out-menu-item
                 :class="{ 'is-disabled': !routes.reviewRoute || isRecentActivityEmpty }"
                 :on-click-action="getClickFunction(routes.reviewRoute)"
             >
                 Review submission
-            </MenuItem>
-            <MenuItem
+            </pop-out-menu-item>
+            <pop-out-menu-item
                 :class="{ 'is-disabled': !routes.publishRoute || isRecentActivityEmpty }"
                 :on-click-action="getClickFunction(routes.publishRoute)"
             >
                 Publish feedback
-            </MenuItem>
-            <MenuItem
+            </pop-out-menu-item>
+            <pop-out-menu-item
                 :class="{ 'is-disabled': !routes.excludeRoute }"
                 :on-click-action="getClickFunction(routes.excludeRoute)"
             >
                 Exclude student
-            </MenuItem>
-            <MenuItem
+            </pop-out-menu-item>
+            <pop-out-menu-item
                 :class="{ 'is-disabled': !routes.historyRoute || isRecentActivityEmpty }"
                 :on-click-action="getClickFunction(routes.historyRoute)"
             >
                 Submission history
-            </MenuItem>
+            </pop-out-menu-item>
         </div>
-    </PopOut>
+    </pop-out>
 </template>
 
 <style lang="scss">
