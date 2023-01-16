@@ -89,7 +89,7 @@
                 </th>
                 {% set weightedMean = markbook.weightedMean %}
                 <th class="{{ weightedMean is null ? 'gradient-off' : urgency.marks(markbook.normalisedMean) }}-bg student-grade-cell">
-                        {{ weightedMean | default('–') }}
+                        {{ weightedMean | default('-') }}
                 </th>
                 {% if rankEnabled %}
                 <th>-</th>
@@ -98,11 +98,11 @@
                     {% set stats = markbook.assessmentStatistics[assessment.id] %}
                     <th data-assessment="{{ assessment.id }}" class="student-grade-cell">
                         <span {% if stats.draftMean is defined and (markbook.hasDraft[assessment.id] is defined) %} data-actual-mark {% endif %}>
-                            {{ stats.mean | default('–') }}
+                            {{ stats.mean | default('-') }}
                         </span>
                         {% if stats.draftMean is defined and (markbook.hasDraft[assessment.id] is defined) %}
                             <span data-draft-mark class="meta" style="display:none;">
-                                {{ stats.draftMean | default('–') }}
+                                {{ stats.draftMean | default('-') }}
                             </span>
                         {% endif %}
                     </th>
@@ -209,14 +209,16 @@
                         class="column-{{ assessment.id }}
                             {% if not participant or participant.isExcluded %} excluded
                             {% endif %} student-grade-cell"
-                            {% if participant and not participant.isExcluded %} data-pop-out-menu {% endif %}
                             data-assessment="{{ assessment.id }}"
-                            data-endpoint="{{ routeLookupIfAuthorized('learningAssessmentTimeline.getFullTimeline', {assessment: assessment, assessmentId: assessment.id, userId: student.id }) }}"
-                            data-update-route="{{ routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
-                            data-review-route="{{ routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
-                            data-publish-route="{{ routeLookupIfAuthorized('learningAssessment.getSummary', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
-                            data-exclude-route="{{ routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessment: assessment, assessmentId:assessment.id }) }}"
-                            data-history-route="{{ routeLookupIfAuthorized('learningAssessment.getSummary', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
+                            {% if assessment.getDefaultTypeName == 'Due Work' and participant and not participant.isExcluded %}
+                                data-pop-out-menu
+                                data-endpoint="{{ routeLookupIfAuthorized('learningAssessmentTimeline.getFullTimeline', {assessment: assessment, assessmentId: assessment.id, userId: student.id }) }}"
+                                data-update-route="{{ routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
+                                data-review-route="{{ routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
+                                data-publish-route="{{ routeLookupIfAuthorized('learningAssessment.getSummary', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
+                                data-exclude-route="{{ routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessment: assessment, assessmentId:assessment.id }) }}"
+                                data-history-route="{{ routeLookupIfAuthorized('learningAssessment.getSummary', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
+                            {% endif %}
                     >
                     <!-- Add data for the popup menu above -->
                         {% if participant and not participant.isExcluded %}
@@ -264,18 +266,6 @@
                                     <span class="individualisation has-tip tip-top" data-tooltip title="{{ participant.plan.name }} ({{ participant.plan.duedate.short }})">i</span>
                                 {% endif %}
                             {% endif %}
-                        {% endif %}
-                        {% if assessment.getDefaultTypeName == 'Due Work' %}
-                            <!-- <div data-markbook-pop-out>
-                                <markbook-pop-out
-                                        data-endpoint="{{ routeLookupIfAuthorized('learningAssessmentTimeline.getFullTimeline', {assessment: assessment, assessmentId: assessment.id, userId: student.id }) }}"
-                                        update-route="{{ routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
-                                        review-route="{{ routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
-                                        publish-route="{{ routeLookupIfAuthorized('learningAssessment.getSummary', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
-                                        exclude-route="{{ routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessment: assessment, assessmentId:assessment.id }) }}"
-                                        history-route="{{ routeLookupIfAuthorized('learningAssessment.getSummary', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
-                                />
-                            </div> -->
                         {% endif %}
                     </td>
                 {% endfor %}

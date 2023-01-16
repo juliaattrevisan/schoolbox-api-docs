@@ -1,10 +1,9 @@
 <script setup lang="ts">
-
 const props = defineProps({
     iconText: {
         type: String,
         required: false,
-        default: '',
+        default: "",
     },
 });
 
@@ -16,15 +15,15 @@ const props = defineProps({
  * generally very lightweight
  */
 
- /* const iconClass = `c-menu-item__icon--${props.iconText}`;
+/* const iconClass = `c-menu-item__icon--${props.iconText}`;
 const classes = {};
 classes[iconClass] = props.iconText; */
 
-const iconClass = props.iconText === 'marker' ? 'c-menu-item__icon--marker' : `icon-${props.iconText}` ;
+const iconClass = props.iconText === "marker" ? "c-menu-item__icon--marker" : `icon-${props.iconText}`;
 const classes = {};
 classes[iconClass] = props.iconText;
 
-const emit = defineEmits(["selected"])
+const emit = defineEmits(["selected"]);
 
 /**
  * Dispatch to notify of selection
@@ -32,17 +31,12 @@ const emit = defineEmits(["selected"])
 function onSelected() {
     emit("selected");
 }
-
 </script>
 
 <template>
     <button class="c-menu-item" @click="onSelected">
         <slot></slot>
-        <div
-            v-if="iconText"
-            class="c-menu-item__icon"
-            :class="classes"
-        />
+        <div v-if="iconText" class="c-menu-item__icon" :class="classes" />
     </button>
 </template>
 
@@ -57,12 +51,13 @@ function onSelected() {
     padding: 0.5rem 2rem;
     -webkit-user-select: none;
     user-select: none;
+    width: 100%;
 
     &.is-disabled {
         cursor: not-allowed;
         pointer-events: none;
         color: #777777;
-        background-color: #F8F8F8;
+        background-color: #f8f8f8;
     }
 
     &:hover:not(.is-disabled) {
@@ -70,19 +65,18 @@ function onSelected() {
         cursor: pointer;
     }
 
-    &__icon{
+    &__icon {
         margin-left: 0.5rem;
 
-        .is-disabled &{
+        .is-disabled & {
             background-color: #777777;
         }
 
-        &--marker{
+        &--marker {
             background-color: var(--content-ui-foreground);
             border-radius: 50%;
-            height: 4px;
-            width: 4px;
-
+            height: 0.25rem;
+            width: 0.25rem;
         }
     }
 }

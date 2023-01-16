@@ -117,6 +117,7 @@
 
             document.dispatchEvent(new CustomEvent('pop-out-menu-markbook__selected', {
                 detail: {
+                    target: target,
                     routes: {
                         dataEndpoint: target.dataset.endpoint,
                         updateRoute: target.dataset.updateRoute,
@@ -161,13 +162,6 @@
 
             // Enable the download report menu
             // $('#report_actions').foundation();     // Seems like something else is handling this now, a listener higher up in the DOM delegating?
-            // spawn the markbook popout menus...
-            /* function loadMarkbookPopoutMenu () {
-                const scriptElement = document.createElement('script');
-                scriptElement.src = '{{ CDN_PREFIX }}/js/bundle/markbookPopOut.js?v={{ config.site_version }}';
-                document.head.appendChild(scriptElement);
-            }
-            loadMarkbookPopoutMenu();*/
         }).progressTickForm({
             // Save form for task completion: apply only to report content,
             // allow content to handle save

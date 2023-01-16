@@ -1,8 +1,8 @@
-import { createApp } from 'vue';
-import PopOutMenuMarkbook from './pop-out-menu-markbook.vue';
+import { createApp } from "vue";
+import PopOutMenuMarkbook from "./pop-out-menu-markbook.vue";
 
 createApp({
     components: {
         PopOutMenuMarkbook
     }
-}).mount('#pop-out-menu-markbook-container');
+}).mount("#pop-out-menu-markbook-container");
