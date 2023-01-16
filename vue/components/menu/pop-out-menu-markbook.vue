@@ -39,7 +39,7 @@ const cards = ref([]);
  * @param {string} target  - The URL we want to navigate to.
  * @returns {Function} - A function redirecting the window to another page.
  */
-function getClickFunction(target:string){
+function onMenuItemSelected(target:string){
     return () => {
         window.location.href = target;
     };
@@ -210,31 +210,31 @@ document.addEventListener("pop-out-menu-markbook__selected", (event) => {
             <pop-out-menu-divider />
             <pop-out-menu-item
                 :class="{ 'is-disabled': !routes.updateRoute }"
-                :on-click-action="getClickFunction(routes.updateRoute)"
+                @selected="onMenuItemSelected(routes.updateRoute)"
             >
                 Update feedback
             </pop-out-menu-item>
             <pop-out-menu-item
                 :class="{ 'is-disabled': !routes.reviewRoute || isRecentActivityEmpty }"
-                :on-click-action="getClickFunction(routes.reviewRoute)"
+                @selected="onMenuItemSelected(routes.reviewRoute)"
             >
                 Review submission
             </pop-out-menu-item>
             <pop-out-menu-item
                 :class="{ 'is-disabled': !routes.publishRoute || isRecentActivityEmpty }"
-                :on-click-action="getClickFunction(routes.publishRoute)"
+                @selected="onMenuItemSelected(routes.publishRoute)"
             >
                 Publish feedback
             </pop-out-menu-item>
             <pop-out-menu-item
                 :class="{ 'is-disabled': !routes.excludeRoute }"
-                :on-click-action="getClickFunction(routes.excludeRoute)"
+                @selected="onMenuItemSelected(routes.excludeRoute)"
             >
                 Exclude student
             </pop-out-menu-item>
             <pop-out-menu-item
                 :class="{ 'is-disabled': !routes.historyRoute || isRecentActivityEmpty }"
-                :on-click-action="getClickFunction(routes.historyRoute)"
+                @selected="onMenuItemSelected(routes.historyRoute)"
             >
                 Submission history
             </pop-out-menu-item>

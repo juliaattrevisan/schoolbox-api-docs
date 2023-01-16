@@ -6,11 +6,6 @@ const props = defineProps({
         required: false,
         default: '',
     },
-    onClickAction: {
-        type: Function,
-        required: false,
-        default: () => {}
-    }
 });
 
 /**
@@ -29,17 +24,26 @@ const iconClass = props.iconText === 'marker' ? 'c-menu-item__icon--marker' : `i
 const classes = {};
 classes[iconClass] = props.iconText;
 
+const emit = defineEmits(['selected'])
+
+/**
+ * Dispatch to notify of selection
+ */
+function onSelected() {
+    emit('selected');
+}
+
 </script>
 
 <template>
-    <div class="c-menu-item" @click="props.onClickAction">
+    <button class="c-menu-item" @click="onSelected">
         <slot></slot>
         <div
+            v-if="iconText"
             class="c-menu-item__icon"
             :class="classes"
-            v-if="iconText"
         />
-    </div>
+    </button>
 </template>
 
 <style lang="scss">
