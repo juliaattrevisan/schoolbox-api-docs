@@ -109,8 +109,9 @@ foreach ($_POST['attemptIds'] as $attemptId) {
 foreach ($attemptsToDelete as $currentAttempt) {
     $deleteAttempt($currentAttempt);
 
-    $projectResultCache = new \Schoolbox\Learning\Assessment\Project\ResultCache\ResultCache(\Schoolbox\Learning\Assessment\Project\ResultCache\Mapper::getInstance());
-    $projectResultCache->refresh($assessmentDataSource, $currentAttempt['quiz'], $currentAttempt['user']);
+    /* Update project result cache
+     */
+    (new \Schoolbox\Learning\Assessment\Project\ResultCache\ResultCache(\Schoolbox\Learning\Assessment\Project\ResultCache\Mapper::getInstance()))->refresh($assessmentDataSource, $currentAttempt['quiz'], $currentAttempt['user']);
 }
 
 SitePage::backToTheFuture(1);

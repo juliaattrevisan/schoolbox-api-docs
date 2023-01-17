@@ -17,8 +17,6 @@ $attemptHandler  = new Assess_Attempt();
 $responseHandler = new Assess_Response();
 $groupHandler    = new Group();
 
-$user_id = $this->arg[1];
-
 $allAttempts = [];
 
 /** @var MapperProxy $assessmentDataSource */
@@ -52,6 +50,12 @@ foreach ($_POST['selectedIds'] as $currentAttempt) {
 
         $attempt['assess'] = $assessHandler->getByID($attempt['assess_id']);
 
+        /* Arbitrarily hijack this array a little bit so we know the context of this attempt's quiz.
+         * If the context is a project, we need to invalidate its result cache
+         */
+        $attempt['quiz'] = $quizzes[$attempt['assess_id']];
+        $attempt['user'] = $user;
+
         $allAttempts[] = $attempt;
 
         if (!$assessHandler->isOwner($attempt['assess_id']) && ($groupHandler->getPermission($attempt['assess']['category_id']) < UserAccess::ACCESS_WRITE)) {
@@ -72,6 +76,10 @@ foreach ($allAttempts as $currentAttempt) {
         $attempt                                        = $attemptMapper->findById($currentAttempt['attempt_id']);
         $result                                         = $attemptMapper->finalizeReview($attempt, $_SESSION['user']);
         $data['updated'][$currentAttempt['attempt_id']] = ($result !== false);
+
+        /* Update project result cache
+         */
+        (new \Schoolbox\Learning\Assessment\Project\ResultCache\ResultCache(\Schoolbox\Learning\Assessment\Project\ResultCache\Mapper::getInstance()))->refresh($assessmentDataSource, $currentAttempt['quiz'], $currentAttempt['user']);
     } catch (Exception $e) {
         // noop;
     }
