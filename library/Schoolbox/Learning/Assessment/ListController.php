@@ -311,6 +311,12 @@ class ListController extends Web\Controller\Base
 
             $explicitReturnUrl = $this->getRequest()->post->get(Redirect::RETURN_URL);
 
+            /* Update project result cache when an activity is spawned in that project
+             */
+            if ($context instanceof Project) {
+                (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))->refresh($this->getAssessmentMapper(), $assessmentInfo['assessment']);
+            }
+
             $this->redirect($controller->determineRedirect(
                 $assessmentInfo['assessment'],
                 $explicitReturnUrl,
@@ -364,6 +370,7 @@ class ListController extends Web\Controller\Base
         }
 
         // Save ordering
+        $this->getAssessmentMapper()->sequenceAssessments($sortedAssessments);
         $this->getAssessmentMapper()->sequenceAssessments($sortedAssessments);
 
         // Redirect to a return URL or something
@@ -496,7 +503,7 @@ class ListController extends Web\Controller\Base
      * @throws RouteNotFound
      */
     public function getCreateAssessmentForm(AssessmentContext $context)
-    {
+    {;
         // check for a valid type declaration
         if ($type = $this->getRequest()->query->get('type')) {
             try {
