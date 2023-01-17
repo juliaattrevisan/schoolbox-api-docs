@@ -10,7 +10,7 @@
 
 import { ref, computed, nextTick, onMounted, onUnmounted } from "vue";
 import type { Ref } from "vue";
-import { createPopper } from "@popperjs/core";
+import { useFloating, autoUpdate, flip, shift, offset} from '@floating-ui/vue';
 import PopOut from "../popOut/pop-out.vue";
 import SmallCard from "../card/small-card.vue";
 import PopOutMenuItem from "./pop-out-menu-item.vue";
@@ -47,10 +47,14 @@ type Routes = {
     historyRoute: string;
 };
 
+// FloatingUI specific, declared here as showPopOut relies on one of these values existing.
+const popOutElement = ref<HTMLDivElement | null>(null);
+const referenceElement = ref(null);
+
 const isLoading = ref(false);
 const isSelected = ref(false);
 const hasLoadError = ref(false);
-const showPopOut = computed(() => !isLoading.value && isSelected.value && !hasLoadError.value);
+const showPopOut = computed(() => isSelected.value && !hasLoadError.value);
 const isExpanded = ref(false); // is recent activity expanded
 const activityItems: Ref<ActivityItem[]> = ref([]); // list of recent activity items to display
 const isActivityEmpty = computed(() => activityItems.value.length === 0);
@@ -64,6 +68,26 @@ const routes: Ref<Routes> = ref({
     historyRoute: "",
 });
 const markbookElement = ref<HTMLDivElement | null>(null);
+
+/**
+ * Middleware are optional modifiers you can provide to floating-ui. Things that determine how
+ * a floating item should flip, shift itself or rotate to prevent overflowing a parent container.
+ */
+const { x, y, strategy } = useFloating(referenceElement, popOutElement, {
+    placement: 'right-start',
+    middleware: [
+        offset({
+            mainAxis: 4
+        }),
+        flip({
+            crossAxis: false
+        }),
+        shift({
+            padding: 16
+        }),
+    ],
+    whileElementsMounted: autoUpdate,
+});
 
 /**
  *  Used to determine the text shown on the "recent activity" menu
@@ -128,43 +152,22 @@ async function getActivity() {
     }
 }
 
-let popper;
-
-/**
- * Destory the popper instance, either when a new pop out has been selected
- * or user clicks somewhere else on the page
- */
-function destoryPopper() {
-    if (popper) {
-        popper.destroy();
-    }
-}
-
-/**
- * To position the pop out we use popper.js
- * https://popper.js.org/docs/v2/
- *
- * @param { CustomEvent } event - the event fired from the mark book
- */
-function updatePopper(event: CustomEvent) {
-    destoryPopper();
-    popper = createPopper(event.detail.target, markbookElement.value, {
-        placement: "top-end",
-    });
-}
-
 /**
  * A linked button has been selected so populate the pop out
  *
  * @param { CustomEvent } event - the event fired from the mark book
  */
 async function onPopOutSelected(event: CustomEvent) {
-    routes.value = updateRoutes(event.detail.routes as Routes);
-    await getActivity();
-    if (!hasLoadError.value) {
+    // Make sure we're not reloading a menu we already have open.
+    if(referenceElement.value !== event.detail.target){
+        routes.value = updateRoutes(event.detail.routes as Routes);
         isSelected.value = true;
-        await nextTick();
-        updatePopper(event);
+        isExpanded.value = false;
+        referenceElement.value = event.detail.target;
+        await getActivity();
+        if (!hasLoadError.value) {
+            await nextTick();
+        }
     }
 }
 
@@ -175,9 +178,13 @@ async function onPopOutSelected(event: CustomEvent) {
  * @param { event } event - the mouse event
  */
 function onMouseClick(event: Event) {
-    if (showPopOut.value && !markbookElement.value.contains(event.target)) {
+    if (showPopOut.value
+        && markbookElement.value !== null
+        && !markbookElement.value.contains(event.target)
+        && referenceElement.value !== event.target
+    ){
         isSelected.value = false;
-        destoryPopper();
+        referenceElement.value = null;
     }
 }
 
@@ -235,8 +242,19 @@ function onMenuItemSelected(target: string) {
 </script>
 
 <template>
-    <div v-if="showPopOut" ref="markbookElement">
-        <pop-out class="c-pop-out-menu" :class="{ 'is-expanded': isExpanded }">
+    <pop-out
+        v-if="showPopOut"
+        ref="popOutElement"
+        :style="{
+            position: strategy,
+            top: `${ y ?? 0 }px`,
+            left: `${ x ?? 0 }px`,
+        }"
+    >
+        <div v-if="isLoading" class="c-pop-out-menu__loader">
+            <div class="loader"></div>
+        </div>
+        <div v-if="!isLoading" class="c-pop-out-menu" ref="markbookElement" :class="{ 'is-expanded': isExpanded }">
             <div className="s-collapsible">
                 <small-card v-for="(activityItem, index) in activityItems" :key="index">
                     <user-photo
@@ -290,14 +308,18 @@ function onMenuItemSelected(target: string) {
                     Submission history
                 </pop-out-menu-item>
             </div>
-        </pop-out>
-    </div>
+        </div>
+    </pop-out>
 </template>
 
 <style lang="scss">
 .c-pop-out-menu {
     white-space: normal;
     width: 16rem;
+
+    &__loader{
+        width: 12rem;
+    }
 }
 
 .is-expanded {
