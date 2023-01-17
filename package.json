@@ -109,7 +109,6 @@
         "raw-loader": "^4.0.2",
         "sass": "~1.52.2",
         "sass-loader": "~13.0.0",
-        "source-map-loader": "~0.2.4",
         "style-loader": "~2.0.0",
         "ts-jest": "^29.0.3",
         "ts-loader": "~8.4.0",
