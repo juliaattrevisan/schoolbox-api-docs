@@ -180,6 +180,9 @@ class Controller extends Base
                         $value[$currentIndex] = trim($value[$currentIndex]);
                     }
 
+                    $property = new ReflectionProperty($model, $field);
+                    $test = $property->getType();
+
                     $model->$setter($value[$currentIndex]);
                 }
             }
@@ -255,6 +258,7 @@ class Controller extends Base
                 // and the value passed in is empty string, convert it to null
                 $nullable   = $fields[$fieldName]['nullable'] ?? false;
                 $fieldValue = $row[$fieldName] ?? null;
+                $fieldValue = is_string($fieldValue) ? trim($fieldValue) : $fieldValue;
                 if ($nullable && $fieldValue === '') {
                     $fieldValue = null;
                 }
