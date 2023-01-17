@@ -61,8 +61,8 @@
                 "vuejs-paginate-next": "~1.0.2"
             },
             "devDependencies": {
-                "@babel/core": "^7.20.12",
-                "@babel/plugin-proposal-optional-chaining": "~7.17.12",
+                "@babel/core": "~7.20.12",
+                "@babel/plugin-proposal-optional-chaining": "^7.20.7",
                 "@babel/preset-env": "~7.18.2",
                 "@babel/preset-typescript": "^7.18.6",
                 "@ckeditor/ckeditor5-dev-utils": "^31.1.13",
@@ -501,12 +501,12 @@
             }
         },
         "node_modules/@babel/helper-skip-transparent-expression-wrappers": {
-            "version": "7.18.9",
-            "resolved": "https://registry.npmjs.org/@babel/helper-skip-transparent-expression-wrappers/-/helper-skip-transparent-expression-wrappers-7.18.9.tgz",
-            "integrity": "sha512-imytd2gHi3cJPsybLRbmFrF7u5BIEuI2cNheyKi3/iOBC63kNn3q8Crn2xVuESli0aM4KYsyEqKyS7lFL8YVtw==",
+            "version": "7.20.0",
+            "resolved": "https://registry.npmjs.org/@babel/helper-skip-transparent-expression-wrappers/-/helper-skip-transparent-expression-wrappers-7.20.0.tgz",
+            "integrity": "sha512-5y1JYeNKfvnT8sZcK9DVRtpTbGiomYIHviSP3OQWmDPU3DeH4a1ZlT/N2lyQ5P8egjcRaT/Y9aNqUxK0WsnIIg==",
             "dev": true,
             "dependencies": {
-                "@babel/types": "^7.18.9"
+                "@babel/types": "^7.20.0"
             },
             "engines": {
                 "node": ">=6.9.0"
@@ -633,23 +633,6 @@
             },
             "peerDependencies": {
                 "@babel/core": "^7.13.0"
-            }
-        },
-        "node_modules/@babel/plugin-bugfix-v8-spread-parameters-in-optional-chaining/node_modules/@babel/plugin-proposal-optional-chaining": {
-            "version": "7.18.9",
-            "resolved": "https://registry.npmjs.org/@babel/plugin-proposal-optional-chaining/-/plugin-proposal-optional-chaining-7.18.9.tgz",
-            "integrity": "sha512-v5nwt4IqBXihxGsW2QmCWMDS3B3bzGIk/EQVZz2ei7f3NJl8NzAJVvUmpDW5q1CRNY+Beb/k58UAH1Km1N411w==",
-            "dev": true,
-            "dependencies": {
-                "@babel/helper-plugin-utils": "^7.18.9",
-                "@babel/helper-skip-transparent-expression-wrappers": "^7.18.9",
-                "@babel/plugin-syntax-optional-chaining": "^7.8.3"
-            },
-            "engines": {
-                "node": ">=6.9.0"
-            },
-            "peerDependencies": {
-                "@babel/core": "^7.0.0-0"
             }
         },
         "node_modules/@babel/plugin-proposal-async-generator-functions": {
@@ -871,13 +854,13 @@
             }
         },
         "node_modules/@babel/plugin-proposal-optional-chaining": {
-            "version": "7.17.12",
-            "resolved": "https://registry.npmjs.org/@babel/plugin-proposal-optional-chaining/-/plugin-proposal-optional-chaining-7.17.12.tgz",
-            "integrity": "sha512-7wigcOs/Z4YWlK7xxjkvaIw84vGhDv/P1dFGQap0nHkc8gFKY/r+hXc8Qzf5k1gY7CvGIcHqAnOagVKJJ1wVOQ==",
+            "version": "7.20.7",
+            "resolved": "https://registry.npmjs.org/@babel/plugin-proposal-optional-chaining/-/plugin-proposal-optional-chaining-7.20.7.tgz",
+            "integrity": "sha512-T+A7b1kfjtRM51ssoOfS1+wbyCVqorfyZhT99TvxxLMirPShD8CzKMRepMlCBGM5RpHMbn8s+5MMHnPstJH6mQ==",
             "dev": true,
             "dependencies": {
-                "@babel/helper-plugin-utils": "^7.17.12",
-                "@babel/helper-skip-transparent-expression-wrappers": "^7.16.0",
+                "@babel/helper-plugin-utils": "^7.20.2",
+                "@babel/helper-skip-transparent-expression-wrappers": "^7.20.0",
                 "@babel/plugin-syntax-optional-chaining": "^7.8.3"
             },
             "engines": {
@@ -1938,23 +1921,6 @@
             },
             "peerDependencies": {
                 "@babel/core": "^7.4.0-0"
-            }
-        },
-        "node_modules/@babel/preset-env/node_modules/@babel/plugin-proposal-optional-chaining": {
-            "version": "7.18.9",
-            "resolved": "https://registry.npmjs.org/@babel/plugin-proposal-optional-chaining/-/plugin-proposal-optional-chaining-7.18.9.tgz",
-            "integrity": "sha512-v5nwt4IqBXihxGsW2QmCWMDS3B3bzGIk/EQVZz2ei7f3NJl8NzAJVvUmpDW5q1CRNY+Beb/k58UAH1Km1N411w==",
-            "dev": true,
-            "dependencies": {
-                "@babel/helper-plugin-utils": "^7.18.9",
-                "@babel/helper-skip-transparent-expression-wrappers": "^7.18.9",
-                "@babel/plugin-syntax-optional-chaining": "^7.8.3"
-            },
-            "engines": {
-                "node": ">=6.9.0"
-            },
-            "peerDependencies": {
-                "@babel/core": "^7.0.0-0"
             }
         },
         "node_modules/@babel/preset-env/node_modules/babel-plugin-polyfill-corejs3": {
@@ -42908,12 +42874,12 @@
             }
         },
         "@babel/helper-skip-transparent-expression-wrappers": {
-            "version": "7.18.9",
-            "resolved": "https://registry.npmjs.org/@babel/helper-skip-transparent-expression-wrappers/-/helper-skip-transparent-expression-wrappers-7.18.9.tgz",
-            "integrity": "sha512-imytd2gHi3cJPsybLRbmFrF7u5BIEuI2cNheyKi3/iOBC63kNn3q8Crn2xVuESli0aM4KYsyEqKyS7lFL8YVtw==",
+            "version": "7.20.0",
+            "resolved": "https://registry.npmjs.org/@babel/helper-skip-transparent-expression-wrappers/-/helper-skip-transparent-expression-wrappers-7.20.0.tgz",
+            "integrity": "sha512-5y1JYeNKfvnT8sZcK9DVRtpTbGiomYIHviSP3OQWmDPU3DeH4a1ZlT/N2lyQ5P8egjcRaT/Y9aNqUxK0WsnIIg==",
             "dev": true,
             "requires": {
-                "@babel/types": "^7.18.9"
+                "@babel/types": "^7.20.0"
             }
         },
         "@babel/helper-split-export-declaration": {
@@ -42998,19 +42964,6 @@
                 "@babel/helper-plugin-utils": "^7.18.9",
                 "@babel/helper-skip-transparent-expression-wrappers": "^7.18.9",
                 "@babel/plugin-proposal-optional-chaining": "^7.18.9"
-            },
-            "dependencies": {
-                "@babel/plugin-proposal-optional-chaining": {
-                    "version": "7.18.9",
-                    "resolved": "https://registry.npmjs.org/@babel/plugin-proposal-optional-chaining/-/plugin-proposal-optional-chaining-7.18.9.tgz",
-                    "integrity": "sha512-v5nwt4IqBXihxGsW2QmCWMDS3B3bzGIk/EQVZz2ei7f3NJl8NzAJVvUmpDW5q1CRNY+Beb/k58UAH1Km1N411w==",
-                    "dev": true,
-                    "requires": {
-                        "@babel/helper-plugin-utils": "^7.18.9",
-                        "@babel/helper-skip-transparent-expression-wrappers": "^7.18.9",
-                        "@babel/plugin-syntax-optional-chaining": "^7.8.3"
-                    }
-                }
             }
         },
         "@babel/plugin-proposal-async-generator-functions": {
@@ -43154,13 +43107,13 @@
             }
         },
         "@babel/plugin-proposal-optional-chaining": {
-            "version": "7.17.12",
-            "resolved": "https://registry.npmjs.org/@babel/plugin-proposal-optional-chaining/-/plugin-proposal-optional-chaining-7.17.12.tgz",
-            "integrity": "sha512-7wigcOs/Z4YWlK7xxjkvaIw84vGhDv/P1dFGQap0nHkc8gFKY/r+hXc8Qzf5k1gY7CvGIcHqAnOagVKJJ1wVOQ==",
+            "version": "7.20.7",
+            "resolved": "https://registry.npmjs.org/@babel/plugin-proposal-optional-chaining/-/plugin-proposal-optional-chaining-7.20.7.tgz",
+            "integrity": "sha512-T+A7b1kfjtRM51ssoOfS1+wbyCVqorfyZhT99TvxxLMirPShD8CzKMRepMlCBGM5RpHMbn8s+5MMHnPstJH6mQ==",
             "dev": true,
             "requires": {
-                "@babel/helper-plugin-utils": "^7.17.12",
-                "@babel/helper-skip-transparent-expression-wrappers": "^7.16.0",
+                "@babel/helper-plugin-utils": "^7.20.2",
+                "@babel/helper-skip-transparent-expression-wrappers": "^7.20.0",
                 "@babel/plugin-syntax-optional-chaining": "^7.8.3"
             }
         },
@@ -43867,17 +43820,6 @@
                         "lodash.debounce": "^4.0.8",
                         "resolve": "^1.14.2",
                         "semver": "^6.1.2"
-                    }
-                },
-                "@babel/plugin-proposal-optional-chaining": {
-                    "version": "7.18.9",
-                    "resolved": "https://registry.npmjs.org/@babel/plugin-proposal-optional-chaining/-/plugin-proposal-optional-chaining-7.18.9.tgz",
-                    "integrity": "sha512-v5nwt4IqBXihxGsW2QmCWMDS3B3bzGIk/EQVZz2ei7f3NJl8NzAJVvUmpDW5q1CRNY+Beb/k58UAH1Km1N411w==",
-                    "dev": true,
-                    "requires": {
-                        "@babel/helper-plugin-utils": "^7.18.9",
-                        "@babel/helper-skip-transparent-expression-wrappers": "^7.18.9",
-                        "@babel/plugin-syntax-optional-chaining": "^7.8.3"
                     }
                 },
                 "babel-plugin-polyfill-corejs3": {
