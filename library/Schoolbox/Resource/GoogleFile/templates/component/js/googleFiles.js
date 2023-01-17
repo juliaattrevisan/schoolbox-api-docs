@@ -36,6 +36,18 @@ if (googleFiles !== null) { // If we do not make this check, a console error wil
                 $gModal.css( { overflowX: 'visible' } );
             }
         } );
+
+        // Auto-select the top-most enabled radio button.
+        let $radioButtons = $('input[id^=gfile-comment]');
+        for (let i = 0; i < $radioButtons.length; ++i) {
+            let $radioButton = $($radioButtons[i]);
+            if ($radioButton.prop('disabled')) {
+                $radioButton.prop('checked', false);
+                continue;
+            }
+            $radioButton.prop('checked', true);
+            break;
+        }
     }
 
     $('#find-files').on('click', function () {
