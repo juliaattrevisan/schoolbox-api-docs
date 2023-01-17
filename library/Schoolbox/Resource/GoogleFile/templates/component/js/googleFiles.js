@@ -37,16 +37,15 @@ if (googleFiles !== null) { // If we do not make this check, a console error wil
             }
         } );
 
+        // If the currently selected radio button is disabled:
         // Auto-select the top-most enabled radio button.
-        let $radioButtons = $('[data-gfile-comment]');
-        for (let i = 0; i < $radioButtons.length; ++i) {
-            let $radioButton = $($radioButtons[i]);
-            if ($radioButton.prop('disabled')) {
-                $radioButton.prop('checked', false);
-                continue;
+        let $radioButtons               = $('[data-gfile-comment]'),
+            $disabledCheckedRadioButton = $radioButtons.filter('[disabled][checked]');
+        if ($disabledCheckedRadioButton.length) {
+            let $enabledRadioButtons = $radioButtons.filter(':not[disabled]');
+            if ($enabledRadioButtons.length) {
+                $enabledRadioButtons[0].checked = true;
             }
-            $radioButton.prop('checked', true);
-            break;
         }
     }
 
