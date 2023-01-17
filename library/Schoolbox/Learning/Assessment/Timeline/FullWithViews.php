@@ -61,17 +61,26 @@ class FullWithViews
 
         foreach ($timeline as $interaction) {
             if ($interaction instanceof AbstractFeedback) {
+                $date = [
+                    'datetime' => $interaction->getUpdatedAt()->getDatabase(),
+                    'short' => $interaction->getUpdatedAt()->getShort(),
+                    'relative' => $interaction->getUpdatedAt()->getRelativeTime(),
+                ];
+                if ($interaction->isPublished()) {
+                    $date = [
+                        'datetime' => $interaction->getPublishedAt()->getDatabase(),
+                        'short' => $interaction->getPublishedAt()->getShort(),
+                        'relative' => $interaction->getPublishedAt()->getRelativeTime(),
+                    ];
+                }
                 $stack[] = [
                     'type' => self::INTERACTION_FEEDBACK,
                     'effector' => [
                         'id' => $interaction->getReviewer()->getId(),
                         'name' => $interaction->getReviewer()->getFullname(),
                     ],
-                    'date' => [
-                        'datetime' => $interaction->getPublishedAt()->getDatabase(),
-                        'short' => $interaction->getPublishedAt()->getShort(),
-                        'relative' => $interaction->getPublishedAt()->getRelativeTime(),
-                    ]
+                    'published' => $interaction->isPublished(),
+                    'date' => $date
                 ];
             } elseif ($interaction instanceof AbstractResponse) {
                 $stack[] = [
@@ -94,17 +103,26 @@ class FullWithViews
          */
         foreach ($this->participant->getAllResponses() as $response) {
             foreach ($response->getAllFeedback() as $interaction) {
+                $date = [
+                    'datetime' => $interaction->getUpdatedAt()->getDatabase(),
+                    'short' => $interaction->getUpdatedAt()->getShort(),
+                    'relative' => $interaction->getUpdatedAt()->getRelativeTime(),
+                ];
+                if ($interaction->isPublished()) {
+                    $date = [
+                        'datetime' => $interaction->getPublishedAt()->getDatabase(),
+                        'short' => $interaction->getPublishedAt()->getShort(),
+                        'relative' => $interaction->getPublishedAt()->getRelativeTime(),
+                    ];
+                }
                 $stack[] = [
                     'type' => self::INTERACTION_FEEDBACK,
                     'effector' => [
                         'id' => $interaction->getReviewer()->getId(),
                         'name' => $interaction->getReviewer()->getFullname(),
                     ],
-                    'date' => [
-                        'datetime' => $interaction->getPublishedAt()->getDatabase(),
-                        'short' => $interaction->getPublishedAt()->getShort(),
-                        'relative' => $interaction->getPublishedAt()->getRelativeTime(),
-                    ]
+                    'published' => $interaction->isPublished(),
+                    'date' => $date,
                 ];
             }
         }
