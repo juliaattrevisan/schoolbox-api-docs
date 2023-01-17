@@ -180,9 +180,6 @@ class Controller extends Base
                         $value[$currentIndex] = trim($value[$currentIndex]);
                     }
 
-                    $property = new ReflectionProperty($model, $field);
-                    $test = $property->getType();
-
                     $model->$setter($value[$currentIndex]);
                 }
             }
