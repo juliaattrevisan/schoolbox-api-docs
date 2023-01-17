@@ -28,22 +28,16 @@ class Tenant
 
     /**
      * @param string $tenant
-     * @param string $sitePath
      * @param string $version
      */
-    public function __construct($tenant, $sitePath = null, $version = 'v1.0')
+    public function __construct($tenant, $version = 'v1.0')
     {
         if (!$tenant) {
             throw new InvalidArgumentException('A tenant must be provided');
         }
 
-        if ($sitePath) {
-            $this->resource = "https://$tenant.sharepoint.com";
-            $this->baseUri  = "{$this->resource}/$sitePath/_api/$version";
-        } else {
-            $this->resource = "https://$tenant-my.sharepoint.com";
-            $this->baseUri  = "{$this->resource}/_api/$version/me";
-        }
+        $this->resource = "https://$tenant-my.sharepoint.com";
+        $this->baseUri  = "{$this->resource}/_api/$version/me";
     }
 
 
