@@ -99,7 +99,7 @@ class State implements Sequential, ISoftDeletable
     }
 
     /**
-     * @param $normaliseAs
+     * @param float|null $normaliseAs
      *
      * @return static
      */
