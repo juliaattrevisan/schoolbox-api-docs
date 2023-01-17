@@ -19,6 +19,7 @@ use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Breadcrumbs;
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Quiz\ActionValidator;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
@@ -37,6 +38,9 @@ $groupHandler = new Group();
 $userHandler = new User();
 $questionHandler = new Assess_Question();
 $answerHandler = new Assess_Answer();
+
+/** @var MapperProxy $assessmentDataSource */
+$assessmentDataSource = $this->getDi()->get('assessmentDataSource');
 
 if (!is_numeric($this->arg[0])) {
     error(112);
@@ -110,12 +114,31 @@ if (!isset($this->arg[1])) {
     // Retrieve all attempts
     $attemptMapper = QuizAttemptMapper::getInstance();
     $attempts = $attemptHandler->retrieveLatestReviewableAttemptIds($assess['assess_id'], true);
+
     // Review them right now
     // (Don't update review date of anything already reviewed)
+    $quizzes = [];
+
     foreach ($attempts as $attemptId) {
         try {
             $attempt = $attemptMapper->findById($attemptId);
             $attemptMapper->finalizeReview($attempt, $_SESSION['user']);
+
+            /* Minimise the number of quizzes spawning
+             */
+            $quizzes[$attempt['assess_id']] ??= $assessmentDataSource->findByQuizId($attempt['assess_id']);
+
+            /* Author nonexistent? skip 'em
+             */
+            try {
+                $user = UserMapper::getInstance()->findById($attempt['user_id']);
+            } catch (Mapper\Exception $e) {
+                continue;
+            }
+
+            /* Update project result cache
+             */
+            (new \Schoolbox\Learning\Assessment\Project\ResultCache\ResultCache(\Schoolbox\Learning\Assessment\Project\ResultCache\Mapper::getInstance()))->refresh($assessmentDataSource, $quizzes[$attempt['assess_id']], $user);
         } catch (Exception $e) {
             // noop;
         }
