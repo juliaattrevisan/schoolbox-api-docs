@@ -38,7 +38,7 @@ if (googleFiles !== null) { // If we do not make this check, a console error wil
         } );
 
         // Auto-select the top-most enabled radio button.
-        let $radioButtons = $('input[id^=gfile-comment]');
+        let $radioButtons = $('[data-gfile-comment]');
         for (let i = 0; i < $radioButtons.length; ++i) {
             let $radioButton = $($radioButtons[i]);
             if ($radioButton.prop('disabled')) {
