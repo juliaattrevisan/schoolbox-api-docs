@@ -1,8 +1,21 @@
 import ClassicEditor from "@ckeditor/ckeditor5-editor-classic/src/classiceditor";
 import Essentials from "@ckeditor/ckeditor5-essentials/src/essentials";
+import Heading from "@ckeditor/ckeditor5-heading/src/heading";
 import Paragraph from "@ckeditor/ckeditor5-paragraph/src/paragraph";
+import HeadingButtonsUI from "@ckeditor/ckeditor5-heading/src/headingbuttonsui";
+import ParagraphButtonUI from "@ckeditor/ckeditor5-paragraph/src/paragraphbuttonui";
+import GeneralHtmlSupport from "@ckeditor/ckeditor5-html-support/src/generalhtmlsupport";
+import Style from "@ckeditor/ckeditor5-style/src/style";
 import Bold from "@ckeditor/ckeditor5-basic-styles/src/bold";
 import Italic from "@ckeditor/ckeditor5-basic-styles/src/italic";
+import Underline from "@ckeditor/ckeditor5-basic-styles/src/underline";
+import Strikethrough from "@ckeditor/ckeditor5-basic-styles/src/strikethrough";
+import Subscript from "@ckeditor/ckeditor5-basic-styles/src/subscript";
+import Superscript from "@ckeditor/ckeditor5-basic-styles/src/superscript";
+import RemoveFormat from "@ckeditor/ckeditor5-remove-format/src/removeformat";
+import Link from "@ckeditor/ckeditor5-link/src/link";
+import DocumentList from "@ckeditor/ckeditor5-list/src/documentlist";
+import Alignment from "@ckeditor/ckeditor5-alignment/src/alignment";
 
 const storageKeys = ["editorData1", "editorData2"];
 const editorTextAreas = document.querySelectorAll("textarea");
@@ -24,19 +37,59 @@ function preFillEditors() {
 /**
  * create the ckeditor instance
  */
-function createEditors() {
-    editorTextAreas.forEach((editorTextArea) => {
-        ClassicEditor.create(editorTextArea, {
-            plugins: [Essentials, Paragraph, Bold, Italic],
-            toolbar: ["bold", "italic"],
+function createEditor() {
+    ClassicEditor.create(editorTextArea, {
+        plugins: [
+            Essentials,
+            Heading,
+            Paragraph,
+            HeadingButtonsUI,
+            ParagraphButtonUI,
+            GeneralHtmlSupport,
+            Style,
+            Bold,
+            Italic,
+            Underline,
+            Strikethrough,
+            Subscript,
+            Superscript,
+            RemoveFormat,
+            Link,
+            DocumentList,
+            Alignment,
+        ],
+        toolbar: [
+            "style",
+            "|",
+            "heading",
+            "|",
+            "bold",
+            "italic",
+            {
+                label: "More basic styles",
+                icon: "threeVerticalDots",
+                items: ["underline", "strikethrough", "subscript", "superscript"],
+            },
+            "|",
+            "removeFormat",
+            "|",
+            "link",
+            "|",
+            {
+                label: "Lists",
+                icon: false,
+                items: ["numberedList", "bulletedList"],
+            },
+            "|",
+            "alignment",
+        ],
+    })
+        .then((newEditor) => {
+            editors.push(newEditor);
         })
-            .then((newEditor) => {
-                editors.push(newEditor);
-            })
-            .catch((error) => {
-                console.error(error.stack);
-            });
-    });
+        .catch((error) => {
+            console.error(error.stack);
+        });
 }
 
 /**
