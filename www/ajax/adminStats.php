@@ -11,7 +11,6 @@
 use Schoolbox\Engagement\Login;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\LogMapper;
-use Schoolbox\Url\Factory;
 use Schoolbox\Admin\Home\SamlCertHelper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -210,7 +209,7 @@ switch ($_POST['module']) {
         }
         fclose($socket);
         $decoded   = unpack('N12', $data);
-        $timestamp = sprintf('%u', $decoded[9]);
+        $timestamp = (int)sprintf('%u', $decoded[9]);
         $timestamp -= 2208988800; #convert ntp timestamp to unix timestamp
         $output = ['diff' => abs($timestamp - time())];
         break;
@@ -273,50 +272,61 @@ switch ($_POST['module']) {
             ];
         break;
     case 'ssl_cert':
-        /** @var IConfigLoader $config */
-        $config = $kernel->get('config');
-        $host = (new Factory($config))->buildFullyQualified();
-        $host = str_replace('https://', '', $host);
-        $streamContext = stream_context_create(
-            [
-                'ssl' => [
-                    'capture_peer_cert' => true,
-                    'peer_name'         => $host,
-                    'verify_peer'       => false,  // Required to fetch expired certificates
-                    'allow_self_signed' => true,   // Required to fetch self-signed certificates (used in dev/test)
-                ],
-            ]
-        );
-        $timeout = 4.0;
-        $client = stream_socket_client(
-            'ssl://127.0.0.1:443',
-            $errorNumber,
-            $errorDescription,
-            $timeout,
-            STREAM_CLIENT_CONNECT,
-            $streamContext
-        );
-        if ($client) {
-            $response              = stream_context_get_params($client);
-            $certificateProperties = openssl_x509_parse($response['options']['ssl']['peer_certificate']);
-
-            // Check cert is issued by LetsEncrypt for exact hostname
-            if ($certificateProperties['issuer']['O'] !== "Let's Encrypt") {
-                // Not issued by LetsEncrypt
-                $isCustomCert = true;
-            } else {
-                // Does not contain exact match
-                $isCustomCert = strpos("DNS:{$certificateProperties['extensions']['subjectAltName']}", $host) === false;
-            }
+        if (!exec(sprintf("INSTANCE_ID=%s schoolbox-read-instances --option hostnames", INSTANCE_ID), $execOutput, $resultCode)) {
             $output = [
-                'isCustomCert' => $isCustomCert,
-                'expiry'       => (int)(($certificateProperties['validTo_time_t'] - time()) / 3600 / 24),
+                'error_code'    => 1,
+                'error_message' => "Unable to derive instance hostnames",
             ];
         } else {
-            $output = [
-                'error_code' => $errorNumber,
-                'error_message' => $errorDescription,
-            ];
+            $output = [];
+            foreach ($execOutput as $host) {
+                // Is this an IP address rather than hostname?
+                if (preg_match("/^\d+\.\d+\.\d+\.\d+$/", $host)) {
+                    continue;
+                }
+                $streamContext = stream_context_create(
+                    [
+                        'ssl' => [
+                            'capture_peer_cert' => true,
+                            'peer_name'         => $host,
+                            'verify_peer'       => false,  // Required to fetch expired certificates
+                            'allow_self_signed' => true,   // Required to fetch self-signed certificates (used in dev/test)
+                        ],
+                    ]
+                );
+                $timeout = 4.0;
+                $client = stream_socket_client(
+                    'ssl://127.0.0.1:443',
+                    $errorNumber,
+                    $errorDescription,
+                    $timeout,
+                    STREAM_CLIENT_CONNECT,
+                    $streamContext
+                );
+                if ($client) {
+                    $response              = stream_context_get_params($client);
+                    $certificateProperties = openssl_x509_parse($response['options']['ssl']['peer_certificate']);
+
+                    // Check cert is issued by LetsEncrypt for exact hostname
+                    if ($certificateProperties['issuer']['O'] !== "Let's Encrypt") {
+                        // Not issued by LetsEncrypt
+                        $isCustomCert = true;
+                    } else {
+                        // Does not contain exact match
+                        $isCustomCert = !str_contains("DNS:{$certificateProperties['extensions']['subjectAltName']}", $host);
+                    }
+                    $expiry = (int)(($certificateProperties['validTo_time_t'] - time()) / 3600 / 24);
+
+                    $output["isCustomCert"] = ($output["isCustomCert"] ?? false) || $isCustomCert;
+                    $output["expiry"]       = array_key_exists("expiry", $output) ? min($expiry, $output["expiry"]) : $expiry;
+                } else {
+                    $output = [
+                        'error_code'    => $errorNumber,
+                        'error_message' => $errorDescription,
+                    ];
+                    break;
+                }
+            }
         }
         break;
     case 'turnitin':

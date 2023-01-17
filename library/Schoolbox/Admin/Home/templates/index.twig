@@ -115,24 +115,54 @@
         {% endif %}
 
         {% if not is_cloud %}
-        // check if https://api.schoolbox.cloud/urlCheck?url=http://$current_domain/.well-known/ping is accessible
-        $.ajax({
-            url: "{{ api_url }}/urlCheck/v2/?url=" + encodeURIComponent("http://" + location.hostname + "/.well-known/acme-challenge/ping"),
-            success: function(result, status, xhr) {
-                if (
-                        "message" in xhr.responseJSON &&
-                        xhr.responseJSON.message === "Response received" &&
-                        xhr.responseJSON.response.body === "port 80 accessible from your location\n"
-                ) {
-                    $('[data-light="port_80"]').html('Online').removeClass('neutral').addClass('success');
-                } else {
-                    $('[data-light="port_80"]').html('Offline').removeClass('neutral').addClass('alert');
+        // Check HTTP port 80 routing for each hostname associated with this instance.
+        // if (any AJAX calls error) then overall is error
+        // else if (any AJAX calls receive an unexpected response) then overall is Offline
+        // else (all AJAX calls receive expected response) then overall is Online
+        let hostnames = [{% for hostname in hostnames %}"{{ hostname }}"{% if not loop.last %},{% endif %}{% endfor %}];
+        let countResolved = 0;
+        let port80checkErrors = false;
+        let port80checkOffline = false;
+
+        hostnames.forEach(function (hostname){
+            // Check if https://api.schoolbox.cloud/urlCheck?url=http://$hostname/.well-known/ping is accessible
+            $.ajax({
+                url: "{{ api_url }}/urlCheck/v2/?url=" + encodeURIComponent("http://" + hostname + "/.well-known/acme-challenge/ping"),
+                success: function(result, status, xhr) {
+                    if (
+                            ! "message" in xhr.responseJSON ||
+                            xhr.responseJSON.message !== "Response received" ||
+                            xhr.responseJSON.response.body !== "port 80 accessible from your location\n"
+                    ) {
+                        port80checkOffline = true;
+                    }
+                },
+                error: function() {
+                    port80checkErrors = true;
+                },
+                complete: function(){
+                    countResolved++;
+                    updateSslRenewalWidget(hostname);
                 }
-            },
-            error: function() {
-                $('[data-light="port_80"]').html('Error').removeClass('neutral').addClass('alert');
+            });
+        })
+
+        function updateSslRenewalWidget(hostname) {
+            if (countResolved < hostnames.length){
+                return;
             }
-        });
+            let $sslRenewalWidget = $('[data-light="port_80"]');
+            if(port80checkErrors){
+                $sslRenewalWidget.html('Error').removeClass('neutral').addClass('alert');
+                return;
+            }
+            if(port80checkOffline){
+                $sslRenewalWidget.html('Offline').removeClass('neutral').addClass('alert');
+                return;
+            }
+            $sslRenewalWidget.html('Online').removeClass('neutral').addClass('success');
+        }
+
         // check ntp status
         $.ajax({
             url: "/ajax/adminStats.php",
