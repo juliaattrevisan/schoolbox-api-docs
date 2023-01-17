@@ -131,7 +131,7 @@ export default {
                     deleteLink = ENDPOINTS.generateUrlFromConst(this.eventDeleteUrl, metadata?.eventId, returnUrl);
                 }
             }
-console.log(data);
+
             return {
                 eventId: metadata?.eventId,
                 seriesId: metadata?.seriesId,
