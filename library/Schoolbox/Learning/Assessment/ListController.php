@@ -458,6 +458,14 @@ class ListController extends Web\Controller\Base
         }
         $assessment->setWeight($weight);
         $this->getAssessmentMapper()->save($assessment, $this->getUser());
+
+        /* Update project result cache when an activity gets its weight changed
+         * via the markbook ui
+         */
+        if ($assessment->getContext() instanceof Project) {
+            (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))->refresh($this->getAssessmentMapper(), $assessment);
+        }
+
         $this->getResponse()->content->set($this->buildJsonOutput(['message' => 'Successfully updated weighting']));
     }
 
