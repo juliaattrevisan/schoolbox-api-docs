@@ -166,6 +166,6 @@ abstract class AbstractSummator implements ISummator
      */
     public function contribute(IAssessable $assessable): bool
     {
-        return !($assessable instanceof Task);
+        return true;
     }
 }
