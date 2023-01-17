@@ -28,7 +28,6 @@ use Schoolbox\UserMapper;
  */
 class Controller extends Base
 {
-
     /**
      * @var StorageMapper $storageMapper
      */
@@ -113,7 +112,10 @@ class Controller extends Base
     {
         $post = $this->getRequest()->post;
 
-        $results = [];
+        $results = [
+            'success' => [],
+            'error'   => [],
+        ];
         if (\is_array($post['attachment'])) {
             /* Remove any bad data SA-8244
              */
@@ -129,9 +131,9 @@ class Controller extends Base
                             $user = $this->userMapper->findByExternalId($portrait->getFilename());
                             $user->setPortrait($portrait);
                             $this->userMapper->save($user);
-                            $results[] = 'success';
+                            $results['success'][] = $portrait->getFilename();
                         } catch (\Schoolbox\Mapper\Exception $e) {
-                            $results[] = $e->getMessage();
+                            $results['error'][$portrait->getBasename()] = $e->getMessage();
                             /* User doesn't exist; noop
                              * TODO: Log it somewhere meaningful?
                              */

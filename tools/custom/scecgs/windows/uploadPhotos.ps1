@@ -88,7 +88,10 @@ function Send-Photo
     $formImport = @{
         'attachment[]' = $hash + ':' + $fileName
     }
-    Invoke-RestMethod -Uri $uri -Headers $headers -Method Post -Form $formImport
+    $resultImport = Invoke-RestMethod -Uri $uri -Headers $headers -Method Post -Form $formImport
+    if ($resultImport.error.Count) {
+        throw $resultImport.error
+    }
 }
 
 # MAIN
@@ -121,13 +124,13 @@ if (!(Test-Path -Path $photoDir -Type Container))
 
 # Find the file to check the last updated date-time. Create the file, if it doesn't exist
 $uploadAll = $true;
-$systemFiles = Get-ChildItem -Path $lastUpdatePath -Force
-if ($systemFiles.Count -eq 1)
+try
 {
+    $systemFiles = Get-ChildItem -Path $lastUpdatePath -Force
     $lastUpdated = $systemFiles[0]
     $uploadAll = $false;
 }
-else
+catch
 {
     $lastUpdated = New-Item -Path $lastUpdatePath -ItemType File
     $lastUpdated.Attributes += 'Hidden'
