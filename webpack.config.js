@@ -275,7 +275,6 @@ module.exports = {
         core: "./www/static/css/core/core.scss",
         editor: "./www/static/css/core/editor.scss",
 
-
     },
     output: {
         path: path.resolve(__dirname, "www/static/js/bundle"),
@@ -360,7 +359,16 @@ module.exports = {
             {
                 test: /\.css$/,
                 exclude: /ckeditor5-[^/\\]+[/\\]theme[/\\].+\.css$/, // ensure ckeditor5 related styling setup below isn't applied elsewhere
-                use: ["vue-style-loader", "style-loader", "css-loader"],
+                use: [
+                    { loader: "vue-style-loader" },
+                    {
+                        loader: "style-loader",
+                        options: {
+                            esModule: false, // enforce CommonJS instead https://www.npmjs.com/package/style-loader#esmodule
+                        }
+                    },
+                    { loader: "css-loader" },
+                ]
             },
             {
                 test: /ckeditor5-[^/\\]+[/\\]theme[/\\].+\.css$/,
@@ -368,9 +376,9 @@ module.exports = {
                     {
                         loader: "style-loader",
                         options: {
-                            injectType: "singletonStyleTag",
+                            injectType: "singletonStyleTag", // applies all styles within in <style> tag
                             attributes: {
-                                "data-cke": true
+                                "data-cke": true // adds data-cke attribute to the <style> tag
                             }
                         }
                     },
