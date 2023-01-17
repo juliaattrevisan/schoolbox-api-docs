@@ -511,7 +511,7 @@ class ListController extends Web\Controller\Base
      * @throws RouteNotFound
      */
     public function getCreateAssessmentForm(AssessmentContext $context)
-    {;
+    {
         // check for a valid type declaration
         if ($type = $this->getRequest()->query->get('type')) {
             try {
