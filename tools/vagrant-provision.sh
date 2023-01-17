@@ -225,6 +225,10 @@ if ! INSTANCE_ID=vagrantx schoolbox-data-refresh.sh \
 --config mail_enable "'1'" \
 --config mail_smtp_host "'127.0.0.1'" \
 --config mail_smtp_port "'1025'" \
+--config office365_client "'85671866-2f6b-4ec3-9940-1f39ecc05e50'" \
+--config office365_immersive_reader_name "'schoolbox-test'" \
+--config office365_tenant "'alaressteam'" \
+--config office365_tenant_id "'9a9eb3a6-27e2-43bf-8831-37e8d0cc2265'" \
 --config pastoral_enabled "'1'" \
 --config push_notifications_enabled "'1'" \
 --config qr_login_enabled "'1'" \
