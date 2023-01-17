@@ -37,9 +37,9 @@ class State implements Sequential, ISoftDeletable
     protected ?string $displayAs = null;
 
     /**
-     * @var float|null
+     * @var float|null $normaliseAs
      */
-    protected ?float $normaliseAs = null;
+    protected $normaliseAs = null;
 
     /**
      * @param string|null $code
@@ -103,7 +103,7 @@ class State implements Sequential, ISoftDeletable
      *
      * @return static
      */
-    public function setNormaliseAs(?float $normaliseAs): self
+    public function setNormaliseAs($normaliseAs): self
     {
         $this->normaliseAs = $normaliseAs;
         return $this;
@@ -112,7 +112,7 @@ class State implements Sequential, ISoftDeletable
     /**
      * @return float|null
      */
-    public function getNormaliseAs(): ?float
+    public function getNormaliseAs()
     {
         return $this->normaliseAs;
     }

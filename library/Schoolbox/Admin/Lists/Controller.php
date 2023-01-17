@@ -255,6 +255,7 @@ class Controller extends Base
                 // and the value passed in is empty string, convert it to null
                 $nullable   = $fields[$fieldName]['nullable'] ?? false;
                 $fieldValue = $row[$fieldName] ?? null;
+                $fieldValue = is_string($fieldValue) ? trim($fieldValue) : $fieldValue;
                 if ($nullable && $fieldValue === '') {
                     $fieldValue = null;
                 }
