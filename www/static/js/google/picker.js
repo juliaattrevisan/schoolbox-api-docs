@@ -110,6 +110,7 @@
             if (config.googleAccessToken !== '' && config.googleAccessTokenType !== '') {
                 // We already have the googleAccessToken (retrieved from the PHP session), so mimic a successful
                 // response to googleClientToken.requestAccessToken().
+                // PROBLEM: The token retrieved from the PHP session may have expired.  How do we check for that?
                 authResult = {
                     access_token: config.googleAccessToken,
                     token_type: config.googleAccessTokenType
@@ -141,7 +142,7 @@
                     // Store authResult.access_token and authResult.token_type to a PHP session so that repeated use of the
                     // Google picker will not require repeated authorisation.
                     // This happens in the background, so we don't need to do anything in response to ajax success or error.
-                    // If case of error, the user will just have to re-authorise every time they visit a new page and try to
+                    // In case of error, the user will just have to re-authorise every time they visit a new page and try to
                     // use the Google Picker (since the token will not exist in $_SESSION at the server, and so it will not
                     // have been passed to the client during page generation).
                     $.ajax({
