@@ -264,6 +264,13 @@ export default {
          * @param { ?String } tag
          */
         applyFilters(clickedFeedItemType, tag) {
+            let $checkboxes = $("[data-filter-checkbox]");
+
+            // If no checkboxes are checked, check all.
+            if ($checkboxes.filter(":checked").length == 0) {
+                $checkboxes.prop("checked", true);
+            }
+
             if (tag !== null) {
                 // Since the user has asked to show only items with a particular tag,
                 //  * check all checkboxes pertaining to feed items that can have tags, and
@@ -329,7 +336,10 @@ export default {
                         <input
                             type="checkbox"
                             class="plain"
+                            data-filter-checkbox
+                            data-assessments
                             id="filter-assessments"
+                            checked="checked"
                             name="includeAssessments"
                             @click="applyFilters('assessments', null)"
                         />
@@ -339,7 +349,10 @@ export default {
                         <input
                             type="checkbox"
                             class="plain"
+                            data-filter-checkbox
+                            data-achievements
                             id="filter-achievements"
+                            checked="checked"
                             name="includeAchievements"
                             @click="applyFilters('achievements', null)"
                         />
@@ -349,7 +362,10 @@ export default {
                         <input
                             type="checkbox"
                             class="plain"
+                            data-filter-checkbox
+                            data-goals
                             id="filter-goals"
+                            checked="checked"
                             name="includeGoals"
                             @click="applyFilters('goals', null)"
                         />
@@ -359,7 +375,10 @@ export default {
                         <input
                             type="checkbox"
                             class="plain"
+                            data-filter-checkbox
+                            data-learning-moments
                             id="filter-learning-moments"
+                            checked="checked"
                             name="includeLearningMoments"
                             @click="applyFilters('learning-moments', null)"
                         />
@@ -625,7 +644,7 @@ export default {
                                 <blockquote v-if="evidence.object.comment">
                                     {{ evidence.object.comment }}<br />
                                 </blockquote>
-                                <a :href="evidence.object._links.summary"> View assessment details</a>
+                                <a :href="evidence.object._links.summary"> View assessment details </a>
                             </div>
                         </template>
                     </li>
@@ -658,7 +677,8 @@ export default {
                             <!--
                                 All these tags need to be on the same line,
                                 because otherwise there will be a space between
-                                the link and the comma -->
+                                the link and the comma
+                             -->
                             <a href="#" title="Share a learning moment" data-reveal-id="shareLearningMoment"
                                 >Share your learning</a
                             ><template v-if="config.routes.getSetAsGoalForm && config.routes.getAwardAsAchievementForm"
@@ -705,7 +725,8 @@ export default {
                             <!--
                                 All these tags need to be on the same line,
                                 because otherwise there will be a space between
-                                the link and the comma -->
+                                the link and the comma
+                             -->
                             <a href="#" title="Share a learning moment" data-reveal-id="shareLearningMoment"
                                 >Share a learning moment</a
                             ><template v-if="config.routes.getSetAsGoalForm && config.routes.getAwardAsAchievementForm"
