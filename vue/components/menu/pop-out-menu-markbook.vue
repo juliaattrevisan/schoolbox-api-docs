@@ -54,7 +54,7 @@ const referenceElement = ref(null);
 const isLoading = ref(false);
 const isSelected = ref(false);
 const hasLoadError = ref(false);
-const showPopOut = computed(() => isSelected.value && !hasLoadError.value);
+const showPopOut = computed(() => isSelected.value );
 const isExpanded = ref(false); // is recent activity expanded
 const activityItems: Ref<ActivityItem[]> = ref([]); // list of recent activity items to display
 const isActivityEmpty = computed(() => activityItems.value.length === 0);
@@ -251,10 +251,13 @@ function onMenuItemSelected(target: string) {
             left: `${ x ?? 0 }px`,
         }"
     >
-        <div v-if="isLoading" class="c-pop-out-menu__loader">
+        <div v-if="hasLoadError">
+            <pop-out-menu-item class="is-disabled"> There was an error during data retrieval. </pop-out-menu-item>
+        </div>
+        <div v-if="isLoading && !hasLoadError" class="c-pop-out-menu__loader">
             <div class="loader"></div>
         </div>
-        <div v-if="!isLoading" class="c-pop-out-menu" ref="markbookElement" :class="{ 'is-expanded': isExpanded }">
+        <div v-if="!isLoading && !hasLoadError" class="c-pop-out-menu" ref="markbookElement" :class="{ 'is-expanded': isExpanded }">
             <div className="s-collapsible">
                 <small-card v-for="(activityItem, index) in activityItems" :key="index">
                     <user-photo

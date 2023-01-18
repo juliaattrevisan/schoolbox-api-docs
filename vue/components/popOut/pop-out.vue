@@ -15,8 +15,8 @@
         background-color: #FFF;
         border-radius: 0.25rem;
         box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.2);
-        min-width: 4rem;
-        min-height: 4rem;
+        min-width: 2rem;
+        min-height: 2rem;
         padding: 0.5rem 0;
         position: absolute;
         z-index: 100001;

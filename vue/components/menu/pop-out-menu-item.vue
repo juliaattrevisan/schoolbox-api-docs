@@ -48,6 +48,7 @@ function onSelected() {
     font-size: 0.8rem;
     display: flex;
     justify-content: space-between;
+    margin: 0;
     padding: 0.5rem 2rem;
     -webkit-user-select: none;
     user-select: none;
@@ -63,6 +64,11 @@ function onSelected() {
     &:hover:not(.is-disabled) {
         background-color: var(--content-ui-background);
         cursor: pointer;
+    }
+
+    //Override standard button styling
+    &:focus{
+        background-color: unset;
     }
 
     &__icon {
