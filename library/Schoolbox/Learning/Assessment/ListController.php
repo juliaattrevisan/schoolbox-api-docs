@@ -371,7 +371,6 @@ class ListController extends Web\Controller\Base
 
         // Save ordering
         $this->getAssessmentMapper()->sequenceAssessments($sortedAssessments);
-        $this->getAssessmentMapper()->sequenceAssessments($sortedAssessments);
 
         // Redirect to a return URL or something
         // If not provided, redirect to somewhere relevant to context
