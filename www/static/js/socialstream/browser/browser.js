@@ -179,10 +179,15 @@ try {
 			/* Load data into the node container
 			 */
             container.load(config.url, args, function (response, status, xhr) {
-
                 if (xhr.status >= 400) {
                     config.loadedCallback.call($j(this));
-                    $j(this).html("<span>"+JSON.parse(response)+"</span>");
+                    let responseContent;
+                    try {
+                        responseContent = JSON.parse(response);
+                    } catch {
+                        responseContent = response;
+                    }
+                    $j(this).html("<span>" + responseContent + "</span>");
                     return;
                 }
 
