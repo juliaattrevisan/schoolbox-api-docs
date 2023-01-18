@@ -477,7 +477,15 @@ do
 		umount $backup_dir;
 	fi
 done
+/usr/share/schoolbox/tools/maintenance/site_down.sh
+## Removing maintenance page
+/usr/share/schoolbox/tools/maintenance/site_up.sh
 
+## Remove crons
+rm -v /etc/schoolbox/cron_config.ini
+
+## Rebuild crons
+/usr/local/bin/puppet agent -t
 # Provide a pretty list of backups to recover from
 if [ "$syncType" == "" ] || [ "$syncType" == "local" ]; then
   echo -e "\n\nPlease select a source to restore from:";
@@ -738,6 +746,10 @@ if ! mysqldump --allow-keywords --default-character-set=utf8mb4 -i -e -q -a --sk
   echo "Unable to backup config table from current database" >&2
   exit 1
 fi
+
+## Put up maintenance page
+/usr/share/schoolbox/tools/maintenance/site_down.sh
+
 ## Drop existing DB and reload just config table
 mysql -u $sqluser -p$sqlpasswd -h $sqlhost -e "SET MAX_STATEMENT_TIME=0; DROP DATABASE $sqldb;";
 mysql -u $sqluser -p$sqlpasswd -h $sqlhost -e "CREATE DATABASE $sqldb CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci';";
@@ -755,6 +767,15 @@ echo "Restoring database '$sourcedb'";
 if ! (echo 'SET MAX_STATEMENT_TIME=0; '; cat "$sourcedb") | pv -s "$(du -b "$sourcedb" | cut -f 1)" | sed -E "s/^\/\*!50013 DEFINER=.+\*\//\/\* Fallback to default DEFINER \*\//g" | mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb; then
   error "Unable to import database from backup file. Exiting."
 fi
+
+## Removing maintenance page
+/usr/share/schoolbox/tools/maintenance/site_up.sh
+
+## Remove crons
+rm -v /etc/schoolbox/cron_config.ini
+
+## Rebuild crons
+/usr/local/bin/puppet agent -t
 
 # Move data files to correct location if restoring from backup
 if [ "$sourceloc" = '[B]' ];
