@@ -14,7 +14,6 @@
 # csv-staff=<The filename of staff csv file under the dirrectory set as csv-dir.>
 # csv-relationship=<The filename of relationship csv file under the dirrectory given as csv-dir.>
 # csv-parent=<The filename of parent csv file under the dirrectory given as csv-dir.>
-$Global:LogPath = "$PSScriptRoot\logs\upload_photo.log"
 
 # As Get-Content and ConvertFrom-String cmdlets does not work consistently between running from shell and from task scheduler
 # using System.IO.File here

@@ -33,7 +33,7 @@ $csvDir = $myConfig['csv-dir']
 # Type of csv files
 $csvTypes = 'staff', 'student', 'parent', 'relationship'
 # Expiry date of the storage files - 7 days from today
-$Global:expiryDate = (Get-Date).AddDays(7) | Get-Date -Format 'yyyy-MM-dd\THH:mm:ssP'
+$Global:expiryDate = (Get-Date).AddDays(7) | Get-Date -AsUTC -Format 'yyyy-MM-dd\THH:mm:ssK'
 # Log file
 $Global:LogPath = "$PSScriptRoot\logs\import_csv.log"
 if (-not(Test-Path $Global:LogPath))
