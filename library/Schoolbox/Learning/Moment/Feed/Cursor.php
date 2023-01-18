@@ -287,9 +287,9 @@ class Cursor implements ICursor
         }
 
         $query .= (
-            "FROM evidence        AS e
-             JOIN evidence_tag    AS et   ON et.evidence_id=e.id
-             JOIN lu_evidence_tag AS luet ON luet.id=et.tag_id
+            "FROM evidence             AS e
+             LEFT JOIN evidence_tag    AS et   ON et.evidence_id=e.id
+             LEFT JOIN lu_evidence_tag AS luet ON luet.id=et.tag_id
              WHERE e.user_id = :userIdEvidence
              AND e.deleted_at IS NULL
              AND $sqlWhereCondition"
