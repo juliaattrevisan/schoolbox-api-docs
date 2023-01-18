@@ -271,16 +271,6 @@ export default {
                 $checkboxes.prop("checked", true);
             }
 
-            if (tag !== null) {
-                // Since the user has asked to show only items with a particular tag,
-                //  * check all checkboxes pertaining to feed items that can have tags, and
-                //  * uncheck all checkboxes pertaining to feed items that cannot have tags.
-                $("#filter-learning-moments").prop("checked", true);
-                $("#filter-assessments").prop("checked", false);
-                $("#filter-achievements").prop("checked", false);
-                $("#filter-goals").prop("checked", false);
-            }
-
             this.selectedTag = tag; // Remember selected tag for later.
 
             $("div.feed:not(*.filter-container)").remove(); // Clear feed except filter checkboxes.

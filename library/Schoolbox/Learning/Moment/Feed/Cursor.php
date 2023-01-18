@@ -309,7 +309,10 @@ class Cursor implements ICursor
         $includeAchievements = in_array('achievements', $this->filter['feedItemTypes'], true); // Achievements are badges with status 'achievement'.
         $includeGoals        = in_array('goals', $this->filter['feedItemTypes'], true); // Goals are badges with status 'goal'.
 
-        if (!$includeAchievements && !$includeGoals) {
+        if (
+            !$includeAchievements && !$includeGoals ||
+            trim($this->filter['tag']) !== '' // Badges cannot have tags, so if a tag filter exists, return no results.
+        ) {
             return [null, []]; // This indicates that the query should not be run because we know that no results will be returned.
         }
 
@@ -362,7 +365,10 @@ class Cursor implements ICursor
             in_array('assessments', $this->filter['feedItemTypes'], true)
         );
 
-        if (!$includeDueWorkFeedback) {
+        if (
+            !$includeDueWorkFeedback ||
+            trim($this->filter['tag']) !== '' // Due work feedback cannot have tags, so if a tag filter exists, return no results.
+        ) {
             return [null, []]; // This indicates that the query should not be run because we know that no results will be returned.
         }
 
