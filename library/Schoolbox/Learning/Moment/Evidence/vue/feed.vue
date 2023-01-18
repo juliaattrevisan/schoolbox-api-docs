@@ -303,21 +303,7 @@ export default {
                 checkedFeedItemTypes = feedItemTypes;
             }
 
-            let filtersDescription =
-                "Showing " +
-                (checkedFeedItemTypes.length === feedItemTypes.length
-                    ? "all items"
-                    : checkedFeedItemTypes.join(", ").replace("-", " ")) +
-                (this.selectedTag === null
-                    ? ""
-                    : (checkedFeedItemTypes.length === feedItemTypes.length || checkedFeedItemTypes.length === 1
-                          ? ""
-                          : ",") +
-                      ' with tag "' +
-                      this.selectedTag +
-                      '"');
-
-            $("#filters-description").html(filtersDescription);
+            $("#filters-description").html(this.selectedTag === null ? "" : 'Showing tag "' + this.selectedTag + '"');
 
             return { feedItemTypes: checkedFeedItemTypes, tag: this.selectedTag === null ? "" : this.selectedTag };
         },
