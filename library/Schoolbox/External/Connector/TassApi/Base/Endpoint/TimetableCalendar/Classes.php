@@ -670,23 +670,15 @@ class Classes implements IStrategy
                                 'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
                                 'source' => \Schoolbox\External\Connector\TassApi\Base\Endpoint\Factory::SOURCE_NAME
                             ]);
+
+                            $logPrefix = 'Reusing existing';
                         } catch (\Schoolbox\Mapper\Exception $e) {
                             /* Cram in everything else into a new instance
                              */
                             $event = $this->eventMapper->createModel();
-                        }
 
-                        /* Save it and remember what we saw in case we need to reuse this later
-                         */
-                        $this->log->info(sprintf(
-                            'Creating new timetable event %s %s - %s, %s, %s-%s',
-                            $event->getTitle(),
-                            $event->getCode(),
-                            $event->getDay(),
-                            $event->getPeriod(),
-                            $event->getStartAt()->getDatabase(),
-                            $event->getFinishAt()->getDatabase()
-                        ));
+                            $logPrefix = 'Creating new';
+                        }
 
                         /* Update an existing sis_event record with whatever might
                          * have changed in tass
@@ -709,6 +701,21 @@ class Classes implements IStrategy
                             ->setGuid($guid)
                             ->setSource(\Schoolbox\External\Connector\TassApi\Base\Endpoint\Factory::SOURCE_NAME);
 
+                        /* Save it and remember what we saw in case we need to reuse this later
+                         */
+                        $this->log->info(sprintf(
+                            '%s timetable event %s %s - %s, %s, %s-%s',
+                            $logPrefix,
+                            $event->getTitle(),
+                            $event->getCode(),
+                            $event->getDay(),
+                            $event->getPeriod(),
+                            $event->getStartAt()->getDatabase(),
+                            $event->getFinishAt()->getDatabase()
+                        ));
+
+                        /* Weird shim
+                         */
                         $this->log->debug(sprintf(
                             'Assigning guid %s to %s on %s-%s',
                             $guid,
