@@ -25,7 +25,6 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
 use Schoolbox\UserMapper;
 
-
 $attemptsToDelete = [];
 /** @var Assessment\MapperProxy $assessmentDataSource */
 $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
