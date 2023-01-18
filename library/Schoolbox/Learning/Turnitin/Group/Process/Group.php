@@ -9,12 +9,14 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Turnitin\Group\Process;
 
+use GuzzleHttp\Exception\GuzzleException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Turnitin;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Learning\Turnitin\LogTrait;
+use Schoolbox\Mapper\Exception as MapperException;
 
 /**
  * Take a set of Submission Box Files from schoolbox and set it up in Turnitin,
@@ -130,19 +132,16 @@ class Group
      * Set up the turnitin Group Attachment containers for a submission box's set of files
      *
      * @param Turnitin\Group\Model $turnitinGroup
-     * @throws Turnitin\Exception\BadEndpoint
-     * @throws Turnitin\Exception\Credentials
-     * @throws \DomainException
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws GuzzleException
+     * @throws MapperException
      * @throws \JsonException
-     * @throws \PDOException
-     * @throws \RuntimeException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
      */
     public function process(Turnitin\Group\Model $turnitinGroup): void
     {
         $model = $this->createGroup($turnitinGroup);
+        if ($model === null) {
+            return;
+        }
 
         $submissionBoxFiles = $this->createGroupAttachments($model);
 
@@ -163,18 +162,12 @@ class Group
      * Create a Turnitin Group for this submission box if it doesn't already exist
      *
      * @param Turnitin\Group\Model $turnitinGroup
-     * @return Turnitin\Group\Model
-     * @throws Turnitin\Exception\BadEndpoint
-     * @throws Turnitin\Exception\Credentials
-     * @throws \DomainException
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @return Turnitin\Group\Model|null
+     * @throws GuzzleException
+     * @throws MapperException
      * @throws \JsonException
-     * @throws \PDOException
-     * @throws \RuntimeException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
      */
-    private function createGroup(Turnitin\Group\Model $turnitinGroup): Turnitin\Group\Model
+    private function createGroup(Turnitin\Group\Model $turnitinGroup): ?Turnitin\Group\Model
     {
         if ('' === (string)$turnitinGroup->getGroupId()) {
             /* Use a formal syntax for the turnitin group identifier
@@ -182,18 +175,31 @@ class Group
             $groupId = (new Turnitin\Group\IdCodec())
                 ->encode($turnitinGroup->getSubmissionBoxId(), $this->instanceIdentifier);
 
+            try {
+                $box     = $this->submissionBoxMapper->findById($turnitinGroup->getSubmissionBoxId());
+                $message = 'Group %s: setting up Turnitin Group for submission box %s, setting status [%s]';
+                $status  = Turnitin\Group\Model::STATUS_TRANSMIT_GROUP;
+            } catch (MapperException $e) {
+                $box = null;
+                $message = 'Group %s: failed to find submission box %s, setting status [%s]';
+                $status  = Turnitin\Group\Model::STATUS_ERROR;
+            }
+
             $this->changeGroupState(
                 $turnitinGroup,
                 sprintf(
-                    'Group %s: setting up Turnitin Group for submission box %s, setting status [%s]',
+                    $message,
                     $turnitinGroup->getId(),
                     $turnitinGroup->getSubmissionBoxId(),
-                    Turnitin\Group\Model::STATUS_TRANSMIT_GROUP
+                    $status
                 ),
-                Turnitin\Group\Model::STATUS_TRANSMIT_GROUP
+                $status
             );
 
-            $box = $this->submissionBoxMapper->findById($turnitinGroup->getSubmissionBoxId());
+            // Failed to get submission box, do not return turnitinGroup
+            if (!$box) {
+                return null;
+            }
 
             /* Fish out due dates from the official Assessment table
              */
@@ -525,9 +531,7 @@ class Group
      * @param Turnitin\Group\Model $model
      * @param string               $message
      * @param string               $status
-     * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
+     * @throws MapperException
      */
     private function changeGroupState(Turnitin\Group\Model $model, string $message, string $status): void
     {
@@ -540,8 +544,8 @@ class Group
          * support a diagnosis and resolution option
          */
         $model->setErrorCode(null)
-            ->setErrorMessage(null)
-            ->setStatus($status);
+              ->setErrorMessage(null)
+              ->setStatus($status);
 
         $this->turnitinGroupMapper->save($model);
     }
@@ -555,7 +559,7 @@ class Group
      * @param string                          $message
      * @param string                          $status
      * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
      * @throws \UnexpectedValueException
      */
     private function changeGroupAttachmentState(Turnitin\Group\Attachment\Model $model, string $message, string $status): void

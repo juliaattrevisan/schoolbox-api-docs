@@ -117,6 +117,7 @@ class SubmissionBoxMapper extends BaseMapper
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteSubmissions']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteReturns']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteShowcase']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteTurnitinGroup']);
     }
 
 
@@ -250,6 +251,16 @@ class SubmissionBoxMapper extends BaseMapper
         $showcaseMapper->deleteByColumn('submission_box_id', $dueWork->getId());
     }
 
+    /**
+     * Soft deletes turn it in group for this submission box
+     * @param SubmissionBox $dueWork
+     * @return void
+     */
+    public function softDeleteTurnitinGroup(SubmissionBox $dueWork)
+    {
+        $turnitinGroupMapper = Schoolbox\Learning\Turnitin\Group\Mapper::getInstance();
+        $turnitinGroupMapper->deleteByColumn('submission_box_id', $dueWork->getId());
+    }
 
     /**
      * Find all the years containing a submission box
