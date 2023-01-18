@@ -19,7 +19,6 @@ use External_Timetable;
 
 class Recurrence
 {
-
     const RECURRENCE_DAILY = 'daily';
     const RECURRENCE_WEEKLY = 'weekly';
     const RECURRENCE_FORTNIGHTLY = 'fortnightly';
