@@ -392,7 +392,7 @@ class Classes implements IStrategy
             $logPrefix = 'Creating new';
         }
 
-        $event = $this->eventMapper->createModel()
+        $event
             ->setTitle($title)
             ->setDetail($detail)
             ->setLocation($room)
