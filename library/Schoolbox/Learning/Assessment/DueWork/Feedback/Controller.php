@@ -276,8 +276,8 @@ class Controller extends Base
                  */
                 (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))->refresh($this->assessmentDataSource, $assessment, $student);
             }
-        } catch (RangeException $e) {
-            $this->sendError('Invalid mark provided');
+        } catch (RangeException | InvalidArgumentException $e) {
+            $this->sendError('Invalid mark provided: ' . $e->getMessage());
             return;
         } catch (MapperException $e) {
             $this->sendError('Invalid mark provided');
