@@ -127,19 +127,19 @@ if (!isset($this->arg[1])) {
 
             /* Minimise the number of quizzes spawning
              */
-            $quizzes[$attempt['assess_id']] ??= $assessmentDataSource->findByQuizId($attempt['assess_id']);
+            $quizzes[$attempt->getQuiz()->getId()] ??= $assessmentDataSource->findByQuizId($attempt->getQuiz()->getId());
 
             /* Author nonexistent? skip 'em
              */
             try {
-                $user = UserMapper::getInstance()->findById($attempt['user_id']);
+                $user = UserMapper::getInstance()->findById($attempt->getUser()->getId());
             } catch (Mapper\Exception $e) {
                 continue;
             }
 
             /* Update project result cache
              */
-            (new Project\ResultCache\ResultCache(Project\ResultCache\Mapper::getInstance()))->refresh($assessmentDataSource, $quizzes[$attempt['assess_id']], $user);
+            (new Project\ResultCache\ResultCache(Project\ResultCache\Mapper::getInstance()))->refresh($assessmentDataSource, $quizzes[$attempt->getQuiz()->getId()], $user);
         } catch (Exception $e) {
             // noop;
         }
