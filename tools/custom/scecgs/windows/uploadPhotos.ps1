@@ -20,7 +20,7 @@
 # $configData = Get-Content -Path "$PSScriptRoot\config.txt" -Raw
 # $myConfig = ConvertFrom-StringData -StringData $configData -Delimiter '='
 $myConfig = @{ }
-foreach ($line in [System.IO.File]::ReadLines("$PSScriptRoot\config.ini"))
+foreach ($line in [System.IO.File]::ReadLines("$PSScriptRoot/config.ini"))
 {
     $parts = $line.Split('=')
     if ($parts.Count -eq 2)
@@ -38,6 +38,10 @@ $photoExt = '.jpg', '.png'
 $lastUpdatePath = "$photoDir\0-last-update"
 # Log file
 $Global:LogPath = "$PSScriptRoot\logs\upload_photo.log"
+if (-not(Test-Path $Global:LogPath))
+{
+    New-Item -Path $Global:LogPath -Force
+}
 
 # Functions
 
