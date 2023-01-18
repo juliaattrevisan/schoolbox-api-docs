@@ -19,7 +19,9 @@ use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Breadcrumbs;
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Quiz\ActionValidator;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Mapper;
@@ -37,6 +39,9 @@ $groupHandler = new Group();
 $userHandler = new User();
 $questionHandler = new Assess_Question();
 $answerHandler = new Assess_Answer();
+
+/** @var MapperProxy $assessmentDataSource */
+$assessmentDataSource = $this->getDi()->get('assessmentDataSource');
 
 if (!is_numeric($this->arg[0])) {
     error(112);
@@ -110,12 +115,31 @@ if (!isset($this->arg[1])) {
     // Retrieve all attempts
     $attemptMapper = QuizAttemptMapper::getInstance();
     $attempts = $attemptHandler->retrieveLatestReviewableAttemptIds($assess['assess_id'], true);
+
     // Review them right now
     // (Don't update review date of anything already reviewed)
+    $quizzes = [];
+
     foreach ($attempts as $attemptId) {
         try {
             $attempt = $attemptMapper->findById($attemptId);
             $attemptMapper->finalizeReview($attempt, $_SESSION['user']);
+
+            /* Minimise the number of quizzes spawning
+             */
+            $quizzes[$attempt->getQuiz()->getId()] ??= $assessmentDataSource->findByQuizId($attempt->getQuiz()->getId());
+
+            /* Author nonexistent? skip 'em
+             */
+            try {
+                $user = UserMapper::getInstance()->findById($attempt->getUser()->getId());
+            } catch (Mapper\Exception $e) {
+                continue;
+            }
+
+            /* Update project result cache
+             */
+            (new Project\ResultCache\ResultCache(Project\ResultCache\Mapper::getInstance()))->refresh($assessmentDataSource, $quizzes[$attempt->getQuiz()->getId()], $user);
         } catch (Exception $e) {
             // noop;
         }

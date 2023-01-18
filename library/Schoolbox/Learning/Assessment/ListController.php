@@ -311,6 +311,12 @@ class ListController extends Web\Controller\Base
 
             $explicitReturnUrl = $this->getRequest()->post->get(Redirect::RETURN_URL);
 
+            /* Update project result cache when an activity is spawned in that project
+             */
+            if ($context instanceof Project) {
+                (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))->refresh($this->getAssessmentMapper(), $assessmentInfo['assessment']);
+            }
+
             $this->redirect($controller->determineRedirect(
                 $assessmentInfo['assessment'],
                 $explicitReturnUrl,
@@ -451,6 +457,14 @@ class ListController extends Web\Controller\Base
         }
         $assessment->setWeight($weight);
         $this->getAssessmentMapper()->save($assessment, $this->getUser());
+
+        /* Update project result cache when an activity gets its weight changed
+         * via the markbook ui
+         */
+        if ($assessment->getContext() instanceof Project) {
+            (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))->refresh($this->getAssessmentMapper(), $assessment);
+        }
+
         $this->getResponse()->content->set($this->buildJsonOutput(['message' => 'Successfully updated weighting']));
     }
 
@@ -684,8 +698,7 @@ class ListController extends Web\Controller\Base
          * Similar to the cli tool's algorithm
          */
         if (!$cacheValid) {
-            $projectResultCache = (new Project\ResultCache\ResultCache($this->projectResultCacheMapper));
-            $projectResultCache->refresh($this->assessmentMapper, $assessment);
+            (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))->refresh($this->assessmentMapper, $assessment);
         }
 
         return $transactionSummary;

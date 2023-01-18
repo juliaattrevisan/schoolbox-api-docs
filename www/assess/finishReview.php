@@ -8,6 +8,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Quiz\ActionValidator;
 use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
@@ -81,9 +82,8 @@ $attemptMapper->finalizeReview($attempt, $sessionUser);
  * except the one you just finalised and summates those, which isn't what
  * we want. We need the latest.
  */
-if ($quiz->getContext() instanceof \Schoolbox\Learning\Assessment\Project) {
-    $projectResultCache = new \Schoolbox\Learning\Assessment\Project\ResultCache\ResultCache(\Schoolbox\Learning\Assessment\Project\ResultCache\Mapper::getInstance());
-    $projectResultCache->refresh($assessmentMapperProxy, $quiz, $attempt->getUser());
+if ($quiz->getContext() instanceof Project) {
+     (new Project\ResultCache\ResultCache(Project\ResultCache\Mapper::getInstance()))->refresh($assessmentMapperProxy, $quiz, $attempt->getUser());
 }
 
 $assessmentId = $assess->getAssessmentModel()->getId();

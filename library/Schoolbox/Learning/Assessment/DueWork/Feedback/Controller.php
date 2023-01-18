@@ -160,7 +160,8 @@ class Controller extends Base
      * @param DueWork\Model $assessment
      * @api   POST /learning/assessments/{assessmentId}/feedbacks
      * @since 170
-     *
+     * @throws MapperException
+     * @throws MapperException\Deleted
      */
     public function postParticipantFeedbacks(DueWork\Model $assessment)
     {
@@ -180,7 +181,11 @@ class Controller extends Base
                 try {
                     $this->returnedWorkMapper->save($submissionReturn);
                     $publishSuccess = true;
-                } catch (PDOException $e) {
+
+                    /* Update project result cache when Publish All is used
+                     */
+                    (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))->refresh($this->assessmentDataSource, $assessment, $submissionReturn->getOwner());
+                } catch (PDOException | \DomainException | \InvalidArgumentException | \LogicException | \UnexpectedValueException$e) {
                     $publishSuccess = false;
                 }
             }

@@ -17,6 +17,7 @@
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Quiz\ActionValidator;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
@@ -109,8 +110,9 @@ foreach ($_POST['attemptIds'] as $attemptId) {
 foreach ($attemptsToDelete as $currentAttempt) {
     $deleteAttempt($currentAttempt);
 
-    $projectResultCache = new \Schoolbox\Learning\Assessment\Project\ResultCache\ResultCache(\Schoolbox\Learning\Assessment\Project\ResultCache\Mapper::getInstance());
-    $projectResultCache->refresh($assessmentDataSource, $currentAttempt['quiz'], $currentAttempt['user']);
+    /* Update project result cache
+     */
+    (new Project\ResultCache\ResultCache(Project\ResultCache\Mapper::getInstance()))->refresh($assessmentDataSource, $currentAttempt['quiz'], $currentAttempt['user']);
 }
 
 SitePage::backToTheFuture(1);

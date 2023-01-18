@@ -68,6 +68,18 @@ abstract class AbstractSummator implements ISummator
 
         /** @var IAssessable $currentAssessable */
         foreach ($allAssessables as $currentAssessable) {
+            /* A $currentAssessable might be in a deleted state if this summation
+             * immediately follows a project activity deletion since that project
+             * will still have an instance of all its assessments, deleted or otherwise,
+             * at this point. Project Result Cache computes the deleted assessment's
+             * following that activity's deletion so we have to explicitly exclude them
+             * to accommodate that use case. If you refreshed/reloaded in between
+             * those two steps, you'd not encounter this.
+             */
+            if ($currentAssessable->isDeleted()) {
+                continue;
+            }
+
             $participant = $currentAssessable->getParticipantIfExtant($user);
             if ($participant) {
                 $normMark = $this->deriveNormalisedMark($participant, $publishedOnly);

@@ -129,7 +129,7 @@ class ValidCache
 
         /* 1. Change in Weighting
          */
-        if ($postData['weight'] !== $assessment->getWeight()) {
+        if (isset($postData['weight']) && $postData['weight'] !== $assessment->getWeight()) {
             $cacheValid = false;
         }
 

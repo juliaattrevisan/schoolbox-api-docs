@@ -414,9 +414,12 @@ class Participant
      * @param bool $publishedOnly Should we ignore draft marks?
      * @return null|float
      */
-    public function getNormalisedMark($publishedOnly): ?float
+    public function getNormalisedMark(bool $publishedOnly): ?float
     {
-        if ($this->plan->getAssessable() instanceof Project) {
+        /* Only read Published project marks from the result cache
+         * Draft project marks get dynamically calculated
+         */
+        if ($publishedOnly && $this->plan->getAssessable() instanceof Project) {
             $cachedProjectMark = (new ResultCache\ResultCache($this->projectResultCacheMapper))->retrieve($this->plan->getAssessable(), $this->getUser());
 
             return $cachedProjectMark?->getNormalisedMark();
@@ -437,9 +440,12 @@ class Participant
      * @param bool $publishedOnly Should we ignore draft marks?
      * @return null|string
      */
-    public function getHumanReadableMark($publishedOnly): ?string
+    public function getHumanReadableMark(bool $publishedOnly): ?string
     {
-        if ($this->plan->getAssessable() instanceof Project) {
+        /* Only read Published project marks from the result cache
+         * Draft project marks get dynamically calculated
+         */
+        if ($publishedOnly && $this->plan->getAssessable() instanceof Project) {
             $cachedProjectMark = (new ResultCache\ResultCache($this->projectResultCacheMapper))->retrieve($this->plan->getAssessable(), $this->getUser());
 
             return $cachedProjectMark?->getHumanReadableMark();
