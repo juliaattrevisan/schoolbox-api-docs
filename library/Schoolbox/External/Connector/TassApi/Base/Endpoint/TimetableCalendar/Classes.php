@@ -673,19 +673,7 @@ class Classes implements IStrategy
                         } catch (\Schoolbox\Mapper\Exception $e) {
                             /* Cram in everything else into a new instance
                              */
-                            $event = $this->eventMapper->createModel()
-                                ->setTitle($title)
-                                ->setDetail($detail)
-                                ->setLocation($room)
-                                ->setCode($classCode)
-                                ->setDay($day)
-                                ->setPeriod($period)
-                                ->setStartAt($startAt)
-                                ->setFinishAt($finishAt)
-                                ->setType($type)
-                                ->setClassification(\Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE)
-                                ->setGuid($guid)
-                                ->setSource(\Schoolbox\External\Connector\TassApi\Base\Endpoint\Factory::SOURCE_NAME);
+                            $event = $this->eventMapper->createModel();
                         }
 
                         /* Save it and remember what we saw in case we need to reuse this later
@@ -700,12 +688,26 @@ class Classes implements IStrategy
                             $event->getFinishAt()->getDatabase()
                         ));
 
-                        /* Weird shim
+                        /* Update an existing sis_event record with whatever might
+                         * have changed in tass
                          *
+                         * Weird shim
                          * Sometimes the db just won't save N rows of this field...wtf?
                          * Explicitly set the guid always, with the available data
                          */
-                        $event->setGuid($guid);
+                        $event
+                            ->setTitle($title)
+                            ->setDetail($detail)
+                            ->setLocation($room)
+                            ->setCode($classCode)
+                            ->setDay($day)
+                            ->setPeriod($period)
+                            ->setStartAt($startAt)
+                            ->setFinishAt($finishAt)
+                            ->setType($type)
+                            ->setClassification(\Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE)
+                            ->setGuid($guid)
+                            ->setSource(\Schoolbox\External\Connector\TassApi\Base\Endpoint\Factory::SOURCE_NAME);
 
                         $this->log->debug(sprintf(
                             'Assigning guid %s to %s on %s-%s',
