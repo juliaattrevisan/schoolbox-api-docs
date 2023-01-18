@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Assessment\DueWork\Feedback;
 
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
+use InvalidArgumentException;
 use PDOException;
 use RangeException;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
@@ -140,8 +141,8 @@ class Controller extends Base
                  */
                 (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))->refresh($this->assessmentDataSource, $assessment, $student);
             }
-        } catch (RangeException $e) {
-            $this->sendError('Invalid mark provided' . $e->getMessage() . $e->getTraceAsString());
+        } catch (RangeException | InvalidArgumentException $e) {
+            $this->sendError('Invalid mark provided: ' . $e->getMessage());
             return;
         } catch (MapperException $e) {
             $this->sendError('Invalid mark provided');
