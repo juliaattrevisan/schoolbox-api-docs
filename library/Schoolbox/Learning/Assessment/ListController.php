@@ -699,8 +699,7 @@ class ListController extends Web\Controller\Base
          * Similar to the cli tool's algorithm
          */
         if (!$cacheValid) {
-            $projectResultCache = (new Project\ResultCache\ResultCache($this->projectResultCacheMapper));
-            $projectResultCache->refresh($this->assessmentMapper, $assessment);
+            (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))->refresh($this->assessmentMapper, $assessment);
         }
 
         return $transactionSummary;

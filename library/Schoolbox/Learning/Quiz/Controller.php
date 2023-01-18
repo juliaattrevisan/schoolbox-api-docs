@@ -13,6 +13,7 @@ use Schoolbox\Application\WebRequest\Restful\AbstractController;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Alaress\Web\Controller\Exception as ControllerException;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;
 use Schoolbox\Learning\Quiz\Section\Question\Mapper as QuizQuestionMapper;
@@ -376,7 +377,7 @@ class Controller extends AbstractController
              */
             $assessment = $this->assessmentMapperProxy->findById($attempt->getQuiz()->getAssessmentModel()->getId());
 
-            (new \Schoolbox\Learning\Assessment\Project\ResultCache\ResultCache($this->projectResultCacheMapper))->refresh($this->assessmentMapperProxy, $assessment, $attempt->getUser());
+            (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))->refresh($this->assessmentMapperProxy, $assessment, $attempt->getUser());
         } catch (MapperException $e) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_ATTEMPT_NOT_FOUND);
         }

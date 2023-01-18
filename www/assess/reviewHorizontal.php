@@ -21,6 +21,7 @@ use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Quiz\ActionValidator;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Mapper;
@@ -138,7 +139,7 @@ if (!isset($this->arg[1])) {
 
             /* Update project result cache
              */
-            (new \Schoolbox\Learning\Assessment\Project\ResultCache\ResultCache(\Schoolbox\Learning\Assessment\Project\ResultCache\Mapper::getInstance()))->refresh($assessmentDataSource, $quizzes[$attempt['assess_id']], $user);
+            (new Project\ResultCache\ResultCache(Project\ResultCache\Mapper::getInstance()))->refresh($assessmentDataSource, $quizzes[$attempt['assess_id']], $user);
         } catch (Exception $e) {
             // noop;
         }

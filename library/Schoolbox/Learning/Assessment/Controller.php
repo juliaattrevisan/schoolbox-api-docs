@@ -479,8 +479,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
          * its outcome; update the cache accordingly
          */
         if (!$cacheValid) {
-            $projectResultCache = new Project\ResultCache\ResultCache($this->projectResultCacheMapper);
-            $projectResultCache->refresh($this->getAssessmentMapper(), $assessment);
+            (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))->refresh($this->getAssessmentMapper(), $assessment);
         }
 
         if ($this->getRequest()->isXhr()) {

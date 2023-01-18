@@ -17,12 +17,14 @@
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Quiz\ActionValidator;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
 use Schoolbox\UserMapper;
+
 
 $attemptsToDelete = [];
 /** @var Assessment\MapperProxy $assessmentDataSource */
@@ -111,7 +113,7 @@ foreach ($attemptsToDelete as $currentAttempt) {
 
     /* Update project result cache
      */
-    (new \Schoolbox\Learning\Assessment\Project\ResultCache\ResultCache(\Schoolbox\Learning\Assessment\Project\ResultCache\Mapper::getInstance()))->refresh($assessmentDataSource, $currentAttempt['quiz'], $currentAttempt['user']);
+    (new Project\ResultCache\ResultCache(Project\ResultCache\Mapper::getInstance()))->refresh($assessmentDataSource, $currentAttempt['quiz'], $currentAttempt['user']);
 }
 
 SitePage::backToTheFuture(1);
