@@ -40,9 +40,9 @@ if (googleFiles !== null) { // If we do not make this check, a console error wil
         // If the currently selected radio button is disabled:
         // Auto-select the top-most enabled radio button.
         let $radioButtons               = $('[data-gfile-comment]'),
-            $disabledCheckedRadioButton = $radioButtons.filter('[disabled][checked]');
+            $disabledCheckedRadioButton = $radioButtons.filter(':disabled:checked');
         if ($disabledCheckedRadioButton.length) {
-            let $enabledRadioButtons = $radioButtons.filter(':not[disabled]');
+            let $enabledRadioButtons = $radioButtons.filter(':not(:disabled)');
             if ($enabledRadioButtons.length) {
                 $enabledRadioButtons[0].checked = true;
             }
@@ -112,7 +112,7 @@ if (googleFiles !== null) { // If we do not make this check, a console error wil
                 let selected = $('input[name="gfileEdit"]:checked').val();
                 $('[data-gfile-comment]').each(function () {
                     if ($(this).val() > selected) {
-                        $(this).attr('disabled', true);
+                        $(this).prop('disabled', true);
                     }
                     // if selected edit level = 1, there will be only one option available.
                     // Pre-check it to save one extra click
