@@ -44,3 +44,5 @@ Script to create tasks to run `importCsv.ps1` and `uploadPhotos.ps1` in Task Sch
 
 The following commands may help, when Windows refuses to run scripts:
 
+* Unblock-File
+* Set-ExecutionPolicy
