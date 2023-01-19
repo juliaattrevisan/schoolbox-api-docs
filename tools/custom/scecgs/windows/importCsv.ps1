@@ -5,8 +5,9 @@
 
 # Set base configuration from Parse config.txt file in the same folder with the following content
 #
-# csv-dir=<The folder name of csv files. This folder must exist in the same folder.>
-# photo-dir=<The folder name of photo files. The folder must exist in the same folder.>
+# csv-dir=<Path of the folder which has csv files. This folder must exist.>
+# photo-dir=<Path of the folder which has photo files. The folder must exist in the same folder.>
+# photo-upload-all=<If `true`, upload all the files in photo-dir.>
 # token=<Token of a Schoolbox superuser.>
 # base-url=<Base URL of a Schoolbox instance, e.g. https://demo.schoolbox.com.au.>
 # csv-student=<The filename of student csv file under the dirrectory set as csv-dir.>
@@ -129,7 +130,7 @@ if (!(Test-Path -Path $csvDir -Type Container))
 foreach ($csvType in $csvTypes)
 {
     $csvFile = $myConfig["csv-$csvType"]
-    $csvFile = "$PSScriptRoot\$csvDir\" + $csvFile
+    $csvFile = "$csvDir\$csvFile"
     # Validate CSV Dir
     if (!(Test-Path -Path $csvFile -Type Leaf))
     {

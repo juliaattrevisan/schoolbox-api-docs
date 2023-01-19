@@ -3,8 +3,9 @@
 Configuration for uploading csv files and photo image files:
 
 ```
-csv-dir=<The folder name of csv files. This folder must exist in the same folder.>
-photo-dir=<The folder name of photo files. The folder must exist in the same folder.>
+csv-dir=<Path of the folder which has csv files. This folder must exist.>
+photo-dir=<Path of the folder which has photo files. The folder must exist in the same folder.>
+photo-upload-all=<If `true`, upload all the files in photo-dir.>
 token=<Token of a Schoolbox superuser.>
 base-url=<Base URL of a Schoolbox instance, e.g. https://demo.schoolbox.com.au.>
 csv-student=<The filename of student csv file under the folder set as csv-dir.>
@@ -38,3 +39,8 @@ Script to create tasks to run `importCsv.ps1` and `uploadPhotos.ps1` in Task Sch
 6. Open Task Scheduler and check the two tasks installed under Schoolbox.
 7. In Task Scheduler, manually run the two tasks and check log files created under `logs` folder in this folder.
 8. In Task Scheduler, set schedule to run the tasks.
+
+# Notes
+
+The following commands may help, when Windows refuses to run scripts:
+

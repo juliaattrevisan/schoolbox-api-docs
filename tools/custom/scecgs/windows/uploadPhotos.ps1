@@ -6,8 +6,9 @@
 
 # Set base configuration from Parse config.txt file in the same folder with the following content
 #
-# csv-dir=<The folder name of csv files. This folder must exist in the same folder.>
-# photo-dir=<The folder name of photo files. The folder must exist in the same folder.>
+# csv-dir=<Path of the folder which has csv files. This folder must exist.>
+# photo-dir=<Path of the folder which has photo files. The folder must exist in the same folder.>
+# photo-upload-all=<If `true`, upload all the files in photo-dir.>
 # token=<Token of a Schoolbox superuser.>
 # base-url=<Base URL of a Schoolbox instance, e.g. https://demo.schoolbox.com.au.>
 # csv-student=<The filename of student csv file under the dirrectory set as csv-dir.>
@@ -20,7 +21,7 @@
 # $configData = Get-Content -Path "$PSScriptRoot\config.txt" -Raw
 # $myConfig = ConvertFrom-StringData -StringData $configData -Delimiter '='
 $myConfig = @{ }
-foreach ($line in [System.IO.File]::ReadLines("$PSScriptRoot/config.ini"))
+foreach ($line in [System.IO.File]::ReadLines("$PSScriptRoot\config.ini"))
 {
     $parts = $line.Split('=')
     if ($parts.Count -eq 2)
@@ -32,6 +33,7 @@ foreach ($line in [System.IO.File]::ReadLines("$PSScriptRoot/config.ini"))
 $token = $myConfig['token']
 $baseUrl = $myConfig['base-url']
 $photoDir = $myConfig['photo-dir']
+$configUploadAll = $myConfig['photo-upload-all'] -eq 'true'
 # Extension of photo files
 $photoExt = '.jpg', '.png'
 # Hidden file for the script to check last updated date-time
@@ -126,25 +128,25 @@ if (!(Test-Path -Path $photoDir -Type Container))
 }
 
 # Find the file to check the last updated date-time. Create the file, if it doesn't exist
-$uploadAll = $true;
+$checkFileExists = $false;
 try
 {
     $systemFiles = Get-ChildItem -Path $lastUpdatePath -Force
     $lastUpdated = $systemFiles[0]
-    $uploadAll = $false;
+    $checkFileExists = $true;
 }
 catch
 {
-    $lastUpdated = New-Item -Path $lastUpdatePath -ItemType File
-    $lastUpdated.Attributes += 'Hidden'
+    # noop
 }
 
 # Get files under the Photo Dir
 $photos = Get-ChildItem -Path $photoDir
+$hasError = $false;
 foreach ($photo in $photos)
 {
     # If it's older than the last updated time, skip
-    if (!$uploadAll -and ($photo.LastWriteTime -lt $lastUpdated.LastWriteTime))
+    if (!$configUploadAll -and $checkFileExists -and ($photo.LastWriteTime -lt $lastUpdated.LastWriteTime))
     {
         continue
     }
@@ -162,8 +164,20 @@ foreach ($photo in $photos)
     catch
     {
         Write-Log -message ('Error: Failed to upload ' + $photo.Name + '. : ' + $_.Exception.Message) -isError $true
+        $hasError = $true
         continue;
     }
+}
+# If there's any file failed to upload, do not update the update check file, to rerun them
+if ($hasError) {
+    Write-Log -message "== Finish uploading photos ==" -isError $false
+    Exit
+}
+
+# If last update file doesn't exist, create one
+if (!$checkFileExists) {
+    $lastUpdated = New-Item -Path $lastUpdatePath -ItemType File
+    $lastUpdated.Attributes += 'Hidden'
 }
 $lastUpdated.LastWriteTime = Get-Date
 Write-Log -message "== Finish uploading photos ==" -isError $false
