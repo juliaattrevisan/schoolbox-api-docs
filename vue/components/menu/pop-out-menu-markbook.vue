@@ -219,12 +219,32 @@ onUnmounted(() => {
  * @returns { string } - the string to return
  */
 function getAction(item: ActivityItem): string {
-    const action = {
-        feedback: "provided feedback",
-        response: `submitted ${item.submittedOnTime ? " on time" : "late"}`, //  Check if an item was submitted late, adjust text accordingly
-        view: "viewed the feedback",
+
+    let scenario = item.type;
+    // If we have a response, we have to consider additional scenarios.
+    if (scenario === 'response') {
+        if (item.submitted) {
+            if (item.submittedOnTime){
+                scenario = 'response_on_time'
+            }
+            else {
+                scenario = 'response_late'
+            }
+        }
+        else{
+            scenario = 'response_draft'
+        }
     };
-    return action[item.type];
+
+    const action = {
+        feedback: `${item.published ? 'published' : 'drafted'} feedback`,
+        response_on_time : 'submitted on time',
+        response_late : 'submitted late',
+        response_draft : 'drafted a response',
+        view : 'viewed the assessment'
+    }
+
+    return action[scenario];
 }
 
 /**
