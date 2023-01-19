@@ -9,6 +9,7 @@
 
 use Alaress\Authorizer\Failure\AuthenticationTimedOut;
 use Alaress\Authorizer\Failure\Unauthorized;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Resource\Browser\Office365\Tenant;
 use Schoolbox\Resource\Folder\IFolder;
 
@@ -29,8 +30,10 @@ header('Content-Type: text/html');
 
 */
 
+$errorMapper = ErrorMapper::getInstance();
 if (count($this->arg) != 1) {
-    $this->error(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
+    http_response_code(400);
+    die($errorMapper->getMessageById(ErrorMapper::ERROR_INFORMATION_MISSING));
 }
 
 $source     = $this->arg[0];
@@ -73,13 +76,17 @@ try {
     $renderer = new \Schoolbox\Resource\Browser\NodeRenderer($this, $nodeData);
     $renderer->render($useFolder);
 } catch (Unauthorized $e) {
-    $this->error(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
+    http_response_code(400);
+    die($errorMapper->getMessageById(ErrorMapper::ERROR_INFORMATION_MISSING));
 } catch (\Schoolbox\Resource\Exception $e) {
-    $this->error(\Schoolbox\Error\Mapper::ERROR_PERM_CATEGORY_WRITE);
+    http_response_code(400);
+    die($errorMapper->getMessageById(ErrorMapper::ERROR_PERM_CATEGORY_WRITE));
 } catch (OutOfBoundsException $e) {
-    $this->error(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
+    http_response_code(400);
+    die($errorMapper->getMessageById(ErrorMapper::ERROR_INFORMATION_MISSING));
 } catch (AuthenticationTimedOut $e) {
-    $this->error(null, "Office 365 error: {$e->getMessage()}");
+    http_response_code(400);
+    die("Office 365 error: {$e->getMessage()}");
 } catch (RuntimeException $e) {
     die('<a data-gettoken href="/ajax/oauth/microsoft" class="button submit">Connect Office 365 account</a>');
 }
