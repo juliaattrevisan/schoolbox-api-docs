@@ -517,7 +517,7 @@ if [ "$syncType" == "" ] || [ "$syncType" == "local" ]; then
 
   # Provide feedback for confirmation of what is to be done based on above questions.
   echo -e "\n $restorepretty";
-  echo -e "\n     Restore into 'schoolbox' at '$instdir'";
+  echo -e "\n     Restore into '$destination_instance_id' at '$thisdatadir'";
   while true; do
     echo -e "\nIs this the correct option? (y/n): \c" && read -r confirm;
     if [[ $confirm =~ [ynYN] ]]; then
