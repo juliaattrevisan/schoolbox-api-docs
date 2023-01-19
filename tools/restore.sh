@@ -617,13 +617,13 @@ then
 		tmpbackupdb=`echo "$sourcedb" | grep '/backups/' | wc -l`;
 		if [ "$tmpbackupdb" == "1" ];
 		then
-			sourcedata=${sourcedb%/*}'/../../../';
+			sourcedata=${sourcedb%/*}'/../../..';
 		else
 			sourcedata=${sourcedb%/*};
 		fi
 		echo -e "\nPerforming Data Transfer";
-		echo -e "\nCopying data from $sourcedata to $thisdatadir";
-		rsync -rltHv $sourcedata/ $thisdatadir/ --delete-before  --exclude=cache/zip* --exclude=*.lock --exclude=backups;
+		echo -e "\nCopying data from $sourcedata/storage to $thisdatadir/storage";
+		rsync -rltHv $sourcedata/storage/ $thisdatadir/storage/ --delete-before;
 		$instdir/tools/create-data-dirs.sh $thisdatadir;
 		$instdir/tools/set-data-dir-perms.sh $thisdatadir $wwwuser;
 	fi
@@ -633,7 +633,7 @@ then
 		gzipdb=`echo "$sourcep2" | grep '.gz' | wc -l`;
 		if [ "$gzipdb" == "1" ];
 		then
-			sourcedata=${sourcep2%/*}'/../../../';
+			sourcedata=${sourcep2%/*}'/../../..';
 		else
 			sourcedata=${sourcep2%/*};
 		fi
@@ -650,8 +650,8 @@ then
 			error;
 		fi
 		echo -e "\nPerforming Data Transfer";
-		echo -e "\nCopying data from ssh $sourcep1 : $sourcedata to $thisdatadir";
-		rsync -rltHzv -e ssh $sourcep1:$sourcedata/ $thisdatadir/ --delete-before  --exclude=cache/zip* --exclude=backups;
+		echo -e "\nCopying storage data from ssh $sourcep1 : ${sourcedata}/storage/ to $thisdatadir/storage";
+		rsync -rltHzv -e ssh $sourcep1:${sourcedata}/storage/ $thisdatadir/storage/ --delete-before;
 		$instdir/tools/create-data-dirs.sh $thisdatadir;
 		$instdir/tools/set-data-dir-perms.sh $thisdatadir $wwwuser;
 	fi
