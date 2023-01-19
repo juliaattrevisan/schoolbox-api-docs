@@ -299,8 +299,11 @@ export default {
                 let oldUrlMinusUrlParams = questionMarkPos === -1 ? oldUrl : oldUrl.substring(0, questionMarkPos);
                 let newUrl = oldUrlMinusUrlParams + "?tag=" + filtersData.tag;
 
-                for (let feedItemType of filtersData.feedItemTypes) {
-                    newUrl += "&feedItemTypes[]=" + feedItemType;
+                // Only save filter state to URL if not all filters are selected.
+                if (filtersData.feedItemTypes.length !== this.feedItemTypes.length) {
+                    for (let feedItemType of filtersData.feedItemTypes) {
+                        newUrl += "&feedItemTypes[]=" + feedItemType;
+                    }
                 }
 
                 history.pushState(filtersData, "", newUrl);
