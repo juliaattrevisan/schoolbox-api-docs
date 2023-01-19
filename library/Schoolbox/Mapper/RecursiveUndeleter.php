@@ -42,6 +42,7 @@ use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Mapper as RubricDescriptorMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as RubricIndicatorMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Level\Mapper as RubricLevelMapper;
+use Schoolbox\Learning\Turnitin\Group\Mapper as TurnitinGroupMapper;
 use Schoolbox\Blog;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News;
@@ -172,11 +173,13 @@ class RecursiveUndeleter
             QuizAttempt\Mapper::class => 'assess_id',
         ],
         SubmissionBoxMapper::class          => [
-            SubmissionMapper::class   => 'box_id',
-            ReturnedWorkMapper::class => 'box_id',
-            RubricLevelMapper::class  => 'box_id',
+            SubmissionMapper::class    => 'box_id',
+            ReturnedWorkMapper::class  => 'box_id',
+            RubricLevelMapper::class   => 'box_id',
+            TurnitinGroupMapper::class => 'submission_box_id',
             Eportfolio\ShowcaseMapper::class,
         ],
+        TurnitinGroupMapper::class => [],
         TaskMapper::class                   => [
             Task\CompletionMapper::class,
         ],
