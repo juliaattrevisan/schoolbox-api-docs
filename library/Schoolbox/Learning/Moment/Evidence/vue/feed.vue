@@ -77,15 +77,13 @@ export default {
                 for (const feedItemType of this.feedItemTypes) {
                     $("#filter-" + feedItemType).prop("checked", event.state.feedItemTypes.includes(feedItemType));
                 }
-
-                this.refreshFeedAndSaveFiltersState(false); // Do not save the state that we've just restored.
             } else {
                 // Return the filters to their default state.
                 this.selectedTag = "";
                 $("[data-filter-checkbox]").prop("checked", true);
             }
 
-            this.load();
+            this.onChangeFilters(this.selectedTag, false); // Do not save the filters state that we just restored.
         };
 
         this.load();
@@ -283,40 +281,46 @@ export default {
         },
 
         /**
-         * Update the feed to match the current state of the filters, and optionally push the current state of the
-         * filters to the browser history.
-         *
-         * The purpose of saving the state of the filters to the browser history is to enable use of the back button to
-         * visit previous filter states, and to enable sharing of the URL for the page in a particular filter state.
-         *
-         * @param saveFilterState {boolean}
+         * @param selectedTag { String } Blank string means no selected tag.
+         * @param saveFiltersState { Boolean }
          */
-        refreshFeedAndSaveFiltersState(saveFilterState) {
-            let $checkboxes = $('[data-filter-checkbox]');
+        onChangeFilters(selectedTag, saveFiltersState) {
+            this.selectedTag = selectedTag;
+
+            let $checkboxes = $("[data-filter-checkbox]");
 
             // If all checkboxes are unchecked, check them all.
-            if ($checkboxes.filter(':checked').length === 0) {
-                $checkboxes.prop('checked', true);
+            if ($checkboxes.filter(":checked").length === 0) {
+                $checkboxes.prop("checked", true);
             }
 
-            if (saveFilterState) {
-                let filtersData = this.getFiltersData();
-                let oldUrl = window.location.href;
-                let questionMarkPos = oldUrl.indexOf("?");
-                let oldUrlMinusUrlParams = questionMarkPos === -1 ? oldUrl : oldUrl.substring(0, questionMarkPos);
-                let newUrl = oldUrlMinusUrlParams + "?tag=" + filtersData.tag;
+            if (saveFiltersState) {
+                this.saveFiltersState();
+            }
 
-                // Only save filter state to URL if not all filters are selected.
-                if (filtersData.feedItemTypes.length !== this.feedItemTypes.length) {
-                    for (let feedItemType of filtersData.feedItemTypes) {
-                        newUrl += "&feedItemTypes[]=" + feedItemType;
-                    }
+            this.load();
+        },
+
+        /**
+         * Save the state of the filters to the browser history.  The purpose of doing this is to enable use of the
+         * back button to visit previous filter states, and to enable sharing of the URL for the page in a particular
+         * filter state.
+         */
+        saveFiltersState() {
+            let filtersData = this.getFiltersData();
+            let oldUrl = window.location.href;
+            let questionMarkPos = oldUrl.indexOf("?");
+            let oldUrlMinusUrlParams = questionMarkPos === -1 ? oldUrl : oldUrl.substring(0, questionMarkPos);
+            let newUrl = oldUrlMinusUrlParams + "?tag=" + filtersData.tag;
+
+            // Only save filter state to URL if not all filters are selected.
+            if (filtersData.feedItemTypes.length !== this.feedItemTypes.length) {
+                for (let feedItemType of filtersData.feedItemTypes) {
+                    newUrl += "&feedItemTypes[]=" + feedItemType;
                 }
-
-                history.pushState(filtersData, "", newUrl);
             }
 
-            this.load(); // Refresh the feed.
+            history.pushState(filtersData, "", newUrl);
         },
 
         getFiltersData() {
@@ -414,7 +418,7 @@ export default {
                             id="filter-assessments"
                             checked="checked"
                             name="includeAssessments"
-                            @click="refreshFeedAndSaveFiltersState(true)"
+                            @click="onChangeFilters('', true)"
                         />
                         Assessments
                     </label>
@@ -427,7 +431,7 @@ export default {
                             id="filter-achievements"
                             checked="checked"
                             name="includeAchievements"
-                            @click="refreshFeedAndSaveFiltersState(true)"
+                            @click="onChangeFilters('', true)"
                         />
                         Achievements
                     </label>
@@ -440,7 +444,7 @@ export default {
                             id="filter-goals"
                             checked="checked"
                             name="includeGoals"
-                            @click="refreshFeedAndSaveFiltersState(true)"
+                            @click="onChangeFilters('', true)"
                         />
                         Goals
                     </label>
@@ -453,7 +457,7 @@ export default {
                             id="filter-learning-moments"
                             checked="checked"
                             name="includeLearningMoments"
-                            @click="refreshFeedAndSaveFiltersState(true)"
+                            @click="onChangeFilters('', true)"
                         />
                         Learning Moments
                     </label>
@@ -576,10 +580,7 @@ export default {
                                             <template v-if="index !== 0">, </template>
                                             <span
                                                 class="anchor-style"
-                                                @click="
-                                                    this.selectedTag = tag.name;
-                                                    refreshFeedAndSaveFiltersState(true);
-                                                "
+                                                @click="onChangeFilters(tag.name, true)"
                                                 title="Click to only show items with this tag."
                                                 >{{ tag.name }}</span
                                             >
