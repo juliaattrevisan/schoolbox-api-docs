@@ -27,6 +27,17 @@ import MediaEmbed from "@ckeditor/ckeditor5-media-embed/src/mediaembed";
 import Table from "@ckeditor/ckeditor5-table/src/table";
 import SpecialCharacters from "@ckeditor/ckeditor5-special-characters/src/specialcharacters";
 import SpecialCharactersEssentials from "@ckeditor/ckeditor5-special-characters/src/specialcharactersessentials";
+import {
+    Emoji,
+    EmojiActivity,
+    EmojiFlags,
+    EmojiFood,
+    EmojiNature,
+    EmojiObjects,
+    EmojiPeople,
+    EmojiPlaces,
+    EmojiSymbols,
+} from "@phudak/ckeditor5-emoji/src";
 import TableToolbar from "@ckeditor/ckeditor5-table/src/tabletoolbar";
 import TableProperties from "@ckeditor/ckeditor5-table/src/tableproperties";
 import TableCellProperties from "@ckeditor/ckeditor5-table/src/tablecellproperties";
@@ -95,6 +106,15 @@ function createEditor() {
             TableCaption,
             SpecialCharacters,
             SpecialCharactersEssentials,
+            Emoji,
+            EmojiPeople,
+            EmojiNature,
+            EmojiFood,
+            EmojiPlaces,
+            EmojiActivity,
+            EmojiObjects,
+            EmojiSymbols,
+            EmojiFlags,
             Link,
             List,
             TodoList,
@@ -130,7 +150,7 @@ function createEditor() {
             {
                 label: "Insert",
                 icon: "plus",
-                items: ["insertImage", "mediaEmbed", "insertTable", "specialCharacters"],
+                items: ["insertImage", "mediaEmbed", "insertTable", "specialCharacters", "emoji"],
             },
             "|",
             {
