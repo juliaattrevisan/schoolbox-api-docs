@@ -265,6 +265,7 @@ Usages:
                         <div id="class-selector-container">
                             <class-selector
                                 endpoint="{{ routeLookup('courseImport.searchClasses') }}"
+                                selector-label="Class(es)"
                                 :previously-selected-class="{{ destinations|json_encode }}"
                                 :required="true"
                             />
