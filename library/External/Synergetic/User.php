@@ -1071,13 +1071,14 @@ class External_Synergetic_User implements External_UserInterface
                         vStaff.StaffCategoryType,
                         vStaff.StaffDefaultMobilePhone,
                         vStaff.StaffVoiceMail,
-                        StaffDepartmentDescription as StaffDepartment,
+                        luDepartment.Description AS StaffDepartment,
                         JobPositions.StaffJobPositionStartDate,
                         JobPositions.StaffJobPositionEndDate,
                         Community.OccupDesc AS JobPositionDescriptionAlternate,
                         {$select}
             FROM        dbo.vStaff vStaff
             JOIN        dbo.Community ON Community.ID = vStaff.StaffID
+            LEFT JOIN   dbo.luDepartment ON luDepartment.Code = vStaff.StaffDepartment
             LEFT JOIN   dbo.vStaffJobPositions JobPositions ON vStaff.StaffID = JobPositions.StaffID
                         {$join}
             WHERE       vStaff.ActiveFlag = 1 AND
