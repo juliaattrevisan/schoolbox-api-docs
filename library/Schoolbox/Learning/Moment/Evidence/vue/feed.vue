@@ -305,6 +305,68 @@ export default {
         <div class="feed filter-container">
             <div class="feed-column left"></div>
             <section class="activity-feed">
+                <div class="profile-learning-actions">
+                    <div>
+                        <template v-if="config.routes.getCreateEvidenceForm">
+                            <a
+                                href="#"
+                                title="Share Learning"
+                                class="learning icon-share"
+                                data-reveal-id="shareLearningMoment"
+                                ><span>Share Learning</span></a
+                            >
+                        </template>
+                        <template v-if="config.routes.getSetAsGoalForm">
+                            <a
+                                :href="
+                                    config.routes.getSetAsGoalForm +
+                                    '?' +
+                                    config.returnUrl.name +
+                                    '=' +
+                                    config.returnUrl.current
+                                "
+                                title="Set goals"
+                                class="goals icon-goal"
+                                ><span>Set Goals</span></a
+                            >
+                        </template>
+                        <template v-if="config.routes.getSetAsGoalForSelfForm">
+                            <a
+                                :href="
+                                    config.routes.getSetAsGoalForSelfForm +
+                                    '?' +
+                                    config.returnUrl.name +
+                                    '=' +
+                                    config.returnUrl.current
+                                "
+                                title="Set goals"
+                                class="goals icon-goal"
+                                ><span>Set My Goals</span></a
+                            >
+                        </template>
+                        <template v-if="config.routes.getAwardAsAchievementForm">
+                            <a
+                                :href="
+                                    config.routes.getAwardAsAchievementForm +
+                                    '?' +
+                                    config.returnUrl.name +
+                                    '=' +
+                                    config.returnUrl.current
+                                "
+                                title="Award achievement"
+                                class="achievement icon-achievement"
+                                ><span>Award Achievement</span></a
+                            >
+                        </template>
+                    </div>
+                </div>
+            </section>
+            <div class="feed-column right"></div>
+        </div>
+
+        <div class="feed filter-container">
+            <div class="feed-column left"></div>
+            <section class="activity-feed">
                 <div id="activity-feed-filters">
                     Filter:
                     <label for="filter-assessments">
@@ -364,64 +426,10 @@ export default {
             </section>
             <div class="feed-column right"></div>
         </div>
+
         <div class="feed" v-for="(evidenceGroup, index) in groupedEvidence" :key="index">
             <div class="feed-column left"></div>
             <section class="activity-feed">
-                <div v-if="index === 0" class="profile-learning-actions">
-                    <div>
-                        <template v-if="config.routes.getCreateEvidenceForm">
-                            <a
-                                href="#"
-                                title="Share Learning"
-                                class="learning icon-share"
-                                data-reveal-id="shareLearningMoment"
-                                ><span>Share Learning</span></a
-                            >
-                        </template>
-                        <template v-if="config.routes.getSetAsGoalForm">
-                            <a
-                                :href="
-                                    config.routes.getSetAsGoalForm +
-                                    '?' +
-                                    config.returnUrl.name +
-                                    '=' +
-                                    config.returnUrl.current
-                                "
-                                title="Set goals"
-                                class="goals icon-goal"
-                                ><span>Set Goals</span></a
-                            >
-                        </template>
-                        <template v-if="config.routes.getSetAsGoalForSelfForm">
-                            <a
-                                :href="
-                                    config.routes.getSetAsGoalForSelfForm +
-                                    '?' +
-                                    config.returnUrl.name +
-                                    '=' +
-                                    config.returnUrl.current
-                                "
-                                title="Set goals"
-                                class="goals icon-goal"
-                                ><span>Set My Goals</span></a
-                            >
-                        </template>
-                        <template v-if="config.routes.getAwardAsAchievementForm">
-                            <a
-                                :href="
-                                    config.routes.getAwardAsAchievementForm +
-                                    '?' +
-                                    config.returnUrl.name +
-                                    '=' +
-                                    config.returnUrl.current
-                                "
-                                title="Award achievement"
-                                class="achievement icon-achievement"
-                                ><span>Award Achievement</span></a
-                            >
-                        </template>
-                    </div>
-                </div>
                 <h2 class="subheader no-margin">
                     <time
                         :datetime="formatDate(evidenceGroup.date, 'YYYY-MM-DD')"
