@@ -729,7 +729,8 @@ fi
 # Restore the DB
 echo -e "\nStarting restore of the database";
 ## Backup the current DB config separately
-if ! mysqldump --allow-keywords --default-character-set=utf8mb4 -i -e -q -a --skip-extended-insert -c -u "$sqluser" -p"$sqlpasswd" -h "$sqlhost" "$sqldb" config > /tmp/"$sqldb"-config-"$(date -I)".sql; then
+config_table_dump_file=/tmp/"$sqldb"-config-"$(date -I)".sql
+if ! mysqldump --allow-keywords --default-character-set=utf8mb4 -i -e -q -a --skip-extended-insert -c -u "$sqluser" -p"$sqlpasswd" -h "$sqlhost" "$sqldb" config > "$config_table_dump_file"; then
   echo "Unable to backup config table from current database" >&2
   exit 1
 fi
@@ -743,7 +744,7 @@ rm /etc/cron.d/sbc_schoolbox_$destination_instance_id
 ## Drop existing DB and reload just config table
 mysql -u $sqluser -p$sqlpasswd -h $sqlhost -e "SET MAX_STATEMENT_TIME=0; DROP DATABASE $sqldb;";
 mysql -u $sqluser -p$sqlpasswd -h $sqlhost -e "CREATE DATABASE $sqldb CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci';";
-mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb < /tmp/$sqldb-config-`date -I`.sql;
+mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb < "$config_table_dump_file";
 ## Unpack if gzipped
 gzipdb=`echo "$sourcedb" | grep '.gz' | wc -l`;
 if [ "$gzipdb" == "1" ];
