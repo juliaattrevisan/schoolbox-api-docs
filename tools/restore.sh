@@ -477,15 +477,7 @@ do
 		umount $backup_dir;
 	fi
 done
-/usr/share/schoolbox/tools/maintenance/site_down.sh
-## Removing maintenance page
-/usr/share/schoolbox/tools/maintenance/site_up.sh
 
-## Remove crons
-rm -v /etc/schoolbox/cron_config.ini
-
-## Rebuild crons
-/usr/local/bin/puppet agent -t
 # Provide a pretty list of backups to recover from
 if [ "$syncType" == "" ] || [ "$syncType" == "local" ]; then
   echo -e "\n\nPlease select a source to restore from:";
@@ -768,14 +760,12 @@ if ! (echo 'SET MAX_STATEMENT_TIME=0; '; cat "$sourcedb") | pv -s "$(du -b "$sou
   error "Unable to import database from backup file. Exiting."
 fi
 
-## Removing maintenance page
+## Remove maintenance page
 /usr/share/schoolbox/tools/maintenance/site_up.sh
 
 ## Remove crons
 rm -v /etc/schoolbox/cron_config.ini
 
-## Rebuild crons
-/usr/local/bin/puppet agent -t
 
 # Move data files to correct location if restoring from backup
 if [ "$sourceloc" = '[B]' ];
