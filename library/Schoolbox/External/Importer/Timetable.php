@@ -127,8 +127,7 @@ class Timetable extends AbstractImporter
             if (!isset($result[$key])) {
                 $class = (new ClassEntry())
                     ->setCode($key)
-                    ->setName(trim($row['Class Title'] ?? ''))
-                    ->setDescription(trim($row['Class Description'] ?? ''));
+                    ->setName(trim($row['Class Title'] ?? ''));
 
                 $result[$key] = [
                     'class'   => $class,

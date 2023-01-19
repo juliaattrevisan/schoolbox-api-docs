@@ -13,7 +13,6 @@ namespace Schoolbox\External;
 
 class ClassEntry
 {
-
     /**
      * @var int
      */
@@ -52,23 +51,6 @@ class ClassEntry
         return $this->code;
     }
 
-    /**
-     * @param  string $description
-     * @return $this
-     */
-    public function setDescription($description)
-    {
-        $this->description = $description;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDescription()
-    {
-        return $this->description;
-    }
 
     /**
      * @param  int $id
