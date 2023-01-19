@@ -31,7 +31,10 @@ type ActivityItem = {
         id: number;
         name: string;
     };
-    submittedOnTime?: string;
+    submitted?: boolean;
+    submittedOnTime?: boolean;
+    published?: boolean;
+
 };
 
 /**
