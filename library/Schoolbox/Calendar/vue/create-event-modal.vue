@@ -1,7 +1,7 @@
 <script>
 
 import RevealModal from '@schoolboxVue/components/reveal-modal'
-import axios from 'axios'
+import Toast from '@schoolboxVue/components/toast.vue'
 import debounce from 'lodash/debounce';
 import { ENDPOINTS } from '@schoolboxCalendarEvent/endpoints';
 
@@ -25,6 +25,7 @@ export default {
 
     components: {
         RevealModal,
+        Toast,
         vSelect
     },
 
@@ -148,39 +149,53 @@ export default {
          * Perform async request and load results into component
          */
         search: debounce(function(loading, query, vm) {
-            axios.get(ENDPOINTS.URL_SELECTIZE, {
-                params: {
-                    query: query,
-                    groupID: 0
-                }
-            })
-            .then(function(response) {
-                vm.options = response.data;
-                loading(false);
-            });
+            const queryParams = new URLSearchParams();
+            queryParams.append('query', query);
+            queryParams.append('groupID', 0);
+
+            fetch(`${ENDPOINTS.URL_SELECTIZE}?${queryParams.toString()}`)
+                .then(response => response.json())
+                .then(data => {
+                    vm.options = data;
+                    loading(false);
+                })
+                .catch(error => console.log(error))
         }, 350),
 
 
         /**
          * Post the event creation form.
-         * 
+         *
          * TODO consider whether this should be in the base FullCalendar component
-         * 
+         *
          * @param form The form that's being submitted
-         * 
+         *
          */
         async createNewEvent (form) {
             this.isProcessing = true;
-            this.$refs.modal.close();
+            const formContent = new FormData(form);
+            this.$refs.toast.activate('Saving...');
+
             try {
-                const response = await axios.request({
-                    url:          form.action,
-                    data:         $(form).serialize(),
-                    method:       form.method,
+                const response = await fetch(form.action, {
+                    method: form.method,
+                    body: formContent,
                     responseType: 'json',
+                    headers: {
+                        'Accept': 'application/json',
+                    }
                 });
-                this.$emit(EVENT_CREATED, response.data);
+                const responseData = await response.json();
+                if (response.ok) {
+                    this.$refs.modal.close();
+                    this.$emit(EVENT_CREATED, responseData);
+                    this.$refs.toast.timeout('Created', true, 2000);
+                } else {
+                    this.$refs.toast.timeout('Unable to create event / task. ' + responseData.message, false, 3000);
+                }
+
             } catch (error) {
+                this.$refs.toast.timeout('Unable to create event / task. ' + error.message, false, 3000);
                 console.warn(error);
             } finally {
                 this.isProcessing = false;
@@ -204,6 +219,7 @@ export default {
 </script>
 
 <template>
+    <toast ref="toast"></toast>
     <reveal-modal ref="modal">
         <!-- create a tab Vue component? Currently they just work magically -->
         <dl class="tabs" data-tab>
@@ -291,7 +307,7 @@ export default {
                         <label class="required" for="createTaskBubbleTitle">
                             Task
                         </label>
-                        <input id="createTaskBubbleTitle" name="title" type="text" v-model.trim="event.title" />
+                        <input id="createTaskBubbleTitle" name="title" maxlength="250" type="text" v-model.trim="event.title" />
 
                         <label>
                             Type

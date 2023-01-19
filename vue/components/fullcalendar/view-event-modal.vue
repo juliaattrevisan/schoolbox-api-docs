@@ -3,8 +3,6 @@
 import RevealModal        from '@schoolboxVue/components/reveal-modal'
 import MetaList           from '@schoolboxVue/components/meta/list'
 import MetaItem           from '@schoolboxVue/components/meta/item'
-import axios              from 'axios';
-import qs                 from 'qs';
 import fullCalendarHelper from '@schoolboxVue/components/fullcalendar/mixinFullCalendarHelper';
 
 /* Path aliases like @schoolboxCalendarEvent are defined in webpack.config.js
@@ -279,39 +277,37 @@ export default {
                 text: 'Updating invitation...'
             });
 
-            axios.request(request)
-                    .then(function (response) {
+            fetch(request)
+                .then(response => {
+                    if(response.ok){
+                        return response.json()
+                    } else {
+                        throw new Error(response.statusText);
+                    }
+                })
+                .then(data => {
+                    self.payload.currentUser.status = status;
+                    self.payload.attendees = data.attendees;
 
-                        /* Update data with the result from async request
-                            */
-                        self.payload.currentUser.status = status;
-                        self.payload.attendees = response.data.attendees;
-
-                        // Update event's status so its rendering updates
-                        if (typeof self?.event?.extendedProps?.data?.attendance?.status === 'object') {
-                            self.event.extendedProps.data.attendance.status.current = status;
-                            self.event.setExtendedProp('data', self.event.extendedProps.data);
-                        }
-
-                        toast.toastTimeout({
-                            text: 'Invitation successfully updated',
-                            css: 'success'
-                        });
-                    })
-                    .catch(error => {
-                        if (error.response) {
-                            toast.toastTimeout({
-                                text: 'Unable to update invitation. ' + error.response.data.message,
-                                css: 'alert'
-                            });
-                        }
-                    })
-                    .finally(function () {
-
-                        /* Reset flag
-                            */
-                        self.isTransacting = false;
+                    if (typeof self?.event?.extendedProps?.data?.attendance?.status === 'object') {
+                        self.event.extendedProps.data.attendance.status.current = status;
+                        self.event.setExtendedProp('data', self.event.extendedProps.data);
+                    }
+                    toast.toastTimeout({
+                        text: 'Invitation successfully updated',
+                        css: 'success'
                     });
+                })
+                .catch(error => {
+                    toast.toastTimeout({
+                        text: 'Unable to update invitation. ' + error.response.data.message,
+                        css: 'alert'
+                    });
+                })
+                .finally(function () {
+                    self.isTransacting = false;
+                });
+
         },
 
 
@@ -331,7 +327,7 @@ export default {
          *
          * TODO consider whether this should be in the base FullCalendar component
          */
-        updateEvent() {
+        async updateEvent() {
             let self = this,
                 form = self.$refs.updateForm,
                 data = {
@@ -340,27 +336,55 @@ export default {
                     title:     this.$refs.eventTitleInput.value.trim(),
                     detail:    this.$refs.eventDetailInput.value,
                 },
-                request = {
-                    url:          form.action,
-                    data:         qs.stringify(data),
-                    method:       form.method,
+                toast = this.jQuery('[data-toast]');
+
+            const formData = new FormData();
+            formData.append('eventId', data.eventId);
+            formData.append('completed', data.completed);
+            formData.append('title', data.title);
+            formData.append('detail', data.detail);
+
+            toast.toastActivate({
+                text: 'Saving...'
+            });
+
+            try {
+                const response = await fetch(form.action, {
+                    method: form.method,
+                    body: formData,
                     responseType: 'json',
-                };
-            axios
-                .request(request)
-                .then(function (response) {
-                    // Assign updated values into existing event
+                    headers: {
+                        'Accept': 'application/json',
+                    }
+                });
+                const responseData = await response.json();
+                if (response.ok) {
                     let eventData = Object.assign({}, self.event?.extendedProps?.data || {});
                     if (typeof eventData?.meta === 'object') {
-                        eventData.meta.completed = Boolean(response?.data?.data?.meta?.completed);
-                        eventData.meta.detail    = response?.data?.data?.meta?.detail;
+                        eventData.meta.completed = Boolean(responseData?.data?.meta?.completed);
+                        eventData.meta.detail = response?.data?.data?.meta?.detail;
                     }
                     self.event.setExtendedProp('data', eventData);
-                    self.event.setProp('title', response?.data?.title);
-                })
-                .finally(function () {
+                    self.event.setProp('title', responseData?.title);
                     self.$refs.modal.close();
+                    toast.toastTimeout({
+                        text: 'Saved.',
+                        css: 'success'
+                    });
+                } else {
+                    toast.toastTimeout({
+                        text: 'Unable to update task. ' + responseData.message,
+                        css: 'alert'
+                    });
+                }
+            } catch (error) {
+                console.warn(error);
+                toast.toastTimeout({
+                    text: 'Failed - ' + error.message,
+                    css: 'alert'
                 });
+                submit.prop('disabled', false);
+            }
         },
 
         /**
@@ -405,18 +429,24 @@ export default {
                 responseType: 'json'
             }
 
-            axios.request(request)
-                    .then(function (response) {
-                        self.payload = response.data;
-                    })
-                    .catch(function(error) {
-
-                        /* Attendance won't be available for some events such as those
-                            * streamed from a third party source, or a sis; looking for their
-                            * identifying hashes will result in 404 because they won't exist
-                            * in our local db
-                            */
-                    });
+            fetch(request)
+                .then(response => {
+                    if(response.ok){
+                        return response.json()
+                    } else {
+                        throw new Error(response.statusText);
+                    }
+                })
+                .then(data => {
+                    self.payload = data;
+                })
+                .catch(error => {
+                    /* Attendance won't be available for some events such as those
+                         * streamed from a third party source, or a sis; looking for their
+                         * identifying hashes will result in 404 because they won't exist
+                         * in our local db
+                         */
+                });
         },
 
         /**
@@ -570,10 +600,25 @@ export default {
                 action: 'Delete',
                 efficacy: efficacy,
             };
-            return axios
-                .post(this.eventExtendedProps.links.delete, qs.stringify(data))
+            fetch(this.eventExtendedProps.links.delete, {
+                method: 'POST',
+                body: JSON.stringify(data),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => {
+                    if(response.ok){
+                        return response;
+                    }else {
+                        throw new Error(response.statusText);
+                    }
+                })
                 .then(() => this.event.remove())
-                .then(() => this.$emit(EVENT_DELETED, this.event));
+                .then(() => this.$emit(EVENT_DELETED, this.event))
+                .catch(error => {
+                    console.error(error);
+                });
         },
 
         /**
@@ -588,11 +633,27 @@ export default {
             this.$refs.bookingDeleteModal.close();
             let data = {
                 efficacy: efficacy,
-            };
-            return axios
-                .post(this.eventExtendedProps.booking.actions.find(action => action.action === 'cancel').href, qs.stringify(data))
+            }, cancelActionUrl = this.eventExtendedProps.booking.actions.find(action => action.action === 'cancel').href;
+            fetch(cancelActionUrl, {
+                method: 'POST',
+                body: JSON.stringify(data),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => {
+                    if(response.ok){
+                        return response;
+                    }else {
+                        throw new Error(response.statusText);
+                    }
+                })
                 .then(() => this.event.remove())
-                .then(() => this.$emit(EVENT_DELETED, this.event));
+                .then(() => this.$emit(EVENT_DELETED, this.event))
+                .catch(error => {
+                    console.error(error);
+                });
+
         },
 
         /**
@@ -607,11 +668,27 @@ export default {
             this.$refs.bookingApproveSeriesModal.close();
             let data = {
                 efficacy: efficacy,
-            };
-            return axios
-                .post(this.eventExtendedProps.booking.actions.find(action => action.action === 'approve').href, qs.stringify(data))
+            }, approveActionUrl = this.eventExtendedProps.booking.actions.find(action => action.action === 'approve').href;
+            fetch(approveActionUrl, {
+                method: 'POST',
+                body: JSON.stringify(data),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => {
+                    if(response.ok){
+                        return response;
+                    }else {
+                        throw new Error(response.statusText);
+                    }
+                })
                 .then(() => this.event.remove())
-                .then(() => this.$emit(EVENT_MODIFIED, this.event));
+                .then(() => this.$emit(EVENT_MODIFIED, this.event))
+                .catch(error => {
+                    console.error(error);
+                });
+
         },
 
         /**
@@ -626,11 +703,27 @@ export default {
             this.$refs.bookingRejectSeriesModal.close();
             let data = {
                 efficacy: efficacy,
-            };
-            return axios
-                .post(this.eventExtendedProps.booking.actions.find(action => action.action === 'reject').href, qs.stringify(data))
+            }, rejectActionUrl = this.eventExtendedProps.booking.actions.find(action => action.action === 'reject').href;
+            fetch(rejectActionUrl, {
+                method: 'POST',
+                body: JSON.stringify(data),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => {
+                    if(response.ok){
+                        return response;
+                    }else {
+                        throw new Error(response.statusText);
+                    }
+                })
                 .then(() => this.event.remove())
-                .then(() => this.$emit(EVENT_MODIFIED, this.event));
+                .then(() => this.$emit(EVENT_MODIFIED, this.event))
+                .catch(error => {
+                    console.error(error);
+                });
+
         },
     },
 }
@@ -675,6 +768,7 @@ export default {
                        :value="event.title"
                        @change="updateFormSubmittable"
                        @keyup="updateFormSubmittable"
+                       maxlength="250"
                 />
 
                 <label class="detail">

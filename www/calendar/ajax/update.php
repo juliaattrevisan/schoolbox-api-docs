@@ -82,6 +82,12 @@ if ($updatedEvent['allday']) {
 if (isset($_POST['title']) && isset($_POST['detail'])) {
     /* For tasks
      */
+
+    //trust no one, char length should match the front end validation
+    if (mb_strlen($_POST['title'] ?? '', 'UTF-8') > 250) {
+        throw new Schoolbox\Application\Exception\Exception("Title must not be longer than 250 characters");
+    }
+
     $updatedEvent['title']     = $_POST['title'];
     $updatedEvent['detail']    = $_POST['detail'];
     $updatedEvent['completed'] = $_POST['completed'];

@@ -38,6 +38,11 @@ if (is_numeric($_POST['type'])) {
     $type = EventTypeMapper::getInstance()->findAll()->first();
 }
 
+//trust no one, char length should match the front end validation
+if (mb_strlen($_POST['title'] ?? '', 'UTF-8') > 250) {
+    throw new Schoolbox\Application\Exception\Exception("Title must not be longer than 250 characters");
+}
+
 /* Persist event attendances
  * If event has zero guests, or if guests weren't specified at all, just provide empty array
  * If you can't add attendees because you're a student and the config var is off, just provide empty array
