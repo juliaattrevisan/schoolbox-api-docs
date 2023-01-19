@@ -273,7 +273,6 @@ export default {
 
             this.selectedTag = tag; // Remember selected tag for later.
 
-            $("div.feed:not(*.filter-container)").remove(); // Clear feed except filter checkboxes.
             this.load();
         },
 
