@@ -260,10 +260,12 @@ export default {
         },
 
         /**
-         * @param { ?String } clickedFeedItemType
+         * Apply to the activity feed, filters as read from the current state of the DOM.
+         * Since the selectedTag is not stored in the DOM, that is passed as a parameter.
+         *
          * @param { ?String } tag
          */
-        applyFilters(clickedFeedItemType, tag) {
+        applyFilters(tag) {
             let $checkboxes = $("[data-filter-checkbox]");
 
             // If no checkboxes are checked, check all.
@@ -378,7 +380,7 @@ export default {
                             id="filter-assessments"
                             checked="checked"
                             name="includeAssessments"
-                            @click="applyFilters('assessments', null)"
+                            @click="applyFilters(null)"
                         />
                         Assessments
                     </label>
@@ -391,7 +393,7 @@ export default {
                             id="filter-achievements"
                             checked="checked"
                             name="includeAchievements"
-                            @click="applyFilters('achievements', null)"
+                            @click="applyFilters(null)"
                         />
                         Achievements
                     </label>
@@ -404,7 +406,7 @@ export default {
                             id="filter-goals"
                             checked="checked"
                             name="includeGoals"
-                            @click="applyFilters('goals', null)"
+                            @click="applyFilters(null)"
                         />
                         Goals
                     </label>
@@ -417,7 +419,7 @@ export default {
                             id="filter-learning-moments"
                             checked="checked"
                             name="includeLearningMoments"
-                            @click="applyFilters('learning-moments', null)"
+                            @click="applyFilters(null)"
                         />
                         Learning Moments
                     </label>
@@ -540,7 +542,7 @@ export default {
                                             <template v-if="index !== 0">, </template>
                                             <span
                                                 class="anchor-style"
-                                                @click="applyFilters(null, tag.name)"
+                                                @click="applyFilters(tag.name)"
                                                 title="Click to only show items with this tag."
                                                 >{{ tag.name }}</span
                                             >
