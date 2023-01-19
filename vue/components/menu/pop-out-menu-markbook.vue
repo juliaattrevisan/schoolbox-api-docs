@@ -59,6 +59,7 @@ const isSelected = ref(false);
 const hasLoadError = ref(false);
 const showPopOut = computed(() => isSelected.value );
 const isExpanded = ref(false); // is recent activity expanded
+const hasSubmissions = ref(false); // has an event of type 'response' and response.submitted === true;
 const activityItems: Ref<ActivityItem[]> = ref([]); // list of recent activity items to display
 const isActivityEmpty = computed(() => activityItems.value.length === 0);
 const isExpansionDisabled = computed(() => activityItems.value.length === 1);
@@ -145,6 +146,20 @@ async function getActivity() {
             const activityItemsResponse = (await response.json()) as ActivityItem[];
             activityItems.value = activityItemsResponse;
             hasLoadError.value = false;
+
+            /**
+             * Check if we have any submissions. If we don't, disable the 'review submission' item.
+             * I tried making hasSubmissions a computed value but it had issues with calling .some
+             * on it the first time it ran.
+             */
+            if(activityItemsResponse.some(item => item.type === 'response' && item.submitted)){
+                hasSubmissions.value = true;
+            }
+            else{
+                hasSubmissions.value = false;
+            }
+
+
         } else {
             hasLoadError.value = true;
         }
@@ -310,7 +325,7 @@ function onMenuItemSelected(target: string) {
                     Update feedback
                 </pop-out-menu-item>
                 <pop-out-menu-item
-                    :class="{ 'is-disabled': !routes.reviewRoute || isActivityEmpty }"
+                    :class="{ 'is-disabled': !routes.reviewRoute || isActivityEmpty || !hasSubmissions }"
                     @selected="onMenuItemSelected(routes.reviewRoute)"
                 >
                     Review submission
