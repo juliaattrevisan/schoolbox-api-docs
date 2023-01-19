@@ -21,7 +21,6 @@ use Schoolbox;
  */
 class ClassEntryMapper extends Schoolbox\Mapper
 {
-
     /**
      * {@inheritdoc}
      */
@@ -43,11 +42,6 @@ class ClassEntryMapper extends Schoolbox\Mapper
         $this->hasMap(array(
             'column'   => 'code',
             'property' => 'code',
-            'type'     => self::TYPE_STRING,
-        ));
-        $this->hasMap(array(
-            'column'   => 'description',
-            'property' => 'description',
             'type'     => self::TYPE_STRING,
         ));
     }

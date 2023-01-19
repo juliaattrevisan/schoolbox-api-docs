@@ -23,7 +23,6 @@ use Schoolbox\External\Importer\Endpoint\IStrategy;
  */
 class Classes implements IStrategy
 {
-
     /**
      * Prevent infinite loop of api calls
      */

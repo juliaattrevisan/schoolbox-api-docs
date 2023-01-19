@@ -33,7 +33,6 @@ use UnexpectedValueException;
  */
 class Classes implements IStrategy
 {
-
     /**
      * @var LoggerInterface
      */
@@ -273,8 +272,7 @@ class Classes implements IStrategy
             /** @var ClassEntry $timetableClass */
             $timetableClass = $this->classEntryMapper->createModel()
                 ->setCode($subject['class']['code'])
-                ->setName($subject['class']['name'])
-                ->setDescription($subject['class']['name']);
+                ->setName($subject['class']['name']);
 
             $this->log->info(sprintf(
                 'Creating new class %s %s',
