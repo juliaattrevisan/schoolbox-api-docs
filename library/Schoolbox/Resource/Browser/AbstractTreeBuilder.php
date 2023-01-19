@@ -25,7 +25,6 @@ use Alaress\Color\Color;
  */
 abstract class AbstractTreeBuilder
 {
-
     /**
      * @var Folder\ILocator
      */
@@ -279,6 +278,7 @@ abstract class AbstractTreeBuilder
         return [
             'data-permission' => $permission,
             'data-type' => $dataType,
+            'title' => $this->getFolderName($folder),
         ];
     }
 

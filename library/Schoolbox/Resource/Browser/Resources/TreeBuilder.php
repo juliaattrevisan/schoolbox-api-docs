@@ -192,7 +192,8 @@ class TreeBuilder extends AbstractTreeBuilder
                 $file->getTitle(),
                 [
                     'data-permission' => $permission,
-                    'data-type' => 'file'
+                    'data-type' => 'file',
+                    'title' => $file->getTitle()
                 ],
                 [
                     'href' => $this->getFileHref($file),
@@ -209,7 +210,8 @@ class TreeBuilder extends AbstractTreeBuilder
                 [
                     'data-id' => $file->getId(),
                     'data-permission' => $permission,
-                    'data-type' => 'link'
+                    'data-type' => 'link',
+                    'title' => $file->getDescription(),
                 ],
                 [
                     'href' => $file->getHref(),
