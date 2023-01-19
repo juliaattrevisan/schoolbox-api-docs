@@ -292,6 +292,13 @@ export default {
          * @param saveFilterState {boolean}
          */
         refreshFeedAndSaveFiltersState(saveFilterState) {
+            let $checkboxes = $('[data-filter-checkbox]');
+
+            // If all checkboxes are unchecked, check them all.
+            if ($checkboxes.filter(':checked').length === 0) {
+                $checkboxes.prop('checked', true);
+            }
+
             if (saveFilterState) {
                 let filtersData = this.getFiltersData();
                 let oldUrl = window.location.href;
