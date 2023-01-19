@@ -236,27 +236,29 @@
                         // On open of this modal:
                         // * point the iframe to the place which sends messages
                         // * listen for messages
-                        // On close:
-                        // * point the iframe nowhere
-                        // * stop listening (so that message listeners for other things work)
-                        // * set the tool ID's selected value back to the empty one
-                        $toolModal.on('open.fndtn.reveal', function () {
-                            $toolModalIframe.attr('src', toolSelectorUrl);
-                            window.addEventListener('message', messageHandler);
-                        });
-                        $toolModal.on('close.fndtn.reveal', function () {
-                            $toolModalIframe.removeAttr('src');
-                            window.removeEventListener('message', messageHandler);
-                            if (!$('#lti-assessment-url').val()) {
-                                $toolIdSelector.val('');
-                            }
-                        });
                         $toolModal.foundation('reveal', 'open');
+                        $toolModalIframe.attr('src', toolSelectorUrl);
+                        window.addEventListener('message', messageHandler);
                     } else if (launchUrl) {
                         // No tool selector URL? Use the launch URL directly,
                         // whatever use that might be
                         useResourceLink(launchUrl, $selection.text(), '', null, null, null);
                     }
+                });
+
+                // On close of this modal:
+                // * set the tool ID's selected value back to the empty one
+                $toolModal.on('close.fndtn.reveal', function () {
+                    if (!$('#lti-assessment-url').val()) {
+                        $toolIdSelector.val('');
+                    }
+                });
+                // After the modal is closed:
+                // * point the iframe nowhere
+                // * stop listening (so that message listeners for other things work)
+                $toolModal.on('closed.fndtn.reveal', function () {
+                    $toolModalIframe.removeAttr('src');
+                    window.removeEventListener('message', messageHandler);
                 });
             });
         </script>

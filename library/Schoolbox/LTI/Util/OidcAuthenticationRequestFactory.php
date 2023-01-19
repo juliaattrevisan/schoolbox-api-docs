@@ -12,6 +12,7 @@ namespace Schoolbox\LTI\Util;
 use Aura\Web\Request;
 use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
+use OAT\Library\Lti1p3Core\Message\Payload\Builder\MessagePayloadBuilder;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Oidc\OidcAuthenticator;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
@@ -54,7 +55,22 @@ class OidcAuthenticationRequestFactory
      */
     public function build(Request $request): LtiMessageInterface
     {
-        return (new OidcAuthenticator($this->registrationRepository, $this->userAuthenticator))
-            ->authenticate((new ServerRequestFactory())->build($request));
+        // Nonce may be in either $_GET or $_POST
+        // If it's not there: use the default nonce generator, I guess
+        if ($request->method->isGet()) {
+            $nonce = $request->query->get('nonce');
+        } elseif ($request->method->isPost()) {
+            $nonce = $request->post->get('nonce');
+        } else {
+            $nonce = null;
+        }
+
+        return (new OidcAuthenticator(
+            $this->registrationRepository,
+            $this->userAuthenticator,
+            new MessagePayloadBuilder(
+                isset($nonce) ? new NoncePassthrough((string)$nonce) : null,
+            ),
+        ))->authenticate((new ServerRequestFactory())->build($request));
     }
 }

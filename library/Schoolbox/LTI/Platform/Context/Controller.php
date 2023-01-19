@@ -366,15 +366,15 @@ class Controller extends BaseController
         ToolModel $tool,
         Component_ControllerAbstract $component
     ): LaunchPresentationClaim {
+        $baseUrl = (new Factory($this->getConfigLoader()))->buildFullyQualified();
         return new LaunchPresentationClaim(
             $tool->getTarget(),
             $component->getConfig(LtiComponent::COMPONENT_CONFIG_HEIGHT),
             null,
-            sprintf(
-                '/homepage/%d#component%d',
-                $component->getInstance()->getIdentifier(),
-                $component->getInstance()->getId(),
-            ),
+            $baseUrl
+                ->setPath(sprintf('/homepage/%d', $component->getInstance()->getIdentifier()))
+                ->setFragment(sprintf('component%d', $component->getInstance()->getId()))
+                ->toString(),
         );
     }
 }
