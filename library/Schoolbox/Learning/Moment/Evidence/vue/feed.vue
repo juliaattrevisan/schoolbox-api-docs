@@ -46,7 +46,8 @@ export default {
             showSkeletonLoader: true,
             currentlyDeletingEvidence: null,
             selectedNode: getEmptyNode(), // The selected curriculum code to display further details for.
-            selectedTag: null, // The tag clicked by the user in order to filter to items having that tag.
+            selectedTag: "", // The tag clicked by the user in order to filter to items having that tag.
+            feedItemTypes: ["assessments", "achievements", "goals", "learning-moments"],
         };
     },
     computed: {
@@ -65,6 +66,28 @@ export default {
     },
     mounted() {
         document.addEventListener(userProfileConstants.events.AWARDS_UPDATED, () => this.load());
+
+        window.onpopstate = (event) => {
+            // NOTE: event.state will be null unless the state has been saved using history.pushState().
+            if (event.state !== null) {
+                // Restore state of selectedTag.
+                this.selectedTag = event.state.tag;
+
+                // Restore state of filter checkboxes.
+                for (const feedItemType of this.feedItemTypes) {
+                    $("#filter-" + feedItemType).prop("checked", event.state.feedItemTypes.includes(feedItemType));
+                }
+
+                this.refreshFeedAndSaveFiltersState(false); // Do not save the state that we've just restored.
+            } else {
+                // Return the filters to their default state.
+                this.selectedTag = "";
+                $("[data-filter-checkbox]").prop("checked", true);
+            }
+
+            this.load();
+        };
+
         this.load();
     },
     methods: {
@@ -260,38 +283,44 @@ export default {
         },
 
         /**
-         * Apply to the activity feed, filters as read from the current state of the DOM.
-         * Since the selected tag is not stored in the DOM, that is read from this.selectedTag.
+         * Update the feed to match the current state of the filters, and optionally push the current state of the
+         * filters to the browser history.
+         *
+         * The purpose of saving the state of the filters to the browser history is to enable use of the back button to
+         * visit previous filter states, and to enable sharing of the URL for the page in a particular filter state.
+         *
+         * @param saveFilterState {boolean}
          */
-        applyFilters() {
-            let $checkboxes = $("[data-filter-checkbox]");
+        refreshFeedAndSaveFiltersState(saveFilterState) {
+            if (saveFilterState) {
+                let filtersData = this.getFiltersData();
+                let oldUrl = window.location.href;
+                let questionMarkPos = oldUrl.indexOf("?");
+                let oldUrlMinusUrlParams = questionMarkPos === -1 ? oldUrl : oldUrl.substring(0, questionMarkPos);
+                let newUrl = oldUrlMinusUrlParams + "?tag=" + filtersData.tag;
 
-            // If no checkboxes are checked, check all.
-            if ($checkboxes.filter(":checked").length == 0) {
-                $checkboxes.prop("checked", true);
+                for (let feedItemType of filtersData.feedItemTypes) {
+                    newUrl += "&feedItemTypes[]=" + feedItemType;
+                }
+
+                history.pushState(filtersData, "", newUrl);
             }
 
-            this.load();
+            this.load(); // Refresh the feed.
         },
 
         getFiltersData() {
-            let feedItemTypes = ["assessments", "achievements", "goals", "learning-moments"];
             let checkedFeedItemTypes = [];
 
-            for (const feedItemType of feedItemTypes) {
+            for (const feedItemType of this.feedItemTypes) {
                 if ($("#filter-" + feedItemType).prop("checked")) {
                     checkedFeedItemTypes.push(feedItemType);
                 }
             }
 
-            if (checkedFeedItemTypes.length === 0) {
-                // If no filters are selected, behave as if all filters are selected.
-                checkedFeedItemTypes = feedItemTypes;
-            }
+            $("#filters-description").html(this.selectedTag === "" ? "" : 'Showing tag "' + this.selectedTag + '"');
 
-            $("#filters-description").html(this.selectedTag === null ? "" : 'Showing tag "' + this.selectedTag + '"');
-
-            return { feedItemTypes: checkedFeedItemTypes, tag: this.selectedTag === null ? "" : this.selectedTag };
+            return { feedItemTypes: checkedFeedItemTypes, tag: this.selectedTag };
         },
     },
 };
@@ -367,7 +396,6 @@ export default {
                 <div id="activity-feed-filters">
                     Filter:
                     <label for="filter-assessments">
-                        <<<<<<< HEAD
                         <input
                             type="checkbox"
                             class="plain"
@@ -376,7 +404,7 @@ export default {
                             id="filter-assessments"
                             checked="checked"
                             name="includeAssessments"
-                            @click="load()"
+                            @click="refreshFeedAndSaveFiltersState(true)"
                         />
                         Assessments
                     </label>
@@ -389,7 +417,7 @@ export default {
                             id="filter-achievements"
                             checked="checked"
                             name="includeAchievements"
-                            @click="load()"
+                            @click="refreshFeedAndSaveFiltersState(true)"
                         />
                         Achievements
                     </label>
@@ -402,7 +430,7 @@ export default {
                             id="filter-goals"
                             checked="checked"
                             name="includeGoals"
-                            @click="load()"
+                            @click="refreshFeedAndSaveFiltersState(true)"
                         />
                         Goals
                     </label>
@@ -415,59 +443,9 @@ export default {
                             id="filter-learning-moments"
                             checked="checked"
                             name="includeLearningMoments"
-                            @click="load()"
+                            @click="refreshFeedAndSaveFiltersState(true)"
                         />
-                        =======
-                        <input
-                            type="checkbox"
-                            class="plain"
-                            data-filter-checkbox
-                            data-assessments
-                            id="filter-assessments"
-                            checked="checked"
-                            name="includeAssessments"
-                            @click="applyFilters()"
-                        />
-                        Assessments
-                    </label>
-                    <label for="filter-achievements">
-                        <input
-                            type="checkbox"
-                            class="plain"
-                            data-filter-checkbox
-                            data-achievements
-                            id="filter-achievements"
-                            checked="checked"
-                            name="includeAchievements"
-                            @click="applyFilters()"
-                        />
-                        Achievements
-                    </label>
-                    <label for="filter-goals">
-                        <input
-                            type="checkbox"
-                            class="plain"
-                            data-filter-checkbox
-                            data-goals
-                            id="filter-goals"
-                            checked="checked"
-                            name="includeGoals"
-                            @click="applyFilters()"
-                        />
-                        Goals
-                    </label>
-                    <label for="filter-learning-moments">
-                        <input
-                            type="checkbox"
-                            class="plain"
-                            data-filter-checkbox
-                            data-learning-moments
-                            id="filter-learning-moments"
-                            checked="checked"
-                            name="includeLearningMoments"
-                            @click="applyFilters()"
-                        />
-                        >>>>>>> d5a2c9947a2... Revert "Remove uneccessary function [SA-14750]" Learning Moments
+                        Learning Moments
                     </label>
                     <div id="filters-description"></div>
                 </div>
@@ -586,27 +564,15 @@ export default {
                                             :key="`${index}-${tag.name}`"
                                         >
                                             <template v-if="index !== 0">, </template>
-                                            <<<<<<< HEAD
                                             <span
                                                 class="anchor-style"
                                                 @click="
                                                     this.selectedTag = tag.name;
-                                                    load();
+                                                    refreshFeedAndSaveFiltersState(true);
                                                 "
                                                 title="Click to only show items with this tag."
                                                 >{{ tag.name }}</span
                                             >
-                                            =======
-                                            <span
-                                                class="anchor-style"
-                                                @click="
-                                                    this.selectedTag = tag.name;
-                                                    applyFilters();
-                                                "
-                                                title="Click to only show items with this tag."
-                                                >{{ tag.name }}</span
-                                            >
-                                            >>>>>>> d5a2c9947a2... Revert "Remove uneccessary function [SA-14750]"
                                         </template>
                                     </p>
                                 </div>
