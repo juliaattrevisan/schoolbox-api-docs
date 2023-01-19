@@ -544,12 +544,11 @@ else
   error;
 fi
 
-# Details of restore source
+# Details of restore source. Variables will have different semantics depending on source location.
 sourceloc=`echo $restore | cut -d',' -f1`;
 sourcetype=`echo $restore | cut -d',' -f2`;
 sourcep1=`echo $restore | cut -d',' -f3`;
 sourcep2=`echo $restore | cut -d',' -f4`;
-sourcep3=`echo $restore | cut -d',' -f5`;
 
 
 # Check if a full restore can be done
@@ -559,7 +558,7 @@ if [ "$sourcetype" == '[A]' ] && [ "$sourceloc" == '[R]' ]; then
   local_mount_dir=$(mount | grep "$local_mount" | awk -F " " '{print $3}');
   local_non_sb_used=$(du -sh "$local_mount_dir" --exclude "$thisdatadir" -B1 | cut -f 1);
   localAvailableStorage=$((local_mount_total - local_non_sb_used));
-  remote_mount=$(ssh "$host" findmnt -n -o SOURCE --target "$sourcep3");
+  remote_mount=$(ssh "$host" findmnt -n -o SOURCE --target "$sourcep2");
   remote_mount_used=$(ssh "$host" df -B1 | grep "$remote_mount" | awk -F " " '{print $3}');
   remote_data_dir=${tempfiledir%/*};
   remote_real_data_dir=$(ssh "$host" realpath "$remote_data_dir");
@@ -631,16 +630,16 @@ then
 	if [ "$sourceloc" = '[R]' ];
 	then
 		# Remote Source, transfer the db file locally.
-		gzipdb=`echo "$sourcep3" | grep '.gz' | wc -l`;
+		gzipdb=`echo "$sourcep2" | grep '.gz' | wc -l`;
 		if [ "$gzipdb" == "1" ];
 		then
-			sourcedata=${sourcep3%/*}'/../../../';
+			sourcedata=${sourcep2%/*}'/../../../';
 		else
-			sourcedata=${sourcep3%/*};
+			sourcedata=${sourcep2%/*};
 		fi
-		sourcesqlfilename=${sourcep3##*/};
+		sourcesqlfilename=${sourcep2##*/};
 		echo -e "\nTransferring database backup";
-		if ! scp $sourcep1:$sourcep3 /tmp; then
+		if ! scp $sourcep1:$sourcep2 /tmp; then
 			errmsg="Unable to transfer database backup successfully";
 			error;
 		fi
@@ -686,9 +685,9 @@ else
 	if [ "$sourceloc" = '[R]' ];
 	then
 		# Remote Source, transfer the db file locally.
-		sourcesqlfilename=${sourcep3##*/};
+		sourcesqlfilename=${sourcep2##*/};
 		echo -e "\nTransferring database backup";
-		if ! scp $sourcep1:$sourcep3 /tmp; then
+		if ! scp $sourcep1:$sourcep2 /tmp; then
 			errmsg="Unable to transfer database backup successfully";
 			error;
 		fi
