@@ -25,7 +25,6 @@ use Alaress\Color\Color;
  */
 abstract class AbstractTreeBuilder
 {
-
     /**
      * @var Folder\ILocator
      */
