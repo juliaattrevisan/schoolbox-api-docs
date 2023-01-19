@@ -640,9 +640,7 @@ then
 		fi
 		sourcesqlfilename=${sourcep3##*/};
 		echo -e "\nTransferring database backup";
-		scp $sourcep1:$sourcep3 /tmp >/dev/null 2>&1;
-		if [ $? -ne 0 ];
-		then
+		if ! scp $sourcep1:$sourcep3 /tmp; then
 			errmsg="Unable to transfer database backup successfully";
 			error;
 		fi
@@ -690,9 +688,7 @@ else
 		# Remote Source, transfer the db file locally.
 		sourcesqlfilename=${sourcep3##*/};
 		echo -e "\nTransferring database backup";
-		scp $sourcep1:$sourcep3 /tmp >/dev/null 2>&1;
-		if [ $? -ne 0 ];
-		then
+		if ! scp $sourcep1:$sourcep3 /tmp; then
 			errmsg="Unable to transfer database backup successfully";
 			error;
 		fi
