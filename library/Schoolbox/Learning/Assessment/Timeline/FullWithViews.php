@@ -60,12 +60,12 @@ class FullWithViews
         $timeline = (new Full($this->participant))->getForTeacher();
 
         foreach ($timeline as $interaction) {
+            $date = [
+                'datetime' => $interaction->getUpdatedAt()->getDatabase(),
+                'short' => $interaction->getUpdatedAt()->getShort(),
+                'relative' => $interaction->getUpdatedAt()->getRelativeTime(),
+            ];
             if ($interaction instanceof AbstractFeedback) {
-                $date = [
-                    'datetime' => $interaction->getUpdatedAt()->getDatabase(),
-                    'short' => $interaction->getUpdatedAt()->getShort(),
-                    'relative' => $interaction->getUpdatedAt()->getRelativeTime(),
-                ];
                 if ($interaction->isPublished()) {
                     $date = [
                         'datetime' => $interaction->getPublishedAt()->getDatabase(),
@@ -83,18 +83,22 @@ class FullWithViews
                     'date' => $date
                 ];
             } elseif ($interaction instanceof AbstractResponse) {
+                if ($interaction->isSubmitted()) {
+                    $date = [
+                        'datetime' => $interaction->getSubmittedAt()->getDatabase(),
+                        'short' => $interaction->getSubmittedAt()->getShort(),
+                        'relative' => $interaction->getSubmittedAt()->getRelativeTime(),
+                    ];
+                }
                 $stack[] = [
                     'type' => self::INTERACTION_RESPONSE,
                     'effector' => [
                         'id' => $interaction->getSubmittedOnBehalfOf()->getId(),
                         'name' => $interaction->getSubmittedOnBehalfOf()->getFullname()
                     ],
+                    'submitted' => $interaction->isSubmitted(),
                     'submittedOnTime' => $interaction->isSubmittedOnTime(),
-                    'date' => [
-                        'datetime' => $interaction->getSubmittedAt()->getDatabase(),
-                        'short' => $interaction->getSubmittedAt()->getShort(),
-                        'relative' => $interaction->getSubmittedAt()->getRelativeTime(),
-                    ]
+                    'date' => $date
                 ];
             }
         }
