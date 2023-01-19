@@ -1,0 +1,32 @@
+/**
+ * Custom styles for our CKEditor5 implementation
+ */
+
+.ck.ck-content span.highlighted-note {
+    background-color: #ffffb5;
+    display: block;
+    padding: 0.75rem;
+}
+
+/**
+ * So the editor UI matches the styles that will actually be used,
+ * otherwise the default editor styles are different weight and size
+ * than what is actually applied
+ */
+.ck.ck-button.ck-heading_heading2,
+.ck.ck-button.ck-heading_heading3,
+.ck.ck-button.ck-heading_heading4 {
+    font-weight: normal;
+}
+
+.ck.ck-button.ck-heading_heading2 {
+    font-size: 1.125rem;
+}
+
+.ck.ck-button.ck-heading_heading3 {
+    font-size: 1.0625rem;
+}
+
+.ck.ck-button.ck-heading_heading4 {
+    font-size: 1rem;
+}
