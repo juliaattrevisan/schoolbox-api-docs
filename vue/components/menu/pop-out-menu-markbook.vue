@@ -60,6 +60,7 @@ const hasLoadError = ref(false);
 const showPopOut = computed(() => isSelected.value );
 const isExpanded = ref(false); // is recent activity expanded
 const hasSubmissions = ref(false); // has an event of type 'response' and response.submitted === true;
+const hasFeedback = ref(false); // has an event of type 'feedback'
 const activityItems: Ref<ActivityItem[]> = ref([]); // list of recent activity items to display
 const isActivityEmpty = computed(() => activityItems.value.length === 0);
 const isExpansionDisabled = computed(() => activityItems.value.length === 1);
@@ -150,9 +151,10 @@ async function getActivity() {
             /**
              * Check if we have any submissions. If we don't, disable the 'review submission' item.
              * I tried making hasSubmissions a computed value but it had issues with calling .some
-             * on it the first time it ran.
+             * on it the first time it ran. Same thing with hasFeedback.
              */
             hasSubmissions.value = activityItemsResponse.some(item => item.type === 'response' && item.submitted);
+            hasFeedback.value = activityItemsResponse.some(item => item.type === 'feedback');
 
         } else {
             hasLoadError.value = true;
@@ -325,7 +327,7 @@ function onMenuItemSelected(target: string) {
                     Review submission
                 </pop-out-menu-item>
                 <pop-out-menu-item
-                    :class="{ 'is-disabled': !routes.publishRoute || isActivityEmpty }"
+                    :class="{ 'is-disabled': !routes.publishRoute || isActivityEmpty || !hasFeedback }"
                     @selected="onMenuItemSelected(routes.publishRoute)"
                 >
                     Publish feedback
