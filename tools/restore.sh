@@ -763,6 +763,12 @@ fi
 /usr/share/schoolbox/tools/maintenance/site_up.sh
 
 
+# Recompress if restoring from local backup that was originally compressed
+if [[ "$gzipdb" == "1" ]] && [[ "$sourceloc" = '[L]' ]]; then
+  echo "Recompressing local database backup file..."
+  gzip $sourcedb
+fi
+
 # Move data files to correct location if restoring from backup
 if [ "$sourceloc" = '[B]' ];
 then
