@@ -263,8 +263,7 @@ export default {
             let feedItemTypes = ["assessments", "achievements", "goals", "learning-moments"];
             let checkedFeedItemTypes = [];
 
-            for (let i = 0; i < feedItemTypes.length; ++i) {
-                let feedItemType = feedItemTypes[i];
+            for (const feedItemType of feedItemTypes) {
                 if ($("#filter-" + feedItemType).prop("checked")) {
                     checkedFeedItemTypes.push(feedItemType);
                 }
