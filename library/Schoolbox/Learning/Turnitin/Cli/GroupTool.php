@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Turnitin\Cli;
 
+use GuzzleHttp\Exception\GuzzleException;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Turnitin;
 use Schoolbox\Assessment\Component\SubmissionBox;
@@ -243,7 +244,13 @@ HELP;
 
             $lock->refresh();
 
-            $processor->process($model);
+            try {
+                $processor->process($model);
+            } catch (GuzzleException | \Exception $e) {
+                // send to sentry, but continue to process
+                $this->getLogger()->error(sprintf("Failed to process %s: %s", $model->getId(), $e->getMessage()));
+                $this->captureException($e);
+            }
         }
 
         $this->getLogger()->info('Done.');
