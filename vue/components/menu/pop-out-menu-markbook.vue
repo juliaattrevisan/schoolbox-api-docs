@@ -152,13 +152,7 @@ async function getActivity() {
              * I tried making hasSubmissions a computed value but it had issues with calling .some
              * on it the first time it ran.
              */
-            if(activityItemsResponse.some(item => item.type === 'response' && item.submitted)){
-                hasSubmissions.value = true;
-            }
-            else{
-                hasSubmissions.value = false;
-            }
-
+            hasSubmissions.value = activityItemsResponse.some(item => item.type === 'response' && item.submitted);
 
         } else {
             hasLoadError.value = true;
