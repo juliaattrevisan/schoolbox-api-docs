@@ -69,6 +69,14 @@ class CachingConnectorAbstract
         } elseif (is_numeric($timeout)) {
             // Ensure the string is an int
             $this->timeout = (int)$timeout;
+
+            /* Negative values forcibly interpreted as equivalent to 0
+             * which turns off the caching. Can't validate the ui in config
+             * area without loads of extra frontend work atm
+             */
+            if ($this->timeout < 0) {
+                $this->timeout = 0;
+            }
         } else {
             // Reject anything else
             throw new InvalidArgumentException("Timeout must be NULL or an integer string");
