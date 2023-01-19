@@ -66,27 +66,12 @@ export default {
     },
     mounted() {
         document.addEventListener(userProfileConstants.events.AWARDS_UPDATED, () => this.load());
-
         window.onpopstate = (event) => {
             // NOTE: event.state will be null unless the state has been saved using history.pushState().
-            if (event.state !== null) {
-                // Restore state of selectedTag.
-                this.selectedTag = event.state.tag;
-
-                // Restore state of filter checkboxes.
-                for (const feedItemType of this.feedItemTypes) {
-                    $("#filter-" + feedItemType).prop("checked", event.state.feedItemTypes.includes(feedItemType));
-                }
-            } else {
-                // Return the filters to their default state.
-                this.selectedTag = "";
-                $("[data-filter-checkbox]").prop("checked", true);
-            }
-
-            this.onChangeFilters(this.selectedTag, false); // Do not save the filters state that we just restored.
+            this.restoreDomAndFeedToFiltersState(event.state);
         };
 
-        this.load();
+        this.restoreDomAndFeedToFiltersState(this.getFiltersStateFromUrl());
     },
     methods: {
         /**
@@ -108,7 +93,7 @@ export default {
                 params.cursor = cursor;
             }
 
-            params.filter = btoa(JSON.stringify(this.getFiltersData()));
+            params.filter = btoa(JSON.stringify(this.getFiltersStateFromDom()));
 
             try {
                 const response = await fetch(this.config.routes.getFeed + "?" + new URLSearchParams(params));
@@ -307,23 +292,37 @@ export default {
          * filter state.
          */
         saveFiltersState() {
-            let filtersData = this.getFiltersData();
+            let filtersState = this.getFiltersStateFromDom();
             let oldUrl = window.location.href;
             let questionMarkPos = oldUrl.indexOf("?");
             let oldUrlMinusUrlParams = questionMarkPos === -1 ? oldUrl : oldUrl.substring(0, questionMarkPos);
-            let newUrl = oldUrlMinusUrlParams + "?tag=" + filtersData.tag;
+            let newUrl = oldUrlMinusUrlParams + "?tag=" + encodeURIComponent(filtersState.tag);
 
             // Only save filter state to URL if not all filters are selected.
-            if (filtersData.feedItemTypes.length !== this.feedItemTypes.length) {
-                for (let feedItemType of filtersData.feedItemTypes) {
-                    newUrl += "&feedItemTypes[]=" + feedItemType;
+            if (filtersState.feedItemTypes.length !== this.feedItemTypes.length) {
+                for (let feedItemType of filtersState.feedItemTypes) {
+                    newUrl += "&feedItemTypes[]=" + encodeURIComponent(feedItemType);
                 }
             }
 
-            history.pushState(filtersData, "", newUrl);
+            history.pushState(filtersState, "", newUrl);
         },
 
-        getFiltersData() {
+        /**
+         * Generate a filterState object from the current state of the DOM.
+         * Since the selectedTag is not stored in the DOM, we get that from this.selectedTag.
+         *
+         * Example of return value:
+         *    {
+         *       feedItemTypes: ['assessments', 'learning-moments'], { Array of strings from this.feedItemTypes }
+         *       tag: '' { String }
+         *    }
+         *
+         * @return { Object }
+         *
+         * @see this.getFiltersStateFromUrl()
+         */
+        getFiltersStateFromDom() {
             let checkedFeedItemTypes = [];
 
             for (const feedItemType of this.feedItemTypes) {
@@ -335,6 +334,86 @@ export default {
             $("#filters-description").html(this.selectedTag === "" ? "" : 'Showing tag "' + this.selectedTag + '"');
 
             return { feedItemTypes: checkedFeedItemTypes, tag: this.selectedTag };
+        },
+
+        /**
+         * Generate a filterState object from the URL parameters (if there are any).
+         * If there are no recognised URL parameters, the return value will be null.
+         *
+         * The URL is expected to have parameters like this:
+         *    https://schoolbox.com.au/search/user/69?tag=Class%20Work&feedItemTypes[]=assessments&feedItemTypes[]=achievements
+         *    * Both parameters ('tag' and 'feedItemTypes') are optional
+         *    * feedItemTypes are expected to match those from this.feedItemTypes.
+         *
+         * Example of non-null return value:
+         *    {
+         *       feedItemTypes: ['assessments', 'learning-moments'],
+         *       tag: '' { String }
+         *    }
+         *
+         * @return { ?Object }
+         *
+         * @see this.getFiltersStateFromDom()
+         */
+        getFiltersStateFromUrl() {
+            let url = window.location.href;
+            let questionMarkPos = url.indexOf("?");
+
+            if (questionMarkPos === -1) {
+                return null;
+            }
+
+            let urlParamsString = url.substring(questionMarkPos + 1);
+            let urlParams = urlParamsString.split("&");
+            let filtersState = { tag: "", feedItemTypes: [] };
+
+            for (let param of urlParams) {
+                let tokens = param.split("=");
+                let key = decodeURIComponent(tokens[0]);
+                let value = decodeURIComponent(tokens[1]);
+
+                switch (key) {
+                    case "tag":
+                        filtersState.tag = value;
+                        break;
+
+                    case "feedItemTypes[]":
+                        filtersState.feedItemTypes.push(value);
+                        break;
+
+                    default:
+                    // Unrecognised key, so ignore.  Do nothing.
+                }
+            }
+
+            return filtersState;
+        },
+
+        /**
+         * @param filtersState { ?Object }
+         *
+         * Example of non-null filtersState object:
+         *    {
+         *       feedItemTypes: ['assessments', 'learning-moments'],
+         *       tag: '' { String }
+         *    }
+         */
+        restoreDomAndFeedToFiltersState(filtersState) {
+            if (filtersState === null) {
+                // Return the filters to their default state.
+                this.selectedTag = "";
+                $("[data-filter-checkbox]").prop("checked", true);
+            } else {
+                // Restore state of selectedTag.
+                this.selectedTag = filtersState.tag;
+
+                // Restore state of filter checkboxes.
+                for (const feedItemType of this.feedItemTypes) {
+                    $("#filter-" + feedItemType).prop("checked", filtersState.feedItemTypes.includes(feedItemType));
+                }
+            }
+
+            this.onChangeFilters(this.selectedTag, false); // Do not save the filters state that we just restored.
         },
     },
 };
