@@ -39,6 +39,13 @@ const props = defineProps({
         default: []
     },
     /**
+     * label for this selector
+     */
+    selectorLabel: {
+        type: String,
+        required: true,
+    },
+    /**
      * whether this field is required for this page
      */
     required: {
@@ -413,7 +420,7 @@ function onClearAllSelected () {
 
 <template>
     <div class="class-selector" ref="classSelectorEl">
-        <label :class="{'required': props.required}">Class(es)</label>
+        <label :class="{'required': props.required}">{{ props.selectorLabel }}</label>
         <input id="import_folders" name="import_folders" type="hidden" tabindex="-1" :value="selectedClassIds" />
         <input
             v-if="isClassSelectorActive"
