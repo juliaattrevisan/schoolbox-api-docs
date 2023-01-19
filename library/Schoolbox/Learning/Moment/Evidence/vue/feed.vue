@@ -280,7 +280,7 @@ export default {
             }
 
             if (saveFiltersState) {
-                this.saveFiltersState();
+                this.saveFiltersStateToBrowserHistory();
             }
 
             this.load();
@@ -291,7 +291,7 @@ export default {
          * back button to visit previous filter states, and to enable sharing of the URL for the page in a particular
          * filter state.
          */
-        saveFiltersState() {
+        saveFiltersStateToBrowserHistory() {
             let filtersState = this.getFiltersStateFromDom();
             let oldUrl = window.location.href;
             let questionMarkPos = oldUrl.indexOf("?");
