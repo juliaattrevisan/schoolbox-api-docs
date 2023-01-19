@@ -259,6 +259,21 @@ export default {
             this.$refs.nodeDetailsModal.open();
         },
 
+        /**
+         * Apply to the activity feed, filters as read from the current state of the DOM.
+         * Since the selected tag is not stored in the DOM, that is read from this.selectedTag.
+         */
+        applyFilters() {
+            let $checkboxes = $("[data-filter-checkbox]");
+
+            // If no checkboxes are checked, check all.
+            if ($checkboxes.filter(":checked").length == 0) {
+                $checkboxes.prop("checked", true);
+            }
+
+            this.load();
+        },
+
         getFiltersData() {
             let feedItemTypes = ["assessments", "achievements", "goals", "learning-moments"];
             let checkedFeedItemTypes = [];
@@ -352,6 +367,7 @@ export default {
                 <div id="activity-feed-filters">
                     Filter:
                     <label for="filter-assessments">
+                        <<<<<<< HEAD
                         <input
                             type="checkbox"
                             class="plain"
@@ -401,7 +417,57 @@ export default {
                             name="includeLearningMoments"
                             @click="load()"
                         />
-                        Learning Moments
+                        =======
+                        <input
+                            type="checkbox"
+                            class="plain"
+                            data-filter-checkbox
+                            data-assessments
+                            id="filter-assessments"
+                            checked="checked"
+                            name="includeAssessments"
+                            @click="applyFilters()"
+                        />
+                        Assessments
+                    </label>
+                    <label for="filter-achievements">
+                        <input
+                            type="checkbox"
+                            class="plain"
+                            data-filter-checkbox
+                            data-achievements
+                            id="filter-achievements"
+                            checked="checked"
+                            name="includeAchievements"
+                            @click="applyFilters()"
+                        />
+                        Achievements
+                    </label>
+                    <label for="filter-goals">
+                        <input
+                            type="checkbox"
+                            class="plain"
+                            data-filter-checkbox
+                            data-goals
+                            id="filter-goals"
+                            checked="checked"
+                            name="includeGoals"
+                            @click="applyFilters()"
+                        />
+                        Goals
+                    </label>
+                    <label for="filter-learning-moments">
+                        <input
+                            type="checkbox"
+                            class="plain"
+                            data-filter-checkbox
+                            data-learning-moments
+                            id="filter-learning-moments"
+                            checked="checked"
+                            name="includeLearningMoments"
+                            @click="applyFilters()"
+                        />
+                        >>>>>>> d5a2c9947a2... Revert "Remove uneccessary function [SA-14750]" Learning Moments
                     </label>
                     <div id="filters-description"></div>
                 </div>
@@ -520,6 +586,7 @@ export default {
                                             :key="`${index}-${tag.name}`"
                                         >
                                             <template v-if="index !== 0">, </template>
+                                            <<<<<<< HEAD
                                             <span
                                                 class="anchor-style"
                                                 @click="
@@ -529,6 +596,17 @@ export default {
                                                 title="Click to only show items with this tag."
                                                 >{{ tag.name }}</span
                                             >
+                                            =======
+                                            <span
+                                                class="anchor-style"
+                                                @click="
+                                                    this.selectedTag = tag.name;
+                                                    applyFilters();
+                                                "
+                                                title="Click to only show items with this tag."
+                                                >{{ tag.name }}</span
+                                            >
+                                            >>>>>>> d5a2c9947a2... Revert "Remove uneccessary function [SA-14750]"
                                         </template>
                                     </p>
                                 </div>
