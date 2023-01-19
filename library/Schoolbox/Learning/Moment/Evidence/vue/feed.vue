@@ -261,19 +261,15 @@ export default {
 
         /**
          * Apply to the activity feed, filters as read from the current state of the DOM.
-         * Since the selectedTag is not stored in the DOM, that is passed as a parameter.
-         *
-         * @param { ?String } tag
+         * Since the selected tag is not stored in the DOM, that is read from this.selectedTag.
          */
-        applyFilters(tag) {
+        applyFilters() {
             let $checkboxes = $("[data-filter-checkbox]");
 
             // If no checkboxes are checked, check all.
             if ($checkboxes.filter(":checked").length == 0) {
                 $checkboxes.prop("checked", true);
             }
-
-            this.selectedTag = tag; // Remember selected tag for later.
 
             this.load();
         },
@@ -380,7 +376,7 @@ export default {
                             id="filter-assessments"
                             checked="checked"
                             name="includeAssessments"
-                            @click="applyFilters(null)"
+                            @click="applyFilters()"
                         />
                         Assessments
                     </label>
@@ -393,7 +389,7 @@ export default {
                             id="filter-achievements"
                             checked="checked"
                             name="includeAchievements"
-                            @click="applyFilters(null)"
+                            @click="applyFilters()"
                         />
                         Achievements
                     </label>
@@ -406,7 +402,7 @@ export default {
                             id="filter-goals"
                             checked="checked"
                             name="includeGoals"
-                            @click="applyFilters(null)"
+                            @click="applyFilters()"
                         />
                         Goals
                     </label>
@@ -419,7 +415,7 @@ export default {
                             id="filter-learning-moments"
                             checked="checked"
                             name="includeLearningMoments"
-                            @click="applyFilters(null)"
+                            @click="applyFilters()"
                         />
                         Learning Moments
                     </label>
@@ -542,7 +538,10 @@ export default {
                                             <template v-if="index !== 0">, </template>
                                             <span
                                                 class="anchor-style"
-                                                @click="applyFilters(tag.name)"
+                                                @click="
+                                                    this.selectedTag = tag.name;
+                                                    applyFilters();
+                                                "
                                                 title="Click to only show items with this tag."
                                                 >{{ tag.name }}</span
                                             >
