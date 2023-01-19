@@ -33,7 +33,6 @@ use UnexpectedValueException;
  */
 class Classes implements IStrategy
 {
-
     /**
      * @var LoggerInterface
      */
