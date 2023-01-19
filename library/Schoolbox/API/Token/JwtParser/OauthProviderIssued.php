@@ -46,6 +46,14 @@ class OauthProviderIssued extends Base
      */
     public function accepts(string $jwt): bool
     {
+        // This JWT could be from either an oAuth provider, or from an LTI tool:
+        // Check the token's audience to determine if it is actually from the
+        // oAuth provider.
+        $claims = $this->decodeWithoutVerification($jwt);
+        if (!$this->claimAudienceMatchesConfiguredClientId($claims)) {
+            return false;
+        }
+
         // If no issuer is provided: always return true
         // TODO remove this in 23.0: issuer must be provided, and match JWT
         $oauthIssuer = trim((string)($this->config->get(ConfigMapper::NAME_OAUTH_ISSUER) ?? ''));
@@ -54,7 +62,6 @@ class OauthProviderIssued extends Base
         }
 
         // If the issuer is provided: it must match the issuer in the JWT
-        $claims    = $this->decodeWithoutVerification($jwt);
         $jwtIssuer = trim((string)($claims[self::CLAIM_ISS] ?? ''));
         return $jwtIssuer === $oauthIssuer;
     }
@@ -88,17 +95,7 @@ class OauthProviderIssued extends Base
             $algs,
         );
 
-        // Validate audience
-        $validAudience = false;
-        $audiences     = (array)$claims[self::CLAIM_AUD];
-        $oauthClientId = $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID);
-        foreach ($audiences as $audience) {
-            if ($audience === $oauthClientId) {
-                $validAudience = true;
-                break;
-            }
-        }
-        if (!$validAudience) {
+        if (!$this->claimAudienceMatchesConfiguredClientId($claims)) {
             throw new Exception\Rejected(
                 sprintf('JWT "%s" claim does not match configured client ID', self::CLAIM_AUD)
             );
@@ -139,5 +136,18 @@ class OauthProviderIssued extends Base
         throw new Exception\InvalidIdentity(
             sprintf('JWT contains no claim matching a user (%s)', implode('; ', $messages))
         );
+    }
+
+    /**
+     * Does this token's audience match the oAuth client ID?
+     *
+     * @param array $claims The claims from the token.
+     * @return bool
+     */
+    private function claimAudienceMatchesConfiguredClientId(array $claims): bool
+    {
+        $audiences     = (array)($claims[self::CLAIM_AUD] ?? []);
+        $oauthClientId = $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID);
+        return in_array($oauthClientId, $audiences, true);
     }
 }
