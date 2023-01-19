@@ -275,16 +275,8 @@ module.exports = {
         core: "./www/static/css/core/core.scss",
         editor: "./www/static/css/core/editor.scss",
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-        // Markbook
-        markbookPopOut: "./vue/components/menu/popoutMenuMarkbook.js",
->>>>>>> 47281160c6d (initial patching of markbook menu popout into SB  [SA-14752])
-=======
         // Markbook Pop Out
         popOutMenuMarkbook: "./vue/components/menu/popOutMenuMarkbook.js",
->>>>>>> e52caa58882 (Change vue entry, vue file and bundle to consistent name: popOutMenuMarbook [SA-14916])
     },
     output: {
         path: path.resolve(__dirname, "www/static/js/bundle"),
