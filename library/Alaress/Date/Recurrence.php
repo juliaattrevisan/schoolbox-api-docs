@@ -19,7 +19,6 @@ use External_Timetable;
 
 class Recurrence
 {
-
     const RECURRENCE_DAILY = 'daily';
     const RECURRENCE_WEEKLY = 'weekly';
     const RECURRENCE_FORTNIGHTLY = 'fortnightly';
@@ -99,8 +98,12 @@ class Recurrence
                         $this->getExternalTimetableHandler(),
                         $campus
                     );
-                } catch (MapperException $e) {
-                    $period = [];
+                } catch (MapperException | InvalidArgumentException $e) {
+                    $period = new DatePeriod(
+                        $startTime,
+                        DateInterval::createFromDateString('+1 year'),
+                        $repeatUntil->modify('+1 day')
+                    );
                 }
                 break;
             default:
