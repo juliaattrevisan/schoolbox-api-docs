@@ -508,7 +508,7 @@ if [ "$syncType" == "" ] || [ "$syncType" == "local" ]; then
 
   # Provide feedback for confirmation of what is to be done based on above questions.
   echo -e "\n $restorepretty";
-  echo -e "\n     Restore into '$destination_instance_id' at '$thisdatadir'";
+  echo -e "\n     Restore into Instance: '$destination_instance_id', Schema: '$(INSTANCE_ID=$destination_instance_id schoolbox-read-instances --option SQL_db)', Data Dir: '$thisdatadir'";
   while true; do
     echo -e "\nIs this the correct option? (y/n): \c" && read -r confirm;
     if [[ $confirm =~ [ynYN] ]]; then
