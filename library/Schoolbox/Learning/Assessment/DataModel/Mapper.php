@@ -822,6 +822,10 @@ class Mapper extends BaseMapper
             }
 
             $model->setAssessmentContext($context);
+
+            // Set assessment model
+            $model->getSubObject()->setAssessmentModel($model);
+
             $modelList->add($model);
         }
         // Load related 1-M models
