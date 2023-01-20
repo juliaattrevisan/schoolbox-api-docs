@@ -46,8 +46,9 @@ class OauthProviderIssuedTest extends TestCase
         // Default configuration + audience:
         // the oAuth provider now requires that the JWT's audience matches the
         // configured client ID.
-        $defaultConfigurationClientId = [ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID => 'test'];
-        $defaultJwtAudience           = [IParser::CLAIM_AUD => 'test'];
+        $defaultAudience              = 'test';
+        $defaultConfigurationClientId = [ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID => $defaultAudience];
+        $defaultJwtAudience           = [IParser::CLAIM_AUD => $defaultAudience];
 
         yield 'no issuer configured, no issuer in JWT' => [
             $this->createParser(
@@ -206,6 +207,44 @@ class OauthProviderIssuedTest extends TestCase
             $this->createJwt(
                 $defaultJwtAudience + [IParser::CLAIM_ISS => 1],
             ),
+            false,
+        ];
+
+        // No configured client ID, or no audience in JWT: reject
+        yield 'no configured client ID, no audience in JWT' => [
+            $this->createParser([]),
+            $this->createJwt([]),
+            false,
+        ];
+        yield 'no configured client ID' => [
+            $this->createParser([]),
+            $this->createJwt($defaultJwtAudience),
+            false,
+        ];
+        yield 'no audience in JWT' => [
+            $this->createParser($defaultConfigurationClientId),
+            $this->createJwt([]),
+            false,
+        ];
+
+        // non-matching client ID: reject
+        yield 'configured client ID and audience in JWT do not match' => [
+            $this->createParser($defaultConfigurationClientId),
+            $this->createJwt([IParser::CLAIM_AUD => 'not-test']),
+            false,
+        ];
+
+        // audience may be an array of values
+        // (see https://www.rfc-editor.org/rfc/rfc7519#section-4.1.3):
+        // if so, JWT is accepted if any match
+        yield 'configured client ID matches array audience in JWT' => [
+            $this->createParser($defaultConfigurationClientId),
+            $this->createJwt([IParser::CLAIM_AUD => [$defaultAudience, 'not-test']]),
+            true,
+        ];
+        yield 'configured client ID does not match array audience in JWT' => [
+            $this->createParser($defaultConfigurationClientId),
+            $this->createJwt([IParser::CLAIM_AUD => ['not-test', 'also-not-test']]),
             false,
         ];
     }
