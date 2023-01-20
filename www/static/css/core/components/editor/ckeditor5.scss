@@ -31,17 +31,18 @@
     font-size: 1rem;
 }
 
+/**
+ * Style for the word count UI that sits at the bottom of the editor
+ */
 .ck.ck-word-count {
-	display: flex;
-	justify-content: flex-end;
-
-	background: var(--ck-color-toolbar-background);
-	padding: var(--ck-spacing-small) var(--ck-spacing-standard);
-	border: 1px solid var(--ck-color-toolbar-border);
-	border-top-width: 0;
-	border-radius: 0 0 var(--ck-border-radius);
-
-	font: normal normal normal var(--ck-font-size-base)/var(--ck-line-height-base) var(--ck-font-face);
+    background: var(--ck-color-toolbar-background);
+    border: 1px solid var(--ck-color-toolbar-border);
+    border-radius: 0 0 var(--ck-border-radius);
+    border-top-width: 0;
+    display: flex;
+    font: normal normal normal var(--ck-font-size-base)/var(--ck-line-height-base) var(--ck-font-face);
+    justify-content: flex-end;
+    padding: var(--ck-spacing-small) var(--ck-spacing-standard);
 }
 
 .ck.ck-word-count .ck-word-count__words {

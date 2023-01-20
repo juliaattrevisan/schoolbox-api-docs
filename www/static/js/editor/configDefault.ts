@@ -54,6 +54,7 @@ import Alignment from "@ckeditor/ckeditor5-alignment/src/alignment";
 import FindAndReplace from "@ckeditor/ckeditor5-find-and-replace/src/findandreplace";
 import SourceEditing from "@ckeditor/ckeditor5-source-editing/src/sourceediting";
 import WordCount from "@ckeditor/ckeditor5-word-count/src/wordcount";
+import { getDefaultColors } from "@js/editor/configDefaultColors";
 
 /**
  * Return the default configuration
@@ -132,7 +133,6 @@ export function getDefault() {
                     "fontSize",
                 ],
             },
-            "|",
             "removeFormat",
             "|",
             "style",
@@ -218,6 +218,14 @@ export function getDefault() {
                 "tableCellProperties",
                 "toggleTableCaption",
             ],
+        },
+        fontColor: {
+            columns: 12,
+            colors: getDefaultColors(),
+        },
+        fontBackgroundColor: {
+            columns: 12,
+            colors: getDefaultColors(),
         },
     };
 }
