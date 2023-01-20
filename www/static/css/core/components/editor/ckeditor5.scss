@@ -13,10 +13,16 @@
  * otherwise the default editor styles are different weight and size
  * than what is actually applied
  */
+.ck.ck-button.ck-heading_heading1,
 .ck.ck-button.ck-heading_heading2,
 .ck.ck-button.ck-heading_heading3,
-.ck.ck-button.ck-heading_heading4 {
+.ck.ck-button.ck-heading_heading4,
+.ck.ck-button.ck-heading_heading5 {
     font-weight: normal;
+}
+
+.ck.ck-button.ck-heading_heading1 {
+    font-size: 1.75rem;
 }
 
 .ck.ck-button.ck-heading_heading2 {
@@ -29,6 +35,10 @@
 
 .ck.ck-button.ck-heading_heading4 {
     font-size: 1rem;
+}
+
+.ck.ck-button.ck-heading_heading5 {
+    font-size: 0.9375rem;
 }
 
 /**
