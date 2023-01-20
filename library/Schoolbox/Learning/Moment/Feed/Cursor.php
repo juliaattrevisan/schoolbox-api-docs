@@ -362,7 +362,7 @@ class Cursor implements ICursor
     {
         $includeDueWorkFeedback = (
             count($this->filter['feedItemTypes']) === 0 ||
-            in_array('due-work', $this->filter['feedItemTypes'], true)
+            in_array('feedback', $this->filter['feedItemTypes'], true)
         );
 
         if (
@@ -444,11 +444,10 @@ class Cursor implements ICursor
         }
 
         foreach ($filter['feedItemTypes'] as $feedItemType) {
-            $expectedFeedItemTypes = ['due-work', 'achievements', 'goals', 'learning-moments'];
-            if (!in_array($feedItemType, $expectedFeedItemTypes, true)) {
+            if (!in_array($feedItemType, self::$feedItemTypes, true)) {
                 throw new InvalidArgumentException(
                     "Filter 'feedItemTypes' array should only contain strings from" .
-                    ' {' . implode(', ', $expectedFeedItemTypes) . '}'
+                    ' {' . implode(', ', self::$feedItemTypes) . '}'
                 );
             }
         }
@@ -457,4 +456,14 @@ class Cursor implements ICursor
             throw new InvalidArgumentException("Filter object must contain 'tag'.");
         }
     }
+
+    /**
+     * This is the set of feed item types that we expect to receive from the client.
+     *
+     * NOTE: There is a matching array in library/Schoolbox/Learning/Moment/Evidence/vue/feed.vue.
+     *       If any change is made to this array, a similar change should be made to that array.
+     *
+     * @var string[]
+     */
+    private static array $feedItemTypes = ['feedback', 'achievements', 'goals', 'learning-moments'];
 }

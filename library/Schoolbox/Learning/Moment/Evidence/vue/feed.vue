@@ -47,7 +47,10 @@ export default {
             currentlyDeletingEvidence: null,
             selectedNode: getEmptyNode(), // The selected curriculum code to display further details for.
             selectedTag: "", // The tag clicked by the user in order to filter to items having that tag.
-            feedItemTypes: ["due-work", "achievements", "goals", "learning-moments"],
+
+            // NOTE: There is a matching array in library/Schoolbox/Learning/Moment/Feed/Cursor.php.
+            //       If any change is made to this array, a similar change should be made to that array.
+            feedItemTypes: ["feedback", "achievements", "goals", "learning-moments"],
         };
     },
     computed: {
@@ -327,7 +330,7 @@ export default {
          *
          * Example of return value:
          *    {
-         *       feedItemTypes: ['due-work', 'learning-moments'], { Array of strings from this.feedItemTypes }
+         *       feedItemTypes: ['feedback', 'learning-moments'], { Array of strings from this.feedItemTypes }
          *       tag: '' { String }
          *    }
          *
@@ -354,13 +357,13 @@ export default {
          * If there are no recognised URL parameters, the return value will be null.
          *
          * The URL is expected to have parameters like this:
-         *    https://schoolbox.com.au/search/user/69?tag=Class%20Work&feedItemTypes[]=due-work&feedItemTypes[]=achievements
+         *    https://schoolbox.com.au/search/user/69?tag=Class%20Work&feedItemTypes[]=feedback&feedItemTypes[]=achievements
          *    * Both parameters ('tag' and 'feedItemTypes') are optional
          *    * feedItemTypes are expected to match those from this.feedItemTypes.
          *
          * Example of non-null return value:
          *    {
-         *       feedItemTypes: ['due-work', 'learning-moments'],
+         *       feedItemTypes: ['feedback', 'learning-moments'],
          *       tag: '' { String }
          *    }
          *
@@ -407,7 +410,7 @@ export default {
          *
          * Example of non-null filtersState object:
          *    {
-         *       feedItemTypes: ['due-work', 'learning-moments'],
+         *       feedItemTypes: ['feedback', 'learning-moments'],
          *       tag: '' { String }
          *    }
          */
@@ -501,18 +504,18 @@ export default {
             <section class="activity-feed">
                 <div id="activity-feed-filters">
                     Filter:
-                    <label for="filter-due-work">
+                    <label for="filter-feedback">
                         <input
                             type="checkbox"
                             class="plain"
                             data-filter-checkbox
-                            data-due-work
-                            id="filter-due-work"
+                            data-feedback
+                            id="filter-feedback"
                             checked="checked"
                             name="includeDueWork"
                             @click="onChangeFilters('', true)"
                         />
-                        Due Work
+                        Feedback
                     </label>
                     <label for="filter-achievements">
                         <input
@@ -723,7 +726,7 @@ export default {
                             <div class="flex-grade">
                                 <div class="small-12 card columns">
                                     <div>
-                                        <span class="icon-due-work"></span
+                                        <span class="icon-feedback"></span
                                         ><a :href="evidence.object._links.summary">{{
                                             evidence.object.assessment.title
                                         }}</a>
