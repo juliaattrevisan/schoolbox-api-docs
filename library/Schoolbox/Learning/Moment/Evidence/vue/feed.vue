@@ -46,9 +46,15 @@ export default {
             showSkeletonLoader: true,
             currentlyDeletingEvidence: null,
             selectedNode: getEmptyNode(), // The selected curriculum code to display further details for.
+<<<<<<< HEAD
             selectedTag: "", // The tag clicked by the user in order to filter to items having that tag.
             feedItemTypes: ["assessments", "achievements", "goals", "learning-moments"],
         };
+=======
+            selectedTag: '', // The tag clicked by the user in order to filter to items having that tag.
+            feedItemTypes: ['due-work', 'achievements', 'goals', 'learning-moments']
+        }
+>>>>>>> 529da4d5e52... Rename 'assessments' to 'due work' [SA-14750]
     },
     computed: {
         jQuery: () => window.jQuery,
@@ -314,7 +320,7 @@ export default {
          *
          * Example of return value:
          *    {
-         *       feedItemTypes: ['assessments', 'learning-moments'], { Array of strings from this.feedItemTypes }
+         *       feedItemTypes: ['due-work', 'learning-moments'], { Array of strings from this.feedItemTypes }
          *       tag: '' { String }
          *    }
          *
@@ -341,13 +347,13 @@ export default {
          * If there are no recognised URL parameters, the return value will be null.
          *
          * The URL is expected to have parameters like this:
-         *    https://schoolbox.com.au/search/user/69?tag=Class%20Work&feedItemTypes[]=assessments&feedItemTypes[]=achievements
+         *    https://schoolbox.com.au/search/user/69?tag=Class%20Work&feedItemTypes[]=due-work&feedItemTypes[]=achievements
          *    * Both parameters ('tag' and 'feedItemTypes') are optional
          *    * feedItemTypes are expected to match those from this.feedItemTypes.
          *
          * Example of non-null return value:
          *    {
-         *       feedItemTypes: ['assessments', 'learning-moments'],
+         *       feedItemTypes: ['due-work', 'learning-moments'],
          *       tag: '' { String }
          *    }
          *
@@ -394,7 +400,7 @@ export default {
          *
          * Example of non-null filtersState object:
          *    {
-         *       feedItemTypes: ['assessments', 'learning-moments'],
+         *       feedItemTypes: ['due-work', 'learning-moments'],
          *       tag: '' { String }
          *    }
          */
@@ -416,7 +422,11 @@ export default {
             this.onChangeFilters(this.selectedTag, false); // Do not save the filters state that we just restored.
         },
     },
+<<<<<<< HEAD
 };
+=======
+}
+>>>>>>> 529da4d5e52... Rename 'assessments' to 'due work' [SA-14750]
 </script>
 
 <template>
@@ -488,6 +498,7 @@ export default {
             <section class="activity-feed">
                 <div id="activity-feed-filters">
                     Filter:
+<<<<<<< HEAD
                     <label for="filter-assessments">
                         <input
                             type="checkbox"
@@ -500,6 +511,12 @@ export default {
                             @click="onChangeFilters('', true)"
                         />
                         Assessments
+=======
+                    <label for="filter-due-work">
+                        <input type="checkbox" class="plain" data-filter-checkbox data-due-work id="filter-due-work"
+                         checked='checked' name="includeDueWork" @click="onChangeFilters('', true)"/>
+                        Due Work
+>>>>>>> 529da4d5e52... Rename 'assessments' to 'due work' [SA-14750]
                     </label>
                     <label for="filter-achievements">
                         <input
