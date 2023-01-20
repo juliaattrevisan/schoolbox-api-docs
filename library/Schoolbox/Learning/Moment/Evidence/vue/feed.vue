@@ -46,15 +46,9 @@ export default {
             showSkeletonLoader: true,
             currentlyDeletingEvidence: null,
             selectedNode: getEmptyNode(), // The selected curriculum code to display further details for.
-<<<<<<< HEAD
             selectedTag: "", // The tag clicked by the user in order to filter to items having that tag.
-            feedItemTypes: ["assessments", "achievements", "goals", "learning-moments"],
+            feedItemTypes: ["due-work", "achievements", "goals", "learning-moments"],
         };
-=======
-            selectedTag: '', // The tag clicked by the user in order to filter to items having that tag.
-            feedItemTypes: ['due-work', 'achievements', 'goals', 'learning-moments']
-        }
->>>>>>> 529da4d5e52... Rename 'assessments' to 'due work' [SA-14750]
     },
     computed: {
         jQuery: () => window.jQuery,
@@ -302,12 +296,25 @@ export default {
             let oldUrl = window.location.href;
             let questionMarkPos = oldUrl.indexOf("?");
             let oldUrlMinusUrlParams = questionMarkPos === -1 ? oldUrl : oldUrl.substring(0, questionMarkPos);
-            let newUrl = oldUrlMinusUrlParams + "?tag=" + encodeURIComponent(filtersState.tag);
+            let newUrl = oldUrlMinusUrlParams;
+            let questionMarkAdded = false;
+
+            if (filtersState.tag !== "") {
+                newUrl += "?tag=" + encodeURIComponent(filtersState.tag);
+                questionMarkAdded = true;
+            }
 
             // Only save filter state to URL if not all filters are selected.
             if (filtersState.feedItemTypes.length !== this.feedItemTypes.length) {
                 for (let feedItemType of filtersState.feedItemTypes) {
-                    newUrl += "&feedItemTypes[]=" + encodeURIComponent(feedItemType);
+                    if (questionMarkAdded) {
+                        newUrl += "&";
+                    } else {
+                        newUrl += "?";
+                        questionMarkAdded = true;
+                    }
+
+                    newUrl += "feedItemTypes[]=" + encodeURIComponent(feedItemType);
                 }
             }
 
@@ -422,11 +429,7 @@ export default {
             this.onChangeFilters(this.selectedTag, false); // Do not save the filters state that we just restored.
         },
     },
-<<<<<<< HEAD
 };
-=======
-}
->>>>>>> 529da4d5e52... Rename 'assessments' to 'due work' [SA-14750]
 </script>
 
 <template>
@@ -498,25 +501,18 @@ export default {
             <section class="activity-feed">
                 <div id="activity-feed-filters">
                     Filter:
-<<<<<<< HEAD
-                    <label for="filter-assessments">
+                    <label for="filter-due-work">
                         <input
                             type="checkbox"
                             class="plain"
                             data-filter-checkbox
-                            data-assessments
-                            id="filter-assessments"
+                            data-due-work
+                            id="filter-due-work"
                             checked="checked"
-                            name="includeAssessments"
+                            name="includeDueWork"
                             @click="onChangeFilters('', true)"
                         />
-                        Assessments
-=======
-                    <label for="filter-due-work">
-                        <input type="checkbox" class="plain" data-filter-checkbox data-due-work id="filter-due-work"
-                         checked='checked' name="includeDueWork" @click="onChangeFilters('', true)"/>
                         Due Work
->>>>>>> 529da4d5e52... Rename 'assessments' to 'due work' [SA-14750]
                     </label>
                     <label for="filter-achievements">
                         <input
