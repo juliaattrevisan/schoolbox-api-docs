@@ -360,7 +360,6 @@ echo -e "\n* Detecting Installs and Backups *";
 
 ## Wipe current detected list
 sbrl='/tmp/schoolbox-restore-list';
-searchlist='/usr/share/schoolbox/conf.php /usr/share/schoolboxdev/conf.php';
 rm -f $sbrl;
 
 ## Detect database backups for this install
@@ -375,30 +374,22 @@ then
 	done;
 fi
 
-# Detect other local installs
-for localinstall in $searchlist;
-do
-	# Search for local installs, but ignore the current install if listed
-	if [ `echo $localinstall | grep -v "schoolbox/" | wc -l` -gt 0 ];
-	then
-		if [ -f $localinstall ];
-		then
-			tempconffile=`readlink -f $localinstall`;
-			INSTANCE_ID="$destination_instance_id" readconf;
-			readsqlver;
-			tempfiledir=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='backup_dir'"`;
-			if [ ! -z $tempfiledir ];
-			then
-				tempdatadirlist=`ls -1 $tempfiledir/../{*-*-*-*_*-*-*.sql,backups/*/*/schoolbox_*-*-*.sql.gz} 2>/dev/null`;
-				for i in $tempdatadirlist;
-				do
-					echo -e ".\c";
-					echo "[L],[D],$tempconffile,`readlink -f $i`" >> $sbrl;
-					echo "[L],[A],$tempconffile,`readlink -f $i`" >> $sbrl;
-				done;
-			fi
-		fi
-	fi
+# Detect other local instances
+for other_instance in $(schoolbox-read-instances --option instance-list | grep -v "$destination_instance_id"); do
+  if [[ -z $other_instance ]]; then
+    continue
+  fi
+  read_ini "$other_instance"
+  readsqlver;
+  tempfiledir=$(mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "SELECT value FROM config WHERE name='backup_dir'");
+  if [ -n "$tempfiledir" ]; then
+    tempdatadirlist=$(ls -1 $tempfiledir/../{*-*-*-*_*-*-*.sql,*-*-*-*_*-*-*.sql.gz,backups/*/*/schoolbox*_*-*-*.sql.gz} 2>/dev/null);
+    for i in $tempdatadirlist; do
+      echo -e ".\c";
+      echo "[L],[D],$other_instance,$(readlink -f "$i")" >> $sbrl;
+      echo "[L],[A],$other_instance,$(readlink -f "$i")" >> $sbrl;
+    done;
+  fi
 done
 
 # Detect other remote installs
@@ -552,7 +543,7 @@ sourcep2=`echo $restore | cut -d',' -f4`;
 
 
 # Check if a full restore can be done
-if [ "$sourcetype" == '[A]' ] && [ "$sourceloc" == '[R]' ]; then
+if [ "$sourcetype" == '[A]' ]; then
   local_mount=$(findmnt -n -o SOURCE --target "$thisdatadir");
   local_mount_total=$(df -B1 | grep "$local_mount" | awk -F " " '{print $2}');
   local_mount_dir=$(mount | grep "$local_mount" | awk -F " " '{print $3}');
