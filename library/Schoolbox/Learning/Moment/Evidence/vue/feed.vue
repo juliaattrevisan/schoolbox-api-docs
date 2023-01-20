@@ -272,12 +272,12 @@ export default {
         onChangeFilters(selectedTag, saveFiltersState) {
             this.selectedTag = selectedTag;
 
-            let $checkboxes = $("[data-filter-checkbox]");
-
-            // If all checkboxes are unchecked, check them all.
-            if ($checkboxes.filter(":checked").length === 0) {
-                $checkboxes.prop("checked", true);
-            }
+            // Note Regarding behaviour when all-checked/none-checked
+            // ------------------------------------------------------
+            // If all checkboxes are checked, we leave them that way.
+            // We could have decided to uncheck all in this situation, to match the default state of all unchecked,
+            // which behaves the same as if all were checked.  However, we decided it would be less confusing to the
+            // user if checking the last checkbox resulted in all being checked rather than none being checkked.
 
             if (saveFiltersState) {
                 this.saveFiltersStateToBrowserHistory();
@@ -415,7 +415,7 @@ export default {
             if (filtersState === null) {
                 // Return the filters to their default state.
                 this.selectedTag = "";
-                $("[data-filter-checkbox]").prop("checked", true);
+                $("[data-filter-checkbox]").prop("checked", false);
             } else {
                 // Restore state of selectedTag.
                 this.selectedTag = filtersState.tag;
