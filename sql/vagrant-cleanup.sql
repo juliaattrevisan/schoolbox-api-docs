@@ -35,6 +35,8 @@ UPDATE config SET value='' WHERE name='kami_api_key';
 UPDATE config SET value='' WHERE name='saml_idp_metadata_url';
 UPDATE config SET value='' WHERE name='saml_public_cert';
 UPDATE config SET value='' WHERE name='saml_private_cert';
-
-
-
+UPDATE config SET value='' WHERE name = 'office365_client';
+UPDATE config SET value='' WHERE name = 'office365_immersive_reader_name';
+UPDATE config SET value='' WHERE name = 'office365_secret';
+UPDATE config SET value='' WHERE name = 'office365_tenant';
+UPDATE config SET value='' WHERE name = 'office365_tenant_id';
