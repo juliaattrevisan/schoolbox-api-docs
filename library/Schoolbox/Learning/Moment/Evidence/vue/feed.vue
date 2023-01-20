@@ -50,7 +50,7 @@ export default {
 
             // NOTE: There is a matching array in library/Schoolbox/Learning/Moment/Feed/Cursor.php.
             //       If any change is made to this array, a similar change should be made to that array.
-            feedItemTypes: ["feedback", "achievements", "goals", "learning-moments"],
+            feedItemTypes: ["goals", "learning-moments", "achievements", "feedback"],
         };
     },
     computed: {
@@ -504,32 +504,6 @@ export default {
             <section class="activity-feed">
                 <div id="activity-feed-filters">
                     Filter:
-                    <label for="filter-feedback">
-                        <input
-                            type="checkbox"
-                            class="plain"
-                            data-filter-checkbox
-                            data-feedback
-                            id="filter-feedback"
-                            checked="checked"
-                            name="includeDueWork"
-                            @click="onChangeFilters('', true)"
-                        />
-                        Feedback
-                    </label>
-                    <label for="filter-achievements">
-                        <input
-                            type="checkbox"
-                            class="plain"
-                            data-filter-checkbox
-                            data-achievements
-                            id="filter-achievements"
-                            checked="checked"
-                            name="includeAchievements"
-                            @click="onChangeFilters('', true)"
-                        />
-                        Achievements
-                    </label>
                     <label for="filter-goals">
                         <input
                             type="checkbox"
@@ -555,6 +529,32 @@ export default {
                             @click="onChangeFilters('', true)"
                         />
                         Learning Moments
+                    </label>
+                    <label for="filter-achievements">
+                        <input
+                            type="checkbox"
+                            class="plain"
+                            data-filter-checkbox
+                            data-achievements
+                            id="filter-achievements"
+                            checked="checked"
+                            name="includeAchievements"
+                            @click="onChangeFilters('', true)"
+                        />
+                        Achievements
+                    </label>
+                    <label for="filter-feedback">
+                        <input
+                            type="checkbox"
+                            class="plain"
+                            data-filter-checkbox
+                            data-feedback
+                            id="filter-feedback"
+                            checked="checked"
+                            name="includeDueWork"
+                            @click="onChangeFilters('', true)"
+                        />
+                        Feedback
                     </label>
                     <div id="filters-description"></div>
                 </div>

@@ -465,5 +465,5 @@ class Cursor implements ICursor
      *
      * @var string[]
      */
-    private static array $feedItemTypes = ['feedback', 'achievements', 'goals', 'learning-moments'];
+    private static array $feedItemTypes = ['goals', 'learning-moments', 'achievements', 'feedback'];
 }
