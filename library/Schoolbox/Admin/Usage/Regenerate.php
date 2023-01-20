@@ -41,7 +41,7 @@ class Regenerate
      */
     public function regenerateUsage(LoggerInterface $logger = null): void
     {
-        $logger?->notice("Clearing all cache's");
+        $logger?->info("Clearing all cache's");
         //clear the cache for all cached queries
         foreach (self::CACHED_QUERIES as $cachedQuery) {
             $logger?->debug("Removing cache: {$cachedQuery}");
@@ -89,6 +89,6 @@ class Regenerate
                 ];
         };
         $payload = $this->cache->cacheFunctionCall(self::CACHE_USAGE_FILETYPE, $callback, '', self::CACHE_TIMEOUT);
-        $logger?->notice("Calculation of storage complete");
+        $logger?->info("Calculation of storage complete");
     }
 }
