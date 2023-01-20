@@ -30,3 +30,20 @@
 .ck.ck-button.ck-heading_heading4 {
     font-size: 1rem;
 }
+
+.ck.ck-word-count {
+	display: flex;
+	justify-content: flex-end;
+
+	background: var(--ck-color-toolbar-background);
+	padding: var(--ck-spacing-small) var(--ck-spacing-standard);
+	border: 1px solid var(--ck-color-toolbar-border);
+	border-top-width: 0;
+	border-radius: 0 0 var(--ck-border-radius);
+
+	font: normal normal normal var(--ck-font-size-base)/var(--ck-line-height-base) var(--ck-font-face);
+}
+
+.ck.ck-word-count .ck-word-count__words {
+	margin-right: var(--ck-spacing-standard);
+}
