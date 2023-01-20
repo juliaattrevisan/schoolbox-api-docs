@@ -56,11 +56,14 @@ import SourceEditing from "@ckeditor/ckeditor5-source-editing/src/sourceediting"
 import WordCount from "@ckeditor/ckeditor5-word-count/src/wordcount";
 
 /**
+ * Return the default configuration
  *
+ * @returns { EditorConfig } - refer to https://ckeditor.com/docs/ckeditor5/latest/api/module_core_editor_editorconfig-EditorConfig.html
  */
 export function getDefault() {
     return {
         plugins: [
+            // list all the plugins we'll use in the editor
             Essentials,
             Heading,
             Paragraph,
@@ -112,6 +115,7 @@ export function getDefault() {
             WordCount,
         ],
         toolbar: [
+            // what displays in the toolbar in order, are either single buttons or groups via objects
             "bold",
             "italic",
             {
@@ -159,6 +163,7 @@ export function getDefault() {
             "sourceEditing",
         ],
         style: {
+            // the list of styles provided: https://ckeditor.com/docs/ckeditor5/latest/features/style.html
             definitions: [
                 {
                     name: "Small",
@@ -183,6 +188,7 @@ export function getDefault() {
             ],
         },
         heading: {
+            // the list of headings provided: https://ckeditor.com/docs/ckeditor5/latest/features/headings.html
             options: [
                 { model: "paragraph", title: "Paragraph", class: "ck-heading_paragraph" },
                 { model: "heading2", view: "h2", title: "Heading 2", class: "ck-heading_heading2" },
@@ -191,6 +197,7 @@ export function getDefault() {
             ],
         },
         image: {
+            // image setup: https://ckeditor.com/docs/ckeditor5/latest/features/images/images-overview.html
             toolbar: [
                 "imageStyle:block",
                 "imageStyle:side",
@@ -202,6 +209,7 @@ export function getDefault() {
             ],
         },
         table: {
+            // the table controls provided: https://ckeditor.com/docs/ckeditor5/latest/features/table.html
             contentToolbar: [
                 "tableColumn",
                 "tableRow",
