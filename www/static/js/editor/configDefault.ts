@@ -51,6 +51,7 @@ import Link from "@ckeditor/ckeditor5-link/src/link";
 import List from "@ckeditor/ckeditor5-list/src/list";
 import TodoList from "@ckeditor/ckeditor5-list/src/todolist";
 import Alignment from "@ckeditor/ckeditor5-alignment/src/alignment";
+import FindAndReplace from "@ckeditor/ckeditor5-find-and-replace/src/findandreplace";
 import SourceEditing from "@ckeditor/ckeditor5-source-editing/src/sourceediting";
 import WordCount from "@ckeditor/ckeditor5-word-count/src/wordcount";
 
@@ -106,6 +107,7 @@ export function getDefault() {
             List,
             TodoList,
             Alignment,
+            FindAndReplace,
             SourceEditing,
             WordCount,
         ],
@@ -151,6 +153,8 @@ export function getDefault() {
             "|",
             "undo",
             "redo",
+            "|",
+            "findAndReplace",
             "|",
             "sourceEditing",
         ],
