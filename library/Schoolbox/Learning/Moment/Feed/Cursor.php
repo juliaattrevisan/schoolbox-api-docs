@@ -362,7 +362,7 @@ class Cursor implements ICursor
     {
         $includeDueWorkFeedback = (
             count($this->filter['feedItemTypes']) === 0 ||
-            in_array('assessments', $this->filter['feedItemTypes'], true)
+            in_array('due-work', $this->filter['feedItemTypes'], true)
         );
 
         if (
@@ -444,7 +444,7 @@ class Cursor implements ICursor
         }
 
         foreach ($filter['feedItemTypes'] as $feedItemType) {
-            $expectedFeedItemTypes = ['assessments', 'achievements', 'goals', 'learning-moments'];
+            $expectedFeedItemTypes = ['due-work', 'achievements', 'goals', 'learning-moments'];
             if (!in_array($feedItemType, $expectedFeedItemTypes, true)) {
                 throw new InvalidArgumentException(
                     "Filter 'feedItemTypes' array should only contain strings from" .
