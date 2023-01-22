@@ -2859,13 +2859,23 @@ class AssessableTest extends TestCase
      * student 1: Task: -
      *            Quiz: -
      *            DueW: -
+     *            Draft/Pub Min/Max/Avg/Wgt: null
      * student 2: Task: self-assessed
      *            Quiz: 1 attempt + 1 published feedback (1/2)
      *            DueW: 1 submission
-     * student 3: Task: teacher-assessed (thus 100%)
+     *            Draft/Pub Min/Max/Avg/Wgt: 50% from quiz
+     * student 3: Task: teacher-assessed
      *            Quiz: 1 attempt + 1 unpublished feedback (1/2)
      *            DueW: 1 submission + 1 published feedback (50.0)
-     * student 4: Task: self-assessed then teacher-assessed (thus 100%)
+     *            Draft Min: 50% from due work / quiz
+     *            Draft Max: 100% from task
+     *            Draft Avg: 66.67% (100% from task, 50% from due work and quiz)
+     *            Draft Wgt: 50% (50% * 1/5 from quiz, 50% * 4/5 from due work)
+     *            Pub Min: 50% from due work
+     *            Pub Max: 100% from task
+     *            Pub Avg: 75% (100% from task, 50% from due work)
+     *            Pub Wgt: 50% from due work
+     * student 4: Task: self-assessed then teacher-assessed
      *            Quiz: 2 attempt + 1 published feedback (1/2) + 1 later unpublished feedback (2/2)
      *            DueW: 1 submission + 1 unpublished feedback (50.0)
      * student 5: Task: -
