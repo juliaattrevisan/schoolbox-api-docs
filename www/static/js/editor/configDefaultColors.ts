@@ -3,12 +3,29 @@
  */
 
 /**
+ * Return the lsit of skin colours for use
+ *
+ * @returns { Array } - refer to https://ckeditor.com/docs/ckeditor5/latest/features/font.html#specifying-available-colors
+ */
+function getSkinColours() {
+    const documentStyles = getComputedStyle(document.documentElement);
+    return [
+        { label: "Body Background Colour", color: documentStyles.getPropertyValue("--content-ui-background") },
+        {
+            label: "Primary Interactive Content Background Colour",
+            color: documentStyles.getPropertyValue("--content-ui-foreground"),
+        },
+    ];
+}
+
+/**
  * Return the default colors
  *
- * @returns { array } - refer to https://ckeditor.com/docs/ckeditor5/latest/features/font.html#specifying-available-colors
+ * @returns { Array } - refer to https://ckeditor.com/docs/ckeditor5/latest/features/font.html#specifying-available-colors
  */
 export function getDefaultColors() {
     return [
+        ...getSkinColours(),
         { label: "Red 50", color: "#ffebee" },
         { label: "Purple 50", color: "#f3e5f5" },
         { label: "Indigo 50", color: "#e8eaf6" },
