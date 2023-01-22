@@ -1702,7 +1702,7 @@ class AssessableTest extends TestCase
             return [
                 [$project, $this->getDummyStudent(1), null],
                 [$project, $this->getDummyStudent(2), 50.0],
-                [$project, $this->getDummyStudent(3), 50.0],
+                [$project, $this->getDummyStudent(3), 100.0],
                 [$project, $this->getDummyStudent(4), 100.0],
                 [$project, $this->getDummyStudent(5), 100.0],
                 [$project, $this->getDummyStudent(6), 50.0],
@@ -1714,7 +1714,7 @@ class AssessableTest extends TestCase
         return [
             [$project, $this->getDummyStudent(1), null],
             [$project, $this->getDummyStudent(2), 50.0],
-            [$project, $this->getDummyStudent(3), 50.0],
+            [$project, $this->getDummyStudent(3), 100.0],
             [$project, $this->getDummyStudent(4), 100.0],
             [$project, $this->getDummyStudent(5), 100.0],
             [$project, $this->getDummyStudent(6), 50.0],
@@ -1735,7 +1735,7 @@ class AssessableTest extends TestCase
         return [
             [$project, $this->getDummyStudent(1), null],
             [$project, $this->getDummyStudent(2), 50.0],
-            [$project, $this->getDummyStudent(3), 50.0],
+            [$project, $this->getDummyStudent(3), 100.0],
             [$project, $this->getDummyStudent(4), 50.0],
             [$project, $this->getDummyStudent(5), 50.0],
             [$project, $this->getDummyStudent(6), 50.0],
@@ -1757,7 +1757,7 @@ class AssessableTest extends TestCase
             return [
                 [$project, $this->getDummyStudent(1), null],
                 [$project, $this->getDummyStudent(2), 50.0],
-                [$project, $this->getDummyStudent(3), 50.0],
+                [$project, $this->getDummyStudent(3), 66.67],
                 [$project, $this->getDummyStudent(4), 75.0],
                 [$project, $this->getDummyStudent(5), 100.0],
                 [$project, $this->getDummyStudent(6), 50.0],
@@ -1769,7 +1769,7 @@ class AssessableTest extends TestCase
         return [
             [$project, $this->getDummyStudent(1), null],
             [$project, $this->getDummyStudent(2), 50.0],
-            [$project, $this->getDummyStudent(3), 50.0],
+            [$project, $this->getDummyStudent(3), 66.67],
             [$project, $this->getDummyStudent(4), 75.0],
             [$project, $this->getDummyStudent(5), 100.0],
             [$project, $this->getDummyStudent(6), 50.0],
@@ -1790,7 +1790,7 @@ class AssessableTest extends TestCase
         return [
             [$project, $this->getDummyStudent(1), null],
             [$project, $this->getDummyStudent(2), 50.0],
-            [$project, $this->getDummyStudent(3), 50.0],
+            [$project, $this->getDummyStudent(3), 75.0],
             [$project, $this->getDummyStudent(4), 50.0],
             [$project, $this->getDummyStudent(5), 41.6666666666666],
             [$project, $this->getDummyStudent(6), 50.0],
@@ -1982,7 +1982,7 @@ class AssessableTest extends TestCase
             return [
                 [$project, $this->getDummyStudent(1), null],
                 [$project, $this->getDummyStudent(2), 'Acceptable'],
-                [$project, $this->getDummyStudent(3), 'Acceptable'],
+                [$project, $this->getDummyStudent(3), 'Excellent'],
                 [$project, $this->getDummyStudent(4), 'Excellent'],
                 [$project, $this->getDummyStudent(5), 'Excellent'],
                 [$project, $this->getDummyStudent(6), 'Acceptable'],
@@ -1994,7 +1994,7 @@ class AssessableTest extends TestCase
         return [
             [$project, $this->getDummyStudent(1), null],
             [$project, $this->getDummyStudent(2), 'Acceptable'],
-            [$project, $this->getDummyStudent(3), 'Acceptable'],
+            [$project, $this->getDummyStudent(3), 'Excellent'],
             [$project, $this->getDummyStudent(4), 'Excellent'],
             [$project, $this->getDummyStudent(5), 'Excellent'],
             [$project, $this->getDummyStudent(6), 'Acceptable'],
@@ -2017,7 +2017,7 @@ class AssessableTest extends TestCase
         return [
             [$project, $this->getDummyStudent(1), null],
             [$project, $this->getDummyStudent(2), 'Acceptable'],
-            [$project, $this->getDummyStudent(3), 'Acceptable'],
+            [$project, $this->getDummyStudent(3), 'Excellent'],
             [$project, $this->getDummyStudent(4), 'Acceptable'],
             [$project, $this->getDummyStudent(5), 'Acceptable'],
             [$project, $this->getDummyStudent(6), 'Acceptable'],
@@ -2041,7 +2041,7 @@ class AssessableTest extends TestCase
             return [
                 [$project, $this->getDummyStudent(1), null],
                 [$project, $this->getDummyStudent(2), '50 %'],
-                [$project, $this->getDummyStudent(3), '50 %'],
+                [$project, $this->getDummyStudent(3), '100 %'],
                 [$project, $this->getDummyStudent(4), '100 %'],
                 [$project, $this->getDummyStudent(5), '100 %'],
                 [$project, $this->getDummyStudent(6), '50 %'],
@@ -2053,7 +2053,7 @@ class AssessableTest extends TestCase
         return [
             [$project, $this->getDummyStudent(1), null],
             [$project, $this->getDummyStudent(2), '50 %'],
-            [$project, $this->getDummyStudent(3), '50 %'],
+            [$project, $this->getDummyStudent(3), '100 %'],
             [$project, $this->getDummyStudent(4), '100 %'],
             [$project, $this->getDummyStudent(5), '100 %'],
             [$project, $this->getDummyStudent(6), '50 %'],
@@ -2076,7 +2076,7 @@ class AssessableTest extends TestCase
         return [
             [$project, $this->getDummyStudent(1), null],
             [$project, $this->getDummyStudent(2), '50 %'],
-            [$project, $this->getDummyStudent(3), '50 %'],
+            [$project, $this->getDummyStudent(3), '100 %'],
             [$project, $this->getDummyStudent(4), '50 %'],
             [$project, $this->getDummyStudent(5), '50 %'],
             [$project, $this->getDummyStudent(6), '50 %'],
@@ -2100,7 +2100,7 @@ class AssessableTest extends TestCase
             return [
                 [$project, $this->getDummyStudent(1), null],
                 [$project, $this->getDummyStudent(2), 'Acceptable'],
-                [$project, $this->getDummyStudent(3), 'Acceptable'],
+                [$project, $this->getDummyStudent(3), 'Good'],
                 [$project, $this->getDummyStudent(4), 'Very Good'],
                 [$project, $this->getDummyStudent(5), 'Excellent'],
                 [$project, $this->getDummyStudent(6), 'Acceptable'],
@@ -2112,7 +2112,7 @@ class AssessableTest extends TestCase
         return [
             [$project, $this->getDummyStudent(1), null],
             [$project, $this->getDummyStudent(2), 'Acceptable'],
-            [$project, $this->getDummyStudent(3), 'Acceptable'],
+            [$project, $this->getDummyStudent(3), 'Good'],
             [$project, $this->getDummyStudent(4), 'Very Good'],
             [$project, $this->getDummyStudent(5), 'Excellent'],
             [$project, $this->getDummyStudent(6), 'Acceptable'],
@@ -2135,7 +2135,7 @@ class AssessableTest extends TestCase
         return [
             [$project, $this->getDummyStudent(1), null],
             [$project, $this->getDummyStudent(2), 'Acceptable'],
-            [$project, $this->getDummyStudent(3), 'Acceptable'],
+            [$project, $this->getDummyStudent(3), 'Very Good'],
             [$project, $this->getDummyStudent(4), 'Acceptable'],
             [$project, $this->getDummyStudent(5), 'Acceptable'],
             [$project, $this->getDummyStudent(6), 'Acceptable'],
@@ -2159,7 +2159,7 @@ class AssessableTest extends TestCase
             return [
                 [$project, $this->getDummyStudent(1), null],
                 [$project, $this->getDummyStudent(2), '50 %'],
-                [$project, $this->getDummyStudent(3), '50 %'],
+                [$project, $this->getDummyStudent(3), '66.67 %'],
                 [$project, $this->getDummyStudent(4), '75 %'],
                 [$project, $this->getDummyStudent(5), '100 %'],
                 [$project, $this->getDummyStudent(6), '50 %'],
@@ -2171,7 +2171,7 @@ class AssessableTest extends TestCase
         return [
             [$project, $this->getDummyStudent(1), null],
             [$project, $this->getDummyStudent(2), '50 %'],
-            [$project, $this->getDummyStudent(3), '50 %'],
+            [$project, $this->getDummyStudent(3), '66.67 %'],
             [$project, $this->getDummyStudent(4), '75 %'],
             [$project, $this->getDummyStudent(5), '100 %'],
             [$project, $this->getDummyStudent(6), '50 %'],
@@ -2194,7 +2194,7 @@ class AssessableTest extends TestCase
         return [
             [$project, $this->getDummyStudent(1), null],
             [$project, $this->getDummyStudent(2), '50 %'],
-            [$project, $this->getDummyStudent(3), '50 %'],
+            [$project, $this->getDummyStudent(3), '75 %'],
             [$project, $this->getDummyStudent(4), '50 %'],
             [$project, $this->getDummyStudent(5), '41.67 %'],
             [$project, $this->getDummyStudent(6), '50 %'],
@@ -2862,10 +2862,10 @@ class AssessableTest extends TestCase
      * student 2: Task: self-assessed
      *            Quiz: 1 attempt + 1 published feedback (1/2)
      *            DueW: 1 submission
-     * student 3: Task: teacher-assessed
+     * student 3: Task: teacher-assessed (thus 100%)
      *            Quiz: 1 attempt + 1 unpublished feedback (1/2)
      *            DueW: 1 submission + 1 published feedback (50.0)
-     * student 4: Task: self-assessed then teacher-assessed
+     * student 4: Task: self-assessed then teacher-assessed (thus 100%)
      *            Quiz: 2 attempt + 1 published feedback (1/2) + 1 later unpublished feedback (2/2)
      *            DueW: 1 submission + 1 unpublished feedback (50.0)
      * student 5: Task: -
