@@ -517,7 +517,7 @@ export default {
                         />
                         Goals
                     </label>
-                    <label for="filter-learning-moments">
+                    <label for="filter-learning-moments" v-if="config.routes.getCreateEvidenceForm">
                         <input
                             type="checkbox"
                             class="plain"
