@@ -236,6 +236,23 @@ class ProjectTest extends TestCase
         $project->setAssessables((new GenericCollection(IAssessable::class))
             ->add($task));
 
+        // Average mark:
+        // participant does _not_ have published feedback before they receive
+        // feedback on their task, because the task contributes toward their
+        // project mark
+        $project->setSummator(new SummatorAverage());
+        $this->assertFalse($project->hasPublishedFeedback($project->getParticipant($this->hodes)));
+
+        // Weighted average mark:
+        // participant _does_ have published feedback before they receive
+        // feedback on their task, because the task doesn't contribute toward
+        // the mark they'd receive on the project
+        $project->setSummator(new SummatorWeightedAverage());
+        $this->assertTrue($project->hasPublishedFeedback($project->getParticipant($this->hodes)));
+
+        // once the participant attempts the task, hasPublishedFeedback changes:
+        // they _have_ published feedback for both summators
+        $this->addFeedbackToTask($task, $this->hodes);
         $project->setSummator(new SummatorAverage());
         $this->assertTrue($project->hasPublishedFeedback($project->getParticipant($this->hodes)));
         $project->setSummator(new SummatorWeightedAverage());
