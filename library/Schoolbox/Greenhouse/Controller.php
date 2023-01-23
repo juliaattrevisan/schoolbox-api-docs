@@ -10,10 +10,8 @@ namespace Schoolbox\Greenhouse;
 
 use Alaress\Web\Controller\Base;
 
-
 class Controller extends Base
 {
-
     /**
      * @var \Schoolbox\Error\Mapper
      */
