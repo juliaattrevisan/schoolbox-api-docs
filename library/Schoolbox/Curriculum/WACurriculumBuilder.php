@@ -201,14 +201,50 @@ class WACurriculumBuilder
      * Collate the WA curriculum csv from the json source files
      *
      * @return void
-     * @throws DebugBarException
      * @throws \DomainException
      * @throws \RuntimeException
      */
     public function generate(): void
     {
+        $i = 1;
+        $csvPayload = [];
+
+        /* Curriculum root node
+         */
+        $curriculumRootNode = 1;
+
+        $csvPayload[] = [
+            'id' => $curriculumRootNode,
+            'curriculum_node_parent_id' => '',
+            'name' => 'WA Curriculum',
+            'code' => '',
+            'order' => 0,
+            'description' => ''
+        ];
+
         foreach (self::MANIFEST as $url => $name) {
-            new \Alaress_Probe($this->retrieve($url));
+            $curriculum = $this->retrieve($url);
+
+            /* Build hierarchy
+             * id,curriculum_node_parent_id,name,code,order,description
+             */
+            $csvPayload[] = [
+                'id' => $curriculumRootNode,
+                'curriculum_node_parent_id' => '',
+                'name' => $curriculum['title'],
+                'code' => '',
+                'order' => 0,
+                'description' => ''
+            ];
+
+            foreach ($curriculum['curriculumStatements'] as $curriculumStatement) {
+                $row = [
+
+                ];
+
+            }
+
+            $i++;
         }
     }
 }
