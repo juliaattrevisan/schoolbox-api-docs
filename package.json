@@ -48,7 +48,7 @@
         "datatables.net": "~1.11.5",
         "datatables.net-fixedcolumns": "~3.2.6",
         "dayjs": "~1.11.7",
-        "dropzone": "~5.9.2",
+        "dropzone": "~5.9.3",
         "filesize": "~8.0.7",
         "flatpickr": "~4.6.13",
         "gsap": "npm:@gsap/business@~3.11.4",

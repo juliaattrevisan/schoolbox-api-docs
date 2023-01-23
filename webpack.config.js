@@ -300,7 +300,7 @@ module.exports = {
                 test: require.resolve("dropzone"),
                 loader: "expose-loader",
                 options: {
-                    exposes: { globalName: "Dropzone", override: true }
+                    exposes: { globalName: "Dropzone", moduleLocalName: "Dropzone", override: true }
                 },
             },
             {
