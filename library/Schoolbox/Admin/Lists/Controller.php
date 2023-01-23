@@ -704,7 +704,7 @@ class Controller extends Base
                     ],
                     'normaliseAs'   => [
                         'caption'   => 'Normalised Mark',
-                        'tooltip'   => 'Add a value between 0 or 100 that will be awarded on the assessment of a learning activity. Leaving the field blank will award a NULL value to the assessment of a learning activity',
+                        'tooltip'   => 'Add a value between 0 or 100 that will be awarded on the assessment of a learning activity. Leaving the field blank will result in a NULL value when the submission state is selected.',
                         'nullable'  => true,
                         'width'     => 2,
                         'default'   => null,
