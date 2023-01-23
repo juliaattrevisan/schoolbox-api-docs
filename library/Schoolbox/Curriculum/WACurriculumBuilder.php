@@ -53,25 +53,25 @@ class WACurriculumBuilder
     private const HOST = 'https://scsaapps.scsa.wa.edu.au/Apps/CurriculumJSON/';
     private const MANIFEST = [
         'english.json' => 'English Curriculum - Pre-primary to Year 10 ',
-//        'hpe.json' => 'Health and Physical Education Curriculum - Pre-primary to Year 10',
-//        'hass.json' => 'Humanities and Social Sciences Curriculum - Pre-primary to Year 10',
+        'hpe.json' => 'Health and Physical Education Curriculum - Pre-primary to Year 10',
+        'hass.json' => 'Humanities and Social Sciences Curriculum - Pre-primary to Year 10',
 
         /* Languages Curriculum
          */
-//        'chinese-second-language.json' => 'Chinese: Second Language Curriculum - Pre-primary to Year 10',
-//        'french-second-language.json' => 'French: Second Language Curriculum - Pre-primary to Year 10',
-//        'german-second-language.json' => 'German: Second Language Curriculum - Pre-primary to Year 10',
-//        'indonesian-second-language.json' => 'Indonesian: Second Language Curriculum - Pre-primary to Year 10',
-//        'italian-second-language.json' => 'Italian: Second Language Curriculum - Pre-primary to Year 10',
-//        'japanese-second-language.json' => 'Japanese: Second Language Curriculum - Pre-primary to Year 10',
-//        'languages7-10.json' => 'Languages Curriculum - Year 7 to Year 10',
+        'chinese-second-language.json' => 'Chinese: Second Language Curriculum - Pre-primary to Year 10',
+        'french-second-language.json' => 'French: Second Language Curriculum - Pre-primary to Year 10',
+        'german-second-language.json' => 'German: Second Language Curriculum - Pre-primary to Year 10',
+        'indonesian-second-language.json' => 'Indonesian: Second Language Curriculum - Pre-primary to Year 10',
+        'italian-second-language.json' => 'Italian: Second Language Curriculum - Pre-primary to Year 10',
+        'japanese-second-language.json' => 'Japanese: Second Language Curriculum - Pre-primary to Year 10',
+        'languages7-10.json' => 'Languages Curriculum - Year 7 to Year 10',
 
         /* Some other unnamed section/grouping
          */
-//        'mathematics.json' => 'Mathematics Curriculum - Pre-primary to Year 10',
-//        'science.json' => 'Science Curriculum - Pre-primary to Year 10',
-//        'technologies.json' => 'Technologies Curriculum - Pre-primary to Year 10',
-//        'arts.json' => 'The Arts Curriculum - Pre-primary to Year 10',
+        'mathematics.json' => 'Mathematics Curriculum - Pre-primary to Year 10',
+        'science.json' => 'Science Curriculum - Pre-primary to Year 10',
+        'technologies.json' => 'Technologies Curriculum - Pre-primary to Year 10',
+        'arts.json' => 'The Arts Curriculum - Pre-primary to Year 10',
     ];
 
 
@@ -99,17 +99,9 @@ class WACurriculumBuilder
 
 
     /**
-     * A list of curriculum codes that we encountered
-     *
-     * @var array
-     */
-    private array $foundCodes = [];
-
-
-    /**
      * Codes we expected to encounter at least once
      */
-    private const EXPECTED_CODES = [
+    private array $missingCodes = [
         // Eng
         'ACELA1430a' => 1,
         'ACELA1435a' => 1,
@@ -4851,6 +4843,7 @@ class WACurriculumBuilder
                          */
                         foreach ($substrand['curriculumStatements'] as $node) {
                             $nodeId = $this->i;
+                            $code = $node['notations'][0] ?? '';
 
                             /* Some curricula's nodes contain a curriculumStatements (English)
                              * Some don't (HPE 7c107937-6277-8883-d5b3-9d05bd64fea2)
@@ -4863,7 +4856,7 @@ class WACurriculumBuilder
                                     'id' => $nodeId,
                                     'curriculum_node_parent_id' => $substrandId,
                                     'name' => strip_tags($node['description'] ?? ''),
-                                    'code' => $node['notations'][0] ?? '',
+                                    'code' => $code,
                                     'order' => 0,
                                     'description' => ''
                                 ];
@@ -4874,11 +4867,15 @@ class WACurriculumBuilder
                                     'id' => $nodeId,
                                     'curriculum_node_parent_id' => $substrandId,
                                     'name' => $node['description'],
-                                    'code' => $node['notations'][0] ?? '',
+                                    'code' => $code,
                                     'order' => 0,
                                     'description' => ''
                                 ];
                             }
+
+                            /* Keep track that we found a code
+                             */
+                            unset($this->missingCodes[$code]);
 
                             /* Increment arbitrary node counter every time a node spawns
                              */
@@ -4975,6 +4972,7 @@ class WACurriculumBuilder
                      */
                     foreach ($substrand['curriculumStatements'] as $node) {
                         $nodeId = $this->i;
+                        $code = $node['notations'][0] ?? '';
 
                         /* Some curricula's nodes contain a curriculumStatements (English)
                          * Some don't (HPE 7c107937-6277-8883-d5b3-9d05bd64fea2)
@@ -4984,7 +4982,7 @@ class WACurriculumBuilder
                                 'id' => $nodeId,
                                 'curriculum_node_parent_id' => $substrandId,
                                 'name' => $node['curriculumStatements'][0]['label'],
-                                'code' => $node['notations'][0] ?? '',
+                                'code' => $code,
                                 'order' => 0,
                                 'description' => strip_tags($node['description'] ?? '')
                             ];
@@ -4995,11 +4993,15 @@ class WACurriculumBuilder
                                 'id' => $nodeId,
                                 'curriculum_node_parent_id' => $substrandId,
                                 'name' => $node['description'],
-                                'code' => $node['notations'][0] ?? '',
+                                'code' => $code,
                                 'order' => 0,
                                 'description' => ''
                             ];
                         }
+
+                        /* Keep track that we found a code
+                         */
+                        unset($this->missingCodes[$code]);
 
                         /* Increment arbitrary node counter every time a node spawns
                          */
@@ -5008,5 +5010,14 @@ class WACurriculumBuilder
                 }
             }
         }
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getMissingCodes(): array
+    {
+        return $this->missingCodes;
     }
 }
