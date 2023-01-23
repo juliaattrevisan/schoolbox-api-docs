@@ -742,6 +742,9 @@ fi
 ## Put up maintenance page
 /usr/share/schoolbox/tools/maintenance/site_down.sh
 
+## Remove crons
+rm /etc/cron.d/sbc_schoolbox_$destination_instance_id
+
 ## Drop existing DB and reload just config table
 mysql -u $sqluser -p$sqlpasswd -h $sqlhost -e "SET MAX_STATEMENT_TIME=0; DROP DATABASE $sqldb;";
 mysql -u $sqluser -p$sqlpasswd -h $sqlhost -e "CREATE DATABASE $sqldb CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci';";
@@ -762,9 +765,6 @@ fi
 
 ## Remove maintenance page
 /usr/share/schoolbox/tools/maintenance/site_up.sh
-
-## Remove crons
-rm -v /etc/schoolbox/cron_config.ini
 
 
 # Move data files to correct location if restoring from backup
