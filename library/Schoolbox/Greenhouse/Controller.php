@@ -10,6 +10,7 @@ namespace Schoolbox\Greenhouse;
 
 use Alaress\Web\Controller\Base;
 
+
 class Controller extends Base
 {
 
@@ -36,7 +37,7 @@ class Controller extends Base
      */
     public function getGreenhouse($templateName)
     {
-        $builder = new \Schoolbox\Curriculum\WACurriculumBuilder();
+        $builder = new \Schoolbox\Curriculum\WACurriculum\Builder();
         $content = $builder->generate();
 
         $headers = $this->getResponse()->headers;

@@ -7,17 +7,14 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Curriculum;
+namespace Schoolbox\Curriculum\WACurriculum;
 
-use DebugBar\DebugBarException;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\TransferStats;
 
 /**
  * Builds the WA Curriculum csv from a set of endpoints
  */
-class WACurriculumBuilder
+class Builder
 {
     /**
      * Number of seconds to take a nap before retrying a failed endpoint
