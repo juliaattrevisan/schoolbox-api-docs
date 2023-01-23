@@ -54,12 +54,12 @@ class WACurriculumBuilder
     private const HOST = 'https://scsaapps.scsa.wa.edu.au/Apps/CurriculumJSON/';
     private const MANIFEST = [
 //        'english.json' => 'English Curriculum - Pre-primary to Year 10 ',
-        //        'hpe.json' => 'Health and Physical Education Curriculum - Pre-primary to Year 10',
+                'hpe.json' => 'Health and Physical Education Curriculum - Pre-primary to Year 10',
         //        'hass.json' => 'Humanities and Social Sciences Curriculum - Pre-primary to Year 10',
 
         /* Languages Curriculum
          */
-                'chinese-second-language.json' => 'Chinese: Second Language Curriculum - Pre-primary to Year 10',
+//                'chinese-second-language.json' => 'Chinese: Second Language Curriculum - Pre-primary to Year 10',
         //        'french-second-language.json' => 'French: Second Language Curriculum - Pre-primary to Year 10',
         //        'german-second-language.json' => 'German: Second Language Curriculum - Pre-primary to Year 10',
         //        'indonesian-second-language.json' => 'Indonesian: Second Language Curriculum - Pre-primary to Year 10',
@@ -252,6 +252,11 @@ class WACurriculumBuilder
             /* Increment arbitrary node counter every time a node spawns
              */
             $i++;
+
+            /* FIXME English/HPE/HSS skips the Subject piece in the hierarchy for some reason
+             *  and the xls suggests it's just a clone of what we just made for the Learning Area
+             *  so I guess we just...noobscript a way out of this heresy
+             */
 
             foreach ($learningArea['curriculumStatements'] as $subject) {
                 $subjectId = $i;
