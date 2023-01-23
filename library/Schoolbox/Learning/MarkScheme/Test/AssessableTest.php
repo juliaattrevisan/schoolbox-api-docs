@@ -1757,8 +1757,8 @@ class AssessableTest extends TestCase
             return [
                 [$project, $this->getDummyStudent(1), null],
                 [$project, $this->getDummyStudent(2), 50.0],
-                [$project, $this->getDummyStudent(3), 66.67],
-                [$project, $this->getDummyStudent(4), 83.33],
+                [$project, $this->getDummyStudent(3), 66.666666666667],
+                [$project, $this->getDummyStudent(4), 83.333333333333],
                 [$project, $this->getDummyStudent(5), 100.0],
                 [$project, $this->getDummyStudent(6), 50.0],
                 [$project, $this->getDummyStudent(7), 100.0],
@@ -1769,8 +1769,8 @@ class AssessableTest extends TestCase
         return [
             [$project, $this->getDummyStudent(1), null],
             [$project, $this->getDummyStudent(2), 50.0],
-            [$project, $this->getDummyStudent(3), 66.67],
-            [$project, $this->getDummyStudent(4), 83.33],
+            [$project, $this->getDummyStudent(3), 66.666666666667],
+            [$project, $this->getDummyStudent(4), 83.333333333333],
             [$project, $this->getDummyStudent(5), 100.0],
             [$project, $this->getDummyStudent(6), 50.0],
             [$project, $this->getDummyStudent(7), 100.0],
