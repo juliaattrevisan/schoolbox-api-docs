@@ -4818,7 +4818,7 @@ class WACurriculumBuilder
             $this->csvPayload[] = [
                 'id' => $subjectId,
                 'curriculum_node_parent_id' => $learningAreaId,
-                'name' => $subject['title'],
+                'name' => strip_tags($subject['title'] ?? ''),
                 'code' => '',
                 'order' => 0,
                 'description' => strip_tags($level['description'] ?? '')
@@ -4836,7 +4836,7 @@ class WACurriculumBuilder
                 $this->csvPayload[] = [
                     'id' => $levelId,
                     'curriculum_node_parent_id' => $subjectId,
-                    'name' => $level['title'],
+                    'name' => strip_tags($level['title'] ?? ''),
                     'code' => '',
                     'order' => 0,
                     'description' => strip_tags($level['description'] ?? '')
@@ -4858,7 +4858,7 @@ class WACurriculumBuilder
                     $this->csvPayload[] = [
                         'id' => $strandId,
                         'curriculum_node_parent_id' => $levelId,
-                        'name' => $strand['title'],
+                        'name' => strip_tags($strand['title'] ?? ''),
                         'code' => '',
                         'order' => 0,
                         'description' => ''
@@ -4879,7 +4879,7 @@ class WACurriculumBuilder
                             $this->csvPayload[] = [
                                 'id' => $substrandId,
                                 'curriculum_node_parent_id' => $strandId,
-                                'name' => $substrand['title'],
+                                'name' => strip_tags($substrand['title'] ?? ''),
                                 'code' => '',
                                 'order' => 0,
                                 'description' => ''
@@ -4916,7 +4916,7 @@ class WACurriculumBuilder
                                     $this->csvPayload[] = [
                                         'id' => $nodeId,
                                         'curriculum_node_parent_id' => $substrandId,
-                                        'name' => $node['description'],
+                                        'name' => strip_tags($node['description'] ?? ''),
                                         'code' => $code,
                                         'order' => 0,
                                         'description' => ''
@@ -4942,7 +4942,7 @@ class WACurriculumBuilder
                             $this->csvPayload[] = [
                                 'id' => $nodeId,
                                 'curriculum_node_parent_id' => $strandId,
-                                'name' => $substrand['description'],
+                                'name' => strip_tags($substrand['description'] ?? ''),
                                 'code' => $code,
                                 'order' => 0,
                                 'description' => ''
@@ -4985,7 +4985,7 @@ class WACurriculumBuilder
         $this->csvPayload[] = [
             'id' => $subjectId,
             'curriculum_node_parent_id' => $learningAreaId,
-            'name' => $learningArea['title'],
+            'name' => strip_tags($learningArea['title'] ?? ''),
             'code' => '',
             'order' => 0,
             'description' => ''
@@ -5003,7 +5003,7 @@ class WACurriculumBuilder
             $this->csvPayload[] = [
                 'id' => $levelId,
                 'curriculum_node_parent_id' => $subjectId,
-                'name' => $level['title'],
+                'name' => strip_tags($level['title'] ?? ''),
                 'code' => '',
                 'order' => 0,
                 'description' => strip_tags($level['description'] ?? '')
@@ -5025,7 +5025,7 @@ class WACurriculumBuilder
                 $this->csvPayload[] = [
                     'id' => $strandId,
                     'curriculum_node_parent_id' => $levelId,
-                    'name' => $strand['title'],
+                    'name' => strip_tags($strand['title'] ?? ''),
                     'code' => '',
                     'order' => 0,
                     'description' => ''
@@ -5043,7 +5043,7 @@ class WACurriculumBuilder
                     $this->csvPayload[] = [
                         'id' => $substrandId,
                         'curriculum_node_parent_id' => $strandId,
-                        'name' => $substrand['title'],
+                        'name' => strip_tags($substrand['title'] ?? ''),
                         'code' => '',
                         'order' => 0,
                         'description' => ''
@@ -5066,7 +5066,7 @@ class WACurriculumBuilder
                             $this->csvPayload[] = [
                                 'id' => $nodeId,
                                 'curriculum_node_parent_id' => $substrandId,
-                                'name' => $node['curriculumStatements'][0]['label'],
+                                'name' => strip_tags($node['curriculumStatements'][0]['label'] ?? ''),
                                 'code' => $code,
                                 'order' => 0,
                                 'description' => strip_tags($node['description'] ?? '')
@@ -5077,7 +5077,7 @@ class WACurriculumBuilder
                             $this->csvPayload[] = [
                                 'id' => $nodeId,
                                 'curriculum_node_parent_id' => $substrandId,
-                                'name' => $node['description'],
+                                'name' => strip_tags($node['description'] ?? ''),
                                 'code' => $code,
                                 'order' => 0,
                                 'description' => ''
