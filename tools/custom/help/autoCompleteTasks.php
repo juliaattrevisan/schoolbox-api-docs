@@ -9,8 +9,6 @@
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
-use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
-use Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 
