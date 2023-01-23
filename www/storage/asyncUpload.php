@@ -37,7 +37,7 @@ $result = array(
     'message' => 'Unknown Error',
     'hash'    => '',
 );
-if (!$_SESSION['id']) {
+if (!($_SESSION['id'] ?? false)) {
     $result['message'] = 'Unauthorized';
     $result['error']   = 403;
 } elseif (isset($_FILES['upload'])) {
