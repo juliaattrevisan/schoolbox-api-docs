@@ -36,6 +36,19 @@ class Controller extends Base
      */
     public function getGreenhouse($templateName)
     {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@greenhouse/' . $templateName . '.twig', []));
+        $builder = new \Schoolbox\Curriculum\WACurriculumBuilder();
+        $content = $builder->generate();
+
+        $headers = $this->getResponse()->headers;
+        $headers->set('Pragma', ' ');
+        $headers->set('Cache-Control', ' ');
+        $headers->set('Content-Type', 'text/csv');
+        $headers->set('Content-Length', \strlen($content));
+        $headers->set('Content-Disposition', "attachment; filename=\"WACurriculum.csv\"");
+
+        $this->getResponse()->content->set([
+            'format' => 'file',
+            'data'   => $content
+        ]);
     }
 }

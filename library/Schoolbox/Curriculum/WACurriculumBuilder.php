@@ -4673,11 +4673,11 @@ class WACurriculumBuilder
     /**
      * Collate the WA curriculum csv from the json source files
      *
-     * @return array
+     * @return void
      * @throws \DomainException
      * @throws \RuntimeException
      */
-    public function generate(): array
+    private function build(): void
     {
         $curriculumRootNode = 1;
 
@@ -4730,8 +4730,45 @@ class WACurriculumBuilder
 
             $learningAreaId = $this->i;
         }
+    }
 
-        return $this->csvPayload;
+
+    /**
+     * Spawn a csv
+     *
+     * @return string
+     * @throws \DomainException
+     * @throws \RuntimeException
+     */
+    public function generate(): string
+    {
+        $this->build();
+
+        /* Header row
+         */
+        $headings = [
+            'id',
+            'curriculum_node_parent_id',
+            'name',
+            'code',
+            'order',
+            'description'
+        ];
+
+        $fp = fopen('php://temp', 'w');
+        fputcsv($fp, $headings);
+
+        foreach ($this->csvPayload as $row) {
+            fputcsv($fp, $row);
+        }
+
+        rewind($fp);
+
+        $contents = stream_get_contents($fp);
+
+        fclose($fp);
+
+        return $contents;
     }
 
 
