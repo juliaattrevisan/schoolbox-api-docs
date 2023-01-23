@@ -312,18 +312,30 @@ class WACurriculumBuilder
                         foreach ($substrand['curriculumStatements'] as $node) {
                             $nodeId = $i;
 
-                            if (!isset($node['curriculumStatements'][0]['label'])) {
-                                new \Alaress_Probe($node);
+                            /* Some curricula's nodes contain a curriculumStatements (English)
+                             * Some don't (HPE 7c107937-6277-8883-d5b3-9d05bd64fea2)
+                             */
+                            if (isset($node['curriculumStatements'][0]['label'])) {
+                                $csvPayload[] = [
+                                    'id' => $nodeId,
+                                    'curriculum_node_parent_id' => $substrandId,
+                                    'name' => $node['curriculumStatements'][0]['label'],
+                                    'code' => $node['notations'][0] ?? '',
+                                    'order' => 0,
+                                    'description' => strip_tags($node['description'])
+                                ];
+                            } else {
+                                /* HPE has a weird union combination of data structs
+                                 */
+                                $csvPayload[] = [
+                                    'id' => $nodeId,
+                                    'curriculum_node_parent_id' => $substrandId,
+                                    'name' => $node['description'],
+                                    'code' => $node['notations'][0] ?? '',
+                                    'order' => 0,
+                                    'description' => ''
+                                ];
                             }
-
-                            $csvPayload[] = [
-                                'id' => $nodeId,
-                                'curriculum_node_parent_id' => $substrandId,
-                                'name' => $node['curriculumStatements'][0]['label'],
-                                'code' => $node['notations'][0] ?? '',
-                                'order' => 0,
-                                'description' => strip_tags($node['description'])
-                            ];
 
                             /* Increment arbitrary node counter every time a node spawns
                              */
