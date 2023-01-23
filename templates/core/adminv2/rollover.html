@@ -48,7 +48,7 @@
 
                                     content.append($('<h3/>').html(len + ' classes found.')).append(list);
 
-                                    var confirmation = $('<form/>').attr('method', 'post').attr('action', '/adminv2/rolloverForm.php');
+                                    var confirmation = $('<form/>').attr('id', 'form-rollover').attr('method', 'post').attr('action', '/adminv2/rolloverForm.php');
                                     confirmation.append($('<input type="hidden" />').attr('name', 'rollover').val(parent));
                                     confirmation.append($('<h3/>').html('Rollover these ' + len + ' classes?<br/>'));
                                     confirmation.append($('<button type="submit" data-rollover>Rollover</button>'));
@@ -57,10 +57,9 @@
                                     $('button[data-rollover]').click(function (event) {
                                         event.preventDefault();
                                         $(this).confirmDialog({
-                                            text: 'This function is irreversible, so only do this if you are absolutely certain that you want to.',
-                                            confirmLabel: 'Rollover',
+                                            text: 'Are you sure you wish to rollover?',
                                             confirmEvent: function () {
-                                                console.warn("confirmed")
+                                                document.getElementById('form-rollover').submit();
                                             }
                                         });
                                     });
