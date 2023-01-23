@@ -2401,7 +2401,7 @@ class AssessableTest extends TestCase
         $participant4->getAllResponses()->add($response4a);
 
         $response4b = new TaskResponse();
-        $response4b->setId(4);
+        $response4b->setId(5);
         $response4b->setAssessable($task);
         $response4b->setSubmittedBy($student4);
         $response4b->setSubmittedOnBehalfOf($teacher);
