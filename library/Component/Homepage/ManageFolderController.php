@@ -59,9 +59,10 @@ class Component_Homepage_ManageFolderController extends Component_Homepage_Contr
         $this->setBlock($templateHandle, "manage_textboxes", "manage_textboxes_block");
 
         // My links button
-        $url = 'https://' . Config::get('site_hostname') . '.' . Config::get('site_domain') . '/homepage/' . $this->getContext()->getId();
+        $homepageUrl = '/homepage/' . $this->getContext()->getId();
+        $url = 'https://' . Config::get('site_hostname') . '.' . Config::get('site_domain') . $homepageUrl;
 
-        if ($this->myLinkHandler->linkExists($_SESSION['id'], $url)) {
+        if ($this->myLinkHandler->linkExists($_SESSION['id'], $homepageUrl, $url)) {
             $this->setVar('addmylinks_block', '');
         } else {
             $this->setVar('HOMEPAGE_URL', $url);

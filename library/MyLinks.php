@@ -2,7 +2,6 @@
 
 class MyLinks extends DeprecatedModel
 {
-
     public function __construct()
     {
         $this->_table = 'bookmarks';
@@ -11,9 +10,15 @@ class MyLinks extends DeprecatedModel
         parent::__construct();
     }
 
-    function linkExists($uid, $link)
+    /**
+     * @param int    $uid
+     * @param string $relativeLink
+     * @param string $absoluteLink
+     * @return mixed
+     */
+    function linkExists(int $uid, string $relativeLink, string $absoluteLink)
     {
-        $query = "SELECT id FROM bookmarks WHERE owner='$uid' AND url = '" . $this->db->quote($link) . "'";
+        $query = "SELECT id FROM bookmarks WHERE owner='$uid' AND (url = '" . $this->db->quote($relativeLink) . "' OR url = '" . $this->db->quote($absoluteLink) . "')";
         return $this->db->getOne($query);
     }
 }
