@@ -2981,6 +2981,13 @@ class AssessableTest extends TestCase
 
 
     /**
+     * Get the letter grade group.
+     * * 0-40:  Needs Attention
+     * * 40-60: Acceptable
+     * * 60-75: Good
+     * * 75-90: Very Good
+     * * 90+:   Excellent
+     *
      * @return GradeGroup
      */
     private function getDummyLetterGradeGroup(): GradeGroup
