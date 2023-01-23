@@ -66,16 +66,10 @@ HELP;
         if (!$this->perform()) {
             $this->getLogger()->alert("Preview Mode");
         } else {
-            $this->getLogger()->alert("Action Mode");
+            $this->getLogger()->info("Action Mode");
         }
 
         $db     = $this->getDatabaseInternal();
-        //grab the response mapper for tasks
-        $taskResponseMapper = new Schoolbox\Learning\Assessment\Task\Response\MapperProxy(Schoolbox\Assessment\Course\Task\CompletionMapper::getInstance());
-        //create a user for who is marking the tasks as complete
-        $markingUser = new Schoolbox\User();
-        $markingUser->setId(1);
-
 
         // finds all tasks that require to update
         $statement = $db->prepareQuery("select `t`.`assessment_id`    AS `assessment_id`,
@@ -84,7 +78,8 @@ HELP;
                        `tc`.`student_id`      AS `student_id`,
                        `tc`.marking_user_id AS `reviewer`,
                        `tc`.`completion_date` AS `published_at`,
-                       `tc`.`completion_status` AS `completion_status`
+                       `tc`.`completion_status` AS `completion_status`,
+                       `tc`.`task_id` AS `task_id`
 
                 from ((`schoolbox`.`task_completion` `tc`
                     join (select
@@ -106,33 +101,23 @@ HELP;
         while ($taskFeedback = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $this->getLogger()->info(
                 sprintf(
-                    "Assessment: %s, Student: %s, feedbackId: %s",
+                    "Assessment: %s, TaskId: %s, Student: %s, feedbackId: %s",
                     $taskFeedback['assessment_id'],
+                    $taskFeedback['task_id'],
                     $taskFeedback['student_id'],
                     $taskFeedback['feedback_id']
                 )
             );
             if ($this->perform()) {
-                // update item
-                //build example student
-                $student = new Schoolbox\User();
-                $student->setId($taskFeedback['student_id']);
-                //build example assessment
-                $assessment = new Schoolbox\Learning\Assessment\Task\Model();
-                $assessment->setId($taskFeedback['assessment_id']);
-                $this->getLogger()->info("Updating Mark");
-                $taskResponse = (new TaskResponse())
-                    ->setAssessable($assessment)
-                    ->setSubmittedOnBehalfOf($student)
-                    ->setSubmittedBy($markingUser)
-                    ->setMarkedComplete(true);
-
-                $feedback = (new TaskFeedback())
-                    ->setResponse($taskResponse);
-                $taskResponse->getAllFeedback()->add($feedback);
-
-                // And save (no need to save a feedback - it will be built automatically from this response on DB retrieval)
-                $taskResponseMapper->save($taskResponse);
+                $this->getLogger()->info(sprintf("Inserting Task Complete Entry for TaskId: %s, studentId: %s", $taskFeedback['task_id'], $taskFeedback['student_id']));
+                $newStatusStatment = $db->prepareQuery("
+                    INSERT INTO
+                    task_completion
+                        (`task_id`, `student_id`, `marking_user_id`, `completion_date`, `completion_status`)
+                    VALUES
+                        (:task_id, :student_id, :marking_user_id, NOW(), 3)
+                ");
+                $newStatusStatment->execute(['task_id' => $taskFeedback['task_id'], 'student_id' => $taskFeedback['student_id'], 'marking_user_id' => 1]);
             }
         }
         $statement->close();
