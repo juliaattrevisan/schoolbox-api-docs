@@ -51,6 +51,7 @@ export default {
             // NOTE: There is a matching array in library/Schoolbox/Learning/Moment/Feed/Cursor.php.
             //       If any change is made to this array, a similar change should be made to that array.
             feedItemTypes: ["goals", "learning-moments", "achievements", "feedback"],
+            showFeed: true,
         };
     },
     computed: {
@@ -83,6 +84,7 @@ export default {
          * Once received, group them by date.
          */
         load() {
+            this.showFeed = false;
             this.data = [];
             this.append(null);
         },
@@ -109,6 +111,7 @@ export default {
                 this.loading = false;
             } finally {
                 this.showSkeletonLoader = false;
+                this.showFeed = true;
             }
         },
 
@@ -589,214 +592,241 @@ export default {
             <div class="feed-column right"></div>
         </div>
 
-        <div class="feed" v-for="(evidenceGroup, index) in groupedEvidence" :key="index">
-            <div class="feed-column left"></div>
-            <section class="activity-feed">
-                <h2 class="subheader no-margin">
-                    <time
-                        :datetime="formatDate(evidenceGroup.date, 'YYYY-MM-DD')"
-                        :title="formatDate(evidenceGroup.date, dateDisplayFormats.dayjsDateLong)"
-                        >{{ renderCreatedAt(evidenceGroup.date) }}</time
-                    >
-                </h2>
-                <ul class="information-list">
-                    <li v-for="(evidence, index) in evidenceGroup.evidence" class="feed-item" :key="index">
-                        <template v-if="evidence.discriminator === 'evidence'">
-                            <!-- This evidence isn't necessarily editable -->
-                            <div
-                                :class="{
-                                    'actions-small-1': hasMenu(evidence.object),
-                                    'actions-small-0': !hasMenu(evidence.object),
-                                }"
+        <Transition name="fade" mode="out-in">
+            <div v-if="showFeed">
+                <div class="feed" v-for="(evidenceGroup, index) in groupedEvidence" :key="index">
+                    <div class="feed-column left"></div>
+                    <section class="activity-feed">
+                        <h2 class="subheader no-margin">
+                            <time
+                                :datetime="formatDate(evidenceGroup.date, 'YYYY-MM-DD')"
+                                :title="formatDate(evidenceGroup.date, dateDisplayFormats.dayjsDateLong)"
+                                >{{ renderCreatedAt(evidenceGroup.date) }}</time
                             >
-                                <div class="card small-12 compact">
-                                    <a :href="evidence.object.creator._links.profile" title="View Profile">
-                                        <img :src="evidence.object.creator._links.avatar" alt="View Profile" />
-                                        <p>{{ evidence.object.creator.fullName }}</p>
-                                        <time
-                                            class="pipe meta"
-                                            :datetime="formatDate(evidence.object.createdAt)"
-                                            :title="
-                                                formatDate(evidence.object.createdAt, dateDisplayFormats.dayjsDatetime)
-                                            "
-                                            >{{
-                                                formatDate(evidence.object.createdAt, dateDisplayFormats.dayjsTime)
-                                            }}</time
-                                        >
-                                    </a>
-                                </div>
-                                <nav v-if="hasMenu(evidence.object)">
-                                    <a
-                                        href="#"
-                                        class="icon-overflow"
-                                        :data-dropdown="'evidence-' + String(evidence.object.id) + '-dropdown'"
-                                        aria-expanded="false"
-                                        title="Actions"
-                                    ></a>
-                                </nav>
-                                <ul
-                                    v-if="hasMenu(evidence.object)"
-                                    :id="'evidence-' + String(evidence.object.id) + '-dropdown'"
-                                    class="f-dropdown"
-                                    data-dropdown-content
-                                >
-                                    <li>
-                                        <a
-                                            v-if="evidence.object._links.modifyForm"
-                                            :href="evidence.object._links.modifyForm + '?returnUrl=' + returnUrl"
-                                            class="icon-modify"
-                                            title="Modify"
-                                            >Modify</a
-                                        >
-                                    </li>
-                                    <li>
-                                        <a
-                                            @click.prevent="showDeleteModal(evidence)"
-                                            v-if="evidence.object._links.delete"
-                                            class="icon-delete"
-                                            title="Delete"
-                                            >Delete</a
-                                        >
-                                    </li>
-                                </ul>
-                            </div>
-
-                            <div class="feed-body small-12 columns">
-                                <!-- Is there an attachment? Display it appropriately -->
-                                <article v-if="evidence.object.filename && evidence.object.storage">
-                                    <storage
-                                        :storage="evidence.object.storage"
-                                        :filename="evidence.object.filename"
-                                    ></storage>
-                                </article>
-
-                                <!-- Display evidence body, with media players initialised -->
-                                <media-article v-if="evidence.object.body">
-                                    <div v-html="evidence.object.body" />
-                                </media-article>
-
-                                <!-- Display curriculum codes and tags -->
-                                <div class="tags">
-                                    <p
-                                        class="meta"
-                                        v-if="
-                                            evidence.object.curriculumNodes.length > 0 ||
-                                            evidence.object.tags.length > 0
-                                        "
+                        </h2>
+                        <ul class="information-list">
+                            <li v-for="(evidence, index) in evidenceGroup.evidence" class="feed-item" :key="index">
+                                <template v-if="evidence.discriminator === 'evidence'">
+                                    <!-- This evidence isn't necessarily editable -->
+                                    <div
+                                        :class="{
+                                            'actions-small-1': hasMenu(evidence.object),
+                                            'actions-small-0': !hasMenu(evidence.object),
+                                        }"
                                     >
-                                        Tags:
-                                        <codes-list
-                                            :nodes="evidence.object.curriculumNodes"
-                                            @selected="onCodeSelected"
-                                        /><template
-                                            v-if="
-                                                evidence.object.curriculumNodes.length > 0 &&
-                                                evidence.object.tags.length > 0
-                                            "
-                                            >,
-                                        </template>
-                                        <template
-                                            v-for="(tag, index) in evidence.object.tags"
-                                            :key="`${index}-${tag.name}`"
+                                        <div class="card small-12 compact">
+                                            <a :href="evidence.object.creator._links.profile" title="View Profile">
+                                                <img :src="evidence.object.creator._links.avatar" alt="View Profile" />
+                                                <p>{{ evidence.object.creator.fullName }}</p>
+                                                <time
+                                                    class="pipe meta"
+                                                    :datetime="formatDate(evidence.object.createdAt)"
+                                                    :title="
+                                                        formatDate(
+                                                            evidence.object.createdAt,
+                                                            dateDisplayFormats.dayjsDatetime
+                                                        )
+                                                    "
+                                                    >{{
+                                                        formatDate(
+                                                            evidence.object.createdAt,
+                                                            dateDisplayFormats.dayjsTime
+                                                        )
+                                                    }}</time
+                                                >
+                                            </a>
+                                        </div>
+                                        <nav v-if="hasMenu(evidence.object)">
+                                            <a
+                                                href="#"
+                                                class="icon-overflow"
+                                                :data-dropdown="'evidence-' + String(evidence.object.id) + '-dropdown'"
+                                                aria-expanded="false"
+                                                title="Actions"
+                                            ></a>
+                                        </nav>
+                                        <ul
+                                            v-if="hasMenu(evidence.object)"
+                                            :id="'evidence-' + String(evidence.object.id) + '-dropdown'"
+                                            class="f-dropdown"
+                                            data-dropdown-content
                                         >
-                                            <template v-if="index !== 0">, </template>
-                                            <span
-                                                class="anchor-style"
-                                                @click="onChangeFilters(tag.name, true)"
-                                                title="Click to only show items with this tag."
-                                                >{{ tag.name }}</span
-                                            >
-                                        </template>
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div class="feed-comments small-12 columns">
-                                <comment-thread
-                                    :thread="evidence.object.discussionThread"
-                                    :create-thread-endpoint="evidence.object._links.createThread"
-                                    :can-comment="config.canComment"
-                                    :cdn-prefix="cdnPrefix"
-                                    :site-version="siteVersion"
-                                />
-                            </div>
-                        </template>
-                        <template v-if="evidence.discriminator === 'badgeAward'">
-                            <div class="card badge-card small-12">
-                                <a href="#" @click.prevent="openViewBadgeAwardModal(evidence.object)">
-                                    <badge-image
-                                        :badge="evidence.object.badge"
-                                        :css="evidence.object.status === 'goal' ? 'goal' : ''"
-                                    ></badge-image>
-                                    <h3>{{ evidence.object.badge.name }}</h3>
-                                    <p class="meta">
-                                        <template v-if="evidence.object.status === 'achievement'"
-                                            >Achievement awarded</template
-                                        >
-                                        <template v-if="evidence.object.status === 'goal'">Goal set</template>
-                                        by {{ evidence.object.awardedBy.fullName }}
-                                        |
-                                        <time
-                                            class="meta"
-                                            :datetime="formatDate(evidence.object.awardedAt)"
-                                            :title="
-                                                formatDate(evidence.object.awardedAt, dateDisplayFormats.dayjsDatetime)
-                                            "
-                                        >
-                                            {{ formatDate(evidence.object.awardedAt, dateDisplayFormats.dayjsTime) }}
-                                        </time>
-                                    </p>
-                                </a>
-                            </div>
-                        </template>
-                        <template v-if="evidence.discriminator === 'dueWorkFeedback'">
-                            <div class="flex-grade">
-                                <div class="small-12 card columns">
-                                    <div>
-                                        <span class="icon-feedback"></span
-                                        ><a :href="evidence.object._links.summary">{{
-                                            evidence.object.assessment.title
-                                        }}</a>
+                                            <li>
+                                                <a
+                                                    v-if="evidence.object._links.modifyForm"
+                                                    :href="
+                                                        evidence.object._links.modifyForm + '?returnUrl=' + returnUrl
+                                                    "
+                                                    class="icon-modify"
+                                                    title="Modify"
+                                                    >Modify</a
+                                                >
+                                            </li>
+                                            <li>
+                                                <a
+                                                    @click.prevent="showDeleteModal(evidence)"
+                                                    v-if="evidence.object._links.delete"
+                                                    class="icon-delete"
+                                                    title="Delete"
+                                                    >Delete</a
+                                                >
+                                            </li>
+                                        </ul>
                                     </div>
-                                    <p class="meta">
-                                        Reviewed by
-                                        <a :href="evidence.object.instructor._links.profile" title="View Profile">{{
-                                            evidence.object.instructor.fullName
-                                        }}</a>
-                                        in {{ evidence.object.assessment.folderName }} |
-                                        <time
-                                            class="meta"
-                                            :datetime="formatDate(evidence.object.publishedAt)"
-                                            :title="
-                                                formatDate(
-                                                    evidence.object.publishedAt,
-                                                    dateDisplayFormats.dayjsDatetime
-                                                )
-                                            "
+
+                                    <div class="feed-body small-12 columns">
+                                        <!-- Is there an attachment? Display it appropriately -->
+                                        <article v-if="evidence.object.filename && evidence.object.storage">
+                                            <storage
+                                                :storage="evidence.object.storage"
+                                                :filename="evidence.object.filename"
+                                            ></storage>
+                                        </article>
+
+                                        <!-- Display evidence body, with media players initialised -->
+                                        <media-article v-if="evidence.object.body">
+                                            <div v-html="evidence.object.body" />
+                                        </media-article>
+
+                                        <!-- Display curriculum codes and tags -->
+                                        <div class="tags">
+                                            <p
+                                                class="meta"
+                                                v-if="
+                                                    evidence.object.curriculumNodes.length > 0 ||
+                                                    evidence.object.tags.length > 0
+                                                "
+                                            >
+                                                Tags:
+                                                <codes-list
+                                                    :nodes="evidence.object.curriculumNodes"
+                                                    @selected="onCodeSelected"
+                                                /><template
+                                                    v-if="
+                                                        evidence.object.curriculumNodes.length > 0 &&
+                                                        evidence.object.tags.length > 0
+                                                    "
+                                                    >,
+                                                </template>
+                                                <template
+                                                    v-for="(tag, index) in evidence.object.tags"
+                                                    :key="`${index}-${tag.name}`"
+                                                >
+                                                    <template v-if="index !== 0">, </template>
+                                                    <span
+                                                        class="anchor-style"
+                                                        @click="onChangeFilters(tag.name, true)"
+                                                        title="Click to only show items with this tag."
+                                                        >{{ tag.name }}</span
+                                                    >
+                                                </template>
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div class="feed-comments small-12 columns">
+                                        <comment-thread
+                                            :thread="evidence.object.discussionThread"
+                                            :create-thread-endpoint="evidence.object._links.createThread"
+                                            :can-comment="config.canComment"
+                                            :cdn-prefix="cdnPrefix"
+                                            :site-version="siteVersion"
+                                        />
+                                    </div>
+                                </template>
+                                <template v-if="evidence.discriminator === 'badgeAward'">
+                                    <div class="card badge-card small-12">
+                                        <a href="#" @click.prevent="openViewBadgeAwardModal(evidence.object)">
+                                            <badge-image
+                                                :badge="evidence.object.badge"
+                                                :css="evidence.object.status === 'goal' ? 'goal' : ''"
+                                            ></badge-image>
+                                            <h3>{{ evidence.object.badge.name }}</h3>
+                                            <p class="meta">
+                                                <template v-if="evidence.object.status === 'achievement'"
+                                                    >Achievement awarded</template
+                                                >
+                                                <template v-if="evidence.object.status === 'goal'">Goal set</template>
+                                                by {{ evidence.object.awardedBy.fullName }}
+                                                |
+                                                <time
+                                                    class="meta"
+                                                    :datetime="formatDate(evidence.object.awardedAt)"
+                                                    :title="
+                                                        formatDate(
+                                                            evidence.object.awardedAt,
+                                                            dateDisplayFormats.dayjsDatetime
+                                                        )
+                                                    "
+                                                >
+                                                    {{
+                                                        formatDate(
+                                                            evidence.object.awardedAt,
+                                                            dateDisplayFormats.dayjsTime
+                                                        )
+                                                    }}
+                                                </time>
+                                            </p>
+                                        </a>
+                                    </div>
+                                </template>
+                                <template v-if="evidence.discriminator === 'dueWorkFeedback'">
+                                    <div class="flex-grade">
+                                        <div class="small-12 card columns">
+                                            <div>
+                                                <span class="icon-feedback"></span
+                                                ><a :href="evidence.object._links.summary">{{
+                                                    evidence.object.assessment.title
+                                                }}</a>
+                                            </div>
+                                            <p class="meta">
+                                                Reviewed by
+                                                <a
+                                                    :href="evidence.object.instructor._links.profile"
+                                                    title="View Profile"
+                                                    >{{ evidence.object.instructor.fullName }}</a
+                                                >
+                                                in {{ evidence.object.assessment.folderName }} |
+                                                <time
+                                                    class="meta"
+                                                    :datetime="formatDate(evidence.object.publishedAt)"
+                                                    :title="
+                                                        formatDate(
+                                                            evidence.object.publishedAt,
+                                                            dateDisplayFormats.dayjsDatetime
+                                                        )
+                                                    "
+                                                >
+                                                    {{
+                                                        formatDate(
+                                                            evidence.object.publishedAt,
+                                                            dateDisplayFormats.dayjsTime
+                                                        )
+                                                    }}
+                                                </time>
+                                            </p>
+                                        </div>
+                                        <div
+                                            v-if="evidence.object.normalisedMark"
+                                            :class="`grade ${gradient(evidence.object.normalisedMark)}`"
                                         >
-                                            {{ formatDate(evidence.object.publishedAt, dateDisplayFormats.dayjsTime) }}
-                                        </time>
-                                    </p>
-                                </div>
-                                <div
-                                    v-if="evidence.object.normalisedMark"
-                                    :class="`grade ${gradient(evidence.object.normalisedMark)}`"
-                                >
-                                    <span>{{ evidence.object.mark }}</span>
-                                </div>
-                            </div>
-                            <div class="content">
-                                <blockquote v-if="evidence.object.comment">
-                                    {{ evidence.object.comment }}<br />
-                                </blockquote>
-                                <a :href="evidence.object._links.summary"> View assessment details </a>
-                            </div>
-                        </template>
-                    </li>
-                </ul>
-            </section>
-            <div class="feed-column right"></div>
-        </div>
+                                            <span>{{ evidence.object.mark }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="content">
+                                        <blockquote v-if="evidence.object.comment">
+                                            {{ evidence.object.comment }}<br />
+                                        </blockquote>
+                                        <a :href="evidence.object._links.summary"> View assessment details </a>
+                                    </div>
+                                </template>
+                            </li>
+                        </ul>
+                    </section>
+                    <div class="feed-column right"></div>
+                </div>
+            </div>
+        </Transition>
         <div class="skeleton-feed" v-if="showSkeletonLoader">
             <ul class="information-list">
                 <li class="row" v-for="n in 3" :key="n">
@@ -961,3 +991,19 @@ export default {
         <toast ref="toast"></toast>
     </div>
 </template>
+<style>
+.fade-enter-active,
+.fade-leave-active {
+    transition: all 0.5s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
+
+.fade-enter-to,
+.fade-leave-from {
+    opacity: 1;
+}
+</style>
