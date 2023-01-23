@@ -4679,7 +4679,7 @@ class Builder
         $curriculumRootNode = 1;
 
         /* Presumed hierarchy
-         * WA Curriculum > learning area > subject > level > strand > substrand > node
+         * WA Curriculum > learning area > subject > level > strand > substrand + metadata
          */
         $learningAreaId = 2;
 
