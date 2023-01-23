@@ -4765,6 +4765,14 @@ class WACurriculumBuilder
     }
 
 
+    /**
+     * Some json files come with a subject node in their json
+     * If so, process them with the full presumed hierarchy
+     *
+     * @param int   $learningAreaId
+     * @param array $learningArea
+     * @return void
+     */
     private function processWithSubject(int $learningAreaId, array $learningArea): void
     {
         foreach ($learningArea['curriculumStatements'] as $subject) {
@@ -4918,6 +4926,16 @@ class WACurriculumBuilder
     }
 
 
+    /**
+     * Some json files do not come with a subject node in their json
+     * If not, arbitrarily clone Learning Area to reflect the reality shown in xlsx files
+     *
+     * That seems to be what humans have done
+     *
+     * @param int   $learningAreaId
+     * @param array $learningArea
+     * @return void
+     */
     private function processWithoutSubject(int $learningAreaId, array $learningArea): void
     {
         $subjectId = $this->i;
