@@ -53,12 +53,12 @@ class WACurriculumBuilder
      */
     private const HOST = 'https://scsaapps.scsa.wa.edu.au/Apps/CurriculumJSON/';
     private const MANIFEST = [
-//        'english.json' => 'English Curriculum - Pre-primary to Year 10 ',
-        'hpe.json' => 'Health and Physical Education Curriculum - Pre-primary to Year 10',
+        'english.json' => 'English Curriculum - Pre-primary to Year 10 ',
+//        'hpe.json' => 'Health and Physical Education Curriculum - Pre-primary to Year 10',
 //        'hass.json' => 'Humanities and Social Sciences Curriculum - Pre-primary to Year 10',
-//
-//        /* Languages Curriculum
-//         */
+
+        /* Languages Curriculum
+         */
 //        'chinese-second-language.json' => 'Chinese: Second Language Curriculum - Pre-primary to Year 10',
 //        'french-second-language.json' => 'French: Second Language Curriculum - Pre-primary to Year 10',
 //        'german-second-language.json' => 'German: Second Language Curriculum - Pre-primary to Year 10',
@@ -66,7 +66,7 @@ class WACurriculumBuilder
 //        'italian-second-language.json' => 'Italian: Second Language Curriculum - Pre-primary to Year 10',
 //        'japanese-second-language.json' => 'Japanese: Second Language Curriculum - Pre-primary to Year 10',
 //        'languages7-10.json' => 'Languages Curriculum - Year 7 to Year 10',
-//
+
 //        /* Some other unnamed section/grouping
 //         */
 //        'mathematics.json' => 'Mathematics Curriculum - Pre-primary to Year 10',
@@ -215,7 +215,7 @@ class WACurriculumBuilder
         /* Presumed hierarchy
          * WA Curriculum > curriculum > level > strand > substrand > node
          */
-        $curriculumId = 2;
+        $learningAreaId = 2;
 
         /* Mapped payload
          */
@@ -235,15 +235,15 @@ class WACurriculumBuilder
         $i++;
 
         foreach (self::MANIFEST as $url => $name) {
-            $curriculum = $this->retrieve($url);
+            $learningArea = $this->retrieve($url);
 
             /* Build hierarchy
              * id,curriculum_node_parent_id,name,code,order,description
              */
             $csvPayload[] = [
-                'id' => $curriculumId,
+                'id' => $learningAreaId,
                 'curriculum_node_parent_id' => $curriculumRootNode,
-                'name' => $curriculum['title'],
+                'name' => $learningArea['title'],
                 'code' => '',
                 'order' => 0,
                 'description' => ''
@@ -255,16 +255,16 @@ class WACurriculumBuilder
 
             /* Level
              */
-            foreach ($curriculum['curriculumStatements'] as $level) {
+            foreach ($learningArea['curriculumStatements'] as $level) {
                 $levelId = $i;
 
                 $csvPayload[] = [
                     'id' => $levelId,
-                    'curriculum_node_parent_id' => $curriculumId,
+                    'curriculum_node_parent_id' => $learningAreaId,
                     'name' => $level['title'],
                     'code' => '',
                     'order' => 0,
-                    'description' => strip_tags($level['description'])
+                    'description' => strip_tags($level['description'] ?? '')
                 ];
 
                 /* Increment arbitrary node counter every time a node spawns
@@ -316,14 +316,27 @@ class WACurriculumBuilder
                              * Some don't (HPE 7c107937-6277-8883-d5b3-9d05bd64fea2)
                              */
                             if (isset($node['curriculumStatements'][0]['label'])) {
-                                $csvPayload[] = [
-                                    'id' => $nodeId,
-                                    'curriculum_node_parent_id' => $substrandId,
-                                    'name' => $node['curriculumStatements'][0]['label'],
-                                    'code' => $node['notations'][0] ?? '',
-                                    'order' => 0,
-                                    'description' => strip_tags($node['description'])
-                                ];
+                                /* Chinese curriculum has node titles in the description node
+                                 */
+                                if ('chinese-second-language.json' === $url) {
+                                    $csvPayload[] = [
+                                        'id' => $nodeId,
+                                        'curriculum_node_parent_id' => $substrandId,
+                                        'name' => strip_tags($node['description'] ?? ''),
+                                        'code' => $node['notations'][0] ?? '',
+                                        'order' => 0,
+                                        'description' => ''
+                                    ];
+                                } else {
+                                    $csvPayload[] = [
+                                        'id' => $nodeId,
+                                        'curriculum_node_parent_id' => $substrandId,
+                                        'name' => $node['curriculumStatements'][0]['label'],
+                                        'code' => $node['notations'][0] ?? '',
+                                        'order' => 0,
+                                        'description' => strip_tags($node['description'] ?? '')
+                                    ];
+                                }
                             } else {
                                 /* HPE has a weird union combination of data structs
                                  */
@@ -345,7 +358,7 @@ class WACurriculumBuilder
                 }
             }
 
-            $curriculumId = $i;
+            $learningAreaId = $i;
         }
 
         return $csvPayload;
