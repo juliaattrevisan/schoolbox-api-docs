@@ -119,8 +119,6 @@ HELP;
             }
         }
         $statement->close();
-
-
     }
 };
 
