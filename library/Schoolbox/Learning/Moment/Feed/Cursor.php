@@ -306,8 +306,14 @@ class Cursor implements ICursor
      */
     private function getBadgeAwardsQueryAndParams(bool $countOnly): array
     {
-        $includeAchievements = in_array('achievements', $this->filter['feedItemTypes'], true); // Achievements are badges with status 'achievement'.
-        $includeGoals        = in_array('goals', $this->filter['feedItemTypes'], true); // Goals are badges with status 'goal'.
+        $includeAchievements = (
+            count($this->filter['feedItemTypes']) === 0 ||
+            in_array('achievements', $this->filter['feedItemTypes'], true) // Achievements are badges with status 'achievement'.
+        );
+        $includeGoals = (
+            count($this->filter['feedItemTypes']) === 0 ||
+            in_array('goals', $this->filter['feedItemTypes'], true) // Goals are badges with status 'goal'.
+        );
 
         if (
             !$includeAchievements && !$includeGoals ||
