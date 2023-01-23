@@ -4818,10 +4818,10 @@ class WACurriculumBuilder
             $this->csvPayload[] = [
                 'id' => $subjectId,
                 'curriculum_node_parent_id' => $learningAreaId,
-                'name' => strip_tags($subject['title'] ?? ''),
+                'name' => $this->cleanse($subject['title'] ?? ''),
                 'code' => '',
                 'order' => 0,
-                'description' => strip_tags($level['description'] ?? '')
+                'description' => $this->cleanse($level['description'] ?? '')
             ];
 
             /* Increment arbitrary node counter every time a node spawns
@@ -4836,10 +4836,10 @@ class WACurriculumBuilder
                 $this->csvPayload[] = [
                     'id' => $levelId,
                     'curriculum_node_parent_id' => $subjectId,
-                    'name' => strip_tags($level['title'] ?? ''),
+                    'name' => $this->cleanse($level['title'] ?? ''),
                     'code' => '',
                     'order' => 0,
-                    'description' => strip_tags($level['description'] ?? '')
+                    'description' => $this->cleanse($level['description'] ?? '')
                 ];
 
                 /* Increment arbitrary node counter every time a node spawns
@@ -4858,7 +4858,7 @@ class WACurriculumBuilder
                     $this->csvPayload[] = [
                         'id' => $strandId,
                         'curriculum_node_parent_id' => $levelId,
-                        'name' => strip_tags($strand['title'] ?? ''),
+                        'name' => $this->cleanse($strand['title'] ?? ''),
                         'code' => '',
                         'order' => 0,
                         'description' => ''
@@ -4879,7 +4879,7 @@ class WACurriculumBuilder
                             $this->csvPayload[] = [
                                 'id' => $substrandId,
                                 'curriculum_node_parent_id' => $strandId,
-                                'name' => strip_tags($substrand['title'] ?? ''),
+                                'name' => $this->cleanse($substrand['title'] ?? ''),
                                 'code' => '',
                                 'order' => 0,
                                 'description' => ''
@@ -4905,7 +4905,7 @@ class WACurriculumBuilder
                                     $this->csvPayload[] = [
                                         'id' => $nodeId,
                                         'curriculum_node_parent_id' => $substrandId,
-                                        'name' => strip_tags($node['description'] ?? ''),
+                                        'name' => $this->cleanse($node['description'] ?? ''),
                                         'code' => $code,
                                         'order' => 0,
                                         'description' => ''
@@ -4916,7 +4916,7 @@ class WACurriculumBuilder
                                     $this->csvPayload[] = [
                                         'id' => $nodeId,
                                         'curriculum_node_parent_id' => $substrandId,
-                                        'name' => strip_tags($node['description'] ?? ''),
+                                        'name' => $this->cleanse($node['description'] ?? ''),
                                         'code' => $code,
                                         'order' => 0,
                                         'description' => ''
@@ -4942,7 +4942,7 @@ class WACurriculumBuilder
                             $this->csvPayload[] = [
                                 'id' => $nodeId,
                                 'curriculum_node_parent_id' => $strandId,
-                                'name' => strip_tags($substrand['description'] ?? ''),
+                                'name' => $this->cleanse($substrand['description'] ?? ''),
                                 'code' => $code,
                                 'order' => 0,
                                 'description' => ''
@@ -4985,7 +4985,7 @@ class WACurriculumBuilder
         $this->csvPayload[] = [
             'id' => $subjectId,
             'curriculum_node_parent_id' => $learningAreaId,
-            'name' => strip_tags($learningArea['title'] ?? ''),
+            'name' => $this->cleanse($learningArea['title'] ?? ''),
             'code' => '',
             'order' => 0,
             'description' => ''
@@ -5003,10 +5003,10 @@ class WACurriculumBuilder
             $this->csvPayload[] = [
                 'id' => $levelId,
                 'curriculum_node_parent_id' => $subjectId,
-                'name' => strip_tags($level['title'] ?? ''),
+                'name' => $this->cleanse($level['title'] ?? ''),
                 'code' => '',
                 'order' => 0,
-                'description' => strip_tags($level['description'] ?? '')
+                'description' => $this->cleanse($level['description'] ?? '')
             ];
 
             /* Increment arbitrary node counter every time a node spawns
@@ -5025,7 +5025,7 @@ class WACurriculumBuilder
                 $this->csvPayload[] = [
                     'id' => $strandId,
                     'curriculum_node_parent_id' => $levelId,
-                    'name' => strip_tags($strand['title'] ?? ''),
+                    'name' => $this->cleanse($strand['title'] ?? ''),
                     'code' => '',
                     'order' => 0,
                     'description' => ''
@@ -5043,7 +5043,7 @@ class WACurriculumBuilder
                     $this->csvPayload[] = [
                         'id' => $substrandId,
                         'curriculum_node_parent_id' => $strandId,
-                        'name' => strip_tags($substrand['title'] ?? ''),
+                        'name' => $this->cleanse($substrand['title'] ?? ''),
                         'code' => '',
                         'order' => 0,
                         'description' => ''
@@ -5066,10 +5066,10 @@ class WACurriculumBuilder
                             $this->csvPayload[] = [
                                 'id' => $nodeId,
                                 'curriculum_node_parent_id' => $substrandId,
-                                'name' => strip_tags($node['curriculumStatements'][0]['label'] ?? ''),
+                                'name' => $this->cleanse($node['curriculumStatements'][0]['label'] ?? ''),
                                 'code' => $code,
                                 'order' => 0,
-                                'description' => strip_tags($node['description'] ?? '')
+                                'description' => $this->cleanse($node['description'] ?? '')
                             ];
                         } else {
                             /* HPE has a weird union combination of data structs
@@ -5077,7 +5077,7 @@ class WACurriculumBuilder
                             $this->csvPayload[] = [
                                 'id' => $nodeId,
                                 'curriculum_node_parent_id' => $substrandId,
-                                'name' => strip_tags($node['description'] ?? ''),
+                                'name' => $this->cleanse($node['description'] ?? ''),
                                 'code' => $code,
                                 'order' => 0,
                                 'description' => ''
@@ -5095,6 +5095,18 @@ class WACurriculumBuilder
                 }
             }
         }
+    }
+
+
+    /**
+     * Try to clean this as much as possible
+     *
+     * @param string $data
+     * @return string
+     */
+    private function cleanse(string $data): string
+    {
+        return html_entity_decode(strip_tags($data));
     }
 
 
