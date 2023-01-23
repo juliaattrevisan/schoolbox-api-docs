@@ -738,6 +738,13 @@ if ! mysqldump --allow-keywords --default-character-set=utf8mb4 -i -e -q -a --sk
   echo "Unable to backup config table from current database" >&2
   exit 1
 fi
+
+## Put up maintenance page
+/usr/share/schoolbox/tools/maintenance/site_down.sh
+
+## Remove crons
+rm /etc/cron.d/sbc_schoolbox_$destination_instance_id
+
 ## Drop existing DB and reload just config table
 mysql -u $sqluser -p$sqlpasswd -h $sqlhost -e "SET MAX_STATEMENT_TIME=0; DROP DATABASE $sqldb;";
 mysql -u $sqluser -p$sqlpasswd -h $sqlhost -e "CREATE DATABASE $sqldb CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci';";
@@ -755,6 +762,10 @@ echo "Restoring database '$sourcedb'";
 if ! (echo 'SET MAX_STATEMENT_TIME=0; '; cat "$sourcedb") | pv -s "$(du -b "$sourcedb" | cut -f 1)" | sed -E "s/^\/\*!50013 DEFINER=.+\*\//\/\* Fallback to default DEFINER \*\//g" | mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb; then
   error "Unable to import database from backup file. Exiting."
 fi
+
+## Remove maintenance page
+/usr/share/schoolbox/tools/maintenance/site_up.sh
+
 
 # Move data files to correct location if restoring from backup
 if [ "$sourceloc" = '[B]' ];
