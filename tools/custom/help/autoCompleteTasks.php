@@ -9,6 +9,8 @@
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
+use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
+use Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 
@@ -68,6 +70,12 @@ HELP;
         }
 
         $db     = $this->getDatabaseInternal();
+        //grab the response mapper for tasks
+        $taskResponseMapper = new Schoolbox\Learning\Assessment\Task\Response\MapperProxy(Schoolbox\Assessment\Course\Task\CompletionMapper::getInstance());
+        //create a user for who is marking the tasks as complete
+        $markingUser = new Schoolbox\User();
+        $markingUser->setId(1);
+
 
         // finds all tasks that require to update
         $statement = $db->prepareQuery("select `t`.`assessment_id`    AS `assessment_id`,
@@ -104,10 +112,32 @@ HELP;
                     $taskFeedback['feedback_id']
                 )
             );
+            if ($this->perform()) {
+                // update item
+                //build example student
+                $student = new Schoolbox\User();
+                $student->setId($taskFeedback['student_id']);
+                //build example assessment
+                $assessment = new Schoolbox\Learning\Assessment\Task\Model();
+                $assessment->setId($taskFeedback['assessment_id']);
+                $this->getLogger()->info("Updating Mark");
+                $taskResponse = (new TaskResponse())
+                    ->setAssessable($assessment)
+                    ->setSubmittedOnBehalfOf($student)
+                    ->setSubmittedBy($markingUser)
+                    ->setMarkedComplete(true);
+
+                $feedback = (new TaskFeedback())
+                    ->setResponse($taskResponse);
+                $taskResponse->getAllFeedback()->add($feedback);
+
+                // And save (no need to save a feedback - it will be built automatically from this response on DB retrieval)
+                $taskResponseMapper->save($taskResponse);
+            }
         }
         $statement->close();
 
-        $this->getLogger()->info("All Complete.");
+
     }
 };
 
