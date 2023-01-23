@@ -16,7 +16,7 @@ class MyLinks extends DeprecatedModel
      * @param string $absoluteLink
      * @return mixed
      */
-    function linkExists(int $uid, string $relativeLink, string $absoluteLink)
+    public function linkExists(int $uid, string $relativeLink, string $absoluteLink)
     {
         $query = "SELECT id FROM bookmarks WHERE owner='$uid' AND (url = '" . $this->db->quote($relativeLink) . "' OR url = '" . $this->db->quote($absoluteLink) . "')";
         return $this->db->getOne($query);
