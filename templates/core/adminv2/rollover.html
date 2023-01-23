@@ -60,6 +60,7 @@
                                             text: 'Are you sure you wish to rollover?',
                                             confirmEvent: function () {
                                                 document.getElementById('form-rollover').submit();
+                                                $(this).attr('disabled', true);
                                             }
                                         });
                                     });
