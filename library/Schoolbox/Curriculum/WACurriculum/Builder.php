@@ -4686,7 +4686,7 @@ class Builder
         $this->csvPayload[] = [
             'id' => $curriculumRootNode,
             'curriculum_node_parent_id' => '',
-            'name' => 'WA Curriculum',
+            'name' => 'Western Australia Curriculum',
             'code' => '',
             'order' => 0,
             'description' => ''
