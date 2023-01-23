@@ -53,25 +53,25 @@ class WACurriculumBuilder
     private const HOST = 'https://scsaapps.scsa.wa.edu.au/Apps/CurriculumJSON/';
     private const MANIFEST = [
         'english.json' => 'English Curriculum - Pre-primary to Year 10 ',
-        'hpe.json' => 'Health and Physical Education Curriculum - Pre-primary to Year 10',
-        'hass.json' => 'Humanities and Social Sciences Curriculum - Pre-primary to Year 10',
+//        'hpe.json' => 'Health and Physical Education Curriculum - Pre-primary to Year 10',
+//        'hass.json' => 'Humanities and Social Sciences Curriculum - Pre-primary to Year 10',
 
         /* Languages Curriculum
          */
-        'chinese-second-language.json' => 'Chinese: Second Language Curriculum - Pre-primary to Year 10',
-        'french-second-language.json' => 'French: Second Language Curriculum - Pre-primary to Year 10',
-        'german-second-language.json' => 'German: Second Language Curriculum - Pre-primary to Year 10',
-        'indonesian-second-language.json' => 'Indonesian: Second Language Curriculum - Pre-primary to Year 10',
-        'italian-second-language.json' => 'Italian: Second Language Curriculum - Pre-primary to Year 10',
-        'japanese-second-language.json' => 'Japanese: Second Language Curriculum - Pre-primary to Year 10',
-        'languages7-10.json' => 'Languages Curriculum - Year 7 to Year 10',
+//        'chinese-second-language.json' => 'Chinese: Second Language Curriculum - Pre-primary to Year 10',
+//        'french-second-language.json' => 'French: Second Language Curriculum - Pre-primary to Year 10',
+//        'german-second-language.json' => 'German: Second Language Curriculum - Pre-primary to Year 10',
+//        'indonesian-second-language.json' => 'Indonesian: Second Language Curriculum - Pre-primary to Year 10',
+//        'italian-second-language.json' => 'Italian: Second Language Curriculum - Pre-primary to Year 10',
+//        'japanese-second-language.json' => 'Japanese: Second Language Curriculum - Pre-primary to Year 10',
+//        'languages7-10.json' => 'Languages Curriculum - Year 7 to Year 10',
 
         /* Some other unnamed section/grouping
          */
-        'mathematics.json' => 'Mathematics Curriculum - Pre-primary to Year 10',
-        'science.json' => 'Science Curriculum - Pre-primary to Year 10',
-        'technologies.json' => 'Technologies Curriculum - Pre-primary to Year 10',
-        'arts.json' => 'The Arts Curriculum - Pre-primary to Year 10',
+//        'mathematics.json' => 'Mathematics Curriculum - Pre-primary to Year 10',
+//        'science.json' => 'Science Curriculum - Pre-primary to Year 10',
+//        'technologies.json' => 'Technologies Curriculum - Pre-primary to Year 10',
+//        'arts.json' => 'The Arts Curriculum - Pre-primary to Year 10',
     ];
 
 
@@ -4893,32 +4893,50 @@ class WACurriculumBuilder
                              */
                             foreach ($substrand['curriculumStatements'] as $node) {
                                 $nodeId = $this->i;
-                                $code = $node['notations'][0] ?? '';
+                                $name = $this->cleanse($node['description'] ?? '');
+                                $code = $this->cleanse($node['notations'][0] ?? '');
+                                $description = '';
 
-                                /* Some curricula's nodes contain a curriculumStatements (English)
-                                 * Some don't (HPE 7c107937-6277-8883-d5b3-9d05bd64fea2)
+                                /* Dig for an Elaboration, which is a curriculum node's description
                                  */
-                                if (isset($node['curriculumStatements'][0]['label'])) {
-                                    $this->csvPayload[] = [
-                                        'id' => $nodeId,
-                                        'curriculum_node_parent_id' => $substrandId,
-                                        'name' => $this->cleanse($node['curriculumStatements'][0]['label'] ?? ''),
-                                        'code' => $code,
-                                        'order' => 0,
-                                        'description' => $this->cleanse($node['description'] ?? '')
-                                    ];
-                                } else {
-                                    /* HPE has a weird union combination of data structs
-                                     */
-                                    $this->csvPayload[] = [
-                                        'id' => $nodeId,
-                                        'curriculum_node_parent_id' => $substrandId,
-                                        'name' => $this->cleanse($node['description'] ?? ''),
-                                        'code' => $code,
-                                        'order' => 0,
-                                        'description' => ''
-                                    ];
+                                foreach ($node['curriculumStatements'] as $meta) {
+                                    if ('Elaboration' === $meta['label']) {
+                                        $description = $this->cleanse($meta['description']);
+                                    }
                                 }
+
+                                $this->csvPayload[] = [
+                                    'id' => $nodeId,
+                                    'curriculum_node_parent_id' => $substrandId,
+                                    'name' => $name,
+                                    'code' => $code,
+                                    'order' => 0,
+                                    'description' => $description
+                                ];
+//                        /* Some curricula's nodes contain a curriculumStatements (English)
+//                         * Some don't (HPE 7c107937-6277-8883-d5b3-9d05bd64fea2)
+//                         */
+//                        if (isset($node['curriculumStatements'][0]['label'])) {
+//                            $this->csvPayload[] = [
+//                                'id' => $nodeId,
+//                                'curriculum_node_parent_id' => $substrandId,
+//                                'name' => $this->cleanse($node['curriculumStatements'][0]['label'] ?? ''),
+//                                'code' => $code,
+//                                'order' => 0,
+//                                'description' => $this->cleanse($node['description'] ?? '')
+//                            ];
+//                        } else {
+//                            /* HPE has a weird union combination of data structs
+//                             */
+//                            $this->csvPayload[] = [
+//                                'id' => $nodeId,
+//                                'curriculum_node_parent_id' => $substrandId,
+//                                'name' => $this->cleanse($node['description'] ?? ''),
+//                                'code' => $code,
+//                                'order' => 0,
+//                                'description' => ''
+//                            ];
+//                        }
 
                                 /* Keep track that we found a code
                                  */
@@ -5054,32 +5072,50 @@ class WACurriculumBuilder
                      */
                     foreach ($substrand['curriculumStatements'] as $node) {
                         $nodeId = $this->i;
-                        $code = $node['notations'][0] ?? '';
+                        $name = $this->cleanse($node['description'] ?? '');
+                        $code = $this->cleanse($node['notations'][0] ?? '');
+                        $description = '';
 
-                        /* Some curricula's nodes contain a curriculumStatements (English)
-                         * Some don't (HPE 7c107937-6277-8883-d5b3-9d05bd64fea2)
+                        /* Dig for an Elaboration, which is a curriculum node's description
                          */
-                        if (isset($node['curriculumStatements'][0]['label'])) {
-                            $this->csvPayload[] = [
-                                'id' => $nodeId,
-                                'curriculum_node_parent_id' => $substrandId,
-                                'name' => $this->cleanse($node['curriculumStatements'][0]['label'] ?? ''),
-                                'code' => $code,
-                                'order' => 0,
-                                'description' => $this->cleanse($node['description'] ?? '')
-                            ];
-                        } else {
-                            /* HPE has a weird union combination of data structs
-                             */
-                            $this->csvPayload[] = [
-                                'id' => $nodeId,
-                                'curriculum_node_parent_id' => $substrandId,
-                                'name' => $this->cleanse($node['description'] ?? ''),
-                                'code' => $code,
-                                'order' => 0,
-                                'description' => ''
-                            ];
+                        foreach ($node['curriculumStatements'] as $meta) {
+                            if ('Elaboration' === $meta['label']) {
+                                $description = $this->cleanse($meta['description']);
+                            }
                         }
+
+                        $this->csvPayload[] = [
+                            'id' => $nodeId,
+                            'curriculum_node_parent_id' => $substrandId,
+                            'name' => $name,
+                            'code' => $code,
+                            'order' => 0,
+                            'description' => $description
+                        ];
+//                        /* Some curricula's nodes contain a curriculumStatements (English)
+//                         * Some don't (HPE 7c107937-6277-8883-d5b3-9d05bd64fea2)
+//                         */
+//                        if (isset($node['curriculumStatements'][0]['label'])) {
+//                            $this->csvPayload[] = [
+//                                'id' => $nodeId,
+//                                'curriculum_node_parent_id' => $substrandId,
+//                                'name' => $this->cleanse($node['curriculumStatements'][0]['label'] ?? ''),
+//                                'code' => $code,
+//                                'order' => 0,
+//                                'description' => $this->cleanse($node['description'] ?? '')
+//                            ];
+//                        } else {
+//                            /* HPE has a weird union combination of data structs
+//                             */
+//                            $this->csvPayload[] = [
+//                                'id' => $nodeId,
+//                                'curriculum_node_parent_id' => $substrandId,
+//                                'name' => $this->cleanse($node['description'] ?? ''),
+//                                'code' => $code,
+//                                'order' => 0,
+//                                'description' => ''
+//                            ];
+//                        }
 
                         /* Keep track that we found a code
                          */
