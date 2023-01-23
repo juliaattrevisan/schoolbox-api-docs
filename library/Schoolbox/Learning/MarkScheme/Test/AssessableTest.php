@@ -2870,7 +2870,7 @@ class AssessableTest extends TestCase
      *            Draft Min: 50% from due work / quiz
      *            Draft Max: 100% from task
      *            Draft Avg: 66.67% (100% from task, 50% from due work and quiz)
-     *            Draft Wgt: 50% (50% * 1/5 from quiz, 50% * 4/5 from due work)
+     *            Draft Wgt: 50% (50% * 1/5 from quiz + 50% * 4/5 from due work)
      *            Pub Min: 50% from due work
      *            Pub Max: 100% from task
      *            Pub Avg: 75% (100% from task, 50% from due work)
@@ -2878,6 +2878,14 @@ class AssessableTest extends TestCase
      * student 4: Task: self-assessed then teacher-assessed
      *            Quiz: 2 attempt + 1 published feedback (1/2) + 1 later unpublished feedback (2/2)
      *            DueW: 1 submission + 1 unpublished feedback (50.0)
+     *            Draft Min: 50% from due work
+     *            Draft Max: 100% from task / quiz
+     *            Draft Avg: 83.33% (100% from task and quiz, 50% from due work)
+     *            Draft Wgt: 80% (100% * 1/5 from quiz + 50% * 4/5 from due work)
+     *            Pub Min: 50% from due work
+     *            Pub Max: 100% from task
+     *            Pub Avg: 75% (100% from task, 50% from due work)
+     *            Pub Wgt: 50% from due work
      * student 5: Task: -
      *            Quiz: 2 attempt + 1 published feedback (1/3) + 1 later unpublished feedback (2/2)
      *            DueW: 1 submission + 1 published feedback (50.0) + 1 later unpublished feedback (100.0)
