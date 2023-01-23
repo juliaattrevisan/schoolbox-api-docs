@@ -54,12 +54,12 @@ class WACurriculumBuilder
     private const HOST = 'https://scsaapps.scsa.wa.edu.au/Apps/CurriculumJSON/';
     private const MANIFEST = [
 //        'english.json' => 'English Curriculum - Pre-primary to Year 10 ',
-                'hpe.json' => 'Health and Physical Education Curriculum - Pre-primary to Year 10',
+//                'hpe.json' => 'Health and Physical Education Curriculum - Pre-primary to Year 10',
         //        'hass.json' => 'Humanities and Social Sciences Curriculum - Pre-primary to Year 10',
 
         /* Languages Curriculum
          */
-//                'chinese-second-language.json' => 'Chinese: Second Language Curriculum - Pre-primary to Year 10',
+                'chinese-second-language.json' => 'Chinese: Second Language Curriculum - Pre-primary to Year 10',
         //        'french-second-language.json' => 'French: Second Language Curriculum - Pre-primary to Year 10',
         //        'german-second-language.json' => 'German: Second Language Curriculum - Pre-primary to Year 10',
         //        'indonesian-second-language.json' => 'Indonesian: Second Language Curriculum - Pre-primary to Year 10',
@@ -80,6 +80,23 @@ class WACurriculumBuilder
      * @var Client|null
      */
     private ?Client $client;
+
+
+    /**
+     * A progressively incrementing node identifier
+     *
+     * @var int
+     */
+    private int $i = 1;
+
+
+    /**
+     * The resultant csv data, in an array format,
+     * which you can then pump into an fputcsv somewhere
+     *
+     * @var array
+     */
+    private array $csvPayload = [];
 
 
     /**
@@ -208,20 +225,12 @@ class WACurriculumBuilder
     {
         $curriculumRootNode = 1;
 
-        /* Hierarchy counter
-         */
-        $i = 1;
-
         /* Presumed hierarchy
          * WA Curriculum > learning area > subject > level > strand > substrand > node
          */
         $learningAreaId = 2;
 
-        /* Mapped payload
-         */
-        $csvPayload = [];
-
-        $csvPayload[] = [
+        $this->csvPayload[] = [
             'id' => $curriculumRootNode,
             'curriculum_node_parent_id' => '',
             'name' => 'WA Curriculum',
@@ -232,7 +241,7 @@ class WACurriculumBuilder
 
         /* Increment arbitrary node counter every time a node spawns
          */
-        $i++;
+        $this->i++;
 
         foreach (self::MANIFEST as $url => $name) {
             $learningArea = $this->retrieve($url);
@@ -240,7 +249,7 @@ class WACurriculumBuilder
             /* Build hierarchy
              * id,curriculum_node_parent_id,name,code,order,description
              */
-            $csvPayload[] = [
+            $this->csvPayload[] = [
                 'id' => $learningAreaId,
                 'curriculum_node_parent_id' => $curriculumRootNode,
                 'name' => $learningArea['title'],
@@ -251,20 +260,80 @@ class WACurriculumBuilder
 
             /* Increment arbitrary node counter every time a node spawns
              */
-            $i++;
+            $this->i++;
 
-            /* FIXME English/HPE/HSS skips the Subject piece in the hierarchy for some reason
+            /* English/HPE/HSS skips the Subject piece in the hierarchy for some reason
              *  and the xls suggests it's just a clone of what we just made for the Learning Area
              *  so I guess we just...noobscript a way out of this heresy
              */
+            if ($this->hasSubject($url)) {
+                $this->processWithSubject($learningAreaId, $learningArea);
+            } else {
+                $this->processWithoutSubject($learningAreaId, $learningArea);
+            }
 
-            foreach ($learningArea['curriculumStatements'] as $subject) {
-                $subjectId = $i;
+            $learningAreaId = $this->i;
+        }
 
-                $csvPayload[] = [
-                    'id' => $subjectId,
-                    'curriculum_node_parent_id' => $learningAreaId,
-                    'name' => $subject['title'],
+        return $this->csvPayload;
+    }
+
+
+    /**
+     * Decide if a particular file has a Subject node
+     *
+     * English, HPE, HSS skip the subject node which is artificially cloned
+     * from the Learning Area
+     *
+     * The languages endpoints like Chinese et al. have a Subject node that
+     * is different to the Learning Area
+     *
+     * Disgusting
+     *
+     * @param string $url
+     * @return bool
+     */
+    private function hasSubject(string $url): bool
+    {
+        return \in_array($url, [
+            'chinese-second-language.json',
+            'french-second-language.json',
+            'german-second-language.json',
+            'indonesian-second-language.json',
+            'italian-second-language.json',
+            'japanese-second-language.json',
+            'languages7-10.json'
+        ], true);
+    }
+
+
+    private function processWithSubject(int $learningAreaId, array $learningArea): void
+    {
+        foreach ($learningArea['curriculumStatements'] as $subject) {
+            $subjectId = $this->i;
+
+            $this->csvPayload[] = [
+                'id' => $subjectId,
+                'curriculum_node_parent_id' => $learningAreaId,
+                'name' => $subject['title'],
+                'code' => '',
+                'order' => 0,
+                'description' => strip_tags($level['description'] ?? '')
+            ];
+
+            /* Increment arbitrary node counter every time a node spawns
+             */
+            $this->i++;
+
+            /* Level
+             */
+            foreach ($subject['curriculumStatements'] as $level) {
+                $levelId = $this->i;
+
+                $this->csvPayload[] = [
+                    'id' => $levelId,
+                    'curriculum_node_parent_id' => $subjectId,
+                    'name' => $level['title'],
                     'code' => '',
                     'order' => 0,
                     'description' => strip_tags($level['description'] ?? '')
@@ -272,39 +341,39 @@ class WACurriculumBuilder
 
                 /* Increment arbitrary node counter every time a node spawns
                  */
-                $i++;
+                $this->i++;
 
-                /* Level
+                /* English skips the Subject node, so artificially ram one in
+                 * that is the same as the node we just spawned
                  */
-                foreach ($subject['curriculumStatements'] as $level) {
-                    $levelId = $i;
 
-                    $csvPayload[] = [
-                        'id' => $levelId,
-                        'curriculum_node_parent_id' => $subjectId,
-                        'name' => $level['title'],
+                /* Strand
+                 */
+                foreach ($level['curriculumStatements'] as $strand) {
+                    $strandId = $this->i;
+
+                    $this->csvPayload[] = [
+                        'id' => $strandId,
+                        'curriculum_node_parent_id' => $levelId,
+                        'name' => $strand['title'],
                         'code' => '',
                         'order' => 0,
-                        'description' => strip_tags($level['description'] ?? '')
+                        'description' => ''
                     ];
 
                     /* Increment arbitrary node counter every time a node spawns
                      */
-                    $i++;
+                    $this->i++;
 
-                    /* English skips the Subject node, so artificially ram one in
-                     * that is the same as the node we just spawned
+                    /* Substrand
                      */
+                    foreach ($strand['curriculumStatements'] as $substrand) {
+                        $substrandId = $this->i;
 
-                    /* Strand
-                     */
-                    foreach ($level['curriculumStatements'] as $strand) {
-                        $strandId = $i;
-
-                        $csvPayload[] = [
-                            'id' => $strandId,
-                            'curriculum_node_parent_id' => $levelId,
-                            'name' => $strand['title'],
+                        $this->csvPayload[] = [
+                            'id' => $substrandId,
+                            'curriculum_node_parent_id' => $strandId,
+                            'name' => $substrand['title'],
                             'code' => '',
                             'order' => 0,
                             'description' => ''
@@ -312,81 +381,168 @@ class WACurriculumBuilder
 
                         /* Increment arbitrary node counter every time a node spawns
                          */
-                        $i++;
+                        $this->i++;
 
-                        /* Substrand
+                        /* Node
                          */
-                        foreach ($strand['curriculumStatements'] as $substrand) {
-                            $substrandId = $i;
+                        foreach ($substrand['curriculumStatements'] as $node) {
+                            $nodeId = $this->i;
 
-                            $csvPayload[] = [
-                                'id' => $substrandId,
-                                'curriculum_node_parent_id' => $strandId,
-                                'name' => $substrand['title'],
-                                'code' => '',
-                                'order' => 0,
-                                'description' => ''
-                            ];
+                            /* Some curricula's nodes contain a curriculumStatements (English)
+                             * Some don't (HPE 7c107937-6277-8883-d5b3-9d05bd64fea2)
+                             */
+                            if (isset($node['curriculumStatements'][0]['label'])) {
+                                /* Chinese (probably Languages) curriculum has node titles in the
+                                 * description node, not a title node
+                                 */
+                                $this->csvPayload[] = [
+                                    'id' => $nodeId,
+                                    'curriculum_node_parent_id' => $substrandId,
+                                    'name' => strip_tags($node['description'] ?? ''),
+                                    'code' => $node['notations'][0] ?? '',
+                                    'order' => 0,
+                                    'description' => ''
+                                ];
+                            } else {
+                                /* HPE has a weird union combination of data structs
+                                 */
+                                $this->csvPayload[] = [
+                                    'id' => $nodeId,
+                                    'curriculum_node_parent_id' => $substrandId,
+                                    'name' => $node['description'],
+                                    'code' => $node['notations'][0] ?? '',
+                                    'order' => 0,
+                                    'description' => ''
+                                ];
+                            }
 
                             /* Increment arbitrary node counter every time a node spawns
                              */
-                            $i++;
-
-                            /* Node
-                             */
-                            foreach ($substrand['curriculumStatements'] as $node) {
-                                $nodeId = $i;
-
-                                /* Some curricula's nodes contain a curriculumStatements (English)
-                                 * Some don't (HPE 7c107937-6277-8883-d5b3-9d05bd64fea2)
-                                 */
-                                if (isset($node['curriculumStatements'][0]['label'])) {
-                                    /* Chinese curriculum has node titles in the description node
-                                     */
-                                    if ('chinese-second-language.json' === $url) {
-                                        $csvPayload[] = [
-                                            'id' => $nodeId,
-                                            'curriculum_node_parent_id' => $substrandId,
-                                            'name' => strip_tags($node['description'] ?? ''),
-                                            'code' => $node['notations'][0] ?? '',
-                                            'order' => 0,
-                                            'description' => ''
-                                        ];
-                                    } else {
-                                        $csvPayload[] = [
-                                            'id' => $nodeId,
-                                            'curriculum_node_parent_id' => $substrandId,
-                                            'name' => $node['curriculumStatements'][0]['label'],
-                                            'code' => $node['notations'][0] ?? '',
-                                            'order' => 0,
-                                            'description' => strip_tags($node['description'] ?? '')
-                                        ];
-                                    }
-                                } else {
-                                    /* HPE has a weird union combination of data structs
-                                     */
-                                    $csvPayload[] = [
-                                        'id' => $nodeId,
-                                        'curriculum_node_parent_id' => $substrandId,
-                                        'name' => $node['description'],
-                                        'code' => $node['notations'][0] ?? '',
-                                        'order' => 0,
-                                        'description' => ''
-                                    ];
-                                }
-
-                                /* Increment arbitrary node counter every time a node spawns
-                                 */
-                                $i++;
-                            }
+                            $this->i++;
                         }
                     }
                 }
             }
-
-            $learningAreaId = $i;
         }
+    }
 
-        return $csvPayload;
+
+    private function processWithoutSubject(int $learningAreaId, array $learningArea): void
+    {
+        $subjectId = $this->i;
+
+        /* Build hierarchy
+         * id,curriculum_node_parent_id,name,code,order,description
+         *
+         * This is an artificial clone of the Learning Area ;(
+         */
+        $this->csvPayload[] = [
+            'id' => $subjectId,
+            'curriculum_node_parent_id' => $learningAreaId,
+            'name' => $learningArea['title'],
+            'code' => '',
+            'order' => 0,
+            'description' => ''
+        ];
+
+        /* Increment arbitrary node counter every time a node spawns
+         */
+        $this->i++;
+
+        /* Level
+         */
+        foreach ($learningArea['curriculumStatements'] as $level) {
+            $levelId = $this->i;
+
+            $this->csvPayload[] = [
+                'id' => $levelId,
+                'curriculum_node_parent_id' => $subjectId,
+                'name' => $level['title'],
+                'code' => '',
+                'order' => 0,
+                'description' => strip_tags($level['description'] ?? '')
+            ];
+
+            /* Increment arbitrary node counter every time a node spawns
+             */
+            $this->i++;
+
+            /* English skips the Subject node, so artificially ram one in
+             * that is the same as the node we just spawned
+             */
+
+            /* Strand
+             */
+            foreach ($level['curriculumStatements'] as $strand) {
+                $strandId = $this->i;
+
+                $this->csvPayload[] = [
+                    'id' => $strandId,
+                    'curriculum_node_parent_id' => $levelId,
+                    'name' => $strand['title'],
+                    'code' => '',
+                    'order' => 0,
+                    'description' => ''
+                ];
+
+                /* Increment arbitrary node counter every time a node spawns
+                 */
+                $this->i++;
+
+                /* Substrand
+                 */
+                foreach ($strand['curriculumStatements'] as $substrand) {
+                    $substrandId = $this->i;
+
+                    $this->csvPayload[] = [
+                        'id' => $substrandId,
+                        'curriculum_node_parent_id' => $strandId,
+                        'name' => $substrand['title'],
+                        'code' => '',
+                        'order' => 0,
+                        'description' => ''
+                    ];
+
+                    /* Increment arbitrary node counter every time a node spawns
+                     */
+                    $this->i++;
+
+                    /* Node
+                     */
+                    foreach ($substrand['curriculumStatements'] as $node) {
+                        $nodeId = $this->i;
+
+                        /* Some curricula's nodes contain a curriculumStatements (English)
+                         * Some don't (HPE 7c107937-6277-8883-d5b3-9d05bd64fea2)
+                         */
+                        if (isset($node['curriculumStatements'][0]['label'])) {
+                            $this->csvPayload[] = [
+                                'id' => $nodeId,
+                                'curriculum_node_parent_id' => $substrandId,
+                                'name' => $node['curriculumStatements'][0]['label'],
+                                'code' => $node['notations'][0] ?? '',
+                                'order' => 0,
+                                'description' => strip_tags($node['description'] ?? '')
+                            ];
+                        } else {
+                            /* HPE has a weird union combination of data structs
+                             */
+                            $this->csvPayload[] = [
+                                'id' => $nodeId,
+                                'curriculum_node_parent_id' => $substrandId,
+                                'name' => $node['description'],
+                                'code' => $node['notations'][0] ?? '',
+                                'order' => 0,
+                                'description' => ''
+                            ];
+                        }
+
+                        /* Increment arbitrary node counter every time a node spawns
+                         */
+                        $this->i++;
+                    }
+                }
+            }
+        }
     }
 }
