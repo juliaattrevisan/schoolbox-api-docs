@@ -16,6 +16,7 @@ use League\OAuth2\Server\ResourceServer;
 use OAT\Library\Lti1p3Core\Message\Launch\Builder\LtiResourceLinkLaunchRequestBuilder;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\LaunchPresentationClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\MessagePayloadClaimInterface;
+use OAT\Library\Lti1p3Core\Message\Payload\Claim\NrpsClaim;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLink;
 use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLinkInterface;
@@ -334,7 +335,19 @@ class Controller extends BaseController
         // Claim about the platform instance
         $platformInstanceClaim = (new PlatformInstanceClaimFactory($this->instance))->build();
 
-        $claims = [$contextClaim, $platformInstanceClaim];
+        // Claim about folder memberships
+        $nrpsClaim = new NrpsClaim(
+            (clone $baseUrl)
+                ->setPath(
+                    $this->router->generate(
+                        'ltiPlatformContext.getMembershipsForFolder',
+                        ['folderId' => $folder->getId()]
+                    )
+                )
+                ->toString(),
+        );
+
+        $claims = [$contextClaim, $platformInstanceClaim, $nrpsClaim];
 
         // Custom claims for the component
         $customClaimFactory = new CustomClaimFactory();
