@@ -286,6 +286,15 @@ export default {
                 this.saveFiltersStateToBrowserHistory();
             }
 
+            // Update filters styling.
+            for (let label of $("label[data-filter-checkbox-label]")) {
+                if ($(label).find("input[type=checkbox]:checked").length > 0) {
+                    $(label).addClass("label-for-checked-checkbox");
+                } else {
+                    $(label).removeClass("label-for-checked-checkbox");
+                }
+            }
+
             this.load();
         },
 
@@ -502,62 +511,80 @@ export default {
         <div class="feed filter-container">
             <div class="feed-column left"></div>
             <section class="activity-feed">
-                <div id="activity-feed-filters">
-                    Filter:
-                    <label for="filter-goals">
-                        <input
-                            type="checkbox"
-                            class="plain"
-                            data-filter-checkbox
-                            data-goals
-                            id="filter-goals"
-                            checked="checked"
-                            name="includeGoals"
-                            @click="onChangeFilters('', true)"
-                        />
-                        Goals
-                    </label>
-                    <label for="filter-learning-moments" v-if="config.routes.getCreateEvidenceForm">
-                        <input
-                            type="checkbox"
-                            class="plain"
-                            data-filter-checkbox
-                            data-learning-moments
-                            id="filter-learning-moments"
-                            checked="checked"
-                            name="includeLearningMoments"
-                            @click="onChangeFilters('', true)"
-                        />
-                        Learning Moments
-                    </label>
-                    <label for="filter-achievements">
-                        <input
-                            type="checkbox"
-                            class="plain"
-                            data-filter-checkbox
-                            data-achievements
-                            id="filter-achievements"
-                            checked="checked"
-                            name="includeAchievements"
-                            @click="onChangeFilters('', true)"
-                        />
-                        Achievements
-                    </label>
-                    <label for="filter-feedback">
-                        <input
-                            type="checkbox"
-                            class="plain"
-                            data-filter-checkbox
-                            data-feedback
-                            id="filter-feedback"
-                            checked="checked"
-                            name="includeDueWork"
-                            @click="onChangeFilters('', true)"
-                        />
-                        Feedback
-                    </label>
-                    <div id="filters-description"></div>
-                </div>
+                <table id="activity-feed-filters">
+                    <tbody>
+                        <tr>
+                            <th>
+                                <label>Filters:</label>
+                            </th>
+                            <th>
+                                <label for="filter-goals" data-filter-checkbox-label>
+                                    <input
+                                        type="checkbox"
+                                        class="plain"
+                                        data-filter-checkbox
+                                        data-goals
+                                        id="filter-goals"
+                                        checked="checked"
+                                        name="includeGoals"
+                                        @click="onChangeFilters('', true)"
+                                    />
+                                    Goals
+                                </label>
+                            </th>
+                            <th>
+                                <label
+                                    for="filter-learning-moments"
+                                    data-filter-checkbox-label
+                                    v-if="config.routes.getCreateEvidenceForm"
+                                >
+                                    <input
+                                        type="checkbox"
+                                        class="plain"
+                                        data-filter-checkbox
+                                        data-learning-moments
+                                        id="filter-learning-moments"
+                                        checked="checked"
+                                        name="includeLearningMoments"
+                                        @click="onChangeFilters('', true)"
+                                    />
+                                    Learning Moments
+                                </label>
+                            </th>
+                            <th>
+                                <label for="filter-achievements" data-filter-checkbox-label>
+                                    <input
+                                        type="checkbox"
+                                        class="plain"
+                                        data-filter-checkbox
+                                        data-achievements
+                                        id="filter-achievements"
+                                        checked="checked"
+                                        name="includeAchievements"
+                                        @click="onChangeFilters('', true)"
+                                    />
+                                    Achievements
+                                </label>
+                            </th>
+                            <th>
+                                <label for="filter-feedback" data-filter-checkbox-label>
+                                    <input
+                                        type="checkbox"
+                                        class="plain"
+                                        data-filter-checkbox
+                                        data-feedback
+                                        id="filter-feedback"
+                                        checked="checked"
+                                        name="includeDueWork"
+                                        @click="onChangeFilters('', true)"
+                                    />
+                                    Feedback
+                                </label>
+                            </th>
+                        </tr>
+                    </tbody>
+                </table>
+                <div id="filters-description"></div>
             </section>
             <div class="feed-column right"></div>
         </div>
