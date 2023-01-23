@@ -4899,21 +4899,17 @@ class WACurriculumBuilder
                                  * Some don't (HPE 7c107937-6277-8883-d5b3-9d05bd64fea2)
                                  */
                                 if (isset($node['curriculumStatements'][0]['label'])) {
-                                    /* Chinese (probably Languages) curriculum has node titles in the
-                                     * description node, not a title node
-                                     */
                                     $this->csvPayload[] = [
                                         'id' => $nodeId,
                                         'curriculum_node_parent_id' => $substrandId,
-                                        'name' => $this->cleanse($node['description'] ?? ''),
+                                        'name' => $this->cleanse($node['curriculumStatements'][0]['label'] ?? ''),
                                         'code' => $code,
                                         'order' => 0,
-                                        'description' => ''
+                                        'description' => $this->cleanse($node['description'] ?? '')
                                     ];
                                 } else {
                                     /* HPE has a weird union combination of data structs
                                      */
-                                    new \Alaress_Probe($node);
                                     $this->csvPayload[] = [
                                         'id' => $nodeId,
                                         'curriculum_node_parent_id' => $substrandId,
