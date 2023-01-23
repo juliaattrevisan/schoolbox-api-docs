@@ -4828,52 +4828,80 @@ class WACurriculumBuilder
                     foreach ($strand['curriculumStatements'] as $substrand) {
                         $substrandId = $this->i;
 
-                        $this->csvPayload[] = [
-                            'id' => $substrandId,
-                            'curriculum_node_parent_id' => $strandId,
-                            'name' => $substrand['title'],
-                            'code' => '',
-                            'order' => 0,
-                            'description' => ''
-                        ];
-
-                        /* Increment arbitrary node counter every time a node spawns
+                        /* Arts doesn't always have a substrand contents
                          */
-                        $this->i++;
+                        if (isset($substrand['curriculumStatements'])) {
+                            $this->csvPayload[] = [
+                                'id' => $substrandId,
+                                'curriculum_node_parent_id' => $strandId,
+                                'name' => $substrand['title'],
+                                'code' => '',
+                                'order' => 0,
+                                'description' => ''
+                            ];
 
-                        /* Node
-                         */
-                        foreach ($substrand['curriculumStatements'] as $node) {
-                            $nodeId = $this->i;
-                            $code = $node['notations'][0] ?? '';
-
-                            /* Some curricula's nodes contain a curriculumStatements (English)
-                             * Some don't (HPE 7c107937-6277-8883-d5b3-9d05bd64fea2)
+                            /* Increment arbitrary node counter every time a node spawns
                              */
-                            if (isset($node['curriculumStatements'][0]['label'])) {
-                                /* Chinese (probably Languages) curriculum has node titles in the
-                                 * description node, not a title node
+                            $this->i++;
+
+                            /* Node
+                             */
+                            foreach ($substrand['curriculumStatements'] as $node) {
+                                $nodeId = $this->i;
+                                $code = $node['notations'][0] ?? '';
+
+                                /* Some curricula's nodes contain a curriculumStatements (English)
+                                 * Some don't (HPE 7c107937-6277-8883-d5b3-9d05bd64fea2)
                                  */
-                                $this->csvPayload[] = [
-                                    'id' => $nodeId,
-                                    'curriculum_node_parent_id' => $substrandId,
-                                    'name' => strip_tags($node['description'] ?? ''),
-                                    'code' => $code,
-                                    'order' => 0,
-                                    'description' => ''
-                                ];
-                            } else {
-                                /* HPE has a weird union combination of data structs
+                                if (isset($node['curriculumStatements'][0]['label'])) {
+                                    /* Chinese (probably Languages) curriculum has node titles in the
+                                     * description node, not a title node
+                                     */
+                                    $this->csvPayload[] = [
+                                        'id' => $nodeId,
+                                        'curriculum_node_parent_id' => $substrandId,
+                                        'name' => strip_tags($node['description'] ?? ''),
+                                        'code' => $code,
+                                        'order' => 0,
+                                        'description' => ''
+                                    ];
+                                } else {
+                                    /* HPE has a weird union combination of data structs
+                                     */
+                                    $this->csvPayload[] = [
+                                        'id' => $nodeId,
+                                        'curriculum_node_parent_id' => $substrandId,
+                                        'name' => $node['description'],
+                                        'code' => $code,
+                                        'order' => 0,
+                                        'description' => ''
+                                    ];
+                                }
+
+                                /* Keep track that we found a code
                                  */
-                                $this->csvPayload[] = [
-                                    'id' => $nodeId,
-                                    'curriculum_node_parent_id' => $substrandId,
-                                    'name' => $node['description'],
-                                    'code' => $code,
-                                    'order' => 0,
-                                    'description' => ''
-                                ];
+                                unset($this->missingCodes[$code]);
+
+                                /* Increment arbitrary node counter every time a node spawns
+                                 */
+                                $this->i++;
                             }
+                        } else {
+                            $nodeId = $this->i;
+
+                            /* Arts: Peculiarly different than everything else ;(
+                             * (That should come as no surprise...)
+                             */
+                            $code = $substrand['notations'];
+
+                            $this->csvPayload[] = [
+                                'id' => $nodeId,
+                                'curriculum_node_parent_id' => $strandId,
+                                'name' => $substrand['description'],
+                                'code' => $code,
+                                'order' => 0,
+                                'description' => ''
+                            ];
 
                             /* Keep track that we found a code
                              */
