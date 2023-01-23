@@ -54,25 +54,25 @@ class WACurriculumBuilder
     private const HOST = 'https://scsaapps.scsa.wa.edu.au/Apps/CurriculumJSON/';
     private const MANIFEST = [
         'english.json' => 'English Curriculum - Pre-primary to Year 10 ',
-        'hpe.json' => 'Health and Physical Education Curriculum - Pre-primary to Year 10',
-        'hass.json' => 'Humanities and Social Sciences Curriculum - Pre-primary to Year 10',
-
-        /* Languages Curriculum
-         */
-        'chinese-second-language.json' => 'Chinese: Second Language Curriculum - Pre-primary to Year 10',
-        'french-second-language.json' => 'French: Second Language Curriculum - Pre-primary to Year 10',
-        'german-second-language.json' => 'German: Second Language Curriculum - Pre-primary to Year 10',
-        'indonesian-second-language.json' => 'Indonesian: Second Language Curriculum - Pre-primary to Year 10',
-        'italian-second-language.json' => 'Italian: Second Language Curriculum - Pre-primary to Year 10',
-        'japanese-second-language.json' => 'Japanese: Second Language Curriculum - Pre-primary to Year 10',
-        'languages7-10.json' => 'Languages Curriculum - Year 7 to Year 10',
-
-        /* Some other unnamed section/grouping
-         */
-        'mathematics.json' => 'Mathematics Curriculum - Pre-primary to Year 10',
-        'science.json' => 'Science Curriculum - Pre-primary to Year 10',
-        'technologies.json' => 'Technologies Curriculum - Pre-primary to Year 10',
-        'arts.json' => 'The Arts Curriculum - Pre-primary to Year 10',
+//        'hpe.json' => 'Health and Physical Education Curriculum - Pre-primary to Year 10',
+//        'hass.json' => 'Humanities and Social Sciences Curriculum - Pre-primary to Year 10',
+//
+//        /* Languages Curriculum
+//         */
+//        'chinese-second-language.json' => 'Chinese: Second Language Curriculum - Pre-primary to Year 10',
+//        'french-second-language.json' => 'French: Second Language Curriculum - Pre-primary to Year 10',
+//        'german-second-language.json' => 'German: Second Language Curriculum - Pre-primary to Year 10',
+//        'indonesian-second-language.json' => 'Indonesian: Second Language Curriculum - Pre-primary to Year 10',
+//        'italian-second-language.json' => 'Italian: Second Language Curriculum - Pre-primary to Year 10',
+//        'japanese-second-language.json' => 'Japanese: Second Language Curriculum - Pre-primary to Year 10',
+//        'languages7-10.json' => 'Languages Curriculum - Year 7 to Year 10',
+//
+//        /* Some other unnamed section/grouping
+//         */
+//        'mathematics.json' => 'Mathematics Curriculum - Pre-primary to Year 10',
+//        'science.json' => 'Science Curriculum - Pre-primary to Year 10',
+//        'technologies.json' => 'Technologies Curriculum - Pre-primary to Year 10',
+//        'arts.json' => 'The Arts Curriculum - Pre-primary to Year 10',
     ];
 
 
@@ -200,18 +200,26 @@ class WACurriculumBuilder
     /**
      * Collate the WA curriculum csv from the json source files
      *
-     * @return void
+     * @return array
      * @throws \DomainException
      * @throws \RuntimeException
      */
-    public function generate(): void
+    public function generate(): array
     {
-        $i = 1;
-        $csvPayload = [];
-
-        /* Curriculum root node
-         */
         $curriculumRootNode = 1;
+
+        /* Hierarchy counter
+         */
+        $i = 1;
+
+        /* Presumed hierarchy
+         * WA Curriculum > curriculum > level > strand > substrand > node
+         */
+        $curriculumId = 2;
+
+        /* Mapped payload
+         */
+        $csvPayload = [];
 
         $csvPayload[] = [
             'id' => $curriculumRootNode,
@@ -222,6 +230,10 @@ class WACurriculumBuilder
             'description' => ''
         ];
 
+        /* Increment arbitrary node counter every time a node spawns
+         */
+        $i++;
+
         foreach (self::MANIFEST as $url => $name) {
             $curriculum = $this->retrieve($url);
 
@@ -229,22 +241,97 @@ class WACurriculumBuilder
              * id,curriculum_node_parent_id,name,code,order,description
              */
             $csvPayload[] = [
-                'id' => $curriculumRootNode,
-                'curriculum_node_parent_id' => '',
+                'id' => $curriculumId,
+                'curriculum_node_parent_id' => $curriculumRootNode,
                 'name' => $curriculum['title'],
                 'code' => '',
                 'order' => 0,
                 'description' => ''
             ];
 
-            foreach ($curriculum['curriculumStatements'] as $curriculumStatement) {
-                $row = [
+            /* Increment arbitrary node counter every time a node spawns
+             */
+            $i++;
 
+            /* Level
+             */
+            foreach ($curriculum['curriculumStatements'] as $level) {
+                $levelId = $i;
+
+                $csvPayload[] = [
+                    'id' => $levelId,
+                    'curriculum_node_parent_id' => $curriculumId,
+                    'name' => $level['title'],
+                    'code' => '',
+                    'order' => 0,
+                    'description' => strip_tags($level['description'])
                 ];
 
+                /* Increment arbitrary node counter every time a node spawns
+                 */
+                $i++;
+
+                /* Strand
+                 */
+                foreach ($level['curriculumStatements'] as $strand) {
+                    $strandId = $i;
+
+                    $csvPayload[] = [
+                        'id' => $strandId,
+                        'curriculum_node_parent_id' => $levelId,
+                        'name' => $strand['title'],
+                        'code' => '',
+                        'order' => 0,
+                        'description' => ''
+                    ];
+
+                    /* Increment arbitrary node counter every time a node spawns
+                     */
+                    $i++;
+
+                    /* Substrand
+                     */
+                    foreach ($strand['curriculumStatements'] as $substrand) {
+                        $substrandId = $i;
+
+                        $csvPayload[] = [
+                            'id' => $substrandId,
+                            'curriculum_node_parent_id' => $strandId,
+                            'name' => $substrand['title'],
+                            'code' => '',
+                            'order' => 0,
+                            'description' => ''
+                        ];
+
+                        /* Increment arbitrary node counter every time a node spawns
+                         */
+                        $i++;
+
+                        /* Node
+                         */
+                        foreach ($substrand['curriculumStatements'] as $node) {
+                            $nodeId = $i;
+
+                            $csvPayload[] = [
+                                'id' => $nodeId,
+                                'curriculum_node_parent_id' => $substrandId,
+                                'name' => $node['curriculumStatements'][0]['label'],
+                                'code' => $node['notations'][0] ?? '',
+                                'order' => 0,
+                                'description' => strip_tags($node['description'])
+                            ];
+
+                            /* Increment arbitrary node counter every time a node spawns
+                             */
+                            $i++;
+                        }
+                    }
+                }
             }
 
-            $i++;
+            $curriculumId++;
         }
+
+        return $csvPayload;
     }
 }
