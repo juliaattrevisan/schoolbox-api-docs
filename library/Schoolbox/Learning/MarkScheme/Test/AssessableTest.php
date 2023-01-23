@@ -2881,7 +2881,7 @@ class AssessableTest extends TestCase
      *            Draft Min: 50% from due work
      *            Draft Max: 100% from task / quiz
      *            Draft Avg: 83.33% (100% from task and quiz, 50% from due work)
-     *            Draft Wgt: 80% (100% * 1/5 from quiz + 50% * 4/5 from due work)
+     *            Draft Wgt: 60% (100% * 1/5 from quiz + 50% * 4/5 from due work)
      *            Pub Min: 50% from due work
      *            Pub Max: 100% from task
      *            Pub Avg: 75% (100% from task, 50% from due work)
@@ -2889,18 +2889,32 @@ class AssessableTest extends TestCase
      * student 5: Task: -
      *            Quiz: 2 attempt + 1 published feedback (1/3) + 1 later unpublished feedback (2/2)
      *            DueW: 1 submission + 1 published feedback (50.0) + 1 later unpublished feedback (100.0)
+     *            Draft Min: 100%
+     *            Draft Max: 100%
+     *            Draft Avg: 100%
+     *            Draft Wgt: 100%
+     *            Pub Min: 33.33% from quiz
+     *            Pub Max: 50% from due work
+     *            Pub Avg: 41.67% (33.3% from quiz, 50% from due work)
+     *            Pub Wgt: 46.67% (33.3% * 1/5 from quiz + 50% * 4/5 from due work)
      * student 6: Task: -
      *            Quiz: -
      *            DueW: 2 submission + 1 published floating feedback (50.0)
+     *            Draft/Pub Min/Max/Avg/Wgt: 50%
      * student 7: Task: -
      *            Quiz: -
      *            DueW: 2 submission + 1 published floating feedback (50.0) + 1 later unpublished floating feedback (100.0)
+     *            Draft Min/Max/Avg/Wgt: 100%
+     *            Pub Min/Max/Avg/Wgt: 50%
      * student 8: Task: -
      *            Quiz: -
      *            DueW: 0 submission + 1 published floating feedback (50.0)
+     *            Draft/Pub Min/Max/Avg/Wgt: 50%
      * student 9: Task: -
      *            Quiz: -
      *            DueW: 0 submission + 1 published floating feedback (50.0) + 1 later unpublished floating feedback (100.0)
+     *            Draft Min/Max/Avg/Wgt: 100%
+     *            Pub Min/Max/Avg/Wgt: 50%
      *
      * @return Project
      * @throws InvalidArgumentException If an unrecognised user.id is passed
