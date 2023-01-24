@@ -39,10 +39,9 @@ class ModelToArray
             'id'          => $courseSpec->getId(),
             'title'       => $courseSpec->getTitle(),
             'subjectCode' => $courseSpec->getSubjectCode(),
-            '_links'   => [
-                // Link to view course page?
+            '_links'      => [
                 'folder' => '/homepage/' . $courseSpec->getFolder()->getId(),
-                'modify'   => $this->getRouteIfAuthorized(
+                'modify' => $this->getRouteIfAuthorized(
                     'course.modifyCourse',
                     ['courseSpec' => $courseSpec, 'id' => $courseSpec->getId()],
                 )

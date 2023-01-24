@@ -30,19 +30,19 @@ class ModelToArray
     }
 
     /**
-     * @param Model $courseSpec
+     * @param Model $unitSpec
      * @return array
      */
-    public function __invoke(Model $courseSpec): array
+    public function __invoke(Model $unitSpec): array
     {
         return [
-            'id'          => $courseSpec->getId(),
-            'title'       => $courseSpec->getTitle(),
-            '_links'   => [
-                'folder' => '/homepage/' . $courseSpec->getFolder()->getId(),
-                'modify'   => $this->getRouteIfAuthorized(
+            'id'          => $unitSpec->getId(),
+            'title'       => $unitSpec->getTitle(),
+            '_links'      => [
+                'folder' => '/homepage/' . $unitSpec->getFolder()->getId(),
+                'modify' => $this->getRouteIfAuthorized(
                     'course.modifyCourse',
-                    ['courseSpec' => $courseSpec, 'id' => $courseSpec->getId()],
+                    ['courseSpec' => $unitSpec, 'id' => $unitSpec->getId()],
                 )
             ],
         ];
