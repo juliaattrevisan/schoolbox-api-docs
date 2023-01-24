@@ -10,7 +10,6 @@ namespace Schoolbox\Curriculum\Api\Usage;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
-use Schoolbox\Curriculum\Api\Controller;
 use Schoolbox\Curriculum\Node\Mapper;
 
 /**
@@ -49,7 +48,7 @@ class Module extends BaseModule
     public function buildController(): Base
     {
         return new Controller(
-            $this->getMapperFactory()->get(Mapper::class),
+            $this->injector->get('databaseInternal'),
         );
     }
 }
