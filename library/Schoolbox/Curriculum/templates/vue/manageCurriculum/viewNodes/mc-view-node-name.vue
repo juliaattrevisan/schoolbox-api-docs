@@ -42,7 +42,7 @@ const props = defineProps({
     /**
      * to disable certain events when editing is taking place
      */
-    isUpdatingOrAdding: {
+    isActive: {
         type: Boolean,
         required: true,
     },
@@ -58,7 +58,7 @@ const searchStore = useSearchStore();
  * @returns { Boolean }
  */
 const isDisabled = computed(() => {
-    if (props.isUpdatingOrAdding) {
+    if (props.isActive) {
         //while the node is being updated
         return true;
     } else if (nodesStore.isLoading) {

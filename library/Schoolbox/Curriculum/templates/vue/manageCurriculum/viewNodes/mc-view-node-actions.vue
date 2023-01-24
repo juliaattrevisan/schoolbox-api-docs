@@ -42,13 +42,6 @@ const props = defineProps({
         type: Boolean,
         required: true,
     },
-    /**
-     * to disable certain events when any editing is taking place
-     */
-    isUpdatingOrAdding: {
-        type: Boolean,
-        required: true,
-    },
 });
 
 const addSubsectionStore = useAddSubsectionStore();

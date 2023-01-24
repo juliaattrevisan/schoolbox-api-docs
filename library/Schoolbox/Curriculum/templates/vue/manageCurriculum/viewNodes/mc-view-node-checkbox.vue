@@ -9,7 +9,7 @@ import type { Node } from "@schoolboxCurriculum/types/Node";
 
 interface Props {
     node: Node; // the assigned node to display
-    isUpdatingOrAdding: boolean; // to disable certain events when editing is taking place
+    isActive: boolean; // to disable certain events when editing is taking place
 }
 
 const props = defineProps<Props>();
@@ -21,7 +21,7 @@ const selectedNodesStore = useSelectedNodesStore();
  * @returns { boolean } whether the checkbox should be disabled
  */
 const isDisabled = computed(() => {
-    return selectedNodesStore.childNodesIds.includes(props.node.id) || props.isUpdatingOrAdding;
+    return selectedNodesStore.childNodesIds.includes(props.node.id) || props.isActive;
 });
 
 /**

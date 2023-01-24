@@ -16,14 +16,14 @@ beforeEach(() => {
                 name: "My Node",
                 children: [],
             },
-            isUpdatingOrAdding: false,
-        },
+            isActive: false,
+        }
     });
 });
 
-test("is disabled when prop isUpdatingOrAdding is true", async () => {
-    await wrapper.setProps({ isUpdatingOrAdding: true });
-    expect(wrapper.find("input").element).toBeDisabled();
+test("is disabled when prop isActive is true", async () => {
+    await wrapper.setProps( { isActive: true } );
+    expect(wrapper.find('input').element).toBeDisabled();
 });
 
 test("is checked when in selected nodes store", async () => {

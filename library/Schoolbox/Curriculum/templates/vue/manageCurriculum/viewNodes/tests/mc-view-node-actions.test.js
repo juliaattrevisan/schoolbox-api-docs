@@ -18,8 +18,7 @@ beforeEach(() => {
             title: "My Node",
             isUpdating: false,
             isAdding: false,
-            isUpdatingOrAdding: false,
-        },
+        }
     });
 });
 

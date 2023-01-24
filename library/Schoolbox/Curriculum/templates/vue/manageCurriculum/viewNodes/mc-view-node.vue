@@ -190,7 +190,7 @@ const isAddingAnother = computed(() => addSubsectionStore.isOpen && activeNodeSt
  *
  * @returns { Boolean }
  */
-const isUpdatingOrAdding = computed(() => isUpdating.value || isAdding.value);
+const isActive = computed(() => isUpdating.value || isAdding.value);
 
 /**
  * To determine whether we need to display further child nodes within this node
@@ -232,21 +232,20 @@ const hasActions = computed(() => !store.isReadOnly && props.node.id !== UNSET_I
                 :data-is-new="isNew"
                 :data-just-updated="justUpdated"
             >
-                <mc-view-node-checkbox v-if="hasActions" :node="props.node" :isUpdatingOrAdding="isUpdatingOrAdding" />
+                <mc-view-node-checkbox v-if="hasActions" :node="props.node" :is-active="isActive" />
                 <mc-view-node-name
                     :node="props.node"
                     :depth="props.depth"
                     :title="title"
-                    :isUpdatingOrAdding="isUpdatingOrAdding"
+                    :is-active="isActive"
                     data-test-view-node-name
                 />
                 <mc-view-node-actions
                     v-if="hasActions"
                     :node="props.node"
                     :title="title"
-                    :isUpdating="isUpdating"
-                    :isAdding="isAdding"
-                    :isUpdatingOrAdding="isUpdatingOrAdding"
+                    :is-updating="isUpdating"
+                    :is-adding="isAdding"
                 />
             </div>
             <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
