@@ -4,22 +4,36 @@
  */
 
 import type { Node } from "@schoolboxCurriculum/types/Node";
+import { useNodeDetailsStore } from "../activeNode/store/mcNodeDetailsStore";
 import { useAddSubsectionStore } from "../activeNode/store/mcAddSubsectionStore";
 import { useUpdateNodeStore } from "../activeNode/store/mcUpdateNodeStore";
 
 interface Props {
     node: Node; // the assigned node to display
     title: string; // the already computed node title
+    isViewing: boolean; // to disable certain events when viewing the node
     isUpdating: boolean; // to disable certain events when updating the node
     isAdding: boolean; // to disable certain events when adding a node
 }
 
 const props = defineProps<Props>();
+const nodeDetailsStore = useNodeDetailsStore();
 const addSubsectionStore = useAddSubsectionStore();
 const updateNodeStore = useUpdateNodeStore();
 
 /**
- * to open up or close the update modal
+ * to open up or close the view modal
+ */
+ function onViewToggleSelected() {
+    if (props.isViewing) {
+        nodeDetailsStore.cancel();
+    } else {
+        nodeDetailsStore.prompt(props.node);
+    }
+}
+
+/**
+ * to open up or close the add subsection modal
  */
 function onAddSubsectionToggleSelected() {
     if (props.isAdding) {
@@ -43,22 +57,29 @@ function onUpdateToggleSelected() {
 
 <template>
     <button
+        :class="`button-action-option ${props.isViewing ? 'icon-close' : 'icon-curriculum-details'}`"
+        :title="`View ${props.title}`"
+        :disabled="props.isUpdating || props.isAdding"
+        data-test-view
+        @click.prevent="onViewToggleSelected"
+    >
+        Update {{ props.title }}
+    </button>
+    <button
         :class="`button-action-option ${props.isUpdating ? 'icon-close' : 'icon-modify'}`"
         :title="`Update ${props.title}`"
-        :disabled="props.isAdding"
+        :disabled="props.isViewing || props.isAdding"
         data-test-update
         @click.prevent="onUpdateToggleSelected"
-        @keyup.enter="onUpdateToggleSelected"
     >
         Update {{ props.title }}
     </button>
     <button
         :class="`button-action-option ${props.isAdding ? 'icon-close' : 'icon-add'}`"
         :title="`Add subsection to ${props.title}`"
-        :disabled="props.isUpdating"
+        :disabled="props.isViewing || props.isUpdating"
         data-test-add
         @click.prevent="onAddSubsectionToggleSelected"
-        @keyup.enter="onAddSubsectionToggleSelected"
     >
         Add subsection to {{ props.title }}
     </button>

@@ -8,7 +8,7 @@ import { useStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/manage
 import { useActiveNodeStore } from "@schoolboxCurriculum/vue/manageCurriculum/activeNode/store/mcActiveNodeStore";
 import type { Node } from "@schoolboxCurriculum/types/Node";
 
-export const useNodeUsageStore = defineStore("mcNodeUsage", () => {
+export const useNodeDetailsStore = defineStore("mcNodeDetails", () => {
     const isProcessing = ref(false);
     const isOpen = ref(false); // to notify that the prompt is opened / closed
 

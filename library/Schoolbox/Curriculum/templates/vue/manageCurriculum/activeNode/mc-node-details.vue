@@ -7,21 +7,16 @@
 import { computed } from "vue";
 import { useStore } from "../store/manageCurriculumStore";
 import { useActiveNodeStore } from "./store/mcActiveNodeStore";
-import { useNodeUsageStore } from "./store/mcNodeUsageStore";
+import { useNodeDetailsStore } from "./store/mcNodeDetailsStore";
 
-const props = defineProps({
-    /**
-     * to gradually add more marginLeft to indicate node level depth
-     */
-    depth: {
-        type: Number,
-        required: true,
-    },
-});
+interface Props {
+    depth: number; // to gradually add more marginLeft to indicate node level depth
+}
 
+const props = defineProps<Props>();
 const store = useStore();
 const activeNodeStore = useActiveNodeStore();
-const nodeUsageStore = useNodeUsageStore();
+const nodeDetailsStore = useNodeDetailsStore();
 
 /**
  * to gradually and more marginLeft to indicate node level depth
@@ -34,14 +29,17 @@ const marginLeft = computed(() => `calc(${props.depth * 2}rem)`);
  * close the update view
  */
 function onCancelSelected() {
-    // nodeUsageStore.cancel();
+    // nodeDetailsStore.cancel();
 }
-
 </script>
 
 <template>
     <div class="node-container">
-        Usage
+        <section>
+            <fieldset class="content">
+                <legend>Node details</legend>
+            </fieldset>
+        </section>
     </div>
 </template>
 
@@ -52,5 +50,10 @@ function onCancelSelected() {
     margin: -1px 0 0 v-bind(marginLeft); //-1px so it butts up against the node border above
     position: relative;
     z-index: 1;
+}
+
+legend {
+    font-size: 1rem;
+    margin-bottom: 1rem;
 }
 </style>
