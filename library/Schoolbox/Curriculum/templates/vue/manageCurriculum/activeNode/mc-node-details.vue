@@ -5,6 +5,7 @@
  */
 
 import { computed } from "vue";
+import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/transitions";
 import { useStore } from "../store/manageCurriculumStore";
 import { useActiveNodeStore } from "./store/mcActiveNodeStore";
 import { useNodeDetailsStore } from "./store/mcNodeDetailsStore";
@@ -25,13 +26,32 @@ const nodeDetailsStore = useNodeDetailsStore();
  */
 const marginLeft = computed(() => `calc(${props.depth * 2}rem)`);
 
+/**
+ * Display the list of breadcrumbs to provide context on where the selected node comes from
+ *
+ * @returns { string }
+ */
+const breadcrumbs = computed(() => {
+    if (activeNodeStore.node.breadcrumbs?.length > 0) {
+        const justNames = activeNodeStore.node.breadcrumbs.map((breadcrumb) => breadcrumb.name);
+        return justNames.join(' > ');
+    }
+    return '';
+});
+
 </script>
 
 <template>
     <div class="node-container" :style="{ marginLeft: marginLeft }">
         <section>
             <fieldset class="content">
-                <legend class="title">Node details</legend>
+                <Transition mode="out-in" @enter="slideDownOnEnter" @leave="slideUpOnLeave">
+                    <div v-if="nodeDetailsStore.isProcessing" class="loader" />
+                    <div v-else>
+                        <p v-if="breadcrumbs.length > 0" class="meta">{{ breadcrumbs }}</p>
+                        <div v-html="activeNodeStore.node.description"></div>
+                    </div>
+                </Transition>
             </fieldset>
         </section>
     </div>

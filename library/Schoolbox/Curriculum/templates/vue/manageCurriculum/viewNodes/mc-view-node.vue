@@ -221,6 +221,7 @@ const title = computed(() =>
  * @returns { boolean }
  */
 const hasActions = computed(() => !store.isReadOnly && props.node.id !== UNSET_ID && !searchStore.isActive);
+
 </script>
 
 <template>

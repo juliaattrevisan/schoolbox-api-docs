@@ -1,3 +1,5 @@
+import type { Breadcrumb } from "@schoolboxCurriculum/types/Breadcrumb";
+
 /**
  * A curriculum node
  */
@@ -11,6 +13,7 @@ export type Node = {
     parent: Node | null;
     name: string;
     selectedParentId?: number; // when a parent Node is selected (to enable/disable or delete), this will be the id of that Node
+    breadcrumbs?: Breadcrumb[]; // list of parents to reach this node
 };
 
 /**
