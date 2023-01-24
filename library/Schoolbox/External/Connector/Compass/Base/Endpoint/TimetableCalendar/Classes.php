@@ -534,15 +534,10 @@ class Classes implements IStrategy
         array $activity,
         array $activityInstance
     ): \Schoolbox\External\Event\Model {
-
-        /* Name is the same as the Code, in compass
-         */
-        $activityName = trim((string)$activity['name']);
-
         /* Truncate it to our schema's length, because somehow schools are making
          * very long class codes somehow
          */
-        $classCode = $this->generateClassCode($activityName);
+        $classCode = $this->generateClassCode(trim((string)$activity['importIdentifier']));
 
         /* Fill in these vars as usual
          */
@@ -629,7 +624,7 @@ class Classes implements IStrategy
         /* Truncate it to our schema's length, because somehow schools are making
          * very long class codes somehow
          */
-        $classCode = $this->generateClassCode($activityName);
+        $classCode = $this->generateClassCode(trim((string)$activity['importIdentifier']));
 
         /* Constraints in the schema are case insensitive, unlike
          * these array keys - class codes sometimes appear like
