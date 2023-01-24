@@ -104,17 +104,6 @@ HELP;
         $file        = null;
         $timeout     = (float)($this->getConfig()->get('schooldata_import_timeout') ?: Endpoint\Scheduler::DEFAULT_TIMEOUT);
 
-        /* Importer strats can be defined by cli args
-         * null or empty string means "import everything"
-         *
-         * Otherwise, whatever you specified must fit within a known vocabulary
-         * and works in conjunction with whatever watchlists you have in place
-         *
-         * scheduler always runs all strats
-         * The cli option is hardcoded to empty str ''
-         */
-        $validStrats = new \Schoolbox\External\Connector\ValidStrats('');
-
         /* SUDS imports can take a notoriously long time to complete based on sis etc.
          * and the instances could start up a new import before the existing one
          * has even finished. If you can't reserve this, then abort.
@@ -158,20 +147,45 @@ HELP;
          */
         $runId = (new \Schoolbox\External\Connector\Log\Guid())->generate();
 
-        /* Execute scheduler: sis stuff
+        /* Split the transaction in half
          */
-        $sisFactory = new Endpoint\Factory($host, $key, $perform, $this->getLogger(), [], $validStrats);
+        $splitStrats = [
+            'families,staff',
+            'timetable'
+        ];
 
-        (new Endpoint\Scheduler(
-            $randomMapper->getDatabase(),
-            $frequency,
-            $customHours,
-            $sisFactory,
-            $type,
-            $file,
-            $this->getLogger(),
-            \Schoolbox\External\Connector\Log\Mapper::getInstance()
-        ))->run(time(), $runId, Endpoint\Scheduler::SCHEDULER_SIS_SCRIPT_NAME);
+        foreach ($splitStrats as $currentStrat) {
+            /* Importer strats can be defined by cli args
+             * null or empty string means "import everything"
+             *
+             * Otherwise, whatever you specified must fit within a known vocabulary
+             * and works in conjunction with whatever watchlists you have in place
+             *
+             * scheduler always runs all strats
+             * The cli option is hardcoded to empty str ''
+             */
+            $validStrats = new \Schoolbox\External\Connector\ValidStrats($currentStrat);
+
+            /* Execute scheduler: sis stuff
+             */
+            $sisFactory = new Endpoint\Factory($host, $key, $perform, $this->getLogger(), [], $validStrats);
+
+            $this->getLogger()->warning(sprintf(
+                'Running strat: %s',
+                $currentStrat
+            ));
+
+            (new Endpoint\Scheduler(
+                $randomMapper->getDatabase(),
+                $frequency,
+                $customHours,
+                $sisFactory,
+                $type,
+                $file,
+                $this->getLogger(),
+                \Schoolbox\External\Connector\Log\Mapper::getInstance()
+            ))->run(time(), $runId, Endpoint\Scheduler::SCHEDULER_SIS_SCRIPT_NAME . " ({$currentStrat})");
+        }
 
         /* Execute scheduler: calendar stuff
          * Not all connectivities contain a calendar importer, just some
