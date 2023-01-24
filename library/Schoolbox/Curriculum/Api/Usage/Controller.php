@@ -10,6 +10,7 @@ namespace Schoolbox\Curriculum\Api\Usage;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Curriculum\Node;
+use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly;
 
 /**
  * Controller for the curriculum usage API.
@@ -41,10 +42,11 @@ class Controller extends Base
         $encodedCursor = $this->request->query->get('cursor');
         $cursor        = new Cursor($this->database, $node, 1, null);
         $data          = $cursor->retrieveResults($encodedCursor);
+        $hydrator      = new Hydrator(new LinkOnly());
 
         $this->response->content->set(
             $this->buildJsonOutput([
-                'data'     => $data,
+                'data'     => $hydrator->hydrateResults($data),
                 'metadata' => [
                     'count' => $cursor->retrieveResultCount(),
                     'cursor' => [

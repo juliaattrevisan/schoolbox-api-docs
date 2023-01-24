@@ -19,11 +19,11 @@ use Schoolbox\Curriculum\Node;
 
 class Cursor implements ICursor
 {
-    private const DISCRIMINATOR_COURSE = 'course';
+    public const DISCRIMINATOR_COURSE = 'course';
 
-    private const DISCRIMINATOR_UNIT = 'unit';
+    public const DISCRIMINATOR_UNIT = 'unit';
 
-    private const DISCRIMINATOR_FOLDER = 'folder';
+    public const DISCRIMINATOR_FOLDER = 'folder';
 
     /**
      * Constructor
