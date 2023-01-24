@@ -19,6 +19,7 @@ import { useSearchStore } from "../store/mcSearchStore";
 import McViewNodeCheckbox from "./mc-view-node-checkbox.vue";
 import McViewNodeName from "./mc-view-node-name.vue";
 import McViewNodeActions from "./mc-view-node-actions.vue";
+import McNodeUsage from "../activeNode/mc-node-usage.vue";
 import McAddSubsection from "../activeNode/mc-add-subsection.vue";
 import McUpdateNode from "../activeNode/mc-update-node.vue";
 
@@ -248,6 +249,9 @@ const hasActions = computed(() => !store.isReadOnly && props.node.id !== UNSET_I
                     :isUpdatingOrAdding="isUpdatingOrAdding"
                 />
             </div>
+            <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
+                <mc-node-usage v-if="isAdding" :depth="props.depth" />
+            </Transition>
             <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
                 <mc-add-subsection v-if="isAdding" :depth="props.depth" />
             </Transition>
