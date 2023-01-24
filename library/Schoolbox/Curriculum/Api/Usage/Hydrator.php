@@ -47,27 +47,28 @@ class Hydrator
      * * an object value, which contains the object's data
      *
      * @param Collection<array{id: int, name: string, discriminator: string}> $results
-     * @return Collection<array{discriminator: string, object: array}>
+     * @return Collection<array{discriminator: string, object: array|null}>
      */
     public function hydrateResults(Collection $results): Collection
     {
         // Fetch results from various mappers
         $models    = [];
+        $mapId     = fn (array $result) => $result['id'];
         $folderIds = $results
-            ->filter(fn (array $result) => $result['discriminator'] === Cursor::DISCRIMINATOR_FOLDER)
-            ->map(fn (array $result) => $result['id'])
+            ->filter($this->buildFilter(Cursor::DISCRIMINATOR_FOLDER))
+            ->map($mapId)
             ->getAll();
         $models[Cursor::DISCRIMINATOR_FOLDER] = $this->folderMapper->findByColumn('id', $folderIds)->indexBy('id');
 
         $courseIds = $results
-            ->filter(fn (array $result) => $result['discriminator'] === Cursor::DISCRIMINATOR_COURSE)
-            ->map(fn (array $result) => $result['id'])
+            ->filter($this->buildFilter(Cursor::DISCRIMINATOR_COURSE))
+            ->map($mapId)
             ->getAll();
         $models[Cursor::DISCRIMINATOR_COURSE] = $this->courseSpecMapper->findByColumn('id', $courseIds)->indexBy('id');
 
         $unitIds = $results
-            ->filter(fn (array $result) => $result['discriminator'] === Cursor::DISCRIMINATOR_UNIT)
-            ->map(fn (array $result) => $result['id'])
+            ->filter($this->buildFilter(Cursor::DISCRIMINATOR_UNIT))
+            ->map($mapId)
             ->getAll();
         $models[Cursor::DISCRIMINATOR_UNIT] = $this->unitSpecMapper->findByColumn('id', $unitIds)->indexBy('id');
 
@@ -91,5 +92,17 @@ class Hydrator
             ]);
         }
         return $newCollection;
+    }
+
+    /**
+     * Build a filter function for finding results which match this
+     * discriminator.
+     *
+     * @param string $discriminator
+     * @return callable
+     */
+    private function buildFilter(string $discriminator): callable
+    {
+        return fn (array $result) => $result['discriminator'] === $discriminator;
     }
 }
