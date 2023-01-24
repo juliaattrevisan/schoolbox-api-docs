@@ -170,7 +170,7 @@ HELP;
              */
             $sisFactory = new Endpoint\Factory($host, $key, $perform, $this->getLogger(), [], $validStrats);
 
-            $this->getLogger()->warning(sprintf(
+            $this->getLogger()->info(sprintf(
                 'Running strat: %s',
                 $currentStrat
             ));
