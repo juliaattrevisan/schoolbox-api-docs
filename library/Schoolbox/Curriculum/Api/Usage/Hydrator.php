@@ -22,10 +22,12 @@ class Hydrator
      *
      * @param LinkOnly                           $folderTranslator Translator for folder objects
      * @param CourseSpec\Translator\ModelToArray $courseTranslator Translator for course objects
+     * @param UnitSpec\Translator\ModelToArray   $unitTranslator   Translator for unit objects
      */
     public function __construct(
         private LinkOnly $folderTranslator,
         private CourseSpec\Translator\ModelToArray $courseTranslator,
+        private UnitSpec\Translator\ModelToArray $unitTranslator,
     ) {
     }
 
@@ -67,11 +69,7 @@ class Hydrator
         $translators = [
             Cursor::DISCRIMINATOR_FOLDER => $this->folderTranslator,
             Cursor::DISCRIMINATOR_COURSE => $this->courseTranslator,
-            Cursor::DISCRIMINATOR_UNIT   => fn (UnitSpec\Model $x) => [
-                'id'     => $x->getId(),
-                'title'  => $x->getTitle(),
-                'folder' => call_user_func($this->folderTranslator, $x->getFolder()),
-            ],
+            Cursor::DISCRIMINATOR_UNIT   => $this->unitTranslator,
         ];
 
         $newCollection = new Collection();

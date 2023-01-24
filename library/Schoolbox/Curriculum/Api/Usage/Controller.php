@@ -11,6 +11,7 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\Learning\Course\DataModel\Specification\Translator\ModelToArray;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Translator\ModelToArray as UnitModelToArray;
 use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly;
 
 /**
@@ -46,6 +47,7 @@ class Controller extends Base
         $hydrator      = new Hydrator(
             new LinkOnly(),
             new ModelToArray($this->router, $this->authorizer, $this->getUser()),
+            new UnitModelToArray($this->router, $this->authorizer, $this->getUser()),
         );
 
         $this->response->content->set(
