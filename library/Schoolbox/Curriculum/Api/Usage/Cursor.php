@@ -171,31 +171,54 @@ class Cursor implements ICursor
                 AND cnfc.curriculum_node_id = :folderCurriculumNodeId
             ",
         ];
-        $queryString = '('
+        $queryString = 'SELECT * FROM (('
             . implode(') UNION (', $selectParts)
-            . ')
-            ORDER BY name asc, discriminator asc, id asc
-            LIMIT :limit';
-
-        // Figure out a WHERE part
-
-        $query = $this->database->prepareQuery($queryString);
-        $query->bindInputs([
+            . ')) AS combined';
+        $params = [
             'courseDiscriminator'    => self::DISCRIMINATOR_COURSE,
             'courseCurriculumNodeId' => $this->node->getId(),
             'unitDiscriminator'      => self::DISCRIMINATOR_UNIT,
             'unitCurriculumNodeId'   => $this->node->getId(),
             'folderDiscriminator'    => self::DISCRIMINATOR_FOLDER,
             'folderCurriculumNodeId' => $this->node->getId(),
-            'limit'                  => [
-                'type'  => PDO::PARAM_INT,
-                'value' => $this->limit,
-            ],
-        ]);
+        ];
+
+        // Figure out a WHERE part
+        if (isset($encodedCursor)) {
+            $decodedCursor = $this->codec->decode($encodedCursor);
+            if (isset($decodedCursor['name'], $decodedCursor['id'], $decodedCursor['discriminator'])) {
+                $whereParts    = [
+                    '(name > :name1)',
+                    '(name = :name2 AND id > :id2)',
+                    '(name = :name3 AND id = :id3 AND discriminator > :discriminator3)',
+                ];
+                $queryString .= ' WHERE ' . implode(' OR ', $whereParts);
+                $params += [
+                    'name1'          => $decodedCursor['name'],
+                    'name2'          => $decodedCursor['name'],
+                    'name3'          => $decodedCursor['name'],
+                    'id2'            => $decodedCursor['id'],
+                    'id3'            => $decodedCursor['id'],
+                    'discriminator3' => $decodedCursor['discriminator'],
+                ];
+            }
+        }
+
+        // Build the rest of the query
+        $queryString .= '
+            ORDER BY name ASC, id ASC, discriminator ASC
+            LIMIT :limit
+        ';
+        $params['limit'] = [
+            'type'  => PDO::PARAM_INT,
+            'value' => $this->limit,
+        ];
+
+        $query = $this->database->prepareQuery($queryString);
+        $query->bindInputs($params);
         $query->execute();
 
-        // Use this list of results to hydrate actual objects
-
+        // Use this list of results to hydrate actual objects in the Hydrator
         return new Collection($query->fetchAll());
     }
 }

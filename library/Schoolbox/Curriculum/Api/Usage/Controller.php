@@ -39,7 +39,7 @@ class Controller extends Base
         // Fetch usage:
         // write a cursor for fetching courses + units
         $encodedCursor = $this->request->query->get('cursor');
-        $cursor        = new Cursor($this->database, $node, 10, null);
+        $cursor        = new Cursor($this->database, $node, 1, null);
         $data          = $cursor->retrieveResults($encodedCursor);
 
         $this->response->content->set(
