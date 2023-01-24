@@ -16,14 +16,48 @@ use PDO;
 use Schoolbox\API\Cursor\ICursor;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node;
+use ValueError;
 
+/**
+ * Cursor for curriculum usage results.
+ *
+ * Fetches a list of names and identifiers of curriculum usages, for conversion
+ * into an actual set of records by `\Schoolbox\Curriculum\Api\Usage\Hydrator`.
+ */
 class Cursor implements ICursor
 {
+    /**
+     * Discriminator for identifying a course result.
+     */
     public const DISCRIMINATOR_COURSE = 'course';
 
+    /**
+     * Discriminator for identifying a unit result.
+     */
     public const DISCRIMINATOR_UNIT = 'unit';
 
+    /**
+     * Discriminator for identifying a folder result.
+     */
     public const DISCRIMINATOR_FOLDER = 'folder';
+
+    /**
+     * Minimum number of results returnable from the cursor at once:
+     * it must return at least one result.
+     */
+    public const LIMIT_MIN = 1;
+
+    /**
+     * Maximum number of results returnable from the cursor at once:
+     * IMO 100 results is a sensible maximum.
+     */
+    public const LIMIT_MAX = 100;
+
+    /**
+     * A sensible default number of results to return from the cursor at once:
+     * IMO the maximum is a sensible default.
+     */
+    public const LIMIT_DEFAULT = self::LIMIT_MAX;
 
     /**
      * Constructor
@@ -40,6 +74,12 @@ class Cursor implements ICursor
         private ?ICodec $codec
     ) {
         $this->codec ??= new Base64();
+        if ($this->limit < self::LIMIT_MIN) {
+            throw new ValueError(sprintf('$limit must be at least %d: %d provided', self::LIMIT_MIN, $this->limit));
+        }
+        if ($this->limit > self::LIMIT_MAX) {
+            throw new ValueError(sprintf('$limit must be at most %d: %d provided', self::LIMIT_MAX, $this->limit));
+        }
     }
 
     /**
@@ -127,7 +167,7 @@ class Cursor implements ICursor
     }
 
     /**
-     * @inheritDoc
+     * @return Collection<array{id: int, name: string, discriminator: string}>
      */
     public function retrieveResults(?string $encodedCursor): Collection
     {

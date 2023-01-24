@@ -43,10 +43,10 @@ class Controller extends Base
      */
     public function getNodeUsage(Node\Model $node): void
     {
-        // Fetch usage:
-        // write a cursor for fetching courses + units
+        // Fetch usage
         $encodedCursor = $this->request->query->get('cursor');
-        $cursor        = new Cursor($this->database, $node, 10, null);
+        $limit         = $this->request->query->getInt('limit', Cursor::LIMIT_DEFAULT);
+        $cursor        = new Cursor($this->database, $node, $limit, null);
         $data          = $cursor->retrieveResults($encodedCursor);
 
         // I can't create this in the module because a user object is required,

@@ -15,6 +15,12 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly;
 
+/**
+ * Hydrator for curriculum usage results.
+ *
+ * Converts the results from `\Schoolbox\Curriculum\Api\Usage\Cursor::retrieveResults`
+ * into a set of more meaningful results.
+ */
 class Hydrator
 {
     /**
@@ -36,12 +42,12 @@ class Hydrator
 
     /**
      * Hydrates the results from `\Schoolbox\Curriculum\Api\Usage\Cursor::retrieveResults`
-     * into a set of actual objects.
+     * into:
+     * * a discriminator value, which specifies the type of object
+     * * an object value, which contains the object's data
      *
-     * @param Collection $results
-     * @return Collection Each item  will contain:
-     *                    * discriminator: identifier of object's type
-     *                    * object:        the actual object
+     * @param Collection<array{id: int, name: string, discriminator: string}> $results
+     * @return Collection<array{discriminator: string, object: array}>
      */
     public function hydrateResults(Collection $results): Collection
     {
