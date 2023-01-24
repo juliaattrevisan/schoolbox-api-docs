@@ -22,6 +22,16 @@ use Schoolbox\Pastoral\SubType\Mapper as PastoralSubtypeMapper;
 use Schoolbox\Pastoral\SubType\Model;
 use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
+use Schoolbox\Permission\Access\RoleAccessMapper;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Group;
+use Schoolbox\Resource\GroupMapper;
+use Schoolbox\Resource\HomepageConfig;
+use Schoolbox\Resource\HomepageConfigMapper;
+use Schoolbox\Resource\HomepageTemplateMapper;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
@@ -40,12 +50,22 @@ class Api extends \Codeception\Module
 
     private UserMapper $userMapper;
 
+    private FolderMapper $folderMapper;
+
+    private RoleMapper $roleMapper;
+
     private array $originalConfig = [];
 
     /**
      * HOOK: executed after configuration is loaded
      *
      * Initializes the cli kernel so that we can use the dependency injector.
+     * @throws MapperException
+     * @throws \Aura\Di\Exception
+     * @throws \Aura\Di\Exception\ContainerLocked
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Aura\Di\Exception\ServiceNotObject
+     * @throws \Schoolbox\External\Exception
      */
     public function _initialize(): void
     {
@@ -56,15 +76,26 @@ class Api extends \Codeception\Module
             }
         };
         // TODO Expose kernel options as Helper config in codeception.dist.yml
-        $this->cliKernel  = new Kernel(
+        $this->cliKernel    = new Kernel(
             $app,
             [Kernel::OPTION_ERRORS => E_ALL]
         );
-        $this->userMapper = UserMapper::getInstance();
+        $this->userMapper   = UserMapper::getInstance();
+        $this->folderMapper = FolderMapper::getInstance();
+        $this->roleMapper   = RoleMapper::getInstance();
+        try {
+            $classFolder = $this->folderMapper->findByCode('DEMO1');
+        } catch (\Exception $e) {
+            $classFolder = $this->folderMapper->findByCode('9ENGA');
+        }
+        $classFolder->loadTeachers();
     }
 
     private array $users = [];
 
+    /**
+     * @throws MapperException
+     */
     public function _before(TestInterface $test): void
     {
         parent::_before($test);
@@ -88,8 +119,16 @@ class Api extends \Codeception\Module
     }
 
     /**
-     * Generate token for user
      * @param string $username
+     * @return User
+     */
+    public function getUserByUsername(string $username): User
+    {
+        return $this->userMapper->findByUsername($username);
+    }
+
+    /**
+     * Generate token for user
      * @return string
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
@@ -105,6 +144,7 @@ class Api extends \Codeception\Module
      * Sets database config value temporally
      * @param string $name
      * @param mixed  $value
+     * @throws ModuleException
      */
     public function changeDBConfig(string $name, $value)
     {
@@ -159,6 +199,54 @@ class Api extends \Codeception\Module
     }
 
     /**
+     * @param User $groupAdmin
+     * @param User $readMember
+     * @return Folder
+     * @throws MapperException
+     */
+    public function createGroup(User $groupAdmin, User $readMember): Folder
+    {
+        $template = HomepageTemplateMapper::getInstance()->findAll()->first();
+        $parent   = $this->folderMapper->findByParent(0)->last();
+
+        $folder = $this->folderMapper->createModel()
+                                     ->setName('GROUP ' . $this->generateText(5))
+                                     ->setParent($parent);
+
+        $homepageConfig = (new HomepageConfig())
+            ->setCategory($folder)
+            ->setTemplate($template);
+        $folder->setHomepage($homepageConfig);
+        $this->folderMapper->save($folder);
+        HomepageConfigMapper::getInstance()->save($homepageConfig);
+
+        $group = (new Group())->setType(Group::FREE_GROUP)
+                              ->setFolder($folder)
+                              ->setForceFollow(false)
+                              ->setNotificationDisabled(false);
+
+        GroupMapper::getInstance()->save($group);
+
+        $roleIds = $this->roleMapper->findAll()->getPropertyValues('id');
+        RoleAccessMapper::getInstance()->savePermissions($folder, array_combine($roleIds, array_fill(0, count($roleIds), 0)));
+
+        $userAccessMapper = UserAccessMapper::getInstance();
+        $access           = $userAccessMapper->createModel()
+                                             ->setServiceIdentifier($folder->getId())
+                                             ->setService(UserAccess::SERVICE_HOMEPAGE)
+                                             ->setUser($groupAdmin)
+                                             ->setAccessLevel(UserAccess::ACCESS_FULL);
+        $userAccessMapper->save($access);
+        $access = $userAccessMapper->createModel()
+                                   ->setServiceIdentifier($folder->getId())
+                                   ->setService(UserAccess::SERVICE_HOMEPAGE)
+                                   ->setUser($readMember)
+                                   ->setAccessLevel(UserAccess::ACCESS_READ);
+        $userAccessMapper->save($access);
+        return $folder;
+    }
+
+    /**
      * @return GenericCollection
      */
     public function getCampuses(): GenericCollection
@@ -173,7 +261,17 @@ class Api extends \Codeception\Module
      */
     public function getRole(string $roleType): Role
     {
-        return RoleMapper::getInstance()->findOneByColumn('group_type', $roleType);
+        try {
+            return $this->roleMapper->findOneByColumn('group_type', $roleType);
+        } catch (MapperException $e) {
+            $admin   = $this->userMapper->findByUsername('alaress');
+            $newRole = (new Role())->setType($roleType)
+                                   ->setUpdatedBy($admin->getId())
+                                   ->setName($roleType . ' ' . $this->generateText(5));
+            $newRole->setSequence(10);
+            $this->roleMapper->save($newRole);
+            return $newRole;
+        }
     }
 
     /**
@@ -195,7 +293,7 @@ class Api extends \Codeception\Module
     /**
      * @return GenericCollection
      */
-    public function getPastoralTags()
+    public function getPastoralTags(): GenericCollection
     {
         return PastoralTagMapper::getInstance()->findAll();
     }
@@ -203,6 +301,7 @@ class Api extends \Codeception\Module
     /**
      * @return GenericCollection
      * @throws MapperException
+     * @throws ModuleException
      */
     public function preparePastoralActions(): GenericCollection
     {
@@ -285,7 +384,7 @@ class Api extends \Codeception\Module
      * @return mixed
      * @throws ModuleException
      */
-    public function getMaxValue(string $tableName, string $column)
+    public function getMaxValue(string $tableName, string $column): mixed
     {
         return $this->getDbModule()->grabFromDatabase($tableName, "max($column)");
     }

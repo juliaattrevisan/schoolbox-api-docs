@@ -214,14 +214,16 @@ class Controller extends Base
      */
     public function apiMembershipDelete(User $user, Group $group)
     {
-        $userAccess = $this->groupsHelper->getGroup($user, $group);
-        if (!$userAccess) {
+        // Need to get UserAccess rather than UserGroupAccess
+        $userAccesses = $this->userAccessMapper->findForFolderUser($group->getFolder(), User::createCollection()->add($user));
+
+        if (!$userAccesses->count()) {
             $this->sendJsonError('User is not enroled in the group', 404);
             return;
         }
 
         try {
-            $this->userAccessMapper->delete($userAccess);
+            $this->userAccessMapper->delete($userAccesses);
             $this->getResponse()->status->setCode(204);
         } catch (MapperException $e) {
             $this->sendJsonError('Unable to remove the user from the group.', 400);
