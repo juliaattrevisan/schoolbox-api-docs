@@ -324,11 +324,11 @@ class User extends DeprecatedModel
                 if (preg_match('/([[:alpha:]\'"]+) ([[:alpha:]\'"]+)/', $keyword, $name)) {
                     $firstName = $this->db->escapeForLike($name[1]);
                     $lastName  = $this->db->escapeForLike($name[2]);
-                    $query .= "
+                    $query .= "(
                         ( firstname like '%{$firstName}%' and lastname like '%{$lastName}%' )
                         or
                         ( preferred_name like '%{$firstName}%' and lastname like '%{$lastName}%' )
-                    ";
+                    )";
                 } else {
                     $param = $this->db->escapeForLike($keyword);
                     $query .= "(
