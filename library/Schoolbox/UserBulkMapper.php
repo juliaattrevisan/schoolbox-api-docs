@@ -133,6 +133,10 @@ class UserBulkMapper extends UserMapper
             $whereList[] = ' jwt.jwt_id IS ' . ($searchToken ? 'NOT' : '') . ' NULL';
         }
 
+        // we do not want to bulk modify alaress user
+        $whereList[] = " u.username != :alaress ";
+        $params      = array_merge($params, ['alaress' => UserMapper::USERNAME_ALARESS_ADMIN]);
+
         $query .= ' WHERE ' . implode(' AND ', $whereList) . ' ORDER BY u.lastname';
 
         $statement = $this->getDatabase()->prepare($query);
