@@ -57,6 +57,16 @@ function onUpdateToggleSelected() {
 
 <template>
     <button
+        class="usage-counts"
+        :title="`View ${props.title}`"
+        @click.prevent="onViewToggleSelected"
+    >
+        <span class="label neutral icon-course-builder" title="Course">2</span>
+        <span class="label neutral icon-unit" title="Unit">5</span>
+        <span class="label neutral icon-due-work" title="Assessment">3</span>
+        <span class="label neutral icon-badge" title="Badges">7</span>
+    </button>
+    <button
         :class="`button-action-option ${props.isViewing ? 'icon-close' : 'icon-curriculum-details'}`"
         :title="`View ${props.title}`"
         :disabled="props.isUpdating || props.isAdding"
@@ -88,6 +98,16 @@ function onUpdateToggleSelected() {
 <style lang="scss" scoped>
 @import "./style/mcViewNode";
 
+.usage-counts {
+    @extend .button;
+    display: flex;
+    gap: 0.5rem;
+    min-width: auto;
+    overflow: visible;
+    span {
+        margin: 0;
+    }
+}
 .button-action-option {
     @extend .button;
     color: var(--content-ui-foreground);
