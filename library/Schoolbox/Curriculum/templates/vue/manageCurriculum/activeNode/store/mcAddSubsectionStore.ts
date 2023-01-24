@@ -109,6 +109,7 @@ export const useAddSubsectionStore = defineStore("mcAddSubsection", () => {
         subsection,
         prompt,
         add,
+        id,
         cancel,
         unsetId,
     };

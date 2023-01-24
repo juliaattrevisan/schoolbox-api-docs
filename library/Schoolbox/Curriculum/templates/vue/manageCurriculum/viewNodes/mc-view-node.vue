@@ -5,9 +5,17 @@
  */
 
 import { ref, computed, onMounted } from "vue";
+<<<<<<< HEAD
 import { gsap } from "gsap/all";
 import { timeout } from "@js/util/jsUtils";
 import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/transitions";
+=======
+import type { Ref } from "vue";
+import { gsap } from "gsap/all";
+import { timeout } from "@js/util/jsUtils";
+import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/transitions";
+import type { Node } from "@schoolboxCurriculum/types/Node";
+>>>>>>> 6487c47add2... Tidy up mc-view-node a bit [SA-15003]
 import { useStore } from "../store/manageCurriculumStore";
 import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 import { useViewNodesStore, DIRECTION } from "./store/mcViewNodesStore";
@@ -23,6 +31,7 @@ import McNodeUsage from "../activeNode/mc-node-usage.vue";
 import McAddSubsection from "../activeNode/mc-add-subsection.vue";
 import McUpdateNode from "../activeNode/mc-update-node.vue";
 
+<<<<<<< HEAD
 const props = defineProps({
     /**
      * the assigned node to display
@@ -46,7 +55,14 @@ const props = defineProps({
         required: true,
     },
 });
+=======
+interface Props {
+    node: Node; // the assigned node to display
+    depth: number; // to gradually add more marginLeft to indicate node level depth
+}
+>>>>>>> 6487c47add2... Tidy up mc-view-node a bit [SA-15003]
 
+const props = defineProps<Props>();
 const store = useStore();
 const viewNodesStore = useViewNodesStore();
 const activeNodeStore = useActiveNodeStore();
@@ -54,28 +70,58 @@ const addCurriculumStore = useAddCurriculumStore();
 const addSubsectionStore = useAddSubsectionStore();
 const updateNodeStore = useUpdateNodeStore();
 const searchStore = useSearchStore();
-const viewNodeEl = ref(null); //to animate the node
-const isNew = ref(false); //to highlight if the node has just been added
-const justUpdated = ref(false); //to highlight if the node has just been updated
+const viewNodeEl = ref(null); // to animate the node
+const isNew = ref(false); // to highlight if the node has just been added
+const justUpdated = ref(false); // to highlight if the node has just been updated
 
 /**
  * Consider whether we are currently only showing enabled nodes
  * and hide the node if we are are and the node is not enabled
  *
- * @returns { Boolean }
+ * @returns { boolean }
  */
 const showNode = computed(() => {
     if (!viewNodesStore.showDisabled && !props.node.enabled) {
         return false;
-    } else {
-        return true;
     }
+    return true;
 });
+
+/**
+ * animate to help show which direction we are currently moving through the tree
+ * fade on the node and slide it from forwards/backwards depending on the currentDirection
+ */
+function animateOn() {
+    const xStart = viewNodesStore.currentDirection === DIRECTION.FORWARDS ? -10 : 10;
+    gsap.set(viewNodeEl.value, {
+        opacity: 0,
+        x: xStart,
+    });
+    gsap.to(viewNodeEl.value, {
+        ease: "power1.out",
+        duration: 0.3,
+        opacity: 1,
+        x: 0,
+    });
+}
+
+/**
+ * show an animation when the node has been added or updated
+ * we add the relevant boolean ref to show the animation then remove
+ *
+ * @param { Ref<boolean> } change - the boolean value to change, can be either isNew or justUpdated
+ */
+async function displayAnimation(change: Ref<boolean>) {
+    change.value = true;
+    await timeout(3000);
+    change.value = false;
+}
 
 /**
  * to animate on the node, checking also if this node is
  * a new subsection or entirely new curriculum and animating
  */
+<<<<<<< HEAD
 onMounted(() => {
     if (showNode.value && props.depth === 0) {
         //we only need to animate the first node, as the rest are contained within
@@ -88,6 +134,20 @@ onMounted(() => {
     } else if (props.node.id === addCurriculumStore.id) {
         //highlight the new curriculum that's just been added
         displayAnimation(isNew);
+=======
+onMounted(async () => {
+    if (showNode.value && props.depth === 0) {
+        // we only need to animate the first node, as the rest are contained within
+        animateOn();
+    }
+    if (props.node.id === addSubsectionStore.id) {
+        // higlight the newly added node
+        await displayAnimation(isNew);
+        addSubsectionStore.unsetId();
+    } else if (props.node.id === addCurriculumStore.id) {
+        // highlight the new curriculum that's just been added
+        await displayAnimation(isNew);
+>>>>>>> 6487c47add2... Tidy up mc-view-node a bit [SA-15003]
         addCurriculumStore.unsetId();
     }
 });
@@ -100,7 +160,11 @@ useUpdateNodeStore().$onAction(({ name, after }) => {
     if (name === "update") {
         after((result) => {
             if (props.node.id === result.id) {
+<<<<<<< HEAD
                 //highlight the just updated node
+=======
+                // highlight the just updated node
+>>>>>>> 6487c47add2... Tidy up mc-view-node a bit [SA-15003]
                 displayAnimation(justUpdated);
             }
         });
@@ -108,6 +172,7 @@ useUpdateNodeStore().$onAction(({ name, after }) => {
 });
 
 /**
+<<<<<<< HEAD
  * animate to help show which direction we are currently moving through the tree
  * fade on the node and slide it from forwards/backwards depending on the currentDirection
  */
@@ -138,86 +203,93 @@ async function displayAnimation(change) {
 }
 
 /**
+=======
+>>>>>>> 6487c47add2... Tidy up mc-view-node a bit [SA-15003]
  * to gradually add more marginLeft to indicate node level depth
  *
- * @returns { Number }
+ * @returns { number }
  */
 const marginLeft = computed(() => `calc(${props.depth * 2}rem)`);
 
 /**
  * To better highlight the current top level node from its children
  *
- * @returns { String }
+ * @returns { string }
  */
 const borderBottomColour = computed(() => {
     if (searchStore.isActive || props.depth !== 0) {
         return `var(--body-background)`;
-    } else if (props.depth === 0) {
-        return `var(--body-foreground-h1)`;
     }
+    return `var(--body-foreground-h1)`;
 });
 
 /**
  * If this is the active node being updated
  *
- * @returns { Boolean }
+ * @returns { boolean }
  */
 const isUpdating = computed(() => updateNodeStore.isOpen && activeNodeStore.node.id === props.node.id);
 
 /**
  * If there's another node being updated
  *
- * @returns { Boolean }
+ * @returns { boolean }
  */
 const isUpdatingAnother = computed(() => updateNodeStore.isOpen && activeNodeStore.node.id !== props.node.id);
 
 /**
  * If this is the active node being added to
  *
- * @returns { Boolean }
+ * @returns { boolean }
  */
 const isAdding = computed(() => addSubsectionStore.isOpen && activeNodeStore.node.id === props.node.id);
 
 /**
  * If there's another node being added to
  *
- * @returns { Boolean }
+ * @returns { boolean }
  */
 const isAddingAnother = computed(() => addSubsectionStore.isOpen && activeNodeStore.node.id !== props.node.id);
 
 /**
  * If this is the active node being updated or added to
  *
- * @returns { Boolean }
+ * @returns { boolean }
  */
 const isActive = computed(() => isUpdating.value || isAdding.value);
 
 /**
  * To determine whether we need to display further child nodes within this node
  *
- * @returns { Boolean }
+ * @returns { boolean }
  */
 const showChildren = computed(() => props.node.children && props.node.children.length > 0 && props.depth + 1 < 2);
 
 /**
  * If there's a code available, which means it can be added to the name
  *
- * @returns { Boolean }
+ * @returns { boolean }
  */
 const hasCode = computed(() => props.node.code && props.node.code !== "");
 
 /**
  * Add in the code if it's available otherwise just show the title
  *
- * @returns { String }
+ * @returns { string }
  */
+<<<<<<< HEAD
 const title = computed(() => (hasCode.value ? `[${props.node.code}] ${props.node.name}` : `${props.node.name}`));
+=======
+const title = computed(() =>
+    hasCode.value ? `[${props.node.code as string}] ${props.node.name}` : `${props.node.name}`
+);
+>>>>>>> 6487c47add2... Tidy up mc-view-node a bit [SA-15003]
 
 /**
  * Whether the buttons should be displayed, shouldn't be if the user is read only
  * or we are at the root level node, or if the search is active
  *
- * @returns { Boolean }
+ * @returns { boolean }
  */
 const hasActions = computed(() => !store.isReadOnly && props.node.id !== UNSET_ID && !searchStore.isActive);
 </script>
@@ -259,9 +331,15 @@ const hasActions = computed(() => !store.isReadOnly && props.node.id !== UNSET_I
             </Transition>
             <ul v-if="showChildren">
                 <mc-view-node
+<<<<<<< HEAD
                     v-for="node in props.node.children"
                     :key="node.id"
                     :node="node"
+=======
+                    v-for="viewNode in props.node.children"
+                    :key="viewNode.id"
+                    :node="viewNode"
+>>>>>>> 6487c47add2... Tidy up mc-view-node a bit [SA-15003]
                     :depth="props.depth + 1"
                     data-test-view-node
                 />

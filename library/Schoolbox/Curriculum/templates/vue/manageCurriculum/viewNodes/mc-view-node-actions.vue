@@ -3,47 +3,18 @@
  * To edit an existing node or add a new subsection to a node
  */
 
+import type { Node } from "@schoolboxCurriculum/types/Node";
 import { useAddSubsectionStore } from "../activeNode/store/mcAddSubsectionStore";
 import { useUpdateNodeStore } from "../activeNode/store/mcUpdateNodeStore";
 
-const props = defineProps({
-    /**
-     * the assigned node to display
-     */
-    node: {
-        type: Object,
-        required: true,
-        default() {
-            return {
-                id: "0",
-                name: "-",
-                children: [],
-            };
-        },
-    },
-    /**
-     * the already computed node title
-     */
-    title: {
-        type: String,
-        required: true,
-    },
-    /**
-     * to disable certain events when updating the node
-     */
-    isUpdating: {
-        type: Boolean,
-        required: true,
-    },
-    /**
-     * to disable certain events when adding a node
-     */
-    isAdding: {
-        type: Boolean,
-        required: true,
-    },
-});
+interface Props {
+    node: Node; // the assigned node to display
+    title: string; // the already computed node title
+    isUpdating: boolean; // to disable certain events when updating the node
+    isAdding: boolean; // to disable certain events when adding a node
+}
 
+const props = defineProps<Props>();
 const addSubsectionStore = useAddSubsectionStore();
 const updateNodeStore = useUpdateNodeStore();
 
@@ -51,14 +22,22 @@ const updateNodeStore = useUpdateNodeStore();
  * to open up or close the update modal
  */
 function onAddSubsectionToggleSelected() {
-    props.isAdding ? addSubsectionStore.cancel() : addSubsectionStore.prompt(props.node);
+    if (props.isAdding) {
+        addSubsectionStore.cancel();
+    } else {
+        addSubsectionStore.prompt(props.node);
+    }
 }
 
 /**
  * to open up or close the update modal
  */
 function onUpdateToggleSelected() {
-    props.isUpdating ? updateNodeStore.cancel() : updateNodeStore.prompt(props.node);
+    if (props.isUpdating) {
+        updateNodeStore.cancel();
+    } else {
+        updateNodeStore.prompt(props.node);
+    }
 }
 </script>
 

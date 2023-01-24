@@ -4,11 +4,10 @@
  * and all the places the node is used
  */
 
-import { computed, watch } from "vue";
+import { computed } from "vue";
 import { useStore } from "../store/manageCurriculumStore";
 import { useActiveNodeStore } from "./store/mcActiveNodeStore";
-import { useUpdateNodeStore } from "./store/mcUpdateNodeStore";
-import { useDescriptionEditor } from "../composable/useDescriptionEditor";
+import { useNodeUsageStore } from "./store/mcNodeUsageStore";
 
 const props = defineProps({
     /**
@@ -22,7 +21,7 @@ const props = defineProps({
 
 const store = useStore();
 const activeNodeStore = useActiveNodeStore();
-const updateNodeStore = useUpdateNodeStore();
+const nodeUsageStore = useNodeUsageStore();
 
 /**
  * to gradually and more marginLeft to indicate node level depth
@@ -35,7 +34,7 @@ const marginLeft = computed(() => `calc(${props.depth * 2}rem)`);
  * close the update view
  */
 function onCancelSelected() {
-    // updateNodeStore.cancel();
+    // nodeUsageStore.cancel();
 }
 
 </script>
