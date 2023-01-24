@@ -539,9 +539,13 @@ class Classes implements IStrategy
          */
         $activityName = trim((string)$activity['name']);
 
+        /* Truncate it to our schema's length, because somehow schools are making
+         * very long class codes somehow
+         */
+        $classCode = $this->generateClassCode($activityName);
+
         /* Fill in these vars as usual
          */
-        $classCode = $activityName;
         $day = null;
         $detail = null;
 
