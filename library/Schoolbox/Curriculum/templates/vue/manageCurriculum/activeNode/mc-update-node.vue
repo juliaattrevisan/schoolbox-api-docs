@@ -98,10 +98,10 @@ const isUpdateDisabled = computed(() => {
 </script>
 
 <template>
-    <div class="node-container">
+    <div class="node-container" :style="{ marginLeft: marginLeft }">
         <section>
             <fieldset class="content">
-                <legend>Update</legend>
+                <legend class="title">Update</legend>
                 <div class="small-12 columns">
                     <label for="name" class="required">Name</label>
                     <input
@@ -151,16 +151,5 @@ const isUpdateDisabled = computed(() => {
 </template>
 
 <style lang="scss" scoped>
-.node-container {
-    border-bottom: 1px solid var(--content-ui-background);
-    border-top: 1px solid var(--content-ui-background);
-    margin: -1px 0 0 v-bind(marginLeft); //-1px so it butts up against the node border above
-    position: relative;
-    z-index: 1;
-}
-
-legend {
-    font-size: 1rem;
-    margin-bottom: 1rem;
-}
+@import "./style/mcActiveNode.scss";
 </style>
