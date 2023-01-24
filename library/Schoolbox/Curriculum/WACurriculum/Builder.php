@@ -4888,40 +4888,7 @@ class Builder
 
                             /* Node
                              */
-                            foreach ($substrand['curriculumStatements'] as $node) {
-                                $nodeId = $this->i;
-                                $name = $this->cleanse($node['description'] ?? '');
-                                $code = $this->cleanse($node['notations'][0] ?? '');
-                                $description = '';
-
-                                /* Dig for an Elaboration, which is a curriculum node's description
-                                 * Elaborations are optional and might not exist
-                                 */
-                                if (isset($node['curriculumStatements'])) {
-                                    foreach ($node['curriculumStatements'] as $meta) {
-                                        if ('Elaboration' === $meta['label']) {
-                                            $description = $this->cleanse($meta['description']);
-                                        }
-                                    }
-                                }
-
-                                $this->csvPayload[] = [
-                                    'id' => $nodeId,
-                                    'curriculum_node_parent_id' => $substrandId,
-                                    'name' => $name,
-                                    'code' => $code,
-                                    'order' => 0,
-                                    'description' => $description
-                                ];
-
-                                /* Keep track that we found a code
-                                 */
-                                unset($this->missingCodes[$code]);
-
-                                /* Increment arbitrary node counter every time a node spawns
-                                 */
-                                $this->i++;
-                            }
+                            $this->processSubstrandMeta($substrandId, $substrand);
                         } else {
                             $nodeId = $this->i;
 
@@ -5046,42 +5013,56 @@ class Builder
 
                     /* Node
                      */
-                    foreach ($substrand['curriculumStatements'] as $node) {
-                        $nodeId = $this->i;
-                        $name = $this->cleanse($node['description'] ?? '');
-                        $code = $this->cleanse($node['notations'][0] ?? '');
-                        $description = '';
+                    $this->processSubstrandMeta($substrandId, $substrand);
+                }
+            }
+        }
+    }
 
-                        /* Dig for an Elaboration, which is a curriculum node's description
-                         * Elaborations are optional and might not exist
-                         */
-                        if (isset($node['curriculumStatements'])) {
-                            foreach ($node['curriculumStatements'] as $meta) {
-                                if ('Elaboration' === $meta['label']) {
-                                    $description = $this->cleanse($meta['description']);
-                                }
-                            }
-                        }
 
-                        $this->csvPayload[] = [
-                            'id' => $nodeId,
-                            'curriculum_node_parent_id' => $substrandId,
-                            'name' => $name,
-                            'code' => $code,
-                            'order' => 0,
-                            'description' => $description
-                        ];
+    /**
+     * Dig out optional Elaborations, if extant, as well as fudge descriptions
+     * contained deeper in the data struct
+     *
+     * @param int   $substrandId
+     * @param array $substrand
+     * @return void
+     */
+    private function processSubstrandMeta(int $substrandId, array $substrand): void
+    {
+        foreach ($substrand['curriculumStatements'] as $node) {
+            $nodeId = $this->i;
+            $name = $this->cleanse($node['description'] ?? '');
+            $code = $this->cleanse($node['notations'][0] ?? '');
+            $description = '';
 
-                        /* Keep track that we found a code
-                         */
-                        unset($this->missingCodes[$code]);
-
-                        /* Increment arbitrary node counter every time a node spawns
-                         */
-                        $this->i++;
+            /* Dig for an Elaboration, which is a curriculum node's description
+             * Elaborations are optional and might not exist
+             */
+            if (isset($node['curriculumStatements'])) {
+                foreach ($node['curriculumStatements'] as $meta) {
+                    if ('Elaboration' === $meta['label']) {
+                        $description = $this->cleanse($meta['description']);
                     }
                 }
             }
+
+            $this->csvPayload[] = [
+                'id' => $nodeId,
+                'curriculum_node_parent_id' => $substrandId,
+                'name' => $name,
+                'code' => $code,
+                'order' => 0,
+                'description' => $description
+            ];
+
+            /* Keep track that we found a code
+             */
+            unset($this->missingCodes[$code]);
+
+            /* Increment arbitrary node counter every time a node spawns
+             */
+            $this->i++;
         }
     }
 
