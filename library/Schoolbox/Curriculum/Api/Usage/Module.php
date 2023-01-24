@@ -11,6 +11,9 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Curriculum\Node\Mapper;
+use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
+use Schoolbox\Resource\Folder;
 
 /**
  * Module for the curriculum usage API.
@@ -49,6 +52,9 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->injector->get('databaseInternal'),
+            $this->getMapperFactory()->get(Folder\Mapper::class),
+            $this->getMapperFactory()->get(CourseSpec\Mapper::class),
+            $this->getMapperFactory()->get(UnitSpec\Mapper::class),
         );
     }
 }

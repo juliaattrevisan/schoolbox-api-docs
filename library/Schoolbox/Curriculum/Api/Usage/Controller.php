@@ -10,9 +10,9 @@ namespace Schoolbox\Curriculum\Api\Usage;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Curriculum\Node;
-use Schoolbox\Learning\Course\DataModel\Specification\Translator\ModelToArray;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Translator\ModelToArray as UnitModelToArray;
-use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly;
+use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
+use Schoolbox\Resource\Folder;
 
 /**
  * Controller for the curriculum usage API.
@@ -24,12 +24,16 @@ class Controller extends Base
      *
      * @param IConnector $database Database required for building cursor object
      */
-    public function __construct(private IConnector $database)
-    {
+    public function __construct(
+        private IConnector $database,
+        private Folder\Mapper $folderMapper,
+        private CourseSpec\Mapper $courseSpecMapper,
+        private UnitSpec\Mapper $unitSpecMapper,
+    ) {
     }
 
     /**
-     * Endpoint for fetching a curriculum node's usage
+     * Endpoint for fetching a curriculum node's usage.
      *
      * @api   GET /api/curriculum/usage/{id}
      * @since 23.0
@@ -44,10 +48,16 @@ class Controller extends Base
         $encodedCursor = $this->request->query->get('cursor');
         $cursor        = new Cursor($this->database, $node, 10, null);
         $data          = $cursor->retrieveResults($encodedCursor);
-        $hydrator      = new Hydrator(
-            new LinkOnly(),
-            new ModelToArray($this->router, $this->authorizer, $this->getUser()),
-            new UnitModelToArray($this->router, $this->authorizer, $this->getUser()),
+
+        // I can't create this in the module because a user object is required,
+        // and the user doesn't reliably exist in the module.
+        $hydrator = new Hydrator(
+            $this->folderMapper,
+            new Folder\Translator\ModelToArray\LinkOnly(),
+            $this->courseSpecMapper,
+            new CourseSpec\Translator\ModelToArray($this->router, $this->authorizer, $this->getUser()),
+            $this->unitSpecMapper,
+            new UnitSpec\Translator\ModelToArray($this->router, $this->authorizer, $this->getUser()),
         );
 
         $this->response->content->set(
