@@ -375,24 +375,33 @@ class Controller extends ConfigController
              */
             $importLogMapper = \Schoolbox\External\Connector\Log\Mapper::getInstance();
 
-            /* ValidStrats is now a cli option
+            /* Split the transaction in half
              */
-            $validStrats = new ValidStrats('');
+            $splitStrats = [
+                'families,staff',
+                'timetable'
+            ];
 
-            /* Execute scheduler: sis stuff
-             */
-            $sisFactory = new Factory($host, $key, true, $logger, $watchlist, $validStrats);
+            foreach ($splitStrats as $currentStrat) {
+                /* ValidStrats is now a cli option
+                 */
+                $validStrats = new ValidStrats($currentStrat);
 
-            (new Scheduler(
-                $importLogMapper->getDatabase(),
-                $frequency,
-                $customHours,
-                $sisFactory,
-                $type,
-                $file,
-                $logger,
-                $importLogMapper
-            ))->run(time(), $runId, Scheduler::MANUAL_SIS_SCRIPT_NAME);
+                /* Execute scheduler: sis stuff
+                 */
+                $sisFactory = new Factory($host, $key, true, $logger, $watchlist, $validStrats);
+
+                (new Scheduler(
+                    $importLogMapper->getDatabase(),
+                    $frequency,
+                    $customHours,
+                    $sisFactory,
+                    $type,
+                    $file,
+                    $logger,
+                    $importLogMapper
+                ))->run(time(), $runId, Scheduler::MANUAL_SIS_SCRIPT_NAME . " ({$currentStrat})");
+            }
 
             /* Execute scheduler: calendar stuff
              * Not all connectivities contain a calendar importer, just some
