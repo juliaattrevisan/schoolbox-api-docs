@@ -16,6 +16,11 @@ use Schoolbox\Curriculum\Node;
  */
 class Controller extends Base
 {
+    /**
+     * Constructor
+     *
+     * @param IConnector $database Database required for building cursor object
+     */
     public function __construct(private IConnector $database)
     {
     }
@@ -34,7 +39,7 @@ class Controller extends Base
         // Fetch usage:
         // write a cursor for fetching courses + units
         $encodedCursor = $this->request->query->get('cursor');
-        $cursor        = new Cursor($this->database, $node, null);
+        $cursor        = new Cursor($this->database, $node, 10, null);
         $data          = $cursor->retrieveResults($encodedCursor);
 
         $this->response->content->set(

@@ -12,6 +12,7 @@ namespace Schoolbox\Curriculum\Api\Usage;
 use Alaress\Codec\ICodec;
 use Alaress\Codec\Json\Base64;
 use Alaress\Database\Connector\IConnector;
+use PDO;
 use Schoolbox\API\Cursor\ICursor;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node;
@@ -29,11 +30,13 @@ class Cursor implements ICursor
      *
      * @param IConnector  $database The database connection to retrieve from.
      * @param Node\Model  $node     The node to fetch usages for.
+     * @param int         $limit    Max number of results to fetch at once
      * @param ICodec|null $codec    If provided: use this codec for encoding/decoding cursors
      */
     public function __construct(
         private IConnector $database,
         private Node\Model $node,
+        private int $limit,
         private ?ICodec $codec
     ) {
         $this->codec ??= new Base64();
@@ -115,49 +118,62 @@ class Cursor implements ICursor
      */
     public function retrieveResults(?string $encodedCursor): Collection
     {
-        // Courses
-        $query = $this->database->prepareQuery('
-            SELECT :courseDiscriminator AS discriminator,
-                   cs.id AS id
-            FROM curriculum_node_for_category cnfc
-            INNER JOIN folder f ON cnfc.category_id = f.id
-            INNER JOIN course_specification cs ON f.id = cs.folder_id
-            WHERE f.deleted_at IS NULL
-            AND cs.deleted_at IS NULL
-            AND cnfc.curriculum_node_id = :courseCurriculumNodeId
-
-            UNION
-
-            SELECT :unitDiscriminator AS discriminator,
-                   cus.id AS id
-            FROM curriculum_node_for_category cnfc
-            INNER JOIN folder f ON cnfc.category_id = f.id
-            INNER JOIN course_unit_specification cus ON f.id = cus.folder_id
-            WHERE f.deleted_at IS NULL
-            AND cus.deleted_at IS NULL
-            AND cnfc.curriculum_node_id = :unitCurriculumNodeId
-
-            UNION
-
-            SELECT :folderDiscriminator AS discriminator,
-                   f.id AS id
-            FROM curriculum_node_for_category cnfc
-            INNER JOIN folder f ON cnfc.category_id = f.id
-            LEFT JOIN course_specification cs ON f.id = cs.folder_id
-            LEFT JOIN course_unit_specification cus ON f.id = cus.folder_id
-            WHERE f.deleted_at IS NULL
-            AND cs.id IS NULL
-            AND cus.id IS NULL
-            AND cnfc.curriculum_node_id = :folderCurriculumNodeId
-        ');
-        $query->execute([
+        $selectParts = [
+            "
+                SELECT
+                    :courseDiscriminator AS discriminator,
+                    cs.id AS id
+                FROM curriculum_node_for_category cnfc
+                INNER JOIN folder f ON cnfc.category_id = f.id
+                INNER JOIN course_specification cs ON f.id = cs.folder_id
+                WHERE f.deleted_at IS NULL
+                AND cs.deleted_at IS NULL
+                AND cnfc.curriculum_node_id = :courseCurriculumNodeId
+            ",
+            "
+                SELECT
+                    :unitDiscriminator AS discriminator,
+                    cus.id AS id
+                FROM curriculum_node_for_category cnfc
+                INNER JOIN folder f ON cnfc.category_id = f.id
+                INNER JOIN course_unit_specification cus ON f.id = cus.folder_id
+                WHERE f.deleted_at IS NULL
+                AND cus.deleted_at IS NULL
+                AND cnfc.curriculum_node_id = :unitCurriculumNodeId
+            ",
+            "
+                SELECT
+                    :folderDiscriminator AS discriminator,
+                    f.id AS id
+                FROM curriculum_node_for_category cnfc
+                INNER JOIN folder f ON cnfc.category_id = f.id
+                LEFT JOIN course_specification cs ON f.id = cs.folder_id
+                LEFT JOIN course_unit_specification cus ON f.id = cus.folder_id
+                WHERE f.deleted_at IS NULL
+                AND cs.id IS NULL
+                AND cus.id IS NULL
+                AND cnfc.curriculum_node_id = :folderCurriculumNodeId
+            ",
+        ];
+        $queryString = '('
+            . implode(') UNION (', $selectParts)
+            . ')
+            ORDER BY discriminator asc, id asc
+            LIMIT :limit';
+        $query = $this->database->prepareQuery($queryString);
+        $query->bindInputs([
             'courseDiscriminator'    => self::DISCRIMINATOR_COURSE,
             'courseCurriculumNodeId' => $this->node->getId(),
             'unitDiscriminator'      => self::DISCRIMINATOR_UNIT,
             'unitCurriculumNodeId'   => $this->node->getId(),
             'folderDiscriminator'    => self::DISCRIMINATOR_FOLDER,
             'folderCurriculumNodeId' => $this->node->getId(),
+            'limit'                  => [
+                'type'  => PDO::PARAM_INT,
+                'value' => $this->limit,
+            ],
         ]);
+        $query->execute();
 
         return new Collection($query->fetchAll());
     }
