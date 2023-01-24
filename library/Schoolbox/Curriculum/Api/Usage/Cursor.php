@@ -70,40 +70,53 @@ class Cursor implements ICursor
      */
     public function retrieveResultCount(): ?int
     {
-        $query = $this->database->prepareQuery('
-            SELECT COUNT(*) AS count
-            FROM curriculum_node_for_category cnfc
-            INNER JOIN folder f ON cnfc.category_id = f.id
-            INNER JOIN course_specification cs ON f.id = cs.folder_id
-            WHERE f.deleted_at IS NULL
-            AND cs.deleted_at IS NULL
-            AND cnfc.curriculum_node_id = :courseCurriculumNodeId
-
-            UNION
-
-            SELECT COUNT(*) AS count
-            FROM curriculum_node_for_category cnfc
-            INNER JOIN folder f ON cnfc.category_id = f.id
-            INNER JOIN course_unit_specification cus ON f.id = cus.folder_id
-            WHERE f.deleted_at IS NULL
-            AND cus.deleted_at IS NULL
-            AND cnfc.curriculum_node_id = :unitCurriculumNodeId
-
-            UNION
-
-            SELECT COUNT(*) AS count
-            FROM curriculum_node_for_category cnfc
-            INNER JOIN folder f ON cnfc.category_id = f.id
-            LEFT JOIN course_specification cs ON f.id = cs.folder_id
-            LEFT JOIN course_unit_specification cus ON f.id = cus.folder_id
-            WHERE f.deleted_at IS NULL
-            AND cs.id IS NULL
-            AND cus.id IS NULL
-            AND cnfc.curriculum_node_id = :folderCurriculumNodeId
-        ');
+        $selectParts = [
+            "
+                SELECT
+                    :courseDiscriminator AS discriminator,
+                    COUNT(*) AS count
+                FROM curriculum_node_for_category cnfc
+                INNER JOIN folder f ON cnfc.category_id = f.id
+                INNER JOIN course_specification cs ON f.id = cs.folder_id
+                WHERE f.deleted_at IS NULL
+                AND cs.deleted_at IS NULL
+                AND cnfc.curriculum_node_id = :courseCurriculumNodeId
+            ",
+            "
+                SELECT
+                    :unitDiscriminator AS discriminator,
+                    COUNT(*) AS count
+                FROM curriculum_node_for_category cnfc
+                INNER JOIN folder f ON cnfc.category_id = f.id
+                INNER JOIN course_unit_specification cus ON f.id = cus.folder_id
+                WHERE f.deleted_at IS NULL
+                AND cus.deleted_at IS NULL
+                AND cnfc.curriculum_node_id = :unitCurriculumNodeId
+            ",
+            "
+                SELECT
+                    :folderDiscriminator AS discriminator,
+                    COUNT(*) AS count
+                FROM curriculum_node_for_category cnfc
+                INNER JOIN folder f ON cnfc.category_id = f.id
+                LEFT JOIN course_specification cs ON f.id = cs.folder_id
+                LEFT JOIN course_unit_specification cus ON f.id = cus.folder_id
+                WHERE f.deleted_at IS NULL
+                AND cs.id IS NULL
+                AND cus.id IS NULL
+                AND cnfc.curriculum_node_id = :folderCurriculumNodeId
+            ",
+        ];
+        $queryString = '('
+            . implode(') UNION (', $selectParts)
+            . ')';
+        $query = $this->database->prepareQuery($queryString);
         $query->execute([
+            'courseDiscriminator'    => self::DISCRIMINATOR_COURSE,
             'courseCurriculumNodeId' => $this->node->getId(),
+            'unitDiscriminator'      => self::DISCRIMINATOR_UNIT,
             'unitCurriculumNodeId'   => $this->node->getId(),
+            'folderDiscriminator'    => self::DISCRIMINATOR_FOLDER,
             'folderCurriculumNodeId' => $this->node->getId(),
         ]);
         $count = 0;
@@ -122,7 +135,8 @@ class Cursor implements ICursor
             "
                 SELECT
                     :courseDiscriminator AS discriminator,
-                    cs.id AS id
+                    cs.id AS id,
+                    f.name AS name
                 FROM curriculum_node_for_category cnfc
                 INNER JOIN folder f ON cnfc.category_id = f.id
                 INNER JOIN course_specification cs ON f.id = cs.folder_id
@@ -133,7 +147,8 @@ class Cursor implements ICursor
             "
                 SELECT
                     :unitDiscriminator AS discriminator,
-                    cus.id AS id
+                    cus.id AS id,
+                    f.name AS name
                 FROM curriculum_node_for_category cnfc
                 INNER JOIN folder f ON cnfc.category_id = f.id
                 INNER JOIN course_unit_specification cus ON f.id = cus.folder_id
@@ -144,7 +159,8 @@ class Cursor implements ICursor
             "
                 SELECT
                     :folderDiscriminator AS discriminator,
-                    f.id AS id
+                    f.id AS id,
+                    f.name AS name
                 FROM curriculum_node_for_category cnfc
                 INNER JOIN folder f ON cnfc.category_id = f.id
                 LEFT JOIN course_specification cs ON f.id = cs.folder_id
@@ -158,8 +174,11 @@ class Cursor implements ICursor
         $queryString = '('
             . implode(') UNION (', $selectParts)
             . ')
-            ORDER BY discriminator asc, id asc
+            ORDER BY name asc, discriminator asc, id asc
             LIMIT :limit';
+
+        // Figure out a WHERE part
+
         $query = $this->database->prepareQuery($queryString);
         $query->bindInputs([
             'courseDiscriminator'    => self::DISCRIMINATOR_COURSE,
@@ -174,6 +193,8 @@ class Cursor implements ICursor
             ],
         ]);
         $query->execute();
+
+        // Use this list of results to hydrate actual objects
 
         return new Collection($query->fetchAll());
     }
