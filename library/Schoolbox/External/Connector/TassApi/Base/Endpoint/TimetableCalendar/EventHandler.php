@@ -96,7 +96,13 @@ class EventHandler
                         $property,
                     );
 
-                    $params[$property] = $newEvent->$getter();
+                    /* Accommodate date to scalar conversions
+                     */
+                    if (\in_array($column, ['start_at', 'finish_at'], true)) {
+                        $params[$property] = $newEvent->$getter()->getDatabase();
+                    } else {
+                        $params[$property] = $newEvent->$getter();
+                    }
                 }
 
                 /* Set updated_at
