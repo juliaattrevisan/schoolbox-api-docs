@@ -28,6 +28,13 @@ use Schoolbox\Mapper\Exception;
 class Classes implements IStrategy
 {
     /**
+     * Some schools are creating class codes >64 chars long
+     * e.g. "Teacher First Lunch Play - Zone C (Court Yard/Top Half Playground)"
+     */
+    private const MAX_CLASS_CODE_LENGTH = 64;
+
+
+    /**
      * RunningStatus determines whether an activity and/or its instance is actually running
      * 0 is cancelled; 1 is running; 2 is draft.
      *
@@ -527,14 +534,13 @@ class Classes implements IStrategy
         array $activity,
         array $activityInstance
     ): \Schoolbox\External\Event\Model {
-
-        /* Name is the same as the Code, in compass
+        /* Truncate it to our schema's length, because somehow schools are making
+         * very long class codes somehow
          */
-        $activityName = trim((string)$activity['name']);
+        $classCode = $this->generateClassCode(trim((string)$activity['importIdentifier']));
 
         /* Fill in these vars as usual
          */
-        $classCode = $activityName;
         $day = null;
         $detail = null;
 
@@ -615,6 +621,11 @@ class Classes implements IStrategy
          */
         $activityName = trim((string)$activity['name']);
 
+        /* Truncate it to our schema's length, because somehow schools are making
+         * very long class codes somehow
+         */
+        $classCode = $this->generateClassCode(trim((string)$activity['importIdentifier']));
+
         /* Constraints in the schema are case insensitive, unlike
          * these array keys - class codes sometimes appear like
          * "Speech Therapy" and "Speech therapy" so inserting them
@@ -628,7 +639,7 @@ class Classes implements IStrategy
         } else {
             $classEntry = $this->classEntryMapper->createModel()
                 ->setName($activityName)
-                ->setCode($activityName);
+                ->setCode($classCode);
 
             if ($this->perform) {
                 $this->classEntryMapper->save($classEntry);
@@ -904,5 +915,20 @@ class Classes implements IStrategy
                 $event->getFinishAt()->getDatabase()
             ));
         }
+    }
+
+
+    /**
+     * Schools are creating data with >64 char class codes
+     * so that snaps our schema
+     *
+     * This method forcibly truncates anything beyond the maximum limit
+     *
+     * @param string $classCode
+     * @return string
+     */
+    private function generateClassCode(string $classCode): string
+    {
+        return trim(mb_substr($classCode, 0, self::MAX_CLASS_CODE_LENGTH, 'utf-8'));
     }
 }
