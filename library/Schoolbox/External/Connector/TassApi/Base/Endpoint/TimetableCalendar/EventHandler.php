@@ -58,6 +58,9 @@ class EventHandler
          *
          * Classification, though indexed, should never change in this current usage
          * It should always be 'timetable'
+         *
+         * TODO Probably could generate this in a more dynamic way via the mapper
+         *  but may not be worth the effort right now; not sure if this helps
          */
         $fields = [
             'title' => 'title',
