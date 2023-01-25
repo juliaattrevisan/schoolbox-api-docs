@@ -68,7 +68,7 @@ Data:
             {# ^ href is populated by js in articletabs.js #}
         {% endif %}
 
-        {% if createRoute %}
+        {% if not readonly and createRoute %}
             <a href="{{ createRoute }}" class="button">Create {{ locale.news }}</a>
         {% endif %}
 
