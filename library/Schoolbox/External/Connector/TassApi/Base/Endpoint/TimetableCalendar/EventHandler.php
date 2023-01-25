@@ -8,6 +8,7 @@
 declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\TimetableCalendar;
+
 use DebugBar\DebugBarException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Event\Mapper;
