@@ -9,6 +9,7 @@
 namespace Schoolbox\Learning\Assessment;
 
 use Schoolbox\Assessment\Term;
+use Schoolbox\Mapper\Exception as MapperException;
 
 /**
  * 'Locked' assessments cannot be modified, or receive responses or feedback.
@@ -18,16 +19,11 @@ use Schoolbox\Assessment\Term;
  */
 class LockedChecker
 {
-    /** @var Term\Mapper */
-    private $termMapper;
-
-
     /**
      * @param Term\Mapper $termMapper
      */
-    public function __construct(Term\Mapper $termMapper)
+    public function __construct(private Term\Mapper $termMapper)
     {
-        $this->termMapper = $termMapper;
     }
 
 
@@ -38,7 +34,7 @@ class LockedChecker
      * @return bool
      * @throws \InvalidArgumentException If assessment is not an assessment spec and due date is null.
      */
-    public function isLockedForModify(IAssessable $assessment)
+    public function isLockedForModify(IAssessable $assessment): bool
     {
         if ($assessment->getContext()->isSpecificationContext()) {
             // Assessment Specifications can always be modified
@@ -55,7 +51,7 @@ class LockedChecker
      * @return bool
      * @throws \InvalidArgumentException If assessment is not an assessment spec and due date is null.
      */
-    public function isLockedForInteractions(IAssessable $assessment)
+    public function isLockedForInteractions(IAssessable $assessment): bool
     {
         if ($assessment->getContext()->isSpecificationContext()) {
             // Assessment Specifications can never have responses or feedback
@@ -72,7 +68,7 @@ class LockedChecker
      * @return bool
      * @throws \InvalidArgumentException If due date is null.
      */
-    private function isDueInArchivedTerm(IAssessable $assessment)
+    private function isDueInArchivedTerm(IAssessable $assessment): bool
     {
         $dueDate = $assessment->getDueAt();
 
@@ -80,10 +76,16 @@ class LockedChecker
             throw new \InvalidArgumentException('Cannot find containing term using a null date');
         }
 
-        $dueInTerm = $this->termMapper->findForDate($dueDate);
+        try {
+            $dueInTerm = $this->termMapper->findForDateAndYearLevel(
+                $dueDate,
+                $assessment->getBaseContext()->getFolder()->getYearLevels()?->first());
+        } catch (MapperException $e) {
+            return true;
+        }
 
         // No term? Or term is archived?
-        return !$dueInTerm || !$dueInTerm->getId() || $dueInTerm->getArchived();
+        return !$dueInTerm->getId() || $dueInTerm->getArchived();
     }
 
     /**
@@ -92,7 +94,7 @@ class LockedChecker
      * @param IAssessable $assessment
      * @return bool
      */
-    public function isLockedForDeletion(IAssessable $assessment)
+    public function isLockedForDeletion(IAssessable $assessment): bool
     {
         if ($assessment->getContext()->isSpecificationContext()) {
             // Assessment Specifications can be deleted at any time
