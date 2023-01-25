@@ -515,6 +515,7 @@ class Classes implements IStrategy
     private function process(int $roleType, array $person, array $timetable): void
     {
         $now = \Alaress_Date_Format::now();
+        $eventHandler = new EventHandler($this->eventMapper);
 
         /* Timetable Calendar gives us a list of Days and Dates
          * Each entry in there represents a day in the timetable,
@@ -663,7 +664,7 @@ class Classes implements IStrategy
                          * autoincrementing ids - if it exists, update it and save it
                          */
                         try {
-                            $event = $this->eventMapper->findOneByColumnList([
+                            $oldEvent = $this->eventMapper->findOneByColumnList([
                                 'code' => $classCode,
                                 'start_at' => $startAt->getDatabase(),
                                 'finish_at' => $finishAt->getDatabase(),
@@ -675,7 +676,7 @@ class Classes implements IStrategy
                         } catch (\Schoolbox\Mapper\Exception $e) {
                             /* Cram in everything else into a new instance
                              */
-                            $event = $this->eventMapper->createModel();
+                            $oldEvent = $this->eventMapper->createModel();
 
                             $logPrefix = 'Creating new';
                         }
@@ -687,6 +688,8 @@ class Classes implements IStrategy
                          * Sometimes the db just won't save N rows of this field...wtf?
                          * Explicitly set the guid always, with the available data
                          */
+                        $event = clone $oldEvent;
+
                         $event
                             ->setTitle($title)
                             ->setDetail($detail)
@@ -697,9 +700,14 @@ class Classes implements IStrategy
                             ->setStartAt($startAt)
                             ->setFinishAt($finishAt)
                             ->setType($type)
-                            ->setClassification(\Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE)
                             ->setGuid($guid)
+                            ->setClassification(\Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE)
                             ->setSource(\Schoolbox\External\Connector\TassApi\Base\Endpoint\Factory::SOURCE_NAME);
+
+                        /* Specially update specific columns if $event was
+                         * different to $oldEvent where indexed columns changed
+                         */
+                        $eventHandler->save($event, $oldEvent);
 
                         /* Save it and remember what we saw in case we need to reuse this later
                          */
