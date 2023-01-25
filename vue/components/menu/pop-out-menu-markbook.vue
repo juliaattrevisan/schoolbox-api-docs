@@ -8,7 +8,7 @@
  * Handle errors from fetching the data
  */
 
-import { ref, computed, nextTick, onMounted, onUnmounted } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
 import type { Ref } from "vue";
 import { useFloating, autoUpdate, flip, shift, offset} from '@floating-ui/vue';
 import PopOut from "../popOut/pop-out.vue";
@@ -52,7 +52,7 @@ type Routes = {
 
 // FloatingUI specific, declared here as showPopOut relies on one of these values existing.
 const popOutElement = ref<HTMLDivElement | null>(null);
-const referenceElement = ref(null);
+const referenceElement = ref<HTMLDivElement | null>(null);
 
 const isLoading = ref(false);
 const isSelected = ref(false);
@@ -179,9 +179,6 @@ async function onPopOutSelected(event: CustomEvent) {
         isExpanded.value = false;
         referenceElement.value = event.detail.target;
         await getActivity();
-        if (!hasLoadError.value) {
-            await nextTick();
-        }
     }
 }
 
@@ -231,31 +228,25 @@ onUnmounted(() => {
  */
 function getAction(item: ActivityItem): string {
 
-    let scenario = item.type;
     // If we have a response, we have to consider additional scenarios.
-    if (scenario === 'response') {
-        if (item.submitted) {
-            if (item.submittedOnTime){
-                scenario = 'response_on_time'
-            }
-            else {
-                scenario = 'response_late'
-            }
-        }
-        else{
-            scenario = 'response_draft'
-        }
+    if (item.type === 'response' && item.submitted && item.submittedOnTime) {
+        return 'submitted on time';
     };
-
-    const action = {
-        feedback: `${item.published ? 'published' : 'drafted'} feedback`,
-        response_on_time : 'submitted on time',
-        response_late : 'submitted late',
-        response_draft : 'drafted a response',
-        view : 'viewed the assessment'
+    if (item.type === 'response' && item.submitted && !item.submittedOnTime) {
+        return 'submitted late';
+    }
+    if (item.type === 'response') {
+        return 'drafted a response';
+    }
+    if (item.type === 'view') {
+        return 'viewed the assessment';
+    }
+    if (item.type === 'feedback') {
+        return `${item.published ? 'published' : 'drafted'} feedback`;
     }
 
-    return action[scenario];
+    // At least return blank as we're expeceted to return something
+    return '';
 }
 
 /**
@@ -286,12 +277,18 @@ function onMenuItemSelected(target: string) {
         }"
     >
         <div v-if="hasLoadError">
-            <pop-out-menu-item class="is-disabled"> There was an error during data retrieval. </pop-out-menu-item>
+            <pop-out-menu-item class="is-disabled">
+                <div className="s-warning-message">
+                    There was an error during data retrieval. Please
+                    <a href="" title="refresh the page"> refresh the page </a>
+                    to try again and contact your support if the problem persists
+                </div>
+            </pop-out-menu-item>
         </div>
-        <div v-if="isLoading && !hasLoadError" class="c-pop-out-menu__loader">
-            <div class="loader"></div>
+        <div v-else-if="isLoading && !hasLoadError" className="c-pop-out-menu__loader">
+            <div className="loader"></div>
         </div>
-        <div v-if="!isLoading && !hasLoadError" class="c-pop-out-menu" ref="markbookElement" :class="{ 'is-expanded': isExpanded }">
+        <div v-else class="c-pop-out-menu" ref="markbookElement" :class="{ 'is-expanded': isExpanded }">
             <div className="s-collapsible">
                 <small-card v-for="(activityItem, index) in activityItems" :key="index">
                     <user-photo
@@ -356,6 +353,16 @@ function onMenuItemSelected(target: string) {
 
     &__loader{
         width: 12rem;
+    }
+}
+
+// Locally scoped class specifically for the error warning message
+.s-warning-message{
+    max-width: 16rem;
+
+    // Allow pointer events on a disabled parent container.
+    a {
+        pointer-events: all;
     }
 }
 
