@@ -515,7 +515,7 @@ class Classes implements IStrategy
     private function process(int $roleType, array $person, array $timetable): void
     {
         $now = \Alaress_Date_Format::now();
-        $eventHandler = new EventHandler($this->eventMapper);
+        $eventHandler = new EventHandler($this->eventMapper, $this->log);
 
         /* Timetable Calendar gives us a list of Days and Dates
          * Each entry in there represents a day in the timetable,

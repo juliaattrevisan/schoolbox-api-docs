@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\TimetableCalendar;
 use DebugBar\DebugBarException;
+use Psr\Log\LoggerInterface;
 use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Event\Model;
 use Schoolbox\Mapper\Exception;
@@ -30,10 +31,12 @@ use Schoolbox\Mapper\Exception;
  */
 class EventHandler
 {
-    /**
-     * @param Mapper $eventMapper
+    /** Constructor, with optional logging
+     *
+     * @param Mapper               $eventMapper
+     * @param LoggerInterface|null $log
      */
-    public function __construct(private Mapper $eventMapper)
+    public function __construct(private Mapper $eventMapper, private ?LoggerInterface $log = null)
     {
     }
 
@@ -118,12 +121,29 @@ class EventHandler
             foreach ($params as $key => $value) {
                 $statement->bindParam(":{$key}", $value);
             }
-new \Alaress_Probe($query, $params);
+
             /* Use the id
              */
             $id = (int)$newEvent->getId();
             $statement->bindParam(':id', $id, \PDO::PARAM_INT);
             $statement->execute($params);
+
+            $this->logDebug(sprintf(
+                'Crafted update occurred for sis_event.id %s',
+                $newEvent->getId()
+            ));
         }
+    }
+
+
+    /**
+     * If logger exists, use it
+     *
+     * @param string $message
+     * @return void
+     */
+    private function logDebug(string $message): void
+    {
+        $this->log?->debug($message);
     }
 }
