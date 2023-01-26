@@ -9,6 +9,7 @@ import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/tran
 import { useStore } from "../store/manageCurriculumStore";
 import { useActiveNodeStore } from "./store/mcActiveNodeStore";
 import { useNodeDetailsStore } from "./store/mcNodeDetailsStore";
+import LoadingTable from '@schoolboxVue/components/loading/loading-table.vue';
 
 interface Props {
     depth: number; // to gradually add more marginLeft to indicate node level depth
@@ -43,11 +44,11 @@ const breadcrumbs = computed(() => {
 
 <template>
     <div class="node-container" :style="{ marginLeft: marginLeft }">
-        <section>
+        <loading-table v-if="nodeDetailsStore.isProcessing" rows="2" />
+        <section v-else>
             <fieldset class="content">
                 <Transition mode="out-in" @enter="slideDownOnEnter" @leave="slideUpOnLeave">
-                    <div v-if="nodeDetailsStore.isProcessing" class="loader" />
-                    <div v-else>
+                    <div>
                         <p v-if="breadcrumbs.length > 0" class="meta">{{ breadcrumbs }}</p>
                         <div v-html="activeNodeStore.node.description"></div>
                     </div>
