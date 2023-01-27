@@ -4895,7 +4895,7 @@ class Builder
                             /* Arts: Peculiarly different than everything else ;(
                              * (That should come as no surprise...)
                              */
-                            $code = $substrand['notations'];
+                            $code = $this->cleanseCode($substrand['notations']);
 
                             $this->csvPayload[] = [
                                 'id' => $nodeId,
@@ -5033,7 +5033,7 @@ class Builder
         foreach ($substrand['curriculumStatements'] as $node) {
             $nodeId = $this->i;
             $name = $this->cleanse($node['description'] ?? '');
-            $code = $this->cleanse($node['notations'][0] ?? '');
+            $code = $this->cleanseCode($node['notations'][0] ?? '');
             $description = '';
 
             /* Dig for an Elaboration, which is a curriculum node's description
@@ -5075,7 +5075,31 @@ class Builder
      */
     private function cleanse(string $data): string
     {
-        return trim(html_entity_decode(strip_tags($data)));
+        /* Translate nbsps and remove random html
+         */
+        $temp = html_entity_decode(strip_tags($data));
+
+        /* Remove trailing curriculum codes usually enclosed in ()
+         * These are in some payloads, but not others
+         */
+        $temp = preg_replace('/\([a-zA-Z0-9]+\)$/', '', $temp);
+
+        return trim($temp);
+    }
+
+
+    /**
+     * Special treatment specifically for curriculum code crazyness
+     *
+     * @param string $code
+     * @return string
+     */
+    private function cleanseCode(string $code): string
+    {
+        /* Remove any leading/trailing (
+         * Remove any leading/trailing spaces
+         */
+        return trim($this->cleanse($code), " (");
     }
 
 
