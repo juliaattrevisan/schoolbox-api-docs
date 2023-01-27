@@ -704,11 +704,6 @@ class Classes implements IStrategy
                             ->setClassification(\Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE)
                             ->setSource(\Schoolbox\External\Connector\TassApi\Base\Endpoint\Factory::SOURCE_NAME);
 
-                        /* Specially update specific columns if $event was
-                         * different to $oldEvent where indexed columns changed
-                         */
-                        $eventHandler->save($event, $oldEvent);
-
                         /* Save it and remember what we saw in case we need to reuse this later
                          */
                         $this->log->info(sprintf(
@@ -732,8 +727,11 @@ class Classes implements IStrategy
                             $finishAt->getDatabase()
                         ));
 
+                        /* Specially update specific columns if $event was
+                         * different to $oldEvent where indexed columns changed
+                         */
                         if ($this->perform) {
-                            $this->eventMapper->save($event);
+                            $eventHandler->save($event, $oldEvent);
                         }
 
                         /* Remember we did this
