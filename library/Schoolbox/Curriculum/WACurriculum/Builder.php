@@ -46,29 +46,115 @@ class Builder
      *
      * The source website produces broken links, so the http protocol
      * is manually repaired to https:// here
+     *
+     * Each file needs some kind of special treatment in some way;
+     * some come with a subject node, some don't, forcing is to create
+     * a subject on their behalf.
+     *
+     * Some need their Learning Area rewritten
      */
     private const HOST = 'https://scsaapps.scsa.wa.edu.au/Apps/CurriculumJSON/';
-    private const MANIFEST = [
-        'english.json' => 'English Curriculum - Pre-primary to Year 10 ',
-        'hpe.json' => 'Health and Physical Education Curriculum - Pre-primary to Year 10',
-        'hass.json' => 'Humanities and Social Sciences Curriculum - Pre-primary to Year 10',
 
-        /* Languages Curriculum
-         */
-        'chinese-second-language.json' => 'Chinese: Second Language Curriculum - Pre-primary to Year 10',
-        'french-second-language.json' => 'French: Second Language Curriculum - Pre-primary to Year 10',
-        'german-second-language.json' => 'German: Second Language Curriculum - Pre-primary to Year 10',
-        'indonesian-second-language.json' => 'Indonesian: Second Language Curriculum - Pre-primary to Year 10',
-        'italian-second-language.json' => 'Italian: Second Language Curriculum - Pre-primary to Year 10',
-        'japanese-second-language.json' => 'Japanese: Second Language Curriculum - Pre-primary to Year 10',
-        'languages7-10.json' => 'Languages Curriculum - Year 7 to Year 10',
+    /* Decide if a particular file has a Subject node
+     *
+     * English, HPE, HSS skip the subject node which is artificially cloned
+     * from the Learning Area
+     *
+     * The languages endpoints like Chinese et al. have a Subject node that
+     * is different to the Learning Area
+     *
+     * Disgusting
+     */
+    private const MANIFEST = [
+        'english.json' => [
+            'name' => 'English Curriculum - Pre-primary to Year 10 ',
+            'hasSubject' => false,
+            'learningArea' => false
+        ],
+
+        'hpe.json' => [
+            'name' => 'Health and Physical Education Curriculum - Pre-primary to Year 10',
+            'hasSubject' => false,
+            'learningArea' => false
+        ],
+
+        'hass.json' => [
+            'name' => 'Humanities and Social Sciences Curriculum - Pre-primary to Year 10',
+            'hasSubject' => false,
+            'learningArea' => false
+        ],
 
         /* Some other unnamed section/grouping
          */
-        'mathematics.json' => 'Mathematics Curriculum - Pre-primary to Year 10',
-        'science.json' => 'Science Curriculum - Pre-primary to Year 10',
-        'technologies.json' => 'Technologies Curriculum - Pre-primary to Year 10',
-        'arts.json' => 'The Arts Curriculum - Pre-primary to Year 10',
+        'mathematics.json' => [
+            'name' => 'Mathematics Curriculum - Pre-primary to Year 10',
+            'hasSubject' => false,
+            'learningArea' => false
+        ],
+
+        'science.json' => [
+            'name' => 'Science Curriculum - Pre-primary to Year 10',
+            'hasSubject' => false,
+            'learningArea' => false
+        ],
+
+        'technologies.json' => [
+            'name' => 'Technologies Curriculum - Pre-primary to Year 10',
+            'hasSubject' => true,
+            'learningArea' => false
+        ],
+
+        'arts.json' => [
+            'name' => 'The Arts Curriculum - Pre-primary to Year 10',
+            'hasSubject' => true,
+            'learningArea' => false
+        ],
+
+        /* Languages Curriculum
+         * Do all these at the end because we need to rewrite their learning areas
+         * such that they all group up under a whole new one
+         */
+        'chinese-second-language.json' => [
+            'name' => 'Chinese: Second Language Curriculum - Pre-primary to Year 10',
+            'hasSubject' => true,
+            'learningArea' => true
+        ],
+
+        'french-second-language.json' => [
+            'name' => 'French: Second Language Curriculum - Pre-primary to Year 10',
+            'hasSubject' => true,
+            'learningArea' => true
+        ],
+
+        'german-second-language.json' => [
+            'name' => 'German: Second Language Curriculum - Pre-primary to Year 10',
+            'hasSubject' => true,
+            'learningArea' => true
+        ],
+
+        'indonesian-second-language.json' => [
+            'name' => 'Indonesian: Second Language Curriculum - Pre-primary to Year 10',
+            'hasSubject' => true,
+            'learningArea' => true
+        ],
+
+        'italian-second-language.json' => [
+            'name' => 'Italian: Second Language Curriculum - Pre-primary to Year 10',
+            'hasSubject' => true,
+            'learningArea' => true
+        ],
+
+        'japanese-second-language.json' => [
+            'name' => 'Japanese: Second Language Curriculum - Pre-primary to Year 10',
+            'hasSubject' => true,
+            'learningArea' => true
+        ],
+
+        'languages7-10.json' => [
+            'name' => 'Languages Curriculum - Year 7 to Year 10',
+            'hasSubject' => true,
+            'learningArea' => true
+        ]
     ];
 
 
@@ -4696,7 +4782,7 @@ class Builder
          */
         $this->i++;
 
-        foreach (self::MANIFEST as $url => $name) {
+        foreach (self::MANIFEST as $url => $struct) {
             $learningArea = $this->retrieve($url);
 
             /* Build hierarchy
@@ -4716,10 +4802,10 @@ class Builder
             $this->i++;
 
             /* English/HPE/HSS skips the Subject piece in the hierarchy for some reason
-             *  and the xls suggests it's just a clone of what we just made for the Learning Area
-             *  so I guess we just...noobscript a way out of this heresy
+             * and the xls suggests it's just a clone of what we just made for the Learning Area
+             * so I guess we just...noobscript a way out of this heresy
              */
-            if ($this->hasSubject($url)) {
+            if ($struct['hasSubject']) {
                 $this->processWithSubject($learningAreaId, $learningArea);
             } else {
                 $this->processWithoutSubject($learningAreaId, $learningArea);
@@ -4766,36 +4852,6 @@ class Builder
         fclose($fp);
 
         return $contents;
-    }
-
-
-    /**
-     * Decide if a particular file has a Subject node
-     *
-     * English, HPE, HSS skip the subject node which is artificially cloned
-     * from the Learning Area
-     *
-     * The languages endpoints like Chinese et al. have a Subject node that
-     * is different to the Learning Area
-     *
-     * Disgusting
-     *
-     * @param string $url
-     * @return bool
-     */
-    private function hasSubject(string $url): bool
-    {
-        return \in_array($url, [
-            'chinese-second-language.json',
-            'french-second-language.json',
-            'german-second-language.json',
-            'indonesian-second-language.json',
-            'italian-second-language.json',
-            'japanese-second-language.json',
-            'languages7-10.json',
-            'technologies.json',
-            'arts.json'
-        ], true);
     }
 
 
