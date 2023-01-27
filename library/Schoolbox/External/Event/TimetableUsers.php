@@ -491,34 +491,12 @@ class TimetableUsers
                     $stack[$row['eventId']]['usuals'][$row['external_id']] = $row['external_id'];
                 }
 
-                /* Get a list of events between $startTimestamp and $endTimestamp
-                 * along with an ordered list of their overrides
+                /* Find all events which have overrides, and occurring between $startDatetime
+                 * and $finishDatetime timestamps. You can't tell how $externalId will be
+                 * affected by existing mutations such as CLEAR and CLEAR_STAFF unless you
+                 * do this and apply the mutations.
                  */
-                $query = "
-                    SELECT se.id AS eventId, se.code, seuo.*
-                    FROM {$this->eventMapper->getTable()} se
-                    INNER JOIN {$this->overrideMapper->getTable()} seuo ON se.id = seuo.event_id
-                    WHERE se.classification = :classification
-                    AND se.start_at >= :from
-                    AND se.start_at <= :to
-                ";
-
-                $params = [
-                    'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
-                    'from'           => $startDatetime,
-                    'to'             => $finishDatetime,
-                ];
-
-                if ($param[3] && $param[3]->count()) {
-                    $bindings = Builder::getBindings($param[3]->keys(), 'folderCode');
-                    $query    .= " AND se.code IN ({$bindings->getPlaceholder()}) ";
-                    $params   = array_merge($params, $bindings->getParams());
-                }
-
-                $query .= " ORDER BY se.id ASC, seuo.sequence ASC";
-
-                $statement = $this->eventMapper->getDatabase()->prepare($query);
-                $statement->execute($params);
+                $rows = $this->findCommonOverrides($startDatetime, $finishDatetime, $param[3]);
 
                 /* Remember: overrides are generally optional so they might not even
                  * exist for $classCode which is why we get the Usual Guys first
@@ -533,7 +511,7 @@ class TimetableUsers
                  *   grand scheme of things it would have been easier to have that
                  *   manifest instead, but I was overridden
                  */
-                while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+                foreach ($rows as $row) {
                     /* Some events might contain only overrides so if the struct
                      * never existed before, reinit it here
                      *
@@ -581,5 +559,61 @@ class TimetableUsers
         );
 
         return $this->eventMapper->findWithCheapStaff($eventIds);
+    }
+
+
+    /**
+     * Find all the overrides for events occurring between the two timestamps
+     *
+     * @param string                 $startDatetime
+     * @param string                 $finishDatetime
+     * @param GenericCollection|null $folderCodes
+     * @return array
+     */
+    private function findCommonOverrides(string $startDatetime, string $finishDatetime, ?GenericCollection $folderCodes = null): array
+    {
+        return \Alaress\Redis::getCacheInstance()->cacheFunctionCall(
+            'findCommonOverrides',
+            function ($param) {
+                $stack = [];
+
+                /* Get a list of events between $startTimestamp and $endTimestamp
+                 * along with an ordered list of their overrides
+                 */
+                $query = "
+                    SELECT se.id AS eventId, se.code, seuo.*
+                    FROM {$this->eventMapper->getTable()} se
+                    INNER JOIN {$this->overrideMapper->getTable()} seuo ON se.id = seuo.event_id
+                    WHERE se.classification = :classification
+                    AND se.start_at >= :from
+                    AND se.start_at <= :to
+                ";
+
+                $params = [
+                    'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
+                    'from'           => $param[0],
+                    'to'             => $param[1],
+                ];
+
+                if ($param[2] && $param[2]->count()) {
+                    $bindings = Builder::getBindings($param[2]->keys(), 'folderCode');
+                    $query    .= " AND se.code IN ({$bindings->getPlaceholder()}) ";
+                    $params   = array_merge($params, $bindings->getParams());
+                }
+
+                $query .= " ORDER BY se.id ASC, seuo.sequence ASC";
+
+                $statement = $this->eventMapper->getDatabase()->prepare($query);
+                $statement->execute($params);
+
+                while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+                    $stack[] = $row;
+                }
+
+                return $stack;
+            },
+            [$startDatetime, $finishDatetime, $folderCodes],
+            \Config::get('external_cache_timeout')
+        );
     }
 }
