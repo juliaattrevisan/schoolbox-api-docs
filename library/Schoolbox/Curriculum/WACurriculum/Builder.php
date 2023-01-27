@@ -72,43 +72,43 @@ class Builder
             'learningArea' => false
         ],
 
-//        'hpe.json' => [
-//            'name' => 'Health and Physical Education Curriculum - Pre-primary to Year 10',
-//            'hasSubject' => false,
-//            'learningArea' => false
-//        ],
-//
-//        'hass.json' => [
-//            'name' => 'Humanities and Social Sciences Curriculum - Pre-primary to Year 10',
-//            'hasSubject' => false,
-//            'learningArea' => false
-//        ],
-//
-//        /* Some other unnamed section/grouping
-//         */
-//        'mathematics.json' => [
-//            'name' => 'Mathematics Curriculum - Pre-primary to Year 10',
-//            'hasSubject' => false,
-//            'learningArea' => false
-//        ],
-//
-//        'science.json' => [
-//            'name' => 'Science Curriculum - Pre-primary to Year 10',
-//            'hasSubject' => false,
-//            'learningArea' => false
-//        ],
-//
-//        'technologies.json' => [
-//            'name' => 'Technologies Curriculum - Pre-primary to Year 10',
-//            'hasSubject' => true,
-//            'learningArea' => false
-//        ],
-//
-//        'arts.json' => [
-//            'name' => 'The Arts Curriculum - Pre-primary to Year 10',
-//            'hasSubject' => true,
-//            'learningArea' => false
-//        ],
+        'hpe.json' => [
+            'name' => 'Health and Physical Education Curriculum - Pre-primary to Year 10',
+            'hasSubject' => false,
+            'learningArea' => false
+        ],
+
+        'hass.json' => [
+            'name' => 'Humanities and Social Sciences Curriculum - Pre-primary to Year 10',
+            'hasSubject' => false,
+            'learningArea' => false
+        ],
+
+        /* Some other unnamed section/grouping
+         */
+        'mathematics.json' => [
+            'name' => 'Mathematics Curriculum - Pre-primary to Year 10',
+            'hasSubject' => false,
+            'learningArea' => false
+        ],
+
+        'science.json' => [
+            'name' => 'Science Curriculum - Pre-primary to Year 10',
+            'hasSubject' => false,
+            'learningArea' => false
+        ],
+
+        'technologies.json' => [
+            'name' => 'Technologies Curriculum - Pre-primary to Year 10',
+            'hasSubject' => true,
+            'learningArea' => false
+        ],
+
+        'arts.json' => [
+            'name' => 'The Arts Curriculum - Pre-primary to Year 10',
+            'hasSubject' => true,
+            'learningArea' => false
+        ],
 
         /* Languages Curriculum
          * Do all these at the end because we need to rewrite their learning areas
@@ -119,41 +119,41 @@ class Builder
          * them; therefore they all get processed last, otherwise other endpoints'
          * data will end up here instead.
          */
-//        'chinese-second-language.json' => [
-//            'name' => 'Chinese: Second Language Curriculum - Pre-primary to Year 10',
-//            'hasSubject' => true,
-//            'learningArea' => true
-//        ],
-//
-//        'french-second-language.json' => [
-//            'name' => 'French: Second Language Curriculum - Pre-primary to Year 10',
-//            'hasSubject' => true,
-//            'learningArea' => true
-//        ],
-//
-//        'german-second-language.json' => [
-//            'name' => 'German: Second Language Curriculum - Pre-primary to Year 10',
-//            'hasSubject' => true,
-//            'learningArea' => true
-//        ],
-//
-//        'indonesian-second-language.json' => [
-//            'name' => 'Indonesian: Second Language Curriculum - Pre-primary to Year 10',
-//            'hasSubject' => true,
-//            'learningArea' => true
-//        ],
-//
-//        'italian-second-language.json' => [
-//            'name' => 'Italian: Second Language Curriculum - Pre-primary to Year 10',
-//            'hasSubject' => true,
-//            'learningArea' => true
-//        ],
-//
-//        'japanese-second-language.json' => [
-//            'name' => 'Japanese: Second Language Curriculum - Pre-primary to Year 10',
-//            'hasSubject' => true,
-//            'learningArea' => true
-//        ],
+        'chinese-second-language.json' => [
+            'name' => 'Chinese: Second Language Curriculum - Pre-primary to Year 10',
+            'hasSubject' => true,
+            'learningArea' => true
+        ],
+
+        'french-second-language.json' => [
+            'name' => 'French: Second Language Curriculum - Pre-primary to Year 10',
+            'hasSubject' => true,
+            'learningArea' => true
+        ],
+
+        'german-second-language.json' => [
+            'name' => 'German: Second Language Curriculum - Pre-primary to Year 10',
+            'hasSubject' => true,
+            'learningArea' => true
+        ],
+
+        'indonesian-second-language.json' => [
+            'name' => 'Indonesian: Second Language Curriculum - Pre-primary to Year 10',
+            'hasSubject' => true,
+            'learningArea' => true
+        ],
+
+        'italian-second-language.json' => [
+            'name' => 'Italian: Second Language Curriculum - Pre-primary to Year 10',
+            'hasSubject' => true,
+            'learningArea' => true
+        ],
+
+        'japanese-second-language.json' => [
+            'name' => 'Japanese: Second Language Curriculum - Pre-primary to Year 10',
+            'hasSubject' => true,
+            'learningArea' => true
+        ],
 
         /* Temporary disabled
          * Apparently this is a collective dupe of all the other languages' files
@@ -4815,20 +4815,31 @@ class Builder
             /* When we start processing languages,
              * Put all their nodes under a common node that hasn't yet existed
              *
-             * SEQUENTIAL DEPENDENCY
+             * SEQUENTIAL DEPENDENCY FOLLOWS
+             */
+            if ($struct['learningArea'] && !$sharedLearningAreaId) {
+                $learningAreaRow['id']    = $learningAreaId;
+                $learningAreaRow['name'] = 'Languages';
+            }
+
+            /* Reuse this crazy if it was ever defined
+             */
+            if (!$sharedLearningAreaId) {
+                /* Build hierarchy
+                 * id,curriculum_node_parent_id,name,code,order,description
+                 */
+                $this->csvPayload[] = $learningAreaRow;
+
+                /* Increment arbitrary node counter every time a node spawns
+                 */
+                $this->i++;
+            }
+
+            /* Recycle this identifier down the hierarchy
              */
             if ($struct['learningArea'] && !$sharedLearningAreaId) {
                 $sharedLearningAreaId = $learningAreaId;
             }
-
-            /* Build hierarchy
-             * id,curriculum_node_parent_id,name,code,order,description
-             */
-            $this->csvPayload[] = $learningAreaRow;
-
-            /* Increment arbitrary node counter every time a node spawns
-             */
-            $this->i++;
 
             /* English/HPE/HSS skips the Subject piece in the hierarchy for some reason
              * and the xls suggests it's just a clone of what we just made for the Learning Area
@@ -4867,20 +4878,19 @@ class Builder
             'description'
         ];
 
-//        $fp = fopen('php://temp', 'w');
-//        fputcsv($fp, $headings);
+        $fp = fopen('php://temp', 'w');
+        fputcsv($fp, $headings);
 
         foreach ($this->csvPayload as $row) {
-            new \Alaress_Probe($row);
-//            fputcsv($fp, $row);
+            fputcsv($fp, $row);
         }
 
-//        rewind($fp);
-//
-//        $contents = stream_get_contents($fp);
-//
-//        fclose($fp);
-return '';
+        rewind($fp);
+
+        $contents = stream_get_contents($fp);
+
+        fclose($fp);
+
         return $contents;
     }
 
