@@ -23,7 +23,7 @@
 <div class="row">
     <div class="card small-12 column meta-preview">
         {% if hasHomepage %}
-            <a title="View Homepage" href="/homepage/{{ folder.id }}">
+            <a title="View Homepage - {{ folder.name }}" href="/homepage/{{ folder.id }}">
         {% endif %}
         {% if folder.hasCoverImage ?? false %}
             <img class="folder-cover" src="/storage/image.php?hash={{ folder.coverImage.hash }}&size=square64" alt="{{ folder.name }}" {{ colouring }} />
@@ -33,8 +33,8 @@
         {% if hasHomepage %}
             </a>
         {% endif %}
-        <h3>
-            {% if hasHomepage %}<a title="View Homepage" href="/homepage/{{ folder.id }}">{% endif %}
+        <h3 title="{{ folder.name }}">
+            {% if hasHomepage %}<a title="View Homepage - {{ folder.name }}" href="/homepage/{{ folder.id }}">{% endif %}
                 {{ folder.name }}
                 {% if hasHomepage %}</a>{% endif %}
             <span class="hint has-tip" data-reveal-id="modal-folder-{{ folder.id }}" title="View folder permissions">?</span>
@@ -245,4 +245,3 @@
     </div>
 </div>
 {% endif %}
-
