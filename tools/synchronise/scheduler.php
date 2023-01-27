@@ -175,7 +175,7 @@ HELP;
              * scheduler always runs all strats
              * The cli option is hardcoded to empty str ''
              */
-            $validStrats = new \Schoolbox\External\Connector\ValidStrats($currentStrat);
+            $validStrats = new ValidStrats($currentStrat);
 
             /* Execute scheduler: sis stuff
              */
