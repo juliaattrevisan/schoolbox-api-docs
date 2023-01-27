@@ -1,12 +1,10 @@
 <script setup>
-
 /**
  * To view all details including breadcrumbs and description on a curriculum node
  */
 
-import { ref, computed, watch } from 'vue';
-import { getBreadcrumbs, UNSET_ID } from '@schoolboxCurriculum/js/nodeUtils';
-
+import { ref, computed, watch } from "vue";
+import { getBreadcrumbs, UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 
 const props = defineProps({
     /**
@@ -26,20 +24,23 @@ const hasLoadError = ref(false);
 /**
  * when there's a new node, we should load all the details to display
  */
-watch(() => props.node, (newNode) => {
-    if (newNode.id === UNSET_ID) {
-        isActive.value = false;
-    } else {
-        node.value = newNode;
-        load();
-        isActive.value = true;
+watch(
+    () => props.node,
+    (newNode) => {
+        if (newNode.id === UNSET_ID) {
+            isActive.value = false;
+        } else {
+            node.value = newNode;
+            load();
+            isActive.value = true;
+        }
     }
-});
+);
 
 /**
  * load al the node details, retrieving the breadcrumbs by loading all the parents
  */
-async function load () {
+async function load() {
     try {
         isLoading.value = true;
         const response = await fetch(`/api/curriculum/${node.value.id}?ancestors=99`); //just use 99 as hopefully there's no tree that deep...
@@ -67,7 +68,7 @@ async function load () {
  * @returns { String }
  */
 const title = computed(() => {
-    if (node.value?.code && node.value.code !== '') {
+    if (node.value?.code && node.value.code !== "") {
         return `[${node.value.code}] ${node.value.name}`;
     } else {
         return node.value?.name;
@@ -82,21 +83,20 @@ const title = computed(() => {
 const breadcrumbs = computed(() => {
     if (node.value?.breadcrumbs.length > 0) {
         const justNames = node.value.breadcrumbs.map((breadcrumb) => breadcrumb.name);
-        return justNames.join(' > ');
+        return justNames.join(" > ");
     } else {
-        return '';
+        return "";
     }
 });
-
 </script>
 
 <template>
-   <div v-if="isActive">
+    <div v-if="isActive">
         <div class="loader" v-if="isLoading" />
         <template v-else>
             <h2>{{ title }}</h2>
             <p v-if="breadcrumbs.length > 0" class="meta">{{ breadcrumbs }}</p>
             <div v-html="node.description"></div>
         </template>
-   </div>
+    </div>
 </template>

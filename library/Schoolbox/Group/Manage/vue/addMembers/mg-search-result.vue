@@ -1,16 +1,13 @@
 <script setup>
-
 /**
  * A single search result that be selected / unselected with a checkbox status
  */
 
-import { computed } from 'vue';
-import { escapeRegExp } from '@js/util/jsUtils';
-import { useSearchStore  } from '../store/mgSearchStore';
-
+import { computed } from "vue";
+import { escapeRegExp } from "@js/util/jsUtils";
+import { useSearchStore } from "../store/mgSearchStore";
 
 const searchStore = useSearchStore();
-
 
 const props = defineProps({
     result: {
@@ -19,9 +16,9 @@ const props = defineProps({
         default: () => {
             return {
                 id: 0,
-                name: '',
-            }
-        }
+                name: "",
+            };
+        },
     },
 });
 
@@ -32,7 +29,6 @@ const props = defineProps({
  */
 const highlightNameSearch = computed(() => highlightSearchInElement(props.result.name));
 
-
 /**
  * To highlight where the search string matches within the settings result
  * (?![^mark>]*mark>) is used to check we are not inside an element node
@@ -41,9 +37,9 @@ const highlightNameSearch = computed(() => highlightSearchInElement(props.result
  *
  * @returns { String } string for v-html with <mark></mark> wrapped around each found result
  */
-function highlightSearchInElement (toHighlight) {
+function highlightSearchInElement(toHighlight) {
     let highlighted = toHighlight;
-    highlighted = highlighted.replace(RegExp(`${escapeRegExp(searchStore.query)}(?![^mark>]*mark>)`, 'ig'), (match) => {
+    highlighted = highlighted.replace(RegExp(`${escapeRegExp(searchStore.query)}(?![^mark>]*mark>)`, "ig"), (match) => {
         return `<mark>${match}</mark>`;
     });
     return highlighted;
@@ -63,24 +59,15 @@ const isSelected = computed(() => {
  * To determine the display of the checkbox based on whether
  * the result is currently selected
  */
-function onSelected () {
+function onSelected() {
     isSelected.value ? searchStore.removeResult(props.result) : searchStore.addResult(props.result);
 }
-
 </script>
 
 <template>
-    <button
-        class="search-result"
-        @click.prevent="onSelected"
-        @keyup.enter="onSelected"
-    >
+    <button class="search-result" @click.prevent="onSelected" @keyup.enter="onSelected">
         <div class="checklist">
-            <input
-                :id="`checkbox-${result.id}`"
-                type="checkbox"
-                :checked="isSelected"
-            />
+            <input :id="`checkbox-${result.id}`" type="checkbox" :checked="isSelected" />
             <label :for="`checkbox-${result.id}`"></label>
         </div>
         <div>
@@ -108,7 +95,7 @@ function onSelected () {
     flex: 2rem 0 0; //ensure a long name doesn't impact the checkbox width, which may add dodgy scroll bars on it
 }
 
-input[type=checkbox]:not(.plain) + label {
+input[type="checkbox"]:not(.plain) + label {
     margin: 0;
 }
 
@@ -116,5 +103,4 @@ aside {
     font-size: 0.725rem;
     font-style: italic;
 }
-
 </style>

@@ -1,20 +1,18 @@
 <script setup lang="ts">
-
 /**
  * To search the currently selected curriculum node
  */
 
-import { computed, watch } from 'vue';
-import debounce from 'lodash/debounce';
-import { useViewNodesStore } from '../viewNodes/store/mcViewNodesStore';
-import { useSearchStore, DEBOUNCE_AMOUNT } from '../store/mcSearchStore';
-
+import { computed, watch } from "vue";
+import debounce from "lodash/debounce";
+import { useViewNodesStore } from "../viewNodes/store/mcViewNodesStore";
+import { useSearchStore, DEBOUNCE_AMOUNT } from "../store/mcSearchStore";
 
 const props = defineProps({
     /**
      * to disable certain events when editing is taking place
      */
-     isDisabled: {
+    isDisabled: {
         type: Boolean,
         required: true,
     },
@@ -37,7 +35,7 @@ const isDisabled = computed(() => !viewNodesStore.isActive || props.isDisabled);
  */
 const placeholder = computed(() => {
     if (!viewNodesStore.isActive) {
-        return 'Expand a curriculum to enable search...'
+        return "Expand a curriculum to enable search...";
     } else {
         return `Search for codes or keywords...`;
     }
@@ -46,12 +44,15 @@ const placeholder = computed(() => {
 /**
  * start searching once the search is active, watching the query string for input
  */
-watch(() => searchStore.query, () => {
-    if (searchStore.isActive) {
-        searchStore.enableSearch();
-        debounceSearch();
+watch(
+    () => searchStore.query,
+    () => {
+        if (searchStore.isActive) {
+            searchStore.enableSearch();
+            debounceSearch();
+        }
     }
-});
+);
 
 /**
  * debounce to avoid constant polling while the user is typing
@@ -63,10 +64,9 @@ const debounceSearch = debounce(() => {
 /**
  * Clear the current search query
  */
-function onClearSearchSelected () {
+function onClearSearchSelected() {
     searchStore.clear();
 }
-
 </script>
 
 <template>
@@ -91,7 +91,7 @@ function onClearSearchSelected () {
                 @click.prevent="onClearSearchSelected"
                 @keyup.enter="onClearSearchSelected"
             >
-            Clear
+                Clear
             </button>
         </div>
     </div>
@@ -113,7 +113,4 @@ function onClearSearchSelected () {
     </div>
 </template>
 
-<style scoped>
-
-
-</style>
+<style scoped></style>

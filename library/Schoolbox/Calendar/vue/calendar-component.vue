@@ -1,30 +1,28 @@
 <script>
-
-import FullCalendar       from '@fullcalendar/vue3'
-import ViewEventModal     from '@schoolboxVue/components/fullcalendar/view-event-modal';
-import ExportUrlModal     from './export-url-modal';
-import interactionPlugin  from "@fullcalendar/interaction";
-import listPlugin         from "@fullcalendar/list";
-import adaptivePlugin     from "@fullcalendar/adaptive";
-import axios              from "axios";
-import fullCalendarHelper from '@schoolboxVue/components/fullcalendar/mixinFullCalendarHelper';
-import {ENDPOINTS}        from '@schoolboxCalendarEvent/endpoints';
-import CustomisedCalendarEvent	  from '@schoolboxVue/components/fullcalendar/customised-calendar-event';
+import FullCalendar from "@fullcalendar/vue3";
+import ViewEventModal from "@schoolboxVue/components/fullcalendar/view-event-modal";
+import ExportUrlModal from "./export-url-modal";
+import interactionPlugin from "@fullcalendar/interaction";
+import listPlugin from "@fullcalendar/list";
+import adaptivePlugin from "@fullcalendar/adaptive";
+import axios from "axios";
+import fullCalendarHelper from "@schoolboxVue/components/fullcalendar/mixinFullCalendarHelper";
+import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
+import CustomisedCalendarEvent from "@schoolboxVue/components/fullcalendar/customised-calendar-event";
 
 // TODO let display formats be configurable
-const FORMAT_DISPLAY_DATE = 'ddd Do MMM';
-const FORMAT_DISPLAY_TIME = 'h:mma';
-const FORMAT_DISPLAY_DATETIME = 'ddd Do MMM, h:mma';
+const FORMAT_DISPLAY_DATE = "ddd Do MMM";
+const FORMAT_DISPLAY_TIME = "h:mma";
+const FORMAT_DISPLAY_DATETIME = "ddd Do MMM, h:mma";
 
 export default {
-
-    name: 'calendar-component',
+    name: "calendar-component",
 
     components: {
         ViewEventModal,
         FullCalendar,
         ExportUrlModal,
-        CustomisedCalendarEvent
+        CustomisedCalendarEvent,
     },
 
     props: {
@@ -38,16 +36,14 @@ export default {
             default: () => {
                 /* Will be using the component config's componentName value when available otherwise
                  */
-                return 'Calendar';
-            }
-        }
+                return "Calendar";
+            },
+        },
     },
 
-    mixins: [
-        fullCalendarHelper
-    ],
+    mixins: [fullCalendarHelper],
 
-    data () {
+    data() {
         return {
             calendarApi: null, //to access the underlying calendar object
             calendarOptions: {}, //will init in beforeMount due to vars being needed
@@ -60,7 +56,7 @@ export default {
             eventsLoaded: false,
             hasEvents: null,
             hasHeadingDisplayUpdated: false, //to ensure it doesn't fire multiple times
-        }
+        };
     },
 
     computed: {
@@ -75,51 +71,49 @@ export default {
         },
     },
 
-    created () {
+    created() {
         this.ENDPOINTS = ENDPOINTS;
     },
 
-    beforeMount () {
+    beforeMount() {
         this.calendarOptions = {
             schedulerLicenseKey: this.config.schedulerLicenseKey,
-            plugins: [ interactionPlugin, listPlugin, adaptivePlugin ],
+            plugins: [interactionPlugin, listPlugin, adaptivePlugin],
             views: {
                 list: {
-                    type: 'list',
+                    type: "list",
                     duration: { days: this.config.days },
                     listDayFormat: (date) => {
-                        return dayjs(date.date.array).format(this.config.dayjsDateLong); 
+                        return dayjs(date.date.array).format(this.config.dayjsDateLong);
                     },
-                    listDaySideFormat: false
-                }
+                    listDaySideFormat: false,
+                },
             },
             headerToolbar: false,
             eventTimeFormat: (date) => {
                 return this.fullCalendarHelper_eventTimeFormat(date);
             },
-            height: 'auto',
-            initialView: 'list',
+            height: "auto",
+            initialView: "list",
             events: this.events,
             eventDidMount: this.fullCalendarHelper_eventRender,
             noEventsDidMount: null, //hide the no events message
             eventClick: this.onEventClick,
             loading: this.onLoading,
-        }
+        };
     },
 
-    mounted () {
-        this.$nextTick()
-        .then(() => {
+    mounted() {
+        this.$nextTick().then(() => {
             this.calendarApi = this.$refs.fullCalendar.getApi();
         });
     },
 
     methods: {
-
         /**
          * To check whether the heading needs to be updated on the homepage dashboard
          */
-        onLoading (isLoading) {
+        onLoading(isLoading) {
             if (!isLoading && this.config.isDashboard && !this.hasHeadingDisplayUpdated) {
                 this.updateHeadingDisplay();
             }
@@ -128,12 +122,11 @@ export default {
         /**
          * To add the <h2 class="subheader"> and remove the lists own date display
          */
-        updateHeadingDisplay () {
-
+        updateHeadingDisplay() {
             this.hasHeadingDisplayUpdated = true; //so it's not added multiple times...
 
-            const headingElement = document.createElement('h2');
-            headingElement.classList.add('subheader');
+            const headingElement = document.createElement("h2");
+            headingElement.classList.add("subheader");
             headingElement.innerText = this.title;
 
             /**
@@ -159,42 +152,41 @@ export default {
          * @param fetchInfo The time span of the events to fetch
          * @param callback  A function to call with the list of events.
          */
-        events (fetchInfo, callback) {
-            axios.get(
-                ENDPOINTS.URL_EVENT_SOURCE,
-                {
+        events(fetchInfo, callback) {
+            axios
+                .get(ENDPOINTS.URL_EVENT_SOURCE, {
                     headers: {
-                        'X-Requested-With' : 'XMLHttpRequest'
+                        "X-Requested-With": "XMLHttpRequest",
                     },
                     params: {
-                        start:    Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
-                        end:      Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
-                        userId:   this.config.userId,
+                        start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
+                        end: Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
+                        userId: this.config.userId,
                         folderId: this.config.folderId,
-                        componentInstanceId: this.componentInstanceId
+                        componentInstanceId: this.componentInstanceId,
+                    },
+                })
+                .then((response) => {
+                    // Add ability to limit events:
+                    // need to filter, then sort, then slice
+                    this.eventsLoaded = true;
+                    let events = response.data
+                        .filter((v) => "start" in v)
+                        .sort((a, b) => String(a.start).localeCompare(String(b.start)));
+                    if (this.config.limit) {
+                        events = events.slice(0, this.config.limit);
                     }
-                }
-            ).then((response) => {
-                // Add ability to limit events:
-                // need to filter, then sort, then slice
-                this.eventsLoaded = true;
-                let events = response.data
-                    .filter(v => 'start' in v)
-                    .sort((a, b) => String(a.start).localeCompare(String(b.start)));
-                if (this.config.limit) {
-                    events = events.slice(0, this.config.limit);
-                }
 
-                // Empty? Don't show the calendar at all
-                if (events.length === 0) {
-                    // self.$refs.emptyState.style.removeProperty('display');
-                    // self.$refs.fullCalendar.getApi().destroy();
-                    this.hasEvents = false;
-                } else {
-                    this.hasEvents = true;
-                }
-                callback(events);
-            } );
+                    // Empty? Don't show the calendar at all
+                    if (events.length === 0) {
+                        // self.$refs.emptyState.style.removeProperty('display');
+                        // self.$refs.fullCalendar.getApi().destroy();
+                        this.hasEvents = false;
+                    } else {
+                        this.hasEvents = true;
+                    }
+                    callback(events);
+                });
             // Fail callback: consider a message saying something failed
         },
 
@@ -205,7 +197,7 @@ export default {
          *
          * @param eventInfo
          */
-        onEventClick (eventInfo) {
+        onEventClick(eventInfo) {
             // Ideally the current event would be a part of the modal,
             // not this component, but :shrug:
             this.$refs.event.open(eventInfo.event);
@@ -218,7 +210,7 @@ export default {
          * Use the base64encoded version of the url's pathname, so it can work in
          * conjunection with Class Redirect in the back end
          */
-        returnUrl () {
+        returnUrl() {
             return btoa(window.location.pathname);
         },
 
@@ -228,14 +220,11 @@ export default {
          * whether an event should be rendered even if it wasn't deleted.
          * @see https://fullcalendar.io/docs/Calendar-refetchEvents
          */
-        reloadEvents () {
+        reloadEvents() {
             this.calendarApi.refetchEvents();
         },
-
     },
-
-}
-
+};
 </script>
 
 <template>
@@ -254,18 +243,14 @@ export default {
             @eventDeleted="reloadEvents"
         />
 
-        <full-calendar
-            ref="fullCalendar"
-            :options="calendarOptions"
-        >
+        <full-calendar ref="fullCalendar" :options="calendarOptions">
             <template v-slot:eventContent="arg">
                 <customised-calendar-event :content="arg" />
             </template>
         </full-calendar>
 
         <!-- Loading state -->
-        <div ref="loadingState" class="loader" v-if="!eventsLoaded">
-        </div>
+        <div ref="loadingState" class="loader" v-if="!eventsLoaded"></div>
 
         <!-- Empty state: show only if events have loaded, but none are shown -->
         <div ref="emptyState" class="empty-state" v-if="eventsLoaded && !hasEvents">
@@ -277,9 +262,7 @@ export default {
                     or <a :href="config.importEventsUrl">import events in bulk</a>
                     to show in this component and in group members' calendars.
                 </p>
-                <p v-else>
-                    There are no upcoming events to display at this time.
-                </p>
+                <p v-else>There are no upcoming events to display at this time.</p>
             </template>
             <span v-else>
                 <i class="icon-calendar"></i>
@@ -291,11 +274,12 @@ export default {
         <div class="component-action" v-if="config.folderId && eventsLoaded && hasEvents">
             <section>
                 <a v-if="config.canCreateEvent" :href="config.createEventUrl" class="button">Add Event</a>
-                <a href="#" @click.prevent="$refs.exportModal.open" @keyup.enter="$refs.exportModal.open" class="button">Export Events</a>
+                <a href="#" @click.prevent="$refs.exportModal.open" @keyup.enter="$refs.exportModal.open" class="button"
+                    >Export Events</a
+                >
                 <a v-if="config.canCreateEvent" :href="config.importEventsUrl" class="button">Import Events</a>
             </section>
         </div>
-
 
         <export-url-modal ref="exportModal" :url="config.exportUrl" />
     </div>

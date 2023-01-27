@@ -1,55 +1,53 @@
 <script>
-
-import FullCalendar               from '@fullcalendar/vue3'
-import interactionPlugin          from '@fullcalendar/interaction'
-import dayGridPlugin              from '@fullcalendar/daygrid'
-import timeGridPlugin             from '@fullcalendar/timegrid'
-import listPlugin                 from '@fullcalendar/list'
-import adaptivePlugin             from '@fullcalendar/adaptive'
-import ViewEventModal             from '@schoolboxVue/components/fullcalendar/view-event-modal';
-import CreateEventModal           from './create-event-modal';
-import ExportModal                from "./export-modal";
-import FilterModal                from "./filter-modal";
-import FlatPickr                  from '@schoolboxVue/components/fullcalendar/flat-pickr';
-import axios                      from 'axios'
-import qs                         from "qs";
-import fullCalendarHelper         from "@schoolboxVue/components/fullcalendar/mixinFullCalendarHelper";
-import {ENDPOINTS}                from '@schoolboxCalendarEvent/endpoints';
-import CustomisedCalendarEvent    from '@schoolboxVue/components/fullcalendar/customised-calendar-event';
-
+import FullCalendar from "@fullcalendar/vue3";
+import interactionPlugin from "@fullcalendar/interaction";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import timeGridPlugin from "@fullcalendar/timegrid";
+import listPlugin from "@fullcalendar/list";
+import adaptivePlugin from "@fullcalendar/adaptive";
+import ViewEventModal from "@schoolboxVue/components/fullcalendar/view-event-modal";
+import CreateEventModal from "./create-event-modal";
+import ExportModal from "./export-modal";
+import FilterModal from "./filter-modal";
+import FlatPickr from "@schoolboxVue/components/fullcalendar/flat-pickr";
+import axios from "axios";
+import qs from "qs";
+import fullCalendarHelper from "@schoolboxVue/components/fullcalendar/mixinFullCalendarHelper";
+import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
+import CustomisedCalendarEvent from "@schoolboxVue/components/fullcalendar/customised-calendar-event";
 
 // Various URLs that FullCalendar may make use of.
-const URL_STATE_CHANGE = '/calendar/changeState';
+const URL_STATE_CHANGE = "/calendar/changeState";
 
-const URL_EVENT_SOURCE = '/calendar/ajax/full';
-const URL_EVENT_UPDATE = '/calendar/ajax/update';
-const URL_EVENT_FILTER = '/calendar/ajax/filter';
-const URL_EVENT_CREATE = '/calendar/ajax/create';
+const URL_EVENT_SOURCE = "/calendar/ajax/full";
+const URL_EVENT_UPDATE = "/calendar/ajax/update";
+const URL_EVENT_FILTER = "/calendar/ajax/filter";
+const URL_EVENT_CREATE = "/calendar/ajax/create";
 
 /* TODO: Events should already know about and come with their own modify link;
  * we shouldn't be inferring and building it out here
  */
-const URL_EVENT_CREATE_FORM = '/calendar/event/create';
-const URL_EVENT_MODIFY_FORM = '/calendar/event/{eventId}/modify';
-const URL_EVENT_MODIFY_FORM_ACTION = '/calendar/modifyForm.php';
-const URL_EVENT_DELETE = '/calendar/event/{eventId}/delete';
-const URL_EVENT_EXPORT = '/calendar/export.php';
+const URL_EVENT_CREATE_FORM = "/calendar/event/create";
+const URL_EVENT_MODIFY_FORM = "/calendar/event/{eventId}/modify";
+const URL_EVENT_MODIFY_FORM_ACTION = "/calendar/modifyForm.php";
+const URL_EVENT_DELETE = "/calendar/event/{eventId}/delete";
+const URL_EVENT_EXPORT = "/calendar/export.php";
 
-const URL_ATTENDANCE_LIST = '/calendar/attendance/list/';
-const URL_ATTENDANCE_TOGGLE = '/service/attendance/setAttendance';
+const URL_ATTENDANCE_LIST = "/calendar/attendance/list/";
+const URL_ATTENDANCE_TOGGLE = "/service/attendance/setAttendance";
 
-const FORMAT_FORM_DATE = 'DD-MM-YYYY';
-const FORMAT_FLATPICKR_DATE = 'DD/MM/YYYY';
-const FORMAT_FORM_DATETIME = 'DD-MM-YYYY HH:mm';
+const FORMAT_FORM_DATE = "DD-MM-YYYY";
+const FORMAT_FLATPICKR_DATE = "DD/MM/YYYY";
+const FORMAT_FORM_DATETIME = "DD-MM-YYYY HH:mm";
 
 // TODO let display formats be configurable
-const FORMAT_DISPLAY_DATE = 'ddd Do MMM';
-const FORMAT_DISPLAY_TIME = 'h:mma';
-const FORMAT_DISPLAY_DATETIME = 'ddd Do MMM, h:mma';
-const FORMAT_DISPLAY_WEEK_DAY = 'ddd D/M';
+const FORMAT_DISPLAY_DATE = "ddd Do MMM";
+const FORMAT_DISPLAY_TIME = "h:mma";
+const FORMAT_DISPLAY_DATETIME = "ddd Do MMM, h:mma";
+const FORMAT_DISPLAY_WEEK_DAY = "ddd D/M";
 
 // Default event duration is 1 hour, default allday event span is 1 day
-const DEFAULT_EVENT_DURATION    = 60 * 60 * 1000;
+const DEFAULT_EVENT_DURATION = 60 * 60 * 1000;
 const DEFAULT_ALLDAY_EVENT_DAYS = 1;
 
 /* Viewports smaller than this width will be presumed to be a small viewport
@@ -57,11 +55,10 @@ const DEFAULT_ALLDAY_EVENT_DAYS = 1;
  */
 const SMALL_VIEWPORT_THRESHOLD = 768;
 
-const EVENT_SOURCE_ID = 'events';
+const EVENT_SOURCE_ID = "events";
 
 export default {
-
-    name: 'timetable-calendar',
+    name: "timetable-calendar",
 
     components: {
         FilterModal,
@@ -70,19 +67,17 @@ export default {
         ViewEventModal,
         FullCalendar,
         FlatPickr,
-        CustomisedCalendarEvent
+        CustomisedCalendarEvent,
     },
 
-    mixins: [
-        fullCalendarHelper
-    ],
+    mixins: [fullCalendarHelper],
 
-    data () {
+    data() {
         return {
             calendarApi: null, //to access the underlying calendar object
             currentDisplay: null,
             duration: {
-                days: 31
+                days: 31,
             },
             listViewDateRange: {
                 start: null,
@@ -92,8 +87,8 @@ export default {
 
             /* For deciding which display format to use
              */
-            windowWidth: window.innerWidth
-        }
+            windowWidth: window.innerWidth,
+        };
     },
 
     computed: {
@@ -121,13 +116,13 @@ export default {
                 displayDatetime: FORMAT_DISPLAY_DATETIME,
                 displayWeekDay: FORMAT_DISPLAY_WEEK_DAY,
             };
-        }
+        },
     },
 
-    beforeMount () {
+    beforeMount() {
         this.calendarOptions = {
             schedulerLicenseKey: this.config.schedulerLicenseKey,
-            plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, adaptivePlugin ],
+            plugins: [interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, adaptivePlugin],
             /* Some schools start on saturday/sundays, some don't
              * For now make this a configurable option
              */
@@ -148,7 +143,7 @@ export default {
                     dayHeaders: false,
                     titleFormat: (date) => {
                         return dayjs(date.date.array).format(this.config.dateDisplayFormats.dayjsDateLong); // will produce something like "Tuesday July 16th 2021"
-                    }
+                    },
                 },
                 week: {
                     dayHeaderFormat: (date) => {
@@ -156,15 +151,15 @@ export default {
                     },
                     titleFormat: (date) => {
                         return this.fullCalendarHelper_titleFormatWeek(date);
-                    }
+                    },
                 },
                 list: {
-                    buttonText: 'List',
+                    buttonText: "List",
                     duration: this.duration,
                     listDayFormat: (date) => {
                         return dayjs(date.date.array).format(this.config.dateDisplayFormats.dayjsDateLong);
-                    }
-                }
+                    },
+                },
             },
             eventTimeFormat: (date) => {
                 return this.fullCalendarHelper_eventTimeFormat(date);
@@ -181,29 +176,29 @@ export default {
                 //     click: this.onFilterClick
                 // },
                 quickSwitchButton: {
-                    text: ' ',
+                    text: " ",
                 },
                 customPrev: {
-                    icon: 'chevron-left',
+                    icon: "chevron-left",
                     click: this.clickPrev,
                 },
                 customNext: {
-                    icon: 'chevron-right',
+                    icon: "chevron-right",
                     click: this.clickNext,
                 },
                 customToday: {
-                    text: 'Today',
+                    text: "Today",
                     click: this.clickToday,
                 },
             },
             headerToolbar: {
-                left: 'quickSwitchButton,customToday,customPrev,customNext',
-                center: 'title',
+                left: "quickSwitchButton,customToday,customPrev,customNext",
+                center: "title",
                 // right: 'customFilters,list,dayGridMonth,timeGridWeek,timeGridDay,customExport'
-                right: ''
+                right: "",
             },
             buttonText: {
-                today:    'Today',
+                today: "Today",
                 /* Didn't need any of these extra buttons in Timetable View
                  */
                 // month:    'Month',
@@ -212,15 +207,15 @@ export default {
                 // list:     'List',
             },
             initialDate: this.config.defaultDate,
-            initialView: this.config.defaultView || 'dayGridMonth',
+            initialView: this.config.defaultView || "dayGridMonth",
             scrollTime: this.config.dateDisplayFormats.calendarStartTime,
             dayMaxEventRows: this.config.eventLimit,
             firstDay: this.config.firstDay,
             eventSources: [
                 {
-                    id:     EVENT_SOURCE_ID,
+                    id: EVENT_SOURCE_ID,
                     events: this.events,
-                }
+                },
             ],
             eventDidMount: this.eventRender,
             viewDidMount: this.viewDidMount,
@@ -228,32 +223,31 @@ export default {
             dateClick: this.onDateClick,
             eventClick: this.onEventClick,
             eventResize: this.onEventResize,
-            eventDrop: this.onEventDrop
-        }
+            eventDrop: this.onEventDrop,
+        };
     },
 
     mounted() {
-        this.$nextTick()
-            .then(() => {
-                this.calendarApi = this.$refs.fullCalendar.getApi();
-                this.calendarApi.setOption('contentHeight', this.fullCalendarHelper_contentHeight());
-                this.calendarApi.scrollToTime(this.config.dateDisplayFormats.calendarStartTime);
+        this.$nextTick().then(() => {
+            this.calendarApi = this.$refs.fullCalendar.getApi();
+            this.calendarApi.setOption("contentHeight", this.fullCalendarHelper_contentHeight());
+            this.calendarApi.scrollToTime(this.config.dateDisplayFormats.calendarStartTime);
 
-                /* shanked from https://stackoverflow.com/questions/47219272/how-can-i-use-window-size-in-vue-how-do-i-detect-the-soft-keyboard
-                 */
-                window.addEventListener('resize', this.onResize);
-            });
+            /* shanked from https://stackoverflow.com/questions/47219272/how-can-i-use-window-size-in-vue-how-do-i-detect-the-soft-keyboard
+             */
+            window.addEventListener("resize", this.onResize);
+        });
 
         this.registerListCustomInputFields();
 
         // Inject calendar icon. Unfortunately, fullcalendar doesn't support injecting our own icons into the custom buttons yet...
-        let quickSwitchIcon = document.createElement('a');
-        quickSwitchIcon.setAttribute('class', 'adtp-btn icon-calendar no-text');
-        document.getElementsByClassName('fc-quickSwitchButton-button')[0].appendChild(quickSwitchIcon);
+        let quickSwitchIcon = document.createElement("a");
+        quickSwitchIcon.setAttribute("class", "adtp-btn icon-calendar no-text");
+        document.getElementsByClassName("fc-quickSwitchButton-button")[0].appendChild(quickSwitchIcon);
     },
 
     beforeDestroy() {
-        window.removeEventListener('resize', this.onResize);
+        window.removeEventListener("resize", this.onResize);
     },
 
     methods: {
@@ -261,15 +255,15 @@ export default {
          * Change the display format depending on viewport size
          */
         onResize() {
-            this.windowWidth = window.innerWidth
+            this.windowWidth = window.innerWidth;
 
             /* Dynamically change display format
              * https://fullcalendar.io/docs/Calendar-changeView
              */
             if (this.windowWidth < SMALL_VIEWPORT_THRESHOLD) {
-                this.calendarApi.changeView('timeGridDay');
+                this.calendarApi.changeView("timeGridDay");
             } else {
-                this.calendarApi.changeView('timeGridWeek');
+                this.calendarApi.changeView("timeGridWeek");
             }
         },
 
@@ -294,38 +288,38 @@ export default {
          * @param fetchInfo The time span of the events to fetch
          * @param callback  A function to call with the list of events.
          */
-        events (fetchInfo, callback) {
-            axios.get(
-                URL_EVENT_SOURCE,
-                {
+        events(fetchInfo, callback) {
+            axios
+                .get(URL_EVENT_SOURCE, {
                     headers: {
-                        'X-Requested-With' : 'XMLHttpRequest'
+                        "X-Requested-With": "XMLHttpRequest",
                     },
                     params: {
-                        start:  Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
-                        end:    Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
+                        start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
+                        end: Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
                         userId: this.config.userId,
 
                         /* This param lets you load the specific set of subscriptions
                          * relevant to the Timetable Calendar
                          */
-                        timetableCalendar: true
-                    }
-                }
-            ).then((response) => {
-                callback(response.data.filter((v) => {
-                    return 'start' in v;
-                }));
+                        timetableCalendar: true,
+                    },
+                })
+                .then((response) => {
+                    callback(
+                        response.data.filter((v) => {
+                            return "start" in v;
+                        })
+                    );
 
-                let slots = this.findSlotBoundaries(response.data);
+                    let slots = this.findSlotBoundaries(response.data);
 
-                this.calendarApi.setOption('slotMinTime', slots.slotMinTime);
-                this.calendarApi.setOption('slotMaxTime', slots.slotMaxTime);
-                this.calendarApi.setOption('allDaySlot', slots.allDaySlot);
-            } );
+                    this.calendarApi.setOption("slotMinTime", slots.slotMinTime);
+                    this.calendarApi.setOption("slotMaxTime", slots.slotMaxTime);
+                    this.calendarApi.setOption("allDaySlot", slots.allDaySlot);
+                });
             // Fail callback: consider a message saying something failed
         },
-
 
         /**
          * Find the earliest time and the latest time in a set of events
@@ -333,7 +327,7 @@ export default {
          *
          * @param data
          */
-        findSlotBoundaries (data) {
+        findSlotBoundaries(data) {
             let slotMinTime = null;
             let slotMaxTime = null;
             let allDaySlot = false;
@@ -352,14 +346,14 @@ export default {
 
                 /* Remember the earliest time we saw
                  */
-                let start = dayjs(new Date(data[i].start)).format('HH:mm:ss');
+                let start = dayjs(new Date(data[i].start)).format("HH:mm:ss");
                 if (null === slotMinTime || slotMinTime > start) {
                     slotMinTime = start;
                 }
 
                 /* Remember the latest time we saw
                  */
-                let finish = dayjs(new Date(data[i].end)).format('HH:mm:ss');
+                let finish = dayjs(new Date(data[i].end)).format("HH:mm:ss");
 
                 if (null === slotMaxTime || slotMaxTime < finish) {
                     slotMaxTime = finish;
@@ -367,12 +361,11 @@ export default {
             }
 
             return {
-                slotMinTime: slotMinTime ?? '00:00:00',
-                slotMaxTime: slotMaxTime ?? '00:00:00',
-                allDaySlot: allDaySlot
-            }
+                slotMinTime: slotMinTime ?? "00:00:00",
+                slotMaxTime: slotMaxTime ?? "00:00:00",
+                allDaySlot: allDaySlot,
+            };
         },
-
 
         /**
          * Callback for when the calendar view changes: preserve the
@@ -382,30 +375,29 @@ export default {
          * @param info
          */
         viewDidMount(info) {
-
-            const customGroup = document.querySelector('.fc-custom-group');
+            const customGroup = document.querySelector(".fc-custom-group");
 
             this.currentDisplay = info.view.type;
 
             // document.querySelectorAll('.fc-toolbar .fc-left .fc-button-group, .fc-toolbar .fc-center').forEach((element) => {
-            document.querySelectorAll('.fc-button-group, .fc-toolbar-title').forEach((element) => {
+            document.querySelectorAll(".fc-button-group, .fc-toolbar-title").forEach((element) => {
                 if (this.currentViewIsList()) {
-                    if (!element.firstChild?.classList?.contains('fc-customFilters-button')) { //never hide the right side buttons
-                        element.classList.add('hide');
+                    if (!element.firstChild?.classList?.contains("fc-customFilters-button")) {
+                        //never hide the right side buttons
+                        element.classList.add("hide");
                     }
-                    if (customGroup?.classList && customGroup?.classList.contains('hide') !== null) {
-                        customGroup.classList.remove('hide')
+                    if (customGroup?.classList && customGroup?.classList.contains("hide") !== null) {
+                        customGroup.classList.remove("hide");
                     }
                 } else {
-                    element.classList.remove('hide');
+                    element.classList.remove("hide");
                     if (customGroup?.classList) {
-                        customGroup.classList.add('hide');
+                        customGroup.classList.add("hide");
                     }
                 }
             });
 
             if (this.currentViewIsList()) {
-
                 this.registerListCustomInputFields();
 
                 /**
@@ -414,20 +406,17 @@ export default {
                  */
                 let attachAlaressDatePicker = function () {
                     var $dateinput = $(this);
-                    if ($dateinput.attr('data-datepicker-id') === undefined) {
+                    if ($dateinput.attr("data-datepicker-id") === undefined) {
                         $dateinput.alaressDateTimePicker();
                     }
                 };
 
                 $(function () {
-                    $('[data-datepicker]').each(attachAlaressDatePicker);
+                    $("[data-datepicker]").each(attachAlaressDatePicker);
                 });
             }
 
-            axios.post(
-                URL_STATE_CHANGE,
-                qs.stringify({calendarView: info.view.type})
-            );
+            axios.post(URL_STATE_CHANGE, qs.stringify({ calendarView: info.view.type }));
         },
 
         /**
@@ -438,8 +427,7 @@ export default {
          * @param eventRenderInfo
          * @return {boolean}
          */
-        eventRender (eventRenderInfo) {
-
+        eventRender(eventRenderInfo) {
             /* Filters Modal doesn't exist in the Timetable Calendar special screen
              * Everything always renders
              */
@@ -542,11 +530,11 @@ export default {
         onDateClick(dateClickInfo) {
             let [firstEventType] = this.config.eventTypes;
             this.$refs.createEvent.open({
-                date:        dateClickInfo.date,
-                allDay:      dateClickInfo.allDay,
-                title:       '',
-                detail:      '',
-                type:        firstEventType ? firstEventType.id : null,
+                date: dateClickInfo.date,
+                allDay: dateClickInfo.allDay,
+                title: "",
+                detail: "",
+                type: firstEventType ? firstEventType.id : null,
             });
         },
 
@@ -604,9 +592,8 @@ export default {
          * @param {Object} event
          */
         moveEvent(event) {
-
             const data = {
-                start:  dayjs(event.start).format(),
+                start: dayjs(event.start).format(),
                 allDay: event.allDay,
             };
 
@@ -616,19 +603,25 @@ export default {
             // This means that all-day events need their end date set back
             // one day before being sent to Schoolbox.
             if (event.allDay && dayjs(event.end).isValid()) {
-                data.end = dayjs(event.end).add(dayjs.duration({days: -1})).format();
-            } else if (dayjs(event.end).isValid()) { //there isn't always an end date, so only add in when it's available
+                data.end = dayjs(event.end)
+                    .add(dayjs.duration({ days: -1 }))
+                    .format();
+            } else if (dayjs(event.end).isValid()) {
+                //there isn't always an end date, so only add in when it's available
                 data.end = dayjs(event.end).format();
-            } else { //otherwise it's assumed the start date is the same as the end date
+            } else {
+                //otherwise it's assumed the start date is the same as the end date
                 data.end = dayjs(event.start).format();
             }
 
             // @TODO this needs to consider events in series
             axios.post(
-                ENDPOINTS.generateUrlFromConst(ENDPOINTS.URL_EVENT_MOVE, String(event?.extendedProps?.data?.meta?.eventId)),
+                ENDPOINTS.generateUrlFromConst(
+                    ENDPOINTS.URL_EVENT_MOVE,
+                    String(event?.extendedProps?.data?.meta?.eventId)
+                ),
                 qs.stringify(data)
             );
-
         },
 
         /**
@@ -656,7 +649,7 @@ export default {
          * Check if current display is list
          */
         currentViewIsList() {
-            return this.currentDisplay === 'list';
+            return this.currentDisplay === "list";
         },
 
         /**
@@ -680,7 +673,7 @@ export default {
             // The selected filters in config are read-only and passed by reference.
             // TODO pass it by value into the filter modal, and update in this method
             try {
-                await axios.post(URL_EVENT_FILTER, qs.stringify({filters: this.config.selectedFilters,}));
+                await axios.post(URL_EVENT_FILTER, qs.stringify({ filters: this.config.selectedFilters }));
                 this.calendarApi.refetchEvents();
             } catch (error) {
                 console.warn(error);
@@ -691,52 +684,54 @@ export default {
          * Register customised input fields for list view
          */
         registerListCustomInputFields() {
-
             // Make sure that there's only one of the custom input field
-            if (!document.querySelector('.fc-custom-group'))
-            {
+            if (!document.querySelector(".fc-custom-group")) {
                 // Prepare input fields
-                const container = document.createElement('div');
-                const startDate = document.createElement('input');
-                const startDateFieldWrapper = document.createElement('div');
-                const endDate = document.createElement('input');
-                const endDateFieldWrapper = document.createElement('div');
-                const updateRangeButton = document.createElement('input');
-                const buttonWrapper = document.createElement('div');
+                const container = document.createElement("div");
+                const startDate = document.createElement("input");
+                const startDateFieldWrapper = document.createElement("div");
+                const endDate = document.createElement("input");
+                const endDateFieldWrapper = document.createElement("div");
+                const updateRangeButton = document.createElement("input");
+                const buttonWrapper = document.createElement("div");
 
-                startDateFieldWrapper.setAttribute('class', 'small-4 columns');
-                endDateFieldWrapper.setAttribute('class', 'small-4 columns');
-                buttonWrapper.setAttribute('class', 'small-4 columns');
+                startDateFieldWrapper.setAttribute("class", "small-4 columns");
+                endDateFieldWrapper.setAttribute("class", "small-4 columns");
+                buttonWrapper.setAttribute("class", "small-4 columns");
 
                 // Start date field
-                startDate.setAttribute('id', 'start_date');
-                startDate.setAttribute('name', 'start_date');
-                startDate.setAttribute('data-datepicker', '');
-                startDate.setAttribute('data-datepicker-buttontext', '');
-                startDate.setAttribute('value',
-                    (this.listViewDateRange.start) ? this.listViewDateRange.start : dayjs(new Date()).format(FORMAT_FLATPICKR_DATE)
+                startDate.setAttribute("id", "start_date");
+                startDate.setAttribute("name", "start_date");
+                startDate.setAttribute("data-datepicker", "");
+                startDate.setAttribute("data-datepicker-buttontext", "");
+                startDate.setAttribute(
+                    "value",
+                    this.listViewDateRange.start
+                        ? this.listViewDateRange.start
+                        : dayjs(new Date()).format(FORMAT_FLATPICKR_DATE)
                 );
-
 
                 // End date field
-                endDate.setAttribute('id', 'end_date');
-                endDate.setAttribute('name', 'end_date');
-                endDate.setAttribute('data-datepicker', '');
-                endDate.setAttribute('data-datepicker-buttontext', '');
-                endDate.setAttribute('value',
-                    (this.listViewDateRange.end) ? this.listViewDateRange.end : dayjs(new Date()).add(this.duration.days, 'days').format(FORMAT_FLATPICKR_DATE)
+                endDate.setAttribute("id", "end_date");
+                endDate.setAttribute("name", "end_date");
+                endDate.setAttribute("data-datepicker", "");
+                endDate.setAttribute("data-datepicker-buttontext", "");
+                endDate.setAttribute(
+                    "value",
+                    this.listViewDateRange.end
+                        ? this.listViewDateRange.end
+                        : dayjs(new Date()).add(this.duration.days, "days").format(FORMAT_FLATPICKR_DATE)
                 );
 
-
                 // Update button
-                updateRangeButton.setAttribute('id', 'update_date_range_button');
-                updateRangeButton.setAttribute('type', 'submit');
-                updateRangeButton.setAttribute('value', 'Update');
+                updateRangeButton.setAttribute("id", "update_date_range_button");
+                updateRangeButton.setAttribute("type", "submit");
+                updateRangeButton.setAttribute("value", "Update");
 
                 if (this.currentViewIsList()) {
-                    container.setAttribute('class', 'fc-custom-group row');
+                    container.setAttribute("class", "fc-custom-group row");
                 } else {
-                    container.setAttribute('class', 'fc-custom-group row hide');
+                    container.setAttribute("class", "fc-custom-group row hide");
                 }
 
                 // Wrap input fields to columns
@@ -750,26 +745,39 @@ export default {
                 container.appendChild(buttonWrapper);
 
                 //add to the first tooblbar chunk, so it'll appear on the left hand side
-                document.querySelector('.fc-toolbar').getElementsByClassName('fc-toolbar-chunk')[0].appendChild(container);
+                document
+                    .querySelector(".fc-toolbar")
+                    .getElementsByClassName("fc-toolbar-chunk")[0]
+                    .appendChild(container);
 
                 // Register an event listener when update button is clicked.
-                document.querySelector('#update_date_range_button').addEventListener('click', () => {
-                    if (document.querySelector('#start_date').value && document.querySelector('#end_date').value) {
-                        const startDateValue = dayjs(document.querySelector('#start_date').value, FORMAT_FLATPICKR_DATE, true);
-                        const endDateValue = dayjs(document.querySelector('#end_date').value, FORMAT_FLATPICKR_DATE, true);
+                document.querySelector("#update_date_range_button").addEventListener("click", () => {
+                    if (document.querySelector("#start_date").value && document.querySelector("#end_date").value) {
+                        const startDateValue = dayjs(
+                            document.querySelector("#start_date").value,
+                            FORMAT_FLATPICKR_DATE,
+                            true
+                        );
+                        const endDateValue = dayjs(
+                            document.querySelector("#end_date").value,
+                            FORMAT_FLATPICKR_DATE,
+                            true
+                        );
 
                         if (startDateValue.isValid() && endDateValue.isValid()) {
-                            this.listViewDateRange.start = document.querySelector('#start_date').value;
-                            this.listViewDateRange.end = document.querySelector('#end_date').value;
+                            this.listViewDateRange.start = document.querySelector("#start_date").value;
+                            this.listViewDateRange.end = document.querySelector("#end_date").value;
 
-                            this.duration.days = this.fullCalendarHelper_dateDiff(startDateValue.format('YYYY-MM-DD'), endDateValue.format('YYYY-MM-DD')) + 1;
-                            this.calendarApi.gotoDate(startDateValue.format('YYYY-MM-DD'));
-
+                            this.duration.days =
+                                this.fullCalendarHelper_dateDiff(
+                                    startDateValue.format("YYYY-MM-DD"),
+                                    endDateValue.format("YYYY-MM-DD")
+                                ) + 1;
+                            this.calendarApi.gotoDate(startDateValue.format("YYYY-MM-DD"));
                         }
                     }
                 });
             }
-
         },
 
         /**
@@ -781,13 +789,19 @@ export default {
             /* This is the next/previous button on the date selector
              * It needs to go to the new /timetable/calendar/... route
              */
-            window.history.pushState('', '', '/timetable/calendar/' + dayjs(start).format(FORMAT_FORM_DATE) + '/' + this.config.userId);
+            window.history.pushState(
+                "",
+                "",
+                "/timetable/calendar/" + dayjs(start).format(FORMAT_FORM_DATE) + "/" + this.config.userId
+            );
 
             this.listViewDateRange.start = dayjs(start).format(FORMAT_FLATPICKR_DATE);
-            this.listViewDateRange.end = dayjs(end || new Date()).add(this.duration.days, 'days').format(FORMAT_FLATPICKR_DATE);
+            this.listViewDateRange.end = dayjs(end || new Date())
+                .add(this.duration.days, "days")
+                .format(FORMAT_FLATPICKR_DATE);
 
-            let startDate = this.jQuery('#start_date'),
-                endDate   = this.jQuery('#end_date');
+            let startDate = this.jQuery("#start_date"),
+                endDate = this.jQuery("#end_date");
 
             // .val() is needed so that we'll have the value visible in the
             // input field.
@@ -798,12 +812,12 @@ export default {
             // updated with the new date.
             startDate
                 .val(this.listViewDateRange.start)
-                .attr('data-default-date', this.listViewDateRange.start)
-                .trigger('change');
+                .attr("data-default-date", this.listViewDateRange.start)
+                .trigger("change");
             endDate
                 .val(this.listViewDateRange.end)
-                .attr('data-default-date', this.listViewDateRange.end)
-                .trigger('change');
+                .attr("data-default-date", this.listViewDateRange.end)
+                .trigger("change");
         },
 
         /**
@@ -840,13 +854,10 @@ export default {
         onQuickSwitch(value) {
             this.calendarApi.gotoDate(value.selectedDate);
 
-            this.updateListViewDateRangeField(
-                value.selectedDate,
-                value.selectedDate,
-            );
+            this.updateListViewDateRangeField(value.selectedDate, value.selectedDate);
         },
-    }
-}
+    },
+};
 </script>
 
 <template>
@@ -882,10 +893,7 @@ export default {
             @eventDeleted="reloadEvents"
         />
 
-        <full-calendar
-            ref="fullCalendar"
-            :options="calendarOptions"
-        >
+        <full-calendar ref="fullCalendar" :options="calendarOptions">
             <template #eventContent="arg">
                 <customised-calendar-event :content="arg" />
             </template>
@@ -915,7 +923,7 @@ export default {
 /* Make each event dig go to the edges of their container columns
  */
 .fc-direction-ltr .fc-timegrid-col-events {
-    margin: 0
+    margin: 0;
 }
 
 /* Make each event div not go all the way to the edge

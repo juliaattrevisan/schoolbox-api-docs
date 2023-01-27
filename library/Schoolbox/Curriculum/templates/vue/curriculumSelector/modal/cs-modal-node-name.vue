@@ -1,16 +1,14 @@
 <script setup>
-
 /**
  * A curriculum node to select to traverse further down the tree,
  * will also highlight any matches in the current search query when search is active
  */
 
-import { computed } from 'vue';
-import { escapeRegExp } from '@js/util/jsUtils';
-import { useNodesStore } from '../store/csNodesStore';
-import { useModalActiveNodesStore } from '../store/csModalActiveNodesStore';
-import { useModalSearchStore } from '../store/csModalSearchStore';
-
+import { computed } from "vue";
+import { escapeRegExp } from "@js/util/jsUtils";
+import { useNodesStore } from "../store/csNodesStore";
+import { useModalActiveNodesStore } from "../store/csModalActiveNodesStore";
+import { useModalSearchStore } from "../store/csModalSearchStore";
 
 const props = defineProps({
     /**
@@ -21,11 +19,11 @@ const props = defineProps({
         required: true,
         default() {
             return {
-                id: '0',
-                name: '-',
+                id: "0",
+                name: "-",
                 children: [],
-            }
-        }
+            };
+        },
     },
     /**
      * to gradually add more marginLeft to indicate node level depth
@@ -53,7 +51,8 @@ const modalSearchStore = useModalSearchStore();
  * @returns { Boolean }
  */
 const isDisabled = computed(() => {
-    if (nodesStore.isLoading) { //while a load is in progress
+    if (nodesStore.isLoading) {
+        //while a load is in progress
         return true;
     } else {
         return false;
@@ -80,13 +79,17 @@ const isParentNode = computed(() => {
  * @returns { Boolean }
  */
 const isButton = computed(() => {
-    if (isParentNode.value) { //is the parent node, which we don't
+    if (isParentNode.value) {
+        //is the parent node, which we don't
         return false;
-    } else if (props.node.children === null) { //the children haven't been loaded
+    } else if (props.node.children === null) {
+        //the children haven't been loaded
         return false;
-    } else if (props.node.children?.length === 0) { //there's no children to display, so no point going further
+    } else if (props.node.children?.length === 0) {
+        //there's no children to display, so no point going further
         return false;
-    } else if (modalSearchStore.isActive) { //cant do any navigation while search is active
+    } else if (modalSearchStore.isActive) {
+        //cant do any navigation while search is active
         return false;
     } else {
         return true;
@@ -98,12 +101,12 @@ const isButton = computed(() => {
  *
  * @returns { string }
  */
-const fontWeight = computed(() => isParentNode.value && !modalSearchStore.isActive ? 'bold' : 'normal');
+const fontWeight = computed(() => (isParentNode.value && !modalSearchStore.isActive ? "bold" : "normal"));
 
 /**
  * traverse to the next nodel level
  */
-function onNameSelected () {
+function onNameSelected() {
     modalActiveNodesStore.setNextSelected(props.node.id);
 }
 
@@ -128,16 +131,15 @@ const highlightTitleSearch = computed(() => {
  *
  * @returns { String } string for v-html with <mark></mark> wrapped around each found result
  */
-function highlightSearchInElement (toHighlight) {
+function highlightSearchInElement(toHighlight) {
     let highlighted = toHighlight;
     modalSearchStore.queryWordList.forEach((wordInSearch) => {
-        highlighted = highlighted.replace(RegExp(`${escapeRegExp(wordInSearch)}(?![^mark>]*mark>)`, 'ig'), (match) => {
+        highlighted = highlighted.replace(RegExp(`${escapeRegExp(wordInSearch)}(?![^mark>]*mark>)`, "ig"), (match) => {
             return `<mark>${match}</mark>`;
         });
     });
     return highlighted;
 }
-
 </script>
 
 <template>
@@ -152,16 +154,12 @@ function highlightSearchInElement (toHighlight) {
     >
         {{ props.title }}
     </button>
-    <div
-        v-else
-        class="name"
-    >
+    <div v-else class="name">
         <span v-html="highlightTitleSearch"></span>
     </div>
 </template>
 
 <style lang="scss" scoped>
-
 .button-name {
     background: none;
     font-size: 1rem;
@@ -192,5 +190,4 @@ function highlightSearchInElement (toHighlight) {
     font-weight: v-bind(fontWeight);
     width: 100%;
 }
-
 </style>

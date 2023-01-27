@@ -1,15 +1,12 @@
 <script>
-
 /**
  * Provides the available options that can be bulk modified
  * for the currently selected users
  */
 
-import RevealModal from '@schoolboxVue/components/reveal-modal';
-
+import RevealModal from "@schoolboxVue/components/reveal-modal";
 
 export default {
-
     components: {
         RevealModal,
     },
@@ -17,7 +14,7 @@ export default {
     props: {
         srcUserModify: {
             type: String,
-            required: true
+            required: true,
         },
         campuses: {
             type: Array,
@@ -33,7 +30,7 @@ export default {
         },
         houses: {
             type: Array,
-            required: true
+            required: true,
         },
         eportfolioEnabled: {
             type: Boolean,
@@ -49,9 +46,9 @@ export default {
         },
     },
 
-    emits: ['updated', 'log'],
+    emits: ["updated", "log"],
 
-    data () {
+    data() {
         return {
             updateFields: {
                 campusIds: [],
@@ -64,43 +61,40 @@ export default {
                 accountEnabled: -1,
                 hideContacts: -1,
                 hideTimetable: -1,
-                positionTitle: '',
+                positionTitle: "",
                 displayGradeGraph: -1,
                 revokeToken: -1,
             },
             updateFieldsOriginal: {}, //to reset to original values once an update is complete
             isProcessing: false,
             hasUpdated: false,
-        }
+        };
     },
 
     computed: {
-
         /**
          * To change when processing
          *
          * @return { String }
          */
-        updateButtonText () {
+        updateButtonText() {
             if (this.isProcessing) {
                 return `<em>Processing, please wait...</em>`;
             } else {
                 return `Update Selected`;
             }
         },
-
     },
 
-    mounted () {
+    mounted() {
         this.updateFieldsOriginal = Object.assign({}, this.updateFields); //to reset to original values
     },
 
     methods: {
-
         /**
          * Update the selected users
          */
-        modify () {
+        modify() {
             this.$refs.modal.open();
             this.hasUpdated = false; //return to its form state
         },
@@ -108,11 +102,11 @@ export default {
         /**
          * Update the selected users
          */
-        async onUpdateUsersSelected () {
+        async onUpdateUsersSelected() {
             try {
                 this.isProcessing = true;
                 const response = await fetch(this.srcUserModify, {
-                    method: 'POST',
+                    method: "POST",
                     body: this.getUpdateUsersFormData(),
                 });
                 const responseData = await response.json();
@@ -124,7 +118,7 @@ export default {
                 this.hasUpdated = true;
                 this.isProcessing = false;
                 this.updateFields = Object.assign({}, this.updateFieldsOriginal); //reset to original values
-                this.$emit('updated');
+                this.$emit("updated");
             }
         },
 
@@ -133,11 +127,11 @@ export default {
          *
          * @returns { FormData }
          */
-        getUpdateUsersFormData () {
-            const usersToModifyIDList = this.selectedRows.map(row => row.id);
+        getUpdateUsersFormData() {
+            const usersToModifyIDList = this.selectedRows.map((row) => row.id);
             const formData = new FormData();
             usersToModifyIDList.forEach((item) => {
-                formData.append('users[]', item);
+                formData.append("users[]", item);
             });
             for (const [key, value] of Object.entries(this.updateFields)) {
                 formData.append(key, value);
@@ -151,33 +145,36 @@ export default {
          * @param { Object }
          * @param { Object }
          */
-        checkUpdateResponse (response, responseData) {
-            let logData, hasDataError = false;
-            if (response.ok) { //successful response
+        checkUpdateResponse(response, responseData) {
+            let logData,
+                hasDataError = false;
+            if (response.ok) {
+                //successful response
                 hasDataError = false;
                 logData = responseData;
-            } else if (!response.ok && response.status === 501) { //otherwise check for 501 error
+            } else if (!response.ok && response.status === 501) {
+                //otherwise check for 501 error
                 hasDataError = true;
                 logData = [responseData.title]; //which comes in with an error message
             } else {
                 hasDataError = true;
-                logData = ['Sorry, an unknown error has occurred. Please contact your IT support if the problem persists.'];
+                logData = [
+                    "Sorry, an unknown error has occurred. Please contact your IT support if the problem persists.",
+                ];
             }
             //close this modal before opening the log modal...
             this.onCloseSelected();
-            this.$emit('log', {logData, hasDataError});
+            this.$emit("log", { logData, hasDataError });
         },
 
         /**
          * Close the modal
          */
-        onCloseSelected () {
+        onCloseSelected() {
             this.$refs.modal.close();
-        }
-
-    }
-
-}
+        },
+    },
+};
 </script>
 
 <template>
@@ -190,16 +187,26 @@ export default {
                 <div>
                     <label>
                         Campus Involvement
-                        <span data-tooltip class="hint has-tip tip-top"
-                                title="One or more campuses that the users will be involved in.
-                                Leave blank if you don't want to update their campuses.">?</span>
+                        <span
+                            data-tooltip
+                            class="hint has-tip tip-top"
+                            title="One or more campuses that the users will be involved in.
+                                Leave blank if you don't want to update their campuses."
+                            >?</span
+                        >
                     </label>
                     <ul class="option-list">
                         <li v-for="campus in campuses">
-                            <input :id="'apply_campus-' + String(campus.id)" name='apply_campus[]'
-                                    :value=campus.id v-model="updateFields.campusIds" type="checkbox"/>
-                            <label class="checkbox-label"
-                                    :for="'apply_campus-' + String(campus.id)">{{ campus.name }}</label>
+                            <input
+                                :id="'apply_campus-' + String(campus.id)"
+                                name="apply_campus[]"
+                                :value="campus.id"
+                                v-model="updateFields.campusIds"
+                                type="checkbox"
+                            />
+                            <label class="checkbox-label" :for="'apply_campus-' + String(campus.id)">{{
+                                campus.name
+                            }}</label>
                         </li>
                     </ul>
                     <label for="apply_role">Role</label>
@@ -217,14 +224,27 @@ export default {
                 <div>
                     <label for="apply_position_title">
                         Position Title
-                        <span data-tooltip class="hint has-tip tip-top"
-                                title="Leave blank if you don't want to update their position title.">?</span>
+                        <span
+                            data-tooltip
+                            class="hint has-tip tip-top"
+                            title="Leave blank if you don't want to update their position title."
+                            >?</span
+                        >
                     </label>
-                    <input id="apply_position_title" name="apply_position_title" type="text" v-model="updateFields.positionTitle">
+                    <input
+                        id="apply_position_title"
+                        name="apply_position_title"
+                        type="text"
+                        v-model="updateFields.positionTitle"
+                    />
                     <label for="apply_house_id">
                         House
-                        <span data-tooltip class="hint has-tip tip-top"
-                                title="Leave blank if you don't want to update their house.">?</span>
+                        <span
+                            data-tooltip
+                            class="hint has-tip tip-top"
+                            title="Leave blank if you don't want to update their house."
+                            >?</span
+                        >
                     </label>
                     <select id="apply_house_id" name="apply_house_id" v-model="updateFields.houseId">
                         <option value="-1" selected="selected">Unchanged</option>
@@ -232,8 +252,12 @@ export default {
                         <option v-for="house in houses" :value="house.id">{{ house.name }}</option>
                     </select>
                     <label for="apply_eportfolio">ePortfolio</label>
-                    <select id="apply_eportfolio" name="apply_eportfolio" v-model="updateFields.ePortfolio"
-                            :disabled="!eportfolioEnabled">
+                    <select
+                        id="apply_eportfolio"
+                        name="apply_eportfolio"
+                        v-model="updateFields.ePortfolio"
+                        :disabled="!eportfolioEnabled"
+                    >
                         <option value="-1">Unchanged</option>
                         <option value="1">Enabled</option>
                         <option value="0">Disabled</option>
@@ -241,22 +265,27 @@ export default {
                 </div>
                 <div>
                     <label for="apply_emailfromusername">Email Address From Username</label>
-                    <select id="apply_emailfromusername" name="apply_emailfromusername"
-                            v-model="updateFields.emailFromUserName">
+                    <select
+                        id="apply_emailfromusername"
+                        name="apply_emailfromusername"
+                        v-model="updateFields.emailFromUserName"
+                    >
                         <option value="-1">Unchanged</option>
                         <option value="1">Enabled</option>
                         <option value="0">Disabled</option>
                     </select>
                     <label for="apply_externalmailclient">Use External Mail Client</label>
-                    <select id="apply_externalmailclient" name="apply_externalmailclient"
-                            v-model="updateFields.externalMailClient">
+                    <select
+                        id="apply_externalmailclient"
+                        name="apply_externalmailclient"
+                        v-model="updateFields.externalMailClient"
+                    >
                         <option value="-1">Unchanged</option>
                         <option value="1">Enabled</option>
                         <option value="0">Disabled</option>
                     </select>
                     <label for="apply_accountenabled">Account Enabled</label>
-                    <select id="apply_accountenabled" name="apply_accountenabled"
-                            v-model="updateFields.accountEnabled">
+                    <select id="apply_accountenabled" name="apply_accountenabled" v-model="updateFields.accountEnabled">
                         <option value="-1">Unchanged</option>
                         <option value="1">Enabled</option>
                         <option value="0">Disabled</option>
@@ -270,15 +299,17 @@ export default {
                         <option value="0">Disabled</option>
                     </select>
                     <label for="apply_hidetimetable">Hide Timetable</label>
-                    <select id="apply_hidetimetable" name="apply_hidetimetable"
-                            v-model="updateFields.hideTimetable">
+                    <select id="apply_hidetimetable" name="apply_hidetimetable" v-model="updateFields.hideTimetable">
                         <option value="-1">Unchanged</option>
                         <option value="1">Enabled</option>
                         <option value="0">Disabled</option>
                     </select>
                     <label for="apply_displaygradegraph">Display Comparative Graph on Grades</label>
-                    <select id="apply_displaygradegraph" name="apply_displaygradegraph"
-                            v-model="updateFields.displayGradeGraph">
+                    <select
+                        id="apply_displaygradegraph"
+                        name="apply_displaygradegraph"
+                        v-model="updateFields.displayGradeGraph"
+                    >
                         <option value="-1">Unchanged</option>
                         <option value="1">Enabled</option>
                         <option value="0">Disabled</option>
@@ -290,10 +321,17 @@ export default {
                     </select>
                 </div>
                 <div v-if="selectedRows.length > 1000" class="new-values__full-width">
-                    <div class="alert-box warning">Please note, as a large number of users has been selected, processing may take some time.</div>
+                    <div class="alert-box warning">
+                        Please note, as a large number of users has been selected, processing may take some time.
+                    </div>
                 </div>
                 <div class="new-values__full-width">
-                    <button @click.prevent="onUpdateUsersSelected" class="button submit" :disabled="isProcessing" v-html="updateButtonText"></button>
+                    <button
+                        @click.prevent="onUpdateUsersSelected"
+                        class="button submit"
+                        :disabled="isProcessing"
+                        v-html="updateButtonText"
+                    ></button>
                 </div>
             </div>
         </Transition>
@@ -301,7 +339,6 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-
 $toTwoColumns: 1200px;
 $toOneColumn: 600px;
 
@@ -318,24 +355,25 @@ $toOneColumn: 600px;
     }
 }
 
-    .new-values__full-width {
-        grid-column: 1 / span 4; //extend full grid width
-        @media (max-width: $toTwoColumns) {
-            grid-column: 1 / span 2;
-        }
+.new-values__full-width {
+    grid-column: 1 / span 4; //extend full grid width
+    @media (max-width: $toTwoColumns) {
+        grid-column: 1 / span 2;
     }
+}
 
-textarea { //to prevent the potential for a massively long modal
+textarea {
+    //to prevent the potential for a massively long modal
     min-height: 200px;
     max-height: 600px;
 }
 
-.fade-enter-active, .fade-leave-active {
+.fade-enter-active,
+.fade-leave-active {
     transition: opacity 0.2s;
 }
 
 .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
     opacity: 0;
 }
-
 </style>

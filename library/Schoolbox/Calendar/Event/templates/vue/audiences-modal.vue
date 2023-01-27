@@ -13,7 +13,9 @@
             </template>
             <template v-else>
                 <div class="small-12 medium-6 columns no-pad" v-if="campuses.length">
-                    <p><strong>{{ campusesLabel }}</strong></p>
+                    <p>
+                        <strong>{{ campusesLabel }}</strong>
+                    </p>
                     <ul>
                         <li v-for="(campus, index) in campuses" :key="index">
                             {{ campus.name }}
@@ -21,7 +23,9 @@
                     </ul>
                 </div>
                 <div class="small-12 medium-6 columns no-pad" v-if="roles.length">
-                    <p><strong>{{ rolesLabel }}</strong></p>
+                    <p>
+                        <strong>{{ rolesLabel }}</strong>
+                    </p>
                     <ul>
                         <li v-for="(role, index) in roles" :key="index">
                             {{ role.name }}
@@ -34,41 +38,38 @@
 </template>
 
 <script>
-    import RevealModal from "@schoolboxVue/components/reveal-modal";
+import RevealModal from "@schoolboxVue/components/reveal-modal";
 
-    export default {
+export default {
+    name: "audiences-modal",
 
-        name: "audiences-modal",
+    props: ["campus-audiences", "role-audiences", "group-audiences", "is-group"],
 
-        props: ['campus-audiences', 'role-audiences', 'group-audiences', 'is-group'],
-        
-        components: { RevealModal },
+    components: { RevealModal },
 
-        data() {
-            return {
-                campuses: this.campusAudiences,
-                roles: this.roleAudiences,
-                groups: this.groupAudiences,
-                isGroupTemplate: this.isGroup,
-            }
+    data() {
+        return {
+            campuses: this.campusAudiences,
+            roles: this.roleAudiences,
+            groups: this.groupAudiences,
+            isGroupTemplate: this.isGroup,
+        };
+    },
+
+    computed: {
+        campusesLabel: function () {
+            return this.campuses.length > 1 ? "Campuses" : "Campus";
         },
 
-        computed: {
-            campusesLabel: function() {
-                return (this.campuses.length > 1) ? 'Campuses' : 'Campus';
-            },
-
-            rolesLabel: function() {
-                return (this.roles.length > 1) ? 'Roles' : 'Role';
-            }
+        rolesLabel: function () {
+            return this.roles.length > 1 ? "Roles" : "Role";
         },
+    },
 
-        methods: {
-            open() {
-                this.$refs.modal.open();
-            },
-        }
-        
-    }
-    
+    methods: {
+        open() {
+            this.$refs.modal.open();
+        },
+    },
+};
 </script>

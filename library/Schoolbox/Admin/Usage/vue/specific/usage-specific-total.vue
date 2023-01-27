@@ -1,8 +1,7 @@
 <script>
-import filesize from 'filesize';
+import filesize from "filesize";
 
 export default {
-
     /**
      * Name.
      * The name of the component that we have here. This name will be used in the container
@@ -23,18 +22,14 @@ export default {
      * Immutable props that were passed to this component, usually via twig, in our setup.
      * These are the hyphen-separated vars which are magically computed into camelcase elsewhere.
      */
-    props: [
-       'endpoint',
-       'isS3Adapter'
-    ],
+    props: ["endpoint", "isS3Adapter"],
 
     /**
      * Components.
      * Any other vue components you also want to use here; they must already be imported
      * at the top of the file.
      */
-    components: {
-    },
+    components: {},
 
     /**
      * Data.
@@ -44,15 +39,14 @@ export default {
      */
     data() {
         return {
-
             /* True, when data is currently loading; used to show skeleton
              */
             loading: true,
 
             /* All the data for this visualisation
              */
-            allData: []
-        }
+            allData: [],
+        };
     },
 
     /**
@@ -68,8 +62,7 @@ export default {
      * Computed properties.
      * Access the results of a function as if they were a property of an object.
      */
-    computed: {
-    },
+    computed: {},
 
     /**
      * Methods.
@@ -77,17 +70,16 @@ export default {
      * other ordinary javascript that you might have written before.
      */
     methods: {
-
         /**
          * Display the chart once the data has been loaded
          */
-        async getData () {
+        async getData() {
             this.loading = true;
             try {
                 const response = await fetch(this.endpoint, {
-                    body: JSON.stringify(this.gradeGroups), 
+                    body: JSON.stringify(this.gradeGroups),
                     headers: {
-                        'Content-Type': 'application/json',
+                        "Content-Type": "application/json",
                     },
                 });
                 this.allData = await response.json();
@@ -104,29 +96,28 @@ export default {
          * @param size
          * @returns {string}
          */
-        filesize: function(size) {
+        filesize: function (size) {
             return filesize(size);
-        }
-
-    }
-}
+        },
+    },
+};
 </script>
 <template>
     <div>
         <template v-if="this.loading">
             <table class="skeleton">
                 <thead>
-                <tr>
-                    <th></th>
-                </tr>
+                    <tr>
+                        <th></th>
+                    </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td></td>
-                </tr>
+                    <tr>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                    </tr>
                 </tbody>
             </table>
         </template>

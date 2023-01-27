@@ -1,33 +1,31 @@
 <script>
-
 /**
  * Show when there's no groups matching the current selection/search criteria
  */
 
-import selectionTypes from '../js/manageGroupsSelectionTypes';
-
+import selectionTypes from "../js/manageGroupsSelectionTypes";
 
 export default {
-
     props: {
-        selectedGroups: { //current groups selection
-            type: String, 
+        selectedGroups: {
+            //current groups selection
+            type: String,
             required: true,
         },
-        isSearchActive: { //to update the empty state messages to consider searching
-            type: Boolean, 
+        isSearchActive: {
+            //to update the empty state messages to consider searching
+            type: Boolean,
             required: true,
-        }
+        },
     },
 
     computed: {
-
         /**
          * Notify the user when there's no groups within the current selection
-         * 
-         * @returns { String } 
+         *
+         * @returns { String }
          */
-        selectionMessage () {
+        selectionMessage() {
             const emptyMessage = {
                 [selectionTypes.ALL_GROUPS]: `No groups are available`,
                 [selectionTypes.MY_FAVOURITE_GROUPS]: `You don't currently have any favourite groups`,
@@ -40,30 +38,27 @@ export default {
 
         /**
          * Whether any groups matches the current search
-         * 
-         * @returns { String } 
+         *
+         * @returns { String }
          */
-        searchMessage () {
+        searchMessage() {
             if (this.isSearchActive) {
-                return ' that match your search'
+                return " that match your search";
             } else {
-                return '';
+                return "";
             }
         },
 
         /**
          * Change the text depending on the status of the group selection and current search
-         * 
-         * @returns { String } 
+         *
+         * @returns { String }
          */
-        emptyMessage () {
+        emptyMessage() {
             return `${this.selectionMessage}${this.searchMessage}.`;
         },
-
-    }
-
-}
-
+    },
+};
 </script>
 
 <template>
@@ -77,6 +72,4 @@ export default {
     </div>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

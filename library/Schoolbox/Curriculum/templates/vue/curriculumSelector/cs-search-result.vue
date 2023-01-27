@@ -1,18 +1,15 @@
 <script setup>
-
 /**
  * A single search result that be selected / unselected with a checkbox status
  */
 
-import { computed } from 'vue';
-import { escapeRegExp } from '@js/util/jsUtils';
-import { useSearchStore } from './store/csSearchStore';
-import { useSelectedNodesStore } from './store/csSelectedNodesStore';
-
+import { computed } from "vue";
+import { escapeRegExp } from "@js/util/jsUtils";
+import { useSearchStore } from "./store/csSearchStore";
+import { useSelectedNodesStore } from "./store/csSelectedNodesStore";
 
 const searchStore = useSearchStore();
 const selectedNodesStore = useSelectedNodesStore();
-
 
 const props = defineProps({
     result: {
@@ -21,10 +18,10 @@ const props = defineProps({
         default: () => {
             return {
                 id: 0,
-                code: '',
-                name: '',
-            }
-        }
+                code: "",
+                name: "",
+            };
+        },
     },
 });
 
@@ -34,7 +31,7 @@ const props = defineProps({
  * @returns { String }
  */
 const title = computed(() => {
-    if (props.result.code && props.result.code !== '') {
+    if (props.result.code && props.result.code !== "") {
         return `[${props.result.code}] ${props.result.name}`;
     } else {
         return props.result.name;
@@ -56,10 +53,10 @@ const highlightTitleSearch = computed(() => highlightSearchInElement(title.value
  *
  * @returns { String } string for v-html with <mark></mark> wrapped around each found result
  */
-function highlightSearchInElement (toHighlight) {
+function highlightSearchInElement(toHighlight) {
     let highlighted = toHighlight;
     searchStore.queryWordList.forEach((wordInSearch) => {
-        highlighted = highlighted.replace(RegExp(`${escapeRegExp(wordInSearch)}(?![^mark>]*mark>)`, 'ig'), (match) => {
+        highlighted = highlighted.replace(RegExp(`${escapeRegExp(wordInSearch)}(?![^mark>]*mark>)`, "ig"), (match) => {
             return `<mark>${match}</mark>`;
         });
     });
@@ -80,25 +77,15 @@ const isNodeSelected = computed(() => {
  * To determine the display of the checkbox based on whether
  * the node is currently selected
  */
-function onSelected () {
+function onSelected() {
     isNodeSelected.value ? selectedNodesStore.remove(props.result) : selectedNodesStore.add(props.result);
 }
-
 </script>
 
 <template>
-    <button
-        class="search-result"
-        :title="title"
-        @click.prevent="onSelected"
-        @keyup.enter="onSelected"
-    >
+    <button class="search-result" :title="title" @click.prevent="onSelected" @keyup.enter="onSelected">
         <div class="checklist">
-            <input
-                :id="`checkbox-${result.id}`"
-                type="checkbox"
-                :checked="isNodeSelected"
-            />
+            <input :id="`checkbox-${result.id}`" type="checkbox" :checked="isNodeSelected" />
             <label :for="`checkbox-${result.id}`"></label>
         </div>
         <div>
@@ -127,7 +114,7 @@ function onSelected () {
     margin: 0;
 }
 
-input[type=checkbox]:not(.plain) + label {
+input[type="checkbox"]:not(.plain) + label {
     margin: 0;
 }
 
@@ -135,5 +122,4 @@ aside {
     font-size: 0.725rem;
     font-style: italic;
 }
-
 </style>

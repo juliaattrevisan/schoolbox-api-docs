@@ -18,7 +18,7 @@ export default {
         },
         filename: {
             type: String,
-            default: '',
+            default: "",
         },
     },
     computed: {
@@ -29,23 +29,23 @@ export default {
             videoWidth: null,
             videoHeight: null,
             player: null,
-        }
+        };
     },
     mounted() {
         switch (this.storage.type) {
-            case 'audio':
+            case "audio":
                 this.player = new this.MediaElementPlayer(this.$el);
                 break;
 
-            case 'video':
+            case "video":
                 this.player = new this.MediaElementPlayer(this.$el);
 
                 // Work around what I think is an issue with mediaelement not
                 // knowing what to do when the player loads.
                 // The video isn't set to the same size as the player.
-                let container = this.$el.closest('.mejs__container');
+                let container = this.$el.closest(".mejs__container");
                 if (container) {
-                    this.videoWidth  = container.clientWidth;
+                    this.videoWidth = container.clientWidth;
                     this.videoHeight = container.clientHeight;
                 }
                 break;
@@ -56,8 +56,8 @@ export default {
     },
     beforeUnmount() {
         switch (this.storage.type) {
-            case 'audio':
-            case 'video':
+            case "audio":
+            case "video":
                 if (this.player) {
                     if (!this.player.paused) {
                         this.player.pause();
@@ -75,24 +75,25 @@ export default {
             // Schoolbox's file size rendering uses the JEDEC standard for
             // better or worse.
             return filesize(size);
-        }
-    }
-}
+        },
+    },
+};
 </script>
 
 <template>
-    <video v-if="storage.type === 'video'"
-           controls
-           preload="none"
-           style="width:100%;height:100%;"
-           :poster="storage._links.poster"
-           :width="videoWidth"
-           :height="videoHeight"
+    <video
+        v-if="storage.type === 'video'"
+        controls
+        preload="none"
+        style="width: 100%; height: 100%"
+        :poster="storage._links.poster"
+        :width="videoWidth"
+        :height="videoHeight"
     >
-        <source type="video/mp4" :src="storage._links.stream">
+        <source type="video/mp4" :src="storage._links.stream" />
     </video>
-    <audio v-else-if="storage.type === 'audio'" controls preload="none" style="width:100%;height:100%;">
-        <source type="audio/mpeg" :src="storage._links.stream">
+    <audio v-else-if="storage.type === 'audio'" controls preload="none" style="width: 100%; height: 100%">
+        <source type="audio/mpeg" :src="storage._links.stream" />
     </audio>
     <img v-else-if="storage.type === 'image'" :src="storage._links.image" :alt="filename" />
     <a v-else :href="storage._links.fetch">

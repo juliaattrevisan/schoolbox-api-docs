@@ -1,486 +1,489 @@
 <script>
-    import AudiencesModal from './audiences-modal';
-    import debounce from 'lodash/debounce';
+import AudiencesModal from "./audiences-modal";
+import debounce from "lodash/debounce";
 
-    /* Path aliases like @schoolboxCalendarEvent are defined in webpack.config.js
+/* Path aliases like @schoolboxCalendarEvent are defined in webpack.config.js
+ */
+import { ATTENDANCE_STATUS } from "@schoolboxCalendarEvent/attendance-status";
+import { ATTENDANCE_LEVELS } from "@schoolboxCalendarEvent/attendance-levels";
+import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
+import checks from "@schoolboxCalendarEvent/checks";
+
+/* Vue select
+ */
+import vSelect from "vue-select";
+import "vue-select/dist/vue-select.css";
+
+/* Render custom template for Deselect icon/button
+ * It's not well documented, but you can trawl through closed PRs to figger out how
+ * https://github.com/sagalbot/vue-select/issues/994
+ */
+import Deselect from "@schoolboxVue/components/selectize/Deselect";
+vSelect.props.components.default = () => ({ Deselect });
+
+const FORMAT_LONG_DATE = "dddd, MMMM DD, YYYY"; // Monday, October 01, 2019
+const FORMAT_LONG_DATE_WITH_TIME = "dddd, MMMM DD, YYYY h:mma"; // Monday, October 01, 2019 02:30pm
+const FORMAT_DATE_ONLY = "MM-DD-YYYY"; // 10-01-2019
+const FORMAT_TIME_ONLY = "h:mma"; // 02:30pm
+
+export default {
+    name: "event-details",
+
+    components: {
+        AudiencesModal,
+        vSelect,
+    },
+
+    /* All props form a one-way-down binding between the child property and the parent one:
+     * when the parent property updates, it will flow down to the child, but not the other way around
+     * https://vuejs.org/v2/guide/components-props.html
      */
-    import {ATTENDANCE_STATUS} from '@schoolboxCalendarEvent/attendance-status';
-    import {ATTENDANCE_LEVELS} from '@schoolboxCalendarEvent/attendance-levels';
-    import {ENDPOINTS}         from '@schoolboxCalendarEvent/endpoints';
-    import checks              from '@schoolboxCalendarEvent/checks';
+    props: ["event"],
 
-    /* Vue select
-     */
-    import vSelect from "vue-select";
-    import "vue-select/dist/vue-select.css";
+    data() {
+        return {
+            currentAttendanceStatus: this.event.attendance.status.current,
+            numMax: this.event.attendance.payload.attendees.max,
+            numAvailable: this.event.attendance.payload.attendees.available,
+            numPending: this.event.attendance.payload.attendees.pending,
+            numAccepted: this.event.attendance.payload.attendees.accepted,
+            numDeclined: this.event.attendance.payload.attendees.declined,
+            guests: this.event.attendance.payload.attendees.guests,
+            canInvite: this.event.attendance.payload.currentUser.canInvite,
 
-    /* Render custom template for Deselect icon/button
-     * It's not well documented, but you can trawl through closed PRs to figger out how
-     * https://github.com/sagalbot/vue-select/issues/994
-     */
-    import Deselect from '@schoolboxVue/components/selectize/Deselect';
-    vSelect.props.components.default = () => ({ Deselect });
+            /* Vue Select
+             */
+            options: [],
+            selected: [],
 
-    const FORMAT_LONG_DATE = 'dddd, MMMM DD, YYYY'; // Monday, October 01, 2019
-    const FORMAT_LONG_DATE_WITH_TIME = 'dddd, MMMM DD, YYYY h:mma'; // Monday, October 01, 2019 02:30pm
-    const FORMAT_DATE_ONLY = 'MM-DD-YYYY'; // 10-01-2019
-    const FORMAT_TIME_ONLY = 'h:mma'; // 02:30pm
+            /* These are probably better off as functions inside computed{}
+             * rather than out here, and should be centralised consts
+             * instead of happenstance strings but we can deal with it later
+             */
+            isPersonalEvent: this.event.level === "personal",
+            isGroupEvent: this.event.level === "group",
+            isCampusEvent: this.event.level === "campus",
 
-    export default {
+            /* Keep track of when an async request is in progress, locking
+             * out other async requests until this has finished, preventing
+             * rsvp-button spamming
+             */
+            isTransacting: false,
+        };
+    },
 
-        name: "event-details",
+    computed: {
+        window: () => window,
+        jQuery: () => window.jQuery,
 
-        components: {
-            AudiencesModal,
-            vSelect
+        dateTimeDisplay: function () {
+            if (this.event.options.allDay) return dayjs(this.event.dates.start).format(FORMAT_LONG_DATE);
+
+            let startDate = dayjs(this.event.dates.start),
+                endDate = dayjs(this.event.dates.end);
+
+            if (startDate.format(FORMAT_DATE_ONLY) === endDate.format(FORMAT_DATE_ONLY)) {
+                return (
+                    startDate.format(FORMAT_LONG_DATE) +
+                    "<br />" +
+                    startDate.format(FORMAT_TIME_ONLY) +
+                    " - " +
+                    endDate.format(FORMAT_TIME_ONLY)
+                );
+            }
+
+            return startDate.format(FORMAT_LONG_DATE_WITH_TIME) + " - " + endDate.format(FORMAT_LONG_DATE_WITH_TIME);
         },
-        
-        /* All props form a one-way-down binding between the child property and the parent one:
-         * when the parent property updates, it will flow down to the child, but not the other way around
-         * https://vuejs.org/v2/guide/components-props.html
+
+        monthDisplay: function () {
+            return dayjs(this.event.dates.start).format("MMM");
+        },
+
+        dateDisplay: function () {
+            return dayjs(this.event.dates.start).format("DD");
+        },
+
+        byLine: function () {
+            if (this.event.author.id && this.event.author.fullName)
+                return (
+                    "By " + '<a href="/search/user/' + this.event.author.id + '">' + this.event.author.fullName + "</a>"
+                );
+            if (!this.event.author.id && this.data.author.fullName) return "By " + this.event.author.fullName;
+
+            return "";
+        },
+
+        audiencesMeta: function () {
+            let result = [],
+                campusCount = this.event.audiences.campus.length,
+                rolesCount = this.event.audiences.roles.length;
+
+            if (this.isPersonalEvent) return "Personal";
+            if (this.isGroupEvent)
+                return (
+                    '<a href="/homepage/' +
+                    this.event.audiences.folders[0].id +
+                    '">' +
+                    this.event.audiences.folders[0].name +
+                    "</a>"
+                );
+
+            if (campusCount) {
+                let suffix = campusCount > 1 ? " Campuses" : " Campus";
+                result.push(campusCount + suffix);
+            }
+
+            if (rolesCount) {
+                let suffix = rolesCount > 1 ? " Roles" : " Role";
+                result.push(rolesCount + suffix);
+            }
+
+            return result.join(" & ");
+        },
+
+        showMoreGroups: function () {
+            let suffix = this.event.audiences.folders.length > 2 ? "groups" : "group";
+
+            return this.event.audiences.folders.length - 1 + " more " + suffix;
+        },
+    },
+
+    watch: {
+        selected: function () {
+            if (this.selected.id) {
+                this.rsvpCreate(this.selected.id, this.selected.first_name + " " + this.selected.last_name);
+            }
+        },
+    },
+
+    created() {
+        this.ENDPOINTS = ENDPOINTS;
+        this.canRsvp = checks.canRsvp;
+        this.showRsvpButtons = checks.showRsvpButtons;
+        this.isInvited = checks.isInvited;
+        this.isPending = checks.isPending;
+        this.isAccepted = checks.isAccepted;
+        this.isDeclined = checks.isDeclined;
+        this.isLimitedAttendance = checks.isLimitedAttendance;
+    },
+
+    methods: {
+        /**
+         * Update attendance counts from Payload data
+         *
+         * @param payload  Payload instance
          */
-        props: [
-            'event'
-        ],
-        
-        data() {
-            return {
-                currentAttendanceStatus: this.event.attendance.status.current,
-                numMax: this.event.attendance.payload.attendees.max,
-                numAvailable: this.event.attendance.payload.attendees.available,
-                numPending: this.event.attendance.payload.attendees.pending,
-                numAccepted: this.event.attendance.payload.attendees.accepted,
-                numDeclined: this.event.attendance.payload.attendees.declined,
-                guests: this.event.attendance.payload.attendees.guests,
-                canInvite: this.event.attendance.payload.currentUser.canInvite,
-
-                /* Vue Select
-                 */
-                options: [],
-                selected: [],
-
-                /* These are probably better off as functions inside computed{}
-                 * rather than out here, and should be centralised consts
-                 * instead of happenstance strings but we can deal with it later
-                 */
-                isPersonalEvent: this.event.level === 'personal',
-                isGroupEvent: this.event.level === 'group',
-                isCampusEvent: this.event.level === 'campus',
-
-                /* Keep track of when an async request is in progress, locking
-                 * out other async requests until this has finished, preventing
-                 * rsvp-button spamming
-                 */
-                isTransacting: false
-            }
+        updateCountsFromPayload(payload) {
+            this.numAvailable = payload.attendees.available;
+            this.numPending = payload.attendees.pending;
+            this.numAccepted = payload.attendees.accepted;
+            this.numDeclined = payload.attendees.declined;
         },
 
-        computed: {
-            window: () => window,
-            jQuery: () => window.jQuery,
-
-            dateTimeDisplay: function() {
-                if (this.event.options.allDay) return dayjs(this.event.dates.start).format(FORMAT_LONG_DATE);
-
-                let startDate = dayjs(this.event.dates.start),
-                        endDate = dayjs(this.event.dates.end);
-
-                if (startDate.format(FORMAT_DATE_ONLY) === endDate.format(FORMAT_DATE_ONLY)) {
-                    return startDate.format(FORMAT_LONG_DATE) +
-                            '<br />' + startDate.format(FORMAT_TIME_ONLY) + ' - ' + endDate.format(FORMAT_TIME_ONLY)
-                }
-
-                return startDate.format(FORMAT_LONG_DATE_WITH_TIME) + ' - ' + endDate.format(FORMAT_LONG_DATE_WITH_TIME);
-            },
-
-            monthDisplay: function() {
-                return dayjs(this.event.dates.start).format('MMM');
-            },
-
-            dateDisplay: function() {
-                return dayjs(this.event.dates.start).format('DD');
-            },
-
-            byLine: function() {
-                if (this.event.author.id && this.event.author.fullName) return 'By ' + '<a href="/search/user/' + this.event.author.id + '">' + this.event.author.fullName + '</a>';
-                if (!this.event.author.id && this.data.author.fullName) return 'By ' + this.event.author.fullName;
-
-                return '';
-            },
-
-            audiencesMeta: function() {
-                let result = [],
-                        campusCount = this.event.audiences.campus.length,
-                        rolesCount  = this.event.audiences.roles.length;
-
-                if (this.isPersonalEvent) return 'Personal';
-                if (this.isGroupEvent) return '<a href="/homepage/'+ this.event.audiences.folders[0].id +'">' + this.event.audiences.folders[0].name  + '</a>';
-
-                if (campusCount) {
-                    let suffix = (campusCount > 1) ? ' Campuses' : ' Campus';
-                    result.push(campusCount + suffix);
-                }
-
-                if (rolesCount) {
-                    let suffix = (rolesCount > 1) ? ' Roles' : ' Role';
-                    result.push(rolesCount + suffix);
-                }
-
-                return result.join(' & ');
-            },
-
-            showMoreGroups: function() {
-                let suffix = (this.event.audiences.folders.length > 2) ? 'groups' : 'group';
-
-                return (this.event.audiences.folders.length - 1) + ' more ' + suffix;
-            }
-        },
-
-        watch: {
-            selected: function() {
-                if (this.selected.id) {
-                    this.rsvpCreate(this.selected.id, this.selected.first_name + ' ' + this.selected.last_name);
+        /**
+         * Accept an invitation
+         */
+        rsvpAccept() {
+            if (!this.isAccepted(this.currentAttendanceStatus)) {
+                if (!this.isTransacting) {
+                    /* If you haven't already accepted,
+                     * async request to accept invitation
+                     */
+                    this.rsvp(ATTENDANCE_STATUS.ACCEPTED, ENDPOINTS.rsvpAcceptPath(this.event.id));
                 }
             }
         },
 
-        created() {
-            this.ENDPOINTS = ENDPOINTS;
-            this.canRsvp = checks.canRsvp;
-            this.showRsvpButtons = checks.showRsvpButtons;
-            this.isInvited = checks.isInvited;
-            this.isPending = checks.isPending;
-            this.isAccepted = checks.isAccepted;
-            this.isDeclined = checks.isDeclined;
-            this.isLimitedAttendance = checks.isLimitedAttendance;
-        },
-
-        methods: {
-
-            /**
-             * Update attendance counts from Payload data
-             *
-             * @param payload  Payload instance
-             */
-            updateCountsFromPayload(payload) {
-                this.numAvailable = payload.attendees.available;
-                this.numPending = payload.attendees.pending;
-                this.numAccepted = payload.attendees.accepted;
-                this.numDeclined = payload.attendees.declined;
-            },
-
-
-            /**
-             * Accept an invitation
-             */
-            rsvpAccept() {
-                if (!this.isAccepted(this.currentAttendanceStatus)) {
+        /**
+         * Decline an invitation
+         */
+        rsvpDecline() {
+            if (this.isInvited(this.currentAttendanceStatus)) {
+                if (!this.isDeclined(this.currentAttendanceStatus)) {
                     if (!this.isTransacting) {
-
-                        /* If you haven't already accepted,
-                         * async request to accept invitation
+                        /* If you're invited, and you haven't already declined,
+                         * async request to decline invitatino
                          */
-                        this.rsvp(ATTENDANCE_STATUS.ACCEPTED, ENDPOINTS.rsvpAcceptPath(this.event.id));
+                        this.rsvp(ATTENDANCE_STATUS.DECLINED, ENDPOINTS.rsvpDeclinePath(this.event.id));
                     }
                 }
-            },
+            }
+        },
 
+        /**
+         * Create an invitation
+         *
+         * @param id        the user's id
+         * @param fullname  the user's name
+         */
+        async rsvpCreate(id, fullname) {
+            const toast = $("[data-toast]");
+            toast.toastActivate({
+                text: "Creating invitation...",
+            });
 
-            /**
-             * Decline an invitation
-             */
-            rsvpDecline() {
-                if (this.isInvited(this.currentAttendanceStatus)) {
-                    if (!this.isDeclined(this.currentAttendanceStatus)) {
-                        if (!this.isTransacting) {
-
-                            /* If you're invited, and you haven't already declined,
-                             * async request to decline invitatino
-                             */
-                            this.rsvp(ATTENDANCE_STATUS.DECLINED, ENDPOINTS.rsvpDeclinePath(this.event.id));
-                        }
-                    }
-                }
-            },
-
-
-            /**
-             * Create an invitation
-             *
-             * @param id        the user's id
-             * @param fullname  the user's name
-             */
-            async rsvpCreate (id, fullname) {
-
-                const toast = $('[data-toast]');
-                toast.toastActivate({
-                    text: 'Creating invitation...'
+            try {
+                const response = await fetch(ENDPOINTS.createAttendancePath(this.event.id), {
+                    method: "POST",
+                    body: this.getRsvpCreateFormData(id),
                 });
-
-                try {
-                    const response = await fetch(ENDPOINTS.createAttendancePath(this.event.id), {
-                        method: 'POST', 
-                        body: this.getRsvpCreateFormData(id), 
-                    });
-                    const responseData = await response.json();
-                    this.updateCountsFromPayload(responseData); //Update data with the result from async request
-                    this.guests = responseData.attendees.guests;
-                    toast.toastTimeout({
-                        text: `${fullname} has been invited`,
-                        css: 'success'
-                    });
-                } catch (error) {
-                    toast.toastTimeout({
-                        text: `Unable to invite ${fullname}; please try again.`,
-                        css: 'alert'
-                    });
-                    console.warn(error);
-                } finally {
-                    this.selected = []; //Clear selection after async outcome
-                }
-
-            },
-
-            /**
-             * Get the form data
-             *
-             * @param id        the user's id
-             */
-            getRsvpCreateFormData (id) {
-                const formData = new FormData();
-                formData.append('guests', id);
-                return formData;
-            },
-
-            /**
-             * Remove an invitation
-             *
-             * @param id    the user's id
-             * @param name  the user's name
-             */
-            async rsvpDelete (id, name) {
-
-                const toast = $('[data-toast]');
-                toast.toastActivate({
-                    text: 'Removing invitation...'
+                const responseData = await response.json();
+                this.updateCountsFromPayload(responseData); //Update data with the result from async request
+                this.guests = responseData.attendees.guests;
+                toast.toastTimeout({
+                    text: `${fullname} has been invited`,
+                    css: "success",
                 });
-
-                try {
-                    const response = await fetch(ENDPOINTS.rsvpDeletePath(this.event.id), {
-                        method: 'POST', 
-                        body: this.getRsvpDeleteFormData(id), 
-                    });
-                    const responseData = await response.json();
-                    const userId = responseData.currentUser.user.id;
-
-                    this.guests = this.guests.filter((guest) => guest.id !== id); //to remove the guest from the list
-
-                    if (id === userId) { //If you removed yourself from the list, reset your currentAttendanceStatus to null
-                        this.currentAttendanceStatus = null;
-                    }
-
-                    this.updateCountsFromPayload(responseData); //Update data with the result from async request
-
-                    toast.toastTimeout({
-                        text: `${name} has been uninvited`,
-                        css: 'success'
-                    });
-                } catch (error) {
-                    toast.toastTimeout({
-                        text: `Unable to uninvite ${fullname}; please try again.`,
-                        css: 'alert'
-                    });
-                    console.warn(error);
-                }
-
-            },
-
-            /**
-             * Get the form data
-             *
-             * @param id        the user's id
-             */
-            getRsvpDeleteFormData (id) {
-                const formData = new FormData();
-                formData.append('userId', id);
-                return formData;
-            },
-
-            /**
-             * Respond to an invitation with new status $status, using accept/decline endpoint $endpoint
-             *
-             * @param status    the new status
-             * @param endpoint  the endpoint to send this new status
-             */
-            async rsvp (status, endpoint) {
-                
-                this.isTransacting = true; //Set a flag to prevent async spammage
-
-                const toast = $('[data-toast]');
-                toast.toastActivate({
-                    text: 'Updating invitation...'
+            } catch (error) {
+                toast.toastTimeout({
+                    text: `Unable to invite ${fullname}; please try again.`,
+                    css: "alert",
                 });
+                console.warn(error);
+            } finally {
+                this.selected = []; //Clear selection after async outcome
+            }
+        },
 
-                try {
-                    const response = await fetch(endpoint, {
-                        method: 'POST', 
-                    });
-                    const responseData = await response.json();
-                    
-                    this.currentAttendanceStatus = status; //Update data with the result from async request
-                    this.updateCountsFromPayload(responseData);
-                    this.guests = responseData.attendees.guests;
+        /**
+         * Get the form data
+         *
+         * @param id        the user's id
+         */
+        getRsvpCreateFormData(id) {
+            const formData = new FormData();
+            formData.append("guests", id);
+            return formData;
+        },
 
-                    toast.toastTimeout({
-                        text: 'Invitation successfully updated',
-                        css: 'success'
-                    });
+        /**
+         * Remove an invitation
+         *
+         * @param id    the user's id
+         * @param name  the user's name
+         */
+        async rsvpDelete(id, name) {
+            const toast = $("[data-toast]");
+            toast.toastActivate({
+                text: "Removing invitation...",
+            });
 
-                } catch (error) {
-                    toast.toastTimeout({
-                        text: 'Unable to update invitation.',
-                        css: 'alert'
-                    });
-                    console.warn(error);
-                } finally {
-                    this.isTransacting = false; //Reset flag
+            try {
+                const response = await fetch(ENDPOINTS.rsvpDeletePath(this.event.id), {
+                    method: "POST",
+                    body: this.getRsvpDeleteFormData(id),
+                });
+                const responseData = await response.json();
+                const userId = responseData.currentUser.user.id;
+
+                this.guests = this.guests.filter((guest) => guest.id !== id); //to remove the guest from the list
+
+                if (id === userId) {
+                    //If you removed yourself from the list, reset your currentAttendanceStatus to null
+                    this.currentAttendanceStatus = null;
                 }
 
-            },
+                this.updateCountsFromPayload(responseData); //Update data with the result from async request
 
+                toast.toastTimeout({
+                    text: `${name} has been uninvited`,
+                    css: "success",
+                });
+            } catch (error) {
+                toast.toastTimeout({
+                    text: `Unable to uninvite ${fullname}; please try again.`,
+                    css: "alert",
+                });
+                console.warn(error);
+            }
+        },
 
-            /**
-             * The Guests island is visible under these conditions
-             * This island also contains the attendance list and invite selectize
+        /**
+         * Get the form data
+         *
+         * @param id        the user's id
+         */
+        getRsvpDeleteFormData(id) {
+            const formData = new FormData();
+            formData.append("userId", id);
+            return formData;
+        },
+
+        /**
+         * Respond to an invitation with new status $status, using accept/decline endpoint $endpoint
+         *
+         * @param status    the new status
+         * @param endpoint  the endpoint to send this new status
+         */
+        async rsvp(status, endpoint) {
+            this.isTransacting = true; //Set a flag to prevent async spammage
+
+            const toast = $("[data-toast]");
+            toast.toastActivate({
+                text: "Updating invitation...",
+            });
+
+            try {
+                const response = await fetch(endpoint, {
+                    method: "POST",
+                });
+                const responseData = await response.json();
+
+                this.currentAttendanceStatus = status; //Update data with the result from async request
+                this.updateCountsFromPayload(responseData);
+                this.guests = responseData.attendees.guests;
+
+                toast.toastTimeout({
+                    text: "Invitation successfully updated",
+                    css: "success",
+                });
+            } catch (error) {
+                toast.toastTimeout({
+                    text: "Unable to update invitation.",
+                    css: "alert",
+                });
+                console.warn(error);
+            } finally {
+                this.isTransacting = false; //Reset flag
+            }
+        },
+
+        /**
+         * The Guests island is visible under these conditions
+         * This island also contains the attendance list and invite selectize
+         *
+         * @return boolean
+         */
+        showGuestsPanel() {
+            /* The Guests panel is available when any of the following can be performed:
              *
-             * @return boolean
+             * You can rsvp to an event (shows rsvp buttons)
+             * There's limited attendance and the attendance list is visible to you (shows metadata about counts)
+             * You can modify the event (you can see the Invite Guest selectize and attendance level != None)
+             * You can see the attendance list (shows invited dudes)
              */
-            showGuestsPanel()
-            {
-                /* The Guests panel is available when any of the following can be performed:
-                 *
-                 * You can rsvp to an event (shows rsvp buttons)
-                 * There's limited attendance and the attendance list is visible to you (shows metadata about counts)
-                 * You can modify the event (you can see the Invite Guest selectize and attendance level != None)
-                 * You can see the attendance list (shows invited dudes)
-                 */
-                return this.canRsvp(this.event.attendance.level.current, this.guests, this.event.attendance.payload.currentUser.user.id, this.currentAttendanceStatus, this.numMax, this.numAvailable) ||
-                        (this.isLimitedAttendance(this.numMax) && this.isAttendeesVisible()) ||
-                        (this.canModify() && !this.isAttendanceLevelNone()) ||
-                        this.isAttendeesVisible();
-            },
+            return (
+                this.canRsvp(
+                    this.event.attendance.level.current,
+                    this.guests,
+                    this.event.attendance.payload.currentUser.user.id,
+                    this.currentAttendanceStatus,
+                    this.numMax,
+                    this.numAvailable
+                ) ||
+                (this.isLimitedAttendance(this.numMax) && this.isAttendeesVisible()) ||
+                (this.canModify() && !this.isAttendanceLevelNone()) ||
+                this.isAttendeesVisible()
+            );
+        },
 
+        /**
+         * Whether you can edit this event,
+         * including whether you can delete an invitation
+         *
+         * @returns boolean
+         */
+        canModify() {
+            return this.event.canModify;
+        },
 
-            /**
-             * Whether you can edit this event,
-             * including whether you can delete an invitation
-             *
-             * @returns boolean
+        /**
+         * Whether you can invite people to this event
+         * Requires WRITE perm and free spaces under the current event configuration and setup
+         *
+         * @return boolean
+         */
+        canInviteAttendees() {
+            /* To invite others, you must
+             *   - be a staff member or the config var lets you invite others
+             *   - have available places
+             *   - be able to edit the event (you're its author)
              */
-            canModify() {
-                return this.event.canModify;
-            },
-
-
-            /**
-             * Whether you can invite people to this event
-             * Requires WRITE perm and free spaces under the current event configuration and setup
-             *
-             * @return boolean
-             */
-            canInviteAttendees() {
-
-                /* To invite others, you must
-                 *   - be a staff member or the config var lets you invite others
-                 *   - have available places
-                 *   - be able to edit the event (you're its author)
-                 */
-                if (this.canInvite && this.canModify()) {
-                    if ((this.isLimitedAttendance(this.numMax) && this.numAvailable) || !this.isLimitedAttendance(this.numMax)) {
-                        return true;
-                    }
-                }
-
-                return false;
-            },
-
-
-            /**
-             * Whether the list of attendees is visible to the current user
-             *
-             * @return boolean
-             */
-            isAttendeesVisible() {
-
-                /* If event has Attendance Level None, hide the panel
-                 */
-                if (this.isAttendanceLevelNone()) {
-                    return false;
-                }
-
-                /* If you've got write access, you can always see it
-                 * regardless of the showAttendees flag
-                 */
-                if (this.canModify()) {
+            if (this.canInvite && this.canModify()) {
+                if (
+                    (this.isLimitedAttendance(this.numMax) && this.numAvailable) ||
+                    !this.isLimitedAttendance(this.numMax)
+                ) {
                     return true;
                 }
+            }
 
-                /* Otherwise, check the showAttendees flag
-                 * If that's on, you can see it
-                 */
-                if (this.event.showAttendees) {
-                    return true;
-                }
+            return false;
+        },
 
-                /* Otherwise, it's hidden
-                 */
+        /**
+         * Whether the list of attendees is visible to the current user
+         *
+         * @return boolean
+         */
+        isAttendeesVisible() {
+            /* If event has Attendance Level None, hide the panel
+             */
+            if (this.isAttendanceLevelNone()) {
                 return false;
-            },
+            }
 
-
-            /**
-             * This event has a Attendance Level of None
+            /* If you've got write access, you can always see it
+             * regardless of the showAttendees flag
              */
-            isAttendanceLevelNone: function() {
-                return this.event.attendance.level.current === ATTENDANCE_LEVELS.NONE;
-            },
+            if (this.canModify()) {
+                return true;
+            }
 
-
-            /**
-             * Start searching for keyword
-             *
-             * @param query
-             * @param loading
+            /* Otherwise, check the showAttendees flag
+             * If that's on, you can see it
              */
-            onSearch(query, loading) {
-                loading(true);
-                this.search(loading, query, this);
-            },
+            if (this.event.showAttendees) {
+                return true;
+            }
 
-
-            /**
-             * Perform async request and load results into component
+            /* Otherwise, it's hidden
              */
-            search: debounce(function(loading, query, vm) {
-                fetch(ENDPOINTS.URL_SELECTIZE + '?' + new URLSearchParams({
-                    query: query,
-                    groupID: 0
-                }))
+            return false;
+        },
+
+        /**
+         * This event has a Attendance Level of None
+         */
+        isAttendanceLevelNone: function () {
+            return this.event.attendance.level.current === ATTENDANCE_LEVELS.NONE;
+        },
+
+        /**
+         * Start searching for keyword
+         *
+         * @param query
+         * @param loading
+         */
+        onSearch(query, loading) {
+            loading(true);
+            this.search(loading, query, this);
+        },
+
+        /**
+         * Perform async request and load results into component
+         */
+        search: debounce(function (loading, query, vm) {
+            fetch(
+                ENDPOINTS.URL_SELECTIZE +
+                    "?" +
+                    new URLSearchParams({
+                        query: query,
+                        groupID: 0,
+                    })
+            )
                 .then((response) => response.json())
                 .then((data) => {
                     vm.options = data;
                     loading(false);
                 });
-            }, 350),
+        }, 350),
 
-
-            showAudiencesModal() {
-                this.$refs.audiencesModal.open();
-            }
-        }
-
-    }
-
+        showAudiencesModal() {
+            this.$refs.audiencesModal.open();
+        },
+    },
+};
 </script>
 
 <template>
@@ -488,7 +491,9 @@
         <div class="small-12 columns">
             <div class="actions-small-1 row" v-if="canModify()">
                 <div class="list-item"></div>
-                <nav><a :href="this.ENDPOINTS.modifyPath(this.event.id)" class="icon-modify" title="Modify Event"></a></nav>
+                <nav>
+                    <a :href="this.ENDPOINTS.modifyPath(this.event.id)" class="icon-modify" title="Modify Event"></a>
+                </nav>
             </div>
         </div>
         <div class="small-12 medium-8 island">
@@ -499,16 +504,23 @@
                         <span>{{ dateDisplay }}</span>
                     </time>
                     <h1>{{ this.event.title }}</h1>
-                    <div class="event-type label" :style="{'background-color': this.event.options.type.color}">{{ this.event.options.type.name }}</div>
+                    <div class="event-type label" :style="{ 'background-color': this.event.options.type.color }">
+                        {{ this.event.options.type.name }}
+                    </div>
                 </div>
                 <div class="meta">
                     <span v-html="byLine"></span>
-                    <template v-if="audiencesMeta"> |
-                        <span v-if="this.isCampusEvent"><a @click="showAudiencesModal()">{{ audiencesMeta }}</a></span>
+                    <template v-if="audiencesMeta">
+                        |
+                        <span v-if="this.isCampusEvent"
+                            ><a @click="showAudiencesModal()">{{ audiencesMeta }}</a></span
+                        >
                         <span v-else-if="this.isPersonalEvent">{{ audiencesMeta }}</span>
                         <span v-else-if="this.isGroupEvent">
                             <span v-html="audiencesMeta"></span>
-                            <span v-if="this.event.audiences.folders.length > 1"> and <a @click="showAudiencesModal()">{{ showMoreGroups }}</a></span>
+                            <span v-if="this.event.audiences.folders.length > 1">
+                                and <a @click="showAudiencesModal()">{{ showMoreGroups }}</a></span
+                            >
                         </span>
                     </template>
                 </div>
@@ -530,68 +542,115 @@
 
             <template v-if="showGuestsPanel()">
                 <h2 class="subheader">Guests</h2>
-                    <template v-if="this.canRsvp(this.event.attendance.level.current, this.guests, this.event.attendance.payload.currentUser.user.id, this.currentAttendanceStatus, this.numMax, this.numAvailable)">
-                        <section class="content attending">
-                            <p><strong>Attending?</strong></p>
+                <template
+                    v-if="
+                        this.canRsvp(
+                            this.event.attendance.level.current,
+                            this.guests,
+                            this.event.attendance.payload.currentUser.user.id,
+                            this.currentAttendanceStatus,
+                            this.numMax,
+                            this.numAvailable
+                        )
+                    "
+                >
+                    <section class="content attending">
+                        <p><strong>Attending?</strong></p>
 
-                            <ul class="flex-list buttons rsvp">
-                                <li><a :href="this.ENDPOINTS.rsvpAcceptPath(this.event.id)" @click.prevent="rsvpAccept()" :class="{ accepted: this.isAccepted(this.currentAttendanceStatus) }">Yes</a></li>
-                                <li><a :href="this.ENDPOINTS.rsvpDeclinePath(this.event.id)" @click.prevent="rsvpDecline()" :class="{ declined: this.isDeclined(this.currentAttendanceStatus) }">No</a></li>
-                            </ul>
-                        </section>
-                    </template>
+                        <ul class="flex-list buttons rsvp">
+                            <li>
+                                <a
+                                    :href="this.ENDPOINTS.rsvpAcceptPath(this.event.id)"
+                                    @click.prevent="rsvpAccept()"
+                                    :class="{ accepted: this.isAccepted(this.currentAttendanceStatus) }"
+                                    >Yes</a
+                                >
+                            </li>
+                            <li>
+                                <a
+                                    :href="this.ENDPOINTS.rsvpDeclinePath(this.event.id)"
+                                    @click.prevent="rsvpDecline()"
+                                    :class="{ declined: this.isDeclined(this.currentAttendanceStatus) }"
+                                    >No</a
+                                >
+                            </li>
+                        </ul>
+                    </section>
+                </template>
 
-                    <section>
-                        <div class="content" v-if="(this.isLimitedAttendance(this.numMax) && isAttendeesVisible()) || canModify()">
-                            <span class="meta" v-if="this.isLimitedAttendance(this.numMax) && isAttendeesVisible()">
-                                <template v-if="this.numAvailable > 0">{{ this.numAvailable }}</template>
-                                <template v-else>No</template>
-                                available place(s) remaining
-                            </span>
+                <section>
+                    <div
+                        class="content"
+                        v-if="(this.isLimitedAttendance(this.numMax) && isAttendeesVisible()) || canModify()"
+                    >
+                        <span class="meta" v-if="this.isLimitedAttendance(this.numMax) && isAttendeesVisible()">
+                            <template v-if="this.numAvailable > 0">{{ this.numAvailable }}</template>
+                            <template v-else>No</template>
+                            available place(s) remaining
+                        </span>
 
-                            <template v-if="canInviteAttendees()">
-                                <v-select id="createAttendanceForm" :options="options" @search="onSearch" label="name" placeholder="Search for people to invite" v-model="selected">
-                                    <template #option="option">
-                                        <div class="d-center">
-                                            {{ option.name }}
-                                        </div>
-                                    </template>
-                                    <template #selected-option="option">
-                                        <div class="selected d-center">
-                                            {{ option.name }}
-                                        </div>
-                                    </template>
-                                </v-select>
-                            </template>
-                        </div>
+                        <template v-if="canInviteAttendees()">
+                            <v-select
+                                id="createAttendanceForm"
+                                :options="options"
+                                @search="onSearch"
+                                label="name"
+                                placeholder="Search for people to invite"
+                                v-model="selected"
+                            >
+                                <template #option="option">
+                                    <div class="d-center">
+                                        {{ option.name }}
+                                    </div>
+                                </template>
+                                <template #selected-option="option">
+                                    <div class="selected d-center">
+                                        {{ option.name }}
+                                    </div>
+                                </template>
+                            </v-select>
+                        </template>
+                    </div>
 
-                        <template v-if="isAttendeesVisible()">
-                            <p class="content"><strong>
-                                {{ numAccepted }} accepted,
-                                {{ numDeclined }} declined,
-                                {{ numPending }} pending
-                            </strong></p>
+                    <template v-if="isAttendeesVisible()">
+                        <p class="content">
+                            <strong>
+                                {{ numAccepted }} accepted, {{ numDeclined }} declined, {{ numPending }} pending
+                            </strong>
+                        </p>
 
-                            <ul class="action-list attendance-guest-list" v-if="guests">
-                                <li class="actions-small-1" v-for="guest in guests" :key="guest.id">
-                                    <div class="compact card small-11">
-                                        <a :href="'/search/user/' + guest.id" title="View Profile">
-                                            <img :src="'/portrait.php?id=' + guest.id + '&size=square64'" alt="portrait photo" />
+                        <ul class="action-list attendance-guest-list" v-if="guests">
+                            <li class="actions-small-1" v-for="guest in guests" :key="guest.id">
+                                <div class="compact card small-11">
+                                    <a :href="'/search/user/' + guest.id" title="View Profile">
+                                        <img
+                                            :src="'/portrait.php?id=' + guest.id + '&size=square64'"
+                                            alt="portrait photo"
+                                        />
 
-                                            <p :class="{
+                                        <p
+                                            :class="{
                                                 pending: isPending(guest.status),
                                                 accepted: isAccepted(guest.status),
-                                                declined: isDeclined(guest.status)
-                                            }">{{ guest.name }}<span class="status-icon"></span></p>
-                                        </a>
-                                    </div>
-                                    <nav>
-                                        <a class="icon-close no-text" v-if="canModify()" @click.prevent="rsvpDelete(guest.id, guest.name)" title="Remove guest"></a>
-                                    </nav>
-                                </li>
-                            </ul>
-                        </template>
-                    </section>
+                                                declined: isDeclined(guest.status),
+                                            }"
+                                        >
+                                            {{ guest.name }}<span class="status-icon"></span>
+                                        </p>
+                                    </a>
+                                </div>
+                                <nav>
+                                    <a
+                                        class="icon-close no-text"
+                                        v-if="canModify()"
+                                        @click.prevent="rsvpDelete(guest.id, guest.name)"
+                                        title="Remove guest"
+                                    ></a>
+                                </nav>
+                            </li>
+                        </ul>
+                    </template>
+                </section>
             </template>
         </div>
 
@@ -604,6 +663,5 @@
             :group-audiences="this.event.audiences.folders"
             :is-group="this.isGroupEvent"
         />
-
     </div>
 </template>

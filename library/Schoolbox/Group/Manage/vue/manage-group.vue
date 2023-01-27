@@ -1,23 +1,21 @@
 <script setup>
-
 /**
  * All the functionality to be able to manage a group
  */
 
-import { ref, onBeforeMount, onMounted } from 'vue';
-import Endpoints from './mgEndpoints';
-import { useStore } from './store/manageGroupStore';
-import { useMembersStore } from './store/mgMembersStore';
-import MgHeading from './mg-heading.vue';
-import LoadingTable from '@schoolboxVue/components/loading/loading-table';
-import MgAddMembers from './addMembers/mg-add-members.vue';
-import MgMembers from './currentMembers/mg-members.vue';
-import MgSelect from './currentMembers/mg-select.vue';
-import MgRemoveMembers from './currentMembers/mg-remove-members.vue';
-import MgUpdateSettings from './mg-update-settings.vue';
-import MgDisbandGroup from './mg-disband-group.vue';
-import Toast from '@schoolboxVue/components/toast.vue';
-
+import { ref, onBeforeMount, onMounted } from "vue";
+import Endpoints from "./mgEndpoints";
+import { useStore } from "./store/manageGroupStore";
+import { useMembersStore } from "./store/mgMembersStore";
+import MgHeading from "./mg-heading.vue";
+import LoadingTable from "@schoolboxVue/components/loading/loading-table";
+import MgAddMembers from "./addMembers/mg-add-members.vue";
+import MgMembers from "./currentMembers/mg-members.vue";
+import MgSelect from "./currentMembers/mg-select.vue";
+import MgRemoveMembers from "./currentMembers/mg-remove-members.vue";
+import MgUpdateSettings from "./mg-update-settings.vue";
+import MgDisbandGroup from "./mg-disband-group.vue";
+import Toast from "@schoolboxVue/components/toast.vue";
 
 const props = defineProps({
     /**
@@ -114,7 +112,7 @@ onBeforeMount(() => {
  */
 onMounted(() => {
     store.toastEl = toastEl;
-    store.showSetting = (props.showSetting === '1');
+    store.showSetting = props.showSetting === "1";
     store.groupStaffOnly = props.groupStaffOnly;
     // NOTE: Endpoints.SEND_EMAIL will be blank if the route is not authorised for the user
     store.emailEnabled = props.emailEnabled && Endpoints.SEND_EMAIL;
@@ -126,8 +124,8 @@ onMounted(() => {
  * When switching between stories, we need to reset the data models
  * as they persist between the stories otherwise
  */
-function checkForStorybook () {
-    if (typeof STORYBOOK_ENV !== 'undefined') {
+function checkForStorybook() {
+    if (typeof STORYBOOK_ENV !== "undefined") {
         store.$reset();
         useMembersStore().$reset();
     }
@@ -136,24 +134,27 @@ function checkForStorybook () {
 /**
  * Reload the page to try loading again
  */
-function onRefreshSelected () {
+function onRefreshSelected() {
     location.reload();
 }
-
 </script>
 
 <template>
     <mg-heading />
     <div v-if="store.isLoading" class="row">
         <div class="small-12 island">
-            <loading-table  />
+            <loading-table />
         </div>
     </div>
     <div v-else-if="store.hasLoadError" class="row">
         <div class="small-12 island">
             <section class="content">
                 <div tableData-alert class="alert-box alert">
-                    Sorry, we are currently unable to load this groups data. Please <a href="#refresh-page" title="refresh the page" @click.prevent="onRefreshSelected">refresh the page</a> to try again and contact your support if the problem persists.
+                    Sorry, we are currently unable to load this groups data. Please
+                    <a href="#refresh-page" title="refresh the page" @click.prevent="onRefreshSelected"
+                        >refresh the page</a
+                    >
+                    to try again and contact your support if the problem persists.
                 </div>
             </section>
         </div>

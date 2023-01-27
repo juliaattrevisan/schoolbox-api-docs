@@ -1,11 +1,9 @@
 <script>
-
 // Valid sizes from https://get.foundation/sites/docs-v5/bundle/reveal.html
-const VALID_SIZES = ['tiny', 'small', 'medium', 'large', 'xlarge', 'full'];
+const VALID_SIZES = ["tiny", "small", "medium", "large", "xlarge", "full"];
 
 export default {
-
-    emits: ['closed'],
+    emits: ["closed"],
 
     props: {
         /**
@@ -15,8 +13,8 @@ export default {
          */
         size: {
             type: String,
-            default: 'small',
-            validator: (value) => VALID_SIZES.indexOf(value) !== -1
+            default: "small",
+            validator: (value) => VALID_SIZES.indexOf(value) !== -1,
         },
 
         /**
@@ -42,14 +40,13 @@ export default {
         },
     },
 
-    data () {
+    data() {
         return {
-            elementId: 'reveal-modal-' + String(this.ucid),
-        }
+            elementId: "reveal-modal-" + String(this.ucid),
+        };
     },
 
-    beforeCreate () {
-
+    beforeCreate() {
         /**
          * Generate a really unique identifier
          * instances of reveal-modal may inadevertently generate conflicting identifier strings
@@ -59,8 +56,9 @@ export default {
          * https://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid
          */
         function uuidv4() {
-            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+            return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+                var r = (Math.random() * 16) | 0,
+                    v = c == "x" ? r : (r & 0x3) | 0x8;
                 return v.toString(16);
             });
         }
@@ -68,26 +66,23 @@ export default {
         this.ucid = uuidv4();
     },
 
-    mounted () {
+    mounted() {
         // How do I find the dialog in the DOM? ID probably needs to be unique
-        this.modal = $('#' + this.elementId);
+        this.modal = $("#" + this.elementId);
     },
 
     methods: {
-
         /**
          * Open this modal.
          */
-        open () {
-            this.modal.foundation(
-                'reveal',
-                'open',
-                { close_on_background_click: this.closeOnBackgroundClick }
-            );
-            $(document).on('closed.fndtn.reveal', '[data-reveal]', (event) => { //to respond to the modal closing when requried
-                if (this.elementId === event.target.id) { //can be multiple modals open at once
-                    this.$emit('closed');
-                    $(document).off('closed.fndtn.reveal');
+        open() {
+            this.modal.foundation("reveal", "open", { close_on_background_click: this.closeOnBackgroundClick });
+            $(document).on("closed.fndtn.reveal", "[data-reveal]", (event) => {
+                //to respond to the modal closing when requried
+                if (this.elementId === event.target.id) {
+                    //can be multiple modals open at once
+                    this.$emit("closed");
+                    $(document).off("closed.fndtn.reveal");
                 }
             });
         },
@@ -97,7 +92,7 @@ export default {
          *
          * @param { Event } select event
          */
-        onCloseSelected (event) {
+        onCloseSelected(event) {
             if (this.isCloseDisabled) {
                 event.stopImmediatePropagation();
             }
@@ -106,13 +101,11 @@ export default {
         /**
          * Close this modal.
          */
-        close () {
-            this.modal.foundation('reveal', 'close');
+        close() {
+            this.modal.foundation("reveal", "close");
         },
-
     },
-
-}
+};
 </script>
 
 <template>
@@ -124,9 +117,7 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-
 .xlarge {
     max-width: 80rem; //make wider for user-bulk-modify-new-values.vue
 }
-
 </style>

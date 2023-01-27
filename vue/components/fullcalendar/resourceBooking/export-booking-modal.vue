@@ -1,21 +1,14 @@
 <script>
-
 import RevealModal from "@schoolboxVue/components/reveal-modal";
-import qs          from 'qs';
+import qs from "qs";
 
 export default {
-
     name: "export-booking-modal",
 
     components: { RevealModal },
 
-    props: [
-        'token',
-        'bookingExportUrl',
-        'resourceId',
-        'bookingType',
-    ],
-    
+    props: ["token", "bookingExportUrl", "resourceId", "bookingType"],
+
     computed: {
         window: () => window,
 
@@ -25,19 +18,21 @@ export default {
             // Add token to object
             values.token = this.token;
 
-            if (this.bookingType === 'category') {
+            if (this.bookingType === "category") {
                 values.resource_category_id = this.resourceId;
             } else {
                 values.resource_id = this.resourceId;
             }
 
-            return this.window.location.protocol
-                + '//'
-                + this.window.location.host
-                + this.bookingExportUrl
-                + '?'
-                + qs.stringify(values);
-        }
+            return (
+                this.window.location.protocol +
+                "//" +
+                this.window.location.host +
+                this.bookingExportUrl +
+                "?" +
+                qs.stringify(values)
+            );
+        },
     },
 
     methods: {
@@ -46,11 +41,9 @@ export default {
          */
         open() {
             this.$refs.modal.open();
-        }
-    }
-
-}
-
+        },
+    },
+};
 </script>
 
 <template>

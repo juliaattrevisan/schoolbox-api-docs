@@ -1,35 +1,30 @@
 <script>
-
 /**
  * Display Log files to users
  */
 
-import RevealModal from '@schoolboxVue/components/reveal-modal';
-
+import RevealModal from "@schoolboxVue/components/reveal-modal";
 
 export default {
-
     components: {
         RevealModal,
     },
 
-    props: {
-    },
+    props: {},
 
-    data () {
+    data() {
         return {
             hasDataError: false,
             errorMessage: [], //text to display in the error div
             logData: [], //to display the output of the returned action
-        }
+        };
     },
 
     methods: {
-
         /**
          * emit listener
          */
-        displayLog (logData, hasDataError, errorMessage) {
+        displayLog(logData, hasDataError, errorMessage) {
             this.logData = logData;
             this.hasDataError = hasDataError;
             this.errorMessage = errorMessage;
@@ -39,20 +34,18 @@ export default {
         /**
          * Open the log modal
          */
-        onLogOpenSelected () {
+        onLogOpenSelected() {
             this.$refs.outputLogModal.open();
         },
 
         /**
          * Close the log modal
          */
-        onLogCloseSelected () {
+        onLogCloseSelected() {
             this.$refs.outputLogModal.close();
-        }
-
+        },
     },
-
-}
+};
 </script>
 
 <template>
@@ -70,10 +63,9 @@ export default {
 </template>
 
 <style lang="scss">
-
-textarea { //to prevent the potential for a massively long modal
+textarea {
+    //to prevent the potential for a massively long modal
     min-height: 200px;
     max-height: 600px;
 }
-
 </style>

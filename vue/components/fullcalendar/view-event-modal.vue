@@ -1,39 +1,38 @@
 <script>
-
-import RevealModal        from '@schoolboxVue/components/reveal-modal'
-import MetaList           from '@schoolboxVue/components/meta/list'
-import MetaItem           from '@schoolboxVue/components/meta/item'
-import fullCalendarHelper from '@schoolboxVue/components/fullcalendar/mixinFullCalendarHelper';
+import RevealModal from "@schoolboxVue/components/reveal-modal";
+import MetaList from "@schoolboxVue/components/meta/list";
+import MetaItem from "@schoolboxVue/components/meta/item";
+import fullCalendarHelper from "@schoolboxVue/components/fullcalendar/mixinFullCalendarHelper";
 
 /* Path aliases like @schoolboxCalendarEvent are defined in webpack.config.js
  */
-import {ATTENDANCE_STATUS} from '@schoolboxCalendarEvent/attendance-status';
-import {ENDPOINTS}         from '@schoolboxCalendarEvent/endpoints';
-import checks              from '@schoolboxCalendarEvent/checks';
+import { ATTENDANCE_STATUS } from "@schoolboxCalendarEvent/attendance-status";
+import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
+import checks from "@schoolboxCalendarEvent/checks";
 
-const EFFICACY_SELF = 'self';
-const EFFICACY_SERIES = 'series';
+const EFFICACY_SELF = "self";
+const EFFICACY_SERIES = "series";
 
-const EVENT_MODIFIED = 'eventModified';
-const EVENT_DELETED = 'eventDeleted';
+const EVENT_MODIFIED = "eventModified";
+const EVENT_DELETED = "eventDeleted";
 
 /* Initialise vars
-    *
-    * Mirrors backend Payload instance to prevent random js error about
-    * undefined vars being accessed; null operator doesn't work when supplying
-    * as an arg, apparently
-    *
-    * This gets updated asynchronously when modals open
-    */
+ *
+ * Mirrors backend Payload instance to prevent random js error about
+ * undefined vars being accessed; null operator doesn't work when supplying
+ * as an arg, apparently
+ *
+ * This gets updated asynchronously when modals open
+ */
 const INITIAL_PAYLOAD = {
     level: null,
     currentUser: {
         user: {
-            id: null
+            id: null,
         },
         status: null,
         canModify: null,
-        canInvite: null
+        canInvite: null,
     },
     attendees: {
         guests: [],
@@ -42,23 +41,20 @@ const INITIAL_PAYLOAD = {
         declined: null,
         max: null,
         num: null,
-        pending: null
-    }
+        pending: null,
+    },
 };
 
 export default {
-
     name: "view-event-modal",
 
     components: {
         MetaItem,
         MetaList,
-        RevealModal
+        RevealModal,
     },
 
-    mixins: [
-        fullCalendarHelper
-    ],
+    mixins: [fullCalendarHelper],
 
     props: {
         eventModifyFormUrl: {},
@@ -68,20 +64,20 @@ export default {
         formatDisplayDate: {},
         formatDisplayTime: {},
         formatDisplayDatetime: {},
-        returnUrl: {}
+        returnUrl: {},
     },
 
-    data () {
+    data() {
         return {
             payload: INITIAL_PAYLOAD,
             event: {},
 
             /* Keep track of when an async request is in progress, locking
-                * out other async requests until this has finished, preventing
-                * rsvp-button spamming
-                */
-            isTransacting: false
-        }
+             * out other async requests until this has finished, preventing
+             * rsvp-button spamming
+             */
+            isTransacting: false,
+        };
     },
 
     computed: {
@@ -101,20 +97,20 @@ export default {
             // Also need to render the event's buttons
 
             /* [Vue warn]: Error in render: "TypeError: Cannot read property 'extendedProps' of undefined"
-                *
-                * There's a weird modal overlay that now spawns, which can cause
-                * this.event to be undefined. That leads to subsequent crashes
-                * Therefore we now have to check whether this exists before using it
-                */
+             *
+             * There's a weird modal overlay that now spawns, which can cause
+             * this.event to be undefined. That leads to subsequent crashes
+             * Therefore we now have to check whether this exists before using it
+             */
             // if (this.event == undefined) {
             //     return;
             // }
 
             let event = this.event,
-                    data = event?.extendedProps?.data,
-                    metadata = data?.meta,
-                    modifyLink = null,
-                    deleteLink = null;
+                data = event?.extendedProps?.data,
+                metadata = data?.meta,
+                modifyLink = null,
+                deleteLink = null;
 
             // Modify/delete links
             if (metadata?.editable) {
@@ -150,17 +146,17 @@ export default {
                 },
                 dateSpan: this.determineDateSpan(event?.start, event?.end, event?.allDay),
                 booking: {
-                    isBooking: (data?.booking?.status || '').length,
+                    isBooking: (data?.booking?.status || "").length,
                     status: data?.booking?.status,
                     related: data?.booking?.related || [],
-                    actions: (data?.booking?.buttons || []).filter(button => button?.href),
+                    actions: (data?.booking?.buttons || []).filter((button) => button?.href),
                 },
                 timetable: {
                     code: data?.timetable?.code,
-                    staff: data?.timetable?.staff
+                    staff: data?.timetable?.staff,
                 },
                 attendance: {
-                    payload: this.payload
+                    payload: this.payload,
                 },
                 classAttendance: {
                     url: data?.classAttendance?.url,
@@ -174,13 +170,13 @@ export default {
                     view: data?.custom?.moreDetailsLink,
                     modify: modifyLink,
                     delete: deleteLink,
-                    path: data?.links?.path
+                    path: data?.links?.path,
                 },
             };
-        }
+        },
     },
 
-    created () {
+    created() {
         this.ENDPOINTS = ENDPOINTS;
         this.canRsvp = checks.canRsvp;
         this.showRsvpButtons = checks.showRsvpButtons;
@@ -195,7 +191,6 @@ export default {
     },
 
     methods: {
-
         /**
          * Decide whether the modal has component actions or not
          *
@@ -205,7 +200,8 @@ export default {
          * @return boolean
          */
         hasComponentActions() {
-            return this.eventExtendedProps.folder.id ||
+            return (
+                this.eventExtendedProps.folder.id ||
                 this.eventExtendedProps.links.path ||
                 this.eventExtendedProps.links.view ||
                 this.eventExtendedProps.links.modify ||
@@ -220,8 +216,8 @@ export default {
                     this.eventExtendedProps.attendance.payload.attendees.max,
                     this.eventExtendedProps.attendance.payload.attendees.available
                 )
+            );
         },
-
 
         /**
          * Accept an invitation
@@ -229,15 +225,13 @@ export default {
         rsvpAccept() {
             if (!this.isAccepted(this.eventExtendedProps.attendance.payload.currentUser.status)) {
                 if (!this.isTransacting) {
-
                     /* If you haven't already accepted,
-                        * async request to accept invitation
-                        */
+                     * async request to accept invitation
+                     */
                     this.rsvp(ATTENDANCE_STATUS.ACCEPTED, ENDPOINTS.rsvpAcceptPath(this.eventExtendedProps.eventId));
                 }
             }
         },
-
 
         /**
          * Decline an invitation
@@ -246,12 +240,14 @@ export default {
             if (this.isInvited(this.eventExtendedProps.attendance.payload.currentUser.status)) {
                 if (!this.isDeclined(this.eventExtendedProps.attendance.payload.currentUser.status)) {
                     if (!this.isTransacting) {
-                        this.rsvp(ATTENDANCE_STATUS.DECLINED, ENDPOINTS.rsvpDeclinePath(this.eventExtendedProps.eventId));
+                        this.rsvp(
+                            ATTENDANCE_STATUS.DECLINED,
+                            ENDPOINTS.rsvpDeclinePath(this.eventExtendedProps.eventId)
+                        );
                     }
                 }
             }
         },
-
 
         /**
          * Respond to an invitation with new status $status, using accept/decline endpoint $endpoint
@@ -261,55 +257,53 @@ export default {
          */
         rsvp(status, endpoint) {
             let self = this;
-            let toast = this.jQuery('[data-toast]');
+            let toast = this.jQuery("[data-toast]");
 
             /* Set a flag to prevent async spammage
-                */
+             */
             self.isTransacting = true;
 
             let request = {
                 url: endpoint,
-                method: 'post',
-                responseType: 'json'
-            }
+                method: "post",
+                responseType: "json",
+            };
 
             toast.toastActivate({
-                text: 'Updating invitation...'
+                text: "Updating invitation...",
             });
 
             fetch(request)
-                .then(response => {
-                    if(response.ok){
-                        return response.json()
+                .then((response) => {
+                    if (response.ok) {
+                        return response.json();
                     } else {
                         throw new Error(response.statusText);
                     }
                 })
-                .then(data => {
+                .then((data) => {
                     self.payload.currentUser.status = status;
                     self.payload.attendees = data.attendees;
 
-                    if (typeof self?.event?.extendedProps?.data?.attendance?.status === 'object') {
+                    if (typeof self?.event?.extendedProps?.data?.attendance?.status === "object") {
                         self.event.extendedProps.data.attendance.status.current = status;
-                        self.event.setExtendedProp('data', self.event.extendedProps.data);
+                        self.event.setExtendedProp("data", self.event.extendedProps.data);
                     }
                     toast.toastTimeout({
-                        text: 'Invitation successfully updated',
-                        css: 'success'
+                        text: "Invitation successfully updated",
+                        css: "success",
                     });
                 })
-                .catch(error => {
+                .catch((error) => {
                     toast.toastTimeout({
-                        text: 'Unable to update invitation. ' + error.response.data.message,
-                        css: 'alert'
+                        text: "Unable to update invitation. " + error.response.data.message,
+                        css: "alert",
                     });
                 })
                 .finally(function () {
                     self.isTransacting = false;
                 });
-
         },
-
 
         /**
          * Update whether the form can be submitted.
@@ -321,7 +315,6 @@ export default {
             this.$refs.eventSubmit.disabled = this.$refs.eventTitleInput.value.trim().length === 0;
         },
 
-
         /**
          * Persist changes to the event.
          *
@@ -331,59 +324,59 @@ export default {
             let self = this,
                 form = self.$refs.updateForm,
                 data = {
-                    eventId:   this.eventExtendedProps.eventId,
+                    eventId: this.eventExtendedProps.eventId,
                     completed: this.$refs.eventCompletedInput.checked ? 1 : 0,
-                    title:     this.$refs.eventTitleInput.value.trim(),
-                    detail:    this.$refs.eventDetailInput.value,
+                    title: this.$refs.eventTitleInput.value.trim(),
+                    detail: this.$refs.eventDetailInput.value,
                 },
-                toast = this.jQuery('[data-toast]');
+                toast = this.jQuery("[data-toast]");
 
             const formData = new FormData();
-            formData.append('eventId', data.eventId);
-            formData.append('completed', data.completed);
-            formData.append('title', data.title);
-            formData.append('detail', data.detail);
+            formData.append("eventId", data.eventId);
+            formData.append("completed", data.completed);
+            formData.append("title", data.title);
+            formData.append("detail", data.detail);
 
             toast.toastActivate({
-                text: 'Saving...'
+                text: "Saving...",
             });
 
             try {
                 const response = await fetch(form.action, {
                     method: form.method,
                     body: formData,
-                    responseType: 'json',
+                    responseType: "json",
                     headers: {
-                        'Accept': 'application/json',
-                    }
+                        Accept: "application/json",
+                    },
                 });
                 const responseData = await response.json();
                 if (response.ok) {
                     let eventData = Object.assign({}, self.event?.extendedProps?.data || {});
-                    if (typeof eventData?.meta === 'object') {
+                    if (typeof eventData?.meta === "object") {
                         eventData.meta.completed = Boolean(responseData?.data?.meta?.completed);
                         eventData.meta.detail = response?.data?.data?.meta?.detail;
                     }
-                    self.event.setExtendedProp('data', eventData);
-                    self.event.setProp('title', responseData?.title);
+                    self.event.setExtendedProp("data", eventData);
+                    self.event.setProp("title", responseData?.title);
                     self.$refs.modal.close();
                     toast.toastTimeout({
-                        text: 'Saved.',
-                        css: 'success'
+                        text: "Saved.",
+                        css: "success",
                     });
                 } else {
                     toast.toastTimeout({
-                        text: 'Unable to update task. ' + responseData.message,
-                        css: 'alert'
+                        text: "Unable to update task. " + responseData.message,
+                        css: "alert",
                     });
                 }
             } catch (error) {
                 console.warn(error);
                 toast.toastTimeout({
-                    text: 'Failed - ' + error.message,
-                    css: 'alert'
+                    text: "Failed - " + error.message,
+                    css: "alert",
                 });
-                submit.prop('disabled', false);
+                submit.prop("disabled", false);
             }
         },
 
@@ -394,58 +387,58 @@ export default {
             let self = this;
 
             /* Initialise data
-                */
+             */
             this.event = event;
             this.payload = INITIAL_PAYLOAD;
 
             /* Pop modal open
-                */
+             */
             this.$refs.modal.open();
 
             /* Non-numeric eventIds are ignored
-                * These could be hashes sourced from a third party, like the sis or a subscription
-                * In those cases, we can't do anything about their attendance
-                * We can only deal with attendance in our local db
-                */
+             * These could be hashes sourced from a third party, like the sis or a subscription
+             * In those cases, we can't do anything about their attendance
+             * We can only deal with attendance in our local db
+             */
             if (isNaN(this.eventExtendedProps.eventId)) {
                 return;
             }
 
             /* Events with the hasAttendance flag set to false should also exit early
-                * Beware that this flag has dual meaning: it also refers to the timetable events'
-                * ability to mark rolls for student attendance, in addition to the ability to invite
-                * people to attend your regular calendar events
-                */
+             * Beware that this flag has dual meaning: it also refers to the timetable events'
+             * ability to mark rolls for student attendance, in addition to the ability to invite
+             * people to attend your regular calendar events
+             */
             if (!this.event?.extendedProps?.data?.attendance?.hasAttendance) {
                 return;
             }
 
             /* Asynchronously fetch attendance payload
-                * This will update the modal in realtime when it's ready
-                */
+             * This will update the modal in realtime when it's ready
+             */
             let request = {
                 url: ENDPOINTS.payloadPath(this.eventExtendedProps.eventId),
-                method: 'get',
-                responseType: 'json'
-            }
+                method: "get",
+                responseType: "json",
+            };
 
             fetch(request)
-                .then(response => {
-                    if(response.ok){
-                        return response.json()
+                .then((response) => {
+                    if (response.ok) {
+                        return response.json();
                     } else {
                         throw new Error(response.statusText);
                     }
                 })
-                .then(data => {
+                .then((data) => {
                     self.payload = data;
                 })
-                .catch(error => {
+                .catch((error) => {
                     /* Attendance won't be available for some events such as those
-                         * streamed from a third party source, or a sis; looking for their
-                         * identifying hashes will result in 404 because they won't exist
-                         * in our local db
-                         */
+                     * streamed from a third party source, or a sis; looking for their
+                     * identifying hashes will result in 404 because they won't exist
+                     * in our local db
+                     */
                 });
         },
 
@@ -457,9 +450,9 @@ export default {
          * @param allDay
          * @return {string}
          */
-        determineDateSpan (startDate, endDate, allDay) {
+        determineDateSpan(startDate, endDate, allDay) {
             if (!startDate) {
-                return '';
+                return "";
             }
             const format = allDay ? this.formatDisplayDate : this.formatDisplayDatetime;
             const startDateFormatted = dayjs(startDate).format(format);
@@ -471,15 +464,19 @@ export default {
                     // This means that all-day events from the event source
                     // have had their end date incremented by one day:
                     // roll it back for rendering the user-visible end.
-                    endDateFormatted = dayjs(endDate).subtract(1, 'd').format(format);
+                    endDateFormatted = dayjs(endDate).subtract(1, "d").format(format);
                 } else {
                     endDateFormatted = dayjs(endDate).format(format);
                 }
             }
 
-            if (dayjs(endDate) && dayjs(endDate).isValid() && !dayjs(startDate).isSame(dayjs(endDate).subtract(1, 'd'))) {
+            if (
+                dayjs(endDate) &&
+                dayjs(endDate).isValid() &&
+                !dayjs(startDate).isSame(dayjs(endDate).subtract(1, "d"))
+            ) {
                 // Start and end aren't the same - stitch them together.
-                if (!allDay && dayjs(startDate).isSame(dayjs(endDate), 'day')) {
+                if (!allDay && dayjs(startDate).isSame(dayjs(endDate), "day")) {
                     // Between two times on the same day - show the timespan but only one date
                     return startDateFormatted + " – " + dayjs(endDate).format(this.formatDisplayTime);
                 } else {
@@ -499,7 +496,7 @@ export default {
          */
         clickBookingButton($event) {
             switch ($event.target.dataset.bookingAction) {
-                case 'approve':
+                case "approve":
                     $event.preventDefault();
                     if (this.eventExtendedProps.seriesId) {
                         this.$refs.bookingApproveSeriesModal.open();
@@ -508,7 +505,7 @@ export default {
                     }
                     break;
 
-                case 'reject':
+                case "reject":
                     $event.preventDefault();
                     if (this.eventExtendedProps.seriesId) {
                         this.$refs.bookingRejectSeriesModal.open();
@@ -517,12 +514,12 @@ export default {
                     }
                     break;
 
-                case 'cancel':
+                case "cancel":
                     $event.preventDefault();
                     this.$refs.bookingDeleteModal.open();
                     break;
 
-                case 'modify':
+                case "modify":
                 default:
                     // Just follow the link
                     break;
@@ -597,26 +594,26 @@ export default {
             this.$refs.eventDeleteModal.close();
             let data = {
                 id: this.eventExtendedProps.eventId,
-                action: 'Delete',
+                action: "Delete",
                 efficacy: efficacy,
             };
             fetch(this.eventExtendedProps.links.delete, {
-                method: 'POST',
+                method: "POST",
                 body: JSON.stringify(data),
                 headers: {
-                    'Content-Type': 'application/json'
-                }
+                    "Content-Type": "application/json",
+                },
             })
-                .then(response => {
-                    if(response.ok){
+                .then((response) => {
+                    if (response.ok) {
                         return response;
-                    }else {
+                    } else {
                         throw new Error(response.statusText);
                     }
                 })
                 .then(() => this.event.remove())
                 .then(() => this.$emit(EVENT_DELETED, this.event))
-                .catch(error => {
+                .catch((error) => {
                     console.error(error);
                 });
         },
@@ -632,28 +629,30 @@ export default {
         bookingDelete(efficacy) {
             this.$refs.bookingDeleteModal.close();
             let data = {
-                efficacy: efficacy,
-            }, cancelActionUrl = this.eventExtendedProps.booking.actions.find(action => action.action === 'cancel').href;
+                    efficacy: efficacy,
+                },
+                cancelActionUrl = this.eventExtendedProps.booking.actions.find(
+                    (action) => action.action === "cancel"
+                ).href;
             fetch(cancelActionUrl, {
-                method: 'POST',
+                method: "POST",
                 body: JSON.stringify(data),
                 headers: {
-                    'Content-Type': 'application/json'
-                }
+                    "Content-Type": "application/json",
+                },
             })
-                .then(response => {
-                    if(response.ok){
+                .then((response) => {
+                    if (response.ok) {
                         return response;
-                    }else {
+                    } else {
                         throw new Error(response.statusText);
                     }
                 })
                 .then(() => this.event.remove())
                 .then(() => this.$emit(EVENT_DELETED, this.event))
-                .catch(error => {
+                .catch((error) => {
                     console.error(error);
                 });
-
         },
 
         /**
@@ -667,28 +666,30 @@ export default {
         bookingApprove(efficacy) {
             this.$refs.bookingApproveSeriesModal.close();
             let data = {
-                efficacy: efficacy,
-            }, approveActionUrl = this.eventExtendedProps.booking.actions.find(action => action.action === 'approve').href;
+                    efficacy: efficacy,
+                },
+                approveActionUrl = this.eventExtendedProps.booking.actions.find(
+                    (action) => action.action === "approve"
+                ).href;
             fetch(approveActionUrl, {
-                method: 'POST',
+                method: "POST",
                 body: JSON.stringify(data),
                 headers: {
-                    'Content-Type': 'application/json'
-                }
+                    "Content-Type": "application/json",
+                },
             })
-                .then(response => {
-                    if(response.ok){
+                .then((response) => {
+                    if (response.ok) {
                         return response;
-                    }else {
+                    } else {
                         throw new Error(response.statusText);
                     }
                 })
                 .then(() => this.event.remove())
                 .then(() => this.$emit(EVENT_MODIFIED, this.event))
-                .catch(error => {
+                .catch((error) => {
                     console.error(error);
                 });
-
         },
 
         /**
@@ -702,90 +703,81 @@ export default {
         bookingReject(efficacy) {
             this.$refs.bookingRejectSeriesModal.close();
             let data = {
-                efficacy: efficacy,
-            }, rejectActionUrl = this.eventExtendedProps.booking.actions.find(action => action.action === 'reject').href;
+                    efficacy: efficacy,
+                },
+                rejectActionUrl = this.eventExtendedProps.booking.actions.find(
+                    (action) => action.action === "reject"
+                ).href;
             fetch(rejectActionUrl, {
-                method: 'POST',
+                method: "POST",
                 body: JSON.stringify(data),
                 headers: {
-                    'Content-Type': 'application/json'
-                }
+                    "Content-Type": "application/json",
+                },
             })
-                .then(response => {
-                    if(response.ok){
+                .then((response) => {
+                    if (response.ok) {
                         return response;
-                    }else {
+                    } else {
                         throw new Error(response.statusText);
                     }
                 })
                 .then(() => this.event.remove())
                 .then(() => this.$emit(EVENT_MODIFIED, this.event))
-                .catch(error => {
+                .catch((error) => {
                     console.error(error);
                 });
-
         },
     },
-}
-
+};
 </script>
 
 <template>
     <reveal-modal ref="modal" size="medium">
         <template v-if="eventExtendedProps.editable && eventExtendedProps.task.isTask">
             <form ref="updateForm" method="post" :action="eventUpdateUrl" @submit.prevent="updateEvent">
-                <input ref="eventIdInput"
-                       name="eventId"
-                       type="hidden"
-                       :value="eventExtendedProps.eventId"
-                />
+                <input ref="eventIdInput" name="eventId" type="hidden" :value="eventExtendedProps.eventId" />
 
                 <!-- Currently only tasks have this form -->
                 <h3>Task</h3>
 
-                <label>
-                    Due {{ eventExtendedProps.dateSpan }}
-                </label>
+                <label> Due {{ eventExtendedProps.dateSpan }} </label>
 
-                <input ref="eventCompletedInput"
-                       id="modifyTaskBubbleCompleted"
-                       name="completed"
-                       type="checkbox"
-                       value="1"
-                       :checked="eventExtendedProps.task.completed"
+                <input
+                    ref="eventCompletedInput"
+                    id="modifyTaskBubbleCompleted"
+                    name="completed"
+                    type="checkbox"
+                    value="1"
+                    :checked="eventExtendedProps.task.completed"
                 />
-                <label for="modifyTaskBubbleCompleted" class="checkbox-label">
-                    Complete
-                </label>
+                <label for="modifyTaskBubbleCompleted" class="checkbox-label"> Complete </label>
 
-                <label class="required" for="modifyTaskBubbleTitle">
-                    Task
-                </label>
-                <input id="modifyTaskBubbleTitle"
-                       ref="eventTitleInput"
-                       name="title"
-                       type="text"
-                       :value="event.title"
-                       @change="updateFormSubmittable"
-                       @keyup="updateFormSubmittable"
-                       maxlength="250"
+                <label class="required" for="modifyTaskBubbleTitle"> Task </label>
+                <input
+                    id="modifyTaskBubbleTitle"
+                    ref="eventTitleInput"
+                    name="title"
+                    type="text"
+                    :value="event.title"
+                    @change="updateFormSubmittable"
+                    @keyup="updateFormSubmittable"
+                    maxlength="250"
                 />
 
                 <label class="detail">
                     Note
-                    <textarea ref="eventDetailInput"
-                              name="detail"
-                              :value="eventExtendedProps.detail"
-                              @change="updateFormSubmittable"
-                              @keyup="updateFormSubmittable"
+                    <textarea
+                        ref="eventDetailInput"
+                        name="detail"
+                        :value="eventExtendedProps.detail"
+                        @change="updateFormSubmittable"
+                        @keyup="updateFormSubmittable"
                     ></textarea>
                 </label>
 
                 <ul class="flex-list buttons">
-                    <li><input ref="eventSubmit"
-                               type="submit"
-                               value="Update Task" />
-                    </li>
+                    <li><input ref="eventSubmit" type="submit" value="Update Task" /></li>
                     <li><button @click.prevent="$refs.eventDeleteModal.open">Delete Task</button></li>
                 </ul>
             </form>
@@ -793,7 +785,9 @@ export default {
 
         <template v-else>
             <template v-if="eventExtendedProps.links.path">
-                <a :href="eventExtendedProps.links.path" title="Go to event page"><h2>{{ event.title }}</h2></a>
+                <a :href="eventExtendedProps.links.path" title="Go to event page"
+                    ><h2>{{ event.title }}</h2></a
+                >
             </template>
             <template v-else>
                 <h2 :class="eventExtendedProps.classCancelled">{{ event.title }}</h2>
@@ -802,40 +796,68 @@ export default {
                 <template v-if="eventExtendedProps.timetable.code && eventExtendedProps.timetable.code.length">
                     <meta-item class="icon-info">{{ eventExtendedProps.timetable.code }}</meta-item>
                 </template>
-                <meta-item class="icon-resource-booking" v-if="eventExtendedProps.booking.status">{{ eventExtendedProps.booking.status.name }}</meta-item>
-                <meta-item class="icon-calendar" v-if="eventExtendedProps.dateSpan">{{ eventExtendedProps.dateSpan }}</meta-item>
-                <meta-item class="icon-location" v-if="eventExtendedProps.location">{{ eventExtendedProps.location }}</meta-item>
-                <meta-item class="icon-staff-students" v-if="eventExtendedProps.author.id">Posted by <a :href="'/search/user/' + String(eventExtendedProps.author.id)">{{ eventExtendedProps.author.name }}</a></meta-item>
-                <meta-item class="icon-staff-students" v-if="eventExtendedProps.reviewer.id">Reviewed by <a :href="'/search/user/' + String(eventExtendedProps.reviewer.id)">{{ eventExtendedProps.reviewer.name }}</a></meta-item>
-                <template v-if="eventExtendedProps.timetable.staff && Object.keys(eventExtendedProps.timetable.staff).length">
+                <meta-item class="icon-resource-booking" v-if="eventExtendedProps.booking.status">{{
+                    eventExtendedProps.booking.status.name
+                }}</meta-item>
+                <meta-item class="icon-calendar" v-if="eventExtendedProps.dateSpan">{{
+                    eventExtendedProps.dateSpan
+                }}</meta-item>
+                <meta-item class="icon-location" v-if="eventExtendedProps.location">{{
+                    eventExtendedProps.location
+                }}</meta-item>
+                <meta-item class="icon-staff-students" v-if="eventExtendedProps.author.id"
+                    >Posted by
+                    <a :href="'/search/user/' + String(eventExtendedProps.author.id)">{{
+                        eventExtendedProps.author.name
+                    }}</a></meta-item
+                >
+                <meta-item class="icon-staff-students" v-if="eventExtendedProps.reviewer.id"
+                    >Reviewed by
+                    <a :href="'/search/user/' + String(eventExtendedProps.reviewer.id)">{{
+                        eventExtendedProps.reviewer.name
+                    }}</a></meta-item
+                >
+                <template
+                    v-if="eventExtendedProps.timetable.staff && Object.keys(eventExtendedProps.timetable.staff).length"
+                >
                     <meta-item class="icon-staff">
                         <template v-for="(name, id, index) in eventExtendedProps.timetable.staff" :key="id">
                             <template v-if="id">
                                 <a :href="'/search/user/' + String(id)">{{ name }}</a>
                             </template>
-                            <template v-else>{{ name }}</template><span v-if="index != Object.keys(eventExtendedProps.timetable.staff).length - 1">, </span>
+                            <template v-else>{{ name }}</template
+                            ><span v-if="index != Object.keys(eventExtendedProps.timetable.staff).length - 1">, </span>
                         </template>
                     </meta-item>
                 </template>
-                <meta-item class="icon-class-list" v-if="this.showAttendanceMeta(eventExtendedProps.attendance.payload.level)">
+                <meta-item
+                    class="icon-class-list"
+                    v-if="this.showAttendanceMeta(eventExtendedProps.attendance.payload.level)"
+                >
                     Attendance:
                     <template v-if="isInviteOnly(eventExtendedProps.attendance.payload.level)">Invite only</template>
                     <template v-else-if="isOpen(eventExtendedProps.attendance.payload.level)">Open</template>
 
-                    <template v-if="this.canRsvp(
-                        eventExtendedProps.attendance.payload.level,
-                        eventExtendedProps.attendance.payload.attendees.guests,
-                        eventExtendedProps.attendance.payload.currentUser.user.id,
-                        eventExtendedProps.attendance.payload.currentUser.status,
-                        eventExtendedProps.attendance.payload.attendees.max,
-                        eventExtendedProps.attendance.payload.attendees.available)
-                        &&
-                        this.isLimitedAttendance(eventExtendedProps.attendance.payload.attendees.max)
-                    ">
-                        (<template v-if="eventExtendedProps.attendance.payload.attendees.available > 0">{{ eventExtendedProps.attendance.payload.attendees.available }}</template>
+                    <template
+                        v-if="
+                            this.canRsvp(
+                                eventExtendedProps.attendance.payload.level,
+                                eventExtendedProps.attendance.payload.attendees.guests,
+                                eventExtendedProps.attendance.payload.currentUser.user.id,
+                                eventExtendedProps.attendance.payload.currentUser.status,
+                                eventExtendedProps.attendance.payload.attendees.max,
+                                eventExtendedProps.attendance.payload.attendees.available
+                            ) && this.isLimitedAttendance(eventExtendedProps.attendance.payload.attendees.max)
+                        "
+                    >
+                        (<template v-if="eventExtendedProps.attendance.payload.attendees.available > 0">{{
+                            eventExtendedProps.attendance.payload.attendees.available
+                        }}</template>
                         <template v-else>No</template>
                         available
-                        <template v-if="eventExtendedProps.attendance.payload.attendees.available === 1">place</template>
+                        <template v-if="eventExtendedProps.attendance.payload.attendees.available === 1"
+                            >place</template
+                        >
                         <template v-else>places</template>
                         remaining)
                     </template>
@@ -865,20 +887,47 @@ export default {
             <template v-if="hasComponentActions()">
                 <div class="component-action">
                     <section>
-                        <template v-if="this.canRsvp(
+                        <template
+                            v-if="
+                                this.canRsvp(
                                     eventExtendedProps.attendance.payload.level,
                                     eventExtendedProps.attendance.payload.attendees.guests,
                                     eventExtendedProps.attendance.payload.currentUser.user.id,
                                     eventExtendedProps.attendance.payload.currentUser.status,
                                     eventExtendedProps.attendance.payload.attendees.max,
-                                    eventExtendedProps.attendance.payload.attendees.available)">
+                                    eventExtendedProps.attendance.payload.attendees.available
+                                )
+                            "
+                        >
                             <div :class="'rsvp'">
                                 <span :class="'attend-label'">Attending?</span>
                                 <span>
-                                    <a :href="this.ENDPOINTS.rsvpAcceptPath(this.eventExtendedProps.eventId)" @click.prevent="rsvpAccept" :class="{ button: true, accepted: this.isAccepted(eventExtendedProps.attendance.payload.currentUser.status) }" data-rsvp="accept">Yes</a>
+                                    <a
+                                        :href="this.ENDPOINTS.rsvpAcceptPath(this.eventExtendedProps.eventId)"
+                                        @click.prevent="rsvpAccept"
+                                        :class="{
+                                            button: true,
+                                            accepted: this.isAccepted(
+                                                eventExtendedProps.attendance.payload.currentUser.status
+                                            ),
+                                        }"
+                                        data-rsvp="accept"
+                                        >Yes</a
+                                    >
                                 </span>
                                 <span>
-                                    <a :href="this.ENDPOINTS.rsvpDeclinePath(this.eventExtendedProps.eventId)" @click.prevent="rsvpDecline" :class="{ button: true, declined: this.isDeclined(eventExtendedProps.attendance.payload.currentUser.status) }" data-rsvp="decline">No</a>
+                                    <a
+                                        :href="this.ENDPOINTS.rsvpDeclinePath(this.eventExtendedProps.eventId)"
+                                        @click.prevent="rsvpDecline"
+                                        :class="{
+                                            button: true,
+                                            declined: this.isDeclined(
+                                                eventExtendedProps.attendance.payload.currentUser.status
+                                            ),
+                                        }"
+                                        data-rsvp="decline"
+                                        >No</a
+                                    >
                                 </span>
                             </div>
                         </template>
@@ -892,33 +941,41 @@ export default {
                                 <a class="button" :href="eventExtendedProps.links.path">View details</a>
                             </span>
                             <span v-if="eventExtendedProps.folder.id">
-                                <a class="button"
-                                   :href="'/homepage/' + String(eventExtendedProps.folder.id)">Go to homepage</a>
+                                <a class="button" :href="'/homepage/' + String(eventExtendedProps.folder.id)"
+                                    >Go to homepage</a
+                                >
                             </span>
                             <span v-if="eventExtendedProps.links.view">
-                                <a class="button"
-                                   :href="eventExtendedProps.links.view">View More Details</a>
+                                <a class="button" :href="eventExtendedProps.links.view">View More Details</a>
                             </span>
                             <span v-if="eventExtendedProps.classAttendance.url">
-                                <a class="button"
-                                   :href="eventExtendedProps.classAttendance.url"
-                                   :target="eventExtendedProps.classAttendance.target">Mark Attendance</a>
+                                <a
+                                    class="button"
+                                    :href="eventExtendedProps.classAttendance.url"
+                                    :target="eventExtendedProps.classAttendance.target"
+                                    >Mark Attendance</a
+                                >
                             </span>
                             <span v-if="eventExtendedProps.links.modify">
-                                <a class="button"
-                                   :href="eventExtendedProps.links.modify">Modify</a>
+                                <a class="button" :href="eventExtendedProps.links.modify">Modify</a>
                             </span>
                             <span v-if="eventExtendedProps.links.delete">
-                                <a class="button"
-                                   :href="eventExtendedProps.links.delete"
-                                   @click.prevent="$refs.eventDeleteModal.open">Delete</a>
+                                <a
+                                    class="button"
+                                    :href="eventExtendedProps.links.delete"
+                                    @click.prevent="$refs.eventDeleteModal.open"
+                                    >Delete</a
+                                >
                             </span>
                             <!-- Booking buttons: handle random events -->
                             <span v-for="(action, index) in eventExtendedProps.booking.actions" :key="index">
-                                <a class="button"
-                                   :data-booking-action="String(action.action)"
-                                   @click="clickBookingButton($event)"
-                                   :href="action.href || '#'">{{ action.label }}</a>
+                                <a
+                                    class="button"
+                                    :data-booking-action="String(action.action)"
+                                    @click="clickBookingButton($event)"
+                                    :href="action.href || '#'"
+                                    >{{ action.label }}</a
+                                >
                             </span>
                         </div>
                     </section>
@@ -940,7 +997,6 @@ export default {
             <template v-else></template>
         </template>
 
-
         <!-- Modals within a modal you say? Sure, why not? -->
         <reveal-modal ref="eventDeleteModal">
             <template v-if="eventExtendedProps.seriesId">
@@ -948,7 +1004,11 @@ export default {
                 <p>Would you like to delete only this event, or all in the series?</p>
                 <ul class="flex-list buttons">
                     <li><a href="#" class="button" @click.prevent="confirmEventDeleteSelf">Only this event</a></li>
-                    <li><a href="#" class="button" @click.prevent="confirmEventDeleteSeries">All events in the series</a></li>
+                    <li>
+                        <a href="#" class="button" @click.prevent="confirmEventDeleteSeries"
+                            >All events in the series</a
+                        >
+                    </li>
                     <li><a href="#" class="button" @click.prevent="$refs.eventDeleteModal.close">Cancel</a></li>
                 </ul>
             </template>
@@ -973,7 +1033,11 @@ export default {
                 </p>
                 <ul class="flex-list buttons">
                     <li><a href="#" class="button" @click.prevent="confirmBookingDeleteSelf">Only this booking</a></li>
-                    <li><a href="#" class="button" @click.prevent="confirmBookingDeleteSeries">All bookings in the series</a></li>
+                    <li>
+                        <a href="#" class="button" @click.prevent="confirmBookingDeleteSeries"
+                            >All bookings in the series</a
+                        >
+                    </li>
                     <li><a href="#" class="button" @click.prevent="$refs.bookingDeleteModal.close">Cancel</a></li>
                 </ul>
             </template>
@@ -997,7 +1061,9 @@ export default {
             <p>Would you like to approve only this booking, or all in the series?</p>
             <ul class="flex-list buttons">
                 <li><a href="#" class="button" @click.prevent="confirmBookingApproveSelf">Only this event</a></li>
-                <li><a href="#" class="button" @click.prevent="confirmBookingApproveSeries">All events in the series</a></li>
+                <li>
+                    <a href="#" class="button" @click.prevent="confirmBookingApproveSeries">All events in the series</a>
+                </li>
                 <li><a href="#" class="button" @click.prevent="$refs.bookingApproveSeriesModal.close">Cancel</a></li>
             </ul>
         </reveal-modal>
@@ -1007,7 +1073,9 @@ export default {
             <p>Would you like to reject only this booking, or all in the series?</p>
             <ul class="flex-list buttons">
                 <li><a href="#" class="button" @click.prevent="confirmBookingRejectSelf">Only this event</a></li>
-                <li><a href="#" class="button" @click.prevent="confirmBookingRejectSeries">All events in the series</a></li>
+                <li>
+                    <a href="#" class="button" @click.prevent="confirmBookingRejectSeries">All events in the series</a>
+                </li>
                 <li><a href="#" class="button" @click.prevent="$refs.bookingRejectSeriesModal.close">Cancel</a></li>
             </ul>
         </reveal-modal>

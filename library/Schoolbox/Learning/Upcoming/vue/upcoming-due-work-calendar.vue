@@ -1,61 +1,56 @@
 <script>
-
-import FullCalendar       			from '@fullcalendar/vue3'
-import interactionPlugin  			from '@fullcalendar/interaction'
-import dayGridPlugin      			from '@fullcalendar/daygrid'
-import timeGridPlugin     			from '@fullcalendar/timegrid'
-import listPlugin         			from '@fullcalendar/list'
-import adaptivePlugin     			from '@fullcalendar/adaptive'
-import RevealModal        			from '@schoolboxVue/components/reveal-modal'
-import ViewEventModal     			from '@schoolboxVue/components/fullcalendar/view-event-modal';
-import FlatPickr          			from '@schoolboxVue/components/fullcalendar/flat-pickr';
-import axios              			from 'axios'
-import fullCalendarHelper           from '@schoolboxVue/components/fullcalendar/mixinFullCalendarHelper';
-import {stringify}        			from 'qs';
-import CustomisedCalendarEvent	  	from '@schoolboxVue/components/fullcalendar/customised-calendar-event';
-
+import FullCalendar from "@fullcalendar/vue3";
+import interactionPlugin from "@fullcalendar/interaction";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import timeGridPlugin from "@fullcalendar/timegrid";
+import listPlugin from "@fullcalendar/list";
+import adaptivePlugin from "@fullcalendar/adaptive";
+import RevealModal from "@schoolboxVue/components/reveal-modal";
+import ViewEventModal from "@schoolboxVue/components/fullcalendar/view-event-modal";
+import FlatPickr from "@schoolboxVue/components/fullcalendar/flat-pickr";
+import axios from "axios";
+import fullCalendarHelper from "@schoolboxVue/components/fullcalendar/mixinFullCalendarHelper";
+import { stringify } from "qs";
+import CustomisedCalendarEvent from "@schoolboxVue/components/fullcalendar/customised-calendar-event";
 
 // Various URLs that FullCalendar may make use of.
-const URL_EVENT_SOURCE = '/learning/due/events';
-const URL_EVENT_EXPORT = '/calendar/export.php';
+const URL_EVENT_SOURCE = "/learning/due/events";
+const URL_EVENT_EXPORT = "/calendar/export.php";
 
-const FORMAT_FORM_DATE = 'DD-MM-YYYY';
-const FORMAT_FORM_DATETIME = 'DD-MM-YYYY HH:mm';
+const FORMAT_FORM_DATE = "DD-MM-YYYY";
+const FORMAT_FORM_DATETIME = "DD-MM-YYYY HH:mm";
 
 // TODO let display formats be configurable
-const FORMAT_DISPLAY_DATE = 'ddd Do MMM';
-const FORMAT_DISPLAY_TIME = 'h:mma';
-const FORMAT_DISPLAY_DATETIME = 'ddd Do MMM, h:mma';
-const FORMAT_DISPLAY_WEEK_DAY = 'ddd D/M';
+const FORMAT_DISPLAY_DATE = "ddd Do MMM";
+const FORMAT_DISPLAY_TIME = "h:mma";
+const FORMAT_DISPLAY_DATETIME = "ddd Do MMM, h:mma";
+const FORMAT_DISPLAY_WEEK_DAY = "ddd D/M";
 
 export default {
-
-    name: 'upcoming-due-work-calendar',
+    name: "upcoming-due-work-calendar",
 
     components: {
         ViewEventModal,
         FullCalendar,
         RevealModal,
         FlatPickr,
-		CustomisedCalendarEvent
+        CustomisedCalendarEvent,
     },
 
-    mixins: [
-        fullCalendarHelper
-    ],
+    mixins: [fullCalendarHelper],
 
-    data () {
+    data() {
         return {
             calendarApi: null, //to access the underlying calendar object
             selectedFilters: null,
-            calendarOptions: {} //will init in beforeMount due to vars being needed
-        }
+            calendarOptions: {}, //will init in beforeMount due to vars being needed
+        };
     },
 
     computed: {
         jQuery: () => window.jQuery,
         config: () => window.fullCalendarConfig,
-        formats () {
+        formats() {
             return {
                 formDate: FORMAT_FORM_DATE,
                 formDatetime: FORMAT_FORM_DATETIME,
@@ -67,16 +62,16 @@ export default {
         },
     },
 
-    beforeMount () {
+    beforeMount() {
         this.calendarOptions = {
             schedulerLicenseKey: this.config.schedulerLicenseKey,
-            plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, adaptivePlugin ],
+            plugins: [interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, adaptivePlugin],
             views: {
                 day: {
                     dayHeaders: false,
                     titleFormat: (date) => {
                         return dayjs(date.date.array).format(this.config.dateDisplayFormats.dayjsDateLong); // will produce something like "Tuesday July 16th 2021"
-                    }
+                    },
                 },
                 week: {
                     dayHeaderFormat: (date) => {
@@ -84,7 +79,7 @@ export default {
                     },
                     titleFormat: (date) => {
                         return this.fullCalendarHelper_titleFormatWeek(date);
-                    }
+                    },
                 },
             },
             eventTimeFormat: (date) => {
@@ -92,62 +87,58 @@ export default {
             },
             customButtons: {
                 quickSwitchButton: {
-                    text: ' ',
+                    text: " ",
                 },
                 customPrev: {
-                    icon: 'chevron-left',
+                    icon: "chevron-left",
                     click: this.clickPrev,
                 },
                 customNext: {
-                    icon: 'chevron-right',
+                    icon: "chevron-right",
                     click: this.clickNext,
                 },
                 customToday: {
-                    text: 'Today',
+                    text: "Today",
                     click: this.clickToday,
                 },
             },
             headerToolbar: {
-                left: 'quickSwitchButton,customToday,customPrev,customNext',
-                center: 'title',
-                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                left: "quickSwitchButton,customToday,customPrev,customNext",
+                center: "title",
+                right: "dayGridMonth,timeGridWeek,timeGridDay",
             },
             buttonText: {
-                today: 'Today',
-                month: 'Month',
-                week: 'Week',
-                day: 'Day'
+                today: "Today",
+                month: "Month",
+                week: "Week",
+                day: "Day",
             },
-            initialView: 'dayGridMonth',
+            initialView: "dayGridMonth",
             scrollTime: this.config.dateDisplayFormats.calendarStartTime,
             eventDidMount: this.fullCalendarHelper_eventRender,
             events: this.events,
             loading: this.fullCalendarHelper_onLoading,
-            eventClick: this.onEventClick
-        }
+            eventClick: this.onEventClick,
+        };
     },
 
-    mounted () {
-
-        this.$nextTick()
-        .then(() => {
+    mounted() {
+        this.$nextTick().then(() => {
             this.calendarApi = this.$refs.fullCalendar.getApi();
-            this.calendarApi.setOption('contentHeight', this.fullCalendarHelper_contentHeight());
+            this.calendarApi.setOption("contentHeight", this.fullCalendarHelper_contentHeight());
             this.calendarApi.scrollToTime(this.config.dateDisplayFormats.calendarStartTime);
         });
 
         // Inject calendar icon. Unfortunately, fullcalendar doesn't support injecting our own icons into the custom buttons yet...
-        const quickSwitchIcon = document.createElement('a');
-        quickSwitchIcon.setAttribute('class', 'adtp-btn icon-calendar no-text');
+        const quickSwitchIcon = document.createElement("a");
+        quickSwitchIcon.setAttribute("class", "adtp-btn icon-calendar no-text");
 
-        document.getElementsByClassName('fc-quickSwitchButton-button')[0].appendChild(quickSwitchIcon);
+        document.getElementsByClassName("fc-quickSwitchButton-button")[0].appendChild(quickSwitchIcon);
 
-        document.addEventListener('upcoming-due-work-calendar__onFilterChange', this.onFilterChange);
-
+        document.addEventListener("upcoming-due-work-calendar__onFilterChange", this.onFilterChange);
     },
 
     methods: {
-
         /**
          * Additional customisation for prev button to sync flatpickr's selected date with fullCalendar's
          */
@@ -192,24 +183,25 @@ export default {
                 successCallback([]);
                 return;
             }
-            axios.get(
-                URL_EVENT_SOURCE + '/' + window.fullCalendarConfig.userId,
-                {
+            axios
+                .get(URL_EVENT_SOURCE + "/" + window.fullCalendarConfig.userId, {
                     headers: {
-                        'X-Requested-With' : 'XMLHttpRequest'
+                        "X-Requested-With": "XMLHttpRequest",
                     },
                     params: {
                         start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
-                        end:   Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
+                        end: Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
                         filters: this.selectedFilters,
                     },
-                    paramsSerializer: params => stringify(params, {arrayFormat: 'brackets'}),
-                }
-            ).then((response) => {
-                successCallback(response.data.filter((v) => {
-                    return 'start' in v;
-                }));
-            } );
+                    paramsSerializer: (params) => stringify(params, { arrayFormat: "brackets" }),
+                })
+                .then((response) => {
+                    successCallback(
+                        response.data.filter((v) => {
+                            return "start" in v;
+                        })
+                    );
+                });
             // Fail callback: consider a message saying something failed
         },
 
@@ -235,11 +227,8 @@ export default {
             this.selectedFilters = event.detail.selectedFilters;
             this.calendarApi.refetchEvents();
         },
-
-    }
-
-}
-
+    },
+};
 </script>
 
 <template>
@@ -250,14 +239,11 @@ export default {
             :format-display-time="formats.displayTime"
             :format-display-datetime="formats.displayDatetime"
         />
-        <full-calendar
-            ref="fullCalendar"
-            :options="calendarOptions"
-        >
-			<template v-slot:eventContent="arg">
-				<customised-calendar-event :content="arg" />
+        <full-calendar ref="fullCalendar" :options="calendarOptions">
+            <template v-slot:eventContent="arg">
+                <customised-calendar-event :content="arg" />
             </template>
-		</full-calendar>
+        </full-calendar>
         <flat-pickr
             ref="flatPickr"
             :config="{

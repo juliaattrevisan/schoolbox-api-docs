@@ -1,16 +1,14 @@
 <script setup>
-
 /**
  * To search for members to add
  */
 
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
-import debounce from 'lodash/debounce';
-import { useAddMembersStore } from '../store/mgAddMembersStore';
-import { useSearchStore, DEBOUNCE_AMOUNT } from '../store/mgSearchStore';
-import FromTypes from './mgAddMembersFromTypes';
-import MgSearchResults from './mg-search-results.vue';
-
+import { ref, computed, watch, onMounted, onUnmounted } from "vue";
+import debounce from "lodash/debounce";
+import { useAddMembersStore } from "../store/mgAddMembersStore";
+import { useSearchStore, DEBOUNCE_AMOUNT } from "../store/mgSearchStore";
+import FromTypes from "./mgAddMembersFromTypes";
+import MgSearchResults from "./mg-search-results.vue";
 
 const addMembersStore = useAddMembersStore();
 const searchStore = useSearchStore();
@@ -23,11 +21,11 @@ const searchEl = ref(null);
  */
 const inputPlaceholder = computed(() => {
     const placeholderOptions = {
-        [FromTypes.NAME]: 'Search users...',
-        [FromTypes.GROUP]: 'Search groups...',
-        [FromTypes.ROLE]: 'Search roles...',
-        [FromTypes.LIST]: 'Add from a list...',
-    }
+        [FromTypes.NAME]: "Search users...",
+        [FromTypes.GROUP]: "Search groups...",
+        [FromTypes.ROLE]: "Search roles...",
+        [FromTypes.LIST]: "Add from a list...",
+    };
     return placeholderOptions[addMembersStore.fromType];
 });
 
@@ -35,16 +33,16 @@ const inputPlaceholder = computed(() => {
  * add relevant keyboard and mouse events
  */
 onMounted(() => {
-    document.addEventListener('keyup', onKeyUp);
-    document.addEventListener('click', onMouseClick);
+    document.addEventListener("keyup", onKeyUp);
+    document.addEventListener("click", onMouseClick);
 });
 
 /**
  * remove relevant keyboard and mouse events
  */
 onUnmounted(() => {
-    document.removeEventListener('keyup', onKeyUp);
-    document.removeEventListener('click', onMouseClick);
+    document.removeEventListener("keyup", onKeyUp);
+    document.removeEventListener("click", onMouseClick);
 });
 
 /**
@@ -54,13 +52,14 @@ onUnmounted(() => {
  *
  * @param { Event }
  */
-function onKeyUp (event) {
+function onKeyUp(event) {
     const keyName = event.key;
     const keyOptions = {
-        'Escape': () => onEscapeKeySelected(),
-    }
-    if (keyOptions[keyName]) { //ensure search input has focus
-    // if (keyOptions[keyName] && document.activeElement === queryInputEl.value) { //ensure search input has focus
+        Escape: () => onEscapeKeySelected(),
+    };
+    if (keyOptions[keyName]) {
+        //ensure search input has focus
+        // if (keyOptions[keyName] && document.activeElement === queryInputEl.value) { //ensure search input has focus
         event.preventDefault();
         keyOptions[keyName](event);
     }
@@ -71,7 +70,7 @@ function onKeyUp (event) {
  *
  * @param { Event }
  */
-function onEscapeKeySelected (event) {
+function onEscapeKeySelected(event) {
     if (searchStore.isSearchActive) {
         searchStore.clear();
     }
@@ -83,7 +82,7 @@ function onEscapeKeySelected (event) {
  *
  * @param { Event }
  */
-function onMouseClick (event) {
+function onMouseClick(event) {
     if (searchStore.isSearchActive && searchEl.value && !searchEl.value.contains(event.target)) {
         searchStore.clear();
     }
@@ -92,12 +91,15 @@ function onMouseClick (event) {
 /**
  * start searching once the search is active, watching the query string for input
  */
-watch(() => searchStore.query, () => {
-    if (searchStore.isSearchActive) {
-        searchStore.enableSearch();
-        debounceSearch();
+watch(
+    () => searchStore.query,
+    () => {
+        if (searchStore.isSearchActive) {
+            searchStore.enableSearch();
+            debounceSearch();
+        }
     }
-});
+);
 
 /**
  * debounce to avoid constant polling while the user is typing
@@ -105,12 +107,11 @@ watch(() => searchStore.query, () => {
 const debounceSearch = debounce(() => {
     searchStore.search();
 }, DEBOUNCE_AMOUNT);
-
 </script>
 
 <template>
-   <div ref="searchEl">
-       <input
+    <div ref="searchEl">
+        <input
             id="search-text"
             type="text"
             v-model="searchStore.query"
@@ -118,13 +119,11 @@ const debounceSearch = debounce(() => {
             @input="$event.target.composing = false"
         />
         <mg-search-results />
-   </div>
+    </div>
 </template>
 
 <style lang="scss" scoped>
-
 input {
     margin-bottom: 0; //so search-results can butt right up
 }
-
 </style>

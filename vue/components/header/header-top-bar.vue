@@ -1,42 +1,41 @@
 <script setup>
-
 /**
  * Top bar that contains most navigation elements and toggles the side menu and notifications
  */
 
-import { ref, computed, onMounted  } from 'vue'
-import { ResizeObserver } from 'vue3-resize';
-import 'vue3-resize/dist/vue3-resize.css';
-import debounce from 'lodash/debounce';
-import { topMenuData } from './headerData';
+import { ref, computed, onMounted } from "vue";
+import { ResizeObserver } from "vue3-resize";
+import "vue3-resize/dist/vue3-resize.css";
+import debounce from "lodash/debounce";
+import { topMenuData } from "./headerData";
 
-const emit = defineEmits(['openSideMenu', 'toggleProfileMenu', 'openNotificationsMenu']);
+const emit = defineEmits(["openSideMenu", "toggleProfileMenu", "openNotificationsMenu"]);
 
 const props = defineProps({
     unreadNotifications: {
         type: Number,
         required: false,
         default: 0,
-        validator (value) {
-            return typeof value === 'number';
-        }
-    }
+        validator(value) {
+            return typeof value === "number";
+        },
+    },
 });
 
 onMounted(() => {
-
-    primaryMenuItems = Array.from(primary.value.querySelectorAll('li')); //get all the list menu list items
+    primaryMenuItems = Array.from(primary.value.querySelectorAll("li")); //get all the list menu list items
     primaryMenuItems.splice(0, 2); //remove the side menu button and the logo
-    primaryMenuItemsMaxXPos = primaryMenuItems.map((menuItem) => menuItem.getBoundingClientRect().x + menuItem.getBoundingClientRect().width);
+    primaryMenuItemsMaxXPos = primaryMenuItems.map(
+        (menuItem) => menuItem.getBoundingClientRect().x + menuItem.getBoundingClientRect().width
+    );
 
     updateTopNavItems();
-
 });
 
 /**
  * Any changes to the element size are tracked by ResizeObserver so can update dimensions
  */
-function onContainerResize () {
+function onContainerResize() {
     updateTopNavItems();
 }
 
@@ -50,23 +49,26 @@ const secondary = ref(null);
 /**
  * Show/hide top nav items based on space available
  */
-function updateTopNavItems () {
+function updateTopNavItems() {
     const secondaryXPos = secondary.value.getBoundingClientRect().x;
     primaryMenuItems.forEach((menuItem, index) => {
         menuData.value[index].isShown = secondaryXPos > primaryMenuItemsMaxXPos[index] ? true : false;
     });
 }
-
 </script>
 
 <template>
     <div class="top-bar" ref="topBar">
-        <resize-observer @notify="onContainerResize"/>
+        <resize-observer @notify="onContainerResize" />
         <nav class="primary" aria-label="Primary navigation" ref="primary">
             <ul>
                 <li>
                     <button class="button-side-menu" aria-label="Open Side Menu" @click="$emit('openSideMenu')">
-                        <svg width="18" height="14" viewBox="0 0 80 60" aria-hidden="true" focusable="false"><rect width="100" height="10"></rect> <rect width="100" y="25" height="10"></rect> <rect width="100" y="50" height="10"></rect></svg>
+                        <svg width="18" height="14" viewBox="0 0 80 60" aria-hidden="true" focusable="false">
+                            <rect width="100" height="10"></rect>
+                            <rect width="100" y="25" height="10"></rect>
+                            <rect width="100" y="50" height="10"></rect>
+                        </svg>
                     </button>
                 </li>
                 <li>
@@ -84,13 +86,23 @@ function updateTopNavItems () {
         <nav class="secondary" aria-label="Secondary navigation" ref="secondary">
             <ul>
                 <li>
-                    <button class="button-profile-menu" aria-label="Toggle Profile Menu" @click="$emit('toggleProfileMenu')">
+                    <button
+                        class="button-profile-menu"
+                        aria-label="Toggle Profile Menu"
+                        @click="$emit('toggleProfileMenu')"
+                    >
                         <img src="admin-logo.jpeg" alt="Profile image" width="72" height="72" />
                     </button>
                 </li>
                 <li>
-                    <button class="button-show-notifications icon-notifications" :data-unread="unreadNotifications" aria-label="Show Notifications" aria-expanded="false" @click="$emit('openNotificationsMenu')">
-                        {{ unreadNotifications > 0 ? unreadNotifications : '' }}
+                    <button
+                        class="button-show-notifications icon-notifications"
+                        :data-unread="unreadNotifications"
+                        aria-label="Show Notifications"
+                        aria-expanded="false"
+                        @click="$emit('openNotificationsMenu')"
+                    >
+                        {{ unreadNotifications > 0 ? unreadNotifications : "" }}
                     </button>
                 </li>
             </ul>
@@ -99,20 +111,19 @@ function updateTopNavItems () {
 </template>
 
 <style lang="scss" scoped>
-
 .top-bar {
     background-color: var(--navigation-background);
     height: 4.5rem;
 }
 
-    ul {
-        display: flex;
-        margin: 0;
-        padding: 0;
-        li {
-            list-style-type: none;
-        }
+ul {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    li {
+        list-style-type: none;
     }
+}
 
 .button-side-menu {
     align-items: center;
@@ -145,7 +156,8 @@ function updateTopNavItems () {
     span {
         display: block;
     }
-    &:before { //increase the icon sizes
+    &:before {
+        //increase the icon sizes
         font-size: 1.5rem;
         line-height: 1.5rem;
         padding: 0;
@@ -184,5 +196,4 @@ function updateTopNavItems () {
         background-color: var(--navigation-hover);
     }
 }
-
 </style>

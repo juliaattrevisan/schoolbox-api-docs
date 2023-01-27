@@ -1,14 +1,13 @@
 <script>
+import axios from "axios";
+import Toast from "@schoolboxVue/components/toast";
+import RevealModal from "@schoolboxVue/components/reveal-modal";
 
-import axios from 'axios';
-import Toast from '@schoolboxVue/components/toast';
-import RevealModal from '@schoolboxVue/components/reveal-modal';
-
-const EVENT_ADD_TEXTBOX = 'textbox-list-add';
-const EVENT_BEFORE_UNLOAD = 'beforeunload';
+const EVENT_ADD_TEXTBOX = "textbox-list-add";
+const EVENT_BEFORE_UNLOAD = "beforeunload";
 
 export default {
-    name: 'textbox-list',
+    name: "textbox-list",
 
     /**
      * Components.
@@ -17,7 +16,7 @@ export default {
      */
     components: {
         RevealModal,
-        Toast
+        Toast,
     },
 
     props: {
@@ -59,7 +58,7 @@ export default {
         returnUrl: {
             type: String,
             required: true,
-        }
+        },
     },
     data() {
         return {
@@ -76,13 +75,13 @@ export default {
              */
             textboxIndexToDelete: undefined,
             isProcessActive: false,
-        }
+        };
     },
     mounted() {
         axios
             .get(this.textboxUsageEndpoint)
-            .then(response => this.textboxes = response.data)
-            .finally(() => this.showSkeletonLoader = false);
+            .then((response) => (this.textboxes = response.data))
+            .finally(() => (this.showSkeletonLoader = false));
 
         // Add event so that a new textbox may be added from outside of this
         // component
@@ -91,7 +90,7 @@ export default {
     },
     destroyed() {
         // Remove the add textbox event
-        this.window.removeEventListener(EVENT_ADD_TEXTBOX, this.addTextbox)
+        this.window.removeEventListener(EVENT_ADD_TEXTBOX, this.addTextbox);
         this.window.removeEventListener(EVENT_BEFORE_UNLOAD, this.onBeforeUnload);
     },
     updated() {
@@ -109,8 +108,8 @@ export default {
                 textbox: {
                     // It is not yet saved, so it has no ID
                     id: null,
-                    heading: '',
-                    body: '',
+                    heading: "",
+                    body: "",
                 },
 
                 // Folders and dashboards the textbox is actually in use on:
@@ -128,9 +127,8 @@ export default {
             // Focus the new textbox's heading input immediately
             this.$nextTick(() => {
                 jQuery(this.$el).find('input[name$="[heading]"]').last().focus();
-            })
+            });
         },
-
 
         /**
          * Does this textbox usage record contain a usage for this component's
@@ -164,7 +162,7 @@ export default {
 
             // DOM updates: disable button, add toast
             this.saveInProgress = true;
-            this.$refs.toast.activate('Saving textboxes...');
+            this.$refs.toast.activate("Saving textboxes...");
 
             // Create a new set of textbox data to post
             this.syncEditorChangesToModel();
@@ -179,16 +177,10 @@ export default {
                     // If it doesn't it's new, so create it: otherwise update.
                     let updateEndpoint = textbox?._links?.update;
                     if (updateEndpoint) {
-                        requests.push(
-                            axios
-                                .put(updateEndpoint, textbox)
-                                .then(() => this.markAsClean(index))
-                        );
+                        requests.push(axios.put(updateEndpoint, textbox).then(() => this.markAsClean(index)));
                     } else {
                         requests.push(
-                            axios
-                                .post(this.createTextboxEndpoint, textbox)
-                                .then(() => this.markAsClean(index))
+                            axios.post(this.createTextboxEndpoint, textbox).then(() => this.markAsClean(index))
                         );
                     }
                 }
@@ -196,12 +188,12 @@ export default {
 
             Promise.all(requests)
                 .then(() => {
-                    this.$refs.toast.timeout('Saved', true);
+                    this.$refs.toast.timeout("Saved", true);
                     this.window.location.href = this.returnUrl;
                 })
                 .catch(() => {
-                    this.$refs.toast.timeout('Could not save all textboxes', false);
-                    this.saveInProgress = false
+                    this.$refs.toast.timeout("Could not save all textboxes", false);
+                    this.saveInProgress = false;
                 });
         },
 
@@ -221,13 +213,13 @@ export default {
                 submitHandler: (form, event) => {
                     event.preventDefault();
                     this.postChanges();
-                }
+                },
             });
 
             // Apply the validation rule to each input
-            $form.find('input[type=text]').each(function(index, element) {
-                $(element).rules('add', {
-                    requiredNotBlank: true
+            $form.find("input[type=text]").each(function (index, element) {
+                $(element).rules("add", {
+                    requiredNotBlank: true,
                 });
             });
         },
@@ -238,8 +230,8 @@ export default {
          */
         setupEditors() {
             let $form = jQuery(this.$refs.form),
-                self  = this;
-            $form.find('textarea').each(function () {
+                self = this;
+            $form.find("textarea").each(function () {
                 if (!(this.id in window.CKEDITOR.instances)) {
                     jQuery.fn.alaressEditor({
                         targetElements: $(this),
@@ -249,7 +241,7 @@ export default {
                             if (index !== null) {
                                 self.markAsDirty(index);
                             }
-                        }
+                        },
                     });
                 }
             });
@@ -264,7 +256,7 @@ export default {
                 let $collapsers = jQuery(this.$el).find('[data-collapser^="collapser-textbox"]');
                 $collapsers.destroyCollapsable();
                 $collapsers.collapsable();
-            })
+            });
         },
 
         /**
@@ -276,7 +268,7 @@ export default {
         syncEditorChangesToModel() {
             this.textboxes.forEach((usage, index) => {
                 let editor = this.retrieveEditorForIndex(index);
-                this.textboxes[index].textbox.body = editor ? editor.getData() : '';
+                this.textboxes[index].textbox.body = editor ? editor.getData() : "";
             });
         },
 
@@ -309,7 +301,7 @@ export default {
          * @param {Number} index The index to mark as dirty in `this.textboxes`
          */
         markAsDirty(index) {
-            this.textboxes[index]['dirty'] = true;
+            this.textboxes[index]["dirty"] = true;
         },
 
         /**
@@ -318,7 +310,7 @@ export default {
          * @param {Number} index The index to mark as clean in `this.textboxes`
          */
         markAsClean(index) {
-            this.textboxes[index]['dirty'] = false;
+            this.textboxes[index]["dirty"] = false;
         },
 
         /**
@@ -330,7 +322,7 @@ export default {
          * @param {Number} index The index to remove from `this.textboxes`
          */
         markAsDeleted(index) {
-            this.textboxes[index]['deleted'] = true;
+            this.textboxes[index]["deleted"] = true;
 
             // This textbox's state has been persisted, thus it is not dirty
             this.markAsClean(index);
@@ -349,7 +341,7 @@ export default {
          * @returns {CKEDITOR.editor|null} The editor, or null if not found
          */
         retrieveEditorForIndex(index) {
-            return this.window.CKEDITOR.instances['textbox-' + String(index) + '-body'] ?? null;
+            return this.window.CKEDITOR.instances["textbox-" + String(index) + "-body"] ?? null;
         },
 
         /**
@@ -373,28 +365,26 @@ export default {
          * @returns {string}
          */
         onBeforeUnload(event) {
-            if (this.textboxes.some(textbox => textbox.dirty ?? false)) {
+            if (this.textboxes.some((textbox) => textbox.dirty ?? false)) {
                 event.preventDefault();
                 event.returnValue = true;
-                return 'Are you sure you wish to leave the page?';
+                return "Are you sure you wish to leave the page?";
             }
         },
 
         /**
          * Asynchronously access an endpoint to delete a file from the appropriate place
          */
-        async sendDeleteTextboxRequest () {
-
+        async sendDeleteTextboxRequest() {
             /* Set the loading flag to prevent people spamming the button
              */
             this.isProcessActive = true;
 
-            this.$refs.toast.activate('Deleting text box...');
+            this.$refs.toast.activate("Deleting text box...");
 
             try {
-
                 /* Asynchronously access the endpoint to delete the thing
-                */
+                 */
                 await axios.delete(this.textboxes[this.textboxIndexToDelete].textbox._links.delete);
 
                 /* Mark this textbox as deleted
@@ -407,17 +397,15 @@ export default {
 
                 /* Toast (though I prefer our twig toast until a better replacement comes along)
                  */
-                this.$refs.toast.timeout('Text box deleted', true);
+                this.$refs.toast.timeout("Text box deleted", true);
                 this.isProcessActive = false;
-
             } catch (error) {
-
                 /* Deal with error case
                  */
-                this.$refs.toast.timeout('Unable to delete text box', false);
+                this.$refs.toast.timeout("Unable to delete text box", false);
                 this.isProcessActive = false;
             }
-        }
+        },
     },
     computed: {
         /**
@@ -426,11 +414,10 @@ export default {
          * @returns {*[]}
          */
         undeletedTextboxes() {
-            return this.textboxes.filter(v => v?.deleted !== true)
-        }
+            return this.textboxes.filter((v) => v?.deleted !== true);
+        },
     },
-}
-
+};
 </script>
 <template>
     <form method="post" ref="form" :action="postChangesEndpoint">
@@ -453,16 +440,20 @@ export default {
                     <template v-for="(usage, index) in textboxes">
                         <li v-if="usage.deleted !== true" :key="index">
                             <div class="actions-small-1">
-                                <div :class="{'expander': true, 'icon-up-arrow': Boolean(usage.textbox.id)}"
-                                     :data-collapser="'collapser-textbox-' + String(index)"></div>
+                                <div
+                                    :class="{ expander: true, 'icon-up-arrow': Boolean(usage.textbox.id) }"
+                                    :data-collapser="'collapser-textbox-' + String(index)"
+                                ></div>
                                 <div class="list-item">
                                     <div class="small-12 column">
                                         <label>
                                             <span class="hide-for-medium-up">Textbox</span>
-                                            <input :name="'textbox[' + String(index) + '][heading]'"
-                                                   type="text"
-                                                   v-model="usage.textbox.heading"
-                                                   @change="markAsDirty(index)" />
+                                            <input
+                                                :name="'textbox[' + String(index) + '][heading]'"
+                                                type="text"
+                                                v-model="usage.textbox.heading"
+                                                @change="markAsDirty(index)"
+                                            />
                                         </label>
 
                                         <p class="meta" v-if="usage.folders.length > 0">
@@ -470,25 +461,39 @@ export default {
                                             <template v-if="inUseOnThisFolder(usage)">
                                                 this page<template v-if="otherFolders(usage).length > 0">, </template>
                                             </template>
-                                            <a v-for="(folder, index) in otherFolders(usage)" :href="folder._links.view" :key="index">{{ folder.name }}</a><template v-if="(index + 1) < otherFolders(usage).length">, </template>
+                                            <a
+                                                v-for="(folder, index) in otherFolders(usage)"
+                                                :href="folder._links.view"
+                                                :key="index"
+                                                >{{ folder.name }}</a
+                                            ><template v-if="index + 1 < otherFolders(usage).length">, </template>
                                         </p>
 
                                         <p class="meta" v-if="usage.dashboards.length > 0">
-                                            Dashboards: {{ usage.dashboards.map((v) => v.name).join(', ') }}
+                                            Dashboards: {{ usage.dashboards.map((v) => v.name).join(", ") }}
                                         </p>
                                     </div>
                                 </div>
                                 <nav>
-                                    <a class="icon-delete" href="#" @click.prevent="attemptToDeleteTextbox(index)" title="Delete"></a>
+                                    <a
+                                        class="icon-delete"
+                                        href="#"
+                                        @click.prevent="attemptToDeleteTextbox(index)"
+                                        title="Delete"
+                                    ></a>
                                 </nav>
                             </div>
-                            <div :class="{'actions-small-1': true, 'hide': Boolean(usage.textbox.id)}"
-                                 :data-collapse-state="usage.textbox.id ? 'collapsed' : 'expanded'"
-                                 :data-collapsable="'collapser-textbox-' + String(index)">
+                            <div
+                                :class="{ 'actions-small-1': true, hide: Boolean(usage.textbox.id) }"
+                                :data-collapse-state="usage.textbox.id ? 'collapsed' : 'expanded'"
+                                :data-collapsable="'collapser-textbox-' + String(index)"
+                            >
                                 <div class="content">
-                                    <textarea :name="'textbox[' + String(index) + '][body]'"
-                                              :id="'textbox-' + String(index) + '-body'"
-                                              v-model="usage.textbox.body">
+                                    <textarea
+                                        :name="'textbox[' + String(index) + '][body]'"
+                                        :id="'textbox-' + String(index) + '-body'"
+                                        v-model="usage.textbox.body"
+                                    >
                                     </textarea>
                                 </div>
                             </div>
@@ -512,8 +517,26 @@ export default {
             <h2>Please confirm</h2>
             <p>Are you sure you want to delete this text box?</p>
             <ul class="flex-list buttons">
-                <li><button @click.prevent="sendDeleteTextboxRequest" class="button submit" id="usage-textbox-delete-button" :disabled="isProcessActive">Delete</button></li>
-                <li><button @click.prevent="$refs.deleteModal.close" class="button" id="usage-textbox-cancel-button" :disabled="isProcessActive">Cancel</button></li>
+                <li>
+                    <button
+                        @click.prevent="sendDeleteTextboxRequest"
+                        class="button submit"
+                        id="usage-textbox-delete-button"
+                        :disabled="isProcessActive"
+                    >
+                        Delete
+                    </button>
+                </li>
+                <li>
+                    <button
+                        @click.prevent="$refs.deleteModal.close"
+                        class="button"
+                        id="usage-textbox-cancel-button"
+                        :disabled="isProcessActive"
+                    >
+                        Cancel
+                    </button>
+                </li>
             </ul>
         </reveal-modal>
     </form>

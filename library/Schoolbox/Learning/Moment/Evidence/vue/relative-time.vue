@@ -1,7 +1,5 @@
 <script>
-
 export default {
-
     /**
      * Name.
      * The name of the component that we have here. This name will be used in the container
@@ -38,7 +36,7 @@ export default {
         dateOnly: {
             type: Boolean,
             default: false,
-        }
+        },
     },
 
     /**
@@ -46,8 +44,7 @@ export default {
      * Any other vue components you also want to use here; they must already be imported
      * at the top of the file.
      */
-    components: {
-    },
+    components: {},
 
     /**
      * Data.
@@ -58,10 +55,10 @@ export default {
     data() {
         return {
             formattedDate: {
-                'absolute': '',
-                'relative': ''
-            }
-        }
+                absolute: "",
+                relative: "",
+            },
+        };
     },
 
     /**
@@ -78,7 +75,7 @@ export default {
      * Access the results of a function as if they were a property of an object.
      */
     computed: {
-        dateDisplayFormats: () => window.dateDisplayFormats
+        dateDisplayFormats: () => window.dateDisplayFormats,
     },
 
     /**
@@ -87,7 +84,6 @@ export default {
      * other ordinary javascript that you might have written before.
      */
     methods: {
-
         /**
          * Renders the given datetime as a string.
          *
@@ -95,16 +91,14 @@ export default {
          *                     constructor.
          */
         renderFormattedDatetimes(datetime) {
-            let now = dayjs().startOf('d'),
+            let now = dayjs().startOf("d"),
                 date = dayjs(datetime),
-                dayDiff = date.diff(now, 'd'),
-                dateFormat = this.dateOnly
-                    ? this.dateDisplayFormats.dayjs
-                    : this.dateDisplayFormats.dayjsDatetime;
+                dayDiff = date.diff(now, "d"),
+                dateFormat = this.dateOnly ? this.dateDisplayFormats.dayjs : this.dateDisplayFormats.dayjsDatetime;
 
             let struct = {
-                'absolute': date.format(dateFormat),
-                'relative': ''
+                absolute: date.format(dateFormat),
+                relative: "",
             };
 
             /* We determine a relative time equivalence based on how different
@@ -112,19 +106,19 @@ export default {
              * gets a non-relative format
              */
             if (dayDiff === 0) {
-                struct.relative = 'today';
+                struct.relative = "today";
             } else if (dayDiff === -1) {
-                struct.relative = 'yesterday';
+                struct.relative = "yesterday";
             } else if (dayDiff === 1) {
-                struct.relative = 'tomorrow';
+                struct.relative = "tomorrow";
             } else {
-                struct.relative = dayjs.duration(dayDiff, 'd').humanize(true);
+                struct.relative = dayjs.duration(dayDiff, "d").humanize(true);
             }
 
             return struct;
-        }
-    }
-}
+        },
+    },
+};
 </script>
 <template>
     <time :title="this.formattedDate.absolute">{{ this.formattedDate.relative }}</time>

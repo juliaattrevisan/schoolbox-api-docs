@@ -1,12 +1,10 @@
 <script setup>
-
 /**
  * A selected Curriculum code, it can be deleted and
  * further details revealed via a modal
  */
 
-import { useSearchStore } from '../store/mgSearchStore';
-
+import { useSearchStore } from "../store/mgSearchStore";
 
 const props = defineProps({
     /**
@@ -18,10 +16,10 @@ const props = defineProps({
         default: () => {
             return {
                 id: 0,
-                name: '',
-                fromType: '',
-            }
-        }
+                name: "",
+                fromType: "",
+            };
+        },
     },
 });
 
@@ -30,18 +28,14 @@ const searchStore = useSearchStore();
 /**
  * To remove from the selected list
  */
-function onRemoveSelected () {
+function onRemoveSelected() {
     searchStore.removeResult(props.result);
 }
-
 </script>
 
 <template>
-   <div class="selected-code">
-        <button
-            class="title-button"
-            :title="`View ${props.result.name}`"
-        >
+    <div class="selected-code">
+        <button class="title-button" :title="`View ${props.result.name}`">
             {{ props.result.name }}
         </button>
         <button
@@ -49,13 +43,11 @@ function onRemoveSelected () {
             :title="`Remove ${props.result.name}`"
             @click.prevent="onRemoveSelected"
             @keyup.enter="onRemoveSelected"
-        >
-        </button>
+        ></button>
     </div>
 </template>
 
 <style lang="scss" scoped>
-
 .selected-code {
     background: var(--body-background);
     color: #000;
@@ -84,5 +76,4 @@ function onRemoveSelected () {
     margin-top: 3px;
     padding: 0;
 }
-
 </style>

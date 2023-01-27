@@ -1,14 +1,13 @@
 <script>
-import MediaArticle   from '@schoolboxVue/components/media-article';
-import Storage        from '@schoolboxVue/components/storage';
-import RelativeTime   from '@schoolboxLearningMomentEvidence/relative-time';
-import CommentThread  from './comment-thread';
-import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin';
-import CodesList      from '@schoolboxCurriculum/vue/codes-list';
-import RevealModal    from "@schoolboxVue/components/reveal-modal";
-import NodeDetails    from '@schoolboxCurriculum/vue/node-details';
-import { getEmptyNode } from '@schoolboxCurriculum/js/nodeUtils';
-
+import MediaArticle from "@schoolboxVue/components/media-article";
+import Storage from "@schoolboxVue/components/storage";
+import RelativeTime from "@schoolboxLearningMomentEvidence/relative-time";
+import CommentThread from "./comment-thread";
+import cdnPrefixMixin from "@schoolboxVue/components/cdn-prefix-mixin";
+import CodesList from "@schoolboxCurriculum/vue/codes-list";
+import RevealModal from "@schoolboxVue/components/reveal-modal";
+import NodeDetails from "@schoolboxCurriculum/vue/node-details";
+import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
 
 export default {
     /**
@@ -31,12 +30,7 @@ export default {
      * Immutable props that were passed to this component, usually via twig, in our setup.
      * These are the hyphen-separated vars which are magically computed into camelcase elsewhere.
      */
-    props: [
-        'evidence',
-        'returnUrl',
-        'canComment',
-        'siteVersion',
-    ],
+    props: ["evidence", "returnUrl", "canComment", "siteVersion"],
 
     /**
      * Components.
@@ -62,7 +56,7 @@ export default {
     data() {
         return {
             selectedNode: getEmptyNode(), //the selected curriculum code to display further details for
-        }
+        };
     },
 
     /**
@@ -70,15 +64,13 @@ export default {
      * Basically, when vue has done all its inits and is ready to go
      * kind of like window.onload
      */
-    mounted: function () {
-    },
+    mounted: function () {},
 
     /**
      * Computed properties.
      * Access the results of a function as if they were a property of an object.
      */
-    computed: {
-    },
+    computed: {},
 
     /**
      * Methods.
@@ -86,13 +78,11 @@ export default {
      * other ordinary javascript that you might have written before.
      */
     methods: {
-
         /**
          * Decide whether to show the tot menu - only provide when it has at least one
          * accessible route
          */
-        hasRoutes: function() {
-
+        hasRoutes: function () {
             /* For now there are only two options, so tot is fairly
              * straightforward to calculate this way
              */
@@ -109,12 +99,16 @@ export default {
             if (this.evidence._links.modifyForm) {
                 let baseModifyLink = this.evidence._links.modifyForm;
                 if (this.returnUrl.name && this.returnUrl.current) {
-                    baseModifyLink = baseModifyLink
-                            + '?' + encodeURIComponent(this.returnUrl.name) + '=' + encodeURIComponent(this.returnUrl.current);
+                    baseModifyLink =
+                        baseModifyLink +
+                        "?" +
+                        encodeURIComponent(this.returnUrl.name) +
+                        "=" +
+                        encodeURIComponent(this.returnUrl.current);
                 }
                 return baseModifyLink;
             }
-            return '';
+            return "";
         },
 
         /**
@@ -124,8 +118,8 @@ export default {
          *
          * @return { String }
          */
-        tagNameWithComma (index) {
-            if (index !== this.evidence.tags.length-1) {
+        tagNameWithComma(index) {
+            if (index !== this.evidence.tags.length - 1) {
                 return `${this.evidence.tags[index].name}, `;
             } else {
                 return this.evidence.tags[index].name;
@@ -137,14 +131,12 @@ export default {
          *
          * @pararm { object }
          */
-        onCodeSelected (node) {
+        onCodeSelected(node) {
             this.selectedNode = node;
             this.$refs.nodeDetailsModal.open();
         },
-
-    }
-
-}
+    },
+};
 </script>
 <template>
     <div class="evidence-detail">
@@ -181,21 +173,27 @@ export default {
                                 </article>
                             </section>
                             <section class="detail content">
-                                <p class="meta">By
+                                <p class="meta">
+                                    By
                                     <a :href="evidence.creator._links.profile" title="View Profile">
                                         {{ evidence.creator.fullName }}
                                     </a>
                                     &mdash;
                                     <relative-time :datetime="evidence.createdAt"></relative-time>
                                     <!-- Display curriculum codes and tags -->
-                                    <br>
+                                    <br />
                                     <template v-if="evidence.curriculumNodes.length > 0 || evidence.tags.length > 0">
                                         Tags:
                                         <codes-list
                                             :nodes="evidence.curriculumNodes"
                                             @selected="onCodeSelected"
-                                        /><template v-if="evidence.curriculumNodes.length > 0 && evidence.tags.length > 0">, </template>
-                                        <span v-for="(tag, index) in evidence.tags" :key="tag.name"> {{ tagNameWithComma(index) }}</span>
+                                        /><template
+                                            v-if="evidence.curriculumNodes.length > 0 && evidence.tags.length > 0"
+                                            >,
+                                        </template>
+                                        <span v-for="(tag, index) in evidence.tags" :key="tag.name">
+                                            {{ tagNameWithComma(index) }}</span
+                                        >
                                     </template>
                                 </p>
 
@@ -220,8 +218,6 @@ export default {
         </div>
     </div>
     <reveal-modal ref="nodeDetailsModal">
-        <node-details
-            :node="selectedNode"
-        />
+        <node-details :node="selectedNode" />
     </reveal-modal>
 </template>

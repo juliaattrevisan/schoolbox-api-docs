@@ -1,11 +1,10 @@
 <script>
-import filesize from 'filesize';
-import RevealModal from '@schoolboxVue/components/reveal-modal';
-import Toast from '@schoolboxVue/components/toast';
-import footerUI from '@schoolboxVue/components/vueTables2/mixinFooterUI';
+import filesize from "filesize";
+import RevealModal from "@schoolboxVue/components/reveal-modal";
+import Toast from "@schoolboxVue/components/toast";
+import footerUI from "@schoolboxVue/components/vueTables2/mixinFooterUI";
 
 export default {
-
     /**
      * Name.
      * The name of the component that we have here. This name will be used in the container
@@ -20,7 +19,7 @@ export default {
      * be superpositioned on top of this javascript here, inside export default {}
      */
     mixins: [
-        footerUI //to place and keep the tables UI in the footer
+        footerUI, //to place and keep the tables UI in the footer
     ],
 
     /**
@@ -30,9 +29,9 @@ export default {
      */
     props: {
         endpoint: {
-           type: String,
-           required: true
-        }
+            type: String,
+            required: true,
+        },
     },
 
     /**
@@ -42,7 +41,7 @@ export default {
      */
     components: {
         RevealModal,
-        Toast
+        Toast,
     },
 
     /**
@@ -51,9 +50,8 @@ export default {
      * Note that v-if and v-for must never be on the same node together, as this overrides
      * the meaning of "this" in a way you don't expect.
      */
-    data () {
+    data() {
         return {
-
             /* True, when data is currently loading; used to show skeleton
              */
             loading: true,
@@ -64,21 +62,21 @@ export default {
 
             /* Table columns.
              */
-            columns: [ 'name', 'size', 'folder', 'location', 'id' ],
+            columns: ["name", "size", "folder", "location", "id"],
 
             /* vue-tables-2 options, see https://matanya.gitbook.io/vue-tables-2/options-api
              */
             options: {
                 headings: {
-                    name: 'Filename',
-                    size: 'Filesize',
-                    folder: 'Folder',
-                    location: 'Location',
-                    id: 'Delete',
+                    name: "Filename",
+                    size: "Filesize",
+                    folder: "Folder",
+                    location: "Location",
+                    id: "Delete",
                 },
                 orderBy: {
                     ascending: true,
-                    column: 'name'
+                    column: "name",
                 },
                 perPage: 50,
                 perPageValues: [50, 100, 200],
@@ -86,27 +84,28 @@ export default {
                 resizableColumns: false,
                 tabbable: false,
                 texts: {
-                    filterPlaceholder: 'Search for files...',
-                    noResults: 'No matching files...',
-                    count: '{from}-{to} of {count}',
-                    limit: 'Rows per page:'
+                    filterPlaceholder: "Search for files...",
+                    noResults: "No matching files...",
+                    count: "{from}-{to} of {count}",
+                    limit: "Rows per page:",
                 },
                 sortIcon: {
-                    is: 'glyphicon-sort',
-                    base: 'glyphicon',
-                    up: 'glyphicon-chevron-up',
-                    down: 'glyphicon-chevron-down'
+                    is: "glyphicon-sort",
+                    base: "glyphicon",
+                    up: "glyphicon-chevron-up",
+                    down: "glyphicon-chevron-down",
                 },
                 customSorting: {
-                    size: (ascending) => { //ensure filesize is sorted numerically
+                    size: (ascending) => {
+                        //ensure filesize is sorted numerically
                         return (a, b) => {
                             if (ascending) {
                                 return parseInt(a.size) >= parseInt(b.size) ? 1 : -1;
                             }
                             return parseInt(a.size) <= parseInt(b.size) ? 1 : -1;
-                        }
-                    }
-                }
+                        };
+                    },
+                },
             },
 
             /* When you click the Delete link, remember its url
@@ -115,7 +114,7 @@ export default {
              */
             fileUrlToDelete: undefined,
             isProcessActive: false,
-        }
+        };
     },
 
     /**
@@ -123,7 +122,7 @@ export default {
      * Basically, when vue has done all its inits and is ready to go
      * kind of like window.onload
      */
-    mounted () {
+    mounted() {
         this.loadRows();
     },
 
@@ -133,12 +132,11 @@ export default {
      * other ordinary javascript that you might have written before.
      */
     methods: {
-
         /**
          * Fetch payload asynchronously
          *
          */
-        async loadRows () {
+        async loadRows() {
             this.loading = true;
             try {
                 const response = await fetch(this.endpoint);
@@ -154,7 +152,7 @@ export default {
          * To update the table to show the UI in the footer
          *
          */
-        onLoaded () {
+        onLoaded() {
             this.$nextTick(() => this.footerUI_update());
         },
 
@@ -165,7 +163,7 @@ export default {
          *
          * @returns { String } - 204.5 MB
          */
-        getHumanReadableFilesize (value) {
+        getHumanReadableFilesize(value) {
             return filesize(value);
         },
 
@@ -174,7 +172,7 @@ export default {
          *
          * @param { String }
          */
-        showDeleteModal (url) {
+        showDeleteModal(url) {
             this.fileUrlToDelete = url;
             this.$refs.deleteModal.open();
         },
@@ -182,21 +180,19 @@ export default {
         /**
          * Asynchronously access an endpoint to delete a file from the appropriate place
          */
-        async deleteFile () {
-
+        async deleteFile() {
             /* Set the loading flag to prevent people spamming the button
              */
             this.isProcessActive = true;
 
             try {
-
                 /* Asynchronously access the endpoint to delete the thing
-                */
+                 */
                 await fetch(this.fileUrlToDelete);
 
                 /* Remove the element from the allData stack
                  */
-                this.allData = this.allData.filter( (item) => item._links.delete !== this.fileUrlToDelete );
+                this.allData = this.allData.filter((item) => item._links.delete !== this.fileUrlToDelete);
 
                 /* Shut the modal
                  */
@@ -204,47 +200,39 @@ export default {
 
                 /* Toast (though I prefer our twig toast until a better replacement comes along)
                  */
-                this.$refs.toast.timeout('File deleted', true);
+                this.$refs.toast.timeout("File deleted", true);
                 this.isProcessActive = false;
-
             } catch (error) {
-
                 /* Deal with error case
                  */
-                this.$refs.toast.timeout('Unable to delete file', false);
+                this.$refs.toast.timeout("Unable to delete file", false);
                 this.isProcessActive = false;
-
             }
-        }
-    }
-}
+        },
+    },
+};
 </script>
 <template>
     <div>
         <template v-if="this.loading">
             <table class="skeleton">
                 <thead>
-                <tr>
-                    <th></th>
-                </tr>
+                    <tr>
+                        <th></th>
+                    </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td></td>
-                </tr>
+                    <tr>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                    </tr>
                 </tbody>
             </table>
         </template>
         <template v-else>
-            <v-client-table
-                :data="allData"
-                :columns="columns"
-                :options="options"
-                @loaded="onLoaded"
-            >
+            <v-client-table :data="allData" :columns="columns" :options="options" @loaded="onLoaded">
                 <template #name="props">
                     <a :href="props.row._links.send">{{ props.row.name }}</a>
                 </template>
@@ -255,7 +243,12 @@ export default {
                     <a :href="`/homepage/${props.row.folderId}`">{{ props.row.folder }}</a>
                 </template>
                 <template #id="props">
-                    <a v-if="props.row._links.delete" :href="props.row._links.delete" @click.prevent="showDeleteModal(props.row._links.delete)">Delete</a>
+                    <a
+                        v-if="props.row._links.delete"
+                        :href="props.row._links.delete"
+                        @click.prevent="showDeleteModal(props.row._links.delete)"
+                        >Delete</a
+                    >
                 </template>
                 <template #afterTable>
                     <div class="VueTables__table-footer" ref="tableFooter"></div>
@@ -267,15 +260,31 @@ export default {
             <h2>Please confirm</h2>
             <p>Are you sure you want to delete this file?</p>
             <ul class="flex-list buttons">
-                <li><button @click.prevent="deleteFile" class="button submit" id="usage-file-delete-button" :disabled="isProcessActive">Delete</button></li>
-                <li><button @click.prevent="$refs.deleteModal.close" class="button" id="usage-file-cancel-button" :disabled="isProcessActive">Cancel</button></li>
+                <li>
+                    <button
+                        @click.prevent="deleteFile"
+                        class="button submit"
+                        id="usage-file-delete-button"
+                        :disabled="isProcessActive"
+                    >
+                        Delete
+                    </button>
+                </li>
+                <li>
+                    <button
+                        @click.prevent="$refs.deleteModal.close"
+                        class="button"
+                        id="usage-file-cancel-button"
+                        :disabled="isProcessActive"
+                    >
+                        Cancel
+                    </button>
+                </li>
             </ul>
         </reveal-modal>
     </div>
 </template>
 
 <style lang="scss">
-
-@import '@schoolboxVue/components/vueTables2/vueTables2';
-
+@import "@schoolboxVue/components/vueTables2/vueTables2";
 </style>

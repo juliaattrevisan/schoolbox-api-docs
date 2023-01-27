@@ -1,53 +1,66 @@
 <script>
-
 /**
  * A previously or just recorded media made through either #record-media-modal or #evidence-media-recording
  *
  */
 
-import { gsap } from 'gsap/all';
-import AudioOnlyPlayer from '@schoolboxVue/components/videojs/audio-only-player';
-import PhotoPlayer from '@schoolboxVue/components/videojs/photo-player';
-import VideoPlayer from '@schoolboxVue/components/videojs/video-player';
-import OverMediaModal from '@schoolboxVue/components/videojs-record/over-media-modal';
-import { getVideoPlayerOptionsWithBlob, getVideoPlayerOptionsWithSrc, getAudioPlayerOptionsWithBlob, getAudioPlayerOptionsWithSrc } from '@js/videojs/videojsOptions';
-import recordMediaTypes from '@js/record-media/recordMediaTypes';
-import recordMediaEvents from '@js/record-media/recordMediaEvents';
-
+import { gsap } from "gsap/all";
+import AudioOnlyPlayer from "@schoolboxVue/components/videojs/audio-only-player";
+import PhotoPlayer from "@schoolboxVue/components/videojs/photo-player";
+import VideoPlayer from "@schoolboxVue/components/videojs/video-player";
+import OverMediaModal from "@schoolboxVue/components/videojs-record/over-media-modal";
+import {
+    getVideoPlayerOptionsWithBlob,
+    getVideoPlayerOptionsWithSrc,
+    getAudioPlayerOptionsWithBlob,
+    getAudioPlayerOptionsWithSrc,
+} from "@js/videojs/videojsOptions";
+import recordMediaTypes from "@js/record-media/recordMediaTypes";
+import recordMediaEvents from "@js/record-media/recordMediaEvents";
 
 export default {
-
     components: {
         OverMediaModal,
         AudioOnlyPlayer,
         PhotoPlayer,
-        VideoPlayer
+        VideoPlayer,
     },
 
     props: {
-        recordMediaType: { //currently should either be AUDIO_ONLY, CAMERA or SCREEN
+        recordMediaType: {
+            //currently should either be AUDIO_ONLY, CAMERA or SCREEN
             type: String,
             required: true,
             validator: function (value) {
-                return [recordMediaTypes.AUDIO_ONLY, recordMediaTypes.CAMERA, recordMediaTypes.SCREEN, recordMediaTypes.PHOTO].indexOf(value) !== -1 // The value must match one of these strings
-            }
+                return (
+                    [
+                        recordMediaTypes.AUDIO_ONLY,
+                        recordMediaTypes.CAMERA,
+                        recordMediaTypes.SCREEN,
+                        recordMediaTypes.PHOTO,
+                    ].indexOf(value) !== -1
+                ); // The value must match one of these strings
+            },
         },
-        hasPreRecordedData: { //if not, it must be a new recording
-            type: Boolean, 
+        hasPreRecordedData: {
+            //if not, it must be a new recording
+            type: Boolean,
             required: true,
-            default: false
+            default: false,
         },
-        preRecordedData: { //to display an already existing recording on startup
+        preRecordedData: {
+            //to display an already existing recording on startup
             type: Object,
             required: false,
         },
-        recordedData: { //new recording
+        recordedData: {
+            //new recording
             type: Blob,
             required: false,
-        }
+        },
     },
 
-    data () {
+    data() {
         return {
             player: null, //videojs-record instance
             isDeviceReady: false, //to toggle the device display
@@ -58,57 +71,54 @@ export default {
             isDeleteRecordingModalActive: false, //to confirm/deny whether to delete the video
             isDeleteRequested: false, //to notify of deletion when over-media-modal is closed
             mediaWidth: 0, //to restore to device dimensions if expanding/contracting on over-media-modal changes
-            mediaHeight: 0, //to restore to device dimensions if expanding/contracting on over-media-modal changes 
-        }
+            mediaHeight: 0, //to restore to device dimensions if expanding/contracting on over-media-modal changes
+        };
     },
 
     computed: {
-
-        currentRecordingType () {
+        currentRecordingType() {
             if (this.recordMediaType === recordMediaTypes.AUDIO_ONLY) {
-                return 'audio recording';
+                return "audio recording";
             } else if (this.recordMediaType === recordMediaTypes.PHOTO) {
-                return 'photo';
-            }  else if (this.recordMediaType === recordMediaTypes.CAMERA) {
-                return 'video recording';
-            }  else if (this.recordMediaType === recordMediaTypes.SCREEN) {
-                return 'screen recording';
+                return "photo";
+            } else if (this.recordMediaType === recordMediaTypes.CAMERA) {
+                return "video recording";
+            } else if (this.recordMediaType === recordMediaTypes.SCREEN) {
+                return "screen recording";
             }
-        }
-
+        },
     },
 
-	created () {
+    created() {
         this.recordMediaTypes = recordMediaTypes; //to be able to move between media types
         this.checkForPreRecordedData();
-	},
+    },
 
-    mounted () {
-        gsap.from(this.$refs.deleteButton, 0.5, { right: '-50px', delay: 0.5 } ); //move it across to highlight
-	},
+    mounted() {
+        gsap.from(this.$refs.deleteButton, 0.5, { right: "-50px", delay: 0.5 }); //move it across to highlight
+    },
 
     methods: {
-
         /**
          * Either display a previously recorded media, or something just recorded
          *
          */
-        checkForPreRecordedData () {
+        checkForPreRecordedData() {
             if (this.preRecordedData) {
                 this.playbackData = {
                     src: this.getPlaybackDataSrc(),
                     type: this.getPlaybackDataType(),
-                    hash: this.preRecordedData.hash
-                } 
+                    hash: this.preRecordedData.hash,
+                };
             }
         },
 
         /**
          * to know where to reference the saved file from
          *
-         * @returns { String } 
+         * @returns { String }
          */
-        getPlaybackDataSrc () {
+        getPlaybackDataSrc() {
             if (this.recordMediaType === recordMediaTypes.PHOTO) {
                 return `/storage/image.php?hash=${this.preRecordedData.hash}`;
             } else {
@@ -119,13 +129,13 @@ export default {
         /**
          * to know what the media type is
          *
-         * @returns { String } 
+         * @returns { String }
          */
-        getPlaybackDataType () {
+        getPlaybackDataType() {
             if (this.recordMediaType === recordMediaTypes.AUDIO_ONLY) {
-                return 'audio/mpeg';
+                return "audio/mpeg";
             } else {
-                return 'video/mp4';
+                return "video/mp4";
             }
         },
 
@@ -133,7 +143,7 @@ export default {
          * close the error modal, animating out
          *
          */
-        onCloseErrorModalSelected () {
+        onCloseErrorModalSelected() {
             this.isOverMediaModalClosing = true;
         },
 
@@ -141,7 +151,7 @@ export default {
          * it's closed now, so disable the errors to allow trying again
          *
          */
-        onErrorModalClosed () {
+        onErrorModalClosed() {
             this.hasError = false;
             this.isOverMediaModalClosing = false;
             this.hasRecordPlayerError = false;
@@ -151,7 +161,7 @@ export default {
          * to be able to record another media
          *
          */
-        onDeleteRecordingSelected () {
+        onDeleteRecordingSelected() {
             this.isDeleteRecordingModalActive = true;
         },
 
@@ -159,7 +169,7 @@ export default {
          * confirm deletion of the latest recording, setting up for another recording
          *
          */
-        onConfirmDeleteRecordingSelected () {
+        onConfirmDeleteRecordingSelected() {
             this.isDeleteRequested = true;
             this.isOverMediaModalClosing = true;
         },
@@ -168,7 +178,7 @@ export default {
          * close the delete recording modal
          *
          */
-        onCancelDeleteRecordingSelected () {
+        onCancelDeleteRecordingSelected() {
             this.isOverMediaModalClosing = true;
         },
 
@@ -176,7 +186,7 @@ export default {
          * closed the delete recording modal, and notify of delete request if required
          *
          */
-        onDeleteRecordingModalClosed () {
+        onDeleteRecordingModalClosed() {
             this.isOverMediaModalClosing = false;
             this.isDeleteRecordingModalActive = false;
             if (this.isDeleteRequested) {
@@ -190,7 +200,7 @@ export default {
          *
          * @returns { Object }
          */
-        getAudioPlayerOptions () {
+        getAudioPlayerOptions() {
             if (this.hasPreRecordedData) {
                 return getAudioPlayerOptionsWithSrc(this.playbackData);
             } else {
@@ -203,11 +213,12 @@ export default {
          *
          * @returns { String }
          */
-        getImgSrc () {
-            if (this.hasPreRecordedData) { //otherwise it's the already saved image src
+        getImgSrc() {
+            if (this.hasPreRecordedData) {
+                //otherwise it's the already saved image src
                 return this.playbackData.src;
-            } else { 
-                return this.recordedData.src; //was put in by 
+            } else {
+                return this.recordedData.src; //was put in by
             }
         },
 
@@ -216,7 +227,7 @@ export default {
          *
          * @returns { Object }
          */
-        getVideoPlayerOptions () {
+        getVideoPlayerOptions() {
             if (this.hasPreRecordedData) {
                 return getVideoPlayerOptionsWithSrc(this.playbackData);
             } else {
@@ -230,7 +241,7 @@ export default {
          * @params { Number }
          * @params { Number }
          */
-        onMediaDimensionsReady (width, height) {
+        onMediaDimensionsReady(width, height) {
             this.mediaWidth = width;
             this.mediaHeight = height;
             this.$emit(recordMediaEvents.RESIZE, width, height);
@@ -240,7 +251,7 @@ export default {
          * A record player has got an error
          *
          */
-        onRecordPlayerError () {
+        onRecordPlayerError() {
             this.hasRecordPlayerError = true;
             this.hasError = true;
         },
@@ -251,7 +262,7 @@ export default {
          * @params { Number }
          * @params { Number }
          */
-        onOverMediaModalOpened (width, height) {
+        onOverMediaModalOpened(width, height) {
             this.$emit(recordMediaEvents.OVER_MEDIA_MODAL_OPENED, width, height);
         },
 
@@ -261,19 +272,15 @@ export default {
          * @params { Number }
          * @params { Number }
          */
-        onOverMediaModalClosed () {
+        onOverMediaModalClosed() {
             this.$emit(recordMediaEvents.OVER_MEDIA_MODAL_CLOSED);
         },
-
-    }
-
-}
+    },
+};
 </script>
 
 <template>
-    
     <div>
-
         <audio-only-player
             v-if="recordMediaType === recordMediaTypes.AUDIO_ONLY"
             :options="getAudioPlayerOptions()"
@@ -293,37 +300,45 @@ export default {
         />
 
         <transition name="slide">
-            <a ref="deleteButton" v-if="!hasError" @click.prevent="onDeleteRecordingSelected" class="button icon-delete delete-button" title="Delete recording"></a>
+            <a
+                ref="deleteButton"
+                v-if="!hasError"
+                @click.prevent="onDeleteRecordingSelected"
+                class="button icon-delete delete-button"
+                title="Delete recording"
+            ></a>
         </transition>
 
-        <over-media-modal 
-            v-if="isDeleteRecordingModalActive" 
-            :is-closing="isOverMediaModalClosing" 
-            :closed-call-back="onDeleteRecordingModalClosed" 
-            @on-over-media-modal-opened="onOverMediaModalOpened" 
-            @on-over-media-modal-closed="onOverMediaModalClosed" 
+        <over-media-modal
+            v-if="isDeleteRecordingModalActive"
+            :is-closing="isOverMediaModalClosing"
+            :closed-call-back="onDeleteRecordingModalClosed"
+            @on-over-media-modal-opened="onOverMediaModalOpened"
+            @on-over-media-modal-closed="onOverMediaModalClosed"
             key="deleteRecordingModal"
         >
-            <p>Are you sure you wish to delete the current {{currentRecordingType}}?</p>
+            <p>Are you sure you wish to delete the current {{ currentRecordingType }}?</p>
             <div class="modal-actions">
                 <button class="submit" @click.prevent="onConfirmDeleteRecordingSelected">Confirm</button>
                 <button @click.prevent="onCancelDeleteRecordingSelected">Cancel</button>
             </div>
         </over-media-modal>
-        <over-media-modal v-else-if="hasRecordPlayerError" :is-closing="isOverMediaModalClosing" :closed-call-back="onErrorModalClosed" key="errorModal">
+        <over-media-modal
+            v-else-if="hasRecordPlayerError"
+            :is-closing="isOverMediaModalClosing"
+            :closed-call-back="onErrorModalClosed"
+            key="errorModal"
+        >
             <div class="alert-box alert">Sorry, the recorded media cannot be accessed.</div>
         </over-media-modal>
-
     </div>
-
 </template>
 
 <style lang="scss" scoped>
-
 .delete-button {
     position: absolute;
     z-index: 3;
-    right: 10px; 
+    right: 10px;
     top: 10px;
     width: 42px;
     height: 44px;
@@ -340,7 +355,7 @@ export default {
         opacity: 0.8;
     }
     @media screen and (max-width: 640px) {
-        right: 5px; 
+        right: 5px;
         top: 5px;
     }
 }
@@ -348,7 +363,7 @@ export default {
 .modal-actions {
     display: flex;
     button {
-        margin: 0px 2px; 
+        margin: 0px 2px;
         width: 100%;
     }
 }
@@ -359,12 +374,11 @@ export default {
 .slide-leave-active {
     transition: right 0.2s ease-in;
 }
-.slide-enter-active, 
+.slide-enter-active,
 .slide-leave-to {
-    right: -50px; 
+    right: -50px;
 }
 .slide-enter-to {
-    right: 10px; 
+    right: 10px;
 }
-
 </style>

@@ -1,19 +1,17 @@
 <script setup>
-
 /**
  * This diplays a single or list of badges linked to a number of users
  * while evidence is being added or updated to a badge
  *
  */
 
-import { ref, computed } from 'vue';
-import BadgeDetail from '../../vue/badgeDetail.vue';
-import BadgeImage from '../../vue/badge-image.vue';
-import BadgeModal from '../../vue/badge-modal.vue';
-import RevealModal from '@schoolboxVue/components/reveal-modal';
-import NodeDetails from '@schoolboxCurriculum/vue/node-details';
-import { getEmptyNode } from '@schoolboxCurriculum/js/nodeUtils';
-
+import { ref, computed } from "vue";
+import BadgeDetail from "../../vue/badgeDetail.vue";
+import BadgeImage from "../../vue/badge-image.vue";
+import BadgeModal from "../../vue/badge-modal.vue";
+import RevealModal from "@schoolboxVue/components/reveal-modal";
+import NodeDetails from "@schoolboxCurriculum/vue/node-details";
+import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
 
 const props = defineProps({
     /**
@@ -60,11 +58,10 @@ const singleBadge = computed(() => {
  *
  * @pararm { object }
  */
-function onCodeSelected (node) {
+function onCodeSelected(node) {
     selectedNode.value = node;
     nodeModalEl.value.open();
 }
-
 
 const currentBadge = ref(null);
 const isBadgeModalOpen = ref(false);
@@ -74,7 +71,7 @@ const isBadgeModalOpen = ref(false);
  *
  * @param {Object} badge
  */
-function openBadgeModal (badge) {
+function openBadgeModal(badge) {
     currentBadge.value = badge;
     isBadgeModalOpen.value = true;
 }
@@ -83,10 +80,9 @@ function openBadgeModal (badge) {
  * the detail modal is closed, so we should set the boolean to
  * false so we can open it again
  */
-function onDetailModalClosed () {
+function onDetailModalClosed() {
     isBadgeModalOpen.value = false;
 }
-
 </script>
 
 <template>
@@ -97,7 +93,7 @@ function onDetailModalClosed () {
                     <badge-detail
                         :badge="singleBadge"
                         parent-css="evidence-badge-container"
-                        :img-css="`evidence-badge-img-container ${ isGoal ? 'goal' : '' }`"
+                        :img-css="`evidence-badge-img-container ${isGoal ? 'goal' : ''}`"
                         @code-selected="onCodeSelected"
                     />
                 </div>
@@ -108,13 +104,15 @@ function onDetailModalClosed () {
                                 <badge-image :badge="badge"></badge-image>
                             </a>
                         </div>
-                        <div class=" actions-small-1 card-content">
+                        <div class="actions-small-1 card-content">
                             <div class="list-item">
                                 <h3>
                                     <a @click.prevent="openBadgeModal(badge)" :title="badge.name">{{ badge.name }}</a>
                                 </h3>
                             </div>
-                            <p class="meta" v-if="badge.category" :title="'Category: ' + badge.category.name">{{ badge.category.name }}</p>
+                            <p class="meta" v-if="badge.category" :title="'Category: ' + badge.category.name">
+                                {{ badge.category.name }}
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -122,21 +120,13 @@ function onDetailModalClosed () {
         </div>
     </div>
     <reveal-modal ref="nodeModalEl">
-        <node-details
-            :node="selectedNode"
-        />
+        <node-details :node="selectedNode" />
     </reveal-modal>
-    <badge-modal
-        :isOpen="isBadgeModalOpen"
-        :badge="currentBadge"
-        @closed="onDetailModalClosed"
-    />
+    <badge-modal :isOpen="isBadgeModalOpen" :badge="currentBadge" @closed="onDetailModalClosed" />
 </template>
 
 <style scoped>
-
 .badge-grid {
     padding: 1rem;
 }
-
 </style>

@@ -1,18 +1,17 @@
 <script>
-import AwardDetailModal from './award-detail-modal';
+import AwardDetailModal from "./award-detail-modal";
 import AchievementWithdrawModal from "./award-achievement-withdraw-modal";
-import BadgeImage from './../../vue/badge-image';
+import BadgeImage from "./../../vue/badge-image";
 import GoalWithdrawModal from "./award-goal-withdraw-modal";
-import foundationMixin from '@schoolboxVue/components/foundation-mixin';
-import goalMixin from './goal-mixin';
-import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
-import toastMixin from '@schoolboxVue/components/toast-mixin';
-import userProfileConstants from '../../../vue/user-profile/constants';
-import userProfileMixin from '../../../vue/user-profile/mixin';
-import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin';
+import foundationMixin from "@schoolboxVue/components/foundation-mixin";
+import goalMixin from "./goal-mixin";
+import RelativeTime from "@schoolboxLearningMomentEvidence/relative-time";
+import toastMixin from "@schoolboxVue/components/toast-mixin";
+import userProfileConstants from "../../../vue/user-profile/constants";
+import userProfileMixin from "../../../vue/user-profile/mixin";
+import cdnPrefixMixin from "@schoolboxVue/components/cdn-prefix-mixin";
 
 export default {
-
     /**
      * Name.
      * The name of the component that we have here. This name will be used in the container
@@ -26,13 +25,7 @@ export default {
      * manner as a php trait. They must already be imported at the top of the file and will
      * be superpositioned on top of this javascript here, inside export default {}
      */
-    mixins: [
-        cdnPrefixMixin,
-        foundationMixin,
-        goalMixin,
-        toastMixin,
-        userProfileMixin,
-    ],
+    mixins: [cdnPrefixMixin, foundationMixin, goalMixin, toastMixin, userProfileMixin],
 
     /**
      * Props.
@@ -40,7 +33,7 @@ export default {
      * These are the hyphen-separated vars which are magically computed into camelcase elsewhere.
      */
     props: {
-        siteVersion: String
+        siteVersion: String,
     },
 
     /**
@@ -53,7 +46,7 @@ export default {
         AchievementWithdrawModal,
         BadgeImage,
         GoalWithdrawModal,
-        RelativeTime
+        RelativeTime,
     },
 
     /**
@@ -66,7 +59,7 @@ export default {
         return {
             data: [],
             loading: true,
-        }
+        };
     },
 
     /**
@@ -84,7 +77,7 @@ export default {
      * Access the results of a function as if they were a property of an object.
      */
     computed: {
-        config: () => window.learningBadgeGoalFeedConfig
+        config: () => window.learningBadgeGoalFeedConfig,
     },
 
     /**
@@ -110,10 +103,10 @@ export default {
         async awardAchievement(award) {
             try {
                 await fetch(award._links.goalAward, {
-                    method: 'POST',
-                    body: JSON.stringify({ users: [award.recipient], reason: award.reason})
+                    method: "POST",
+                    body: JSON.stringify({ users: [award.recipient], reason: award.reason }),
                 });
-                this.toastSuccess('Achievement awarded');
+                this.toastSuccess("Achievement awarded");
                 /* Temporarily replaced implementation of self.updateAwards()
                  * goal-feed.vue can't tell achievement-feed.vue to update itself; they don't
                  * share a common parent. They're entirely separate vue apps. An action inside
@@ -125,7 +118,7 @@ export default {
                 window.location.reload();
             } catch (error) {
                 console.warn(error);
-                this.toastError('Failed to award achievement');
+                this.toastError("Failed to award achievement");
             }
         },
 
@@ -154,7 +147,7 @@ export default {
          * @returns {string}
          */
         generateIdentifier(award) {
-            return 'header-options-' + award.badge.category.id + '-' + award.badge.id + '-' + award.status;
+            return "header-options-" + award.badge.category.id + "-" + award.badge.id + "-" + award.status;
         },
 
         /**
@@ -189,9 +182,9 @@ export default {
          */
         canWithdraw(award) {
             return Boolean(award._links.goalWithdraw) || Boolean(award._links.achievementWithdraw);
-        }
-    }
-}
+        },
+    },
+};
 </script>
 <template>
     <div>
@@ -215,43 +208,72 @@ export default {
                                         <badge-image :badge="award.badge" :css="getCss(award)"></badge-image>
                                     </a>
                                     <template v-if="award.count > 1">
-                                        <div class="award-count" :title="'Awarded ' + award.count + ' times'">x{{ award.count }}</div>
+                                        <div class="award-count" :title="'Awarded ' + award.count + ' times'">
+                                            x{{ award.count }}
+                                        </div>
                                     </template>
                                 </div>
                                 <div class="actions-small-1 card-content">
                                     <div class="list-item">
-                                        <h3><a href="#" @click.prevent="openDetailModal(award)" :title="award.badge.name">{{ award.badge.name }}</a></h3>
+                                        <h3>
+                                            <a
+                                                href="#"
+                                                @click.prevent="openDetailModal(award)"
+                                                :title="award.badge.name"
+                                                >{{ award.badge.name }}</a
+                                            >
+                                        </h3>
                                     </div>
                                     <template v-if="hasTot(award)">
-                                    <nav>
-                                      <a class="icon-more" title="Actions" :data-dropdown="generateIdentifier(award)"></a>
-                                    </nav>
-                                    <ul :id="generateIdentifier(award)" class="f-dropdown" data-dropdown-content>
-
-                                      <!-- Only show Withdraw button if you can actually do it
+                                        <nav>
+                                            <a
+                                                class="icon-more"
+                                                title="Actions"
+                                                :data-dropdown="generateIdentifier(award)"
+                                            ></a>
+                                        </nav>
+                                        <ul :id="generateIdentifier(award)" class="f-dropdown" data-dropdown-content>
+                                            <!-- Only show Withdraw button if you can actually do it
                                         -- Students can't withdraw their own Achievement
                                         -->
-                                      <template v-if="canWithdraw(award)">
-                                        <template v-if="!award.isGoal">
-                                          <li><a @click.prevent="openAchievementWithdrawModal(award)" class="icon-withdraw-achievement" title="Withdraw achievement">Withdraw achievement</a></li>
-                                        </template>
-                                        <template v-else>
-                                          <li><a @click.prevent="awardAchievement(award)" class="icon-showcase" title="Award achievement">Award achievement</a></li>
-                                          <li><a @click.prevent="openGoalWithdrawModal(award)" class="icon-close" title="Remove goal">Remove goal</a></li>
-                                        </template>
-                                      </template>
-                                    </ul>
+                                            <template v-if="canWithdraw(award)">
+                                                <template v-if="!award.isGoal">
+                                                    <li>
+                                                        <a
+                                                            @click.prevent="openAchievementWithdrawModal(award)"
+                                                            class="icon-withdraw-achievement"
+                                                            title="Withdraw achievement"
+                                                            >Withdraw achievement</a
+                                                        >
+                                                    </li>
+                                                </template>
+                                                <template v-else>
+                                                    <li>
+                                                        <a
+                                                            @click.prevent="awardAchievement(award)"
+                                                            class="icon-showcase"
+                                                            title="Award achievement"
+                                                            >Award achievement</a
+                                                        >
+                                                    </li>
+                                                    <li>
+                                                        <a
+                                                            @click.prevent="openGoalWithdrawModal(award)"
+                                                            class="icon-close"
+                                                            title="Remove goal"
+                                                            >Remove goal</a
+                                                        >
+                                                    </li>
+                                                </template>
+                                            </template>
+                                        </ul>
                                     </template>
                                     <p class="meta">
                                         <!-- Change metadata text subtly depending on the Award status
                                           -- Goals and Achievements, while badges, aren't the same thing
                                           -->
-                                        <template v-if="award.isGoal">
-                                          Goal set
-                                        </template>
-                                        <template v-else>
-                                          Awarded
-                                        </template>
+                                        <template v-if="award.isGoal"> Goal set </template>
+                                        <template v-else> Awarded </template>
                                         <relative-time :datetime="award.awardedAt"></relative-time>
                                     </p>
                                 </div>
@@ -269,22 +291,54 @@ export default {
                     <!-- Current user -->
                     <p>You don't have any goals yet.</p>
                     <p v-if="config.routes.getSetAsGoalForSelfForm">
-                        <a :href="config.routes.getSetAsGoalForSelfForm + '?' + config.returnUrl.name + '=' + config.returnUrl.current" title="Set a goal">Set a goal</a> to see it appear here.
+                        <a
+                            :href="
+                                config.routes.getSetAsGoalForSelfForm +
+                                '?' +
+                                config.returnUrl.name +
+                                '=' +
+                                config.returnUrl.current
+                            "
+                            title="Set a goal"
+                            >Set a goal</a
+                        >
+                        to see it appear here.
                     </p>
                 </template>
                 <template v-else>
                     <!-- Parent or student -->
                     <p>{{ config.student.givenName }} doesn't have any goals yet.</p>
                     <p v-if="config.routes.getSetAsGoalForm">
-                        <a :href="config.routes.getSetAsGoalForm + '?' + config.returnUrl.name + '=' + config.returnUrl.current" title="Set a goal">Set a goal</a> for {{ config.student.givenName }}.
+                        <a
+                            :href="
+                                config.routes.getSetAsGoalForm +
+                                '?' +
+                                config.returnUrl.name +
+                                '=' +
+                                config.returnUrl.current
+                            "
+                            title="Set a goal"
+                            >Set a goal</a
+                        >
+                        for {{ config.student.givenName }}.
                     </p>
                 </template>
             </div>
         </template>
 
-        <award-detail-modal ref="awardDetailModal" :cdn-prefix="this.cdnPrefix" :site-version="this.siteVersion"></award-detail-modal>
+        <award-detail-modal
+            ref="awardDetailModal"
+            :cdn-prefix="this.cdnPrefix"
+            :site-version="this.siteVersion"
+        ></award-detail-modal>
 
-        <achievement-withdraw-modal ref="achievementWithdrawModal" v-on:withdraw-complete="emitUpdateToAllUserProfileFeeds"></achievement-withdraw-modal>
-        <goal-withdraw-modal ref="goalWithdrawModal" v-on:withdraw-complete="emitUpdateToAllUserProfileFeeds"></goal-withdraw-modal>
+        <achievement-withdraw-modal
+            ref="achievementWithdrawModal"
+            v-on:withdraw-complete="emitUpdateToAllUserProfileFeeds"
+        ></achievement-withdraw-modal>
+        <goal-withdraw-modal
+            ref="goalWithdrawModal"
+            v-on:withdraw-complete="emitUpdateToAllUserProfileFeeds"
+        ></goal-withdraw-modal>
     </div>
 </template>

@@ -1,14 +1,12 @@
 <script setup>
-
 /**
  * to select a node within the current modal session
  */
 
-import { computed } from 'vue';
-import { generateUUID } from '@js/util/jsUtils';
-import { UNSET_ID } from '@schoolboxCurriculum/js/nodeUtils';
-import { useModalSelectedNodesStore } from '../store/csModalSelectedNodesStore';
-
+import { computed } from "vue";
+import { generateUUID } from "@js/util/jsUtils";
+import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
+import { useModalSelectedNodesStore } from "../store/csModalSelectedNodesStore";
 
 const modalSelectedNodesStore = useModalSelectedNodesStore();
 const extraId = generateUUID(); //to ensure the input/label id is unique
@@ -22,11 +20,11 @@ const props = defineProps({
         required: true,
         default() {
             return {
-                id: '0',
-                name: '-',
+                id: "0",
+                name: "-",
                 children: [],
-            }
-        }
+            };
+        },
     },
 });
 
@@ -42,7 +40,7 @@ const isIdSet = computed(() => props.node.id !== UNSET_ID);
  *
  * @returns { Boolean }
  */
-const hasCode = computed(() => props.node.code && props.node.code !== '');
+const hasCode = computed(() => props.node.code && props.node.code !== "");
 
 /**
  * Only show the checkbox if the node has an id and a code
@@ -63,10 +61,9 @@ const isChecked = computed(() => modalSelectedNodesStore.isSelected(props.node))
  *
  * @param { boolean }
  */
-function onChange (isChecked) {
+function onChange(isChecked) {
     modalSelectedNodesStore.switch(props.node, isChecked);
 }
-
 </script>
 
 <template>
@@ -83,10 +80,8 @@ function onChange (isChecked) {
 </template>
 
 <style lang="scss" scoped>
-
 .checklist {
     flex: 2rem 0 0; //ensure a long name doesn't impact the checkbox width, which may add dodgy scroll bars on it
     padding-top: 0.5rem;
 }
-
 </style>

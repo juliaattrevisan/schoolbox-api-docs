@@ -1,26 +1,19 @@
 <script>
-
 import RevealModal from "@schoolboxVue/components/reveal-modal";
 
-
 export default {
-
     name: "create-booking-modal",
-    
+
     components: { RevealModal },
 
-    props: [
-        'bookingPath',
-        'dateFormats',
-        'bookingType',
-    ],
+    props: ["bookingPath", "dateFormats", "bookingType"],
 
     data() {
         return {
             startDate: this.getStartDate(),
-            startTime: '',
+            startTime: "",
             event: {},
-        }
+        };
     },
 
     computed: {
@@ -34,12 +27,10 @@ export default {
         displayDate() {
             return this.event.date
                 ? dayjs(this.event.date).format(
-                    this.event.allDay
-                        ? this.dateFormats.displayDate
-                        : this.dateFormats.displayDatetime
-                )
-                : '';
-        }
+                      this.event.allDay ? this.dateFormats.displayDate : this.dateFormats.displayDatetime
+                  )
+                : "";
+        },
     },
 
     methods: {
@@ -52,34 +43,35 @@ export default {
         },
 
         submitForm() {
-            var createBookingParamsRoute = [
-                'startDate=' + dayjs(this.event.date).format('YYYY-MM-DD')
-            ];
+            var createBookingParamsRoute = ["startDate=" + dayjs(this.event.date).format("YYYY-MM-DD")];
 
             if (!this.event.allDay) {
-                createBookingParamsRoute.push('startTime=' + dayjs(this.event.date).format('HH:mm'));
+                createBookingParamsRoute.push("startTime=" + dayjs(this.event.date).format("HH:mm"));
             }
 
-            var createBookingPath = this.bookingPath + '?' + createBookingParamsRoute.join('&');
+            var createBookingPath = this.bookingPath + "?" + createBookingParamsRoute.join("&");
 
-            if (this.bookingType === 'category') {
+            if (this.bookingType === "category") {
                 var currentLocation = window.location;
                 var callBackUrl = currentLocation.pathname + currentLocation.search;
-                createBookingParamsRoute.push('callbackUrl=' + encodeURIComponent(callBackUrl));
+                createBookingParamsRoute.push("callbackUrl=" + encodeURIComponent(callBackUrl));
 
-                createBookingPath = this.bookingPath + this.event.id + '?' + createBookingParamsRoute.join('&') + '#resourceBookingByCategory';
+                createBookingPath =
+                    this.bookingPath +
+                    this.event.id +
+                    "?" +
+                    createBookingParamsRoute.join("&") +
+                    "#resourceBookingByCategory";
             }
 
             window.location = createBookingPath;
         },
 
         getStartDate() {
-            return this.event?.date ? dayjs(this.event.date).format('YYYY-MM-DD') : '';
-        }
-    }
-
-}
-
+            return this.event?.date ? dayjs(this.event.date).format("YYYY-MM-DD") : "";
+        },
+    },
+};
 </script>
 
 <template>
@@ -97,7 +89,9 @@ export default {
                     need to update jQuery to 3.x. However, doing so may potentially open un new issues.
                  -->
             </template>
-            <p>Create booking for: <span>{{ displayDate }}</span></p>
+            <p>
+                Create booking for: <span>{{ displayDate }}</span>
+            </p>
             <input type="submit" value="Create Booking" v-on:click="submitForm" />
         </form>
     </reveal-modal>

@@ -1,13 +1,11 @@
 <script setup>
-
 /**
  * To indicate progress through the node tree and to be able to
  * move backwards through the tree
  */
 
-import { shortenLength } from '@js/util/stringUtils';
-import { useModalActiveNodesStore } from '../store/csModalActiveNodesStore';
-
+import { shortenLength } from "@js/util/stringUtils";
+import { useModalActiveNodesStore } from "../store/csModalActiveNodesStore";
 
 const modalActiveNodesStore = useModalActiveNodesStore();
 const maxNameLength = 100;
@@ -18,15 +16,14 @@ const maxNameLength = 100;
  * @param { number }
  * @param { number }
  */
-function onSelected (depth, id) {
+function onSelected(depth, id) {
     modalActiveNodesStore.setSelected(depth, parseInt(id));
 }
-
 </script>
 
 <template>
     <TransitionGroup name="list" class="breadcrumb" tag="ul">
-        <li v-for="(breadcrumb) in modalActiveNodesStore.breadcrumbs" :key="breadcrumb.id">
+        <li v-for="breadcrumb in modalActiveNodesStore.breadcrumbs" :key="breadcrumb.id">
             <a
                 :href="`/curriculum/#${breadcrumb.id}`"
                 :title="`View ${breadcrumb.name}`"
@@ -40,7 +37,6 @@ function onSelected (depth, id) {
 </template>
 
 <style lang="scss" scoped>
-
 .list-enter-active,
 .list-leave-active {
     transition: all 0.3s ease;
@@ -53,5 +49,4 @@ function onSelected (depth, id) {
     opacity: 0;
     transform: translateX(10px);
 }
-
 </style>

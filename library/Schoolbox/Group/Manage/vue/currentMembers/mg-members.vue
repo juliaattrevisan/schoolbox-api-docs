@@ -1,20 +1,17 @@
 <script setup>
-
 /**
  * Display the group members in a table display
  */
 
-import { ref, watch, nextTick } from 'vue';
-import { EventBus } from 'v-tables-3-select-rows';
-import { useMembersStore } from '../store/mgMembersStore';
-import { updateFooterUI } from '@schoolboxVue/components/vueTables2/useFooterUI';
-import MgMembersFilters from './mg-members-filters.vue';
-import MgMembersName from './mg-members-name.vue';
-import MgMembersAccess from './mg-members-access.vue';
-import FilterEvents from './mgFilterEvents';
-import AccessTypes from './mgAccessTypes';
-
-
+import { ref, watch, nextTick } from "vue";
+import { EventBus } from "v-tables-3-select-rows";
+import { useMembersStore } from "../store/mgMembersStore";
+import { updateFooterUI } from "@schoolboxVue/components/vueTables2/useFooterUI";
+import MgMembersFilters from "./mg-members-filters.vue";
+import MgMembersName from "./mg-members-name.vue";
+import MgMembersAccess from "./mg-members-access.vue";
+import FilterEvents from "./mgFilterEvents";
+import AccessTypes from "./mgAccessTypes";
 
 /*****************************************************************
  *
@@ -24,13 +21,26 @@ import AccessTypes from './mgAccessTypes';
 
 const membersStore = useMembersStore();
 const tableEl = ref(null);
-const tableColumns = ['name', 'firstName', 'givenName', 'preferredName', 'lastName', 'role', 'campus', 'yearLevel', 'house', 'accessType'];
-const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vue-tables-2/options-api
+const tableColumns = [
+    "name",
+    "firstName",
+    "givenName",
+    "preferredName",
+    "lastName",
+    "role",
+    "campus",
+    "yearLevel",
+    "house",
+    "accessType",
+];
+const tableOptions = {
+    //options for vue-tables-2: https://matanya.gitbook.io/vue-tables-2/options-api
     alwaysShowPerPageSelect: true,
     columnsClasses: {
-        accessType: 'access-td ', //to specify a width
+        accessType: "access-td ", //to specify a width
     },
-    customFilters: [ //refer to https://matanya.gitbook.io/vue-tables-2/custom-filters for further info
+    customFilters: [
+        //refer to https://matanya.gitbook.io/vue-tables-2/custom-filters for further info
         {
             name: FilterEvents.SHOW_WAITING_LIST,
             callback: (row, query) => row.accessType !== query,
@@ -49,9 +59,11 @@ const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vu
         },
     ],
     customSorting: {
-        name: (ascending) => { //'waiting' members to always show on top and then sort by lastName
+        name: (ascending) => {
+            //'waiting' members to always show on top and then sort by lastName
             return (a, b) => {
-                if (a.displayPriority < b.displayPriority) { //the displayPriority is set in mgMembersStore.js
+                if (a.displayPriority < b.displayPriority) {
+                    //the displayPriority is set in mgMembersStore.js
                     return 1;
                 } else if (a.displayPriority > b.displayPriority) {
                     return -1;
@@ -67,49 +79,54 @@ const tableOptions = { //options for vue-tables-2: https://matanya.gitbook.io/vu
                     return a.givenName >= b.givenName ? 1 : -1;
                 }
                 return a.givenName <= b.givenName ? 1 : -1;
-            }
+            };
         },
     },
     debounce: 100, //shorter debounce time as data is stored locally
     headings: {
-        name: 'Name',
-        accessType: 'Access',
+        name: "Name",
+        accessType: "Access",
     },
-    hiddenColumns: ['firstName', 'givenName', 'preferredName', 'lastName', 'role', 'campus', 'yearLevel', 'house'], //these are all added to name, but we need to add them to tableColumns so we can search them
-    orderBy: { //initial sorting display
+    hiddenColumns: ["firstName", "givenName", "preferredName", "lastName", "role", "campus", "yearLevel", "house"], //these are all added to name, but we need to add them to tableColumns so we can search them
+    orderBy: {
+        //initial sorting display
         ascending: true,
-        column: 'name'
+        column: "name",
     },
     perPage: 50,
     perPageValues: [50, 100, 200],
     resizableColumns: false,
-    rowClassCallback: (row) => { //to differentiate new / updated rows
-        if (row.isNew) { //so it's clear the rows have just been added
-            return 'is-new';
-        } else if (row.justUpdated) { //and so it's clear they've just been updated
-            return 'just-updated';
+    rowClassCallback: (row) => {
+        //to differentiate new / updated rows
+        if (row.isNew) {
+            //so it's clear the rows have just been added
+            return "is-new";
+        } else if (row.justUpdated) {
+            //and so it's clear they've just been updated
+            return "just-updated";
         }
-        return '';
+        return "";
     },
     selectable: {
-        mode: 'multiple' //to enable multi-select for those with permission
+        mode: "multiple", //to enable multi-select for those with permission
     },
-    sortable: ['name'], //the access column doesn't need to be sortable
+    sortable: ["name"], //the access column doesn't need to be sortable
     tabbable: false,
     texts: {
-        count: '{from}-{to} of {count} members|{count} members|1 member',
-        filterPlaceholder: 'Search current members...',
-        noResults: 'No matching group members',
+        count: "{from}-{to} of {count} members|{count} members|1 member",
+        filterPlaceholder: "Search current members...",
+        noResults: "No matching group members",
     },
-}
+};
 
 let isFirstLoad = true;
 
 /**
  * To update the table to show the UI in the footer
  */
-async function onLoaded () {
-    if (isFirstLoad) { //loaded gets called on every state change, and we only want to do the below once
+async function onLoaded() {
+    if (isFirstLoad) {
+        //loaded gets called on every state change, and we only want to do the below once
         isFirstLoad = false;
         updateFooterUI();
         addSearchNote();
@@ -121,17 +138,15 @@ async function onLoaded () {
  * We add below rather than in a placeholder so the long list of search
  * options is always available and are visible on mobile
  */
-async function addSearchNote () {
+async function addSearchNote() {
     await nextTick(); //ensure the dom is updated
-    const searchNote = document.createElement('p');
-    searchNote.classList.add('meta');
-    searchNote.style.marginTop = '0.25rem';
-    searchNote.innerText = 'The Group can be searched by name, year level, house, campus, role or access.';
-    const searchInput = document.querySelector('.VueTables__search__input'); //safe to assume only one, despite class selection
+    const searchNote = document.createElement("p");
+    searchNote.classList.add("meta");
+    searchNote.style.marginTop = "0.25rem";
+    searchNote.innerText = "The Group can be searched by name, year level, house, campus, role or access.";
+    const searchInput = document.querySelector(".VueTables__search__input"); //safe to assume only one, despite class selection
     searchInput.parentElement.appendChild(searchNote);
 }
-
-
 
 /*****************************************************************
  *
@@ -144,7 +159,7 @@ async function addSearchNote () {
  *
  * @param { Array }
  */
-function onRowSelected (currentSelection) {
+function onRowSelected(currentSelection) {
     membersStore.updateSelectedMembers(currentSelection);
 }
 
@@ -152,13 +167,15 @@ function onRowSelected (currentSelection) {
  * ensure the table selection is also cleared when 'Clear Selection' is selected
  * or when the selected members have been removed
  */
-watch(() => membersStore.selectedMembers, (newSelectedMembers, oldSelectedMembers) => {
-    if (newSelectedMembers.length === 0 && oldSelectedMembers.length > 0) { //to clear the current selection
-        tableEl.value.resetSelectedRows();
+watch(
+    () => membersStore.selectedMembers,
+    (newSelectedMembers, oldSelectedMembers) => {
+        if (newSelectedMembers.length === 0 && oldSelectedMembers.length > 0) {
+            //to clear the current selection
+            tableEl.value.resetSelectedRows();
+        }
     }
-});
-
-
+);
 
 /*****************************************************************
  *
@@ -169,16 +186,21 @@ watch(() => membersStore.selectedMembers, (newSelectedMembers, oldSelectedMember
 /**
  * to update the table display based on the selected filters change
  */
-watch(() => membersStore.selectedFilters, (newSelectedFilters, oldSelectedFilters) => {
-    let selectedFilter = []; //to membersStore the filter that has been toggled
-    if (newSelectedFilters.length < oldSelectedFilters.length) { //a filter has been taken out
-        selectedFilter = oldSelectedFilters.filter(filterType => !newSelectedFilters.includes(filterType)); //comparing the two arrays to find the only value in oldSelectedFilters
-    } else { //otherwise one has been added back in
-        selectedFilter = newSelectedFilters.filter(filterType => !oldSelectedFilters.includes(filterType)); //comparing the two arrays to find the only value in newSelectedFilters
+watch(
+    () => membersStore.selectedFilters,
+    (newSelectedFilters, oldSelectedFilters) => {
+        let selectedFilter = []; //to membersStore the filter that has been toggled
+        if (newSelectedFilters.length < oldSelectedFilters.length) {
+            //a filter has been taken out
+            selectedFilter = oldSelectedFilters.filter((filterType) => !newSelectedFilters.includes(filterType)); //comparing the two arrays to find the only value in oldSelectedFilters
+        } else {
+            //otherwise one has been added back in
+            selectedFilter = newSelectedFilters.filter((filterType) => !oldSelectedFilters.includes(filterType)); //comparing the two arrays to find the only value in newSelectedFilters
+        }
+        dispatchFilterEvent(selectedFilter.join()); //to just get the single filter as a string
+        updateSelectedMembers();
     }
-    dispatchFilterEvent(selectedFilter.join()); //to just get the single filter as a string
-    updateSelectedMembers();
-});
+);
 
 /**
  * Modify what's displayed in the table, showing or hiding a filter type
@@ -186,14 +208,14 @@ watch(() => membersStore.selectedFilters, (newSelectedFilters, oldSelectedFilter
  *
  * @param { String }
  */
-function dispatchFilterEvent (selectedFilter) {
-    const filterParam = membersStore.selectedFilters.includes(selectedFilter) ? '' : selectedFilter ;
+function dispatchFilterEvent(selectedFilter) {
+    const filterParam = membersStore.selectedFilters.includes(selectedFilter) ? "" : selectedFilter;
     const filterEventsType = {
         [AccessTypes.WAITING]: FilterEvents.SHOW_WAITING_LIST,
         [AccessTypes.READ]: FilterEvents.SHOW_READ_ACCESS,
         [AccessTypes.WRITE]: FilterEvents.SHOW_WRITE_ACCESS,
         [AccessTypes.ADMIN]: FilterEvents.SHOW_ADMIN_ACCESS,
-    }
+    };
     EventBus.emit(`vue-tables.filter::${filterEventsType[selectedFilter]}`, filterParam);
 }
 
@@ -201,7 +223,7 @@ function dispatchFilterEvent (selectedFilter) {
  * Ensure the current selectedMembers also considers the current filter selection,
  * taking any out that no longer match the selected filters
  */
-function updateSelectedMembers () {
+function updateSelectedMembers() {
     const newSelectedMembers = []; //to membersStore the newly selected members with the filter change considered
     const membersToRemove = []; //to membersStore those selected members that need to be removed due to the filter change
     membersStore.selectedMembers.forEach((member) => {
@@ -216,14 +238,15 @@ function updateSelectedMembers () {
     }
     membersStore.updateSelectedMembers(newSelectedMembers);
 }
-
 </script>
 
 <template>
-   <div class="row">
+    <div class="row">
         <div class="small-12 island">
             <h2 class="subheader">Current Members</h2>
-            <div v-if="membersStore.hasNoGroupAdmins" class="alert-box warning">Please note, this group currently has no Group Admins.</div>
+            <div v-if="membersStore.hasNoGroupAdmins" class="alert-box warning">
+                Please note, this group currently has no Group Admins.
+            </div>
             <v-client-table
                 v-if="membersStore.hasGroupMembers"
                 ref="tableEl"
@@ -251,16 +274,16 @@ function updateSelectedMembers () {
             </v-client-table>
             <div v-else-if="membersStore.hasNoGroupMembers" class="empty-state">
                 <i class="icon-group"></i>
-                <p>This group currently has no members.<br>Once members have been added they will appear here.</p>
+                <p>This group currently has no members.<br />Once members have been added they will appear here.</p>
             </div>
-        </div><!-- small-12 island -->
-    </div><!-- row  -->
-
+        </div>
+        <!-- small-12 island -->
+    </div>
+    <!-- row  -->
 </template>
 
 <style lang="scss">
-
-@import '@schoolboxVue/components/vueTables2/vueTables2';
+@import "@schoolboxVue/components/vueTables2/vueTables2";
 
 .VueTables {
     margin-bottom: 150px; //to allow space for the bottom-drawer so it can't cut off the bottom of the table
@@ -284,25 +307,33 @@ function updateSelectedMembers () {
     animation-iteration-count: 1;
 }
 
-.VueTables__table tr.is-new { //have to be pretty specific to overwrite foundation rules...
+.VueTables__table tr.is-new {
+    //have to be pretty specific to overwrite foundation rules...
     @extend .change-animation;
     animation-name: isNewAnimation;
 }
 
 @keyframes isNewAnimation {
-    0% { background-color: #4fa74f; } //is $success-color from _colors.scss
-    100% { background-color: white; }
+    0% {
+        background-color: #4fa74f;
+    } //is $success-color from _colors.scss
+    100% {
+        background-color: white;
+    }
 }
 
-.VueTables__table tr.just-updated { //have to be pretty specific to overwrite foundation rules...
+.VueTables__table tr.just-updated {
+    //have to be pretty specific to overwrite foundation rules...
     @extend .change-animation;
     animation-name: justUpdatedAnimation;
 }
 
 @keyframes justUpdatedAnimation {
-    0% { background-color: var(--accent-background); }
-    100% { background-color: white; }
+    0% {
+        background-color: var(--accent-background);
+    }
+    100% {
+        background-color: white;
+    }
 }
-
-
 </style>

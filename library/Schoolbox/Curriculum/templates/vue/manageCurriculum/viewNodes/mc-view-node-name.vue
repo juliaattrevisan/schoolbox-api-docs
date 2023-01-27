@@ -1,16 +1,14 @@
 <script setup lang="ts">
-
 /**
  * A curriculum node to select to traverse further down the tree,
  * will also highlight any matches in the current search query when search is active
  */
 
-import { computed } from 'vue';
-import { escapeRegExp } from '@js/util/jsUtils';
-import { useNodesStore } from '../store/mcNodesStore';
-import { useViewNodesStore } from './store/mcViewNodesStore';
-import { useSearchStore } from '../store/mcSearchStore';
-
+import { computed } from "vue";
+import { escapeRegExp } from "@js/util/jsUtils";
+import { useNodesStore } from "../store/mcNodesStore";
+import { useViewNodesStore } from "./store/mcViewNodesStore";
+import { useSearchStore } from "../store/mcSearchStore";
 
 const props = defineProps({
     /**
@@ -21,11 +19,11 @@ const props = defineProps({
         required: true,
         default() {
             return {
-                id: '0',
-                name: '-',
+                id: "0",
+                name: "-",
                 children: [],
-            }
-        }
+            };
+        },
     },
     /**
      * to gradually add more marginLeft to indicate node level depth
@@ -60,9 +58,11 @@ const searchStore = useSearchStore();
  * @returns { Boolean }
  */
 const isDisabled = computed(() => {
-    if (props.isUpdatingOrAdding) { //while the node is being updated
+    if (props.isUpdatingOrAdding) {
+        //while the node is being updated
         return true;
-    } else if (nodesStore.isLoading) { //or while a load is in progress
+    } else if (nodesStore.isLoading) {
+        //or while a load is in progress
         return true;
     } else {
         return false;
@@ -74,7 +74,7 @@ const isDisabled = computed(() => {
  *
  * @returns { Boolean }
  */
- const isParentNode = computed(() => {
+const isParentNode = computed(() => {
     if (props.depth === 0) {
         return true;
     } else {
@@ -89,13 +89,17 @@ const isDisabled = computed(() => {
  * @returns { Boolean }
  */
 const isButton = computed(() => {
-    if (searchStore.isActive) { //when search is active, we can jump to the selected node
+    if (searchStore.isActive) {
+        //when search is active, we can jump to the selected node
         return true;
-    } else if (isParentNode.value) { //is the parent node, which we can't select
+    } else if (isParentNode.value) {
+        //is the parent node, which we can't select
         return false;
-    } else if (props.node.children === null) { //the children haven't been loaded
+    } else if (props.node.children === null) {
+        //the children haven't been loaded
         return false;
-    } else if (props.node.children?.length === 0) { //there's no children to display, so no point going further
+    } else if (props.node.children?.length === 0) {
+        //there's no children to display, so no point going further
         return false;
     } else {
         return true;
@@ -107,15 +111,17 @@ const isButton = computed(() => {
  *
  * @returns { string }
  */
-const fontWeight = computed(() => isParentNode.value && !searchStore.isActive ? 'bold' : 'normal');
+const fontWeight = computed(() => (isParentNode.value && !searchStore.isActive ? "bold" : "normal"));
 
 /**
  * reset the structure to that node or traverse to the next node level
  */
-function onNameSelected () {
-    if (searchStore.isActive) { //reset the structure and move to the selected searched node
+function onNameSelected() {
+    if (searchStore.isActive) {
+        //reset the structure and move to the selected searched node
         viewNodesStore.toId(props.node.id);
-    } else { //traverse to the next node level
+    } else {
+        //traverse to the next node level
         viewNodesStore.setNextSelected(props.node.id);
     }
 }
@@ -141,16 +147,15 @@ const highlightTitleSearch = computed(() => {
  *
  * @returns { String } string for v-html with <mark></mark> wrapped around each found result
  */
-function highlightSearchInElement (toHighlight) {
+function highlightSearchInElement(toHighlight) {
     let highlighted = toHighlight;
     searchStore.queryWordList.forEach((wordInSearch) => {
-        highlighted = highlighted.replace(RegExp(`${escapeRegExp(wordInSearch)}(?![^mark>]*mark>)`, 'ig'), (match) => {
+        highlighted = highlighted.replace(RegExp(`${escapeRegExp(wordInSearch)}(?![^mark>]*mark>)`, "ig"), (match) => {
             return `<mark>${match}</mark>`;
         });
     });
     return highlighted;
 }
-
 </script>
 
 <template>
@@ -164,18 +169,13 @@ function highlightSearchInElement (toHighlight) {
     >
         <span v-html="highlightTitleSearch"></span>
     </button>
-    <div
-        v-else
-        class="name"
-    >
+    <div v-else class="name">
         <span v-html="highlightTitleSearch"></span>
     </div>
-
 </template>
 
 <style lang="scss" scoped>
-
-@import './style/mcViewNode';
+@import "./style/mcViewNode";
 
 .button-name {
     @extend .button;
@@ -191,5 +191,4 @@ function highlightSearchInElement (toHighlight) {
     font-weight: v-bind(fontWeight);
     width: 100%;
 }
-
 </style>

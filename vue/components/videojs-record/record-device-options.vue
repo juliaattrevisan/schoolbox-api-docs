@@ -1,60 +1,52 @@
 <script>
-
 /**
  * When there's more than one, a device list will be presented for the user to choose which input device
  * they would like to record with
  */
 
-import recordMediaEvents from '@js/record-media/recordMediaEvents';
+import recordMediaEvents from "@js/record-media/recordMediaEvents";
 
 export default {
-    
     props: {
         title: {
             type: String,
-            required: true
+            required: true,
         },
         currentDeviceId: {
             type: String,
-            required: true
+            required: true,
         },
         deviceList: {
             type: Array,
-            required: true
+            required: true,
         },
         isRecording: {
             type: Boolean,
             required: false,
-            default: false
+            default: false,
         },
     },
 
     computed: {
-        
         /**
          * only show if more than one device and not recording
-         * 
+         *
          * @returns { Boolean }
          */
-        canDisplay () {
+        canDisplay() {
             return this.deviceList.length > 1 && !this.isRecording;
-        }
-
+        },
     },
 
     methods: {
-
         /**
          * onDeviceSelected
          */
-        onDeviceSelected (deviceId) {
+        onDeviceSelected(deviceId) {
             this.$emit(recordMediaEvents.VIDEO_DEVICE_CHANGE, deviceId);
         },
-
-    }
-
-}
-
+    },
+};
 </script>
 
 <template>
@@ -65,7 +57,13 @@ export default {
                     <legend class="legend">{{ title }}</legend>
                     <ul class="option-list">
                         <li v-for="device in deviceList" :key="device.deviceId">
-                            <a href="#toggle-device" :class="`toggle-button ${ device.deviceId === currentDeviceId ? 'toggle-button-active' : '' }`" @click.prevent="onDeviceSelected(device.deviceId)">
+                            <a
+                                href="#toggle-device"
+                                :class="`toggle-button ${
+                                    device.deviceId === currentDeviceId ? 'toggle-button-active' : ''
+                                }`"
+                                @click.prevent="onDeviceSelected(device.deviceId)"
+                            >
                                 <span class="toggle-button-icon vjs-icon-photo-camera"></span>
                                 <span class="toggle-button-text">{{ device.label }}</span>
                             </a>
@@ -78,12 +76,11 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-
 .device-options {
     position: absolute;
     z-index: 2;
     top: 10px;
-    left: 10px; 
+    left: 10px;
     max-width: 50%;
     border: 2px solid white;
     padding: 0.5rem 1rem;
@@ -131,11 +128,11 @@ export default {
     padding-left: 20px;
 }
 
-.slide-enter-active, .slide-leave-active {
-  transition: left .5s;
+.slide-enter-active,
+.slide-leave-active {
+    transition: left 0.5s;
 }
 .slide-enter, .slide-leave-to /* .fade-leave-active below version 2.1.8 */ {
-  left: -400px; //the video container can't be bigger then 700px, so enough to ensure it can't be shown
+    left: -400px; //the video container can't be bigger then 700px, so enough to ensure it can't be shown
 }
-
 </style>
