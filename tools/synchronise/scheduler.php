@@ -12,6 +12,7 @@ declare(strict_types=1);
 use Schoolbox\Admin\Settings\FieldType\SelectMulti\Renderer;
 use Schoolbox\Application\CliTool;
 use Schoolbox\External\Importer\Endpoint;
+use Schoolbox\External\Importer\Endpoint\Factory;
 use Schoolbox\UserMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -104,17 +105,6 @@ HELP;
         $file        = null;
         $timeout     = (float)($this->getConfig()->get('schooldata_import_timeout') ?: Endpoint\Scheduler::DEFAULT_TIMEOUT);
 
-        /* Importer strats can be defined by cli args
-         * null or empty string means "import everything"
-         *
-         * Otherwise, whatever you specified must fit within a known vocabulary
-         * and works in conjunction with whatever watchlists you have in place
-         *
-         * scheduler always runs all strats
-         * The cli option is hardcoded to empty str ''
-         */
-        $validStrats = new \Schoolbox\External\Connector\ValidStrats('');
-
         /* SUDS imports can take a notoriously long time to complete based on sis etc.
          * and the instances could start up a new import before the existing one
          * has even finished. If you can't reserve this, then abort.
@@ -158,14 +148,38 @@ HELP;
          */
         $runId = (new \Schoolbox\External\Connector\Log\Guid())->generate();
 
-        /* Execute scheduler: sis stuff
+        /* Split the transaction in half
          */
-        $sisFactory = new Endpoint\Factory($host, $key, $perform, $this->getLogger(), [], $validStrats);
+        if (Factory::SENTRAL === $type) {
+            $splitStrats = [''];
+        } else {
+            $splitStrats = [
+                'families,staff',
+                'timetable'
+            ];
+        }
 
         /* The time when both parts of the import ran
          * Could do REQUEST_TIME but this is good enough
          */
         $time = time();
+
+        foreach ($splitStrats as $currentStrat) {
+            /* Importer strats can be defined by cli args
+             * null or empty string means "import everything"
+             *
+             * Otherwise, whatever you specified must fit within a known vocabulary
+             * and works in conjunction with whatever watchlists you have in place
+             *
+             * scheduler always runs all strats
+             * The cli option is hardcoded to empty str ''
+             */
+            $validStrats = new \Schoolbox\External\Connector\ValidStrats($currentStrat);
+
+            /* Execute scheduler: sis stuff
+             */
+            $sisFactory = new Endpoint\Factory($host, $key, $perform, $this->getLogger(), [], $validStrats);
+        }
 
         (new Endpoint\Scheduler(
             $randomMapper->getDatabase(),

@@ -377,10 +377,14 @@ class Controller extends ConfigController
 
             /* Split the transaction in half
              */
-            $splitStrats = [
-                'families,staff',
-                'timetable'
-            ];
+            if (Factory::SENTRAL === $type) {
+                $splitStrats = [''];
+            } else {
+                $splitStrats = [
+                    'families,staff',
+                    'timetable'
+                ];
+            }
 
             /* The time when both parts of the import ran
              * Could do REQUEST_TIME but this is good enough
