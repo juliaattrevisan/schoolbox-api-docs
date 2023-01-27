@@ -147,15 +147,6 @@ async function getActivity() {
             const activityItemsResponse = (await response.json()) as ActivityItem[];
             activityItems.value = activityItemsResponse;
             hasLoadError.value = false;
-
-            /**
-             * Check if we have any submissions. If we don't, disable the 'review submission' item.
-             * I tried making hasSubmissions a computed value but it had issues with calling .some
-             * on it the first time it ran. Same thing with hasFeedback.
-             */
-            hasSubmissions.value = activityItemsResponse.some(item => item.type === 'response' && item.submitted);
-            hasFeedback.value = activityItemsResponse.some(item => item.type === 'feedback');
-
         } else {
             hasLoadError.value = true;
         }
@@ -175,6 +166,7 @@ async function onPopOutSelected(event: CustomEvent) {
     // Make sure we're not reloading a menu we already have open.
     if(referenceElement.value !== event.detail.target){
         routes.value = updateRoutes(event.detail.routes as Routes);
+        debugger;
         isSelected.value = true;
         isExpanded.value = false;
         referenceElement.value = event.detail.target;
@@ -278,32 +270,32 @@ function onMenuItemSelected(target: string) {
     >
         <div v-if="hasLoadError">
             <pop-out-menu-item class="is-disabled">
-                <div className="s-warning-message">
+                <div class="s-warning-message">
                     There was an error during data retrieval. Please
                     <a href="" title="refresh the page"> refresh the page </a>
                     to try again and contact your support if the problem persists
                 </div>
             </pop-out-menu-item>
         </div>
-        <div v-else-if="isLoading && !hasLoadError" className="c-pop-out-menu__loader">
-            <div className="loader"></div>
+        <div v-else-if="isLoading && !hasLoadError" class="c-pop-out-menu__loader">
+            <div class="loader"></div>
         </div>
         <div v-else class="c-pop-out-menu" ref="markbookElement" :class="{ 'is-expanded': isExpanded }">
-            <div className="s-collapsible">
+            <div class="s-collapsible">
                 <small-card v-for="(activityItem, index) in activityItems" :key="index">
                     <user-photo
                         :src="`/portrait.php?id=${activityItem.effector.id}&size=square32`"
                         :size="32"
                     ></user-photo>
-                    <div className="c-card__details">
-                        <div className="c-card__text">
+                    <div class="c-card__details">
+                        <div class="c-card__text">
                             {{ activityItem.effector.name }} {{ getAction(activityItem) }}
                         </div>
-                        <div className="c-card__subtext">{{ activityItem.date.short }}</div>
+                        <div class="c-card__subtext">{{ activityItem.date.short }}</div>
                     </div>
                 </small-card>
             </div>
-            <div className="c-pop-out-menu__options">
+            <div class="c-pop-out-menu__options">
                 <pop-out-menu-item
                     :class="{ 'is-disabled': isExpansionDisabled || isActivityEmpty }"
                     @selected="onToggleSelected()"
