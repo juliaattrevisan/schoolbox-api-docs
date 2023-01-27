@@ -150,11 +150,14 @@ class Builder
             'learningArea' => true
         ],
 
-        'languages7-10.json' => [
-            'name' => 'Languages Curriculum - Year 7 to Year 10',
-            'hasSubject' => true,
-            'learningArea' => true
-        ]
+        /* Temporary disabled
+         * Apparently this is a collective dupe of all the other languages' files
+         */
+//        'languages7-10.json' => [
+//            'name' => 'Languages Curriculum - Year 7 to Year 10',
+//            'hasSubject' => true,
+//            'learningArea' => true
+//        ]
     ];
 
 
