@@ -381,8 +381,8 @@ class Controller extends ConfigController
                 $splitStrats = [''];
             } else {
                 $splitStrats = [
-                    'families,staff',
-                    'timetable'
+                    ValidStrats::FAMILIES . ',' . ValidStrats::STAFF,
+                    ValidStrats::TIMETABLE
                 ];
             }
 

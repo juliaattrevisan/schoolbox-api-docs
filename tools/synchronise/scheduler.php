@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 use Schoolbox\Admin\Settings\FieldType\SelectMulti\Renderer;
 use Schoolbox\Application\CliTool;
+use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Importer\Endpoint;
 use Schoolbox\External\Importer\Endpoint\Factory;
 use Schoolbox\UserMapper;
@@ -154,8 +155,8 @@ HELP;
             $splitStrats = [''];
         } else {
             $splitStrats = [
-                'families,staff',
-                'timetable'
+                ValidStrats::FAMILIES . ',' . ValidStrats::STAFF,
+                ValidStrats::TIMETABLE
             ];
         }
 
