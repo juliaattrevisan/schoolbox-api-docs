@@ -83,7 +83,11 @@ class EventHandler
         if (!$newEvent->getId()) {
             $this->eventMapper->save($newEvent);
         } else {
-            $params = ['id' => (int)$newEvent->getId()];
+            $params = [
+                'id' => (int)$newEvent->getId(),
+                'updatedAt' => \Alaress_Date_Format::now()->getDatabase()
+            ];
+
             $pieces = [];
 
             foreach ($fields as $column => $property) {
@@ -104,10 +108,6 @@ class EventHandler
                         $params[$property] = $newEvent->$getter();
                     }
                 }
-
-                /* Set updated_at
-                 */
-                $params['updatedAt'] = \Alaress_Date_Format::now()->getDatabase();
             }
 
             /* Manufacture query
