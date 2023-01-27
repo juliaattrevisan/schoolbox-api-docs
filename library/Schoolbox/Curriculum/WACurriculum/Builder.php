@@ -72,83 +72,88 @@ class Builder
             'learningArea' => false
         ],
 
-        'hpe.json' => [
-            'name' => 'Health and Physical Education Curriculum - Pre-primary to Year 10',
-            'hasSubject' => false,
-            'learningArea' => false
-        ],
-
-        'hass.json' => [
-            'name' => 'Humanities and Social Sciences Curriculum - Pre-primary to Year 10',
-            'hasSubject' => false,
-            'learningArea' => false
-        ],
-
-        /* Some other unnamed section/grouping
-         */
-        'mathematics.json' => [
-            'name' => 'Mathematics Curriculum - Pre-primary to Year 10',
-            'hasSubject' => false,
-            'learningArea' => false
-        ],
-
-        'science.json' => [
-            'name' => 'Science Curriculum - Pre-primary to Year 10',
-            'hasSubject' => false,
-            'learningArea' => false
-        ],
-
-        'technologies.json' => [
-            'name' => 'Technologies Curriculum - Pre-primary to Year 10',
-            'hasSubject' => true,
-            'learningArea' => false
-        ],
-
-        'arts.json' => [
-            'name' => 'The Arts Curriculum - Pre-primary to Year 10',
-            'hasSubject' => true,
-            'learningArea' => false
-        ],
+//        'hpe.json' => [
+//            'name' => 'Health and Physical Education Curriculum - Pre-primary to Year 10',
+//            'hasSubject' => false,
+//            'learningArea' => false
+//        ],
+//
+//        'hass.json' => [
+//            'name' => 'Humanities and Social Sciences Curriculum - Pre-primary to Year 10',
+//            'hasSubject' => false,
+//            'learningArea' => false
+//        ],
+//
+//        /* Some other unnamed section/grouping
+//         */
+//        'mathematics.json' => [
+//            'name' => 'Mathematics Curriculum - Pre-primary to Year 10',
+//            'hasSubject' => false,
+//            'learningArea' => false
+//        ],
+//
+//        'science.json' => [
+//            'name' => 'Science Curriculum - Pre-primary to Year 10',
+//            'hasSubject' => false,
+//            'learningArea' => false
+//        ],
+//
+//        'technologies.json' => [
+//            'name' => 'Technologies Curriculum - Pre-primary to Year 10',
+//            'hasSubject' => true,
+//            'learningArea' => false
+//        ],
+//
+//        'arts.json' => [
+//            'name' => 'The Arts Curriculum - Pre-primary to Year 10',
+//            'hasSubject' => true,
+//            'learningArea' => false
+//        ],
 
         /* Languages Curriculum
          * Do all these at the end because we need to rewrite their learning areas
          * such that they all group up under a whole new one
+         *
+         * SEQUENTIAL DEPENDENCY
+         * The languages endpoints all get a common ancestral node manufactured for
+         * them; therefore they all get processed last, otherwise other endpoints'
+         * data will end up here instead.
          */
-        'chinese-second-language.json' => [
-            'name' => 'Chinese: Second Language Curriculum - Pre-primary to Year 10',
-            'hasSubject' => true,
-            'learningArea' => true
-        ],
-
-        'french-second-language.json' => [
-            'name' => 'French: Second Language Curriculum - Pre-primary to Year 10',
-            'hasSubject' => true,
-            'learningArea' => true
-        ],
-
-        'german-second-language.json' => [
-            'name' => 'German: Second Language Curriculum - Pre-primary to Year 10',
-            'hasSubject' => true,
-            'learningArea' => true
-        ],
-
-        'indonesian-second-language.json' => [
-            'name' => 'Indonesian: Second Language Curriculum - Pre-primary to Year 10',
-            'hasSubject' => true,
-            'learningArea' => true
-        ],
-
-        'italian-second-language.json' => [
-            'name' => 'Italian: Second Language Curriculum - Pre-primary to Year 10',
-            'hasSubject' => true,
-            'learningArea' => true
-        ],
-
-        'japanese-second-language.json' => [
-            'name' => 'Japanese: Second Language Curriculum - Pre-primary to Year 10',
-            'hasSubject' => true,
-            'learningArea' => true
-        ],
+//        'chinese-second-language.json' => [
+//            'name' => 'Chinese: Second Language Curriculum - Pre-primary to Year 10',
+//            'hasSubject' => true,
+//            'learningArea' => true
+//        ],
+//
+//        'french-second-language.json' => [
+//            'name' => 'French: Second Language Curriculum - Pre-primary to Year 10',
+//            'hasSubject' => true,
+//            'learningArea' => true
+//        ],
+//
+//        'german-second-language.json' => [
+//            'name' => 'German: Second Language Curriculum - Pre-primary to Year 10',
+//            'hasSubject' => true,
+//            'learningArea' => true
+//        ],
+//
+//        'indonesian-second-language.json' => [
+//            'name' => 'Indonesian: Second Language Curriculum - Pre-primary to Year 10',
+//            'hasSubject' => true,
+//            'learningArea' => true
+//        ],
+//
+//        'italian-second-language.json' => [
+//            'name' => 'Italian: Second Language Curriculum - Pre-primary to Year 10',
+//            'hasSubject' => true,
+//            'learningArea' => true
+//        ],
+//
+//        'japanese-second-language.json' => [
+//            'name' => 'Japanese: Second Language Curriculum - Pre-primary to Year 10',
+//            'hasSubject' => true,
+//            'learningArea' => true
+//        ],
 
         /* Temporary disabled
          * Apparently this is a collective dupe of all the other languages' files
@@ -159,6 +164,15 @@ class Builder
 //            'learningArea' => true
 //        ]
     ];
+
+
+    /**
+     * An artificially manfactured common parent Learning Area node
+     * for just the languages endpoints
+     *
+     * @var array|null
+     */
+    private ?array $sharedLearningArea = null;
 
 
     /**
@@ -4766,6 +4780,7 @@ class Builder
     private function build(): void
     {
         $curriculumRootNode = 1;
+        $sharedLearningAreaId = null;
 
         /* Presumed hierarchy
          * WA Curriculum > learning area > subject > level > strand > substrand + metadata
@@ -4788,10 +4803,7 @@ class Builder
         foreach (self::MANIFEST as $url => $struct) {
             $learningArea = $this->retrieve($url);
 
-            /* Build hierarchy
-             * id,curriculum_node_parent_id,name,code,order,description
-             */
-            $this->csvPayload[] = [
+            $learningAreaRow = [
                 'id' => $learningAreaId,
                 'curriculum_node_parent_id' => $curriculumRootNode,
                 'name' => $learningArea['title'],
@@ -4799,6 +4811,20 @@ class Builder
                 'order' => 0,
                 'description' => ''
             ];
+
+            /* When we start processing languages,
+             * Put all their nodes under a common node that hasn't yet existed
+             *
+             * SEQUENTIAL DEPENDENCY
+             */
+            if ($struct['learningArea'] && !$sharedLearningAreaId) {
+                $sharedLearningAreaId = $learningAreaId;
+            }
+
+            /* Build hierarchy
+             * id,curriculum_node_parent_id,name,code,order,description
+             */
+            $this->csvPayload[] = $learningAreaRow;
 
             /* Increment arbitrary node counter every time a node spawns
              */
@@ -4809,9 +4835,9 @@ class Builder
              * so I guess we just...noobscript a way out of this heresy
              */
             if ($struct['hasSubject']) {
-                $this->processWithSubject($learningAreaId, $learningArea);
+                $this->processWithSubject($sharedLearningAreaId ?? $learningAreaId, $learningArea);
             } else {
-                $this->processWithoutSubject($learningAreaId, $learningArea);
+                $this->processWithoutSubject($sharedLearningAreaId ?? $learningAreaId, $learningArea);
             }
 
             $learningAreaId = $this->i;
@@ -4841,19 +4867,20 @@ class Builder
             'description'
         ];
 
-        $fp = fopen('php://temp', 'w');
-        fputcsv($fp, $headings);
+//        $fp = fopen('php://temp', 'w');
+//        fputcsv($fp, $headings);
 
         foreach ($this->csvPayload as $row) {
-            fputcsv($fp, $row);
+            new \Alaress_Probe($row);
+//            fputcsv($fp, $row);
         }
 
-        rewind($fp);
-
-        $contents = stream_get_contents($fp);
-
-        fclose($fp);
-
+//        rewind($fp);
+//
+//        $contents = stream_get_contents($fp);
+//
+//        fclose($fp);
+return '';
         return $contents;
     }
 
@@ -4992,26 +5019,6 @@ class Builder
      */
     private function processWithoutSubject(int $learningAreaId, array $learningArea): void
     {
-        $subjectId = $this->i;
-
-        /* Build hierarchy
-         * id,curriculum_node_parent_id,name,code,order,description
-         *
-         * This is an artificial clone of the Learning Area ;(
-         */
-        $this->csvPayload[] = [
-            'id' => $subjectId,
-            'curriculum_node_parent_id' => $learningAreaId,
-            'name' => $this->cleanse($learningArea['title'] ?? ''),
-            'code' => '',
-            'order' => 0,
-            'description' => ''
-        ];
-
-        /* Increment arbitrary node counter every time a node spawns
-         */
-        $this->i++;
-
         /* Level
          */
         foreach ($learningArea['curriculumStatements'] as $level) {
@@ -5019,7 +5026,7 @@ class Builder
 
             $this->csvPayload[] = [
                 'id' => $levelId,
-                'curriculum_node_parent_id' => $subjectId,
+                'curriculum_node_parent_id' => $learningAreaId,
                 'name' => $this->cleanse($level['title'] ?? ''),
                 'code' => '',
                 'order' => 0,
