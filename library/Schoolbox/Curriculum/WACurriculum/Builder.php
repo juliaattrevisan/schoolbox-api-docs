@@ -5158,7 +5158,7 @@ class Builder
         /* Remove trailing curriculum codes usually enclosed in ()
          * These are in some payloads, but not others
          */
-        $temp = preg_replace('/\([a-zA-Z0-9]+\)$/', '', $temp);
+        $temp = preg_replace('/\([a-zA-Z0-9()\ ]+\)$/', '', $temp);
 
         return trim($temp);
     }
