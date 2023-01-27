@@ -154,8 +154,14 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
                     $message = 'Schoolbox has detected that your auth token identifies an invalid user.';
                     $info    = $e->getMessage();
                 } elseif (
-                    ($e instanceof \PDOException && $e->getCode() === "70100") ||
-                    ($e instanceof \Alaress\Database\Exception && $e->getPrevious() instanceof \PDOException && $e->getPrevious()->getCode() === "70100")
+                    // MySQL Query execution was interrupted - "70100"
+                    // MsSQL Query timeout expired = "HYT00" and message indicates QUERY timeout rather than a LOGIN timeout (they share the same code)
+                    ($e instanceof \PDOException && ($e->getCode() === "70100" || ($e->getCode() === "HYT00" && str_contains($e->getMessage(), "Query timeout")))) ||
+                    (
+                        $e instanceof \Alaress\Database\Exception &&
+                        $e->getPrevious() instanceof \PDOException &&
+                        ($e->getPrevious()->getCode() === "70100" || ($e->getPrevious()->getCode() === "HYT00" && str_contains($e->getPrevious()->getMessage(), "Query timeout")))
+                    )
                 ) {
                     $code    = 599;
                     $message = "Unfortunately your query was taking too long. To avoid further disruption to the system we have stopped this request. Please try again later as this may be a temporary performance issue.";
