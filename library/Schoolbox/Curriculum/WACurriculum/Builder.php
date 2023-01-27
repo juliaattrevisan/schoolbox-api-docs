@@ -4914,7 +4914,7 @@ class Builder
                 'name' => $this->cleanse($subject['title'] ?? ''),
                 'code' => '',
                 'order' => 0,
-                'description' => $this->cleanse($level['description'] ?? '')
+                'description' => ''
             ];
 
             /* Increment arbitrary node counter every time a node spawns
@@ -4932,7 +4932,7 @@ class Builder
                     'name' => $this->cleanse($level['title'] ?? ''),
                     'code' => '',
                     'order' => 0,
-                    'description' => $this->cleanse($level['description'] ?? '')
+                    'description' => ''
                 ];
 
                 /* Increment arbitrary node counter every time a node spawns
@@ -5040,7 +5040,7 @@ class Builder
                 'name' => $this->cleanse($level['title'] ?? ''),
                 'code' => '',
                 'order' => 0,
-                'description' => $this->cleanse($level['description'] ?? '')
+                'description' => ''
             ];
 
             /* Increment arbitrary node counter every time a node spawns
@@ -5111,17 +5111,6 @@ class Builder
             $name = $this->cleanse($node['description'] ?? '');
             $code = $this->cleanseCode($node['notations'][0] ?? '');
             $description = '';
-
-            /* Dig for an Elaboration, which is a curriculum node's description
-             * Elaborations are optional and might not exist
-             */
-            if (isset($node['curriculumStatements'])) {
-                foreach ($node['curriculumStatements'] as $meta) {
-                    if ('Elaboration' === $meta['label']) {
-                        $description = $this->cleanse($meta['description']);
-                    }
-                }
-            }
 
             $this->csvPayload[] = [
                 'id' => $nodeId,
