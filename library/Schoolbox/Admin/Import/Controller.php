@@ -382,6 +382,11 @@ class Controller extends ConfigController
                 'timetable'
             ];
 
+            /* The time when both parts of the import ran
+             * Could do REQUEST_TIME but this is good enough
+             */
+            $time = time();
+
             foreach ($splitStrats as $currentStrat) {
                 /* ValidStrats is now a cli option
                  */
@@ -400,7 +405,7 @@ class Controller extends ConfigController
                     $file,
                     $logger,
                     $importLogMapper
-                ))->run(time(), $runId, Scheduler::MANUAL_SIS_SCRIPT_NAME . " ({$currentStrat})");
+                ))->run($time, $runId, Scheduler::MANUAL_SIS_SCRIPT_NAME . " ({$currentStrat})");
             }
 
             /* Execute scheduler: calendar stuff
@@ -417,7 +422,7 @@ class Controller extends ConfigController
                 $file,
                 $logger,
                 $importLogMapper
-            ))->run(time(), $runId, Scheduler::MANUAL_CALENDAR_SCRIPT_NAME);
+            ))->run($time, $runId, Scheduler::MANUAL_CALENDAR_SCRIPT_NAME);
 
             /* Go to the "Previous IMports" area of SUDS Control Panel
              */
