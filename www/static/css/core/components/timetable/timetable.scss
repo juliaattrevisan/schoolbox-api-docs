@@ -1,7 +1,9 @@
 $timetable-cell-border: $body-bg;
 
-.timetable, .timetable-small {
-    td, th {
+.timetable,
+.timetable-small {
+    td,
+    th {
         border: 1px solid $timetable-cell-border;
     }
 
@@ -46,7 +48,7 @@ $timetable-cell-border: $body-bg;
             /* override global icon colour.
             *  make it normal icon size.
             */
-            [class^="icon-"]:before{
+            [class^="icon-"]:before {
                 font-size: $base-font-size;
             }
             [class^="icon-"]:before,
@@ -76,7 +78,8 @@ $timetable-cell-border: $body-bg;
 /* Fifty-fifty split on small devices
  */
 .timetable-small {
-    th, td {
+    th,
+    td {
         width: 50%;
     }
 
@@ -99,8 +102,10 @@ $timetable-cell-border: $body-bg;
  *
  * Applies to th elements in small viewport and larger viewports
  */
-.timetable, .timetable-small {
-    .timetable-day-active, .timetable-period-active {
+.timetable,
+.timetable-small {
+    .timetable-day-active,
+    .timetable-period-active {
         color: $accent-foreground;
         background-color: $accent-background;
     }
@@ -110,10 +115,10 @@ $timetable-cell-border: $body-bg;
  */
 @media print {
     .timetable {
-
         /* Reduce font size in each time element
          */
-        th, time {
+        th,
+        time {
             font-size: 0.5rem;
             padding: 0.25rem !important;
         }
@@ -126,7 +131,7 @@ $timetable-cell-border: $body-bg;
             /* Hide the indicator triangle
              */
             &:before {
-                border-top: 0 !important
+                border-top: 0 !important;
             }
         }
 

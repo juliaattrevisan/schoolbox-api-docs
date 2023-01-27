@@ -1,159 +1,159 @@
 #event-details {
-  .title-section {
-    align-items: flex-start;
-    display: flex;
-  }
-
-  h1 {
-    flex: 1 auto;
-    margin-bottom: 0;
-  }
-
-  time.icon {
-    display: block;
-    position: relative;
-    min-width: 3rem;
-    background-color: $white;
-  }
-
-  time.icon * {
-    display: block;
-    width: 100%;
-    font-size: 0.875rem;
-    font-weight: 600;
-    text-align: center;
-    line-height: 1.2;
-  }
-
-  time.icon strong {
-    background-color: $content-ui-foreground;
-    position: absolute;
-    top: 0;
-    color: $white;
-    text-transform: uppercase;
-  }
-
-  time.icon span {
-    border: 1px solid $content-ui-foreground;
-    color: $content-ui-foreground;
-    font-size: 1.5rem;
-    padding-top: 1rem;
-  }
-
-  time {
-    margin-right: 1rem;
-  }
-
-  .label {
-    @media #{$small-only} {
-      flex-shrink: 0;
-      margin-top: 0.5rem;
-      width: 100%;
+    .title-section {
+        align-items: flex-start;
+        display: flex;
     }
-    @media #{$medium-up} {
-      flex: 0 auto;
-      margin-top: 0.5rem;
-    }
-  }
 
-  .title-section {
-    @media #{$small-only} {
-      flex-wrap: wrap;
+    h1 {
+        flex: 1 auto;
+        margin-bottom: 0;
     }
-  }
 
-  .detail .meta {
-    border-bottom: 1px solid $gainsboro;
-    margin: 0 0 1rem;
-    padding-bottom: 0.5rem;
-  }
-  section.attending {
-    margin-bottom: 2px;
-  }
+    time.icon {
+        display: block;
+        position: relative;
+        min-width: 3rem;
+        background-color: $white;
+    }
+
+    time.icon * {
+        display: block;
+        width: 100%;
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-align: center;
+        line-height: 1.2;
+    }
+
+    time.icon strong {
+        background-color: $content-ui-foreground;
+        position: absolute;
+        top: 0;
+        color: $white;
+        text-transform: uppercase;
+    }
+
+    time.icon span {
+        border: 1px solid $content-ui-foreground;
+        color: $content-ui-foreground;
+        font-size: 1.5rem;
+        padding-top: 1rem;
+    }
+
+    time {
+        margin-right: 1rem;
+    }
+
+    .label {
+        @media #{$small-only} {
+            flex-shrink: 0;
+            margin-top: 0.5rem;
+            width: 100%;
+        }
+        @media #{$medium-up} {
+            flex: 0 auto;
+            margin-top: 0.5rem;
+        }
+    }
+
+    .title-section {
+        @media #{$small-only} {
+            flex-wrap: wrap;
+        }
+    }
+
+    .detail .meta {
+        border-bottom: 1px solid $gainsboro;
+        margin: 0 0 1rem;
+        padding-bottom: 0.5rem;
+    }
+    section.attending {
+        margin-bottom: 2px;
+    }
 }
 
 // Attendance Guest list
 .attendance-guest-list {
-  // Special style for removing attendance records
-  .actions-small-1 > nav a[class^="icon-"] {
-    line-height: 3.1;
-  }
-
-  [class^="icon-"]:before {
-    font-size: 0.5rem;
-  }
-
-  // Status icons
-  .status-icon:after {
-    border-radius: 1rem;
-    font-family: $font-family-icon;
-    font-size: 0.5rem;
-    font-weight: bold;
-    margin-left: 0.5rem;
-    padding: 0.25rem;
-  }
-
-  // Pending state doesn't have an icon, it's just translucent
-  .pending {
-    opacity: 0.4;
-  }
-
-  .accepted {
-    .status-icon:after {
-      background-color: tint($success-color, 74%);
-      color: $success-color;
-      content: "\e604"; //.icon-approve
+    // Special style for removing attendance records
+    .actions-small-1 > nav a[class^="icon-"] {
+        line-height: 3.1;
     }
-  }
 
-  .declined {
-    .status-icon:after {
-      background-color: tint($alert-color, 74%);
-      color: $alert-color;
-      content: "\e60d"; //.icon-close
+    [class^="icon-"]:before {
+        font-size: 0.5rem;
     }
-  }
+
+    // Status icons
+    .status-icon:after {
+        border-radius: 1rem;
+        font-family: $font-family-icon;
+        font-size: 0.5rem;
+        font-weight: bold;
+        margin-left: 0.5rem;
+        padding: 0.25rem;
+    }
+
+    // Pending state doesn't have an icon, it's just translucent
+    .pending {
+        opacity: 0.4;
+    }
+
+    .accepted {
+        .status-icon:after {
+            background-color: tint($success-color, 74%);
+            color: $success-color;
+            content: "\e604"; //.icon-approve
+        }
+    }
+
+    .declined {
+        .status-icon:after {
+            background-color: tint($alert-color, 74%);
+            color: $alert-color;
+            content: "\e60d"; //.icon-close
+        }
+    }
 }
 
 // RSVP Buttons
 .component-action {
-  .rsvp {
-    flex: 0 auto;
-    align-items: center;
-    padding: 0 1rem;
-    line-height: 1.6;
+    .rsvp {
+        flex: 0 auto;
+        align-items: center;
+        padding: 0 1rem;
+        line-height: 1.6;
 
-    .attend-label {
-      font-size: rem-calc(($base-font-size - 2));
-      margin-right: 1rem;
+        .attend-label {
+            font-size: rem-calc(($base-font-size - 2));
+            margin-right: 1rem;
+        }
     }
-  }
 }
 .rsvp {
-  // Enforce css specificity
-  &.flex-list.buttons a {
-    &.accepted {
-      background-color: tint($success-color, 74%);
-      border: 1px solid $success-color;
-      color: $success-color;
-      font-weight: 600;
+    // Enforce css specificity
+    &.flex-list.buttons a {
+        &.accepted {
+            background-color: tint($success-color, 74%);
+            border: 1px solid $success-color;
+            color: $success-color;
+            font-weight: 600;
+        }
+
+        &.declined {
+            background-color: tint($alert-color, 74%);
+            border: 1px solid $alert-color;
+            color: $alert-color;
+            font-weight: 600;
+        }
     }
 
-    &.declined {
-      background-color: tint($alert-color, 74%);
-      border: 1px solid $alert-color;
-      color: $alert-color;
-      font-weight: 600;
+    // For the modal, the rsvp buttons are not in a flex-list element;
+    // they're in component actions style, which is different
+    .accepted {
+        color: $success-color;
     }
-  }
 
-  // For the modal, the rsvp buttons are not in a flex-list element;
-  // they're in component actions style, which is different
-  .accepted {
-    color: $success-color;
-  }
-
-  .declined {
-    color: $alert-color;
-  }
+    .declined {
+        color: $alert-color;
+    }
 }

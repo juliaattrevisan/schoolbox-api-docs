@@ -1,5 +1,4 @@
 .marksheet {
-
     thead {
         tr:first-child th:last-child {
             // Make room for the final header (with the diagonal style)
@@ -18,18 +17,20 @@
 }
 
 // Course markbook styles
-#courseMarkbookContent, .marksheet, #report_content {
+#courseMarkbookContent,
+.marksheet,
+#report_content {
     // Legend
     .legend {
         .indicators {
-          display: flex;
-          justify-content: flex-end;
-          flex-wrap: wrap;
+            display: flex;
+            justify-content: flex-end;
+            flex-wrap: wrap;
         }
         .indicator {
             position: relative;
-            top: .75rem;
-            margin-right: .5rem;
+            top: 0.75rem;
+            margin-right: 0.5rem;
         }
         .meta {
             display: inline-block;
@@ -41,24 +42,25 @@
         }
     }
     .actions-small-1 {
-      display: flex;
-      justify-content: flex-end;
-      align-items: flex-end;
-      flex-wrap: wrap;
+        display: flex;
+        justify-content: flex-end;
+        align-items: flex-end;
+        flex-wrap: wrap;
 
-      > div, nav {
-        flex: 0 1 auto;
-      }
-      .checklist {
-        margin-right: 2rem;
-
-        @media #{$small-only} {
-          margin-right: 1rem;
+        > div,
+        nav {
+            flex: 0 1 auto;
         }
-      }
-      nav {
-        position: relative;
-      }
+        .checklist {
+            margin-right: 2rem;
+
+            @media #{$small-only} {
+                margin-right: 1rem;
+            }
+        }
+        nav {
+            position: relative;
+        }
     }
 
     // Indicators: used in legend, so don't put in .marksheet
@@ -70,20 +72,20 @@
         height: 0;
     }
     .indicator.indicator-none {
-        border-top: .75rem solid $base;
-        border-left: .75rem solid transparent;
+        border-top: 0.75rem solid $base;
+        border-left: 0.75rem solid transparent;
     }
     .indicator.indicator-pending {
-        border-top: .75rem solid $warning-color;
-        border-left: .75rem solid transparent;
+        border-top: 0.75rem solid $warning-color;
+        border-left: 0.75rem solid transparent;
     }
     .indicator.indicator-published {
-        border-top: .75rem solid $success-color;
-        border-left: .75rem solid transparent;
+        border-top: 0.75rem solid $success-color;
+        border-left: 0.75rem solid transparent;
     }
     .indicator.indicator-resubmit {
-        border-top: .75rem solid $alert-color;
-        border-left: .75rem solid transparent;
+        border-top: 0.75rem solid $alert-color;
+        border-left: 0.75rem solid transparent;
     }
 
     // Marksheet content
@@ -122,8 +124,8 @@
             text-transform: uppercase;
             //font-size: 12px;
             text-align: center;
-            padding-top: .25rem;
-            padding-bottom: .25rem;
+            padding-top: 0.25rem;
+            padding-bottom: 0.25rem;
             border-right: 1px solid #eee;
         }
         .course-headers th.transparent {
@@ -132,7 +134,8 @@
         .course-headers th.white {
             background: $white;
         }
-        .row-header, .island table.dataTable thead th {
+        .row-header,
+        .island table.dataTable thead th {
             border-bottom: none;
         }
 

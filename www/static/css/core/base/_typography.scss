@@ -34,7 +34,13 @@ a {
     }
 }
 
-p, h1, h2, h3, h4, h5, h6 {
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     overflow-wrap: break-word; //Avoid text overflows
 }
 
@@ -63,7 +69,12 @@ $header-font-weight: $font-weight-normal;
 $header-line-height: 1.4;
 $header-bottom-margin: 1rem;
 $small-font-size: rem-calc(($base-font-size - 4));
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     color: $header-font-color;
     font-family: $body-font-family;
     font-style: normal;
@@ -167,13 +178,12 @@ code {
     color: $accent-foreground;
     font-family: $font-family-monospace;
     font-weight: $font-weight-normal;
-    padding: rem-calc(2) rem-calc(5) rem-calc(1)
+    padding: rem-calc(2) rem-calc(5) rem-calc(1);
 }
 
 pre {
     overflow: auto; //contain overflow in all browsers.
 }
-
 
 $list-margin-bottom: $paragraph-margin-bottom;
 $list-side-margin: 1.1rem;
@@ -209,13 +219,16 @@ ul {
         }
     }
     &.square {
-        list-style-type: square; margin-#{$default-float}: $list-side-margin;
+        list-style-type: square;
+        margin-#{$default-float}: $list-side-margin;
     }
     &.circle {
-        list-style-type: circle; margin-#{$default-float}: $list-side-margin;
+        list-style-type: circle;
+        margin-#{$default-float}: $list-side-margin;
     }
     &.disc {
-        list-style-type: disc; margin-#{$default-float}: $list-side-margin;
+        list-style-type: disc;
+        margin-#{$default-float}: $list-side-margin;
     }
 }
 
@@ -418,7 +431,6 @@ blockquote p {
 * Credit to Paul Irish and HTML5 Boilerplate (html5boilerplate.com)
 */
 @media print {
-
     * {
         box-shadow: none !important;
         text-shadow: none !important;
@@ -484,5 +496,4 @@ blockquote p {
     a[href*="/"]:visited:after {
         content: normal;
     }
-
 }

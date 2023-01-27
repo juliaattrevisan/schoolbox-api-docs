@@ -33,7 +33,7 @@
     .fc-cell-shaded {
         background-color: $white-smoke;
     }
-    .fc-list-event-time { 
+    .fc-list-event-time {
         min-width: 150px;
         max-width: 150px;
         @media #{$small-only} {
@@ -313,5 +313,10 @@
 }
 
 .fc .fc-timegrid-col.fc-day-today {
-    background-color: rgba(var(--accent-background-r), var(--accent-background-g), var(--accent-background-b), 0.25); //0.25 opacity so you dont lose the time lines
+    background-color: rgba(
+        var(--accent-background-r),
+        var(--accent-background-g),
+        var(--accent-background-b),
+        0.25
+    ); //0.25 opacity so you dont lose the time lines
 }

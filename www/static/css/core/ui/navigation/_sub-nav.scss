@@ -27,7 +27,6 @@ $sub-nav-padding: rem-calc(calc($base-font-size / 2));
 $sub-nav-border-radius: 0px;
 $sub-nav-font-color-hover: scale-color($sub-nav-font-color, $lightness: -25%) !default;
 
-
 // We use these to control the active item styles
 $sub-nav-active-font-weight: $font-weight-normal;
 $sub-nav-active-bg: $primary-color !default;
@@ -43,7 +42,6 @@ $sub-nav-item-divider-margin: rem-calc(12) !default;
 // @mixins
 //
 
-
 // Create a sub-nav item
 //
 // $font-color - Font color. Default: $sub-nav-font-color.
@@ -51,74 +49,77 @@ $sub-nav-item-divider-margin: rem-calc(12) !default;
 // $active-bg - Background of active nav item. Default: $sub-nav-active-bg.
 // $active-bg-hover - Background of active nav item, when hovered. Default: $sub-nav-active-bg-hover.
 @mixin sub-nav(
-  $font-color: $sub-nav-font-color,
-  $font-size: $sub-nav-font-size,
-  $active-bg: $sub-nav-active-bg,
-  $active-bg-hover: $sub-nav-active-bg-hover) {
-  display: block;
-  margin: $sub-nav-list-margin;
-  overflow: hidden;
-  padding-top: $sub-nav-list-padding-top;
-  width: auto;
+    $font-color: $sub-nav-font-color,
+    $font-size: $sub-nav-font-size,
+    $active-bg: $sub-nav-active-bg,
+    $active-bg-hover: $sub-nav-active-bg-hover
+) {
+    display: block;
+    margin: $sub-nav-list-margin;
+    overflow: hidden;
+    padding-top: $sub-nav-list-padding-top;
+    width: auto;
 
-  dt {
-    text-transform: uppercase;
-  }
-
-  dt,
-  dd,
-  li {
-    color: $font-color;
-    float: $default-float;
-    font-family: $sub-nav-font-family;
-    font-size: $font-size;
-    font-weight: $sub-nav-font-weight;
-    margin-#{$default-float}: rem-calc(16);
-    margin-bottom: 0;
-
-    a {
-      color: $sub-nav-font-color;
-      padding: $sub-nav-padding;
-      text-decoration: $sub-nav-text-decoration;
-
-      &:hover {
-        color: $sub-nav-font-color-hover;
-      }
+    dt {
+        text-transform: uppercase;
     }
 
-    &.active a {
-      @include radius($sub-nav-border-radius);
-      background: $active-bg;
-      color: $sub-nav-active-color;
-      cursor: $sub-nav-active-cursor;
-      font-weight: $sub-nav-active-font-weight;
-      padding: $sub-nav-active-padding;
+    dt,
+    dd,
+    li {
+        color: $font-color;
+        float: $default-float;
+        font-family: $sub-nav-font-family;
+        font-size: $font-size;
+        font-weight: $sub-nav-font-weight;
+        margin-#{$default-float}: rem-calc(16);
+        margin-bottom: 0;
 
-      &:hover {
-        background: $active-bg-hover;
-      }
+        a {
+            color: $sub-nav-font-color;
+            padding: $sub-nav-padding;
+            text-decoration: $sub-nav-text-decoration;
+
+            &:hover {
+                color: $sub-nav-font-color-hover;
+            }
+        }
+
+        &.active a {
+            @include radius($sub-nav-border-radius);
+            background: $active-bg;
+            color: $sub-nav-active-color;
+            cursor: $sub-nav-active-cursor;
+            font-weight: $sub-nav-active-font-weight;
+            padding: $sub-nav-active-padding;
+
+            &:hover {
+                background: $active-bg-hover;
+            }
+        }
+
+        @if $sub-nav-item-divider != "" {
+            margin-#{$default-float}: 0;
+
+            &:before {
+                content: "#{$sub-nav-item-divider}";
+                margin: 0 $sub-nav-item-divider-margin;
+            }
+
+            &:first-child:before {
+                content: "";
+                margin: 0;
+            }
+        }
     }
-
-    @if $sub-nav-item-divider != "" {
-      margin-#{$default-float}: 0;
-
-      &:before {
-        content: "#{$sub-nav-item-divider}";
-        margin: 0 $sub-nav-item-divider-margin;
-      }
-
-      &:first-child:before {
-        content: "";
-        margin: 0;
-      }
-    }
-  }
 }
 
 @include exports("sub-nav") {
-  @if $include-html-nav-classes {
-    .sub-nav { @include sub-nav; }
-  }
+    @if $include-html-nav-classes {
+        .sub-nav {
+            @include sub-nav;
+        }
+    }
 }
 
 /*-------------------------------------------------------------------------------------
@@ -127,35 +128,36 @@ $sub-nav-item-divider-margin: rem-calc(12) !default;
 
 // Sub Navigation
 .sub-nav {
-  list-style: none;
-  li,
-  dd {
-    margin: 0 1px 1px 0;
-    a {
-      @include button-dimensions();
-      color: $content-ui-foreground;
-      background-color: $content-ui-background;
-      display: inline-block;
+    list-style: none;
+    li,
+    dd {
+        margin: 0 1px 1px 0;
+        a {
+            @include button-dimensions();
+            color: $content-ui-foreground;
+            background-color: $content-ui-background;
+            display: inline-block;
 
-      &:hover {
-        color: $content-ui-foreground;
-        background-color: $content-ui-hover;
-        text-decoration: none;
-      }
-    }
-    &.active a {
-      color: $content-ui-foreground;
-      background-color: $content-ui-selected;
+            &:hover {
+                color: $content-ui-foreground;
+                background-color: $content-ui-hover;
+                text-decoration: none;
+            }
+        }
+        &.active a {
+            color: $content-ui-foreground;
+            background-color: $content-ui-selected;
 
-      &:hover {
-        color: $content-ui-foreground;
-        background-color: $content-ui-selected;
-      }
+            &:hover {
+                color: $content-ui-foreground;
+                background-color: $content-ui-selected;
+            }
+        }
     }
-  }
-  [class^='icon-'], [class*=' icon-'] {
-    &:before {
-      line-height: normal;
+    [class^="icon-"],
+    [class*=" icon-"] {
+        &:before {
+            line-height: normal;
+        }
     }
-  }
 }

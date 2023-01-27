@@ -1,83 +1,83 @@
 #news-component {
-  .card {
-    padding: 1rem;
+    .card {
+        padding: 1rem;
 
-    > a > img {
-      margin: 0 1rem 0 0;
-      width: 12.5rem;
+        > a > img {
+            margin: 0 1rem 0 0;
+            width: 12.5rem;
 
-      @media #{$medium-down} {
-        width: 6rem;
-      }
-    }
-    .thumbnail {
-      width: 4rem;
-    }
-    &.reversed {
-      > a > img {
-        float: right;
-        margin: 0 0 0 1rem;
-      }
-      .card-actions {
-        display: flex;
-        nav {
-          min-width: 5.25rem;
+            @media #{$medium-down} {
+                width: 6rem;
+            }
         }
-        [class^="icon-"],
-        [class*=" icon-"] {
-          color: $anchor-font-color;
-          margin: 0;
-          padding: 0;
-          line-height: strip-unit($global-button-height);
-          text-align: center;
-          width: $global-button-height;
-          height: $global-button-height;
-
-          &:before {
-            padding-right: 0;
-            float: none;
-          }
-          &[disabled], &.disabled {
-            opacity: 0.33;
-          }
-          &.selected {
-            color: $content-ui-selected;
-            background-color: $content-ui-foreground;
-          }
-          &:hover {
-            background-color: rgba(0,0,0,0.1);
-            text-decoration: none;
-          }
+        .thumbnail {
+            width: 4rem;
         }
-      }
-      .card-feature-avatar {
-        float: right;
-        margin: 0 0 0 1rem;
-      }
-      .spacer {
-        flex-grow: 1;
-      }
-    }
-    h3 {
-      margin-bottom: .25rem;
-    }
-    .icon-pin {
-      margin: -0.5rem .5rem 0 -1rem;
-    }
-    article {
-      padding-top: .5rem;
-    }
+        &.reversed {
+            > a > img {
+                float: right;
+                margin: 0 0 0 1rem;
+            }
+            .card-actions {
+                display: flex;
+                nav {
+                    min-width: 5.25rem;
+                }
+                [class^="icon-"],
+                [class*=" icon-"] {
+                    color: $anchor-font-color;
+                    margin: 0;
+                    padding: 0;
+                    line-height: strip-unit($global-button-height);
+                    text-align: center;
+                    width: $global-button-height;
+                    height: $global-button-height;
 
-  }
-  .v-card {
-    @media #{$small-only} {
-      flex-basis: 100%;
+                    &:before {
+                        padding-right: 0;
+                        float: none;
+                    }
+                    &[disabled],
+                    &.disabled {
+                        opacity: 0.33;
+                    }
+                    &.selected {
+                        color: $content-ui-selected;
+                        background-color: $content-ui-foreground;
+                    }
+                    &:hover {
+                        background-color: rgba(0, 0, 0, 0.1);
+                        text-decoration: none;
+                    }
+                }
+            }
+            .card-feature-avatar {
+                float: right;
+                margin: 0 0 0 1rem;
+            }
+            .spacer {
+                flex-grow: 1;
+            }
+        }
+        h3 {
+            margin-bottom: 0.25rem;
+        }
+        .icon-pin {
+            margin: -0.5rem 0.5rem 0 -1rem;
+        }
+        article {
+            padding-top: 0.5rem;
+        }
     }
-    @media #{$medium-only} {
-      flex-basis: 50%;
+    .v-card {
+        @media #{$small-only} {
+            flex-basis: 100%;
+        }
+        @media #{$medium-only} {
+            flex-basis: 50%;
+        }
+        flex: 0 0 33.33%;
     }
-    flex: 0 0 33.33%;
-  }
 }
 
 /* Extremely specific to news on the dashboard,
@@ -108,13 +108,13 @@
 }
 
 .skeleton.news > .img {
-      margin: 0 1rem 0 0;
-      width: rem-calc(200);
+    margin: 0 1rem 0 0;
+    width: rem-calc(200);
 }
 .skeleton.news-reversed > .img {
-      float: right;
-      margin: 0 0 0 1rem;
-      width: rem-calc(200);
+    float: right;
+    margin: 0 0 0 1rem;
+    width: rem-calc(200);
 }
 
 .news-post {
@@ -126,7 +126,8 @@
     .banner img {
         align-self: center;
     }
-    .detail, article {
+    .detail,
+    article {
         margin: 0 auto;
         max-width: 45rem;
     }
@@ -137,7 +138,7 @@
     .detail > .meta {
         border-bottom: 1px solid $gainsboro;
         margin: 0 0 2rem;
-        padding-bottom: .5rem;
+        padding-bottom: 0.5rem;
     }
 
     // Padding on the top of the article so headings and images don't get
@@ -156,7 +157,7 @@
     .discussion-threads {
         margin: 0 auto;
         max-width: 45rem;
-        padding: 0 .75rem;
+        padding: 0 0.75rem;
     }
 }
 
@@ -180,8 +181,8 @@
         }
         @media #{$medium-up} {
             flex: 0 auto;
-            margin: ($h1-font-size * .3) 0 0 2rem;
-            margin-top: ($h1-font-size - $h1-font-reduction) * .3;
+            margin: ($h1-font-size * 0.3) 0 0 2rem;
+            margin-top: ($h1-font-size - $h1-font-reduction) * 0.3;
         }
     }
 }
@@ -193,11 +194,7 @@
         border: 0;
         //shadow trick to have a 1px 'border' around child items without them becoming
         //2px borders when sitting next to other children: https://stackoverflow.com/a/52807938
-        box-shadow:
-            2px 0 0 0 $white,
-            0 2px 0 0 $white,
-            2px 2px 0 0 $white,
-            2px 0 0 0 $white inset,
+        box-shadow: 2px 0 0 0 $white, 0 2px 0 0 $white, 2px 2px 0 0 $white, 2px 0 0 0 $white inset,
             0 2px 0 0 $white inset;
         min-height: 80px;
     }
@@ -205,7 +202,7 @@
 
 .audience-composite-row {
     font-size: $paragraph-font-size;
-    margin-bottom: .25rem;
+    margin-bottom: 0.25rem;
 }
 
 .infographic {
@@ -223,7 +220,8 @@
 }
 
 .ico {
-    td, th {
+    td,
+    th {
         text-align: center;
     }
 }
@@ -233,7 +231,7 @@
 }
 
 .article-read-more {
-    margin-top: .5rem;
+    margin-top: 0.5rem;
     text-transform: uppercase;
 }
 
@@ -256,24 +254,28 @@
 
 /* News Homepage component specific
  */
-div[id^='news-container'], div[id*='news-container']{
-  #article-attachments {
-    padding: 0 1rem 1rem 1rem;
+div[id^="news-container"],
+div[id*="news-container"] {
+    #article-attachments {
+        padding: 0 1rem 1rem 1rem;
 
-    hr {
-      margin-top: 0;
+        hr {
+            margin-top: 0;
+        }
     }
-  }
 }
 
 /* show the read news items with lower opacity, to make it more obvious
 */
-.read h3, .read article, .read meta, .read .article-read-more {
+.read h3,
+.read article,
+.read meta,
+.read .article-read-more {
     opacity: 70%;
 }
 /* show the unread news items with a bold header and "Read More" link
 */
-.unread h3, .unread .article-read-more {
+.unread h3,
+.unread .article-read-more {
     font-weight: bold;
 }
-

@@ -1,43 +1,44 @@
 @media all {
-  #nceaReport {
-    #graph {
-      height: 350px;
-    }
+    #nceaReport {
+        #graph {
+            height: 350px;
+        }
 
-    span.disclaimer {
-      font-weight: bold;
-      text-decoration: underline;
-    }
+        span.disclaimer {
+            font-weight: bold;
+            text-decoration: underline;
+        }
 
-    th, td {
-      border: 1px solid #000 !important;
-      padding: 0.25rem !important;
-    }
+        th,
+        td {
+            border: 1px solid #000 !important;
+            padding: 0.25rem !important;
+        }
 
-    td {
-      span {
-        font-weight: bold;
-      }
+        td {
+            span {
+                font-weight: bold;
+            }
 
-      &.total {
-        background-color: #ededed;
-        font-weight: bold;
-      }
-    }
+            &.total {
+                background-color: #ededed;
+                font-weight: bold;
+            }
+        }
 
-    .center {
-      text-align: center;
-    }
+        .center {
+            text-align: center;
+        }
 
-    p.center {
-      margin: 0 auto;
+        p.center {
+            margin: 0 auto;
+        }
     }
-  }
 }
 
 @media print {
-  h1 {
-    margin: 0 !important;
-    padding: 0 !important;
-  }
+    h1 {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
 }

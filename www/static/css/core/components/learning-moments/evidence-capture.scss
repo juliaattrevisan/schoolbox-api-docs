@@ -1,212 +1,212 @@
 .share-work-buttons {
-  a {
-    display: flex;
-    align-items: center;
-    height: rem-calc(58);
-    padding: 0 0.875rem;
-    margin-bottom: 1rem;
-    color: $anchor-font-color;
+    a {
+        display: flex;
+        align-items: center;
+        height: rem-calc(58);
+        padding: 0 0.875rem;
+        margin-bottom: 1rem;
+        color: $anchor-font-color;
 
-    &:before {
-      font-size: 2rem;
-      padding-right: 0.875rem;
+        &:before {
+            font-size: 2rem;
+            padding-right: 0.875rem;
+        }
+        &:hover {
+            color: $white;
+            &:before {
+                color: $white;
+            }
+        }
     }
-    &:hover {
-      color: $white;
-      &:before {
-        color: $white;
-      }
+    .share-photo {
+        border: 1px solid $icon-color-image;
+        &:before {
+            color: $icon-color-image;
+        }
+        &:hover {
+            background-color: $icon-color-image;
+        }
     }
-  }
-  .share-photo {
-    border: 1px solid $icon-color-image;
-    &:before {
-      color: $icon-color-image;
+    .share-video {
+        border: 1px solid $icon-color-video-player;
+        &:before {
+            color: $icon-color-video-player;
+        }
+        &:hover {
+            background-color: $icon-color-video-player;
+        }
     }
-    &:hover {
-      background-color: $icon-color-image;
+    .share-audio {
+        border: 1px solid $icon-color-audio;
+        &:before {
+            color: $icon-color-audio;
+        }
+        &:hover {
+            background-color: $icon-color-audio;
+        }
     }
-  }
-  .share-video {
-    border: 1px solid $icon-color-video-player;
-    &:before {
-      color: $icon-color-video-player;
+    .share-file {
+        border: 1px solid $icon-color-files;
+        &:before {
+            color: $icon-color-files;
+        }
+        &:hover {
+            background-color: $icon-color-files;
+        }
     }
-    &:hover {
-      background-color: $icon-color-video-player;
+    .share-text {
+        border: 1px solid $emotion;
+        &:before {
+            color: $emotion;
+        }
+        &:hover {
+            background-color: $emotion;
+        }
     }
-  }
-  .share-audio {
-    border: 1px solid $icon-color-audio;
-    &:before {
-      color: $icon-color-audio;
-    }
-    &:hover {
-      background-color: $icon-color-audio;
-    }
-  }
-  .share-file {
-    border: 1px solid $icon-color-files;
-    &:before {
-      color: $icon-color-files;
-    }
-    &:hover {
-      background-color: $icon-color-files;
-    }
-  }
-  .share-text {
-    border: 1px solid $emotion;
-    &:before {
-      color: $emotion;
-    }
-    &:hover {
-      background-color: $emotion;
-    }
-  }
 }
 
 #evidence-form {
-  .evidence-storage-preview {
-    max-height: rem-calc(500);
-    max-width: rem-calc(500);
-    margin-bottom: 1rem;
-  }
-  label[for="evidence-body"] {
-    display: block;
-  }
+    .evidence-storage-preview {
+        max-height: rem-calc(500);
+        max-width: rem-calc(500);
+        margin-bottom: 1rem;
+    }
+    label[for="evidence-body"] {
+        display: block;
+    }
 }
 
 .skeleton-feed > ul {
-  width: 100%;
-  max-width: 45rem;
-  margin: 0 auto;
-  padding: 1rem;
-  img {
-    margin-bottom: 1rem;
-  }
-  h3 {
-    width: 80%;
-  }
-  p {
-    width: 40%;
-  }
-}
-.feed-column {
-  background-color: $white;
-  flex: 1 0 auto;
-}
-.feed {
-  background-color: $white;
-  display: flex;
-
-  .subheader {
-    background-color: $ghost;
-    padding: 0.5rem 1rem;
-    margin: 0;
-    border-top: 2px solid #ededed;
-    border-left: 2px solid #ededed;
-    border-right: 2px solid #ededed;
-  }
-
-  > section {
-    border-bottom: 2px solid #ededed;
     width: 100%;
     max-width: 45rem;
-  }
+    margin: 0 auto;
+    padding: 1rem;
+    img {
+        margin-bottom: 1rem;
+    }
+    h3 {
+        width: 80%;
+    }
+    p {
+        width: 40%;
+    }
+}
+.feed-column {
+    background-color: $white;
+    flex: 1 0 auto;
+}
+.feed {
+    background-color: $white;
+    display: flex;
+
+    .subheader {
+        background-color: $ghost;
+        padding: 0.5rem 1rem;
+        margin: 0;
+        border-top: 2px solid #ededed;
+        border-left: 2px solid #ededed;
+        border-right: 2px solid #ededed;
+    }
+
+    > section {
+        border-bottom: 2px solid #ededed;
+        width: 100%;
+        max-width: 45rem;
+    }
 }
 
 .feed-item {
-  border: 2px solid #ededed;
+    border: 2px solid #ededed;
 
-  .badge-card {
-    padding: 1rem;
+    .badge-card {
+        padding: 1rem;
 
-    img {
-      margin: 0 1rem 0 0;
-      width: 4rem;
+        img {
+            margin: 0 1rem 0 0;
+            width: 4rem;
+        }
     }
-  }
 
-  .article-read-more {
-    margin-top: 0;
-    padding-bottom: 1rem;
-    width: 100%;
-    clear: both;
-  }
+    .article-read-more {
+        margin-top: 0;
+        padding-bottom: 1rem;
+        width: 100%;
+        clear: both;
+    }
 }
 
 .feed-body {
-  article {
-    margin-bottom: 1rem;
-    margin-top: 1rem;
+    article {
+        margin-bottom: 1rem;
+        margin-top: 1rem;
 
-    // prevent images in posts displaying too large
-    img {
-      max-height: rem-calc(500);
+        // prevent images in posts displaying too large
+        img {
+            max-height: rem-calc(500);
+        }
     }
-  }
-  .tags {
-    margin-bottom: 1rem;
-  }
+    .tags {
+        margin-bottom: 1rem;
+    }
 }
 
 .feed-comments {
-  padding-bottom: 1rem;
+    padding-bottom: 1rem;
 
-  .island {
-    border-top: 1px solid #ededed;
-    padding: 1rem 0 0 0;
-  }
-  .discussion-threads {
-    padding: 0;
-    margin: 0;
-    max-width: 100%;
-  }
-  .comment-count {
-    font-weight: $font-weight-semibold;
-  }
-  .discussion {
-    border: 0;
-  }
-  #threads-section {
-    margin: 0;
-    padding: 0;
-  }
-  .information-list {
-    margin-top: 1rem;
-  }
+    .island {
+        border-top: 1px solid #ededed;
+        padding: 1rem 0 0 0;
+    }
+    .discussion-threads {
+        padding: 0;
+        margin: 0;
+        max-width: 100%;
+    }
+    .comment-count {
+        font-weight: $font-weight-semibold;
+    }
+    .discussion {
+        border: 0;
+    }
+    #threads-section {
+        margin: 0;
+        padding: 0;
+    }
+    .information-list {
+        margin-top: 1rem;
+    }
 }
 
 .evidence-detail {
-  .comment-count {
-    font-size: $h2-font-size;
-  }
-  .information-list {
-    margin-top: 1rem;
-  }
+    .comment-count {
+        font-size: $h2-font-size;
+    }
+    .information-list {
+        margin-top: 1rem;
+    }
 }
 
 .feed-load-more {
-  background-color: $white;
-  width: 100%;
+    background-color: $white;
+    width: 100%;
 }
 
 @media only screen and (max-width: 769px) {
-  .feed-item,
-  .feed .subheader {
-    border-left: 0;
-    border-right: 0;
-  }
+    .feed-item,
+    .feed .subheader {
+        border-left: 0;
+        border-right: 0;
+    }
 }
 
 @media #{$medium-only} {
-  .feed .subheader {
-    padding: 0.5rem 0.75rem;
-  }
+    .feed .subheader {
+        padding: 0.5rem 0.75rem;
+    }
 }
 
 @media #{$small-only} {
-  .feed .subheader {
-    padding: 0.5rem;
-  }
+    .feed .subheader {
+        padding: 0.5rem;
+    }
 }
