@@ -59,9 +59,11 @@ const isSelected = ref(false);
 const hasLoadError = ref(false);
 const showPopOut = computed(() => isSelected.value );
 const isExpanded = ref(false); // is recent activity expanded
-const hasSubmissions = ref(false); // has an event of type 'response' and response.submitted === true;
-const hasFeedback = ref(false); // has an event of type 'feedback'
 const activityItems: Ref<ActivityItem[]> = ref([]); // list of recent activity items to display
+// has an event of type 'response' and response.submitted === true;
+const hasSubmissions = computed(() => activityItems.value.some(item => item.type === 'response' && item.submitted));
+// has an event of type 'feedback'
+const hasFeedback = computed(() => activityItems.value.some(item => item.type === 'feedback'));
 const isActivityEmpty = computed(() => activityItems.value.length === 0);
 const isExpansionDisabled = computed(() => activityItems.value.length === 1);
 const routes: Ref<Routes> = ref({
