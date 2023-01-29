@@ -19,10 +19,7 @@ use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Resource\Folder\Model as Folder;
-use Schoolbox\Resource\Group;
 use Schoolbox\Resource\GroupMapper;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 class Module extends BaseModule
@@ -50,26 +47,19 @@ class Module extends BaseModule
 
         $preloadUser = function ($params) {
             return [
-                'user' => $this->preloadUser($params),
-            ];
+                'user' => $this->preloadUser($params)
+                ];
         };
 
         $preloadUserGroup = function ($params) {
             return [
-                'user'  => $this->preloadUser($params),
-                'group' => $this->preloadGroup($params),
-            ];
-        };
-
-        $preloadUserFolder = function ($params) {
-            return [
-                'user'   => $this->preloadUser($params),
-                'folder' => $this->preloadFolder($params),
-            ];
+                'user' => $this->preloadUser($params),
+                'group' => $this->preloadGroup($params)
+                ];
         };
 
         $this->register('GET', '/{userId}/group', 'apiMembership', $hasApiAccess, $preloadUser);
-        $this->register('POST', '/{userId}/group/{groupId}', 'apiMembershipAdd', $hasApiAccess, $preloadUserFolder);
+        $this->register('POST', '/{userId}/group/{groupId}', 'apiMembershipAdd', $hasApiAccess, $preloadUserGroup);
         $this->register('GET', '/{userId}/group/{groupId}', 'apiMembershipGet', $hasApiAccess, $preloadUserGroup);
         $this->register('PUT', '/{userId}/group/{groupId}', 'apiMembershipPut', $hasApiAccess, $preloadUserGroup);
         $this->register('PATCH', '/{userId}/group/{groupId}', 'apiMembershipPatch', $hasApiAccess, $preloadUserGroup);
@@ -95,9 +85,11 @@ class Module extends BaseModule
      * Preload a User instance
      *
      * @param array $params
-     * @return User
+     * @return object
+     * @throws \InvalidArgumentException
+     * @throws SchoolboxException
      */
-    private function preloadUser(array $params): User
+    private function preloadUser(array $params): object
     {
         try {
             $user = $this->getUserMapper()->findById($params['userId']);
@@ -112,13 +104,15 @@ class Module extends BaseModule
      * Preload a Group instances
      *
      * @param array $params
-     * @return Group
+     * @return object
+     * @throws \InvalidArgumentException
+     * @throws SchoolboxException
      */
-    private function preloadGroup(array $params): Group
+    private function preloadGroup(array $params): object
     {
         try {
             $folder = $this->getFolderMapper()->findById($params['groupId']);
-            $group  = $folder->getGroup();
+            $group = $folder->getGroup();
             if (!$group) {
                 throw new SchoolboxException('Group Does not Exist', 404, null, 404);
             }
@@ -126,22 +120,6 @@ class Module extends BaseModule
             throw new SchoolboxException('Group Does not Exist', 404, null, 404);
         }
         return $group;
-    }
-
-    /**
-     * Preload a folder
-     *
-     * @param array $params
-     * @return Folder
-     */
-    private function preloadFolder(array $params): Folder
-    {
-        try {
-            $folder = $this->getFolderMapper()->findById($params['groupId']);
-        } catch (MapperException $e) {
-            throw new SchoolboxException('Folder does not exist', 404, null, 404);
-        }
-        return $folder;
     }
 
     /**
