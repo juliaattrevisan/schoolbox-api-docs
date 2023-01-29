@@ -166,7 +166,6 @@ async function onPopOutSelected(event: CustomEvent) {
     // Make sure we're not reloading a menu we already have open.
     if(referenceElement.value !== event.detail.target){
         routes.value = updateRoutes(event.detail.routes as Routes);
-        debugger;
         isSelected.value = true;
         isExpanded.value = false;
         referenceElement.value = event.detail.target;
@@ -187,6 +186,8 @@ function onMouseClick(event: Event) {
         && referenceElement.value !== event.target
     ){
         isSelected.value = false;
+        // Clear out any selected states.
+        referenceElement.value?.classList.remove('is-selected');
         referenceElement.value = null;
     }
 }
