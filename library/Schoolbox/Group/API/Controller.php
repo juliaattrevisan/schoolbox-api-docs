@@ -18,6 +18,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Group;
 use Schoolbox\Resource\GroupMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -27,8 +28,6 @@ use Timetable_ColourMapper;
 class Controller extends Base
 {
     private GroupsHelper $groupsHelper;
-
-    private UserAccessMapper $userAccessMapper;
 
     /**
      * Controller constructor.
@@ -40,14 +39,13 @@ class Controller extends Base
      * @param RerouteOverrideMapper  $reRouteOverrideMapper
      */
     public function __construct(
-        UserAccessMapper $userAccessMapper,
-        GroupMapper $groupMapper,
+        private UserAccessMapper $userAccessMapper,
+        private GroupMapper $groupMapper,
         FolderMapper $folderMapper,
         Timetable_ColourMapper $timetableColourMapper,
         RerouteOverrideMapper $reRouteOverrideMapper
     ) {
-        $this->userAccessMapper = $userAccessMapper;
-        $this->groupsHelper     = new GroupsHelper(
+        $this->groupsHelper = new GroupsHelper(
             $groupMapper,
             $userAccessMapper,
             $folderMapper,
@@ -102,12 +100,24 @@ class Controller extends Base
      * @link http://api.schoolbox.com.au/#operation/userGroupMembershipPost
      * @api  POST /user/{userId}/group/{groupId}
      */
-    public function apiMembershipAdd(User $user, Group $group)
+    public function apiMembershipAdd(User $user, Folder $folder)
     {
-        $userAccess = $this->groupsHelper->getGroup($user, $group);
-        if ($userAccess && $userAccess->getAccessLevel() !== 0) {
-            $this->sendJsonError('User is already enroled in the group', 409);
-            return;
+        $userAccess = null;
+        $group = $folder->getGroup();
+        if ($group) {
+            $userAccess = $this->groupsHelper->getGroup($user, $group);
+            if ($userAccess && $userAccess->getAccessLevel() !== 0) {
+                $this->sendJsonError('User is already enroled in the group', 409);
+                return;
+            }
+        } else {
+            // Create a group for this folder, if it does not exist.
+            $group = $this->groupMapper->createModel()
+                                       ->setFolder($folder)
+                                       ->setNotificationDisabled(false)
+                                       ->setForceFollow(false)
+                                       ->setType(Group::PRIVATE_GROUP);
+            $this->groupMapper->save($group);
         }
         if (!$userAccess) {
             $userAccess = new UserGroupAccess();
