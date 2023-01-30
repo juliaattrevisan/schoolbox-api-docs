@@ -30,7 +30,6 @@ use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
-use Schoolbox\UserMapper;
 use UnexpectedValueException;
 
 /**
@@ -53,6 +52,7 @@ class Factory implements IFactory
     public const COMPASS = 'compass';
     public const WONDE = 'wonde';
     public const LISS = 'liss';
+    public const VERACROSS = 'veracross';
     public const CSV = 'csv';
 
 
@@ -67,6 +67,7 @@ class Factory implements IFactory
         self::COMPASS => 'Compass',
         self::WONDE => 'Wonde',
         self::LISS => 'LISS',
+        self::VERACROSS => 'Veracross',
         self::CSV => 'External',
 
         /* When you've not chosen a SUDS Data Source
@@ -316,6 +317,10 @@ class Factory implements IFactory
                     TimetablePeriodMapper::getInstance()->disableCache(),
                     \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache()
                 ))->produce();
+
+            // TODO: VeracrossEndpoint\Factory
+            case self::VERACROSS:
+                return null;
 
             default:
                 // Use manual csv imports
