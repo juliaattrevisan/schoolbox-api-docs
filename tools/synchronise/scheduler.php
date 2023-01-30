@@ -180,18 +180,18 @@ HELP;
             /* Execute scheduler: sis stuff
              */
             $sisFactory = new Endpoint\Factory($host, $key, $perform, $this->getLogger(), [], $validStrats);
-        }
 
-        (new Endpoint\Scheduler(
-            $randomMapper->getDatabase(),
-            $frequency,
-            $customHours,
-            $sisFactory,
-            $type,
-            $file,
-            $this->getLogger(),
-            \Schoolbox\External\Connector\Log\Mapper::getInstance()
-        ))->run($time, $runId, Endpoint\Scheduler::SCHEDULER_SIS_SCRIPT_NAME);
+            (new Endpoint\Scheduler(
+                $randomMapper->getDatabase(),
+                $frequency,
+                $customHours,
+                $sisFactory,
+                $type,
+                $file,
+                $this->getLogger(),
+                \Schoolbox\External\Connector\Log\Mapper::getInstance()
+            ))->run($time, $runId, Endpoint\Scheduler::SCHEDULER_SIS_SCRIPT_NAME);
+        }
 
         /* Execute scheduler: calendar stuff
          * Not all connectivities contain a calendar importer, just some
