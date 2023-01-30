@@ -36,6 +36,12 @@ class Generator
 
 
     /**
+     * Dynamically constructed endpoint
+     */
+    private const OAUTH_PATH = '%s/oauth/token';
+
+
+    /**
      * Veracross docs also refer to this as the "token_type"
      * I guess they changed the name in some places, or
      * they are colloquially synonymous
@@ -64,6 +70,12 @@ class Generator
      * Lifetime of a token, as set by Veracross
      */
     private const TOKEN_DURATION = 3600;
+
+
+    /**
+     * Time given to respawn a new token when the existing one is about to expire
+     */
+    private const TOKEN_OFFSET = 60;
 
 
     /**
@@ -149,7 +161,7 @@ class Generator
         /* Guzzle the Access Token Generation endpoint
          */
         $endpoint = sprintf(
-            '%s/oauth/token',
+            self::OAUTH_PATH,
             $this->schoolRoute
         );
 
@@ -205,7 +217,7 @@ class Generator
                     /* Predict the death of the token and subtract an arbitrary
                      * amount off its actual lifespan to give us time to spawn another
                      */
-                    $expiryTime = time() + (int)$token['expires_in'] - 60;
+                    $expiryTime = time() + (int)$token['expires_in'] - self::TOKEN_OFFSET;
 
                     /* Spawn the token
                      */
