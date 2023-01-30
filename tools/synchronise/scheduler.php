@@ -182,6 +182,14 @@ HELP;
              */
             $sisFactory = new Endpoint\Factory($host, $key, $perform, $this->getLogger(), [], $validStrats);
 
+            /* Importer strat gets suffixed onto the end
+             */
+            $subtitle = '';
+
+            if ('' !== $currentStrat) {
+                $subtitle = " ({$currentStrat})";
+            }
+
             (new Endpoint\Scheduler(
                 $randomMapper->getDatabase(),
                 $frequency,
@@ -191,7 +199,7 @@ HELP;
                 $file,
                 $this->getLogger(),
                 \Schoolbox\External\Connector\Log\Mapper::getInstance()
-            ))->run($time, $runId, Endpoint\Scheduler::SCHEDULER_SIS_SCRIPT_NAME);
+            ))->run($time, $runId, Endpoint\Scheduler::SCHEDULER_SIS_SCRIPT_NAME . $subtitle);
         }
 
         /* Execute scheduler: calendar stuff

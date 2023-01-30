@@ -401,6 +401,14 @@ class Controller extends ConfigController
                  */
                 $sisFactory = new Factory($host, $key, true, $logger, $watchlist, $validStrats);
 
+                /* Importer strat gets suffixed onto the end
+                 */
+                $subtitle = '';
+
+                if ('' !== $currentStrat) {
+                    $subtitle = " ({$currentStrat})";
+                }
+
                 (new Scheduler(
                     $importLogMapper->getDatabase(),
                     $frequency,
@@ -410,7 +418,7 @@ class Controller extends ConfigController
                     $file,
                     $logger,
                     $importLogMapper
-                ))->run($time, $runId, Scheduler::MANUAL_SIS_SCRIPT_NAME . " ({$currentStrat})");
+                ))->run($time, $runId, Scheduler::MANUAL_SIS_SCRIPT_NAME . $subtitle);
             }
 
             /* Execute scheduler: calendar stuff
