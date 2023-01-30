@@ -12,10 +12,9 @@ namespace Schoolbox\External\Connector\Veracross\Base\Endpoint\AccessToken;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\InvalidArgumentException;
 use GuzzleHttp\RequestOptions;
-use Schoolbox\External\Connector\Veracross\Base\Endpoint\Codec;
 
 /**
- * Class enerator
+ * Class Generator
  *
  * Generate a Veracross Access Token
  *
