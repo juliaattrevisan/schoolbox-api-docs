@@ -14,6 +14,7 @@ export type Node = {
     name: string;
     selectedParentId?: number; // when a parent Node is selected (to enable/disable or delete), this will be the id of that Node
     breadcrumbs?: Breadcrumb[]; // list of parents to reach this node
+    usage?: Usage[]; // all the places the node has been used
 };
 
 /**
@@ -23,4 +24,26 @@ export type NodeToUpdate = {
     code: string | null;
     description: string | null;
     name: string;
+};
+
+/**
+ * An activity linked to the node
+ */
+export type Usage = {
+    discriminator: "course" | "folder" | "unit";
+    object: UsageObject;
+};
+
+/**
+ * The further details of the the usage
+ */
+export type UsageObject = {
+    id: number;
+    subjectCode?: string;
+    title: string;
+    links: {
+        folder?: string;
+        modify?: string;
+        view?: string;
+    };
 };

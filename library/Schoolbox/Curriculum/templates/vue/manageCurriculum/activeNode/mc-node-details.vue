@@ -44,7 +44,7 @@ const breadcrumbs = computed(() => {
 
 <template>
     <div class="node-container" :style="{ marginLeft: marginLeft }">
-        <loading-table v-if="nodeDetailsStore.isProcessing" rows="2" />
+        <loading-table v-if="nodeDetailsStore.isProcessing" :rows="2" />
         <section v-else>
             <fieldset class="content">
                 <Transition mode="out-in" @enter="slideDownOnEnter" @leave="slideUpOnLeave">

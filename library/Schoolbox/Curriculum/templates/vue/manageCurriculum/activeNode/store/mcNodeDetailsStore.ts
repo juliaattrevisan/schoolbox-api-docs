@@ -19,20 +19,22 @@ export const useNodeDetailsStore = defineStore("mcNodeDetails", () => {
     async function view() {
         try {
             isProcessing.value = true;
+            const store = useStore();
             const activeNodeStore = useActiveNodeStore();
             const nodeId: number = activeNodeStore.node.id;
-            const response = await fetch(`${useStore().getApiEndpoint()}/${nodeId}?ancestors=99`); // just use 99 as hopefully there's no tree that deep...            // if (response.ok) {
+            const breadcrumbsResponse = await fetch(`${store.getApiEndpoint()}/${nodeId}?ancestors=99`); // just use 99 as hopefully there's no tree that deep...            // if (response.ok) {
+            const usageResponse = await fetch(`${store.getApiEndpoint()}/usage/${nodeId}`);
             //     activeNodeStore.update(activeNodeCopy.value);
             //     isProcessing.value = false;
             //     cancel();
             //     return { id: nodeId, message: "Node successfully updated" };
             // }
-            if (response.ok) {
-                const nodeWithParents = (await response.json()) as Node;
+            if (breadcrumbsResponse.ok && usageResponse.ok) {
+                const nodeWithParents = (await breadcrumbsResponse.json()) as Node;
                 activeNodeStore.node.breadcrumbs = getBreadcrumbs(nodeWithParents, []);
-                // node.value.description = nodeWithParents.description;
+                const usage = await usageResponse.json();
+                console.warn(usage);
             } else {
-                console.warn(response);
                 // hasLoadError.value = true;
             }
             // throw new Error(responseJson.title, { ...responseJson });
