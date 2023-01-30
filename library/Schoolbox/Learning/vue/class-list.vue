@@ -410,6 +410,7 @@ export default {
          * @param {String|null} classCode
          */
         setClassCode(classCode) {
+            classCode = decodeURIComponent(classCode);
             if (this.classCodeList.includes(classCode)) {
                 this.currentClassCode = classCode;
             } else {
