@@ -375,15 +375,16 @@ class Controller extends ConfigController
              */
             $importLogMapper = \Schoolbox\External\Connector\Log\Mapper::getInstance();
 
-            /* Split the transaction in half
+            /* Split the transaction in half for suds connectors that can actually do that
+             * Otherwise just import everything like it always did
              */
-            if (in_array($type, [Factory::KAMAR, Factory::SENTRAL])) {
-                $splitStrats = [''];
-            } else {
+            if (\in_array($type, [Factory::TASS_API, Factory::COMPASS], true)) {
                 $splitStrats = [
                     ValidStrats::FAMILIES . ',' . ValidStrats::STAFF,
                     ValidStrats::TIMETABLE
                 ];
+            } else {
+                $splitStrats = [''];
             }
 
             /* The time when both parts of the import ran
