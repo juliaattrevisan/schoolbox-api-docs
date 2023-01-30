@@ -1,5 +1,10 @@
 <script setup lang="ts">
-
+/**
+ * Small card component that can be used like:
+ * <small-card>
+ *  Here's my small card content
+ * </small-card>
+ */
 </script>
 
 <template>

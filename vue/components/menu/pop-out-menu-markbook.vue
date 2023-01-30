@@ -2,10 +2,6 @@
 /**
  * To display recent history on a selected mark book item as well
  * as provide quick links to futher actions
- *
- * @todo
- * Add loading state to menu whilst waiting for cards to load async
- * Handle errors from fetching the data
  */
 
 import { ref, computed, onMounted, onUnmounted } from "vue";

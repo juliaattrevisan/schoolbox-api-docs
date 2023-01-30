@@ -1,27 +1,7 @@
 <script setup lang="ts">
-const props = defineProps({
-    iconText: {
-        type: String,
-        required: false,
-        default: "",
-    },
-});
-
 /**
- * Assign the correct icon class to apply an icon. Ideally,
- * you should just load an icon font and you wouldn't have to
- * do these sorts of checks at all. Icon fonts are the modern
- * way to store a slew of icons within your website - they're
- * generally very lightweight
+ * A button contained within pop-out-menu-markbook
  */
-
-/* const iconClass = `c-menu-item__icon--${props.iconText}`;
-const classes = {};
-classes[iconClass] = props.iconText; */
-
-const iconClass = props.iconText === "marker" ? "c-menu-item__icon--marker" : `icon-${props.iconText}`;
-const classes = {};
-classes[iconClass] = props.iconText;
 
 const emit = defineEmits(["selected"]);
 

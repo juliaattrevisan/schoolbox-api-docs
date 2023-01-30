@@ -1,6 +1,7 @@
 <script setup lang="ts">
 /**
- *
+ * Base 'pop out' that display info outside the context of the document flow.
+ * Typically linked to a button that triggers the display.
  */
 </script>
 
