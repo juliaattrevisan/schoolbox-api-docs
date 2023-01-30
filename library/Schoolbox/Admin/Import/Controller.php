@@ -375,24 +375,42 @@ class Controller extends ConfigController
              */
             $importLogMapper = \Schoolbox\External\Connector\Log\Mapper::getInstance();
 
-            /* ValidStrats is now a cli option
+            /* Split the transaction in half
              */
-            $validStrats = new ValidStrats('');
+            if (Factory::SENTRAL === $type) {
+                $splitStrats = [''];
+            } else {
+                $splitStrats = [
+                    ValidStrats::FAMILIES . ',' . ValidStrats::STAFF,
+                    ValidStrats::TIMETABLE
+                ];
+            }
 
-            /* Execute scheduler: sis stuff
+            /* The time when both parts of the import ran
+             * Could do REQUEST_TIME but this is good enough
              */
-            $sisFactory = new Factory($host, $key, true, $logger, $watchlist, $validStrats);
+            $time = time();
 
-            (new Scheduler(
-                $importLogMapper->getDatabase(),
-                $frequency,
-                $customHours,
-                $sisFactory,
-                $type,
-                $file,
-                $logger,
-                $importLogMapper
-            ))->run(time(), $runId, Scheduler::MANUAL_SIS_SCRIPT_NAME);
+            foreach ($splitStrats as $currentStrat) {
+                /* ValidStrats is now a cli option
+                 */
+                $validStrats = new ValidStrats($currentStrat);
+
+                /* Execute scheduler: sis stuff
+                 */
+                $sisFactory = new Factory($host, $key, true, $logger, $watchlist, $validStrats);
+
+                (new Scheduler(
+                    $importLogMapper->getDatabase(),
+                    $frequency,
+                    $customHours,
+                    $sisFactory,
+                    $type,
+                    $file,
+                    $logger,
+                    $importLogMapper
+                ))->run($time, $runId, Scheduler::MANUAL_SIS_SCRIPT_NAME . " ({$currentStrat})");
+            }
 
             /* Execute scheduler: calendar stuff
              * Not all connectivities contain a calendar importer, just some
@@ -408,7 +426,7 @@ class Controller extends ConfigController
                 $file,
                 $logger,
                 $importLogMapper
-            ))->run(time(), $runId, Scheduler::MANUAL_CALENDAR_SCRIPT_NAME);
+            ))->run($time, $runId, Scheduler::MANUAL_CALENDAR_SCRIPT_NAME);
 
             /* Go to the "Previous IMports" area of SUDS Control Panel
              */
