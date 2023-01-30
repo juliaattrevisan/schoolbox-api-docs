@@ -10,11 +10,13 @@ declare(strict_types=1);
 namespace Schoolbox\External\Event;
 
 use Alaress\Database\Predicate\Builder;
+use Alaress\Database\Predicate\InvalidColumnException;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\Event\Overrides\Applicator;
 use Schoolbox\External\Event\Overrides\Mapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\User;
 
 /**
@@ -107,115 +109,123 @@ class TimetableUsers
      * @param int    $startTimestamp
      * @param int    $endTimestamp
      * @return array
-     * @throws \PDOException
      */
     public function findTeachersForClassCode(string $classCode, int $startTimestamp, int $endTimestamp): array
     {
-        /* Micromanage a stack of minimal event data with overrides
-         */
-        $stack[$classCode] = [
-            'code' => $classCode,
-            'usuals' => [],
-            /* A list of people who survived all the mutations
-             * and transformations in this algorithm
-             */
-            'manifest' => [],
-        ];
+        return \Alaress\Redis::getCacheInstance()->cacheFunctionCall(
+            'findTeachersForClassCode',
+            function ($param) {
+                [$classCode, $startTimestamp, $endTimestamp] = $param;
 
-        /* Find the usual guys for the given class code out of sis_class_user
-         */
-        $query = "
-            SELECT DISTINCT se.code, scu.*
-            FROM {$this->classInvolvementMapper->getTable()} scu
-            INNER JOIN {$this->classEntryMapper->getTable()} sc ON scu.class_id = sc.id
-            INNER JOIN {$this->eventMapper->getTable()} se ON sc.code = se.code
-            WHERE sc.code = :classCode
-            AND se.classification = :classification
-            ORDER BY sc.id ASC
-        ";
-
-        $statement = $this->eventMapper->getDatabase()->prepare($query);
-        $statement->execute([
-            'classCode' => $classCode,
-            'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
-        ]);
-
-        /* Pile it into the $stack in preparation for the mutations
-         */
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            if (!isset($stack[$row['code']])) {
-                $stack[$row['code']] = [
-                    'code' => $row['code'],
+                /* Micromanage a stack of minimal event data with overrides
+                 */
+                $stack[$classCode] = [
+                    'code' => $classCode,
                     'usuals' => [],
                     /* A list of people who survived all the mutations
                      * and transformations in this algorithm
                      */
                     'manifest' => [],
                 ];
-            }
 
-            /* Insert and dedupe
-             */
-            $stack[$row['code']]['usuals'][$row['external_id']] = $row['external_id'];
-        }
+                /* Find the usual guys for the given class code out of sis_class_user
+                 */
+                $query = "
+                    SELECT DISTINCT se.code, scu.*
+                    FROM {$this->classInvolvementMapper->getTable()} scu
+                    INNER JOIN {$this->classEntryMapper->getTable()} sc ON scu.class_id = sc.id
+                    INNER JOIN {$this->eventMapper->getTable()} se ON sc.code = se.code
+                    WHERE sc.code = :classCode
+                    AND se.classification = :classification
+                    ORDER BY sc.id ASC
+                ";
 
-        /* Get a list of events between $startTimestamp and $endTimestamp
-         * along with an ordered list of their overrides
-         */
-        $query = "
-            SELECT se.id, se.code, seuo.*
-            FROM {$this->eventMapper->getTable()} se
-            INNER JOIN {$this->overrideMapper->getTable()} seuo ON se.id = seuo.event_id
-            WHERE se.code = :classCode
-            AND se.classification = :classification
-            AND se.start_at >= :from
-            AND se.start_at <= :to
-            ORDER BY se.id ASC, seuo.sequence ASC
-        ";
+                $statement = $this->eventMapper->getDatabase()->prepare($query);
+                $statement->execute([
+                    'classCode' => $classCode,
+                    'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
+                ]);
 
-        $statement = $this->eventMapper->getDatabase()->prepare($query);
-        $statement->execute([
-            'classCode' => $classCode,
-            'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
-            'from' => \Alaress_Date_Format::newFromTimestamp($startTimestamp)->getDatabase(),
-            'to' => \Alaress_Date_Format::newFromTimestamp($endTimestamp)->getDatabase(),
-        ]);
+                /* Pile it into the $stack in preparation for the mutations
+                 */
+                while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+                    if (!isset($stack[$row['code']])) {
+                        $stack[$row['code']] = [
+                            'code' => $row['code'],
+                            'usuals' => [],
+                            /* A list of people who survived all the mutations
+                             * and transformations in this algorithm
+                             */
+                            'manifest' => [],
+                        ];
+                    }
 
-        /* Remember: overrides are generally optional so they might not even
-         * exist for $classCode which is why we get the Usual Guys first
-         *
-         * Assumption:
-         *   We can presume that sis_class_user data exists first simply because
-         *   that's how we chose to build things. To have overrides only, and
-         *   nothing for sis_class and sis_class_user, is a bit weird and is
-         *   probably a broken situation. I thought of making a manifest for
-         *   each sis_event, but the data size would be extremely big so we chose
-         *   not to do that and opted for this hybrid approach instead. In the
-         *   grand scheme of things it would have been easier to have that
-         *   manifest instead, but I was overridden
-         */
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $stack[$row['code']]['overrides'][] = [
-                'external_id' => $row['external_id'],
-                'action' => $row['action']
-            ];
-        }
+                    /* Insert and dedupe
+                     */
+                    $stack[$row['code']]['usuals'][$row['external_id']] = $row['external_id'];
+                }
 
-        /* Perform mutations
-         */
-        $manifest = $this->applicator->apply(
-            $stack[$classCode]['usuals'] ?? [],
-            $stack[$classCode]['overrides'] ?? [],
+                /* Get a list of events between $startTimestamp and $endTimestamp
+                 * along with an ordered list of their overrides
+                 */
+                $query = "
+                    SELECT se.id, se.code, seuo.*
+                    FROM {$this->eventMapper->getTable()} se
+                    INNER JOIN {$this->overrideMapper->getTable()} seuo ON se.id = seuo.event_id
+                    WHERE se.code = :classCode
+                    AND se.classification = :classification
+                    AND se.start_at >= :from
+                    AND se.start_at <= :to
+                    ORDER BY se.id ASC, seuo.sequence ASC
+                ";
+
+                $statement = $this->eventMapper->getDatabase()->prepare($query);
+                $statement->execute([
+                    'classCode' => $classCode,
+                    'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
+                    'from' => \Alaress_Date_Format::newFromTimestamp($startTimestamp)->getDatabase(),
+                    'to' => \Alaress_Date_Format::newFromTimestamp($endTimestamp)->getDatabase(),
+                ]);
+
+                /* Remember: overrides are generally optional so they might not even
+                 * exist for $classCode which is why we get the Usual Guys first
+                 *
+                 * Assumption:
+                 *   We can presume that sis_class_user data exists first simply because
+                 *   that's how we chose to build things. To have overrides only, and
+                 *   nothing for sis_class and sis_class_user, is a bit weird and is
+                 *   probably a broken situation. I thought of making a manifest for
+                 *   each sis_event, but the data size would be extremely big so we chose
+                 *   not to do that and opted for this hybrid approach instead. In the
+                 *   grand scheme of things it would have been easier to have that
+                 *   manifest instead, but I was overridden
+                 */
+                while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+                    $stack[$row['code']]['overrides'][] = [
+                        'external_id' => $row['external_id'],
+                        'action' => $row['action']
+                    ];
+                }
+
+                /* Perform mutations
+                 */
+                $manifest = $this->applicator->apply(
+                    $stack[$classCode]['usuals'] ?? [],
+                    $stack[$classCode]['overrides'] ?? [],
+                );
+
+                /* Since we're explicitly looking for staff members in this method
+                  * we can basically kick out everyone else who isn't, if they
+                  * survived the override mutations
+                  *
+                  * If we haven't got this already, get it and remember it
+                  * in case we needed it again and again and again
+                  */
+                return $this->applicator->staffOnly($manifest);
+            },
+            [$classCode, $startTimestamp, $endTimestamp],
+            \Config::get('external_cache_timeout')
         );
-
-        /* Since we're explicitly looking for staff members in this method
-         * we can basically kick out everyone else who isn't, if they
-         * survived the override mutations
-         *
-         * If we haven't got this already, get it and remember it
-         * in case we needed it again and again and again
-         */
-        return $this->applicator->staffOnly($manifest);
     }
 
 
@@ -232,158 +242,167 @@ class TimetableUsers
      */
     public function findClassCodesForUser(\Schoolbox\User $user, int $startTimestamp, int $endTimestamp, ?GenericCollection $folderCodes = null): array
     {
-        /* Micromanage a stack of minimal event data with overrides
-         */
-        $lookup = [];
-        $stack = [];
+        return \Alaress\Redis::getCacheInstance()->cacheFunctionCall(
+            'findClassCodesForUser',
+            function ($param) {
+                [$user, $startTimestamp, $endTimestamp, $folderCodes] = $param;
 
-        /* Micromanage dates
-         */
-        $from = \Alaress_Date_Format::newFromTimestamp($startTimestamp)->getDatabase();
-        $to = \Alaress_Date_Format::newFromTimestamp($endTimestamp)->getDatabase();
-
-        /* Find the usual guys for the given class code out of sis_class_user
-         * In this case, $user will be the only guy in the list since we don't
-         * actually care about anyone else. We only care when $user is one of
-         * a class' usual guys.
-         */
-        $query = "
-            SELECT se.code, sc.name, scu.*
-            FROM {$this->classInvolvementMapper->getTable()} scu
-            INNER JOIN {$this->classEntryMapper->getTable()} sc ON scu.class_id = sc.id
-            INNER JOIN {$this->eventMapper->getTable()} se ON sc.code = se.code
-            WHERE scu.external_id = :externalId
-            AND se.classification = :classification
-            AND se.start_at >= :from
-            AND se.start_at <= :to
-            ORDER BY sc.id ASC
-        ";
-
-        $statement = $this->eventMapper->getDatabase()->prepare($query);
-        $statement->execute([
-            'externalId' => $user->getExternalId(),
-            'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
-            'from' => $from,
-            'to' => $to,
-        ]);
-
-        /* Pile it into the $lookup in preparation for the mutations across multiple
-         * instances of a sis_event. A class code could have different sets of humans
-         * involved on different days so you have to repeat the process for every
-         * sis_event you find
-         */
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            if (!isset($lookup[$row['code']])) {
-                $lookup[$row['code']] = [
-                    'name' => $row['name'],
-                    'code' => $row['code'],
-                    /* The guys who are usually involved in this class
-                     */
-                    'usuals' => [],
-                    /* A list of overrides index by event id since each event
-                     * has its own list of overrides
-                     */
-                    'overrides' => [],
-                    /* A list of people who survived all the mutations
-                     * and transformations in this algorithm, for each event instance
-                     */
-                    'manifest' => [],
-                ];
-            }
-
-            /* Insert and dedupe
-             */
-            $lookup[$row['code']]['usuals'][$row['external_id']] = $row['external_id'];
-        }
-
-        /* Find all the events within the time interval specified, because $user
-         * could have been affected by any of their overrides - you won't know
-         * until you play through all the mutations
-         */
-        $query = "
-            SELECT se.code, se.title, se.id, seuo.*
-            FROM {$this->eventMapper->getTable()} se
-            INNER JOIN {$this->overrideMapper->getTable()} seuo ON se.id = seuo.event_id
-            WHERE se.classification = :classification
-            AND se.start_at >= :from
-            AND se.start_at <= :to
-            ORDER BY se.id, seuo.sequence
-        ";
-
-        $statement = $this->eventMapper->getDatabase()->prepare($query);
-        $statement->execute([
-            'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
-            'from' => $from,
-            'to' => $to,
-        ]);
-
-        /* Collate all the overrides and group them so we can mutate everything
-         * in a convenient manner
-         */
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            if (!isset($lookup[$row['code']])) {
-                $lookup[$row['code']] = [
-                    'name' => $row['title'],
-                    'code' => $row['code'],
-                    /* The guys who are usually involved in this class
-                     */
-                    'usuals' => [],
-                    /* A list of overrides index by event id since each event
-                     * has its own list of overrides
-                     */
-                    'overrides' => [],
-                    /* A list of people who survived all the mutations
-                     * and transformations in this algorithm, for each event instance
-                     */
-                    'manifest' => [],
-                ];
-            }
-
-            /* Manufacture a list of overrides for each event id
-             */
-            $lookup[$row['code']]['overrides'][$row['id']][] = [
-                'external_id' => $row['external_id'],
-                'action' => $row['action']
-            ];
-        }
-
-        /* For every thing we found in $lookup,
-         * Play back all the overrides against $usuals
-         * then collate the list of surviving guys in $manifest
-         */
-        foreach ($lookup as $classCode => &$data) {
-            foreach ($data['overrides'] as $eventId => $overrides) {
-                $manifest = $this->applicator->apply($data['usuals'], $overrides);
-
-                /* When we use this to calculate My Subjects in the side menu
-                 * it's actually a union of the usual guys and the survivors
-                 * of the mutations. This does not affect timetables, just
-                 * folder access and shortcuts.
+                /* Micromanage a stack of minimal event data with overrides
                  */
-                $superposition = array_merge($manifest, $data['usuals']);
+                $lookup = [];
+                $stack = [];
 
-                $data['manifest'][$eventId] = $superposition;
-
-                /* If you were involved in this class at any point within the
-                 * time interval specified, I suppose you can pile its class code
-                 * into the stack and skip processing other overrides - we don't
-                 * need to investigate further, since we know you're involved at
-                 * least once.
+                /* Micromanage dates
                  */
-                if (isset($data['manifest'][$eventId][$user->getExternalId()])) {
-                    $stack[$data['code']] = [
-                        'name' => $data['name'],
-                        'code' => $data['code'],
-                    ];
+                $from = \Alaress_Date_Format::newFromTimestamp($startTimestamp)->getDatabase();
+                $to = \Alaress_Date_Format::newFromTimestamp($endTimestamp)->getDatabase();
 
-                    break;
+                /* Find the usual guys for the given class code out of sis_class_user
+                 * In this case, $user will be the only guy in the list since we don't
+                 * actually care about anyone else. We only care when $user is one of
+                 * a class' usual guys.
+                 */
+                $query = "
+                    SELECT se.code, sc.name, scu.*
+                    FROM {$this->classInvolvementMapper->getTable()} scu
+                    INNER JOIN {$this->classEntryMapper->getTable()} sc ON scu.class_id = sc.id
+                    INNER JOIN {$this->eventMapper->getTable()} se ON sc.code = se.code
+                    WHERE scu.external_id = :externalId
+                    AND se.classification = :classification
+                    AND se.start_at >= :from
+                    AND se.start_at <= :to
+                    ORDER BY sc.id ASC
+                ";
+
+                $statement = $this->eventMapper->getDatabase()->prepare($query);
+                $statement->execute([
+                    'externalId' => $user->getExternalId(),
+                    'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
+                    'from' => $from,
+                    'to' => $to,
+                ]);
+
+                /* Pile it into the $lookup in preparation for the mutations across multiple
+                 * instances of a sis_event. A class code could have different sets of humans
+                 * involved on different days so you have to repeat the process for every
+                 * sis_event you find
+                 */
+                while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+                    if (!isset($lookup[$row['code']])) {
+                        $lookup[$row['code']] = [
+                            'name' => $row['name'],
+                            'code' => $row['code'],
+                            /* The guys who are usually involved in this class
+                             */
+                            'usuals' => [],
+                            /* A list of overrides index by event id since each event
+                             * has its own list of overrides
+                             */
+                            'overrides' => [],
+                            /* A list of people who survived all the mutations
+                             * and transformations in this algorithm, for each event instance
+                             */
+                            'manifest' => [],
+                        ];
+                    }
+
+                    /* Insert and dedupe
+                     */
+                    $lookup[$row['code']]['usuals'][$row['external_id']] = $row['external_id'];
                 }
-            }
-        }
 
-        unset($data);
+                /* Find all the events within the time interval specified, because $user
+                 * could have been affected by any of their overrides - you won't know
+                 * until you play through all the mutations
+                 */
+                $query = "
+                    SELECT se.code, se.title, se.id, seuo.*
+                    FROM {$this->eventMapper->getTable()} se
+                    INNER JOIN {$this->overrideMapper->getTable()} seuo ON se.id = seuo.event_id
+                    WHERE se.classification = :classification
+                    AND se.start_at >= :from
+                    AND se.start_at <= :to
+                    ORDER BY se.id, seuo.sequence
+                ";
 
-        return array_values($stack);
+                $statement = $this->eventMapper->getDatabase()->prepare($query);
+                $statement->execute([
+                    'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
+                    'from' => $from,
+                    'to' => $to,
+                ]);
+
+                /* Collate all the overrides and group them so we can mutate everything
+                 * in a convenient manner
+                 */
+                while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+                    if (!isset($lookup[$row['code']])) {
+                        $lookup[$row['code']] = [
+                            'name' => $row['title'],
+                            'code' => $row['code'],
+                            /* The guys who are usually involved in this class
+                             */
+                            'usuals' => [],
+                            /* A list of overrides index by event id since each event
+                             * has its own list of overrides
+                             */
+                            'overrides' => [],
+                            /* A list of people who survived all the mutations
+                             * and transformations in this algorithm, for each event instance
+                             */
+                            'manifest' => [],
+                        ];
+                    }
+
+                    /* Manufacture a list of overrides for each event id
+                     */
+                    $lookup[$row['code']]['overrides'][$row['id']][] = [
+                        'external_id' => $row['external_id'],
+                        'action' => $row['action']
+                    ];
+                }
+
+                /* For every thing we found in $lookup,
+                 * Play back all the overrides against $usuals
+                 * then collate the list of surviving guys in $manifest
+                 */
+                foreach ($lookup as $classCode => &$data) {
+                    foreach ($data['overrides'] as $eventId => $overrides) {
+                        $manifest = $this->applicator->apply($data['usuals'], $overrides);
+
+                        /* When we use this to calculate My Subjects in the side menu
+                         * it's actually a union of the usual guys and the survivors
+                         * of the mutations. This does not affect timetables, just
+                         * folder access and shortcuts.
+                         */
+                        $superposition = array_merge($manifest, $data['usuals']);
+
+                        $data['manifest'][$eventId] = $superposition;
+
+                        /* If you were involved in this class at any point within the
+                         * time interval specified, I suppose you can pile its class code
+                         * into the stack and skip processing other overrides - we don't
+                         * need to investigate further, since we know you're involved at
+                         * least once.
+                         */
+                        if (isset($data['manifest'][$eventId][$user->getExternalId()])) {
+                            $stack[$data['code']] = [
+                                'name' => $data['name'],
+                                'code' => $data['code'],
+                            ];
+
+                            break;
+                        }
+                    }
+                }
+
+                unset($data);
+
+                return array_values($stack);
+            },
+            [$user, $startTimestamp, $endTimestamp, $folderCodes],
+            \Config::get('external_cache_timeout')
+        );
     }
 
 
@@ -396,161 +415,212 @@ class TimetableUsers
      * @param int                    $endTimestamp
      * @param GenericCollection|null $folderCodes
      * @return GenericCollection
+     * @throws InvalidColumnException
      * @throws \PDOException
+     * @throws Exception
+     * @throws \UnderflowException
+     * @throws \UnexpectedValueException
      */
     public function findForUser(\Schoolbox\User $user, int $startTimestamp, int $endTimestamp, ?GenericCollection $folderCodes = null): GenericCollection
     {
         if (!$user->getExternalId()) {
             return $this->eventMapper->createCollection();
         }
-        $startDatetime  = \Alaress_Date_Format::newFromTimestamp($startTimestamp)->getDatabase();
-        $finishDatetime = \Alaress_Date_Format::newFromTimestamp($endTimestamp)->getDatabase();
 
-        /* Micromanage a stack of minimal event data with overrides
-         */
-        $stack = [];
+        $eventIds = \Alaress\Redis::getCacheInstance()->cacheFunctionCall(
+            'findForUser',
+            function ($param) {
+                [$user, $startTimestamp, $endTimestamp, $folderCodes] = $param;
 
-        /* Events where $user is somehow relevant today
-         */
-        $eventIds = [];
+                $startDatetime  = \Alaress_Date_Format::newFromTimestamp($startTimestamp)->getDatabase();
+                $finishDatetime = \Alaress_Date_Format::newFromTimestamp($endTimestamp)->getDatabase();
 
-        /* Find the usual guys for the sis_events occurring between the two timestamps
-         */
-        $query = "
-            SELECT DISTINCT se.id AS eventId, se.code, scu.*
-            FROM {$this->classInvolvementMapper->getTable()} scu
-            INNER JOIN {$this->classEntryMapper->getTable()} sc ON scu.class_id = sc.id
-            INNER JOIN {$this->eventMapper->getTable()} se ON sc.code = se.code
-            WHERE se.classification = :classification
-            AND se.start_at >= :from
-            AND se.start_at <= :to
-            AND scu.external_id = :externalId
-        ";
+                /* Micromanage a stack of minimal event data with overrides
+                 */
+                $stack = [];
 
-        $params = [
-            'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
-            'from'           => $startDatetime,
-            'to'             => $finishDatetime,
-            'externalId'     => $user->getExternalId(),
-        ];
+                /* Events where $user is somehow relevant today
+                 */
+                $eventIds = [];
 
-        if ($folderCodes && $folderCodes->count()) {
-            $bindings = Builder::getBindings($folderCodes->keys(), 'folderCode');
-            $query    .= " AND se.code IN ({$bindings->getPlaceholder()})";
-            $params   = array_merge($params, $bindings->getParams());
-        }
+                /* Find the usual guys for the sis_events occurring between the two timestamps
+                 */
+                $query = "
+                    SELECT DISTINCT se.id AS eventId, se.code, scu.*
+                    FROM {$this->classInvolvementMapper->getTable()} scu
+                    INNER JOIN {$this->classEntryMapper->getTable()} sc ON scu.class_id = sc.id
+                    INNER JOIN {$this->eventMapper->getTable()} se ON sc.code = se.code
+                    WHERE se.classification = :classification
+                    AND se.start_at >= :from
+                    AND se.start_at <= :to
+                    AND scu.external_id = :externalId
+                ";
 
-        $query .= "ORDER BY sc.id ASC";
-
-        $statement = $this->eventMapper->getDatabase()->prepare($query);
-        $statement->execute($params);
-
-        /* Pile it into the $stack in preparation for the mutations
-         */
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            if (!isset($stack[$row['eventId']])) {
-                $stack[$row['eventId']] = [
-                    'code'      => $row['code'],
-                    'usuals'    => [],
-                    /* A list of overrides index by event id since each event
-                     * has its own list of overrides
-                     */
-                    'overrides' => [],
-                    /* A list of people who survived all the mutations
-                     * and transformations in this algorithm
-                     */
-                    'manifest'  => [],
+                $params = [
+                    'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
+                    'from'           => $startDatetime,
+                    'to'             => $finishDatetime,
+                    'externalId'     => $user->getExternalId(),
                 ];
-            }
 
-            /* Insert and dedupe
-             */
-            $stack[$row['eventId']]['usuals'][$row['external_id']] = $row['external_id'];
-        }
+                if ($folderCodes && $folderCodes->count()) {
+                    $bindings = Builder::getBindings($folderCodes->keys(), 'folderCode');
+                    $query    .= " AND se.code IN ({$bindings->getPlaceholder()})";
+                    $params   = array_merge($params, $bindings->getParams());
+                }
 
-        /* Get a list of events between $startTimestamp and $endTimestamp
-         * along with an ordered list of their overrides
-         */
-        $query = "
-            SELECT se.id AS eventId, se.code, seuo.*
-            FROM {$this->eventMapper->getTable()} se
-            INNER JOIN {$this->overrideMapper->getTable()} seuo ON se.id = seuo.event_id
-            WHERE se.classification = :classification
-            AND se.start_at >= :from
-            AND se.start_at <= :to
-        ";
+                $query .= "ORDER BY sc.id ASC";
 
-        $params = [
-            'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
-            'from'           => $startDatetime,
-            'to'             => $finishDatetime,
-        ];
+                $statement = $this->eventMapper->getDatabase()->prepare($query);
+                $statement->execute($params);
 
-        if ($folderCodes && $folderCodes->count()) {
-            $bindings = Builder::getBindings($folderCodes->keys(), 'folderCode');
-            $query    .= " AND se.code IN ({$bindings->getPlaceholder()}) ";
-            $params   = array_merge($params, $bindings->getParams());
-        }
+                /* Pile it into the $stack in preparation for the mutations
+                 */
+                while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+                    if (!isset($stack[$row['eventId']])) {
+                        $stack[$row['eventId']] = [
+                            'code'      => $row['code'],
+                            'usuals'    => [],
+                            /* A list of overrides index by event id since each event
+                             * has its own list of overrides
+                             */
+                            'overrides' => [],
+                            /* A list of people who survived all the mutations
+                             * and transformations in this algorithm
+                             */
+                            'manifest'  => [],
+                        ];
+                    }
 
-        $query .= " ORDER BY se.id ASC, seuo.sequence ASC";
-
-        $statement = $this->eventMapper->getDatabase()->prepare($query);
-        $statement->execute($params);
-
-        /* Remember: overrides are generally optional so they might not even
-         * exist for $classCode which is why we get the Usual Guys first
-         *
-         * Assumption:
-         *   We can presume that sis_class_user data exists first simply because
-         *   that's how we chose to build things. To have overrides only, and
-         *   nothing for sis_class and sis_class_user, is a bit weird and is
-         *   probably a broken situation. I thought of making a manifest for
-         *   each sis_event, but the data size would be extremely big so we chose
-         *   not to do that and opted for this hybrid approach instead. In the
-         *   grand scheme of things it would have been easier to have that
-         *   manifest instead, but I was overridden
-         */
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            /* Some events might contain only overrides so if the struct
-             * never existed before, reinit it here
-             *
-             * Sometimes a class consists purely of overrides
-             * e.g. no students, just a non-regular teacher
-             * In that case $data['usuals'] is not set
-             */
-            if (!isset($stack[$row['eventId']])) {
-                $stack[$row['eventId']] = [
-                    'code'      => $row['code'],
-                    'usuals'    => [],
-                    /* A list of overrides index by event id since each event
-                     * has its own list of overrides
+                    /* Insert and dedupe
                      */
-                    'overrides' => [],
-                    /* A list of people who survived all the mutations
-                     * and transformations in this algorithm
+                    $stack[$row['eventId']]['usuals'][$row['external_id']] = $row['external_id'];
+                }
+
+                /* Find all events which have overrides, and occurring between $startDatetime
+                 * and $finishDatetime timestamps. You can't tell how $externalId will be
+                 * affected by existing mutations such as CLEAR and CLEAR_STAFF unless you
+                 * do this and apply the mutations.
+                 */
+                $rows = $this->findCommonOverrides($startDatetime, $finishDatetime, $folderCodes);
+
+                /* Remember: overrides are generally optional so they might not even
+                 * exist for $classCode which is why we get the Usual Guys first
+                 *
+                 * Assumption:
+                 *   We can presume that sis_class_user data exists first simply because
+                 *   that's how we chose to build things. To have overrides only, and
+                 *   nothing for sis_class and sis_class_user, is a bit weird and is
+                 *   probably a broken situation. I thought of making a manifest for
+                 *   each sis_event, but the data size would be extremely big so we chose
+                 *   not to do that and opted for this hybrid approach instead. In the
+                 *   grand scheme of things it would have been easier to have that
+                 *   manifest instead, but I was overridden
+                 */
+                foreach ($rows as $row) {
+                    /* Some events might contain only overrides so if the struct
+                     * never existed before, reinit it here
+                     *
+                     * Sometimes a class consists purely of overrides
+                     * e.g. no students, just a non-regular teacher
+                     * In that case $data['usuals'] is not set
                      */
-                    'manifest'  => [],
-                ];
-            }
+                    if (!isset($stack[$row['eventId']])) {
+                        $stack[$row['eventId']] = [
+                            'code'      => $row['code'],
+                            'usuals'    => [],
+                            /* A list of overrides index by event id since each event
+                             * has its own list of overrides
+                             */
+                            'overrides' => [],
+                            /* A list of people who survived all the mutations
+                             * and transformations in this algorithm
+                             */
+                            'manifest'  => [],
+                        ];
+                    }
 
-            $stack[$row['eventId']]['overrides'][] = [
-                'external_id' => $row['external_id'],
-                'action'      => $row['action'],
-            ];
-        }
+                    $stack[$row['eventId']]['overrides'][] = [
+                        'external_id' => $row['external_id'],
+                        'action'      => $row['action'],
+                    ];
+                }
 
-        /* Perform mutations
-         */
-        foreach ($stack as $eventId => &$data) {
-            $data['manifest'] = $this->applicator->apply($data['usuals'], $data['overrides']);
+                /* Perform mutations
+                 */
+                foreach ($stack as $eventId => &$data) {
+                    $data['manifest'] = $this->applicator->apply($data['usuals'], $data['overrides']);
 
-            /* Only care about events the current user is in today
-             */
-            if (array_key_exists($user->getExternalId(), $data['manifest'])) {
-                $eventIds[] = $eventId;
-            }
-        }
+                    /* Only care about events the current user is in today
+                     */
+                    if (array_key_exists($user->getExternalId(), $data['manifest'])) {
+                        $eventIds[] = $eventId;
+                    }
+                }
+
+                return $eventIds;
+            },
+            [$user, $startTimestamp, $endTimestamp, $folderCodes],
+            \Config::get('external_cache_timeout')
+        );
 
         return $this->eventMapper->findWithCheapStaff($eventIds);
+    }
+
+
+    /**
+     * Find all the overrides for events occurring between the two timestamps
+     *
+     * @param string                 $startDatetime
+     * @param string                 $finishDatetime
+     * @param GenericCollection|null $folderCodes
+     * @return array
+     */
+    private function findCommonOverrides(string $startDatetime, string $finishDatetime, ?GenericCollection $folderCodes = null): array
+    {
+        return \Alaress\Redis::getCacheInstance()->cacheFunctionCall(
+            'findCommonOverrides',
+            function ($param) {
+                [$startDatetime, $finishDatetime, $folderCodes] = $param;
+                $stack = [];
+
+                /* Get a list of events between $startTimestamp and $endTimestamp
+                 * along with an ordered list of their overrides
+                 */
+                $query = "
+                    SELECT se.id AS eventId, se.code, seuo.*
+                    FROM {$this->eventMapper->getTable()} se
+                    INNER JOIN {$this->overrideMapper->getTable()} seuo ON se.id = seuo.event_id
+                    WHERE se.classification = :classification
+                    AND se.start_at >= :from
+                    AND se.start_at <= :to
+                ";
+
+                $params = [
+                    'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
+                    'from'           => $startDatetime,
+                    'to'             => $finishDatetime,
+                ];
+
+                if ($folderCodes && $folderCodes->count()) {
+                    $bindings = Builder::getBindings($folderCodes->keys(), 'folderCode');
+                    $query    .= " AND se.code IN ({$bindings->getPlaceholder()}) ";
+                    $params   = array_merge($params, $bindings->getParams());
+                }
+
+                $query .= " ORDER BY se.id ASC, seuo.sequence ASC";
+
+                $statement = $this->eventMapper->getDatabase()->prepare($query);
+                $statement->execute($params);
+
+                while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+                    $stack[] = $row;
+                }
+
+                return $stack;
+            },
+            [$startDatetime, $finishDatetime, $folderCodes],
+            \Config::get('external_cache_timeout')
+        );
     }
 }
