@@ -13,19 +13,32 @@ namespace Schoolbox\External\Connector\Veracross\Base\Endpoint\AccessToken;
  * Veracross Access Token
  *
  * These have a 3600 second lifetime after which they must be regenerated
+ *
+ * Also store a copy of the payload Veracross sent to us, as a receipt
+ * for diagnostics I guess
  */
 class AccessToken
 {
     /**
+     * The actual value of the token, used in the header for
+     * Authorization: Bearer
+     *
+     * @var string|mixed
+     */
+    private string $value;
+
+
+    /**
      * Constructor.
      *
      * @param int    $expiryTime
-     * @param string $value
+     * @param array  $token
      */
     public function __construct(
         private int $expiryTime,
-        private string $value
+        private array $token
     ) {
+        $this->value = $token['access_token'];
     }
 
 
@@ -36,6 +49,17 @@ class AccessToken
     public function isExpired(): bool
     {
         return time() > $this->expiryTime;
+    }
+
+
+    /**
+     * Return a human-readable version of $expiryTime, for debugging
+     *
+     * @return string
+     */
+    public function getExpiryTime(): string
+    {
+        return \Alaress_Date_Format::newFromTimestamp($this->expiryTime)->getDatabase();
     }
 
 
@@ -51,12 +75,11 @@ class AccessToken
 
 
     /**
-     * Return a human-readable version of $expiryTime, for debugging
+     * Return the actual payload Veracross gave to us, for inspection
      *
-     * @return string
+     * @return array
      */
-    public function getExpiryTime(): string
-    {
-        return  \Alaress_Date_Format::newFromTimestamp($this->expiryTime)->getDatabase();
+    public function getToken(): array {
+        return $this->token;
     }
 }
