@@ -104,6 +104,9 @@ class Mapper extends BaseMapper
     {
         $results = $this->createCollection();
 
+        // get roles in advance to hydrate user roles
+        $roles = $this->getJoinMapper('role')->findAll(['deleted' => true])->indexBy('id');
+
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             // The record must have a user, role, role type or group specified
 
@@ -118,7 +121,7 @@ class Mapper extends BaseMapper
             if (!empty($row['u.id'])) {
                 /** @var User $user */
                 $user = $this->hydrateJoin($row, 'user', 'u');
-                $user->setRole = $this->getJoinMapper('role')->findByIdWithFallback($user->getRole()->getId());
+                $user->setRole($roles->offsetGet($user->getRole()->getId()));
                 $access->setUser($user);
             }
 
