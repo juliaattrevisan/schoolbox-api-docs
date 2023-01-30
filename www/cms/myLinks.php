@@ -1,21 +1,24 @@
 <?php
 
+/** @var SitePage $this */
 $this->setFile(TEMPLATE_content, 'cms/myLinks.html');
 $this->setBlock(TEMPLATE_content, 'myLink', 'myLink_block');
 $this->setBlock(TEMPLATE_content, 'empty_state', 'empty_state_block');
 
 
-$myLinksHandler = new MyLinks();
+$bookmarkMapper = \Schoolbox\Bookmark\Mapper::getInstance();
 
-$allLinks = $myLinksHandler->getAllByField('owner', $_SESSION['id']);
+$allLinks = $bookmarkMapper->findByColumn('owner', $_SESSION['id']);
 
-if (is_array($allLinks)) {
+
+if ($allLinks->count()) {
     $this->setVar('empty_state_block', '');
+    /** @var \Schoolbox\Bookmark\Model $currentLink */
     foreach ($allLinks as $currentLink) {
         $this->setVar(array(
-            'MYLINK_URL' => $currentLink['url'],
-            'MYLINK_DESCRIPTION' => \Scrub::text($currentLink['description']),
-            'MYLINK_ID' => $currentLink['id'],
+            'MYLINK_URL' => $currentLink->getUrl(),
+            'MYLINK_DESCRIPTION' => \Scrub::text($currentLink->getDescription()),
+            'MYLINK_ID' => $currentLink->getId(),
         ));
 
         $this->parse('myLink_block', 'myLink', true);

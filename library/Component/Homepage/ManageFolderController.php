@@ -17,11 +17,6 @@ class Component_Homepage_ManageFolderController extends Component_Homepage_Contr
     private $groupHandler;
 
     /**
-     * @var MyLinks
-     */
-    private $myLinkHandler;
-
-    /**
      * Prepares data for the render function. Business logic.
      *
      * @return bool Whether to continue on and attempt Component render
@@ -34,7 +29,6 @@ class Component_Homepage_ManageFolderController extends Component_Homepage_Contr
             return false;
         }
 
-        $this->myLinkHandler = new MyLinks();
         $this->groupHandler  = new Group();
         return true;
     }
@@ -59,16 +53,21 @@ class Component_Homepage_ManageFolderController extends Component_Homepage_Contr
         $this->setBlock($templateHandle, "manage_textboxes", "manage_textboxes_block");
 
         // My links button
-        $homepageUrl = '/homepage/' . $this->getContext()->getId();
-        $url = 'https://' . Config::get('site_hostname') . '.' . Config::get('site_domain') . $homepageUrl;
-
-        if ($this->myLinkHandler->linkExists($_SESSION['id'], $homepageUrl, $url)) {
+        try {
+            \Schoolbox\Bookmark\Mapper::getInstance()->findOneByColumnList(
+                [
+                    'owner' => $this->getUser()->getId(),
+                    'url'   => '/homepage/' . $this->getContext()->getId(),
+                ]
+            );
             $this->setVar('addmylinks_block', '');
-        } else {
-            $this->setVar('HOMEPAGE_URL', $url);
-            $this->setVar('HOMEPAGE_URL_JS', json_encode($url));
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $homepageUrl = '/homepage/' . $this->getContext()->getId();
+            $this->setVar('HOMEPAGE_URL', $homepageUrl);
+            $this->setVar('HOMEPAGE_URL_JS', json_encode($homepageUrl));
             $this->parse('addmylinks_block', 'addmylinks');
         }
+
         $params = [
             'folderId' => $this->getContext()->getId(),
             'folder'   => $this->getContext(),
