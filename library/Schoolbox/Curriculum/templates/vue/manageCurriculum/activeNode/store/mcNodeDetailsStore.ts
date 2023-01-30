@@ -7,7 +7,7 @@ import { defineStore } from "pinia";
 import { getBreadcrumbs } from "@schoolboxCurriculum/js/nodeUtils";
 import { useStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/manageCurriculumStore";
 import { useActiveNodeStore } from "@schoolboxCurriculum/vue/manageCurriculum/activeNode/store/mcActiveNodeStore";
-import type { Node } from "@schoolboxCurriculum/types/Node";
+import type { Node, Usage } from "@schoolboxCurriculum/types/Node";
 
 export const useNodeDetailsStore = defineStore("mcNodeDetails", () => {
     const isProcessing = ref(false);
@@ -24,16 +24,11 @@ export const useNodeDetailsStore = defineStore("mcNodeDetails", () => {
             const nodeId: number = activeNodeStore.node.id;
             const breadcrumbsResponse = await fetch(`${store.getApiEndpoint()}/${nodeId}?ancestors=99`); // just use 99 as hopefully there's no tree that deep...            // if (response.ok) {
             const usageResponse = await fetch(`${store.getApiEndpoint()}/usage/${nodeId}`);
-            //     activeNodeStore.update(activeNodeCopy.value);
-            //     isProcessing.value = false;
-            //     cancel();
-            //     return { id: nodeId, message: "Node successfully updated" };
-            // }
             if (breadcrumbsResponse.ok && usageResponse.ok) {
                 const nodeWithParents = (await breadcrumbsResponse.json()) as Node;
                 activeNodeStore.node.breadcrumbs = getBreadcrumbs(nodeWithParents, []);
-                const usage = await usageResponse.json();
-                console.warn(usage);
+                const usage = ((await usageResponse.json()) as JSON).data as Usage[];
+                activeNodeStore.node.usage = usage;
             } else {
                 // hasLoadError.value = true;
             }
