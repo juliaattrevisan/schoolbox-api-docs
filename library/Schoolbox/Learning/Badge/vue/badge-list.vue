@@ -221,7 +221,6 @@ export default {
                 });
                 //this is to prevent 'Fetch failed loading' in the console, as nothing is returned and Fetch currently doesn't like that with DELETE
                 await response.text();
-console.info('response: ', response);
                 this.data = this.data.filter((badge) => badge.id !== this.currentBadge.id);
                 this.metadata.count -= 1;
                 this.$refs.toast.timeout("Badge successfully deleted", true);
