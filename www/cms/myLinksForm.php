@@ -39,7 +39,6 @@ if (isset($_REQUEST['url']) && $_REQUEST['url'] && isset($_REQUEST['description'
         $existing->setUrl($url);
         $existing->setDescription($_REQUEST['description']);
         $bookmarkMapper->save($existing);
-
     } else {
         $newLink = $bookmarkMapper->createModel()
             ->setOwner($_SESSION['id'])
