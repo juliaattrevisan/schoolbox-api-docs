@@ -101,13 +101,13 @@ class Api extends \Codeception\Module
         parent::_before($test);
         $this->userMapper = UserMapper::getInstance();
 
-        $time = time();
+        $uniqid = uniqid((string)mt_rand(), true);
 
-        $this->users['super']   = $this->createTestUser("tester-superuser-$time", Role::STAFF, true);
-        $this->users['staff']   = $this->createTestUser("tester-staff-$time", Role::STAFF, false);
-        $this->users['student'] = $this->createTestUser("tester-student-$time", Role::STUDENT, false);
-        $this->users['parent']  = $this->createTestUser("tester-parent-$time", Role::PARENT, false);
-        $this->users['guest']   = $this->createTestUser("tester-guest-$time", Role::GUEST, false);
+        $this->users['super']   = $this->createTestUser("tester-superuser-$uniqid", Role::STAFF, true);
+        $this->users['staff']   = $this->createTestUser("tester-staff-$uniqid", Role::STAFF, false);
+        $this->users['student'] = $this->createTestUser("tester-student-$uniqid", Role::STUDENT, false);
+        $this->users['parent']  = $this->createTestUser("tester-parent-$uniqid", Role::PARENT, false);
+        $this->users['guest']   = $this->createTestUser("tester-guest-$uniqid", Role::GUEST, false);
     }
 
     /**
