@@ -23,22 +23,22 @@ class AccessToken
      * The actual value of the token, used in the header for
      * Authorization: Bearer
      *
-     * @var string|mixed
+     * @var string
      */
-    private string $value;
+    private string $token;
 
 
     /**
      * Constructor.
      *
      * @param int    $expiryTime
-     * @param array  $token
+     * @param array  $original
      */
     public function __construct(
         private int $expiryTime,
-        private array $token
+        private array $original
     ) {
-        $this->value = $token['access_token'];
+        $this->token = $original['access_token'];
     }
 
 
@@ -68,9 +68,9 @@ class AccessToken
      *
      * @return string
      */
-    public function getValue(): string
+    public function getToken(): string
     {
-        return $this->value;
+        return $this->token;
     }
 
 
@@ -79,7 +79,7 @@ class AccessToken
      *
      * @return array
      */
-    public function getToken(): array {
-        return $this->token;
+    public function getOriginalToken(): array {
+        return $this->original;
     }
 }

@@ -101,13 +101,11 @@ class Generator
      * @param string $schoolRoute
      * @param string $clientId
      * @param string $clientSecret
-     * @param string $scope
      */
     public function __construct(
         private string $schoolRoute,
         private string $clientId,
-        private string $clientSecret,
-        private string $scope
+        private string $clientSecret
     ) {
     }
 
@@ -117,23 +115,24 @@ class Generator
      *    - when we're creating the first token
      *    - when a previously-created token is about to expire
      *
+     * @param string $scope
      * @return AccessToken
      * @throws InvalidArgumentException
      * @throws \DomainException
      * @throws \RuntimeException
      */
-    public function generate(): AccessToken
+    public function generate(string $scope): AccessToken
     {
         if (null === $this->accessToken) {
             /* If we have never spawned a token; this is our first time use
              * Spawn a new one
              */
-            $this->accessToken = $this->create();
+            $this->accessToken = $this->create($scope);
         } elseif ($this->accessToken->isExpired()) {
             /* The token we previously created is about to expire
              * Spawn a new one
              */
-            $this->accessToken = $this->create();
+            $this->accessToken = $this->create($scope);
         }
 
         /* The one we have is currently alright; reuse it
@@ -147,13 +146,17 @@ class Generator
      * of its own death so we can easily decide if it's expired
      *
      * Subtract 60 seconds so we have enough time to
-     * respawn a new access token
+     * respawn a new access token.
+     *
+     * The token only works for the $scope provided.
+     *
+     * @param string $scope
      * @return AccessToken
      * @throws InvalidArgumentException
      * @throws \DomainException
      * @throws \RuntimeException
      */
-    private function create(): AccessToken
+    private function create(string $scope): AccessToken
     {
         $response = null;
 
@@ -185,7 +188,7 @@ class Generator
                         'grant_type' => self::GRANT_TYPE,
                         'client_id' => $this->clientId,
                         'client_secret' => $this->clientSecret,
-                        'scope' => $this->scope
+                        'scope' => $scope
                     ]
                 ]);
             } catch (\GuzzleHttp\Exception\GuzzleException $e) {
