@@ -115,10 +115,12 @@ class TimetableUsers
         return \Alaress\Redis::getCacheInstance()->cacheFunctionCall(
             'findTeachersForClassCode',
             function ($param) {
+                [$classCode, $startTimestamp, $endTimestamp] = $param;
+
                 /* Micromanage a stack of minimal event data with overrides
                  */
-                $stack[$param[0]] = [
-                    'code' => $param[0],
+                $stack[$classCode] = [
+                    'code' => $classCode,
                     'usuals' => [],
                     /* A list of people who survived all the mutations
                      * and transformations in this algorithm
@@ -140,7 +142,7 @@ class TimetableUsers
 
                 $statement = $this->eventMapper->getDatabase()->prepare($query);
                 $statement->execute([
-                    'classCode' => $param[0],
+                    'classCode' => $classCode,
                     'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
                 ]);
 
@@ -179,10 +181,10 @@ class TimetableUsers
 
                 $statement = $this->eventMapper->getDatabase()->prepare($query);
                 $statement->execute([
-                    'classCode' => $param[0],
+                    'classCode' => $classCode,
                     'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
-                    'from' => \Alaress_Date_Format::newFromTimestamp($param[1])->getDatabase(),
-                    'to' => \Alaress_Date_Format::newFromTimestamp($param[2])->getDatabase(),
+                    'from' => \Alaress_Date_Format::newFromTimestamp($startTimestamp)->getDatabase(),
+                    'to' => \Alaress_Date_Format::newFromTimestamp($endTimestamp)->getDatabase(),
                 ]);
 
                 /* Remember: overrides are generally optional so they might not even
@@ -208,8 +210,8 @@ class TimetableUsers
                 /* Perform mutations
                  */
                 $manifest = $this->applicator->apply(
-                    $stack[$param[0]]['usuals'] ?? [],
-                    $stack[$param[0]]['overrides'] ?? [],
+                    $stack[$classCode]['usuals'] ?? [],
+                    $stack[$classCode]['overrides'] ?? [],
                 );
 
                 /* Since we're explicitly looking for staff members in this method
@@ -243,6 +245,8 @@ class TimetableUsers
         return \Alaress\Redis::getCacheInstance()->cacheFunctionCall(
             'findClassCodesForUser',
             function ($param) {
+                [$user, $startTimestamp, $endTimestamp, $folderCodes] = $param;
+
                 /* Micromanage a stack of minimal event data with overrides
                  */
                 $lookup = [];
@@ -250,8 +254,8 @@ class TimetableUsers
 
                 /* Micromanage dates
                  */
-                $from = \Alaress_Date_Format::newFromTimestamp($param[1])->getDatabase();
-                $to = \Alaress_Date_Format::newFromTimestamp($param[2])->getDatabase();
+                $from = \Alaress_Date_Format::newFromTimestamp($startTimestamp)->getDatabase();
+                $to = \Alaress_Date_Format::newFromTimestamp($endTimestamp)->getDatabase();
 
                 /* Find the usual guys for the given class code out of sis_class_user
                  * In this case, $user will be the only guy in the list since we don't
@@ -272,7 +276,7 @@ class TimetableUsers
 
                 $statement = $this->eventMapper->getDatabase()->prepare($query);
                 $statement->execute([
-                    'externalId' => $param[0]->getExternalId(),
+                    'externalId' => $user->getExternalId(),
                     'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
                     'from' => $from,
                     'to' => $to,
@@ -381,7 +385,7 @@ class TimetableUsers
                          * need to investigate further, since we know you're involved at
                          * least once.
                          */
-                        if (isset($data['manifest'][$eventId][$param[0]->getExternalId()])) {
+                        if (isset($data['manifest'][$eventId][$user->getExternalId()])) {
                             $stack[$data['code']] = [
                                 'name' => $data['name'],
                                 'code' => $data['code'],
@@ -426,8 +430,10 @@ class TimetableUsers
         $eventIds = \Alaress\Redis::getCacheInstance()->cacheFunctionCall(
             'findForUser',
             function ($param) {
-                $startDatetime  = \Alaress_Date_Format::newFromTimestamp($param[1])->getDatabase();
-                $finishDatetime = \Alaress_Date_Format::newFromTimestamp($param[2])->getDatabase();
+                [$user, $startTimestamp, $endTimestamp, $folderCodes] = $param;
+
+                $startDatetime  = \Alaress_Date_Format::newFromTimestamp($startTimestamp)->getDatabase();
+                $finishDatetime = \Alaress_Date_Format::newFromTimestamp($endTimestamp)->getDatabase();
 
                 /* Micromanage a stack of minimal event data with overrides
                  */
@@ -454,11 +460,11 @@ class TimetableUsers
                     'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
                     'from'           => $startDatetime,
                     'to'             => $finishDatetime,
-                    'externalId'     => $param[0]->getExternalId(),
+                    'externalId'     => $user->getExternalId(),
                 ];
 
-                if ($param[3] && $param[3]->count()) {
-                    $bindings = Builder::getBindings($param[3]->keys(), 'folderCode');
+                if ($folderCodes && $folderCodes->count()) {
+                    $bindings = Builder::getBindings($folderCodes->keys(), 'folderCode');
                     $query    .= " AND se.code IN ({$bindings->getPlaceholder()})";
                     $params   = array_merge($params, $bindings->getParams());
                 }
@@ -496,7 +502,7 @@ class TimetableUsers
                  * affected by existing mutations such as CLEAR and CLEAR_STAFF unless you
                  * do this and apply the mutations.
                  */
-                $rows = $this->findCommonOverrides($startDatetime, $finishDatetime, $param[3]);
+                $rows = $this->findCommonOverrides($startDatetime, $finishDatetime, $folderCodes);
 
                 /* Remember: overrides are generally optional so they might not even
                  * exist for $classCode which is why we get the Usual Guys first
@@ -547,7 +553,7 @@ class TimetableUsers
 
                     /* Only care about events the current user is in today
                      */
-                    if (array_key_exists($param[0]->getExternalId(), $data['manifest'])) {
+                    if (array_key_exists($user->getExternalId(), $data['manifest'])) {
                         $eventIds[] = $eventId;
                     }
                 }
@@ -575,6 +581,7 @@ class TimetableUsers
         return \Alaress\Redis::getCacheInstance()->cacheFunctionCall(
             'findCommonOverrides',
             function ($param) {
+                [$startDatetime, $finishDatetime, $folderCodes] = $param;
                 $stack = [];
 
                 /* Get a list of events between $startTimestamp and $endTimestamp
@@ -591,12 +598,12 @@ class TimetableUsers
 
                 $params = [
                     'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
-                    'from'           => $param[0],
-                    'to'             => $param[1],
+                    'from'           => $startDatetime,
+                    'to'             => $finishDatetime,
                 ];
 
-                if ($param[2] && $param[2]->count()) {
-                    $bindings = Builder::getBindings($param[2]->keys(), 'folderCode');
+                if ($folderCodes && $folderCodes->count()) {
+                    $bindings = Builder::getBindings($folderCodes->keys(), 'folderCode');
                     $query    .= " AND se.code IN ({$bindings->getPlaceholder()}) ";
                     $params   = array_merge($params, $bindings->getParams());
                 }
