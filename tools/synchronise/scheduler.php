@@ -151,7 +151,7 @@ HELP;
 
         /* Split the transaction in half
          */
-        if (Factory::SENTRAL === $type) {
+        if (in_array($type, [Factory::KAMAR, Factory::SENTRAL])) {
             $splitStrats = [''];
         } else {
             $splitStrats = [
