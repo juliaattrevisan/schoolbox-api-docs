@@ -176,23 +176,6 @@ async function onPopOutSelected(event: CustomEvent) {
 }
 
 /**
- *
- * @param { CustomEvent } event
- */
-function onStorybookLoad(event: CustomEvent){
-
-    // Set our ref values to simulate dummy data.
-    isSelected.value = event.detail.dummyData.isSelected as boolean;
-    isExpanded.value = event.detail.dummyData.isExpanded as boolean;
-    activityItems.value = event.detail.dummyData.activityItems as ActivityItem;
-    referenceElement.value = event.detail.target as HTMLDivElement;
-    routes.value = updateRoutes(event.detail.routes as Routes);
-
-    // As we're in Storybook, remove our listener for clicking outside the menu.
-    document.removeEventListener("click", onMouseClick);
-}
-
-/**
  * to be able to close the search results
  * when selection outside is made
  *
@@ -222,12 +205,6 @@ onMounted(() => {
      */
     document.addEventListener("pop-out-menu-markbook__selected", (event) => onPopOutSelected(event));
     document.addEventListener("click", onMouseClick);
-
-    /**
-     * Also listen for a dispatch event we use to handle loading the menu within Storybook.
-     * Currently dispatched from stores/menu/popOutMenuMarkbook.stories.js
-     */
-    document.addEventListener("pop-out-menu-markbook__storybook-play", (event) => onStorybookLoad(event));
 });
 
 /**
@@ -235,7 +212,6 @@ onMounted(() => {
  */
 onUnmounted(() => {
     document.removeEventListener("pop-out-menu-markbook__selected", onPopOutSelected);
-    document.removeEventListener("pop-out-menu-markbook__storybook-play", onStorybookLoad);
     document.removeEventListener("click", onMouseClick);
 });
 
