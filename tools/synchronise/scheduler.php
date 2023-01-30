@@ -149,15 +149,16 @@ HELP;
          */
         $runId = (new \Schoolbox\External\Connector\Log\Guid())->generate();
 
-        /* Split the transaction in half
+        /* Split the transaction in half for suds connectors that can actually do that
+         * Otherwise just import everything like it always did
          */
-        if (in_array($type, [Factory::KAMAR, Factory::SENTRAL])) {
-            $splitStrats = [''];
-        } else {
+        if (\in_array($type, [Factory::TASS_API, Factory::COMPASS], true)) {
             $splitStrats = [
                 ValidStrats::FAMILIES . ',' . ValidStrats::STAFF,
                 ValidStrats::TIMETABLE
             ];
+        } else {
+            $splitStrats = [''];
         }
 
         /* The time when both parts of the import ran
@@ -181,6 +182,14 @@ HELP;
              */
             $sisFactory = new Endpoint\Factory($host, $key, $perform, $this->getLogger(), [], $validStrats);
 
+            /* Importer strat gets suffixed onto the end
+             */
+            $subtitle = '';
+
+            if ('' !== $currentStrat) {
+                $subtitle = " ({$currentStrat})";
+            }
+
             (new Endpoint\Scheduler(
                 $randomMapper->getDatabase(),
                 $frequency,
@@ -190,7 +199,7 @@ HELP;
                 $file,
                 $this->getLogger(),
                 \Schoolbox\External\Connector\Log\Mapper::getInstance()
-            ))->run($time, $runId, Endpoint\Scheduler::SCHEDULER_SIS_SCRIPT_NAME);
+            ))->run($time, $runId, Endpoint\Scheduler::SCHEDULER_SIS_SCRIPT_NAME . $subtitle);
         }
 
         /* Execute scheduler: calendar stuff
