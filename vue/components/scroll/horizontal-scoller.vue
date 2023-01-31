@@ -9,7 +9,6 @@ import "vue3-resize/dist/vue3-resize.css";
 
 gsap.registerPlugin(Draggable, InertiaPlugin);
 
-const BADGE_ANIMATE_DURATION = 0.3;
 const SCROLL_PADDING = 10;
 const MIN_SCROLL_BAR_WIDTH = 100;
 
@@ -255,11 +254,9 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-@import "www/static/css/core/base/_variables.scss";
-
 .scroller {
-    display: flex;
     align-items: flex-start;
+    display: flex;
 }
 
 .scroller__button-container {
@@ -268,39 +265,39 @@ export default {
 }
 
 .button {
-    width: 100%;
+    background: none;
+    color: #4f4f4f;
+    font-size: 1.5rem;
+    font-weight: bold;
     height: 100%;
     margin: 0px auto;
-    background: none;
-    font-weight: bold;
-    font-size: 1.5rem;
-    color: #4f4f4f;
+    width: 100%;
 }
 
 .scroller__outer-container {
     flex: 1 1 auto;
-    position: relative;
-    width: 100%;
     height: 100%;
-    overflow: hidden;
     margin: 0;
+    overflow: hidden;
     padding: 0;
+    position: relative;
     white-space: nowrap;
+    width: 100%;
 }
 
 .scroller__inner-container {
-    position: relative;
     height: 100%;
     margin: 0;
     padding: 0;
+    position: relative;
 }
 
 .scroller-bar {
-    position: absolute;
-    left: 5px;
+    background: var(--content-ui-foreground);
     bottom: 0px;
-    width: 120px; // will be updated relative to scroll amount with this.scrollBarWidth
     height: 3px;
-    background: $content-ui-foreground;
+    left: 5px;
+    position: absolute;
+    width: 120px; // will be updated relative to scroll amount with this.scrollBarWidth
 }
 </style>
