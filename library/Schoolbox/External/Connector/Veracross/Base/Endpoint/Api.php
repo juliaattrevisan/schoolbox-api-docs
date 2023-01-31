@@ -55,6 +55,13 @@ class Api implements IApi
 
 
     /**
+     * Maximum number of pages to obtain from an endpoint
+     * to safeguard against infinite loops
+     */
+    private const MAX_PAYLOADS = 1000;
+
+
+    /**
      * @var ApiUsage
      */
     private ApiUsage $apiUsage;
@@ -179,7 +186,6 @@ class Api implements IApi
         $pageNum = 1;
         $payload = null;
         $n = 0;
-        $maxPayloads = 1000;
 
         /* Iterate all pages from Veracross.
          *
@@ -187,7 +193,7 @@ class Api implements IApi
          * 2. If you're requesting your first payload
          * 3. The payload size == page size
          */
-        while (($n < $maxPayloads) && (!$payload || \count($payload['data']) === self::PAGE_SIZE)) {
+        while (($n < self::MAX_PAYLOADS) && (!$payload || \count($payload['data']) === self::PAGE_SIZE)) {
             $payload = $this->retrieveOne($method, $endpoint, $scope, $pageNum, $pageSize, $params);
 
             $pageNum++;
