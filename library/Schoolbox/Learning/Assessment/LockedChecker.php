@@ -76,15 +76,26 @@ class LockedChecker
             throw new \InvalidArgumentException('Cannot find containing term using a null date');
         }
 
+        $assessmentYearLevels = $assessment->getBaseContext()->getFolder()->getYearLevels();
+
+        if ($assessmentYearLevels && $assessmentYearLevels->count() > 0) {
+            foreach ($assessmentYearLevels as $yearLevel) {
+                try {
+                    $dueInTerm = $this->termMapper->findForDateAndYearLevel($dueDate, $yearLevel);
+                    // if active term found, return not locked
+                    if ($dueInTerm->getId() && !$dueInTerm->getArchived()) {
+                        return false;
+                    }
+                } catch (MapperException $e) {
+                }
+            }
+        }
         try {
-            $dueInTerm = $this->termMapper->findForDateAndYearLevel(
-                $dueDate,
-                $assessment->getBaseContext()->getFolder()->getYearLevels()?->first());
+            $dueInTerm = $this->termMapper->findForDate($dueDate);
         } catch (MapperException $e) {
+            // error finding term, return locked
             return true;
         }
-
-        // No term? Or term is archived?
         return !$dueInTerm->getId() || $dueInTerm->getArchived();
     }
 

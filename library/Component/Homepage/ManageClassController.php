@@ -57,7 +57,17 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
      */
     public function getCurrentTerm(): Model
     {
-        return $this->termMapper->findForDateAndYearLevel(Alaress_Date_Format::now(), $this->getContext()->getYearLevels()->first());
+        $assessmentYearLevels = $this->getContext()->getYearLevels();
+        if ($assessmentYearLevels && $assessmentYearLevels->count() > 0) {
+            foreach ($assessmentYearLevels as $yearLevel) {
+                $term = $this->termMapper->findForDateAndYearLevel(Alaress_Date_Format::now(), $yearLevel);
+                // if active term found, return it
+                if ($term->getId() && !$term->getArchived()) {
+                    return $term;
+                }
+            }
+        }
+        return $this->termMapper->findForToday();
     }
 
     /**
