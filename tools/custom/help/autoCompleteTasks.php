@@ -9,6 +9,7 @@
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
+use Schoolbox\Assessment\Course\Task\Completion;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 
@@ -27,7 +28,7 @@ $app = new class extends CliTool\App {
     {
         return [
             self::OPT_LONG_HELP,
-            self::OPT_COURSE_ID
+            self::OPT_COURSE_ID,
         ];
     }
 
@@ -69,56 +70,57 @@ HELP;
 
         $db     = $this->getDatabaseInternal();
 
-        // finds all tasks that require to update
-        $statement = $db->prepareQuery("select `t`.`assessment_id`    AS `assessment_id`,
-                       'task_completion'      AS `feedback_table`,
-                       max(`tc`.`id`)         AS `feedback_id`,
-                       `tc`.`student_id`      AS `student_id`,
-                       `tc`.marking_user_id AS `reviewer`,
-                       `tc`.`completion_date` AS `published_at`,
-                       `tc`.`completion_status` AS `completion_status`,
-                       `tc`.`task_id` AS `task_id`
+        // running log of updated entries
+        $updated = [];
 
-                from ((`task_completion` `tc`
-                    join (select
-                              `task_completion`.`task_id` AS `task_id`,
-                              `task_completion`.`student_id`           AS `student_id`,
-                              max(`task_completion`.`completion_date`) AS `max_completion_date`,
-                              max(`task_completion`.`completion_status`) AS `completion_status`
-                          from `task_completion`
-                          where `task_completion`.`deleted_at` is null
-                          group by `task_completion`.`task_id`,
-                                   `task_completion`.`student_id`) `t1`
-                       on (`tc`.`task_id` = `t1`.`task_id` and `tc`.`student_id` = `t1`.`student_id` and
-                           `tc`.`completion_date` = `t1`.`max_completion_date` and 2 = `t1`.completion_status ))
-                    join `task` `t` on (`t`.`id` = `tc`.`task_id`)
-                    join v_assessment_relation on v_assessment_relation.assessment_id = `t`.assessment_id
-                    join course_implementation on (v_assessment_relation.course_implementation_id = course_implementation.id and course_implementation.course_specification_id = :courseId))
-                group by `t`.`assessment_id`, `tc`.`student_id`");
-        $statement->execute(['courseId' => $this->getOpt(self::OPT_COURSE_ID)]);
-        while ($taskFeedback = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $this->getLogger()->info(
-                sprintf(
-                    "Assessment: %s, TaskId: %s, Student: %s, feedbackId: %s",
-                    $taskFeedback['assessment_id'],
-                    $taskFeedback['task_id'],
-                    $taskFeedback['student_id'],
-                    $taskFeedback['feedback_id']
-                )
-            );
+        // finds all tasks that require to update
+        $courseTaskStatement = $db->prepareQuery("select `t`.id as id from task as `t`
+            join v_assessment_relation on v_assessment_relation.assessment_id = `t`.assessment_id
+            join course_implementation on (v_assessment_relation.course_implementation_id = course_implementation.id and course_implementation.course_specification_id = :courseId);
+        ");
+        $courseTaskStatement->execute(['courseId' => $this->getOpt(self::OPT_COURSE_ID)]);
+        $tasks = $courseTaskStatement->fetchColumnArray('id');
+
+        // find all completion status for the above tasks
+        $taskCompletionMapper = \Schoolbox\Assessment\Course\Task\CompletionMapper::getInstance();
+        $completionEntries = $taskCompletionMapper->findByColumn('task_id', $tasks)->sortBy('CompletionStatus', 'desc');
+
+        // loop through the tasks / students and find only those with no completion_status == 3 (teacher complete)
+        /** @var Schoolbox\Assessment\Course\Task\Completion $completionEntry */
+        foreach ($completionEntries as $completionEntry) {
+            $this->getLogger()->debug(sprintf("Inspecting Assessment: %s, studentId: %s", $completionEntry->getTask()->getAssessmentModel()->getId(), $completionEntry->getStudent()->getId()));
+
+            // find if this entry has a teacher complete status
+            //all the tmp variables
+            $thisTaskList = $completionEntries->filterBy('task', $completionEntry->getTask());
+            $thisStudentAssessment = $thisTaskList->getBy('student', $completionEntry->getStudent());
+            if (Completion::STATUS_TEACHER_ASSESSED_COMPLETE === $thisStudentAssessment->getcompletionStatus()) {
+                $this->getLogger()->debug("Task Complete");
+                continue;
+            }
+
+            //this assessment has no teacher feedback, so lets add that in now, making sure not to do this multiple times
+            $token = sprintf("%s_%s", $completionEntry->getTask()->getId(), $completionEntry->getStudent()->getId());
+            //have we updated this already?
+            if (in_array($token, $updated)) {
+                //skip and move along
+                continue;
+            }
+            $updated[] = $token;
             if ($this->perform()) {
-                $this->getLogger()->info(sprintf("Inserting Task Complete Entry for TaskId: %s, studentId: %s", $taskFeedback['task_id'], $taskFeedback['student_id']));
+                $this->getLogger()->info(sprintf("Inserting Task Complete Entry for TaskId: %s, studentId: %s", $completionEntry->getTask()->getId(), $completionEntry->getStudent()->getId()));
                 $newStatusStatment = $db->prepareQuery("
                     INSERT INTO
                     task_completion
                         (`task_id`, `student_id`, `marking_user_id`, `completion_date`, `completion_status`)
                     VALUES
-                        (:task_id, :student_id, :marking_user_id, NOW(), 3)
+                        (:task_id, :student_id, :marking_user_id, NOW(), :completion_status)
                 ");
-                $newStatusStatment->execute(['task_id' => $taskFeedback['task_id'], 'student_id' => $taskFeedback['student_id'], 'marking_user_id' => 1]);
+                $newStatusStatment->execute(['task_id' => $completionEntry->getTask()->getId(), 'student_id' => $completionEntry->getStudent()->getId(), 'marking_user_id' => 1, 'completion_status' => Completion::STATUS_TEACHER_ASSESSED_COMPLETE]);
+            } else {
+                $this->getLogger()->info("Task Not Complete, would have updated");
             }
         }
-        $statement->close();
     }
 };
 
