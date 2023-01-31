@@ -79,19 +79,19 @@ HELP;
                        `tc`.`completion_status` AS `completion_status`,
                        `tc`.`task_id` AS `task_id`
 
-                from ((`schoolbox`.`task_completion` `tc`
+                from ((`task_completion` `tc`
                     join (select
-                              `schoolbox`.`task_completion`.`task_id` AS `task_id`,
-                              `schoolbox`.`task_completion`.`student_id`           AS `student_id`,
-                              max(`schoolbox`.`task_completion`.`completion_date`) AS `max_completion_date`,
-                              max(`schoolbox`.`task_completion`.`completion_status`) AS `completion_status`
-                          from `schoolbox`.`task_completion`
-                          where `schoolbox`.`task_completion`.`deleted_at` is null
-                          group by `schoolbox`.`task_completion`.`task_id`,
-                                   `schoolbox`.`task_completion`.`student_id`) `t1`
+                              `task_completion`.`task_id` AS `task_id`,
+                              `task_completion`.`student_id`           AS `student_id`,
+                              max(`task_completion`.`completion_date`) AS `max_completion_date`,
+                              max(`task_completion`.`completion_status`) AS `completion_status`
+                          from `task_completion`
+                          where `task_completion`.`deleted_at` is null
+                          group by `task_completion`.`task_id`,
+                                   `task_completion`.`student_id`) `t1`
                        on (`tc`.`task_id` = `t1`.`task_id` and `tc`.`student_id` = `t1`.`student_id` and
                            `tc`.`completion_date` = `t1`.`max_completion_date` and 2 = `t1`.completion_status ))
-                    join `schoolbox`.`task` `t` on (`t`.`id` = `tc`.`task_id`)
+                    join `task` `t` on (`t`.`id` = `tc`.`task_id`)
                     join v_assessment_relation on v_assessment_relation.assessment_id = `t`.assessment_id
                     join course_implementation on (v_assessment_relation.course_implementation_id = course_implementation.id and course_implementation.course_specification_id = :courseId))
                 group by `t`.`assessment_id`, `tc`.`student_id`");
