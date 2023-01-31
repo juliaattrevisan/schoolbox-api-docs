@@ -55,6 +55,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(Folder\Mapper::class),
             $this->getMapperFactory()->get(CourseSpec\Mapper::class),
             $this->getMapperFactory()->get(UnitSpec\Mapper::class),
+            new Counter($this->injector->get('databaseInternal')),
         );
     }
 }

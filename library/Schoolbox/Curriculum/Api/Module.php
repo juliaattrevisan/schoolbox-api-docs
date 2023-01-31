@@ -13,7 +13,6 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Curriculum\Node\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
-use Schoolbox\Role;
 
 /**
  * Module for the curriculum API.
@@ -62,6 +61,7 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->getMapperFactory()->get(NodeMapper::class),
+            new Usage\Counter($this->injector->get('databaseInternal')),
         );
     }
 }

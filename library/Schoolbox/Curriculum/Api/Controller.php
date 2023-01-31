@@ -10,7 +10,6 @@ namespace Schoolbox\Curriculum\Api;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Curriculum\Api\Translator\ArrayToModel;
 use Schoolbox\Curriculum\Api\Translator\ModelToArray;
-use Schoolbox\Curriculum\Api\Usage\Counter;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -29,10 +28,12 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param Node\Mapper $nodeMapper Curriculum node mapper
+     * @param Node\Mapper   $nodeMapper Curriculum node mapper
+     * @param Usage\Counter $counter    Counter for node usages
      */
     public function __construct(
         private Node\Mapper $nodeMapper,
+        private Usage\Counter $counter,
     ) {
     }
 
@@ -87,11 +88,14 @@ class Controller extends Base
 
         Node\Mapper::sortNodes($resultsForAllKeywords, 0);
 
-        $counter = new Counter($this->getDi()->get('databaseInternal'));
-        $counts  = $counter->count($resultsForAllKeywords->getPropertyValues('id'));
-
         // Translate results: also add all result counts (for top level only)
-        $translatedResults = $resultsForAllKeywords->map(new ModelToArray($ancestorCount, $descendantCount, $counts));
+        $translatedResults = $resultsForAllKeywords->map(
+            new ModelToArray(
+                $ancestorCount,
+                $descendantCount,
+                $this->counter->count($resultsForAllKeywords->getPropertyValues('id')),
+            )
+        );
 
         $this->response->content->set($this->buildJsonOutput($translatedResults));
     }
@@ -214,7 +218,7 @@ class Controller extends Base
         $childNodes = $node->getChildren();
         Node\Mapper::sortNodes($childNodes, 0);
         $node->setChildren($childNodes);
-        $translator = new ModelToArray($ancestorCount, $descendantCount, null);
+        $translator = new ModelToArray($ancestorCount, $descendantCount, $this->counter->count([$node->getId()]));
         $this->response->content->set(
             $this->buildJsonOutput($translator($node))
         );
