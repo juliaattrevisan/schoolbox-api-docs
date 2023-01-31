@@ -9,7 +9,9 @@ import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/tran
 import { useStore } from "../store/manageCurriculumStore";
 import { useActiveNodeStore } from "./store/mcActiveNodeStore";
 import { useNodeDetailsStore } from "./store/mcNodeDetailsStore";
-import LoadingTable from '@schoolboxVue/components/loading/loading-table.vue';
+import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
+import HorizontalScoller from "@schoolboxVue/components/scroll/horizontal-scoller";
+import McNodeDetailsUsage from "./mc-node-details-usage.vue";
 
 interface Props {
     depth: number; // to gradually add more marginLeft to indicate node level depth
@@ -35,9 +37,9 @@ const marginLeft = computed(() => `calc(${props.depth * 2}rem)`);
 const breadcrumbs = computed(() => {
     if (activeNodeStore.node.breadcrumbs && activeNodeStore.node.breadcrumbs.length > 0) {
         const justNames = activeNodeStore.node.breadcrumbs.map((breadcrumb) => breadcrumb.name);
-        return justNames.join(' > ');
+        return justNames.join(" > ");
     }
-    return '';
+    return "";
 });
 
 /**
@@ -46,9 +48,8 @@ const breadcrumbs = computed(() => {
  * @returns { boolean }
  */
 const hasUsage = computed(() => {
-    return activeNodeStore.node.usage && activeNodeStore.node.usage.length > 0
+    return activeNodeStore.node.usage && activeNodeStore.node.usage.length > 0;
 });
-
 </script>
 
 <template>
@@ -60,6 +61,18 @@ const hasUsage = computed(() => {
                     <div>
                         <p v-if="breadcrumbs.length > 0" class="meta">{{ breadcrumbs }}</p>
                         <div v-html="activeNodeStore.node.description"></div>
+                        <template v-if="hasUsage">
+                            <h3>Connected Material</h3>
+                            <horizontal-scoller :has-buttons="true" :height="80" :has-content-change="false">
+                                <ul class="usage-list">
+                                    <mc-node-details-usage
+                                        v-for="(usage, index) in activeNodeStore.node.usage"
+                                        :key="index"
+                                        :usage="usage"
+                                    />
+                                </ul>
+                            </horizontal-scoller>
+                        </template>
                     </div>
                 </Transition>
             </fieldset>
@@ -69,4 +82,8 @@ const hasUsage = computed(() => {
 
 <style lang="scss" scoped>
 @import "./style/mcActiveNode.scss";
+
+.usage-list {
+    margin: 0;
+}
 </style>

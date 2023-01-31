@@ -2,7 +2,7 @@
  * Various utils related to managing curriculum nodes
  */
 
-import type { Node } from "@schoolboxCurriculum/types/Node";
+import type { Node, Usage } from "@schoolboxCurriculum/types/Node";
 import type { Breadcrumb } from "@schoolboxCurriculum/types/Breadcrumb";
 
 /**
@@ -146,4 +146,34 @@ export function getBreadcrumbs(node: Node, currentBreadcrumbs: Breadcrumb[]): Br
     }
     // otherwise we must be at the top of the breadcrumb list
     return currentBreadcrumbs; // so we can return now
+}
+
+/**
+ * To distinguish the activity type
+ *
+ * @param { Usage } usage - the curr
+ * @returns { string } - the icon to return
+ */
+export function getUsageIcon(usage: Usage) {
+    const icons = {
+        course: "icon-course",
+        folder: "icon-folder",
+        unit: "icon-unit",
+    };
+    return icons[usage.discriminator];
+}
+
+/**
+ * To distinguish the activity type
+ *
+ * @param { Usage } usage - the curr
+ * @returns { string } - the icon to return
+ */
+export function getUsageHref(usage: Usage) {
+    const icons = {
+        course: () => usage.object.links.folder,
+        folder: () => usage.object.links.view,
+        unit: () => usage.object.links.folder,
+    };
+    return icons[usage.discriminator];
 }
