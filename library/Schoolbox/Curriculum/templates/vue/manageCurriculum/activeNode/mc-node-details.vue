@@ -33,11 +33,20 @@ const marginLeft = computed(() => `calc(${props.depth * 2}rem)`);
  * @returns { string }
  */
 const breadcrumbs = computed(() => {
-    if (activeNodeStore.node.breadcrumbs?.length > 0) {
+    if (activeNodeStore.node.breadcrumbs && activeNodeStore.node.breadcrumbs.length > 0) {
         const justNames = activeNodeStore.node.breadcrumbs.map((breadcrumb) => breadcrumb.name);
         return justNames.join(' > ');
     }
     return '';
+});
+
+/**
+ * Whether we should show the usage list
+ *
+ * @returns { boolean }
+ */
+const hasUsage = computed(() => {
+    return activeNodeStore.node.usage && activeNodeStore.node.usage.length > 0
 });
 
 </script>

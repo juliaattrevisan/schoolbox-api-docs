@@ -1,9 +1,8 @@
-<script>
+<script lang="ts">
 /**
  * To scroll a list of items horizontally
  */
 
-// import HorizontalScroller from '@js/scroll/HorizontalScroller';
 import { gsap, Draggable, InertiaPlugin } from "gsap/all";
 import { ResizeObserver } from "vue3-resize";
 import "vue3-resize/dist/vue3-resize.css";
@@ -16,22 +15,22 @@ const MIN_SCROLL_BAR_WIDTH = 100;
 
 export default {
     components: {
-        ResizeObserver, //to track any size changes to the parent container
+        ResizeObserver, // to track any size changes to the parent container
     },
 
     props: {
         hasButtons: {
-            //whether to show prev/next buttons
+            // whether to show prev/next buttons
             type: Boolean,
             required: true,
         },
         height: {
-            //to set how high the container will be
+            // to set how high the container will be
             type: Number,
             required: true,
         },
         hasContentChange: {
-            //to trigger a resize when the content within changes
+            // to trigger a resize when the content within changes
             type: Boolean,
             required: true,
         },
@@ -39,11 +38,11 @@ export default {
 
     data() {
         return {
-            minX: 0, //to restrict movement to the left
-            maxX: 0, //to restrict movement to the right
-            currentXPos: 0, //to track the scroll progress
-            isEnabled: false, //don't always need to scroll horizontally if there's not enough in the container
-            scrollBarWidth: 0, //to adjust the width of the scroll progress indicator based on the amount of content to scroll
+            minX: 0, // to restrict movement to the left
+            maxX: 0, // to restrict movement to the right
+            currentXPos: 0, // to track the scroll progress
+            isEnabled: false, // don't always need to scroll horizontally if there's not enough in the container
+            scrollBarWidth: 0, // to adjust the width of the scroll progress indicator based on the amount of content to scroll
         };
     },
 
@@ -52,7 +51,7 @@ export default {
          * Used to notify that the parent has changed the content within,
          * so we need to evaluate the scroller again
          *
-         * @params { Boolean }
+         * @param { boolean } hasChange - to trigger a refresh
          */
         hasContentChange(hasChange) {
             if (hasChange) {
@@ -99,24 +98,24 @@ export default {
          * The visual indication of scroll progress, moves as you scroll
          */
         initScrollBar() {
-            gsap.set(this.scrollBar, { alpha: 0 }); //only show when sliding active
+            gsap.set(this.scrollBar, { alpha: 0 }); // only show when sliding active
         },
 
         /**
          * Only need to provide scrolling functionality when we actually need to scroll
          */
         refresh() {
-            gsap.to(this.innerContainer, { x: 0, duration: 0.5 }); //don't use moveInnerContainer as we don't want to trigger the scrollBar
+            gsap.to(this.innerContainer, { x: 0, duration: 0.5 }); // don't use moveInnerContainer as we don't want to trigger the scrollBar
             this.refreshDraggableBounds();
-            this.minX < 0 ? this.enable() : this.disable(); //only provide scrolling when needed
+            this.minX < 0 ? this.enable() : this.disable(); // only provide scrolling when needed
         },
 
         /**
          * Ensure can't scroll beyond the bounds of what's in the container
          */
         refreshDraggableBounds() {
-            this.innerContainer.style.width = "auto"; //reset for accurate re-display and bound detection
-            this.innerContainer.style.width = `${this.innerContainer.scrollWidth}px`; //and ensure can grab the whole container to drag
+            this.innerContainer.style.width = "auto"; // reset for accurate re-display and bound detection
+            this.innerContainer.style.width = `${this.innerContainer.scrollWidth}px`; // and ensure can grab the whole container to drag
             this.minX = -(this.innerContainer.scrollWidth - this.outerContainer.clientWidth);
             this.maxX = 0;
             this.draggable.applyBounds({ minX: this.minX, maxX: this.maxX });
@@ -138,9 +137,9 @@ export default {
             const unconstrainedWidth =
                 (this.outerContainer.clientWidth - SCROLL_PADDING) *
                 (this.outerContainer.clientWidth / this.innerContainer.scrollWidth);
-            this.scrollBarWidth = unconstrainedWidth < MIN_SCROLL_BAR_WIDTH ? MIN_SCROLL_BAR_WIDTH : unconstrainedWidth; //don't make the scroll bar to small
+            this.scrollBarWidth = unconstrainedWidth < MIN_SCROLL_BAR_WIDTH ? MIN_SCROLL_BAR_WIDTH : unconstrainedWidth; // don't make the scroll bar to small
             this.$nextTick(() => {
-                //to ensure the scrollBarWidth change has occured
+                // to ensure the scrollBarWidth change has occured
                 this.scrollBarXFactor =
                     (this.outerContainer.clientWidth - this.scrollBar.clientWidth - SCROLL_PADDING) /
                     (this.innerContainer.scrollWidth - this.outerContainer.clientWidth);
@@ -158,9 +157,9 @@ export default {
         /**
          * Used by the next/previous buttons to move the scroller
          *
-         * @param {Number}
+         * @param { number } xTarget - where to move the container
          */
-        moveInnerContainer(xTarget) {
+        moveInnerContainer(xTarget: number) {
             gsap.to(this.innerContainer, {
                 x: xTarget,
                 duration: 0.5,
@@ -198,7 +197,7 @@ export default {
          */
         onPreviousButtonSelected() {
             const xTarget = gsap.getProperty(this.innerContainer, "x") + this.outerContainer.clientWidth;
-            const constrainedXTarget = xTarget > this.maxX ? this.maxX : xTarget; //ensure doesn't move beyond the container bounds
+            const constrainedXTarget = xTarget > this.maxX ? this.maxX : xTarget; // ensure doesn't move beyond the container bounds
             this.moveInnerContainer(constrainedXTarget);
         },
 
@@ -207,7 +206,7 @@ export default {
          */
         onNextButtonSelected() {
             const xTarget = gsap.getProperty(this.innerContainer, "x") - this.outerContainer.clientWidth;
-            const constrainedXTarget = xTarget < this.minX ? this.minX : xTarget; //ensure doesn't move beyond the container bounds
+            const constrainedXTarget = xTarget < this.minX ? this.minX : xTarget; // ensure doesn't move beyond the container bounds
             this.moveInnerContainer(constrainedXTarget);
         },
 
@@ -300,7 +299,7 @@ export default {
     position: absolute;
     left: 5px;
     bottom: 0px;
-    width: 120px; //will be updated relative to scroll amount with this.scrollBarWidth
+    width: 120px; // will be updated relative to scroll amount with this.scrollBarWidth
     height: 3px;
     background: $content-ui-foreground;
 }

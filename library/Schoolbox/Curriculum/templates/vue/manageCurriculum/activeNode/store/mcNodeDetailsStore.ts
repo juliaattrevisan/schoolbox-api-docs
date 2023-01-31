@@ -12,6 +12,7 @@ import type { Node, Usage } from "@schoolboxCurriculum/types/Node";
 export const useNodeDetailsStore = defineStore("mcNodeDetails", () => {
     const isProcessing = ref(false);
     const isOpen = ref(false); // to notify that the prompt is opened / closed
+    const hasLoadError = ref(false);
 
     /**
      * retrieve all the details of the nodes usage
@@ -30,7 +31,7 @@ export const useNodeDetailsStore = defineStore("mcNodeDetails", () => {
                 const usage = ((await usageResponse.json()) as JSON).data as Usage[];
                 activeNodeStore.node.usage = usage;
             } else {
-                // hasLoadError.value = true;
+                hasLoadError.value = true;
             }
             // throw new Error(responseJson.title, { ...responseJson });
         } catch (error) {
