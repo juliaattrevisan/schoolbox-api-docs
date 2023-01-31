@@ -48,11 +48,23 @@
 
                                     content.append($('<h3/>').html(len + ' classes found.')).append(list);
 
-                                    var confirmation = $('<form/>').attr('method', 'post').attr('action', '/adminv2/rolloverForm.php');
+                                    var confirmation = $('<form/>').attr('id', 'form-rollover').attr('method', 'post').attr('action', '/adminv2/rolloverForm.php');
                                     confirmation.append($('<input type="hidden" />').attr('name', 'rollover').val(parent));
-                                    confirmation.append($('<p/>').html('Rollover these ' + len + ' classes?<br/><em>You cannot undo this.</em>'));
-                                    confirmation.append($('<input type="submit" value="Rollover" />'));
+                                    confirmation.append($('<h3/>').html('Rollover these ' + len + ' classes?<br/>'));
+                                    confirmation.append($('<button type="submit" data-rollover>Rollover</button>'));
                                     confirmationWindow.html(confirmation);
+
+                                    $('button[data-rollover]').click(function (event) {
+                                        event.preventDefault();
+                                        $(this).confirmDialog({
+                                            text: 'Are you sure you wish to rollover?',
+                                            confirmEvent: function () {
+                                                document.getElementById('form-rollover').submit();
+                                                document.getElementById('confirm-dialog-confirm-button').setAttribute('disabled', 'true');
+                                            }
+                                        });
+                                    });
+
                                 }
                                 else {
                                     content.html('<h3>No classes found.</h3>');
@@ -85,16 +97,16 @@
 
     <div class="admin-content">
         <div class="small-12 island">
-            <div class="alert-box highlight">
-                <p>
+            <section class="content">
+                <h5>
                     Rollover will look through all subfolders of the selected folder, and detach them from
                     their class codes. The codes will be appended to the folder title for ease of archiving.
-                </p>
-                <p>
+                </h5>
+                <div data-alert="" class="alert-box warning">
                     This function is irreversible, so only do this if you are <strong>absolutely
                     certain</strong> that you want to.
-                </p>
-            </div>
+                </div>
+            </section>
         </div>
 
         <div class="small-12 columns">
