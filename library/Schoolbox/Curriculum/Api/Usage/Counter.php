@@ -17,16 +17,30 @@ use Alaress\Database\Predicate\Builder;
  */
 class Counter
 {
+    /**
+     * Constructor
+     *
+     * @param IConnector $database The database connection to retrieve from.
+     */
     public function __construct(private IConnector $database)
     {
     }
 
+    /**
+     * Fetch counts of curriculum node usages for the given node IDs.
+     *
+     * @param array<int> $ids A set of nodes to fetch usages for
+     * @return array<int, array<string, int>> key: curriculum node ID,
+     *                                        value: array with key: discriminator, value: count for that discriminator
+     */
     public function count(array $ids): array
     {
         if (empty($ids)) {
             return [];
         }
 
+        // Sub-queries for fetching the counts of each discriminator:
+        // these get joined together into a single UNION statement
         $selectParts = [
             "
                 SELECT
@@ -65,7 +79,9 @@ class Counter
                 AND cnfc.curriculum_node_id IN " . Builder::getArrayPlaceholders($ids, Cursor::DISCRIMINATOR_FOLDER),
         ];
         $queryString = '(' . implode(') UNION (', $selectParts) . ')';
-        $query  = $this->database->prepareQuery($queryString);
+        $query       = $this->database->prepareQuery($queryString);
+
+        // Parameters for the query
         $params = [
             'courseDiscriminator' => Cursor::DISCRIMINATOR_COURSE,
             'unitDiscriminator'   => Cursor::DISCRIMINATOR_UNIT,
@@ -74,8 +90,8 @@ class Counter
         $params += Builder::getArrayParameters($ids, Cursor::DISCRIMINATOR_COURSE);
         $params += Builder::getArrayParameters($ids, Cursor::DISCRIMINATOR_UNIT);
         $params += Builder::getArrayParameters($ids, Cursor::DISCRIMINATOR_FOLDER);
-        $query->execute($params);
 
+        // Run query and compile result
         $result = array_fill_keys(
             $ids,
             [
@@ -84,6 +100,7 @@ class Counter
                 Cursor::DISCRIMINATOR_FOLDER => 0,
             ]
         );
+        $query->execute($params);
         foreach ($query->fetchAll() as $row) {
             if (isset($row['id'])) {
                 $result[$row['id']][$row['discriminator']] += $row['count'];
