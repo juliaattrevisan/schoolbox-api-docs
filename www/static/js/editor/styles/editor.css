@@ -1,0 +1,17 @@
+/**
+ * Any style overwrites to customise the CKEditor instance
+ */
+
+:root {
+    /* Remove the border radius */
+    --ck-border-radius: 0px;
+    /* -- Border colours */
+    --ck-color-toolbar-border: var(--form-border-color);
+    --ck-color-base-border: var(--form-border-color);
+    /* Button hover colour */
+    --ck-color-button-default-hover-background: var(--form-bg-hover-color);
+}
+
+.ck-word-count {
+    margin-bottom: 1rem;
+}

@@ -6,6 +6,7 @@ import ClassicEditor from "@ckeditor/ckeditor5-editor-classic/src/classiceditor"
 import { getDefault } from "@js/editor/configDefault";
 import CKEditorInspector from "@ckeditor/ckeditor5-inspector";
 import { insertElementAfter } from "@js/util/domUtils";
+import "@js/editor/styles/editor.css"; // to overwrite some of the styles
 
 /**
  * Add the word count UI to the bottom of the editor
@@ -48,7 +49,7 @@ function createEditor(textarea: HTMLTextAreaElement) {
  *
  * @param { CustomEvent } event - the custom event
  */
-function onInit(event: CustomEvent) {
+function onCreate(event: CustomEvent) {
     const targetElements = event.detail.targetElements as string[];
     targetElements.forEach((targetElement) => {
         // assume that each targetElement could contain multiple instances
@@ -58,4 +59,4 @@ function onInit(event: CustomEvent) {
     });
 }
 
-document.addEventListener("EDITOR__CREATE", onInit);
+document.addEventListener("EDITOR__CREATE", onCreate);
