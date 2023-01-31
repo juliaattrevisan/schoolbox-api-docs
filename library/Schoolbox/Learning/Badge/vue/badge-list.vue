@@ -219,11 +219,14 @@ export default {
                 const response = await fetch(this.currentBadge._links.delete, {
                     method: 'DELETE',
                 });
-                //this is to prevent 'Fetch failed loading' in the console, as nothing is returned and Fetch currently doesn't like that with DELETE
-                await response.text();
-                this.data = this.data.filter((badge) => badge.id !== this.currentBadge.id);
-                this.metadata.count -= 1;
-                this.$refs.toast.timeout('Badge successfully deleted', true);
+
+                if (response.status === 200) {
+                    this.data = this.data.filter((badge) => badge.id !== this.currentBadge.id);
+                    this.metadata.count -= 1;
+                    this.$refs.toast.timeout('Badge successfully deleted', true);
+                } else {
+                    this.$refs.toast.timeout('Failed to delete badge', false);
+                }
             } catch (error) {
                 console.warn(error);
                 this.$refs.toast.timeout('Failed to delete badge', false);
