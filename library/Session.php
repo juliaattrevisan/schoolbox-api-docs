@@ -304,11 +304,15 @@ class Session
                 if (!file_exists($ldapCaCertPath)) {
                     try {
                         file_put_contents($ldapCaCertPath, $filesystemProxy->read($ldapCaCert));
-                        ldap_set_option(null, LDAP_OPT_X_TLS_CACERTDIR, dirname($ldapCaCertPath));
-                        ldap_set_option(null, LDAP_OPT_X_TLS_CACERTFILE, $ldapCaCertPath);
                     } catch (FilesystemException $e) {
                         //can't read cert, just continue without the certificate
                     }
+                }
+
+                // Now if the file _does_ exist: set ldap options
+                if (file_exists($ldapCaCertPath)) {
+                    ldap_set_option(null, LDAP_OPT_X_TLS_CACERTDIR, dirname($ldapCaCertPath));
+                    ldap_set_option(null, LDAP_OPT_X_TLS_CACERTFILE, $ldapCaCertPath);
                 }
             }
             $ds = ldap_connect($host);
