@@ -107,9 +107,11 @@ class Api implements IApi
          *
          * Remember this, because we need to remove it in ApiUsage
          * for it to report unique endpoints properly
+         *
+         * Ensure this baseUri ends in just one /
          */
         $this->baseUri = sprintf(
-            '%s/%s/v3',
+            '%s/%s/v3/',
             rtrim($host, '/'),
             $credentials['schoolroute'],
         );
@@ -180,7 +182,10 @@ class Api implements IApi
                  */
                 $options['headers'] = [
                     'Authorization' => "Bearer {$accessToken}",
-                    'Content-Type' => 'application/json'
+                    'Content-Type' => 'application/json',
+                    'X-API-Value-Lists' => 'include',
+                    'X-Page-Number' => '',
+                    'X-Page-Size' => ''
                 ];
 
                 $response = $this->client->request($method, $endpoint, $options);
