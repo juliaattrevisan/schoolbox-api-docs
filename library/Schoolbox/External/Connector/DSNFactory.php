@@ -22,7 +22,6 @@ use Schoolbox\External\Importer\Endpoint\IDSN;
  */
 class DSNFactory
 {
-
     /**
      * Produces a specific DSN codec for the selected suds importer
      *

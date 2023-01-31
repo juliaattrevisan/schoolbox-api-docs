@@ -214,7 +214,7 @@ class Generator
 
                     /* Get the value of that new token
                      */
-                    $token = json_decode($content, true, 512, JSON_THROW_ON_ERROR);;
+                    $token = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
 
                     /* Predict the death of the token and subtract an arbitrary
                      * amount off its actual lifespan to give us time to spawn another

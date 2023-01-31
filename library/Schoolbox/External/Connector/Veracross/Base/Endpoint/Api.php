@@ -113,8 +113,8 @@ class Api implements IApi
         private string $host,
         private string $apiKey,
         private string $scope,
-        private int $timeout = self::DEFAULT_TIMEOUT)
-    {
+        private int $timeout = self::DEFAULT_TIMEOUT
+    ) {
         $this->client = $this->initClient($this->host, $this->apiKey, $this->timeout);
 
         /* Record some stats about api usage

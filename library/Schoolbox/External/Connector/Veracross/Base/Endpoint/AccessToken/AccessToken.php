@@ -79,7 +79,8 @@ class AccessToken
      *
      * @return array
      */
-    public function getOriginalToken(): array {
+    public function getOriginalToken(): array
+    {
         return $this->original;
     }
 }
