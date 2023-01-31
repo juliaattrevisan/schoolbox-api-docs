@@ -52,9 +52,9 @@ class Household
         if (null === $this->household) {
             $this->household = [];
 
-            /* Rebuild lookups on each page (see TODO)
+            /* Rebuild lookups on each page
              */
-            $lookupConverter = (new ValueListConverter());
+            $lookupConverter = new ValueListConverter();
 
             $parentPayloadGenerator = $this->api->retrieve('GET', 'parents');
 

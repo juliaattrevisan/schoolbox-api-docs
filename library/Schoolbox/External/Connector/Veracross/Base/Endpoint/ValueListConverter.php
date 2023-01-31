@@ -24,6 +24,14 @@ namespace Schoolbox\External\Connector\Veracross\Base\Endpoint;
 class ValueListConverter
 {
     /**
+     * Remember this output so we can recycle it
+     *
+     * @var array|null
+     */
+    private ?array $stack = null;
+
+
+    /**
      * $valueLists is all the lookups in a paginated payload
      * This reindexes them based on key/value tuples, in order
      * they were given (pre-sorted by Veracross)
@@ -33,20 +41,24 @@ class ValueListConverter
      */
     public function generate(array $valueLists): array
     {
-        $stack = [];
-
-        /* Reindex each value list
+        /* Recycle it, if it previously existed
          */
-        foreach ($valueLists as $valueList) {
-            $data = [];
+        if (null === $this->stack) {
+            $this->stack = [];
 
-            foreach ($valueList['items'] as $value) {
-                $data[$value['id']] = $value['description'];
+            /* Reindex each value list
+             */
+            foreach ($valueLists as $valueList) {
+                $data = [];
+
+                foreach ($valueList['items'] as $value) {
+                    $data[$value['id']] = $value['description'];
+                }
+
+                $this->stack[$valueList['fields'][0]] = $data;
             }
-
-            $stack[$valueList['fields'][0]] = $data;
         }
 
-        return $stack;
+        return $this->stack;
     }
 }
