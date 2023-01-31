@@ -49,6 +49,9 @@ class Controller extends Base
         $cursor        = new Cursor($this->database, $node, $limit, null);
         $data          = $cursor->retrieveResults($encodedCursor);
 
+        $counter = new Counter($this->database);
+        $counts  = $counter->count([$node->getId()]);
+
         // I can't create this in the module because a user object is required,
         // and the user doesn't reliably exist in the module.
         $hydrator = new Hydrator(
