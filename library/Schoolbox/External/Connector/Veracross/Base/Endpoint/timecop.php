@@ -1,4 +1,5 @@
 <?php
+
 require_once __DIR__ . '/../conf/core/require.php';
 
 $config = new \Schoolbox\Config\Loader();
@@ -70,7 +71,6 @@ foreach ($timecop as $i => $row) {
     $previousTimestamp = $row[0];
 }
 
-new \Alaress_Probe('<strong>Total</strong>: '. number_format(($end - $start), 3));
-
+new \Alaress_Probe('<strong>Total</strong>: ' . number_format(($end - $start), 3));
 
 die();
