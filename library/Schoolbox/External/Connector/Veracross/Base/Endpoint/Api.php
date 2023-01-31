@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Veracross\Base\Endpoint;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\InvalidArgumentException;
 use GuzzleHttp\RequestOptions;
 use GuzzleHttp\TransferStats;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Codec;
@@ -94,15 +95,27 @@ class Api implements IApi
     /**
      * Constructor.
      *
+     * Each instance of IApi is limited to the $scope provided. To save
+     * on generating too many tokens, this $scope should fulfil the extent
+     * of this IApi instance so if you're doing Profile strat, your scope
+     * should just be all the profile scopes you need such as
+     *
+     * "students:list parents:list ......."
+     *
      * @param string $host
      * @param string $apiKey
+     * @param string $scope
      * @param int    $timeout
      * @throws \DomainException
-     * @throws \GuzzleHttp\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
-    public function __construct(string $host, string $apiKey, int $timeout = self::DEFAULT_TIMEOUT)
+    public function __construct(
+        private string $host,
+        private string $apiKey,
+        private string $scope,
+        private int $timeout = self::DEFAULT_TIMEOUT)
     {
-        $this->client = $this->initClient($host, $apiKey, $timeout);
+        $this->client = $this->initClient($this->host, $this->apiKey, $this->timeout);
 
         /* Record some stats about api usage
          * Turn this into an Observer pattern if you want to record more details
@@ -173,7 +186,6 @@ class Api implements IApi
      *
      * @param string $method
      * @param string $endpoint
-     * @param string $scope
      * @param array  $params
      * @param int    $pageSize
      * @return \Generator
@@ -181,7 +193,7 @@ class Api implements IApi
      * @throws \JsonException
      * @throws \RuntimeException
      */
-    public function retrieve(string $method, string $endpoint, string $scope, array $params = [], int $pageSize = self::PAGE_SIZE): \Generator
+    public function retrieve(string $method, string $endpoint, array $params = [], int $pageSize = self::PAGE_SIZE): \Generator
     {
         $pageNum = 1;
         $payload = null;
@@ -194,7 +206,7 @@ class Api implements IApi
          * 3. The payload size == page size
          */
         while (($n < self::MAX_PAYLOADS) && (!$payload || \count($payload['data']) === self::PAGE_SIZE)) {
-            $payload = $this->retrieveOne($method, $endpoint, $scope, $pageNum, $pageSize, $params);
+            $payload = $this->retrieveOne($method, $endpoint, $this->scope, $pageNum, $pageSize, $params);
 
             $pageNum++;
             $n++;

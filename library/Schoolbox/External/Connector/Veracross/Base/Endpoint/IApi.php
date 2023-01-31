@@ -21,11 +21,10 @@ interface IApi
      *
      * @param string $method
      * @param string $endpoint
-     * @param string $scope
      * @param array  $params
      * @return \Generator
      */
-    public function retrieve(string $method, string $endpoint, string $scope, array $params = []): \Generator;
+    public function retrieve(string $method, string $endpoint, array $params = []): \Generator;
 
 
     /**
