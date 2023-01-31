@@ -206,7 +206,7 @@ class Api implements IApi
          * 3. The payload size == page size
          */
         while (($n < self::MAX_PAYLOADS) && (!$payload || \count($payload['data']) === self::PAGE_SIZE)) {
-            $payload = $this->retrieveOne($method, $endpoint, $this->scope, $pageNum, $pageSize, $params);
+            $payload = $this->retrieveOne($method, $endpoint, $pageNum, $pageSize, $params);
 
             $pageNum++;
             $n++;
@@ -225,7 +225,6 @@ class Api implements IApi
      *
      * @param string $method
      * @param string $endpoint
-     * @param string $scope
      * @param int    $pageNum
      * @param int    $pageSize
      * @param array  $params
@@ -234,7 +233,7 @@ class Api implements IApi
      * @throws \JsonException
      * @throws \RuntimeException
      */
-    private function retrieveOne(string $method, string $endpoint, string $scope, int $pageNum, int $pageSize, array $params = []): array
+    public function retrieveOne(string $method, string $endpoint, int $pageNum, int $pageSize, array $params = []): array
     {
         $response = null;
 
@@ -263,7 +262,7 @@ class Api implements IApi
 
                 /* Grab an Access Token
                  */
-                $accessToken = ($this->accessTokenGenerator->generate($scope))->getToken();
+                $accessToken = ($this->accessTokenGenerator->generate($this->scope))->getToken();
 
                 /* Slam in headers with the dynamic token
                  */
