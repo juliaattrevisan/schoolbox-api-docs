@@ -1,45 +1,43 @@
 <script>
-
-import RevealModal from '@schoolboxVue/components/reveal-modal'
-import Toast from '@schoolboxVue/components/toast.vue'
-import debounce from 'lodash/debounce';
-import { ENDPOINTS } from '@schoolboxCalendarEvent/endpoints';
+import RevealModal from "@schoolboxVue/components/reveal-modal";
+import Toast from "@schoolboxVue/components/toast.vue";
+import debounce from "lodash/debounce";
+import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
 
 /* Vue select
-    */
+ */
 import vSelect from "vue-select";
 import "vue-select/dist/vue-select.css";
 
 /* Render custom template for Deselect icon/button
-* It's not well documented, but you can trawl through closed PRs to figger out how
-* https://github.com/sagalbot/vue-select/issues/994
-*/
-import Deselect from '@schoolboxVue/components/selectize/Deselect';
+ * It's not well documented, but you can trawl through closed PRs to figger out how
+ * https://github.com/sagalbot/vue-select/issues/994
+ */
+import Deselect from "@schoolboxVue/components/selectize/Deselect";
 vSelect.props.components.default = () => ({ Deselect });
 
-const EVENT_CREATED = 'eventCreated';
+const EVENT_CREATED = "eventCreated";
 
 export default {
-
     name: "create-event-modal",
 
     components: {
         RevealModal,
         Toast,
-        vSelect
+        vSelect,
     },
 
     props: [
-        'userId',
-        'canInvite',
-        'eventTypes',
-        'eventCreateUrl',
-        'eventCreateFormUrl',
-        'eventModifyFormUrl',
-        'formatFormDate',
-        'formatFormDatetime',
-        'formatDisplayDate',
-        'formatDisplayDatetime',
+        "userId",
+        "canInvite",
+        "eventTypes",
+        "eventCreateUrl",
+        "eventCreateFormUrl",
+        "eventModifyFormUrl",
+        "formatFormDate",
+        "formatFormDatetime",
+        "formatDisplayDate",
+        "formatDisplayDatetime",
     ],
 
     data() {
@@ -47,10 +45,10 @@ export default {
             event: {},
             isProcessing: false, //to disable on form submission to prevent rapid fire
             /* Vue Select
-                */
+             */
             options: [],
-            selected: []
-        }
+            selected: [],
+        };
     },
 
     computed: {
@@ -72,12 +70,8 @@ export default {
          */
         formDate() {
             return this.event.date
-                ? dayjs(this.event.date).format(
-                    this.event.allDay
-                        ? this.formatFormDate
-                        : this.formatFormDatetime
-                )
-                : '';
+                ? dayjs(this.event.date).format(this.event.allDay ? this.formatFormDate : this.formatFormDatetime)
+                : "";
         },
 
         /**
@@ -87,14 +81,9 @@ export default {
          */
         displayDate() {
             return this.event.date
-                ? dayjs(this.event.date).format(
-                    this.event.allDay
-                        ? this.formatDisplayDate
-                        : this.formatDisplayDatetime
-                )
-                : '';
+                ? dayjs(this.event.date).format(this.event.allDay ? this.formatDisplayDate : this.formatDisplayDatetime)
+                : "";
         },
-
 
         /**
          * Compile object ids into csv
@@ -106,8 +95,8 @@ export default {
                 stack.push(this.selected[i].id);
             }
 
-            return stack.join(',');
-        }
+            return stack.join(",");
+        },
     },
 
     created() {
@@ -115,7 +104,6 @@ export default {
     },
 
     methods: {
-
         /**
          * Open this modal.
          */
@@ -125,10 +113,9 @@ export default {
             this.$refs.modal.open();
 
             /* Clear selectize contents
-                */
+             */
             this.selected = [];
         },
-
 
         /**
          * Start searching for keyword
@@ -144,24 +131,22 @@ export default {
             this.search(loading, query, this);
         },
 
-
         /**
          * Perform async request and load results into component
          */
-        search: debounce(function(loading, query, vm) {
+        search: debounce(function (loading, query, vm) {
             const queryParams = new URLSearchParams();
-            queryParams.append('query', query);
-            queryParams.append('groupID', 0);
+            queryParams.append("query", query);
+            queryParams.append("groupID", 0);
 
             fetch(`${ENDPOINTS.URL_SELECTIZE}?${queryParams.toString()}`)
-                .then(response => response.json())
-                .then(data => {
+                .then((response) => response.json())
+                .then((data) => {
                     vm.options = data;
                     loading(false);
                 })
-                .catch(error => console.log(error))
+                .catch((error) => console.log(error));
         }, 350),
-
 
         /**
          * Post the event creation form.
@@ -171,31 +156,30 @@ export default {
          * @param form The form that's being submitted
          *
          */
-        async createNewEvent (form) {
+        async createNewEvent(form) {
             this.isProcessing = true;
             const formContent = new FormData(form);
-            this.$refs.toast.activate('Saving...');
+            this.$refs.toast.activate("Saving...");
 
             try {
                 const response = await fetch(form.action, {
                     method: form.method,
                     body: formContent,
-                    responseType: 'json',
+                    responseType: "json",
                     headers: {
-                        'Accept': 'application/json',
-                    }
+                        Accept: "application/json",
+                    },
                 });
                 const responseData = await response.json();
                 if (response.ok) {
                     this.$refs.modal.close();
                     this.$emit(EVENT_CREATED, responseData);
-                    this.$refs.toast.timeout('Created', true, 2000);
+                    this.$refs.toast.timeout("Created", true, 2000);
                 } else {
-                    this.$refs.toast.timeout('Unable to create event / task. ' + responseData.message, false, 3000);
+                    this.$refs.toast.timeout("Unable to create event / task. " + responseData.message, false, 3000);
                 }
-
             } catch (error) {
-                this.$refs.toast.timeout('Unable to create event / task. ' + error.message, false, 3000);
+                this.$refs.toast.timeout("Unable to create event / task. " + error.message, false, 3000);
                 console.warn(error);
             } finally {
                 this.isProcessing = false;
@@ -207,15 +191,15 @@ export default {
          */
         redirectToEventForm() {
             // TODO don't use jQuery form serialize
-            this.window.location.href = this.eventCreateFormUrl
-                + '?returnUrl=' + btoa(window.location.pathname)
-                + '&' + $(this.$refs.createEventForm).serialize();
+            this.window.location.href =
+                this.eventCreateFormUrl +
+                "?returnUrl=" +
+                btoa(window.location.pathname) +
+                "&" +
+                $(this.$refs.createEventForm).serialize();
         },
-
     },
-
-}
-
+};
 </script>
 
 <template>
@@ -228,24 +212,31 @@ export default {
         </dl>
         <div class="tabs-content">
             <div class="content active" id="createEventPanel" aria-hidden="false">
-                <form ref="createEventForm"
-                      method="post"
-                      :action="eventCreateUrl"
-                      @submit.prevent="createNewEvent($refs.createEventForm)"
-                      class="top"
+                <form
+                    ref="createEventForm"
+                    method="post"
+                    :action="eventCreateUrl"
+                    @submit.prevent="createNewEvent($refs.createEventForm)"
+                    class="top"
                 >
-                    <input name="userId"  type="hidden" :value="userId" />
-                    <input name="allDay"  type="hidden" :value="Number(event.allDay)" />
-                    <input name="date"    type="hidden" :value="formDate" />
+                    <input name="userId" type="hidden" :value="userId" />
+                    <input name="allDay" type="hidden" :value="Number(event.allDay)" />
+                    <input name="date" type="hidden" :value="formDate" />
                     <input name="variant" type="hidden" value="event" />
 
                     <section>
-                        <h3>On <span>{{ displayDate }}</span></h3>
+                        <h3>
+                            On <span>{{ displayDate }}</span>
+                        </h3>
 
-                        <label class="required" for="createEventBubbleTitle">
-                            Title
-                        </label>
-                        <input id="createEventBubbleTitle" name="title" maxlength="250" type="text" v-model.trim="event.title" />
+                        <label class="required" for="createEventBubbleTitle"> Title </label>
+                        <input
+                            id="createEventBubbleTitle"
+                            name="title"
+                            maxlength="250"
+                            type="text"
+                            v-model.trim="event.title"
+                        />
 
                         <label>
                             Type
@@ -258,16 +249,22 @@ export default {
 
                         <template v-if="canInvite">
                             <label>Invite Guests</label>
-                            <v-select class="schoolbox-vue-selectize"
-                                      :options="options"
-                                      :clear-search-on-blur="function() { return true; }"
-                                      :clear-search-on-select="true"
-                                      :close-on-select="false"
-                                      multiple
-                                      @search="onSearch"
-                                      label="name"
-                                      placeholder="Search for people to invite"
-                                      v-model="selected">
+                            <v-select
+                                class="schoolbox-vue-selectize"
+                                :options="options"
+                                :clear-search-on-blur="
+                                    function () {
+                                        return true;
+                                    }
+                                "
+                                :clear-search-on-select="true"
+                                :close-on-select="false"
+                                multiple
+                                @search="onSearch"
+                                label="name"
+                                placeholder="Search for people to invite"
+                                v-model="selected"
+                            >
                                 <template slot="option" slot-scope="option">
                                     <span class="d-center">
                                         {{ option.name }}
@@ -284,30 +281,35 @@ export default {
                     </section>
                     <ul class="flex-list buttons">
                         <li><button @click.prevent="redirectToEventForm($event)">Edit Event</button></li>
-                        <li><input type="submit"
-                                   :disabled="!isFormSubmittable"
-                                   value="Create Event" /></li>
+                        <li><input type="submit" :disabled="!isFormSubmittable" value="Create Event" /></li>
                     </ul>
                 </form>
             </div>
             <div class="content" id="createTaskPanel" aria-hidden="true" tabindex="-1">
-                <form ref="createTaskForm"
-                      method="post"
-                      :action="eventCreateUrl"
-                      @submit.prevent="createNewEvent($refs.createTaskForm)"
+                <form
+                    ref="createTaskForm"
+                    method="post"
+                    :action="eventCreateUrl"
+                    @submit.prevent="createNewEvent($refs.createTaskForm)"
                 >
-                    <input name="userId"  type="hidden" :value="userId" />
-                    <input name="allDay"  type="hidden" :value="Number(event.allDay)" />
-                    <input name="date"    type="hidden" :value="formDate" />
+                    <input name="userId" type="hidden" :value="userId" />
+                    <input name="allDay" type="hidden" :value="Number(event.allDay)" />
+                    <input name="date" type="hidden" :value="formDate" />
                     <input name="variant" type="hidden" value="task" />
 
                     <section>
-                        <h3>Due <span>{{ displayDate }}</span></h3>
+                        <h3>
+                            Due <span>{{ displayDate }}</span>
+                        </h3>
 
-                        <label class="required" for="createTaskBubbleTitle">
-                            Task
-                        </label>
-                        <input id="createTaskBubbleTitle" name="title" maxlength="250" type="text" v-model.trim="event.title" />
+                        <label class="required" for="createTaskBubbleTitle"> Task </label>
+                        <input
+                            id="createTaskBubbleTitle"
+                            name="title"
+                            maxlength="250"
+                            type="text"
+                            v-model.trim="event.title"
+                        />
 
                         <label>
                             Type
@@ -325,9 +327,7 @@ export default {
                     </section>
                     <div class="row">
                         <div class="small-12 columns no-pad">
-                            <input type="submit"
-                                   :disabled="!isFormSubmittable"
-                                   value="Create Task" />
+                            <input type="submit" :disabled="!isFormSubmittable" value="Create Task" />
                         </div>
                     </div>
                 </form>

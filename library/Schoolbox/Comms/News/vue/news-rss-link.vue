@@ -1,5 +1,4 @@
 <script>
-
 /**
  * Provides a link for RSS feeds
  * Changes depending on the current news feed tab selection
@@ -7,46 +6,42 @@
  */
 
 export default {
-    
     props: {
         route: String,
         initialQueryStringTopic: String,
-        initialTopic: String
+        initialTopic: String,
     },
 
-    data () {
+    data() {
         return {
-            queryStringTopic: '',
-            topic: ''
-        }
+            queryStringTopic: "",
+            topic: "",
+        };
     },
 
     computed: {
-        
         /**
          * the rss link, that changes on tab selection changes
          *
          * @returns {String} eg: https://vagrant.dev.schoolbox.cloud/news/feed/baf8da85532750735975e1809?topic=academic
          *
          */
-        link () {
-            return this.route + '?' + this.queryStringTopic + '=' + this.topic;
-        }
-
+        link() {
+            return this.route + "?" + this.queryStringTopic + "=" + this.topic;
+        },
     },
 
-    mounted () {
+    mounted() {
         this.initData();
         this.initTabChangeListener();
     },
 
     methods: {
-
         /**
          * those that will change
          *
          */
-        initData () {
+        initData() {
             this.queryStringTopic = this.initialQueryStringTopic;
             this.topic = this.initialTopic;
         },
@@ -56,19 +51,16 @@ export default {
          * So #article-list-mixin dipatches the event so the link can change
          *
          */
-        initTabChangeListener () {
-            document.addEventListener('article-list-mixin__onTabChange', (event) => {
+        initTabChangeListener() {
+            document.addEventListener("article-list-mixin__onTabChange", (event) => {
                 this.queryStringTopic = event.detail.queryStringTopic;
                 this.topic = event.detail.tab;
-            }); 
-        }
-
-    }
-
-}
+            });
+        },
+    },
+};
 </script>
 
 <template>
-    <a :href="link" class='icon-rss' title="Download RSS feed for this topic" id="rss"></a>
+    <a :href="link" class="icon-rss" title="Download RSS feed for this topic" id="rss"></a>
 </template>
-

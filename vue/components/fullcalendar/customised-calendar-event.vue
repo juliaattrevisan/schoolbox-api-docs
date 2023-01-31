@@ -1,32 +1,29 @@
 <script>
-
 /**
  * To customise the display of the event, ensuring the background/text colour is readable
  *
  */
 
-import tinycolor from 'tinycolor2';
-import { EVENT_VARIANTS } from '@schoolboxCalendarEvent/event-variants';
-import { ATTENDANCE_STATUS } from '@schoolboxCalendarEvent/attendance-status';
+import tinycolor from "tinycolor2";
+import { EVENT_VARIANTS } from "@schoolboxCalendarEvent/event-variants";
+import { ATTENDANCE_STATUS } from "@schoolboxCalendarEvent/attendance-status";
 
 export default {
-
     props: {
         content: {
             type: Object,
-            required: true
-        }
+            required: true,
+        },
     },
 
     computed: {
-
         /**
          * don't apply these customisations to list views
          *
          * @returns { Boolean }
          */
-        isEventInListComponent () {
-            return this.$el.parentElement.parentElement.className.includes('fc-list-event-title');
+        isEventInListComponent() {
+            return this.$el.parentElement.parentElement.className.includes("fc-list-event-title");
         },
 
         /**
@@ -34,16 +31,16 @@ export default {
          *
          * @returns { String }
          */
-        eventBackgroundColor () {
+        eventBackgroundColor() {
             return this.$el.parentElement.parentElement.parentElement.style.backgroundColor;
         },
 
         /**
          * Ensure the new lines are respected
          */
-        lineBreakedTitleText () {
+        lineBreakedTitleText() {
             const eventTitle = this.content.event.title;
-            return eventTitle.replace('\n', '<br>');
+            return eventTitle.replace("\n", "<br>");
         },
 
         /**
@@ -51,7 +48,7 @@ export default {
          *
          * @returns { Boolean }
          */
-        isTask () {
+        isTask() {
             if (this.content.event?.extendedProps?.data?.meta?.variant === EVENT_VARIANTS.TASK) {
                 return true;
             } else {
@@ -64,7 +61,7 @@ export default {
          *
          * @returns { Boolean }
          */
-        isTaskComplete () {
+        isTaskComplete() {
             if (this.content.event?.extendedProps?.data?.meta?.completed) {
                 return true;
             } else {
@@ -78,33 +75,36 @@ export default {
          *
          * @returns { String }
          */
-        getAttendanceClass () {
+        getAttendanceClass() {
             const attendanceStatus = this.content.event?.extendedProps?.data?.attendance?.status?.current;
             if (attendanceStatus === ATTENDANCE_STATUS.DECLINED) {
-                return 'declined';
+                return "declined";
             } else if (attendanceStatus === ATTENDANCE_STATUS.PENDING) {
-                return 'pending';
-            } else { //otherwise just return blank
-                return '';
+                return "pending";
+            } else {
+                //otherwise just return blank
+                return "";
             }
         },
-
     },
 
-    mounted () {
+    mounted() {
         this.updateTextColor();
         this.checkBackgroundColor();
     },
 
     methods: {
-
         /**
          * Ensure the text colour is readable on the background, which uses the user assigned folder colour
          */
-        updateTextColor () {
-            if (!this.isEventInListComponent) { //don't do for list view, only within month/week views
-                const readableTextColor = tinycolor.mostReadable(this.eventBackgroundColor, ['black', 'white']).toRgbString();
-                if (this.content.timeText !== '') { //not always available
+        updateTextColor() {
+            if (!this.isEventInListComponent) {
+                //don't do for list view, only within month/week views
+                const readableTextColor = tinycolor
+                    .mostReadable(this.eventBackgroundColor, ["black", "white"])
+                    .toRgbString();
+                if (this.content.timeText !== "") {
+                    //not always available
                     this.$refs.timeText.style.color = readableTextColor;
                 }
                 this.$refs.titleText.style.color = readableTextColor;
@@ -115,36 +115,39 @@ export default {
         /**
          * If it's white, add a border
          */
-        checkBackgroundColor () {
-            if (!this.isEventInListComponent) { //don't do for list view, only within month/week views
-                if (this.eventBackgroundColor === 'rgb(255, 255, 255)') {
-                    this.$refs.eventContainer.style.border = '1px solid black';
+        checkBackgroundColor() {
+            if (!this.isEventInListComponent) {
+                //don't do for list view, only within month/week views
+                if (this.eventBackgroundColor === "rgb(255, 255, 255)") {
+                    this.$refs.eventContainer.style.border = "1px solid black";
                 }
             }
         },
-
-    }
-
-}
+    },
+};
 </script>
 
 <template>
     <div class="event-container" ref="eventContainer" :class="getAttendanceClass">
         <b v-if="content.timeText" ref="timeText" class="fc-event-title">{{ content.timeText }}</b>
-        <input v-if="isTask" type="checkbox" class="checkbox plain" name="completed" v-model="isTaskComplete">
-        <span ref="titleText" class="fc-event-title" v-html="lineBreakedTitleText" :class="{ strike : isTaskComplete }"></span>
+        <input v-if="isTask" type="checkbox" class="checkbox plain" name="completed" v-model="isTaskComplete" />
+        <span
+            ref="titleText"
+            class="fc-event-title"
+            v-html="lineBreakedTitleText"
+            :class="{ strike: isTaskComplete }"
+        ></span>
     </div>
 </template>
 
 <style lang="scss" scoped>
-
 //apply padding as .fc-event-title will lose its padding from display: inline
-.event-container { 
+.event-container {
     padding: 2px;
 }
 
-//needs to be inline to ensure the .strike class works 
-.fc-event-title { 
+//needs to be inline to ensure the .strike class works
+.fc-event-title {
     display: inline;
     padding-right: 2px;
 }
@@ -167,6 +170,4 @@ export default {
 .pending {
     opacity: 0.5;
 }
-
-
 </style>

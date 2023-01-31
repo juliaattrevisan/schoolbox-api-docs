@@ -1,7 +1,7 @@
 <script>
-    export default {
-        name: "result-meta"
-    }
+export default {
+    name: "result-meta",
+};
 </script>
 
 <template>

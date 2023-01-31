@@ -11,13 +11,13 @@ export default {
         jQuery: () => window.jQuery,
     },
     mounted() {
-        let $el = this.jQuery(this.$el)
+        let $el = this.jQuery(this.$el);
         this.jQuery.fn.schoolboxResource_ReplaceAll($el);
         this.$nextTick(() => {
             this.jQuery.fn.schoolboxResource_InitialiseMediaElementPlayer($el);
         });
     },
-}
+};
 </script>
 
 <template>

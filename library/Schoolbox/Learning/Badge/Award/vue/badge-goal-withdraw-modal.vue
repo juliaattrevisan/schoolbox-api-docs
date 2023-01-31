@@ -1,9 +1,9 @@
 <script>
-import axios from 'axios';
-import debounce from 'lodash/debounce';
-import BadgeImage from '../../vue/badge-image';
-import RevealModal from '@schoolboxVue/components/reveal-modal'
-import toastMixin from '@schoolboxVue/components/toast-mixin';
+import axios from "axios";
+import debounce from "lodash/debounce";
+import BadgeImage from "../../vue/badge-image";
+import RevealModal from "@schoolboxVue/components/reveal-modal";
+import toastMixin from "@schoolboxVue/components/toast-mixin";
 
 /* Vue select
  */
@@ -14,7 +14,7 @@ import "vue-select/dist/vue-select.css";
  * It's not well documented, but you can trawl through closed PRs to figger out how
  * https://github.com/sagalbot/vue-select/issues/994
  */
-import Deselect from '@schoolboxVue/components/selectize/Deselect';
+import Deselect from "@schoolboxVue/components/selectize/Deselect";
 import qs from "qs";
 vSelect.props.components.default = () => ({ Deselect });
 
@@ -22,7 +22,6 @@ vSelect.props.components.default = () => ({ Deselect });
  * Modal for withdrawing a single goal from a single student.
  */
 export default {
-
     /**
      * Name.
      * The name of the component that we have here. This name will be used in the container
@@ -36,17 +35,14 @@ export default {
      * manner as a php trait. They must already be imported at the top of the file and will
      * be superpositioned on top of this javascript here, inside export default {}
      */
-    mixins: [
-        toastMixin
-    ],
+    mixins: [toastMixin],
 
     /**
      * Props.
      * Immutable props that were passed to this component, usually via twig, in our setup.
      * These are the hyphen-separated vars which are magically computed into camelcase elsewhere.
      */
-    props: [
-    ],
+    props: [],
 
     /**
      * Components.
@@ -56,7 +52,7 @@ export default {
     components: {
         BadgeImage,
         RevealModal,
-        vSelect
+        vSelect,
     },
 
     /**
@@ -74,7 +70,7 @@ export default {
              */
             options: [],
             selected: [],
-        }
+        };
     },
 
     /**
@@ -82,15 +78,13 @@ export default {
      * Basically, when vue has done all its inits and is ready to go
      * kind of like window.onload
      */
-    mounted: function () {
-    },
+    mounted: function () {},
 
     /**
      * Computed properties.
      * Access the results of a function as if they were a property of an object.
      */
-    computed: {
-    },
+    computed: {},
 
     /**
      * Methods.
@@ -98,7 +92,6 @@ export default {
      * other ordinary javascript that you might have written before.
      */
     methods: {
-
         /**
          * Open this modal.
          */
@@ -137,23 +130,23 @@ export default {
         /**
          * Perform async request and load results into component
          */
-        search: debounce(function(loading, query, vm) {
-            axios.get(this.badge._links.goalRecipients, {
-                params: {
-                    query: query
-                }
-            })
-            .then(function(response) {
-                vm.options = response.data;
-                loading(false);
-            });
+        search: debounce(function (loading, query, vm) {
+            axios
+                .get(this.badge._links.goalRecipients, {
+                    params: {
+                        query: query,
+                    },
+                })
+                .then(function (response) {
+                    vm.options = response.data;
+                    loading(false);
+                });
         }, 350),
 
         /**
          * Perform goal withdrawal from selected users
          */
         withdraw() {
-
             /* Nobody selected - nothing to do
              */
             if (!this.selected.length) {
@@ -174,47 +167,48 @@ export default {
              */
             let request = {
                 url: this.badge._links.goalWithdraw,
-                data:  qs.stringify({userIds: userIds}),
-                method: 'post',
-                responseType: 'json'
-            }
+                data: qs.stringify({ userIds: userIds }),
+                method: "post",
+                responseType: "json",
+            };
 
             /* A toast - to your valour, my sword, and our victory together
              */
-            self.toastActivate('Removing goal for ' + this.selected.length + ' student(s)');
+            self.toastActivate("Removing goal for " + this.selected.length + " student(s)");
 
-            axios.request(request)
+            axios
+                .request(request)
                 .then(function (response) {
-
                     /* Close this modal
                      */
                     self.close();
 
                     /* Pop toast
                      */
-                    self.toastSuccess('Goal has been removed');
+                    self.toastSuccess("Goal has been removed");
                 })
-                .then(function() {
-
+                .then(function () {
                     /* Clear selection after async outcome
                      */
                     self.selected = [];
                 })
-                .catch(error => {
+                .catch((error) => {
                     if (error.response) {
                         if (error.response) {
-                            self.toastError('Unable to remove goal; please try again.');
+                            self.toastError("Unable to remove goal; please try again.");
                         }
                     }
                 });
-        }
-    }
-}
+        },
+    },
+};
 </script>
 <template>
     <reveal-modal ref="modal">
         <template v-if="badge">
-            <h2>Remove <strong>'{{ badge.name }}'</strong> goal</h2>
+            <h2>
+                Remove <strong>'{{ badge.name }}'</strong> goal
+            </h2>
 
             <div class="card small-12 compact badge-card">
                 <div>
@@ -223,16 +217,22 @@ export default {
                 </div>
             </div>
 
-            <v-select class="schoolbox-vue-selectize"
-                      :options="options"
-                      :clear-search-on-blur="function() { return true; }"
-                      :clear-search-on-select="true"
-                      :close-on-select="false"
-                      multiple
-                      @search="onSearch"
-                      label="name"
-                      placeholder="Search for users to remove goal from"
-                      v-model="selected">
+            <v-select
+                class="schoolbox-vue-selectize"
+                :options="options"
+                :clear-search-on-blur="
+                    function () {
+                        return true;
+                    }
+                "
+                :clear-search-on-select="true"
+                :close-on-select="false"
+                multiple
+                @search="onSearch"
+                label="name"
+                placeholder="Search for users to remove goal from"
+                v-model="selected"
+            >
                 <template #option="option">
                     <div class="d-center">
                         {{ option.name }}
@@ -240,13 +240,21 @@ export default {
                 </template>
                 <template #selected-option="option">
                     <div class="selected d-center">
-                       {{ option.name }}
+                        {{ option.name }}
                     </div>
                 </template>
             </v-select>
 
             <ul class="flex-list buttons">
-                <li><a href="#" class="submit" @click.prevent="withdraw()" v-bind:class="{ disabled: !this.selected.length}">Remove goal</a></li>
+                <li>
+                    <a
+                        href="#"
+                        class="submit"
+                        @click.prevent="withdraw()"
+                        v-bind:class="{ disabled: !this.selected.length }"
+                        >Remove goal</a
+                    >
+                </li>
                 <li><a href="#" class="button" @click.prevent="close()">Cancel</a></li>
             </ul>
         </template>

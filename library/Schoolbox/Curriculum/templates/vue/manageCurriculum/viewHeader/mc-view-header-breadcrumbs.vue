@@ -1,13 +1,11 @@
 <script setup lang="ts">
-
 /**
  * To indicate progress through the node tree and to be able to
  * move backwards through the tree
  */
 
-import { useViewNodesStore } from '../viewNodes/store/mcViewNodesStore';
-import McViewHeaderBreadcrumb from './mc-view-header-breadcrumb.vue';
-
+import { useViewNodesStore } from "../viewNodes/store/mcViewNodesStore";
+import McViewHeaderBreadcrumb from "./mc-view-header-breadcrumb.vue";
 
 const props = defineProps({
     /**
@@ -20,7 +18,6 @@ const props = defineProps({
 });
 
 const viewNodesStore = useViewNodesStore();
-
 </script>
 
 <template>
@@ -37,7 +34,6 @@ const viewNodesStore = useViewNodesStore();
 </template>
 
 <style lang="scss" scoped>
-
 //animate on/off the breadcrumbs, sliding in when added, sliding out when removed
 .list-enter-active,
 .list-leave-active {
@@ -51,5 +47,4 @@ const viewNodesStore = useViewNodesStore();
     opacity: 0;
     transform: translateX(10px);
 }
-
 </style>

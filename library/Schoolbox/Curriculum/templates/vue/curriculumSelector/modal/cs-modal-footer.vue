@@ -1,14 +1,12 @@
 <script setup>
-
 /**
  * To cancel or confirm the current node selection
  */
 
-import { computed } from 'vue';
-import { useModalStore } from '../store/csModalStore';
-import { useSelectedNodesStore } from '../store/csSelectedNodesStore';
-import { useModalSelectedNodesStore } from '../store/csModalSelectedNodesStore';
-
+import { computed } from "vue";
+import { useModalStore } from "../store/csModalStore";
+import { useSelectedNodesStore } from "../store/csSelectedNodesStore";
+import { useModalSelectedNodesStore } from "../store/csModalSelectedNodesStore";
 
 const modalStore = useModalStore();
 const selectedNodesStore = useSelectedNodesStore();
@@ -17,7 +15,7 @@ const modalSelectedNodesStore = useModalSelectedNodesStore();
 /**
  * Close the modal
  */
-function onCancelled () {
+function onCancelled() {
     modalStore.cancel();
 }
 
@@ -25,7 +23,7 @@ function onCancelled () {
  * The selection has been confirmed, so close the modal
  * and insert into the current nodes
  */
-function onSelected () {
+function onSelected() {
     modalStore.select();
 }
 
@@ -35,7 +33,7 @@ function onSelected () {
  *
  * @returns { String }
  */
-const saveText = computed(() => selectedNodesStore.hasNoNodes ? 'Select' : 'Update');
+const saveText = computed(() => (selectedNodesStore.hasNoNodes ? "Select" : "Update"));
 
 /**
  * If there's no nodes currently selected and we haven't selected any
@@ -44,16 +42,17 @@ const saveText = computed(() => selectedNodesStore.hasNoNodes ? 'Select' : 'Upda
  * @returns { String }
  */
 const isSaveDisabled = computed(() => selectedNodesStore.hasNoNodes && modalSelectedNodesStore.hasNoNodes);
-
 </script>
 
 <template>
     <ul class="flex-list buttons">
         <li><button type="button" @click.prevent="onCancelled" class="button" :disabled="false">Cancel</button></li>
-        <li><button type="button" @click.prevent="onSelected" class="button submit" :disabled="isSaveDisabled">{{ saveText }}</button></li>
+        <li>
+            <button type="button" @click.prevent="onSelected" class="button submit" :disabled="isSaveDisabled">
+                {{ saveText }}
+            </button>
+        </li>
     </ul>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

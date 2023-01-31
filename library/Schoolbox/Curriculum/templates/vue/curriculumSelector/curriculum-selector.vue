@@ -1,21 +1,19 @@
 <script setup>
-
 /**
  * To select Curriculum Nodes to assign to something like a Due Work
  */
 
-import { ref, onMounted, nextTick } from 'vue';
-import { ResizeObserver } from 'vue3-resize';
-import 'vue3-resize/dist/vue3-resize.css';
-import { useStore } from './store/curriculumSelectorStore';
-import { useSelectedNodesStore } from './store/csSelectedNodesStore';
-import { getEmptyNode } from '@schoolboxCurriculum/js/nodeUtils';
-import CsSearchInput from './cs-search-input.vue';
-import CsSelectedNodes from './cs-selected-nodes.vue';
-import CsSearchResults from './cs-search-results.vue';
-import CsModal from './modal/cs-modal.vue';
-import SelectedNodeModal from '../selected-node-modal.vue';
-
+import { ref, onMounted, nextTick } from "vue";
+import { ResizeObserver } from "vue3-resize";
+import "vue3-resize/dist/vue3-resize.css";
+import { useStore } from "./store/curriculumSelectorStore";
+import { useSelectedNodesStore } from "./store/csSelectedNodesStore";
+import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
+import CsSearchInput from "./cs-search-input.vue";
+import CsSelectedNodes from "./cs-selected-nodes.vue";
+import CsSearchResults from "./cs-search-results.vue";
+import CsModal from "./modal/cs-modal.vue";
+import SelectedNodeModal from "../selected-node-modal.vue";
 
 const props = defineProps({
     /**
@@ -24,7 +22,7 @@ const props = defineProps({
     dataEndpoint: {
         type: String,
         required: false,
-        default: '',
+        default: "",
     },
     /**
      * the nodes already previously selected
@@ -48,7 +46,7 @@ const props = defineProps({
     formValueName: {
         type: String,
         required: false,
-        default: 'curriculumCodes[]',
+        default: "curriculumCodes[]",
     },
     /**
      * an 'original' selection, saved by the user
@@ -83,7 +81,7 @@ onMounted(() => {
 /**
  * so can respond to dimenion changes if required
  */
-async function checkContainerWidth () {
+async function checkContainerWidth() {
     await nextTick();
     store.updateContainerWidth(curriculumSelectorEl.value.offsetWidth);
 }
@@ -91,29 +89,25 @@ async function checkContainerWidth () {
 /**
  * Any changes to the element size are tracked by ResizeObserver so can update dimensions
  */
-function onContainerResize () {
+function onContainerResize() {
     checkContainerWidth();
 }
 
 /**
  * close the modal, setting the activeNode to null so we can allow another selection
  */
-function onSelectedNodeModalClosed () {
+function onSelectedNodeModalClosed() {
     selectedNodesStore.setActiveNode(getEmptyNode());
 }
-
 </script>
 
 <template>
-   <div ref="curriculumSelectorEl">
+    <div ref="curriculumSelectorEl">
         <cs-selected-nodes />
         <cs-search-input :curriculum-selector-el="curriculumSelectorEl" />
         <cs-search-results />
         <resize-observer @notify="onContainerResize" />
     </div>
     <cs-modal />
-    <selected-node-modal
-        :node="selectedNodesStore.activeNode"
-        @closed="onSelectedNodeModalClosed"
-    />
+    <selected-node-modal :node="selectedNodesStore.activeNode" @closed="onSelectedNodeModalClosed" />
 </template>

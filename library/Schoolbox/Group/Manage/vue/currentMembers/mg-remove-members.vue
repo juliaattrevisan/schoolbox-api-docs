@@ -1,15 +1,13 @@
 <script setup>
-
 /**
  * To be able to remove selected members from the group
  */
 
-import { ref, computed, watch } from 'vue';
-import { useStore } from '../store/manageGroupStore';
-import { useRemoveMembersStore } from '../store/mgRemoveMembersStore';
-import RevealModal from '@schoolboxVue/components/reveal-modal.vue';
-import {useMembersStore} from "../store/mgMembersStore";
-
+import { ref, computed, watch } from "vue";
+import { useStore } from "../store/manageGroupStore";
+import { useRemoveMembersStore } from "../store/mgRemoveMembersStore";
+import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
+import { useMembersStore } from "../store/mgMembersStore";
 
 const store = useStore();
 const removeMembersStore = useRemoveMembersStore();
@@ -19,14 +17,17 @@ const removeModalEl = ref(null);
 /**
  * to open the modal when requested
  */
-watch(() => removeMembersStore.isPromptOpen, (newIsOpen) => {
-    newIsOpen ? removeModalEl.value.open() : removeModalEl.value.close();
-});
+watch(
+    () => removeMembersStore.isPromptOpen,
+    (newIsOpen) => {
+        newIsOpen ? removeModalEl.value.open() : removeModalEl.value.close();
+    }
+);
 
 /**
  * remove the selected members
  */
-function onRemoveSelected () {
+function onRemoveSelected() {
     removeMembersStore.removeSelectedMembers();
 }
 
@@ -35,14 +36,14 @@ function onRemoveSelected () {
  * and update the UI accordingly
  */
 removeMembersStore.$onAction(({ name, after, onError }) => {
-    if (name === 'removeSelectedMembers') {
-        store.toastEl.activate('Removing...');
+    if (name === "removeSelectedMembers") {
+        store.toastEl.activate("Removing...");
         after(() => {
-            store.toastEl.timeout('Members successfully removed', true, 5000);
+            store.toastEl.timeout("Members successfully removed", true, 5000);
         });
         onError((error) => {
             console.warn(error);
-            store.toastEl.timeout('Unable to remove members', false, 5000);
+            store.toastEl.timeout("Unable to remove members", false, 5000);
         });
     }
 });
@@ -53,7 +54,7 @@ removeMembersStore.$onAction(({ name, after, onError }) => {
  *
  * @returns { String }
  */
-const removeButtonText = computed(() => removeMembersStore.isProcessing ? 'Removing...' : 'Yes');
+const removeButtonText = computed(() => (removeMembersStore.isProcessing ? "Removing..." : "Yes"));
 
 /**
  * to prevent the user from moving away from the modal while
@@ -66,7 +67,7 @@ const isCloseModalDisabled = computed(() => removeMembersStore.isProcessing);
 /**
  * to close the modal
  */
-function onCancelSelected () {
+function onCancelSelected() {
     removeMembersStore.cancelRemoveSelectedMembers();
 }
 
@@ -74,10 +75,9 @@ function onCancelSelected () {
  * ensure the isPromptOpen is kept up to date
  * as we can currently also use foundation to close the modal
  */
-function onModalClosed () {
+function onModalClosed() {
     removeMembersStore.cancelRemoveSelectedMembers();
 }
-
 </script>
 
 <template>
@@ -89,23 +89,32 @@ function onModalClosed () {
     >
         <h2>Remove {{ membersStore.selectedMembersPlural }}</h2>
         <p>
-            Are you sure you wish to remove the <b>{{ membersStore.selectedMembersCount }} selected
-            {{ membersStore.selectedMembersPlural }}</b> from the {{ store.name }} group?
+            Are you sure you wish to remove the
+            <b>{{ membersStore.selectedMembersCount }} selected {{ membersStore.selectedMembersPlural }}</b> from the
+            {{ store.name }} group?
         </p>
-        <p v-if="membersStore.selectedGroupAdminCount > 0">
-            <div class="alert-box alert">
-                Warning: You are removing {{ membersStore.selectedGroupAdminCount }} Group
-                {{ membersStore.selectedGroupAdminCount > 1 ? 'Admins' : 'Admin' }}.
-                They will no longer be able to manage the group.
-            </div>
-        </p>
+        <div v-if="membersStore.selectedGroupAdminCount > 0" class="alert-box alert">
+            Warning: You are removing {{ membersStore.selectedGroupAdminCount }} Group
+            {{ membersStore.selectedGroupAdminCount > 1 ? "Admins" : "Admin" }}. They will no longer be able to manage
+            the group.
+        </div>
         <ul class="flex-list buttons">
-            <li><button @click.prevent="onRemoveSelected" class="button submit" :disabled="removeMembersStore.isProcessing">{{ removeButtonText }}</button></li>
-            <li><button @click.prevent="onCancelSelected" class="button" :disabled="removeMembersStore.isProcessing">Cancel</button></li>
+            <li>
+                <button
+                    @click.prevent="onRemoveSelected"
+                    class="button submit"
+                    :disabled="removeMembersStore.isProcessing"
+                >
+                    {{ removeButtonText }}
+                </button>
+            </li>
+            <li>
+                <button @click.prevent="onCancelSelected" class="button" :disabled="removeMembersStore.isProcessing">
+                    Cancel
+                </button>
+            </li>
         </ul>
     </reveal-modal>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

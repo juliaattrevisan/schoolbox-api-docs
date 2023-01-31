@@ -1,12 +1,10 @@
 <script setup lang="ts">
-
 /**
  * To edit an existing node or add a new subsection to a node
  */
 
-import { useAddSubsectionStore } from '../activeNode/store/mcAddSubsectionStore';
-import { useUpdateNodeStore } from '../activeNode/store/mcUpdateNodeStore';
-
+import { useAddSubsectionStore } from "../activeNode/store/mcAddSubsectionStore";
+import { useUpdateNodeStore } from "../activeNode/store/mcUpdateNodeStore";
 
 const props = defineProps({
     /**
@@ -17,11 +15,11 @@ const props = defineProps({
         required: true,
         default() {
             return {
-                id: '0',
-                name: '-',
+                id: "0",
+                name: "-",
                 children: [],
-            }
-        }
+            };
+        },
     },
     /**
      * the already computed node title
@@ -59,22 +57,21 @@ const updateNodeStore = useUpdateNodeStore();
 /**
  * to open up or close the update modal
  */
-function onAddSubsectionToggleSelected () {
+function onAddSubsectionToggleSelected() {
     props.isAdding ? addSubsectionStore.cancel() : addSubsectionStore.prompt(props.node);
 }
 
 /**
  * to open up or close the update modal
  */
-function onUpdateToggleSelected () {
+function onUpdateToggleSelected() {
     props.isUpdating ? updateNodeStore.cancel() : updateNodeStore.prompt(props.node);
 }
-
 </script>
 
 <template>
     <button
-        :class="`button-action-option ${ props.isUpdating ? 'icon-close' : 'icon-modify' }`"
+        :class="`button-action-option ${props.isUpdating ? 'icon-close' : 'icon-modify'}`"
         :title="`Update ${props.title}`"
         :disabled="props.isAdding"
         data-test-update
@@ -84,7 +81,7 @@ function onUpdateToggleSelected () {
         Update {{ props.title }}
     </button>
     <button
-        :class="`button-action-option ${ props.isAdding ? 'icon-close' : 'icon-add' }`"
+        :class="`button-action-option ${props.isAdding ? 'icon-close' : 'icon-add'}`"
         :title="`Add subsection to ${props.title}`"
         :disabled="props.isUpdating"
         data-test-add
@@ -96,8 +93,7 @@ function onUpdateToggleSelected () {
 </template>
 
 <style lang="scss" scoped>
-
-@import './style/mcViewNode';
+@import "./style/mcViewNode";
 
 .button-action-option {
     @extend .button;
@@ -109,5 +105,4 @@ function onUpdateToggleSelected () {
         opacity: 1;
     }
 }
-
 </style>

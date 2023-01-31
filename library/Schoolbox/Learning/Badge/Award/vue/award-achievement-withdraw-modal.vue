@@ -1,11 +1,9 @@
 <script>
-
-import BadgeImage from './../../vue/badge-image';
-import RevealModal from '@schoolboxVue/components/reveal-modal'
-import toastMixin from '@schoolboxVue/components/toast-mixin';
+import BadgeImage from "./../../vue/badge-image";
+import RevealModal from "@schoolboxVue/components/reveal-modal";
+import toastMixin from "@schoolboxVue/components/toast-mixin";
 
 export default {
-
     /**
      * Name.
      * The name of the component that we have here. This name will be used in the container
@@ -19,17 +17,14 @@ export default {
      * manner as a php trait. They must already be imported at the top of the file and will
      * be superpositioned on top of this javascript here, inside export default {}
      */
-    mixins: [
-        toastMixin
-    ],
+    mixins: [toastMixin],
 
     /**
      * Props.
      * Immutable props that were passed to this component, usually via twig, in our setup.
      * These are the hyphen-separated vars which are magically computed into camelcase elsewhere.
      */
-    props: [
-    ],
+    props: [],
 
     /**
      * Components.
@@ -38,7 +33,7 @@ export default {
      */
     components: {
         BadgeImage,
-        RevealModal
+        RevealModal,
     },
 
     /**
@@ -49,8 +44,8 @@ export default {
      */
     data() {
         return {
-            award: {}
-        }
+            award: {},
+        };
     },
 
     /**
@@ -58,15 +53,13 @@ export default {
      * Basically, when vue has done all its inits and is ready to go
      * kind of like window.onload
      */
-    mounted: function () {
-    },
+    mounted: function () {},
 
     /**
      * Computed properties.
      * Access the results of a function as if they were a property of an object.
      */
-    computed: {
-    },
+    computed: {},
 
     /**
      * Methods.
@@ -74,7 +67,6 @@ export default {
      * other ordinary javascript that you might have written before.
      */
     methods: {
-
         /**
          * Open this modal.
          */
@@ -84,7 +76,6 @@ export default {
             this.$refs.modal.open();
         },
 
-
         /**
          * Close this modal
          */
@@ -92,26 +83,24 @@ export default {
             this.$refs.modal.close();
         },
 
-
         /**
          * Perform withdrawal
          */
         async withdraw() {
-
-            this.toastActivate('Withdrawing achievement...');
+            this.toastActivate("Withdrawing achievement...");
             try {
                 const response = await fetch(this.award._links.achievementWithdraw, {
-                    method: 'POST',
+                    method: "POST",
                     body: this.getFormData(this.award.recipient.id),
                 });
-                
+
                 /* This is to prevent 'Fetch failed loading' in the console, as nothing is returned and Fetch currently doesn't like that
                  */
-                await response.text(); 
+                await response.text();
 
                 /* Send bat signal to the parent component
                  */
-                this.$emit('withdraw-complete');
+                this.$emit("withdraw-complete");
 
                 /* Close this modal
                  */
@@ -119,42 +108,44 @@ export default {
 
                 /* Pop toast
                  */
-                this.toastSuccess('Withdraw complete');
+                this.toastSuccess("Withdraw complete");
             } catch (error) {
                 if (error.response) {
                     if (400 === error.response.status) {
                         /* Goal prevents achievement from being withdrawn
                          */
-                        self.toastError('Unable to withdraw achievement; a goal might exist and should be withdrawn first.');
+                        self.toastError(
+                            "Unable to withdraw achievement; a goal might exist and should be withdrawn first."
+                        );
                     } else {
                         /* Generic error
                          */
-                        self.toastError('Unable to withdraw achievement; please try again.');
+                        self.toastError("Unable to withdraw achievement; please try again.");
                     }
                 }
                 console.warn(error);
             } finally {
                 this.loading = false;
             }
-
         },
 
         /**
          * Put in the award id to withdraw
          */
-        getFormData (userId) {
+        getFormData(userId) {
             const formData = new FormData();
-            formData.append('userIds[0]', userId);
+            formData.append("userIds[0]", userId);
             return formData;
         },
-
-    }
-}
+    },
+};
 </script>
 <template>
     <reveal-modal ref="modal">
         <template v-if="award.badge">
-            <h2>Withdraw <strong>'{{ award.badge.name }}'</strong></h2>
+            <h2>
+                Withdraw <strong>'{{ award.badge.name }}'</strong>
+            </h2>
 
             <div class="compact card small-12 badge-card">
                 <div>

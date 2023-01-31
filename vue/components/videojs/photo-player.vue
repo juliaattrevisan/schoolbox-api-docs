@@ -1,42 +1,40 @@
 <script>
-
 /*
  * To show an image that's beeen generated from videojs-record
  *
  */
 
-import { gsap } from 'gsap/all';
-
+import { gsap } from "gsap/all";
 
 export default {
-
     props: {
-        imgSrc: { //will pass through a dataURL
+        imgSrc: {
+            //will pass through a dataURL
             type: String,
             required: true,
-            default: ''
+            default: "",
         },
-        isNewPhoto: { //to animate on
+        isNewPhoto: {
+            //to animate on
             type: Boolean,
             required: true,
-            default: false
+            default: false,
         },
     },
 
-    mounted () {
+    mounted() {
         this.displayPhoto();
     },
 
     methods: {
-
         /**
          * Determine whether to show flash, or just display
          *
          */
-        displayPhoto () {
+        displayPhoto() {
             this.$nextTick(() => {
                 if (this.isNewPhoto) {
-                    gsap.to(this.$refs.imgForeground, 0.5, { opacity: 0 } ); //say cheese! *FLASH*
+                    gsap.to(this.$refs.imgForeground, 0.5, { opacity: 0 }); //say cheese! *FLASH*
                 } else {
                     this.$refs.imgForeground.style.opacity = 0;
                 }
@@ -47,35 +45,32 @@ export default {
          * The image is loaded, so dispatch size to anyone listening
          *
          */
-        onImgLoad () {
-            this.$emit('on-dimensions-ready', this.$refs.img.width, this.$refs.img.height);
-        }
-
-    }
-
-}
+        onImgLoad() {
+            this.$emit("on-dimensions-ready", this.$refs.img.width, this.$refs.img.height);
+        },
+    },
+};
 </script>
 
 <template>
     <div>
-        <img ref="img" :src="imgSrc" @load="onImgLoad">
-        <div class="img-foreground" ref='imgForeground'></div>
+        <img ref="img" :src="imgSrc" @load="onImgLoad" />
+        <div class="img-foreground" ref="imgForeground"></div>
     </div>
 </template>
 
 <style lang="scss" scoped>
-
 img {
     position: absolute;
     width: 100%;
     height: auto;
 }
 
-.img-foreground { //the white background to hide to animate 'photo taken' 
+.img-foreground {
+    //the white background to hide to animate 'photo taken'
     position: absolute;
     width: 100%;
     height: 100%;
     background: white;
 }
-
 </style>

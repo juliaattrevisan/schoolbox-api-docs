@@ -1,5 +1,4 @@
 <script setup>
-
 /**
  * An individual class search result that matches the search query with search result
  * highlighted within. Selecting will add the class to the list
@@ -7,18 +6,19 @@
  * results currently shown
  */
 
-import { computed } from 'vue';
+import { computed } from "vue";
 
-
-const emit = defineEmits(['select-all']);
+const emit = defineEmits(["select-all"]);
 
 const props = defineProps({
-    isAllResultsSelected: { //to determine the behaviour of the 'Select all classes' button
+    isAllResultsSelected: {
+        //to determine the behaviour of the 'Select all classes' button
         type: Boolean,
         required: true,
         default: false,
     },
-    isSomeResultsSelected: { //to add the 'indeterminate' class to the select all checkbox
+    isSomeResultsSelected: {
+        //to add the 'indeterminate' class to the select all checkbox
         type: Boolean,
         required: true,
         default: false,
@@ -28,7 +28,7 @@ const props = defineProps({
 /**
  * To determine the check display of the checkbox
  *
- * @returns { Boolean } 
+ * @returns { Boolean }
  */
 const isChecked = computed(() => {
     return props.isAllResultsSelected ? true : false;
@@ -37,23 +37,19 @@ const isChecked = computed(() => {
 /**
  * dispatch to parent so can move to relevant settings page
  */
-function onSelectAll () {
-    emit('select-all');
+function onSelectAll() {
+    emit("select-all");
 }
-
 </script>
 
 <template>
-    <button class="search-result"
-        @click.prevent="onSelectAll"
-        @keyup.enter="onSelectAll"
-    >
+    <button class="search-result" @click.prevent="onSelectAll" @keyup.enter="onSelectAll">
         <div class="checklist">
-            <input 
+            <input
                 id="checkbox-select-all"
                 type="checkbox"
                 :checked="isChecked"
-                :class="{ 'indeterminate': isSomeResultsSelected }"
+                :class="{ indeterminate: isSomeResultsSelected }"
             />
             <label for="checkbox-select-all"></label>
         </div>
@@ -78,8 +74,7 @@ function onSelectAll () {
 .search-result-active {
     background: var(--content-ui-hover);
 }
-input[type=checkbox]:not(.plain) + label {
+input[type="checkbox"]:not(.plain) + label {
     margin: 0;
 }
-
 </style>

@@ -1,11 +1,8 @@
 <script>
-
-import filesize from 'filesize';
-import footerUI from '@schoolboxVue/components/vueTables2/mixinFooterUI';
-
+import filesize from "filesize";
+import footerUI from "@schoolboxVue/components/vueTables2/mixinFooterUI";
 
 export default {
-
     /**
      * Name.
      * The name of the component that we have here. This name will be used in the container
@@ -20,7 +17,7 @@ export default {
      * be superpositioned on top of this javascript here, inside export default {}
      */
     mixins: [
-        footerUI //to place and keep the tables UI in the footer
+        footerUI, //to place and keep the tables UI in the footer
     ],
 
     /**
@@ -30,9 +27,9 @@ export default {
      */
     props: {
         endpoint: {
-           type: String,
-           required: true
-        }
+            type: String,
+            required: true,
+        },
     },
 
     /**
@@ -40,8 +37,7 @@ export default {
      * Any other vue components you also want to use here; they must already be imported
      * at the top of the file.
      */
-    components: {
-    },
+    components: {},
 
     /**
      * Data.
@@ -51,7 +47,6 @@ export default {
      */
     data() {
         return {
-
             /* True, when data is currently loading; used to show skeleton
              */
             loading: true,
@@ -62,20 +57,20 @@ export default {
 
             /* Table columns
              */
-            columns: [ 'firstname', 'lastname', 'role', 'size' ],
+            columns: ["firstname", "lastname", "role", "size"],
 
             /* v-tables-3 options, see https://matanya.gitbook.io/vue-tables-2/options-api
              */
             options: {
                 headings: {
-                    firstname: 'Firstname',
-                    lastname: 'Lastname',
-                    role: 'Role',
-                    size: 'Filesize',
+                    firstname: "Firstname",
+                    lastname: "Lastname",
+                    role: "Role",
+                    size: "Filesize",
                 },
                 orderBy: {
                     ascending: true,
-                    column: 'lastname'
+                    column: "lastname",
                 },
                 perPage: 50,
                 perPageValues: [50, 100, 200],
@@ -83,29 +78,30 @@ export default {
                 resizableColumns: false,
                 tabbable: false,
                 texts: {
-                    filterPlaceholder: 'Search for users...',
-                    noResults: 'No matching users...',
-                    count: '{from}-{to} of {count}',
-                    limit: 'Rows per page:'
+                    filterPlaceholder: "Search for users...",
+                    noResults: "No matching users...",
+                    count: "{from}-{to} of {count}",
+                    limit: "Rows per page:",
                 },
                 sortIcon: {
-                    is: 'glyphicon-sort',
-                    base: 'glyphicon',
-                    up: 'glyphicon-chevron-up',
-                    down: 'glyphicon-chevron-down'
+                    is: "glyphicon-sort",
+                    base: "glyphicon",
+                    up: "glyphicon-chevron-up",
+                    down: "glyphicon-chevron-down",
                 },
                 customSorting: {
-                    size: (ascending) => { //ensure filesize is sorted numerically
+                    size: (ascending) => {
+                        //ensure filesize is sorted numerically
                         return (a, b) => {
                             if (ascending) {
                                 return parseInt(a.size) >= parseInt(b.size) ? 1 : -1;
                             }
                             return parseInt(a.size) <= parseInt(b.size) ? 1 : -1;
-                        }
-                    }
-                }
+                        };
+                    },
+                },
             },
-        }
+        };
     },
 
     /**
@@ -113,7 +109,7 @@ export default {
      * Basically, when vue has done all its inits and is ready to go
      * kind of like window.onload
      */
-    mounted () {
+    mounted() {
         this.loadRows();
     },
 
@@ -121,8 +117,7 @@ export default {
      * Computed properties.
      * Access the results of a function as if they were a property of an object.
      */
-    computed: {
-    },
+    computed: {},
 
     /**
      * Methods.
@@ -130,7 +125,6 @@ export default {
      * other ordinary javascript that you might have written before.
      */
     methods: {
-
         lastGen() {
             return dayjs.unix(this.allData.time).fromNow();
         },
@@ -139,7 +133,7 @@ export default {
          * Fetch payload asynchronously
          *
          */
-        async loadRows () {
+        async loadRows() {
             this.loading = true;
             try {
                 const response = await fetch(this.endpoint);
@@ -155,7 +149,7 @@ export default {
          * To update the table to show the UI in the footer
          *
          */
-        onLoaded () {
+        onLoaded() {
             this.$nextTick(() => this.footerUI_update());
         },
 
@@ -166,51 +160,49 @@ export default {
          *
          * @returns { String } - 204.5 MB
          */
-        getHumanReadableFilesize (value) {
+        getHumanReadableFilesize(value) {
             return filesize(value);
-        }
-
-    }
-}
+        },
+    },
+};
 </script>
 <template>
     <div>
         <template v-if="this.loading">
             <table class="skeleton">
                 <thead>
-                <tr>
-                    <th></th>
-                </tr>
+                    <tr>
+                        <th></th>
+                    </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td></td>
-                </tr>
+                    <tr>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                    </tr>
                 </tbody>
             </table>
         </template>
         <template v-else>
-            <v-client-table
-                :data="allData.data"
-                :columns="columns"
-                :options="options"
-                @loaded="onLoaded"
-            >
+            <v-client-table :data="allData.data" :columns="columns" :options="options" @loaded="onLoaded">
                 <template #firstname="props">
-                    <a :href="`/adminv2/usage/specific/${props.row.userId}`" :title="props.row.fullname">{{ props.row.firstname }}</a>
+                    <a :href="`/adminv2/usage/specific/${props.row.userId}`" :title="props.row.fullname">{{
+                        props.row.firstname
+                    }}</a>
                 </template>
                 <template #lastname="props">
-                    <a :href="`/adminv2/usage/specific/${props.row.userId}`" :title="props.row.fullname">{{ props.row.lastname }}</a>
+                    <a :href="`/adminv2/usage/specific/${props.row.userId}`" :title="props.row.fullname">{{
+                        props.row.lastname
+                    }}</a>
                 </template>
                 <template #size="props">
                     {{ getHumanReadableFilesize(props.row.size) }}
                 </template>
                 <template #afterTable>
                     <div class="VueTables__table-footer" ref="tableFooter"></div>
-                    <div class="meta"> ^ Last Generated: {{ lastGen() }}</div>
+                    <div class="meta">^ Last Generated: {{ lastGen() }}</div>
                 </template>
             </v-client-table>
         </template>
@@ -218,7 +210,5 @@ export default {
 </template>
 
 <style lang="scss">
-
-@import '@schoolboxVue/components/vueTables2/vueTables2';
-
+@import "@schoolboxVue/components/vueTables2/vueTables2";
 </style>

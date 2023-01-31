@@ -1,17 +1,15 @@
 <script setup lang="ts">
-
 /**
  * The filtered results from using the <selects> or search <input>
  * From here curriclum codes can be selected for further travesal or editing
  */
 
-import { ref, watch } from 'vue';
-import { useNodesStore } from '../store/mcNodesStore';
-import { useViewNodesStore } from './store/mcViewNodesStore';
-import { useSearchStore } from '../store/mcSearchStore';
-import LoadingTable from '@schoolboxVue/components/loading/loading-table.vue';
-import McViewNode from './mc-view-node.vue'
-
+import { ref, watch } from "vue";
+import { useNodesStore } from "../store/mcNodesStore";
+import { useViewNodesStore } from "./store/mcViewNodesStore";
+import { useSearchStore } from "../store/mcSearchStore";
+import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
+import McViewNode from "./mc-view-node.vue";
 
 const nodesStore = useNodesStore();
 const viewNodesStore = useViewNodesStore();
@@ -22,7 +20,7 @@ const nodesContainerEl = ref<HTMLDivElement | null>(null); //to scroll back to t
 /**
  * Clear the current search query
  */
-function onClearSearchSelected () {
+function onClearSearchSelected() {
     searchStore.clear();
 }
 
@@ -30,12 +28,15 @@ function onClearSearchSelected () {
  * to scroll back to top on any selection change, otherwise the
  * scroll may be at the bottom on change, which is a bit odd
  */
-watch(() => viewNodesStore.nodesWithSearch, () => {
-    if (nodesContainerEl.value) { //may not always exists in the dom
-        nodesContainerEl.value.scrollTop = 0;
+watch(
+    () => viewNodesStore.nodesWithSearch,
+    () => {
+        if (nodesContainerEl.value) {
+            //may not always exists in the dom
+            nodesContainerEl.value.scrollTop = 0;
+        }
     }
-});
-
+);
 </script>
 
 <template>
@@ -68,10 +69,8 @@ watch(() => viewNodesStore.nodesWithSearch, () => {
 </template>
 
 <style lang="scss" scoped>
-
 ul {
     list-style: none;
     margin: 0 0 1rem 0;
 }
-
 </style>

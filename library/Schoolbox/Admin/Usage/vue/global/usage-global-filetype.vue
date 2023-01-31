@@ -2,7 +2,6 @@
 import UsageBarchart from "../barchart";
 
 export default {
-
     /**
      * Name.
      * The name of the component that we have here. This name will be used in the container
@@ -23,10 +22,7 @@ export default {
      * Immutable props that were passed to this component, usually via twig, in our setup.
      * These are the hyphen-separated vars which are magically computed into camelcase elsewhere.
      */
-    props: [
-       'endpoint',
-       'isS3Adapter'
-    ],
+    props: ["endpoint", "isS3Adapter"],
 
     /**
      * Components.
@@ -34,7 +30,7 @@ export default {
      * at the top of the file.
      */
     components: {
-        UsageBarchart
+        UsageBarchart,
     },
 
     /**
@@ -44,8 +40,7 @@ export default {
      * the meaning of "this" in a way you don't expect.
      */
     data() {
-        return {
-        }
+        return {};
     },
 
     /**
@@ -53,27 +48,29 @@ export default {
      * Basically, when vue has done all its inits and is ready to go
      * kind of like window.onload
      */
-    mounted: function () {
-    },
+    mounted: function () {},
 
     /**
      * Computed properties.
      * Access the results of a function as if they were a property of an object.
      */
-    computed: {
-    },
+    computed: {},
 
     /**
      * Methods.
      * Arbitrary javascript functions which operate on the args provided, just like any
      * other ordinary javascript that you might have written before.
      */
-    methods: {
-    }
-}
+    methods: {},
+};
 </script>
 <template>
     <div>
-        <usage-barchart :endpoint="endpoint" :is-s3-adapter="isS3Adapter" :title="'Type Usage'" :y-axis-title="'Bytes'"/>
+        <usage-barchart
+            :endpoint="endpoint"
+            :is-s3-adapter="isS3Adapter"
+            :title="'Type Usage'"
+            :y-axis-title="'Bytes'"
+        />
     </div>
 </template>

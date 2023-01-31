@@ -1,29 +1,24 @@
 <script>
-
 import RevealModal from "@schoolboxVue/components/reveal-modal";
-import BadgeImage from '../../vue/badge-image';
-import BadgeList from '../../vue/badge-list';
-import toastMixin from '@schoolboxVue/components/toast-mixin';
-import HorizontalScoller from '@schoolboxVue/components/scroll/horizontal-scoller';
-import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer';
-import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin';
-import { generateAwardWithEvidenceUrl } from '../js/awardBadgeUtils';
+import BadgeImage from "../../vue/badge-image";
+import BadgeList from "../../vue/badge-list";
+import toastMixin from "@schoolboxVue/components/toast-mixin";
+import HorizontalScoller from "@schoolboxVue/components/scroll/horizontal-scoller";
+import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer";
+import cdnPrefixMixin from "@schoolboxVue/components/cdn-prefix-mixin";
+import { generateAwardWithEvidenceUrl } from "../js/awardBadgeUtils";
 
 /**
  * Form for awarding badges to users, by selecting them from a list of badges.
  */
 export default {
-
     /**
      * Mixins.
      * Basically traits for vue; allows you to share javascript between components in the same
      * manner as a php trait. They must already be imported at the top of the file and will
      * be superpositioned on top of this javascript here, inside export default {}
      */
-    mixins: [
-        cdnPrefixMixin,
-        toastMixin
-    ],
+    mixins: [cdnPrefixMixin, toastMixin],
 
     components: {
         BadgeList,
@@ -46,7 +41,7 @@ export default {
          */
         getBadgeCreateFormRoute: {
             type: String,
-            default: '',
+            default: "",
             required: true,
         },
 
@@ -93,7 +88,7 @@ export default {
          */
         returnUrl: {
             type: String,
-            default: '/',
+            default: "/",
         },
 
         /**
@@ -101,7 +96,7 @@ export default {
          */
         toastActivateMessageSingular: {
             type: String,
-            default: 'Awarding achievement...',
+            default: "Awarding achievement...",
         },
 
         /**
@@ -109,7 +104,7 @@ export default {
          */
         toastSuccessMessageSingular: {
             type: String,
-            default: 'Awarded achievement',
+            default: "Awarded achievement",
         },
 
         /**
@@ -117,7 +112,7 @@ export default {
          */
         toastFailureMessageSingular: {
             type: String,
-            default: 'Awarding achievement failed',
+            default: "Awarding achievement failed",
         },
 
         /**
@@ -125,7 +120,7 @@ export default {
          */
         confirmModalHeaderSingular: {
             type: String,
-            default: 'Confirm achievement',
+            default: "Confirm achievement",
         },
 
         /**
@@ -133,7 +128,7 @@ export default {
          */
         confirmModalBadgeListMetaSingular: {
             type: String,
-            default: 'Awarding the following achievement:',
+            default: "Awarding the following achievement:",
         },
 
         /**
@@ -141,7 +136,7 @@ export default {
          */
         confirmModalUserListMetaSingular: {
             type: String,
-            default: 'To the following user:',
+            default: "To the following user:",
         },
 
         /**
@@ -149,7 +144,7 @@ export default {
          */
         confirmButtonTextSingular: {
             type: String,
-            default: 'Award selected achievement',
+            default: "Award selected achievement",
         },
 
         /**
@@ -157,7 +152,7 @@ export default {
          */
         toastActivateMessagePlural: {
             type: String,
-            default: 'Awarding achievements...',
+            default: "Awarding achievements...",
         },
 
         /**
@@ -165,7 +160,7 @@ export default {
          */
         toastSuccessMessagePlural: {
             type: String,
-            default: 'Awarded achievements',
+            default: "Awarded achievements",
         },
 
         /**
@@ -173,7 +168,7 @@ export default {
          */
         toastFailureMessagePlural: {
             type: String,
-            default: 'Awarding achievements failed',
+            default: "Awarding achievements failed",
         },
 
         /**
@@ -181,7 +176,7 @@ export default {
          */
         confirmModalHeaderPlural: {
             type: String,
-            default: 'Confirm achievements',
+            default: "Confirm achievements",
         },
 
         /**
@@ -189,7 +184,7 @@ export default {
          */
         confirmModalBadgeListMetaPlural: {
             type: String,
-            default: 'Awarding the following achievements:',
+            default: "Awarding the following achievements:",
         },
 
         /**
@@ -197,7 +192,7 @@ export default {
          */
         confirmModalUserListMetaPlural: {
             type: String,
-            default: 'To the following users:',
+            default: "To the following users:",
         },
 
         /**
@@ -205,7 +200,7 @@ export default {
          */
         confirmButtonTextPlural: {
             type: String,
-            default: 'Award selected achievements',
+            default: "Award selected achievements",
         },
 
         /* Either "goal" or "achievement" depending on the context of this badge
@@ -217,16 +212,16 @@ export default {
         /* Used to spawn ckeditor files from cdn somewhere
          */
         siteVersion: {
-            type: String
-        }
+            type: String,
+        },
     },
     data() {
         return {
             selectedBadges: [],
-            badgeListChangeEvent: 'EVENT_CHANGE',
+            badgeListChangeEvent: "EVENT_CHANGE",
             hasContentChange: false, //to track badge addition changes
             isProcessing: false, //to disable buttons while form is processing
-        }
+        };
     },
     computed: {
         window: () => window,
@@ -238,19 +233,13 @@ export default {
                 : this.toastActivateMessagePlural;
         },
         toastSuccessMessage() {
-            return this.selectedBadges.length === 1
-                ? this.toastSuccessMessageSingular
-                : this.toastSuccessMessagePlural;
+            return this.selectedBadges.length === 1 ? this.toastSuccessMessageSingular : this.toastSuccessMessagePlural;
         },
         toastFailureMessage() {
-            return this.selectedBadges.length === 1
-                ? this.toastFailureMessageSingular
-                : this.toastFailureMessagePlural;
+            return this.selectedBadges.length === 1 ? this.toastFailureMessageSingular : this.toastFailureMessagePlural;
         },
         confirmModalHeader() {
-            return this.selectedBadges.length === 1
-                ? this.confirmModalHeaderSingular
-                : this.confirmModalHeaderPlural;
+            return this.selectedBadges.length === 1 ? this.confirmModalHeaderSingular : this.confirmModalHeaderPlural;
         },
         confirmModalBadgeListMeta() {
             return this.selectedBadges.length === 1
@@ -263,57 +252,59 @@ export default {
                 : this.confirmModalUserListMetaPlural;
         },
         confirmButtonText() {
-            return this.selectedBadges.length === 1
-                ? this.confirmButtonTextSingular
-                : this.confirmButtonTextPlural;
+            return this.selectedBadges.length === 1 ? this.confirmButtonTextSingular : this.confirmButtonTextPlural;
         },
-        selectedBadgeCount () {
+        selectedBadgeCount() {
             return this.selectedBadges.length;
         },
-        selectedBadgeText () {
+        selectedBadgeText() {
             if (this.selectedBadgeCount > 0) {
-                const plural = this.selectedBadgeCount > 1 ? 's' : '';
-                const typeSelected = this.confirmButtonText.includes('goal') ? `goal${plural} selected` : `achievement${plural} selected`;
+                const plural = this.selectedBadgeCount > 1 ? "s" : "";
+                const typeSelected = this.confirmButtonText.includes("goal")
+                    ? `goal${plural} selected`
+                    : `achievement${plural} selected`;
                 return `${this.selectedBadgeCount} ${typeSelected}`;
             } else {
-                return '';
+                return "";
             }
         },
-        submitButtonText () { //change button text depending on whether an award or goal
-            return this.type === 'achievement' ? 'Award' : 'Set Goal';
+        submitButtonText() {
+            //change button text depending on whether an award or goal
+            return this.type === "achievement" ? "Award" : "Set Goal";
         },
-        selectedUserIds () { //return a string of comma separated user ids
+        selectedUserIds() {
+            //return a string of comma separated user ids
             const userIdList = this.users.map((user) => user.id);
-            return userIdList.join(',');
+            return userIdList.join(",");
         },
-        selectedBadgeIds () { //return a string of comma separated badge ids
+        selectedBadgeIds() {
+            //return a string of comma separated badge ids
             const badgeIdList = this.selectedBadges.map((badge) => badge.id);
-            return badgeIdList.join(',');
+            return badgeIdList.join(",");
         },
     },
     watch: {
-
         /**
          * We need to wait for the transition animation to complete before we re-evaluate
          * the status of horizontal-scroller.
          * @TODO - consider using ResizeObserver once Safari 15 is released, as
          * this could be handled much better by the feature
          */
-        selectedBadges (newSelectedBadges, oldSelectedBadges) {
-            if (newSelectedBadges.length !== oldSelectedBadges.length) { //if the number of badges has changed
-                setTimeout(() => { //notify horizontal-scroller.vue once enought time to allow the animation to complete has passed
+        selectedBadges(newSelectedBadges, oldSelectedBadges) {
+            if (newSelectedBadges.length !== oldSelectedBadges.length) {
+                //if the number of badges has changed
+                setTimeout(() => {
+                    //notify horizontal-scroller.vue once enought time to allow the animation to complete has passed
                     this.hasContentChange = true;
-                    this.$nextTick(() => this.hasContentChange = false); //set back to false for another possibile filtration
+                    this.$nextTick(() => (this.hasContentChange = false)); //set back to false for another possibile filtration
                 }, 400);
             }
-        }
-
+        },
     },
-    mounted () {
-        document.addEventListener('badge-list-form__onFilterChange', this.onFilterChange);
+    mounted() {
+        document.addEventListener("badge-list-form__onFilterChange", this.onFilterChange);
     },
     methods: {
-
         /**
          * Callback for when the filters for the badge list form are updated:
          * passed directly to the badge list.
@@ -332,7 +323,7 @@ export default {
          * @params { Object }
          * @params { Boolean }
          */
-        onBadgeSelected (badge, isChecked) {
+        onBadgeSelected(badge, isChecked) {
             if (isChecked) {
                 this.selectedBadges = [badge, ...this.selectedBadges]; //add in
             } else {
@@ -343,14 +334,14 @@ export default {
         /**
          * Clear the current badge selection
          */
-        onClearSelectedBadges () {
+        onClearSelectedBadges() {
             this.selectedBadges = [];
         },
 
         /**
          * Open the award modal to confirm and submit the goals/awards
          */
-        onConfirmSelected () {
+        onConfirmSelected() {
             this.isModalOpen = true;
             this.$refs.awardModal.open();
         },
@@ -358,14 +349,14 @@ export default {
         /**
          * close the modal
          */
-        onCancelSelected () {
+        onCancelSelected() {
             this.$refs.awardModal.close();
         },
 
         /**
          * The modal is now completely closed so reset
          */
-        onModalClosed () {
+        onModalClosed() {
             this.isModalOpen = false;
         },
 
@@ -378,21 +369,21 @@ export default {
             this.toastActivate(this.toastActivateMessage);
             this.isProcessing = true;
 
-            Promise
-                .all(this.selectedBadges.map((badge) => {
-
+            Promise.all(
+                this.selectedBadges.map((badge) => {
                     /* Construct each payload for each badge uniquely
                      */
                     const payload = this.awardToSelfOnly ? null : { users: this.users };
 
                     fetch(badge._links[this.postAwardRouteLookup], {
-                        method: 'POST',
+                        method: "POST",
                         headers: {
-                            'Content-Type': 'application/json',
+                            "Content-Type": "application/json",
                         },
                         body: JSON.stringify(payload),
                     });
-                }))
+                })
+            )
                 .then(() => {
                     this.toastSuccess(this.toastSuccessMessage);
                     this.$refs.awardModal.close();
@@ -410,12 +401,11 @@ export default {
          *
          * @return {String}
          */
-        getEvidenceUrl () {
+        getEvidenceUrl() {
             return generateAwardWithEvidenceUrl(this.selectedUserIds, this.selectedBadgeIds);
         },
-
     },
-}
+};
 </script>
 
 <template>
@@ -438,13 +428,11 @@ export default {
 
         <bottom-drawer :showDrawer="selectedBadges.length > 0">
             <div class="selected-container">
-                <h3 class="selected-container__count"><em>{{ selectedBadgeText }}</em></h3>
+                <h3 class="selected-container__count">
+                    <em>{{ selectedBadgeText }}</em>
+                </h3>
                 <div class="selected-container__badges">
-                    <horizontal-scoller
-                        :hasButtons="false"
-                        :height="36"
-                        :has-content-change="hasContentChange"
-                    >
+                    <horizontal-scoller :hasButtons="false" :height="36" :has-content-change="hasContentChange">
                         <transition-group name="selected-badges" class="selected-badges" tag="div">
                             <span v-for="badge in selectedBadges" :key="badge.id" class="selected-badges__item">
                                 <badge-image :badge="badge" class="selected-badge-image"></badge-image>
@@ -455,10 +443,18 @@ export default {
             </div>
             <ul class="flex-list buttons">
                 <li>
-                    <button @click.prevent="onClearSelectedBadges" @keyup.enter="onClearSelectedBadges" class="button-clear">Clear selection</button>
+                    <button
+                        @click.prevent="onClearSelectedBadges"
+                        @keyup.enter="onClearSelectedBadges"
+                        class="button-clear"
+                    >
+                        Clear selection
+                    </button>
                 </li>
                 <li>
-                    <button @click.prevent="onConfirmSelected" @keyup.enter="onConfirmSelected" class="submit">{{ confirmButtonText }}</button>
+                    <button @click.prevent="onConfirmSelected" @keyup.enter="onConfirmSelected" class="submit">
+                        {{ confirmButtonText }}
+                    </button>
                 </li>
             </ul>
         </bottom-drawer>
@@ -483,7 +479,7 @@ export default {
                     <li v-for="(user, index) in users" :key="index">
                         <div class="card small-12 compact">
                             <div>
-                                <img :src="user._links.avatar" :alt="user.fullName">
+                                <img :src="user._links.avatar" :alt="user.fullName" />
                                 <p>{{ user.fullName }}</p>
                             </div>
                         </div>
@@ -515,7 +511,6 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-
 .badge-list-form {
     padding-bottom: 100px; // allow space for bottom-drawer at the bottom
 }
@@ -552,5 +547,4 @@ export default {
 .selected-badges-leave-active {
     position: absolute;
 }
-
 </style>

@@ -1,15 +1,13 @@
 <script setup lang="ts">
-
 /**
  * to be able to update a nodes name, code and description
  */
 
-import { computed, watch } from 'vue';
-import { useStore } from '../store/manageCurriculumStore';
-import { useActiveNodeStore } from './store/mcActiveNodeStore';
-import { useUpdateNodeStore } from './store/mcUpdateNodeStore';
-import { useDescriptionEditor } from '../composable/useDescriptionEditor';
-
+import { computed, watch } from "vue";
+import { useStore } from "../store/manageCurriculumStore";
+import { useActiveNodeStore } from "./store/mcActiveNodeStore";
+import { useUpdateNodeStore } from "./store/mcUpdateNodeStore";
+import { useDescriptionEditor } from "../composable/useDescriptionEditor";
 
 const props = defineProps({
     /**
@@ -24,7 +22,6 @@ const props = defineProps({
 const store = useStore();
 const activeNodeStore = useActiveNodeStore();
 const updateNodeStore = useUpdateNodeStore();
-
 
 /**
  * to gradually and more marginLeft to indicate node level depth
@@ -58,12 +55,12 @@ watch(descriptionField, (newValue) => {
  *
  * @returns { String }
  */
-const updateButtonText = computed(() => updateNodeStore.isProcessing ? 'Updating...' : 'Update');
+const updateButtonText = computed(() => (updateNodeStore.isProcessing ? "Updating..." : "Update"));
 
 /**
  * submit save
  */
-function onUpdateSelected () {
+function onUpdateSelected() {
     updateNodeStore.update();
 }
 
@@ -71,14 +68,14 @@ function onUpdateSelected () {
  * to display the toast on subsection added / failed
  */
 updateNodeStore.$onAction(({ name, after, onError }) => {
-    if (name === 'update') {
-        store.toastEl.value.activate('Updating...');
+    if (name === "update") {
+        store.toastEl.value.activate("Updating...");
         after((result) => {
             store.toastEl.value.timeout(result.message, true, 5000);
         });
         onError((error) => {
             console.warn(error);
-            store.toastEl.value.timeout('Unable to update node', false, 5000);
+            store.toastEl.value.timeout("Unable to update node", false, 5000);
         });
     }
 });
@@ -86,7 +83,7 @@ updateNodeStore.$onAction(({ name, after, onError }) => {
 /**
  * close the update view
  */
-function onCancelSelected () {
+function onCancelSelected() {
     updateNodeStore.cancel();
 }
 
@@ -98,7 +95,6 @@ function onCancelSelected () {
 const isUpdateDisabled = computed(() => {
     return updateNodeStore.activeNodeCopy.name.trim().length === 0 || updateNodeStore.isProcessing;
 });
-
 </script>
 
 <template>
@@ -108,11 +104,17 @@ const isUpdateDisabled = computed(() => {
                 <legend>Update</legend>
                 <div class="small-12 columns">
                     <label for="name" class="required">Name</label>
-                    <input type="text" id="name" v-model="updateNodeStore.activeNodeCopy.name" maxlength="2048" required>
+                    <input
+                        type="text"
+                        id="name"
+                        v-model="updateNodeStore.activeNodeCopy.name"
+                        maxlength="2048"
+                        required
+                    />
                 </div>
                 <div class="small-12 columns">
                     <label for="code">Code</label>
-                    <input type="text" id="code" v-model="updateNodeStore.activeNodeCopy.code" maxlength="64">
+                    <input type="text" id="code" v-model="updateNodeStore.activeNodeCopy.code" maxlength="64" />
                 </div>
                 <div class="small-12 columns">
                     <label for="description">Description</label>
@@ -149,7 +151,6 @@ const isUpdateDisabled = computed(() => {
 </template>
 
 <style lang="scss" scoped>
-
 .node-container {
     border-bottom: 1px solid var(--content-ui-background);
     border-top: 1px solid var(--content-ui-background);
@@ -162,5 +163,4 @@ legend {
     font-size: 1rem;
     margin-bottom: 1rem;
 }
-
 </style>

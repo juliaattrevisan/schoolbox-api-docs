@@ -1,6 +1,5 @@
 <script>
 export default {
-
     /**
      * Name.
      * The name of the component that we have here. This name will be used in the container
@@ -24,12 +23,12 @@ export default {
     props: {
         badge: {
             default: null,
-            type: Object
+            type: Object,
         },
         css: {
-            default: '',
-            type: String
-        }
+            default: "",
+            type: String,
+        },
     },
 
     /**
@@ -37,8 +36,7 @@ export default {
      * Any other vue components you also want to use here; they must already be imported
      * at the top of the file.
      */
-    components: {
-    },
+    components: {},
 
     /**
      * Data.
@@ -47,8 +45,7 @@ export default {
      * the meaning of "this" in a way you don't expect.
      */
     data() {
-        return {
-        }
+        return {};
     },
 
     /**
@@ -56,24 +53,21 @@ export default {
      * Basically, when vue has done all its inits and is ready to go
      * kind of like window.onload
      */
-    mounted: function () {
-    },
+    mounted: function () {},
 
     /**
      * Computed properties.
      * Access the results of a function as if they were a property of an object.
      */
-    computed: {
-    },
+    computed: {},
 
     /**
      * Methods.
      * Arbitrary javascript functions which operate on the args provided, just like any
      * other ordinary javascript that you might have written before.
      */
-    methods: {
-    }
-}
+    methods: {},
+};
 </script>
 <template>
     <div>
@@ -91,10 +85,9 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-
-.selected-badge-image { //shrink down the image, used by #badge-list-form
+.selected-badge-image {
+    //shrink down the image, used by #badge-list-form
     height: auto;
     width: 30px;
 }
-
 </style>

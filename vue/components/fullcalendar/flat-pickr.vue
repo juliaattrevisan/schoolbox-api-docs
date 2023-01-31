@@ -1,21 +1,19 @@
 <script>
-
 import flatpickr from "flatpickr";
 
 export default {
-
     name: "flat-pickr",
 
     components: { flatpickr },
 
-    props: ['config'],
+    props: ["config"],
 
     data() {
         return {
             selector: this.config.selector,
             activeFlatPickr: {},
             toggle: false,
-        }
+        };
     },
 
     mounted() {
@@ -26,10 +24,10 @@ export default {
             onChange: self.onChange,
             onOpen: self.onOpen,
             onClose: self.onClose,
-            disableMobile: self.config.disableMobile
+            disableMobile: self.config.disableMobile,
         });
 
-        document.querySelector(".fc-quickSwitchButton-button").addEventListener('click', function (element) {
+        document.querySelector(".fc-quickSwitchButton-button").addEventListener("click", function (element) {
             if (self.toggle) {
                 self.activeFlatPickr.close();
             } else {
@@ -40,8 +38,8 @@ export default {
 
     methods: {
         onChange(selectedDates, dateStr, instance) {
-            this.$emit('dateSelected', {
-                selectedDate: dateStr
+            this.$emit("dateSelected", {
+                selectedDate: dateStr,
             });
         },
 
@@ -50,21 +48,17 @@ export default {
         },
 
         updateActiveDate(val) {
-            this.activeFlatPickr.setDate(val)
-        }
-    }
-
-}
-
+            this.activeFlatPickr.setDate(val);
+        },
+    },
+};
 </script>
 
-<template>
-
-</template>
+<template></template>
 
 <style>
-    .flatpickr-current-month {
-        padding-top: 0 !important;
-        top: 0;
-    }
+.flatpickr-current-month {
+    padding-top: 0 !important;
+    top: 0;
+}
 </style>

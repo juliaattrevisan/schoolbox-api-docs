@@ -1,15 +1,12 @@
 <script>
-
 /**
  * Provides the available options that can be bulk modified
  * for the currently selected users
  */
 
-import RevealModal from '@schoolboxVue/components/reveal-modal';
-
+import RevealModal from "@schoolboxVue/components/reveal-modal";
 
 export default {
-
     components: {
         RevealModal,
     },
@@ -17,11 +14,11 @@ export default {
     props: {
         srcUserModify: {
             type: String,
-            required: true
+            required: true,
         },
         courses: {
             type: Array,
-            required: true
+            required: true,
         },
         selectedRows: {
             type: Array,
@@ -33,9 +30,9 @@ export default {
         },
     },
 
-    emits: ['updated'],
+    emits: ["updated"],
 
-    data () {
+    data() {
         return {
             updateFields: {
                 courseIds: [],
@@ -44,43 +41,39 @@ export default {
             hasUpdated: false,
             hasDataError: false,
             logData: [], //to display the output of the returned action
-        }
+        };
     },
 
     computed: {
-
         /**
          * To change when processing
          *
          * @return { String }
          */
-        updateButtonText () {
+        updateButtonText() {
             if (this.isProcessing) {
                 return `<em>Processing, please wait...</em>`;
             } else {
                 return `Update Selected`;
             }
         },
-
     },
 
-    mounted () {
+    mounted() {
         this.setDefaultSelection();
     },
 
     methods: {
-        setDefaultSelection () {
-            this.courses.forEach(
-                (course) => {
-                    this.updateFields.courseIds[course.id] = null;
-                }
-            )
+        setDefaultSelection() {
+            this.courses.forEach((course) => {
+                this.updateFields.courseIds[course.id] = null;
+            });
         },
 
         /**
          * Update the selected users
          */
-        modify () {
+        modify() {
             this.$refs.modal.open();
             this.hasUpdated = false; //return to its form state
         },
@@ -88,11 +81,11 @@ export default {
         /**
          * Update the selected users
          */
-        async onUpdateUsersSelected () {
+        async onUpdateUsersSelected() {
             try {
                 this.isProcessing = true;
                 const response = await fetch(this.srcUserModify, {
-                    method: 'POST',
+                    method: "POST",
                     body: this.getUpdateUsersFormData(),
                 });
                 const responseData = await response.json();
@@ -106,7 +99,7 @@ export default {
                 this.updateFields.courseIds.forEach((value, key) => {
                     this.updateFields.courseIds[key] = null;
                 });
-                this.$emit('updated');
+                this.$emit("updated");
             }
         },
 
@@ -115,15 +108,15 @@ export default {
          *
          * @returns { FormData }
          */
-        getUpdateUsersFormData () {
-            const usersToModifyIDList = this.selectedRows.map(row => row.id);
+        getUpdateUsersFormData() {
+            const usersToModifyIDList = this.selectedRows.map((row) => row.id);
             const formData = new FormData();
             usersToModifyIDList.forEach((item) => {
-                formData.append('users[]', item);
+                formData.append("users[]", item);
             });
             for (const [key, value] of Object.entries(this.updateFields.courseIds)) {
                 if (value) {
-                    formData.append('courses[' + key + ']', value);
+                    formData.append("courses[" + key + "]", value);
                 }
             }
             return formData;
@@ -135,26 +128,25 @@ export default {
          * @param { Object }
          * @param { Object }
          */
-        checkUpdateResponse (response, responseData) {
-            if (response.ok) { //successful response
+        checkUpdateResponse(response, responseData) {
+            if (response.ok) {
+                //successful response
                 this.hasDataError = false;
-                this.logData = responseData.data.join('\n');
+                this.logData = responseData.data.join("\n");
             } else if (!response.ok) {
                 this.hasDataError = true;
-                this.logData = responseData.data.join('\n'); //which comes in with an error message
+                this.logData = responseData.data.join("\n"); //which comes in with an error message
             }
         },
 
         /**
          * Close the modal
          */
-        onCloseSelected () {
+        onCloseSelected() {
             this.$refs.modal.close();
-        }
-
-    }
-
-}
+        },
+    },
+};
 </script>
 
 <template>
@@ -162,8 +154,8 @@ export default {
         <Transition name="fade" mode="out-in">
             <div v-if="hasUpdated">
                 <div>
-                    <div v-if="hasDataError" class="alert-box alert">Error occurred. Further
-                        details are logged below.
+                    <div v-if="hasDataError" class="alert-box alert">
+                        Error occurred. Further details are logged below.
                     </div>
                     <textarea v-html="logData"></textarea>
                 </div>
@@ -174,27 +166,32 @@ export default {
             <div v-else>
                 <div>
                     <h2>Provision {{ selectedRowsCountWithRowName }} selected</h2>
-                    <label>
-                        Course Involvement
-                    </label>
+                    <label> Course Involvement </label>
                     <div v-for="course in courses">
                         <label :for="'apply_course-' + String(course.id)">{{ course.name }}</label>
-                        <select :id="'apply_course-' + String(course.id)" :name="'apply_course-' + String(course.id)"
-                                v-model="updateFields.courseIds[course.id]">
-                            <option :value=null>Unchanged</option>
+                        <select
+                            :id="'apply_course-' + String(course.id)"
+                            :name="'apply_course-' + String(course.id)"
+                            v-model="updateFields.courseIds[course.id]"
+                        >
+                            <option :value="null">Unchanged</option>
                             <option value="1">Enroll</option>
                             <option value="0">Remove</option>
                         </select>
                     </div>
                 </div>
                 <div v-if="selectedRows.length > 1000">
-                    <div class="alert-box warning">Please note, as a large number of users has been selected, processing
-                        may take some time.
+                    <div class="alert-box warning">
+                        Please note, as a large number of users has been selected, processing may take some time.
                     </div>
                 </div>
                 <div>
-                    <button @click.prevent="onUpdateUsersSelected" class="button submit" :disabled="isProcessing"
-                            v-html="updateButtonText"></button>
+                    <button
+                        @click.prevent="onUpdateUsersSelected"
+                        class="button submit"
+                        :disabled="isProcessing"
+                        v-html="updateButtonText"
+                    ></button>
                 </div>
             </div>
         </Transition>
@@ -202,19 +199,18 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-
-textarea { //to prevent the potential for a massively long modal
+textarea {
+    //to prevent the potential for a massively long modal
     min-height: 200px;
     max-height: 600px;
 }
 
-.fade-enter-active, .fade-leave-active {
+.fade-enter-active,
+.fade-leave-active {
     transition: opacity 0.2s;
 }
 
-.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */
-{
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
     opacity: 0;
 }
-
 </style>

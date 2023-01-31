@@ -1,60 +1,55 @@
 <script>
-
 /**
  * Update an individual rows pop out options
  * Currently only checkboxes are being considered, can be extended as required
  */
 
-import { mapState, mapActions } from 'pinia';
-import { useAdminListStore } from './store/adminListStore'
-import { gsap } from 'gsap/all';
-import saveRows from './mixins/mixinAdminListSaveRows';
-import Toast from '@schoolboxVue/components/toast';
-
+import { mapState, mapActions } from "pinia";
+import { useAdminListStore } from "./store/adminListStore";
+import { gsap } from "gsap/all";
+import saveRows from "./mixins/mixinAdminListSaveRows";
+import Toast from "@schoolboxVue/components/toast";
 
 export default {
-
     components: {
-        Toast
+        Toast,
     },
 
     props: {
-        tableName: { //the name of the current list, used to submit updates to the DB
+        tableName: {
+            //the name of the current list, used to submit updates to the DB
             type: String,
-            required: true
-        }
+            required: true,
+        },
     },
 
-    mixins: [
-        saveRows
-    ],
+    mixins: [saveRows],
 
-    data () {
+    data() {
         return {
-            isActive: true
-        }
+            isActive: true,
+        };
     },
 
     computed: {
-
         ...mapState(useAdminListStore, {
-            selectedRow: state => state.selectedRow,
-            isOpen: state => state.isPopOutOpen,
-            headerField: state => state.popOutHeaderField, //the header field object
-            fields: state => state.popOutFields, //the fields to display within the pop out
+            selectedRow: (state) => state.selectedRow,
+            isOpen: (state) => state.isPopOutOpen,
+            headerField: (state) => state.popOutHeaderField, //the header field object
+            fields: (state) => state.popOutFields, //the fields to display within the pop out
         }),
 
         /**
-         * When 'changePopOut' is set on the popOutList, we need to consider 
+         * When 'changePopOut' is set on the popOutList, we need to consider
          * displaying only those fields linked to the current selection of 'changePopOutOptions'
-         * For example on Lists > Roles, changing 'Role Type' will change the list of Permissions available 
+         * For example on Lists > Roles, changing 'Role Type' will change the list of Permissions available
          * If 'changePopOut' isn't set, we can just return all 'popOutList' fields
          *
          * @returns { Array of Objects }
          */
-        changePopOutFields () {
+        changePopOutFields() {
             if (this.headerField.changePopOut && this.selectedRow.id) {
-                const selectedRowChangePopOutValue = this.selectedRow[this.headerField.changePopOut]; //eg: for 'Role Type', could be 'Staff' or 'Student' 
+                const selectedRowChangePopOutValue = this.selectedRow[this.headerField.changePopOut]; //eg: for 'Role Type', could be 'Staff' or 'Student'
                 const changePopOutOptions = this.headerField.changePopOutOptions[selectedRowChangePopOutValue]; //eg: only the options linked to the selected 'Role Type'
                 return this.fields.filter((field) => changePopOutOptions.includes(field.id)); //now only those fields linked to the value
             } else {
@@ -67,7 +62,7 @@ export default {
          *
          * @returns { Array }
          */
-        checkboxFieldList () {
+        checkboxFieldList() {
             return this.changePopOutFields.filter((field) => field.checkbox);
         },
 
@@ -77,7 +72,7 @@ export default {
          *
          * @returns { Boolean }
          */
-        canShowSelectAllCheckbox () {
+        canShowSelectAllCheckbox() {
             return this.checkboxFieldList.length > 2;
         },
 
@@ -86,7 +81,7 @@ export default {
          *
          * @returns { Array }
          */
-        selectedCheckboxFieldList () {
+        selectedCheckboxFieldList() {
             return this.checkboxFieldList.filter((field) => this.selectedRow[field.id]); //will return those checkboxes with a true value
         },
 
@@ -95,70 +90,71 @@ export default {
          *
          * @returns { Boolean }
          */
-        isAllCheckboxesSelected () {
+        isAllCheckboxesSelected() {
             return this.selectedCheckboxFieldList.length === this.checkboxFieldList.length; //whether all checkboxes are selected (set as true) or not
-        }
-
+        },
     },
 
     watch: {
-
         /**
          * To open or close depending on boolean value
          */
-        isOpen (newValue) {
+        isOpen(newValue) {
             if (newValue === true) {
                 this.open();
             } else {
                 this.close();
             }
-        }
-
+        },
     },
 
-    mounted () {
-        this.$emit('on-pop-out-mounted', this.$refs.innerContainer.clientHeight); //to ensure the parent container is tall enough to display the entire pop out
+    mounted() {
+        this.$emit("on-pop-out-mounted", this.$refs.innerContainer.clientHeight); //to ensure the parent container is tall enough to display the entire pop out
         this.isActive = false;
     },
 
     methods: {
-
-        ...mapActions(useAdminListStore, ['closePopUp']),
+        ...mapActions(useAdminListStore, ["closePopUp"]),
 
         /**
          * Animate the view on
          */
-        open () {
+        open() {
             this.isActive = true;
-            gsap.to(this.$refs.innerContainer, { right: 0, duration: 0.4 } );
+            gsap.to(this.$refs.innerContainer, { right: 0, duration: 0.4 });
             this.checkInView();
         },
 
         /**
          * Ensure the pop out does not appear above the current viewport
          */
-        checkInView () {
+        checkInView() {
             this.$nextTick(() => {
-                if (this.$refs.innerContainer.getBoundingClientRect().y < 0) { //if it's less than 0 the top will be out of view
+                if (this.$refs.innerContainer.getBoundingClientRect().y < 0) {
+                    //if it's less than 0 the top will be out of view
                     this.$refs.innerContainer.style.top = `${-this.$refs.innerContainer.getBoundingClientRect().y}px`; //so move it down how much it's out of view
-                } 
+                }
             });
         },
 
         /**
          * Close the view
          */
-        close () {
-            gsap.to(this.$refs.innerContainer, { right: '-100%', duration: 0.3, onComplete: () => {
-                this.isActive = false;
-                this.$refs.innerContainer.style.top = '0px'; //set back to 0, checkInView() can always update on another open
-            } } );
+        close() {
+            gsap.to(this.$refs.innerContainer, {
+                right: "-100%",
+                duration: 0.3,
+                onComplete: () => {
+                    this.isActive = false;
+                    this.$refs.innerContainer.style.top = "0px"; //set back to 0, checkInView() can always update on another open
+                },
+            });
         },
 
         /**
          * check / uncheck all checkboxes
          */
-        onSelectAllSelected (event) {
+        onSelectAllSelected(event) {
             this.checkboxFieldList.forEach((field) => {
                 this.selectedRow[field.id] = event.target.checked;
             });
@@ -167,22 +163,27 @@ export default {
         /**
          * Close the pop out
          */
-        onCloseSelected () {
+        onCloseSelected() {
             this.closePopUp();
         },
-
-    }
-
-}
+    },
+};
 </script>
 
 <template>
-    <div class="outer-container" :style="`display: ${ isActive ? 'block' : 'none' };`">
+    <div class="outer-container" :style="`display: ${isActive ? 'block' : 'none'};`">
         <div class="inner-container checklist" ref="innerContainer">
             <h4>{{ selectedRow.name }} {{ headerField.caption }}</h4>
-            <button href="#close-pop-out" class="close-button icon-close" @click.prevent="onCloseSelected" @keyup.enter="onCloseSelected"  :disabled="saveRows_isProcessing" title="close pop out"></button>
+            <button
+                href="#close-pop-out"
+                class="close-button icon-close"
+                @click.prevent="onCloseSelected"
+                @keyup.enter="onCloseSelected"
+                :disabled="saveRows_isProcessing"
+                title="close pop out"
+            ></button>
             <ul class="option-list" data-option-list>
-                <li v-if="canShowSelectAllCheckbox" style="margin-bottom: 5px;">
+                <li v-if="canShowSelectAllCheckbox" style="margin-bottom: 5px">
                     <input
                         id="select-all"
                         type="checkbox"
@@ -192,23 +193,29 @@ export default {
                     <label for="select-all">Select All</label>
                 </li>
                 <li v-for="(field, index) in changePopOutFields" :key="index">
-                    <input
-                        :id="field.caption"
-                        type="checkbox"
-                        v-model="selectedRow[field.id]"
-                    />
-                    <label :for="field.caption">{{ field.caption }}<span v-if="field.tooltip" :class="`hint has-tip tip-${ field.tooltipPosition ? field.tooltipPosition : 'top' }`" data-tooltip :title="field.tooltip">?</span></label>
+                    <input :id="field.caption" type="checkbox" v-model="selectedRow[field.id]" />
+                    <label :for="field.caption"
+                        >{{ field.caption
+                        }}<span
+                            v-if="field.tooltip"
+                            :class="`hint has-tip tip-${field.tooltipPosition ? field.tooltipPosition : 'top'}`"
+                            data-tooltip
+                            :title="field.tooltip"
+                            >?</span
+                        ></label
+                    >
                 </li>
             </ul>
-            <button @click.prevent="saveRows_onSaveSelected" @keyup.enter="saveRows_onSaveSelected" class="save-button">{{ saveRows_saveStatus }} {{ headerField.caption }}</button>
+            <button @click.prevent="saveRows_onSaveSelected" @keyup.enter="saveRows_onSaveSelected" class="save-button">
+                {{ saveRows_saveStatus }} {{ headerField.caption }}
+            </button>
         </div>
         <toast ref="toast"></toast>
     </div>
 </template>
 
 <style lang="scss" scoped>
-
-@import 'www/static/css/core/base/_variables.scss';
+@import "www/static/css/core/base/_variables.scss";
 
 .outer-container {
     position: absolute;
@@ -240,5 +247,4 @@ export default {
 .save-button {
     width: 100%;
 }
-
 </style>

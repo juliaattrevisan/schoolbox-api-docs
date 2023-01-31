@@ -1,15 +1,13 @@
 <script setup>
-
 /**
  * To be able to remove selected members from the group
  */
 
-import { ref, computed, watch } from 'vue';
-import { timeout } from '@js/util/jsUtils';
-import { useStore } from './store/manageGroupStore';
-import { useDisbandStore } from './store/mgDisbandStore';
-import RevealModal from '@schoolboxVue/components/reveal-modal.vue';
-
+import { ref, computed, watch } from "vue";
+import { timeout } from "@js/util/jsUtils";
+import { useStore } from "./store/manageGroupStore";
+import { useDisbandStore } from "./store/mgDisbandStore";
+import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 
 const store = useStore();
 const disbandStore = useDisbandStore();
@@ -19,14 +17,17 @@ const hasDisbanded = ref(false); //to toggle the successful disband note
 /**
  * to open the modal when requested
  */
-watch(() => disbandStore.isPromptOpen, (newIsOpen) => {
-    newIsOpen ? removeModalEl.value.open() : removeModalEl.value.close();
-});
+watch(
+    () => disbandStore.isPromptOpen,
+    (newIsOpen) => {
+        newIsOpen ? removeModalEl.value.open() : removeModalEl.value.close();
+    }
+);
 
 /**
  * disband the group confirmed
  */
-function onDisbandGroupSelected () {
+function onDisbandGroupSelected() {
     disbandStore.disbandGroup();
 }
 
@@ -35,15 +36,15 @@ function onDisbandGroupSelected () {
  * and update the UI accordingly
  */
 disbandStore.$onAction(({ name, after, onError }) => {
-    if (name === 'disbandGroup') {
-        store.toastEl.activate('Disbanding...');
+    if (name === "disbandGroup") {
+        store.toastEl.activate("Disbanding...");
         after(() => {
             hasDisbanded.value = true;
             redirect();
         });
         onError((error) => {
             console.warn(error);
-            store.toastEl.timeout('Unable to disband group', false, 5000);
+            store.toastEl.timeout("Unable to disband group", false, 5000);
         });
     }
 });
@@ -51,11 +52,10 @@ disbandStore.$onAction(({ name, after, onError }) => {
 /**
  * redirect to the appropriate page once the group has been disbanded
  */
-async function redirect () {
+async function redirect() {
     await timeout(5000);
-    window.location = `/homepage/${store.id}`
+    window.location = `/homepage/${store.id}`;
 }
-
 
 /**
  * To instantly notify the user that the members are being removed
@@ -63,7 +63,7 @@ async function redirect () {
  *
  * @returns { String }
  */
-const disbandButtonText = computed(() => disbandStore.isProcessing ? 'Disbanding...' : 'Yes');
+const disbandButtonText = computed(() => (disbandStore.isProcessing ? "Disbanding..." : "Yes"));
 
 /**
  * to prevent the user from moving away from the modal while
@@ -77,7 +77,7 @@ const isCloseModalDisabled = computed(() => disbandStore.isProcessing || hasDisb
 /**
  * to close the modal
  */
-function onCancelSelected () {
+function onCancelSelected() {
     disbandStore.cancelDisbandGroup();
 }
 
@@ -85,10 +85,9 @@ function onCancelSelected () {
  * ensure the isPromptOpen is kept up to date
  * as we can currently also use foundation to close the modal
  */
-function onModalClosed () {
+function onModalClosed() {
     disbandStore.cancelDisbandGroup();
 }
-
 </script>
 
 <template>
@@ -99,15 +98,32 @@ function onModalClosed () {
         @closed="onModalClosed"
     >
         <h2>Please Confirm</h2>
-        <p>Are you sure you wish to disband this group? All members of the group will be removed, but all homepage content will remain.</p>
+        <p>
+            Are you sure you wish to disband this group? All members of the group will be removed, but all homepage
+            content will remain.
+        </p>
         <div v-if="hasDisbanded" class="alert-box success">Group successfully disbanded, redirecting...</div>
         <ul class="flex-list buttons">
-            <li><button @click.prevent="onDisbandGroupSelected" class="button submit" :disabled="disbandStore.isProcessing || hasDisbanded">{{ disbandButtonText }}</button></li>
-            <li><button @click.prevent="onCancelSelected" class="button" :disabled="disbandStore.isProcessing || hasDisbanded">Cancel</button></li>
+            <li>
+                <button
+                    @click.prevent="onDisbandGroupSelected"
+                    class="button submit"
+                    :disabled="disbandStore.isProcessing || hasDisbanded"
+                >
+                    {{ disbandButtonText }}
+                </button>
+            </li>
+            <li>
+                <button
+                    @click.prevent="onCancelSelected"
+                    class="button"
+                    :disabled="disbandStore.isProcessing || hasDisbanded"
+                >
+                    Cancel
+                </button>
+            </li>
         </ul>
     </reveal-modal>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

@@ -1,20 +1,16 @@
 <script setup>
-
 /**
  * The modal header, containing the title, select list and search input
  */
 
-import CsModalHeaderBreadcrumbs from './cs-modal-header-breadcrumbs.vue';
-import CsModalHeaderSearchInput from './cs-modal-header-search-input.vue';
-
+import CsModalHeaderBreadcrumbs from "./cs-modal-header-breadcrumbs.vue";
+import CsModalHeaderSearchInput from "./cs-modal-header-search-input.vue";
 </script>
 
 <template>
-   <h2>Select Curriculum Codes</h2>
-   <cs-modal-header-breadcrumbs />
-   <cs-modal-header-search-input />
+    <h2>Select Curriculum Codes</h2>
+    <cs-modal-header-breadcrumbs />
+    <cs-modal-header-search-input />
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

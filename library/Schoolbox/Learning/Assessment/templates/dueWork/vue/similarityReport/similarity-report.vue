@@ -1,18 +1,15 @@
 <script>
-
 /**
  * Show a smiliarity report for a due work, showing a list of students latest submissions.
  * The list can be filtered by similarity score and submission status
  */
 
-import SimilarityReportFilters from './similarity-report-filters';
-import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer';
-import Toast from '@schoolboxVue/components/toast';
-import FilterEvents from './similarityReportFilterEvents';
-
+import SimilarityReportFilters from "./similarity-report-filters";
+import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer";
+import Toast from "@schoolboxVue/components/toast";
+import FilterEvents from "./similarityReportFilterEvents";
 
 export default {
-
     components: {
         SimilarityReportFilters,
         BottomDrawer,
@@ -20,24 +17,28 @@ export default {
     },
 
     props: {
-        assessmentId: { //to mark submissions as requiring resubmission
+        assessmentId: {
+            //to mark submissions as requiring resubmission
             type: Number,
-            required: true
+            required: true,
         },
-        payloadUrl: { //where to get the tableData from
+        payloadUrl: {
+            //where to get the tableData from
             type: String,
-            required: true
+            required: true,
         },
     },
 
-    data () {
+    data() {
         return {
             isDataLoaded: false, //show loading display until true
             hasDataLoadError: false, //display load error
             tableData: [], //hold all student tableData
-            tableColumns: ['student', 'submissionDate', 'similarity', 'status'], //the table tableColumns
-            tableOptions: { //options for vue-tables-2: https://matanya.gitbook.io/vue-tables-2/options-api
-                customFilters: [ //refer to https://matanya.gitbook.io/vue-tables-2/custom-filters for further info
+            tableColumns: ["student", "submissionDate", "similarity", "status"], //the table tableColumns
+            tableOptions: {
+                //options for vue-tables-2: https://matanya.gitbook.io/vue-tables-2/options-api
+                customFilters: [
+                    //refer to https://matanya.gitbook.io/vue-tables-2/custom-filters for further info
                     {
                         name: FilterEvents.SIMILARITY_SCORE,
                         callback: (row, filteredPercentage) => {
@@ -45,90 +46,95 @@ export default {
                                 return parseInt(file.turnitin.percentage.overall) >= parseInt(filteredPercentage);
                             });
                             return hasFilesAboveSimilarity;
-                        }
+                        },
                     },
                     {
                         name: FilterEvents.RESUBMISSION_REQUIRED,
                         callback: (row, query) => {
                             return row.submission.status !== query;
-                        }
+                        },
                     },
                     {
                         name: FilterEvents.MARKING_REQUIRED,
                         callback: (row, query) => {
                             return row.submission.status !== query;
-                        }
+                        },
                     },
                     {
                         name: FilterEvents.REVIEWED,
                         callback: (row, query) => {
                             return row.submission.status !== query;
-                        }
+                        },
                     },
                 ],
                 customSorting: {
-                    student: (ascending) => { //sort student by lastname
+                    student: (ascending) => {
+                        //sort student by lastname
                         return (a, b) => {
                             if (ascending) {
                                 return a.user.lastname >= b.user.lastname ? 1 : -1;
                             }
                             return a.user.lastname <= b.user.lastname ? 1 : -1;
-                        }
+                        };
                     },
-                    submissionDate: (ascending) => { //sort submission date accurately by the timestamp
+                    submissionDate: (ascending) => {
+                        //sort submission date accurately by the timestamp
                         return (a, b) => {
                             if (ascending) {
-                                return a.submission.submitted_at.timestamp >= b.submission.submitted_at.timestamp ? 1 : -1;
+                                return a.submission.submitted_at.timestamp >= b.submission.submitted_at.timestamp
+                                    ? 1
+                                    : -1;
                             }
                             return a.submission.submitted_at.timestamp <= b.submission.submitted_at.timestamp ? 1 : -1;
-                        }
-                    }
+                        };
+                    },
                 },
                 filterable: false, //this hides the search input field, the custom filters still function as expected
                 headings: {
-                    student: 'Student',
-                    submissionDate: 'Submission date',
-                    similarity: 'Similarity %',
-                    status: 'Status',
+                    student: "Student",
+                    submissionDate: "Submission date",
+                    similarity: "Similarity %",
+                    status: "Status",
                 },
-                orderBy: { //initial sorting display
+                orderBy: {
+                    //initial sorting display
                     ascending: true,
-                    column: 'student'
+                    column: "student",
                 },
                 perPage: 9999, //absurdly large value to avoid pagination as there's no footer
                 resizableColumns: false,
-                selectable: { //to enable row selection
-                    mode: 'multiple',
+                selectable: {
+                    //to enable row selection
+                    mode: "multiple",
                     only: function (row) {
-                        return row.submission.status !== 'failed'; //can't mark as resubmission required those rows that are already marked as so
+                        return row.submission.status !== "failed"; //can't mark as resubmission required those rows that are already marked as so
                     },
                 },
-                sortable: ['student', 'submissionDate'], //only student and submission date are sortable
+                sortable: ["student", "submissionDate"], //only student and submission date are sortable
                 sortIcon: {
-                    is: 'glyphicon-sort',
-                    base: 'glyphicon',
-                    up: 'glyphicon-chevron-up',
-                    down: 'glyphicon-chevron-down'
+                    is: "glyphicon-sort",
+                    base: "glyphicon",
+                    up: "glyphicon-chevron-up",
+                    down: "glyphicon-chevron-down",
                 },
                 tabbable: false,
             },
             currentSimilartyScoreSelection: 0, //to be able to show only those files above the currently selected similarity score
-            comment: '', //the message coupled with the mark as requiring resubmission
-            singleRowName: 'submission',
-            pluralRowName: 'submissions',
+            comment: "", //the message coupled with the mark as requiring resubmission
+            singleRowName: "submission",
+            pluralRowName: "submissions",
             selectedRows: [], //keep track of which rows could be deleted
             isProcessing: false,
-        }
+        };
     },
 
     computed: {
-
         /**
          * To show a note showing no students have submitted yet
          *
          * @returns { Boolean }
          */
-        hasNoSubmissions () {
+        hasNoSubmissions() {
             return this.isDataLoaded && !this.hasDataLoadError && this.tableData.length === 0;
         },
 
@@ -137,7 +143,7 @@ export default {
          *
          * @returns { Boolean }
          */
-        hasSubmissions () {
+        hasSubmissions() {
             return this.isDataLoaded && !this.hasDataLoadError && this.tableData.length > 0;
         },
 
@@ -146,7 +152,7 @@ export default {
          *
          * @returns { Number }
          */
-        selectedRowsCount () {
+        selectedRowsCount() {
             return this.selectedRows.length;
         },
 
@@ -155,13 +161,13 @@ export default {
          *
          * @returns { String }
          */
-        selectedRowsCountWithRowName () {
+        selectedRowsCountWithRowName() {
             if (this.selectedRowsCount === 0) {
-                return 'No ' + this.singleRowName;
+                return "No " + this.singleRowName;
             } else if (this.selectedRowsCount === 1) {
-                return this.selectedRowsCount + ' ' + this.singleRowName;
+                return this.selectedRowsCount + " " + this.singleRowName;
             } else {
-                return this.selectedRowsCount + ' ' + this.pluralRowName;
+                return this.selectedRowsCount + " " + this.pluralRowName;
             }
         },
 
@@ -170,11 +176,11 @@ export default {
          *
          * @returns { String }
          */
-        submitButtonText () {
+        submitButtonText() {
             if (this.isProcessing) {
-                return 'Submitting, please wait...';
+                return "Submitting, please wait...";
             } else {
-                return 'Mark as resubmission required';
+                return "Mark as resubmission required";
             }
         },
 
@@ -183,23 +189,21 @@ export default {
          *
          * @returns { Boolean }
          */
-        isSubmitDisabled () {
+        isSubmitDisabled() {
             return this.isProcessing;
         },
-
     },
 
-    mounted () {
+    mounted() {
         this.getTableData();
         this.initFilterListeners();
     },
 
     methods: {
-
         /**
          * Load the current student tableData
          */
-        async getTableData () {
+        async getTableData() {
             try {
                 const response = await fetch(this.payloadUrl);
                 const responseData = await response.json();
@@ -211,11 +215,11 @@ export default {
                 this.isDataLoaded = true; //update the display to show the list
             }
         },
-        
+
         /**
          * So we can ensure that rows that are removed through filters are also removed from the selected rows
          */
-        initFilterListeners () {
+        initFilterListeners() {
             document.addEventListener(FilterEvents.SIMILARITY_SCORE, (event) => this.onSimilarityScoreChanged(event));
             document.addEventListener(FilterEvents.RESUBMISSION_REQUIRED, () => this.onFilterChanged());
             document.addEventListener(FilterEvents.MARKING_REQUIRED, () => this.onFilterChanged());
@@ -224,10 +228,10 @@ export default {
 
         /**
          * Show only the files within selected similarity range
-         * 
+         *
          * @param { Object }
          */
-        onSimilarityScoreChanged (event) {
+        onSimilarityScoreChanged(event) {
             this.currentSimilartyScoreSelection = parseInt(event.detail.score);
             this.onFilterChanged();
         },
@@ -235,10 +239,10 @@ export default {
         /**
          * Pull any rows that are no longer visible out of the selected rows
          */
-        onFilterChanged () {
+        onFilterChanged() {
             const filteredRowsIds = this.$refs.table.allFilteredData.map((filteredRow) => filteredRow.id); //is the currently visible list of rows, mapped to just the ids
             const selectedRowsIds = this.selectedRows.map((selectedRow) => selectedRow.id);
-            const rowsToUnselect = selectedRowsIds.filter((selectedRowId) => !filteredRowsIds.includes(selectedRowId)); //filter out any that aren't in the filtered list 
+            const rowsToUnselect = selectedRowsIds.filter((selectedRowId) => !filteredRowsIds.includes(selectedRowId)); //filter out any that aren't in the filtered list
             this.$refs.table.unselectRows(rowsToUnselect);
             this.selectedRows = this.selectedRows.filter((selectedRow) => !rowsToUnselect.includes(selectedRow.id));
         },
@@ -248,10 +252,10 @@ export default {
          * similarity score
          *
          * @param { Array }
-         * 
+         *
          * @returns { Array }
          */
-        matchedFiles (files) {
+        matchedFiles(files) {
             return files.filter((file) => {
                 return parseInt(file.turnitin.percentage.overall) >= parseInt(this.currentSimilartyScoreSelection);
             });
@@ -265,19 +269,19 @@ export default {
          *
          * @returns { String }
          */
-        getFileColour (file) {
+        getFileColour(file) {
             const percentageRounded = Math.round(file.turnitin.percentage.overall);
             if (percentageRounded >= 75) {
-                return 'turnitin-red'; 
+                return "turnitin-red";
             } else if (percentageRounded >= 50) {
-                return 'turnitin-orange'; 
+                return "turnitin-orange";
             } else if (percentageRounded >= 25) {
-                return 'turnitin-yellow'; 
+                return "turnitin-yellow";
             } else if (percentageRounded >= 1) {
-                return 'turnitin-green'; 
+                return "turnitin-green";
             } else if (percentageRounded === 0) {
-                return 'turnitin-blue'; 
-            } 
+                return "turnitin-blue";
+            }
         },
 
         /**
@@ -287,12 +291,14 @@ export default {
          *
          * @return { String }
          */
-        getFormattedStatus (status) {
+        getFormattedStatus(status) {
             const statusOptions = {
-                'failed': '<span class="progress-tick no-text tiny failed" title="Resubmission required"></span><span>Resubmission required</span>',
-                'pending': '<span class="progress-tick no-text tiny pending" title="Mark required"></span><span>Marking required</span>',
-                'reviewed': '<span class="progress-tick no-text tiny reviewed" title="Reviewed"></span><span>Reviewed</span>',
-            }
+                failed: '<span class="progress-tick no-text tiny failed" title="Resubmission required"></span><span>Resubmission required</span>',
+                pending:
+                    '<span class="progress-tick no-text tiny pending" title="Mark required"></span><span>Marking required</span>',
+                reviewed:
+                    '<span class="progress-tick no-text tiny reviewed" title="Reviewed"></span><span>Reviewed</span>',
+            };
             return statusOptions[status];
         },
 
@@ -301,23 +307,23 @@ export default {
          *
          * @param { Object }
          */
-        onRowSelected (selectedRows) {
+        onRowSelected(selectedRows) {
             this.selectedRows = selectedRows;
         },
 
         /**
          * Mark the selected submissions as requiring resubmission
          */
-        async onRequiringResubmissionSelected () {
+        async onRequiringResubmissionSelected() {
             this.isProcessing = true;
-            this.$refs.toast.activate('Updating...');
+            this.$refs.toast.activate("Updating...");
             try {
                 await Promise.all(this.getFetches());
                 this.onFeedbackPublished();
-                this.$refs.toast.timeout('Feedback published', true, 2000);
+                this.$refs.toast.timeout("Feedback published", true, 2000);
             } catch (error) {
                 console.warn(error);
-                this.$refs.toast.timeout('Unable to update', false, 3000);
+                this.$refs.toast.timeout("Unable to update", false, 3000);
             } finally {
                 this.isProcessing = false;
             }
@@ -329,13 +335,15 @@ export default {
          *
          * @returns { Array }
          */
-        getFetches () {
+        getFetches() {
             const fetchList = [];
             this.selectedRows.forEach((row) => {
-                fetchList.push(fetch(`/learning/assessments/${this.assessmentId}/${row.user.id}/feedback`, {
-                    method: 'POST',
-                    body: this.getFormData(),
-                }));
+                fetchList.push(
+                    fetch(`/learning/assessments/${this.assessmentId}/${row.user.id}/feedback`, {
+                        method: "POST",
+                        body: this.getFormData(),
+                    })
+                );
             });
             return fetchList;
         },
@@ -346,20 +354,20 @@ export default {
          *
          * @returns { FormData }
          */
-        getFormData () {
+        getFormData() {
             const formData = new FormData();
-            formData.append('responseId', ''); //to mark the submission as a floating comment
-            formData.append('resubmissionRequired', '1');
-            formData.append('comment', this.comment);
-            formData.append('publish', '1');
+            formData.append("responseId", ""); //to mark the submission as a floating comment
+            formData.append("resubmissionRequired", "1");
+            formData.append("comment", this.comment);
+            formData.append("publish", "1");
             return formData;
         },
 
         /**
          * Set up for another possible update
          */
-        onFeedbackPublished () {
-            this.comment = ''; //clear the comment for another possible entry
+        onFeedbackPublished() {
+            this.comment = ""; //clear the comment for another possible entry
             this.markRowsAsRequiringResubmission();
             this.clearRows();
         },
@@ -367,17 +375,18 @@ export default {
         /**
          * Loop through and update the submissions
          */
-        markRowsAsRequiringResubmission () {
-            this.selectedRows.forEach((selectedRow) => { //directly edit the original data to update the display
+        markRowsAsRequiringResubmission() {
+            this.selectedRows.forEach((selectedRow) => {
+                //directly edit the original data to update the display
                 const rowData = this.tableData.find((row) => selectedRow.user.id === row.user.id);
-                rowData.submission.status = 'failed';
+                rowData.submission.status = "failed";
             });
         },
 
         /**
          * Clear the selection
          */
-        clearRows () {
+        clearRows() {
             this.selectedRows = [];
             this.$refs.table.resetSelectedRows(); //ensure vue-tables-2 updates
         },
@@ -385,21 +394,16 @@ export default {
         /**
          * To clear selected users
          */
-        onClearSelected () {
+        onClearSelected() {
             this.clearRows();
         },
-
-    }
-
-}
+    },
+};
 </script>
 
 <template>
-
     <div class="row">
-
         <div class="small-12 island">
-
             <v-client-table
                 v-if="hasSubmissions"
                 ref="table"
@@ -414,32 +418,40 @@ export default {
                 <template #student="props">
                     <div class="student title-on-single-column" data-title="Student">
                         <div class="student__portrait">
-                            <img :src="`/portrait.php?id=${props.row.user.id}&size=square32`" :alt="`profile photo of ${props.row.user.fullname}`" class="portrait">
+                            <img
+                                :src="`/portrait.php?id=${props.row.user.id}&size=square32`"
+                                :alt="`profile photo of ${props.row.user.fullname}`"
+                                class="portrait"
+                            />
                         </div>
                         <div class="student__name">
                             <template v-if="props.row.user.id">
                                 <a :href="`/search/user/${props.row.user.id}`" title="View profile" class="name">
-                                    <h3>{{ props.row.user.lastname + ', ' + props.row.user.firstname }}</h3>
+                                    <h3>{{ props.row.user.lastname + ", " + props.row.user.firstname }}</h3>
                                 </a>
                             </template>
                             <template v-else>
-                                <h3>{{ props.row.user.lastname + ', ' + props.row.user.firstname }}</h3>
-                            </template> 
+                                <h3>{{ props.row.user.lastname + ", " + props.row.user.firstname }}</h3>
+                            </template>
                         </div>
                     </div>
                 </template>
                 <template #submissionDate="props">
-                    <div class="submission-date title-on-single-column" data-title="Submission date"> 
-                        <span :title="props.row.submission.submitted_at.relative">{{ props.row.submission.submitted_at.nice }}</span>
+                    <div class="submission-date title-on-single-column" data-title="Submission date">
+                        <span :title="props.row.submission.submitted_at.relative">{{
+                            props.row.submission.submitted_at.nice
+                        }}</span>
                     </div>
                 </template>
                 <template #similarity="props">
                     <div class="similarity title-on-single-column" data-title="Similarity %">
                         <ul class="list">
                             <li v-for="file in matchedFiles(props.row.files)" :key="file.id">
-                                <a class="file" :href="file._links.turnitin_report"  title="View similarity check">
-                                    <span :class="`percentage ${getFileColour(file)}`">{{ Math.round(file.turnitin.percentage.overall) }}%</span>
-                                    <span>{{ file.name + '.' + file.ext }}</span>
+                                <a class="file" :href="file._links.turnitin_report" title="View similarity check">
+                                    <span :class="`percentage ${getFileColour(file)}`"
+                                        >{{ Math.round(file.turnitin.percentage.overall) }}%</span
+                                    >
+                                    <span>{{ file.name + "." + file.ext }}</span>
                                 </a>
                             </li>
                         </ul>
@@ -451,7 +463,12 @@ export default {
                             <p class="meta" v-html="getFormattedStatus(props.row.submission.status)"></p>
                         </div>
                         <div class="status__column">
-                            <a class="button button-status icon-approve" :href="props.row.submission._links.inline_grader" title="Review submission">Review submission</a>
+                            <a
+                                class="button button-status icon-approve"
+                                :href="props.row.submission._links.inline_grader"
+                                title="Review submission"
+                                >Review submission</a
+                            >
                         </div>
                     </div>
                 </template>
@@ -459,13 +476,18 @@ export default {
 
             <div v-else-if="hasNoSubmissions" class="empty-state">
                 <i class="icon-staff-students"></i>
-                <p>Students have either not yet submitted any work or any similarity results are yet to be generated.<br>Once work is submitted and results generated, you may return to this page to review the similarity results for each submission.</p>
+                <p>
+                    Students have either not yet submitted any work or any similarity results are yet to be
+                    generated.<br />Once work is submitted and results generated, you may return to this page to review
+                    the similarity results for each submission.
+                </p>
             </div>
 
             <div v-else-if="hasDataLoadError">
                 <section class="content">
                     <div tableData-alert class="alert-box alert">
-                        Sorry, we are currently unable to load the similarity report. Please contact your support it the problem persists.
+                        Sorry, we are currently unable to load the similarity report. Please contact your support it the
+                        problem persists.
                     </div>
                 </section>
             </div>
@@ -489,31 +511,39 @@ export default {
             </div>
 
             <bottom-drawer :showDrawer="selectedRowsCount > 0">
-                <h3 class="selected-count"><em>{{ selectedRowsCountWithRowName }} selected</em></h3>
-                <button @click.prevent="onClearSelected" @keydown.enter="onClearSelected" class="button-clear">Clear selection</button>
+                <h3 class="selected-count">
+                    <em>{{ selectedRowsCountWithRowName }} selected</em>
+                </h3>
+                <button @click.prevent="onClearSelected" @keydown.enter="onClearSelected" class="button-clear">
+                    Clear selection
+                </button>
                 <label>Comment</label>
                 <textarea class="comment-field" v-model="comment"></textarea>
-                <button @click.prevent="onRequiringResubmissionSelected" @keydown.enter="onRequiringResubmissionSelected" class="button submit button-delete" :disabled="isSubmitDisabled">{{ submitButtonText }}</button>
+                <button
+                    @click.prevent="onRequiringResubmissionSelected"
+                    @keydown.enter="onRequiringResubmissionSelected"
+                    class="button submit button-delete"
+                    :disabled="isSubmitDisabled"
+                >
+                    {{ submitButtonText }}
+                </button>
             </bottom-drawer>
 
             <toast ref="toast"></toast>
-
         </div>
-
     </div>
-
 </template>
 
 <style lang="scss">
-
-@import '@schoolboxVue/components/vueTables2/vueTables2';
-@import './similarity-report';
+@import "@schoolboxVue/components/vueTables2/vueTables2";
+@import "./similarity-report";
 
 .VuePagination {
     display: none; //there's no footer, so no count/pagination/next/prev etc for this report
 }
 
-@media (max-width: $tableToDoubleColumn) { //display everything in two columns
+@media (max-width: $tableToDoubleColumn) {
+    //display everything in two columns
     .VueTables thead {
         display: none;
     }
@@ -531,7 +561,8 @@ export default {
     }
 }
 
-@media (max-width: $tableToSingleColumn) { //and then display everything in one column
+@media (max-width: $tableToSingleColumn) {
+    //and then display everything in one column
     .VueTables__row td:not(.VueTables__select-row) {
         display: block;
         padding: 0.5rem 0;
@@ -567,10 +598,11 @@ export default {
 }
 
 .file {
-    display: flex; //so when filenames are long, they don't sit under the percentage, rather +1 lines stay under the filename 'column' 
+    display: flex; //so when filenames are long, they don't sit under the percentage, rather +1 lines stay under the filename 'column'
 }
 
-.percentage { //block percentages so files names line up
+.percentage {
+    //block percentages so files names line up
     flex: 0 0 40px;
     margin-right: 0.5rem;
     text-align: right;
@@ -585,11 +617,11 @@ export default {
     }
 }
 
-    .status__column {
-        @media (max-width: $tableToDoubleColumn) {
-            margin-bottom: 0.5rem; //so there's a gap to .button
-        }
+.status__column {
+    @media (max-width: $tableToDoubleColumn) {
+        margin-bottom: 0.5rem; //so there's a gap to .button
     }
+}
 
 .meta .progress-tick {
     margin-right: 0.5rem; //bit of extra gap
@@ -618,5 +650,4 @@ export default {
 .comment-field {
     min-height: 4rem;
 }
-
 </style>

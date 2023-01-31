@@ -1,16 +1,14 @@
 <script setup>
-
 /**
  * To list all the current search results, also include a select all
  * button to easily add/remove all search results
  */
 
-import { ref, watch, computed, nextTick } from 'vue';
-import { gsap } from 'gsap/all';
-import { useSearchStore  } from './store/csSearchStore';
-import CsSelectAllSearchResults from './cs-select-all-search-results.vue';
-import CsSearchResult from './cs-search-result.vue';
-
+import { ref, watch, computed, nextTick } from "vue";
+import { gsap } from "gsap/all";
+import { useSearchStore } from "./store/csSearchStore";
+import CsSelectAllSearchResults from "./cs-select-all-search-results.vue";
+import CsSearchResult from "./cs-search-result.vue";
 
 const searchStore = useSearchStore();
 const searchResultsContainerEl = ref(null);
@@ -29,16 +27,18 @@ const showSelectAll = computed(() => {
 /**
  * to slide up and down the search results
  */
-watch(() => searchStore.filteredResults, () => {
-    nextTick(() => {
-        const targetHeight = searchResultsEl.value.offsetHeight;
-        gsap.to(searchResultsContainerEl.value, {
-            duration: 0.3,
-            height: targetHeight,
+watch(
+    () => searchStore.filteredResults,
+    () => {
+        nextTick(() => {
+            const targetHeight = searchResultsEl.value.offsetHeight;
+            gsap.to(searchResultsContainerEl.value, {
+                duration: 0.3,
+                height: targetHeight,
+            });
         });
-    });
-});
-
+    }
+);
 </script>
 
 <template>
@@ -46,22 +46,25 @@ watch(() => searchStore.filteredResults, () => {
         <div class="search-results" ref="searchResultsEl">
             <ul>
                 <li v-if="searchStore.isLoading" class="search-status">Searching for results....</li>
-                <li v-else-if="searchStore.hasNoResults" class="search-status">No results found for your current search.</li>
+                <li v-else-if="searchStore.hasNoResults" class="search-status">
+                    No results found for your current search.
+                </li>
                 <template v-else>
                     <li v-if="showSelectAll">
                         <cs-select-all-search-results />
                     </li>
                     <li v-for="result in searchStore.filteredResults" :key="result.id">
-                        <cs-search-result :result="result"/>
+                        <cs-search-result :result="result" />
                     </li>
                 </template>
             </ul>
-        </div><!-- .search-results -->
-    </div><!-- .search-results-container -->
+        </div>
+        <!-- .search-results -->
+    </div>
+    <!-- .search-results-container -->
 </template>
 
 <style lang="scss" scoped>
-
 .search-results-container {
     height: 0; //will animate the results within with the watch() above
     position: relative;
@@ -94,9 +97,8 @@ watch(() => searchStore.filteredResults, () => {
 }
 
 .search-status {
-    background-color: #FAFAFA;
+    background-color: #fafafa;
     padding: 0.75rem;
     font-style: italic;
 }
-
 </style>

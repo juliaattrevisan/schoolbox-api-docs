@@ -1,28 +1,26 @@
 <script setup lang="ts">
-
 /**
  * A curriculum node to select to traverse further down the tree,
  * and add subsections or update the details on
  */
 
-import { ref, computed, onMounted } from 'vue';
-import { gsap } from 'gsap/all';
-import { timeout } from '@js/util/jsUtils';
-import { slideDownOnEnter, slideUpOnLeave } from '@schoolboxVue/transitions/transitions';
-import { useStore } from '../store/manageCurriculumStore';
-import { UNSET_ID } from '@schoolboxCurriculum/js/nodeUtils';
-import { useViewNodesStore, DIRECTION } from './store/mcViewNodesStore';
-import { useActiveNodeStore } from '../activeNode/store/mcActiveNodeStore';
-import { useAddCurriculumStore } from '../store/mcAddCurriculumStore';
-import { useAddSubsectionStore } from '../activeNode/store/mcAddSubsectionStore';
-import { useUpdateNodeStore } from '../activeNode/store/mcUpdateNodeStore';
-import { useSearchStore } from '../store/mcSearchStore';
-import McViewNodeCheckbox from './mc-view-node-checkbox.vue';
-import McViewNodeName from './mc-view-node-name.vue';
-import McViewNodeActions from './mc-view-node-actions.vue';
-import McAddSubsection from '../activeNode/mc-add-subsection.vue';
-import McUpdateNode from '../activeNode/mc-update-node.vue';
-
+import { ref, computed, onMounted } from "vue";
+import { gsap } from "gsap/all";
+import { timeout } from "@js/util/jsUtils";
+import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/transitions";
+import { useStore } from "../store/manageCurriculumStore";
+import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
+import { useViewNodesStore, DIRECTION } from "./store/mcViewNodesStore";
+import { useActiveNodeStore } from "../activeNode/store/mcActiveNodeStore";
+import { useAddCurriculumStore } from "../store/mcAddCurriculumStore";
+import { useAddSubsectionStore } from "../activeNode/store/mcAddSubsectionStore";
+import { useUpdateNodeStore } from "../activeNode/store/mcUpdateNodeStore";
+import { useSearchStore } from "../store/mcSearchStore";
+import McViewNodeCheckbox from "./mc-view-node-checkbox.vue";
+import McViewNodeName from "./mc-view-node-name.vue";
+import McViewNodeActions from "./mc-view-node-actions.vue";
+import McAddSubsection from "../activeNode/mc-add-subsection.vue";
+import McUpdateNode from "../activeNode/mc-update-node.vue";
 
 const props = defineProps({
     /**
@@ -33,11 +31,11 @@ const props = defineProps({
         required: true,
         default() {
             return {
-                id: '0',
-                name: '-',
+                id: "0",
+                name: "-",
                 children: [],
-            }
-        }
+            };
+        },
     },
     /**
      * to gradually add more marginLeft to indicate node level depth
@@ -78,13 +76,16 @@ const showNode = computed(() => {
  * a new subsection or entirely new curriculum and animating
  */
 onMounted(() => {
-    if (showNode.value && props.depth === 0) { //we only need to animate the first node, as the rest are contained within
+    if (showNode.value && props.depth === 0) {
+        //we only need to animate the first node, as the rest are contained within
         animateOn();
     }
-    if (props.node.id === addSubsectionStore.id) { //higlight the newly added node
+    if (props.node.id === addSubsectionStore.id) {
+        //higlight the newly added node
         displayAnimation(isNew);
         addSubsectionStore.unsetId();
-    } else if (props.node.id === addCurriculumStore.id) { //highlight the new curriculum that's just been added
+    } else if (props.node.id === addCurriculumStore.id) {
+        //highlight the new curriculum that's just been added
         displayAnimation(isNew);
         addCurriculumStore.unsetId();
     }
@@ -95,9 +96,10 @@ onMounted(() => {
  * https://pinia.vuejs.org/core-concepts/actions.html#without-setup
  */
 useUpdateNodeStore().$onAction(({ name, after }) => {
-    if (name === 'update') {
+    if (name === "update") {
         after((result) => {
-            if (props.node.id === result.id) { //highlight the just updated node
+            if (props.node.id === result.id) {
+                //highlight the just updated node
                 displayAnimation(justUpdated);
             }
         });
@@ -108,18 +110,18 @@ useUpdateNodeStore().$onAction(({ name, after }) => {
  * animate to help show which direction we are currently moving through the tree
  * fade on the node and slide it from forwards/backwards depending on the currentDirection
  */
-function animateOn () {
+function animateOn() {
     const xStart = viewNodesStore.currentDirection === DIRECTION.FORWARDS ? -10 : 10;
     gsap.set(viewNodeEl.value, {
         opacity: 0,
-        x: xStart
-    } );
+        x: xStart,
+    });
     gsap.to(viewNodeEl.value, {
-        ease: 'power1.out',
-        duration: 0.3 ,
+        ease: "power1.out",
+        duration: 0.3,
         opacity: 1,
-        x: 0
-    } );
+        x: 0,
+    });
 }
 
 /**
@@ -128,7 +130,7 @@ function animateOn () {
  *
  * @param { ref }
  */
-async function displayAnimation (change) {
+async function displayAnimation(change) {
     change.value = true;
     await timeout(3000);
     change.value = false;
@@ -194,21 +196,21 @@ const isUpdatingOrAdding = computed(() => isUpdating.value || isAdding.value);
  *
  * @returns { Boolean }
  */
-const showChildren = computed(() => props.node.children && props.node.children.length > 0 && (props.depth+1) < 2);
+const showChildren = computed(() => props.node.children && props.node.children.length > 0 && props.depth + 1 < 2);
 
 /**
  * If there's a code available, which means it can be added to the name
  *
  * @returns { Boolean }
  */
-const hasCode = computed(() => props.node.code && props.node.code !== '');
+const hasCode = computed(() => props.node.code && props.node.code !== "");
 
 /**
  * Add in the code if it's available otherwise just show the title
  *
  * @returns { String }
  */
-const title = computed(() => hasCode.value ? `[${props.node.code}] ${props.node.name}` : `${props.node.name}`);
+const title = computed(() => (hasCode.value ? `[${props.node.code}] ${props.node.name}` : `${props.node.name}`));
 
 /**
  * Whether the buttons should be displayed, shouldn't be if the user is read only
@@ -217,28 +219,19 @@ const title = computed(() => hasCode.value ? `[${props.node.code}] ${props.node.
  * @returns { Boolean }
  */
 const hasActions = computed(() => !store.isReadOnly && props.node.id !== UNSET_ID && !searchStore.isActive);
-
 </script>
 
 <template>
     <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
-        <li
-            v-if="showNode"
-            ref="viewNodeEl"
-            data-test-node
-        >
+        <li v-if="showNode" ref="viewNodeEl" data-test-node>
             <div
                 class="buttons-container"
                 :data-enabled="props.node.enabled"
-                :data-is-inactive="`${ isUpdatingAnother || isAddingAnother ? true : false }`"
+                :data-is-inactive="`${isUpdatingAnother || isAddingAnother ? true : false}`"
                 :data-is-new="isNew"
                 :data-just-updated="justUpdated"
             >
-                <mc-view-node-checkbox
-                    v-if="hasActions"
-                    :node="props.node"
-                    :isUpdatingOrAdding="isUpdatingOrAdding"
-                />
+                <mc-view-node-checkbox v-if="hasActions" :node="props.node" :isUpdatingOrAdding="isUpdatingOrAdding" />
                 <mc-view-node-name
                     :node="props.node"
                     :depth="props.depth"
@@ -258,7 +251,7 @@ const hasActions = computed(() => !store.isReadOnly && props.node.id !== UNSET_I
             <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
                 <mc-add-subsection v-if="isAdding" :depth="props.depth" />
             </Transition>
-            <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave" >
+            <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
                 <mc-update-node v-if="isUpdating" :depth="props.depth" />
             </Transition>
             <ul v-if="showChildren">
@@ -266,7 +259,7 @@ const hasActions = computed(() => !store.isReadOnly && props.node.id !== UNSET_I
                     v-for="node in props.node.children"
                     :key="node.id"
                     :node="node"
-                    :depth="props.depth+1"
+                    :depth="props.depth + 1"
                     data-test-view-node
                 />
             </ul>
@@ -275,7 +268,6 @@ const hasActions = computed(() => !store.isReadOnly && props.node.id !== UNSET_I
 </template>
 
 <style lang="scss" scoped>
-
 .buttons-container {
     align-items: center;
     border-bottom: 1px solid v-bind(borderBottomColour);
@@ -288,20 +280,20 @@ const hasActions = computed(() => !store.isReadOnly && props.node.id !== UNSET_I
     transition: opacity 0.3s;
 }
 
-    [data-is-inactive="true"] {
-        opacity: 0.2;
-        pointer-events: none;
-    }
+[data-is-inactive="true"] {
+    opacity: 0.2;
+    pointer-events: none;
+}
 
-    [data-is-new="true"] {
-        @extend .change-animation;
-        animation-name: isNewAnimation;
-    }
+[data-is-new="true"] {
+    @extend .change-animation;
+    animation-name: isNewAnimation;
+}
 
-    [data-just-updated="true"] {
-        @extend .change-animation;
-        animation-name: justUpdatedAnimation;
-    }
+[data-just-updated="true"] {
+    @extend .change-animation;
+    animation-name: justUpdatedAnimation;
+}
 
 .change-animation {
     animation-duration: 2s;
@@ -309,13 +301,21 @@ const hasActions = computed(() => !store.isReadOnly && props.node.id !== UNSET_I
 }
 
 @keyframes isNewAnimation {
-    0% { background-color: #4fa74f; } //is $success-color from _colors.scss
-    100% { background-color: white; }
+    0% {
+        background-color: #4fa74f;
+    } //is $success-color from _colors.scss
+    100% {
+        background-color: white;
+    }
 }
 
 @keyframes justUpdatedAnimation {
-    0% { background-color: var(--accent-background); }
-    100% { background-color: white; }
+    0% {
+        background-color: var(--accent-background);
+    }
+    100% {
+        background-color: white;
+    }
 }
 
 ul {
@@ -323,7 +323,5 @@ ul {
     margin: 0; //and spacing is controlled by props.depth
 }
 
-
-@import '../style/mcStyle';
-
+@import "../style/mcStyle";
 </style>

@@ -1,33 +1,30 @@
 <script>
-
 /**
  * Contains the similarity report filters, score and status
  */
 
-import { EventBus } from 'v-tables-3-select-rows';
-import FilterEvents from './similarityReportFilterEvents';
+import { EventBus } from "v-tables-3-select-rows";
+import FilterEvents from "./similarityReportFilterEvents";
 
 export default {
-
-    data () {
+    data() {
         return {
             similarityScoreSelection: 0,
             isResubmissionRequiredChecked: true,
             isMarkingRequiredChecked: true,
             isReviewedChecked: true,
-        }
+        };
     },
 
-    mounted () {
+    mounted() {
         this.initResetFiltersListener();
     },
 
     methods: {
-        
         /**
          * Reset all the filters back to there base level
          */
-        initResetFiltersListener () {
+        initResetFiltersListener() {
             document.addEventListener(FilterEvents.RESET_FILTERS, () => {
                 this.similarityScoreSelection = 0;
                 this.isResubmissionRequiredChecked = true;
@@ -45,49 +42,50 @@ export default {
          * Note that for rows with multiple files, only a single file with a similarity
          * score above is required
          */
-        onSimilarityScoreChange () {
-            EventBus.emit(`vue-tables.filter::${FilterEvents.SIMILARITY_SCORE}`, this.similarityScoreSelection); //picked up by similarity-report.vue 
-            this.$nextTick(() => { //to ensure the latest filtered rows are available, dispatched to similarity-report-row-similarity.vue and similarity-report.vue 
-                document.dispatchEvent(new CustomEvent(FilterEvents.SIMILARITY_SCORE, { detail: { score: this.similarityScoreSelection } } ) );
+        onSimilarityScoreChange() {
+            EventBus.emit(`vue-tables.filter::${FilterEvents.SIMILARITY_SCORE}`, this.similarityScoreSelection); //picked up by similarity-report.vue
+            this.$nextTick(() => {
+                //to ensure the latest filtered rows are available, dispatched to similarity-report-row-similarity.vue and similarity-report.vue
+                document.dispatchEvent(
+                    new CustomEvent(FilterEvents.SIMILARITY_SCORE, { detail: { score: this.similarityScoreSelection } })
+                );
             });
         },
 
         /**
          * Toggle the display of submissions that are marked as resubmission required
-         * If it's checked, it's shown, so there's no filter applied, otherwise any 
+         * If it's checked, it's shown, so there's no filter applied, otherwise any
          * rows with status 'failed' will be hidden
          */
-        onResubmissionRequiredChange () {
-            const filterParam = this.isResubmissionRequiredChecked ? '' : 'failed'; 
-            EventBus.emit(`vue-tables.filter::${FilterEvents.RESUBMISSION_REQUIRED}`, filterParam); //picked up by similarity-report.vue 
-            this.$nextTick(() => document.dispatchEvent(new CustomEvent(FilterEvents.RESUBMISSION_REQUIRED))); //picked up by similarity-report.vue 
+        onResubmissionRequiredChange() {
+            const filterParam = this.isResubmissionRequiredChecked ? "" : "failed";
+            EventBus.emit(`vue-tables.filter::${FilterEvents.RESUBMISSION_REQUIRED}`, filterParam); //picked up by similarity-report.vue
+            this.$nextTick(() => document.dispatchEvent(new CustomEvent(FilterEvents.RESUBMISSION_REQUIRED))); //picked up by similarity-report.vue
         },
 
         /**
          * Toggle the display of submissions that are marked as marking required
-         * If it's checked, it's shown, so there's no filter applied, otherwise any 
+         * If it's checked, it's shown, so there's no filter applied, otherwise any
          * rows with status 'pending' will be hidden
          */
-        onMarkingRequiredChange () {
-            const filterParam = this.isMarkingRequiredChecked ? '' : 'pending'; 
-            EventBus.emit(`vue-tables.filter::${FilterEvents.MARKING_REQUIRED}`, filterParam); //picked up by similarity-report.vue 
-            this.$nextTick(() => document.dispatchEvent(new CustomEvent(FilterEvents.MARKING_REQUIRED))); //picked up by similarity-report.vue 
+        onMarkingRequiredChange() {
+            const filterParam = this.isMarkingRequiredChecked ? "" : "pending";
+            EventBus.emit(`vue-tables.filter::${FilterEvents.MARKING_REQUIRED}`, filterParam); //picked up by similarity-report.vue
+            this.$nextTick(() => document.dispatchEvent(new CustomEvent(FilterEvents.MARKING_REQUIRED))); //picked up by similarity-report.vue
         },
 
         /**
          * Toggle the display of submissions that are marked as reviewed
-         * If it's checked, it's shown, so there's no filter applied, otherwise any 
+         * If it's checked, it's shown, so there's no filter applied, otherwise any
          * rows with status 'reviewed' will be hidden
          */
-        onReviewedChange () {
-            const filterParam = this.isReviewedChecked ? '' : 'reviewed'; 
-            EventBus.emit(`vue-tables.filter::${FilterEvents.REVIEWED}`, filterParam); //picked up by similarity-report.vue 
-            this.$nextTick(() => document.dispatchEvent(new CustomEvent(FilterEvents.REVIEWED))); //picked up by similarity-report.vue 
+        onReviewedChange() {
+            const filterParam = this.isReviewedChecked ? "" : "reviewed";
+            EventBus.emit(`vue-tables.filter::${FilterEvents.REVIEWED}`, filterParam); //picked up by similarity-report.vue
+            this.$nextTick(() => document.dispatchEvent(new CustomEvent(FilterEvents.REVIEWED))); //picked up by similarity-report.vue
         },
-
-    }
-
-}
+    },
+};
 </script>
 
 <template>
@@ -107,15 +105,25 @@ export default {
                 <label>Status</label>
                 <ul class="option-list">
                     <li>
-                        <input type="checkbox" id="resubmission-required" v-model="isResubmissionRequiredChecked" @change="onResubmissionRequiredChange()">
+                        <input
+                            type="checkbox"
+                            id="resubmission-required"
+                            v-model="isResubmissionRequiredChecked"
+                            @change="onResubmissionRequiredChange()"
+                        />
                         <label for="resubmission-required">Resubmission required</label>
                     </li>
                     <li>
-                        <input type="checkbox" id="marking-required" v-model="isMarkingRequiredChecked" @change="onMarkingRequiredChange()">
+                        <input
+                            type="checkbox"
+                            id="marking-required"
+                            v-model="isMarkingRequiredChecked"
+                            @change="onMarkingRequiredChange()"
+                        />
                         <label for="marking-required">Marking required</label>
                     </li>
                     <li>
-                        <input type="checkbox" id="reviewed" v-model="isReviewedChecked" @change="onReviewedChange()">
+                        <input type="checkbox" id="reviewed" v-model="isReviewedChecked" @change="onReviewedChange()" />
                         <label for="reviewed">Reviewed</label>
                     </li>
                 </ul>
@@ -125,8 +133,7 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-
-@import './similarity-report';
+@import "./similarity-report";
 
 .filters {
     background: white;
@@ -137,12 +144,12 @@ export default {
     }
 }
 
-    .filters__column { 
-        flex: 1 1 0; //keep both sides equal
-        margin: 0 1rem;
-    }
+.filters__column {
+    flex: 1 1 0; //keep both sides equal
+    margin: 0 1rem;
+}
 
-legend { 
+legend {
     margin-bottom: 0.5rem; //extra gap between it and the form element below
 }
 
@@ -153,5 +160,4 @@ legend {
         display: block;
     }
 }
-
 </style>

@@ -1,9 +1,8 @@
 <script>
-import {Chart} from 'highcharts-vue';
-import filesize from 'filesize';
+import { Chart } from "highcharts-vue";
+import filesize from "filesize";
 
 export default {
-
     /**
      * Name.
      * The name of the component that we have here. This name will be used in the container
@@ -24,12 +23,7 @@ export default {
      * Immutable props that were passed to this component, usually via twig, in our setup.
      * These are the hyphen-separated vars which are magically computed into camelcase elsewhere.
      */
-    props: [
-        'endpoint',
-        'isS3Adapter',
-        'title',
-        'yAxisTitle'
-    ],
+    props: ["endpoint", "isS3Adapter", "title", "yAxisTitle"],
 
     /**
      * Components.
@@ -48,7 +42,6 @@ export default {
      */
     data() {
         return {
-
             /* True, when data is currently loading; used to show skeleton
              */
             loading: true,
@@ -59,8 +52,8 @@ export default {
 
             /* Chart options
              */
-            chartOptions: {}
-        }
+            chartOptions: {},
+        };
     },
 
     /**
@@ -76,8 +69,7 @@ export default {
      * Computed properties.
      * Access the results of a function as if they were a property of an object.
      */
-    computed: {
-    },
+    computed: {},
 
     /**
      * Methods.
@@ -96,18 +88,19 @@ export default {
         /**
          * Display the chart once the data has been loaded
          */
-        async getData () {
+        async getData() {
             this.loading = true;
             try {
                 const response = await fetch(this.endpoint, {
                     headers: {
-                        'Content-Type': 'application/json',
+                        "Content-Type": "application/json",
                     },
                 });
-                let values = [], categories = [];
+                let values = [],
+                    categories = [];
                 this.allData = await response.json();
                 //check if we have a data value in the response object
-                if ('undefined' !== typeof this.allData.data) {
+                if ("undefined" !== typeof this.allData.data) {
                     values = this.allData.data.map((item) => parseInt(item.size));
                     categories = this.allData.data.map((item) => item.label);
                 } else {
@@ -131,86 +124,85 @@ export default {
          *
          * @returns { Object }
          */
-        getChartOptions (values, categories) {
+        getChartOptions(values, categories) {
             return {
                 chart: {
                     reflow: true,
                     spacingRight: 48,
-                    type: 'bar'
+                    type: "bar",
                 },
                 credits: {
-                    enabled: false
+                    enabled: false,
                 },
                 legend: {
-                    enabled: false
+                    enabled: false,
                 },
                 plotOptions: {
                     bar: {
                         dataLabels: {
                             crop: false,
                             enabled: true,
-                            formatter: function() {
-                                return '<span style="color: #777777">' + filesize(this.y) + '</span>'
+                            formatter: function () {
+                                return '<span style="color: #777777">' + filesize(this.y) + "</span>";
                             },
                             inside: false,
-                            overflow: 'none'
-                        }
-                    }
+                            overflow: "none",
+                        },
+                    },
                 },
                 series: [
                     {
-                        color: '#82b5d8',
-                        name: '',
-                        data: values
-                    }
+                        color: "#82b5d8",
+                        name: "",
+                        data: values,
+                    },
                 ],
                 time: {
-                    useUTC: false
+                    useUTC: false,
                 },
                 title: {
-                    text: this.title
+                    text: this.title,
                 },
                 tooltip: {
-                    enabled: false
+                    enabled: false,
                 },
                 xAxis: {
-                    categories: categories
+                    categories: categories,
                 },
                 yAxis: {
                     allowDecimals: false,
                     min: 0,
                     title: {
-                        text: this.yAxisTitle
-                    }
+                        text: this.yAxisTitle,
+                    },
                 },
-            }
+            };
         },
-
-    }
-}
+    },
+};
 </script>
 <template>
     <div>
         <template v-if="this.loading">
             <table class="skeleton">
                 <thead>
-                <tr>
-                    <th></th>
-                </tr>
+                    <tr>
+                        <th></th>
+                    </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td></td>
-                </tr>
+                    <tr>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                    </tr>
                 </tbody>
             </table>
         </template>
         <template v-else>
             <highcharts :options="chartOptions"></highcharts>
-            <div v-if="lastGen()" class="meta"> ^ Last Generated: {{ lastGen() }}</div>
+            <div v-if="lastGen()" class="meta">^ Last Generated: {{ lastGen() }}</div>
         </template>
     </div>
 </template>

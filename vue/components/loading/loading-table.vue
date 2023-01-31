@@ -1,13 +1,11 @@
 <script setup>
-
 /**
  * Just a basic loading animation that is replaced by a table when ready
  */
-
 </script>
 
 <template>
-   <table class="skeleton">
+    <table class="skeleton">
         <thead>
             <tr>
                 <th></th>

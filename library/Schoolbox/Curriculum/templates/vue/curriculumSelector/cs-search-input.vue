@@ -1,21 +1,18 @@
 <script setup>
-
 /**
  * To search for codes or select the browse button to open the modal
  */
 
-import { ref, watch, computed, onMounted, onUnmounted } from 'vue';
-import debounce from 'lodash/debounce';
-import { useStore } from './store/curriculumSelectorStore';
-import { useModalStore } from './store/csModalStore';
-import { useSearchStore, DEBOUNCE_AMOUNT } from './store/csSearchStore';
-
+import { ref, watch, computed, onMounted, onUnmounted } from "vue";
+import debounce from "lodash/debounce";
+import { useStore } from "./store/curriculumSelectorStore";
+import { useModalStore } from "./store/csModalStore";
+import { useSearchStore, DEBOUNCE_AMOUNT } from "./store/csSearchStore";
 
 const store = useStore();
 const modalStore = useModalStore();
 const searchStore = useSearchStore();
 const queryInputEl = ref(null); //to deterch if the search input is currently active
-
 
 const props = defineProps({
     /**
@@ -33,31 +30,30 @@ const props = defineProps({
  */
 const inputPlaceholder = computed(() => {
     if (store.isLoading) {
-        return 'Loading Curriculum Codes...';
+        return "Loading Curriculum Codes...";
     } else if (store.hasLoadError) {
-        return 'Currently unable to load Curriculum Codes. Please contact your IT support if the problem persists.';
+        return "Currently unable to load Curriculum Codes. Please contact your IT support if the problem persists.";
     } else {
-        return 'Search for curriculum codes or keywords...';
+        return "Search for curriculum codes or keywords...";
     }
-
 });
 
 /**
  * add relevant keyboard and mouse events
  */
 onMounted(() => {
-    document.addEventListener('keydown', onKeyDown);
-    document.addEventListener('keyup', onKeyUp);
-    document.addEventListener('click', onMouseClick);
+    document.addEventListener("keydown", onKeyDown);
+    document.addEventListener("keyup", onKeyUp);
+    document.addEventListener("click", onMouseClick);
 });
 
 /**
  * remove relevant keyboard and mouse events
  */
 onUnmounted(() => {
-    document.removeEventListener('keydown', onKeyDown);
-    document.removeEventListener('keyup', onKeyUp);
-    document.removeEventListener('click', onMouseClick);
+    document.removeEventListener("keydown", onKeyDown);
+    document.removeEventListener("keyup", onKeyUp);
+    document.removeEventListener("click", onMouseClick);
 });
 
 /**
@@ -65,8 +61,8 @@ onUnmounted(() => {
  *
  * @param { Event }
  */
-function onKeyDown (event) {
-    if (event.key === 'Enter' && document.activeElement === queryInputEl.value) {
+function onKeyDown(event) {
+    if (event.key === "Enter" && document.activeElement === queryInputEl.value) {
         event.preventDefault();
     }
 }
@@ -78,12 +74,13 @@ function onKeyDown (event) {
  *
  * @param { Event }
  */
-function onKeyUp (event) {
+function onKeyUp(event) {
     const keyName = event.key;
     const keyOptions = {
-        'Enter': () => onEnterKeySelected(),
-    }
-    if (keyOptions[keyName] && document.activeElement === queryInputEl.value) { //ensure search input has focus
+        Enter: () => onEnterKeySelected(),
+    };
+    if (keyOptions[keyName] && document.activeElement === queryInputEl.value) {
+        //ensure search input has focus
         event.preventDefault();
         keyOptions[keyName]();
     }
@@ -93,7 +90,7 @@ function onKeyUp (event) {
  * enter the manual entry or select the currently
  * highlighted search result
  */
-function onEnterKeySelected () {
+function onEnterKeySelected() {
     searchStore.addAllResults();
     searchStore.clear();
 }
@@ -104,7 +101,7 @@ function onEnterKeySelected () {
  *
  * @param { Event }
  */
-function onMouseClick (event) {
+function onMouseClick(event) {
     if (searchStore.isActive && props.curriculumSelectorEl && !props.curriculumSelectorEl.contains(event.target)) {
         searchStore.clear();
     }
@@ -113,12 +110,15 @@ function onMouseClick (event) {
 /**
  * start searching once the search is active, watching the query string for input
  */
- watch(() => searchStore.query, () => {
-    if (searchStore.isActive) {
-        searchStore.enableSearch();
-        debounceSearch();
+watch(
+    () => searchStore.query,
+    () => {
+        if (searchStore.isActive) {
+            searchStore.enableSearch();
+            debounceSearch();
+        }
     }
-});
+);
 
 /**
  * debounce to avoid constant polling while the user is typing
@@ -130,10 +130,9 @@ const debounceSearch = debounce(() => {
 /**
  * to open the modal
  */
-function onBrowseSelected () {
+function onBrowseSelected() {
     modalStore.open();
 }
-
 </script>
 
 <template>
@@ -154,14 +153,14 @@ function onBrowseSelected () {
             class="button icon-curriculum"
             title="Browse and select from the Curriculum"
             @click.prevent="onBrowseSelected"
-            @keyup.enter="onBrowseSelected">
+            @keyup.enter="onBrowseSelected"
+        >
             Browse
         </button>
     </div>
 </template>
 
 <style scoped>
-
 input,
 button {
     margin-bottom: 0;
@@ -170,5 +169,4 @@ button {
 .input-group[data-is-small-container="true"] {
     flex-direction: column; /*stack the input and button when the container is small */
 }
-
 </style>

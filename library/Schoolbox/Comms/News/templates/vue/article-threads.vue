@@ -1,16 +1,13 @@
 <script>
-
-import axios from 'axios';
-import MediaArticle from '@schoolboxVue/components/media-article';
-import toastMixin from '@schoolboxVue/components/toast-mixin';
-import RevealModal from '@schoolboxVue/components/reveal-modal';
-import AddCommentInput from '@schoolboxVue/components/ckeditor/add-comment-input';
-import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin';
-
+import axios from "axios";
+import MediaArticle from "@schoolboxVue/components/media-article";
+import toastMixin from "@schoolboxVue/components/toast-mixin";
+import RevealModal from "@schoolboxVue/components/reveal-modal";
+import AddCommentInput from "@schoolboxVue/components/ckeditor/add-comment-input";
+import cdnPrefixMixin from "@schoolboxVue/components/cdn-prefix-mixin";
 
 export default {
-
-    name: 'article-threads',
+    name: "article-threads",
 
     components: {
         MediaArticle,
@@ -18,10 +15,7 @@ export default {
         AddCommentInput,
     },
 
-    mixins: [
-        cdnPrefixMixin,
-        toastMixin
-    ],
+    mixins: [cdnPrefixMixin, toastMixin],
 
     props: {
         articleId: Number,
@@ -34,7 +28,7 @@ export default {
         siteVersion: String, //for cache busting
     },
 
-    data () {
+    data() {
         return {
             threadId: 0,
             isThreadCheckboxVisible: undefined,
@@ -42,7 +36,7 @@ export default {
             isThreadEnabled: undefined,
             comments: [],
             totalCommentsCount: 0,
-            cursorNext: '',
+            cursorNext: "",
             showLoadMoreButton: false,
             commentIndexToDelete: undefined,
             confirmDeleteButton: true,
@@ -50,23 +44,22 @@ export default {
             showCommentsSection: false,
             isInitialLoad: true,
             postHeaders: {
-                'X-Requested-With' : 'XMLHttpRequest'
+                "X-Requested-With": "XMLHttpRequest",
             },
-        }
+        };
     },
 
-    mounted () {
+    mounted() {
         this.initDataFromProps();
         this.getThread();
     },
 
     methods: {
-
         /**
          * Setup data that is passed through as Props
          *
          */
-        initDataFromProps () {
+        initDataFromProps() {
             this.threadId = this.threadIdOnLoad;
             this.isThreadCheckboxVisible = this.isThreadCheckboxVisibleOnLoad;
             this.isThreadCheckboxEnabled = this.isThreadCheckboxEnabledOnLoad;
@@ -77,7 +70,7 @@ export default {
          * Retrieve a list of comments
          *
          */
-        getThread () {
+        getThread() {
             this.isProcessing = true;
 
             // Short-circuit if no thread ID
@@ -88,50 +81,53 @@ export default {
                 return;
             }
 
-            axios.get('/discussion/comms/' + this.articleId + '/threads/' + this.threadId + '/comments/', {
-                params: {
-                    cursor: this.cursorNext
-                }
-            }).then((response) => {
+            axios
+                .get("/discussion/comms/" + this.articleId + "/threads/" + this.threadId + "/comments/", {
+                    params: {
+                        cursor: this.cursorNext,
+                    },
+                })
+                .then((response) => {
+                    const responseData = response.data;
 
-                const responseData = response.data;
+                    responseData.data.forEach((data) => {
+                        this.comments.push(data);
+                    });
 
-                responseData.data.forEach((data) => {
-                    this.comments.push(data);
-                });
+                    this.totalCommentsCount = responseData.metadata.count;
+                    this.cursorNext = responseData.metadata.cursor.next;
 
-                this.totalCommentsCount = responseData.metadata.count;
-                this.cursorNext = responseData.metadata.cursor.next;
+                    /**
+                     * TODO: Maybe the API should return a metadata that will let the front-end know if there's still
+                     * a next page to render rather than comparing the value of the length of array and the comment's total count?
+                     *
+                     * Do not show load more button when all the comments has been loaded
+                     */
+                    this.showLoadMoreButton = this.comments.length < responseData.metadata.count;
 
-                /**
-                 * TODO: Maybe the API should return a metadata that will let the front-end know if there's still
-                 * a next page to render rather than comparing the value of the length of array and the comment's total count?
-                 *
-                 * Do not show load more button when all the comments has been loaded
-                 */
-                this.showLoadMoreButton = this.comments.length < responseData.metadata.count;
-
-                /**
-                 * If the user has the rights to modify the thread, despite that there's comments,
-                 * comments section must be rendered
-                 */
-                this.showCommentsSection = (this.isThreadCheckboxVisible || this.totalCommentsCount > 0 || this.isThreadEnabled);
-
-            }).catch((error) => {
-                this.isInitialLoad = false;
-                this.toastActivate('Unable to load comments');
-                this.toastError('Unable to load comments');
-            }).finally(() => {
-                if (this.isInitialLoad) {
-                    // Anchored? go to the element once the component has been loaded
-                    if (window.location.hash === '#discussion') {
-                        const discussionElement = document.getElementById('discussion');
-                        discussionElement.scrollIntoView( { behavior: 'smooth' } );
-                    }
+                    /**
+                     * If the user has the rights to modify the thread, despite that there's comments,
+                     * comments section must be rendered
+                     */
+                    this.showCommentsSection =
+                        this.isThreadCheckboxVisible || this.totalCommentsCount > 0 || this.isThreadEnabled;
+                })
+                .catch((error) => {
                     this.isInitialLoad = false;
-                }
-                this.isProcessing = false;
-            });
+                    this.toastActivate("Unable to load comments");
+                    this.toastError("Unable to load comments");
+                })
+                .finally(() => {
+                    if (this.isInitialLoad) {
+                        // Anchored? go to the element once the component has been loaded
+                        if (window.location.hash === "#discussion") {
+                            const discussionElement = document.getElementById("discussion");
+                            discussionElement.scrollIntoView({ behavior: "smooth" });
+                        }
+                        this.isInitialLoad = false;
+                    }
+                    this.isProcessing = false;
+                });
         },
 
         /**
@@ -139,7 +135,7 @@ export default {
          *
          * @param {event} event  To determine the status
          */
-        changeThreadStatus (event) {
+        changeThreadStatus(event) {
             let changeThreadStatusAction;
 
             this.isThreadEnabled = event.target.checked;
@@ -147,19 +143,22 @@ export default {
             if (this.threadId) {
                 // I already have a thread ID: switch it on/off
                 changeThreadStatusAction = new Promise((resolve, reject) => {
-
-                    let changeThreadStatusEndpoint = '/discussion/comms/' + this.articleId + '/threads/' + this.threadId + '/';
+                    let changeThreadStatusEndpoint =
+                        "/discussion/comms/" + this.articleId + "/threads/" + this.threadId + "/";
                     if (this.isThreadEnabled) {
-                        changeThreadStatusEndpoint += 'open';
+                        changeThreadStatusEndpoint += "open";
                     } else {
-                        changeThreadStatusEndpoint += 'close';
+                        changeThreadStatusEndpoint += "close";
                     }
 
-                    axios.put(changeThreadStatusEndpoint, {}, { headers: this.postHeaders }).then(() => {
-                        resolve();
-                    }).catch(function (error) {
-                        reject(error ?? '');
-                    });
+                    axios
+                        .put(changeThreadStatusEndpoint, {}, { headers: this.postHeaders })
+                        .then(() => {
+                            resolve();
+                        })
+                        .catch(function (error) {
+                            reject(error ?? "");
+                        });
                 });
             } else {
                 // No thread ID.
@@ -174,26 +173,25 @@ export default {
                             resolve();
                         })
                         .catch(function (error) {
-                            reject(error ?? '');
+                            reject(error ?? "");
                         });
                 });
             }
 
             // Actually run the promise, setting the toast accordingly
             changeThreadStatusAction
-                .then(() => {
-                })
+                .then(() => {})
                 .catch((error) => {
-                    this.toastActivate('Saving...');
-                    this.toastError('Unable to save');
+                    this.toastActivate("Saving...");
+                    this.toastError("Unable to save");
                 });
         },
 
         /**
          * Comment input failed to load, so show error
          */
-        onLoadError () {
-            this.$refs.toast.timeout('Loading comment box failed', false, 5000);
+        onLoadError() {
+            this.$refs.toast.timeout("Loading comment box failed", false, 5000);
         },
 
         /**
@@ -201,26 +199,27 @@ export default {
          *
          *  @param { String }
          */
-        postComment (newComment) {
+        postComment(newComment) {
             this.isProcessing = true;
-            this.toastActivate('Posting comment...');
+            this.toastActivate("Posting comment...");
 
-            axios.post('/discussion/comms/' + this.articleId + '/threads/' + this.threadId + '/comments', {
-                content: newComment
-            }).then((response) => {
+            axios
+                .post("/discussion/comms/" + this.articleId + "/threads/" + this.threadId + "/comments", {
+                    content: newComment,
+                })
+                .then((response) => {
+                    this.comments.unshift(response.data);
+                    this.totalCommentsCount++;
 
-                this.comments.unshift(response.data);
-                this.totalCommentsCount++;
-
-                this.toastSuccess('Comment has been added');
-
-            }).catch((error) => {
-                this.isProcessing = false;
-                this.toastError('Unable to post comment');
-            }).finally(() => {
-                this.isProcessing = false;
-            });
-
+                    this.toastSuccess("Comment has been added");
+                })
+                .catch((error) => {
+                    this.isProcessing = false;
+                    this.toastError("Unable to post comment");
+                })
+                .finally(() => {
+                    this.isProcessing = false;
+                });
         },
 
         /**
@@ -239,32 +238,37 @@ export default {
          *
          * @param {event} to determine the status
          */
-        deleteComment () {
+        deleteComment() {
             this.isProcessing = true;
-            this.toastActivate('Deleting comment...');
+            this.toastActivate("Deleting comment...");
 
             const commentIdToDelete = this.comments[this.commentIndexToDelete].id;
 
             // Need the commentIdToDelete, so needs to be constructed manually?
-            axios.delete('/discussion/comms/' + this.articleId + '/comments/' + commentIdToDelete, {}, { headers: this.postHeaders }).then(() => {
+            axios
+                .delete(
+                    "/discussion/comms/" + this.articleId + "/comments/" + commentIdToDelete,
+                    {},
+                    { headers: this.postHeaders }
+                )
+                .then(() => {
+                    this.comments.splice(this.commentIndexToDelete, 1);
+                    this.totalCommentsCount--;
 
-                this.comments.splice(this.commentIndexToDelete, 1);
-                this.totalCommentsCount--;
+                    // Automatically trigger show previous comments to show the next set of records when the list has gone down to 0
+                    if (this.comments.length < 1 && this.totalCommentsCount > 0) {
+                        this.getThread();
+                    }
 
-                // Automatically trigger show previous comments to show the next set of records when the list has gone down to 0
-                if (this.comments.length < 1 && this.totalCommentsCount > 0) {
-                    this.getThread();
-                }
+                    this.$refs.deleteModal.close();
 
-                this.$refs.deleteModal.close();
-
-                this.toastSuccess('Comment deleted');
-                this.isProcessing = false;
-
-            }).catch((error) => {
-                this.toastError('Unable to delete comment');
-                this.isProcessing = false;
-            });
+                    this.toastSuccess("Comment deleted");
+                    this.isProcessing = false;
+                })
+                .catch((error) => {
+                    this.toastError("Unable to delete comment");
+                    this.isProcessing = false;
+                });
         },
 
         /**
@@ -274,7 +278,7 @@ export default {
          *
          * @returns { String } ie: 2 hours ago
          */
-        fromNow (date) {
+        fromNow(date) {
             return dayjs(date.database).fromNow();
         },
 
@@ -285,13 +289,11 @@ export default {
          *
          * @returns { String }
          */
-        fullString (date) {
+        fullString(date) {
             return dayjs(date.database).format(dateDisplayFormats.dayjsDatetime);
-        }
-
+        },
     },
-
-}
+};
 </script>
 
 <template>
@@ -300,10 +302,18 @@ export default {
             <div class="discussion-threads">
                 <div class="row">
                     <div class="small-6 columns">
-                        <h2>Comments <span v-if="!isInitialLoad">({{ totalCommentsCount }})</span></h2>
+                        <h2>
+                            Comments <span v-if="!isInitialLoad">({{ totalCommentsCount }})</span>
+                        </h2>
                     </div>
                     <div v-if="!isInitialLoad && isThreadCheckboxVisible" class="checklist small-6 columns">
-                        <input id="allow-comments" name="allowComments" type="checkbox" @click="changeThreadStatus" v-model="isThreadCheckboxEnabled" />
+                        <input
+                            id="allow-comments"
+                            name="allowComments"
+                            type="checkbox"
+                            @click="changeThreadStatus"
+                            v-model="isThreadCheckboxEnabled"
+                        />
                         <label for="allow-comments">Allow comments</label>
                     </div>
                 </div>
@@ -320,7 +330,9 @@ export default {
                         </template>
                         <template v-else>
                             <div data-alert="" class="alert-box">
-                                <span class="icon-locked">Comments will be available once this article is published.</span>
+                                <span class="icon-locked"
+                                    >Comments will be available once this article is published.</span
+                                >
                             </div>
                         </template>
                     </div>
@@ -349,31 +361,58 @@ export default {
                             <div class="list-item">
                                 <div class="card compact small-12">
                                     <a :href="'/search/user/' + comment.author.id" title="View Profile">
-                                        <img :src="'/portrait.php?id=' + comment.author.id + '&size=square64'">
+                                        <img :src="'/portrait.php?id=' + comment.author.id + '&size=square64'" />
                                         {{ comment.author.fullName }}
-                                        <span class="pipe meta" :title="fullString(comment.createdAt)">Posted {{ fromNow(comment.createdAt) }}</span>
+                                        <span class="pipe meta" :title="fullString(comment.createdAt)"
+                                            >Posted {{ fromNow(comment.createdAt) }}</span
+                                        >
                                     </a>
                                 </div>
                             </div>
                             <nav>
-                                <a v-if="comment._links.delete.auth" @click.prevent="showDeleteModal(index)" href="#delete-comment" class="icon-delete no-text" title="Delete comment"></a>
+                                <a
+                                    v-if="comment._links.delete.auth"
+                                    @click.prevent="showDeleteModal(index)"
+                                    href="#delete-comment"
+                                    class="icon-delete no-text"
+                                    title="Delete comment"
+                                ></a>
                             </nav>
                             <media-article v-html="comment.content"></media-article>
                         </li>
                     </ul>
-                    <button v-if="showLoadMoreButton" @click="getThread" class="button expand" :disabled="isProcessing">Show older comments</button>
+                    <button v-if="showLoadMoreButton" @click="getThread" class="button expand" :disabled="isProcessing">
+                        Show older comments
+                    </button>
                 </template>
             </div>
         </section>
-        <div id='toaster' class="toast" data-toast></div>
+        <div id="toaster" class="toast" data-toast></div>
         <reveal-modal ref="deleteModal">
             <h2>Please confirm</h2>
             <p>Are you sure you want to delete this comment?</p>
             <ul class="flex-list buttons">
-                <li><button @click.prevent="deleteComment" class="button submit" id="article-threads-delete-button" :disabled="isProcessing">Delete</button></li>
-                <li><button @click.prevent="$refs.deleteModal.close" class="button" id="article-threads-cancel-button" :disabled="isProcessing">Cancel</button></li>
+                <li>
+                    <button
+                        @click.prevent="deleteComment"
+                        class="button submit"
+                        id="article-threads-delete-button"
+                        :disabled="isProcessing"
+                    >
+                        Delete
+                    </button>
+                </li>
+                <li>
+                    <button
+                        @click.prevent="$refs.deleteModal.close"
+                        class="button"
+                        id="article-threads-cancel-button"
+                        :disabled="isProcessing"
+                    >
+                        Cancel
+                    </button>
+                </li>
             </ul>
         </reveal-modal>
     </div>
 </template>
-

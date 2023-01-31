@@ -1,39 +1,36 @@
 <script>
-
 /*
  * To play an audio only, which contains waveform visualizer
  *
  */
 
-import 'video.js/dist/video-js.css';
-import 'videojs-wavesurfer/dist/css/videojs.wavesurfer.css'
-import videojs from 'video.js';
-import { timeout } from '@js/util/jsUtils';
-
+import "video.js/dist/video-js.css";
+import "videojs-wavesurfer/dist/css/videojs.wavesurfer.css";
+import videojs from "video.js";
+import { timeout } from "@js/util/jsUtils";
 
 export default {
-
     props: {
         options: {
             type: Object,
             required: true,
-            default () {
+            default() {
                 return {};
-            }
+            },
         },
     },
 
-    data () {
+    data() {
         return {
-            isVideoEncoding: true //until it's checked at least once or confirmed the video is a blob
-        }
+            isVideoEncoding: true, //until it's checked at least once or confirmed the video is a blob
+        };
     },
 
-    created () {
+    created() {
         this.hasHash = this.checkForHash();
     },
 
-    mounted () {
+    mounted() {
         if (this.hasHash) {
             this.checkVideoEncodingLoop();
         } else {
@@ -42,24 +39,25 @@ export default {
         }
     },
 
-    beforeUnmount () {
+    beforeUnmount() {
         if (this.player) {
             this.player.dispose(); //cleanup, can be re-activated later on the same page
         }
     },
 
     methods: {
-
         /**
          * if the file contains a hash, we should ensure the video isn't transcoding prior to displaying
          *
          * @returns { Boolean }
          */
-        checkForHash () {
+        checkForHash() {
             this.hash = this.options.audioPlayerHash;
-            if (this.hash) { //need to check its status first
+            if (this.hash) {
+                //need to check its status first
                 return true;
-            } else { //otherwise it's a blob recording
+            } else {
+                //otherwise it's a blob recording
                 return false;
             }
         },
@@ -68,9 +66,10 @@ export default {
          * ensure the video has finished processing prior to displaying
          *
          */
-        async checkVideoEncodingLoop () {
+        async checkVideoEncodingLoop() {
             this.isVideoEncoding = await this.checkIsVideoEncoding();
-            if (this.isVideoEncoding && document.body.contains(this.$el)) {  //ensure that the player is still in the DOM (could have been deleted)
+            if (this.isVideoEncoding && document.body.contains(this.$el)) {
+                //ensure that the player is still in the DOM (could have been deleted)
                 await timeout(2000); //loop around until it's complete
                 this.checkVideoEncodingLoop();
             } else if (!this.isVideoEncoding && document.body.contains(this.$el)) {
@@ -83,14 +82,17 @@ export default {
          *
          * @returns { Boolean }
          */
-        async checkIsVideoEncoding () {
+        async checkIsVideoEncoding() {
             try {
-                const response = await fetch('/storage/checkVideoStatus.php?' + new URLSearchParams({
-                    hash: this.hash
-                }));
+                const response = await fetch(
+                    "/storage/checkVideoStatus.php?" +
+                        new URLSearchParams({
+                            hash: this.hash,
+                        })
+                );
                 const responseData = await response.json();
                 const videoStatus = responseData.status;
-                if (videoStatus === 'pending' || videoStatus === 'processing') {
+                if (videoStatus === "pending" || videoStatus === "processing") {
                     return true;
                 } else {
                     return false;
@@ -104,11 +106,11 @@ export default {
          * set up videojs
          *
          */
-        initVideojs () {
+        initVideojs() {
             this.$nextTick(() => {
                 this.player = videojs(this.$refs.audioPlayer, this.options, this.onVideojsReady);
-                this.player.on('play', this.onPlay);
-                this.player.on('waveReady', this.onWaveformReady);
+                this.player.on("play", this.onPlay);
+                this.player.on("waveReady", this.onWaveformReady);
             });
         },
 
@@ -116,21 +118,25 @@ export default {
          * videojs is ready, dispatch event in case anyone listening and pass in the audio src
          *
          */
-        onVideojsReady () {
+        onVideojsReady() {
             this.player.src({
                 src: this.options.audioPlayerSrc,
-                type: this.options.audioPlayerType
+                type: this.options.audioPlayerType,
             });
-            this.$emit('on-dimensions-ready', this.$refs.audioContainer.offsetWidth, this.$refs.audioContainer.offsetHeight);
+            this.$emit(
+                "on-dimensions-ready",
+                this.$refs.audioContainer.offsetWidth,
+                this.$refs.audioContainer.offsetHeight
+            );
         },
 
         /**
          * ensure big play button is disabled on play
          *
          */
-        onPlay () {
+        onPlay() {
             const audioContainer = this.$refs.audioContainer.firstChild;
-            audioContainer.querySelector('.vjs-big-play-button').classList.add('vjs-hidden');
+            audioContainer.querySelector(".vjs-big-play-button").classList.add("vjs-hidden");
         },
 
         /**
@@ -139,7 +145,7 @@ export default {
          * divs to still behave the same as a standard video
          *
          */
-        onWaveformReady () {
+        onWaveformReady() {
             const audioContainer = this.$refs.audioContainer.firstChild;
             this.addPlayToggle(audioContainer);
             this.updateBigPlayButton(audioContainer);
@@ -150,18 +156,18 @@ export default {
          * Put a toggle play/pause over the top of the waveform
          *
          */
-        addPlayToggle (audioContainer) {
-            const bigPlayButton = audioContainer.querySelector('.vjs-big-play-button');
-            const playToggle = document.createElement('div'); //cover the entire video container
-            playToggle.style.position = 'absolute';
-            playToggle.style.left = '0';
-            playToggle.style.top = '0';
-            playToggle.style.width = '100%';
-            playToggle.style.height = '100%';
-            playToggle.addEventListener('click', () => {
+        addPlayToggle(audioContainer) {
+            const bigPlayButton = audioContainer.querySelector(".vjs-big-play-button");
+            const playToggle = document.createElement("div"); //cover the entire video container
+            playToggle.style.position = "absolute";
+            playToggle.style.left = "0";
+            playToggle.style.top = "0";
+            playToggle.style.width = "100%";
+            playToggle.style.height = "100%";
+            playToggle.addEventListener("click", () => {
                 if (this.player.paused()) {
                     this.player.play();
-                    bigPlayButton.classList.add('vjs-hidden');
+                    bigPlayButton.classList.add("vjs-hidden");
                 } else {
                     this.player.pause();
                 }
@@ -173,11 +179,11 @@ export default {
          * Move the big play button above the waveform and ensure behaves as expected
          *
          */
-        updateBigPlayButton (audioContainer) {
-            const bigPlayButton = audioContainer.querySelector('.vjs-big-play-button');
-            bigPlayButton.classList.remove('vjs-hidden');
-            bigPlayButton.addEventListener('click', () => {
-                bigPlayButton.classList.add('vjs-hidden');
+        updateBigPlayButton(audioContainer) {
+            const bigPlayButton = audioContainer.querySelector(".vjs-big-play-button");
+            bigPlayButton.classList.remove("vjs-hidden");
+            bigPlayButton.addEventListener("click", () => {
+                bigPlayButton.classList.add("vjs-hidden");
             });
             audioContainer.appendChild(bigPlayButton);
         },
@@ -186,25 +192,22 @@ export default {
          * Put the control above the waveform
          *
          */
-        updateControlBar (audioContainer) {
-            const controlBar = audioContainer.querySelector('.vjs-control-bar');
+        updateControlBar(audioContainer) {
+            const controlBar = audioContainer.querySelector(".vjs-control-bar");
             audioContainer.appendChild(controlBar);
-        }
-
-    }
-
-}
+        },
+    },
+};
 </script>
 
 <template>
     <div ref="audioContainer">
-        <img v-if="isVideoEncoding" class="processing-img" src="`${cdnPrefix}images/core/video-processing.gif`">
+        <img v-if="isVideoEncoding" class="processing-img" src="`${cdnPrefix}images/core/video-processing.gif`" />
         <video v-else ref="audioPlayer" class="video-js vjs-play-skin"></video>
     </div>
 </template>
 
 <style lang="scss" scoped>
-
 .processing-img {
     width: 100%;
     height: auto;
@@ -225,9 +228,9 @@ export default {
     }
     .vjs-time-control {
         color: white;
-        font-size: .875rem;
-        padding-left: .5rem;
-        padding-right: .5rem;
+        font-size: 0.875rem;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
         width: auto;
         min-width: 0;
         line-height: 3.5em;
@@ -275,7 +278,7 @@ export default {
             width: 2.5em;
         }
         .vjs-time-control {
-            font-size: .7rem;
+            font-size: 0.7rem;
             padding-left: 0.1rem;
             padding-right: 0.1rem;
             line-height: 2.2em;
@@ -286,5 +289,4 @@ export default {
         }
     }
 }
-
 </style>

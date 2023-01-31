@@ -1,70 +1,66 @@
 <script>
-
-import FullCalendar       from '@fullcalendar/vue3'
-import interactionPlugin  from '@fullcalendar/interaction'
-import dayGridPlugin      from '@fullcalendar/daygrid'
-import timeGridPlugin     from '@fullcalendar/timegrid'
-import adaptivePlugin     from '@fullcalendar/adaptive'
-import RevealModal        from '@schoolboxVue/components/reveal-modal'
-import ViewEventModal     from '@schoolboxVue/components/fullcalendar/view-event-modal';
-import axios              from 'axios'
-import fullCalendarHelper from '@schoolboxVue/components/fullcalendar/mixinFullCalendarHelper';
-import {stringify}        from 'qs';
-import resourceTimelinePlugin     from '@fullcalendar/resource-timeline';
-import ViewGroupedEventsModal     from './view-grouped-events-modal';
-import CustomisedCalendarEvent    from '@schoolboxVue/components/fullcalendar/customised-calendar-event';
+import FullCalendar from "@fullcalendar/vue3";
+import interactionPlugin from "@fullcalendar/interaction";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import timeGridPlugin from "@fullcalendar/timegrid";
+import adaptivePlugin from "@fullcalendar/adaptive";
+import RevealModal from "@schoolboxVue/components/reveal-modal";
+import ViewEventModal from "@schoolboxVue/components/fullcalendar/view-event-modal";
+import axios from "axios";
+import fullCalendarHelper from "@schoolboxVue/components/fullcalendar/mixinFullCalendarHelper";
+import { stringify } from "qs";
+import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
+import ViewGroupedEventsModal from "./view-grouped-events-modal";
+import CustomisedCalendarEvent from "@schoolboxVue/components/fullcalendar/customised-calendar-event";
 
 // Various URLs this calendar can make use of
-const URL_ASSESSMENT_EVENT_SOURCE = '/learning/assessment/calendar/events';
-const URL_ASSESSMENT_GROUPED_EVENT_SOURCE = '/learning/assessment/calendar/events/grouped';
-const URL_EVENT_UPDATE = '/calendar/ajax/update';
+const URL_ASSESSMENT_EVENT_SOURCE = "/learning/assessment/calendar/events";
+const URL_ASSESSMENT_GROUPED_EVENT_SOURCE = "/learning/assessment/calendar/events/grouped";
+const URL_EVENT_UPDATE = "/calendar/ajax/update";
 
 /* TODO: Events should already know about and come with their own modify link;
-    * we shouldn't be inferring and building it out here
-    */
-const URL_EVENT_CREATE_FORM = '/calendar/event/create';
-const URL_EVENT_MODIFY_FORM = '/calendar/event/{eventId}/modify';
-const URL_EVENT_MODIFY_FORM_ACTION = '/calendar/modifyForm.php';
-const URL_EVENT_DELETE = '/calendar/event/{eventId}/delete';
+ * we shouldn't be inferring and building it out here
+ */
+const URL_EVENT_CREATE_FORM = "/calendar/event/create";
+const URL_EVENT_MODIFY_FORM = "/calendar/event/{eventId}/modify";
+const URL_EVENT_MODIFY_FORM_ACTION = "/calendar/modifyForm.php";
+const URL_EVENT_DELETE = "/calendar/event/{eventId}/delete";
 
-const URL_ATTENDANCE_LIST = '/calendar/attendance/list/';
-const URL_ATTENDANCE_TOGGLE = '/service/attendance/setAttendance';
+const URL_ATTENDANCE_LIST = "/calendar/attendance/list/";
+const URL_ATTENDANCE_TOGGLE = "/service/attendance/setAttendance";
 
-const FORMAT_FORM_DATE = 'DD-MM-YYYY';
-const FORMAT_FORM_DATETIME = 'DD-MM-YYYY HH:mm';
+const FORMAT_FORM_DATE = "DD-MM-YYYY";
+const FORMAT_FORM_DATETIME = "DD-MM-YYYY HH:mm";
 
 // TODO let display formats be configurable
-const FORMAT_DISPLAY_DATE = 'ddd Do MMM';
-const FORMAT_DISPLAY_TIME = 'h:mma';
-const FORMAT_DISPLAY_DATETIME = 'ddd Do MMM, h:mma';
-const FORMAT_DISPLAY_WEEK_DAY = 'ddd D/M';
+const FORMAT_DISPLAY_DATE = "ddd Do MMM";
+const FORMAT_DISPLAY_TIME = "h:mma";
+const FORMAT_DISPLAY_DATETIME = "ddd Do MMM, h:mma";
+const FORMAT_DISPLAY_WEEK_DAY = "ddd D/M";
 
-const VIEW_RESOURCE_TIMELINE_SEMESTER = 'resourceTimelineSemester';
-const VIEW_RESOURCE_TIMELINE_WEEK = 'resourceTimelineWeek';
-const VIEW_DAY_GRID_MONTH = 'dayGridMonth';
+const VIEW_RESOURCE_TIMELINE_SEMESTER = "resourceTimelineSemester";
+const VIEW_RESOURCE_TIMELINE_WEEK = "resourceTimelineWeek";
+const VIEW_DAY_GRID_MONTH = "dayGridMonth";
 
-const RESOURCE_FOLDER_PREFIX = 'folder-';
-const RESOURCE_EVENT_TYPE_PREFIX = 'eventType-';
+const RESOURCE_FOLDER_PREFIX = "folder-";
+const RESOURCE_EVENT_TYPE_PREFIX = "eventType-";
 
-const MILLISECONDS_PER_DAY = (1000 * 60 * 60 * 24);
+const MILLISECONDS_PER_DAY = 1000 * 60 * 60 * 24;
 
 export default {
-
-    name: 'assessment-calendar',
+    name: "assessment-calendar",
 
     components: {
         ViewGroupedEventsModal,
         ViewEventModal,
         FullCalendar,
         RevealModal,
-        CustomisedCalendarEvent
+        CustomisedCalendarEvent,
     },
 
-    mixins: [
-        fullCalendarHelper
-    ],
+    mixins: [fullCalendarHelper],
 
-    data () {
+    data() {
         return {
             calendarApi: null, //to access the underlying calendar object
             calendarOptions: {},
@@ -78,21 +74,21 @@ export default {
             cursor: 0,
             currentBatchCursor: null,
             eventGroups: [],
-            defaultBgColour: '#0066b0',
+            defaultBgColour: "#0066b0",
             maxDate: null,
             minDate: null,
             inContext: null,
             eventSources: {
                 events: {
-                    id: 'events',
+                    id: "events",
                     events: this.events,
                 },
                 groupedEvents: {
-                    id: 'groupedEvents',
+                    id: "groupedEvents",
                     events: this.groupedEvents,
                 },
-            }
-        }
+            },
+        };
     },
 
     computed: {
@@ -121,7 +117,7 @@ export default {
         },
     },
 
-    created () {
+    created() {
         this.termStartDate = this.config.termDates.current.start;
         this.termEndDate = this.config.termDates.current.end;
         this.allTerms = this.buildAllTermsList();
@@ -129,31 +125,31 @@ export default {
         this.inContext = this.config.inContext;
     },
 
-    beforeMount () {
+    beforeMount() {
         this.resourceTimelineSemester = {
-            type: 'resourceTimeline',
+            type: "resourceTimeline",
             visibleRange: this.determineVisibleRange,
             slotDuration: { weeks: 1 },
             weekNumbers: true,
             slotLabelFormat: [
                 (date) => {
-                    return dayjs(date.date.array).format('MMM');
+                    return dayjs(date.date.array).format("MMM");
                 },
                 (date) => {
-                    return dayjs(date.date.array).format('w');
-                }
+                    return dayjs(date.date.array).format("w");
+                },
             ],
-            resourceAreaWidth: '15%',
+            resourceAreaWidth: "15%",
             filterResourcesWithEvents: true,
             validRange: {
                 start: this.minDate,
                 end: this.maxDate,
             },
-            resourceAreaHeaderContent: 'Week',
-            slotMinWidth: '50',
+            resourceAreaHeaderContent: "Week",
+            slotMinWidth: "50",
             titleFormat: (date) => {
                 return this.fullCalendarHelper_titleFormatWeek(date);
-            } 
+            },
         };
         this.resourceTimelineWeek = {
             dayHeaderFormat: (date) => {
@@ -162,86 +158,84 @@ export default {
             duration: { weeks: 1 },
             slotDuration: { days: 1 },
             slotLabelFormat: (date) => {
-                return dayjs(date.date.array).format('ddd DD');
+                return dayjs(date.date.array).format("ddd DD");
             },
-            resourceAreaWidth: '15%',
+            resourceAreaWidth: "15%",
             filterResourcesWithEvents: true,
             titleFormat: (date) => {
                 return this.fullCalendarHelper_titleFormatWeek(date);
-            } 
+            },
         };
         this.calendarOptions = {
             schedulerLicenseKey: this.config.schedulerLicenseKey,
-            plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, resourceTimelinePlugin, adaptivePlugin ],
+            plugins: [interactionPlugin, dayGridPlugin, timeGridPlugin, resourceTimelinePlugin, adaptivePlugin],
             views: {
                 resourceTimelineSemester: this.resourceTimelineSemester,
-                resourceTimelineWeek: this.resourceTimelineWeek
+                resourceTimelineWeek: this.resourceTimelineWeek,
             },
-            initialView: 'resourceTimelineSemester',
+            initialView: "resourceTimelineSemester",
             weekText: "''",
             eventTimeFormat: (date) => {
                 return this.fullCalendarHelper_eventTimeFormat(date);
             },
             headerToolbar: {
-                left: 'customToday,customPrev,customNext',
-                center: 'title',
-                right: 'resourceTimelineSemester,customDayGridMonth,customResourceTimelineWeek'
+                left: "customToday,customPrev,customNext",
+                center: "title",
+                right: "resourceTimelineSemester,customDayGridMonth,customResourceTimelineWeek",
             },
             buttonText: {
-                today:'Today',
+                today: "Today",
             },
             customButtons: {
                 customNext: {
-                    icon: 'chevron-right',
+                    icon: "chevron-right",
                     click: this.clickNext,
                 },
                 customPrev: {
-                    icon: 'chevron-left',
+                    icon: "chevron-left",
                     click: this.clickPrev,
                 },
                 customToday: {
-                    text: 'Today',
+                    text: "Today",
                     click: this.clickToday,
                 },
                 customDayGridMonth: {
                     dayMaxEventRows: this.config.eventLimit,
-                    text: 'Month',
+                    text: "Month",
                     click: this.clickMonthView,
                 },
                 customResourceTimelineWeek: {
-                    text: 'Week',
+                    text: "Week",
                     click: this.clickWeekView,
                 },
                 resourceTimelineSemester: {
-                    text: 'Semester',
+                    text: "Semester",
                     click: this.clickSemesterView,
-                }
+                },
             },
             scrollTime: this.config.dateDisplayFormats.calendarStartTime,
             eventDidMount: this.eventRender,
             resources: this.resources,
-            firstDay: '1',
+            firstDay: "1",
             initialDate: this.termStartDate,
             viewDidMount: this.viewDidMount,
-            weekNumberCalculation: 'ISO',
+            weekNumberCalculation: "ISO",
             loading: this.fullCalendarHelper_onLoading,
             eventClick: this.onEventClick,
             dateClick: this.onDateClick,
-            datesSet: this.datesSet
-        }
+            datesSet: this.datesSet,
+        };
     },
 
-    mounted () {
-        this.$nextTick()
-        .then(() => {
+    mounted() {
+        this.$nextTick().then(() => {
             this.calendarApi = this.$refs.fullCalendar.getApi();
-            this.calendarApi.setOption('contentHeight', this.fullCalendarHelper_contentHeight());
+            this.calendarApi.setOption("contentHeight", this.fullCalendarHelper_contentHeight());
         });
-        document.addEventListener('assessment-calendar__onFilterChange', this.onFilterChange);
+        document.addEventListener("assessment-calendar__onFilterChange", this.onFilterChange);
     },
 
     methods: {
-
         /**
          * Event source.
          * @see https://fullcalendar.io/docs/events-function
@@ -250,7 +244,6 @@ export default {
          * @param successCallback A function to call with the list of events.
          */
         events(fetchInfo, successCallback) {
-
             // No filters loaded yet? Render nothing.
             // The selected filters get populated by `onFilterChange`:
             // this is called by the filter's `filterContentLoaded` trigger.
@@ -262,19 +255,17 @@ export default {
             // AJAX params: the same for all requests
             let ajaxParams = {
                 headers: {
-                    'X-Requested-With' : 'XMLHttpRequest'
+                    "X-Requested-With": "XMLHttpRequest",
                 },
                 params: {
-                    start:   Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
-                    end:     Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
+                    start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
+                    end: Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
                     filters: this.selectedFilters,
                 },
-                paramsSerializer: params => stringify(params, {arrayFormat: 'brackets'}),
+                paramsSerializer: (params) => stringify(params, { arrayFormat: "brackets" }),
             };
 
-            axios.get(URL_ASSESSMENT_EVENT_SOURCE, ajaxParams)
-            .then((response) => {
-
+            axios.get(URL_ASSESSMENT_EVENT_SOURCE, ajaxParams).then((response) => {
                 // Assign event grouping and resourceIds into every event
                 response.data = response.data.map((element) => {
                     element.resourceId = this.buildResourceIdFromEvent(element);
@@ -283,10 +274,10 @@ export default {
 
                 // Add new resources
                 response.data.forEach((element) => {
-                    if (!this.folderResources.some(el => el.id === element.data.meta?.folderId)) {
+                    if (!this.folderResources.some((el) => el.id === element.data.meta?.folderId)) {
                         this.folderResources.push({
-                            id:                   element.resourceId,
-                            title:                element.data.meta.folderName,
+                            id: element.resourceId,
+                            title: element.data.meta.folderName,
                             eventBackgroundColor: element.data.meta.colour || this.defaultBgColour,
                         });
                     }
@@ -296,15 +287,12 @@ export default {
                 this.calendarApi.refetchResources();
 
                 // Filter out events which don't start
-                successCallback(response.data.filter(v => 'start' in v));
-
-            } );
+                successCallback(response.data.filter((v) => "start" in v));
+            });
             // Fail callback: consider a message saying something failed
         },
 
-
         groupedEvents(fetchInfo, successCallback) {
-
             // No filters loaded yet? Render nothing.
             // The selected filters get populated by `onFilterChange`:
             // this is called by the filter's `filterContentLoaded` trigger.
@@ -316,20 +304,18 @@ export default {
             // AJAX params: the same for all requests
             let ajaxParams = {
                 headers: {
-                    'X-Requested-With' : 'XMLHttpRequest'
+                    "X-Requested-With": "XMLHttpRequest",
                 },
                 params: {
-                    start:   Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
-                    end:     Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
+                    start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
+                    end: Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
                     filters: this.selectedFilters,
                     inContext: this.inContext,
                 },
-                paramsSerializer: params => stringify(params, {arrayFormat: 'brackets'}),
+                paramsSerializer: (params) => stringify(params, { arrayFormat: "brackets" }),
             };
 
-            axios.get(URL_ASSESSMENT_GROUPED_EVENT_SOURCE, ajaxParams)
-            .then((response) => {
-
+            axios.get(URL_ASSESSMENT_GROUPED_EVENT_SOURCE, ajaxParams).then((response) => {
                 // Assign event grouping and resourceIds into every event
                 response.data = response.data.map((element) => {
                     element.resourceId = this.buildResourceIdFromEvent(element);
@@ -338,17 +324,17 @@ export default {
 
                 // Add new resources
                 response.data.forEach((element) => {
-                    if (!this.folderResources.some(el => el.id === element.data.meta?.folderId)) {
+                    if (!this.folderResources.some((el) => el.id === element.data.meta?.folderId)) {
                         this.folderResources.push({
-                            id:                   element.resourceId,
-                            title:                element.data.meta.folderName,
+                            id: element.resourceId,
+                            title: element.data.meta.folderName,
                             eventBackgroundColor: element.data.meta.colour || this.defaultBgColour,
                         });
                     }
                 });
                 this.folderResources.sort((a, b) => {
-                    if (typeof a?.title === 'string' && typeof b?.title === 'string') {
-                        return a.title.localeCompare(b.title, 'en', { numeric: true, sensitivity: 'accent' });
+                    if (typeof a?.title === "string" && typeof b?.title === "string") {
+                        return a.title.localeCompare(b.title, "en", { numeric: true, sensitivity: "accent" });
                     }
                     return 0;
                 });
@@ -357,11 +343,9 @@ export default {
                 this.calendarApi.refetchResources();
 
                 // Filter out events which don't start
-                successCallback(response.data.filter(v => 'start' in v));
-
+                successCallback(response.data.filter((v) => "start" in v));
             });
         },
-
 
         /**
          * Resource source.
@@ -375,12 +359,12 @@ export default {
         resources(fetchInfo, successCallback) {
             successCallback([
                 {
-                    title: 'Events',
+                    title: "Events",
                     children: this.eventTypeResources,
                     eventAllow: false,
                 },
                 {
-                    title: 'Assessments',
+                    title: "Assessments",
                     children: this.folderResources,
                     eventAllow: false,
                 },
@@ -396,7 +380,6 @@ export default {
          * @return {boolean}
          */
         eventRender(eventRenderInfo) {
-
             const eventGrouping = eventRenderInfo.event.extendedProps.data.meta.eventGrouping;
             const element = eventRenderInfo.el;
 
@@ -405,16 +388,16 @@ export default {
             }
 
             if (eventRenderInfo.event.extendedProps.data.placeholder) {
-                element.setAttribute('event-group-id-placeholder', eventGrouping);
-                element.classList.add('placeholder');
-                element.classList.add('fc-more');
+                element.setAttribute("event-group-id-placeholder", eventGrouping);
+                element.classList.add("placeholder");
+                element.classList.add("fc-more");
             } else {
                 if (this.currentViewIsSemester()) {
-                    element.style.width = 'auto';
+                    element.style.width = "auto";
                 }
-                element.setAttribute('event-group-id', eventGrouping);
-                element.setAttribute('event-id', eventRenderInfo.event.extendedProps.data.meta.eventId);
-                element.setAttribute('event-group-date', dayjs(eventRenderInfo.event.start).format('MMMM DD, YYYY'));
+                element.setAttribute("event-group-id", eventGrouping);
+                element.setAttribute("event-id", eventRenderInfo.event.extendedProps.data.meta.eventId);
+                element.setAttribute("event-group-date", dayjs(eventRenderInfo.event.start).format("MMMM DD, YYYY"));
             }
         },
 
@@ -427,7 +410,7 @@ export default {
          */
         onEventClick(eventInfo) {
             this.currentEvent = eventInfo.event;
-            if (eventInfo.event.source.id === 'groupedEvents') {
+            if (eventInfo.event.source.id === "groupedEvents") {
                 this.$refs.groupedEvents.open(eventInfo.event);
             } else {
                 this.$refs.event.open(eventInfo.event);
@@ -461,10 +444,9 @@ export default {
          * @see https://fullcalendar.io/docs/view-render-hooks
          */
         viewDidMount() {
-
             const calendarApi = this.$refs.fullCalendar.getApi(); //runs before the nextTick, so need api here
-            const eventSource = calendarApi.getEventSourceById('events');
-            const groupedEventSource = calendarApi.getEventSourceById('groupedEvents');
+            const eventSource = calendarApi.getEventSourceById("events");
+            const groupedEventSource = calendarApi.getEventSourceById("groupedEvents");
 
             this.destroyPopOver();
 
@@ -502,11 +484,11 @@ export default {
             if (this.currentViewIsSemester()) {
                 // Figure out which term I'm in: go to the next one
                 let termIndex = this.findTermIndex(this.convertDateToDateString(this.calendarApi.getDate()));
-                if (this.allTerms[termIndex+1]) {
+                if (this.allTerms[termIndex + 1]) {
                     // Go to the midpoint of the term, as we can reasonably
                     // assume that will not overlap the view for another
                     // term.
-                    this.calendarApi.gotoDate(this.allTerms[termIndex+1].mid);
+                    this.calendarApi.gotoDate(this.allTerms[termIndex + 1].mid);
                     this.redrawWeekNumbers();
                 }
             } else {
@@ -522,12 +504,12 @@ export default {
             if (this.currentViewIsSemester()) {
                 // Figure out which term I'm in: go to the previous one
                 let termIndex = this.findTermIndex(this.convertDateToDateString(this.calendarApi.getDate()));
-                if (this.allTerms[termIndex-1]) {
+                if (this.allTerms[termIndex - 1]) {
                     // As with clickNext():
                     // Go to the midpoint of the term, as we can reasonably
                     // assume that will not overlap the view for another
                     // term.
-                    this.calendarApi.gotoDate(this.allTerms[termIndex-1].mid);
+                    this.calendarApi.gotoDate(this.allTerms[termIndex - 1].mid);
                     this.redrawWeekNumbers();
                 }
             } else {
@@ -579,42 +561,46 @@ export default {
             new Promise((resolve) => {
                 this.fullCalendarHelper_onLoading(true);
                 setTimeout(() => resolve(1), 1000);
-            }).then((result) => {
-                // Semester view, will just use the term start date that's set on page load
-                if (updateDate) {
-                    if (viewType === VIEW_RESOURCE_TIMELINE_SEMESTER) {
-                        this.calendarApi.gotoDate(this.termStartDate);
-                    } else { //otherwise use current date
-                        this.calendarApi.gotoDate(this.convertDateToDateString(new Date()));
+            })
+                .then((result) => {
+                    // Semester view, will just use the term start date that's set on page load
+                    if (updateDate) {
+                        if (viewType === VIEW_RESOURCE_TIMELINE_SEMESTER) {
+                            this.calendarApi.gotoDate(this.termStartDate);
+                        } else {
+                            //otherwise use current date
+                            this.calendarApi.gotoDate(this.convertDateToDateString(new Date()));
+                        }
                     }
-                }
 
-                this.calendarApi.changeView(viewType);
+                    this.calendarApi.changeView(viewType);
 
-                return result;
-            }).then((result) => {
-                this.viewDidMount()
-                this.fullCalendarHelper_onLoading(false);
-                return result;
-            });
+                    return result;
+                })
+                .then((result) => {
+                    this.viewDidMount();
+                    this.fullCalendarHelper_onLoading(false);
+                    return result;
+                });
         },
 
         /**
-         * As this calendar uses FullCalendars Custom Buttons for Month and Week views, the active class styling doesn't appear to be 
-         * automatically applied like it is for standard buttons. So we currently need to apply manually in this instance.  
-         * Without this ths Month and Week view buttons don't appear with active styling like they do in the other calendars. 
+         * As this calendar uses FullCalendars Custom Buttons for Month and Week views, the active class styling doesn't appear to be
+         * automatically applied like it is for standard buttons. So we currently need to apply manually in this instance.
+         * Without this ths Month and Week view buttons don't appear with active styling like they do in the other calendars.
          * @param {String}  viewType
          */
-        updateSelectedCustomButton (viewType) {
-            this.$el.querySelectorAll('.fc-button-primary').forEach((element) => {
-                element.classList.remove('fc-button-active');
+        updateSelectedCustomButton(viewType) {
+            this.$el.querySelectorAll(".fc-button-primary").forEach((element) => {
+                element.classList.remove("fc-button-active");
             });
-            const activeButtonSelectors = { //use the existing viewType to target the buttons, FC applies a unique custom class to each button  
-                [VIEW_RESOURCE_TIMELINE_SEMESTER]: '.fc-resourceTimelineSemester-button',
-                [VIEW_DAY_GRID_MONTH]: '.fc-customDayGridMonth-button',
-                [VIEW_RESOURCE_TIMELINE_WEEK]: '.fc-customResourceTimelineWeek-button',
-            }
-            this.$el.querySelector(activeButtonSelectors[viewType]).classList.add('fc-button-active');
+            const activeButtonSelectors = {
+                //use the existing viewType to target the buttons, FC applies a unique custom class to each button
+                [VIEW_RESOURCE_TIMELINE_SEMESTER]: ".fc-resourceTimelineSemester-button",
+                [VIEW_DAY_GRID_MONTH]: ".fc-customDayGridMonth-button",
+                [VIEW_RESOURCE_TIMELINE_WEEK]: ".fc-customResourceTimelineWeek-button",
+            };
+            this.$el.querySelector(activeButtonSelectors[viewType]).classList.add("fc-button-active");
         },
 
         /**
@@ -654,10 +640,12 @@ export default {
          * @see: https://fullcalendar.io/docs/validRange
          */
         getMaxTermDate() {
-            const termStartDates = Object.values(this.config.termDates).flat().map((row) => {
-                return new Date(row.end);
-            });
-            return dayjs(new Date(Math.max.apply(null,termStartDates))).format('YYYY-MM-DD');
+            const termStartDates = Object.values(this.config.termDates)
+                .flat()
+                .map((row) => {
+                    return new Date(row.end);
+                });
+            return dayjs(new Date(Math.max.apply(null, termStartDates))).format("YYYY-MM-DD");
         },
 
         /**
@@ -665,18 +653,20 @@ export default {
          * @see: https://fullcalendar.io/docs/validRange
          */
         getMinTermDate() {
-            const termStartDates = Object.values(this.config.termDates).flat().map((row) => {
-                return new Date(row.start);
-            });
+            const termStartDates = Object.values(this.config.termDates)
+                .flat()
+                .map((row) => {
+                    return new Date(row.start);
+                });
 
-            return dayjs(new Date(Math.min.apply(null,termStartDates))).format('YYYY-MM-DD');
+            return dayjs(new Date(Math.min.apply(null, termStartDates))).format("YYYY-MM-DD");
         },
 
         /**
          * As much as possible, destroy the popover holder whenever it's created on every calendar transitions.
          */
         destroyPopOver() {
-            var popOver = document.getElementById('popOver');
+            var popOver = document.getElementById("popOver");
 
             // Always destroy the current popover, as there should only be one.
             if (popOver) {
@@ -705,15 +695,15 @@ export default {
          * whether they're available.
          */
         datesSet(datesRenderInfo) {
-            let todayButton = this.$el.querySelector('button.fc-customToday-button'),
-                nextButton  = this.$el.querySelector('button.fc-customNext-button'),
-                prevButton  = this.$el.querySelector('button.fc-customPrev-button'),
-                start       = datesRenderInfo.view.currentStart,
-                end         = datesRenderInfo.view.currentEnd,
-                now         = new Date();
+            let todayButton = this.$el.querySelector("button.fc-customToday-button"),
+                nextButton = this.$el.querySelector("button.fc-customNext-button"),
+                prevButton = this.$el.querySelector("button.fc-customPrev-button"),
+                start = datesRenderInfo.view.currentStart,
+                end = datesRenderInfo.view.currentEnd,
+                now = new Date();
 
             // Should the Today button be enabled?
-            todayButton.disabled = (now >= start && now < end);
+            todayButton.disabled = now >= start && now < end;
 
             // What about next/prev?
             if (this.currentViewIsSemester()) {
@@ -722,20 +712,20 @@ export default {
                 // is displaying.
                 // That's because the start of the view may overlap another
                 // term (see `determineVisibleRange`)
-                let startMoment     = dayjs(start),
-                    endMoment       = dayjs(end),
-                    diff            = endMoment.diff(startMoment, 'day'),
-                    midMoment       = dayjs(start).add(Math.ceil(diff / 2), 'day'),
-                    currentIndex    = this.findTermIndex(midMoment.format('YYYY-MM-DD'));
+                let startMoment = dayjs(start),
+                    endMoment = dayjs(end),
+                    diff = endMoment.diff(startMoment, "day"),
+                    midMoment = dayjs(start).add(Math.ceil(diff / 2), "day"),
+                    currentIndex = this.findTermIndex(midMoment.format("YYYY-MM-DD"));
 
                 // Next:  disable if there is no next term
                 // Prev:  disable if there is no prev term
                 // Today: disable if today isn't within a term
-                nextButton.disabled = (currentIndex === this.allTerms.length - 1);
-                prevButton.disabled = (currentIndex === 0);
+                nextButton.disabled = currentIndex === this.allTerms.length - 1;
+                prevButton.disabled = currentIndex === 0;
                 if (!todayButton.disabled) {
-                    let todayIndex       = this.findTermIndex(dayjs(now).format('YYYY-MM-DD'));
-                    todayButton.disabled = (todayIndex === -1);
+                    let todayIndex = this.findTermIndex(dayjs(now).format("YYYY-MM-DD"));
+                    todayButton.disabled = todayIndex === -1;
                 }
             } else {
                 nextButton.disabled = false;
@@ -778,16 +768,16 @@ export default {
         determineVisibleRange(currentDate) {
             // Find the range in the list of terms.
             let dateString = this.convertDateToDateString(currentDate),
-                termIndex  = this.findTermIndex(dateString);
+                termIndex = this.findTermIndex(dateString);
 
             // Ensure that visible range starts on Monday (round down),
             // and ends on Monday (round up), all without using Moment
             // (Not initialized on initial calendar load)
             if (this.allTerms[termIndex]) {
                 let startDate = new Date(this.allTerms[termIndex].start),
-                    endDate   = new Date(this.allTerms[termIndex].end),
-                    startDay  = startDate.getDay() || 7,
-                    endDay    = endDate.getDay() || 7;
+                    endDate = new Date(this.allTerms[termIndex].end),
+                    startDay = startDate.getDay() || 7,
+                    endDay = endDate.getDay() || 7;
 
                 // Round start down to previous Monday
                 if (startDay !== 1) {
@@ -801,7 +791,7 @@ export default {
 
                 return {
                     start: startDate,
-                    end:   endDate,
+                    end: endDate,
                 };
             }
 
@@ -815,7 +805,8 @@ export default {
          * @return {Array}
          */
         buildAllTermsList() {
-            return this.config.termDates.past.concat([this.config.termDates.current], this.config.termDates.future)
+            return this.config.termDates.past
+                .concat([this.config.termDates.current], this.config.termDates.future)
                 .sort((a, b) => {
                     if (a.start < b.start) {
                         return -1;
@@ -833,8 +824,8 @@ export default {
                 })
                 .map((term) => {
                     let start = new Date(term.start),
-                        mid   = new Date(term.start),
-                        end   = new Date(term.end);
+                        mid = new Date(term.start),
+                        end = new Date(term.end);
 
                     // Extend the end date by one day, as FullCalendar dates
                     // are exclusive.
@@ -845,7 +836,7 @@ export default {
                     // when we query the calendar's date in `datesRender` we
                     // can reasonably assume it doesn't overlap the view
                     // window for another term.
-                    mid.setDate(mid.getDate() + Math.ceil(((end - start) / MILLISECONDS_PER_DAY) / 2))
+                    mid.setDate(mid.getDate() + Math.ceil((end - start) / MILLISECONDS_PER_DAY / 2));
                     term.mid = this.convertDateToDateString(mid);
                     term.end = this.convertDateToDateString(end);
                     return term;
@@ -879,10 +870,10 @@ export default {
         buildEventTypeResourcesList() {
             return this.config.eventTypes.map((a) => {
                 return {
-                    id:                   RESOURCE_EVENT_TYPE_PREFIX + String(a.id),
-                    title:                a.type,
+                    id: RESOURCE_EVENT_TYPE_PREFIX + String(a.id),
+                    title: a.type,
                     eventBackgroundColor: a.color,
-                }
+                };
             });
         },
 
@@ -947,9 +938,8 @@ export default {
             this.calendarApi.gotoDate(date);
             this.switchView(VIEW_RESOURCE_TIMELINE_WEEK, false);
         },
-    }
-}
-
+    },
+};
 </script>
 
 <template>
@@ -977,19 +967,15 @@ export default {
             :format-display-datetime="formats.displayDatetime"
             @eventViewWeek="viewWeek"
         />
-        <full-calendar
-            ref="fullCalendar"
-            :options="calendarOptions"
-        >
-			<template v-slot:eventContent="arg">
-				<customised-calendar-event :content="arg" />
+        <full-calendar ref="fullCalendar" :options="calendarOptions">
+            <template v-slot:eventContent="arg">
+                <customised-calendar-event :content="arg" />
             </template>
-		</full-calendar>
+        </full-calendar>
     </div>
 </template>
 
 <style lang="scss">
-
 @import "@schoolboxVue/components/fullcalendar/styles/calendar";
 
 // Please forgive me...
@@ -1000,7 +986,7 @@ export default {
 
 .fc-resourceTimelineSemester-view .fc-timeline-event.placeholder .fc-title-wrap {
     padding: 5px;
-    font-size: .8rem;
+    font-size: 0.8rem;
     line-height: 1.7;
 }
 
@@ -1010,16 +996,18 @@ export default {
 }
 
 .fc-direction-ltr .fc-timeline-event .fc-title {
-        padding-left: 3px !important;
-        margin-left: 0 !important;
-    }
+    padding-left: 3px !important;
+    margin-left: 0 !important;
+}
 
-.fc-timeline-event, .fc-day-grid-event {
+.fc-timeline-event,
+.fc-day-grid-event {
     border: 0 !important;
 }
 
-.fc-event .fc-title, .fc-event .fc-title:hover {
-    color: #FFF !important;
+.fc-event .fc-title,
+.fc-event .fc-title:hover {
+    color: #fff !important;
 }
 
 .fc-resourceTimelineSemester-view .fc-direction-ltr .fc-timeline-event {
@@ -1064,7 +1052,7 @@ export default {
 
 .fc-resourceTimelineSemester-view .fc-head tr td:first-child .fc-widget-header div {
     text-align: right !important;
-    padding-top: .30rem;
+    padding-top: 0.3rem;
 }
 
 .fc-time {
@@ -1109,5 +1097,4 @@ a.fc-not-start .fc-title-wrap .fc-title {
 .fc-timeline-event.fc-not-end::after {
     content: none;
 }
-
 </style>

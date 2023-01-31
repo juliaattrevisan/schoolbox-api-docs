@@ -1,14 +1,12 @@
 <script>
-
 /**
  * Contains the shaps modify fileters Campus, Role, ePortfolio, Year and Token
  */
 
-import { EventBus } from 'v-tables-3-select-rows';
-import FilterEvents from './shapsListFilterEvents';
+import { EventBus } from "v-tables-3-select-rows";
+import FilterEvents from "./shapsListFilterEvents";
 
 export default {
-
     props: {
         campuses: {
             type: Array,
@@ -29,13 +27,12 @@ export default {
     },
 
     methods: {
-
         /**
          * Show any rows that contain the selected campus
          *
          * @param { Event }
          */
-        onCampusChange (event) {
+        onCampusChange(event) {
             EventBus.emit(`vue-tables.filter::${FilterEvents.CAMPUS}`, event.target.value); //picked up by shaps-list.vue
         },
 
@@ -44,7 +41,7 @@ export default {
          *
          * @param { Event }
          */
-        onRoleChange (event) {
+        onRoleChange(event) {
             EventBus.emit(`vue-tables.filter::${FilterEvents.ROLE}`, event.target.value); //picked up by shaps-list.vue
         },
 
@@ -53,7 +50,7 @@ export default {
          *
          * @param { Event }
          */
-        onCourseChange (event) {
+        onCourseChange(event) {
             EventBus.emit(`vue-tables.filter::${FilterEvents.COURSE}`, event.target.value); //picked up by shaps-list.vue
         },
 
@@ -62,12 +59,11 @@ export default {
          *
          * @param { Event }
          */
-        onProvisionedChange (event) {
+        onProvisionedChange(event) {
             EventBus.emit(`vue-tables.filter::${FilterEvents.PROVISIONED}`, event.target.value); //picked up by shaps-list.vue
         },
-    }
-
-}
+    },
+};
 </script>
 
 <template>
@@ -112,7 +108,6 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-
 $toWrapFlex: 1000px;
 
 .filters {
@@ -131,5 +126,4 @@ $toWrapFlex: 1000px;
         flex: none; //back to default state
     }
 }
-
 </style>

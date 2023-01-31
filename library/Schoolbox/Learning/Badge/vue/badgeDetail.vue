@@ -1,13 +1,13 @@
 <script>
-import BadgeImage from './badge-image';
-import CodesList from '@schoolboxCurriculum/vue/codes-list';
+import BadgeImage from "./badge-image";
+import CodesList from "@schoolboxCurriculum/vue/codes-list";
 
-import {translateDaysToExpiryLabel} from './expiry-helper';
+import { translateDaysToExpiryLabel } from "./expiry-helper";
 
 export default {
     components: {
         BadgeImage,
-        CodesList
+        CodesList,
     },
     props: {
         /**
@@ -22,27 +22,27 @@ export default {
          */
         parentCss: {
             type: String,
-            default: 'badge-modal',
+            default: "badge-modal",
         },
         /**
          * To customise how the image displays
          */
         imgCss: {
             type: String,
-            default: 'badge-img-container',
+            default: "badge-img-container",
         },
     },
-    emits: ['code-selected'], //dispatch to notify of curriculum code selection
+    emits: ["code-selected"], //dispatch to notify of curriculum code selection
     computed: {
         badgeTagNames() {
             if (this.badge?.tags?.length) {
-                return this.badge.tags.map(v => v.name).join(', ');
+                return this.badge.tags.map((v) => v.name).join(", ");
             }
-            return '';
+            return "";
         },
         curriculumNodesWithCode() {
             if (this.badge?.curriculumNodes?.length) {
-                return this.badge.curriculumNodes.filter(v => v.code.length);
+                return this.badge.curriculumNodes.filter((v) => v.code.length);
             }
             return [];
         },
@@ -59,11 +59,11 @@ export default {
          *
          * @pararm { object }
          */
-        onCodeSelected (node) {
-            this.$emit('code-selected', node);
+        onCodeSelected(node) {
+            this.$emit("code-selected", node);
         },
     },
-}
+};
 </script>
 
 <template>
@@ -72,14 +72,13 @@ export default {
         <h2>{{ badge.name }}</h2>
         <p class="meta" v-if="badge.category">Category: {{ badge.category.name }}</p>
         <p class="meta" v-if="badge.goalExpiry">Goal expires: {{ goalExpiryLabel }} after setting</p>
-        <p class="meta" v-if="badge.achievementExpiry">Achievement expires: {{ achievementExpiryLabel }} after awarding</p>
+        <p class="meta" v-if="badge.achievementExpiry">
+            Achievement expires: {{ achievementExpiryLabel }} after awarding
+        </p>
         <p class="meta" v-if="badgeTagNames.length > 0">Tags: {{ badgeTagNames }}</p>
         <p v-if="badge.curriculumNodes.length" class="meta">
             Curriculum Codes:
-            <codes-list
-                :nodes="curriculumNodesWithCode"
-                @selected="onCodeSelected"
-            />
+            <codes-list :nodes="curriculumNodesWithCode" @selected="onCodeSelected" />
         </p>
         <article v-if="badge.body" v-html="badge.body"></article>
     </div>

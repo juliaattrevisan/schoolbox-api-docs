@@ -1,83 +1,82 @@
 <script>
-
 /**
  * Manage your groups
  */
 
-import ManageGroupsHeading from './manage-groups-heading';
-import ManageGroupsEmpty from './manage-groups-empty';
-import ManageGroupsItem from './manage-groups-item';
-import selectionTypes from '../js/manageGroupsSelectionTypes';
-import Toast from '@schoolboxVue/components/toast';
-
+import ManageGroupsHeading from "./manage-groups-heading";
+import ManageGroupsEmpty from "./manage-groups-empty";
+import ManageGroupsItem from "./manage-groups-item";
+import selectionTypes from "../js/manageGroupsSelectionTypes";
+import Toast from "@schoolboxVue/components/toast";
 
 export default {
-
     components: {
         ManageGroupsHeading,
         ManageGroupsEmpty,
         ManageGroupsItem,
-        Toast
+        Toast,
     },
 
     props: {
-        endpointAdd: { //to join a group
+        endpointAdd: {
+            //to join a group
             type: String,
             required: true,
         },
-        endpointDelete: { //to leave a group
+        endpointDelete: {
+            //to leave a group
             type: String,
             required: true,
         },
-        endpointNotify: { //to update a groups notification status
+        endpointNotify: {
+            //to update a groups notification status
             type: String,
             required: true,
         },
-        endpointFavourite: { //to update a groups favourite status
+        endpointFavourite: {
+            //to update a groups favourite status
             type: String,
             required: true,
         },
-        groups: { //all the groups that the user can access
+        groups: {
+            //all the groups that the user can access
             type: Array,
             required: true,
         },
     },
 
-    data () {
+    data() {
         return {
             selectedGroups: selectionTypes.GROUPS_IM_IN, //current group selection as a String
             filteredGroups: [], //selectedGroups, then also with the search filter considered and as an Array
             isSearchActive: false, //to update the empty state messages to consider searching
-        }
+        };
     },
 
     computed: {
-
         /**
          * Whether to show the empty state
          *
          * @returns { Number }
          */
-        isGroupsEmpty () {
+        isGroupsEmpty() {
             return this.filteredGroups.length === 0;
         },
-
     },
 
-    created () {
+    created() {
         window.onhashchange = this.checkForValidHash; //account for history changes or for example selection the 'my favourite groups' link in the side menu
         this.checkForValidHash();
     },
 
     methods: {
-
         /**
          * The hash is used for initial group selection display, so we can land straight
          * on my favourite groups, groups pending membership etc
          *
          * @param { String }
          */
-        checkForValidHash () {
+        checkForValidHash() {
             const hash = window.location.hash.substring(1); //ditch the # of the hash
             const isHashValid = Object.values(selectionTypes).includes(hash); //check if the hash is one of the valid selectionTypes
             if (isHashValid) {
@@ -90,7 +89,7 @@ export default {
          *
          * @param { String }
          */
-        onGroupsSelected (groupsSelection) {
+        onGroupsSelected(groupsSelection) {
             this.selectedGroups = groupsSelection;
             window.location.hash = this.selectedGroups;
             this.checkForDropdowns();
@@ -102,7 +101,7 @@ export default {
          * @param { Array }
          * @param { Boolean }
          */
-        onGroupsFiltered (groups, isSearchActive=false) {
+        onGroupsFiltered(groups, isSearchActive = false) {
             this.filteredGroups = groups;
             this.isSearchActive = isSearchActive;
             this.checkForDropdowns();
@@ -112,10 +111,10 @@ export default {
          * If there's no groups visible on the page on initial display, foundations dropdowns won't work
          * So we need to check for them on every select / filter change to ensure they work properly
          */
-        checkForDropdowns () {
+        checkForDropdowns() {
             this.$nextTick(() => {
-                Foundation.global.namespace = '';
-                $(document).foundation('dropdown', 'reflow');
+                Foundation.global.namespace = "";
+                $(document).foundation("dropdown", "reflow");
             });
         },
 
@@ -124,7 +123,7 @@ export default {
          *
          * @param { String }
          */
-        onGroupEditStart (text) {
+        onGroupEditStart(text) {
             this.$refs.toast.activate(text);
         },
 
@@ -133,7 +132,7 @@ export default {
          *
          * @param { String }
          */
-        onGroupEditSuccess (text) {
+        onGroupEditSuccess(text) {
             this.$refs.toast.timeout(text, true, 3000);
             this.checkForDropdowns();
         },
@@ -143,14 +142,11 @@ export default {
          *
          * @param { String }
          */
-        onGroupEditError (text) {
+        onGroupEditError(text) {
             this.$refs.toast.timeout(text, false, 3000);
         },
-
     },
-
-}
-
+};
 </script>
 
 <template>
@@ -185,7 +181,6 @@ export default {
 </template>
 
 <style>
-
 body {
     overflow-y: scroll; /*to prevent jarring shifts when moving between group selections */
 }
@@ -194,5 +189,4 @@ body {
     display: flex; /*to avoid misaligned rows due to differences in group item heights */
     flex-wrap: wrap;
 }
-
 </style>

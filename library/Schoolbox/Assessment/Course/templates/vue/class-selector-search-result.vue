@@ -1,5 +1,4 @@
 <script setup>
-
 /**
  * An individual class search result that matches the search query with search result
  * highlighted within. Selecting will add the class to the list
@@ -7,11 +6,10 @@
  * results currently shown
  */
 
-import { computed } from 'vue';
-import { escapeRegExp } from '@js/util/jsUtils';
+import { computed } from "vue";
+import { escapeRegExp } from "@js/util/jsUtils";
 
-
-const emit = defineEmits(['select']);
+const emit = defineEmits(["select"]);
 
 const props = defineProps({
     result: {
@@ -20,22 +18,25 @@ const props = defineProps({
         default: () => {
             return {
                 id: 0,
-                name: 'name',
+                name: "name",
                 isSelected: false,
-            }
-        }
+            };
+        },
     },
-    isAllResultsSelected: { //to determine the behaviour of the 'Select all classes' button
+    isAllResultsSelected: {
+        //to determine the behaviour of the 'Select all classes' button
         type: Boolean,
         required: true,
         default: false,
     },
-    isSomeResultsSelected: { //to add the 'indeterminate' class to the select all checkbox
+    isSomeResultsSelected: {
+        //to add the 'indeterminate' class to the select all checkbox
         type: Boolean,
         required: true,
         default: false,
     },
-    queryWordList: { //current word list in the query
+    queryWordList: {
+        //current word list in the query
         type: Array,
         required: true,
         default: [],
@@ -48,16 +49,16 @@ const highlightTitleSearch = computed(() => {
 
 /**
  * To highlight where the search string matches within the settings result
- * (?![^>]*>) is used to check we are not inside an element node 
+ * (?![^>]*>) is used to check we are not inside an element node
  *
  * @params { String } the string to find all instanced of the current search string in
  *
  * @returns { String } string for v-html with <mark></mark> wrapped around each found result
  */
-function highlightSearchInElement (toHighlight) {
+function highlightSearchInElement(toHighlight) {
     let highlighted = toHighlight;
     props.queryWordList.forEach((wordInSearch) => {
-        highlighted = highlighted.replace(RegExp(`${escapeRegExp(wordInSearch)}(?![^>]*>)`, 'ig'), (match) => {
+        highlighted = highlighted.replace(RegExp(`${escapeRegExp(wordInSearch)}(?![^>]*>)`, "ig"), (match) => {
             return `<mark>${match}</mark>`;
         });
     });
@@ -67,7 +68,7 @@ function highlightSearchInElement (toHighlight) {
 /**
  * To determine the check display of the checkbox
  *
- * @returns { Boolean } 
+ * @returns { Boolean }
  */
 const isChecked = computed(() => {
     return props.result.isSelected;
@@ -76,23 +77,15 @@ const isChecked = computed(() => {
 /**
  * dispatch to parent so can move to relevant settings page
  */
-function onSelect () {
-    emit('select', props.result);
+function onSelect() {
+    emit("select", props.result);
 }
-
 </script>
 
 <template>
-    <button class="search-result"
-        @click.prevent="onSelect"
-        @keyup.enter="onSelect"
-    >
+    <button class="search-result" @click.prevent="onSelect" @keyup.enter="onSelect">
         <div class="checklist">
-            <input 
-                :id="`checkbox-${result.id}`"
-                type="checkbox"
-                :checked="isChecked"
-            />
+            <input :id="`checkbox-${result.id}`" type="checkbox" :checked="isChecked" />
             <label :for="`checkbox-${result.id}`"></label>
         </div>
         <span v-html="highlightTitleSearch"></span>
@@ -114,8 +107,7 @@ function onSelect () {
     }
 }
 
-input[type=checkbox]:not(.plain) + label {
+input[type="checkbox"]:not(.plain) + label {
     margin: 0;
 }
-
 </style>

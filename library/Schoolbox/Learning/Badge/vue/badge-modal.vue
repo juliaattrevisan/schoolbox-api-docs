@@ -1,16 +1,14 @@
 <script setup>
-
 /**
  * A general badge modal containing a sequential modal showing the badge details
  * then a selected curriculum code details
  */
 
-import { ref } from 'vue';
-import SequentialRevealModal from '@schoolboxVue/components/sequential-reveal-modal';
-import BadgeDetail from './badgeDetail';
-import NodeDetails from '@schoolboxCurriculum/vue/node-details';
-import { getEmptyNode } from '@schoolboxCurriculum/js/nodeUtils';
-
+import { ref } from "vue";
+import SequentialRevealModal from "@schoolboxVue/components/sequential-reveal-modal";
+import BadgeDetail from "./badgeDetail";
+import NodeDetails from "@schoolboxCurriculum/vue/node-details";
+import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
 
 const props = defineProps({
     /**
@@ -29,7 +27,7 @@ const props = defineProps({
     },
 });
 
-const emit = defineEmits(['closed']);
+const emit = defineEmits(["closed"]);
 
 const sequenceIndex = ref(1);
 const selectedNodeDetails = ref(getEmptyNode());
@@ -39,7 +37,7 @@ const selectedNodeDetails = ref(getEmptyNode());
  *
  * @pararm { object }
  */
-function onCodeSelected (node) {
+function onCodeSelected(node) {
     selectedNodeDetails.value = node;
     sequenceIndex.value++;
 }
@@ -47,34 +45,20 @@ function onCodeSelected (node) {
 /**
  * dispatch that the modal is closed
  */
-function onModalClosed () {
-    emit('closed');
+function onModalClosed() {
+    emit("closed");
 }
-
 </script>
 
 <template>
-   <sequential-reveal-modal
-        size="medium"
-        :isOpen="isOpen"
-        :sequence-index="sequenceIndex"
-        @closed="onModalClosed"
-    >
+    <sequential-reveal-modal size="medium" :isOpen="isOpen" :sequence-index="sequenceIndex" @closed="onModalClosed">
         <template v-slot:sequence-1>
-            <badge-detail
-                v-if="badge"
-                :badge="badge"
-                @code-selected="onCodeSelected"
-            />
+            <badge-detail v-if="badge" :badge="badge" @code-selected="onCodeSelected" />
         </template>
         <template v-slot:sequence-2>
-            <node-details
-                :node="selectedNodeDetails"
-            />
+            <node-details :node="selectedNodeDetails" />
         </template>
     </sequential-reveal-modal>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>
