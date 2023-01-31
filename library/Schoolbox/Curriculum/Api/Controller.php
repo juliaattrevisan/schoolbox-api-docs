@@ -12,6 +12,7 @@ use Schoolbox\Curriculum\Api\Translator\ArrayToModel;
 use Schoolbox\Curriculum\Api\Translator\ModelToArray;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
 
 /**
@@ -69,7 +70,8 @@ class Controller extends Base
         $descendantCount       = $this->determineDescendantCount();
         $searchQuery           = trim($this->request->query->get('query') ?? '');
         $searchKeywords        = explode(',', $searchQuery);
-        $resultsForAllKeywords = new Collection();
+        /** @var GenericCollection|Node\Model[] $resultsForAllKeywords */
+        $resultsForAllKeywords = new GenericCollection(Node\Model::class);
 
         foreach ($searchKeywords as $searchKeyword) {
             $resultsForKeyword = $this->nodeMapper->findByKeyword(
@@ -88,12 +90,18 @@ class Controller extends Base
 
         Node\Mapper::sortNodes($resultsForAllKeywords, 0);
 
-        // Translate results: also add all result counts (for top level only)
+        // Translate results: also add all result counts
+        // (for top and first descendant level only, to keep my sanity)
+        // Maybe add usages links?
+        $ids = [];
+        foreach ($resultsForAllKeywords as $node) {
+            $ids = array_merge($ids, $this->extractIdsFromNode($node));
+        }
         $translatedResults = $resultsForAllKeywords->map(
             new ModelToArray(
                 $ancestorCount,
                 $descendantCount,
-                $this->counter->count($resultsForAllKeywords->getPropertyValues('id')),
+                $this->counter->count($ids),
             )
         );
 
@@ -218,7 +226,11 @@ class Controller extends Base
         $childNodes = $node->getChildren();
         Node\Mapper::sortNodes($childNodes, 0);
         $node->setChildren($childNodes);
-        $translator = new ModelToArray($ancestorCount, $descendantCount, $this->counter->count([$node->getId()]));
+        $translator = new ModelToArray(
+            $ancestorCount,
+            $descendantCount,
+            $this->counter->count($this->extractIdsFromNode($node)),
+        );
         $this->response->content->set(
             $this->buildJsonOutput($translator($node))
         );
@@ -277,5 +289,20 @@ class Controller extends Base
     private function determineOffset(): int
     {
         return max(0, $this->request->query->getInt('offset', 0));
+    }
+
+    /**
+     * Extract this node's IDs, as well as its parent and child IDs.
+     *
+     * @param Node\Model $node
+     * @return array<int>
+     */
+    private function extractIdsFromNode(Node\Model $node): array
+    {
+        $ids = [$node->getId()];
+        if ($node->getParent()?->getId()) {
+            $ids[] = $node->getParent()->getId();
+        }
+        return array_merge($ids, $node->getChildren()->getPropertyValues('id'));
     }
 }
