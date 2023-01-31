@@ -13,7 +13,6 @@ use Schoolbox\Collection;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Resource\Folder;
-use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly;
 
 /**
  * Hydrator for curriculum usage results.
@@ -26,13 +25,13 @@ class Hydrator
     /**
      * Constructor
      *
-     * @param LinkOnly                           $folderTranslator Translator for folder objects
+     * @param Folder\Translator\IModelToArray    $folderTranslator Translator for folder objects
      * @param CourseSpec\Translator\ModelToArray $courseTranslator Translator for course objects
      * @param UnitSpec\Translator\ModelToArray   $unitTranslator   Translator for unit objects
      */
     public function __construct(
         private Folder\Mapper $folderMapper,
-        private LinkOnly $folderTranslator,
+        private Folder\Translator\IModelToArray $folderTranslator,
         private CourseSpec\Mapper $courseSpecMapper,
         private CourseSpec\Translator\ModelToArray $courseTranslator,
         private UnitSpec\Mapper $unitSpecMapper,

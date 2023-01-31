@@ -51,13 +51,27 @@ class Controller extends Base
 
         // I can't create this in the module because a user object is required,
         // and the user doesn't reliably exist in the module.
+        $folderTranslator = new Folder\Translator\ModelToArray\LinkOnly();
+        $courseTranslator = new CourseSpec\Translator\ModelToArray(
+            $this->router,
+            $this->authorizer,
+            $this->getUser(),
+            $folderTranslator,
+        );
+        $unitTranslator = new UnitSpec\Translator\ModelToArray(
+            $this->router,
+            $this->authorizer,
+            $this->getUser(),
+            $folderTranslator,
+            $courseTranslator,
+        );
         $hydrator = new Hydrator(
             $this->folderMapper,
-            new Folder\Translator\ModelToArray\LinkOnly(),
+            $folderTranslator,
             $this->courseSpecMapper,
-            new CourseSpec\Translator\ModelToArray($this->router, $this->authorizer, $this->getUser()),
+            $courseTranslator,
             $this->unitSpecMapper,
-            new UnitSpec\Translator\ModelToArray($this->router, $this->authorizer, $this->getUser()),
+            $unitTranslator,
         );
 
         $this->response->content->set(

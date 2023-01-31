@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Resource\Folder\Translator\ModelToArray;
 
 use Schoolbox\Resource\Folder\Model;
+use Schoolbox\Resource\Folder\Translator\IModelToArray;
 
 /**
  * Folder model to array translator.
@@ -21,7 +22,7 @@ use Schoolbox\Resource\Folder\Model;
  * * class codes
  * * view folder link
  */
-class LinkOnly
+class LinkOnly implements IModelToArray
 {
     /**
      * @param Model $folder
@@ -30,13 +31,13 @@ class LinkOnly
     public function __invoke(Model $folder): array
     {
         return [
-            'id'    => $folder->getId(),
-            'name'  => $folder->getName(),
-            'title' => $folder->getTitle(),
-            'codes' => $folder->getCodes()
+            'id'     => $folder->getId(),
+            'name'   => $folder->getName(),
+            'title'  => $folder->getTitle(),
+            'codes'  => $folder->getCodes()
                 ? $folder->getCodes()->getPropertyValues('code')
                 : [],
-            '_links'   => [
+            '_links' => [
                 'view' => '/homepage/' . $folder->getId(),
             ],
         ];
