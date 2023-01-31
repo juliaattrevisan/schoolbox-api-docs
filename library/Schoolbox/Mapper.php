@@ -2104,7 +2104,7 @@ abstract class Mapper implements IMapper, Serializable
 
         // Use the first non-deleted model
         foreach ($result_collection as $model) {
-            if ($model instanceof ISoftDeletable && $model->isDeleted()) {
+            if (!$options['deleted'] && $model instanceof ISoftDeletable && $model->isDeleted()) {
                 continue;
             }
             return $model;
