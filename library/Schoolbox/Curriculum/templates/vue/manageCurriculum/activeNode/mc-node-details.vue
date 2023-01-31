@@ -61,8 +61,8 @@ const hasUsage = computed(() => {
                     <div>
                         <p v-if="breadcrumbs.length > 0" class="meta">{{ breadcrumbs }}</p>
                         <div v-html="activeNodeStore.node.description"></div>
-                        <template v-if="hasUsage">
-                            <h3>Connected Material</h3>
+                        <div v-if="hasUsage" class="usage-list-container">
+                            <h4>Connected Material ({{ activeNodeStore.node.usageCount }})</h4>
                             <horizontal-scoller :has-buttons="true" :height="80" :has-content-change="false">
                                 <ul class="usage-list">
                                     <mc-node-details-usage
@@ -72,7 +72,7 @@ const hasUsage = computed(() => {
                                     />
                                 </ul>
                             </horizontal-scoller>
-                        </template>
+                        </div>
                     </div>
                 </Transition>
             </fieldset>
@@ -83,6 +83,9 @@ const hasUsage = computed(() => {
 <style lang="scss" scoped>
 @import "./style/mcActiveNode.scss";
 
+.usage-list-container {
+    padding-top: 1rem;
+}
 .usage-list {
     margin: 0;
 }

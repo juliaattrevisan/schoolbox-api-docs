@@ -151,8 +151,8 @@ export function getBreadcrumbs(node: Node, currentBreadcrumbs: Breadcrumb[]): Br
 /**
  * To distinguish the activity type
  *
- * @param { Usage } usage - the curr
- * @returns { string } - the icon to return
+ * @param { Usage } usage - the usage
+ * @returns { string } - the href to return
  */
 export function getUsageIcon(usage: Usage) {
     const icons = {
@@ -164,16 +164,16 @@ export function getUsageIcon(usage: Usage) {
 }
 
 /**
- * To distinguish the activity type
+ * To return the href based on the activity type
  *
- * @param { Usage } usage - the curr
+ * @param { Usage } usage - the usage
  * @returns { string } - the icon to return
  */
 export function getUsageHref(usage: Usage) {
     const icons = {
         course: () => usage.object.links.folder,
-        folder: () => usage.object.links.view,
+        folder: () => usage.object._links.view,
         unit: () => usage.object.links.folder,
     };
-    return icons[usage.discriminator];
+    return icons[usage.discriminator]();
 }

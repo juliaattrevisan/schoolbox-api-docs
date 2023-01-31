@@ -43,7 +43,6 @@ const props = defineProps<Props>();
 }
 
 .usage__icon-container {
-    // v-deep is used so can target the img succesfully
     background-color: #f6f6f6;
     flex: 0 0 50px;
     padding: 1rem;

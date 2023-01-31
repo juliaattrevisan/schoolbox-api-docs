@@ -15,6 +15,7 @@ export type Node = {
     selectedParentId?: number; // when a parent Node is selected (to enable/disable or delete), this will be the id of that Node
     breadcrumbs?: Breadcrumb[]; // list of parents to reach this node
     usage?: Usage[]; // all the places the node has been used
+    usageCount?: number; // the total number of linked activities (not just the currently loaded)
 };
 
 /**
