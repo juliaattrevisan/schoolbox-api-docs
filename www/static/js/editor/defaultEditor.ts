@@ -22,9 +22,10 @@ function insertWordCount(textarea, editor) {
 
 /**
  * create the ckeditor instance
+ *
+ * @param { HTMLTextAreaElement } textarea - the textarea the CKEditor will replace
  */
-function createEditor() {
-    const textarea = document.querySelector("textarea") as HTMLTextAreaElement;
+function createEditor(textarea: HTMLTextAreaElement) {
     ClassicEditor.create(textarea, getDefault())
         .then((editor) => {
             insertWordCount(textarea, editor);
@@ -48,7 +49,13 @@ function createEditor() {
  * @param { CustomEvent } event - the custom event
  */
 function onInit(event: CustomEvent) {
-    createEditor();
+    const targetElements = event.detail.targetElements as string[];
+    targetElements.forEach((targetElement) => {
+        // assume that each targetElement could contain multiple instances
+        document.querySelectorAll(targetElement).forEach((textarea) => {
+            createEditor(textarea as HTMLTextAreaElement);
+        });
+    });
 }
 
 document.addEventListener("EDITOR__CREATE", onInit);
