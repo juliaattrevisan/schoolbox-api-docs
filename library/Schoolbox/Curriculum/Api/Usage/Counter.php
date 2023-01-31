@@ -13,14 +13,14 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
 
 /**
- * Counter class for returning counts of curriculum node usages.
+ * Counter class for fetching counts of curriculum node usages.
  */
 class Counter
 {
     /**
      * Constructor
      *
-     * @param IConnector $database The database connection to retrieve from.
+     * @param IConnector $database The database connection to fetch from.
      */
     public function __construct(private IConnector $database)
     {
@@ -33,7 +33,7 @@ class Counter
      * @return array<int, array<string, int>> key: curriculum node ID,
      *                                        value: array with key: discriminator, value: count for that discriminator
      */
-    public function count(array $ids): array
+    public function findUsageCounts(array $ids): array
     {
         if (empty($ids)) {
             return [];

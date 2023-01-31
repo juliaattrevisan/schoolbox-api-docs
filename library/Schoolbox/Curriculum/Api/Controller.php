@@ -101,7 +101,7 @@ class Controller extends Base
             new ModelToArray(
                 $ancestorCount,
                 $descendantCount,
-                $this->counter->count($ids),
+                $this->counter->findUsageCounts($ids),
             )
         );
 
@@ -229,7 +229,7 @@ class Controller extends Base
         $translator = new ModelToArray(
             $ancestorCount,
             $descendantCount,
-            $this->counter->count($this->extractIdsFromNode($node)),
+            $this->counter->findUsageCounts($this->extractIdsFromNode($node)),
         );
         $this->response->content->set(
             $this->buildJsonOutput($translator($node))

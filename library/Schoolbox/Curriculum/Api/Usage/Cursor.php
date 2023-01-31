@@ -113,7 +113,7 @@ class Cursor implements ICursor
     public function retrieveResultCount(): ?int
     {
         $totalCount = 0;
-        $counts = $this->counter->count([$this->node->getId()])[$this->node->getId()] ?? [];
+        $counts = $this->counter->findUsageCounts([$this->node->getId()])[$this->node->getId()] ?? [];
         foreach ($counts as $subCount) {
             $totalCount += $subCount;
         }
