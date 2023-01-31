@@ -9,7 +9,11 @@ declare(strict_types=1);
 
 namespace Schoolbox\Curriculum\Api\Translator;
 
+use Alaress\Authorizer\Authorizer;
+use Alaress\Authorizer\GetRouteIfAuthorized;
+use Aura\Router\Router;
 use Schoolbox\Curriculum\Node\Model;
+use Schoolbox\User;
 
 /**
  * Translator for translating a curriculum node model into an array, ready for
@@ -17,6 +21,8 @@ use Schoolbox\Curriculum\Node\Model;
  */
 class ModelToArray
 {
+    use GetRouteIfAuthorized;
+
     /**
      * Constructor
      *
@@ -28,6 +34,9 @@ class ModelToArray
      * @param ?array<int, array<string, int>> $counts A set of usage counts for each node to be translated.
      */
     public function __construct(
+        protected Router $router,
+        protected Authorizer $authorizer,
+        protected User $currentUser,
         private int $ancestorCount,
         private int $descendantCount,
         private ?array $counts,
@@ -91,7 +100,25 @@ class ModelToArray
             'order'         => $node->getOrder(),
             'createdAt'     => $node->getCreatedAt()->toRfc3339String(),
             'modifiedAt'    => $node->getModifiedAt()->toRfc3339String(),
-            'usageCounts'   => $this->counts[$node->getId()] ?? null,
+            '_usageCounts'  => $this->counts[$node->getId()] ?? null,
+            '_links'        => [
+                'read' => $this->getRouteIfAuthorized(
+                    'curriculumApi.getNode',
+                    ['id' => $node->getId(), 'node' => $node],
+                ),
+                'update' => $this->getRouteIfAuthorized(
+                    'curriculumApi.putNode',
+                    ['id' => $node->getId(), 'node' => $node],
+                ),
+                'delete' => $this->getRouteIfAuthorized(
+                    'curriculumApi.deleteNode',
+                    ['id' => $node->getId(), 'node' => $node],
+                ),
+                'getUsage' => $this->getRouteIfAuthorized(
+                    'curriculumApiUsage.getNodeUsage',
+                    ['id' => $node->getId(), 'node' => $node],
+                ),
+            ],
         ];
     }
 }

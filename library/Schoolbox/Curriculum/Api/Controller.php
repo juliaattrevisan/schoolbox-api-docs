@@ -92,13 +92,15 @@ class Controller extends Base
 
         // Translate results: also add all result counts
         // (for top and first descendant level only, to keep my sanity)
-        // Maybe add usages links?
         $ids = [];
         foreach ($resultsForAllKeywords as $node) {
             $ids = array_merge($ids, $this->extractIdsFromNode($node));
         }
         $translatedResults = $resultsForAllKeywords->map(
             new ModelToArray(
+                $this->router,
+                $this->authorizer,
+                $this->getUser(),
                 $ancestorCount,
                 $descendantCount,
                 $this->counter->findUsageCounts($ids),
@@ -123,7 +125,16 @@ class Controller extends Base
         );
         $this->response->content->set(
             $this->buildJsonOutput(
-                $tree->map(new ModelToArray(0, self::MAX_DESCENDANTS, null))
+                $tree->map(
+                    new ModelToArray(
+                        $this->router,
+                        $this->authorizer,
+                        $this->getUser(),
+                        0,
+                        self::MAX_DESCENDANTS,
+                        null,
+                    )
+                )
             ),
         );
     }
@@ -227,6 +238,9 @@ class Controller extends Base
         Node\Mapper::sortNodes($childNodes, 0);
         $node->setChildren($childNodes);
         $translator = new ModelToArray(
+            $this->router,
+            $this->authorizer,
+            $this->getUser(),
             $ancestorCount,
             $descendantCount,
             $this->counter->findUsageCounts($this->extractIdsFromNode($node)),
