@@ -43,7 +43,7 @@ class ModelToArray
             'subjectCode' => $courseSpec->getSubjectCode(),
             'folder'      => call_user_func($this->folderTranslator, $courseSpec->getFolder()),
             '_links'      => [
-                'modify' => $this->getRouteIfAuthorized(
+                'read' => $this->getRouteIfAuthorized(
                     'course.modifyCourse',
                     ['courseSpec' => $courseSpec, 'id' => $courseSpec->getId()],
                 ),

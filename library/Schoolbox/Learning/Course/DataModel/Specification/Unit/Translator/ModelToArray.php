@@ -45,7 +45,7 @@ class ModelToArray
             'folder' => call_user_func($this->folderTranslator, $unitSpec->getFolder()),
             'course' => call_user_func($this->courseTranslator, $unitSpec->getCourse()),
             '_links' => [
-                'modify' => $this->getRouteIfAuthorized(
+                'read' => $this->getRouteIfAuthorized(
                     'course.modifyCourse',
                     ['courseSpec' => $unitSpec, 'id' => $unitSpec->getId()],
                 ),
