@@ -39,15 +39,16 @@ class ModelToArray
      */
     public function __invoke(CourseSpecification\Unit\Model $unitSpec): array
     {
+        $course = $unitSpec->getCourse();
         return [
             'id'     => $unitSpec->getId(),
             'title'  => $unitSpec->getTitle(),
             'folder' => call_user_func($this->folderTranslator, $unitSpec->getFolder()),
-            'course' => call_user_func($this->courseTranslator, $unitSpec->getCourse()),
+            'course' => call_user_func($this->courseTranslator, $course),
             '_links' => [
                 'view' => $this->getRouteIfAuthorized(
                     'course.modifyCourse',
-                    ['courseSpec' => $unitSpec, 'id' => $unitSpec->getId()],
+                    ['courseSpec' => $course, 'id' => $course->getId()],
                 ),
             ],
         ];
