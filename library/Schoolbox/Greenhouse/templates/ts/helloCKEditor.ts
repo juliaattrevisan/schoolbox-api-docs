@@ -21,31 +21,6 @@ function preFillEditors() {
 }
 
 /**
- * Add the word count UI to the bottom of the editor
- * Its assumed this method is called once the editor has been created,
- * so editorTextArea.nextSibling will be the newly created editor instance
- */
-function insertWordCount() {
-    const wordCountPlugin = editor.plugins.get("WordCount");
-    insertElementAfter(editorTextArea.nextSibling, wordCountPlugin.wordCountContainer);
-}
-
-/**
- * create the ckeditor instance
- */
-function createEditor() {
-    ClassicEditor.create(editorTextArea, getDefault())
-        .then((newEditor) => {
-            editor = newEditor;
-            insertWordCount();
-            CKEditorInspector.attach(editor);
-        })
-        .catch((error) => {
-            console.error(error.stack);
-        });
-}
-
-/**
  * on selection save the editor content into local storage
  */
 function initEditorSaves() {
@@ -59,5 +34,11 @@ function initEditorSaves() {
 }
 
 preFillEditors();
-createEditors();
 initEditorSaves();
+
+/**
+ * store the newly created editor instance to we can get its data on save
+ */
+document.addEventListener("EDITOR__CREATED", (event: CustomEvent) => {
+    editor = event.detail.editor;
+});

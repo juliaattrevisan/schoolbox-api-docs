@@ -22,4 +22,12 @@
         <button id="save-button" class="full-width">Save</button>
     </div>
 </div>
+<script src="{{ CDN_PREFIX }}/js/bundle/defaultEditor.js?v={{ config.site_version }}"></script>
 <script src="{{ CDN_PREFIX }}/js/bundle/helloCKEditor.js?v={{ config.site_version }}"></script>
+<script>
+document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+    detail: {
+        targetElements: ["#editor"],
+    }
+}));
+</script>
