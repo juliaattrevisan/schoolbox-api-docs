@@ -2102,8 +2102,8 @@ abstract class Mapper implements IMapper, Serializable
             throw new Exception\NotFound();
         }
 
-        // Use the first non-deleted model
         foreach ($result_collection as $model) {
+            // If $options['deleted'] is true, we are interested in soft-deleted options.  If not, we skip them.
             if (!$options['deleted'] && $model instanceof ISoftDeletable && $model->isDeleted()) {
                 continue;
             }
