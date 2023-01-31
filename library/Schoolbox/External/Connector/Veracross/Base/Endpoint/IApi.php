@@ -23,9 +23,9 @@ interface IApi
      * @param string $endpoint
      * @param string $scope
      * @param array  $params
-     * @return array
+     * @return \Generator
      */
-    public function retrieve(string $method, string $endpoint, string $scope, array $params = []): array;
+    public function retrieve(string $method, string $endpoint, string $scope, array $params = []): \Generator;
 
 
     /**

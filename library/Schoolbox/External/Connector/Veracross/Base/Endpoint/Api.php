@@ -46,6 +46,15 @@ class Api implements IApi
 
 
     /**
+     * Decide how pig each page size should be
+     * Veracross lets you have up to 1000 rows per return
+     *
+     * Lots of little pages is super slow for them
+     */
+    private const PAGE_SIZE = 1000;
+
+
+    /**
      * @var ApiUsage
      */
     private ApiUsage $apiUsage;
@@ -58,15 +67,21 @@ class Api implements IApi
 
 
     /**
+     * A Veracross Access Token generator, in case you needed to
+     * make a new one somewhere along the way
+     *
+     * @var AccessTokenGenerator
+     */
+    private AccessTokenGenerator $accessTokenGenerator;
+
+
+    /**
      * The base uri that consists of host and school identifier
      * Paginated data can appear separately in ApiUsage
      *
      * @var string
      */
     private string $baseUri = '';
-
-
-    private AccessTokenGenerator $accessTokenGenerator;
 
 
     /**
@@ -133,23 +148,77 @@ class Api implements IApi
 
 
     /**
-     * @inheritDoc
+     * Yield one page of the return payload per iteration,
+     * spawning new payloads while Veracross has data for it
+     *
+     * You'll incur an API request cost when payload size equals page size,
+     * and the next request is empty. This is by Veracross design, sadly,
+     * and you'll have paid for an empty payload. This is because when the
+     * payload == page size, you can't tell if there's more or if that's
+     * exactly the amount there was.
+     *
+     * https://api-docs.veracross.com/docs/docs/ZG9jOjMzNzcxODE-pagination
+     *
+     *     "If a collection response includes fewer records than the page
+     *      size (including zero records) then you have reached the end of
+     *      the data. Subsequent requests for page numbers after the end
+     *      of the data will continue to be empty"
      *
      * @param string $method
      * @param string $endpoint
+     * @param string $scope
      * @param array  $params
-     * @return array
-     * @throws \RuntimeException
+     * @param int    $pageSize
+     * @return \Generator
      * @throws \DomainException
      * @throws \JsonException
+     * @throws \RuntimeException
      */
-    public function retrieve(string $method, string $endpoint, string $scope, array $params = []): array
+    public function retrieve(string $method, string $endpoint, string $scope, array $params = [], int $pageSize = self::PAGE_SIZE): \Generator
+    {
+        $pageNum = 1;
+        $payload = null;
+        $n = 0;
+        $maxPayloads = 1000;
+
+        /* Iterate all pages from Veracross.
+         *
+         * 1. Check base case, to prevent infinite loopage.
+         * 2. If you're requesting your first payload
+         * 3. The payload size == page size
+         */
+        while (($n < $maxPayloads) && (!$payload || \count($payload['data']) === self::PAGE_SIZE)) {
+            $payload = $this->retrieveOne($method, $endpoint, $scope, $pageNum, $pageSize, $params);
+
+            $pageNum++;
+            $n++;
+
+            /* Record endpoint usage
+             */
+            $this->apiUsage->record($endpoint);
+
+            yield $payload;
+        }
+    }
+
+
+    /**
+     * Retrieve one page of data from the endpoint
+     *
+     * @param string $method
+     * @param string $endpoint
+     * @param string $scope
+     * @param int    $pageNum
+     * @param int    $pageSize
+     * @param array  $params
+     * @return array
+     * @throws \DomainException
+     * @throws \JsonException
+     * @throws \RuntimeException
+     */
+    private function retrieveOne(string $method, string $endpoint, string $scope, int $pageNum, int $pageSize, array $params = []): array
     {
         $response = null;
-
-        /* Record endpoint usage
-         */
-        $this->apiUsage->record($endpoint);
 
         /* Mine out an error message if you try to access a thing that doesn't exist
          */
@@ -184,8 +253,8 @@ class Api implements IApi
                     'Authorization' => "Bearer {$accessToken}",
                     'Content-Type' => 'application/json',
                     'X-API-Value-Lists' => 'include',
-                    'X-Page-Number' => '',
-                    'X-Page-Size' => ''
+                    'X-Page-Number' => $pageNum,
+                    'X-Page-Size' => $pageSize
                 ];
 
                 $response = $this->client->request($method, $endpoint, $options);
