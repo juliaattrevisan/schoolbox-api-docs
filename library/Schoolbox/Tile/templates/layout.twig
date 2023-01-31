@@ -12,6 +12,9 @@
 
         // Validation -_-
         var rules = {
+            heading: {
+                required: true,
+            },
             grid_width: {
                 required: true,
                 digits: true,
@@ -195,6 +198,42 @@
                 }
             });
         });
+
+        /**
+         * Listen for the 'Add Tile' click, save the current state of the
+         * 'Modify Tile Layout'. Will require an AJAX call to submit
+         * the form. Either that or it needs to be preserved whenever a field
+         * is modified...
+         *
+         * Added in response to [SA-14666]
+        **/
+        async function interceptAddTile(e){
+            if (!e.target.closest('a[data-add-tile]')) return;
+
+            // Validate our form.
+            if (form.valid()){
+                fetch(form[0].getAttribute('action'), {
+                    method: 'POST',
+                    /* headers: {
+                        'Content-Type': 'x-www-form-urlencoded'
+                    }, */
+                    body: form[0]
+                }).then(
+                    res => {
+
+                    }
+                );
+                e.preventDefault();
+            }
+            else {
+                /* Prevent the click action. form.valid's fail will tell the
+                 * user why the click failed.
+                **/
+                e.preventDefault();
+            }
+        }
+
+        document.addEventListener('click', interceptAddTile);
     })
 })(jQuery);
 </script>
@@ -357,4 +396,3 @@
         </form>
     </div>
 </div>
-
