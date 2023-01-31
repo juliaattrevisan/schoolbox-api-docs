@@ -52,7 +52,6 @@
 
             &.alert:before {
                 background-color: $alert-color;
-
             }
 
             &.warning:before {
@@ -62,7 +61,7 @@
             &:before {
                 background-color: var(--body-foreground);
                 border-radius: 1rem;
-                content: '';
+                content: "";
                 display: inline-block;
                 height: 0.5rem;
                 margin-right: 0.5rem;
@@ -79,7 +78,7 @@
         margin-bottom: 0.5rem;
         position: relative;
 
-        &.alert{
+        &.alert {
             background-color: $gradient-0;
         }
     }
@@ -112,7 +111,7 @@
             background-color: $alert-color;
         }
 
-        &.warning{
+        &.warning {
             background-color: $gradient-2;
         }
 
@@ -135,5 +134,4 @@
             z-index: 2;
         }
     }
-
 }

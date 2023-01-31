@@ -16,7 +16,9 @@
 */
 
 // Use a more-intuitive box-sizing model.
-*, *::before, *::after {
+*,
+*::before,
+*::after {
     box-sizing: border-box;
 }
 
@@ -31,8 +33,8 @@ html {
 }
 
 html,
-body { 
-    font-size: $base-font-size; 
+body {
+    font-size: $base-font-size;
     height: 100%; //Allow percentage-based heights in the application
 }
 
@@ -50,7 +52,8 @@ body {
     -webkit-font-smoothing: antialiased; //Improve text rendering when available
 }
 
-::selection { //to customise the portion of a document that has been highlighted
+::selection {
+    //to customise the portion of a document that has been highlighted
     background-color: $accent-foreground;
     color: $accent-background;
 }
@@ -63,10 +66,10 @@ body {
 
 // Grid Defaults to get images and embeds to work properly
 // Get rid of gap under images by making them display: inline-block; by default
-img { 
+img {
     display: inline-block;
-    height: auto; 
-    max-width: 100%; 
+    height: auto;
+    max-width: 100%;
     vertical-align: middle;
 }
 
@@ -76,7 +79,9 @@ img[src=""] {
 }
 
 // Improve media defaults
-picture, video, canvas {
+picture,
+video,
+canvas {
     display: block;
     max-width: 100%;
 }
@@ -88,20 +93,20 @@ picture, video, canvas {
 .mqa-display {
     img,
     embed,
-    object { 
+    object {
         max-width: none !important;
     }
 }
 
 // Make sure textarea takes on height automatically
-textarea { 
-    height: auto; 
-    min-height: 50px; 
+textarea {
+    height: auto;
+    min-height: 50px;
 }
 
 // Make select elements 100% width by default
-select { 
-    width: 100%; 
+select {
+    width: 100%;
 }
 
 // Ensure time is on one line

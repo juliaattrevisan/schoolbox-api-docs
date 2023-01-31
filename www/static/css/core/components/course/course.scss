@@ -18,34 +18,35 @@ ul.unit-list {
 }
 
 #import_assessments {
-  .unit {
-    background-color: var(--accent-background);
-    padding: 1rem;
+    .unit {
+        background-color: var(--accent-background);
+        padding: 1rem;
 
-    @media #{$medium-only} {
-      padding: .75rem;
-    }
+        @media #{$medium-only} {
+            padding: 0.75rem;
+        }
 
-    h3, label {
-      margin: 0;
+        h3,
+        label {
+            margin: 0;
+        }
+        .checkbox-label {
+            padding: 0 0 0 2.65rem;
+        }
     }
-    .checkbox-label {
-      padding: 0 0 0 2.65rem;
+    span[class^="icon-"]:before,
+    span[class*=" icon-"]:before {
+        padding-right: 5px;
     }
-  }
-  span[class^='icon-']:before,
-  span[class*=' icon-']:before {
-    padding-right: 5px;
-  }
-  [data-assessment] {
-    span[class^='icon-']:before,
-    span[class*=' icon-']:before {
-      padding-left: 10px;
+    [data-assessment] {
+        span[class^="icon-"]:before,
+        span[class*=" icon-"]:before {
+            padding-left: 10px;
+        }
     }
-  }
-  [data-assessment-dates] {
-    padding-left: 2.65rem;
-  }
+    [data-assessment-dates] {
+        padding-left: 2.65rem;
+    }
 }
 
 label .unit-heading {
@@ -58,7 +59,7 @@ label .unit-heading {
  * search results for a course
  */
 input.course-selector-loader:focus {
-    background-repeat:no-repeat;
+    background-repeat: no-repeat;
     background-position: 99% 50%;
 
     &.course-selector-search-loading {
@@ -73,7 +74,7 @@ input.course-selector-loader:focus {
 }
 
 fieldset {
-    transition: opacity 360ms cubic-bezier(0.2,1,0,1);
+    transition: opacity 360ms cubic-bezier(0.2, 1, 0, 1);
 }
 
 fieldset[disabled] {

@@ -40,24 +40,24 @@
     }
 }
 
-    .empty-state-flex-centered {
-        @extend .empty-state;
-        align-items: center;
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-        justify-content: center;
-        p {
-            max-width: 50%;
-        }
-        button {
+.empty-state-flex-centered {
+    @extend .empty-state;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    justify-content: center;
+    p {
+        max-width: 50%;
+    }
+    button {
+        background: none;
+        font-size: 0.875rem;
+        &:hover {
             background: none;
-            font-size: 0.875rem;
-            &:hover {
-                background: none;
-            }
         }
     }
+}
 
 // a general error display notifying something couldn't be processed
 .error-state section {
@@ -437,7 +437,7 @@ $progress-tick-size-regular: rem-calc($base-font-size * 2);
 $progress-tick-size-small: rem-calc($base-font-size * 1.25);
 $progress-tick-size-tiny: rem-calc($base-font-size * 0.75);
 
-@mixin progress-tick ($progress-tick-size) {
+@mixin progress-tick($progress-tick-size) {
     width: $progress-tick-size;
     height: $progress-tick-size;
     min-width: $progress-tick-size;
@@ -525,7 +525,8 @@ $progress-tick-size-tiny: rem-calc($base-font-size * 0.75);
 
 // Profiles
 .profile {
-    .alert-box, .pastoral-flags {
+    .alert-box,
+    .pastoral-flags {
         margin: 0 0 0.75rem 0.75rem;
         @media #{$small-only} {
             margin: 0 0 0.5rem 0.5rem;

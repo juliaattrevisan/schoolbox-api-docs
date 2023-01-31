@@ -1,16 +1,14 @@
 $login-html-styles: true !default;
 $login-background-position: top right !default;
 $login-overlay: transparent !default;
-$login-form-width: 20rem !default;    // 320px: this is the functional min-width of Schoolbox
+$login-form-width: 20rem !default; // 320px: this is the functional min-width of Schoolbox
 $login-form-height: 32rem !default;
 $login-form-padding: 2rem !default;
 $login-footer-background-top: rgba($black, 0) !default;
 $login-footer-background-bottom: rgba($black, 0.3) !default;
 $login-img-max-height: 12rem !default; // 192px
 
-
 @if ($login-html-styles) {
-
     $login-footer-height: (1.5 * 4 * 1rem) + (2 * $footer-margin-bottom); // 4 lines, 1.5 line height
 
     body.login {
@@ -60,7 +58,7 @@ $login-img-max-height: 12rem !default; // 192px
                 background-color: $login-footer-background-top;
             } @else {
                 background-color: $login-footer-background-top;
-	            background-image: linear-gradient(top, $login-footer-background-top, $login-footer-background-bottom);
+                background-image: linear-gradient(top, $login-footer-background-top, $login-footer-background-bottom);
             }
 
             margin: 0 0 0 -360px;
@@ -77,16 +75,16 @@ $login-img-max-height: 12rem !default; // 192px
             }
         }
 
-        input[type=password] {
-            margin-bottom: .5rem;
+        input[type="password"] {
+            margin-bottom: 0.5rem;
         }
 
-        input[type=submit] {
+        input[type="submit"] {
             @extend .expand;
-            margin-top: .5rem;
+            margin-top: 0.5rem;
         }
 
-        input[type=checkbox] + label {
+        input[type="checkbox"] + label {
             @extend .checkbox-label;
         }
 
@@ -99,7 +97,8 @@ $login-img-max-height: 12rem !default; // 192px
             }
         }
 
-        a, label{
+        a,
+        label {
             // DONE use contrasting color
             color: $login-form-background-contrast;
             font-size: inherit;
@@ -118,7 +117,7 @@ $login-img-max-height: 12rem !default; // 192px
 
         .login-links {
             p:first-of-type {
-                margin: .75rem 0 1rem 0;
+                margin: 0.75rem 0 1rem 0;
                 color: calc-text-color($login-overlay);
                 text-align: center;
             }
@@ -129,7 +128,7 @@ $login-img-max-height: 12rem !default; // 192px
         }
 
         #footer,
-        #footer a{
+        #footer a {
             color: calc-text-color($login-overlay);
         }
 
@@ -143,9 +142,9 @@ $login-img-max-height: 12rem !default; // 192px
                 form {
                     max-width: 360px;
                 }
-                #footer{
+                #footer {
                     margin: 0;
-                    ul{
+                    ul {
                         padding: 0;
                     }
                 }

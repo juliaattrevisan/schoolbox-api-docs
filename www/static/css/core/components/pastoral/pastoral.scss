@@ -7,12 +7,10 @@
 */
 
 .pastoral-report {
-
     .information-list {
-
         .small-12.card + .content {
             // Force the content to sit properly underneath the elements above it
-                float: left;
+            float: left;
         }
     }
 }

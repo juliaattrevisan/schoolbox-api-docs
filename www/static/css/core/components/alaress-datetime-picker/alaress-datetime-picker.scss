@@ -21,16 +21,16 @@ input.datepicker-input {
 .adtp-btn {
     @extend .button;
     white-space: nowrap;
-    transition: all 360ms cubic-bezier(0.2,1,0,1);
+    transition: all 360ms cubic-bezier(0.2, 1, 0, 1);
     max-width: rem-calc(400);
 
     &.no-text:before {
-      float: none;
+        float: none;
     }
 
     @media #{$small-only} {
         max-width: none;
-        &.no-text:before{
+        &.no-text:before {
             float: none;
         }
     }
@@ -44,63 +44,62 @@ input.datepicker-input {
 }
 
 .flatpickr-months {
-  margin-top: .25rem;
-  margin-bottom: .25rem;
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
 
     .flatpickr-prev-month.flatpickr-prev-month,
     .flatpickr-next-month.flatpickr-prev-month,
     .flatpickr-prev-month.flatpickr-next-month,
     .flatpickr-next-month.flatpickr-next-month {
-      top: .25rem;
+        top: 0.25rem;
     }
 }
 
 .flatpickr-current-month {
-  font-size: .9rem;
-  width: 75%;
-  padding: 0;
-  height: auto;
+    font-size: 0.9rem;
+    width: 75%;
+    padding: 0;
+    height: auto;
 }
 
 .flatpickr-monthDropdown-months {
-  width: 6rem !important;
-  line-height: normal !important;
-  height: 0 !important;
+    width: 6rem !important;
+    line-height: normal !important;
+    height: 0 !important;
 }
 
 .flatpickr-current-month {
-  .numInputWrapper {
-    width: 4rem;
-  }
-  .numInputWrapper span {
-    opacity: 1;
-    border: none;
-  }
+    .numInputWrapper {
+        width: 4rem;
+    }
+    .numInputWrapper span {
+        opacity: 1;
+        border: none;
+    }
 }
 
 .flatpickr-months .flatpickr-prev-month:hover svg,
 .flatpickr-months .flatpickr-next-month:hover svg {
-  fill: $accent-foreground;
+    fill: $accent-foreground;
 }
 
 /**
  * The modal
  */
 .adtp {
-
     transition: width 0.3s;
 
     .flatpickr-months {
-      padding-top: .5rem;
-      margin-top: 0 !important;
-      margin-bottom: 0 !important;
+        padding-top: 0.5rem;
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
 
-      .flatpickr-prev-month.flatpickr-prev-month,
-      .flatpickr-next-month.flatpickr-prev-month,
-      .flatpickr-prev-month.flatpickr-next-month,
-      .flatpickr-next-month.flatpickr-next-month {
-        padding-top: 0 !important;
-      }
+        .flatpickr-prev-month.flatpickr-prev-month,
+        .flatpickr-next-month.flatpickr-prev-month,
+        .flatpickr-prev-month.flatpickr-next-month,
+        .flatpickr-next-month.flatpickr-next-month {
+            padding-top: 0 !important;
+        }
     }
 
     /**
@@ -125,7 +124,7 @@ input.datepicker-input {
 
     .flatpickr-month {
         height: $pickr-month-height + $pickr-month-padding;
-        font-size: .8rem;
+        font-size: 0.8rem;
     }
 
     .flatpickr-prev-month,
@@ -146,15 +145,15 @@ input.datepicker-input {
     }
 
     .flatpickr-current-month {
-      width: auto !important;
+        width: auto !important;
 
-      input.cur-year {
+        input.cur-year {
             font-weight: $font-weight-normal;
         }
 
         .numInputWrapper {
             width: rem-calc(70);
-            margin-right: .45rem;
+            margin-right: 0.45rem;
         }
 
         span.cur-month:hover {
@@ -163,7 +162,7 @@ input.datepicker-input {
     }
 
     .flatpickr-monthDropdown-months {
-      width: 6.5rem !important;
+        width: 6.5rem !important;
     }
 
     .flatpickr-day {
@@ -253,7 +252,6 @@ input.datepicker-input {
 
     // Medium up
     @media #{$medium-up} {
-
         &.pickerSingle {
             width: 390px;
         }
@@ -269,12 +267,11 @@ input.datepicker-input {
         }
     }
 
-
     /**
      * Timetable picker
      */
     [data-adtp-tt-picker] > div {
-        margin-bottom: .75rem;
+        margin-bottom: 0.75rem;
     }
 
     .adtp-tt-container {
@@ -325,12 +322,12 @@ input.datepicker-input {
     }
 
     .adtp-tt-date {
-        margin-bottom: .25rem;
-        padding-bottom: .5rem;
+        margin-bottom: 0.25rem;
+        padding-bottom: 0.5rem;
         text-align: right;
     }
 
-    input[type=radio]:not(.plain) + label.input-toggle {
+    input[type="radio"]:not(.plain) + label.input-toggle {
         width: auto;
         padding: 0 0.75rem;
     }
@@ -346,7 +343,6 @@ input.datepicker-input {
     .adtp-tt-period {
         margin-bottom: 0;
     }
-
 
     /**
      * Response / event list
@@ -398,5 +394,4 @@ input.datepicker-input {
     a.timetable-submit {
         margin-bottom: 1rem;
     }
-
 }

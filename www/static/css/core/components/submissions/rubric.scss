@@ -50,7 +50,8 @@ table.rb {
         }
 
         // Styling for the selected descriptor on the rubric marked grid
-        input[type=checkbox], input[type=radio] {
+        input[type="checkbox"],
+        input[type="radio"] {
             &:checked {
                 + label {
                     background-color: $content-ui-selected;
@@ -70,16 +71,15 @@ table.rb {
                     // DONE use CSS lighten
                     background-color: css-lighten($content-ui-hover, 3%);
                     color: var(--content-ui-hover-contrast);
-                    cursor: pointer; 
+                    cursor: pointer;
                 }
             }
         }
 
-        input[type='tel'] {
+        input[type="tel"] {
             border-color: $input-border-color;
             background-color: $container-bg;
         }
-
     }
 
     label {
@@ -100,7 +100,8 @@ table.rb {
     .rb-self-reflection-choice {
         border-radius: 50%;
         float: right;
-        &.blind-mode { //can't show the students image, so just show a circle in place
+        &.blind-mode {
+            //can't show the students image, so just show a circle in place
             width: 2rem;
             height: 2rem;
             background: $content-ui-submit-background;
@@ -114,7 +115,8 @@ table.rb {
         white-space: nowrap;
         line-height: 2.75rem;
     }
-    input[type=text], input[type=tel] {
+    input[type="text"],
+    input[type="tel"] {
         + label.rb-readonly {
             padding-left: 2.6125rem;
         }
@@ -129,11 +131,14 @@ table.rb {
         border-right: solid 2px $body-bg;
         border-left: 0;
     }
-    td, th {
+    td,
+    th {
         border-left: 1px solid $body-bg;
         transition: all 360ms cubic-bezier(0.2, 1, 0, 1);
         &:hover {
-            input[type=text], input[type=tel], textarea {
+            input[type="text"],
+            input[type="tel"],
+            textarea {
                 border-color: $input-border-color;
                 background-color: $container-bg;
             }
@@ -144,7 +149,7 @@ table.rb {
         }
         // Print font size for the rubric grid: ~10px
         @media print {
-           font-size: rem-calc(($base-font-size * 0.625));
+            font-size: rem-calc(($base-font-size * 0.625));
         }
     }
 
@@ -155,13 +160,13 @@ table.rb {
          * such as the student's avatar in Self Reflection
          */
     }
-  div {
-    position: relative;
-    line-height: $form-label-line-height;
-    span{
-      margin: $table-row-padding;
+    div {
+        position: relative;
+        line-height: $form-label-line-height;
+        span {
+            margin: $table-row-padding;
+        }
     }
-  }
     textarea {
         font-size: 0.625rem;
         resize: none;
@@ -173,7 +178,9 @@ table.rb {
             background-color: $container-bg;
         }
     }
-    textarea, input[type=text], input[type=tel] {
+    textarea,
+    input[type="text"],
+    input[type="tel"] {
         border-color: transparent;
         background-color: transparent;
         &:focus {
@@ -191,11 +198,11 @@ table.rb {
 
         label {
             //color: $form-bg-hover-color-contrast;
-            font-weight: bold!important;
+            font-weight: bold !important;
             display: block;
         }
 
-        input[type=tel] {
+        input[type="tel"] {
             border-color: $input-border-color;
             color: calc-text-color($container-bg);
             background-color: $container-bg;
@@ -221,7 +228,9 @@ table.rb {
         padding-left: 0;
         padding-right: 0;
         width: 0;
-        input[type=text], input[type=tel], textarea {
+        input[type="text"],
+        input[type="tel"],
+        textarea {
             opacity: 0;
             /* far out! */
             width: 0 !important;
@@ -237,7 +246,7 @@ table.rb {
     .hide-v {
         background-color: #f9f9f9 !important;
         &:not(:last-child):hover:before {
-            content: 'Click to add descriptor';
+            content: "Click to add descriptor";
             font-size: $small-font-size;
             opacity: 0.5;
             font-style: italic;
@@ -245,7 +254,9 @@ table.rb {
         &:hover {
             cursor: pointer;
         }
-        input[type=text], input[type=tel], textarea {
+        input[type="text"],
+        input[type="tel"],
+        textarea {
             opacity: 0;
             /* far out! */
             height: 0 !important;
@@ -313,15 +324,15 @@ table.rb {
 .rb-blank {
     //Background stripes for blank rubric
     background-image: repeating-linear-gradient(
-        135deg, 
+        135deg,
         var(--content-ui-foreground) 0px,
         var(--content-ui-foreground) 5px,
-        #FFF 5px,
-        #FFF 20px
+        #fff 5px,
+        #fff 20px
     );
     //no-repeat is here to stop a visual bug. Check the ticket SA-14840 for the explanation.
     background-repeat: no-repeat;
-    color: calc-text-color(#FFEFEB);
+    color: calc-text-color(#ffefeb);
     opacity: 0.25;
 }
 .rb-final-summary {
@@ -330,7 +341,8 @@ table.rb {
     color: $input-border-color-contrast;
 }
 
-.rb-description, .rb-value {
+.rb-description,
+.rb-value {
     display: block;
     &.error {
         border-color: $alert-color !important;
@@ -342,18 +354,18 @@ table.rb {
 }
 /* Rubric Capabilities and Indicators component
 */
-.rb-capabilities-indicators{
-    th{
+.rb-capabilities-indicators {
+    th {
         margin-top: 0.35rem;
         padding-bottom: 0rem;
     }
 
-    tr td{
+    tr td {
         padding-bottom: 0;
         padding-top: 0;
     }
 
-    p{
+    p {
         margin-bottom: 0;
     }
 }
@@ -408,132 +420,134 @@ select.letter-grade-select {
 }
 
 @media not print {
-  @media #{$medium-down} {
-    table.rb.markable {
-      thead {
-        position: absolute;
-        clip: rect(1px, 1px, 1px, 1px);
+    @media #{$medium-down} {
+        table.rb.markable {
+            thead {
+                position: absolute;
+                clip: rect(1px, 1px, 1px, 1px);
+                padding: 0;
+                border: 0;
+                height: 1px;
+                width: 1px;
+                overflow: hidden;
+            }
+
+            tbody,
+            tr,
+            th,
+            td {
+                display: block;
+                white-space: normal;
+            }
+
+            tr td,
+            tr th {
+                overflow: hidden;
+                position: relative;
+                width: 100%;
+                white-space: normal;
+            }
+
+            .capability {
+                background-color: $snow;
+            }
+
+            th[scope="row"] {
+                display: block;
+                font-size: rem-calc(($base-font-size - 2));
+                text-align: center;
+                width: 100%;
+            }
+        }
+        table.rb {
+            tbody th {
+                &:last-of-type {
+                    border-right-width: 0;
+                }
+
+                &:first-of-type {
+                    border-right-width: 0;
+                    border-bottom-width: 1px;
+                }
+            }
+
+            .rb-group-name,
+            .rb-group-header label {
+                font-size: $base-font-size;
+            }
+
+            .hide-v,
+            .rb-blank,
+            th:empty {
+                display: none;
+            }
+
+            thead {
+                display: block;
+            }
+
+            tr {
+                .rb-group-header {
+                    label {
+                        font-weight: bold;
+                    }
+                }
+            }
+
+            .rb-criterion-name {
+                padding-left: 1.25rem;
+            }
+
+            .rb-group-summary {
+                padding-left: 1.5rem;
+            }
+
+            label span {
+                margin-left: 1.25rem;
+            }
+
+            .rb-description,
+            .rb-value {
+                margin-left: 1.5rem;
+            }
+
+            select {
+                padding: 0 1.5rem;
+            }
+
+            textarea {
+                min-height: 1rem;
+            }
+
+            .rb-no-cell {
+                display: none;
+            }
+
+            .sequencer {
+                margin-bottom: 0.5rem;
+            }
+        }
+    }
+
+    // Rubric progression graph
+    th.rubric-progression-capability,
+    th.rubric-progression-indicator {
+        width: 15%;
+    }
+    td.rubric-progression-graph {
         padding: 0;
-        border: 0;
-        height: 1px;
-        width: 1px;
-        overflow: hidden;
-      }
-
-      tbody,
-      tr,
-      th,
-      td {
-        display: block;
-        white-space: normal;
-      }
-
-      tr td,
-      tr th {
-        overflow: hidden;
-        position: relative;
-        width: 100%;
-        white-space: normal;
-      }
-
-      .capability {
-        background-color: $snow;
-      }
-
-      th[scope="row"] {
-        display: block;
-        font-size: rem-calc(($base-font-size - 2));
-        text-align: center;
-        width: 100%;
-      }
     }
-    table.rb {
-      tbody th {
-        &:last-of-type {
-          border-right-width: 0;
-        }
-
-        &:first-of-type {
-          border-right-width: 0;
-          border-bottom-width: 1px;
-        }
-      }
-
-      .rb-group-name,
-      .rb-group-header label {
-        font-size: $base-font-size;
-      }
-
-      .hide-v,
-      .rb-blank,
-      th:empty {
-        display: none;
-      }
-
-      thead {
-        display: block;
-      }
-
-      tr {
-        .rb-group-header {
-          label {
-            font-weight: bold;
-          }
-        }
-      }
-
-      .rb-criterion-name {
-        padding-left: 1.25rem;
-      }
-
-      .rb-group-summary {
-        padding-left: 1.5rem;
-      }
-
-      label span {
-        margin-left: 1.25rem;
-      }
-
-      .rb-description,
-      .rb-value {
-        margin-left: 1.5rem;
-      }
-
-      select {
-        padding: 0 1.5rem;
-      }
-
-      textarea {
-        min-height: 1rem;
-      }
-
-      .rb-no-cell {
-        display: none;
-      }
-
-      .sequencer {
-        margin-bottom: 0.5rem;
-      }
-    }
-  }
-
-  // Rubric progression graph
-  th.rubric-progression-capability, th.rubric-progression-indicator {
-    width: 15%;
-  }
-  td.rubric-progression-graph {
-    padding: 0;
-  }
 }
 
 @media print {
     .rb-selected p,
-    .rb-selected aside{
+    .rb-selected aside {
         font-size: 1rem;
         font-weight: bold;
         font-style: italic;
     }
-    .rb td, .rb th {
+    .rb td,
+    .rb th {
         border: solid 1px #8c8c8c !important; //make happen, print needs this... I don't care...
     }
     //force text size for rubric when printing
@@ -543,10 +557,10 @@ select.letter-grade-select {
 }
 
 // This was added for the RubricResultSet index.twig template.
- span.result-rubric-label {
-     background-color: var(--body-background);
-     display: inline-block;
-     margin-bottom: 0.2rem;
-     margin-right: 0.2rem;
-     padding: 0.5rem;
- }
+span.result-rubric-label {
+    background-color: var(--body-background);
+    display: inline-block;
+    margin-bottom: 0.2rem;
+    margin-right: 0.2rem;
+    padding: 0.5rem;
+}

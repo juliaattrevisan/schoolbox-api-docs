@@ -1,4 +1,3 @@
-
 $tree-node-height: 3rem;
 
 /* Default idle state of a node anchor
@@ -16,7 +15,6 @@ $tree-homepage-icon-color: darkorange;
 $tree-course-icon-color: #008600;
 $tree-favorite-icon-color: darkorange;
 
-
 %browser-icon-colors {
     .icon-folder:before {
         color: $tree-folder-icon-color;
@@ -26,7 +24,8 @@ $tree-favorite-icon-color: darkorange;
         color: $tree-homepage-icon-color;
     }
 
-    .icon-course-builder, .icon-course {
+    .icon-course-builder,
+    .icon-course {
         &:before {
             color: $tree-course-icon-color;
         }
@@ -39,8 +38,8 @@ $tree-favorite-icon-color: darkorange;
 
 // a whole bushel of jstree overrides.....
 
-div.jstree-default, ul.jstree-default {
-
+div.jstree-default,
+ul.jstree-default {
     .jstree-node {
         min-height: $tree-node-height;
         line-height: $tree-node-height;
@@ -58,7 +57,7 @@ div.jstree-default, ul.jstree-default {
         }
 
         /* Can't touch this... node */
-        &[data-type=noaccess] {
+        &[data-type="noaccess"] {
             > .jstree-wholerow,
             > .jstree-anchor,
             > .jstree-ocl {
@@ -72,17 +71,21 @@ div.jstree-default, ul.jstree-default {
         background: $tree-node-hover-background;
     }
 
-    li.selected, li.jstree-wholerow-clicked {
+    li.selected,
+    li.jstree-wholerow-clicked {
         color: $tree-node-selected-color;
         background: $tree-node-selected-background;
     }
 
-
-    .jstree-wholerow, .jstree-anchor {
+    .jstree-wholerow,
+    .jstree-anchor {
         height: $tree-node-height;
     }
 
-    .jstree-wholerow, .jstree-anchor, .jstree-default, .jstree-icon:empty {
+    .jstree-wholerow,
+    .jstree-anchor,
+    .jstree-default,
+    .jstree-icon:empty {
         line-height: $tree-node-height;
     }
 
@@ -108,8 +111,8 @@ div.jstree-default, ul.jstree-default {
 }
 
 // override throbber.gif
-.jstree-default > .jstree-container-ul{
-    .jstree-loading > i.jstree-ocl  {
+.jstree-default > .jstree-container-ul {
+    .jstree-loading > i.jstree-ocl {
         background: url("#{$cdn-prefix}/images/foundation/preloader.gif") center center no-repeat;
         background-size: 1rem 1rem;
     }
@@ -147,7 +150,7 @@ div.jstree-default, ul.jstree-default {
         }
 
         .card {
-            margin-bottom: .75rem;
+            margin-bottom: 0.75rem;
         }
 
         .folder-cover {

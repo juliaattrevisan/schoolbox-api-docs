@@ -1,4 +1,4 @@
-@import 'selectize';
+@import "selectize";
 
 $selectize-color-item: #1da7ee;
 $selectize-color-item-text: #fff;
@@ -10,11 +10,8 @@ $selectize-width-item-border: 1px;
 $selectize-caret-margin: 0 1px;
 
 .selectize-control {
-
     &.multi {
-
         .selectize-input {
-
             &.has-items {
                 $padding-x: $selectize-padding-x - 3px;
                 padding-left: $padding-x;
@@ -35,33 +32,26 @@ $selectize-caret-margin: 0 1px;
                 .remove {
                     background: none;
                 }
-
             }
             [data-value] {
-                text-shadow: 0 1px 0 rgba(0, 51, 83, .3);
+                text-shadow: 0 1px 0 rgba(0, 51, 83, 0.3);
                 @include selectize-border-radius(3px);
                 @include selectize-vertical-gradient(#1da7ee, #178ee9);
-                @include selectize-box-shadow(#{0 1px 0 rgba(0, 0, 0, .2), inset 0 1px rgba(255, 255, 255, .03)});
+                @include selectize-box-shadow(#{0 1px 0 rgba(0, 0, 0, 0.2), inset 0 1px rgba(255, 255, 255, 0.03)});
 
                 &.active {
                     @include selectize-vertical-gradient(#008fd8, #0075cf);
                 }
-
             }
-
         }
-
     }
 
     &.single {
-
         .selectize-input {
-            @include selectize-box-shadow(#{0 1px 0 rgba(0, 0, 0, .05), inset 0 1px 0 rgba(255, 255, 255, .8)});
+            @include selectize-box-shadow(#{0 1px 0 rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.8)});
             @include selectize-vertical-gradient(#fefefe, #f2f2f2);
         }
-
     }
-
 }
 
 .selectize-control.single .selectize-input,
@@ -70,11 +60,10 @@ $selectize-caret-margin: 0 1px;
 }
 
 .selectize-dropdown {
-
     .optgroup-header {
         padding-top: $selectize-padding-dropdown-item-y + 2px;
         font-weight: bold;
-        font-size: .85em;
+        font-size: 0.85em;
     }
 
     .optgroup {
@@ -83,7 +72,5 @@ $selectize-caret-margin: 0 1px;
         &:first-child {
             border-top: 0 none;
         }
-
     }
-
 }

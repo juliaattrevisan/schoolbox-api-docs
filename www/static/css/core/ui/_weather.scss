@@ -1,77 +1,79 @@
 // Shared values between the currrent panels and forecast display on the detail screen
 // and the list view on the dashboard component itself
-.weather-current, .weather-forecast, .weather-list {
-  .hot {
-    color: $hot-color;
-  }
-  .cold {
-    color: $cold-color;
-  }
-
-  .current-value {
-    font-size: 1rem;
-  }
-
-  .panel {
-    margin-top: .5rem;
-    text-align: center;
-
-    @media #{$small-only} {
-      border-bottom: 1px solid $body-bg;
+.weather-current,
+.weather-forecast,
+.weather-list {
+    .hot {
+        color: $hot-color;
     }
-  }
+    .cold {
+        color: $cold-color;
+    }
+
+    .current-value {
+        font-size: 1rem;
+    }
+
+    .panel {
+        margin-top: 0.5rem;
+        text-align: center;
+
+        @media #{$small-only} {
+            border-bottom: 1px solid $body-bg;
+        }
+    }
 }
 
 // Detail screen, today's details
 .weather-current {
-  p.temperature {
-    @media #{$medium-up} {
-      margin-top: 1.5rem;
+    p.temperature {
+        @media #{$medium-up} {
+            margin-top: 1.5rem;
+        }
     }
-  }
 }
 
 // Detail screen, all the future days' details
 .weather-forecast {
-  @include information-list;
-  &.active {
-    background-color: $row-hover-background;
-  }
+    @include information-list;
+    &.active {
+        background-color: $row-hover-background;
+    }
 
-  li {
-    text-align: center;
-  }
+    li {
+        text-align: center;
+    }
 
-  .weather-summary {
-    margin-bottom: 1rem;
-  }
+    .weather-summary {
+        margin-bottom: 1rem;
+    }
 
-  @media #{$small-only} {
-    padding-left: 0;
-    padding-right: 0;
-  }
+    @media #{$small-only} {
+        padding-left: 0;
+        padding-right: 0;
+    }
 }
 
 // Dashboard Component
 .weather-list {
-  @include information-list;
-  .active {
-    background-color: $row-hover-background;
-  }
-
-  .current-value,
-  .hot,
-  .cold {
-    @media #{$medium-up} {
-      margin-top: 1.5rem;
+    @include information-list;
+    .active {
+        background-color: $row-hover-background;
     }
-  }
 
-  p {
-    margin-bottom: 0;
-  }
+    .current-value,
+    .hot,
+    .cold {
+        @media #{$medium-up} {
+            margin-top: 1.5rem;
+        }
+    }
 
-  .highlighted-day {
-    background: #fafafa;
-  }
+    p {
+        margin-bottom: 0;
+    }
+
+    .highlighted-day {
+        background: #fafafa;
+    }
 }

@@ -35,8 +35,8 @@ $cdn-prefix: "/static";
 }
 
 .VueTables__sortable {
-    .VueTables__sort-icon { 
-        float: left; 
+    .VueTables__sort-icon {
+        float: left;
         margin-right: 0.5rem;
     }
 }
@@ -50,22 +50,22 @@ $cdn-prefix: "/static";
     }
 }
 
-$font-family-icon: 'schoolbox';
+$font-family-icon: "schoolbox";
 .sort-icon {
     font-family: $font-family-icon;
     font-size: 0.75rem;
 }
 .VueTables .glyphicon-sort:before {
     @extend .sort-icon;
-    content: '\e800';
+    content: "\e800";
 }
 .VueTables .glyphicon-chevron-up:before {
     @extend .sort-icon;
-    content: '\e920';
+    content: "\e920";
 }
 .VueTables .glyphicon-chevron-down:before {
     @extend .sort-icon;
-    content: '\e621';
+    content: "\e621";
 }
 
 .VueTables__select-all,

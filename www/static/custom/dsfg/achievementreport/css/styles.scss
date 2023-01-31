@@ -68,13 +68,13 @@ into their skin config textarea
          */
         &.juniorschoolblog {
             background-image: url("#{$cdn-prefix}/custom/dsfg/achievementreport/img/juniorschoolblog.png");
-            color: #0066b0
+            color: #0066b0;
         }
 
         /* Remove icon
          */
         &.juniorschoolblog:before {
-            content: '';
+            content: "";
             font-size: 0;
         }
 
@@ -83,13 +83,13 @@ into their skin config textarea
          */
         &.enrolmy {
             background-image: url("#{$cdn-prefix}/custom/dsfg/achievementreport/img/enrolmy.png");
-            color: #0066b0
+            color: #0066b0;
         }
 
         /* Remove icon
          */
         &.enrolmy:before {
-            content: '';
+            content: "";
             font-size: 0;
         }
     }
@@ -98,7 +98,6 @@ into their skin config textarea
 /* Custom: Achievement Report
  */
 .achievement-report {
-
     /**
      * Generic styles
      */
@@ -107,7 +106,8 @@ into their skin config textarea
         border-collapse: collapse;
         margin-bottom: 2rem;
 
-        th, td {
+        th,
+        td {
             border: 1px solid #ddd;
             padding: 0.5rem;
             text-align: left;
@@ -143,11 +143,12 @@ into their skin config textarea
     /* Colours - Internal/External background colours
      */
     .type-pink {
-        background-color: #FF00FF
+        background-color: #ff00ff;
     }
 
-    .type-blue, .generic-heading-highlight {
-        background-color: #6495ED
+    .type-blue,
+    .generic-heading-highlight {
+        background-color: #6495ed;
     }
 
     /* Key, used in footer explanations typically
@@ -174,7 +175,6 @@ into their skin config textarea
      * School Grades Report
      */
     &.school-grades {
-
         /* Spacer row
          */
         tr.spacer td {
@@ -202,8 +202,9 @@ into their skin config textarea
         table {
             &.credit-summary {
                 .equal-widths {
-                    th, td {
-                        width: 7.14%
+                    th,
+                    td {
+                        width: 7.14%;
                     }
                 }
             }
@@ -211,7 +212,8 @@ into their skin config textarea
             &.summary {
                 margin-bottom: 0;
 
-                th.level, td.level {
+                th.level,
+                td.level {
                     width: 6rem;
                 }
             }
@@ -238,7 +240,9 @@ into their skin config textarea
         }
 
         td.spacer {
-            line-height: 0;padding: 0;border-bottom-width:5px;
+            line-height: 0;
+            padding: 0;
+            border-bottom-width: 5px;
         }
     }
 }
