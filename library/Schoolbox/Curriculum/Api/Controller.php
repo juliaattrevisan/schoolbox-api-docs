@@ -10,6 +10,7 @@ namespace Schoolbox\Curriculum\Api;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Curriculum\Api\Translator\ArrayToModel;
 use Schoolbox\Curriculum\Api\Translator\ModelToArray;
+use Schoolbox\Curriculum\Api\Usage\Counter;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -86,11 +87,13 @@ class Controller extends Base
 
         Node\Mapper::sortNodes($resultsForAllKeywords, 0);
 
-        $this->response->content->set(
-            $this->buildJsonOutput(
-                $resultsForAllKeywords->map(new ModelToArray($ancestorCount, $descendantCount))
-            )
-        );
+        $counter = new Counter($this->getDi()->get('databaseInternal'));
+        $counts  = $counter->count($resultsForAllKeywords->getPropertyValues('id'));
+
+        // Translate results: also add all result counts (for top level only)
+        $translatedResults = $resultsForAllKeywords->map(new ModelToArray($ancestorCount, $descendantCount, $counts));
+
+        $this->response->content->set($this->buildJsonOutput($translatedResults));
     }
 
     /**
@@ -108,7 +111,7 @@ class Controller extends Base
         );
         $this->response->content->set(
             $this->buildJsonOutput(
-                $tree->map(new ModelToArray(0, self::MAX_DESCENDANTS))
+                $tree->map(new ModelToArray(0, self::MAX_DESCENDANTS, null))
             ),
         );
     }
@@ -211,7 +214,7 @@ class Controller extends Base
         $childNodes = $node->getChildren();
         Node\Mapper::sortNodes($childNodes, 0);
         $node->setChildren($childNodes);
-        $translator = new ModelToArray($ancestorCount, $descendantCount);
+        $translator = new ModelToArray($ancestorCount, $descendantCount, null);
         $this->response->content->set(
             $this->buildJsonOutput($translator($node))
         );

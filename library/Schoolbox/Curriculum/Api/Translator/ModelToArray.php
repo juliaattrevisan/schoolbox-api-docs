@@ -20,17 +20,17 @@ class ModelToArray
     /**
      * Constructor
      *
-     * @param int $ancestorCount   How many levels of ancestor get translated?
-     *                             Any levels of ancestor above this get only a
-     *                             stub record (with no further ancestor)
-     *                             translated.
-     * @param int $descendantCount How many levels of descendant get translated?
-     *                             Any levels of descendant below this are not
-     *                             translated at all.
+     * @param int $ancestorCount                      How many levels of ancestor get translated?
+     *                                                Any levels of ancestor above this get only a stub record
+     *                                                (with no further ancestor) translated.
+     * @param int $descendantCount                    How many levels of descendant get translated?
+     *                                                Any levels of descendant below this are not translated at all.
+     * @param ?array<int, array<string, int>> $counts A set of usage counts for each node to be translated.
      */
     public function __construct(
         private int $ancestorCount,
         private int $descendantCount,
+        private ?array $counts,
     ) {
     }
 
@@ -91,6 +91,7 @@ class ModelToArray
             'order'         => $node->getOrder(),
             'createdAt'     => $node->getCreatedAt()->toRfc3339String(),
             'modifiedAt'    => $node->getModifiedAt()->toRfc3339String(),
+            'usageCounts'   => $this->counts[$node->getId()] ?? null,
         ];
     }
 }
