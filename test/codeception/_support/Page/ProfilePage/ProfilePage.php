@@ -3,6 +3,7 @@
 namespace Page\ProfilePage;
 
 use AcceptanceTester;
+use Codeception\Util\Locator;
 
 class ProfilePage
 {
@@ -42,4 +43,25 @@ class ProfilePage
     {
         $this->tester->click('a[href="#tab-' . $tabName . '"]');
     }
+
+    /**
+     * click a Badge by passing its name
+     * or
+     * click a dropdown option: Remove goal, Award achievement, Withdraw achievement
+     */
+    public function clickBadgeOrDropdownOption(string $badgeNameOrDropdownOption): void
+    {
+        $this->tester->click(Locator::lastElement('a[title="' . $badgeNameOrDropdownOption . '"]'));
+    }
+
+    /**
+     * Click a badge dropdown
+     */
+    public function clickBadgeDropdown($badgeId): void
+    {
+        $this->tester->click('a[data-dropdown="header-options-1-' . $badgeId . '-achievement"]');
+    }
+
+
+
 }

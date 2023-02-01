@@ -66,9 +66,18 @@ class Badges
      * click an option in the dropdown (Award Achievement, Set Goal, etc)
      * options are: achievement, goal, withdraw-achievement, close, modify, delete
      */
-    public function clickDropdownOption($dropdownOption): void
+    public function clickDropdownOptionLastElement($dropdownOption): void
     {
         $this->tester->click(Locator::lastElement('a.icon-' . $dropdownOption));
+    }
+
+    /**
+     * click an option in the dropdown (Award Achievement, Set Goal, etc)
+     * options are: achievement, goal, withdraw-achievement, close, modify, delete
+     */
+    public function clickDropdownOptionFirstElement($dropdownOption): void
+    {
+        $this->tester->click(Locator::firstElement('a.icon-' . $dropdownOption));
     }
 
     /**

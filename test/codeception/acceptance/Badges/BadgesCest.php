@@ -92,7 +92,7 @@ class BadgesCest
         $createBadge = new CreateBadge($i);
         $category = "Learning";
         $i->amGoingTo('click the badge dropdown and click Modify');
-        $badgeId = $i->grabNumRecords('badge');
+        $badgeId = $i->grabFromDatabase('badge', 'id', ['deleted_at' => null,'name like' => 'Automation Badge']);
         $badges->clickBadgeDropdown($badgeId);
         $badges->clickDropdownModify($badgeId);
         $i->amGoingTo('get name and category updated and click Modify Badge button');
@@ -118,7 +118,7 @@ class BadgesCest
     {
         $badges = new Badges($i);
         $i->amGoingTo('click the badge dropdown and click Delete');
-        $badgeId = $i->grabNumRecords('badge');
+        $badgeId = $i->grabFromDatabase('badge', 'id', ['deleted_at' => null,'name like' => 'Automation Badge Updated']);
         $badges->clickBadgeDropdown($badgeId);
         $badges->clickDropdownDelete();
         $badges->clickConfirmDelete();
