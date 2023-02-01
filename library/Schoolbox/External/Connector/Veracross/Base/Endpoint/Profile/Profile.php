@@ -16,6 +16,7 @@ use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\IApi;
+use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Health;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Household;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\EmergencyContact;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\ValueListConverter;
@@ -44,9 +45,10 @@ class Profile implements IStrategy
      *
      * students:list
      * emergency_contacts:list
+     * health.patients:list
      * parents:list
      */
-    public const SCOPE = 'students:list parents:list';
+    public const SCOPE = 'students:list health.patients:list parents:list';
 
 
     /**
@@ -168,6 +170,11 @@ class Profile implements IStrategy
         $this->log->debug('Prefetching emergency contacts...');
         $emergencyContactsLookup = (new EmergencyContact($this->api))->generate();
 
+        /* Prefetch a list of medically-afflicted dudes
+         */
+        $this->log->debug('Prefetching medicals...');
+        $medicalLookup = (new Health($this->api))->generate();
+
         /* Get ready to remember an indexed set of Value Lists for Students
          */
         $studentLookupConverter = new ValueListConverter();
@@ -229,7 +236,7 @@ class Profile implements IStrategy
                  */
                 $comments = '';
                 $legal = '';
-                $medical = '';
+                $medical = $medicalLookup[$student['id']] ?? false;
                 $messages = '';
 
                 /* Find out a staff member via their user code
