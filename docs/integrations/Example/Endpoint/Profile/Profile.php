@@ -29,7 +29,6 @@ use UnexpectedValueException;
  */
 class Profile implements IStrategy
 {
-
     /**
      * Maximum number of emergency contacts we've permitted (3 by default)
      */
@@ -116,7 +115,6 @@ class Profile implements IStrategy
      */
     public function import(): void
     {
-
         /* Import students' profile data
          * Import their specific parents' profile data
          */
@@ -137,7 +135,6 @@ class Profile implements IStrategy
      */
     private function importStudents(): void
     {
-
         /* TODO Get a set of students that we need to process
          */
         $students = [];
