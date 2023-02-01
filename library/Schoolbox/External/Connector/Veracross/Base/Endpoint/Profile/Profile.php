@@ -55,12 +55,6 @@ class Profile implements IStrategy
 
 
     /**
-     * Maximum number of emergency contacts we've permitted (3 by default)
-     */
-    private const MAX_EMERGENCY_CONTACTS = 3;
-
-
-    /**
      * @var ValidStrats
      */
     private ValidStrats $validStrats;
@@ -78,6 +72,12 @@ class Profile implements IStrategy
      * @var bool
      */
     private bool $perform;
+
+
+    /**
+     * @var IApi
+     */
+    private IApi $api;
 
 
     /**
@@ -208,6 +208,8 @@ class Profile implements IStrategy
         /* Prefetch a list of contact info, which contain phone numbers
          * This generally only applies to Parents and Staff
          */
+        $contactInfoLookup = [];
+
         if ($this->validStrats->isFamiliesStratEnabled()) {
             $this->log->debug('Prefetching contact info...');
             $contactInfoLookup = $this->contactInfoLookup->generate();
@@ -285,11 +287,17 @@ class Profile implements IStrategy
 
                 /* Find out a staff member via their user code
                  */
-                $formTeacher = [];
+                $formTeacher = [
+                    'id' => null,
+                    'name' => null
+                ];
 
                 /* Fish out a staff member via their user code
                  */
-                $housemaster = [];
+                $housemaster = [
+                    'id' => null,
+                    'name' => null
+                ];
 
                 /* Fish out special needs
                  */
@@ -297,7 +305,10 @@ class Profile implements IStrategy
 
                 /* Find out a staff member via their user code
                  */
-                $yearLevelCoordinator = [];
+                $yearLevelCoordinator = [
+                    'id' => null,
+                    'name' => null
+                ];
 
                 /* Dates
                  */
@@ -354,11 +365,11 @@ class Profile implements IStrategy
                     ->setEmail($email)
                     ->setEnrolmentDate($enrolment)
                     ->setFormName($form)
-                    ->setFormTeacherId($formTeacher['id'] ?? '')
-                    ->setFormTeacherName($formTeacher['name'] ?? '')
+                    ->setFormTeacherId($formTeacher['id'])
+                    ->setFormTeacherName($formTeacher['name'])
                     ->setGender($gender)
-                    ->setHeadOfHouseId($housemaster['id'] ?? '')
-                    ->setHeadOfHouseName($housemaster['name'] ?? '')
+                    ->setHeadOfHouseId($housemaster['id'])
+                    ->setHeadOfHouseName($housemaster['name'])
                     ->setHouseName($academicHouse)
                     ->setLeavingDate($leaving)
                     ->setMobile($mobile)
@@ -368,8 +379,8 @@ class Profile implements IStrategy
                     ->setTutorTeacherId($tutorId)
                     ->setTutorTeacherName($tutorName)
                     ->setYearLevel($yearLevel)
-                    ->setYearLevelCoordinatorId($yearLevelCoordinator['id'] ?? '')
-                    ->setYearLevelCoordinatorName($yearLevelCoordinator['name'] ?? '')
+                    ->setYearLevelCoordinatorId($yearLevelCoordinator['id'])
+                    ->setYearLevelCoordinatorName($yearLevelCoordinator['name'])
 
                     /**
                      * Flags

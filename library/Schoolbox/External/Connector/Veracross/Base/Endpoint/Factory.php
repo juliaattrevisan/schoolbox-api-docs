@@ -116,6 +116,12 @@ class Factory
 
 
     /**
+     * @var \Schoolbox\External\Event\Mapper
+     */
+    private \Schoolbox\External\Event\Mapper $eventMapper;
+
+
+    /**
      * @var ClassEntryMapper
      */
     private ClassEntryMapper $classEntryMapper;
