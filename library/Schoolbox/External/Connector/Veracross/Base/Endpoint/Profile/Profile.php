@@ -251,7 +251,7 @@ class Profile implements IStrategy
                  */
                 $comments = '';
                 $legal = '';
-                $medical = $medicalLookup[$student['id']] ?? false;
+                $medical = $medicalLookup[$student['id']] ? 'This student has medical conditions.' : null;
                 $messages = '';
 
                 /* Find out a staff member via their user code
