@@ -39,8 +39,14 @@ class Profile implements IStrategy
     /**
      * The access token's scope, used throughout this strat
      * (perhaps) could work on subdividing or unifying this further)
+     *
+     * Required scopes:
+     *
+     * students:list
+     * emergency_contacts:list
+     * parents:list
      */
-    public const SCOPE = 'students:list emergency_contacts:read parents:list';
+    public const SCOPE = 'students:list parents:list';
 
 
     /**
