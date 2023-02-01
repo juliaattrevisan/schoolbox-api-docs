@@ -224,15 +224,11 @@ class Profile implements IStrategy
                 $studiesCode = '';
                 $title = '';
 
-                /* Skip this if it's specifically id 0 (None)
+                /* TODO: Maybe Skip this if it's specifically id 0 (None)
+                 *  These lookups are user configurable though
                  */
-                $tutorId = '';
-                $tutorName = '';
-
-                if ($student['homeroom_teacher']['id']) {
-                    $tutorId = trim((string)$student['homeroom_teacher']['id']);
-                    $tutorName = trim((string)$student['homeroom_teacher']['name']);
-                }
+                $tutorId = trim((string)$student['homeroom_teacher']['id']);
+                $tutorName = trim((string)$student['homeroom_teacher']['name']);
 
                 /* $student['homeroom'] is a lookup identifier that might not
                  * actually exist in the lookup itself
