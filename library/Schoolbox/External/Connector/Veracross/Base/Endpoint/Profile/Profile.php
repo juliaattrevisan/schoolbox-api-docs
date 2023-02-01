@@ -17,6 +17,7 @@ use RuntimeException;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\IApi;
+use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\ContactInfo;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Health;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Household;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\EmergencyContact;
@@ -24,7 +25,6 @@ use Schoolbox\External\Connector\Veracross\Base\Endpoint\ValueListConverter;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\Profile\Model;
-use Schoolbox\Mapper;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
 use UnexpectedValueException;
@@ -49,8 +49,9 @@ class Profile implements IStrategy
      * health.patients:list
      * parents:list
      * staff_faculty:list
+     * contact_info:list
      */
-    public const SCOPE = 'students:list health.patients:list parents:list staff_faculty:list';
+    public const SCOPE = 'students:list health.patients:list parents:list staff_faculty:list contact_info:list';
 
 
     /**
@@ -110,6 +111,15 @@ class Profile implements IStrategy
 
 
     /**
+     * This lookup could be shared between student/parent/staff imports
+     * depending on your strat selection for segregated imports
+     *
+     * @var ContactInfo
+     */
+    private ContactInfo $contactInfoLookup;
+
+
+    /**
      * Profile constructor.
      *
      * @param ValidStrats                     $validStrats
@@ -142,6 +152,10 @@ class Profile implements IStrategy
         $this->parentProfileMapper = $parentProfileMapper;
         $this->staffProfileMapper = $staffProfileMapper;
         $this->relationshipMapper = $relationshipMapper;
+
+        /* Shared lookups
+         */
+        $this->contactInfoLookup = new ContactInfo($this->api);
     }
 
 
@@ -190,6 +204,14 @@ class Profile implements IStrategy
          */
         $this->log->debug('Prefetching medicals...');
         $medicalLookup = (new Health($this->api))->generate();
+
+        /* Prefetch a list of contact info, which contain phone numbers
+         * This generally only applies to Parents and Staff
+         */
+        if ($this->validStrats->isFamiliesStratEnabled()) {
+            $this->log->debug('Prefetching contact info...');
+            $contactInfoLookup = $this->contactInfoLookup->generate();
+        }
 
         /* Get ready to remember an indexed set of Value Lists for Students
          */
@@ -416,7 +438,9 @@ class Profile implements IStrategy
 
                 /* Add their parents' profile data
                  */
-                $this->importParentsOfStudent($externalId, $studentBaseProfile, $householdLookup[$student['household_id']] ?? []);
+                if ($this->validStrats->isFamiliesStratEnabled()) {
+                    $this->importParentsOfStudent($externalId, $studentBaseProfile, $contactInfoLookup, $householdLookup[$student['household_id']] ?? []);
+                }
             }
         }
     }
@@ -443,6 +467,7 @@ class Profile implements IStrategy
      *
      * @param string $studentExternalId
      * @param Model  $studentBaseProfile
+     * @param array  $contactInfoLookup
      * @param array  $household
      * @throws DefinitionException
      * @throws Exception
@@ -452,6 +477,7 @@ class Profile implements IStrategy
     private function importParentsOfStudent(
         string $studentExternalId,
         UserProfile\Model $studentBaseProfile,
+        array $contactInfoLookup,
         array $household
     ): void {
         /* For every associated parent, find out if they have a parent profile
@@ -473,9 +499,9 @@ class Profile implements IStrategy
             ]);
 
             $lastname = trim((string)$parent['last_name']);
-            $phoneHome = '';
-            $phoneMobile = '';
-            $phoneWork = '';
+            $phoneHome = trim((string)$contactInfoLookup[$parent['id']]['home_phone']);
+            $phoneMobile = trim((string)$contactInfoLookup[$parent['id']]['mobile_phone']);
+            $phoneWork = trim((string)$contactInfoLookup[$parent['id']]['business_phone']);
 
             /* TODO Need relationships:list scope
              *  $relationship might be inferred from relationships:list,
@@ -576,6 +602,11 @@ class Profile implements IStrategy
      */
     private function importStaff(): void
     {
+        /* Prefetch a list of contact info, which contain phone numbers
+         */
+        $this->log->debug('Prefetching contact info...');
+        $contactInfoLookup = $this->contactInfoLookup->generate();
+
         /* Get ready to remember an indexed set of Value Lists for Students
          */
         $staffLookupConverter = new ValueListConverter();
@@ -602,7 +633,7 @@ class Profile implements IStrategy
                 $category = trim((string)$staffLookup['faculty_type'][$staff['faculty_type']]);
                 $department = trim((string)$staffLookup['department'][$staff['department']]);
                 $email = trim((string)$staff['email_1']);
-                $phone = '';
+                $phone = trim((string)$contactInfoLookup[$staff['id']]['business_phone']);
                 $positionTitle = trim((string)$staff['job_title']);
                 $room = '';
                 $title = trim((string)$staffLookup['name_prefix'][$staff['name_prefix']]);
