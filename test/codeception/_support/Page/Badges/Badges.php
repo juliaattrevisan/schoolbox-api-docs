@@ -100,7 +100,7 @@ class Badges
     /**
      * click Delete button on confirmation dialog
      */
-    public function clickConfirmDelete(): void
+    public function clickConfirm(): void
     {
         $this->tester->click(Locator::lastElement(self::BUTTON_CONFIRM_DELETE));
     }
@@ -131,5 +131,13 @@ class Badges
     public function clickSetGoalorAwardAchievement(): void
     {
         $this->tester->click(Locator::lastElement(self::MODAL_BUTTON_SET_GOAL_ACHIEVEMENT));
+    }
+
+    /**
+     * click submit button on the evidence page
+     */
+    public function clickEvidenceSubmitButton(): void
+    {
+        $this->tester->click(("input[type=submit]"));
     }
 }

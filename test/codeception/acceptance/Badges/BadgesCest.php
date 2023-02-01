@@ -121,7 +121,7 @@ class BadgesCest
         $badgeId = $i->grabFromDatabase('badge', 'id', ['deleted_at' => null,'name like' => 'Automation Badge Updated']);
         $badges->clickBadgeDropdown($badgeId);
         $badges->clickDropdownDelete();
-        $badges->clickConfirmDelete();
+        $badges->clickConfirm();
         $i->amGoingTo('ensure the badge is no longer presented in the page');
         $i->cantSee('Automation Badge Updated');
         $i->amGoingTo('reload the page to ensue the badge is not presented');

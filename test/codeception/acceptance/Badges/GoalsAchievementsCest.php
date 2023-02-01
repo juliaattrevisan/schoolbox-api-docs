@@ -135,33 +135,118 @@ class GoalsAchievementsCest
         $profilePage->clickTab('goals');
         $i->canSee($badgeNameGoal);
         $profilePage->clickBadgeOrDropdownOption($badgeNameGoal);
-//        $i->click('a[title="' . $badgeName . '"]');
         $badges->clickSetGoalorAwardAchievement();
         $i->amGoingTo('Click the achievements tab, ensure the achievements are presented and withdraw them');
         $profilePage->clickTab('achievements');
         $i->canSee($badgeNameGoal);
         $badgeIdAchievement = $i->grabFromDatabase('badge', 'id', ['deleted_at' => null,'name like' => $badgeNameAchievement]);
-//        $i->click('a[data-dropdown="header-options-1-' . $badgeId . '-achievement"]');
         $profilePage->clickBadgeDropdown($badgeIdAchievement);
         $profilePage->clickBadgeOrDropdownOption('Withdraw achievement');
-//        $i->click(Locator::lastElement('a[title="Withdraw achievement"]'));
-        $badges->clickConfirmDelete();
+        $badges->clickConfirm();
         $badgeIdGoal = $i->grabFromDatabase('badge', 'id', ['deleted_at' => null,'name like' => $badgeNameGoal]);
-//        $i->click('a[data-dropdown="header-options-1-' . $badgeIdGoal . '-achievement"]');
         $profilePage->clickBadgeDropdown($badgeIdGoal);
         $profilePage->clickBadgeOrDropdownOption('Withdraw achievement');
-//        $i->click(Locator::lastElement('a[title="Withdraw achievement"]'));
-        $badges->clickConfirmDelete();
+        $badges->clickConfirm();
         $i->amGoingTo('Click the goals tab, ensure the goal is presented and remove it');
         $profilePage->clickTab('goals');
         $i->canSee($badgeNameGoal);
         $i->cantSee($badgeNameAchievement);
         $i->click('a[data-dropdown="header-options-1-' . $badgeIdGoal . '-goal"]');
         $badges->clickDropdownOptionFirstElement('close');
-        $badges->clickConfirmDelete();
+        $badges->clickConfirm();
         $i->cantSee($badgeNameGoal);
         $profilePage->clickTab('activity');
         $i->cantSee($badgeNameAchievement);
         $i->cantSee($badgeNameGoal);
+    }
+
+    /**
+     * @param AcceptanceTester $i
+     * @throws Exception
+     *
+     *
+     * set a goal, add an evidence, view the evidence, edit it, check it is updated, award it and check the evidence is presented
+     * withdraw the achievement, remove the evidence, award it again with evidence, check the evidence, update the evidence, check the evidence is presented properly
+     *
+     */
+    public function viewEvidence(AcceptanceTester $i): void
+    {
+        $badges = new Badges($i);
+        $profilePage = new ProfilePage($i);
+        $badgeNameGoal = 'Automation Badge created to set goal from Badges page';
+        $student = 'Jana Reed';
+        $studentId = 25;
+        $i->amGoingTo('Set a Goal to Jana Reed');
+        $badgeId = $i->grabFromDatabase('badge', 'id', ['deleted_at' => null,'name like' => $badgeNameGoal]);
+        $i->amGoingTo('click the 3-dot menu and click Set Goal');
+        $badges->clickBadgeDropdown($badgeId);
+        $badges->clickDropdownOptionLastElement('goal');
+        $i->amGoingTo('search and select Jana Reed on the modal');
+        $badges->selectStudentSetGoal($student);
+        $i->amGoingTo('click Set Goal button on the modal');
+        $badges->clickSetGoalorAwardAchievement();
+        $i->amGoingTo('Navigate to Jana Reed profile page goals tab and add an evidence to the goal');
+        $i->amOnPage($profilePage->generateRoute($studentId));
+        $profilePage->clickTab('goals');
+        $i->canSee($badgeNameGoal);
+        $profilePage->clickBadgeOrDropdownOption($badgeNameGoal);
+        $profilePage->clickBadgeOrDropdownOption('Add evidence');
+        $i->fillCkEditorById('reason', 'Great job, Jana!');
+        $badges->clickEvidenceSubmitButton();
+        $i->amGoingTo('Check the evidence is presented by navigating to view evidence');
+        $i->amOnPage($profilePage->generateRoute($studentId));
+        $profilePage->clickTab('goals');
+        $profilePage->clickBadgeOrDropdownOption($badgeNameGoal);
+        $profilePage->clickBadgeOrDropdownOption('View evidence');
+        $i->canSee('Great job, Jana!');
+        $i->amGoingTo('Get the evidence updated');
+        $i->click(Locator::lastElement("a.icon-modify"));
+        $i->fillCkEditorById('reason', 'Well done, Jana!');
+        $badges->clickEvidenceSubmitButton();
+        $i->amGoingTo('Ensure the evidence text is updated');
+        $i->canSee('Well done, Jana!');
+        $i->amGoingTo('Award the goal as achievement and check if it is presented on the achievements tab on the profile page');
+        $badges->clickConfirm();
+        $i->amOnPage($profilePage->generateRoute($studentId));
+        $profilePage->clickTab('achievements');
+        $i->canSee($badgeNameGoal);
+        $i->amGoingTo("Check the evidence is still presented");
+        $profilePage->clickBadgeOrDropdownOption($badgeNameGoal);
+        $profilePage->clickBadgeOrDropdownOption('View evidence');
+        $i->canSee('Well done, Jana!');
+
+        $i->amGoingTo('Navigate to the profile page and withdraw the achievement');
+        $i->amOnPage($profilePage->generateRoute($studentId));
+        $profilePage->clickTab('achievements');
+        $profilePage->clickBadgeDropdown($badgeId);
+        $profilePage->clickBadgeOrDropdownOption('Withdraw achievement');
+        $badges->clickConfirm();
+        $i->amGoingTo('click the tab Goals and ensure the evidence is still presented to the goal');
+        $profilePage->clickTab('goals');
+        $profilePage->clickBadgeOrDropdownOption($badgeNameGoal);
+        $profilePage->clickBadgeOrDropdownOption('View evidence');
+        $i->canSee('Well done, Jana!');
+        $i->amGoingTo('Remove the evidence and ensure it is no longer presented');
+        $badges->clickDropdownDelete();
+        $i->click("a#confirm-dialog-confirm-button.button.submit");
+        $i->cantSee('Well done, Jana!');
+        $i->amGoingTo('Award the goal as achievement with evidence and check the evidence is presented');
+        $i->amOnPage($profilePage->generateRoute($studentId));
+        $profilePage->clickTab('goals');
+        $profilePage->clickBadgeOrDropdownOption($badgeNameGoal);
+        $profilePage->clickBadgeOrDropdownOption('Award with evidence');
+        $i->fillCkEditorById('reason', 'Awarding this as achievement with evidence.');
+        $badges->clickEvidenceSubmitButton();
+        $i->amOnPage($profilePage->generateRoute($studentId));
+        $profilePage->clickTab('achievements');
+        $profilePage->clickBadgeOrDropdownOption($badgeNameGoal);
+        $profilePage->clickBadgeOrDropdownOption('View evidence');
+        $i->canSee('Awarding this as achievement with evidence.');
+        $i->amGoingTo('Get the evidence updated and ensure it is properly updated');
+        $i->click(Locator::lastElement("a.icon-modify"));
+        $i->fillCkEditorById('reason', 'This is updated');
+        $badges->clickEvidenceSubmitButton();
+        $i->amGoingTo('Ensure the evidence text is updated');
+        $i->canSee('This is updated');
     }
 }
