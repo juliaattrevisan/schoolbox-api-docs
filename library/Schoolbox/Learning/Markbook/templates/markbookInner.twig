@@ -89,7 +89,7 @@
                 </th>
                 {% set weightedMean = markbook.weightedMean %}
                 <th class="{{ weightedMean is null ? 'gradient-off' : urgency.marks(markbook.normalisedMean) }}-bg student-grade-cell">
-                        {{ weightedMean | default('–') }}
+                        {{ weightedMean | default('-') }}
                 </th>
                 {% if rankEnabled %}
                 <th>-</th>
@@ -98,11 +98,11 @@
                     {% set stats = markbook.assessmentStatistics[assessment.id] %}
                     <th data-assessment="{{ assessment.id }}" class="student-grade-cell">
                         <span {% if stats.draftMean is defined and (markbook.hasDraft[assessment.id] is defined) %} data-actual-mark {% endif %}>
-                            {{ stats.mean | default('–') }}
+                            {{ stats.mean | default('-') }}
                         </span>
                         {% if stats.draftMean is defined and (markbook.hasDraft[assessment.id] is defined) %}
                             <span data-draft-mark class="meta" style="display:none;">
-                                {{ stats.draftMean | default('–') }}
+                                {{ stats.draftMean | default('-') }}
                             </span>
                         {% endif %}
                     </th>
@@ -183,12 +183,12 @@
                     {# Regardless of which term is being filtered to, link to default term grades page (ie empty termCode) #}
                     <a class="{{ draftsOffClass }}"
                        href="{{ gradesRoute }}" {% if draftWeightedMean %}data-actual-mark{% endif %}
-                       title="View students {{ locale.grades.plural }}"> {{ studentMean | default('–') }}
+                       title="View students {{ locale.grades.plural }}"> {{ studentMean | default('-') }}
                     </a>
                     {% if draftWeightedMean %}
                         <a class="{{ draftsOnClass }}"
                            href="{{ gradesRoute }}" data-draft-mark style="display: none"
-                           title="View student draft {{ locale.grades.plural }}"> {{ draftWeightedMean | default('–') }}
+                           title="View student draft {{ locale.grades.plural }}"> {{ draftWeightedMean | default('-') }}
                         </a>
                     {% endif %}
                 </td>
@@ -205,7 +205,22 @@
 
                 {% for assessment in markbook.assessments %}
                     {% set participant = assessment.getParticipantIfExtant(student) %}
-                    <td class="column-{{ assessment.id }}{% if not participant or participant.isExcluded %} excluded{% endif %} student-grade-cell" data-assessment="{{ assessment.id }}">
+                    <td
+                        class="column-{{ assessment.id }}
+                            {% if not participant or participant.isExcluded %} excluded
+                            {% endif %} student-grade-cell"
+                            data-assessment="{{ assessment.id }}"
+                            {% if assessment.getDefaultTypeName == 'Due Work' and participant and not participant.isExcluded %}
+                                data-pop-out-menu
+                                data-endpoint="{{ routeLookupIfAuthorized('learningAssessmentTimeline.getFullTimeline', {assessment: assessment, assessmentId: assessment.id, userId: student.id }) }}"
+                                data-update-route="{{ routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
+                                data-review-route="{{ routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
+                                data-publish-route="{{ routeLookupIfAuthorized('learningAssessment.getSummary', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
+                                data-exclude-route="{{ routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessment: assessment, assessmentId:assessment.id }) }}"
+                                data-history-route="{{ routeLookupIfAuthorized('learningAssessment.getSummary', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
+                            {% endif %}
+                    >
+                    <!-- Add data for the popup menu above -->
                         {% if participant and not participant.isExcluded %}
                             {% if assessment is task %}
                                 {# An icon that shows if the student has attempted the task or not #}

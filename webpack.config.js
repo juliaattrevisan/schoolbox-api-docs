@@ -275,6 +275,8 @@ module.exports = {
         core: "./www/static/css/core/core.scss",
         editor: "./www/static/css/core/editor.scss",
 
+        // Markbook Pop Out
+        popOutMenuMarkbook: "./vue/components/menu/popOutMenuMarkbook.js",
     },
     output: {
         path: path.resolve(__dirname, "www/static/js/bundle"),

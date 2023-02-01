@@ -380,6 +380,19 @@ $rotate-span-width: 11rem;
         border-bottom: none;
     }
     .dataTables_wrapper {
+        //For marksheet cursor hover + selected states
+        [data-pop-out-menu] {
+            cursor: pointer;
+
+            &:hover {
+                background-color: var(--content-ui-hover);
+            }
+        }
+
+        .is-selected {
+            background-color: var(--content-ui-selected);
+        }
+
         .dataTables_info {
             @extend .meta;
             font-size: $paragraph-font-size;
@@ -393,7 +406,6 @@ $rotate-span-width: 11rem;
                 margin-left: 2rem;
             }
         }
-
         // Remove scrollbar from fixed column, is a bug that needs a workaround
         // https://datatables.net/forums/discussion/33008/scrolx-create-scrolbar-under-fixed-columns-on-firefox-with-bootstrap
         .DTFC_LeftBodyLiner {
