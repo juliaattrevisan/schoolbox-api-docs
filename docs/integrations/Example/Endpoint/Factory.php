@@ -16,7 +16,6 @@ use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
-use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\GenericCollection;
 use UnexpectedValueException;
@@ -31,8 +30,6 @@ use UnexpectedValueException;
  */
 class Factory
 {
-
-
     /**
      * Get timetable classes occurring this far in the past
      * Measured in months, defaults to -1 month
@@ -107,24 +104,6 @@ class Factory
      * @var UserProfile\Relationship\Mapper
      */
     private UserProfile\Relationship\Mapper $relationshipMapper;
-
-
-    /**
-     * @var CampusMapper
-     */
-    private CampusMapper $campusMapper;
-
-
-    /**
-     * @var TimetableCycleMapper
-     */
-    private TimetableCycleMapper $timetableCycleMapper;
-
-
-    /**
-     * @var TimetablePeriodMapper
-     */
-    private TimetablePeriodMapper $timetablePeriodMapper;
 
 
     /**
@@ -234,12 +213,7 @@ class Factory
      */
     public function produce(): GenericCollection
     {
-        /* Classical Grid: Cache a list of known users and periods
-         * Every student timetable processing uses info stored there
-         */
-        $lookup = new Timetable\Lookup($this->timetablePeriodMapper);
-
-        /* SUDS Timetable Events: Date Range
+        /* Schedule/SUDS Timetable: Date Range
          */
         $from = \Alaress_Date_Format::now()->addMonths(self::FROM);
         $to = \Alaress_Date_Format::now()->addMonths(self::TO);
@@ -282,30 +256,6 @@ class Factory
                 $this->parentProfileMapper,
                 $this->staffProfileMapper,
                 $this->relationshipMapper
-            ))
-            /* Classical timetable grid
-             */
-            ->add(new Timetable\Prepare(
-                $this->log,
-                $this->perform,
-                $this->timetablePeriodMapper,
-                $this->classEntryMapper,
-                $this->classInvolvementMapper,
-                $this->classPeriodMapper
-            ))
-            ->add(new Timetable\Definition(
-                $this->log,
-                $this->perform,
-                $this->timetableCycleMapper,
-                $this->timetablePeriodMapper
-            ))
-            ->add(new Timetable\Classes(
-                $this->log,
-                $this->perform,
-                $lookup,
-                $this->classEntryMapper,
-                $this->classInvolvementMapper,
-                $this->classPeriodMapper
             ))
             /* SUDS Timetable Events
              */
