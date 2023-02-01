@@ -76,6 +76,7 @@ class Status implements IStatus
      */
     public function getReport(): array
     {
+        return [];
 //        try {
 //            $api = new Api($this->host, $this->key);
 //        } catch (\DomainException $e) {

@@ -66,12 +66,6 @@ class Generator
 
 
     /**
-     * Lifetime of a token, as set by Veracross
-     */
-    private const TOKEN_DURATION = 3600;
-
-
-    /**
      * Time given to respawn a new token when the existing one is about to expire
      */
     private const TOKEN_OFFSET = 60;
