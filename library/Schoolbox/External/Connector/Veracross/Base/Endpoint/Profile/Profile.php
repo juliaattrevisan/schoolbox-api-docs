@@ -180,9 +180,10 @@ class Profile implements IStrategy
 
         /* Prefetch a list of emergency contacts
          * TODO: We don't have perms yet; need Veracross to let us in
+         * $emergencyContactsLookup = (new EmergencyContact($this->api))->generate();
          */
         $this->log->debug('Prefetching emergency contacts...');
-        $emergencyContactsLookup = (new EmergencyContact($this->api))->generate();
+        $emergencyContactsLookup = [];
 
         /* Prefetch a list of medically-afflicted dudes
          */
@@ -361,7 +362,7 @@ class Profile implements IStrategy
                  * Emergency Contacts
                  * ...because we didn't normalise it, I'm hardcoding these
                  */
-                if (\count($emergencyContactsLookup[$student['id']])) {
+                if (\count($emergencyContactsLookup[$student['id']] ?? [])) {
                     if (isset($emergencyContactsLookup[$student['id']][0])) {
                         $studentProfile
                             ->setEmergencyContactName1($emergencyContactsLookup[$student['id']][0]['name'])
