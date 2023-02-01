@@ -234,7 +234,11 @@ class Profile implements IStrategy
                     $tutorName = trim((string)$student['homeroom_teacher']['name']);
                 }
 
-                $tutorGroup = trim((string)$studentLookup['homeroom'][$student['homeroom']]);
+                /* $student['homeroom'] is a lookup identifier that might not
+                 * actually exist in the lookup itself
+                 */
+                $tutorGroup = trim((string)($studentLookup['homeroom'][$student['homeroom']] ?? ''));
+
                 $username = trim((string)$student['username']);
                 $yearLevel = trim((string)$studentLookup['grade_level'][$student['grade_level']]);
 
