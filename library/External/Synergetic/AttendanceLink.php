@@ -37,7 +37,7 @@ class External_Synergetic_AttendanceLink implements External_AttendanceLinkInter
         }
         $encodedClass = urlencode(urlencode(urlencode($classCode)));
         $periodLink   = implode(',', $attendancePeriods);
-        $classLink    = $campus ? $campus . '/' . $encodedClass : '0/' . $encodedClass;
+        $classLink    = trim($campus) ? $campus . '/' . $encodedClass : '0/' . $encodedClass;
         return "/modules/attendance/modify/{$classLink}/{$time->getDatabaseDate()}/{$periodLink}/{$campusList[$campusId]->getExtTimetableCode()}/{$fileType}";
     }
 
