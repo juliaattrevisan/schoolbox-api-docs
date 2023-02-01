@@ -35,6 +35,7 @@ function createEditor(textarea: HTMLTextAreaElement) {
                 new CustomEvent("EDITOR__CREATED", {
                     detail: {
                         editor: editor,
+                        textarea: textarea,
                     },
                 })
             );

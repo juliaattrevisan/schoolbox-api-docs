@@ -27,6 +27,7 @@
         "@ckeditor/ckeditor5-theme-lark": "~35.4.0",
         "@ckeditor/ckeditor5-upload": "~35.4.0",
         "@ckeditor/ckeditor5-word-count": "~35.4.0",
+        "@floating-ui/vue": "~0.2.0",
         "@fullcalendar/adaptive": "~5.11.0",
         "@fullcalendar/core": "~5.11.0",
         "@fullcalendar/daygrid": "~5.11.0",

@@ -1,8 +1,3 @@
-import ClassicEditor from "@ckeditor/ckeditor5-editor-classic/src/classiceditor";
-import { getDefault } from "@js/editor/configDefault";
-import CKEditorInspector from "@ckeditor/ckeditor5-inspector";
-import { insertElementAfter } from "@js/util/domUtils";
-
 const storageKeys = ["editorData1", "editorData2"];
 const editorTextAreas = document.querySelectorAll("textarea");
 const editors = [];
@@ -40,5 +35,6 @@ initEditorSaves();
  * store the newly created editor instance to we can get its data on save
  */
 document.addEventListener("EDITOR__CREATED", (event: CustomEvent) => {
-    editor = event.detail.editor;
+    // for the purposes of this demo, we just assume that editor-1 has been created before editor-2
+    editors.push(event.detail.editor);
 });
