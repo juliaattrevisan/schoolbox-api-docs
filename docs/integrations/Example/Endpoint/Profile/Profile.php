@@ -675,6 +675,7 @@ class Profile implements IStrategy
             $externalId = '';
 
             $firstname = '';
+            $firstnamePreferred = '';
             $lastname = '';
             $building = '';
             $campusName = '';
@@ -710,6 +711,7 @@ class Profile implements IStrategy
                 ->setExternalId($externalId)
                 ->setTitle($title)
                 ->setFirstname($firstname)
+                ->setFirstnamePreferred($firstnamePreferred)
                 ->setLastname($lastname);
 
             /* Then save it

@@ -48,8 +48,9 @@ class Profile implements IStrategy
      * emergency_contacts:list OR relationships:list
      * health.patients:list
      * parents:list
+     * staff_faculty:list
      */
-    public const SCOPE = 'students:list health.patients:list parents:list';
+    public const SCOPE = 'students:list health.patients:list parents:list staff_faculty:list';
 
 
     /**
@@ -575,80 +576,94 @@ class Profile implements IStrategy
      */
     private function importStaff(): void
     {
-        $staffs = [];
+        /* Get ready to remember an indexed set of Value Lists for Students
+         */
+        $staffLookupConverter = new ValueListConverter();
 
-        foreach ($staffs as $staff) {
-            /* TODO Fill in basic staff vars
-             */
-            $externalId = '';
+        /* Spawn a Generator of paginated payloads
+         */
+        $staffPayloadGenerator = $this->api->retrieve('GET', 'staff_faculty', self::SCOPE);
 
-            $firstname = '';
-            $lastname = '';
-            $building = '';
-            $campusName = '';
-            $category = '';
-            $department = '';
-            $email = '';
-            $phone = '';
-            $positionTitle = '';
-            $room = '';
-            $title = '';
-            $username = '';
+        foreach ($staffPayloadGenerator as $staffPage) {
+            $staffLookup = $staffLookupConverter->generate($staffPage['value_lists']);
 
-            /* Find out if this externalId already has a staff profile
-             * If one already exists, load it, update it, then save it
-             * Otherwise make a new one for the given id
-             */
-            try {
-                $staffProfile = $this->staffProfileMapper->findByExternalId($externalId);
-                $staffBaseProfile = $staffProfile->getBaseProfile();
-            } catch (Exception $e) {
-                $staffProfile = $this->staffProfileMapper->createModel();
+            foreach ($staffPage['data'] as $staff) {
+                $externalId = trim((string)$staff['id']);
 
+                $firstname = trim((string)$staff['first_name']);
+                $firstnamePreferred = (new FirstMeaningfulValue())->find([
+                    $staff['preferred_name'],
+                    $firstname
+                ]);
+
+                $lastname = trim((string)$staff['last_name']);
+                $building = '';
+                $campusName = trim((string)$staffLookup['campus'][$staff['campus']]);
+                $category = trim((string)$staffLookup['faculty_type'][$staff['faculty_type']]);
+                $department = trim((string)$staffLookup['department'][$staff['department']]);
+                $email = trim((string)$staff['email_1']);
+                $phone = '';
+                $positionTitle = trim((string)$staff['job_title']);
+                $room = '';
+                $title = trim((string)$staffLookup['name_prefix'][$staff['name_prefix']]);
+                $username = trim((string)$staff['username']);
+
+                /* Find out if this externalId already has a staff profile
+                 * If one already exists, load it, update it, then save it
+                 * Otherwise make a new one for the given id
+                 */
                 try {
-                    $staffBaseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $externalId);
+                    $staffProfile     = $this->staffProfileMapper->findByExternalId($externalId);
+                    $staffBaseProfile = $staffProfile->getBaseProfile();
                 } catch (Exception $e) {
-                    $staffBaseProfile = $this->baseProfileMapper->createModel();
+                    $staffProfile = $this->staffProfileMapper->createModel();
+
+                    try {
+                        $staffBaseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $externalId);
+                    } catch (Exception $e) {
+                        $staffBaseProfile = $this->baseProfileMapper->createModel();
+                    }
+
+                    $staffProfile->setBaseProfile($staffBaseProfile);
                 }
 
-                $staffProfile->setBaseProfile($staffBaseProfile);
-            }
+                $staffBaseProfile
+                    ->setExternalId($externalId)
+                    ->setTitle($title)
+                    ->setFirstname($firstname)
+                    ->setFirstnamePreferred($firstnamePreferred)
+                    ->setLastname($lastname);
 
-            $staffBaseProfile
-                ->setExternalId($externalId)
-                ->setTitle($title)
-                ->setFirstname($firstname)
-                ->setLastname($lastname);
+                /* Then save it
+                 */
+                if ($this->perform) {
+                    $this->baseProfileMapper->save($staffBaseProfile);
+                }
 
-            /* Then save it
-             */
-            if ($this->perform) {
-                $this->baseProfileMapper->save($staffBaseProfile);
-            }
+                $staffProfile
+                    ->setBuilding($building)
+                    ->setCampusName($campusName)
+                    ->setCategory($category)
+                    ->setDepartment($department)
+                    ->setEmail($email)
+                    ->setPhone($phone)
+                    ->setPositionTitle($positionTitle)
+                    ->setRoom($room)
+                    ->setUsername($username);
 
-            $staffProfile
-                ->setBuilding($building)
-                ->setCampusName($campusName)
-                ->setCategory($category)
-                ->setDepartment($department)
-                ->setEmail($email)
-                ->setPhone($phone)
-                ->setPositionTitle($positionTitle)
-                ->setRoom($room)
-                ->setUsername($username);
+                /* Log it
+                 */
+                $this->log->info(sprintf(
+                    'Adding staff profile for %s (%s)',
+                    trim("{$staffBaseProfile->getFirstname()} {$staffBaseProfile->getLastname()}"),
+                    $externalId
+                ));
 
-            /* Log it
-             */
-            $this->log->info(sprintf(
-                'Adding staff profile for %s (%s)',
-                trim("{$staffBaseProfile->getFirstname()} {$staffBaseProfile->getLastname()}"),
-                $externalId
-            ));
-
-            /* Then save it
-             */
-            if ($this->perform) {
-                $this->staffProfileMapper->save($staffProfile);
+                /* Then save it
+                 */
+                if ($this->perform) {
+                    $this->staffProfileMapper->save($staffProfile);
+                }
             }
         }
     }
