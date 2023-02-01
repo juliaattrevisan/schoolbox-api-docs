@@ -216,11 +216,13 @@ export default {
         async deleteBadge() {
             this.$refs.toast.activate("Deleting badge...");
             try {
-                const response = await fetch(this.currentBadge._links.delete, {
-                    method: "DELETE",
-                });
+                const response     = await fetch(this.currentBadge._links.delete, {method: 'DELETE'});
+                const responseText = await response.text();
 
-                if (response.status === 200) {
+                // The expected response is blank, with a HTTP status code of 200 (OK).
+                // Any other response is treated as an error.
+
+                if (response.status === 200 && responseText === '') {
                     this.data = this.data.filter((badge) => badge.id !== this.currentBadge.id);
                     this.metadata.count -= 1;
                     this.$refs.toast.timeout('Badge successfully deleted', true);
