@@ -150,6 +150,7 @@ class Profile implements IStrategy
             $dob = '';
             $email = '';
             $firstname = '';
+            $firstnamePreferred = '';
             $form = '';
             $gender = '';
             $lastname = '';
@@ -245,6 +246,7 @@ class Profile implements IStrategy
                 ->setExternalId($externalId)
                 ->setTitle($title)
                 ->setFirstname($firstname)
+                ->setFirstnamePreferred($firstnamePreferred)
                 ->setLastname($lastname);
 
             /* Then save it
