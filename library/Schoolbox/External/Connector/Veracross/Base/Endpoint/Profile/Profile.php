@@ -159,11 +159,13 @@ class Profile implements IStrategy
     {
         /* Prefetch a list of households, which contain Parents
          */
+        $this->log->debug('Prefetching households...');
         $householdLookup = (new Household($this->api))->generate();
 
         /* Prefetch a list of emergency contacts
          * TODO: We don't have perms yet; need Veracross to let us in
          */
+        $this->log->debug('Prefetching emergency contacts...');
         $emergencyContactsLookup = (new EmergencyContact($this->api))->generate();
 
         /* Get ready to remember an indexed set of Value Lists for Students
@@ -200,7 +202,7 @@ class Profile implements IStrategy
                 $studiesCode = '';
                 $title = '';
 
-                /* Skip this if it's specifically id 0 (Mone)
+                /* Skip this if it's specifically id 0 (None)
                  */
                 $tutorId = '';
                 $tutorName = '';
