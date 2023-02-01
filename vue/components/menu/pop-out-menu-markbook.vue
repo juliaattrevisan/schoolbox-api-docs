@@ -282,6 +282,16 @@ async function onMenuItemSelected(target: string, shouldPost: boolean = false) {
             hasLoadError.value = false;
             // invert the excluded option that is currently the only post system
             isExcluded.value = !isExcluded.value;
+            // update the data location in html, so if you click back in it doesn't break...
+            const element = referenceElement.value;
+            if (element) {
+                element.classList.toggle('excluded');
+                const currentValue = element.getAttribute('data-is-excluded');
+                const newValue = currentValue === 'true' ? 'false' : 'true';
+                element.setAttribute('data-is-excluded', newValue);
+            }
+
+
         } else {
             hasLoadError.value = true;
         }
