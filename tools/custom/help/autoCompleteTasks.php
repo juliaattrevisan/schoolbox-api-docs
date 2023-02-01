@@ -83,12 +83,22 @@ HELP;
 
         // find all completion status for the above tasks
         $taskCompletionMapper = \Schoolbox\Assessment\Course\Task\CompletionMapper::getInstance();
-        $completionEntries = $taskCompletionMapper->findByColumn('task_id', $tasks)->sortBy('CompletionStatus', 'desc');
+        $completionEntries = $taskCompletionMapper->findByColumn('task_id', $tasks)->sortBy('id', 'desc');
 
         // loop through the tasks / students and find only those with no completion_status == 3 (teacher complete)
         /** @var Schoolbox\Assessment\Course\Task\Completion $completionEntry */
         foreach ($completionEntries as $completionEntry) {
             $this->getLogger()->debug(sprintf("Inspecting Assessment: %s, studentId: %s", $completionEntry->getTask()->getAssessmentModel()->getId(), $completionEntry->getStudent()->getId()));
+
+            // remember what we are looking at, so we don't look at it again...
+            $token = sprintf("%s_%s", $completionEntry->getTask()->getAssessmentModel()->getId(), $completionEntry->getStudent()->getId());
+            //have we seen this already?
+            if (in_array($token, $updated)) {
+                //skip and move along
+                $this->getLogger()->debug(sprintf("Token: %s already been processed, skipping...", $token));
+                continue;
+            }
+            $updated[] = $token;
 
             // find if this entry has a teacher complete status
             //all the tmp variables
@@ -98,15 +108,12 @@ HELP;
                 $this->getLogger()->debug("Task Complete");
                 continue;
             }
-
-            //this assessment has no teacher feedback, so lets add that in now, making sure not to do this multiple times
-            $token = sprintf("%s_%s", $completionEntry->getTask()->getId(), $completionEntry->getStudent()->getId());
-            //have we updated this already?
-            if (in_array($token, $updated)) {
-                //skip and move along
+            if (Completion::STATUS_INCOMPLETE === $thisStudentAssessment->getcompletionStatus()) {
+                $this->getLogger()->debug("Task Not Complete");
                 continue;
             }
-            $updated[] = $token;
+
+            //this assessment has no teacher feedback, so lets add that in now, making sure not to do this multiple times
             if ($this->perform()) {
                 $this->getLogger()->info(sprintf("Inserting Task Complete Entry for TaskId: %s, studentId: %s", $completionEntry->getTask()->getId(), $completionEntry->getStudent()->getId()));
                 $newStatusStatment = $db->prepareQuery("
