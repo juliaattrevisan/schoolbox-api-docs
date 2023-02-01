@@ -45,7 +45,7 @@ for table in $(mysql -h"$db_host" -u"$db_user" -p"$db_pass" -sse "SELECT TABLE_N
   log "Starting optimize for table: '$table'..."
 
   # Capture so we can analyse (OPTIMISE does not provide useful exit codes)
-  output=$(mysql --table -h"$db_host" -u"$db_user" -p"$db_pass" "$db_schema" -e "SET MAX_STATEMENT_TIME=300; OPTIMIZE TABLE $table;")
+  output=$(mysql --table -h"$db_host" -u"$db_user" -p"$db_pass" "$db_schema" -e "SET MAX_STATEMENT_TIME=600; OPTIMIZE TABLE $table;")
 
   if echo -e "$output" | grep -qE "optimize\s+\|\s+status\s+\|\s+OK"; then
     log "Optimize successfully completed for table: '$table'..."
