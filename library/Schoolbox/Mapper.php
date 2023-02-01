@@ -1737,19 +1737,19 @@ abstract class Mapper implements IMapper, Serializable
         // for comparison when triggering callbacks
         $previousCollection = $collection->deepClone();
 
+        // Update property on each model
+        foreach ($collection as $model) {
+            if (isset($property_map)) {
+                $this->setModelProperty($model, $property_map['property'], $value);
+            }
+        }
+
         // Trigger the pre-trigger, if there is one.
         if (isset($pre_trigger)) {
             foreach ($collection as $i => $model) {
                 if (!($this->triggerCallbacks($pre_trigger, $model, $previousCollection[$i] ?? null))) {
                     return false;
                 }
-            }
-        }
-
-        // Update property on each model
-        foreach ($collection as $model) {
-            if (isset($property_map)) {
-                $this->setModelProperty($model, $property_map['property'], $value);
             }
         }
 
