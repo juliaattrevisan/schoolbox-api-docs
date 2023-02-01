@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Example\Base\Endpoint;
+namespace Schoolbox\External\Connector\Veracross\Base\Endpoint;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\CampusMapper;
@@ -223,7 +223,7 @@ class Factory
 
         /* Spawn an Api instance
          */
-        $api = null;
+        $api = new Api($this->host, $this->key);
 
         return (new GenericCollection(IStrategy::class))
 
@@ -241,6 +241,7 @@ class Factory
             ->add(new Profile\Profile(
                 $this->log,
                 $this->perform,
+                $api,
                 $this->baseProfileMapper,
                 $this->studentProfileMapper,
                 $this->parentProfileMapper,
