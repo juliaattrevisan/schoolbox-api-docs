@@ -1,19 +1,17 @@
 <script setup lang="ts">
-
 /**
  * Manage member selection and the various actions that can occur based
  * on the members currently selected
  */
 
-import { computed  } from 'vue';
-import { useSelectedNodesStore } from './store/mcSelectedNodesStore';
-import { useDeleteNodesStore } from './store/mcDeleteNodesStore';
-import { useEnableNodesStore } from './store/mcEnableNodesStore';
-import { useUpdateNodeStore } from '../activeNode/store/mcUpdateNodeStore';
-import { useAddSubsectionStore } from '../activeNode/store/mcAddSubsectionStore';
-import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer.vue';
-import McSelectedNode from './mc-selected-node.vue';
-
+import { computed } from "vue";
+import { useSelectedNodesStore } from "./store/mcSelectedNodesStore";
+import { useDeleteNodesStore } from "./store/mcDeleteNodesStore";
+import { useEnableNodesStore } from "./store/mcEnableNodesStore";
+import { useUpdateNodeStore } from "../activeNode/store/mcUpdateNodeStore";
+import { useAddSubsectionStore } from "../activeNode/store/mcAddSubsectionStore";
+import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vue";
+import McSelectedNode from "./mc-selected-node.vue";
 
 const selectedNodesStore = useSelectedNodesStore(); //to keep track of selected nodes
 const deleteNodesStore = useDeleteNodesStore();
@@ -39,31 +37,29 @@ const selectedNodesSummary = computed(() => {
  *
  * @param { boolean }
  */
- function onEnableNodesSelected (enabled) {
+function onEnableNodesSelected(enabled) {
     enableNodesStore.prompt(enabled);
 }
 
 /**
  * So the selected nodes can be removed
  */
-function onDeleteNodesSelected () {
+function onDeleteNodesSelected() {
     deleteNodesStore.prompt();
 }
-
 </script>
 
 <template>
     <div class="small-12 island">
-        <bottom-drawer :showDrawer="selectedNodesStore.hasNodes && !updateNodeStore.isOpen && !addSubsectionStore.isOpen">
+        <bottom-drawer
+            :showDrawer="selectedNodesStore.hasNodes && !updateNodeStore.isOpen && !addSubsectionStore.isOpen"
+        >
             <div v-if="selectedNodesStore.hasNodes" class="selected-nodes-container" data-test-nodes-container>
-                <mc-selected-node
-                    v-for="node in selectedNodesStore.nodes"
-                    :key="node.id"
-                    :node="node"
-                    data-test-node
-                />
+                <mc-selected-node v-for="node in selectedNodesStore.nodes" :key="node.id" :node="node" data-test-node />
             </div>
-            <p v-if="selectedNodesStore.hasDisabledChildNodes && !selectedNodesStore.allNodesEnabled" class="meta">If you wish to re-enable disabled nodes, please enable the disabled parent.</p>
+            <p v-if="selectedNodesStore.hasDisabledChildNodes && !selectedNodesStore.allNodesEnabled" class="meta">
+                If you wish to re-enable disabled nodes, please enable the disabled parent.
+            </p>
             <ul class="flex-list">
                 <li v-if="selectedNodesStore.allNodesEnabled">
                     <button
@@ -81,9 +77,9 @@ function onDeleteNodesSelected () {
                         data-test-enable-nodes
                         @click.prevent="onEnableNodesSelected(true)"
                         @keyup.enter="onEnableNodesSelected(true)"
-                >
-                    Enable {{ selectedNodesSummary }}
-                </button>
+                    >
+                        Enable {{ selectedNodesSummary }}
+                    </button>
                 </li>
                 <li>
                     <button
@@ -101,7 +97,6 @@ function onDeleteNodesSelected () {
 </template>
 
 <style lang="scss" scoped>
-
 .selected-nodes-container {
     border: 1px solid var(--form-border-color);
     display: flex;
@@ -118,5 +113,4 @@ select,
 button {
     margin-bottom: 0; //to bring the bottom-drawer down, we don't need any margin currently
 }
-
 </style>

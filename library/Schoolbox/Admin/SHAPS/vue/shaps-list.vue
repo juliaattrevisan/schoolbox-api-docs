@@ -1,17 +1,15 @@
 <script>
-
 /**
  * Schoolbox Help
  */
 
-import ShapsListFilters from './shaps-list-filters.vue';
-import ShapsListNewValues from './shaps-list-new-values.vue';
-import FilterEvents from './shapsListFilterEvents';
-import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer';
-import footerUI from '@schoolboxVue/components/vueTables2/mixinFooterUI';
+import ShapsListFilters from "./shaps-list-filters.vue";
+import ShapsListNewValues from "./shaps-list-new-values.vue";
+import FilterEvents from "./shapsListFilterEvents";
+import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer";
+import footerUI from "@schoolboxVue/components/vueTables2/mixinFooterUI";
 
 export default {
-
     components: {
         ShapsListFilters,
         ShapsListNewValues,
@@ -19,138 +17,139 @@ export default {
     },
 
     mixins: [
-        footerUI //to place and keep the tables UI in the footer
+        footerUI, //to place and keep the tables UI in the footer
     ],
 
     props: {
         srcUserList: {
             type: String,
-            required: true
+            required: true,
         },
         srcUserModify: {
             type: String,
-            required: true
+            required: true,
         },
         campuses: {
             type: Array,
-            required: true
+            required: true,
         },
         roles: {
             type: Array,
-            required: true
+            required: true,
         },
         courses: {
             type: Array,
-            required: true
+            required: true,
         },
         provisioned: {
-            type: Boolean
+            type: Boolean,
         },
         deleted: {
-            type: Boolean
+            type: Boolean,
         },
     },
 
-    data () {
+    data() {
         return {
             hasDataLoaded: false, //show loading display until true
             hasLoadError: false, //display load error
             rows: [],
             selectedRows: [], //keep track of which rows could be modified
-            tableColumns: ['firstname', 'lastname', 'email', 'campuses', 'role', 'courses', 'provisioned'],
+            tableColumns: ["firstname", "lastname", "email", "campuses", "role", "courses", "provisioned"],
             tableOptions: {
-                customFilters: [ //refer to https://matanya.gitbook.io/vue-tables-2/custom-filters for further info
+                customFilters: [
+                    //refer to https://matanya.gitbook.io/vue-tables-2/custom-filters for further info
                     {
                         name: FilterEvents.CAMPUS,
                         callback: (row, query) => {
                             return row.campuses.join().includes(query); //need to flatten the campuses array then check
-                        }
+                        },
                     },
                     {
                         name: FilterEvents.ROLE,
                         callback: (row, query) => {
                             return row.role === query;
-                        }
+                        },
                     },
                     {
                         name: FilterEvents.COURSE,
                         callback: (row, query) => {
-                            if (query === 'null') {
+                            if (query === "null") {
                                 return row.courses.length === 0;
                             }
                             return row.courses.join().includes(query);
-                        }
+                        },
                     },
                     {
                         name: FilterEvents.PROVISIONED,
                         callback: (row, query) => {
                             return row.provisioned === parseInt(query);
-                        }
+                        },
                     },
                 ],
                 debounce: 100, //faster debounce as data is stored on the client side,
                 headings: {
-                    firstname: 'First Name',
-                    lastname: 'Surname',
-                    email: 'Email',
-                    campuses: 'Campuses',
-                    role: 'Role',
-                    courses: 'Courses',
-                    provisioned: 'Provisioned',
+                    firstname: "First Name",
+                    lastname: "Surname",
+                    email: "Email",
+                    campuses: "Campuses",
+                    role: "Role",
+                    courses: "Courses",
+                    provisioned: "Provisioned",
                 },
                 orderBy: {
                     ascending: false,
-                    column: 'Surname' //TODO ??
+                    column: "Surname", //TODO ??
                 },
                 perPage: 25,
                 perPageValues: [25, 50, 100, 150, 200],
                 resizableColumns: false,
                 selectable: {
-                    mode: 'multiple', //to enable multi-select
+                    mode: "multiple", //to enable multi-select
                     only: (row) => {
-                        return row.email != null && row.email.length > 0
-                            && row.lastname != null && row.lastname.length > 0;
+                        return (
+                            row.email != null && row.email.length > 0 && row.lastname != null && row.lastname.length > 0
+                        );
                     },
                 },
                 sortIcon: {
-                    is: 'glyphicon-sort',
-                    base: 'glyphicon',
-                    up: 'glyphicon-chevron-up',
-                    down: 'glyphicon-chevron-down'
+                    is: "glyphicon-sort",
+                    base: "glyphicon",
+                    up: "glyphicon-chevron-up",
+                    down: "glyphicon-chevron-down",
                 },
                 tabbable: false,
                 templates: {
                     campuses: (h, row, index) => {
-                        return row.campuses.join(', ');
+                        return row.campuses.join(", ");
                     },
                     provisioned: (h, row, index) => {
-                        return row.provisioned == 1 ? 'Provisioned' : '';
+                        return row.provisioned == 1 ? "Provisioned" : "";
                     },
                 },
                 texts: {
-                    filterPlaceholder: 'Search for users...',
-                    noResults: 'No matching users...',
-                    count: '{from}-{to} of {count}',
-                    limit: 'Rows per page:'
+                    filterPlaceholder: "Search for users...",
+                    noResults: "No matching users...",
+                    count: "{from}-{to} of {count}",
+                    limit: "Rows per page:",
                 },
             },
-            singleRowName: 'user',
-            pluralRowName: 'users',
+            singleRowName: "user",
+            pluralRowName: "users",
             selectContainer: null,
-            collator: new Intl.Collator('en', {numeric: true, sensitivity: 'base'}), //to naturally sort year level column
+            collator: new Intl.Collator("en", { numeric: true, sensitivity: "base" }), //to naturally sort year level column
             isShiftKeySelected: false, //to multi-select fields,
             hasSelectedShiftKey: false, //to hide a UI note
-        }
+        };
     },
 
     computed: {
-
         /**
          * To track how many are selected
          *
          * @returns {Number}
          */
-        selectedRowsCount () {
+        selectedRowsCount() {
             return this.selectedRows.length;
         },
 
@@ -159,36 +158,34 @@ export default {
          *
          * @returns {String}
          */
-        selectedRowsCountWithRowName () {
+        selectedRowsCountWithRowName() {
             if (this.selectedRowsCount === 0) {
-                return 'No ' + this.singleRowName;
+                return "No " + this.singleRowName;
             } else if (this.selectedRowsCount === 1) {
-                return this.selectedRowsCount + ' ' + this.singleRowName;
+                return this.selectedRowsCount + " " + this.singleRowName;
             } else {
-                return this.selectedRowsCount + ' ' + this.pluralRowName;
+                return this.selectedRowsCount + " " + this.pluralRowName;
             }
         },
-
     },
 
-    mounted () {
+    mounted() {
         this.initShiftKeyDetection();
         this.loadRows();
     },
 
     methods: {
-
         /**
          * To hide a UI note informing of shift-selection once pressed
          */
-        initShiftKeyDetection () {
-            document.addEventListener('keydown', (event) => {
-                if (event.key === 'Shift') {
+        initShiftKeyDetection() {
+            document.addEventListener("keydown", (event) => {
+                if (event.key === "Shift") {
                     this.isShiftKeySelected = true;
                 }
             });
-            document.addEventListener('keyup', (event) => {
-                if (event.key === 'Shift') {
+            document.addEventListener("keyup", (event) => {
+                if (event.key === "Shift") {
                     this.isShiftKeySelected = false;
                 }
             });
@@ -197,10 +194,10 @@ export default {
         /**
          * Load users
          */
-        async loadRows () {
+        async loadRows() {
             try {
                 const response = await fetch(this.srcUserList, {
-                    method: 'POST',
+                    method: "POST",
                     body: JSON.stringify(this.getRowsBody()),
                 });
                 this.rows = await response.json();
@@ -217,28 +214,29 @@ export default {
          *
          * @retrun { Object}
          */
-        getRowsBody () {
+        getRowsBody() {
             return {
                 campusId: -1,
                 roleId: -1,
                 courses: -1,
                 provisioned: -1,
-            }
+            };
         },
 
         /**
          * To update the table to show the UI in the footer
          */
-        onLoaded () {
+        onLoaded() {
             this.$nextTick(() => this.footerUI_update());
         },
 
         /**
          * To keep track of selected rows
          */
-        onRowSelected (event) {
+        onRowSelected(event) {
             this.selectedRows = event;
-            if (this.selectedRows.length > 1 && this.isShiftKeySelected) { //to hide a UI note, notifying of availability of shift-select
+            if (this.selectedRows.length > 1 && this.isShiftKeySelected) {
+                //to hide a UI note, notifying of availability of shift-select
                 this.hasSelectedShiftKey = true;
             }
         },
@@ -246,7 +244,7 @@ export default {
         /**
          * Clear the selection
          */
-        clearRows () {
+        clearRows() {
             this.selectedRows = [];
             this.$refs.table.resetSelectedRows();
         },
@@ -254,28 +252,26 @@ export default {
         /**
          * To confirm/cancel selected users deletion
          */
-        onClearUsersSelected () {
+        onClearUsersSelected() {
             this.clearRows();
         },
 
         /**
          * To open the modify modal
          */
-        onModifySelected () {
+        onModifySelected() {
             this.$refs.newValues.modify(); //will open up the reveal-modal in shaps-list-new-values
         },
 
         /**
          * Selected modify is complete, so clear the rows and update the data
          */
-        onUpdated () {
+        onUpdated() {
             this.clearRows();
             this.loadRows(); //refresh the data
         },
-
     },
-
-}
+};
 </script>
 
 <template>
@@ -297,23 +293,24 @@ export default {
             @select="onRowSelected"
         >
             <template #beforeTable>
-                <shaps-list-filters
-                    :campuses="campuses"
-                    :roles="roles"
-                    :courses="courses"
-                    :provisioned="provisioned"
-                />
+                <shaps-list-filters :campuses="campuses" :roles="roles" :courses="courses" :provisioned="provisioned" />
             </template>
             <template #firstname="props">
-                <div v-if="props.row.deleted">
-                    {{ props.row.firstname }} (deleted)
-                </div>
+                <div v-if="props.row.deleted">{{ props.row.firstname }} (deleted)</div>
                 <div v-else>
                     <span
-                        v-if="props.row.email === null || props.row.email.length === 0 || props.row.lastname === null || props.row.lastname.length === 0"
-                        data-tooltip class="hint has-tip tip-top"
-                        title="Please make sure that email and surname are both set to provision this user.">?</span>
-                    <a :href="'/search/user/'+props.row.id">
+                        v-if="
+                            props.row.email === null ||
+                            props.row.email.length === 0 ||
+                            props.row.lastname === null ||
+                            props.row.lastname.length === 0
+                        "
+                        data-tooltip
+                        class="hint has-tip tip-top"
+                        title="Please make sure that email and surname are both set to provision this user."
+                        >?</span
+                    >
+                    <a :href="'/search/user/' + props.row.id">
                         {{ props.row.firstname }}
                     </a>
                 </div>
@@ -332,22 +329,24 @@ export default {
         <div v-else>
             <table class="skeleton">
                 <thead>
-                <tr>
-                    <th></th>
-                </tr>
+                    <tr>
+                        <th></th>
+                    </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td></td>
-                </tr>
+                    <tr>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                    </tr>
                 </tbody>
             </table>
         </div>
         <bottom-drawer :showDrawer="selectedRowsCount > 0">
-            <h3 class="selected-count"><em>{{ selectedRowsCountWithRowName }} selected</em></h3>
+            <h3 class="selected-count">
+                <em>{{ selectedRowsCountWithRowName }} selected</em>
+            </h3>
             <span v-if="!hasSelectedShiftKey" class="shift-select-note">Use Shift+Select to select multiple users</span>
             <button @click.prevent="onClearUsersSelected" class="button-clear">Clear User Selection</button>
             <button @click.prevent="onModifySelected" class="button submit">Modify</button>
@@ -364,8 +363,7 @@ export default {
 </template>
 
 <style lang="scss">
-
-@import '@schoolboxVue/components/vueTables2/vueTables2';
+@import "@schoolboxVue/components/vueTables2/vueTables2";
 
 .VueTables--client {
     padding-bottom: 100px; // allow space for bottom-drawer at the bottom
@@ -375,7 +373,8 @@ export default {
     margin-right: 1rem;
 }
 
-.button-clear, .selected-count {
+.button-clear,
+.selected-count {
     display: inline-block;
 }
 
@@ -395,5 +394,4 @@ export default {
         background: none;
     }
 }
-
 </style>

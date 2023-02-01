@@ -4,48 +4,54 @@ import Paragraph from "@ckeditor/ckeditor5-paragraph/src/paragraph";
 import Bold from "@ckeditor/ckeditor5-basic-styles/src/bold";
 import Italic from "@ckeditor/ckeditor5-basic-styles/src/italic";
 
-let editor;
-const storageKey = "editorData";
-const editorTextArea = document.querySelector("#editor") as HTMLTextAreaElement;
+const storageKeys = ["editorData1", "editorData2"];
+const editorTextAreas = document.querySelectorAll("textarea");
+const editors = [];
 
 /**
  * check the local storage for any previously saved content
  */
-function preFillEditor() {
+function preFillEditors() {
     let storageValue: string | null;
-    if (window.localStorage.getItem(storageKey)) {
-        storageValue = window.localStorage.getItem(storageKey) as string;
-        editorTextArea.insertAdjacentHTML("beforeend", storageValue);
-    }
+    storageKeys.forEach((storageKey, index) => {
+        if (window.localStorage.getItem(storageKey)) {
+            storageValue = window.localStorage.getItem(storageKey) as string;
+            editorTextAreas[index].insertAdjacentHTML("beforeend", storageValue);
+        }
+    });
 }
 
 /**
  * create the ckeditor instance
  */
-function createEditor() {
-    ClassicEditor.create(editorTextArea, {
-        plugins: [Essentials, Paragraph, Bold, Italic],
-        toolbar: ["bold", "italic"],
-    })
-        .then((newEditor) => {
-            editor = newEditor;
+function createEditors() {
+    editorTextAreas.forEach((editorTextArea) => {
+        ClassicEditor.create(editorTextArea, {
+            plugins: [Essentials, Paragraph, Bold, Italic],
+            toolbar: ["bold", "italic"],
         })
-        .catch((error) => {
-            console.error(error.stack);
-        });
+            .then((newEditor) => {
+                editors.push(newEditor);
+            })
+            .catch((error) => {
+                console.error(error.stack);
+            });
+    });
 }
 
 /**
  * on selection save the editor content into local storage
  */
-function initEditorSave() {
+function initEditorSaves() {
     const saveButton = document.getElementById("save-button") as HTMLButtonElement;
     saveButton.addEventListener("click", () => {
-        const editorData = editor.getData() as string;
-        window.localStorage.setItem(storageKey, editorData);
+        storageKeys.forEach((storageKey, index) => {
+            const editorData = editors[index].getData() as string;
+            window.localStorage.setItem(storageKey, editorData);
+        });
     });
 }
 
-preFillEditor();
-createEditor();
-initEditorSave();
+preFillEditors();
+createEditors();
+initEditorSaves();

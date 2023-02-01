@@ -1,40 +1,38 @@
 <script>
-
 /**
  * Groups page title, search and toggles
  */
 
-import selectionTypes from '../js/manageGroupsSelectionTypes';
-import enrolmentTypes from '../js/manageGroupsEnrolmentTypes';
-
+import selectionTypes from "../js/manageGroupsSelectionTypes";
+import enrolmentTypes from "../js/manageGroupsEnrolmentTypes";
 
 export default {
-
     props: {
-        groups: { //all the groups that the user can access
+        groups: {
+            //all the groups that the user can access
             type: Array,
             required: true,
         },
-        selectedGroups: { //current groups selection
+        selectedGroups: {
+            //current groups selection
             type: String,
             required: true,
-        }
+        },
     },
 
-    data () {
+    data() {
         return {
-            query: '', //to further refine group search
-        }
+            query: "", //to further refine group search
+        };
     },
 
     computed: {
-
         /**
          * Change the page title depending on the current group selection
          *
          * @returns { String }
          */
-        pageTitle () {
+        pageTitle() {
             const pageTitle = {
                 [selectionTypes.ALL_GROUPS]: `All groups`,
                 [selectionTypes.MY_FAVOURITE_GROUPS]: `My favourite groups`,
@@ -50,7 +48,7 @@ export default {
          *
          * @returns { String }
          */
-        inputPlaceholder () {
+        inputPlaceholder() {
             const inputPlaceholder = {
                 [selectionTypes.ALL_GROUPS]: `Search all groups...`,
                 [selectionTypes.MY_FAVOURITE_GROUPS]: `Search my favourite groups...`,
@@ -66,13 +64,19 @@ export default {
          *
          * @returns { Array }
          */
-        currentGroups () {
+        currentGroups() {
             const currentGroups = {
                 [selectionTypes.ALL_GROUPS]: () => this.groups,
-                [selectionTypes.MY_FAVOURITE_GROUPS]: () => this.groups.filter((group) => (group.isFavourite && group.enrolmentStatus === enrolmentTypes.ENROLED)),
-                [selectionTypes.GROUPS_IM_IN]: () => this.groups.filter((group) => group.enrolmentStatus === enrolmentTypes.ENROLED),
-                [selectionTypes.GROUPS_I_CAN_JOIN]: () => this.groups.filter((group) => group.enrolmentStatus === enrolmentTypes.NOT_ENROLED),
-                [selectionTypes.GROUPS_PENDING_MEMBERSHIP]: () => this.groups.filter((group) => group.enrolmentStatus === enrolmentTypes.PENDING),
+                [selectionTypes.MY_FAVOURITE_GROUPS]: () =>
+                    this.groups.filter(
+                        (group) => group.isFavourite && group.enrolmentStatus === enrolmentTypes.ENROLED
+                    ),
+                [selectionTypes.GROUPS_IM_IN]: () =>
+                    this.groups.filter((group) => group.enrolmentStatus === enrolmentTypes.ENROLED),
+                [selectionTypes.GROUPS_I_CAN_JOIN]: () =>
+                    this.groups.filter((group) => group.enrolmentStatus === enrolmentTypes.NOT_ENROLED),
+                [selectionTypes.GROUPS_PENDING_MEMBERSHIP]: () =>
+                    this.groups.filter((group) => group.enrolmentStatus === enrolmentTypes.PENDING),
             };
             return currentGroups[this.selectedGroups]();
         },
@@ -82,25 +86,25 @@ export default {
          *
          * @returns { Array }
          */
-        filteredGroups () {
+        filteredGroups() {
             if (this.query.length <= 2) {
                 return this.currentGroups;
             } else {
-                return this.currentGroups.filter((group) => group.name.toLowerCase().includes(this.query.toLowerCase()));
+                return this.currentGroups.filter((group) =>
+                    group.name.toLowerCase().includes(this.query.toLowerCase())
+                );
             }
         },
-
     },
 
     watch: {
-
         /**
          * The <select> is not the only way the selectedGroups can change, it can be toggled by
          * a history state change or for example selection the 'my favourite groups' link in the side menu
          *
          * @param { String }
          */
-        selectedGroups (newGroups) {
+        selectedGroups(newGroups) {
             this.$refs.select.value = newGroups; //to set <select> value on change
         },
 
@@ -110,37 +114,32 @@ export default {
          *
          * @param { Array }
          */
-        filteredGroups (newGroups) {
+        filteredGroups(newGroups) {
             const isSearchActive = this.query.length > 2 ? true : false;
-            this.$emit('on-groups-filtered', newGroups, isSearchActive);
-        }
-
+            this.$emit("on-groups-filtered", newGroups, isSearchActive);
+        },
     },
 
-    created () {
+    created() {
         this.selectionTypes = selectionTypes; //to access within the template
-        this.$emit('on-groups-filtered', this.filteredGroups); //dipsatch to set up the initial group selection on manage-groups.vue
+        this.$emit("on-groups-filtered", this.filteredGroups); //dipsatch to set up the initial group selection on manage-groups.vue
     },
 
-    mounted () {
+    mounted() {
         this.$refs.select.value = this.selectedGroups; //to set the initial <select> value
     },
 
     methods: {
-
         /**
          * Notify manage-groups.vue of state change
          *
          * @param { Object }
          */
-        onSelectionChange (event) {
-            this.$emit('on-groups-selected', event.currentTarget.value);
-        }
-
-    }
-
-}
-
+        onSelectionChange(event) {
+            this.$emit("on-groups-selected", event.currentTarget.value);
+        },
+    },
+};
 </script>
 
 <template>
@@ -175,12 +174,12 @@ export default {
 </template>
 
 <style scoped>
-
-.fade-enter-active, .fade-leave-active {
+.fade-enter-active,
+.fade-leave-active {
     transition: opacity 0.2s;
 }
-.fade-enter, .fade-leave-to {
+.fade-enter,
+.fade-leave-to {
     opacity: 0;
 }
-
 </style>

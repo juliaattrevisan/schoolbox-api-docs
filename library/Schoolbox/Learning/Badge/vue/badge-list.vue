@@ -1,17 +1,15 @@
 <script>
-
-import Toast from '@schoolboxVue/components/toast';
-import RevealModal from '@schoolboxVue/components/reveal-modal';
-import BadgeAward from '../Award/vue/badgeAward';
-import BadgeDetail from './badgeDetail';
-import BadgeAchievementWithdrawModal from '../Award/vue/badge-achievement-withdraw-modal';
-import BadgeGoalWithdrawModal from '../Award/vue/badge-goal-withdraw-modal';
-import BadgeImage from './badge-image';
-import BadgeModal from './badge-modal';
-import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
-import mixinFilter from '@schoolboxVue/mixins/filter';
-import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin';
-
+import Toast from "@schoolboxVue/components/toast";
+import RevealModal from "@schoolboxVue/components/reveal-modal";
+import BadgeAward from "../Award/vue/badgeAward";
+import BadgeDetail from "./badgeDetail";
+import BadgeAchievementWithdrawModal from "../Award/vue/badge-achievement-withdraw-modal";
+import BadgeGoalWithdrawModal from "../Award/vue/badge-goal-withdraw-modal";
+import BadgeImage from "./badge-image";
+import BadgeModal from "./badge-modal";
+import RelativeTime from "@schoolboxLearningMomentEvidence/relative-time";
+import mixinFilter from "@schoolboxVue/mixins/filter";
+import cdnPrefixMixin from "@schoolboxVue/components/cdn-prefix-mixin";
 
 export default {
     /**
@@ -20,10 +18,7 @@ export default {
      * manner as a php trait. They must already be imported at the top of the file and will
      * be superpositioned on top of this javascript here, inside export default {}
      */
-    mixins: [
-        cdnPrefixMixin,
-        mixinFilter
-    ],
+    mixins: [cdnPrefixMixin, mixinFilter],
 
     components: {
         RelativeTime,
@@ -34,42 +29,48 @@ export default {
         BadgeImage,
         RevealModal,
         Toast,
-        BadgeModal
+        BadgeModal,
     },
 
     props: {
-        getBadgesRoute: { //the route via which badges are retrieved.
+        getBadgesRoute: {
+            //the route via which badges are retrieved.
             type: String,
-            default: '',
+            default: "",
             required: true,
         },
-        getBadgeCreateFormRoute: { //The route which shows the badge create form.
+        getBadgeCreateFormRoute: {
+            //The route which shows the badge create form.
             type: String,
-            default: '',
+            default: "",
             required: true,
         },
-        showBadgeMenus: { //Is the menu shown for each badge?
+        showBadgeMenus: {
+            //Is the menu shown for each badge?
             type: Boolean,
             default: true,
         },
-        allowSelection: { //Can badges be selected?
+        allowSelection: {
+            //Can badges be selected?
             type: Boolean,
             default: false,
         },
-        expiryDateFormat: { //The Moment date format which is used to render the date when an awarding of a badge will expire. If not provided, the date will not be rendered.
+        expiryDateFormat: {
+            //The Moment date format which is used to render the date when an awarding of a badge will expire. If not provided, the date will not be rendered.
             type: String,
             default: null,
         },
-        selectedBadges: { //to know which badges are currently selected
+        selectedBadges: {
+            //to know which badges are currently selected
             type: Array,
             default() {
-                return []
+                return [];
             },
         },
-        siteVersion: String
+        siteVersion: String,
     },
 
-    data () {
+    data() {
         return {
             currentBadge: null,
             data: [],
@@ -81,19 +82,18 @@ export default {
             showSkeletonLoader: true,
             selectedFilters: null,
             isDetailModalOpen: false, //whether the modal to display the badge details is open
-        }
+        };
     },
 
-    created () {
+    created() {
         this.filter_endpoint = this.getBadgesRoute; //assign endpoint for the mixinFilter
     },
 
-    mounted () {
-        document.addEventListener('badge-list__onFilterChange', this.onFilterChange);
+    mounted() {
+        document.addEventListener("badge-list__onFilterChange", this.onFilterChange);
     },
 
     methods: {
-
         /**
          * Opens a modal window for viewing this badge's full details.
          *
@@ -108,7 +108,7 @@ export default {
          * the detail modal is closed, so we should set the boolean to
          * false so we can open it again
          */
-        onDetailModalClosed () {
+        onDetailModalClosed() {
             this.isDetailModalOpen = false;
         },
 
@@ -127,7 +127,7 @@ export default {
          * @param {Object} badge
          */
         openGoalWithdrawModal(badge) {
-          this.$refs.goalWithdrawModal.open(badge);
+            this.$refs.goalWithdrawModal.open(badge);
         },
 
         /**
@@ -154,7 +154,7 @@ export default {
          *
          * @param {Object} badge
          */
-        openSetAsGoalModal (badge) {
+        openSetAsGoalModal(badge) {
             this.isModalOpen = true;
             this.currentBadge = badge;
             this.$refs.setAsGoalModal.open();
@@ -165,7 +165,7 @@ export default {
          *
          * @param {Object} badge
          */
-        closeSetAsGoalModal (badge) {
+        closeSetAsGoalModal(badge) {
             this.isModalOpen = false;
             this.$refs.setAsGoalModal.close();
         },
@@ -177,7 +177,7 @@ export default {
          *
          * @param {object} selectedFilters The filters that were selected
          */
-        onFilterChange (event) {
+        onFilterChange(event) {
             this.changeFilters(event.detail.selectedFilters);
         },
 
@@ -186,7 +186,7 @@ export default {
          *
          * @param {object} selectedFilters The filters that were selected
          */
-        changeFilters (selectedFilters) {
+        changeFilters(selectedFilters) {
             this.selectedFilters = selectedFilters;
             this.showSkeletonLoader = true;
             this.filter_load(false);
@@ -198,26 +198,26 @@ export default {
          *
          * @param {Object} badge
          */
-        openDeleteModal (badge) {
-          this.currentBadge = badge;
-          this.$refs.deleteModal.open();
+        openDeleteModal(badge) {
+            this.currentBadge = badge;
+            this.$refs.deleteModal.open();
         },
 
         /**
          * Closes a modal window for deleting this badge.
          */
-        closeDeleteModal () {
-          this.$refs.deleteModal.close();
+        closeDeleteModal() {
+            this.$refs.deleteModal.close();
         },
 
         /**
          * Perform delete
          */
-        async deleteBadge () {
-            this.$refs.toast.activate('Deleting badge...');
+        async deleteBadge() {
+            this.$refs.toast.activate("Deleting badge...");
             try {
                 const response = await fetch(this.currentBadge._links.delete, {
-                    method: 'DELETE',
+                    method: "DELETE",
                 });
 
                 if (response.status === 200) {
@@ -229,7 +229,7 @@ export default {
                 }
             } catch (error) {
                 console.warn(error);
-                this.$refs.toast.timeout('Failed to delete badge', false);
+                this.$refs.toast.timeout("Failed to delete badge", false);
             } finally {
                 this.closeDeleteModal();
             }
@@ -241,12 +241,12 @@ export default {
          *
          * @return {Boolean}
          */
-        isSelectedFiltersEmpty () {
+        isSelectedFiltersEmpty() {
             let nonEmptyFilters = Object.values(this.selectedFilters).filter(function (v1) {
                 if (v1 instanceof Object) {
                     // Each value in this object will be either a string 0 or 1:
                     // 1 if it is selected, 0 if it is not
-                    return Object.values(v1).some(v2 => Number(v2) === 1);
+                    return Object.values(v1).some((v2) => Number(v2) === 1);
                 }
                 return false;
             });
@@ -258,16 +258,15 @@ export default {
          *
          * @return {String}
          */
-        generateResetFilterUrl () {
+        generateResetFilterUrl() {
             let emptyQueryString = {};
-            Object.keys(this.selectedFilters).forEach(k => emptyQueryString[k] = '');
+            Object.keys(this.selectedFilters).forEach((k) => (emptyQueryString[k] = ""));
             const url = new URL(window.location.href);
-            if (url.searchParams.get('returnUrl') !== null) {
-                emptyQueryString['returnUrl'] = url.searchParams.get('returnUrl');
+            if (url.searchParams.get("returnUrl") !== null) {
+                emptyQueryString["returnUrl"] = url.searchParams.get("returnUrl");
             }
             return "?" + new URLSearchParams(emptyQueryString).toString();
         },
-
 
         /**
          * To ensure it's unchecked when 'Clear Selection' is selected in #badge-list-form
@@ -276,7 +275,7 @@ export default {
          *
          * @returns { Boolean }
          */
-        isInSelectedBadges (badgeId) {
+        isInSelectedBadges(badgeId) {
             return this.selectedBadges.some((badge) => badge.id === badgeId);
         },
 
@@ -285,18 +284,18 @@ export default {
          *
          * @params { Boolean }
          */
-        onBadgeSelected (badge, isChecked) {
-            this.$emit('on-badge-selected', badge, isChecked);
+        onBadgeSelected(badge, isChecked) {
+            this.$emit("on-badge-selected", badge, isChecked);
         },
 
         /**
          * The modal is now completely closed so reset
          */
-        onModalClosed () {
+        onModalClosed() {
             this.isModalOpen = false;
         },
-    }
-}
+    },
+};
 </script>
 
 <template>
@@ -317,7 +316,8 @@ export default {
                     <i class="icon-search"></i>
                     <p>
                         No badges were found.
-                        <a :href="generateResetFilterUrl()" title="Reset filters">Reset filters</a> to see all available badges.
+                        <a :href="generateResetFilterUrl()" title="Reset filters">Reset filters</a> to see all available
+                        badges.
                     </p>
                 </template>
 
@@ -327,12 +327,12 @@ export default {
                     <p>
                         <!-- the getBadgeCreateFormRoute could optionally contain a ?returnUrl=... appendage -->
                         <template v-if="getBadgeCreateFormRoute !== '' && getBadgeCreateFormRoute[0] !== '?'">
-                            No badges have been created.
-                            Start by <a :href="getBadgeCreateFormRoute" title="Create the first badge">creating the first badge</a>.
+                            No badges have been created. Start by
+                            <a :href="getBadgeCreateFormRoute" title="Create the first badge"
+                                >creating the first badge</a
+                            >.
                         </template>
-                        <template v-else>
-                            There are no goals for you to choose yet. Please try again soon.
-                        </template>
+                        <template v-else> There are no goals for you to choose yet. Please try again soon. </template>
                     </p>
                 </template>
             </div>
@@ -346,57 +346,108 @@ export default {
                                     <badge-image :badge="badge"></badge-image>
                                 </a>
                             </div>
-                            <div :class="{'': !showBadgeMenus, 'actions-small-1': showBadgeMenus,'checkbox-content': !showBadgeMenus, 'card-content': true}">
+                            <div
+                                :class="{
+                                    '': !showBadgeMenus,
+                                    'actions-small-1': showBadgeMenus,
+                                    'checkbox-content': !showBadgeMenus,
+                                    'card-content': true,
+                                }"
+                            >
                                 <div class="list-item">
                                     <template v-if="allowSelection">
-                                        <input type="checkbox"
-                                               :id="'selectBadge-' + String(badge.id)"
-                                               :checked="isInSelectedBadges(badge.id)"
-                                               @change="onBadgeSelected(badge, $event.target.checked)"
-                                        >
+                                        <input
+                                            type="checkbox"
+                                            :id="'selectBadge-' + String(badge.id)"
+                                            :checked="isInSelectedBadges(badge.id)"
+                                            @change="onBadgeSelected(badge, $event.target.checked)"
+                                        />
                                         <label :for="'selectBadge-' + String(badge.id)" class="checkbox-label">
                                             {{ badge.name }}
                                         </label>
                                     </template>
                                     <h3 v-else>
-                                        <a @click.prevent="openDetailModal(badge)" :title="badge.name">{{ badge.name }}</a>
+                                        <a @click.prevent="openDetailModal(badge)" :title="badge.name">{{
+                                            badge.name
+                                        }}</a>
                                     </h3>
                                 </div>
                                 <nav v-if="showBadgeMenus">
-                                  <a href="#"
-                                     class="icon-overflow"
-                                     :data-dropdown="'badge-' + String(badge.id) + '-dropdown'"
-                                     aria-expanded="false" title="Actions"></a>
+                                    <a
+                                        href="#"
+                                        class="icon-overflow"
+                                        :data-dropdown="'badge-' + String(badge.id) + '-dropdown'"
+                                        aria-expanded="false"
+                                        title="Actions"
+                                    ></a>
                                 </nav>
-                                <ul v-if="showBadgeMenus" :id="'badge-' + String(badge.id) + '-dropdown'" class="f-dropdown" data-dropdown-content>
-                                    <li><a @click.prevent="openAwardAsAchievementModal(badge)" class="icon-achievement" title="Award achievement">Award achievement</a></li>
-                                    <li v-if="badge.allowAsGoal"><a @click.prevent="openSetAsGoalModal(badge)" class="icon-goal" title="Set goal">Set goal</a></li>
-                                    <li><a @click.prevent="openAchievementWithdrawModal(badge)" class="icon-withdraw-achievement" title="Withdraw achievement">Withdraw achievement</a></li>
-                                    <li v-if="badge.allowAsGoal"><a @click.prevent="openGoalWithdrawModal(badge)" class="icon-close" title="Remove goal">Remove goal</a></li>
-                                    <li><a :href="badge._links.update" class="icon-modify" title="Modify">Modify</a></li>
-                                  <li><a @click.prevent="openDeleteModal(badge)" class="icon-delete">Delete</a></li>
+                                <ul
+                                    v-if="showBadgeMenus"
+                                    :id="'badge-' + String(badge.id) + '-dropdown'"
+                                    class="f-dropdown"
+                                    data-dropdown-content
+                                >
+                                    <li>
+                                        <a
+                                            @click.prevent="openAwardAsAchievementModal(badge)"
+                                            class="icon-achievement"
+                                            title="Award achievement"
+                                            >Award achievement</a
+                                        >
+                                    </li>
+                                    <li v-if="badge.allowAsGoal">
+                                        <a @click.prevent="openSetAsGoalModal(badge)" class="icon-goal" title="Set goal"
+                                            >Set goal</a
+                                        >
+                                    </li>
+                                    <li>
+                                        <a
+                                            @click.prevent="openAchievementWithdrawModal(badge)"
+                                            class="icon-withdraw-achievement"
+                                            title="Withdraw achievement"
+                                            >Withdraw achievement</a
+                                        >
+                                    </li>
+                                    <li v-if="badge.allowAsGoal">
+                                        <a
+                                            @click.prevent="openGoalWithdrawModal(badge)"
+                                            class="icon-close"
+                                            title="Remove goal"
+                                            >Remove goal</a
+                                        >
+                                    </li>
+                                    <li>
+                                        <a :href="badge._links.update" class="icon-modify" title="Modify">Modify</a>
+                                    </li>
+                                    <li><a @click.prevent="openDeleteModal(badge)" class="icon-delete">Delete</a></li>
                                 </ul>
-                                <p class="meta" v-if="badge.category" :title="'Category: ' + badge.category.name">{{ badge.category.name }}</p>
+                                <p class="meta" v-if="badge.category" :title="'Category: ' + badge.category.name">
+                                    {{ badge.category.name }}
+                                </p>
                             </div>
                         </div>
                     </div>
 
                     <!-- Load more button, if there are more to load -->
-                    <a @click.prevent="filter_append(metadata.cursor.next, true, false)"
-                       class="button load-more expand"
-                       title="Load more"
-                       v-if="metadata.cursor.next && data.length < metadata.count">Load more</a>
+                    <a
+                        @click.prevent="filter_append(metadata.cursor.next, true, false)"
+                        class="button load-more expand"
+                        title="Load more"
+                        v-if="metadata.cursor.next && data.length < metadata.count"
+                        >Load more</a
+                    >
                 </section>
             </template>
         </div>
 
-        <badge-modal
-            :isOpen="isDetailModalOpen"
-            :badge="currentBadge"
-            @closed="onDetailModalClosed"
-        />
+        <badge-modal :isOpen="isDetailModalOpen" :badge="currentBadge" @closed="onDetailModalClosed" />
 
-        <reveal-modal size="medium" ref="awardAsAchievementModal" :closeOnBackgroundClick="false" @closed="onModalClosed">
+        <reveal-modal
+            size="medium"
+            ref="awardAsAchievementModal"
+            :closeOnBackgroundClick="false"
+            @closed="onModalClosed"
+        >
             <badge-award
                 v-if="currentBadge"
                 type="achievement"
@@ -415,14 +466,16 @@ export default {
                 toast-failure-message="Awarding achievement failed"
             >
                 <template v-slot:header="slotProps">
-                    <h2>Award &lsquo;<b>{{ slotProps.badge.name }}</b>&rsquo; as an Achievement</h2>
+                    <h2>
+                        Award &lsquo;<b>{{ slotProps.badge.name }}</b
+                        >&rsquo; as an Achievement
+                    </h2>
                 </template>
-                <template v-slot:confirmButton>
-                    Award
-                </template>
+                <template v-slot:confirmButton> Award </template>
                 <template v-slot:expiryMessage="slotProps">
                     <p class="meta" v-if="slotProps.expiryDate">
-                        This achievement will expire <relative-time :datetime="slotProps.expiryDate" date-only></relative-time>.
+                        This achievement will expire
+                        <relative-time :datetime="slotProps.expiryDate" date-only></relative-time>.
                     </p>
                 </template>
             </badge-award>
@@ -446,14 +499,16 @@ export default {
                 toast-failure-message="Setting goal failed"
             >
                 <template v-slot:header="slotProps">
-                    <h2>Set &lsquo;<b>{{ slotProps.badge.name }}</b>&rsquo; as a goal</h2>
+                    <h2>
+                        Set &lsquo;<b>{{ slotProps.badge.name }}</b
+                        >&rsquo; as a goal
+                    </h2>
                 </template>
-                <template v-slot:confirmButton>
-                    Set goal
-                </template>
+                <template v-slot:confirmButton> Set goal </template>
                 <template v-slot:expiryMessage="slotProps">
                     <p class="meta" v-if="slotProps.expiryDate">
-                        This goal will expire <relative-time :datetime="slotProps.expiryDate" date-only></relative-time>.
+                        This goal will expire
+                        <relative-time :datetime="slotProps.expiryDate" date-only></relative-time>.
                     </p>
                 </template>
             </badge-award>
@@ -461,8 +516,12 @@ export default {
 
         <reveal-modal ref="deleteModal">
             <template v-if="currentBadge">
-                <h2>Delete <strong>&lsquo;{{ currentBadge.name }}&rsquo;</strong></h2>
-                <div class="alert-box alert icon-alert">WARNING! Any users who have been awarded this badge will have it removed from their collection.</div>
+                <h2>
+                    Delete <strong>&lsquo;{{ currentBadge.name }}&rsquo;</strong>
+                </h2>
+                <div class="alert-box alert icon-alert">
+                    WARNING! Any users who have been awarded this badge will have it removed from their collection.
+                </div>
                 <p>Are you sure you wish to delete the badge '{{ currentBadge.name }}'?</p>
                 <ul class="flex-list buttons">
                     <li><a @click.prevent="deleteBadge()" class="button submit">Delete</a></li>

@@ -1,26 +1,24 @@
 <script setup>
-
 /**
  * To list all the currently selected Curriculum codes
  */
 
-import { ref, computed, watch, nextTick, onMounted } from 'vue';
-import { useStore } from './store/curriculumSelectorStore';
-import { useSelectedNodesStore } from './store/csSelectedNodesStore';
-import CsSelectedNode from './cs-selected-node.vue';
-
+import { ref, computed, watch, nextTick, onMounted } from "vue";
+import { useStore } from "./store/curriculumSelectorStore";
+import { useSelectedNodesStore } from "./store/csSelectedNodesStore";
+import CsSelectedNode from "./cs-selected-node.vue";
 
 const store = useStore();
 const selectedNodesStore = useSelectedNodesStore();
 const selectEl = ref(null);
 
-
 /**
  * to listen for any clears of the selected codes from outside the Vue app
  */
 onMounted(() => {
-    document.addEventListener('SEARCH_SELECT__UPDATE_SELECTION', (event) => {
-        if (selectEl.value.getAttribute('id') === event.detail.elementId) { //just in case there are multiple on the page
+    document.addEventListener("SEARCH_SELECT__UPDATE_SELECTION", (event) => {
+        if (selectEl.value.getAttribute("id") === event.detail.elementId) {
+            //just in case there are multiple on the page
             const newSelection = JSON.parse(event.detail.selection);
             selectedNodesStore.update(newSelection);
         }
@@ -34,7 +32,7 @@ onMounted(() => {
  * @returns { String }
  */
 const ids = computed(() => {
-    return selectedNodesStore.nodesIds.join(',');
+    return selectedNodesStore.nodesIds.join(",");
 });
 
 /**
@@ -43,23 +41,21 @@ const ids = computed(() => {
  * except when the <select> is first displayed in the DOM.
  * We listen for this in library/Schoolbox/Filter/templates/panel.twig
  */
-watch(() => selectedNodesStore.nodesIds, () => {
-    nextTick(() => { //nextTick to ensure the dom has updated so we can access with the latest changes
-        const event = new Event('change');
-        selectEl.value.dispatchEvent(event);
-    });
-});
-
+watch(
+    () => selectedNodesStore.nodesIds,
+    () => {
+        nextTick(() => {
+            //nextTick to ensure the dom has updated so we can access with the latest changes
+            const event = new Event("change");
+            selectEl.value.dispatchEvent(event);
+        });
+    }
+);
 </script>
 
 <template>
     <div v-if="selectedNodesStore.hasNodes" class="selected-nodes-container" data-test-nodes-container>
-        <cs-selected-node
-            v-for="node in selectedNodesStore.nodes"
-            :key="node.id"
-            :node="node"
-            data-test-node
-        />
+        <cs-selected-node v-for="node in selectedNodesStore.nodes" :key="node.id" :node="node" data-test-node />
     </div>
     <div v-else-if="selectedNodesStore.hasNoNodes && store.isReadOnly" class="selected-nodes-container">
         <aside class="meta no-codes-note">No Curriculum Codes have been selected</aside>
@@ -85,11 +81,9 @@ watch(() => selectedNodesStore.nodesIds, () => {
             {{ node.code }}
         </option>
     </select>
-
 </template>
 
 <style lang="scss" scoped>
-
 .selected-nodes-container {
     border: 1px solid var(--form-border-color);
     display: flex;
@@ -109,5 +103,4 @@ watch(() => selectedNodesStore.nodesIds, () => {
 select[data-search-select] {
     display: none;
 }
-
 </style>

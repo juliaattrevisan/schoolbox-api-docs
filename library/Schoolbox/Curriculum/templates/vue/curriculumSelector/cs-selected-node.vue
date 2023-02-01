@@ -1,14 +1,12 @@
 <script setup>
-
 /**
  * A selected Curriculum node, it can be deleted and
  * further details revealed via a modal
  */
 
-import { computed } from 'vue';
-import { useStore } from './store/curriculumSelectorStore';
-import { useSelectedNodesStore } from './store/csSelectedNodesStore';
-
+import { computed } from "vue";
+import { useStore } from "./store/curriculumSelectorStore";
+import { useSelectedNodesStore } from "./store/csSelectedNodesStore";
 
 const props = defineProps({
     /**
@@ -20,10 +18,10 @@ const props = defineProps({
         default: () => {
             return {
                 id: 0,
-                code: '',
-                name: '',
-            }
-        }
+                code: "",
+                name: "",
+            };
+        },
     },
 });
 
@@ -40,21 +38,20 @@ const isDisabled = computed(() => selectedNodesStore.isLoading);
 /**
  * To open a modal that shows further info on the selected node
  */
-function onTitleSelected () {
+function onTitleSelected() {
     selectedNodesStore.setActiveNode(props.node);
 }
 
 /**
  * To remove from the selected list
  */
-function onRemoveSelected () {
+function onRemoveSelected() {
     selectedNodesStore.remove(props.node);
 }
-
 </script>
 
 <template>
-   <div class="selected-node">
+    <div class="selected-node">
         <button
             type="button"
             class="title-button"
@@ -62,7 +59,8 @@ function onRemoveSelected () {
             :disabled="isDisabled"
             @click.prevent="onTitleSelected"
             @keyup.enter="onTitleSelected"
-            data-test-title-button>
+            data-test-title-button
+        >
             {{ props.node.code }}
         </button>
         <button
@@ -72,13 +70,12 @@ function onRemoveSelected () {
             :title="`Remove ${props.node.name}`"
             @click.prevent="onRemoveSelected"
             @keyup.enter="onRemoveSelected"
-            data-test-remove-button>
-        </button>
+            data-test-remove-button
+        ></button>
     </div>
 </template>
 
 <style lang="scss" scoped>
-
 .selected-node {
     background: var(--body-background);
     color: #000;
@@ -110,5 +107,4 @@ function onRemoveSelected () {
     margin-top: 3px;
     padding: 0;
 }
-
 </style>

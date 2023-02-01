@@ -1,8 +1,8 @@
-
 $tableToDoubleColumn: 1200px;
 $tableToSingleColumn: 700px;
 
-.title-on-single-column { //to show the row title when at single column, ie <div class="title-on-single-column" data-title="Submission date"> 
+.title-on-single-column {
+    //to show the row title when at single column, ie <div class="title-on-single-column" data-title="Submission date">
     position: relative;
     &:before {
         content: attr(data-title); //will just be blank if no data-title is set

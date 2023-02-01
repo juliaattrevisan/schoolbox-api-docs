@@ -1,51 +1,45 @@
 <script>
-
 /**
  * Pop-up badge award animation component used within Storybook only
  */
 
-import { clearCanvas } from '../../../library/Schoolbox/Learning/Badge/Award/js/animateBadgeImage';
-import { init } from '../../../library/Schoolbox/Learning/Badge/Award/js/animations/spinIn';
+import { clearCanvas } from "../../../library/Schoolbox/Learning/Badge/Award/js/animateBadgeImage";
+import { init } from "../../../library/Schoolbox/Learning/Badge/Award/js/animations/spinIn";
 
 export default {
-
-    data () {
+    data() {
         return {
             canvasWidth: 0,
             canvasHeight: 0,
-        }
+        };
     },
 
-    mounted () {
+    mounted() {
         this.getCanvasDimensions();
         this.animateBadgeImage();
     },
 
     methods: {
-       
         /**
          * The <canvas> element (that shows the stars) requires accurate width/height to function properly.
          */
-        getCanvasDimensions () {
+        getCanvasDimensions() {
             const canvasDimensions = this.$refs.badgeImgContainer.getBoundingClientRect();
             this.canvasWidth = Math.round(canvasDimensions.width);
             this.canvasHeight = Math.round(canvasDimensions.height);
             this.$nextTick(() => this.animateBadgeImage());
         },
 
-       /**
+        /**
          * animate the badge
          */
-        animateBadgeImage () {
+        animateBadgeImage() {
             const badgeImage = this.$refs.badgeImage;
             clearCanvas();
             init(badgeImage);
         },
-
     },
-
-}
-
+};
 </script>
 
 <template>
@@ -63,17 +57,15 @@ export default {
 </template>
 
 <style scoped>
-
 .badge-img-container {
     height: 300px;
     width: 972px;
 }
 
 button {
-    background: #1EA7FD;
+    background: #1ea7fd;
     color: white;
     font-weight: bold;
     padding: 10px 20px;
 }
-
 </style>

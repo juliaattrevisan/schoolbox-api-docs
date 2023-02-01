@@ -1,41 +1,39 @@
 <script>
-
 /**
- * To record, playback and upload a screen recording into SB 
+ * To record, playback and upload a screen recording into SB
  *
  */
 
-import 'video.js/dist/video-js.css';
-import 'videojs-record/dist/css/videojs.record.css';
-import videojs from 'video.js';
-import 'webrtc-adapter';
-import RecordRTC from 'recordrtc';
-import Record from 'videojs-record/dist/videojs.record.js';
-import TsEBMLEngine from 'videojs-record/dist/plugins/videojs.record.ts-ebml.js';
-import RecordedMedia from '@schoolboxVue/components/videojs-record/recorded-media';
-import OverMediaModal from '@schoolboxVue/components/videojs-record/over-media-modal';
-import { getRecordScreenOptions } from '@js/videojs/videojsOptions';
-import recordMediaTypes from '@js/record-media/recordMediaTypes';
-import recordMediaEvents from '@js/record-media/recordMediaEvents';
-import { isDeviceAlreadyInUseError, isPermissionDeniedError } from '@js/record-media/recordMediaErrors';
-import { isOfMimeType } from '@js/util/fileUtils';
-
+import "video.js/dist/video-js.css";
+import "videojs-record/dist/css/videojs.record.css";
+import videojs from "video.js";
+import "webrtc-adapter";
+import RecordRTC from "recordrtc";
+import Record from "videojs-record/dist/videojs.record.js";
+import TsEBMLEngine from "videojs-record/dist/plugins/videojs.record.ts-ebml.js";
+import RecordedMedia from "@schoolboxVue/components/videojs-record/recorded-media";
+import OverMediaModal from "@schoolboxVue/components/videojs-record/over-media-modal";
+import { getRecordScreenOptions } from "@js/videojs/videojsOptions";
+import recordMediaTypes from "@js/record-media/recordMediaTypes";
+import recordMediaEvents from "@js/record-media/recordMediaEvents";
+import { isDeviceAlreadyInUseError, isPermissionDeniedError } from "@js/record-media/recordMediaErrors";
+import { isOfMimeType } from "@js/util/fileUtils";
 
 export default {
-
     components: {
         RecordedMedia,
-        OverMediaModal
+        OverMediaModal,
     },
 
     props: {
-        preRecordedData: { //to display an already existing recording on startup
+        preRecordedData: {
+            //to display an already existing recording on startup
             type: Object,
             required: false,
-        }
+        },
     },
 
-    data () {
+    data() {
         return {
             player: null, //videojs-record instance,
             recordedData: null, //the recorded data that will be passed through to #recored-media
@@ -49,33 +47,33 @@ export default {
             isRecordingOverMaxFileSize: false, //notify that the recording won't upload
             hasNewRecording: false, //need a different videojs player for playback to enable the progress controls
             isDeleteRecordingModalActive: false, //to confirm/deny whether to delete the video
-        }
+        };
     },
 
-	created () {
+    created() {
         this.recordMediaTypes = recordMediaTypes; //to be able to move between media types
         this.checkForPreRecordedData();
-	},
+    },
 
-    mounted () {
-        if (!this.hasPreRecordedData) { //only if no pre recording available
+    mounted() {
+        if (!this.hasPreRecordedData) {
+            //only if no pre recording available
             this.initVideojsRecord();
         }
     },
 
-    beforeUnmount () {
+    beforeUnmount() {
         this.destroyVideojs();
     },
 
     methods: {
-
         /**
-         * Do we need to request the media device straight away? 
+         * Do we need to request the media device straight away?
          * If not wait until it's requested - by deleting the pre recorded media recording
          * Otherwise we will just be displaying the existing pre recorded media
          *
          */
-        checkForPreRecordedData () {
+        checkForPreRecordedData() {
             if (this.preRecordedData) {
                 this.hasPreRecordedData = true;
             }
@@ -85,7 +83,7 @@ export default {
          * Start up the videojs-record instance, which is just videojs with record functionality wrapped around it
          *
          */
-        initVideojsRecord () {
+        initVideojsRecord() {
             try {
                 this.player = videojs(this.$refs.recordingVideo, getRecordScreenOptions(), this.onVideojsReady);
             } catch (error) {
@@ -98,10 +96,11 @@ export default {
          * videojs is ready, so set up listeners and animate on
          *
          */
-        onVideojsReady () {
+        onVideojsReady() {
             this.initVideojsRecordRecordListeners();
             const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-            if (!isSafari) { //Safari requires a direct click on the request (for screen only, not video)
+            if (!isSafari) {
+                //Safari requires a direct click on the request (for screen only, not video)
                 this.player.record().getDevice(); //request the device to avoid needing to click the activate button
             }
         },
@@ -110,21 +109,21 @@ export default {
          * track the events videojs-record offers to manage display
          *
          */
-        initVideojsRecordRecordListeners () {
-            this.player.on('deviceReady', this.onDeviceReady);
-            this.player.on('startRecord', this.onStartRecord);
-            this.player.on('finishRecord', this.onFinishRecord);
-            this.player.on('error', this.onError);
-            this.player.on('deviceError', this.onDeviceError);
+        initVideojsRecordRecordListeners() {
+            this.player.on("deviceReady", this.onDeviceReady);
+            this.player.on("startRecord", this.onStartRecord);
+            this.player.on("finishRecord", this.onFinishRecord);
+            this.player.on("error", this.onError);
+            this.player.on("deviceError", this.onDeviceError);
         },
 
         /**
          * onDeviceReady, dispatch to anyone listening, maybe the parent
          *
          */
-        onDeviceReady () {
+        onDeviceReady() {
             this.isDeviceReady = true;
-            const currentDeviceSettings = this.player.record().stream.getVideoTracks()[0].getSettings(); 
+            const currentDeviceSettings = this.player.record().stream.getVideoTracks()[0].getSettings();
             this.$emit(recordMediaEvents.DEVICE_READY, currentDeviceSettings.width, currentDeviceSettings.height);
         },
 
@@ -132,17 +131,20 @@ export default {
          * onStartRecord
          *
          */
-        onStartRecord () {
-            document.querySelectorAll('.vjs-time-control').forEach((el) => el.style.backgroundColor = 'rgba(255, 0, 0, 0.25)');
+        onStartRecord() {
+            document
+                .querySelectorAll(".vjs-time-control")
+                .forEach((el) => (el.style.backgroundColor = "rgba(255, 0, 0, 0.25)"));
         },
 
         /**
          * the recorded file is ready
          *
          */
-        onFinishRecord () {
-            if (this.player.recordedData.type && isOfMimeType(this.player.recordedData.type, 'video/webm')) { //if it's a webm
-                this.player.on('finishConvert', this.onFinishConvert);
+        onFinishRecord() {
+            if (this.player.recordedData.type && isOfMimeType(this.player.recordedData.type, "video/webm")) {
+                //if it's a webm
+                this.player.on("finishConvert", this.onFinishConvert);
             } else {
                 this.recordedVideoReady(this.player.recordedData);
             }
@@ -152,8 +154,8 @@ export default {
          * the seekable webm file is ready
          *
          */
-        onFinishConvert () {
-            this.player.off('finishConvert', this.onFinishConvert);
+        onFinishConvert() {
+            this.player.off("finishConvert", this.onFinishConvert);
             this.recordedVideoReady(this.player.convertedData);
         },
 
@@ -161,10 +163,10 @@ export default {
          * a media has been recorded, so can now either upload it, delete and re-record or play it back
          *
          */
-        recordedVideoReady (mediaData) {
-            document.querySelectorAll('.vjs-time-control').forEach((el) => el.style.backgroundColor = 'transparent');
-            this.recordedData = mediaData; // the blob object contains the recorded data 
-			this.hasNewRecording = true; //show the <player></player>
+        recordedVideoReady(mediaData) {
+            document.querySelectorAll(".vjs-time-control").forEach((el) => (el.style.backgroundColor = "transparent"));
+            this.recordedData = mediaData; // the blob object contains the recorded data
+            this.hasNewRecording = true; //show the <player></player>
             this.$emit(recordMediaEvents.RECORDED_MEDIA_READY, this.recordedData); //notify anyone wishing to upload the media
         },
 
@@ -172,7 +174,7 @@ export default {
          * not sure what would cause this trigger yet, but it's in the videojs-record examples, probably an invalid src etc
          *
          */
-        onError (element, error) {
+        onError(element, error) {
             this.hasError = true;
             console.warn(error);
         },
@@ -181,10 +183,10 @@ export default {
          * onDeviceError - try and manage as many errors as possible
          *
          */
-        onDeviceError () {
+        onDeviceError() {
             this.hasError = true;
             const errorCode = String(this.player.deviceErrorCode);
-            console.warn('errorCode = ' + errorCode);
+            console.warn("errorCode = " + errorCode);
             if (isDeviceAlreadyInUseError(errorCode)) {
                 this.hasDeviceAlreadyInUseError = true;
             } else if (isPermissionDeniedError(errorCode)) {
@@ -196,7 +198,7 @@ export default {
          * ensure everything reset on possible modal re-display
          *
          */
-        destroyVideojs () {
+        destroyVideojs() {
             if (this.player) {
                 this.player.record().stopDevice();
                 this.player.record().destroy();
@@ -207,7 +209,7 @@ export default {
          * close the error modal, animating out
          *
          */
-        onCloseErrorModalSelected () {
+        onCloseErrorModalSelected() {
             this.isOverMediaModalClosing = true;
         },
 
@@ -215,7 +217,7 @@ export default {
          * it's closed now, so disable the errors to allow trying again
          *
          */
-        onErrorModalClosed () {
+        onErrorModalClosed() {
             this.hasError = false;
             this.isOverMediaModalClosing = false;
             this.hasDeviceAlreadyInUseError = false;
@@ -227,13 +229,15 @@ export default {
          * confirm deletion of the latest recording, setting up for another recording
          *
          */
-        onRecordedMediaDeleted () {
+        onRecordedMediaDeleted() {
             this.$emit(recordMediaEvents.RECORDED_MEDIA_DELETED);
-            this.hasPreRecordedData = false;  //set to false again for possible display or a re-recording
+            this.hasPreRecordedData = false; //set to false again for possible display or a re-recording
             this.hasNewRecording = false;
-            if (this.player) { //relaunch the recorder if it's already set up
-                this.player.record().getDevice(); 
-            } else { //otherwise lets fire it up
+            if (this.player) {
+                //relaunch the recorder if it's already set up
+                this.player.record().getDevice();
+            } else {
+                //otherwise lets fire it up
                 this.initVideojsRecord();
             }
         },
@@ -244,7 +248,7 @@ export default {
          * @params { Number }
          * @params { Number }
          */
-        onResize (width, height) {
+        onResize(width, height) {
             this.$emit(recordMediaEvents.RESIZE, width, height);
         },
 
@@ -254,7 +258,7 @@ export default {
          * @params { Number }
          * @params { Number }
          */
-        onOverMediaModalOpened (width, height) {
+        onOverMediaModalOpened(width, height) {
             this.$emit(recordMediaEvents.OVER_MEDIA_MODAL_OPENED, width, height);
         },
 
@@ -262,24 +266,20 @@ export default {
          * revert back to original setting
          *
          */
-        onOverMediaModalClosed () {
+        onOverMediaModalClosed() {
             this.$emit(recordMediaEvents.OVER_MEDIA_MODAL_CLOSED);
         },
-
-    }
-
-}
+    },
+};
 </script>
 
 <template>
-    
     <div class="container">
-        
         <div class="media-container media-container-record">
             <video ref="recordingVideo" playsinline class="video-js vjs-record-skin"></video>
         </div>
 
-        <recorded-media 
+        <recorded-media
             v-if="hasPreRecordedData || hasNewRecording"
             class="media-container media-container-playback"
             :record-media-type="recordMediaTypes.SCREEN"
@@ -288,31 +288,38 @@ export default {
             :recorded-data="recordedData"
             @on-recorded-media-deleted="onRecordedMediaDeleted"
             @on-resize="onResize"
-            @on-over-media-modal-opened="onOverMediaModalOpened" 
+            @on-over-media-modal-opened="onOverMediaModalOpened"
             @on-over-media-modal-closed="onOverMediaModalClosed"
         />
 
-        <over-media-modal 
-            v-if="hasError" 
-            :is-closing="isOverMediaModalClosing" 
+        <over-media-modal
+            v-if="hasError"
+            :is-closing="isOverMediaModalClosing"
             :closed-call-back="onErrorModalClosed"
-            @on-over-media-modal-opened="onOverMediaModalOpened" 
+            @on-over-media-modal-opened="onOverMediaModalOpened"
             @on-over-media-modal-closed="onOverMediaModalClosed"
         >
-            <div v-if="hasDeviceAlreadyInUseError" class="alert-box warning">Screen sharing appears to be already in use or permission has been denied. Please close any Applications or Browser windows that may be using the camera and try again.</div>
-            <div v-else-if="hasPermissionDeniedError" class="alert-box alert">Permission to access the screen was denied. Please retry and grant access if you wish to proceed.</div>
-            <div v-else-if="isRecordingOverMaxFileSize" class="alert-box alert">Sorry, the recording has stopped as it is over the allowed file size limit. Please record a shorter screen recording or request your administrator(s) to increase the allowed file size limit.</div>
-            <div v-else-if="hasNotSupportedError" class="alert-box alert">Sorry, unable to record video. It's likely your browser does not support the required features. If possible please upgrade your browser.</div>
+            <div v-if="hasDeviceAlreadyInUseError" class="alert-box warning">
+                Screen sharing appears to be already in use or permission has been denied. Please close any Applications
+                or Browser windows that may be using the camera and try again.
+            </div>
+            <div v-else-if="hasPermissionDeniedError" class="alert-box alert">
+                Permission to access the screen was denied. Please retry and grant access if you wish to proceed.
+            </div>
+            <div v-else-if="isRecordingOverMaxFileSize" class="alert-box alert">
+                Sorry, the recording has stopped as it is over the allowed file size limit. Please record a shorter
+                screen recording or request your administrator(s) to increase the allowed file size limit.
+            </div>
+            <div v-else-if="hasNotSupportedError" class="alert-box alert">
+                Sorry, unable to record video. It's likely your browser does not support the required features. If
+                possible please upgrade your browser.
+            </div>
             <div v-else class="alert-box alert">Sorry, an unknown error has occured.</div>
             <button @click.prevent="onCloseErrorModalSelected">Close</button>
         </over-media-modal>
-
     </div>
-
 </template>
 
 <style lang="scss" scoped>
-
-@import '@schoolboxVue/components/videojs-record/videojs-record';
-
+@import "@schoolboxVue/components/videojs-record/videojs-record";
 </style>

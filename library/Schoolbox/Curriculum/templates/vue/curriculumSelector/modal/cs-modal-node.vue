@@ -1,17 +1,15 @@
 <script setup>
-
 /**
  * A curriculum node to select to traverse further down the tree,
  * or to CRUD via the actions
  */
 
-import { ref, computed, onMounted } from 'vue';
-import { gsap } from 'gsap/all';
-import { useModalActiveNodesStore, DIRECTION } from '../store/csModalActiveNodesStore';
-import { useModalSearchStore } from '../store/csModalSearchStore';
-import CsModalNodeCheckbox from './cs-modal-node-checkbox.vue';
-import CsModalNodeName from './cs-modal-node-name.vue';
-
+import { ref, computed, onMounted } from "vue";
+import { gsap } from "gsap/all";
+import { useModalActiveNodesStore, DIRECTION } from "../store/csModalActiveNodesStore";
+import { useModalSearchStore } from "../store/csModalSearchStore";
+import CsModalNodeCheckbox from "./cs-modal-node-checkbox.vue";
+import CsModalNodeName from "./cs-modal-node-name.vue";
 
 const props = defineProps({
     /**
@@ -22,11 +20,11 @@ const props = defineProps({
         required: true,
         default() {
             return {
-                id: '0',
-                name: '-',
+                id: "0",
+                name: "-",
                 children: [],
-            }
-        }
+            };
+        },
     },
     /**
      * to gradually add more marginLeft to indicate node level depth
@@ -45,7 +43,8 @@ const viewNodeEl = ref(null); //to animate the node
  * to animate on the node
  */
 onMounted(() => {
-    if (props.depth === 0) { //we only need to animate the first node, as the rest are contained within
+    if (props.depth === 0) {
+        //we only need to animate the first node, as the rest are contained within
         animateOn();
     }
 });
@@ -54,18 +53,18 @@ onMounted(() => {
  * animate to help show which direction we are currently moving through the tree
  * fade on the node and slide it from forwards/backwards depending on the currentDirection
  */
-function animateOn () {
+function animateOn() {
     const xStart = modalActiveNodesStore.currentDirection === DIRECTION.FORWARDS ? -10 : 10;
     gsap.set(viewNodeEl.value, {
         opacity: 0,
-        x: xStart
-    } );
+        x: xStart,
+    });
     gsap.to(viewNodeEl.value, {
-        ease: 'power1.out',
-        duration: 0.3 ,
+        ease: "power1.out",
+        duration: 0.3,
         opacity: 1,
-        x: 0
-    } );
+        x: 0,
+    });
 }
 
 /**
@@ -93,49 +92,36 @@ const borderBottomColour = computed(() => {
  *
  * @returns { Boolean }
  */
-const showChildren = computed(() => props.node.children && props.node.children.length > 0 && (props.depth+1) < 2);
+const showChildren = computed(() => props.node.children && props.node.children.length > 0 && props.depth + 1 < 2);
 
 /**
  * If there's a code available, which means it can be added to the name
  *
  * @returns { Boolean }
  */
-const hasCode = computed(() => props.node.code && props.node.code !== '');
+const hasCode = computed(() => props.node.code && props.node.code !== "");
 
 /**
  * Add in the code if it's available otherwise just show the title
  *
  * @returns { String }
  */
-const title = computed(() => hasCode.value ? `[${props.node.code}] ${props.node.name}` : `${props.node.name}`);
-
+const title = computed(() => (hasCode.value ? `[${props.node.code}] ${props.node.name}` : `${props.node.name}`));
 </script>
 
 <template>
     <li ref="viewNodeEl">
         <div :class="`buttons-container`">
-            <cs-modal-node-checkbox
-                :node="props.node"
-            />
-            <cs-modal-node-name
-                :node="props.node"
-                :depth="props.depth"
-                :title="title"
-            />
+            <cs-modal-node-checkbox :node="props.node" />
+            <cs-modal-node-name :node="props.node" :depth="props.depth" :title="title" />
         </div>
         <ul v-if="showChildren">
-            <cs-modal-node
-                v-for="node in props.node.children"
-                :key="node.id"
-                :node="node"
-                :depth="props.depth+1"
-            />
+            <cs-modal-node v-for="node in props.node.children" :key="node.id" :node="node" :depth="props.depth + 1" />
         </ul>
     </li>
 </template>
 
 <style lang="scss" scoped>
-
 .buttons-container {
     align-items: center;
     border-bottom: 1px solid v-bind(borderBottomColour);
@@ -150,5 +136,4 @@ ul {
     list-style: none; //don't use any dots
     margin: 0; //and spacing is controlled by props.depth
 }
-
 </style>

@@ -1,5 +1,4 @@
 <script>
-
 /**
  * Lazy load the CKEditor instance on demand
  */
@@ -7,15 +6,12 @@
 let __uniqueId = 0; //to ensure multiple instances of CKEditor on the same page have unique ids
 let __isFirstCKEditorLoad = true; //so a page only loads the CKEditor scripts once
 
-import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin'
-import { injectScript } from '@js/util/domUtils';
-import configTypes from '@js/editor/editorConfigTypes';
+import cdnPrefixMixin from "@schoolboxVue/components/cdn-prefix-mixin";
+import { injectScript } from "@js/util/domUtils";
+import configTypes from "@js/editor/editorConfigTypes";
 
 export default {
-
-    mixins: [
-        cdnPrefixMixin,
-    ],
+    mixins: [cdnPrefixMixin],
 
     props: {
         /* The id of the input/textarea element, supplied
@@ -29,24 +25,25 @@ export default {
          * by its id in CKEDITOR.instances[id], directly - so if you programmatically
          * generate them it's a bit annoying.
          */
-        presetUniqueId: { //
+        presetUniqueId: {
+            //
             type: String,
             required: false,
-            default: '',
+            default: "",
         },
         /* The name attribute for the input field, supplied
          * by whatever summons this component
          */
         inputName: {
             type: String,
-            required: true
+            required: true,
         },
         /* A word that represents a singular form
          * for the thing you're adding e.g. "Comment"
          */
         singular: {
             type: String,
-            required: true
+            required: true,
         },
         /* This is an identifier for an element which should be made hidden
          * when the ckeditor spawns. It shows a readonly version of what
@@ -54,20 +51,20 @@ export default {
          */
         proxy: {
             type: String,
-            required: false
+            required: false,
         },
         /* The existing textarea content to prefill
          */
         value: {
             type: String,
-            required: false
+            required: false,
         },
         /* Decide whether to show edit button
          * Users click this to activate a ckeditor
          */
         allowEdit: {
             type: Boolean,
-            required: true
+            required: true,
         },
         /* Decide whether to show submit button
          * If you're using this as part of a bigger form, set to false
@@ -76,14 +73,14 @@ export default {
          */
         allowSubmit: {
             type: Boolean,
-            required: true
+            required: true,
         },
         /* Spawn ckeditor immediately upon load so users don't need to
          * interact with the ui to start it
          */
         spawnImmediately: {
             type: Boolean,
-            required: true
+            required: true,
         },
         isProcessing: {
             type: Boolean,
@@ -95,16 +92,16 @@ export default {
         },
     },
 
-   data () {
+    data() {
         return {
             isCKEditorLoading: false,
             isCKEditorLoaded: false,
-            showEdit: true
-        }
+            showEdit: true,
+        };
     },
 
-    created () {
-        if (this.presetUniqueId === '') {
+    created() {
+        if (this.presetUniqueId === "") {
             this.uniqueId = __uniqueId.toString();
             __uniqueId += 1;
         } else {
@@ -112,7 +109,7 @@ export default {
         }
     },
 
-    mounted () {
+    mounted() {
         /* Spawn immediately, if configured to do so
          */
         if (this.spawnImmediately) {
@@ -120,18 +117,17 @@ export default {
         }
     },
 
-    unmounted () {
+    unmounted() {
         /**
          * check if a proxy existed, and if so display it again as per the saved display property
          */
-        let proxy = document.querySelector('#' + this.proxy);
+        let proxy = document.querySelector("#" + this.proxy);
         if (proxy) {
             proxy.style.display = proxy.dataset.display;
         }
     },
 
     computed: {
-
         /**
          * The text within the prompt button, will change to loading when selected to notify
          *
@@ -139,10 +135,10 @@ export default {
          */
         getEditButtonText() {
             if (this.isCKEditorLoading) {
-                return 'Loading';
+                return "Loading";
             }
 
-            return 'Add ' + this.singular;
+            return "Add " + this.singular;
         },
 
         /**
@@ -150,8 +146,8 @@ export default {
          *
          * @returns { Object }
          */
-        getStyles () {
-            return this.isCKEditorLoaded ? { 'position': 'static' } : { 'position': 'absolute', 'left': '-9999px' };
+        getStyles() {
+            return this.isCKEditorLoaded ? { position: "static" } : { position: "absolute", left: "-9999px" };
         },
 
         /**
@@ -159,30 +155,29 @@ export default {
          *
          * @returns {Boolean}
          */
-        isPostDisabled () {
+        isPostDisabled() {
             return false;
             // return this.newValue.trim() === '' || this.isProcessing;
-        }
+        },
     },
 
     methods: {
-
         /**
          * To initialise the CKEditor, passing in the preset config options that exist globally on the $ jQuery object
          */
-        spawnEditor () {
+        spawnEditor() {
             this.init(configTypes.BASIC);
 
             /* If a proxy element exists, hide it while the dynamic input is visible
              */
-            let proxy = document.querySelector('#' + this.proxy);
+            let proxy = document.querySelector("#" + this.proxy);
 
             if (proxy) {
                 /**
                  * we store the original display property so we can apply it again when this component is unmounted
                  */
                 proxy.dataset.display = proxy.style.display;
-                proxy.style.display = 'none';
+                proxy.style.display = "none";
             }
 
             /* Once the ck spawns you can also hide the edit button
@@ -195,7 +190,7 @@ export default {
          *
          * @param { String } editorType an option within editorTypes.js to determine which config options to pass to CKEditor
          */
-        async init (editorType) {
+        async init(editorType) {
             try {
                 this.isCKEditorLoading = true; //to replace 'Add a Comment' with 'Loading' once the prompt button is selected
                 if (__isFirstCKEditorLoad) {
@@ -207,7 +202,7 @@ export default {
             } catch (error) {
                 console.warn(error);
                 this.isCKEditorLoading = false;
-                this.$emit('on-load-error');
+                this.$emit("on-load-error");
             }
         },
 
@@ -219,15 +214,16 @@ export default {
          *
          * @returns { Object }
          */
-        getConfigOptions (editorType) {
+        getConfigOptions(editorType) {
             const vueSpecificConfig = this.getVueSpecificConfig();
 
-            const configOptions = { //use computed property names to retrieve the appropriate config options: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Object_initializer#computed_property_names
+            const configOptions = {
+                //use computed property names to retrieve the appropriate config options: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Object_initializer#computed_property_names
                 [configTypes.DEFAULT]: $.alaressEditorConfig(vueSpecificConfig),
                 [configTypes.FOR_COMMENTS]: $.alaressEditorConfigForComments(vueSpecificConfig),
                 [configTypes.WITH_USER_TOKENS]: $.alaressEditorConfigWithUserTokens(vueSpecificConfig),
                 [configTypes.BASIC]: $.alaressEditorConfigBasic(vueSpecificConfig),
-            }
+            };
             return configOptions[editorType] || $.alaressEditorConfig(vueSpecificConfig);
         },
 
@@ -236,54 +232,55 @@ export default {
          *
          * @returns { Object }
          */
-        getVueSpecificConfig () {
+        getVueSpecificConfig() {
             return {
                 on: {
-                    change: () => { // Bind the content of CKEditor into the comment model on change
-                        this.$emit('value-changed', CKEDITOR.instances[this.inputName].getData()); //notifying of any changes for a parent to maintain state
+                    change: () => {
+                        // Bind the content of CKEditor into the comment model on change
+                        this.$emit("value-changed", CKEDITOR.instances[this.inputName].getData()); //notifying of any changes for a parent to maintain state
                     },
-                    instanceReady: (event) => { //can display the loaded CKEditor now
+                    instanceReady: (event) => {
+                        //can display the loaded CKEditor now
                         const ckeditor = event.editor.container.$;
                         /**
                          * removing the Equation editor button via the 'removeButtons' in the config settings is currently preventing the drag and drop from working
                          * so we manually remove the button once the ckeditor instance is loaded
                          */
-                        const eqnEditorButton = ckeditor.querySelector('.cke_button__eqneditor');
-                        eqnEditorButton.style.display = 'none';
+                        const eqnEditorButton = ckeditor.querySelector(".cke_button__eqneditor");
+                        eqnEditorButton.style.display = "none";
                         this.isCKEditorLoading = false;
                         this.isCKEditorLoaded = true;
-                    }
+                    },
                 },
                 startupFocus: true,
                 targetElements: $(`#${this.presetUniqueId}`),
-            }
+            };
         },
 
         /**
          * Notify the parent to submit the form
          */
-        postItem () {
+        postItem() {
             const value = CKEDITOR.instances[this.inputName].getData();
-            this.$emit('post', value);
+            this.$emit("post", value);
         },
-    }
-}
-
+    },
+};
 </script>
 
 <template>
     <div class="dynamic-input">
         <div :style="getStyles">
             <textarea :id="this.presetUniqueId" :name="this.inputName" rows="4">{{ this.value }}</textarea>
-            <button v-if="this.allowSubmit" class="button submit" @click="postItem" :disabled="isPostDisabled">Save</button>
+            <button v-if="this.allowSubmit" class="button submit" @click="postItem" :disabled="isPostDisabled">
+                Save
+            </button>
         </div>
     </div>
 </template>
 
 <style lang="scss" scoped>
-
 .dynamic-input {
     margin-bottom: 1rem;
 }
-
 </style>

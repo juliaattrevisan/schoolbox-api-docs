@@ -1,20 +1,19 @@
 <script>
-import BadgeImage from './../../vue/badge-image';
-import goalMixin from './goal-mixin';
-import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
-import SequentialRevealModal from '@schoolboxVue/components/sequential-reveal-modal';
-import toastMixin from '@schoolboxVue/components/toast-mixin';
-import userProfileMixin from '../../../vue/user-profile/mixin';
-import axios from 'axios';
-import { animateBadgeImage } from '../js/animateBadgeImage'
-import { ResizeObserver } from 'vue3-resize';
-import 'vue3-resize/dist/vue3-resize.css';
-import CodesList from '@schoolboxCurriculum/vue/codes-list';
-import NodeDetails from '@schoolboxCurriculum/vue/node-details';
-import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin';
-import { getEmptyNode } from '@schoolboxCurriculum/js/nodeUtils';
-import { generateAwardWithEvidenceUrl } from '../js/awardBadgeUtils';
-
+import BadgeImage from "./../../vue/badge-image";
+import goalMixin from "./goal-mixin";
+import RelativeTime from "@schoolboxLearningMomentEvidence/relative-time";
+import SequentialRevealModal from "@schoolboxVue/components/sequential-reveal-modal";
+import toastMixin from "@schoolboxVue/components/toast-mixin";
+import userProfileMixin from "../../../vue/user-profile/mixin";
+import axios from "axios";
+import { animateBadgeImage } from "../js/animateBadgeImage";
+import { ResizeObserver } from "vue3-resize";
+import "vue3-resize/dist/vue3-resize.css";
+import CodesList from "@schoolboxCurriculum/vue/codes-list";
+import NodeDetails from "@schoolboxCurriculum/vue/node-details";
+import cdnPrefixMixin from "@schoolboxVue/components/cdn-prefix-mixin";
+import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
+import { generateAwardWithEvidenceUrl } from "../js/awardBadgeUtils";
 
 /**
  * Award detail modal.
@@ -23,7 +22,6 @@ import { generateAwardWithEvidenceUrl } from '../js/awardBadgeUtils';
  *                       (This is raised on the root Vue instance.)
  */
 export default {
-
     /**
      * Name.
      * The name of the component that we have here. This name will be used in the container
@@ -37,12 +35,7 @@ export default {
      * manner as a php trait. They must already be imported at the top of the file and will
      * be superpositioned on top of this javascript here, inside export default {}
      */
-    mixins: [
-        cdnPrefixMixin,
-        goalMixin,
-        toastMixin,
-        userProfileMixin
-    ],
+    mixins: [cdnPrefixMixin, goalMixin, toastMixin, userProfileMixin],
 
     /**
      * Props.
@@ -54,11 +47,11 @@ export default {
         returnUrl: {
             type: String,
             default: null,
-            required: false
-        }
+            required: false,
+        },
     },
 
-    emits: ['on-achievement-awarded'],
+    emits: ["on-achievement-awarded"],
 
     /**
      * Components.
@@ -88,7 +81,7 @@ export default {
             canvasWidth: 0,
             canvasHeight: 0,
             selectedNode: getEmptyNode(), //the selected curriculum code to display further details for
-        }
+        };
     },
 
     /**
@@ -96,8 +89,7 @@ export default {
      * Basically, when vue has done all its inits and is ready to go
      * kind of like window.onload
      */
-    mounted: function () {
-    },
+    mounted: function () {},
 
     /**
      * Computed properties.
@@ -113,8 +105,8 @@ export default {
             if (this.award.expiresAt === null) {
                 return false;
             }
-            return dayjs(this.award.expiresAt).isBefore(dayjs(), 'd');
-        }
+            return dayjs(this.award.expiresAt).isBefore(dayjs(), "d");
+        },
     },
 
     /**
@@ -123,11 +115,10 @@ export default {
      * other ordinary javascript that you might have written before.
      */
     methods: {
-
         /**
          * Open this modal.
          */
-        open (award) {
+        open(award) {
             this.award = award;
             this.isModalOpen = true;
             this.modelCheckInterval = setInterval(this.onModalCheck, 50); //be checking if the modal is on screen yet
@@ -138,7 +129,7 @@ export default {
          * As the canvas is within a modal, it's not currently in the dom, so we have to wait until
          * the foundation modal has displayed it, so we can ensure its dimensions are up to date.
          */
-        onModalCheck () {
+        onModalCheck() {
             const canvasDimensions = this.$refs.badgeImgContainer.getBoundingClientRect();
             if (canvasDimensions.width > 0) {
                 clearInterval(this.modelCheckInterval);
@@ -152,7 +143,7 @@ export default {
          * check to see whether this is the first time the user has viewed this badge achievement
          * and if so animate it to add a little sparkle
          */
-        checkForBadgeAnimation () {
+        checkForBadgeAnimation() {
             if (this.canAnimateBadgeImage()) {
                 this.checkBadgeAnimationCleanedUp();
                 this.animateBadgeImage();
@@ -166,11 +157,13 @@ export default {
          *
          * @returns { Boolean }
          */
-        canAnimateBadgeImage () {
-            return this.award.viewedOn === null //hasn't been looked at before
-                && this.award.recipient.id === window.schoolboxUser.id //is the awarded user
-                && this.award.isGoal === false //has been awarded
-                && this.award.badge.animate === true; //badge can be animated
+        canAnimateBadgeImage() {
+            return (
+                this.award.viewedOn === null && //hasn't been looked at before
+                this.award.recipient.id === window.schoolboxUser.id && //is the awarded user
+                this.award.isGoal === false && //has been awarded
+                this.award.badge.animate === true
+            ); //badge can be animated
         },
 
         /**
@@ -178,35 +171,35 @@ export default {
          * it displays as expected when the user re-opens the modal window after
          * closing it the first time.
          */
-        checkBadgeAnimationCleanedUp () {
-            const badgeImage = this.$refs.badgeImage.$el.querySelector('img');
-            badgeImage.style = ''; //gsap applies some style attributes, which should be cleared again
+        checkBadgeAnimationCleanedUp() {
+            const badgeImage = this.$refs.badgeImage.$el.querySelector("img");
+            badgeImage.style = ""; //gsap applies some style attributes, which should be cleared again
         },
 
         /**
          * animate the badge and notify that it's been viewed so
          * it won't be animated again
          */
-        animateBadgeImage () {
-            const badgeImage = this.$refs.badgeImage.$el.querySelector('img');
+        animateBadgeImage() {
+            const badgeImage = this.$refs.badgeImage.$el.querySelector("img");
             animateBadgeImage(badgeImage);
-            this.award.viewedOn = ''; //viewedOn will currently only be updated on page reload due to the way awards are currently displayed
+            this.award.viewedOn = ""; //viewedOn will currently only be updated on page reload due to the way awards are currently displayed
             axios.post(`/learning/badge/award/${this.award.id}/view`); //to update viewedOn in the backend
         },
 
         /**
          * Award the achievement
          */
-        awardAchievement () {
-            this.toastActivate('Awarding...');
+        awardAchievement() {
+            this.toastActivate("Awarding...");
             this.convertToAchievement(this.award)
                 .then((response) => {
-                    this.toastSuccess('Achievement awarded');
+                    this.toastSuccess("Achievement awarded");
 
                     // Once awarded: update the award within this object
                     this.award = response.data;
 
-                    this.$emit('on-achievement-awarded', this.award); //dispatch to react specifically to this badge achievement
+                    this.$emit("on-achievement-awarded", this.award); //dispatch to react specifically to this badge achievement
 
                     // And post a message to the other components that this
                     // user's awards have updated
@@ -214,8 +207,8 @@ export default {
                     this.emitUpdateToAllUserProfileFeeds();
                 })
                 .catch(() => {
-                    this.toastError('Failed to award achievement')
-                })
+                    this.toastError("Failed to award achievement");
+                });
             this.isModalOpen = false;
         },
 
@@ -224,7 +217,7 @@ export default {
          *
          * @pararm { object }
          */
-        onCodeSelected (node) {
+        onCodeSelected(node) {
             this.selectedNode = node;
             this.modalIndex++;
         },
@@ -232,15 +225,15 @@ export default {
         /**
          * The modal is now completely closed
          */
-        onModalClosed () {
+        onModalClosed() {
             this.isModalOpen = false;
         },
 
         /**
          * Redirect back to where we started and not the students profile.
          */
-        returnToHere( value ) {
-            return value + '?returnUrl=' + btoa(window.location.pathname);
+        returnToHere(value) {
+            return value + "?returnUrl=" + btoa(window.location.pathname);
         },
 
         /**
@@ -250,7 +243,7 @@ export default {
          *
          * @return { string }
          */
-        getEvidenceUrl (badgeId) {
+        getEvidenceUrl(badgeId) {
             return generateAwardWithEvidenceUrl(this.award.recipient.id, badgeId);
         },
 
@@ -259,7 +252,7 @@ export default {
          * @returns {string}
          */
         getReturnUrl() {
-            return (this.returnUrl !== null) ? `?returnUrl=${this.returnUrl}` : '';
+            return this.returnUrl !== null ? `?returnUrl=${this.returnUrl}` : "";
         },
 
         /**
@@ -268,7 +261,7 @@ export default {
          *
          * @returns { boolean }
          */
-        isAwardedGoal () {
+        isAwardedGoal() {
             return this.award.award !== null;
         },
 
@@ -278,7 +271,7 @@ export default {
          *
          * @returns { boolean }
          */
-        isUnawardedGoal () {
+        isUnawardedGoal() {
             return this.award.isGoal && this.award.award === null;
         },
 
@@ -288,7 +281,7 @@ export default {
          *
          * @returns { boolean }
          */
-        hasGoalAwardLink () {
+        hasGoalAwardLink() {
             return this.award._links?.goalAward !== null;
         },
 
@@ -298,7 +291,7 @@ export default {
          *
          * @returns { boolean }
          */
-        hasAwardUpdateLink () {
+        hasAwardUpdateLink() {
             return this.award._links?.awardUpdate !== null;
         },
 
@@ -310,7 +303,7 @@ export default {
          *
          * @returns { boolean }
          */
-        hasEvidence (award) {
+        hasEvidence(award) {
             return award.reason !== null && award.reason.length > 0;
         },
 
@@ -319,7 +312,7 @@ export default {
          *
          * @returns { boolean }
          */
-        awardedGoalHasEvidence () {
+        awardedGoalHasEvidence() {
             return this.award.award !== null && this.hasEvidence(this.award.award);
         },
 
@@ -331,10 +324,10 @@ export default {
          *
          * @returns { string }
          */
-        getViewEvidenceLink () {
+        getViewEvidenceLink() {
             // check if it's a goal that's been achieved which has evidence, otherwise a goal/achievement with evidence
             const awardId = this.awardedGoalHasEvidence(this.award) ? this.award.award.id : this.award.id;
-            return `/learning/badge/award/${awardId}/viewEvidence${this.getReturnUrl()}`
+            return `/learning/badge/award/${awardId}/viewEvidence${this.getReturnUrl()}`;
         },
 
         /**
@@ -344,22 +337,16 @@ export default {
          *
          * @returns { string }
          */
-        getAddEvidenceLink () {
+        getAddEvidenceLink() {
             // check if it's a goal that's been achieved so link to the achievement evidence, not the goal evidence, otherwise just link to the goal/achievement link
             const awardId = this.isAwardedGoal(this.award) ? this.award.award.id : this.award.id;
-            return `/learning/badge/award/${awardId}/update${this.getReturnUrl()}`
+            return `/learning/badge/award/${awardId}/update${this.getReturnUrl()}`;
         },
-
-    }
-}
+    },
+};
 </script>
 <template>
-    <sequential-reveal-modal
-        size="medium"
-        :isOpen="isModalOpen"
-        :sequence-index="modalIndex"
-        @closed="onModalClosed"
-    >
+    <sequential-reveal-modal size="medium" :isOpen="isModalOpen" :sequence-index="modalIndex" @closed="onModalClosed">
         <template v-slot:sequence-1>
             <template v-if="award.badge">
                 <div class="badge-modal">
@@ -369,37 +356,46 @@ export default {
                         </div>
                         <div class="badge-img-container__foreground">
                             <badge-image :badge="award.badge" :css="getCss(award)" ref="badgeImage"></badge-image>
-                            <div v-if="award.count > 1" class="award-count" :title="'Awarded ' + award.count + ' times'">x{{ award.count }}</div>
+                            <div
+                                v-if="award.count > 1"
+                                class="award-count"
+                                :title="'Awarded ' + award.count + ' times'"
+                            >
+                                x{{ award.count }}
+                            </div>
                         </div>
                     </div>
                     <!-- Only show the count if one was provided in the award -->
                     <h2>{{ award.badge.name }}</h2>
                     <p class="meta">Category: {{ award.badge.category.name }}</p>
                     <p class="meta">
-                        <template v-if="award.isGoal">
-                            Goal set
-                        </template>
-                        <template v-else>
-                            Awarded
-                        </template>
+                        <template v-if="award.isGoal"> Goal set </template>
+                        <template v-else> Awarded </template>
                         <relative-time :datetime="award.awardedAt" :key="`${award.id}-awardedAt`"></relative-time>
                         by
-                        <a :href="award.awardedBy._links.profile">{{ award.awardedBy.fullName }}</a><template v-if="award.expiresAt">,
+                        <a :href="award.awardedBy._links.profile">{{ award.awardedBy.fullName }}</a
+                        ><template v-if="award.expiresAt"
+                            >,
                             <template v-if="isExpired">expired</template>
                             <template v-else>expires</template>
-                            <relative-time :datetime="award.expiresAt" date-only :key="`${award.id}-expiresAt`"></relative-time>
+                            <relative-time
+                                :datetime="award.expiresAt"
+                                date-only
+                                :key="`${award.id}-expiresAt`"
+                            ></relative-time>
                         </template>
                     </p>
                     <p class="meta" v-if="award.isGoal && award.award">
-                        Goal has been achieved <relative-time :datetime="award.award.awardedAt" :key="`${award.id}-goalAwardedAt`"></relative-time>
+                        Goal has been achieved
+                        <relative-time
+                            :datetime="award.award.awardedAt"
+                            :key="`${award.id}-goalAwardedAt`"
+                        ></relative-time>
                     </p>
                     <template v-if="award.badge.curriculumNodes.length">
                         <p class="meta">
                             Curriculum Codes:
-                            <codes-list
-                                :nodes="award.badge.curriculumNodes"
-                                @selected="onCodeSelected"
-                            />
+                            <codes-list :nodes="award.badge.curriculumNodes" @selected="onCodeSelected" />
                         </p>
                     </template>
                     <article v-if="award.badge.body" v-html="award.badge.body"></article>
@@ -442,15 +438,12 @@ export default {
             </template>
         </template>
         <template v-slot:sequence-2>
-            <node-details
-                :node="selectedNode"
-            />
+            <node-details :node="selectedNode" />
         </template>
     </sequential-reveal-modal>
 </template>
 
 <style scoped>
-
 .modify-link {
     background: none;
     color: var(--content-ui-foreground);
@@ -464,5 +457,4 @@ article {
 .save-button {
     margin-bottom: 1rem;
 }
-
 </style>

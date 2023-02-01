@@ -1,7 +1,6 @@
 <script>
-
-import { ResizeObserver } from 'vue3-resize';
-import 'vue3-resize/dist/vue3-resize.css';
+import { ResizeObserver } from "vue3-resize";
+import "vue3-resize/dist/vue3-resize.css";
 
 /**
  * To display content that appears when requested from the bottom of the window.
@@ -9,9 +8,8 @@ import 'vue3-resize/dist/vue3-resize.css';
  * Once +1 users is selected the drawer will slide in from the bottom of the window.
  */
 export default {
-
     components: {
-        ResizeObserver //to track any size changes to the parent container
+        ResizeObserver, //to track any size changes to the parent container
     },
 
     props: {
@@ -25,7 +23,7 @@ export default {
         },
         /**
          * To unanchor the drawer from the bottom of the browser, usually on smaller widths.
-         * This is usually when there's multiple columns of content in the bottom-drawer, so it 
+         * This is usually when there's multiple columns of content in the bottom-drawer, so it
          * takes up too much height on smaller devices to still be position: fixed
          */
         isAlwaysAnchored: {
@@ -43,24 +41,23 @@ export default {
         },
     },
 
-    data () {
-        return { 
-            width: '', //as the drawer is position: fixed, need to use ResizeObserver to track the parent containers width
-            left: '', //as the drawer is position: fixed, need to use ResizeObserver to track the parent containers left position
-            position: '', //can be fixed/static when isAlwaysAnchored is set to false
-        }
+    data() {
+        return {
+            width: "", //as the drawer is position: fixed, need to use ResizeObserver to track the parent containers width
+            left: "", //as the drawer is position: fixed, need to use ResizeObserver to track the parent containers left position
+            position: "", //can be fixed/static when isAlwaysAnchored is set to false
+        };
     },
 
-    mounted () {
+    mounted() {
         this.updatePosition();
     },
 
     methods: {
-
         /**
          * Any changes to the element size are tracked by ResizeObserver so can update dimensions
          */
-        onContainerResize () {
+        onContainerResize() {
             this.updatePosition();
         },
 
@@ -69,22 +66,19 @@ export default {
          * which will change depending on whether the side menu is opened/closed, browser resized etc
          * And to also 'unanchor' the drawer from the bottom of the browser window when required
          */
-        updatePosition () {
+        updatePosition() {
             const elementRect = this.$el.getBoundingClientRect();
-            this.width = `${ elementRect.width }px`;
-            this.left = `${ elementRect.x }px`;
+            this.width = `${elementRect.width}px`;
+            this.left = `${elementRect.x}px`;
             this.position = elementRect.width <= this.unanchorWidth && !this.isAlwaysAnchored ? `static` : `fixed`;
         },
-
-    }
-
-}
-
+    },
+};
 </script>
 
 <template>
     <div>
-        <resize-observer @notify="onContainerResize"/>
+        <resize-observer @notify="onContainerResize" />
         <transition name="slide">
             <div v-show="showDrawer" class="bottom-drawer-container">
                 <!-- @slot Default slot, put whatever HTML markup you like in here -->
@@ -95,16 +89,15 @@ export default {
 </template>
 
 <style>
-
 .bottom-drawer-container {
     background: white;
     bottom: 0px;
     box-shadow: 0px -2px 6px 0px rgba(0, 0, 0, 0.1);
     height: auto;
-    left: v-bind(left); 
+    left: v-bind(left);
     padding: 1rem;
     position: v-bind(position);
-    width: v-bind(width); 
+    width: v-bind(width);
 }
 
 .slide-enter-active,
@@ -120,5 +113,4 @@ export default {
 .slide-leave-to {
     transform: translateY(100%);
 }
-
 </style>

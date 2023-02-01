@@ -10,7 +10,7 @@
     min-height: 1.5rem;
     line-height: 1.5rem;
     overflow: visible;
-    position: absolute!important;
+    position: absolute !important;
     right: 1.25rem;
     color: $success-color;
 }
@@ -25,7 +25,7 @@
     min-height: 1.5rem;
     line-height: 1.5rem;
     overflow: visible;
-    position: absolute!important;
+    position: absolute !important;
     right: 1.25rem;
     color: $alert-color;
 }
@@ -40,11 +40,10 @@
     min-height: 1.5rem;
     line-height: 1.5rem;
     overflow: visible;
-    position: absolute!important;
+    position: absolute !important;
     right: 1.25rem;
     color: $warning-color;
 }
-
 
 /* This is used to show which Respondents submitted a chosen response.
  * Formerly a panel (this is now extinct).
@@ -83,8 +82,8 @@
 
 /* Divide Matching Pairs questions
  */
-#answerCollection{
-    li ~ li{
+#answerCollection {
+    li ~ li {
         padding-top: rem-calc($base-font-size);
     }
 }

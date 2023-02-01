@@ -46,13 +46,13 @@
         line-height: normal !important;
     }
 
-    input[type="checkbox"]+label,
-    input[type="radio"]+label {
+    input[type="checkbox"] + label,
+    input[type="radio"] + label {
         margin: 0;
     }
 
-    input[type=checkbox],
-    input[type=radio] {
+    input[type="checkbox"],
+    input[type="radio"] {
         position: static;
         opacity: 1;
         width: auto;
@@ -63,7 +63,6 @@
 /* Icons for our custom plugins
  */
 a.cke_button {
-
     /* Add a generic link to a generic place
      */
     .cke_button__schoolboxlink_icon {
@@ -121,12 +120,17 @@ a.cke_button {
 
 article,
 .cke_editable {
-    h1, h2, h3, h4, h5, h6 {
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
         margin-bottom: 0.75rem;
         margin-top: 1.25rem;
     }
 
-    >:first-child {
+    > :first-child {
         margin-top: 0;
     }
 }

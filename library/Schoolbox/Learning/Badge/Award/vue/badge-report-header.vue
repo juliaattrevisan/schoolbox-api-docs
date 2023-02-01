@@ -1,48 +1,42 @@
 <script>
-
 /**
  * The badge report header
  */
 
 export default {
-    
     props: {
-        
-        hasSomeStudentsSelected: { //To show an 'indeterminate' state on the header checkbox, currently a dash in the box
+        hasSomeStudentsSelected: {
+            //To show an 'indeterminate' state on the header checkbox, currently a dash in the box
             type: Boolean,
-            required: true
+            required: true,
         },
-        areAllStudentsSelected: { 
+        areAllStudentsSelected: {
             type: Boolean,
-            required: true
-        }
+            required: true,
+        },
     },
 
     methods: {
-
         /**
          * To toggle on/off all students for badge selection
-         * 
-         * @params { Boolean } 
+         *
+         * @params { Boolean }
          */
-        onSelectAllSelected (isChecked) {
-            this.$emit('on-select-all-selected', isChecked);
+        onSelectAllSelected(isChecked) {
+            this.$emit("on-select-all-selected", isChecked);
         },
-
-    }
-
-}
-
+    },
+};
 </script>
 
 <template>
     <div class="header">
         <div class="header__checkbox">
             <div class="checklist">
-                <input 
+                <input
                     id="select-all"
                     type="checkbox"
-                    :class="{ indeterminate : hasSomeStudentsSelected }"
+                    :class="{ indeterminate: hasSomeStudentsSelected }"
                     :checked="areAllStudentsSelected"
                     @change="onSelectAllSelected($event.target.checked)"
                 />
@@ -53,7 +47,6 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-
 .header {
     display: flex;
     width: 100%;
@@ -75,7 +68,4 @@ export default {
     font-size: 0.8125rem;
     font-weight: 600;
 }
-
-
 </style>
-

@@ -1,19 +1,17 @@
 <script>
-
 /**
  * Bulk modify selected users
  */
 
-import UserBulkModifyFilters from './user-bulk-modify-filters.vue';
-import UserBulkModifyNewValues from './user-bulk-modify-new-values.vue';
-import FilterEvents from './userBulkModifyFilterEvents';
+import UserBulkModifyFilters from "./user-bulk-modify-filters.vue";
+import UserBulkModifyNewValues from "./user-bulk-modify-new-values.vue";
+import FilterEvents from "./userBulkModifyFilterEvents";
 import UserBulkModifyLog from "@schoolboxVue/components/log-modal";
-import BottomDrawer from '@schoolboxVue/components/bottomDrawer/bottom-drawer';
-import footerUI from '@schoolboxVue/components/vueTables2/mixinFooterUI';
-import RevealModal from '@schoolboxVue/components/reveal-modal';
+import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer";
+import footerUI from "@schoolboxVue/components/vueTables2/mixinFooterUI";
+import RevealModal from "@schoolboxVue/components/reveal-modal";
 
 export default {
-
     components: {
         UserBulkModifyFilters,
         UserBulkModifyNewValues,
@@ -23,165 +21,176 @@ export default {
     },
 
     mixins: [
-        footerUI //to place and keep the tables UI in the footer
+        footerUI, //to place and keep the tables UI in the footer
     ],
 
     props: {
         srcUserList: {
             type: String,
-            required: true
+            required: true,
         },
         srcUserModify: {
             type: String,
-            required: true
+            required: true,
         },
         srcUserDelete: {
             type: String,
-            required: true
+            required: true,
         },
         campuses: {
             type: Array,
-            required: true
+            required: true,
         },
         roles: {
             type: Array,
-            required: true
+            required: true,
         },
         yearLevels: {
             type: Array,
-            required: true
+            required: true,
         },
         eportfolioEnabled: {
-            type: Boolean
+            type: Boolean,
         },
         houses: {
             type: Array,
-            required: true
+            required: true,
         },
     },
 
-    emits: ['displayLog'],
+    emits: ["displayLog"],
 
-    data () {
+    data() {
         return {
             hasDataLoaded: false, //show loading display until true
             hasLoadError: false, //display load error
             rows: [],
             selectedRows: [], //keep track of which rows could be modified
-            tableColumns: ['firstname', 'preferred_name', 'lastname', 'external_id', 'campuses', 'role', 'year', 'token', 'eportfolio_enabled'],
+            tableColumns: [
+                "firstname",
+                "preferred_name",
+                "lastname",
+                "external_id",
+                "campuses",
+                "role",
+                "year",
+                "token",
+                "eportfolio_enabled",
+            ],
             tableOptions: {
-                customFilters: [ //refer to https://matanya.gitbook.io/vue-tables-2/custom-filters for further info
+                customFilters: [
+                    //refer to https://matanya.gitbook.io/vue-tables-2/custom-filters for further info
                     {
                         name: FilterEvents.CAMPUS,
                         callback: (row, query) => {
                             return row.campuses.join().includes(query); //need to flatten the campuses array then check
-                        }
+                        },
                     },
                     {
                         name: FilterEvents.ROLE,
                         callback: (row, query) => {
                             return row.role === query;
-                        }
+                        },
                     },
                     {
                         name: FilterEvents.YEAR,
                         callback: (row, query) => {
-                            if (query === 'null') {
+                            if (query === "null") {
                                 query = null; //cast to proper null here to match
                             }
                             return row.year === query;
-                        }
+                        },
                     },
                     {
                         name: FilterEvents.TOKEN,
                         callback: (row, query) => {
                             return row.token === query;
-                        }
+                        },
                     },
                     {
                         name: FilterEvents.EPORTFOLIO,
                         callback: (row, query) => {
                             return row.eportfolio_enabled === query;
-                        }
+                        },
                     },
                 ],
                 customSorting: {
-                    year: (ascending) => { //sort year level naturally
+                    year: (ascending) => {
+                        //sort year level naturally
                         return (a, b) => {
                             if (ascending) {
                                 return this.collator.compare(a.year, b.year);
                             } else {
                                 return this.collator.compare(b.year, a.year);
                             }
-                        }
-                    }
+                        };
+                    },
                 },
                 debounce: 100, //faster debounce as data is stored on the client side,
                 headings: {
-                    firstname: 'First Name',
-                    preferred_name: 'Preferred Name',
-                    lastname: 'Surname',
-                    external_id: 'External ID',
-                    campuses: 'Campuses',
-                    role: 'Role',
-                    year: 'Year Level',
-                    token: 'Token',
-                    eportfolio_enabled: 'ePortfolio',
+                    firstname: "First Name",
+                    preferred_name: "Preferred Name",
+                    lastname: "Surname",
+                    external_id: "External ID",
+                    campuses: "Campuses",
+                    role: "Role",
+                    year: "Year Level",
+                    token: "Token",
+                    eportfolio_enabled: "ePortfolio",
                 },
                 orderBy: {
                     ascending: false,
-                    column: 'Surname' //TODO ??
+                    column: "Surname", //TODO ??
                 },
                 perPage: 25,
                 perPageValues: [25, 50, 100, 150, 200],
                 resizableColumns: false,
                 selectable: {
-                    mode: 'multiple' //to enable multi-select
+                    mode: "multiple", //to enable multi-select
                 },
                 sortIcon: {
-                    is: 'glyphicon-sort',
-                    base: 'glyphicon',
-                    up: 'glyphicon-chevron-up',
-                    down: 'glyphicon-chevron-down'
+                    is: "glyphicon-sort",
+                    base: "glyphicon",
+                    up: "glyphicon-chevron-up",
+                    down: "glyphicon-chevron-down",
                 },
                 tabbable: false,
                 templates: {
                     campuses: (h, row, index) => {
-                        return row.campuses.join(', ');
+                        return row.campuses.join(", ");
                     },
                     token: (h, row, index) => {
-                        return row.token === '1' ? 'Set' : 'Not set';
+                        return row.token === "1" ? "Set" : "Not set";
                     },
                     eportfolio_enabled: (h, row, index) => {
-                        return row.eportfolio_enabled === '1' ? 'Enabled' : 'Disabled';
+                        return row.eportfolio_enabled === "1" ? "Enabled" : "Disabled";
                     },
                 },
                 texts: {
-                    filterPlaceholder: 'Search for users...',
-                    noResults: 'No matching users...',
-                    count: '{from}-{to} of {count}',
-                    limit: 'Rows per page:'
+                    filterPlaceholder: "Search for users...",
+                    noResults: "No matching users...",
+                    count: "{from}-{to} of {count}",
+                    limit: "Rows per page:",
                 },
             },
-            singleRowName: 'user',
-            pluralRowName: 'users',
+            singleRowName: "user",
+            pluralRowName: "users",
             selectContainer: null,
-            collator: new Intl.Collator('en', {numeric: true, sensitivity: 'base'}), //to naturally sort year level column
+            collator: new Intl.Collator("en", { numeric: true, sensitivity: "base" }), //to naturally sort year level column
             isShiftKeySelected: false, //to multi-select fields,
             hasSelectedShiftKey: false, //to hide a UI note
             hasDataError: false,
             logData: [], //to display the output of the returned action
-        }
+        };
     },
 
     computed: {
-
         /**
          * To track how many are selected
          *
          * @returns {Number}
          */
-        selectedRowsCount () {
+        selectedRowsCount() {
             return this.selectedRows.length;
         },
 
@@ -190,36 +199,34 @@ export default {
          *
          * @returns {String}
          */
-        selectedRowsCountWithRowName () {
+        selectedRowsCountWithRowName() {
             if (this.selectedRowsCount === 0) {
-                return 'No ' + this.singleRowName;
+                return "No " + this.singleRowName;
             } else if (this.selectedRowsCount === 1) {
-                return this.selectedRowsCount + ' ' + this.singleRowName;
+                return this.selectedRowsCount + " " + this.singleRowName;
             } else {
-                return this.selectedRowsCount + ' ' + this.pluralRowName;
+                return this.selectedRowsCount + " " + this.pluralRowName;
             }
         },
-
     },
 
-    mounted () {
+    mounted() {
         this.initShiftKeyDetection();
         this.loadRows();
     },
 
     methods: {
-
         /**
          * To hide a UI note informing of shift-selection once pressed once
          */
-        initShiftKeyDetection () {
-            document.addEventListener('keydown', (event) => {
-                if (event.key === 'Shift') {
+        initShiftKeyDetection() {
+            document.addEventListener("keydown", (event) => {
+                if (event.key === "Shift") {
                     this.isShiftKeySelected = true;
                 }
             });
-            document.addEventListener('keyup', (event) => {
-                if (event.key === 'Shift') {
+            document.addEventListener("keyup", (event) => {
+                if (event.key === "Shift") {
                     this.isShiftKeySelected = false;
                 }
             });
@@ -228,10 +235,10 @@ export default {
         /**
          * Load users
          */
-        async loadRows () {
+        async loadRows() {
             try {
                 const response = await fetch(this.srcUserList, {
-                    method: 'POST',
+                    method: "POST",
                     body: JSON.stringify(this.getRowsBody()),
                 });
                 this.rows = await response.json();
@@ -248,29 +255,30 @@ export default {
          *
          * @retrun { Object}
          */
-        getRowsBody () {
-            return  {
+        getRowsBody() {
+            return {
                 campusId: -1,
                 roleId: -1,
                 yearLevelId: -1,
                 token: -1,
                 ePortfolio: -1,
-            }
+            };
         },
 
         /**
          * To update the table to show the UI in the footer
          */
-        onLoaded () {
+        onLoaded() {
             this.$nextTick(() => this.footerUI_update());
         },
 
         /**
          * To keep track of selected rows
          */
-        onRowSelected (event) {
+        onRowSelected(event) {
             this.selectedRows = event;
-            if (this.selectedRows.length > 1 && this.isShiftKeySelected) { //to hide a UI note, notifying of availability of shift-select
+            if (this.selectedRows.length > 1 && this.isShiftKeySelected) {
+                //to hide a UI note, notifying of availability of shift-select
                 this.hasSelectedShiftKey = true;
             }
         },
@@ -278,7 +286,7 @@ export default {
         /**
          * Clear the selection
          */
-        clearRows () {
+        clearRows() {
             this.selectedRows = [];
             this.$refs.table.resetSelectedRows();
         },
@@ -286,21 +294,21 @@ export default {
         /**
          * To confirm/cancel selected users deletion
          */
-        onClearUsersSelected () {
+        onClearUsersSelected() {
             this.clearRows();
         },
 
         /**
          * To open the modify modal
          */
-        onModifySelected () {
+        onModifySelected() {
             this.$refs.newValues.modify(); //will open up the reveal-modal in user-bulk-modify-new-values
         },
 
         /**
          * Selected modify is complete, so clear the rows and update the data
          */
-        onUpdated () {
+        onUpdated() {
             this.clearRows();
             this.loadRows(); //refresh the data
         },
@@ -308,51 +316,49 @@ export default {
         /**
          * To confirm/cancel selected users deletion
          */
-        onDeleteUsersSelected () {
+        onDeleteUsersSelected() {
             this.$refs.deleteModal.open();
         },
 
         /**
          * Cancel the the selected users deletion
          */
-        onCancelDeleteUsersSelected () {
+        onCancelDeleteUsersSelected() {
             this.$refs.deleteModal.close();
         },
 
         /**
          * Delete the selected users
          */
-        async onConfirmDeleteUsersSelected () {
-            const usersToModifyIDList = this.selectedRows.map(row => row.id);
+        async onConfirmDeleteUsersSelected() {
+            const usersToModifyIDList = this.selectedRows.map((row) => row.id);
             const formData = new FormData();
             usersToModifyIDList.forEach((item) => {
-                formData.append('users[]', item);
+                formData.append("users[]", item);
             });
             try {
                 this.isProcessing = true;
                 const response = await fetch(this.srcUserDelete, {
                     headers: {
-                        'Accept': 'application/json',
+                        Accept: "application/json",
                     },
-                    method: 'POST',
+                    method: "POST",
                     body: formData,
                 });
                 const responseData = await response.json();
                 this.checkUpdateResponse(response, responseData);
                 this.$refs.deleteModal.close();
-
             } catch (error) {
                 console.warn(error);
                 this.isProcessing = false;
                 this.hasDataError = true;
-
             } finally {
                 this.hasUpdated = true;
                 this.isProcessing = false;
 
                 let logData = this.logData;
                 let hasDataError = this.hasDataError;
-                this.openLog({logData, hasDataError});
+                this.openLog({ logData, hasDataError });
             }
         },
 
@@ -361,9 +367,10 @@ export default {
          *
          * @returns { Array }
          */
-        getUpdatedRowsAfterUserDeletion () {
+        getUpdatedRowsAfterUserDeletion() {
             return this.rows.filter((row) => {
-                if (this.selectedRows.some((rowToDelete) => rowToDelete.id === row.id)) { //pull out any deleted rows, those rows that are in selectedFiles, which have just been deleted
+                if (this.selectedRows.some((rowToDelete) => rowToDelete.id === row.id)) {
+                    //pull out any deleted rows, those rows that are in selectedFiles, which have just been deleted
                     return false;
                 }
                 return true;
@@ -376,19 +383,23 @@ export default {
          * @param { Object }
          * @param { Object }
          */
-        checkUpdateResponse (response, responseData) {
-            if (response.ok) { //successful response
+        checkUpdateResponse(response, responseData) {
+            if (response.ok) {
+                //successful response
                 this.hasDataError = false;
                 this.logData = responseData;
                 this.rows = this.getUpdatedRowsAfterUserDeletion();
                 this.clearRows();
                 this.$refs.table.resetSelectedRows();
-            } else if (!response.ok && response.status === 501) { //otherwise check for 501 error
+            } else if (!response.ok && response.status === 501) {
+                //otherwise check for 501 error
                 this.hasDataError = true;
                 this.logData = [responseData.title]; //which comes in with an error message
             } else {
                 this.hasDataError = true;
-                this.logData = ['Sorry, an unknown error has occurred. Please contact your IT support if the problem persists.'];
+                this.logData = [
+                    "Sorry, an unknown error has occurred. Please contact your IT support if the problem persists.",
+                ];
                 if (responseData.title !== undefined) {
                     this.logData = [responseData.title];
                 }
@@ -398,17 +409,15 @@ export default {
         /**
          * send to log and open
          */
-        openLog ({logData, hasDataError = false}) {
+        openLog({ logData, hasDataError = false }) {
             let errorMessage = [];
             if (hasDataError) {
-                errorMessage = 'The bulk modify has failed to update. Further details are logged below.\n';
+                errorMessage = "The bulk modify has failed to update. Further details are logged below.\n";
             }
             this.$refs.userLogView.displayLog(logData, hasDataError, errorMessage);
-        }
-
+        },
     },
-
-}
+};
 </script>
 
 <template>
@@ -416,7 +425,8 @@ export default {
         <div v-if="hasLoadError">
             <section class="content">
                 <div tableData-alert class="alert-box alert">
-                    Sorry, we are currently unable to load the Bulk Modify list. Please contact your support it the problem persists.
+                    Sorry, we are currently unable to load the Bulk Modify list. Please contact your support it the
+                    problem persists.
                 </div>
             </section>
         </div>
@@ -459,7 +469,9 @@ export default {
             </table>
         </div>
         <bottom-drawer :showDrawer="selectedRowsCount > 0">
-            <h3 class="selected-count"><em>{{ selectedRowsCountWithRowName }} selected</em></h3>
+            <h3 class="selected-count">
+                <em>{{ selectedRowsCountWithRowName }} selected</em>
+            </h3>
             <span v-if="!hasSelectedShiftKey" class="shift-select-note">Use Shift+Select to select multiple users</span>
             <button @click.prevent="onClearUsersSelected" class="button-clear">Clear User Selection</button>
             <ul class="flex-list buttons">
@@ -467,7 +479,9 @@ export default {
                     <button @click.prevent="onModifySelected" class="submit">Modify</button>
                 </li>
                 <li class="one-third">
-                    <button @click.prevent="onDeleteUsersSelected" class="alert icon-delete button-delete">Delete Users</button>
+                    <button @click.prevent="onDeleteUsersSelected" class="alert icon-delete button-delete">
+                        Delete Users
+                    </button>
                 </li>
             </ul>
         </bottom-drawer>
@@ -487,26 +501,28 @@ export default {
         <reveal-modal ref="deleteModal">
             <h2>Please Confirm Multiple User Deletion</h2>
             <div data-alert class="alert-box alert">
-                You are about to permanently delete <strong>{{ selectedRowsCountWithRowName }}</strong>. Deleting users
-                will prevent them from logging into the system and from accessing resources that belong to them. Attached
-                resources that will be removed include; ePortfolio, My Files, Pastoral Records and My Links. Resources shared
-                with or by the user like Files, Grades, News, Forum Posts and other collaborative activities will remain
-                available.
+                You are about to permanently delete <strong>{{ selectedRowsCountWithRowName }}</strong
+                >. Deleting users will prevent them from logging into the system and from accessing resources that
+                belong to them. Attached resources that will be removed include; ePortfolio, My Files, Pastoral Records
+                and My Links. Resources shared with or by the user like Files, Grades, News, Forum Posts and other
+                collaborative activities will remain available.
             </div>
             <ul class="flex-list buttons">
-                <li><button @click.prevent="onConfirmDeleteUsersSelected" class="button submit">Confirm Deletion</button></li>
+                <li>
+                    <button @click.prevent="onConfirmDeleteUsersSelected" class="button submit">
+                        Confirm Deletion
+                    </button>
+                </li>
                 <li><button @click.prevent="onCancelDeleteUsersSelected" class="button">Cancel</button></li>
             </ul>
         </reveal-modal>
 
         <UserBulkModifyLog ref="userLogView" />
-
     </div>
 </template>
 
 <style lang="scss">
-
-@import '@schoolboxVue/components/vueTables2/vueTables2';
+@import "@schoolboxVue/components/vueTables2/vueTables2";
 
 .VueTables--client {
     padding-bottom: 100px; // allow space for bottom-drawer at the bottom
@@ -516,7 +532,8 @@ export default {
     margin-right: 1rem;
 }
 
-.button-clear, .selected-count {
+.button-clear,
+.selected-count {
     display: inline-block;
 }
 

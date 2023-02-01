@@ -1,14 +1,12 @@
 <script>
-
 /**
  * Contains the bulk modify fileters Campus, Role, ePortfolio, Year and Token
  */
 
-import { EventBus } from 'v-tables-3-select-rows';
-import FilterEvents from './userBulkModifyFilterEvents';
+import { EventBus } from "v-tables-3-select-rows";
+import FilterEvents from "./userBulkModifyFilterEvents";
 
 export default {
-
     props: {
         campuses: {
             type: Array,
@@ -29,55 +27,52 @@ export default {
     },
 
     methods: {
-
         /**
          * Show any rows that contain the selected campus
-         * 
+         *
          * @param { Event }
          */
-        onCampusChange (event) {
-            EventBus.emit(`vue-tables.filter::${FilterEvents.CAMPUS}`, event.target.value); //picked up by user-bulk-modify.vue 
+        onCampusChange(event) {
+            EventBus.emit(`vue-tables.filter::${FilterEvents.CAMPUS}`, event.target.value); //picked up by user-bulk-modify.vue
         },
 
         /**
          * Show any rows that contain the selected role
-         * 
+         *
          * @param { Event }
          */
-        onRoleChange (event) {
-            EventBus.emit(`vue-tables.filter::${FilterEvents.ROLE}`, event.target.value); //picked up by user-bulk-modify.vue 
+        onRoleChange(event) {
+            EventBus.emit(`vue-tables.filter::${FilterEvents.ROLE}`, event.target.value); //picked up by user-bulk-modify.vue
         },
 
         /**
          * Show any rows that contain the selected year
-         * 
+         *
          * @param { Event }
          */
-        onYearChange (event) {
-            EventBus.emit(`vue-tables.filter::${FilterEvents.YEAR}`, event.target.value); //picked up by user-bulk-modify.vue 
+        onYearChange(event) {
+            EventBus.emit(`vue-tables.filter::${FilterEvents.YEAR}`, event.target.value); //picked up by user-bulk-modify.vue
         },
 
         /**
          * Show any rows that contain the selected token
-         * 
+         *
          * @param { Event }
          */
-        onTokenChange (event) {
-            EventBus.emit(`vue-tables.filter::${FilterEvents.TOKEN}`, event.target.value); //picked up by user-bulk-modify.vue 
+        onTokenChange(event) {
+            EventBus.emit(`vue-tables.filter::${FilterEvents.TOKEN}`, event.target.value); //picked up by user-bulk-modify.vue
         },
 
         /**
          * Show any rows that contain the selected ePortfolio
-         * 
+         *
          * @param { Event }
          */
-        onEportfolioChange (event) {
-            EventBus.emit(`vue-tables.filter::${FilterEvents.EPORTFOLIO}`, event.target.value); //picked up by user-bulk-modify.vue 
+        onEportfolioChange(event) {
+            EventBus.emit(`vue-tables.filter::${FilterEvents.EPORTFOLIO}`, event.target.value); //picked up by user-bulk-modify.vue
         },
-
-    }
-
-}
+    },
+};
 </script>
 
 <template>
@@ -130,7 +125,6 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-
 $toWrapFlex: 1000px;
 
 .filters {
@@ -143,11 +137,10 @@ $toWrapFlex: 1000px;
     }
 }
 
-    .filters__column { 
-        flex: 1 1 0; //keep both sides equal
-        @media (max-width: $toWrapFlex) {
-            flex: none; //back to default state 
-        }
+.filters__column {
+    flex: 1 1 0; //keep both sides equal
+    @media (max-width: $toWrapFlex) {
+        flex: none; //back to default state
     }
-
+}
 </style>

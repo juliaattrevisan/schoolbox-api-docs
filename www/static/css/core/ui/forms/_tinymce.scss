@@ -1,6 +1,6 @@
-
 @media #{$small-only} {
-    table.mceLayout, textarea.tinyMCE {
+    table.mceLayout,
+    textarea.tinyMCE {
         width: 100% !important;
     }
     td.mceToolbar {
@@ -19,11 +19,11 @@ body#tinymce {
     padding: 1rem !important;
 }
 
-body#tinymce span.selected-word{
-    background: #CAE9B9;
+body#tinymce span.selected-word {
+    background: #cae9b9;
 }
 
-.mceIframeContainer{
+.mceIframeContainer {
     padding: 1rem;
 }
 
@@ -34,24 +34,25 @@ body#tinymce span.selected-word{
 }
 
 // Tables
-.mceEditor table{
-	background: transparent;
-	margin: 0;
-	td{
-		padding: 0;
-	}
+.mceEditor table {
+    background: transparent;
+    margin: 0;
+    td {
+        padding: 0;
+    }
 }
 .cirkuitSkin .mceButton {
-	height: auto;
-	width: auto;
+    height: auto;
+    width: auto;
     min-height: initial;
 }
-.cirkuitSkin .mceSplitButton a.mceOpen, .cirkuitSkin .mceSplitButton a.mceAction {
+.cirkuitSkin .mceSplitButton a.mceOpen,
+.cirkuitSkin .mceSplitButton a.mceAction {
     min-height: initial;
 }
 
-.mceLayout{
-	border: 1px solid #ccc;
+.mceLayout {
+    border: 1px solid #ccc;
 }
 
 table.mceLayout tbody tr td {
@@ -63,7 +64,6 @@ table.mceLayout tbody tr:hover td {
 }
 
 .mceEditor.cirkuitSkin {
-
     table.mceLayout {
         border: none;
         .mceToolbar {
@@ -81,7 +81,8 @@ table.mceLayout tbody tr:hover td {
             border: none;
             padding: 0 !important;
             @extend .meta;
-            span, a {
+            span,
+            a {
                 @extend .meta;
             }
         }

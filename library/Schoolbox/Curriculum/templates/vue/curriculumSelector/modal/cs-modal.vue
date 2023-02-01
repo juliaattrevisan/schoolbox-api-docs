@@ -1,16 +1,14 @@
 <script setup>
-
 /**
  * The modal that's used to help select curriculum
  */
 
-import { ref, watch } from 'vue';
-import { useModalStore } from '../store/csModalStore';
-import RevealModal from '@schoolboxVue/components/reveal-modal.vue';
-import CsModalHeader from './cs-modal-header.vue';
-import CsModalNodes from './cs-modal-nodes.vue';
-import CsModalFooter from './cs-modal-footer.vue';
-
+import { ref, watch } from "vue";
+import { useModalStore } from "../store/csModalStore";
+import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
+import CsModalHeader from "./cs-modal-header.vue";
+import CsModalNodes from "./cs-modal-nodes.vue";
+import CsModalFooter from "./cs-modal-footer.vue";
 
 const modalStore = useModalStore();
 const modalEl = ref(null);
@@ -18,17 +16,19 @@ const modalEl = ref(null);
 /**
  * to open the modal when requested
  */
-watch(() => modalStore.isOpen, (newIsOpen) => {
-    newIsOpen ? modalEl.value.open() : modalEl.value.close();
-});
+watch(
+    () => modalStore.isOpen,
+    (newIsOpen) => {
+        newIsOpen ? modalEl.value.open() : modalEl.value.close();
+    }
+);
 
 /**
  * close the modal
  */
-function onModalClosed () {
+function onModalClosed() {
     modalStore.cancel();
 }
-
 </script>
 
 <template>
@@ -45,6 +45,4 @@ function onModalClosed () {
     </reveal-modal>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

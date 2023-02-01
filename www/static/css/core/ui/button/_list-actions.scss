@@ -38,7 +38,7 @@
                 }
             }
             a[class*="icon-"],
-            a[class^="icon-"]{
+            a[class^="icon-"] {
                 padding: 0;
                 display: inline-block;
                 text-align: center;
@@ -50,7 +50,8 @@
                     padding-right: 0;
                     float: none;
                 }
-                &[disabled], &.disabled {
+                &[disabled],
+                &.disabled {
                     opacity: 0.33;
                 }
                 &.selected {
@@ -58,15 +59,15 @@
                     background-color: $content-ui-foreground;
                 }
                 &:hover {
-                    background-color: rgba(0,0,0,0.1);
+                    background-color: rgba(0, 0, 0, 0.1);
                     text-decoration: none;
                 }
             }
 
-            a[aria-expanded="true"]{
+            a[aria-expanded="true"] {
                 background-color: $content-ui-background;
                 opacity: 1;
-                &:hover{
+                &:hover {
                     background-color: $content-ui-background;
                     opacity: 0.7;
                 }
@@ -84,7 +85,6 @@
         &.dz-error > nav a {
             color: $attachzone-error-color;
         }
-
     }
 
     /* Inside a containing column, but not an action-
@@ -93,7 +93,8 @@
     .row.actions-small-#{$i} {
         nav {
             right: 1rem;
-            @media #{$small-only} { //currently creating a Sass compile error
+            @media #{$small-only} {
+                //currently creating a Sass compile error
                 right: 0;
             }
         }
@@ -104,8 +105,10 @@
             right: 0;
         }
 
-        @media #{$small-only} { //currently creating a Sass compile error
-            .column, .columns {
+        @media #{$small-only} {
+            //currently creating a Sass compile error
+            .column,
+            .columns {
                 padding-left: 0;
                 padding-right: 0;
             }
@@ -122,10 +125,11 @@
     @extend .show-for-medium-up;
     font-weight: $font-weight-bold;
     font-size: $paragraph-font-size;
-    padding-top: .5rem;
+    padding-top: 0.5rem;
 }
 
-.sortable, .sortable-card {
+.sortable,
+.sortable-card {
     .list-header {
         padding-left: 40px; // TODO needs to be not hardcoded, but vars don't exist - see %interaction-selector
     }
@@ -138,7 +142,8 @@
         padding-right: 0.5rem;
         padding-left: 0.5rem;
     }
-    .sortable, .sortable-card {
+    .sortable,
+    .sortable-card {
         .list-item {
             // remove guttering if there's a grip handle
             padding-left: 0;

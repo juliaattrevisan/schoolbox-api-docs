@@ -1,12 +1,10 @@
 <script>
+/**
+ * To display a list canvas Assignments
+ */
 
-    /**
-    * To display a list canvas Assignments
-    */
-
-    export default {
-
-    name: 'canvas-assignments',
+export default {
+    name: "canvas-assignments",
 
     /**
      * Data.
@@ -14,14 +12,14 @@
      * Note that v-if and v-for must never be on the same node together, as this overrides
      * the meaning of "this" in a way you don't expect.
      */
-    data () {
-    return {
-    hasAssignments: null,
-    loading: false,
-    assignments: [],
-    error: false,
-}
-},
+    data() {
+        return {
+            hasAssignments: null,
+            loading: false,
+            assignments: [],
+            error: false,
+        };
+    },
 
     /**
      * Mounted.
@@ -32,9 +30,9 @@
      * see https://vuejs.org/v2/guide/instance.html#Lifecycle-Diagram for reference
      *
      */
-    mounted () {
+    mounted() {
         this.getData();
-},
+    },
 
     /**
      * Methods.
@@ -45,21 +43,18 @@
         async getData() {
             this.loading = true; //Show skeleton
             try {
-                const response = await fetch(
-                    '/canvas/assignments',
-                    {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-Requested-With' : 'XMLHttpRequest'
-                        }
-                    }
-                )
+                const response = await fetch("/canvas/assignments", {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-Requested-With": "XMLHttpRequest",
+                    },
+                });
 
                 // Add ability to limit events:
                 // need to filter, then sort, then slice
                 this.assignments = await response.json();
-                if(this.assignments.error) {
+                if (this.assignments.error) {
                     this.error = this.assignments.status;
                     this.hasAssignments = false;
                     this.assignments = false;
@@ -72,39 +67,40 @@
                 }
             } catch (error) {
                 this.loading = false;
-                this.error = error
+                this.error = error;
                 this.assignments = false;
             } finally {
                 this.loading = false;
             }
-        }
-    }
-
-}
-
+        },
+    },
+};
 </script>
 
 <template>
-        <div v-if="loading">
-            <div class="loader"></div>
-        </div>
-        <div v-if="!hasAssignments && !loading && error" class="">
-            We are unable to retrieve any assignments from canvas due to a connection error.
-        </div>
-        <div v-else-if="!hasAssignments && !loading">
-            You currently have no assignments that are due in the next 30 days
-        </div>
-        <ul v-else class="action-list">
-            <li v-for="assignment in assignments.assignments" :key="assignment.id">
-                <div class="list-item">
-                    <div class="card small-12">
-
-                        <h3><a :href="assignment.html_url">{{ assignment.title }}</a></h3>
-                        <p class="meta">{{ assignment.context_name }}</p>
-                        <div v-if="assignment.end_at" class="meta">Due: <time>{{ assignment.end_at }}</time></div>
-                        <div v-else class="meta">&nbsp;</div>
+    <div v-if="loading">
+        <div class="loader"></div>
+    </div>
+    <div v-if="!hasAssignments && !loading && error" class="">
+        We are unable to retrieve any assignments from canvas due to a connection error.
+    </div>
+    <div v-else-if="!hasAssignments && !loading">
+        You currently have no assignments that are due in the next 30 days
+    </div>
+    <ul v-else class="action-list">
+        <li v-for="assignment in assignments.assignments" :key="assignment.id">
+            <div class="list-item">
+                <div class="card small-12">
+                    <h3>
+                        <a :href="assignment.html_url">{{ assignment.title }}</a>
+                    </h3>
+                    <p class="meta">{{ assignment.context_name }}</p>
+                    <div v-if="assignment.end_at" class="meta">
+                        Due: <time>{{ assignment.end_at }}</time>
                     </div>
+                    <div v-else class="meta">&nbsp;</div>
                 </div>
-            </li>
-        </ul>
+            </div>
+        </li>
+    </ul>
 </template>

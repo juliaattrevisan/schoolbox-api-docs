@@ -1,15 +1,13 @@
 <script setup lang="ts">
-
 /**
  * to show further info in a modal on a code that's been selected
  */
 
-import { useStore } from '../store/manageCurriculumStore';
-import { computed, watch } from 'vue';
-import { useActiveNodeStore } from './store/mcActiveNodeStore';
-import { useAddSubsectionStore } from './store/mcAddSubsectionStore';
-import { useDescriptionEditor } from '../composable/useDescriptionEditor';
-
+import { useStore } from "../store/manageCurriculumStore";
+import { computed, watch } from "vue";
+import { useActiveNodeStore } from "./store/mcActiveNodeStore";
+import { useAddSubsectionStore } from "./store/mcAddSubsectionStore";
+import { useDescriptionEditor } from "../composable/useDescriptionEditor";
 
 const props = defineProps({
     /**
@@ -42,7 +40,7 @@ const ckeditorInstance = computed(() => `description-${activeNodeStore.node.id}`
 /**
  * Use a customised ckeditor for the description field
  */
- const descriptionField = useDescriptionEditor(addSubsectionStore.subsection.description, ckeditorInstance.value);
+const descriptionField = useDescriptionEditor(addSubsectionStore.subsection.description, ckeditorInstance.value);
 
 /**
  * And watch for changes on this field so we can update the description in the store
@@ -57,27 +55,27 @@ watch(descriptionField, (newValue) => {
  *
  * @returns { String }
  */
-const addButtonText = computed(() => addSubsectionStore.isProcessing ? 'Adding...' : 'Add');
+const addButtonText = computed(() => (addSubsectionStore.isProcessing ? "Adding..." : "Add"));
 
 /**
  * submit save
  */
-function onAddSubsectionSelected () {
+function onAddSubsectionSelected() {
     addSubsectionStore.add();
 }
 
 /**
  * to display the toast on subsection added / failed
  */
- addSubsectionStore.$onAction(({ name, after, onError }) => {
-    if (name === 'add') {
-        store.toastEl.value.activate('Adding...');
+addSubsectionStore.$onAction(({ name, after, onError }) => {
+    if (name === "add") {
+        store.toastEl.value.activate("Adding...");
         after((result) => {
             store.toastEl.value.timeout(result.message, true, 5000);
         });
         onError((error) => {
             console.warn(error);
-            store.toastEl.value.timeout('Unable to add subsection', false, 5000);
+            store.toastEl.value.timeout("Unable to add subsection", false, 5000);
         });
     }
 });
@@ -85,7 +83,7 @@ function onAddSubsectionSelected () {
 /**
  * close the addSubsection view
  */
-function onCancelSelected () {
+function onCancelSelected() {
     addSubsectionStore.cancel();
 }
 
@@ -97,7 +95,6 @@ function onCancelSelected () {
 const isAddDisabled = computed(() => {
     return addSubsectionStore.subsection.name.trim().length === 0 || addSubsectionStore.isProcessing;
 });
-
 </script>
 
 <template>
@@ -107,11 +104,17 @@ const isAddDisabled = computed(() => {
                 <legend>Add subsection</legend>
                 <div class="small-12 columns">
                     <label for="name" class="required">Name</label>
-                    <input type="text" id="name" v-model="addSubsectionStore.subsection.name" maxlength="2048" required>
+                    <input
+                        type="text"
+                        id="name"
+                        v-model="addSubsectionStore.subsection.name"
+                        maxlength="2048"
+                        required
+                    />
                 </div>
                 <div class="small-12 columns">
                     <label for="code">Code</label>
-                    <input type="text" id="code" v-model="addSubsectionStore.subsection.code" maxlength="64">
+                    <input type="text" id="code" v-model="addSubsectionStore.subsection.code" maxlength="64" />
                 </div>
                 <div class="small-12 columns">
                     <label for="description">Description</label>
@@ -148,7 +151,6 @@ const isAddDisabled = computed(() => {
 </template>
 
 <style lang="scss" scoped>
-
 .node-container {
     border-bottom: 1px solid var(--content-ui-background);
     border-top: 1px solid var(--content-ui-background);
@@ -161,5 +163,4 @@ legend {
     font-size: 1rem;
     margin-bottom: 1rem;
 }
-
 </style>

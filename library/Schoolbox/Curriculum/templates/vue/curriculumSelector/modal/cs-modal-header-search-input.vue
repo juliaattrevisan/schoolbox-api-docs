@@ -1,14 +1,12 @@
 <script setup>
-
 /**
  * To search the currently selected curriculum node
  */
 
-import { computed, watch } from 'vue';
-import debounce from 'lodash/debounce';
-import { useModalActiveNodesStore } from '../store/csModalActiveNodesStore';
-import { useModalSearchStore, DEBOUNCE_AMOUNT } from '../store/csModalSearchStore';
-
+import { computed, watch } from "vue";
+import debounce from "lodash/debounce";
+import { useModalActiveNodesStore } from "../store/csModalActiveNodesStore";
+import { useModalSearchStore, DEBOUNCE_AMOUNT } from "../store/csModalSearchStore";
 
 const modalActiveNodesStore = useModalActiveNodesStore();
 const modalSearchStore = useModalSearchStore();
@@ -27,7 +25,7 @@ const isDisabled = computed(() => !modalActiveNodesStore.isActive);
  */
 const placeholder = computed(() => {
     if (isDisabled.value) {
-        return 'Expand a curriculum to enable search...'
+        return "Expand a curriculum to enable search...";
     } else {
         return `Search for codes or keywords...`;
     }
@@ -36,12 +34,15 @@ const placeholder = computed(() => {
 /**
  * start searching once the search is active, watching the query string for input
  */
- watch(() => modalSearchStore.query, () => {
-    if (modalSearchStore.isActive) {
-        modalSearchStore.enableSearch();
-        debounceSearch();
+watch(
+    () => modalSearchStore.query,
+    () => {
+        if (modalSearchStore.isActive) {
+            modalSearchStore.enableSearch();
+            debounceSearch();
+        }
     }
-});
+);
 
 /**
  * debounce to avoid constant polling while the user is typing
@@ -53,10 +54,9 @@ const debounceSearch = debounce(() => {
 /**
  * Clear the current search query
  */
- function onClearSearchSelected () {
+function onClearSearchSelected() {
     modalSearchStore.clear();
 }
-
 </script>
 
 <template>
@@ -77,7 +77,7 @@ const debounceSearch = debounce(() => {
             @click.prevent="onClearSearchSelected"
             @keyup.enter="onClearSearchSelected"
         >
-        Clear
+            Clear
         </button>
     </div>
 </template>

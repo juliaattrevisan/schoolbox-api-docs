@@ -1,16 +1,14 @@
 <script setup>
-
 /**
  * To list all the current search results, also include a select all
  * button to easily add/remove all search results
  */
 
-import { ref, computed, watch, nextTick } from 'vue';
-import { gsap } from 'gsap/all';
-import { useSearchStore  } from '../store/mgSearchStore';
-import MgSelectAllSearchResults from './mg-select-all-search-results.vue';
-import MgAddMembersSearchResult from './mg-search-result.vue';
-
+import { ref, computed, watch, nextTick } from "vue";
+import { gsap } from "gsap/all";
+import { useSearchStore } from "../store/mgSearchStore";
+import MgSelectAllSearchResults from "./mg-select-all-search-results.vue";
+import MgAddMembersSearchResult from "./mg-search-result.vue";
 
 const searchStore = useSearchStore();
 const searchResultsContainerEl = ref(null);
@@ -29,21 +27,27 @@ const showSelectAll = computed(() => {
 /**
  * so can slide down to show searching
  */
-watch(() => searchStore.isLoading, () => {
-    nextTick(() => animate());
-});
+watch(
+    () => searchStore.isLoading,
+    () => {
+        nextTick(() => animate());
+    }
+);
 
 /**
  * to slide up and down based on the amount of results
  */
-watch(() => searchStore.filteredResults, () => {
-    nextTick(() => animate());
-});
+watch(
+    () => searchStore.filteredResults,
+    () => {
+        nextTick(() => animate());
+    }
+);
 
 /**
  * to slide up and down the search results
  */
-function animate () {
+function animate() {
     //the height will be 2 as there's a 2px border, and we add +1 to allow the border to be shown
     const targetHeight = searchResultsEl.value.offsetHeight === 2 ? 0 : searchResultsEl.value.offsetHeight + 1;
     gsap.to(searchResultsContainerEl.value, {
@@ -51,7 +55,6 @@ function animate () {
         height: targetHeight,
     });
 }
-
 </script>
 
 <template>
@@ -59,22 +62,25 @@ function animate () {
         <div class="search-results" ref="searchResultsEl">
             <ul>
                 <li v-if="searchStore.isLoading" class="search-status">Searching for results....</li>
-                <li v-else-if="searchStore.hasNoResults" class="search-status">No results found for your current search.</li>
+                <li v-else-if="searchStore.hasNoResults" class="search-status">
+                    No results found for your current search.
+                </li>
                 <template v-else>
                     <li v-if="showSelectAll">
                         <mg-select-all-search-results />
                     </li>
                     <li v-for="result in searchStore.filteredResults" :key="result.id">
-                        <mg-add-members-search-result :result="result"/>
+                        <mg-add-members-search-result :result="result" />
                     </li>
                 </template>
             </ul>
-        </div><!-- .search-results -->
-    </div><!-- .search-results-container -->
+        </div>
+        <!-- .search-results -->
+    </div>
+    <!-- .search-results-container -->
 </template>
 
 <style lang="scss" scoped>
-
 .search-results-container {
     height: 0; //will animate the results within with the watch() above
     overflow: hidden;
@@ -100,9 +106,8 @@ function animate () {
 }
 
 .search-status {
-    background-color: #FAFAFA;
+    background-color: #fafafa;
     padding: 0.75rem;
     font-style: italic;
 }
-
 </style>

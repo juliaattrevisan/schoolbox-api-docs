@@ -1,0 +1,199 @@
+architecture of SB
+
+Services
+
+Core points of ingress:
+
+Schoolbox web
+* talk about Aura vs Sitepage paradigms?
+* maybe keep as an overview of services?
+
+CLI
+Daemons
+Notifications
+
+Ancillary services:
+
+Notifications
+Database
+Gotenberg
+Task daemon
+Etherpad?
+External DB
+
+
+
+entities and use-cases
+
+Assessments
+Comms
+Portal
+SUDS
+Admin?
+
+
+
+various folders in library/
+
+Alaress/ should be libraries with no relation to Schoolbox-specific code: all libs unless otherwise mentioned
+- Application is just the base kernel: should move to Schoolbox or be made more abstract
+- Async looks like stuff for working with Rabbit queues, and the broker
+- Authorizer is the permission rules: should move to Schoolbox
+- Byte is a library
+- Cache is a library? Could be depercated
+- Codec a library
+- Color a library
+- CSRF a library
+- CSV a library
+- Curl a library
+- Database a library:
+- DataStructures a library
+- Date a library
+- Diff
+- Exception
+- File
+- Html
+- HtmlPurifier
+- Http
+- Image a library: but this could be moved to Schoolbox
+- Jitter
+- Json a library but should be deprecated?
+- Lock a library, but the inspector should move to Schoolbox
+- Log
+- Lumberjack
+- Mail
+- Module belongs to Schoolbox's framework?
+- Oauth2
+- Paginator
+- Password
+- Random
+- Redis a library, but CLI tool should be extracted
+- Routing belongs to notifications?
+- Rss should move?
+- Rules is mainly UPS?
+- Saml
+- Scheduler belongs to notifications?
+- Sentry
+- Session probably belongs to Schoolbox?
+- Specification I don't know what this is
+- Statistics
+- Test (just tests)
+- Twig probably belongs in Schoolbox, as it's application-specific?
+- Validator should be removed
+- Weather contains only a cache
+- Web maybe belongs only to Schoolbox?
+- WorkerCrew belongs to notifications
+- Xml
+
+
+Other library folders (non-Schoolbox) belong in Schoolbox unless otherwise stated
+- Assess
+- Attendance
+- Bulk
+- Calendar
+- Component
+- Custom (should be its own namespace)
+- DailyQuote
+- DAV
+- EOTC
+- Eportfolio
+- Etherpad
+- Evaluation
+- Event
+- External
+- Leave
+- Proxy
+- Report
+- Schoolbox (its own namespace)
+- SocialStream
+- Survey
+- Timetable
+- User
+
+
+The Schoolbox folder contains:
+- Admin (a feature)
+- API (library?)
+- ApiAssessment (feature)
+- ApiUser (feature)
+- Application (library mostly, exc. Login, Feedback, Policy?)
+- Assessment (feature)
+- Auth (library, interface to other systems e.g. Redis?)
+- Blog (feature)
+- Bookmark (feature)
+- Calendar (feature mainly, maybe some library?)
+- Canvas (library)
+- CDN (library)
+- Clipboard (feature?)
+- CMS (feature)
+- Column (library, used by Mapper)
+- Comms (feature)
+- Component (feature?)
+- Config (library/feature)
+- Curriculum (feature)
+- Cyberhound (feature)
+- Database (library)
+- DI (library)
+- Discussion (feature)
+- Dropbox (feature)
+- Editor (feature)
+- Engagement (feature)
+- Error (library/feature?)
+- External (library, interface to other systems)
+- Feed (feature)
+- File (feature?)
+- Filter (odd space betwen library and feature)
+- Fixtures (feature)
+- Forum (feature)
+- Geosnapshot (feature)
+- Gotenberg (feature, interface to other systems)
+- Greenhouse (feature)
+- Group (feature)
+- Help (feature: could be split into send/receive)
+- Iframely (library)
+- ImmersiveReader (feature)
+- Import (move alongside other external classes?)
+- InstanceRegistry (library: interface to help?)
+- Intellischool (feature: interface to remote)
+- JSON (library)
+- L10n (library)
+- Learning (feature)
+- LearningAnalytics (feature, move to in Learning)
+- LTI (library and feature: interface to LTI 1.3?)
+- Mail (library: interface to mail)
+- Mapper (library: interface to DB)
+- Menu (feature)
+- MobileApp (feature: interface to remote login?)
+- Mobile (library)
+- Notif (library, interface to notifications system)
+- Pastoral (feature: accepts import?)
+- Permission (library)
+- Picker (feature)
+- Preview (feature)
+- ProfessionalDevelopment (feature: belongs in custom help?)
+- Profile (feature)
+- Qrcode (feature)
+- Realtime (library, interface to notifications, from socket delivery)
+- Resource (feature)
+- ResourceBooking (feature)
+- Search (feature)
+- Statistics (feature)
+- Submenu (feature)
+- Survey (feature)
+- Sync (feature, used by UPS)
+- TagCloud (feature)
+- TaskDaemon (feature, interface to task daemon)
+- Test (tests)
+- Tile (feature)
+- Timetable (feature)
+- TokenReplacer (library)
+- Tour (feature)
+- Twitter (feature, interface to Twitter)
+- Url (library: requires Schoolbox though)
+- User (library/feature)
+- Version (library)
+- Video (feature, interface to transcoder)
+- Weather (feature)
+- WebDav (feature, interface to webdav)
+- Wiki (feature)
+- YearLevel (feature)

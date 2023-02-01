@@ -1,15 +1,13 @@
 <script setup>
-
 /**
  * To view and update each members status
  */
 
-import { ref, computed } from 'vue';
-import { useStore } from '../store/manageGroupStore';
-import { useUpdateMembersStore } from '../store/mgUpdateMembersStore';
-import { useRejectMembersStore } from '../store/mgRejectMembersStore';
-import AccessTypes from './mgAccessTypes';
-
+import { ref, computed } from "vue";
+import { useStore } from "../store/manageGroupStore";
+import { useUpdateMembersStore } from "../store/mgUpdateMembersStore";
+import { useRejectMembersStore } from "../store/mgRejectMembersStore";
+import AccessTypes from "./mgAccessTypes";
 
 const props = defineProps({
     /**
@@ -23,8 +21,6 @@ const props = defineProps({
 
 const store = useStore();
 const isProcessing = ref(false); //so only the just selected member is active
-
-
 
 /*****************************************************************
  *
@@ -40,14 +36,16 @@ const updateMembersStore = useUpdateMembersStore();
  *
  * @returns { String }
  */
-const approveButtonText = computed(() => updateMembersStore.isProcessing && isProcessing.value ? 'Approving...' : 'Approve');
+const approveButtonText = computed(() =>
+    updateMembersStore.isProcessing && isProcessing.value ? "Approving..." : "Approve"
+);
 
 /**
  * To approve a members membership request and set them as read by default
  *
  * @param { Object } related member
  */
-function onApproveMembershipSelected (member) {
+function onApproveMembershipSelected(member) {
     updateMembersStore.updateMemberAccess(member, AccessTypes.READ);
 }
 
@@ -56,7 +54,7 @@ function onApproveMembershipSelected (member) {
  *
  * @param { Object } related member
  */
-function onMemberAccessChange (member) {
+function onMemberAccessChange(member) {
     updateMembersStore.updateMemberAccess(member, member.accessType);
 }
 
@@ -66,11 +64,12 @@ function onMemberAccessChange (member) {
  */
 updateMembersStore.$onAction(({ name, args, after, onError }) => {
     const updatedMember = args[0];
-    if (name === 'updateMemberAccess' && updatedMember.id === props.member.id) { //as each member is subscribed to onAction, we have to check for the selected member
+    if (name === "updateMemberAccess" && updatedMember.id === props.member.id) {
+        //as each member is subscribed to onAction, we have to check for the selected member
         isProcessing.value = true;
-        store.toastEl.activate('Updating...');
+        store.toastEl.activate("Updating...");
         after(() => {
-            store.toastEl.timeout('Member successfully updated', true, 5000);
+            store.toastEl.timeout("Member successfully updated", true, 5000);
             isProcessing.value = false;
         });
         onError((error) => {
@@ -79,8 +78,6 @@ updateMembersStore.$onAction(({ name, args, after, onError }) => {
         });
     }
 });
-
-
 
 /*****************************************************************
  *
@@ -96,14 +93,16 @@ const rejectMembersStore = useRejectMembersStore();
  *
  * @returns { String }
  */
-const rejectButtonText = computed(() => rejectMembersStore.isProcessing && isProcessing.value ? 'Rejecting...' : 'Reject');
+const rejectButtonText = computed(() =>
+    rejectMembersStore.isProcessing && isProcessing.value ? "Rejecting..." : "Reject"
+);
 
 /**
  * To reject a members request and remove the user
  *
  * @param { Object } related member
  */
-function onRejectMembershipSelected (member) {
+function onRejectMembershipSelected(member) {
     rejectMembersStore.rejectMember(member);
 }
 
@@ -113,21 +112,21 @@ function onRejectMembershipSelected (member) {
  */
 rejectMembersStore.$onAction(({ name, args, after, onError }) => {
     const rejectedMember = args[0];
-    if (name === 'rejectMember' && rejectedMember.id === props.member.id) { //as each member is subscribed to onAction, we have to check for the selected member
+    if (name === "rejectMember" && rejectedMember.id === props.member.id) {
+        //as each member is subscribed to onAction, we have to check for the selected member
         isProcessing.value = true;
-        store.toastEl.activate('Rejecting...');
+        store.toastEl.activate("Rejecting...");
         after(() => {
-            store.toastEl.timeout('Member successfully rejected', true, 5000);
+            store.toastEl.timeout("Member successfully rejected", true, 5000);
             isProcessing.value = false;
         });
         onError((error) => {
             console.warn(error);
-            store.toastEl.timeout('Unable to reject member', false, 5000);
+            store.toastEl.timeout("Unable to reject member", false, 5000);
             isProcessing.value = false;
         });
     }
 });
-
 </script>
 
 <template>
@@ -165,6 +164,4 @@ rejectMembersStore.$onAction(({ name, args, after, onError }) => {
     </select>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

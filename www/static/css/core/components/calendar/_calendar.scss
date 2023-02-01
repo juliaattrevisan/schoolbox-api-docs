@@ -1,111 +1,111 @@
 #start_date,
 #finish_date,
 #end_date {
-  margin: 0;
+    margin: 0;
 }
 
 .calendar-list {
-  @include information-list;
+    @include information-list;
 
-  .column,
-  .columns {
-    @extend .no-pad;
-  }
+    .column,
+    .columns {
+        @extend .no-pad;
+    }
 
-  label {
-    @extend .content;
-  }
+    label {
+        @extend .content;
+    }
 
-  li.row {
-    cursor: pointer;
-    @extend .content;
-  }
+    li.row {
+        cursor: pointer;
+        @extend .content;
+    }
 }
 
 /* Destroy FullCalendar icons...
  */
 .fc-icon-chevron-right:before,
 .fc-icon-chevron-left:before {
-  font-family: $font-family-icon;
+    font-family: $font-family-icon;
 }
 /* Add SB icons instead
  */
 .fc-button .fc-icon {
-  font-family: $font-family-icon;
-  font-size: 1rem !important;
+    font-family: $font-family-icon;
+    font-size: 1rem !important;
 }
 
 .fc-icon-chevron-left:before {
-  content: "\e655" !important; //.icon-previous
+    content: "\e655" !important; //.icon-previous
 }
 
 .fc-icon-chevron-right:before {
-  content: "\e64b" !important; //.icon-next
+    content: "\e64b" !important; //.icon-next
 }
 
 /* Force FullCalendar control buttons to absorb
  * Skin Builder choices
  */
 .fc-toolbar {
-  border-bottom: 2px solid #ededed;
-  margin: 0 !important;
-  padding: 1rem;
+    border-bottom: 2px solid #ededed;
+    margin: 0 !important;
+    padding: 1rem;
 
-  .fc-button {
-    @include button-dimensions();
+    .fc-button {
+        @include button-dimensions();
 
-    &:disabled {
-      @extend .disabled;
+        &:disabled {
+            @extend .disabled;
+        }
+        &:hover,
+        &.fc-button-active {
+            background-color: $content-ui-hover !important;
+            color: $content-ui-foreground !important;
+        }
     }
-    &:hover,
-    &.fc-button-active {
-      background-color: $content-ui-hover !important;
-      color: $content-ui-foreground !important;
-    }
-  }
 }
 
 @media #{$medium-down} {
-  .fc-toolbar {
-    flex-direction: column;
+    .fc-toolbar {
+        flex-direction: column;
 
-    .fc-toolbar-title {
-      margin: .5rem 0 !important;
-      text-align: center;
+        .fc-toolbar-title {
+            margin: 0.5rem 0 !important;
+            text-align: center;
+        }
+
+        .fc-custom-group.row {
+            margin-bottom: 0.5rem;
+
+            > .small-4:last-child {
+                padding-right: 0.8rem;
+            }
+        }
+
+        .fc-toolbar-chunk,
+        .fc-button-group {
+            width: 100%;
+        }
     }
-
-    .fc-custom-group.row {
-      margin-bottom: .5rem;
-
-      > .small-4:last-child {
-        padding-right: .8rem;
-      }
-    }
-
-    .fc-toolbar-chunk,
-    .fc-button-group {
-      width: 100%;
-    }
-  }
 }
 
 .fc-custom-group.row {
-  padding-left: 0;
-  @media #{$medium-up} {
-    top: 0.5rem;
-    position: relative;
-  }
+    padding-left: 0;
+    @media #{$medium-up} {
+        top: 0.5rem;
+        position: relative;
+    }
 }
 
 /* Dashboard component indents this heading for some reason
  */
 .Schoolbox_Calendar_Component_Dashboard_Controller {
-  .fc-widget-header {
-    padding: 0;
+    .fc-widget-header {
+        padding: 0;
 
-    .fc-list-heading-main {
-      @extend h2;
-      @extend .subheader;
+        .fc-list-heading-main {
+            @extend h2;
+            @extend .subheader;
+        }
     }
-  }
 }

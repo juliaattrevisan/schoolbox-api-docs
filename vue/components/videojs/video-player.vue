@@ -1,40 +1,37 @@
 <script>
-
 /*
  * To play a video
  *
  */
 
-import 'video.js/dist/video-js.css';
-import videojs from 'video.js';
-import { gsap } from 'gsap/all';
-import { timeout } from '@js/util/jsUtils';
-
+import "video.js/dist/video-js.css";
+import videojs from "video.js";
+import { gsap } from "gsap/all";
+import { timeout } from "@js/util/jsUtils";
 
 export default {
-
     props: {
         options: {
             type: Object,
             required: true,
-            default () {
+            default() {
                 return {};
-            }
+            },
         },
     },
 
-    data () {
+    data() {
         return {
             videoHeight: 0, //to ensure the parent container is high enough when the video is loaded
-            isVideoEncoding: true //until it's checked at least once or confirmed the video is a blob
-        }
+            isVideoEncoding: true, //until it's checked at least once or confirmed the video is a blob
+        };
     },
 
-    created () {
+    created() {
         this.hasHash = this.checkForHash();
     },
 
-    mounted () {
+    mounted() {
         if (this.hasHash) {
             this.checkVideoEncodingLoop();
         } else {
@@ -43,24 +40,25 @@ export default {
         }
     },
 
-    beforeUnmount () {
+    beforeUnmount() {
         if (this.player) {
             this.player.dispose(); //cleanup, can be re-activated later on the same page
         }
     },
 
     methods: {
-
         /**
          * if the file contains a hash, we should ensure the video isn't transcoding prior to displaying
          *
          * @returns { Boolean }
          */
-        checkForHash () {
+        checkForHash() {
             this.hash = this.options?.sources[0].hash;
-            if (this.hash) { //need to check its status first
+            if (this.hash) {
+                //need to check its status first
                 return true;
-            } else { //otherwise it's a blob recording
+            } else {
+                //otherwise it's a blob recording
                 return false;
             }
         },
@@ -69,9 +67,10 @@ export default {
          * ensure the video has finished processing prior to displaying
          *
          */
-        async checkVideoEncodingLoop () {
+        async checkVideoEncodingLoop() {
             this.isVideoEncoding = await this.checkIsVideoEncoding();
-            if (this.isVideoEncoding && document.body.contains(this.$el)) {  //ensure that the player is still in the DOM (could have been deleted)
+            if (this.isVideoEncoding && document.body.contains(this.$el)) {
+                //ensure that the player is still in the DOM (could have been deleted)
                 await timeout(2000); //loop around until it's complete
                 this.checkVideoEncodingLoop();
             } else if (!this.isVideoEncoding && document.body.contains(this.$el)) {
@@ -84,14 +83,17 @@ export default {
          *
          * @returns { Boolean }
          */
-        async checkIsVideoEncoding () {
+        async checkIsVideoEncoding() {
             try {
-                const response = await fetch('/storage/checkVideoStatus.php?' + new URLSearchParams({
-                    hash: this.hash
-                }));
+                const response = await fetch(
+                    "/storage/checkVideoStatus.php?" +
+                        new URLSearchParams({
+                            hash: this.hash,
+                        })
+                );
                 const responseData = await response.json();
                 const videoStatus = responseData.status;
-                if (videoStatus === 'pending' || videoStatus === 'processing') {
+                if (videoStatus === "pending" || videoStatus === "processing") {
                     return true;
                 } else {
                     return false;
@@ -105,18 +107,14 @@ export default {
          * set up videojs
          *
          */
-        initVideojs () {
-
+        initVideojs() {
             this.$nextTick(() => {
-
                 this.videoHeight = this.$refs.videoPlayer.offsetHeight;
 
                 this.player = videojs(this.$refs.videoPlayer, this.options, this.onVideoPlayerReady);
-                this.player.on('error', this.onVideoError);
-                gsap.from(this.$refs.videoPlayer, 0.5, { opacity: 0, scale: 1.025 } );
-
+                this.player.on("error", this.onVideoError);
+                gsap.from(this.$refs.videoPlayer, 0.5, { opacity: 0, scale: 1.025 });
             });
-
         },
 
         /**
@@ -124,7 +122,7 @@ export default {
          * and as all we need is height detection, just use an interval
          *
          */
-        onVideoPlayerReady () {
+        onVideoPlayerReady() {
             this.checkInterval = setInterval(this.checkVideoHeight, 500);
         },
 
@@ -133,12 +131,12 @@ export default {
          * just use an interval. This mainly relates to safari ios, which doesn't load a input captured video.
          *
          */
-        checkVideoHeight () {
+        checkVideoHeight() {
             const currentVideoHeight = this.$refs.container.firstChild.offsetHeight; //videojs wraps around the <video> element
             if (this.videoHeight !== currentVideoHeight) {
                 this.videoHeight = currentVideoHeight;
                 clearInterval(this.checkInterval);
-                this.$emit('on-dimensions-ready', this.$refs.container.firstChild.offsetWidth, currentVideoHeight);
+                this.$emit("on-dimensions-ready", this.$refs.container.firstChild.offsetWidth, currentVideoHeight);
             }
         },
 
@@ -146,24 +144,21 @@ export default {
          * unable to load for whatever reason
          *
          */
-        onVideoError () {
-            this.$emit('on-video-error');
+        onVideoError() {
+            this.$emit("on-video-error");
         },
-
-    }
-
-}
+    },
+};
 </script>
 
 <template>
     <div ref="container">
-        <img v-if="isVideoEncoding" class="processing-img" src="`${cdnPrefix}images/core/video-processing.gif`">
+        <img v-if="isVideoEncoding" class="processing-img" src="`${cdnPrefix}images/core/video-processing.gif`" />
         <video v-else ref="videoPlayer" class="video-js vjs-play-skin"></video>
     </div>
 </template>
 
 <style lang="scss" scoped>
-
 .processing-img {
     width: 100%;
     height: auto;
@@ -184,9 +179,9 @@ export default {
     }
     .vjs-time-control {
         color: white;
-        font-size: .875rem;
-        padding-left: .5rem;
-        padding-right: .5rem;
+        font-size: 0.875rem;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
         width: auto;
         min-width: 0;
         line-height: 3.5em;
@@ -229,5 +224,4 @@ export default {
         }
     }
 }
-
 </style>

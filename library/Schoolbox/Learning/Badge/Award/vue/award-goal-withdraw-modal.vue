@@ -1,12 +1,11 @@
 <script>
 import axios from "axios";
-import BadgeImage from './../../vue/badge-image';
-import RevealModal from '@schoolboxVue/components/reveal-modal'
-import qs from 'qs';
-import toastMixin from '@schoolboxVue/components/toast-mixin';
+import BadgeImage from "./../../vue/badge-image";
+import RevealModal from "@schoolboxVue/components/reveal-modal";
+import qs from "qs";
+import toastMixin from "@schoolboxVue/components/toast-mixin";
 
 export default {
-
     /**
      * Name.
      * The name of the component that we have here. This name will be used in the container
@@ -20,17 +19,14 @@ export default {
      * manner as a php trait. They must already be imported at the top of the file and will
      * be superpositioned on top of this javascript here, inside export default {}
      */
-    mixins: [
-        toastMixin
-    ],
+    mixins: [toastMixin],
 
     /**
      * Props.
      * Immutable props that were passed to this component, usually via twig, in our setup.
      * These are the hyphen-separated vars which are magically computed into camelcase elsewhere.
      */
-    props: [
-    ],
+    props: [],
 
     /**
      * Components.
@@ -39,7 +35,7 @@ export default {
      */
     components: {
         BadgeImage,
-        RevealModal
+        RevealModal,
     },
 
     /**
@@ -50,8 +46,8 @@ export default {
      */
     data() {
         return {
-            award: {}
-        }
+            award: {},
+        };
     },
 
     /**
@@ -59,15 +55,13 @@ export default {
      * Basically, when vue has done all its inits and is ready to go
      * kind of like window.onload
      */
-    mounted: function () {
-    },
+    mounted: function () {},
 
     /**
      * Computed properties.
      * Access the results of a function as if they were a property of an object.
      */
-    computed: {
-    },
+    computed: {},
 
     /**
      * Methods.
@@ -75,7 +69,6 @@ export default {
      * other ordinary javascript that you might have written before.
      */
     methods: {
-
         /**
          * Open this modal.
          */
@@ -85,14 +78,12 @@ export default {
             this.$refs.modal.open();
         },
 
-
         /**
          * Close this modal
          */
         close() {
             this.$refs.modal.close();
         },
-
 
         /**
          * Perform withdrawal
@@ -104,21 +95,21 @@ export default {
              */
             let request = {
                 url: this.award._links.goalWithdraw,
-                data: qs.stringify({userIds: [this.award.recipient.id]}),
-                method: 'post',
-                responseType: 'json'
-            }
+                data: qs.stringify({ userIds: [this.award.recipient.id] }),
+                method: "post",
+                responseType: "json",
+            };
 
             /* A toast - to your valour, my sword, and our victory together
              */
-            self.toastActivate('Removing goal...');
+            self.toastActivate("Removing goal...");
 
-            axios.request(request)
-                .then(response => {
-
+            axios
+                .request(request)
+                .then((response) => {
                     /* Send bat signal to the parent component
                      */
-                    this.$emit('withdraw-complete');
+                    this.$emit("withdraw-complete");
 
                     /* Close this modal
                      */
@@ -126,21 +117,23 @@ export default {
 
                     /* Pop toast
                      */
-                    self.toastSuccess('Goal has been removed');
+                    self.toastSuccess("Goal has been removed");
                 })
-                .catch(error => {
+                .catch((error) => {
                     if (error.response) {
-                        self.toastError('Unable to remove goal; please try again.');
+                        self.toastError("Unable to remove goal; please try again.");
                     }
                 });
-        }
-    }
-}
+        },
+    },
+};
 </script>
 <template>
     <reveal-modal ref="modal">
         <template v-if="award.badge">
-            <h2>Remove <strong>'{{ award.badge.name }}'</strong> goal</h2>
+            <h2>
+                Remove <strong>'{{ award.badge.name }}'</strong> goal
+            </h2>
 
             <div class="card small-12 compact badge-card">
                 <div>

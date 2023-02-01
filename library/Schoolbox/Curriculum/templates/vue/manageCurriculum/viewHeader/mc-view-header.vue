@@ -1,16 +1,14 @@
 <script setup lang="ts">
-
 /**
  * The header containing the breadcrumbs and search input
  */
 
-import { computed } from 'vue';
-import { useUpdateNodeStore } from '../activeNode/store/mcUpdateNodeStore';
-import { useAddSubsectionStore } from '../activeNode/store/mcAddSubsectionStore';
-import { useNodesStore } from '../store/mcNodesStore';
-import McViewHeaderBreadcrumbs from './mc-view-header-breadcrumbs.vue';
-import McViewHeaderSearchInput from './mc-view-header-search-input.vue';
-
+import { computed } from "vue";
+import { useUpdateNodeStore } from "../activeNode/store/mcUpdateNodeStore";
+import { useAddSubsectionStore } from "../activeNode/store/mcAddSubsectionStore";
+import { useNodesStore } from "../store/mcNodesStore";
+import McViewHeaderBreadcrumbs from "./mc-view-header-breadcrumbs.vue";
+import McViewHeaderSearchInput from "./mc-view-header-search-input.vue";
 
 const updateNodeStore = useUpdateNodeStore();
 const addSubsectionStore = useAddSubsectionStore();
@@ -23,14 +21,11 @@ const nodesStore = useNodesStore();
  * @returns { Boolean }
  */
 const isDisabled = computed(() => updateNodeStore.isOpen || addSubsectionStore.isOpen || nodesStore.isLoading);
-
 </script>
 
 <template>
-   <mc-view-header-breadcrumbs :is-disabled="isDisabled" />
-   <mc-view-header-search-input :is-disabled="isDisabled" />
+    <mc-view-header-breadcrumbs :is-disabled="isDisabled" />
+    <mc-view-header-search-input :is-disabled="isDisabled" />
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

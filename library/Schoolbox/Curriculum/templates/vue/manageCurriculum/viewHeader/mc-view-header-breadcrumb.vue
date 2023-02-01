@@ -1,13 +1,12 @@
 <script setup lang="ts">
-
 /**
  * To indicate progress through the node tree and to be able to
  * move backwards through the tree
  */
 
-import { shortenLength } from '@js/util/stringUtils';
-import { useViewNodesStore } from '@schoolboxCurriculum/vue/manageCurriculum/viewNodes/store/mcViewNodesStore';
-import type { Breadcrumb } from '@schoolboxCurriculum/types/Breadcrumb';
+import { shortenLength } from "@js/util/stringUtils";
+import { useViewNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/viewNodes/store/mcViewNodesStore";
+import type { Breadcrumb } from "@schoolboxCurriculum/types/Breadcrumb";
 
 interface Props {
     breadcrumb: Breadcrumb; // the relevant breadcrumb
@@ -21,10 +20,9 @@ const viewNodesStore = useViewNodesStore();
 /**
  * to display the just selected node
  */
-function onSelected () {
+function onSelected() {
     viewNodesStore.setSelected(props.breadcrumb.depth as number, props.breadcrumb.id);
 }
-
 </script>
 
 <template>

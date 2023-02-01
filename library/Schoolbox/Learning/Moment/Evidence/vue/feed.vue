@@ -1,19 +1,17 @@
 <script>
-
-import MediaArticle from '@schoolboxVue/components/media-article';
-import Storage from '@schoolboxVue/components/storage';
-import CommentThread from './comment-thread';
+import MediaArticle from "@schoolboxVue/components/media-article";
+import Storage from "@schoolboxVue/components/storage";
+import CommentThread from "./comment-thread";
 import RevealModal from "@schoolboxVue/components/reveal-modal";
 import Toast from "@schoolboxVue/components/toast";
 import AwardDetailModal from "../../../Badge/Award/vue/award-detail-modal";
 import BadgeImage from "../../../Badge/vue/badge-image";
-import CodesList from '@schoolboxCurriculum/vue/codes-list';
-import NodeDetails from '@schoolboxCurriculum/vue/node-details';
+import CodesList from "@schoolboxCurriculum/vue/codes-list";
+import NodeDetails from "@schoolboxCurriculum/vue/node-details";
 import foundationMixin from "@schoolboxVue/components/foundation-mixin";
-import userProfileConstants from '../../../vue/user-profile/constants';
-import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin';
-import { getEmptyNode } from '@schoolboxCurriculum/js/nodeUtils';
-
+import userProfileConstants from "../../../vue/user-profile/constants";
+import cdnPrefixMixin from "@schoolboxVue/components/cdn-prefix-mixin";
+import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
 
 export default {
     components: {
@@ -27,31 +25,28 @@ export default {
         CodesList,
         NodeDetails,
     },
-    mixins: [
-        foundationMixin,
-        cdnPrefixMixin,
-    ],
+    mixins: [foundationMixin, cdnPrefixMixin],
     props: {
         siteVersion: {
             type: String,
-            required: true
+            required: true,
         },
         configGradeGradientEnabled: {
             type: Boolean,
-            required: true
-        }
+            required: true,
+        },
     },
     data() {
         return {
-            data:     [],
+            data: [],
             metadata: {
-                count:  null,
+                count: null,
                 cursor: null,
             },
             showSkeletonLoader: true,
             currentlyDeletingEvidence: null,
             selectedNode: getEmptyNode(), //the selected curriculum code to display further details for
-        }
+        };
     },
     computed: {
         jQuery: () => window.jQuery,
@@ -60,12 +55,12 @@ export default {
         groupedEvidence() {
             return this.groupFeedResults(this.data);
         },
-        currentCount () {
+        currentCount() {
             return data.length;
         },
         returnUrl() {
-            return btoa(window.location.pathname)
-        }
+            return btoa(window.location.pathname);
+        },
     },
     mounted() {
         document.addEventListener(userProfileConstants.events.AWARDS_UPDATED, () => this.load());
@@ -85,22 +80,22 @@ export default {
         /**
          * Appends learning evidence to the data list.
          */
-        async append (cursor) {
+        async append(cursor) {
             const params = {};
             if (cursor) {
                 params.cursor = cursor;
             }
             try {
-                const response = await fetch(this.config.routes.getFeed + '?' + new URLSearchParams(params));
+                const response = await fetch(this.config.routes.getFeed + "?" + new URLSearchParams(params));
                 const responseData = await response.json();
-                this.data = this.data.concat(responseData.data ? responseData.data : [])
+                this.data = this.data.concat(responseData.data ? responseData.data : []);
                 this.metadata.count = responseData.metadata?.count ? responseData.metadata.count : 0;
                 this.metadata.cursor = responseData.metadata?.cursor ? responseData.metadata.cursor : null;
             } catch (error) {
                 console.warn(error);
                 this.loading = false;
             } finally {
-                this.showSkeletonLoader = false
+                this.showSkeletonLoader = false;
             }
         },
 
@@ -112,29 +107,27 @@ export default {
          */
         groupFeedResults(feedResults) {
             let groupedEvidenceByDate = {};
-            feedResults.forEach(v => {
+            feedResults.forEach((v) => {
                 let date = dayjs(v.date),
-                    key  = date.format('YYYYMMDD');
+                    key = date.format("YYYYMMDD");
                 if (!(key in groupedEvidenceByDate)) {
                     groupedEvidenceByDate[key] = {
-                        date:     dayjs(date).startOf('d'),
-                        evidence: []
-                    }
+                        date: dayjs(date).startOf("d"),
+                        evidence: [],
+                    };
                 }
                 v.date = date;
                 groupedEvidenceByDate[key].evidence.push(v);
             });
 
             // Flatten grouped evidence into an array
-            let groupedEvidence = Object.values(groupedEvidenceByDate).sort(
-                (a, b) => a.date.isBefore(b.date) ? 1 : -1
+            let groupedEvidence = Object.values(groupedEvidenceByDate).sort((a, b) =>
+                a.date.isBefore(b.date) ? 1 : -1
             );
 
             // Ensure that each evidence within the group is sorted
-            groupedEvidence.forEach(v => {
-                v.evidence.sort(
-                    (a, b) => a.date.isBefore(b.date) ? 1 : -1
-                )
+            groupedEvidence.forEach((v) => {
+                v.evidence.sort((a, b) => (a.date.isBefore(b.date) ? 1 : -1));
             });
 
             return groupedEvidence;
@@ -146,29 +139,27 @@ export default {
          * @param {Moment} createdAt
          */
         renderCreatedAt(createdAt) {
-            let now     = dayjs().startOf('d'),
-                dayDiff = createdAt.diff(now, 'd');
+            let now = dayjs().startOf("d"),
+                dayDiff = createdAt.diff(now, "d");
             if (dayDiff === 0) {
-                return 'today';
+                return "today";
             }
             if (dayDiff === -1) {
-                return 'yesterday';
+                return "yesterday";
             }
             if (dayDiff === 1) {
-                return 'tomorrow';
+                return "tomorrow";
             }
-            return dayjs.duration(dayDiff, 'd').humanize(true);
+            return dayjs.duration(dayDiff, "d").humanize(true);
         },
-
 
         /**
          * Open the share learning moment modal.
          */
         openShareLearningMomentModal() {
             // shareLearningMoment
-            this.jQuery('#shareLearningMoment').foundation('reveal', 'open');
+            this.jQuery("#shareLearningMoment").foundation("reveal", "open");
         },
-
 
         /**
          * Does this evidence have a menu?
@@ -177,9 +168,8 @@ export default {
          * @returns {Boolean}
          */
         hasMenu(evidence) {
-            return Boolean(evidence?._links?.modifyForm || evidence?._links?.deleteForm)
+            return Boolean(evidence?._links?.modifyForm || evidence?._links?.deleteForm);
         },
-
 
         /**
          * Display the delete modal for a piece of evidence.
@@ -191,22 +181,21 @@ export default {
             this.$refs.deleteModal.open();
         },
 
-
         /**
          * Actually delete this evidence.
          *
          * @param {Object} evidence
          */
-        async deleteEvidence (evidence) {
-            this.$refs.toast.activate('Deleting...');
+        async deleteEvidence(evidence) {
+            this.$refs.toast.activate("Deleting...");
 
             //awards, other things may also be deleted in the future, so ensure this is also the right data type
             const removeEvidenceToDelete = (data) => {
                 if (data.discriminator !== evidence.discriminator) {
                     return true;
                 }
-                return data.object.id !== evidence.object.id
-            }
+                return data.object.id !== evidence.object.id;
+            };
             const newData = this.data.filter(removeEvidenceToDelete);
 
             // Replacing the data in place in the same tick causes issues with
@@ -215,21 +204,20 @@ export default {
             // next tick.
             try {
                 await fetch(evidence.object._links.delete, {
-                    method: 'DELETE'
+                    method: "DELETE",
                 });
                 this.data = [];
-                this.$refs.toast.timeout('Deleted', true);
+                this.$refs.toast.timeout("Deleted", true);
                 this.$nextTick(() => {
                     this.data = newData;
                     this.metadata.count -= 1;
                 });
             } catch (error) {
-                this.$refs.toast.timeout('Could not delete', false)
+                this.$refs.toast.timeout("Could not delete", false);
             } finally {
                 this.$refs.deleteModal.close();
             }
         },
-
 
         /**
          * Open the view badge award modal.
@@ -248,12 +236,12 @@ export default {
          *
          * @returns { String }
          */
-        formatDate (date, format) {
+        formatDate(date, format) {
             return dayjs(date).format(format);
         },
 
         gradient(data) {
-            let gradientLevel = this.configGradeGradientEnabled ? (parseInt(data) / 10).toFixed() : 'none';
+            let gradientLevel = this.configGradeGradientEnabled ? (parseInt(data) / 10).toFixed() : "none";
             return `gradient-${gradientLevel}-bg`;
         },
 
@@ -262,14 +250,12 @@ export default {
          *
          * @pararm { object }
          */
-        onCodeSelected (node) {
+        onCodeSelected(node) {
             this.selectedNode = node;
             this.$refs.nodeDetailsModal.open();
         },
-
     },
-
-}
+};
 </script>
 
 <template>
@@ -277,61 +263,137 @@ export default {
         <div class="feed" v-for="(evidenceGroup, index) in groupedEvidence" :key="index">
             <div class="feed-column left"></div>
             <section class="activity-feed">
-              <div v-if="index === 0" class="profile-learning-actions">
-                <div>
-                  <template v-if="config.routes.getCreateEvidenceForm">
-                  <a href="#" title="Share Learning" class="learning icon-share" data-reveal-id="shareLearningMoment"><span>Share Learning</span></a>
-                  </template>
-                  <template v-if="config.routes.getSetAsGoalForm">
-                    <a :href="config.routes.getSetAsGoalForm + '?' + config.returnUrl.name + '=' + config.returnUrl.current"
-                       title="Set goals" class="goals icon-goal"><span>Set Goals</span></a>
-                  </template>
-                  <template v-if="config.routes.getSetAsGoalForSelfForm">
-                    <a :href="config.routes.getSetAsGoalForSelfForm + '?' + config.returnUrl.name + '=' + config.returnUrl.current"
-                       title="Set goals" class="goals icon-goal"><span>Set My Goals</span></a>
-                  </template>
-                  <template v-if="config.routes.getAwardAsAchievementForm">
-                    <a :href="config.routes.getAwardAsAchievementForm + '?' + config.returnUrl.name + '=' + config.returnUrl.current"
-                       title="Award achievement" class="achievement icon-achievement"><span>Award Achievement</span></a>
-                  </template>
+                <div v-if="index === 0" class="profile-learning-actions">
+                    <div>
+                        <template v-if="config.routes.getCreateEvidenceForm">
+                            <a
+                                href="#"
+                                title="Share Learning"
+                                class="learning icon-share"
+                                data-reveal-id="shareLearningMoment"
+                                ><span>Share Learning</span></a
+                            >
+                        </template>
+                        <template v-if="config.routes.getSetAsGoalForm">
+                            <a
+                                :href="
+                                    config.routes.getSetAsGoalForm +
+                                    '?' +
+                                    config.returnUrl.name +
+                                    '=' +
+                                    config.returnUrl.current
+                                "
+                                title="Set goals"
+                                class="goals icon-goal"
+                                ><span>Set Goals</span></a
+                            >
+                        </template>
+                        <template v-if="config.routes.getSetAsGoalForSelfForm">
+                            <a
+                                :href="
+                                    config.routes.getSetAsGoalForSelfForm +
+                                    '?' +
+                                    config.returnUrl.name +
+                                    '=' +
+                                    config.returnUrl.current
+                                "
+                                title="Set goals"
+                                class="goals icon-goal"
+                                ><span>Set My Goals</span></a
+                            >
+                        </template>
+                        <template v-if="config.routes.getAwardAsAchievementForm">
+                            <a
+                                :href="
+                                    config.routes.getAwardAsAchievementForm +
+                                    '?' +
+                                    config.returnUrl.name +
+                                    '=' +
+                                    config.returnUrl.current
+                                "
+                                title="Award achievement"
+                                class="achievement icon-achievement"
+                                ><span>Award Achievement</span></a
+                            >
+                        </template>
+                    </div>
                 </div>
-              </div>
                 <h2 class="subheader no-margin">
-                    <time :datetime="formatDate(evidenceGroup.date, 'YYYY-MM-DD')"
-                          :title="formatDate(evidenceGroup.date, dateDisplayFormats.dayjsDateLong)"
-                    >{{ renderCreatedAt(evidenceGroup.date) }}</time>
+                    <time
+                        :datetime="formatDate(evidenceGroup.date, 'YYYY-MM-DD')"
+                        :title="formatDate(evidenceGroup.date, dateDisplayFormats.dayjsDateLong)"
+                        >{{ renderCreatedAt(evidenceGroup.date) }}</time
+                    >
                 </h2>
                 <ul class="information-list">
                     <li v-for="(evidence, index) in evidenceGroup.evidence" class="feed-item" :key="index">
                         <template v-if="evidence.discriminator === 'evidence'">
                             <!-- This evidence isn't necessarily editable -->
-                            <div :class="{'actions-small-1': hasMenu(evidence.object), 'actions-small-0': !hasMenu(evidence.object)}">
+                            <div
+                                :class="{
+                                    'actions-small-1': hasMenu(evidence.object),
+                                    'actions-small-0': !hasMenu(evidence.object),
+                                }"
+                            >
                                 <div class="card small-12 compact">
                                     <a :href="evidence.object.creator._links.profile" title="View Profile">
-                                        <img :src="evidence.object.creator._links.avatar" alt="View Profile">
+                                        <img :src="evidence.object.creator._links.avatar" alt="View Profile" />
                                         <p>{{ evidence.object.creator.fullName }}</p>
-                                        <time class="pipe meta"
-                                              :datetime="formatDate(evidence.object.createdAt)"
-                                              :title="formatDate(evidence.object.createdAt, dateDisplayFormats.dayjsDatetime)"
-                                        >{{ formatDate(evidence.object.createdAt, dateDisplayFormats.dayjsTime) }}</time>
+                                        <time
+                                            class="pipe meta"
+                                            :datetime="formatDate(evidence.object.createdAt)"
+                                            :title="
+                                                formatDate(evidence.object.createdAt, dateDisplayFormats.dayjsDatetime)
+                                            "
+                                            >{{
+                                                formatDate(evidence.object.createdAt, dateDisplayFormats.dayjsTime)
+                                            }}</time
+                                        >
                                     </a>
                                 </div>
                                 <nav v-if="hasMenu(evidence.object)">
-                                    <a href="#"
-                                       class="icon-overflow"
-                                       :data-dropdown="'evidence-' + String(evidence.object.id) + '-dropdown'"
-                                       aria-expanded="false" title="Actions"></a>
+                                    <a
+                                        href="#"
+                                        class="icon-overflow"
+                                        :data-dropdown="'evidence-' + String(evidence.object.id) + '-dropdown'"
+                                        aria-expanded="false"
+                                        title="Actions"
+                                    ></a>
                                 </nav>
-                                <ul v-if="hasMenu(evidence.object)" :id="'evidence-' + String(evidence.object.id) + '-dropdown'" class="f-dropdown" data-dropdown-content>
-                                    <li><a v-if="evidence.object._links.modifyForm" :href="evidence.object._links.modifyForm + '?returnUrl=' + returnUrl " class="icon-modify" title="Modify">Modify</a></li>
-                                    <li><a @click.prevent="showDeleteModal(evidence)" v-if="evidence.object._links.delete" class="icon-delete" title="Delete">Delete</a></li>
+                                <ul
+                                    v-if="hasMenu(evidence.object)"
+                                    :id="'evidence-' + String(evidence.object.id) + '-dropdown'"
+                                    class="f-dropdown"
+                                    data-dropdown-content
+                                >
+                                    <li>
+                                        <a
+                                            v-if="evidence.object._links.modifyForm"
+                                            :href="evidence.object._links.modifyForm + '?returnUrl=' + returnUrl"
+                                            class="icon-modify"
+                                            title="Modify"
+                                            >Modify</a
+                                        >
+                                    </li>
+                                    <li>
+                                        <a
+                                            @click.prevent="showDeleteModal(evidence)"
+                                            v-if="evidence.object._links.delete"
+                                            class="icon-delete"
+                                            title="Delete"
+                                            >Delete</a
+                                        >
+                                    </li>
                                 </ul>
                             </div>
 
                             <div class="feed-body small-12 columns">
                                 <!-- Is there an attachment? Display it appropriately -->
                                 <article v-if="evidence.object.filename && evidence.object.storage">
-                                    <storage :storage="evidence.object.storage" :filename="evidence.object.filename"></storage>
+                                    <storage
+                                        :storage="evidence.object.storage"
+                                        :filename="evidence.object.filename"
+                                    ></storage>
                                 </article>
 
                                 <!-- Display evidence body, with media players initialised -->
@@ -341,13 +403,28 @@ export default {
 
                                 <!-- Display curriculum codes and tags -->
                                 <div class="tags">
-                                    <p class="meta" v-if="evidence.object.curriculumNodes.length > 0 || evidence.object.tags.length > 0">
-                                      Tags:
+                                    <p
+                                        class="meta"
+                                        v-if="
+                                            evidence.object.curriculumNodes.length > 0 ||
+                                            evidence.object.tags.length > 0
+                                        "
+                                    >
+                                        Tags:
                                         <codes-list
                                             :nodes="evidence.object.curriculumNodes"
                                             @selected="onCodeSelected"
-                                        /><template v-if="evidence.object.curriculumNodes.length > 0 && evidence.object.tags.length > 0">, </template>
-                                        <template v-for="(tag, index) in evidence.object.tags" :key="`${index}-${tag.name}`">
+                                        /><template
+                                            v-if="
+                                                evidence.object.curriculumNodes.length > 0 &&
+                                                evidence.object.tags.length > 0
+                                            "
+                                            >,
+                                        </template>
+                                        <template
+                                            v-for="(tag, index) in evidence.object.tags"
+                                            :key="`${index}-${tag.name}`"
+                                        >
                                             <template v-if="index !== 0">, </template><span>{{ tag.name }}</span>
                                         </template>
                                     </p>
@@ -367,16 +444,26 @@ export default {
                         <template v-if="evidence.discriminator === 'badgeAward'">
                             <div class="card badge-card small-12">
                                 <a href="#" @click.prevent="openViewBadgeAwardModal(evidence.object)">
-                                    <badge-image :badge="evidence.object.badge" :css=" evidence.object.status === 'goal' ? 'goal' : ''"></badge-image>
+                                    <badge-image
+                                        :badge="evidence.object.badge"
+                                        :css="evidence.object.status === 'goal' ? 'goal' : ''"
+                                    ></badge-image>
                                     <h3>{{ evidence.object.badge.name }}</h3>
                                     <p class="meta">
-                                        <template v-if="evidence.object.status === 'achievement'">Achievement awarded</template>
+                                        <template v-if="evidence.object.status === 'achievement'"
+                                            >Achievement awarded</template
+                                        >
                                         <template v-if="evidence.object.status === 'goal'">Goal set</template>
                                         by {{ evidence.object.awardedBy.fullName }}
                                         |
-                                        <time class="meta" :datetime="formatDate(evidence.object.awardedAt)"
-                                              :title="formatDate(evidence.object.awardedAt, dateDisplayFormats.dayjsDatetime)">
-                                        {{ formatDate(evidence.object.awardedAt, dateDisplayFormats.dayjsTime) }}
+                                        <time
+                                            class="meta"
+                                            :datetime="formatDate(evidence.object.awardedAt)"
+                                            :title="
+                                                formatDate(evidence.object.awardedAt, dateDisplayFormats.dayjsDatetime)
+                                            "
+                                        >
+                                            {{ formatDate(evidence.object.awardedAt, dateDisplayFormats.dayjsTime) }}
                                         </time>
                                     </p>
                                 </a>
@@ -386,26 +473,43 @@ export default {
                             <div class="flex-grade">
                                 <div class="small-12 card columns">
                                     <div>
-                                        <span class="icon-due-work"></span><a :href="evidence.object._links.summary">{{ evidence.object.assessment.title }}</a>
+                                        <span class="icon-due-work"></span
+                                        ><a :href="evidence.object._links.summary">{{
+                                            evidence.object.assessment.title
+                                        }}</a>
                                     </div>
                                     <p class="meta">
-                                        Reviewed by <a :href="evidence.object.instructor._links.profile" title="View Profile">{{ evidence.object.instructor.fullName }}</a>
+                                        Reviewed by
+                                        <a :href="evidence.object.instructor._links.profile" title="View Profile">{{
+                                            evidence.object.instructor.fullName
+                                        }}</a>
                                         in {{ evidence.object.assessment.folderName }} |
-                                        <time class="meta" :datetime="formatDate(evidence.object.publishedAt)"
-                                              :title="formatDate(evidence.object.publishedAt, dateDisplayFormats.dayjsDatetime)">
+                                        <time
+                                            class="meta"
+                                            :datetime="formatDate(evidence.object.publishedAt)"
+                                            :title="
+                                                formatDate(
+                                                    evidence.object.publishedAt,
+                                                    dateDisplayFormats.dayjsDatetime
+                                                )
+                                            "
+                                        >
                                             {{ formatDate(evidence.object.publishedAt, dateDisplayFormats.dayjsTime) }}
                                         </time>
                                     </p>
                                 </div>
-                                <div v-if="evidence.object.normalisedMark" :class="`grade ${gradient(evidence.object.normalisedMark)}` ">
+                                <div
+                                    v-if="evidence.object.normalisedMark"
+                                    :class="`grade ${gradient(evidence.object.normalisedMark)}`"
+                                >
                                     <span>{{ evidence.object.mark }}</span>
                                 </div>
                             </div>
                             <div class="content">
-                                <blockquote v-if="evidence.object.comment">{{ evidence.object.comment }}<br>
+                                <blockquote v-if="evidence.object.comment">
+                                    {{ evidence.object.comment }}<br />
                                 </blockquote>
-                                <a :href="evidence.object._links.summary">
-                                    View assessment details</a>
+                                <a :href="evidence.object._links.summary"> View assessment details</a>
                             </div>
                         </template>
                     </li>
@@ -439,12 +543,24 @@ export default {
                                 All these tags need to be on the same line,
                                 because otherwise there will be a space between
                                 the link and the comma -->
-                            <a href="#" title="Share a learning moment" data-reveal-id="shareLearningMoment">Share your learning</a><template v-if="config.routes.getSetAsGoalForm && config.routes.getAwardAsAchievementForm">, </template><template v-else-if="config.routes.getSetAsGoalForSelfForm"> or </template>
+                            <a href="#" title="Share a learning moment" data-reveal-id="shareLearningMoment"
+                                >Share your learning</a
+                            ><template v-if="config.routes.getSetAsGoalForm && config.routes.getAwardAsAchievementForm"
+                                >, </template
+                            ><template v-else-if="config.routes.getSetAsGoalForSelfForm"> or </template>
                         </template>
 
                         <template v-if="config.routes.getSetAsGoalForSelfForm">
-                            <a :href="config.routes.getSetAsGoalForSelfForm + '?' + config.returnUrl.name + '=' + config.returnUrl.current"
-                               title="Set a goal">
+                            <a
+                                :href="
+                                    config.routes.getSetAsGoalForSelfForm +
+                                    '?' +
+                                    config.returnUrl.name +
+                                    '=' +
+                                    config.returnUrl.current
+                                "
+                                title="Set a goal"
+                            >
                                 <!-- Different capitalization for if this is start or middle of a sentence -->
                                 <template v-if="config.routes.getCreateEvidenceForm">set a goal</template>
                                 <template v-else>Set a goal</template>
@@ -462,28 +578,60 @@ export default {
                     <!-- What can the current user do? -->
 
                     <!-- Can share moments? -->
-                    <p v-if="config.routes.getCreateEvidenceForm || config.routes.getSetAsGoalForm || config.routes.getAwardAsAchievementForm">
+                    <p
+                        v-if="
+                            config.routes.getCreateEvidenceForm ||
+                            config.routes.getSetAsGoalForm ||
+                            config.routes.getAwardAsAchievementForm
+                        "
+                    >
                         <template v-if="config.routes.getCreateEvidenceForm">
                             <!--
                                 All these tags need to be on the same line,
                                 because otherwise there will be a space between
                                 the link and the comma -->
-                            <a href="#" title="Share a learning moment" data-reveal-id="shareLearningMoment">Share a learning moment</a><template v-if="config.routes.getSetAsGoalForm && config.routes.getAwardAsAchievementForm">, </template><template v-else-if="config.routes.getSetAsGoalForm || config.routes.getAwardAsAchievementForm"> or </template>
+                            <a href="#" title="Share a learning moment" data-reveal-id="shareLearningMoment"
+                                >Share a learning moment</a
+                            ><template v-if="config.routes.getSetAsGoalForm && config.routes.getAwardAsAchievementForm"
+                                >, </template
+                            ><template
+                                v-else-if="config.routes.getSetAsGoalForm || config.routes.getAwardAsAchievementForm"
+                            >
+                                or
+                            </template>
                         </template>
 
                         <template v-if="config.routes.getSetAsGoalForm">
-                            <a :href="config.routes.getSetAsGoalForm + '?' + config.returnUrl.name + '=' + config.returnUrl.current"
-                               title="Set a goal">
+                            <a
+                                :href="
+                                    config.routes.getSetAsGoalForm +
+                                    '?' +
+                                    config.returnUrl.name +
+                                    '=' +
+                                    config.returnUrl.current
+                                "
+                                title="Set a goal"
+                            >
                                 <!-- Different capitalization for if this is start or middle of a sentence -->
                                 <template v-if="config.routes.getCreateEvidenceForm">set a goal</template>
-                                <template v-else>Set a goal</template>
-                            </a><template v-if="config.routes.getAwardAsAchievementForm"> or </template>
+                                <template v-else>Set a goal</template> </a
+                            ><template v-if="config.routes.getAwardAsAchievementForm"> or </template>
                         </template>
 
                         <template v-if="config.routes.getAwardAsAchievementForm">
-                            <a :href="config.routes.getAwardAsAchievementForm + '?' + config.returnUrl.name + '=' + config.returnUrl.current"
-                               title="Award an achievement">
-                                <template v-if="config.routes.getCreateEvidenceForm || config.routes.getSetAsGoalForm">award an achievement</template>
+                            <a
+                                :href="
+                                    config.routes.getAwardAsAchievementForm +
+                                    '?' +
+                                    config.returnUrl.name +
+                                    '=' +
+                                    config.returnUrl.current
+                                "
+                                title="Award an achievement"
+                            >
+                                <template v-if="config.routes.getCreateEvidenceForm || config.routes.getSetAsGoalForm"
+                                    >award an achievement</template
+                                >
                                 <template v-else>Award an achievement</template>
                             </a>
                         </template>
@@ -495,7 +643,6 @@ export default {
                     <p v-else>
                         When {{ config.student.givenName }} or their teacher shares learning, it will appear here.
                     </p>
-
                 </template>
             </div>
 
@@ -507,9 +654,7 @@ export default {
         </div>
 
         <reveal-modal ref="nodeDetailsModal">
-            <node-details
-                :node="selectedNode"
-            />
+            <node-details :node="selectedNode" />
         </reveal-modal>
 
         <!-- TODO create a Vue equivalent of $.confirmDialog -->
@@ -517,18 +662,20 @@ export default {
             <h2>Please confirm</h2>
             <p>Are you sure you wish to delete this Learning Moment?</p>
             <ul class="flex-list buttons">
-                <li><a @click.prevent="deleteEvidence(currentlyDeletingEvidence)" id="confirm-delete-learning-moment" class="button submit">Delete</a></li>
+                <li>
+                    <a
+                        @click.prevent="deleteEvidence(currentlyDeletingEvidence)"
+                        id="confirm-delete-learning-moment"
+                        class="button submit"
+                        >Delete</a
+                    >
+                </li>
                 <li><a @click.prevent="$refs.deleteModal.close()" class="button">Cancel</a></li>
             </ul>
         </reveal-modal>
 
-        <award-detail-modal
-            ref="awardDetailModal"
-            :cdn-prefix="this.cdnPrefix"
-            :site-version="this.siteVersion"
-        />
+        <award-detail-modal ref="awardDetailModal" :cdn-prefix="this.cdnPrefix" :site-version="this.siteVersion" />
 
         <toast ref="toast"></toast>
     </div>
-
 </template>

@@ -1,19 +1,17 @@
 <script>
+import RevealModal from "@schoolboxVue/components/reveal-modal";
+import MetaList from "@schoolboxVue/components/meta/list";
+import MetaItem from "@schoolboxVue/components/meta/item";
 
-import RevealModal from '@schoolboxVue/components/reveal-modal'
-import MetaList    from '@schoolboxVue/components/meta/list'
-import MetaItem    from '@schoolboxVue/components/meta/item'
-
-const EVENT_VIEW_WEEK = 'eventViewWeek';
+const EVENT_VIEW_WEEK = "eventViewWeek";
 
 export default {
-
     name: "view-grouped-events-modal",
 
     components: {
         MetaItem,
         MetaList,
-        RevealModal
+        RevealModal,
     },
 
     props: {
@@ -26,14 +24,14 @@ export default {
         formatDisplayTime: {},
         formatDisplayDatetime: {},
         returnUrl: {
-            default: 'calendar',
-        }
+            default: "calendar",
+        },
     },
 
-    data () {
+    data() {
         return {
             event: {},
-        }
+        };
     },
 
     computed: {
@@ -48,17 +46,17 @@ export default {
          */
         eventExtendedProps() {
             // Also need to render the event's buttons
-            let event      = this.event,
-                data       = event?.extendedProps?.data,
-                metadata   = data?.meta;
+            let event = this.event,
+                data = event?.extendedProps?.data,
+                metadata = data?.meta;
 
             return {
-                start:     event?.start,
-                title:     metadata?.folderName || metadata?.eventTypeName,
-                dateSpan:  this.determineDateSpan(event?.start, event?.end, event?.allDay),
+                start: event?.start,
+                title: metadata?.folderName || metadata?.eventTypeName,
+                dateSpan: this.determineDateSpan(event?.start, event?.end, event?.allDay),
                 subEvents: data?.subEvents || [],
             };
-        }
+        },
     },
 
     methods: {
@@ -78,9 +76,9 @@ export default {
          * @param allDay
          * @return {string}
          */
-        determineDateSpan (startDate, endDate, allDay) {
+        determineDateSpan(startDate, endDate, allDay) {
             if (!startDate) {
-                return '';
+                return "";
             }
             const format = allDay ? this.formatDisplayDate : this.formatDisplayDatetime;
             const startDateFormatted = dayjs(startDate).format(format);
@@ -92,15 +90,19 @@ export default {
                     // This means that all-day events from the event source
                     // have had their end date incremented by one day:
                     // roll it back for rendering the user-visible end.
-                    endDateFormatted = dayjs(endDate).subtract(1, 'd').format(format);
+                    endDateFormatted = dayjs(endDate).subtract(1, "d").format(format);
                 } else {
                     endDateFormatted = dayjs(endDate).format(format);
                 }
             }
 
-            if (dayjs(endDate) && dayjs(endDate).isValid() && !dayjs(startDate).isSame(dayjs(endDate).subtract(1, 'd'))) {
+            if (
+                dayjs(endDate) &&
+                dayjs(endDate).isValid() &&
+                !dayjs(startDate).isSame(dayjs(endDate).subtract(1, "d"))
+            ) {
                 // Start and end aren't the same - stitch them together.
-                if (!allDay && dayjs(startDate).isSame(dayjs(endDate), 'day')) {
+                if (!allDay && dayjs(startDate).isSame(dayjs(endDate), "day")) {
                     // Between two times on the same day - show the timespan but only one date
                     return startDateFormatted + " – " + dayjs(endDate).format(this.formatDisplayTime);
                 } else {
@@ -112,7 +114,6 @@ export default {
             // Otherwise start and end are the same - just show the start
             return startDateFormatted;
         },
-
 
         /**
          * Event listener for clicking the "view week" button.
@@ -127,8 +128,7 @@ export default {
             this.$emit(EVENT_VIEW_WEEK, date);
         },
     },
-}
-
+};
 </script>
 
 <template>
@@ -136,7 +136,10 @@ export default {
         <h2>{{ eventExtendedProps.title }}: {{ eventExtendedProps.dateSpan }}</h2>
 
         <meta-list>
-            <meta-item class="icon-calendar">{{ eventExtendedProps.subEvents.length }} {{ eventExtendedProps.subEvents.length === 1 ? 'event' : 'events'}}</meta-item>
+            <meta-item class="icon-calendar"
+                >{{ eventExtendedProps.subEvents.length }}
+                {{ eventExtendedProps.subEvents.length === 1 ? "event" : "events" }}</meta-item
+            >
         </meta-list>
 
         <section>
@@ -153,8 +156,13 @@ export default {
                                 <h3>{{ subEvent.title }}</h3>
                             </template>
                             <meta-list>
-                                <meta-item  v-if="subEvent.type">{{ subEvent.type }} due on {{ determineDateSpan(subEvent.start, subEvent.end, subEvent.allDay) }}</meta-item>
-                                <meta-item v-else>{{ determineDateSpan(subEvent.start, subEvent.end, subEvent.allDay) }}</meta-item>
+                                <meta-item v-if="subEvent.type"
+                                    >{{ subEvent.type }} due on
+                                    {{ determineDateSpan(subEvent.start, subEvent.end, subEvent.allDay) }}</meta-item
+                                >
+                                <meta-item v-else>{{
+                                    determineDateSpan(subEvent.start, subEvent.end, subEvent.allDay)
+                                }}</meta-item>
                             </meta-list>
                         </div>
                     </div>

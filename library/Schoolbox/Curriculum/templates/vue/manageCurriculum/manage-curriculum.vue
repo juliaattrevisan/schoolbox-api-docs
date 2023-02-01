@@ -1,23 +1,21 @@
 <script setup lang="ts">
-
 /**
  * To manage Curriculum nodes, being able to view the entire node tree and
  * CRUD individual nodes
  */
 
-import { ref, onMounted } from 'vue';
-import { useStore } from './store/manageCurriculumStore';
-import { useNodesStore } from './store/mcNodesStore';
-import { useSelectedNodesStore } from './selectedNodes/store/mcSelectedNodesStore';
-import { getEmptyNode } from '@schoolboxCurriculum/js/nodeUtils';
-import McHeader from './mc-header.vue';
-import McView from './mc-view.vue';
-import McSelectedNodes from './selectedNodes/mc-selected-nodes.vue';
-import McEnableNodes from './selectedNodes/mc-enable-nodes.vue';
-import McDeleteNodes from './selectedNodes/mc-delete-nodes.vue';
-import SelectedNodeModal from '../selected-node-modal.vue';
-import Toast from '@schoolboxVue/components/toast.vue';
-
+import { ref, onMounted } from "vue";
+import { useStore } from "./store/manageCurriculumStore";
+import { useNodesStore } from "./store/mcNodesStore";
+import { useSelectedNodesStore } from "./selectedNodes/store/mcSelectedNodesStore";
+import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
+import McHeader from "./mc-header.vue";
+import McView from "./mc-view.vue";
+import McSelectedNodes from "./selectedNodes/mc-selected-nodes.vue";
+import McEnableNodes from "./selectedNodes/mc-enable-nodes.vue";
+import McDeleteNodes from "./selectedNodes/mc-delete-nodes.vue";
+import SelectedNodeModal from "../selected-node-modal.vue";
+import Toast from "@schoolboxVue/components/toast.vue";
 
 const props = defineProps({
     /**
@@ -26,7 +24,7 @@ const props = defineProps({
     dataEndpoint: {
         type: String,
         required: true,
-        default: '',
+        default: "",
     },
     /**
      * can only view the currently selected codes, not edit them
@@ -42,8 +40,8 @@ const props = defineProps({
     uiLimit: {
         type: Number,
         required: true,
-        default: 0
-    }
+        default: 0,
+    },
 });
 
 const store = useStore();
@@ -63,9 +61,9 @@ onMounted(() => {
 /**
  * Display an error if we cant find the node id that we jump to straight on page load
  */
-function initErrorListener () {
+function initErrorListener() {
     useNodesStore().$onAction(({ name, onError }) => {
-        if (name === 'loadId') {
+        if (name === "loadId") {
             onError((error) => {
                 console.warn(error.message);
                 store.toastEl?.activate();
@@ -78,10 +76,9 @@ function initErrorListener () {
 /**
  * close the modal, setting the activeNode to null so we can allow another selection
  */
-function onSelectedNodeModalClosed () {
+function onSelectedNodeModalClosed() {
     selectedNodesStore.setActiveNode(getEmptyNode());
 }
-
 </script>
 
 <template>
@@ -90,9 +87,6 @@ function onSelectedNodeModalClosed () {
     <mc-selected-nodes />
     <mc-enable-nodes />
     <mc-delete-nodes />
-    <selected-node-modal
-        :node="selectedNodesStore.activeNode"
-        @closed="onSelectedNodeModalClosed"
-    />
+    <selected-node-modal :node="selectedNodesStore.activeNode" @closed="onSelectedNodeModalClosed" />
     <toast ref="toastEl"></toast>
 </template>

@@ -1,0 +1,63 @@
+# Schoolbox Architecture
+
+This provides a very basic overview of the Schoolbox product's architecture.
+
+This should give an overview of the flow of execution of a request incoming to
+Schoolbox, and its possible outputs.
+
+
+## Overview diagram
+
+![overview](overview.png)
+
+
+## Structure
+
+I've attempted to structure the overview diagram and this set of documents
+according to the
+[clean architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
+pattern (which in itself is influenced by the
+[hexagonal architecture](https://en.wikipedia.org/wiki/Hexagonal_architecture_(software))
+pattern), even if Schoolbox itself does not always meet the ideals in that
+pattern.
+
+The basic principles of this pattern are:
+- business-wide policies are in the innermost circle
+- frameworks and drivers (input and output) are in the outermost circle
+- glue code between IO and policy exists between these two circles
+- source code dependencies _always_ point inward, never outward
+
+This document concerns itself mostly with the outer layers of the Schoolbox
+application, as that code is used to translate incoming requests into actions.
+
+
+## Points of ingress
+
+Schoolbox has the following points of ingress; each of these documents will give
+an overview about how a request coming through any of these sources is
+bootstrapped, routed and processed:
+* [Web request](io/requests/web.md)
+* [CLI request](io/requests/cli.md)
+* [Daemon request](io/requests/daemon.md)
+
+## Standard outputs
+
+* [HTTP responses](io/stdout/http-response.md)
+* [Logs](io/stdout/log.md)
+
+## Other inputs and outputs
+
+* [Schoolbox Database](io/schoolbox-database.md)
+* [SIS Database](io/sis-database/README.md)
+  * [External](io/sis-database/external.md)
+  * [School User Data Store](io/sis-database/suds.md)
+* [File Storage](io/file-storage/README.md)
+  * [Local](io/file-storage/local.md)
+  * [AWS S3](io/file-storage/s3.md)
+* [Redis Cache](io/redis-cache.md)
+* [Redis Storage](io/redis-storage.md)
+* [Task Daemon](io/task-daemon.md)
+* [HTTP Request/Response](io/http-request-response.md)
+* [Mail Transport](io/mail-transport.md)
+* [PDF Generator](io/pdf-generator.md)
+* [Notification Subsystem](io/notification-subsystem.md)

@@ -5,7 +5,7 @@
 </template>
 
 <script>
-    export default {
-        name: "meta-list"
-    }
+export default {
+    name: "meta-list",
+};
 </script>

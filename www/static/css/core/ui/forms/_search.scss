@@ -5,9 +5,9 @@
     top: 0;
     width: $tabbar-height;
     z-index: 1000;
-    ::placeholder { 
-        color: transparent; 
-        font-weight: normal; 
+    ::placeholder {
+        color: transparent;
+        font-weight: normal;
     }
 
     input[type="text"] {
@@ -25,9 +25,9 @@
     &.focus {
         width: 100%;
         padding-left: $tabbar-icon-width * 2;
-        ::placeholder { 
-            color: $black; 
-            font-weight: normal; 
+        ::placeholder {
+            color: $black;
+            font-weight: normal;
         }
     }
 
@@ -75,7 +75,7 @@
     }
 
     .loader {
-        border-radius: .20rem;
+        border-radius: 0.2rem;
         height: 1rem;
         margin: 1rem auto;
         width: 1rem;
@@ -99,7 +99,7 @@
     .result-meta {
         @extend .meta;
         margin: 0;
-        padding: .5rem;
+        padding: 0.5rem;
         text-align: left;
     }
 
@@ -143,7 +143,7 @@
         }
     }
     .inner-wrap.left-open .global-search {
-        right:  $tabbar-icon-width * 2;
+        right: $tabbar-icon-width * 2;
         &:hover,
         &.focus {
             padding-left: $tabbar-icon-width * 2;
@@ -151,7 +151,7 @@
     }
     .inner-wrap:not(.left-open):not(.right-open) .global-search,
     .inner-wrap.right-open .global-search {
-        right:  $tabbar-icon-width * 2;
+        right: $tabbar-icon-width * 2;
         &:hover,
         &.focus {
             padding-left: $tabbar-icon-width * 3;
@@ -191,17 +191,17 @@
         }
     }
     .inner-wrap.left-open .global-search {
-        right:  $tabbar-icon-width * 2;
+        right: $tabbar-icon-width * 2;
     }
     .inner-wrap.right-open .global-search {
-        right:  $tabbar-icon-width;
+        right: $tabbar-icon-width;
         &:hover,
         &.focus {
             padding-left: $tabbar-icon-width * 2;
         }
     }
     .inner-wrap.right-open.left-open .global-search {
-        right:  $tabbar-icon-width;
+        right: $tabbar-icon-width;
         &:hover,
         &.focus {
             padding-left: $tabbar-icon-width;

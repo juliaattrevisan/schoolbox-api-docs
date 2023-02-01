@@ -1,54 +1,45 @@
 <script>
-    import RevealModal from '@schoolboxVue/components/reveal-modal';
-    import ClipboardJs from 'clipboard/dist/clipboard';
+import RevealModal from "@schoolboxVue/components/reveal-modal";
+import ClipboardJs from "clipboard/dist/clipboard";
 
-    export default {
+export default {
+    name: "export-url-modal",
 
-        name: "export-url-modal",
-        
-        components: { RevealModal },
+    components: { RevealModal },
 
-        props: [
-            'url',
-        ],
+    props: ["url"],
 
-        
-        data() {
-            return {
-                clipboardJs: null
-            }
-        },
+    data() {
+        return {
+            clipboardJs: null,
+        };
+    },
 
+    /**
+     * On mount: instantiate the clipboardJS object
+     */
+    mounted() {
+        this.clipboardJs = new ClipboardJs(this.$refs.button, {
+            target: () => this.$refs.urlInput,
+        });
+    },
+
+    /**
+     * On destroy: clean up the clipboardJS object
+     */
+    beforeUnmount() {
+        this.clipboardJs.destroy();
+    },
+
+    methods: {
         /**
-         * On mount: instantiate the clipboardJS object
+         * Open this modal.
          */
-        mounted() {
-            this.clipboardJs = new ClipboardJs(
-                this.$refs.button,
-                {
-                    target: () => this.$refs.urlInput,
-                }
-            );
+        open() {
+            this.$refs.modal.open();
         },
-
-        /**
-         * On destroy: clean up the clipboardJS object
-         */
-        beforeUnmount() {
-            this.clipboardJs.destroy();
-        },
-
-        methods: {
-            /**
-             * Open this modal.
-             */
-            open() {
-                this.$refs.modal.open();
-            },
-        },
-        
-    }
-
+    },
+};
 </script>
 
 <template>

@@ -1,82 +1,78 @@
 <script>
-
 /**
  * An individual search result that matches the search query with search result
  * highlighted within. Selecting will take the user to relevant page/setting
  *
  */
 
-import { getIndex } from '@js/util/domUtils';
-import { escapeRegExp } from '@js/util/jsUtils';
+import { getIndex } from "@js/util/domUtils";
+import { escapeRegExp } from "@js/util/jsUtils";
 
 export default {
-
     props: {
         result: {
-              type: Object,
-              required: true,
-              default: () => {
+            type: Object,
+            required: true,
+            default: () => {
                 return {
-                    name: 'name',
-                    title: 'title',
-                    description: 'description',
-                    module: 'module',
-                    url: 'url'
-                }
-              }
+                    name: "name",
+                    title: "title",
+                    description: "description",
+                    module: "module",
+                    url: "url",
+                };
+            },
         },
-        queryWordList: { //current word list in the query
-             type: Array,
-              required: true,
-              default: []
+        queryWordList: {
+            //current word list in the query
+            type: Array,
+            required: true,
+            default: [],
         },
-        activeIndex: { //to know whether this result is currently active
-             type: Number,
-              required: true,
-              default: 0
-        }
-      },
+        activeIndex: {
+            //to know whether this result is currently active
+            type: Number,
+            required: true,
+            default: 0,
+        },
+    },
 
-    data () {
+    data() {
         return {
             itemIndex: -1,
-            isActive: false
-        }
-      },
+            isActive: false,
+        };
+    },
 
-      computed: {
-
-        highlightTitleSearch () {
-              return this.highlightSearchInElement(this.result.title);
+    computed: {
+        highlightTitleSearch() {
+            return this.highlightSearchInElement(this.result.title);
         },
 
-        highlightDescriptionSearch () {
-              return this.highlightSearchInElement(this.result.description);
-        }
-
-      },
+        highlightDescriptionSearch() {
+            return this.highlightSearchInElement(this.result.description);
+        },
+    },
 
     watch: {
-        activeIndex () {
+        activeIndex() {
             this.checkIndex();
-        }
+        },
     },
 
-    mounted () {
+    mounted() {
         this.checkIndex();
     },
 
-    updated () {
+    updated() {
         this.checkIndex();
     },
 
-    beforeUnmount () {
+    beforeUnmount() {
         this.checkIndex();
     },
-
 
     methods: {
-
         /**
          * to highlight the current selection relative to key events
          * needs to be updated once the animations have completed
@@ -92,7 +88,7 @@ export default {
 
         /**
          * To highlight where the search string matches within the settings result
-         * (?![^>]*>) is used to check we are not inside an element node 
+         * (?![^>]*>) is used to check we are not inside an element node
          *
          * @params { String } the string to find all instanced of the current search string in
          *
@@ -101,7 +97,7 @@ export default {
         highlightSearchInElement(toHighlight) {
             let highlighted = toHighlight;
             this.queryWordList.forEach((wordInSearch) => {
-                highlighted = highlighted.replace(RegExp(`${escapeRegExp(wordInSearch)}(?![^>]*>)`, 'ig'), (match) => {
+                highlighted = highlighted.replace(RegExp(`${escapeRegExp(wordInSearch)}(?![^>]*>)`, "ig"), (match) => {
                     return `<mark>${match}</mark>`;
                 });
             });
@@ -112,24 +108,22 @@ export default {
          * so mouse selection takes precendence over the arrow/enter selection
          */
         mouseOverResult() {
-            this.$emit('on-mouse-over-result');
+            this.$emit("on-mouse-over-result");
         },
 
         /**
          * dispatch to parent so can move to relevant settings page
          */
         selectResult() {
-            this.$emit('on-selected-result', this.result.url);
-        }
-
-    }
-
-}
-
+            this.$emit("on-selected-result", this.result.url);
+        },
+    },
+};
 </script>
 
 <template>
-    <a class="search-result"
+    <a
+        class="search-result"
         :href="result.url"
         :class="{ searchResultActive: isActive }"
         @mouseover="mouseOverResult"
@@ -139,26 +133,25 @@ export default {
     >
         <h4 class="result-title" v-html="highlightTitleSearch"></h4>
         <p class="result-description" v-if="result.description" v-html="highlightDescriptionSearch"></p>
-      </a>
+    </a>
 </template>
 
 <style lang="scss" scoped>
-
-@import 'www/static/css/core/base/_variables.scss';
+@import "www/static/css/core/base/_variables.scss";
 
 .search-result {
     display: block;
-    padding: .75rem;
+    padding: 0.75rem;
     background: white;
     transition: background 0.2s;
     &:hover {
         background: $content-ui-hover;
     }
     h4 {
-        margin-bottom: .5rem;
+        margin-bottom: 0.5rem;
     }
     p {
-        color: #9A9A9A;
+        color: #9a9a9a;
         font-size: 13px;
         font-style: italic;
         margin-bottom: 0;
@@ -168,5 +161,4 @@ export default {
 .searchResultActive {
     background: $content-ui-hover;
 }
-
 </style>

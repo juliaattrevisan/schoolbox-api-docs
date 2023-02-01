@@ -1,12 +1,11 @@
 <script setup lang="ts">
-
 /**
  * To be able to enable/disable or delete a node
  */
 
-import { computed } from 'vue';
-import { useSelectedNodesStore } from '@schoolboxCurriculum/vue/manageCurriculum/selectedNodes/store/mcSelectedNodesStore';
-import type { Node } from '@schoolboxCurriculum/types/Node';
+import { computed } from "vue";
+import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/selectedNodes/store/mcSelectedNodesStore";
+import type { Node } from "@schoolboxCurriculum/types/Node";
 
 interface Props {
     node: Node; // the assigned node to display
@@ -31,7 +30,9 @@ const isDisabled = computed(() => {
  * @returns { boolean }
  */
 const isChecked = computed(() => {
-    return selectedNodesStore.nodesIds.includes(props.node.id) || selectedNodesStore.childNodesIds.includes(props.node.id);
+    return (
+        selectedNodesStore.nodesIds.includes(props.node.id) || selectedNodesStore.childNodesIds.includes(props.node.id)
+    );
 });
 
 /**
@@ -39,10 +40,9 @@ const isChecked = computed(() => {
  *
  * @param { boolean } isCheckedChange - whether the Node is selected or not
  */
-function onChange (isCheckedChange: boolean) {
+function onChange(isCheckedChange: boolean) {
     selectedNodesStore.switchNode(props.node, isCheckedChange);
 }
-
 </script>
 
 <template>
@@ -60,10 +60,8 @@ function onChange (isCheckedChange: boolean) {
 </template>
 
 <style lang="scss" scoped>
-
 .checklist {
     flex: 2rem 0 0; //ensure a long name doesn't impact the checkbox width, which may add dodgy scroll bars on it
     padding-top: 0.5rem;
 }
-
 </style>

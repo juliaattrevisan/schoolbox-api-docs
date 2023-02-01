@@ -44,12 +44,13 @@ table.rubric {
         margin-top: 0;
         padding-left: 0;
         font-weight: $header-font-weight;
-        &:hover{
+        &:hover {
             background-color: $body-bg;
         }
     }
 
-    th, td {
+    th,
+    td {
         vertical-align: top;
     }
 
@@ -76,29 +77,25 @@ table.rubric {
             -webkit-print-color-adjust: exact;
         }
 
-        input[type=radio]:not(.plain):disabled + label{
+        input[type="radio"]:not(.plain):disabled + label {
             opacity: 1;
         }
     }
 }
 
 .comment {
-
     font-style: italic;
 
     &:not(:empty) {
-
-        &:before, &:after {
-            content: "\"";
+        &:before,
+        &:after {
+            content: '"';
         }
-
     }
-
 }
 
 // The rubric criterion selector
 .rubric-criterion-selector {
-
     .criteria-group {
         @extend .small-12;
         @extend .column;
@@ -130,7 +127,7 @@ table.rubric {
             padding: 0;
             display: inline;
             position: absolute;
-            &[type=checkbox] {
+            &[type="checkbox"] {
                 top: 0.1875rem;
             }
         }
@@ -202,10 +199,10 @@ table.rubric {
         margin: -1rem 0;
 
         @media #{$small-only} {
-            margin: -.5rem -1rem;
+            margin: -0.5rem -1rem;
         }
         @media #{$medium-only} {
-            margin: -.25rem 0;
+            margin: -0.25rem 0;
         }
     }
 }

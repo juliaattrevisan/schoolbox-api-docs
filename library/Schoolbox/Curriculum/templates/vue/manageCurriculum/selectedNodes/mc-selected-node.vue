@@ -1,14 +1,12 @@
 <script setup lang="ts">
-
 /**
  * A selected Curriculum node, it can be deleted and
  * further details revealed via a modal
  */
 
-import { computed } from 'vue';
-import { shortenLength } from '@js/util/stringUtils';
-import { useSelectedNodesStore } from './store/mcSelectedNodesStore';
-
+import { computed } from "vue";
+import { shortenLength } from "@js/util/stringUtils";
+import { useSelectedNodesStore } from "./store/mcSelectedNodesStore";
 
 const props = defineProps({
     /**
@@ -20,11 +18,11 @@ const props = defineProps({
         default: () => {
             return {
                 id: 0,
-                code: '',
-                name: '',
-                breadcrumb: '',
-            }
-        }
+                code: "",
+                name: "",
+                breadcrumb: "",
+            };
+        },
     },
 });
 
@@ -43,7 +41,7 @@ const isDisabled = computed(() => selectedNodesStore.isLoading);
  * @returns { String }
  */
 const title = computed(() => {
-    if (props.node.code && props.node.code !== '') {
+    if (props.node.code && props.node.code !== "") {
         return `${props.node.code}`;
     } else {
         return shortenLength(props.node.name, 50);
@@ -53,24 +51,20 @@ const title = computed(() => {
 /**
  * To open a modal that shows further info on the selected code
  */
-function onTitleSelected () {
+function onTitleSelected() {
     selectedNodesStore.setActiveNode(props.node);
 }
 
 /**
  * To remove from the selected list
  */
-function onRemoveSelected () {
+function onRemoveSelected() {
     selectedNodesStore.remove(props.node);
 }
-
 </script>
 
 <template>
-   <div
-        class="selected-node"
-        :data-enabled="props.node.enabled"
-    >
+    <div class="selected-node" :data-enabled="props.node.enabled">
         <button
             type="button"
             class="title-button"
@@ -78,7 +72,8 @@ function onRemoveSelected () {
             :disabled="isDisabled"
             @click.prevent="onTitleSelected"
             @keyup.enter="onTitleSelected"
-            data-test-title-button>
+            data-test-title-button
+        >
             {{ title }}
         </button>
         <button
@@ -87,13 +82,12 @@ function onRemoveSelected () {
             :title="`Remove ${props.node.name}`"
             @click.prevent="onRemoveSelected"
             @keyup.enter="onRemoveSelected"
-            data-test-remove-button>
-        </button>
+            data-test-remove-button
+        ></button>
     </div>
 </template>
 
 <style lang="scss" scoped>
-
 .selected-node {
     background: var(--body-background);
     color: #000;
@@ -123,6 +117,5 @@ function onRemoveSelected () {
     padding: 0;
 }
 
-@import '../style/mcStyle';
-
+@import "../style/mcStyle";
 </style>

@@ -1,8 +1,7 @@
 <script>
-import {Chart} from 'highcharts-vue';
+import { Chart } from "highcharts-vue";
 
 export default {
-
     /**
      * Name.
      * The name of the component that we have here. This name will be used in the container
@@ -23,10 +22,7 @@ export default {
      * Immutable props that were passed to this component, usually via twig, in our setup.
      * These are the hyphen-separated vars which are magically computed into camelcase elsewhere.
      */
-    props: [
-       'endpoint',
-       'isS3Adapter'
-    ],
+    props: ["endpoint", "isS3Adapter"],
 
     /**
      * Components.
@@ -34,7 +30,7 @@ export default {
      * at the top of the file.
      */
     components: {
-        highcharts: Chart
+        highcharts: Chart,
     },
 
     /**
@@ -45,7 +41,6 @@ export default {
      */
     data() {
         return {
-
             /* True, when data is currently loading; used to show skeleton
              */
             loading: true,
@@ -56,8 +51,8 @@ export default {
 
             /* Chart options
              */
-            chartOptions: {}
-        }
+            chartOptions: {},
+        };
     },
 
     /**
@@ -73,8 +68,7 @@ export default {
      * Computed properties.
      * Access the results of a function as if they were a property of an object.
      */
-    computed: {
-    },
+    computed: {},
 
     /**
      * Methods.
@@ -82,16 +76,15 @@ export default {
      * other ordinary javascript that you might have written before.
      */
     methods: {
-
         /**
          * Display the chart once the data has been loaded
          */
-        async getData () {
+        async getData() {
             this.loading = true;
             try {
                 const response = await fetch(this.endpoint, {
                     headers: {
-                        'Content-Type': 'application/json',
+                        "Content-Type": "application/json",
                     },
                 });
                 this.allData = await response.json();
@@ -106,23 +99,23 @@ export default {
 
         /**
          * To setup the HighCharts config options
-         * 
+         *
          * @param { Array }
-         * 
+         *
          * @returns { Object }
          */
-        getChartOptions (values) {
+        getChartOptions(values) {
             return {
                 chart: {
                     height: 150,
                     spacingRight: 48,
-                    type: 'bar'
+                    type: "bar",
                 },
                 credits: {
-                    enabled: false
+                    enabled: false,
                 },
                 legend: {
-                    enabled: false
+                    enabled: false,
                 },
                 plotOptions: {
                     bar: {
@@ -130,44 +123,43 @@ export default {
                          */
                         dataLabels: {
                             enabled: true,
-                            formatter: function() {
-                                return '<span style="color: #777777">' + this.y + '%</span>'
-                            }
-                        }
-                    }
+                            formatter: function () {
+                                return '<span style="color: #777777">' + this.y + "%</span>";
+                            },
+                        },
+                    },
                 },
                 time: {
-                    useUTC: false
+                    useUTC: false,
                 },
                 title: {
-                    text: 'Total Usage'
+                    text: "Total Usage",
                 },
                 tooltip: {
-                    enabled: false
+                    enabled: false,
                 },
                 xAxis: {
-                    categories: ['']
+                    categories: [""],
                 },
                 yAxis: {
                     allowDecimals: false,
                     min: 0,
                     max: 100,
                     title: {
-                        text: 'Percentage'
-                    }
+                        text: "Percentage",
+                    },
                 },
                 series: [
                     {
-                        color: '#82b5d8',
-                        name: '',
-                        data: values
-                    }
+                        color: "#82b5d8",
+                        name: "",
+                        data: values,
+                    },
                 ],
-            }
+            };
         },
-
-    }
-}
+    },
+};
 </script>
 <template>
     <div>
@@ -175,17 +167,17 @@ export default {
             <template v-if="this.loading">
                 <table class="skeleton">
                     <thead>
-                    <tr>
-                        <th></th>
-                    </tr>
+                        <tr>
+                            <th></th>
+                        </tr>
                     </thead>
                     <tbody>
-                    <tr>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                    </tr>
+                        <tr>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                        </tr>
                     </tbody>
                 </table>
             </template>

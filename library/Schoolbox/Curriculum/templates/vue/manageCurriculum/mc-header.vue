@@ -1,13 +1,12 @@
 <script setup lang="ts">
-
 /**
  *
  */
 
-import { slideDown, slideUp } from '@js/util/animateUtils';
-import { useStore } from './store/manageCurriculumStore';
-import { useAddCurriculumStore } from './store/mcAddCurriculumStore';
-import McAddCurriculum from './mc-add-curriculum.vue';
+import { slideDown, slideUp } from "@js/util/animateUtils";
+import { useStore } from "./store/manageCurriculumStore";
+import { useAddCurriculumStore } from "./store/mcAddCurriculumStore";
+import McAddCurriculum from "./mc-add-curriculum.vue";
 
 const store = useStore();
 const addCurriculumStore = useAddCurriculumStore();
@@ -15,7 +14,7 @@ const addCurriculumStore = useAddCurriculumStore();
 /**
  * To show / hide the add curriculum display
  */
-function onCreateNewSelected () {
+function onCreateNewSelected() {
     if (addCurriculumStore.isOpen) {
         addCurriculumStore.cancel();
     } else {
@@ -28,9 +27,9 @@ function onCreateNewSelected () {
  *
  * @param { DOMElement }
  */
-async function onEnter (el, done) {
+async function onEnter(el, done) {
     await slideDown(el);
-    done()
+    done();
 }
 
 /**
@@ -38,15 +37,14 @@ async function onEnter (el, done) {
  *
  * @param { DOMElement }
  */
-async function onLeave (el, done) {
+async function onLeave(el, done) {
     await slideUp(el);
-    done()
+    done();
 }
-
 </script>
 
 <template>
-   <div :class="`row ${ store.isReadOnly ? '' : 'actions-small-1 actions-medium-2'}`">
+    <div :class="`row ${store.isReadOnly ? '' : 'actions-small-1 actions-medium-2'}`">
         <div class="list-item">
             <div class="small-12 column">
                 <h1>Manage Curriculum</h1>
@@ -58,7 +56,7 @@ async function onLeave (el, done) {
                     href="#create-curriculum"
                     data-interaction="create-curriculum"
                     data-test-toggle-create-curriculum
-                    :class="`icon ${ addCurriculumStore.isOpen ? 'icon-close' : 'icon-add' }`"
+                    :class="`icon ${addCurriculumStore.isOpen ? 'icon-close' : 'icon-add'}`"
                     title="Create New Curriculum"
                     @click.prevent="onCreateNewSelected"
                     @keyup.enter="onCreateNewSelected"
@@ -68,11 +66,9 @@ async function onLeave (el, done) {
             </nav>
         </template>
     </div>
-    <Transition @enter="onEnter" @leave="onLeave" >
+    <Transition @enter="onEnter" @leave="onLeave">
         <mc-add-curriculum v-if="addCurriculumStore.isOpen" />
     </Transition>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

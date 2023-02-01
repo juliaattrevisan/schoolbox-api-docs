@@ -1,13 +1,11 @@
 <script setup>
-
 /**
  * Toggle the selection of currently listed search results so can select
  * multiple search results at once
  */
 
-import { computed } from 'vue';
-import { useSearchStore  } from '../store/mgSearchStore';
-
+import { computed } from "vue";
+import { useSearchStore } from "../store/mgSearchStore";
 
 const searchStore = useSearchStore();
 
@@ -39,7 +37,10 @@ const isSomeResultsSelected = computed(() => {
         const alreadySelectedResults = searchStore.filteredResults.filter((resultItem) => {
             return searchStore.selectedResults.some((selectionItem) => resultItem.id === selectionItem.id);
         });
-        return alreadySelectedResults.length >= 1 && alreadySelectedResults.length !== searchStore.filteredResults.length ? true : false;
+        return alreadySelectedResults.length >= 1 &&
+            alreadySelectedResults.length !== searchStore.filteredResults.length
+            ? true
+            : false;
     } else {
         return false;
     }
@@ -50,28 +51,24 @@ const isSomeResultsSelected = computed(() => {
  *
  * @returns { Boolean }
  */
-const isChecked = computed(() => isAllResultsSelected.value ? true : false);
+const isChecked = computed(() => (isAllResultsSelected.value ? true : false));
 
 /**
  * Add or remove all current search results
  */
-function onSelectAll () {
+function onSelectAll() {
     isChecked.value ? searchStore.removeAllResults() : searchStore.addAllResults();
 }
-
 </script>
 
 <template>
-    <button class="search-result"
-        @click.prevent="onSelectAll"
-        @keyup.enter="onSelectAll"
-    >
+    <button class="search-result" @click.prevent="onSelectAll" @keyup.enter="onSelectAll">
         <div class="checklist">
             <input
                 id="checkbox-select-all"
                 type="checkbox"
                 :checked="isChecked"
-                :class="{ 'indeterminate': isSomeResultsSelected }"
+                :class="{ indeterminate: isSomeResultsSelected }"
             />
             <label for="checkbox-select-all"></label>
         </div>
@@ -97,8 +94,7 @@ function onSelectAll () {
     background: var(--content-ui-hover);
 }
 
-input[type=checkbox]:not(.plain) + label {
+input[type="checkbox"]:not(.plain) + label {
     margin: 0;
 }
-
 </style>

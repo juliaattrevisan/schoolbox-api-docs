@@ -6,14 +6,19 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 /** @var SitePage $page */
 $page = $kernel->get('sitePage');
 $page->initSession();
-$myLinksHandler = new MyLinks();
+$bookmarkMapper = \Schoolbox\Bookmark\Mapper::getInstance();
 
-$existing = is_numeric($_POST['linkID'] ?? null) ? $myLinksHandler->getByID($_POST['linkID']) : null;
+try {
+    /** @var \Schoolbox\Bookmark\Model|null $existing */
+    $existing = is_numeric($_POST['linkID'] ?? null) ? $bookmarkMapper->findById($_POST['linkID']) : null;
+} catch (\Schoolbox\Mapper\Exception $e) {
+    $existing = null;
+}
 
 /** @var \Schoolbox\User $sessionUser */
 $sessionUser = $_SESSION['user'];
 
-if ($existing && ((int)$existing['owner'] !== $sessionUser->getId())) {
+if ($existing instanceof \Schoolbox\Bookmark\Model && ($existing->getOwner() !== $sessionUser->getId())) {
     error(\Schoolbox\Error\Mapper::ERROR_PERM_LINK);
 }
 
@@ -30,21 +35,20 @@ if (isset($_REQUEST['url']) && $_REQUEST['url'] && isset($_REQUEST['description'
     /* Create/update
      */
 
-    if ($existing) {
-        $existing['url']         = $url;
-        $existing['description'] = $_REQUEST['description'];
-
-        $myLinksHandler->update($existing);
+    if ($existing instanceof \Schoolbox\Bookmark\Model) {
+        $existing->setUrl($url);
+        $existing->setDescription($_REQUEST['description']);
+        $bookmarkMapper->save($existing);
     } else {
-        $myLinksHandler->create([
-            'owner'       => $_SESSION['id'],
-            'url'         => $url,
-            'description' => $_REQUEST['description'],
-        ]);
+        $newLink = $bookmarkMapper->createModel()
+            ->setOwner($_SESSION['id'])
+            ->setUrl($url)
+            ->setDescription($_REQUEST['description']);
+        $bookmarkMapper->save($newLink);
     }
 } else {
     if (isset($_GET['delete']) && $existing) {
-        $myLinksHandler->delete($existing['id']);
+        $bookmarkMapper->delete($existing);
     }
 }
 

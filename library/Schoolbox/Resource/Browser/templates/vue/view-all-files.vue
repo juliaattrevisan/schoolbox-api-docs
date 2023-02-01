@@ -1,21 +1,18 @@
 <script>
-
 /**
  * Presents all the files within a homepage file component in a filterable table
  */
 
-import { EventBus } from 'v-tables-3-select-rows';
-import fileTypes from './viewAllFilesFileTypes.js';
-import ViewAllFilesFilters from './view-all-files-filters.vue';
-import ViewAllFilesDropzone from './view-all-files-dropzone.vue';
-import ViewAllFilesDeleteFiles from './view-all-files-delete-files.vue';
-import footerUI from '@schoolboxVue/components/vueTables2/mixinFooterUI.js';
+import { EventBus } from "v-tables-3-select-rows";
+import fileTypes from "./viewAllFilesFileTypes.js";
+import ViewAllFilesFilters from "./view-all-files-filters.vue";
+import ViewAllFilesDropzone from "./view-all-files-dropzone.vue";
+import ViewAllFilesDeleteFiles from "./view-all-files-delete-files.vue";
+import footerUI from "@schoolboxVue/components/vueTables2/mixinFooterUI.js";
 
-const SB_SELECTED_FILTERS_STORAGE = 'sb_viewAllFilesSelectedFilters'
-
+const SB_SELECTED_FILTERS_STORAGE = "sb_viewAllFilesSelectedFilters";
 
 export default {
-
     components: {
         ViewAllFilesFilters,
         ViewAllFilesDropzone,
@@ -23,11 +20,12 @@ export default {
     },
 
     mixins: [
-        footerUI //to place and keep the tables UI in the footer
+        footerUI, //to place and keep the tables UI in the footer
     ],
 
     props: {
-        canEdit: { //whether the user has permission to modify files
+        canEdit: {
+            //whether the user has permission to modify files
             type: Boolean,
             required: true,
         },
@@ -39,151 +37,157 @@ export default {
             type: String,
             required: true,
         },
-        files: { //all files within the component
+        files: {
+            //all files within the component
             type: Array,
             required: true,
         },
-        presetFilters: { //the list of currently selected filters passed through
+        presetFilters: {
+            //the list of currently selected filters passed through
             type: Array,
             required: true,
         },
-        referrer: { //to know whether we are coming from 'component' or elsewhere
+        referrer: {
+            //to know whether we are coming from 'component' or elsewhere
             type: String,
             required: true,
         },
-        sourceFolderId: { //to know where to upload files to
+        sourceFolderId: {
+            //to know where to upload files to
             type: Number,
             required: true,
         },
     },
 
-    data () {
+    data() {
         return {
             selectedFilters: [],
             tableData: [],
-            tableOptions: { //options for vue-tables-2: https://matanya.gitbook.io/vue-tables-2/options-api
+            tableOptions: {
+                //options for vue-tables-2: https://matanya.gitbook.io/vue-tables-2/options-api
                 alwaysShowPerPageSelect: true,
                 columnsClasses: {
-                    ['dateModified.formatted']: 'date-modified-td ', //to hide the column for mobile
-                    edit: 'edit-td ', //to specify a width
+                    ["dateModified.formatted"]: "date-modified-td ", //to hide the column for mobile
+                    edit: "edit-td ", //to specify a width
                 },
-                customFilters: [ //refer to https://matanya.gitbook.io/vue-tables-2/custom-filters for further info
+                customFilters: [
+                    //refer to https://matanya.gitbook.io/vue-tables-2/custom-filters for further info
                     {
                         name: fileTypes.DOCUMENT,
-                        callback: (row, query) => row.type !== query
+                        callback: (row, query) => row.type !== query,
                     },
                     {
                         name: fileTypes.AUDIO,
-                        callback: (row, query) => row.type !== query
+                        callback: (row, query) => row.type !== query,
                     },
                     {
                         name: fileTypes.VIDEO,
-                        callback: (row, query) => row.type !== query
+                        callback: (row, query) => row.type !== query,
                     },
                     {
                         name: fileTypes.IMAGE,
-                        callback: (row, query) => row.type !== query
+                        callback: (row, query) => row.type !== query,
                     },
                     {
                         name: fileTypes.OTHER,
-                        callback: (row, query) => row.type !== query
+                        callback: (row, query) => row.type !== query,
                     },
                 ],
                 customSorting: {
-                    name: (ascending) => { //sort name naturally
+                    name: (ascending) => {
+                        //sort name naturally
                         return (a, b) => {
                             if (ascending) {
                                 return this.collator.compare(a.name, b.name);
                             } else {
                                 return this.collator.compare(b.name, a.name);
                             }
-                        }
+                        };
                     },
-                    ['dateModified.formatted']: (ascending) => { //sort date modified accurately by the timestamp
+                    ["dateModified.formatted"]: (ascending) => {
+                        //sort date modified accurately by the timestamp
                         return (a, b) => {
                             if (ascending) {
                                 return a.dateModified.timestamp >= b.dateModified.timestamp ? 1 : -1;
                             }
                             return a.dateModified.timestamp <= b.dateModified.timestamp ? 1 : -1;
-                        }
+                        };
                     },
                 },
                 debounce: 100, //shorter debounce time as data is stored locally
                 headings: {
-                    name: 'Name',
-                    ['dateModified.formatted']: 'Date modified',
-                    edit: '',
+                    name: "Name",
+                    ["dateModified.formatted"]: "Date modified",
+                    edit: "",
                 },
-                orderBy: { //use the passed through component instance config to match the initial sorting
-                    ascending: this.sortDir === 'asc',
-                    column: this.sortBy === 'name' ? 'name' : 'dateModified.formatted',
+                orderBy: {
+                    //use the passed through component instance config to match the initial sorting
+                    ascending: this.sortDir === "asc",
+                    column: this.sortBy === "name" ? "name" : "dateModified.formatted",
                 },
                 perPage: 100,
                 perPageValues: [100, 200, 300],
                 resizableColumns: false,
-                rowClassCallback: (row) => { //to differentiate newly uploaded files so it's clear where they've been placed in the table
-                    return row.isNew ? 'new-file-upload' : '';
+                rowClassCallback: (row) => {
+                    //to differentiate newly uploaded files so it's clear where they've been placed in the table
+                    return row.isNew ? "new-file-upload" : "";
                 },
                 selectable: {
-                    mode: this.canEdit ? 'multiple' : '' //to enable multi-select for those with permission
+                    mode: this.canEdit ? "multiple" : "", //to enable multi-select for those with permission
                 },
-                sortable: ['name', 'dateModified.formatted'], //the edit column doesn't need to be sortable
+                sortable: ["name", "dateModified.formatted"], //the edit column doesn't need to be sortable
                 sortIcon: {
-                    is: 'glyphicon-sort',
-                    base: 'glyphicon',
-                    up: 'glyphicon-chevron-up',
-                    down: 'glyphicon-chevron-down'
+                    is: "glyphicon-sort",
+                    base: "glyphicon",
+                    up: "glyphicon-chevron-up",
+                    down: "glyphicon-chevron-down",
                 },
                 tabbable: false,
                 texts: {
-                    count: '{from}-{to} of {count} files|{count} files|1 file',
-                    filterPlaceholder: 'Search files',
-                    noResults: 'No matching files',
+                    count: "{from}-{to} of {count} files|{count} files|1 file",
+                    filterPlaceholder: "Search files",
+                    noResults: "No matching files",
                 },
             },
             tableColumns: this.getTableColumns(),
-            collator: new Intl.Collator('en', { numeric: true, sensitivity: 'base' }), //to natually sort name column
+            collator: new Intl.Collator("en", { numeric: true, sensitivity: "base" }), //to natually sort name column
             selectedFiles: [], //keep track of which rows could be deleted/downloaded
             isShiftKeySelected: false, //to multi-select fields
             hasSelectedShiftKey: false, //to hide a UI note
-        }
+        };
     },
 
     computed: {
-
         /**
          * Whether there's saved session storage and we aren't coming
          * from the component (as the component settings take precedence)
          *
          * @returns { Boolean }
          */
-        useSessionStorage () {
-            return sessionStorage.getItem(this.selectedFiltersStorage)
-                   && this.referrer !== 'component';
-        }
-
+        useSessionStorage() {
+            return sessionStorage.getItem(this.selectedFiltersStorage) && this.referrer !== "component";
+        },
     },
 
-    created () {
+    created() {
         this.initSelectedFilters();
     },
 
-    mounted () {
+    mounted() {
         this.initShiftKeyDetection();
         this.initTable();
     },
 
     methods: {
-
         /**
          * The edit column is only displayed to those that have permission
          *
          * @returns { Array }
          */
-        getTableColumns () {
-            const tableColumns = ['name', 'dateModified.formatted'];
+        getTableColumns() {
+            const tableColumns = ["name", "dateModified.formatted"];
             if (this.canEdit) {
-                tableColumns.push('edit');
+                tableColumns.push("edit");
             }
             return tableColumns;
         },
@@ -191,7 +195,7 @@ export default {
         /**
          * Check if the filters are stored in session storage
          */
-        initSelectedFilters () {
+        initSelectedFilters() {
             this.selectedFiltersStorage = `${SB_SELECTED_FILTERS_STORAGE}_${this.sourceFolderId}`;
             if (this.useSessionStorage) {
                 this.selectedFilters = this.getFiltersSessionStorage();
@@ -203,22 +207,22 @@ export default {
         /**
          * pull the filters from local storage
          */
-        getFiltersSessionStorage () {
+        getFiltersSessionStorage() {
             const filtersSessionStorage = sessionStorage.getItem(this.selectedFiltersStorage);
-            return filtersSessionStorage.split(',');
+            return filtersSessionStorage.split(",");
         },
 
         /**
          * To hide a UI note informing of shift-selection once pressed once
          */
-        initShiftKeyDetection () {
-            document.addEventListener('keydown', (event) => {
-                if (event.key === 'Shift') {
+        initShiftKeyDetection() {
+            document.addEventListener("keydown", (event) => {
+                if (event.key === "Shift") {
                     this.isShiftKeySelected = true;
                 }
             });
-            document.addEventListener('keyup', (event) => {
-                if (event.key === 'Shift') {
+            document.addEventListener("keyup", (event) => {
+                if (event.key === "Shift") {
                     this.isShiftKeySelected = false;
                 }
             });
@@ -227,15 +231,15 @@ export default {
         /**
          * Populate the table with the files list
          */
-        initTable () {
-            this.tableData = this.files.map((file) => file = { ...file, isNew: false } ); //add isNew so can differentiate newly uploaded files
+        initTable() {
+            this.tableData = this.files.map((file) => (file = { ...file, isNew: false })); //add isNew so can differentiate newly uploaded files
             this.onTableLoaded();
         },
 
         /**
          * To update the table to show the UI in the footer
          */
-        onTableLoaded () {
+        onTableLoaded() {
             this.$nextTick(() => {
                 this.footerUI_update();
                 this.initFilterDisplay();
@@ -249,7 +253,7 @@ export default {
         /**
          * To only show those files within the currently filtered list
          */
-        initFilterDisplay () {
+        initFilterDisplay() {
             if (!this.selectedFilters.includes(fileTypes.DOCUMENT)) {
                 EventBus.emit(`vue-tables.filter::${fileTypes.DOCUMENT}`, fileTypes.DOCUMENT);
             }
@@ -270,9 +274,10 @@ export default {
         /**
          * To keep track of selected rows
          */
-        onRowSelected (event) {
+        onRowSelected(event) {
             this.selectedFiles = event;
-            if (this.selectedFiles.length > 1 && this.isShiftKeySelected) { //to hide a UI note, notifying of availability of shift-select
+            if (this.selectedFiles.length > 1 && this.isShiftKeySelected) {
+                //to hide a UI note, notifying of availability of shift-select
                 this.hasSelectedShiftKey = true;
             }
         },
@@ -282,7 +287,7 @@ export default {
          *
          * @param { String }
          */
-        onFilterChange (fileType) {
+        onFilterChange(fileType) {
             this.updateSelectedFilters(fileType);
             this.dispatchFilterEvent(fileType);
             this.updateSessionStorage();
@@ -294,7 +299,7 @@ export default {
          *
          * @param { String }
          */
-        updateSelectedFilters (fileType) {
+        updateSelectedFilters(fileType) {
             if (this.selectedFilters.includes(fileType)) {
                 this.selectedFilters = this.selectedFilters.filter((filterType) => filterType !== fileType);
             } else {
@@ -308,8 +313,8 @@ export default {
          *
          * @param { String }
          */
-        dispatchFilterEvent (fileType) {
-            const filterParam = this.selectedFilters.includes(fileType) ? '' : fileType ;
+        dispatchFilterEvent(fileType) {
+            const filterParam = this.selectedFilters.includes(fileType) ? "" : fileType;
             EventBus.emit(`vue-tables.filter::${fileType}`, filterParam);
         },
 
@@ -317,8 +322,8 @@ export default {
          * Save the modified filters in the session storage to allow returning to the correct
          * selected files if returning to the page from editing a file
          */
-        updateSessionStorage () {
-            const selectedFiltersAsString = this.selectedFilters.join(',');
+        updateSessionStorage() {
+            const selectedFiltersAsString = this.selectedFilters.join(",");
             sessionStorage.setItem(this.selectedFiltersStorage, selectedFiltersAsString);
         },
 
@@ -329,11 +334,11 @@ export default {
          *
          * @param { Object }
          */
-        markAllFilesAsOld () {
+        markAllFilesAsOld() {
             this.$nextTick(() => {
                 this.tableData.forEach((file) => {
                     file.isNew = false;
-                })
+                });
             });
         },
 
@@ -346,11 +351,11 @@ export default {
          *
          * @returns { String }
          */
-        getVisibilityAction (file) {
+        getVisibilityAction(file) {
             if (file.hidden) {
-                return 'Show file';
+                return "Show file";
             } else {
-                return 'Hide file';
+                return "Hide file";
             }
         },
 
@@ -359,18 +364,18 @@ export default {
          *
          * @param { Object }
          */
-        async onToggleVisibilitySelected (toggledFile) {
+        async onToggleVisibilitySelected(toggledFile) {
             //we need to do this as Vue is watching tableData, not each individual file within
             const fileInTableData = this.tableData.find((file) => file.id === toggledFile.id);
             try {
                 const invertedFileHidden = !fileInTableData.hidden; //to pass through to the endpoint
                 const response = await fetch(toggledFile.visibilityUrl, {
-                    method: 'PATCH',
+                    method: "PATCH",
                     headers: {
-                        'Content-Type': 'application/json',
+                        "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
-                        'hidden': invertedFileHidden,
+                        hidden: invertedFileHidden,
                     }),
                 });
                 const responseData = await response.json();
@@ -386,10 +391,11 @@ export default {
          *
          * @param { Object }
          */
-        onFileSuccess (file) {
+        onFileSuccess(file) {
             this.checkFileFilterIsActive(file);
             this.addFileToTable(file);
-            this.$nextTick(() => { //so we can use jQuery preview on newly added files
+            this.$nextTick(() => {
+                //so we can use jQuery preview on newly added files
                 $('[data-plugin="preview"]').preview();
             });
         },
@@ -401,10 +407,10 @@ export default {
          *
          * @param { Object }
          */
-        checkFileFilterIsActive (file) {
+        checkFileFilterIsActive(file) {
             if (!this.selectedFilters.includes(file.type)) {
                 this.selectedFilters = [...this.selectedFilters, file.type];
-                EventBus.emit(`vue-tables.filter::${file.type}`, '');
+                EventBus.emit(`vue-tables.filter::${file.type}`, "");
                 this.updateSessionStorage();
             }
         },
@@ -415,11 +421,11 @@ export default {
          *
          * @param { Object }
          */
-        addFileToTable (file) {
+        addFileToTable(file) {
             const newFile = {
                 ...file,
                 isNew: true,
-                editUrl: `${file.editUrl}?returnUrl=${encodeURIComponent(btoa(window.location.pathname))}`
+                editUrl: `${file.editUrl}?returnUrl=${encodeURIComponent(btoa(window.location.pathname))}`,
             };
             this.tableData = [...this.tableData, newFile];
         },
@@ -427,7 +433,7 @@ export default {
         /**
          * Files have been deleted, so clear them from the table and clear the selection
          */
-        onFilesDeleted () {
+        onFilesDeleted() {
             this.tableData = this.getUpdatedRowsAfterUserDeletion();
             this.markAllFilesAsOld();
             this.clearRowSelection();
@@ -438,9 +444,10 @@ export default {
          *
          * @returns { Array }
          */
-        getUpdatedRowsAfterUserDeletion () {
+        getUpdatedRowsAfterUserDeletion() {
             return this.tableData.filter((file) => {
-                if (this.selectedFiles.some((rowToDelete) => rowToDelete.id === file.id)) { //pull out any deleted rows, those rows that are in selectedFiles, which have just been deleted
+                if (this.selectedFiles.some((rowToDelete) => rowToDelete.id === file.id)) {
+                    //pull out any deleted rows, those rows that are in selectedFiles, which have just been deleted
                     return false;
                 }
                 return true;
@@ -450,26 +457,25 @@ export default {
         /**
          * Clear the selection
          */
-        clearRowSelection () {
+        clearRowSelection() {
             this.selectedFiles = [];
             this.$refs.table.resetSelectedRows();
         },
-
     },
-
-}
-
+};
 </script>
 
 <template>
-
     <div class="row" id="view-all-files">
-
         <div class="small-12 columns">
-
             <div class="dropzone-wrap">
-
-                <form v-if="canEdit" class="dropzone overlay" id="dropzone" action="/cms/fileForm.php?ajax=1" method="post">
+                <form
+                    v-if="canEdit"
+                    class="dropzone overlay"
+                    id="dropzone"
+                    action="/cms/fileForm.php?ajax=1"
+                    method="post"
+                >
                     <div class="dz-default dz-message">You can drag files into this space.</div>
                 </form>
 
@@ -491,15 +497,33 @@ export default {
                     </template>
                     <template #name="props">
                         <div>
-                            <a v-if="props.row.mime.inline" data-plugin="preview" :href="props.row.url" :title="props.row.name" rel="external">
+                            <a
+                                v-if="props.row.mime.inline"
+                                data-plugin="preview"
+                                :href="props.row.url"
+                                :title="props.row.name"
+                                rel="external"
+                            >
                                 <h3 class="name" :style="{ opacity: props.row.hidden ? '0.3' : '1' }">
-                                    <img class="mime" :src="`${cdnPrefix}${props.row.mime.url}`" height="32" width="32" :title="props.row.mime.description">
+                                    <img
+                                        class="mime"
+                                        :src="`${cdnPrefix}${props.row.mime.url}`"
+                                        height="32"
+                                        width="32"
+                                        :title="props.row.mime.description"
+                                    />
                                     {{ props.row.name }}
                                 </h3>
                             </a>
                             <a v-else :href="props.row.url" :title="props.row.name" rel="external">
                                 <h3 class="name" :style="{ opacity: props.row.hidden ? '0.3' : '1' }">
-                                    <img class="mime" :src="`${cdnPrefix}${props.row.mime.url}`" height="32" width="32" :title="props.row.mime.description">
+                                    <img
+                                        class="mime"
+                                        :src="`${cdnPrefix}${props.row.mime.url}`"
+                                        height="32"
+                                        width="32"
+                                        :title="props.row.mime.description"
+                                    />
                                     {{ props.row.name }}
                                 </h3>
                             </a>
@@ -508,7 +532,15 @@ export default {
                     </template>
                     <template #edit="props">
                         <nav class="edit">
-                            <button :class="`button-toggle-visibility ${ props.row.hidden ? 'icon-view-hollow' : 'icon-view' }`" @click.prevent="onToggleVisibilitySelected(props.row)" :title="getVisibilityAction(props.row)">{{ getVisibilityAction(props.row) }}</button>
+                            <button
+                                :class="`button-toggle-visibility ${
+                                    props.row.hidden ? 'icon-view-hollow' : 'icon-view'
+                                }`"
+                                @click.prevent="onToggleVisibilitySelected(props.row)"
+                                :title="getVisibilityAction(props.row)"
+                            >
+                                {{ getVisibilityAction(props.row) }}
+                            </button>
                             <a class="icon-modify" :href="props.row.editUrl" title="Modify File"></a>
                         </nav>
                     </template>
@@ -523,12 +555,16 @@ export default {
                         <div class="VueTables__table-footer" ref="tableFooter"></div>
                         <div v-if="canEdit" class="component-action">
                             <section>
-                                <p><a :href="`/cms/file/new/${this.sourceFolderId}`" title="Select a file">Select a file</a> or drag and drop multiple onto this component</p>
+                                <p>
+                                    <a :href="`/cms/file/new/${this.sourceFolderId}`" title="Select a file"
+                                        >Select a file</a
+                                    >
+                                    or drag and drop multiple onto this component
+                                </p>
                             </section>
                         </div>
                     </template>
                 </v-client-table>
-
             </div>
 
             <view-all-files-delete-files
@@ -539,16 +575,12 @@ export default {
                 @on-files-deleted="onFilesDeleted"
                 @on-selection-cleared="clearRowSelection"
             />
-
         </div>
-
     </div>
-
 </template>
 
 <style lang="scss">
-
-@import '@schoolboxVue/components/vueTables2/vueTables2';
+@import "@schoolboxVue/components/vueTables2/vueTables2";
 
 .VueTables table {
     table-layout: fixed; //to ensure the flex within view-all-files-row-name can shrink all the way down
@@ -566,7 +598,8 @@ export default {
     margin-bottom: 0; //to put the view-all-files-filters.vue up closer to the search input
 }
 
-.VueTables__table td, .VueTables__select-all {
+.VueTables__table td,
+.VueTables__select-all {
     padding: 0.25rem 0.5rem 0.25rem 0.5rem;
     vertical-align: middle;
     @media (max-width: 700px) {
@@ -588,7 +621,8 @@ export default {
 
 .meta {
     display: none;
-    @media (max-width: 700px) { //show on mobile, as the .date-modified-td will be hidden
+    @media (max-width: 700px) {
+        //show on mobile, as the .date-modified-td will be hidden
         display: block;
     }
 }
@@ -637,15 +671,19 @@ export default {
     margin-bottom: 2rem; //add margin as it's below the table-footer
 }
 
-.VueTables__table tr.new-file-upload { //have to be pretty specific to overwrite foundation rules...
+.VueTables__table tr.new-file-upload {
+    //have to be pretty specific to overwrite foundation rules...
     animation-duration: 2s;
     animation-iteration-count: 1;
     animation-name: fadeOutBackgroundColour;
 }
 
 @keyframes fadeOutBackgroundColour {
-    0% { background-color: #4fa74f; } //is $success-color from _colors.scss
-    100% { background-color: white; }
+    0% {
+        background-color: #4fa74f;
+    } //is $success-color from _colors.scss
+    100% {
+        background-color: white;
+    }
 }
-
 </style>

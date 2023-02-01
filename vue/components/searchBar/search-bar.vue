@@ -1,18 +1,16 @@
 <script>
-
-import ResultMeta from './search-bar-results-meta';
-import debounce from 'lodash/debounce';
+import ResultMeta from "./search-bar-results-meta";
+import debounce from "lodash/debounce";
 
 export default {
-
     components: {
-        ResultMeta
+        ResultMeta,
     },
 
-    data () {
+    data() {
         return {
             isFocused: false,
-            keyword: '',
+            keyword: "",
             results: [],
             isOpen: false,
             isLoading: true,
@@ -20,33 +18,30 @@ export default {
             totalCount: 0,
             arrowCounter: -1, // Want to automatically select the first result? set this to 0
             paths: {
-                'portrait': '/portrait.php?id=',
-                'searchEndpoint': '/user/search?keyword=',
-                'userPage': '/search/user/',
-                'searchPage': '/search?keyword=',
-            }
-        }
+                portrait: "/portrait.php?id=",
+                searchEndpoint: "/user/search?keyword=",
+                userPage: "/search/user/",
+                searchPage: "/search?keyword=",
+            },
+        };
     },
 
     watch: {
-
-        keyword () {
+        keyword() {
             if (this.keyword.length >= this.minKeywordLength) {
                 this.isOpen = true;
                 this.isLoading = true;
                 this.results = [];
                 this.filterResults();
             }
-        }
-
+        },
     },
 
     methods: {
-
         /**
          * Arrow pressed down, moving to next result
          */
-        onArrowDown () {
+        onArrowDown() {
             if (this.arrowCounter < this.results.length - 1) {
                 this.arrowCounter = this.arrowCounter + 1;
             }
@@ -55,7 +50,7 @@ export default {
         /**
          * Arrow pressed up, moving to previous result
          */
-        onArrowUp () {
+        onArrowUp() {
             if (this.arrowCounter > -1) {
                 this.arrowCounter = this.arrowCounter - 1;
             }
@@ -64,11 +59,11 @@ export default {
         /**
          * Navigate to the chosen result
          */
-        onEnter () {
+        onEnter() {
             if (this.arrowCounter > 0) {
                 this.goToPath(this.paths.userPage + this.results[this.arrowCounter].id);
             } else {
-                document.getElementById('search').submit();
+                document.getElementById("search").submit();
             }
         },
 
@@ -77,14 +72,13 @@ export default {
          *
          * @param { Event }
          */
-        onFocusOver (event) {
-
-            if (event.type === 'focus') {
-                var offCanvasWrap = document.getElementById('off-canvas-wrap');
+        onFocusOver(event) {
+            if (event.type === "focus") {
+                var offCanvasWrap = document.getElementById("off-canvas-wrap");
 
                 // If left nav is unpinned and currently open, close it
-                if (offCanvasWrap.classList.contains('move-right')) {
-                    offCanvasWrap.classList.remove('move-right');
+                if (offCanvasWrap.classList.contains("move-right")) {
+                    offCanvasWrap.classList.remove("move-right");
                 }
 
                 this.isFocused = true;
@@ -105,7 +99,7 @@ export default {
              *
              * TODO: Convert the whole chrome to VueJS to prevent/minimise this kinds of implementation
              */
-            document.querySelector('#menu-toggle').classList.add('search-is-active');
+            document.querySelector("#menu-toggle").classList.add("search-is-active");
         },
 
         /**
@@ -113,7 +107,7 @@ export default {
          *
          * @param { String }
          */
-        goToPath (path) {
+        goToPath(path) {
             window.location.href = path;
         },
 
@@ -123,15 +117,17 @@ export default {
          */
         filterResults: debounce(function () {
             fetch(this.paths.searchEndpoint + this.keyword)
-            .then((response) => response.json())
-            .then((data) => {
-                this.totalCount = data.totalCount;
-                this.results = data.results;
-            }).finally(() => {
-                this.isLoading = false;
-            }).catch((error) => {
-                console.warn(error);
-            });
+                .then((response) => response.json())
+                .then((data) => {
+                    this.totalCount = data.totalCount;
+                    this.results = data.results;
+                })
+                .finally(() => {
+                    this.isLoading = false;
+                })
+                .catch((error) => {
+                    console.warn(error);
+                });
         }, 500),
 
         /**
@@ -141,42 +137,47 @@ export default {
          *
          * @returns { String }
          */
-        formatPortrait (id) {
-            return this.paths.portrait + id + '&size=square64';
-        }
-
-    }
-
-}
-
+        formatPortrait(id) {
+            return this.paths.portrait + id + "&size=square64";
+        },
+    },
+};
 </script>
 
 <template>
-    <form id="search" class="global-search" action="/search" :class="{focus: isFocused}">
-        <input id="search-field"
-               type="text"
-               name="keyword"
-               placeholder="Search"
-               autocomplete="off"
-               :value="keyword"
-               @input="keyword = $event.target.value"
-               @keydown.down="onArrowDown"
-               @keydown.up="onArrowUp"
-               @keydown.enter.prevent="onEnter"
-               @focus="onFocusOver"
-               @mouseover="onFocusOver"
-               @blur="isFocused=false"
-               @focusout="isFocused=false"
-               maxlength="2048"
+    <form id="search" class="global-search" action="/search" :class="{ focus: isFocused }">
+        <input
+            id="search-field"
+            type="text"
+            name="keyword"
+            placeholder="Search"
+            autocomplete="off"
+            :value="keyword"
+            @input="keyword = $event.target.value"
+            @keydown.down="onArrowDown"
+            @keydown.up="onArrowUp"
+            @keydown.enter.prevent="onEnter"
+            @focus="onFocusOver"
+            @mouseover="onFocusOver"
+            @blur="isFocused = false"
+            @focusout="isFocused = false"
+            maxlength="2048"
         />
         <ul class="results information-list" v-show="isFocused && isOpen && keyword.length >= minKeywordLength">
             <li class="result-meta" v-if="results.length && results.length !== totalCount" @click.prevent>
                 <result-meta>Showing {{ results.length }} of {{ totalCount }} matching users</result-meta>
             </li>
             <li v-for="(result, i) in results" :key="i" class="result">
-                <a class="link-row" @click="goToPath(paths.userPage + result.id)" @mousedown.left="goToPath(paths.userPage + result.id)" :class="{ 'is-active': i === arrowCounter }" @mouseover="arrowCounter = i" @mouseleave="arrowCounter = -1">
+                <a
+                    class="link-row"
+                    @click="goToPath(paths.userPage + result.id)"
+                    @mousedown.left="goToPath(paths.userPage + result.id)"
+                    :class="{ 'is-active': i === arrowCounter }"
+                    @mouseover="arrowCounter = i"
+                    @mouseleave="arrowCounter = -1"
+                >
                     <div class="card small-12">
-                        <img :src="formatPortrait(result.id)" alt="portrait photo">
+                        <img :src="formatPortrait(result.id)" alt="portrait photo" />
                         <h3 class="name">{{ result.formattedName }}</h3>
                         <p class="meta">{{ result.metadata }}</p>
                     </div>
@@ -185,18 +186,23 @@ export default {
             <li class="result-meta" v-if="isLoading">
                 <result-meta><div class="loader"></div></result-meta>
             </li>
-            <li class="result-meta with-bg" v-if="results.length && totalCount > results.length" @mousedown.left="goToPath(paths.searchPage + keyword + '#user')">
-                <result-meta>
-                    View all {{ totalCount }} users
-                </result-meta>
+            <li
+                class="result-meta with-bg"
+                v-if="results.length && totalCount > results.length"
+                @mousedown.left="goToPath(paths.searchPage + keyword + '#user')"
+            >
+                <result-meta> View all {{ totalCount }} users </result-meta>
             </li>
             <li class="result-meta" v-if="!isLoading && !results.length">
                 <result-meta>No users were found matching "{{ keyword }}"</result-meta>
             </li>
-            <li class="result-meta with-bg" v-if="!isLoading && !results.length" @click="goToPath(paths.searchPage + keyword + '#all')" @mousedown.left="goToPath(paths.searchPage + keyword + '#all')">
-                <result-meta>
-                    Search everything for "{{ keyword }}"
-                </result-meta>
+            <li
+                class="result-meta with-bg"
+                v-if="!isLoading && !results.length"
+                @click="goToPath(paths.searchPage + keyword + '#all')"
+                @mousedown.left="goToPath(paths.searchPage + keyword + '#all')"
+            >
+                <result-meta> Search everything for "{{ keyword }}" </result-meta>
             </li>
         </ul>
         <label data-jsubmit for="search-field" class="icon-search no-text"></label>
@@ -204,8 +210,8 @@ export default {
 </template>
 
 <style scoped>
-    .inner-wrap:not(.left-open):not(.right-open) .global-search:hover,
-    .inner-wrap:not(.left-open):not(.right-open) .global-search.focus {
-        padding-left: 9rem;
-    }
+.inner-wrap:not(.left-open):not(.right-open) .global-search:hover,
+.inner-wrap:not(.left-open):not(.right-open) .global-search.focus {
+    padding-left: 9rem;
+}
 </style>

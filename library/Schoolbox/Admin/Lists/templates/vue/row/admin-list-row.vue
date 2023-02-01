@@ -1,17 +1,15 @@
 <script>
-
 /**
  * Display an indivudal row, providing access to view and edit permissions and delete
  */
 
-import { mapState, mapActions } from 'pinia';
-import { useAdminListStore } from '../store/adminListStore';
-import AdminListRowLookup from './admin-list-row-lookup';
-import AdminListRowColour from './admin-list-row-colour';
-import AdminListRowPopOut from './admin-list-row-pop-out';
+import { mapState, mapActions } from "pinia";
+import { useAdminListStore } from "../store/adminListStore";
+import AdminListRowLookup from "./admin-list-row-lookup";
+import AdminListRowColour from "./admin-list-row-colour";
+import AdminListRowPopOut from "./admin-list-row-pop-out";
 
 export default {
-
     components: {
         AdminListRowLookup,
         AdminListRowColour,
@@ -19,23 +17,23 @@ export default {
     },
 
     props: {
-        row: { //row to display
+        row: {
+            //row to display
             type: Object,
-            required: true
+            required: true,
         },
     },
 
     computed: {
-
         ...mapState(useAdminListStore, {
-            isSortable: state => state.loadedData.isSortable,
-            canDelete: state => state.loadedData.canDelete,
-            selectedRow: state => state.selectedRow,
-            isPopOutOpen: state => state.isPopOutOpen,
-            selectedPopOutName: state => state.selectedPopOutName,
-            headerFields: state => state.headerFields, //the headerFields to display within the list item
-            popOutHeaderField: state => state.popOutHeaderField,  //the title field of the pop out
-            popOutFields: state => state.popOutFields, //when a #admin-list-pop-out.vue is in use
+            isSortable: (state) => state.loadedData.isSortable,
+            canDelete: (state) => state.loadedData.canDelete,
+            selectedRow: (state) => state.selectedRow,
+            isPopOutOpen: (state) => state.isPopOutOpen,
+            selectedPopOutName: (state) => state.selectedPopOutName,
+            headerFields: (state) => state.headerFields, //the headerFields to display within the list item
+            popOutHeaderField: (state) => state.popOutHeaderField, //the title field of the pop out
+            popOutFields: (state) => state.popOutFields, //when a #admin-list-pop-out.vue is in use
         }),
 
         /**
@@ -43,7 +41,7 @@ export default {
          *
          * @returns { Array of Objects }
          */
-        rowKeyValueList () {
+        rowKeyValueList() {
             const rowKeyValueList = [];
             for (const [key, value] of Object.entries(this.row)) {
                 rowKeyValueList.push({ key: key, value: value });
@@ -56,40 +54,35 @@ export default {
          *
          * @returns { Boolean }
          */
-        isUnselectedRow () {
-            return (this.isPopOutOpen && this.selectedRow.id !== this.row.id) //is a row selected, and is it this row if so
+        isUnselectedRow() {
+            return this.isPopOutOpen && this.selectedRow.id !== this.row.id; //is a row selected, and is it this row if so
         },
-
     },
 
     methods: {
-
-        ...mapActions(useAdminListStore, ['deleteRowPrompt']),
+        ...mapActions(useAdminListStore, ["deleteRowPrompt"]),
 
         /**
          * To confirm whether should delete the row
          */
-        onDeleteRowSelected () {
+        onDeleteRowSelected() {
             this.deleteRowPrompt(this.row);
         },
-
-    }
-
-}
+    },
+};
 </script>
 
 <template>
-
-    <li :class="[ isUnselectedRow ? 'un-selected-row' : '', 'list-item-container' ]" :data-row-id="row.id">
-
-        <div :class="`actions-small-${ canDelete ? '1' : '0' }`">
-
+    <li :class="[isUnselectedRow ? 'un-selected-row' : '', 'list-item-container']" :data-row-id="row.id">
+        <div :class="`actions-small-${canDelete ? '1' : '0'}`">
             <div v-if="isSortable" class="grip ui-sortable-handle"></div>
 
             <div class="list-item">
-
-                <div v-for="(field) in headerFields" :class="`small-12 medium-${ field.width ? field.width : '2' } column`" :key="field.id">
-
+                <div
+                    v-for="field in headerFields"
+                    :class="`small-12 medium-${field.width ? field.width : '2'} column`"
+                    :key="field.id"
+                >
                     <span class="hide-for-medium-up">{{ field.caption }}</span>
 
                     <template v-if="field.readonly">
@@ -98,20 +91,13 @@ export default {
 
                     <template v-else-if="field.checkbox">
                         <div class="checklist">
-                            <input
-                                :id="`${row.id}-${field.caption}`"
-                                type="checkbox"
-                                v-model="row[field.id]"
-                            />
+                            <input :id="`${row.id}-${field.caption}`" type="checkbox" v-model="row[field.id]" />
                             <label :for="`${row.id}-${field.caption}`"></label>
                         </div>
                     </template>
 
                     <template v-else-if="field.lookup">
-                        <admin-list-row-lookup
-                            :field="field"
-                            :row="row"
-                        />
+                        <admin-list-row-lookup :field="field" :row="row" />
                     </template>
 
                     <template v-else-if="field.colour">
@@ -123,35 +109,41 @@ export default {
                     </template>
 
                     <template v-else-if="field.isPopOutList">
-                        <admin-list-row-pop-out
-                            :row="row"
-                        />
+                        <admin-list-row-pop-out :row="row" />
                     </template>
 
                     <template v-else>
-                        <input type="text" :required="field.mandatory" :placeholder="field.caption" v-model="row[field.id]" :maxlength="field.maxLength ? field.maxLength : ''">
+                        <input
+                            type="text"
+                            :required="field.mandatory"
+                            :placeholder="field.caption"
+                            v-model="row[field.id]"
+                            :maxlength="field.maxLength ? field.maxLength : ''"
+                        />
                     </template>
 
                     <template v-if="row.hasValidationError && row.hasValidationError[field.id]">
                         <label class="error">This field is required.</label>
                     </template>
                 </div>
-
-            </div><!-- .list-item -->
+            </div>
+            <!-- .list-item -->
 
             <nav v-if="canDelete">
-                <a @click.prevent="onDeleteRowSelected" @keyup.enter="onDeleteRowSelected" class="delete-row-button icon-delete" href="#delete-row" title="Delete Row"></a>
+                <a
+                    @click.prevent="onDeleteRowSelected"
+                    @keyup.enter="onDeleteRowSelected"
+                    class="delete-row-button icon-delete"
+                    href="#delete-row"
+                    title="Delete Row"
+                ></a>
             </nav>
-
         </div>
-
     </li>
-
 </template>
 
 <style lang="scss" scoped>
-
-@import 'www/static/css/core/base/_variables.scss';
+@import "www/static/css/core/base/_variables.scss";
 
 .field {
     @media screen and (max-width: 1500px) {
@@ -172,5 +164,4 @@ export default {
     height: 40px;
     margin: 14px 8px 0px 0px;
 }
-
 </style>

@@ -1,4 +1,4 @@
-$cdn-prefix: '../../';
+$cdn-prefix: "../../";
 
 @import "base/colors";
 @import "base/variables";
@@ -25,8 +25,8 @@ $cdn-prefix: '../../';
 @import "ui/iframe";
 @import "components/editor/custom-styles.scss";
 
-
-html, body {
+html,
+body {
     height: 100%;
 }
 

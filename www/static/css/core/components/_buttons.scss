@@ -19,7 +19,7 @@ $include-html-button-classes: $include-html-classes;
 
  */
 $button-input-scale: 250 !default;
-$global-button-input-height: rem-calc(($base-font-size  * calc($button-input-scale / 100))) !default;
+$global-button-input-height: rem-calc(($base-font-size * calc($button-input-scale / 100))) !default;
 $global-button-height: $global-button-input-height;
 $global-button-padding: rem-calc(calc($base-font-size / 2));
 
@@ -37,7 +37,7 @@ $button-font-med: $base-font-size;
 $button-font-weight: $font-weight-normal;
 
 // We use these to control various hover effects.
- $button-function-factor: 11%;
+$button-function-factor: 11%;
 
 // We use these to control button border and hover styles.
 $button-bg-color: $content-ui-background;
@@ -61,26 +61,26 @@ $button-disabled-opacity: 0.5;
 
 // Override buttons with icons font-size
 .size-24[class^="icon-"]:before,
-.size-24[class*=" icon-"]:before{
-	font-size: 1.5rem;
+.size-24[class*=" icon-"]:before {
+    font-size: 1.5rem;
 }
 
 .size-32[class^="icon-"]:before,
-.size-32[class*=" icon-"]:before{
-	font-size: 2rem;
+.size-32[class*=" icon-"]:before {
+    font-size: 2rem;
 }
 
 .size-48[class^="icon-"]:before,
-.size-48[class*=" icon-"]:before{
-	font-size: 3rem;
+.size-48[class*=" icon-"]:before {
+    font-size: 3rem;
 }
 
 .size-64[class^="icon-"]:before,
-.size-64[class*=" icon-"]:before{
-	font-size: 4rem;
+.size-64[class*=" icon-"]:before {
+    font-size: 4rem;
 }
 
 // MS Immersive reader button
 .immersive-reader-button {
-  float: right;
+    float: right;
 }

@@ -1,12 +1,11 @@
 <script setup>
-
 /**
  * An individual search result that matches the search query with search result
  * highlighted within. Selecting will take the user to relevant page/setting
  *
  */
 
-const emit = defineEmits(['remove']);
+const emit = defineEmits(["remove"]);
 
 const props = defineProps({
     /**
@@ -18,40 +17,42 @@ const props = defineProps({
         default: () => {
             return {
                 id: 0,
-                name: 'name',
+                name: "name",
                 isSelectAll: false,
                 isSelected: false,
-            }
-        }
+            };
+        },
     },
     /**
      * if the class-selector is disabled, we can hide the close button
      */
     isClassSelectorActive: {
-        type: Boolean, 
+        type: Boolean,
         required: false,
-    }
+    },
 });
 
 /**
  * To remove from the selected list
  */
-function onRemoveSelected () {
-    emit('remove', props.classItem);
+function onRemoveSelected() {
+    emit("remove", props.classItem);
 }
-
-
 </script>
 
 <template>
     <div class="selected-class">
         <span>{{ classItem.name }}</span>
-        <button v-if="isClassSelectorActive" class="remove-button icon-close" :aria-label="`Remove ${classItem.name}`" @click.prevent="onRemoveSelected"></button>
+        <button
+            v-if="isClassSelectorActive"
+            class="remove-button icon-close"
+            :aria-label="`Remove ${classItem.name}`"
+            @click.prevent="onRemoveSelected"
+        ></button>
     </div>
 </template>
 
 <style lang="scss" scoped>
-
 .selected-class {
     background: var(--body-background);
     color: #000;
@@ -74,5 +75,4 @@ function onRemoveSelected () {
     margin-top: 3px;
     padding: 0;
 }
-
 </style>

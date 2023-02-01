@@ -1,4 +1,3 @@
-
 .pastoral-flag-in-profile {
     margin-bottom: 0.75rem !important;
     font-size: 1rem !important;
@@ -9,39 +8,39 @@
 }
 
 .profile-tabs {
-  .subheader {
-    color: $header-font-color;
-    margin-left: 0 !important;
-  }
-  .divider {
-    border-bottom: 2px solid #EDEDED;
-
-    &:last-child {
-      border: 0;
+    .subheader {
+        color: $header-font-color;
+        margin-left: 0 !important;
     }
-  }
-  /* Achievements feed via the Achievements tab on student profile
+    .divider {
+        border-bottom: 2px solid #ededed;
+
+        &:last-child {
+            border: 0;
+        }
+    }
+    /* Achievements feed via the Achievements tab on student profile
    * Also, the Goals feed via the Goals tab on student profile
    */
-  .goals-achievements {
-    .awards > div {
-      border-bottom: 2px solid #EDEDED;
+    .goals-achievements {
+        .awards > div {
+            border-bottom: 2px solid #ededed;
+        }
     }
-  }
-  .classes-groups {
-    .v-card {
-      flex: 1 0 300px;
-      border: 1px solid #EDEDED;
-      margin: 0 1rem 1rem 0;
-      max-width: 300px;
-      padding: 0;
+    .classes-groups {
+        .v-card {
+            flex: 1 0 300px;
+            border: 1px solid #ededed;
+            margin: 0 1rem 1rem 0;
+            max-width: 300px;
+            padding: 0;
 
-      @media #{$medium-down} {
-        max-width: none;
-      }
-      @media #{$small-only} {
-        margin-right: 0;
-      }
+            @media #{$medium-down} {
+                max-width: none;
+            }
+            @media #{$small-only} {
+                margin-right: 0;
+            }
+        }
     }
-  }
 }

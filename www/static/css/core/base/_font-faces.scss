@@ -3,19 +3,17 @@
 */
 
 @font-face {
-  font-family: "schoolbox";
-  src:
-    url('#{$cdn-prefix}/fonts/schoolbox.ttf?7bbold') format('truetype'),
-    url('#{$cdn-prefix}/fonts/schoolbox.woff?7bbold') format('woff'),
-    url('#{$cdn-prefix}/fonts/schoolbox.svg?7bbold#schoolbox') format('svg');
-  font-weight: normal;
-  font-style: normal;
+    font-family: "schoolbox";
+    src: url("#{$cdn-prefix}/fonts/schoolbox.ttf?7bbold") format("truetype"),
+        url("#{$cdn-prefix}/fonts/schoolbox.woff?7bbold") format("woff"),
+        url("#{$cdn-prefix}/fonts/schoolbox.svg?7bbold#schoolbox") format("svg");
+    font-weight: normal;
+    font-style: normal;
 }
 
 @font-face {
     font-family: "LibreBarcode39";
-    src:
-        url('#{$cdn-prefix}/fonts/LibreBarcode39-Regular.ttf');
+    src: url("#{$cdn-prefix}/fonts/LibreBarcode39-Regular.ttf");
     font-weight: normal;
     font-style: normal;
 }

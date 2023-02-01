@@ -1,7 +1,6 @@
 <script>
-
 import axios from "axios";
-import BadgeImage from '../../vue/badge-image';
+import BadgeImage from "../../vue/badge-image";
 import Toast from "@schoolboxVue/components/toast";
 
 // Vue-select boilerplate
@@ -9,19 +8,19 @@ import Toast from "@schoolboxVue/components/toast";
 import vSelect from "vue-select";
 import debounce from "lodash/debounce";
 import "vue-select/dist/vue-select.css";
-import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin';
-import { generateAwardWithEvidenceUrl } from '../js/awardBadgeUtils';
+import cdnPrefixMixin from "@schoolboxVue/components/cdn-prefix-mixin";
+import { generateAwardWithEvidenceUrl } from "../js/awardBadgeUtils";
 
 // Render a custom template for the deselect icon.
 // Partially documented on https://github.com/sagalbot/vue-select/issues/994
-import Deselect from '@schoolboxVue/components/selectize/Deselect';
+import Deselect from "@schoolboxVue/components/selectize/Deselect";
 vSelect.props.components.default = () => ({ Deselect });
 
-import {calculateExpiryDate} from '../../vue/expiry-helper'
+import { calculateExpiryDate } from "../../vue/expiry-helper";
 
 const EVENTS = {
-    done: 'done',
-    cancel: 'cancel'
+    done: "done",
+    cancel: "cancel",
 };
 
 // The number of milliseconds to wait between the user's input and a search for
@@ -45,9 +44,7 @@ export default {
      * manner as a php trait. They must already be imported at the top of the file and will
      * be superpositioned on top of this javascript here, inside export default {}
      */
-    mixins: [
-        cdnPrefixMixin,
-    ],
+    mixins: [cdnPrefixMixin],
     components: {
         BadgeImage,
         Toast,
@@ -84,7 +81,7 @@ export default {
          */
         userSearchEndpoint: {
             type: String,
-            default: '/ajax/user.php',
+            default: "/ajax/user.php",
         },
 
         /**
@@ -93,7 +90,7 @@ export default {
          */
         userSearchQueryParam: {
             type: String,
-            default: 'query',
+            default: "query",
         },
 
         /**
@@ -105,7 +102,7 @@ export default {
         userSearchAdditionalParams: {
             type: Object,
             default: () => {
-                return {roleTypeID: 'student',};
+                return { roleTypeID: "student" };
             },
         },
 
@@ -115,7 +112,7 @@ export default {
          */
         placeholder: {
             type: String,
-            default: 'Search for users to award achievement to',
+            default: "Search for users to award achievement to",
         },
 
         /**
@@ -123,16 +120,15 @@ export default {
          */
         toastActivateMessage: {
             type: String,
-            default: 'Awarding achievement...',
+            default: "Awarding achievement...",
         },
-
 
         /**
          * Toast success message
          */
         toastSuccessMessage: {
             type: String,
-            default: 'Awarded achievement',
+            default: "Awarded achievement",
         },
 
         /**
@@ -140,7 +136,7 @@ export default {
          */
         toastFailureMessage: {
             type: String,
-            default: 'Awarding achievement failed',
+            default: "Awarding achievement failed",
         },
 
         /**
@@ -159,14 +155,14 @@ export default {
         type: String,
 
         isModalOpen: Boolean,
-        siteVersion: String
+        siteVersion: String,
     },
     data() {
         return {
             options: [],
             selected: [],
             isFormSubmitActive: false,
-        }
+        };
     },
     computed: {
         /**
@@ -175,7 +171,7 @@ export default {
          *
          * @returns {Boolean}
          */
-        isSubmitButtonDisabled () {
+        isSubmitButtonDisabled() {
             if (this.selected.length === 0) {
                 return true;
             } else if (this.isFormSubmitActive) {
@@ -191,7 +187,7 @@ export default {
          * @param {Date|null} fromDate
          * @returns {Date|null}
          */
-        expiryDate (fromDate) {
+        expiryDate(fromDate) {
             return calculateExpiryDate(this.expiry, fromDate);
         },
 
@@ -200,9 +196,9 @@ export default {
          *
          * @returns {String}
          */
-        selectedUserIds () {
+        selectedUserIds() {
             const userIdList = this.selected.map((user) => user.id);
-            return userIdList.join(',');
+            return userIdList.join(",");
         },
     },
     methods: {
@@ -217,7 +213,7 @@ export default {
          * @param {Function} loading A function to call when the loading state
          *                           changes (accepts a Boolean)
          */
-        onSearch: debounce(function(query, loading) {
+        onSearch: debounce(function (query, loading) {
             if (query.length < 3) {
                 return;
             }
@@ -225,11 +221,10 @@ export default {
             let params = this.userSearchAdditionalParams;
             params[this.userSearchQueryParam] = query;
             axios
-                .get(this.userSearchEndpoint, {params: params})
-                .then(response => this.options = response.data)
-                .finally(() => loading(false))
+                .get(this.userSearchEndpoint, { params: params })
+                .then((response) => (this.options = response.data))
+                .finally(() => loading(false));
         }, SEARCH_RESULT_RETRIEVE_DELAY),
-
 
         /**
          * Callback for when the badge award form is submitted.
@@ -244,7 +239,8 @@ export default {
             this.isFormSubmitActive = true;
             this.$refs.toast.activate(this.toastActivateMessage);
 
-            axios.post(this.endpoint, { users: this.selected })
+            axios
+                .post(this.endpoint, { users: this.selected })
                 .then(() => {
                     // Clear the select, so they don't show next time this opens
                     this.selected = [];
@@ -258,7 +254,6 @@ export default {
                         Toast.DEFAULT_FADE_DURATION,
                         () => this.$emit(EVENTS.done)
                     );
-
                 })
                 .catch(() => {
                     this.$refs.toast.timeout(this.toastFailureMessage, false);
@@ -268,7 +263,6 @@ export default {
                     this.isFormSubmitActive = false;
                 });
         },
-
 
         /**
          * Callback for when the badge award form is cancelled.
@@ -282,7 +276,7 @@ export default {
         /**
          * The modal is now completely closed so reset
          */
-        onModalClosed () {
+        onModalClosed() {
             this.isModalOpen = false;
         },
 
@@ -291,12 +285,11 @@ export default {
          *
          * @return { string }
          */
-        getEvidenceUrl () {
+        getEvidenceUrl() {
             return generateAwardWithEvidenceUrl(this.selectedUserIds, this.badge.id);
         },
-
     },
-}
+};
 </script>
 <template>
     <div>
@@ -319,16 +312,22 @@ export default {
         -->
         <slot name="expiryMessage" :expiryDate="expiryDate"></slot>
 
-        <v-select class="schoolbox-vue-selectize"
-                  :options="options"
-                  :clear-search-on-blur="function() { return true; }"
-                  :clear-search-on-select="true"
-                  :close-on-select="false"
-                  multiple
-                  @search="onSearch"
-                  label="name"
-                  :placeholder="placeholder"
-                  v-model="selected">
+        <v-select
+            class="schoolbox-vue-selectize"
+            :options="options"
+            :clear-search-on-blur="
+                function () {
+                    return true;
+                }
+            "
+            :clear-search-on-select="true"
+            :close-on-select="false"
+            multiple
+            @search="onSearch"
+            label="name"
+            :placeholder="placeholder"
+            v-model="selected"
+        >
             <template #option="option">
                 <span class="d-center">
                     {{ option.name }}
@@ -351,11 +350,7 @@ export default {
                 >
                     Award with Evidence
                 </a>
-                <button
-                    :disabled="isSubmitButtonDisabled"
-                    @click.prevent="onSubmit"
-                    @keyup.enter="onSubmit"
-                >
+                <button :disabled="isSubmitButtonDisabled" @click.prevent="onSubmit" @keyup.enter="onSubmit">
                     <slot name="confirmButton">Award</slot>
                 </button>
             </section>

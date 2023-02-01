@@ -360,11 +360,10 @@ echo -e "\n* Detecting Installs and Backups *";
 
 ## Wipe current detected list
 sbrl='/tmp/schoolbox-restore-list';
-searchlist='/usr/share/schoolbox/conf.php /usr/share/schoolboxdev/conf.php';
 rm -f $sbrl;
 
 ## Detect database backups for this install
-thisinstall="$(ls -1 $thisdatadir/{*-*-*-*_*-*-*.sql,*-*-*-*_*-*-*.sql.gz,backups/*/*/schoolbox_*-*-*.sql.gz} 2> /dev/null)";
+thisinstall="$(ls -1 $thisdatadir/{*-*-*-*_*-*-*.sql,*-*-*-*_*-*-*.sql.gz,backups/*/*/schoolbox*_*-*-*.sql.gz} 2> /dev/null)";
 echo -e "Local installs \c"
 if [ ! -z "$thisinstall" ];
 then
@@ -375,30 +374,22 @@ then
 	done;
 fi
 
-# Detect other local installs
-for localinstall in $searchlist;
-do
-	# Search for local installs, but ignore the current install if listed
-	if [ `echo $localinstall | grep -v "schoolbox/" | wc -l` -gt 0 ];
-	then
-		if [ -f $localinstall ];
-		then
-			tempconffile=`readlink -f $localinstall`;
-			INSTANCE_ID="$destination_instance_id" readconf;
-			readsqlver;
-			tempfiledir=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='backup_dir'"`;
-			if [ ! -z $tempfiledir ];
-			then
-				tempdatadirlist=`ls -1 $tempfiledir/../{*-*-*-*_*-*-*.sql,backups/*/*/schoolbox_*-*-*.sql.gz} 2>/dev/null`;
-				for i in $tempdatadirlist;
-				do
-					echo -e ".\c";
-					echo "[L],[D],$tempconffile,`readlink -f $i`" >> $sbrl;
-					echo "[L],[A],$tempconffile,`readlink -f $i`" >> $sbrl;
-				done;
-			fi
-		fi
-	fi
+# Detect other local instances
+for other_instance in $(schoolbox-read-instances --option instance-list | grep -v "$destination_instance_id"); do
+  if [[ -z $other_instance ]]; then
+    continue
+  fi
+  read_ini "$other_instance"
+  readsqlver;
+  tempfiledir=$(mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "SELECT value FROM config WHERE name='backup_dir'");
+  if [ -n "$tempfiledir" ]; then
+    tempdatadirlist=$(ls -1 $tempfiledir/../{*-*-*-*_*-*-*.sql,*-*-*-*_*-*-*.sql.gz,backups/*/*/schoolbox*_*-*-*.sql.gz} 2>/dev/null);
+    for i in $tempdatadirlist; do
+      echo -e ".\c";
+      echo "[L],[D],$other_instance,$(readlink -f "$i")" >> $sbrl;
+      echo "[L],[A],$other_instance,$(readlink -f "$i")" >> $sbrl;
+    done;
+  fi
 done
 
 # Detect other remote installs
@@ -517,7 +508,7 @@ if [ "$syncType" == "" ] || [ "$syncType" == "local" ]; then
 
   # Provide feedback for confirmation of what is to be done based on above questions.
   echo -e "\n $restorepretty";
-  echo -e "\n     Restore into 'schoolbox' at '$instdir'";
+  echo -e "\n     Restore into Instance: '$destination_instance_id', Schema: '$(INSTANCE_ID=$destination_instance_id schoolbox-read-instances --option SQL_db)', Data Dir: '$thisdatadir'";
   while true; do
     echo -e "\nIs this the correct option? (y/n): \c" && read -r confirm;
     if [[ $confirm =~ [ynYN] ]]; then
@@ -544,22 +535,21 @@ else
   error;
 fi
 
-# Details of restore source
+# Details of restore source. Variables will have different semantics depending on source location.
 sourceloc=`echo $restore | cut -d',' -f1`;
 sourcetype=`echo $restore | cut -d',' -f2`;
 sourcep1=`echo $restore | cut -d',' -f3`;
 sourcep2=`echo $restore | cut -d',' -f4`;
-sourcep3=`echo $restore | cut -d',' -f5`;
 
 
 # Check if a full restore can be done
-if [ "$sourcetype" == '[A]' ] && [ "$sourceloc" == '[R]' ]; then
+if [ "$sourcetype" == '[A]' ]; then
   local_mount=$(findmnt -n -o SOURCE --target "$thisdatadir");
   local_mount_total=$(df -B1 | grep "$local_mount" | awk -F " " '{print $2}');
   local_mount_dir=$(mount | grep "$local_mount" | awk -F " " '{print $3}');
   local_non_sb_used=$(du -sh "$local_mount_dir" --exclude "$thisdatadir" -B1 | cut -f 1);
   localAvailableStorage=$((local_mount_total - local_non_sb_used));
-  remote_mount=$(ssh "$host" findmnt -n -o SOURCE --target "$sourcep3");
+  remote_mount=$(ssh "$host" findmnt -n -o SOURCE --target "$sourcep2");
   remote_mount_used=$(ssh "$host" df -B1 | grep "$remote_mount" | awk -F " " '{print $3}');
   remote_data_dir=${tempfiledir%/*};
   remote_real_data_dir=$(ssh "$host" realpath "$remote_data_dir");
@@ -618,31 +608,29 @@ then
 		tmpbackupdb=`echo "$sourcedb" | grep '/backups/' | wc -l`;
 		if [ "$tmpbackupdb" == "1" ];
 		then
-			sourcedata=${sourcedb%/*}'/../../../';
+			sourcedata=${sourcedb%/*}'/../../..';
 		else
 			sourcedata=${sourcedb%/*};
 		fi
 		echo -e "\nPerforming Data Transfer";
-		echo -e "\nCopying data from $sourcedata to $thisdatadir";
-		rsync -rltHv $sourcedata/ $thisdatadir/ --delete-before  --exclude=cache/zip* --exclude=*.lock --exclude=backups;
+		echo -e "\nCopying data from $sourcedata/storage to $thisdatadir/storage";
+		rsync -rltHv $sourcedata/storage/ $thisdatadir/storage/ --delete-before;
 		$instdir/tools/create-data-dirs.sh $thisdatadir;
 		$instdir/tools/set-data-dir-perms.sh $thisdatadir $wwwuser;
 	fi
 	if [ "$sourceloc" = '[R]' ];
 	then
 		# Remote Source, transfer the db file locally.
-		gzipdb=`echo "$sourcep3" | grep '.gz' | wc -l`;
+		gzipdb=`echo "$sourcep2" | grep '.gz' | wc -l`;
 		if [ "$gzipdb" == "1" ];
 		then
-			sourcedata=${sourcep3%/*}'/../../../';
+			sourcedata=${sourcep2%/*}'/../../..';
 		else
-			sourcedata=${sourcep3%/*};
+			sourcedata=${sourcep2%/*};
 		fi
-		sourcesqlfilename=${sourcep3##*/};
+		sourcesqlfilename=${sourcep2##*/};
 		echo -e "\nTransferring database backup";
-		scp $sourcep1:$sourcep3 /tmp >/dev/null 2>&1;
-		if [ $? -ne 0 ];
-		then
+		if ! scp $sourcep1:$sourcep2 /tmp; then
 			errmsg="Unable to transfer database backup successfully";
 			error;
 		fi
@@ -653,8 +641,8 @@ then
 			error;
 		fi
 		echo -e "\nPerforming Data Transfer";
-		echo -e "\nCopying data from ssh $sourcep1 : $sourcedata to $thisdatadir";
-		rsync -rltHzv -e ssh $sourcep1:$sourcedata/ $thisdatadir/ --delete-before  --exclude=cache/zip* --exclude=backups;
+		echo -e "\nCopying storage data from ssh $sourcep1 : ${sourcedata}/storage/ to $thisdatadir/storage";
+		rsync -rltHzv -e ssh $sourcep1:${sourcedata}/storage/ $thisdatadir/storage/ --delete-before;
 		$instdir/tools/create-data-dirs.sh $thisdatadir;
 		$instdir/tools/set-data-dir-perms.sh $thisdatadir $wwwuser;
 	fi
@@ -688,11 +676,9 @@ else
 	if [ "$sourceloc" = '[R]' ];
 	then
 		# Remote Source, transfer the db file locally.
-		sourcesqlfilename=${sourcep3##*/};
+		sourcesqlfilename=${sourcep2##*/};
 		echo -e "\nTransferring database backup";
-		scp $sourcep1:$sourcep3 /tmp >/dev/null 2>&1;
-		if [ $? -ne 0 ];
-		then
+		if ! scp $sourcep1:$sourcep2 /tmp; then
 			errmsg="Unable to transfer database backup successfully";
 			error;
 		fi
@@ -734,7 +720,8 @@ fi
 # Restore the DB
 echo -e "\nStarting restore of the database";
 ## Backup the current DB config separately
-if ! mysqldump --allow-keywords --default-character-set=utf8mb4 -i -e -q -a --skip-extended-insert -c -u "$sqluser" -p"$sqlpasswd" -h "$sqlhost" "$sqldb" config > /tmp/"$sqldb"-config-"$(date -I)".sql; then
+config_table_dump_file=/tmp/"$sqldb"-config-"$(date -I)".sql
+if ! mysqldump --allow-keywords --default-character-set=utf8mb4 -i -e -q -a --skip-extended-insert -c -u "$sqluser" -p"$sqlpasswd" -h "$sqlhost" "$sqldb" config > "$config_table_dump_file"; then
   echo "Unable to backup config table from current database" >&2
   exit 1
 fi
@@ -748,7 +735,7 @@ rm /etc/cron.d/sbc_schoolbox_$destination_instance_id
 ## Drop existing DB and reload just config table
 mysql -u $sqluser -p$sqlpasswd -h $sqlhost -e "SET MAX_STATEMENT_TIME=0; DROP DATABASE $sqldb;";
 mysql -u $sqluser -p$sqlpasswd -h $sqlhost -e "CREATE DATABASE $sqldb CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci';";
-mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb < /tmp/$sqldb-config-`date -I`.sql;
+mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb < "$config_table_dump_file";
 ## Unpack if gzipped
 gzipdb=`echo "$sourcedb" | grep '.gz' | wc -l`;
 if [ "$gzipdb" == "1" ];
@@ -766,6 +753,12 @@ fi
 ## Remove maintenance page
 /usr/share/schoolbox/tools/maintenance/site_up.sh
 
+
+# Recompress if restoring from local backup that was originally compressed
+if [[ "$gzipdb" == "1" ]] && [[ "$sourceloc" = '[L]' ]]; then
+  echo "Recompressing local database backup file..."
+  gzip $sourcedb
+fi
 
 # Move data files to correct location if restoring from backup
 if [ "$sourceloc" = '[B]' ];
