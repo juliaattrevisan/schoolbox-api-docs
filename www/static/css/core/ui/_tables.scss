@@ -406,50 +406,10 @@ $rotate-span-width: 11rem;
                 margin-left: 2rem;
             }
         }
-        .dataTables_wrapper {
-            //For marksheet cursor hover + selected states
-            [data-pop-out-menu] {
-                cursor: pointer;
-            }
-
-            .is-selected {
-                background-color: var(--content-ui-selected);
-            }
-
-            .dataTables_info {
-                @extend .meta;
-                font-size: $paragraph-font-size;
-                text-align: left;
-
-                margin-bottom: 1.5rem;
-                margin-left: 1rem;
-                margin-top: 1rem;
-
-                @media #{$small-only} {
-                    margin-left: 2rem;
-                }
-            }
-            .dataTables_wrapper {
-                .dataTables_info {
-                    @extend .meta;
-                    font-size: $paragraph-font-size;
-                    text-align: left;
-
-                    margin-bottom: 1.5rem;
-                    margin-left: 1rem;
-                    margin-top: 1rem;
-
-                    @media #{$small-only} {
-                        margin-left: 2rem;
-                    }
-                }
-
-                // Remove scrollbar from fixed column, is a bug that needs a workaround
-                // https://datatables.net/forums/discussion/33008/scrolx-create-scrolbar-under-fixed-columns-on-firefox-with-bootstrap
-                .DTFC_LeftBodyLiner {
-                    overflow-x: hidden;
-                }
-            }
+        // Remove scrollbar from fixed column, is a bug that needs a workaround
+        // https://datatables.net/forums/discussion/33008/scrolx-create-scrolbar-under-fixed-columns-on-firefox-with-bootstrap
+        .DTFC_LeftBodyLiner {
+            overflow-x: hidden;
         }
     }
 }
