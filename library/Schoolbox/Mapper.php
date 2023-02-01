@@ -2078,7 +2078,7 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * @inheritDoc
      */
-    public function findOneByColumn($columnName, $columnValue, array $options = array())
+    public function findOneByColumn($columnName, $columnValue, array $options = ['deleted' => false])
     {
         return $this->findOneByColumnList(array($columnName => $columnValue), $options);
     }
@@ -2103,7 +2103,7 @@ abstract class Mapper implements IMapper, Serializable
         }
 
         foreach ($result_collection as $model) {
-            // If $options['deleted'] is true, we are interested in soft-deleted options.  If not, we skip them.
+            // If $options['deleted'] is false, check whether the item has been soft-deleted.  If so, skip it.
             if (!$options['deleted'] && $model instanceof ISoftDeletable && $model->isDeleted()) {
                 continue;
             }
