@@ -409,7 +409,7 @@ class Profile implements IStrategy
 
                 /* Add their parents' profile data
                  */
-                $this->importParentsOfStudent($externalId, $studentBaseProfile, $householdLookup);
+                $this->importParentsOfStudent($externalId, $studentBaseProfile, $householdLookup[$student['household_id']] ?? []);
             }
         }
     }
@@ -436,26 +436,22 @@ class Profile implements IStrategy
      *
      * @param string $studentExternalId
      * @param Model  $studentBaseProfile
-     * @param array  $householdLookup
-     * @throws Exception
+     * @param array  $household
      * @throws DefinitionException
+     * @throws Exception
      * @throws PDOException
      * @throws UnexpectedValueException
      */
     private function importParentsOfStudent(
         string $studentExternalId,
         UserProfile\Model $studentBaseProfile,
-        array $householdLookup
+        array $household
     ): void {
-        /* Household lookup is indexed by Veracross student id
-         */
-        $parents = $householdLookup[$studentExternalId] ?? [];
-
         /* For every associated parent, find out if they have a parent profile
          * If one already exists, load it, update it, then save it
          * Otherwise make a new one for the given id
          */
-        foreach ($parents as $parent) {
+        foreach ($household as $parent) {
             $externalId = trim((string)$parent['id']);
             $email = trim((string)$parent['email_1']);
 
