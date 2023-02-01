@@ -103,6 +103,9 @@ const { x, y, strategy } = useFloating(referenceElement, popOutElement, {
  *  the activity they're expecting to see might not be there.
  */
 const viewAllText = computed(() => {
+    if (isExcluded.value) {
+        return "The student has been excluded. You may create feedback or include this student in this activity";
+    }
     if (isActivityEmpty.value) {
         return "There has been no activity yet, you may create feedback or exclude this student from this activity";
     }
@@ -171,7 +174,7 @@ async function onPopOutSelected(event: CustomEvent) {
         routes.value = updateRoutes(event.detail.routes as Routes);
         isSelected.value = true;
         isExpanded.value = false;
-        isExcluded.value = event.detail.isExcluded;
+        isExcluded.value = "true" === event.detail.isExcluded; //make bool from string issues....
         referenceElement.value = event.detail.target;
         await getActivity();
     }
@@ -354,13 +357,13 @@ async function onMenuItemSelected(target: string, shouldPost: boolean = false) {
                     Publish feedback
                 </pop-out-menu-item>
                 <pop-out-menu-item
-                    :class="{ 'is-disabled': !isExcluded }"
+                    :class="{ 'is-disabled': isExcluded }"
                     @selected="onMenuItemSelected(routes.excludeRoute, true)"
                 >
                     Exclude student
                 </pop-out-menu-item>
                 <pop-out-menu-item
-                    :class="{ 'is-disabled': isExcluded }"
+                    :class="{ 'is-disabled': !isExcluded }"
                     @selected="onMenuItemSelected(routes.includeRoute, true)"
                 >
                     Include student
