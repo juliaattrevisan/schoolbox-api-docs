@@ -118,7 +118,7 @@ HELP;
                 ");
                 $newStatusStatment->execute(['task_id' => $completionEntry->getTask()->getId(), 'student_id' => $completionEntry->getStudent()->getId(), 'marking_user_id' => 1, 'completion_status' => Completion::STATUS_TEACHER_ASSESSED_COMPLETE]);
             } else {
-                $this->getLogger()->info("Task Not Complete, would have updated");
+                $this->getLogger()->info(sprintf("Assessment: %s, studentId: %s Not Complete, would have updated", $completionEntry->getTask()->getAssessmentModel()->getId(), $completionEntry->getStudent()->getId()));
             }
         }
     }
