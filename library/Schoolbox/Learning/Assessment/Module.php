@@ -235,6 +235,12 @@ class Module extends BaseModule
             $canSubmit,
             $preloadParticipant,
         );
+
+        // Easy access participation endpoint
+        // include user in assessment
+        $this->register('POST', "$assRoute/$studentParam/include", 'postInclude', $canModify, $preloadParticipant);
+        // exclude user from assessment
+        $this->register('POST', "$assRoute/$studentParam/exclude", 'postExclude', $canModify, $preloadParticipant);
     }
 
 

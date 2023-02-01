@@ -13,6 +13,7 @@ use Alaress\Module\Registry;
 use Alaress\Web;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Web\Exception\InvalidStatusCode;
+use Crell\ApiProblem\ApiProblem;
 use DomainException;
 use InvalidArgumentException;
 use LogicException;
@@ -25,6 +26,7 @@ use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Feedback\Visibility as FeedbackVisibility;
 use Schoolbox\Learning\Assessment\Participant\DataSource;
+use Schoolbox\Learning\Assessment\Participant\ParticipationHelper;
 use Schoolbox\Learning\Assessment\Project\ResultCache\ValidCache;
 use Schoolbox\Learning\Assessment\Seb\Payload;
 use Schoolbox\Learning\Assessment\Seb\Payload as SebPayload;
@@ -904,5 +906,49 @@ class ListController extends Web\Controller\Base
     protected function getBakery(): BreadcrumbFactory
     {
         return $this->bakery;
+    }
+
+    /**
+     * Easy access to include students into the default assessment Plan
+     * @param IAssessable $assessment
+     * @param User        $student
+     * @return void
+     * @throws InvalidStatusCode
+     */
+    public function postInclude(IAssessable $assessment, User $student): void
+    {
+        $partitionHelper = new ParticipationHelper($this->participantDataSource, $this->userMapper);
+        try {
+            $partitionHelper->include($assessment, $student->getId());
+            $this->getResponse()->status->setCode(201);
+        } catch (MapperException $e) {
+            $problem = new ApiProblem($e->getMessage());
+            $problem->setStatus($e->getCode());
+            $this->getResponse()->content->set(
+                $this->buildJsonOutput($problem->asArray())
+            );
+        }
+    }
+
+    /**
+     * Easy access to exclude students from the assessment
+     * @param IAssessable $assessment
+     * @param User        $student
+     * @return void
+     * @throws InvalidStatusCode
+     */
+    public function postExclude(IAssessable $assessment, User $student): void
+    {
+        $partitionHelper = new ParticipationHelper($this->participantDataSource, $this->userMapper);
+        try {
+            $partitionHelper->exclude($assessment, $student->getId());
+            $this->getResponse()->status->setCode(201);
+        } catch (MapperException $e) {
+            $problem = new ApiProblem($e->getMessage());
+            $problem->setStatus($e->getCode());
+            $this->getResponse()->content->set(
+                $this->buildJsonOutput($problem->asArray())
+            );
+        }
     }
 }
