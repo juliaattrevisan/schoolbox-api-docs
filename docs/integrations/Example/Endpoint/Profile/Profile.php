@@ -109,6 +109,7 @@ class Profile implements IStrategy
         UserProfile\Relationship\Mapper $relationshipMapper
     ) {
         $this->validStrats = $validStrats;
+
         $this->log = $log;
         $this->perform = $perform;
 
@@ -567,6 +568,7 @@ class Profile implements IStrategy
             $externalId = '';
             $email = '';
             $firstname = '';
+            $firstnamePreferred = '';
             $lastname = '';
             $phoneHome = '';
             $phoneMobile = '';
@@ -604,6 +606,7 @@ class Profile implements IStrategy
                 ->setExternalId($externalId)
                 ->setTitle($title)
                 ->setFirstname($firstname)
+                ->setFirstnamePreferred($firstnamePreferred)
                 ->setLastname($lastname);
 
             /* Then save it

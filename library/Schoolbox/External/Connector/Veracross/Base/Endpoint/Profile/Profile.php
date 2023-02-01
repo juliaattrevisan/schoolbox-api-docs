@@ -447,25 +447,35 @@ class Profile implements IStrategy
         UserProfile\Model $studentBaseProfile,
         array $householdLookup
     ): void {
-        $parents = [];
+        /* Household lookup is indexed by Veracross student id
+         */
+        $parents = $householdLookup[$studentExternalId] ?? [];
 
         /* For every associated parent, find out if they have a parent profile
          * If one already exists, load it, update it, then save it
          * Otherwise make a new one for the given id
          */
         foreach ($parents as $parent) {
-            /* TODO Fill in these basic parent vars
+            $externalId = trim((string)$parent['id']);
+            $email = trim((string)$parent['email_1']);
+
+            /* I guess we can forget about first_nick_name
+             * Not sure you'd refer to someone like that in our world?
+             * (In test data nickname is the same as firstname anyway)
              */
-            $externalId = '';
-            $email = '';
-            $firstname = '';
-            $lastname = '';
+            $firstname = trim((string)$parent['first_name']);
+            $firstnamePreferred = (new FirstMeaningfulValue())->find([
+                $parent['preferred_name'],
+                $firstname
+            ]);
+
+            $lastname = trim((string)$parent['last_name']);
             $phoneHome = '';
             $phoneMobile = '';
             $phoneWork = '';
             $relationship = '';
-            $title = '';
-            $username = '';
+            $title = trim((string)$parent['name_prefix']);
+            $username = trim((string)$parent['username']);
 
             /* Parents might inadvertently have the same externalId as someone else's
              * base profile (e.g. parent has same external id as student)
@@ -496,6 +506,7 @@ class Profile implements IStrategy
                 ->setExternalId($externalId)
                 ->setTitle($title)
                 ->setFirstname($firstname)
+                ->setFirstnamePreferred($firstnamePreferred)
                 ->setLastname($lastname);
 
             /* Then save it
