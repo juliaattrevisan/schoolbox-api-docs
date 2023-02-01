@@ -162,6 +162,7 @@ class Profile implements IStrategy
         $householdLookup = (new Household($this->api))->generate();
 
         /* Prefetch a list of emergency contacts
+         * TODO: We don't have perms yet; need Veracross to let us in
          */
         $emergencyContactsLookup = (new EmergencyContact($this->api))->generate();
 
@@ -182,7 +183,7 @@ class Profile implements IStrategy
                 $boardingStatus = false;
                 $campusName = '';
 
-                $dob = $this->findDate($student['birthday']);
+                $dob = trim((string)$student['birthday']);
                 $email = trim((string)$student['email_1']);
 
                 $firstname = trim((string)$student['first_name']);
@@ -229,15 +230,6 @@ class Profile implements IStrategy
                 $medical = '';
                 $messages = '';
 
-//                /* TODO Customise these find* methods to suit your implementation
-//                 *  Maintain the methods' return signature for easiest resolution
-//                 *  though you are free to customise it as you see fit
-//                 */
-//
-//                /* Emergency Contacts
-//                 */
-//                $emergencyContacts = $this->findEmergencyContacts();
-//
                 /* Find out a staff member via their user code
                  */
                 $formTeacher = [];
@@ -339,30 +331,30 @@ class Profile implements IStrategy
                  */
                 if ($dob) {
                     $studentProfile
-                        ->setDateOfBirth(new Alaress_Date_Format($dob, 'Ymd'));
+                        ->setDateOfBirth(new Alaress_Date_Format($dob, 'Y-m-d'));
                 }
 
                 /**
                  * Emergency Contacts
                  * ...because we didn't normalise it, I'm hardcoding these
                  */
-                if (\count($emergencyContacts)) {
-                    if (isset($emergencyContacts[0])) {
+                if (\count($emergencyContactsLookup[$student['id']])) {
+                    if (isset($emergencyContactsLookup[$student['id']][0])) {
                         $studentProfile
-                            ->setEmergencyContactName1($emergencyContacts[0]['name'])
-                            ->setEmergencyContactPhone1($emergencyContacts[0]['phone']);
+                            ->setEmergencyContactName1($emergencyContactsLookup[$student['id']][0]['name'])
+                            ->setEmergencyContactPhone1($emergencyContactsLookup[$student['id']][0]['phone']);
                     }
 
-                    if (isset($emergencyContacts[1])) {
+                    if (isset($emergencyContactsLookup[$student['id']][1])) {
                         $studentProfile
-                            ->setEmergencyContactName2($emergencyContacts[1]['name'])
-                            ->setEmergencyContactPhone2($emergencyContacts[1]['phone']);
+                            ->setEmergencyContactName2($emergencyContactsLookup[$student['id']][1]['name'])
+                            ->setEmergencyContactPhone2($emergencyContactsLookup[$student['id']][1]['phone']);
                     }
 
-                    if (isset($emergencyContacts[2])) {
+                    if (isset($emergencyContactsLookup[$student['id']][2])) {
                         $studentProfile
-                            ->setEmergencyContactName3($emergencyContacts[2]['name'])
-                            ->setEmergencyContactPhone3($emergencyContacts[2]['phone']);
+                            ->setEmergencyContactName3($emergencyContactsLookup[$student['id']][2]['name'])
+                            ->setEmergencyContactPhone3($emergencyContactsLookup[$student['id']][2]['phone']);
                     }
                 } else {
                     /* This student doesn't have any emergency contacts anymore
@@ -412,48 +404,6 @@ class Profile implements IStrategy
         }
 
         return null;
-    }
-
-
-    /**
-     * Find all the meaningful emergency contacts for a student
-     *
-     * @return array
-     */
-    public function findEmergencyContacts(): array
-    {
-        $emergencyContacts = [];
-        $contacts = [];
-        $n = 0;
-
-        foreach ($emergencyContacts as $emergencyContact) {
-            if ($n < self::MAX_EMERGENCY_CONTACTS) {
-                /* TODO Fill in these emergency contact vars
-                 */
-                $fullname = '';
-                $relation = '';
-                $phone = '';
-
-                /* Suffix the $relation if provided
-                 */
-                if ('' !== $relation) {
-                    $fullname .= " ({$relation})";
-                }
-
-                /* Aggregate them if we have a name
-                 */
-                if ('' !== $fullname) {
-                    $contacts[] = [
-                        'name' => $fullname,
-                        'phone' => $phone
-                    ];
-                }
-            }
-
-            $n++;
-        }
-
-        return $contacts;
     }
 
 
