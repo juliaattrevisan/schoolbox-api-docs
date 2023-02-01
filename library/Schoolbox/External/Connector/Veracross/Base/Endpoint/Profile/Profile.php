@@ -30,6 +30,13 @@ use UnexpectedValueException;
 class Profile implements IStrategy
 {
     /**
+     * The access token's scope, used throughout this strat
+     * (perhaps) could work on subdividing or unifying this further)
+     */
+    public const SCOPE = 'students:list parents:list';
+
+
+    /**
      * Maximum number of emergency contacts we've permitted (3 by default)
      */
     private const MAX_EMERGENCY_CONTACTS = 3;
@@ -122,11 +129,11 @@ class Profile implements IStrategy
 
         $this->importStudents();
 
-        /* Import staff profile data
-         */
-        $this->log->info('Processing staff.');
-
-        $this->importStaff();
+//        /* Import staff profile data
+//         */
+//        $this->log->info('Processing staff.');
+//
+//        $this->importStaff();
     }
 
 

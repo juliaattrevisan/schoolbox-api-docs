@@ -84,9 +84,13 @@ class Generator
 
 
     /**
-     * @var null|AccessToken
+     * An index of (scope, access token) tuples so this one Generator can be used
+     * to spawn and manage multiple scopes, saving you the hassle of making multiple
+     * IApi instances that were tied to each scope.
+     *
+     * @var array
      */
-    private ?AccessToken $accessToken = null;
+    private array $accessToken = [];
 
 
     /**
@@ -117,21 +121,22 @@ class Generator
      */
     public function generate(string $scope): AccessToken
     {
-        if (null === $this->accessToken) {
-            /* If we have never spawned a token; this is our first time use
+        if (!isset($this->accessToken[$scope])) {
+            /* If we have never spawned a token for $scope,
+             * then this is our first time using that scope
              * Spawn a new one
              */
-            $this->accessToken = $this->create($scope);
-        } elseif ($this->accessToken->isExpired()) {
+            $this->accessToken[$scope] = $this->create($scope);
+        } elseif ($this->accessToken[$scope]->isExpired()) {
             /* The token we previously created is about to expire
              * Spawn a new one
              */
-            $this->accessToken = $this->create($scope);
+            $this->accessToken[$scope] = $this->create($scope);
         }
 
         /* The one we have is currently alright; reuse it
          */
-        return $this->accessToken;
+        return $this->accessToken[$scope];
     }
 
 

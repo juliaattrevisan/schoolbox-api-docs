@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup;
 
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\IApi;
+use Schoolbox\External\Connector\Veracross\Base\Endpoint\Profile\Profile;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\ValueListConverter;
 
 /**
@@ -56,7 +57,7 @@ class Household
              */
             $lookupConverter = new ValueListConverter();
 
-            $parentPayloadGenerator = $this->api->retrieve('GET', 'parents');
+            $parentPayloadGenerator = $this->api->retrieve('GET', 'parents', Profile::SCOPE);
 
             foreach ($parentPayloadGenerator as $parentPage) {
                 $parentLookups = $lookupConverter->generate($parentPage['value_lists']);
