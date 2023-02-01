@@ -45,7 +45,7 @@ class Profile implements IStrategy
      * Required scopes:
      *
      * students:list
-     * emergency_contacts:list
+     * emergency_contacts:list OR relationships:list
      * health.patients:list
      * parents:list
      */
@@ -250,7 +250,13 @@ class Profile implements IStrategy
                 /* Alerts
                  */
                 $comments = '';
+
+                /* TODO Need relationships:list scope
+                 *  $legal might be inferred from relationships:list,
+                 *  which provides (bool)legal_custody and (string)custody_status
+                 */
                 $legal = '';
+
                 $medical = $medicalLookup[$student['id']] ? 'This student has medical conditions.' : null;
                 $messages = '';
 
@@ -469,7 +475,13 @@ class Profile implements IStrategy
             $phoneHome = '';
             $phoneMobile = '';
             $phoneWork = '';
+
+            /* TODO Need relationships:list scope
+             *  $relationship might be inferred from relationships:list,
+             *  which provides a Value List
+             */
             $relationship = '';
+
             $title = trim((string)$parent['name_prefix']);
             $username = trim((string)$parent['username']);
 
