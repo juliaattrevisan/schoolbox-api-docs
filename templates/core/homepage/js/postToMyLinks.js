@@ -1,12 +1,15 @@
-/** 
+/**
  * Adds this homepage page to my links
  *
  */
 
 /**
- * Listen for the button press and then save the link to DB and dipslay it on the page
+ * Listen for the button press and then save the link to DB and display it on the page
  */
 export function initPostToMyLinks () {
+    if (!document.getElementById('postToMyLinks')) {
+        return;
+    }
     document.getElementById('postToMyLinks').addEventListener('click', (event) => {
         event.preventDefault();
         postLink();
@@ -24,15 +27,15 @@ async function postLink () {
         })
     } catch (error) {
         console.warn(error);
-    } finally { 
+    } finally {
         displayLinkOnPage();
-    } 
+    }
 }
 
 /**
  * To pass through the required FormData to save the page to my links
- * 
- * @returns { FormData }  
+ *
+ * @returns { FormData }
  */
 function getFormData () {
     const formData = new FormData();
@@ -45,11 +48,11 @@ function getFormData () {
  * Add the link to the side panel
  */
 function displayLinkOnPage () {
-    
+
     const link = document.createElement('a');
     link.setAttribute('href', document.getElementById('homepageURL').value);
     link.innerText = document.getElementById('heading').value;
-    
+
     const linkListItem = document.createElement('li');
     linkListItem.appendChild(link);
 

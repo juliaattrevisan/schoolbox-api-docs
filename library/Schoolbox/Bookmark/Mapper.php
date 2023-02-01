@@ -8,11 +8,13 @@
 
 namespace Schoolbox\Bookmark;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\Mapper\Exception;
-use Schoolbox\Resource\Storage;
-use Schoolbox\User;
 
+/**
+ * @method Model createModel($idValue = null)
+ * @method GenericCollection findByColumn($columnName, $columnValue, $options = [])
+ */
 class Mapper extends BaseMapper
 {
     /**
