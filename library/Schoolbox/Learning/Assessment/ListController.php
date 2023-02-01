@@ -910,6 +910,8 @@ class ListController extends Web\Controller\Base
 
     /**
      * Easy access to include students into the default assessment Plan
+     *
+     * @api   POST /learning/assessments/:assessmentId/:userId/include
      * @param IAssessable $assessment
      * @param User        $student
      * @return void
@@ -932,6 +934,8 @@ class ListController extends Web\Controller\Base
 
     /**
      * Easy access to exclude students from the assessment
+     *
+     * @api   POST /learning/assessments/:assessmentId/:userId/exclude
      * @param IAssessable $assessment
      * @param User        $student
      * @return void
