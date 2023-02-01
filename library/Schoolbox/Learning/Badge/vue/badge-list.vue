@@ -221,7 +221,6 @@ export default {
 
                 // The expected response is blank, with a HTTP status code of 200 (OK).
                 // Any other response is treated as an error.
-
                 if (response.status === 200 && responseText === '') {
                     this.data = this.data.filter((badge) => badge.id !== this.currentBadge.id);
                     this.metadata.count -= 1;
