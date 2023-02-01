@@ -150,7 +150,8 @@ class Mapper extends \Schoolbox\Mapper
              * but I can't tell if that's going to be really necessary at the moment
              */
             if (!array_key_exists($badgeId, $badges)) {
-                $badge = $badgeMapper->findById($badgeId);
+                // The cache must be disabled here to prevent an error when deleting a badge with linked badge_user rows.
+                $badge = $badgeMapper->disableCache()->findById($badgeId);
 
                 /* Save it for later
                  */
