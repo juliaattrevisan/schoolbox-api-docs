@@ -16,7 +16,6 @@ function onSelected() {
 <template>
     <button class="c-menu-item" @click="onSelected">
         <slot></slot>
-        <div v-if="iconText" class="c-menu-item__icon" :class="classes" />
     </button>
 </template>
 
@@ -47,7 +46,7 @@ function onSelected() {
     }
 
     //Override standard button styling
-    &:focus{
+    &:focus {
         background-color: unset;
     }
 
