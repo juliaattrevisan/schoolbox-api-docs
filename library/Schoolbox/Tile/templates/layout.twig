@@ -200,37 +200,36 @@
         });
 
         /**
-         * Listen for the 'Add Tile' click, save the current state of the
-         * 'Modify Tile Layout'. Will require an AJAX call to submit
-         * the form. Either that or it needs to be preserved whenever a field
-         * is modified...
+         * Listen for the 'Add Tile' click, save the current state of the 'Modify
+         * Tile Layout'. It uses a fetch to submit the form. Either that or it
+         * needs to be preserved whenever a field is modified...
+         * TODO - Trigger favicon loading state to indicate page load in progress...
          *
          * Added in response to [SA-14666]
         **/
         async function interceptAddTile(e){
             if (!e.target.closest('a[data-add-tile]')) return;
 
-            // Validate our form.
             if (form.valid()){
+                // Format the form data in a .fetch-friendly manner
+                const fd = new FormData(form[0]);
                 fetch(form[0].getAttribute('action'), {
                     method: 'POST',
-                    /* headers: {
-                        'Content-Type': 'x-www-form-urlencoded'
-                    }, */
-                    body: form[0]
+                    body: fd
                 }).then(
                     res => {
-
+                        // Remove the listener.
+                        document.removeEventListener('click', interceptAddTile);
+                        // Navigate to the 'Add tile' page.
+                        window.location.href = "{{ routeLookup('tile.add', {layoutId: item.id}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}";
                     }
                 );
-                e.preventDefault();
             }
-            else {
-                /* Prevent the click action. form.valid's fail will tell the
-                 * user why the click failed.
-                **/
-                e.preventDefault();
-            }
+            /* Prevent the click action. form.valid's fail will tell the
+             * user why the click failed if it failed, otherwise the
+             * callback will navigate us forward.
+            **/
+            e.preventDefault();
         }
 
         document.addEventListener('click', interceptAddTile);
