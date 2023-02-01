@@ -2038,7 +2038,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function findById($identifierValue)
     {
-        return $this->findOneByColumn($this->getIdentifierColumn(), $identifierValue, ['deleted' => false]);
+        return $this->findOneByColumn($this->getIdentifierColumn(), $identifierValue);
     }
 
     /**
