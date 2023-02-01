@@ -239,11 +239,12 @@ class Generator
         if ($response) {
             throw new \RuntimeException(
                 sprintf(
-                    'Bad endpoint %s: %s %s after %s retries, attempting to generate access token.',
+                    'Bad endpoint %s: %s %s after %s retries, attempting to generate access token. Check that your Veracross instance allows the scope(s) specified: %s',
                     $endpoint,
                     $response->getStatusCode(),
                     $response->getReasonPhrase(),
                     self::NUM_RETRY,
+                    $scope
                 ),
                 $response->getStatusCode(),
                 $e ?? null
