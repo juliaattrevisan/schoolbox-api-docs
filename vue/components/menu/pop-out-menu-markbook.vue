@@ -43,6 +43,7 @@ type Routes = {
     reviewRoute: string;
     publishRoute: string;
     excludeRoute: string;
+    includeRoute: string;
     historyRoute: string;
 };
 
@@ -60,6 +61,8 @@ const activityItems: Ref<ActivityItem[]> = ref([]); // list of recent activity i
 const hasSubmissions = computed(() => activityItems.value.some(item => item.type === 'response' && item.submitted));
 // has an event of type 'feedback'
 const hasFeedback = computed(() => activityItems.value.some(item => item.type === 'feedback'));
+// is the user excluded from the assessment
+const isExcluded = ref(false);
 const isActivityEmpty = computed(() => activityItems.value.length === 0);
 const isExpansionDisabled = computed(() => activityItems.value.length === 1);
 const routes: Ref<Routes> = ref({
@@ -68,6 +71,7 @@ const routes: Ref<Routes> = ref({
     reviewRoute: "",
     publishRoute: "",
     excludeRoute: "",
+    includeRoute: "",
     historyRoute: "",
 });
 const markbookElement = ref<HTMLDivElement | null>(null);
@@ -124,6 +128,7 @@ function updateRoutes(newRoutes: Routes) {
         reviewRoute: newRoutes.reviewRoute,
         publishRoute: newRoutes.publishRoute,
         excludeRoute: newRoutes.excludeRoute,
+        includeRoute: newRoutes.includeRoute,
         historyRoute: newRoutes.historyRoute,
     };
 }
@@ -166,6 +171,7 @@ async function onPopOutSelected(event: CustomEvent) {
         routes.value = updateRoutes(event.detail.routes as Routes);
         isSelected.value = true;
         isExpanded.value = false;
+        isExcluded.value = event.detail.isExcluded;
         referenceElement.value = event.detail.target;
         await getActivity();
     }
@@ -251,9 +257,36 @@ function onToggleSelected() {
  * Navigate to a new page
  *
  * @param { string } target - The URL we want to navigate to.
+ * @param { boolean } shouldPost - Should we use this as a post request?.
  */
-function onMenuItemSelected(target: string) {
-    window.location.href = target;
+async function onMenuItemSelected(target: string, shouldPost: boolean = false) {
+    if (!shouldPost) {
+        window.location.href = target;
+        return;
+    }
+
+    // Not as basic redirect, js fetch things...
+    try {
+        isLoading.value = true;
+        const response = await fetch(target, {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+        });
+        if (response.ok) {
+            hasLoadError.value = false;
+            // invert the excluded option that is currently the only post system
+            isExcluded.value = !isExcluded.value;
+        } else {
+            hasLoadError.value = true;
+        }
+    } catch (error) {
+        hasLoadError.value = true;
+    } finally {
+        isLoading.value = false;
+    }
 }
 </script>
 
@@ -321,10 +354,16 @@ function onMenuItemSelected(target: string) {
                     Publish feedback
                 </pop-out-menu-item>
                 <pop-out-menu-item
-                    :class="{ 'is-disabled': !routes.excludeRoute }"
-                    @selected="onMenuItemSelected(routes.excludeRoute)"
+                    :class="{ 'is-disabled': !isExcluded }"
+                    @selected="onMenuItemSelected(routes.excludeRoute, true)"
                 >
                     Exclude student
+                </pop-out-menu-item>
+                <pop-out-menu-item
+                    :class="{ 'is-disabled': isExcluded }"
+                    @selected="onMenuItemSelected(routes.includeRoute, true)"
+                >
+                    Include student
                 </pop-out-menu-item>
                 <pop-out-menu-item
                     :class="{ 'is-disabled': !routes.historyRoute || isActivityEmpty }"

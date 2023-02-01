@@ -210,13 +210,15 @@
                             {% if not participant or participant.isExcluded %} excluded
                             {% endif %} student-grade-cell"
                             data-assessment="{{ assessment.id }}"
-                            {% if assessment.getDefaultTypeName == 'Due Work' and participant and not participant.isExcluded %}
+                            {% if assessment.getDefaultTypeName == 'Due Work' %}
                                 data-pop-out-menu
                                 data-endpoint="{{ routeLookupIfAuthorized('learningAssessmentTimeline.getFullTimeline', {assessment: assessment, assessmentId: assessment.id, userId: student.id }) }}"
                                 data-update-route="{{ routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
                                 data-review-route="{{ routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
                                 data-publish-route="{{ routeLookupIfAuthorized('learningAssessment.getSummary', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
-                                data-exclude-route="{{ routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessment: assessment, assessmentId:assessment.id }) }}"
+                                data-exclude-route="{{ routeLookupIfAuthorized('learningAssessment.postExclude', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
+                                data-include-route="{{ routeLookupIfAuthorized('learningAssessment.postInclude', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
+                                data-is-excluded="{% if participant and not participant.isExcluded %}false{% else %}true{% endif %}"
                                 data-history-route="{{ routeLookupIfAuthorized('learningAssessment.getSummary', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
                             {% endif %}
                     >
