@@ -402,8 +402,14 @@ async function onMenuItemSelected(target: string, shouldPost: boolean = false) {
                     <template v-if="'Due Work' === assessmentType">
                         Submission history
                     </template>
+                    <template v-else-if="'Project' === assessmentType">
+                        View Progress
+                    </template>
+                    <template v-else-if="'Task' === assessmentType">
+                        Student View
+                    </template>
                     <template v-else>
-                        View Student Page
+                        View Attempts
                     </template>
                 </pop-out-menu-item>
             </div>
