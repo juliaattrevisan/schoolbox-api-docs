@@ -8,9 +8,12 @@
 namespace Schoolbox\Assessment\Rubric\DataModel\IndicatorUsage;
 
 use PDOStatement;
-use Schoolbox;
+use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as IndicatorMapper;
+use Schoolbox\Assessment\Rubric\DataModel\Capability;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator;
+use Schoolbox\GenericCollection;
+use Schoolbox\Mapper as BaseMapper;
 
 /**
  * Mapper for rubric indicator usage.
@@ -18,9 +21,9 @@ use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as IndicatorMapper;
  * @package Schoolbox\Assessment\Rubric\DataModel
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  * @method Model createModel($idValue = null)
- * @method Model[]|Schoolbox\GenericCollection findByColumn($columnName, $columnValue, $options = [])
+ * @method Model[]|GenericCollection findByColumn($columnName, $columnValue, $options = [])
  */
-class Mapper extends Schoolbox\Mapper
+class Mapper extends BaseMapper
 {
     protected function mapping()
     {
@@ -28,7 +31,7 @@ class Mapper extends Schoolbox\Mapper
         $this->hasModel(Model::class);
         $this->uses('max_value', self::TYPE_DECIMAL);
         $this->uses('sequence', self::TYPE_INTEGER);
-        $this->joins('rubric_indicator_id', IndicatorMapper::class, 'id', null, null, 'indicator', 'indicator');
+        $this->joins('rubric_indicator_id', Indicator\Mapper::class, 'id', null, null, 'indicator', 'indicator');
         $this->joins('submission_box_id', SubmissionBoxMapper::class, 'id', null, null, 'submissionBox', 'submission_box');
 
         // Indicator usages are hard-deleted, so we have to use CALLBACK_POSTDELETE not CALLBACK_POSTSOFTDELETE
@@ -58,7 +61,9 @@ class Mapper extends Schoolbox\Mapper
         return "
             SELECT
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('submission_box', 'sb')}
+                {$this->getJoinColumnString('submission_box', 'sb')},
+                {$this->getJoinColumnString('indicator', 'i')},
+                {$this->getJoinColumnString('indicator.capability', 'ic')}
         ";
     }
 
@@ -71,6 +76,8 @@ class Mapper extends Schoolbox\Mapper
         return "
             FROM {$this->getTable()}
             INNER JOIN {$this->getJoinSql('submission_box', '', 'sb', true)}
+            INNER JOIN {$this->getJoinSql('indicator', '', 'i', true)}
+            INNER JOIN {$this->getJoinSql('indicator.capability', 'i', 'ic', true)}
         ";
     }
 
@@ -78,14 +85,21 @@ class Mapper extends Schoolbox\Mapper
     /**
      * @inheritdoc
      */
-    protected function hydrateSelect(PDOStatement $statement): Schoolbox\GenericCollection
+    protected function hydrateSelect(PDOStatement $statement): GenericCollection
     {
-        /** @var SubmissionBoxMapper $boxMapper */
-        $boxMapper  = $this->getJoinMapper('submission_box');
         $collection = $this->createCollection();
         foreach ($statement as $row) {
             $usage = $this->hydrate($row);
-            $usage->setSubmissionBox($boxMapper->hydrate($row, 'sb'));
+            /** @var SubmissionBox $submissionBox */
+            $submissionBox = $this->hydrateJoin($row, 'submission_box', 'sb');
+            /** @var Indicator\Model $indicator */
+            $indicator = $this->hydrateJoin($row, 'indicator', 'i');
+            /** @var Capability\Model $capability */
+            $capability = $this->hydrateJoin($row, 'indicator.capability', 'ic');
+            $usage
+                ->setSubmissionBox($submissionBox)
+                ->setIndicator($indicator->setCapability($capability))
+            ;
             $collection->add($usage);
         }
         return $collection;

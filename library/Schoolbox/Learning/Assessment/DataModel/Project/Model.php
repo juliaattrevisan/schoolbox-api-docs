@@ -106,9 +106,9 @@ class Model implements IAssessableDataModel, IAssessmentContextDataModel, ISoftD
     /**
      * The collection of this project's sub-assessment models.
      *
-     * @var Collection|Assessment\Model[]
+     * @var (GenericCollection&Assessment\Model[])|null
      */
-    protected $assessments;
+    protected ?GenericCollection $assessments = null;
 
     /**
      * @return FolderModel
@@ -165,20 +165,20 @@ class Model implements IAssessableDataModel, IAssessmentContextDataModel, ISoftD
     }
 
     /**
-     * @return GenericCollection|Assessment\Model[]
+     * @return (GenericCollection&Assessment\Model[])|null
      */
-    public function getAssessments()
+    public function getAssessments(): ?GenericCollection
     {
         return $this->assessments;
     }
 
     /**
-     * @param Collection|GenericCollection|Assessment\Model[] $assessments
+     * @param (GenericCollection&Assessment\Model[])|null $assessments
      * @return $this
      */
-    public function setAssessments(Collection $assessments): self
+    public function setAssessments(?GenericCollection $assessments): self
     {
-        $assessments->assertCollectionOf(Assessment\Model::class);
+        $assessments?->assertCollectionOf(Assessment\Model::class);
         $this->assessments = $assessments;
         return $this;
     }

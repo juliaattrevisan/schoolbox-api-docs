@@ -253,17 +253,22 @@ abstract class Mapper implements IMapper, Serializable
      */
     protected $sessionData = [];
 
-    /** @var Cache|GenericCollection[] */
-    private $selectCache;
+    /**
+     * A cache of the results of `SELECT` statements which this mapper executes.
+     */
+    private Cache $selectCache;
 
-    /** @var Cache */
-    private $joinMapperCache;
+    /**
+     * A cache of mappers which are related to this mapper via a join.
+     *
+     * (Mapper creation is expensive, thus these are cached.)
+     */
+    private Cache $joinMapperCache;
 
-    /** @var Cache */
-    protected $foreignBodyCache;
-
-    /** @var Cache */
-    protected $localBodyCache;
+    /**
+     * A cache of the hydrated models which this mapper may produce.
+     */
+    protected Cache $hydrateCache;
 
     /** @var IMonitor */
     protected $monitor;
@@ -472,15 +477,18 @@ abstract class Mapper implements IMapper, Serializable
         $this->selectCache = new Cache(function (PDOStatement $statement, $bypassCache = false) {
             $statement->execute();
 
-            // bypass the local body cache if necessary
-            $this->localBodyCacheBypass = $bypassCache;
+            // Bypass cache if requested, and cache isn't already being bypassed
+            $previousLocalBodyCacheBypass = $this->localBodyCacheBypass;
+            if (!$this->localBodyCacheBypass) {
+                $this->localBodyCacheBypass = $bypassCache;
+            }
 
-            $collection = $this->hydrateSelect($statement);
-
-            // turn that cache back on!
-            $this->localBodyCacheBypass = false;
-
-            return $collection;
+            // set the cache bypass setting back to what it was once done
+            try {
+                return $this->hydrateSelect($statement);
+            } finally {
+                $this->localBodyCacheBypass = $previousLocalBodyCacheBypass;
+            }
         });
 
         // a cache of join mappers (for some reason this method is expensive)
@@ -509,14 +517,8 @@ abstract class Mapper implements IMapper, Serializable
             return $mapper->getJoinMapper(array_shift($parts));
         });
 
-        // cache of foreign entities retrieved via this mapper
-        // they SHOULD be the same object in memory as those found in local on the equivalent sub-mapper
-        $this->foreignBodyCache = new Cache(function (Mapper $foreignMapper, array $row, $alias = '') {
-            return $foreignMapper->hydrate($row, $alias);
-        });
-
         // cache of local entities
-        $this->localBodyCache = new Cache(function (Mapper $mapper, array $row, $alias = '') {
+        $this->hydrateCache = new Cache(function (Mapper $mapper, array $row, $alias = '') {
 
             // Does this model lack an identifier?
             if (!$this->hasIdentifier()) {
@@ -538,7 +540,7 @@ abstract class Mapper implements IMapper, Serializable
 
             $key = trim("$alias.{$mapper->getIdentifierColumn()}", '.');
 
-            if (array_key_exists($key, $row) && $this->localBodyCacheBypass == false) {
+            if (array_key_exists($key, $row)) {
                 $id = $row[$key];
 
                 // If the identifier is null, just return scalar NULL.
@@ -1563,6 +1565,10 @@ abstract class Mapper implements IMapper, Serializable
         }
         $this->database->commit();
 
+        // Deletion causes the DB state to change:
+        // therefore, clear caches
+        $this->clearCaches();
+
         // Post-delete callbacks
         foreach ($collection as $model) {
             $this->triggerCallbacks(self::CALLBACK_POSTDELETE, $model);
@@ -1652,6 +1658,10 @@ abstract class Mapper implements IMapper, Serializable
 
         // execute with predicate params
         $statement = $this->getDatabase()->query($query, $predicate->getParams());
+
+        // Deletion causes the DB state to change:
+        // therefore, clear caches
+        $this->clearCaches();
 
         // Call post-delete hooks
         foreach ($deletedItems as $model) {
@@ -1780,6 +1790,10 @@ abstract class Mapper implements IMapper, Serializable
             }
         }
         $this->database->commit();
+
+        // Update causes the DB state to change:
+        // therefore, clear caches
+        $this->clearCaches();
 
         // Trigger the post-trigger, if there is one.
         if (isset($post_trigger)) {
@@ -3056,6 +3070,11 @@ abstract class Mapper implements IMapper, Serializable
             throw $e;
         }
         $this->database->commit();
+
+        // Save causes the DB state to change:
+        // therefore, clear caches
+        $this->clearCaches();
+
         foreach ($collection as $i => $model) {
             $previous = null;
 
@@ -3456,7 +3475,7 @@ abstract class Mapper implements IMapper, Serializable
             }
         }
 
-        return $this->performHydration($this->localBodyCache, $this, $row, $alias, $callback);
+        return $this->performHydration($row, $alias, $callback);
     }
 
     /**
@@ -3467,7 +3486,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function invalidateHydrateCache(array $row, $alias = '')
     {
-        $this->localBodyCache->invalidate($this->getLocalObjectCacheKey($this, $row, $alias));
+        $this->hydrateCache->invalidate($this->getLocalObjectCacheKey($this, $row, $alias));
     }
 
     /**
@@ -3487,37 +3506,49 @@ abstract class Mapper implements IMapper, Serializable
     {
         $foreignMapper = $this->getJoinMapper($join);
 
-        return $this->performHydration($this->foreignBodyCache, $foreignMapper, $row, $alias, $callback);
+        // Bypass join mapper's cache if bypassing this mapper's cache
+        $previousForeignBodyCacheBypass = $foreignMapper->localBodyCacheBypass;
+        if ($this->localBodyCacheBypass) {
+            $foreignMapper->localBodyCacheBypass = $this->localBodyCacheBypass;
+        }
+
+        // Hydrate joined model:
+        // set the joined mapper's cache bypass setting back to what it was
+        // once done
+        try {
+            return $this->getJoinMapper($join)->hydrate($row, $alias, $callback);
+        } finally {
+            $foreignMapper->localBodyCacheBypass = $previousForeignBodyCacheBypass;
+        }
     }
 
 
     /**
-     * Actually performs hydration via the cache given
+     * Actually performs hydration using the local body cache and this mapper.
      *
-     * @param Cache    $cache
-     * @param Mapper   $mapper
      * @param array    $row
      * @param string   $alias
      * @param callable $callback
      * @return object|null
      */
-    private function performHydration(Cache $cache, Mapper $mapper, array $row, $alias = '', $callback = null)
+    private function performHydration(array $row, $alias = '', $callback = null)
     {
-        // courtesy of late static bindings, this private var is accessible even if you're in a different mapper
-        // however, it is not accessible to subclasses
-        // Always bypass the cache if within CLI/daemon context.
-        // This is because database contents will change before the process dies.
-        if (!$mapper->isCacheEnabled() || $mapper->localBodyCacheBypass) {
+        // Always bypass the cache if within CLI/daemon context:
+        // database contents will change before the process dies.
+        if (!$this->isCacheEnabled() || $this->localBodyCacheBypass) {
             // fetch direct
-            $model = $cache->fetch([ $mapper, $row, $alias ]);
+            $model = $this->hydrateCache->fetch([$this, $row, $alias ]);
         } else {
             // use cached value if available
-            $model = $cache->get($this->getLocalObjectCacheKey($mapper, $row, $alias), [ $mapper, $row, $alias ]);
+            $model = $this->hydrateCache->get(
+                $this->getLocalObjectCacheKey($this, $row, $alias),
+                [ $this, $row, $alias ]
+            );
         }
 
         // we don't cache this part
         if (is_callable($callback)) {
-            $model = call_user_func($callback, $mapper, $model, $row);
+            $model = call_user_func($callback, $this, $model, $row);
         }
 
         return $model;
@@ -4378,5 +4409,20 @@ abstract class Mapper implements IMapper, Serializable
         $otherMapper = $otherMapper instanceof IMapper ? $otherMapper : $otherMapper::getInstance();
         $otherColumn = $joinDef['other_key'];
         return $otherMapper->getColumnScalarHydrator($otherColumn, $depth + 1);
+    }
+
+    /**
+     * Clears the select and local body caches for this mapper.
+     *
+     * This should be called after an `INSERT`, `UPDATE` or `DELETE` operation,
+     * because those operations change the database's state; thus
+     * desynchronising the cache's state from the database's.
+     *
+     * @return void
+     */
+    private function clearCaches(): void
+    {
+        $this->selectCache->clear();
+        $this->hydrateCache->clear();
     }
 }

@@ -10,18 +10,20 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Rubric\DataModel\CapabilityUsage;
 
 use PDOStatement;
-use Schoolbox;
+use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper as CapabilityMapper;
+use Schoolbox\Assessment\Rubric\DataModel\Capability;
+use Schoolbox\GenericCollection;
+use Schoolbox\Mapper as BaseMapper;
 
 /**
  * Mapper for usage of a rubric capability on a due work.
  *
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  * @method Model createModel($idValue = null)
- * @method Model[]|Schoolbox\GenericCollection findByColumn($columnName, $columnValue, $options = [])
+ * @method Model[]|GenericCollection findByColumn($columnName, $columnValue, $options = [])
  */
-class Mapper extends Schoolbox\Mapper
+class Mapper extends BaseMapper
 {
     /**
      * @inheritdoc
@@ -34,7 +36,7 @@ class Mapper extends Schoolbox\Mapper
         $this->uses('sequence', self::TYPE_INTEGER);
         $this->joins(
             'rubric_capability_id',
-            CapabilityMapper::class,
+            Capability\Mapper::class,
             'id',
             null,
             null,
@@ -61,7 +63,8 @@ class Mapper extends Schoolbox\Mapper
         return "
             SELECT
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('submission_box', 'sb')}
+                {$this->getJoinColumnString('submission_box', 'sb')},
+                {$this->getJoinColumnString('capability', 'c')}
         ";
     }
 
@@ -74,6 +77,7 @@ class Mapper extends Schoolbox\Mapper
         return "
             FROM {$this->getTable()}
             INNER JOIN {$this->getJoinSql('submission_box', '', 'sb', true)}
+            INNER JOIN {$this->getJoinSql('capability', '', 'c', true)}
         ";
     }
 
@@ -81,14 +85,19 @@ class Mapper extends Schoolbox\Mapper
     /**
      * @inheritdoc
      */
-    protected function hydrateSelect(PDOStatement $statement): Schoolbox\GenericCollection
+    protected function hydrateSelect(PDOStatement $statement): GenericCollection
     {
-        /** @var SubmissionBoxMapper $boxMapper */
-        $boxMapper  = $this->getJoinMapper('submission_box');
         $collection = $this->createCollection();
         foreach ($statement as $row) {
             $usage = $this->hydrate($row);
-            $usage->setSubmissionBox($boxMapper->hydrate($row, 'sb'));
+            /** @var SubmissionBox $submissionBox */
+            $submissionBox = $this->hydrateJoin($row, 'submission_box', 'sb');
+            /** @var Capability\Model $capability */
+            $capability = $this->hydrateJoin($row, 'capability', 'c');
+            $usage
+                ->setSubmissionBox($submissionBox)
+                ->setCapability($capability)
+            ;
             $collection->add($usage);
         }
         return $collection;

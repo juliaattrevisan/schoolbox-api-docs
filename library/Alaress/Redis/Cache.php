@@ -11,6 +11,7 @@ namespace Alaress\Redis;
 
 use Alaress\Cache as BaseCache;
 use Predis\ClientInterface;
+use Predis\Collection\Iterator\Keyspace;
 use Predis\Transaction\MultiExec;
 
 /**
@@ -64,6 +65,21 @@ class Cache extends BaseCache
         return $this;
     }
 
+    /**
+     * Clears the cache.
+     *
+     * @return bool Always true for now.
+     */
+    public function clear(): bool
+    {
+        $keyspace = new Keyspace($this->redis, $this->buildRedisKey('*'));
+        $keys     = [];
+        foreach ($keyspace as $key) {
+            $keys[] = $key;
+        }
+        $this->redis->del($keys);
+        return true;
+    }
 
     /**
      * @param int|string $key

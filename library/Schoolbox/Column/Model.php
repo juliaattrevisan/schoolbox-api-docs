@@ -11,59 +11,10 @@
 
 namespace Schoolbox\Column;
 
-use Alaress\Cache;
 use Schoolbox\Mapper;
 
 class Model implements IColumnType
 {
-
-    /** @var Cache|object[] */
-    private $cache = [];
-
-
-    /**
-     * Model Column constructor.
-     */
-    public function __construct()
-    {
-        $this->cache = new Cache(function (Mapper $mapper, $value) {
-            if (null === $value) {
-                return null;
-            }
-
-            $model = $mapper->createModel();
-
-            if (!$model) {
-                // the model failed to instantiate, so return null accordingly
-                return null;
-            }
-
-            // Figure out the identifier property to set on the model.
-            $id_property = $this->getIdentifierProperty();
-
-            $identifier_method  = isset($id_property)
-                ? $mapper->getSetMethodName($id_property)
-                : $mapper->getSetIdentifierMethodName();
-
-            // Hydrate the identifier before setting it, if possible
-            // Prefer this column's configured identifier, fall back to mapper's configured identifier
-            $identifier = isset($id_property)
-                ? $mapper->getMap()[$id_property]
-                : $mapper->getIdentifier();
-
-            $identifierHydrator = $identifier['hydrator'] ?? null;
-            if ($identifierHydrator instanceof IColumnType) {
-                $identifierJoin       = $identifier['join'] ?? null;
-                $identifierJoinMapper = $identifierJoin ? $mapper->getJoinMapper($identifierJoin) : null;
-                $model->$identifier_method($identifierHydrator->hydrate($value, $identifierJoinMapper));
-            } else {
-                $model->$identifier_method($value);
-            }
-
-            return $model;
-        });
-    }
-
     /**
      * The property to set on the model when hydrating, or get when dehydrating.
      * If not set, then the mapper's ID property is used.
@@ -107,7 +58,43 @@ class Model implements IColumnType
      */
     public function hydrate($value, $mapper = null)
     {
-        return $this->cache->get(sprintf("'%s'.'%s'", get_class($mapper), $value), [ $mapper, $value ]);
+        if (!isset($mapper)) {
+            return null;
+        }
+        if (null === $value) {
+            return null;
+        }
+
+        $model = $mapper->createModel();
+
+        if (!$model) {
+            // the model failed to instantiate, so return null accordingly
+            return null;
+        }
+
+        // Figure out the identifier property to set on the model.
+        $id_property = $this->getIdentifierProperty();
+
+        $identifier_method  = isset($id_property)
+            ? $mapper->getSetMethodName($id_property)
+            : $mapper->getSetIdentifierMethodName();
+
+        // Hydrate the identifier before setting it, if possible
+        // Prefer this column's configured identifier, fall back to mapper's configured identifier
+        $identifier = isset($id_property)
+            ? $mapper->getMap()[$id_property]
+            : $mapper->getIdentifier();
+
+        $identifierHydrator = $identifier['hydrator'] ?? null;
+        if ($identifierHydrator instanceof IColumnType) {
+            $identifierJoin       = $identifier['join'] ?? null;
+            $identifierJoinMapper = $identifierJoin ? $mapper->getJoinMapper($identifierJoin) : null;
+            $model->$identifier_method($identifierHydrator->hydrate($value, $identifierJoinMapper));
+        } else {
+            $model->$identifier_method($value);
+        }
+
+        return $model;
     }
 
     /**

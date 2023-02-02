@@ -822,6 +822,10 @@ class Mapper extends BaseMapper
             }
 
             $model->setAssessmentContext($context);
+
+            // Set assessment model
+            $model->getSubObject()->setAssessmentModel($model);
+
             $modelList->add($model);
         }
         // Load related 1-M models
@@ -888,7 +892,7 @@ class Mapper extends BaseMapper
         foreach ($modelList as $model) {
             $project = $model->getProject();
             if ($project) {
-                if ($project->getAssessments() === null) {
+                if (!$project->getAssessments()) {
                     $project->setAssessments($this->createCollection());
                 }
                 $projects[$project->getId()] = $project;
@@ -1048,6 +1052,11 @@ class Mapper extends BaseMapper
                     if (isset($contextProjects[$contextId])) {
                         $context->setAssessmentModel($contextProjects[$contextId]);
                         // Ensure project is linked to (potentially deleted) child
+                        // Need to ensure that the assessment list is
+                        // initialised, so that sub-assessments can be linked
+                        if (!$context->getAssessments()) {
+                            $context->setAssessments($this->createCollection());
+                        }
                         $context->getAssessments()[$model->getId()] = $model;
                     }
                 }

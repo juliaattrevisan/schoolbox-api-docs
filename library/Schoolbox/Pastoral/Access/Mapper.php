@@ -72,7 +72,10 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Return the first part of the string required to select from this mapper
+     * Select:
+     * * role
+     * * user and their role
+     * * group
      *
      * @throws BaseMapper\DefinitionException
      * @return string
@@ -88,9 +91,25 @@ class Mapper extends BaseMapper
                         {$this->getJoinColumnString('user', 'u')},
                         {$this->getJoinColumnString('user.role', 'ur')},
                         {$this->getJoinColumnString('group', 'g')}
+        ";
+    }
+
+    /**
+     * Join onto:
+     * * role
+     * * user and their role
+     * * group
+     *
+     * @throws BaseMapper\DefinitionException
+     * @return string
+     */
+    protected function getFromString()
+    {
+        return "
             FROM        {$this->getTable()}
             LEFT JOIN   {$this->getJoinSql('role', '', 'r')}
             LEFT JOIN   {$this->getJoinSql('user', '', 'u')}
+            LEFT JOIN   {$this->getJoinSql('user.role', 'u', 'ur')}
             LEFT JOIN   {$this->getJoinSql('group', '', 'g')}
             LEFT JOIN   {$this->getJoinSql('user.role', 'u', 'ur')}
         ";
@@ -120,6 +139,7 @@ class Mapper extends BaseMapper
             if (!empty($row['u.id'])) {
                 /** @var User $user */
                 $user = $this->hydrateJoin($row, 'user', 'u');
+
                 /** @var Role $role */
                 $role = $this->hydrateJoin($row, 'user.role', 'ur');
                 $access->setUser($user->setRole($role));

@@ -26,7 +26,6 @@ use function is_scalar;
  */
 class Cache
 {
-
     /** @var callable */
     private $fetch;
 
@@ -83,6 +82,16 @@ class Cache
         return $this;
     }
 
+    /**
+     * Clears the cache.
+     *
+     * @return bool Always true for now.
+     */
+    public function clear(): bool
+    {
+        $this->cache = [];
+        return true;
+    }
 
     /**
      * Will fetch the result of the given args DIRECTLY. The cache will be completely bypassed.

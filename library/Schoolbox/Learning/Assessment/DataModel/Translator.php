@@ -316,7 +316,9 @@ class Translator
         // The danger of that is worth the instanceof check here.
         if ($domainObject instanceof Project && $domainObject->getAssessables() !== null) {
             /** @var ProjectModel $dataModel */
-            $dataModel->setAssessments(new GenericCollection(AssessmentModel::class));
+            if (!$dataModel->getAssessments()) {
+                $dataModel->setAssessments(new GenericCollection(AssessmentModel::class));
+            }
             foreach ($domainObject->getAssessables() as $idx => $domainChild) {
                 $subAssessmentModel = $this->translateToDataModelRecursive($domainChild, $depth + 1)->getAssessmentModel();
                 $subAssessmentModel->setContextProject($dataModel);
