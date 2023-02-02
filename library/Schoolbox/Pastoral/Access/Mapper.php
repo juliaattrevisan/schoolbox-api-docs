@@ -111,7 +111,6 @@ class Mapper extends BaseMapper
             LEFT JOIN   {$this->getJoinSql('user', '', 'u')}
             LEFT JOIN   {$this->getJoinSql('user.role', 'u', 'ur')}
             LEFT JOIN   {$this->getJoinSql('group', '', 'g')}
-            LEFT JOIN   {$this->getJoinSql('user.role', 'u', 'ur')}
         ";
     }
 
