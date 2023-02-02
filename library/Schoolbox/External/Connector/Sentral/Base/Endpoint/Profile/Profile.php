@@ -1191,7 +1191,7 @@ class Profile implements IStrategy
                 /* Disregard unemployed staff
                  */
                 if (!$isEmployed) {
-                    $this->log->debug(sprintf(
+                    $this->log->warning(sprintf(
                         'Skipping base profile for staff %s - staff is not currently employed',
                         $fullname
                     ));
@@ -1202,7 +1202,7 @@ class Profile implements IStrategy
                 /* Disregard deceased staff (never seen this set to true so far)
                  */
                 if ($staff['relationships']['person']['data']['attributes']['isDeceased']) {
-                    $this->log->debug(sprintf(
+                    $this->log->warning(sprintf(
                         'Skipping base profile for staff %s - deceased',
                         $fullname
                     ));
@@ -1213,7 +1213,7 @@ class Profile implements IStrategy
                 /* Disregard inactive staff
                  */
                 if (!(int)$staff['attributes']['isActive']) {
-                    $this->log->debug(sprintf(
+                    $this->log->warning(sprintf(
                         'Skipping base profile for staff %s - staff is inactive',
                         $fullname
                     ));
