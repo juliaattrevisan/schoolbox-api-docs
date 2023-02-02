@@ -16,6 +16,17 @@ export type Node = {
     breadcrumbs?: Breadcrumb[]; // list of parents to reach this node
     usage?: Usage[]; // all the places the node has been used
     usageCount?: number; // the total number of linked activities (not just the currently loaded)
+    _links: {
+        delete: string;
+        getUsage: string;
+        read: string;
+        update: string;
+    };
+    _usageCounts: {
+        course: number;
+        folder: number;
+        unit: number;
+    };
 };
 
 /**
