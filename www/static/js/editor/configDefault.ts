@@ -42,6 +42,7 @@ import {
     EmojiPlaces,
     EmojiSymbols,
 } from "@phudak/ckeditor5-emoji/src";
+import HorizontalLine from "@ckeditor/ckeditor5-horizontal-line/src/horizontalline";
 import TableToolbar from "@ckeditor/ckeditor5-table/src/tabletoolbar";
 import TableProperties from "@ckeditor/ckeditor5-table/src/tableproperties";
 import TableCellProperties from "@ckeditor/ckeditor5-table/src/tablecellproperties";
@@ -107,6 +108,7 @@ export function getDefault() {
             EmojiObjects,
             EmojiSymbols,
             EmojiFlags,
+            HorizontalLine,
             Link,
             List,
             TodoList,
@@ -145,7 +147,7 @@ export function getDefault() {
             {
                 label: "Insert",
                 icon: "plus",
-                items: ["insertImage", "mediaEmbed", "insertTable", "specialCharacters", "emoji"],
+                items: ["insertImage", "mediaEmbed", "insertTable", "specialCharacters", "emoji", "horizontalLine"],
             },
             "|",
             {
