@@ -44,9 +44,9 @@ class ParticipationHelper
                     throw new DomainException("User {$userId} was assigned index {$userPlanIndices[$userId]}, but there's no plan with that index (valid plan indices were " . json_encode($plans->keys()) . ')');
                 }
 
-                $this->include($assessment, $userId);
+                $this->include($assessment, $userId, $userPlan);
             } else {
-                $this->exclude($assessment, $userId);
+                $this->exclude($assessment, $userId, $userPlan);
             }
         }
     }
@@ -109,13 +109,13 @@ class ParticipationHelper
      * @return void
      * @throws MapperException
      */
-    public function exclude(IAssessable $assessment, int $userId): void
+    public function exclude(IAssessable $assessment, int $userId, PlanModel|null $plan = null): void
     {
         $participantMapper = $this->participantDataSource->getParticipantMapper();
         /** @var ParticipantModel|null $existingParticipation */
         $existingParticipation = $this->getExistingParticipation($assessment, $userId);
         /** @var PlanModel $userPlan */
-        $userPlan = $this->getPlans($assessment->getId())[$assessment->getId()];
+        $userPlan = $plan ?: $this->getPlans($assessment->getId())[$assessment->getId()];
 
         // excluded
         if ($existingParticipation && $existingParticipation->isExcluded() && $existingParticipation->getPlan()->getId() === $userPlan->getId()) {
@@ -143,13 +143,13 @@ class ParticipationHelper
      * @return void
      * @throws MapperException
      */
-    public function include(IAssessable $assessment, int $userId): void
+    public function include(IAssessable $assessment, int $userId, PlanModel|null $plan = null): void
     {
         $participantMapper = $this->participantDataSource->getParticipantMapper();
         /** @var ParticipantModel|null $existingParticipation */
         $existingParticipation = $this->getExistingParticipation($assessment, $userId);
         /** @var PlanModel $userPlan */
-        $userPlan = $this->getPlans($assessment->getId())[$assessment->getId()];
+        $userPlan = $plan ?: $this->getPlans($assessment->getId())[$assessment->getId()];
 
         // generate a record if there is ALREADY existing participation, OR the plan is NOT dynamic
         if (!$existingParticipation && $userPlan->isDynamic()) {
