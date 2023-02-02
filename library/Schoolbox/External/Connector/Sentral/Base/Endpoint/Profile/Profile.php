@@ -1191,7 +1191,7 @@ class Profile implements IStrategy
                 /* Disregard unemployed staff
                  */
                 if (!$isEmployed) {
-                    $this->log->warning(sprintf(
+                    $this->log->debug(sprintf(
                         'Skipping base profile for staff %s - staff is not currently employed',
                         $fullname
                     ));
@@ -1202,7 +1202,7 @@ class Profile implements IStrategy
                 /* Disregard deceased staff (never seen this set to true so far)
                  */
                 if ($staff['relationships']['person']['data']['attributes']['isDeceased']) {
-                    $this->log->warning(sprintf(
+                    $this->log->debug(sprintf(
                         'Skipping base profile for staff %s - deceased',
                         $fullname
                     ));
@@ -1213,19 +1213,8 @@ class Profile implements IStrategy
                 /* Disregard inactive staff
                  */
                 if (!(int)$staff['attributes']['isActive']) {
-                    $this->log->warning(sprintf(
+                    $this->log->debug(sprintf(
                         'Skipping base profile for staff %s - staff is inactive',
-                        $fullname
-                    ));
-
-                    continue;
-                }
-
-                /* Disregard departed staff
-                 */
-                if (self::STAFF_EMPLOYMENT_STATUS_DEPARTED === $staff['attributes']['employmentStatus']) {
-                    $this->log->warning(sprintf(
-                        'Skipping base profile for staff %s - staff is departed',
                         $fullname
                     ));
 
@@ -1375,7 +1364,7 @@ class Profile implements IStrategy
                 /* I suppose this might be conclusive, if set.
                  * We can skip the date analysis
                  */
-                if ('left' === $employment['attributes']['employmentStatus']) {
+                if (self::STAFF_EMPLOYMENT_STATUS_DEPARTED === $employment['attributes']['employmentStatus']) {
                     return false;
                 }
 
