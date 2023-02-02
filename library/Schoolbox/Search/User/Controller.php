@@ -83,7 +83,7 @@ class Controller extends BaseController
         private PastoralSubTypeMapper $pastoralSubTypeMapper,
         private PastoralDataSource $pastoralDataSource,
         private TermMapper $termMapper,
-        protected \Schoolbox\External\User $userRelationHydrator
+        private \Schoolbox\External\User $userRelationHydrator
     ) {
     }
 
