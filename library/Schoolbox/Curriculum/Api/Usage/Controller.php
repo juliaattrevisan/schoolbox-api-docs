@@ -23,12 +23,23 @@ class Controller extends Base
      * Constructor
      *
      * @param IConnector $database Database required for building cursor object
+     *
+     */
+    /**
+     * Constructor
+     *
+     * @param IConnector        $database         Database required for building cursor object
+     * @param Folder\Mapper     $folderMapper     Folder mapper
+     * @param CourseSpec\Mapper $courseSpecMapper Course specification mapper
+     * @param UnitSpec\Mapper   $unitSpecMapper   Unit specification mapper
+     * @param Counter           $counter          Counter for node usages
      */
     public function __construct(
         private IConnector $database,
         private Folder\Mapper $folderMapper,
         private CourseSpec\Mapper $courseSpecMapper,
         private UnitSpec\Mapper $unitSpecMapper,
+        private Counter $counter,
     ) {
     }
 
@@ -46,18 +57,32 @@ class Controller extends Base
         // Fetch usage
         $encodedCursor = $this->request->query->get('cursor');
         $limit         = $this->request->query->getInt('limit', Cursor::LIMIT_DEFAULT);
-        $cursor        = new Cursor($this->database, $node, $limit, null);
+        $cursor        = new Cursor($this->database, $node, $this->counter, $limit, null);
         $data          = $cursor->retrieveResults($encodedCursor);
 
         // I can't create this in the module because a user object is required,
         // and the user doesn't reliably exist in the module.
+        $folderTranslator = new Folder\Translator\ModelToArray\LinkOnly();
+        $courseTranslator = new CourseSpec\Translator\ModelToArray(
+            $this->router,
+            $this->authorizer,
+            $this->getUser(),
+            $folderTranslator,
+        );
+        $unitTranslator = new UnitSpec\Translator\ModelToArray(
+            $this->router,
+            $this->authorizer,
+            $this->getUser(),
+            $folderTranslator,
+            $courseTranslator,
+        );
         $hydrator = new Hydrator(
             $this->folderMapper,
-            new Folder\Translator\ModelToArray\LinkOnly(),
+            $folderTranslator,
             $this->courseSpecMapper,
-            new CourseSpec\Translator\ModelToArray($this->router, $this->authorizer, $this->getUser()),
+            $courseTranslator,
             $this->unitSpecMapper,
-            new UnitSpec\Translator\ModelToArray($this->router, $this->authorizer, $this->getUser()),
+            $unitTranslator,
         );
 
         $this->response->content->set(

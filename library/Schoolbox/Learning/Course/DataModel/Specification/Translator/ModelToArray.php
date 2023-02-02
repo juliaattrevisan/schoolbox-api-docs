@@ -13,6 +13,7 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\GetRouteIfAuthorized;
 use Aura\Router\Router;
 use Schoolbox\Learning\Course\DataModel\Specification\Model;
+use Schoolbox\Resource\Folder\Translator\IModelToArray;
 use Schoolbox\User;
 
 /**
@@ -26,6 +27,7 @@ class ModelToArray
         protected Router $router,
         protected Authorizer $authorizer,
         protected User $currentUser,
+        private IModelToArray $folderTranslator,
     ) {
     }
 
@@ -39,12 +41,12 @@ class ModelToArray
             'id'          => $courseSpec->getId(),
             'title'       => $courseSpec->getTitle(),
             'subjectCode' => $courseSpec->getSubjectCode(),
+            'folder'      => call_user_func($this->folderTranslator, $courseSpec->getFolder()),
             '_links'      => [
-                'folder' => '/homepage/' . $courseSpec->getFolder()->getId(),
-                'modify' => $this->getRouteIfAuthorized(
+                'view' => $this->getRouteIfAuthorized(
                     'course.modifyCourse',
                     ['courseSpec' => $courseSpec, 'id' => $courseSpec->getId()],
-                )
+                ),
             ],
         ];
     }
