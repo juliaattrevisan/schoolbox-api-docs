@@ -282,7 +282,7 @@ class Family
                     foreach (self::PARENT_PERSON_NODES as $node) {
                         /* Only process the living
                          */
-                        if (!isset($family[$node]['deceased_flg']) || (self::DECEASED_FLAG === $family[$node]['deceased_flg'])) {
+                        if ($this->isAlive($node, $family)) {
                             $personExternalId = $this->deriveExternalId($node, (string)$family['user_code'], '');
 
                             $this->processParentNode($node, $personExternalId, $family);
@@ -337,7 +337,7 @@ class Family
                         if (isset($subfamily['address'][$this->addnumFather])) {
                             /* Only process the living
                              */
-                            if (!isset($family[self::FATHER_NODE]['deceased_flg']) || (self::DECEASED_FLAG === $subfamily[self::FATHER_NODE]['deceased_flg'])) {
+                            if ($this->isAlive(self::FATHER_NODE, $subfamily)) {
                                 $personExternalId = $this->deriveExternalId(self::FATHER_NODE, (string)$subfamily['user_code'], (string)$subfamily['sfa_num']);
 
                                 $this->processSplitParentNode(
@@ -361,7 +361,7 @@ class Family
                         if (isset($subfamily['address'][$this->addnumMother])) {
                             /* Only process the living
                              */
-                            if (!isset($family[self::MOTHER_NODE]['deceased_flg']) || (self::DECEASED_FLAG === $subfamily[self::MOTHER_NODE]['deceased_flg'])) {
+                            if ($this->isAlive(self::MOTHER_NODE, $subfamily)) {
                                 $personExternalId = $this->deriveExternalId(self::MOTHER_NODE, (string)$subfamily['user_code'], (string)$subfamily['sfa_num']);
 
                                 $this->processSplitParentNode(
@@ -396,6 +396,30 @@ class Family
                 'unknown' => \count($unknown),
             ],
         ];
+    }
+
+
+    /**
+     * Decide if someone is alive.
+     *
+     * @param string $node
+     * @param array  $family
+     * @return bool
+     */
+    private function isAlive(string $node, array $family): bool
+    {
+        /* They are alive if the deceased_flg info is missing
+         * This represents the least-change for our users
+         */
+        if (!isset($family[$node]['deceased_flg'])) {
+            return true;
+        }
+
+        /* If deceased_flg is present, try to interpret that
+         * N: alive
+         * anything else: dead
+         */
+        return self::DECEASED_FLAG === $family[$node]['deceased_flg'];
     }
 
 
