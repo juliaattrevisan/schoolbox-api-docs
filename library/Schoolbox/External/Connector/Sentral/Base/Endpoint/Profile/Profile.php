@@ -1370,8 +1370,6 @@ class Profile implements IStrategy
          */
         foreach ($staff['relationships']['employments']['data'] as $employment) {
             if ('staffEmployment' === $employment['type']) {
-                $isEmployed = true;
-
                 $now = \Alaress_Date_Format::now();
 
                 /* I suppose this might be conclusive, if set.
@@ -1398,10 +1396,8 @@ class Profile implements IStrategy
                     /* They started before now? I guess their employment has begun
                      * Otherwise, they haven't yet started
                      */
-                    if ($now->gt($start)) {
-                        $isEmployed = true;
-                    } else {
-                        $isEmployed = false;
+                    if ($now->lt($start)) {
+                        return false;
                     }
                 }
 
@@ -1416,13 +1412,13 @@ class Profile implements IStrategy
                      * Otherwise, they finished somewhere in the past
                      */
                     if ($now->lt($end)) {
-                        $isEmployed = true;
-                    } else {
-                        $isEmployed = false;
+                        return true;
                     }
+
+                    return false;
                 }
 
-                return $isEmployed;
+                return true;
             }
         }
 
