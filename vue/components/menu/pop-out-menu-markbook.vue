@@ -389,7 +389,7 @@ async function onMenuItemSelected(target: string, shouldPost: boolean = false) {
                 >
                     Include student
                 </pop-out-menu-item>
-                <pop-out-menu-item v-else
+                <pop-out-menu-item v-else-if="'Project' !== assessmentType"
                     :class="{ 'is-disabled': isExcluded }"
                     @selected="onMenuItemSelected(routes.excludeRoute, true)"
                 >
