@@ -43,12 +43,14 @@ type Routes = {
     reviewRoute: string;
     publishRoute: string;
     excludeRoute: string;
+    includeRoute: string;
     historyRoute: string;
 };
 
 // FloatingUI specific, declared here as showPopOut relies on one of these values existing.
 const popOutElement = ref<HTMLDivElement | null>(null);
 const referenceElement = ref<HTMLDivElement | null>(null);
+const assessmentType = ref('');
 
 const isLoading = ref(false);
 const isSelected = ref(false);
@@ -60,6 +62,8 @@ const activityItems: Ref<ActivityItem[]> = ref([]); // list of recent activity i
 const hasSubmissions = computed(() => activityItems.value.some(item => item.type === 'response' && item.submitted));
 // has an event of type 'feedback'
 const hasFeedback = computed(() => activityItems.value.some(item => item.type === 'feedback'));
+// is the user excluded from the assessment
+const isExcluded = ref(false);
 const isActivityEmpty = computed(() => activityItems.value.length === 0);
 const isExpansionDisabled = computed(() => activityItems.value.length === 1);
 const routes: Ref<Routes> = ref({
@@ -68,6 +72,7 @@ const routes: Ref<Routes> = ref({
     reviewRoute: "",
     publishRoute: "",
     excludeRoute: "",
+    includeRoute: "",
     historyRoute: "",
 });
 const markbookElement = ref<HTMLDivElement | null>(null);
@@ -99,6 +104,12 @@ const { x, y, strategy } = useFloating(referenceElement, popOutElement, {
  *  the activity they're expecting to see might not be there.
  */
 const viewAllText = computed(() => {
+    if ('Due Work' !== assessmentType.value) {
+        return "";
+    }
+    if (isExcluded.value) {
+        return "The student has been excluded. You may include this student in this activity";
+    }
     if (isActivityEmpty.value) {
         return "There has been no activity yet, you may create feedback or exclude this student from this activity";
     }
@@ -124,6 +135,7 @@ function updateRoutes(newRoutes: Routes) {
         reviewRoute: newRoutes.reviewRoute,
         publishRoute: newRoutes.publishRoute,
         excludeRoute: newRoutes.excludeRoute,
+        includeRoute: newRoutes.includeRoute,
         historyRoute: newRoutes.historyRoute,
     };
 }
@@ -166,7 +178,15 @@ async function onPopOutSelected(event: CustomEvent) {
         routes.value = updateRoutes(event.detail.routes as Routes);
         isSelected.value = true;
         isExpanded.value = false;
+        isExcluded.value = "true" === event.detail.isExcluded; //make bool from string issues....
+        assessmentType.value = event.detail.assessmentType;
         referenceElement.value = event.detail.target;
+        if ('Due Work' !== assessmentType.value) {
+            hasLoadError.value = false;
+            isLoading.value = false;
+            activityItems.value = [];
+            return;
+        }
         await getActivity();
     }
 }
@@ -251,9 +271,50 @@ function onToggleSelected() {
  * Navigate to a new page
  *
  * @param { string } target - The URL we want to navigate to.
+ * @param { boolean } shouldPost - Should we use this as a post request?.
  */
-function onMenuItemSelected(target: string) {
-    window.location.href = target;
+async function onMenuItemSelected(target: string, shouldPost: boolean = false) {
+    if (!shouldPost) {
+        window.location.href = target;
+        return;
+    }
+
+    // Not as basic redirect, js fetch things...
+    try {
+        isLoading.value = true;
+        const response = await fetch(target, {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+        });
+        if (response.ok) {
+            hasLoadError.value = false;
+            // invert the excluded option that is currently the only post system
+            isExcluded.value = !isExcluded.value;
+            // update the data location in html, so if you click back in it doesn't break...
+            const element = referenceElement.value;
+            if (element) {
+                element.classList.toggle('excluded');
+                const currentValue = element.getAttribute('data-is-excluded');
+                const newValue = currentValue === 'true' ? 'false' : 'true';
+                element.setAttribute('data-is-excluded', newValue);
+            }
+            // If including student reload the activity list
+            if ('Due Work' === assessmentType.value) {
+                await getActivity();
+            } else {
+                activityItems.value = [];
+            }
+        } else {
+            hasLoadError.value = true;
+        }
+    } catch (error) {
+        hasLoadError.value = true;
+    } finally {
+        isLoading.value = false;
+    }
 }
 </script>
 
@@ -295,6 +356,7 @@ function onMenuItemSelected(target: string) {
                 </small-card>
             </div>
             <div class="c-pop-out-menu__options">
+                <template v-if="'Due Work' === assessmentType & !isExcluded">
                 <pop-out-menu-item
                     :class="{ 'is-disabled': isExpansionDisabled || isActivityEmpty }"
                     @selected="onToggleSelected()"
@@ -302,35 +364,53 @@ function onMenuItemSelected(target: string) {
                     {{ viewAllText }}
                 </pop-out-menu-item>
                 <pop-out-menu-divider />
-                <pop-out-menu-item
-                    :class="{ 'is-disabled': !routes.updateRoute }"
-                    @selected="onMenuItemSelected(routes.updateRoute)"
+                    <pop-out-menu-item v-if="!isExcluded"
+                        :class="{ 'is-disabled': !routes.updateRoute }"
+                        @selected="onMenuItemSelected(routes.updateRoute)"
+                    >
+                        Update feedback
+                    </pop-out-menu-item>
+                    <pop-out-menu-item
+                        :class="{ 'is-disabled': !routes.reviewRoute || isActivityEmpty || !hasSubmissions }"
+                        @selected="onMenuItemSelected(routes.reviewRoute)"
+                    >
+                        Review submission
+                    </pop-out-menu-item>
+                    <pop-out-menu-item
+                        :class="{ 'is-disabled': !routes.publishRoute || isActivityEmpty || !hasFeedback }"
+                        @selected="onMenuItemSelected(routes.publishRoute)"
+                    >
+                        Publish feedback
+                    </pop-out-menu-item>
+                </template>
+                <pop-out-menu-item v-if="isExcluded"
+                                   :class="{ 'is-disabled': !isExcluded }"
+                                   @selected="onMenuItemSelected(routes.includeRoute, true)"
                 >
-                    Update feedback
+                    Include student
                 </pop-out-menu-item>
-                <pop-out-menu-item
-                    :class="{ 'is-disabled': !routes.reviewRoute || isActivityEmpty || !hasSubmissions }"
-                    @selected="onMenuItemSelected(routes.reviewRoute)"
-                >
-                    Review submission
-                </pop-out-menu-item>
-                <pop-out-menu-item
-                    :class="{ 'is-disabled': !routes.publishRoute || isActivityEmpty || !hasFeedback }"
-                    @selected="onMenuItemSelected(routes.publishRoute)"
-                >
-                    Publish feedback
-                </pop-out-menu-item>
-                <pop-out-menu-item
-                    :class="{ 'is-disabled': !routes.excludeRoute }"
-                    @selected="onMenuItemSelected(routes.excludeRoute)"
+                <pop-out-menu-item v-else-if="'Project' !== assessmentType"
+                    :class="{ 'is-disabled': isExcluded }"
+                    @selected="onMenuItemSelected(routes.excludeRoute, true)"
                 >
                     Exclude student
                 </pop-out-menu-item>
-                <pop-out-menu-item
-                    :class="{ 'is-disabled': !routes.historyRoute || isActivityEmpty }"
+                <pop-out-menu-item v-if="!isExcluded"
+                    :class="{ 'is-disabled': !routes.historyRoute || isExcluded }"
                     @selected="onMenuItemSelected(routes.historyRoute)"
                 >
-                    Submission history
+                    <template v-if="'Due Work' === assessmentType">
+                        Submission history
+                    </template>
+                    <template v-else-if="'Project' === assessmentType">
+                        View Progress
+                    </template>
+                    <template v-else-if="'Task' === assessmentType">
+                        Student View
+                    </template>
+                    <template v-else>
+                        View Attempts
+                    </template>
                 </pop-out-menu-item>
             </div>
         </div>
