@@ -140,18 +140,18 @@ class GoalsAchievementsCest
         $profilePage->clickTab('achievements');
         $i->canSee($badgeNameGoal);
         $badgeIdAchievement = $i->grabFromDatabase('badge', 'id', ['deleted_at' => null,'name like' => $badgeNameAchievement]);
-        $profilePage->clickBadgeDropdown($badgeIdAchievement);
+        $profilePage->clickBadgeGoalDropdown($badgeIdAchievement);
         $profilePage->clickBadgeOrDropdownOption('Withdraw achievement');
         $badges->clickConfirm();
         $badgeIdGoal = $i->grabFromDatabase('badge', 'id', ['deleted_at' => null,'name like' => $badgeNameGoal]);
-        $profilePage->clickBadgeDropdown($badgeIdGoal);
+        $profilePage->clickBadgeGoalDropdown($badgeIdGoal);
         $profilePage->clickBadgeOrDropdownOption('Withdraw achievement');
         $badges->clickConfirm();
         $i->amGoingTo('Click the goals tab, ensure the goal is presented and remove it');
         $profilePage->clickTab('goals');
         $i->canSee($badgeNameGoal);
         $i->cantSee($badgeNameAchievement);
-        $i->click('a[data-dropdown="header-options-1-' . $badgeIdGoal . '-goal"]');
+        $profilePage->clickBadgeGoalDropdown($badgeIdGoal);
         $badges->clickDropdownOptionFirstElement('close');
         $badges->clickConfirm();
         $i->cantSee($badgeNameGoal);
@@ -163,7 +163,7 @@ class GoalsAchievementsCest
     /**
      * @param AcceptanceTester $i
      * @throws Exception
-     *
+     * @depends setGoals
      *
      * set a goal, add an evidence, view the evidence, edit it, check it is updated, award it and check the evidence is presented
      * withdraw the achievement, remove the evidence, award it again with evidence, check the evidence, update the evidence, check the evidence is presented properly
@@ -214,11 +214,10 @@ class GoalsAchievementsCest
         $profilePage->clickBadgeOrDropdownOption($badgeNameGoal);
         $profilePage->clickBadgeOrDropdownOption('View evidence');
         $i->canSee('Well done, Jana!');
-
         $i->amGoingTo('Navigate to the profile page and withdraw the achievement');
         $i->amOnPage($profilePage->generateRoute($studentId));
         $profilePage->clickTab('achievements');
-        $profilePage->clickBadgeDropdown($badgeId);
+        $profilePage->clickBadgeGoalDropdown($badgeId);
         $profilePage->clickBadgeOrDropdownOption('Withdraw achievement');
         $badges->clickConfirm();
         $i->amGoingTo('click the tab Goals and ensure the evidence is still presented to the goal');

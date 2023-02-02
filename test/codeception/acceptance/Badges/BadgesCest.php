@@ -5,14 +5,12 @@ declare(strict_types=1);
 namespace Badges;
 
 use AcceptanceTester;
-use Codeception\Util\Locator;
 use Page\Badges\Badges;
 use Page\Badges\CreateBadge;
 use Exception;
 
 class BadgesCest
 {
-
     /**
      * Preparations
      *
