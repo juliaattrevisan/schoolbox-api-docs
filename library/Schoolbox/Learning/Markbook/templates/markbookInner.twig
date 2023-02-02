@@ -210,17 +210,16 @@
                             {% if not participant or participant.isExcluded %} excluded
                             {% endif %} student-grade-cell"
                             data-assessment="{{ assessment.id }}"
-                            {% if assessment.getDefaultTypeName == 'Due Work' %}
-                                data-pop-out-menu
-                                data-endpoint="{{ routeLookupIfAuthorized('learningAssessmentTimeline.getFullTimeline', {assessment: assessment, assessmentId: assessment.id, userId: student.id }) }}"
-                                data-update-route="{{ routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
-                                data-review-route="{{ routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
-                                data-publish-route="{{ routeLookupIfAuthorized('learningAssessment.getSummary', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
-                                data-exclude-route="{{ routeLookupIfAuthorized('learningAssessment.postExclude', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
-                                data-include-route="{{ routeLookupIfAuthorized('learningAssessment.postInclude', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
-                                data-is-excluded="{% if participant and not participant.isExcluded %}false{% else %}true{% endif %}"
-                                data-history-route="{{ routeLookupIfAuthorized('learningAssessment.getSummary', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
-                            {% endif %}
+                            data-pop-out-menu
+                            data-assessment-type="{{ assessment.getDefaultTypeName }}"
+                            data-endpoint="{{ routeLookupIfAuthorized('learningAssessmentTimeline.getFullTimeline', {assessment: assessment, assessmentId: assessment.id, userId: student.id }) }}"
+                            data-update-route="{{ routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
+                            data-review-route="{{ routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
+                            data-publish-route="{{ routeLookupIfAuthorized('learningAssessment.getSummary', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
+                            data-exclude-route="{{ routeLookupIfAuthorized('learningAssessment.postExclude', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
+                            data-include-route="{{ routeLookupIfAuthorized('learningAssessment.postInclude', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
+                            data-is-excluded="{% if participant and not participant.isExcluded %}false{% else %}true{% endif %}"
+                            data-history-route="{{ routeLookupIfAuthorized('learningAssessment.getSummary', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
                     >
                     <!-- Add data for the popup menu above -->
                         {% if participant and not participant.isExcluded %}
@@ -253,13 +252,13 @@
                                 {% set normalisedMark = participant.normalisedMark(true) %}
                                 {% set participationRoute = routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) %}
                                 {% set draftMark = markbook.hasDraft[assessment.id][student.id] is defined %}
-                                 <a class="{{ urgency.marks(normalisedMark) }}"
+                                 <span class="{{ urgency.marks(normalisedMark) }}"
                                     href="{{ participationRoute }}" {% if draftMark %} data-actual-mark {% endif %}
-                                    title="{{ participant.authoritativeFeedback(true) ? participant.authoritativeFeedback(true).comment : '' }}">{{ decorator.label(participant, true) }}</a>
+                                    title="{{ participant.authoritativeFeedback(true) ? participant.authoritativeFeedback(true).comment : '' }}">{{ decorator.label(participant, true) }}</span>
                                 {% if draftMark %}
-                                    <a href="{{ participationRoute }}" data-draft-mark style="display: none"
+                                    <span href="{{ participationRoute }}" data-draft-mark style="display: none"
                                        class="meta"
-                                       title="{{ participant.authoritativeFeedback(false) ? participant.authoritativeFeedback(false).comment : '' }}">{{ decorator.label(participant, false) }}</a>
+                                       title="{{ participant.authoritativeFeedback(false) ? participant.authoritativeFeedback(false).comment : '' }}">{{ decorator.label(participant, false) }}</span>
                                 {% endif %}
                                 {% if participant.hasSubmittedResponse or participant.resubmissionRequired or participant.hasPublishedFeedback or draftMark %}
                                     <span class="indicator indicator-{{ decorator.indicator(participant, draftMark) }}" title="{{ decorator.notchTitle(participant, draftMark) }}"></span>
