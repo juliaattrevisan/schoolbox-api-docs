@@ -219,9 +219,9 @@ export default {
                 const response     = await fetch(this.currentBadge._links.delete, {method: 'DELETE'});
                 const responseText = await response.text();
 
-                // The expected response is blank, with a HTTP status code of 200 (OK).
+                // The expected response is blank, with a HTTP status code in the 'success' range (200-299).
                 // Any other response is treated as an error.
-                if (response.status === 200 && responseText === '') {
+                if (response.ok && responseText === '') {
                     this.data = this.data.filter((badge) => badge.id !== this.currentBadge.id);
                     this.metadata.count -= 1;
                     this.$refs.toast.timeout('Badge successfully deleted', true);
