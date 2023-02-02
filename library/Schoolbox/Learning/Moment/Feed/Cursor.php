@@ -56,6 +56,14 @@ class Cursor implements ICursor
     public const DISCRIMINATOR_DUE_WORK_FEEDBACK = 'dueWorkFeedback';
 
     /**
+     * This is the set of feed item types that we expect to receive from the client.
+     *
+     * NOTE: There is a matching array in library/Schoolbox/Learning/Moment/Evidence/vue/feed.vue.
+     *       If any change is made to this array, a similar change should be made to that array.
+     */
+    private const FEED_ITEM_TYPES = ['goals', 'learning-moments', 'achievements', 'feedback'];
+
+    /**
      * Whether the learning moments module is enabled
      */
     private bool $learningMomentsEnabled;
@@ -450,10 +458,10 @@ class Cursor implements ICursor
         }
 
         foreach ($filter['feedItemTypes'] as $feedItemType) {
-            if (!in_array($feedItemType, self::$feedItemTypes, true)) {
+            if (!in_array($feedItemType, self::FEED_ITEM_TYPES, true)) {
                 throw new InvalidArgumentException(
                     "Filter 'feedItemTypes' array should only contain strings from" .
-                    ' {' . implode(', ', self::$feedItemTypes) . '}'
+                    ' {' . implode(', ', self::FEED_ITEM_TYPES) . '}'
                 );
             }
         }
@@ -462,14 +470,4 @@ class Cursor implements ICursor
             throw new InvalidArgumentException("Filter object must contain 'tag'.");
         }
     }
-
-    /**
-     * This is the set of feed item types that we expect to receive from the client.
-     *
-     * NOTE: There is a matching array in library/Schoolbox/Learning/Moment/Evidence/vue/feed.vue.
-     *       If any change is made to this array, a similar change should be made to that array.
-     *
-     * @var string[]
-     */
-    private static array $feedItemTypes = ['goals', 'learning-moments', 'achievements', 'feedback'];
 }
