@@ -341,6 +341,7 @@ class Profile implements IStrategy
             $this->log->info('Downloading parent data (this might take a while)');
 
             $familiesLookup = (new Lookup\Family(
+                $this->log,
                 $this->api[Codec\DSN::MODULE_IDENTITY_MANAGEMENT],
                 $this->spousePrefix,
                 $this->addnumFather,

@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Lookup;
 
+use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\IApi;
 
@@ -49,6 +50,12 @@ class Family
      * These two nodes have the following keys and we use them to identify father and mother details.
      */
     private const PARENT_PERSON_NODES = ['person2', 'person1'];
+
+
+    /**
+     * 'N' means someone is alive; we disregard the dead.
+     */
+    private const DECEASED_FLAG = 'N';
 
 
     /**
@@ -105,18 +112,20 @@ class Family
      *
      * $api uses the credentials for DSNCodec::MODULE_IDENTITY_MANAGEMENT
      *
-     * @param IApi   $api
-     * @param string $spousePrefix
-     * @param int    $addnumFather
-     * @param int    $addnumMother
-     * @param array  $phones
+     * @param LoggerInterface $log
+     * @param IApi            $api
+     * @param string          $spousePrefix
+     * @param int             $addnumFather
+     * @param int             $addnumMother
+     * @param array           $phones
      */
     public function __construct(
+        private LoggerInterface $log,
         IApi $api,
         string $spousePrefix,
         int $addnumFather,
         int $addnumMother,
-        array $phones
+        array $phones,
     ) {
         $this->api = $api;
 
@@ -271,9 +280,19 @@ class Family
                      * person1 and person2 need to be each given an externalId
                      */
                     foreach (self::PARENT_PERSON_NODES as $node) {
-                        $personExternalId = $this->deriveExternalId($node, (string)$family['user_code'], '');
+                        /* Only process the living
+                         */
+                        if (self::DECEASED_FLAG === $family[$node]['deceased_flg']) {
+                            $personExternalId = $this->deriveExternalId($node, (string)$family['user_code'], '');
 
-                        $this->processParentNode($node, $personExternalId, $family);
+                            $this->processParentNode($node, $personExternalId, $family);
+                        } else {
+                            $this->log->debug(sprintf(
+                                'Parent %s %s in nuclear family is not classified as living: skipping.',
+                                $family[$node]['first_name'],
+                                $family[$node]['surname'],
+                            ));
+                        }
                     }
 
                     $nuclear++;
@@ -316,28 +335,48 @@ class Family
                          * which is apparently person2.
                          */
                         if (isset($subfamily['address'][$this->addnumFather])) {
-                            $personExternalId = $this->deriveExternalId(self::FATHER_NODE, (string)$subfamily['user_code'], (string)$subfamily['sfa_num']);
+                            /* Only process the living
+                             */
+                            if (self::DECEASED_FLAG === $subfamily[self::FATHER_NODE]['deceased_flg']) {
+                                $personExternalId = $this->deriveExternalId(self::FATHER_NODE, (string)$subfamily['user_code'], (string)$subfamily['sfa_num']);
 
-                            $this->processSplitParentNode(
-                                self::FATHER_NODE,
-                                $personExternalId,
-                                $subfamily,
-                                $this->addnumFather
-                            );
+                                $this->processSplitParentNode(
+                                    self::FATHER_NODE,
+                                    $personExternalId,
+                                    $subfamily,
+                                    $this->addnumFather
+                                );
+                            } else {
+                                $this->log->debug(sprintf(
+                                    'Parent %s %s in split family is not classified as living: skipping.',
+                                    $subfamily[self::FATHER_NODE]['first_name'],
+                                    $subfamily[self::FATHER_NODE]['surname'],
+                                ));
+                            }
                         }
 
                         /* Once you identify mothers, construct a parent using their node
                          * which is apparently person1.
                          */
                         if (isset($subfamily['address'][$this->addnumMother])) {
-                            $personExternalId = $this->deriveExternalId(self::MOTHER_NODE, (string)$subfamily['user_code'], (string)$subfamily['sfa_num']);
+                            /* Only process the living
+                             */
+                            if (self::DECEASED_FLAG === $subfamily[self::MOTHER_NODE]['deceased_flg']) {
+                                $personExternalId = $this->deriveExternalId(self::MOTHER_NODE, (string)$subfamily['user_code'], (string)$subfamily['sfa_num']);
 
-                            $this->processSplitParentNode(
-                                self::MOTHER_NODE,
-                                $personExternalId,
-                                $subfamily,
-                                $this->addnumMother
-                            );
+                                $this->processSplitParentNode(
+                                    self::MOTHER_NODE,
+                                    $personExternalId,
+                                    $subfamily,
+                                    $this->addnumMother
+                                );
+                            } else {
+                                $this->log->debug(sprintf(
+                                    'Parent %s %s in split family is not classified as living: skipping.',
+                                    $subfamily[self::MOTHER_NODE]['first_name'],
+                                    $subfamily[self::MOTHER_NODE]['surname'],
+                                ));
+                            }
                         }
                     }
 
