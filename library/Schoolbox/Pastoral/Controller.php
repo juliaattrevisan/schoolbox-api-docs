@@ -381,6 +381,13 @@ class Controller extends Base
 
         // Hydrate group members and their roles so we can display them in the visibility section
         if ($record->getAccess()) {
+            // User is not fully hydrated in some cases (likely for SUDS?)
+            // Hydrate the user, if user role type is not set
+            foreach ($record->getAccess() as $rawAccess) {
+                if ($rawAccess->getUser() && !$rawAccess->getUser()->getRole()->getType()) {
+                    $this->userMapper->findById($rawAccess->getUser()->getId());
+                }
+            }
             foreach ($record->getAccessWithPermission() as $access) {
                 if ($access->getGroup() instanceof PastoralGroup) {
                     $this->pastoralGroupMapper->findById($access->getGroup()->getId());

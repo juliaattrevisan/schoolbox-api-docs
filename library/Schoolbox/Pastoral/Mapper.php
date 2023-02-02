@@ -274,7 +274,7 @@ class Mapper extends BaseMapper
             $model->getStudent()->getCampusCollection()->offsetSet($campus->getId(), $campus);
         }
 
-        $model->setAccess($this->getJoinMapper('access')->disableCache()->findByColumn('pastoral_id', $model->getId()));
+        $model->setAccess($this->getJoinMapper('access')->findByColumn('pastoral_id', $model->getId()));
 
         if ($this->getConfigLoader()->get('pastoral_severity')) {
             $model->setSeverity($severityMapper->hydrate($row, 'sv'));
