@@ -84,6 +84,9 @@ class Factory
             case Endpoint\Factory::WONDE:
                 return new Connector\Wonde\Base\Endpoint\Status($this->host, $this->key);
 
+            case Endpoint\Factory::VERACROSS:
+                return new Connector\Veracross\Base\Endpoint\Status($this->host, $this->key);
+
             default:
                 // Use manual csv imports
                 return null;

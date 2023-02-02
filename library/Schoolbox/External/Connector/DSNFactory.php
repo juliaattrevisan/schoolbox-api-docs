@@ -22,7 +22,6 @@ use Schoolbox\External\Importer\Endpoint\IDSN;
  */
 class DSNFactory
 {
-
     /**
      * Produces a specific DSN codec for the selected suds importer
      *
@@ -49,6 +48,12 @@ class DSNFactory
 
             case \Schoolbox\External\Importer\Endpoint\Factory::WONDE:
                 return new \Schoolbox\External\Connector\Wonde\Base\Endpoint\Codec\DSN();
+
+            // LISS doesn't have any SUDS-specific configs; they're all part of global
+            // schoolbox config table
+
+            case \Schoolbox\External\Importer\Endpoint\Factory::VERACROSS:
+                return new \Schoolbox\External\Connector\Veracross\Base\Endpoint\Codec\DSN();
         }
 
         return null;

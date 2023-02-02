@@ -1,0 +1,34 @@
+{##
+ # Veracross SUDS Configuration fragment
+ #
+ # A list of dsn pieces for this suds connector are provided by their key names already
+ # via the include of this template
+ #
+ # @param string|null $schoolRoute
+ # @param string|null $clientId
+ # @param string|null $clientSecret
+ #}
+<div data-data-source="veracross" style="display:none">
+    <section>
+        <fieldset class="content">
+            <div class="small-12 columns">
+                <h3>Veracross Configuration</h3>
+
+                <div class="row">
+                    <div class="small-12 columns">
+                        <label class="required">School Route</label>
+                        <input type="text" class='required suds-crypto' name="dsn[veracross][schoolroute]" value="{{ schoolroute ?? ''}}" />
+                    </div>
+                    <div class="small-12 medium-6 columns">
+                        <label class="required">Client ID</label>
+                        <input type="text" class='required suds-crypto' name="dsn[veracross][clientid]" value="{{ clientid ?? ''}}" />
+                    </div>
+                    <div class="small-12 medium-6 columns">
+                        <label class="required">Client Secret</label>
+                        <input type="text" class='required suds-crypto' name="dsn[veracross][clientsecret]" value="{{ clientsecret ?? ''}}" />
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+    </section>
+</div>
