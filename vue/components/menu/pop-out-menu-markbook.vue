@@ -108,7 +108,7 @@ const viewAllText = computed(() => {
         return "";
     }
     if (isExcluded.value) {
-        return "The student has been excluded. You may create feedback or include this student in this activity";
+        return "The student has been excluded. You may include this student in this activity";
     }
     if (isActivityEmpty.value) {
         return "There has been no activity yet, you may create feedback or exclude this student from this activity";
@@ -356,7 +356,7 @@ async function onMenuItemSelected(target: string, shouldPost: boolean = false) {
                 </small-card>
             </div>
             <div class="c-pop-out-menu__options">
-                <template v-if="'Due Work' === assessmentType">
+                <template v-if="'Due Work' === assessmentType & !isExcluded">
                 <pop-out-menu-item
                     :class="{ 'is-disabled': isExpansionDisabled || isActivityEmpty }"
                     @selected="onToggleSelected()"
@@ -395,7 +395,7 @@ async function onMenuItemSelected(target: string, shouldPost: boolean = false) {
                 >
                     Exclude student
                 </pop-out-menu-item>
-                <pop-out-menu-item
+                <pop-out-menu-item v-if="!isExcluded"
                     :class="{ 'is-disabled': !routes.historyRoute || isExcluded }"
                     @selected="onMenuItemSelected(routes.historyRoute)"
                 >
