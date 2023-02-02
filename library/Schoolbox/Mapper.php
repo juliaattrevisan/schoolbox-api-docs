@@ -2102,6 +2102,7 @@ abstract class Mapper implements IMapper, Serializable
             throw new Exception\NotFound();
         }
 
+        // Use the first non-deleted model
         foreach ($result_collection as $model) {
             if ($model instanceof ISoftDeletable && $model->isDeleted()) {
                 continue;
