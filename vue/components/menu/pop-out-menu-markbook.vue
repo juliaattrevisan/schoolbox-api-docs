@@ -290,8 +290,8 @@ async function onMenuItemSelected(target: string, shouldPost: boolean = false) {
                 const newValue = currentValue === 'true' ? 'false' : 'true';
                 element.setAttribute('data-is-excluded', newValue);
             }
-
-
+            // If including student reload the activity list
+            await getActivity();
         } else {
             hasLoadError.value = true;
         }
@@ -348,7 +348,7 @@ async function onMenuItemSelected(target: string, shouldPost: boolean = false) {
                     {{ viewAllText }}
                 </pop-out-menu-item>
                 <pop-out-menu-divider />
-                <pop-out-menu-item
+                <pop-out-menu-item v-if="!isExcluded"
                     :class="{ 'is-disabled': !routes.updateRoute }"
                     @selected="onMenuItemSelected(routes.updateRoute)"
                 >
@@ -366,17 +366,17 @@ async function onMenuItemSelected(target: string, shouldPost: boolean = false) {
                 >
                     Publish feedback
                 </pop-out-menu-item>
-                <pop-out-menu-item
+                <pop-out-menu-item v-if="isExcluded"
+                                   :class="{ 'is-disabled': !isExcluded }"
+                                   @selected="onMenuItemSelected(routes.includeRoute, true)"
+                >
+                    Include student
+                </pop-out-menu-item>
+                <pop-out-menu-item v-else
                     :class="{ 'is-disabled': isExcluded }"
                     @selected="onMenuItemSelected(routes.excludeRoute, true)"
                 >
                     Exclude student
-                </pop-out-menu-item>
-                <pop-out-menu-item
-                    :class="{ 'is-disabled': !isExcluded }"
-                    @selected="onMenuItemSelected(routes.includeRoute, true)"
-                >
-                    Include student
                 </pop-out-menu-item>
                 <pop-out-menu-item
                     :class="{ 'is-disabled': !routes.historyRoute || isActivityEmpty }"
