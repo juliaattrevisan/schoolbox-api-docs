@@ -16,6 +16,14 @@
 }
 
 /**
+ * add a min and max height to the editable area
+ */
+.ck-editor__editable_inline {
+    max-height: 400px;
+    min-height: 100px;
+}
+
+/**
  * add a custom highlight style
  */
 .ck.ck-content span.highlighted-note {
