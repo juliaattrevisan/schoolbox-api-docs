@@ -12,6 +12,7 @@ use Schoolbox\Curriculum\Api\Translator\ArrayToModel;
 use Schoolbox\Curriculum\Api\Translator\ModelToArray;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
 
 /**
@@ -28,10 +29,12 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param Node\Mapper $nodeMapper Curriculum node mapper
+     * @param Node\Mapper   $nodeMapper Curriculum node mapper
+     * @param Usage\Counter $counter    Counter for node usages
      */
     public function __construct(
         private Node\Mapper $nodeMapper,
+        private Usage\Counter $counter,
     ) {
     }
 
@@ -67,7 +70,8 @@ class Controller extends Base
         $descendantCount       = $this->determineDescendantCount();
         $searchQuery           = trim($this->request->query->get('query') ?? '');
         $searchKeywords        = explode(',', $searchQuery);
-        $resultsForAllKeywords = new Collection();
+        /** @var GenericCollection|Node\Model[] $resultsForAllKeywords */
+        $resultsForAllKeywords = new GenericCollection(Node\Model::class);
 
         foreach ($searchKeywords as $searchKeyword) {
             $resultsForKeyword = $this->nodeMapper->findByKeyword(
@@ -86,11 +90,24 @@ class Controller extends Base
 
         Node\Mapper::sortNodes($resultsForAllKeywords, 0);
 
-        $this->response->content->set(
-            $this->buildJsonOutput(
-                $resultsForAllKeywords->map(new ModelToArray($ancestorCount, $descendantCount))
+        // Translate results: also add all result counts
+        // (for top and first descendant level only, to keep my sanity)
+        $ids = [];
+        foreach ($resultsForAllKeywords as $node) {
+            $ids = array_merge($ids, $this->extractIdsFromNode($node));
+        }
+        $translatedResults = $resultsForAllKeywords->map(
+            new ModelToArray(
+                $this->router,
+                $this->authorizer,
+                $this->getUser(),
+                $ancestorCount,
+                $descendantCount,
+                $this->counter->findUsageCounts($ids),
             )
         );
+
+        $this->response->content->set($this->buildJsonOutput($translatedResults));
     }
 
     /**
@@ -108,7 +125,16 @@ class Controller extends Base
         );
         $this->response->content->set(
             $this->buildJsonOutput(
-                $tree->map(new ModelToArray(0, self::MAX_DESCENDANTS))
+                $tree->map(
+                    new ModelToArray(
+                        $this->router,
+                        $this->authorizer,
+                        $this->getUser(),
+                        0,
+                        self::MAX_DESCENDANTS,
+                        null,
+                    )
+                )
             ),
         );
     }
@@ -211,7 +237,14 @@ class Controller extends Base
         $childNodes = $node->getChildren();
         Node\Mapper::sortNodes($childNodes, 0);
         $node->setChildren($childNodes);
-        $translator = new ModelToArray($ancestorCount, $descendantCount);
+        $translator = new ModelToArray(
+            $this->router,
+            $this->authorizer,
+            $this->getUser(),
+            $ancestorCount,
+            $descendantCount,
+            $this->counter->findUsageCounts($this->extractIdsFromNode($node)),
+        );
         $this->response->content->set(
             $this->buildJsonOutput($translator($node))
         );
@@ -270,5 +303,20 @@ class Controller extends Base
     private function determineOffset(): int
     {
         return max(0, $this->request->query->getInt('offset', 0));
+    }
+
+    /**
+     * Extract this node's IDs, as well as its parent and child IDs.
+     *
+     * @param Node\Model $node
+     * @return array<int>
+     */
+    private function extractIdsFromNode(Node\Model $node): array
+    {
+        $ids = [$node->getId()];
+        if ($node->getParent()?->getId()) {
+            $ids[] = $node->getParent()->getId();
+        }
+        return array_merge($ids, $node->getChildren()->getPropertyValues('id'));
     }
 }

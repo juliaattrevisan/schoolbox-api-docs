@@ -111,6 +111,7 @@ class Mapper extends BaseMapper
             LEFT JOIN   {$this->getJoinSql('user', '', 'u')}
             LEFT JOIN   {$this->getJoinSql('user.role', 'u', 'ur')}
             LEFT JOIN   {$this->getJoinSql('group', '', 'g')}
+            LEFT JOIN   {$this->getJoinSql('user.role', 'u', 'ur')}
         ";
     }
 
@@ -138,10 +139,10 @@ class Mapper extends BaseMapper
             if (!empty($row['u.id'])) {
                 /** @var User $user */
                 $user = $this->hydrateJoin($row, 'user', 'u');
-                /** @var Role $userRole */
-                $userRole = $this->hydrateJoin($row, 'user.role', 'ur');
-                $user->setRole($userRole);
-                $access->setUser($user);
+
+                /** @var Role $role */
+                $role = $this->hydrateJoin($row, 'user.role', 'ur');
+                $access->setUser($user->setRole($role));
             }
 
             // Hydrate role

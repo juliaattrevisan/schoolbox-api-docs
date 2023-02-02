@@ -64,12 +64,14 @@ class Cursor implements ICursor
      *
      * @param IConnector  $database The database connection to retrieve from.
      * @param Node\Model  $node     The node to fetch usages for.
+     * @param Counter     $counter  The counter used for fetching usage counts in an efficient manner.
      * @param int         $limit    Max number of results to fetch at once
      * @param ICodec|null $codec    If provided: use this codec for encoding/decoding cursors
      */
     public function __construct(
         private IConnector $database,
         private Node\Model $node,
+        private Counter $counter,
         private int $limit,
         private ?ICodec $codec
     ) {
@@ -110,60 +112,12 @@ class Cursor implements ICursor
      */
     public function retrieveResultCount(): ?int
     {
-        $selectParts = [
-            "
-                SELECT
-                    :courseDiscriminator AS discriminator,
-                    COUNT(*) AS count
-                FROM curriculum_node_for_category cnfc
-                INNER JOIN folder f ON cnfc.category_id = f.id
-                INNER JOIN course_specification cs ON f.id = cs.folder_id
-                WHERE f.deleted_at IS NULL
-                AND cs.deleted_at IS NULL
-                AND cnfc.curriculum_node_id = :courseCurriculumNodeId
-            ",
-            "
-                SELECT
-                    :unitDiscriminator AS discriminator,
-                    COUNT(*) AS count
-                FROM curriculum_node_for_category cnfc
-                INNER JOIN folder f ON cnfc.category_id = f.id
-                INNER JOIN course_unit_specification cus ON f.id = cus.folder_id
-                WHERE f.deleted_at IS NULL
-                AND cus.deleted_at IS NULL
-                AND cnfc.curriculum_node_id = :unitCurriculumNodeId
-            ",
-            "
-                SELECT
-                    :folderDiscriminator AS discriminator,
-                    COUNT(*) AS count
-                FROM curriculum_node_for_category cnfc
-                INNER JOIN folder f ON cnfc.category_id = f.id
-                LEFT JOIN course_specification cs ON f.id = cs.folder_id
-                LEFT JOIN course_unit_specification cus ON f.id = cus.folder_id
-                WHERE f.deleted_at IS NULL
-                AND cs.id IS NULL
-                AND cus.id IS NULL
-                AND cnfc.curriculum_node_id = :folderCurriculumNodeId
-            ",
-        ];
-        $queryString = '('
-            . implode(') UNION (', $selectParts)
-            . ')';
-        $query = $this->database->prepareQuery($queryString);
-        $query->execute([
-            'courseDiscriminator'    => self::DISCRIMINATOR_COURSE,
-            'courseCurriculumNodeId' => $this->node->getId(),
-            'unitDiscriminator'      => self::DISCRIMINATOR_UNIT,
-            'unitCurriculumNodeId'   => $this->node->getId(),
-            'folderDiscriminator'    => self::DISCRIMINATOR_FOLDER,
-            'folderCurriculumNodeId' => $this->node->getId(),
-        ]);
-        $count = 0;
-        foreach ($query->fetchColumnArray('count') as $counts) {
-            $count += $counts;
+        $totalCount = 0;
+        $counts = $this->counter->findUsageCounts([$this->node->getId()])[$this->node->getId()] ?? [];
+        foreach ($counts as $subCount) {
+            $totalCount += $subCount;
         }
-        return $count;
+        return $totalCount;
     }
 
     /**
