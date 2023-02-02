@@ -1179,27 +1179,42 @@ class Profile implements IStrategy
                 $title = (string)$staff['relationships']['person']['data']['attributes']['title'];
                 $username = (string)$staff['attributes']['timetableCode'];
 
+                /* Employment status/dates
+                 */
+                $isEmployed = $this->findEmploymentStatus($staff);
+
                 /* A shortcut for convenience in logging
                  * (Sometimes people don't have all the parts of their name; odd but ok)
                  */
                 $fullname = trim("{$firstname} {$lastname}");
 
-                /* Disregard inactive staff
+                /* Disregard unemployed staff
                  */
-                if (!(int)$staff['attributes']['isActive']) {
+                if (!$isEmployed) {
                     $this->log->warning(sprintf(
-                        'Skipping base profile for staff %s - staff is inactive',
+                        'Skipping base profile for staff %s - staff is not currently employed',
                         $fullname
                     ));
 
                     continue;
                 }
 
-                /* Disregard departed staff
+                /* Disregard deceased staff (never seen this set to true so far)
                  */
-                if (self::STAFF_EMPLOYMENT_STATUS_DEPARTED === $staff['attributes']['employmentStatus']) {
+                if ($staff['relationships']['person']['data']['attributes']['isDeceased']) {
                     $this->log->warning(sprintf(
-                        'Skipping base profile for staff %s - staff is departed',
+                        'Skipping base profile for staff %s - deceased',
+                        $fullname
+                    ));
+
+                    continue;
+                }
+
+                /* Disregard inactive staff
+                 */
+                if (!(int)$staff['attributes']['isActive']) {
+                    $this->log->warning(sprintf(
+                        'Skipping base profile for staff %s - staff is inactive',
                         $fullname
                     ));
 
@@ -1327,5 +1342,77 @@ class Profile implements IStrategy
              */
             $nextUrl = $payload['links']['next'] ?? null;
         }
+    }
+
+
+    /**
+     * Find the first employment data and use that to decide something about
+     * a staff member's employment state
+     *
+     * @param array $staff
+     * @return bool
+     * @throws \InvalidArgumentException
+     */
+    private function findEmploymentStatus(array $staff): bool
+    {
+        /* Find the first employment data and accept that as canon
+         */
+        foreach ($staff['relationships']['employments']['data'] as $employment) {
+            if ('staffEmployment' === $employment['type']) {
+                $now = \Alaress_Date_Format::now();
+
+                /* I suppose this might be conclusive, if set.
+                 * We can skip the date analysis
+                 */
+                if (self::STAFF_EMPLOYMENT_STATUS_DEPARTED === $employment['attributes']['employmentStatus']) {
+                    return false;
+                }
+
+                /* Otherwise, inspect the dates.
+                 * One or more of the dates might be missing
+                 *
+                 * I presume (perhaps unsafely) that an employee's finish date
+                 * must come after their start date
+                 */
+
+                /* Start date was specified
+                 */
+                $employmentStart = trim((string)$employment['attributes']['startDate']);
+
+                if ('' !== $employmentStart) {
+                    $start = new \Alaress_Date_Format($employmentStart, \Alaress_Date_Format::DATABASE_DATE_FORMAT);
+
+                    /* They started before now? I guess their employment has begun
+                     * Otherwise, they haven't yet started
+                     */
+                    if ($now->lt($start)) {
+                        return false;
+                    }
+                }
+
+                /* End date was specified
+                 */
+                $employmentEnd = trim((string)$employment['attributes']['endDate']);
+
+                if ('' !== $employmentEnd) {
+                    $end = new \Alaress_Date_Format($employmentEnd, \Alaress_Date_Format::DATABASE_DATE_FORMAT);
+
+                    /* They finish somewhere in the future? I guess they're employed
+                     * Otherwise, they finished somewhere in the past
+                     */
+                    if ($now->lt($end)) {
+                        return true;
+                    }
+
+                    return false;
+                }
+
+                return true;
+            }
+        }
+
+        /* They're an active employed staff member unless otherwise decided
+         */
+        return true;
     }
 }
