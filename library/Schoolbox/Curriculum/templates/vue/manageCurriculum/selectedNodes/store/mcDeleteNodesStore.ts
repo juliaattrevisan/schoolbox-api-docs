@@ -5,7 +5,6 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
 import { capitalizeFirstLetter } from "@js/util/stringUtils";
-import { useStore } from "../../store/manageCurriculumStore";
 import { useSelectedNodesStore } from "./mcSelectedNodesStore";
 
 export const useDeleteNodesStore = defineStore("mcDeleteNodes", () => {
@@ -23,14 +22,14 @@ export const useDeleteNodesStore = defineStore("mcDeleteNodes", () => {
      * To delete all the marked nodes in parallel
      * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all
      *
-     * @returns { Array }
+     * @returns { Array } - list of fetches
      */
     function getFetches() {
         const fetchList = [];
         const selectedNodesStore = useSelectedNodesStore();
         selectedNodesStore.nodes.forEach((node) => {
             fetchList.push(
-                fetch(`${useStore().getApiEndpoint()}/${node.id}`, {
+                fetch(node._links.delete, {
                     method: "DELETE",
                     headers: {
                         "Content-Type": "application/json",

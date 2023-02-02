@@ -4,7 +4,6 @@
 
 import { ref } from "vue";
 import { defineStore } from "pinia";
-import { useStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/manageCurriculumStore";
 import { useActiveNodeStore } from "@schoolboxCurriculum/vue/manageCurriculum/activeNode/store/mcActiveNodeStore";
 import type { Node, NodeToUpdate } from "@schoolboxCurriculum/types/Node";
 
@@ -67,8 +66,7 @@ export const useUpdateNodeStore = defineStore("mcUpdateNode", () => {
         try {
             isProcessing.value = true;
             const activeNodeStore = useActiveNodeStore();
-            const nodeId: number = activeNodeStore.node.id;
-            const response = await fetch(`${useStore().getApiEndpoint()}/${nodeId}`, {
+            const response = await fetch(activeNodeStore.node._links.update, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
@@ -80,7 +78,7 @@ export const useUpdateNodeStore = defineStore("mcUpdateNode", () => {
                 activeNodeStore.update(activeNodeCopy.value);
                 isProcessing.value = false;
                 cancel();
-                return { id: nodeId, message: "Node successfully updated" };
+                return { id: activeNodeStore.node.id, message: "Node successfully updated" };
             }
             throw new Error(responseJson.title, { ...responseJson });
         } catch (error) {

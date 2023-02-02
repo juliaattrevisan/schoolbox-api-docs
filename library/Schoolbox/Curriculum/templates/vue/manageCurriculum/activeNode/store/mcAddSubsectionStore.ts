@@ -4,7 +4,6 @@
 
 import { ref } from "vue";
 import { defineStore } from "pinia";
-import { useStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/manageCurriculumStore";
 import { useActiveNodeStore } from "@schoolboxCurriculum/vue/manageCurriculum/activeNode/store/mcActiveNodeStore";
 import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/selectedNodes/store/mcSelectedNodesStore";
 import type { Node } from "@schoolboxCurriculum/types/Node";
@@ -72,7 +71,7 @@ export const useAddSubsectionStore = defineStore("mcAddSubsection", () => {
         const activeNodeStore = useActiveNodeStore();
         try {
             isProcessing.value = true;
-            const response = await fetch(`${useStore().getApiEndpoint()}/${activeNodeStore.node.id}`, {
+            const response = await fetch(activeNodeStore.node._links.update, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
