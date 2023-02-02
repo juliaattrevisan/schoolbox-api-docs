@@ -4,6 +4,7 @@ namespace Schoolbox\Learning\Assessment\Participant;
 
 use DomainException;
 use Schoolbox\Assessment\Participant\Model as ParticipantModel;
+use Schoolbox\Assessment\Participant\Plan\Model;
 use Schoolbox\Assessment\Participant\Plan\Model as PlanModel;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
@@ -199,6 +200,6 @@ class ParticipationHelper
         $planMap = $this->participantDataSource->getPlanMapper();
 
         // preload the plans list with the dyna-plan
-        return $planMap->findByColumnList(['assessment_id' => $assessmentId ])->indexBy('id');
+        return $planMap->findByColumnList(['assessment_id' => $assessmentId ])->indexByCallback(function (Model $model) { return $model->getAssessment()->getId();});
     }
 }
