@@ -102,14 +102,26 @@ class Mapper extends \Schoolbox\Mapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        $badgeMapper = \Schoolbox\Learning\Badge\Mapper::getInstance();
+        $badgeMapper = Badge\Mapper::getInstance();
+        $rows        = $statement->fetchAll();
+
+        // Create array of badgeIds, de-duping as we go.
+        $badgeIdsAsKeys = [];
+        foreach ($rows as $row) {
+            $badgeIdsAsKeys[$row['badge_id']] = null; // Store as keys so we de-dupe as we store.
+        }
+
+        // Create array of badges, indexed by badgeId.
+        $badgeById = [];
+        foreach ($badgeMapper->findByColumnList(['id' => array_keys($badgeIdsAsKeys)]) as $badge) {
+            $badgeById[$badge->getId()] = $badge;
+        }
+
         $collection = $this->createCollection();
 
         /* A lookup, because badge hydration is a dog
          */
-        $badges = [];
-
-        foreach ($statement as $row) {
+        foreach ($rows as $row) {
             $badgeId = $row['badge_id'];
             $award = $this->hydrate($row);
 
@@ -141,24 +153,7 @@ class Mapper extends \Schoolbox\Mapper
                 $award->setAwardedBy($awardedBy);
             }
 
-            /* Instead of getting the Badge/Mapper's fields and hydration and stuff
-             * just access them if we haven't already seen it; otherwise reuse the
-             * one in the cache
-             *
-             * You can probably improve this some more by finding all the badge_id
-             * then using findIn(...) instead, then map them back to their $awards
-             * but I can't tell if that's going to be really necessary at the moment
-             */
-            if (!array_key_exists($badgeId, $badges)) {
-                // The cache must be disabled here to prevent an error when deleting a badge with linked badge_user rows.
-                $badge = $badgeMapper->disableCache()->findById($badgeId);
-
-                /* Save it for later
-                 */
-                $badges[$badgeId] = $badge;
-            }
-
-            $award->setBadge($badges[$badgeId]);
+            $award->setBadge($badgeById[$badgeId]);
 
             // If there is a parent award:
             // Hydrate it, and its awarded by and recipient
