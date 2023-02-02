@@ -1052,6 +1052,11 @@ class Mapper extends BaseMapper
                     if (isset($contextProjects[$contextId])) {
                         $context->setAssessmentModel($contextProjects[$contextId]);
                         // Ensure project is linked to (potentially deleted) child
+                        // Need to ensure that the assessment list is
+                        // initialised, so that sub-assessments can be linked
+                        if ($context->getAssessments() === null) {
+                            $context->setAssessments($this->createCollection());
+                        }
                         $context->getAssessments()[$model->getId()] = $model;
                     }
                 }
