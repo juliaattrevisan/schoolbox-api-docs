@@ -6,7 +6,6 @@ import axios from "axios";
  */
 export default {
     methods: {
-
         /**
          * Decide if this Award was a goal or an achievement
          * and provide the css class accordingly
@@ -16,12 +15,11 @@ export default {
          */
         getCss(award) {
             if (award.isGoal) {
-                return 'goal';
+                return "goal";
             }
 
-            return '';
+            return "";
         },
-
 
         /**
          * Converts a goal to an achievement.
@@ -32,11 +30,10 @@ export default {
         convertToAchievement(award) {
             return axios.request({
                 url: award._links.goalAward,
-                data: {users: [award.recipient], conversion: true},
-                method: 'post',
-                responseType: 'json'
+                data: { users: [award.recipient], conversion: true },
+                method: "post",
+                responseType: "json",
             });
-        }
-    }
-}
-
+        },
+    },
+};

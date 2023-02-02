@@ -4,18 +4,16 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-;
 (function ($, window, document, undefined) {
-
-    var pluginName = 'infiniscroll',
+    var pluginName = "infiniscroll",
         noop = function () {},
         defaults = {
             threshold: 0.2,
             maxPages: 3,
-            url: '',
-            pageParam: 'p',
-            filterParam: 'filter',
-            onUpdate: noop
+            url: "",
+            pageParam: "p",
+            filterParam: "filter",
+            onUpdate: noop,
         };
 
     /**
@@ -23,13 +21,12 @@
      * @param {*}      alt
      * @returns {string}
      */
-    function queryStringValue(param, alt)
-    {
-        if (typeof alt == 'undefined') {
-            alt = '';
+    function queryStringValue(param, alt) {
+        if (typeof alt == "undefined") {
+            alt = "";
         }
 
-        var result = window.location.search.match(new RegExp(param + '=([^&]*)'));
+        var result = window.location.search.match(new RegExp(param + "=([^&]*)"));
 
         return result ? result[1] : alt;
     }
@@ -40,24 +37,24 @@
      * @param {number} increment
      * @returns {number}
      */
-    Infiniscroll.prototype.pageToFetch = function (increment)
-    {
+    Infiniscroll.prototype.pageToFetch = function (increment) {
         if (increment > 0) {
             // are we about to increment/decrement to a place we already know doesn't exist?
-            if (typeof this.lastPage != 'undefined' && this.currentLastPage >= this.lastPage) {
+            if (typeof this.lastPage != "undefined" && this.currentLastPage >= this.lastPage) {
                 // if we know we're on the first page, bug out
                 // console.log('We have the last page, not going down any further');
                 return -1;
             }
-
         } else {
             // are we about to increment/decrement to a place we already know doesn't exist?
-            if (this.currentFirstPage == 1 || (typeof this.firstPage != 'undefined' && this.currentFirstPage <= this.firstPage)) {
+            if (
+                this.currentFirstPage == 1 ||
+                (typeof this.firstPage != "undefined" && this.currentFirstPage <= this.firstPage)
+            ) {
                 // if we know we're on the first page, bug out
                 // console.log('We have the first page, not going up any further');
                 return -1;
             }
-
         }
 
         var targetPage = (increment > 0 ? this.currentLastPage : this.currentFirstPage) + increment;
@@ -77,32 +74,36 @@
      * @constructor
      */
     function Infiniscroll(element, options) {
-        var self   = this,
-            $elem  = $(element),
+        var self = this,
+            $elem = $(element),
             $inner = $elem.children().eq(0);
 
-        this.element          = element;
-        this.options          = $.extend(true, {}, defaults, options);
-        this.prevPosition     = 0;     // where we were previously
-        this.fetchInProgress  = false; // are we currently fetching a page?
-        this.firstPage        = undefined;
-        this.lastPage         = undefined;
+        this.element = element;
+        this.options = $.extend(true, {}, defaults, options);
+        this.prevPosition = 0; // where we were previously
+        this.fetchInProgress = false; // are we currently fetching a page?
+        this.firstPage = undefined;
+        this.lastPage = undefined;
         this.currentFirstPage = queryStringValue(this.options.pageParam, 1);
-        this.currentLastPage  = this.currentFirstPage;
-        this.pagesFetched     = [ this.currentFirstPage ];
+        this.currentLastPage = this.currentFirstPage;
+        this.pagesFetched = [this.currentFirstPage];
 
         // apply the page number to the content we already have
-        $inner.children().attr('data-page', this.currentFirstPage);
+        $inner.children().attr("data-page", this.currentFirstPage);
 
         // set up the listener
-        $(this.element).on('scroll', function () {
-
-            var opt           = self.options,
-                fromTop       = $elem.scrollTop(),
-                innerHeight   = $inner.height(),
+        $(this.element).on("scroll", function () {
+            var opt = self.options,
+                fromTop = $elem.scrollTop(),
+                innerHeight = $inner.height(),
                 wrapperHeight = $elem.height(),
-                fromBottom    = innerHeight - wrapperHeight - fromTop,
-                relevantValue, percentageDistance, increment, params, filterValue, targetPage;
+                fromBottom = innerHeight - wrapperHeight - fromTop,
+                relevantValue,
+                percentageDistance,
+                increment,
+                params,
+                filterValue,
+                targetPage;
 
             if (fromTop == self.prevPosition || self.fetchInProgress) {
                 // if no scroll or already fetching, do nothing
@@ -112,13 +113,11 @@
             if (fromTop > self.prevPosition) {
                 // heading toward the bottom, use these values
                 relevantValue = fromBottom;
-                increment     = 1;
-
+                increment = 1;
             } else {
                 // heading toward the top, use these values
                 relevantValue = fromTop;
-                increment     = -1;
-
+                increment = -1;
             }
 
             // keep track of where we are
@@ -129,7 +128,6 @@
 
             // if we're withing the threshold, ajax another page
             if (percentageDistance <= opt.threshold) {
-
                 targetPage = self.pageToFetch(increment);
 
                 // no page to fetch
@@ -151,23 +149,33 @@
 
                 // fetch the next/previous page
                 $.get(opt.url, params, function (data) {
-
-                    var pageToPop, indexToPop, DOMToPop, fn, $keepInView,
-                        wrapTop, listTop, kievTop, newListTop, newKievTop, dKievTop;
+                    var pageToPop,
+                        indexToPop,
+                        DOMToPop,
+                        fn,
+                        $keepInView,
+                        wrapTop,
+                        listTop,
+                        kievTop,
+                        newListTop,
+                        newKievTop,
+                        dKievTop;
 
                     // set up a hook we can scroll to once the new data has been jammed in
-                    $keepInView = $inner.children().filter(function () {
-                        return $(this).offset().top > $elem.offset().top;
-                    }).eq(0);
+                    $keepInView = $inner
+                        .children()
+                        .filter(function () {
+                            return $(this).offset().top > $elem.offset().top;
+                        })
+                        .eq(0);
 
                     // calculate original keepInView position
                     wrapTop = $elem.offset().top;
                     listTop = $inner.offset().top - wrapTop;
                     kievTop = $keepInView.offset().top - listTop;
 
-
                     // we need to stamp the returned data with the page number
-                    data = $(data).attr('data-page', targetPage);
+                    data = $(data).attr("data-page", targetPage);
 
                     // special delivery! where am I putting this? just over here? ok!
                     if (increment > 0) {
@@ -184,13 +192,11 @@
                         self.currentFirstPage = targetPage;
                     }
 
-
                     // and add the page to the list of pages fetched
                     self.pagesFetched.push(targetPage);
 
                     // dump out stuff we can't see
                     if (self.pagesFetched.length > opt.maxPages) {
-
                         // which end are we popping?
                         fn = increment > 0 ? Math.min : Math.max;
 
@@ -201,7 +207,7 @@
                         indexToPop = self.pagesFetched.indexOf(pageToPop);
 
                         // find the corresponding log records
-                        DOMToPop = $inner.children('[data-page=' + pageToPop + ']');
+                        DOMToPop = $inner.children("[data-page=" + pageToPop + "]");
 
                         // chop it!!
                         // TODO cache rather than dump it out completely
@@ -224,41 +230,35 @@
                     // calculate our new scroll position
                     newListTop = $inner.offset().top - wrapTop;
                     newKievTop = $keepInView.offset().top - newListTop;
-                    dKievTop   = kievTop - newKievTop;
+                    dKievTop = kievTop - newKievTop;
 
                     // calculate the new scroll position
-                    var scrollPosition = (0 - listTop) - dKievTop;
+                    var scrollPosition = 0 - listTop - dKievTop;
 
                     // make sure our scroll-to element still *looks* like it's where it was, even though the DOM has shifted under its feet
                     $elem.scrollTop(scrollPosition);
-
-                }).fail(function () {
-
-                    // so that page didn't exist: depending on which way we were travelling, institute bounds-check for that direction
-                    if (increment > 0) {
-                        self.lastPage = self.currentLastPage;
-                    } else {
-                        self.firstPage = self.currentFirstPage;
-                    }
-
-                }).always(function () {
-                    // prevent permablock of future requests
-                    self.fetchInProgress = false;
-                });
+                })
+                    .fail(function () {
+                        // so that page didn't exist: depending on which way we were travelling, institute bounds-check for that direction
+                        if (increment > 0) {
+                            self.lastPage = self.currentLastPage;
+                        } else {
+                            self.firstPage = self.currentFirstPage;
+                        }
+                    })
+                    .always(function () {
+                        // prevent permablock of future requests
+                        self.fetchInProgress = false;
+                    });
             }
-
         });
-
-
     }
-
 
     $.fn[pluginName] = function (options) {
         return this.each(function () {
-            if (!$.data(this, 'plugin_' + pluginName)) {
-                $.data(this, 'plugin_' + pluginName, new Infiniscroll(this, options));
+            if (!$.data(this, "plugin_" + pluginName)) {
+                $.data(this, "plugin_" + pluginName, new Infiniscroll(this, options));
             }
         });
-    }
-
+    };
 })(jQuery, window, document);

@@ -1,13 +1,12 @@
-
-import DropDown from './drop-down.vue';
+import DropDown from "./drop-down.vue";
 
 export default {
-    title: 'Animations/Badge Awards/Drop Down',
+    title: "Animations/Badge Awards/Drop Down",
     component: DropDown,
     parameters: {
         docs: {
             description: {
-                component: '_Drop Down_ badge award animation',
+                component: "_Drop Down_ badge award animation",
             },
         },
     },
@@ -15,8 +14,7 @@ export default {
 
 const Template = (args, { argTypes }) => ({
     components: { DropDown },
-    template:
-        `
+    template: `
         <drop-down />
         `,
 });

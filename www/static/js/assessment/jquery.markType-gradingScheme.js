@@ -1,5 +1,4 @@
-(function() {
-
+(function () {
     /**
      * markTypeGradingScheme
      *
@@ -8,14 +7,14 @@
      *
      * @param options
      */
-    $.fn.markTypeGradingScheme = function(options) {
+    $.fn.markTypeGradingScheme = function (options) {
         options = options || {};
 
         let config = init(options, $(this));
 
         /* Set up event listeners
          */
-        config.markTypeDropdown.on('change', function () {
+        config.markTypeDropdown.on("change", function () {
             if ($(this).val() === config.markTypeTotalMark) {
                 showMaxMark();
             } else {
@@ -31,7 +30,7 @@
 
         /* Initialise mark type dropdown
          */
-        config.markTypeDropdown.trigger('change');
+        config.markTypeDropdown.trigger("change");
 
         /* Populate the grade scale modal on scheme change
          */
@@ -47,17 +46,17 @@
         function init(options, element) {
             let defaults = {
                 element: element,
-                context: '',
+                context: "",
 
                 /* These const correspond to backend consts
                  */
                 markTypeTotalMark: null,
-                markTypeLetterGrade: null
+                markTypeLetterGrade: null,
             };
 
             /* Derive some selectors
              */
-            let context = '';
+            let context = "";
 
             if (options.context.length) {
                 context = options.context;
@@ -66,7 +65,6 @@
             /* Finally get to use a derived object literal
              */
             let derived = {
-
                 /* Enforce type safety
                  */
                 markTypeTotalMark: parseInt(options.markTypeTotalMark),
@@ -74,7 +72,7 @@
 
                 /* Mark Type dropdown dictates what other elements become available
                  */
-                markTypeDropdown: $('#' + context + 'markType'),
+                markTypeDropdown: $("#" + context + "markType"),
 
                 /* A container for the Total Mark elements
                  */
@@ -86,15 +84,15 @@
 
                 /* Grading Scheme select element
                  */
-                gradingSchemeSelect: $('#' + context + 'gradingScheme'),
+                gradingSchemeSelect: $("#" + context + "gradingScheme"),
 
                 /* Title in the modal
                  */
-                gradingSchemeTitle: $('#' + context + 'gradeScaleTitle'),
+                gradingSchemeTitle: $("#" + context + "gradeScaleTitle"),
 
                 /* Main body in the modal
                  */
-                gradingSchemeBody: $('#' + context + 'gradeScaleDesc')
+                gradingSchemeBody: $("#" + context + "gradeScaleDesc"),
             };
 
             return $.extend(defaults, derived, options);
@@ -134,9 +132,9 @@
          * Put a title and grade scale into a modal based on the currently selected scheme
          */
         function populateScaleModal() {
-            let schemeName = config.gradingSchemeSelect.find(':selected').text(),
+            let schemeName = config.gradingSchemeSelect.find(":selected").text(),
                 schemeId = config.gradingSchemeSelect.val(),
-                schemeTemplate = $('[data-grading-scale=' + config.context + schemeId +']').html();
+                schemeTemplate = $("[data-grading-scale=" + config.context + schemeId + "]").html();
 
             // Populate the modal title with scheme name
             config.gradingSchemeTitle.text(schemeName);
@@ -144,5 +142,5 @@
             // Populate the modal body with the scheme table
             config.gradingSchemeBody.html(schemeTemplate);
         }
-    }
-}(jQuery));
+    };
+})(jQuery);

@@ -1,13 +1,12 @@
-
-import FlipUp from './flip-up.vue';
+import FlipUp from "./flip-up.vue";
 
 export default {
-    title: 'Animations/Badge Awards/Flip Up',
+    title: "Animations/Badge Awards/Flip Up",
     component: FlipUp,
     parameters: {
         docs: {
             description: {
-                component: '_Flip up_ badge award animation',
+                component: "_Flip up_ badge award animation",
             },
         },
     },
@@ -15,8 +14,7 @@ export default {
 
 const Template = (args, { argTypes }) => ({
     components: { FlipUp },
-    template:
-        `
+    template: `
         <flip-up />
         `,
 });

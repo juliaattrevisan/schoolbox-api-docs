@@ -1,5 +1,4 @@
-(function() {
-
+(function () {
     /**
      * Manufactures a NCEA generic stacked barchart
      *
@@ -7,7 +6,7 @@
      * @copyright   Copyright 2019, Schoolbox Pty Ltd
      * @link        https://schoolbox.com.au/
      */
-    $.fn.ncea_stackedBar = function(options) {
+    $.fn.ncea_stackedBar = function (options) {
         options = options || {};
 
         var config = init(options, this);
@@ -27,7 +26,7 @@
 
                 /* Graph title
                  */
-                title: '',
+                title: "",
 
                 /* Colour stack for the bars
                  */
@@ -38,7 +37,7 @@
                  * Note that in horizontal barcharts x and y are
                  * used conversely in highcharts
                  */
-                yAxisTitle: '',
+                yAxisTitle: "",
 
                 /* Bar Names
                  */
@@ -46,11 +45,10 @@
 
                 /* Bar segments
                  */
-                series: []
-            }
+                series: [],
+            };
 
-            var derived = {
-            }
+            var derived = {};
 
             var merged = $.extend(defaults, derived, options);
 
@@ -63,49 +61,49 @@
         function graph() {
             $(config.element).highcharts({
                 chart: {
-                    type: 'bar'
+                    type: "bar",
                 },
                 colors: config.colors,
                 title: {
-                    text: config.title
+                    text: config.title,
                 },
                 xAxis: {
-                    categories: config.categories
+                    categories: config.categories,
                 },
                 yAxis: {
                     min: 0,
                     reversedStacks: false,
                     title: {
-                        text: config.yAxisTitle
-                    }
+                        text: config.yAxisTitle,
+                    },
                 },
                 legend: {
-                    reversed: false
+                    reversed: false,
                 },
                 plotOptions: {
                     series: {
-                        stacking: 'percent',
+                        stacking: "percent",
                         dataLabels: {
                             enabled: true,
-                            align: 'center',
+                            align: "center",
                             inside: true,
-                            formatter: function() {
-                                var str = '';
+                            formatter: function () {
+                                var str = "";
 
                                 if (this.y > 0) {
                                     str = this.y;
                                 }
-                                
+
                                 return str;
-                            }
-                        }
-                    }
+                            },
+                        },
+                    },
                 },
                 series: config.series,
                 credits: {
-                    enabled: false
-                }
+                    enabled: false,
+                },
             });
         }
-    }
-}(jQuery));
+    };
+})(jQuery);

@@ -1,8 +1,8 @@
-import { createApp } from 'vue';
-import NewsAuthored from './news-authored';
+import { createApp } from "vue";
+import NewsAuthored from "./news-authored";
 
 createApp({
-	components: {
-		NewsAuthored
-    }
-}).mount('#authored-container');
+    components: {
+        NewsAuthored,
+    },
+}).mount("#authored-container");

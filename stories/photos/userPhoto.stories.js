@@ -1,15 +1,13 @@
-
-import UserPhoto from '../../vue/components/userPhoto/user-photo.vue';
+import UserPhoto from "../../vue/components/userPhoto/user-photo.vue";
 
 export default {
-    title: 'Photos/UserPhoto',
+    title: "Photos/UserPhoto",
     component: UserPhoto,
 };
 
 const Template = (args, { argTypes }) => ({
     components: { UserPhoto },
-    template:
-        `
+    template: `
         <user-photo />
         `,
 });

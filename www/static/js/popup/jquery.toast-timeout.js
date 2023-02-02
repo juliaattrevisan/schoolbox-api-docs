@@ -1,4 +1,4 @@
-(function() {
+(function () {
     "use strict";
 
     /**
@@ -7,7 +7,7 @@
      *
      * @param options
      */
-    $.fn.toastActivate = function(options) {
+    $.fn.toastActivate = function (options) {
         options = options || {};
 
         var config = init(options, $(this));
@@ -27,15 +27,14 @@
 
                 /* Initial text to display
                  */
-                text: 'Updating...please wait',
+                text: "Updating...please wait",
 
                 /* The style to use after toastActivate
                  */
-                css: ''
-            }
+                css: "",
+            };
 
-            var derived = {
-            }
+            var derived = {};
 
             var merged = $.extend(defaults, derived, options);
 
@@ -49,17 +48,17 @@
             $(config.element)
                 .stop()
                 .text(config.text)
-                .removeClass('alert success')
-                .addClass('pop')
+                .removeClass("alert success")
+                .addClass("pop")
                 .addClass(config.css);
         }
-    }
+    };
 
     /**
      * Fades out a label.
      * This occurs within an ajax success/error callback
      */
-    $.fn.toastTimeout = function(options) {
+    $.fn.toastTimeout = function (options) {
         options = options || {};
 
         var config = init(options, $(this));
@@ -88,16 +87,14 @@
 
                 /* Text to display when callback completes
                  */
-                text: 'Updated',
+                text: "Updated",
 
                 /* The style to use after toastActivate
                  */
-                css: 'success'
+                css: "success",
+            };
 
-            }
-
-            var derived = {
-            }
+            var derived = {};
 
             var merged = $.extend(defaults, derived, options);
 
@@ -108,23 +105,13 @@
          * Apply animation
          */
         function apply() {
-
             /* Reset values when triggering repeatedly
              */
-            $(config.element)
-                .text(config.text)
-                .addClass(config.css)
-                .stop();
+            $(config.element).text(config.text).addClass(config.css).stop();
 
-            setTimeout(
-                function() {
-                    $(config.element)
-                        .stop()
-                        .removeClass('pop')
-                        .trigger('toastTimeout');
-                },
-                config.duration
-            )
+            setTimeout(function () {
+                $(config.element).stop().removeClass("pop").trigger("toastTimeout");
+            }, config.duration);
         }
     };
-}(jQuery));
+})(jQuery);

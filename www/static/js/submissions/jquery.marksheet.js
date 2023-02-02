@@ -1,10 +1,9 @@
-(function() {
-
+(function () {
     /**
      * Controls for Averages
      */
-    $.fn.marksheetAverages = function(options) {
-        options = options || {}
+    $.fn.marksheetAverages = function (options) {
+        options = options || {};
 
         var config = init(options, $(this));
 
@@ -25,11 +24,11 @@
 
                 /* When you click this element, rows are toggled
                  */
-                averagesRowsSelector: '[data-toggle-averages]',
+                averagesRowsSelector: "[data-toggle-averages]",
 
                 /* These rows are shown when averagesRowsSelector is clicked
                  */
-                averagesRows: '[data-sub-table-row]',
+                averagesRows: "[data-sub-table-row]",
 
                 /* Element containing the url for updating visibility of
                  * a Due Work/Quiz e.g. [data-visiblity-selector]
@@ -37,19 +36,18 @@
                  * data-visibility-selector, as an attribute, is also used
                  * to select a corresponding ajax feedback label
                  */
-                visibilitySelector: 'data-visibility-selector',
+                visibilitySelector: "data-visibility-selector",
 
                 /* Icon replacement
                  * Icon to show when you can expand/collapse
                  */
                 icon: {
-                    expand: 'icon-down-arrow',
-                    collapse: 'icon-up-arrow'
-                }
-            }
+                    expand: "icon-down-arrow",
+                    collapse: "icon-up-arrow",
+                },
+            };
 
-            var derived = {
-            }
+            var derived = {};
 
             var merged = $.extend(defaults, derived, options);
 
@@ -67,18 +65,17 @@
          * Toggle averages rows and change icon
          */
         function toggleTableRows() {
-            $(config.averagesRowsSelector).click(function(event){
+            $(config.averagesRowsSelector).click(function (event) {
                 event.preventDefault();
 
-                if ($(config.averagesRows).is(':visible')) {
+                if ($(config.averagesRows).is(":visible")) {
                     $(this).addClass(config.icon.expand).removeClass(config.icon.collapse);
 
-                    $('[data-sub-table-row]').hide();
-                }
-                else {
+                    $("[data-sub-table-row]").hide();
+                } else {
                     $(this).removeClass(config.icon.expand).addClass(config.icon.collapse);
 
-                    $('[data-sub-table-row]').show();
+                    $("[data-sub-table-row]").show();
                 }
             });
         }
@@ -88,27 +85,27 @@
          * Ajaxes the new value silently
          */
         function updateVisibility() {
-            $('[' + config.visibilitySelector + ']').change(function(event) {
+            $("[" + config.visibilitySelector + "]").change(function (event) {
                 event.preventDefault();
 
                 var self = $(this);
 
-                $.get($(this).val(), function(data) {
+                $.get($(this).val(), function (data) {
                     var indicator = self.attr(config.visibilitySelector);
 
-                    var label = $('[data-identifier="'+indicator+'"]');
-                    label.text('Saved').css({opacity:1}).removeClass('hide');
-                    label.toastTimeout({duration: 3000});
+                    var label = $('[data-identifier="' + indicator + '"]');
+                    label.text("Saved").css({ opacity: 1 }).removeClass("hide");
+                    label.toastTimeout({ duration: 3000 });
                 });
             });
         }
-    }
+    };
 
     /**
      * Controls for Inputs
      */
-    $.fn.marksheetInputs = function(options) {
-        options = options || {}
+    $.fn.marksheetInputs = function (options) {
+        options = options || {};
 
         var config = init(options, $(this));
 
@@ -127,11 +124,10 @@
 
                 /* The url which receives the updated values via ajax
                  */
-                url: '/ajax/submission/marks.php'
-            }
+                url: "/ajax/submission/marks.php",
+            };
 
-            var derived = {
-            }
+            var derived = {};
 
             var merged = $.extend(defaults, derived, options);
 
@@ -142,68 +138,70 @@
          * Everything
          */
         function everything() {
-            $(config.element).on('change', 'input', function (e) {
+            $(config.element).on("change", "input", function (e) {
                 var self = $(this);
 
                 /* Disable the current input until ajax transaction completes
                  * This prevents update spamming
                  */
-                self.prop('disabled', true);
+                self.prop("disabled", true);
 
                 // set up the data variable for POSTing
-                var data = {}
+                var data = {};
                 data[this.name] = self.val();
 
                 /* Label data identifier
                  */
-                var identifier = self.attr('name') + '-weight';
-                var label = $('[data-identifier="'+identifier+'"]');
+                var identifier = self.attr("name") + "-weight";
+                var label = $('[data-identifier="' + identifier + '"]');
 
                 label.toastActivate({
-                    text: 'Preparing to save'
+                    text: "Preparing to save",
                 });
 
                 /* Ajax new settings
                  */
                 config.element
                     .ajaxForm({
-                        type: 'POST',
+                        type: "POST",
                         url: config.url,
-                        data: data
+                        data: data,
                     })
-                    .on('done.ajaxForm', function(event, data) {
-                        var tbody = $(config.element).children('tbody');
+                    .on("done.ajaxForm", function (event, data) {
+                        var tbody = $(config.element).children("tbody");
 
                         $.each(data, function (k, v) {
                             var userId = k,
-                                gradient = v['avg-int'],
-                                letter = v['avg-letter'];
+                                gradient = v["avg-int"],
+                                letter = v["avg-letter"];
 
-                            var row = tbody.children('tr[data-student=' + userId + ']');
+                            var row = tbody.children("tr[data-student=" + userId + "]");
 
-                            row.children('td').last()
-                                .attr('class', 'gradient-' + gradient + '-bg').children('a')
-                                .attr('class', 'gradient-' + gradient).text(letter);
-
+                            row.children("td")
+                                .last()
+                                .attr("class", "gradient-" + gradient + "-bg")
+                                .children("a")
+                                .attr("class", "gradient-" + gradient)
+                                .text(letter);
                         });
 
                         /* Animate label feedback
                          */
                         label.toastTimeout({
-                            text: 'Saved',
-                            css: 'success'
+                            text: "Saved",
+                            css: "success",
                         });
                     })
-                    .on('fail.ajaxForm', function() {
+                    .on("fail.ajaxForm", function () {
                         label.toastTimeout({
-                            text: 'Value failed to save',
-                            css: 'alert'
+                            text: "Value failed to save",
+                            css: "alert",
                         });
                     })
-                    .on('always.ajaxForm', function() {
-                        self.prop('disabled', false);
+                    .on("always.ajaxForm", function () {
+                        self.prop("disabled", false);
                     });
             });
         }
-    }
-}(jQuery));
+    };
+})(jQuery);

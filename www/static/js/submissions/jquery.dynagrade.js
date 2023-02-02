@@ -12,13 +12,12 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-;(function ($, window, document, undefined) {
-
-    var pluginName = 'dynagrade';
+(function ($, window, document, undefined) {
+    var pluginName = "dynagrade";
 
     var defaults = {
         // a submission_mark_type.slug value
-        mode: 'percent',
+        mode: "percent",
 
         // the configuration data specific to the given marktype (presently only 'letter' uses a config)
         conf: {},
@@ -28,7 +27,7 @@
         //  - `text` is the calculated output intended for display
         onCalculate: function (text) {
             this.text(text);
-        }
+        },
     };
 
     function Dynagrade(element, options) {
@@ -39,45 +38,43 @@
 
         var conf = this.options.conf;
 
-        $(element).on('dynagrade dynagrade.preload', function (e) {
-
+        $(element).on("dynagrade dynagrade.preload", function (e) {
             var target = $(e.target),
-                scaledMark = target.attr('data-scaled-mark');
+                scaledMark = target.attr("data-scaled-mark");
             if (scaledMark === null || scaledMark === undefined) {
-                self.options.onCalculate.call(target, '')
+                self.options.onCalculate.call(target, "");
             } else {
                 switch (self.options.mode) {
-                    case 'percent':
+                    case "percent":
                         calcPercent.call(target, self.options.onCalculate);
                         break;
-                    case 'letter':
+                    case "letter":
                         calcLetter.call(target, conf, self.options.onCalculate);
                         break;
-                    case 'none':
+                    case "none":
                         calcNone.call(target, self.options.onCalculate);
                         break;
-                    case 'raw':
+                    case "raw":
                     default:
                         calcRaw.call(target, self.options.onCalculate);
                         break;
                 }
             }
-
         });
     }
 
     function calcPercent(callback) {
         var percentage = 0;
 
-        var scaledMark = this.attr('data-scaled-mark'),
-            maxFromIndicators = this.attr('data-row-max-sum'),
-            capMax = parseFloat(this.attr('data-max'));
+        var scaledMark = this.attr("data-scaled-mark"),
+            maxFromIndicators = this.attr("data-row-max-sum"),
+            capMax = parseFloat(this.attr("data-max"));
 
         // If capability max is 0, use the max calculated from the indicators instead
         if (capMax >= 0) {
-            percentage = parseFloat(scaledMark / capMax * 100);
+            percentage = parseFloat((scaledMark / capMax) * 100);
         } else {
-            percentage = parseFloat(scaledMark / maxFromIndicators * 100);
+            percentage = parseFloat((scaledMark / maxFromIndicators) * 100);
         }
 
         if (isNaN(percentage)) {
@@ -85,19 +82,19 @@
         }
 
         // If sum isn't a whole number: round to 2dp
-        if(percentage % 1 !== 0){
+        if (percentage % 1 !== 0) {
             percentage = percentage.toFixed(2);
         }
 
-        callback.call(this, percentage + ' %');
+        callback.call(this, percentage + " %");
     }
 
     function calcLetter(conf, callback) {
         // start by getting the percentage
-        var scaledMark = this.attr('data-scaled-mark'),
-            max        = this.attr('data-max'),
-            percentage = parseFloat(scaledMark / max * 100),
-            $el        = this;
+        var scaledMark = this.attr("data-scaled-mark"),
+            max = this.attr("data-max"),
+            percentage = parseFloat((scaledMark / max) * 100),
+            $el = this;
 
         if (isNaN(percentage)) {
             percentage = 0;
@@ -111,12 +108,11 @@
         var sortedConf = Array.from(conf);
         sortedConf.sort(function (a, b) {
             return b.lowerBound - a.lowerBound;
-        })
+        });
 
         $.each(conf, function (k, v) {
-
             var lowerBound = Number(v.lowerBound),
-                caption    = v.caption;
+                caption = v.caption;
 
             // bound is too high, ignore this one
             if (percentage < lowerBound) {
@@ -134,23 +130,21 @@
     }
 
     function calcRaw(callback) {
-        var scaledMark = this.attr('data-scaled-mark'),
-            max        = this.attr('data-max');
+        var scaledMark = this.attr("data-scaled-mark"),
+            max = this.attr("data-max");
 
-        callback.call(this, scaledMark + ' / ' + max);
+        callback.call(this, scaledMark + " / " + max);
     }
 
     function calcNone(callback) {
-        callback.call(this, '');
+        callback.call(this, "");
     }
-
 
     $.fn[pluginName] = function (options) {
         return this.each(function () {
-            if (!$.data(this, 'plugin_' + pluginName)) {
-                $.data(this, 'plugin_' + pluginName, new Dynagrade(this, options));
+            if (!$.data(this, "plugin_" + pluginName)) {
+                $.data(this, "plugin_" + pluginName, new Dynagrade(this, options));
             }
         });
-    }
-
+    };
 })(jQuery, window, document);

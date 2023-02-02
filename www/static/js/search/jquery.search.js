@@ -1,5 +1,4 @@
-(function() {
-
+(function () {
     /**
      * Search Plugin
      *
@@ -7,7 +6,7 @@
      *
      * @param options
      */
-    $.fn.search = function(options) {
+    $.fn.search = function (options) {
         options = options || {};
 
         var config = init(options, $(this));
@@ -29,53 +28,52 @@
 
                 /* The search section (type) that was selected e.g. all, people, etc.
                  */
-                section: '',
+                section: "",
 
                 /* The keyword to search for
                  */
-                keyword: '',
+                keyword: "",
 
                 /* Default page number
                  */
-                pageNumber: 1
-            }
+                pageNumber: 1,
+            };
 
             var derived = {
-
                 /* Navigation elements which you can use to see results for different items
                  * These elements contain data about which "section" you're viewing ie. the
                  * kind of item for which you are viewing search results - e.g. blog, news
                  */
-                navElements: '#type dd',
+                navElements: "#type dd",
 
                 /* A comma-separated string/int tuple, e.g. all,1 / user,1 / user,2
                  *
                  * This is used to parameterise the search method. This interface is now
                  * expected each time a search is run.
                  */
-                hash: '',
+                hash: "",
 
                 /* "See More" elements. These trigger a dynamic hash page reload
                  */
-                more: 'data-more',
+                more: "data-more",
 
                 /* The actual section's HTML element that was selected
                  */
-                sectionElement: $('[data-section=' + options.section + ']'),
+                sectionElement: $("[data-section=" + options.section + "]"),
 
                 /* A set of results tabs. These are denoted by data-container=resultType,
                  * caching the selection here allows you to switch tabs faster
                  */
-                resultsTabs: defaults.element.find('[data-result-container]'),
+                resultsTabs: defaults.element.find("[data-result-container]"),
 
                 /* The url to access asynchronously to populate different tabs
                  */
-                url: '/resource/' + options.section + '/search',
+                url: "/resource/" + options.section + "/search",
 
                 /* The div into which search results get loaded
                  */
-                targetDiv: defaults.element.find('[data-type="'+options.section+'"]')
-            }
+                targetDiv: defaults.element.find('[data-type="' + options.section + '"]'),
+            };
 
             var merged = $.extend(defaults, derived, options);
 
@@ -87,7 +85,6 @@
          * results.
          */
         function runOnce() {
-
             /* Set up hash configuration
              */
             deriveHash(config.section, config.pageNumber);
@@ -106,14 +103,13 @@
          * Load data in
          */
         function load() {
-            if (!$(config.targetDiv).attr('data-loaded') === true) {
+            if (!$(config.targetDiv).attr("data-loaded") === true) {
                 var params = "keyword=" + config.keyword + "&type=" + config.section + "&p=" + config.pageNumber;
 
-                $(config.targetDiv).load(config.url, params, function() {
-
+                $(config.targetDiv).load(config.url, params, function () {
                     /* Flag it as having loaded
                      */
-                    $(config.targetDiv).attr('data-loaded', true);
+                    $(config.targetDiv).attr("data-loaded", true);
 
                     /* Add pagination again
                      */
@@ -129,8 +125,7 @@
                      */
                     reflow();
                 });
-            }
-            else {
+            } else {
                 /* Add pagination again
                  */
                 paginate();
@@ -143,38 +138,43 @@
          * Add pagination events to all the <a> links
          */
         function paginate() {
-            $('[data-search-pagination] [data-page]').unbind('click').bind('click', function(event) {
-                event.preventDefault();
+            $("[data-search-pagination] [data-page]")
+                .unbind("click")
+                .bind("click", function (event) {
+                    event.preventDefault();
 
-                /* Set the page number
-                 */
-                config.pageNumber = $(this).attr('data-page');
+                    /* Set the page number
+                     */
+                    config.pageNumber = $(this).attr("data-page");
 
-                /* Update hash configuration
-                 */
-                deriveHash(config.section, config.pageNumber);
+                    /* Update hash configuration
+                     */
+                    deriveHash(config.section, config.pageNumber);
 
-                /* Slap the hash into the url
-                 */
-                applyHash(config.hash);
+                    /* Slap the hash into the url
+                     */
+                    applyHash(config.hash);
 
-                /* Load search results in, update pagination and styles
-                 */
-                $(config.targetDiv).load(config.url, "keyword=" + config.keyword + "&type=" + config.section + "&p=" + config.pageNumber, function() {
-                    paginate();
-                    updateStyles();
-                    reflow();
+                    /* Load search results in, update pagination and styles
+                     */
+                    $(config.targetDiv).load(
+                        config.url,
+                        "keyword=" + config.keyword + "&type=" + config.section + "&p=" + config.pageNumber,
+                        function () {
+                            paginate();
+                            updateStyles();
+                            reflow();
+                        }
+                    );
                 });
-            });
 
             /* Show the pagination div again
              * but only for non-all portions
              */
-            if (config.section === 'all') {
-                $('[data-search-pagination]').hide();
-            }
-            else {
-                $('[data-search-pagination]').show();
+            if (config.section === "all") {
+                $("[data-search-pagination]").hide();
+            } else {
+                $("[data-search-pagination]").show();
             }
         }
 
@@ -192,29 +192,27 @@
          * @param pageNumber
          */
         function deriveHash(section, pageNumber) {
-            config.hash = section + ',' + pageNumber;
+            config.hash = section + "," + pageNumber;
         }
 
         /**
          * Update UI styles
          */
         function updateStyles() {
-
             /* Remove all selected classes
              */
-            $(config.navElements).removeClass('active');
+            $(config.navElements).removeClass("active");
 
             /* Add active class to the thing you clicked on
              */
-            config.sectionElement.parent().addClass('active');
+            config.sectionElement.parent().addClass("active");
         }
 
         /**
          * Reflow Foundation UI elements
          */
-        function reflow()
-        {
-            $(config.targetDiv).foundation('dropdown', 'reflow');
+        function reflow() {
+            $(config.targetDiv).foundation("dropdown", "reflow");
         }
 
         /**
@@ -229,28 +227,28 @@
          * Set up seymour links
          */
         function setupMore() {
-            $(config.element).on('click', '[' + config.more + ']', function(event) {
+            $(config.element).on("click", "[" + config.more + "]", function (event) {
                 event.preventDefault();
 
                 var type = $(this).attr(config.more);
 
-                window.location.hash = '#' + type + ',1';
+                window.location.hash = "#" + type + ",1";
 
                 // Ajax more results instead
                 $(config.element).search({
                     keyword: config.keyword,
                     section: type,
-                    pageNumber: 1
+                    pageNumber: 1,
                 });
             });
         }
-    }
+    };
 
     /**
      * Determine what the current hash configuration is, in the url. Split it
      * into its separate components
      */
-    $.fn.fetchHash = function() {
-        return window.location.hash.toString().substring(1, window.location.hash.length).split(',');
-    }
-}(jQuery));
+    $.fn.fetchHash = function () {
+        return window.location.hash.toString().substring(1, window.location.hash.length).split(",");
+    };
+})(jQuery);

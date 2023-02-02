@@ -2,13 +2,11 @@
  * Manage the currently selected curriculum nodes
  */
 
-import { defineStore } from 'pinia';
-import { apiEndpoint } from './curriculumSelectorStore';
-import { UNSET_ID, getBreadcrumbs } from '@schoolboxCurriculum/js/nodeUtils';
-
+import { defineStore } from "pinia";
+import { apiEndpoint } from "./curriculumSelectorStore";
+import { UNSET_ID, getBreadcrumbs } from "@schoolboxCurriculum/js/nodeUtils";
 
 export const useSelectedNodesStore = defineStore(`csSelectedNodes`, {
-
     state: () => ({
         nodes: [], //the currently selected nodes
         activeNode: { id: UNSET_ID }, //to show extra info on a selected node in a modal
@@ -17,13 +15,12 @@ export const useSelectedNodesStore = defineStore(`csSelectedNodes`, {
     }),
 
     getters: {
-
         /**
          * Do we have any selected nodes?
          *
          * @return { Boolean }
          */
-        hasNoNodes () {
+        hasNoNodes() {
             return this.nodes.length === 0;
         },
 
@@ -32,7 +29,7 @@ export const useSelectedNodesStore = defineStore(`csSelectedNodes`, {
          *
          * @return { Boolean }
          */
-        hasNodes () {
+        hasNodes() {
             return this.nodes.length > 0;
         },
 
@@ -41,7 +38,7 @@ export const useSelectedNodesStore = defineStore(`csSelectedNodes`, {
          *
          * @return { Boolean }
          */
-        hasActiveNode () {
+        hasActiveNode() {
             return this.activeNode.id !== UNSET_ID ? true : false;
         },
 
@@ -50,20 +47,18 @@ export const useSelectedNodesStore = defineStore(`csSelectedNodes`, {
          *
          * @return { array }
          */
-        nodesIds () {
+        nodesIds() {
             return this.nodes.map((node) => node.id);
         },
-
     },
 
     actions: {
-
         /**
          * add a node
          *
          * @param { Object or Array } either a single node, or mulitple can be added
          */
-        add (nodeToAdd) {
+        add(nodeToAdd) {
             if (Array.isArray(nodeToAdd)) {
                 this.nodes = [...this.nodes, ...nodeToAdd];
             } else {
@@ -76,7 +71,7 @@ export const useSelectedNodesStore = defineStore(`csSelectedNodes`, {
          *
          * @param { Object }
          */
-        remove (nodeToRemove) {
+        remove(nodeToRemove) {
             if (Array.isArray(nodeToRemove)) {
                 nodeToRemove.forEach((node) => {
                     this.nodes = this.nodes.filter((selectedNode) => selectedNode.id !== node.id);
@@ -93,7 +88,7 @@ export const useSelectedNodesStore = defineStore(`csSelectedNodes`, {
          *
          * @returns { boolean }
          */
-        isSelected (node) {
+        isSelected(node) {
             return this.nodesIds.includes(node.id);
         },
 
@@ -103,7 +98,7 @@ export const useSelectedNodesStore = defineStore(`csSelectedNodes`, {
          * @param { object }
          * @param { boolean }
          */
-        switch (node, isChecked) {
+        switch(node, isChecked) {
             isChecked ? this.add(node) : this.remove(node);
         },
 
@@ -112,14 +107,14 @@ export const useSelectedNodesStore = defineStore(`csSelectedNodes`, {
          *
          * @param { Aray }
          */
-        update (updatedNodes) {
-            this.nodes  = [...updatedNodes];
+        update(updatedNodes) {
+            this.nodes = [...updatedNodes];
         },
 
         /**
          * clear all the currently selected nodes
          */
-        empty () {
+        empty() {
             this.nodes.forEach((node) => this.remove(node));
         },
 
@@ -128,7 +123,7 @@ export const useSelectedNodesStore = defineStore(`csSelectedNodes`, {
          *
          * @param { object }
          */
-        setActiveNode (node) {
+        setActiveNode(node) {
             this.activeNode = node;
         },
 
@@ -139,13 +134,11 @@ export const useSelectedNodesStore = defineStore(`csSelectedNodes`, {
          *
          * @param { object }
          */
-        trimNode (node) {
+        trimNode(node) {
             const copiedNode = { ...node };
             delete copiedNode.children;
             delete copiedNode.parent;
             return copiedNode;
         },
-
     },
-
-})
+});

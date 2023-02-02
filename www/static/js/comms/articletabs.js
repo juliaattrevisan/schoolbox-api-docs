@@ -1,14 +1,13 @@
 /**
  * Async load articles for a topic
  */
-(function() {
-
+(function () {
     /**
      * Plugin
      *
      * @param options
      */
-    $.fn.articleTabs = function(options) {
+    $.fn.articleTabs = function (options) {
         options = options || {};
 
         var config = init(options, $(this));
@@ -37,12 +36,12 @@
 
                 /* The ul containing tabs that trigger async requests
                  */
-                topicTabs: $(element).parents('[data-component]').find('[data-tab]'),
+                topicTabs: $(element).parents("[data-component]").find("[data-tab]"),
 
                 /* Asynchronously load this data upon start
                  * If empty, it'll do nothing until you change topics
                  */
-                selectedUrl: '',
+                selectedUrl: "",
 
                 /* Update the url upon tab change
                  * The url comes from backend, telling you the url of the topic requested
@@ -53,7 +52,7 @@
                 onChange: function () {},
 
                 // Callback on articles loaded
-                onChangeSuccess: function () {}
+                onChangeSuccess: function () {},
             };
 
             return $.extend(defaults, options);
@@ -63,7 +62,6 @@
          * Get articles via url specified
          */
         function getArticles(url) {
-
             /* TODO: Check for a cached version and load that, if possible; otherwise fetch it
              * Temporarily disabled due to action-at-a-distance with saved for later
              * and articles that appear in multiple topics with different saved for later states
@@ -73,23 +71,23 @@
             config.onChange();
 
             $.ajax({
-                type: 'GET',
+                type: "GET",
                 url: url,
-                dataType: 'json'
-            }).done(function (response) {
-                $(config.element).html(response.fragment);
+                dataType: "json",
+            })
+                .done(function (response) {
+                    $(config.element).html(response.fragment);
 
-                // Fire onChangeSuccess callback
-                config.onChangeSuccess(response);
+                    // Fire onChangeSuccess callback
+                    config.onChangeSuccess(response);
 
-                /* Update the url if desired
-                 */
-                if (config.updateUrl) {
-                    window.history.pushState('', response.title, response.url);
-                }
-
-            }).fail(function (response) {
-            });
+                    /* Update the url if desired
+                     */
+                    if (config.updateUrl) {
+                        window.history.pushState("", response.title, response.url);
+                    }
+                })
+                .fail(function (response) {});
         }
 
         /**
@@ -97,20 +95,20 @@
          */
         function initListeners() {
             if (config.updateUrl) {
-                window.addEventListener('popstate', function () {
+                window.addEventListener("popstate", function () {
                     window.location = location.href;
                 });
             }
 
-            $(config.topicTabs).on('click', 'a', function(event) {
+            $(config.topicTabs).on("click", "a", function (event) {
                 event.preventDefault();
 
                 $(config.element).html('<div class="loader"></div>');
 
                 /* Reload article list afresh
                  */
-                getArticles($(this).attr('href'));
+                getArticles($(this).attr("href"));
             });
         }
-    }
-}(jQuery));
+    };
+})(jQuery);

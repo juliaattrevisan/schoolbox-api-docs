@@ -3,14 +3,13 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-(function() {
-
+(function () {
     /**
      * Responsive IFrame
      *
      * @param options
      */
-    $.fn.responsiveIframe = function(options) {
+    $.fn.responsiveIframe = function (options) {
         options = options || {};
 
         var config = init(options, $(this));
@@ -21,17 +20,17 @@
 
         /* Set up listeners
          */
-        $(window).resize(function() {
+        $(window).resize(function () {
             if ($(this).resizeTimeout) {
                 clearTimeout($(this).resizeTimeout);
             }
 
             $(this).resizeTimeout = setTimeout(function () {
-                $(this).trigger('resizeEnd');
+                $(this).trigger("resizeEnd");
             }, config.threshold);
         });
 
-        $(window).bind('resizeEnd', function() {
+        $(window).bind("resizeEnd", function () {
             config.onResize();
         });
 
@@ -52,19 +51,16 @@
 
                 /* Callback to execute upon init
                  */
-                onLoad: function() {
-                },
+                onLoad: function () {},
 
                 /* Callback to execute upon resize
                  */
-                onResize: function() {
-                }
+                onResize: function () {},
             };
 
-            var derived = {
-            };
+            var derived = {};
 
             return $.extend(defaults, derived, options);
         }
-    }
-}(jQuery));
+    };
+})(jQuery);

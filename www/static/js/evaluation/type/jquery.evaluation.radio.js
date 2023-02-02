@@ -1,100 +1,98 @@
-(function($) {
+(function ($) {
+    /**
+     * Constructor
+     *
+     * @param options
+     */
+    $.fn.evaluationRadio = function (options) {
+        var config = init(options);
 
-	/**
-	 * Constructor
-	 *
-	 * @param options
-	 */
-	$.fn.evaluationRadio = function(options) {
-		var config = init(options);
+        initSelected();
+        initChange();
 
-		initSelected();
-		initChange();
+        /**
+         * Set up options
+         *
+         * @param options
+         * @returns {*}
+         */
+        function init(options) {
+            var defaults = {
+                id: 0,
+            };
 
-		/**
-		 * Set up options
-		 *
-		 * @param options
-		 * @returns {*}
-		 */
-		function init(options) {
-			var defaults = {
-				id: 0
-			}
+            var derived = {
+                questionForm: $("#questionForm-" + options.id),
+            };
 
-			var derived = {
-				questionForm: $('#questionForm-' + options.id)
-			}
+            return $.extend(true, defaults, derived, options);
+        }
 
-			return $.extend(true,defaults, derived, options);
-		}
+        /**
+         * Highlight preselected items
+         */
+        function initSelected() {
+            config.questionForm.find("input[type=radio]").each(function () {
+                if ($(this).is(":checked")) {
+                    $(this).parent().addClass("evaluation-selected");
+                }
+            });
+        }
 
-		/**
-		 * Highlight preselected items
-		 */
-		function initSelected() {
-			config.questionForm.find('input[type=radio]').each(function() {
-				if ($(this).is(':checked')) {
-					$(this).parent().addClass('evaluation-selected');
-				}
-			});
-		}
+        /**
+         * Save response upon change
+         */
+        function initChange() {
+            /* Remove all selected classes and reapply just one
+             */
+            config.questionForm.find("input").change(function () {
+                config.questionForm.find("input").parent().removeClass("evaluation-selected");
+                $(this).parent().addClass("evaluation-selected");
 
-		/**
-		 * Save response upon change
-		 */
-		function initChange() {
+                $.fn.evaluationRadio.saveOne(config.questionForm);
+            });
+        }
+    };
 
-			/* Remove all selected classes and reapply just one
-			 */
-			config.questionForm.find('input').change(function() {
-				config.questionForm.find('input').parent().removeClass('evaluation-selected');
-				$(this).parent().addClass('evaluation-selected');
+    /**
+     * Save individual form contents
+     *
+     * @param element
+     * @returns jqXHR
+     */
+    $.fn.evaluationRadio.saveOne = function (element) {
+        return $.ajax({
+            type: "post",
+            url: $(element).attr("action"),
+            data: $(element).serialize(),
+            /* Callback on success
+             */
+            success: function (responseText) {
+                var result = new Function("return " + responseText);
 
-				$.fn.evaluationRadio.saveOne(config.questionForm);
-			});
-		}
-	}
+                $.fn.evaluationPercentageComplete({
+                    result: result(),
+                });
+            },
+        });
+    };
 
-	/**
-	 * Save individual form contents
-	 *
-	 * @param element
-	 * @returns jqXHR
-	 */
-	$.fn.evaluationRadio.saveOne = function(element) {
-		return $.ajax({
-			type: 'post',
-			url: $(element).attr('action'),
-			data: $(element).serialize(),
-			/* Callback on success
-			 */
-			success: function(responseText) {
-				var result = new Function('return ' + responseText);
-
-				$.fn.evaluationPercentageComplete({
-					result: result()
-				});
-			}
-		});
-	}
-
-	/**
-	 * Decide what the validation rules are for this particular
-	 * question type. Optionally specify errorContainer if you want
-	 * the validation messages to appear in a special location,
-	 * otherwise leave it undefined for default behaviour
-	 *
-	 * @returns {{element: string, rules: {required: boolean, minlength: number}, errorContainer: string}}
-	 */
-	$.fn.evaluationRadio.getValidationRules = function() {
-		return {
-			element: 'input[name=answer]',
-			rules: {
-				required: true,
-				minlength: 1
-			},
-			errorContainer: '[data-evaluationerrors="1"]'
-		}
-	}
-}(jQuery));
+    /**
+     * Decide what the validation rules are for this particular
+     * question type. Optionally specify errorContainer if you want
+     * the validation messages to appear in a special location,
+     * otherwise leave it undefined for default behaviour
+     *
+     * @returns {{element: string, rules: {required: boolean, minlength: number}, errorContainer: string}}
+     */
+    $.fn.evaluationRadio.getValidationRules = function () {
+        return {
+            element: "input[name=answer]",
+            rules: {
+                required: true,
+                minlength: 1,
+            },
+            errorContainer: '[data-evaluationerrors="1"]',
+        };
+    };
+})(jQuery);

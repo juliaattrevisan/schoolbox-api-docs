@@ -1,12 +1,12 @@
-import SmallCard from '../../vue/components/card/small-card.vue';
-import UserPhoto from '../../vue/components/userPhoto/user-photo.vue';
+import SmallCard from "../../vue/components/card/small-card.vue";
+import UserPhoto from "../../vue/components/userPhoto/user-photo.vue";
 
 export default {
-    title: 'Cards/SmallCard',
+    title: "Cards/SmallCard",
     component: SmallCard,
 };
 
-const DefaultTemplate = ( args, { argTypes }) => ({
+const DefaultTemplate = (args, { argTypes }) => ({
     components: { SmallCard, UserPhoto },
     template: `
         <small-card>

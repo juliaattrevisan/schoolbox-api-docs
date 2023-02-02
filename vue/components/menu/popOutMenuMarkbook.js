@@ -3,6 +3,6 @@ import PopOutMenuMarkbook from "./pop-out-menu-markbook.vue";
 
 createApp({
     components: {
-        PopOutMenuMarkbook
-    }
+        PopOutMenuMarkbook,
+    },
 }).mount("#pop-out-menu-markbook-container");

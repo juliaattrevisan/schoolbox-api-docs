@@ -2,28 +2,25 @@
  * Handles the store of the current Manage Group page
  */
 
-import { defineStore } from 'pinia';
-import { useStore } from './manageGroupStore';
-import { useMembersStore } from './mgMembersStore';
-import Endpoints from '../mgEndpoints';
+import { defineStore } from "pinia";
+import { useStore } from "./manageGroupStore";
+import { useMembersStore } from "./mgMembersStore";
+import Endpoints from "../mgEndpoints";
 
-
-export const useUpdateMembersStore = defineStore('mgUpdateMembers', {
-
+export const useUpdateMembersStore = defineStore("mgUpdateMembers", {
     state: () => ({
         isProcessing: false,
         isSelectedProcessing: false, //need to distinguish between processing a single member via updateMemberAccess() and updateSelectedMembersAccess()
     }),
 
     actions: {
-
         /**
          * update an individual members access
          *
          * @param { Object } the members data
          * @param { String } a FilterTypes
          */
-        async updateMemberAccess (member, accessType) {
+        async updateMemberAccess(member, accessType) {
             this.isProcessing = true;
             const store = useStore();
             store.isProcessing = true;
@@ -31,11 +28,11 @@ export const useUpdateMembersStore = defineStore('mgUpdateMembers', {
             membersStore.refreshMembers(); //to set any previously isNew or justUpdated to false
             try {
                 const response = await fetch(Endpoints.UPDATE_MEMBERS, {
-                    method: 'PATCH',
+                    method: "PATCH",
                     headers: {
-                        'Content-Type': 'application/json',
+                        "Content-Type": "application/json",
                     },
-                    body: getFormData([member], accessType)
+                    body: getFormData([member], accessType),
                 });
                 const updatedMember = membersStore.members.find((groupMember) => groupMember.id === member.id);
                 const responseJson = await response.json();
@@ -43,7 +40,7 @@ export const useUpdateMembersStore = defineStore('mgUpdateMembers', {
                     updateMember(updatedMember, accessType);
                 } else {
                     updateMember(updatedMember, updatedMember.accessType); //we revert back to original accessType if the change has failed
-                    throw new Error(responseJson.title, { ...responseJson } );
+                    throw new Error(responseJson.title, { ...responseJson });
                 }
             } catch (error) {
                 throw new Error(error.message, error.options);
@@ -58,7 +55,7 @@ export const useUpdateMembersStore = defineStore('mgUpdateMembers', {
          *
          * @param { String } a FilterTypes
          */
-        async updateSelectedMembersAccess (accessType) {
+        async updateSelectedMembersAccess(accessType) {
             this.isSelectedProcessing = true;
             const store = useStore();
             store.isProcessing = true;
@@ -66,21 +63,22 @@ export const useUpdateMembersStore = defineStore('mgUpdateMembers', {
             membersStore.refreshMembers(); //to set any previously isNew or justUpdated to false
             try {
                 const response = await fetch(Endpoints.UPDATE_MEMBERS, {
-                    method: 'PATCH',
+                    method: "PATCH",
                     headers: {
-                        'Content-Type': 'application/json',
+                        "Content-Type": "application/json",
                     },
-                    body: getFormData(membersStore.selectedMembers, accessType)
+                    body: getFormData(membersStore.selectedMembers, accessType),
                 });
                 const responseJson = await response.json();
-                if (response.ok) { //update the state only after the DB change is a success
+                if (response.ok) {
+                    //update the state only after the DB change is a success
                     membersStore.selectedMembers.forEach((member) => {
                         member.accessType = accessType; //the selectedMembers data is unique to the members data
                         const updatedMember = membersStore.members.find((groupMember) => groupMember.id === member.id);
                         updateMember(updatedMember, accessType);
                     });
                 } else {
-                    throw new Error(responseJson.title, { ...responseJson } );
+                    throw new Error(responseJson.title, { ...responseJson });
                 }
             } catch (error) {
                 throw new Error(error.message, error.options);
@@ -89,10 +87,8 @@ export const useUpdateMembersStore = defineStore('mgUpdateMembers', {
                 store.isProcessing = false;
             }
         },
-
     },
-
-})
+});
 
 /**
  * Set up a deleted users array to POST
@@ -102,9 +98,9 @@ export const useUpdateMembersStore = defineStore('mgUpdateMembers', {
  *
  * @returns { FormData }
  */
-function getFormData (selectedMembers, accessType) {
+function getFormData(selectedMembers, accessType) {
     const store = useStore();
-    const membersToUpdateIdList = selectedMembers.map(row => ({userId: row.id, accessType: accessType}));
+    const membersToUpdateIdList = selectedMembers.map((row) => ({ userId: row.id, accessType: accessType }));
     return JSON.stringify({
         groupId: store.id,
         accessTypes: membersToUpdateIdList,
@@ -117,7 +113,7 @@ function getFormData (selectedMembers, accessType) {
  * @param { Object }
  * @param { String }
  */
-function updateMember (member, accessType) {
+function updateMember(member, accessType) {
     member.accessType = accessType; //only once the change has occured in the database, do we reflect this change in the display table
     member.isNew = false; //no longer considered new once updated
     member.justUpdated = true; //to add a class in the display table to help show the member has just been updated

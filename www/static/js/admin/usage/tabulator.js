@@ -1,203 +1,216 @@
-(function($) {
+(function ($) {
+    /**
+     * Constructor
+     */
+    $.fn.usageTabulator = function (options) {
+        var config = init(this, options);
 
-	/**
-	 * Constructor
-	 */
-	$.fn.usageTabulator= function(options) {
-		var config = init(this, options);
+        plot();
 
-		plot();
+        /**
+         * Init
+         *
+         * @param element
+         * @param options
+         * @returns {*}
+         */
+        function init(element, options) {
+            var defaults = {
+                url: "",
+                title: "",
+                numPerPage: 15,
+                columns: [
+                    { column: "firstname", label: "Firstname" },
+                    { column: "lastname", label: "Lastname" },
+                    { column: "name", label: "Role" },
+                    { column: "bytes", label: "Usage" },
+                ],
+                ascendingHtml: '<img src="/images/core/tablesorter/sort-ascending.gif">',
+                descendingHtml: '<img src="/images/core/tablesorter/sort-descending.gif">',
+            };
 
-		/**
-		 * Init
-		 *
-		 * @param element
-		 * @param options
-		 * @returns {*}
-		 */
-		function init(element, options) {
-			var defaults = {
-				url: '',
-				title: '',
-				numPerPage: 15,
-				columns: [
-					{column: 'firstname', label: 'Firstname'},
-					{column: 'lastname', label: 'Lastname'},
-					{column: 'name', label: 'Role'},
-					{column: 'bytes', label: 'Usage'}
-				],
-				ascendingHtml:  '<img src="/images/core/tablesorter/sort-ascending.gif">',
-				descendingHtml: '<img src="/images/core/tablesorter/sort-descending.gif">'
-			}
+            var derived = {
+                element: element,
+            };
 
-			var derived = {
-				element: element
-			}
+            var merged = $.extend(defaults, derived, options);
 
-			var merged = $.extend(defaults, derived, options);
+            /* Dynamically append params
+             */
+            merged.url =
+                merged.url +
+                "&orderBy=" +
+                options.orderBy +
+                "&order=" +
+                options.order +
+                "&index=" +
+                options.index +
+                "&numPerPage=" +
+                options.numPerPage;
+            merged.index = parseInt(merged.index);
 
-			/* Dynamically append params
-			 */
-			merged.url = merged.url + '&orderBy=' + options.orderBy + '&order=' + options.order + '&index=' + options.index + '&numPerPage=' + options.numPerPage;
-			merged.index = parseInt(merged.index);
+            return merged;
+        }
 
-			return merged;
-		}
+        /**
+         * Apply sortorder controls
+         */
+        function applySortorder() {
+            $.each(config.element.find("[data-control]"), function (index, element) {
+                $(element).click(function (event) {
+                    event.preventDefault();
+                    var order = "ASC";
 
-		/**
-		 * Apply sortorder controls
-		 */
-		function applySortorder() {
-			$.each(config.element.find('[data-control]'), function(index, element) {
-				$(element).click(function(event) {
-					event.preventDefault();
-                    var order = 'ASC';
+                    /* Toggle ordering upon click
+                     */
+                    if (config.order == "ASC") {
+                        order = "DESC";
+                    }
 
-					/* Toggle ordering upon click
-					 */
-					if (config.order == 'ASC') {
-						order = 'DESC';
-					}
-
-					config.element.usageTabulator({
-						url: config.url,
-						title: config.title,
-						columns: config.columns,
-						orderBy: $(this).attr('rel'),
-						order: order,
-						index: 0,
-						numPerPage: config.numPerPage,
-						numTotal: config.numTotal
-					});
-				});
-			});
-		}
-
-		/**
-		 * Paginate things
-		 */
-		function applyPaginator() {
-			$.each(config.element.find('li a'), function(index, element) {
-				$(element).click(function(event) {
-					event.preventDefault();
-
-					config.element.usageTabulator({
-						url: config.url,
+                    config.element.usageTabulator({
+                        url: config.url,
                         title: config.title,
-						columns: config.columns,
-						orderBy: config.orderBy,
-						order: config.order,
-						index: parseInt($(this).attr('rel')),
-						numPerPage: config.numPerPage,
-						numTotal: config.numTotal
-					});
-				});
-			});
-		}
+                        columns: config.columns,
+                        orderBy: $(this).attr("rel"),
+                        order: order,
+                        index: 0,
+                        numPerPage: config.numPerPage,
+                        numTotal: config.numTotal,
+                    });
+                });
+            });
+        }
 
-		/**
-		 * Plot graph
-		 */
-		function plot() {
-			$.ajax({
-				url: config.url,
-				method: 'GET',
-				dataType: 'text',
-				success: function(datasets) {
+        /**
+         * Paginate things
+         */
+        function applyPaginator() {
+            $.each(config.element.find("li a"), function (index, element) {
+                $(element).click(function (event) {
+                    event.preventDefault();
 
-					/* Manufacture a table only if there is data
-					 */
-					if (datasets.length) {
-						makeTable(datasets);
-					}
-					else {
-						noTable();
-					}
-				}
-			});
-		}
+                    config.element.usageTabulator({
+                        url: config.url,
+                        title: config.title,
+                        columns: config.columns,
+                        orderBy: config.orderBy,
+                        order: config.order,
+                        index: parseInt($(this).attr("rel")),
+                        numPerPage: config.numPerPage,
+                        numTotal: config.numTotal,
+                    });
+                });
+            });
+        }
 
-		/**
-		 * Make indicator arrows for table headings
-		 *
-		 * @param currentColumn
-		 * @returns {string}
-		 */
-		function makeIndicatorArrows(currentColumn) {
-			var indicator = '';
+        /**
+         * Plot graph
+         */
+        function plot() {
+            $.ajax({
+                url: config.url,
+                method: "GET",
+                dataType: "text",
+                success: function (datasets) {
+                    /* Manufacture a table only if there is data
+                     */
+                    if (datasets.length) {
+                        makeTable(datasets);
+                    } else {
+                        noTable();
+                    }
+                },
+            });
+        }
 
-			/* Asc/desc indicator arrows
-			 */
-			if (currentColumn == config.orderBy) {
-				indicator = config.ascendingHtml;
+        /**
+         * Make indicator arrows for table headings
+         *
+         * @param currentColumn
+         * @returns {string}
+         */
+        function makeIndicatorArrows(currentColumn) {
+            var indicator = "";
 
-				if (config.order == 'DESC') {
-					indicator = config.descendingHtml;
-				}
-			}
+            /* Asc/desc indicator arrows
+             */
+            if (currentColumn == config.orderBy) {
+                indicator = config.ascendingHtml;
 
-			return indicator;
-		}
+                if (config.order == "DESC") {
+                    indicator = config.descendingHtml;
+                }
+            }
 
-		/**
-		 * Make table headings
-		 *
-		 * @returns {string}
-		 */
-		function makeTableHeadings() {
-			var thead = '';
+            return indicator;
+        }
 
-			for (var i = 0; i < config.columns.length; i++) {
-				var current = config.columns[i];
-				var indicator = makeIndicatorArrows(current.column);
+        /**
+         * Make table headings
+         *
+         * @returns {string}
+         */
+        function makeTableHeadings() {
+            var thead = "";
 
-				thead += "<th><a href='#' data-control rel='"+ current.column +"'>"+ current.label + indicator + "</a></th>"
-			}
+            for (var i = 0; i < config.columns.length; i++) {
+                var current = config.columns[i];
+                var indicator = makeIndicatorArrows(current.column);
 
-			return thead;
-		}
+                thead +=
+                    "<th><a href='#' data-control rel='" +
+                    current.column +
+                    "'>" +
+                    current.label +
+                    indicator +
+                    "</a></th>";
+            }
 
-		/**
-		 * Make pagination
-		 */
-		function makePagination() {
-			var pagination = '';
-			var numPages = Math.floor(config.numTotal/config.numPerPage);
+            return thead;
+        }
 
-			/* Previous Navigator
-			 */
-			if (config.index > 0) {
-				pagination += '<li><a href="#" rel="' + (config.index-1) +'">&lsaquo;</a></li>';
-			}
+        /**
+         * Make pagination
+         */
+        function makePagination() {
+            var pagination = "";
+            var numPages = Math.floor(config.numTotal / config.numPerPage);
 
-			/* Page Navigator
-			 */
-			for (var i = 0; i < numPages; i++) {
-				var active = '';
+            /* Previous Navigator
+             */
+            if (config.index > 0) {
+                pagination += '<li><a href="#" rel="' + (config.index - 1) + '">&lsaquo;</a></li>';
+            }
 
-				if (i == config.index) {
-					active = 'active';
-				}
+            /* Page Navigator
+             */
+            for (var i = 0; i < numPages; i++) {
+                var active = "";
 
-				pagination += '<li class="' + active + '" ><a href="#" rel="' + i +'">' + (i+1) + '</a></li>';
-			}
+                if (i == config.index) {
+                    active = "active";
+                }
 
-			/* Next Navigator
-			 */
-			if (config.index+1 < numPages) {
-				pagination += '<li><a href="#" rel="' + (config.index+1) +'">&rsaquo;</a></li>';
-			}
+                pagination += '<li class="' + active + '" ><a href="#" rel="' + i + '">' + (i + 1) + "</a></li>";
+            }
 
-			return pagination;
-		}
+            /* Next Navigator
+             */
+            if (config.index + 1 < numPages) {
+                pagination += '<li><a href="#" rel="' + (config.index + 1) + '">&rsaquo;</a></li>';
+            }
 
-		/**
-		 * Manufacture a table
-		 *
-		 * @param datasets
-		 */
-		function makeTable(datasets) {
-			var html = '\
+            return pagination;
+        }
+
+        /**
+         * Manufacture a table
+         *
+         * @param datasets
+         */
+        function makeTable(datasets) {
+            var html =
+                '\
 				<h2 class="subheader">{TITLE}</h2>\
 				<table>\
 					<thead>\
@@ -212,24 +225,24 @@
 				</ul>\
 			';
 
-			/* Table, table heading and paginator
-			 */
-			html = html.replace('{TITLE}', config.title);
-			html = html.replace('{CONTENTS}', datasets);
-			html = html.replace('{THEAD}', makeTableHeadings());
-			html = html.replace('{PAGINATION}', makePagination());
+            /* Table, table heading and paginator
+             */
+            html = html.replace("{TITLE}", config.title);
+            html = html.replace("{CONTENTS}", datasets);
+            html = html.replace("{THEAD}", makeTableHeadings());
+            html = html.replace("{PAGINATION}", makePagination());
 
-			config.element.html(html);
+            config.element.html(html);
 
-			applySortorder();
-			applyPaginator();
-		}
+            applySortorder();
+            applyPaginator();
+        }
 
-		/**
-		 * This is used when there is no data
-		 */
-		function noTable() {
-			config.element.html('<h3>' + config.title + '</h3><p>This user has no files.</p>');
-		}
-	}
-}(jQuery));
+        /**
+         * This is used when there is no data
+         */
+        function noTable() {
+            config.element.html("<h3>" + config.title + "</h3><p>This user has no files.</p>");
+        }
+    };
+})(jQuery);

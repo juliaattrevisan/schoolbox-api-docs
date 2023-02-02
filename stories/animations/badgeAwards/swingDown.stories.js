@@ -1,13 +1,12 @@
-
-import SwingDown from './swing-down.vue';
+import SwingDown from "./swing-down.vue";
 
 export default {
-    title: 'Animations/Badge Awards/Swing Down',
+    title: "Animations/Badge Awards/Swing Down",
     component: SwingDown,
     parameters: {
         docs: {
             description: {
-                component: '_Swing Down_ badge award animation',
+                component: "_Swing Down_ badge award animation",
             },
         },
     },
@@ -15,8 +14,7 @@ export default {
 
 const Template = (args, { argTypes }) => ({
     components: { SwingDown },
-    template:
-        `
+    template: `
         <swing-down />
         `,
 });

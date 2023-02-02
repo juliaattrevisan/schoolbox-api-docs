@@ -16,4 +16,4 @@ export const removeClassesThatContain = (element, search) => {
             classList.remove(className);
         }
     });
-}
+};

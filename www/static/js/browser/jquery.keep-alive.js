@@ -12,33 +12,30 @@
  * * interval: time in ms between pings
  * * onFailure: what happens when the session dies unexpectedly
  */
-(function($) {
+(function ($) {
     "use strict";
 
     var defaults = {
-        location: '/keepAlive',
+        location: "/keepAlive",
         interval: 180000,
-        onFailure: function() {}
+        onFailure: function () {},
     };
 
     /**
      * @param settings
      */
-    $.keepAlive = function(settings) {
-        var config   = $.extend({}, defaults, settings);
-        var interval = setInterval(
-            function() {
-                $.ajax(config.location)
-                    .done(function() {
-                        console.debug('User session kept alive');
-                    })
-                    .fail(function() {
-                        console.warn('User session died unexpectedly!');
-                        clearInterval(interval);
-                        settings.onFailure();
-                    });
-            },
-            config.interval
-        )
+    $.keepAlive = function (settings) {
+        var config = $.extend({}, defaults, settings);
+        var interval = setInterval(function () {
+            $.ajax(config.location)
+                .done(function () {
+                    console.debug("User session kept alive");
+                })
+                .fail(function () {
+                    console.warn("User session died unexpectedly!");
+                    clearInterval(interval);
+                    settings.onFailure();
+                });
+        }, config.interval);
     };
-}(jQuery));
+})(jQuery);

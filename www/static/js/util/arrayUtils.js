@@ -1,17 +1,17 @@
 /*
- * Array tools 
+ * Array tools
  */
 
 /**
-* To move an item in an array to a new index
-* https://stackoverflow.com/questions/5306680/move-an-array-element-from-one-array-position-to-another
-*
-* @param { Array }
-* @param { Number }
-* @param { Number }
-*
-* @returns { Array }
-*/
+ * To move an item in an array to a new index
+ * https://stackoverflow.com/questions/5306680/move-an-array-element-from-one-array-position-to-another
+ *
+ * @param { Array }
+ * @param { Number }
+ * @param { Number }
+ *
+ * @returns { Array }
+ */
 export const moveArrayItem = (array, oldIndex, newIndex) => {
     if (newIndex >= array.length) {
         var k = newIndex - array.length + 1;
@@ -20,6 +20,5 @@ export const moveArrayItem = (array, oldIndex, newIndex) => {
         }
     }
     array.splice(newIndex, 0, array.splice(oldIndex, 1)[0]);
-    return array; 
-}
-
+    return array;
+};

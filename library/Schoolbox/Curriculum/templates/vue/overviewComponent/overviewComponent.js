@@ -1,18 +1,18 @@
-import { createApp } from 'vue';
-import OverviewComponent from './overview-component';
+import { createApp } from "vue";
+import OverviewComponent from "./overview-component";
 
-const overviewComponents = document.querySelectorAll('[data-overview-component]');
+const overviewComponents = document.querySelectorAll("[data-overview-component]");
 
 overviewComponents.forEach((overviewComponent) => {
     /**
      *  Ensure each Vue component is only initiated once
      */
-    if (!overviewComponent.hasAttribute('data-loaded')) {
+    if (!overviewComponent.hasAttribute("data-loaded")) {
         createApp({
             components: {
-                OverviewComponent
-            }
+                OverviewComponent,
+            },
         }).mount(overviewComponent);
     }
-    overviewComponent.setAttribute('data-loaded', true);
+    overviewComponent.setAttribute("data-loaded", true);
 });

@@ -1,21 +1,20 @@
 /**!
  * Created by matt.day on 29/08/14.
  */
-;(function($, window, document, Dropzone, undefined) {
-
-    var plugin = 'fileDrop',
+(function ($, window, document, Dropzone, undefined) {
+    var plugin = "fileDrop",
         drag = 0,
         pending = 0,
-        noop = function() {},
+        noop = function () {},
         defaults = {
             // filedrop detection options
-            wrap: 'html > body',
-            wrapClass: 'dragging',
+            wrap: "html > body",
+            wrapClass: "dragging",
             showIfEmpty: true,
 
             // dropzone options we choose to expose
             clickable: false,
-            previewsContainer: '.dropzone',
+            previewsContainer: ".dropzone",
             createImageThumbnails: false,
             thumbnailWidth: 100,
             thumbnailHeight: 100,
@@ -24,7 +23,7 @@
             fallback: noop,
             forceFallback: false,
             maxFilesize: 2048,
-            paramName: 'file',
+            paramName: "file",
 
             // custom handling for dropzone
             navWarning: "You still have files uploading, which will be cancelled if you leave this page.",
@@ -33,7 +32,7 @@
 
             // componentry
             refreshSelector: null,
-            refreshUrl: '/homepage/configForm.php',
+            refreshUrl: "/homepage/configForm.php",
             refreshData: {},
             refreshTimeout: 2000,
 
@@ -45,36 +44,38 @@
 
             uploadprogress: function (file, progress, bytesSent) {
                 var el = $(file.previewElement);
-                el.find('div.dz-filename').addClass('started');
-                el.find('span.dz-upload').css('width', parseInt(progress) + '%');
+                el.find("div.dz-filename").addClass("started");
+                el.find("span.dz-upload").css("width", parseInt(progress) + "%");
             },
 
             success: function (file, response) {
                 var el = $(file.previewElement);
 
-                el.attr('data-file', response.id)
-                    .removeClass('dz-processing')
-                    .find('span.dz-upload')
-                    .addClass('complete');
+                el.attr("data-file", response.id)
+                    .removeClass("dz-processing")
+                    .find("span.dz-upload")
+                    .addClass("complete");
             },
 
             error: function (file, response) {
-                $(file.previewElement).removeClass('dz-processing').find('span.dz-upload').addClass('error').attr('title', response.error);
+                $(file.previewElement)
+                    .removeClass("dz-processing")
+                    .find("span.dz-upload")
+                    .addClass("error")
+                    .attr("title", response.error);
             },
 
-
             // dropzone dictionary
-            dictDefaultMessage: '',
-            dictFallbackMessage: '',
+            dictDefaultMessage: "",
+            dictFallbackMessage: "",
 
             // Reload component content on file upload. Set the default to `true` for now as file component is the only one that's using this as of the moment.
-            reloadContent: true
+            reloadContent: true,
         };
 
     function FileDrop(element, options) {
-
         // sigh
-        var self         = this,
+        var self = this,
             acceptedMime = null,
             dataAccepts;
 
@@ -90,58 +91,53 @@
         this._tt = null;
 
         // only allow global window listeners once
-        if(!$.data(window, 'listening_'+plugin)) {
-
+        if (!$.data(window, "listening_" + plugin)) {
             //noinspection FunctionWithInconsistentReturnsJS
-            window.onbeforeunload = function() {
+            window.onbeforeunload = function () {
                 if (pending > 0) {
                     return self.options.navWarning;
                 }
             };
 
             // detect dragstart
-            $(window).on('dragenter', function(e) {
+            $(window).on("dragenter", function (e) {
                 drag = 2;
             });
 
             // detect dragstop
-            $(window).on('dragend drop dragleave mouseenter', function(e) {
-                if(drag > 0) {
+            $(window).on("dragend drop dragleave mouseenter", function (e) {
+                if (drag > 0) {
                     --drag;
                 }
             });
 
-            $.data(window, 'listening_'+plugin, true);
+            $.data(window, "listening_" + plugin, true);
         }
 
         // add THIS detect to the window listener
-        $(window).on(
-            'dragenter dragend drop dragleave mouseenter',
-            function (e) {
-                // Add a delay to ensure that dragleave event has processed
-                // before drop event
-                setTimeout(
-                    function() { self.detect(e); },
-                    100
-                )
-            }
-        );
+        $(window).on("dragenter dragend drop dragleave mouseenter", function (e) {
+            // Add a delay to ensure that dragleave event has processed
+            // before drop event
+            setTimeout(function () {
+                self.detect(e);
+            }, 100);
+        });
 
         if (this.options.acceptedFiles) {
             acceptedMime = this.options.acceptedFiles;
         } else {
-            dataAccepts = $(this.element).attr('data-accepts');
+            dataAccepts = $(this.element).attr("data-accepts");
             if (dataAccepts) {
-                acceptedMime = dataAccepts + '/*';
+                acceptedMime = dataAccepts + "/*";
             }
         }
 
-        $(document).on("click", ".dz-error [data-close]", function() {
-            $(this).parents('li, [data-dz-template-item]').fadeOut('slow');
+        $(document).on("click", ".dz-error [data-close]", function () {
+            $(this).parents("li, [data-dz-template-item]").fadeOut("slow");
         });
 
         var myDropzone = new Dropzone(this.element, {
-        // $(this.element).dropzone({
+            // $(this.element).dropzone({
             clickable: this.options.clickable,
             previewsContainer: this.options.previewsContainer,
             createImageThumbnails: this.options.createImageThumbnails,
@@ -156,10 +152,12 @@
             timeout: 1800000,
             dictDefaultMessage: this.options.dictDefaultMessage,
             dictFallbackMessage: this.options.dictFallbackMessage,
-            previewTemplate: this.options.previewTemplate ? $(this.options.previewTemplate).detach().html() : this.createTemplate(this.options.tplWrap),
+            previewTemplate: this.options.previewTemplate
+                ? $(this.options.previewTemplate).detach().html()
+                : this.createTemplate(this.options.tplWrap),
 
             // expose dropzone methods
-            init: function() {
+            init: function () {
                 self.checkState();
 
                 //fileDrop instances should not be clickable, as they weren't before
@@ -167,20 +165,28 @@
                 //and the options.clickable property is not being considered, so the
                 //button still appears despite it being set to false on all fileDrop instances
                 if (!this.options.clickable) {
-                    const dzMessage = this.element.querySelector('.dz-message');
-                    const dzButton = this.element.querySelector('.dz-button');
+                    const dzMessage = this.element.querySelector(".dz-message");
+                    const dzButton = this.element.querySelector(".dz-button");
                     if (dzButton !== null) {
                         dzMessage.removeChild(dzButton);
                         dzMessage.textContent = dzButton.textContent;
                     }
                 }
 
-                this.on('sending',        function() { self.options.sending.apply(this, arguments) });
-                this.on('uploadprogress', function() { self.options.uploadprogress.apply(this, arguments); });
-                this.on('success',        function() { self.options.success.apply(this, arguments); });
-                this.on('error',          function() { self.options.error.apply(this, arguments); });
+                this.on("sending", function () {
+                    self.options.sending.apply(this, arguments);
+                });
+                this.on("uploadprogress", function () {
+                    self.options.uploadprogress.apply(this, arguments);
+                });
+                this.on("success", function () {
+                    self.options.success.apply(this, arguments);
+                });
+                this.on("error", function () {
+                    self.options.error.apply(this, arguments);
+                });
 
-                this.on('addedfile', function(file) {
+                this.on("addedfile", function (file) {
                     ++pending;
                     if (self.options.refreshSelector) {
                         window.clearTimeout(self._tt);
@@ -189,18 +195,15 @@
                     self.checkState();
                 });
 
-                this.on('complete', function(file) {
+                this.on("complete", function (file) {
                     --pending;
-                    self.options.complete.apply(this, [file])
+                    self.options.complete.apply(this, [file]);
                 });
 
-                this.on('queuecomplete',  function() {
+                this.on("queuecomplete", function () {
                     if (self.options.refreshSelector) {
                         self._tt = window.setTimeout(function () {
-                            $.post(
-                                self.options.refreshUrl,
-                                self.options.refreshData
-                            ).done(function(data) {
+                            $.post(self.options.refreshUrl, self.options.refreshData).done(function (data) {
                                 /**
                                  * Everytime a file is being uploaded, the component gets refreshed.
                                  * With that when there's an error, the message gets automatically dismissed as well.
@@ -215,14 +218,13 @@
                     }
 
                     self.options.queuecomplete.apply(this, arguments);
-
                 });
 
                 // affect global state
-                this.on('dragenter', function(file) {
+                this.on("dragenter", function (file) {
                     drag = 2;
                 });
-            }
+            },
         });
     }
 
@@ -231,9 +233,9 @@
             e = $(this.options.refreshSelector);
 
         if (containerEmpty && this.options.dictDefaultMessage && this.options.showIfEmpty) {
-            e.addClass('dragging');
+            e.addClass("dragging");
         } else {
-            e.removeClass('dragging');
+            e.removeClass("dragging");
         }
     };
 
@@ -241,9 +243,9 @@
         event.preventDefault();
 
         var i,
-            self     = this,
+            self = this,
             dragging = [],
-            native   = event.originalEvent;
+            native = event.originalEvent;
 
         // read global state
         if (!drag) {
@@ -262,29 +264,29 @@
         self._wrap.addClass(self.options.wrapClass);
 
         // no datatransfer object available, ignore this
-        if (typeof native.dataTransfer == 'undefined' || native.dataTransfer == null) {
+        if (typeof native.dataTransfer == "undefined" || native.dataTransfer == null) {
             return;
         }
 
         var dt = native.dataTransfer;
 
         // don't got files, ignore this
-        if(!containsFiles(native)) {
+        if (!containsFiles(native)) {
             return;
         }
 
         // drop event, will be picked up by dropzone
-        if(!(typeof dt.files == 'undefined' || dt.files == null || dt.files.length == 0)) {
+        if (!(typeof dt.files == "undefined" || dt.files == null || dt.files.length == 0)) {
             return;
         }
 
         // attempt to read the items array, if data not available, defer back to generic
-        var fileItems = dt.items || [{type: 'unknown/mime'}],
-            mime = '';
+        var fileItems = dt.items || [{ type: "unknown/mime" }],
+            mime = "";
 
         // update wrapper with reference to what we're dragging around
         for (i = 0; i < fileItems.length || 0; ++i) {
-            mime = 'mime-' + (fileItems[i].type.match(/[^/]+/) || 'binary');
+            mime = "mime-" + (fileItems[i].type.match(/[^/]+/) || "binary");
             self._wrap.addClass(mime);
             dragging.push(mime);
         }
@@ -292,31 +294,35 @@
         self._dragging = dragging;
     };
 
-    FileDrop.prototype.createTemplate = function(tpl) {
+    FileDrop.prototype.createTemplate = function (tpl) {
         var e = $(this.element);
 
-        if(e.find('.dz-preview').length) {
-            var template = outerHTML(e.find('.dz-preview')[0]);
-            e.html('');
+        if (e.find(".dz-preview").length) {
+            var template = outerHTML(e.find(".dz-preview")[0]);
+            e.html("");
             return template;
         }
 
         var t = $(tpl);
 
-        var isself = t.find('.dz-preview').length ? false : true;
+        var isself = t.find(".dz-preview").length ? false : true;
 
-        e = isself ? t : t.find('.dz-preview');
+        e = isself ? t : t.find(".dz-preview");
 
         // Hardcoding the static URL will be good enough.
         // I can see no place which actually creates a template instead of
         // having it be passed in.
-        e.addClass('dz-file-preview')
-            .append($('<div class="dz-details" />')
-                .append($('<div class="dz-filename" />').html('<span data-dz-name></span>'))
-                .append('<img class="dz-pending" width="16" height="16" src="/static/images/foundation/preloader.gif" />'))
+        e.addClass("dz-file-preview")
+            .append(
+                $('<div class="dz-details" />')
+                    .append($('<div class="dz-filename" />').html("<span data-dz-name></span>"))
+                    .append(
+                        '<img class="dz-pending" width="16" height="16" src="/static/images/foundation/preloader.gif" />'
+                    )
+            )
             .append($('<div class="dz-progress" />').html('<span class="dz-upload"></span>'));
 
-        if(isself) {
+        if (isself) {
             return outerHTML(t.append(e)[0]);
         }
 
@@ -329,14 +335,14 @@
      * @param options
      * @returns {each|*}
      */
-    $.fn[plugin] = function(options) {
-        if(!Dropzone.isBrowserSupported()) {
+    $.fn[plugin] = function (options) {
+        if (!Dropzone.isBrowserSupported()) {
             return this;
         }
 
-        return this.each(function() {
-            if(!$.data(this, 'plugin_' + plugin) && $(this).is('form')) {
-                $.data(this, 'plugin_' + plugin, new FileDrop(this, options));
+        return this.each(function () {
+            if (!$.data(this, "plugin_" + plugin) && $(this).is("form")) {
+                $.data(this, "plugin_" + plugin, new FileDrop(this, options));
             }
         });
     };
@@ -350,14 +356,17 @@
      */
     function outerHTML(node) {
         // if IE, Chrome take the internal method otherwise build one
-        return node.outerHTML || (
-            function(n){
-                var div = document.createElement('div'), h;
-                div.appendChild( n.cloneNode(true) );
+        return (
+            node.outerHTML ||
+            (function (n) {
+                var div = document.createElement("div"),
+                    h;
+                div.appendChild(n.cloneNode(true));
                 h = div.innerHTML;
                 div = null;
                 return h;
-            })(node);
+            })(node)
+        );
     }
 
     /**
@@ -376,9 +385,7 @@
         }
         return false;
     }
-
-}(jQuery, window, document, Dropzone));
+})(jQuery, window, document, Dropzone);
 
 // since we're using fileDrop, don't autodiscover dropzones
 Dropzone.autoDiscover = false;
-

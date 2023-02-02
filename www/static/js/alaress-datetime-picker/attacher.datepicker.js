@@ -13,12 +13,12 @@
 (function ($) {
     attachAlaressDatePicker = function () {
         var $dateinput = $(this);
-        if ($dateinput.attr('data-datepicker-id') === undefined) {
+        if ($dateinput.attr("data-datepicker-id") === undefined) {
             $dateinput.alaressDateTimePicker();
         }
     };
 
     $(function () {
-        $('[data-datepicker]').each(attachAlaressDatePicker);
+        $("[data-datepicker]").each(attachAlaressDatePicker);
     });
 })(jQuery);

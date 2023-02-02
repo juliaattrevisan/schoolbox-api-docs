@@ -5,16 +5,14 @@
      * @param options
      */
     $.fn.eventModify = function (options) {
-
         /* Optional parameter
          */
-        options = options || {}
+        options = options || {};
 
         /* Store the config in this instance so private methods
          * can access it
          */
         var config = init(options, this);
-
 
         /* Form validator
          */
@@ -37,11 +35,11 @@
         function init(options, element) {
             var defaults = {
                 element: element,
-                functionLabel: '',
-                deleteButton: $()
-            }
+                functionLabel: "",
+                deleteButton: $(),
+            };
 
-            var derived = {}
+            var derived = {};
 
             var merged = $.extend(defaults, derived, options);
 
@@ -54,22 +52,22 @@
         function setupRepeat() {
             // TODO move this to hideWatch plugin (once we apply rules conditionally)
             var showRepeats = function () {
-                var repeatInput = config.element.find('input[name=repeat_until]');
-                if ($(this).val() !== '') {
-                    $('#repeatUntil').show();
-                    $('[data-repeat-until]').removeClass('hide');
+                var repeatInput = config.element.find("input[name=repeat_until]");
+                if ($(this).val() !== "") {
+                    $("#repeatUntil").show();
+                    $("[data-repeat-until]").removeClass("hide");
                     if (repeatInput.length) {
-                        repeatInput.rules('add', 'required');
+                        repeatInput.rules("add", "required");
                     }
                 } else {
-                    $('#repeatUntil, [data-repeat-until]').hide();
-                    $('[data-repeat-until]').addClass('hide');
+                    $("#repeatUntil, [data-repeat-until]").hide();
+                    $("[data-repeat-until]").addClass("hide");
                     if (repeatInput.length) {
-                        repeatInput.rules('remove', 'required');
+                        repeatInput.rules("remove", "required");
                     }
                 }
             };
-            var repeatSelector = config.element.find('select[name=repeat]');
+            var repeatSelector = config.element.find("select[name=repeat]");
             repeatSelector.change(showRepeats);
             showRepeats.apply(repeatSelector);
         }
@@ -83,29 +81,29 @@
          * @param deleteButton
          */
         function setupDeleteActions(deleteButton) {
-            var multi = $('#repeat-reminder, [data-repeat-reminder]').length != 0;
+            var multi = $("#repeat-reminder, [data-repeat-reminder]").length != 0;
             if (multi) {
-                deleteButton.on('click', function (event) {
+                deleteButton.on("click", function (event) {
                     event.preventDefault();
                     var dialog = $('[data-dialog="bulk-delete"]');
-                    dialog.foundation('reveal', 'open');
+                    dialog.foundation("reveal", "open");
                     // Do stuff with buttons
                     setupBulkDialogEvents(
                         dialog,
                         function () {
                             // Add self to href
-                            $.post(deleteButton.attr('href'), {
-                                id: $('input[name=id]').val(),
-                                efficacy: 'self'
+                            $.post(deleteButton.attr("href"), {
+                                id: $("input[name=id]").val(),
+                                efficacy: "self",
                             }).done(function (response) {
                                 window.location.href = response.callbackUrl;
                             });
                         },
                         function () {
                             // Add series to href
-                            $.post(deleteButton.attr('href'), {
-                                id: $('input[name=id]').val(),
-                                efficacy: 'series'
+                            $.post(deleteButton.attr("href"), {
+                                id: $("input[name=id]").val(),
+                                efficacy: "series",
                             }).done(function (response) {
                                 window.location.href = response.callbackUrl;
                             });
@@ -113,20 +111,20 @@
                     );
                 });
             } else {
-                deleteButton.on('click', function (event) {
+                deleteButton.on("click", function (event) {
                     event.preventDefault();
                     deleteButton.confirmDialog({
-                        text: 'Are you sure you want to delete this event?',
-                        confirmLabel: 'Delete',
+                        text: "Are you sure you want to delete this event?",
+                        confirmLabel: "Delete",
                         confirmEvent: function () {
-                            $.post(deleteButton.attr('href'), {
-                                id: $('input[name=id]').val()
+                            $.post(deleteButton.attr("href"), {
+                                id: $("input[name=id]").val(),
                             }).done(function (response) {
                                 window.location.href = response.callbackUrl;
                             });
-                        }
+                        },
                     });
-                })
+                });
             }
         }
 
@@ -139,25 +137,28 @@
          */
         function setupBulkDialogEvents(dialog, selfCallback, seriesCallback) {
             // Rebind events on open/close/cancel
-            dialog.find('[data-action="self"]')
-                .off('click')
-                .on('click', function (e) {
+            dialog
+                .find('[data-action="self"]')
+                .off("click")
+                .on("click", function (e) {
                     e.preventDefault();
-                    dialog.foundation('reveal', 'close');
+                    dialog.foundation("reveal", "close");
                     selfCallback();
                 });
-            dialog.find('[data-action="series"]')
-                .off('click')
-                .on('click', function (e) {
+            dialog
+                .find('[data-action="series"]')
+                .off("click")
+                .on("click", function (e) {
                     e.preventDefault();
-                    dialog.foundation('reveal', 'close');
+                    dialog.foundation("reveal", "close");
                     seriesCallback();
                 });
-            dialog.find('[data-action="cancel"]')
-                .off('click')
-                .on('click', function (e) {
+            dialog
+                .find('[data-action="cancel"]')
+                .off("click")
+                .on("click", function (e) {
                     e.preventDefault();
-                    dialog.foundation('reveal', 'close');
+                    dialog.foundation("reveal", "close");
                 });
         }
 
@@ -179,7 +180,7 @@
              */
             var validateFolderSelected = function () {
                 if ($('select[name="level"]').length) {
-                    return parseInt($('select[name=level]').val()) == 2;
+                    return parseInt($("select[name=level]").val()) == 2;
                 }
 
                 return false;
@@ -191,57 +192,57 @@
              */
             var isRepeating = function () {
                 if ($('select[name="repeat"]').length) {
-                    return '' !== $('select[name=repeat]').val();
+                    return "" !== $("select[name=repeat]").val();
                 }
                 return false;
             };
 
             $(config.element).alaressValidate({
                 rules: {
-                    'campus[]': {
+                    "campus[]": {
                         required: {
-                            depends: validateCampusSelected
+                            depends: validateCampusSelected,
                         },
                         minlength: {
                             param: 1,
-                            depends: validateCampusSelected
-                        }
+                            depends: validateCampusSelected,
+                        },
                     },
-                    'roles[]': {
+                    "roles[]": {
                         required: {
-                            depends: validateCampusSelected
+                            depends: validateCampusSelected,
                         },
                         minlength: {
                             param: 1,
-                            depends: validateCampusSelected
-                        }
+                            depends: validateCampusSelected,
+                        },
                     },
-                    'folder[]': {
+                    "folder[]": {
                         required: {
-                            depends: validateFolderSelected
+                            depends: validateFolderSelected,
                         },
                         minlength: {
                             param: 1,
-                            depends: validateFolderSelected
-                        }
+                            depends: validateFolderSelected,
+                        },
                     },
                     startDate: {
                         required: true,
-                        datepickerDate: true
+                        datepickerDate: true,
                     },
                     endDate: {
                         required: true,
-                        datepickerDate: true
+                        datepickerDate: true,
                     },
                     repeat_until: {
                         datepickerDate: {
                             param: true,
-                            depends: isRepeating
-                        }
+                            depends: isRepeating,
+                        },
                     },
                     publishDate: {
-                        datepickerDate: true
-                    }
+                        datepickerDate: true,
+                    },
                 },
 
                 /**
@@ -257,21 +258,21 @@
                 submitHandler: function (form) {
                     // Find the submit button for this form and disable it,
                     // to avoid accidental multiple requests
-                    $('#calendar-modify-submit').prop("disabled", true);
+                    $("#calendar-modify-submit").prop("disabled", true);
 
-                    var multi = $('#repeat-reminder, [data-repeat-reminder]').length != 0;
+                    var multi = $("#repeat-reminder, [data-repeat-reminder]").length != 0;
                     if (multi) {
                         // series - show a dialog
                         var dialog = $('[data-dialog="bulk-modify"]');
-                        dialog.foundation('reveal', 'open');
+                        dialog.foundation("reveal", "open");
                         setupBulkDialogEvents(
                             dialog,
                             function () {
-                                $('#efficacy').val('self');
+                                $("#efficacy").val("self");
                                 form.submit();
                             },
                             function () {
-                                $('#efficacy').val('series');
+                                $("#efficacy").val("series");
                                 form.submit();
                             }
                         );
@@ -279,8 +280,8 @@
                         // single event - just submit
                         form.submit();
                     }
-                }
+                },
             });
         }
-    }
+    };
 })(jQuery);

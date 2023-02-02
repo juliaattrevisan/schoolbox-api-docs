@@ -1,8 +1,8 @@
-import { createApp } from 'vue';
-import PastoralRecordComments from './pastoral-record-comments';
+import { createApp } from "vue";
+import PastoralRecordComments from "./pastoral-record-comments";
 
 createApp({
     components: {
         PastoralRecordComments,
-    }
-}).mount('#pastoral-record-comments-container-private');
+    },
+}).mount("#pastoral-record-comments-container-private");

@@ -3,20 +3,18 @@
  * sends off the data to settings/members stores
  */
 
-import { defineStore } from 'pinia';
-import Endpoints from '../mgEndpoints';
-import { useSettingsStore } from './mgSettingsStore';
-import { useMembersStore } from './mgMembersStore';
+import { defineStore } from "pinia";
+import Endpoints from "../mgEndpoints";
+import { useSettingsStore } from "./mgSettingsStore";
+import { useMembersStore } from "./mgMembersStore";
 
-
-export const useStore = defineStore('manageGroup', {
-
+export const useStore = defineStore("manageGroup", {
     state: () => ({
         isLoading: true, //to display loading note
         hasLoadError: false, //to display loading error
         isProcessing: false, //to notify that an action is taking place, like updating a member access
         id: 0, //the id of the group
-        name: '', //the name of the group
+        name: "", //the name of the group
         toastEl: null, //so we don't need to pass it all around as a prop
         showSetting: false, // display setting modal
         groupStaffOnly: false, // restrict only staff to be group admin
@@ -24,26 +22,23 @@ export const useStore = defineStore('manageGroup', {
     }),
 
     getters: {
-
         /**
          * When load is complete and and was a success
          *
          * @returns { Boolean }
          */
-        hasLoadedOk () {
+        hasLoadedOk() {
             return !this.isLoading && !this.hasLoadError;
         },
-
     },
 
     actions: {
-
         /**
          * load all the group data
          *
          * @param { String }
          */
-        async loadData () {
+        async loadData() {
             try {
                 const response = await fetch(Endpoints.GROUP_DATA);
                 if (response.ok) {
@@ -65,7 +60,5 @@ export const useStore = defineStore('manageGroup', {
                 this.isLoading = false; //otherwise show the table
             }
         },
-
     },
-
 });

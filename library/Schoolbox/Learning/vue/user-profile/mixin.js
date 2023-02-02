@@ -11,5 +11,5 @@ export default {
         emitUpdateToAllUserProfileFeeds() {
             document.dispatchEvent(new CustomEvent(constants.events.AWARDS_UPDATED));
         },
-    }
-}
+    },
+};

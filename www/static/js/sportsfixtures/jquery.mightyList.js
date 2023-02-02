@@ -1,11 +1,10 @@
-(function() {
-
+(function () {
     /**
      * Plugin
      *
      * @param options
      */
-    $.fn.mightyList = function(options) {
+    $.fn.mightyList = function (options) {
         options = options || {};
 
         var mightyList = this;
@@ -33,13 +32,13 @@
                 /* When deleting, this is the param containing the
                  * deleted item's id - used asynchronously
                  */
-                deleteKey: 'id',
+                deleteKey: "id",
 
-                listSelector: '[data-item-list]',
+                listSelector: "[data-item-list]",
 
                 /* What am I cloning to create a new row?
                  */
-                templateSelector: '#item-clone',
+                templateSelector: "#item-clone",
 
                 /* Which element to focus when a new record is spawned
                  */
@@ -47,51 +46,54 @@
 
                 /* Callback when a line-item is reverted to its original state. By default, no effect.
                  */
-                onRevert: function (element) { /* noop*/ },
+                onRevert: function (element) {
+                    /* noop*/
+                },
 
                 /* Callback when a new line-item is spawned. By default, no effect.
                  */
-                onCreate: function (element) { /* noop */ },
+                onCreate: function (element) {
+                    /* noop */
+                },
 
                 /* Callback when a line-item is modified. By default, persist to server.
                  */
                 onModify: function (element, newData) {
                     /* Parent container for this row
                      */
-                    var container = element.parents('[data-item]');
+                    var container = element.parents("[data-item]");
 
                     /* Data package
                      */
                     var data = {
-                        entityId: container.attr('data-item'),
-                        name: newData
+                        entityId: container.attr("data-item"),
+                        name: newData,
                     };
 
                     /* Indicator
                      */
-                    var indicator = container.find('[data-save-item]');
+                    var indicator = container.find("[data-save-item]");
 
                     indicator.toastActivate({
-                        text: 'Saving'
+                        text: "Saving",
                     });
 
                     $.ajax({
                         type: "POST",
-                        url:  container.find('[data-action]').attr('data-action'),
+                        url: container.find("[data-action]").attr("data-action"),
                         data: data,
                         success: function (newItem) {
-
                             /* Update all the links, controls and identifiers when you spawn new rows
                              * This is so their controls will work correctly after persisting
                              */
-                            container.attr('data-item', newItem.id);
-                            container.find('[data-delete]').attr('href', newItem.delete);
-                            container.find('[data-action]').attr('data-action', newItem.update);
-                            element.attr('data-item-original-value', newData);
+                            container.attr("data-item", newItem.id);
+                            container.find("[data-delete]").attr("href", newItem.delete);
+                            container.find("[data-action]").attr("data-action", newItem.update);
+                            element.attr("data-item-original-value", newData);
 
                             indicator.toastTimeout({
-                                text: 'Saved',
-                                css: 'success'
+                                text: "Saved",
+                                css: "success",
                             });
 
                             /* Spawn a new row automatically if there are no
@@ -101,12 +103,12 @@
                                 spawnNewRow();
                             }
                         },
-                        error: function() {
+                        error: function () {
                             indicator.toastTimeout({
-                                text: 'Error!',
-                                css: 'alert'
+                                text: "Error!",
+                                css: "alert",
                             });
-                        }
+                        },
                     });
                 },
 
@@ -114,22 +116,21 @@
                  */
                 onDelete: function (element, container) {
                     $(this).confirmDialog({
-                        text: 'Are you sure you want to delete ' + container.find('[data-item-element]').val() + '?',
-                        confirmLabel: 'Delete',
+                        text: "Are you sure you want to delete " + container.find("[data-item-element]").val() + "?",
+                        confirmLabel: "Delete",
                         confirmEvent: function () {
                             var data = [];
 
-                            data[config.deleteKey] = element.attr('data-delete');
+                            data[config.deleteKey] = element.attr("data-delete");
 
                             $.ajax({
                                 type: "POST",
-                                url: element.attr('href'),
+                                url: element.attr("href"),
                                 data: data,
-                                success: function() {
+                                success: function () {
                                     container.remove();
-                                }
-                            }).fail(function(responseText) {
-
+                                },
+                            }).fail(function (responseText) {
                                 /* Tried to delete an already-deleted item?
                                  * Be compliant and just remove it
                                  */
@@ -139,15 +140,14 @@
                                     refreshEmptyStates();
                                 }
                             });
-                        }
+                        },
                     });
-
                 },
 
                 /* Empty State element
                  * Shown when there are no items
                  */
-                emptyState: '.empty-state'
+                emptyState: ".empty-state",
             };
 
             return $.extend(defaults, options);
@@ -158,10 +158,9 @@
          * If you already have an empty row, prompt to use it
          */
         function setupNewItems() {
-            $(config.element).on('click', '[data-item-add]', function(event) {
+            $(config.element).on("click", "[data-item-add]", function (event) {
                 if (canSpawnRow()) {
                     spawnNewRow();
-
                 } else {
                     $(config.element).find(config.focusSelector).last().focus();
                 }
@@ -172,35 +171,32 @@
          * Determine whether the last list item is empty
          */
         function canSpawnRow() {
-            return $(config.element).find(config.listSelector).find(config.focusSelector).last().val() != '';
+            return $(config.element).find(config.listSelector).find(config.focusSelector).last().val() != "";
         }
 
         /**
          * Attach save timeouts to input changes
          */
         function setupPersist() {
-
             /* Remember original value
              *
              * Compare against this in onChange event to determine whether anything
              * changed and needs to be saved
              */
-            $(config.element).on('enter', '[data-item-element]', function() {
+            $(config.element).on("enter", "[data-item-element]", function () {
                 var element = $(this);
 
                 /* Force trim
                  */
                 element.val($.trim(element.val()));
 
-                element.attr('data-item-original-value', element.val());
+                element.attr("data-item-original-value", element.val());
             });
-
 
             /**
              * Save typing based inputs on keyup (with a timeout)
              */
-            $(config.element).on('keyup change', '[data-item-element]', function(event) {
-
+            $(config.element).on("keyup change", "[data-item-element]", function (event) {
                 var self = this;
 
                 /**
@@ -211,12 +207,10 @@
                 /**
                  * Set a new save timeout
                  */
-                mightyList.saveTimeout = window.setTimeout(function() {
+                mightyList.saveTimeout = window.setTimeout(function () {
                     saveElement(self);
                 }, 1000);
-
             });
-
         }
 
         /**
@@ -233,9 +227,9 @@
             /* Only execute if there is data to send
              */
             var newData = $element.val();
-            var originalData = $element.attr('data-item-original-value');
+            var originalData = $element.attr("data-item-original-value");
 
-            if (newData && (newData != originalData)) {
+            if (newData && newData != originalData) {
                 $.when(config.onModify($element, newData)).then(function () {
                     /* Spawn a new row automatically if there are no
                      * empty ones ready to utilise
@@ -260,22 +254,21 @@
          * Remove asynchronously upon confirm
          */
         function setupDelete() {
-            $(config.element).on('click', '[data-delete]', function(event) {
+            $(config.element).on("click", "[data-delete]", function (event) {
                 event.preventDefault();
 
                 var element = $(this);
-                var container = element.parents('[data-item]');
+                var container = element.parents("[data-item]");
 
                 /* Just remove unsaved elements
                  */
-                if (container.attr('data-item') == '') {
+                if (container.attr("data-item") == "") {
                     container.remove();
 
                     refreshEmptyStates();
-                }
+                } else {
                 /* Otherwise confirm deletion
                  */
-                else {
                     $.when(config.onDelete(element, container)).then(refreshEmptyStates);
                 }
             });
@@ -287,17 +280,16 @@
          */
         function refreshEmptyStates() {
             var $element = $(config.element),
-                $empty   = $element.find(config.emptyState),
-                $list    = $element.find(config.listSelector),
-                numItems = $list.find('[data-item]').length;
+                $empty = $element.find(config.emptyState),
+                $list = $element.find(config.listSelector),
+                numItems = $list.find("[data-item]").length;
 
             if (numItems) {
-                $empty.addClass('hide');
-                $list.removeClass('hide');
-            }
-            else {
-                $empty.removeClass('hide');
-                $list.addClass('hide');
+                $empty.addClass("hide");
+                $list.removeClass("hide");
+            } else {
+                $empty.removeClass("hide");
+                $list.addClass("hide");
             }
         }
 
@@ -306,22 +298,20 @@
          */
         function spawnNewRow() {
             var $element = $(config.element),
-                $list    = $element.find(config.listSelector),
-                clone    = $element.find(config.templateSelector).clone(),
-                last     = config.templateSelector.split(' ').pop(),
+                $list = $element.find(config.listSelector),
+                clone = $element.find(config.templateSelector).clone(),
+                last = config.templateSelector.split(" ").pop(),
                 selector = last.match(/([a-z]+)?([^a-z][a-z-_0-9]+)/).pop(),
-                sstring  = selector.substr(1),
-                type     = selector[0];
+                sstring = selector.substr(1),
+                type = selector[0];
 
-            if (type == '#') {
+            if (type == "#") {
                 // remove id
-                clone.removeAttr('id');
-
-            } else if (type == '.') {
+                clone.removeAttr("id");
+            } else if (type == ".") {
                 // remove class
                 clone.removeClass(sstring);
-
-            } else if (type == '[') {
+            } else if (type == "[") {
                 // remove attr
                 clone.removeAttr(sstring);
             }
@@ -338,5 +328,5 @@
 
             config.onCreate(clone);
         }
-    }
-}(jQuery));
+    };
+})(jQuery);

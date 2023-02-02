@@ -3,16 +3,13 @@
  *
  */
 
-
 export default {
-
     methods: {
-
         /**
          * To adjust the UI display,
          * putting everything down the bottom right
          */
-        footerUI_update () {
+        footerUI_update() {
             this.footerUI_pushUIIntoFooterSlot();
         },
 
@@ -22,21 +19,19 @@ export default {
          * the list and current pagination count settings, not all UI elements
          * will always be available, so we need to check for the existence of each.
          */
-        footerUI_pushUIIntoFooterSlot () {
-            const perPageControls = document.querySelector('.VueTables__limit');
+        footerUI_pushUIIntoFooterSlot() {
+            const perPageControls = document.querySelector(".VueTables__limit");
             if (perPageControls) {
                 this.$refs.tableFooter.appendChild(perPageControls);
             }
-            const paginationCount = document.querySelector('.VuePagination__count');
+            const paginationCount = document.querySelector(".VuePagination__count");
             if (paginationCount) {
                 this.$refs.tableFooter.appendChild(paginationCount);
             }
-            const paginationControls = document.querySelector('.VuePagination');
+            const paginationControls = document.querySelector(".VuePagination");
             if (paginationControls) {
                 this.$refs.tableFooter.appendChild(paginationControls);
             }
         },
-
-    }
-
-}
+    },
+};

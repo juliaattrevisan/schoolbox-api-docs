@@ -2,23 +2,20 @@
  * Handles the display state of the curriculum selector modal
  */
 
-import { defineStore } from 'pinia';
-import { useModalSelectedNodesStore } from './csModalSelectedNodesStore';
-
+import { defineStore } from "pinia";
+import { useModalSelectedNodesStore } from "./csModalSelectedNodesStore";
 
 export const useModalStore = defineStore(`csModal`, {
-
     state: () => ({
         isOpen: false, //to notify that the modal is opened / closed
     }),
 
     actions: {
-
         /**
          * to open the modal and show currently selected nodes
          * in the new modal session
          */
-        open () {
+        open() {
             useModalSelectedNodesStore().refresh(); //ensure current selections are reflected in the new modal session
             this.isOpen = true;
         },
@@ -26,7 +23,7 @@ export const useModalStore = defineStore(`csModal`, {
         /**
          * to close the modal, clearing any selected nodes in this modal session
          */
-        cancel () {
+        cancel() {
             useModalSelectedNodesStore().empty();
             this.isOpen = false;
         },
@@ -35,12 +32,10 @@ export const useModalStore = defineStore(`csModal`, {
          * close the modal, also updating the selected nodes to reflect the changes
          * made in this modal session and then clear for another possible modal session
          */
-        select () {
+        select() {
             useModalSelectedNodesStore().update();
             this.isOpen = false;
             useModalSelectedNodesStore().empty();
         },
-
     },
-
-})
+});

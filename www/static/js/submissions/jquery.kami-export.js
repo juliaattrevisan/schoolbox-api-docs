@@ -5,14 +5,13 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-;(function ($, window, document, undefined) {
-
+(function ($, window, document, undefined) {
     var kamiExport,
-        pluginName       = 'kamiExport',
-        cookieNameToken  = 'kamiExportToken',
-        cookieNameStatus = 'kamiExportStatus',
+        pluginName = "kamiExport",
+        cookieNameToken = "kamiExportToken",
+        cookieNameStatus = "kamiExportStatus",
         defaults = {
-            timeout: 120         // after how many seconds should we assume the download failed and re-enable button
+            timeout: 120, // after how many seconds should we assume the download failed and re-enable button
         };
 
     /**
@@ -23,7 +22,7 @@
      * @constructor
      */
     function KamiExport(element, options) {
-        kamiExport         = this;
+        kamiExport = this;
         kamiExport.element = $(element);
         kamiExport.options = $.extend(true, {}, defaults, options);
 
@@ -36,14 +35,14 @@
         updateDownloadToken(kamiExport.element);
 
         // install listeners
-        kamiExport.element.on('click', function (event) {
+        kamiExport.element.on("click", function (event) {
             // We need to prevent multiple clicks on the download button. But we cannot do an async request
             // as the browser blocks async file downloads.
             // @see https://stackoverflow.com/questions/1106377/detect-when-browser-receives-file-download
             var $downloadButton = $(this);
-            $downloadButton.attr('disabled', true);
-            kamiExport.options.toast.toastActivate({text: 'Requesting export...'});
-            checkDownloadFinished($downloadButton, $downloadButton.attr('token'), 1000, 0, kamiExport.options.timeout);
+            $downloadButton.attr("disabled", true);
+            kamiExport.options.toast.toastActivate({ text: "Requesting export..." });
+            checkDownloadFinished($downloadButton, $downloadButton.attr("token"), 1000, 0, kamiExport.options.timeout);
         });
     }
 
@@ -55,8 +54,8 @@
     function updateDownloadToken($downloadButton) {
         removeDownloadToken($downloadButton);
         var token = generateRandomToken(10);
-        $downloadButton.attr('token', token);
-        $downloadButton.attr('href', $downloadButton.attr('href') + '?token=' + token);
+        $downloadButton.attr("token", token);
+        $downloadButton.attr("href", $downloadButton.attr("href") + "?token=" + token);
     }
 
     /**
@@ -64,12 +63,17 @@
      *
      * @param {jQuery} $downloadButton
      */
-    function removeDownloadToken($downloadButton){
-        $downloadButton.removeAttr('token');
+    function removeDownloadToken($downloadButton) {
+        $downloadButton.removeAttr("token");
         // strip the token from the URL, and the '?' char if no other args remain
-        $downloadButton.attr('href', $downloadButton.attr('href').replace(/token=\d+&*/, '').replace(/\?$/, ''));
+        $downloadButton.attr(
+            "href",
+            $downloadButton
+                .attr("href")
+                .replace(/token=\d+&*/, "")
+                .replace(/\?$/, "")
+        );
     }
-
 
     /**
      * Check to see if the download has finished
@@ -82,38 +86,38 @@
      */
     function checkDownloadFinished($downloadButton, token, interval, count, limit) {
         // Has our limit expired?
-        if(count * interval / 1000 >= limit){
+        if ((count * interval) / 1000 >= limit) {
             kamiExport.options.toast.toastTimeout({
-                text: 'No download detected after ' + limit + ' seconds. Assuming failed',
-                css: 'alert'
+                text: "No download detected after " + limit + " seconds. Assuming failed",
+                css: "alert",
             });
             stopPolling($downloadButton);
             return;
         }
         // Has the server finished the request?
         if (token === getCookie(cookieNameToken)) {
-            if ('done' === getCookie(cookieNameStatus)) {
+            if ("done" === getCookie(cookieNameStatus)) {
                 kamiExport.options.toast.toastTimeout({
-                    text: 'Export successful',
-                    css: 'success'
+                    text: "Export successful",
+                    css: "success",
                 });
-            } else if ('pending' === getCookie(cookieNameStatus)) {
+            } else if ("pending" === getCookie(cookieNameStatus)) {
                 kamiExport.options.toast.toastTimeout({
-                    text: 'Export timed out server-side',
-                    css: 'alert'
+                    text: "Export timed out server-side",
+                    css: "alert",
                 });
-            } else if ('error' === getCookie(cookieNameStatus)) {
+            } else if ("error" === getCookie(cookieNameStatus)) {
                 kamiExport.options.toast.toastTimeout({
-                    text: 'Export failed',
-                    css: 'alert'
+                    text: "Export failed",
+                    css: "alert",
                 });
             }
             stopPolling($downloadButton);
             return;
         }
-        setTimeout(function(){
+        setTimeout(function () {
             checkDownloadFinished($downloadButton, token, interval, count + 1, limit);
-        }, interval)
+        }, interval);
     }
 
     /**
@@ -125,9 +129,8 @@
         deleteCookie(cookieNameToken);
         deleteCookie(cookieNameStatus);
         updateDownloadToken($downloadButton);
-        $downloadButton.attr('disabled', false);
+        $downloadButton.attr("disabled", false);
     }
-
 
     /**
      * Read a cookie
@@ -138,10 +141,10 @@
     function getCookie(cname) {
         var name = cname + "=";
         var decodedCookie = decodeURIComponent(document.cookie);
-        var ca = decodedCookie.split(';');
-        for(var i = 0; i <ca.length; i++) {
+        var ca = decodedCookie.split(";");
+        for (var i = 0; i < ca.length; i++) {
             var c = ca[i];
-            while (c.charAt(0) === ' ') {
+            while (c.charAt(0) === " ") {
                 c = c.substring(1);
             }
             if (c.indexOf(name) === 0) {
@@ -159,7 +162,7 @@
     function deleteCookie(cname) {
         var d = new Date();
         d.setTime(d.getTime()); // now
-        var expires = "expires="+d.toUTCString();
+        var expires = "expires=" + d.toUTCString();
         document.cookie = cname + "=empty;" + expires + ";path=/";
     }
 
@@ -170,7 +173,7 @@
      */
     function generateRandomToken(length) {
         var random = Math.random();
-        while(random < 0.1){
+        while (random < 0.1) {
             random *= 10;
         }
         return random.toString().substr(2, length);
@@ -178,9 +181,9 @@
 
     $.fn[pluginName] = function (options) {
         return this.each(function () {
-            if (!$.data(this, 'plugin_' + pluginName)) {
-                $.data(this, 'plugin_' + pluginName, new KamiExport(this, options));
+            if (!$.data(this, "plugin_" + pluginName)) {
+                $.data(this, "plugin_" + pluginName, new KamiExport(this, options));
             }
         });
-    }
+    };
 })(jQuery, window, document);

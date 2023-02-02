@@ -4,14 +4,12 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-;
 (function ($, window, document, undefined) {
-
-    var pluginName = 'svgInline',
+    var pluginName = "svgInline",
         cache = {};
 
     var defaults = {
-        selector: 'img[src$=".svg"]'
+        selector: 'img[src$=".svg"]',
     };
 
     /**
@@ -27,15 +25,16 @@
         this.element = element;
         this.options = $.extend(true, {}, defaults, options);
 
-        $(this.element).find(this.options.selector).each(function() {
-            var $img = $(this);
+        $(this.element)
+            .find(this.options.selector)
+            .each(function () {
+                var $img = $(this);
 
-            getCached($img, function ($svg) {
-                // Replace image with new SVG
-                $img.replaceWith($svg.clone());
+                getCached($img, function ($svg) {
+                    // Replace image with new SVG
+                    $img.replaceWith($svg.clone());
+                });
             });
-
-        });
     }
 
     /**
@@ -43,53 +42,50 @@
      * @param {Function} completeCallback
      */
     function getCached($img, completeCallback) {
+        var imgID = $img.attr("id"),
+            imgClass = $img.attr("class"),
+            imgURL = $img.attr("src"),
+            imgSize = $img.attr("width");
 
-        var imgID    = $img.attr('id'),
-            imgClass = $img.attr('class'),
-            imgURL   = $img.attr('src'),
-            imgSize  = $img.attr('width');
-
-        if (typeof cache[imgURL] == 'undefined') {
+        if (typeof cache[imgURL] == "undefined") {
             // promise to retrieve and cache
-            cache[imgURL] = $.get(imgURL, null, 'xml').then(function (data) {
-                // Get the SVG tag, ignore the rest
-                var $svg = $(data).find('svg');
+            cache[imgURL] = $.get(imgURL, null, "xml")
+                .then(function (data) {
+                    // Get the SVG tag, ignore the rest
+                    var $svg = $(data).find("svg");
 
-                // Add replaced image's ID to the new SVG
-                if (typeof imgID !== 'undefined') {
-                    $svg = $svg.attr('id', imgID);
-                }
-                // Add replaced image's classes to the new SVG
-                if (typeof imgClass !== 'undefined') {
-                    $svg = $svg.attr('class', imgClass+' replaced-svg');
-                }
-                if (typeof imgSize !== 'undefined') {
-                    $svg = $svg.attr('width', imgSize);
-                }
+                    // Add replaced image's ID to the new SVG
+                    if (typeof imgID !== "undefined") {
+                        $svg = $svg.attr("id", imgID);
+                    }
+                    // Add replaced image's classes to the new SVG
+                    if (typeof imgClass !== "undefined") {
+                        $svg = $svg.attr("class", imgClass + " replaced-svg");
+                    }
+                    if (typeof imgSize !== "undefined") {
+                        $svg = $svg.attr("width", imgSize);
+                    }
 
-                // Remove any invalid XML tags as per http://validator.w3.org
-                $svg = $svg.removeAttr('xmlns:a');
+                    // Remove any invalid XML tags as per http://validator.w3.org
+                    $svg = $svg.removeAttr("xmlns:a");
 
-                var df = $.Deferred();
+                    var df = $.Deferred();
 
-                df.resolve($svg);
+                    df.resolve($svg);
 
-                return df;
-
-            }, null).promise();
+                    return df;
+                }, null)
+                .promise();
         }
 
         cache[imgURL].done(completeCallback);
     }
 
-
-
     $.fn[pluginName] = function (options) {
         return this.each(function () {
-            if (!$.data(this, 'plugin_' + pluginName)) {
-                $.data(this, 'plugin_' + pluginName, new SvgInline(this, options));
+            if (!$.data(this, "plugin_" + pluginName)) {
+                $.data(this, "plugin_" + pluginName, new SvgInline(this, options));
             }
         });
-    }
-
+    };
 })(jQuery, window, document);

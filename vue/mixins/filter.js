@@ -1,13 +1,13 @@
-import { stringify } from 'qs';
-import axios from 'axios';
+import { stringify } from "qs";
+import axios from "axios";
 
-const ON_FILTER_CHANGE = 'on-filter-change';
+const ON_FILTER_CHANGE = "on-filter-change";
 
 export default {
-    data () {
+    data() {
         return {
-            filter_endpoint: '' //the endpoint of the filter action
-        }
+            filter_endpoint: "", //the endpoint of the filter action
+        };
     },
     methods: {
         /**
@@ -18,7 +18,7 @@ export default {
          *                            selections change, and that has its own
          *                            toast so don't show another.
          */
-        filter_load (showToast) {
+        filter_load(showToast) {
             this.data = [];
             this.filter_append(null, showToast, true);
         },
@@ -31,7 +31,7 @@ export default {
          *
          * @returns {Object}
          */
-        filter_build_params () {
+        filter_build_params() {
             return {};
         },
 
@@ -42,7 +42,7 @@ export default {
          * @param {Boolean}     showToast
          * @param {Boolean}     clear     Is the data cleared before appending?
          */
-        filter_append (cursor, showToast, clear) {
+        filter_append(cursor, showToast, clear) {
             let params = this.filter_build_params();
             if (cursor) {
                 params.cursor = cursor;
@@ -51,38 +51,38 @@ export default {
                 params.filters = this.selectedFilters;
             }
             if (showToast) {
-                this.$refs.toast.activate('Loading...');
+                this.$refs.toast.activate("Loading...");
             }
             let config = {
-                params:           params,
-                paramsSerializer: params => stringify(params, { arrayFormat: 'brackets' } ),
-            }
+                params: params,
+                paramsSerializer: (params) => stringify(params, { arrayFormat: "brackets" }),
+            };
             axios
                 .get(this.filter_endpoint, config)
-                .then(response => {
+                .then((response) => {
                     if (clear) {
                         this.data = [];
                     }
-                    this.data = this.data.concat(response?.data?.data ? response.data.data : [])
-                    this.metadata.count  = response?.data?.metadata?.count  ? response.data.metadata.count  : 0;
+                    this.data = this.data.concat(response?.data?.data ? response.data.data : []);
+                    this.metadata.count = response?.data?.metadata?.count ? response.data.metadata.count : 0;
                     this.metadata.cursor = response?.data?.metadata?.cursor ? response.data.metadata.cursor : null;
                     if (showToast) {
-                        this.$refs.toast.timeout('Loaded', true);
+                        this.$refs.toast.timeout("Loaded", true);
                     }
                 })
                 .catch(() => {
                     if (showToast) {
-                        this.$refs.toast.timeout('Loading failed', false);
+                        this.$refs.toast.timeout("Loading failed", false);
                     }
                 })
-                .finally(() => this.showSkeletonLoader = false);
+                .finally(() => (this.showSkeletonLoader = false));
         },
 
         /**
          * Helper for emitting the change event: this happens when reloading the filter
          */
-        filter_emitChange () {
+        filter_emitChange() {
             this.$emit(ON_FILTER_CHANGE);
         },
     },
-}
+};

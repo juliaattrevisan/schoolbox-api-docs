@@ -1,11 +1,10 @@
-(function() {
-
+(function () {
     /**
      * Course Selector Modal
      *
      * @param options
      */
-    $.fn.courseSelector = function(options) {
+    $.fn.courseSelector = function (options) {
         options = options || {};
 
         var config = init(options, $(this));
@@ -21,34 +20,32 @@
          */
         function init(options, element) {
             var defaults = {
-
                 /* The element which activates the Course Selector
                  */
                 element: element,
 
                 courseSelector: {
-
                     /* Where the Course List is located
                      */
-                    url: '/course/list/ajax',
+                    url: "/course/list/ajax",
 
                     // any additional params to send with the AJAX request
                     query: {
                         hasBreadcrumb: false,
-                        hasAdd:        false,
-                        hasTot:        true,
-                        linkToUnits:   false
+                        hasAdd: false,
+                        hasTot: true,
+                        linkToUnits: false,
                     },
 
                     /* Ajax requests spawn inside this element
                      * These should reference the same element
                      */
-                    modalIdentifier: '#course-selector-modal',
-                    modal: $('#course-selector-modal'),
+                    modalIdentifier: "#course-selector-modal",
+                    modal: $("#course-selector-modal"),
 
                     /* This element is used to filter the ajax request contents
                      */
-                    filter: '[data-course-selector-filter]',
+                    filter: "[data-course-selector-filter]",
 
                     /* Ajax update occurs $delay milliseconds after last keypress
                      * is detected in config.courseSelector.filter
@@ -57,8 +54,8 @@
 
                     /* CSS rule for indicating searching is happening
                      */
-                    loadingCss: 'course-selector-search-loading'
-                }
+                    loadingCss: "course-selector-search-loading",
+                },
             };
 
             return $.extend(true, {}, defaults, options);
@@ -76,16 +73,14 @@
          * stopped typing before firing an ajax missile out
          */
         function courseSelector() {
-
             /* After you finish typing, spawn search results
              */
-            $('body').on('keydown', config.courseSelector.filter, function(event) {
+            $("body").on("keydown", config.courseSelector.filter, function (event) {
                 if (this.courseFilterTimeout) {
                     clearTimeout(this.courseFilterTimeout);
                 }
 
                 this.courseFilterTimeout = setTimeout(function () {
-
                     // clone the params so we can extend them
                     var params = $.extend(true, {}, config.courseSelector.query);
 
@@ -94,25 +89,23 @@
 
                     addLoadingState(config.courseSelector.filter);
 
-                    $.get(config.courseSelector.url, params, function(responseText) {
-                        $('#course-selector-results').html(responseText);
+                    $.get(config.courseSelector.url, params, function (responseText) {
+                        $("#course-selector-results").html(responseText);
 
                         removeLoadingState(config.courseSelector.filter);
 
                         if (config.courseSelector.addFilterQueryToUrlHistory) {
-                            $('[data-course-link]').click(
-                                function (e) {
-                                    // Add filter query to URL history before redirecting to link destination page.  This
-                                    // ensures that when the user clicks the 'back' button from the link destination page,
-                                    // the filter query will be remembered on the results list page.
-                                    let filterQuery = $('[data-course-selector-filter]').val();
-                                    let url = new URL(window.location);
-                                    url.searchParams.set('filterQuery', filterQuery.trim());
-                                    if (filterQuery.trim() !== '') {
-                                        history.pushState({}, '', url);
-                                    }
+                            $("[data-course-link]").click(function (e) {
+                                // Add filter query to URL history before redirecting to link destination page.  This
+                                // ensures that when the user clicks the 'back' button from the link destination page,
+                                // the filter query will be remembered on the results list page.
+                                let filterQuery = $("[data-course-selector-filter]").val();
+                                let url = new URL(window.location);
+                                url.searchParams.set("filterQuery", filterQuery.trim());
+                                if (filterQuery.trim() !== "") {
+                                    history.pushState({}, "", url);
                                 }
-                            );
+                            });
                         }
                     });
                 }, config.courseSelector.delay);
@@ -136,17 +129,16 @@
         function removeLoadingState(element) {
             $(element).removeClass(config.courseSelector.loadingCss);
         }
-    }
-}(jQuery));
+    };
+})(jQuery);
 
-(function() {
-
+(function () {
     /**
      * Plugin
      *
      * @param options
      */
-    $.fn.courseSelectorModal = function(options) {
+    $.fn.courseSelectorModal = function (options) {
         options = options || {};
 
         var config = init(options, $(this));
@@ -162,7 +154,6 @@
          */
         function init(options, element) {
             var defaults = {
-
                 /* The element acted upon by plugin
                  */
                 element: element,
@@ -172,32 +163,30 @@
                  * version for .data() accessor
                  */
                 activator: {
-                    selector: '[data-course-selector]',
-                    instanceID: 'course-selector',
-                    folderID:   'course-folder'
+                    selector: "[data-course-selector]",
+                    instanceID: "course-selector",
+                    folderID: "course-folder",
                 },
 
                 courseSelector: {
-
                     /* Where the Course List is located
                      */
-                    url: '/course/list',
+                    url: "/course/list",
 
                     /* Ajax requests spawn inside this element
                      * These should reference the same element
                      */
-                    modalIdentifier: '#course-selector-modal',
-                    modal: $('#course-selector-modal'),
+                    modalIdentifier: "#course-selector-modal",
+                    modal: $("#course-selector-modal"),
 
                     /* This element is used to filter the ajax request contents
                      */
-                    filter: '[data-course-selector-filter]',
+                    filter: "[data-course-selector-filter]",
 
-                    addFilterQueryToUrlHistory: false
+                    addFilterQueryToUrlHistory: false,
                 },
 
-                onCourseSelect: function() {
-                }
+                onCourseSelect: function () {},
             };
 
             return $.extend(true, {}, defaults, options);
@@ -207,22 +196,21 @@
          * Set up modal behaviour
          */
         function setupModal() {
-            $(document).on('opened.fndtn.reveal', config.courseSelector.modalIdentifier, function () {
+            $(document).on("opened.fndtn.reveal", config.courseSelector.modalIdentifier, function () {
                 config.courseSelector.modal.find(config.courseSelector.filter).focus();
             });
 
             /* Spawn modal
              */
-            $(document).on('click', config.activator.selector, function(event) {
+            $(document).on("click", config.activator.selector, function (event) {
                 event.preventDefault();
                 var query = {};
 
                 // Find the folder ID that the course should be imported to
                 var folderID = $(this).data(config.activator.folderID);
-                if(folderID) {
+                if (folderID) {
                     query.folder = folderID;
-                }
-                else {
+                } else {
                     query = $.extend(true, {}, config.courseSelector.query);
                 }
 
@@ -232,9 +220,9 @@
                     query.component = compInstId;
                 }
 
-                config.courseSelector.modal.foundation('reveal', 'open', {
+                config.courseSelector.modal.foundation("reveal", "open", {
                     url: config.courseSelector.url,
-                    data: query
+                    data: query,
                 });
             });
 
@@ -242,5 +230,5 @@
              */
             config.onCourseSelect();
         }
-    }
-}(jQuery));
+    };
+})(jQuery);

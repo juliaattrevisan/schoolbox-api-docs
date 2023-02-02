@@ -1,5 +1,4 @@
-(function() {
-
+(function () {
     /**
      * Manufactures a NCEA generic stacked barchart
      *
@@ -7,7 +6,7 @@
      * @copyright   Copyright 2019, Schoolbox Pty Ltd
      * @link        https://schoolbox.com.au/
      */
-    $.fn.ncea_stackedBar = function(options) {
+    $.fn.ncea_stackedBar = function (options) {
         options = options || {};
 
         var config = init(options, this);
@@ -27,7 +26,7 @@
 
                 /* Graph title
                  */
-                title: '',
+                title: "",
 
                 /* Colour stack for the bars
                  */
@@ -38,7 +37,7 @@
                  * Note that in horizontal barcharts x and y are
                  * used conversely in highcharts
                  */
-                yAxisTitle: '',
+                yAxisTitle: "",
 
                 /* Bar Names
                  */
@@ -50,15 +49,14 @@
 
                 /* Type of stacking
                  */
-                stacking: 'percent',
+                stacking: "percent",
 
                 /* Stack Labels
                  */
-                stackLabels: false
+                stackLabels: false,
             };
 
-            var derived = {
-            };
+            var derived = {};
 
             return $.extend(defaults, derived, options);
         }
@@ -67,12 +65,11 @@
          * Graph it
          */
         function graph() {
-
             /* Hide graph if no data is present
              */
             var hasData = false;
 
-            for (var i = 0; (i < config.series.length) && !hasData; i++) {
+            for (var i = 0; i < config.series.length && !hasData; i++) {
                 if (config.series[i].data.length) {
                     hasData = true;
                 }
@@ -81,58 +78,56 @@
             if (hasData) {
                 $(config.element).highcharts({
                     chart: {
-                        type: 'bar'
+                        type: "bar",
                     },
                     colors: config.colors,
                     title: {
-                        text: config.title
+                        text: config.title,
                     },
                     xAxis: {
-                        categories: config.categories
-
+                        categories: config.categories,
                     },
                     yAxis: {
                         allowDecimals: false,
                         min: 0,
                         reversedStacks: false,
                         title: {
-                            text: config.yAxisTitle
+                            text: config.yAxisTitle,
                         },
                         stackLabels: {
-                            enabled: config.stackLabels
-                        }
+                            enabled: config.stackLabels,
+                        },
                     },
                     legend: {
-                        reversed: false
+                        reversed: false,
                     },
                     plotOptions: {
                         series: {
                             stacking: config.stacking,
                             dataLabels: {
                                 enabled: true,
-                                align: 'center',
+                                align: "center",
                                 inside: true,
                                 formatter: function () {
-                                    var str = '';
+                                    var str = "";
 
                                     if (this.y > 0) {
                                         str = this.y;
                                     }
 
                                     return str;
-                                }
-                            }
-                        }
+                                },
+                            },
+                        },
                     },
                     series: config.series,
                     credits: {
-                        enabled: false
-                    }
+                        enabled: false,
+                    },
                 });
-            }
-            else {
+            } else {
                 $(config.element).hide();
             }
         }
-    }
-}(jQuery));
+    };
+})(jQuery);
