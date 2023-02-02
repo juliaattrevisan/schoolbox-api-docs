@@ -225,12 +225,6 @@
                         {% if participant and not participant.isExcluded %}
                             {% if assessment is task %}
                                 {# An icon that shows if the student has attempted the task or not #}
-                                {% if studentCount < functionDegradeLimit %}
-                                    {% include '@learningAssessment/fragments/progressTick.twig' with {
-                                        assessment: assessment,
-                                        student: participant.user
-                                    } only %}
-                                {% else %}
                                     {% if participant.isResponseRequired %}
                                         <div
                                            class="no-text progress-tick readonly"
@@ -247,7 +241,6 @@
                                            title="Completed"
                                            data-progress-tick-status="teacherAssessed"></div>
                                     {% endif %}
-                                {% endif %}
                             {% else %}
                                 {% set normalisedMark = participant.normalisedMark(true) %}
                                 {% set participationRoute = routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) %}
