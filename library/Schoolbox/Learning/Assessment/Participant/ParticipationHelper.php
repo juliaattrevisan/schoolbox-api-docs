@@ -200,6 +200,8 @@ class ParticipationHelper
         $planMap = $this->participantDataSource->getPlanMapper();
 
         // preload the plans list with the dyna-plan
-        return $planMap->findByColumnList(['assessment_id' => $assessmentId ])->indexByCallback(function (Model $model) { return $model->getAssessment()->getId();});
+        return $planMap->findByColumnList(['assessment_id' => $assessmentId ])->indexByCallback(function (Model $model) {
+            return $model->getAssessment()->getId();
+        });
     }
 }
