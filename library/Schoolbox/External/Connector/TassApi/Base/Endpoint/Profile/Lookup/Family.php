@@ -282,7 +282,7 @@ class Family
                     foreach (self::PARENT_PERSON_NODES as $node) {
                         /* Only process the living
                          */
-                        if (self::DECEASED_FLAG === $family[$node]['deceased_flg']) {
+                        if (!isset($family[$node]['deceased_flg']) || (self::DECEASED_FLAG === $family[$node]['deceased_flg'])) {
                             $personExternalId = $this->deriveExternalId($node, (string)$family['user_code'], '');
 
                             $this->processParentNode($node, $personExternalId, $family);
@@ -337,7 +337,7 @@ class Family
                         if (isset($subfamily['address'][$this->addnumFather])) {
                             /* Only process the living
                              */
-                            if (self::DECEASED_FLAG === $subfamily[self::FATHER_NODE]['deceased_flg']) {
+                            if (!isset($family[self::FATHER_NODE]['deceased_flg']) || (self::DECEASED_FLAG === $subfamily[self::FATHER_NODE]['deceased_flg'])) {
                                 $personExternalId = $this->deriveExternalId(self::FATHER_NODE, (string)$subfamily['user_code'], (string)$subfamily['sfa_num']);
 
                                 $this->processSplitParentNode(
@@ -361,7 +361,7 @@ class Family
                         if (isset($subfamily['address'][$this->addnumMother])) {
                             /* Only process the living
                              */
-                            if (self::DECEASED_FLAG === $subfamily[self::MOTHER_NODE]['deceased_flg']) {
+                            if (!isset($family[self::MOTHER_NODE]['deceased_flg']) || (self::DECEASED_FLAG === $subfamily[self::MOTHER_NODE]['deceased_flg'])) {
                                 $personExternalId = $this->deriveExternalId(self::MOTHER_NODE, (string)$subfamily['user_code'], (string)$subfamily['sfa_num']);
 
                                 $this->processSplitParentNode(
