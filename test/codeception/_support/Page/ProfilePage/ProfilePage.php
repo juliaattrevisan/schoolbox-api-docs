@@ -59,7 +59,7 @@ class ProfilePage
      */
     public function clickBadgeGoalDropdown($badgeId): void
     {
-        $this->tester->click('a[data-dropdown="header-options-1-' . $badgeId . '-achievement"]');
+        $this->tester->click('a[data-dropdown="header-options-1-' . $badgeId . '-goal"]');
     }
 
     /**

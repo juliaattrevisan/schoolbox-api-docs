@@ -115,8 +115,8 @@ class GoalsAchievementsCest
      * @param AcceptanceTester $i
      * @throws Exception
      * @beforeSuite
-     * @depends setGoals
-     * @depends awardAchievement
+//     * @depends setGoals
+//     * @depends awardAchievement
      *
      *
      * remove the goal and withdraw the achievement from Jana Reed
@@ -140,17 +140,18 @@ class GoalsAchievementsCest
         $profilePage->clickTab('achievements');
         $i->canSee($badgeNameGoal);
         $badgeIdAchievement = $i->grabFromDatabase('badge', 'id', ['deleted_at' => null,'name like' => $badgeNameAchievement]);
-        $profilePage->clickBadgeGoalDropdown($badgeIdAchievement);
+        $profilePage->clickBadgeAchievementDropdown($badgeIdAchievement);
         $profilePage->clickBadgeOrDropdownOption('Withdraw achievement');
         $badges->clickConfirm();
-        $badgeIdGoal = $i->grabFromDatabase('badge', 'id', ['deleted_at' => null,'name like' => $badgeNameGoal]);
-        $profilePage->clickBadgeGoalDropdown($badgeIdGoal);
+        $badgeIdAchievement = $i->grabFromDatabase('badge', 'id', ['deleted_at' => null,'name like' => $badgeNameGoal]);
+        $profilePage->clickBadgeAchievementDropdown($badgeIdAchievement);
         $profilePage->clickBadgeOrDropdownOption('Withdraw achievement');
         $badges->clickConfirm();
         $i->amGoingTo('Click the goals tab, ensure the goal is presented and remove it');
         $profilePage->clickTab('goals');
         $i->canSee($badgeNameGoal);
         $i->cantSee($badgeNameAchievement);
+        $badgeIdGoal = $i->grabFromDatabase('badge', 'id', ['deleted_at' => null,'name like' => $badgeNameGoal]);
         $profilePage->clickBadgeGoalDropdown($badgeIdGoal);
         $badges->clickDropdownOptionFirstElement('close');
         $badges->clickConfirm();
