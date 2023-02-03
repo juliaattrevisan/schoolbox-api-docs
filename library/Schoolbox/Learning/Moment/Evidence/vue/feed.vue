@@ -350,11 +350,32 @@ export default {
                 }
             }
 
-            $("[data-filters-description]").html(
-                this.selectedTag === "" ? "" : 'Showing tag "' + this.selectedTag + '"'
-            );
+            let newHtml = '';
+
+            if (this.selectedTag !== '') {
+                newHtml = (
+                    "<p class=''>" +
+                     "Showing tag \"" + this.selectedTag + "\" <span class='anchor-style' id='removeFilters'>(remove)</span>" +
+                     "</p>"
+                );
+            }
+
+            $("[data-filters-description]").html(newHtml);
+
+            if (newHtml !== '') {
+                $('#removeFilters').click(this.onClickRemoveTag);
+            }
 
             return { feedItemTypes: checkedFeedItemTypes, tag: this.selectedTag };
+        },
+
+        /**
+         * Remove the selected tag from the filters, leaveing the filters otherwise the same.
+         *
+         * Note this function cannot be defined inline, because if we try that we get an error 'this.onChangeFilters is not a function'.
+         */
+        onClickRemoveTag() {
+            this.onChangeFilters('', true);
         },
 
         /**
