@@ -2098,12 +2098,15 @@ abstract class Mapper implements IMapper, Serializable
     }
 
     /**
+     * If param 'deleted' is true, should return soft-deleted item.
+     * If param 'deleted' is false, should not return soft-deleted item.
+     *
      * @inheritDoc
      */
     public function findOneByColumnList($columnList, array $options = array())
     {
         $defaults = [
-            'deleted' => true,
+            'deleted' => false,
             'order'   => [],
         ];
         $options = array_merge($defaults, $options);
