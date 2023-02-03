@@ -115,8 +115,8 @@ class GoalsAchievementsCest
      * @param AcceptanceTester $i
      * @throws Exception
      * @beforeSuite
-//     * @depends setGoals
-//     * @depends awardAchievement
+     * @depends setGoals
+     * @depends awardAchievement
      *
      *
      * remove the goal and withdraw the achievement from Jana Reed
@@ -165,7 +165,6 @@ class GoalsAchievementsCest
      * @param AcceptanceTester $i
      * @throws Exception
      * @depends setGoals
-     *
      * set a goal, add an evidence, view the evidence, edit it, check it is updated, award it and check the evidence is presented
      * withdraw the achievement, remove the evidence, award it again with evidence, check the evidence, update the evidence, check the evidence is presented properly
      *
@@ -218,7 +217,7 @@ class GoalsAchievementsCest
         $i->amGoingTo('Navigate to the profile page and withdraw the achievement');
         $i->amOnPage($profilePage->generateRoute($studentId));
         $profilePage->clickTab('achievements');
-        $profilePage->clickBadgeGoalDropdown($badgeId);
+        $profilePage->clickBadgeAchievementDropdown($badgeId);
         $profilePage->clickBadgeOrDropdownOption('Withdraw achievement');
         $badges->clickConfirm();
         $i->amGoingTo('click the tab Goals and ensure the evidence is still presented to the goal');
