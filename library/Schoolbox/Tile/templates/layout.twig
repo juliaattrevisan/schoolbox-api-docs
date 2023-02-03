@@ -199,49 +199,62 @@
             });
         });
 
+        var jForm = $('form[data-role="layoutForm"]');
+        var initialFormData = new FormData(jForm[0]);
         /**
-         * Listen for the 'Add Tile' click, save the current state of the 'Modify
-         * Tile Layout'. It uses a fetch to submit the form. Either that or it
-         * needs to be preserved whenever a field is modified...
-         *
-         * Added in response to [SA-14666]
+        * Listen for the 'Add Tile' click, save the current state of the 'Modify
+        * Tile Layout'. It uses a fetch to submit the form. Either that or it
+        * needs to be preserved whenever a field is modified...
+        *
+        * Added in response to [SA-14666]
         **/
         function interceptAddTile(e) {
 
-            /* Prevent the click action. form.valid's fail will tell the
-             * user why the click failed if it failed, otherwise the
-             * callback will navigate us forward.
+            // Format the form data in a .fetch-friendly manner
+            const fd = new FormData(jForm[0]);
+
+            /**
+             * If statements are nested this way so that Add Tile can still navigate where it needs to
+             * when no changes have been made to the form. Only a form that has been changed should trigger
+             * the .valid check.
             **/
-            e.preventDefault();
-
-            if (form.valid()) {
-                const toast = $('[data-toast]');
-                toast.toastActivate({text: 'Saving tile layout...'});
-
-                // Format the form data in a .fetch-friendly manner
-                const fd = new FormData(form[0]);
-                e.target.previousSibling.innerHTML = 'Working...';
-                e.target.style.pointerEvents = 'none';
+            if (
+                JSON.stringify([...fd.entries()])
+                !== JSON.stringify([...initialFormData.entries()])
+            ) {
+                /* Prevent the click action. form.valid's fail will tell the
+                    * user why the click failed if it failed, otherwise the
+                    * callback will navigate us forward.
+                **/
                 e.preventDefault();
 
-                fetch(form[0].getAttribute('action'), {
-                    method: 'POST',
-                    body: fd
-                }).then(
-                    res => {
-                        // Remove the listener.
-                        document.removeEventListener('click', interceptAddTile);
-                        toast.toastTimeout({text: 'Success!', duration: 3000, css: 'success'});
-                        // Navigate to the 'Add tile' page.
-                        window.location.href = "{{ routeLookup('tile.add', {layoutId: item.id}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}";
-                    }
-                ).catch(ex => {
-                    toast.toastTimeout({text: 'Save failed!', duration: 3000, css: 'alert'});
-                });
+                if(form.valid()){
+                    const toast = $('[data-toast]');
+                    toast.toastActivate({text: 'Saving tile layout...'});
+                    e.target.previousSibling.innerHTML = 'Working...';
+                    e.target.style.pointerEvents = 'none';
+                    e.preventDefault();
+
+                    fetch(jForm[0].getAttribute('action'), {
+                        method: 'POST',
+                        body: fd
+                    }).then(
+                        res => {
+                            // Remove the listener.
+                            document.removeEventListener('click', interceptAddTile);
+                            toast.toastTimeout({text: 'Success!', duration: 3000, css: 'success'});
+                            // Navigate to the 'Add tile' page.
+                            window.location.href = "{{ routeLookup('tile.add', {layoutId: item.id}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}";
+                        }
+                    ).catch(ex => {
+                        toast.toastTimeout({text: 'Save failed!', duration: 3000, css: 'alert'});
+                    });
+                }
             }
         }
 
         document.querySelector('a[data-add-tile]').addEventListener('click', interceptAddTile);
+
     })
 })(jQuery);
 </script>
@@ -405,3 +418,8 @@
     </div>
     <div id='toaster' class="toast" data-toast></div>
 </div>
+
+<script type="text/javascript">
+
+
+</script>
