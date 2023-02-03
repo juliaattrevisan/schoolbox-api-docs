@@ -415,6 +415,13 @@ class Family
             return true;
         }
 
+        /* If deceased_flg is present, but empty,
+         * presume they are alive
+         */
+        if ('' === trim((string)$family[$node]['deceased_flg'])) {
+            return true;
+        }
+
         /* If deceased_flg is present, try to interpret that
          * N: alive
          * anything else: dead
