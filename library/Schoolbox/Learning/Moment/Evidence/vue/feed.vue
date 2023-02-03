@@ -328,57 +328,6 @@ export default {
         },
 
         /**
-         * Generate a filterState object from the current state of the DOM.
-         * Since the selectedTag is not stored in the DOM, we get that from this.selectedTag.
-         *
-         * Example of return value:
-         *    {
-         *       feedItemTypes: ['feedback', 'learning-moments'], { Array of strings from this.feedItemTypes }
-         *       tag: '' { String }
-         *    }
-         *
-         * @return { Object }
-         *
-         * @see this.getFiltersStateFromUrl()
-         */
-        getFiltersStateFromDom() {
-            let checkedFeedItemTypes = [];
-
-            for (const feedItemType of this.feedItemTypes) {
-                if ($("#filter-" + feedItemType).prop("checked")) {
-                    checkedFeedItemTypes.push(feedItemType);
-                }
-            }
-
-            let newHtml = '';
-
-            if (this.selectedTag !== '') {
-                newHtml = (
-                    "<p class=''>" +
-                     "Showing tag \"" + this.selectedTag + "\" <span class='anchor-style' id='removeFilters'>(remove)</span>" +
-                     "</p>"
-                );
-            }
-
-            $("[data-filters-description]").html(newHtml);
-
-            if (newHtml !== '') {
-                $('#removeFilters').click(this.onClickRemoveTag);
-            }
-
-            return { feedItemTypes: checkedFeedItemTypes, tag: this.selectedTag };
-        },
-
-        /**
-         * Remove the selected tag from the filters, leaveing the filters otherwise the same.
-         *
-         * Note this function cannot be defined inline, because if we try that we get an error 'this.onChangeFilters is not a function'.
-         */
-        onClickRemoveTag() {
-            this.onChangeFilters('', true);
-        },
-
-        /**
          * Generate a filterState object from the URL parameters (if there are any).
          * If there are no recognised URL parameters, the return value will be null.
          *
@@ -429,6 +378,57 @@ export default {
             }
 
             return filtersState;
+        },
+
+        /**
+         * Generate a filterState object from the current state of the DOM.
+         * Since the selectedTag is not stored in the DOM, we get that from this.selectedTag.
+         *
+         * Example of return value:
+         *    {
+         *       feedItemTypes: ['feedback', 'learning-moments'], { Array of strings from this.feedItemTypes }
+         *       tag: '' { String }
+         *    }
+         *
+         * @return { Object }
+         *
+         * @see this.getFiltersStateFromUrl()
+         */
+        getFiltersStateFromDom() {
+            let checkedFeedItemTypes = [];
+
+            for (const feedItemType of this.feedItemTypes) {
+                if ($("#filter-" + feedItemType).prop("checked")) {
+                    checkedFeedItemTypes.push(feedItemType);
+                }
+            }
+
+            let newHtml = '';
+
+            if (this.selectedTag !== '') {
+                newHtml = (
+                    "<p class=''>" +
+                    "Showing tag \"" + this.selectedTag + "\" <span class='anchor-style' id='removeFilters'>(remove)</span>" +
+                    "</p>"
+                );
+            }
+
+            $("[data-filters-description]").html(newHtml);
+
+            if (newHtml !== '') {
+                $('#removeFilters').click(this.onClickRemoveTag);
+            }
+
+            return { feedItemTypes: checkedFeedItemTypes, tag: this.selectedTag };
+        },
+
+        /**
+         * Remove the selected tag from the filters, leaveing the filters otherwise the same.
+         *
+         * Note this function cannot be defined inline, because if we try that we get an error 'this.onChangeFilters is not a function'.
+         */
+        onClickRemoveTag() {
+            this.onChangeFilters('', true);
         },
 
         /**
