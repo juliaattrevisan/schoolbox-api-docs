@@ -98,7 +98,10 @@ class Component extends Filter\BaseComponent
 
         // Add unitSpecs to courseSpecs
         foreach ($unitSpecsImportedToFolders as $unitSpec) {
-            $unitSpec->getCourse()->getUnits()->setOffset($unitSpec->getId(), $unitSpec);
+            $courseId = $unitSpec->getCourse()->getId();
+            if (isset($this->courseSpecs[$courseId])) {
+                $this->courseSpecs[$courseId]->getUnits()->setOffset($unitSpec->getId(), $unitSpec);
+            }
         }
 
         // Sort unitSpecs inside courseSpecs by unitSpec.id
