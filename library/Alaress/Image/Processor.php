@@ -105,6 +105,7 @@ class Processor
      * @throws PDOException
      * @throws UnexpectedValueException
      * @throws ConcurrentTransformationException
+     * @throws ImagickException if something unexpected happened in ImageMagick
      */
     public function load(int $maxAttempts = 1, ?int $retryAfter = null, bool $permFail = false): StreamableFile
     {
@@ -212,7 +213,8 @@ class Processor
             | ImagineException\RuntimeException
             | OverflowException
             | LayeredNonGifException
-            | CorruptImageException $e
+            | CorruptImageException
+            | ImagickException $e
         ) {
             if ($permFail) {
                 /**
