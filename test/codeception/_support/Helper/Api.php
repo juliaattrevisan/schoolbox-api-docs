@@ -12,8 +12,28 @@ use Codeception\Module\Db;
 use Codeception\TestInterface;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\Application\CliTool\Kernel;
+use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Calendar\Event;
+use Schoolbox\Calendar\EventMapper;
+use Schoolbox\Calendar\EventTypeMapper;
+use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
+use Schoolbox\Curriculum\Node\Model as Node;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Learning\Assessment\Feedback\DataSource as FeedbackDataSource;
+use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\Summator\Factory;
+use Schoolbox\Learning\Assessment\Task\Model as Task;
+use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
+use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\AssessmentContext;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecMapper;
+use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Action\Mapper as PastoralActionMapper;
 use Schoolbox\Pastoral\TypeAction\Mapper as PastoralTypeActionMapper;
@@ -50,11 +70,27 @@ class Api extends \Codeception\Module
 
     private UserMapper $userMapper;
 
+    private MapperProxy $assessmentDataSource;
+
     private FolderMapper $folderMapper;
 
     private RoleMapper $roleMapper;
 
     private array $originalConfig = [];
+
+    private Folder $classFolder;
+
+    private CourseSpecMapper $courseSpecMapper;
+
+    private CourseImplMapper $courseImplMapper;
+
+    private UnitSpecMapper $unitSpecMapper;
+
+    private UnitImplMapper $unitImplMapper;
+
+    private EventMapper $eventMapper;
+
+    private EventTypeMapper $eventTypeMapper;
 
     /**
      * HOOK: executed after configuration is loaded
@@ -89,6 +125,14 @@ class Api extends \Codeception\Module
             $classFolder = $this->folderMapper->findByCode('9ENGA');
         }
         $classFolder->loadTeachers();
+        $this->assessmentDataSource = $this->cliKernel->get('assessmentDataSource');
+        $this->classFolder          = $classFolder;
+        $this->courseSpecMapper     = CourseSpecMapper::getInstance();
+        $this->courseImplMapper = CourseImplMapper::getInstance();
+        $this->unitSpecMapper   = UnitSpecMapper::getInstance();
+        $this->unitImplMapper   = UnitImplMapper::getInstance();
+        $this->eventMapper      = EventMapper::getInstance();
+        $this->eventTypeMapper  = EventTypeMapper::getInstance();
     }
 
     private array $users = [];
@@ -125,6 +169,14 @@ class Api extends \Codeception\Module
     public function getUserByUsername(string $username): User
     {
         return $this->userMapper->findByUsername($username);
+    }
+
+    /**
+     * @return Folder
+     */
+    public function getFolder(): Folder
+    {
+        return $this->classFolder;
     }
 
     /**
@@ -345,6 +397,228 @@ class Api extends \Codeception\Module
         $test = $this->getMaxValue('lu_pastoral_action', 'id');
 
         return $pastoralActionMapper->findAll();
+    }
+
+
+    private function import()
+    {
+        $now   = \Alaress_Date_Format::now();
+        $close = (clone $now)->addDays(10);
+
+        $courseSpecFolder = $this->folderMapper->createModel()
+                                               ->setParent($this->folderMapper->findById(2)) // TODO: Course folder
+                                               ->setName('Course ' . $this->generateText(10))
+                                               ->setCurriculumNodes(new GenericCollection(Node::class))
+                                               ->setInherit(true);
+        $this->folderMapper->save($courseSpecFolder);
+
+
+        // Save the course spec
+        $courseSpec = $this->courseSpecMapper->createModel()
+                                             ->setFolder($courseSpecFolder);
+        $this->courseSpecMapper->save($courseSpec);
+
+        // Create and save unit spec folder
+        $unitSpecFolder = $this->folderMapper->createModel()
+                                             ->setParent($courseSpec->getFolder())
+                                             ->setName('Unit ' . $this->generateText(10))
+                                             ->setCurriculumNodes(new GenericCollection(Node::class))
+                                             ->setInherit(true);
+        $this->folderMapper->save($unitSpecFolder);
+
+
+        // Save the unit spec
+        $unitSpec = $this->unitSpecMapper->createModel()
+                                         ->setFolder($unitSpecFolder)
+                                         ->setCourse($courseSpec);
+        $this->unitSpecMapper->save($unitSpec);
+
+        $courseImpl = $this->courseImplMapper->createModel()
+                                             ->setSpecification($courseSpec)
+                                             ->setFolder($this->classFolder);
+        $this->courseImplMapper->save($courseImpl);
+
+        $unitImpl = $this->unitImplMapper->createModel()
+                                         ->setTitle($unitSpec->getTitle())
+                                         ->setOpenDate($now)
+                                         ->setDueDate($close)
+                                         ->setSpecification($unitSpec)
+                                         ->setCourse($courseImpl);
+        $this->unitImplMapper->save($unitImpl);
+        return $unitImpl;
+    }
+
+
+    public function createDueWork(AssessmentContext $context, float $weight)
+    {
+        $staff = $this->getUsers()['staff'];
+        $now   = \Alaress_Date_Format::now();
+        $close = (clone $now)->addDays(10);
+
+        $dueWork = new DueWork();
+        $dueWork
+            ->setContext($context)
+            ->setTitle('Due Work ' . $this->generateText(6))
+            ->setDescription($this->generateText(100))
+            ->setWeight($weight)
+            ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_NONE)
+            ->setCreator($staff)
+            ->setMarkScheme(new Percentage())
+            ->setOpenAt($now)
+            ->setPublishAt($now)
+            ->setDueAt($close)
+            ->setCloseAt($close)
+            ->setMarkVisibility(SubmissionBox::MARK_VISIBILITY_STAFF_STUDENT_PARENT);
+
+        if ($context instanceof Project) {
+            $context->getAssessables()->add($dueWork);
+        }
+
+        $this->assessmentDataSource->save($dueWork, $staff);
+        return $dueWork;
+    }
+
+    public function createProject(string $summator, bool $requireAll)
+    {
+        $unit     = $this->import();
+        $summator = (new Factory($summator, $requireAll))->produce();
+
+        $staff   = $this->getUsers()['staff'];
+        $now     = \Alaress_Date_Format::now();
+        $close   = (clone $now)->addDays(10);
+        $project = new Project();
+        $project
+            ->setContext($unit)
+            ->setTitle('Project ' . $this->generateText(6))
+            ->setDescription($this->generateText(100))
+            ->setWeight(0)
+            ->setCreator($staff)
+            ->setMarkScheme(new Percentage())
+            ->setSummator($summator)
+            ->setRequireAllActivities($requireAll)
+            ->setOpenAt($now)
+            ->setPublishAt($now)
+            ->setDueAt($close)
+            ->setCloseAt($close)
+            ->setMarkVisibility(SubmissionBox::MARK_VISIBILITY_STAFF_STUDENT_PARENT);
+
+        $this->assessmentDataSource->save($project, $staff);
+        return $project;
+    }
+
+    public function createTask(AssessmentContext $context)
+    {
+        $staff = $this->getUsers()['staff'];
+        $now   = \Alaress_Date_Format::now();
+        $close = (clone $now)->addDays(10);
+
+        $task = new Task();
+        $task
+            ->setContext($context)
+            ->setTitle('Task ' . $this->generateText(6))
+            ->setDescription($this->generateText(100))
+            ->setWeight(0)
+            ->setCreator($staff)
+            ->setMarkScheme(new Percentage())
+            ->setOpenAt($now)
+            ->setPublishAt($now)
+            ->setDueAt($close)
+            ->setCloseAt($close)
+            ->setMarkVisibility(SubmissionBox::MARK_VISIBILITY_STAFF_STUDENT_PARENT);
+
+        $context->getAssessables()->add($task);
+        $this->assessmentDataSource->save($task, $staff);
+        return $task;
+    }
+
+    public function createQuiz(AssessmentContext $context, float $weight)
+    {
+        $staff = $this->getUsers()['staff'];
+        $now   = \Alaress_Date_Format::now();
+        $close = (clone $now)->addDays(10);
+
+        $quiz = new Quiz();
+        $quiz
+            ->setContext($context)
+            ->setTitle('Quiz ' . $this->generateText(6))
+            ->setDescription($this->generateText(100))
+            ->setWeight($weight)
+            ->setCreator($staff)
+            ->setMarkScheme(new Percentage())
+            ->setMaxAttempts(0) // unlimited
+            ->setOpenAt($now)
+            ->setPublishAt($now)
+            ->setDueAt($close)
+            ->setCloseAt($close)
+            ->setMarkVisibility(SubmissionBox::MARK_VISIBILITY_STAFF_STUDENT_PARENT);
+
+        $context->getAssessables()->add($quiz);
+        $this->assessmentDataSource->save($quiz, $staff);
+        return $quiz;
+    }
+
+    public function addReview(IAssessable $assessment, User $student, User $teacher, ?float $normalisedMark)
+    {
+        /** @var FeedbackDataSource $feedbackDataSource */
+        $feedbackDataSource = $this->cliKernel->get('feedbackDataSource');
+
+        $now = \Alaress_Date_Format::now();
+
+//        /** @var ResponseDataSource $responseDataSource */
+//        $responseDataSource = $this->cliKernel->get('responseDataSource');
+        /** @var \Schoolbox\Learning\Assessment\Quiz\Attempt\MapperProxy $attemptDataSource */
+        $attemptDataSource = $this->cliKernel->get('attemptDataSource');
+
+        $feedback = $feedbackDataSource->createModel($assessment)
+                                       ->setHumanReadableMark((new Percentage())->getHumanReadableMark($normalisedMark))
+                                       ->setNormalisedMark($normalisedMark)
+                                       ->setCreatedAt($now)
+                                       ->setPublishedAt($now)
+                                       ->setReviewee($student)
+                                       ->setReviewer($teacher);
+        if ($feedback instanceof \Schoolbox\Learning\Assessment\DueWork\Feedback\Model) {
+            $feedback->setReviewRoute(SubmissionBox\ReturnedWork::REVIEW_ROUTE_INSTRUCTOR);
+        }
+        if ($feedback instanceof \Schoolbox\Learning\Assessment\Quiz\Feedback\Model) {
+            $attempt = (new \Schoolbox\Learning\Assessment\Quiz\Attempt\Model())->setAssessable($assessment)
+                                                                                ->setMarksAvailable(100)
+                                                                                ->setMarksGiven(100)
+                                                                                ->setSubmittedOnBehalfOf($student)
+                                                                                ->setSubmittedAt($now)
+                                                                                ->setCreatedAt($now);
+            $attemptDataSource->save($attempt);
+            $feedback->setResponse($attempt);
+        }
+
+        $feedbackDataSource->save($feedback);
+//        $projectResultCacheMapper = Project\ResultCache\Mapper::getInstance();
+//        $projectResultCache       = new Project\ResultCache\ResultCache($projectResultCacheMapper);
+//        $projectResultCache->refresh($this->assessmentDataSource, $assessment);
+    }
+
+    /**
+     * @param User $owner
+     * @param int  $accessLevel
+     * @param int  $attendance
+     * @param bool $showAttendance
+     * @return Event
+     * @throws MapperException
+     */
+    public function createEvent(User $owner, int $accessLevel, int $attendance, bool $showAttendance): Event
+    {
+        $event = $this->eventMapper->createModel();
+        $event->setTitle($this->generateText(50))
+              ->setAuthor($owner)
+              ->setOwner($owner)
+              ->setAccess($accessLevel)
+              ->setAttendance($attendance)
+              ->setShowAttendees($showAttendance)
+              ->setCampusCollection(Campus::createCollection())
+              ->setType($this->eventTypeMapper->findAll()->first())
+              ->setStartDateTime(\Alaress_Date_Format::now()->addDays(1))
+              ->setEndDateTime(\Alaress_Date_Format::now()->addDays(1)->addHours(1));
+        $this->eventMapper->save($event);
+        return $event;
     }
 
     /**
