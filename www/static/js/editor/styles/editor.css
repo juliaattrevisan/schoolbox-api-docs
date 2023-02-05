@@ -103,3 +103,8 @@
 .ck.ck-editor .todo-list__label {
     display: inline;
 }
+
+.ck.ck-editor .todo-list .todo-list__label>input[checked]:before {
+    background: var(--content-ui-background);
+    border-color: var(--content-ui-background);
+}
