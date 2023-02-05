@@ -22,6 +22,20 @@ function insertWordCount(textarea, editor) {
 }
 
 /**
+ * Prevent jquery.validator trying to access ckeditor instances
+ * as it throws an error on focus in / out
+ *
+ * @todo - review this, there may be a better way to handle this
+ */
+function removeValidation() {
+    $("form").each(function () {
+        if ($(this).data("validator")) {
+            $(this).data("validator").settings.ignore = ".ck";
+        }
+    });
+}
+
+/**
  * create the ckeditor instance
  *
  * @param { HTMLTextAreaElement } textarea - the textarea the CKEditor will replace
@@ -30,6 +44,7 @@ function createEditor(textarea: HTMLTextAreaElement) {
     ClassicEditor.create(textarea, getDefault())
         .then((editor) => {
             insertWordCount(textarea, editor);
+            removeValidation();
             CKEditorInspector.attach(editor);
             document.dispatchEvent(
                 new CustomEvent("EDITOR__CREATED", {
