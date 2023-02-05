@@ -22,6 +22,7 @@ use Imagine\Image\Metadata\ExifMetadataReader;
 use Imagine\Imagick\Imagine;
 use InvalidArgumentException;
 use League\Flysystem;
+use League\Flysystem\FilesystemException;
 use League\Flysystem\UnableToReadFile;
 use League\Flysystem\Filesystem;
 use OverflowException;
@@ -208,7 +209,7 @@ class Processor
                 $transformPath,
             );
         } catch (
-            UnableToReadFile
+            Flysystem\FilesystemException
             | ImagineException\OutOfBoundsException
             | ImagineException\RuntimeException
             | OverflowException
@@ -250,7 +251,7 @@ class Processor
      * @param string $transformPath
      * @return int
      * @throws CorruptImageException
-     * @throws UnableToReadFile If original storage file not found on disk
+     * @throws Flysystem\FilesystemException If original storage file not found on disk, or other FS error
      * @throws ImagickException
      * @throws ImagineException\OutOfBoundsException
      * @throws ImagineException\RuntimeException
@@ -290,6 +291,7 @@ class Processor
      * @throws UnableToReadFile If original storage file not found on disk
      * @throws CorruptImageException If unable to parse width/height dimensions from image contents
      * @throws ImagickException If we can't set the Imagick processing timeout
+     * @throws FilesystemException if there's another filesystem error
      */
     private function loadImageFromFile(int $maxAttempts): ImageInterface
     {
