@@ -4,9 +4,11 @@
  */
 
 import type { Node } from "@schoolboxCurriculum/types/Node";
+import { hasUsage } from "@schoolboxCurriculum/js/nodeUtils";
 import { useNodeDetailsStore } from "../activeNode/store/mcNodeDetailsStore";
 import { useAddSubsectionStore } from "../activeNode/store/mcAddSubsectionStore";
 import { useUpdateNodeStore } from "../activeNode/store/mcUpdateNodeStore";
+import McViewNodeActionsUsage from "./mc-view-node-actions-usage.vue";
 
 interface Props {
     node: Node; // the assigned node to display
@@ -24,7 +26,7 @@ const updateNodeStore = useUpdateNodeStore();
 /**
  * to open up or close the view modal
  */
- function onViewToggleSelected() {
+function onViewToggleSelected() {
     if (props.isViewing) {
         nodeDetailsStore.cancel();
     } else {
@@ -56,16 +58,14 @@ function onUpdateToggleSelected() {
 </script>
 
 <template>
-    <button
-        class="usage-counts"
-        :title="`View ${props.title}`"
-        @click.prevent="onViewToggleSelected"
-    >
-        <span class="label neutral icon-course-builder" title="Course">2</span>
-        <span class="label neutral icon-unit" title="Unit">5</span>
-        <span class="label neutral icon-due-work" title="Assessment">3</span>
-        <span class="label neutral icon-badge" title="Badges">7</span>
-    </button>
+    <mc-view-node-actions-usage
+        v-if="hasUsage(props.node)"
+        :node="props.node"
+        :title="props.title"
+        :is-updating="props.isUpdating"
+        :is-adding="props.isAdding"
+        @selected="onViewToggleSelected"
+    />
     <button
         :class="`button-action-option ${props.isViewing ? 'icon-close' : 'icon-curriculum-details'}`"
         :title="`View ${props.title}`"
@@ -97,17 +97,6 @@ function onUpdateToggleSelected() {
 
 <style lang="scss" scoped>
 @import "./style/mcViewNode";
-
-.usage-counts {
-    @extend .button;
-    display: flex;
-    gap: 0.5rem;
-    min-width: auto;
-    overflow: visible;
-    span {
-        margin: 0;
-    }
-}
 .button-action-option {
     @extend .button;
     color: var(--content-ui-foreground);

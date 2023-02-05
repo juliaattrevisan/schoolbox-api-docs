@@ -149,6 +149,19 @@ export function getBreadcrumbs(node: Node, currentBreadcrumbs: Breadcrumb[]): Br
 }
 
 /**
+ * To determine if there's any usage assigned on the node
+ *
+ * @param { Node } node - the node to check
+ * @returns { boolean } - whether theres any usage assigned on the node
+ */
+export function hasUsage(node: Node) {
+    if (node._usageCounts.course > 0 || node._usageCounts.folder > 0 || node._usageCounts.course > 0) {
+        return true;
+    }
+    return false;
+}
+
+/**
  * To distinguish the activity type
  *
  * @param { Usage } usage - the usage
