@@ -11,9 +11,6 @@ declare(strict_types=1);
 namespace Schoolbox\Calendar\Event\Attendance;
 
 use Alaress\Web\Controller\Base;
-use InvalidArgumentException;
-use LogicException;
-use PDOException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\Exception\Exception;
@@ -22,7 +19,6 @@ use Schoolbox\Calendar\EventRecurrenceMapper;
 use Schoolbox\Error;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
-use UnexpectedValueException;
 
 /**
  * Class Controller
@@ -115,8 +111,11 @@ class Controller extends Base
          */
         $ids = [];
 
-        if ((new ValidCanInvite())->isSatisfiedBy($this->getUser(), (bool)$this->di->get('config')->get('calendar_student_can_invite'))) {
-            $newGuestIds = explode(',', $this->request->post->get('guests') ?? '');
+        if (
+            (new ValidCanInvite())->isSatisfiedBy($this->getUser(), (bool)$this->di->get('config')->get('calendar_student_can_invite'))
+            && $event->getAttendance() > Model::LEVEL_NO_ATTENDANCE
+        ) {
+            $newGuestIds = $this->request->post->get('guests') ? explode(',', $this->request->post->get('guests')) : [];
 
             $ids = array_diff($newGuestIds, $oldGuestIds);
         }
@@ -141,10 +140,12 @@ class Controller extends Base
         }
 
         foreach ($ids as $id) {
-            $this->attendanceMapper->save((new Event\Attendance\Model())
-                ->setEvent($event)
-                ->setUser($this->userMapper->createModel()->setId($id))
-                ->setStatus(Event\Attendance\Model::STATUS_PENDING));
+            $this->attendanceMapper->save(
+                (new Event\Attendance\Model())
+                    ->setEvent($event)
+                    ->setUser($this->userMapper->createModel()->setId($id))
+                    ->setStatus(Event\Attendance\Model::STATUS_PENDING)
+            );
         }
 
         $this->eventRecurrenceMapper->raiseNotification($event, \Schoolbox\Mapper::METHOD_UPDATE, $previous);
@@ -189,6 +190,10 @@ class Controller extends Base
         $guests = $this->attendanceMapper->findAttendances($event);
         $analysis = new PayloadAnalysis($event->getMaxAttendees(), $guests);
 
+        if ($event->getAttendance() === Model::LEVEL_NO_ATTENDANCE) {
+            throw new Exception('Attendance is disabled.');
+        }
+
         /* Don't exceed the maximum number of guests, if one was specified
          */
         if ($event->getMaxAttendees() !== null && $analysis->getNumAvailable() <= 0) {
@@ -204,6 +209,10 @@ class Controller extends Base
                 'user_id'  => $this->getUser()->getId()
             ]);
         } catch (MapperException $e) {
+            if ($event->getAttendance() === Model::LEVEL_INVITE_ONLY) {
+                throw new Exception('Attendance is disabled.');
+            }
+
             $attendance = $this->attendanceMapper->createModel()
                 ->setEvent($event)
                 ->setUser($this->getUser());
@@ -231,6 +240,10 @@ class Controller extends Base
      */
     public function postDecline(Event $event): void
     {
+        if ($event->getAttendance() === Model::LEVEL_NO_ATTENDANCE) {
+            throw new Exception('Attendance is disabled.');
+        }
+
         /* Check if they're already on the list - if so, shank down their existing record
          * Otherwise exit early - no changes required
          */
@@ -246,7 +259,9 @@ class Controller extends Base
 
             $this->attendanceMapper->save($attendance);
         } catch (MapperException $e) {
-            // noop
+            if ($event->getAttendance() === Model::LEVEL_INVITE_ONLY) {
+                throw new Exception('Attendance is disabled.');
+            }
         }
 
         /* Regenerate a new payload for the people currently invited
