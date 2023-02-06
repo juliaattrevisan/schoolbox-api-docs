@@ -63,4 +63,52 @@ class External_Isams_Cispl_User extends External_Isams_User
         }
         return $results;
     }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function getStudent(string $externalUserId): array
+    {
+        $query = "
+            SELECT TOP 1
+                        StudentID               AS StudentID,
+                        StudentFirstname        AS StudentGiven1,
+                        StudentSurname          AS StudentSurname,
+                        ''                      AS StudentGender,
+                        CONVERT(nvarchar(30), DOB, " . self::FORMAT_ISO8601 . " ) AS StudentBirthDate,
+                        ''                      AS StudentTutorName,
+                        ''                      AS StudentHeadOfHouse,
+                        ''                      AS HeadOfHouseID,
+                        ''                      AS StudentFormStaffName,
+                        ''                      AS StudentTutorDescription,
+                        ''                      AS TeacherFormID,
+                        ''                      AS StudentForm,
+                        ''                      AS TeacherTutorID,
+                        AcademicHouse           AS StudentHouseDescription,
+                        ''                      AS StudentHouse,
+                        Grade                   AS StudentYearLevel,
+                        ''                      AS StudentEmergencyName,
+                        ''                      AS StudentEmergencyPhone,
+                        ''                      AS StudentEmergencyPhoneAlt,
+                        txtadditionalHealth     AS StudentMedicalAlert,
+                        ''                      AS CourtOrderType,
+                        ''                      AS StudentMobilePhone,
+                        ''                      AS StudentSpecialNeedsFlag,
+                        ''                      AS EnglishSecondFlag,
+                        ''                      AS StudentStudiesCode,
+                        ''                      AS StudentBoarder,
+                        ''                      AS StudentIBFlag,
+                        ''                      AS IndigenousFlag,
+                        ''                      AS StudentTSIFlag,
+                        ''                      AS ParentsSeparatedFlag,
+                        EnrolmentDate           AS StudentEnrolmentDate,
+                        LeavingDate             AS StudentLeavingDate,
+                        0 AS countIndividualEducationPlans
+            FROM        V_Student
+            WHERE       StudentID = :external_user_id
+        ";
+
+        return $this->getConnector()->executeQuery($query, ['external_user_id' => $externalUserId])->fetch() ?: [];
+    }
 }
