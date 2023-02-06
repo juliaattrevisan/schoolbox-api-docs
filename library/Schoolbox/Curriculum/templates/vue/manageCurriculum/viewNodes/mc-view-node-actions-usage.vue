@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- *
+ * To display the usages linked to the node
  */
 
 import type { Node } from "@schoolboxCurriculum/types/Node";
@@ -16,7 +16,7 @@ const props = defineProps<Props>();
 const emit = defineEmits(["selected"]);
 
 /**
- *
+ * Dispatch to mc-view-node-actions to respond accordingly
  */
 function onSelected() {
     emit("selected");

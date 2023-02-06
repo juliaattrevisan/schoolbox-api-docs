@@ -14,28 +14,21 @@ export type Node = {
     name: string;
     selectedParentId?: number; // when a parent Node is selected (to enable/disable or delete), this will be the id of that Node
     breadcrumbs?: Breadcrumb[]; // list of parents to reach this node
-    usage?: Usage[]; // all the places the node has been used
-    usageCount?: number; // the total number of linked activities (not just the currently loaded)
     _links: {
+        // links to the endpoints for various actions
         delete: string;
         getUsage: string;
         read: string;
         update: string;
     };
     _usageCounts: {
+        // just the counts for each acitivity type
         course: number;
         folder: number;
         unit: number;
     };
-};
-
-/**
- * Just the field properties that can be updated
- */
-export type NodeToUpdate = {
-    code: string | null;
-    description: string | null;
-    name: string;
+    usage?: Usage[]; // all the details for all the places the node has been used
+    usageCount?: number; // the total number of linked activities (not just the currently loaded)
 };
 
 /**
@@ -53,9 +46,20 @@ export type UsageObject = {
     id: number;
     subjectCode?: string;
     title: string;
-    links: {
-        folder?: string;
-        modify?: string;
+    _links: {
         view?: string;
     };
+    course?: {
+        id: number;
+        title: string;
+    };
+};
+
+/**
+ * Just the field properties that can be updated
+ */
+export type NodeToUpdate = {
+    code: string | null;
+    description: string | null;
+    name: string;
 };

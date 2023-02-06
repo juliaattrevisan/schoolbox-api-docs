@@ -24,13 +24,14 @@ export const useNodeDetailsStore = defineStore("mcNodeDetails", () => {
             const activeNodeStore = useActiveNodeStore();
             const nodeId: number = activeNodeStore.node.id;
             const breadcrumbsResponse = await fetch(`${store.getApiEndpoint()}/${nodeId}?ancestors=99`); // just use 99 as hopefully there's no tree that deep...            // if (response.ok) {
-            const usageResponse = await fetch(`${store.getApiEndpoint()}/usage/${nodeId}`);
+            const usageResponse = await fetch(activeNodeStore.node._links.getUsage);
             if (breadcrumbsResponse.ok && usageResponse.ok) {
                 const nodeWithParents = (await breadcrumbsResponse.json()) as Node;
                 activeNodeStore.node.breadcrumbs = getBreadcrumbs(nodeWithParents, []);
                 const usage = (await usageResponse.json()) as JSON;
-                activeNodeStore.node.usage = usage.data as Usage[];
-                activeNodeStore.node.usageCount = usage.metadata.count as number;
+                debugger;
+                // activeNodeStore.node.usage = usage.data as Usage[];
+                // activeNodeStore.node.usageCount = usage.metadata.count as number;
             } else {
                 hasLoadError.value = true;
             }
