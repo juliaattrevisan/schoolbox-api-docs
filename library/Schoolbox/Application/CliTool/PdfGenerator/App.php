@@ -11,6 +11,8 @@ namespace Schoolbox\Application\CliTool\PdfGenerator;
 
 use Alaress\Authorizer\Failure\Unauthenticated;
 use Alaress\Authorizer\Failure\Unauthorized;
+use Gotenberg\Modules\Chromium;
+use Gotenberg\Modules\PdfEngines;
 use GuzzleHttp\Client;
 use Predis\ClientInterface as RedisClient;
 use Psr\Container\ContainerExceptionInterface;

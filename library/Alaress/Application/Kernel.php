@@ -1544,6 +1544,7 @@ abstract class Kernel
                         new GuzzleAdapter($httpClient),
                         Gotenberg::chromium($config->get(ConfigMapper::NAME_GOTENBERG_HOST)),
                         Gotenberg::pdfEngines($config->get(ConfigMapper::NAME_GOTENBERG_HOST)),
+                        $config->get(ConfigMapper::NAME_GOTENBERG_API_KEY),
                     );
                 }
             )
