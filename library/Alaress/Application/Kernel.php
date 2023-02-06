@@ -81,7 +81,6 @@ use Schoolbox\External\Connector\Offline\Base\Sync as OfflineSync;
 use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Filter;
 use Schoolbox\Gotenberg\Client as GotenbergClient;
-use Schoolbox\Gotenberg\RequestFactory;
 use Schoolbox\Help\InstanceRegistry\Mapper as InstanceRegistryMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Instance;
@@ -470,7 +469,7 @@ abstract class Kernel
                     'tokenBuilder'        => $di->lazyGet('user.tokenBuilder'),
                     'gotenbergUrl'        => $config->get(ConfigMapper::NAME_GOTENBERG_HOST),
                     'gotenbergKey'        => $config->get(ConfigMapper::NAME_GOTENBERG_API_KEY),
-                    'gotenbergHttpHeader' => RequestFactory::AUTH_HTTP_HEADER,
+                    'gotenbergHttpHeader' => GotenbergClient::AUTH_HTTP_HEADER,
                     'kamiApiKey'          => $config->get('kami_api_key'),
                     'turnitinApiKey'      => $config->get('turnitin_api_key'),
                     'turnitinApiHost'     => $config->get('turnitin_api_host'),
@@ -1536,7 +1535,7 @@ abstract class Kernel
                     /** @var ProxyServer $proxyServer */
                     $proxyServer = $di->get('proxyServer');
                     $httpClient  = new GuzzleHttp\Client(
-                        ['curl' => $proxyServer->buildCurlOptions(RequestFactory::DEFAULT_WAIT_TIMEOUT)]
+                        ['curl' => $proxyServer->buildCurlOptions(GotenbergClient::DEFAULT_WAIT_TIMEOUT)]
                     );
 
                     // Mimic the previous API as closely as possible?

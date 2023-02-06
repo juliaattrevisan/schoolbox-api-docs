@@ -21,7 +21,7 @@ use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool\App as BaseApp;
 use Schoolbox\Auth\Remote\RemoteLogin;
 use Schoolbox\GenericCollection;
-use Schoolbox\Gotenberg\RequestFactory;
+use Schoolbox\Gotenberg\Client as GotenbergClient;
 use Schoolbox\Realtime\Pipe\PipeManager;
 use Schoolbox\Url\Factory;
 use Schoolbox\User;
@@ -141,7 +141,7 @@ abstract class App extends BaseApp
 
 
         // Build a PDF generator object
-        /** @var \Schoolbox\Gotenberg\Client $pdfGenerator */
+        /** @var GotenbergClient $pdfGenerator */
         $pdfGenerator = $this->getDi()->get('pdfGenerator');
 
 
@@ -444,16 +444,16 @@ BASE;
     /**
      * Generates a PDF for this source.
      *
-     * @param SourceBundle                       $pdfSource
-     * @param string                             $tempDir
-     * @param \Schoolbox\Gotenberg\Client $pdfGenerator
-     * @param string                             $sessionHash
+     * @param SourceBundle    $pdfSource
+     * @param string          $tempDir
+     * @param GotenbergClient $pdfGenerator
+     * @param string          $sessionHash
      * @return string
      */
     private function generatePdf(
         SourceBundle $pdfSource,
         string $tempDir,
-        \Schoolbox\Gotenberg\Client $pdfGenerator,
+        GotenbergClient $pdfGenerator,
         string $sessionHash
     ): string {
         $filename          = $tempDir . '/' . $pdfSource->getFilename();
@@ -478,7 +478,7 @@ BASE;
                 $mergeRequests = [];
                 foreach ($pdfSource->getUrls() as $i => $url) {
                     $htmlToPdf = $pdfGenerator->buildHtmlToPdfConverter($sessionHash)
-                        ->waitDelay(sprintf('%ds', RequestFactory::DEFAULT_WAIT_DELAY));
+                        ->waitDelay(sprintf('%ds', GotenbergClient::DEFAULT_WAIT_DELAY));
                     if ((bool)$this->getOpt(self::OPT_LONG_ORIENTATION_LANDSCAPE)) {
                         $htmlToPdf = $htmlToPdf->landscape();
                     }
