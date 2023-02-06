@@ -88,4 +88,25 @@ class CreateBadge
     {
         $this->tester->click(self::CREATE_BADGE_BUTTON);
     }
+
+    /**
+     * create a Badge
+     */
+    public function createBadge(AcceptanceTester $i, string $badgeName)
+    {
+
+        $badges = new Badges($i);
+        $category = "Learning";
+        $badges->clickAddBadgeButton();
+        $this->typeName($badgeName);
+        $this->clickBrowseIconLibraryButton();
+        $this->waitModalDialogPresented();
+        $this->clickVerticalTabItem("food");
+        $this->clickBadgeImage("food/1");
+        $this->clickCategoryDropDown();
+        $this->clickCategoryItem($category);
+        $this->clickCreateBadgeButton();
+        $badges->waitAddBadgeButtonToBePresented();
+        $badges->verifyTextIsPresented($badgeName);
+    }
 }

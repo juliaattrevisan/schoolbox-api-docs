@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Badges;
 
 use AcceptanceTester;
-use Codeception\Util\Locator;
 use Page\Badges\Badges;
 use Page\Badges\CreateBadge;
 use Exception;
@@ -21,7 +20,7 @@ class BadgesCest
      * get logged in
      * navigate to https://vagrant.dev.schoolbox.cloud/learning/badge
      */
-    public function _before(AcceptanceTester $i)
+    public function _before(AcceptanceTester $i): void
     {
         $i->logout();
         $i->loginAsAdmin();
@@ -30,8 +29,20 @@ class BadgesCest
     }
 
     /**
+     * Deleting Bagdes when the test is about to start so it does not get impacted by other tests already executed
+     *
+     * @param AcceptanceTester $i
+     */
+    public function beforeSuite(AcceptanceTester $i): void
+    {
+        $i->amGoingTo("update delete_at for the news article so it does not impact the news tests");
+        $i->updateInDatabase('badge', ['deleted_at' => "2022-01-15 11:22:34"], ['name like' => "Automation Badge%"]);
+    }
+
+    /**
      * @param AcceptanceTester $i
      * @throws Exception
+     * @beforeSuite
      *
      * on learning/badge page click Create Badge button
      * Type a Name
@@ -46,6 +57,7 @@ class BadgesCest
         $createBadge = new CreateBadge($i);
         $badgeName = "Automation Badge";
         $category = "Learning";
+        $i->amGoingTo('click Create Badge button and create a badge');
         $badges->clickAddBadgeButton();
         $createBadge->typeName($badgeName);
         $createBadge->clickBrowseIconLibraryButton();
@@ -55,6 +67,7 @@ class BadgesCest
         $createBadge->clickCategoryDropDown();
         $createBadge->clickCategoryItem($category);
         $createBadge->clickCreateBadgeButton();
+        $i->amGoingTo('ensure the badge is presented');
         $badges->waitAddBadgeButtonToBePresented();
         $badges->verifyTextIsPresented($badgeName);
         $badges->verifyTextIsPresented($category);
@@ -76,9 +89,11 @@ class BadgesCest
         $badges = new Badges($i);
         $createBadge = new CreateBadge($i);
         $category = "Learning";
-        $badgeId = $i->grabNumRecords('badge');
+        $i->amGoingTo('click the badge dropdown and click Modify');
+        $badgeId = $i->grabFromDatabase('badge', 'id', ['deleted_at' => null,'name like' => 'Automation Badge']);
         $badges->clickBadgeDropdown($badgeId);
         $badges->clickDropdownModify($badgeId);
+        $i->amGoingTo('get name and category updated and click Modify Badge button');
         $createBadge->typeName('Automation Badge Updated');
         $createBadge->clickCategoryDropDown();
         $createBadge->clickCategoryItem($category);
@@ -100,10 +115,15 @@ class BadgesCest
     public function deleteBadge(AcceptanceTester $i)
     {
         $badges = new Badges($i);
-        $badgeId = $i->grabNumRecords('badge');
+        $i->amGoingTo('click the badge dropdown and click Delete');
+        $badgeId = $i->grabFromDatabase('badge', 'id', ['deleted_at' => null,'name like' => 'Automation Badge Updated']);
         $badges->clickBadgeDropdown($badgeId);
         $badges->clickDropdownDelete();
-        $badges->clickConfirmDelete();
+        $badges->clickConfirm();
+        $i->amGoingTo('ensure the badge is no longer presented in the page');
+        $i->cantSee('Automation Badge Updated');
+        $i->amGoingTo('reload the page to ensue the badge is not presented');
+        $i->amOnPage($badges::URL);
         $i->cantSee('Automation Badge Updated');
     }
 }
