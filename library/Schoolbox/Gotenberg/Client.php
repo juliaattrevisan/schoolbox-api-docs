@@ -29,11 +29,6 @@ use Schoolbox\Realtime\Pipe\PipeManager;
 class Client
 {
     /**
-     * The version of the Gotenberg API which is being communicated with.
-     */
-    private const GOTENBERG_VERSION = 7;
-
-    /**
      * The name of the HTTP header used for authorization of Gotenberg requests.
      *
      * `$this->apiKey` will be set as the value of this header in all requests
@@ -116,14 +111,9 @@ class Client
             $request = $request->withHeader('x-api-version', $this->apiVersion);
         }
 
-        // Add webhook API key here:
-        // I'm not yet sure whether `x-api-key` or the hijacked
-        // `Gotenberg-WebhookUrl` header is correct?
+        // Add webhook API key here
         if (isset($this->apiKey)) {
-            $request = $request
-                ->withHeader('x-api-key', $this->apiKey)
-                ->withHeader('Gotenberg-Webhookurl-' . self::AUTH_HTTP_HEADER, $this->apiKey)
-            ;
+            $request = $request->withHeader('x-api-key', $this->apiKey);
         }
         return $this->httpClient->sendRequest($request);
     }
