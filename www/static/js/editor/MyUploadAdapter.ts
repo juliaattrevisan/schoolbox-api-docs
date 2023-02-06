@@ -27,7 +27,6 @@ export default class MyUploadAdapter {
         xhr.addEventListener("abort", () => reject());
         xhr.addEventListener("load", () => {
             const response = xhr.response;
-            debugger;
 
             // This example assumes the XHR server's "response" object will come with
             // an "error" which has its own "message" that can be passed to reject()

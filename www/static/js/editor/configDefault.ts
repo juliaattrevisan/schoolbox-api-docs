@@ -217,6 +217,7 @@ export function getDefault() {
         image: {
             // image setup: https://ckeditor.com/docs/ckeditor5/latest/features/images/images-overview.html
             toolbar: [
+                "imageStyle:inline",
                 "imageStyle:block",
                 "imageStyle:side",
                 "|",
