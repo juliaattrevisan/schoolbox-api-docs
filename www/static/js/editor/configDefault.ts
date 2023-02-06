@@ -65,7 +65,6 @@ import { getDefaultColors } from "@js/editor/configDefaultColors";
  */
 function MyCustomUploadAdapterPlugin(editor) {
     editor.plugins.get("FileRepository").createUploadAdapter = (loader) => {
-        // Configure the URL to the upload script in your back-end here!
         return new MyUploadAdapter(loader);
     };
 }
