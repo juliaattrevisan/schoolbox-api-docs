@@ -1,12 +1,11 @@
 <script setup lang="ts">
 /**
- * To edit an existing node or add a new subsection to a node
+ * Shows the activity count types when available and can be selected
+ * to reveal the node description and connected material
  */
 
 import type { Node } from "@schoolboxCurriculum/types/Node";
-import { hasUsage } from "@schoolboxCurriculum/js/nodeUtils";
 import { useNodeDetailsStore } from "../activeNode/store/mcNodeDetailsStore";
-import McViewNodeActionsUsage from "./mc-view-node-actions-usage.vue";
 
 interface Props {
     node: Node; // the assigned node to display
