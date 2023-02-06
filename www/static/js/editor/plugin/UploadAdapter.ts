@@ -3,7 +3,7 @@
  * https://ckeditor.com/docs/ckeditor5/latest/framework/guides/deep-dive/upload-adapter.html
  *
  */
-export default class MyUploadAdapter {
+export default class UploadAdapter {
     loader: unknown;
 
     xhr: XMLHttpRequest;

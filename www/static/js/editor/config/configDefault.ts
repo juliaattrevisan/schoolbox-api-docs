@@ -55,7 +55,7 @@ import Alignment from "@ckeditor/ckeditor5-alignment/src/alignment";
 import FindAndReplace from "@ckeditor/ckeditor5-find-and-replace/src/findandreplace";
 import SourceEditing from "@ckeditor/ckeditor5-source-editing/src/sourceediting";
 import WordCount from "@ckeditor/ckeditor5-word-count/src/wordcount";
-import MyUploadAdapter from "../plugin/MyUploadAdapter";
+import UploadAdapter from "../plugin/UploadAdapter";
 import { getDefaultColors } from "@js/editor/config/configDefaultColors";
 
 /**
@@ -65,7 +65,7 @@ import { getDefaultColors } from "@js/editor/config/configDefaultColors";
  */
 function MyCustomUploadAdapterPlugin(editor) {
     editor.plugins.get("FileRepository").createUploadAdapter = (loader) => {
-        return new MyUploadAdapter(loader);
+        return new UploadAdapter(loader);
     };
 }
 
