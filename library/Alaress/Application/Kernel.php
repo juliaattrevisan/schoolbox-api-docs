@@ -44,7 +44,6 @@ use External_Markbook;
 use External_Timetable;
 use External_User;
 use External_UserInterface;
-use Gotenberg\Gotenberg;
 use GuzzleHttp;
 use Http\Adapter\Guzzle7\Client as GuzzleAdapter;
 use InvalidArgumentException;
@@ -1543,10 +1542,18 @@ abstract class Kernel
                     if ($gotenbergApiKey === '') {
                         $gotenbergApiKey = null;
                     }
+
+                    $gotenbergApiVersion = filter_var(
+                        $config->get(ConfigMapper::NAME_GOTENBERG_API_VERSION),
+                    FILTER_VALIDATE_INT,
+                    FILTER_NULL_ON_FAILURE,
+                    );
+
                     return new GotenbergClient(
                         new GuzzleAdapter($httpClient),
                         $config->get(ConfigMapper::NAME_GOTENBERG_HOST),
                         $gotenbergApiKey,
+                        $gotenbergApiVersion,
                     );
                 }
             )

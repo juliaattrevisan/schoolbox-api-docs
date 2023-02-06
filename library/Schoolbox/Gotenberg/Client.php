@@ -63,11 +63,13 @@ class Client
      * @param HttpClient  $httpClient The HTTP client used for sending requests.
      * @param string      $apiHost    The URL which hosts the Gotenberg API.
      * @param string|null $apiKey     The Gotenberg API key (if required).
+     * @param int|null    $apiVersion The Gotenberg API version (if known)
      */
     public function __construct(
         private HttpClient $httpClient,
         private string $apiHost,
         private ?string $apiKey,
+        private ?int $apiVersion,
     ) {
     }
 
@@ -110,7 +112,9 @@ class Client
     public function send(RequestInterface $request): ResponseInterface
     {
         // Add API version here
-        $request = $request->withHeader('x-api-version', self::GOTENBERG_VERSION);
+        if (isset($this->apiVersion)) {
+            $request = $request->withHeader('x-api-version', $this->apiVersion);
+        }
 
         // Add webhook API key here:
         // I'm not yet sure whether `x-api-key` or the hijacked
