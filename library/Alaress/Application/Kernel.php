@@ -1552,30 +1552,6 @@ abstract class Kernel
             )
         );
 
-        // Gotenberg services:
-        // - Chromium to convert HTML to PDF
-        // - PDF engines to merge
-        $di->set(
-            'gotenberg.htmlToPdf',
-            $di->lazy(
-                static function () use ($di) {
-                    /** @var IConfigLoader $config */
-                    $config = $di->get('config');
-                    return Gotenberg::chromium($config->get(ConfigMapper::NAME_GOTENBERG_HOST));
-                }
-            )
-        );
-        $di->set(
-            'gotenberg.pdfEngines',
-            $di->lazy(
-                static function () use ($di) {
-                    /** @var IConfigLoader $config */
-                    $config = $di->get('config');
-                    return Gotenberg::pdfEngines($config->get(ConfigMapper::NAME_GOTENBERG_HOST));
-                }
-            )
-        );
-
         // injectable module auth rules
         $di->set('rule:isLoggedIn', $di->lazyNew(Rule\IsLoggedIn::class));
         $di->set('rule:isSuperuser', $di->lazyNew(Rule\IsSuperuser::class));
