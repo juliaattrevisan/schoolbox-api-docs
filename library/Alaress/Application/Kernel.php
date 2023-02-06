@@ -1539,10 +1539,14 @@ abstract class Kernel
                     );
 
                     // Mimic the previous API as closely as possible?
+                    $gotenbergApiKey = $config->get(ConfigMapper::NAME_GOTENBERG_API_KEY);
+                    if ($gotenbergApiKey === '') {
+                        $gotenbergApiKey = null;
+                    }
                     return new GotenbergClient(
                         new GuzzleAdapter($httpClient),
                         $config->get(ConfigMapper::NAME_GOTENBERG_HOST),
-                        $config->get(ConfigMapper::NAME_GOTENBERG_API_KEY),
+                        $gotenbergApiKey,
                     );
                 }
             )
