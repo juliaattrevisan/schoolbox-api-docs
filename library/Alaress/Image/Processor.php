@@ -22,8 +22,6 @@ use Imagine\Image\Metadata\ExifMetadataReader;
 use Imagine\Imagick\Imagine;
 use InvalidArgumentException;
 use League\Flysystem;
-use League\Flysystem\UnableToReadFile;
-use League\Flysystem\Filesystem;
 use OverflowException;
 use PDOException;
 use Schoolbox\Mapper;
@@ -54,8 +52,8 @@ class Processor
      * @param string                $path               Path to the file in the filesystem
      * @param string|null           $mimetype           If provided: the file's mimetype.
      *                                                  If not provided: will attempt to determine from `$path`.
-     * @param Filesystem            $pathFilesystem     The filesystem on which `$path` is stored
-     * @param Filesystem            $storageFilesystem  The filesystem on which storage transforms are stored.
+     * @param Flysystem\Filesystem  $pathFilesystem     The filesystem on which `$path` is stored
+     * @param Flysystem\Filesystem  $storageFilesystem  The filesystem on which storage transforms are stored.
      *                                                  This may be a different filesystem to `$pathFilesystem`.
      * @param Storage\HashGenerator $hashGenerator      Helper for generating a storage hash out of `$path`
      * @param string                $cacheKey           Uniquely associate a cached image with a particular series of
@@ -75,8 +73,8 @@ class Processor
     public function __construct(
         private string $path,
         private ?string $mimetype,
-        private Filesystem $pathFilesystem,
-        private Filesystem $storageFilesystem,
+        private Flysystem\Filesystem $pathFilesystem,
+        private Flysystem\Filesystem $storageFilesystem,
         private Storage\HashGenerator $hashGenerator,
         private string $cacheKey,
         private ITransform $transform,
@@ -105,6 +103,7 @@ class Processor
      * @throws PDOException
      * @throws UnexpectedValueException
      * @throws ConcurrentTransformationException
+     * @throws ImagickException if something unexpected happened in ImageMagick
      */
     public function load(int $maxAttempts = 1, ?int $retryAfter = null, bool $permFail = false): StreamableFile
     {
@@ -207,12 +206,13 @@ class Processor
                 $transformPath,
             );
         } catch (
-            UnableToReadFile
+            Flysystem\FilesystemException
             | ImagineException\OutOfBoundsException
             | ImagineException\RuntimeException
             | OverflowException
             | LayeredNonGifException
-            | CorruptImageException $e
+            | CorruptImageException
+            | ImagickException $e
         ) {
             if ($permFail) {
                 /**
@@ -248,7 +248,7 @@ class Processor
      * @param string $transformPath
      * @return int
      * @throws CorruptImageException
-     * @throws UnableToReadFile If original storage file not found on disk
+     * @throws Flysystem\FilesystemException If original storage file not found on disk, or other FS error
      * @throws ImagickException
      * @throws ImagineException\OutOfBoundsException
      * @throws ImagineException\RuntimeException
@@ -285,9 +285,10 @@ class Processor
      * @throws OverflowException If file contents are too big
      * @throws UnexpectedValueException if the file's mimetype isn't a recognised image type
      * @throws ImagineException\RuntimeException If cannot read file into an image
-     * @throws UnableToReadFile If original storage file not found on disk
+     * @throws Flysystem\UnableToReadFile If original storage file not found on disk
      * @throws CorruptImageException If unable to parse width/height dimensions from image contents
      * @throws ImagickException If we can't set the Imagick processing timeout
+     * @throws Flysystem\FilesystemException if there's another filesystem error
      */
     private function loadImageFromFile(int $maxAttempts): ImageInterface
     {
@@ -296,7 +297,7 @@ class Processor
         // ErrorException. This will be caught by the Kernel's ExceptionHandler and sent to Sentry, flooding it.
         // Let's detect this case and throw an exception before we attempt to open the file.
         if (!$this->pathFilesystem->has($this->path)) {
-            throw new UnableToReadFile("File not found");
+            throw new Flysystem\UnableToReadFile("File not found");
         }
 
         // Die extremely early if this is corrupted or giant
