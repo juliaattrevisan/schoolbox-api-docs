@@ -21,6 +21,7 @@ import { useUpdateNodeStore } from "../activeNode/store/mcUpdateNodeStore";
 import { useSearchStore } from "../store/mcSearchStore";
 import McViewNodeCheckbox from "./mc-view-node-checkbox.vue";
 import McViewNodeName from "./mc-view-node-name.vue";
+import McViewNodeDetails from "./mc-view-node-details.vue";
 import McViewNodeActions from "./mc-view-node-actions.vue";
 import McNodeDetails from "../activeNode/mc-node-details.vue";
 import McAddSubsection from "../activeNode/mc-add-subsection.vue";
@@ -215,13 +216,20 @@ const title = computed(() =>
 );
 
 /**
- * Whether the buttons should be displayed, shouldn't be if the user is read only
+ * Whether the checkbox and actions should be displayed, shouldn't be if the user is read only
  * or we are at the root level node, or if the search is active
  *
  * @returns { boolean }
  */
-const hasActions = computed(() => !store.isReadOnly && props.node.id !== UNSET_ID && !searchStore.isActive);
+const showActions = computed(() => !store.isReadOnly && props.node.id !== UNSET_ID && !searchStore.isActive);
 
+/**
+ * Whether the details should be displayed, shouldn't be if we are at the root level node,
+ * or if the search is active
+ *
+ * @returns { boolean }
+ */
+const showDetails = computed(() => props.node.id !== UNSET_ID && !searchStore.isActive);
 </script>
 
 <template>
@@ -234,7 +242,7 @@ const hasActions = computed(() => !store.isReadOnly && props.node.id !== UNSET_I
                 :data-is-new="isNew"
                 :data-just-updated="justUpdated"
             >
-                <mc-view-node-checkbox v-if="hasActions" :node="props.node" :is-active="isActive" />
+                <mc-view-node-checkbox v-if="showActions" :node="props.node" :is-active="isActive" />
                 <mc-view-node-name
                     :node="props.node"
                     :depth="props.depth"
@@ -242,8 +250,16 @@ const hasActions = computed(() => !store.isReadOnly && props.node.id !== UNSET_I
                     :is-active="isActive"
                     data-test-view-node-name
                 />
+                <mc-view-node-details
+                    v-if="showDetails"
+                    :node="props.node"
+                    :title="title"
+                    :is-viewing="isViewing"
+                    :is-updating="isUpdating"
+                    :is-adding="isAdding"
+                />
                 <mc-view-node-actions
-                    v-if="hasActions"
+                    v-if="showActions"
                     :node="props.node"
                     :title="title"
                     :is-viewing="isViewing"

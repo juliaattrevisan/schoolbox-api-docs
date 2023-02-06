@@ -4,11 +4,8 @@
  */
 
 import type { Node } from "@schoolboxCurriculum/types/Node";
-import { hasUsage } from "@schoolboxCurriculum/js/nodeUtils";
-import { useNodeDetailsStore } from "../activeNode/store/mcNodeDetailsStore";
 import { useAddSubsectionStore } from "../activeNode/store/mcAddSubsectionStore";
 import { useUpdateNodeStore } from "../activeNode/store/mcUpdateNodeStore";
-import McViewNodeActionsUsage from "./mc-view-node-actions-usage.vue";
 
 interface Props {
     node: Node; // the assigned node to display
@@ -19,20 +16,8 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const nodeDetailsStore = useNodeDetailsStore();
 const addSubsectionStore = useAddSubsectionStore();
 const updateNodeStore = useUpdateNodeStore();
-
-/**
- * to open up or close the view modal
- */
-function onViewToggleSelected() {
-    if (props.isViewing) {
-        nodeDetailsStore.cancel();
-    } else {
-        nodeDetailsStore.prompt(props.node);
-    }
-}
 
 /**
  * to open up or close the add subsection modal
@@ -58,23 +43,6 @@ function onUpdateToggleSelected() {
 </script>
 
 <template>
-    <mc-view-node-actions-usage
-        v-if="hasUsage(props.node)"
-        :node="props.node"
-        :title="props.title"
-        :is-updating="props.isUpdating"
-        :is-adding="props.isAdding"
-        @selected="onViewToggleSelected"
-    />
-    <button
-        :class="`button-action-option ${props.isViewing ? 'icon-close' : 'icon-curriculum-details'}`"
-        :title="`View ${props.title}`"
-        :disabled="props.isUpdating || props.isAdding"
-        data-test-view
-        @click.prevent="onViewToggleSelected"
-    >
-        Update {{ props.title }}
-    </button>
     <button
         :class="`button-action-option ${props.isUpdating ? 'icon-close' : 'icon-modify'}`"
         :title="`Update ${props.title}`"

@@ -56,10 +56,9 @@ export type UsageObject = {
     subjectCode?: string;
     title: string;
     _links: {
-        view?: string;
+        view: string;
     };
     course?: {
-        id: number;
         title: string;
     };
     folder?: {
