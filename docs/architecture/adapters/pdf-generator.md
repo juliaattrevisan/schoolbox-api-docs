@@ -1,11 +1,7 @@
 # PDF Generator Adapter
 
 Communication with the PDF generator is done via Gotenberg's PHP client:
-https://github.com/thecodingmachine/gotenberg-php-client.
-
-> Note that this is the client for Schoolbox's currently used Gotenberg version
-> 6: https://github.com/gotenberg/gotenberg-php is the newer version of the
-> client.
+https://github.com/gotenberg/gotenberg-php.
 
 The PDF generator has these supporting classes:
 - `\Schoolbox\Gotenberg\RequestFactory`: a class for building requests to
