@@ -80,6 +80,7 @@ use Schoolbox\External\Connector\ICommunityPortal;
 use Schoolbox\External\Connector\Offline\Base\Sync as OfflineSync;
 use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Filter;
+use Schoolbox\Gotenberg\Client as GotenbergClient;
 use Schoolbox\Gotenberg\RequestFactory;
 use Schoolbox\Help\InstanceRegistry\Mapper as InstanceRegistryMapper;
 use Schoolbox\IConfigLoader;
@@ -176,7 +177,6 @@ use Scrub;
 use SitePage;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\RedisStore;
-use TheCodingMachine\Gotenberg\Client as GotenbergClient;
 use Throwable;
 use Twig\Environment;
 use Twig\Extension\DebugExtension;
@@ -1538,9 +1538,12 @@ abstract class Kernel
                     $httpClient  = new GuzzleHttp\Client(
                         ['curl' => $proxyServer->buildCurlOptions(RequestFactory::DEFAULT_WAIT_TIMEOUT)]
                     );
+
+                    // Mimic the previous API as closely as possible?
                     return new GotenbergClient(
-                        $config->get(ConfigMapper::NAME_GOTENBERG_HOST),
                         new GuzzleAdapter($httpClient),
+                        Gotenberg::chromium($config->get(ConfigMapper::NAME_GOTENBERG_HOST)),
+                        Gotenberg::pdfEngines($config->get(ConfigMapper::NAME_GOTENBERG_HOST)),
                     );
                 }
             )
