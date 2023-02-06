@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a87065091fe687a71659ced50c861479",
+    "content-hash": "0fe234a68dd2d0146b76db0f95a5e591",
     "packages": [
         {
             "name": "0x46616c6b/etherpad-lite-client",
@@ -2611,28 +2611,28 @@
         },
         {
             "name": "intelliscl/sdk",
-            "version": "0.2.0.4-beta",
+            "version": "dev-main",
             "source": {
                 "type": "git",
-                "url": "https://github.com/intelliscl/sdk-php.git",
-                "reference": "0f1a31a7595c647b3800010e61495c266a9d7aef"
+                "url": "git@github.com:intelliscl/sdk-php.git",
+                "reference": "0d14a54b1550a8087412d94733e27610741a26e6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/intelliscl/sdk-php/zipball/0f1a31a7595c647b3800010e61495c266a9d7aef",
-                "reference": "0f1a31a7595c647b3800010e61495c266a9d7aef",
+                "url": "https://api.github.com/repos/intelliscl/sdk-php/zipball/0d14a54b1550a8087412d94733e27610741a26e6",
+                "reference": "0d14a54b1550a8087412d94733e27610741a26e6",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "ext-pdo": "*",
-                "firebase/php-jwt": "^5.4",
+                "firebase/php-jwt": "^5.4 || ^6.0",
                 "guzzlehttp/guzzle": "^7.0",
-                "guzzlehttp/psr7": "^1.8.2",
+                "guzzlehttp/psr7": "^1.8.4 || ^2.1.1",
                 "kamermans/guzzle-oauth2-subscriber": "^1.0.8",
                 "microsoft/azure-storage-blob": "^1.5.2",
                 "php": ">=7.4",
-                "psr/log": "^1.1.4"
+                "psr/log": "^1|^2|^3"
             },
             "suggest": {
                 "ext-openssl": "For Launch Token signing",
@@ -2640,6 +2640,7 @@
                 "ext-pdo_pgsql": "For Postgre databases",
                 "ext-pdo_sqlsrv": "For MsSQL databases"
             },
+            "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
@@ -2665,11 +2666,7 @@
                 "lti launch",
                 "sdk"
             ],
-            "support": {
-                "issues": "https://github.com/intelliscl/sdk-php/issues",
-                "source": "https://github.com/intelliscl/sdk-php/tree/v0.2.0.4-beta"
-            },
-            "time": "2021-10-21T06:33:18+00:00"
+            "time": "2022-12-01T03:03:06+00:00"
         },
         {
             "name": "jean85/pretty-package-versions",
@@ -15250,7 +15247,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "intelliscl/sdk": 10,
+        "intelliscl/sdk": 20,
         "roave/security-advisories": 20
     },
     "prefer-stable": false,
