@@ -269,7 +269,7 @@ module.exports = {
         typescriptTest: "./library/Schoolbox/Greenhouse/templates/ts/typescriptTest.ts",
 
         //CKEditor
-        defaultEditor: "./www/static/js/editor/defaultEditor.ts",
+        editorDefault: "./www/static/js/editor/editorDefault.ts",
         helloCKEditor: "./library/Schoolbox/Greenhouse/templates/ts/helloCKEditor.ts",
 
         //Sass
