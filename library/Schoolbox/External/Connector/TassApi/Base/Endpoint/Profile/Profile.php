@@ -998,7 +998,8 @@ class Profile implements IStrategy
                 'portal_user_code' => $employee['username'],
                 'active_flag' => null,
                 'teacher_photo' => $teacherPhoto,
-                'position' => $position
+                'position' => $position,
+                'work_phone' => '',
             ];
         }
 
@@ -1047,6 +1048,10 @@ class Profile implements IStrategy
                 /* Get the position for every guy
                  */
                 $employeeDetail['position'] = $employeeLookup[$employeeCode]['general']['position_title'];
+
+                /* Get the work phone for every guy
+                 */
+                $employeeDetail['work_phone'] = $employeeLookup[$employeeCode]['address']['work_phone'];
 
                 /* Fetch each Employee's picture if Load Photos From SIS is enabled
                  * Find the piece that closely resembles teacher_photo
@@ -1134,7 +1139,7 @@ class Profile implements IStrategy
             $firstnamePreferred = trim((string)($staff['preferred_name'] ?? null));
 
             $lastname = trim((string)$staff['surname']);
-            $phone = '';
+            $phone = trim((string)$staff['work_phone']);
             $position = trim((string)($staff['position'] ?? ''));
             $room = '';
             $title = trim((string)$staff['salutation']);
