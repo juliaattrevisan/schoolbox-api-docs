@@ -32,10 +32,19 @@ export type Node = {
 };
 
 /**
+ * The different activity types available that can be linked to a node
+ */
+export enum ActivityTypes {
+    COURSE = "course",
+    FOLDER = "folder",
+    UNIT = "unit",
+}
+
+/**
  * An activity linked to the node
  */
 export type Usage = {
-    discriminator: "course" | "folder" | "unit";
+    discriminator: ActivityTypes.COURSE | ActivityTypes.FOLDER | ActivityTypes.UNIT;
     object: UsageObject;
 };
 
@@ -52,6 +61,11 @@ export type UsageObject = {
     course?: {
         id: number;
         title: string;
+    };
+    folder?: {
+        _links?: {
+            view: string;
+        };
     };
 };
 

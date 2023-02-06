@@ -4,6 +4,7 @@
  */
 
 import type { Usage } from "@schoolboxCurriculum/types/Node";
+import { ActivityTypes } from "@schoolboxCurriculum/types/Node";
 import { getUsageHref, getUsageIcon } from "@schoolboxCurriculum/js/nodeUtils";
 
 interface Props {
@@ -20,6 +21,9 @@ const props = defineProps<Props>();
                 <div :class="`usage__icon-container ${getUsageIcon(props.usage)} size-24`"></div>
                 <div class="usage__title-container">
                     <p>{{ props.usage.object.title }}</p>
+                    <p v-if="props.usage.discriminator === ActivityTypes.UNIT" class="meta">
+                        {{ props.usage.object.course?.title }}
+                    </p>
                 </div>
             </div>
         </a>
@@ -59,6 +63,7 @@ const props = defineProps<Props>();
         display: -webkit-box;
         font-size: 0.75rem;
         line-height: 1rem;
+        margin-bottom: 0.25rem;
         overflow: hidden;
         white-space: normal;
         -webkit-line-clamp: 3; // clamp the lines to a max of three, cutting off the rest: https://css-tricks.com/almanac/properties/l/line-clamp/

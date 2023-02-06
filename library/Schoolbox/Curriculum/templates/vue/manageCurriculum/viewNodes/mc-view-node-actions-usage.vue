@@ -24,7 +24,12 @@ function onSelected() {
 </script>
 
 <template>
-    <button class="usage-counts" :title="`View ${props.title}`" @click.prevent="onSelected">
+    <button
+        class="usage-counts"
+        :title="`View ${props.title}`"
+        :disabled="props.isUpdating || props.isAdding"
+        @click.prevent="onSelected"
+    >
         <span v-if="props.node._usageCounts.course > 0" class="label neutral icon-course-builder" title="Courses">{{
             props.node._usageCounts.course
         }}</span>

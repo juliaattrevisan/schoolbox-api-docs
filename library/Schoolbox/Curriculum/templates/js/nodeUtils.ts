@@ -3,6 +3,7 @@
  */
 
 import type { Node, Usage } from "@schoolboxCurriculum/types/Node";
+import { ActivityTypes } from "@schoolboxCurriculum/types/Node";
 import type { Breadcrumb } from "@schoolboxCurriculum/types/Breadcrumb";
 
 /**
@@ -169,9 +170,9 @@ export function hasUsage(node: Node) {
  */
 export function getUsageIcon(usage: Usage) {
     const icons = {
-        course: "icon-course",
-        folder: "icon-folder",
-        unit: "icon-unit",
+        [ActivityTypes.COURSE]: "icon-course",
+        [ActivityTypes.FOLDER]: "icon-folder",
+        [ActivityTypes.UNIT]: "icon-unit",
     };
     return icons[usage.discriminator];
 }
@@ -184,9 +185,9 @@ export function getUsageIcon(usage: Usage) {
  */
 export function getUsageHref(usage: Usage) {
     const icons = {
-        course: () => usage.object.links.folder,
-        folder: () => usage.object._links.view,
-        unit: () => usage.object.links.folder,
+        [ActivityTypes.COURSE]: () => usage.object.folder?._links?.view,
+        [ActivityTypes.FOLDER]: () => usage.object._links.view,
+        [ActivityTypes.UNIT]: () => usage.object.folder?._links?.view,
     };
     return icons[usage.discriminator]();
 }

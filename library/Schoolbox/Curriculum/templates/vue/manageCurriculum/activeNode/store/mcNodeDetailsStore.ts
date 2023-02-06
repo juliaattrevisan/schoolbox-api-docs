@@ -29,9 +29,8 @@ export const useNodeDetailsStore = defineStore("mcNodeDetails", () => {
                 const nodeWithParents = (await breadcrumbsResponse.json()) as Node;
                 activeNodeStore.node.breadcrumbs = getBreadcrumbs(nodeWithParents, []);
                 const usage = (await usageResponse.json()) as JSON;
-                debugger;
-                // activeNodeStore.node.usage = usage.data as Usage[];
-                // activeNodeStore.node.usageCount = usage.metadata.count as number;
+                activeNodeStore.node.usage = usage.data as Usage[];
+                activeNodeStore.node.usageCount = usage.metadata.count as number;
             } else {
                 hasLoadError.value = true;
             }
