@@ -268,7 +268,8 @@ module.exports = {
         // Temporary Typescript testing playground, to be deleted in future
         typescriptTest: "./library/Schoolbox/Greenhouse/templates/ts/typescriptTest.ts",
 
-        //Temporary CKEditor tester
+        //CKEditor
+        defaultEditor: "./www/static/js/editor/defaultEditor.ts",
         helloCKEditor: "./library/Schoolbox/Greenhouse/templates/ts/helloCKEditor.ts",
 
         //Sass

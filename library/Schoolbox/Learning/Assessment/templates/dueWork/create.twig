@@ -77,10 +77,8 @@
         {% endif %}
     </div>
 
-    <label>
-        Description
-        <textarea name="description" id="assessment-description">{{ assessment.description }}</textarea>
-    </label>
+    <label>Description</label>
+    <textarea id="assessment-description">{{ assessment.description }}</textarea>
 
     {% include 'sub/attachzone.twig' %}
 
@@ -240,15 +238,16 @@
 {# ----------------------------------------------------------- #}
 {# General Scripts #}
 {# ----------------------------------------------------------- #}
-<script src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
-<script src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/bundle/defaultEditor.js?v={{ config.site_version }}"></script>
 <script>
     $(function () {
 
         // 'Description' TextArea only
-        $.fn.alaressEditor({
-            targetElements: $('#assessment-description')
-        });
+        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+            detail: {
+                targetElements: ["#assessment-description"],
+            }
+        }));
 
         /**
          * Decide which date fields to show, depending on

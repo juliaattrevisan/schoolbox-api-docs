@@ -1,0 +1,110 @@
+/**
+ * Any style overwrites to customise the CKEditor instance
+ */
+
+/**
+ * overwrite existing ckeditor vars
+ */
+:root {
+    /* Remove the border radius */
+    --ck-border-radius: 0px;
+    /* -- Border colours */
+    --ck-color-toolbar-border: var(--form-border-color);
+    --ck-color-base-border: var(--form-border-color);
+    /* Button hover colour */
+    --ck-color-button-default-hover-background: var(--form-bg-hover-color);
+}
+
+/**
+ * add a min and max height to the editable area
+ */
+.ck.ck-editor__editable_inline {
+    max-height: 400px;
+    min-height: 100px;
+}
+
+/**
+ * add a custom highlight style
+ */
+.ck.ck-content span.highlighted-note {
+    background-color: #ffffb5;
+    display: block;
+    padding: 0.75rem;
+}
+
+/**
+ * So the editor UI matches the styles that will actually be used,
+ * otherwise the default editor styles are different weight and size
+ * than what is actually applied
+ */
+.ck.ck-button.ck-heading_heading2,
+.ck.ck-button.ck-heading_heading3,
+.ck.ck-button.ck-heading_heading4,
+.ck.ck-button.ck-heading_heading5 {
+    font-weight: normal;
+}
+
+.ck.ck-button.ck-heading_heading2 {
+    font-size: 1.125rem;
+}
+
+.ck.ck-button.ck-heading_heading3 {
+    font-size: 1.0625rem;
+}
+
+.ck.ck-button.ck-heading_heading4 {
+    font-size: 1rem;
+}
+
+.ck.ck-button.ck-heading_heading5 {
+    font-size: 0.9375rem;
+}
+
+/**
+ * Style for the word count UI that sits at the bottom of the editor
+ */
+.ck.ck-word-count {
+    background: var(--ck-color-toolbar-background);
+    border: 1px solid var(--ck-color-toolbar-border);
+    border-radius: 0 0 var(--ck-border-radius);
+    border-top-width: 0;
+    display: flex;
+    font: normal normal normal var(--ck-font-size-base)/var(--ck-line-height-base) var(--ck-font-face);
+    justify-content: flex-end;
+    margin-bottom: 1rem;
+    padding: var(--ck-spacing-small) var(--ck-spacing-standard);
+}
+
+.ck.ck-word-count .ck-word-count__words {
+	margin-right: var(--ck-spacing-standard);
+}
+
+/**
+ * Our foundation styles does some funky things with
+ * checkboxes, hiding the <input> and using the <label>
+ * instead, so we need to revert them to a
+ * reasonable display state for the todo-list
+ * https://ckeditor.com/docs/ckeditor5/latest/features/lists/todo-lists.html
+ */
+.ck.ck-editor .todo-list {
+    margin-left: 0.5rem;
+}
+
+.ck.ck-editor .todo-list input[type=checkbox] {
+    height: var(--ck-todo-list-checkmark-size);
+    left: -0.5rem;
+    margin: 0;
+    min-height: auto;
+    opacity: 1;
+    position: relative;
+    width: var(--ck-todo-list-checkmark-size);
+}
+
+.ck.ck-editor .todo-list__label {
+    display: inline;
+}
+
+.ck.ck-editor .todo-list .todo-list__label>input[checked]:before {
+    background: var(--content-ui-background);
+    border-color: var(--content-ui-background);
+}

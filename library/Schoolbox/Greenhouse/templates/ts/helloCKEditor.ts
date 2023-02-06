@@ -1,9 +1,3 @@
-import ClassicEditor from "@ckeditor/ckeditor5-editor-classic/src/classiceditor";
-import Essentials from "@ckeditor/ckeditor5-essentials/src/essentials";
-import Paragraph from "@ckeditor/ckeditor5-paragraph/src/paragraph";
-import Bold from "@ckeditor/ckeditor5-basic-styles/src/bold";
-import Italic from "@ckeditor/ckeditor5-basic-styles/src/italic";
-
 const storageKeys = ["editorData1", "editorData2"];
 const editorTextAreas = document.querySelectorAll("textarea");
 const editors = [];
@@ -22,24 +16,6 @@ function preFillEditors() {
 }
 
 /**
- * create the ckeditor instance
- */
-function createEditors() {
-    editorTextAreas.forEach((editorTextArea) => {
-        ClassicEditor.create(editorTextArea, {
-            plugins: [Essentials, Paragraph, Bold, Italic],
-            toolbar: ["bold", "italic"],
-        })
-            .then((newEditor) => {
-                editors.push(newEditor);
-            })
-            .catch((error) => {
-                console.error(error.stack);
-            });
-    });
-}
-
-/**
  * on selection save the editor content into local storage
  */
 function initEditorSaves() {
@@ -53,5 +29,12 @@ function initEditorSaves() {
 }
 
 preFillEditors();
-createEditors();
 initEditorSaves();
+
+/**
+ * store the newly created editor instance to we can get its data on save
+ */
+document.addEventListener("EDITOR__CREATED", (event: CustomEvent) => {
+    // for the purposes of this demo, we just assume that editor-1 has been created before editor-2
+    editors.push(event.detail.editor);
+});
