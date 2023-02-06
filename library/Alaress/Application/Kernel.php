@@ -44,6 +44,7 @@ use External_Markbook;
 use External_Timetable;
 use External_User;
 use External_UserInterface;
+use Gotenberg\Gotenberg;
 use GuzzleHttp;
 use Http\Adapter\Guzzle7\Client as GuzzleAdapter;
 use InvalidArgumentException;
@@ -1541,6 +1542,30 @@ abstract class Kernel
                         $config->get(ConfigMapper::NAME_GOTENBERG_HOST),
                         new GuzzleAdapter($httpClient),
                     );
+                }
+            )
+        );
+
+        // Gotenberg services:
+        // - Chromium to convert HTML to PDF
+        // - PDF engines to merge
+        $di->set(
+            'gotenberg.htmlToPdf',
+            $di->lazy(
+                static function () use ($di) {
+                    /** @var IConfigLoader $config */
+                    $config = $di->get('config');
+                    return Gotenberg::chromium($config->get(ConfigMapper::NAME_GOTENBERG_HOST));
+                }
+            )
+        );
+        $di->set(
+            'gotenberg.pdfEngines',
+            $di->lazy(
+                static function () use ($di) {
+                    /** @var IConfigLoader $config */
+                    $config = $di->get('config');
+                    return Gotenberg::pdfEngines($config->get(ConfigMapper::NAME_GOTENBERG_HOST));
                 }
             )
         );
