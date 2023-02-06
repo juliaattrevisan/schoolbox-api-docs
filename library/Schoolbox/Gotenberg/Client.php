@@ -19,6 +19,12 @@ use Schoolbox\Realtime\Pipe\PipeManager;
 
 /**
  * Wrapper around Gotenberg's API.
+ *
+ * This class provides:
+ * - factory methods for the Gotenberg API's modules (e.g. Chromium for
+ *   converting HTML or URLs to PDF, PDF Engines for merging PDFs)
+ * - a send method for actually sending the request objects created by those
+ *   modules
  */
 class Client
 {
@@ -46,14 +52,29 @@ class Client
      */
     public const DEFAULT_WAIT_TIMEOUT = 30;
 
+    /**
+     * Constructor
+     *
+     * @param HttpClient  $httpClient The HTTP client used for sending requests.
+     * @param string      $apiHost    The URL which hosts the Gotenberg API.
+     * @param string|null $apiKey     The Gotenberg API key (if required).
+     */
     public function __construct(
         private HttpClient $httpClient,
         private string $apiHost,
-        private string $apiKey,
+        private ?string $apiKey,
     ) {
-        // Pre-configure Chromium and PDF engines
     }
 
+    /**
+     * Build an instance of Gotenberg's Chromium-based HTML to PDF converter.
+     *
+     * @param string|null $sessionHash if provided: a session hash to send along
+     *                                 with the request.
+     *                                 May contain an authenticated Schoolbox
+     *                                 user?
+     * @return Chromium
+     */
     public function buildHtmlToPdfConverter(?string $sessionHash): Chromium
     {
         $params = [];
@@ -63,13 +84,19 @@ class Client
         return (new Chromium($this->apiHost))->extraHttpHeaders($params);
     }
 
+    /**
+     * Build an instance of Gotenberg's PDF engine, as used for merging two or
+     * more pre-generated PDF documents.
+     *
+     * @return PdfEngines
+     */
     public function buildPdfMerger(): PdfEngines
     {
         return (new PdfEngines($this->apiHost));
     }
 
     /**
-     * Send a request created with a Gotenberg client.
+     * Send a request created with one of this object's `build*` methods.
      *
      * @param RequestInterface $request
      * @return ResponseInterface
@@ -80,7 +107,7 @@ class Client
         // Add webhook API key here:
         // note that this uses the old header instead of the new one which
         // `\Gotenberg\MultipartFormDataModule::webhook` adds.
-        if ($this->apiKey) {
+        if (isset($this->apiKey)) {
             $request = $request->withHeader('Gotenberg-Webhookurl-' . self::AUTH_HTTP_HEADER, $this->apiKey);
         }
         return $this->httpClient->sendRequest($request);
