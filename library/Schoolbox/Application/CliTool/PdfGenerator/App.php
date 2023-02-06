@@ -11,8 +11,7 @@ namespace Schoolbox\Application\CliTool\PdfGenerator;
 
 use Alaress\Authorizer\Failure\Unauthenticated;
 use Alaress\Authorizer\Failure\Unauthorized;
-use Gotenberg\Modules\Chromium;
-use Gotenberg\Modules\PdfEngines;
+use Gotenberg\Stream;
 use GuzzleHttp\Client;
 use Predis\ClientInterface as RedisClient;
 use Psr\Container\ContainerExceptionInterface;
@@ -21,13 +20,11 @@ use RuntimeException;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool\App as BaseApp;
 use Schoolbox\Auth\Remote\RemoteLogin;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Gotenberg\RequestFactory;
 use Schoolbox\Realtime\Pipe\PipeManager;
 use Schoolbox\Url\Factory;
 use Schoolbox\User;
-use TheCodingMachine\Gotenberg;
 use Laminas\Uri\UriInterface;
 use ZipArchive;
 
@@ -464,7 +461,7 @@ BASE;
         $attempts          = 0;
         $previousException = null;
         $jsDelay           = $this->getOptAsInt(self::OPT_LONG_JS_DELAY) ?? self::DEFAULT_JS_DELAY;
-        $requestFactory    = new RequestFactory($this->getConfig()->get(ConfigMapper::NAME_GOTENBERG_API_KEY));
+//        $requestFactory    = new RequestFactory($this->getConfig()->get(ConfigMapper::NAME_GOTENBERG_API_KEY));
         while (true) {
             if ($attempts++ >= $maxAttempts) {
                 unlink($filename);
@@ -479,15 +476,18 @@ BASE;
                 // merge appears to not work with URLs.
                 // Just generate a PDF for each URL, then merge them.
 //                /** @var Gotenberg\Document[] $files */
-                $fileContents = [];
+                $mergeRequests = [];
                 foreach ($pdfSource->getUrls() as $i => $url) {
-                    $htmlToPdf = $pdfGenerator->htmlToPdf($sessionHash)
+                    $htmlToPdf = $pdfGenerator->buildHtmlToPdfConverter($sessionHash)
                         ->waitDelay(sprintf('%ds', RequestFactory::DEFAULT_WAIT_DELAY));
                     if ((bool)$this->getOpt(self::OPT_LONG_ORIENTATION_LANDSCAPE)) {
                         $htmlToPdf = $htmlToPdf->landscape();
                     }
 
-                    $fileContents[] = $pdfGenerator->send($htmlToPdf)->getBody()->getContents();
+                    $mergeRequests[] = new Stream(
+                        "$i.pdf",
+                        $pdfGenerator->send($htmlToPdf->url($url))->getBody(),
+                    );
 
 //                    $request = $requestFactory->buildUrlRequest(
 //                        $url,
@@ -505,15 +505,22 @@ BASE;
                 }
 
                 // Merge the intermediary PDFs together, then delete them
-                $request = new Gotenberg\MergeRequest($files);
-                $request->addWebhookURLHTTPHeader(
-                    RequestFactory::AUTH_HTTP_HEADER,
-                    $this->getConfig()->get(ConfigMapper::NAME_GOTENBERG_API_KEY),
-                );
-                $pdfGenerator->store($request, $filename);
-                foreach ($files as $file) {
-                    unlink($tempDir . '/' . $file->getFileName());
-                }
+                $mergeResponse = $pdfGenerator->send($pdfGenerator->buildPdfMerger()->merge(...$mergeRequests));
+                file_put_contents($filename, $mergeResponse->getBody()->getContents());
+//                $mergeRequests = array_map(
+//                    $fileContents,
+//                    fn ($x) => new Stream()
+//                );
+
+//                $request = new Gotenberg\MergeRequest($files);
+//                $request->addWebhookURLHTTPHeader(
+//                    RequestFactory::AUTH_HTTP_HEADER,
+//                    $this->getConfig()->get(ConfigMapper::NAME_GOTENBERG_API_KEY),
+//                );
+//                $pdfGenerator->store($request, $filename);
+//                foreach ($files as $file) {
+//                    unlink($tempDir . '/' . $file->getFileName());
+//                }
                 break;
             } catch (RuntimeException $e) {
                 $this->getLogger()->warning($e->getMessage());

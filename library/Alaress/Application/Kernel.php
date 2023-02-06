@@ -1542,8 +1542,7 @@ abstract class Kernel
                     // Mimic the previous API as closely as possible?
                     return new GotenbergClient(
                         new GuzzleAdapter($httpClient),
-                        Gotenberg::chromium($config->get(ConfigMapper::NAME_GOTENBERG_HOST)),
-                        Gotenberg::pdfEngines($config->get(ConfigMapper::NAME_GOTENBERG_HOST)),
+                        $config->get(ConfigMapper::NAME_GOTENBERG_HOST),
                         $config->get(ConfigMapper::NAME_GOTENBERG_API_KEY),
                     );
                 }

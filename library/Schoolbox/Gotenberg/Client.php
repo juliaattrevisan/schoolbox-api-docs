@@ -25,27 +25,24 @@ class Client
 {
     public function __construct(
         private HttpClient $httpClient,
-        private Chromium $htmlToPdf,
-        private PdfEngines $pdfEngine,
+        private string $apiHost,
         private string $apiKey,
     ) {
         // Pre-configure Chromium and PDF engines
     }
 
-    public function htmlToPdf(?string $sessionHash): Chromium
+    public function buildHtmlToPdfConverter(?string $sessionHash): Chromium
     {
-        // TODO factoryise this as this will never be immutable
+        $params = [];
         if (isset($sessionHash)) {
-            return $this->htmlToPdf->extraHttpHeaders([
-                'Cookie' => sprintf('%s=%s', PipeManager::PHP_SESSION_PREFIX, $sessionHash)
-            ]);
+            $params['Cookie'] = sprintf('%s=%s', PipeManager::PHP_SESSION_PREFIX, $sessionHash);
         }
-        return $this->htmlToPdf->extraHttpHeaders([]);
+        return (new Chromium($this->apiHost))->extraHttpHeaders($params);
     }
 
-    public function merge(): PdfEngines
+    public function buildPdfMerger(): PdfEngines
     {
-        return $this->pdfEngine;
+        return (new PdfEngines($this->apiHost));
     }
 
     /**
