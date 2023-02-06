@@ -461,7 +461,6 @@ BASE;
         $attempts          = 0;
         $previousException = null;
         $jsDelay           = $this->getOptAsInt(self::OPT_LONG_JS_DELAY) ?? self::DEFAULT_JS_DELAY;
-//        $requestFactory    = new RequestFactory($this->getConfig()->get(ConfigMapper::NAME_GOTENBERG_API_KEY));
         while (true) {
             if ($attempts++ >= $maxAttempts) {
                 unlink($filename);
@@ -475,7 +474,7 @@ BASE;
                 // Gotenberg needs to download each URL individually:
                 // merge appears to not work with URLs.
                 // Just generate a PDF for each URL, then merge them.
-//                /** @var Gotenberg\Document[] $files */
+                /** @var array<Stream> $mergeRequests */
                 $mergeRequests = [];
                 foreach ($pdfSource->getUrls() as $i => $url) {
                     $htmlToPdf = $pdfGenerator->buildHtmlToPdfConverter($sessionHash)
@@ -488,39 +487,16 @@ BASE;
                         "$i.pdf",
                         $pdfGenerator->send($htmlToPdf->url($url))->getBody(),
                     );
-
-//                    $request = $requestFactory->buildUrlRequest(
-//                        $url,
-//                        RequestFactory::DEFAULT_WAIT_DELAY,
-//                        RequestFactory::DEFAULT_WAIT_TIMEOUT,
-//                        $sessionHash
-//                    );
-//                    $request->setLandscape((bool)$this->getOpt(self::OPT_LONG_ORIENTATION_LANDSCAPE));
-//
-//                    // Gotenberg doesn't seem to care about the response code.
-//                    // Just have to hope that no requests are made with an
-//                    // invalid URL.
-//                    $pdfGenerator->store($request, $tempDir . "/$i.pdf");
-//                    $files[] = Gotenberg\DocumentFactory::makeFromPath("$i.pdf", $tempDir . "/$i.pdf");
                 }
 
                 // Merge the intermediary PDFs together, then delete them
-                $mergeResponse = $pdfGenerator->send($pdfGenerator->buildPdfMerger()->merge(...$mergeRequests));
-                file_put_contents($filename, $mergeResponse->getBody()->getContents());
-//                $mergeRequests = array_map(
-//                    $fileContents,
-//                    fn ($x) => new Stream()
-//                );
-
-//                $request = new Gotenberg\MergeRequest($files);
-//                $request->addWebhookURLHTTPHeader(
-//                    RequestFactory::AUTH_HTTP_HEADER,
-//                    $this->getConfig()->get(ConfigMapper::NAME_GOTENBERG_API_KEY),
-//                );
-//                $pdfGenerator->store($request, $filename);
-//                foreach ($files as $file) {
-//                    unlink($tempDir . '/' . $file->getFileName());
-//                }
+                $mergeRequestCount = count($mergeRequests);
+                if ($mergeRequestCount === 1) {
+                    file_put_contents($filename, $mergeRequests[0]->getStream());
+                } elseif ($mergeRequestCount > 0) {
+                    $mergeResponse = $pdfGenerator->send($pdfGenerator->buildPdfMerger()->merge(...$mergeRequests));
+                    file_put_contents($filename, $mergeResponse->getBody()->getContents());
+                }
                 break;
             } catch (RuntimeException $e) {
                 $this->getLogger()->warning($e->getMessage());
