@@ -1533,12 +1533,12 @@ abstract class Kernel
                     /** @var IConfigLoader $config */
                     $config = $di->get('config');
                     /** @var ProxyServer $proxyServer */
-                    $proxyServer = $di->get('proxyServer');
-                    $httpClient  = new GuzzleHttp\Client(
-                        ['curl' => $proxyServer->buildCurlOptions(GotenbergClient::DEFAULT_WAIT_TIMEOUT)]
+                    $proxyServer        = $di->get('proxyServer');
+                    $defaultCurlOptions = [CURLOPT_TIMEOUT => GotenbergClient::DEFAULT_WAIT_TIMEOUT];
+                    $httpClient         = new GuzzleHttp\Client(
+                        ['curl' => $defaultCurlOptions + $proxyServer->buildCurlOptions()]
                     );
 
-                    // Mimic the previous API as closely as possible?
                     $gotenbergApiKey = $config->get(ConfigMapper::NAME_GOTENBERG_API_KEY);
                     if ($gotenbergApiKey === '') {
                         $gotenbergApiKey = null;
