@@ -123,6 +123,23 @@ const viewAllText = computed(() => {
 });
 
 /**
+ * Used to determine the text shown for the view status link / menu
+ */
+const viewStatusText = computed(() => {
+    if ('Due Work' === assessmentType.value) {
+        return "Submission history";
+    }
+    if ('Task' === assessmentType.value) {
+        return "Student View";
+    }
+    if ('Project' === assessmentType.value) {
+        return "View Progress";
+    }
+    return "View Attempts";
+});
+
+
+/**
  * Get the latest routes to display within the popout
  *
  * @param { Routes } newRoutes - the routes linked to the selection
@@ -399,18 +416,7 @@ async function onMenuItemSelected(target: string, shouldPost: boolean = false) {
                     :class="{ 'is-disabled': !routes.historyRoute || isExcluded }"
                     @selected="onMenuItemSelected(routes.historyRoute)"
                 >
-                    <template v-if="'Due Work' === assessmentType">
-                        Submission history
-                    </template>
-                    <template v-else-if="'Project' === assessmentType">
-                        View Progress
-                    </template>
-                    <template v-else-if="'Task' === assessmentType">
-                        Student View
-                    </template>
-                    <template v-else>
-                        View Attempts
-                    </template>
+                    {{ viewStatusText }}
                 </pop-out-menu-item>
             </div>
         </div>
