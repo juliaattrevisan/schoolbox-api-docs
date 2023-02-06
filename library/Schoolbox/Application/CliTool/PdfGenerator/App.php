@@ -144,7 +144,7 @@ abstract class App extends BaseApp
 
 
         // Build a PDF generator object
-        /** @var Gotenberg\Client $pdfGenerator */
+        /** @var \Schoolbox\Gotenberg\Client $pdfGenerator */
         $pdfGenerator = $this->getDi()->get('pdfGenerator');
 
 
@@ -449,14 +449,14 @@ BASE;
      *
      * @param SourceBundle                       $pdfSource
      * @param string                             $tempDir
-     * @param Gotenberg\GotenbergClientInterface $pdfGenerator
+     * @param \Schoolbox\Gotenberg\Client $pdfGenerator
      * @param string                             $sessionHash
      * @return string
      */
     private function generatePdf(
         SourceBundle $pdfSource,
         string $tempDir,
-        Gotenberg\GotenbergClientInterface $pdfGenerator,
+        \Schoolbox\Gotenberg\Client $pdfGenerator,
         string $sessionHash
     ): string {
         $filename          = $tempDir . '/' . $pdfSource->getFilename();
@@ -478,22 +478,30 @@ BASE;
                 // Gotenberg needs to download each URL individually:
                 // merge appears to not work with URLs.
                 // Just generate a PDF for each URL, then merge them.
-                /** @var Gotenberg\Document[] $files */
-                $files = [];
+//                /** @var Gotenberg\Document[] $files */
+                $fileContents = [];
                 foreach ($pdfSource->getUrls() as $i => $url) {
-                    $request = $requestFactory->buildUrlRequest(
-                        $url,
-                        RequestFactory::DEFAULT_WAIT_DELAY,
-                        RequestFactory::DEFAULT_WAIT_TIMEOUT,
-                        $sessionHash
-                    );
-                    $request->setLandscape((bool)$this->getOpt(self::OPT_LONG_ORIENTATION_LANDSCAPE));
+                    $htmlToPdf = $pdfGenerator->htmlToPdf($sessionHash)
+                        ->waitDelay(sprintf('%ds', RequestFactory::DEFAULT_WAIT_DELAY));
+                    if ((bool)$this->getOpt(self::OPT_LONG_ORIENTATION_LANDSCAPE)) {
+                        $htmlToPdf = $htmlToPdf->landscape();
+                    }
 
-                    // Gotenberg doesn't seem to care about the response code.
-                    // Just have to hope that no requests are made with an
-                    // invalid URL.
-                    $pdfGenerator->store($request, $tempDir . "/$i.pdf");
-                    $files[] = Gotenberg\DocumentFactory::makeFromPath("$i.pdf", $tempDir . "/$i.pdf");
+                    $fileContents[] = $pdfGenerator->send($htmlToPdf)->getBody()->getContents();
+
+//                    $request = $requestFactory->buildUrlRequest(
+//                        $url,
+//                        RequestFactory::DEFAULT_WAIT_DELAY,
+//                        RequestFactory::DEFAULT_WAIT_TIMEOUT,
+//                        $sessionHash
+//                    );
+//                    $request->setLandscape((bool)$this->getOpt(self::OPT_LONG_ORIENTATION_LANDSCAPE));
+//
+//                    // Gotenberg doesn't seem to care about the response code.
+//                    // Just have to hope that no requests are made with an
+//                    // invalid URL.
+//                    $pdfGenerator->store($request, $tempDir . "/$i.pdf");
+//                    $files[] = Gotenberg\DocumentFactory::makeFromPath("$i.pdf", $tempDir . "/$i.pdf");
                 }
 
                 // Merge the intermediary PDFs together, then delete them

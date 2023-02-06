@@ -34,6 +34,7 @@ class Client
 
     public function htmlToPdf(?string $sessionHash): Chromium
     {
+        // TODO factoryise this as this will never be immutable
         if (isset($sessionHash)) {
             return $this->htmlToPdf->extraHttpHeaders([
                 'Cookie' => sprintf('%s=%s', PipeManager::PHP_SESSION_PREFIX, $sessionHash)
