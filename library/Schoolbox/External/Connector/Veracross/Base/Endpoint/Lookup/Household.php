@@ -66,11 +66,11 @@ class Household
                 foreach ($page['data'] as $record) {
                     /* Overwrite with lookupped values
                      */
-                    $compiledParent = $record;
-                    $compiledParent['name_prefix'] = $valueLists['name_prefix'][$compiledParent['name_prefix']];
-                    $compiledParent['name_suffix'] = $valueLists['name_suffix'][$compiledParent['name_suffix']];
+                    $compiledRecord = $record;
+                    $compiledRecord['name_prefix'] = $valueLists['name_prefix'][$compiledRecord['name_prefix']];
+                    $compiledRecord['name_suffix'] = $valueLists['name_suffix'][$compiledRecord['name_suffix']];
 
-                    $this->lookup[$record['household_id']][] = $compiledParent;
+                    $this->lookup[$record['household_id']][] = $compiledRecord;
                 }
             }
         }

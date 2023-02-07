@@ -17,6 +17,7 @@ use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\ContactInfo;
+use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\EmergencyContact;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Health;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Household;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\ValueListConverter;
@@ -49,7 +50,7 @@ class Profile implements IStrategy
      * staff_faculty:list
      * contact_info:list
      */
-    public const SCOPE = 'students:list health.patients:list parents:list staff_faculty:list contact_info:list';
+    public const SCOPE = 'students:list emergency_contacts:list health.patients:list parents:list staff_faculty:list contact_info:list';
 
 
     /**
@@ -186,29 +187,31 @@ class Profile implements IStrategy
      */
     private function importStudents(): void
     {
-        /* Prefetch a list of households, which contain Parents
-         */
-        $this->log->debug('Prefetching households...');
-        $householdLookup = (new Household($this->api))->generate();
-
-        /* Prefetch a list of emergency contacts
-         * TODO: We don't have perms yet; need Veracross to let us in
-         * $emergencyContactsLookup = (new EmergencyContact($this->api))->generate();
-         */
-        $this->log->debug('Prefetching emergency contacts...');
-        $emergencyContactsLookup = [];
-
         /* Prefetch a list of medically-afflicted dudes
          */
         $this->log->debug('Prefetching medicals...');
         $medicalLookup = (new Health($this->api))->generate();
 
-        /* Prefetch a list of contact info, which contain phone numbers
-         * This generally only applies to Parents and Staff
+        /* Only available when Families strat is enabled
          */
+        $householdLookup = [];
         $contactInfoLookup = [];
+        $emergencyContactsLookup = [];
 
         if ($this->validStrats->isFamiliesStratEnabled()) {
+            /* Prefetch a list of households, which contain Parents
+             */
+            $this->log->debug('Prefetching households...');
+            $householdLookup = (new Household($this->api))->generate();
+
+            /* Prefetch a list of emergency contacts
+             */
+            $this->log->debug('Prefetching emergency contacts...');
+            $emergencyContactsLookup = (new EmergencyContact($this->api))->generate();
+
+            /* Prefetch a list of contact info, which contain phone numbers
+             * This generally only applies to Parents and Staff
+             */
             $this->log->debug('Prefetching contact info...');
             $contactInfoLookup = $this->contactInfoLookup->generate();
         }
@@ -236,7 +239,7 @@ class Profile implements IStrategy
                 $firstname = trim((string)$student['first_name']);
                 $firstnamePreferred = (new FirstMeaningfulValue())->find([
                     $student['preferred_name'],
-                   $firstname,
+                    $firstname,
                 ]);
 
                 $form = '';

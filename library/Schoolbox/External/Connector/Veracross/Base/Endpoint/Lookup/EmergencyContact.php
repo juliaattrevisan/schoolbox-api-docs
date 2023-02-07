@@ -61,7 +61,10 @@ class EmergencyContact
                 foreach ($page['data'] as $record) {
                     /* Overwrite with lookupped values
                      */
-                     $this->lookup[$record['student_id']][] = $record;
+                    $compiledRecord = $record;
+                    $compiledRecord['relationship'] = $valueLists['relationship'][$record['relationship']];
+
+                    $this->lookup[$record['student_id']][] = $compiledRecord;
                 }
             }
         }
