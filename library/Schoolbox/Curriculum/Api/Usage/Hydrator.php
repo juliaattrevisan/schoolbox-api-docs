@@ -40,8 +40,7 @@ class Hydrator
     }
 
     /**
-     * Hydrates the results from `\Schoolbox\Curriculum\Api\Usage\Cursor::retrieveResults`
-     * into:
+     * Hydrates `\Schoolbox\Curriculum\Api\Usage\Cursor::retrieveResults` into:
      * * a discriminator value, which specifies the type of object
      * * an object value, which contains the object's data
      *
@@ -51,65 +50,8 @@ class Hydrator
     public function hydrateResults(Collection $results): Collection
     {
         // Fetch results from various mappers
-        $models    = [];
-        $mapId     = fn (array $result) => $result['id'];
-        $folderIds = $results
-            ->filter($this->buildFilter(Cursor::DISCRIMINATOR_FOLDER))
-            ->map($mapId)
-            ->getAll();
-        $models[Cursor::DISCRIMINATOR_FOLDER] = $this->folderMapper->findByColumn('id', $folderIds)->indexBy('id');
-
-        $courseIds = $results
-            ->filter($this->buildFilter(Cursor::DISCRIMINATOR_COURSE))
-            ->map($mapId)
-            ->getAll();
-        $models[Cursor::DISCRIMINATOR_COURSE] = $this->courseSpecMapper->findByColumn('id', $courseIds)->indexBy('id');
-
-        $unitIds = $results
-            ->filter($this->buildFilter(Cursor::DISCRIMINATOR_UNIT))
-            ->map($mapId)
-            ->getAll();
-        $models[Cursor::DISCRIMINATOR_UNIT] = $this->unitSpecMapper->findByColumn('id', $unitIds)->indexBy('id');
-
-        // Find parent folders of each folder/course/unit as well?
-        foreach ($models[Cursor::DISCRIMINATOR_COURSE] as $course) {
-            /** @var CourseSpec\Model $course */
-            $folderIds[] = $course->getFolder()->getId();
-        }
-        foreach ($models[Cursor::DISCRIMINATOR_UNIT] as $unit) {
-            /** @var UnitSpec\Model $unit */
-            $folderIds[] = $unit->getFolder()->getId();
-            $folderIds[] = $unit->getCourse()->getFolder()->getId();
-        }
-        $allFolders         = $this->folderMapper->findByColumn('id', $folderIds);
-        $allFolderParentIds = $allFolders->map(fn (Folder\Model $folder) => $folder->getParent()?->getId());
-        $allFolderParents   = $this->folderMapper->findByColumn('id', $allFolderParentIds)->indexBy('id');
-        foreach ($models[Cursor::DISCRIMINATOR_FOLDER] as $folder) {
-            /** @var Folder\Model $folder */
-            $parentId = $folder->getParent()?->getId();
-            if (isset($parentId, $allFolderParents[$parentId])) {
-                $folder->setParent($allFolderParents[$parentId]);
-            }
-        }
-        foreach ($models[Cursor::DISCRIMINATOR_COURSE] as $course) {
-            /** @var CourseSpec\Model $course */
-            $parentId = $course->getFolder()->getParent()?->getId();
-            if (isset($parentId, $allFolderParents[$parentId])) {
-                $course->getFolder()->setParent($allFolderParents[$parentId]);
-            }
-        }
-        foreach ($models[Cursor::DISCRIMINATOR_UNIT] as $unit) {
-            /** @var UnitSpec\Model $unit */
-            $courseParentId = $unit->getCourse()->getFolder()->getParent()?->getId();
-            if (isset($courseParentId, $allFolderParents[$parentId])) {
-                $unit->getCourse()->getFolder()->setParent($allFolderParents[$courseParentId]);
-            }
-            $unitParentId = $unit->getFolder()->getParent()?->getId();
-            if (isset($unitParentId, $allFolderParents[$unitParentId])) {
-                $unit->getFolder()->setParent($allFolderParents[$unitParentId]);
-            }
-        }
-
+        $models        = $this->findModelsForResults($results);
+        $models        = $this->assignParentFoldersToModels($models);
         $newCollection = new Collection();
         foreach ($results as $result) {
             $disc        = $result['discriminator'];
@@ -133,6 +75,36 @@ class Hydrator
     }
 
     /**
+     * Finds models for results.
+     *
+     * @param Collection<array{id: int, name: string, discriminator: string}> $results
+     * @return array<string, Collection>
+     */
+    private function findModelsForResults(Collection $results): array
+    {
+        $models    = [];
+        $mapId     = fn (array $result) => $result['id'];
+        $folderIds = $results
+            ->filter($this->buildFilter(Cursor::DISCRIMINATOR_FOLDER))
+            ->map($mapId)
+            ->getAll();
+        $models[Cursor::DISCRIMINATOR_FOLDER] = $this->folderMapper->findByColumn('id', $folderIds)->indexBy('id');
+
+        $courseIds = $results
+            ->filter($this->buildFilter(Cursor::DISCRIMINATOR_COURSE))
+            ->map($mapId)
+            ->getAll();
+        $models[Cursor::DISCRIMINATOR_COURSE] = $this->courseSpecMapper->findByColumn('id', $courseIds)->indexBy('id');
+
+        $unitIds = $results
+            ->filter($this->buildFilter(Cursor::DISCRIMINATOR_UNIT))
+            ->map($mapId)
+            ->getAll();
+        $models[Cursor::DISCRIMINATOR_UNIT] = $this->unitSpecMapper->findByColumn('id', $unitIds)->indexBy('id');
+        return $models;
+    }
+
+    /**
      * Build a filter function for finding results which match this
      * discriminator.
      *
@@ -142,5 +114,66 @@ class Hydrator
     private function buildFilter(string $discriminator): callable
     {
         return fn (array $result) => $result['discriminator'] === $discriminator;
+    }
+
+    /**
+     * Assign parent folders to the various results within `$models`:
+     * - Folder results
+     * - The folder of course results
+     * - The folder and course's folder of unit results
+     *
+     * @param array<string, Collection> $models
+     * @return array<string, Collection> `$models` with parent folders assigned
+     */
+    private function assignParentFoldersToModels(array $models): array
+    {
+        // Collate folder IDs
+        $folderIds = [];
+        foreach ($models[Cursor::DISCRIMINATOR_FOLDER] ?? [] as $folder) {
+            /** @var Folder\Model $folder */
+            $folderIds[] = $folder->getId();
+        }
+        foreach ($models[Cursor::DISCRIMINATOR_COURSE] ?? [] as $course) {
+            /** @var CourseSpec\Model $course */
+            $folderIds[] = $course->getFolder()->getId();
+        }
+        foreach ($models[Cursor::DISCRIMINATOR_UNIT] ?? [] as $unit) {
+            /** @var UnitSpec\Model $unit */
+            $folderIds[] = $unit->getFolder()->getId();
+            $folderIds[] = $unit->getCourse()->getFolder()->getId();
+        }
+
+        // Look up parent folders
+        $allFolders         = $this->folderMapper->findByColumn('id', $folderIds);
+        $allFolderParentIds = $allFolders->map(fn(Folder\Model $folder) => $folder->getParent()?->getId());
+        $allFolderParents   = $this->folderMapper->findByColumn('id', $allFolderParentIds)->indexBy('id');
+
+        // Assign parent folders
+        foreach ($models[Cursor::DISCRIMINATOR_FOLDER] ?? [] as $folder) {
+            /** @var Folder\Model $folder */
+            $parentId = $folder->getParent()?->getId();
+            if (isset($parentId, $allFolderParents[$parentId])) {
+                $folder->setParent($allFolderParents[$parentId]);
+            }
+        }
+        foreach ($models[Cursor::DISCRIMINATOR_COURSE] ?? [] as $course) {
+            /** @var CourseSpec\Model $course */
+            $parentId = $course->getFolder()->getParent()?->getId();
+            if (isset($parentId, $allFolderParents[$parentId])) {
+                $course->getFolder()->setParent($allFolderParents[$parentId]);
+            }
+        }
+        foreach ($models[Cursor::DISCRIMINATOR_UNIT] ?? [] as $unit) {
+            /** @var UnitSpec\Model $unit */
+            $courseParentId = $unit->getCourse()->getFolder()->getParent()?->getId();
+            if (isset($courseParentId, $allFolderParents[$courseParentId])) {
+                $unit->getCourse()->getFolder()->setParent($allFolderParents[$courseParentId]);
+            }
+            $unitParentId = $unit->getFolder()->getParent()?->getId();
+            if (isset($unitParentId, $allFolderParents[$unitParentId])) {
+                $unit->getFolder()->setParent($allFolderParents[$unitParentId]);
+            }
+        }
+        return $models;
     }
 }
