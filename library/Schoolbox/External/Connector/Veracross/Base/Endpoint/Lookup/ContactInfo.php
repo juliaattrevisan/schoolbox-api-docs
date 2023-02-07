@@ -55,7 +55,7 @@ class ContactInfo
                 foreach ($page['data'] as $record) {
                     /* Overwrite with lookupped values
                      */
-                     $this->lookup[$record['id']] = $record;
+                    $this->lookup[$record['id']] = $record;
                 }
             }
         }
