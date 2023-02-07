@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Veracross\Base\Endpoint;
+namespace Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup;
 
 /**
  * Takes a set of included value_list records and converts
@@ -17,9 +17,12 @@ namespace Schoolbox\External\Connector\Veracross\Base\Endpoint;
  * According to Veracross,
  *     "An array of value list items whose id field matches the value in the response data"
  *
- * TODO Find out if the contents of a value_list changes depending
- *  on what ids were present in the payload; that might force you
- *  to compile value_lists PER PAYLOAD which is what we currently do
+ * From Thad 7/2/23:
+ *     "Value Lists, in general: You are correct, value lists contain all of the values
+ *      for the database you are interacting with."
+ *
+ *     "Value Lists, <None>: Hardcoded – throughout Veracross we reserve and model ID 0
+ *      as a null value in cases where objects have IDs."
  */
 class ValueListConverter
 {

@@ -11,7 +11,6 @@ namespace Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup;
 
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Profile\Profile;
-use Schoolbox\External\Connector\Veracross\Base\Endpoint\ValueListConverter;
 
 /**
  * Grab all the Parents from everywhere. This is the Household concept
