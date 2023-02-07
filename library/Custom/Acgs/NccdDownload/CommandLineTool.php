@@ -525,14 +525,15 @@ class CommandLineTool extends App
      */
     private function convertToPdf(string $filename, string $input): string
     {
-        /** @var Chromium $htmlToPdf */
-        $htmlToPdf = $this->getDi()->get('gotenberg.htmlToPdf');
-        $request   = $htmlToPdf->html(
-            new Stream($filename, (new StreamFactory())->createStream(Scrub::htmlAbsoluteUri($input, $this->baseUri)))
-        );
-
         /** @var Client $gotenberg */
         $gotenberg = $this->getDi()->get('pdfGenerator');
+        $request   = $gotenberg->buildHtmlToPdfConverter(null)
+            ->html(
+                new Stream(
+                    $filename,
+                    (new StreamFactory())->createStream(Scrub::htmlAbsoluteUri($input, $this->baseUri))
+                )
+            );
         $response  = $gotenberg->send($request);
         return $response->getBody()->getContents();
     }
