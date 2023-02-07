@@ -13,6 +13,7 @@ use Alaress_Date_Format;
 use InvalidArgumentException;
 use PDOException;
 use RangeException;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
@@ -433,5 +434,40 @@ class Controller extends Base
                 : ReturnedWork::REVIEW_ROUTE_SELF_REFLECTION;
         }
         return $reviewRoute;
+    }
+
+    /**
+     * Publish last draft feedback for a participant.
+     *
+     * This is a dueWork-only route. It is not applicable to Project, Quiz, or Task.
+     *
+     * @param DueWork\Model $assessment
+     * @param User  $student
+     * @since 23.0
+     * @api   POST /learning/assessments/{assessmentId}/{studentId}/feedback/publish
+     */
+    public function postPublishFeedback(DueWork\Model $assessment, User $student)
+    {
+        $participant = $assessment->getParticipant($student);
+        $feedback = $participant->findMostRecentInstructorGivenFeedback();
+
+        if (null === $feedback) {
+            throw new NotFound("No Feedback for assessment.");
+        }
+
+        if (!$feedback->isPublished()) {
+            // publish this
+            $feedback->setPublishedAt(\Alaress_Date_Format::now());
+        }
+
+        $this->getFeedbackDataSource()->save($feedback);
+
+        $data = [
+            'success' => true,
+            'message' => 'OK',
+            'id'      => $feedback->getId(),
+        ];
+
+        $this->respond('', $data);
     }
 }

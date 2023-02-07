@@ -285,13 +285,32 @@ function onToggleSelected() {
 }
 
 /**
+ * UI toggle student to exclusion display
+ * are change from excluded included and visa-versa
+ */
+function toggleExclusion() {
+    // invert the excluded option that is currently the only post system
+    isExcluded.value = !isExcluded.value;
+    // update the data location in html, so if you click back in it doesn't break...
+    const element = referenceElement.value;
+    if (element) {
+        element.classList.toggle('excluded');
+        const currentValue = element.getAttribute('data-is-excluded');
+        const newValue = currentValue === 'true' ? 'false' : 'true';
+        element.setAttribute('data-is-excluded', newValue);
+    }
+}
+
+
+/**
  * Navigate to a new page
  *
  * @param { string } target - The URL we want to navigate to.
- * @param { boolean } shouldPost - Should we use this as a post request?.
+ * @param { string } action - Should we redirect, or do a specific action? (exclude,publish)
  */
-async function onMenuItemSelected(target: string, shouldPost: boolean = false) {
-    if (!shouldPost) {
+async function onMenuItemSelected(target: string, action: string|null = null) {
+    // No specific action, just redirect
+    if (null === action) {
         window.location.href = target;
         return;
     }
@@ -308,16 +327,12 @@ async function onMenuItemSelected(target: string, shouldPost: boolean = false) {
         });
         if (response.ok) {
             hasLoadError.value = false;
-            // invert the excluded option that is currently the only post system
-            isExcluded.value = !isExcluded.value;
-            // update the data location in html, so if you click back in it doesn't break...
-            const element = referenceElement.value;
-            if (element) {
-                element.classList.toggle('excluded');
-                const currentValue = element.getAttribute('data-is-excluded');
-                const newValue = currentValue === 'true' ? 'false' : 'true';
-                element.setAttribute('data-is-excluded', newValue);
+
+            //if action is exclude then toggle the exclusion UI
+            if ('exclude' === action) {
+                toggleExclusion();
             }
+
             // If including student reload the activity list
             if ('Due Work' === assessmentType.value) {
                 await getActivity();
@@ -395,20 +410,20 @@ async function onMenuItemSelected(target: string, shouldPost: boolean = false) {
                     </pop-out-menu-item>
                     <pop-out-menu-item
                         :class="{ 'is-disabled': !routes.publishRoute || isActivityEmpty || !hasFeedback }"
-                        @selected="onMenuItemSelected(routes.publishRoute)"
+                        @selected="onMenuItemSelected(routes.publishRoute, 'publish')"
                     >
                         Publish Feedback
                     </pop-out-menu-item>
                 </template>
                 <pop-out-menu-item v-if="isExcluded"
                                    :class="{ 'is-disabled': !isExcluded }"
-                                   @selected="onMenuItemSelected(routes.includeRoute, true)"
+                                   @selected="onMenuItemSelected(routes.includeRoute, 'exclude')"
                 >
                     Include Student
                 </pop-out-menu-item>
                 <pop-out-menu-item v-else-if="'Project' !== assessmentType"
                     :class="{ 'is-disabled': isExcluded }"
-                    @selected="onMenuItemSelected(routes.excludeRoute, true)"
+                    @selected="onMenuItemSelected(routes.excludeRoute, 'exclude')"
                 >
                     Exclude Student
                 </pop-out-menu-item>
