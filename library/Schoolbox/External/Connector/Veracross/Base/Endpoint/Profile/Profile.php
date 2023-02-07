@@ -20,6 +20,7 @@ use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\ContactInfo;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\EmergencyContact;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Health;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Household;
+use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Relationship;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\ValueListConverter;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
@@ -208,7 +209,7 @@ class Profile implements IStrategy
             /* Prefetch a list of relationships
              */
             $this->log->debug('Prefetching relationships...');
-            $relationshipLookup = $relationshipLookup->generate();
+            $relationshipLookup = (new Relationship($this->api))->generate();
 
             /* Prefetch a list of emergency contacts
              */
@@ -519,7 +520,13 @@ class Profile implements IStrategy
                 /* Add their parents' profile data
                  */
                 if ($this->validStrats->isFamiliesStratEnabled()) {
-                    $this->importParentsOfStudent($externalId, $studentBaseProfile, $contactInfoLookup, $householdLookup[$student['household_id']] ?? []);
+                    $this->importParentsOfStudent(
+                        $externalId,
+                        $studentBaseProfile,
+                        $contactInfoLookup,
+                        $relationshipLookup,
+                        $householdLookup[$student['household_id']] ?? []
+                    );
                 }
             }
         }
@@ -548,6 +555,7 @@ class Profile implements IStrategy
      * @param string $studentExternalId
      * @param Model  $studentBaseProfile
      * @param array  $contactInfoLookup
+     * @param array  $relationshipLookup
      * @param array  $household
      * @throws DefinitionException
      * @throws Exception
@@ -558,6 +566,7 @@ class Profile implements IStrategy
         string $studentExternalId,
         UserProfile\Model $studentBaseProfile,
         array $contactInfoLookup,
+        array $relationshipLookup,
         array $household
     ): void {
         /* For every associated parent, find out if they have a parent profile
@@ -579,15 +588,13 @@ class Profile implements IStrategy
             ]);
 
             $lastname = trim((string)$parent['last_name']);
-            $phoneHome = trim((string)$contactInfoLookup[$parent['id']]['home_phone']);
-            $phoneMobile = trim((string)$contactInfoLookup[$parent['id']]['mobile_phone']);
-            $phoneWork = trim((string)$contactInfoLookup[$parent['id']]['business_phone']);
+            $phoneHome = trim((string)($contactInfoLookup[$parent['id']]['home_phone'] ?? ''));
+            $phoneMobile = trim((string)($contactInfoLookup[$parent['id']]['mobile_phone'] ?? ''));
+            $phoneWork = trim((string)($contactInfoLookup[$parent['id']]['business_phone'] ?? ''));
 
-            /* TODO Need relationships:list scope
-             *  $relationship might be inferred from relationships:list,
-             *  which provides a Value List
+            /* Dig out some info about these guys' relationships to a student
              */
-            $relationship = '';
+            $relationship = trim((string)($relationshipLookup[$studentExternalId][$externalId]['relationship'] ?? ''));
 
             $title = trim((string)$parent['name_prefix']);
             $username = trim((string)$parent['username']);
@@ -713,7 +720,7 @@ class Profile implements IStrategy
                 $category = trim((string)$staffLookup['faculty_type'][$staff['faculty_type']]);
                 $department = trim((string)$staffLookup['department'][$staff['department']]);
                 $email = trim((string)$staff['email_1']);
-                $phone = trim((string)$contactInfoLookup[$staff['id']]['business_phone']);
+                $phone = trim((string)($contactInfoLookup[$staff['id']]['business_phone'] ?? ''));
                 $positionTitle = trim((string)$staff['job_title']);
                 $room = '';
                 $title = trim((string)$staffLookup['name_prefix'][$staff['name_prefix']]);

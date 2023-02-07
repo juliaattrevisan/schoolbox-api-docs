@@ -52,14 +52,14 @@ class Api implements IApi
      *
      * Lots of little pages is super slow for them
      */
-    private const PAGE_SIZE = 1000;
+    private const PAGE_SIZE = 100;
 
 
     /**
      * Maximum number of pages to obtain from an endpoint
      * to safeguard against infinite loops
      */
-    private const MAX_PAYLOADS = 1000;
+    private const MAX_PAYLOADS = 100;
 
 
     /**
