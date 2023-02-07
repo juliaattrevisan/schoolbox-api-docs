@@ -29,12 +29,14 @@ use Schoolbox\Realtime\Pipe\PipeManager;
 class Client
 {
     /**
-     * The name of the HTTP header used for authorization of Gotenberg requests.
-     *
-     * `$this->apiKey` will be set as the value of this header in all requests
-     * to the Gotenberg container.
+     * The name of the HTTP header within which the API key is sent.
      */
-    public const AUTH_HTTP_HEADER = 'SBAuth';
+    public const API_KEY_HEADER = 'x-api-key';
+
+    /**
+     * The name of the HTTP header within which the API version is sent.
+     */
+    public const API_VERSION_HEADER = 'x-api-version';
 
     /**
      * Default wait for Javascript to complete rendering a page retrieved by a
@@ -108,12 +110,12 @@ class Client
     {
         // Add API version here
         if (isset($this->apiVersion)) {
-            $request = $request->withHeader('x-api-version', $this->apiVersion);
+            $request = $request->withHeader(self::API_VERSION_HEADER, $this->apiVersion);
         }
 
         // Add webhook API key here
         if (isset($this->apiKey)) {
-            $request = $request->withHeader('x-api-key', $this->apiKey);
+            $request = $request->withHeader(self::API_KEY_HEADER, $this->apiKey);
         }
         return $this->httpClient->sendRequest($request);
     }

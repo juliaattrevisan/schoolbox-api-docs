@@ -461,18 +461,37 @@ abstract class Kernel
         );
         $di->set(
             'taskd.downloadPagesMessageFactory',
-            $di->lazyNew(
-                DownloadPagesMessageFactory::class,
-                [
-                    'instance'            => $di->lazyGet('instance'),
-                    'tokenBuilder'        => $di->lazyGet('user.tokenBuilder'),
-                    'gotenbergUrl'        => $config->get(ConfigMapper::NAME_GOTENBERG_HOST),
-                    'gotenbergKey'        => $config->get(ConfigMapper::NAME_GOTENBERG_API_KEY),
-                    'gotenbergHttpHeader' => GotenbergClient::AUTH_HTTP_HEADER,
-                    'kamiApiKey'          => $config->get('kami_api_key'),
-                    'turnitinApiKey'      => $config->get('turnitin_api_key'),
-                    'turnitinApiHost'     => $config->get('turnitin_api_host'),
-                ],
+            $di->lazy(
+                function () use ($config, $di) {
+                    /** @var Instance $instance */
+                    $instance = $di->get('instance');
+
+                    /** @var Jwt $tokenBuilder */
+                    $tokenBuilder = $di->get('user.tokenBuilder');
+
+                    // Build API key and version
+                    $gotenbergApiKey = $config->get(ConfigMapper::NAME_GOTENBERG_API_KEY);
+                    if ($gotenbergApiKey === '') {
+                        $gotenbergApiKey = null;
+                    }
+                    $gotenbergApiVersion = filter_var(
+                        $config->get(ConfigMapper::NAME_GOTENBERG_API_VERSION),
+                        FILTER_VALIDATE_INT,
+                        FILTER_NULL_ON_FAILURE,
+                    );
+                    return new DownloadPagesMessageFactory(
+                        $instance,
+                        $tokenBuilder,
+                        $config->get(ConfigMapper::NAME_GOTENBERG_HOST),
+                        $gotenbergApiKey,
+                        $gotenbergApiVersion,
+                        GotenbergClient::API_KEY_HEADER,
+                        GotenbergClient::API_VERSION_HEADER,
+                        $config->get('kami_api_key'),
+                        $config->get('turnitin_api_key'),
+                        $config->get('turnitin_api_host'),
+                    );
+                }
             )
         );
 
