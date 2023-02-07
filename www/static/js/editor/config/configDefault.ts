@@ -241,18 +241,18 @@ export function getDefault() {
                 "resizeImage",
             ],
         },
+        // Configure 'mediaEmbed' with Iframely previews.
         mediaEmbed: {
-            // Configure 'mediaEmbed' with Iframely previews.
             // Previews are always enabled if there’s a provider for a URL (below regex catches all URLs)
             // By default `previewsInData` are disabled, but let’s set it to `false` explicitely to be sure
             previewsInData: false,
             providers: [
                 {
                     name: "iframely previews", // hint: this is just for previews. Get actual HTML codes by making API calls from your CMS
-                    url: /.+/, // Match all URLs or just the ones you need:
+                    url: /.+/, // Match all URLs or just the ones you need
                     html: (match: string) => {
                         const url = match[0];
-                        const iframeUrl = `${IFRAME_SRC}?app=1&api_key=${API_KEY}&url="${encodeURIComponent(url)}`;
+                        const iframeUrl = `${IFRAME_SRC}?app=1&api_key=${API_KEY}&url=${encodeURIComponent(url)}`;
                         // alternatively, use &key= instead of &api_key with the MD5 hash of your api_key
                         // more about it: https://iframely.com/docs/allow-origins
                         return (
