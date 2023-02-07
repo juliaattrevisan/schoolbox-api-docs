@@ -293,9 +293,12 @@ class Profile implements IStrategy
                  */
                 $comments = '';
 
-                /* TODO Need relationships:list scope
-                 *  $legal might be inferred from relationships:list,
-                 *  which provides (bool)legal_custody and (string)custody_status
+                /* TODO Find out how a split family is represented in pilot school
+                 *
+                 * $legal might be inferred from relationships:list,
+                 * which provides (bool)legal_custody and (string)custody_status
+                 * The relationships lookup specifically filters to legal_custody 1
+                 * so anyone appearing here is legally allowed to do so
                  */
                 $legal = '';
 
