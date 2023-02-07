@@ -1,0 +1,99 @@
+<?php
+
+/**
+ * @copyright   Copyright 2023, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+
+declare(strict_types=1);
+
+namespace Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup;
+
+use Schoolbox\External\Connector\Veracross\Base\Endpoint\IApi;
+use Schoolbox\External\Connector\Veracross\Base\Endpoint\Profile\Profile;
+
+/**
+ * Grab all the Language proficiencies. We can presume that English
+ * is in node 1, perhaps, but we double-check to be sure anyway.
+ * ESL is when the node corresponding to English has a false setting
+ * for is_primary.
+ */
+class Language
+{
+    /**
+     * A const corresponding to the language node for English
+     * This node can appear anywhere in the value list so you
+     * have to inspect it manually
+     */
+    private const ENGLISH_DESCRIPTION = 'english';
+
+
+    /**
+     * Remember the output we might have previously generated
+     *
+     * @var array|null
+     */
+    private ?array $lookup = null;
+
+
+    /**
+     * Constructor
+     *
+     * @param IApi $api
+     */
+    public function __construct(private IApi $api)
+    {
+    }
+
+
+    /**
+     * Generate a compiled list of records, indexed by an identifier
+     *
+     * @return array
+     */
+    public function generate(): array
+    {
+        /* If we generated this lookup previously, just recycle it
+         */
+        if (null === $this->lookup) {
+            $this->lookup = [];
+
+            /* Rebuild lookups on each page
+             */
+            $lookupConverter = new ValueListConverter();
+
+            /* English node, wherever that is, must have is_primary set to true
+             * to qualify someone as native speaker. Everyone else is EAL
+             */
+            $generator = $this->api->retrieve('GET', 'admission/languages', Profile::SCOPE);
+
+            foreach ($generator as $page) {
+                $valueLists = $lookupConverter->generate($page['value_lists']);
+
+                /* Avengers Assemble!
+                 */
+                foreach ($page['data'] as $record) {
+                    /* Overwrite with lookupped values
+                     */
+                    $language = $valueLists['language'][$record['language']];
+
+                    /* Everyone is not a native speaker until otherwise decided
+                     */
+                    $eal = true;
+
+                    /* Analyse the node to decide nativeness
+                     */
+                    if ($record['is_primary'] && (self::ENGLISH_DESCRIPTION === strtolower($language))) {
+                        $eal = false;
+                    }
+
+                    /* Simplify usage since we only care if English was is_primary
+                     */
+                    $this->lookup[$record['person_id']] = $eal;
+                }
+            }
+        }
+
+        return $this->lookup;
+    }
+}

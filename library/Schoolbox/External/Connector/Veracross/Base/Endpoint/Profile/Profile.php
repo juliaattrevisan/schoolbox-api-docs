@@ -20,6 +20,7 @@ use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\ContactInfo;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\EmergencyContact;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Health;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Household;
+use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Language;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Relationship;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\ValueListConverter;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
@@ -45,13 +46,24 @@ class Profile implements IStrategy
      * Required scopes:
      *
      * students:list
-     * emergency_contacts:list OR relationships:list
+     * emergency_contacts:list
      * health.patients:list
+     * admission.languages:list
      * parents:list
+     * relationships:list
      * staff_faculty:list
      * contact_info:list
      */
-    public const SCOPE = 'students:list emergency_contacts:list health.patients:list parents:list relationships:list staff_faculty:list contact_info:list';
+    public const SCOPE = '
+        students:list 
+        emergency_contacts:list 
+        health.patients:list
+        admission.languages:list 
+        parents:list 
+        relationships:list 
+        staff_faculty:list 
+        contact_info:list
+    ';
 
 
     /**
@@ -193,6 +205,11 @@ class Profile implements IStrategy
         $this->log->debug('Prefetching medicals...');
         $medicalLookup = (new Health($this->api))->generate();
 
+        /* Prefetch a list of language usages
+         */
+        $this->log->debug('Prefetching languages...');
+        $languageLookup = (new Language($this->api))->generate();
+
         /* Only available when Families strat is enabled
          */
         $householdLookup = [];
@@ -285,7 +302,7 @@ class Profile implements IStrategy
 
                 /* Flags
                  */
-                $esl = false;
+                $esl = (bool)($languageLookup[$externalId]['eal'] ?? true);
                 $ib = false;
                 $ilp = false;
 
