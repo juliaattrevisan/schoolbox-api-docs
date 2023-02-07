@@ -138,7 +138,7 @@
         ] |join('&') %}
         <div class="empty-state no-margin">
             <i class="icon-news"></i>
-            {% if not createRoute %}
+            {% if (readonly is defined and readonly) or not createRoute %}
                 <p>There is no {{ locale.news }} to view at this time.</p>
                 {% if archiveRoute and showArchiveNewsLink %}
                     <p><a href="{{ archiveRoute ~ '?' ~archiveRouteSuffix }}">View the {{ locale.news }} archive.</a></p>
