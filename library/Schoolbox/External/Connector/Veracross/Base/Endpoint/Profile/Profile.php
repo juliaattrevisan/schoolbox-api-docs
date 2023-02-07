@@ -311,8 +311,8 @@ class Profile implements IStrategy
 
                 if ($student['advisor']['id']) {
                     $formTeacher = [
-                        'id' => $student['advisor']['id'],
-                        'name' => $student['advisor']['name']
+                        'id' => trim((string)$student['advisor']['id']),
+                        'name' => trim((string)$student['advisor']['name'])
                     ];
                 }
 
@@ -428,21 +428,60 @@ class Profile implements IStrategy
                  */
                 if (\count($emergencyContactsLookup[$student['id']] ?? [])) {
                     if (isset($emergencyContactsLookup[$student['id']][0])) {
+                        $fullname = trim(sprintf(
+                            '%s %s (%s)',
+                            $emergencyContactsLookup[$student['id']][0]['first_name'],
+                            $emergencyContactsLookup[$student['id']][0]['last_name'],
+                            $emergencyContactsLookup[$student['id']][0]['relationship'],
+                        ));
+
+                        $phone = (new FirstMeaningfulValue())->find([
+                            $emergencyContactsLookup[$student['id']][0]['mobile_phone'],
+                            $emergencyContactsLookup[$student['id']][0]['business_phone'],
+                            $emergencyContactsLookup[$student['id']][0]['home_phone'],
+                        ]);
+
                         $studentProfile
-                            ->setEmergencyContactName1($emergencyContactsLookup[$student['id']][0]['name'])
-                            ->setEmergencyContactPhone1($emergencyContactsLookup[$student['id']][0]['phone']);
+                            ->setEmergencyContactName1($fullname)
+                            ->setEmergencyContactPhone1($phone);
                     }
 
                     if (isset($emergencyContactsLookup[$student['id']][1])) {
+                        $fullname = trim(sprintf(
+                            '%s %s (%s)',
+                            $emergencyContactsLookup[$student['id']][1]['first_name'],
+                            $emergencyContactsLookup[$student['id']][1]['last_name'],
+                            $emergencyContactsLookup[$student['id']][1]['relationship'],
+                        ));
+
+                        $phone = (new FirstMeaningfulValue())->find([
+                            $emergencyContactsLookup[$student['id']][1]['mobile_phone'],
+                            $emergencyContactsLookup[$student['id']][1]['business_phone'],
+                            $emergencyContactsLookup[$student['id']][1]['home_phone'],
+                        ]);
+
                         $studentProfile
-                            ->setEmergencyContactName2($emergencyContactsLookup[$student['id']][1]['name'])
-                            ->setEmergencyContactPhone2($emergencyContactsLookup[$student['id']][1]['phone']);
+                            ->setEmergencyContactName2($fullname)
+                            ->setEmergencyContactPhone2($phone);
                     }
 
                     if (isset($emergencyContactsLookup[$student['id']][2])) {
+                        $fullname = trim(sprintf(
+                            '%s %s (%s)',
+                            $emergencyContactsLookup[$student['id']][2]['first_name'],
+                            $emergencyContactsLookup[$student['id']][2]['last_name'],
+                            $emergencyContactsLookup[$student['id']][2]['relationship'],
+                        ));
+
+                        $phone = (new FirstMeaningfulValue())->find([
+                            $emergencyContactsLookup[$student['id']][2]['mobile_phone'],
+                            $emergencyContactsLookup[$student['id']][2]['business_phone'],
+                            $emergencyContactsLookup[$student['id']][2]['home_phone'],
+                        ]);
+
                         $studentProfile
-                            ->setEmergencyContactName3($emergencyContactsLookup[$student['id']][2]['name'])
-                            ->setEmergencyContactPhone3($emergencyContactsLookup[$student['id']][2]['phone']);
+                            ->setEmergencyContactName3($fullname)
+                            ->setEmergencyContactPhone3($phone);
                     }
                 } else {
                     /* This student doesn't have any emergency contacts anymore
