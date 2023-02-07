@@ -41,7 +41,7 @@ class Household
 
 
     /**
-     * Generate a compiled list of parents indexed by their household_id
+     * Generate a compiled list of records, indexed by an identifier
      *
      * @return array
      */

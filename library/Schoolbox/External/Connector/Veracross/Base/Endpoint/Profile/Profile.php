@@ -50,7 +50,7 @@ class Profile implements IStrategy
      * staff_faculty:list
      * contact_info:list
      */
-    public const SCOPE = 'students:list emergency_contacts:list health.patients:list parents:list staff_faculty:list contact_info:list';
+    public const SCOPE = 'students:list emergency_contacts:list health.patients:list parents:list relationships:list staff_faculty:list contact_info:list';
 
 
     /**
@@ -195,14 +195,20 @@ class Profile implements IStrategy
         /* Only available when Families strat is enabled
          */
         $householdLookup = [];
-        $contactInfoLookup = [];
+        $relationshipLookup = [];
         $emergencyContactsLookup = [];
+        $contactInfoLookup = [];
 
         if ($this->validStrats->isFamiliesStratEnabled()) {
             /* Prefetch a list of households, which contain Parents
              */
             $this->log->debug('Prefetching households...');
             $householdLookup = (new Household($this->api))->generate();
+
+            /* Prefetch a list of relationships
+             */
+            $this->log->debug('Prefetching relationships...');
+            $relationshipLookup = $relationshipLookup->generate();
 
             /* Prefetch a list of emergency contacts
              */
