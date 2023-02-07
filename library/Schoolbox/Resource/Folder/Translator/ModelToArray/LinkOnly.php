@@ -37,6 +37,9 @@ class LinkOnly implements IModelToArray
             'codes'  => $folder->getCodes()
                 ? $folder->getCodes()->getPropertyValues('code')
                 : [],
+            'parent' => $folder->getParent() && $folder->getParent()->getId()
+                ? call_user_func($this, $folder->getParent())
+                : null,
             '_links' => [
                 'view' => '/homepage/' . $folder->getId(),
             ],
