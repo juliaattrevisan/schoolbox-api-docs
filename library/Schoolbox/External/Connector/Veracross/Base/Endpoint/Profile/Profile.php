@@ -247,15 +247,12 @@ class Profile implements IStrategy
                 $studiesCode = '';
                 $title = '';
 
-                /* TODO: Maybe Skip this if it's specifically id 0 (None)
-                 *  These lookups are user configurable though
+                /* $student['homeroom'] is a lookup identifier that might not
+                 * actually exist in the lookup itself; Veracross has automated
+                 * cleanups which could be turned off, leading to orphaned data.
                  */
                 $tutorId = trim((string)$student['homeroom_teacher']['id']);
                 $tutorName = trim((string)$student['homeroom_teacher']['name']);
-
-                /* $student['homeroom'] is a lookup identifier that might not
-                 * actually exist in the lookup itself
-                 */
                 $tutorGroup = trim((string)($studentLookup['homeroom'][$student['homeroom']] ?? ''));
 
                 $username = trim((string)$student['username']);
@@ -283,11 +280,18 @@ class Profile implements IStrategy
                 $medical = $medicalLookup[$student['id']] ? 'This student has medical conditions.' : null;
                 $messages = '';
 
-                /* Find out a staff member via their user code
+                /* From Thad, 7/2/23:
+                 *     "In the U.S., an Advisor is typically a faculty or staff member who meets with
+                 *      the student to monitor their academic success and provide/coordinate support
+                 *      services. Most commonly, we see this in Upper school divisions where this
+                 *      person is the “College Advisor” and is helping the student track their progress
+                 *      toward graduation requirements, apply to colleges/universities, etc."
+                 *
+                 * Not sure whether this is closer to YLC or Form Teacher, but I'll put it here for now
                  */
                 $formTeacher = [
                     'id' => null,
-                    'name' => null
+                    'name' => $student['advisor']['name']
                 ];
 
                 /* Fish out a staff member via their user code
