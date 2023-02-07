@@ -55,7 +55,15 @@ class ValueListConverter
                 $data = [];
 
                 foreach ($valueList['items'] as $value) {
-                    $data[$value['id']] = $value['description'];
+                    /* Special meaning for id 0: it means "null" but is
+                     * provided as "None" or sometimes "<None>", the latter
+                     * renders as a random node in the dom
+                     */
+                    if (0 === (int)$value['id']) {
+                        $data[$value['id']] = null;
+                    } else {
+                        $data[$value['id']] = $value['description'];
+                    }
                 }
 
                 $this->stack[$valueList['fields'][0]] = $data;
