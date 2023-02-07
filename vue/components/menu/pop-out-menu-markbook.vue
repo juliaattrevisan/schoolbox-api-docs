@@ -127,7 +127,7 @@ const viewAllText = computed(() => {
  */
 const viewStatusText = computed(() => {
     if ('Due Work' === assessmentType.value) {
-        return "Submission history";
+        return "Submission History";
     }
     if ('Task' === assessmentType.value) {
         return "Student View";
@@ -385,32 +385,32 @@ async function onMenuItemSelected(target: string, shouldPost: boolean = false) {
                         :class="{ 'is-disabled': !routes.updateRoute }"
                         @selected="onMenuItemSelected(routes.updateRoute)"
                     >
-                        Update feedback
+                        Update Feedback
                     </pop-out-menu-item>
                     <pop-out-menu-item
                         :class="{ 'is-disabled': !routes.reviewRoute || isActivityEmpty || !hasSubmissions }"
                         @selected="onMenuItemSelected(routes.reviewRoute)"
                     >
-                        Review submission
+                        Review Submission
                     </pop-out-menu-item>
                     <pop-out-menu-item
                         :class="{ 'is-disabled': !routes.publishRoute || isActivityEmpty || !hasFeedback }"
                         @selected="onMenuItemSelected(routes.publishRoute)"
                     >
-                        Publish feedback
+                        Publish Feedback
                     </pop-out-menu-item>
                 </template>
                 <pop-out-menu-item v-if="isExcluded"
                                    :class="{ 'is-disabled': !isExcluded }"
                                    @selected="onMenuItemSelected(routes.includeRoute, true)"
                 >
-                    Include student
+                    Include Student
                 </pop-out-menu-item>
                 <pop-out-menu-item v-else-if="'Project' !== assessmentType"
                     :class="{ 'is-disabled': isExcluded }"
                     @selected="onMenuItemSelected(routes.excludeRoute, true)"
                 >
-                    Exclude student
+                    Exclude Student
                 </pop-out-menu-item>
                 <pop-out-menu-item v-if="!isExcluded"
                     :class="{ 'is-disabled': !routes.historyRoute || isExcluded }"
