@@ -228,8 +228,8 @@ class Controller extends Base
                 'icons'           => $this->iconMapper->findAll()->sortNaturally('title'),
                 'sentiments'      => Pastoral\Type\TypeAbstract::SENTIMENT_VALUES,
                 'flagColors'  => [
-                    'foreground' => ($foregroundColor === null)? null : $foregroundColor->getAsRgba(),
-                    'background' => ($backgroundColor === null)? null : $backgroundColor->getAsRgba(),
+                    'foreground' => ($foregroundColor === null) ? null : $foregroundColor->getAsRgba(),
+                    'background' => ($backgroundColor === null) ? null : $backgroundColor->getAsRgba(),
                     'baseLight'  => ColorHelper::BASE_BACKGROUND_COLOR_LIGHT,
                     'baseDark'   => ColorHelper::BASE_BACKGROUND_COLOR_DARK,
                 ],
