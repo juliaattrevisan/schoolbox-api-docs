@@ -241,7 +241,7 @@
                     }).then(
                         res => {
                             // Remove the listener.
-                            document.removeEventListener('click', interceptAddTile);
+                            document.querySelector('a[data-add-tile]').removeEventListener('click', interceptAddTile);
                             toast.toastTimeout({text: 'Success!', duration: 3000, css: 'success'});
                             // Navigate to the 'Add tile' page.
                             window.location.href = "{{ routeLookup('tile.add', {layoutId: item.id}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}";
@@ -418,8 +418,3 @@
     </div>
     <div id='toaster' class="toast" data-toast></div>
 </div>
-
-<script type="text/javascript">
-
-
-</script>
