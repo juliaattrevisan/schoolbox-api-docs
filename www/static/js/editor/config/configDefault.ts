@@ -63,7 +63,7 @@ import { getDefaultColors } from "@js/editor/config/configDefaultColors";
  *
  * @param { CKEditor } editor - the CKEditor instance
  */
-function MyCustomUploadAdapterPlugin(editor) {
+function UploadAdapterPlugin(editor) {
     editor.plugins.get("FileRepository").createUploadAdapter = (loader) => {
         return new UploadAdapter(loader);
     };
@@ -129,7 +129,7 @@ export function getDefault() {
             SourceEditing,
             WordCount,
         ],
-        extraPlugins: [MyCustomUploadAdapterPlugin],
+        extraPlugins: [UploadAdapterPlugin],
         toolbar: [
             // what displays in the toolbar in order, are either single buttons or groups via objects
             "bold",
