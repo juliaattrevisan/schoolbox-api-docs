@@ -23,12 +23,14 @@ class LinkOnlyTest extends TestCase
     /**
      * @dataProvider getTestInvokeData
      *
-     * @param Folder $folder
-     * @param array  $expected
+     * @param Folder   $folder
+     * @param LinkOnly $translator
+     * @param array    $expected
+     * @return void
      */
-    public function testInvoke(Folder $folder, array $expected): void
+    public function testInvoke(Folder $folder, LinkOnly $translator, array $expected): void
     {
-        self::assertSame($expected, call_user_func(new LinkOnly(), $folder));
+        self::assertSame($expected, call_user_func($translator, $folder));
     }
 
     /**
@@ -40,12 +42,14 @@ class LinkOnlyTest extends TestCase
             (new Folder())
                 ->setId(1)
                 ->setName('Test 1'),
+            new LinkOnly(0),
             [
-                'id'    => 1,
-                'name'  => 'Test 1',
-                'title' => 'Test 1',
-                'codes' => [],
-                '_links'   => [
+                'id'     => 1,
+                'name'   => 'Test 1',
+                'title'  => 'Test 1',
+                'codes'  => [],
+                'parent' => null,
+                '_links' => [
                     'view' => '/homepage/1',
                 ],
             ]
@@ -64,12 +68,14 @@ class LinkOnlyTest extends TestCase
                         ]
                     )
                 ),
+            new LinkOnly(0),
             [
-                'id'    => 2,
-                'name'  => 'Test 2',
-                'title' => 'Test 2 (A,B)',
-                'codes' => ['A', 'B'],
-                '_links'   => [
+                'id'     => 2,
+                'name'   => 'Test 2',
+                'title'  => 'Test 2 (A,B)',
+                'codes'  => ['A', 'B'],
+                'parent' => null,
+                '_links' => [
                     'view' => '/homepage/2',
                 ],
             ]
