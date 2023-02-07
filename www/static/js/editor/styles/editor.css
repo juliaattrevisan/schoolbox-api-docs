@@ -108,3 +108,10 @@
     background: var(--content-ui-background);
     border-color: var(--content-ui-background);
 }
+
+/**
+ * Customise the iframely sizing
+ */
+.ck.ck-editor .iframely-embed {
+    max-width: 500px;
+}
