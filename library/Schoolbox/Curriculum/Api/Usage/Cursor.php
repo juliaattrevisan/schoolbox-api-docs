@@ -125,9 +125,16 @@ class Cursor implements ICursor
      */
     public function retrieveResults(?string $encodedCursor): Collection
     {
+        // Order:
+        // - Courses
+        // - Units
+        // - Assessments
+        // - Badges
+        // - Folders
         $selectParts = [
             "
                 SELECT
+                    1 AS discriminator_order,
                     :courseDiscriminator AS discriminator,
                     cs.id AS id,
                     f.name AS name
@@ -140,6 +147,7 @@ class Cursor implements ICursor
             ",
             "
                 SELECT
+                    2 AS discriminator_order,
                     :unitDiscriminator AS discriminator,
                     cus.id AS id,
                     f.name AS name
@@ -152,6 +160,7 @@ class Cursor implements ICursor
             ",
             "
                 SELECT
+                    5 AS discriminator_order,
                     :folderDiscriminator AS discriminator,
                     f.id AS id,
                     f.name AS name
@@ -180,27 +189,27 @@ class Cursor implements ICursor
         // Figure out a WHERE part
         if (isset($encodedCursor)) {
             $decodedCursor = $this->codec->decode($encodedCursor);
-            if (isset($decodedCursor['name'], $decodedCursor['id'], $decodedCursor['discriminator'])) {
+            if (isset($decodedCursor['discriminator_order'], $decodedCursor['name'], $decodedCursor['id'])) {
                 $whereParts    = [
-                    '(name > :name1)',
-                    '(name = :name2 AND id > :id2)',
-                    '(name = :name3 AND id = :id3 AND discriminator > :discriminator3)',
+                    '(discriminator_order > :discriminatorOrder1)',
+                    '(discriminator_order = :discriminatorOrder2 AND name > :name2)',
+                    '(discriminator_order = :discriminatorOrder3 AND name = :name3 AND id > :id3)',
                 ];
                 $queryString .= ' WHERE ' . implode(' OR ', $whereParts);
                 $params += [
-                    'name1'          => $decodedCursor['name'],
-                    'name2'          => $decodedCursor['name'],
-                    'name3'          => $decodedCursor['name'],
-                    'id2'            => $decodedCursor['id'],
-                    'id3'            => $decodedCursor['id'],
-                    'discriminator3' => $decodedCursor['discriminator'],
+                    'discriminatorOrder1' => $decodedCursor['discriminator_order'],
+                    'discriminatorOrder2' => $decodedCursor['discriminator_order'],
+                    'discriminatorOrder3' => $decodedCursor['discriminator_order'],
+                    'name2'               => $decodedCursor['name'],
+                    'name3'               => $decodedCursor['name'],
+                    'id3'                 => $decodedCursor['id'],
                 ];
             }
         }
 
         // Build the rest of the query
         $queryString .= '
-            ORDER BY name ASC, id ASC, discriminator ASC
+            ORDER BY discriminator_order ASC, name ASC, id ASC
             LIMIT :limit
         ';
         $params['limit'] = [
