@@ -251,13 +251,25 @@ class Profile implements IStrategy
                  * actually exist in the lookup itself; Veracross has automated
                  * cleanups which could be turned off, leading to orphaned data.
                  */
-                $tutorId = trim((string)$student['homeroom_teacher']['id']);
-                $tutorName = trim((string)$student['homeroom_teacher']['name']);
+                $tutor = [
+                    'id' => null,
+                    'name' => null
+                ];
+
+                if ($student['homeroom_teacher']['id']) {
+                    $tutor = [
+                        'id' => trim((string)$student['homeroom_teacher']['id']),
+                        'name' => trim((string)$student['homeroom_teacher']['name']),
+                    ];
+                }
+
                 $tutorGroup = trim((string)($studentLookup['homeroom'][$student['homeroom']] ?? ''));
 
                 $username = trim((string)$student['username']);
                 $yearLevel = trim((string)$studentLookup['grade_level'][$student['grade_level']]);
 
+                /* Dates
+                 */
                 $enrolmentDate = trim((string)$student['entry_date']);
                 $leavingDate = trim((string)$student['exit_date']);
 
@@ -291,8 +303,15 @@ class Profile implements IStrategy
                  */
                 $formTeacher = [
                     'id' => null,
-                    'name' => $student['advisor']['name']
+                    'name' => null
                 ];
+
+                if ($student['advisor']['id']) {
+                    $formTeacher = [
+                        'id' => $student['advisor']['id'],
+                        'name' => $student['advisor']['name']
+                    ];
+                }
 
                 /* Fish out a staff member via their user code
                  */
@@ -378,8 +397,8 @@ class Profile implements IStrategy
                     ->setPhotoRedacted($photoRedacted)
                     ->setStudiesCode($studiesCode)
                     ->setTutorGroup($tutorGroup)
-                    ->setTutorTeacherId($tutorId)
-                    ->setTutorTeacherName($tutorName)
+                    ->setTutorTeacherId($tutor['id'])
+                    ->setTutorTeacherName($tutor['name'])
                     ->setYearLevel($yearLevel)
                     ->setYearLevelCoordinatorId($yearLevelCoordinator['id'])
                     ->setYearLevelCoordinatorName($yearLevelCoordinator['name'])
