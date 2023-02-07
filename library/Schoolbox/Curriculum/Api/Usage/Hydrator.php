@@ -71,6 +71,45 @@ class Hydrator
             ->getAll();
         $models[Cursor::DISCRIMINATOR_UNIT] = $this->unitSpecMapper->findByColumn('id', $unitIds)->indexBy('id');
 
+        // Find parent folders of each folder/course/unit as well?
+        foreach ($models[Cursor::DISCRIMINATOR_COURSE] as $course) {
+            /** @var CourseSpec\Model $course */
+            $folderIds[] = $course->getFolder()->getId();
+        }
+        foreach ($models[Cursor::DISCRIMINATOR_UNIT] as $unit) {
+            /** @var UnitSpec\Model $unit */
+            $folderIds[] = $unit->getFolder()->getId();
+            $folderIds[] = $unit->getCourse()->getFolder()->getId();
+        }
+        $allFolders         = $this->folderMapper->findByColumn('id', $folderIds);
+        $allFolderParentIds = $allFolders->map(fn (Folder\Model $folder) => $folder->getParent()?->getId());
+        $allFolderParents   = $this->folderMapper->findByColumn('id', $allFolderParentIds)->indexBy('id');
+        foreach ($models[Cursor::DISCRIMINATOR_FOLDER] as $folder) {
+            /** @var Folder\Model $folder */
+            $parentId = $folder->getParent()?->getId();
+            if (isset($parentId, $allFolderParents[$parentId])) {
+                $folder->setParent($allFolderParents[$parentId]);
+            }
+        }
+        foreach ($models[Cursor::DISCRIMINATOR_COURSE] as $course) {
+            /** @var CourseSpec\Model $course */
+            $parentId = $course->getFolder()->getParent()?->getId();
+            if (isset($parentId, $allFolderParents[$parentId])) {
+                $course->getFolder()->setParent($allFolderParents[$parentId]);
+            }
+        }
+        foreach ($models[Cursor::DISCRIMINATOR_UNIT] as $unit) {
+            /** @var UnitSpec\Model $unit */
+            $courseParentId = $unit->getCourse()->getFolder()->getParent()?->getId();
+            if (isset($courseParentId, $allFolderParents[$parentId])) {
+                $unit->getCourse()->getFolder()->setParent($allFolderParents[$courseParentId]);
+            }
+            $unitParentId = $unit->getFolder()->getParent()?->getId();
+            if (isset($unitParentId, $allFolderParents[$unitParentId])) {
+                $unit->getFolder()->setParent($allFolderParents[$unitParentId]);
+            }
+        }
+
         $newCollection = new Collection();
         foreach ($results as $result) {
             $disc        = $result['discriminator'];
