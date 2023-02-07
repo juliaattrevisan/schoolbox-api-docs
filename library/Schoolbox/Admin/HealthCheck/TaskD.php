@@ -4,9 +4,9 @@ namespace Schoolbox\Admin\HealthCheck;
 
 use Aura\Router\Router;
 use Laminas\Uri\UriInterface;
-use Psr\Container\ContainerInterface;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Gotenberg\Client;
 use Schoolbox\IConfigLoader;
 use Schoolbox\TaskDaemon\Producer;
 use Schoolbox\TaskDaemon\Request\MessageFactory;
@@ -81,8 +81,15 @@ class TaskD
                 'content'   => $sources,
                 'outfile'   => mb_substr($outfile, 0, self::FILENAME_MAX_LENGTH, 'UTF-8') . '.zip',
                 'gotenberg' => [
-                    'url' => $this->config->get(ConfigMapper::NAME_GOTENBERG_HOST),
-                    'key' => $this->config->get(ConfigMapper::NAME_GOTENBERG_API_KEY),
+                    'url'     => $this->config->get(ConfigMapper::NAME_GOTENBERG_HOST),
+                    'version' => [
+                        'value'  => $this->config->get(ConfigMapper::NAME_GOTENBERG_API_VERSION),
+                        'header' => Client::API_VERSION_HEADER,
+                    ],
+                    'auth'    => [
+                        'key'    => $this->config->get(ConfigMapper::NAME_GOTENBERG_API_KEY),
+                        'header' => Client::API_KEY_HEADER,
+                    ],
                 ],
             ],
             $this->urlBase->setPath($this->router->generate('apiusernotify.apiUserNotify', ['userId' => $user->getId()]))
