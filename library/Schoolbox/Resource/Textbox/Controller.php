@@ -181,7 +181,7 @@ class Controller extends Base
     public function getUsageForFolder(Folder\Model $folder): void
     {
         // Convert `$usages` to an array structure
-        $translateFolder  = new Folder\Translator\ModelToArray\LinkOnly();
+        $translateFolder  = new Folder\Translator\ModelToArray\LinkOnly(0);
         $translateTextbox = new Translator\ModelToArray(
             $translateFolder,
             $this->router,
