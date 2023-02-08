@@ -17,24 +17,15 @@ use Schoolbox\External\Connector\Veracross\Base\Endpoint\IApi;
 class ClassCompiler
 {
     /**
-     * The scopes we used for manufacturing a Schedule Timetable
-     */
-    private const SCOPE = '
-        classes:list
-        academics.enrollments:list
-        academics.classes.meeting_times:list
-    ';
-
-
-    /**
      * Constructor.
      *
      * You can reuse this instance to precompile multiple classes
      * without having to reinstantiate
      *
-     * @param IApi $api
+     * @param IApi   $api
+     * @param string $scope
      */
-    public function __construct(private IApi $api)
+    public function __construct(private IApi $api, private string $scope)
     {
     }
 
@@ -83,7 +74,7 @@ class ClassCompiler
         /* TODO This can be busted out into a mega prefetch lookup
          *  to save precious seconds to the US
          */
-        $enrolmentsGenerator = $this->api->retrieve('GET', 'academics/enrollments', self::SCOPE, [
+        $enrolmentsGenerator = $this->api->retrieve('GET', 'academics/enrollments', $this->scope, [
             'internal_class_id' => $class['id']
         ]);
 
@@ -131,7 +122,7 @@ class ClassCompiler
         /* TODO remove dates and replace with actual ones using PAST_ and FUTURE_ thresholds
          *  ~2016 is the only year with data in the sandbox environment
          */
-        $classMeetingTimesGenerator = $this->api->retrieve('GET', $endpoint, self::SCOPE, [
+        $classMeetingTimesGenerator = $this->api->retrieve('GET', $endpoint, $this->scope, [
             'on_or_after_date' => $startDate ?? date('Y-m-d'),
             'on_or_before_date' => $endDate ?? date('Y-m-d'),
         ]);

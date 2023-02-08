@@ -307,17 +307,18 @@ class Factory
                     $this->periodMapper,
                     $this->overridesMapper
                 ))
-                //            ->add(new TimetableCalendar\Classes(
-                //                $this->log,
-                //                $this->perform,
-                //                $api,
-                //                $this->eventMapper,
-                //                $this->classEntryMapper,
-                //                $this->classInvolvementMapper,
-                //                $timezone,
-                //                $from,
-                //                $to
-                //            ))
+                ->add(new TimetableCalendar\Classes(
+                    $this->log,
+                    $this->perform,
+                    $api,
+                    $this->eventMapper,
+                    $this->overridesMapper,
+                    $this->classEntryMapper,
+                    $this->classInvolvementMapper,
+                    $timezone,
+                    $from,
+                    $to
+                ))
                 ->add(new TimetableCalendar\Cleanup(
                     $this->log,
                     $this->perform,
