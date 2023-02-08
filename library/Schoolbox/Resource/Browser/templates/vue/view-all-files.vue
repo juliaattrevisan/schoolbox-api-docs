@@ -653,11 +653,11 @@ export default {
 .VueTables__row {
     //  Kept here, without it the rule leaks into affecting .meta classes in the notifications sidebar
     .meta {
-    display: none;
-    @media (max-width: 700px) { //show on mobile, as the .date-modified-td will be hidden
-        display: block;
+        display: none;
+        @media (max-width: 700px) { //show on mobile, as the .date-modified-td will be hidden
+            display: block;
+        }
     }
-}
 }
 
 .VueTables__table .edit-td {
