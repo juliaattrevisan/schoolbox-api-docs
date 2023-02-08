@@ -591,6 +591,18 @@
                         userSelector: '[data-mass-download]',
                         userList: $userList,
                         onSubmit: function (toSubmit) {
+                            let userIdsString = '';
+                            for (let elem of toSubmit) {
+                                let userId = $(elem).attr('data-action-bar')
+                                userIdsString += '&userIds[]=' + userId;
+                            }
+
+                            window.location.replace(
+                                "{{ routeLookup('learningAssessment.downloadSubmissions', {
+                                    assessmentId: assessment.id,
+                                    assessment: assessment
+                                }) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" + userIdsString
+                            );
                         }
                     });
 

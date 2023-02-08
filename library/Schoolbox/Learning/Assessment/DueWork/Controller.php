@@ -239,7 +239,7 @@ class Controller extends Assessment\Controller
             'rubricMarks'       => RubricIndicatorMarkMapper::getInstance()->findMarkedByAssessment($assessment->getId()),
             'interactionLocked' => (new Assessment\LockedChecker($this->getTermMapper()))->isLockedForInteractions($assessment),
             'selfReflect'       => false,
-            'selfAssess'         => false,
+            'selfAssess'        => false,
             /* Find the first valid Blind Review url
              */
             'blindReviewUrl'    => (new StudentCarousel\Blind(
@@ -429,6 +429,12 @@ class Controller extends Assessment\Controller
         if (!$assessment instanceof Model) {
             throw new NotFound();
         }
+
+        $userIds = $this->getRequest()->query->get('userIds');
+echo "in downloadSubmissions()\n";
+echo "userIds:\n";
+var_export($userIds);
+die;
 
         // Generate message and send to taskd
         $message = $this->dueWorkDownloadMessageFactory->buildForAssessment(
