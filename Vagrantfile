@@ -146,7 +146,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.network :private_network, ip: private_network_ip, auto_config: network_auto_config
   if ! network_auto_config
     # manual ip to prevent ip6 being assigned on networks that don't support them
-    config.vm.provision "shell", run: "always", inline: "ifconfig enp0s8 #{private_network_ip} netmask 255.255.255.0 up"
+    config.vm.provision "shell", run: "once", inline: "ip address add #{private_network_ip}/24 dev enp0s8 && networkctl up enp0s8"
   end
 
 
@@ -160,7 +160,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
     if ! network_auto_config
       # manually configure DHCP ip to prevent ip6 being assigned on networks that don't support them
-      config.vm.provision "shell", run: "always", inline: "dhclient -4 enp0s9 && ifconfig enp0s9 up"
+      config.vm.provision "shell", run: "always", inline: "dhclient -4 enp0s9 && networkctl up enp0s9"
     end
   end
 
