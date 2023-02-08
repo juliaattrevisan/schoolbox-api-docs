@@ -211,7 +211,7 @@ class Classes implements IStrategy
         $i = 0;
 
         foreach ($userLookup as $externalId => $user) {
-            if ($i > 99) {
+            if ($i > 10) {
                 break;
             }
 
@@ -293,7 +293,17 @@ class Classes implements IStrategy
         $classCode = trim((string)$class['class_id']);
         $day = null;
         $detail = null;
-        $guid = null;
+
+        /* Arbitrarily manufacture a guid for now, which represents
+         * a class whose instance is happening at a particular time
+         */
+        $guid = sprintf(
+            '%s_%s_%s',
+            $class['class_id'],
+            $classInstance['start'],
+            $classInstance['end']
+        );
+
         $period = null;
         $room = null;
         $title = trim((string)$class['description']);
@@ -332,9 +342,17 @@ class Classes implements IStrategy
             new \DateTimeZone('UTC')
         ))->setTimezone($this->timezone);
 
+        /* Try to recycle based on guid
+         */
+        try {
+            $event = $this->eventMapper->findOneByColumn('guid', $guid);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $event = $this->eventMapper->createModel();
+        }
+
         /* Cram in everything else
          */
-        $event = $this->eventMapper->createModel()
+        $event
             ->setTitle($title)
             ->setDetail($detail)
             ->setLocation($room)

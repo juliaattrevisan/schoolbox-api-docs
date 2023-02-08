@@ -264,9 +264,17 @@ class Classes implements IStrategy
             $room = "{$lesson['room']['data']['name']} ({$lesson['room']['data']['code']}";
         }
 
+        /* Try to recycle based on guid
+         */
+        try {
+            $event = $this->eventMapper->findOneByColumn('guid', $guid);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $event = $this->eventMapper->createModel();
+        }
+
         /* Cram in everything else
          */
-        $event = $this->eventMapper->createModel()
+        $event
             ->setTitle($title)
             ->setDetail($detail)
             ->setLocation($room)
