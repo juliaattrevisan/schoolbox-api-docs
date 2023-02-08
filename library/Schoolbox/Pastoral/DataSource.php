@@ -377,12 +377,16 @@ class DataSource
                 {$this->mapper->getJoinColumnString('owner', 'o')},
                 {$this->mapper->getJoinColumnString('student', 's')},
                 {$this->mapper->getJoinColumnString('modifiedBy', 'm')},
-                {$this->mapper->getJoinColumnString('severity', 'sev')}
+                {$this->mapper->getJoinColumnString('severity', 'sev')},
+                {$this->mapper->getJoinColumnString('type', 't')},
+                {$this->mapper->getJoinColumnString('subtype', 'c')}
             FROM       {$this->mapper->getTable()} p
             INNER JOIN {$this->mapper->getJoinSql('student', 'p', 's')}
             INNER JOIN {$this->mapper->getJoinSql('owner', 'p', 'o', true)}
             LEFT JOIN  {$this->mapper->getJoinSql('modifiedBy', 'p', 'm', true)}
             LEFT JOIN  {$this->mapper->getJoinSql('severity', 'p', 'sev', true)}
+            LEFT JOIN  {$this->mapper->getJoinSql('type', 'p', 't', true)}
+            LEFT JOIN  {$this->mapper->getJoinSql('subtype', 'p', 'c', true)}
             WHERE s.deleted_at IS NULL
                 AND {$where}
             GROUP BY p.id
@@ -412,6 +416,10 @@ class DataSource
         // hydrate
         $userMapper = $this->mapper->getJoinMapper('owner');
         $severityMapper = $this->mapper->getJoinMapper('severity');
+        /** @var \Schoolbox\Pastoral\Type\Mapper $typeMapper */
+        $typeMapper = $this->mapper->getJoinMapper('type');
+        /** @var \Schoolbox\Pastoral\SubType\Mapper $subtypeMapper */
+        $subtypeMapper = $this->mapper->getJoinMapper('subtype');
 
         $records = $this->mapper->createCollection();
         foreach ($rows as $row) {
@@ -432,6 +440,10 @@ class DataSource
                     $severity = $severityMapper->hydrate($row, 'sev');
                     $record->setSeverity($severity);
                 }
+                $type = $typeMapper->hydrate($row, 't');
+                $record->setType($type);
+                $subtype = $subtypeMapper->hydrate($row, 'c');
+                $record->setSubType($subtype);
             } catch (MapperException $e) {
                 // noop
                 continue;
