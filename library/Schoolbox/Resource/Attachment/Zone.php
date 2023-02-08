@@ -214,6 +214,9 @@ class Zone
      */
     public function setMimeFilter($filter)
     {
+        if ($filter === 'image/*') {
+            $filter = 'image/*,.heic,.heics';
+        }
         $this->mimeFilter = $filter;
         return $this;
     }
