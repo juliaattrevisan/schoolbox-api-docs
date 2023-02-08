@@ -215,7 +215,7 @@ class Classes implements IStrategy
                 break;
             }
 
-            $timetable = $compiler->compile($externalId, $startDate, $endDate);
+            $timetable = $compiler->compile((string)$externalId, $startDate, $endDate);
 
             /* A student's timetable is a set of enrolments for their classes
              */
@@ -228,7 +228,7 @@ class Classes implements IStrategy
                     continue;
                 }
 
-                $this->processClass($externalId, $enrolment);
+                $this->processClass((string)$externalId, $enrolment);
             }
 
             $i++;

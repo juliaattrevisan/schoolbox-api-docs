@@ -63,7 +63,7 @@ class Users
         $students = [];
 
         foreach ($userStatement as $row) {
-            $students[$row['external_id']] = $row;
+            $students[(string)$row['external_id']] = $row;
         }
 
         return $students;
@@ -88,7 +88,7 @@ class Users
         $staff = [];
 
         foreach ($userStatement as $row) {
-            $staff[$row['external_id']] = $row;
+            $staff[(string)$row['external_id']] = $row;
         }
 
         return $staff;
