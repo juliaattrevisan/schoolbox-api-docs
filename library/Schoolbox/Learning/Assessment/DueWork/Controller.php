@@ -431,14 +431,11 @@ class Controller extends Assessment\Controller
         }
 
         $userIds = $this->getRequest()->query->get('userIds');
-echo "in downloadSubmissions()\n";
-echo "userIds:\n";
-var_export($userIds);
-die;
 
         // Generate message and send to taskd
         $message = $this->dueWorkDownloadMessageFactory->buildForAssessment(
             $assessment,
+            $userIds,
             $this->getUser(),
         );
         $this->producer->send($message);
