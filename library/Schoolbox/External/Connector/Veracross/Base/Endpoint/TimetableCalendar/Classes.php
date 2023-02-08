@@ -215,6 +215,13 @@ class Classes implements IStrategy
                 break;
             }
 
+            $this->log->debug(sprintf(
+                'Fetching timetable data for %s %s (%s) - this might take a little while',
+                $user['firstname'],
+                $user['lastname'],
+                $externalId
+            ));
+
             $timetable = $compiler->compile((string)$externalId, $startDate, $endDate);
 
             /* A student's timetable is a set of enrolments for their classes
