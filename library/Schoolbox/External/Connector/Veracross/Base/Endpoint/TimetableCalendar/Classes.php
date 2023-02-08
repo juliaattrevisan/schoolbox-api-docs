@@ -291,11 +291,25 @@ class Classes implements IStrategy
 
         /* Convert strings to adf
          *
-         * Previously we put these dates into the format 2016-08-18T10:25:00Z
-         * which strtotime should be able to figure out
+         * Apply timezone settings to these zulu-time dates
          */
-        $startAt = \Alaress_Date_Format::newFromTimestamp(strtotime($classInstance['start']));
-        $finishAt = \Alaress_Date_Format::newFromTimestamp(strtotime($classInstance['end']));
+        $this->log->debug(sprintf(
+            'Original dates: %s - %s',
+            $classInstance['start'],
+            $classInstance['end']
+        ));
+
+        $startAt = (new \Alaress_Date_Format(
+            $classInstance['start'],
+            \Alaress_Date_Format::FORMAT_DATETIME_UTC_NO_MLS,
+            new \DateTimeZone('UTC')
+        ))->setTimezone($this->timezone);
+
+        $finishAt = (new \Alaress_Date_Format(
+            $classInstance['end'],
+            \Alaress_Date_Format::FORMAT_DATETIME_UTC_NO_MLS,
+            new \DateTimeZone('UTC')
+        ))->setTimezone($this->timezone);
 
         /* Cram in everything else
          */
