@@ -11,6 +11,9 @@ namespace Schoolbox\External\Connector\Veracross\Base\Endpoint\TimetableCalendar
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\IApi;
 
 /**
+ * DEPRECATED
+ *   But I am using this for reference
+ *
  * For convenience, take a $class array and fill it with the bare
  * necessities such as students, teachers, rooms, scheduled instances
  */

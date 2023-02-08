@@ -31,7 +31,7 @@ class Classes implements IStrategy
     /**
      * The scopes we used for manufacturing a Schedule Timetable
      */
-    private const SCOPE = '
+    public const SCOPE = '
         classes:list
         academics.enrollments:list
         academics.classes.meeting_times:list
@@ -198,27 +198,26 @@ class Classes implements IStrategy
 
         /* Precompiler
          */
-        $compiler = new ClassCompiler($this->api, self::SCOPE);
+        $compiler = new PersonCompiler($this->api, self::SCOPE);
 
-        /* Hit the endpoint to get all the classes as best you can
+        /* TODO Parameterise these
          */
-        $classesGenerator = $this->api->retrieve('GET', 'classes', self::SCOPE);
+        $externalId = '13063';
+        $startDate = '2016-08-01';
+        $endDate = '2016-09-01';
 
-        foreach ($classesGenerator as $classPage) {
-            foreach ($classPage['data'] as $class) {
-                /* You can use the class id as a watchlist param to specifically
-                 * import this one class. Once we find it, we exit this loop -
-                 * we don't expect it to appear again in the classes index
-                 */
-                if (!(new Watchlist())->isOnWatchlist((string)$class['id'], $this->watchlist)) {
-                    continue;
-                }
+        $timetable = $compiler->compile($externalId, $startDate, $endDate);
 
-                /* TODO: Temporary inspection
-                 */
-                $this->processClass($compiler->compileClass($class));
-                break;
+        foreach ($timetable as $enrolment) {
+            /* You can use the class id as a watchlist param to specifically
+             * import this one class. Once we find it, we exit this loop -
+             * we don't expect it to appear again in the classes index
+             */
+            if (!(new Watchlist())->isOnWatchlist((string)$enrolment['internal_class_id']['id'], $this->watchlist)) {
+                continue;
             }
+
+            $this->processClass($externalId, $enrolment);
         }
     }
 
@@ -227,16 +226,18 @@ class Classes implements IStrategy
      * For each class, process the lessons and apply student/staff involvements
      * Ignore lessons that occur outside the [$from, $to] window
      *
-     * @param array $class
+     * @param string $externalId
+     * @param array  $enrolment
      * @return void
-     * @throws \InvalidArgumentException
+     * @throws Exception
      * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function processClass(array $class)
+    private function processClass(string $externalId, array $enrolment): void
     {
-        foreach ($class['schedule'] as $classInstance) {
+        foreach ($enrolment['schedule'] as $classInstance) {
+            $class = $enrolment['internal_class_id'];
+
             /* Save sis_event record
              */
             $event = $this->createEvent($class, $classInstance);
@@ -247,7 +248,7 @@ class Classes implements IStrategy
 
             /* Save the involvements
              */
-            $this->createInvolvements($class, $event, $classEntry);
+            $this->createInvolvements($externalId, $class, $event, $classEntry);
         }
     }
 
@@ -268,13 +269,13 @@ class Classes implements IStrategy
     ): \Schoolbox\External\Event\Model {
         /* Fill in these vars as usual
          */
-        $classCode = trim((string)$class['code']);
+        $classCode = trim((string)$class['class_id']);
         $day = null;
         $detail = null;
         $guid = null;
         $period = null;
         $room = null;
-        $title = trim((string)$class['name']);
+        $title = trim((string)$class['description']);
 
         /* This is pretty optional - this is the sis' equivalent of our luEventType
          * Sometimes it's provided, sometimes it's not - we can record it here if
@@ -347,8 +348,8 @@ class Classes implements IStrategy
             $classEntry = $this->classEntries[$event->getCode()];
         } else {
             $classEntry = $this->classEntryMapper->createModel()
-                ->setName($class['name'])
-                ->setCode($class['code']);
+                ->setName($class['description'])
+                ->setCode($class['class_id']);
 
             if ($this->perform) {
                 $this->classEntryMapper->save($classEntry);
@@ -364,6 +365,7 @@ class Classes implements IStrategy
     /**
      * Save all the involvements for a given $class
      *
+     * @param string     $studentExternalId
      * @param array      $class
      * @param Model      $event
      * @param ClassEntry $classEntry
@@ -373,46 +375,29 @@ class Classes implements IStrategy
      * @throws \UnexpectedValueException
      */
     private function createInvolvements(
+        string $studentExternalId,
         array $class,
         \Schoolbox\External\Event\Model $event,
         ClassEntry $classEntry
     ): void {
-        /* Save sis_class_user involvements
-         * This is the teacher(s)
+        /* Save the teacher's involvement
          */
-        if (!\count($class['teachers'])) {
-            $this->log->debug(sprintf(
-                '%s: no staff involved',
-                $class['code']
-            ));
-        } else {
-            foreach ($class['teachers'] as $teacher) {
-                $externalId = trim((string)$teacher['id']);
-                $name = trim((string)$teacher['name']);
+        $externalId = trim((string)$class['primary_teacher']['id']);
+        $name = trim((string)$class['primary_teacher']['name']);
 
-                /* TODO Figure out overrides to put into saveStaffInvolvement
-                 *  So far, no distinction has yet been made for Overrides to exist
-                 */
-                $this->saveInvolvement($event, $classEntry, $name, $externalId);
-            }
-        }
-
-        /* Save sis_class_user involvements
-         * This is the student(s)
+        /* TODO Figure out overrides to put into saveStaffInvolvement
+         *  So far, no distinction has yet been made for Overrides to exist
          */
-        if (!\count($class['students'])) {
-            $this->log->debug(sprintf(
-                '%s: no students involved',
-                $class['code']
-            ));
-        } else {
-            foreach ($class['students'] as $student) {
-                $externalId = trim((string)$student['id']);
-                $name = '';
+        $this->saveInvolvement($event, $classEntry, $name, $externalId);
 
-                $this->saveEnrolment($event, $classEntry, $name, $externalId);
-            }
-        }
+        /* Save the student's enrolment
+         *
+         * We don't have their name conveniently, so for now it can be just ''
+         * and you'll have to track people down via their external id instead
+         */
+        $name = '';
+
+        $this->saveEnrolment($event, $classEntry, $name, $studentExternalId);
     }
 
 
