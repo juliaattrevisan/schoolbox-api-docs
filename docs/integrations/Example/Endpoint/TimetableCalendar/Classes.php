@@ -366,7 +366,7 @@ class Classes implements IStrategy
                     $employee['surname']
                 );
 
-                $this->saveStaffInvolvement($event, $classEntry, $name, $externalId);
+                $this->saveInvolvement($event, $classEntry, $name, $externalId);
             }
         }
 
@@ -388,7 +388,7 @@ class Classes implements IStrategy
                     $student['surname']
                 );
 
-                $this->saveRegularInvolvement($event, $classEntry, $name, $externalId);
+                $this->saveEnrolment($event, $classEntry, $name, $externalId);
             }
         }
     }
@@ -407,13 +407,13 @@ class Classes implements IStrategy
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function saveStaffInvolvement(
+    private function saveInvolvement(
         \Schoolbox\External\Event\Model $event,
         ClassEntry $classEntry,
         string $name,
         string $externalId
     ): void {
-        $this->saveRegularInvolvement($event, $classEntry, $name, $externalId);
+        $this->saveEnrolment($event, $classEntry, $name, $externalId);
 
         /* We use the Overrides system to specify a particular person's involvement
          * in a particular sis_event instance, rather than being associated with all
@@ -463,7 +463,7 @@ class Classes implements IStrategy
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function saveRegularInvolvement(
+    private function saveEnrolment(
         \Schoolbox\External\Event\Model $event,
         ClassEntry $classEntry,
         string $name,
