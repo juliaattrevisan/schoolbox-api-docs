@@ -213,6 +213,16 @@ class Controller extends Base\Base
             $errors[] = 'Proposed Unit folder already has a Course: ' . $unitFolderCourse->getId();
         }
 
+        // Are children courses / units?
+        $children = FolderMapper::getInstance()->findAllChildren($courseFolder->getId(), true);
+        foreach ($children as $childFolder) {
+            // Does the proposed Unit Folder already have a Course ?
+            $childFolderCourse = $childFolder->getCourseSpecification();
+            if ($childFolderCourse instanceof CourseSpecification && $childFolderCourse->getId()) {
+                $errors[] = 'Child folder already has a Course: ' . $childFolderCourse->getId();
+            }
+        }
+
         if (\count($errors)) {
             $this->returnJson($errors, 400);
             return;
