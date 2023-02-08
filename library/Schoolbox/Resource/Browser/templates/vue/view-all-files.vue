@@ -619,14 +619,6 @@ export default {
     white-space: nowrap;
 }
 
-.meta {
-    display: none;
-    @media (max-width: 700px) {
-        //show on mobile, as the .date-modified-td will be hidden
-        display: block;
-    }
-}
-
 .edit {
     display: flex;
     height: 2.5rem;
@@ -656,6 +648,16 @@ export default {
     @media (max-width: 700px) {
         display: none; //hide on mobile, as the date will then be shown within view-all-files-name.vue
     }
+}
+
+.VueTables__row {
+    //  Kept here, without it the rule leaks into affecting .meta classes in the notifications sidebar
+    .meta {
+    display: none;
+    @media (max-width: 700px) { //show on mobile, as the .date-modified-td will be hidden
+        display: block;
+    }
+}
 }
 
 .VueTables__table .edit-td {
