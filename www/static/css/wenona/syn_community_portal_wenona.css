@@ -4,33 +4,29 @@
  * To install, place this file in SynergeticCommunityPortal/Site/Css
  * Authored by @alaress, '12
 /* ========================================================================== */
-body
-{
+body {
     font-size: 13px;
     background: #fff !important;
 }
 
-input, select, td
-{
+input,
+select,
+td {
     font-size: 13px !important;
 }
 
-a
-{
+a {
     color: #006;
 }
 
-a:hover
-{
-    color: #C00;
+a:hover {
+    color: #c00;
 }
-
 
 /*
     Header and menu styles
 */
-.upperBody .headerDiv
-{
+.upperBody .headerDiv {
     display: none !important;
 }
 
@@ -38,19 +34,15 @@ a:hover
     Portal Floating menu
 */
 
-.floatMenuDiv
-{
+.floatMenuDiv {
     height: 28px;
     padding-top: 11px;
-    background: #F0F0F0;
+    background: #f0f0f0;
 }
 
-.floatUnderlay
-{
-    height:38px;
+.floatUnderlay {
+    height: 38px;
 }
-
-
 
 /*
 
@@ -58,94 +50,99 @@ Portal heading style elements
 
 */
 
-h2, .headerDiv
-{
+h2,
+.headerDiv {
     background-color: transparent;
     color: #000000;
     border-bottom: 2px solid #002452;
     background-image: none;
 }
 
-.heading_cell /* need to phase heading cells out.. convert to h2 or headDiv*/
-{
+.heading_cell /* need to phase heading cells out.. convert to h2 or headDiv*/ {
     background-color: transparent;
     color: #000000;
     border-bottom: 2px solid #002452;
     background-image: none;
 }
 
-.name_cell, .class_type_cell, .prepost_hdr_cell, .hdr_type_cell, .time_h_cell, .time_wh_cell, .financeTableRowHeader,
-#TimetableWeekly table tr th, .dataView .columnTitleRows, .time_wh_cell_sub
-{
+.name_cell,
+.class_type_cell,
+.prepost_hdr_cell,
+.hdr_type_cell,
+.time_h_cell,
+.time_wh_cell,
+.financeTableRowHeader,
+#TimetableWeekly table tr th,
+.dataView .columnTitleRows,
+.time_wh_cell_sub {
     font-weight: bold;
-    background-color: #F0F0F0;
+    background-color: #f0f0f0;
     background-image: none;
 }
 
-.fin_ReceiptDateHeader, .fin_ReceiptNumberHeader, .fin_ReceiptAmountHeader, .fin_ReceiptDescriptionHeader, .fin_ReceiptPrintHeader, .fin_StatementDateHeader, .fin_StatementNumberHeader, .fin_StatementDueDateHeader, .fin_StatementBalanceHeader, .fin_StatementDescriptionHeader, .fin_StatementPrintHeader
-{
+.fin_ReceiptDateHeader,
+.fin_ReceiptNumberHeader,
+.fin_ReceiptAmountHeader,
+.fin_ReceiptDescriptionHeader,
+.fin_ReceiptPrintHeader,
+.fin_StatementDateHeader,
+.fin_StatementNumberHeader,
+.fin_StatementDueDateHeader,
+.fin_StatementBalanceHeader,
+.fin_StatementDescriptionHeader,
+.fin_StatementPrintHeader {
     background: none;
 }
 
 /*
     Page Layout styles
 */
-.upperBody
-{
-    height:38px;
+.upperBody {
+    height: 38px;
 }
 /*
     Portal column framwork for left column elements.
 */
 
 /* Top Menu Button (is actually a TableCell. SW 19/2/08 */
-.mnu_btn_cell /* lnk_drk_row */
-{
+.mnu_btn_cell /* lnk_drk_row */ {
     background-color: transparent;
 }
 
 /* Table row above the Top Menu Buttons (is a TableCell). SW 19/2/08 */
-.mnu_btn_cell_top /* lnk_drk_row_top */
-{
+.mnu_btn_cell_top /* lnk_drk_row_top */ {
     background-color: transparent;
 }
 
-
 /* In the Results and contacts pages - everything under the headings (eg. information and calender). SW 26/2/08 */
-.tableBlackTopBorder /* cla_tab */
-{
+.tableBlackTopBorder /* cla_tab */ {
     border-top: none;
 }
 
 /*************************
 	Weekly Timetable
 *************************/
-#TimetableWeekly table tr td
-{
-    background: #FBFBFB;
+#TimetableWeekly table tr td {
+    background: #fbfbfb;
     border: 3px solid #ffffff;
     border-width: 3px 3px 0 3px;
 }
 
 /* Weekly Timetable - Header Cells */
-.time_whc_cell
-{
+.time_whc_cell {
     background: none;
 }
 
 /* Weekly Timetable - Regular Cells */
-.time_wtc_cell
-{
+.time_wtc_cell {
     background-color: transparent;
 }
-.time_wdc_cell
-{
+.time_wdc_cell {
     background-color: transparent;
 }
 
 /* Textual Hyperlink on each Tab eg Results, Interviews, Contact Us ... */
-.lnk_btn
-{
+.lnk_btn {
     font-weight: normal;
     padding: 7px 16px;
     color: #036;
@@ -156,104 +153,87 @@ h2, .headerDiv
 }
 
 /* The current page Textual Hyperlink on each Tab eg Results, Interviews, Contact Us ... */
-.lnk_btn_highlight
-{
+.lnk_btn_highlight {
     font-weight: normal;
     padding: 7px 16px;
-    color: #FFF;
+    color: #fff;
     background: #036;
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
     border-radius: 3px;
 }
 
-.lnk_btn:hover
-{
-    background: #D6F0F6;
-    color: #0066B0;
+.lnk_btn:hover {
+    background: #d6f0f6;
+    color: #0066b0;
 }
 .lnk_btn_highlight:hover {
     color: #ffffff;
     text-decoration: none;
 }
 
-.res_ttl_cell /* Results Maintenance: Assessment Area description cell with dotted underline */
-{
-    border-bottom:none;
+.res_ttl_cell /* Results Maintenance: Assessment Area description cell with dotted underline */ {
+    border-bottom: none;
 }
 
-.time_t_cell /* the time cell of the Daily Timetable HTMLTable */
-{
+.time_t_cell /* the time cell of the Daily Timetable HTMLTable */ {
     background: none;
 }
 
-.time_d_cell /* the other cells of the daily timetable HTMLTable */
-{
+.time_d_cell /* the other cells of the daily timetable HTMLTable */ {
     background: none;
 }
 
-.time_d_cell_pti_print
-{
+.time_d_cell_pti_print {
     background: none;
 }
 
-.time_tr_cell
-{
+.time_tr_cell {
     background: none;
 }
 
-.time_dr_cell
-{
+.time_dr_cell {
     background: none;
 }
 
 /* Table cell between each Menu Cell. SW 19/2/08 */
-.mnu_mid_img_cell /* mid_img_cell */
-{
+.mnu_mid_img_cell /* mid_img_cell */ {
     background: none;
     display: none;
 }
 /* End Table cell after all Menu Cells. SW 19/2/08 */
-.mnu_end_img_cell /* end_img_cell */
-{
+.mnu_end_img_cell /* end_img_cell */ {
     background: none;
     display: none;
 }
 /* right hand Cell after HeaderCell eg Available Results/Information. SW 19/2/08 */
-.tbl_hdr_end_img_cell /* triang_cell */
-{
+.tbl_hdr_end_img_cell /* triang_cell */ {
     background: none;
-    display: none;}
+    display: none;
+}
 
 /* Attendances - Cells */
-.att_grd_cell
-{
-    border-bottom:none !important;
+.att_grd_cell {
+    border-bottom: none !important;
 }
 
-#att_Selection
-{
-    height:75px;
-
+#att_Selection {
+    height: 75px;
 }
 
-.financeTableRow
-{
+.financeTableRow {
     background: none;
 }
-.financeTableRow:hover
-{
-    background-color: #ECECEC;
+.financeTableRow:hover {
+    background-color: #ececec;
     color: #000;
 }
 
-#fin_TransactionHistoryHeader
-{
+#fin_TransactionHistoryHeader {
     background-color: transparent;
 }
 
-.dataView .titleRow
-{
+.dataView .titleRow {
     padding-right: 0;
     padding-left: 0;
     background-color: transparent;
@@ -263,23 +243,20 @@ h2, .headerDiv
     vertical-align: bottom;
     background-image: none;
     line-height: 20px;
-    margin-top:0px;
+    margin-top: 0px;
 }
 
-.dataView .dataRow
-{
+.dataView .dataRow {
     background: none;
     font-size: 13px;
 }
-.dataView .dataRow:hover
-{
-    background-color: #ECECEC;
+.dataView .dataRow:hover {
+    background-color: #ececec;
     color: #000;
 }
 
 /* Styling for the docman grid and the columns. SW7012 30/06/09 */
-.docman_grd_hdr_cell /* Docman GridView header cells. SW7012 30/06/09 */
-{
+.docman_grd_hdr_cell /* Docman GridView header cells. SW7012 30/06/09 */ {
     /* width:100%; */
     font-weight: normal;
     background-color: transparent;
@@ -287,24 +264,21 @@ h2, .headerDiv
     border-bottom: 2px solid #002452;
 }
 
-.ulSideMenu li .selected
-{
-    color: #FF5A00 !important;
+.ulSideMenu li .selected {
+    color: #ff5a00 !important;
 }
-.ulSideMenu li a.selected
-{
-    color: #FF5A00 !important;
+.ulSideMenu li a.selected {
+    color: #ff5a00 !important;
 }
-.ulSideMenu li a
-{
-    border: 1px solid #D1D1D1;
+.ulSideMenu li a {
+    border: 1px solid #d1d1d1;
     color: black !important;
     display: block;
     float: right;
     text-shadow: 0 1px 0px white;
-    background-color: #FBFBFB;
-    background-image: -moz-linear-gradient(top, #FBFBFB, #F7F7F7);
-    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #FBFBFB), color-stop(1, #F7F7F7));
+    background-color: #fbfbfb;
+    background-image: -moz-linear-gradient(top, #fbfbfb, #f7f7f7);
+    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #fbfbfb), color-stop(1, #f7f7f7));
     filter: progid:dximagetransform.microsoft.gradient(startColorStr='#fbfbfb', EndColorStr='#f7f7f7');
     -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorStr='#fbfbfb', EndColorStr='#f7f7f7')";
     height: 22px;
@@ -314,19 +288,17 @@ h2, .headerDiv
     font-weight: normal;
     overflow: visible;
     margin-top: 4px;
-    font-family: Arial,Helvetica,sans-serif;
+    font-family: Arial, Helvetica, sans-serif;
     -moz-border-radius: 3px;
     -webkit-border-radius: 3px;
     border-radius: 3px;
-
 }
 
-.dxgvFocusedRow
-{
-    background-color: #ECECEC;
+.dxgvFocusedRow {
+    background-color: #ececec;
     color: #000;
 }
-.dxgvControl, .dxgvDisabled
-{
+.dxgvControl,
+.dxgvDisabled {
     border: none;
 }
