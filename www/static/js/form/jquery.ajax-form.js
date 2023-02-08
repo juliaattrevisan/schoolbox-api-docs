@@ -14,7 +14,7 @@
  * TODO: investigate whether this needs to be renamed.
  *       jQuery validation defines $.fn.ajaxForm, but Schoolbox doesn't use it.
  */
-(function($){
+(function ($) {
     "use strict";
 
     /**
@@ -24,33 +24,31 @@
      * @param options AJAX command options
      * @constructor
      */
-    var AjaxForm = function(form, options) {
-        this.form    = form;
+    var AjaxForm = function (form, options) {
+        this.form = form;
         this.options = options;
     };
 
     /**
      * Handles when the form doesn't save.
      */
-    AjaxForm.prototype.handleFailure = function() {
-        this.buildRevealModal().foundation('reveal', 'open');
+    AjaxForm.prototype.handleFailure = function () {
+        this.buildRevealModal().foundation("reveal", "open");
     };
 
     /**
      * Attempts to submit the form again
      */
-    AjaxForm.prototype.retrySubmit = function() {
-        this.form.trigger('retry.ajaxForm');
+    AjaxForm.prototype.retrySubmit = function () {
+        this.form.trigger("retry.ajaxForm");
         this.submitForm();
     };
 
     /**
      * Aborts submission, and resets form
      */
-    AjaxForm.prototype.abortSubmit = function() {
-        this.form
-            .trigger('reset.ajaxForm')
-            .trigger('abort.ajaxForm');
+    AjaxForm.prototype.abortSubmit = function () {
+        this.form.trigger("reset.ajaxForm").trigger("abort.ajaxForm");
     };
 
     /**
@@ -58,30 +56,30 @@
      *
      * @returns {jQuery} The reveal modal
      */
-    AjaxForm.prototype.buildRevealModal = function() {
-        var self  = this;
+    AjaxForm.prototype.buildRevealModal = function () {
+        var self = this;
         var modal = $(
             '<div class="reveal-modal" id="retry-modal" data-reveal aria-hidden="true" role="dialog">' +
-            '<h2>Save failed</h2>' +
-            '<p>Do you wish to retry?</p>' +
-            '<ul class="flex-list buttons">' +
-            '<li><a href="#" class="button submit" data-action="retry">Retry</a></li>' +
-            '<li><a href="#" class="button" data-action="abort">Cancel</a></li>' +
-            '</ul>' +
-            '</div>'
+                "<h2>Save failed</h2>" +
+                "<p>Do you wish to retry?</p>" +
+                '<ul class="flex-list buttons">' +
+                '<li><a href="#" class="button submit" data-action="retry">Retry</a></li>' +
+                '<li><a href="#" class="button" data-action="abort">Cancel</a></li>' +
+                "</ul>" +
+                "</div>"
         );
 
-        modal.appendTo('body');
+        modal.appendTo("body");
 
         return modal
-            .on('click', '[data-action="retry"]', function(e) {
-                modal.foundation('reveal', 'close');
+            .on("click", '[data-action="retry"]', function (e) {
+                modal.foundation("reveal", "close");
                 modal.remove();
                 e.preventDefault();
                 self.retrySubmit();
             })
-            .on('click', '[data-action="abort"]', function(e) {
-                modal.foundation('reveal', 'close');
+            .on("click", '[data-action="abort"]', function (e) {
+                modal.foundation("reveal", "close");
                 modal.remove();
                 e.preventDefault();
                 self.abortSubmit();
@@ -93,34 +91,34 @@
      *
      * @returns {jqXHR}
      */
-    AjaxForm.prototype.submitForm = function() {
+    AjaxForm.prototype.submitForm = function () {
         // Build options out of form if they aren't there
-        var self        = this;
-        var form        = this.form;
+        var self = this;
+        var form = this.form;
         var ajaxOptions = this.options;
-        if (!('url' in ajaxOptions)) {
-            ajaxOptions.url = form.attr('action');
+        if (!("url" in ajaxOptions)) {
+            ajaxOptions.url = form.attr("action");
         }
-        if (!('data' in ajaxOptions)) {
+        if (!("data" in ajaxOptions)) {
             ajaxOptions.data = form.serializeArray();
         }
-        if (!('method' in ajaxOptions || 'type' in ajaxOptions)) {
-            ajaxOptions.method = form.attr('method');
+        if (!("method" in ajaxOptions || "type" in ajaxOptions)) {
+            ajaxOptions.method = form.attr("method");
         }
-        form.trigger('beforeAttemptingSubmit.ajaxForm');
+        form.trigger("beforeAttemptingSubmit.ajaxForm");
         return $.ajax(ajaxOptions)
             .then(
-                function(data, status, xhr) {
-                    form.trigger('done.ajaxForm', [data, status, xhr]);
+                function (data, status, xhr) {
+                    form.trigger("done.ajaxForm", [data, status, xhr]);
                 },
-                function(xhr, status, error) {
+                function (xhr, status, error) {
                     // Consider auto-retry w/ jitter?
-                    form.trigger('fail.ajaxForm', [xhr, status, error]);
+                    form.trigger("fail.ajaxForm", [xhr, status, error]);
                     self.handleFailure();
                 }
             )
-            .always(function(xhr, status) {
-                form.trigger('always.ajaxForm', [xhr, status]);
+            .always(function (xhr, status) {
+                form.trigger("always.ajaxForm", [xhr, status]);
             });
     };
 
@@ -130,7 +128,7 @@
      * @param options
      * @returns {jQuery}
      */
-    $.fn.ajaxForm = function(options) {
+    $.fn.ajaxForm = function (options) {
         var ajaxForm = new AjaxForm(this, options);
         ajaxForm.submitForm();
         return this;

@@ -2,11 +2,11 @@
  * Animation helpers based on GSAP
  */
 
-import { gsap } from 'gsap/all';
-import { setAndGetAttribute } from '@js/util/domUtils';
+import { gsap } from "gsap/all";
+import { setAndGetAttribute } from "@js/util/domUtils";
 
-const PADDING_TOP_ATTRIBUTE = 'data-padding-top';
-const PADDING_BOTTOM_ATTRIBUTE = 'data-padding-bottom';
+const PADDING_TOP_ATTRIBUTE = "data-padding-top";
+const PADDING_BOTTOM_ATTRIBUTE = "data-padding-bottom";
 
 /**
  * Replicates jQuery's slideDown - Display the element with a sliding motion.
@@ -15,13 +15,12 @@ const PADDING_BOTTOM_ATTRIBUTE = 'data-padding-bottom';
  * @params { DOMElement }
  * @params { Number } in seconds, so 0.3 is 300ms
  */
-export async function slideDown (element, duration = 0.3) {
+export async function slideDown(element, duration = 0.3) {
+    if (element.classList.contains("hide")) element.classList.remove("hide");
 
-    if (element.classList.contains('hide')) element.classList.remove('hide');
-
-    element.style.display = 'block';
-    element.style.height = 'auto';
-    element.style.overflow = 'hidden';
+    element.style.display = "block";
+    element.style.height = "auto";
+    element.style.overflow = "hidden";
 
     const paddingTop = getPaddingTop(element);
     element.style.paddingTop = 0;
@@ -36,12 +35,11 @@ export async function slideDown (element, duration = 0.3) {
         height: targetHeight,
         paddingTop: paddingTop,
         paddingBottom: paddingBottom,
-        overwrite: 'auto',
+        overwrite: "auto",
         duration: duration,
-        ease: 'power1.out',
-        onComplete: () => onSlideDownComplete(element)
-    } );
-
+        ease: "power1.out",
+        onComplete: () => onSlideDownComplete(element),
+    });
 }
 
 /**
@@ -49,9 +47,9 @@ export async function slideDown (element, duration = 0.3) {
  *
  * @params { DOMElement }
  */
-function onSlideDownComplete (element) {
-    element.style.height = 'auto';
-    element.style.overflow = 'visible';
+function onSlideDownComplete(element) {
+    element.style.height = "auto";
+    element.style.overflow = "visible";
 }
 
 /**
@@ -61,11 +59,13 @@ function onSlideDownComplete (element) {
  *
  * @returns { Number }
  */
-function getPaddingTop (element) {
+function getPaddingTop(element) {
     if (element.getAttribute(PADDING_TOP_ATTRIBUTE)) {
         return parseFloat(element.getAttribute(PADDING_TOP_ATTRIBUTE));
     } else {
-        return parseFloat(setAndGetAttribute(element, PADDING_TOP_ATTRIBUTE, parseFloat(getComputedStyle(element).paddingTop)));
+        return parseFloat(
+            setAndGetAttribute(element, PADDING_TOP_ATTRIBUTE, parseFloat(getComputedStyle(element).paddingTop))
+        );
     }
 }
 
@@ -76,11 +76,13 @@ function getPaddingTop (element) {
  *
  * @returns { Number }
  */
-function getPaddingBottom (element) {
+function getPaddingBottom(element) {
     if (element.getAttribute(PADDING_BOTTOM_ATTRIBUTE)) {
         return parseFloat(element.getAttribute(PADDING_BOTTOM_ATTRIBUTE));
     } else {
-        return parseFloat(setAndGetAttribute(element, PADDING_BOTTOM_ATTRIBUTE, parseFloat(getComputedStyle(element).paddingBottom)));
+        return parseFloat(
+            setAndGetAttribute(element, PADDING_BOTTOM_ATTRIBUTE, parseFloat(getComputedStyle(element).paddingBottom))
+        );
     }
 }
 
@@ -90,19 +92,19 @@ function getPaddingBottom (element) {
  * @params { DOMElement }
  * @params { Number } in seconds, so 0.3 is 300ms
  */
-export async function slideUp (element, duration = 0.3) {
-    element.style.overflow = 'hidden';
+export async function slideUp(element, duration = 0.3) {
+    element.style.overflow = "hidden";
     const paddingTop = getPaddingTop(element);
     const paddingBottom = getPaddingBottom(element);
     return gsap.to(element, {
         height: 0,
         paddingTop: 0,
         paddingBottom: 0,
-        overwrite: 'auto',
+        overwrite: "auto",
         duration: duration,
-        ease: 'power1.in',
-        onComplete: () => onSlideUpComplete(element, paddingTop, paddingBottom)
-    } );
+        ease: "power1.in",
+        onComplete: () => onSlideUpComplete(element, paddingTop, paddingBottom),
+    });
 }
 
 /**
@@ -112,10 +114,10 @@ export async function slideUp (element, duration = 0.3) {
  * @params { Number }
  * @params { Number }
  */
-function onSlideUpComplete (element, paddingTop, paddingBottom) {
-    element.style.display = 'none';
-    element.style.height = 'auto';
-    element.style.overflow = 'visible';
+function onSlideUpComplete(element, paddingTop, paddingBottom) {
+    element.style.display = "none";
+    element.style.height = "auto";
+    element.style.overflow = "visible";
     element.style.paddingTop = `${paddingTop}px`;
     element.style.paddingBottom = `${paddingBottom}px`;
     element.removeAttribute(PADDING_TOP_ATTRIBUTE);

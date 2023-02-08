@@ -2,20 +2,17 @@
  * To select Curriculum codes to apply to a Due Work, Learning Moments, Badges etc
  */
 
-import ManageCurriculum from '@schoolboxCurriculum/vue/manageCurriculum/manage-curriculum.vue';
-import { rest } from 'msw';
-import { data as allCurriculumData } from '../../curriculumSelector/dataCurriculumSelector';
-import { data as vicCurriculumData } from '../../curriculumSelector/dataVicCurriculum';
+import ManageCurriculum from "@schoolboxCurriculum/vue/manageCurriculum/manage-curriculum.vue";
+import { rest } from "msw";
+import { data as allCurriculumData } from "../../curriculumSelector/dataCurriculumSelector";
+import { data as vicCurriculumData } from "../../curriculumSelector/dataVicCurriculum";
 // import { data as nswCurriculumData } from '../../curriculumSelector/dataNswCurriculum';
 
-
-const dataEndpoint = '/curriculumData';
+const dataEndpoint = "/curriculumData";
 
 const mswHandlers = [
     rest.get(dataEndpoint, (req, res, ctx) => {
-        return res(
-            ctx.json(allCurriculumData)
-        )
+        return res(ctx.json(allCurriculumData));
     }),
 ];
 
@@ -33,21 +30,21 @@ export default {
                     <story />
                 </div>
             </div>
-            `
-        })
+            `,
+        }),
     ],
     parameters: {
         controls: { hideNoControlsWarning: true },
         docs: {
             description: {
-                component: 'To browse and manage Curriculum',
+                component: "To browse and manage Curriculum",
             },
         },
         msw: {
-            handlers: mswHandlers
+            handlers: mswHandlers,
         },
     },
-    title: 'Pages/ManageCurriculum',
+    title: "Pages/ManageCurriculum",
 };
 
 const Template = (args, { argTypes }) => ({
@@ -55,8 +52,7 @@ const Template = (args, { argTypes }) => ({
     setup() {
         return { args };
     },
-    template:
-        `
+    template: `
         <manage-curriculum v-bind="args" />
         `,
 });
@@ -70,18 +66,18 @@ LoadError.parameters = {
             rest.get(dataEndpoint, (req, res, ctx) => {
                 return res(
                     ctx.status(500) //to simulate an error
-                )
+                );
             }),
             ...mswHandlers,
-        ]
-    }
-}
+        ],
+    },
+};
 
 export const readOnly = Template.bind({});
 readOnly.args = {
     ...Default.args,
     isReadOnly: true,
-}
+};
 
 export const editModal = Template.bind({});
 editModal.decorators = [
@@ -89,6 +85,6 @@ editModal.decorators = [
         template: `
         <story />
         <p style="margin: 1rem;"><em>To view a node with full info, navigate to Victorian Curriculum > The Arts > Dance > Level A > Explore and Express Ideas > Experience dance, safe movement possibilities and move their body parts intentionally in response to stimulus</em></p>
-        `
-    })
+        `,
+    }),
 ];

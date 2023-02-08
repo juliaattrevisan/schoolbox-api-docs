@@ -1,11 +1,10 @@
-(function() {
-
+(function () {
     /**
      * A facade method for spawning timetables
      *
      * @param options
      */
-    $.fn.timetableStart = function(options) {
+    $.fn.timetableStart = function (options) {
         options = options || {};
 
         var config = init(options, $(this));
@@ -29,11 +28,10 @@
 
                 /* This indicates the timetable table itself
                  */
-                timetable: '[data-timetable]'
-            }
+                timetable: "[data-timetable]",
+            };
 
-            var derived = {
-            }
+            var derived = {};
 
             var merged = $.extend(defaults, derived, options);
 
@@ -57,11 +55,11 @@
 
             /* Wait till resizing actually stops before resizing everything
              */
-            $(window).bind('resizeEnd', function() {
+            $(window).bind("resizeEnd", function () {
                 timetable.timetableResize();
             });
         }
-    }
+    };
 
     /**
      * Timetable
@@ -71,7 +69,7 @@
      *
      * @param options
      */
-    $.fn.timetableRow = function(options) {
+    $.fn.timetableRow = function (options) {
         options = options || {};
 
         var config = init(options, $(this));
@@ -89,22 +87,21 @@
             var defaults = {
                 element: element,
 
-                container: '[data-timetable-container]',
-                header: '[data-timetable-header]',
+                container: "[data-timetable-container]",
+                header: "[data-timetable-header]",
 
                 /* Reforged timetables end up inside this element
                  */
-                target: '[data-smaller]'
-            }
+                target: "[data-smaller]",
+            };
 
             var derived = {
-
                 /* Island html
                  * Sorry, Doctor
                  */
                 island: '<div class="small-12 island no-pad"></div>',
-                section: '<section></section>'
-            }
+                section: "<section></section>",
+            };
 
             var merged = $.extend(defaults, derived, options);
 
@@ -115,12 +112,12 @@
          * Assemble a timetable
          */
         function assemble() {
-            $(config.element).each(function() {
-                var timetable   = $(this),
-                    container   = timetable.closest(config.container),
-                    header      = timetable.closest(config.header),
-                    target      = container.find(config.target),
-                    periodNames = timetable.find('thead th');
+            $(config.element).each(function () {
+                var timetable = $(this),
+                    container = timetable.closest(config.container),
+                    header = timetable.closest(config.header),
+                    target = container.find(config.target),
+                    periodNames = timetable.find("thead th");
 
                 /* For every day, assemble a two column timetable
                  */
@@ -128,10 +125,10 @@
 
                 /* Generate table rows
                  */
-                $.each(periodNames, function(index, element) {
-                    var tr = $('<tr></tr>');
+                $.each(periodNames, function (index, element) {
+                    var tr = $("<tr></tr>");
                     tr.append($(element).clone());
-                    tr.append(dataCellSelector(timetable, 1, index+1).clone());
+                    tr.append(dataCellSelector(timetable, 1, index + 1).clone());
 
                     table.append(tr);
                 });
@@ -154,7 +151,7 @@
          * @param column
          */
         function dataCellSelector(table, row, column) {
-            return table.find('tbody tr:nth-child('+row+') td:nth-child('+column+')').first();
+            return table.find("tbody tr:nth-child(" + row + ") td:nth-child(" + column + ")").first();
         }
-    }
-}(jQuery));
+    };
+})(jQuery);

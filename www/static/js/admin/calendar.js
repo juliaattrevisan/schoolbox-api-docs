@@ -7,86 +7,85 @@
  * @type {Object}
  */
 var calendar = {
-
-	/**
-	 * Init
-	 */
-	init: function(options) {
-
+    /**
+     * Init
+     */
+    init: function (options) {
         var defaults = {
-            addConfig:    'a.addConfig',
-            addUri:       '/adminv2/calendar/addOption',
-            removeConfig: 'a.removeConfig',
-            removeUri:    '/adminv2/calendar/removeOption'
+            addConfig: "a.addConfig",
+            addUri: "/adminv2/calendar/addOption",
+            removeConfig: "a.removeConfig",
+            removeUri: "/adminv2/calendar/removeOption",
         };
 
         this.options = $.extend({}, defaults, options);
 
-		/* Config actions - add, update and remove individual configs
-		 */
-		this.initAdd();
-		this.initRemove();
-	},
+        /* Config actions - add, update and remove individual configs
+         */
+        this.initAdd();
+        this.initRemove();
+    },
 
-	/**
-	 * Reload screen
-	 */
-	refresh: function() {
-		window.location.href = window.location.href;
-	},
+    /**
+     * Reload screen
+     */
+    refresh: function () {
+        window.location.href = window.location.href;
+    },
 
-	/**
-	 * Set up Add behaviours
-	 */
-	initAdd: function() {
-		var self = this;
+    /**
+     * Set up Add behaviours
+     */
+    initAdd: function () {
+        var self = this;
 
-		$(this.options.addConfig).click(function() {
+        $(this.options.addConfig).click(function () {
+            /* Only add if all inputs are filled
+             * Jump to latest input field when trying to add while you have an empty input
+             *
+             * This prevents you from adding a url, not hitting Update, then adding a new record
+             * which refreshes the screen - causing you to lose the url
+             */
+            if (!$(this).parent().find('input[value=""]').length) {
+                var id = $(this).attr("id").toString().replace(/add_/, "");
 
-			/* Only add if all inputs are filled
-			 * Jump to latest input field when trying to add while you have an empty input
-			 *
-			 * This prevents you from adding a url, not hitting Update, then adding a new record
-			 * which refreshes the screen - causing you to lose the url
-			 */
-			if (!$(this).parent().find('input[value=""]').length) {
-				var id = $(this).attr('id').toString().replace(/add_/, '');
+                /* Ajax add this config option
+                 */
+                var data = {
+                    id: id,
+                };
 
-				/* Ajax add this config option
-				 */
-				var data = {
-					id: id
-				};
+                $.post(self.options.addUri, data, function (responseText) {
+                    self.refresh();
+                });
+            } else {
+                $(this).parent().find('input[value=""]').focus();
+            }
+        });
+    },
 
-				$.post(self.options.addUri, data, function(responseText) {
-					self.refresh();
-				});
-			}
-			else {
-				$(this).parent().find('input[value=""]').focus();
-			}
-		});
-	},
-
-	/**
-	 * Set up Remove behaviours
-	 */
-	initRemove: function() {
-		window.self = this;
-		$(window.self.options.removeConfig).click(function() {
-			window.id = $(this).attr('id').toString().replace(/remove_/, '');
+    /**
+     * Set up Remove behaviours
+     */
+    initRemove: function () {
+        window.self = this;
+        $(window.self.options.removeConfig).click(function () {
+            window.id = $(this)
+                .attr("id")
+                .toString()
+                .replace(/remove_/, "");
             $(this).confirmDialog({
-                text: 'Are you sure you want to remove this source?',
-                confirmEvent: function() {
+                text: "Are you sure you want to remove this source?",
+                confirmEvent: function () {
                     var data = {
-                        id: window.id
+                        id: window.id,
                     };
 
                     $.post(window.self.options.removeUri, data, function (responseText) {
                         window.self.refresh();
                     });
-                }
+                },
             });
-		});
-	}
-}
+        });
+    },
+};

@@ -2,19 +2,16 @@
  * Handles the load of the curriculum data
  */
 
-import { defineStore } from 'pinia';
-import { useNodesStore } from './csNodesStore';
-import { useSelectedNodesStore } from './csSelectedNodesStore';
-import { useSearchStore } from './csSearchStore';
-import { useModalStore } from './csModalStore';
-import { useModalActiveNodesStore } from './csModalActiveNodesStore';
+import { defineStore } from "pinia";
+import { useNodesStore } from "./csNodesStore";
+import { useSelectedNodesStore } from "./csSelectedNodesStore";
+import { useSearchStore } from "./csSearchStore";
+import { useModalStore } from "./csModalStore";
+import { useModalActiveNodesStore } from "./csModalActiveNodesStore";
 
-
-export let apiEndpoint = '';
-
+export let apiEndpoint = "";
 
 export const useStore = defineStore(`curriculumSelector`, {
-
     state: () => ({
         isLoading: true, //to display loading note
         hasLoadError: false, //to display loading error
@@ -26,13 +23,12 @@ export const useStore = defineStore(`curriculumSelector`, {
     }),
 
     getters: {
-
         /**
          * When load is complete and was a success
          *
          * @returns { Boolean }
          */
-        hasLoadedOk () {
+        hasLoadedOk() {
             return !this.isLoading && !this.hasLoadError;
         },
 
@@ -41,28 +37,28 @@ export const useStore = defineStore(`curriculumSelector`, {
          *
          * @returns { Boolean }
          */
-        isSmallContainer () {
+        isSmallContainer() {
             return this.containerWidth < 500;
         },
-
     },
 
     actions: {
-
         /**
          * set up the passed properties and start loading the node data
          *
          * @param { object }
          */
-        init (props) {
+        init(props) {
             this.checkForStorybook();
             this.isReadOnly = props.isReadOnly;
             this.formValueName = props.formValueName;
-            if (!this.isReadOnly && props.dataEndpoint !== '') { //only load when we need to
+            if (!this.isReadOnly && props.dataEndpoint !== "") {
+                //only load when we need to
                 apiEndpoint = props.dataEndpoint;
                 useNodesStore().load();
             }
-            if (props.selectedNodes?.length > 0) { //add in any nodes that have been selected previously
+            if (props.selectedNodes?.length > 0) {
+                //add in any nodes that have been selected previously
                 useSelectedNodesStore().add(props.selectedNodes);
             }
         },
@@ -71,8 +67,8 @@ export const useStore = defineStore(`curriculumSelector`, {
          * When switching between stories, we need to reset the data models
          * as they persist between the stories otherwise
          */
-        checkForStorybook () {
-            if (typeof STORYBOOK_ENV !== 'undefined') {
+        checkForStorybook() {
+            if (typeof STORYBOOK_ENV !== "undefined") {
                 useSelectedNodesStore().$reset();
                 useSearchStore().$reset();
                 useModalStore().$reset();
@@ -87,10 +83,8 @@ export const useStore = defineStore(`curriculumSelector`, {
          *
          * @param { number }
          */
-        updateContainerWidth (width) {
+        updateContainerWidth(width) {
             this.containerWidth = width;
         },
-
     },
-
 });

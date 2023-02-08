@@ -1,28 +1,25 @@
+import { defineStore } from "pinia";
+import cloneDeep from "lodash/cloneDeep";
+import orderBy from "lodash/orderBy";
 
-import { defineStore } from 'pinia'
-import cloneDeep from 'lodash/cloneDeep';
-import orderBy from 'lodash/orderBy';
-
-export const useAdminListStore = defineStore('main', {
-
+export const useAdminListStore = defineStore("main", {
     state: () => ({
         loadedData: null, // contains the loaded data
         rows: [], // to display and possibly edit the rows
         selectedRow: {}, // to track which row is selected
         rowToDelete: {}, // to track which row could be deleted
         isPopOutOpen: false, // to open and close the list
-        selectedPopOutName: '', // to highlight all other rows that have that permission
+        selectedPopOutName: "", // to highlight all other rows that have that permission
     }),
 
     getters: {
-
         /**
          * Retrieve only those fields that will appear in the header
          *
          * @returns { Array of Objects }
          */
-        headerFields (state) {
-            return state.loadedData.fields.filter((field) => field.hasOwnProperty('width')); //use width to determine if it's to display in the header
+        headerFields(state) {
+            return state.loadedData.fields.filter((field) => field.hasOwnProperty("width")); //use width to determine if it's to display in the header
         },
 
         /**
@@ -31,9 +28,9 @@ export const useAdminListStore = defineStore('main', {
          *
          * @returns { Object }
          */
-        popOutHeaderField () {
+        popOutHeaderField() {
             const popOutHeaderField = this.headerFields.find((field) => field.isPopOutList); //use width to determine if it's to display in the header
-            if (typeof popOutHeaderField !== 'undefined') {
+            if (typeof popOutHeaderField !== "undefined") {
                 return popOutHeaderField;
             }
             return {};
@@ -44,40 +41,39 @@ export const useAdminListStore = defineStore('main', {
          *
          * @returns { Array of Objects }
          */
-        popOutFields (state) {
+        popOutFields(state) {
             return state.loadedData.fields.filter((field) => field.popOutList);
         },
-
     },
 
     actions: {
-
         /**
          * The requested data is loaded from the backend
          */
-        updateLoadedData (loadedData) {
+        updateLoadedData(loadedData) {
             this.loadedData = Object.freeze(loadedData); //freeze the loaded data to ensure it's not changed
             const loadedRows = cloneDeep(this.loadedData.rows); //cloneDeep is from underscore.js
-            const sortedRows = orderBy(loadedRows, 'sequence', 'asc'); //orderBy is from underscore.js, to display according to sequence
-            sortedRows.forEach((row) => row.isNew = false); //Add a boolean to know whether the row is one being newly added
+            const sortedRows = orderBy(loadedRows, "sequence", "asc"); //orderBy is from underscore.js, to display according to sequence
+            sortedRows.forEach((row) => (row.isNew = false)); //Add a boolean to know whether the row is one being newly added
             this.rows = sortedRows;
         },
 
         /**
          * Can be choosen by opening the pop out
          */
-        updateSelectedRow (row) {
+        updateSelectedRow(row) {
             this.selectedRow = row;
-            this.selectedPopOutName = '';
+            this.selectedPopOutName = "";
         },
 
         /**
          * To highlight all rows which also have the same pop out option
          * for an easier visual way to check which rows have the same pop out option
          */
-         updateSelectedPopOutName (popOutName) {
-            if (this.selectedPopOutName === popOutName) { //so can toggle on/off
-                this.selectedPopOutName = '';
+        updateSelectedPopOutName(popOutName) {
+            if (this.selectedPopOutName === popOutName) {
+                //so can toggle on/off
+                this.selectedPopOutName = "";
             } else {
                 this.selectedPopOutName = popOutName;
             }
@@ -86,51 +82,51 @@ export const useAdminListStore = defineStore('main', {
         /**
          * Add a row
          */
-        addRow (row) {
+        addRow(row) {
             this.rows = [...this.rows, row];
         },
 
         /**
          * Provide a prompt to confirm deletion of row
          */
-        deleteRowPrompt (rowToDelete) {
+        deleteRowPrompt(rowToDelete) {
             this.rowToDelete = rowToDelete;
         },
 
         /**
          * Now the row is deleted, remove it from the rows list
          */
-        deleteRowConfirmed (rowToDelete) {
+        deleteRowConfirmed(rowToDelete) {
             this.rows = this.rows.filter((row) => row.id !== rowToDelete.id);
         },
 
         /**
          * To clear the rowToDelete object, otherwise we couldn't reselect the same row to delete
          */
-        deleteRowCancelled () {
+        deleteRowCancelled() {
             this.rowToDelete = null;
         },
 
         /**
          * Display the options within the pop out
          */
-        openPopUp (row) {
+        openPopUp(row) {
             this.selectedRow = row;
             this.isPopOutOpen = true;
-            this.selectedPopOutName = '';
+            this.selectedPopOutName = "";
         },
 
         /**
          * Close the pop out
          */
-        closePopUp () {
+        closePopUp() {
             this.isPopOutOpen = false;
         },
 
         /**
          * Ensure the latest sorted order is saved to the DB
          */
-        updateSequence (sequenceList) {
+        updateSequence(sequenceList) {
             sequenceList.forEach((item, index) => {
                 const matchingRowData = this.rows.find((row) => Number(row.id) === Number(item)); //get the row data matched to the current row DOM element
                 matchingRowData.sequence = ++index;
@@ -146,16 +142,17 @@ export const useAdminListStore = defineStore('main', {
          * of the data, (with the fields and rows being seperate objects)
          * the check is a little more complicated than what we might expect.
          **/
-         isValidated () {
+        isValidated() {
             let valid = true;
-            this.rows.forEach((row, index) => { // check each row
+            this.rows.forEach((row, index) => {
+                // check each row
                 // set the field validation attribute
                 this.rows[index].hasValidationError = [];
                 // check each cell in the row
                 this.loadedData.fields.forEach((header) => {
                     const headerId = `${header.id}`;
                     // if the header for that cell is mandatory, and the cell is empty, set the error state
-                    if (header.mandatory && String(row[headerId]).trim() === '') {
+                    if (header.mandatory && String(row[headerId]).trim() === "") {
                         valid = false;
                         this.rows[index].hasValidationError[headerId] = true;
                     } else {
@@ -164,8 +161,6 @@ export const useAdminListStore = defineStore('main', {
                 });
             });
             return valid;
-        }
-
+        },
     },
-
 });

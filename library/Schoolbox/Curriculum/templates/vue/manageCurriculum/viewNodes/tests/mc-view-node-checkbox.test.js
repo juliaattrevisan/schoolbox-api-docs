@@ -1,8 +1,7 @@
-
-import { mount } from '@vue/test-utils';
-import McViewNodeCheckbox from '../mc-view-node-checkbox';
-import { createTestingPinia } from '@pinia/testing';
-import { useSelectedNodesStore } from '../../selectedNodes/store/mcSelectedNodesStore';
+import { mount } from "@vue/test-utils";
+import McViewNodeCheckbox from "../mc-view-node-checkbox";
+import { createTestingPinia } from "@pinia/testing";
+import { useSelectedNodesStore } from "../../selectedNodes/store/mcSelectedNodesStore";
 
 let wrapper; // so we don't need to pass it into every test
 
@@ -14,40 +13,40 @@ beforeEach(() => {
         props: {
             node: {
                 id: 5,
-                name: 'My Node',
-                children: []
+                name: "My Node",
+                children: [],
             },
             isUpdatingOrAdding: false,
-        }
+        },
     });
 });
 
-test('is disabled when prop isUpdatingOrAdding is true', async () => {
-    await wrapper.setProps( { isUpdatingOrAdding: true } );
-    expect(wrapper.find('input').element).toBeDisabled();
+test("is disabled when prop isUpdatingOrAdding is true", async () => {
+    await wrapper.setProps({ isUpdatingOrAdding: true });
+    expect(wrapper.find("input").element).toBeDisabled();
 });
 
-test('is checked when in selected nodes store', async () => {
+test("is checked when in selected nodes store", async () => {
     await useSelectedNodesStore().$patch({
         nodes: [
             {
                 id: 5,
-                name: 'My Node',
-            }
-        ]
+                name: "My Node",
+            },
+        ],
     });
-    expect(wrapper.find('input').element).toBeChecked();
+    expect(wrapper.find("input").element).toBeChecked();
 });
 
-test('is disabled and also checked when a child of a selected node', async () => {
+test("is disabled and also checked when a child of a selected node", async () => {
     await useSelectedNodesStore().$patch({
         childNodes: [
             {
                 id: 5,
-                name: 'My Node',
-            }
-        ]
+                name: "My Node",
+            },
+        ],
     });
-    expect(wrapper.find('input').element).toBeDisabled();
-    expect(wrapper.find('input').element).toBeChecked();
+    expect(wrapper.find("input").element).toBeDisabled();
+    expect(wrapper.find("input").element).toBeChecked();
 });

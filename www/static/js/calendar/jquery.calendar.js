@@ -1,4 +1,4 @@
-(function() {
+(function () {
     /**
      * Set up attendance processing
      *
@@ -9,7 +9,7 @@
      *
      * @param options
      */
-    $.fn.calendarAttendance = function(options) {
+    $.fn.calendarAttendance = function (options) {
         options = options || {};
 
         var config = init(options, $(this));
@@ -29,28 +29,27 @@
 
                 /* Clicking this element spawns a bubble
                  */
-                attendanceActivator: '[data-attendance-request]',
+                attendanceActivator: "[data-attendance-request]",
 
                 /* The controller to deal with the attendance
                  */
-                url: '/service/attendance/setAttendance',
+                url: "/service/attendance/setAttendance",
 
                 /* Text strings for button label states
                  */
                 text: {
-                    rsvp: 'RSVP',
-                    unattend: 'Unattend'
+                    rsvp: "RSVP",
+                    unattend: "Unattend",
                 },
 
                 /* You can determine post data your own way
                  */
-                getFormData: function(button) {
+                getFormData: function (button) {
                     return defaultGetFormData(button);
-                }
-            }
+                },
+            };
 
-            var derived = {
-            }
+            var derived = {};
 
             var merged = $.extend(defaults, derived, options);
 
@@ -61,7 +60,7 @@
          * Set up attendances
          */
         function setupAttendance() {
-            config.element.on('click', config.attendanceActivator, function(event) {
+            config.element.on("click", config.attendanceActivator, function (event) {
                 event.preventDefault();
 
                 var button = $(this);
@@ -69,17 +68,16 @@
                 var data = config.getFormData(button);
 
                 if (button.text() === config.text.rsvp) {
-                    data['status'] = 'add';
+                    data["status"] = "add";
                 } else {
-                    data['status'] = 'remove';
+                    data["status"] = "remove";
                 }
 
                 $.post(config.url, data, function (data) {
                     if (data.error == undefined) {
                         if (button.text() === config.text.rsvp) {
                             button.html(config.text.unattend);
-                        }
-                        else {
+                        } else {
                             button.html(config.text.rsvp);
                         }
                     }
@@ -96,9 +94,9 @@
         function defaultGetFormData(button) {
             return {
                 event: {
-                    id: button.parent('form').find('input[name="eventId"]').val()
-                }
+                    id: button.parent("form").find('input[name="eventId"]').val(),
+                },
             };
         }
-    }
-}(jQuery));
+    };
+})(jQuery);

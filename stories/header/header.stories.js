@@ -1,15 +1,13 @@
-
-import SbHeader from '../../vue/components/header/header';
+import SbHeader from "../../vue/components/header/header";
 
 export default {
-    title: 'IN PROGRESS/Header',
+    title: "IN PROGRESS/Header",
     component: SbHeader,
 };
 
 const Template = (args, { argTypes }) => ({
     components: { SbHeader },
-    template:
-        `
+    template: `
         <sb-header />
         `,
 });

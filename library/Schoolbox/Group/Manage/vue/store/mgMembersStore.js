@@ -2,14 +2,12 @@
  * Handles the store of the current Manage Group page
  */
 
-import { nextTick } from 'vue';
-import { defineStore } from 'pinia';
-import { useStore } from './manageGroupStore';
-import AccessTypes from '../currentMembers/mgAccessTypes';
+import { nextTick } from "vue";
+import { defineStore } from "pinia";
+import { useStore } from "./manageGroupStore";
+import AccessTypes from "../currentMembers/mgAccessTypes";
 
-
-export const useMembersStore = defineStore('mgMembers', {
-
+export const useMembersStore = defineStore("mgMembers", {
     state: () => ({
         members: [], //all the group members
         selectedMemberIds: [], //to track the current group member selection
@@ -17,13 +15,12 @@ export const useMembersStore = defineStore('mgMembers', {
     }),
 
     getters: {
-
         /**
          * When the table is ready and able to be displayed with group members
          *
          * @returns { Boolean }
          */
-        hasGroupMembers () {
+        hasGroupMembers() {
             const store = useStore();
             return !store.isLoading && !store.hasLoadError && this.members.length > 0;
         },
@@ -33,7 +30,7 @@ export const useMembersStore = defineStore('mgMembers', {
          *
          * @returns { Boolean }
          */
-        hasNoGroupMembers () {
+        hasNoGroupMembers() {
             const store = useStore();
             return !store.isLoading && !store.hasLoadError && this.members.length === 0;
         },
@@ -43,9 +40,11 @@ export const useMembersStore = defineStore('mgMembers', {
          *
          * @returns { Boolean }
          */
-        hasNoGroupAdmins () {
-            return this.members.filter((member) => member.accessType === AccessTypes.ADMIN).length === 0
-                    && this.hasGroupMembers;
+        hasNoGroupAdmins() {
+            return (
+                this.members.filter((member) => member.accessType === AccessTypes.ADMIN).length === 0 &&
+                this.hasGroupMembers
+            );
         },
 
         /**
@@ -56,7 +55,7 @@ export const useMembersStore = defineStore('mgMembers', {
          *
          * @returns { Array }
          */
-        selectedMembers () {
+        selectedMembers() {
             return this.members.filter((member) => this.selectedMemberIds.includes(member.id));
         },
 
@@ -65,8 +64,8 @@ export const useMembersStore = defineStore('mgMembers', {
          *
          * @returns { Number }
          */
-        selectedMembersCount () {
-            return this.selectedMembers.length
+        selectedMembersCount() {
+            return this.selectedMembers.length;
         },
 
         /**
@@ -74,8 +73,8 @@ export const useMembersStore = defineStore('mgMembers', {
          *
          * @returns { String }
          */
-        selectedMembersPlural () {
-            return this.selectedMembersCount > 1 ? 'Members' : 'Member'
+        selectedMembersPlural() {
+            return this.selectedMembersCount > 1 ? "Members" : "Member";
         },
 
         /**
@@ -83,7 +82,7 @@ export const useMembersStore = defineStore('mgMembers', {
          *
          * @returns { Array }
          */
-        currentGroupAdminIds () {
+        currentGroupAdminIds() {
             return this.members.filter((member) => member.accessType === AccessTypes.ADMIN).map((member) => member.id);
         },
 
@@ -92,27 +91,26 @@ export const useMembersStore = defineStore('mgMembers', {
          *
          * @returns { Number }
          */
-        selectedGroupAdminCount () {
+        selectedGroupAdminCount() {
             return this.selectedMemberIds.filter((id) => this.currentGroupAdminIds.includes(id)).length;
         },
-
     },
 
     actions: {
-
         /**
          * load all the group members for tabular display
          *
          * @param { Object }
          */
-        loadMembers (loadedMembers) {
-            const members = loadedMembers.map((member) => { //add in some additional properties
+        loadMembers(loadedMembers) {
+            const members = loadedMembers.map((member) => {
+                //add in some additional properties
                 return {
                     ...member,
-                    displayPriority: member.accessType === 'none' ? 1 : 0, //waiting list members are put at the top of the table
+                    displayPriority: member.accessType === "none" ? 1 : 0, //waiting list members are put at the top of the table
                     isNew: false, //to highlight new members just added
                     justUpdated: false, //to highlight members that have just been changed
-                }
+                };
             });
             this.members = members;
         },
@@ -122,7 +120,7 @@ export const useMembersStore = defineStore('mgMembers', {
          *
          * @param { Array }
          */
-        updateSelectedMembers (selectedMembers) {
+        updateSelectedMembers(selectedMembers) {
             this.selectedMemberIds = selectedMembers.map((member) => member.id);
         },
 
@@ -131,16 +129,16 @@ export const useMembersStore = defineStore('mgMembers', {
          *
          * @param { Object }
          */
-        removeMember (removedMember) {
+        removeMember(removedMember) {
             this.members = this.members.filter((member) => member.id !== removedMember.id);
-            this.selectedMemberIds = this.selectedMemberIds.filter((memberId) => memberId !== removedMember.id);; //ensure the member wasn't also a selected member
+            this.selectedMemberIds = this.selectedMemberIds.filter((memberId) => memberId !== removedMember.id); //ensure the member wasn't also a selected member
         },
 
         /**
          * pull out any removed/rejected members, those rows that are in selectedMembers,
          * which have just been deleted or rejected
          */
-        removeSelectedGroupMembers () {
+        removeSelectedGroupMembers() {
             this.members = this.members.filter((member) => !this.selectedMemberIds.includes(member.id));
             this.clearSelectedMembers(); //can't keep selecting members that have just been removed/rejected
         },
@@ -148,7 +146,7 @@ export const useMembersStore = defineStore('mgMembers', {
         /**
          * clear the current selected member selection
          */
-        clearSelectedMembers () {
+        clearSelectedMembers() {
             this.selectedMemberIds = [];
         },
 
@@ -157,11 +155,13 @@ export const useMembersStore = defineStore('mgMembers', {
          *
          * @param { String }
          */
-        async updateFilterSelection (accessType) {
+        async updateFilterSelection(accessType) {
             await this.refreshMembers();
-            if (this.selectedFilters.includes(accessType)) { //pull the updated filter out of the list
+            if (this.selectedFilters.includes(accessType)) {
+                //pull the updated filter out of the list
                 this.selectedFilters = this.selectedFilters.filter((filterType) => filterType !== accessType);
-            } else { //otherwise add it back in
+            } else {
+                //otherwise add it back in
                 this.selectedFilters = [...this.selectedFilters, accessType];
             }
         },
@@ -177,7 +177,7 @@ export const useMembersStore = defineStore('mgMembers', {
          *
          * @param { Boolean }
          */
-        async refreshMembers (isTableChange=false ) {
+        async refreshMembers(isTableChange = false) {
             await nextTick();
             this.members.forEach((member) => {
                 member.isNew = false;
@@ -187,7 +187,5 @@ export const useMembersStore = defineStore('mgMembers', {
                 }
             });
         },
-
     },
-
 });

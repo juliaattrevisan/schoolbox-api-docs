@@ -16,10 +16,9 @@
  * Note that the Filesystem options, aliased via 'allowedFilesystems' parameter, are found in the
  * Resource\Attachment\Context\Factory so if you need to adjust the available options, do it there
  */
-(function() {
+(function () {
     var modalCache = {};
     var singletonModal = null;
-
 
     /**
      * Attempt to restore the previous modal with the identifier $id
@@ -27,29 +26,27 @@
      *
      * @param id
      */
-    $.fn.schoolboxRestorePreviousModal = function(id)
-    {
+    $.fn.schoolboxRestorePreviousModal = function (id) {
         if (null === id || undefined === id) {
             return;
         }
 
         /* Select it, in case it was provided as just an id string
          */
-        $(id).foundation('reveal', 'open');
+        $(id).foundation("reveal", "open");
 
         /* M3 picker shut this overlay so I have to manually restore it after
          * foundation finishes its animation
          */
-        setTimeout(function() {
-            $('.reveal-modal-bg')
-                .css('opacity', 0)
-                .css('display', 'block')
-                .animate({
-                    opacity: 1
-                }, 250);
+        setTimeout(function () {
+            $(".reveal-modal-bg").css("opacity", 0).css("display", "block").animate(
+                {
+                    opacity: 1,
+                },
+                250
+            );
         }, 275);
-    }
-
+    };
 
     /**
      * Spawns a Schoolbox Resource Browser which allows you
@@ -59,13 +56,12 @@
      *
      * @param options
      */
-    $.fn.schoolboxResource = function(options) {
+    $.fn.schoolboxResource = function (options) {
         options = options || {};
 
         var config = init(options, $(this));
 
         cacheModal();
-
 
         /**
          * Init
@@ -80,7 +76,7 @@
 
                 /* Url to get node information
                  */
-                source: '/resources/attachment',
+                source: "/resources/attachment",
 
                 /* Comma-separated list of extensions to filter
                  */
@@ -118,18 +114,15 @@
 
                 /* Executes before picker modal opens
                  */
-                onBeforeOpen: function() {
-                },
+                onBeforeOpen: function () {},
 
                 /* Executes after picker modal shuts
                  */
-                onAfterClose: function() {
-                }
+                onAfterClose: function () {},
             };
 
             return $.extend(defaults, options);
         }
-
 
         /**
          * Augment url with parameters
@@ -137,47 +130,43 @@
          * @returns {string}
          */
         function getQueryString() {
-            var qString = 'multi=0';
+            var qString = "multi=0";
 
             /* Didn't specify a mimetype for files; display folders and all files via the empty string
              * Or, if you specified an allowedFiles string, use that as a filter
              */
             if (false === config.allowedFiles) {
-
                 /* Only show folders (disallow all files)
                  * Specify an empty mime querystring param
                  */
-                qString += '&mime=';
+                qString += "&mime=";
             } else if (null === config.allowedFiles) {
-
                 /* Show both folders and any/all files
                  * This is the default behaviour (noop)
                  */
-
             } else {
-
                 /* Filter to specific filetypes
                  */
-                qString += '&mime=' + config.allowedFiles;
+                qString += "&mime=" + config.allowedFiles;
             }
 
             /* Pick from the presets as to what controllers are available
              */
             if (config.allowedFilesystems) {
-                qString += '&fs=' + config.allowedFilesystems;
+                qString += "&fs=" + config.allowedFilesystems;
             }
 
             /* If the Use This Folder button is available
              */
             if (config.useFolder) {
-                qString += '&f';
+                qString += "&f";
             }
 
             /* If a default Folder is specified, just go straight to that node to
              * save users the immense hassle of navigating the folder tree
              */
             if (config.defaultFolderSelector) {
-                qString += '&fid=' + config.defaultFolderSelector;
+                qString += "&fid=" + config.defaultFolderSelector;
             }
 
             return qString;
@@ -189,7 +178,7 @@
          * @returns {string}
          */
         function getCacheKey() {
-            return config.source + '?' + getQueryString();
+            return config.source + "?" + getQueryString();
         }
 
         /**
@@ -199,11 +188,11 @@
         function cacheModal() {
             var key = getCacheKey();
 
-            if ('undefined' == typeof modalCache[key]) {
+            if ("undefined" == typeof modalCache[key]) {
                 modalCache[key] = $.get(config.source, getQueryString()).promise();
             }
 
-            modalCache[key].done(function(data) {
+            modalCache[key].done(function (data) {
                 // ensure we retain ResourceAttache context
                 build(data);
             });
@@ -215,9 +204,9 @@
         function resizePicker() {
             var pickerWidth = $(window).width() * 0.67;
 
-            $('.reveal-modal.file-picker.open').css({
-                width: pickerWidth + 'px',
-                left: Math.floor($(window).width()/2 - pickerWidth/2) + 'px'
+            $(".reveal-modal.file-picker.open").css({
+                width: pickerWidth + "px",
+                left: Math.floor($(window).width() / 2 - pickerWidth / 2) + "px",
             });
         }
 
@@ -227,7 +216,7 @@
          * @param data
          */
         function build(data) {
-            var body = $('body');
+            var body = $("body");
 
             /* null !== config.restoreModal was previously known as allowDetachment
              *
@@ -243,22 +232,23 @@
              * selector applies to all modals, not just the picker one. Maybe that's the next change.
              */
             if (singletonModal && (null === config.restoreModal || undefined === config.restoreModal)) {
-
                 /* Forcibly reopen it anyway. You can enter this code path by opening a socialstream reply
                  * M3 picker, then cancel it, then try to open a socialstream post M3 where
                  * restoreModal is empty and singletonModal existed, but was shut (so reopen it)
                  */
                 singletonModal
-                    .html(singletonModal.data('content'))
-                    .foundation('reveal', 'open')
-                    .off('closed.fndtn.reveal.attach');
+                    .html(singletonModal.data("content"))
+                    .foundation("reveal", "open")
+                    .off("closed.fndtn.reveal.attach");
 
                 return;
-            } else if($('#attachment-browser').length) {
-                singletonModal = $('#attachment-browser').parent();
+            } else if ($("#attachment-browser").length) {
+                singletonModal = $("#attachment-browser").parent();
             } else {
-                singletonModal = $('<div data-reveal class="reveal-modal file-picker" id="file-picker" />')
-                    .data('content', data);
+                singletonModal = $('<div data-reveal class="reveal-modal file-picker" id="file-picker" />').data(
+                    "content",
+                    data
+                );
 
                 body.append(singletonModal);
             }
@@ -266,9 +256,9 @@
             config.onBeforeOpen();
 
             singletonModal
-                .html(singletonModal.data('content'))
-                .foundation('reveal', 'open')
-                .off('closed.fndtn.reveal.attach');
+                .html(singletonModal.data("content"))
+                .foundation("reveal", "open")
+                .off("closed.fndtn.reveal.attach");
 
             /* If you're opening the modal in cke_maximised,
              * you have to wrangle styles around so it doesn't
@@ -278,12 +268,12 @@
              * so dynamically assign a pixel width upon initiation and
              * also aupon resization
              */
-            if ($('.cke_maximized').length) {
-                $(window).resize(function() {
+            if ($(".cke_maximized").length) {
+                $(window).resize(function () {
                     resizePicker();
                 });
 
-                $(document).on('opened.fndtn.reveal', '.file-picker', function() {
+                $(document).on("opened.fndtn.reveal", ".file-picker", function () {
                     resizePicker();
                 });
             }
@@ -292,40 +282,39 @@
              * Schoolbox Resource Browser appears on top of the
              * ckeditor dialog (enormous sigh)
              */
-            $('.cke_dialog_background_cover').addClass('hide');
+            $(".cke_dialog_background_cover").addClass("hide");
 
             /* ckeditor dialog appears at z-index 10010 so our
              * Resource Browser needs to be more
              */
-            $('[data-reveal]').css({zIndex: 20000});
+            $("[data-reveal]").css({ zIndex: 20000 });
 
             // reinit
             $(document)
                 //.foundation('reveal', 'reflow')
-                .on('closed.fndtn.reveal', '[data-reveal]', function () {
+                .on("closed.fndtn.reveal", "[data-reveal]", function () {
                     //if singletonModal is set, and there is no restoreModal OR if the event is triggered from the singletonModal
                     //detatch the singletonModal, and set it to null
                     if (
-                        singletonModal &&
-                        (null === config.restoreModal || undefined === config.restoreModal) ||
-                        ( singletonModal && singletonModal[0].id === this.id)
+                        (singletonModal && (null === config.restoreModal || undefined === config.restoreModal)) ||
+                        (singletonModal && singletonModal[0].id === this.id)
                     ) {
                         singletonModal.detach();
                         singletonModal = null;
                     }
 
                     if (undefined !== config.previousModal) {
-                        config.previousModal.removeClass('hide');
+                        config.previousModal.removeClass("hide");
                     }
 
                     // Show the cke dialog overlay again
-                    $('.cke_dialog_background_cover').removeClass('hide');
+                    $(".cke_dialog_background_cover").removeClass("hide");
                 });
 
-            singletonModal.on('click', '.cancel[role=button]', function (e) {
+            singletonModal.on("click", ".cancel[role=button]", function (e) {
                 e.preventDefault();
                 window.top.postMessage(JSON.stringify({ data: [] }), location.origin);
-                singletonModal.foundation('reveal', 'close');
+                singletonModal.foundation("reveal", "close");
 
                 config.onAfterClose();
 
@@ -334,15 +323,13 @@
         }
     };
 
-
     /**
      * Pass whatever you chose in the modal to the window messaging thing
      *
      * @param config  object  a configuration object literal
      * @param dialog  object  the cke dialog to update (use null if you aren't in a cke context)
      */
-    $.fn.schoolboxMessage = function(config, dialog) {
-
+    $.fn.schoolboxMessage = function (config, dialog) {
         /**
          * Construct a url from the pieces provided
          *
@@ -362,43 +349,35 @@
              * Urls can be generated contextually based on some combination of these args
              * Here, I've consolidated known outcomes as best I could
              */
-            if (type === 'folder') {
-
+            if (type === "folder") {
                 /* When you select Use This Folder which is available in special circumstances
                  */
                 url = config.url.folder + val;
-            } else if (filesystem === 'store') {
-
+            } else if (filesystem === "store") {
                 /* When you Upload A File via the modal's dropzone
                  */
                 url = config.url.storage + hash;
-            } else if (filesystem === 'browse') {
-
+            } else if (filesystem === "browse") {
                 /* When you select a file via Resource Browser
                  */
                 url = config.url.storage + hash;
-            } else if (filesystem === 'office365') {
-
+            } else if (filesystem === "office365") {
                 /* When you select a file via Office365
                  */
                 url = config.url.storage + hash;
-            } else if (filesystem === 'myfile') {
-
+            } else if (filesystem === "myfile") {
                 /* When you select a My File
                  */
                 url = config.url.storage + hash;
-            } else if (filesystem === 'webdav') {
-
+            } else if (filesystem === "webdav") {
                 /* When you select a WebDAV file
                  */
                 url = config.url.webdav + val;
-            } else if (type === 'meetingUrl') {
-
+            } else if (type === "meetingUrl") {
                 /* When you select a Microsoft Teams meeting url
                  */
                 url = config.url.meetingUrl + val;
             } else {
-
                 /* Default assumption (not sure where this manifests anymore, sorry)
                  */
                 url = config.url.file + val;
@@ -407,71 +386,82 @@
             return url;
         }
 
-        $(window).unbind('message').on('message', function(event) {
-            var message;
+        $(window)
+            .unbind("message")
+            .on("message", function (event) {
+                var message;
 
-            try {
-                message = JSON.parse(event.originalEvent.data);
-            } catch (err) {
-                message = event.originalEvent.data;
-            }
-
-            /* Find out how to render this file
-             */
-            if (message.data != undefined) {
-                if (0 in message.data && 'hash' in message.data[0]) {
-                    var status = 'success';
-                    if ('status' in message.data[0]) {
-                        status = message.data[0].status;
-                    }
-                    if (status === 'success') {
-                        $.getJSON(config.url.nodeinfo, {identifier: message.data[0].hash}, function (responseText) {
-                            config.onSelect(
-                                processSelection(responseText.type, responseText.filesystem, responseText.hash, responseText.id),
-                                responseText.name,
-                                responseText.mime,
-                                dialog,
-                                responseText
-                            );
-
-                            /* Shut modal, go back to Dialog
-                             */
-                            $('#file-picker').foundation('reveal', 'close');
-
-                            config.onAfterClose();
-
-                            $.fn.schoolboxRestorePreviousModal(config.restoreModal);
-                        });
-                    } else {
-                        // Unknown status: assume error and do nothing, as the modal already shows the error
-                    }
-                } else if ('meetingUrl' in message.data) {
-
-                    /* Microsoft Teams meetings url format
-                     */
-                    config.onSelect(processSelection('meetingUrl', '', '', message.data.meetingUrl), 'Microsoft Teams Meeting', null, dialog);
-
-                    /* Shut modal, go back to Dialog
-                     */
-                    $('#file-picker').foundation('reveal', 'close');
-
-                    config.onAfterClose();
-
-                    $.fn.schoolboxRestorePreviousModal(config.restoreModal);
-                } else {
-
-                    // The file was rejected, probably cause it was the wrong mimetype.
-                    // Do nothing
+                try {
+                    message = JSON.parse(event.originalEvent.data);
+                } catch (err) {
+                    message = event.originalEvent.data;
                 }
-            }
-            else {
 
-                /* Connecting to your Google Drive
+                /* Find out how to render this file
                  */
-            }
-        });
-    };
+                if (message.data != undefined) {
+                    if (0 in message.data && "hash" in message.data[0]) {
+                        var status = "success";
+                        if ("status" in message.data[0]) {
+                            status = message.data[0].status;
+                        }
+                        if (status === "success") {
+                            $.getJSON(
+                                config.url.nodeinfo,
+                                { identifier: message.data[0].hash },
+                                function (responseText) {
+                                    config.onSelect(
+                                        processSelection(
+                                            responseText.type,
+                                            responseText.filesystem,
+                                            responseText.hash,
+                                            responseText.id
+                                        ),
+                                        responseText.name,
+                                        responseText.mime,
+                                        dialog,
+                                        responseText
+                                    );
 
+                                    /* Shut modal, go back to Dialog
+                                     */
+                                    $("#file-picker").foundation("reveal", "close");
+
+                                    config.onAfterClose();
+
+                                    $.fn.schoolboxRestorePreviousModal(config.restoreModal);
+                                }
+                            );
+                        } else {
+                            // Unknown status: assume error and do nothing, as the modal already shows the error
+                        }
+                    } else if ("meetingUrl" in message.data) {
+                        /* Microsoft Teams meetings url format
+                         */
+                        config.onSelect(
+                            processSelection("meetingUrl", "", "", message.data.meetingUrl),
+                            "Microsoft Teams Meeting",
+                            null,
+                            dialog
+                        );
+
+                        /* Shut modal, go back to Dialog
+                         */
+                        $("#file-picker").foundation("reveal", "close");
+
+                        config.onAfterClose();
+
+                        $.fn.schoolboxRestorePreviousModal(config.restoreModal);
+                    } else {
+                        // The file was rejected, probably cause it was the wrong mimetype.
+                        // Do nothing
+                    }
+                } else {
+                    /* Connecting to your Google Drive
+                     */
+                }
+            });
+    };
 
     /**
      * Spawn a modal config object literal with auxiliary options such
@@ -480,70 +470,71 @@
      * @param options
      * @returns {*}
      */
-    $.fn.schoolboxModalConfig = function(options) {
-        return $.extend({
-            url: {
-                /* Find information about a node/resource
-                 */
-                nodeinfo: '/editor/nodeInfo.php',
+    $.fn.schoolboxModalConfig = function (options) {
+        return $.extend(
+            {
+                url: {
+                    /* Find information about a node/resource
+                     */
+                    nodeinfo: "/editor/nodeInfo.php",
 
-                /* Prefix for linking to Folders
-                 */
-                folder: '/homepage/',
+                    /* Prefix for linking to Folders
+                     */
+                    folder: "/homepage/",
 
-                /* Prefix for linking to MyFolders
-                 */
-                myfolder: '/my-files/',
+                    /* Prefix for linking to MyFolders
+                     */
+                    myfolder: "/my-files/",
 
-                /* Prefix for linking to MyFiles
-                 */
-                myfile: '/storage/fetch.php?hash=',
+                    /* Prefix for linking to MyFiles
+                     */
+                    myfile: "/storage/fetch.php?hash=",
 
-                /* Prefix for link to Storage hash
-                 */
-                storage: '/storage/fetch.php?hash=',
+                    /* Prefix for link to Storage hash
+                     */
+                    storage: "/storage/fetch.php?hash=",
 
-                /* Prefix for link to WebDAV
-                 */
-                webdav: '/cms/sendNetworkFile.php?id=',
+                    /* Prefix for link to WebDAV
+                     */
+                    webdav: "/cms/sendNetworkFile.php?id=",
 
-                /* Prefix for linking to Files
-                 */
-                file: '/send.php?id=',
+                    /* Prefix for linking to Files
+                     */
+                    file: "/send.php?id=",
 
-                /* Prefix for Microsoft Teams meeting urls (normally empty, don't need to touch it)
-                 */
-                meetingUrl: '',
+                    /* Prefix for Microsoft Teams meeting urls (normally empty, don't need to touch it)
+                     */
+                    meetingUrl: "",
 
-                /* restoreModal specifies whether there's a modal that should be restored once the M3 shuts
-                 * This is in the form of an id string for the modal but you can use a jquery selector too
+                    /* restoreModal specifies whether there's a modal that should be restored once the M3 shuts
+                     * This is in the form of an id string for the modal but you can use a jquery selector too
+                     *
+                     */
+                    restoreModal: null,
+                },
+
+                /**
+                 * A callback which you use to deal with the url produced
+                 * by interacting with the modal
                  *
+                 * @param url      string the url to which you linked
+                 * @param name     string user-facing name of the thing you linked
+                 * @param mime     string the mime type of the thing you linked
+                 * @param dialog   object the cke dialog to update (supply null if you aren't using cke dialogs)
+                 * @param response object the actual JSON response for the thing you linked
                  */
-                restoreModal: null
-            },
+                onSelect: function (url, name, mime, dialog, response) {
+                    return url;
+                },
 
-            /**
-             * A callback which you use to deal with the url produced
-             * by interacting with the modal
-             *
-             * @param url      string the url to which you linked
-             * @param name     string user-facing name of the thing you linked
-             * @param mime     string the mime type of the thing you linked
-             * @param dialog   object the cke dialog to update (supply null if you aren't using cke dialogs)
-             * @param response object the actual JSON response for the thing you linked
-             */
-            onSelect: function(url, name, mime, dialog, response) {
-                return url;
+                /**
+                 * Executes after the M3 picker shuts its own modal
+                 */
+                onAfterClose: function () {},
             },
-
-            /**
-             * Executes after the M3 picker shuts its own modal
-             */
-            onAfterClose: function() {
-            }
-        }, options);
+            options
+        );
     };
-
 
     /**
      * Plugin
@@ -556,18 +547,17 @@
      *
      * @param options  object
      */
-    $.fn.schoolboxLink = function(options) {
+    $.fn.schoolboxLink = function (options) {
         options = options || {};
 
         var config = $.extend(
-
             /* Default filesystem is 'link' for this usage
              */
             {
                 element: $(this),
                 allowedFiles: null,
-                allowedFilesystems: 'link',
-                defaultFolderSelector: null
+                allowedFilesystems: "link",
+                defaultFolderSelector: null,
             },
 
             /* Combine with modal configuration requirements
@@ -587,8 +577,7 @@
         /* When $(element) is clicked, spawn modal and process selection
          * as per the callback you optionally specified via constructor
          */
-        $(config.element).on('click', function() {
-
+        $(config.element).on("click", function () {
             /* Select something from the Resource Browser
              */
             $.fn.schoolboxResource({
@@ -605,5 +594,5 @@
              */
             $.fn.schoolboxMessage(config, null);
         });
-    }
-}(jQuery));
+    };
+})(jQuery);

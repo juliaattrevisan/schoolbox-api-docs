@@ -1,8 +1,8 @@
-import { createApp } from 'vue';
-import RecordMediaModal from './record-media-modal';
+import { createApp } from "vue";
+import RecordMediaModal from "./record-media-modal";
 
 createApp({
     components: {
-        RecordMediaModal
-    }
-}).mount('#record-media-modal');
+        RecordMediaModal,
+    },
+}).mount("#record-media-modal");

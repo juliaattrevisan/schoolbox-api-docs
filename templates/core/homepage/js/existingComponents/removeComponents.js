@@ -3,21 +3,20 @@
  *
  */
 
-import { gsap } from 'gsap/all';
-import { slideDown, slideUp } from '@js/util/animateUtils';
-import { EXISTING_COMPONENT_SELECTOR, UPDATE_URL, getComponentID } from '../updateHomepage';
-import UpdateHomepageEvents from '../updateHomepageEvents';
-
+import { gsap } from "gsap/all";
+import { slideDown, slideUp } from "@js/util/animateUtils";
+import { EXISTING_COMPONENT_SELECTOR, UPDATE_URL, getComponentID } from "../updateHomepage";
+import UpdateHomepageEvents from "../updateHomepageEvents";
 
 const ANIMATE_SPEED = 0.3;
 const BUTTON_SELECTOR = '[data-target="delete"]';
-const STATE_ATTRIBUTE = 'data-state'; //can be 'opened' or 'closed'
+const STATE_ATTRIBUTE = "data-state"; //can be 'opened' or 'closed'
 const PANEL_SELECTOR = '[data-component-panel="delete"]';
 
 /**
  * Toggle the remove palette and manage the confirm/deny actions
  */
-export function initRemoveComponents () {
+export function initRemoveComponents() {
     document.querySelectorAll(EXISTING_COMPONENT_SELECTOR).forEach((component) => init(component)); //existing components
     document.addEventListener(UpdateHomepageEvents.COMPONENT_ADDED, (event) => init(event.detail.component)); //newly added components
     document.addEventListener(UpdateHomepageEvents.COMPONENT_UPDATED, (event) => init(event.detail.component)); //newly added components
@@ -28,7 +27,7 @@ export function initRemoveComponents () {
  *
  * @param { Element }
  */
-function init (component) {
+function init(component) {
     initToggleButon(component);
     initCancelButton(component);
     initConfirmButton(component);
@@ -40,12 +39,16 @@ function init (component) {
  * @param { Element }
  * @param { Element }
  */
-function initToggleButon (component) {
+function initToggleButon(component) {
     const toggleButtons = component.querySelectorAll(BUTTON_SELECTOR);
     toggleButtons.forEach((toggleButton) => {
-        toggleButton.addEventListener('click', (event) => {
+        toggleButton.addEventListener("click", (event) => {
             event.preventDefault();
-            gsap.to(toggleButton, { rotation: isOpen(component) ? 0 : 180, transformOrigin: '20px 20px', duration: ANIMATE_SPEED } );
+            gsap.to(toggleButton, {
+                rotation: isOpen(component) ? 0 : 180,
+                transformOrigin: "20px 20px",
+                duration: ANIMATE_SPEED,
+            });
             isOpen(component) ? close(component) : open(component);
         });
     });
@@ -58,9 +61,9 @@ function initToggleButon (component) {
  *
  * @returns { Boolean }
  */
-export function isOpen (component) {
+export function isOpen(component) {
     const toggleButton = component.querySelector(BUTTON_SELECTOR);
-    return toggleButton.getAttribute(STATE_ATTRIBUTE) === 'opened';
+    return toggleButton.getAttribute(STATE_ATTRIBUTE) === "opened";
 }
 
 /**
@@ -68,9 +71,9 @@ export function isOpen (component) {
  *
  * @param { Element }
  */
-function open (component) {
+function open(component) {
     const toggleButton = component.querySelector(BUTTON_SELECTOR);
-    toggleButton.setAttribute(STATE_ATTRIBUTE, 'opened');
+    toggleButton.setAttribute(STATE_ATTRIBUTE, "opened");
     const panel = component.querySelector(PANEL_SELECTOR);
     slideDown(panel, ANIMATE_SPEED);
 }
@@ -80,9 +83,9 @@ function open (component) {
  *
  * @param { Element }
  */
-async function close (component) {
+async function close(component) {
     const toggleButton = component.querySelector(BUTTON_SELECTOR);
-    toggleButton.setAttribute(STATE_ATTRIBUTE, 'closed');
+    toggleButton.setAttribute(STATE_ATTRIBUTE, "closed");
     const panel = component.querySelector(PANEL_SELECTOR);
     await slideUp(panel, ANIMATE_SPEED);
 }
@@ -92,9 +95,9 @@ async function close (component) {
  *
  * @param { Element }
  */
-function initCancelButton (component) {
+function initCancelButton(component) {
     const cancelDeleteButton = component.querySelector('[data-remove="0"]');
-    cancelDeleteButton.addEventListener('click', (event) => {
+    cancelDeleteButton.addEventListener("click", (event) => {
         event.preventDefault();
         if (isOpen(component)) {
             close(component);
@@ -107,9 +110,9 @@ function initCancelButton (component) {
  *
  * @param { Element }
  */
-function initConfirmButton (component) {
+function initConfirmButton(component) {
     const confirmDeleteButton = component.querySelector('[data-remove="1"]');
-    confirmDeleteButton.addEventListener('click', (event) => {
+    confirmDeleteButton.addEventListener("click", (event) => {
         event.preventDefault();
         removeComponent(component, confirmDeleteButton);
     });
@@ -121,13 +124,13 @@ function initConfirmButton (component) {
  * @param { Element }
  * @param { Element }
  */
-async function removeComponent (component, confirmDeleteButton) {
+async function removeComponent(component, confirmDeleteButton) {
     try {
         document.dispatchEvent(new Event(UpdateHomepageEvents.PROCESSING_START));
-        confirmDeleteButton.classList.add('disabled');
-        confirmDeleteButton.innerText = 'Removing...';
+        confirmDeleteButton.classList.add("disabled");
+        confirmDeleteButton.innerText = "Removing...";
         await fetch(UPDATE_URL, {
-            method: 'POST',
+            method: "POST",
             body: getFormData(component),
         });
         await slideUp(component);
@@ -137,11 +140,13 @@ async function removeComponent (component, confirmDeleteButton) {
         slideUp(component);
     } finally {
         component.remove();
-        document.dispatchEvent(new CustomEvent(UpdateHomepageEvents.COMPONENT_REMOVED, {
-            detail: {
-                component: component
-            }
-        }));
+        document.dispatchEvent(
+            new CustomEvent(UpdateHomepageEvents.COMPONENT_REMOVED, {
+                detail: {
+                    component: component,
+                },
+            })
+        );
         document.dispatchEvent(new Event(UpdateHomepageEvents.PROCESSING_END));
     }
 }
@@ -153,11 +158,11 @@ async function removeComponent (component, confirmDeleteButton) {
  *
  * @returns { FormData }
  */
-function getFormData (component) {
+function getFormData(component) {
     const formData = new FormData();
-    formData.append('cid', document.getElementById('categoryID').value);
-    formData.append('delete', getComponentID(component));
-    formData.append('component', component.querySelector('[data-defn-id]').value);
+    formData.append("cid", document.getElementById("categoryID").value);
+    formData.append("delete", getComponentID(component));
+    formData.append("component", component.querySelector("[data-defn-id]").value);
     return formData;
 }
 
@@ -167,18 +172,16 @@ function getFormData (component) {
  *
  * @param { Element }
  */
-export function updateRemovedComponent (component) {
+export function updateRemovedComponent(component) {
+    component.querySelector("[data-component-handle]").remove(); //remove the drag trigger
+    component.querySelector("[data-component-titlebar-container] > nav").remove(); //as well as the edit controls to prevent any further interactions on this component
 
-    component.querySelector('[data-component-handle]').remove(); //remove the drag trigger
-    component.querySelector('[data-component-titlebar-container] > nav').remove(); //as well as the edit controls to prevent any further interactions on this component
-
-    const errorElement = document.createElement('div');
-    errorElement.classList.add('alert', 'alert-box');
+    const errorElement = document.createElement("div");
+    errorElement.classList.add("alert", "alert-box");
     errorElement.innerHTML = `<b>Warning:</b> This component has been removed from the page. Most likely by another user elsewhere. Please <a href="">refresh your page</a> to ensure you're up to date.`;
 
-    const insideComponentElement = component.querySelector('[data-collapsable] > div > section');
+    const insideComponentElement = component.querySelector("[data-collapsable] > div > section");
     insideComponentElement.replaceChildren(errorElement);
 
-    gsap.from(errorElement, { opacity: 0, duration: ANIMATE_SPEED } );
-
+    gsap.from(errorElement, { opacity: 0, duration: ANIMATE_SPEED });
 }

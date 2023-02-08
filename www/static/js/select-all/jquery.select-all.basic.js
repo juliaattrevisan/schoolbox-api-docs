@@ -1,5 +1,4 @@
-(function() {
-
+(function () {
     /**
      * A lightweight select-all plugin that changes the checkboxes (defined by
      * "selector" string), whenever the select-all checkbox (defined by the element
@@ -10,7 +9,7 @@
      *
      * @param options
      */
-    $.fn.selectAllBasic = function(options) {
+    $.fn.selectAllBasic = function (options) {
         options = options || {};
 
         let config = init(options, $(this));
@@ -26,7 +25,6 @@
          */
         function init(options, element) {
             let defaults = {
-
                 /* The select-all checkbox
                  */
                 element: element,
@@ -35,15 +33,14 @@
                  * by the select-all checkbox; it's the selector string so we can
                  * append ':checked' and avoid using filter()
                  */
-                selector: '[data-select-all-group]',
+                selector: "[data-select-all-group]",
 
                 /* Special css styles to apply in particular scenarios
                  */
                 css: {
-
                     /* Occurs when some, but not all, checkboxes in a group are ticked
                      */
-                    'indeterminate': 'indeterminate'
+                    indeterminate: "indeterminate",
                 },
 
                 /* Callbacks
@@ -55,35 +52,29 @@
 
                 /* This callback occurs when the select-all checkbox is ticked
                  */
-                onAfterSelectAllTick: function(allCheckboxes) {
-                },
+                onAfterSelectAllTick: function (allCheckboxes) {},
 
                 /* This callback occurs when the select-all checkbox is unticked
                  */
-                onAfterSelectAllUntick: function(allCheckboxes) {
-                },
+                onAfterSelectAllUntick: function (allCheckboxes) {},
 
                 /* This callback occurs after the select-all checkbox is changed
                  * and occurs regardless of whatever state the select-all checkbox
                  * has become
                  */
-                onAfterSelectAllChange: function(allCheckboxes) {
-                },
+                onAfterSelectAllChange: function (allCheckboxes) {},
 
                 /* This callback occurs after a checkbox is ticked
                  */
-                onAfterCheckboxTick: function(checkboxTicked) {
-                },
+                onAfterCheckboxTick: function (checkboxTicked) {},
 
                 /* This callback occurs after a checkbox is unticked
                  */
-                onAfterCheckboxUntick: function(checkboxUnticked) {
-                },
+                onAfterCheckboxUntick: function (checkboxUnticked) {},
 
                 /* This callback occurs after a checkbox state is changed
                  */
-                onAfterCheckboxChange: function(checkbox) {
-                },
+                onAfterCheckboxChange: function (checkbox) {},
             };
 
             return $.extend(defaults, options);
@@ -99,15 +90,15 @@
             const selectAll = config.element;
             const selector = config.selector;
             const allCheckboxes = $(selector);
-            const selectedCheckboxes = selector + ':checked';
+            const selectedCheckboxes = selector + ":checked";
 
-            selectAll.on('click', function(event) {
-                if ($(this).is(':checked')) {
-                    allCheckboxes.prop('checked', true);
+            selectAll.on("click", function (event) {
+                if ($(this).is(":checked")) {
+                    allCheckboxes.prop("checked", true);
 
                     config.onAfterSelectAllTick(allCheckboxes);
                 } else {
-                    allCheckboxes.prop('checked', false);
+                    allCheckboxes.prop("checked", false);
 
                     config.onAfterSelectAllUntick(allCheckboxes);
                 }
@@ -121,14 +112,13 @@
 
             /* Checkboxes in the group affect the select-all parent
              */
-            allCheckboxes.on('change', function(event) {
-                if ($(this).prop('checked') === false) {
-                    selectAll.prop('checked', false);
+            allCheckboxes.on("change", function (event) {
+                if ($(this).prop("checked") === false) {
+                    selectAll.prop("checked", false);
 
                     config.onAfterCheckboxTick($(this));
-
                 } else if ($(selectedCheckboxes).length === allCheckboxes.length) {
-                    selectAll.prop('checked', true);
+                    selectAll.prop("checked", true);
 
                     config.onAfterCheckboxUntick($(this));
                 }
@@ -147,5 +137,5 @@
                 }
             });
         }
-    }
-}(jQuery));
+    };
+})(jQuery);

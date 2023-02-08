@@ -1,14 +1,13 @@
 /**
  * Artificial Print Button
  */
-(function() {
-
+(function () {
     /**
      * Artificial Print Button
      *
      * @param options
      */
-    $.fn.artificialPrint = function(options) {
+    $.fn.artificialPrint = function (options) {
         options = options || {};
 
         var config = init(options, $(this));
@@ -24,11 +23,10 @@
          */
         function init(options, element) {
             var defaults = {
-                element: element
-            }
+                element: element,
+            };
 
-            var derived = {
-            }
+            var derived = {};
 
             var merged = $.extend(defaults, derived, options);
 
@@ -39,11 +37,11 @@
          * Apply javascript to trigger Print artificially
          */
         function apply() {
-            $(config.element).click(function(event) {
+            $(config.element).click(function (event) {
                 event.preventDefault();
                 window.print();
                 return false;
             });
         }
-    }
+    };
 })(jQuery);

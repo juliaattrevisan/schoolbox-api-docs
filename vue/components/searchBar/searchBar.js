@@ -1,8 +1,8 @@
-import { createApp } from 'vue';
-import SearchBar from './search-bar';
+import { createApp } from "vue";
+import SearchBar from "./search-bar";
 
 createApp({
     components: {
-        SearchBar
-    }
-}).mount('#hybrid-bar');
+        SearchBar,
+    },
+}).mount("#hybrid-bar");

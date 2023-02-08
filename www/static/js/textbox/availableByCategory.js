@@ -15,92 +15,89 @@ $j(function() {
  * @link        https://schoolbox.com.au/
  */
 
-(function($j) {
+(function ($j) {
+    /**
+     * Constructor
+     *
+     * @param options
+     */
+    $j.fn.availableByCategory = function (options) {
+        /* Store the config in this instance so private methods
+         * can access it
+         */
+        var config = init(options, this);
 
-	/**
-	 * Constructor
-	 *
-	 * @param options
-	 */
-	$j.fn.availableByCategory = function(options) {
+        /* Spawn that select
+         */
+        load();
 
-		/* Store the config in this instance so private methods
-		 * can access it
-		 */
-		var config = init(options, this);
+        /**
+         * Init
+         *
+         * @param options
+         * @param element
+         * @returns {*|void|Function|extend|extend|extend}
+         */
+        function init(options, element) {
+            var defaults = {
+                element: element,
 
-		/* Spawn that select
-		 */
-		load();
+                /* The current category id
+                 */
+                categoryId: 0,
 
-		/**
-		 * Init
-		 *
-		 * @param options
-		 * @param element
-		 * @returns {*|void|Function|extend|extend|extend}
-		 */
-		function init(options, element) {
-			var defaults = {
-				element: element,
+                /* Ajax url for getting a list of textboxes
+                 * available for a particular category
+                 */
+                url: "/component/ajax/availableByCategory.php",
 
-				/* The current category id
-				 */
-				categoryId: 0,
+                /* A jquery-selected element where the <select>
+                 * element eventually gets put
+                 */
+                target: null,
+            };
 
-				/* Ajax url for getting a list of textboxes
-				 * available for a particular category
-				 */
-				url: '/component/ajax/availableByCategory.php',
+            var derived = {};
 
-				/* A jquery-selected element where the <select>
-				 * element eventually gets put
-				 */
-				target: null
-			}
+            var merged = $j.extend(defaults, derived, options);
 
-			var derived = {
-			}
+            merged.payload = $j.extend(merged.payload, { categoryId: parseInt(merged.categoryId) });
 
-			var merged = $j.extend(defaults, derived, options);
+            return merged;
+        }
 
-			merged.payload = $j.extend(
-				merged.payload,
-				{ categoryId: parseInt(merged.categoryId) }
-			);
+        /**
+         * Loads a new select element into config.target
+         */
+        function load() {
+            $j.get(
+                config.url,
+                config.payload,
+                function (allTextboxes) {
+                    /* If there are textboxes for this homepage, glue
+                     * them all together
+                     */
+                    var allOptions = [];
+                    if (allTextboxes.length) {
+                        /* Accumulate a list of <options>
+                         */
+                        for (var i = 0; i < allTextboxes.length; i++) {
+                            allOptions.push($("<option/>").val(allTextboxes[i].value).text(allTextboxes[i].name));
+                        }
+                    } else {
+                        allOptions.push($("<option/>").val(0).text("(none)"));
+                    }
 
-			return merged;
-		}
-
-		/**
-		 * Loads a new select element into config.target
-		 */
-		function load() {
-			$j.get(config.url, config.payload, function(allTextboxes) {
-				/* If there are textboxes for this homepage, glue
-				 * them all together
-				 */
-				var allOptions = [];
-				if (allTextboxes.length) {
-
-					/* Accumulate a list of <options>
-					 */
-					for (var i = 0; i < allTextboxes.length; i++) {
-						allOptions.push($('<option/>').val(allTextboxes[i].value).text(allTextboxes[i].name));
-					}
-				}
-				else {
-					allOptions.push($('<option/>').val(0).text('(none)'));
-				}
-
-				/* If the target exists, replace it - since Resource Browser
-				 * is shared by everything, if the textbox target doesn't exist,
-				 * just do nowt
-				 */
-				if (config.target.length) {
-					config.target.empty().append(allOptions);
-				}
-			}, 'json');
-		}
-	}
-}(jQuery));
+                    /* If the target exists, replace it - since Resource Browser
+                     * is shared by everything, if the textbox target doesn't exist,
+                     * just do nowt
+                     */
+                    if (config.target.length) {
+                        config.target.empty().append(allOptions);
+                    }
+                },
+                "json"
+            );
+        }
+    };
+})(jQuery);

@@ -4,8 +4,8 @@
  */
 
 export default Object.freeze({
-    WAITING: 'none',
-    READ: 'read',
-    WRITE: 'write',
-    ADMIN: 'admin',
+    WAITING: "none",
+    READ: "read",
+    WRITE: "write",
+    ADMIN: "admin",
 });

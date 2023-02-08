@@ -1,5 +1,4 @@
-(function() {
-
+(function () {
     /**
      * Manufactures a IB Yearly Breakdown barchart
      *
@@ -7,7 +6,7 @@
      * @copyright   Copyright 2019, Schoolbox Pty Ltd
      * @link        https://schoolbox.com.au/
      */
-    $.fn.ib_yearlyBreakdown = function(options) {
+    $.fn.ib_yearlyBreakdown = function (options) {
         options = options || {};
 
         var config = init(options, this);
@@ -27,17 +26,16 @@
 
                 /* Graph title
                  */
-                title: '',
+                title: "",
 
                 /* Term 2, Term 4
                  */
                 categories: [],
 
-                series: []
-            }
+                series: [],
+            };
 
-            var derived = {
-            }
+            var derived = {};
 
             var merged = $.extend(defaults, derived, options);
 
@@ -50,30 +48,30 @@
         function graph() {
             $(config.element).highcharts({
                 chart: {
-                    type: 'bar'
+                    type: "bar",
                 },
                 title: {
-                    text: config.title
+                    text: config.title,
                 },
                 xAxis: {
-                    categories: config.categories
+                    categories: config.categories,
                 },
                 yAxis: {
                     min: 0,
                     max: 7,
                     allowDecimals: false,
                     title: {
-                        text: ''
-                    }
+                        text: "",
+                    },
                 },
                 legend: {
-                    enabled: false
+                    enabled: false,
                 },
                 series: config.series,
                 credits: {
-                    enabled: false
-                }
+                    enabled: false,
+                },
             });
         }
-    }
-}(jQuery));
+    };
+})(jQuery);

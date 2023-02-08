@@ -1,8 +1,8 @@
-import { createApp } from 'vue';
-import ClassList from './class-list';
+import { createApp } from "vue";
+import ClassList from "./class-list";
 
 createApp({
     components: {
-        ClassList
-    }
-}).mount('#email-class-lists');
+        ClassList,
+    },
+}).mount("#email-class-lists");

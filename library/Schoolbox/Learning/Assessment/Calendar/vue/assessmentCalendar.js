@@ -1,8 +1,8 @@
-import { createApp } from 'vue';
-import AssessmentCalendar from './assessment-calendar';
+import { createApp } from "vue";
+import AssessmentCalendar from "./assessment-calendar";
 
 createApp({
     components: {
-        AssessmentCalendar
-    }
-}).mount('#calendar');
+        AssessmentCalendar,
+    },
+}).mount("#calendar");

@@ -1,25 +1,23 @@
 /**
  * TODO - Return and add menu items with icons.
  */
-import MenuItem from '../../vue/components/menu/pop-out-menu-item.vue';
+import MenuItem from "../../vue/components/menu/pop-out-menu-item.vue";
 
 export default {
-    title: 'Menu/MenuItem',
+    title: "Menu/MenuItem",
     component: MenuItem,
 };
 
 const DefaultTemplate = (args, { argTypes }) => ({
     components: { MenuItem },
-    template:
-        `
+    template: `
         <MenuItem>I am a menu item</MenuItem>
         `,
 });
 
 const DisabledTemplate = (args, { argTypes }) => ({
     components: { MenuItem },
-    template:
-        `
+    template: `
         <MenuItem class="is-disabled">I am a disabled menu item</MenuItem>
         `,
 });
@@ -29,8 +27,7 @@ const IconTemplate = (args, { argTypes }) => ({
     setup() {
         return { args };
     },
-    template:
-        `
+    template: `
         <MenuItem v-bind="args">I am a menu item with an icon</MenuItem>
         `,
 });
@@ -40,8 +37,7 @@ const MarkerTemplate = (args, { argTypes }) => ({
     setup() {
         return { args };
     },
-    template:
-        `
+    template: `
         <MenuItem v-bind="args">I am a menu item with a marker</MenuItem>
         `,
 });
@@ -61,7 +57,7 @@ Icon.parameters = {
     controls: { hideNoControlsWarning: true },
 };
 Icon.args = {
-    iconText: 'teacher'
+    iconText: "teacher",
 };
 
 export const Marker = MarkerTemplate.bind({});
@@ -69,5 +65,5 @@ Marker.parameters = {
     controls: { hideNoControlsWarning: true },
 };
 Marker.args = {
-    iconText: 'marker'
-}
+    iconText: "marker",
+};

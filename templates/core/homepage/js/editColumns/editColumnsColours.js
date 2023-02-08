@@ -8,14 +8,13 @@
  *
  */
 
-const COLOUR_PICKERS_SELECTOR = '[data-colorpicker]';
+const COLOUR_PICKERS_SELECTOR = "[data-colorpicker]";
 const COLOURS = colours; //is a global variable from templates/core/homepage/index.html
-
 
 /**
  * Change the column colours
  */
-export function initEditColumnsColours () {
+export function initEditColumnsColours() {
     initCheckboxes();
     initColourPickers();
     displayDefaultColourPickerColours();
@@ -26,10 +25,11 @@ export function initEditColumnsColours () {
  * so at least one checkbox has to be selected at all times
  * This is so we are always changing the colour of at least one column
  */
-function initCheckboxes () {
+function initCheckboxes() {
     getAllColumnCheckboxes().forEach((checkbox) => {
-        checkbox.addEventListener('change', () => {
-            if (getSelectedColumnCheckboxes().length === 0) { //if none are currently selected after the change
+        checkbox.addEventListener("change", () => {
+            if (getSelectedColumnCheckboxes().length === 0) {
+                //if none are currently selected after the change
                 checkbox.checked = true; //put the just de-selected checkbox back to selected
             }
             displaySelectedColourPickerColours();
@@ -42,8 +42,8 @@ function initCheckboxes () {
  *
  * @returns { Array }
  */
-function getAllColumnCheckboxes () {
-    return Array.from(document.querySelectorAll('[data-column-selector]'));
+function getAllColumnCheckboxes() {
+    return Array.from(document.querySelectorAll("[data-column-selector]"));
 }
 
 /**
@@ -52,28 +52,24 @@ function getAllColumnCheckboxes () {
  *
  * @returns { Array }
  */
-function getSelectedColumnCheckboxes () {
+function getSelectedColumnCheckboxes() {
     return getAllColumnCheckboxes().filter((checkbox) => checkbox.checked);
 }
 
 /**
  * Initiate the colour pickers
  */
-function initColourPickers () {
+function initColourPickers() {
     $(COLOUR_PICKERS_SELECTOR).spectrum(
-        $.extend(
-            {},
-            window.sbProps.spectrum,
-            {
-                allowEmpty: true,
-                showAlpha: true
-            }
-        )
+        $.extend({}, window.sbProps.spectrum, {
+            allowEmpty: true,
+            showAlpha: true,
+        })
     );
-    $(COLOUR_PICKERS_SELECTOR).on('change.spectrum, move.spectrum', (event, colour) => {
+    $(COLOUR_PICKERS_SELECTOR).on("change.spectrum, move.spectrum", (event, colour) => {
         // Apply when there's a colour selected, otherwise set the colour as black transparent,
         // as the 'Clear Color Selection' button has been selected.
-        const colourAsRGB = colour instanceof tinycolor ? colour.toRgbString() : 'rgba(0, 0, 0, 0)';
+        const colourAsRGB = colour instanceof tinycolor ? colour.toRgbString() : "rgba(0, 0, 0, 0)";
         onColourChange(event.currentTarget, colourAsRGB);
     });
 }
@@ -85,10 +81,11 @@ function initColourPickers () {
  * @param { Element }
  * @param { String }
  */
-function onColourChange (element, colourAsRGB) {
+function onColourChange(element, colourAsRGB) {
     const elementId = element.id;
     const selectedColumnCheckboxes = getSelectedColumnCheckboxes();
-    for (let i = 0; i < selectedColumnCheckboxes.length; i++) { //run though each selected column and apply the colour change
+    for (let i = 0; i < selectedColumnCheckboxes.length; i++) {
+        //run though each selected column and apply the colour change
         const colourId = `${selectedColumnCheckboxes[i].id}_${elementId}`; //for example 'top_head_font'
         updateColour(colourId, colourAsRGB);
     }
@@ -101,11 +98,11 @@ function onColourChange (element, colourAsRGB) {
  * @param { Element }
  * @param { String }
  */
-function updateColour (colourId, colourAsRGB) {
+function updateColour(colourId, colourAsRGB) {
     COLOURS.pickers[colourId] = colourAsRGB; //update the object for possible future save / reset / undo
-    const colourProperty = `--${colourId.replace(/_/g, '-')}`;
-    const homepage = document.getElementById('component-layout');
-    homepage.style.setProperty(colourProperty, colourAsRGB)
+    const colourProperty = `--${colourId.replace(/_/g, "-")}`;
+    const homepage = document.getElementById("component-layout");
+    homepage.style.setProperty(colourProperty, colourAsRGB);
 }
 
 /**
@@ -114,7 +111,7 @@ function updateColour (colourId, colourAsRGB) {
  * no colour will be set. So the colour will only be set if all
  * the columns have the same colour.
  */
-function displayDefaultColourPickerColours () {
+function displayDefaultColourPickerColours() {
     updateColourPickerColours(getAllColumnCheckboxes());
 }
 
@@ -124,7 +121,7 @@ function displayDefaultColourPickerColours () {
  * no colour will be set. So the colour will only be set if all
  * the selected columns have the same colour.
  */
-function displaySelectedColourPickerColours () {
+function displaySelectedColourPickerColours() {
     updateColourPickerColours(getSelectedColumnCheckboxes());
 }
 
@@ -136,14 +133,14 @@ function displaySelectedColourPickerColours () {
  *
  * @param { array }
  */
-function updateColourPickerColours (columnCheckboxes) {
+function updateColourPickerColours(columnCheckboxes) {
     const colourPickers = getAllColourPickers();
     colourPickers.forEach((colourPicker) => {
         const checkboxes = columnCheckboxes; //use to retrieve the relevant colours
         const colourList = checkboxes.map((checkbox) => COLOURS.pickers[`${checkbox.id}_${colourPicker.id}`]); //for example top_head_font, left_head_font and right_head_font
         const areAllColoursTheSame = colourList.every((value, index, array) => value === array[0]); //are all colour values within the array the same as the first value in the array
         const initialColour = areAllColoursTheSame ? colourList[0] : null; //if all the colours aren't the same, set to null
-        $(colourPicker).spectrum('set', initialColour);
+        $(colourPicker).spectrum("set", initialColour);
     });
 }
 
@@ -152,7 +149,7 @@ function updateColourPickerColours (columnCheckboxes) {
  *
  * @returns { Array }
  */
-function getAllColourPickers () {
+function getAllColourPickers() {
     return Array.from(document.querySelectorAll(COLOUR_PICKERS_SELECTOR));
 }
 
@@ -161,8 +158,9 @@ function getAllColourPickers () {
  *
  * @param { FormData }
  */
-export function appendColours (formData) {
-    for (const [key, value] of Object.entries(COLOURS.pickers)) { //loop through the key/value pairs for each value and append to FormData
+export function appendColours(formData) {
+    for (const [key, value] of Object.entries(COLOURS.pickers)) {
+        //loop through the key/value pairs for each value and append to FormData
         formData.append(`colors[${key}]`, value);
     }
 }
@@ -171,7 +169,7 @@ export function appendColours (formData) {
  * Reset all the colours back to the default selections.
  * This represents the admin set colours used as the default
  */
-export function resetColours () {
+export function resetColours() {
     updateAllColours(COLOURS.defaults);
 }
 
@@ -179,7 +177,7 @@ export function resetColours () {
  * Undo all the colour changes back to the original selections.
  * This represents the colours at page load, prior to any further Saves
  */
-export function undoColourChanges () {
+export function undoColourChanges() {
     updateAllColours(COLOURS.original);
 }
 
@@ -188,8 +186,9 @@ export function undoColourChanges () {
  *
  * @param { Object }
  */
-function updateAllColours (colourList) {
-    for (const [key, value] of Object.entries(colourList)) { //loop through the key/value pairs to revert all colours back
+function updateAllColours(colourList) {
+    for (const [key, value] of Object.entries(colourList)) {
+        //loop through the key/value pairs to revert all colours back
         //need to ensure assigned colour is always rgb, as if we are moving from rgba to hex, the alpha will not convert
         const colourAsRGB = tinycolor(value).toRgbString();
         updateColour(key, colourAsRGB); //in this case key is 'top_head_font' and value could be 'rgba()'

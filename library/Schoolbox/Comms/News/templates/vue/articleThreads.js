@@ -1,8 +1,8 @@
-import { createApp } from 'vue';
-import ArticleThreads from './article-threads';
+import { createApp } from "vue";
+import ArticleThreads from "./article-threads";
 
 createApp({
-	components: {
-		ArticleThreads
-    }
-}).mount('#threads-section');
+    components: {
+        ArticleThreads,
+    },
+}).mount("#threads-section");

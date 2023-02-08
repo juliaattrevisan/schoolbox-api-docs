@@ -1,18 +1,18 @@
 /**
  * Plugin for the task progress tick form.
  */
-(function($) {
+(function ($) {
     "use strict";
 
     // Form submit/return values for each config type
     var statusValues = {
-        incomplete:      1,
-        selfAssessed:    2,
-        teacherAssessed: 3
+        incomplete: 1,
+        selfAssessed: 2,
+        teacherAssessed: 3,
     };
 
     // Not configurable
-    var tickSelector = 'a[data-progress-tick-status]';
+    var tickSelector = "a[data-progress-tick-status]";
 
     var defaults = {
         // Toast label
@@ -23,111 +23,108 @@
 
         // Button title for each status
         titles: {
-            incomplete:      'Incomplete',
-            selfAssessed:    'Self-assessed',
-            teacherAssessed: 'Complete'
+            incomplete: "Incomplete",
+            selfAssessed: "Self-assessed",
+            teacherAssessed: "Complete",
         },
 
         // Transitions
         // key:   old status
         // value: new status
         transitions: {
-            incomplete:      'teacherAssessed',
-            selfAssessed:    'teacherAssessed',
-            teacherAssessed: 'incomplete'
+            incomplete: "teacherAssessed",
+            selfAssessed: "teacherAssessed",
+            teacherAssessed: "incomplete",
         },
 
         // Change callback
-        onChange: function(newStatus) {}
+        onChange: function (newStatus) {},
     };
 
-    $.fn.progressTickForm = function(options) {
+    $.fn.progressTickForm = function (options) {
         var config = $.extend(true, {}, defaults, options);
 
         // Disable any which match the disabled selector
         if (config.disabledSelector) {
-            $(this).filter(config.disabledSelector).find(tickSelector).prop('disabled', true);
-            $(this).find(config.disabledSelector).find(tickSelector).prop('disabled', true);
+            $(this).filter(config.disabledSelector).find(tickSelector).prop("disabled", true);
+            $(this).find(config.disabledSelector).find(tickSelector).prop("disabled", true);
         }
 
-        $(this).on('click.progressTickForm', tickSelector, function(event) {
+        $(this).on("click.progressTickForm", tickSelector, function (event) {
             event.preventDefault();
 
             var element = $(this),
-                form = element.closest('form'),
+                form = element.closest("form"),
                 label = $(config.label);
 
             // Toast if we can
-            if (label.length && 'toastActivate' in label) {
+            if (label.length && "toastActivate" in label) {
                 label.toastActivate();
             }
 
             // Look up status to transition to, based on current status
             var formData = [
                 {
-                    name: 'status',
-                    value: statusValues[config.transitions[element.data('progressTickStatus')]]
-                }
+                    name: "status",
+                    value: statusValues[config.transitions[element.data("progressTickStatus")]],
+                },
             ];
 
             // Disable form for aesthetic reasons
-            form.attr('disabled', 'disabled');
+            form.attr("disabled", "disabled");
 
             // And transition
             $.ajax({
-                url: form.attr('action'),
-                type: form.attr('method') || 'post',
-                dataType: 'json',
-                data: formData
+                url: form.attr("action"),
+                type: form.attr("method") || "post",
+                dataType: "json",
+                data: formData,
             })
-            .done(function(data) {
-                // Update something.
-                // I guess add the same class the update submission has.
-                element.removeClass('pending reviewed');
-                // Update name, class and value
-                var statusString = '';
-                switch (data.status) {
-                    case statusValues.incomplete:
-                        statusString = 'incomplete';
-                        break;
-                    case statusValues.selfAssessed:
-                        statusString = 'selfAssessed';
-                        element.addClass('pending');
-                        break;
-                    case statusValues.teacherAssessed:
-                        statusString = 'teacherAssessed';
-                        element.addClass('reviewed');
-                        break;
-                }
-                if (statusString) {
-                    element
-                        .data('progressTickStatus', statusString)
-                        .attr('title', config.titles[statusString]);
-                }
-                // Toast if we can
-                if (label.length && 'toastTimeout' in label) {
-                    label.toastTimeout({
-                        text: 'Saved',
-                        css: 'success'
-                    });
-                }
-                // Callback
-                config.onChange.apply(form, [statusString])
-            })
-            .fail(function() {
-                // Toast if we can
-                if (label.length && 'toastTimeout' in label) {
-                    label.toastTimeout({
-                        text: 'Could not save!',
-                        css: 'alert'
-                    });
-                }
-            })
-            .always(function() {
-                // Re-enable form
-                form.removeAttr('disabled');
-            });
+                .done(function (data) {
+                    // Update something.
+                    // I guess add the same class the update submission has.
+                    element.removeClass("pending reviewed");
+                    // Update name, class and value
+                    var statusString = "";
+                    switch (data.status) {
+                        case statusValues.incomplete:
+                            statusString = "incomplete";
+                            break;
+                        case statusValues.selfAssessed:
+                            statusString = "selfAssessed";
+                            element.addClass("pending");
+                            break;
+                        case statusValues.teacherAssessed:
+                            statusString = "teacherAssessed";
+                            element.addClass("reviewed");
+                            break;
+                    }
+                    if (statusString) {
+                        element.data("progressTickStatus", statusString).attr("title", config.titles[statusString]);
+                    }
+                    // Toast if we can
+                    if (label.length && "toastTimeout" in label) {
+                        label.toastTimeout({
+                            text: "Saved",
+                            css: "success",
+                        });
+                    }
+                    // Callback
+                    config.onChange.apply(form, [statusString]);
+                })
+                .fail(function () {
+                    // Toast if we can
+                    if (label.length && "toastTimeout" in label) {
+                        label.toastTimeout({
+                            text: "Could not save!",
+                            css: "alert",
+                        });
+                    }
+                })
+                .always(function () {
+                    // Re-enable form
+                    form.removeAttr("disabled");
+                });
         });
     };
-
 })(jQuery);

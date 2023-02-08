@@ -19,13 +19,12 @@
             setupListeners();
         } else {
             if (config.authBtn) {
-                $(config.authBtn).on('click', function () {
+                $(config.authBtn).on("click", function () {
                     authorize();
                 });
             }
             authorize();
         }
-
 
         /**
          * Init
@@ -36,8 +35,8 @@
          */
         function init(options, element) {
             let defaults = {
-                googleAccessToken: '',
-                googleAccessTokenType: '',
+                googleAccessToken: "",
+                googleAccessTokenType: "",
 
                 /* The link which activates the Google picker
                  */
@@ -49,19 +48,18 @@
 
                 /* Our modal. The Google modal appears on top of this.
                  */
-                modalId: '#gfile',
+                modalId: "#gfile",
 
-                postGoogleFileUrl: '', // TODO: Remove this (and from comment in googleFiles.twig)?
+                postGoogleFileUrl: "", // TODO: Remove this (and from comment in googleFiles.twig)?
                 features: [],
                 views: [],
                 mimeTypes: [],
                 /* Callback
                  */
-                onSelect: function () {
-                },
+                onSelect: function () {},
                 onAuth: function (e) {
                     if (config.modalId) {
-                        $(config.modalId).foundation('reveal', 'open');
+                        $(config.modalId).foundation("reveal", "open");
                         $(config.modalId).hide(); // Hide the second modal until a file has been picked.
                     }
                     createPicker(e);
@@ -69,20 +67,18 @@
                 listener: true,
                 authBtn: false,
             };
-            $('#gfile-google-ids').val('');
+            $("#gfile-google-ids").val("");
             return $.extend(defaults, options);
         }
-
 
         /**
          * Set up listener
          */
         function setupListeners() {
-            $(config.element).on('click', function () {
+            $(config.element).on("click", function () {
                 authorize();
             });
         }
-
 
         /**
          * TODO:
@@ -93,9 +89,8 @@
             // The google.accounts.oauth2 variable comes from https://accounts.google.com/gsi/client.
             let googleClientToken = window.google.accounts.oauth2.initTokenClient({
                 client_id: config.clientId,
-                scope: 'https://www.googleapis.com/auth/drive', // See, edit, create, and delete all of your Google Drive files (see https://developers.google.com/identity/protocols/oauth2/scopes).
-                callback: (response) => {
-                },
+                scope: "https://www.googleapis.com/auth/drive", // See, edit, create, and delete all of your Google Drive files (see https://developers.google.com/identity/protocols/oauth2/scopes).
+                callback: (response) => {},
             });
 
             // This function will run when a response is received from window.googleClientToken.requestAccessToken().
@@ -107,23 +102,22 @@
                 handleAuthResult(true);
             };
 
-            if (config.googleAccessToken !== '' && config.googleAccessTokenType !== '') {
+            if (config.googleAccessToken !== "" && config.googleAccessTokenType !== "") {
                 // We already have the googleAccessToken (retrieved from the PHP session), so mimic a successful
                 // response to googleClientToken.requestAccessToken().
                 // PROBLEM: The token retrieved from the PHP session may have expired.  How do we check for that?
                 authResult = {
                     access_token: config.googleAccessToken,
-                    token_type: config.googleAccessTokenType
+                    token_type: config.googleAccessTokenType,
                 };
                 handleAuthResult(false); // Do not send the token to the server, because that's where it came from.
-            } else if (config.authBtn && $(config.authBtn).hasClass('hide')) {
+            } else if (config.authBtn && $(config.authBtn).hasClass("hide")) {
                 // If the auth button is hidden, show the button so the user can click to authorise access to Google files.
-                $(config.authBtn).removeClass('hide');
+                $(config.authBtn).removeClass("hide");
             } else {
-                googleClientToken.requestAccessToken({prompt: ''}); // Setting prompt to blank tells Google to prompt for authorisation only if necessary.
+                googleClientToken.requestAccessToken({ prompt: "" }); // Setting prompt to blank tells Google to prompt for authorisation only if necessary.
             }
         }
-
 
         /**
          * Respond to Google when you get past the authentication request
@@ -131,11 +125,11 @@
          */
         function handleAuthResult(sendAccessTokenToServer) {
             if (authResult && !authResult.error) {
-                if (config.authBtn && !$(config.authBtn).hasClass('hide')) {
-                    $(config.authBtn).addClass('hide');
+                if (config.authBtn && !$(config.authBtn).hasClass("hide")) {
+                    $(config.authBtn).addClass("hide");
                 }
-                $('#gfile-access-token').val(authResult.access_token);
-                $('#gfile-token-type').val(authResult.token_type);
+                $("#gfile-access-token").val(authResult.access_token);
+                $("#gfile-token-type").val(authResult.token_type);
                 config.onAuth.call($(this.element), authResult.access_token);
 
                 if (sendAccessTokenToServer) {
@@ -146,15 +140,14 @@
                     // use the Google Picker (since the token will not exist in $_SESSION at the server, and so it will not
                     // have been passed to the client during page generation).
                     $.ajax({
-                        data: {accessToken: authResult.access_token, tokenType: authResult.token_type},
-                        dataType: 'json',
-                        method: 'post',
-                        url: '/googleFile/saveAccessTokenToSession'
+                        data: { accessToken: authResult.access_token, tokenType: authResult.token_type },
+                        dataType: "json",
+                        method: "post",
+                        url: "/googleFile/saveAccessTokenToSession",
                     });
                 }
             }
         }
-
 
         /**
          * Create and render a Picker object for searching images.
@@ -164,12 +157,10 @@
         function createPicker() {
             let builder = new google.picker.PickerBuilder();
 
-            let features = config.features.length > 0 ? config.features :
-                [
-                    google.picker.Feature.MULTISELECT_ENABLED,
-                    google.picker.Feature.SUPPORT_DRIVES
-                ]
-            ;
+            let features =
+                config.features.length > 0
+                    ? config.features
+                    : [google.picker.Feature.MULTISELECT_ENABLED, google.picker.Feature.SUPPORT_DRIVES];
             let views = config.views.length > 0 ? config.views : getDefaultViews();
 
             // Enable selected features.
@@ -192,17 +183,16 @@
             /* Shut Google picker modal when we shut our modal
              * https://stackoverflow.com/questions/13745505/how-to-use-zurb-foundation-reveal-with-open-opened-close-closed-callback-func
              */
-            $(document).on('close.fndtn.reveal', config.modalId, onClosePicker);
+            $(document).on("close.fndtn.reveal", config.modalId, onClosePicker);
 
             /**
              * Clean up after the picker modal has been closed.
              */
             function onClosePicker() {
                 picker.setVisible(false);
-                $(document).off('close.fndtn.reveal', config.modalId, onClosePicker);
+                $(document).off("close.fndtn.reveal", config.modalId, onClosePicker);
             }
         }
-
 
         /* This is documented in the API but it's currently kind of broken
          *
@@ -212,26 +202,17 @@
          */
         function getDefaultViews() {
             let views = [
-                new google.picker.DocsView()
-                    .setOwnedByMe(true),
-                new google.picker.DocsView()
-                    .setOwnedByMe(false),
-                new google.picker.DocsView()
-                    .setEnableDrives(true),
-                new google.picker.DocsView()
-                    .setLabel('Starred')
-                    .setStarred(true),
-                new google.picker.DocsView(google.picker.ViewId.RECENTLY_PICKED)
-                    .setLabel('Recent'),
+                new google.picker.DocsView().setOwnedByMe(true),
+                new google.picker.DocsView().setOwnedByMe(false),
+                new google.picker.DocsView().setEnableDrives(true),
+                new google.picker.DocsView().setLabel("Starred").setStarred(true),
+                new google.picker.DocsView(google.picker.ViewId.RECENTLY_PICKED).setLabel("Recent"),
             ];
             views.forEach(function (e) {
-                e.setIncludeFolders(true)
-                    .setSelectFolderEnabled(false)
-                    .setMimeTypes(config.mimeTypes.join(','));
+                e.setIncludeFolders(true).setSelectFolderEnabled(false).setMimeTypes(config.mimeTypes.join(","));
             });
             return views;
         }
-
 
         /**
          * Asynchronously execute this whenever you pick a file in the modal
@@ -249,9 +230,9 @@
 
             if (data[google.picker.Response.ACTION] === google.picker.Action.CANCEL) {
                 if (config.modalId) {
-                    $(config.modalId).foundation('reveal', 'close');
+                    $(config.modalId).foundation("reveal", "close");
                 }
             }
         }
-    }
-}(jQuery));
+    };
+})(jQuery);

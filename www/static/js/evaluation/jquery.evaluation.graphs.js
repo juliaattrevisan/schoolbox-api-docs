@@ -1,9 +1,8 @@
-(function() {
-
+(function () {
     /**
      * Generate a bargraph for Quiz/Survey responses
      */
-    $.fn.evaluationBarchart = function(options) {
+    $.fn.evaluationBarchart = function (options) {
         options = options || {};
 
         var config = init(options, $(this));
@@ -12,12 +11,12 @@
         if (config.categories) {
             xAxis = {
                 categories: config.categories,
-                type: 'category'
+                type: "category",
             };
         } else {
             xAxis = {
                 labels: {
-                    enabled: false
+                    enabled: false,
                 },
 
                 /* Hide useless ticketty-boo lines (you need all
@@ -25,44 +24,44 @@
                  */
                 lineWidth: 0,
                 minorGridLineWidth: 0,
-                lineColor: 'transparent',
+                lineColor: "transparent",
                 minorTickLength: 0,
-                tickLength: 0
-            }
+                tickLength: 0,
+            };
         }
 
         /* The plot unfolds
          */
         $(config.element).highcharts({
             chart: {
-                type: 'column'
+                type: "column",
             },
             title: {
-                text: ''
+                text: "",
             },
             xAxis: xAxis,
             yAxis: {
                 min: 0,
                 allowDecimals: false,
                 title: {
-                    text: ''
-                }
+                    text: "",
+                },
             },
             plotOptions: {
                 column: {
                     grouping: false,
-                    stacking: config.stacking
-                }
+                    stacking: config.stacking,
+                },
             },
             series: config.series,
             tooltip: {
-                formatter: function() {
-                    return this.series.name + ': ' + this.y;
-                }
+                formatter: function () {
+                    return this.series.name + ": " + this.y;
+                },
             },
             credits: {
-                enabled: false
-            }
+                enabled: false,
+            },
         });
 
         /**
@@ -76,22 +75,21 @@
             var defaults = {
                 element: element,
                 stacking: false,
-                categories: []
-            }
+                categories: [],
+            };
 
-            var derived = {
-            }
+            var derived = {};
 
-            var merged = $.extend(true,defaults, derived, options);
+            var merged = $.extend(true, defaults, derived, options);
 
             return merged;
         }
-    }
+    };
 
     /**
      * Generate a pie for Quiz/Survey responses
      */
-    $.fn.evaluationPiechart = function(options) {
+    $.fn.evaluationPiechart = function (options) {
         options = options || {};
 
         var config = init(options, $(this));
@@ -102,31 +100,33 @@
             chart: {
                 plotBackgroundColor: null,
                 plotBorderWidth: null,
-                plotShadow: false
+                plotShadow: false,
             },
             title: {
-                text: config.title
+                text: config.title,
             },
             tooltip: {
-                pointFormat: '<strong>{point.percentage:.1f}%</strong>'
+                pointFormat: "<strong>{point.percentage:.1f}%</strong>",
             },
             plotOptions: {
                 pie: {
                     allowPointSelect: true,
-                    cursor: 'pointer',
+                    cursor: "pointer",
                     dataLabels: {
                         enabled: true,
-                        format: '<strong>{point.name}</strong>: {point.percentage:.1f} %'
-                    }
-                }
+                        format: "<strong>{point.name}</strong>: {point.percentage:.1f} %",
+                    },
+                },
             },
-            series: [{
-                type: 'pie',
-                data: config.series
-            }],
+            series: [
+                {
+                    type: "pie",
+                    data: config.series,
+                },
+            ],
             credits: {
-                enabled: false
-            }
+                enabled: false,
+            },
         });
 
         /**
@@ -138,15 +138,14 @@
          */
         function init(options, element) {
             var defaults = {
-                element: element
-            }
+                element: element,
+            };
 
-            var derived = {
-            }
+            var derived = {};
 
-            var merged = $.extend(true,defaults, derived, options);
+            var merged = $.extend(true, defaults, derived, options);
 
             return merged;
         }
-    }
-}(jQuery));
+    };
+})(jQuery);

@@ -1,5 +1,4 @@
 (function ($) {
-
     /**
      * Constructor
      *
@@ -29,14 +28,14 @@
         /* https://coderwall.com/p/zyrr2g/reset-jquery-form-validation-jquery-validate
          * but why...?
          */
-        $(config.element).on('change', 'select', function (event) {
+        $(config.element).on("change", "select", function (event) {
             $(config.element).validate().resetForm();
         });
 
         /* https://coderwall.com/p/zyrr2g/reset-jquery-form-validation-jquery-validate
          * but why...?
          */
-        $(config.element).on('change', 'input', function (event) {
+        $(config.element).on("change", "input", function (event) {
             $(config.element).validate().resetForm();
         });
 
@@ -51,8 +50,8 @@
         function init(options, element) {
             var defaults = {
                 element: element,
-                functionLabel: '',
-                deleteButton: $()
+                functionLabel: "",
+                deleteButton: $(),
             };
 
             var derived = {};
@@ -66,23 +65,22 @@
         function setupRepeat() {
             // TODO move this to hideWatch plugin (once we apply rules conditionally)
             var showRepeats = function () {
-                var repeatInput = config.element.find('input[name=repeat_until]');
-                if ($(this).val() !== '') {
-                    $('#repeatUntil').show();
-                    $('[data-repeat-until]').removeClass('hide');
+                var repeatInput = config.element.find("input[name=repeat_until]");
+                if ($(this).val() !== "") {
+                    $("#repeatUntil").show();
+                    $("[data-repeat-until]").removeClass("hide");
                     if (repeatInput.length) {
-                        repeatInput.rules('add', 'required');
+                        repeatInput.rules("add", "required");
                     }
-                }
-                else {
-                    $('#repeatUntil, [data-repeat-until]').hide();
-                    $('[data-repeat-until]').addClass('hide');
+                } else {
+                    $("#repeatUntil, [data-repeat-until]").hide();
+                    $("[data-repeat-until]").addClass("hide");
                     if (repeatInput.length) {
-                        repeatInput.rules('remove', 'required');
+                        repeatInput.rules("remove", "required");
                     }
                 }
             };
-            var repeatSelector = config.element.find('select[name=repeat]');
+            var repeatSelector = config.element.find("select[name=repeat]");
             repeatSelector.change(showRepeats);
             showRepeats.apply(repeatSelector);
         }
@@ -93,8 +91,8 @@
          * Now, all #b{action} change the form's action.
          */
         function setupFormActions() {
-            config.element.find(':submit[id^="b"]').on('click', function () {
-                config.element.find('#action').val(this.id.substr(1));
+            config.element.find(':submit[id^="b"]').on("click", function () {
+                config.element.find("#action").val(this.id.substr(1));
             });
         }
 
@@ -107,34 +105,34 @@
          * @param deleteButton
          */
         function setupDeleteActions(deleteButton) {
-            var multi = $('#repeat-reminder, [data-repeat-reminder]').length != 0;
+            var multi = $("#repeat-reminder, [data-repeat-reminder]").length != 0;
             if (multi) {
-                deleteButton.on('click', function (event) {
+                deleteButton.on("click", function (event) {
                     event.preventDefault();
                     var dialog = $('[data-dialog="bulk-delete"]');
-                    dialog.foundation('reveal', 'open');
+                    dialog.foundation("reveal", "open");
                     // Do stuff with buttons
                     setupBulkDialogEvents(
                         dialog,
                         function () {
                             // Add self to href
-                            location.href = deleteButton.attr('href') + '&efficacy=self';
+                            location.href = deleteButton.attr("href") + "&efficacy=self";
                         },
                         function () {
                             // Add series to href
-                            location.href = deleteButton.attr('href') + '&efficacy=series';
+                            location.href = deleteButton.attr("href") + "&efficacy=series";
                         }
                     );
                 });
             } else {
-                deleteButton.on('click', function (event) {
+                deleteButton.on("click", function (event) {
                     event.preventDefault();
                     deleteButton.confirmDialog({
-                        text: 'Are you sure you want to delete this event?',
-                        confirmLabel: 'Delete',
-                        confirmEvent: $.confirmDialog.followHref
+                        text: "Are you sure you want to delete this event?",
+                        confirmLabel: "Delete",
+                        confirmEvent: $.confirmDialog.followHref,
                     });
-                })
+                });
             }
         }
 
@@ -147,25 +145,28 @@
          */
         function setupBulkDialogEvents(dialog, selfCallback, seriesCallback) {
             // Rebind events on open/close/cancel
-            dialog.find('[data-action="self"]')
-                .off('click')
-                .on('click', function (e) {
+            dialog
+                .find('[data-action="self"]')
+                .off("click")
+                .on("click", function (e) {
                     e.preventDefault();
-                    dialog.foundation('reveal', 'close');
+                    dialog.foundation("reveal", "close");
                     selfCallback();
                 });
-            dialog.find('[data-action="series"]')
-                .off('click')
-                .on('click', function (e) {
+            dialog
+                .find('[data-action="series"]')
+                .off("click")
+                .on("click", function (e) {
                     e.preventDefault();
-                    dialog.foundation('reveal', 'close');
+                    dialog.foundation("reveal", "close");
                     seriesCallback();
                 });
-            dialog.find('[data-action="cancel"]')
-                .off('click')
-                .on('click', function (e) {
+            dialog
+                .find('[data-action="cancel"]')
+                .off("click")
+                .on("click", function (e) {
                     e.preventDefault();
-                    dialog.foundation('reveal', 'close');
+                    dialog.foundation("reveal", "close");
                 });
         }
 
@@ -175,7 +176,6 @@
          * @returns {object}
          */
         function setupEventValidationRules() {
-
             /* A campus was chosen
              */
             var validateCampusSelected = function () {
@@ -189,46 +189,46 @@
             };
 
             var validateTeacherInCharge = function () {
-                var ticValue = $('input[name=teacherInCharge]').val();
+                var ticValue = $("input[name=teacherInCharge]").val();
 
-                return (ticValue == '[]' || ticValue == '');
+                return ticValue == "[]" || ticValue == "";
             };
 
             return {
-                'campus[]': {
+                "campus[]": {
                     required: {
-                        depends: validateCampusSelected
+                        depends: validateCampusSelected,
                     },
                     minlength: {
                         param: 1,
-                        depends: validateCampusSelected
-                    }
+                        depends: validateCampusSelected,
+                    },
                 },
-                'ramsFile': {
+                ramsFile: {
                     required: {
-                        depends: validateRamsFile
+                        depends: validateRamsFile,
                     },
                     minlength: {
-                        param: 1
-                    }
+                        param: 1,
+                    },
                 },
-                'teacherInCharge': {
+                teacherInCharge: {
                     required: {
-                        depends: validateTeacherInCharge
+                        depends: validateTeacherInCharge,
                     },
                     minlength: {
-                        param: 1
-                    }
+                        param: 1,
+                    },
                 },
                 startDate: {
                     required: true,
-                    datepickerDate: true
+                    datepickerDate: true,
                 },
                 endDate: {
                     required: true,
                     datepickerDate: true,
-                    datepickerDateNotBefore: $('#startDate')
-                }
+                    datepickerDateNotBefore: $("#startDate"),
+                },
             };
         }
 
@@ -242,38 +242,37 @@
                 rules: setupEventValidationRules(),
                 messages: {
                     endDate: {
-                        datepickerDateNotBefore: 'Start date and time must occur before end date and time'
-                    }
+                        datepickerDateNotBefore: "Start date and time must occur before end date and time",
+                    },
                 },
                 submitHandler: function (form) {
                     // Find the submit button for this form and disable it,
                     // to avoid accidental multiple requests
-                    $('#eotc-modify-submit').prop("disabled", true);
+                    $("#eotc-modify-submit").prop("disabled", true);
 
-                    var multi = $('#repeat-reminder, [data-repeat-reminder]').length != 0;
+                    var multi = $("#repeat-reminder, [data-repeat-reminder]").length != 0;
                     if (multi) {
                         // series - show a dialog
                         var dialog = $('[data-dialog="bulk-modify"]');
-                        dialog.foundation('reveal', 'open');
+                        dialog.foundation("reveal", "open");
                         setupBulkDialogEvents(
                             dialog,
                             function () {
-                                $('#efficacy').val('self');
+                                $("#efficacy").val("self");
 
                                 form.submit();
                             },
                             function () {
-                                $('#efficacy').val('series');
+                                $("#efficacy").val("series");
 
                                 form.submit();
                             }
                         );
-                    }
-                    else {
+                    } else {
                         // single event - just submit
                         form.submit();
                     }
-                }
+                },
             });
         }
     };

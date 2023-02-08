@@ -1,16 +1,15 @@
 export const ENDPOINTS = Object.freeze({
-
     /* Endpoint for the Top 10 visitors payload
      */
-    URL_VISITATION_PAYLOAD_TOP10: '/news/statistics/{articleId}/visitation/top10',
+    URL_VISITATION_PAYLOAD_TOP10: "/news/statistics/{articleId}/visitation/top10",
 
     /* Endpoint for the Full visitors payload
      */
-    URL_VISITATION_PAYLOAD_FULL: '/news/statistics/{articleId}/visitation/full',
+    URL_VISITATION_PAYLOAD_FULL: "/news/statistics/{articleId}/visitation/full",
 
     /* Url for the Full report
      */
-    URL_VISITATION_FULL: '/news/statistics/{articleId}/visitation',
+    URL_VISITATION_FULL: "/news/statistics/{articleId}/visitation",
 
     /**
      * Generate a path via const
@@ -20,9 +19,8 @@ export const ENDPOINTS = Object.freeze({
      * @return string
      */
     generateUrlFromConst(str, articleId) {
-        return str.replace('{articleId}', articleId);
+        return str.replace("{articleId}", articleId);
     },
-
 
     /**
      * Get Top 10 payload data about a given article
@@ -30,7 +28,7 @@ export const ENDPOINTS = Object.freeze({
      * @param articleId
      * @return string
      */
-    payloadTop10Path: function(articleId) {
+    payloadTop10Path: function (articleId) {
         return this.generateUrlFromConst(ENDPOINTS.URL_VISITATION_PAYLOAD_TOP10, articleId);
     },
 
@@ -40,7 +38,7 @@ export const ENDPOINTS = Object.freeze({
      * @param articleId
      * @return string
      */
-    payloadFullPath: function(articleId) {
+    payloadFullPath: function (articleId) {
         return this.generateUrlFromConst(ENDPOINTS.URL_VISITATION_PAYLOAD_FULL, articleId);
-    }
+    },
 });

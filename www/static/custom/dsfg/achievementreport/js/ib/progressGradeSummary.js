@@ -1,5 +1,4 @@
-(function() {
-
+(function () {
     /**
      * Manufactures a Progress Grade Summary barchart
      *
@@ -7,7 +6,7 @@
      * @copyright   Copyright 2019, Schoolbox Pty Ltd
      * @link        https://schoolbox.com.au/
      */
-    $.fn.ib_progressGradeSummary = function(options) {
+    $.fn.ib_progressGradeSummary = function (options) {
         options = options || {};
 
         var config = init(options, this);
@@ -27,7 +26,7 @@
 
                 /* Graph title
                  */
-                title: '',
+                title: "",
 
                 /* Colour stack for the bars
                  */
@@ -37,11 +36,10 @@
                  */
                 categories: [],
 
-                series: []
-            }
+                series: [],
+            };
 
-            var derived = {
-            }
+            var derived = {};
 
             var merged = $.extend(defaults, derived, options);
 
@@ -54,34 +52,33 @@
         function graph() {
             $(config.element).highcharts({
                 chart: {
-                    type: 'bar'
+                    type: "bar",
                 },
                 colors: config.colors,
                 title: {
-                    text: ''
+                    text: "",
                 },
                 xAxis: {
-                    categories: config.categories
+                    categories: config.categories,
                 },
                 yAxis: {
                     min: 0,
-                        max: 100,
-                        reversedStacks: false,
-                        title: {
-                        text: 'Percentage'
-                    }
+                    max: 100,
+                    reversedStacks: false,
+                    title: {
+                        text: "Percentage",
+                    },
                 },
                 legend: {
-                    reversed: false
+                    reversed: false,
                 },
                 plotOptions: {
                     series: {
-                        stacking: 'normal'
-                    }
+                        stacking: "normal",
+                    },
                 },
                 series: config.series,
                 tooltip: {
-
                     /**
                      * Sigh, find all the values in the series which match the
                      * outlier value and concat it all into one giant tooltip
@@ -90,20 +87,20 @@
                      *
                      * @returns {string}
                      */
-                    formatter: function() {
-                        var template = '<strong>{NAME}</strong> ({VALUE}%)';
+                    formatter: function () {
+                        var template = "<strong>{NAME}</strong> ({VALUE}%)";
 
                         var tooltipContent = template;
                         tooltipContent = tooltipContent.replace(/{NAME}/, this.series.name);
                         tooltipContent = tooltipContent.replace(/{VALUE}/, this.y.toFixed(1));
 
                         return tooltipContent;
-                    }
+                    },
                 },
                 credits: {
-                    enabled: false
-                }
+                    enabled: false,
+                },
             });
         }
-    }
-}(jQuery));
+    };
+})(jQuery);

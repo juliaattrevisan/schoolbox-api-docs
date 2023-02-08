@@ -2,34 +2,31 @@
  * To search for users to add
  */
 
-import { defineStore } from 'pinia';
-import { useStore } from './manageGroupStore';
-import { useMembersStore } from './mgMembersStore';
-import { useAddMembersStore } from './mgAddMembersStore';
-import FromTypes from '../addMembers/mgAddMembersFromTypes';
-
+import { defineStore } from "pinia";
+import { useStore } from "./manageGroupStore";
+import { useMembersStore } from "./mgMembersStore";
+import { useAddMembersStore } from "./mgAddMembersStore";
+import FromTypes from "../addMembers/mgAddMembersFromTypes";
 
 const MIN_QUERY_LENGTH = 2; //the amount of characters typed before the search becomes active
 export const DEBOUNCE_AMOUNT = 350; //to allow time for further user key presses before search begins
 
-export const useSearchStore = defineStore('mgSearch', {
-
+export const useSearchStore = defineStore("mgSearch", {
     state: () => ({
         isLoading: false, //to notify that an action is taking place, like updating a member access
-        query: '', //current search query
+        query: "", //current search query
         results: [], //members/groups/roles returned in the current search results
         selectedResults: [], //members to add on Add Members selectedResults
     }),
 
     getters: {
-
         /**
          * To only start showing search results once enough characters
          * have been added
          *
          * @return { Boolean }
          */
-        isSearchActive () {
+        isSearchActive() {
             return this.query.length >= MIN_QUERY_LENGTH;
         },
 
@@ -38,13 +35,13 @@ export const useSearchStore = defineStore('mgSearch', {
          *
          * @return { String }
          */
-        searchEndpoint () {
+        searchEndpoint() {
             const searchEndpoints = {
-                [FromTypes.NAME]: '/ajax/user.php?groupID=0&query=',
-                [FromTypes.GROUP]: '/group/searchGroups?query=',
-                [FromTypes.ROLE]: '/group/searchRoles?query=',
-                [FromTypes.LIST]: '/group/searchUsers?query=',
-            }
+                [FromTypes.NAME]: "/ajax/user.php?groupID=0&query=",
+                [FromTypes.GROUP]: "/group/searchGroups?query=",
+                [FromTypes.ROLE]: "/group/searchRoles?query=",
+                [FromTypes.LIST]: "/group/searchUsers?query=",
+            };
             const addMembersStore = useAddMembersStore();
             return searchEndpoints[addMembersStore.fromType];
         },
@@ -54,7 +51,7 @@ export const useSearchStore = defineStore('mgSearch', {
          *
          * @return { array }
          */
-        filteredResults () {
+        filteredResults() {
             const addMembersStore = useAddMembersStore();
             if (!this.isSearchActive) {
                 return [];
@@ -75,7 +72,7 @@ export const useSearchStore = defineStore('mgSearch', {
          *
          * @return { Boolean }
          */
-        hasNoResults () {
+        hasNoResults() {
             return this.isSearchActive && this.filteredResults.length === 0 && !this.isLoading;
         },
 
@@ -84,7 +81,7 @@ export const useSearchStore = defineStore('mgSearch', {
          *
          * @return { Boolean }
          */
-        hasSelectedResults () {
+        hasSelectedResults() {
             return this.selectedResults.length > 0;
         },
 
@@ -93,18 +90,16 @@ export const useSearchStore = defineStore('mgSearch', {
          *
          * @returns { Boolean }
          */
-        canAddMembers () {
+        canAddMembers() {
             return this.hasSelectedResults && !this.isLoading;
         },
-
     },
 
     actions: {
-
         /**
          * search has started
          */
-        enableSearch () {
+        enableSearch() {
             this.isLoading = true;
         },
 
@@ -113,14 +108,14 @@ export const useSearchStore = defineStore('mgSearch', {
          *
          * @returns { Array }
          */
-        async search () {
+        async search() {
             const store = useStore();
             store.isProcessing = true;
             try {
                 const response = await fetch(`${this.searchEndpoint}${this.query}`, {
-                    method: 'GET',
+                    method: "GET",
                     headers: {
-                        'Content-Type': 'application/json',
+                        "Content-Type": "application/json",
                     },
                 });
                 this.results = await response.json();
@@ -135,22 +130,22 @@ export const useSearchStore = defineStore('mgSearch', {
         /**
          * clear the current search
          */
-        clear () {
-            this.query = '';
+        clear() {
+            this.query = "";
             this.results = [];
         },
 
         /**
          * clear the currently selected results
          */
-        clearSelectedResults () {
+        clearSelectedResults() {
             this.selectedResults = [];
         },
 
         /**
          * add all found results to the selectedResults
          */
-        addAllResults () {
+        addAllResults() {
             this.filteredResults.forEach((result) => {
                 this.addResult(result);
             });
@@ -161,14 +156,15 @@ export const useSearchStore = defineStore('mgSearch', {
          *
          * @param { Object }
          */
-        addResult (searchResult) {
+        addResult(searchResult) {
             const addMembersStore = useAddMembersStore();
             const searchResultWithFromType = {
                 ...searchResult,
                 // list returns search result in the same format as name
-                fromType: addMembersStore.fromType === 'list' ? 'name' : addMembersStore.fromType,
-            }
-            const hasMatch = this.selectedResults.some((result) => { //confirm that the member is not in the list already
+                fromType: addMembersStore.fromType === "list" ? "name" : addMembersStore.fromType,
+            };
+            const hasMatch = this.selectedResults.some((result) => {
+                //confirm that the member is not in the list already
                 return result.id === searchResult.id && result.fromType === searchResultWithFromType.fromType;
             });
             if (!hasMatch) {
@@ -179,7 +175,7 @@ export const useSearchStore = defineStore('mgSearch', {
         /**
          * remove all found results from the selectedResults
          */
-        removeAllResults () {
+        removeAllResults() {
             this.filteredResults.forEach((result) => {
                 this.removeResult(result);
             });
@@ -190,10 +186,10 @@ export const useSearchStore = defineStore('mgSearch', {
          *
          * @param { Object }
          */
-        removeResult (searchResult) {
-            this.selectedResults = this.selectedResults.filter((selectedResultsItem) => selectedResultsItem.id !== searchResult.id);
+        removeResult(searchResult) {
+            this.selectedResults = this.selectedResults.filter(
+                (selectedResultsItem) => selectedResultsItem.id !== searchResult.id
+            );
         },
-
     },
-
-})
+});

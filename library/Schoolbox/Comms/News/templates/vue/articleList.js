@@ -1,8 +1,8 @@
-import { createApp } from 'vue';
-import ArticleList from './article-list';
+import { createApp } from "vue";
+import ArticleList from "./article-list";
 
 createApp({
     components: {
-        ArticleList
-    }
-}).mount('#news-component');
+        ArticleList,
+    },
+}).mount("#news-component");

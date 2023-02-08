@@ -4,27 +4,25 @@
  * which is the launch area for vue.
  */
 export default {
-
     /**
      * Get access to jquery
      */
     computed: {
-        jQuery: () => window.jQuery
+        jQuery: () => window.jQuery,
     },
 
     /**
      * Alias some of the more common usages
      */
     methods: {
-
         /**
          * Start toaster with this text
          *
          * @param text
          */
         toastActivate(text) {
-            this.jQuery('[data-toast]').toastActivate({
-                text: text
+            this.jQuery("[data-toast]").toastActivate({
+                text: text,
             });
         },
 
@@ -34,12 +32,11 @@ export default {
          * @param text
          */
         toastSuccess(text) {
-            this.jQuery('[data-toast]').toastTimeout({
+            this.jQuery("[data-toast]").toastTimeout({
                 text: text,
-                css: 'success'
+                css: "success",
             });
         },
-
 
         /**
          * Toast Error
@@ -47,10 +44,10 @@ export default {
          * @param text
          */
         toastError(text) {
-            this.jQuery('[data-toast]').toastTimeout({
+            this.jQuery("[data-toast]").toastTimeout({
                 text: text,
-                css: 'alert'
+                css: "alert",
             });
-        }
-    }
-}
+        },
+    },
+};

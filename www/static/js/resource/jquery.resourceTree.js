@@ -3,7 +3,7 @@
  *
  * Can tie into three panel.
  */
-(function($) {
+(function ($) {
     /**
      * Helper method for determining whether a node is a folder, for sort purposes.
      *
@@ -11,15 +11,15 @@
      * @param nodeId
      * @returns {boolean}
      */
-    var isFolder = function(jstree, nodeId) {
+    var isFolder = function (jstree, nodeId) {
         switch (jstree.get_type(nodeId)) {
-            case 'folder':
-            case 'home':
-            case 'homepage':
-            case 'course':
+            case "folder":
+            case "home":
+            case "homepage":
+            case "course":
                 return true;
-            case 'link':
-            case 'file':
+            case "link":
+            case "file":
             default:
                 return false;
         }
@@ -33,7 +33,7 @@
      * @param b
      * @returns {number}
      */
-    var resourceTreeSort = function(jstree, a, b) {
+    var resourceTreeSort = function (jstree, a, b) {
         var isAFolder = isFolder(jstree, a);
         var isBFolder = isFolder(jstree, b);
         if (isAFolder && !isBFolder) {
@@ -45,15 +45,11 @@
 
         // locales and options aren't supported by garbage browsers like IE < 11 and Safari,
         // they will just ignore these parameters.
-        return jstree.get_text(a).localeCompare(
-            jstree.get_text(b),
-            window.navigator.language || 'en',
-            {
-                usage: 'sort',
-                sensitivity: 'accent',
-                numeric: true
-            }
-        );
+        return jstree.get_text(a).localeCompare(jstree.get_text(b), window.navigator.language || "en", {
+            usage: "sort",
+            sensitivity: "accent",
+            numeric: true,
+        });
     };
 
     /**
@@ -67,33 +63,32 @@
      *   jstree: Any and all jstree parameters
      * @constructor
      */
-    var ResourceTree = function(element, nodeTypeIconMap, options) {
-        var self     = this;
+    var ResourceTree = function (element, nodeTypeIconMap, options) {
+        var self = this;
         var defaults = {
             data: {
                 cache: [],
                 ajaxParams: {
-                    url:      '/resources/{folderId}/nodes',
-                    type:     'GET',
-                    data:     {},
-                    dataType: 'json',
-                    token:    '{folderId}',
+                    url: "/resources/{folderId}/nodes",
+                    type: "GET",
+                    data: {},
+                    dataType: "json",
+                    token: "{folderId}",
                 },
-                ajaxDataParam: 'parent'
+                ajaxDataParam: "parent",
             },
             jstree: {
                 animation: 50,
                 core: {
-                    data: function(node, callback) {
+                    data: function (node, callback) {
                         // Search the tree for the children of this node.
                         // This assumes that the data has been passed in flat.
-                        var children = self.cache.filter(function(child) {
+                        var children = self.cache.filter(function (child) {
                             return child.parent == node.id;
-                        })
+                        });
                         if (children.length) {
                             callback(children);
-                        }
-                        else {
+                        } else {
                             var ajaxParams = $.extend(true, {}, self.options.data.ajaxParams);
 
                             if (ajaxParams.token) {
@@ -103,26 +98,26 @@
                             }
 
                             $.ajax(ajaxParams)
-                                .done(function(data) {
+                                .done(function (data) {
                                     self.cache = self.cache.concat(data);
                                     callback(data);
                                 })
-                                .fail(function() {
+                                .fail(function () {
                                     callback();
-                                })
+                                });
                         }
                     },
                     force_text: true,
                     multiple: false,
-                    check_callback: function(operation, node, node_parent) {
+                    check_callback: function (operation, node, node_parent) {
                         // Ensure the node I'm dragging onto is one I have write access to
-                        if (operation === 'move_node') {
+                        if (operation === "move_node") {
                             var permission = null,
-                                parentId   = Number(node_parent.id);
+                                parentId = Number(node_parent.id);
                             if (node_parent.original && node_parent.original.li_attr) {
-                                permission = node_parent.original.li_attr['data-permission'];
+                                permission = node_parent.original.li_attr["data-permission"];
                             }
-                            if (!(permission === 'write' || permission === 'full')) {
+                            if (!(permission === "write" || permission === "full")) {
                                 return false;
                             }
 
@@ -132,20 +127,20 @@
                             }
 
                             // also check that you're not trying to drag onto a file
-                            if (node_parent.original.type === 'file' || node_parent.original.type === 'link') {
+                            if (node_parent.original.type === "file" || node_parent.original.type === "link") {
                                 return false;
                             }
 
                             // also check course/unit dragging:
                             // * no dragging a unit into a unit or into the root
                             // * no dragging a course into a course or a unit
-                            if (node.type === 'unit') {
-                                if (node_parent.type === 'unit' || parentId === 0) {
+                            if (node.type === "unit") {
+                                if (node_parent.type === "unit" || parentId === 0) {
                                     return false;
                                 }
                             }
-                            if (node.type === 'course') {
-                                if (node_parent.type === 'unit' || node_parent.type === 'course') {
+                            if (node.type === "course") {
+                                if (node_parent.type === "unit" || node_parent.type === "course") {
                                     return false;
                                 }
                             }
@@ -156,25 +151,26 @@
                         variant: "resourcetree",
                         dots: true,
                         icons: true,
-                        responsive: false
-                    }
+                        responsive: false,
+                    },
                 },
-                plugins : ['dnd', 'sort', 'types', 'wholerow', 'conditionalselect'],
+                plugins: ["dnd", "sort", "types", "wholerow", "conditionalselect"],
                 dnd: {
                     touch: false, // no dragging on touch screen thanks
                     copy: false,
-                    is_draggable: function(nodes) {
+                    is_draggable: function (nodes) {
                         var isDraggable = true,
-                            jstree      = this;
-                        $.each(nodes, function(i, node) {
+                            jstree = this;
+                        $.each(nodes, function (i, node) {
                             // Check both the file and its parent
-                            var permission       = node.li_attr['data-permission'];
-                            var parent           = jstree.get_node(node.parent);
+                            var permission = node.li_attr["data-permission"];
+                            var parent = jstree.get_node(node.parent);
 
-                            if (parent['id'] != '#') {
-                                var parentPermission = parent.li_attr['data-permission'];
-                                if (!(permission == 'write' || permission == 'full')
-                                    || !(parentPermission == 'write' || parentPermission == 'full')
+                            if (parent["id"] != "#") {
+                                var parentPermission = parent.li_attr["data-permission"];
+                                if (
+                                    !(permission == "write" || permission == "full") ||
+                                    !(parentPermission == "write" || parentPermission == "full")
                                 ) {
                                     isDraggable = false;
                                     return false;
@@ -185,61 +181,61 @@
                             }
                         });
                         return isDraggable;
-                    }
+                    },
                 },
                 conditionalselect: function (node, e) {
-                    return typeof node.li_attr['data-id'] != 'undefined' && node.li_attr['data-type'] != 'noaccess';
+                    return typeof node.li_attr["data-id"] != "undefined" && node.li_attr["data-type"] != "noaccess";
                 },
                 types: {
                     root: {
-                        icon: nodeTypeIconMap.root
+                        icon: nodeTypeIconMap.root,
                     },
-                    'default': {
-                        icon: nodeTypeIconMap.default
+                    default: {
+                        icon: nodeTypeIconMap.default,
                     },
                     file: {
-                        icon: nodeTypeIconMap.file
+                        icon: nodeTypeIconMap.file,
                     },
                     link: {
-                        icon: nodeTypeIconMap.link
+                        icon: nodeTypeIconMap.link,
                     },
                     folder: {
-                        icon: nodeTypeIconMap.folder
+                        icon: nodeTypeIconMap.folder,
                     },
                     home: {
-                        icon: nodeTypeIconMap.home
+                        icon: nodeTypeIconMap.home,
                     },
                     homepage: {
-                        icon: nodeTypeIconMap.homepage
+                        icon: nodeTypeIconMap.homepage,
                     },
                     course: {
-                        icon: nodeTypeIconMap.course
+                        icon: nodeTypeIconMap.course,
                     },
                     unit: {
-                        icon: nodeTypeIconMap.unit
+                        icon: nodeTypeIconMap.unit,
                     },
                     noaccess: {
-                        icon: nodeTypeIconMap.noaccess
-                    }
+                        icon: nodeTypeIconMap.noaccess,
+                    },
                 },
-                sort: function(a, b) {
+                sort: function (a, b) {
                     return resourceTreeSort(this, a, b);
-                }
-            }
-        }
+                },
+            },
+        };
 
         self.element = element;
         self.options = $.extend(true, {}, defaults, options);
-        self.cache   = self.options.data.cache;
+        self.cache = self.options.data.cache;
 
         element.jstree(self.options.jstree);
-    }
+    };
 
-    $.fn.resourceTree = function(nodeTypeIconMap, options) {
-        this.each(function() {
+    $.fn.resourceTree = function (nodeTypeIconMap, options) {
+        this.each(function () {
             var element = $(this);
-            element.data('resourceTree', new ResourceTree(element, nodeTypeIconMap, options));
-        })
+            element.data("resourceTree", new ResourceTree(element, nodeTypeIconMap, options));
+        });
         return this;
     };
 })(jQuery);
