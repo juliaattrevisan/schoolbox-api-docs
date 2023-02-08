@@ -428,7 +428,7 @@ async function onMenuItemSelected(target: string, action: string|null = null) {
                     Exclude Student
                 </pop-out-menu-item>
                 <pop-out-menu-item v-if="!isExcluded"
-                    :class="{ 'is-disabled': !routes.historyRoute || isExcluded }"
+                    :class="{ 'is-disabled': !routes.historyRoute || isExcluded || (isActivityEmpty && 'Due Work' === assessmentType) }"
                     @selected="onMenuItemSelected(routes.historyRoute)"
                 >
                     {{ viewStatusText }}
