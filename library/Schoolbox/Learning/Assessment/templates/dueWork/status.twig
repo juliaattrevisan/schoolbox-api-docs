@@ -47,7 +47,7 @@
                }) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Download All</a>
         </li>
 -->
-        <li><a class="icon-download" data-mass="publish" data-reveal-id="download-submissions-students">Download All</a></li>
+        <li><a class="icon-download" data-mass="publish" data-reveal-id="mass-download">Download All</a></li>
     {% endif %}
 
     {% set similarityReportRoute = routeLookupIfAuthorized('learningAssessment.getSimilarityReport', {assessmentId: assessment.id, assessment: assessment}) %}
@@ -86,9 +86,9 @@
     {# Tot actions are derived from access to the Attempt History route
      # By default this empty, hiding the tot
      #}
-    {% set pActionSummary = routeLookupIfAuthorized('learningAssessment.getSummary', routeArgs) %}
-    {% set pActionResponses = routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', routeArgs) %}
-    {% set pActionCount = (pActionResponses ? 1 : 0) + (pActionSummary ? 1 : 0) %}
+    {% set pActionSummary    = routeLookupIfAuthorized('learningAssessment.getSummary', routeArgs) %}
+    {% set pActionResponses  = routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', routeArgs) %}
+    {% set pActionCount      = (pActionResponses ? 1 : 0) + (pActionSummary ? 1 : 0) %}
 
     {# A route to see the list of responses for this participation #}
     {% set fbUrl             = routeLookupIfAuthorized('learningDueWorkFeedback.postParticipantFeedback', routeArgs) %}
@@ -259,6 +259,7 @@
         {# Action Bar data attrs #}
         {% set massActions = isDraftFeedback ? 'data-mass-publish' : '' %}
         {% set massActions = massActions ~ (pAckReceipt ? ' data-mass-submit' : '') %}
+        {% set massActions = massActions ~ (download ? ' data-mass-download' : '') %}
         {% set dataAttrs   = isPublishedFeedback ? 'data-published' : '' %}
 
         {% set buttons %}
@@ -331,9 +332,9 @@
             <p data-mass-unavailable>There aren't any valid and unpublished drafts for this activity.</p>
             <p data-mass-available>The following drafts can be published:</p>
             <section class="checklist" id="mass-publish-list">
-                <div data-template>{# this will get detached from the DOM on pageload #}
+                <div data-template>{# this will get detached from the DOM on pageload (jquery.bulky.js) #}
                     <input type="checkbox" data-selected checked/>
-                    <label class="checkbox-label" data-participant-name>{# populated by JS #}</label>
+                    <label class="checkbox-label" data-participant-name>{# populated by JS (jquery.bulky.js) #}</label>
                 </div>
             </section>
             <div class="component-action">
@@ -364,9 +365,9 @@
             <p data-mass-unavailable>You have no students requiring submission.</p>
             <p data-mass-available>Acknowledge receipt of submission for:</p>
             <section class="checklist" id="mass-submit-list">
-                <div data-template>{# this will get detached from the DOM on pageload #}
+                <div data-template>{# this will get detached from the DOM on pageload (jquery.bulky.js) #}
                     <input type="checkbox" data-selected checked/>
-                    <label class="checkbox-label" data-participant-name>{# populated by JS #}</label>
+                    <label class="checkbox-label" data-participant-name>{# populated by JS (jquery.bulky.js) #}</label>
                 </div>
             </section>
             <div class="component-action">
@@ -380,22 +381,20 @@
             <a class="close-reveal-modal" aria-label="Close">&#215;</a>
         </div>
 
-        <div id="download-submissions-students" class="reveal-modal" data-reveal
-             data-list-id="download-submissions-students-list" aria-hidden="true" role="dialog">
+        <div id="mass-download" class="reveal-modal" data-reveal data-list-id="mass-download-list" aria-hidden="true"
+             role="dialog">
             <h2>Download Submissions</h2>
             <p>Download for these students</p>
-<!--
-            <section class="checklist" id="download-submissions-students-list">
-                <div data-template>{# this will get detached from the DOM on pageload #}
+            <section class="checklist" id="mass-download-list">
+                <div data-template>{# this will get detached from the DOM on pageload (jquery.bulky.js) #}
                     <input type="checkbox" data-selected checked/>
-                    <label class="checkbox-label" data-participant-name>{# populated by JS #}</label>
+                    <label class="checkbox-label" data-participant-name>{# populated by JS (jquery.bulky.js) #}</label>
                 </div>
             </section>
--->
             <div class="component-action">
                 <section>
                     {%- apply spaceless -%}
-                        <a class="button" onclick="$('#download-submissions-students').foundation('reveal', 'close');">Cancel</a>
+                        <a class="button" onclick="$('#mass-download').foundation('reveal', 'close');">Cancel</a>
                         <a class="button" id="download-submissions" data-submit>Download</a>
                     {%- endapply -%}
                 </section>
@@ -470,7 +469,7 @@
                                 return 'Publish All';
                             }
 
-                            return 'Publish ' + len + ' Selected';
+                            return 'Publish ' + len + ' of ' + all;
                         },
 
                         userSelector: '[data-mass-publish]',
@@ -483,7 +482,7 @@
                             return $('[data-feedback-form="' + id + '"]').valid();
                         },
 
-                        {# When you hit Publish All, it attempts to saves each draft feedback in the list
+                        {# When you hit Publish All, it attempts to save each draft feedback in the list
                          # It gets those feedbacks' ids and publishes them in the back end
                          #
                          # This should take an intersect of the checkbox list that you saw in the modal
@@ -559,12 +558,12 @@
                             }
 
                             if (!len) {
-                                return 'None Selected';
+                                return 'Acknowledge None Received';
                             }
                             if (len === all) {
-                                return 'All Received';
+                                return 'Acknowledge All Received';
                             }
-                            return 'Received ' + len + ' selected';
+                            return 'Acknowledge ' + len + ' of ' + all + ' Received';
                         },
                         userSelector: '[data-mass-submit]',
                         userList: $userList,
@@ -575,6 +574,23 @@
                                 $(this).find('[data-sobo]').trigger('click');
                             });
                             confirmDialogDisabled = false; // Re-enable the confirm dialog.
+                        }
+                    });
+
+                    {# Mass download submissions #}
+                    $('#mass-download').bulky({
+                        submitText: function (len, all) {
+                            if (!len) {
+                                return 'Download None';
+                            }
+                            if (len === all) {
+                                return 'Download All';
+                            }
+                            return 'Download ' + len + ' of ' + all;
+                        },
+                        userSelector: '[data-mass-download]',
+                        userList: $userList,
+                        onSubmit: function (toSubmit) {
                         }
                     });
 
