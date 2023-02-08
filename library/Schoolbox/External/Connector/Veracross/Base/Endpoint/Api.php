@@ -52,7 +52,7 @@ class Api implements IApi
      *
      * Lots of little pages is super slow for them
      */
-    private const PAGE_SIZE = 100;
+    private const PAGE_SIZE = 1000;
 
 
     /**
