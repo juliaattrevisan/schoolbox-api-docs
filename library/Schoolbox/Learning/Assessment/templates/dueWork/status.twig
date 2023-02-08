@@ -37,6 +37,7 @@
     {% endif %}
 
     {% if download %}
+<!--
         <li>
             <a class="icon-download"
                id="download-submissions"
@@ -45,6 +46,8 @@
                    assessment: assessment
                }) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Download All</a>
         </li>
+-->
+        <li><a class="icon-download" data-mass="publish" data-reveal-id="download-submissions-students">Download All</a></li>
     {% endif %}
 
     {% set similarityReportRoute = routeLookupIfAuthorized('learningAssessment.getSimilarityReport', {assessmentId: assessment.id, assessment: assessment}) %}
@@ -268,7 +271,7 @@
                 {% set draftSaveHtml = isDraftFeedback ? 'Saved as Draft' : '' %}
                 <button class="button disabled" data-draft="drafted" title="{{ draftSaveTitle }}">{{ draftSaveHtml }}</button>
                 {% if not readonly %}
-                    <a  class="button"
+                    <a class="button"
                         data-draft="publish"
                         {% if not latestFeedback or latestFeedback.published %}style="display:none;"{% endif %}
                             {% if isDraftFeedback %}data-draft-id="{{ latestFeedback.id }}"{% endif %}
@@ -371,6 +374,29 @@
                     {%- apply spaceless -%}
                         <a class="button">Cancel</a>
                         <a class="button" data-submit>All Received</a>
+                    {%- endapply -%}
+                </section>
+            </div>
+            <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+        </div>
+
+        <div id="download-submissions-students" class="reveal-modal" data-reveal
+             data-list-id="download-submissions-students-list" aria-hidden="true" role="dialog">
+            <h2>Download Submissions</h2>
+            <p>Download for these students</p>
+<!--
+            <section class="checklist" id="download-submissions-students-list">
+                <div data-template>{# this will get detached from the DOM on pageload #}
+                    <input type="checkbox" data-selected checked/>
+                    <label class="checkbox-label" data-participant-name>{# populated by JS #}</label>
+                </div>
+            </section>
+-->
+            <div class="component-action">
+                <section>
+                    {%- apply spaceless -%}
+                        <a class="button" onclick="$('#download-submissions-students').foundation('reveal', 'close');">Cancel</a>
+                        <a class="button" id="download-submissions" data-submit>Download</a>
                     {%- endapply -%}
                 </section>
             </div>
