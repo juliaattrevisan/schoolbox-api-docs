@@ -15,6 +15,7 @@ use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Factory;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\IApi;
+use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Users;
 use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Event\Model;
@@ -188,8 +189,6 @@ class Classes implements IStrategy
     {
         $this->log->info('Processing timetables.');
 
-        $this->log->debug('Preloading involvements for all the classes.');
-
         $this->log->debug(sprintf(
             'Processing classes between %s and %s',
             $this->fromDate,
@@ -200,24 +199,39 @@ class Classes implements IStrategy
          */
         $compiler = new PersonCompiler($this->api, self::SCOPE);
 
+        /* Get a list of guys
+         */
+        $userLookup = (new Users($this->eventMapper))->generate();
+
         /* TODO Parameterise these
          */
-        $externalId = '13063';
         $startDate = '2016-08-01';
         $endDate = '2016-09-01';
 
-        $timetable = $compiler->compile($externalId, $startDate, $endDate);
+        $i = 0;
 
-        foreach ($timetable as $enrolment) {
-            /* You can use the class id as a watchlist param to specifically
-             * import this one class. Once we find it, we exit this loop -
-             * we don't expect it to appear again in the classes index
-             */
-            if (!(new Watchlist())->isOnWatchlist((string)$enrolment['internal_class_id']['id'], $this->watchlist)) {
-                continue;
+        foreach ($userLookup as $externalId => $user) {
+            if ($i > 9) {
+                break;
             }
 
-            $this->processClass($externalId, $enrolment);
+            $timetable = $compiler->compile($externalId, $startDate, $endDate);
+
+            /* A student's timetable is a set of enrolments for their classes
+             */
+            foreach ($timetable as $enrolment) {
+                /* You can use the class id as a watchlist param to specifically
+                 * import this one class. Once we find it, we exit this loop -
+                 * we don't expect it to appear again in the classes index
+                 */
+                if (!(new Watchlist())->isOnWatchlist((string)$enrolment['internal_class_id']['id'], $this->watchlist)) {
+                    continue;
+                }
+
+                $this->processClass($externalId, $enrolment);
+            }
+
+            $i++;
         }
     }
 
