@@ -297,7 +297,7 @@ class Classes implements IStrategy
         /* Fill in these vars as usual
          */
         $classCode = trim((string)$class['class_id']);
-        $day = null;
+        $day = trim((string)$classInstance['day']['name']);
         $detail = null;
 
         /* Arbitrarily manufacture a guid for now, which represents
