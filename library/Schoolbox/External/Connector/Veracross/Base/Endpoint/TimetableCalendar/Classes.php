@@ -217,7 +217,7 @@ class Classes implements IStrategy
         $i = 0;
 
         foreach ($userLookup as $externalId => $user) {
-            if ($i > 50) {
+            if ($i > 25) {
                 break;
             }
 
