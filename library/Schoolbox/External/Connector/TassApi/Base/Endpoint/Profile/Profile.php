@@ -1139,7 +1139,7 @@ class Profile implements IStrategy
             $firstnamePreferred = trim((string)($staff['preferred_name'] ?? null));
 
             $lastname = trim((string)$staff['surname']);
-            $phone = trim((string)$staff['work_phone']);
+            $phone = trim((string)($staff['work_phone'] ?? ''));
             $position = trim((string)($staff['position'] ?? ''));
             $room = '';
             $title = trim((string)$staff['salutation']);
