@@ -36,6 +36,7 @@ class ValidUsesSudsTimetable
         Factory::COMPASS,
         Factory::WONDE,
         Factory::LISS,
+        Factory::VERACROSS
     ];
 
 
