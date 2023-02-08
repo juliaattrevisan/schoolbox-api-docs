@@ -206,8 +206,18 @@ class Classes implements IStrategy
 
         foreach ($classesGenerator as $classPage) {
             foreach ($classPage['data'] as $class) {
-                if ((new Watchlist())->isOnWatchlist($class['id'], $this->watchlist)))
+                /* You can use the class id as a watchlist param to specifically
+                 * import this one class. Once we find it, we exit this loop -
+                 * we don't expect it to appear again in the classes index
+                 */
+                if (!(new Watchlist())->isOnWatchlist((string)$class['id'], $this->watchlist)) {
+                    continue;
+                }
+
+                /* TODO: Temporary inspection
+                 */
                 $this->processClass($compiler->compileClass($class));
+                break;
             }
         }
     }
