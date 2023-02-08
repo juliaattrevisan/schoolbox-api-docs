@@ -1551,10 +1551,13 @@ abstract class Kernel
                     /** @var IConfigLoader $config */
                     $config = $di->get('config');
                     /** @var ProxyServer $proxyServer */
-                    $proxyServer        = $di->get('proxyServer');
-                    $defaultCurlOptions = [CURLOPT_TIMEOUT => GotenbergClient::DEFAULT_WAIT_TIMEOUT];
-                    $httpClient         = new GuzzleHttp\Client(
-                        ['curl' => $defaultCurlOptions + $proxyServer->buildCurlOptions()]
+                    $proxyServer            = $di->get('proxyServer');
+                    $proxyServerCurlOptions = $proxyServer->buildCurlOptions(GotenbergClient::DEFAULT_WAIT_TIMEOUT);
+                    $httpClient             = new GuzzleHttp\Client(
+                        [
+                            'curl'                             => $proxyServerCurlOptions,
+                            GuzzleHttp\RequestOptions::TIMEOUT => GotenbergClient::DEFAULT_WAIT_TIMEOUT,
+                        ]
                     );
 
                     $gotenbergApiKey = $config->get(ConfigMapper::NAME_GOTENBERG_API_KEY);
@@ -1564,8 +1567,8 @@ abstract class Kernel
 
                     $gotenbergApiVersion = filter_var(
                         $config->get(ConfigMapper::NAME_GOTENBERG_API_VERSION),
-                    FILTER_VALIDATE_INT,
-                    FILTER_NULL_ON_FAILURE,
+                        FILTER_VALIDATE_INT,
+                        FILTER_NULL_ON_FAILURE,
                     );
 
                     return new GotenbergClient(
