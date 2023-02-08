@@ -569,12 +569,10 @@ class Profile implements IStrategy
      */
     public function findDate(?string $date): ?Alaress_Date_Format
     {
+        /* These don't have any timezone data, specifically
+         */
         if ($date) {
-            return (new \Alaress_Date_Format(
-                $date,
-                \Alaress_Date_Format::FORMAT_DATETIME_UTC_NO_MLS,
-                new \DateTimeZone('UTC')
-            ))->setTimezone($this->timezone);
+            return (new \Alaress_Date_Format($date, \Alaress_Date_Format::DATABASE_DATE_FORMAT));
         }
 
         return null;
