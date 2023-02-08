@@ -17,7 +17,6 @@ use Schoolbox\Campus;
  */
 class External_Edumate_Timetable extends External_Edumate_Connection implements External_TimetableInterface
 {
-
     /**
      * @var Group $groupHandler
      */
