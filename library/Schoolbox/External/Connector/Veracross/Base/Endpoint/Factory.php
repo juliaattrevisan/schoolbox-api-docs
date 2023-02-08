@@ -279,6 +279,7 @@ class Factory
                     $this->log,
                     $this->perform,
                     $api,
+                    $timezone,
                     $this->baseProfileMapper,
                     $this->studentProfileMapper,
                     $this->parentProfileMapper,

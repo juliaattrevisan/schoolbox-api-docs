@@ -25,6 +25,7 @@ use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Relationship;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\ValueListConverter;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
+use Schoolbox\External\Profile\Mapper;
 use Schoolbox\External\Profile\Model;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
@@ -93,6 +94,12 @@ class Profile implements IStrategy
 
 
     /**
+     * @var \DateTimeZone
+     */
+    private \DateTimeZone $timezone;
+
+
+    /**
      * @var UserProfile\Mapper
      */
     private UserProfile\Mapper $baseProfileMapper;
@@ -138,7 +145,8 @@ class Profile implements IStrategy
      * @param LoggerInterface                 $log
      * @param bool                            $perform
      * @param IApi                            $api
-     * @param UserProfile\Mapper              $baseProfileMapper
+     * @param \DateTimeZone                   $timezone
+     * @param Mapper                          $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
      * @param UserProfile\Staff\Mapper        $staffProfileMapper
@@ -149,6 +157,7 @@ class Profile implements IStrategy
         LoggerInterface $log,
         bool $perform,
         IApi $api,
+        \DateTimeZone $timezone,
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
         UserProfile\Parent\Mapper $parentProfileMapper,
@@ -159,6 +168,7 @@ class Profile implements IStrategy
         $this->log = $log;
         $this->perform = $perform;
         $this->api = $api;
+        $this->timezone = $timezone;
         $this->baseProfileMapper = $baseProfileMapper;
         $this->studentProfileMapper = $studentProfileMapper;
         $this->parentProfileMapper = $parentProfileMapper;
@@ -555,11 +565,16 @@ class Profile implements IStrategy
      *
      * @param string|null $date
      * @return Alaress_Date_Format|null
+     * @throws \InvalidArgumentException
      */
     public function findDate(?string $date): ?Alaress_Date_Format
     {
         if ($date) {
-            return Alaress_Date_Format::newFromTimestamp(strtotime($date));
+            return (new \Alaress_Date_Format(
+                $date,
+                \Alaress_Date_Format::FORMAT_DATETIME_UTC_NO_MLS,
+                new \DateTimeZone('UTC')
+            ))->setTimezone($this->timezone);
         }
 
         return null;
