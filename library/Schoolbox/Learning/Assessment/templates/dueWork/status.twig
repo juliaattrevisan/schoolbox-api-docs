@@ -37,16 +37,6 @@
     {% endif %}
 
     {% if download %}
-<!--
-        <li>
-            <a class="icon-download"
-               id="download-submissions"
-               href="{{ routeLookup('learningAssessment.downloadSubmissions', {
-                   assessmentId: assessment.id,
-                   assessment: assessment
-               }) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Download All</a>
-        </li>
--->
         <li><a class="icon-download" data-mass="publish" data-reveal-id="mass-download">Download All</a></li>
     {% endif %}
 
@@ -298,32 +288,6 @@
  # Massive javascript hulk
  #}
 {% block scripts %}
-    {% autoescape 'js' %}
-    <script type="text/javascript">
-        $(function () {
-            $('#download-submissions').click(function (event) {
-                event.preventDefault();
-                $(this).confirmDialog({
-                    header: 'Download all feedback and submissions?',
-                    format: 'html',
-                    text: `
-                    <p>
-                        Please be aware that your download will take some time
-                        to complete, as we compile the students&rsquo; feedback
-                        and submissions into a ZIP file.
-                    </p>
-                    <p>
-                        Feel free to move away from this page and continue
-                        working: we will send you a notification when the file
-                        is ready to download.
-                    </p>
-                    `,
-                });
-            })
-        });
-    </script>
-    {% endautoescape %}
-
     {% if not readonly %}
         <script type="application/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.bulky.js?v={{ config.site_version }}"></script>
         <div id="mass-publish" class="reveal-modal" data-reveal data-list-id="mass-publish-list" aria-hidden="true"
@@ -591,18 +555,40 @@
                         userSelector: '[data-mass-download]',
                         userList: $userList,
                         onSubmit: function (toSubmit) {
-                            let userIdsString = '';
-                            for (let elem of toSubmit) {
-                                let userId = $(elem).attr('data-action-bar')
-                                userIdsString += '&userIds[]=' + userId;
-                            }
+                            $(this).confirmDialog({
+                                header: 'Download all feedback and submissions?',
+                                format: 'html',
+                                text: `
+                                    <p>
+                                        Please be aware that your download will take some time
+                                        to complete, as we compile the students&rsquo; feedback
+                                        and submissions into a ZIP file.
+                                    </p>
+                                    <p>
+                                        Feel free to move away from this page and continue
+                                        working: we will send you a notification when the file
+                                        is ready to download.
+                                    </p>
+                                    `,
+                                confirmEvent: function () {
+                                    let userIdsString = '';
+                                    for (let elem of toSubmit) {
+                                        let userId = $(elem).attr('data-action-bar')
+                                        userIdsString += '&userIds[]=' + userId;
+                                    }
 
-                            window.location.replace(
-                                "{{ routeLookup('learningAssessment.downloadSubmissions', {
-                                    assessmentId: assessment.id,
-                                    assessment: assessment
-                                }) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" + userIdsString
-                            );
+                                    let url = (
+                                        "{{ routeLookup('learningAssessment.downloadSubmissions', {
+                                            assessmentId: assessment.id,
+                                            assessment: assessment
+                                        }) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" + userIdsString
+                                    );
+
+                                    window.location.replace(url);
+                                },
+                                cancelEvent () {
+                                }
+                            });
                         }
                     });
 
