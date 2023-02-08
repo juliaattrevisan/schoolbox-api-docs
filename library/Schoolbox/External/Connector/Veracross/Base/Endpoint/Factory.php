@@ -172,6 +172,7 @@ class Factory
      * @param bool                                       $perform
      * @param string                                     $host
      * @param string                                     $key
+     * @param array                                      $watchlist
      * @param string                                     $timezone
      * @param Mapper                                     $baseProfileMapper
      * @param UserProfile\Student\Mapper                 $studentProfileMapper
@@ -191,6 +192,7 @@ class Factory
         bool $perform,
         string $host,
         string $key,
+        array $watchlist,
         string $timezone,
         /* Profile pieces */
         UserProfile\Mapper $baseProfileMapper,
@@ -211,6 +213,7 @@ class Factory
         $this->perform = $perform;
         $this->host = $host;
         $this->key = $key;
+        $this->watchlist = $watchlist;
 
         /* Choose a timezone for startAt/finishAt datetimes
          */
@@ -311,6 +314,7 @@ class Factory
                     $this->log,
                     $this->perform,
                     $api,
+                    $this->watchlist,
                     $this->eventMapper,
                     $this->overridesMapper,
                     $this->classEntryMapper,

@@ -15,6 +15,7 @@ use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Factory;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\IApi;
+use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Event\Model;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
@@ -68,6 +69,12 @@ class Classes implements IStrategy
      * @var IApi
      */
     private IApi $api;
+
+
+    /**
+     * @var array
+     */
+    private array $watchlist;
 
 
     /**
@@ -134,6 +141,7 @@ class Classes implements IStrategy
      * @param LoggerInterface                            $log
      * @param bool                                       $perform
      * @param IApi                                       $api
+     * @param array                                      $watchlist
      * @param Mapper                                     $eventMapper
      * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
      * @param ClassEntryMapper                           $classEntryMapper
@@ -146,6 +154,7 @@ class Classes implements IStrategy
         LoggerInterface $log,
         bool $perform,
         IApi $api,
+        array $watchlist,
         \Schoolbox\External\Event\Mapper $eventMapper,
         \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
         ClassEntryMapper $classEntryMapper,
@@ -157,6 +166,7 @@ class Classes implements IStrategy
         $this->log = $log;
         $this->perform = $perform;
         $this->api = $api;
+        $this->watchlist = $watchlist;
         $this->eventMapper = $eventMapper;
         $this->overridesMapper = $overridesMapper;
         $this->classEntryMapper = $classEntryMapper;
@@ -196,6 +206,7 @@ class Classes implements IStrategy
 
         foreach ($classesGenerator as $classPage) {
             foreach ($classPage['data'] as $class) {
+                if ((new Watchlist())->isOnWatchlist($class['id'], $this->watchlist)))
                 $this->processClass($compiler->compileClass($class));
             }
         }
