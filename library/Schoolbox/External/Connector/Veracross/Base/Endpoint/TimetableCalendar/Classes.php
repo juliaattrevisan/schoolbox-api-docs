@@ -211,7 +211,7 @@ class Classes implements IStrategy
         $i = 0;
 
         foreach ($userLookup as $externalId => $user) {
-            if ($i > 9) {
+            if ($i > 99) {
                 break;
             }
 
