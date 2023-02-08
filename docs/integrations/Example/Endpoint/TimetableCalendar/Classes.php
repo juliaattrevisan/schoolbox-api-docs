@@ -269,7 +269,7 @@ class Classes implements IStrategy
             ->setType($type)
             ->setClassification(\Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE)
             ->setGuid($guid)
-            ->setSource(Prepare::EVENT_IMPORT_IDENTIFIER);
+            ->setSource(Factory::SOURCE_NAME);
 
         /* Save it and remember what we saw in case we need to reuse this later
          */

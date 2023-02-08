@@ -17,6 +17,7 @@ use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
+use Schoolbox\External\Profile\Mapper;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\GenericCollection;
 use UnexpectedValueException;
@@ -31,6 +32,13 @@ use UnexpectedValueException;
  */
 class Factory
 {
+    /**
+     * Event source is an arbitrary string that helps identify the thing that imported
+     * them into the local event table so you can do a mass remove if needed
+     */
+    public const SOURCE_NAME = 'suds_example';
+
+
     /**
      * Get timetable classes occurring this far in the past
      * Measured in months, defaults to -1 month
@@ -140,12 +148,13 @@ class Factory
     /**
      * Factory constructor.
      *
+     * @param ValidStrats                                $validStrats
      * @param LoggerInterface                            $log
      * @param bool                                       $perform
      * @param string                                     $host
      * @param string                                     $key
      * @param string                                     $timezone
-     * @param UserProfile\Mapper                         $baseProfileMapper
+     * @param Mapper                                     $baseProfileMapper
      * @param UserProfile\Student\Mapper                 $studentProfileMapper
      * @param UserProfile\Parent\Mapper                  $parentProfileMapper
      * @param UserProfile\Staff\Mapper                   $staffProfileMapper
@@ -229,64 +238,80 @@ class Factory
          */
         $api = null;
 
-        return (new GenericCollection(IStrategy::class))
+        $bus = new GenericCollection(IStrategy::class);
 
-            /* Purge previously-imported profile relationships and classes
-             */
-            ->add(new Profile\Prepare(
-                $this->log,
-                $this->perform,
-                $this->baseProfileMapper,
-                $this->studentProfileMapper,
-                $this->parentProfileMapper,
-                $this->staffProfileMapper,
-                $this->relationshipMapper
-            ))
-            ->add(new Profile\Profile(
-                $this->validStrats,
-                $this->log,
-                $this->perform,
-                $this->baseProfileMapper,
-                $this->studentProfileMapper,
-                $this->parentProfileMapper,
-                $this->staffProfileMapper,
-                $this->relationshipMapper
-            ))
-            ->add(new Profile\Cleanup(
-                $this->log,
-                $this->perform,
-                $this->baseProfileMapper,
-                $this->studentProfileMapper,
-                $this->parentProfileMapper,
-                $this->staffProfileMapper,
-                $this->relationshipMapper
-            ))
-            /* SUDS Timetable Events
-             */
-            ->add(new TimetableCalendar\Prepare(
-                $this->log,
-                $this->perform,
-                $this->eventMapper,
-                $this->classEntryMapper,
-                $this->classInvolvementMapper,
-                $this->classPeriodMapper,
-                $this->periodMapper,
-                $this->overridesMapper
-            ))
-            ->add(new TimetableCalendar\Classes(
-                $this->log,
-                $this->perform,
-                $api,
-                $this->eventMapper,
-                $this->classEntryMapper,
-                $this->classInvolvementMapper,
-                $timezone,
-                $from,
-                $to
-            ))
+        if ($this->validStrats->isProfileStratEnabled()) {
+            $bus
+                /* Purge previously-imported profile relationships and classes
+                 */
+                ->add(new Profile\Prepare(
+                    $this->log,
+                    $this->perform,
+                    $this->baseProfileMapper,
+                    $this->studentProfileMapper,
+                    $this->parentProfileMapper,
+                    $this->staffProfileMapper,
+                    $this->relationshipMapper
+                ))
+                ->add(new Profile\Profile(
+                    $this->validStrats,
+                    $this->log,
+                    $this->perform,
+                    $this->baseProfileMapper,
+                    $this->studentProfileMapper,
+                    $this->parentProfileMapper,
+                    $this->staffProfileMapper,
+                    $this->relationshipMapper
+                ))
+                ->add(new Profile\Cleanup(
+                    $this->log,
+                    $this->perform,
+                    $this->baseProfileMapper,
+                    $this->studentProfileMapper,
+                    $this->parentProfileMapper,
+                    $this->staffProfileMapper,
+                    $this->relationshipMapper
+                ));
+        }
+
+        if ($this->validStrats->isTimetableStratEnabled()) {
+            $bus
+                /* SUDS Timetable Events
+                 */
+                ->add(new TimetableCalendar\Prepare(
+                    $this->log,
+                    $this->perform,
+                    $this->eventMapper,
+                    $this->classEntryMapper,
+                    $this->classInvolvementMapper,
+                    $this->classPeriodMapper,
+                    $this->periodMapper,
+                    $this->overridesMapper
+                ))
+                ->add(new TimetableCalendar\Classes(
+                    $this->log,
+                    $this->perform,
+                    $api,
+                    $this->eventMapper,
+                    $this->classEntryMapper,
+                    $this->classInvolvementMapper,
+                    $timezone,
+                    $from,
+                    $to
+                ))
+                ->add(new TimetableCalendar\Cleanup(
+                    $this->log,
+                    $this->perform,
+                    $this->eventMapper
+                ));
+        }
+
+        $bus
             ->add(new ApiStatistics(
                 $this->log,
                 $api
             ));
+
+        return $bus;
     }
 }
