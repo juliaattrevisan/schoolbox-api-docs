@@ -119,11 +119,15 @@ class PersonCompiler
          * The more you remember, the more you save
          */
         if (isset($this->meetingTimes[$class['id']])) {
-            echo sprintf(
-                "\nNodes: %s.  Recycled accesses: %s.\n\n",
-                \count($this->meetingTimes),
-                ++$this->numRecycledAccesses
-            );
+            /* This helps you get an idea of how many endpoints get recycled
+             * In the sandbox data, roughly 33% are reusable, cutting your latency
+             * to the US by a significant margin
+             */
+//            echo sprintf(
+//                "\nNodes: %s.  Recycled accesses: %s.\n\n",
+//                \count($this->meetingTimes),
+//                ++$this->numRecycledAccesses
+//            );
 
             return $this->meetingTimes[$class['id']];
         }
