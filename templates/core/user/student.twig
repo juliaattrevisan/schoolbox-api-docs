@@ -239,16 +239,16 @@
                                     {% endblock details_tutorTeacher %}
 
                                     {% block details_coordTeacher %}
-                                        {#{% if coordTeacher %}#}
-                                        {#<dt class="no-margin small-6 medium-3">Year Coordinator:</dt>#}
-                                        {#<dd class="no-margin small-6 medium-9">#}
-                                        {#{% if coordTeacher.id %}#}
-                                        {#<a href="{{ session.mailhandle }}{{ coordTeacher.email }}">{{ coordTeacher.formatName }}</a>#}
-                                        {#{% else %}#}
-                                        {#{{ coordTeacher.formatName }}#}
-                                        {#{% endif %}#}
-                                        {#</dd>#}
-                                        {#{% endif %}#}
+                                        {% if coordTeacher %}
+                                        <dt class="no-margin small-6 medium-3">Year Coordinator:</dt>
+                                        <dd class="no-margin small-6 medium-9">
+                                        {% if coordTeacher.id %}
+                                        <a href="{{ session.mailhandle }}{{ coordTeacher.email }}">{{ coordTeacher.formatName }}</a>
+                                        {% else %}
+                                        {{ coordTeacher.formatName }}
+                                        {% endif %}
+                                        </dd>
+                                        {% endif %}
                                     {% endblock details_coordTeacher %}
 
                                     {% block details_house %}
