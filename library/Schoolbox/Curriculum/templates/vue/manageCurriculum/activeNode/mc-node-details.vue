@@ -1,7 +1,6 @@
 <script setup lang="ts">
 /**
- * to view a nodes full breadcrumb trail, its description,
- * and all the places the node is used
+ * to view a nodes description and all the places the node is used
  */
 
 import { computed } from "vue";
