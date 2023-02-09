@@ -26,14 +26,14 @@ const updateNodeStore = useUpdateNodeStore();
 /**
  * to gradually and more marginLeft to indicate node level depth
  *
- * @returns { Number }
+ * @returns { number }
  */
 const marginLeft = computed(() => `calc(${props.depth * 2}rem)`);
 
 /**
  * Store a reference to the ckeditor used for the description
  *
- * @returns { String }
+ * @returns { string }
  */
 const ckeditorInstance = computed(() => `description-${activeNodeStore.node.id}`);
 
@@ -53,7 +53,7 @@ watch(descriptionField, (newValue) => {
  * To instantly notify the user that the node is being updated
  * by updating the button text
  *
- * @returns { String }
+ * @returns { string }
  */
 const updateButtonText = computed(() => (updateNodeStore.isProcessing ? "Updating..." : "Update"));
 
@@ -90,7 +90,7 @@ function onCancelSelected() {
 /**
  * Only enable the button once the conditions are met
  *
- * @returns { Boolean }
+ * @returns { boolean }
  */
 const isUpdateDisabled = computed(() => {
     return updateNodeStore.activeNodeCopy.name.trim().length === 0 || updateNodeStore.isProcessing;
@@ -105,16 +105,16 @@ const isUpdateDisabled = computed(() => {
                 <div class="small-12 columns">
                     <label for="name" class="required">Name</label>
                     <input
-                        type="text"
                         id="name"
                         v-model="updateNodeStore.activeNodeCopy.name"
+                        type="text"
                         maxlength="2048"
                         required
                     />
                 </div>
                 <div class="small-12 columns">
                     <label for="code">Code</label>
-                    <input type="text" id="code" v-model="updateNodeStore.activeNodeCopy.code" maxlength="64" />
+                    <input id="code" v-model="updateNodeStore.activeNodeCopy.code" type="text" maxlength="64" />
                 </div>
                 <div class="small-12 columns">
                     <label for="description">Description</label>
