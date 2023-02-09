@@ -4,10 +4,11 @@
  */
 
 import { computed } from "vue";
-import { useActiveNodeStore } from "./store/mcActiveNodeStore";
-import { useNodeDetailsStore } from "./store/mcNodeDetailsStore";
+import { getTotalUsage } from "@schoolboxCurriculum/js/nodeUtils";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import HorizontalScoller from "@schoolboxVue/components/scroll/horizontal-scoller";
+import { useActiveNodeStore } from "./store/mcActiveNodeStore";
+import { useNodeDetailsStore } from "./store/mcNodeDetailsStore";
 import McNodeDetailsUsage from "./mc-node-details-usage.vue";
 
 interface Props {
@@ -60,7 +61,7 @@ function onRefreshSelected() {
             <fieldset class="content">
                 <div v-html="activeNodeStore.node.description"></div>
                 <div v-if="hasUsage" class="usage-list-container">
-                    <h4>Connected Material ({{ activeNodeStore.node.usageCount }})</h4>
+                    <h4>Connected Material ({{ getTotalUsage(activeNodeStore.node) }})</h4>
                     <horizontal-scoller :has-buttons="false" :height="80" :has-content-change="false">
                         <ul class="usage-list">
                             <mc-node-details-usage

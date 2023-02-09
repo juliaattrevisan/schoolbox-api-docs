@@ -5,6 +5,7 @@
  */
 
 import type { Node } from "@schoolboxCurriculum/types/Node";
+import { getTotalUsage } from "@schoolboxCurriculum/js/nodeUtils";
 import { useNodeDetailsStore } from "../activeNode/store/mcNodeDetailsStore";
 
 interface Props {
@@ -32,6 +33,7 @@ function onViewToggleSelected() {
 
 <template>
     <button
+        v-if="getTotalUsage(props.node) > 0"
         class="usage-counts"
         :title="`View ${props.title}`"
         :disabled="props.isUpdating || props.isAdding"

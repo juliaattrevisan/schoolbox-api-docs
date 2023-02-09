@@ -36,15 +36,15 @@ export type Node = {
  */
 export enum ActivityTypes {
     COURSE = "course",
-    FOLDER = "folder",
     UNIT = "unit",
+    FOLDER = "folder",
 }
 
 /**
  * An activity linked to the node
  */
 export type Usage = {
-    discriminator: ActivityTypes.COURSE | ActivityTypes.FOLDER | ActivityTypes.UNIT;
+    discriminator: ActivityTypes.COURSE | ActivityTypes.UNIT | ActivityTypes.FOLDER;
     object: UsageObject;
 };
 

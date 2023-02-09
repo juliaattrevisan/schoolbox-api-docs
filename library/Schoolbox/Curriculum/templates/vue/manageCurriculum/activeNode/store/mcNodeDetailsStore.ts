@@ -23,7 +23,6 @@ export const useNodeDetailsStore = defineStore("mcNodeDetails", () => {
             if (usageResponse.ok) {
                 const usage = (await usageResponse.json()) as JSON;
                 activeNodeStore.node.usage = usage.data as Usage[];
-                activeNodeStore.node.usageCount = usage.metadata.count as number;
             } else {
                 hasLoadError.value = true;
             }

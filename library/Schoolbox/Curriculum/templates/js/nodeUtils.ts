@@ -156,10 +156,20 @@ export function getBreadcrumbs(node: Node, currentBreadcrumbs: Breadcrumb[]): Br
  * @returns { boolean } - whether theres any usage assigned on the node
  */
 export function hasUsage(node: Node) {
-    if (node._usageCounts.course > 0 || node._usageCounts.folder > 0 || node._usageCounts.course > 0) {
+    if (node._usageCounts.course > 0 || node._usageCounts.unit > 0 || node._usageCounts.folder > 0) {
         return true;
     }
     return false;
+}
+
+/**
+ * Get the total usage linked to all activities
+ *
+ * @param { Node } node - the node to check
+ * @returns { number } - the total count
+ */
+export function getTotalUsage(node: Node) {
+    return node._usageCounts.course + node._usageCounts.unit + node._usageCounts.folder;
 }
 
 /**
@@ -171,8 +181,8 @@ export function hasUsage(node: Node) {
 export function getUsageIcon(usage: Usage) {
     const icons = {
         [ActivityTypes.COURSE]: "icon-course",
-        [ActivityTypes.FOLDER]: "icon-folder",
         [ActivityTypes.UNIT]: "icon-unit",
+        [ActivityTypes.FOLDER]: "icon-folder",
     };
     return icons[usage.discriminator];
 }
@@ -186,8 +196,8 @@ export function getUsageIcon(usage: Usage) {
 export function getUsageHref(usage: Usage) {
     const icons = {
         [ActivityTypes.COURSE]: () => usage.object.folder?._links?.view,
-        [ActivityTypes.FOLDER]: () => usage.object._links.view,
         [ActivityTypes.UNIT]: () => usage.object.folder?._links?.view,
+        [ActivityTypes.FOLDER]: () => usage.object._links.view,
     };
     return icons[usage.discriminator]();
 }
