@@ -14,9 +14,9 @@ use Schoolbox\CampusMapper;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
+use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
-use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\GenericCollection;
 use UnexpectedValueException;
@@ -31,8 +31,6 @@ use UnexpectedValueException;
  */
 class Factory
 {
-
-
     /**
      * Get timetable classes occurring this far in the past
      * Measured in months, defaults to -1 month
@@ -110,24 +108,6 @@ class Factory
 
 
     /**
-     * @var CampusMapper
-     */
-    private CampusMapper $campusMapper;
-
-
-    /**
-     * @var TimetableCycleMapper
-     */
-    private TimetableCycleMapper $timetableCycleMapper;
-
-
-    /**
-     * @var TimetablePeriodMapper
-     */
-    private TimetablePeriodMapper $timetablePeriodMapper;
-
-
-    /**
      * @var ClassEntryMapper
      */
     private ClassEntryMapper $classEntryMapper;
@@ -179,6 +159,7 @@ class Factory
      * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
      */
     public function __construct(
+        ValidStrats $validStrats,
         LoggerInterface $log,
         bool $perform,
         string $host,
@@ -199,6 +180,7 @@ class Factory
         TimetablePeriodMapper $periodMapper,
         \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
     ) {
+        $this->validStrats = $validStrats;
         $this->log = $log;
         $this->perform = $perform;
         $this->host = $host;
@@ -234,12 +216,7 @@ class Factory
      */
     public function produce(): GenericCollection
     {
-        /* Classical Grid: Cache a list of known users and periods
-         * Every student timetable processing uses info stored there
-         */
-        $lookup = new Timetable\Lookup($this->timetablePeriodMapper);
-
-        /* SUDS Timetable Events: Date Range
+        /* Schedule/SUDS Timetable: Date Range
          */
         $from = \Alaress_Date_Format::now()->addMonths(self::FROM);
         $to = \Alaress_Date_Format::now()->addMonths(self::TO);
@@ -266,6 +243,7 @@ class Factory
                 $this->relationshipMapper
             ))
             ->add(new Profile\Profile(
+                $this->validStrats,
                 $this->log,
                 $this->perform,
                 $this->baseProfileMapper,
@@ -282,30 +260,6 @@ class Factory
                 $this->parentProfileMapper,
                 $this->staffProfileMapper,
                 $this->relationshipMapper
-            ))
-            /* Classical timetable grid
-             */
-            ->add(new Timetable\Prepare(
-                $this->log,
-                $this->perform,
-                $this->timetablePeriodMapper,
-                $this->classEntryMapper,
-                $this->classInvolvementMapper,
-                $this->classPeriodMapper
-            ))
-            ->add(new Timetable\Definition(
-                $this->log,
-                $this->perform,
-                $this->timetableCycleMapper,
-                $this->timetablePeriodMapper
-            ))
-            ->add(new Timetable\Classes(
-                $this->log,
-                $this->perform,
-                $lookup,
-                $this->classEntryMapper,
-                $this->classInvolvementMapper,
-                $this->classPeriodMapper
             ))
             /* SUDS Timetable Events
              */
