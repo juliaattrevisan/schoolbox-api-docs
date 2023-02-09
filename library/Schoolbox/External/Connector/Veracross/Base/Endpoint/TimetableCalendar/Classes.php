@@ -40,19 +40,6 @@ class Classes implements IStrategy
 
 
     /**
-     * Prevent infinite loop of api calls
-     */
-    private const MAX_CALLS = 100;
-
-
-    /**
-     * Number of records per page
-     * The maximum is an unwritten 200 or so, apparently
-     */
-    private const NUM_PER_PAGE = 200;
-
-
-    /**
      * @var LoggerInterface
      */
     private LoggerInterface $log;
@@ -180,9 +167,8 @@ class Classes implements IStrategy
 
     /**
      * @return void
-     * @throws \InvalidArgumentException
+     * @throws Exception
      * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
     public function import(): void
@@ -296,7 +282,8 @@ class Classes implements IStrategy
     private function createEvent(
         array $class,
         array $classInstance
-    ): \Schoolbox\External\Event\Model {
+    ): Model
+    {
         /* Fill in these vars as usual
          */
         $classCode = trim((string)$class['class_id']);
@@ -354,15 +341,32 @@ class Classes implements IStrategy
         /* Try to recycle based on guid
          */
         try {
-            $event = $this->eventMapper->findOneByColumn('guid', $guid);
+            $oldEvent = $this->eventMapper->findOneByColumn('guid', $guid);
+
+            $logPrefix = 'Reusing existing';
+
+            $this->log->debug(sprintf(
+                'Found previously existing sis_event instance for guid %s',
+                $guid
+            ));
         } catch (\Schoolbox\Mapper\Exception $e) {
-            $event = $this->eventMapper->createModel();
+            /* Initialise props before trying to access them to avoid fatals like
+             * "$startAt must not be accessed before initialization"
+             */
+            $oldEvent = $this->eventMapper->createModel()
+                ->setStartAt(null)
+                ->setFinishAt(null);
+
+            $logPrefix = 'Creating new';
         }
 
         /* Cram in everything else
-         * TODO Calculate a diff to see if anything changed before saving it
-         *  to minimise transaction size
+         *
+         * Calculate a diff to see if anything changed before saving it
+         * to minimise transaction size
          */
+        $event = clone $oldEvent;
+
         $event
             ->setTitle($title)
             ->setDetail($detail)
@@ -373,14 +377,20 @@ class Classes implements IStrategy
             ->setStartAt($startAt)
             ->setFinishAt($finishAt)
             ->setType($type)
-            ->setClassification(\Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE)
+            ->setClassification(Model::CLASSIFICATION_TIMETABLE)
             ->setGuid($guid)
             ->setSource(Factory::SOURCE_NAME);
+
+        /* Diff. If this is empty, the objects are the same
+         * and we don't need to persist it again to the db
+         */
+        $diff = $this->eventMapper->diff($event, $oldEvent);
 
         /* Save it and remember what we saw in case we need to reuse this later
          */
         $this->log->debug(sprintf(
-            'Creating new timetable event %s - %s, %s, %s-%s',
+            '%s timetable event %s - %s, %s, %s-%s',
+            $logPrefix,
             $event->getTitle(),
             $event->getDay(),
             $event->getPeriod(),
@@ -388,10 +398,9 @@ class Classes implements IStrategy
             $event->getFinishAt()->getDatabase()
         ));
 
-        if ($this->perform) {
-            /* TODO Calculate a diff to see if anything changed before saving it
-             *  to minimise transation size
-             */
+        /* Only persist if it's different than before
+         */
+        if ($this->perform && !empty($diff)) {
             $this->eventMapper->save($event);
         }
 
@@ -402,14 +411,14 @@ class Classes implements IStrategy
     /**
      * Create (or reuse) a ClassEntry corresponding to $event
      *
-     * @param array                           $class
-     * @param \Schoolbox\External\Event\Model $event
+     * @param array $class
+     * @param Model $event
      * @return ClassEntry
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function createClassEntry(array $class, \Schoolbox\External\Event\Model $event): ClassEntry
+    private function createClassEntry(array $class, Model $event): ClassEntry
     {
         if (isset($this->classEntries[$event->getCode()])) {
             $classEntry = $this->classEntries[$event->getCode()];
@@ -442,9 +451,9 @@ class Classes implements IStrategy
      * @throws \UnexpectedValueException
      */
     private function createInvolvements(
-        string $studentExternalId,
-        array $class,
-        \Schoolbox\External\Event\Model $event,
+        string     $studentExternalId,
+        array      $class,
+        Model      $event,
         ClassEntry $classEntry
     ): void {
         /* Save the teacher's involvement
@@ -472,20 +481,20 @@ class Classes implements IStrategy
      * Save staff involvement as an override, which allows each class
      * to have different teachers depending on their associated sis_event
      *
-     * @param \Schoolbox\External\Event\Model $event
-     * @param ClassEntry                      $classEntry
-     * @param string                          $name
-     * @param string                          $externalId
+     * @param Model      $event
+     * @param ClassEntry $classEntry
+     * @param string     $name
+     * @param string     $externalId
      * @return void
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
     private function saveInvolvement(
-        \Schoolbox\External\Event\Model $event,
+        Model      $event,
         ClassEntry $classEntry,
-        string $name,
-        string $externalId
+        string     $name,
+        string     $externalId
     ): void {
         $this->saveEnrolment($event, $classEntry, $name, $externalId);
 
@@ -529,20 +538,20 @@ class Classes implements IStrategy
      * Save an involvement for user $externalId, whose name is $name,
      * for the sis_event $event
      *
-     * @param \Schoolbox\External\Event\Model $event
-     * @param ClassEntry                      $classEntry
-     * @param string                          $name
-     * @param string                          $externalId
+     * @param Model      $event
+     * @param ClassEntry $classEntry
+     * @param string     $name
+     * @param string     $externalId
      * @return void
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
     private function saveEnrolment(
-        \Schoolbox\External\Event\Model $event,
+        Model      $event,
         ClassEntry $classEntry,
-        string $name,
-        string $externalId
+        string     $name,
+        string     $externalId
     ): void {
         if (isset($this->classInvolvements[$classEntry->getId()][$externalId])) {
             $this->log->debug(sprintf(
