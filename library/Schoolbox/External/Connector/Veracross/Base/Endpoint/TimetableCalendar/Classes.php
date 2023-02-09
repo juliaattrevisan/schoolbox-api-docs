@@ -131,7 +131,7 @@ class Classes implements IStrategy
         $i = 0;
 
         foreach ($userLookup as $externalId => $user) {
-            if ($i > 50) {
+            if ($i > 100) {
                 break;
             }
 
@@ -170,7 +170,9 @@ class Classes implements IStrategy
      * @param string $externalId
      * @param array  $enrolment
      * @return void
+     * @throws DebugBarException
      * @throws Exception
+     * @throws \InvalidArgumentException
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
