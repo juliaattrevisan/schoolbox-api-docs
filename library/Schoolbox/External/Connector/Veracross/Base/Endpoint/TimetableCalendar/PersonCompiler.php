@@ -35,10 +35,10 @@ class PersonCompiler
     private array $meetingTimes = [];
 
 
-    /**
-     * @var int
-     */
-    private int $numRecycledAccesses = 0;
+//    /**
+//     * @var int
+//     */
+//    private int $numRecycledAccesses = 0;
 
 
     /**
@@ -147,8 +147,8 @@ class PersonCompiler
          *  ~2016 is the only year with data in the sandbox environment
          */
         $classMeetingTimesGenerator = $this->api->retrieve('GET', $endpoint, $this->scope, [
-            'on_or_after_date' => $startDate ?? date('Y-m-d'),
-            'on_or_before_date' => $endDate ?? date('Y-m-d'),
+            'on_or_after_date' => $startDate,
+            'on_or_before_date' => $endDate,
         ]);
 
         /* Massive performance penalty
