@@ -360,6 +360,8 @@ class Classes implements IStrategy
         }
 
         /* Cram in everything else
+         * TODO Calculate a diff to see if anything changed before saving it
+         *  to minimise transaction size
          */
         $event
             ->setTitle($title)
@@ -387,6 +389,9 @@ class Classes implements IStrategy
         ));
 
         if ($this->perform) {
+            /* TODO Calculate a diff to see if anything changed before saving it
+             *  to minimise transation size
+             */
             $this->eventMapper->save($event);
         }
 
