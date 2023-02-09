@@ -381,11 +381,6 @@ class Classes implements IStrategy
             ->setGuid($guid)
             ->setSource(Factory::SOURCE_NAME);
 
-        /* Diff. If this is empty, the objects are the same
-         * and we don't need to persist it again to the db
-         */
-        $diff = $this->eventMapper->diff($event, $oldEvent);
-
         /* Save it and remember what we saw in case we need to reuse this later
          */
         $this->log->debug(sprintf(
@@ -400,7 +395,9 @@ class Classes implements IStrategy
 
         /* Only persist if it's different than before
          */
-        if ($this->perform && !empty($diff)) {
+        if ($this->perform) {
+            /* EventHandler->save($event, $oldEvent);
+             */
             $this->eventMapper->save($event);
         }
 
