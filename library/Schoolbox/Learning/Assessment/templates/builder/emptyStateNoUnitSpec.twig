@@ -19,14 +19,34 @@ Usage:
             var $convertFeedback = $('[data-relation="save-label"]');
             $convertFeedback.toastActivate({text: 'Converting Folder'+(countFolders > 1 ? 's' : '')+'...'});
 
-            $.post($element[0].href, function(){
-                $convertFeedback.toastTimeout({text: 'Conversion Complete', css: 'success'});
-                reloadComponent();
-            })
-            .fail(function(){
-                $convertFeedback.toastTimeout({text: 'Conversion Failed!', css: 'alert'});
-            });
+            convertFolder($element[0], $convertFeedback);
+            return false;
         });
+
+        /**
+         * async function to post convert folder
+         */
+        async function convertFolder(element, toast) {
+            try {
+                const response = await fetch(element.href, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With' : 'XMLHttpRequest'
+                    }
+                });
+                const responseData = await response.json();
+                if (response.ok) {
+                    toast.toastTimeout({text: 'Conversion Complete', css: 'success'});
+                    reloadComponent();
+                    return responseData;
+                } else {
+                    throw new Error('Conversion Failed!', {cause: responseData});
+                }
+            } catch (error) {
+                console.warn(error);
+                toast.toastTimeout({text: error.message + " " + error.cause.join(' '), css: 'alert'});
+            }
+        }
 
         /**
          * Call after successful conversion to AJAX refresh the component
