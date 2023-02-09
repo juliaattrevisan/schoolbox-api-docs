@@ -33,11 +33,29 @@ const marginLeft = computed(() => `calc(${props.depth * 2}rem)`);
 const hasUsage = computed(() => {
     return activeNodeStore.node.usage && activeNodeStore.node.usage.length > 0;
 });
+
+/**
+ * Reload the page to try loading again
+ */
+function onRefreshSelected() {
+    location.reload();
+}
 </script>
 
 <template>
     <div class="node-container" :style="{ marginLeft: marginLeft }">
         <loading-table v-if="nodeDetailsStore.isProcessing" :rows="2" />
+        <section v-else-if="nodeDetailsStore.hasLoadError">
+            <fieldset class="content">
+                <div class="alert-box alert">
+                    Sorry, we are currently unable to load the Curriculum usage data. Please
+                    <a href="#refresh-page" title="refresh the page" @click.prevent="onRefreshSelected"
+                        >refresh the page</a
+                    >
+                    to try again and contact your support if the problem persists.
+                </div>
+            </fieldset>
+        </section>
         <section v-else>
             <fieldset class="content">
                 <div v-html="activeNodeStore.node.description"></div>

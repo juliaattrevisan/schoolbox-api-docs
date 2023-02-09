@@ -55,6 +55,7 @@ export const useNodeDetailsStore = defineStore("mcNodeDetails", () => {
 
     return {
         isProcessing,
+        hasLoadError,
         isOpen,
         prompt,
         view,
