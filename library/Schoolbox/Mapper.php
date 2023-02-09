@@ -2112,8 +2112,12 @@ abstract class Mapper implements IMapper, Serializable
         $options = array_merge($defaults, $options);
 
         $result_collection = $this->findByColumnList(
-            $columnList,
-            $options
+            $columnList, [
+                'deleted' => true, // We always need to find deleted items here, regardless of what is passed in $options.
+                                   // This is so if $options['deleted'] is false, and no non-deleted items are found,
+                                   // we can return the deleted option below via $e->setDeletedObject().
+                'order' => $options['order']
+            ]
         );
         if ($result_collection->count() === 0) {
             throw new Exception\NotFound();
