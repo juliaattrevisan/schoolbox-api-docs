@@ -262,8 +262,7 @@ class Profile implements IStrategy
 
                 $firstname = trim((string)$student['first_name']);
                 $firstnamePreferred = (new FirstMeaningfulValue())->find([
-                    $student['preferred_name'],
-                    $firstname,
+                    $student['preferred_name']
                 ]);
 
                 $form = '';
@@ -604,7 +603,7 @@ class Profile implements IStrategy
             $firstname = trim((string)$parent['first_name']);
             $firstnamePreferred = (new FirstMeaningfulValue())->find([
                 $parent['preferred_name'],
-                $firstname
+                ''
             ]);
 
             $lastname = trim((string)$parent['last_name']);
@@ -730,8 +729,7 @@ class Profile implements IStrategy
 
                 $firstname = trim((string)$staff['first_name']);
                 $firstnamePreferred = (new FirstMeaningfulValue())->find([
-                    $staff['preferred_name'],
-                    $firstname
+                    $staff['preferred_name']
                 ]);
 
                 $lastname = trim((string)$staff['last_name']);
