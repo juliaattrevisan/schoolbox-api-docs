@@ -76,8 +76,7 @@ class Users
      */
     private function initStaffLookup(): array
     {
-        $userStatement = $this->eventMapper->getDatabase()->query(
-            '
+        $userStatement = $this->eventMapper->getDatabase()->query('
             SELECT external_id, firstname, lastname
             FROM sis_user_profile sup
             INNER JOIN sis_user_profile_staff sups ON sup.id = sups.sis_user_profile_id

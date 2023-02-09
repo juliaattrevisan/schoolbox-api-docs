@@ -8,6 +8,7 @@
 declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Veracross\Base\Endpoint\TimetableCalendar;
+
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\IApi;
 
 /**

@@ -207,8 +207,7 @@ class Classes implements IStrategy
     private function createEvent(
         array $class,
         array $classInstance
-    ): Model
-    {
+    ): Model {
         /* Fill in these vars as usual
          */
         $classCode = trim((string)$class['class_id']);
@@ -371,9 +370,9 @@ class Classes implements IStrategy
      * @throws \UnexpectedValueException
      */
     private function createInvolvements(
-        string     $studentExternalId,
-        array      $class,
-        Model      $event,
+        string $studentExternalId,
+        array $class,
+        Model $event,
         ClassEntry $classEntry
     ): void {
         /* Save the teacher's involvement
@@ -411,10 +410,10 @@ class Classes implements IStrategy
      * @throws \UnexpectedValueException
      */
     private function saveInvolvement(
-        Model      $event,
+        Model $event,
         ClassEntry $classEntry,
-        string     $name,
-        string     $externalId
+        string $name,
+        string $externalId
     ): void {
         $this->saveEnrolment($event, $classEntry, $name, $externalId);
 
@@ -468,10 +467,10 @@ class Classes implements IStrategy
      * @throws \UnexpectedValueException
      */
     private function saveEnrolment(
-        Model      $event,
+        Model $event,
         ClassEntry $classEntry,
-        string     $name,
-        string     $externalId
+        string $name,
+        string $externalId
     ): void {
         if (isset($this->classInvolvements[$classEntry->getId()][$externalId])) {
             $this->log->debug(sprintf(
