@@ -1,13 +1,12 @@
-
-import SpinIn from './spin-in.vue';
+import SpinIn from "./spin-in.vue";
 
 export default {
-    title: 'Animations/Badge Awards/Spin In',
+    title: "Animations/Badge Awards/Spin In",
     component: SpinIn,
     parameters: {
         docs: {
             description: {
-                component: '_Spin In_ badge award animation',
+                component: "_Spin In_ badge award animation",
             },
         },
     },
@@ -15,8 +14,7 @@ export default {
 
 const Template = (args, { argTypes }) => ({
     components: { SpinIn },
-    template:
-        `
+    template: `
         <spin-in />
         `,
 });

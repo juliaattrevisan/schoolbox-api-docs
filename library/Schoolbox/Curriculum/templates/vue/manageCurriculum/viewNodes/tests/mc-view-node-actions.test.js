@@ -1,7 +1,6 @@
-
-import { mount } from '@vue/test-utils';
-import McViewNodeActions from '../mc-view-node-actions';
-import { createTestingPinia } from '@pinia/testing';
+import { mount } from "@vue/test-utils";
+import McViewNodeActions from "../mc-view-node-actions";
+import { createTestingPinia } from "@pinia/testing";
 
 let wrapper; // so we don't need to pass it into every test
 
@@ -13,25 +12,25 @@ beforeEach(() => {
         props: {
             node: {
                 id: 0,
-                name: 'My Node',
-                children: []
+                name: "My Node",
+                children: [],
             },
-            title: 'My Node',
+            title: "My Node",
             isUpdating: false,
             isAdding: false,
             isUpdatingOrAdding: false,
-        }
+        },
     });
 });
 
-test('update button is disabled when prop isAdding is true', async () => {
-    await wrapper.setProps( { isAdding: true } );
-    expect(wrapper.find('[data-test-update]').element).toBeDisabled();
-    expect(wrapper.find('[data-test-add]').element).not.toBeDisabled();
+test("update button is disabled when prop isAdding is true", async () => {
+    await wrapper.setProps({ isAdding: true });
+    expect(wrapper.find("[data-test-update]").element).toBeDisabled();
+    expect(wrapper.find("[data-test-add]").element).not.toBeDisabled();
 });
 
-test('add button is disabled when prop isUpdating is true', async () => {
-    await wrapper.setProps( { isUpdating: true } );
-    expect(wrapper.find('[data-test-update]').element).not.toBeDisabled();
-    expect(wrapper.find('[data-test-add]').element).toBeDisabled();
+test("add button is disabled when prop isUpdating is true", async () => {
+    await wrapper.setProps({ isUpdating: true });
+    expect(wrapper.find("[data-test-update]").element).not.toBeDisabled();
+    expect(wrapper.find("[data-test-add]").element).toBeDisabled();
 });

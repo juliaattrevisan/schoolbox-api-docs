@@ -1,5 +1,4 @@
 (function () {
-
     /**
      * Plugin
      *
@@ -27,7 +26,7 @@
                  * We need to load their js asynchronously, which gives us access to the
                  * object "gapi" that's used everywhere else
                  */
-                url: 'https://apis.google.com/js/api.js',
+                url: "https://apis.google.com/js/api.js",
 
                 /* A list of modules for which to execute the callback provided
                  */
@@ -36,8 +35,7 @@
                 /* A callback to execute when the last of the modules has loaded
                  * This will always occur after gapi.client.init() completes
                  */
-                callback: function () {
-                }
+                callback: function () {},
             };
 
             return $.extend(defaults, options);
@@ -49,8 +47,8 @@
         function setup() {
             $.ajax({
                 url: config.url,
-                dataType: 'script',
-                cache: true
+                dataType: "script",
+                cache: true,
             }).then(function () {
                 let nModulesLoaded = 0;
                 for (let i = 0; i < config.modules.length; ++i) {
@@ -65,5 +63,5 @@
                 }
             });
         }
-    }
-}(jQuery));
+    };
+})(jQuery);

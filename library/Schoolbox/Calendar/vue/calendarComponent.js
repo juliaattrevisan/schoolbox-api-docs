@@ -1,5 +1,5 @@
-import { createApp } from 'vue';
-import CalendarComponent from './calendar-component.vue';
+import { createApp } from "vue";
+import CalendarComponent from "./calendar-component.vue";
 
 const calendars = document.querySelectorAll('[id^="calendar-"]');
 
@@ -13,12 +13,12 @@ calendars.forEach((calendar) => {
      * already encountered by checking the data-loaded attribute and using
      * that as a flag
      */
-    if (!calendar.hasAttribute('data-loaded')) {
+    if (!calendar.hasAttribute("data-loaded")) {
         createApp({
             components: {
-                CalendarComponent
-            }
+                CalendarComponent,
+            },
         }).mount(`#${calendar.id}`);
     }
-    calendar.setAttribute('data-loaded', true);
+    calendar.setAttribute("data-loaded", true);
 });

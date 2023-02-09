@@ -2,35 +2,32 @@
  * Handles the store to remove members from the Manage Group page
  */
 
-import { defineStore } from 'pinia';
-import { useStore } from './manageGroupStore';
-import { useMembersStore } from './mgMembersStore';
-import Endpoints from '../mgEndpoints';
+import { defineStore } from "pinia";
+import { useStore } from "./manageGroupStore";
+import { useMembersStore } from "./mgMembersStore";
+import Endpoints from "../mgEndpoints";
 
-
-export const useRejectMembersStore = defineStore('mgRejectMembers', {
-
+export const useRejectMembersStore = defineStore("mgRejectMembers", {
     state: () => ({
         isProcessing: false,
         isSelectedProcessing: false, //need to distinguish between processing a single member via rejectMember() and rejectSelectedMembers()
     }),
 
     actions: {
-
         /**
          * reject the single member
          *
          * @param { Object }
          */
-        async rejectMember (member) {
+        async rejectMember(member) {
             this.isProcessing = true;
             const store = useStore();
             store.isProcessing = true;
             try {
                 const response = await fetch(Endpoints.REMOVE_MEMBERS, {
-                    method: 'DELETE',
+                    method: "DELETE",
                     headers: {
-                        'Content-Type': 'application/json',
+                        "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
                         groupId: store.id,
@@ -54,15 +51,15 @@ export const useRejectMembersStore = defineStore('mgRejectMembers', {
         /**
          * reject the selected members
          */
-        async rejectSelectedMembers () {
+        async rejectSelectedMembers() {
             this.isSelectedProcessing = true;
             const store = useStore();
             store.isProcessing = true;
             try {
                 const response = await fetch(Endpoints.REMOVE_MEMBERS, {
-                    method: 'DELETE',
+                    method: "DELETE",
                     headers: {
-                        'Content-Type': 'application/json',
+                        "Content-Type": "application/json",
                     },
                     body: getFormData(),
                 });
@@ -79,22 +76,20 @@ export const useRejectMembersStore = defineStore('mgRejectMembers', {
                 store.isProcessing = false;
             }
         },
-
     },
-
-})
+});
 
 /**
  * Set up a deleted users array to POST
  *
  * @returns { FormData }
  */
-function getFormData () {
+function getFormData() {
     const store = useStore();
     const membersStore = useMembersStore();
-    const membersToRejectIdList = membersStore.selectedMembers.map(row => row.id);
+    const membersToRejectIdList = membersStore.selectedMembers.map((row) => row.id);
     return JSON.stringify({
         groupId: store.id,
-        members: membersToRejectIdList
+        members: membersToRejectIdList,
     });
 }

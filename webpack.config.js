@@ -1,6 +1,6 @@
 const path = require("path");
 const webpack = require("webpack");
-const {VueLoaderPlugin} = require("vue-loader");
+const { VueLoaderPlugin } = require("vue-loader");
 const RemoveEmptyScriptsPlugin = require("webpack-remove-empty-scripts"); //https://www.npmjs.com/package/webpack-remove-empty-scripts
 const { styles } = require("@ckeditor/ckeditor5-dev-utils");
 
@@ -10,28 +10,21 @@ const babelOptions = {
             "@babel/preset-env",
             {
                 targets: {
-                    browsers: [
-                        ">0.25%",
-                        "not dead",
-                        "not op_mini all",
-                        "not ie 11"
-                    ],
+                    browsers: [">0.25%", "not dead", "not op_mini all", "not ie 11"],
                 },
                 useBuiltIns: "usage",
-                corejs: 3
-            }
-        ]
+                corejs: 3,
+            },
+        ],
     ],
-    plugins: [
-        "@babel/plugin-proposal-optional-chaining",
-    ]
-}
+    plugins: ["@babel/plugin-proposal-optional-chaining"],
+};
 
 module.exports = {
-    entry: { // https://webpack.js.org/configuration/entry-context/
+    entry: {
+        // https://webpack.js.org/configuration/entry-context/
 
         main: [
-
             // jQuery
             "./node_modules/jquery/dist/jquery.js",
 
@@ -142,13 +135,13 @@ module.exports = {
 
             "./www/static/js/calendar/jquery.getExportCalendarLink.js",
 
-            "./www/static/js/global/sb_props.js"
+            "./www/static/js/global/sb_props.js",
         ],
         spectrum: {
             import: [
                 "./node_modules/spectrum-colorpicker/spectrum.js", // Colour handling
             ],
-            dependOn: "main" //ensures jQuery is loaded prior
+            dependOn: "main", //ensures jQuery is loaded prior
         },
         masonry: {
             import: [
@@ -159,20 +152,18 @@ module.exports = {
                 "./www/static/js/masonry/jquery.masonry.js",
                 "./www/static/js/masonry/jquery.masonry.spectrum.js",
             ],
-            dependOn: "main" // ensures jQuery is loaded prior
+            dependOn: "main", // ensures jQuery is loaded prior
         },
         mage: {
-            import: [
-                "./www/static/js/form/jquery.mage.js",
-            ],
-            dependOn: "main" // ensures jQuery is loaded prior
+            import: ["./www/static/js/form/jquery.mage.js"],
+            dependOn: "main", // ensures jQuery is loaded prior
         },
         dataTables: {
             import: [
                 "./node_modules/datatables.net/js/jquery.dataTables.js",
                 "./node_modules/datatables.net-fixedcolumns/js/dataTables.fixedColumns.js",
             ],
-            dependOn: "main" // ensures jQuery is loaded prior
+            dependOn: "main", // ensures jQuery is loaded prior
         },
 
         // Libraries
@@ -190,7 +181,8 @@ module.exports = {
         assessmentCalendar: "./library/Schoolbox/Learning/Assessment/Calendar/vue/assessmentCalendar.js",
         upcomingDueWorkCalendar: "./library/Schoolbox/Learning/Upcoming/vue/upcomingDueWorkCalendar.js",
         resourceBookingItemCalendar: "./library/Schoolbox/ResourceBooking/Item/vue/resourceBookingItemCalendar.js",
-        resourceBookingCategoryCalendar: "./library/Schoolbox/ResourceBooking/Category/vue/resourceBookingCategoryCalendar.js",
+        resourceBookingCategoryCalendar:
+            "./library/Schoolbox/ResourceBooking/Category/vue/resourceBookingCategoryCalendar.js",
         calendarComponent: "./library/Schoolbox/Calendar/vue/calendarComponent.js",
         calendarEventDetails: "./library/Schoolbox/Calendar/Event/templates/vue/calendarEventDetails.js",
 
@@ -205,7 +197,8 @@ module.exports = {
         newsRssLink: "./library/Schoolbox/Comms/News/vue/newsRssLink.js",
 
         // Learning
-        learningMomentsEvidenceDetail: "./library/Schoolbox/Learning/Moment/Evidence/vue/learningMomentsEvidenceDetail.js",
+        learningMomentsEvidenceDetail:
+            "./library/Schoolbox/Learning/Moment/Evidence/vue/learningMomentsEvidenceDetail.js",
         userProfileFeeds: "./library/Schoolbox/Learning/vue/user-profile/userProfileFeeds.js",
         badgeList: "./library/Schoolbox/Learning/Badge/vue/badgeList.js",
         badgeListForm: "./library/Schoolbox/Learning/Badge/Award/vue/badgeListForm.js",
@@ -213,7 +206,8 @@ module.exports = {
         awardWithEvidenceBadgeList: "./library/Schoolbox/Learning/Badge/Award/vue/awardWithEvidenceBadgeList.js",
         evidenceMediaRecording: "./library/Schoolbox/Learning/Moment/Evidence/vue/evidenceMediaRecording.js",
         checkShareWorkButtons: "./library/Schoolbox/Learning/Moment/Evidence/templates/js/checkShareWorkButtons.js",
-        similarityReport: "./library/Schoolbox/Learning/Assessment/templates/dueWork/vue/similarityReport/similarityReport.js",
+        similarityReport:
+            "./library/Schoolbox/Learning/Assessment/templates/dueWork/vue/similarityReport/similarityReport.js",
 
         // Textboxes
         textboxList: "./library/Schoolbox/Resource/Textbox/vue/textboxList.js",
@@ -222,7 +216,7 @@ module.exports = {
         adminGrades: "./library/Schoolbox/Admin/Grades/vue/adminGrades.js",
         adminSettingsSearch: "./library/Schoolbox/Admin/Navigation/vue/adminSettingsSearch.js",
         staleUsersReport: "./library/Schoolbox/Admin/User/vue/staleUsersReports/staleUsersReport.js",
-        userBulkModify:  "./library/Schoolbox/Admin/User/vue/userBulkModify/userBulkModify.js",
+        userBulkModify: "./library/Schoolbox/Admin/User/vue/userBulkModify/userBulkModify.js",
         adminList: "./library/Schoolbox/Admin/Lists/templates/vue/adminList.js",
         saveAdminSettings: "./library/Schoolbox/Admin/Navigation/vue/saveAdminSettings.js",
         shapsList: "./library/Schoolbox/Admin/SHAPS/vue/shapsList.js",
@@ -282,9 +276,10 @@ module.exports = {
     output: {
         path: path.resolve(__dirname, "www/static/js/bundle"),
         publicPath: "/static/js/bundle/",
-        filename: "[name].js"
+        filename: "[name].js",
     },
-    module: { // https://webpack.js.org/configuration/module/
+    module: {
+        // https://webpack.js.org/configuration/module/
         rules: [
             {
                 test: require.resolve("jquery"),
@@ -292,7 +287,7 @@ module.exports = {
                 options: {
                     exposes: [
                         { globalName: "$", override: true },
-                        { globalName: "jQuery", override: true }
+                        { globalName: "jQuery", override: true },
                     ],
                 },
             },
@@ -300,28 +295,28 @@ module.exports = {
                 test: require.resolve("dropzone"),
                 loader: "expose-loader",
                 options: {
-                    exposes: { globalName: "Dropzone", override: true }
+                    exposes: { globalName: "Dropzone", moduleLocalName: "Dropzone", override: true }
                 },
             },
             {
                 test: require.resolve("dayjs"),
                 loader: "expose-loader",
                 options: {
-                    exposes: { globalName: "dayjs", override: true }
+                    exposes: { globalName: "dayjs", override: true },
                 },
             },
             {
                 test: require.resolve("intro.js"),
                 loader: "expose-loader",
                 options: {
-                    exposes: { globalName: "IntroJs", moduleLocalName: "introJs", override: true }
+                    exposes: { globalName: "IntroJs", moduleLocalName: "introJs", override: true },
                 },
             },
             {
                 test: require.resolve("highcharts"),
                 loader: "expose-loader",
                 options: {
-                    exposes: { globalName: "Highcharts", override: true }
+                    exposes: { globalName: "Highcharts", override: true },
                 },
             },
             {
@@ -345,9 +340,9 @@ module.exports = {
                         options: {
                             appendTsSuffixTo: [/\.vue$/],
                             transpileOnly: true,
-                        }
-                    }
-                ]
+                        },
+                    },
+                ],
             },
             {
                 test: /\.vue$/,
@@ -356,8 +351,8 @@ module.exports = {
                     appendTsSuffixTo: [/\.vue$/],
                     compilerOptions: {
                         whitespace: "preserve",
-                    }
-                }
+                    },
+                },
             },
             {
                 test: /\.css$/,
@@ -368,10 +363,10 @@ module.exports = {
                         loader: "style-loader",
                         options: {
                             esModule: false, // enforce CommonJS instead https://www.npmjs.com/package/style-loader#esmodule
-                        }
+                        },
                     },
                     { loader: "css-loader" },
-                ]
+                ],
             },
             {
                 test: /ckeditor5-[^/\\]+[/\\]theme[/\\].+\.css$/,
@@ -381,27 +376,28 @@ module.exports = {
                         options: {
                             injectType: "singletonStyleTag", // applies all styles within in <style> tag
                             attributes: {
-                                "data-cke": true // adds data-cke attribute to the <style> tag
-                            }
-                        }
+                                "data-cke": true, // adds data-cke attribute to the <style> tag
+                            },
+                        },
                     },
                     "css-loader",
                     {
                         loader: "postcss-loader",
                         options: {
-                            postcssOptions: styles.getPostCssConfig( {
+                            postcssOptions: styles.getPostCssConfig({
                                 themeImporter: {
-                                    themePath: require.resolve("@ckeditor/ckeditor5-theme-lark")
+                                    themePath: require.resolve("@ckeditor/ckeditor5-theme-lark"),
                                 },
-                                minify: true
-                            } )
-                        }
-                    }
-                ]
+                                minify: true,
+                            }),
+                        },
+                    },
+                ],
             },
             {
                 test: /\.scss$/,
-                oneOf: [ // this allows us to only perform the below on vue files, then other scss files follow the following
+                oneOf: [
+                    // this allows us to only perform the below on vue files, then other scss files follow the following
                     {
                         resourceQuery: /^\?vue/,
                         use: [
@@ -410,10 +406,10 @@ module.exports = {
                                 loader: "css-loader",
                                 options: {
                                     url: false, // don't validate image urls as they error, so we trust rely on checking in browser
-                                }
+                                },
                             },
                             { loader: "sass-loader" },
-                        ]
+                        ],
                     },
                     {
                         use: [
@@ -421,16 +417,16 @@ module.exports = {
                                 loader: "file-loader", // to emit the css `main` and `editor` into the /core directory
                                 options: {
                                     name: "[name].css",
-                                    outputPath: "../../css/core/"
-                                }
+                                    outputPath: "../../css/core/",
+                                },
                             },
                             { loader: "extract-loader" },
                             {
                                 loader: "css-loader",
                                 options: {
                                     url: false, // don't validate image urls as they error, so we just rely on checking in browser
-                                    modules: false // disable css modules for all files: https://github.com/css-modules/css-modules
-                                }
+                                    modules: false, // disable css modules for all files: https://github.com/css-modules/css-modules
+                                },
                             },
                             {
                                 loader: "sass-loader", // to load the sass and export it to css
@@ -440,34 +436,40 @@ module.exports = {
                                         includePaths: ["../../css/core/"], // where our base css file is loaded
                                     },
                                 },
-                            }
-                        ]
-                    }
-                ]
+                            },
+                        ],
+                    },
+                ],
             },
             {
                 test: /ckeditor5-[^/\\]+[/\\]theme[/\\]icons[/\\][^/\\]+\.svg$/,
-                use: ["raw-loader"]
+                use: ["raw-loader"],
             },
-        ]
+        ],
     },
     cache: true,
-    resolve: { // https://webpack.js.org/configuration/resolve/
+    resolve: {
+        // https://webpack.js.org/configuration/resolve/
         alias: {
-            "vue$": "vue/dist/vue.esm-bundler.js",
+            vue$: "vue/dist/vue.esm-bundler.js",
             "@schoolboxLibrary": path.resolve(__dirname, "library/Schoolbox"),
             "@schoolboxCalendarEvent": path.resolve(__dirname, "library/Schoolbox/Calendar/Event/templates/vue"),
             "@schoolboxCommsNews": path.resolve(__dirname, "library/Schoolbox/Comms/News"),
-            "@schoolboxLearningMomentEvidence": path.resolve(__dirname, "library/Schoolbox/Learning/Moment/Evidence/vue"),
+            "@schoolboxLearningMomentEvidence": path.resolve(
+                __dirname,
+                "library/Schoolbox/Learning/Moment/Evidence/vue"
+            ),
             "@schoolboxCurriculum": path.resolve(__dirname, "library/Schoolbox/Curriculum/templates/"),
             "@schoolboxVue": path.resolve(__dirname, "vue"),
             "@js": path.resolve(__dirname, "www/static/js"),
             "@css": path.resolve(__dirname, "www/static/css"),
         },
-        extensions: ["*", ".js", ".vue", ".json", ".ts"]
+        extensions: ["*", ".js", ".vue", ".json", ".ts"],
     },
-    plugins: [ // https://webpack.js.org/configuration/plugins/
-        new webpack.DefinePlugin({ // to enable bundler feature flags, to enable build when compiling in production:
+    plugins: [
+        // https://webpack.js.org/configuration/plugins/
+        new webpack.DefinePlugin({
+            // to enable bundler feature flags, to enable build when compiling in production:
             __VUE_OPTIONS_API__: true,
             __VUE_PROD_DEVTOOLS__: false,
         }),

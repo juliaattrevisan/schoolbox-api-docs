@@ -1,14 +1,14 @@
-import { createApp, markRaw } from 'vue';
-import SimilarityReport from './similarity-report';
-import SimilarityReportNoResults from './similarity-report-no-results';
-import { ClientTable } from 'v-tables-3-select-rows';
+import { createApp, markRaw } from "vue";
+import SimilarityReport from "./similarity-report";
+import SimilarityReportNoResults from "./similarity-report-no-results";
+import { ClientTable } from "v-tables-3-select-rows";
 
 const app = createApp({
     components: {
-        SimilarityReport
-    }
+        SimilarityReport,
+    },
 });
-app.use(ClientTable, {}, 'bootstrap3', {
-    noResultsRow: markRaw(SimilarityReportNoResults) //use a custom template for no results to add in reset filter button: https://matanya.gitbook.io/vue-tables-2/custom-template
+app.use(ClientTable, {}, "bootstrap3", {
+    noResultsRow: markRaw(SimilarityReportNoResults), //use a custom template for no results to add in reset filter button: https://matanya.gitbook.io/vue-tables-2/custom-template
 });
-app.mount('#similarity-report-container');
+app.mount("#similarity-report-container");

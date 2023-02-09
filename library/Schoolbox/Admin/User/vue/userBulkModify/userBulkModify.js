@@ -1,9 +1,11 @@
-import { createApp } from 'vue';
-import UserBulkModify from './user-bulk-modify';
-import { ClientTable } from 'v-tables-3-select-rows';
+import { createApp } from "vue";
+import UserBulkModify from "./user-bulk-modify";
+import { ClientTable } from "v-tables-3-select-rows";
 
 createApp({
     components: {
-        UserBulkModify
-    }
-}).use(ClientTable).mount('#user-bulk-modify-container');
+        UserBulkModify,
+    },
+})
+    .use(ClientTable)
+    .mount("#user-bulk-modify-container");

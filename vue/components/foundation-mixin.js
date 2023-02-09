@@ -6,7 +6,7 @@ export default {
      * Get access to jquery
      */
     computed: {
-        jQuery: () => window.jQuery
+        jQuery: () => window.jQuery,
     },
 
     /**
@@ -23,11 +23,9 @@ export default {
      * see https://get.foundation/sites/docs-v5/javascript.html#adding-new-content-after-page-load
      */
     updated() {
-        Foundation.global.namespace = '';
+        Foundation.global.namespace = "";
         this.$nextTick(() => {
-            this.jQuery(document)
-                .foundation('dropdown', 'reflow')
-                .foundation('equalizer', 'reflow');
+            this.jQuery(document).foundation("dropdown", "reflow").foundation("equalizer", "reflow");
         });
     },
-}
+};

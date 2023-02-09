@@ -11,13 +11,13 @@
  *
  * @return { string }
  */
-export function generateAwardWithEvidenceUrl (selectedUserIds, selectedBadgeIds) {
+export function generateAwardWithEvidenceUrl(selectedUserIds, selectedBadgeIds) {
     const evidenceUrl = `/learning/badge/award/user/${selectedUserIds}/award`;
     const emptyQueryString = {};
-    emptyQueryString['badges'] = selectedBadgeIds;
+    emptyQueryString["badges"] = selectedBadgeIds;
     const url = new URL(window.location.href);
-    if (url.searchParams.get('returnUrl') !== null) {
-        emptyQueryString['returnUrl'] = url.searchParams.get('returnUrl');
+    if (url.searchParams.get("returnUrl") !== null) {
+        emptyQueryString["returnUrl"] = url.searchParams.get("returnUrl");
     }
     return evidenceUrl + "?" + new URLSearchParams(emptyQueryString).toString();
 }

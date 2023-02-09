@@ -2,39 +2,36 @@
  * Handles the store to disband the group
  */
 
-import { defineStore } from 'pinia';
-import { useStore } from './manageGroupStore'
-import Endpoints from '../mgEndpoints';
+import { defineStore } from "pinia";
+import { useStore } from "./manageGroupStore";
+import Endpoints from "../mgEndpoints";
 
-
-export const useDisbandStore = defineStore('mgDisband', {
-
+export const useDisbandStore = defineStore("mgDisband", {
     state: () => ({
         isProcessing: false,
         isPromptOpen: false, //to notify that the prompt is opened / closed
     }),
 
     actions: {
-
         /**
          * to display a prompt to confirm member removal
          */
-        promptDisbandGroup () {
+        promptDisbandGroup() {
             this.isPromptOpen = true;
         },
 
         /**
          * member removal has been confirmed so pull them out
          */
-        async disbandGroup () {
+        async disbandGroup() {
             this.isProcessing = true;
             const store = useStore();
             store.isProcessing = true;
             try {
                 const response = await fetch(Endpoints.DISBAND_GROUP, {
-                    method: 'POST',
+                    method: "POST",
                     headers: {
-                        'Content-Type': 'application/json',
+                        "Content-Type": "application/json",
                     },
                     body: getFormData(),
                 });
@@ -52,22 +49,20 @@ export const useDisbandStore = defineStore('mgDisband', {
         /**
          * to hide the confirmation prompt
          */
-        cancelDisbandGroup () {
+        cancelDisbandGroup() {
             this.isPromptOpen = false;
         },
-
     },
-
-})
+});
 
 /**
  * Pass through the group id
  *
  * @returns { FormData }
  */
-function getFormData () {
+function getFormData() {
     const store = useStore();
     return JSON.stringify({
-        groupId: store.id
+        groupId: store.id,
     });
 }

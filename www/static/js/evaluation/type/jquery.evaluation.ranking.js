@@ -1,11 +1,10 @@
-(function($) {
-
+(function ($) {
     /**
      * Constructor
      *
      * @param options
      */
-    $.fn.evaluationRanking = function(options) {
+    $.fn.evaluationRanking = function (options) {
         var config = init(options);
 
         initChange();
@@ -13,8 +12,8 @@
         // Set up equalization
         $(config.questionForm).foundation({
             equalizer: {
-                equalize_on_stack: true
-            }
+                equalize_on_stack: true,
+            },
         });
 
         /**
@@ -25,33 +24,33 @@
          */
         function init(options) {
             var defaults = {
-                id: 0
-            }
+                id: 0,
+            };
 
             var derived = {
-                questionForm: $('#questionForm-' + options.id)
-            }
+                questionForm: $("#questionForm-" + options.id),
+            };
 
-            return $.extend(true,defaults, derived, options);
+            return $.extend(true, defaults, derived, options);
         }
 
         /**
          * Save response upon change
          */
         function initChange() {
-            var rightList = $(config.questionForm).find('[data-answer-list]');
+            var rightList = $(config.questionForm).find("[data-answer-list]");
             //rightList.disableSelection();
             rightList.sortable({
-                placeholder:          "sortable-placeholder",
+                placeholder: "sortable-placeholder",
                 forcePlaceholderSize: true,
-                handle:               '.grip',
-                axis:                 'y',
-                stop: function() {
+                handle: ".grip",
+                axis: "y",
+                stop: function () {
                     $.fn.evaluationRanking.saveOne(config.questionForm);
-                }
-            })
+                },
+            });
         }
-    }
+    };
 
     /**
      * Save individual form contents
@@ -59,22 +58,22 @@
      * @param element
      * @returns jqXHR
      */
-    $.fn.evaluationRanking.saveOne = function(element) {
+    $.fn.evaluationRanking.saveOne = function (element) {
         return $.ajax({
-            type: 'post',
-            url: $(element).attr('action'),
+            type: "post",
+            url: $(element).attr("action"),
             data: $(element).serialize(),
             /* Callback on success
              */
-            success: function(responseText) {
-                var result = new Function('return ' + responseText);
+            success: function (responseText) {
+                var result = new Function("return " + responseText);
 
                 $.fn.evaluationPercentageComplete({
-                    result: result()
+                    result: result(),
                 });
-            }
+            },
         });
-    }
+    };
 
     /**
      * Decide what the validation rules are for this particular
@@ -84,6 +83,5 @@
      *
      * @returns {{element: string, rules: {required: boolean, minlength: number}, errorContainer: string}}
      */
-    $.fn.evaluationRanking.getValidationRules = function() {
-    }
-}(jQuery));
+    $.fn.evaluationRanking.getValidationRules = function () {};
+})(jQuery);

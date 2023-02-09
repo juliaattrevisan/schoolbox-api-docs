@@ -216,14 +216,18 @@ export default {
         async deleteBadge() {
             this.$refs.toast.activate("Deleting badge...");
             try {
-                const response = await fetch(this.currentBadge._links.delete, {
-                    method: "DELETE",
-                });
-                //this is to prevent 'Fetch failed loading' in the console, as nothing is returned and Fetch currently doesn't like that with DELETE
-                await response.text();
-                this.data = this.data.filter((badge) => badge.id !== this.currentBadge.id);
-                this.metadata.count -= 1;
-                this.$refs.toast.timeout("Badge successfully deleted", true);
+                const response     = await fetch(this.currentBadge._links.delete, {method: 'DELETE'});
+                const responseText = await response.text();
+
+                // The expected response is blank, with a HTTP status code in the 'success' range (200-299).
+                // Any other response is treated as an error.
+                if (response.ok && responseText === '') {
+                    this.data = this.data.filter((badge) => badge.id !== this.currentBadge.id);
+                    this.metadata.count -= 1;
+                    this.$refs.toast.timeout('Badge successfully deleted', true);
+                } else {
+                    this.$refs.toast.timeout('Failed to delete badge', false);
+                }
             } catch (error) {
                 console.warn(error);
                 this.$refs.toast.timeout("Failed to delete badge", false);

@@ -2,24 +2,21 @@
  * Manages the currently selected nodes relevant to the curent modal session
  */
 
-import { defineStore } from 'pinia';
-import { useSelectedNodesStore } from './csSelectedNodesStore';
-
+import { defineStore } from "pinia";
+import { useSelectedNodesStore } from "./csSelectedNodesStore";
 
 export const useModalSelectedNodesStore = defineStore(`csModalSelectedNodes`, {
-
     state: () => ({
         nodes: [], //the currently selected nodes in the current modal session, with any previously selected also considered
     }),
 
     getters: {
-
         /**
          * Do we have any selected nodes?
          *
          * @return { Boolean }
          */
-        hasNoNodes () {
+        hasNoNodes() {
             return this.nodes.length === 0;
         },
 
@@ -28,18 +25,16 @@ export const useModalSelectedNodesStore = defineStore(`csModalSelectedNodes`, {
          *
          * @return { array }
          */
-        nodesIds () {
+        nodesIds() {
             return this.nodes.map((node) => node.id);
         },
-
     },
 
     actions: {
-
         /**
          * populate with the currently selected nodes
          */
-        refresh () {
+        refresh() {
             this.nodes = useSelectedNodesStore().nodes; //ensure current selections are reflected in the new modal session
         },
 
@@ -48,8 +43,8 @@ export const useModalSelectedNodesStore = defineStore(`csModalSelectedNodes`, {
          *
          * @param { Object }
          */
-        add (nodeToAdd) {
-            this.nodes  = [...this.nodes, nodeToAdd];
+        add(nodeToAdd) {
+            this.nodes = [...this.nodes, nodeToAdd];
         },
 
         /**
@@ -57,7 +52,7 @@ export const useModalSelectedNodesStore = defineStore(`csModalSelectedNodes`, {
          *
          * @param { Object }
          */
-        remove (nodeToRemove) {
+        remove(nodeToRemove) {
             this.nodes = this.nodes.filter((node) => node.id !== nodeToRemove.id);
         },
 
@@ -68,7 +63,7 @@ export const useModalSelectedNodesStore = defineStore(`csModalSelectedNodes`, {
          *
          * @returns { boolean }
          */
-        isSelected (node) {
+        isSelected(node) {
             return this.nodesIds.includes(node.id);
         },
 
@@ -78,24 +73,22 @@ export const useModalSelectedNodesStore = defineStore(`csModalSelectedNodes`, {
          * @param { object }
          * @param { boolean }
          */
-        switch (node, isChecked) {
+        switch(node, isChecked) {
             isChecked ? this.add(node) : this.remove(node);
         },
 
         /**
          * clear all the currently selected nodes
          */
-        empty () {
+        empty() {
             this.nodes.forEach((node) => this.remove(node));
         },
 
         /**
          * update the currently selected with the latest modal session
          */
-        update () {
+        update() {
             useSelectedNodesStore().update(this.nodes);
         },
-
     },
-
-})
+});

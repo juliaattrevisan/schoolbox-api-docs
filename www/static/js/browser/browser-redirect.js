@@ -3,5 +3,5 @@
  * No IE versions are supported: `"ActiveXObject" in window` ought to detect IE
  */
 if ("ActiveXObject" in window) {
-    window.location.href = '/upgrade.php';
+    window.location.href = "/upgrade.php";
 }

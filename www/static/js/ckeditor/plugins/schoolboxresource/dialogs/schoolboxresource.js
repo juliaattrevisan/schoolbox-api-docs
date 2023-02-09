@@ -564,7 +564,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                                      */
                                     $.fn.schoolboxResource({
                                         allowedFilesystems: 'files',
-                                        allowedFiles: 'image/*,audio/*,video/*',
+                                        allowedFiles: 'image/*,audio/*,video/*,.heic,.heics,.heif',
                                         previousModal: previousModal,
                                         useFolder: false,
                                         defaultFolderSelector: defaultFolderSelector

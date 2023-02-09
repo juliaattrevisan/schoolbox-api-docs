@@ -1,4 +1,4 @@
-(function() {
+(function () {
     /**
      * Method for exporting a calendar link.
      *
@@ -7,13 +7,12 @@
      *
      * @return string
      */
-    $.fn.getExportCalendarLink = function(token, values) {
-
+    $.fn.getExportCalendarLink = function (token, values) {
         // If from serializeArray: convert to object
         if ($.isArray(values)) {
             var new_values = {};
 
-            $.each(values, function(k,v) {
+            $.each(values, function (k, v) {
                 new_values[v.name] = v.value;
             });
 
@@ -24,14 +23,14 @@
         values.token = token;
 
         // remove unused fields
-        if (values['export'] !== 'group') {
+        if (values["export"] !== "group") {
             delete values.group;
         }
 
-        if (values['export'] !== 'campus') {
+        if (values["export"] !== "campus") {
             delete values.campus;
         }
 
-        return window.location.protocol+'//'+window.location.host+'/calendar/export.php?'+$.param(values);
+        return window.location.protocol + "//" + window.location.host + "/calendar/export.php?" + $.param(values);
     };
-}(jQuery));
+})(jQuery);

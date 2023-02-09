@@ -1,10 +1,9 @@
-
 (function (win, doc, nav, params, namespace, undefined) {
-    'use strict';
+    "use strict";
 
     var util = {
         keycode: {
-            ESCAPE: 27
+            ESCAPE: 27,
         },
         getRequest: function () {
             if (win.XDomainRequest) {
@@ -16,13 +15,17 @@
             return null;
         },
         loadScript: function (src, parent, callback) {
-            var script = doc.createElement('script');
+            var script = doc.createElement("script");
             script.src = src;
 
-            script.addEventListener('load', function onLoad() {
-                this.removeEventListener('load', onLoad, false);
-                callback();
-            }, false);
+            script.addEventListener(
+                "load",
+                function onLoad() {
+                    this.removeEventListener("load", onLoad, false);
+                    callback();
+                },
+                false
+            );
 
             parent.appendChild(script);
         },
@@ -36,7 +39,7 @@
             request.onload = function () {
                 callback(this.responseText);
             };
-            request.open('GET', url, true);
+            request.open("GET", url, true);
 
             win.setTimeout(function () {
                 request.send();
@@ -45,11 +48,11 @@
             return request;
         },
         getStyleList: function (element) {
-            var value = element.getAttribute('class');
+            var value = element.getAttribute("class");
             if (!value) {
                 return [];
             }
-            return value.replace(/\s+/g, ' ').trim().split(' ');
+            return value.replace(/\s+/g, " ").trim().split(" ");
         },
         hasStyleName: function (element, name) {
             var list = this.getStyleList(element);
@@ -58,21 +61,25 @@
         addStyleName: function (element, name) {
             var list = this.getStyleList(element);
             list.push(name);
-            element.setAttribute('class', list.join(' '));
+            element.setAttribute("class", list.join(" "));
         },
         removeStyleName: function (element, name) {
-            var list = this.getStyleList(element), index = list.indexOf(name);
+            var list = this.getStyleList(element),
+                index = list.indexOf(name);
             if (index >= 0) {
                 list.splice(index, 1);
-                element.setAttribute('class', list.join(' '));
+                element.setAttribute("class", list.join(" "));
             }
         },
         isSupportedBrowser: function () {
-            return 'localStorage' in win &&
-                'querySelector' in doc &&
-                'addEventListener' in win &&
-                'getComputedStyle' in win && doc.compatMode === 'CSS1Compat';
-        }
+            return (
+                "localStorage" in win &&
+                "querySelector" in doc &&
+                "addEventListener" in win &&
+                "getComputedStyle" in win &&
+                doc.compatMode === "CSS1Compat"
+            );
+        },
     };
 
     // Button
@@ -80,9 +87,13 @@
     var Button = function Button(element, contentElement) {
         var self = this;
 
-        element.addEventListener('click', function (event) {
-            self.onClick(event);
-        }, false);
+        element.addEventListener(
+            "click",
+            function (event) {
+                self.onClick(event);
+            },
+            false
+        );
 
         this._element = element;
         this._contentElement = contentElement || this._element;
@@ -102,19 +113,27 @@
 
         form.reset();
 
-        form.addEventListener('click', function (event) {
-            var target = event.target;
-            if ('value' in target) {
-                self.onSelect(target.value);
-            }
-        }, false);
+        form.addEventListener(
+            "click",
+            function (event) {
+                var target = event.target;
+                if ("value" in target) {
+                    self.onSelect(target.value);
+                }
+            },
+            false
+        );
 
-        form.addEventListener('change', function (event) {
-            var target = event.target;
-            if (target.checked) {
-                self.onChange(target.value);
-            }
-        }, false);
+        form.addEventListener(
+            "change",
+            function (event) {
+                var target = event.target;
+                if (target.checked) {
+                    self.onChange(target.value);
+                }
+            },
+            false
+        );
 
         this._form = form;
         this._itemName = itemName;
@@ -125,7 +144,7 @@
     Select.prototype.onChange = function () {};
 
     Select.prototype.isHidden = function () {
-        return this._form.hasAttribute('hidden');
+        return this._form.hasAttribute("hidden");
     };
 
     Select.prototype.getItems = function () {
@@ -133,17 +152,21 @@
     };
 
     Select.prototype.getValue = function () {
-        var i, n, items = this.getItems();
+        var i,
+            n,
+            items = this.getItems();
         for (i = 0, n = items.length; i < n; i++) {
             if (items[i].checked) {
                 return items[i].value;
             }
         }
-        return '';
+        return "";
     };
 
     Select.prototype.setValue = function (value) {
-        var i, n, items = this.getItems();
+        var i,
+            n,
+            items = this.getItems();
         if (value === this.getValue()) {
             return this;
         }
@@ -160,7 +183,7 @@
     Select.prototype.setHidden = function (hidden) {
         hidden = !!hidden;
         if (hidden !== this.isHidden()) {
-            this._form[(hidden ? 'set' : 'remove') + 'Attribute']('hidden', '');
+            this._form[(hidden ? "set" : "remove") + "Attribute"]("hidden", "");
             this.onHiddenChange(hidden);
         }
         return this;
@@ -190,8 +213,8 @@
         this._translator = translator;
 
         this.onStateChange = function (name, enable) {
-            if (name === 'active') {
-                storage.setValue('active', enable);
+            if (name === "active") {
+                storage.setValue("active", enable);
             }
         };
 
@@ -201,58 +224,69 @@
         };
 
         select.onChange = function (lang) {
-            storage.setValue('lang', lang);
+            storage.setValue("lang", lang);
             rightButton.setText(lang);
-            self.setState('invalid', lang === pageLang);
+            self.setState("invalid", lang === pageLang);
         };
 
         select.onHiddenChange = function (hidden) {
-            var docElem = doc.documentElement, formRect;
-            self.setState('expanded', !hidden);
+            var docElem = doc.documentElement,
+                formRect;
+            self.setState("expanded", !hidden);
             if (!hidden) {
-                self.setState('right', false)
-                    .setState('bottom', false);
+                self.setState("right", false).setState("bottom", false);
                 element.focus();
                 formRect = this._form.getBoundingClientRect();
 
-                if (formRect.right + (win.pageXOffset || docElem.scrollLeft) + 1 >= Math.max(docElem.clientWidth, docElem.scrollWidth)) {
-                    self.setState('right', true);
+                if (
+                    formRect.right + (win.pageXOffset || docElem.scrollLeft) + 1 >=
+                    Math.max(docElem.clientWidth, docElem.scrollWidth)
+                ) {
+                    self.setState("right", true);
                 }
 
-                if (formRect.bottom + (win.pageYOffset || docElem.scrollTop) + 1 >= Math.max(docElem.clientHeight, docElem.scrollHeight)) {
-                    self.setState('bottom', true);
+                if (
+                    formRect.bottom + (win.pageYOffset || docElem.scrollTop) + 1 >=
+                    Math.max(docElem.clientHeight, docElem.scrollHeight)
+                ) {
+                    self.setState("bottom", true);
                 }
             }
         };
 
-        element.addEventListener('blur', function () {
-            select.setHidden(true);
-        }, false);
+        element.addEventListener(
+            "blur",
+            function () {
+                select.setHidden(true);
+            },
+            false
+        );
 
-        element.addEventListener('keydown', function (event) {
-            switch (event.keyCode) {
-                case util.keycode.ESCAPE:
-                    select.setHidden(true);
-                    break;
-            }
-        }, false);
+        element.addEventListener(
+            "keydown",
+            function (event) {
+                switch (event.keyCode) {
+                    case util.keycode.ESCAPE:
+                        select.setHidden(true);
+                        break;
+                }
+            },
+            false
+        );
 
-        translator.on('error', function () {
+        translator.on("error", function () {
             this.abort();
-            self.setState('busy', false)
-                .setState('error', true);
+            self.setState("busy", false).setState("error", true);
         });
 
-        translator.on('progress', function (progress) {
+        translator.on("progress", function (progress) {
             switch (progress) {
                 case 0:
-                    self.setState('busy', true)
-                        .setState('active', true);
+                    self.setState("busy", true).setState("active", true);
                     break;
 
                 case 100:
-                    self.setState('done', true)
-                        .setState('busy', false);
+                    self.setState("done", true).setState("busy", false);
                     break;
             }
         });
@@ -263,12 +297,9 @@
         };
 
         rightButton.onClick = function () {
-            if (self.hasState('active')) {
+            if (self.hasState("active")) {
                 translator.undo();
-                self.setState('busy', false)
-                    .setState('done', false)
-                    .setState('error', false)
-                    .setState('active', false);
+                self.setState("busy", false).setState("done", false).setState("error", false).setState("active", false);
             } else {
                 select.setHidden(!select.isHidden());
             }
@@ -278,11 +309,11 @@
             select.setHidden(true);
         };
 
-        defaultLang = storage.getValue('lang') || userLang;
+        defaultLang = storage.getValue("lang") || userLang;
 
         if (defaultLang) {
             select.setValue(defaultLang);
-            active = storage.getValue('active');
+            active = storage.getValue("active");
             if (active || (autoMode && active === undefined)) {
                 this.translate(defaultLang);
             }
@@ -290,7 +321,7 @@
     };
 
     Widget.prototype.hasState = function (name) {
-        return util.hasStyleName(this._element, 'yt-state_' + name);
+        return util.hasStyleName(this._element, "yt-state_" + name);
     };
 
     Widget.prototype.setState = function (name, enable) {
@@ -299,15 +330,13 @@
         if (enable === hasState) {
             return this;
         }
-        util[(enable ? 'add' : 'remove') + 'StyleName'](
-            this._element, 'yt-state_' + name
-        );
+        util[(enable ? "add" : "remove") + "StyleName"](this._element, "yt-state_" + name);
         this.onStateChange(name, enable);
         return this;
     };
 
     Widget.prototype.translate = function (targetLang) {
-        if (targetLang && !this.hasState('active')) {
+        if (targetLang && !this.hasState("active")) {
             this._translator.translate(this._pageLang, targetLang);
         }
         return this;
@@ -344,50 +373,54 @@
     }
 
     var initWidget = function () {
-        util.loadScript('https://yastatic.net/s3/translate/v21.4.13/js/tr_page.js', wrapper, function () {
-            util.loadResource('https://translate.yandex.net/website-widget/v1/widget.html',
-                function (responseText) {
-                    var element;
+        util.loadScript("https://yastatic.net/s3/translate/v21.4.13/js/tr_page.js", wrapper, function () {
+            util.loadResource("https://translate.yandex.net/website-widget/v1/widget.html", function (responseText) {
+                var element;
 
-                    if (!responseText) {
-                        return;
-                    }
-
-                    wrapper.innerHTML = responseText;
-                    element = wrapper.querySelector('.yt-widget');
-                    if (params.widgetTheme) {
-                        element.setAttribute('data-theme', params.widgetTheme);
-                    }
-
-                    new Widget({
-                        select: new Select(element.querySelector('.yt-listbox'), 'yt-lang'),
-                        element: element,
-                        storage: new Storage('yt-widget'),
-                        autoMode: params.autoMode === 'true',
-                        pageLang: params.pageLang,
-                        userLang: (nav.language || nav.userLanguage || '').split('-')[0],
-                        translator: new namespace.PageTranslator({
-                            srv: 'tr-url-widget',
-                            sid: 'adfc5b68.6090aee5.cb2e423c.74722d75726c2d776964676574',
-                            url: 'https://translate.yandex.net/api/v1/tr.json/translate',
-                            autoSync: true,
-                            maxPortionLength: 600
-                        }),
-                        leftButton: new Button(element.querySelector('.yt-button_type_left')),
-                        rightButton: new Button(
-                            element.querySelector('.yt-button_type_right'),
-                            element.querySelector('.yt-button_type_right > .yt-button__text')
-                        ),
-                        closeButton: new Button(element.querySelector('.yt-button_type_close'))
-                    });
+                if (!responseText) {
+                    return;
                 }
-            );
+
+                wrapper.innerHTML = responseText;
+                element = wrapper.querySelector(".yt-widget");
+                if (params.widgetTheme) {
+                    element.setAttribute("data-theme", params.widgetTheme);
+                }
+
+                new Widget({
+                    select: new Select(element.querySelector(".yt-listbox"), "yt-lang"),
+                    element: element,
+                    storage: new Storage("yt-widget"),
+                    autoMode: params.autoMode === "true",
+                    pageLang: params.pageLang,
+                    userLang: (nav.language || nav.userLanguage || "").split("-")[0],
+                    translator: new namespace.PageTranslator({
+                        srv: "tr-url-widget",
+                        sid: "adfc5b68.6090aee5.cb2e423c.74722d75726c2d776964676574",
+                        url: "https://translate.yandex.net/api/v1/tr.json/translate",
+                        autoSync: true,
+                        maxPortionLength: 600,
+                    }),
+                    leftButton: new Button(element.querySelector(".yt-button_type_left")),
+                    rightButton: new Button(
+                        element.querySelector(".yt-button_type_right"),
+                        element.querySelector(".yt-button_type_right > .yt-button__text")
+                    ),
+                    closeButton: new Button(element.querySelector(".yt-button_type_close")),
+                });
+            });
         });
     };
 
-    if (doc.readyState === 'complete' || doc.readyState === 'interactive') {
+    if (doc.readyState === "complete" || doc.readyState === "interactive") {
         initWidget();
     } else {
-        doc.addEventListener('DOMContentLoaded', initWidget, false);
+        doc.addEventListener("DOMContentLoaded", initWidget, false);
     }
-})(this, this.document, this.navigator, {"widgetTheme":"","autoMode":"","pageLang":"","widgetId":""}, this.yt = this.yt || {});
+})(
+    this,
+    this.document,
+    this.navigator,
+    { widgetTheme: "", autoMode: "", pageLang: "", widgetId: "" },
+    (this.yt = this.yt || {})
+);

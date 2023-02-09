@@ -1,4 +1,3 @@
-
 /**
  * This puts content into a textarea which can be copied to clipboard.
  * The textarea typically appears inside a modal, triggered by Foundation
@@ -13,7 +12,7 @@
  *
  * @param options
  */
-$.fn.clipboardSelector = function(options) {
+$.fn.clipboardSelector = function (options) {
     options = options || {};
 
     var config = init(options, $(this));
@@ -33,37 +32,36 @@ $.fn.clipboardSelector = function(options) {
 
             /* User Token (phplib)
              */
-            userToken: '',
+            userToken: "",
 
             /* GroupID (phplib)
              */
-            groupId: '0',
+            groupId: "0",
 
             /* Clicking this element spawns a dialog
              */
-            exportActivator: '#calendar-export',
+            exportActivator: "#calendar-export",
 
             /* An element which copies contents to clipboard
              */
-            copy: '#copy-button',
+            copy: "#copy-button",
 
             /* The dialog element
              */
-            exportElement: '#calendar-export-dialog',
+            exportElement: "#calendar-export-dialog",
 
             /* The element containing the export url
              */
-            exportUrl: '#calendar-export-dialog-url',
+            exportUrl: "#calendar-export-dialog-url",
 
             /* Executes when Ready
              */
-            onReady: function() {
+            onReady: function () {
                 defaultOnReady();
             },
-        }
+        };
 
-        var derived = {
-        }
+        var derived = {};
 
         var merged = $.extend(defaults, derived, options);
 
@@ -79,20 +77,19 @@ $.fn.clipboardSelector = function(options) {
     function defaultOnReady() {
         var dialogUrl = $(config.exportUrl);
 
-        dialogUrl.text($.fn.getExportCalendarLink(
-            config.userToken,
-            {
-                'export': 'group',
-                'group': config.groupId
-            }
-        ));
+        dialogUrl.text(
+            $.fn.getExportCalendarLink(config.userToken, {
+                export: "group",
+                group: config.groupId,
+            })
+        );
 
         $(config.copy).show();
 
         /* Bypass foundation bug
          * https://github.com/zurb/foundation/issues/4746
          */
-        $(config.exportElement).on('opened', function() {
+        $(config.exportElement).on("opened", function () {
             dialogUrl.select();
         });
     }
@@ -104,7 +101,7 @@ $.fn.clipboardSelector = function(options) {
      * URL to click.
      */
     function setupExport() {
-        $(config.exportActivator).click(function(event) {
+        $(config.exportActivator).click(function (event) {
             event.preventDefault();
 
             // ZeroClipboard was not ready immediately.
@@ -113,4 +110,4 @@ $.fn.clipboardSelector = function(options) {
             config.onReady();
         });
     }
-}
+};

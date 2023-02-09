@@ -62,7 +62,7 @@ class Controller extends Base
 
         // I can't create this in the module because a user object is required,
         // and the user doesn't reliably exist in the module.
-        $folderTranslator = new Folder\Translator\ModelToArray\LinkOnly();
+        $folderTranslator = new Folder\Translator\ModelToArray\LinkOnly(1);
         $courseTranslator = new CourseSpec\Translator\ModelToArray(
             $this->router,
             $this->authorizer,

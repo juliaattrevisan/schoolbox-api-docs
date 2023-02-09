@@ -1,13 +1,12 @@
-
-import PopUp from './pop-up.vue';
+import PopUp from "./pop-up.vue";
 
 export default {
-    title: 'Animations/Badge Awards/Pop Up',
+    title: "Animations/Badge Awards/Pop Up",
     component: PopUp,
     parameters: {
         docs: {
             description: {
-                component: '_Pop Up_ badge award animation',
+                component: "_Pop Up_ badge award animation",
             },
         },
     },
@@ -15,8 +14,7 @@ export default {
 
 const Template = (args, { argTypes }) => ({
     components: { PopUp },
-    template:
-        `
+    template: `
         <pop-up />
         `,
 });

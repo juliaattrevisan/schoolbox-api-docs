@@ -5,11 +5,11 @@
  */
 
 export default Object.seal({
-    GROUP_DATA: '',
-    REMOVE_MEMBERS: '',
-    UPDATE_MEMBERS: '',
-    ADD_MEMBERS: '',
-    UPDATE_SETTINGS: '',
-    DISBAND_GROUP: '',
-    SEND_EMAIL: '',
+    GROUP_DATA: "",
+    REMOVE_MEMBERS: "",
+    UPDATE_MEMBERS: "",
+    ADD_MEMBERS: "",
+    UPDATE_SETTINGS: "",
+    DISBAND_GROUP: "",
+    SEND_EMAIL: "",
 });

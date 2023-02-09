@@ -225,7 +225,7 @@ input.datepicker-input {
         border-bottom: $pickr-border;
     }
 
-    .flatpickr-calendar.showTimeInput.hasTime .flatpickr-time {
+    .flatpickr-calendar.hasTime .flatpickr-time {
         border-top: none;
         border-bottom: $pickr-border;
     }

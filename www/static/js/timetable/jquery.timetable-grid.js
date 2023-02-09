@@ -1,11 +1,10 @@
-(function() {
-
+(function () {
     /**
      * A facade method for spawning timetables
      *
      * @param options
      */
-    $.fn.timetableStart = function(options) {
+    $.fn.timetableStart = function (options) {
         options = options || {};
 
         var config = init(options, $(this));
@@ -30,32 +29,31 @@
 
                 /* Reforged timetables end up inside this element
                  */
-                target: '[data-smaller]',
+                target: "[data-smaller]",
 
                 /* The menu items when you have multiple timetables
                  * to chooze from. A unique identifier, typically a
                  * user id
                  */
                 selectors: {
-                    data: '[data-timetable-selector]',
-                    attr: 'data-timetable-selector'
+                    data: "[data-timetable-selector]",
+                    attr: "data-timetable-selector",
                 },
 
                 /* Timetable wrapper element containing the heading
                  * and the timetable itself (they are separate elements)
                  */
                 wrapper: {
-                    data: '[data-timetable-wrapper]',
-                    attr: 'data-timetable-wrapper'
+                    data: "[data-timetable-wrapper]",
+                    attr: "data-timetable-wrapper",
                 },
 
                 /* This indicates the timetable table itself
                  */
-                timetable: '[data-timetable]'
-            }
+                timetable: "[data-timetable]",
+            };
 
-            var derived = {
-            }
+            var derived = {};
 
             var merged = $.extend(defaults, derived, options);
 
@@ -78,7 +76,7 @@
          * Occurs when selecting a menu item from the person selector
          */
         function showSelectedTimetable() {
-            $(config.selectors.data).click(function(event) {
+            $(config.selectors.data).click(function (event) {
                 event.preventDefault();
 
                 updateMenu($(this));
@@ -96,10 +94,10 @@
          * @param selected
          */
         function showTimetable(selected) {
-            var wrapper = $('['+config.wrapper.attr+'='+selected+']');
+            var wrapper = $("[" + config.wrapper.attr + "=" + selected + "]");
             var timetable = wrapper.find(config.timetable);
 
-            wrapper.removeClass('hide').timetable();
+            wrapper.removeClass("hide").timetable();
 
             /* Adjust heights
              */
@@ -107,7 +105,7 @@
 
             /* Wait till resizing actually stops before resizing everything
              */
-            $(window).bind('resizeEnd', function() {
+            $(window).bind("resizeEnd", function () {
                 timetable.timetableResize();
             });
         }
@@ -116,20 +114,19 @@
          * Update person selector
          */
         function updateMenu(selectedItem) {
-
             /* Unselect all menu items
              * Reselect this one
              */
-            $(config.selectors.data).parent().removeClass('active');
-            $(selectedItem).parent().addClass('active');
+            $(config.selectors.data).parent().removeClass("active");
+            $(selectedItem).parent().addClass("active");
 
             /* Hide all large timetables
              * Clear existing small timetables
              */
-            $(config.wrapper.data).addClass('hide');
-            $(config.target).html('')
+            $(config.wrapper.data).addClass("hide");
+            $(config.target).html("");
         }
-    }
+    };
 
     /**
      * Timetable
@@ -139,7 +136,7 @@
      *
      * @param options
      */
-    $.fn.timetable = function(options) {
+    $.fn.timetable = function (options) {
         options = options || {};
 
         var config = init(options, $(this));
@@ -159,17 +156,16 @@
 
                 /* Reforged timetables end up inside this element
                  */
-                target: '[data-smaller]'
-            }
+                target: "[data-smaller]",
+            };
 
             var derived = {
-
                 /* Island html
                  * Sorry, Doctor
                  */
                 header: '<h2 class="subheader"></h2>',
                 island: '<div class="small-12 island no-pad"></div>',
-            }
+            };
 
             var merged = $.extend(defaults, derived, options);
 
@@ -180,51 +176,49 @@
          * Assemble a timetable
          */
         function assemble() {
-            var periodNames = $(config.element).find('tbody th');
-            var numDays = $(config.element).find('thead th').length;
+            var periodNames = $(config.element).find("tbody th");
+            var numDays = $(config.element).find("thead th").length;
             var i;
 
             /* The timetable belongs to this person
              */
-            var person = config.element.find('data-timetable-title');
+            var person = config.element.find("data-timetable-title");
 
             $(config.target).append(person);
 
             /* Figure out which Day is the active one
              */
-            var activeDay = $(config.element).find('.timetable-day-active').html();
-            var activePeriod = $(config.element).find('.timetable-period-active').html();
+            var activeDay = $(config.element).find(".timetable-day-active").html();
+            var activePeriod = $(config.element).find(".timetable-period-active").html();
 
             /* For every day, assemble a two column timetable
              */
             for (i = 1; i < numDays; i++) {
-
                 /* Assemble island
                  */
-                var header = $(config.header).append(headerCellSelector(i+1).html());
+                var header = $(config.header).append(headerCellSelector(i + 1).html());
 
                 var table = $('<table class="no-hover">');
 
                 /* Generate table rows
                  */
-                $.each(periodNames, function(index, element) {
-                    var tr = $('<tr></tr>');
+                $.each(periodNames, function (index, element) {
+                    var tr = $("<tr></tr>");
                     var clone = $(element).clone();
 
                     /* Highlight current Period th
                      */
-                    if ((header.html() == activeDay) && ($(element).html() == activePeriod)) {
-                        clone.addClass('timetable-period-active');
-                    }
+                    if (header.html() == activeDay && $(element).html() == activePeriod) {
+                        clone.addClass("timetable-period-active");
+                    } else {
                     /* Due to reforging, clear the active class from this
                      * particular instance of th
                      */
-                    else {
-                        clone.removeClass('timetable-period-active');
+                        clone.removeClass("timetable-period-active");
                     }
 
                     tr.append(clone);
-                    tr.append(dataCellSelector(index+1, i+1).clone());
+                    tr.append(dataCellSelector(index + 1, i + 1).clone());
 
                     table.append(tr);
                 });
@@ -244,7 +238,9 @@
          * @param column
          */
         function dataCellSelector(row, column) {
-            return $(config.element).find('tbody tr:nth-child('+row+') td:nth-child('+column+')').first();
+            return $(config.element)
+                .find("tbody tr:nth-child(" + row + ") td:nth-child(" + column + ")")
+                .first();
         }
 
         /**
@@ -254,7 +250,9 @@
          * @returns {*|jQuery}
          */
         function headerCellSelector(column) {
-            return $(config.element).find('thead tr:first() th:nth-child('+column+')').first();
+            return $(config.element)
+                .find("thead tr:first() th:nth-child(" + column + ")")
+                .first();
         }
-    }
-}(jQuery));
+    };
+})(jQuery);

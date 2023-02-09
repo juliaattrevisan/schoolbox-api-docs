@@ -11,14 +11,13 @@
  * All tied into already-established ids, so you only need to
  * add data-tab-activator to your top-level tab spawners.
  */
-(function() {
-
+(function () {
     /**
      * Plugin
      *
      * @param options
      */
-    $.fn.tabActivator = function(options) {
+    $.fn.tabActivator = function (options) {
         options = options || {};
 
         var config = init(options, $(this));
@@ -35,26 +34,22 @@
         function init(options, element) {
             var defaults = {
                 element: element,
-                activator: 'data-tab-activator',
+                activator: "data-tab-activator",
 
                 /* Occurs whenever you click a tab activator
                  */
-                onTabOpen: function(tabActivator) {
-                },
+                onTabOpen: function (tabActivator) {},
 
                 /* Occurs when you change active tabs
                  */
-                onTabSwitch: function(tabActivator) {
-                },
+                onTabSwitch: function (tabActivator) {},
 
                 /* Occurs when a tab is closed
                  */
-                onTabClose: function(tabActivator) {
-                }
-            }
+                onTabClose: function (tabActivator) {},
+            };
 
-            var derived = {
-            }
+            var derived = {};
 
             var merged = $.extend(defaults, derived, options);
 
@@ -66,13 +61,13 @@
          * to spawn the currently active (visible) tab
          */
         function tabActivator() {
-            $('['+config.activator+']').click(function() {
+            $("[" + config.activator + "]").click(function () {
                 config.onTabOpen($(this));
 
                 /* Tab corresponding to this activator
                  */
                 var activator = $(this);
-                var tab = $(this).attr('href');
+                var tab = $(this).attr("href");
 
                 /* If this tab activator wasn't already active,
                  * just use default tab-switching behaviour.
@@ -80,28 +75,25 @@
                  * Otherwise, toggle tab
                  */
                 if ($(this).data(config.activator) == true) {
-
                     /* Close this tab if it's open
                      * Otherwise just use default behaviour
                      */
-                    if ($(tab).hasClass('active')) {
-
+                    if ($(tab).hasClass("active")) {
                         /* Wait a little bit for foundation to do its crazy crap,
                          * then surreptitiously do our own crazy crap
                          */
-                        setTimeout(function() {
-                            $(tab).toggleClass('active');
+                        setTimeout(function () {
+                            $(tab).toggleClass("active");
 
                             config.onTabClose(activator);
                         }, 100);
                     }
-                }
-                else {
+                } else {
                     config.onTabSwitch($(this));
 
                     /* Clear out every other activator's setting
                      */
-                    $('[data-tab-activator]').data(config.activator, false);
+                    $("[data-tab-activator]").data(config.activator, false);
 
                     /* Add a flag to remember this tab activator is active,
                      * so toggling can take place
@@ -110,5 +102,5 @@
                 }
             });
         }
-    }
-}(jQuery));
+    };
+})(jQuery);

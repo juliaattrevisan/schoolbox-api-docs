@@ -1,14 +1,13 @@
-import MenuDivider from '../../vue/components/menu/pop-out-menu-divider.vue';
+import MenuDivider from "../../vue/components/menu/pop-out-menu-divider.vue";
 
 export default {
-    title: 'Menu/MenuDivider',
+    title: "Menu/MenuDivider",
     component: MenuDivider,
 };
 
 const DefaultTemplate = (args, { argTypes }) => ({
     components: { MenuDivider },
-    template:
-        `
+    template: `
         <pop-out-menu-divider />
         `,
 });

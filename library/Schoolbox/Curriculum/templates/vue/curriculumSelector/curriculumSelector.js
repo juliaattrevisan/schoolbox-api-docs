@@ -1,8 +1,8 @@
-import { createApp } from 'vue';
-import CurriculumSelector from './curriculum-selector';
-import { createPinia } from 'pinia';
+import { createApp } from "vue";
+import CurriculumSelector from "./curriculum-selector";
+import { createPinia } from "pinia";
 
-const curriculumSelectorObjs = document.querySelectorAll('[data-cs-container]');
+const curriculumSelectorObjs = document.querySelectorAll("[data-cs-container]");
 
 curriculumSelectorObjs.forEach((curriculumSelectorObj) => {
     /* Only spawn one vue component per object on the Manage Rubric page
@@ -11,12 +11,14 @@ curriculumSelectorObjs.forEach((curriculumSelectorObj) => {
      * already encountered by checking the data-loaded attribute and using
      * that as a flag
      */
-    if (!curriculumSelectorObj.hasAttribute('data-loaded')) {
+    if (!curriculumSelectorObj.hasAttribute("data-loaded")) {
         createApp({
             components: {
-                CurriculumSelector
-            }
-        }).use(createPinia()).mount(curriculumSelectorObj);
+                CurriculumSelector,
+            },
+        })
+            .use(createPinia())
+            .mount(curriculumSelectorObj);
     }
-    curriculumSelectorObj.setAttribute('data-loaded', true);
+    curriculumSelectorObj.setAttribute("data-loaded", true);
 });

@@ -30,6 +30,7 @@ class Component_Homepage_PinterestController extends Component_Homepage_Controll
 
         $emptyState = false;
         $noConfig   = false;
+        $partCount  = 0;
 
         $url = trim($this->getConfig('url'));
 
@@ -56,10 +57,10 @@ class Component_Homepage_PinterestController extends Component_Homepage_Controll
                 $partCount = count($parts);
 
                 /**
-                 * If there's zero or more than two parts -
+                 * If there's zero or more than three parts -
                  * we can't handle this (most likely invalid url) so show empty state
                  */
-                if ($partCount != 1 && $partCount != 2) {
+                if ($partCount < 1 || $partCount > 3) {
                     $emptyState = true;
                 }
             }
@@ -109,6 +110,7 @@ class Component_Homepage_PinterestController extends Component_Homepage_Controll
                 /* Board
                  */
                 case 2:
+                case 3:
                     $this->parse('has_pinterest_board_block', 'has_pinterest_board');
                     break;
 

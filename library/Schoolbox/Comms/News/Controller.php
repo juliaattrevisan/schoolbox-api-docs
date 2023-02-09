@@ -656,6 +656,8 @@ class Controller extends Base
         $params->setFolderId($folderId);
 
         $partialData = $this->generatePartialForHomepage($params);
+        // homepage student view
+        $partialData['readonly'] = $this->request->query->get('readonly') ?? false;
 
         if (!$this->isXhrRequest()) {
             // if it's NOT XHR, go for API version

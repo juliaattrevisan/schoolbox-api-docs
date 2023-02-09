@@ -600,7 +600,19 @@ class Report_Parent extends Report_Abstract
 
             // Uniqueify and cleanup empty string emails
             $filteredEmails = array_filter(array_unique($allEmails));
+            if ($showContact == false) {
+                $this->getPage()->setVar(array(
+                                             'public_block' => ''
+                                         ));
 
+                $this->getPage()->parse('private_block', 'private');
+            } else {
+                $this->getPage()->setVar(array(
+                                             'private_block' => ''
+                                         ));
+
+                $this->getPage()->parse('public_block', 'public');
+            }
             $this->getPage()->parse('student_block', 'student', true);
             $this->getPage()->setVar('EMAIL_ALL_PARENTS', implode(',', $filteredEmails));
             $this->getPage()->setVar('empty_block', '');

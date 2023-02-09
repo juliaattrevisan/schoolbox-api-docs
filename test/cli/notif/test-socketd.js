@@ -15,91 +15,90 @@
 "use strict";
 
 // dependencies
-const redis     = require('redis').createClient();
-const WebSocket = require('ws');
-const JSON      = require('jsonify');
-const http      = require('http');
-const sleep     = require('sleep');
+const redis = require("redis").createClient();
+const WebSocket = require("ws");
+const JSON = require("jsonify");
+const http = require("http");
+const sleep = require("sleep");
 
 // config constants
-const remember  = process.env.REMEMBER || '';
-const subscript = `msg:vagrantx:${process.env.USER_ID || '230'}:push`;
+const remember = process.env.REMEMBER || "";
+const subscript = `msg:vagrantx:${process.env.USER_ID || "230"}:push`;
 
 const repeat = process.env.REPEAT || 500;
-const delay  = process.env.DELAY || 16; // 75/sec
+const delay = process.env.DELAY || 16; // 75/sec
 
 let c = repeat;
 
 for (let i = 0; i < repeat; ++i) {
-    setTimeout(() => { ws(); }, i * delay);
+    setTimeout(() => {
+        ws();
+    }, i * delay);
 }
 
 // main execution
 function ws() {
-
     // connect to our own sock
-    let ws = new WebSocket('ws://localhost:9081', {
+    let ws = new WebSocket("ws://localhost:9081", {
         perMessageDeflate: false,
         headers: {
-            cookie: `remember=${remember}`
-        }
+            cookie: `remember=${remember}`,
+        },
     });
 
     let seen = {};
     let ackd = {};
 
-    ws.on('open', () => {
-        console.log('Connection established');
+    ws.on("open", () => {
+        console.log("Connection established");
         ws.send(JSON.stringify({ subscribe: true }));
     });
 
-    ws.on('message', data => {
+    ws.on("message", (data) => {
         const payload = JSON.parse(data);
-        const action  = Object.keys(payload)[0];
+        const action = Object.keys(payload)[0];
 
         console.log(`Received ${action}`);
 
         if (payload.subscribe) {
             // STEP 1: subscription handshake
             ws.send(JSON.stringify({ fetch: 5 }));
-
         } else if (payload.fetch) {
             // STEP 2: anything we receive in fetch, broadcast it via redis for push
             seen = broadcastPush(payload.fetch, seen);
-
         } else if (payload.push) {
             // STEP 3: acknowledge the pushed messages
             ackd = acknowledgePush(payload.push, seen, ackd);
-
         } else if (payload.ack) {
             // STEP 4: verify the ACKs we have received are the ones we sent
             verifyAck(payload.ack, ackd);
         }
     });
 
-    ws.on('close', () => {
-        console.log('Connection terminated');
+    ws.on("close", () => {
+        console.log("Connection terminated");
         subC();
     });
 
-    ws.on('error', () => {})
+    ws.on("error", () => {});
 }
-
 
 /**
  * @param {object} messages
  * @param {object} seen
  * @return {object}
  */
-function broadcastPush(messages, seen)
-{
+function broadcastPush(messages, seen) {
     for (let msgId in messages) {
         if (messages.hasOwnProperty(msgId)) {
             console.log(`Faking a push of ${msgId}: ${messages[msgId].href}  "${messages[msgId].body}"`);
 
-            redis.publish(subscript, JSON.stringify({
-                message: JSON.stringify(messages[msgId])
-            }));
+            redis.publish(
+                subscript,
+                JSON.stringify({
+                    message: JSON.stringify(messages[msgId]),
+                })
+            );
 
             seen[msgId] = true;
         }
@@ -108,23 +107,23 @@ function broadcastPush(messages, seen)
     return seen;
 }
 
-
 /**
  * @param {object} messages
  * @param {object} seen
  * @param {object} ackd
  * @return {object}
  */
-function acknowledgePush(messages, seen, ackd)
-{
+function acknowledgePush(messages, seen, ackd) {
     for (let msgId in messages) {
         if (msgId in seen) {
             if (messages.hasOwnProperty(msgId)) {
                 console.log(`Acknowledging ${msgId}: ${messages[msgId].href}  "${messages[msgId].body}"`);
 
-                ws.send(JSON.stringify({
-                    ack: { msgId }
-                }));
+                ws.send(
+                    JSON.stringify({
+                        ack: { msgId },
+                    })
+                );
 
                 ackd[msgId] = true;
             }
@@ -137,13 +136,11 @@ function acknowledgePush(messages, seen, ackd)
     return ackd;
 }
 
-
 /**
  * @param {object} messages
  * @param {object} ackd
  */
-function verifyAck(messages, ackd)
-{
+function verifyAck(messages, ackd) {
     for (let msgId in messages) {
         if (msgId in ackd) {
             if (messages.hasOwnProperty(msgId)) {
@@ -155,10 +152,9 @@ function verifyAck(messages, ackd)
     }
 }
 
-function subC()
-{
+function subC() {
     --c;
-    console.log('c is now %d', c);
+    console.log("c is now %d", c);
     if (c <= 0) {
         process.exit(1);
     }

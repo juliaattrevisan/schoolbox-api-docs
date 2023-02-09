@@ -17,10 +17,10 @@ window.sbProps = {
     spectrum: {
         allowEmpty: false,
         clickoutFiresChange: true,
-        preferredFormat: 'hex',
+        preferredFormat: "hex",
         showAlpha: false,
         showButtons: false,
         showInitial: true,
         showInput: true,
-    }
+    },
 };

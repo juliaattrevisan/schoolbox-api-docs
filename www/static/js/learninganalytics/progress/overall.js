@@ -1,17 +1,16 @@
-(function() {
-
+(function () {
     /**
      * Render overall progress graph
      *
      * @param options
      */
-    $.fn.overallProgressRender = function(options) {
+    $.fn.overallProgressRender = function (options) {
         var options = options || {
-            element: '',
-            title: 'Overall Progress',
+            element: "",
+            title: "Overall Progress",
             mostAdvancedStudent: 0,
             classCompletions: 0,
-            clusterName: 'Class' // or 'Cohort'
+            clusterName: "Class", // or 'Cohort'
         };
 
         /* The plot unfolds
@@ -21,34 +20,34 @@
              * chart to simulate an overlaid bar chart.
              */
             chart: {
-                type: 'column',
+                type: "column",
                 inverted: true,
-                height: 160
+                height: 160,
             },
             title: {
-                text: options.title
+                text: options.title,
             },
             xAxis: {
                 labels: {
-                    enabled: false
+                    enabled: false,
                 },
-                categories: ['Most Advanced Student', 'Entire Class'],
+                categories: ["Most Advanced Student", "Entire Class"],
 
                 /* Hide useless ticketty-boo lines (you need all
                  * of these values, seemingly)
                  */
                 lineWidth: 0,
                 minorGridLineWidth: 0,
-                lineColor: 'transparent',
+                lineColor: "transparent",
                 minorTickLength: 0,
-                tickLength: 0
+                tickLength: 0,
             },
             yAxis: {
                 min: 0,
                 max: 100,
                 title: {
-                    text: 'Percentage Complete %'
-                }
+                    text: "Percentage Complete %",
+                },
             },
 
             /* This is used to ensure that Entire Class bar always
@@ -57,28 +56,28 @@
              * Entire Class value
              */
             legend: {
-                reversed: true
+                reversed: true,
             },
             plotOptions: {
                 column: {
-                    grouping: false
-                }
+                    grouping: false,
+                },
             },
             series: [
                 {
-                    name: 'Most Advanced Student',
-                    data: [parseFloat(options.mostAdvancedStudent.toFixed(1))]
+                    name: "Most Advanced Student",
+                    data: [parseFloat(options.mostAdvancedStudent.toFixed(1))],
                 },
                 {
-                    name: options.clusterName + ' Completion',
-                    data: [parseFloat(options.classCompletions.toFixed(1))]
-                }
+                    name: options.clusterName + " Completion",
+                    data: [parseFloat(options.classCompletions.toFixed(1))],
+                },
             ],
             tooltip: {
-                formatter: function() {
-                    return this.series.name + ': ' + this.y + '%';
-                }
-            }
+                formatter: function () {
+                    return this.series.name + ": " + this.y + "%";
+                },
+            },
         });
-    }
-}(jQuery));
+    };
+})(jQuery);

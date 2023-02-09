@@ -215,7 +215,7 @@
                             data-endpoint="{{ routeLookupIfAuthorized('learningAssessmentTimeline.getFullTimeline', {assessment: assessment, assessmentId: assessment.id, userId: student.id }) }}"
                             data-update-route="{{ routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
                             data-review-route="{{ routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
-                            data-publish-route="{{ routeLookupIfAuthorized('learningAssessment.getSummary', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
+                            data-publish-route="{{ routeLookupIfAuthorized('learningDueWorkFeedback.postPublishFeedback', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
                             data-exclude-route="{{ routeLookupIfAuthorized('learningAssessment.postExclude', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
                             data-include-route="{{ routeLookupIfAuthorized('learningAssessment.postInclude', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
                             data-is-excluded="{% if participant and not participant.isExcluded %}false{% else %}true{% endif %}"

@@ -10,11 +10,11 @@
  * 4. System set checked state of all intervening checkboxes to match the newly selected checkbox's state
  */
 (function ($) {
-    var pluginName = 'selectMulti';
+    var pluginName = "selectMulti";
 
     var defaults = {
-        labelSelector:    'label',                    // How to find all checkboxes labels in some parent element
-        checkboxSelector: 'input[type=checkbox]'      // How to find all checkboxes in some parent element
+        labelSelector: "label", // How to find all checkboxes labels in some parent element
+        checkboxSelector: "input[type=checkbox]", // How to find all checkboxes in some parent element
     };
 
     /**
@@ -24,14 +24,13 @@
      * @param {Object} options
      */
     function SelectMulti(element, options) {
-
-        var config  = $.extend(true, {}, defaults, options || {});  // Plugin config
-        var mostRecentChangedIndex;                                 // Track the most recently changed checkbox
+        var config = $.extend(true, {}, defaults, options || {}); // Plugin config
+        var mostRecentChangedIndex; // Track the most recently changed checkbox
 
         // Get handles to relevant DOM elements
-        var $listParent     = $(element),                           // Container that contains checkbox list
-            $checkboxLabels = $listParent.find('label'),
-            $checkboxes     = $listParent.find('input[type=checkbox]');
+        var $listParent = $(element), // Container that contains checkbox list
+            $checkboxLabels = $listParent.find("label"),
+            $checkboxes = $listParent.find("input[type=checkbox]");
 
         attachListeners(element);
 
@@ -41,8 +40,8 @@
          * @param element
          */
         function attachListeners(element) {
-            $(element).on('click', config.labelSelector, function (e) {
-                  handleCheckboxLabelClick(e, e.target);
+            $(element).on("click", config.labelSelector, function (e) {
+                handleCheckboxLabelClick(e, e.target);
             });
         }
 
@@ -53,23 +52,22 @@
          * @param element The element the event occurred on
          */
         function handleCheckboxLabelClick(event, element) {
-            var labelIndex      = $checkboxLabels.index(element);
+            var labelIndex = $checkboxLabels.index(element);
 
             // Was this a shiftClick on a different checkbox ?
             // And is this not the first checkbox changed for this component ?
-            if (event.shiftKey && typeof mostRecentChangedIndex === 'number' && mostRecentChangedIndex !== labelIndex) {
-
+            if (event.shiftKey && typeof mostRecentChangedIndex === "number" && mostRecentChangedIndex !== labelIndex) {
                 // Change all intervening checkboxes to the new value
                 var changedCheckbox = $checkboxes.get(labelIndex),
-                    newState        = !$(changedCheckbox).prop('checked'),
-                    increment       = labelIndex > mostRecentChangedIndex ? +1 : -1;
+                    newState = !$(changedCheckbox).prop("checked"),
+                    increment = labelIndex > mostRecentChangedIndex ? +1 : -1;
                 for (var i = mostRecentChangedIndex; i !== labelIndex; i += increment) {
                     var $checkbox = $($checkboxes.get(i));
 
-                    $checkbox.prop('checked', newState);
+                    $checkbox.prop("checked", newState);
 
                     // Ensure 'change' listeners get triggered
-                    $checkbox.trigger('change');
+                    $checkbox.trigger("change");
                 }
                 clearSelection();
             }
@@ -100,9 +98,9 @@
      */
     $.fn[pluginName] = function (options) {
         return this.each(function () {
-            if (!$.data(this, 'plugin_' + pluginName)) {
-                $.data(this, 'plugin_' + pluginName, new SelectMulti(this, options));
+            if (!$.data(this, "plugin_" + pluginName)) {
+                $.data(this, "plugin_" + pluginName, new SelectMulti(this, options));
             }
         });
     };
-}(jQuery));
+})(jQuery);

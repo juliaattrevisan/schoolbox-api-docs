@@ -3,7 +3,7 @@
  */
 
 export default Object.freeze({
-    ENROLED: 'enroled',
-    PENDING: 'pending',
-    NOT_ENROLED: 'notEnroled',
-})
+    ENROLED: "enroled",
+    PENDING: "pending",
+    NOT_ENROLED: "notEnroled",
+});

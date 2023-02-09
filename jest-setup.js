@@ -1,1 +1,1 @@
-import '@testing-library/jest-dom'; //so we can use jest-dom in any test file https://github.com/testing-library/jest-dom
+import "@testing-library/jest-dom"; //so we can use jest-dom in any test file https://github.com/testing-library/jest-dom

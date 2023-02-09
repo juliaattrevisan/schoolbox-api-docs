@@ -1,8 +1,7 @@
-import {ATTENDANCE_LEVELS} from '@schoolboxCalendarEvent/attendance-levels';
-import {ATTENDANCE_STATUS} from '@schoolboxCalendarEvent/attendance-status';
+import { ATTENDANCE_LEVELS } from "@schoolboxCalendarEvent/attendance-levels";
+import { ATTENDANCE_STATUS } from "@schoolboxCalendarEvent/attendance-status";
 
 export default {
-
     /**
      * Decide whether you can RSVP to an invitation or, alternatively,
      * insert yourself into the guest list (same approach either way)
@@ -15,9 +14,7 @@ export default {
      * @param numAvailable            int      the quantity of free spaces available,
      * @return boolean
      */
-    canRsvp(currentAttendanceLevel, guests, currentUserId, currentAttendanceStatus, maxAttendees, numAvailable)
-    {
-
+    canRsvp(currentAttendanceLevel, guests, currentUserId, currentAttendanceStatus, maxAttendees, numAvailable) {
         /* Attendance Levels prohibit availability of the RSVP buttons
          * If you have access to see the buttons, check if attendance quantities let you rsvp
          */
@@ -34,7 +31,6 @@ export default {
         /* If you've not responded at all, or are currently Pending
          */
         if (!this.isInvited(currentAttendanceStatus) || this.isPending(currentAttendanceStatus)) {
-
             /* If your currentAttendanceStatus is null, or Pending, and there are available spaces,
              * then you haven't yet responded and are able to insert yourself into the list or
              * accept/decline the invitation respectively
@@ -56,7 +52,6 @@ export default {
         /* If you've currently Accepted
          */
         if (this.isAccepted(currentAttendanceStatus)) {
-
             /* If your currentAttendanceStatus is Accepted, you can always decline
              * freeing up a spot for someone else to occupy
              *
@@ -68,7 +63,6 @@ export default {
         /* If you've currently Declined
          */
         if (this.isDeclined(currentAttendanceStatus)) {
-
             /* If your currentAttendanceStatus is Declined and there are available spaces
              * then you can change your mind and accept the invitation
              *
@@ -91,7 +85,6 @@ export default {
         return false;
     },
 
-
     /**
      * Decide when the RSVP buttons are available for usage
      *
@@ -100,9 +93,7 @@ export default {
      *
      * @return boolean
      */
-    showRsvpButtons(currentAttendanceLevel, guests, currentUserId)
-    {
-
+    showRsvpButtons(currentAttendanceLevel, guests, currentUserId) {
         /* If the event attendance is Open, show the buttons
          */
         if (currentAttendanceLevel === ATTENDANCE_LEVELS.OPEN) {
@@ -132,32 +123,29 @@ export default {
      * @param currentAttendanceStatus
      * @returns boolean
      */
-    isInvited: function(currentAttendanceStatus) {
+    isInvited: function (currentAttendanceStatus) {
         return currentAttendanceStatus !== null;
     },
 
-
     /**
      * Find out whether you've Accepted the event's invitation
      *
      * @param currentAttendanceStatus int|null
      * @return boolean
      */
-    isPending: function(currentAttendanceStatus) {
+    isPending: function (currentAttendanceStatus) {
         return currentAttendanceStatus === ATTENDANCE_STATUS.PENDING;
     },
 
-
     /**
      * Find out whether you've Accepted the event's invitation
      *
      * @param currentAttendanceStatus int|null
      * @return boolean
      */
-    isAccepted: function(currentAttendanceStatus) {
+    isAccepted: function (currentAttendanceStatus) {
         return currentAttendanceStatus === ATTENDANCE_STATUS.ACCEPTED;
     },
-
 
     /**
      * Find out whether you've Declined the event's invitation
@@ -165,10 +153,9 @@ export default {
      * @param currentAttendanceStatus int|null
      * @return boolean
      */
-    isDeclined: function(currentAttendanceStatus) {
+    isDeclined: function (currentAttendanceStatus) {
         return currentAttendanceStatus === ATTENDANCE_STATUS.DECLINED;
     },
-
 
     /**
      * Find out whether this event's max_attendees setting means there are a limited
@@ -177,7 +164,7 @@ export default {
      * @param max int|null
      * @return boolean
      */
-    isLimitedAttendance: function(max) {
+    isLimitedAttendance: function (max) {
         return max !== null;
     },
 
@@ -188,7 +175,10 @@ export default {
      * @return {boolean}
      */
     showAttendanceMeta: function (currentAttendanceLevel) {
-        return currentAttendanceLevel === ATTENDANCE_LEVELS.OPEN || currentAttendanceLevel === ATTENDANCE_LEVELS.INVITE_ONLY;
+        return (
+            currentAttendanceLevel === ATTENDANCE_LEVELS.OPEN ||
+            currentAttendanceLevel === ATTENDANCE_LEVELS.INVITE_ONLY
+        );
     },
 
     /**
@@ -206,4 +196,4 @@ export default {
      * @return {boolean}
      */
     isInviteOnly: (currentAttendanceLevel) => currentAttendanceLevel === ATTENDANCE_LEVELS.INVITE_ONLY,
-}
+};

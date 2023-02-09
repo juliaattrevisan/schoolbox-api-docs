@@ -4,14 +4,13 @@ $(function () {
             /* First series color: also default colour of
              * borders and stuff
              */
-            '#bcd7ea',
+            "#bcd7ea",
 
             /* Second series color
              */
-            '#0066b0'
+            "#0066b0",
         ],
         plotOptions: {
-
             /* Stacked Progress Bars
              *
              * You can't use colors array, because colorsByPoint needs
@@ -23,44 +22,44 @@ $(function () {
             column: {
                 states: {
                     hover: {
-                        brightness: 0.1
-                    }
-                }
+                        brightness: 0.1,
+                    },
+                },
             },
 
             /* Boxplots
              */
             boxplot: {
-                color: '#0066b0',
-                fillColor: '#bcd7ea',
+                color: "#0066b0",
+                fillColor: "#bcd7ea",
                 animation: {
-                    duration: 300
-                }
+                    duration: 300,
+                },
             },
 
             bar: {
                 animation: {
-                    duration: 300
-                }
+                    duration: 300,
+                },
             },
 
             column: {
                 animation: {
-                    duration: 300
-                }
+                    duration: 300,
+                },
             },
 
             /* Effort
              */
             scatter: {
-                color: 'rgba(0,102,176, .5)',
-                animation: false
-            }
+                color: "rgba(0,102,176, .5)",
+                animation: false,
+            },
         },
 
         credits: {
-            enabled: false
-        }
+            enabled: false,
+        },
     };
 
     Highcharts.setOptions(schoolboxTheme);

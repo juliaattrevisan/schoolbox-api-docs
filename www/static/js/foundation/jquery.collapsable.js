@@ -1,14 +1,13 @@
 /**
  * Make homepage components collapsable
  */
-(function() {
-
+(function () {
     /**
      * Compute dimensions dynamically
      *
      * @param options
      */
-    $.fn.collapsable = function(options) {
+    $.fn.collapsable = function (options) {
         options = options || {};
 
         this.config = init(options, $(this));
@@ -25,7 +24,7 @@
         function init(options, element) {
             var defaults = {
                 element: element,
-                container: '[data-component]'
+                container: "[data-component]",
             };
 
             return $.extend(defaults, options);
@@ -36,22 +35,22 @@
          */
         function setupCollapsable() {
             var self = this;
-            $(self.config.element).on('click.collapsable', function(event) {
+            $(self.config.element).on("click.collapsable", function (event) {
                 event.preventDefault();
 
                 var component,
-                    target = $(this).data('collapser'),
+                    target = $(this).data("collapser"),
                     simple = target === true || target.length === undefined,
-                    icon   = '';
+                    icon = "";
 
                 if (simple) {
                     // if the string "true" is used, or no value, target the container
                     component = $(this).closest(self.config.container).find('[data-collapsable="true"]');
-                    icon      = $(this).closest('[data-collapser="true"]');
+                    icon = $(this).closest('[data-collapser="true"]');
                 } else {
                     // otherwise, treat the value as the data-collapsable target value
-                    component = $('[data-collapsable=' + target + ']');
-                    icon      = $(this);
+                    component = $("[data-collapsable=" + target + "]");
+                    icon = $(this);
                 }
 
                 $.fn.executeCollapsable.call(self, component, icon);
@@ -65,9 +64,9 @@
     $.fn.destroyCollapsable = function (options) {
         // Mimic the element from the collapsable's init
         options = options || {};
-        let config = $.extend({element: $(this)}, options);
-        $(config.element).off('click.collapsable');
-    }
+        let config = $.extend({ element: $(this) }, options);
+        $(config.element).off("click.collapsable");
+    };
 
     /**
      * Directly execute collapsable on demand
@@ -81,39 +80,40 @@
      * @param component
      * @param icon
      */
-    $.fn.executeCollapsable = function(component, icon) {
-
+    $.fn.executeCollapsable = function (component, icon) {
         /* When it's collapsed by default, it just renders with .hide
          * It's actually uncollapsed, just hidden.
          *
          * This slides it up real fast so it can slide back down gracefully
          */
-        if (component.attr('data-collapse-state') == 'collapsed') {
-            component.stop().removeClass('hide').slideUp(1).slideDown({
-                start: function() {
-                    component.trigger('expandStart.collapsable');
-                },
-                done:  function() {
-                    component.trigger('expandStop.collapsable');
-                }
-            });
-            component.attr('data-collapse-state', 'uncollapsed');
-        }
-        else {
-            component.attr('data-collapse-state', 'collapsed');
+        if (component.attr("data-collapse-state") == "collapsed") {
+            component
+                .stop()
+                .removeClass("hide")
+                .slideUp(1)
+                .slideDown({
+                    start: function () {
+                        component.trigger("expandStart.collapsable");
+                    },
+                    done: function () {
+                        component.trigger("expandStop.collapsable");
+                    },
+                });
+            component.attr("data-collapse-state", "uncollapsed");
+        } else {
+            component.attr("data-collapse-state", "collapsed");
             component.stop().slideUp({
-                start: function() {
-                    component.trigger('collapseStart.collapsable');
+                start: function () {
+                    component.trigger("collapseStart.collapsable");
                 },
-                done:  function() {
-                    component.trigger('collapseStop.collapsable');
-                }
+                done: function () {
+                    component.trigger("collapseStop.collapsable");
+                },
             });
         }
 
         $.fn.executeIconToggle.call(this, icon);
     };
-
 
     /**
      * Explicitly and abruptly shut an accordion and reset its state and arrow
@@ -121,25 +121,24 @@
      *
      * @param component
      */
-    $.fn.executeCollapsableSnapShut = function(component) {
-        component.stop().slideUp(1).attr('data-collapse-state', 'collapsed');
+    $.fn.executeCollapsableSnapShut = function (component) {
+        component.stop().slideUp(1).attr("data-collapse-state", "collapsed");
 
-        let icon = $('[data-collapser="'+component.attr('data-collapsable')+'"]');
+        let icon = $('[data-collapser="' + component.attr("data-collapsable") + '"]');
 
-        icon.removeClass('icon-up-arrow').addClass('icon-down-arrow');
-    }
-
+        icon.removeClass("icon-up-arrow").addClass("icon-down-arrow");
+    };
 
     /**
      * Toggle expand/collapse icon state
      *
      * @param icon
      */
-    $.fn.executeIconToggle = function(icon) {
-        if (icon.hasClass('icon-up-arrow')) {
-            icon.removeClass('icon-up-arrow').addClass('icon-down-arrow');
+    $.fn.executeIconToggle = function (icon) {
+        if (icon.hasClass("icon-up-arrow")) {
+            icon.removeClass("icon-up-arrow").addClass("icon-down-arrow");
         } else {
-            icon.removeClass('icon-down-arrow').addClass('icon-up-arrow');
+            icon.removeClass("icon-down-arrow").addClass("icon-up-arrow");
         }
-    }
-}(jQuery));
+    };
+})(jQuery);

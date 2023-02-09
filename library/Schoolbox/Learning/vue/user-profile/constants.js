@@ -6,6 +6,6 @@ export default {
      * Events that any user profile feed may emit.
      */
     events: {
-        AWARDS_UPDATED: 'awards-updated'
-    }
-}
+        AWARDS_UPDATED: "awards-updated",
+    },
+};

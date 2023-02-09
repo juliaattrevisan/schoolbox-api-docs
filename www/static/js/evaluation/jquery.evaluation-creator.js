@@ -1,11 +1,10 @@
-(function() {
-
+(function () {
     /**
      * Short Answer Creator
      *
      * @param options
      */
-    $.fn.shortCreate = function(options) {
+    $.fn.shortCreate = function (options) {
         options = options || {};
 
         var config = init(options, $(this));
@@ -31,7 +30,7 @@
 
                 /* Which validator to use
                  */
-                mode: 'create',
+                mode: "create",
 
                 /* Whether you came from the QuestionBank
                  */
@@ -39,13 +38,12 @@
 
                 /* An element containing all the available configuration options
                  */
-                configuration: '#configuration',
+                configuration: "#configuration",
 
                 /* Setup of custom validation rules to use
                  * Call $.fn.addCustomRules_* here.
                  */
-                customValidationRules: function() {
-                },
+                customValidationRules: function () {},
 
                 /* Actual validation rules
                  * Defaults to the full set. Can be extended/overridden via instance-specific options
@@ -54,18 +52,18 @@
                 rules: {
                     question: {
                         required: true,
-                        minlength: 2
+                        minlength: 2,
                     },
                     marks: {
                         required: true,
                         minlength: 1,
-                        greaterThanZero:true
+                        greaterThanZero: true,
                     },
                     answer: {
                         required: true,
                         minlength: 2,
-                        emptyAnswer:true
-                    }
+                        emptyAnswer: true,
+                    },
                 },
 
                 /* Error messages
@@ -75,29 +73,26 @@
                 messages: {
                     question: {
                         required: "Please enter a question.",
-                        minlength: "Please enter a question."
+                        minlength: "Please enter a question.",
                     },
                     answer: {
                         required: "Please fill out an answer.",
                         minlength: "Please fill out an answer.",
-                        emptyAnswer: "Please fill out an answer."
-                    }
-
+                        emptyAnswer: "Please fill out an answer.",
+                    },
                 },
 
-                errorPlacement: function(error, element) {
-
+                errorPlacement: function (error, element) {
                     // position error label after generated textarea
-                    if (element.is("textarea") && element.next().hasClass('mceEditor')) {
+                    if (element.is("textarea") && element.next().hasClass("mceEditor")) {
                         error.insertAfter(element.next());
                     } else {
-                        error.insertAfter(element)
+                        error.insertAfter(element);
                     }
-                }
+                },
             };
 
-            var derived = {
-            };
+            var derived = {};
 
             var merged = $.extend(true, defaults, derived, options);
 
@@ -111,41 +106,41 @@
          * Apply the validator to the form
          */
         function applyValidator() {
-            $(config.element).submit(function() {
-                // update underlying textareas before submit validation
-                $.each(CKEDITOR.instances, function(prop, val){
-                    CKEDITOR.instances[prop].updateElement();
+            $(config.element)
+                .submit(function () {
+                    // update underlying textareas before submit validation
+                    $.each(CKEDITOR.instances, function (prop, val) {
+                        CKEDITOR.instances[prop].updateElement();
+                    });
+                })
+                .alaressValidate({
+                    onfocusout: false,
+                    rules: config.rules,
+                    messages: config.messages,
+
+                    // Don't ignore radios and checkboxes, as these are actually hidden
+                    ignore: "",
+
+                    errorPlacement: function (error, element) {
+                        /* If the error was found on the Marks field, just leave it
+                         * to spawn naturally
+                         *
+                         * Position error label after generated textarea
+                         */
+                        if (element.is("textarea") && element.next().hasClass("mceEditor")) {
+                            error.insertAfter(element.next());
+                        } else {
+                            error.insertAfter(element);
+                        }
+                    },
                 });
-            }).alaressValidate({
-                onfocusout: false,
-                rules: config.rules,
-                messages: config.messages,
-
-                // Don't ignore radios and checkboxes, as these are actually hidden
-                ignore: '',
-
-                errorPlacement: function(error, element) {
-
-                    /* If the error was found on the Marks field, just leave it
-                     * to spawn naturally
-                     *
-                     * Position error label after generated textarea
-                     */
-                    if (element.is("textarea") && element.next().hasClass('mceEditor')) {
-                        error.insertAfter(element.next());
-                    }
-                    else {
-                        error.insertAfter(element)
-                    }
-                }
-            });
         }
     };
 
     /**
      * Multiple Choice/Radio Creator
      */
-    $.fn.multiRadioCreate = function(options) {
+    $.fn.multiRadioCreate = function (options) {
         options = options || {};
 
         var config = init(options, $(this));
@@ -184,11 +179,11 @@
 
                 /* Which validator to use
                  */
-                mode: 'create',
+                mode: "create",
 
                 /* The element which contains all the answer options to choooze from
                  */
-                answerCollectionList: '#answerCollection',
+                answerCollectionList: "#answerCollection",
 
                 /* Minimum number of answer options to chooze from
                  */
@@ -205,7 +200,7 @@
 
                 /* Quiz or Survey
                  */
-                availability: 'assess',
+                availability: "assess",
 
                 /* Whether you came from the QuestionBank
                  */
@@ -213,11 +208,11 @@
 
                 /* An element containing all the available configuration options
                  */
-                configuration: '#configuration',
+                configuration: "#configuration",
 
                 /* What POST var are answers stored in?
                  */
-                answerName: 'description',
+                answerName: "description",
 
                 /* Custom method for generating an answer from this form.
                  * Accepts configuration object as a parameter,
@@ -226,12 +221,12 @@
                 generateAnswer: null,
 
                 // Input name attribute for a returnUrl
-                returnUrlName: 'returnUrl',
+                returnUrlName: "returnUrl",
 
                 /* Setup of custom validation rules to use
                  * Call $.fn.addCustomRules_* here.
                  */
-                customValidationRules: function(config) {
+                customValidationRules: function (config) {
                     $.fn.addCustomRules_greaterThanZero(config);
                     $.fn.addCustomRules_somethingChecked(config);
                     $.fn.addCustomRules_emptyInputs(config);
@@ -244,31 +239,30 @@
                 rules: {
                     question: {
                         required: true,
-                        minlength: 2
+                        minlength: 2,
                     },
                     marks: {
                         required: true,
                         minlength: 1,
-                        greaterThanZero:true
+                        greaterThanZero: true,
                     },
                     answer: false,
-                    'answerDescription[]': {
+                    "answerDescription[]": {
                         emptyInputs: true,
-                        hasUniqueOptions: "answerCollection"
-                    }
+                        hasUniqueOptions: "answerCollection",
+                    },
                 },
 
                 /* Error messages
                  */
                 messages: {
-                    question: "Please enter a question."
-                }
+                    question: "Please enter a question.",
+                },
             };
 
-            var derived = {
-            };
+            var derived = {};
 
-            var merged = $.extend(true,defaults, derived, options);
+            var merged = $.extend(true, defaults, derived, options);
 
             return merged;
         }
@@ -277,9 +271,9 @@
          * Add the minimum number of options to choose from
          */
         function addDefaultOptions() {
-            if (!$(config.answerCollectionList).find('[data-input]').length) {
+            if (!$(config.answerCollectionList).find("[data-input]").length) {
                 for (var i = 0; i < config.minOptions; i++) {
-                    $(config.answerCollectionList).append($('[data-clone] [data-input]').clone());
+                    $(config.answerCollectionList).append($("[data-clone] [data-input]").clone());
                 }
             }
         }
@@ -293,40 +287,44 @@
             /* Only reindex options that have been added
              * (ignore the clone)
              */
-            $(config.answerCollectionList).find('[data-input]').each(function(index, element) {
-                $(element).find('[data-answer-code-representation]').html($.fn.evaluation.findLetterIndex(i) + ')');
-                $(element).find('[data-answer-code-value]').val(i);
+            $(config.answerCollectionList)
+                .find("[data-input]")
+                .each(function (index, element) {
+                    $(element)
+                        .find("[data-answer-code-representation]")
+                        .html($.fn.evaluation.findLetterIndex(i) + ")");
+                    $(element).find("[data-answer-code-value]").val(i);
 
-                /* Update checkbox id and label target, due to custom styles
-                 */
-                var id = 'answer-option-'+i;
+                    /* Update checkbox id and label target, due to custom styles
+                     */
+                    var id = "answer-option-" + i;
 
-                $(element).find('[data-answer-code-representation]').parent('label').attr('for', id);
-                $(element).find('[data-answer-option]').attr('id', id).val(i);
+                    $(element).find("[data-answer-code-representation]").parent("label").attr("for", id);
+                    $(element).find("[data-answer-option]").attr("id", id).val(i);
 
-                i++;
-            });
+                    i++;
+                });
         }
 
         /**
          * Add a new answer option
          */
         function addNewAnswerOption() {
-            $(document).on('click', '[data-add-answer]', function(event) {
+            $(document).on("click", "[data-add-answer]", function (event) {
                 event.preventDefault();
 
                 /* Obey limit
                  */
-                var allInputs = $(config.answerCollectionList).find('[data-input]');
+                var allInputs = $(config.answerCollectionList).find("[data-input]");
 
                 if (allInputs.length < config.maxOptions) {
-                    $(config.answerCollectionList).append($('[data-clone] [data-input]').clone());
+                    $(config.answerCollectionList).append($("[data-clone] [data-input]").clone());
 
                     refreshList();
 
                     /* Bring focus to the new clone
                      */
-                    $(config.answerCollectionList).find('[data-answer-description]').last().focus();
+                    $(config.answerCollectionList).find("[data-answer-description]").last().focus();
                 }
 
                 return false;
@@ -337,15 +335,15 @@
          * Remove an answer option
          */
         function removeAnswerOption() {
-            $(document).on('click', '[data-delete]', function(event) {
+            $(document).on("click", "[data-delete]", function (event) {
                 event.preventDefault();
 
                 /* Only remove when greater than three
                  */
-                var allInputs = $(config.answerCollectionList).find('[data-input]');
+                var allInputs = $(config.answerCollectionList).find("[data-input]");
 
                 if (allInputs.length > config.minOptions) {
-                    $(this).parents('[data-input]').remove();
+                    $(this).parents("[data-input]").remove();
 
                     refreshList();
                 }
@@ -359,165 +357,168 @@
          * Apply the validator to the form
          */
         function applyValidator() {
-            $(config.element).submit(function() {
-                // update underlying textarea before submit validation
-                CKEDITOR.instances.question.updateElement();
-            }).alaressValidate({
-                onfocusout: false,
-                submitHandler: function() {
+            $(config.element)
+                .submit(function () {
+                    // update underlying textarea before submit validation
+                    CKEDITOR.instances.question.updateElement();
+                })
+                .alaressValidate({
+                    onfocusout: false,
+                    submitHandler: function () {
+                        var theForm = $(config.element);
 
-                    var theForm = $(config.element);
+                        theForm.find('input[type="submit"]').prop("disabled", true); //prevent multiple submissions
 
-                    theForm.find('input[type="submit"]').prop('disabled', true); //prevent multiple submissions
+                        /* Collate possible answers and their correctness status
+                         */
+                        var answerCollection = [];
+                        if (typeof config.generateAnswer === "function") {
+                            answerCollection = config.generateAnswer(config);
+                        } else {
+                            $.each($(config.answerCollectionList).find("[data-input]"), function (index, element) {
+                                var elem = $(element);
 
-                    /* Collate possible answers and their correctness status
-                     */
-                    var answerCollection = [];
-                    if (typeof config.generateAnswer === 'function') {
-                        answerCollection = config.generateAnswer(config);
-                    } else {
-                        $.each($(config.answerCollectionList).find('[data-input]'), function(index, element) {
-                            var elem = $(element);
+                                var description = $.trim(elem.find("[data-answer-description]").val());
+                                var code = $.trim(elem.find("[data-answer-code-value]").val());
 
-                            var description = $.trim(elem.find('[data-answer-description]').val());
-                            var code = $.trim(elem.find('[data-answer-code-value]').val());
+                                /* Ignore empty answers that weren't removed
+                                 */
+                                if (description != "" && code != "") {
+                                    var answer = {};
+                                    answer[config.answerName] = description;
+                                    answer.value = code;
+                                    answer.correct = elem.find("[data-answer-option]").prop("checked");
+                                    answerCollection.push(answer);
+                                }
+                            });
+                        }
 
-                            /* Ignore empty answers that weren't removed
+                        /* Collate the usual fields containing ids.
+                         * Collate the checkboxes too but append all the possibilities as well!
+                         *
+                         * Common data
+                         */
+                        var data = {
+                            question: CKEDITOR.instances.question.getData(),
+                            sequence: theForm.find("input[name=sequence]").val(),
+                            allAnswers: JSON.stringify(answerCollection),
+                            configuration: JSON.stringify(
+                                $(config.configuration).find("input, textarea, select").serializeArray()
+                            ),
+                        };
+
+                        /* Quiz-specific data
+                         */
+                        if (config.availability == "assess") {
+                            data.marks = theForm.find("input[name=marks]").val();
+                        }
+
+                        /* Redirect url
+                         */
+                        var redirect = "";
+
+                        /* Create in Quiz/Survey
+                         */
+                        if (config.mode == "create") {
+                            data.type_id = theForm.find("select[name=type_id]").val();
+                            data.assess_id = theForm.find("input[name=assess_id]").val();
+                            data.section_id = theForm.find("input[name=section_id]").val();
+
+                            redirect = "/" + config.availability + "/question/create/" + data.section_id + "/create";
+                        } else {
+                            /* Modify in Quiz/Survey
                              */
-                            if ((description != '') && (code != '')) {
-                                var answer = {};
-                                answer[config.answerName] = description;
-                                answer.value              = code;
-                                answer.correct            = elem.find('[data-answer-option]').prop('checked');
-                                answerCollection.push(answer);
+                            if (typeof config.questionBank == "undefined" || config.questionBank === false) {
+                                data.assess_id = theForm.find("input[name=assess_id]").val();
+                                data.type_id = theForm.find("input[name=type_id]").val();
+                                data.section_id = theForm.find("input[name=section_id]").val();
+                                data.question_id = theForm.find("input[name=question_id]").val();
+
+                                redirect = "/" + config.availability + "/summary/" + data.assess_id;
+                            } else {
+                            /* Modify directly in the Question Bank
+                             */
+                                data.type_id = theForm.find("input[name=type_id]").val();
+                                data.question_bank_id = theForm.find("input[name=question_bank_id]").val();
+                                data.assess_id = theForm.find("input[name=assess_id]").val();
+                                data.section_id = theForm.find("input[name=section_id]").val();
+                                var catId = theForm.find("input[name=question_category_id]").val();
+                                if (typeof catId === "undefined") {
+                                    catId = "0";
+                                }
+                                redirect =
+                                    config.questionBank.url +
+                                    "/" +
+                                    catId +
+                                    "/" +
+                                    data.assess_id +
+                                    "/" +
+                                    data.section_id;
                             }
+                        }
+
+                        // Whack the return URL on if we have one
+
+                        var returnUrl = theForm.find("input[name=" + config.returnUrlName + "]").val();
+
+                        if (returnUrl === "" || returnUrl === undefined) {
+                            returnUrl = "";
+                        } else {
+                            returnUrl = "?" + config.returnUrlName + "=" + returnUrl;
+                        }
+
+                        /* Submit via POST and redirect to question creation screen upon done
+                         */
+                        $.post(theForm.attr("action"), data, function (responseText) {
+                            window.location = redirect + returnUrl;
                         });
-                    }
 
-                    /* Collate the usual fields containing ids.
-                     * Collate the checkboxes too but append all the possibilities as well!
-                     *
-                     * Common data
-                     */
-                    var data = {
-                        question: CKEDITOR.instances.question.getData(),
-                        sequence: theForm.find('input[name=sequence]').val(),
-                        allAnswers: JSON.stringify(answerCollection),
-                        configuration: JSON.stringify($(config.configuration).find('input, textarea, select').serializeArray())
-                    };
+                        return false;
+                    },
 
-                    /* Quiz-specific data
-                     */
-                    if (config.availability == 'assess') {
-                        data.marks = theForm.find('input[name=marks]').val();
-                    }
+                    rules: config.rules,
+                    messages: config.messages,
 
-                    /* Redirect url
-                     */
-                    var redirect = '';
-
-                    /* Create in Quiz/Survey
-                     */
-                    if (config.mode == 'create') {
-                        data.type_id = theForm.find('select[name=type_id]').val();
-                        data.assess_id = theForm.find('input[name=assess_id]').val();
-                        data.section_id = theForm.find('input[name=section_id]').val();
-
-                        redirect = '/' + config.availability + '/question/create/' + data.section_id + '/create';
-                    }
-                    else {
-                        /* Modify in Quiz/Survey
+                    errorPlacement: function (error, element) {
+                        /* If the error has to do with the entire list,
+                         * spawn the error at the bottom
+                         * http://stackoverflow.com/questions/1318076/jquery-hasattr-checking-to-see-if-there-is-an-attribute-on-an-element
                          */
-                        if ((typeof config.questionBank == "undefined") || (config.questionBank === false)) {
-                            data.assess_id = theForm.find('input[name=assess_id]').val();
-                            data.type_id = theForm.find('input[name=type_id]').val();
-                            data.section_id = theForm.find('input[name=section_id]').val();
-                            data.question_id = theForm.find('input[name=question_id]').val();
+                        var hasCorrectAnswer = $(element).attr("data-correct-answer");
+                        var hasAllDescriptors = $(element).attr("data-answer-description");
+                        var isAnswerOption = $(element).attr("data-answer-option");
 
-                            redirect = '/' + config.availability + '/summary/' + data.assess_id;
-                        }
-                        /* Modify directly in the Question Bank
+                        if (typeof hasCorrectAnswer !== typeof undefined && hasCorrectAnswer !== false) {
+                            error.insertAfter(element.closest(config.answerCollectionList));
+                        } else if (typeof hasAllDescriptors !== typeof undefined && hasAllDescriptors !== false) {
+                            error.insertAfter(element.closest(config.answerCollectionList));
+                        } else if (typeof isAnswerOption !== typeof undefined && isAnswerOption !== false) {
+                            error.insertAfter(element.closest(config.answerCollectionList));
+                        } else if (element.is("textarea") && element.next().hasClass("mceEditor")) {
+                        /* If the error was found on the Marks field, just leave it
+                         * to spawn naturally
+                         *
+                         * If the error was found on one of the answer options,
+                         * spawn it naturally
                          */
-                        else {
-                            data.type_id = theForm.find('input[name=type_id]').val();
-                            data.question_bank_id = theForm.find('input[name=question_bank_id]').val();
-                            data.assess_id = theForm.find('input[name=assess_id]').val();
-                            data.section_id = theForm.find('input[name=section_id]').val();
-                            var catId = theForm.find('input[name=question_category_id]').val();
-                            if (typeof catId === 'undefined') {
-                                catId = '0';
-                            }
-                            redirect = config.questionBank.url + '/' + catId + '/' + data.assess_id + '/' + data.section_id;
+                            error.insertAfter(element.next());
+                        } else {
+                            error.insertAfter(element);
                         }
-                    }
+                    },
 
-                    // Whack the return URL on if we have one
-
-                    var returnUrl = theForm.find('input[name='+config.returnUrlName+']').val();
-
-                    if (returnUrl === '' || returnUrl === undefined) {
-                        returnUrl = '';
-                    } else {
-                        returnUrl = "?"+config.returnUrlName+"=" + returnUrl;
-                    }
-
-                    /* Submit via POST and redirect to question creation screen upon done
-                     */
-                    $.post(theForm.attr('action'), data, function(responseText) {
-                        window.location = redirect + returnUrl;
-                    });
-
-                    return false;
-                },
-
-                rules: config.rules,
-                messages: config.messages,
-
-                errorPlacement: function(error, element) {
-
-                    /* If the error has to do with the entire list,
-                     * spawn the error at the bottom
-                     * http://stackoverflow.com/questions/1318076/jquery-hasattr-checking-to-see-if-there-is-an-attribute-on-an-element
-                     */
-                    var hasCorrectAnswer = $(element).attr('data-correct-answer');
-                    var hasAllDescriptors = $(element).attr('data-answer-description');
-                    var isAnswerOption = $(element).attr('data-answer-option');
-
-                    if ((typeof hasCorrectAnswer !== typeof undefined) && (hasCorrectAnswer !== false)) {
-                        error.insertAfter(element.closest(config.answerCollectionList));
-                    }
-                    else if ((typeof hasAllDescriptors !== typeof undefined) && (hasAllDescriptors !== false)) {
-                        error.insertAfter(element.closest(config.answerCollectionList));
-                    }
-                    else if ((typeof isAnswerOption !== typeof undefined) && (isAnswerOption !== false)) {
-                        error.insertAfter(element.closest(config.answerCollectionList));
-                    }
-                    /* If the error was found on the Marks field, just leave it
-                     * to spawn naturally
-                     *
-                     * If the error was found on one of the answer options,
-                     * spawn it naturally
-                     */
-                    else if (element.is("textarea") && element.next().hasClass('mceEditor')) {
-                        error.insertAfter(element.next());
-                    }
-                    else {
-                        error.insertAfter(element)
-                    }
-                },
-
-                // Don't ignore radios and checkboxes, as these are actually hidden
-                ignore: ''
-            });
+                    // Don't ignore radios and checkboxes, as these are actually hidden
+                    ignore: "",
+                });
         }
-    }
+    };
 
     /**
      * Fillgap Creator
      *
      * @param options
      */
-    $.fn.fillgapCreate = function(options) {
+    $.fn.fillgapCreate = function (options) {
         options = options || {};
 
         var config = init(options, $(this));
@@ -534,18 +535,17 @@
         function init(options, element) {
             var defaults = {
                 element: element,
-                targetElements: $('#answerBox'),
-                file_browser_category_id: 0
-            }
+                targetElements: $("#answerBox"),
+                file_browser_category_id: 0,
+            };
 
             var derived = {
-
                 /* CSS for indicating which data to "make blank"
                  */
-                css: 'span.selected-word { background: #cae9b9; }'
-            }
+                css: "span.selected-word { background: #cae9b9; }",
+            };
 
-            var merged = $.extend(true,defaults, derived, options);
+            var merged = $.extend(true, defaults, derived, options);
 
             return merged;
         }
@@ -559,56 +559,57 @@
                 file_browser_category_id: config.file_browser_category_id,
 
                 toolbarGroups: [
-                    {name: 'schoolbox', groups: []},
-                    {name: 'basicstyles', groups: ['cleanup']}
+                    { name: "schoolbox", groups: [] },
+                    { name: "basicstyles", groups: ["cleanup"] },
                 ],
 
                 allowedContent:
-                    'img[!src,data-schoolboxresource-fullwidth,data-schoolboxresource-width,data-schoolboxresource-height,data-schoolboxresource-filesystem,data-schoolboxresource-type,data-schoolboxresource-thumbnail,data-schoolboxresource-source];' +
-                    'span(selected-word)',
+                    "img[!src,data-schoolboxresource-fullwidth,data-schoolboxresource-width,data-schoolboxresource-height,data-schoolboxresource-filesystem,data-schoolboxresource-type,data-schoolboxresource-thumbnail,data-schoolboxresource-source];" +
+                    "span(selected-word)",
 
                 /* Words to "make blank" in fillgap
                  */
-                load: function() {
+                load: function () {
                     CKEDITOR.addCss(config.css);
                 },
 
-                start: function(element) {
-                    var instance = CKEDITOR.instances['answerBox'];
+                start: function (element) {
+                    var instance = CKEDITOR.instances["answerBox"];
 
                     /* Add special unique buttons
                      */
                     instance.addCommand("makeBlank", {
-                        exec: function(editorInstance) {
+                        exec: function (editorInstance) {
                             var selectedContent = editorInstance.getSelection().getSelectedText();
-                            var updatedContent = '<span class="selected-word">' + selectedContent + '</span>'
+                            var updatedContent = '<span class="selected-word">' + selectedContent + "</span>";
 
                             /* Replace selected content in editor
                              */
-                            editorInstance.insertHtml(updatedContent, 'html');
-                        }
+                            editorInstance.insertHtml(updatedContent, "html");
+                        },
                     });
 
-                    instance.ui.addButton('schoolboxMakeBlank', { // add new button and bind our command
+                    instance.ui.addButton("schoolboxMakeBlank", {
+                        // add new button and bind our command
                         label: "Make Blank",
-                        command: 'makeBlank',
-                        toolbar: 'schoolbox'
+                        command: "makeBlank",
+                        toolbar: "schoolbox",
                     });
-                }
+                },
             });
 
-            $('#createQuestionForm').shortCreate({
+            $("#createQuestionForm").shortCreate({
                 rules: {
                     answer: {
-                        hasClozeField: "selected-word"
-                    }
+                        hasClozeField: "selected-word",
+                    },
                 },
-                customValidationRules: function(config) {
+                customValidationRules: function (config) {
                     $.fn.addCustomRules_greaterThanZero(config);
                     $.fn.addCustomRules_emptyAnswer(config);
                     $.fn.addCustomRules_containsClozeField(config);
-                }
+                },
             });
         }
-    }
-}(jQuery));
+    };
+})(jQuery);

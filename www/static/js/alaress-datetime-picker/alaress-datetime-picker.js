@@ -5,7 +5,7 @@
     adtp.dayjsFormats = {
         database: "YYYY-MM-DD HH:mm:ss",
         databaseShort: "YYYY-MM-DD",
-        nice: "dddd, MMM D, Y"
+        nice: "dddd, MMM D, Y",
     };
 
     // Use global counter in case multiple alaressDateTimePicker() have been called from one page
@@ -46,7 +46,7 @@
                 H: "HH",
                 i: "mm",
                 O: "ZZ",
-                P: "Z"
+                P: "Z",
             },
             formatEx = /[dDjJlNKSwWFmMnoYyaAgGhHisOP]/g;
 
@@ -63,7 +63,6 @@
      * @returns {boolean}
      */
     adtp.getValue = function (input, attribute) {
-
         /* input doesn't exist; was never in the dom
          */
         if (input === undefined) {
@@ -109,7 +108,7 @@
             type: adtp.getValue(element, "data-datepicker-call"), //Ajax call type: events, duework or nothing
             endDay: adtp.getValue(element, "data-datepicker-endofday"), // Should allday change time to 23:59:59
             endPeriod: adtp.getValue(element, "data-datepicker-endofperiod"), // It will use end of the period to set time through timetable picker
-            staller: null
+            staller: null,
         };
         return elementOptions;
     };
@@ -123,46 +122,30 @@
      * @param {string} from - used to set a direction this will go in, start or end
      */
     adtp.syncDatesOnElement = function ($element, options, from) {
-        var dateFormat = fieldHasTime(options)
-            ? dateDisplayFormats.dayjsDatetime
-            : dateDisplayFormats.dayjs;
+        var dateFormat = fieldHasTime(options) ? dateDisplayFormats.dayjsDatetime : dateDisplayFormats.dayjs;
 
         var syncOptions = {
-            dateFormat: dateFormat
+            dateFormat: dateFormat,
         };
 
-        if (
-            $element.attr("data-datesync-startdate") !== undefined &&
-            from !== "end"
-        ) {
+        if ($element.attr("data-datesync-startdate") !== undefined && from !== "end") {
             syncOptions.startDate = $element.attr("data-datesync-startdate");
             syncOptions.endDate = $element;
 
             $element.syncDatesNow(syncOptions);
 
             // Run this again for the start element
-            adtp.syncDatesOnElement(
-                $($element.attr("data-datesync-startdate")),
-                options,
-                "start"
-            );
+            adtp.syncDatesOnElement($($element.attr("data-datesync-startdate")), options, "start");
         }
 
-        if (
-            $element.attr("data-datesync-endDate") !== undefined &&
-            from !== "start"
-        ) {
+        if ($element.attr("data-datesync-endDate") !== undefined && from !== "start") {
             syncOptions.startDate = $element;
             syncOptions.endDate = $element.attr("data-datesync-endDate");
 
             $element.syncDatesNow(syncOptions);
 
             // Run this again for the end element
-            adtp.syncDatesOnElement(
-                $($element.attr("data-datesync-endDate")),
-                options,
-                "end"
-            );
+            adtp.syncDatesOnElement($($element.attr("data-datesync-endDate")), options, "end");
         }
     };
 
@@ -240,9 +223,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
         } else {
             $datebtn.addClass("no-text");
         }
-        element
-            .data("dateButton", $datebtn)
-            .after($datebtn);
+        element.data("dateButton", $datebtn).after($datebtn);
     }
 
     var $datepickerButton = $(this).siblings("[data-adtp-btn]");
@@ -255,18 +236,15 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
     // Set pickerID to the element attr
     element.attr("data-datepicker-id", pickerId);
 
-    var modalSize =
-        options.type == "event" || options.type == "duework"
-            ? "pickerDouble"
-            : "pickerSingle";
+    var modalSize = options.type == "event" || options.type == "duework" ? "pickerDouble" : "pickerSingle";
     $("body").append(
         '<div id="adtp-modal-wrapper-' +
-        pickerId +
-        '"><div data-reveal id="adtp-modal-' +
-        pickerId +
-        '" class="adtp reveal-modal no-pad ' +
-        modalSize +
-        '" data-adtp></div></div>'
+            pickerId +
+            '"><div data-reveal id="adtp-modal-' +
+            pickerId +
+            '" class="adtp reveal-modal no-pad ' +
+            modalSize +
+            '" data-adtp></div></div>'
     );
 
     // On focus of the element- store the original value in a data var, so that we can compare before 'massaging' (strtotime)
@@ -291,23 +269,20 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
         var originalValue;
 
         if (element.val().length > 0) {
-            originalValue = dayjs(
-                element.val(),
-                [adtp.convertFormat(options.displayFormat), adtp.convertFormat(options.displayFormatDate)]
-            );
+            originalValue = dayjs(element.val(), [
+                adtp.convertFormat(options.displayFormat),
+                adtp.convertFormat(options.displayFormatDate),
+            ]);
         }
         // if no value has been passed, use today
         else {
             originalValue = dayjs();
         }
-        if (
-            options.allDayInput !== false &&
-            $("#" + options.allDayInput).val() == 1
-        ) {
-            originalValue = dayjs(
-                originalValue,
-                [adtp.convertFormat(options.displayFormat), adtp.convertFormat(options.displayFormatDate)]
-            );
+        if (options.allDayInput !== false && $("#" + options.allDayInput).val() == 1) {
+            originalValue = dayjs(originalValue, [
+                adtp.convertFormat(options.displayFormat),
+                adtp.convertFormat(options.displayFormatDate),
+            ]);
         }
 
         var $modal = $("#adtp-modal-" + pickerId);
@@ -328,25 +303,21 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
             // AJAX in the modal contents if they haven't already been loaded
             $modal.load(
                 "/picker/datetime/type/" +
-                options.type +
-                "/element/" +
-                element.attr("id") +
-                "/id/" +
-                pickerId +
-                "/value/" +
-                encodeURIComponent(originalValue.format(adtp.dayjsFormats.database)),
+                    options.type +
+                    "/element/" +
+                    element.attr("id") +
+                    "/id/" +
+                    pickerId +
+                    "/value/" +
+                    encodeURIComponent(originalValue.format(adtp.dayjsFormats.database)),
                 function () {
                     // Capture closure of modal
-                    $(document).on(
-                        "closed.fndtn.reveal",
-                        "#adtp-modal-" + pickerId,
-                        function () {
-                            // Open back the parent modal, if any
-                            if ($modal.data("reveal").length > 0) {
-                                $("#" + $modal.data("reveal")).foundation("reveal", "open");
-                            }
+                    $(document).on("closed.fndtn.reveal", "#adtp-modal-" + pickerId, function () {
+                        // Open back the parent modal, if any
+                        if ($modal.data("reveal").length > 0) {
+                            $("#" + $modal.data("reveal")).foundation("reveal", "open");
                         }
-                    );
+                    });
                     // Update picker status
                     $modal.data("status", "loaded");
 
@@ -370,12 +341,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                             linkedElements.forEach(function (item) {
                                 var opts = adtp.getOptions(item);
 
-                                setValue(
-                                    item,
-                                    opts,
-                                    $("#hideTime" + pickerId).is(":checked"),
-                                    true
-                                );
+                                setValue(item, opts, $("#hideTime" + pickerId).is(":checked"), true);
 
                                 /* Entangle All Day settings for linked elements
                                  */
@@ -398,16 +364,12 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
 
                     $timetablePicker.find("[data-adtp-tt-submit]").click(function () {
                         var newDate = dayjs($(this).attr("data-timetable-value"));
-                        var selectedCampus = $timetablePicker
-                            .find("[data-adtp-tt-campus]")
-                            .val();
+                        var selectedCampus = $timetablePicker.find("[data-adtp-tt-campus]").val();
                         var timetableAllDay = false;
 
                         if (options.enableTime === true) {
                             var selectedPeriod = $timetablePicker
-                                .find(
-                                    "[data-adtp-tt-period][data-campus=" + selectedCampus + "]"
-                                )
+                                .find("[data-adtp-tt-period][data-campus=" + selectedCampus + "]")
                                 .val();
 
                             if (selectedPeriod == "allday") {
@@ -424,17 +386,12 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                                 var newTime = dayjs(
                                     $timetablePicker
                                         .find(
-                                            "[data-adtp-tt-period][data-campus=" +
-                                            selectedCampus +
-                                            "] option:selected"
+                                            "[data-adtp-tt-period][data-campus=" + selectedCampus + "] option:selected"
                                         )
                                         .attr("data-" + periodTime + "-time"),
                                     "h:mma"
                                 );
-                                newDate = newDate
-                                    .hour(newTime.hour())
-                                    .minute(newTime.minute())
-                                    .second(0);
+                                newDate = newDate.hour(newTime.hour()).minute(newTime.minute()).second(0);
                             }
                         }
 
@@ -446,10 +403,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                             var linkedElements = getLinkedElements(element, options);
                             linkedElements.forEach(function (item) {
                                 setValue(item, adtp.getOptions(item), timetableAllDay, true);
-                                adtp.setCalendarAllDay(
-                                    timetableAllDay,
-                                    adtp.getOptions(item).id
-                                );
+                                adtp.setCalendarAllDay(timetableAllDay, adtp.getOptions(item).id);
                             });
                         }
 
@@ -515,7 +469,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
 
         return {
             convertFrom: from,
-            convertTo: to
+            convertTo: to,
         };
     }
 
@@ -527,9 +481,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
      */
     function getLinkedElements(element, options) {
         // Get all linked inputs, e.g. startDate, endDate
-        var elements = $(
-            "[data-datepicker-alldayinput = " + options.allDayInput + "]"
-        );
+        var elements = $("[data-datepicker-alldayinput = " + options.allDayInput + "]");
         var linkedElements = [];
         elements.each(function () {
             if ($(this)[0] !== element[0]) {
@@ -557,16 +509,13 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
 
         if (date !== undefined) {
             value = dayjs(date);
-        } else if (
-            window.pickerInstance[pId] !== undefined &&
-            window.pickerInstance[pId].input.value
-        ) {
+        } else if (window.pickerInstance[pId] !== undefined && window.pickerInstance[pId].input.value) {
             value = dayjs(window.pickerInstance[pId].input.value);
         } else if (element.val() !== undefined && element.val()) {
-            value = dayjs(
-                element.val(),
-                [adtp.convertFormat(options.displayFormat), adtp.convertFormat(options.displayFormatDate)]
-            );
+            value = dayjs(element.val(), [
+                adtp.convertFormat(options.displayFormat),
+                adtp.convertFormat(options.displayFormatDate),
+            ]);
             // debugger;
         } else {
             value = dayjs();
@@ -576,13 +525,9 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
         var v;
         if (state === true) {
             if (options.endDay) {
-                v = value
-                    .endOf("day")
-                    .format(adtp.convertFormat(pickerFormats.convertTo));
+                v = value.endOf("day").format(adtp.convertFormat(pickerFormats.convertTo));
             } else {
-                v = value
-                    .startOf("day")
-                    .format(adtp.convertFormat(pickerFormats.convertTo));
+                v = value.startOf("day").format(adtp.convertFormat(pickerFormats.convertTo));
             }
 
             if (window.pickerInstance[pId] !== undefined) {
@@ -620,10 +565,10 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
      * @param {jQuery}       staller if given, the element to attach the AJAX promise to
      */
     function massageDateValue(e, staller) {
-        var t           = e.target,
-            $t          = $(t),
-            val         = $t.val(),
-            originalVal = $t.data('originalValue');
+        var t = e.target,
+            $t = $(t),
+            val = $t.val(),
+            originalVal = $t.data("originalValue");
         if (val !== "" && val !== originalVal) {
             // set up params to guide parsing
             var opts = adtp.getOptions($(t));
@@ -639,7 +584,6 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
 
             // If it couldn't parse a date - show a validation error on the form
             if (timestamp === false) {
-
                 if (!$fieldError.length) {
                     // don't create multiple errors
 
@@ -651,9 +595,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                         '">Please enter a valid date</label>';
 
                     if ($(t).closest(".input-group").length) {
-                        $(t)
-                            .closest(".input-group")
-                            .after(error);
+                        $(t).closest(".input-group").after(error);
                     } else {
                         $(t).after(error);
                     }
@@ -665,10 +607,7 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                 var newDate = dayjs.unix(timestamp);
 
                 // If field has all day switch data param and is end or start of day - make all day
-                var state =
-                    (newDate.format("HHmm") == "0000" ||
-                        newDate.format("HHmm") == "2359") &&
-                    opts.allDaySwitch;
+                var state = (newDate.format("HHmm") == "0000" || newDate.format("HHmm") == "2359") && opts.allDaySwitch;
 
                 // Does the linked element (if any) have time?
                 if (opts.allDayInput) {
@@ -676,14 +615,12 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
 
                     linkedElements.forEach(function (item) {
                         var itemOptions = adtp.getOptions($(item));
-                        var itemDate = dayjs(
-                            item.val(),
-                            [adtp.convertFormat(options.displayFormat), adtp.convertFormat(options.displayFormatDate)]
-                        );
+                        var itemDate = dayjs(item.val(), [
+                            adtp.convertFormat(options.displayFormat),
+                            adtp.convertFormat(options.displayFormatDate),
+                        ]);
                         var itemState =
-                            (itemDate.format("HHmm") == "0000" ||
-                                itemDate.format("HHmm") == "2359") &&
-                            state;
+                            (itemDate.format("HHmm") == "0000" || itemDate.format("HHmm") == "2359") && state;
 
                         // Update the state of the linked field
                         setValue($(item), itemOptions, itemState, true);
@@ -716,7 +653,6 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
         }
     }
 
-
     /**
      * JS port of /ajax/strtotime.php.
      *
@@ -726,7 +662,6 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
     function parseTime(text) {
         return $.fn.strtotime(denaturalize(text));
     }
-
 
     /**
      * Smooth out formats so strtotime digests times more easily
@@ -743,27 +678,26 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
         return text
             .trim()
             .toLowerCase()
-            .replace(/\s+/g, ' ')
-            .replace(/^in\s+/g, '')
-            .replace(/\s+from\s+now$/g, '')
-            .replace(/\s+at\s+/g, '')
-            .replace(/\s+on\s+/g, '')
-            .replace(/,\s/g, '')
-            .replace(/zero/g, '0')
-            .replace(/one/g, '1')
-            .replace(/two/g, '2')
-            .replace(/three/g, '3')
-            .replace(/four/g, '4')
-            .replace(/five/g, '5')
-            .replace(/six/g, '6')
-            .replace(/seven/g, '7')
-            .replace(/eight/g, '8')
-            .replace(/nine/g, '9')
-            .replace(/ten/g, '10')
-            .replace(/eleven/g, '11')
-            .replace(/twelve/g, '12')
-            .replace(/\//g, '-')
-            .replace(/\s+/g, ' ')
-            ;
+            .replace(/\s+/g, " ")
+            .replace(/^in\s+/g, "")
+            .replace(/\s+from\s+now$/g, "")
+            .replace(/\s+at\s+/g, "")
+            .replace(/\s+on\s+/g, "")
+            .replace(/,\s/g, "")
+            .replace(/zero/g, "0")
+            .replace(/one/g, "1")
+            .replace(/two/g, "2")
+            .replace(/three/g, "3")
+            .replace(/four/g, "4")
+            .replace(/five/g, "5")
+            .replace(/six/g, "6")
+            .replace(/seven/g, "7")
+            .replace(/eight/g, "8")
+            .replace(/nine/g, "9")
+            .replace(/ten/g, "10")
+            .replace(/eleven/g, "11")
+            .replace(/twelve/g, "12")
+            .replace(/\//g, "-")
+            .replace(/\s+/g, " ");
     }
 };
