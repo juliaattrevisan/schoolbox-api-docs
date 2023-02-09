@@ -196,6 +196,7 @@ class Classes implements IStrategy
         ));
 
         /* Precompiler
+         * Note this has a local cache that remembers an endpoint's outcome
          */
         $compiler = new PersonCompiler($this->api, self::SCOPE);
 
@@ -204,6 +205,8 @@ class Classes implements IStrategy
         $userLookup = (new Users($this->eventMapper))->generate();
 
         /* TODO Parameterise these
+         *  For now, this 2016 year has timetabled data. Need a pilot school
+         *  for actual data, not manufactured tests
          */
         $startDate = '2016-08-01';
         $endDate = '2016-09-01';
@@ -217,7 +220,7 @@ class Classes implements IStrategy
         $i = 0;
 
         foreach ($userLookup as $externalId => $user) {
-            if ($i > 25) {
+            if ($i > 50) {
                 break;
             }
 

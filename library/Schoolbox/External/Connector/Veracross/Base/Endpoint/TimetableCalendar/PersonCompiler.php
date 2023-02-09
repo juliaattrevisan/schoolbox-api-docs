@@ -24,6 +24,23 @@ class PersonCompiler
      */
     private Lookup\ClassIndex $classIndexLookup;
 
+
+    /**
+     * A local cache of meeting_times endpoint accesses
+     * This output is the same regardless of the person's timetable
+     * (It's the times that a class is occurring)
+     *
+     * @var array
+     */
+    private array $meetingTimes = [];
+
+
+    /**
+     * @var int
+     */
+    private int $numRecycledAccesses = 0;
+
+
     /**
      * @param IApi   $api
      * @param string $scope
@@ -98,6 +115,19 @@ class PersonCompiler
      */
     private function compileSchedule(array $class, string $startDate, string $endDate): array
     {
+        /* Try to optimise by regurgitating the answer if we've been here before
+         * The more you remember, the more you save
+         */
+        if (isset($this->meetingTimes[$class['id']])) {
+            echo sprintf(
+                "\nNodes: %s.  Recycled accesses: %s.\n\n",
+                \count($this->meetingTimes),
+                ++$this->numRecycledAccesses
+            );
+
+            return $this->meetingTimes[$class['id']];
+        }
+
         $schedule = [];
 
         /* Class Times are part of a derived url...you incur a massive
@@ -164,6 +194,10 @@ class PersonCompiler
                 ];
             }
         }
+
+        /* Try to optimise by remembering the answer for the next time
+         */
+        $this->meetingTimes[$class['id']] = $schedule;
 
         return $schedule;
     }
