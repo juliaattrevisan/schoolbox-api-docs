@@ -55,13 +55,13 @@ class Profile implements IStrategy
      * contact_info:list
      */
     public const SCOPE = '
-        students:list 
-        emergency_contacts:list 
+        students:list
+        emergency_contacts:list
         health.patients:list
-        admission.languages:list 
-        parents:list 
-        relationships:list 
-        staff_faculty:list 
+        admission.languages:list
+        parents:list
+        relationships:list
+        staff_faculty:list
         contact_info:list
     ';
 
@@ -261,9 +261,7 @@ class Profile implements IStrategy
                 $email = trim((string)$student['email_1']);
 
                 $firstname = trim((string)$student['first_name']);
-                $firstnamePreferred = (new FirstMeaningfulValue())->find([
-                    $student['preferred_name']
-                ]);
+                $firstnamePreferred = trim((string)$student['preferred_name']);
 
                 $form = '';
                 $gender = trim((string)$studentLookup['gender'][$student['gender']]);
@@ -601,10 +599,7 @@ class Profile implements IStrategy
              * (In test data nickname is the same as firstname anyway)
              */
             $firstname = trim((string)$parent['first_name']);
-            $firstnamePreferred = (new FirstMeaningfulValue())->find([
-                $parent['preferred_name'],
-                ''
-            ]);
+            $firstnamePreferred = trim((string)$parent['preferred_name']);
 
             $lastname = trim((string)$parent['last_name']);
             $phoneHome = trim((string)($contactInfoLookup[$parent['id']]['home_phone'] ?? ''));
@@ -728,9 +723,7 @@ class Profile implements IStrategy
                 $externalId = trim((string)$staff['id']);
 
                 $firstname = trim((string)$staff['first_name']);
-                $firstnamePreferred = (new FirstMeaningfulValue())->find([
-                    $staff['preferred_name']
-                ]);
+                $firstnamePreferred = trim((string)$staff['preferred_name']);
 
                 $lastname = trim((string)$staff['last_name']);
                 $building = '';
