@@ -58,7 +58,7 @@ class EventHandler
         /* Insert a whole new row just like we always did
          */
         if (!$newEvent->getId()) {
-//            $this->eventMapper->save($newEvent);
+            $this->eventMapper->save($newEvent);
 
             return;
         }
@@ -85,9 +85,13 @@ class EventHandler
                 WHERE {$this->eventMapper->getTable()}.id = :id
             ";
 
-            new \Alaress_Probe($query);
-//            $statement = $this->eventMapper->getDatabase()->prepare($query);
-//            $statement->execute($params);
+            $statement = $this->eventMapper->getDatabase()->prepare($query);
+            $statement->execute($params);
+
+            $this->logDebug(sprintf(
+                '** Crafted update occurred for sis_event.id %s - changed updated_at only',
+                $newEvent->getId()
+            ));
 
             return;
         }
@@ -161,15 +165,15 @@ class EventHandler
         foreach ($params as $key => $value) {
             $statement->bindParam(":{$key}", $value);
         }
-new \Alaress_Probe($query, $params);
-//        /* Use the id
-//         */
-//        $id = (int)$newEvent->getId();
-//        $statement->bindParam(':id', $id, \PDO::PARAM_INT);
-//        $statement->execute($params);
+
+        /* Use the id
+         */
+        $id = (int)$newEvent->getId();
+        $statement->bindParam(':id', $id, \PDO::PARAM_INT);
+        $statement->execute($params);
 
         $this->logDebug(sprintf(
-            'Crafted update occurred for sis_event.id %s',
+            '** Crafted update occurred for sis_event.id %s - subset diff',
             $newEvent->getId()
         ));
     }

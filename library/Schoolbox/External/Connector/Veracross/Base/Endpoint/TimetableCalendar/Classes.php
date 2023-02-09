@@ -108,6 +108,15 @@ class Classes implements IStrategy
 
 
     /**
+     * Event Chandler that saves a subset of event records' columns
+     * to minimise changes to the db, due to db ignoring the indexes
+     *
+     * @var EventHandler
+     */
+    private EventHandler $eventHandler;
+
+
+    /**
      * A list of classEntries that we saw previously
      *
      * @var array
@@ -162,6 +171,11 @@ class Classes implements IStrategy
         $this->timezone = $timezone;
         $this->fromDate = $fromDate;
         $this->toDate = $toDate;
+
+        /* Event Chandler that saves a subset of event records' columns
+         * to minimise changes to the db, due to db ignoring the indexes
+         */
+        $this->eventHandler = new EventHandler($eventMapper, $log);
     }
 
 
@@ -396,9 +410,7 @@ class Classes implements IStrategy
         /* Only persist if it's different than before
          */
         if ($this->perform) {
-            /* EventHandler->save($event, $oldEvent);
-             */
-            $this->eventMapper->save($event);
+            $this->eventHandler->save($event, $oldEvent);
         }
 
         return $event;
