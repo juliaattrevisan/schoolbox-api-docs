@@ -130,21 +130,9 @@ class Classes implements IStrategy
          *  for actual data, not manufactured tests
          */
         $startDate = '2016-08-01';
-        $endDate = '2016-09-01';
-
-        /* TODO a manual limit, because so slow due to latency
-         *  It takes about 30 minutes to process 100 timetables alone
-         *  so the average school would take 5 hours at this rate.
-         *  This break allows you to leave earlier than that, while
-         *  still obtaining something vaguely meaningful
-         */
-        $i = 0;
+        $endDate = '2017-02-01';
 
         foreach ($userLookup as $externalId => $user) {
-            if ($i > 100) {
-                break;
-            }
-
             $this->log->debug(sprintf(
                 'Fetching timetable data for %s %s (%s) - this might take a little while',
                 $user['firstname'],
@@ -167,8 +155,6 @@ class Classes implements IStrategy
 
                 $this->processClass((string)$externalId, $enrolment);
             }
-
-            $i++;
         }
     }
 
