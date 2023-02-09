@@ -65,6 +65,9 @@ export type UsageObject = {
         _links?: {
             view: string;
         };
+        parent?: {
+            title: string;
+        };
     };
 };
 
