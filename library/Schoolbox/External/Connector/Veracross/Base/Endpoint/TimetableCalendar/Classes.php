@@ -56,6 +56,14 @@ class Classes implements IStrategy
 
 
     /**
+     * Special event query generator that saves partial rows
+     *
+     * @var EventHandler
+     */
+    private EventHandler $eventHandler;
+
+
+    /**
      * Constructor.
      *
      * @param LoggerInterface                            $log
@@ -92,7 +100,9 @@ class Classes implements IStrategy
 
     /**
      * @return void
+     * @throws DebugBarException
      * @throws Exception
+     * @throws \InvalidArgumentException
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
