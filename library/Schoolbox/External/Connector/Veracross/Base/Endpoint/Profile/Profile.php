@@ -42,7 +42,7 @@ class Profile implements IStrategy
 {
     /**
      * The access token's scope, used throughout this strat
-     * (perhaps) could work on subdividing or unifying this further)
+     * (perhaps could work on subdividing or unifying this further)
      *
      * Required scopes:
      *
@@ -94,12 +94,6 @@ class Profile implements IStrategy
 
 
     /**
-     * @var \DateTimeZone
-     */
-    private \DateTimeZone $timezone;
-
-
-    /**
      * @var UserProfile\Mapper
      */
     private UserProfile\Mapper $baseProfileMapper;
@@ -145,7 +139,6 @@ class Profile implements IStrategy
      * @param LoggerInterface                 $log
      * @param bool                            $perform
      * @param IApi                            $api
-     * @param \DateTimeZone                   $timezone
      * @param Mapper                          $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
@@ -157,7 +150,6 @@ class Profile implements IStrategy
         LoggerInterface $log,
         bool $perform,
         IApi $api,
-        \DateTimeZone $timezone,
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
         UserProfile\Parent\Mapper $parentProfileMapper,
@@ -168,7 +160,6 @@ class Profile implements IStrategy
         $this->log = $log;
         $this->perform = $perform;
         $this->api = $api;
-        $this->timezone = $timezone;
         $this->baseProfileMapper = $baseProfileMapper;
         $this->studentProfileMapper = $studentProfileMapper;
         $this->parentProfileMapper = $parentProfileMapper;
