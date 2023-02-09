@@ -555,7 +555,7 @@
                         userSelector: '[data-mass-download]',
                         userList: $userList,
                         onSubmit: function (toSubmit) {
-                            $(this).confirmDialog({
+                            $('body').confirmDialog({
                                 header: 'Download all feedback and submissions?',
                                 format: 'html',
                                 text: `
@@ -585,11 +585,13 @@
                                     );
 
                                     window.location.replace(url);
-                                },
-                                cancelEvent () {
                                 }
                             });
-                        }
+                        },
+                        // Override the default 'onClose' action with no action.  This is necessary because the default
+                        // action (which is to close the bulky modal), has the unwanted side-effect of also closing the
+                        // confirmDialog modal before the user can interact with it.
+                        onClose: function () {}
                     });
 
                     {# Handle clicks on 'Submission Received' buttons #}
