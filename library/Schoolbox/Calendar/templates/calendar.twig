@@ -44,6 +44,8 @@
         firstDay:           Number('{{ config.calendar_start_day }}'),
         defaultView:        anchorView || '{{ calendarView }}',
         dateDisplayFormats: dateDisplayFormats,
+        eotcEnabled:        Boolean('{{ config.eotc_enabled }}'),
+        resourceBookingEnabled: Boolean('{{ config.resource_booking_enabled }}'),
         translations:       {
             eotc: {
                 proper: '{{ locale.eotc.proper }}'

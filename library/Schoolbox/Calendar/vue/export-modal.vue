@@ -8,7 +8,16 @@ export default {
 
     components: { ExportUrlModal, RevealModal },
 
-    props: ["eventTypes", "groups", "campuses", "translations", "token", "eventExportUrl"],
+    props: [
+        'eventTypes',
+        'groups',
+        'campuses',
+        'translations',
+        'token',
+        'eventExportUrl',
+        'eotcEnabled',
+        'resourceBookingEnabled',
+    ],
 
     data() {
         return {
@@ -156,7 +165,7 @@ export default {
                             />
                             <label for="export-duework">{{ translations.dueWork.proper }}</label>
                         </li>
-                        <li>
+                        <li v-if="resourceBookingEnabled">
                             <input
                                 type="radio"
                                 v-model="form.export"
@@ -176,7 +185,7 @@ export default {
                             />
                             <label for="export-external">External events</label>
                         </li>
-                        <li>
+                        <li v-if="eotcEnabled">
                             <input
                                 type="radio"
                                 v-model="form.export"
