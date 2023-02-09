@@ -3,7 +3,7 @@
  */
 
 import ClassicEditor from "@ckeditor/ckeditor5-editor-classic/src/classiceditor";
-import { getDefault } from "@js/editor/configDefault";
+import { getDefault } from "@js/editor/config/configDefault";
 import CKEditorInspector from "@ckeditor/ckeditor5-inspector";
 import { insertElementAfter } from "@js/util/domUtils";
 import "@js/editor/styles/editor.css"; // to overwrite some of the styles

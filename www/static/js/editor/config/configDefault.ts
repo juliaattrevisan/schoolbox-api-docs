@@ -55,7 +55,19 @@ import Alignment from "@ckeditor/ckeditor5-alignment/src/alignment";
 import FindAndReplace from "@ckeditor/ckeditor5-find-and-replace/src/findandreplace";
 import SourceEditing from "@ckeditor/ckeditor5-source-editing/src/sourceediting";
 import WordCount from "@ckeditor/ckeditor5-word-count/src/wordcount";
-import { getDefaultColors } from "@js/editor/configDefaultColors";
+import UploadAdapter from "../plugin/UploadAdapter";
+import { getDefaultColors } from "@js/editor/config/configDefaultColors";
+
+/**
+ * Add our custom upload adapter
+ *
+ * @param { CKEditor } editor - the CKEditor instance
+ */
+function UploadAdapterPlugin(editor) {
+    editor.plugins.get("FileRepository").createUploadAdapter = (loader) => {
+        return new UploadAdapter(loader);
+    };
+}
 
 /**
  * Return the default configuration
@@ -117,6 +129,7 @@ export function getDefault() {
             SourceEditing,
             WordCount,
         ],
+        extraPlugins: [UploadAdapterPlugin],
         toolbar: [
             // what displays in the toolbar in order, are either single buttons or groups via objects
             "bold",
@@ -203,13 +216,26 @@ export function getDefault() {
         image: {
             // image setup: https://ckeditor.com/docs/ckeditor5/latest/features/images/images-overview.html
             toolbar: [
-                "imageStyle:block",
+                "imageTextAlternative",
+                "toggleImageCaption",
+                "linkImage",
+                "|",
+                "imageStyle:inline",
+                {
+                    name: "imageStyle:wrapText",
+                    title: "Wrap text",
+                    items: ["imageStyle:alignLeft", "imageStyle:alignRight"],
+                    defaultItem: "imageStyle:alignLeft",
+                },
+                {
+                    name: "imageStyle:breakText",
+                    title: "Break text",
+                    items: ["imageStyle:alignBlockLeft", "imageStyle:block", "imageStyle:alignBlockRight"],
+                    defaultItem: "imageStyle:block",
+                },
                 "imageStyle:side",
                 "|",
-                "toggleImageCaption",
-                "imageTextAlternative",
-                "|",
-                "linkImage",
+                "resizeImage",
             ],
         },
         table: {
