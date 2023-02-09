@@ -190,14 +190,45 @@ class Browser implements Source\BrowserInterface
      */
     protected function buildOutputTree(stdClass $jsonTree, LearningLevel\Model $level): ?Node\Model
     {
-        $node = null;
+        // get parent node, regardless of level
+        $node = $this->buildSingleNode($jsonTree);
+        $isForLevel = $this->isForLevel($jsonTree, $level);
+
+        // even parent is not for the level, child node may be
+        if (isset($jsonTree->children) && is_iterable($jsonTree->children)) {
+            foreach ($jsonTree->children as $child) {
+                if (!$isForLevel && !$this->isForLevel($child, $level)) {
+                    continue;
+                }
+                $nodes = $this->buildOutputTree($child, $level);
+                if ($nodes) {
+                    $node->addChild($nodes);
+                }
+            }
+        }
+
+        // if parent is not for the level and also no children found for the level, return null
+        if (!$isForLevel && !$node->getChildren()->count()) {
+            return null;
+        }
+        return $node;
+    }
+
+    /**
+     * Determine whether the jsonTree is for this level
+     * @param stdClass            $jsonTree
+     * @param LearningLevel\Model $level
+     * @return bool
+     */
+    private function isForLevel(stdClass $jsonTree, LearningLevel\Model $level): bool
+    {
         if (
             isset($jsonTree->dcterms_educationLevel->uri)
             && $jsonTree->dcterms_educationLevel->uri === $level->getReference()
         ) {
             // This is the right year level within this learning area.
             // Build an outcome tree out of it.
-            $node = $this->buildSingleNode($jsonTree);
+            return true;
         } elseif (
             isset($jsonTree->dcterms_educationLevel)
             && is_array($jsonTree->dcterms_educationLevel)
@@ -206,21 +237,11 @@ class Browser implements Source\BrowserInterface
             // if any match the given learning level, build an outcome tree.
             foreach ($jsonTree->dcterms_educationLevel as $educationLevel) {
                 if (isset($educationLevel->uri) && $educationLevel->uri === $level->getReference()) {
-                    $node = $this->buildSingleNode($jsonTree);
-                    break;
+                    return true;
                 }
             }
         }
-
-        if ($node && isset($jsonTree->children) && is_iterable($jsonTree->children)) {
-            foreach ($jsonTree->children as $child) {
-                $nodes = $this->buildOutputTree($child, $level);
-                if ($nodes) {
-                    $node->addChild($nodes);
-                }
-            }
-        }
-        return $node;
+        return false;
     }
 
     /**

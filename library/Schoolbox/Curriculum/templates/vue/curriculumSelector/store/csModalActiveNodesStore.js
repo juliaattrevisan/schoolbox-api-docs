@@ -2,32 +2,30 @@
  * Manages the currently visible nodes in mc-modal-nodes
  */
 
-import { defineStore } from 'pinia';
-import { useNodesStore } from '../store/csNodesStore';
-import { findById } from '@schoolboxCurriculum/js/nodeUtils';
-import { useModalSearchStore } from './csModalSearchStore';
+import { defineStore } from "pinia";
+import { useNodesStore } from "../store/csNodesStore";
+import { findById } from "@schoolboxCurriculum/js/nodeUtils";
+import { useModalSearchStore } from "./csModalSearchStore";
 
 export const DIRECTION = {
-    FORWARDS: 'forwards',
-    BACKWARDS: 'backwards',
-}
+    FORWARDS: "forwards",
+    BACKWARDS: "backwards",
+};
 
 export const useModalActiveNodesStore = defineStore(`csModelActiveNodes`, {
-
     state: () => ({
         idList: [], //ids of the selected nodes
         currentDepth: 0, //track how far down the tree we are
-        currentDirection: DIRECTION.FORWARDS //which direction we are currently travelling in the tree
+        currentDirection: DIRECTION.FORWARDS, //which direction we are currently travelling in the tree
     }),
 
     getters: {
-
         /**
          * Can now use the search input when we have selected at least one node
          *
          * @return { Boolean }
          */
-        isActive () {
+        isActive() {
             return this.idList.length > 0;
         },
 
@@ -36,15 +34,17 @@ export const useModalActiveNodesStore = defineStore(`csModelActiveNodes`, {
          *
          * @return { Array }
          */
-        breadcrumbs () {
+        breadcrumbs() {
             let breadcrumbs = [];
             const nodesStore = useNodesStore();
-            if (!nodesStore.hasSingleCurriculum) { //we only need this breadcrumb if there's more than one Curriculum, otherwise we jump straight to the single node with no option of returning back
-                breadcrumbs.push( { id: nodesStore.nodes.id, name: nodesStore.nodes.name, depth: 0 } );
+            if (!nodesStore.hasSingleCurriculum) {
+                //we only need this breadcrumb if there's more than one Curriculum, otherwise we jump straight to the single node with no option of returning back
+                breadcrumbs.push({ id: nodesStore.nodes.id, name: nodesStore.nodes.name, depth: 0 });
             }
-            this.idList.forEach((id, index) => { //add in a breadcrumb for each selected node
+            this.idList.forEach((id, index) => {
+                //add in a breadcrumb for each selected node
                 const nodeAtDepth = findById(nodesStore.nodes.children, id);
-                breadcrumbs.push( { id: id, name: nodeAtDepth.name, depth: index+1 } );
+                breadcrumbs.push({ id: id, name: nodeAtDepth.name, depth: index + 1 });
             });
             //we return an empty array if there's no selections yet, otherwise we pull out the latest as it represents the node we are currently on (not one we need to move back to)
             return breadcrumbs.length === 0 ? [] : breadcrumbs.slice(0, -1);
@@ -55,11 +55,13 @@ export const useModalActiveNodesStore = defineStore(`csModelActiveNodes`, {
          *
          * @returns { Object }
          */
-        current () {
+        current() {
             const nodesStore = useNodesStore();
-            if (this.idList.length > 0) { //grab the current latest selection
-                return findById(nodesStore.nodes.children, this.idList[this.currentDepth-1]);
-            } else { //otherwise return the root level structure when there's more than one root level node
+            if (this.idList.length > 0) {
+                //grab the current latest selection
+                return findById(nodesStore.nodes.children, this.idList[this.currentDepth - 1]);
+            } else {
+                //otherwise return the root level structure when there's more than one root level node
                 return nodesStore.nodes;
             }
         },
@@ -70,7 +72,7 @@ export const useModalActiveNodesStore = defineStore(`csModelActiveNodes`, {
          *
          * @returns { Array }
          */
-        nodes () {
+        nodes() {
             const modalSearchStore = useModalSearchStore();
             if (modalSearchStore.isActive) {
                 return modalSearchStore.results;
@@ -78,11 +80,9 @@ export const useModalActiveNodesStore = defineStore(`csModelActiveNodes`, {
                 return [this.current];
             }
         },
-
     },
 
     actions: {
-
         /**
          * There's been a change in node selection,
          * so update based on the change in depth
@@ -90,14 +90,17 @@ export const useModalActiveNodesStore = defineStore(`csModelActiveNodes`, {
          * @param { number }
          * @param { number }
          */
-        setSelected (depth, id) {
+        setSelected(depth, id) {
             useModalSearchStore().clear(); //clear the search results when traversing
-            if (depth === 0) { //pulling back to no node selection at all, the root level
+            if (depth === 0) {
+                //pulling back to no node selection at all, the root level
                 this.reset();
-            } else if (depth > this.currentDepth) { //progressing to the next depth
+            } else if (depth > this.currentDepth) {
+                //progressing to the next depth
                 this.toNext(id);
-            } else if (depth < this.currentDepth) { //or going back to a previous depth
-                this.toPrevious(depth)
+            } else if (depth < this.currentDepth) {
+                //or going back to a previous depth
+                this.toPrevious(depth);
             }
             this.currentDepth = depth;
         },
@@ -105,7 +108,7 @@ export const useModalActiveNodesStore = defineStore(`csModelActiveNodes`, {
         /**
          * Reset to the original state, with no active selection at all
          */
-        reset () {
+        reset() {
             this.currentDirection = DIRECTION.BACKWARDS;
             this.idList = [];
             this.currentDepth = 0;
@@ -116,7 +119,7 @@ export const useModalActiveNodesStore = defineStore(`csModelActiveNodes`, {
          *
          * @param { number }
          */
-        toNext (id) {
+        toNext(id) {
             this.currentDirection = DIRECTION.FORWARDS;
             this.idList = [...this.idList, id]; //add the new id in
         },
@@ -126,7 +129,7 @@ export const useModalActiveNodesStore = defineStore(`csModelActiveNodes`, {
          *
          * @param { number }
          */
-        toPrevious (targetDepth) {
+        toPrevious(targetDepth) {
             this.currentDirection = DIRECTION.BACKWARDS;
             this.idList = this.idList.filter((id, index) => index < targetDepth); //shorten the list back to the new reduced depth
         },
@@ -136,12 +139,10 @@ export const useModalActiveNodesStore = defineStore(`csModelActiveNodes`, {
          *
          * @param { number }
          */
-        async setNextSelected (id) {
+        async setNextSelected(id) {
             const nodesStore = useNodesStore();
             await nodesStore.loadChildren(id);
-            this.setSelected(this.currentDepth+1, id);
+            this.setSelected(this.currentDepth + 1, id);
         },
-
     },
-
 });

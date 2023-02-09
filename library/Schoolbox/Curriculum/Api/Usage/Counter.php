@@ -52,7 +52,9 @@ class Counter
                 INNER JOIN course_specification cs ON f.id = cs.folder_id
                 WHERE f.deleted_at IS NULL
                 AND cs.deleted_at IS NULL
-                AND cnfc.curriculum_node_id IN " . Builder::getArrayPlaceholders($ids, Cursor::DISCRIMINATOR_COURSE),
+                AND cnfc.curriculum_node_id IN "
+                . Builder::getArrayPlaceholders($ids, Cursor::DISCRIMINATOR_COURSE)
+                . " GROUP BY id, discriminator",
             "
                 SELECT
                     cnfc.curriculum_node_id AS id,
@@ -63,7 +65,9 @@ class Counter
                 INNER JOIN course_unit_specification cus ON f.id = cus.folder_id
                 WHERE f.deleted_at IS NULL
                 AND cus.deleted_at IS NULL
-                AND cnfc.curriculum_node_id IN " . Builder::getArrayPlaceholders($ids, Cursor::DISCRIMINATOR_UNIT),
+                AND cnfc.curriculum_node_id IN "
+                . Builder::getArrayPlaceholders($ids, Cursor::DISCRIMINATOR_UNIT)
+                . " GROUP BY id, discriminator",
             "
                 SELECT
                     cnfc.curriculum_node_id AS id,
@@ -76,7 +80,9 @@ class Counter
                 WHERE f.deleted_at IS NULL
                 AND cs.id IS NULL
                 AND cus.id IS NULL
-                AND cnfc.curriculum_node_id IN " . Builder::getArrayPlaceholders($ids, Cursor::DISCRIMINATOR_FOLDER),
+                AND cnfc.curriculum_node_id IN "
+                . Builder::getArrayPlaceholders($ids, Cursor::DISCRIMINATOR_FOLDER)
+                . " GROUP BY id, discriminator",
         ];
         $queryString = '(' . implode(') UNION (', $selectParts) . ')';
         $query       = $this->database->prepareQuery($queryString);

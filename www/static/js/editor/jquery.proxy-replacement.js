@@ -1,11 +1,9 @@
-(function() {
-
+(function () {
     /**
      * Replace all placeholders with html elements
      * By default this replaces everything in #content, our main container
      */
-    $.fn.schoolboxResource_ProxyReplacement = function(identifier) {
-
+    $.fn.schoolboxResource_ProxyReplacement = function (identifier) {
         /* Replace all the placeholders with html fragments that a media player can understand
          */
         $.fn.schoolboxResource_ReplaceAll($(identifier));
@@ -15,7 +13,6 @@
         $.fn.schoolboxResource_InitialiseMediaElementPlayer(identifier);
     };
 
-
     /**
      * Mass-replace all media placeholders
      *
@@ -23,10 +20,10 @@
      *                  that should be replaced with a media player
      * @return int      the number of things that got replaced
      */
-    $.fn.schoolboxResource_ReplaceAll = function(selector) {
+    $.fn.schoolboxResource_ReplaceAll = function (selector) {
         var count = 0;
 
-        $.each(selector.find('[data-schoolboxresource-type]'), function (index, element) {
+        $.each(selector.find("[data-schoolboxresource-type]"), function (index, element) {
             var replaced = $.fn.schoolboxResource_ReplaceOne(element);
 
             if (replaced) {
@@ -36,7 +33,6 @@
 
         return count;
     };
-
 
     /**
      * Mass-restore all media placeholders that were hidden by
@@ -48,16 +44,15 @@
      * @param selector
      * @return {Number} the number of placeholders which got restored
      */
-    $.fn.schoolboxResource_RestoreAllPlaceholders = function(selector) {
+    $.fn.schoolboxResource_RestoreAllPlaceholders = function (selector) {
         var count = 0;
-        selector.find('[data-schoolboxmedia-replacement-container]').each(function () {
+        selector.find("[data-schoolboxmedia-replacement-container]").each(function () {
             if ($.fn.schoolboxResource_RestorePlaceholder(this)) {
                 count++;
             }
         });
         return count;
     };
-
 
     /**
      * Apply all the placeholders that were found in element.
@@ -69,17 +64,16 @@
      *
      * @param element
      */
-    $.fn.schoolboxResource_ReplaceOne = function(element) {
+    $.fn.schoolboxResource_ReplaceOne = function (element) {
         var replacement = $.fn.schoolboxResource_GenerateReplacement(element);
 
         if (replacement !== false) {
-            $(element).css('display', 'none').after(replacement);
+            $(element).css("display", "none").after(replacement);
             return true;
         }
 
         return false;
     };
-
 
     /**
      * Restores the placeholder that was replaced by
@@ -90,13 +84,13 @@
      * @param element
      * @returns {boolean}
      */
-    $.fn.schoolboxResource_RestorePlaceholder = function(element) {
+    $.fn.schoolboxResource_RestorePlaceholder = function (element) {
         var $element = $(element),
-            $placeholder = $element.prev('[data-schoolboxresource-type]');
+            $placeholder = $element.prev("[data-schoolboxresource-type]");
         if ($placeholder.length) {
             // Does this actually have a placeholder to restore?
-            $placeholder.css('display', '');
-            $element.find('.mejs__container').each(function () {
+            $placeholder.css("display", "");
+            $element.find(".mejs__container").each(function () {
                 var playerId = this.id;
                 if (playerId && mejs.players && mejs.players[playerId]) {
                     mejs.players[playerId].remove();
@@ -108,28 +102,37 @@
         return false;
     };
 
-
     /**
      * Get parameters from DOM
      * @param element
      * @returns {{thumbnail: *, maxwidth: string, classes: *, width: *, style: *, source: *, type: *, height: *, fullwidth: *}}
      */
-    $.fn.schoolboxResource_GetParams = function(element) {
+    $.fn.schoolboxResource_GetParams = function (element) {
         var e = $(element);
 
         return {
-            'style': (e.attr('style') !== undefined) ? e.attr('style') : '',
-            'width': (e.attr('data-schoolboxresource-width') !== undefined) ? e.attr('data-schoolboxresource-width') : '',
-            'height': (e.attr('data-schoolboxresource-height') !== undefined) ? e.attr('data-schoolboxresource-height') : '',
-            'thumbnail': (e.attr('data-schoolboxresource-thumbnail') !== undefined) ? e.attr('data-schoolboxresource-thumbnail') : '',
-            'classes': (e.attr('class') !== undefined) ? e.attr('class') : '',
-            'source': (e.attr('data-schoolboxresource-source') !== undefined) ? e.attr('data-schoolboxresource-source') : '',
-            'type': (e.attr('data-schoolboxresource-type') !== undefined) ? e.attr('data-schoolboxresource-type') : '',
-            'fullwidth': (e.attr('data-schoolboxresource-fullwidth') !== undefined) ? e.attr('data-schoolboxresource-fullwidth') : '',
-            'maxwidth': (e.attr('data-schoolboxresource-fullwidth') === 'true') ? '100%' : e.attr('data-schoolboxresource-width') + 'px'
+            style: e.attr("style") !== undefined ? e.attr("style") : "",
+            width: e.attr("data-schoolboxresource-width") !== undefined ? e.attr("data-schoolboxresource-width") : "",
+            height:
+                e.attr("data-schoolboxresource-height") !== undefined ? e.attr("data-schoolboxresource-height") : "",
+            thumbnail:
+                e.attr("data-schoolboxresource-thumbnail") !== undefined
+                    ? e.attr("data-schoolboxresource-thumbnail")
+                    : "",
+            classes: e.attr("class") !== undefined ? e.attr("class") : "",
+            source:
+                e.attr("data-schoolboxresource-source") !== undefined ? e.attr("data-schoolboxresource-source") : "",
+            type: e.attr("data-schoolboxresource-type") !== undefined ? e.attr("data-schoolboxresource-type") : "",
+            fullwidth:
+                e.attr("data-schoolboxresource-fullwidth") !== undefined
+                    ? e.attr("data-schoolboxresource-fullwidth")
+                    : "",
+            maxwidth:
+                e.attr("data-schoolboxresource-fullwidth") === "true"
+                    ? "100%"
+                    : e.attr("data-schoolboxresource-width") + "px",
         };
     };
-
 
     /**
      * Generate html compatible with media player
@@ -140,69 +143,89 @@
     $.fn.schoolboxResource_GenerateReplacement = function (element) {
         var params = $.fn.schoolboxResource_GetParams(element);
 
-        var style = params['style'];
-        var width = params['width'];
-        var height = params['height'];
-        var thumbnail = params['thumbnail'];
-        var classes = params['classes'];
-        var source = params['source'];
-        var fullwidth = params['fullwidth'];
-        var type = params['type'];
-        var maxwidth = width + 'px;';
+        var style = params["style"];
+        var width = params["width"];
+        var height = params["height"];
+        var thumbnail = params["thumbnail"];
+        var classes = params["classes"];
+        var source = params["source"];
+        var fullwidth = params["fullwidth"];
+        var type = params["type"];
+        var maxwidth = width + "px;";
 
-        if (fullwidth == 'true') {
-            maxwidth = '100%';
+        if (fullwidth == "true") {
+            maxwidth = "100%";
         }
 
-        if (typeof source == 'undefined') {
-            source = '';
+        if (typeof source == "undefined") {
+            source = "";
         }
-        source = source.replace('type=browse', 'type=sbfs').replace('type=store', 'type=storage');
+        source = source.replace("type=browse", "type=sbfs").replace("type=store", "type=storage");
 
-        if (type === 'video') {
-            return '<div data-schoolboxmedia-replacement-container style="max-width:' + maxwidth + style + '">' +
-                '<video width="' + width + '" height="' + height + '" data-schoolboxmedia-replacement controls preload="none" ' +
-                'poster="' + thumbnail + '" class="' + classes + '" style="width:100%;height:100%;">' +
-                '<source src="' + source + '" type="video/mp4">' +
-                '</video>' +
-                '</div>';
-        } else if (type === 'audio') {
-            return '<div data-schoolboxmedia-replacement-container>' +
-                '<audio data-schoolboxmedia-replacement controls preload="none" style="' + style + ';width:100%;height:40px;border:0px;">' +
-                '<source src="' + source + '" type="audio/mpeg">' +
-                '</audio>' +
-                '</div>';
+        if (type === "video") {
+            return (
+                '<div data-schoolboxmedia-replacement-container style="max-width:' +
+                maxwidth +
+                style +
+                '">' +
+                '<video width="' +
+                width +
+                '" height="' +
+                height +
+                '" data-schoolboxmedia-replacement controls preload="none" ' +
+                'poster="' +
+                thumbnail +
+                '" class="' +
+                classes +
+                '" style="width:100%;height:100%;">' +
+                '<source src="' +
+                source +
+                '" type="video/mp4">' +
+                "</video>" +
+                "</div>"
+            );
+        } else if (type === "audio") {
+            return (
+                "<div data-schoolboxmedia-replacement-container>" +
+                '<audio data-schoolboxmedia-replacement controls preload="none" style="' +
+                style +
+                ';width:100%;height:40px;border:0px;">' +
+                '<source src="' +
+                source +
+                '" type="audio/mpeg">' +
+                "</audio>" +
+                "</div>"
+            );
         }
 
         return false;
     };
-
 
     /**
      * Replace all media players with mejs
      * @param selector
      */
     $.fn.schoolboxResource_InitialiseMediaElementPlayer = function (selector) {
-        $(selector).find('[data-schoolboxmedia-replacement]').each(function(index, element) {
-
-            /* Use the natural rendering mechanism when full-width class is present
-             */
-            if ($(element).hasClass('full-width')) {
-                $(element).mediaelementplayer();
-            } else {
-
-                /* Video dimensions exceed the container's maxwidth setting for some reason
-                 * https://github.com/mediaelement/mediaelement/issues/42
-                 *
-                 * This was also encountered in storage.vue:46 in mounted()
-                 *
-                 * So I guess we can set it manually and explicitly here
+        $(selector)
+            .find("[data-schoolboxmedia-replacement]")
+            .each(function (index, element) {
+                /* Use the natural rendering mechanism when full-width class is present
                  */
-                $(element).mediaelementplayer({
-                    videoWidth: $(element).attr('width'),
-                    videoHeight: $(element).attr('height')
-                });
-            }
-        })
+                if ($(element).hasClass("full-width")) {
+                    $(element).mediaelementplayer();
+                } else {
+                    /* Video dimensions exceed the container's maxwidth setting for some reason
+                     * https://github.com/mediaelement/mediaelement/issues/42
+                     *
+                     * This was also encountered in storage.vue:46 in mounted()
+                     *
+                     * So I guess we can set it manually and explicitly here
+                     */
+                    $(element).mediaelementplayer({
+                        videoWidth: $(element).attr("width"),
+                        videoHeight: $(element).attr("height"),
+                    });
+                }
+            });
     };
-}(jQuery));
+})(jQuery);

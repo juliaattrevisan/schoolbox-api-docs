@@ -12,45 +12,45 @@ export const EXPIRY_HALF_YEAR = 183;
 export const EXPIRY_YEAR = 365;
 export const EXPIRY_OPTIONS = [
     {
-        expiryLabel: 'Does not expire',
-        lifetimeLabel: 'Forever',
+        expiryLabel: "Does not expire",
+        lifetimeLabel: "Forever",
         value: EXPIRY_NEVER,
     },
     {
-        expiryLabel: '1 day',
-        lifetimeLabel: '1 day',
+        expiryLabel: "1 day",
+        lifetimeLabel: "1 day",
         value: EXPIRY_DAY,
     },
     {
-        expiryLabel: '1 week',
-        lifetimeLabel: '1 week',
+        expiryLabel: "1 week",
+        lifetimeLabel: "1 week",
         value: EXPIRY_WEEK,
     },
     {
-        expiryLabel: '2 weeks',
-        lifetimeLabel: '2 weeks',
+        expiryLabel: "2 weeks",
+        lifetimeLabel: "2 weeks",
         value: EXPIRY_FORTNIGHT,
     },
     {
-        expiryLabel: '1 month',
-        lifetimeLabel: '1 month',
+        expiryLabel: "1 month",
+        lifetimeLabel: "1 month",
         value: EXPIRY_MONTH,
     },
     {
-        expiryLabel: '3 months',
-        lifetimeLabel: '3 months',
+        expiryLabel: "3 months",
+        lifetimeLabel: "3 months",
         value: EXPIRY_QUARTER_YEAR,
     },
     {
-        expiryLabel: '6 months',
-        lifetimeLabel: '6 months',
+        expiryLabel: "6 months",
+        lifetimeLabel: "6 months",
         value: EXPIRY_HALF_YEAR,
     },
     {
-        expiryLabel: '1 year',
-        lifetimeLabel: '1 year',
+        expiryLabel: "1 year",
+        lifetimeLabel: "1 year",
         value: EXPIRY_YEAR,
-    }
+    },
 ];
 
 /**
@@ -61,7 +61,7 @@ export const EXPIRY_OPTIONS = [
  * @return {string|null}
  */
 export function translateDaysToExpiryLabel(expiry) {
-    let match = EXPIRY_OPTIONS.find(v => v.value === expiry);
+    let match = EXPIRY_OPTIONS.find((v) => v.value === expiry);
     if (match) {
         return match.expiryLabel;
     }
@@ -81,7 +81,7 @@ export function translateDaysToExpiryLabel(expiry) {
  * @return {string|null}
  */
 export function translateDaysToLifetimeLabel(expiry) {
-    let match = EXPIRY_OPTIONS.find(v => v.value === expiry);
+    let match = EXPIRY_OPTIONS.find((v) => v.value === expiry);
     if (match) {
         return match.lifetimeLabel;
     }

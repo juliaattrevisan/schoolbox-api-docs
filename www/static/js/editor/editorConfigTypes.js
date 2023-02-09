@@ -3,8 +3,8 @@
  */
 
 export default Object.freeze({
-    DEFAULT: 'DEFAULT',
-    FOR_COMMENTS: 'FOR_COMMENTS',
-    WITH_USER_TOKENS: 'WITH_USER_TOKENS',
-    BASIC: 'BASIC',
+    DEFAULT: "DEFAULT",
+    FOR_COMMENTS: "FOR_COMMENTS",
+    WITH_USER_TOKENS: "WITH_USER_TOKENS",
+    BASIC: "BASIC",
 });

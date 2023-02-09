@@ -1,39 +1,37 @@
-
-(function() {
-
+(function () {
     /**
      * Render boxplot graphs
      *
      * @param options
      */
-    $.fn.reportCardBoxplotRender = function(options) {
+    $.fn.reportCardBoxplotRender = function (options) {
         var options = options || {
-                element: '',
-                title: '',
-                orientation: 'vertical',
-                allAssessments: [],
-                allData: [],
-                additionalSeries: [],
+            element: "",
+            title: "",
+            orientation: "vertical",
+            allAssessments: [],
+            allData: [],
+            additionalSeries: [],
 
-                /* Format of outlier data
-                 */
-                pointFormatter: function() {
-                    return '';
-                }
-            };
+            /* Format of outlier data
+             */
+            pointFormatter: function () {
+                return "";
+            },
+        };
 
         /* The typical boxplots
          */
         var currentSeries = [
             {
-                name: 'Analysis',
+                name: "Analysis",
                 data: options.allData.allGraphData,
                 tooltip: {
-                    headerFormat: ''
+                    headerFormat: "",
                 },
-                enableMouseTracking: false
-            }
-        ]
+                enableMouseTracking: false,
+            },
+        ];
 
         /* Include overlaid graphs
          */
@@ -45,45 +43,45 @@
             /* can use inverted:true to make it horizontal'
              */
             chart: {
-                type: 'boxplot',
-                inverted: options.orientation == 'vertical' ? false : true
+                type: "boxplot",
+                inverted: options.orientation == "vertical" ? false : true,
             },
 
             title: {
-                text: options.title
+                text: options.title,
             },
 
             legend: {
-                enabled: false
+                enabled: false,
             },
 
             xAxis: {
-                categories: options.allAssessments
+                categories: options.allAssessments,
             },
 
             yAxis: {
                 min: 0,
                 max: 100,
                 labels: {
-                    enabled: false
+                    enabled: false,
                 },
                 title: {
-                    text: ''
-                }
+                    text: "",
+                },
             },
 
             tooltip: {
-                useHTML: true
+                useHTML: true,
             },
 
             credits: {
-                enabled: false
+                enabled: false,
             },
 
-            series: allSeries
+            series: allSeries,
         };
         $(options.element).highcharts($.extend(true, {}, highchartsOptions, options.highcharts));
-    }
+    };
 
     /**
      * Calculate five-point summary and outliers for all series
@@ -91,16 +89,16 @@
      *
      * @returns {{allGraphData: Array, allOutliers: Array}}
      */
-    $.fn.reportCardBoxplotCalculateAllSeriesData = function(input) {
+    $.fn.reportCardBoxplotCalculateAllSeriesData = function (input) {
         var output = {
             input: input,
             allGraphData: [],
-            allOutliers: []
-        }
+            allOutliers: [],
+        };
 
         for (var i = 0; i < input.length; i++) {
             var currentSeriesData = $.fn.reportCardBoxplotCalculateSeriesData({
-                input: input[i]
+                input: input[i],
             });
 
             /* Outliers and boxplots rendered separately
@@ -113,7 +111,7 @@
         }
 
         return output;
-    }
+    };
 
     /**
      * Calculate five-point summary and outliers for one series
@@ -122,8 +120,7 @@
      * @param options
      * @returns {{fivePointSummary: {structured: null, array: Array}, iqr: null, outliers: Array}}
      */
-    $.fn.reportCardBoxplotCalculateSeriesData = function(options) {
-
+    $.fn.reportCardBoxplotCalculateSeriesData = function (options) {
         /* Store the config in this instance so private methods
          * can access it
          */
@@ -132,14 +129,13 @@
         /* Output data structure
          */
         var output = {
-
             /* An object literal containing another object literal and
              * an array, both of which correspond to the five-point
              * summary (min, q1, q2, q3 and max values)
              */
             fivePointSummary: {
                 structured: null,
-                array: []
+                array: [],
             },
 
             /* A float, the interquartile range
@@ -149,8 +145,8 @@
             /* An array of key/value literals
              * e.g. {98, 'John Smith, Year 9'}
              */
-            outliers: []
-        }
+            outliers: [],
+        };
 
         /* Populate with data
          */
@@ -160,32 +156,29 @@
          * Init
          */
         function init(options) {
-
             /* Default values
              */
             var defaults = {
-
                 /* An array of object literals
                  */
-                input: []
-            }
+                input: [],
+            };
 
             /* Derived values
              */
             var derived = {
-
                 /* An array of values derived from input
                  */
-                values: []
-            }
+                values: [],
+            };
 
             /* This sorts as strings by default so use an
              * anonymous function to do it properly
              *
              * http://www.w3schools.com/jsref/jsref_sort.asp
              */
-            options.input.sort(function(a, b) {
-                return a.value - b.value
+            options.input.sort(function (a, b) {
+                return a.value - b.value;
             });
 
             /* Remove null values before computing
@@ -201,7 +194,6 @@
             return merged;
         }
 
-
         /**
          * Generate an object containing all the box plot values
          * required to manufacture a graph
@@ -214,10 +206,9 @@
                 quartile1: config.values[1],
                 quartile2: config.values[2],
                 quartile3: config.values[3],
-                maximum: config.values[4]
+                maximum: config.values[4],
             };
         }
-
 
         /**
          * Generate IQR value
@@ -229,13 +220,11 @@
             return fivePointSummary.quartile3 - fivePointSummary.quartile1;
         }
 
-
         /**
          * Populate output data structure with computed values
          * and any outlier stacks
          */
         function populateOutput(output) {
-
             /* Calculate five point summary
              */
             var fivePointSummary = generateValues();
@@ -256,10 +245,10 @@
                 output.fivePointSummary.structured.quartile1,
                 output.fivePointSummary.structured.quartile2,
                 output.fivePointSummary.structured.quartile3,
-                output.fivePointSummary.structured.maximum
+                output.fivePointSummary.structured.maximum,
             ];
 
             return output;
         }
-    }
-}(jQuery));
+    };
+})(jQuery);

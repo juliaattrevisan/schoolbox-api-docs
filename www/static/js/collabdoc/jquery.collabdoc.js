@@ -1,5 +1,5 @@
-(function($) {
-    $.fn.collabDoc = function(options) {
+(function ($) {
+    $.fn.collabDoc = function (options) {
         options = options || {};
 
         var config = init(options, $(this));
@@ -16,11 +16,10 @@
         function init(options, element) {
             var defaults = {
                 element: element,
-                width: '100%',
-            }
+                width: "100%",
+            };
 
-            var derived = {
-            }
+            var derived = {};
 
             var merged = $.extend(defaults, derived, options);
 
@@ -31,23 +30,21 @@
          * Set up iframe dimensions upon init and resize
          */
         function setupDimensions() {
-
             /* Initial dimensions
              */
             $(config.element).css({
                 width: config.width,
-                height: $(window).height()*0.66
+                height: $(window).height() * 0.66,
             });
 
             /* Resized dimensions
              */
-            $(window).resize(function() {
+            $(window).resize(function () {
                 $(config.element).css({
                     width: config.width,
-                    height: $(window).height()*0.66
+                    height: $(window).height() * 0.66,
                 });
             });
         }
-    }
-}(jQuery));
-
+    };
+})(jQuery);

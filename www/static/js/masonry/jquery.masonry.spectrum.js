@@ -4,29 +4,27 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-;
 (function ($, window, document, undefined) {
-
-    var pluginName = 'masonrySpectrum',
-        interactionState = 'interaction-state';
+    var pluginName = "masonrySpectrum",
+        interactionState = "interaction-state";
 
     var defaults = {
         colours: {
             original: {},
             pickers: {},
-            defaults: {}
+            defaults: {},
         },
         url: null,
-        complete: function() {
+        complete: function () {
             // TODO fix this
-            $('.saved-colours').slideDown(150).delay(2000).slideUp(150);
+            $(".saved-colours").slideDown(150).delay(2000).slideUp(150);
         },
-        inputSelector: 'input',
-        columnSelectorSelector: '[data-column-selector]',
+        inputSelector: "input",
+        columnSelectorSelector: "[data-column-selector]",
         restoreBtnSelector: null,
         cancelBtnSelector: null,
         saveBtnSelector: null,
-        saveLabelSelector: null
+        saveLabelSelector: null,
     };
 
     /**
@@ -35,7 +33,8 @@
      * @constructor
      */
     function MasonrySpectrum(element, masonry) {
-        var mspec = this, opt;
+        var mspec = this,
+            opt;
 
         this.element = element;
         this.masonry = masonry;
@@ -43,27 +42,29 @@
 
         opt = this.options;
 
-        $(this.element).find(this.options.inputSelector).spectrum(
-            $.extend(
-                {},
-                window.sbProps.spectrum,
-                {
+        $(this.element)
+            .find(this.options.inputSelector)
+            .spectrum(
+                $.extend({}, window.sbProps.spectrum, {
                     allowEmpty: true,
-                    change: function (colorObject) {mspec.onColorChange(this, colorObject);},
-                    move: function (colorObject) {mspec.onColorChange(this, colorObject);},
-                    showAlpha: true
-                }
-            )
-        );
+                    change: function (colorObject) {
+                        mspec.onColorChange(this, colorObject);
+                    },
+                    move: function (colorObject) {
+                        mspec.onColorChange(this, colorObject);
+                    },
+                    showAlpha: true,
+                })
+            );
 
         // setup colour selectors
         this.loadColorpickerColors();
 
         // attach listeners if
         var saveLabel = $(this.options.saveLabelSelector);
-        var useLabel  = saveLabel.length && saveLabel.toastActivate && saveLabel.toastTimeout;
+        var useLabel = saveLabel.length && saveLabel.toastActivate && saveLabel.toastTimeout;
         $(this.element)
-            .on('click', this.options.columnSelectorSelector, function (event) {
+            .on("click", this.options.columnSelectorSelector, function (event) {
                 // Don't allow deselect of the only column selected
                 if (mspec.getSelectedColumns().length < 1) {
                     event.preventDefault();
@@ -71,18 +72,19 @@
                     mspec.loadColorpickerColors();
                 }
             })
-            .on('click', opt.restoreBtnSelector+", "+opt.cancelBtnSelector, function (event) {
+            .on("click", opt.restoreBtnSelector + ", " + opt.cancelBtnSelector, function (event) {
                 event.preventDefault();
 
-                var colourSet, labelParams = {css: 'success'};
+                var colourSet,
+                    labelParams = { css: "success" };
 
                 // if it's the restore button
                 if ($(this).filter(opt.restoreBtnSelector).length) {
-                    colourSet        = opt.colours.defaults;
-                    labelParams.text = 'Colours restored to defaults'
+                    colourSet = opt.colours.defaults;
+                    labelParams.text = "Colours restored to defaults";
                 } else if ($(this).filter(opt.cancelBtnSelector).length) {
-                    colourSet        = opt.colours.original;
-                    labelParams.text = 'Colour changes undone'
+                    colourSet = opt.colours.original;
+                    labelParams.text = "Colour changes undone";
                 } else {
                     throw Error("Invalid selector");
                 }
@@ -91,7 +93,7 @@
                 mspec.resetColours(colourSet);
 
                 // copy values from defaults into pickers and reload
-                $.each(colourSet, function(key, value) {
+                $.each(colourSet, function (key, value) {
                     opt.colours.pickers[key] = value;
                 });
                 mspec.loadColorpickerColors();
@@ -100,7 +102,7 @@
                     saveLabel.toastTimeout(labelParams);
                 }
             })
-            .on('click', this.options.saveBtnSelector, function (event) {
+            .on("click", this.options.saveBtnSelector, function (event) {
                 event.preventDefault();
 
                 // if there's no callback, don't try to fire a request at it
@@ -111,7 +113,7 @@
                 // This saves everything, not just colors
                 var data = {
                     colors: mspec.options.colours.pickers,
-                    width: masonry.slider.attr('data-slider')
+                    width: masonry.slider.attr("data-slider"),
                 };
 
                 data = $.extend({}, data, mspec.masonry.options.context);
@@ -119,25 +121,24 @@
                 var ajaxRequest = $.post(opt.url, data, opt.complete);
                 if (useLabel) {
                     saveLabel.toastActivate({
-                        text: 'Saving...'
+                        text: "Saving...",
                     });
                     ajaxRequest
-                        .done(function() {
+                        .done(function () {
                             saveLabel.toastTimeout({
-                                text: 'Columns Saved',
-                                css: 'success'
+                                text: "Columns Saved",
+                                css: "success",
                             });
                         })
-                        .fail(function() {
+                        .fail(function () {
                             saveLabel.toastTimeout({
-                                text: 'Error!',
-                                css: 'alert'
+                                text: "Error!",
+                                css: "alert",
                             });
                         });
                 }
             });
     }
-
 
     /**
      * To be fired whenever
@@ -147,22 +148,21 @@
      */
     MasonrySpectrum.prototype.onColorChange = function (element, colorObject) {
         // Change the colors for the selected items
-        var color   = colorObject.toRgbString(),
-            id      = element.id,
+        var color = colorObject.toRgbString(),
+            id = element.id,
             pickers = this.options.colours.pickers,
-            mspec   = this;
+            mspec = this;
 
         if (!(colorObject instanceof tinycolor)) {
             return;
         }
 
         this.getSelectedColumns().forEach(function (column) {
-            var colorId = column + '_' + id;
+            var colorId = column + "_" + id;
             pickers[colorId] = color;
-            mspec.updateColor(colorId, color)
+            mspec.updateColor(colorId, color);
         });
     };
-
 
     /**
      * Loads picked colors for selected columns into colorpickers.
@@ -173,28 +173,29 @@
         var columns = this.getSelectedColumns(),
             pickers = this.options.colours.pickers;
 
-        $(this.element).find(this.options.inputSelector).each(function () {
-            var element = $(this),
-                id      = this.id;
+        $(this.element)
+            .find(this.options.inputSelector)
+            .each(function () {
+                var element = $(this),
+                    id = this.id;
 
-            var colors = columns.map(function(column) {
-                return pickers[column + '_' + id];
+                var colors = columns.map(function (column) {
+                    return pickers[column + "_" + id];
+                });
+
+                // If this isn't the first instance of color in colors:
+                // filter it out (thus getting unique array)
+                var uniqueColors = colors.filter(function (color, index) {
+                    return colors.indexOf(color) === index;
+                });
+
+                if (uniqueColors.length === 1) {
+                    element.spectrum("set", uniqueColors.pop());
+                } else {
+                    element.spectrum("set", null);
+                }
             });
-
-            // If this isn't the first instance of color in colors:
-            // filter it out (thus getting unique array)
-            var uniqueColors = colors.filter(function(color, index) {
-                return colors.indexOf(color) === index;
-            });
-
-            if (uniqueColors.length === 1) {
-                element.spectrum('set', uniqueColors.pop());
-            } else {
-                element.spectrum('set', null);
-            }
-        });
     };
-
 
     /**
      * Read DOM to find out what is currently selected
@@ -203,11 +204,12 @@
      */
     MasonrySpectrum.prototype.getSelectedColumns = function () {
         return $(this.options.columnSelectorSelector)
-            .filter(':checked')
-            .map(function() { return this.id; })
+            .filter(":checked")
+            .map(function () {
+                return this.id;
+            })
             .toArray();
     };
-
 
     /**
      * @param {object} colours
@@ -217,7 +219,7 @@
         //noinspection AssignmentToFunctionParameterJS
         var masonry = this;
         colours = colours || this.options.colours.defaults;
-        $.each(colours, function(i, v) {
+        $.each(colours, function (i, v) {
             masonry.updateColor(i, v);
         });
         return false;
@@ -229,12 +231,8 @@
     MasonrySpectrum.prototype.resetWidth = function () {
         // Note: foundation slider's set_value is buggy and causes the slider
         // to stop sending change events.
-        this.masonry.slider.foundation(
-            'slider',
-            'set_value',
-            this.masonry.slider.data('original-value')
-        );
-        this.masonry.updateWidth(this.masonry.slider.data('original-value'));
+        this.masonry.slider.foundation("slider", "set_value", this.masonry.slider.data("original-value"));
+        this.masonry.updateWidth(this.masonry.slider.data("original-value"));
     };
 
     /**
@@ -246,11 +244,11 @@
      */
     MasonrySpectrum.prototype.updateColor = function (element, color) {
         // 1: column, 2: element to update
-        var tinyColor   = new tinycolor(color),
+        var tinyColor = new tinycolor(color),
             colorString = tinyColor.toRgbString();
         // Set the value of the CSS var on the masonry's element,
         // as that's where the color vars are defined
-        this.masonry.element.style.setProperty('--' + element.replace(/_/g, '-'), colorString);
+        this.masonry.element.style.setProperty("--" + element.replace(/_/g, "-"), colorString);
     };
 
     /**
@@ -263,17 +261,17 @@
         return this.each(function () {
             var mspec;
 
-            if (!$.data(this, 'plugin_' + pluginName)) {
-                $.data(this, 'plugin_' + pluginName, new MasonrySpectrum(this, masonry));
-            } else if (typeof masonry == 'string') {
-                mspec = $.data(this, 'plugin_' + pluginName);
+            if (!$.data(this, "plugin_" + pluginName)) {
+                $.data(this, "plugin_" + pluginName, new MasonrySpectrum(this, masonry));
+            } else if (typeof masonry == "string") {
+                mspec = $.data(this, "plugin_" + pluginName);
 
                 switch (masonry) {
-                    case 'resetColours':
+                    case "resetColours":
                         mspec.resetColours(mspec.options.colours.original);
                         break;
 
-                    case 'reapplyColors':
+                    case "reapplyColors":
                         mspec.resetColours(mspec.options.colours.pickers);
                         break;
 
@@ -282,6 +280,5 @@
                 }
             }
         });
-    }
-
+    };
 })(jQuery, window, document);

@@ -1,6 +1,4 @@
-(function($) {
-
-
+(function ($) {
     /**
      * Syncs dates with each other - ensures that a start date is not after an end
      * date.
@@ -10,19 +8,19 @@
      *                       is left out, the DOM node in 'this' is used instead.
      * * dateFormat:         a dayjs date format to expect dates in
      */
-    $.fn.syncDates = function(options) {
+    $.fn.syncDates = function (options) {
         // Format: use dayjs format if it's there, otherwise d/m/Y
-        var dateFormat = 'DD/MM/YYYY';
+        var dateFormat = "DD/MM/YYYY";
         var element = this;
 
-        if ('dayjs' in dateDisplayFormats) {
+        if ("dayjs" in dateDisplayFormats) {
             dateFormat = dateDisplayFormats.dayjs;
         }
 
         var defaults = {
             dateFormat: dateFormat,
-            startDate:  null,
-            endDate:    null
+            startDate: null,
+            endDate: null,
         };
 
         var settings = $.extend({}, defaults, options);
@@ -40,17 +38,16 @@
             settings.endDate = element;
         }
 
-        settings.startDate.bind('change.syncDates', function() {
+        settings.startDate.bind("change.syncDates", function () {
             settings.startDate.syncDatesNow(settings);
         });
 
-        settings.endDate.bind('change.syncDates', function() {
+        settings.endDate.bind("change.syncDates", function () {
             settings.endDate.syncDatesNow(settings);
         });
 
         return element;
     };
-
 
     /**
      * Syncs dates on function call
@@ -60,12 +57,11 @@
      *                       is left out, the DOM node in 'this' is used instead.
      * * dateFormat:         a dayjs date format to expect dates in
      */
-    $.fn.syncDatesNow = function(options) {
-
+    $.fn.syncDatesNow = function (options) {
         var defaults = {
-            dateFormat: 'DD/MM/YYYY',
-            startDate:  null,
-            endDate:    null
+            dateFormat: "DD/MM/YYYY",
+            startDate: null,
+            endDate: null,
         };
 
         var settings = $.extend({}, defaults, options);
@@ -91,7 +87,5 @@
                 settings.endDate.val($(this).val()).change();
             }
         }
-
     };
-
 })(jQuery);

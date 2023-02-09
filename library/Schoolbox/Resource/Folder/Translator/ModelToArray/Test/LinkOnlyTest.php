@@ -23,12 +23,14 @@ class LinkOnlyTest extends TestCase
     /**
      * @dataProvider getTestInvokeData
      *
-     * @param Folder $folder
-     * @param array  $expected
+     * @param Folder   $folder
+     * @param LinkOnly $translator
+     * @param array    $expected
+     * @return void
      */
-    public function testInvoke(Folder $folder, array $expected): void
+    public function testInvoke(Folder $folder, LinkOnly $translator, array $expected): void
     {
-        self::assertSame($expected, call_user_func(new LinkOnly(), $folder));
+        self::assertSame($expected, call_user_func($translator, $folder));
     }
 
     /**
@@ -40,12 +42,14 @@ class LinkOnlyTest extends TestCase
             (new Folder())
                 ->setId(1)
                 ->setName('Test 1'),
+            new LinkOnly(0),
             [
-                'id'    => 1,
-                'name'  => 'Test 1',
-                'title' => 'Test 1',
-                'codes' => [],
-                '_links'   => [
+                'id'     => 1,
+                'name'   => 'Test 1',
+                'title'  => 'Test 1',
+                'codes'  => [],
+                'parent' => null,
+                '_links' => [
                     'view' => '/homepage/1',
                 ],
             ]
@@ -64,15 +68,135 @@ class LinkOnlyTest extends TestCase
                         ]
                     )
                 ),
+            new LinkOnly(0),
             [
-                'id'    => 2,
-                'name'  => 'Test 2',
-                'title' => 'Test 2 (A,B)',
-                'codes' => ['A', 'B'],
-                '_links'   => [
+                'id'     => 2,
+                'name'   => 'Test 2',
+                'title'  => 'Test 2 (A,B)',
+                'codes'  => ['A', 'B'],
+                'parent' => null,
+                '_links' => [
                     'view' => '/homepage/2',
                 ],
             ]
+        ];
+
+        // Test ancestry
+        $folderWithAncestry = (new Folder())
+            ->setId(2)
+            ->setName('Test 2')
+            ->setCodes(
+                new GenericCollection(
+                    FolderCode::class,
+                    [
+                        (new FolderCode())->setCode('A'),
+                        (new FolderCode())->setCode('B'),
+                    ]
+                )
+            )
+            ->setParent(
+                (new Folder())
+                    ->setId(3)
+                    ->setName('Test 3')
+                    ->setCodes(
+                        new GenericCollection(
+                            FolderCode::class,
+                            [
+                                (new FolderCode())->setCode('A3'),
+                                (new FolderCode())->setCode('B3'),
+                            ]
+                        )
+                    )->setParent(
+                        (new Folder())
+                            ->setId(5)
+                            ->setName('Test 5')
+                            ->setCodes(
+                                new GenericCollection(
+                                    FolderCode::class,
+                                    [
+                                        (new FolderCode())->setCode('A5'),
+                                    ]
+                                )
+                            )
+                    )
+            );
+
+        yield 'folder with ancestry: ancestor count 0' => [
+            $folderWithAncestry,
+            new LinkOnly(0),
+            [
+                'id'     => 2,
+                'name'   => 'Test 2',
+                'title'  => 'Test 2 (A,B)',
+                'codes'  => ['A', 'B'],
+                'parent' => ['id' => 3],
+                '_links' => [
+                    'view' => '/homepage/2',
+                ],
+            ],
+        ];
+
+        yield 'folder with ancestry: ancestor count 1' => [
+            $folderWithAncestry,
+            new LinkOnly(1),
+            [
+                'id'     => 2,
+                'name'   => 'Test 2',
+                'title'  => 'Test 2 (A,B)',
+                'codes'  => ['A', 'B'],
+                'parent' => [
+                    'id'     => 3,
+                    'name'   => 'Test 3',
+                    'title'  => 'Test 3 (A3,B3)',
+                    'codes'  => ['A3', 'B3'],
+                    'parent' => ['id' => 5],
+                    '_links' => [
+                        'view' => '/homepage/3',
+                    ],
+                ],
+                '_links' => [
+                    'view' => '/homepage/2',
+                ],
+            ],
+        ];
+
+        $fullTranslation = [
+            'id'     => 2,
+            'name'   => 'Test 2',
+            'title'  => 'Test 2 (A,B)',
+            'codes'  => ['A', 'B'],
+            'parent' => [
+                'id'     => 3,
+                'name'   => 'Test 3',
+                'title'  => 'Test 3 (A3,B3)',
+                'codes'  => ['A3', 'B3'],
+                'parent' => [
+                    'id'     => 5,
+                    'name'   => 'Test 5',
+                    'title'  => 'Test 5 (A5)',
+                    'codes'  => ['A5'],
+                    'parent' => null,
+                    '_links' => [
+                        'view' => '/homepage/5',
+                    ],
+                ],
+                '_links' => [
+                    'view' => '/homepage/3',
+                ],
+            ],
+            '_links' => [
+                'view' => '/homepage/2',
+            ],
+        ];
+        yield 'folder with ancestry: ancestor count 2' => [
+            $folderWithAncestry,
+            new LinkOnly(2),
+            $fullTranslation,
+        ];
+        yield 'folder with ancestry: ancestor count 999' => [
+            $folderWithAncestry,
+            new LinkOnly(999),
+            $fullTranslation,
         ];
     }
 }

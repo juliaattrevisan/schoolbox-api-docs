@@ -16,8 +16,6 @@ import "vue-select/dist/vue-select.css";
 import Deselect from "@schoolboxVue/components/selectize/Deselect";
 vSelect.props.components.default = () => ({ Deselect });
 
-const EVENT_CREATED = "eventCreated";
-
 export default {
     name: "create-event-modal",
 
@@ -39,6 +37,8 @@ export default {
         "formatDisplayDate",
         "formatDisplayDatetime",
     ],
+
+    emits: ["eventCreated"],
 
     data() {
         return {
@@ -173,7 +173,7 @@ export default {
                 const responseData = await response.json();
                 if (response.ok) {
                     this.$refs.modal.close();
-                    this.$emit(EVENT_CREATED, responseData);
+                    this.$emit("eventCreated", responseData);
                     this.$refs.toast.timeout("Created", true, 2000);
                 } else {
                     this.$refs.toast.timeout("Unable to create event / task. " + responseData.message, false, 3000);

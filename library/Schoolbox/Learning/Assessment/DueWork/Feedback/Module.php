@@ -174,6 +174,15 @@ class Module extends BaseModule
             $canGiveFeedbackForAssessment,
             $preloadAssessable
         );
+
+        // new markbook publish feedback
+        $this->register(
+            'POST',
+            "/{$participantRoute}/feedback/publish",
+            'postPublishFeedback',
+            $canGiveFeedbackFromParticipant,
+            $preloadParticipant
+        );
     }
 
     /**

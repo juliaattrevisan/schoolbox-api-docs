@@ -8,28 +8,31 @@
  * * select-all-for-group: if set, ignores the container setting and acts as select all for any
  *                         checkbox with matching `data-select-all-group`.
  */
-(function($){
-    $(function(){
-        $('[data-select-all]').each(function() {
-            var selectAll  = $(this);
-            var data       = selectAll.data();
+(function ($) {
+    $(function () {
+        $("[data-select-all]").each(function () {
+            var selectAll = $(this);
+            var data = selectAll.data();
             var checkboxes = $();
-            if ('selectAllForGroup' in data) {
-                checkboxes = $('input[type="checkbox"][data-select-all-group="'+data.selectAllForGroup+'"]')
+            if ("selectAllForGroup" in data) {
+                checkboxes = $('input[type="checkbox"][data-select-all-group="' + data.selectAllForGroup + '"]');
             } else {
-                checkboxes = selectAll.closest(data.selectAll || 'fieldset').find(':checkbox').not(selectAll);
+                checkboxes = selectAll
+                    .closest(data.selectAll || "fieldset")
+                    .find(":checkbox")
+                    .not(selectAll);
             }
 
             // When the select all changes, update the checkboxes this is a select all for
-            selectAll.on('change.selectAll', function() {
-                checkboxes.prop('checked', selectAll.prop('checked'));
-                checkboxes.trigger('change');
+            selectAll.on("change.selectAll", function () {
+                checkboxes.prop("checked", selectAll.prop("checked"));
+                checkboxes.trigger("change");
             });
 
             // When this changes, update its select all?
-            checkboxes.on('change.selectAll', function() {
-                selectAll.prop('checked', checkboxes.length === checkboxes.filter(':checked').length);
+            checkboxes.on("change.selectAll", function () {
+                selectAll.prop("checked", checkboxes.length === checkboxes.filter(":checked").length);
             });
         });
-    })
+    });
 })(jQuery);

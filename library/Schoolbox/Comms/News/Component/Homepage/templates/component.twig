@@ -20,6 +20,9 @@ Data:
         'ref=' ~ referrer,
         'cid=' ~ componentInstanceId,
     ] |join('&') %}
+    {% if readonly %}
+    {% set querystringParams = querystringParams ~ '&readonly=1' %}
+    {% endif %}
 
     {% set getListHomePagePath = routeLookup('commsNews.getListForHomepage', {folderId: folder.id}) %}
 

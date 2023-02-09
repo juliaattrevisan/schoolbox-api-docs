@@ -9,7 +9,7 @@ export default {
          */
         cdnPrefix: {
             type: String,
-            default: '',
+            default: "",
         },
     },
-}
+};

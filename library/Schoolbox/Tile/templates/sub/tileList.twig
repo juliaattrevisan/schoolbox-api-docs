@@ -45,11 +45,13 @@
 
     {% if editable %}
     {# This button should transparently save layout before adding tile #}
+    {# It now also saves the form data (heading, etc.) - check library/Schoolbox/Tile/templates/layout.twig #}
     <li class="tile add" data-tile>
         <span class="title position-middle">+ Add Tile</span>
         <a class="edit"
-           href="{{ routeLookup('tile.add', {layoutId: layout.id}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}"
-           title="Add a new tile"
+            data-add-tile
+            href="{{ routeLookup('tile.add', {layoutId: layout.id}) }}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}"
+            title="Add a new tile"
         ></a>
     </li>
     {% endif %}

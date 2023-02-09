@@ -2,14 +2,12 @@
  * Stores all the curriculum nodes and load in subsequent children
  */
 
-import { defineStore } from 'pinia';
-import { UNSET_ID, findById } from '@schoolboxCurriculum/js/nodeUtils';
-import { useStore, apiEndpoint } from './curriculumSelectorStore';
-import { useModalActiveNodesStore } from './csModalActiveNodesStore';
-
+import { defineStore } from "pinia";
+import { UNSET_ID, findById } from "@schoolboxCurriculum/js/nodeUtils";
+import { useStore, apiEndpoint } from "./curriculumSelectorStore";
+import { useModalActiveNodesStore } from "./csModalActiveNodesStore";
 
 export const useNodesStore = defineStore(`csNodes`, {
-
     state: () => ({
         nodes: [], //all the nodes currenty loaded
         isLoading: false, //to display loading note
@@ -18,13 +16,12 @@ export const useNodesStore = defineStore(`csNodes`, {
     }),
 
     getters: {
-
         /**
          * If there's only no Curriculum, display an empty state
          *
          * @return { Boolean }
          */
-        hasNoCurriculum () {
+        hasNoCurriculum() {
             return this.nodes.children && this.nodes.children.length === 0 ? true : false;
         },
 
@@ -34,18 +31,16 @@ export const useNodesStore = defineStore(`csNodes`, {
          *
          * @return { Boolean }
          */
-        hasSingleCurriculum () {
+        hasSingleCurriculum() {
             return this.nodes.children && this.nodes.children.length === 1 ? true : false;
         },
-
     },
 
     actions: {
-
         /**
          * load in the top level nodes from the api
          */
-         async load () {
+        async load() {
             const store = useStore();
             try {
                 const response = await fetch(`${apiEndpoint}/?topLevelOnly=1&enabled=1&descendants=1&limit=50`);
@@ -70,9 +65,10 @@ export const useNodesStore = defineStore(`csNodes`, {
          *
          * @param { object }
          */
-        async setTopLevel (nodes) {
+        async setTopLevel(nodes) {
             this.updateNodes(nodes);
-            if (this.hasSingleCurriculum) { //we jump straight to the only node available if there's only one
+            if (this.hasSingleCurriculum) {
+                //we jump straight to the only node available if there's only one
                 const singleCurriculumId = this.nodes.children[0].id;
                 await useModalActiveNodesStore().setNextSelected(singleCurriculumId); //load in its children for initial display
             }
@@ -83,13 +79,13 @@ export const useNodesStore = defineStore(`csNodes`, {
          *
          * @param { number }
          */
-        async loadChildren (id) {
+        async loadChildren(id) {
             try {
                 this.isLoading = true;
                 const response = await fetch(`${apiEndpoint}/${id}?descendants=2&limit=50`); //we go two levels deep so we can check for children on two levels
                 if (response.ok) {
                     const newNode = await response.json();
-                    const newNodeChildrenEnabled = newNode.children.filter((node) => (node.enabled)); //only show those nodes with children enabled, this can be handled with enabled=1 on just topLevelOnly
+                    const newNodeChildrenEnabled = newNode.children.filter((node) => node.enabled); //only show those nodes with children enabled, this can be handled with enabled=1 on just topLevelOnly
                     const oldNode = findById(this.nodes.children, id);
                     oldNode.children = newNodeChildrenEnabled; //we just grab the loaded children and overwrite the old property that was previously null
                 } else {
@@ -109,15 +105,14 @@ export const useNodesStore = defineStore(`csNodes`, {
          *
          * @param { Object }
          */
-        updateNodes (nodes) { //we add them to .children so the top level structure is consistent with the levels below
+        updateNodes(nodes) {
+            //we add them to .children so the top level structure is consistent with the levels below
             this.nodes = {
                 id: UNSET_ID,
-                name: 'Curricula',
+                name: "Curricula",
                 children: nodes,
                 enabled: true,
-            }
+            };
         },
-
     },
-
 });

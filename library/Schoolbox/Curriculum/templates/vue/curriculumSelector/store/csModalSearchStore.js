@@ -2,32 +2,29 @@
  * Store the current search results when searcing from cs-modal-header-search-input
  */
 
-import { defineStore } from 'pinia';
-import { apiEndpoint } from './curriculumSelectorStore';
-import { useSelectedNodesStore } from './csSelectedNodesStore';
-import { useModalActiveNodesStore } from './csModalActiveNodesStore';
-
+import { defineStore } from "pinia";
+import { apiEndpoint } from "./curriculumSelectorStore";
+import { useSelectedNodesStore } from "./csSelectedNodesStore";
+import { useModalActiveNodesStore } from "./csModalActiveNodesStore";
 
 const MIN_QUERY_LENGTH = 2; //the amount of characters typed before the search becomes active
 export const DEBOUNCE_AMOUNT = 350; //the amount in ms to hold off on searching, to allow the user to keep typing
 
 export const useModalSearchStore = defineStore(`csModalSearch`, {
-
     state: () => ({
         isLoading: false, //to notify that an action is taking place,
-        query: '', //current search term to filter the active nodes
+        query: "", //current search term to filter the active nodes
         results: [], //nodes returned in the current search results
     }),
 
     getters: {
-
         /**
          * To only start showing search results once enough characters
          * have been added
          *
          * @return { Boolean }
          */
-        isActive () {
+        isActive() {
             return this.query.length >= MIN_QUERY_LENGTH;
         },
 
@@ -36,7 +33,7 @@ export const useModalSearchStore = defineStore(`csModalSearch`, {
          *
          * @return { array }
          */
-        filteredResults () {
+        filteredResults() {
             if (this.isActive) {
                 return this.results;
             } else {
@@ -49,11 +46,11 @@ export const useModalSearchStore = defineStore(`csModalSearch`, {
          *
          * @returns { Array } the search string broken into single words
          */
-        queryWordList () {
+        queryWordList() {
             const queryTrimmed = this.query.trim(); //remove any front or back white space
-            const re = /\s*(?:,|$)\s*/ //adapted from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/split#removing_spaces_from_a_string
+            const re = /\s*(?:,|$)\s*/; //adapted from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/split#removing_spaces_from_a_string
             const commaSeparated = queryTrimmed.split(re) ?? []; //split the string into a comma separated list
-            return commaSeparated.filter(word => word.length > 0); //and ensure each contains a character
+            return commaSeparated.filter((word) => word.length > 0); //and ensure each contains a character
         },
 
         /**
@@ -61,38 +58,39 @@ export const useModalSearchStore = defineStore(`csModalSearch`, {
          *
          * @return { Boolean }
          */
-        hasNoResults () {
+        hasNoResults() {
             return this.isActive && this.filteredResults.length === 0 && !this.isLoading;
         },
-
     },
 
     actions: {
-
         /**
          * when the search isActive, we should display the loading prompt straight away,
          * but the debounce holds on calling search() until we assume the user has stopped typing
          */
-        enableSearch () {
+        enableSearch() {
             this.isLoading = true;
         },
 
         /**
          * search for nodes that match
          */
-        async search () {
+        async search() {
             this.isLoading = true;
             try {
                 const modalActiveNodesStore = useModalActiveNodesStore();
-                const response = await fetch(`${apiEndpoint}?parentId=${modalActiveNodesStore.current.id}&query=${this.query}&enabled=1&limit=50`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
+                const response = await fetch(
+                    `${apiEndpoint}?parentId=${modalActiveNodesStore.current.id}&query=${this.query}&enabled=1&limit=50`,
+                    {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                    }
+                );
                 this.results = await response.json();
                 const selectedNodesStore = useSelectedNodesStore();
-                this.results.forEach((node) => node.isSelected = selectedNodesStore.isSelected(node)); //ensure checked results are reflected
+                this.results.forEach((node) => (node.isSelected = selectedNodesStore.isSelected(node))); //ensure checked results are reflected
             } catch (error) {
                 console.warn(error);
             } finally {
@@ -103,11 +101,9 @@ export const useModalSearchStore = defineStore(`csModalSearch`, {
         /**
          * clear the current search
          */
-        clear () {
-            this.query = '';
+        clear() {
+            this.query = "";
             this.results = [];
         },
-
     },
-
 });

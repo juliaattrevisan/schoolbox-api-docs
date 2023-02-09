@@ -62,7 +62,7 @@ class Status implements IStatus
          */
         $scope = 'students:list';
 
-        (new Api($this->host, $this->key, $scope))->retrieveOne('GET', 'students', 1, 1, []);
+        (new Api($this->host, $this->key))->retrieveOne('GET', 'students', $scope, 1, 1, []);
 
         return true;
     }

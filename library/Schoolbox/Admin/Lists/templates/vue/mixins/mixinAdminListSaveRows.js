@@ -2,36 +2,34 @@
  * To save the rows data to the db, used by both admin-list.vue and admin-list-pop-out.vue
  */
 
- import { mapState, mapActions } from 'pinia';
- import { useAdminListStore } from '../store/adminListStore';
+import { mapState, mapActions } from "pinia";
+import { useAdminListStore } from "../store/adminListStore";
 
 export default {
-
-    data () {
+    data() {
         return {
             saveRows_isProcessing: false,
-            saveRows_saveStatus: 'Save'
-        }
+            saveRows_saveStatus: "Save",
+        };
     },
 
     computed: {
-        ...mapState(useAdminListStore, ['loadedData', 'rows']),
+        ...mapState(useAdminListStore, ["loadedData", "rows"]),
     },
 
     methods: {
-
-        ...mapActions(useAdminListStore, ['updateSequence', 'deleteRowCancelled', 'isValidated']),
+        ...mapActions(useAdminListStore, ["updateSequence", "deleteRowCancelled", "isValidated"]),
 
         /**
          * Save all data
          */
-        async saveRows_onSaveSelected () {
+        async saveRows_onSaveSelected() {
             try {
                 // First close any open colour selectors by auto-clicking 'choose'.  This ensures that the colour
                 // selectors will be in a state consistent with the database after the save action has been performed.
                 // Note that this is required even though the buttons may not be visible due to 'showButtons' having
                 // been set to false in the spectrum color-picker config.
-                $('button.sp-choose').click();
+                $("button.sp-choose").click();
 
                 this.saveRows_isProcessing = true;
                 //check rows for valid / invalid data
@@ -39,23 +37,24 @@ export default {
                     //if form is invalid... return
                     return;
                 }
-                this.saveRows_saveStatus = 'Saving...';
+                this.saveRows_saveStatus = "Saving...";
                 this.$refs.toast.activate(this.saveRows_saveStatus);
                 this.updateSequenceOrder();
                 const response = await fetch(this.loadedData.saveRoute, {
-                    method: 'POST',
+                    method: "POST",
                     body: this.getSaveAllFormData(),
                     headers: {
-                        'Accept': 'application/json'
-                    }
+                        Accept: "application/json",
+                    },
                 });
-                const contentType = response.headers.get('content-type');
+                const contentType = response.headers.get("content-type");
                 if (response.status === 200) {
-                    if (contentType.includes('application/json')) { //if it's json there's a list of new row ids
+                    if (contentType.includes("application/json")) {
+                        //if it's json there's a list of new row ids
                         const responseJson = await response.json();
                         this.updateNewRowIds(responseJson.newRowIdList);
                     }
-                    this.$refs.toast.timeout('Save successful', true, 2000);
+                    this.$refs.toast.timeout("Save successful", true, 2000);
                 } else {
                     const responseJson = await response.json(); //grab the json error message and show to the user
                     this.$refs.toast.timeout(responseJson.title, false, 2000);
@@ -65,9 +64,10 @@ export default {
                 console.warn(error);
                 this.$refs.toast.timeout(responseJson.title, false, 2000);
             } finally {
-                this.$nextTick(() => { //to avoid animating any newly inserted rows in onBeforeEnter
+                this.$nextTick(() => {
+                    //to avoid animating any newly inserted rows in onBeforeEnter
                     this.saveRows_isProcessing = false;
-                    this.saveRows_saveStatus = 'Save';
+                    this.saveRows_saveStatus = "Save";
                 });
             }
         },
@@ -75,10 +75,11 @@ export default {
         /**
          * Ensure the correct sorting order is reflected
          */
-        updateSequenceOrder () {
+        updateSequenceOrder() {
             const newSequenceList = [];
-            const allRowElements = document.querySelector('[data-list]').children;
-            Array.from(allRowElements).forEach((rowElement) => { //loop through each row in order to set the latest correct sequence
+            const allRowElements = document.querySelector("[data-list]").children;
+            Array.from(allRowElements).forEach((rowElement) => {
+                //loop through each row in order to set the latest correct sequence
                 newSequenceList.push(rowElement.dataset.rowId);
             });
             this.updateSequence(newSequenceList);
@@ -89,10 +90,10 @@ export default {
          *
          * @returns { FormData }
          */
-        getSaveAllFormData () {
+        getSaveAllFormData() {
             const formData = new FormData();
-            formData.append('table', this.tableName);
-            formData.append('rows', JSON.stringify(this.rows));
+            formData.append("table", this.tableName);
+            formData.append("rows", JSON.stringify(this.rows));
             return formData;
         },
 
@@ -101,8 +102,9 @@ export default {
          *
          * @param { Array or undefined }
          */
-        updateNewRowIds (newRowIdList) {
-            if (typeof newRowIdList !== 'undefined') { //won't be returned currently if there's no new rows
+        updateNewRowIds(newRowIdList) {
+            if (typeof newRowIdList !== "undefined") {
+                //won't be returned currently if there's no new rows
                 const newRows = this.rows.filter((row) => row.id < 0);
                 newRows.forEach((row, index) => {
                     row.id = newRowIdList[index];
@@ -110,7 +112,5 @@ export default {
                 });
             }
         },
-
-    }
-
-  }
+    },
+};

@@ -6,24 +6,22 @@
  * @link        https://schoolbox.com.au/
  */
 
-import { getLoadedHTML } from '@js/util/domUtils';
+import { getLoadedHTML } from "@js/util/domUtils";
 
-
-;(function ($, window, document, undefined) {
-
+(function ($, window, document, undefined) {
     var slideSlow = 600;
     var slideFast = 100;
 
-    var pluginName = 'mage';
+    var pluginName = "mage";
 
     var defaults = {
-        submittable: 'fieldset',
-        currentStopClass: 'current-stop',
+        submittable: "fieldset",
+        currentStopClass: "current-stop",
         reenablePrevious: false,
         beforeAttemptingSubmit: $.noop,
-        formWillSubmit: function(formData) {
+        formWillSubmit: function (formData) {
             // Accepts serialized form data as an arg, accessible as 'this' inside the function
-            return new Promise(function(resolve, reject) {
+            return new Promise(function (resolve, reject) {
                 // Plugin instances can override this if they want to prevent submission until something async has happened.
                 resolve();
             });
@@ -36,7 +34,7 @@ import { getLoadedHTML } from '@js/util/domUtils';
         setFormData: $.noop,
         initValidation: $.noop,
         validateOptions: false,
-        defaultErrorMessage: 'Something went wrong when submitting the form. Please try again.'
+        defaultErrorMessage: "Something went wrong when submitting the form. Please try again.",
     };
 
     function Mage(element, options) {
@@ -48,16 +46,15 @@ import { getLoadedHTML } from '@js/util/domUtils';
 
         var $elem = $(this.element);
 
-        this.thisPart = $elem.attr('name');
-        this.nextPart = $elem.data('mage-next');
+        this.thisPart = $elem.attr("name");
+        this.nextPart = $elem.data("mage-next");
 
         // non-negotiable selector
-        var $form = $elem.closest('form');
+        var $form = $elem.closest("form");
 
         if ($form.length) {
-
             // don't duplicate this listener
-            $form.off('submit', submitIntercept).on('submit', submitIntercept);
+            $form.off("submit", submitIntercept).on("submit", submitIntercept);
         }
 
         // wrap the interceptor so we can clear and reset it for overloading
@@ -69,12 +66,12 @@ import { getLoadedHTML } from '@js/util/domUtils';
         var onrevert = function (e) {
             e.preventDefault();
 
-            self.options.confirmRevert.call($(this).closest('[data-mage-trainstop]'), e, function () {
+            self.options.confirmRevert.call($(this).closest("[data-mage-trainstop]"), e, function () {
                 // if this callback is called by the confirmation, perform the reversion
                 var sectionToRestore = self.findSubmittable($(self.element));
-                var sectionsToClear  = sectionToRestore.nextAll(self.options.submittable);
+                var sectionsToClear = sectionToRestore.nextAll(self.options.submittable);
 
-                sectionsToClear.find(':submit').mage('hide');
+                sectionsToClear.find(":submit").mage("hide");
 
                 // just before re-enabling the section, call the callback
                 self.options.onRevert.call(self.element);
@@ -88,65 +85,65 @@ import { getLoadedHTML } from '@js/util/domUtils';
         };
 
         // prevent double-listen of reversion
-        $('[data-mage-trainstop=' + this.thisPart + '] a').off('click', onrevert).on('click', onrevert);
+        $("[data-mage-trainstop=" + this.thisPart + "] a")
+            .off("click", onrevert)
+            .on("click", onrevert);
 
         // prevent submissions on click and prevent double-listen
         // this is delegated so stallSubmit can do its job where required
         $form
-            .off('click', '[name=' + this.thisPart + ']', onclick)
-            .on('click',  '[name=' + this.thisPart + ']', onclick);
+            .off("click", "[name=" + this.thisPart + "]", onclick)
+            .on("click", "[name=" + this.thisPart + "]", onclick);
 
         $form.alaressValidate(self.options.validateOptions);
         self.options.initValidation.call();
     }
 
-
     $.fn[pluginName] = function (options) {
+        var plugin = "plugin_" + pluginName;
 
-        var plugin = 'plugin_' + pluginName;
-
-        if (typeof options === 'object' || typeof options === 'undefined') {
+        if (typeof options === "object" || typeof options === "undefined") {
             // if this is configuration
             return this.each(function () {
                 if (!$.data(this, plugin)) {
                     // initialise if not already
                     $.data(this, plugin, new Mage(this, options));
-
                 } else {
                     // just update existing config
                     setOptions.call($.data(this, plugin), options);
                 }
             });
-
-        } else if (typeof options === 'string') {
+        } else if (typeof options === "string") {
             // if this is a function request
             var rtn = [];
 
             this.each(function () {
                 var mage = $(this).data(plugin);
 
-                if (typeof mage === 'undefined') {
+                if (typeof mage === "undefined") {
                     throw "Mage not initialised";
                 }
 
                 // return the thing I'm pointing at
-                if (options === 'next' || options === 'target') {
-                    rtn.push($('[data-mage="' + $(mage.element).data('mage-next') + '"]'));
+                if (options === "next" || options === "target") {
+                    rtn.push($('[data-mage="' + $(mage.element).data("mage-next") + '"]'));
                 }
 
                 // attempt a method call
-                var method = options + 'Section';
+                var method = options + "Section";
 
                 if (method in mage) {
                     rtn.push(mage[method].call(mage));
                 }
             });
 
-            return $($.map(rtn, function (el) { return $.makeArray(el) } ));
+            return $(
+                $.map(rtn, function (el) {
+                    return $.makeArray(el);
+                })
+            );
         }
-
     };
-
 
     /**
      * Disable the fieldset to which this mage step applies.
@@ -155,17 +152,16 @@ import { getLoadedHTML } from '@js/util/domUtils';
      * @return void
      */
     Mage.prototype.disableSection = function () {
-
         var $e = $(this.element);
         var $t = this.findSubmittable($e);
 
-        $t.attr('disabled', 'disabled');
-        $t.find('[data-mage-error]').slideUp(slideFast);
+        $t.attr("disabled", "disabled");
+        $t.find("[data-mage-error]").slideUp(slideFast);
 
-        if ($e.data('mage-reset') === undefined) {
-            $e.data('mage-reset', $e.val());
+        if ($e.data("mage-reset") === undefined) {
+            $e.data("mage-reset", $e.val());
         }
-        $e.val($e.data('mage-working')).attr('disabled', 'disabled');
+        $e.val($e.data("mage-working")).attr("disabled", "disabled");
     };
 
     /**
@@ -175,19 +171,18 @@ import { getLoadedHTML } from '@js/util/domUtils';
      * @return void
      */
     Mage.prototype.enableSection = function () {
-
         var $e = $(this.element);
         var $t = this.findSubmittable($e);
 
-        $t.removeAttr('disabled');
+        $t.removeAttr("disabled");
 
-        if ($e.data('mage-reset')) {
+        if ($e.data("mage-reset")) {
             // reset the submit button text and re-enable it
-            $e.val($e.data('mage-reset')).removeAttr('disabled');
+            $e.val($e.data("mage-reset")).removeAttr("disabled");
         }
 
         // unset the 'submitted' flag
-        $e.removeData('mage-submitted');
+        $e.removeData("mage-submitted");
 
         // open this section if it's not already
         this.openSection();
@@ -200,22 +195,21 @@ import { getLoadedHTML } from '@js/util/domUtils';
      * @return void
      */
     Mage.prototype.closeSection = function () {
-
         var $e = $(this.element);
         var $t = this.findSubmittable($e);
 
         this.disableSection();
 
         // slide away the submit for this section
-        $t.find('[data-mage-submitrow]').slideUp(slideSlow);
+        $t.find("[data-mage-submitrow]").slideUp(slideSlow);
 
         // also slide away this section's helptext
-        this.findSubmittable($e).find('[data-mage-helptext]').slideUp(slideSlow, function() {
-            // disable all inputs in the closed section
-            $t.find(':input').attr('disabled', 'disabled');
-        });
-
-
+        this.findSubmittable($e)
+            .find("[data-mage-helptext]")
+            .slideUp(slideSlow, function () {
+                // disable all inputs in the closed section
+                $t.find(":input").attr("disabled", "disabled");
+            });
     };
 
     /**
@@ -225,28 +219,27 @@ import { getLoadedHTML } from '@js/util/domUtils';
      * @return void
      */
     Mage.prototype.openSection = function () {
-
         var $e = $(this.element);
         var $t = this.findSubmittable($e);
 
         // enable all inputs in the section (that we have not explicitly declared to be excluded)
-        $t.find(':input:not([data-mage-disabled])').removeAttr('disabled');
+        $t.find(":input:not([data-mage-disabled])").removeAttr("disabled");
 
         // slide out the main content wrapper
-        var $content = $t.find('[data-mage-collapsed]');
+        var $content = $t.find("[data-mage-collapsed]");
 
-        if ($content.hasClass('hide')) {
+        if ($content.hasClass("hide")) {
             // swap .hide for jQuery.hide()
-            $content.hide().removeClass('hide');
+            $content.hide().removeClass("hide");
         }
 
-        $t.find('[data-mage-collapsed]').slideDown(slideSlow);
+        $t.find("[data-mage-collapsed]").slideDown(slideSlow);
 
         // slide out the submit for this section
-        $t.find('[data-mage-submitrow]').slideDown(slideSlow);
+        $t.find("[data-mage-submitrow]").slideDown(slideSlow);
 
         // also out this section's helptext
-        $t.find('[data-mage-helptext]').slideDown(slideSlow);
+        $t.find("[data-mage-helptext]").slideDown(slideSlow);
     };
 
     /**
@@ -256,24 +249,21 @@ import { getLoadedHTML } from '@js/util/domUtils';
      * @return void
      */
     Mage.prototype.hideSection = function () {
-
         var $e = $(this.element);
         var $t = this.findSubmittable($e);
 
         var self = this;
 
-        $t.find('[data-mage-collapsed]').slideUp(slideSlow, function () {
-
+        $t.find("[data-mage-collapsed]").slideUp(slideSlow, function () {
             // hide any previous errors
-            $(this).find('[data-mage-error]').hide();
+            $(this).find("[data-mage-error]").hide();
 
             // at this point you might think "wait what??" - what we're doing is hiding the overall
             // wrapper of this content, but preparing the content for the next time it's displayed
-            $t.find('[data-mage-submitrow]').show();
+            $t.find("[data-mage-submitrow]").show();
 
             // also out this section's helptext
-            $t.find('[data-mage-helptext]').show();
-
+            $t.find("[data-mage-helptext]").show();
         });
     };
 
@@ -283,14 +273,15 @@ import { getLoadedHTML } from '@js/util/domUtils';
      * @return void
      */
     Mage.prototype.visitSection = function () {
-
-        var thisIsMyStop = $('[data-mage-trainstop=' + this.thisPart + ']');
+        var thisIsMyStop = $("[data-mage-trainstop=" + this.thisPart + "]");
 
         var c = this.options.currentStopClass;
 
-        thisIsMyStop.addClass(c).siblings('.'+c).removeClass(c);
+        thisIsMyStop
+            .addClass(c)
+            .siblings("." + c)
+            .removeClass(c);
     };
-
 
     /**
      * Finds whatever the submittable for this element is.
@@ -309,10 +300,9 @@ import { getLoadedHTML } from '@js/util/domUtils';
             return submittable;
         }
         return $(this.options.submittable).filter(function () {
-            return $(this).data('mage-next') === element.attr(name);
+            return $(this).data("mage-next") === element.attr(name);
         });
-    }
-
+    };
 
     /**
      * Expects to be applied to the Mage object (but is not a prototype method so as to keep it private).
@@ -320,14 +310,12 @@ import { getLoadedHTML } from '@js/util/domUtils';
      * @param {Object} opts
      */
     function setOptions(opts) {
-
         // if options are already defined, merge with that, otherwise defaults
-        var merge = typeof this.options === 'undefined' ? defaults : this.options;
+        var merge = typeof this.options === "undefined" ? defaults : this.options;
 
         // and apply the merged set
         this.options = $.extend(true, {}, merge, opts);
     }
-
 
     /**
      * Prevent the form from submitting itself
@@ -335,7 +323,7 @@ import { getLoadedHTML } from '@js/util/domUtils';
      * @param {event} e
      */
     function submitIntercept(e) {
-        if ($(this).data('mage-preventsubmit')) {
+        if ($(this).data("mage-preventsubmit")) {
             e.preventDefault();
         }
     }
@@ -348,9 +336,8 @@ import { getLoadedHTML } from '@js/util/domUtils';
      * @param {jQuery} [form] optional
      */
     function submitSection(self, elem, form) {
-
         // destroy any existing alaressValidate options
-        $(form).removeData('validator');
+        $(form).removeData("validator");
 
         // set alaressValidate with new options
         if (self.options.validateOptions !== false) {
@@ -375,7 +362,7 @@ import { getLoadedHTML } from '@js/util/domUtils';
          */
         if (form.valid() == false) {
             // focus user to first invalid field
-            $(form).find(':input.error').first().focus();
+            $(form).find(":input.error").first().focus();
 
             // prevent submit
             return;
@@ -383,7 +370,7 @@ import { getLoadedHTML } from '@js/util/domUtils';
 
         // Everything after this point will only run if the form is valid: we shouldn't be trying to submit at all otherwise.
 
-        if (typeof elem.data('mageSubmitted') != 'undefined') {
+        if (typeof elem.data("mageSubmitted") != "undefined") {
             // do not resubmit this section
             return;
         }
@@ -397,18 +384,18 @@ import { getLoadedHTML } from '@js/util/domUtils';
         // Wait for async requests to approve submit (e.g. with a confirm dialog); goes straight through by default
         var promise = self.options.formWillSubmit.call(formData);
         promise.then(
-            function() {
+            function () {
                 // Submit the form if Promise is resolved
 
                 // HTML5 FTW
-                var method = elem.attr('formmethod') || (form.length ? form.attr('method') : 'post'),
-                    action = elem.attr('formaction') || (form.length ? form.attr('action') : window.location.pathname),
+                var method = elem.attr("formmethod") || (form.length ? form.attr("method") : "post"),
+                    action = elem.attr("formaction") || (form.length ? form.attr("action") : window.location.pathname),
                     target = self.findSubmittable(elem);
 
                 // send it off
                 xhrSend.call(self, method, action, target);
             },
-            function() {
+            function () {
                 // Re-enable form and remove "loading" text if Promise is rejected
                 xhrAfter.call(self);
             }
@@ -418,21 +405,20 @@ import { getLoadedHTML } from '@js/util/domUtils';
     /**
      * Called just before validation runs to copy any CK Editor values to their corresponding text area
      */
-    function copyCkEditorValues(elem)
-    {
+    function copyCkEditorValues(elem) {
         // Is CkEditor running on this page?
-        if(typeof CKEDITOR == 'undefined' || typeof CKEDITOR.instances == 'undefined'){
+        if (typeof CKEDITOR == "undefined" || typeof CKEDITOR.instances == "undefined") {
             return;
         }
 
         /* Find textareas with a name attribute
          */
-        var $textAreas = this.findSubmittable(elem).find('textarea[name]');
+        var $textAreas = this.findSubmittable(elem).find("textarea[name]");
 
-        $textAreas.each(function(idx, elem){
+        $textAreas.each(function (idx, elem) {
             var $textArea = $(elem);
-            var $ckEditorById = CKEDITOR.instances[$textArea.attr('id')];
-            var $ckEditorByName = CKEDITOR.instances[$textArea.attr('name')];
+            var $ckEditorById = CKEDITOR.instances[$textArea.attr("id")];
+            var $ckEditorByName = CKEDITOR.instances[$textArea.attr("name")];
 
             // Does there exist a CK Editor instance for this text area?
             //
@@ -474,14 +460,14 @@ import { getLoadedHTML } from '@js/util/domUtils';
      * @return {Deferred}
      */
     function xhrSend(method, action, targetElement) {
-
         var mage = this,
             targetCopy = cloneTarget(targetElement),
-            form = $('<form/>'), formSerial;
+            form = $("<form/>"),
+            formSerial;
 
         if (this.element.name) {
             // submit clicked-button value
-            targetCopy.append($('<input type=text />').attr('name', this.element.name).val(1))
+            targetCopy.append($("<input type=text />").attr("name", this.element.name).val(1));
         }
 
         form.append(targetCopy);
@@ -492,21 +478,20 @@ import { getLoadedHTML } from '@js/util/domUtils';
         // pre-flight check
         mage.options.setFormData(formSerial);
 
-        return $
-            .ajax(action, {
-                type: method,
-                data: formSerial
-            })
-            .done(function (data/*, status, xhr*/) {
+        return $.ajax(action, {
+            type: method,
+            data: formSerial,
+        })
+            .done(function (data /*, status, xhr*/) {
                 xhrDone.call(mage, mage.options.onXhrDone, targetElement, parseJSON(data));
             })
-            .fail(function (xhr/*, status, error*/) {
+            .fail(function (xhr /*, status, error*/) {
                 xhrFail.call(
                     mage,
                     mage.options.onXhrFail,
                     targetElement,
-                    parseJSON(xhr.responseText) || mage.options.defaultErrorMessage)
-                ;
+                    parseJSON(xhr.responseText) || mage.options.defaultErrorMessage
+                );
             })
             .always(function (/*xhrOrData, status, xhrOrError*/) {
                 xhrAlways.call(mage, mage.options.onXhrAlways);
@@ -520,18 +505,16 @@ import { getLoadedHTML } from '@js/util/domUtils';
      * @param target
      * @returns {*}
      */
-    function cloneTarget(target)
-    {
-        var hauser = target.clone().removeAttr('disabled');
+    function cloneTarget(target) {
+        var hauser = target.clone().removeAttr("disabled");
 
-        hauser.find('select').each(function () {
-
+        hauser.find("select").each(function () {
             var $select = $(this),
-                name    = $select.attr('name'),
+                name = $select.attr("name"),
                 // extract the value from the ORIGINAL
-                value   = target.find('[name="' + name + '"]').val(),
+                value = target.find('[name="' + name + '"]').val(),
                 // replicate the select with a new input
-                $hidden = $('<input type="hidden" />').attr('name', name).val(value);
+                $hidden = $('<input type="hidden" />').attr("name", name).val(value);
 
             // and switch it out
             $select.replaceWith($hidden);
@@ -539,7 +522,6 @@ import { getLoadedHTML } from '@js/util/domUtils';
 
         return hauser;
     }
-
 
     /**
      * Attempt to parse input to return JSON, but do it safely
@@ -557,7 +539,6 @@ import { getLoadedHTML } from '@js/util/domUtils';
         }
     }
 
-
     /**
      * Expects to be applied to the Mage object (but is not a prototype method so as to keep it private).
      */
@@ -569,7 +550,6 @@ import { getLoadedHTML } from '@js/util/domUtils';
         this.enableSection();
     }
 
-
     /**
      * Expects to be applied to the Mage object (but is not a prototype method so as to keep it private).
      *
@@ -578,12 +558,11 @@ import { getLoadedHTML } from '@js/util/domUtils';
      * @param {*} data
      */
     async function xhrDone(onXhrDone, target, data) {
-                
         // ensure the error is slidden away (although onBefore should have handled it)
-        target.find('[data-mage-error]').slideUp(slideSlow);
+        target.find("[data-mage-error]").slideUp(slideSlow);
 
         // mark this section as being submitted, preventing repeat submissions
-        $(this.element).data('mage-submitted', true);
+        $(this.element).data("mage-submitted", true);
 
         // close this section
         this.closeSection();
@@ -594,28 +573,29 @@ import { getLoadedHTML } from '@js/util/domUtils';
          * locked/unlocked state - but previously, instantiation was into a disabled
          * fieldset, so you have to manually re-enable them which is terrible
          */
-        $('[data-mage="' + this.nextPart +  '"]').removeAttr('disabled');
+        $('[data-mage="' + this.nextPart + '"]').removeAttr("disabled");
 
-        if (typeof data === 'string' && /<\/?[a-z][\s\S]*>/i.test(data)) { //if it's a string and if it contains any HTML markup
+        if (typeof data === "string" && /<\/?[a-z][\s\S]*>/i.test(data)) {
+            //if it's a string and if it contains any HTML markup
             const loadedHTMLData = await getLoadedHTML(data); //we need to ensure any <script> tags are preloaded prior to adding to the page
             // call the callback (this would include any specific manipulation for the section being targeted)
             onXhrDone.call(this.element, loadedHTMLData.innerHTML);
-        } else { //oterwise proceed as normal
+        } else {
+            //oterwise proceed as normal
             onXhrDone.call(this.element, data);
         }
 
         // if this is not the final section, the submit for the next section should be available, albeit hidden
-        var nextMage = $('[name="' + this.nextPart +  '"]');
+        var nextMage = $('[name="' + this.nextPart + '"]');
 
         if (nextMage.length) {
             // enable and show the next section
-            nextMage.mage('enable');
+            nextMage.mage("enable");
 
             // set the trainline to the next stop
-            nextMage.mage('visit');
+            nextMage.mage("visit");
         }
     }
-
 
     /**
      * Expects to be applied to the Mage object (but is not a prototype method so as to keep it private).
@@ -625,9 +605,8 @@ import { getLoadedHTML } from '@js/util/domUtils';
      * @param {*} error
      */
     function xhrFail(onXhrFail, target, error) {
-
         // apply the error text and slide into view
-        target.find('[data-mage-error]').hide().html(error).slideDown();
+        target.find("[data-mage-error]").hide().html(error).slideDown();
 
         // re-enable this section (which will implicitly reopen it if it's closed)
         this.enableSection();
@@ -636,14 +615,12 @@ import { getLoadedHTML } from '@js/util/domUtils';
         onXhrFail.call(this.element, error);
     }
 
-
     /**
      * Expects to be applied to the Mage object (but is not a prototype method so as to keep it private).
      *
      * @param {Function} onXhrAlways
      */
     function xhrAlways(onXhrAlways) {
-
         // re-enable if requested
         if (this.options.reenablePrevious) {
             this.enableSection();
@@ -666,17 +643,15 @@ import { getLoadedHTML } from '@js/util/domUtils';
      * @param event
      * @returns {Array}
      */
-    function getEventHandlers(target, event)
-    {
-        if (!('_data' in $)) {
+    function getEventHandlers(target, event) {
+        if (!("_data" in $)) {
             // Access to _data was removed
-            throw new Error('jQuery._data internal API method was removed');
+            throw new Error("jQuery._data internal API method was removed");
         }
-        var events = $._data(target, 'events');
-        if (typeof event === 'undefined') {
+        var events = $._data(target, "events");
+        if (typeof event === "undefined") {
             return events;
         }
-        return (event in events) ? events[event] : [];
+        return event in events ? events[event] : [];
     }
-
 })(jQuery, window, document);

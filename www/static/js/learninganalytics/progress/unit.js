@@ -1,15 +1,14 @@
-(function() {
-
+(function () {
     /**
      * Render unit progress graph
      *
      * @param options
      */
-    $.fn.unitProgressRender = function(options) {
+    $.fn.unitProgressRender = function (options) {
         var options = options || {
-            element: '',
-            title: 'Unit Progress',
-            clusterName: 'Class', // or 'Cohort'
+            element: "",
+            title: "Unit Progress",
+            clusterName: "Class", // or 'Cohort'
 
             /* All unit names
              */
@@ -23,7 +22,7 @@
             /* A series of values corresponding to % of tasks completed
              * by all students
              */
-            classCompletions: []
+            classCompletions: [],
         };
 
         /* Data formatting
@@ -31,7 +30,7 @@
         var formattedMostAdvancedStudents = [];
 
         for (i = 0; i < options.mostAdvancedStudents.length; i++) {
-            formattedMostAdvancedStudents[i] = parseFloat(options.mostAdvancedStudents[i].toFixed(1))
+            formattedMostAdvancedStudents[i] = parseFloat(options.mostAdvancedStudents[i].toFixed(1));
         }
 
         options.mostAdvancedStudents = formattedMostAdvancedStudents;
@@ -39,7 +38,7 @@
         var formattedClassCompletions = [];
 
         for (i = 0; i < options.classCompletions.length; i++) {
-            formattedClassCompletions[i] = parseFloat(options.classCompletions[i].toFixed(1))
+            formattedClassCompletions[i] = parseFloat(options.classCompletions[i].toFixed(1));
         }
 
         options.classCompletions = formattedClassCompletions;
@@ -51,21 +50,21 @@
              * chart to simulate an overlaid bar chart.
              */
             chart: {
-                type: 'column',
-                inverted: true
+                type: "column",
+                inverted: true,
             },
             title: {
-                text: options.title
+                text: options.title,
             },
             xAxis: {
-                categories: options.units
+                categories: options.units,
             },
             yAxis: {
                 min: 0,
                 max: 100,
                 title: {
-                    text: 'Percentage Complete %'
-                }
+                    text: "Percentage Complete %",
+                },
             },
 
             /* This is used to ensure that Entire Class bar always
@@ -74,28 +73,28 @@
              * Entire Class value
              */
             legend: {
-                reversed: true
+                reversed: true,
             },
             plotOptions: {
                 column: {
-                    grouping: false
-                }
+                    grouping: false,
+                },
             },
             series: [
                 {
-                    name: 'Most Advanced Student',
-                    data: options.mostAdvancedStudents
+                    name: "Most Advanced Student",
+                    data: options.mostAdvancedStudents,
                 },
                 {
-                    name: options.clusterName + ' Completion',
-                    data: options.classCompletions
-                }
+                    name: options.clusterName + " Completion",
+                    data: options.classCompletions,
+                },
             ],
             tooltip: {
-                formatter: function() {
-                    return this.series.name + ': ' + this.y + '%';
-                }
-            }
+                formatter: function () {
+                    return this.series.name + ": " + this.y + "%";
+                },
+            },
         });
-    }
-}(jQuery));
+    };
+})(jQuery);

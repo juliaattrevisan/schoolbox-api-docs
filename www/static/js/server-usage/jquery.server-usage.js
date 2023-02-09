@@ -1,5 +1,4 @@
-(function() {
-
+(function () {
     /**
      * Manufactures a bar graph
      *
@@ -7,7 +6,7 @@
      * @copyright   Copyright 2019, Schoolbox Pty Ltd
      * @link        https://schoolbox.com.au/
      */
-    $.fn.serverUsage = function(options) {
+    $.fn.serverUsage = function (options) {
         options = options || {};
 
         var config = init(options, this);
@@ -31,7 +30,7 @@
 
                 /* Graph title
                  */
-                title: '',
+                title: "",
 
                 /* Colour stack for the bars
                  */
@@ -48,23 +47,22 @@
                 /* Tooltip enabled?
                  */
                 tooltip: {
-                    enabled: true
+                    enabled: true,
                 },
 
                 /* Use color transitions?
                  * Must be one of ['default', 'stepped', 'continuous', 'reverseContinuous']
                  */
-                useColorTransitions: 'stepped',
+                useColorTransitions: "stepped",
 
                 /* Custom callback formatter
                  */
-                formatter: function() {
-                    return '';
-                }
-            }
+                formatter: function () {
+                    return "";
+                },
+            };
 
-            var derived = {
-            }
+            var derived = {};
 
             var merged = $.extend(defaults, derived, options);
 
@@ -82,15 +80,15 @@
             var newData;
             var method = merged.useColorTransitions.toLowerCase();
 
-            switch(method) {
-                case 'stepped':
-                case 'continuous':
-                case 'reversecontinuous':
+            switch (method) {
+                case "stepped":
+                case "continuous":
+                case "reversecontinuous":
                     newData = applyColorTransitions(merged.series[0].data, method);
                     break;
 
                 default:
-                    newData = applyColorTransitions(merged.series[0].data, 'default');
+                    newData = applyColorTransitions(merged.series[0].data, "default");
                     break;
             }
 
@@ -110,7 +108,7 @@
             for (var i = 0; i < data.length; i++) {
                 allTemp.push({
                     color: $.fn.serverUsage[method](data[i]),
-                    y: data[i]
+                    y: data[i],
                 });
             }
 
@@ -124,48 +122,48 @@
             $(config.element).highcharts({
                 chart: {
                     height: config.height,
-                    type: 'bar'
+                    type: "bar",
                 },
                 colors: config.colors,
                 title: {
-                    text: config.title
+                    text: config.title,
                 },
                 xAxis: {
-                    categories: config.categories
+                    categories: config.categories,
                 },
                 yAxis: {
                     min: 0,
                     max: 100,
                     reversedStacks: false,
                     title: {
-                        text: ''
-                    }
+                        text: "",
+                    },
                 },
                 tooltip: config.tooltip,
                 legend: {
-                    enabled: false
+                    enabled: false,
                 },
                 plotOptions: {
                     series: {
                         dataLabels: {
-                            color: '#ffffff',
+                            color: "#ffffff",
                             style: {
-                                textShadow: ''
+                                textShadow: "",
                             },
                             enabled: true,
-                            align: 'center',
+                            align: "center",
                             inside: true,
-                            formatter: config.formatter
-                        }
-                    }
+                            formatter: config.formatter,
+                        },
+                    },
                 },
                 series: config.series,
                 credits: {
-                    enabled: false
-                }
+                    enabled: false,
+                },
             });
         }
-    }
+    };
 
     /**
      * Default bar color
@@ -173,9 +171,9 @@
      * @param percent
      * @returns {string}
      */
-    $.fn.serverUsage.default = function(percent) {
-        return '#0066b0';
-    }
+    $.fn.serverUsage.default = function (percent) {
+        return "#0066b0";
+    };
 
     /**
      * Stepped transition
@@ -185,13 +183,13 @@
      * @param percent
      * @returns {string}
      */
-    $.fn.serverUsage.stepped = function(percent) {
+    $.fn.serverUsage.stepped = function (percent) {
         if (percent < 90) {
-            return '#0066b0';
+            return "#0066b0";
         }
 
-        return '#ff5757';
-    }
+        return "#ff5757";
+    };
 
     /**
      * Continuous transition
@@ -201,14 +199,14 @@
      *
      * @param percent
      */
-    $.fn.serverUsage.continuous = function(percent) {
+    $.fn.serverUsage.continuous = function (percent) {
         var max = 230;
 
-        var r = percent<50 ? max : Math.floor(max-(percent*2-100)*max/100);
-        var g = percent>50 ? max : Math.floor((percent*2)*max/100);
+        var r = percent < 50 ? max : Math.floor(max - ((percent * 2 - 100) * max) / 100);
+        var g = percent > 50 ? max : Math.floor((percent * 2 * max) / 100);
 
-        return '#' + $.fn.serverUsage.hexColorComponent(r) + $.fn.serverUsage.hexColorComponent(g) + '00';
-    }
+        return "#" + $.fn.serverUsage.hexColorComponent(r) + $.fn.serverUsage.hexColorComponent(g) + "00";
+    };
 
     /**
      * Continuous transition
@@ -218,14 +216,14 @@
      *
      * @param percent
      */
-    $.fn.serverUsage.reversecontinuous = function(percent) {
+    $.fn.serverUsage.reversecontinuous = function (percent) {
         var max = 230;
 
-        var r = percent>50 ? max : Math.floor((percent*2)*max/100);
-        var g = percent<50 ? max : Math.floor(max-(percent*2-100)*max/100);
+        var r = percent > 50 ? max : Math.floor((percent * 2 * max) / 100);
+        var g = percent < 50 ? max : Math.floor(max - ((percent * 2 - 100) * max) / 100);
 
-        return '#' + $.fn.serverUsage.hexColorComponent(r) + $.fn.serverUsage.hexColorComponent(g) + '00';
-    }
+        return "#" + $.fn.serverUsage.hexColorComponent(r) + $.fn.serverUsage.hexColorComponent(g) + "00";
+    };
 
     /**
      * With prefixed 0
@@ -233,13 +231,13 @@
      * @param percentage
      * @returns {*}
      */
-    $.fn.serverUsage.hexColorComponent = function(percentage) {
+    $.fn.serverUsage.hexColorComponent = function (percentage) {
         var hexValue = percentage.toString(16);
 
         if (hexValue.length < 2) {
-            return '0' + hexValue;
+            return "0" + hexValue;
         }
 
         return hexValue;
-    }
-}(jQuery));
+    };
+})(jQuery);

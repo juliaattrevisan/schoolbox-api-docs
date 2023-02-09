@@ -32,46 +32,47 @@
  *                                show this element, otherwise hide
  * * hide-watch-option-attribute: select value based only - check this attribute instead of the value
  */
-(function($){
-    $(function(){
-        $('[data-hide-watch]').each(function() {
+(function ($) {
+    $(function () {
+        $("[data-hide-watch]").each(function () {
             var element = $(this);
-            var data    = element.data();
-            var watch   = $(data.hideWatch);
+            var data = element.data();
+            var watch = $(data.hideWatch);
             if (watch.length) {
-                var toggleCallback = function() { return true; };
-                if (watch.is(':checkbox')) {
-                    toggleCallback = function() {
-                        var invert  = 'hideWatchInvert' in data;
-                        var checked = watch.prop('checked');
+                var toggleCallback = function () {
+                    return true;
+                };
+                if (watch.is(":checkbox")) {
+                    toggleCallback = function () {
+                        var invert = "hideWatchInvert" in data;
+                        var checked = watch.prop("checked");
                         return invert ? checked : !checked;
                     };
                 } else {
                     // Watch on a value, or attribute of the selected option
                     var watchValue = data.hideWatchValue;
-                    toggleCallback = function() {
+                    toggleCallback = function () {
                         return watch.val() != watchValue;
                     };
-                    if (watch.is('select')) {
+                    if (watch.is("select")) {
                         var watchAttribute = data.hideWatchOptionAttribute;
                         if (watchAttribute) {
-                            toggleCallback = function() {
-                                return watch.find('option:selected').attr(watchAttribute)
-                                    != watchValue;
+                            toggleCallback = function () {
+                                return watch.find("option:selected").attr(watchAttribute) != watchValue;
                             };
                         }
-                    } else if (watch.is(':radio')) {
-                        toggleCallback = function() {
-                            return watch.filter(':checked').val() != watchValue;
+                    } else if (watch.is(":radio")) {
+                        toggleCallback = function () {
+                            return watch.filter(":checked").val() != watchValue;
                         };
                     }
                 }
-                watch.on('change.hideWatch', function() {
-                    element.toggleClass('hide', toggleCallback());
+                watch.on("change.hideWatch", function () {
+                    element.toggleClass("hide", toggleCallback());
                 });
                 // Apply now
-                element.toggleClass('hide', toggleCallback())
+                element.toggleClass("hide", toggleCallback());
             }
         });
-    })
+    });
 })(jQuery);

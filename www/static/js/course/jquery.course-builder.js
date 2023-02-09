@@ -1,7 +1,7 @@
 /**
  * Event listeners for the course task list.
  */
-(function($) {
+(function ($) {
     /**
      * Execute this plugin against a UnitSpec's DOM element
      *
@@ -9,74 +9,72 @@
      * @var int[] options['unitsImplementationsIds']     IDs of UnitImpls imported from this UnitSpec
      * @todo, this should really be executed once against a Course, and use delegation to select a Unit
      */
-    $.fn.setupCourseBuilder = function(options) {
+    $.fn.setupCourseBuilder = function (options) {
         var defaults = {
-            toastSelector: ''
+            toastSelector: "",
         };
-        var settings       = $.extend({}, defaults, options);
-        var unitSpec       = $(this);
-        var unitSpecId     = unitSpec.attr('data-unit-spec');
+        var settings = $.extend({}, defaults, options);
+        var unitSpec = $(this);
+        var unitSpecId = unitSpec.attr("data-unit-spec");
 
         // Initialises the task list, setting up drag/drop as well.
-        var initTaskList = function() {
-
-            var assessmentList = unitSpec.find('[data-assessment-list]');
+        var initTaskList = function () {
+            var assessmentList = unitSpec.find("[data-assessment-list]");
             assessmentList.sortable({
-                placeholder:          "sortable-placeholder",
+                placeholder: "sortable-placeholder",
                 forcePlaceholderSize: true,
-                handle:               '.grip',
-                axis:                 'y'
+                handle: ".grip",
+                axis: "y",
             });
-            assessmentList.bind('sortstop', function(event, ui) {
+            assessmentList.bind("sortstop", function (event, ui) {
                 var sequence = [];
-                assessmentList.find('[data-assessment]').each(function(idx, elem){
-                    sequence.push($(elem).attr('data-assessment'));
+                assessmentList.find("[data-assessment]").each(function (idx, elem) {
+                    sequence.push($(elem).attr("data-assessment"));
                 });
                 var data = {
-                    id: sequence
+                    id: sequence,
                 };
-                $.post(assessmentList.attr('data-action'), data);
-            })
+                $.post(assessmentList.attr("data-action"), data);
+            });
         };
         initTaskList();
 
         var $toastFeedback = $(settings.toastSelector);
 
         // Delete task: "are you sure?"
-        unitSpec.on('click.courseAssessmentList', '[data-action=delete-assessment]', function(event) {
+        unitSpec.on("click.courseAssessmentList", "[data-action=delete-assessment]", function (event) {
             event.preventDefault();
             var $element = $(this);
-            var $assessmentRow = $element.closest('[data-assessment]');
+            var $assessmentRow = $element.closest("[data-assessment]");
             $element.confirmDialog({
-                text: 'Are you sure you wish to delete this activity? You will be unable to import this activity to classes.',
+                text: "Are you sure you wish to delete this activity? You will be unable to import this activity to classes.",
                 confirmEvent: function () {
-
-                    $toastFeedback.toastActivate({text: 'Deleting activity...'});
+                    $toastFeedback.toastActivate({ text: "Deleting activity..." });
 
                     $.ajax({
                         method: "POST",
-                        url: $element.attr('href'),
+                        url: $element.attr("href"),
                         success: function () {
-                            $toastFeedback.toastTimeout({text: 'Activity deleted.', css: 'success'});
+                            $toastFeedback.toastTimeout({ text: "Activity deleted.", css: "success" });
                             $assessmentRow.fadeOut({
                                 done: function () {
                                     // If no Assessments remaining, display empty-state
-                                    var $unit = $assessmentRow.closest('[data-unit-spec]');
+                                    var $unit = $assessmentRow.closest("[data-unit-spec]");
 
                                     $assessmentRow.remove();
 
-                                    if (0 == $unit.find('[data-assessment]').length) {
-                                        $unit.find('[data-empty-state]').removeClass('hide');
+                                    if (0 == $unit.find("[data-assessment]").length) {
+                                        $unit.find("[data-empty-state]").removeClass("hide");
                                     }
-                                }
+                                },
                             });
                         },
-                        error: function(){
-                            $toastFeedback.toastTimeout({text: 'Deletion failed!', css: 'alert'});
-                        }
+                        error: function () {
+                            $toastFeedback.toastTimeout({ text: "Deletion failed!", css: "alert" });
+                        },
                     });
-                }
-            })
+                },
+            });
         });
-    }
+    };
 })(jQuery);

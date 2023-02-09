@@ -2,16 +2,14 @@
  * Handles the store to update the group settings
  */
 
-import { defineStore } from 'pinia';
-import { useStore } from './manageGroupStore'
-import Endpoints from '../mgEndpoints';
+import { defineStore } from "pinia";
+import { useStore } from "./manageGroupStore";
+import Endpoints from "../mgEndpoints";
 
-
-export const useSettingsStore = defineStore('mgSettings', {
-
+export const useSettingsStore = defineStore("mgSettings", {
     state: () => ({
         isProcessing: false,
-        access: '', //can be private, moderated or free
+        access: "", //can be private, moderated or free
         isNotificationsEnabled: false, //to send notifications to the group
         isForceFollow: false, //so notifcations are ALWAYS sent to all members
         isPromptOpen: false, //to notify that the prompt is opened / closed
@@ -19,29 +17,26 @@ export const useSettingsStore = defineStore('mgSettings', {
     }),
 
     getters: {
-
         /**
          * to prompt the user to select the group access
          *
          * @return { Boolean }
          */
-        isAccessNotSet () {
+        isAccessNotSet() {
             const store = useStore();
             return store.showSetting;
         },
-
     },
 
     actions: {
-
         /**
          * Add in the group settings for reference / updating
          *
          * @param { Object }
          */
-        loadSettings (settings) {
+        loadSettings(settings) {
             this.access = settings.access;
-            if (this.access !== '') {
+            if (this.access !== "") {
                 this.isAccessSaved = true;
             }
             this.isNotificationsEnabled = settings.isNotificationsEnabled;
@@ -51,22 +46,22 @@ export const useSettingsStore = defineStore('mgSettings', {
         /**
          * to display a prompt to confirm member removal
          */
-        promptUpdateSettings () {
+        promptUpdateSettings() {
             this.isPromptOpen = true;
         },
 
         /**
          * update the pages settings
          */
-        async updateSettings () {
+        async updateSettings() {
             this.isProcessing = true;
             const store = useStore();
             store.isProcessing = true;
             try {
                 const response = await fetch(Endpoints.UPDATE_SETTINGS, {
-                    method: 'POST',
+                    method: "POST",
                     headers: {
-                        'Content-Type': 'application/json',
+                        "Content-Type": "application/json",
                     },
                     body: getFormData(this),
                 });
@@ -88,20 +83,18 @@ export const useSettingsStore = defineStore('mgSettings', {
         /**
          * to hide the confirmation prompt
          */
-        cancelUpdateSettings () {
+        cancelUpdateSettings() {
             this.isPromptOpen = false;
         },
-
     },
-
-})
+});
 
 /**
  * Pass through the latest settings
  *
  * @returns { FormData }
  */
-function getFormData (myStore) {
+function getFormData(myStore) {
     const store = useStore();
     return JSON.stringify({
         groupId: store.id,
@@ -109,6 +102,6 @@ function getFormData (myStore) {
             access: myStore.access,
             isNotificationsEnabled: myStore.isNotificationsEnabled,
             isForceFollow: myStore.isForceFollow,
-        }
+        },
     });
 }

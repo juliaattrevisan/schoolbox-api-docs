@@ -6,11 +6,11 @@
 /**
  * Listen for the button press and then save the link to DB and display it on the page
  */
-export function initPostToMyLinks () {
-    if (!document.getElementById('postToMyLinks')) {
+export function initPostToMyLinks() {
+    if (!document.getElementById("postToMyLinks")) {
         return;
     }
-    document.getElementById('postToMyLinks').addEventListener('click', (event) => {
+    document.getElementById("postToMyLinks").addEventListener("click", (event) => {
         event.preventDefault();
         postLink();
     });
@@ -19,12 +19,12 @@ export function initPostToMyLinks () {
 /**
  * Save the settings to the DB
  */
-async function postLink () {
+async function postLink() {
     try {
-        await fetch('/cms/myLinksForm.php', {
-            method: 'POST',
+        await fetch("/cms/myLinksForm.php", {
+            method: "POST",
             body: getFormData(),
-        })
+        });
     } catch (error) {
         console.warn(error);
     } finally {
@@ -37,26 +37,24 @@ async function postLink () {
  *
  * @returns { FormData }
  */
-function getFormData () {
+function getFormData() {
     const formData = new FormData();
-    formData.append('url', document.getElementById('homepageURL').value);
-    formData.append('description', document.getElementById('heading').value);
+    formData.append("url", document.getElementById("homepageURL").value);
+    formData.append("description", document.getElementById("heading").value);
     return formData;
 }
 
 /**
  * Add the link to the side panel
  */
-function displayLinkOnPage () {
+function displayLinkOnPage() {
+    const link = document.createElement("a");
+    link.setAttribute("href", document.getElementById("homepageURL").value);
+    link.innerText = document.getElementById("heading").value;
 
-    const link = document.createElement('a');
-    link.setAttribute('href', document.getElementById('homepageURL').value);
-    link.innerText = document.getElementById('heading').value;
-
-    const linkListItem = document.createElement('li');
+    const linkListItem = document.createElement("li");
     linkListItem.appendChild(link);
 
-    const myLinksList = document.getElementById('side-menu-mylinks').querySelector('ul');
+    const myLinksList = document.getElementById("side-menu-mylinks").querySelector("ul");
     myLinksList.appendChild(linkListItem);
-
 }

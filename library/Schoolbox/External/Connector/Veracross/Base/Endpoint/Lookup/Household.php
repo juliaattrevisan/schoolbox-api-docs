@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup;
 
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\IApi;
-use Schoolbox\External\Connector\Veracross\Base\Endpoint\ValueListConverter;
+use Schoolbox\External\Connector\Veracross\Base\Endpoint\Profile\Profile;
 
 /**
  * Grab all the Parents from everywhere. This is the Household concept
@@ -27,7 +27,7 @@ class Household
      *
      * @var array|null
      */
-    private ?array $household = null;
+    private ?array $lookup = null;
 
 
     /**
@@ -41,7 +41,7 @@ class Household
 
 
     /**
-     * Generate a compiled list of parents indexed by their household_id
+     * Generate a compiled list of records, indexed by an identifier
      *
      * @return array
      */
@@ -49,32 +49,32 @@ class Household
     {
         /* If we generated this lookup previously, just recycle it
          */
-        if (null === $this->household) {
-            $this->household = [];
+        if (null === $this->lookup) {
+            $this->lookup = [];
 
             /* Rebuild lookups on each page
              */
             $lookupConverter = new ValueListConverter();
 
-            $parentPayloadGenerator = $this->api->retrieve('GET', 'parents');
+            $generator = $this->api->retrieve('GET', 'parents', Profile::SCOPE);
 
-            foreach ($parentPayloadGenerator as $parentPage) {
-                $parentLookups = $lookupConverter->generate($parentPage['value_lists']);
+            foreach ($generator as $page) {
+                $valueLists = $lookupConverter->generate($page['value_lists']);
 
                 /* Avengers Assemble!
                  */
-                foreach ($parentPage['data'] as $parent) {
+                foreach ($page['data'] as $record) {
                     /* Overwrite with lookupped values
                      */
-                    $compiledParent = $parent;
-                    $compiledParent['name_prefix'] = $parentLookups['name_prefix'][$compiledParent['name_prefix']];
-                    $compiledParent['name_suffix'] = $parentLookups['name_suffix'][$compiledParent['name_suffix']];
+                    $compiledRecord = $record;
+                    $compiledRecord['name_prefix'] = $valueLists['name_prefix'][$compiledRecord['name_prefix']];
+                    $compiledRecord['name_suffix'] = $valueLists['name_suffix'][$compiledRecord['name_suffix']];
 
-                    $this->household[$parent['household_id']][] = $compiledParent;
+                    $this->lookup[$record['household_id']][] = $compiledRecord;
                 }
             }
         }
 
-        return $this->household;
+        return $this->lookup;
     }
 }

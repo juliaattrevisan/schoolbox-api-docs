@@ -31,7 +31,7 @@
                             <p class="meta">
                                 If a student has one or more {{ locale.pastoral }} records of this type,
                                 a flag will display on their profile page, when marking attendance,
-                                and on the class list. If there is no icon or colour selected,
+                                and on the class list. If there is no icon selected, or no colour selected,
                                 no flag will appear for this {{ locale.pastoral }} type.
                             </p>
 
@@ -54,10 +54,10 @@
                                            value="{{ flagColors.foreground }}"/>
                                 </div>
                                 <div class="small-6 medium-2 columns">
-                        <span id="pastoralFlagPreview"
-                              class="label neutral {% if icon and color %}icon-{{ icon }}{% else %}hide{% endif %}"
-                              style="color: {{ flagColors.foreground }}; background-color: {{ flagColors.background }}"
-                        >1</span>
+                                    <span id="pastoralFlagPreview"
+                                          class="label neutral {% if icon and color %}icon-{{ icon }}{% else %}hide{% endif %}"
+                                          style="color: {{ flagColors.foreground }}; background-color: {{ flagColors.background }}"
+                                    >1</span>
                                 </div>
                             </div>
                         </div>
@@ -196,7 +196,18 @@
                                     let colorInput = document.getElementById('pastoralColor'),
                                             iconSelect = document.getElementById('pastoralIcon'),
                                             flagPreview = document.getElementById('pastoralFlagPreview');
-                                    $(colorInput).spectrum(window.sbProps.spectrum);
+                                    $(colorInput).spectrum(
+                                        $.extend(
+                                            {},
+                                            window.sbProps.spectrum,
+                                            {
+                                                allowEmpty: true,
+                                                change: function (color) {if (color !== null) {$(this).val(color.toRgbString());}},
+                                                hide: function (color) {if (color !== null) {$(this).val(color.toRgbString());}},
+                                                preferredFormat: 'rgb'
+                                            }
+                                        )
+                                    );
 
                                     $().add(colorInput).add(iconSelect).on('change', function () {
                                         let color = colorInput.value,

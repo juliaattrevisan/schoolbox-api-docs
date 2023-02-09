@@ -1,8 +1,8 @@
-import { createApp } from 'vue';
-import ClassSelector from './class-selector';
+import { createApp } from "vue";
+import ClassSelector from "./class-selector";
 
 createApp({
     components: {
-        ClassSelector
-    }
-}).mount('#class-selector-container');
+        ClassSelector,
+    },
+}).mount("#class-selector-container");

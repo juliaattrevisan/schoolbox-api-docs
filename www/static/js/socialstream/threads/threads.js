@@ -9,335 +9,344 @@
  * @link        https://schoolbox.com.au/
  */
 
-(function($j) {
+(function ($j) {
+    /**
+     * Constructor
+     *
+     * @param options
+     */
+    $j.fn.socialstreamThreads = function (options) {
+        /* Store the config in this instance so private methods
+         * can access it
+         */
+        var config = init(options, this);
 
-	/**
-	 * Constructor
-	 *
-	 * @param options
-	 */
-	$j.fn.socialstreamThreads = function(options) {
+        /* Set up the input form
+         */
+        initPostForm();
 
-		/* Store the config in this instance so private methods
-		 * can access it
-		 */
-		var config = init(options, this);
+        /* Stream first batch, I guess
+         */
+        stream();
 
-		/* Set up the input form
-		 */
-		initPostForm();
+        /* Show or hide the View More link contextually
+         */
+        updateViewMoreLink();
 
-		/* Stream first batch, I guess
-		 */
-		stream();
+        /* Allow View More to load more stuff
+         */
+        config.viewMoreLink.click(function () {
+            stream();
+        });
 
-		/* Show or hide the View More link contextually
-		 */
-		updateViewMoreLink();
+        /* Allow you to chooze the kind of attachment (if any)
+         * to accompany your post
+         */
+        initAttachmentSelectors(config.defaultForm);
 
-		/* Allow View More to load more stuff
-		 */
-		config.viewMoreLink.click(function() {
-			stream();
-		});
+        /**
+         * Initialise parameters
+         *
+         * @param options
+         * @param element
+         * @returns {*}
+         */
+        function init(options, element) {
+            /* Default values
+             */
+            var defaults = {
+                instanceId: 0,
+                homepageId: 0,
+                start: 0,
+                end: 0,
+                offset: 0,
 
-		/* Allow you to chooze the kind of attachment (if any)
-		 * to accompany your post
-		 */
-		initAttachmentSelectors(config.defaultForm);
+                /* Total number of posts that exist
+                 */
+                numPosts: 0,
+            };
 
-		/**
-		 * Initialise parameters
-		 *
-		 * @param options
-		 * @param element
-		 * @returns {*}
-		 */
-		function init(options, element) {
+            /* Derived values
+             */
+            var derived = {
+                element: element,
 
-			/* Default values
-			 */
-			var defaults = {
-				instanceId: 0,
-				homepageId: 0,
-				start: 0,
-				end: 0,
-				offset: 0,
+                /* The form which gets cloned per post and the one
+                 * which allows you to make new posts
+                 */
+                defaultForm: $j("#socialstream-form-default-" + options.instanceId),
 
-				/* Total number of posts that exist
-				 */
-				numPosts: 0
-			}
+                /* The new post reveal modal, supersedes defaultForm
+                 */
+                replyModal: $j("#socialstream-reply-" + options.instanceId),
 
-			/* Derived values
-			 */
-			var derived = {
-				element: element,
+                /* The url to stream from
+                 */
+                streamUrl: generateStreamUrl(options.instanceId, options.homepageId, options.start, options.offset),
 
-				/* The form which gets cloned per post and the one
-				 * which allows you to make new posts
-				 */
-				defaultForm: $j('#socialstream-form-default-' + options.instanceId),
+                /* The element which allows you to make comments and replies
+                 */
+                addPostLink: "[data-add-post-link]",
 
-				/* The new post reveal modal, supersedes defaultForm
-				 */
-				replyModal: $j('#socialstream-reply-' + options.instanceId),
+                /* The form which spawns when making comments and replies
+                 */
+                addPostForm: "[data-add-post-form]",
 
-				/* The url to stream from
-				 */
-				streamUrl: generateStreamUrl(options.instanceId, options.homepageId, options.start, options.offset),
+                /* The element which allows you to spawn more
+                 */
+                viewMoreLink: $j(element).find("[data-socialstream-view-more]"),
 
-				/* The element which allows you to make comments and replies
-				 */
-				addPostLink: '[data-add-post-link]',
+                /* Lightboxed attachments are found using this key
+                 */
+                lightboxKey: "socialstream-" + options.instanceId + "-lightbox",
 
-				/* The form which spawns when making comments and replies
-				 */
-				addPostForm: '[data-add-post-form]',
+                /* Container div for a loading graphic or message
+                 */
+                loading: $j(element).find("[data-loader]"),
 
-				/* The element which allows you to spawn more
-				 */
-				viewMoreLink: $j(element).find('[data-socialstream-view-more]'),
+                /* Container div for threads
+                 */
+                threadContainer: $j(element).find("[data-socialstream-threads]"),
 
-				/* Lightboxed attachments are found using this key
-				 */
-				lightboxKey: 'socialstream-' + options.instanceId + '-lightbox',
+                /* Attachment selectors everywhere in the entire stream
+                 */
+                attachment: $j("[data-socialstream-attachment]"),
+            };
 
-				/* Container div for a loading graphic or message
-				 */
-				loading: $j(element).find('[data-loader]'),
+            /* Force integer (use the force)
+             */
+            var merged = $j.extend(defaults, derived, options);
 
-				/* Container div for threads
-				 */
-				threadContainer: $j(element).find('[data-socialstream-threads]'),
+            merged.instanceId = parseInt(merged.instanceId);
+            merged.start = parseInt(merged.start);
+            merged.end = parseInt(merged.end);
+            merged.offset = parseInt(merged.offset);
+            merged.numPosts = parseInt(merged.numPosts);
 
-				/* Attachment selectors everywhere in the entire stream
-				 */
-				attachment: $j('[data-socialstream-attachment]')
-			}
+            return merged;
+        }
 
-			/* Force integer (use the force)
-			 */
-			var merged = $j.extend(defaults, derived, options);
+        /**
+         * Allow input forms to be spawned
+         */
+        function initPostForm() {
+            /* Steal focus when reply modal opens
+             */
+            config.replyModal.on("opened.fndtn.reveal", function () {
+                config.replyModal.find("textarea[name=body]").focus();
+            });
 
-			merged.instanceId = parseInt(merged.instanceId);
-			merged.start = parseInt(merged.start);
-			merged.end = parseInt(merged.end);
-			merged.offset = parseInt(merged.offset);
-			merged.numPosts = parseInt(merged.numPosts);
+            config.element.on("click", config.addPostLink, function (e) {
+                e.preventDefault();
 
-			return merged;
-		}
+                // Does this have a post form already? If so, don't add it back
+                // after it gets removed.
+                var row = $j(this).closest("[data-socialstream-row]");
+                var body = row.find("[data-body]").first();
 
-		/**
-		 * Allow input forms to be spawned
-		 */
-		function initPostForm() {
+                /* Clear out all instances of .addPostForm in the socialstream
+                 */
+                clearAllPostForms();
 
-			/* Steal focus when reply modal opens
-			 */
-			config.replyModal.on('opened.fndtn.reveal', function() {
-				config.replyModal.find('textarea[name=body]').focus();
-			});
+                /* Get the ids for this node
+                 */
+                var parentId = $j(this).data("parentid");
+                var rootId = $j(this).data("rootid");
 
-			config.element.on('click', config.addPostLink, function(e) {
-				e.preventDefault();
+                /* Clone an instance of .addPostForm and inject ids
+                 */
+                var clone = config.replyModal.find("form");
+                clone.find("textarea[name=body]").val("");
+                clone.find("input[name=parentId]").val(parentId);
+                clone.find("input[name=rootId]").val(rootId);
+                clone.find("input[name=url]").val("");
 
-				// Does this have a post form already? If so, don't add it back
-				// after it gets removed.
-                var row = $j(this).closest('[data-socialstream-row]');
-				var body = row.find('[data-body]').first();
+                var dzone = clone.find("div.dzone");
+                dzone.attr("id", dzone.attr("id") + parentId);
 
-				/* Clear out all instances of .addPostForm in the socialstream
-				 */
-				clearAllPostForms();
+                var azone = clone.find("div.attachzone");
+                azone.attr("id", azone.attr("id") + parentId);
 
-				/* Get the ids for this node
-				 */
-				var parentId = $j(this).data('parentid');
-				var rootId = $j(this).data('rootid');
+                azone.removeClass("dz-max-files-reached").find("ul.az-list").html("");
 
-				/* Clone an instance of .addPostForm and inject ids
-				 */
-				var clone = config.replyModal.find('form');
-				clone.find('textarea[name=body]').val('');
-				clone.find('input[name=parentId]').val(parentId);
-				clone.find('input[name=rootId]').val(rootId);
-				clone.find('input[name=url]').val('');
+                /* Show specific ones
+                 */
+                azone.resourceAttachClone(config.defaultForm.find("div.attachzone"));
+                initAttachmentSelectors(clone);
+            });
+        }
 
-                var dzone = clone.find('div.dzone');
-                dzone.attr('id', dzone.attr('id') + parentId);
+        /**
+         * Clear all the forms used to make comments and replies
+         */
+        function clearAllPostForms() {
+            config.threadContainer.find(config.addPostForm).remove();
+        }
 
-                var azone = clone.find('div.attachzone');
-                azone.attr('id', azone.attr('id') + parentId);
+        /**
+         * Stream more content
+         */
+        function stream() {
+            $j.get(config.streamUrl, function (responseText) {
+                /* Shove in the new content
+                 */
+                addThreads(responseText);
 
-                azone.removeClass('dz-max-files-reached').find('ul.az-list').html('');
+                /* Update offsets, hiding View More if there were none left
+                 * after streaming
+                 */
+                updateStreamUrl();
 
-				/* Show specific ones
-				 */
-                azone.resourceAttachClone(config.defaultForm.find('div.attachzone'));
-				initAttachmentSelectors(clone);
-			});
-		}
+                /* Show or hide the View More link
+                 */
+                updateViewMoreLink();
 
-		/**
-		 * Clear all the forms used to make comments and replies
-		 */
-		function clearAllPostForms() {
-			config.threadContainer.find(config.addPostForm).remove();
-		}
+                /* Clear out any loading div indicators
+                 */
+                removeLoaderGifs();
 
-		/**
-		 * Stream more content
-		 */
-		function stream() {
-			$j.get(config.streamUrl, function(responseText) {
-
-				/* Shove in the new content
-				 */
-				addThreads(responseText);
-
-				/* Update offsets, hiding View More if there were none left
-				 * after streaming
-				 */
-				updateStreamUrl();
-
-				/* Show or hide the View More link
-				 */
-				updateViewMoreLink();
-
-				/* Clear out any loading div indicators
-				 */
-				removeLoaderGifs();
-
-				/* Lightbox everything!
-				 * But only the images in a particular socialstream thread
-				 */
-				$j("a[rel='" + config.lightboxKey + "']").magnificPopup({
-                    type: 'image',
+                /* Lightbox everything!
+                 * But only the images in a particular socialstream thread
+                 */
+                $j("a[rel='" + config.lightboxKey + "']").magnificPopup({
+                    type: "image",
                     removalDelay: 300,
-                    mainClass: 'mfp-fade'
+                    mainClass: "mfp-fade",
                 });
 
-                config.element.find('[data-socialstream-delete]').unbind('click').click(function(event) {
-                    event.preventDefault();
+                config.element
+                    .find("[data-socialstream-delete]")
+                    .unbind("click")
+                    .click(function (event) {
+                        event.preventDefault();
 
-                    var element = $(this);
-                    $(this).confirmDialog({
-                        text: 'Do you want to delete this item?',
-                        confirmEvent: function() {
-                            window.location.href = element.attr('href');
-                        }
+                        var element = $(this);
+                        $(this).confirmDialog({
+                            text: "Do you want to delete this item?",
+                            confirmEvent: function () {
+                                window.location.href = element.attr("href");
+                            },
+                        });
                     });
-                });
-			});
+            });
 
-			/**
-			 * Add new threads
-			 *
-			 * @param html
-			 */
-			function addThreads(html) {
-				config.threadContainer.append(html);
-			}
+            /**
+             * Add new threads
+             *
+             * @param html
+             */
+            function addThreads(html) {
+                config.threadContainer.append(html);
+            }
 
-			/**
-			 * Update stream url
-			 * This is subject to the issue SB-3160
-			 */
-			function updateStreamUrl() {
-				var newStart = parseInt(config.start) + parseInt(config.offset);
+            /**
+             * Update stream url
+             * This is subject to the issue SB-3160
+             */
+            function updateStreamUrl() {
+                var newStart = parseInt(config.start) + parseInt(config.offset);
 
-				/* Remember updated values
-				 */
-				config.start = newStart;
-				config.streamUrl = generateStreamUrl(config.instanceId, config.homepageId, config.start, config.offset);
-			}
+                /* Remember updated values
+                 */
+                config.start = newStart;
+                config.streamUrl = generateStreamUrl(config.instanceId, config.homepageId, config.start, config.offset);
+            }
 
-			/**
-			 * Clear out any loading gifs
-			 */
-			function removeLoaderGifs() {
-				config.loading.remove();
-			}
-		}
+            /**
+             * Clear out any loading gifs
+             */
+            function removeLoaderGifs() {
+                config.loading.remove();
+            }
+        }
 
-		/**
-		 * Show or hide the View More link contextually
-		 */
-		function updateViewMoreLink() {
-			// Never show view more if viewing all (offset = 0)
-			if (config.offset > 0 && config.start < config.numPosts) {
-				$j(config.viewMoreLink).show();
-			}
-			else {
-				$j(config.viewMoreLink).hide();
-			}
-		}
+        /**
+         * Show or hide the View More link contextually
+         */
+        function updateViewMoreLink() {
+            // Never show view more if viewing all (offset = 0)
+            if (config.offset > 0 && config.start < config.numPosts) {
+                $j(config.viewMoreLink).show();
+            } else {
+                $j(config.viewMoreLink).hide();
+            }
+        }
 
-		/**
-		 * Show or hide the View More link contextually
-		 */
-		function updateViewMoreLinkSlow() {
-			// Never show view more if viewing all (offset = 0)
-			if (config.offset > 0 && config.end < config.numPosts) {
-				$j(config.viewMoreLink).show();
-			}
-			else {
-				$j(config.viewMoreLink).hide();
-			}
-		}
+        /**
+         * Show or hide the View More link contextually
+         */
+        function updateViewMoreLinkSlow() {
+            // Never show view more if viewing all (offset = 0)
+            if (config.offset > 0 && config.end < config.numPosts) {
+                $j(config.viewMoreLink).show();
+            } else {
+                $j(config.viewMoreLink).hide();
+            }
+        }
 
-		/**
-		 * Generate a stream url
-		 *
-		 * @param instanceId
-		 * @param homepageId
-		 * @param start
-		 * @param offset
-		 */
-		function generateStreamUrl(instanceId, homepageId, start, offset) {
-			return '/socialstream/threads/threads.php?instanceId=' + instanceId + '&homepageId=' + homepageId + '&start=' + start + '&offset=' + offset;
-		}
+        /**
+         * Generate a stream url
+         *
+         * @param instanceId
+         * @param homepageId
+         * @param start
+         * @param offset
+         */
+        function generateStreamUrl(instanceId, homepageId, start, offset) {
+            return (
+                "/socialstream/threads/threads.php?instanceId=" +
+                instanceId +
+                "&homepageId=" +
+                homepageId +
+                "&start=" +
+                start +
+                "&offset=" +
+                offset
+            );
+        }
 
-		/**
-		 * Abilities granted to all attachment selectors everywhere
-		 */
-		function initAttachmentSelectors(form) {
-			resetAttachmentSelectors(form);
+        /**
+         * Abilities granted to all attachment selectors everywhere
+         */
+        function initAttachmentSelectors(form) {
+            resetAttachmentSelectors(form);
 
-			/* Url attachment options
-			 */
-            form.on('click', 'a.sstream-attachment', function() {
-                var type = $(this).attr('data-value');
+            /* Url attachment options
+             */
+            form.on("click", "a.sstream-attachment", function () {
+                var type = $(this).attr("data-value");
 
-                form.find('input[name=type]').val(type);
+                form.find("input[name=type]").val(type);
 
                 // show only the one we want
-                var attachers = form.find('div.post-attachment');
-                attachers.hide().filter('.'+type).show();
+                var attachers = form.find("div.post-attachment");
+                attachers
+                    .hide()
+                    .filter("." + type)
+                    .show();
 
-                form.find('input[name=url]').val('').prop('readonly', type == 'attach');
+                form.find("input[name=url]")
+                    .val("")
+                    .prop("readonly", type == "attach");
 
-                if (type == 'url') {
+                if (type == "url") {
                     // tell the attacher to clear any attachments
-                    form.find('.attachzone').data('plugin_resourceAttach').dropzone.removeAllFiles();
+                    form.find(".attachzone").data("plugin_resourceAttach").dropzone.removeAllFiles();
                 }
+            });
 
-			});
+            return form;
 
-			return form;
-
-			/**
-			 * Hide certain form controls
-			 *
-			 * @param form
-			 */
-			function resetAttachmentSelectors(form) {
-				form.find('.socialstream-selected-file').closest('li').hide();
-				form.find('input[name=url]').closest('li').hide();
-				form.find('input[name=file]').closest('li').hide();
-			}
-		}
-	}
-}(jQuery));
+            /**
+             * Hide certain form controls
+             *
+             * @param form
+             */
+            function resetAttachmentSelectors(form) {
+                form.find(".socialstream-selected-file").closest("li").hide();
+                form.find("input[name=url]").closest("li").hide();
+                form.find("input[name=file]").closest("li").hide();
+            }
+        }
+    };
+})(jQuery);

@@ -1,8 +1,8 @@
-import { createApp } from 'vue';
-import ManageQrCodes from './manage-qr-codes';
+import { createApp } from "vue";
+import ManageQrCodes from "./manage-qr-codes";
 
 createApp({
     components: {
-        ManageQrCodes
-    }
-}).mount('#manage-qr-codes-container');
+        ManageQrCodes,
+    },
+}).mount("#manage-qr-codes-container");

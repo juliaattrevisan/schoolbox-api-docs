@@ -856,11 +856,6 @@ parameters:
 			path: library/Component/Homepage/ImageController.php
 
 		-
-			message: "#^Variable \\$partCount might not be defined\\.$#"
-			count: 1
-			path: library/Component/Homepage/PinterestController.php
-
-		-
 			message: "#^Access to an undefined property Xml\\:\\:\\$channel\\.$#"
 			count: 4
 			path: library/Component/Homepage/PodcastController.php

@@ -1,14 +1,14 @@
-import BottomDrawer from './bottom-drawer.vue';
+import BottomDrawer from "./bottom-drawer.vue";
 
 // More on default export: https://storybook.js.org/docs/vue/writing-stories/introduction#default-export
 export default {
-    title: 'Components/Drawers/Bottom Drawer',
+    title: "Components/Drawers/Bottom Drawer",
     component: BottomDrawer,
     // More on argTypes: https://storybook.js.org/docs/vue/api/argtypes
     argTypes: {
         default: {
-            control: { type: 'text' },
-            defaultValue: '<strong>Bottom drawer content goes here</strong>',
+            control: { type: "text" },
+            defaultValue: "<strong>Bottom drawer content goes here</strong>",
         },
     },
     //wrap the component in some html: https://storybook.js.org/docs/vue/writing-stories/introduction#using-decorators
@@ -22,8 +22,7 @@ const Template = (args, { argTypes }) => ({
         //👇 The args will now be passed down to the template
         return { args };
     },
-    template:
-        `
+    template: `
         <bottom-drawer v-bind="args">
             ${args.default}
         </bottom-drawer>

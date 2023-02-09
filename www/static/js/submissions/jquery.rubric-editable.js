@@ -4,35 +4,34 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-;(function ($, window, document, undefined) {
-
-    var pluginName = 'rubricEditable';
+(function ($, window, document, undefined) {
+    var pluginName = "rubricEditable";
 
     var defaults = {
-
-        hideHorizontalClass: 'hide-h',
-        hideVerticalClass: 'hide-v',
-        inputSelector: 'input[type=text],input[type=tel],textarea',
+        hideHorizontalClass: "hide-h",
+        hideVerticalClass: "hide-v",
+        inputSelector: "input[type=text],input[type=tel],textarea",
         levelLimit: 0,
-        url: '',
+        url: "",
         swap: function (move, first, second) {
             first[move](second);
         },
         afterApplyResultSet: $.noop,
         rubricId: null,
-        formField: 'rb',
-        localisedGroupName: 'Capability',
-        localisedCriterionName: 'Indicator',
-};
+        formField: "rb",
+        localisedGroupName: "Capability",
+        localisedCriterionName: "Indicator",
+    };
 
     /**
      * maxCapabilityLength/maxIndicatorLength is 900, due to the way browsers look at maxlength as character lenght, but mysql table looks at char byte lenght
      * so if there are bullet points in the textbox they count as 3 characters, and will cause issues, so lets work on 900 as the limit, and we shouldn't hit the db max...
      */
-    let maxCapabilityLength = 900, maxIndicatorLength = 900, maxDescriptorLength = 900;
+    let maxCapabilityLength = 900,
+        maxIndicatorLength = 900,
+        maxDescriptorLength = 900;
 
-
-        function RubricEditable(element, options) {
+    function RubricEditable(element, options) {
         this.element = element;
         this.options = $.extend(true, {}, defaults, options);
 
@@ -52,27 +51,25 @@
         var $rb = $(this.element);
         var opt = this.options;
 
-        $rb.off('click', '[data-spawn]');
-        $rb.on('click', '[data-spawn]', function (e) {
+        $rb.off("click", "[data-spawn]");
+        $rb.on("click", "[data-spawn]", function (e) {
             e.preventDefault();
 
-            if ($(this).data('spawn') === 'level') {
+            if ($(this).data("spawn") === "level") {
                 rubricEditable.addLevel();
             }
-
         });
 
-        $rb.off('blur keydown', '[data-spawn]');
-        $rb.on('blur keydown', '[data-spawn]', function (e) {
-
+        $rb.off("blur keydown", "[data-spawn]");
+        $rb.on("blur keydown", "[data-spawn]", function (e) {
             // ignore all key presses except for a non-shift return (ie shift+return is ignored)
-            if (e.type === 'keydown' && (e.keyCode !== 13 || e.shiftKey)) {
+            if (e.type === "keydown" && (e.keyCode !== 13 || e.shiftKey)) {
                 return true;
             }
 
             var $input = $(this),
-                type   = $input.data('spawn'),
-                name   = this.value ? this.value.trim() : '',
+                type = $input.data("spawn"),
+                name = this.value ? this.value.trim() : "",
                 $toastFeedback = $('[data-relation="create-response"]'),
                 $row,
                 groupIdentifier,
@@ -80,51 +77,53 @@
                 groupId,
                 $groupIdInput;
 
-
             // prevent blank, but also prevent double-fire from keydown to blur
-            if (name.length === 0 || $input.prop('disabled')) {
+            if (name.length === 0 || $input.prop("disabled")) {
                 return true;
             }
 
-            $row = $input.closest('tr');
+            $row = $input.closest("tr");
 
-            groupIdentifier = $row.data('group');
+            groupIdentifier = $row.data("group");
 
-            if (typeof groupIdentifier !== 'undefined') {
+            if (typeof groupIdentifier !== "undefined") {
                 // This is creating a new indicator within an existing capability
-                groupIndex    = groupIdentifier.split('-')[2];
-                $groupIdInput = $rb.find('[data-group="'+groupIdentifier+'"][data-groupname] input[data-group-id]');
-                groupId       = $groupIdInput.val();
+                groupIndex = groupIdentifier.split("-")[2];
+                $groupIdInput = $rb.find('[data-group="' + groupIdentifier + '"][data-groupname] input[data-group-id]');
+                groupId = $groupIdInput.val();
             } else {
                 // This is creating a new capability
-                groupIndex    = $rb.find('[data-group][data-groupname]').length;
+                groupIndex = $rb.find("[data-group][data-groupname]").length;
                 $groupIdInput = $();
-                groupId       = null;
+                groupId = null;
             }
 
             var message = 'Creating "' + name + '"...';
-            $toastFeedback.toastActivate({text: message});
+            $toastFeedback.toastActivate({ text: message });
 
             /*
              * Ensure user is not trying to add a duplicate group. The server-side validation will prevent
              * duplicate criterion, but cannot prevent duplicate groups as they are not persisted until a indicator
              * name is entered.
              */
-            if ('group' === type) {
+            if ("group" === type) {
                 var normalisedNewGroup = normaliseForComparison(name);
-                var $groups =  $('[data-groupname]');
+                var $groups = $("[data-groupname]");
                 for (var i = 0; i < $groups.length; i++) {
-                    var existingGroup = $($groups.get(i)).data('groupname').toString();
-                    if(normalisedNewGroup === normaliseForComparison(existingGroup)){
-                        $toastFeedback.toastTimeout({text: opt.localisedGroupName + ' name already exists!', css: 'alert'});
-                        $input.val('');
+                    var existingGroup = $($groups.get(i)).data("groupname").toString();
+                    if (normalisedNewGroup === normaliseForComparison(existingGroup)) {
+                        $toastFeedback.toastTimeout({
+                            text: opt.localisedGroupName + " name already exists!",
+                            css: "alert",
+                        });
+                        $input.val("");
                         return false;
                     }
                 }
             }
 
             // prevent mods
-            $input.val(message).prop('disabled', true);
+            $input.val(message).prop("disabled", true);
 
             // Pass in group index too
             var payload = {
@@ -133,17 +132,19 @@
                 groupId: groupId,
                 groupIndex: groupIndex,
                 name: name,
-                levelCount: $rb.children('thead').find('input[data-level]').length,
-                folderId: $('input[name=folderId]').val(),
-                markPerCapability: $('#markPerCapability').prop('checked')
+                levelCount: $rb.children("thead").find("input[data-level]").length,
+                folderId: $("input[name=folderId]").val(),
+                markPerCapability: $("#markPerCapability").prop("checked"),
             };
 
-            if ('criterion' === type) {
-                payload.groupName = $rb.find(
-                    '[name="'
-                    + ( opt.formField + '[' + [ payload.rubricId, 'group', groupIndex, 'name' ].join('][') + ']' )
-                    + '"]'
-                ).val();
+            if ("criterion" === type) {
+                payload.groupName = $rb
+                    .find(
+                        '[name="' +
+                            (opt.formField + "[" + [payload.rubricId, "group", groupIndex, "name"].join("][") + "]") +
+                            '"]'
+                    )
+                    .val();
             }
 
             $.post(opt.url, payload)
@@ -153,44 +154,46 @@
                     // simple case: prepend the row
                     $row.before($data);
 
-                    var cellTypeName = '';
+                    var cellTypeName = "";
 
-                    if ('criterion' === type) {
+                    if ("criterion" === type) {
                         cellTypeName = opt.localisedCriterionName;
 
                         // just gotta extend that rowspan
-                        var $span = $row.parent().children('[data-group="' + $row.data('group') + '"][data-groupname]').children('[rowspan]');
-                        $span.attr('rowspan', parseInt($span.attr('rowspan')) + 1);
+                        var $span = $row
+                            .parent()
+                            .children('[data-group="' + $row.data("group") + '"][data-groupname]')
+                            .children("[rowspan]");
+                        $span.attr("rowspan", parseInt($span.attr("rowspan")) + 1);
 
                         // and show the sequencer
-                        $span.find('[data-sequencer-v]').removeClass('hide');
+                        $span.find("[data-sequencer-v]").removeClass("hide");
 
                         // And apply the group ID from this element to the new one
                         // find data-sequencer-group=something
                         // update its ID to whatever is in this ID
-                        $groupIdInput.val($data.find('input[data-group-id]').val());
-
+                        $groupIdInput.val($data.find("input[data-group-id]").val());
                     } else {
                         cellTypeName = opt.localisedGroupName;
                     }
-                    $toastFeedback.toastTimeout({text: cellTypeName + ' created!', css: 'success'});
+                    $toastFeedback.toastTimeout({ text: cellTypeName + " created!", css: "success" });
 
-                    $rb.sequencer('refresh');
+                    $rb.sequencer("refresh");
 
                     //re start the onchange maxlength check for new objects....
-                    $('[data-group-edit-text]').on('change', (event) => {
-                        event.target.setAttribute('maxlength', maxCapabilityLength);
+                    $("[data-group-edit-text]").on("change", (event) => {
+                        event.target.setAttribute("maxlength", maxCapabilityLength);
                     });
-                    $('[data-criterion-text]').on('change', (event) => {
-                        event.target.setAttribute('maxlength', maxIndicatorLength);
+                    $("[data-criterion-text]").on("change", (event) => {
+                        event.target.setAttribute("maxlength", maxIndicatorLength);
                     });
                 })
-                .fail(function (data){
-                    $toastFeedback.toastTimeout({text: data.responseText, css: 'alert'});
+                .fail(function (data) {
+                    $toastFeedback.toastTimeout({ text: data.responseText, css: "alert" });
                 })
-                .always(function(){
+                .always(function () {
                     // clear and re-enable the input
-                    $input.val('').prop('disabled', false);
+                    $input.val("").prop("disabled", false);
                 });
 
             // probability is high the user pressed return, so prevent form submission
@@ -199,82 +202,76 @@
             return false;
         });
 
-        $rb.off('change', '[type=checkbox]');
-        $rb.on('change', '[type=checkbox]', function () {
-
-            var $input  = $(this),
-                $cells  = $input.closest('tr').children('td'),
-                checked = $input.prop('checked');
+        $rb.off("change", "[type=checkbox]");
+        $rb.on("change", "[type=checkbox]", function () {
+            var $input = $(this),
+                $cells = $input.closest("tr").children("td"),
+                checked = $input.prop("checked");
 
             if (checked) {
-                $cells.removeClass(opt.hideVerticalClass).find(opt.inputSelector).prop('disabled', false);
+                $cells.removeClass(opt.hideVerticalClass).find(opt.inputSelector).prop("disabled", false);
             } else {
-                $cells.addClass(opt.hideVerticalClass).find(opt.inputSelector).prop('disabled', true);
+                $cells.addClass(opt.hideVerticalClass).find(opt.inputSelector).prop("disabled", true);
             }
-
         });
 
-        $rb.off('focus keyup paste', 'textarea');
-        $rb.on('focus keyup paste', 'textarea', function () {
-
+        $rb.off("focus keyup paste", "textarea");
+        $rb.on("focus keyup paste", "textarea", function () {
             // get mah row, and resize its inputs
-            rubricEditable.resizeDescriptorTextInputs($(this.closest('[data-group]')));
+            rubricEditable.resizeDescriptorTextInputs($(this.closest("[data-group]")));
         });
 
-        $rb.off('click', 'td.' + opt.hideVerticalClass);
-        $rb.on('click', 'td.' + opt.hideVerticalClass, function () {
+        $rb.off("click", "td." + opt.hideVerticalClass);
+        $rb.on("click", "td." + opt.hideVerticalClass, function () {
+            var $cell = $(this),
+                $check = $cell.closest("tr").find("input[type=checkbox]"),
+                $textarea = $cell.find("textarea");
 
-            var $cell     = $(this),
-                $check    = $cell.closest('tr').find('input[type=checkbox]'),
-                $textarea = $cell.find('textarea');
-
-            $check.prop('checked', true).trigger('change');
-            $textarea.focus().trigger('focus');
+            $check.prop("checked", true).trigger("change");
+            $textarea.focus().trigger("focus");
             //limit all descriptors to the max lenght, not just $textbox, as it won't add the attribute to the one directly next to it...
-            $('[data-descriptor-text]').on('change', (event) => {
-                event.target.setAttribute('maxlength', maxDescriptorLength);
+            $("[data-descriptor-text]").on("change", (event) => {
+                event.target.setAttribute("maxlength", maxDescriptorLength);
             });
         });
 
-        $rb.off('change', 'th [data-level]');
-        $rb.on('change', 'th [data-level]', function () {
-
+        $rb.off("change", "th [data-level]");
+        $rb.on("change", "th [data-level]", function () {
             // locate all descriptors in column and update text
 
-            var $level      = $(this);
-            var levelText   = $level.val();
-            var columnIndex = $level.closest('th').index() - 2;
+            var $level = $(this);
+            var levelText = $level.val();
+            var columnIndex = $level.closest("th").index() - 2;
 
-            $rb.children('tbody').children('[data-group]').each(function () {
+            $rb.children("tbody")
+                .children("[data-group]")
+                .each(function () {
+                    var $row = $(this);
+                    var crit = $row.find("[data-criterion-name]").data("criterion-name");
 
-                var $row = $(this);
-                var crit = $row.find('[data-criterion-name]').data('criterion-name');
+                    var $textarea = $row.children("td").eq(columnIndex).children("textarea");
 
-                var $textarea = $row.children('td').eq(columnIndex).children('textarea');
-
-                $textarea.attr('placeholder', 'Descriptor for ' + levelText + ' ' + crit);
-
-            });
-
+                    $textarea.attr("placeholder", "Descriptor for " + levelText + " " + crit);
+                });
         });
 
         // effect these listeners
-        $rb.find('input[data-level]').trigger('change');
-        $rb.find('[data-group]').each(function() {
+        $rb.find("input[data-level]").trigger("change");
+        $rb.find("[data-group]").each(function () {
             rubricEditable.resizeDescriptorTextInputs($(this));
         });
 
         $rb.sequencer({
             swap: function (axis, first, second) {
-
-                var move = first.index() > second.index() ? 'after' : 'before';
+                var move = first.index() > second.index() ? "after" : "before";
 
                 // sigh... special case for moving groups
-                if (first.filter('[data-groupname]').length) {
-
+                if (first.filter("[data-groupname]").length) {
                     // figure out what we're moving
-                    var firstElem   = $(this).find('[data-group="' + first.data('group')  + '"]').eq(first.index() > second.index() ? -1 : 0);
-                    var secondGroup = $(this).find('[data-group="' + second.data('group') + '"]');
+                    var firstElem = $(this)
+                        .find('[data-group="' + first.data("group") + '"]')
+                        .eq(first.index() > second.index() ? -1 : 0);
+                    var secondGroup = $(this).find('[data-group="' + second.data("group") + '"]');
 
                     // move the thing! and... the other thing! move it!
                     opt.swap(move, firstElem, secondGroup);
@@ -282,13 +279,13 @@
                     return;
                 }
 
-                if (axis === 'horizontal') {
+                if (axis === "horizontal") {
                     // horizontal swap
 
-                    var rows = $(this).children('tbody').children('[data-sequencer-group]');
+                    var rows = $(this).children("tbody").children("[data-sequencer-group]");
 
-                    var firstCells  = rows.children(':nth-child(' + first.index()  + ')');
-                    var secondCells = rows.children(':nth-child(' + second.index() + ')');
+                    var firstCells = rows.children(":nth-child(" + first.index() + ")");
+                    var secondCells = rows.children(":nth-child(" + second.index() + ")");
 
                     // iterate manually
                     for (var i = 0; i < firstCells.length; ++i) {
@@ -299,12 +296,9 @@
 
                 // finally, swap the elements themselves
                 opt.swap(move, first, second);
-
-            }
+            },
         });
-
     };
-
 
     /**
      * Adds a level to the grid, on the right-hand side
@@ -312,23 +306,22 @@
      * @param {*} [descriptorValue]
      */
     RubricEditable.prototype.addLevel = function (levelName, descriptorValue) {
-
         // allow undefined
-        levelName       = levelName || '';
-        descriptorValue = typeof descriptorValue === 'undefined' ? '' : descriptorValue;
+        levelName = levelName || "";
+        descriptorValue = typeof descriptorValue === "undefined" ? "" : descriptorValue;
 
         var $rb = $(this.element),
             opt = this.options;
 
         // prevent programmatic addition of too-many-levels
-        if (opt.levelLimit > 0 && $rb.children('thead').find('input[data-level]').length >= opt.levelLimit) {
+        if (opt.levelLimit > 0 && $rb.children("thead").find("input[data-level]").length >= opt.levelLimit) {
             return false;
         }
 
         // determine the new index
         // Need the maximum index + 1, not just the count
         var nextIndex = 0;
-        $rb.find('th[data-sequencer-group=levels] input[data-level]').each(function(i, v) {
+        $rb.find("th[data-sequencer-group=levels] input[data-level]").each(function (i, v) {
             var thisIndex = v.name.match(/^rb\[\d+]\[level]\[(\d+)]\[name]$/);
             if (thisIndex) {
                 nextIndex = Math.max(nextIndex, thisIndex[1]);
@@ -337,84 +330,81 @@
         nextIndex += 1;
 
         // iterate all rows
-        $rb.find('tr').each(function () {
+        $rb.find("tr").each(function () {
             // locate the second-from-right-most cell, and replicate it
 
             var $row = $(this);
 
-            var $cells = $row.children('td,th');
+            var $cells = $row.children("td,th");
 
             var $last = $cells.eq(-1);
 
             // don't replicate, just extend the colspan
-            if ($last.attr('colspan')) {
-                $last.attr('colspan', parseInt($last.attr('colspan')) + 1);
-
+            if ($last.attr("colspan")) {
+                $last.attr("colspan", parseInt($last.attr("colspan")) + 1);
             } else {
                 var $td = $cells.eq(-2);
 
                 var $clone = $td.clone();
 
                 // start hidden away so we can all slide out together
-                var inputs = $clone.addClass(opt.hideHorizontalClass).find(opt.inputSelector + ', input[type="hidden"]');
+                var inputs = $clone
+                    .addClass(opt.hideHorizontalClass)
+                    .find(opt.inputSelector + ', input[type="hidden"]');
 
                 // assign levelname by default
                 inputs.val(levelName);
 
                 // override to the value if this is a value field
-                inputs.filter('[data-descriptor-value]').val(descriptorValue);
+                inputs.filter("[data-descriptor-value]").val(descriptorValue);
 
                 // ID for added levels and descriptors must always be empty
-                inputs.filter('[data-id]').val('');
+                inputs.filter("[data-id]").val("");
 
                 // rename inputs to accommodate new level "identity"
                 inputs.each(function () {
-
                     var split = this.name.split(/]\[/);
 
                     // increment the level index in the name (second-last index)
                     split[split.length - 2] = nextIndex;
 
-                    this.name = split.join('][');
+                    this.name = split.join("][");
 
                     var $elem = $(this);
-                    var attr = $(this).attr('data-descriptor-value');
-                    if(attr !== undefined && attr !== false){
-                        $elem.attr('data-descriptor-level-index', nextIndex);
+                    var attr = $(this).attr("data-descriptor-value");
+                    if (attr !== undefined && attr !== false) {
+                        $elem.attr("data-descriptor-level-index", nextIndex);
                     }
                 });
 
                 $td.after($clone);
-
             }
-
         });
 
         // aaand meaningful-transition out
-        $rb.find('td.' + opt.hideHorizontalClass + ', th.' + opt.hideHorizontalClass).removeClass(opt.hideHorizontalClass);
+        $rb.find("td." + opt.hideHorizontalClass + ", th." + opt.hideHorizontalClass).removeClass(
+            opt.hideHorizontalClass
+        );
 
         // focus on the newly-created level input
-        var $levels = $rb.children('thead').find('input[data-level]');
+        var $levels = $rb.children("thead").find("input[data-level]");
         $levels.eq(-1).focus();
 
         // Once level is added, scroll to it
-        $rb.closest('.scrollable').scrollTo(
-            $rb.find('[data-spawn="level"]'),
-            {
-                scrollX: true,
-                scrollY: false,
-                offsetLeft: 0,
-                duration: 0
-            }
-        );
+        $rb.closest(".scrollable").scrollTo($rb.find('[data-spawn="level"]'), {
+            scrollX: true,
+            scrollY: false,
+            offsetLeft: 0,
+            duration: 0,
+        });
 
         // permit up to 11 levels
         if (opt.levelLimit > 0 && $levels.length >= opt.levelLimit) {
-            $levels.find('[data-spawn]').addClass('hide');
+            $levels.find("[data-spawn]").addClass("hide");
         }
 
         // refresh the sequencer
-        $rb.sequencer('refresh');
+        $rb.sequencer("refresh");
 
         return true;
     };
@@ -425,10 +415,7 @@
      * @returns int
      */
     RubricEditable.prototype.getLevelCount = function () {
-        return $(this.element)
-            .find('tr')
-            .eq(0)
-            .find('[data-sequencer-group="levels"]').length;
+        return $(this.element).find("tr").eq(0).find('[data-sequencer-group="levels"]').length;
     };
 
     /**
@@ -437,11 +424,10 @@
      * @param {Number} index
      */
     RubricEditable.prototype.deleteLevel = function (index) {
-
         var $rb = $(this.element),
             opt = this.options;
 
-        var rows = $rb.find('tr');
+        var rows = $rb.find("tr");
 
         var levelCount = this.getLevelCount();
 
@@ -461,37 +447,34 @@
         }
 
         // ok... NOW we can delete the level given. we count backwards from the end, to accommodate colspans and such
-        index -= (levelCount + 1);
+        index -= levelCount + 1;
 
         rows.each(function () {
             var $row = $(this);
 
-            var $cells = $row.children('td,th');
+            var $cells = $row.children("td,th");
 
             // either the column given, or the last (for colspan)
             var $selected = $($cells.eq(index)[0] || $cells.eq(-1)[0]);
 
-            if ($selected.attr('rowspan')) {
+            if ($selected.attr("rowspan")) {
                 // say nothing.
-
-            } else if ($selected.attr('colspan')) {
-                $selected.attr('colspan', parseInt($selected.attr('colspan')) - 1);
-
+            } else if ($selected.attr("colspan")) {
+                $selected.attr("colspan", parseInt($selected.attr("colspan")) - 1);
             } else {
                 $selected.detach();
             }
-
         });
 
-        var $levels = $rb.children('thead').find('input[data-level]');
+        var $levels = $rb.children("thead").find("input[data-level]");
 
         // permit up to opt.levelLimit levels
         if (opt.levelLimit === 0 || $levels.length < opt.levelLimit) {
-            $levels.find('[data-spawn]').removeClass('hide');
+            $levels.find("[data-spawn]").removeClass("hide");
         }
 
         // refresh the sequencer
-        $rb.sequencer('refresh');
+        $rb.sequencer("refresh");
 
         // Inputs for levels and descriptors need to be renumbered after deleting a row.
         this.renumberColumnInputs();
@@ -504,34 +487,33 @@
      *
      * Levels and descriptors (text and points) are renumbered.
      */
-    RubricEditable.prototype.renumberColumnInputs = function()
-    {
+    RubricEditable.prototype.renumberColumnInputs = function () {
         var $rb = $(this.element),
-            rows = $rb.find('tr');
+            rows = $rb.find("tr");
 
         // Re-number all the IDs, levels, descriptors and values in the rubric grid
-        rows.each(function() {
+        rows.each(function () {
             var $row = $(this);
 
             // Renumber IDs
-            $row.find('[data-id]').each(function(i) {
-                this.name = this.name.replace(/\[\d+]\[id]$/, '[' + String(i) + '][id]');
+            $row.find("[data-id]").each(function (i) {
+                this.name = this.name.replace(/\[\d+]\[id]$/, "[" + String(i) + "][id]");
             });
 
             // Renumber levels
-            $row.find('[data-level]').each(function(i) {
-                this.name = this.name.replace(/\[\d+]\[name]$/, '[' + String(i) + '][name]');
+            $row.find("[data-level]").each(function (i) {
+                this.name = this.name.replace(/\[\d+]\[name]$/, "[" + String(i) + "][name]");
             });
 
             // Renumber descriptor texts
-            $row.find('[data-descriptor-text]').each(function(i) {
-                this.name = this.name.replace(/\[\d+]\[text]$/, '[' + String(i) + '][text]');
+            $row.find("[data-descriptor-text]").each(function (i) {
+                this.name = this.name.replace(/\[\d+]\[text]$/, "[" + String(i) + "][text]");
             });
 
             // Renumber descriptor values
-            $row.find('[data-descriptor-value]').each(function(i) {
-                this.name = this.name.replace(/\[\d+]\[points]$/, '[' + String(i) + '][points]');
-                $(this).attr('data-descriptor-level-index', String(i));
+            $row.find("[data-descriptor-value]").each(function (i) {
+                this.name = this.name.replace(/\[\d+]\[points]$/, "[" + String(i) + "][points]");
+                $(this).attr("data-descriptor-level-index", String(i));
             });
         });
     };
@@ -577,50 +559,49 @@
      */
     RubricEditable.prototype.resizeDescriptorTextInputs = function (row) {
         // get mah inputs
-        var $areas = row.find('[data-descriptor-text]');
+        var $areas = row.find("[data-descriptor-text]");
 
         var h = 0;
 
-        $areas.each(function() {
-            this.style.height = 'auto';
-            h = Math.max(h, this.scrollHeight - parseInt($(this).css('paddingTop')) - parseInt($(this).css('paddingBottom')));
+        $areas.each(function () {
+            this.style.height = "auto";
+            h = Math.max(
+                h,
+                this.scrollHeight - parseInt($(this).css("paddingTop")) - parseInt($(this).css("paddingBottom"))
+            );
         });
 
         $areas.height(h);
     };
 
-
     $.fn[pluginName] = function (options) {
+        var plugin = "plugin_" + pluginName;
 
-        var plugin = 'plugin_' + pluginName;
-
-        if (typeof options === 'object' || typeof options === 'undefined') {
+        if (typeof options === "object" || typeof options === "undefined") {
             // if this is configuration
             return this.each(function () {
                 if (!$.data(this, plugin)) {
                     // initialise if not already
                     $.data(this, plugin, new RubricEditable(this, options));
-
                 } else {
                     // just update existing config
                     setOptions.call($.data(this, plugin), options);
                 }
             });
-
-        } else if (typeof options === 'string') {
+        } else if (typeof options === "string") {
             // if this is a function request
             var rtn = [];
 
             this.each(function () {
                 var rbe = $(this).data(plugin);
 
-                if (typeof rbe === 'undefined') {
+                if (typeof rbe === "undefined") {
                     throw "RubricEditable not initialised";
                 }
 
                 // return the thing I'm pointing at
-                if (options === 'next' || options === 'target') {
-                    rtn.push($('[data-mage="' + $(rbe.element).data('mage-next') + '"]'));
+                if (options === "next" || options === "target") {
+                    rtn.push($('[data-mage="' + $(rbe.element).data("mage-next") + '"]'));
                 }
 
                 // attempt a method call
@@ -629,7 +610,11 @@
                 }
             });
 
-            return $($.map(rtn, function (el) { return $.makeArray(el) } ));
+            return $(
+                $.map(rtn, function (el) {
+                    return $.makeArray(el);
+                })
+            );
         }
     };
 
@@ -639,9 +624,8 @@
      * @param {Object} opts
      */
     function setOptions(opts) {
-
         // if options are already defined, merge with that, otherwise defaults
-        var merge = typeof this.options === 'undefined' ? defaults : this.options;
+        var merge = typeof this.options === "undefined" ? defaults : this.options;
 
         // and apply the merged set
         this.options = $.extend(true, {}, merge, opts);
@@ -655,10 +639,8 @@
      * @param {string} string
      * @return string
      */
-    function normaliseForComparison(string)
-    {
+    function normaliseForComparison(string) {
         // Ensure var really is a string before performing string operations
-        return string.toString().replace(/\s+/g, ' ').trim().toLowerCase();
+        return string.toString().replace(/\s+/g, " ").trim().toLowerCase();
     }
-
 })(jQuery, window, document);

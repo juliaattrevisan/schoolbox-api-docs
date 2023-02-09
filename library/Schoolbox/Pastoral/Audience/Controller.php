@@ -203,9 +203,9 @@ class Controller extends Base
 
         // Figure out a background color based on the record's color
         // (default color: black)
-        $foregroundColor = ($subType ? $subType->getColor() : $type->getColor()) ?? Color::black();
+        $foregroundColor = ($subType ? $subType->getColor() : $type->getColor());
         $transformer     = new ColorHelper();
-        $backgroundColor = $transformer->calculateBackground($foregroundColor);
+        $backgroundColor = ($foregroundColor === null ? null : $transformer->calculateBackground($foregroundColor));
 
         $this->getResponse()->content->set([
             'template' => '@pastoralAudience/audiences_modify.twig',
@@ -228,8 +228,8 @@ class Controller extends Base
                 'icons'           => $this->iconMapper->findAll()->sortNaturally('title'),
                 'sentiments'      => Pastoral\Type\TypeAbstract::SENTIMENT_VALUES,
                 'flagColors'  => [
-                    'foreground' => $foregroundColor->getAsRgba(),
-                    'background' => $backgroundColor->getAsRgba(),
+                    'foreground' => ($foregroundColor === null) ? null : $foregroundColor->getAsRgba(),
+                    'background' => ($backgroundColor === null) ? null : $backgroundColor->getAsRgba(),
                     'baseLight'  => ColorHelper::BASE_BACKGROUND_COLOR_LIGHT,
                     'baseDark'   => ColorHelper::BASE_BACKGROUND_COLOR_DARK,
                 ],
