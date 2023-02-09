@@ -11,7 +11,6 @@ namespace Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup;
 
 use Schoolbox\External\Event\Mapper;
 
-
 /**
  * Class Lookup
  *

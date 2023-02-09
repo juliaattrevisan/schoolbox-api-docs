@@ -11,7 +11,6 @@ namespace Schoolbox\External\Connector\Veracross\Base\Endpoint;
 
 use GuzzleHttp\Exception\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
-use Schoolbox\CampusMapper;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
