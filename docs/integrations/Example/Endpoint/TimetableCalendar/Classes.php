@@ -9,13 +9,17 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Example\Base\Endpoint\TimetableCalendar;
 
+use DebugBar\DebugBarException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\Connector\Example\Base\Endpoint\IApi;
+use Schoolbox\External\Connector\Example\Base\Endpoint\Factory;
 use Schoolbox\External\Event\Mapper;
+use Schoolbox\External\Event\Model;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
+use Schoolbox\Mapper\Exception;
 
 /**
  * Import all the classes for a student, saving them as sis_event records
@@ -99,6 +103,15 @@ class Classes implements IStrategy
 
 
     /**
+     * Event Chandler that saves a subset of event records' columns
+     * to minimise changes to the db, due to db ignoring the indexes
+     *
+     * @var EventHandler
+     */
+    private EventHandler $eventHandler;
+
+
+    /**
      * A list of classEntries that we saw previously
      *
      * @var array
@@ -150,6 +163,11 @@ class Classes implements IStrategy
         $this->timezone = $timezone;
         $this->fromDate = $fromDate;
         $this->toDate = $toDate;
+
+        /* Event Chandler that saves a subset of event records' columns
+         * to minimise changes to the db, due to db ignoring the indexes
+         */
+        $this->eventHandler = new EventHandler($eventMapper, $log);
     }
 
 
@@ -201,17 +219,18 @@ class Classes implements IStrategy
      *
      * @param array $class
      * @return void
+     * @throws DebugBarException
+     * @throws Exception
      * @throws \InvalidArgumentException
      * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function processClass(array $class)
+    private function processClass(array $class): void
     {
-        foreach ($class['lessons']['data'] as $lesson) {
+        foreach ($class['lessons']['data'] as $classInstance) {
             /* Save sis_event record
              */
-            $event = $this->createEvent($class, $lesson, $startAt, $finishAt);
+            $event = $this->createEvent($class, $classInstance);
 
             /* Save sis_class record
              */
@@ -219,7 +238,7 @@ class Classes implements IStrategy
 
             /* Save the involvements
              */
-            $this->createInvolvements($class, $lesson, $event, $classEntry);
+            $this->createInvolvements($class, $classInstance, $event, $classEntry);
         }
     }
 
@@ -227,20 +246,18 @@ class Classes implements IStrategy
     /**
      * Create a new SUDS Timetable Event with all the class and lesson pieces
      *
-     * @param array                $class
-     * @param array                $lesson
-     * @param \Alaress_Date_Format $startAt
-     * @param \Alaress_Date_Format $finishAt
-     * @return \Schoolbox\External\Event\Model
+     * @param array $class
+     * @param array $classInstance
+     * @return Model
+     * @throws DebugBarException
+     * @throws \InvalidArgumentException
      * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws Exception
      * @throws \UnexpectedValueException
      */
     private function createEvent(
         array $class,
-        array $lesson,
-        \Alaress_Date_Format $startAt,
-        \Alaress_Date_Format $finishAt
+        array $classInstance
     ): \Schoolbox\External\Event\Model {
         /* TODO Fill in these vars as usual
          */
@@ -260,20 +277,54 @@ class Classes implements IStrategy
 
         /* Decide where this class happens
          */
-        if (is_array($lesson['room'])) {
-            $room = "{$lesson['room']['data']['name']} ({$lesson['room']['data']['code']}";
+        if (is_array($classInstance['room'])) {
+            $room = "{$classInstance['room']['data']['name']} ({$classInstance['room']['data']['code']}";
         }
+
+        /* Don't forget to check if your data is timezone-sensitive
+         * Alaress_Date_Format has some consts which you could use
+         */
+        $startAt = (new \Alaress_Date_Format(
+            $classInstance['start'],
+            \Alaress_Date_Format::FORMAT_DATETIME_UTC_NO_MLS,
+            new \DateTimeZone('UTC')
+        ))->setTimezone($this->timezone);
+
+        $finishAt = (new \Alaress_Date_Format(
+            $classInstance['end'],
+            \Alaress_Date_Format::FORMAT_DATETIME_UTC_NO_MLS,
+            new \DateTimeZone('UTC')
+        ))->setTimezone($this->timezone);
 
         /* Try to recycle based on guid
          */
         try {
-            $event = $this->eventMapper->findOneByColumn('guid', $guid);
+            $oldEvent = $this->eventMapper->findOneByColumn('guid', $guid);
+
+            $logPrefix = 'Reusing existing';
+
+            $this->log->debug(sprintf(
+                'Found previously existing sis_event instance for guid %s',
+                $guid
+            ));
         } catch (\Schoolbox\Mapper\Exception $e) {
-            $event = $this->eventMapper->createModel();
+            /* Initialise props before trying to access them to avoid fatals like
+             * "$startAt must not be accessed before initialization"
+             */
+            $oldEvent = $this->eventMapper->createModel()
+                ->setStartAt(null)
+                ->setFinishAt(null);
+
+            $logPrefix = 'Creating new';
         }
 
         /* Cram in everything else
+         *
+         * Calculate a diff to see if anything changed before saving it
+         * to minimise transaction size
          */
+        $event = clone $oldEvent;
+
         $event
             ->setTitle($title)
             ->setDetail($detail)
@@ -284,14 +335,15 @@ class Classes implements IStrategy
             ->setStartAt($startAt)
             ->setFinishAt($finishAt)
             ->setType($type)
-            ->setClassification(\Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE)
+            ->setClassification(Model::CLASSIFICATION_TIMETABLE)
             ->setGuid($guid)
             ->setSource(Factory::SOURCE_NAME);
 
         /* Save it and remember what we saw in case we need to reuse this later
          */
         $this->log->debug(sprintf(
-            'Creating new timetable event %s - %s, %s, %s-%s',
+            '%s timetable event %s - %s, %s, %s-%s',
+            $logPrefix,
             $event->getTitle(),
             $event->getDay(),
             $event->getPeriod(),
@@ -299,8 +351,10 @@ class Classes implements IStrategy
             $event->getFinishAt()->getDatabase()
         ));
 
+        /* Only persist if it's different than before
+         */
         if ($this->perform) {
-            $this->eventMapper->save($event);
+            $this->eventHandler->save($event, $oldEvent);
         }
 
         return $event;
