@@ -431,7 +431,13 @@ class Controller extends Assessment\Controller
         }
 
         $userIds = $this->getRequest()->query->get('userIds');
-        $userIds = array_map(function ($v) {return (int)$v;}, $userIds); // Convert strings to integers to avoid problems later.
+        $userIds = array_map(
+            // Convert strings to integers to avoid problems later.
+            static function ($v) {
+                return (int)$v;
+            },
+            $userIds
+        );
 
         // Generate message and send to taskd
         $message = $this->dueWorkDownloadMessageFactory->buildForAssessment(
