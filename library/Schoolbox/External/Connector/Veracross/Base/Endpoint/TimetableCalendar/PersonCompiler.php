@@ -143,9 +143,6 @@ class PersonCompiler
             $class['id']
         );
 
-        /* TODO remove dates and replace with actual ones using PAST_ and FUTURE_ thresholds
-         *  ~2016 is the only year with data in the sandbox environment
-         */
         $classMeetingTimesGenerator = $this->api->retrieve('GET', $endpoint, $this->scope, [
             'on_or_after_date' => $startDate,
             'on_or_before_date' => $endDate,

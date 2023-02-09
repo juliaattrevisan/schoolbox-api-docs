@@ -258,7 +258,7 @@ class Api implements IApi
 
                 /* Slam in headers with the dynamic token
                  *
-                 * TODO: perhaps toggle the X-API-Value-Lists include if you've already
+                 * TODO perhaps toggle the X-API-Value-Lists include if you've already
                  *  spawned its contents once, saving us the data transfer...maybe
                  */
                 $options['headers'] = [

@@ -125,12 +125,8 @@ class Classes implements IStrategy
          */
         $userLookup = (new Users($this->eventMapper))->generate();
 
-        /* TODO Parameterise these
-         *  For now, this 2016 year has timetabled data. Need a pilot school
-         *  for actual data, not manufactured tests
-         */
-        $startDate = '2016-08-01';
-        $endDate = '2017-02-01';
+        $startDate = $this->fromDate->getDatabaseDate();
+        $endDate = $this->toDate->getDatabaseDate();
 
         foreach ($userLookup as $externalId => $user) {
             $this->log->debug(sprintf(

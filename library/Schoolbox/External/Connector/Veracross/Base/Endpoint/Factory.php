@@ -110,8 +110,14 @@ class Factory
     {
         /* Schedule/SUDS Timetable: Date Range
          */
-        $from = \Alaress_Date_Format::now()->addMonths(self::FROM);
-        $to = \Alaress_Date_Format::now()->addMonths(self::TO);
+//        $from = \Alaress_Date_Format::now()->addMonths(self::FROM);
+//        $to = \Alaress_Date_Format::now()->addMonths(self::TO);
+
+        /*  TODO For now, this 2016 year has timetabled data. Need a pilot school
+         *   for actual data, not manufactured tests
+         */
+        $from = \Alaress_Date_Format::newDatabaseDate('2016-08-01 00:00:00')->startOfDay();
+        $to =  \Alaress_Date_Format::newDatabaseDate('2017-02-01 00:00:00')->endOfDay();
 
         /* Decide a timezone for all the UTC dates sis gives to us
          */
