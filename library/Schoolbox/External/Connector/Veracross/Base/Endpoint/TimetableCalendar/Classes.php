@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Veracross\Base\Endpoint\TimetableCalendar;
 
+use DebugBar\DebugBarException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
@@ -21,7 +22,6 @@ use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Event\Model;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\Mapper\Exception;
-
 
 /**
  * Import all the classes for a student, saving them as sis_event records
@@ -289,8 +289,10 @@ class Classes implements IStrategy
      * @param array $class
      * @param array $classInstance
      * @return Model
-     * @throws \PDOException
      * @throws Exception
+     * @throws DebugBarException
+     * @throws \InvalidArgumentException
+     * @throws \PDOException
      * @throws \UnexpectedValueException
      */
     private function createEvent(
