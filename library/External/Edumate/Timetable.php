@@ -17,7 +17,6 @@ use Schoolbox\Campus;
  */
 class External_Edumate_Timetable extends External_Edumate_Connection implements External_TimetableInterface
 {
-
     /**
      * @var Group $groupHandler
      */
@@ -41,12 +40,20 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         $periodCount = 0;
 
         $definition = [
-            'desc'     => [],
-            'start'    => [],
-            'end'      => [],
-            'number'   => [],
-            'sequence' => [],
+            'desc'        => [],
+            'start'       => [],
+            'end'         => [],
+            'number'      => [],
+            'sequence'    => [],
+            'periodCount' => 0,
+            'dayCount'    => 0,
         ];
+
+        // Return empty definition, if campus external timetable code is not set
+        if ((string)$campus->getExtTimetableCode() === '') {
+            return $definition;
+        }
+
 
         $stmt = $this->getConnection()->prepareQuery(
             '
@@ -103,18 +110,25 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
      */
     protected function getCycleLength(Campus $campus)
     {
+        // Return 0 if campus external timetable code is not set
+        if ((string)$campus->getExtTimetableCode() === '') {
+            return 0;
+        }
+
         $stmt = $this->getConnection()->prepareQuery('
             SELECT DAYS_IN_CYCLE
             FROM SCHOOLBOX_TIMETABLE_DAYS
             WHERE TIMETABLE_ID = :campus
-            AND START_DATE <= :date
-            AND END_DATE >= :date
+            AND START_DATE <= :startDate
+            AND END_DATE >= :endDate
             FETCH FIRST 1 ROW ONLY
         ');
 
+        $formattedDate = date('Y-m-d');
         $campusCode = explode(',', $campus->getExtTimetableCode());
         $params = array(
-            'date' => date('Y-m-d'),
+            'startDate' => $formattedDate,
+            'endDate' => $formattedDate,
             'campus' => $campusCode[0],
         );
 
@@ -132,11 +146,16 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
      */
     public function getDayNumber(Campus $campus, $date = 0)
     {
+        // Return 0 if campus external timetable code is not set
+        if ((string)$campus->getExtTimetableCode() === '') {
+            return 0;
+        }
+
         $stmt = $this->getConnection()->prepareQuery('
-            SELECT START_DATE, CYCLE_START_DAY, DAYS_IN_CYCLE
+            SELECT START_DATE, CYCLE_START_DATE, DAYS_IN_CYCLE
             FROM SCHOOLBOX_TIMETABLE_DAYS
-            WHERE START_DATE <= :date
-            AND END_DATE >= :date
+            WHERE START_DATE <= :startDate
+            AND END_DATE >= :endDate
             AND TIMETABLE_ID = :campus
             ORDER BY START_DATE
             FETCH FIRST 1 ROW ONLY
@@ -153,10 +172,11 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
 
         // Increase timestamp to get business day properly
         $date++;
-
+        $formattedDate = date('Y-m-d', $date);
         $campusCode = explode(',', $campus->getExtTimetableCode());
         $params = array(
-            'date' => date('Y-m-d', $date),
+            'startDate' => $formattedDate,
+            'endDate' => $formattedDate,
             'campus' => $campusCode[0],
         );
 
@@ -182,8 +202,8 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
                 }
             }
 
-            if (is_numeric($row['CYCLE_START_DAY'])) {
-                $businessDays += ($row['CYCLE_START_DAY'] - 1);
+            if (is_numeric($row['CYCLE_START_DATE'])) {
+                $businessDays += ($row['CYCLE_START_DATE'] - 1);
             }
 
             $currentDay = $businessDays % $row['DAYS_IN_CYCLE'];
@@ -240,6 +260,11 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         if (empty($externalUserId)) {
             return array();
         }
+        // Return [] if campus external timetable code is not set
+        if ((string)$campus->getExtTimetableCode() === '') {
+            return [];
+        }
+
         if (!($definition = $this->getTimetableDefinition($externalUserId, $campus, $dayNumber))) {
             return [];
         }
