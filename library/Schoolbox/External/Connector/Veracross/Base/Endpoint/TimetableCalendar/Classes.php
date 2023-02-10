@@ -129,6 +129,12 @@ class Classes implements IStrategy
         $endDate = $this->toDate->getDatabaseDate();
 
         foreach ($userLookup as $externalId => $user) {
+            /* Only import for specific users
+             */
+            if (!(new Watchlist())->isOnWatchlist((string)$externalId, $this->watchlist)) {
+                continue;
+            }
+
             $this->log->debug(sprintf(
                 'Fetching timetable data for %s %s (%s) - this might take a little while',
                 $user['firstname'],
@@ -141,15 +147,20 @@ class Classes implements IStrategy
             /* A student's timetable is a set of enrolments for their classes
              */
             foreach ($timetable as $enrolment) {
-                /* You can use the class id as a watchlist param to specifically
-                 * import this one class. Once we find it, we exit this loop -
-                 * we don't expect it to appear again in the classes index
+                /* You can use the class_id (this is the Veracross class code)
+                 * as a watchlist param to specifically import this one class.
+                 * Once we find it, we exit this loop - we don't expect it to
+                 * appear again in the classes index. You can use the numeric
+                 * class id instead if that helps
                  */
-                if (!(new Watchlist())->isOnWatchlist((string)$enrolment['internal_class_id']['id'], $this->watchlist)) {
-                    continue;
-                }
+//                if (!(new Watchlist())->isOnWatchlist((string)$enrolment['internal_class_id']['id'], $this->watchlist)) {
+//                    continue;
+//                }
+//                if (!(new Watchlist())->isOnWatchlist((string)$enrolment['internal_class_id']['class_id'], $this->watchlist)) {
+//                    continue;
+//                }
 
-                $this->processClass((string)$externalId, $enrolment);
+                $this->processClass((string)$externalId, $enrolment, $userLookup);
             }
         }
     }
@@ -161,6 +172,7 @@ class Classes implements IStrategy
      *
      * @param string $externalId
      * @param array  $enrolment
+     * @param array  $userLookup
      * @return void
      * @throws DebugBarException
      * @throws Exception
@@ -168,7 +180,7 @@ class Classes implements IStrategy
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    private function processClass(string $externalId, array $enrolment): void
+    private function processClass(string $externalId, array $enrolment, array $userLookup): void
     {
         foreach ($enrolment['schedule'] as $classInstance) {
             $class = $enrolment['internal_class_id'];
@@ -183,7 +195,7 @@ class Classes implements IStrategy
 
             /* Save the involvements
              */
-            $this->createInvolvements($externalId, $class, $event, $classEntry);
+            $this->createInvolvements($externalId, $class, $event, $classEntry, $userLookup);
         }
     }
 
@@ -360,6 +372,7 @@ class Classes implements IStrategy
      * @param array      $class
      * @param Model      $event
      * @param ClassEntry $classEntry
+     * @param array      $userLookup
      * @return void
      * @throws Exception
      * @throws \PDOException
@@ -369,7 +382,8 @@ class Classes implements IStrategy
         string $studentExternalId,
         array $class,
         Model $event,
-        ClassEntry $classEntry
+        ClassEntry $classEntry,
+        array $userLookup
     ): void {
         /* Save the teacher's involvement
          */
@@ -382,11 +396,8 @@ class Classes implements IStrategy
         $this->saveInvolvement($event, $classEntry, $name, $externalId);
 
         /* Save the student's enrolment
-         *
-         * We don't have their name conveniently, so for now it can be just ''
-         * and you'll have to track people down via their external id instead
          */
-        $name = '';
+        $name = "{$userLookup[$externalId]['firstname']} {$userLookup[$externalId]['lastname']}";
 
         $this->saveEnrolment($event, $classEntry, $name, $studentExternalId);
     }
