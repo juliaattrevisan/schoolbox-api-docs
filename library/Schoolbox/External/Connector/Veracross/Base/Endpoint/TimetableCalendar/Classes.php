@@ -14,6 +14,7 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
+use Schoolbox\External\Connector\Veracross\Base\Endpoint\Chandler;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Factory;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Users;
@@ -58,9 +59,9 @@ class Classes implements IStrategy
     /**
      * Special event query generator that saves partial rows
      *
-     * @var EventHandler
+     * @var Chandler
      */
-    private EventHandler $eventHandler;
+    private Chandler $eventHandler;
 
 
     /**
@@ -94,7 +95,7 @@ class Classes implements IStrategy
         /* Event Chandler that saves a subset of event records' columns
          * to minimise changes to the db, due to db ignoring the indexes
          */
-        $this->eventHandler = new EventHandler($eventMapper, $log);
+        $this->eventHandler = new Chandler($eventMapper, $log);
     }
 
 

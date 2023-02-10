@@ -16,6 +16,8 @@ use Schoolbox\External\Event\Model;
 use Schoolbox\Mapper\Exception;
 
 /**
+ * DEPRECATED in favour of Universal Chandler
+ *
  * Prototype for specially handlerising data going into sis_event
  *
  * There's a hypothesis that changing an indexed field causes

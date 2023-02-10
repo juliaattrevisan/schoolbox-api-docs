@@ -68,6 +68,14 @@ class Profile implements IStrategy
 
 
     /**
+     * Special event query generator that saves partial rows
+     *
+     * @var ProfileHandler
+     */
+    private ProfileHandler $profileHandler;
+
+
+    /**
      * This lookup could be shared between student/parent/staff imports
      * depending on your strat selection for segregated imports
      *
@@ -100,6 +108,17 @@ class Profile implements IStrategy
         private UserProfile\Staff\Mapper $staffProfileMapper,
         private UserProfile\Relationship\Mapper $relationshipMapper
     ) {
+        /* Profile Chandler that saves a subset of profile records' columns
+         * to minimise changes to the db, due to db ignoring the indexes
+         */
+        $this->profileHandler = new ProfileHandler(
+            $this->baseProfileMapper,
+            $this->studentProfileMapper,
+            $this->parentProfileMapper,
+            $this->staffProfileMapper,
+            $this->log
+        );
+
         /* Shared lookups
          */
         $this->contactInfoLookup = new ContactInfo($this->api);
@@ -309,19 +328,22 @@ class Profile implements IStrategy
                  * profile before making a whole new one (this is how you end up with fk issues)
                  */
                 try {
-                    $studentProfile = $this->studentProfileMapper->findByExternalId($externalId);
-                    $studentBaseProfile = $studentProfile->getBaseProfile();
+                    $oldStudentProfile = $this->studentProfileMapper->findByExternalId($externalId);
+                    $oldStudentBaseProfile = $oldStudentProfile->getBaseProfile();
                 } catch (Exception $e) {
-                    $studentProfile = $this->studentProfileMapper->createModel();
+                    $oldStudentProfile = $this->studentProfileMapper->createModel();
 
                     try {
-                        $studentBaseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $externalId);
+                        $oldStudentBaseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $externalId);
                     } catch (Exception $e) {
-                        $studentBaseProfile = $this->baseProfileMapper->createModel();
+                        $oldStudentBaseProfile = $this->baseProfileMapper->createModel();
                     }
 
-                    $studentProfile->setBaseProfile($studentBaseProfile);
+                    $oldStudentProfile->setBaseProfile($oldStudentBaseProfile);
                 }
+
+                $studentBaseProfile = clone $oldStudentBaseProfile;
+                $studentProfile = clone $oldStudentProfile;
 
                 $studentBaseProfile
                     ->setExternalId($externalId)
@@ -333,7 +355,7 @@ class Profile implements IStrategy
                 /* Then save it
                  */
                 if ($this->perform) {
-                    $this->baseProfileMapper->save($studentBaseProfile);
+                    $this->profileHandler->saveBaseProfile($studentBaseProfile, $oldStudentBaseProfile);
                 }
 
                 /* Smoosh it all together
@@ -466,6 +488,7 @@ class Profile implements IStrategy
                 /* Then save it
                  */
                 if ($this->perform) {
+                    $this->profileHandler->save($studentProfile, $oldStudentProfile);
                     $this->studentProfileMapper->save($studentProfile);
                 }
 
@@ -562,19 +585,22 @@ class Profile implements IStrategy
              * profile before making a whole new one (this is how you end up with fk issues)
              */
             try {
-                $parentProfile = $this->parentProfileMapper->findByExternalId($externalId);
-                $parentBaseProfile = $parentProfile->getBaseProfile();
+                $oldParentProfile = $this->parentProfileMapper->findByExternalId($externalId);
+                $oldParentBaseProfile = $oldParentProfile->getBaseProfile();
             } catch (Exception $e) {
-                $parentProfile = $this->parentProfileMapper->createModel();
+                $oldParentProfile = $this->parentProfileMapper->createModel();
 
                 try {
-                    $parentBaseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $externalId);
+                    $oldParentBaseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $externalId);
                 } catch (Exception $e) {
-                    $parentBaseProfile = $this->baseProfileMapper->createModel();
+                    $oldParentBaseProfile = $this->baseProfileMapper->createModel();
                 }
 
-                $parentProfile->setBaseProfile($parentBaseProfile);
+                $oldParentProfile->setBaseProfile($oldParentBaseProfile);
             }
+
+            $parentBaseProfile = clone $oldParentBaseProfile;
+            $parentProfile = clone $oldParentProfile;
 
             $parentBaseProfile
                 ->setExternalId($externalId)
@@ -586,7 +612,7 @@ class Profile implements IStrategy
             /* Then save it
              */
             if ($this->perform) {
-                $this->baseProfileMapper->save($parentBaseProfile);
+                $this->profileHandler->saveParentProfile($parentProfile, $oldParentProfile);
             }
 
             $parentProfile
@@ -680,19 +706,22 @@ class Profile implements IStrategy
                  * Otherwise make a new one for the given id
                  */
                 try {
-                    $staffProfile     = $this->staffProfileMapper->findByExternalId($externalId);
-                    $staffBaseProfile = $staffProfile->getBaseProfile();
+                    $oldStaffProfile = $this->staffProfileMapper->findByExternalId($externalId);
+                    $oldStaffBaseProfile = $oldStaffProfile->getBaseProfile();
                 } catch (Exception $e) {
-                    $staffProfile = $this->staffProfileMapper->createModel();
+                    $oldStaffProfile = $this->staffProfileMapper->createModel();
 
                     try {
-                        $staffBaseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $externalId);
+                        $oldStaffBaseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $externalId);
                     } catch (Exception $e) {
-                        $staffBaseProfile = $this->baseProfileMapper->createModel();
+                        $oldStaffBaseProfile = $this->baseProfileMapper->createModel();
                     }
 
-                    $staffProfile->setBaseProfile($staffBaseProfile);
+                    $oldStaffProfile->setBaseProfile($oldStaffBaseProfile);
                 }
+
+                $staffBaseProfile = clone $oldStaffBaseProfile;
+                $staffProfile = clone $oldStaffProfile;
 
                 $staffBaseProfile
                     ->setExternalId($externalId)
@@ -704,7 +733,7 @@ class Profile implements IStrategy
                 /* Then save it
                  */
                 if ($this->perform) {
-                    $this->baseProfileMapper->save($staffBaseProfile);
+                    $this->profileHandler->saveBaseProfile($staffBaseProfile, $oldStaffBaseProfile);
                 }
 
                 $staffProfile
@@ -729,7 +758,7 @@ class Profile implements IStrategy
                 /* Then save it
                  */
                 if ($this->perform) {
-                    $this->staffProfileMapper->save($staffProfile);
+                    $this->profileHandler->saveStaffProfile($staffProfile, $oldStaffProfile);
                 }
             }
         }
