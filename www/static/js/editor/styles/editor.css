@@ -69,14 +69,14 @@
     border-radius: 0 0 var(--ck-border-radius);
     border-top-width: 0;
     display: flex;
-    font: normal normal normal var(--ck-font-size-base)/var(--ck-line-height-base) var(--ck-font-face);
+    font: normal normal normal var(--ck-font-size-base) / var(--ck-line-height-base) var(--ck-font-face);
     justify-content: flex-end;
     margin-bottom: 1rem;
     padding: var(--ck-spacing-small) var(--ck-spacing-standard);
 }
 
 .ck.ck-word-count .ck-word-count__words {
-	margin-right: var(--ck-spacing-standard);
+    margin-right: var(--ck-spacing-standard);
 }
 
 /**
@@ -90,7 +90,7 @@
     margin-left: 0.5rem;
 }
 
-.ck.ck-editor .todo-list input[type=checkbox] {
+.ck.ck-editor .todo-list input[type="checkbox"] {
     height: var(--ck-todo-list-checkmark-size);
     left: -0.5rem;
     margin: 0;
@@ -104,14 +104,15 @@
     display: inline;
 }
 
-.ck.ck-editor .todo-list .todo-list__label>input[checked]:before {
+.ck.ck-editor .todo-list .todo-list__label > input[checked]:before {
     background: var(--content-ui-background);
     border-color: var(--content-ui-background);
 }
 
 /**
  * Customise the iframely sizing
+ * Not sure we want to use this yet - can we customise the size of the iframe?
  */
-.ck.ck-editor .iframely-embed {
+/* .ck.ck-editor .media {
     max-width: 500px;
-}
+} */
