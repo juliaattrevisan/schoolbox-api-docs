@@ -44,7 +44,7 @@ Usage:
                 }
             } catch (error) {
                 console.warn(error);
-                toast.toastTimeout({text: error.message + " " + error.cause.join(' '), css: 'alert'});
+                toast.toastTimeout({text: error.message + " " + error.cause.join(', '), css: 'alert'});
             }
         }
 
