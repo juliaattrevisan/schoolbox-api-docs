@@ -266,6 +266,9 @@ module.exports = {
         editorDefault: "./www/static/js/editor/editorDefault.ts",
         helloCKEditor: "./library/Schoolbox/Greenhouse/templates/ts/helloCKEditor.ts",
 
+        //Countdown
+        countdown: "./www/static/js/countdown/countdown.ts",
+
         //Sass
         core: "./www/static/css/core/core.scss",
         editor: "./www/static/css/core/editor.scss",

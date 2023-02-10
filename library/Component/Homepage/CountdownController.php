@@ -80,12 +80,7 @@ class Component_Homepage_CountdownController extends Component_Homepage_Controll
             }
             $this->setVar(
                 [
-                    'DEADLINE_YEAR'  => $deadline->getYear(),
-                    'DEADLINE_MONTH' => $deadline->getMonth(),
-                    'DEADLINE_DAY'   => $deadline->getDay(),
-                    'DEADLINE_HOUR'  => $deadline->getHour(),
-                    'DEADLINE_MIN'   => $deadline->getMinute(),
-                    'DEADLINE_SEC'   => $deadline->getSecond(),
+                    'DEADLINE_ISO'   => $deadline->toIso8601String(),
                 ]
             );
 
