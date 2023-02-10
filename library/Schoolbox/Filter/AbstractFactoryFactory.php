@@ -21,22 +21,10 @@ use function in_array;
 
 abstract class AbstractFactoryFactory implements IFactoryFactory
 {
-
     /**
      * Mapper class of the entity being filtered
      */
     protected const ENTITY = '';
-
-    /** @var MapperFactory */
-    private $mapperFactory;
-
-
-    /**
-     * Config loader: may be required for determining if a particular filter
-     * is even able to be created.
-     */
-    protected IConfigLoader $configLoader;
-
 
     /**
      * Constructor
@@ -44,10 +32,8 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
      * @param MapperFactory $mapperFactory
      * @param IConfigLoader $configLoader
      */
-    public function __construct(MapperFactory $mapperFactory, IConfigLoader $configLoader)
+    public function __construct(private MapperFactory $mapperFactory, public IConfigLoader $configLoader)
     {
-        $this->mapperFactory = $mapperFactory;
-        $this->configLoader  = $configLoader;
     }
 
 
@@ -61,11 +47,8 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
      */
     public function buildEnabledKeyConverters($page): GenericCollection
     {
-        $enabledOnly          = true;
-        $userConfigurableOnly = false;
-
         /** @var Page\Model[] $pageFilters */
-        $pageFilters          = $this->buildPageFilters($page, $enabledOnly, $userConfigurableOnly);
+        $pageFilters          = $this->buildPageFilters($page, enabledOnly: true, userConfigurableOnly: false);
 
         $keyConverters        = $this->createKeyConverterCollection();
 
@@ -329,11 +312,11 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
             if (!$pageFilter) {
                 $pageFilter = $pageFilterMapper->createModel();
                 $pageFilter
-                    ->setFilter($instance)
                     ->setPage($page)
                     ->setEnabled($class::getEnabledInitialState($page))
                     ->setUserConfigurable($class::getUserConfigurableInitialState($page));
             }
+            $pageFilter->setFilter($instance);
 
             // Skip if not enabled
             if ($enabledOnly && !$pageFilter->getEnabled()) {
@@ -351,35 +334,29 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
 
 
     /**
-     * @param null|IDefinition[] $contents
-     * @return GenericCollection|IDefinition[]
-     * @throws \UnexpectedValueException             If wrong item type inserted in a generic collection
+     * @return GenericCollection
      */
-    private function createDefinitionCollection(array $contents = []): GenericCollection
+    private function createDefinitionCollection(): GenericCollection
     {
-        return new GenericCollection(IDefinition::class, $contents);
+        return new GenericCollection(IDefinition::class, []);
     }
 
 
     /**
-     * @param null|IKeyConverter[] $contents
-     * @return GenericCollection|IKeyConverter[]
-     * @throws \UnexpectedValueException             If wrong item type inserted in a generic collection
+     * @return GenericCollection
      */
-    private function createKeyConverterCollection(array $contents = []): GenericCollection
+    private function createKeyConverterCollection(): GenericCollection
     {
-        return new GenericCollection(IKeyConverter::class, $contents);
+        return new GenericCollection(IKeyConverter::class, []);
     }
 
 
     /**
-     * @param null|IComponent[] $contents
-     * @return GenericCollection|IComponent[]
-     * @throws \UnexpectedValueException             If wrong item type inserted in a generic collection
+     * @return GenericCollection
      */
-    private function createComponentCollection(array $contents = []): GenericCollection
+    private function createComponentCollection(): GenericCollection
     {
-        return new GenericCollection(IComponent::class, $contents);
+        return new GenericCollection(IComponent::class, []);
     }
 
 
@@ -393,60 +370,54 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
 
 
     /**
-     * @return \Schoolbox\Mapper|Mapper
-     * @throws \InvalidArgumentException If mapper class not found
+     * @return Mapper
      */
-    private function getFilterMapper()
+    private function getFilterMapper(): Mapper
     {
         return $this->mapperFactory->get(Mapper::class);
     }
 
 
     /**
-     * @return \Schoolbox\Mapper|Page\Mapper
-     * @throws \InvalidArgumentException If mapper class not found
+     * @return Page\Mapper
      */
-    private function getPageMapper()
+    private function getPageMapper(): Page\Mapper
     {
         return $this->mapperFactory->get(Page\Mapper::class);
     }
 
 
     /**
-     * @return \Schoolbox\Mapper|Page\Option\Mapper
-     * @throws \InvalidArgumentException If mapper class not found
+     * @return Page\Option\Mapper
      */
-    protected function getOptionMapper()
+    protected function getOptionMapper(): Page\Option\Mapper
     {
         return $this->mapperFactory->get(Page\Option\Mapper::class);
     }
 
 
     /**
-     * @return \Schoolbox\Mapper|Page\Option\Defaults\Mapper
-     * @throws \InvalidArgumentException If mapper class not found
+     * @return Page\Option\Defaults\Mapper
      */
-    protected function getDefaultsMapper()
+    protected function getDefaultsMapper(): Page\Option\Defaults\Mapper
     {
         return $this->mapperFactory->get(Page\Option\Defaults\Mapper::class);
     }
 
 
     /**
-     * @return \Schoolbox\Mapper|Selection\Mapper
-     * @throws \InvalidArgumentException If mapper class not found
+     * @return Selection\Mapper
      */
-    protected function getSelectionMapper()
+    protected function getSelectionMapper(): Selection\Mapper
     {
         return $this->mapperFactory->get(Selection\Mapper::class);
     }
 
 
     /**
-     * @return \Schoolbox\YearLevel\Mapper|\Schoolbox\Mapper
-     * @throws \InvalidArgumentException
+     * @return \Schoolbox\YearLevel\Mapper
      */
-    protected function getYearLevelMapper()
+    protected function getYearLevelMapper(): \Schoolbox\YearLevel\Mapper
     {
         return $this->mapperFactory->get(\Schoolbox\YearLevel\Mapper::class);
     }
