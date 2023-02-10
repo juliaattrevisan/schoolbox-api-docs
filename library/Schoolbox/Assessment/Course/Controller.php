@@ -214,7 +214,7 @@ class Controller extends Base\Base
         }
 
         // Are children courses / units?
-        $children = FolderMapper::getInstance()->findAllChildren($courseFolder->getId(), true);
+        $children = $this->folderMapper->findAllChildren($courseFolder->getId(), true);
         foreach ($children as $childFolder) {
             // Does the proposed Unit Folder already have a Course ?
             $childFolderCourse = $childFolder->getCourseSpecification();
@@ -1162,7 +1162,7 @@ class Controller extends Base\Base
         }
 
         $treeBuilder = new TreeBuilder(
-            FolderMapper::getInstance(),
+            $this->folderMapper,
             $_SESSION['user'],
             $folderId
         );
