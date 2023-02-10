@@ -396,8 +396,14 @@ class Classes implements IStrategy
         $this->saveInvolvement($event, $classEntry, $name, $teacherExternalId);
 
         /* Save the student's enrolment
+         *
+         * In case you pick a guy that isn't known in the db, you can still proceed
          */
-        $name = "{$userLookup[$studentExternalId]['firstname']} {$userLookup[$studentExternalId]['lastname']}";
+        $name = sprintf(
+            '%s %s',
+            $userLookup[$studentExternalId]['firstname'] ?? '',
+            $userLookup[$studentExternalId]['lastname'] ?? '',
+        );
 
         $this->saveEnrolment($event, $classEntry, $name, $studentExternalId);
     }
