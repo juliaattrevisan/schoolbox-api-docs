@@ -41,15 +41,18 @@ class TimetableArrayExporter
 
             $timetable = $this->timetableHandler->getTimetableDefinition(null, $campus);
 
-            // Even if this fails to get a period list, it will get a day count
-            $timetableDayNames = [];
-            for ($i = 1; $i <= $timetable['dayCount']; $i++) {
-                $timetableDayNames[] = [
-                    'number' => $i,
-                    'name'   => $this->timetableHandler->getDayName($i),
-                ];
+            // If we are missing the CampusTimetableDefinition, just use the default CampusArray
+            if ([] !== $timetable) {
+                // Even if this fails to get a period list, it will get a day count
+                $timetableDayNames = [];
+                for ($i = 1; $i <= $timetable['dayCount']; $i++) {
+                    $timetableDayNames[] = [
+                        'number' => $i,
+                        'name'   => $this->timetableHandler->getDayName($i),
+                    ];
+                }
+                $campusArray['days'] = $timetableDayNames;
             }
-            $campusArray['days'] = $timetableDayNames;
             $campusList[$campusId] = $campusArray;
         }
         return $campusList;
