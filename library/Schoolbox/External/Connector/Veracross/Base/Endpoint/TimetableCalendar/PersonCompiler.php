@@ -162,11 +162,10 @@ class PersonCompiler
                     continue;
                 }
 
-                /* Trim away the leading 1900-01-01
-                 * Why can't people just use the full datetime like normal humans?
+                /* Convert date/time tuple into one item
                  */
-                $startDate = $meetingTime['date'] . substr($meetingTime['start_time'], 10);
-                $endDate = $meetingTime['date'] . substr($meetingTime['end_time'], 10);
+                $startDate = $this->compileDate($meetingTime['date'], $meetingTime['start_time']);
+                $endDate = $this->compileDate($meetingTime['date'], $meetingTime['end_time']);
 
                 /* Clear out meaningless id 0
                  */
@@ -201,5 +200,24 @@ class PersonCompiler
         $this->meetingTimes[$class['id']] = $schedule;
 
         return $schedule;
+    }
+
+
+    /**
+     * Class instances' datetimes are split over two fields: a date field
+     * and a time field. We need to concat them together.
+     *
+     * @param string $date
+     * @param string $time
+     * @return string
+     */
+    private function compileDate(string $date, string $time): string
+    {
+        /* Trim away the leading 1900-01-01 from the time
+         * then slap the $date in front of it
+         *
+         * Why can't people just use the full datetime like normal humans?
+         */
+        return $date . substr($time, 10);
     }
 }
