@@ -604,8 +604,8 @@ class Connector implements IConnector
      */
     private function generateApiException(RequestInterface $request, ResponseInterface $response): void
     {
-        $requestString  = Psr7\str($request);
-        $responseString = Psr7\str($response);
+        $requestString  = Psr7\Message::toString($request);
+        $responseString = Psr7\Message::toString($response);
         throw new Exception\ApiException("Unable to fetch document.\n{$requestString}\n$responseString");
     }
 
