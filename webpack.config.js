@@ -267,7 +267,8 @@ module.exports = {
         helloCKEditor: "./library/Schoolbox/Greenhouse/templates/ts/helloCKEditor.ts",
 
         //Countdown
-        countdown: "./www/static/js/countdown/countdown.ts",
+        countdown: "./www/static/js/countdown/countdown.ts", // For countdown component on homepage
+        evaluation: "./www/static/js/countdown/evaluation.ts", // For quiz evaluation countdown
 
         //Sass
         core: "./www/static/css/core/core.scss",
@@ -298,7 +299,7 @@ module.exports = {
                 test: require.resolve("dropzone"),
                 loader: "expose-loader",
                 options: {
-                    exposes: { globalName: "Dropzone", moduleLocalName: "Dropzone", override: true }
+                    exposes: { globalName: "Dropzone", moduleLocalName: "Dropzone", override: true },
                 },
             },
             {
