@@ -58,7 +58,7 @@ function onViewToggleSelected() {
         data-test-view
         @click.prevent="onViewToggleSelected"
     >
-        Update {{ props.title }}
+        View {{ props.title }}
     </button>
 </template>
 
