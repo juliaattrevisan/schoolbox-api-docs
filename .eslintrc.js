@@ -32,5 +32,6 @@ module.exports = {
         "import/prefer-default-export": "off", // as Pinia especially uses single exports
         "no-param-reassign": [2, { props: false }], // allow modifying props of parameters, especially valid when passing DOM elements, as we don"t really want to be cloning DOM elements
         "arrow-body-style": "off", // this can be at the dev discretion instead: https://eslint.org/docs/latest/rules/arrow-body-style
+        "no-underscore-dangle": "off", // PHP will pass computed properties down with the _ identifier prepended: https://eslint.org/docs/latest/rules/no-underscore-dangle
     },
 };

@@ -3,7 +3,7 @@
  * To display a single activity linked to a node
  */
 
-import type { Usage } from "@schoolboxCurriculum/types/Node";
+import type { Usage, CourseUsageObject, UnitUsageObject, FolderUsageObject } from "@schoolboxCurriculum/types/Node";
 import { ActivityTypes } from "@schoolboxCurriculum/types/Node";
 import { getUsageHref, getUsageIcon } from "@schoolboxCurriculum/js/nodeUtils";
 
@@ -22,10 +22,13 @@ const props = defineProps<Props>();
                 <div class="usage__title-container">
                     <p>{{ props.usage.object.title }}</p>
                     <p v-if="props.usage.discriminator === ActivityTypes.COURSE" class="meta">
-                        {{ props.usage.object.folder?.parent?.title }}
+                        {{ (props.usage.object as CourseUsageObject).folder?.parent?.title }}
                     </p>
                     <p v-else-if="props.usage.discriminator === ActivityTypes.UNIT" class="meta">
-                        {{ props.usage.object.course?.title }}
+                        {{ (props.usage.object as UnitUsageObject).folder?.parent?.title }}
+                    </p>
+                    <p v-else-if="props.usage.discriminator === ActivityTypes.FOLDER" class="meta">
+                        {{ (props.usage.object as FolderUsageObject).parent?.title }}
                     </p>
                 </div>
             </div>

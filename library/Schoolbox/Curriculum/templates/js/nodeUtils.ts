@@ -2,7 +2,13 @@
  * Various utils related to managing curriculum nodes
  */
 
-import type { Node, Usage } from "@schoolboxCurriculum/types/Node";
+import type {
+    Node,
+    Usage,
+    CourseUsageObject,
+    UnitUsageObject,
+    FolderUsageObject,
+} from "@schoolboxCurriculum/types/Node";
 import { ActivityTypes } from "@schoolboxCurriculum/types/Node";
 import type { Breadcrumb } from "@schoolboxCurriculum/types/Breadcrumb";
 
@@ -195,9 +201,9 @@ export function getUsageIcon(usage: Usage) {
  */
 export function getUsageHref(usage: Usage) {
     const icons = {
-        [ActivityTypes.COURSE]: () => usage.object.folder?._links?.view,
-        [ActivityTypes.UNIT]: () => usage.object.folder?._links?.view,
-        [ActivityTypes.FOLDER]: () => usage.object._links.view,
+        [ActivityTypes.COURSE]: () => (usage.object as CourseUsageObject).folder._links.view,
+        [ActivityTypes.UNIT]: () => (usage.object as UnitUsageObject).folder._links.view,
+        [ActivityTypes.FOLDER]: () => (usage.object as FolderUsageObject)._links.view,
     };
     return icons[usage.discriminator]();
 }

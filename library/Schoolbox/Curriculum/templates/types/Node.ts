@@ -45,31 +45,56 @@ export enum ActivityTypes {
  */
 export type Usage = {
     discriminator: ActivityTypes.COURSE | ActivityTypes.UNIT | ActivityTypes.FOLDER;
-    object: UsageObject;
+    object: CourseUsageObject | UnitUsageObject | FolderUsageObject;
 };
 
 /**
  * The further details of the the usage
  */
-export type UsageObject = {
+interface UsageObject {
     id: number;
-    subjectCode?: string;
     title: string;
+}
+
+/**
+ * The further details of the the course usage
+ */
+export interface CourseUsageObject extends UsageObject {
+    folder: {
+        parent: {
+            title: string;
+        };
+        _links: {
+            view: string;
+        };
+    };
+}
+
+/**
+ *  The further details of the the unit usage
+ */
+export interface UnitUsageObject extends UsageObject {
+    folder: {
+        parent: {
+            title: string;
+        };
+        _links: {
+            view: string;
+        };
+    };
+}
+
+/**
+ * The further details of the the folder usage
+ */
+export interface FolderUsageObject extends UsageObject {
     _links: {
         view: string;
     };
-    course?: {
+    parent: {
         title: string;
     };
-    folder?: {
-        _links?: {
-            view: string;
-        };
-        parent?: {
-            title: string;
-        };
-    };
-};
+}
 
 /**
  * Just the field properties that can be updated
