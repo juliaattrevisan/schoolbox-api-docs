@@ -15,8 +15,7 @@ export default {
         'translations',
         'token',
         'eventExportUrl',
-        'eotcEnabled',
-        'resourceBookingEnabled',
+        'exportOptions',
     ],
 
     data() {
@@ -145,7 +144,7 @@ export default {
                             />
                             <label for="export-timetable">Timetable classes</label>
                         </li>
-                        <li>
+                        <li v-if="exportOptions.timetabledays">
                             <input
                                 type="radio"
                                 v-model="form.export"
@@ -155,7 +154,7 @@ export default {
                             />
                             <label for="export-timetableday">Timetable days</label>
                         </li>
-                        <li>
+                        <li v-if="exportOptions.duework">
                             <input
                                 type="radio"
                                 v-model="form.export"
@@ -165,7 +164,7 @@ export default {
                             />
                             <label for="export-duework">{{ translations.dueWork.proper }}</label>
                         </li>
-                        <li v-if="resourceBookingEnabled">
+                        <li v-if="exportOptions.resources">
                             <input
                                 type="radio"
                                 v-model="form.export"
@@ -185,7 +184,7 @@ export default {
                             />
                             <label for="export-external">External events</label>
                         </li>
-                        <li v-if="eotcEnabled">
+                        <li v-if="exportOptions.eotc_all">
                             <input
                                 type="radio"
                                 v-model="form.export"

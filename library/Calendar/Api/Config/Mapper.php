@@ -167,10 +167,6 @@ class Calendar_Api_Config_Mapper extends BaseMapper
     public function getSourceListForCalendar(ModuleChecker $moduleChecker, User $user): array
     {
         $configs    = $this->getAllConfigRecords();
-        $useSudsTimetable = (new ValidUsesSudsTimetable())->isSatisfiedBy(
-            $this->getConfigLoader()->get('external_type'),
-            $this->getConfigLoader()->get('schooldata_import_data_source')
-        );
 
         $sourceList = [];
 
@@ -189,14 +185,6 @@ class Calendar_Api_Config_Mapper extends BaseMapper
                         $user->getCampusCollection()->getColumnValues('id'),
                         $user->getRole()->getId()
                     )
-                ) {
-                    continue;
-                }
-
-                // if using suds timetable, do not include direct SIS timetable access
-                if (
-                    $config instanceof \Calendar_Api_Config_Connector_External
-                    && $useSudsTimetable
                 ) {
                     continue;
                 }

@@ -751,8 +751,7 @@ export default {
             :translations="config.translations"
             :token="config.token"
             :event-export-url="urls.export"
-            :eotc-enabled="config.eotcEnabled ?? true"
-            :resource-booking-enabled="config.resourceBookingEnabled ?? true"
+            :export-options="config.exportOptions"
         />
 
         <filter-modal
