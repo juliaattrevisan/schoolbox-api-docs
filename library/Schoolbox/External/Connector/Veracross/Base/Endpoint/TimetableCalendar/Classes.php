@@ -387,17 +387,17 @@ class Classes implements IStrategy
     ): void {
         /* Save the teacher's involvement
          */
-        $externalId = trim((string)$class['primary_teacher']['id']);
+        $teacherExternalId = trim((string)$class['primary_teacher']['id']);
         $name = trim((string)$class['primary_teacher']['name']);
 
         /* TODO Figure out overrides to put into saveStaffInvolvement
          *  So far, no distinction has yet been made for Overrides to exist
          */
-        $this->saveInvolvement($event, $classEntry, $name, $externalId);
+        $this->saveInvolvement($event, $classEntry, $name, $teacherExternalId);
 
         /* Save the student's enrolment
          */
-        $name = "{$userLookup[$externalId]['firstname']} {$userLookup[$externalId]['lastname']}";
+        $name = "{$userLookup[$studentExternalId]['firstname']} {$userLookup[$studentExternalId]['lastname']}";
 
         $this->saveEnrolment($event, $classEntry, $name, $studentExternalId);
     }
