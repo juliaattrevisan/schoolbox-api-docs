@@ -5,7 +5,7 @@
 import ClassicEditor from "@ckeditor/ckeditor5-editor-classic/src/classiceditor";
 import { getDefault } from "@js/editor/config/configDefault";
 import CKEditorInspector from "@ckeditor/ckeditor5-inspector";
-import { insertElementAfter } from "@js/util/domUtils";
+import { insertElementAfter, injectScript } from "@js/util/domUtils";
 import "@js/editor/styles/editor.css"; // to overwrite some of the styles
 
 /**
@@ -16,7 +16,7 @@ import "@js/editor/styles/editor.css"; // to overwrite some of the styles
  * @param { HTMLTextAreaElement } textarea - the textarea the CKEditor has replaced
  * @param { CKEditor } editor - the CKEditor instance
  */
-function insertWordCount(textarea, editor) {
+function insertWordCount(textarea: HTMLTextAreaElement, editor) {
     const wordCountPlugin = editor.plugins.get("WordCount");
     insertElementAfter(textarea.nextSibling, wordCountPlugin.wordCountContainer);
 }
@@ -36,6 +36,35 @@ function removeValidation() {
 }
 
 /**
+ * Add the iFramely embed code in order for iframe embeds to work
+ * For more info: https://iframely.com/docs/ckeditor
+ */
+async function addIframelyEmbed() {
+    await injectScript("//cdn.iframe.ly/embed.js?cancel=0");
+}
+
+/**
+ * Add in any additional setup required and then dispatch that the editor is ready
+ *
+ * @param { HTMLTextAreaElement } textarea - the textarea the CKEditor will replace
+ * @param { CKEditor } editor - the CKEditor instance
+ */
+async function onEditorCreated(textarea: HTMLTextAreaElement, editor) {
+    insertWordCount(textarea, editor);
+    removeValidation();
+    await addIframelyEmbed();
+    CKEditorInspector.attach(editor);
+    document.dispatchEvent(
+        new CustomEvent("EDITOR__CREATED", {
+            detail: {
+                editor,
+                textarea,
+            },
+        })
+    );
+}
+
+/**
  * create the ckeditor instance
  *
  * @param { HTMLTextAreaElement } textarea - the textarea the CKEditor will replace
@@ -43,17 +72,7 @@ function removeValidation() {
 function createEditor(textarea: HTMLTextAreaElement) {
     ClassicEditor.create(textarea, getDefault())
         .then((editor) => {
-            insertWordCount(textarea, editor);
-            removeValidation();
-            CKEditorInspector.attach(editor);
-            document.dispatchEvent(
-                new CustomEvent("EDITOR__CREATED", {
-                    detail: {
-                        editor: editor,
-                        textarea: textarea,
-                    },
-                })
-            );
+            onEditorCreated(textarea, editor);
         })
         .catch((error) => {
             console.error(error.stack);
