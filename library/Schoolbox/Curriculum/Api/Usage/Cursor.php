@@ -180,6 +180,21 @@ class Cursor implements ICursor
             ",
             "
                 SELECT
+                    3 AS discriminator_order,
+                    :assessmentDiscriminator AS discriminator,
+                    a.id AS id,
+                    a.title AS name
+                FROM curriculum_node_for_assessment cnfa
+                INNER JOIN assessment a ON cnfa.assessment_id = a.id AND a.deleted_at IS NULL
+                INNER JOIN project_assessment pa ON a.id = pa.assessment_id
+                INNER JOIN assessment a2 ON pa.assessment_id = a2.id
+                INNER JOIN assessment_course_unit_specification acus ON a2.id = acus.assessment_id
+                INNER JOIN course_unit_specification cus
+                    ON acus.course_unit_specification_id = cus.id AND cus.deleted_at IS NULL
+                WHERE cnfa.curriculum_node_id = :assessmentCurriculumNodeId
+            ",
+            "
+                SELECT
                     5 AS discriminator_order,
                     :folderDiscriminator AS discriminator,
                     f.id AS id,
