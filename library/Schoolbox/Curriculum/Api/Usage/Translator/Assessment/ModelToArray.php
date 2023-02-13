@@ -13,8 +13,9 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\GetRouteIfAuthorized;
 use Aura\Router\Router;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\User;
+use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpecification;
+use Schoolbox\User;
 
 /**
  * Curriculum usage specific translator for translating assessments to an array.
@@ -47,15 +48,44 @@ class ModelToArray
      */
     public function __invoke(IAssessable $assessment): array
     {
-        $unit = $assessment->getBaseContext() instanceof UnitSpecification\Model
-            ? $assessment->getBaseContext()
-            : null;
+        return $this->translate($assessment, true, true);
+    }
+
+    /**
+     * Internal translation function: recursively translates `$assessment`
+     * project if it exists, but doesn't include the unit or project fields in
+     * that translation.
+     *
+     * @param IAssessable $assessment
+     * @param bool        $includeUnit
+     * @param bool        $includeProject
+     * @return array
+     */
+    private function translate(IAssessable $assessment, bool $includeUnit, bool $includeProject): array
+    {
+        $unit = null;
+        if ($includeUnit) {
+            $baseContext = $assessment->getBaseContext();
+            if ($baseContext instanceof UnitSpecification\Model) {
+                $unit = call_user_func($this->unitTranslator, $assessment->getBaseContext());
+            }
+        }
+
+        $project = null;
+        if ($includeProject) {
+            $context = $assessment->getContext();
+            if ($context instanceof Project) {
+                $project = $this->translate($context, false, false);
+            }
+        }
+
         return [
-            'id'     => $assessment->getId(),
-            'title'  => $assessment->getTitle(),
-            'type'   => $assessment->getFamilyName(),
-            'unit'   => $unit ? call_user_func($this->unitTranslator, $unit) : null,
-            '_links' => [
+            'id'      => $assessment->getId(),
+            'title'   => $assessment->getTitle(),
+            'type'    => $assessment->getFamilyName(),
+            'unit'    => $unit,
+            'project' => $project,
+            '_links'  => [
                 'view' => $this->getRouteIfAuthorized(
                     'learningAssessment.getUpdateAssessmentForm',
                     ['assessment' => $assessment, 'assessmentId' => $assessment->getId()],
