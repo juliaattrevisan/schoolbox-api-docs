@@ -403,20 +403,7 @@ export default {
                 }
             }
 
-            if (this.selectedTag !== '') {
-                $('#removeFilters').click(this.onClickRemoveTag);
-            }
-
             return { feedItemTypes: checkedFeedItemTypes, tag: this.selectedTag };
-        },
-
-        /**
-         * Remove the selected tag from the filters, leaveing the filters otherwise the same.
-         *
-         * Note this function cannot be defined inline, because if we try that we get an error 'this.onChangeFilters is not a function'.
-         */
-        onClickRemoveTag() {
-            this.onChangeFilters('', true);
         },
 
         /**
@@ -569,7 +556,7 @@ export default {
                         </div>
                         <div class="filters-description" data-filters-description>
                             <template v-if="selectedTag !== ''">
-                                <p>Showing tag "{{ selectedTag }}" <span class='anchor-style' id='removeFilters'>(remove)</span></p>
+                                <p>Showing tag "{{ selectedTag }}" <span class='anchor-style' id='removeFilters' @click="onChangeFilters('', true)">(remove)</span></p>
                             </template>
                         </div>
                     </div>
