@@ -298,33 +298,28 @@ export default {
          * filter state.
          */
         saveFiltersStateToBrowserHistory() {
-            let filtersState = this.getFiltersStateFromDom();
-            let oldUrl = window.location.href;
-            let questionMarkPos = oldUrl.indexOf("?");
-            let oldUrlMinusUrlParams = questionMarkPos === -1 ? oldUrl : oldUrl.substring(0, questionMarkPos);
-            let newUrl = oldUrlMinusUrlParams;
-            let questionMarkAdded = false;
+            let filtersState       = this.getFiltersStateFromDom();
+            let newUrlHostname     = new URL(window.location.href).hostname;
+            let newUrlSearchParams = new URLSearchParams();
 
             if (filtersState.tag !== "") {
-                newUrl += "?tag=" + encodeURIComponent(filtersState.tag);
-                questionMarkAdded = true;
+                newUrlSearchParams.append('tag', encodeURIComponent(filtersState.tag));
             }
 
             // Only save filter state to URL if not all filters are selected.
             if (filtersState.feedItemTypes.length !== this.feedItemTypes.length) {
                 for (let feedItemType of filtersState.feedItemTypes) {
-                    if (questionMarkAdded) {
-                        newUrl += "&";
-                    } else {
-                        newUrl += "?";
-                        questionMarkAdded = true;
-                    }
-
-                    newUrl += "feedItemTypes[]=" + encodeURIComponent(feedItemType);
+                    newUrlSearchParams.append('feedItemTypes[]', feedItemType);
                 }
             }
 
-            history.pushState(filtersState, "", newUrl);
+            let newUrlSearchParamsString = newUrlSearchParams.toString();
+
+            history.pushState(
+                filtersState,
+                '',
+                newUrlHostname + ((newUrlSearchParamsString === '') ? '' : '?') + newUrlSearchParamsString
+            );
         },
 
         /**
