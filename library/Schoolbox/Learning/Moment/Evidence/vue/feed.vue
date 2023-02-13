@@ -310,7 +310,7 @@ export default {
             newUrl.searchParams.delete('feedItemTypes[]');
             if (filtersState.feedItemTypes.length !== this.feedItemTypes.length) {
                 for (let feedItemType of filtersState.feedItemTypes) {
-                    newUrl.searchParams.append('feedItemTypes[]', feedItemType);
+                    newUrl.searchParams.append('feedItemTypes[]', encodeURIComponent(feedItemType));
                 }
             }
 
@@ -337,28 +337,24 @@ export default {
          * @see this.getFiltersStateFromDom()
          */
         getFiltersStateFromUrl() {
-            let url = window.location.href;
-            let questionMarkPos = url.indexOf("?");
+            let url = new URL(window.location.href);
 
-            if (questionMarkPos === -1) {
+            if (Array.from(url.searchParams).length === 0) {
                 return null;
             }
 
-            let urlParamsString = url.substring(questionMarkPos + 1);
-            let urlParams = urlParamsString.split("&");
-            let filtersState = { tag: "", feedItemTypes: [] };
+            let filtersState = { tag: '', feedItemTypes: [] };
 
-            for (let param of urlParams) {
-                let tokens = param.split("=");
-                let key = decodeURIComponent(tokens[0]);
-                let value = decodeURIComponent(tokens[1]);
+            for (let [key, value] of url.searchParams.entries()) {
+                key   = decodeURIComponent(key);
+                value = decodeURIComponent(value);
 
                 switch (key) {
-                    case "tag":
+                    case 'tag':
                         filtersState.tag = value;
                         break;
 
-                    case "feedItemTypes[]":
+                    case 'feedItemTypes[]':
                         filtersState.feedItemTypes.push(value);
                         break;
 
