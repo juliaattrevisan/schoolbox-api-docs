@@ -49,7 +49,7 @@ export default {
             selectedTag: "", // The tag clicked by the user in order to filter to items having that tag.
             selectedFilters: {
                 // NOTE: There is an array in library/Schoolbox/Learning/Moment/Feed/Cursor.php whose values must match
-                //       the keys in this object.  If any change is made to this array, a similar change should be made
+                //       the keys in this object.  If any change is made to these keys, a similar change should be made
                 //       to that array.
                 goals: false,
                 learningMoments: false,
