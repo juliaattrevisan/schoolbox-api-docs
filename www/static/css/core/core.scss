@@ -172,3 +172,6 @@ $cdn-prefix: "../..";
 // jQuery UI
 @import "/node_modules/jquery-ui/themes/base/draggable";
 @import "/node_modules/jquery-ui/themes/base/sortable";
+
+//Override classes
+@import "ui/profile-image-override";

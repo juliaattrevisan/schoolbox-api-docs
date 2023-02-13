@@ -1,0 +1,72 @@
+/**
+* This class is created for the sole purpose of overriding the display of the
+* dropzone and profile image styles that appear on the administration menu.
+* See the ticket SA-12610 for an explanation about exactly why this exists.
+*/
+
+.profile-image-override {
+    #portraitImage {
+        &.is-hidden {
+            opacity: 0;
+            position: absolute;
+            visibility: hidden;
+        }
+    }
+
+    .az-list {
+        margin: 0;
+        padding: 0;
+
+        .actions-small-1 {
+            margin: 0;
+            padding: 0;
+        }
+
+        .list-item {
+            //!important necessary to clobber another !important...
+            padding-right: 0 !important;
+
+            .card.small-12 {
+                max-width: initial;
+                padding: 0;
+                width: 100%;
+
+                p.filename {
+                    background-color: rgba(0, 0, 0, 0.6);
+                    bottom: 0;
+                    color: white;
+                    left: 0;
+                    padding: 0.5rem;
+                    position: absolute;
+                    width: 100%;
+
+                    a {
+                        color: white;
+
+                        &:hover {
+                            text-decoration: underline;
+                        }
+                    }
+                }
+            }
+
+            img {
+                margin: 0;
+                max-width: initial;
+                width: 100%;
+            }
+        }
+    }
+
+    .actions-small-1 {
+        nav {
+            display: flex;
+            position: absolute;
+
+            a[class*="icon-"],
+            a[class^="icon-"] {
+                background-color: rgba(255, 255, 255, 0.6);
+            }
+        }
+    }
+}
