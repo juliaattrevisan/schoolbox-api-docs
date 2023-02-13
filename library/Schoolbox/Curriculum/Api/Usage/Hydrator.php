@@ -33,7 +33,7 @@ class Hydrator
      * @param UnitSpec\Mapper                    $unitSpecMapper       Mapper for unit objects
      * @param UnitSpec\Translator\ModelToArray   $unitTranslator       Translator for unit objects
      * @param Assessment\DataModel\MapperProxy   $assessmentDataSource Data source for assessment objects
-     * @param Assessment\ModelToArray            $assessmentTranslator Translator for assessment objects
+     * @param Translator\Assessment\ModelToArray $assessmentTranslator Translator for assessment objects
      */
     public function __construct(
         private Folder\Mapper $folderMapper,
@@ -43,7 +43,7 @@ class Hydrator
         private UnitSpec\Mapper $unitSpecMapper,
         private UnitSpec\Translator\ModelToArray $unitTranslator,
         private Assessment\DataModel\MapperProxy $assessmentDataSource,
-        private Assessment\ModelToArray $assessmentTranslator,
+        private Translator\Assessment\ModelToArray $assessmentTranslator,
     ) {
     }
 

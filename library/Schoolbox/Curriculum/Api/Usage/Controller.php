@@ -73,6 +73,12 @@ class Controller extends Base
             $folderTranslator,
             $courseTranslator,
         );
+        $assessmentTranslator = new Translator\Assessment\ModelToArray(
+            $this->router,
+            $this->authorizer,
+            $this->getUser(),
+            $unitTranslator,
+        );
         $hydrator = new Hydrator(
             $this->folderMapper,
             $folderTranslator,
@@ -81,7 +87,7 @@ class Controller extends Base
             $this->unitSpecMapper,
             $unitTranslator,
             $this->assessmentDataSource,
-            new Assessment\ModelToArray(),
+            $assessmentTranslator,
         );
 
         $this->response->content->set(
