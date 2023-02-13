@@ -8,14 +8,14 @@
 
 declare(strict_types=1);
 
-namespace Page\ModalFilePicker;
+namespace Page\Resources;
 
 use AcceptanceTester;
+use Codeception\Util\Locator;
 use Exception;
 
 class ResourcesMyFilesPicker
 {
-
     public const URL = '/resources/';
     private AcceptanceTester $tester;
 
@@ -31,13 +31,24 @@ class ResourcesMyFilesPicker
     }
 
     /**
-     * clicks the admin folder
+     * clicks a folder in the resources page by folder id
      * @param int $folderId
      * @throws Exception
      */
-    public function clickFolder(int $folderId)
+    public function clickFolder(int $folderId): void
     {
         $this->tester->executeJS('$("a#' . $folderId . '_anchor").click()');
+    }
+
+
+    /**
+     * clicks a folder in the resources page by folder name
+     * @param string $folderName
+     * @throws Exception
+     */
+    public function clickFolderName(string $folderName): void
+    {
+        $this->tester->click(Locator::contains('a.jstree-anchor', $folderName));
     }
 
     /**

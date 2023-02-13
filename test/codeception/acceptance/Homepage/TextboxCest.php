@@ -9,7 +9,11 @@ namespace Homepage;
 
 use AcceptanceTester;
 use Codeception\Util\Locator;
+use Page\Folder\CreateFolder;
 use Page\Homepage;
+use Exception;
+use Page\ModalFilePicker\ResourcesMyFilesPicker;
+use Page\Resources\Resources;
 
 /**
  * Test for attaching a textbox to a page.
@@ -18,8 +22,10 @@ class TextboxCest
 {
     private const CREATE_FOLDER_URL = 'https://vagrant.dev.schoolbox.cloud/resource/folder/0/create';
 
+
     /**
      * @param AcceptanceTester $i
+     * @throws Exception
      * @return void
      */
     public function _before(AcceptanceTester $i)
@@ -33,56 +39,54 @@ class TextboxCest
      */
     public function createHomepage(AcceptanceTester $i): void
     {
-        $i->login("alaress", "alaress");
-        $i->amOnUrl(self::CREATE_FOLDER_URL);
-        $i->selectOption("template", "Blank");
-        $i->fillField(['name' => 'name'], 'Test TextBox Homepage');
-        $i->click(['css' => 'label[class=radio-label][for=groupWrite1]']);
-        $i->click(['css' => 'label[class=radio-label][for=groupWrite2]']);
-        $i->click(['css' => 'label[class=radio-label][for=groupRead3]']);
-        $i->click(['css' => 'label[class=radio-label][for=groupRead4]']);
-        $i->click(['css' => 'label[class=radio-label][for=groupRead5]']);
-        $i->click(['css' => 'label[class=radio-label][for=groupRead6]']);
-        $i->click(['css' => 'input[type=submit]']);
-        $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resources/");
+        $i->loginAsAdmin();
+        $createFolder = new createFolder($i);
+        $i->amGoingTo("create a homepage folder");
+        $i->amOnPage($createFolder::URL);
+        $createFolder->waitCreateFolderTitleToBePresented();
+        $folderName = "Test TextBox Homepage";
+        $homepageTemplateOption = "Blank";
+        $i->amGoingTo("type a folder name, select a template option and set access permissions");
+        $createFolder->typeName($folderName);
+        $createFolder->setHomepageTemplate($homepageTemplateOption);
+        $createFolder->setAccessPermission('groupWrite1');
+        $createFolder->setAccessPermission('groupWrite2');
+        $createFolder->setAccessPermission('groupRead3');
+        $createFolder->setAccessPermission('groupRead4');
+        $createFolder->setAccessPermission('groupRead5');
+        $createFolder->setAccessPermission('groupRead6');
+        $createFolder->clickCreateFolderButton();
+        $i->amGoingTo("navigate to the resources page and check the new homepage folder is presented");
+        $i->amOnPage($createFolder::URL_RESOURCES);
         $i->canSee("Test TextBox Homepage");
     }
 
     /**
      * Test that a news item I create retains the settings I chose
      *
-     * as zsmith:
-     * * go to http://192.168.36.10/homepage/code/FREA1
-     * * add a text box component
-     * * add text to it
-     * * enter:
-     * ** a heading
-     * ** content
-     * *** including uploaded images
-     * * save it
-     * * verify that:
-     * ** what I entered is there, including images
-     * ** component's heading is what I entered
-     * * modify it again
-     * * verify that:
-     * ** the heading is as I entered it
-     * ** the content is as I entered it
+     * as jcoles I will navigate to a homepage,
+     * add a textbox component with heading and content
+     * and verify it is properly presented
      *
      * @param AcceptanceTester     $i
      * @param Homepage             $homepage
      * @param Homepage\TextboxForm $textboxForm
      * @beforeSuite
      * @depends createHomepage
-     * @throws \Exception
+     * @throws Exception
      */
     public function createTextbox(AcceptanceTester $i, Homepage $homepage, Homepage\TextboxForm $textboxForm): void
     {
         $i->login("jcoles", "password");
-        $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resources/");
+        $createFolder = new createFolder($i);
+        $resources = new Resources($i);
+        $folderName = "Test TextBox Homepage";
+        $i->amOnPage($createFolder::URL_RESOURCES);
+        $i->waitForText($folderName);
+        $resources->clickFolderName($folderName);
+//        $testHomepage = Locator::contains('a.jstree-anchor', 'Test TextBox Homepage');
+//        $i->click($testHomepage);
 
-        $i->waitForText("Test TextBox Homepage");
-        $testHomepage = Locator::contains('a.jstree-anchor', 'Test TextBox Homepage');
-        $i->click($testHomepage);
         $i->waitForText("Homepage", 5);
         sleep(1);
         $i->click("a.icon-home");

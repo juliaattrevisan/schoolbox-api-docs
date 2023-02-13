@@ -65,7 +65,7 @@ class GroupPermissionCest
 
         $manageGroup->waitManageGroupTitleToBePresented();
         $manageGroup->setAccessPermission('type-3');
-        $manageGroup->clickUpdateButton();;
+        $manageGroup->clickUpdateButton();
 
         //getting logged in as a junior student to check the group is presented to them
         $i->impersonate($studentJunior);

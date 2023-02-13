@@ -10,6 +10,8 @@ namespace Page\ModalFilePicker;
 
 use AcceptanceTester;
 use Exception;
+use Page\Resources\Resources;
+use Page\Resources\ResourcesMyFilesPicker;
 
 class UpoloadFilesCest
 {
@@ -48,8 +50,9 @@ class UpoloadFilesCest
     public function attachFilesViaResources(AcceptanceTester $i)
     {
         $resources = new ResourcesMyFilesPicker($i);
+        $resourcesPage = new Resources($i);
         $i->amGoingTo("click the Admin folder in the resources page");
-        $resources->clickFolder(57);
+        $resourcesPage->clickFolder(57);
         $i->amGoingTo("click the attach zone to upload files via modal");
         $resources->clickAttachmentZone();
         $i->amGoingTo("click Resources folder on the modal");
@@ -90,8 +93,9 @@ class UpoloadFilesCest
     public function attachFilesViaMyFiles(AcceptanceTester $i)
     {
         $resources = new ResourcesMyFilesPicker($i);
+        $resourcesPage = new Resources($i);
         $i->amGoingTo("click the Admin folder in the resources page");
-        $resources->clickFolder(57);
+        $resourcesPage->clickFolder(57);
         $i->amGoingTo("click the attach zone to upload files via modal");
         $resources->clickAttachmentZone();
         $i->amGoingTo("click My Files folder on the modal");
@@ -115,8 +119,9 @@ class UpoloadFilesCest
     public function attachFilesByRecordingAudio(AcceptanceTester $i)
     {
         $resources = new ResourcesMyFilesPicker($i);
+        $resourcesPage = new Resources($i);
         $i->amGoingTo("click the Admin folder in the resources page");
-        $resources->clickFolder(57);
+        $resourcesPage->clickFolder(57);
         $i->amGoingTo("click the attach zone to upload files via modal");
         $resources->clickAttachmentZone();
         $i->amGoingTo("click Recording on the modal and then click Audio button");
@@ -148,8 +153,9 @@ class UpoloadFilesCest
     public function attachFilesByRecordingAVideo(AcceptanceTester $i)
     {
         $resources = new ResourcesMyFilesPicker($i);
+        $resourcesPage = new Resources($i);
         $i->amGoingTo("click the Admin folder in the resources page");
-        $resources->clickFolder(57);
+        $resourcesPage->clickFolder(57);
         $i->amGoingTo("click the attach zone to upload files via modal");
         $resources->clickAttachmentZone();
         $i->amGoingTo("click Recording on the modal and then click Video button");
@@ -181,8 +187,9 @@ class UpoloadFilesCest
     public function attachFilesByTakingPhoto(AcceptanceTester $i)
     {
         $resources = new ResourcesMyFilesPicker($i);
+        $resourcesPage = new Resources($i);
         $i->amGoingTo("click the Admin folder in the resources page");
-        $resources->clickFolder(57);
+        $resourcesPage->clickFolder(57);
         $i->amGoingTo("click the attach zone to upload files via modal");
         $resources->clickAttachmentZone();
         $i->amGoingTo("click Recording on the modal and then click Photo button");
