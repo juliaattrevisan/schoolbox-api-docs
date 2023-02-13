@@ -232,6 +232,7 @@ class RecursiveUndeleter
             Pastoral\Comment\Mapper::class,
             Pastoral\Attachment\Mapper::class,
             Pastoral\Access\Mapper::class,
+            Pastoral\UploadQueue\Mapper::class,
         ],
         Pastoral\Group\Mapper::class        => [
             Pastoral\Access\Mapper::class => 'group_id',
@@ -247,6 +248,8 @@ class RecursiveUndeleter
         Pastoral\Access\Mapper::class       => [],
         Pastoral\Audience\Mapper::class     => [],
         Pastoral\Group\Member\Mapper::class => [],
+        Pastoral\Attachment\Mapper::class   => [],
+        Pastoral\UploadQueue\Mapper::class  => [],
         Discussion\Thread\Mapper::class     => [
             Discussion\Comment\Mapper::class => 'discussion_thread_id',
         ],
@@ -285,10 +288,6 @@ class RecursiveUndeleter
             Fixtures\Team\Player\Mapper::class => 'team_id',
         ],
         Fixtures\Team\Player\Mapper::class              => [],
-        Pastoral\Attachment\Mapper::class               => [
-            Pastoral\UploadQueue\Mapper::class,
-        ],
-        Pastoral\UploadQueue\Mapper::class              => [],
         MyFile\Mapper::class                            => [
             ComponentEportfolio\FileListMapper::class => 'file_id',
         ],
@@ -325,7 +324,7 @@ class RecursiveUndeleter
     {
         // check this mapper is in our registry
         if (!array_key_exists($mapperClass, self::$softDeleteRegistry)) {
-            $this->logger->error('Mapper is not registered in soft-delete registry. Unable to un-delete children');
+            $this->logger->error("Mapper {$mapperClass} is not registered in soft-delete registry. Unable to un-delete children");
             throw new OutOfBoundsException('Mapper is not registered in soft-delete registry. Unable to un-delete children');
         }
         $this->logger->debug(sprintf("Mapper '%s' found in registry", $mapperClass));
@@ -349,7 +348,6 @@ class RecursiveUndeleter
     public function loadMapper(string $table): IMapper
     {
         // Use the specified root table to find the root mapper
-        /** @var IMapper $mapperClass */
         foreach (self::$softDeleteRegistry as $mapperClass => $children) {
             // A bit of house keeping to try to keep things in order
             if (!class_exists($mapperClass)) {
@@ -357,6 +355,7 @@ class RecursiveUndeleter
             }
 
             try {
+                /** @var IMapper $mapperClass */
                 $mapperInstance = $mapperClass::getInstance();
                 if ($mapperInstance->getTable() === $table) {
                     return $mapperInstance;
@@ -375,7 +374,7 @@ class RecursiveUndeleter
      * Parse the registered key+val to derive a Mapper instance and foreign key
      *
      * @param IMapper $parentMapper
-     * @param string  $key
+     * @param string|IMapper $key
      * @param string  $val
      * @return mixed[]
      */
