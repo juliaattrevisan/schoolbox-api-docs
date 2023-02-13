@@ -1,17 +1,17 @@
 <script>
-import MediaArticle from "@schoolboxVue/components/media-article";
-import Storage from "@schoolboxVue/components/storage";
-import CommentThread from "./comment-thread";
-import RevealModal from "@schoolboxVue/components/reveal-modal";
-import Toast from "@schoolboxVue/components/toast";
-import AwardDetailModal from "../../../Badge/Award/vue/award-detail-modal";
-import BadgeImage from "../../../Badge/vue/badge-image";
-import CodesList from "@schoolboxCurriculum/vue/codes-list";
-import NodeDetails from "@schoolboxCurriculum/vue/node-details";
-import foundationMixin from "@schoolboxVue/components/foundation-mixin";
-import userProfileConstants from "../../../vue/user-profile/constants";
-import cdnPrefixMixin from "@schoolboxVue/components/cdn-prefix-mixin";
-import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
+import MediaArticle from '@schoolboxVue/components/media-article';
+import Storage from '@schoolboxVue/components/storage';
+import CommentThread from './comment-thread';
+import RevealModal from '@schoolboxVue/components/reveal-modal';
+import Toast from '@schoolboxVue/components/toast';
+import AwardDetailModal from '../../../Badge/Award/vue/award-detail-modal';
+import BadgeImage from '../../../Badge/vue/badge-image';
+import CodesList from '@schoolboxCurriculum/vue/codes-list';
+import NodeDetails from '@schoolboxCurriculum/vue/node-details';
+import foundationMixin from '@schoolboxVue/components/foundation-mixin';
+import userProfileConstants from '../../../vue/user-profile/constants';
+import cdnPrefixMixin from '@schoolboxVue/components/cdn-prefix-mixin';
+import { getEmptyNode } from '@schoolboxCurriculum/js/nodeUtils';
 
 export default {
     components: {
@@ -46,11 +46,11 @@ export default {
             showSkeletonLoader: true,
             currentlyDeletingEvidence: null,
             selectedNode: getEmptyNode(), // The selected curriculum code to display further details for.
-            selectedTag: "", // The tag clicked by the user in order to filter to items having that tag.
+            selectedTag: '', // The tag clicked by the user in order to filter to items having that tag.
 
             // NOTE: There is a matching array in library/Schoolbox/Learning/Moment/Feed/Cursor.php.
             //       If any change is made to this array, a similar change should be made to that array.
-            feedItemTypes: ["goals", "learning-moments", "achievements", "feedback"],
+            feedItemTypes: ['goals', 'learning-moments', 'achievements', 'feedback'],
             showFeed: true,
         };
     },
@@ -101,7 +101,7 @@ export default {
             params.filter = btoa(JSON.stringify(this.getFiltersStateFromDom()));
 
             try {
-                const response = await fetch(this.config.routes.getFeed + "?" + new URLSearchParams(params));
+                const response = await fetch(this.config.routes.getFeed + '?' + new URLSearchParams(params));
                 const responseData = await response.json();
                 this.data = this.data.concat(responseData.data ? responseData.data : []);
                 this.metadata.count = responseData.metadata?.count ? responseData.metadata.count : 0;
@@ -125,10 +125,10 @@ export default {
             let groupedEvidenceByDate = {};
             feedResults.forEach((v) => {
                 let date = dayjs(v.date),
-                    key = date.format("YYYYMMDD");
+                    key = date.format('YYYYMMDD');
                 if (!(key in groupedEvidenceByDate)) {
                     groupedEvidenceByDate[key] = {
-                        date: dayjs(date).startOf("d"),
+                        date: dayjs(date).startOf('d'),
                         evidence: [],
                     };
                 }
@@ -155,18 +155,18 @@ export default {
          * @param {Moment} createdAt
          */
         renderCreatedAt(createdAt) {
-            let now = dayjs().startOf("d"),
-                dayDiff = createdAt.diff(now, "d");
+            let now = dayjs().startOf('d'),
+                dayDiff = createdAt.diff(now, 'd');
             if (dayDiff === 0) {
-                return "today";
+                return 'today';
             }
             if (dayDiff === -1) {
-                return "yesterday";
+                return 'yesterday';
             }
             if (dayDiff === 1) {
-                return "tomorrow";
+                return 'tomorrow';
             }
-            return dayjs.duration(dayDiff, "d").humanize(true);
+            return dayjs.duration(dayDiff, 'd').humanize(true);
         },
 
         /**
@@ -174,7 +174,7 @@ export default {
          */
         openShareLearningMomentModal() {
             // shareLearningMoment
-            this.jQuery("#shareLearningMoment").foundation("reveal", "open");
+            this.jQuery('#shareLearningMoment').foundation('reveal', 'open');
         },
 
         /**
@@ -203,7 +203,7 @@ export default {
          * @param {Object} evidence
          */
         async deleteEvidence(evidence) {
-            this.$refs.toast.activate("Deleting...");
+            this.$refs.toast.activate('Deleting...');
 
             //awards, other things may also be deleted in the future, so ensure this is also the right data type
             const removeEvidenceToDelete = (data) => {
@@ -220,16 +220,16 @@ export default {
             // next tick.
             try {
                 await fetch(evidence.object._links.delete, {
-                    method: "DELETE",
+                    method: 'DELETE',
                 });
                 this.data = [];
-                this.$refs.toast.timeout("Deleted", true);
+                this.$refs.toast.timeout('Deleted', true);
                 this.$nextTick(() => {
                     this.data = newData;
                     this.metadata.count -= 1;
                 });
             } catch (error) {
-                this.$refs.toast.timeout("Could not delete", false);
+                this.$refs.toast.timeout('Could not delete', false);
             } finally {
                 this.$refs.deleteModal.close();
             }
@@ -257,7 +257,7 @@ export default {
         },
 
         gradient(data) {
-            let gradientLevel = this.configGradeGradientEnabled ? (parseInt(data) / 10).toFixed() : "none";
+            let gradientLevel = this.configGradeGradientEnabled ? (parseInt(data) / 10).toFixed() : 'none';
             return `gradient-${gradientLevel}-bg`;
         },
 
@@ -384,7 +384,7 @@ export default {
             let checkedFeedItemTypes = [];
 
             for (const feedItemType of this.feedItemTypes) {
-                if ($("#filter-" + feedItemType).prop("checked")) {
+                if ($('#filter-' + feedItemType).prop('checked')) {
                     checkedFeedItemTypes.push(feedItemType);
                 }
             }
@@ -404,15 +404,15 @@ export default {
         restoreDomAndFeedToFiltersState(filtersState) {
             if (filtersState === null) {
                 // Return the filters to their default state.
-                this.selectedTag = "";
-                $("[data-filter-checkbox]").prop("checked", false);
+                this.selectedTag = '';
+                $('[data-filter-checkbox]').prop('checked', false);
             } else {
                 // Restore state of selectedTag.
                 this.selectedTag = filtersState.tag;
 
                 // Restore state of filter checkboxes.
                 for (const feedItemType of this.feedItemTypes) {
-                    $("#filter-" + feedItemType).prop("checked", filtersState.feedItemTypes.includes(feedItemType));
+                    $('#filter-' + feedItemType).prop('checked', filtersState.feedItemTypes.includes(feedItemType));
                 }
             }
 
