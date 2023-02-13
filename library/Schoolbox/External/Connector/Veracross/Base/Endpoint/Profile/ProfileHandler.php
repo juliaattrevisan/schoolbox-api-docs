@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Veracross\Base\Endpoint\Profile;
 
 use Psr\Log\LoggerInterface;
+use Schoolbox\Column\Date;
 use Schoolbox\External\Profile\Mapper as BaseProfileMapper;
 use Schoolbox\External\Profile\Model as BaseProfile;
 use Schoolbox\External\Profile\Parent\Mapper as ParentProfileMapper;
@@ -37,6 +38,12 @@ use Schoolbox\Mapper\Exception;
  */
 class ProfileHandler
 {
+    /**
+     * Used for converting a baseProfile instance into a scalar
+     */
+    private const BASE_PROFILE_PROPERTY = 'baseProfile';
+
+
     /**
      * Constructor, with optional logging
      *
@@ -89,16 +96,12 @@ class ProfileHandler
      * @param StudentProfile $newProfile
      * @param StudentProfile $oldProfile
      * @return void
-     * @throws Exception
-     * @throws \PDOException
-     * @throws \UnexpectedValueException
      */
     public function saveStudentProfile(
         StudentProfile $newProfile,
         StudentProfile $oldProfile
     ): void {
-        (new Chandler($this->studentProfileMapper, $this->log))
-            ->save($newProfile, $oldProfile);
+        $this->save($this->studentProfileMapper, $newProfile, $oldProfile);
     }
 
 
@@ -108,16 +111,12 @@ class ProfileHandler
      * @param ParentProfile $newProfile
      * @param ParentProfile $oldProfile
      * @return void
-     * @throws Exception
-     * @throws \PDOException
-     * @throws \UnexpectedValueException
      */
     public function saveParentProfile(
         ParentProfile $newProfile,
         ParentProfile $oldProfile
     ): void {
-        (new Chandler($this->parentProfileMapper, $this->log))
-            ->save($newProfile, $oldProfile);
+        $this->save($this->parentProfileMapper, $newProfile, $oldProfile);
     }
 
 
@@ -127,15 +126,208 @@ class ProfileHandler
      * @param StaffProfile $newProfile
      * @param StaffProfile $oldProfile
      * @return void
-     * @throws Exception
-     * @throws \PDOException
-     * @throws \UnexpectedValueException
      */
     public function saveStaffProfile(
         StaffProfile $newProfile,
         StaffProfile $oldProfile
     ): void {
-        (new Chandler($this->staffProfileMapper, $this->log))
-            ->save($newProfile, $oldProfile);
+        $this->save($this->staffProfileMapper, $newProfile, $oldProfile);
+    }
+
+
+    /**
+     * A somewhat wonky pseudo-polymorphic rendition
+     * All these profiles and mappers just happen to behave the same way
+     *
+     * TODO probably add to phpstan baseline to ignore mixed definitions
+     *  as this could be used for TimetableCalendar imports too
+     *
+     * @param                                                       $mapper
+     * @param BaseProfile|StudentProfile|ParentProfile|StaffProfile $newObject
+     * @param BaseProfile|StudentProfile|ParentProfile|StaffProfile $oldObject
+     * @return void
+     */
+    public function save(
+        $mapper,
+        BaseProfile|StudentProfile|ParentProfile|StaffProfile $newObject,
+        BaseProfile|StudentProfile|ParentProfile|StaffProfile $oldObject
+    ): void {
+        /* Insert a whole new row just like we always did
+         */
+        $identifierColumn = $mapper->getIdentifierColumn();
+        $identifierValue = $newObject->getBaseProfile()?->getId();
+
+        /* Due to sequential dependencies, a base profile should always already exist;
+         * this part shouldn't happen at all
+         */
+        if (!$identifierValue) {
+            $this->log->debug(sprintf(
+                '!! Standard mapper save for %s.%s %s',
+                $mapper->getTable(),
+                $identifierColumn,
+                $identifierValue
+            ));
+
+            $mapper->save($newObject);
+
+            return;
+        }
+
+        /* If a subprofile does not already exist with this sis_user_profile id,
+         * we can assume the subprofile can be mapper->save()'d for its first time
+         *
+         * Otherwise, if this object already exists in the db, we can update it
+         */
+        $existingStatement = $mapper->getDatabase()->prepare("
+            SELECT COUNT(*) AS num
+            FROM {$mapper->getTable()}
+            WHERE sis_user_profile_id = :{$identifierColumn}
+        ");
+
+        $existingStatement->execute([
+            $identifierColumn => $identifierValue
+        ]);
+
+        /* This subprofile hasn't existed yet, but its base profile does exist
+         * Create it for the first time with a regular mapper save
+         */
+        if (!$existingStatement->fetch(\PDO::FETCH_ASSOC)['num']) {
+            $mapper->save($newObject);
+
+            return;
+        }
+
+        /* Diff. If this is empty, the objects are the same
+         * and we don't need to persist it again to the db
+         */
+        $diff = $mapper->diff($newObject, $oldObject);
+
+        /* Objects' fields are the same; just set the updated_at field
+         * so we know this record is current, though unchanged
+         */
+        if (empty($diff)) {
+            $params = [
+                $identifierColumn => $identifierValue,
+                'updatedAt' => \Alaress_Date_Format::now()->getDatabase()
+            ];
+
+            /* Otherwise, craft the differences into a chandler update
+             * and do that instead
+             */
+            $query = "
+                UPDATE {$mapper->getTable()}
+                SET updated_at = :updatedAt
+                WHERE {$mapper->getTable()}.{$identifierColumn} = :{$identifierColumn}
+            ";
+
+            $statement = $mapper->getDatabase()->prepare($query);
+            $statement->execute($params);
+
+            $this->logDebug(sprintf(
+                '** Crafted update occurred for %s.%s %s - changed updated_at only',
+                $mapper->getTable(),
+                $identifierColumn,
+                $identifierValue
+            ));
+
+            return;
+        }
+
+        /* Some part of $newObject is different to $oldObject somehow
+         *
+         * Avoid nuking every column via mapper save by piecing it together manually
+         * just like we used to do in the previous millenium
+         */
+        $pieces = [];
+
+        $params = [
+            $identifierColumn => $identifierValue,
+            'updatedAt' => \Alaress_Date_Format::now()->getDatabase()
+        ];
+
+        /* Find the column/mapping relationship
+         *
+         * This allows us to map properties that were different via $diff
+         * into a custom crafted sql query that only updates columns that
+         * had somehow changed, rather than the whole row
+         */
+        $schema = [];
+        $mapping = $mapper->getMap();
+
+        foreach ($mapping as $property => $data) {
+            $schema[$property] = $data['column'];
+        }
+
+        /* Individually craft updates for differing columns only
+         */
+        foreach ($diff as $property => $values) {
+            $column = $schema[$property];
+            $getter = $mapper->getGetMethodName($property);
+
+            if ($newObject->$getter() !== $oldObject->$getter()) {
+                $pieces[] = sprintf(
+                    '%s = :%s',
+                    $column,
+                    $property,
+                );
+
+                /* Accommodate date to scalar conversions
+                 * Special case for base user profiles
+                 */
+                if (self::BASE_PROFILE_PROPERTY === $property) {
+                    $params[$property] = $identifierValue;
+                } else if ($mapping[$property]['hydrator'] instanceof Date) {
+                    $params[$property] = $newObject->$getter()->getDatabase();
+                } else {
+                    $params[$property] = $newObject->$getter();
+                }
+            }
+        }
+
+        /* Manufacture query
+         */
+        $query = "UPDATE {$mapper->getTable()}";
+
+        if (\count($pieces)) {
+            $query .= ' SET ';
+            $query .= implode(', ', $pieces);
+            $query .= ', updated_at = :updatedAt';
+        } else {
+            $query .= ' SET updated_at = :updatedAt';
+        }
+
+        $query .= " WHERE {$mapper->getTable()}.{$identifierColumn} = :{$identifierColumn}";
+
+        /* Slap it into prepared statement
+         */
+        $statement = $mapper->getDatabase()->prepare($query);
+
+        foreach ($params as $key => $value) {
+            $statement->bindParam(":{$key}", $value);
+        }
+
+        /* Use the id
+         */
+        $statement->bindParam(":{$identifierColumn}", $identifierValue, \PDO::PARAM_INT);
+        $statement->execute($params);
+
+        $this->logDebug(sprintf(
+            '** Crafted update occurred for %s.%s %s - subset diff',
+            $mapper->getTable(),
+            $identifierColumn,
+            $identifierValue
+        ));
+    }
+
+
+    /**
+     * If logger exists, use it
+     *
+     * @param string $message
+     * @return void
+     */
+    private function logDebug(string $message): void
+    {
+        $this->log?->debug($message);
     }
 }
