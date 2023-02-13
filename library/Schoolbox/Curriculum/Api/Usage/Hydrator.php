@@ -201,31 +201,33 @@ class Hydrator
      */
     private function assignUnitSpecsToModels(array $models): array
     {
+        // Collate unit spec IDs
         $unitSpecIds = [];
         foreach ($models[Cursor::DISCRIMINATOR_ASSESSMENT] ?? [] as $assessment) {
             /** @var Assessment\IAssessable $assessment */
             $context = $assessment->getContext();
             if ($context instanceof UnitSpec\Model) {
                 $unitSpecIds[] = $context->getId();
-//            } elseif ($context instanceof Assessment\Project && $context->getContext() instanceof UnitSpec\Model) {
-//                $unitSpecIds[] = $context->getContext()->getId();
+            } elseif ($context instanceof Assessment\Project && $context->getContext() instanceof UnitSpec\Model) {
+                $unitSpecIds[] = $context->getContext()->getId();
             }
         }
         $unitSpecs = $this->unitSpecMapper->findByColumn('id', $unitSpecIds);
 
+        // Assign unit spec contexts
         foreach ($models[Cursor::DISCRIMINATOR_ASSESSMENT] ?? [] as $assessment) {
             /** @var Assessment\IAssessable $assessment */
-            $context = $assessment->getBaseContext();
+            $context = $assessment->getContext();
             if ($context instanceof UnitSpec\Model) {
                 $unitSpec = $unitSpecs[$context->getId()] ?? null;
                 if ($unitSpec) {
                     $assessment->setContext($unitSpec);
                 }
-//            } elseif ($context instanceof Assessment\Project && $context->getContext() instanceof UnitSpec\Model) {
-//                $unitSpec = $unitSpecs[$context->getContext()->getId()] ?? null;
-//                if ($unitSpec) {
-//                    $context->setContext($unitSpec);
-//                }
+            } elseif ($context instanceof Assessment\Project && $context->getContext() instanceof UnitSpec\Model) {
+                $unitSpec = $unitSpecs[$context->getContext()->getId()] ?? null;
+                if ($unitSpec) {
+                    $context->setContext($unitSpec);
+                }
             }
         }
 
