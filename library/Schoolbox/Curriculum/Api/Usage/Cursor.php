@@ -167,6 +167,19 @@ class Cursor implements ICursor
             ",
             "
                 SELECT
+                    3 AS discriminator_order,
+                    :assessmentDiscriminator AS discriminator,
+                    a.id AS id,
+                    a.title AS name
+                FROM curriculum_node_for_assessment cnfa
+                INNER JOIN assessment a ON cnfa.assessment_id = a.id AND a.deleted_at IS NULL
+                INNER JOIN assessment_course_unit_specification acus ON a.id = acus.assessment_id
+                INNER JOIN course_unit_specification cus
+                    ON acus.course_unit_specification_id = cus.id AND cus.deleted_at IS NOT NULL
+                WHERE cnfa.curriculum_node_id IN :assessmentCurriculumNodeId
+            ",
+            "
+                SELECT
                     5 AS discriminator_order,
                     :folderDiscriminator AS discriminator,
                     f.id AS id,
@@ -185,12 +198,14 @@ class Cursor implements ICursor
             . implode(') UNION (', $selectParts)
             . ')) AS combined';
         $params = [
-            'courseDiscriminator'    => self::DISCRIMINATOR_COURSE,
-            'courseCurriculumNodeId' => $this->node->getId(),
-            'unitDiscriminator'      => self::DISCRIMINATOR_UNIT,
-            'unitCurriculumNodeId'   => $this->node->getId(),
-            'folderDiscriminator'    => self::DISCRIMINATOR_FOLDER,
-            'folderCurriculumNodeId' => $this->node->getId(),
+            'courseDiscriminator'        => self::DISCRIMINATOR_COURSE,
+            'courseCurriculumNodeId'     => $this->node->getId(),
+            'unitDiscriminator'          => self::DISCRIMINATOR_UNIT,
+            'unitCurriculumNodeId'       => $this->node->getId(),
+            'assessmentDiscriminator'    => self::DISCRIMINATOR_ASSESSMENT,
+            'assessmentCurriculumNodeId' => $this->node->getId(),
+            'folderDiscriminator'        => self::DISCRIMINATOR_FOLDER,
+            'folderCurriculumNodeId'     => $this->node->getId(),
         ];
 
         // Figure out a WHERE part
