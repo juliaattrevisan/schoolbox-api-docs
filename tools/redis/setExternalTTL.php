@@ -26,7 +26,7 @@ $app = new class extends CliTool\App {
     /** @inheritDoc */
     public function run(): void
     {
-        $redis = Redis::getStorageClientInstance();
+        $redis = Redis::getCacheClientInstance();
 
         if (!$redis) {
             $this->getLogger()->error("Unable to fetch redis connection");
@@ -42,9 +42,10 @@ $app = new class extends CliTool\App {
         $cursor  = null;
 
         while ($cursor !== '0') {
-            [$cursor, $elements] = $redis->scan($cursor, ['MATCH' => self::EXTERNAL_DB_KEY_PATTERN]);
+            [$cursor, $elements] = $redis->scan($cursor, ['MATCH' => $this->getCacheKey()]);
             foreach ($elements as $cacheKey) {
                 $currentTtl = $redis->ttl($cacheKey);
+                $this->getLogger()->info("Cache TTL for $cacheKey is: $currentTtl seconds");
                 if ($currentTtl > $externalDbCacheTimeout) {
                     $this->getLogger()->info("Set cache TTL for $cacheKey from $currentTtl to $externalDbCacheTimeout seconds");
                     $redis->expire($cacheKey, $externalDbCacheTimeout);
@@ -60,6 +61,11 @@ $app = new class extends CliTool\App {
     {
         $value = $this->getConfig()->get('external_cache_timeout');
         return $value === null ? null : (int)$value;
+    }
+
+    private function getCacheKey()
+    {
+        return sprintf("%s:%s:%s", Redis::FUNCTION_CALL_CACHE_PREFIX, INSTANCE_ID, self::EXTERNAL_DB_KEY_PATTERN);
     }
 };
 

@@ -47,7 +47,7 @@ class Redis
     /**
      * Prefix all function call Redis keys with this value.
      */
-    private const FUNCTION_CALL_CACHE_PREFIX = 'fc';
+    public const FUNCTION_CALL_CACHE_PREFIX = 'fc';
 
     /**
      * @var self
