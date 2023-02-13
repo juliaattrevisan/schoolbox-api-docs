@@ -152,7 +152,7 @@ class ProfileHandler
         BaseProfile|StudentProfile|ParentProfile|StaffProfile $newObject,
         BaseProfile|StudentProfile|ParentProfile|StaffProfile $oldObject
     ): void {
-        /* Insert a whole new row just like we always did
+        /* Shortcuts to some facts
          */
         $identifierColumn = $mapper->getIdentifierColumn();
         $identifierValue = $newObject->getBaseProfile()?->getId();
