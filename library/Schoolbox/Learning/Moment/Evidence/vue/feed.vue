@@ -47,10 +47,16 @@ export default {
             currentlyDeletingEvidence: null,
             selectedNode: getEmptyNode(), // The selected curriculum code to display further details for.
             selectedTag: "", // The tag clicked by the user in order to filter to items having that tag.
+            selectedFilters: {
+                // NOTE: There is an array in library/Schoolbox/Learning/Moment/Feed/Cursor.php whose values must match
+                //       the keys in this object.  If any change is made to this array, a similar change should be made
+                //       to that array.
+                goals: false,
+                learningMoments: false,
+                achievements: false,
+                feedback: false,
+            },
 
-            // NOTE: There is a matching array in library/Schoolbox/Learning/Moment/Feed/Cursor.php.
-            //       If any change is made to this array, a similar change should be made to that array.
-            feedItemTypes: ["goals", "learning-moments", "achievements", "feedback"],
             showFeed: true,
         };
     },
@@ -72,10 +78,10 @@ export default {
         document.addEventListener(userProfileConstants.events.AWARDS_UPDATED, () => this.load());
         window.onpopstate = (event) => {
             // NOTE: event.state will be null unless the state has been saved using history.pushState().
-            this.restoreDomAndFeedToFiltersState(event.state);
+            this.setSelectedTagAndFiltersToMatchState(event.state);
         };
 
-        this.restoreDomAndFeedToFiltersState(this.getFiltersStateFromUrl());
+        this.setSelectedTagAndFiltersToMatchState(this.getFiltersStateFromUrl());
     },
     methods: {
         /**
@@ -307,10 +313,10 @@ export default {
             }
 
             // Only save filter state to URL if not all filters are selected.
-            newUrl.searchParams.delete("feedItemTypes[]");
-            if (filtersState.feedItemTypes.length !== this.feedItemTypes.length) {
-                for (let feedItemType of filtersState.feedItemTypes) {
-                    newUrl.searchParams.append("feedItemTypes[]", encodeURIComponent(feedItemType));
+            newUrl.searchParams.delete("filterNames[]");
+            if (filtersState.filterNames.length !== Object.keys(this.selectedFilters).length) {
+                for (let filterName of filtersState.filterNames) {
+                    newUrl.searchParams.append("filterNames[]", encodeURIComponent(filterName));
                 }
             }
 
@@ -322,13 +328,13 @@ export default {
          * If there are no recognised URL parameters, the return value will be null.
          *
          * The URL is expected to have parameters like this:
-         *    https://schoolbox.com.au/search/user/69?tag=Class%20Work&feedItemTypes[]=feedback&feedItemTypes[]=achievements
-         *    * Both parameters ('tag' and 'feedItemTypes') are optional
-         *    * feedItemTypes are expected to match those from this.feedItemTypes.
+         *    https://schoolbox.com.au/search/user/69?tag=Class%20Work&filterNames[]=feedback&filterNames[]=achievements
+         *    * Both parameters ('tag' and 'filterNames') are optional
+         *    * filterNames are expected to match the keys from this.selectedFilters.
          *
          * Example of non-null return value:
          *    {
-         *       feedItemTypes: ['feedback', 'learning-moments'],
+         *       filterNames: ['feedback', 'learningMoments'],
          *       tag: '' { String }
          *    }
          *
@@ -343,7 +349,7 @@ export default {
                 return null;
             }
 
-            let filtersState = { tag: "", feedItemTypes: [] };
+            let filtersState = { tag: "", filterNames: [] };
 
             for (let [key, value] of url.searchParams.entries()) {
                 key = decodeURIComponent(key);
@@ -354,8 +360,8 @@ export default {
                         filtersState.tag = value;
                         break;
 
-                    case "feedItemTypes[]":
-                        filtersState.feedItemTypes.push(value);
+                    case "filterNames[]":
+                        filtersState.filterNames.push(value);
                         break;
 
                     default:
@@ -372,7 +378,7 @@ export default {
          *
          * Example of return value:
          *    {
-         *       feedItemTypes: ['feedback', 'learning-moments'], { Array of strings from this.feedItemTypes }
+         *       filterNames: ['feedback', 'learningMoments'], { Array of keys from this.selectedFilters }
          *       tag: '' { String }
          *    }
          *
@@ -383,13 +389,13 @@ export default {
         getFiltersStateFromDom() {
             let checkedFeedItemTypes = [];
 
-            for (const feedItemType of this.feedItemTypes) {
-                if ($("#filter-" + feedItemType).prop("checked")) {
-                    checkedFeedItemTypes.push(feedItemType);
+            for (const filterName of Object.keys(this.selectedFilters)) {
+                if ($("#filter-" + filterName).prop("checked")) {
+                    checkedFeedItemTypes.push(filterName);
                 }
             }
 
-            return { feedItemTypes: checkedFeedItemTypes, tag: this.selectedTag };
+            return { filterNames: checkedFeedItemTypes, tag: this.selectedTag };
         },
 
         /**
@@ -397,22 +403,30 @@ export default {
          *
          * Example of non-null filtersState object:
          *    {
-         *       feedItemTypes: ['feedback', 'learning-moments'],
+         *       filterNames: ['feedback', 'learningMoments'],
          *       tag: '' { String }
          *    }
          */
-        restoreDomAndFeedToFiltersState(filtersState) {
+        setSelectedTagAndFiltersToMatchState(filtersState) {
             if (filtersState === null) {
                 // Return the filters to their default state.
                 this.selectedTag = "";
-                $("[data-filter-checkbox]").prop("checked", false);
+
+                for (let filterName of Object.keys(this.selectedFilters)) {
+                    this.selectedFilters.filterName = false;
+                }
             } else {
                 // Restore state of selectedTag.
                 this.selectedTag = filtersState.tag;
 
                 // Restore state of filter checkboxes.
-                for (const feedItemType of this.feedItemTypes) {
-                    $("#filter-" + feedItemType).prop("checked", filtersState.feedItemTypes.includes(feedItemType));
+                const allFiltersAreSelected =
+                    Array.from(this.selectedFilters).length === filtersState.filterNames.length;
+
+                for (const filterName of Object.keys(this.selectedFilters)) {
+                    this.selectedFilters[filterName] = allFiltersAreSelected
+                        ? true
+                        : filtersState.filterNames.includes(filterName);
                 }
             }
 
@@ -499,9 +513,9 @@ export default {
                                         type="checkbox"
                                         data-filter-checkbox
                                         id="filter-goals"
-                                        checked="checked"
                                         name="includeGoals"
                                         @click="onChangeFilters('', true)"
+                                        v-model="selectedFilters.goals"
                                     />
                                     <label for="filter-goals">Goals</label>
                                 </li>
@@ -509,21 +523,21 @@ export default {
                                     <input
                                         type="checkbox"
                                         data-filter-checkbox
-                                        id="filter-learning-moments"
-                                        checked="checked"
+                                        id="filter-learningMoments"
                                         name="includeLearningMoments"
                                         @click="onChangeFilters('', true)"
+                                        v-model="selectedFilters.learningMoments"
                                     />
-                                    <label for="filter-learning-moments">Learning Moments</label>
+                                    <label for="filter-learningMoments">Learning Moments</label>
                                 </li>
                                 <li>
                                     <input
                                         type="checkbox"
                                         data-filter-checkbox
                                         id="filter-achievements"
-                                        checked="checked"
                                         name="includeAchievements"
                                         @click="onChangeFilters('', true)"
+                                        v-model="selectedFilters.achievements"
                                     />
                                     <label for="filter-achievements">Achievements</label>
                                 </li>
@@ -532,9 +546,9 @@ export default {
                                         type="checkbox"
                                         data-filter-checkbox
                                         id="filter-feedback"
-                                        checked="checked"
                                         name="includeDueWork"
                                         @click="onChangeFilters('', true)"
+                                        v-model="selectedFilters.feedback"
                                     />
                                     <label for="filter-feedback">Feedback</label>
                                 </li>

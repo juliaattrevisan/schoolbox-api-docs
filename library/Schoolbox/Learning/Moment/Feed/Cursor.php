@@ -61,7 +61,7 @@ class Cursor implements ICursor
      * NOTE: There is a matching array in library/Schoolbox/Learning/Moment/Evidence/vue/feed.vue.
      *       If any change is made to this array, a similar change should be made to that array.
      */
-    private const FEED_ITEM_TYPES = ['goals', 'learning-moments', 'achievements', 'feedback'];
+    private const FILTER_NAMES = ['goals', 'learningMoments', 'achievements', 'feedback'];
 
     /**
      * Whether the learning moments module is enabled
@@ -102,7 +102,7 @@ class Cursor implements ICursor
         $this->codec = $codec ?? new Base64();
         $this->filter = (
             ($encodedFilter === null) ? [
-                'feedItemTypes' => [],
+                'filterNames' => [],
                 'tag' => ''
             ] :
             $this->codec->decode($encodedFilter)
@@ -265,8 +265,8 @@ class Cursor implements ICursor
     private function getEvidenceQueryAndParams(bool $countOnly): array
     {
         $includeEvidence = (
-            count($this->filter['feedItemTypes']) === 0 ||
-            in_array('learning-moments', $this->filter['feedItemTypes'], true)
+            count($this->filter['filterNames']) === 0 ||
+            in_array('learningMoments', $this->filter['filterNames'], true)
         );
 
         if (!$includeEvidence) {
@@ -315,12 +315,12 @@ class Cursor implements ICursor
     private function getBadgeAwardsQueryAndParams(bool $countOnly): array
     {
         $includeAchievements = (
-            count($this->filter['feedItemTypes']) === 0 ||
-            in_array('achievements', $this->filter['feedItemTypes'], true) // Achievements are badges with status 'achievement'.
+            count($this->filter['filterNames']) === 0 ||
+            in_array('achievements', $this->filter['filterNames'], true) // Achievements are badges with status 'achievement'.
         );
         $includeGoals = (
-            count($this->filter['feedItemTypes']) === 0 ||
-            in_array('goals', $this->filter['feedItemTypes'], true) // Goals are badges with status 'goal'.
+            count($this->filter['filterNames']) === 0 ||
+            in_array('goals', $this->filter['filterNames'], true) // Goals are badges with status 'goal'.
         );
 
         if (
@@ -375,8 +375,8 @@ class Cursor implements ICursor
     private function getDueWorkFeedbackQueryAndParams(bool $countOnly): array
     {
         $includeDueWorkFeedback = (
-            count($this->filter['feedItemTypes']) === 0 ||
-            in_array('feedback', $this->filter['feedItemTypes'], true)
+            count($this->filter['filterNames']) === 0 ||
+            in_array('feedback', $this->filter['filterNames'], true)
         );
 
         if (
@@ -453,15 +453,15 @@ class Cursor implements ICursor
      */
     private static function validateFilter(array $filter): void
     {
-        if (!array_key_exists('feedItemTypes', $filter) || !is_array($filter['feedItemTypes'])) {
-            throw new InvalidArgumentException("Filter object must contain key 'feedItemTypes'.");
+        if (!array_key_exists('filterNames', $filter) || !is_array($filter['filterNames'])) {
+            throw new InvalidArgumentException("Filter object must contain key 'filterNames'.");
         }
 
-        foreach ($filter['feedItemTypes'] as $feedItemType) {
-            if (!in_array($feedItemType, self::FEED_ITEM_TYPES, true)) {
+        foreach ($filter['filterNames'] as $filterName) {
+            if (!in_array($filterName, self::FILTER_NAMES, true)) {
                 throw new InvalidArgumentException(
-                    "Filter 'feedItemTypes' array should only contain strings from" .
-                    ' {' . implode(', ', self::FEED_ITEM_TYPES) . '}'
+                    "Filter 'filterNames' array should only contain strings from" .
+                    ' {' . implode(', ', self::FILTER_NAMES) . '}'
                 );
             }
         }
