@@ -45,6 +45,15 @@ class ProfileHandler
 
 
     /**
+     * A list of (sql, prepared statement) tuples that we will have
+     * manufactured as we progress through the strats
+     *
+     * @var array
+     */
+    private array $existingQueries = [];
+
+
+    /**
      * Constructor, with optional logging
      *
      * @param BaseProfileMapper    $baseProfileMapper
@@ -177,12 +186,23 @@ class ProfileHandler
          * we can assume the subprofile can be mapper->save()'d for its first time
          *
          * Otherwise, if this object already exists in the db, we can update it
+         *
+         * In any case, build a custom query to decide if something exists without
+         * having to hydrate the answer. We can recycle prepared statements so if
+         * we made one earlier, we can reuse it; otherwise make a new one. You can't
+         * tell when such a query exists.
          */
-        $existingStatement = $mapper->getDatabase()->prepare("
+        $existingQuery = "
             SELECT COUNT(*) AS num
             FROM {$mapper->getTable()}
             WHERE {$identifierColumn} = :{$identifierColumn}
-        ");
+        ";
+
+        if (!isset($this->existingQueries[$existingQuery])) {
+            $this->existingQueries[$existingQuery] = $mapper->getDatabase()->prepare($existingQuery);
+        }
+
+        $existingStatement = $this->existingQueries[$existingQuery];
 
         $existingStatement->execute([
             $identifierColumn => $identifierValue
@@ -220,7 +240,12 @@ class ProfileHandler
                 WHERE {$mapper->getTable()}.{$identifierColumn} = :{$identifierColumn}
             ";
 
-            $statement = $mapper->getDatabase()->prepare($query);
+            if (!isset($this->existingQueries[$query])) {
+                $this->existingQueries[$query] = $mapper->getDatabase()->prepare($query);
+            }
+
+            $statement = $this->existingQueries[$query];
+
             $statement->execute($params);
 
             $this->logDebug(sprintf(
@@ -300,7 +325,11 @@ class ProfileHandler
 
         /* Slap it into prepared statement
          */
-        $statement = $mapper->getDatabase()->prepare($query);
+        if (!isset($this->existingQueries[$query])) {
+            $this->existingQueries[$query] = $mapper->getDatabase()->prepare($query);
+        }
+
+        $statement = $this->existingQueries[$query];
 
         foreach ($params as $key => $value) {
             $statement->bindParam(":{$key}", $value);

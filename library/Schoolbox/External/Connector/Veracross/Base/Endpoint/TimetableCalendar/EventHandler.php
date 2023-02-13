@@ -32,6 +32,15 @@ use Schoolbox\Mapper\Exception;
  */
 class EventHandler
 {
+    /**
+     * A list of (sql, prepared statement) tuples that we will have
+     * manufactured as we progress through the strats
+     *
+     * @var array
+     */
+    private array $existingQueries = [];
+
+
     /** Constructor, with optional logging
      *
      * @param Mapper               $eventMapper
@@ -85,7 +94,11 @@ class EventHandler
                 WHERE {$this->eventMapper->getTable()}.id = :id
             ";
 
-            $statement = $this->eventMapper->getDatabase()->prepare($query);
+            if (!isset($this->existingQueries[$query])) {
+                $this->existingQueries[$query] = $this->eventMapper->getDatabase()->prepare($query);
+            }
+
+            $statement = $this->existingQueries[$query];
             $statement->execute($params);
 
             $this->logDebug(sprintf(
@@ -160,7 +173,11 @@ class EventHandler
 
         /* Slap it into prepared statement
          */
-        $statement = $this->eventMapper->getDatabase()->prepare($query);
+        if (!isset($this->existingQueries[$query])) {
+            $this->existingQueries[$query] = $this->eventMapper->getDatabase()->prepare($query);
+        }
+
+        $statement = $this->existingQueries[$query];
 
         foreach ($params as $key => $value) {
             $statement->bindParam(":{$key}", $value);
