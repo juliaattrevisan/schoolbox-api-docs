@@ -299,27 +299,23 @@ export default {
          */
         saveFiltersStateToBrowserHistory() {
             let filtersState       = this.getFiltersStateFromDom();
-            let newUrlHostname     = new URL(window.location.href).hostname;
-            let newUrlSearchParams = new URLSearchParams();
+            let newUrl             = new URL(window.location.href);
+            let newUrlSearchParams = newUrl.searchParams;
 
-            if (filtersState.tag !== "") {
+            newUrlSearchParams.delete('tag');
+            if (filtersState.tag !== '') {
                 newUrlSearchParams.append('tag', encodeURIComponent(filtersState.tag));
             }
 
             // Only save filter state to URL if not all filters are selected.
+            newUrlSearchParams.delete('feedItemTypes[]');
             if (filtersState.feedItemTypes.length !== this.feedItemTypes.length) {
                 for (let feedItemType of filtersState.feedItemTypes) {
                     newUrlSearchParams.append('feedItemTypes[]', feedItemType);
                 }
             }
 
-            let newUrlSearchParamsString = newUrlSearchParams.toString();
-
-            history.pushState(
-                filtersState,
-                '',
-                newUrlHostname + ((newUrlSearchParamsString === '') ? '' : '?') + newUrlSearchParamsString
-            );
+            history.pushState(filtersState, '', newUrl.toString());
         },
 
         /**
@@ -349,8 +345,6 @@ export default {
                 return null;
             }
 
-            let urlParamsString = url.substring(questionMarkPos + 1);
-            let urlParams = urlParamsString.split("&");
             let filtersState = { tag: "", feedItemTypes: [] };
 
             for (let param of urlParams) {
