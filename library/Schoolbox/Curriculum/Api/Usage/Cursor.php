@@ -42,6 +42,13 @@ class Cursor implements ICursor
     public const DISCRIMINATOR_FOLDER = 'folder';
 
     /**
+     * Discriminator for identifying an assessment result.
+     *
+     * (Only specification assessments are currently retrieved by this API.)
+     */
+    public const DISCRIMINATOR_ASSESSMENT = 'assessment';
+
+    /**
      * Minimum number of results returnable from the cursor at once:
      * it must return at least one result.
      */

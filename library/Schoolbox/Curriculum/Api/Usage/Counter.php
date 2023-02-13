@@ -70,6 +70,19 @@ class Counter
                 . " GROUP BY id, discriminator",
             "
                 SELECT
+                    cnfa.curriculum_node_id AS id,
+                    :assessmentDiscriminator AS discriminator,
+                    COUNT(*) AS count
+                FROM curriculum_node_for_assessment cnfa
+                INNER JOIN assessment a ON cnfa.assessment_id = a.id AND a.deleted_at IS NULL
+                INNER JOIN assessment_course_unit_specification acus ON a.id = acus.assessment_id
+                INNER JOIN course_unit_specification cus
+                    ON acus.course_unit_specification_id = cus.id AND cus.deleted_at IS NOT NULL
+                WHERE cnfa.curriculum_node_id IN "
+            . Builder::getArrayPlaceholders($ids, Cursor::DISCRIMINATOR_ASSESSMENT)
+            . " GROUP BY id, discriminator",
+            "
+                SELECT
                     cnfc.curriculum_node_id AS id,
                     :folderDiscriminator AS discriminator,
                     COUNT(*) AS count
@@ -89,21 +102,24 @@ class Counter
 
         // Parameters for the query
         $params = [
-            'courseDiscriminator' => Cursor::DISCRIMINATOR_COURSE,
-            'unitDiscriminator'   => Cursor::DISCRIMINATOR_UNIT,
-            'folderDiscriminator' => Cursor::DISCRIMINATOR_FOLDER,
+            'courseDiscriminator'     => Cursor::DISCRIMINATOR_COURSE,
+            'unitDiscriminator'       => Cursor::DISCRIMINATOR_UNIT,
+            'assessmentDiscriminator' => Cursor::DISCRIMINATOR_ASSESSMENT,
+            'folderDiscriminator'     => Cursor::DISCRIMINATOR_FOLDER,
         ];
         $params += Builder::getArrayParameters($ids, Cursor::DISCRIMINATOR_COURSE);
         $params += Builder::getArrayParameters($ids, Cursor::DISCRIMINATOR_UNIT);
+        $params += Builder::getArrayParameters($ids, Cursor::DISCRIMINATOR_ASSESSMENT);
         $params += Builder::getArrayParameters($ids, Cursor::DISCRIMINATOR_FOLDER);
 
         // Run query and compile result
         $result = array_fill_keys(
             $ids,
             [
-                Cursor::DISCRIMINATOR_COURSE => 0,
-                Cursor::DISCRIMINATOR_UNIT   => 0,
-                Cursor::DISCRIMINATOR_FOLDER => 0,
+                Cursor::DISCRIMINATOR_COURSE     => 0,
+                Cursor::DISCRIMINATOR_UNIT       => 0,
+                Cursor::DISCRIMINATOR_ASSESSMENT => 0,
+                Cursor::DISCRIMINATOR_FOLDER     => 0,
             ]
         );
         $query->execute($params);
