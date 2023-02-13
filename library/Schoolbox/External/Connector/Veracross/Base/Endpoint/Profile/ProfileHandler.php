@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Veracross\Base\Endpoint\Profile;
 
 use Psr\Log\LoggerInterface;
-use Schoolbox\External\Connector\Veracross\Base\Endpoint\Chandler;
 use Schoolbox\External\Profile\Mapper as BaseProfileMapper;
 use Schoolbox\External\Profile\Model as BaseProfile;
 use Schoolbox\External\Profile\Parent\Mapper as ParentProfileMapper;
@@ -20,7 +19,6 @@ use Schoolbox\External\Profile\Staff\Model as StaffProfile;
 use Schoolbox\External\Profile\Student\Mapper as StudentProfileMapper;
 use Schoolbox\External\Profile\Student\Model as StudentProfile;
 use Schoolbox\Mapper\Exception;
-
 
 /**
  * Prototype for specially handlerising data going into sis_user_*
@@ -72,8 +70,16 @@ class ProfileHandler
         BaseProfile $newProfile,
         BaseProfile $oldProfile
     ): void {
-        (new Chandler($this->baseProfileMapper, $this->log))
-            ->save($newProfile, $oldProfile);
+        /* The student/parent/staff profiles need to know a base profile's id
+         * so we can't chandler that; we'd never know the autoincrementing id
+         * that was given to the base profile. Use the regular mapper instead,
+         * and incur the cost; we'll make some savings in the subprofiles such
+         * as student/parent/staff specific profiles
+         *
+         * (new Chandler($this->baseProfileMapper, $this->log))
+         *     ->save($newProfile, $oldProfile);
+         */
+        $this->baseProfileMapper->save($newProfile);
     }
 
 

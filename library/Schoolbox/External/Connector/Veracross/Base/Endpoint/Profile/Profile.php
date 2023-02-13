@@ -344,6 +344,7 @@ class Profile implements IStrategy
 
                 $studentBaseProfile = clone $oldStudentBaseProfile;
                 $studentProfile = clone $oldStudentProfile;
+                $studentProfile->setBaseProfile($studentBaseProfile);
 
                 $studentBaseProfile
                     ->setExternalId($externalId)
@@ -356,6 +357,7 @@ class Profile implements IStrategy
                  */
                 if ($this->perform) {
                     $this->profileHandler->saveBaseProfile($studentBaseProfile, $oldStudentBaseProfile);
+
                 }
 
                 /* Smoosh it all together

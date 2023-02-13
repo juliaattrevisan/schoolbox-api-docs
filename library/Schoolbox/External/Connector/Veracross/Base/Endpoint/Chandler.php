@@ -38,9 +38,23 @@ class Chandler
      * @param LoggerInterface|null $log
      */
     public function __construct(
-        private Mapper $mapper,
+        protected Mapper $mapper,
         private ?LoggerInterface $log = null
     ) {
+    }
+
+
+    /**
+     * Returns a scalar corresponding to the identifier for $newObject
+     *
+     * @param $newObject
+     * @return int|null
+     */
+    protected function getIdentifierValue($newObject): ?int
+    {
+        $identifierGetter = $this->mapper->getGetIdentifierMethodName();
+
+        return $newObject->$identifierGetter();
     }
 
 
@@ -62,7 +76,16 @@ class Chandler
     {
         /* Insert a whole new row just like we always did
          */
-        if (!$newObject->getId()) {
+        $identifierColumn = $this->mapper->getIdentifierColumn();
+        $identifierValue = $this->getIdentifierValue($newObject);
+
+        if (!$this->getIdentifierValue($newObject)) {
+            $this->log->debug(sprintf(
+                '** Standard mapper save for %s.%s',
+                $this->mapper->getTable(),
+                $identifierColumn,
+            ));
+
             $this->mapper->save($newObject);
 
             return;
@@ -78,7 +101,7 @@ class Chandler
          */
         if (empty($diff)) {
             $params = [
-                'id' => (int)$newObject->getId(),
+                $identifierColumn => $this->getIdentifierValue($newObject),
                 'updatedAt' => \Alaress_Date_Format::now()->getDatabase()
             ];
 
@@ -88,15 +111,16 @@ class Chandler
             $query = "
                 UPDATE {$this->mapper->getTable()}
                 SET updated_at = :updatedAt
-                WHERE {$this->mapper->getTable()}.id = :id
+                WHERE {$this->mapper->getTable()}.{$identifierColumn} = :{$identifierColumn}
             ";
 
             $statement = $this->mapper->getDatabase()->prepare($query);
             $statement->execute($params);
 
             $this->logDebug(sprintf(
-                '** Crafted update occurred for %s.id %s - changed updated_at only',
+                '** Crafted update occurred for %s.%s %s - changed updated_at only',
                 $this->mapper->getTable(),
+                $identifierColumn,
                 $newObject->getId()
             ));
 
@@ -111,7 +135,7 @@ class Chandler
         $pieces = [];
 
         $params = [
-            'id' => (int)$newObject->getId(),
+            $identifierColumn =>$this->getIdentifierValue($newObject),
             'updatedAt' => \Alaress_Date_Format::now()->getDatabase()
         ];
 
@@ -142,8 +166,11 @@ class Chandler
                 );
 
                 /* Accommodate date to scalar conversions
+                 * Special case for base user profiles
                  */
-                if ($mapping[$property]['hydrator'] instanceof Date) {
+                if ('baseProfile' === $property) {
+                    $params[$property] = $identifierValue;
+                } else if ($mapping[$property]['hydrator'] instanceof Date) {
                     $params[$property] = $newObject->$getter()->getDatabase();
                 } else {
                     $params[$property] = $newObject->$getter();
@@ -163,7 +190,7 @@ class Chandler
             $query .= ' SET updated_at = :updatedAt';
         }
 
-        $query .= " WHERE {$this->mapper->getTable()}.id = :id";
+        $query .= " WHERE {$this->mapper->getTable()}.{$identifierColumn} = :{$identifierColumn}";
 
         /* Slap it into prepared statement
          */
@@ -175,14 +202,15 @@ class Chandler
 
         /* Use the id
          */
-        $id = (int)$newObject->getId();
-        $statement->bindParam(':id', $id, \PDO::PARAM_INT);
+        $id = $this->getIdentifierValue($newObject);
+        $statement->bindParam(":{$identifierColumn}", $id, \PDO::PARAM_INT);
         $statement->execute($params);
 
         $this->logDebug(sprintf(
-            '** Crafted update occurred for %s.id %s - subset diff',
+            '** Crafted update occurred for %s.%s %s - subset diff',
             $this->mapper->getTable(),
-            $newObject->getId()
+            $identifierColumn,
+            $identifierValue
         ));
     }
 
