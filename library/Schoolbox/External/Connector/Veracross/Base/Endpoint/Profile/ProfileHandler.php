@@ -181,7 +181,7 @@ class ProfileHandler
         $existingStatement = $mapper->getDatabase()->prepare("
             SELECT COUNT(*) AS num
             FROM {$mapper->getTable()}
-            WHERE sis_user_profile_id = :{$identifierColumn}
+            WHERE {$identifierColumn} = :{$identifierColumn}
         ");
 
         $existingStatement->execute([
