@@ -44,6 +44,7 @@
         firstDay:           Number('{{ config.calendar_start_day }}'),
         defaultView:        anchorView || '{{ calendarView }}',
         dateDisplayFormats: dateDisplayFormats,
+        exportOptions:      {{ exportOptions | json_encode | raw }},
         translations:       {
             eotc: {
                 proper: '{{ locale.eotc.proper }}'

@@ -13,6 +13,7 @@
 
 use Calendar\Api\ModuleChecker;
 use Schoolbox\Collection;
+use Schoolbox\External\Importer\Endpoint\ValidUsesSudsTimetable;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
@@ -166,6 +167,7 @@ class Calendar_Api_Config_Mapper extends BaseMapper
     public function getSourceListForCalendar(ModuleChecker $moduleChecker, User $user): array
     {
         $configs    = $this->getAllConfigRecords();
+
         $sourceList = [];
 
         foreach ($configs as $record) {
@@ -175,21 +177,22 @@ class Calendar_Api_Config_Mapper extends BaseMapper
                     continue;
                 }
 
+                // check vcal permission
                 if (
-                    !$config instanceof Calendar_Api_Config_Connector_Vcal ||
-                    (
-                        $user->isSuperuser() ||
-                        $config->hasPermissions(
-                            $user->getCampusCollection()->getColumnValues('id'),
-                            $user->getRole()->getId()
-                        )
+                    $config instanceof Calendar_Api_Config_Connector_Vcal
+                    && !$user->isSuperuser()
+                    && !$config->hasPermissions(
+                        $user->getCampusCollection()->getColumnValues('id'),
+                        $user->getRole()->getId()
                     )
                 ) {
-                    $sourceList[] = [
-                        'id'   => (int)$record->getId(),
-                        'name' => $config->getLabel()
-                    ];
+                    continue;
                 }
+
+                $sourceList[] = [
+                    'id'   => (int)$record->getId(),
+                    'name' => $config->getLabel(),
+                ];
             } catch (\TypeError $e) {
                 // I will not buy this record; it is scratched
             }
