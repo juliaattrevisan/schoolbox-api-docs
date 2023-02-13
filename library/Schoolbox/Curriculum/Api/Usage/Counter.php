@@ -86,7 +86,7 @@ class Counter
             "
                 SELECT
                     cnfa.curriculum_node_id AS id,
-                    :assessmentDiscriminator AS discriminator,
+                    :projectAssessmentDiscriminator AS discriminator,
                     COUNT(*) AS count
                 FROM curriculum_node_for_assessment cnfa
                 INNER JOIN assessment a ON cnfa.assessment_id = a.id AND a.deleted_at IS NULL
@@ -96,7 +96,7 @@ class Counter
                 INNER JOIN course_unit_specification cus
                     ON acus.course_unit_specification_id = cus.id AND cus.deleted_at IS NULL
                 WHERE cnfa.curriculum_node_id IN "
-            . Builder::getArrayPlaceholders($ids, Cursor::DISCRIMINATOR_ASSESSMENT)
+            . Builder::getArrayPlaceholders($ids, Cursor::DISCRIMINATOR_PROJECT_ASSESSMENT)
             . " GROUP BY id, discriminator",
             "
                 SELECT
@@ -114,19 +114,23 @@ class Counter
                 . Builder::getArrayPlaceholders($ids, Cursor::DISCRIMINATOR_FOLDER)
                 . " GROUP BY id, discriminator",
         ];
-        $queryString = '(' . implode(') UNION (', $selectParts) . ')';
+        $queryString = '(' . implode(') UNION ALL (', $selectParts) . ')';
         $query       = $this->database->prepareQuery($queryString);
 
-        // Parameters for the query
+        // Parameters for the query:
+        // Note that project assessments and standalone assessments both count
+        // toward the same assessment count.
         $params = [
-            'courseDiscriminator'     => Cursor::DISCRIMINATOR_COURSE,
-            'unitDiscriminator'       => Cursor::DISCRIMINATOR_UNIT,
-            'assessmentDiscriminator' => Cursor::DISCRIMINATOR_ASSESSMENT,
-            'folderDiscriminator'     => Cursor::DISCRIMINATOR_FOLDER,
+            'courseDiscriminator'            => Cursor::DISCRIMINATOR_COURSE,
+            'unitDiscriminator'              => Cursor::DISCRIMINATOR_UNIT,
+            'assessmentDiscriminator'        => Cursor::DISCRIMINATOR_ASSESSMENT,
+            'projectAssessmentDiscriminator' => Cursor::DISCRIMINATOR_ASSESSMENT,
+            'folderDiscriminator'            => Cursor::DISCRIMINATOR_FOLDER,
         ];
         $params += Builder::getArrayParameters($ids, Cursor::DISCRIMINATOR_COURSE);
         $params += Builder::getArrayParameters($ids, Cursor::DISCRIMINATOR_UNIT);
         $params += Builder::getArrayParameters($ids, Cursor::DISCRIMINATOR_ASSESSMENT);
+        $params += Builder::getArrayParameters($ids, Cursor::DISCRIMINATOR_PROJECT_ASSESSMENT);
         $params += Builder::getArrayParameters($ids, Cursor::DISCRIMINATOR_FOLDER);
 
         // Run query and compile result

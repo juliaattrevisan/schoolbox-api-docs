@@ -49,6 +49,13 @@ class Cursor implements ICursor
     public const DISCRIMINATOR_ASSESSMENT = 'assessment';
 
     /**
+     * Discriminator for identifying an assessment within a project result.
+     *
+     * (Only specification assessments are currently retrieved by this API.)
+     */
+    public const DISCRIMINATOR_PROJECT_ASSESSMENT = 'projectAssessment';
+
+    /**
      * Minimum number of results returnable from the cursor at once:
      * it must return at least one result.
      */
