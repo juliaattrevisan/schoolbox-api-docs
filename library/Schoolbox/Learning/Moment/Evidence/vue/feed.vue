@@ -79,9 +79,11 @@ export default {
         window.onpopstate = (event) => {
             // NOTE: event.state will be null unless the state has been saved using history.pushState().
             this.setSelectedTagAndFiltersToMatchState(event.state);
+            this.onChangeFilters(this.selectedTag, false); // Do not save the filters state that we just restored.
         };
 
         this.setSelectedTagAndFiltersToMatchState(this.getFiltersStateFromUrl());
+        this.onChangeFilters(this.selectedTag, false); // Do not save the filters state that we just restored.
     },
     methods: {
         /**
@@ -422,15 +424,16 @@ export default {
                 // Restore state of filter checkboxes.
                 const allFiltersAreSelected =
                     Array.from(this.selectedFilters).length === filtersState.filterNames.length;
-
                 for (const filterName of Object.keys(this.selectedFilters)) {
                     this.selectedFilters[filterName] = allFiltersAreSelected
                         ? true
                         : filtersState.filterNames.includes(filterName);
+
+                    // Vue two-way sync between this.selectedFilters[filterName] and the checkbox is not working for
+                    // some reason, so we must update the state of the checkbox manually.
+                    $("#filter-" + filterName).prop("checked", this.selectedFilters[filterName]);
                 }
             }
-
-            this.onChangeFilters(this.selectedTag, false); // Do not save the filters state that we just restored.
         },
     },
 };
@@ -516,6 +519,8 @@ export default {
                                         name="includeGoals"
                                         @click="onChangeFilters('', true)"
                                         v-model="selectedFilters.goals"
+                                        :true-value="true"
+                                        :false-value="false"
                                     />
                                     <label for="filter-goals">Goals</label>
                                 </li>
