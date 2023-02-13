@@ -116,36 +116,42 @@ class Factory
 
 
     /**
+     * @phpstan-ignore-next-line this will be used in future
      * @var \Schoolbox\External\Event\Mapper
      */
     private \Schoolbox\External\Event\Mapper $eventMapper;
 
 
     /**
+     * @phpstan-ignore-next-line this will be used in future
      * @var ClassEntryMapper
      */
     private ClassEntryMapper $classEntryMapper;
 
 
     /**
+     * @phpstan-ignore-next-line this will be used in future
      * @var ClassInvolvementMapper
      */
     private ClassInvolvementMapper $classInvolvementMapper;
 
 
     /**
+     * @phpstan-ignore-next-line this will be used in future
      * @var ClassPeriodMapper
      */
     private ClassPeriodMapper $classPeriodMapper;
 
 
     /**
+     * @phpstan-ignore-next-line this will be used in future
      * @var TimetablePeriodMapper
      */
     private TimetablePeriodMapper $periodMapper;
 
 
     /**
+     * @phpstan-ignore-next-line this will be used in future
      * @var \Schoolbox\External\Event\Overrides\Mapper
      */
     private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper;
