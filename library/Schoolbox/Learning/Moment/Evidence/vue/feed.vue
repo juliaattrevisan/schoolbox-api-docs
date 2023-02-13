@@ -403,19 +403,7 @@ export default {
                 }
             }
 
-            let newHtml = '';
-
             if (this.selectedTag !== '') {
-                newHtml = (
-                    "<p class=''>" +
-                    "Showing tag \"" + this.selectedTag + "\" <span class='anchor-style' id='removeFilters'>(remove)</span>" +
-                    "</p>"
-                );
-            }
-
-            $("[data-filters-description]").html(newHtml);
-
-            if (newHtml !== '') {
                 $('#removeFilters').click(this.onClickRemoveTag);
             }
 
@@ -579,7 +567,11 @@ export default {
                                 </li>
                             </ul>
                         </div>
-                        <div class="filters-description" data-filters-description></div>
+                        <div class="filters-description" data-filters-description>
+                            <template v-if="selectedTag !== ''">
+                                <p>Showing tag "{{ selectedTag }}" <span class='anchor-style' id='removeFilters'>(remove)</span></p>
+                            </template>
+                        </div>
                     </div>
                 </div>
             </section>
