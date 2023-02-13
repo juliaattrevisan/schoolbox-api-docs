@@ -727,33 +727,36 @@
 <div class="row">
     <div class="small-12 island">
         <h2 class="subheader" id="image-slider">Image Slider (Swiper)</h2>
-        <script src="{CDN_PREFIX}/js/vendors/swiper/dist/js/swiper.min.js"></script>
-        <script src="{CDN_PREFIX}/js/gallery/jquery.alaressSlider.js"></script>
-        <script>
-            $(function() {
-                $('#pantry-imageslider').alaressSlider({
-                    navigation: {
-                        nextEl: '#image-slider-button-next',
-                        prevEl: '#image-slider-button-prev'
-                    }
-                });
-            });
-        </script>
-        <div class="swiper-container" id="pantry-imageslider">
+        <div class="swiper" id="pantry-imageslider">
             <div class="swiper-wrapper">
                 <div class="swiper-slide">
-                    <img data-src="https://placeimg.com/1440/280/animals" alt="Animals" class="swiper-lazy" />
+                    <img src="https://source.unsplash.com/Cwyp10YmDRw/1440x280" loading="lazy" />
                     <div class="loader"></div>
                 </div>
                 <div class="swiper-slide">
-                    <img data-src="https://placeimg.com/1440/280/nature" alt="Nature" class="swiper-lazy" />
+                    <img src="https://source.unsplash.com/pYyOZ8q7AII/1440x280" loading="lazy" />
+                    <div class="loader"></div>
+                </div>
+                <div class="swiper-slide">
+                    <img src="https://source.unsplash.com/a1BQDxZTQ74/1440x280" loading="lazy" />
                     <div class="loader"></div>
                 </div>
             </div>
             <div class="swiper-pagination"></div>
-            <div class="swiper-button-next" id="image-slider-button-next"></div>
-            <div class="swiper-button-prev" id="image-slider-button-prev"></div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
         </div>
+        <script src="{CDN_PREFIX}/js/bundle/slideshow.js"></script>
+        <script>
+            document.dispatchEvent(
+                new CustomEvent("swiperInitialize", {
+                    detail: {
+                        target: document.getElementById("pantry-imageslider"),
+                        options: {},
+                    },
+                })
+            );
+        </script>
     </div>
 </div>
 

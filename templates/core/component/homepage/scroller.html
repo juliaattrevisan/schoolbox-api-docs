@@ -1,7 +1,4 @@
 <div id="component{COMPONENT_INSTANCE_ID}" class="component-container {COMPONENT_CLASS}" data-component>
-    <script src="{CDN_PREFIX}/js/vendors/swiper/dist/js/swiper.min.js?v={SITE_VERSION}"></script>
-    <script src="{CDN_PREFIX}/js/gallery/jquery.alaressSlider.js?v={SITE_VERSION}"></script>
-
     {CONFIGURATION}
 
     <div data-collapsable='true' class="row {CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
@@ -73,50 +70,23 @@
                 <!-- END source_folder_deleted -->
 
                 <!-- BEGIN source_folder_exists -->
-                <script>
-                    // Expanded? init on load
-                    // Collapsed? init on expand
-                    $(function() {
-                        var init = function() {
-                            $('#component{COMPONENT_INSTANCE_ID}-imageslider').alaressSlider({
-                                initialSlide: {COMPONENT_RANDOM_SLIDE},
-                                navigation: {
-                                    nextEl: '#component{COMPONENT_INSTANCE_ID}-imageslider-button-next',
-                                    prevEl: '#component{COMPONENT_INSTANCE_ID}-imageslider-button-prev'
-                                },
-                                alaress: {
-                                    autoplayDelay: {COMPONENT_CONFIG_TIMING_VALUE_MS}
-                                }
-                            });
-                        };
-
-                        var component = $("#component{COMPONENT_INSTANCE_ID}");
-                        var collapser = component.find('[data-collapsable="true"]');
-                        if (collapser.data('collapseState') === 'uncollapsed') {
-                            init();
-                        } else {
-                            collapser.one('expandStop.collapsable', init);
-                        }
-                    });
-                </script>
-
                 <div class="dropzone-wrap no-margin">
                     <form class="dropzone overlay" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post" data-accepts="image"></form>
-                    <div class="swiper-container" id="component{COMPONENT_INSTANCE_ID}-imageslider">
+                    <div class="swiper" id="component{COMPONENT_INSTANCE_ID}-imageslider">
                         <div class="swiper-wrapper">
                             <!-- BEGIN image_scroller -->
                             <div class="swiper-slide">
                                 <!-- BEGIN linked_image -->
                                 <a href="{IMAGE_URL}">
                                     <div class="{COMPONENT_CONFIG_IMAGE_RATIO}">
-                                        <img data-src="/cms/image.php?id={IMAGE_ID}&height=2048&width=2048" class="swiper-lazy" />
+                                        <img src="/cms/image.php?id={IMAGE_ID}&height=2048&width=2048" loading="lazy" />
                                     </div>
                                 </a>
                                 <div class="loader"></div>
                                 <!-- END linked_image -->
                                 <!-- BEGIN unlinked_image -->
                                 <div class="{COMPONENT_CONFIG_IMAGE_RATIO}">
-                                    <img data-src="/cms/image.php?id={IMAGE_ID}&height=2048&width=2048" class="swiper-lazy" />
+                                    <img src="/cms/image.php?id={IMAGE_ID}&height=2048&width=2048" loading="lazy" />
                                     <div class="loader"></div>
                                 </div>
                                 <!-- END unlinked_image -->
@@ -126,9 +96,36 @@
                             </div>
                             <!-- END image_scroller -->
                         </div>
-                        <div class="swiper-button-next" id="component{COMPONENT_INSTANCE_ID}-imageslider-button-next"></div>
-                        <div class="swiper-button-prev" id="component{COMPONENT_INSTANCE_ID}-imageslider-button-prev"></div>
+                        <div class="swiper-button-next"></div>
+                        <div class="swiper-button-prev"></div>
+                        <div class="swiper-pagination"></div>
                     </div>
+                    <script src="{CDN_PREFIX}/js/bundle/slideshow.js"></script>
+                    <script>
+                        var init = function() {
+                            document.dispatchEvent(
+                                new CustomEvent("swiperInitialize", {
+                                    detail : {
+                                        target: document.getElementById("component{COMPONENT_INSTANCE_ID}-imageslider"),
+                                        options: {
+                                            initialSlide: {COMPONENT_RANDOM_SLIDE},
+                                            autoplay: {
+                                                delay: {COMPONENT_CONFIG_TIMING_VALUE_MS}
+                                            }
+                                        }
+                                    }
+                                })
+                            );
+                        }
+
+                        var component = $("#component{COMPONENT_INSTANCE_ID}");
+                        var collapser = component.find('[data-collapsable="true"]');
+                        if (collapser.data('collapseState') === 'uncollapsed') {
+                            init();
+                        } else {
+                            collapser.one('expandStop.collapsable', init);
+                        }
+                    </script>
                     <ul data-dz-container class="inline-list dz-container no-margin">
                         <!-- THIS TEMPLATE WILL BE DETACHED, DON'T WORRY ABOUT THE BAD DOM -->
                         <ul class="hide" data-dz-template>
