@@ -164,7 +164,7 @@ class ProfileHandler
         /* Shortcuts to some facts
          */
         $identifierColumn = $mapper->getIdentifierColumn();
-        $identifierValue = $newObject->getBaseProfile()?->getId();
+        $identifierValue = $newObject->getBaseProfile()->getId();
 
         /* Due to sequential dependencies, a base profile should always already exist;
          * this part shouldn't happen at all
