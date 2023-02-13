@@ -20,7 +20,6 @@ require __DIR__ . '/../../conf/core/require.php';
  * respecting the current config.
  */
 $app = new class extends CliTool\App {
-
     private const EXTERNAL_DB_KEY_PATTERN = 'External_*';
 
     /** @inheritDoc */
