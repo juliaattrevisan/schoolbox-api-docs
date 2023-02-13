@@ -14,6 +14,7 @@
         onSubmit: $.noop, // action-bar DOM element
         onClose: null, // Supply a function if you want non-default behaviour on close of the modal.
         submitText: $.noop, // checkedCount, totalCount
+        invalidOptionText: 'invalid',
         userList: null,
         templateSelector: "[data-template]",
         submitSelector: "[data-submit]",
@@ -131,7 +132,7 @@
                          */
                         if (!opt.checkboxConditionality(id)) {
                             $chk.prop("disabled", true).removeAttr("checked");
-                            $lbl.text($lbl.text() + " (invalid)");
+                            $lbl.text($lbl.text() + ' (' + opt.invalidOptionText + ')');
 
                             numInvalid++;
                         }
