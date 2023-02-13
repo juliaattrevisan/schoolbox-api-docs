@@ -68,6 +68,7 @@ class Counter
                 AND cnfc.curriculum_node_id IN "
                 . Builder::getArrayPlaceholders($ids, Cursor::DISCRIMINATOR_UNIT)
                 . " GROUP BY id, discriminator",
+            // Assessments directly within a unit spec
             "
                 SELECT
                     cnfa.curriculum_node_id AS id,
@@ -81,6 +82,7 @@ class Counter
                 WHERE cnfa.curriculum_node_id IN "
             . Builder::getArrayPlaceholders($ids, Cursor::DISCRIMINATOR_ASSESSMENT)
             . " GROUP BY id, discriminator",
+            // Assessments within a project which is within a unit spec
             "
                 SELECT
                     cnfa.curriculum_node_id AS id,
@@ -89,7 +91,7 @@ class Counter
                 FROM curriculum_node_for_assessment cnfa
                 INNER JOIN assessment a ON cnfa.assessment_id = a.id AND a.deleted_at IS NULL
                 INNER JOIN project_assessment pa ON a.id = pa.assessment_id
-                INNER JOIN assessment a2 ON pa.assessment_id = a2.id
+                INNER JOIN assessment a2 ON pa.project_id = a2.id
                 INNER JOIN assessment_course_unit_specification acus ON a2.id = acus.assessment_id
                 INNER JOIN course_unit_specification cus
                     ON acus.course_unit_specification_id = cus.id AND cus.deleted_at IS NULL
@@ -138,7 +140,8 @@ class Counter
             ]
         );
         $query->execute($params);
-        foreach ($query->fetchAll() as $row) {
+        $queryResults = $query->fetchAll();
+        foreach ($queryResults as $row) {
             if (isset($row['id'])) {
                 $result[$row['id']][$row['discriminator']] += $row['count'];
             }
