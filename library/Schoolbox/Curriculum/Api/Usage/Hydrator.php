@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Curriculum\Api\Usage;
 
 use Schoolbox\Collection;
+use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Resource\Folder;
@@ -25,9 +26,14 @@ class Hydrator
     /**
      * Constructor
      *
-     * @param Folder\Translator\IModelToArray    $folderTranslator Translator for folder objects
-     * @param CourseSpec\Translator\ModelToArray $courseTranslator Translator for course objects
-     * @param UnitSpec\Translator\ModelToArray   $unitTranslator   Translator for unit objects
+     * @param Folder\Mapper                      $folderMapper         Mapper for folder objects
+     * @param Folder\Translator\IModelToArray    $folderTranslator     Translator for folder objects
+     * @param CourseSpec\Mapper                  $courseSpecMapper     Mapper for course objects
+     * @param CourseSpec\Translator\ModelToArray $courseTranslator     Translator for course objects
+     * @param UnitSpec\Mapper                    $unitSpecMapper       Mapper for unit objects
+     * @param UnitSpec\Translator\ModelToArray   $unitTranslator       Translator for unit objects
+     * @param Assessment\DataModel\MapperProxy   $assessmentDataSource Data source for assessment objects
+     * @param Assessment\ModelToArray            $assessmentTranslator Translator for assessment objects
      */
     public function __construct(
         private Folder\Mapper $folderMapper,
@@ -36,6 +42,8 @@ class Hydrator
         private CourseSpec\Translator\ModelToArray $courseTranslator,
         private UnitSpec\Mapper $unitSpecMapper,
         private UnitSpec\Translator\ModelToArray $unitTranslator,
+        private Assessment\DataModel\MapperProxy $assessmentDataSource,
+        private Assessment\ModelToArray $assessmentTranslator,
     ) {
     }
 
@@ -60,10 +68,11 @@ class Hydrator
             $translation = null;
             if (isset($model)) {
                 $translation = match ($disc) {
-                    Cursor::DISCRIMINATOR_FOLDER => call_user_func($this->folderTranslator, $model),
-                    Cursor::DISCRIMINATOR_COURSE => call_user_func($this->courseTranslator, $model),
-                    Cursor::DISCRIMINATOR_UNIT   => call_user_func($this->unitTranslator, $model),
-                    default                      => null,
+                    Cursor::DISCRIMINATOR_FOLDER     => call_user_func($this->folderTranslator, $model),
+                    Cursor::DISCRIMINATOR_COURSE     => call_user_func($this->courseTranslator, $model),
+                    Cursor::DISCRIMINATOR_UNIT       => call_user_func($this->unitTranslator, $model),
+                    Cursor::DISCRIMINATOR_ASSESSMENT => call_user_func($this->assessmentTranslator, $model),
+                    default                          => null,
                 };
             }
             $newCollection->add([
@@ -101,6 +110,12 @@ class Hydrator
             ->map($mapId)
             ->getAll();
         $models[Cursor::DISCRIMINATOR_UNIT] = $this->unitSpecMapper->findByColumn('id', $unitIds)->indexBy('id');
+
+        $assessmentIds = $results
+            ->filter($this->buildFilter(Cursor::DISCRIMINATOR_ASSESSMENT))
+            ->map($mapId)
+            ->getAll();
+        $models[Cursor::DISCRIMINATOR_ASSESSMENT] = $this->assessmentDataSource->findAllByIds($assessmentIds)->indexBy('id');
         return $models;
     }
 

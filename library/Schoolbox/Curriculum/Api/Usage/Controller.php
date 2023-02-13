@@ -10,6 +10,7 @@ namespace Schoolbox\Curriculum\Api\Usage;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Curriculum\Node;
+use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Resource\Folder;
@@ -22,23 +23,19 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param IConnector $database Database required for building cursor object
-     *
-     */
-    /**
-     * Constructor
-     *
-     * @param IConnector        $database         Database required for building cursor object
-     * @param Folder\Mapper     $folderMapper     Folder mapper
-     * @param CourseSpec\Mapper $courseSpecMapper Course specification mapper
-     * @param UnitSpec\Mapper   $unitSpecMapper   Unit specification mapper
-     * @param Counter           $counter          Counter for node usages
+     * @param IConnector                       $database             Database required for building cursor object
+     * @param Folder\Mapper                    $folderMapper         Folder mapper
+     * @param CourseSpec\Mapper                $courseSpecMapper     Course specification mapper
+     * @param UnitSpec\Mapper                  $unitSpecMapper       Unit specification mapper
+     * @param Assessment\DataModel\MapperProxy $assessmentDataSource Data source for assessment
+     * @param Counter                          $counter              Counter for node usages
      */
     public function __construct(
         private IConnector $database,
         private Folder\Mapper $folderMapper,
         private CourseSpec\Mapper $courseSpecMapper,
         private UnitSpec\Mapper $unitSpecMapper,
+        private Assessment\DataModel\MapperProxy $assessmentDataSource,
         private Counter $counter,
     ) {
     }
@@ -83,6 +80,8 @@ class Controller extends Base
             $courseTranslator,
             $this->unitSpecMapper,
             $unitTranslator,
+            $this->assessmentDataSource,
+            new Assessment\ModelToArray(),
         );
 
         $this->response->content->set(
