@@ -60,6 +60,7 @@ class Hydrator
         // Fetch results from various mappers
         $models        = $this->findModelsForResults($results);
         $models        = $this->assignParentFoldersToModels($models);
+        $models        = $this->assignUnitSpecsToModels($models);
         $newCollection = new Collection();
         foreach ($results as $result) {
             $disc        = $result['discriminator'];
@@ -189,6 +190,45 @@ class Hydrator
                 $unit->getFolder()->setParent($allFolderParents[$unitParentId]);
             }
         }
+        return $models;
+    }
+
+    /**
+     * Assign fully hydrated unit specs to the assessments within `$models`:
+     *
+     * @param array<string, Collection> $models
+     * @return array<string, Collection> `$models` with units assigned
+     */
+    private function assignUnitSpecsToModels(array $models): array
+    {
+        $unitSpecIds = [];
+        foreach ($models[Cursor::DISCRIMINATOR_ASSESSMENT] ?? [] as $assessment) {
+            /** @var Assessment\IAssessable $assessment */
+            $context = $assessment->getContext();
+            if ($context instanceof UnitSpec\Model) {
+                $unitSpecIds[] = $context->getId();
+//            } elseif ($context instanceof Assessment\Project && $context->getContext() instanceof UnitSpec\Model) {
+//                $unitSpecIds[] = $context->getContext()->getId();
+            }
+        }
+        $unitSpecs = $this->unitSpecMapper->findByColumn('id', $unitSpecIds);
+
+        foreach ($models[Cursor::DISCRIMINATOR_ASSESSMENT] ?? [] as $assessment) {
+            /** @var Assessment\IAssessable $assessment */
+            $context = $assessment->getBaseContext();
+            if ($context instanceof UnitSpec\Model) {
+                $unitSpec = $unitSpecs[$context->getId()] ?? null;
+                if ($unitSpec) {
+                    $assessment->setContext($unitSpec);
+                }
+//            } elseif ($context instanceof Assessment\Project && $context->getContext() instanceof UnitSpec\Model) {
+//                $unitSpec = $unitSpecs[$context->getContext()->getId()] ?? null;
+//                if ($unitSpec) {
+//                    $context->setContext($unitSpec);
+//                }
+            }
+        }
+
         return $models;
     }
 }
