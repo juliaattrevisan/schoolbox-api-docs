@@ -152,7 +152,7 @@ try {
     // Not 100% happy with this token but meh, it's what's being used in other
     // places that need a token.
     try {
-        $user = UserMapper::getInstance()->findOneByColumn('key', $token, ['deleted' => false]);
+        $user = UserMapper::getInstance()->findOneByColumn('key', $token);
     } catch (Exception $ex) {
         throw new SchoolboxException('Invalid token', 401);
     }
