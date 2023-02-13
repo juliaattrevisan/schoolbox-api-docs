@@ -68,35 +68,18 @@ class Counter
                 AND cnfc.curriculum_node_id IN "
                 . Builder::getArrayPlaceholders($ids, Cursor::DISCRIMINATOR_UNIT)
                 . " GROUP BY id, discriminator",
-            // Assessments directly within a unit spec
             "
                 SELECT
                     cnfa.curriculum_node_id AS id,
                     :assessmentDiscriminator AS discriminator,
                     COUNT(*) AS count
                 FROM curriculum_node_for_assessment cnfa
-                INNER JOIN assessment a ON cnfa.assessment_id = a.id AND a.deleted_at IS NULL
-                INNER JOIN assessment_course_unit_specification acus ON a.id = acus.assessment_id
+                INNER JOIN v_assessment_relation var ON cnfa.assessment_id = var.assessment_id
+                INNER JOIN assessment a ON var.assessment_id = a.id AND a.deleted_at IS NULL
                 INNER JOIN course_unit_specification cus
-                    ON acus.course_unit_specification_id = cus.id AND cus.deleted_at IS NULL
+                    ON var.course_unit_specification_id = cus.id AND cus.deleted_at IS NULL
                 WHERE cnfa.curriculum_node_id IN "
             . Builder::getArrayPlaceholders($ids, Cursor::DISCRIMINATOR_ASSESSMENT)
-            . " GROUP BY id, discriminator",
-            // Assessments within a project which is within a unit spec
-            "
-                SELECT
-                    cnfa.curriculum_node_id AS id,
-                    :projectAssessmentDiscriminator AS discriminator,
-                    COUNT(*) AS count
-                FROM curriculum_node_for_assessment cnfa
-                INNER JOIN assessment a ON cnfa.assessment_id = a.id AND a.deleted_at IS NULL
-                INNER JOIN project_assessment pa ON a.id = pa.assessment_id
-                INNER JOIN assessment a2 ON pa.project_id = a2.id
-                INNER JOIN assessment_course_unit_specification acus ON a2.id = acus.assessment_id
-                INNER JOIN course_unit_specification cus
-                    ON acus.course_unit_specification_id = cus.id AND cus.deleted_at IS NULL
-                WHERE cnfa.curriculum_node_id IN "
-            . Builder::getArrayPlaceholders($ids, Cursor::DISCRIMINATOR_PROJECT_ASSESSMENT)
             . " GROUP BY id, discriminator",
             "
                 SELECT
@@ -117,20 +100,16 @@ class Counter
         $queryString = '(' . implode(') UNION ALL (', $selectParts) . ')';
         $query       = $this->database->prepareQuery($queryString);
 
-        // Parameters for the query:
-        // Note that project assessments and standalone assessments both count
-        // toward the same assessment count.
+        // Parameters for the query
         $params = [
-            'courseDiscriminator'            => Cursor::DISCRIMINATOR_COURSE,
-            'unitDiscriminator'              => Cursor::DISCRIMINATOR_UNIT,
-            'assessmentDiscriminator'        => Cursor::DISCRIMINATOR_ASSESSMENT,
-            'projectAssessmentDiscriminator' => Cursor::DISCRIMINATOR_ASSESSMENT,
-            'folderDiscriminator'            => Cursor::DISCRIMINATOR_FOLDER,
+            'courseDiscriminator'     => Cursor::DISCRIMINATOR_COURSE,
+            'unitDiscriminator'       => Cursor::DISCRIMINATOR_UNIT,
+            'assessmentDiscriminator' => Cursor::DISCRIMINATOR_ASSESSMENT,
+            'folderDiscriminator'     => Cursor::DISCRIMINATOR_FOLDER,
         ];
         $params += Builder::getArrayParameters($ids, Cursor::DISCRIMINATOR_COURSE);
         $params += Builder::getArrayParameters($ids, Cursor::DISCRIMINATOR_UNIT);
         $params += Builder::getArrayParameters($ids, Cursor::DISCRIMINATOR_ASSESSMENT);
-        $params += Builder::getArrayParameters($ids, Cursor::DISCRIMINATOR_PROJECT_ASSESSMENT);
         $params += Builder::getArrayParameters($ids, Cursor::DISCRIMINATOR_FOLDER);
 
         // Run query and compile result
@@ -144,8 +123,7 @@ class Counter
             ]
         );
         $query->execute($params);
-        $queryResults = $query->fetchAll();
-        foreach ($queryResults as $row) {
+        foreach ($query->fetchAll() as $row) {
             if (isset($row['id'])) {
                 $result[$row['id']][$row['discriminator']] += $row['count'];
             }
