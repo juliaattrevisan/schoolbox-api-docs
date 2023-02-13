@@ -488,8 +488,7 @@ class Profile implements IStrategy
                 /* Then save it
                  */
                 if ($this->perform) {
-                    $this->profileHandler->save($studentProfile, $oldStudentProfile);
-                    $this->studentProfileMapper->save($studentProfile);
+                    $this->profileHandler->saveStudentProfile($studentProfile, $oldStudentProfile);
                 }
 
                 /* Add their parents' profile data
@@ -612,7 +611,7 @@ class Profile implements IStrategy
             /* Then save it
              */
             if ($this->perform) {
-                $this->profileHandler->saveParentProfile($parentProfile, $oldParentProfile);
+                $this->profileHandler->saveBaseProfile($parentBaseProfile, $oldParentBaseProfile);
             }
 
             $parentProfile
@@ -633,7 +632,7 @@ class Profile implements IStrategy
             /* Then save it
              */
             if ($this->perform) {
-                $this->parentProfileMapper->save($parentProfile);
+                $this->profileHandler->saveParentProfile($parentProfile, $oldParentProfile);
             }
 
             /* Manufacture relations
