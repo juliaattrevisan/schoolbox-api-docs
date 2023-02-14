@@ -1,7 +1,7 @@
 .attachment-browser-container {
     display: flex;
 
-    .ab-filesystems {
+    .attachment-browser-filesystems {
         flex: 0 0 auto;
 
         ul {
@@ -36,7 +36,7 @@
         }
     }
 
-    .ab-panel-container {
+    .attachment-browser-panel-container {
         flex-grow: 1;
         max-height: 75vh;
         min-height: 292px;

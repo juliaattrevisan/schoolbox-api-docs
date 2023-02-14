@@ -11,7 +11,7 @@
             filesystems.find('[data-source]').on('click', function (event) {
 
                 let source = $(this).attr('data-source');
-                let panel = $('#attachment-browser-panel-container #' + source + '-panel');
+                let panel = $('#' + source + '-panel');
 
                 let url = $(this).attr('data-url');
                 let method = $(this).attr('data-method');
@@ -26,7 +26,7 @@
                 * Inline content starts with a preloader class which should be removed
                 * once content has loaded
                 */
-                console.warn(panel);
+
                 if (method === 'inline') {
                     fetch(url).then((response) => {
                         response.text().then((text) => {
@@ -48,7 +48,7 @@
 </head>
 <body>
     <div class="attachment-browser-container">
-        <div class="ab-filesystems">
+        <div class="attachment-browser-filesystems">
             <ul id="attachment-browser-filesystems" class="tabs vertical" data-tab>
                 <!-- BEGIN source -->
                 <li class="tab-title" data-source="{SRC_SLUG}" data-url="{SRC_URL}" data-method="{SRC_METHOD}">
@@ -57,7 +57,7 @@
                 <!-- END source -->
             </ul>
         </div>
-        <div id="attachment-browser-panel-container" class="ab-panel-container tabs-content">
+        <div id="attachment-browser-panel-container" class="attachment-browser-panel-container tabs-content">
             <!-- BEGIN source_panel -->
             <div id="{SRC_SLUG}-panel" class="content">
                 <div class="loader"></div>
