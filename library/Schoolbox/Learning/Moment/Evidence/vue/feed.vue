@@ -12,6 +12,7 @@ import foundationMixin from "@schoolboxVue/components/foundation-mixin";
 import userProfileConstants from "../../../vue/user-profile/constants";
 import cdnPrefixMixin from "@schoolboxVue/components/cdn-prefix-mixin";
 import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
+import { nextTick } from "vue";
 
 export default {
     components: {
@@ -74,16 +75,19 @@ export default {
             return btoa(window.location.pathname);
         },
     },
-    mounted() {
+    async mounted() {
         document.addEventListener(userProfileConstants.events.AWARDS_UPDATED, () => this.load());
-        window.onpopstate = (event) => {
+        window.onpopstate = async function (event) {
             // NOTE: event.state will be null unless the state has been saved using history.pushState().
             this.setSelectedTagAndFiltersToMatchState(event.state);
-            window.setTimeout(this.onChangeFilters, 0, this.selectedTag, false); // Call onChangeFilters() after timeout to allow Vue to do its syncing.
+
+            await nextTick(); // Wait for Vue to sync checkboxes to match this.selectedTag.
+            this.onChangeFilters(this.selectedTag, false);
         };
 
         this.setSelectedTagAndFiltersToMatchState(this.getFiltersStateFromUrl());
-        window.setTimeout(this.onChangeFilters, 0, this.selectedTag, false); // Call onChangeFilters() after timeout to allow Vue to do its syncing.
+        await nextTick(); // Wait for Vue to sync checkboxes to match this.selectedFilters.
+        this.onChangeFilters(this.selectedTag, false);
     },
     methods: {
         /**
