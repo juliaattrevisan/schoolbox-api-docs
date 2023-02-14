@@ -63,34 +63,37 @@ class ModelToArray
      */
     private function translate(IAssessable $assessment, bool $includeUnit, bool $includeProject): array
     {
-        $unit = null;
+        $translation = [
+            'id'    => $assessment->getId(),
+            'title' => $assessment->getTitle(),
+            'type'  => $assessment->getFamilyName(),
+        ];
+
         if ($includeUnit) {
+            $unit        = null;
             $baseContext = $assessment->getBaseContext();
             if ($baseContext instanceof UnitSpecification\Model) {
                 $unit = call_user_func($this->unitTranslator, $assessment->getBaseContext());
             }
+            $translation['unit'] = $unit;
         }
 
-        $project = null;
         if ($includeProject) {
+            $project = null;
             $context = $assessment->getContext();
             if ($context instanceof Project) {
                 $project = $this->translate($context, false, false);
             }
+            $translation['project'] = $project;
         }
 
-        return [
-            'id'      => $assessment->getId(),
-            'title'   => $assessment->getTitle(),
-            'type'    => $assessment->getFamilyName(),
-            'unit'    => $unit,
-            'project' => $project,
-            '_links'  => [
-                'view' => $this->getRouteIfAuthorized(
-                    'learningAssessment.getUpdateAssessmentForm',
-                    ['assessment' => $assessment, 'assessmentId' => $assessment->getId()],
-                ),
-            ],
+        $translation['_links'] = [
+            'view' => $this->getRouteIfAuthorized(
+                'learningAssessment.getUpdateAssessmentForm',
+                ['assessment' => $assessment, 'assessmentId' => $assessment->getId()],
+            ),
         ];
+
+        return $translation;
     }
 }
