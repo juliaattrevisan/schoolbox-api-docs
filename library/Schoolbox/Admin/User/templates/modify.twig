@@ -53,18 +53,6 @@
                                     <div class="small-12 medium-4 island profile-image-override">
                                         <label>Portrait Image</label>
 
-                                        {# If the user has a picture, show it
-                                        #}
-                                        {% if user.portrait %}
-                                            <div id="portraitImage" class="is-hidden">
-                                                {% include 'include/portrait.twig' with {user: user, render: 'large', appendQueryParam: '&cb=' ~ date().timestamp} only %}
-                                            </div>
-                                        {% endif %}
-
-                                        {# If you can change the picture manually, show attachzone
-                                        # This depends on the config setting "Load From SIS"
-                                        # If it's on, you -cannot- change pictures manually
-                                        #}
                                         {% if portraitZone %}
                                             {% include 'sub/attachzone.twig' with {
                                                 attachzone: portraitZone,
