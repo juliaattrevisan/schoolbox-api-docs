@@ -28,10 +28,11 @@ function getButton() {
  * @param { number } editorId - the id of the editor to create unique file picker ids
  */
 async function initResourceModal(editorId: number) {
-    const html = await fetchHtmlAsText("/resources/attachment?multi=0");
-    const tweakedHTML = html.replace(/attachment-browser-filesystems/g, `attachment-browser-filesystems-${editorId}`);
+    let html = await fetchHtmlAsText("/resources/attachment?multi=0");
+    html = html.replace(/attachment-browser-filesystems/g, `attachment-browser-filesystems-${editorId}`);
+    html = html.replace(/attachment-browser-panel-container/g, `attachment-browser-panel-container-${editorId}`);
     const $modal = $(`<div data-reveal class="reveal-modal file-picker" id="file-picker-${editorId}" />`);
-    $modal.html(tweakedHTML);
+    $modal.html(html);
     $modal.on("click", ".cancel[role=button]", () => {
         $modal.foundation("reveal", "close");
     });
