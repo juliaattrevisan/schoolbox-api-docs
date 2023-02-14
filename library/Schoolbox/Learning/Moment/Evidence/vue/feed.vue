@@ -79,11 +79,11 @@ export default {
         window.onpopstate = (event) => {
             // NOTE: event.state will be null unless the state has been saved using history.pushState().
             this.setSelectedTagAndFiltersToMatchState(event.state);
-            this.onChangeFilters(this.selectedTag, false); // Do not save the filters state that we just restored.
+            window.setTimeout(this.onChangeFilters, 0, this.selectedTag, false); // Call onChangeFilters() after timeout to allow Vue to do its syncing.
         };
 
         this.setSelectedTagAndFiltersToMatchState(this.getFiltersStateFromUrl());
-        this.onChangeFilters(this.selectedTag, false); // Do not save the filters state that we just restored.
+        window.setTimeout(this.onChangeFilters, 0, this.selectedTag, false); // Call onChangeFilters() after timeout to allow Vue to do its syncing.
     },
     methods: {
         /**
@@ -428,10 +428,6 @@ export default {
                     this.selectedFilters[filterName] = allFiltersAreSelected
                         ? true
                         : filtersState.filterNames.includes(filterName);
-
-                    // Vue two-way sync between this.selectedFilters[filterName] and the checkbox is not working for
-                    // some reason, so we must update the state of the checkbox manually.
-                    $("#filter-" + filterName).prop("checked", this.selectedFilters[filterName]);
                 }
             }
         },
