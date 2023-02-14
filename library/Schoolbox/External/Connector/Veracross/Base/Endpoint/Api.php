@@ -52,14 +52,14 @@ class Api implements IApi
      *
      * Lots of little pages is super slow for them
      */
-    private const PAGE_SIZE = 1000;
+    private const PAGE_SIZE = 1;
 
 
     /**
      * Maximum number of pages to obtain from an endpoint
      * to safeguard against infinite loops
      */
-    private const MAX_PAYLOADS = 100;
+    private const MAX_PAYLOADS = 1;
 
 
     /**
@@ -95,16 +95,18 @@ class Api implements IApi
     /**
      * Constructor.
      *
-     * @param string $host
-     * @param string $apiKey
-     * @param int    $timeout
-     * @throws \DomainException
+     * @param string       $host
+     * @param string       $apiKey
+     * @param int          $timeout
+     * @param Timecop|null $timecop
      * @throws InvalidArgumentException
+     * @throws \DomainException
      */
     public function __construct(
         private string $host,
         private string $apiKey,
-        private int $timeout = self::DEFAULT_TIMEOUT
+        private int $timeout = self::DEFAULT_TIMEOUT,
+        private ?Timecop $timecop = null
     ) {
         $this->client = $this->initClient($this->host, $this->apiKey, $this->timeout);
 
@@ -177,6 +179,7 @@ class Api implements IApi
      *
      * @param string $method
      * @param string $endpoint
+     * @param string $scope
      * @param array  $params
      * @param int    $pageSize
      * @return \Generator
@@ -254,7 +257,15 @@ class Api implements IApi
 
                 /* Grab an Access Token
                  */
+                if ($this->timecop) {
+                    $this->timecop->regulate('** Access Token: about to obtain/reuse one');
+                }
+
                 $accessToken = ($this->accessTokenGenerator->generate($scope))->getToken();
+
+                if ($this->timecop) {
+                    $this->timecop->regulate('** Access Token: token obtained');
+                }
 
                 /* Slam in headers with the dynamic token
                  *
@@ -269,7 +280,21 @@ class Api implements IApi
                     'X-Page-Size' => $pageSize
                 ];
 
+                if ($this->timecop) {
+                    $this->timecop->regulate(sprintf(
+                        '++ API Request to endpoint: %s (started)',
+                        $endpoint
+                    ));
+                }
+
                 $response = $this->client->request($method, $endpoint, $options);
+
+                if ($this->timecop) {
+                    $this->timecop->regulate(sprintf(
+                        '++ API Request to endpoint: %s (finished)',
+                        $endpoint
+                    ));
+                }
 
                 /* Debugging:
                  * Find out what guzzle calculated as the endpoint + query string params

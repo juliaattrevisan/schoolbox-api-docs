@@ -270,7 +270,14 @@ class Profile implements IStrategy
                  */
                 $legal = '';
 
-                $medical = $medicalLookup[$student['id']] ? 'This student has medical conditions.' : null;
+                /* This student might not have any meaningful medical records
+                 */
+                $medical = null;
+
+                if (isset($medicalLookup[$student['id']])) {
+                    $medical = 'This student has medical conditions.';
+                }
+
                 $messages = '';
 
                 /* From Thad, 7/2/23:
