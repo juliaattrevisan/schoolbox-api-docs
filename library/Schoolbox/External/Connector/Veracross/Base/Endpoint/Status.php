@@ -21,27 +21,15 @@ use Schoolbox\External\Importer\Endpoint\Status\IStatus;
 class Status implements IStatus
 {
     /**
-     * @var string
-     */
-    private string $host;
-
-
-    /**
-     * @var string
-     */
-    private string $key;
-
-
-    /**
      * Status constructor.
      *
      * @param string $host
      * @param string $key
      */
-    public function __construct(string $host, string $key)
-    {
-        $this->host = $host;
-        $this->key = $key;
+    public function __construct(
+        private string $host,
+        private string $key
+    ) {
     }
 
 
@@ -72,7 +60,6 @@ class Status implements IStatus
      * @inheritDoc
      *
      * @return array
-     * @throws \InvalidArgumentException
      */
     public function getReport(): array
     {

@@ -21,29 +21,16 @@ use Schoolbox\External\Importer\Endpoint\IStrategy;
  */
 class ApiStatistics implements IStrategy
 {
-
-    /**
-     * @var LoggerInterface
-     */
-    private LoggerInterface $log;
-
-
-    /**
-     * @var IApi
-     */
-    private IApi $api;
-
-
     /**
      * ApiStatistics constructor.
      *
      * @param LoggerInterface $log
      * @param IApi            $api
      */
-    public function __construct(LoggerInterface $log, IApi $api)
-    {
-        $this->log = $log;
-        $this->api = $api;
+    public function __construct(
+        private LoggerInterface $log,
+        private IApi $api
+    ) {
     }
 
 

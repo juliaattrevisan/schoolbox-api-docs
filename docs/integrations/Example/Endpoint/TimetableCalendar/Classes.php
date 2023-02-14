@@ -41,77 +41,6 @@ class Classes implements IStrategy
 
 
     /**
-     * @var LoggerInterface
-     */
-    private LoggerInterface $log;
-
-
-    /**
-     * The "perform" flag from the cli tool
-     *
-     * @var bool
-     */
-    private bool $perform;
-
-
-    /**
-     * @var IApi
-     */
-    private IApi $api;
-
-
-    /**
-     * @var \Schoolbox\External\Event\Mapper
-     */
-    private \Schoolbox\External\Event\Mapper $eventMapper;
-
-
-    /**
-     * @var \Schoolbox\External\Event\Overrides\Mapper
-     */
-    private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper;
-
-
-    /**
-     * @var ClassEntryMapper
-     */
-    private ClassEntryMapper $classEntryMapper;
-
-
-    /**
-     * @var ClassInvolvementMapper
-     */
-    private ClassInvolvementMapper $classInvolvementMapper;
-
-
-    /**
-     * @var \DateTimeZone
-     */
-    private \DateTimeZone $timezone;
-
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    private \Alaress_Date_Format $fromDate;
-
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    private \Alaress_Date_Format $toDate;
-
-
-    /**
-     * Event Chandler that saves a subset of event records' columns
-     * to minimise changes to the db, due to db ignoring the indexes
-     *
-     * @var EventHandler
-     */
-    private EventHandler $eventHandler;
-
-
-    /**
      * A list of classEntries that we saw previously
      *
      * @var array
@@ -133,6 +62,7 @@ class Classes implements IStrategy
      * @param LoggerInterface                            $log
      * @param bool                                       $perform
      * @param IApi                                       $api
+     * @param array                                      $watchlist
      * @param Mapper                                     $eventMapper
      * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
      * @param ClassEntryMapper                           $classEntryMapper
@@ -142,28 +72,18 @@ class Classes implements IStrategy
      * @param \Alaress_Date_Format                       $toDate
      */
     public function __construct(
-        LoggerInterface $log,
-        bool $perform,
-        IApi $api,
-        \Schoolbox\External\Event\Mapper $eventMapper,
-        \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
-        ClassEntryMapper $classEntryMapper,
-        ClassInvolvementMapper $classInvolvementMapper,
-        \DateTimeZone $timezone,
-        \Alaress_Date_Format $fromDate,
-        \Alaress_Date_Format $toDate
+        private LoggerInterface $log,
+        private bool $perform,
+        private IApi $api,
+        private array $watchlist,
+        private \Schoolbox\External\Event\Mapper $eventMapper,
+        private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
+        private ClassEntryMapper $classEntryMapper,
+        private ClassInvolvementMapper $classInvolvementMapper,
+        private \DateTimeZone $timezone,
+        private \Alaress_Date_Format $fromDate,
+        private \Alaress_Date_Format $toDate
     ) {
-        $this->log = $log;
-        $this->perform = $perform;
-        $this->api = $api;
-        $this->eventMapper = $eventMapper;
-        $this->overridesMapper = $overridesMapper;
-        $this->classEntryMapper = $classEntryMapper;
-        $this->classInvolvementMapper = $classInvolvementMapper;
-        $this->timezone = $timezone;
-        $this->fromDate = $fromDate;
-        $this->toDate = $toDate;
-
         /* Event Chandler that saves a subset of event records' columns
          * to minimise changes to the db, due to db ignoring the indexes
          */
