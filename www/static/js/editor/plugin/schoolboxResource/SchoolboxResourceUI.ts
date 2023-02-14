@@ -4,7 +4,6 @@
 
 import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
 import ButtonView from "@ckeditor/ckeditor5-ui/src/button/buttonview";
-import { fetchHtmlAsText } from "@js/util/fileUtils";
 
 /**
  * Returns the button to display in the toolbar
@@ -22,65 +21,31 @@ function getButton() {
     return button;
 }
 
-/**
- * Initiate the resource modal
- *
- * @param { number } editorId - the id of the editor to create unique file picker ids
- */
-async function initResourceModal(editorId: number) {
-    let html = await fetchHtmlAsText("/resources/attachment?multi=0");
-    html = html.replace(/attachment-browser-filesystems/g, `attachment-browser-filesystems-${editorId}`);
-    html = html.replace(/attachment-browser-panel-container/g, `attachment-browser-panel-container-${editorId}`);
-    const $modal = $(`<div data-reveal class="reveal-modal file-picker" id="file-picker-${editorId}" />`);
-    $modal.html(html);
-    $modal.on("click", ".cancel[role=button]", () => {
-        $modal.foundation("reveal", "close");
-    });
-    $("body").append($modal); // add to the DOM
-    $modal.foundation("reveal", "open");
-}
-
-/**
- * Display the resource modal
- *
- * @param { number } editorId - the id of the editor to create unique file picker ids
- */
-function displayResourceModal(editorId: number) {
-    const $modal = $(`#file-picker-${editorId}`);
-    $modal.foundation("reveal", "open");
-}
-
 export default class SchoolboxResourceUI extends Plugin {
-    isModalInit = false; // whether the modal has been initiated so we only set up once
-
-    editorId = 0; // the id of the editor to create unique file picker ids
-
-    /**
-     * To add the button to the toolbar and define
-     * its behaviour when selected - which is opening the modal
-     *
-     * @returns { ButtonView } - the button to display in the toolbar
-     */
-    initButton() {
-        const button = getButton();
-        this.listenTo(button, "execute", () => {
-            if (this.isModalInit) {
-                displayResourceModal(this.editorId);
-            } else {
-                initResourceModal(this.editorId);
-                this.isModalInit = true;
-            }
-        });
-        return button;
-    }
-
     /**
      * Register the button in the editor's UI component factory.
      */
     init() {
         this.editorId = this.editor.id;
         this.editor.ui.componentFactory.add("schoolboxResource", () => {
-            return this.initButton();
+            const button = getButton();
+
+            button.on("execute", () => {
+                $.fn.schoolboxResource({
+                    allowedFilesystems: "files",
+                    allowedFiles: "image/*,audio/*,video/*,.heic,.heics,.heif",
+                    useFolder: false,
+                    // defaultFolderSelector: defaultFolderSelector,
+                });
+
+                // Change the model using the model writer.
+                this.editor.model.change((writer) => {
+                    // Insert the text at the user's current position.
+                    this.editor.model.insertContent(writer.createText(now.toString()));
+                });
+            });
+
+            return button;
         });
     }
 }
