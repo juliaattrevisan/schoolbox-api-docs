@@ -31,6 +31,7 @@ use Schoolbox\Resource\Storage\Transform;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Exception as LockException;
+use Symfony\Component\Lock\Exception\LockReleasingException;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Lock\Store\RedisStore;
@@ -232,6 +233,8 @@ class Manager
         $this->localStorageDir = $this->deriveLocalStorageDir($pdo);
         $transformations = $this->generateTransformations($this->deriveHashList($pdo), $pdo);
         unset($pdo);
+        $this->logger->debug("acquire Lock");
+        $this->lock->acquire();
         $this->processTransformations($transformations);
         $this->lock->release();
         return $this->isInterrupted;
@@ -317,8 +320,15 @@ class Manager
      */
     private function renewLockAndMaxExecutionTime(): void
     {
+        $this->logger->debug("renew Lock and timeout");
         // TODO, this should be $lock->refresh(), but that's throwing an exception for some reason?
-        $this->lock->release();
+//        $this->lock->refresh();
+        try {
+            $this->lock->release();
+        } catch (LockReleasingException $e) {
+            // noop its all threaded.... that could be the issue...
+            $this->logger->debug("Unable to release image lock, ignoring...");
+        }
         $this->lock->acquire();
         $maxExecutionTime = time() - $this->startTime + self::IMAGICK_TIME_LIMIT;
         ini_set('max_execution_time', (string)$maxExecutionTime);
@@ -356,6 +366,7 @@ class Manager
         $instanceLockFactory = new InstanceLockFactory(new LockFactory(new RedisStore($this->redis)), INSTANCE_ID);
         $timeout             = self::IMAGICK_TIME_LIMIT;
         $lock                = $instanceLockFactory->createLock(self::LOCK_NAME, $timeout);
+        $lock->setLogger($this->logger);
 
         try {
             $acquired = $lock->acquire();
@@ -631,6 +642,8 @@ class Manager
         $pid = posix_getpid();
         $this->logger->debug($this->prefixLog("Manager PID: $pid"));
 
+        $this->logger->debug(sprintf("count of transformations: %s", count($transformations)));
+
         // While still have work to do
         while (count($transformations) && !$this->isInterrupted) {
             $this->workerCleanup();
@@ -645,6 +658,8 @@ class Manager
                 }
                 // Delegate next hash processing to a new worker
                 array_shift($transformations);
+                $this->logger->debug(sprintf("count of worker pids: %s", count($this->workerPids)));
+                $this->logger->debug(sprintf("current PID: %s", $pid));
                 $this->renewLockAndMaxExecutionTime();
                 $pid = pcntl_fork();
                 if ($pid === -1) {
