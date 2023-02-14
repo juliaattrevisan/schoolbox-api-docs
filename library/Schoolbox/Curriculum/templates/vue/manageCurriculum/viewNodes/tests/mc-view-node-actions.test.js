@@ -16,10 +16,10 @@ beforeEach(() => {
                 children: [],
             },
             title: "My Node",
+            isViewing: false,
             isUpdating: false,
             isAdding: false,
-            isUpdatingOrAdding: false,
-        },
+        }
     });
 });
 

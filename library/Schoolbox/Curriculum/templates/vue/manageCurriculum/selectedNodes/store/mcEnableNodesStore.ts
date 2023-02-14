@@ -4,7 +4,6 @@
 
 import { ref } from "vue";
 import { defineStore } from "pinia";
-import { useStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/manageCurriculumStore";
 import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/selectedNodes/store/mcSelectedNodesStore";
 
 export const useEnableNodesStore = defineStore("mcEnableNodes", () => {
@@ -40,7 +39,7 @@ export const useEnableNodesStore = defineStore("mcEnableNodes", () => {
         const selectedNodesStore = useSelectedNodesStore();
         selectedNodesStore.nodes.forEach((node) => {
             fetchList.push(
-                fetch(`${useStore().getApiEndpoint()}/${node.id}`, {
+                fetch(node._links.update, {
                     method: "PATCH",
                     headers: {
                         "Content-Type": "application/json",

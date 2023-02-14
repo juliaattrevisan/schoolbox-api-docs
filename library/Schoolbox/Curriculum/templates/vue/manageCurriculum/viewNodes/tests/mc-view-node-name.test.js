@@ -24,8 +24,8 @@ beforeEach(() => {
             },
             depth: 1,
             title: "My Node",
-            isUpdatingOrAdding: false,
-        },
+            isActive: false,
+        }
     });
 });
 
@@ -59,6 +59,6 @@ test("is not disabled when search is active", async () => {
 });
 
 test("is disabled when updating or adding another node", async () => {
-    await wrapper.setProps({ isUpdatingOrAdding: true });
-    expect(wrapper.find("button").element).toBeDisabled();
+    await wrapper.setProps( { isActive: true } );
+    expect(wrapper.find('button').element).toBeDisabled();
 });

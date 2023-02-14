@@ -34,7 +34,7 @@ function onCreateNewSelected() {
         <div class="small-12 island">
             <loading-table v-if="store.isLoading" />
             <section v-else-if="store.hasLoadError" class="content">
-                <div tableData-alert class="alert-box alert">
+                <div class="alert-box alert">
                     Sorry, we are currently unable to load the Curriculum data. Please
                     <a href="#refresh-page" title="refresh the page" @click.prevent="onRefreshSelected"
                         >refresh the page</a

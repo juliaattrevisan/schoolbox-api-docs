@@ -46,17 +46,7 @@ const props = defineProps({
 
 const store = useStore();
 const selectedNodesStore = useSelectedNodesStore();
-const toastEl = ref<typeof Toast | null>(null);
-
-/**
- * Start loading the curriculum data
- */
-onMounted(() => {
-    store.init(props.dataEndpoint, props.isReadOnly, props.uiLimit, toastEl);
-    if (store.hasId) {
-        initErrorListener();
-    }
-});
+const toastEl = ref<Toast | null>(null);
 
 /**
  * Display an error if we cant find the node id that we jump to straight on page load
@@ -66,12 +56,22 @@ function initErrorListener() {
         if (name === "loadId") {
             onError((error) => {
                 console.warn(error.message);
-                store.toastEl?.activate();
-                store.toastEl?.timeout(error.message, false, 5000);
+                toastEl?.activate();
+                toastEl?.timeout(error.message, false, 5000);
             });
         }
     });
 }
+
+/**
+ * Start loading the curriculum data
+ */
+onMounted(async () => {
+    await store.init(props.dataEndpoint, props.isReadOnly, props.uiLimit, toastEl);
+    if (store.hasId) {
+        initErrorListener();
+    }
+});
 
 /**
  * close the modal, setting the activeNode to null so we can allow another selection

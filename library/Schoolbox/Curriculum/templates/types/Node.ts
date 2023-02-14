@@ -1,3 +1,5 @@
+import type { Breadcrumb } from "@schoolboxCurriculum/types/Breadcrumb";
+
 /**
  * A curriculum node
  */
@@ -11,7 +13,88 @@ export type Node = {
     parent: Node | null;
     name: string;
     selectedParentId?: number; // when a parent Node is selected (to enable/disable or delete), this will be the id of that Node
+    breadcrumbs?: Breadcrumb[]; // list of parents to reach this node
+    _links: {
+        // links to the endpoints for various actions
+        delete: string;
+        getUsage: string;
+        read: string;
+        update: string;
+    };
+    _usageCounts: {
+        // just the counts for each acitivity type
+        course: number;
+        folder: number;
+        unit: number;
+    };
+    usage?: Usage[]; // all the details for all the places the node has been used
+    usageCount?: number; // the total number of linked activities (not just the currently loaded)
 };
+
+/**
+ * The different activity types available that can be linked to a node
+ */
+export enum ActivityTypes {
+    COURSE = "course",
+    UNIT = "unit",
+    FOLDER = "folder",
+}
+
+/**
+ * An activity linked to the node
+ */
+export type Usage = {
+    discriminator: ActivityTypes.COURSE | ActivityTypes.UNIT | ActivityTypes.FOLDER;
+    object: CourseUsageObject | UnitUsageObject | FolderUsageObject;
+};
+
+/**
+ * The further details of the the usage
+ */
+interface UsageObject {
+    id: number;
+    title: string;
+}
+
+/**
+ * The further details of the the course usage
+ */
+export interface CourseUsageObject extends UsageObject {
+    folder: {
+        parent: {
+            title: string;
+        };
+        _links: {
+            view: string;
+        };
+    };
+}
+
+/**
+ *  The further details of the the unit usage
+ */
+export interface UnitUsageObject extends UsageObject {
+    folder: {
+        parent: {
+            title: string;
+        };
+        _links: {
+            view: string;
+        };
+    };
+}
+
+/**
+ * The further details of the the folder usage
+ */
+export interface FolderUsageObject extends UsageObject {
+    _links: {
+        view: string;
+    };
+    parent: {
+        title: string;
+    };
+}
 
 /**
  * Just the field properties that can be updated
