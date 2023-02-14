@@ -39,18 +39,21 @@ class Factory
     public const SOURCE_NAME = 'suds_veracross';
 
 
-    /**
-     * Get timetable classes occurring this far in the past
-     * Measured in months, defaults to -1 month
+    /* Temporarily disabled
+     * I didn't find any data in the recent years
      */
-    private const FROM = -1;
-
-
-    /**
-     * Get timetable classes up to this far into the future
-     * Measured in months, defaults to 6 months
-     */
-    private const TO = 6;
+//    /**
+//     * Get timetable classes occurring this far in the past
+//     * Measured in months, defaults to -1 month
+//     */
+//    private const FROM = -1;
+//
+//
+//    /**
+//     * Get timetable classes up to this far into the future
+//     * Measured in months, defaults to 6 months
+//     */
+//    private const TO = 6;
 
 
     /**

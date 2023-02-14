@@ -69,26 +69,29 @@ class Users
     }
 
 
-    /**
-     * Get a list of (external_id, sis_user_profile) tuples
-     *
-     * @return array
+    /* Temporarily disabled
+     * We don't know where staff timetable located right now
      */
-    private function initStaffLookup(): array
-    {
-        $userStatement = $this->eventMapper->getDatabase()->query('
-            SELECT external_id, firstname, lastname
-            FROM sis_user_profile sup
-            INNER JOIN sis_user_profile_staff sups ON sup.id = sups.sis_user_profile_id
-            WHERE external_id IS NOT NULL
-        ');
-
-        $staff = [];
-
-        foreach ($userStatement as $row) {
-            $staff[(string)$row['external_id']] = $row;
-        }
-
-        return $staff;
-    }
+//    /**
+//     * Get a list of (external_id, sis_user_profile) tuples
+//     *
+//     * @return array
+//     */
+//    private function initStaffLookup(): array
+//    {
+//        $userStatement = $this->eventMapper->getDatabase()->query('
+//            SELECT external_id, firstname, lastname
+//            FROM sis_user_profile sup
+//            INNER JOIN sis_user_profile_staff sups ON sup.id = sups.sis_user_profile_id
+//            WHERE external_id IS NOT NULL
+//        ');
+//
+//        $staff = [];
+//
+//        foreach ($userStatement as $row) {
+//            $staff[(string)$row['external_id']] = $row;
+//        }
+//
+//        return $staff;
+//    }
 }
