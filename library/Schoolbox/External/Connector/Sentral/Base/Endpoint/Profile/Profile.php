@@ -1357,6 +1357,12 @@ class Profile implements IStrategy
     {
         /* Find the first employment data and accept that as canon
          */
+        // 'employments' may not exist for invalid data
+        if (!isset($staff['relationships']['employments'])) {
+            $this->log->debug('Relationships employments data does not exist.');
+            return false;
+        }
+
         foreach ($staff['relationships']['employments']['data'] as $employment) {
             if ('staffEmployment' === $employment['type']) {
                 $now = \Alaress_Date_Format::now();
