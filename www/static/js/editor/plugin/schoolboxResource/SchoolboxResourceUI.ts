@@ -38,11 +38,48 @@ export default class SchoolboxResourceUI extends Plugin {
                     // defaultFolderSelector: defaultFolderSelector,
                 });
 
-                // Change the model using the model writer.
-                this.editor.model.change((writer) => {
-                    // Insert the text at the user's current position.
-                    this.editor.model.insertContent(writer.createText(now.toString()));
-                });
+                $(window)
+                    .unbind("message")
+                    .on("message", (event) => {
+                        let message;
+
+                        try {
+                            message = JSON.parse(event.originalEvent.data);
+                        } catch (err) {
+                            message = event.originalEvent.data;
+                        }
+
+                        /* Find out how to render this file
+                         */
+                        if (message.data != undefined) {
+                            if (0 in message.data && "hash" in message.data[0]) {
+                                $.getJSON(
+                                    "/editor/nodeInfo.php",
+                                    { identifier: message.data[0].hash },
+                                    (responseText) => {
+                                        if (responseText.type === "image") {
+                                            const imageUtils = this.editor.plugins.get("ImageUtils");
+                                            imageUtils.insertImage({
+                                                src: `/storage/image.php?hash=${responseText.hash}`,
+                                                alt: message.data[0].title,
+                                                title: message.data[0].title,
+                                            });
+                                        }
+
+                                        /* Shut file picker modal, go back to Dialog
+                                         */
+                                        $("#file-picker").foundation("reveal", "close");
+                                    }
+                                );
+                            } else {
+                                // The file was rejected, probably cause it was the wrong mimetype.
+                                // Do nothing
+                            }
+                        } else {
+                            /* Connecting to your Google Drive
+                             */
+                        }
+                    });
             });
 
             return button;

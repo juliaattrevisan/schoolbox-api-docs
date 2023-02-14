@@ -35,6 +35,10 @@ initEditorSaves();
  * store the newly created editor instance to we can get its data on save
  */
 document.addEventListener("EDITOR__CREATED", (event: CustomEvent) => {
-    // for the purposes of this demo, we just assume that editor-1 has been created before editor-2
-    editors.push(event.detail.editor);
+    // editor-1 is the first editor on the page, so we want to add it to the front of the array
+    if (editors.length === 1 && event.detail.editor.sourceElement.getAttribute("id") === "editor-1") {
+        editors.unshift(event.detail.editor);
+    } else {
+        editors.push(event.detail.editor);
+    }
 });
