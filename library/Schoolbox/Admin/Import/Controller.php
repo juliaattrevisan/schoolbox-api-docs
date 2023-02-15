@@ -136,11 +136,36 @@ class Controller extends ConfigController
         $configContext['dsn'][$dataSource] = (new DSNFactory())->produceDSNParts($dataSource, $key);
 
         /* If you run the Live Sync, you might get a message about it
+         * This message persists to keep reminding people that it's still going
          */
         $hasPerformUpdate = false;
 
-        if ($this->getSession()->getSegment(static::class)->getFlash('hasPerformUpdate')) {
-            $hasPerformUpdate = true;
+        /* Decide if you can execute a Perform Live Update
+         *   - You need to be on an actual suds connector
+         *     (ie. selected something other than CSV and "Please select")
+         *   - A lock must be obtainable (ie. a lock has not yet been acquired)
+         */
+        $canPerformUpdate = false;
+
+        if ('' !== $type && Factory::CSV !== $type) {
+            /* No lock? You can perform the update, but immediately release the lock
+             * so you can actually do that
+             */
+            try {
+                /* Spawn a logger out of darkness
+                 * Was there a particular way to do this?
+                 */
+                $lock = $this->acquireLock($this->spawnLogger(), Scheduler::LOCK_NAME, 1);
+                $lock->release();
+
+                $canPerformUpdate = true;
+            } catch (\RuntimeException $e) {
+                // noop
+
+                /* However, it means that the syn cis running in some way
+                 */
+                $hasPerformUpdate = true;
+            }
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/schoolData/index.twig', [
@@ -156,7 +181,7 @@ class Controller extends ConfigController
              * data source selected (you can't do it if you're using No Data Source
              * or if you're using CSV Files)
              */
-            'canPerformUpdate' => '' !== $type && Factory::CSV !== $type,
+            'canPerformUpdate' => $canPerformUpdate,
             /* A flash message to tell users to w8
              */
             'hasPerformUpdate' => $hasPerformUpdate,
@@ -304,14 +329,12 @@ class Controller extends ConfigController
         }
 
         // Redirect back to ruleset page, with either an alert message on the page or in notifications
-        $this->getSession()->getSegment(static::class)->setFlash('hasPerformUpdate', true);
         $this->getResponse()->redirect->to($this->getRouter()->generate('adminImportIndex.getSchoolDataIndex'));
 
         /* Spawn a logger out of darkness
          * Was there a particular way to do this?
          */
-        $logFile = fopen($this->getConfigLoader()->get('logs_dir') . '/suds_live.log', 'a');
-        $logger = new Logger($logFile, $logFile, \Monolog\Logger::DEBUG, [], true);
+        $logger = $this->spawnLogger();
 
         // Not the best place to put it but it will do for now
         $this->getResponse()->content->set([
@@ -513,6 +536,8 @@ class Controller extends ConfigController
              */
             $message = 'This process is already running for this instance: trusting it will self-terminate on timeout';
 
+            $logger->warning($message);
+
             throw new \RuntimeException($message);
         }
 
@@ -531,6 +556,19 @@ class Controller extends ConfigController
         }
 
         return $lock;
+    }
+
+
+    /**
+     * Spawn a Logger instance, for the lock mechanism
+     *
+     * @return Logger
+     */
+    private function spawnLogger(): Logger
+    {
+        $logFile = fopen($this->getConfigLoader()->get('logs_dir') . '/suds_live.log', 'a');
+
+        return new Logger($logFile, $logFile, \Monolog\Logger::DEBUG, [], true);
     }
 
 
