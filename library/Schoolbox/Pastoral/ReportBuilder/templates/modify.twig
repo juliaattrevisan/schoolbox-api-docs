@@ -44,7 +44,7 @@
                     </div>
                     <div class="small-12 medium-6 columns">
                         <label class="inline-block" for="dashboard">
-                        Show this report on my {{ locale.pastoral }} dashboard
+                            Show this report on my {{ locale.pastoral }} dashboard
                         </label>
                         <div class="switch">
                             <input id="dashboard" name="dashboard" value="1" type="checkbox"
@@ -118,13 +118,13 @@
                                     :preselected-classes="{{ foldersSelected | json_encode }}"
                             />
                         </div>
-                        <script src="{{CDN_PREFIX}}/js/bundle/classSelector.js?v={{ config.site_version }}"></script>
+                        <script src="{{ CDN_PREFIX }}/js/bundle/classSelector.js?v={{ config.site_version }}"></script>
                     </div>
                 </fieldset>
             </section>
 
             <h2 class="subheader">Date Range</h2>
-            <p class="meta">Include reports published within the selected time period</p>
+            <p class="meta">Include records occurred within the selected time period</p>
 
             <section>
                 <fieldset class="radiolist content">
@@ -462,78 +462,12 @@
             <section>
                 <ul id="sort-order" class="information-list sortable ui-sortable" data-sortable>
                     {% for order in report.order %}
-
-                        {# This is a hideous hack to display these in the right order #}
-
-                        {% if order == 'student' %}
-                            <li data-order="student">
+                        {% if order != 'severity' %}
+                            <li data-order="{{ order }}">
                                 <div>
                                     <div class="grip"></div>
                                     <div class="card small-12">
-                                        <p>Student Name</p>
-                                    </div>
-                                </div>
-                            </li>
-                        {% elseif order == 'date' %}
-                            <li data-order="date">
-                                <div>
-                                    <div class="grip"></div>
-                                    <div class="card small-12">
-                                        <p>Created Date</p>
-                                    </div>
-                                </div>
-                            </li>
-                        {% elseif order == 'year' %}
-                            <li data-order="year">
-                                <div>
-                                    <div class="grip"></div>
-                                    <div class="card small-12">
-                                        <p>Year Level</p>
-                                    </div>
-                                </div>
-                            </li>
-                        {% elseif order == 'house' %}
-                            <li data-order="house">
-                                <div>
-                                    <div class="grip"></div>
-                                    <div class="card small-12">
-                                        <p>House</p>
-                                    </div>
-                                </div>
-                            </li>
-                        {% elseif order == 'campus' %}
-                            <li data-order="campus">
-                                <div>
-                                    <div class="grip"></div>
-                                    <div class="card small-12">
-                                        <p>Campus</p>
-                                    </div>
-                                </div>
-                            </li>
-                        {% elseif order == 'points' %}
-                            <li data-order="points">
-                                <div>
-                                    <div class="grip"></div>
-                                    <div class="card small-12">
-                                        <p>Points</p>
-                                    </div>
-                                </div>
-                            </li>
-                        {% elseif order == 'type' %}
-                            <li data-order="type">
-                                <div>
-                                    <div class="grip"></div>
-                                    <div class="card small-12 wrap-down">
-                                        <p>Type</p>
-                                    </div>
-                                </div>
-                            </li>
-                        {% elseif order == 'subtype' %}
-                            <li data-order="subtype">
-                                <div>
-                                    <div class="grip"></div>
-                                    <div class="card small-12 wrap-down">
-                                        <p>Sub-Type</p>
+                                        <p>{{ orderFields[order] }}</p>
                                     </div>
                                 </div>
                             </li>
@@ -555,36 +489,27 @@
                                     </div>
                                 </div>
                             </li>
-                        {% elseif order == 'author' %}
-                            <li data-order="author">
-                                <div>
-                                    <div class="grip"></div>
-                                    <div class="card small-12">
-                                        <p>Author Name</p>
-                                    </div>
-                                </div>
-                            </li>
                         {% endif %}
                     {% endfor %}
                 </ul>
             </section>
 
-                {% include "@pastoral/modify_section_visibility.twig" with
-                    {
-                        record: record,
-                        allowIndividual: true,
-                        groups: groups,
-                        allowParents: false,
-                        roles: roles,
-                        roleTypes: [],
-                        roleUserCounts: [],
-                        rolesWithUsers: [],
-                        moderatorIds: moderatorIds,
-                        bulkCreate: false,
-                        managePage: false,
-                        reportPage: true,
-                        visibilityLocked: false,
-                    } only %}
+            {% include "@pastoral/modify_section_visibility.twig" with
+                {
+                    record: record,
+                    allowIndividual: true,
+                    groups: groups,
+                    allowParents: false,
+                    roles: roles,
+                    roleTypes: [],
+                    roleUserCounts: [],
+                    rolesWithUsers: [],
+                    moderatorIds: moderatorIds,
+                    bulkCreate: false,
+                    managePage: false,
+                    reportPage: true,
+                    visibilityLocked: false,
+                } only %}
             <input type="submit" value="Save Report"/>
         </form>
     </div>

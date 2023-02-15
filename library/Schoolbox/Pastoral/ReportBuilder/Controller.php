@@ -235,28 +235,23 @@ class Controller extends Base
             $availableActions = $this->actionMapper->findAll();
         }
 
-        $orders = [
-            'date',
-            'student',
-            'type',
-            'subtype',
-            'author',
-            'points',
-            'year',
-            'house',
-            'campus',
-        ];
+        $orderFields = PastoralReport::ORDER_FIELDS;
 
         // Only show severity if it is enabled by policy
-
         if (!$this->getConfigLoader()->get('pastoral_severity')) {
             $severities = [];
         } else {
-            $orders[]   = 'severity';
+            // this will be localised in twig...
+            $orderFields[PastoralReport::ORDER_SEVERITY] = 'Severity';
             $severities = $this->pastoralSeverityMapper->findAll();
         }
 
-        foreach ($orders as $orderCurrent) {
+        // Remove fields that are not supported
+        $report->setOrder($report->getOrder()->filter(static function (string $order) use ($orderFields) {
+            return in_array($order, array_keys($orderFields));
+        }));
+        // Add order fields missing in the current report
+        foreach (array_keys($orderFields) as $orderCurrent) {
             if (!in_array($orderCurrent, $report->getOrder()->getAll())) {
                 $report->getOrder()->add($orderCurrent);
             }
@@ -320,6 +315,7 @@ class Controller extends Base
                     'record'               => $fakeRecord,
                     'moderatorIds'         => $this->userMapper->findByAccess(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ)->getPropertyValues('id'),
                     'roles'                => $roles,
+                    'orderFields'          => $orderFields,
                 ],
                 'title'    => 'Pastoral Report',
             ]

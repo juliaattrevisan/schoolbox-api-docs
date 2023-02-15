@@ -260,7 +260,7 @@ class Mapper extends BaseMapper
 
         $wheres = [];
         $params = [
-            'createdAt'   => $pastoral->getCreatedAt()->getDatabase(),
+            'createdAt'   => $pastoral->getRecordDate()->getDatabase(),
             'authorLike'  => "%,{$pastoral->getOwner()->getId()},%",
             'studentLike' => "%,{$pastoral->getStudent()->getId()},%",
         ];

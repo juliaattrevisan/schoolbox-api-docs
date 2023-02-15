@@ -82,7 +82,7 @@ class Cursor implements ICursor
         if ($lastRecord instanceof Model) {
             $nextCursor = $this->codec->encode([
                 'severity' => $lastRecord->getSeverity()?->getSequence(),
-                'created'  => $lastRecord->getCreatedAt()->toRfc3339String(),
+                'created'  => $lastRecord->getRecordDate()->toRfc3339String(),
                 'updated'  => $lastRecord->getUpdatedAt()->toRfc3339String(),
                 'id'       => $lastRecord->getId(),
             ]);
