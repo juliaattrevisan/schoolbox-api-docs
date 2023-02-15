@@ -411,7 +411,8 @@
 }
 
 .icon-hidden:before,
-.icon-review-hollow:before {
+.icon-eye-hollow:before,
+.icon-view-hollow:before {
     content: "\e925";
     font-family: $font-family-icon;
 }
@@ -873,12 +874,6 @@
 .icon-view:before,
 .icon-eye:before {
     content: "\e675";
-    font-family: $font-family-icon;
-}
-
-.icon-view-hollow:before,
-.icon-eye-hollow:before {
-    content: "\e926";
     font-family: $font-family-icon;
 }
 
