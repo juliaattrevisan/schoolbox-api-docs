@@ -55,7 +55,9 @@ class Builder
      */
     private const HOST = 'https://scsaapps.scsa.wa.edu.au/Apps/CurriculumJSON/';
 
-    /* Decide if a particular file has a Subject node
+
+    /**
+     * Decide if a particular file has a Subject node
      *
      * English, HPE, HSS skip the subject node which is artificially cloned
      * from the Learning Area
