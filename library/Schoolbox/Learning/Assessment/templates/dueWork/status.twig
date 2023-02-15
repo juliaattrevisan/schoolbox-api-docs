@@ -543,7 +543,7 @@
 
                     {# Mass download submissions #}
                     $('#mass-download').bulky({
-                        invalidOptionText: 'Not Submitted',
+                        invalidOptionText: 'Nothing to download',
                         submitText: function (len, all) {
                             if (!len) {
                                 return 'Download None';
@@ -563,7 +563,8 @@
                                     //  * A 'Preview Submission' link exists in that student's block OR
                                     //  * A non-blank feedback comment exists for that student.
                                     $('[data-participant=' + id + '] [data-previewable]').length != 0 ||
-                                    $('#comment-' + id).text().trim() != ''
+                                    $('#comment-' + id).val().trim() != '' ||
+                                    $('#mark-' + id).val().trim() != ''
                                 );
                             }
                         ),
