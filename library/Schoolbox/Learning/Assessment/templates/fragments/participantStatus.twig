@@ -39,7 +39,7 @@
         {% if latestResponse is defined and latestResponse and latestResponse.allFiles|length %}
 
                 {% import '@learning/macro/urgency.twig' as urgency %}
-                <span class="pipe meta"><a id="similarity-preview-{{ latestResponse.id }}">Preview Submission</a></span>
+                <span class="pipe meta" data-previewable><a id="similarity-preview-{{ latestResponse.id }}">Preview Submission</a></span>
 
                 <script>
                     $(function() {

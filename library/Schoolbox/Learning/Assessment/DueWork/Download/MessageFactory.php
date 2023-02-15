@@ -72,19 +72,23 @@ class MessageFactory
      * * All Kami feedback for each participant
      *
      * @param DueWork  $dueWork The due work to build a message for.
+     * @param Array    $studentUserIds Array of student user IDs (those who submitted the responses).
      * @param User     $viewer  The user who is requesting the due work ZIP.
      * @return Message
      */
-    public function buildForAssessment(DueWork $dueWork, User $viewer): Message
+    public function buildForAssessment(DueWork $dueWork, $studentUserIds, User $viewer): Message
     {
         // Generate list of files to fetch via taskd, and add to a ZIP
         $messageFactory = (clone $this->baseMessageFactory);
 
         // Iterate participants and get their responses
         foreach ($dueWork->getAllParticipants() as $participant) {
-            // Short-circuit if there's no interactions
+            // Short-circuit if userId not in $studentUserIds array or if there's no interactions.
             // (draft feedback does count, though)
-            if (!$participant->hasSubmittedResponse() && $participant->getAllFeedbacks()->count() === 0) {
+            if (
+                !in_array($participant->getUser()->getId(), $studentUserIds, true) ||
+                (!$participant->hasSubmittedResponse() && $participant->getAllFeedbacks()->count() === 0)
+            ) {
                 continue;
             }
 

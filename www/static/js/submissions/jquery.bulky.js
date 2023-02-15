@@ -10,8 +10,11 @@
     var currentlyOpenModal = null;
 
     var defaults = {
+
         onSubmit: $.noop, // action-bar DOM element
+        onClose: null, // Supply a function if you want non-default behaviour on close of the modal.
         submitText: $.noop, // checkedCount, totalCount
+        invalidOptionText: 'invalid',
         userList: null,
         templateSelector: "[data-template]",
         submitSelector: "[data-submit]",
@@ -129,7 +132,7 @@
                          */
                         if (!opt.checkboxConditionality(id)) {
                             $chk.prop("disabled", true).removeAttr("checked");
-                            $lbl.text($lbl.text() + " (invalid)");
+                            $lbl.text($lbl.text() + ' (' + opt.invalidOptionText + ')');
 
                             numInvalid++;
                         }
@@ -216,8 +219,15 @@
          * Typically it's "Cancel" or the Action button itself, after which
          * the modal can be dismissed
          */
-        this.element.on("click", ".button", function () {
-            bulky.element.foundation("reveal", "close");
+        this.element.on('click', '.button', function () {
+            if (opt.onClose === null) {
+                // Do the default thing, which is to close the modal.  Note that this will close any other open
+                // foundation modals as well due to the firing of the closeme.zf.reveal event.
+                // Documentation: https://get.foundation/sites/docs/reveal.html#js-events
+                bulky.element.foundation('reveal', 'close');
+            } else {
+                opt.onClose();
+            }
         });
     }
 
