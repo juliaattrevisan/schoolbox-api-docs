@@ -67,18 +67,6 @@ class Controller extends ConfigController
 
 
     /**
-     * @var \Schoolbox\External\Connector\Log\Mapper
-     */
-    protected \Schoolbox\External\Connector\Log\Mapper $importLogMapper;
-
-
-    /**
-     * @var ClientInterface
-     */
-    private ClientInterface $redisStorage;
-
-
-    /**
      * Constructor
      *
      * @param ConfigMapper                     $configMapper
@@ -93,24 +81,23 @@ class Controller extends ConfigController
         ConfigMapper $configMapper,
         FieldStrategyFactory $fieldStrategyFactory,
         Rebuilder $rebuilder,
-        \Schoolbox\External\Connector\Log\Mapper $importLogMapper,
-        ClientInterface $redisStorage,
+        protected \Schoolbox\External\Connector\Log\Mapper $importLogMapper,
+        private ClientInterface $redisStorage,
         private \Schoolbox\External\Event\Mapper $eventMapper,
         private \Schoolbox\External\ClassEntryMapper $classEntryMapper,
     ) {
         parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder);
-
-        $this->importLogMapper = $importLogMapper;
-        $this->redisStorage = $redisStorage;
     }
 
 
     /**
      * Landing Page for School Data Import
      *
-     * @throws RouteNotFound
-     * @throws ReflectionException
+     * @throws ContainerExceptionInterface
      * @throws InvalidColumnException
+     * @throws NotFoundExceptionInterface
+     * @throws ReflectionException
+     * @throws RouteNotFound
      */
     public function getSchoolDataIndex(): void
     {
