@@ -149,7 +149,7 @@ class Controller extends ConfigController
             } catch (\RuntimeException $e) {
                 // noop
 
-                /* However, it means that the syn cis running in some way
+                /* However, it means that the sync is running in some way
                  */
                 $hasPerformUpdate = true;
             }
