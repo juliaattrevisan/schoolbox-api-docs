@@ -14,6 +14,7 @@ use Alaress_Date_Format;
 use PDOException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
+use Schoolbox\External\Connector\Example\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
@@ -37,61 +38,12 @@ class Profile implements IStrategy
 
 
     /**
-     * @var ValidStrats
-     */
-    private ValidStrats $validStrats;
-
-
-    /**
-     * @var LoggerInterface
-     */
-    private LoggerInterface $log;
-
-
-    /**
-     * The "perform" flag from the cli tool
-     *
-     * @var bool
-     */
-    private bool $perform;
-
-
-    /**
-     * @var UserProfile\Mapper
-     */
-    private UserProfile\Mapper $baseProfileMapper;
-
-
-    /**
-     * @var UserProfile\Student\Mapper
-     */
-    private UserProfile\Student\Mapper $studentProfileMapper;
-
-
-    /**
-     * @var UserProfile\Parent\Mapper
-     */
-    private UserProfile\Parent\Mapper $parentProfileMapper;
-
-
-    /**
-     * @var UserProfile\Staff\Mapper
-     */
-    private UserProfile\Staff\Mapper $staffProfileMapper;
-
-
-    /**
-     * @var UserProfile\Relationship\Mapper
-     */
-    private UserProfile\Relationship\Mapper $relationshipMapper;
-
-
-    /**
      * Profile constructor.
      *
      * @param ValidStrats                     $validStrats
      * @param LoggerInterface                 $log
      * @param bool                            $perform
+     * @param IApi                            $api
      * @param UserProfile\Mapper              $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
@@ -99,25 +51,16 @@ class Profile implements IStrategy
      * @param UserProfile\Relationship\Mapper $relationshipMapper
      */
     public function __construct(
-        ValidStrats $validStrats,
-        LoggerInterface $log,
-        bool $perform,
-        UserProfile\Mapper $baseProfileMapper,
-        UserProfile\Student\Mapper $studentProfileMapper,
-        UserProfile\Parent\Mapper $parentProfileMapper,
-        UserProfile\Staff\Mapper $staffProfileMapper,
-        UserProfile\Relationship\Mapper $relationshipMapper
+        private ValidStrats $validStrats,
+        private LoggerInterface $log,
+        private bool $perform,
+        private IApi $api,
+        private UserProfile\Mapper $baseProfileMapper,
+        private UserProfile\Student\Mapper $studentProfileMapper,
+        private UserProfile\Parent\Mapper $parentProfileMapper,
+        private UserProfile\Staff\Mapper $staffProfileMapper,
+        private UserProfile\Relationship\Mapper $relationshipMapper
     ) {
-        $this->validStrats = $validStrats;
-
-        $this->log = $log;
-        $this->perform = $perform;
-
-        $this->baseProfileMapper = $baseProfileMapper;
-        $this->studentProfileMapper = $studentProfileMapper;
-        $this->parentProfileMapper = $parentProfileMapper;
-        $this->staffProfileMapper = $staffProfileMapper;
-        $this->relationshipMapper = $relationshipMapper;
     }
 
 

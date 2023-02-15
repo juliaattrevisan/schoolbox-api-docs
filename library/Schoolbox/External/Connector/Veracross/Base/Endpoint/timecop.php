@@ -1,7 +1,5 @@
 <?php
 
-// Profiling, which revealed mega latency in Veracross
-//
 //require_once __DIR__ . '/../conf/core/require.php';
 //
 //$config = new \Schoolbox\Config\Loader();
@@ -10,69 +8,107 @@
 //$dsn = $config->get('schooldata_import_endpoint_key');
 //
 //use Schoolbox\External\Connector\Veracross\Base\Endpoint;
+//use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\EmergencyContact;
+//use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Health;
+//use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Household;
+//use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Language;
+//use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Relationship;
+//use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\ValueListConverter;
 //
-//$api = new Endpoint\Api($host, $dsn, 'students:list parents:list');
+//define('DEFAULT_TIMEOUT', 300);
+//$defaultTimeout = 300;
 //
-//$timecop = [];
-//$start = microtime(true);
-//
-///* Get ready to consume all the pages from the "students" endpoint,
-// * using the scope "students:list"
+///* JCVD this stuff
 // */
-//$studentPayloadGenerator = $api->retrieve('GET', 'students');
+//$timecop = new Endpoint\Timecop();
+//$timecop->regulate('start');
 //
-///* Rebuild lookups on each page (see TODO)
+//$api = new Endpoint\Api($host, $dsn, DEFAULT_TIMEOUT, $timecop);
+//
+///* Get ready to remember an indexed set of Value Lists for Students
 // */
-//$lookupConverter = (new Endpoint\ValueListConverter());
+//$studentLookupConverter = new ValueListConverter();
 //
-//$timecop[] = [$start, 'start'];
+///* Spawn a Generator of paginated payloads
+// */
+//$timecop->regulate('students endpoint: Setting up studentPage generator');
+//$studentPayloadGenerator = $api->retrieve('GET', 'students', Endpoint\Profile\Profile::SCOPE);
+//$timecop->regulate('students endpoint: studentPage generator ready');
+//
+///* Manufacture lookups, for performance
+// */
+//$lookupConverter = (new Endpoint\Lookup\ValueListConverter());
+//
+//$medicalLookup = (new Health($api))->generate();
+//$timecop->regulate('Prefetching medicals');
+//
+//$medicalLookup = (new Language($api))->generate();
+//$timecop->regulate('Prefetching languages');
+//
+//$householdLookup = (new Household($api))->generate();
+//$timecop->regulate('Prefetching households');
+//
+//$relationshipLookup = (new Relationship($api))->generate();
+//$timecop->regulate('Prefetching relationships');
+//
+//$emergencyContactsLookup = (new EmergencyContact($api))->generate();
+//$timecop->regulate('Prefetching emergency contacts');
+//
+//$contactInfoLookup = (new Endpoint\Lookup\ContactInfo($api))->generate();
+//$timecop->regulate('Prefetching contact info');
+//
+///* Crunch through the payload data
+// *
+// * Process 10 students
+// */
+//$i = 0;
+//$n = 10;
 //
 //foreach ($studentPayloadGenerator as $studentPage) {
-//    $timecop[] = [microtime(true), 'studentPage fetched'];
-//    $studentLookups = $lookupConverter->generate($studentPage['value_lists']);
+//    $timecop->regulate('studentPage fetched from endpoint');
+//    $timecop->regulate('Proceeding through pagination');
 //
+//    $timecop->regulate('    Start converting Value Lists');
+//    $studentLookups = $lookupConverter->generate($studentPage['value_lists']);
+//    $timecop->regulate('    Finished converting Value Lists');
+//
+//    $timecop->regulate('    Proceeding through each student record in the page');
 //    foreach ($studentPage['data'] as $student) {
-//        $parentPayloadGenerator = $api->retrieve('GET', 'parents', [
+//        $timecop->regulate('        $student fetched');
+//
+//        $timecop->regulate('        parents endpoint: Setting up parentPage generator for this houshold_id');
+//        $parentPayloadGenerator = $api->retrieve('GET', 'parents', Endpoint\Profile\Profile::SCOPE, [
 //            'household_id' => $student['household_id']
 //        ]);
+//        $timecop->regulate('        parents endpoint: parentPage generator ready');
 //
-//        $timecop[] = [microtime(true), 'about to retrieve from parentPage generator'];
 //        foreach ($parentPayloadGenerator as $parentPage) {
-//            $timecop[] = [microtime(true), 'parentPage fetched'];
+//            $timecop->regulate('            parentPage fetched from endpoint');
+//            $timecop->regulate('            Start converting Value Lists');
 //            $parentLookups = $lookupConverter->generate($parentPage['value_lists']);
+//            $timecop->regulate('            Finished converting Value Lists');
 //
+//            $timecop->regulate('            Proceeding through each parent record in the page');
 //            foreach ($parentPage['data'] as $parent) {
-////                new \Alaress_Probe(
-////                    $student ?? null,
-////                    $parent ?? null,
-////                    $studentLookups ?? null,
-////                    $parentLookups ?? null
-////                );
+//                // noop
 //            }
-//            $timecop[] = [microtime(true), 'parentPage traversed'];
+//            $timecop->regulate('            parentPage traversed');
 //        }
-//        $timecop[] = [microtime(true), 'studentPage traversed'];
+//        $timecop->regulate('        studentPage traversed');
+//
+//        /* We processed a guy!
+//         */
+//        $i++;
+//
+//        /* FIXME Forcibly exit after first page of 10 students
+//         */
+//        if ($i >= $n) {
+//            $timecop->regulate('end');
+//
+//            $timecop->generateTimeline();
+//            die();
+//        }
 //    }
 //}
-//
-//$end = microtime(true);
-//$timecop[] = [$end, 'end'];
-//
-//$previousTimestamp = null;
-//$diff = null;
-//
-//new \Alaress_Probe('id', 'event', 'diff from previous', 'time');
-//
-//foreach ($timecop as $i => $row) {
-//    if ($previousTimestamp) {
-//        $diff = $row[0] - $previousTimestamp;
-//    }
-//
-//    new \Alaress_Probe($i, $row[1], number_format($diff, 3), $row[0]);
-//
-//    $previousTimestamp = $row[0];
-//}
-//
-//new \Alaress_Probe('<strong>Total</strong>: ' . number_format(($end - $start), 3));
 //
 //die();

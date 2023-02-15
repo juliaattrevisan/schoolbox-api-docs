@@ -9,13 +9,17 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Example\Base\Endpoint\TimetableCalendar;
 
+use DebugBar\DebugBarException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\Connector\Example\Base\Endpoint\IApi;
+use Schoolbox\External\Connector\Example\Base\Endpoint\Factory;
 use Schoolbox\External\Event\Mapper;
+use Schoolbox\External\Event\Model;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
+use Schoolbox\Mapper\Exception;
 
 /**
  * Import all the classes for a student, saving them as sis_event records
@@ -37,62 +41,6 @@ class Classes implements IStrategy
 
 
     /**
-     * @var LoggerInterface
-     */
-    private LoggerInterface $log;
-
-
-    /**
-     * The "perform" flag from the cli tool
-     *
-     * @var bool
-     */
-    private bool $perform;
-
-
-    /**
-     * @var IApi
-     */
-    private IApi $api;
-
-
-    /**
-     * @var \Schoolbox\External\Event\Mapper
-     */
-    private \Schoolbox\External\Event\Mapper $eventMapper;
-
-
-    /**
-     * @var ClassEntryMapper
-     */
-    private ClassEntryMapper $classEntryMapper;
-
-
-    /**
-     * @var ClassInvolvementMapper
-     */
-    private ClassInvolvementMapper $classInvolvementMapper;
-
-
-    /**
-     * @var \DateTimeZone
-     */
-    private \DateTimeZone $timezone;
-
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    private \Alaress_Date_Format $fromDate;
-
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    private \Alaress_Date_Format $toDate;
-
-
-    /**
      * A list of classEntries that we saw previously
      *
      * @var array
@@ -109,12 +57,22 @@ class Classes implements IStrategy
 
 
     /**
+     * Special event query generator that saves partial rows
+     *
+     * @var EventHandler
+     */
+    private EventHandler $eventHandler;
+
+
+    /**
      * Constructor.
      *
      * @param LoggerInterface                            $log
      * @param bool                                       $perform
      * @param IApi                                       $api
+     * @param array                                      $watchlist
      * @param Mapper                                     $eventMapper
+     * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
      * @param ClassEntryMapper                           $classEntryMapper
      * @param ClassInvolvementMapper                     $classInvolvementMapper
      * @param \DateTimeZone                              $timezone
@@ -122,25 +80,22 @@ class Classes implements IStrategy
      * @param \Alaress_Date_Format                       $toDate
      */
     public function __construct(
-        LoggerInterface $log,
-        bool $perform,
-        IApi $api,
-        \Schoolbox\External\Event\Mapper $eventMapper,
-        ClassEntryMapper $classEntryMapper,
-        ClassInvolvementMapper $classInvolvementMapper,
-        \DateTimeZone $timezone,
-        \Alaress_Date_Format $fromDate,
-        \Alaress_Date_Format $toDate
+        private LoggerInterface $log,
+        private bool $perform,
+        private IApi $api,
+        private array $watchlist,
+        private \Schoolbox\External\Event\Mapper $eventMapper,
+        private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
+        private ClassEntryMapper $classEntryMapper,
+        private ClassInvolvementMapper $classInvolvementMapper,
+        private \DateTimeZone $timezone,
+        private \Alaress_Date_Format $fromDate,
+        private \Alaress_Date_Format $toDate
     ) {
-        $this->log = $log;
-        $this->perform = $perform;
-        $this->api = $api;
-        $this->eventMapper = $eventMapper;
-        $this->classEntryMapper = $classEntryMapper;
-        $this->classInvolvementMapper = $classInvolvementMapper;
-        $this->timezone = $timezone;
-        $this->fromDate = $fromDate;
-        $this->toDate = $toDate;
+        /* Event Chandler that saves a subset of event records' columns
+         * to minimise changes to the db, due to db ignoring the indexes
+         */
+        $this->eventHandler = new EventHandler($eventMapper, $log);
     }
 
 
@@ -192,17 +147,18 @@ class Classes implements IStrategy
      *
      * @param array $class
      * @return void
+     * @throws DebugBarException
+     * @throws Exception
      * @throws \InvalidArgumentException
      * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function processClass(array $class)
+    private function processClass(array $class): void
     {
-        foreach ($class['lessons']['data'] as $lesson) {
+        foreach ($class['lessons']['data'] as $classInstance) {
             /* Save sis_event record
              */
-            $event = $this->createEvent($class, $lesson, $startAt, $finishAt);
+            $event = $this->createEvent($class, $classInstance);
 
             /* Save sis_class record
              */
@@ -210,7 +166,7 @@ class Classes implements IStrategy
 
             /* Save the involvements
              */
-            $this->createInvolvements($class, $lesson, $event, $classEntry);
+            $this->createInvolvements($class, $classInstance, $event, $classEntry);
         }
     }
 
@@ -218,22 +174,20 @@ class Classes implements IStrategy
     /**
      * Create a new SUDS Timetable Event with all the class and lesson pieces
      *
-     * @param array                $class
-     * @param array                $lesson
-     * @param \Alaress_Date_Format $startAt
-     * @param \Alaress_Date_Format $finishAt
-     * @return \Schoolbox\External\Event\Model
+     * @param array $class
+     * @param array $classInstance
+     * @return Model
+     * @throws DebugBarException
+     * @throws \InvalidArgumentException
      * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws Exception
      * @throws \UnexpectedValueException
      */
     private function createEvent(
         array $class,
-        array $lesson,
-        \Alaress_Date_Format $startAt,
-        \Alaress_Date_Format $finishAt
+        array $classInstance
     ): \Schoolbox\External\Event\Model {
-        /* Fill in these vars as usual
+        /* TODO Fill in these vars as usual
          */
         $classCode = null;
         $day = null;
@@ -251,13 +205,55 @@ class Classes implements IStrategy
 
         /* Decide where this class happens
          */
-        if (is_array($lesson['room'])) {
-            $room = "{$lesson['room']['data']['name']} ({$lesson['room']['data']['code']}";
+        if (is_array($classInstance['room'])) {
+            $room = "{$classInstance['room']['data']['name']} ({$classInstance['room']['data']['code']}";
+        }
+
+        /* Don't forget to check if your data is timezone-sensitive
+         * Alaress_Date_Format has some consts which you could use
+         */
+        $startAt = (new \Alaress_Date_Format(
+            $classInstance['start'],
+            \Alaress_Date_Format::FORMAT_DATETIME_UTC_NO_MLS,
+            new \DateTimeZone('UTC')
+        ))->setTimezone($this->timezone);
+
+        $finishAt = (new \Alaress_Date_Format(
+            $classInstance['end'],
+            \Alaress_Date_Format::FORMAT_DATETIME_UTC_NO_MLS,
+            new \DateTimeZone('UTC')
+        ))->setTimezone($this->timezone);
+
+        /* Try to recycle based on guid
+         */
+        try {
+            $oldEvent = $this->eventMapper->findOneByColumn('guid', $guid);
+
+            $logPrefix = 'Reusing existing';
+
+            $this->log->debug(sprintf(
+                'Found previously existing sis_event instance for guid %s',
+                $guid
+            ));
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            /* Initialise props before trying to access them to avoid fatals like
+             * "$startAt must not be accessed before initialization"
+             */
+            $oldEvent = $this->eventMapper->createModel()
+                ->setStartAt(null)
+                ->setFinishAt(null);
+
+            $logPrefix = 'Creating new';
         }
 
         /* Cram in everything else
+         *
+         * Calculate a diff to see if anything changed before saving it
+         * to minimise transaction size
          */
-        $event = $this->eventMapper->createModel()
+        $event = clone $oldEvent;
+
+        $event
             ->setTitle($title)
             ->setDetail($detail)
             ->setLocation($room)
@@ -267,14 +263,15 @@ class Classes implements IStrategy
             ->setStartAt($startAt)
             ->setFinishAt($finishAt)
             ->setType($type)
-            ->setClassification(\Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE)
+            ->setClassification(Model::CLASSIFICATION_TIMETABLE)
             ->setGuid($guid)
-            ->setSource(Prepare::EVENT_IMPORT_IDENTIFIER);
+            ->setSource(Factory::SOURCE_NAME);
 
         /* Save it and remember what we saw in case we need to reuse this later
          */
         $this->log->debug(sprintf(
-            'Creating new timetable event %s - %s, %s, %s-%s',
+            '%s timetable event %s - %s, %s, %s-%s',
+            $logPrefix,
             $event->getTitle(),
             $event->getDay(),
             $event->getPeriod(),
@@ -282,8 +279,10 @@ class Classes implements IStrategy
             $event->getFinishAt()->getDatabase()
         ));
 
+        /* Only persist if it's different than before
+         */
         if ($this->perform) {
-            $this->eventMapper->save($event);
+            $this->eventHandler->save($event, $oldEvent);
         }
 
         return $event;
@@ -379,11 +378,67 @@ class Classes implements IStrategy
                     $student['surname']
                 );
 
-                $this->saveInvolvement($event, $classEntry, $name, $externalId);
+                $this->saveEnrolment($event, $classEntry, $name, $externalId);
             }
         }
     }
 
+
+    /**
+     * Save staff involvement as an override, which allows each class
+     * to have different teachers depending on their associated sis_event
+     *
+     * @param \Schoolbox\External\Event\Model $event
+     * @param ClassEntry                      $classEntry
+     * @param string                          $name
+     * @param string                          $externalId
+     * @return void
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    private function saveInvolvement(
+        \Schoolbox\External\Event\Model $event,
+        ClassEntry $classEntry,
+        string $name,
+        string $externalId
+    ): void {
+        $this->saveEnrolment($event, $classEntry, $name, $externalId);
+
+        /* We use the Overrides system to specify a particular person's involvement
+         * in a particular sis_event instance, rather than being associated with all
+         */
+        $this->log->debug(sprintf(
+            'Creating new class involvement for %s in timetable event %s - %s, %s, %s-%s',
+            $externalId,
+            $event->getTitle(),
+            $event->getDay(),
+            $event->getPeriod(),
+            $event->getStartAt()->getDatabase(),
+            $event->getFinishAt()->getDatabase()
+        ));
+
+        /* For specific teaching, execute CLEAR_STAFF to disregard the usual guy
+         * and add the guy teaching this particular instance (even though they
+         * might end up being the same person sometimes)
+         */
+        $clearOverride = $this->overridesMapper->createModel()
+            ->setEventId($event->getId())
+            ->setExternalId(null)
+            ->setAction(\Schoolbox\External\Event\Overrides\Model::CLEAR_STAFF)
+            ->setSequence(1);
+
+        $involvementOverride = $this->overridesMapper->createModel()
+            ->setEventId($event->getId())
+            ->setExternalId($coveringTeacher['externalId'])
+            ->setAction(\Schoolbox\External\Event\Overrides\Model::ADD)
+            ->setSequence(2);
+
+        if ($this->perform) {
+            $this->overridesMapper->save($clearOverride);
+            $this->overridesMapper->save($involvementOverride);
+        }
+    }
 
     /**
      * Save an involvement for user $externalId, whose name is $name,
@@ -398,7 +453,7 @@ class Classes implements IStrategy
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function saveInvolvement(
+    private function saveEnrolment(
         \Schoolbox\External\Event\Model $event,
         ClassEntry $classEntry,
         string $name,

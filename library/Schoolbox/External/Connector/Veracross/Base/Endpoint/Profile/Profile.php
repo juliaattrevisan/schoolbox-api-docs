@@ -25,6 +25,7 @@ use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Relationship;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\ValueListConverter;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
+use Schoolbox\External\Profile\Mapper;
 use Schoolbox\External\Profile\Model;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
@@ -41,7 +42,7 @@ class Profile implements IStrategy
 {
     /**
      * The access token's scope, used throughout this strat
-     * (perhaps) could work on subdividing or unifying this further)
+     * (perhaps could work on subdividing or unifying this further)
      *
      * Required scopes:
      *
@@ -67,59 +68,11 @@ class Profile implements IStrategy
 
 
     /**
-     * @var ValidStrats
-     */
-    private ValidStrats $validStrats;
-
-
-    /**
-     * @var LoggerInterface
-     */
-    private LoggerInterface $log;
-
-
-    /**
-     * The "perform" flag from the cli tool
+     * Special event query generator that saves partial rows
      *
-     * @var bool
+     * @var ProfileHandler
      */
-    private bool $perform;
-
-
-    /**
-     * @var IApi
-     */
-    private IApi $api;
-
-
-    /**
-     * @var UserProfile\Mapper
-     */
-    private UserProfile\Mapper $baseProfileMapper;
-
-
-    /**
-     * @var UserProfile\Student\Mapper
-     */
-    private UserProfile\Student\Mapper $studentProfileMapper;
-
-
-    /**
-     * @var UserProfile\Parent\Mapper
-     */
-    private UserProfile\Parent\Mapper $parentProfileMapper;
-
-
-    /**
-     * @var UserProfile\Staff\Mapper
-     */
-    private UserProfile\Staff\Mapper $staffProfileMapper;
-
-
-    /**
-     * @var UserProfile\Relationship\Mapper
-     */
-    private UserProfile\Relationship\Mapper $relationshipMapper;
+    private ProfileHandler $profileHandler;
 
 
     /**
@@ -138,32 +91,33 @@ class Profile implements IStrategy
      * @param LoggerInterface                 $log
      * @param bool                            $perform
      * @param IApi                            $api
-     * @param UserProfile\Mapper              $baseProfileMapper
+     * @param Mapper                          $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
      * @param UserProfile\Staff\Mapper        $staffProfileMapper
      * @param UserProfile\Relationship\Mapper $relationshipMapper
      */
     public function __construct(
-        ValidStrats $validStrats,
-        LoggerInterface $log,
-        bool $perform,
-        IApi $api,
-        UserProfile\Mapper $baseProfileMapper,
-        UserProfile\Student\Mapper $studentProfileMapper,
-        UserProfile\Parent\Mapper $parentProfileMapper,
-        UserProfile\Staff\Mapper $staffProfileMapper,
-        UserProfile\Relationship\Mapper $relationshipMapper
+        private ValidStrats $validStrats,
+        private LoggerInterface $log,
+        private bool $perform,
+        private IApi $api,
+        private UserProfile\Mapper $baseProfileMapper,
+        private UserProfile\Student\Mapper $studentProfileMapper,
+        private UserProfile\Parent\Mapper $parentProfileMapper,
+        private UserProfile\Staff\Mapper $staffProfileMapper,
+        private UserProfile\Relationship\Mapper $relationshipMapper
     ) {
-        $this->validStrats = $validStrats;
-        $this->log = $log;
-        $this->perform = $perform;
-        $this->api = $api;
-        $this->baseProfileMapper = $baseProfileMapper;
-        $this->studentProfileMapper = $studentProfileMapper;
-        $this->parentProfileMapper = $parentProfileMapper;
-        $this->staffProfileMapper = $staffProfileMapper;
-        $this->relationshipMapper = $relationshipMapper;
+        /* Profile Chandler that saves a subset of profile records' columns
+         * to minimise changes to the db, due to db ignoring the indexes
+         */
+        $this->profileHandler = new ProfileHandler(
+            $this->baseProfileMapper,
+            $this->studentProfileMapper,
+            $this->parentProfileMapper,
+            $this->staffProfileMapper,
+            $this->log
+        );
 
         /* Shared lookups
          */
@@ -316,7 +270,14 @@ class Profile implements IStrategy
                  */
                 $legal = '';
 
-                $medical = $medicalLookup[$student['id']] ? 'This student has medical conditions.' : null;
+                /* This student might not have any meaningful medical records
+                 */
+                $medical = null;
+
+                if (isset($medicalLookup[$student['id']])) {
+                    $medical = 'This student has medical conditions.';
+                }
+
                 $messages = '';
 
                 /* From Thad, 7/2/23:
@@ -374,19 +335,23 @@ class Profile implements IStrategy
                  * profile before making a whole new one (this is how you end up with fk issues)
                  */
                 try {
-                    $studentProfile = $this->studentProfileMapper->findByExternalId($externalId);
-                    $studentBaseProfile = $studentProfile->getBaseProfile();
+                    $oldStudentProfile = $this->studentProfileMapper->findByExternalId($externalId);
+                    $oldStudentBaseProfile = $oldStudentProfile->getBaseProfile();
                 } catch (Exception $e) {
-                    $studentProfile = $this->studentProfileMapper->createModel();
+                    $oldStudentProfile = $this->studentProfileMapper->createModel();
 
                     try {
-                        $studentBaseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $externalId);
+                        $oldStudentBaseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $externalId);
                     } catch (Exception $e) {
-                        $studentBaseProfile = $this->baseProfileMapper->createModel();
+                        $oldStudentBaseProfile = $this->baseProfileMapper->createModel();
                     }
 
-                    $studentProfile->setBaseProfile($studentBaseProfile);
+                    $oldStudentProfile->setBaseProfile($oldStudentBaseProfile);
                 }
+
+                $studentBaseProfile = clone $oldStudentBaseProfile;
+                $studentProfile = clone $oldStudentProfile;
+                $studentProfile->setBaseProfile($studentBaseProfile);
 
                 $studentBaseProfile
                     ->setExternalId($externalId)
@@ -398,7 +363,7 @@ class Profile implements IStrategy
                 /* Then save it
                  */
                 if ($this->perform) {
-                    $this->baseProfileMapper->save($studentBaseProfile);
+                    $this->profileHandler->saveBaseProfile($studentBaseProfile, $oldStudentBaseProfile);
                 }
 
                 /* Smoosh it all together
@@ -531,7 +496,7 @@ class Profile implements IStrategy
                 /* Then save it
                  */
                 if ($this->perform) {
-                    $this->studentProfileMapper->save($studentProfile);
+                    $this->profileHandler->saveStudentProfile($studentProfile, $oldStudentProfile);
                 }
 
                 /* Add their parents' profile data
@@ -555,11 +520,14 @@ class Profile implements IStrategy
      *
      * @param string|null $date
      * @return Alaress_Date_Format|null
+     * @throws \InvalidArgumentException
      */
     public function findDate(?string $date): ?Alaress_Date_Format
     {
+        /* These don't have any timezone data, specifically
+         */
         if ($date) {
-            return Alaress_Date_Format::newFromTimestamp(strtotime($date));
+            return (new \Alaress_Date_Format($date, \Alaress_Date_Format::DATABASE_DATE_FORMAT));
         }
 
         return null;
@@ -624,19 +592,23 @@ class Profile implements IStrategy
              * profile before making a whole new one (this is how you end up with fk issues)
              */
             try {
-                $parentProfile = $this->parentProfileMapper->findByExternalId($externalId);
-                $parentBaseProfile = $parentProfile->getBaseProfile();
+                $oldParentProfile = $this->parentProfileMapper->findByExternalId($externalId);
+                $oldParentBaseProfile = $oldParentProfile->getBaseProfile();
             } catch (Exception $e) {
-                $parentProfile = $this->parentProfileMapper->createModel();
+                $oldParentProfile = $this->parentProfileMapper->createModel();
 
                 try {
-                    $parentBaseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $externalId);
+                    $oldParentBaseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $externalId);
                 } catch (Exception $e) {
-                    $parentBaseProfile = $this->baseProfileMapper->createModel();
+                    $oldParentBaseProfile = $this->baseProfileMapper->createModel();
                 }
 
-                $parentProfile->setBaseProfile($parentBaseProfile);
+                $oldParentProfile->setBaseProfile($oldParentBaseProfile);
             }
+
+            $parentBaseProfile = clone $oldParentBaseProfile;
+            $parentProfile = clone $oldParentProfile;
+            $parentProfile->setBaseProfile($parentBaseProfile);
 
             $parentBaseProfile
                 ->setExternalId($externalId)
@@ -648,7 +620,7 @@ class Profile implements IStrategy
             /* Then save it
              */
             if ($this->perform) {
-                $this->baseProfileMapper->save($parentBaseProfile);
+                $this->profileHandler->saveBaseProfile($parentBaseProfile, $oldParentBaseProfile);
             }
 
             $parentProfile
@@ -669,7 +641,7 @@ class Profile implements IStrategy
             /* Then save it
              */
             if ($this->perform) {
-                $this->parentProfileMapper->save($parentProfile);
+                $this->profileHandler->saveParentProfile($parentProfile, $oldParentProfile);
             }
 
             /* Manufacture relations
@@ -742,19 +714,23 @@ class Profile implements IStrategy
                  * Otherwise make a new one for the given id
                  */
                 try {
-                    $staffProfile     = $this->staffProfileMapper->findByExternalId($externalId);
-                    $staffBaseProfile = $staffProfile->getBaseProfile();
+                    $oldStaffProfile = $this->staffProfileMapper->findByExternalId($externalId);
+                    $oldStaffBaseProfile = $oldStaffProfile->getBaseProfile();
                 } catch (Exception $e) {
-                    $staffProfile = $this->staffProfileMapper->createModel();
+                    $oldStaffProfile = $this->staffProfileMapper->createModel();
 
                     try {
-                        $staffBaseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $externalId);
+                        $oldStaffBaseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $externalId);
                     } catch (Exception $e) {
-                        $staffBaseProfile = $this->baseProfileMapper->createModel();
+                        $oldStaffBaseProfile = $this->baseProfileMapper->createModel();
                     }
 
-                    $staffProfile->setBaseProfile($staffBaseProfile);
+                    $oldStaffProfile->setBaseProfile($oldStaffBaseProfile);
                 }
+
+                $staffBaseProfile = clone $oldStaffBaseProfile;
+                $staffProfile = clone $oldStaffProfile;
+                $staffProfile->setBaseProfile($staffBaseProfile);
 
                 $staffBaseProfile
                     ->setExternalId($externalId)
@@ -766,7 +742,7 @@ class Profile implements IStrategy
                 /* Then save it
                  */
                 if ($this->perform) {
-                    $this->baseProfileMapper->save($staffBaseProfile);
+                    $this->profileHandler->saveBaseProfile($staffBaseProfile, $oldStaffBaseProfile);
                 }
 
                 $staffProfile
@@ -791,7 +767,7 @@ class Profile implements IStrategy
                 /* Then save it
                  */
                 if ($this->perform) {
-                    $this->staffProfileMapper->save($staffProfile);
+                    $this->profileHandler->saveStaffProfile($staffProfile, $oldStaffProfile);
                 }
             }
         }
