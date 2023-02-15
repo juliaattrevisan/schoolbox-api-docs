@@ -12,6 +12,7 @@ use Alaress\Web\Controller\Base;
 
 class Controller extends Base
 {
+
     /**
      * @var \Schoolbox\Error\Mapper
      */
@@ -31,23 +32,11 @@ class Controller extends Base
      * Load $templateName
      *
      * @param string $templateName
+     * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function getGreenhouse($templateName)
     {
-        $builder = new \Schoolbox\Curriculum\WACurriculum\Builder();
-        $content = $builder->generate();
-
-        $headers = $this->getResponse()->headers;
-        $headers->set('Pragma', ' ');
-        $headers->set('Cache-Control', ' ');
-        $headers->set('Content-Type', 'text/csv');
-        $headers->set('Content-Length', \strlen($content));
-        $headers->set('Content-Disposition', "attachment; filename=\"WACurriculum.csv\"");
-
-        $this->getResponse()->content->set([
-            'format' => 'file',
-            'data'   => $content
-        ]);
+        $this->getResponse()->content->set($this->buildHtmlOutput('@greenhouse/' . $templateName . '.twig', []));
     }
 }
