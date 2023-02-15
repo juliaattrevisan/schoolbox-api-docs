@@ -64,7 +64,6 @@ $limits           = [
     3 => Monolog\Logger::DEBUG,    // max verbosity: EV-ER-Y-THING...
 ];
 
-echo sprintf("\nImage Count Limit: %s, Worker Count: %s\n", $imageCountLimit, $workerCount);
 // TODO inject lock inspector instead of cache
 /** @var ClientInterface $redis */
 $redis  = $kernel->get('redis.cache');
