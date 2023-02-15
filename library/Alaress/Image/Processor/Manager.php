@@ -236,6 +236,7 @@ class Manager
         $this->logger->debug("acquire Lock");
         $this->lock->acquire();
         $this->processTransformations($transformations);
+        $this->logger->debug("Clear Lock....");
         $this->lock->release();
         return $this->isInterrupted;
     }
@@ -322,10 +323,11 @@ class Manager
     {
         $this->logger->debug("renew Lock and timeout");
         // TODO, this should be $lock->refresh(), but that's throwing an exception for some reason?
-//        $this->lock->refresh();
         try {
-            $this->lock->release();
-        } catch (LockReleasingException $e) {
+            $this->logger->debug("Current PID: {pid}, lets see if we are having threading issues...", ['pid' => posix_getpid()]);
+            $this->lock->refresh();
+//            $this->lock->release();
+        } catch (LockReleasingException | LockConflictedException | LockAcquiringException $e) {
             // noop its all threaded.... that could be the issue...
             $this->logger->debug("Unable to release image lock, ignoring...");
         }
@@ -365,7 +367,7 @@ class Manager
     {
         $instanceLockFactory = new InstanceLockFactory(new LockFactory(new RedisStore($this->redis)), INSTANCE_ID);
         $timeout             = self::IMAGICK_TIME_LIMIT;
-        $lock                = $instanceLockFactory->createLock(self::LOCK_NAME, $timeout);
+        $lock                = $instanceLockFactory->createLock(self::LOCK_NAME, $timeout, false);
         $lock->setLogger($this->logger);
 
         try {
