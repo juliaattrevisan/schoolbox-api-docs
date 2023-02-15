@@ -67,7 +67,6 @@ class Logger implements LoggerInterface
      */
     public function __construct($outStream = STDOUT, $errStream = null, $threshold = Monologger::INFO, $fields = array(), $porcelain = false)
     {
-
         $this->out = $outStream;
         $this->err = $errStream;
         $this->porcelain = $porcelain;
@@ -102,7 +101,7 @@ class Logger implements LoggerInterface
         // attach STDOUT
         if (is_resource($this->out)) {
             $handler = new StreamHandler($this->out, $level);
-            $handler->setFormatter(new TtyFormatter($this->out, $this->porcelain, true));
+            $handler->setFormatter(new TtyFormatter($this->out, $this->porcelain));
             $this->pushHandler($handler);
         }
 

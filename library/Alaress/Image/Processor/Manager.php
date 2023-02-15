@@ -361,7 +361,6 @@ class Manager
         $instanceLockFactory = new InstanceLockFactory(new LockFactory(new RedisStore($this->redis)), INSTANCE_ID);
         $timeout             = self::IMAGICK_TIME_LIMIT;
         $lock                = $instanceLockFactory->createLock(self::LOCK_NAME, $timeout, false);
-        $lock->setLogger($this->logger);
 
         try {
             $acquired = $lock->acquire();
