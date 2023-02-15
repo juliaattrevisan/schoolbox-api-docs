@@ -1,5 +1,5 @@
 id,curriculum_node_parent_id,name,code,order,description
-1,NULL,"Western Australia Curriculum",,0,
+1,,"Western Australia Curriculum",,0,
 2,1,English,,0,
 3,2,"ABLEWA Stage A",,0,
 4,3,Language,,0,
