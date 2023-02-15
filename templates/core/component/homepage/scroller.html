@@ -172,9 +172,13 @@
                             $(file.previewElement)
                                     .closest('[data-dz-container]')
                                     .find('.dz-preview').remove();
+                        },
+                        success: function (file, response) {
+                            // Set a localStoerage item to check when the component is reloaded
+                            localStorage.setItem("refreshComponent{COMPONENT_INSTANCE_ID}", "true");
                         }
                     });
-                </script>
+                    </script>
                 <!-- END submit_image_scroller -->
 
                 <!-- END source_folder_exists -->
@@ -183,4 +187,11 @@
 
         </div>
     </div>
+    <script>
+        // This checks when the component reloaded so the component can still move moved on the page
+        if (localStorage.getItem("refreshComponent{COMPONENT_INSTANCE_ID}") === "true") {
+            localStorage.removeItem("refreshComponent{COMPONENT_INSTANCE_ID}");
+            document.dispatchEvent(new CustomEvent("UPDATE_HOMEPAGE__COMPONENT_UPDATED", { detail: { component: document.getElementById("component{COMPONENT_INSTANCE_ID}") } }))
+        }
+    </script>
 </div>
