@@ -48,11 +48,9 @@ class Counter
                     :courseDiscriminator AS discriminator,
                     COUNT(*) AS count
                 FROM curriculum_node_for_category cnfc
-                INNER JOIN folder f ON cnfc.category_id = f.id
-                INNER JOIN course_specification cs ON f.id = cs.folder_id
-                WHERE f.deleted_at IS NULL
-                AND cs.deleted_at IS NULL
-                AND cnfc.curriculum_node_id IN "
+                INNER JOIN folder f ON cnfc.category_id = f.id AND f.deleted_at IS NULL
+                INNER JOIN course_specification cs ON f.id = cs.folder_id AND cs.deleted_at IS NULL
+                WHERE cnfc.curriculum_node_id IN "
                 . Builder::getArrayPlaceholders($ids, Cursor::DISCRIMINATOR_COURSE)
                 . " GROUP BY id, discriminator",
             "
@@ -61,11 +59,9 @@ class Counter
                     :unitDiscriminator AS discriminator,
                     COUNT(*) AS count
                 FROM curriculum_node_for_category cnfc
-                INNER JOIN folder f ON cnfc.category_id = f.id
-                INNER JOIN course_unit_specification cus ON f.id = cus.folder_id
-                WHERE f.deleted_at IS NULL
-                AND cus.deleted_at IS NULL
-                AND cnfc.curriculum_node_id IN "
+                INNER JOIN folder f ON cnfc.category_id = f.id AND f.deleted_at IS NULL
+                INNER JOIN course_unit_specification cus ON f.id = cus.folder_id AND cus.deleted_at IS NULL
+                WHERE cnfc.curriculum_node_id IN "
                 . Builder::getArrayPlaceholders($ids, Cursor::DISCRIMINATOR_UNIT)
                 . " GROUP BY id, discriminator",
             "
@@ -87,11 +83,10 @@ class Counter
                     :folderDiscriminator AS discriminator,
                     COUNT(*) AS count
                 FROM curriculum_node_for_category cnfc
-                INNER JOIN folder f ON cnfc.category_id = f.id
-                LEFT JOIN course_specification cs ON f.id = cs.folder_id
-                LEFT JOIN course_unit_specification cus ON f.id = cus.folder_id
-                WHERE f.deleted_at IS NULL
-                AND cs.id IS NULL
+                INNER JOIN folder f ON cnfc.category_id = f.id AND f.deleted_at IS NULL
+                LEFT JOIN course_specification cs ON f.id = cs.folder_id AND cs.deleted_at IS NULL
+                LEFT JOIN course_unit_specification cus ON f.id = cus.folder_id AND cus.deleted_at IS NULL
+                WHERE cs.id IS NULL
                 AND cus.id IS NULL
                 AND cnfc.curriculum_node_id IN "
                 . Builder::getArrayPlaceholders($ids, Cursor::DISCRIMINATOR_FOLDER)
