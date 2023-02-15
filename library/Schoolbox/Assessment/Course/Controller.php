@@ -214,7 +214,7 @@ class Controller extends Base\Base
         }
 
         // Are children courses / units?
-        $children = $this->folderMapper->findAllChildren($courseFolder->getId(), true);
+        $children = $this->folderMapper->findAllChildren($courseFolder->getId());
         foreach ($children as $childFolder) {
             // Does the proposed Unit Folder already have a Course ?
             $childFolderCourse = $childFolder->getCourseSpecification();
