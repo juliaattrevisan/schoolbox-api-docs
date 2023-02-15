@@ -10,32 +10,27 @@ namespace Schoolbox\Greenhouse;
 
 use Alaress\Web\Controller\Base;
 
+/**
+ * The Greenhouse lets you experiment with twig templates and contents without
+ * needing a backend dev to do it for you. You can also experiment with other
+ * front-end stuff in an isolated manner
+ */
 class Controller extends Base
 {
-
-    /**
-     * @var \Schoolbox\Error\Mapper
-     */
-    private $errorMapper;
-
     /**
      * Controller constructor.
-     *
-     * @param \Schoolbox\Error\Mapper $errorMapper
      */
-    public function __construct(\Schoolbox\Error\Mapper $errorMapper)
+    public function __construct()
     {
-        $this->errorMapper = $errorMapper;
     }
+
 
     /**
      * Load $templateName
      *
      * @param string $templateName
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
-    public function getGreenhouse($templateName)
+    public function getGreenhouse(string $templateName): void
     {
         $this->getResponse()->content->set($this->buildHtmlOutput('@greenhouse/' . $templateName . '.twig', []));
     }
