@@ -680,17 +680,17 @@ export default {
                                                     evidence.object.tags.length > 0
                                                 "
                                             >
-                                                Tags:
                                                 <codes-list
                                                     :nodes="evidence.object.curriculumNodes"
                                                     @selected="onCodeSelected"
-                                                /><template
+                                                />
+                                                <br
                                                     v-if="
-                                                        evidence.object.curriculumNodes.length > 0 &&
-                                                        evidence.object.tags.length > 0
+                                                        evidence.object.tags.length > 0 &&
+                                                        evidence.object.curriculumNodes.length > 0
                                                     "
-                                                    >,
-                                                </template>
+                                                />
+                                                <span v-if="evidence.object.tags.length > 0">Tags:</span>
                                                 <template
                                                     v-for="(tag, index) in evidence.object.tags"
                                                     :key="`${index}-${tag.name}`"
