@@ -252,14 +252,16 @@ class Cursor implements ICursor
         // There's a possible issue in that `badge_user.badge_id` is not unique
         $params['limit'] = $this->limit;
 
-        return new Collection(
-            $this->database->executeQuery($query, $params)->fetchAll()
-        );
+        return new Collection($this->database->executeQuery($query, $params)->fetchAll());
     }
 
     /**
      * Returns query to get evidence.
-     * @param bool  $countOnly
+     *
+     * Notes:
+     *  * $this->filter['tag'] is used to restrict the rows returned by the query to those linked to a matching tag.
+     *
+     * @param bool $countOnly - If true, return a query that fetches the number of rows that would have been returned had $countOnly been false.
      * @return array containing query and associated params.
      */
     private function getEvidenceQueryAndParams(bool $countOnly): array
@@ -290,14 +292,19 @@ class Cursor implements ICursor
         $sqlWhereCondition = 'TRUE';
 
         if (trim($this->filter['tag']) !== '') {
-            $sqlWhereCondition = 'luet.name = :tagEvidence';
+            $sqlWhereCondition = (
+                'EXISTS(
+                     SELECT *
+                     FROM evidence_tag    AS et
+                     JOIN lu_evidence_tag AS luet ON luet.id = et.tag_id
+                     WHERE luet.name = :tagEvidence
+                 )'
+            );
             $params['tagEvidence'] = $this->filter['tag'];
         }
 
         $query .= (
-            "FROM evidence             AS e
-             LEFT JOIN evidence_tag    AS et   ON et.evidence_id=e.id
-             LEFT JOIN lu_evidence_tag AS luet ON luet.id=et.tag_id
+            "FROM evidence AS e
              WHERE e.user_id = :userIdEvidence
              AND e.deleted_at IS NULL
              AND $sqlWhereCondition"
