@@ -18,6 +18,9 @@ use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Resource\Storage\Model as StorageModel;
 
+/**
+ * @method Model findById($identifierValue)
+ */
 class Mapper extends BaseMapper
 {
     public function mapping()
@@ -79,7 +82,8 @@ class Mapper extends BaseMapper
             SELECT
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('backgroundImage', 'bi')},
-                {$this->getJoinColumnString('backgroundImage.allowedFileExtension', 'bim')}
+                {$this->getJoinColumnString('backgroundImage.allowedFileExtension', 'bim')},
+                {$this->getJoinColumnString('tile_container', 'tc')}
         ";
     }
 
@@ -96,6 +100,7 @@ class Mapper extends BaseMapper
             FROM $table
             LEFT JOIN {$this->getJoinSql('backgroundImage', '', 'bi', true)}
             LEFT JOIN {$this->getJoinSql('backgroundImage.allowedFileExtension', 'bi', 'bim', true)}
+            INNER JOIN {$this->getJoinSql('tile_container', '', 'tc', true)}
         ";
     }
 
@@ -114,10 +119,14 @@ class Mapper extends BaseMapper
             /** @var Model $item */
             $item = $this->hydrate($r);
 
-            /** @var StorageModel $backgroundImage */
+            /** @var Layout\Model $layout */
+            $layout = $this->hydrateJoin($r, 'tile_container', 'tc');
+            $item->setTileLayout($layout);
+
+            /** @var StorageModel|null $backgroundImage */
             $backgroundImage = $this->hydrateJoin($r, 'backgroundImage', 'bi');
             if ($backgroundImage) {
-                /** @var Mimetype $mimeType */
+                /** @var Mimetype|null $mimeType */
                 $mimeType = $this->hydrateJoin($r, 'backgroundImage.allowedFileExtension', 'bim');
                 if ($mimeType) {
                     $backgroundImage->setMimetype($mimeType);
