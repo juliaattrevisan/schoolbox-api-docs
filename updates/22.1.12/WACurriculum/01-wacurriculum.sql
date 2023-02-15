@@ -1,6 +1,6 @@
 -- embiggen the maximum curric nname size for now
 -- something is busted with their data
-ALTER TABLE `schoolbox`.`curriculum_node`
+ALTER TABLE `curriculum_node`
     CHANGE COLUMN `name` `name` VARCHAR(8192) NULL DEFAULT NULL;
 
 -- Add curric package option
