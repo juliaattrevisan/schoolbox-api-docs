@@ -68,7 +68,8 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
                     'timing'
                 ) * 1000 : '2000',
                 'COMPONENT_CONFIG_RANDOM_STARTING_SLIDE' => $this->getConfig('randomStartingSlide'),
-                'COMPONENT_CONFIG_IMAGE_RATIO'          => $this->getConfig('imageRatio') ? $this->getConfig('imageRatio') : 'square' ,
+                'COMPONENT_CONFIG_IMAGE_RATIO'          => $this->getConfig('imageRatio') ? $this->getConfig('imageRatio') : 'square',
+                'COMPONENT_CONFIG_SLIDESHOWTRANSITION'  => $this->getConfig('transition') ? $this->getConfig('transition') : 'swipe',
             )
         );
 
