@@ -93,7 +93,7 @@
 }
 
 .icon-archive:before {
-    content: "\e903";
+    content: "\e902";
     font-family: $font-family-icon;
 }
 
@@ -108,7 +108,7 @@
 }
 
 .icon-badge:before {
-    content: "\e91e";
+    content: "\e91d";
     font-family: $font-family-icon;
 }
 
@@ -123,7 +123,7 @@
 }
 
 .icon-canvas-lms:before {
-    content: "\e918";
+    content: "\e917";
     font-family: $font-family-icon;
 }
 
@@ -244,7 +244,7 @@
 }
 
 .icon-division:before {
-    content: "\e905";
+    content: "\e904";
     font-family: $font-family-icon;
 }
 
@@ -254,7 +254,7 @@
 }
 
 .icon-dollar:before {
-    content: "\e91c";
+    content: "\e91b";
     font-family: $font-family-icon;
 }
 
@@ -291,8 +291,8 @@
     font-family: $font-family-icon;
 }
 
-.icon-education-mainentance:before {
-    content: "\e90f";
+.icon-education-maintenance:before {
+    content: "\e90e";
     font-family: $font-family-icon;
 }
 
@@ -303,7 +303,7 @@
 }
 
 .icon-eng-second-lang:before {
-    content: "\e910";
+    content: "\e90f";
     font-family: $font-family-icon;
 }
 
@@ -323,7 +323,7 @@
 }
 
 .icon-external-link:before {
-    content: "\e922";
+    content: "\e921";
     font-family: $font-family-icon;
 }
 
@@ -343,7 +343,7 @@
 }
 
 .icon-favourite-hollow:before {
-    content: "\e913";
+    content: "\e912";
     font-family: $font-family-icon;
 }
 
@@ -373,12 +373,12 @@
 }
 
 .icon-geosnapshot:before {
-    content: "\e91f";
+    content: "\e91e";
     font-family: $font-family-icon;
 }
 
 .icon-goal:before {
-    content: "\e91a";
+    content: "\e919";
     font-family: $font-family-icon;
 }
 
@@ -407,6 +407,12 @@
 .icon-help:before,
 .icon-questionmark:before {
     content: "\e632";
+    font-family: $font-family-icon;
+}
+
+.icon-hidden:before,
+.icon-review-hollow:before {
+    content: "\e925";
     font-family: $font-family-icon;
 }
 
@@ -448,17 +454,17 @@
 }
 
 .icon-international-baccalaureate:before {
-    content: "\e915";
+    content: "\e914";
     font-family: $font-family-icon;
 }
 
 .icon-integration-student:before {
-    content: "\e911";
+    content: "\e910";
     font-family: $font-family-icon;
 }
 
 .icon-international-student:before {
-    content: "\e912";
+    content: "\e911";
     font-family: $font-family-icon;
 }
 
@@ -468,7 +474,7 @@
 }
 
 .icon-live-marks:before {
-    content: "\e928";
+    content: "\e927";
     font-family: $font-family-icon;
 }
 
@@ -501,12 +507,12 @@
 }
 
 .icon-lti:before {
-    content: "\e90e";
+    content: "\e90d";
     font-family: $font-family-icon;
 }
 
 .icon-match:before {
-    content: "\e904";
+    content: "\e903";
     font-family: $font-family-icon;
 }
 
@@ -522,7 +528,7 @@
 }
 
 .icon-microsoft-teams:before {
-    content: "\e917";
+    content: "\e916";
     font-family: $font-family-icon;
 }
 
@@ -592,7 +598,7 @@
 
 .icon-notifications-hollow:before,
 .icon-bell-hollow:before {
-    content: "\e925";
+    content: "\e924";
     font-family: $font-family-icon;
 }
 
@@ -617,11 +623,11 @@
 }
 
 .icon-pin-hollow:before {
-    content: "\e916";
+    content: "\e915";
     font-family: $font-family-icon;
 }
 .icon-pin:before {
-    content: "\e914";
+    content: "\e913";
     font-family: $font-family-icon;
 }
 
@@ -641,7 +647,7 @@
 }
 
 .icon-position:before {
-    content: "\e906";
+    content: "\e905";
     font-family: $font-family-icon;
 }
 
@@ -656,7 +662,7 @@
 }
 
 .icon-project:before {
-    content: "\e90d";
+    content: "\e90c";
     font-family: $font-family-icon;
 }
 
@@ -708,7 +714,7 @@
 }
 
 .icon-screen-capture:before {
-    content: "\e921";
+    content: "\e920";
     font-family: $font-family-icon;
 }
 
@@ -724,7 +730,7 @@
 }
 
 .icon-share:before {
-    content: "\e919";
+    content: "\e918";
     font-family: $font-family-icon;
 }
 
@@ -746,7 +752,7 @@
 }
 
 .icon-sort-up:before {
-    content: "\e920";
+    content: "\e91f";
     font-family: $font-family-icon;
 }
 
@@ -829,17 +835,17 @@
 }
 
 .icon-up-arrow:before {
-    content: "\e901";
+    content: "\e900";
     font-family: $font-family-icon;
 }
 
 .icon-down-arrow:before {
-    content: "\e902";
+    content: "\e901";
     font-family: $font-family-icon;
 }
 
 .icon-unit:before {
-    content: "\e90c";
+    content: "\e90b";
     font-family: $font-family-icon;
 }
 
@@ -860,7 +866,7 @@
 }
 
 .icon-video-error:before {
-    content: "\e91b";
+    content: "\e91a";
     font-family: $font-family-icon;
 }
 
@@ -878,30 +884,30 @@
 
 .icon-weather:before,
 .icon-mostly-cloudy:before {
-    content: "\e907";
+    content: "\e906";
     font-family: $font-family-icon;
 }
 
 .icon-thunder:before,
 .icon-storm:before {
-    content: "\e90a";
+    content: "\e909";
     font-family: $font-family-icon;
 }
 
 .icon-rain:before {
-    content: "\e90b";
+    content: "\e90a";
     font-family: $font-family-icon;
 }
 
 .icon-cloud:before,
 .icon-cloudy:before {
-    content: "\e908";
+    content: "\e907";
     font-family: $font-family-icon;
 }
 
 .icon-clear:before,
 .icon-sunny:before {
-    content: "\e909";
+    content: "\e908";
     font-family: $font-family-icon;
 }
 
@@ -916,7 +922,7 @@
 }
 
 .icon-withdraw-achievement:before {
-    content: "\e91d";
+    content: "\e91c";
     font-family: $font-family-icon;
 }
 
@@ -926,7 +932,7 @@
 }
 
 .icon-intellischool:before {
-    content: "\e927";
+    content: "\e926";
     font-family: $font-family-icon;
 }
 
@@ -936,6 +942,6 @@
 }
 
 .icon-reach-logo:before {
-    content: "\e900";
+    content: "\e92b";
     font-family: $font-family-icon;
 }
