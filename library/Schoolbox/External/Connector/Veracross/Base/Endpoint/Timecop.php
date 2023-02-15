@@ -11,7 +11,6 @@ namespace Schoolbox\External\Connector\Veracross\Base\Endpoint;
 
 use DebugBar\DebugBarException;
 
-
 /**
  * Maintains a list of things that occurred during a php runtime
  * for Veracross' connector. There are a lot of moving parts
