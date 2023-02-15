@@ -297,7 +297,8 @@ class Cursor implements ICursor
                      SELECT *
                      FROM evidence_tag    AS et
                      JOIN lu_evidence_tag AS luet ON luet.id = et.tag_id
-                     WHERE luet.name = :tagEvidence
+                     WHERE et.evidence_id = e.id
+                     AND luet.name = :tagEvidence
                  )'
             );
             $params['tagEvidence'] = $this->filter['tag'];
