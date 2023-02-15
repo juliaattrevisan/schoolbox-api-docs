@@ -44,3 +44,24 @@
         }
     }
 }
+
+.anchor-style {
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.checklist > label,
+.checklist > ul,
+.option-list > li {
+    display: inline-block;
+}
+
+.checklist > label,
+.option-list > li {
+    margin-right: 2rem;
+}
+
+.filters-description {
+    font-style: italic;
+}
+

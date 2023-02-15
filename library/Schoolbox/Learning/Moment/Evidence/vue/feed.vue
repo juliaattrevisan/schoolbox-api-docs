@@ -12,6 +12,7 @@ import foundationMixin from "@schoolboxVue/components/foundation-mixin";
 import userProfileConstants from "../../../vue/user-profile/constants";
 import cdnPrefixMixin from "@schoolboxVue/components/cdn-prefix-mixin";
 import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
+import { nextTick } from "vue";
 
 export default {
     components: {
@@ -45,7 +46,19 @@ export default {
             },
             showSkeletonLoader: true,
             currentlyDeletingEvidence: null,
-            selectedNode: getEmptyNode(), //the selected curriculum code to display further details for
+            selectedNode: getEmptyNode(), // The selected curriculum code to display further details for.
+            selectedTag: "", // The tag clicked by the user in order to filter to items having that tag.
+            selectedFilters: {
+                // NOTE: There is an array in library/Schoolbox/Learning/Moment/Feed/Cursor.php whose values must match
+                //       the keys in this object.  If any change is made to these keys, a similar change should be made
+                //       to that array.
+                goals: false,
+                learningMoments: false,
+                achievements: false,
+                feedback: false,
+            },
+
+            showFeed: true,
         };
     },
     computed: {
@@ -62,9 +75,19 @@ export default {
             return btoa(window.location.pathname);
         },
     },
-    mounted() {
+    async mounted() {
         document.addEventListener(userProfileConstants.events.AWARDS_UPDATED, () => this.load());
-        this.load();
+        window.onpopstate = async function (event) {
+            // NOTE: event.state will be null unless the state has been saved using history.pushState().
+            this.setSelectedTagAndFiltersToMatchState(event.state);
+
+            await nextTick(); // Wait for Vue to sync checkboxes to match this.selectedTag.
+            this.onChangeFilters(this.selectedTag, false);
+        };
+
+        this.setSelectedTagAndFiltersToMatchState(this.getFiltersStateFromUrl());
+        await nextTick(); // Wait for Vue to sync checkboxes to match this.selectedFilters.
+        this.onChangeFilters(this.selectedTag, false);
     },
     methods: {
         /**
@@ -73,6 +96,7 @@ export default {
          * Once received, group them by date.
          */
         load() {
+            this.showFeed = false;
             this.data = [];
             this.append(null);
         },
@@ -85,6 +109,9 @@ export default {
             if (cursor) {
                 params.cursor = cursor;
             }
+
+            params.filter = btoa(JSON.stringify(this.getFiltersStateFromDom()));
+
             try {
                 const response = await fetch(this.config.routes.getFeed + "?" + new URLSearchParams(params));
                 const responseData = await response.json();
@@ -96,6 +123,7 @@ export default {
                 this.loading = false;
             } finally {
                 this.showSkeletonLoader = false;
+                this.showFeed = true;
             }
         },
 
@@ -248,11 +276,164 @@ export default {
         /**
          * to open up the node details modal
          *
-         * @pararm { object }
+         * @param { Object }
          */
         onCodeSelected(node) {
             this.selectedNode = node;
             this.$refs.nodeDetailsModal.open();
+        },
+
+        /**
+         * @param selectedTag { String } Blank string means no selected tag.
+         * @param saveFiltersState { Boolean }
+         */
+        onChangeFilters(selectedTag, saveFiltersState) {
+            this.selectedTag = selectedTag;
+
+            // Note Regarding behaviour when all-checked/none-checked
+            // ------------------------------------------------------
+            // If all checkboxes are checked, we leave them that way.
+            // We could have decided to uncheck all in this situation, to match the default state of all unchecked,
+            // which behaves the same as if all were checked.  However, we decided it would be less confusing to the
+            // user if checking the last checkbox resulted in all being checked rather than none being checkked.
+
+            if (saveFiltersState) {
+                this.saveFiltersStateToBrowserHistory();
+            }
+
+            this.load();
+        },
+
+        /**
+         * Save the state of the filters to the browser history.  The purpose of doing this is to enable use of the
+         * back button to visit previous filter states, and to enable sharing of the URL for the page in a particular
+         * filter state.
+         */
+        saveFiltersStateToBrowserHistory() {
+            let filtersState = this.getFiltersStateFromDom();
+            let newUrl = new URL(window.location.href);
+
+            newUrl.searchParams.delete("tag");
+            if (filtersState.tag !== "") {
+                newUrl.searchParams.append("tag", encodeURIComponent(filtersState.tag));
+            }
+
+            // Only save filter state to URL if not all filters are selected.
+            newUrl.searchParams.delete("filterNames[]");
+            if (filtersState.filterNames.length !== Object.keys(this.selectedFilters).length) {
+                for (let filterName of filtersState.filterNames) {
+                    newUrl.searchParams.append("filterNames[]", encodeURIComponent(filterName));
+                }
+            }
+
+            history.pushState(filtersState, "", newUrl.toString());
+        },
+
+        /**
+         * Generate a filterState object from the URL parameters (if there are any).
+         * If there are no recognised URL parameters, the return value will be null.
+         *
+         * The URL is expected to have parameters like this:
+         *    https://schoolbox.com.au/search/user/69?tag=Class%20Work&filterNames[]=feedback&filterNames[]=achievements
+         *    * Both parameters ('tag' and 'filterNames') are optional
+         *    * filterNames are expected to match the keys from this.selectedFilters.
+         *
+         * Example of non-null return value:
+         *    {
+         *       filterNames: ['feedback', 'learningMoments'],
+         *       tag: '' { String }
+         *    }
+         *
+         * @return { ?Object }
+         *
+         * @see this.getFiltersStateFromDom()
+         */
+        getFiltersStateFromUrl() {
+            let url = new URL(window.location.href);
+
+            if (Array.from(url.searchParams).length === 0) {
+                return null;
+            }
+
+            let filtersState = { tag: "", filterNames: [] };
+
+            for (let [key, value] of url.searchParams.entries()) {
+                key = decodeURIComponent(key);
+                value = decodeURIComponent(value);
+
+                switch (key) {
+                    case "tag":
+                        filtersState.tag = value;
+                        break;
+
+                    case "filterNames[]":
+                        filtersState.filterNames.push(value);
+                        break;
+
+                    default:
+                    // Unrecognised key, so ignore.  Do nothing.
+                }
+            }
+
+            return filtersState;
+        },
+
+        /**
+         * Generate a filterState object from the current state of the DOM.
+         * Since the selectedTag is not stored in the DOM, we get that from this.selectedTag.
+         *
+         * Example of return value:
+         *    {
+         *       filterNames: ['feedback', 'learningMoments'], { Array of keys from this.selectedFilters }
+         *       tag: '' { String }
+         *    }
+         *
+         * @return { Object }
+         *
+         * @see this.getFiltersStateFromUrl()
+         */
+        getFiltersStateFromDom() {
+            let checkedFeedItemTypes = [];
+
+            for (const filterName of Object.keys(this.selectedFilters)) {
+                if ($("#filter-" + filterName).prop("checked")) {
+                    checkedFeedItemTypes.push(filterName);
+                }
+            }
+
+            return { filterNames: checkedFeedItemTypes, tag: this.selectedTag };
+        },
+
+        /**
+         * @param filtersState { ?Object }
+         *
+         * Example of non-null filtersState object:
+         *    {
+         *       filterNames: ['feedback', 'learningMoments'],
+         *       tag: '' { String }
+         *    }
+         */
+        setSelectedTagAndFiltersToMatchState(filtersState) {
+            if (filtersState === null) {
+                // Return the filters to their default state.
+                this.selectedTag = "";
+
+                for (let filterName of Object.keys(this.selectedFilters)) {
+                    this.selectedFilters.filterName = false;
+                }
+            } else {
+                // Restore state of selectedTag.
+                this.selectedTag = filtersState.tag;
+
+                // Restore state of filter checkboxes.
+                const allFiltersAreSelected =
+                    Array.from(this.selectedFilters).length === filtersState.filterNames.length;
+                for (const filterName of Object.keys(this.selectedFilters)) {
+                    this.selectedFilters[filterName] = allFiltersAreSelected
+                        ? true
+                        : filtersState.filterNames.includes(filterName);
+                }
+            }
         },
     },
 };
@@ -260,10 +441,10 @@ export default {
 
 <template>
     <div>
-        <div class="feed" v-for="(evidenceGroup, index) in groupedEvidence" :key="index">
+        <div class="feed filter-container">
             <div class="feed-column left"></div>
             <section class="activity-feed">
-                <div v-if="index === 0" class="profile-learning-actions">
+                <div class="profile-learning-actions">
                     <div>
                         <template v-if="config.routes.getCreateEvidenceForm">
                             <a
@@ -318,205 +499,317 @@ export default {
                         </template>
                     </div>
                 </div>
-                <h2 class="subheader no-margin">
-                    <time
-                        :datetime="formatDate(evidenceGroup.date, 'YYYY-MM-DD')"
-                        :title="formatDate(evidenceGroup.date, dateDisplayFormats.dayjsDateLong)"
-                        >{{ renderCreatedAt(evidenceGroup.date) }}</time
-                    >
-                </h2>
-                <ul class="information-list">
-                    <li v-for="(evidence, index) in evidenceGroup.evidence" class="feed-item" :key="index">
-                        <template v-if="evidence.discriminator === 'evidence'">
-                            <!-- This evidence isn't necessarily editable -->
-                            <div
-                                :class="{
-                                    'actions-small-1': hasMenu(evidence.object),
-                                    'actions-small-0': !hasMenu(evidence.object),
-                                }"
-                            >
-                                <div class="card small-12 compact">
-                                    <a :href="evidence.object.creator._links.profile" title="View Profile">
-                                        <img :src="evidence.object.creator._links.avatar" alt="View Profile" />
-                                        <p>{{ evidence.object.creator.fullName }}</p>
-                                        <time
-                                            class="pipe meta"
-                                            :datetime="formatDate(evidence.object.createdAt)"
-                                            :title="
-                                                formatDate(evidence.object.createdAt, dateDisplayFormats.dayjsDatetime)
-                                            "
-                                            >{{
-                                                formatDate(evidence.object.createdAt, dateDisplayFormats.dayjsTime)
-                                            }}</time
-                                        >
-                                    </a>
-                                </div>
-                                <nav v-if="hasMenu(evidence.object)">
-                                    <a
-                                        href="#"
-                                        class="icon-overflow"
-                                        :data-dropdown="'evidence-' + String(evidence.object.id) + '-dropdown'"
-                                        aria-expanded="false"
-                                        title="Actions"
-                                    ></a>
-                                </nav>
-                                <ul
-                                    v-if="hasMenu(evidence.object)"
-                                    :id="'evidence-' + String(evidence.object.id) + '-dropdown'"
-                                    class="f-dropdown"
-                                    data-dropdown-content
-                                >
-                                    <li>
-                                        <a
-                                            v-if="evidence.object._links.modifyForm"
-                                            :href="evidence.object._links.modifyForm + '?returnUrl=' + returnUrl"
-                                            class="icon-modify"
-                                            title="Modify"
-                                            >Modify</a
-                                        >
-                                    </li>
-                                    <li>
-                                        <a
-                                            @click.prevent="showDeleteModal(evidence)"
-                                            v-if="evidence.object._links.delete"
-                                            class="icon-delete"
-                                            title="Delete"
-                                            >Delete</a
-                                        >
-                                    </li>
-                                </ul>
-                            </div>
-
-                            <div class="feed-body small-12 columns">
-                                <!-- Is there an attachment? Display it appropriately -->
-                                <article v-if="evidence.object.filename && evidence.object.storage">
-                                    <storage
-                                        :storage="evidence.object.storage"
-                                        :filename="evidence.object.filename"
-                                    ></storage>
-                                </article>
-
-                                <!-- Display evidence body, with media players initialised -->
-                                <media-article v-if="evidence.object.body">
-                                    <div v-html="evidence.object.body" />
-                                </media-article>
-
-                                <!-- Display curriculum codes and tags -->
-                                <div class="tags">
-                                    <p
-                                        class="meta"
-                                        v-if="
-                                            evidence.object.curriculumNodes.length > 0 ||
-                                            evidence.object.tags.length > 0
-                                        "
-                                    >
-                                        Tags:
-                                        <codes-list
-                                            :nodes="evidence.object.curriculumNodes"
-                                            @selected="onCodeSelected"
-                                        /><template
-                                            v-if="
-                                                evidence.object.curriculumNodes.length > 0 &&
-                                                evidence.object.tags.length > 0
-                                            "
-                                            >,
-                                        </template>
-                                        <template
-                                            v-for="(tag, index) in evidence.object.tags"
-                                            :key="`${index}-${tag.name}`"
-                                        >
-                                            <template v-if="index !== 0">, </template><span>{{ tag.name }}</span>
-                                        </template>
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div class="feed-comments small-12 columns">
-                                <comment-thread
-                                    :thread="evidence.object.discussionThread"
-                                    :create-thread-endpoint="evidence.object._links.createThread"
-                                    :can-comment="config.canComment"
-                                    :cdn-prefix="cdnPrefix"
-                                    :site-version="siteVersion"
-                                />
-                            </div>
-                        </template>
-                        <template v-if="evidence.discriminator === 'badgeAward'">
-                            <div class="card badge-card small-12">
-                                <a href="#" @click.prevent="openViewBadgeAwardModal(evidence.object)">
-                                    <badge-image
-                                        :badge="evidence.object.badge"
-                                        :css="evidence.object.status === 'goal' ? 'goal' : ''"
-                                    ></badge-image>
-                                    <h3>{{ evidence.object.badge.name }}</h3>
-                                    <p class="meta">
-                                        <template v-if="evidence.object.status === 'achievement'"
-                                            >Achievement awarded</template
-                                        >
-                                        <template v-if="evidence.object.status === 'goal'">Goal set</template>
-                                        by {{ evidence.object.awardedBy.fullName }}
-                                        |
-                                        <time
-                                            class="meta"
-                                            :datetime="formatDate(evidence.object.awardedAt)"
-                                            :title="
-                                                formatDate(evidence.object.awardedAt, dateDisplayFormats.dayjsDatetime)
-                                            "
-                                        >
-                                            {{ formatDate(evidence.object.awardedAt, dateDisplayFormats.dayjsTime) }}
-                                        </time>
-                                    </p>
-                                </a>
-                            </div>
-                        </template>
-                        <template v-if="evidence.discriminator === 'dueWorkFeedback'">
-                            <div class="flex-grade">
-                                <div class="small-12 card columns">
-                                    <div>
-                                        <span class="icon-due-work"></span
-                                        ><a :href="evidence.object._links.summary">{{
-                                            evidence.object.assessment.title
-                                        }}</a>
-                                    </div>
-                                    <p class="meta">
-                                        Reviewed by
-                                        <a :href="evidence.object.instructor._links.profile" title="View Profile">{{
-                                            evidence.object.instructor.fullName
-                                        }}</a>
-                                        in {{ evidence.object.assessment.folderName }} |
-                                        <time
-                                            class="meta"
-                                            :datetime="formatDate(evidence.object.publishedAt)"
-                                            :title="
-                                                formatDate(
-                                                    evidence.object.publishedAt,
-                                                    dateDisplayFormats.dayjsDatetime
-                                                )
-                                            "
-                                        >
-                                            {{ formatDate(evidence.object.publishedAt, dateDisplayFormats.dayjsTime) }}
-                                        </time>
-                                    </p>
-                                </div>
-                                <div
-                                    v-if="evidence.object.normalisedMark"
-                                    :class="`grade ${gradient(evidence.object.normalisedMark)}`"
-                                >
-                                    <span>{{ evidence.object.mark }}</span>
-                                </div>
-                            </div>
-                            <div class="content">
-                                <blockquote v-if="evidence.object.comment">
-                                    {{ evidence.object.comment }}<br />
-                                </blockquote>
-                                <a :href="evidence.object._links.summary"> View assessment details</a>
-                            </div>
-                        </template>
-                    </li>
-                </ul>
             </section>
             <div class="feed-column right"></div>
         </div>
+
+        <div class="feed filter-container">
+            <div class="feed-column left"></div>
+            <section class="activity-feed">
+                <div class="VueTables">
+                    <div class="filters">
+                        <div class="checklist">
+                            <label class="title">Filter to:</label>
+                            <ul class="option-list">
+                                <li>
+                                    <input
+                                        type="checkbox"
+                                        data-filter-checkbox
+                                        id="filter-goals"
+                                        name="includeGoals"
+                                        @click="onChangeFilters('', true)"
+                                        v-model="selectedFilters.goals"
+                                        :true-value="true"
+                                        :false-value="false"
+                                    />
+                                    <label for="filter-goals">Goals</label>
+                                </li>
+                                <li v-if="config.routes.getCreateEvidenceForm">
+                                    <input
+                                        type="checkbox"
+                                        data-filter-checkbox
+                                        id="filter-learningMoments"
+                                        name="includeLearningMoments"
+                                        @click="onChangeFilters('', true)"
+                                        v-model="selectedFilters.learningMoments"
+                                    />
+                                    <label for="filter-learningMoments">Learning Moments</label>
+                                </li>
+                                <li>
+                                    <input
+                                        type="checkbox"
+                                        data-filter-checkbox
+                                        id="filter-achievements"
+                                        name="includeAchievements"
+                                        @click="onChangeFilters('', true)"
+                                        v-model="selectedFilters.achievements"
+                                    />
+                                    <label for="filter-achievements">Achievements</label>
+                                </li>
+                                <li>
+                                    <input
+                                        type="checkbox"
+                                        data-filter-checkbox
+                                        id="filter-feedback"
+                                        name="includeDueWork"
+                                        @click="onChangeFilters('', true)"
+                                        v-model="selectedFilters.feedback"
+                                    />
+                                    <label for="filter-feedback">Feedback</label>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="filters-description" data-filters-description>
+                            <template v-if="selectedTag !== ''">
+                                <p>
+                                    Showing tag "{{ selectedTag }}"
+                                    <span class="anchor-style" id="removeFilters" @click="onChangeFilters('', true)"
+                                        >(remove)</span
+                                    >
+                                </p>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <div class="feed-column right"></div>
+        </div>
+
+        <Transition name="fade" mode="out-in">
+            <div v-if="showFeed">
+                <div class="feed" v-for="(evidenceGroup, index) in groupedEvidence" :key="index">
+                    <div class="feed-column left"></div>
+                    <section class="activity-feed">
+                        <h2 class="subheader no-margin">
+                            <time
+                                :datetime="formatDate(evidenceGroup.date, 'YYYY-MM-DD')"
+                                :title="formatDate(evidenceGroup.date, dateDisplayFormats.dayjsDateLong)"
+                                >{{ renderCreatedAt(evidenceGroup.date) }}</time
+                            >
+                        </h2>
+                        <ul class="information-list">
+                            <li v-for="(evidence, index) in evidenceGroup.evidence" class="feed-item" :key="index">
+                                <template v-if="evidence.discriminator === 'evidence'">
+                                    <!-- This evidence isn't necessarily editable -->
+                                    <div
+                                        :class="{
+                                            'actions-small-1': hasMenu(evidence.object),
+                                            'actions-small-0': !hasMenu(evidence.object),
+                                        }"
+                                    >
+                                        <div class="card small-12 compact">
+                                            <a :href="evidence.object.creator._links.profile" title="View Profile">
+                                                <img :src="evidence.object.creator._links.avatar" alt="View Profile" />
+                                                <p>{{ evidence.object.creator.fullName }}</p>
+                                                <time
+                                                    class="pipe meta"
+                                                    :datetime="formatDate(evidence.object.createdAt)"
+                                                    :title="
+                                                        formatDate(
+                                                            evidence.object.createdAt,
+                                                            dateDisplayFormats.dayjsDatetime
+                                                        )
+                                                    "
+                                                    >{{
+                                                        formatDate(
+                                                            evidence.object.createdAt,
+                                                            dateDisplayFormats.dayjsTime
+                                                        )
+                                                    }}</time
+                                                >
+                                            </a>
+                                        </div>
+                                        <nav v-if="hasMenu(evidence.object)">
+                                            <a
+                                                href="#"
+                                                class="icon-overflow"
+                                                :data-dropdown="'evidence-' + String(evidence.object.id) + '-dropdown'"
+                                                aria-expanded="false"
+                                                title="Actions"
+                                            ></a>
+                                        </nav>
+                                        <ul
+                                            v-if="hasMenu(evidence.object)"
+                                            :id="'evidence-' + String(evidence.object.id) + '-dropdown'"
+                                            class="f-dropdown"
+                                            data-dropdown-content
+                                        >
+                                            <li>
+                                                <a
+                                                    v-if="evidence.object._links.modifyForm"
+                                                    :href="
+                                                        evidence.object._links.modifyForm + '?returnUrl=' + returnUrl
+                                                    "
+                                                    class="icon-modify"
+                                                    title="Modify"
+                                                    >Modify</a
+                                                >
+                                            </li>
+                                            <li>
+                                                <a
+                                                    @click.prevent="showDeleteModal(evidence)"
+                                                    v-if="evidence.object._links.delete"
+                                                    class="icon-delete"
+                                                    title="Delete"
+                                                    >Delete</a
+                                                >
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <div class="feed-body small-12 columns">
+                                        <!-- Is there an attachment? Display it appropriately -->
+                                        <article v-if="evidence.object.filename && evidence.object.storage">
+                                            <storage
+                                                :storage="evidence.object.storage"
+                                                :filename="evidence.object.filename"
+                                            ></storage>
+                                        </article>
+
+                                        <!-- Display evidence body, with media players initialised -->
+                                        <media-article v-if="evidence.object.body">
+                                            <div v-html="evidence.object.body" />
+                                        </media-article>
+
+                                        <!-- Display curriculum codes and tags -->
+                                        <div class="tags">
+                                            <p
+                                                class="meta"
+                                                v-if="
+                                                    evidence.object.curriculumNodes.length > 0 ||
+                                                    evidence.object.tags.length > 0
+                                                "
+                                            >
+                                                Tags:
+                                                <codes-list
+                                                    :nodes="evidence.object.curriculumNodes"
+                                                    @selected="onCodeSelected"
+                                                /><template
+                                                    v-if="
+                                                        evidence.object.curriculumNodes.length > 0 &&
+                                                        evidence.object.tags.length > 0
+                                                    "
+                                                    >,
+                                                </template>
+                                                <template
+                                                    v-for="(tag, index) in evidence.object.tags"
+                                                    :key="`${index}-${tag.name}`"
+                                                >
+                                                    <template v-if="index !== 0">, </template>
+                                                    <span
+                                                        class="anchor-style"
+                                                        @click="onChangeFilters(tag.name, true)"
+                                                        title="Click to only show items with this tag."
+                                                        >{{ tag.name }}</span
+                                                    >
+                                                </template>
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div class="feed-comments small-12 columns">
+                                        <comment-thread
+                                            :thread="evidence.object.discussionThread"
+                                            :create-thread-endpoint="evidence.object._links.createThread"
+                                            :can-comment="config.canComment"
+                                            :cdn-prefix="cdnPrefix"
+                                            :site-version="siteVersion"
+                                        />
+                                    </div>
+                                </template>
+                                <template v-if="evidence.discriminator === 'badgeAward'">
+                                    <div class="card badge-card small-12">
+                                        <a href="#" @click.prevent="openViewBadgeAwardModal(evidence.object)">
+                                            <badge-image
+                                                :badge="evidence.object.badge"
+                                                :css="evidence.object.status === 'goal' ? 'goal' : ''"
+                                            ></badge-image>
+                                            <h3>{{ evidence.object.badge.name }}</h3>
+                                            <p class="meta">
+                                                <template v-if="evidence.object.status === 'achievement'"
+                                                    >Achievement awarded</template
+                                                >
+                                                <template v-if="evidence.object.status === 'goal'">Goal set</template>
+                                                by {{ evidence.object.awardedBy.fullName }}
+                                                |
+                                                <time
+                                                    class="meta"
+                                                    :datetime="formatDate(evidence.object.awardedAt)"
+                                                    :title="
+                                                        formatDate(
+                                                            evidence.object.awardedAt,
+                                                            dateDisplayFormats.dayjsDatetime
+                                                        )
+                                                    "
+                                                >
+                                                    {{
+                                                        formatDate(
+                                                            evidence.object.awardedAt,
+                                                            dateDisplayFormats.dayjsTime
+                                                        )
+                                                    }}
+                                                </time>
+                                            </p>
+                                        </a>
+                                    </div>
+                                </template>
+                                <template v-if="evidence.discriminator === 'dueWorkFeedback'">
+                                    <div class="flex-grade">
+                                        <div class="small-12 card columns">
+                                            <div>
+                                                <span class="icon-feedback"></span
+                                                ><a :href="evidence.object._links.summary">{{
+                                                    evidence.object.assessment.title
+                                                }}</a>
+                                            </div>
+                                            <p class="meta">
+                                                Reviewed by
+                                                <a
+                                                    :href="evidence.object.instructor._links.profile"
+                                                    title="View Profile"
+                                                    >{{ evidence.object.instructor.fullName }}</a
+                                                >
+                                                in {{ evidence.object.assessment.folderName }} |
+                                                <time
+                                                    class="meta"
+                                                    :datetime="formatDate(evidence.object.publishedAt)"
+                                                    :title="
+                                                        formatDate(
+                                                            evidence.object.publishedAt,
+                                                            dateDisplayFormats.dayjsDatetime
+                                                        )
+                                                    "
+                                                >
+                                                    {{
+                                                        formatDate(
+                                                            evidence.object.publishedAt,
+                                                            dateDisplayFormats.dayjsTime
+                                                        )
+                                                    }}
+                                                </time>
+                                            </p>
+                                        </div>
+                                        <div
+                                            v-if="evidence.object.normalisedMark"
+                                            :class="`grade ${gradient(evidence.object.normalisedMark)}`"
+                                        >
+                                            <span>{{ evidence.object.mark }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="content">
+                                        <blockquote v-if="evidence.object.comment">
+                                            {{ evidence.object.comment }}<br />
+                                        </blockquote>
+                                        <a :href="evidence.object._links.summary"> View assessment details </a>
+                                    </div>
+                                </template>
+                            </li>
+                        </ul>
+                    </section>
+                    <div class="feed-column right"></div>
+                </div>
+            </div>
+        </Transition>
         <div class="skeleton-feed" v-if="showSkeletonLoader">
             <ul class="information-list">
                 <li class="row" v-for="n in 3" :key="n">
@@ -542,7 +835,8 @@ export default {
                             <!--
                                 All these tags need to be on the same line,
                                 because otherwise there will be a space between
-                                the link and the comma -->
+                                the link and the comma
+                             -->
                             <a href="#" title="Share a learning moment" data-reveal-id="shareLearningMoment"
                                 >Share your learning</a
                             ><template v-if="config.routes.getSetAsGoalForm && config.routes.getAwardAsAchievementForm"
@@ -589,7 +883,8 @@ export default {
                             <!--
                                 All these tags need to be on the same line,
                                 because otherwise there will be a space between
-                                the link and the comma -->
+                                the link and the comma
+                             -->
                             <a href="#" title="Share a learning moment" data-reveal-id="shareLearningMoment"
                                 >Share a learning moment</a
                             ><template v-if="config.routes.getSetAsGoalForm && config.routes.getAwardAsAchievementForm"
@@ -647,7 +942,7 @@ export default {
             </div>
 
             <div class="feed-load-more content" v-else-if="metadata.cursor.next && metadata.count > data.length">
-                <button class="load-more expand" @click.prevent="append(metadata.cursor.next)" title="Load more">
+                <button class="load-more expand" @click="append(metadata.cursor.next)" title="Load more">
                     Load more
                 </button>
             </div>
@@ -679,3 +974,19 @@ export default {
         <toast ref="toast"></toast>
     </div>
 </template>
+<style>
+.fade-enter-active,
+.fade-leave-active {
+    transition: all 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
+
+.fade-enter-to,
+.fade-leave-from {
+    opacity: 1;
+}
+</style>

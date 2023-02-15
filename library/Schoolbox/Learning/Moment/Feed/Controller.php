@@ -79,11 +79,13 @@ class Controller extends Base
      */
     public function getFeedForUser(User $user): void
     {
-        $encodedCursor = $this->request->query->get('cursor');
-        $cursor        = new Cursor(
+        $encodedFilters = $this->request->query->get('filter');
+        $encodedCursor  = $this->request->query->get('cursor');
+        $cursor         = new Cursor(
             $this->database,
             $user,
             $this->getUser(),
+            $encodedFilters,
             null,
             self::FEED_ITEMS_PER_PAGE,
             $this->getConfigLoader(),

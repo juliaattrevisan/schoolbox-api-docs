@@ -48,79 +48,9 @@ use Twig\Environment;
 class Controller extends BaseController
 {
     /**
-     * UserMapper
-     */
-    private UserMapper $userMapper;
-
-    /**
-     * RoleMapper
-     */
-    private RoleMapper $roleMapper;
-
-    /**
-     * FolderMapper
-     */
-    private FolderMapper $folderMapper;
-
-    /**
-     * Access
-     */
-    private Access $access;
-
-    /**
-     * External_UserInterface
-     */
-    private External_UserInterface $externalUser;
-
-    /**
-     * External_ClassInterface
-     */
-    private External_ClassInterface $externalClass;
-
-    /**
-     * ProfileButtonMapper
-     */
-    private ProfileButtonMapper $profileButtonMapper;
-
-    /**
-     * Timetable_ColourMapper
-     */
-    private Timetable_ColourMapper $timetableColourMapper;
-
-    /**
      * Eportfolio_Authenticator
      */
     private Eportfolio_Authenticator $eportfolioAuthenticator;
-
-    /**
-     * ProfessionalDevelopmentMapper
-     */
-    private ProfessionalDevelopmentMapper $professionalDevelopmentMapper;
-
-    /**
-     * PastoralTypeMapper
-     */
-    private PastoralTypeMapper $pastoralTypeMapper;
-
-    /**
-     * PastoralSubTypeMapper
-     */
-    private PastoralSubTypeMapper $pastoralSubTypeMapper;
-
-    /**
-     * PastoralDataSource
-     */
-    private PastoralDataSource $pastoralDataSource;
-
-    /**
-     * TermMapper
-     */
-    private TermMapper $termMapper;
-
-    /**
-     * User relationship Hydrator
-     */
-    protected \Schoolbox\External\User $userRelationHydrator;
 
     /**
      * Constructor
@@ -140,36 +70,21 @@ class Controller extends BaseController
      * @param \Schoolbox\External\User      $userRelationHydrator
      */
     public function __construct(
-        UserMapper $userMapper,
-        RoleMapper $roleMapper,
-        FolderMapper $folderMapper,
-        Access $access,
-        External_UserInterface $externalUser,
-        External_ClassInterface $externalClass,
-        ProfileButtonMapper $profileButtonMapper,
-        Timetable_ColourMapper $timetableColourMapper,
-        ProfessionalDevelopmentMapper $professionalDevelopmentMapper,
-        PastoralTypeMapper $pastoralTypeMapper,
-        PastoralSubTypeMapper $pastoralSubTypeMapper,
-        PastoralDataSource $pastoralDataSource,
-        TermMapper $termMapper,
-        \Schoolbox\External\User $userRelationHydrator
+        private UserMapper $userMapper,
+        private RoleMapper $roleMapper,
+        private FolderMapper $folderMapper,
+        private Access $access,
+        private External_UserInterface $externalUser,
+        private External_ClassInterface $externalClass,
+        private ProfileButtonMapper $profileButtonMapper,
+        private Timetable_ColourMapper $timetableColourMapper,
+        private ProfessionalDevelopmentMapper $professionalDevelopmentMapper,
+        private PastoralTypeMapper $pastoralTypeMapper,
+        private PastoralSubTypeMapper $pastoralSubTypeMapper,
+        private PastoralDataSource $pastoralDataSource,
+        private TermMapper $termMapper,
+        private \Schoolbox\External\User $userRelationHydrator
     ) {
-        $this->userMapper                    = $userMapper;
-        $this->roleMapper                    = $roleMapper;
-        $this->folderMapper                  = $folderMapper;
-        $this->access                        = $access;
-        $this->externalUser                  = $externalUser;
-        $this->externalClass                 = $externalClass;
-        $this->profileButtonMapper           = $profileButtonMapper;
-        $this->timetableColourMapper         = $timetableColourMapper;
-        $this->professionalDevelopmentMapper = $professionalDevelopmentMapper;
-        $this->pastoralTypeMapper            = $pastoralTypeMapper;
-        $this->pastoralSubTypeMapper         = $pastoralSubTypeMapper;
-        $this->pastoralDataSource            = $pastoralDataSource;
-        $this->termMapper                    = $termMapper;
-
-        $this->userRelationHydrator = $userRelationHydrator;
     }
 
     /**
