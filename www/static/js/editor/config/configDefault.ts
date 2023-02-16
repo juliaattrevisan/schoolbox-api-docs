@@ -65,6 +65,7 @@ import Abbreviation from "../abbreviation/abbreviation";
 import SchoolboxResource from "../plugin/schoolboxResource/SchoolboxResource";
 
 import SimpleBox from "../simpleBox/SimpleBox";
+import AddVideo from "../video/AddVideo";
 
 /**
  * Add our custom upload adapter
@@ -146,6 +147,8 @@ export function getDefault(config: EditorDefaultConfig) {
             Timestamp,
             Abbreviation,
             SchoolboxResource,
+            SimpleBox,
+            AddVideo,
         ],
         extraPlugins: [UploadAdapterPlugin],
         toolbar: [
@@ -198,6 +201,7 @@ export function getDefault(config: EditorDefaultConfig) {
             "abbreviation",
             "schoolboxResource",
             "simpleBox",
+            "addVideo",
         ],
         style: {
             // the list of styles provided: https://ckeditor.com/docs/ckeditor5/latest/features/style.html
