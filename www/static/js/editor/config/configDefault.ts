@@ -230,6 +230,7 @@ export function getDefault(config: EditorDefaultConfig) {
             "timestamp",
             "abbreviation",
             "schoolboxResource",
+            "simpleBox",
         ],
         style: {
             // the list of styles provided: https://ckeditor.com/docs/ckeditor5/latest/features/style.html

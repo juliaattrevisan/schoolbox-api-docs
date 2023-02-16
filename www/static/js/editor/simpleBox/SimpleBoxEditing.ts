@@ -1,6 +1,7 @@
 import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
 import { toWidget, toWidgetEditable } from "@ckeditor/ckeditor5-widget/src/utils";
 import Widget from "@ckeditor/ckeditor5-widget/src/widget";
+import InsertSimpleBoxCommand from "./insertSimpleBoxCommand";
 
 export default class SimpleBoxEditing extends Plugin {
     static get requires() {
@@ -11,6 +12,7 @@ export default class SimpleBoxEditing extends Plugin {
         console.log("SimpleBoxEditing#init() got called");
         this._defineSchema();
         this._defineConverters();
+        this.editor.commands.add("insertSimpleBox", new InsertSimpleBoxCommand(this.editor));
     }
 
     _defineSchema() {
@@ -40,6 +42,13 @@ export default class SimpleBoxEditing extends Plugin {
 
             // Allow content which is allowed in the root (e.g. paragraphs).
             allowContentOf: "$root",
+        });
+
+        // to disable the simple box command when the selection is inside a simple description
+        schema.addChildCheck((context, childDefinition) => {
+            if (context.endsWith("simpleBoxDescription") && childDefinition.name == "simpleBox") {
+                return false;
+            }
         });
     }
 
