@@ -18,9 +18,6 @@ const props = defineProps<Props>();
     <li class="usage">
         <a :href="`${getUsageHref(props.usage)}`" :title="props.usage.object.title">
             <div class="usage__container">
-                <div v-if="props.usage.discriminator === ActivityTypes.BADGE" :class="`usage__icon-container icon-badge size-24`">
-                    <img v-if="props.usage.discriminator === ActivityTypes.BADGE" :src="`${getUsageIcon(props.usage)}`" alt="Badge Image">
-                </div>
                 <div v-else :class="`usage__icon-container ${getUsageIcon(props.usage)} size-24`"></div>
                 <div class="usage__title-container">
                     <p>{{ props.usage.object.title }}</p>
