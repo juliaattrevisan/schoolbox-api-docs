@@ -82,8 +82,7 @@ class Mapper extends BaseMapper
             SELECT
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('backgroundImage', 'bi')},
-                {$this->getJoinColumnString('backgroundImage.allowedFileExtension', 'bim')},
-                {$this->getJoinColumnString('tile_container', 'tc')}
+                {$this->getJoinColumnString('backgroundImage.allowedFileExtension', 'bim')}
         ";
     }
 
@@ -100,7 +99,6 @@ class Mapper extends BaseMapper
             FROM $table
             LEFT JOIN {$this->getJoinSql('backgroundImage', '', 'bi', true)}
             LEFT JOIN {$this->getJoinSql('backgroundImage.allowedFileExtension', 'bi', 'bim', true)}
-            INNER JOIN {$this->getJoinSql('tile_container', '', 'tc', true)}
         ";
     }
 
@@ -118,10 +116,6 @@ class Mapper extends BaseMapper
         while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
             /** @var Model $item */
             $item = $this->hydrate($r);
-
-            /** @var Layout\Model $layout */
-            $layout = $this->hydrateJoin($r, 'tile_container', 'tc');
-            $item->setTileLayout($layout);
 
             /** @var StorageModel|null $backgroundImage */
             $backgroundImage = $this->hydrateJoin($r, 'backgroundImage', 'bi');
