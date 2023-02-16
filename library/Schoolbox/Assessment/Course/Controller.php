@@ -219,7 +219,7 @@ class Controller extends Base\Base
             // Does the proposed Unit Folder already have a Course ?
             $childFolderCourse = $childFolder->getCourseSpecification();
             if ($childFolderCourse instanceof CourseSpecification && $childFolderCourse->getId()) {
-                $errors[] = 'The proposed folder already contains a course: ' . $childFolderCourse->getTitle();
+                $errors[] = 'The proposed folder already contains a course: ' . $childFolder->getTitle();
             }
         }
 
