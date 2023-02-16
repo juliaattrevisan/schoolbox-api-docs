@@ -324,21 +324,16 @@ class Controller extends ConfigController
         $logger = $this->spawnLogger();
 
         // Not the best place to put it but it will do for now
-//        $this->getResponse()->content->set([
-//            'format' => 'noContent',
-//            'postOutput' => [
-//                function () use ($logger) {
+        $this->getResponse()->content->set([
+            'format' => 'noContent',
+            'postOutput' => [
+                function () use ($logger) {
                     $this->syncCallback($logger);
-//                }
-//            ],
-//        ]);
+                }
+            ],
+        ]);
     }
 
-
-    private function bleah()
-    {
-
-    }
 
     /**
      * Performs an actual sync.
@@ -362,7 +357,7 @@ class Controller extends ConfigController
             $customHours = [];
             $type        = $this->getConfigLoader()->get('schooldata_import_data_source');
             $file        = null;
-            $timeout     = (int)($this->getConfigLoader()->get('schooldata_import_timeout') ?: Scheduler::DEFAULT_TIMEOUT);
+            $timeout     = (float)($this->getConfigLoader()->get('schooldata_import_timeout') ?: Scheduler::DEFAULT_TIMEOUT);
 
             /* Cannot do this with No Data Source, or with CSV Files
              * Exit early if either of those are selected
@@ -385,7 +380,7 @@ class Controller extends ConfigController
              * while running in a detached process. runPostOutputCallbacks()
              * arbitrarily sets a time limit so you have to override that
              */
-            set_time_limit($timeout);
+            set_time_limit((int)$timeout);
 
             /* Get this particular db instance
              */
@@ -412,13 +407,6 @@ class Controller extends ConfigController
                 /* Each part of a Segregated Import gets its own run id
                  */
                 $runId = (new \Schoolbox\External\Connector\Log\Guid())->generate();
-
-                /* Check if the import was Running when we died/ended
-                 * If so, set it to Incomplete
-                 */
-                register_shutdown_function(static function() use ($runId, $importLogMapper) {
-                    $importLogMapper->assignIncomplete($runId);
-                });
 
                 /* ValidStrats is now a cli option
                  */

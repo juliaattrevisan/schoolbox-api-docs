@@ -153,56 +153,6 @@ class Mapper extends \Schoolbox\Mapper
 
 
     /**
-     * If the $runId is currently running, set its status to Incomplete
-     * This method is called as a register_shutdown_function when the
-     * script terminates.
-     *
-     * If it terminated while its status was Running,
-     * it exceeded the timeout and never finished; set it to incomplete
-     *
-     * If it terminated while its status was something other than Running,
-     * don't do anything - it errored out for other reasons, or it Completed
-     *
-     * @param string $runId
-     * @return void
-     * @throws \PDOException
-     * @throws \UnexpectedValueException
-     */
-    public function assignIncomplete(string $runId): void
-    {
-//        try {
-            $log = $this->findOneByColumnList([
-                'run_id' => $runId,
-                'status' => Model::STATUS_RUNNING
-            ], ['cache' => false]);
-
-            $log->setStatus(Model::STATUS_INCOMPLETE);
-            $log->setErrorMessage('cornbap');
-
-            $query = "
-                UPDATE sis_import_log
-                SET status = :status
-                WHERE run_id = :runId
-            ";
-
-            $statement = $this->getDatabase()->prepare($query);
-            $statement->execute([
-                'status' => Model::STATUS_INCOMPLETE,
-                'runId' => $runId
-            ]);
-
-            ;
-//            $this->save($log);
-            new \Alaress_Probe($log, $this->findByColumn('run_id', $runId, ['cache' => false]));
-//
-//        } catch (\Schoolbox\Mapper\Exception $e) {
-//            // noop
-//            new \Alaress_Probe($e->getMessage());
-//        }
-    }
-
-
-    /**
      * Update with Complete status with the time it ended
      *
      * @param Model $importLog

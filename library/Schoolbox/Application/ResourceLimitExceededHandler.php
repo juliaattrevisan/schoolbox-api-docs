@@ -33,16 +33,16 @@ class ResourceLimitExceededHandler
      */
     public function __invoke(): void
     {
-//        $error = error_get_last();
-//        // Request exceeded 'max_execution_time'
-//        if (preg_match("/Maximum execution time of \d+ seconds? exceeded/", $error['message'] ?? '')) {
-//            call_user_func($this->function);
-//        }
-//        // Request exceeded 'memory_limit'
-//        if (preg_match("/Allowed memory size of \d+ bytes? exhausted/", $error['message'] ?? '')) {
-//            // Extra 10M over current (not max) memory usage for handling
-//            ini_set('memory_limit', (string)(memory_get_usage() + 10 * 1024 * 1024));
-//            call_user_func($this->function);
-//        }
+        $error = error_get_last();
+        // Request exceeded 'max_execution_time'
+        if (preg_match("/Maximum execution time of \d+ seconds? exceeded/", $error['message'] ?? '')) {
+            call_user_func($this->function);
+        }
+        // Request exceeded 'memory_limit'
+        if (preg_match("/Allowed memory size of \d+ bytes? exhausted/", $error['message'] ?? '')) {
+            // Extra 10M over current (not max) memory usage for handling
+            ini_set('memory_limit', (string)(memory_get_usage() + 10 * 1024 * 1024));
+            call_user_func($this->function);
+        }
     }
 }

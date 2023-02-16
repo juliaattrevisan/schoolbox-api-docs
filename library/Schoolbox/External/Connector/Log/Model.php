@@ -41,7 +41,6 @@ class Model
      */
     public const STATUS_RUNNING = 'running';
     public const STATUS_COMPLETE = 'complete';
-    public const STATUS_INCOMPLETE = 'incomplete';
     public const STATUS_ERROR = 'error';
 
 
