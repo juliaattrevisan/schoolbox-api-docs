@@ -18,6 +18,9 @@ use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Resource\Storage\Model as StorageModel;
 
+/**
+ * @method Model findById($identifierValue)
+ */
 class Mapper extends BaseMapper
 {
     public function mapping()
@@ -114,10 +117,10 @@ class Mapper extends BaseMapper
             /** @var Model $item */
             $item = $this->hydrate($r);
 
-            /** @var StorageModel $backgroundImage */
+            /** @var StorageModel|null $backgroundImage */
             $backgroundImage = $this->hydrateJoin($r, 'backgroundImage', 'bi');
             if ($backgroundImage) {
-                /** @var Mimetype $mimeType */
+                /** @var Mimetype|null $mimeType */
                 $mimeType = $this->hydrateJoin($r, 'backgroundImage.allowedFileExtension', 'bim');
                 if ($mimeType) {
                     $backgroundImage->setMimetype($mimeType);
