@@ -1,5 +1,4 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="{CDN_PREFIX}/js/vendors/countdown/jquery.countdown.min.js?v={SITE_VERSION}"></script>
 <script type="text/javascript" src="{CDN_PREFIX}/js/ckeditor/ckeditor.js?v={SITE_VERSION}"></script>
 <script type="text/javascript" src="{CDN_PREFIX}/js/editor/jquery.editor.js?v={SITE_VERSION}"></script>
 <script type="text/javascript" src="{CDN_PREFIX}/js/evaluation/jquery.alphanumeric.js?v={SITE_VERSION}"></script>
@@ -29,8 +28,7 @@ $(function() {
 	 */
 	$('#evaluation-countdown').evaluationCountdown({
 		attemptId: '{ATTEMPT_ID}',
-		evaluationId: '{ASSESS_ASSESS_ID}',
-		timeLeft: '{ASSESS_TIME_REMAINING}'
+		evaluationId: '{ASSESS_ASSESS_ID}'
 	});
 });
 </script>
@@ -42,7 +40,8 @@ $(function() {
 		<section>
 			<ul class="information-list">
 				<li class="row content">
-					<time id="evaluation-countdown" class="countdown">Unlimited</time>
+					<time id="evaluation-countdown" data-countdown="evaluation" data-timeleft="{ASSESS_TIME_REMAINING}" class="countdown">00 : 00 : 00</time>
+                    <script type="text/javascript" src="{CDN_PREFIX}/js/bundle/evaluation.js?v={SITE_VERSION}"></script>
 					<ul class="meta">
 						<li>You began on <time>{ATTEMPT_START}</time></li>
 						<li>You must finish this quiz by <time>{ATTEMPT_END}</time></li>
