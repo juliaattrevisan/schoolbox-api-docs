@@ -96,9 +96,10 @@ class Counter
                     :badgeDiscriminator AS discriminator,
                     COUNT(*) AS count
                 FROM curriculum_badge cb
+                JOIN badge b on (cb.badge_id = b.id AND b.deleted_at IS NULL)
                 WHERE cb.curriculum_node_id IN "
             . Builder::getArrayPlaceholders($ids, Cursor::DISCRIMINATOR_BADGE)
-            . " GROUP BY id, discriminator",
+            . " GROUP BY cb.curriculum_node_id, discriminator",
         ];
         $queryString = '(' . implode(') UNION ALL (', $selectParts) . ')';
         $query       = $this->database->prepareQuery($queryString);

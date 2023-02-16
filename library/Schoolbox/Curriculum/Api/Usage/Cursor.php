@@ -194,7 +194,7 @@ class Cursor implements ICursor
                     b.id AS id,
                     b.name AS name
                 FROM curriculum_badge cb
-                    JOIN badge b on cb.badge_id = b.id
+                JOIN badge b on (cb.badge_id = b.id AND b.deleted_at IS NULL)
                 WHERE cb.curriculum_node_id = :badgeCurriculumNodeId
             ",
             "
