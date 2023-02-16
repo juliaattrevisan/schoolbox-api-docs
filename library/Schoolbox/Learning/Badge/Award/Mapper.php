@@ -113,7 +113,18 @@ class Mapper extends \Schoolbox\Mapper
 
         // Create array of badges, indexed by badgeId.
         $badgeById = [];
-        foreach ($badgeMapper->findByColumnList(['id' => array_keys($badgeIdsAsKeys)]) as $badge) {
+        foreach (
+            // Note regarding soft-deletion inconsistencies between parent and child records
+            // -----------------------------------------------------------------------------
+            // Include deleted badges here, because the query in $statement may not exclude non-soft-deleted badge_user
+            // rows that have soft-deleted badge rows as parents.  This situation should not happen, but it has happened
+            // in the past due to 'UPDATE badge SET deleted_at=NOW()' commands being run manually without badge_user.deleted_at
+            // being updated similarly.
+            //    If we do not include deleted badges here, then when we try to use $badgeById below to get the badge
+            // with a particular ID (sourced from $statement), we may find that no matching entry exists in $badgeById.
+            $badgeMapper->findByColumnList(['id' => array_keys($badgeIdsAsKeys)], array('deleted' => true))
+            as $badge
+        ) {
             $badgeById[$badge->getId()] = $badge;
         }
 
@@ -395,11 +406,13 @@ class Mapper extends \Schoolbox\Mapper
             FROM `user`
             INNER JOIN `groups` ON `user`.group_id = `groups`.id
             INNER JOIN badge_user ON `user`.id = badge_user.recipient_id
+            INNER JOIN badge ON badge.id = badge_user.badge_id
             LEFT JOIN lu_year_level lyl ON `user`.year_id = lyl.id
             WHERE `groups`.`group_type` = :roleType
             AND badge_user.badge_id = :badgeId
             AND badge_user.status = :status
             AND badge_user.deleted_at IS NULL
+            AND badge.deleted_at IS NULL /* This excludes non-soft-deleted badge_user rows linked to soft-deleted badge rows. */
             AND ({$where})
         ";
 
