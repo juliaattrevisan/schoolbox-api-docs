@@ -4121,11 +4121,6 @@ parameters:
 			path: library/Schoolbox/GenericCollection.php
 
 		-
-			message: "#^Property Schoolbox\\\\Greenhouse\\\\Controller\\:\\:\\$errorMapper is never read, only written\\.$#"
-			count: 1
-			path: library/Schoolbox/Greenhouse/Controller.php
-
-		-
 			message: "#^Dead catch \\- RuntimeException is never thrown in the try block\\.$#"
 			count: 1
 			path: library/Schoolbox/InstanceRegistry/ApiClient.php
