@@ -357,7 +357,7 @@ class Controller extends ConfigController
             $customHours = [];
             $type        = $this->getConfigLoader()->get('schooldata_import_data_source');
             $file        = null;
-            $timeout     = (float)($this->getConfigLoader()->get('schooldata_import_timeout') ?: Scheduler::DEFAULT_TIMEOUT);
+            $timeout     = (int)($this->getConfigLoader()->get('schooldata_import_timeout') ?: Scheduler::DEFAULT_TIMEOUT);
 
             /* Cannot do this with No Data Source, or with CSV Files
              * Exit early if either of those are selected
@@ -375,6 +375,12 @@ class Controller extends ConfigController
             } catch (\RuntimeException $e) {
                 return;
             }
+
+            /* Explicitly set a time limit to conclude this sync
+             * while running in a detached process. runPostOutputCallbacks()
+             * arbitrarily sets a time limit so you have to override that
+             */
+            set_time_limit($timeout);
 
             /* This identifier indicates that the two schedulers were part of this
              * script execution together

@@ -119,7 +119,7 @@ HELP;
         $customHours = [];
         $type        = $this->getConfig()->get('schooldata_import_data_source');
         $file        = $this->getOpt(self::OPT_LONG_FILE);
-        $timeout     = (float)($this->getConfig()->get('schooldata_import_timeout') ?: Endpoint\Scheduler::DEFAULT_TIMEOUT);
+        $timeout     = (int)($this->getConfig()->get('schooldata_import_timeout') ?: Endpoint\Scheduler::DEFAULT_TIMEOUT);
 
         /* Figure out what was specified in the Watchlist
          * Empty strings and spaces are filtered away etc.

@@ -104,7 +104,7 @@ HELP;
         $type        = $this->getConfig()->get('schooldata_import_data_source') ?: Endpoint\Factory::CSV;
         $customHours = explode(Renderer::VALUE_DELIMITER, $this->getConfig()->get('schooldata_import_managed_hours') ?? '');
         $file        = null;
-        $timeout     = (float)($this->getConfig()->get('schooldata_import_timeout') ?: Endpoint\Scheduler::DEFAULT_TIMEOUT);
+        $timeout     = (int)($this->getConfig()->get('schooldata_import_timeout') ?: Endpoint\Scheduler::DEFAULT_TIMEOUT);
 
         /* SUDS imports can take a notoriously long time to complete based on sis etc.
          * and the instances could start up a new import before the existing one
