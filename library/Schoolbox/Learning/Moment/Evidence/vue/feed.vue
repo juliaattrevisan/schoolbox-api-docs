@@ -975,6 +975,26 @@ export default {
     </div>
 </template>
 <style>
+.anchor-style {
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.checklist > label,
+.checklist > ul,
+.option-list > li {
+    display: inline-block;
+}
+
+.checklist > label,
+.option-list > li {
+    margin-right: 2rem;
+}
+
+.filters-description {
+    font-style: italic;
+}
+
 .fade-enter-active,
 .fade-leave-active {
     transition: all 0.3s ease;
