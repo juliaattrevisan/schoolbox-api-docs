@@ -175,7 +175,7 @@ export default {
                             v-model="updateFields.courseIds[course.id]"
                         >
                             <option :value="null">Unchanged</option>
-                            <option value="1">Enroll</option>
+                            <option value="1">Enrol</option>
                             <option value="0">Remove</option>
                         </select>
                     </div>

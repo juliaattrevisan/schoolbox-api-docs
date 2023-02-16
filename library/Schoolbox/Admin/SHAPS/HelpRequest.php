@@ -228,21 +228,16 @@ class HelpRequest
 
     /**
      * Provision course participation
-     * @param array $userIds
+     * @param array $usernames
      * @param array $courses
      * @return array
      */
-    public function provisionUserParticipation(array $userIds, array $courses): array
+    public function provisionUserParticipation(array $usernames, array $courses): array
     {
-        $users         = $this->userMapper->findByColumn('id', $userIds, ['deleted' => true]);
         $coursePayload = [];
         foreach ($courses as $courseId => $add) {
-            foreach ($users as $user) {
-                if ($add && $user->isDeleted()) {
-                    // do not attempt to add deleted user to a course
-                    continue;
-                }
-                $coursePayload[$courseId][$user->getEmail()] = $add;
+            foreach ($usernames as $username) {
+                $coursePayload[$courseId][$username] = $add;
             }
         }
         $data = [];
@@ -283,13 +278,13 @@ class HelpRequest
     /**
      * Provision users
      *
-     * @param array $userIds
+     * @param array $users
      * @return array
      * @throws InvalidArgumentException                If unable to instantiate a guzzle client
      */
-    public function provisionUsers(array $userIds): array
+    public function provisionUsers(array $users): array
     {
-        $payload = $this->buildProvisionUsersPayload($userIds);
+        $payload = $this->buildProvisionUsersPayload($users);
         $data    = [];
         if (!empty($payload)) {
             // Send each user to Help
@@ -336,13 +331,13 @@ class HelpRequest
     /**
      * Build a payload of users to provision to Schoolbox Help.
      *
-     * @param array $userIds
+     * @param array $users
      * @return array
      */
-    private function buildProvisionUsersPayload(array $userIds): array
+    private function buildProvisionUsersPayload(array $users): array
     {
         $userPayload = [];
-        foreach ($this->userMapper->findByColumn('id', $userIds) as $user) {
+        foreach ($users as $user) {
             /** @var User $user */
             if (!$user->getRole()->isStaff()) {
                 continue;
