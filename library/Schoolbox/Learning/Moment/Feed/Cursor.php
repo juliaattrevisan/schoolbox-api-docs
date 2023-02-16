@@ -345,7 +345,7 @@ class Cursor implements ICursor
             $query .= 'COUNT(*) ';
         } else {
             $query .= (
-                'id                       AS id,
+                'bu.id                    AS id,
                  :discriminatorBadgeAward AS discriminator,
                  awarded_at               AS date '
             );
@@ -361,10 +361,14 @@ class Cursor implements ICursor
         }
 
         $query .= (
-            'FROM badge_user
+            'FROM badge_user AS bu
+             JOIN badge      AS b ON (b.id = bu.badge_id)
              WHERE (' . implode(' OR ', $filterOrClauses) . ')
-             AND recipient_id = :userIdBadgeAward AND deleted_at IS NULL '
-        );
+             AND bu.recipient_id = :userIdBadgeAward
+             AND bu.deleted_at IS NULL
+             AND b.deleted_at IS NULL' // Protect against situation where badge rows are deleted, but child badge_user
+        );                             // rows are not.  Child rows of deleted parent rows should always be deleted.
+                                       // But this rule is not enforced by the database, we must handle this case.
         $params['userIdBadgeAward'] = $this->viewee->getId();
 
         if ($this->expiryDate) {
