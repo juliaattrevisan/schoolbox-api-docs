@@ -31,6 +31,7 @@ use Schoolbox\Resource\Storage\Transform;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Exception as LockException;
+use Symfony\Component\Lock\Exception\LockReleasingException;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Lock\Store\RedisStore;
@@ -232,6 +233,7 @@ class Manager
         $this->localStorageDir = $this->deriveLocalStorageDir($pdo);
         $transformations = $this->generateTransformations($this->deriveHashList($pdo), $pdo);
         unset($pdo);
+        $this->lock->acquire();
         $this->processTransformations($transformations);
         $this->lock->release();
         return $this->isInterrupted;
@@ -317,8 +319,11 @@ class Manager
      */
     private function renewLockAndMaxExecutionTime(): void
     {
-        // TODO, this should be $lock->refresh(), but that's throwing an exception for some reason?
-        $this->lock->release();
+        try {
+            $this->lock->refresh();
+        } catch (LockReleasingException | LockConflictedException | LockAcquiringException $e) {
+            $this->logger->debug("Unable to release image lock, ignoring...");
+        }
         $this->lock->acquire();
         $maxExecutionTime = time() - $this->startTime + self::IMAGICK_TIME_LIMIT;
         ini_set('max_execution_time', (string)$maxExecutionTime);
@@ -355,7 +360,7 @@ class Manager
     {
         $instanceLockFactory = new InstanceLockFactory(new LockFactory(new RedisStore($this->redis)), INSTANCE_ID);
         $timeout             = self::IMAGICK_TIME_LIMIT;
-        $lock                = $instanceLockFactory->createLock(self::LOCK_NAME, $timeout);
+        $lock                = $instanceLockFactory->createLock(self::LOCK_NAME, $timeout, false);
 
         try {
             $acquired = $lock->acquire();

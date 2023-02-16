@@ -20,7 +20,6 @@ use Psr\Log\LoggerInterface;
 
 class Logger implements LoggerInterface
 {
-
     // Command line options
     public const FIELD_MEM      = 'mem';        // Prepend a memory usage field to each log item
     public const FIELD_TRUE_MEM = 'truemem';    // Prepend a true memory usage field to each log item
@@ -67,7 +66,6 @@ class Logger implements LoggerInterface
      */
     public function __construct($outStream = STDOUT, $errStream = null, $threshold = Monologger::INFO, $fields = array(), $porcelain = false)
     {
-
         $this->out = $outStream;
         $this->err = $errStream;
         $this->porcelain = $porcelain;
