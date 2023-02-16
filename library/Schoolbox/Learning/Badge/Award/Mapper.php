@@ -122,8 +122,7 @@ class Mapper extends \Schoolbox\Mapper
             // being updated similarly.
             //    If we do not include deleted badges here, then when we try to use $badgeById below to get the badge
             // with a particular ID (sourced from $statement), we may find that no matching entry exists in $badgeById.
-            $badgeMapper->findByColumnList(['id' => array_keys($badgeIdsAsKeys)], array('deleted' => true))
-            as $badge
+            $badgeMapper->findByColumnList(['id' => array_keys($badgeIdsAsKeys)], array('deleted' => true)) as $badge
         ) {
             $badgeById[$badge->getId()] = $badge;
         }
