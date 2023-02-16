@@ -201,20 +201,33 @@ class Controller extends Base
         } catch (GuzzleException $e) {
             $existingUsers = [];
         }
+        $emails = [];
+
+        // provision new users
         $newUserIds = array_diff($userIds, array_keys($existingUsers));
         if (count($newUserIds) > 0) {
-            $responseUser = $this->helpRequest->provisionUsers($newUserIds);
+            $newUsers     = $this->userMapper->findByColumn('id', $newUserIds);
+            $responseUser = $this->helpRequest->provisionUsers($newUsers->getAll());
             $responseCode = $responseUser['status']['code'];
             if ($responseCode === 200) {
-                $messages[] = count($newUserIds) . ' user' . (count($newUserIds) > 1 ? 's' : '') . ' provisioned successfully';
+                $messages[] = $newUsers->count() . ' user' . ($newUsers->count() > 1 ? 's' : '') . ' provisioned successfully';
+                $emails     = $newUsers->getPropertyValues('email');
             } else {
                 $messages = array_column($responseUser['data'], 'message');
             }
         }
 
+        // gather usernames in response which correspond to user ids
+        foreach ($existingUsers as $existingUserId => $existingUserEmail) {
+            if (in_array($existingUserId, $userIds)) {
+                $emails[] = $existingUserEmail;
+            }
+        }
+
+        // course participation
         if (!empty($courses)) {
             $courses            = array_map('boolVal', $courses);
-            $responseCourse     = $this->helpRequest->provisionUserParticipation($userIds, $courses);
+            $responseCourse     = $this->helpRequest->provisionUserParticipation($emails, $courses);
             $responseCourseCode = $responseCourse['status']['code'];
             if ($responseCourseCode === 200) {
                 $messages[] = 'Course participation updated successfully.';
