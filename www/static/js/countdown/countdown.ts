@@ -37,16 +37,18 @@ countdownElements.forEach((element) => {
         targetElement.innerHTML = '<li class="count">Countdown has been reached!</li>';
         targetElement.parentElement.classList.add('disabled');
 
-        const boundRect = targetElement.getBoundingClientRect();
-        confetti({
-            particleCount: 300,
-            spread: 360,
-            ticks: 200,
-            origin: {
-                x: ((boundRect.left + (boundRect.width / 2)) / window.innerWidth),
-                y: ((boundRect.top + (boundRect.height / 2)) / window.innerHeight),
-            }
-        });
+        if (targetElement.getAttribute("data-finish-animation") === "1") {
+            const boundRect = targetElement.getBoundingClientRect();
+            confetti({
+                particleCount: 300,
+                spread: 360,
+                ticks: 200,
+                origin: {
+                    x: ((boundRect.left + (boundRect.width / 2)) / window.innerWidth),
+                    y: ((boundRect.top + (boundRect.height / 2)) / window.innerHeight),
+                }
+            });
+        }
     };
 
     countdownTimer.start();
