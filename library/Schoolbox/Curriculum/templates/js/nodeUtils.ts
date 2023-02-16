@@ -186,11 +186,15 @@ export function getTotalUsage(node: Node) {
  * @returns { string } - the href to return
  */
 export function getUsageIcon(usage: Usage) {
+    let badge = "icon-badge";
+    if ("icon" in usage.object) {
+        badge = usage.object.icon;
+    }
     const icons = {
         [ActivityTypes.COURSE]: "icon-course",
         [ActivityTypes.UNIT]: "icon-unit",
         [ActivityTypes.FOLDER]: "icon-folder",
-        [ActivityTypes.BADGE]: "icon-badge",
+        [ActivityTypes.BADGE]: badge,
     };
     return icons[usage.discriminator];
 }

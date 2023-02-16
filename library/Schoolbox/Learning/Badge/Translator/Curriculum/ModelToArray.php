@@ -16,7 +16,12 @@ class ModelToArray
             'id'        => $model->getId(),
             'title'     => $model->getName(),
             'category'  => $model->getCategory()->getName(),
+            'icon'      => $model->getIcon() ?: "/storage/image.php?hash={$model->getImage()->getHash()}",
             'yearLevel' => $model->getYearLevels() ? $model->getYearLevels()->getPropertyValues('name') : []
         ];
     }
+
+    /**
+     * Generate
+     */
 }

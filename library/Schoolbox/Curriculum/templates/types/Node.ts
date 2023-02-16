@@ -47,7 +47,7 @@ export enum ActivityTypes {
  */
 export type Usage = {
     discriminator: ActivityTypes.COURSE | ActivityTypes.UNIT | ActivityTypes.FOLDER | ActivityTypes.BADGE;
-    object: CourseUsageObject | UnitUsageObject | FolderUsageObject;
+    object: CourseUsageObject | UnitUsageObject | FolderUsageObject | BadgeUsageObject;
 };
 
 /**
@@ -112,4 +112,6 @@ export type NodeToUpdate = {
  */
 export interface BadgeUsageObject extends UsageObject {
     category: string;
+    yearLevel: string;
+    icon: string;
 }
