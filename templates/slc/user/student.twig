@@ -14,16 +14,3 @@
      {% endif %}
  {% endif %}
  {% endblock details_formTeacher %}
-
-{% block details_coordTeacher %}
-    {% if coordTeacher %}
-    <dt class="small-12 medium-3">Year Coordinator:</dt>
-    <dd class="small-12 medium-9">
-        {% if coordTeacher.getId() %}
-        <a href="{{ session.mailhandle }}{{ coordTeacher.getEmail() }}">{{ coordTeacher.formatName() }}</a>
-        {% else %}
-        {{ coordTeacher.formatName() }}
-        {% endif %}
-    </dd>
-    {% endif %}
-{% endblock details_coordTeacher %}

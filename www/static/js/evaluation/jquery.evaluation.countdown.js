@@ -42,7 +42,6 @@
          */
         function renderCountdown() {
             const element = config.element[0];
-            console.log(element);
             element.addEventListener("countdownChange", (event) => {
                 const hours = event.detail.hours.toString().padStart(2, "0");
                 const minutes = event.detail.minutes.toString().padStart(2, "0");

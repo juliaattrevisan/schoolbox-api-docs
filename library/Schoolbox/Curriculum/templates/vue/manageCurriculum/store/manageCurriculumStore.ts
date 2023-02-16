@@ -40,7 +40,7 @@ export const useStore = defineStore("manageCurriculum", () => {
     /**
      * Get default number of nodes to retrieve using the api
      *
-     * @returns { number }
+     * @returns { number } the number of nodes to show
      */
     function getUILimit(): number {
         return uiLimit;
@@ -79,10 +79,15 @@ export const useStore = defineStore("manageCurriculum", () => {
      *
      * @param { string } dataEndpoint - the curriculum api url
      * @param { boolean } $isReadOnly - whether the current user can edit the curriculum
-     * @param { number } uiLimit - the number of nodes to retrieve using the api
-     * @param { ref } toastElement -
+     * @param { number } dataUiLimit - the number of nodes to retrieve using the api
+     * @param { ref } toastElement - the toast element that can pop up
      */
-    async function init(dataEndpoint: string, $isReadOnly: boolean, dataUiLimit: number, toastElement: typeof Toast): Promise<void> {
+    async function init(
+        dataEndpoint: string,
+        $isReadOnly: boolean,
+        dataUiLimit: number,
+        toastElement: typeof Toast
+    ): Promise<void> {
         checkForNodeHash();
         checkForStorybook();
         isReadOnly.value = $isReadOnly;

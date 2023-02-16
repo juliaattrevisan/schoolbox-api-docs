@@ -274,6 +274,9 @@ module.exports = {
         core: "./www/static/css/core/core.scss",
         editor: "./www/static/css/core/editor.scss",
 
+        // Slideshow
+        slideshow: "./www/static/js/slideshow/slideshow.ts",
+
         // Markbook Pop Out
         popOutMenuMarkbook: "./vue/components/menu/popOutMenuMarkbook.js",
     },

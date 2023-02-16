@@ -25,6 +25,7 @@ use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Group;
 use Schoolbox\Resource\GroupMapper;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 class UserAccessNotifier extends AbstractModuleNotifier
 {
@@ -46,6 +47,8 @@ class UserAccessNotifier extends AbstractModuleNotifier
 
     private FolderMapper $folderMapper;
 
+    private UserMapper $userMapper;
+
     /**
      * @return string
      */
@@ -61,6 +64,9 @@ class UserAccessNotifier extends AbstractModuleNotifier
     {
         if (empty($dependencies['folderMapper'])) {
             $dependencies['folderMapper'] = FolderMapper::getInstance();
+        }
+        if (empty($dependencies['userMapper'])) {
+            $dependencies['userMapper'] = UserMapper::getInstance();
         }
         parent::loadDependencies($dependencies);
     }
@@ -405,18 +411,30 @@ class UserAccessNotifier extends AbstractModuleNotifier
             'groupname' => new CategoryParam($folder, ParameterInterface::STACKING_APPEND),
         ];
 
+        $icon = 'icon-group';
+
         if (str_contains($body, ':user')) {
-            $params['user'] = new UserParam($userAccess->getUser(), ParameterInterface::STACKING_APPEND);
+            // hydrate user
+            try {
+                $accessUser = $this->userMapper->findById($userAccess->getUser()->getId());
+            } catch (Exception $e) {
+                // should not happen, but falling back to unknown user
+                $accessUser = $userAccess->getUser();
+            }
+            $params['user'] = new UserParam($accessUser, ParameterInterface::STACKING_APPEND);
+            $icon           = $this->getUserIcon($accessUser);
         }
+
         if ($effector && (str_contains($body, ':effector'))) {
             $params['effector'] = new UserParam($effector);
+            $icon               = $this->getUserIcon($effector);
         }
 
         $href = $isAdmin ? "/group/modify/" . $folder->getId() : "/homepage/" . $folder->getId();
 
         $bob->setTitle($body)
             ->setHref($href)
-            ->setIcon($this->getUserIcon($effector ?? $userAccess->getUser()))
+            ->setIcon($icon)
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::NOTICE)
             ->addTopic("group.{$folder->getId()}.$label")
@@ -434,6 +452,16 @@ class UserAccessNotifier extends AbstractModuleNotifier
     protected function setFolderMapper(FolderMapper $folderMapper): static
     {
         $this->folderMapper = $folderMapper;
+        return $this;
+    }
+
+    /**
+     * @param UserMapper $userMapper
+     * @return static
+     */
+    protected function setUserMapper(UserMapper $userMapper): static
+    {
+        $this->userMapper = $userMapper;
         return $this;
     }
 }

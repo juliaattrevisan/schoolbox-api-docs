@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Example\Base\Endpoint;
 
+use GuzzleHttp\Exception\InvalidArgumentException;
+use Laminas\Uri\Exception\InvalidUriPartException;
 use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
 use Schoolbox\External\Importer\Endpoint\Status\IStatus;
 
@@ -19,7 +21,6 @@ use Schoolbox\External\Importer\Endpoint\Status\IStatus;
  */
 class Status implements IStatus
 {
-
     /**
      * @var Api
      */
@@ -31,10 +32,13 @@ class Status implements IStatus
      *
      * @param string $host
      * @param string $key
+     * @throws InvalidArgumentException
      */
-    public function __construct(string $host, string $key)
-    {
-        $this->api = new Api($host, $key);
+    public function __construct(
+        private string $host,
+        private string $key
+    ) {
+        $this->api = new Api($this->host, $this->key);
     }
 
 
@@ -53,6 +57,8 @@ class Status implements IStatus
      * @inheritDoc
      *
      * @return array
+     * @throws \Laminas\Uri\Exception\InvalidArgumentException
+     * @throws InvalidUriPartException
      */
     public function getReport(): array
     {

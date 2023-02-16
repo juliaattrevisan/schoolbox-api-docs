@@ -80,7 +80,7 @@ class External_Tass_Class implements External_ClassInterface
             WHERE semester = {$fileSemester}
                 AND yr_study = {$fileYear}
                 AND next_yr_ind != 'F'
-                AND student.cmpy_code = '{$companyCode}'
+                AND student.cmpy_code = {$companyCode}
                 AND student.doe <= CAST(GETDATE() AS DATE)
                 AND (student.dol IS NULL OR student.dol >= CAST(GETDATE() AS DATE))
                 AND (studsub.from_date IS NULL OR studsub.from_date <= CAST(GETDATE() AS DATE))

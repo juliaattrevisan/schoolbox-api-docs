@@ -22,6 +22,7 @@ use Schoolbox\Calendar\Config\SourceList;
 use Schoolbox\Calendar\Event\Attendance\ValidCanInvite;
 use Schoolbox\Calendar\Util\ViewNameMapping;
 use Schoolbox\CampusMapper;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User;
@@ -153,6 +154,14 @@ class Controller extends Base
         $eventType    = (new EventType($this->eventTypeMapper))->generate();
         $sourceList   = (new SourceList($this->calApiConfigMapper, $this->moduleChecker, $user))->generate();
 
+        // export options which may be disabled by config in www/calendar/export.php
+        $exportOptions = [
+            'duework'       => $this->calApiConfigMapper->isSourceEnabled('Submission', 'Schoolbox'),
+            'timetabledays' => $this->calApiConfigMapper->isSourceEnabled('TimetableDays', 'External'),
+            'resources'     => $this->getConfigLoader()->get(ConfigMapper::NAME_RESOURCE_BOOKING_ENABLED) && $this->calApiConfigMapper->isSourceEnabled('ResourceBooking', 'Booking'),
+            'eotc_all'      => $this->getConfigLoader()->get('eotc_enabled') && $this->calApiConfigMapper->isSourceEnabled('Custom', 'EOTC'),
+        ];
+
         /* Get the current session vars that store the Filter settings
          */
         $persistedFilters = $this->session->get('calendarFilter');
@@ -175,6 +184,7 @@ class Controller extends Base
                     'calendarView' => $calendarView,
                     'filters'      => $filters,
                     'selectedDate' => $selectedDate ?? Alaress_Date_Format::now(),
+                    'exportOptions' => $exportOptions,
                 ]
             )
         );

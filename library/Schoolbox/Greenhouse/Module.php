@@ -12,7 +12,6 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Twig\Error\LoaderError;
 
 class Module extends BaseModule
@@ -52,6 +51,6 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
-        return new Controller($this->getMapperFactory()->get(ErrorMapper::class));
+        return new Controller();
     }
 }

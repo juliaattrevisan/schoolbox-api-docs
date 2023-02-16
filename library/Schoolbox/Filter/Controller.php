@@ -198,9 +198,12 @@ class Controller extends BaseController
         /** @var string[][][] $postDefaults */
         $postDefaults = $this->getRequest()->post->get('filter_defaults');
 
-        foreach ($pageFilters as $pageFilter) {
+        /**
+         * @var IDefinition $class
+         * @var \Schoolbox\Filter\Page\Model $pageFilter
+         */
+        foreach ($pageFilters as $class => $pageFilter) {
             $filterId    = $pageFilter->getFilter()->getId();
-            $class       = $pageFilter->getFilter()->getClass();
             $isMandatory = $class::isMandatory($pageFilter->getPage());
 
             $pageFilter->setEnabled($isMandatory || isset($postEnabled[$filterId]));

@@ -59,7 +59,7 @@ class Api implements IApi
      * Maximum number of pages to obtain from an endpoint
      * to safeguard against infinite loops
      */
-    private const MAX_PAYLOADS = 1000;
+    private const MAX_PAYLOADS = 100;
 
 
     /**
@@ -95,25 +95,18 @@ class Api implements IApi
     /**
      * Constructor.
      *
-     * Each instance of IApi is limited to the $scope provided. To save
-     * on generating too many tokens, this $scope should fulfil the extent
-     * of this IApi instance so if you're doing Profile strat, your scope
-     * should just be all the profile scopes you need such as
-     *
-     * "students:list parents:list ......."
-     *
-     * @param string $host
-     * @param string $apiKey
-     * @param string $scope
-     * @param int    $timeout
-     * @throws \DomainException
+     * @param string       $host
+     * @param string       $apiKey
+     * @param int          $timeout
+     * @param Timecop|null $timecop
      * @throws InvalidArgumentException
+     * @throws \DomainException
      */
     public function __construct(
         private string $host,
         private string $apiKey,
-        private string $scope,
-        private int $timeout = self::DEFAULT_TIMEOUT
+        private int $timeout = self::DEFAULT_TIMEOUT,
+        private ?Timecop $timecop = null
     ) {
         $this->client = $this->initClient($this->host, $this->apiKey, $this->timeout);
 
@@ -186,6 +179,7 @@ class Api implements IApi
      *
      * @param string $method
      * @param string $endpoint
+     * @param string $scope
      * @param array  $params
      * @param int    $pageSize
      * @return \Generator
@@ -193,7 +187,7 @@ class Api implements IApi
      * @throws \JsonException
      * @throws \RuntimeException
      */
-    public function retrieve(string $method, string $endpoint, array $params = [], int $pageSize = self::PAGE_SIZE): \Generator
+    public function retrieve(string $method, string $endpoint, string $scope, array $params = [], int $pageSize = self::PAGE_SIZE): \Generator
     {
         $pageNum = 1;
         $payload = null;
@@ -206,7 +200,7 @@ class Api implements IApi
          * 3. The payload size == page size
          */
         while (($n < self::MAX_PAYLOADS) && (!$payload || \count($payload['data']) === self::PAGE_SIZE)) {
-            $payload = $this->retrieveOne($method, $endpoint, $pageNum, $pageSize, $params);
+            $payload = $this->retrieveOne($method, $endpoint, $scope, $pageNum, $pageSize, $params);
 
             $pageNum++;
             $n++;
@@ -225,6 +219,7 @@ class Api implements IApi
      *
      * @param string $method
      * @param string $endpoint
+     * @param string $scope
      * @param int    $pageNum
      * @param int    $pageSize
      * @param array  $params
@@ -233,7 +228,7 @@ class Api implements IApi
      * @throws \JsonException
      * @throws \RuntimeException
      */
-    public function retrieveOne(string $method, string $endpoint, int $pageNum, int $pageSize, array $params = []): array
+    public function retrieveOne(string $method, string $endpoint, string $scope, int $pageNum, int $pageSize, array $params = []): array
     {
         $response = null;
 
@@ -262,9 +257,20 @@ class Api implements IApi
 
                 /* Grab an Access Token
                  */
-                $accessToken = ($this->accessTokenGenerator->generate($this->scope))->getToken();
+                if ($this->timecop) {
+                    $this->timecop->regulate('** Access Token: about to obtain/reuse one');
+                }
+
+                $accessToken = ($this->accessTokenGenerator->generate($scope))->getToken();
+
+                if ($this->timecop) {
+                    $this->timecop->regulate('** Access Token: token obtained');
+                }
 
                 /* Slam in headers with the dynamic token
+                 *
+                 * TODO perhaps toggle the X-API-Value-Lists include if you've already
+                 *  spawned its contents once, saving us the data transfer...maybe
                  */
                 $options['headers'] = [
                     'Authorization' => "Bearer {$accessToken}",
@@ -274,7 +280,21 @@ class Api implements IApi
                     'X-Page-Size' => $pageSize
                 ];
 
+                if ($this->timecop) {
+                    $this->timecop->regulate(sprintf(
+                        '++ API Request to endpoint: %s (started)',
+                        $endpoint
+                    ));
+                }
+
                 $response = $this->client->request($method, $endpoint, $options);
+
+                if ($this->timecop) {
+                    $this->timecop->regulate(sprintf(
+                        '++ API Request to endpoint: %s (finished)',
+                        $endpoint
+                    ));
+                }
 
                 /* Debugging:
                  * Find out what guzzle calculated as the endpoint + query string params

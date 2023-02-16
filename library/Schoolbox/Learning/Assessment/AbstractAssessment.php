@@ -264,13 +264,13 @@ abstract class AbstractAssessment implements IAssessable
         $this->workType        = $source->getWorkType();
 
         // Dates are cloned
-        $this->publishAt = clone $source->getPublishAt();
-        $this->openAt    = clone $source->getOpenAt();
-        $this->dueAt     = clone $source->getDueAt();
-        $this->closeAt   = clone $source->getCloseAt();
-        $this->createdAt = clone $source->getCreatedAt();
-        $this->updatedAt = clone $source->getUpdatedAt();
-        $this->deletedAt = clone $source->getDeletedAt();
+        $this->publishAt = $source->getPublishAt() ? clone $source->getPublishAt() : null;
+        $this->openAt    = $source->getOpenAt()    ? clone $source->getOpenAt()    : null;
+        $this->dueAt     = $source->getDueAt()     ? clone $source->getDueAt()     : null;
+        $this->closeAt   = $source->getCloseAt()   ? clone $source->getCloseAt()   : null;
+        $this->createdAt = $source->getCreatedAt() ? clone $source->getCreatedAt() : null;
+        $this->updatedAt = $source->getUpdatedAt() ? clone $source->getUpdatedAt() : null;
+        $this->deletedAt = $source->getDeletedAt() ? clone $source->getDeletedAt() : null;
         return $this;
     }
 

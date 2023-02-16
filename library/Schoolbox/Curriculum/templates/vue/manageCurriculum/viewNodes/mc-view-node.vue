@@ -5,105 +5,57 @@
  */
 
 import { ref, computed, onMounted } from "vue";
+import type { Ref } from "vue";
 import { gsap } from "gsap/all";
 import { timeout } from "@js/util/jsUtils";
 import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/transitions";
-import { useStore } from "../store/manageCurriculumStore";
+import type { Node } from "@schoolboxCurriculum/types/Node";
 import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
+import { useStore } from "../store/manageCurriculumStore";
 import { useViewNodesStore, DIRECTION } from "./store/mcViewNodesStore";
 import { useActiveNodeStore } from "../activeNode/store/mcActiveNodeStore";
 import { useAddCurriculumStore } from "../store/mcAddCurriculumStore";
+import { useNodeDetailsStore } from "../activeNode/store/mcNodeDetailsStore";
 import { useAddSubsectionStore } from "../activeNode/store/mcAddSubsectionStore";
 import { useUpdateNodeStore } from "../activeNode/store/mcUpdateNodeStore";
 import { useSearchStore } from "../store/mcSearchStore";
 import McViewNodeCheckbox from "./mc-view-node-checkbox.vue";
 import McViewNodeName from "./mc-view-node-name.vue";
+import McViewNodeDetails from "./mc-view-node-details.vue";
 import McViewNodeActions from "./mc-view-node-actions.vue";
+import McNodeDetails from "../activeNode/mc-node-details.vue";
 import McAddSubsection from "../activeNode/mc-add-subsection.vue";
 import McUpdateNode from "../activeNode/mc-update-node.vue";
 
-const props = defineProps({
-    /**
-     * the assigned node to display
-     */
-    node: {
-        type: Object,
-        required: true,
-        default() {
-            return {
-                id: "0",
-                name: "-",
-                children: [],
-            };
-        },
-    },
-    /**
-     * to gradually add more marginLeft to indicate node level depth
-     */
-    depth: {
-        type: Number,
-        required: true,
-    },
-});
+interface Props {
+    node: Node; // the assigned node to display
+    depth: number; // to gradually add more marginLeft to indicate node level depth
+}
 
+const props = defineProps<Props>();
 const store = useStore();
 const viewNodesStore = useViewNodesStore();
 const activeNodeStore = useActiveNodeStore();
 const addCurriculumStore = useAddCurriculumStore();
+const nodeDetailsStore = useNodeDetailsStore();
 const addSubsectionStore = useAddSubsectionStore();
 const updateNodeStore = useUpdateNodeStore();
 const searchStore = useSearchStore();
-const viewNodeEl = ref(null); //to animate the node
-const isNew = ref(false); //to highlight if the node has just been added
-const justUpdated = ref(false); //to highlight if the node has just been updated
+const viewNodeEl = ref(null); // to animate the node
+const isNew = ref(false); // to highlight if the node has just been added
+const justUpdated = ref(false); // to highlight if the node has just been updated
 
 /**
  * Consider whether we are currently only showing enabled nodes
  * and hide the node if we are are and the node is not enabled
  *
- * @returns { Boolean }
+ * @returns { boolean }
  */
 const showNode = computed(() => {
     if (!viewNodesStore.showDisabled && !props.node.enabled) {
         return false;
-    } else {
-        return true;
     }
-});
-
-/**
- * to animate on the node, checking also if this node is
- * a new subsection or entirely new curriculum and animating
- */
-onMounted(() => {
-    if (showNode.value && props.depth === 0) {
-        //we only need to animate the first node, as the rest are contained within
-        animateOn();
-    }
-    if (props.node.id === addSubsectionStore.id) {
-        //higlight the newly added node
-        displayAnimation(isNew);
-        addSubsectionStore.unsetId();
-    } else if (props.node.id === addCurriculumStore.id) {
-        //highlight the new curriculum that's just been added
-        displayAnimation(isNew);
-        addCurriculumStore.unsetId();
-    }
-});
-
-/**
- * we listen for the actions we want to respond with
- * https://pinia.vuejs.org/core-concepts/actions.html#without-setup
- */
-useUpdateNodeStore().$onAction(({ name, after }) => {
-    if (name === "update") {
-        after((result) => {
-            if (props.node.id === result.id) {
-                //highlight the just updated node
-                displayAnimation(justUpdated);
-            }
-        });
-    }
+    return true;
 });
 
 /**
@@ -128,97 +80,156 @@ function animateOn() {
  * show an animation when the node has been added or updated
  * we add the relevant boolean ref to show the animation then remove
  *
- * @param { ref }
+ * @param { Ref<boolean> } change - the boolean value to change, can be either isNew or justUpdated
  */
-async function displayAnimation(change) {
+async function displayAnimation(change: Ref<boolean>) {
     change.value = true;
     await timeout(3000);
     change.value = false;
 }
 
 /**
+ * to animate on the node, checking also if this node is
+ * a new subsection or entirely new curriculum and animating
+ */
+
+onMounted(async () => {
+    if (showNode.value && props.depth === 0) {
+        // we only need to animate the first node, as the rest are contained within
+        animateOn();
+    }
+    if (props.node.id === addSubsectionStore.id) {
+        // higlight the newly added node
+        await displayAnimation(isNew);
+        addSubsectionStore.unsetId();
+    } else if (props.node.id === addCurriculumStore.id) {
+        // highlight the new curriculum that's just been added
+        await displayAnimation(isNew);
+        addCurriculumStore.unsetId();
+    }
+});
+
+/**
+ * we listen for the actions we want to respond with
+ * https://pinia.vuejs.org/core-concepts/actions.html#without-setup
+ */
+useUpdateNodeStore().$onAction(({ name, after }) => {
+    if (name === "update") {
+        after((result) => {
+            if (props.node.id === result.id) {
+                // highlight the just updated node
+                displayAnimation(justUpdated);
+            }
+        });
+    }
+});
+
+/**
  * to gradually add more marginLeft to indicate node level depth
  *
- * @returns { Number }
+ * @returns { number }
  */
 const marginLeft = computed(() => `calc(${props.depth * 2}rem)`);
 
 /**
  * To better highlight the current top level node from its children
  *
- * @returns { String }
+ * @returns { string }
  */
 const borderBottomColour = computed(() => {
     if (searchStore.isActive || props.depth !== 0) {
         return `var(--body-background)`;
-    } else if (props.depth === 0) {
-        return `var(--body-foreground-h1)`;
     }
+    return `var(--body-foreground-h1)`;
 });
+
+/**
+ * If this is the active node being viewed
+ *
+ * @returns { boolean }
+ */
+const isViewing = computed(() => nodeDetailsStore.isOpen && activeNodeStore.node.id === props.node.id);
+
+/**
+ * If there's another node being viewed
+ *
+ * @returns { boolean }
+ */
+const isViewingAnother = computed(() => nodeDetailsStore.isOpen && activeNodeStore.node.id !== props.node.id);
 
 /**
  * If this is the active node being updated
  *
- * @returns { Boolean }
+ * @returns { boolean }
  */
 const isUpdating = computed(() => updateNodeStore.isOpen && activeNodeStore.node.id === props.node.id);
 
 /**
  * If there's another node being updated
  *
- * @returns { Boolean }
+ * @returns { boolean }
  */
 const isUpdatingAnother = computed(() => updateNodeStore.isOpen && activeNodeStore.node.id !== props.node.id);
 
 /**
  * If this is the active node being added to
  *
- * @returns { Boolean }
+ * @returns { boolean }
  */
 const isAdding = computed(() => addSubsectionStore.isOpen && activeNodeStore.node.id === props.node.id);
 
 /**
  * If there's another node being added to
  *
- * @returns { Boolean }
+ * @returns { boolean }
  */
 const isAddingAnother = computed(() => addSubsectionStore.isOpen && activeNodeStore.node.id !== props.node.id);
 
 /**
- * If this is the active node being updated or added to
+ * If this is the active node being viewed, updated or added to
  *
- * @returns { Boolean }
+ * @returns { boolean }
  */
-const isUpdatingOrAdding = computed(() => isUpdating.value || isAdding.value);
+const isActive = computed(() => isViewing.value || isUpdating.value || isAdding.value);
 
 /**
  * To determine whether we need to display further child nodes within this node
  *
- * @returns { Boolean }
+ * @returns { boolean }
  */
 const showChildren = computed(() => props.node.children && props.node.children.length > 0 && props.depth + 1 < 2);
 
 /**
  * If there's a code available, which means it can be added to the name
  *
- * @returns { Boolean }
+ * @returns { boolean }
  */
 const hasCode = computed(() => props.node.code && props.node.code !== "");
 
 /**
  * Add in the code if it's available otherwise just show the title
  *
- * @returns { String }
+ * @returns { string }
  */
-const title = computed(() => (hasCode.value ? `[${props.node.code}] ${props.node.name}` : `${props.node.name}`));
+const title = computed(() =>
+    hasCode.value ? `[${props.node.code as string}] ${props.node.name}` : `${props.node.name}`
+);
 
 /**
- * Whether the buttons should be displayed, shouldn't be if the user is read only
+ * Whether the checkbox and actions should be displayed, shouldn't be if the user is read only
  * or we are at the root level node, or if the search is active
  *
- * @returns { Boolean }
+ * @returns { boolean }
  */
-const hasActions = computed(() => !store.isReadOnly && props.node.id !== UNSET_ID && !searchStore.isActive);
+const showActions = computed(() => !store.isReadOnly && props.node.id !== UNSET_ID && !searchStore.isActive);
+
+/**
+ * Whether the details should be displayed, shouldn't be if we are at the root level node,
+ * or if the search is active
+ *
+ * @returns { boolean }
+ */
+const showDetails = computed(() => props.node.id !== UNSET_ID && !searchStore.isActive);
 </script>
 
 <template>
@@ -227,27 +238,38 @@ const hasActions = computed(() => !store.isReadOnly && props.node.id !== UNSET_I
             <div
                 class="buttons-container"
                 :data-enabled="props.node.enabled"
-                :data-is-inactive="`${isUpdatingAnother || isAddingAnother ? true : false}`"
+                :data-is-inactive="`${isViewingAnother || isUpdatingAnother || isAddingAnother ? true : false}`"
                 :data-is-new="isNew"
                 :data-just-updated="justUpdated"
             >
-                <mc-view-node-checkbox v-if="hasActions" :node="props.node" :isUpdatingOrAdding="isUpdatingOrAdding" />
+                <mc-view-node-checkbox v-if="showActions" :node="props.node" :is-active="isActive" />
                 <mc-view-node-name
                     :node="props.node"
                     :depth="props.depth"
                     :title="title"
-                    :isUpdatingOrAdding="isUpdatingOrAdding"
+                    :is-active="isActive"
                     data-test-view-node-name
                 />
-                <mc-view-node-actions
-                    v-if="hasActions"
+                <mc-view-node-details
+                    v-if="showDetails"
                     :node="props.node"
                     :title="title"
-                    :isUpdating="isUpdating"
-                    :isAdding="isAdding"
-                    :isUpdatingOrAdding="isUpdatingOrAdding"
+                    :is-viewing="isViewing"
+                    :is-updating="isUpdating"
+                    :is-adding="isAdding"
+                />
+                <mc-view-node-actions
+                    v-if="showActions"
+                    :node="props.node"
+                    :title="title"
+                    :is-viewing="isViewing"
+                    :is-updating="isUpdating"
+                    :is-adding="isAdding"
                 />
             </div>
+            <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
+                <mc-node-details v-if="isViewing" :depth="props.depth" />
+            </Transition>
             <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
                 <mc-add-subsection v-if="isAdding" :depth="props.depth" />
             </Transition>
@@ -256,9 +278,9 @@ const hasActions = computed(() => !store.isReadOnly && props.node.id !== UNSET_I
             </Transition>
             <ul v-if="showChildren">
                 <mc-view-node
-                    v-for="node in props.node.children"
-                    :key="node.id"
-                    :node="node"
+                    v-for="viewNode in props.node.children"
+                    :key="viewNode.id"
+                    :node="viewNode"
                     :depth="props.depth + 1"
                     data-test-view-node
                 />

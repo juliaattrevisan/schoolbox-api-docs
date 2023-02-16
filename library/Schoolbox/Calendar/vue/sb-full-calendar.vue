@@ -751,6 +751,7 @@ export default {
             :translations="config.translations"
             :token="config.token"
             :event-export-url="urls.export"
+            :export-options="config.exportOptions"
         />
 
         <filter-modal

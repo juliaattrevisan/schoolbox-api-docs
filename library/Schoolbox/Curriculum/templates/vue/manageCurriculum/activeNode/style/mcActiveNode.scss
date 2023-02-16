@@ -1,0 +1,12 @@
+.node-container {
+    border-bottom: 1px solid var(--content-ui-background);
+    border-top: 1px solid var(--content-ui-background);
+    margin: -1px 0 0 0; //-1px so it butts up against the node border above
+    position: relative;
+    z-index: 1;
+}
+
+.title {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+}

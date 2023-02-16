@@ -2,7 +2,14 @@
  * Various utils related to managing curriculum nodes
  */
 
-import type { Node } from "@schoolboxCurriculum/types/Node";
+import type {
+    Node,
+    Usage,
+    CourseUsageObject,
+    UnitUsageObject,
+    FolderUsageObject,
+} from "@schoolboxCurriculum/types/Node";
+import { ActivityTypes } from "@schoolboxCurriculum/types/Node";
 import type { Breadcrumb } from "@schoolboxCurriculum/types/Breadcrumb";
 
 /**
@@ -146,4 +153,57 @@ export function getBreadcrumbs(node: Node, currentBreadcrumbs: Breadcrumb[]): Br
     }
     // otherwise we must be at the top of the breadcrumb list
     return currentBreadcrumbs; // so we can return now
+}
+
+/**
+ * To determine if there's any usage assigned on the node
+ *
+ * @param { Node } node - the node to check
+ * @returns { boolean } - whether theres any usage assigned on the node
+ */
+export function hasUsage(node: Node) {
+    if (node._usageCounts.course > 0 || node._usageCounts.unit > 0 || node._usageCounts.folder > 0) {
+        return true;
+    }
+    return false;
+}
+
+/**
+ * Get the total usage linked to all activities
+ *
+ * @param { Node } node - the node to check
+ * @returns { number } - the total count
+ */
+export function getTotalUsage(node: Node) {
+    return node._usageCounts.course + node._usageCounts.unit + node._usageCounts.folder;
+}
+
+/**
+ * To distinguish the activity type
+ *
+ * @param { Usage } usage - the usage
+ * @returns { string } - the href to return
+ */
+export function getUsageIcon(usage: Usage) {
+    const icons = {
+        [ActivityTypes.COURSE]: "icon-course",
+        [ActivityTypes.UNIT]: "icon-unit",
+        [ActivityTypes.FOLDER]: "icon-folder",
+    };
+    return icons[usage.discriminator];
+}
+
+/**
+ * To return the href based on the activity type
+ *
+ * @param { Usage } usage - the usage
+ * @returns { string } - the icon to return
+ */
+export function getUsageHref(usage: Usage) {
+    const icons = {
+        [ActivityTypes.COURSE]: () => (usage.object as CourseUsageObject).folder._links.view,
+        [ActivityTypes.UNIT]: () => (usage.object as UnitUsageObject).folder._links.view,
+        [ActivityTypes.FOLDER]: () => (usage.object as FolderUsageObject)._links.view,
+    };
+    return icons[usage.discriminator]();
 }

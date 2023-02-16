@@ -68,6 +68,7 @@ class Module extends BaseModule
                 try {
                     $item   = $this->getTileMapper()->findById($params['id']);
                     $layout = $this->getTileLayoutMapper()->findById($item->getTileLayout()->getId());
+                    $item->setTileLayout($layout);
                 } catch (MapperException\Deleted $e) {
                     throw $e;
                 } catch (MapperException $e) {

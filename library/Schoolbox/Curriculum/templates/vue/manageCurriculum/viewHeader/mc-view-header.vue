@@ -4,12 +4,14 @@
  */
 
 import { computed } from "vue";
+import { useNodeDetailsStore } from "../activeNode/store/mcNodeDetailsStore";
 import { useUpdateNodeStore } from "../activeNode/store/mcUpdateNodeStore";
 import { useAddSubsectionStore } from "../activeNode/store/mcAddSubsectionStore";
 import { useNodesStore } from "../store/mcNodesStore";
 import McViewHeaderBreadcrumbs from "./mc-view-header-breadcrumbs.vue";
 import McViewHeaderSearchInput from "./mc-view-header-search-input.vue";
 
+const nodeDetailsStore = useNodeDetailsStore();
 const updateNodeStore = useUpdateNodeStore();
 const addSubsectionStore = useAddSubsectionStore();
 const nodesStore = useNodesStore();
@@ -18,9 +20,11 @@ const nodesStore = useNodesStore();
  * Can't select the breadcrumbs or search input while updating or adding a node
  * or while nodes are being loaded
  *
- * @returns { Boolean }
+ * @returns { boolean }
  */
-const isDisabled = computed(() => updateNodeStore.isOpen || addSubsectionStore.isOpen || nodesStore.isLoading);
+const isDisabled = computed(
+    () => nodeDetailsStore.isOpen || updateNodeStore.isOpen || addSubsectionStore.isOpen || nodesStore.isLoading
+);
 </script>
 
 <template>

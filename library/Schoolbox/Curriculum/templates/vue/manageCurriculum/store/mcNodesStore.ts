@@ -157,11 +157,14 @@ export const useNodesStore = defineStore("mcNodes", () => {
     async function load() {
         const store = useStore();
         try {
-            const response = await fetch(`${store.getApiEndpoint()}/?topLevelOnly=1&descendants=1&limit=${store.getUILimit()}`, {
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
+            const response = await fetch(
+                `${store.getApiEndpoint()}/?topLevelOnly=1&descendants=1&limit=${store.getUILimit()}`,
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
             if (response.ok) {
                 const topLevelNodes = (await response.json()) as Node[];
                 await setTopLevel(topLevelNodes);
@@ -183,11 +186,14 @@ export const useNodesStore = defineStore("mcNodes", () => {
     async function loadNextChildren(id: number) {
         try {
             isLoading.value = true;
-            const response = await fetch(`${useStore().getApiEndpoint()}/${id}?descendants=2&limit=${useStore().getUILimit()}`, {
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
+            const response = await fetch(
+                `${useStore().getApiEndpoint()}/${id}?descendants=2&limit=${useStore().getUILimit()}`,
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
             const responseJson = await response.json();
             if (response.ok) {
                 const newNode = responseJson as Node;

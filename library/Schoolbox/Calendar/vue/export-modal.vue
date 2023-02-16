@@ -8,7 +8,15 @@ export default {
 
     components: { ExportUrlModal, RevealModal },
 
-    props: ["eventTypes", "groups", "campuses", "translations", "token", "eventExportUrl"],
+    props: [
+        'eventTypes',
+        'groups',
+        'campuses',
+        'translations',
+        'token',
+        'eventExportUrl',
+        'exportOptions',
+    ],
 
     data() {
         return {
@@ -136,7 +144,7 @@ export default {
                             />
                             <label for="export-timetable">Timetable classes</label>
                         </li>
-                        <li>
+                        <li v-if="exportOptions.timetabledays">
                             <input
                                 type="radio"
                                 v-model="form.export"
@@ -146,7 +154,7 @@ export default {
                             />
                             <label for="export-timetableday">Timetable days</label>
                         </li>
-                        <li>
+                        <li v-if="exportOptions.duework">
                             <input
                                 type="radio"
                                 v-model="form.export"
@@ -156,7 +164,7 @@ export default {
                             />
                             <label for="export-duework">{{ translations.dueWork.proper }}</label>
                         </li>
-                        <li>
+                        <li v-if="exportOptions.resources">
                             <input
                                 type="radio"
                                 v-model="form.export"
@@ -176,7 +184,7 @@ export default {
                             />
                             <label for="export-external">External events</label>
                         </li>
-                        <li>
+                        <li v-if="exportOptions.eotc_all">
                             <input
                                 type="radio"
                                 v-model="form.export"

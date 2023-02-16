@@ -2098,27 +2098,33 @@ abstract class Mapper implements IMapper, Serializable
     }
 
     /**
+     * If param 'deleted' is true, should return soft-deleted item.
+     * If param 'deleted' is false, should not return soft-deleted item.
+     *
      * @inheritDoc
      */
     public function findOneByColumnList($columnList, array $options = array())
     {
         $defaults = [
-            'deleted' => true,
+            'deleted' => false,
             'order'   => [],
         ];
         $options = array_merge($defaults, $options);
 
-        $result_collection = $this->findByColumnList(
-            $columnList,
-            $options
-        );
+        // We always need to find deleted items for the below call to findByColumnList, regardless of what is passed
+        // in $options.  This is so if $options['deleted'] is false, and no non-deleted items are found, we can return
+        // the deleted option below via $e->setDeletedObject().
+        $optionsForFindByColumnList = $options;        // Make copy of $options array.
+        $optionsForFindByColumnList['deleted'] = true; // Override 'deleted' for this call only.
+        $result_collection = $this->findByColumnList($columnList, $optionsForFindByColumnList);
+
         if ($result_collection->count() === 0) {
             throw new Exception\NotFound();
         }
 
-        // Use the first non-deleted model
         foreach ($result_collection as $model) {
-            if ($model instanceof ISoftDeletable && $model->isDeleted()) {
+            // If $options['deleted'] is false, check whether the item has been soft-deleted.  If so, skip it.
+            if (!$options['deleted'] && $model instanceof ISoftDeletable && $model->isDeleted()) {
                 continue;
             }
             return $model;

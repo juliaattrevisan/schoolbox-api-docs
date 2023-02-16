@@ -42,6 +42,20 @@ class Cursor implements ICursor
     public const DISCRIMINATOR_FOLDER = 'folder';
 
     /**
+     * Discriminator for identifying an assessment result.
+     *
+     * (Only specification assessments are currently retrieved by this API.)
+     */
+    public const DISCRIMINATOR_ASSESSMENT = 'assessment';
+
+    /**
+     * Discriminator for identifying an assessment within a project result.
+     *
+     * (Only specification assessments are currently retrieved by this API.)
+     */
+    public const DISCRIMINATOR_PROJECT_ASSESSMENT = 'projectAssessment';
+
+    /**
      * Minimum number of results returnable from the cursor at once:
      * it must return at least one result.
      */
@@ -139,11 +153,9 @@ class Cursor implements ICursor
                     cs.id AS id,
                     f.name AS name
                 FROM curriculum_node_for_category cnfc
-                INNER JOIN folder f ON cnfc.category_id = f.id
-                INNER JOIN course_specification cs ON f.id = cs.folder_id
-                WHERE f.deleted_at IS NULL
-                AND cs.deleted_at IS NULL
-                AND cnfc.curriculum_node_id = :courseCurriculumNodeId
+                INNER JOIN folder f ON cnfc.category_id = f.id AND f.deleted_at IS NULL
+                INNER JOIN course_specification cs ON f.id = cs.folder_id AND cs.deleted_at IS NULL
+                WHERE cnfc.curriculum_node_id = :courseCurriculumNodeId
             ",
             "
                 SELECT
@@ -152,11 +164,22 @@ class Cursor implements ICursor
                     cus.id AS id,
                     f.name AS name
                 FROM curriculum_node_for_category cnfc
-                INNER JOIN folder f ON cnfc.category_id = f.id
-                INNER JOIN course_unit_specification cus ON f.id = cus.folder_id
-                WHERE f.deleted_at IS NULL
-                AND cus.deleted_at IS NULL
-                AND cnfc.curriculum_node_id = :unitCurriculumNodeId
+                INNER JOIN folder f ON cnfc.category_id = f.id AND f.deleted_at IS NULL
+                INNER JOIN course_unit_specification cus ON f.id = cus.folder_id AND cus.deleted_at IS NULL
+                WHERE cnfc.curriculum_node_id = :unitCurriculumNodeId
+            ",
+            "
+                SELECT
+                    3 AS discriminator_order,
+                    :assessmentDiscriminator AS discriminator,
+                    a.id AS id,
+                    a.title AS name
+                FROM curriculum_node_for_assessment cnfa
+                INNER JOIN v_assessment_relation var ON cnfa.assessment_id = var.assessment_id
+                INNER JOIN assessment a ON var.assessment_id = a.id AND a.deleted_at IS NULL
+                INNER JOIN course_unit_specification cus
+                    ON var.course_unit_specification_id = cus.id AND cus.deleted_at IS NULL
+                WHERE cnfa.curriculum_node_id = :assessmentCurriculumNodeId
             ",
             "
                 SELECT
@@ -165,25 +188,26 @@ class Cursor implements ICursor
                     f.id AS id,
                     f.name AS name
                 FROM curriculum_node_for_category cnfc
-                INNER JOIN folder f ON cnfc.category_id = f.id
-                LEFT JOIN course_specification cs ON f.id = cs.folder_id
-                LEFT JOIN course_unit_specification cus ON f.id = cus.folder_id
-                WHERE f.deleted_at IS NULL
-                AND cs.id IS NULL
+                INNER JOIN folder f ON cnfc.category_id = f.id AND f.deleted_at IS NULL
+                LEFT JOIN course_specification cs ON f.id = cs.folder_id AND cs.deleted_at IS NULL
+                LEFT JOIN course_unit_specification cus ON f.id = cus.folder_id AND cus.deleted_at IS NULL
+                WHERE cs.id IS NULL
                 AND cus.id IS NULL
                 AND cnfc.curriculum_node_id = :folderCurriculumNodeId
             ",
         ];
         $queryString = 'SELECT * FROM (('
-            . implode(') UNION (', $selectParts)
+            . implode(') UNION ALL (', $selectParts)
             . ')) AS combined';
         $params = [
-            'courseDiscriminator'    => self::DISCRIMINATOR_COURSE,
-            'courseCurriculumNodeId' => $this->node->getId(),
-            'unitDiscriminator'      => self::DISCRIMINATOR_UNIT,
-            'unitCurriculumNodeId'   => $this->node->getId(),
-            'folderDiscriminator'    => self::DISCRIMINATOR_FOLDER,
-            'folderCurriculumNodeId' => $this->node->getId(),
+            'courseDiscriminator'        => self::DISCRIMINATOR_COURSE,
+            'courseCurriculumNodeId'     => $this->node->getId(),
+            'unitDiscriminator'          => self::DISCRIMINATOR_UNIT,
+            'unitCurriculumNodeId'       => $this->node->getId(),
+            'assessmentDiscriminator'    => self::DISCRIMINATOR_ASSESSMENT,
+            'assessmentCurriculumNodeId' => $this->node->getId(),
+            'folderDiscriminator'        => self::DISCRIMINATOR_FOLDER,
+            'folderCurriculumNodeId'     => $this->node->getId(),
         ];
 
         // Figure out a WHERE part

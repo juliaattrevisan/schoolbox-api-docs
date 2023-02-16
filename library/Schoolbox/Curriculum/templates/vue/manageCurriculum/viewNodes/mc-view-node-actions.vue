@@ -3,69 +3,42 @@
  * To edit an existing node or add a new subsection to a node
  */
 
+import type { Node } from "@schoolboxCurriculum/types/Node";
 import { useAddSubsectionStore } from "../activeNode/store/mcAddSubsectionStore";
 import { useUpdateNodeStore } from "../activeNode/store/mcUpdateNodeStore";
 
-const props = defineProps({
-    /**
-     * the assigned node to display
-     */
-    node: {
-        type: Object,
-        required: true,
-        default() {
-            return {
-                id: "0",
-                name: "-",
-                children: [],
-            };
-        },
-    },
-    /**
-     * the already computed node title
-     */
-    title: {
-        type: String,
-        required: true,
-    },
-    /**
-     * to disable certain events when updating the node
-     */
-    isUpdating: {
-        type: Boolean,
-        required: true,
-    },
-    /**
-     * to disable certain events when adding a node
-     */
-    isAdding: {
-        type: Boolean,
-        required: true,
-    },
-    /**
-     * to disable certain events when any editing is taking place
-     */
-    isUpdatingOrAdding: {
-        type: Boolean,
-        required: true,
-    },
-});
+interface Props {
+    node: Node; // the assigned node to display
+    title: string; // the already computed node title
+    isViewing: boolean; // to disable certain events when viewing the node
+    isUpdating: boolean; // to disable certain events when updating the node
+    isAdding: boolean; // to disable certain events when adding a node
+}
 
+const props = defineProps<Props>();
 const addSubsectionStore = useAddSubsectionStore();
 const updateNodeStore = useUpdateNodeStore();
 
 /**
- * to open up or close the update modal
+ * to open up or close the add subsection modal
  */
 function onAddSubsectionToggleSelected() {
-    props.isAdding ? addSubsectionStore.cancel() : addSubsectionStore.prompt(props.node);
+    if (props.isAdding) {
+        addSubsectionStore.cancel();
+    } else {
+        addSubsectionStore.prompt(props.node);
+    }
 }
 
 /**
  * to open up or close the update modal
  */
 function onUpdateToggleSelected() {
-    props.isUpdating ? updateNodeStore.cancel() : updateNodeStore.prompt(props.node);
+    if (props.isUpdating) {
+        updateNodeStore.cancel();
+    } else {
+        updateNodeStore.prompt(props.node);
+    }
 }
 </script>
 
@@ -73,20 +46,18 @@ function onUpdateToggleSelected() {
     <button
         :class="`button-action-option ${props.isUpdating ? 'icon-close' : 'icon-modify'}`"
         :title="`Update ${props.title}`"
-        :disabled="props.isAdding"
+        :disabled="props.isViewing || props.isAdding"
         data-test-update
         @click.prevent="onUpdateToggleSelected"
-        @keyup.enter="onUpdateToggleSelected"
     >
         Update {{ props.title }}
     </button>
     <button
         :class="`button-action-option ${props.isAdding ? 'icon-close' : 'icon-add'}`"
         :title="`Add subsection to ${props.title}`"
-        :disabled="props.isUpdating"
+        :disabled="props.isViewing || props.isUpdating"
         data-test-add
         @click.prevent="onAddSubsectionToggleSelected"
-        @keyup.enter="onAddSubsectionToggleSelected"
     >
         Add subsection to {{ props.title }}
     </button>
@@ -94,7 +65,6 @@ function onUpdateToggleSelected() {
 
 <style lang="scss" scoped>
 @import "./style/mcViewNode";
-
 .button-action-option {
     @extend .button;
     color: var(--content-ui-foreground);
