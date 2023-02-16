@@ -26,6 +26,7 @@ export type Node = {
         course: number;
         folder: number;
         unit: number;
+        badge: number;
     };
     usage?: Usage[]; // all the details for all the places the node has been used
     usageCount?: number; // the total number of linked activities (not just the currently loaded)
@@ -38,13 +39,14 @@ export enum ActivityTypes {
     COURSE = "course",
     UNIT = "unit",
     FOLDER = "folder",
+    BADGE = "badge",
 }
 
 /**
  * An activity linked to the node
  */
 export type Usage = {
-    discriminator: ActivityTypes.COURSE | ActivityTypes.UNIT | ActivityTypes.FOLDER;
+    discriminator: ActivityTypes.COURSE | ActivityTypes.UNIT | ActivityTypes.FOLDER | ActivityTypes.BADGE;
     object: CourseUsageObject | UnitUsageObject | FolderUsageObject;
 };
 
@@ -104,3 +106,10 @@ export type NodeToUpdate = {
     description: string | null;
     name: string;
 };
+
+/**
+ * The further details of the badge usage
+ */
+export interface BadgeUsageObject extends UsageObject {
+    category: string;
+}

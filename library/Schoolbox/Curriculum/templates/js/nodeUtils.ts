@@ -8,6 +8,7 @@ import type {
     CourseUsageObject,
     UnitUsageObject,
     FolderUsageObject,
+    BadgeUsageObject,
 } from "@schoolboxCurriculum/types/Node";
 import { ActivityTypes } from "@schoolboxCurriculum/types/Node";
 import type { Breadcrumb } from "@schoolboxCurriculum/types/Breadcrumb";
@@ -189,6 +190,7 @@ export function getUsageIcon(usage: Usage) {
         [ActivityTypes.COURSE]: "icon-course",
         [ActivityTypes.UNIT]: "icon-unit",
         [ActivityTypes.FOLDER]: "icon-folder",
+        [ActivityTypes.BADGE]: "icon-badge",
     };
     return icons[usage.discriminator];
 }
@@ -204,6 +206,7 @@ export function getUsageHref(usage: Usage) {
         [ActivityTypes.COURSE]: () => (usage.object as CourseUsageObject).folder._links.view,
         [ActivityTypes.UNIT]: () => (usage.object as UnitUsageObject).folder._links.view,
         [ActivityTypes.FOLDER]: () => (usage.object as FolderUsageObject)._links.view,
+        [ActivityTypes.BADGE]: () => "#",
     };
     return icons[usage.discriminator]();
 }
