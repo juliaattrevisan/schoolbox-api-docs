@@ -18,7 +18,7 @@ const props = defineProps<Props>();
     <li class="usage">
         <a :href="`${getUsageHref(props.usage)}`" :title="props.usage.object.title">
             <div class="usage__container">
-                <div v-else :class="`usage__icon-container ${getUsageIcon(props.usage)} size-24`"></div>
+                <div :class="`usage__icon-container ${getUsageIcon(props.usage)} size-24`"></div>
                 <div class="usage__title-container">
                     <p>{{ props.usage.object.title }}</p>
                     <p v-if="props.usage.discriminator === ActivityTypes.COURSE" class="meta">
