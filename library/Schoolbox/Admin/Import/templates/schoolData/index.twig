@@ -200,7 +200,10 @@
                 <div data-alert class="alert-box">
                     <h2>Performing Live Sync</h2>
                     {% if config.messaging_enabled %}
-                        <p>Please be patient - we'll notify you when it's done.</p>
+                        <p>
+                            Please be patient - a sync is in progress.
+                           If you manually initiated this sync, you'll be notified when it's complete.
+                        </p>
                     {% else %}
                         <p>
                             If messaging was enabled, you would have been notified when the School Data sync
