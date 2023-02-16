@@ -135,11 +135,7 @@ $allow-sidebar-stash: $large-up;
         transform: none;
 
         .left-menu-dock::after {
-<<<<<<< HEAD
-            content: "\e916"; //.icon-pin-hollow
-=======
             content: "\e915"; //.icon-pin-hollow
->>>>>>> 9d1808efc18 (Update manual code references to font icon + prettier hit three files [SA-14710])
         }
     }
     .exit-off-canvas {
@@ -365,11 +361,7 @@ $allow-sidebar-stash: $large-up;
 
             .profile-drop:after {
                 font-family: $font-family-icon;
-<<<<<<< HEAD
-                content: "\e901"; //.icon-up-arrow
-=======
                 content: "\e900"; //.icon-up-arrow
->>>>>>> 9d1808efc18 (Update manual code references to font icon + prettier hit three files [SA-14710])
                 color: $accounts-menu-foreground;
                 display: table-cell;
                 padding: 0px 10px;
@@ -386,11 +378,7 @@ $allow-sidebar-stash: $large-up;
 
             &.active > a:after {
                 font-family: $font-family-icon;
-<<<<<<< HEAD
-                content: "\e902"; //.icon-down-arrow
-=======
                 content: "\e901"; //.icon-down-arrow
->>>>>>> 9d1808efc18 (Update manual code references to font icon + prettier hit three files [SA-14710])
             }
 
             .content {
@@ -437,11 +425,7 @@ $allow-sidebar-stash: $large-up;
             }
 
             &::after {
-<<<<<<< HEAD
-                content: "\e914"; //.icon-pin
-=======
                 content: "\e913"; //.icon-pin
->>>>>>> 9d1808efc18 (Update manual code references to font icon + prettier hit three files [SA-14710])
                 font-family: $font-family-icon;
                 padding-left: rem-calc(4);
             }
