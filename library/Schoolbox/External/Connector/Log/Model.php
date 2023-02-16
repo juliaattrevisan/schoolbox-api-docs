@@ -36,11 +36,12 @@ class Model
 
 
     /**
-     * These constts explicitly indicate the status of an import
+     * These consts explicitly indicate the status of an import
      * without having to infer meaning from a null finish_at
      */
     public const STATUS_RUNNING = 'running';
     public const STATUS_COMPLETE = 'complete';
+    public const STATUS_INCOMPLETE = 'incomplete';
     public const STATUS_ERROR = 'error';
 
 

@@ -324,16 +324,21 @@ class Controller extends ConfigController
         $logger = $this->spawnLogger();
 
         // Not the best place to put it but it will do for now
-        $this->getResponse()->content->set([
-            'format' => 'noContent',
-            'postOutput' => [
-                function () use ($logger) {
+//        $this->getResponse()->content->set([
+//            'format' => 'noContent',
+//            'postOutput' => [
+//                function () use ($logger) {
                     $this->syncCallback($logger);
-                }
-            ],
-        ]);
+//                }
+//            ],
+//        ]);
     }
 
+
+    private function bleah()
+    {
+
+    }
 
     /**
      * Performs an actual sync.
@@ -382,11 +387,6 @@ class Controller extends ConfigController
              */
             set_time_limit($timeout);
 
-            /* This identifier indicates that the two schedulers were part of this
-             * script execution together
-             */
-            $runId = (new \Schoolbox\External\Connector\Log\Guid())->generate();
-
             /* Get this particular db instance
              */
             $importLogMapper = \Schoolbox\External\Connector\Log\Mapper::getInstance();
@@ -409,6 +409,17 @@ class Controller extends ConfigController
             $time = time();
 
             foreach ($splitStrats as $currentStrat) {
+                /* Each part of a Segregated Import gets its own run id
+                 */
+                $runId = (new \Schoolbox\External\Connector\Log\Guid())->generate();
+
+                /* Check if the import was Running when we died/ended
+                 * If so, set it to Incomplete
+                 */
+                register_shutdown_function(static function() use ($runId, $importLogMapper) {
+                    $importLogMapper->assignIncomplete($runId);
+                });
+
                 /* ValidStrats is now a cli option
                  */
                 $validStrats = new ValidStrats($currentStrat);
@@ -453,7 +464,7 @@ class Controller extends ConfigController
                 $importLogMapper
             ))->run($time, $runId, Scheduler::MANUAL_CALENDAR_SCRIPT_NAME);
 
-            /* Go to the "Previous IMports" area of SUDS Control Panel
+            /* Go to the "Previous Imports" area of SUDS Control Panel
              */
             $redirect = $this->router->generate('adminImportIndex.getSchoolDataIndex') . '#previous';
 
