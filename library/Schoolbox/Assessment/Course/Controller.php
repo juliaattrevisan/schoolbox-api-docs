@@ -213,6 +213,16 @@ class Controller extends Base\Base
             $errors[] = 'Proposed Unit folder already has a Course: ' . $unitFolderCourse->getId();
         }
 
+        // Are children courses / units?
+        $children = $this->folderMapper->findAllChildren($courseFolder->getId());
+        foreach ($children as $childFolder) {
+            // Does the proposed Unit Folder already have a Course ?
+            $childFolderCourse = $childFolder->getCourseSpecification();
+            if ($childFolderCourse instanceof CourseSpecification && $childFolderCourse->getId()) {
+                $errors[] = 'The proposed folder already contains a course: ' . $childFolderCourse->getTitle();
+            }
+        }
+
         if (\count($errors)) {
             $this->returnJson($errors, 400);
             return;
@@ -1152,7 +1162,7 @@ class Controller extends Base\Base
         }
 
         $treeBuilder = new TreeBuilder(
-            FolderMapper::getInstance(),
+            $this->folderMapper,
             $_SESSION['user'],
             $folderId
         );
