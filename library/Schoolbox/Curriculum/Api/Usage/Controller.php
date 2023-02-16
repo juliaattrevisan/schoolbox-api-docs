@@ -13,6 +13,7 @@ use Schoolbox\Curriculum\Node;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
+use Schoolbox\Learning\Badge as Badge;
 use Schoolbox\Resource\Folder;
 
 /**
@@ -37,6 +38,7 @@ class Controller extends Base
         private UnitSpec\Mapper $unitSpecMapper,
         private Assessment\DataModel\MapperProxy $assessmentDataSource,
         private Counter $counter,
+        private Badge\Mapper $badgeMapper
     ) {
     }
 
@@ -79,6 +81,8 @@ class Controller extends Base
             $this->getUser(),
             $unitTranslator,
         );
+        $badgeTranslator = new Badge\Translator\Curriculum\ModelToArray();
+
         $hydrator = new Hydrator(
             $this->folderMapper,
             $folderTranslator,
@@ -88,6 +92,8 @@ class Controller extends Base
             $unitTranslator,
             $this->assessmentDataSource,
             $assessmentTranslator,
+            $this->badgeMapper,
+            $badgeTranslator
         );
 
         $this->response->content->set(
