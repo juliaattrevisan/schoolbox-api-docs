@@ -174,34 +174,34 @@
         <!-- END no_recent_blog -->
 
         <!-- BEGIN has_recent_photo -->
-        <script src="{CDN_PREFIX}/js/vendors/swiper/dist/js/swiper.min.js?v={SITE_VERSION}"></script>
-        <script src="{CDN_PREFIX}/js/gallery/jquery.alaressSlider.js?v={SITE_VERSION}"></script>
-        <script>
-            $(function() {
-                $('#profile-imageslider').alaressSlider({
-                    navigation: {
-                        nextEl: '#image-slider-button-next',
-                        prevEl: '#image-slider-button-prev'
-                    }
-                });
-            });
-        </script>
         <div class="row">
             <div class="small-12 island">
                 <h2 class="subheader">Recent Photos</h2>
-                <div class="swiper-container" id="profile-imageslider">
+                <div class="swiper" id="profile-imageslider">
                     <div class="swiper-wrapper">
                     <!-- BEGIN recent_photo -->'
                         <div class="swiper-slide">
-                            <img alt="{RECENT_PHOTO_FILE_DESC}" src='/cms/myImage.php?id={RECENT_PHOTO_FILE_ID}&amp;key=eportfolioRecentPhoto'  class="swiper-lazy" />
+                            <img alt="{RECENT_PHOTO_FILE_DESC}" src='/cms/myImage.php?id={RECENT_PHOTO_FILE_ID}&amp;key=eportfolioRecentPhoto' loading="lazy" />
                             <div class="loader"></div>
                         </div>
                     <!-- END recent_photo -->
                     </div>
                     <div class="swiper-pagination"></div>
-                    <div class="swiper-button-next" id="image-slider-button-next"></div>
-                    <div class="swiper-button-prev" id="image-slider-button-prev"></div>
+                    <div class="swiper-button-next"></div>
+                    <div class="swiper-button-prev"></div>
                 </div>
+                <script src="{CDN_PREFIX}/js/bundle/slideshow.js"></script>
+                <script>
+                    document.dispatchEvent(
+                        new CustomEvent("swiperInitialize", {
+                            detail: {
+                                target: document.getElementById("profile-imageslider"),
+                                options: {},
+                            },
+                        })
+                    );
+                </script>
+            </div>
             </div>
         </div>
         <!-- END has_recent_photo -->

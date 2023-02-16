@@ -270,6 +270,9 @@ module.exports = {
         core: "./www/static/css/core/core.scss",
         editor: "./www/static/css/core/editor.scss",
 
+        // Slideshow
+        slideshow: "./www/static/js/slideshow/slideshow.ts",
+
         // Markbook Pop Out
         popOutMenuMarkbook: "./vue/components/menu/popOutMenuMarkbook.js",
     },
@@ -295,7 +298,7 @@ module.exports = {
                 test: require.resolve("dropzone"),
                 loader: "expose-loader",
                 options: {
-                    exposes: { globalName: "Dropzone", moduleLocalName: "Dropzone", override: true }
+                    exposes: { globalName: "Dropzone", moduleLocalName: "Dropzone", override: true },
                 },
             },
             {
