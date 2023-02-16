@@ -91,6 +91,15 @@ class Counter
                 AND cnfc.curriculum_node_id IN "
                 . Builder::getArrayPlaceholders($ids, Cursor::DISCRIMINATOR_FOLDER)
                 . " GROUP BY id, discriminator",
+            " SELECT
+                    cb.curriculum_node_id AS id,
+                    :badgeDiscriminator AS discriminator,
+                    COUNT(*) AS count
+                FROM curriculum_badge cb
+                JOIN badge b on (cb.badge_id = b.id AND b.deleted_at IS NULL)
+                WHERE cb.curriculum_node_id IN "
+            . Builder::getArrayPlaceholders($ids, Cursor::DISCRIMINATOR_BADGE)
+            . " GROUP BY cb.curriculum_node_id, discriminator",
         ];
         $queryString = '(' . implode(') UNION ALL (', $selectParts) . ')';
         $query       = $this->database->prepareQuery($queryString);
@@ -101,11 +110,13 @@ class Counter
             'unitDiscriminator'       => Cursor::DISCRIMINATOR_UNIT,
             'assessmentDiscriminator' => Cursor::DISCRIMINATOR_ASSESSMENT,
             'folderDiscriminator'     => Cursor::DISCRIMINATOR_FOLDER,
+            'badgeDiscriminator'      => Cursor::DISCRIMINATOR_BADGE,
         ];
         $params += Builder::getArrayParameters($ids, Cursor::DISCRIMINATOR_COURSE);
         $params += Builder::getArrayParameters($ids, Cursor::DISCRIMINATOR_UNIT);
         $params += Builder::getArrayParameters($ids, Cursor::DISCRIMINATOR_ASSESSMENT);
         $params += Builder::getArrayParameters($ids, Cursor::DISCRIMINATOR_FOLDER);
+        $params += Builder::getArrayParameters($ids, Cursor::DISCRIMINATOR_BADGE);
 
         // Run query and compile result
         $result = array_fill_keys(
@@ -115,6 +126,7 @@ class Counter
                 Cursor::DISCRIMINATOR_UNIT       => 0,
                 Cursor::DISCRIMINATOR_ASSESSMENT => 0,
                 Cursor::DISCRIMINATOR_FOLDER     => 0,
+                Cursor::DISCRIMINATOR_BADGE      => 0,
             ]
         );
         $query->execute($params);

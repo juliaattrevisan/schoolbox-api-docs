@@ -46,7 +46,9 @@ function onViewToggleSelected() {
             props.node._usageCounts.unit
         }}</span>
         <!-- <span v-if="props.node._usageCounts?.assessment > 0" class="label neutral icon-due-work" title="Assessment">3</span> -->
-        <!-- <span v-if="props.node._usageCounts?.badge > 0" class="label neutral icon-badge" title="Badges">7</span> -->
+        <span v-if="props.node._usageCounts?.badge > 0" class="label neutral icon-badge" title="Badges">{{
+            props.node._usageCounts.badge
+        }}</span>
         <span v-if="props.node._usageCounts?.folder > 0" class="label neutral icon-folder" title="Folders">{{
             props.node._usageCounts.folder
         }}</span>

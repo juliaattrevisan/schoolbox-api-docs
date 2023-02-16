@@ -56,6 +56,12 @@ class Cursor implements ICursor
     public const DISCRIMINATOR_PROJECT_ASSESSMENT = 'projectAssessment';
 
     /**
+     * Discriminator for identifying a badge.
+     *
+     */
+    public const DISCRIMINATOR_BADGE = 'badge';
+
+    /**
      * Minimum number of results returnable from the cursor at once:
      * it must return at least one result.
      */
@@ -183,6 +189,16 @@ class Cursor implements ICursor
             ",
             "
                 SELECT
+                    4 AS discriminator_order,
+                    :badgeDiscriminator AS discriminator,
+                    b.id AS id,
+                    b.name AS name
+                FROM curriculum_badge cb
+                JOIN badge b on (cb.badge_id = b.id AND b.deleted_at IS NULL)
+                WHERE cb.curriculum_node_id = :badgeCurriculumNodeId
+            ",
+            "
+                SELECT
                     5 AS discriminator_order,
                     :folderDiscriminator AS discriminator,
                     f.id AS id,
@@ -208,6 +224,8 @@ class Cursor implements ICursor
             'assessmentCurriculumNodeId' => $this->node->getId(),
             'folderDiscriminator'        => self::DISCRIMINATOR_FOLDER,
             'folderCurriculumNodeId'     => $this->node->getId(),
+            'badgeDiscriminator'         => self::DISCRIMINATOR_BADGE,
+            'badgeCurriculumNodeId'      => $this->node->getId(),
         ];
 
         // Figure out a WHERE part

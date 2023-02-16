@@ -13,6 +13,7 @@ use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
+use Schoolbox\Learning\Badge as Badge;
 use Schoolbox\Resource\Folder;
 
 /**
@@ -44,6 +45,8 @@ class Hydrator
         private UnitSpec\Translator\ModelToArray $unitTranslator,
         private Assessment\DataModel\MapperProxy $assessmentDataSource,
         private Translator\Assessment\ModelToArray $assessmentTranslator,
+        private Badge\Mapper $badgeMapper,
+        private Badge\Translator\Curriculum\ModelToArray $badgeTranslator,
     ) {
     }
 
@@ -73,6 +76,7 @@ class Hydrator
                     Cursor::DISCRIMINATOR_COURSE     => call_user_func($this->courseTranslator, $model),
                     Cursor::DISCRIMINATOR_UNIT       => call_user_func($this->unitTranslator, $model),
                     Cursor::DISCRIMINATOR_ASSESSMENT => call_user_func($this->assessmentTranslator, $model),
+                    Cursor::DISCRIMINATOR_BADGE      => call_user_func($this->badgeTranslator, $model),
                     default                          => null,
                 };
             }
@@ -117,6 +121,12 @@ class Hydrator
             ->map($mapId)
             ->getAll();
         $models[Cursor::DISCRIMINATOR_ASSESSMENT] = $this->assessmentDataSource->findAllByIds($assessmentIds)->indexBy('id');
+
+        $badgeIds = $results
+            ->filter($this->buildFilter(Cursor::DISCRIMINATOR_BADGE))
+            ->map($mapId)
+            ->getAll();
+        $models[Cursor::DISCRIMINATOR_BADGE] = $this->badgeMapper->findByColumn('id', $badgeIds)->indexBy('id');
         return $models;
     }
 
