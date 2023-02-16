@@ -67,6 +67,8 @@ import ButtonView from "@ckeditor/ckeditor5-ui/src/button/buttonview";
 import Abbreviation from "../abbreviation/abbreviation";
 import SchoolboxResource from "../plugin/schoolboxResource/SchoolboxResource";
 
+import SimpleBox from "../simpleBox/SimpleBox";
+
 class Timestamp extends Plugin {
     init() {
         const editor = this.editor;
@@ -172,13 +174,10 @@ export function getDefault(config: EditorDefaultConfig) {
             FindAndReplace,
             SourceEditing,
             WordCount,
-<<<<<<< HEAD
             ...getTokensPlugins(config),
-=======
             Timestamp,
             Abbreviation,
             SchoolboxResource,
->>>>>>> debafb01437... Add icon to embed resource button [SA-15076]
         ],
         extraPlugins: [UploadAdapterPlugin],
         toolbar: [
