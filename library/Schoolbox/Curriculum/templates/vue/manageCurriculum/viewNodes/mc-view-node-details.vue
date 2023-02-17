@@ -5,7 +5,8 @@
  */
 
 import type { Node } from "@schoolboxCurriculum/types/Node";
-import { getTotalUsage } from "@schoolboxCurriculum/js/nodeUtils";
+import { ActivityTypes } from "@schoolboxCurriculum/types/Node";
+import { getUsageIcon, getTotalUsage } from "@schoolboxCurriculum/js/nodeUtils";
 import { useNodeDetailsStore } from "../activeNode/store/mcNodeDetailsStore";
 
 interface Props {
@@ -39,19 +40,36 @@ function onViewToggleSelected() {
         :disabled="props.isUpdating || props.isAdding"
         @click.prevent="onViewToggleSelected"
     >
-        <span v-if="props.node._usageCounts?.course > 0" class="label neutral icon-course-builder" title="Courses">{{
-            props.node._usageCounts.course
-        }}</span>
-        <span v-if="props.node._usageCounts?.unit > 0" class="label neutral icon-unit" title="Units">{{
-            props.node._usageCounts.unit
-        }}</span>
-        <!-- <span v-if="props.node._usageCounts?.assessment > 0" class="label neutral icon-due-work" title="Assessment">3</span> -->
-        <span v-if="props.node._usageCounts?.badge > 0" class="label neutral icon-badge" title="Badges">{{
-            props.node._usageCounts.badge
-        }}</span>
-        <span v-if="props.node._usageCounts?.folder > 0" class="label neutral icon-folder" title="Folders">{{
-            props.node._usageCounts.folder
-        }}</span>
+        <span
+            v-if="props.node._usageCounts?.course > 0"
+            :class="`label neutral ${getUsageIcon(ActivityTypes.COURSE)}`"
+            title="Courses"
+            >{{ props.node._usageCounts.course }}</span
+        >
+        <span
+            v-if="props.node._usageCounts?.unit > 0"
+            :class="`label neutral ${getUsageIcon(ActivityTypes.UNIT)}`"
+            title="Units"
+            >{{ props.node._usageCounts.unit }}</span
+        >
+        <span
+            v-if="props.node._usageCounts?.assessment > 0"
+            :class="`label neutral ${getUsageIcon(ActivityTypes.ASSESSMENT)}`"
+            title="Assessment"
+            >{{ props.node._usageCounts.assessment }}</span
+        >
+        <span
+            v-if="props.node._usageCounts?.badge > 0"
+            :class="`label neutral ${getUsageIcon(ActivityTypes.BADGE)}`"
+            title="Badges"
+            >{{ props.node._usageCounts.badge }}</span
+        >
+        <span
+            v-if="props.node._usageCounts?.folder > 0"
+            :class="`label neutral ${getUsageIcon(ActivityTypes.FOLDER)}`"
+            title="Folders"
+            >{{ props.node._usageCounts.folder }}</span
+        >
     </button>
     <button
         :class="`button-action-option ${props.isViewing ? 'icon-close' : 'icon-curriculum-details'}`"

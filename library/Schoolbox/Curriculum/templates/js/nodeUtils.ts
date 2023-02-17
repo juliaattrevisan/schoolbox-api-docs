@@ -7,8 +7,9 @@ import type {
     Usage,
     CourseUsageObject,
     UnitUsageObject,
-    FolderUsageObject,
+    AssessmentUsageObject,
     BadgeUsageObject,
+    FolderUsageObject,
 } from "@schoolboxCurriculum/types/Node";
 import { ActivityTypes } from "@schoolboxCurriculum/types/Node";
 import type { Breadcrumb } from "@schoolboxCurriculum/types/Breadcrumb";
@@ -163,7 +164,13 @@ export function getBreadcrumbs(node: Node, currentBreadcrumbs: Breadcrumb[]): Br
  * @returns { boolean } - whether theres any usage assigned on the node
  */
 export function hasUsage(node: Node) {
-    if (node._usageCounts.course > 0 || node._usageCounts.unit > 0 || node._usageCounts.folder > 0) {
+    if (
+        node._usageCounts.course > 0 ||
+        node._usageCounts.unit > 0 ||
+        node._usageCounts.assessment > 0 ||
+        node._usageCounts.badge > 0 ||
+        node._usageCounts.folder > 0
+    ) {
         return true;
     }
     return false;
@@ -176,23 +183,30 @@ export function hasUsage(node: Node) {
  * @returns { number } - the total count
  */
 export function getTotalUsage(node: Node) {
-    return node._usageCounts.course + node._usageCounts.unit + node._usageCounts.folder;
+    return (
+        node._usageCounts.course +
+        node._usageCounts.unit +
+        node._usageCounts.assessment +
+        node._usageCounts.badge +
+        node._usageCounts.folder
+    );
 }
 
 /**
  * To distinguish the activity type
  *
- * @param { Usage } usage - the usage
- * @returns { string } - the href to return
+ * @param { ActivityTypes } type - the activity type
+ * @returns { string } - the icon to return
  */
-export function getUsageIcon(usage: Usage) {
+export function getUsageIcon(type: ActivityTypes) {
     const icons = {
-        [ActivityTypes.COURSE]: "icon-course",
+        [ActivityTypes.COURSE]: "icon-course-builder",
         [ActivityTypes.UNIT]: "icon-unit",
-        [ActivityTypes.FOLDER]: "icon-folder",
+        [ActivityTypes.ASSESSMENT]: "icon-due-work",
         [ActivityTypes.BADGE]: "icon-badge",
+        [ActivityTypes.FOLDER]: "icon-folder",
     };
-    return icons[usage.discriminator];
+    return icons[type];
 }
 
 /**
@@ -205,8 +219,9 @@ export function getUsageHref(usage: Usage) {
     const icons = {
         [ActivityTypes.COURSE]: () => (usage.object as CourseUsageObject).folder._links.view,
         [ActivityTypes.UNIT]: () => (usage.object as UnitUsageObject).folder._links.view,
-        [ActivityTypes.FOLDER]: () => (usage.object as FolderUsageObject)._links.view,
+        [ActivityTypes.ASSESSMENT]: () => (usage.object as AssessmentUsageObject)._links.view,
         [ActivityTypes.BADGE]: () => "#",
+        [ActivityTypes.FOLDER]: () => (usage.object as FolderUsageObject)._links.view,
     };
     return icons[usage.discriminator]();
 }

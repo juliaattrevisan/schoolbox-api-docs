@@ -24,9 +24,10 @@ export type Node = {
     _usageCounts: {
         // just the counts for each acitivity type
         course: number;
-        folder: number;
         unit: number;
+        assessment: number;
         badge: number;
+        folder: number;
     };
     usage?: Usage[]; // all the details for all the places the node has been used
     usageCount?: number; // the total number of linked activities (not just the currently loaded)
@@ -38,16 +39,22 @@ export type Node = {
 export enum ActivityTypes {
     COURSE = "course",
     UNIT = "unit",
-    FOLDER = "folder",
+    ASSESSMENT = "assessment",
     BADGE = "badge",
+    FOLDER = "folder",
 }
 
 /**
  * An activity linked to the node
  */
 export type Usage = {
-    discriminator: ActivityTypes.COURSE | ActivityTypes.UNIT | ActivityTypes.FOLDER | ActivityTypes.BADGE;
-    object: CourseUsageObject | UnitUsageObject | FolderUsageObject | BadgeUsageObject;
+    discriminator:
+        | ActivityTypes.COURSE
+        | ActivityTypes.UNIT
+        | ActivityTypes.ASSESSMENT
+        | ActivityTypes.FOLDER
+        | ActivityTypes.BADGE;
+    object: CourseUsageObject | UnitUsageObject | AssessmentUsageObject | BadgeUsageObject | FolderUsageObject;
 };
 
 /**
@@ -83,6 +90,18 @@ export interface UnitUsageObject extends UsageObject {
         _links: {
             view: string;
         };
+    };
+}
+
+/**
+ * The further details of the the assessment usage
+ */
+export interface AssessmentUsageObject extends UsageObject {
+    _links: {
+        view: string;
+    };
+    unit: {
+        title: string;
     };
 }
 

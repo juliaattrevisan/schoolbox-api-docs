@@ -3,7 +3,14 @@
  * To display a single activity linked to a node
  */
 
-import type { Usage, CourseUsageObject, UnitUsageObject, FolderUsageObject, BadgeUsageObject } from "@schoolboxCurriculum/types/Node";
+import type {
+    Usage,
+    CourseUsageObject,
+    UnitUsageObject,
+    AssessmentUsageObject,
+    BadgeUsageObject,
+    FolderUsageObject,
+} from "@schoolboxCurriculum/types/Node";
 import { ActivityTypes } from "@schoolboxCurriculum/types/Node";
 import { getUsageHref, getUsageIcon } from "@schoolboxCurriculum/js/nodeUtils";
 
@@ -18,7 +25,7 @@ const props = defineProps<Props>();
     <li class="usage">
         <a :href="`${getUsageHref(props.usage)}`" :title="props.usage.object.title">
             <div class="usage__container">
-                <div :class="`usage__icon-container ${getUsageIcon(props.usage)} size-24`"></div>
+                <div :class="`usage__icon-container ${getUsageIcon(props.usage.discriminator)} size-24`"></div>
                 <div class="usage__title-container">
                     <p v-if="props.usage.discriminator === ActivityTypes.BADGE">{{ props.usage.object.name }}</p>
                     <p v-else>{{ props.usage.object.title }}</p>
@@ -28,11 +35,14 @@ const props = defineProps<Props>();
                     <p v-else-if="props.usage.discriminator === ActivityTypes.UNIT" class="meta">
                         {{ (props.usage.object as UnitUsageObject).folder?.parent?.title }}
                     </p>
-                    <p v-else-if="props.usage.discriminator === ActivityTypes.FOLDER" class="meta">
-                        {{ (props.usage.object as FolderUsageObject).parent?.title }}
+                    <p v-else-if="props.usage.discriminator === ActivityTypes.ASSESSMENT" class="meta">
+                        {{ (props.usage.object as AssessmentUsageObject).unit?.title }}
                     </p>
                     <p v-else-if="props.usage.discriminator === ActivityTypes.BADGE" class="meta">
                         {{ (props.usage.object as BadgeUsageObject).category.name }}
+                    </p>
+                    <p v-else-if="props.usage.discriminator === ActivityTypes.FOLDER" class="meta">
+                        {{ (props.usage.object as FolderUsageObject).parent?.title }}
                     </p>
                 </div>
             </div>
