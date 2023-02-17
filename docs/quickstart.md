@@ -168,6 +168,12 @@ Update the controller and have a play with the contents of `FAVOURITE_WARCRY`.
 
 When you're ready, we'll start moving onto more complex stuff.
 
+## Change dataset to have some valid data
+
+Lets start by changing to a old sales dataset, which contains some wiki data for us to use
+in your `vagrant.yaml` update the `data_filename:` to `sales.tar.gz`
+then make sure to `vagrant provision` to load that dataset into your vagrant.
+
 ### The Handler
 Let's summon a known Handler and have it interact with the database and fetch some data for us in an array, and then we can work on pushing out to the screen. Modification of the controller below results in some content being dumped out using `var_dump()`
 
