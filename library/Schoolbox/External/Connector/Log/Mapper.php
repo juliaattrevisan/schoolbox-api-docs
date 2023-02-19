@@ -17,6 +17,7 @@ use Schoolbox\GenericCollection;
  * @method GenericCollection|Model[] findAll($options = [])
  * @method Model findById($identifierValue)
  * @method Model findOneByColumn($columnName, $columnValue, array $options = [])
+ * @method Model findOneByColumnList($columnList, array $options = [])
  */
 class Mapper extends \Schoolbox\Mapper
 {

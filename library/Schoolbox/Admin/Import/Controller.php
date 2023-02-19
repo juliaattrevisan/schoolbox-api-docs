@@ -376,10 +376,11 @@ class Controller extends ConfigController
                 return;
             }
 
-            /* This identifier indicates that the two schedulers were part of this
-             * script execution together
+            /* Explicitly set a time limit to conclude this sync
+             * while running in a detached process. runPostOutputCallbacks()
+             * arbitrarily sets a time limit so you have to override that
              */
-            $runId = (new \Schoolbox\External\Connector\Log\Guid())->generate();
+            set_time_limit((int)$timeout);
 
             /* Get this particular db instance
              */
@@ -403,6 +404,10 @@ class Controller extends ConfigController
             $time = time();
 
             foreach ($splitStrats as $currentStrat) {
+                /* Each part of a Segregated Import gets its own run id
+                 */
+                $runId = (new \Schoolbox\External\Connector\Log\Guid())->generate();
+
                 /* ValidStrats is now a cli option
                  */
                 $validStrats = new ValidStrats($currentStrat);
@@ -447,7 +452,7 @@ class Controller extends ConfigController
                 $importLogMapper
             ))->run($time, $runId, Scheduler::MANUAL_CALENDAR_SCRIPT_NAME);
 
-            /* Go to the "Previous IMports" area of SUDS Control Panel
+            /* Go to the "Previous Imports" area of SUDS Control Panel
              */
             $redirect = $this->router->generate('adminImportIndex.getSchoolDataIndex') . '#previous';
 
