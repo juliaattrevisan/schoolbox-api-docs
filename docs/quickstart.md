@@ -950,7 +950,7 @@ class Module extends BaseModule
 
 The only methods you really need to think about for now is `initRoutes()` and `initRoutePermissions()`. Respectively, these determine urls and who can access those urls. We'll look at those later.
 
-Generate the routeing cache inside vagrant `vagrant ssh` then:
+Generate the route table cache inside vagrant `vagrant ssh` then:
 `php /usr/share/schoolbox/tools/module/refresh-cache.php`
 
 ### Controller
