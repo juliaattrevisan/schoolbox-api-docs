@@ -47,7 +47,7 @@ class Redis
     /**
      * Prefix all function call Redis keys with this value.
      */
-    private const FUNCTION_CALL_CACHE_PREFIX = 'fc';
+    public const FUNCTION_CALL_CACHE_PREFIX = 'fc';
 
     /**
      * @var self
@@ -320,6 +320,8 @@ class Redis
 
     /**
      * Build a common redis key for inserting and returning cached data
+     * If updating, will also have to update the format at:
+     * tools/redis/setExternalTTL.php::getLikeCacheKey
      *
      * @param string   $base_key The base of the key to store the result in.
      * @param mixed    $params   A parameter to pass to $callback. This is also
