@@ -101,7 +101,7 @@ class CSV extends AbstractCSV
     {
         // Average row
         $averageRowHeaders = [
-            'Markbook Average',
+            'Class Average',
             '',
             '',
             $markbook->getWeightedMean(),
