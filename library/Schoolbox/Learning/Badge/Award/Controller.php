@@ -419,10 +419,17 @@ class Controller extends Base
             $badgeId = $award->getBadgeIndex();
             $categoryId = "category-{$award->getBadge()->getCategory()->getId()}";
 
+            $badge = $award->getBadge();
+
+            if ($badge->isDeleted()) {
+                // Skip awards on deleted badges.
+                continue;
+            }
+
             /* Some inline hydration due to curriculum nodes no longer being included
              * as part of the hydrateSelect in badge mapper
              */
-            $award->getBadge()->setCurriculumNodes($this->badgeMapper->findCurriculumNodes($award->getBadge()));
+            $badge->setCurriculumNodes($this->badgeMapper->findCurriculumNodes($award->getBadge()));
 
             /* Convert to array format
              */
