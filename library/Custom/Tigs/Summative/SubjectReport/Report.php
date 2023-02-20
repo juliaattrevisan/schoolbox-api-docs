@@ -213,6 +213,8 @@ class Report
             $middleYearsTaskMarks = $this->buildMiddleYearsTaskMarksData($folder, $attributes, $courseSpec, $user, $roleTypeOverride);
             $middleYearsRankData = $this->buildMiddleYearsAssessmentRankData($folder, $attributes, $courseSpec, $user, $roleTypeOverride);
 
+            $learningProfileData = $this->buildLearningProfileData($folder, $attributes, $user, $roleTypeOverride);
+
             // Filter out unit specs without any data
             $unitSpecsWithData = new Collection();
             foreach ($unitSpecs as $unitSpecId => $unitSpec) {
@@ -1045,6 +1047,74 @@ class Report
         } catch (UnexpectedValueException $e) {
             return ['error' => $e->getMessage()];
         }
+    }
+
+
+    private function buildLearningProfileData(
+        Folder\Model $folder,
+        StudentAttributes $attributes,
+        User $student,
+        ?string $roleTypeOverride
+    ): ?array {
+        // Which work type?
+        $workTypeConfig = null;
+        $yearLevel      = $attributes->getYearLevel();
+        $term           = $attributes->getTerm();
+        if ($attributes->isMiddleYear()) {
+            $workTypeConfig = match ($term) {
+                1       => Config::_TIGS_WORK_TYPE_YEAR_7_10_TERM_1_LEARNING_PROFILE,
+                2       => Config::_TIGS_WORK_TYPE_YEAR_7_10_TERM_2_LEARNING_PROFILE,
+                3       => Config::_TIGS_WORK_TYPE_YEAR_7_10_TERM_3_LEARNING_PROFILE,
+                4       => Config::_TIGS_WORK_TYPE_YEAR_7_10_TERM_4_LEARNING_PROFILE,
+                default => null,
+            };
+        } elseif ($yearLevel === 11) {
+            // What happens to Year 11 term 4?
+            $workTypeConfig = match ($term) {
+                1       => Config::_TIGS_WORK_TYPE_YEAR_11_TERM_1_LEARNING_PROFILE,
+                2       => Config::_TIGS_WORK_TYPE_YEAR_11_TERM_2_LEARNING_PROFILE,
+                3       => Config::_TIGS_WORK_TYPE_YEAR_11_TERM_3_LEARNING_PROFILE,
+                default => null,
+            };
+        } elseif ($yearLevel === 12) {
+            $workTypeConfig = match ($term) {
+                1       => Config::_TIGS_WORK_TYPE_YEAR_12_TERM_1_LEARNING_PROFILE,
+                2       => Config::_TIGS_WORK_TYPE_YEAR_12_TERM_2_LEARNING_PROFILE,
+                3       => Config::_TIGS_WORK_TYPE_YEAR_12_TERM_3_LEARNING_PROFILE,
+                4       => Config::_TIGS_WORK_TYPE_YEAR_12_TERM_4_LEARNING_PROFILE,
+                default => null,
+            };
+        }
+
+        if ($workTypeConfig === null) {
+            return [
+                'error' => sprintf(
+                    'Cannot render Learning Profile components. Unknown year/term %d/%d.',
+                    $yearLevel,
+                    $term,
+                )
+            ];
+        }
+
+        try {
+            $workTypeId = $this->checkWorkType(
+                $workTypeConfig,
+                sprintf(
+                    'Cannot render Learning Profile components. Work type not set for year/term %d/%d.',
+                    $yearLevel,
+                    $term,
+                ),
+                sprintf(
+                    'Set Learning Profile Work Type for year/term %d/%d',
+                    $yearLevel,
+                    $term,
+                ),
+            );
+        } catch (UnexpectedValueException $e) {
+            return ['error' => $e->getMessage()];
+        }
+
+        // Now find the item with this name
     }
 
     /**
