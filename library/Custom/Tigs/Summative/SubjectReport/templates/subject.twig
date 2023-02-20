@@ -179,8 +179,8 @@ Data:
                  # any existing commentary in the right column
                  #}
                 <div class="small-12 column">
-                    <div class="row">
-                        <div class="small-12 medium-4 columns">
+{#                    <div class="row">#}
+{#                        <div class="small-12 medium-4 columns">#}
                             {# Middle Years Task Marks #}
                             {% if middleYearsTaskMarks.data is defined and middleYearsTaskMarks.data[unitSpecId] is defined %}
                                 {% include '@tigsSubjectReport/components/middleYearsTaskMarks.twig' with middleYearsTaskMarks.data[unitSpecId]|merge(extraComponentData) only %}
@@ -190,7 +190,7 @@ Data:
                             {% if hscTaskMarks.data is defined and hscTaskMarks.data[unitSpecId] is defined %}
                                 {% include '@tigsSubjectReport/components/hscTaskMarks.twig' with hscTaskMarks.data[unitSpecId]|merge(extraComponentData) only %}
                             {% endif %}
-                        </div>
+{#                        </div>#}
 
 {#                        <div class="small-12 medium-8 columns">#}
 {#                            #}{# Comments come from different assessments, depending on student type #}
@@ -210,7 +210,7 @@ Data:
 {#                                </div>#}
 {#                            {% endif %}#}
 {#                        </div>#}
-                    </div>
+{#                    </div>#}
                 </div>
 
 {#                <div class="small-12 columns">#}
