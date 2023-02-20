@@ -79,7 +79,7 @@ use Schoolbox\External\Connector\ICommunityPortal;
 use Schoolbox\External\Connector\Offline\Base\Sync as OfflineSync;
 use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Filter;
-use Schoolbox\Gotenberg\RequestFactory;
+use Schoolbox\Gotenberg\Client as GotenbergClient;
 use Schoolbox\Help\InstanceRegistry\Mapper as InstanceRegistryMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Instance;
@@ -175,7 +175,6 @@ use Scrub;
 use SitePage;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\RedisStore;
-use TheCodingMachine\Gotenberg\Client as GotenbergClient;
 use Throwable;
 use Twig\Environment;
 use Twig\Extension\DebugExtension;
@@ -462,18 +461,37 @@ abstract class Kernel
         );
         $di->set(
             'taskd.downloadPagesMessageFactory',
-            $di->lazyNew(
-                DownloadPagesMessageFactory::class,
-                [
-                    'instance'            => $di->lazyGet('instance'),
-                    'tokenBuilder'        => $di->lazyGet('user.tokenBuilder'),
-                    'gotenbergUrl'        => $config->get(ConfigMapper::NAME_GOTENBERG_HOST),
-                    'gotenbergKey'        => $config->get(ConfigMapper::NAME_GOTENBERG_API_KEY),
-                    'gotenbergHttpHeader' => RequestFactory::AUTH_HTTP_HEADER,
-                    'kamiApiKey'          => $config->get('kami_api_key'),
-                    'turnitinApiKey'      => $config->get('turnitin_api_key'),
-                    'turnitinApiHost'     => $config->get('turnitin_api_host'),
-                ],
+            $di->lazy(
+                function () use ($config, $di) {
+                    /** @var Instance $instance */
+                    $instance = $di->get('instance');
+
+                    /** @var Jwt $tokenBuilder */
+                    $tokenBuilder = $di->get('user.tokenBuilder');
+
+                    // Build API key and version
+                    $gotenbergApiKey = $config->get(ConfigMapper::NAME_GOTENBERG_API_KEY);
+                    if ($gotenbergApiKey === '') {
+                        $gotenbergApiKey = null;
+                    }
+                    $gotenbergApiVersion = filter_var(
+                        $config->get(ConfigMapper::NAME_GOTENBERG_API_VERSION),
+                        FILTER_VALIDATE_INT,
+                        FILTER_NULL_ON_FAILURE,
+                    );
+                    return new DownloadPagesMessageFactory(
+                        $instance,
+                        $tokenBuilder,
+                        $config->get(ConfigMapper::NAME_GOTENBERG_HOST),
+                        $gotenbergApiKey,
+                        $gotenbergApiVersion,
+                        GotenbergClient::API_KEY_HEADER,
+                        GotenbergClient::API_VERSION_HEADER,
+                        $config->get('kami_api_key'),
+                        $config->get('turnitin_api_key'),
+                        $config->get('turnitin_api_host'),
+                    );
+                }
             )
         );
 
@@ -1533,13 +1551,31 @@ abstract class Kernel
                     /** @var IConfigLoader $config */
                     $config = $di->get('config');
                     /** @var ProxyServer $proxyServer */
-                    $proxyServer = $di->get('proxyServer');
-                    $httpClient  = new GuzzleHttp\Client(
-                        ['curl' => $proxyServer->buildCurlOptions(RequestFactory::DEFAULT_WAIT_TIMEOUT)]
+                    $proxyServer            = $di->get('proxyServer');
+                    $proxyServerCurlOptions = $proxyServer->buildCurlOptions(GotenbergClient::DEFAULT_WAIT_TIMEOUT);
+                    $httpClient             = new GuzzleHttp\Client(
+                        [
+                            'curl'                             => $proxyServerCurlOptions,
+                            GuzzleHttp\RequestOptions::TIMEOUT => GotenbergClient::DEFAULT_WAIT_TIMEOUT,
+                        ]
                     );
+
+                    $gotenbergApiKey = $config->get(ConfigMapper::NAME_GOTENBERG_API_KEY);
+                    if ($gotenbergApiKey === '') {
+                        $gotenbergApiKey = null;
+                    }
+
+                    $gotenbergApiVersion = filter_var(
+                        $config->get(ConfigMapper::NAME_GOTENBERG_API_VERSION),
+                        FILTER_VALIDATE_INT,
+                        FILTER_NULL_ON_FAILURE,
+                    );
+
                     return new GotenbergClient(
-                        $config->get(ConfigMapper::NAME_GOTENBERG_HOST),
                         new GuzzleAdapter($httpClient),
+                        $config->get(ConfigMapper::NAME_GOTENBERG_HOST),
+                        $gotenbergApiKey,
+                        $gotenbergApiVersion,
                     );
                 }
             )

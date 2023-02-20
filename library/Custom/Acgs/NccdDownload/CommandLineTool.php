@@ -13,11 +13,13 @@ use Alaress\Database\Predicate\Builder;
 use Alaress_Date_Format;
 use DateTimeImmutable;
 use DateTimeInterface;
+use Gotenberg\Modules\Chromium;
+use Gotenberg\Stream;
+use Http\Factory\Guzzle\StreamFactory;
 use Laminas\Uri\Uri;
 use Schoolbox\Application\CliTool\App;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as DueWorkResponseFile;
-use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Gotenberg\RequestFactory;
+use Schoolbox\Gotenberg\Client;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkResponse;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -31,9 +33,6 @@ use Schoolbox\Url\Factory as UrlFactory;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Scrub;
-use TheCodingMachine\Gotenberg\DocumentFactory;
-use TheCodingMachine\Gotenberg\GotenbergClientInterface;
-use TheCodingMachine\Gotenberg\HTMLRequest;
 use ZipArchive;
 
 /**
@@ -523,24 +522,20 @@ class CommandLineTool extends App
      * @return string
      * @throws \Psr\Container\ContainerExceptionInterface
      * @throws \Psr\Container\NotFoundExceptionInterface
-     * @throws \TheCodingMachine\Gotenberg\FilesystemException
      */
     private function convertToPdf(string $filename, string $input): string
     {
-        $document = DocumentFactory::makeFromString($filename, Scrub::htmlAbsoluteUri($input, $this->baseUri));
-        $request  = new HTMLRequest($document);
-        $tmpfile  = tempnam(sys_get_temp_dir(), 'pdf');
-        $request->addWebhookURLHTTPHeader(
-            RequestFactory::AUTH_HTTP_HEADER,
-            $this->getConfig()->get(ConfigMapper::NAME_GOTENBERG_API_KEY),
-        );
-
-        /** @var GotenbergClientInterface $gotenberg */
+        /** @var Client $gotenberg */
         $gotenberg = $this->getDi()->get('pdfGenerator');
-        $gotenberg->store($request, $tmpfile);
-        $result = file_get_contents($tmpfile);
-        unlink($tmpfile);
-        return $result;
+        $request   = $gotenberg->buildHtmlToPdfConverter(null)
+            ->html(
+                new Stream(
+                    $filename,
+                    (new StreamFactory())->createStream(Scrub::htmlAbsoluteUri($input, $this->baseUri))
+                )
+            );
+        $response  = $gotenberg->send($request);
+        return $response->getBody()->getContents();
     }
 
     /**

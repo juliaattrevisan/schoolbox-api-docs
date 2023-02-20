@@ -42,13 +42,13 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Restarting Etherpad service";
 service schoolbox-epl restart;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Stopping Gotenberg service";
-gotenberg_container_ids="$(docker ps -f ancestor=thecodingmachine/gotenberg:6 -q)"
+gotenberg_container_ids="$(docker ps -f name=schoolbox_vagrant_gotenberg -q)"
 if [[ -n $gotenberg_container_ids ]]; then
   echo -e "$gotenberg_container_ids" | xargs docker stop
 fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Installing and starting Gotenberg service";
-docker run -d --rm --network host --name schoolbox_vagrant_gotenberg thecodingmachine/gotenberg:6;
+docker run -d --rm --network host --name schoolbox_vagrant_gotenberg gotenberg/gotenberg:7;
 
 # Rebuild & restart task daemon
 # if `taskd_build_from_local` then build from the mounted taskd dir

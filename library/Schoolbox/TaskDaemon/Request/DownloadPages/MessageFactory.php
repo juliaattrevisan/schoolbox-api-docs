@@ -58,23 +58,28 @@ class MessageFactory
     /**
      * Constructor
      *
-     * @param Instance    $instance            Information about the Schoolbox instance.
-     * @param Jwt         $tokenBuilder        Used to generate a JWT for use by taskd when:
-     *                                         * calling the callback URL
-     *                                         * initiating a session for Gotenberg when generating PDFs from Schoolbox
-     * @param string|null $gotenbergUrl        The URL of the Gotenberg container.
-     * @param string|null $gotenbergKey        The API key which the Gotenberg container requires, if any.
-     * @param string|null $gotenbergHttpHeader The header in which `$gotenbergKey` will be passed.
-     * @param string|null $kamiApiKey          The API key used to authenticate with Kami.
-     * @param string|null $turnitinApiKey      The API key used to authenticate with Turnitin.
-     * @param string|null $turnitinApiHost     The host name of this instance's Turnitin instance.
+     * @param Instance    $instance                  Information about the Schoolbox instance.
+     * @param Jwt         $tokenBuilder              Used to generate a JWT for use by taskd when:
+     *                                               * calling the callback URL
+     *                                               * initiating a session for Gotenberg when generating PDFs from
+     *                                                 Schoolbox
+     * @param string|null $gotenbergUrl              The URL of the Gotenberg container.
+     * @param string|null $gotenbergApiKey           The API key which the Gotenberg container requires, if any.
+     * @param string|null $gotenbergApiVersion       The API version which the Gotenberg container requires, if any.
+     * @param string|null $gotenbergApiKeyHeader     The header in which `$gotenbergApiKey` will be passed.
+     * @param string|null $gotenbergApiVersionHeader The header in which `$gotenbergApiVersion` will be passed.
+     * @param string|null $kamiApiKey                The API key used to authenticate with Kami.
+     * @param string|null $turnitinApiKey            The API key used to authenticate with Turnitin.
+     * @param string|null $turnitinApiHost           The host name of this instance's Turnitin instance.
      */
     public function __construct(
         private Instance $instance,
         private Jwt $tokenBuilder,
         private ?string $gotenbergUrl,
-        private ?string $gotenbergKey,
-        private ?string $gotenbergHttpHeader,
+        private ?string $gotenbergApiKey,
+        private ?string $gotenbergApiVersion,
+        private ?string $gotenbergApiKeyHeader,
+        private ?string $gotenbergApiVersionHeader,
         private ?string $kamiApiKey,
         private ?string $turnitinApiKey,
         private ?string $turnitinApiHost,
@@ -241,11 +246,14 @@ class MessageFactory
         }
         if (isset($this->gotenbergUrl)) {
             $params['gotenberg'] = [
-                'url'  => $this->gotenbergUrl,
-                'auth' => isset($this->gotenbergKey, $this->gotenbergHttpHeader)
-                    ? ['key' => $this->gotenbergKey, 'header' => $this->gotenbergHttpHeader]
+                'url'     => $this->gotenbergUrl,
+                'version' => isset($this->gotenbergApiVersion, $this->gotenbergApiVersionHeader)
+                    ? ['value' => $this->gotenbergApiVersion, 'header' => $this->gotenbergApiVersionHeader]
                     : null,
-                'footer' => $this->pdfFooter,
+                'auth'    => isset($this->gotenbergApiKey, $this->gotenbergApiKeyHeader)
+                    ? ['key' => $this->gotenbergApiKey, 'header' => $this->gotenbergApiKeyHeader]
+                    : null,
+                'footer'  => $this->pdfFooter,
             ];
         }
         if (isset($this->kamiApiKey)) {

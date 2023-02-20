@@ -11,6 +11,7 @@ namespace Schoolbox\Application\CliTool\PdfGenerator;
 
 use Alaress\Authorizer\Failure\Unauthenticated;
 use Alaress\Authorizer\Failure\Unauthorized;
+use Gotenberg\Stream;
 use GuzzleHttp\Client;
 use Predis\ClientInterface as RedisClient;
 use Psr\Container\ContainerExceptionInterface;
@@ -19,13 +20,11 @@ use RuntimeException;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool\App as BaseApp;
 use Schoolbox\Auth\Remote\RemoteLogin;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
-use Schoolbox\Gotenberg\RequestFactory;
+use Schoolbox\Gotenberg\Client as GotenbergClient;
 use Schoolbox\Realtime\Pipe\PipeManager;
 use Schoolbox\Url\Factory;
 use Schoolbox\User;
-use TheCodingMachine\Gotenberg;
 use Laminas\Uri\UriInterface;
 use ZipArchive;
 
@@ -142,7 +141,7 @@ abstract class App extends BaseApp
 
 
         // Build a PDF generator object
-        /** @var Gotenberg\Client $pdfGenerator */
+        /** @var GotenbergClient $pdfGenerator */
         $pdfGenerator = $this->getDi()->get('pdfGenerator');
 
 
@@ -445,16 +444,16 @@ BASE;
     /**
      * Generates a PDF for this source.
      *
-     * @param SourceBundle                       $pdfSource
-     * @param string                             $tempDir
-     * @param Gotenberg\GotenbergClientInterface $pdfGenerator
-     * @param string                             $sessionHash
+     * @param SourceBundle    $pdfSource
+     * @param string          $tempDir
+     * @param GotenbergClient $pdfGenerator
+     * @param string          $sessionHash
      * @return string
      */
     private function generatePdf(
         SourceBundle $pdfSource,
         string $tempDir,
-        Gotenberg\GotenbergClientInterface $pdfGenerator,
+        GotenbergClient $pdfGenerator,
         string $sessionHash
     ): string {
         $filename          = $tempDir . '/' . $pdfSource->getFilename();
@@ -462,7 +461,6 @@ BASE;
         $attempts          = 0;
         $previousException = null;
         $jsDelay           = $this->getOptAsInt(self::OPT_LONG_JS_DELAY) ?? self::DEFAULT_JS_DELAY;
-        $requestFactory    = new RequestFactory($this->getConfig()->get(ConfigMapper::NAME_GOTENBERG_API_KEY));
         while (true) {
             if ($attempts++ >= $maxAttempts) {
                 unlink($filename);
@@ -476,33 +474,28 @@ BASE;
                 // Gotenberg needs to download each URL individually:
                 // merge appears to not work with URLs.
                 // Just generate a PDF for each URL, then merge them.
-                /** @var Gotenberg\Document[] $files */
-                $files = [];
+                /** @var array<Stream> $mergeRequests */
+                $mergeRequests = [];
                 foreach ($pdfSource->getUrls() as $i => $url) {
-                    $request = $requestFactory->buildUrlRequest(
-                        $url,
-                        RequestFactory::DEFAULT_WAIT_DELAY,
-                        RequestFactory::DEFAULT_WAIT_TIMEOUT,
-                        $sessionHash
-                    );
-                    $request->setLandscape((bool)$this->getOpt(self::OPT_LONG_ORIENTATION_LANDSCAPE));
+                    $htmlToPdf = $pdfGenerator->buildHtmlToPdfConverter($sessionHash)
+                        ->waitDelay(sprintf('%ds', GotenbergClient::DEFAULT_WAIT_DELAY));
+                    if ((bool)$this->getOpt(self::OPT_LONG_ORIENTATION_LANDSCAPE)) {
+                        $htmlToPdf = $htmlToPdf->landscape();
+                    }
 
-                    // Gotenberg doesn't seem to care about the response code.
-                    // Just have to hope that no requests are made with an
-                    // invalid URL.
-                    $pdfGenerator->store($request, $tempDir . "/$i.pdf");
-                    $files[] = Gotenberg\DocumentFactory::makeFromPath("$i.pdf", $tempDir . "/$i.pdf");
+                    $mergeRequests[] = new Stream(
+                        "$i.pdf",
+                        $pdfGenerator->send($htmlToPdf->url($url))->getBody(),
+                    );
                 }
 
                 // Merge the intermediary PDFs together, then delete them
-                $request = new Gotenberg\MergeRequest($files);
-                $request->addWebhookURLHTTPHeader(
-                    RequestFactory::AUTH_HTTP_HEADER,
-                    $this->getConfig()->get(ConfigMapper::NAME_GOTENBERG_API_KEY),
-                );
-                $pdfGenerator->store($request, $filename);
-                foreach ($files as $file) {
-                    unlink($tempDir . '/' . $file->getFileName());
+                $mergeRequestCount = count($mergeRequests);
+                if ($mergeRequestCount === 1) {
+                    file_put_contents($filename, $mergeRequests[0]->getStream());
+                } elseif ($mergeRequestCount > 0) {
+                    $mergeResponse = $pdfGenerator->send($pdfGenerator->buildPdfMerger()->merge(...$mergeRequests));
+                    file_put_contents($filename, $mergeResponse->getBody()->getContents());
                 }
                 break;
             } catch (RuntimeException $e) {

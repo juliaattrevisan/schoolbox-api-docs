@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a87065091fe687a71659ced50c861479",
+    "content-hash": "aa27a1c8c742fa312bb3e2bb3483ac1c",
     "packages": [
         {
             "name": "0x46616c6b/etherpad-lite-client",
@@ -2075,6 +2075,81 @@
             "time": "2021-11-08T20:18:51+00:00"
         },
         {
+            "name": "gotenberg/gotenberg-php",
+            "version": "v1.1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/gotenberg/gotenberg-php.git",
+                "reference": "699f995d0c25b2a50ecbada6bb8fc730fbb108f1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/gotenberg/gotenberg-php/zipball/699f995d0c25b2a50ecbada6bb8fc730fbb108f1",
+                "reference": "699f995d0c25b2a50ecbada6bb8fc730fbb108f1",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "ext-mbstring": "*",
+                "guzzlehttp/psr7": "^2.1",
+                "php": "^7.4|^8.0|^8.1|^8.2",
+                "php-http/discovery": "^1.14",
+                "psr/http-client": "^1.0",
+                "psr/http-message": "^1.0"
+            },
+            "require-dev": {
+                "doctrine/coding-standard": "^9.0",
+                "pestphp/pest": "^1.21",
+                "phpstan/phpstan": "^1.2",
+                "squizlabs/php_codesniffer": "^3.6"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Gotenberg\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Julien Neuhart",
+                    "email": "neuhart.julien@gmail.com",
+                    "homepage": "https://github.com/gulien",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A PHP client for interacting with Gotenberg, a developer-friendly API for converting numerous document formats into PDF files, and more!",
+            "homepage": "https://github.com/gotenberg/gotenberg-php",
+            "keywords": [
+                "Gotenberg",
+                "LibreOffice",
+                "chrome",
+                "chromium",
+                "convert",
+                "csv",
+                "docx",
+                "excel",
+                "html",
+                "markdown",
+                "pdf",
+                "pdftk",
+                "pptx",
+                "puppeteer",
+                "unoconv",
+                "wkhtmltopdf",
+                "word",
+                "xlsx"
+            ],
+            "support": {
+                "issues": "https://github.com/gotenberg/gotenberg-php/issues",
+                "source": "https://github.com/gotenberg/gotenberg-php/tree/v1.1.2"
+            },
+            "time": "2023-01-09T14:39:53+00:00"
+        },
+        {
             "name": "guzzlehttp/guzzle",
             "version": "7.5.0",
             "source": {
@@ -2288,43 +2363,47 @@
         },
         {
             "name": "guzzlehttp/psr7",
-            "version": "1.9.0",
+            "version": "2.4.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/psr7.git",
-                "reference": "e98e3e6d4f86621a9b75f623996e6bbdeb4b9318"
+                "reference": "67c26b443f348a51926030c83481b85718457d3d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/psr7/zipball/e98e3e6d4f86621a9b75f623996e6bbdeb4b9318",
-                "reference": "e98e3e6d4f86621a9b75f623996e6bbdeb4b9318",
+                "url": "https://api.github.com/repos/guzzle/psr7/zipball/67c26b443f348a51926030c83481b85718457d3d",
+                "reference": "67c26b443f348a51926030c83481b85718457d3d",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.4.0",
-                "psr/http-message": "~1.0",
-                "ralouphie/getallheaders": "^2.0.5 || ^3.0.0"
+                "php": "^7.2.5 || ^8.0",
+                "psr/http-factory": "^1.0",
+                "psr/http-message": "^1.0",
+                "ralouphie/getallheaders": "^3.0"
             },
             "provide": {
+                "psr/http-factory-implementation": "1.0",
                 "psr/http-message-implementation": "1.0"
             },
             "require-dev": {
-                "ext-zlib": "*",
-                "phpunit/phpunit": "~4.8.36 || ^5.7.27 || ^6.5.14 || ^7.5.20 || ^8.5.8 || ^9.3.10"
+                "bamarni/composer-bin-plugin": "^1.8.1",
+                "http-interop/http-factory-tests": "^0.9",
+                "phpunit/phpunit": "^8.5.29 || ^9.5.23"
             },
             "suggest": {
                 "laminas/laminas-httphandlerrunner": "Emit PSR-7 responses"
             },
             "type": "library",
             "extra": {
+                "bamarni-bin": {
+                    "bin-links": true,
+                    "forward-command": false
+                },
                 "branch-alias": {
-                    "dev-master": "1.9-dev"
+                    "dev-master": "2.4-dev"
                 }
             },
             "autoload": {
-                "files": [
-                    "src/functions_include.php"
-                ],
                 "psr-4": {
                     "GuzzleHttp\\Psr7\\": "src/"
                 }
@@ -2363,6 +2442,11 @@
                     "name": "Tobias Schultze",
                     "email": "webmaster@tubo-world.de",
                     "homepage": "https://github.com/Tobion"
+                },
+                {
+                    "name": "Márk Sági-Kazár",
+                    "email": "mark.sagikazar@gmail.com",
+                    "homepage": "https://sagikazarmark.hu"
                 }
             ],
             "description": "PSR-7 message implementation that also provides common utility methods",
@@ -2378,7 +2462,7 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/psr7/issues",
-                "source": "https://github.com/guzzle/psr7/tree/1.9.0"
+                "source": "https://github.com/guzzle/psr7/tree/2.4.3"
             },
             "funding": [
                 {
@@ -2394,7 +2478,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-06-20T21:43:03+00:00"
+            "time": "2022-10-26T14:07:24+00:00"
         },
         {
             "name": "html2text/html2text",
@@ -2611,28 +2695,28 @@
         },
         {
             "name": "intelliscl/sdk",
-            "version": "0.2.0.4-beta",
+            "version": "dev-main",
             "source": {
                 "type": "git",
-                "url": "https://github.com/intelliscl/sdk-php.git",
-                "reference": "0f1a31a7595c647b3800010e61495c266a9d7aef"
+                "url": "git@github.com:intelliscl/sdk-php.git",
+                "reference": "0d14a54b1550a8087412d94733e27610741a26e6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/intelliscl/sdk-php/zipball/0f1a31a7595c647b3800010e61495c266a9d7aef",
-                "reference": "0f1a31a7595c647b3800010e61495c266a9d7aef",
+                "url": "https://api.github.com/repos/intelliscl/sdk-php/zipball/0d14a54b1550a8087412d94733e27610741a26e6",
+                "reference": "0d14a54b1550a8087412d94733e27610741a26e6",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "ext-pdo": "*",
-                "firebase/php-jwt": "^5.4",
+                "firebase/php-jwt": "^5.4 || ^6.0",
                 "guzzlehttp/guzzle": "^7.0",
-                "guzzlehttp/psr7": "^1.8.2",
+                "guzzlehttp/psr7": "^1.8.4 || ^2.1.1",
                 "kamermans/guzzle-oauth2-subscriber": "^1.0.8",
                 "microsoft/azure-storage-blob": "^1.5.2",
                 "php": ">=7.4",
-                "psr/log": "^1.1.4"
+                "psr/log": "^1|^2|^3"
             },
             "suggest": {
                 "ext-openssl": "For Launch Token signing",
@@ -2640,6 +2724,7 @@
                 "ext-pdo_pgsql": "For Postgre databases",
                 "ext-pdo_sqlsrv": "For MsSQL databases"
             },
+            "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
@@ -2665,11 +2750,7 @@
                 "lti launch",
                 "sdk"
             ],
-            "support": {
-                "issues": "https://github.com/intelliscl/sdk-php/issues",
-                "source": "https://github.com/intelliscl/sdk-php/tree/v0.2.0.4-beta"
-            },
-            "time": "2021-10-21T06:33:18+00:00"
+            "time": "2022-12-01T03:03:06+00:00"
         },
         {
             "name": "jean85/pretty-package-versions",
@@ -10808,79 +10889,6 @@
             "time": "2022-10-03T15:15:50+00:00"
         },
         {
-            "name": "thecodingmachine/gotenberg-php-client",
-            "version": "6.3.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/thecodingmachine/gotenberg-php-client.git",
-                "reference": "7bfaaa790d54d6f72de749198bd784882f8c2b36"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/thecodingmachine/gotenberg-php-client/zipball/7bfaaa790d54d6f72de749198bd784882f8c2b36",
-                "reference": "7bfaaa790d54d6f72de749198bd784882f8c2b36",
-                "shasum": ""
-            },
-            "require": {
-                "guzzlehttp/psr7": "^1.4.2",
-                "php": ">=7.1",
-                "php-http/client-implementation": "^1.0",
-                "php-http/discovery": "^1.0",
-                "php-http/httplug": ">=1.0",
-                "php-http/message": "^1.0",
-                "psr/http-message": "^1.0"
-            },
-            "require-dev": {
-                "doctrine/coding-standard": "^6.0",
-                "php-http/guzzle6-adapter": "^1.1",
-                "php-http/mock-client": "^1.0",
-                "phpstan/phpstan": "^0.12.7",
-                "phpunit/phpunit": "^7",
-                "squizlabs/php_codesniffer": "^3.2",
-                "thecodingmachine/phpstan-strict-rules": "^0.12.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "6.0.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "TheCodingMachine\\Gotenberg\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Julien Neuhart",
-                    "email": "j.neuhart@thecodingmachine.com",
-                    "homepage": "https://github.com/gulien"
-                }
-            ],
-            "description": "A client for sending files to a Gotenberg API",
-            "homepage": "https://github.com/thecodingmachine/gotenberg-php-client",
-            "keywords": [
-                "Gotenberg",
-                "PowerPoint",
-                "api",
-                "client",
-                "html",
-                "markdown",
-                "office",
-                "pdf",
-                "word"
-            ],
-            "support": {
-                "issues": "https://github.com/thecodingmachine/gotenberg-php-client/issues",
-                "source": "https://github.com/thecodingmachine/gotenberg-php-client/tree/6.3.0"
-            },
-            "time": "2021-01-04T10:06:18+00:00"
-        },
-        {
             "name": "tijsverkoyen/css-to-inline-styles",
             "version": "2.2.5",
             "source": {
@@ -15250,7 +15258,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "intelliscl/sdk": 10,
+        "intelliscl/sdk": 20,
         "roave/security-advisories": 20
     },
     "prefer-stable": false,
