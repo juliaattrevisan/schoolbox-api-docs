@@ -236,36 +236,40 @@ const showDetails = computed(() => props.node.id !== UNSET_ID && !searchStore.is
     <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
         <li v-if="showNode" ref="viewNodeEl" data-test-node>
             <div
-                class="buttons-container"
+                class="container"
                 :data-enabled="props.node.enabled"
                 :data-is-inactive="`${isViewingAnother || isUpdatingAnother || isAddingAnother ? true : false}`"
                 :data-is-new="isNew"
                 :data-just-updated="justUpdated"
             >
-                <mc-view-node-checkbox v-if="showActions" :node="props.node" :is-active="isActive" />
-                <mc-view-node-name
-                    :node="props.node"
-                    :depth="props.depth"
-                    :title="title"
-                    :is-active="isActive"
-                    data-test-view-node-name
-                />
-                <mc-view-node-details
-                    v-if="showDetails"
-                    :node="props.node"
-                    :title="title"
-                    :is-viewing="isViewing"
-                    :is-updating="isUpdating"
-                    :is-adding="isAdding"
-                />
-                <mc-view-node-actions
-                    v-if="showActions"
-                    :node="props.node"
-                    :title="title"
-                    :is-viewing="isViewing"
-                    :is-updating="isUpdating"
-                    :is-adding="isAdding"
-                />
+                <div class="inner-containers name-container">
+                    <mc-view-node-checkbox v-if="showActions" :node="props.node" :is-active="isActive" />
+                    <mc-view-node-name
+                        :node="props.node"
+                        :depth="props.depth"
+                        :title="title"
+                        :is-active="isActive"
+                        data-test-view-node-name
+                    />
+                </div>
+                <div class="inner-containers">
+                    <mc-view-node-details
+                        v-if="showDetails"
+                        :node="props.node"
+                        :title="title"
+                        :is-viewing="isViewing"
+                        :is-updating="isUpdating"
+                        :is-adding="isAdding"
+                    />
+                    <mc-view-node-actions
+                        v-if="showActions"
+                        :node="props.node"
+                        :title="title"
+                        :is-viewing="isViewing"
+                        :is-updating="isUpdating"
+                        :is-adding="isAdding"
+                    />
+                </div>
             </div>
             <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
                 <mc-node-details v-if="isViewing" :depth="props.depth" />
@@ -290,7 +294,7 @@ const showDetails = computed(() => props.node.id !== UNSET_ID && !searchStore.is
 </template>
 
 <style lang="scss" scoped>
-.buttons-container {
+.container {
     align-items: center;
     border-bottom: 1px solid v-bind(borderBottomColour);
     display: flex;
@@ -300,6 +304,19 @@ const showDetails = computed(() => props.node.id !== UNSET_ID && !searchStore.is
     padding: 2px;
     position: relative;
     transition: opacity 0.3s;
+    @media (max-width: 500px) {
+        // to allow more space for the name / buttons on mobile
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
+.inner-containers {
+    display: flex;
+}
+
+.name-container {
+    width: 100%; // so the name can stretch to fill the space
 }
 
 [data-is-inactive="true"] {
