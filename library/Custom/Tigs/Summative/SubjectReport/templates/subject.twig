@@ -191,24 +191,25 @@ Data:
                                 {% include '@tigsSubjectReport/components/hscTaskMarks.twig' with hscTaskMarks.data[unitSpecId]|merge(extraComponentData) only %}
                             {% endif %}
                         </div>
-                        <div class="small-12 medium-8 columns">
-                            {# Comments come from different assessments, depending on student type #}
 
-                            {% if attributes.isHsc %}
-                                {% set commentData = hscTaskMarks.data[unitSpecId] %}
-                            {% else %}
-                                {% set commentData = aamData.data[unitSpecId] %}
-                            {% endif %}
+{#                        <div class="small-12 medium-8 columns">#}
+{#                            #}{# Comments come from different assessments, depending on student type #}
 
-                            {% if commentData.comment is defined and commentData.comment %}
-                                <div class="small-12 island comments">
-                                    <h4 class="subheader">Comments by {{ commentData.commentBy.fullname }}</h4>
-                                    <section class="content">
-                                        <p>{{ commentData.comment | nl2br }}</p>
-                                    </section>
-                                </div>
-                            {% endif %}
-                        </div>
+{#                            {% if attributes.isHsc %}#}
+{#                                {% set commentData = hscTaskMarks.data[unitSpecId] %}#}
+{#                            {% else %}#}
+{#                                {% set commentData = aamData.data[unitSpecId] %}#}
+{#                            {% endif %}#}
+
+{#                            {% if commentData.comment is defined and commentData.comment %}#}
+{#                                <div class="small-12 island comments">#}
+{#                                    <h4 class="subheader">Comments by {{ commentData.commentBy.fullname }}</h4>#}
+{#                                    <section class="content">#}
+{#                                        <p>{{ commentData.comment | nl2br }}</p>#}
+{#                                    </section>#}
+{#                                </div>#}
+{#                            {% endif %}#}
+{#                        </div>#}
                     </div>
                 </div>
 
