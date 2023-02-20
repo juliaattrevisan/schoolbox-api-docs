@@ -223,6 +223,12 @@ class Controller extends Base\Base
             }
         }
 
+        // Is $courseFolder a child of a course?
+        $courseParent = $this->folderMapper->findById($courseFolder->getParent()->getId());
+        if ($courseParent->getCourseSpecification() instanceof CourseSpecification) {
+            $errors[] = 'The proposed course folder is a child of ' . $courseParent->getFolder()->getTitle();
+        }
+
         if (\count($errors)) {
             $this->returnJson($errors, 400);
             return;
