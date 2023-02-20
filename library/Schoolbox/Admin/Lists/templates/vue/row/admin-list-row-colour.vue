@@ -1,72 +1,71 @@
 <script>
 /**
- * Pass in the jQuery spectrum colour picker
- * Make use of Using v-model on Components to simulate v-model like input change
- * See: https://vuejs.org/v2/guide/components.html#Using-v-model-on-Components
+ * To initiate the Coloris colour picker and keep track of the colour changes
+ * Make use of v-model to keep track of <input> changes
  */
-
-import "@melloware/coloris/dist/coloris.css";
-import Coloris from "@melloware/coloris";
+import { mapActions } from "pinia";
+import { useAdminListStore } from "../store/adminListStore";
 
 export default {
     props: {
-        caption: {
-            //just shown prior to load
-            type: String,
+        field: {
+            // field the lookup is linked to
+            type: Object,
+            required: true,
+        },
+        row: {
+            // the data for the lookup
+            type: Object,
             required: true,
         },
         colour: {
-            //the colour chosen
+            // the colour chosen
             type: String,
-            required: false,
-        },
-        rowId: {
-            //the id of the row
-            type: Number,
             required: true,
+        },
+    },
+
+    data() {
+        return {
+            uid: `coloris-${this.getNewColourPickerId()}`, // generate a unique id for the colour picker
+        };
+    },
+
+    watch: {
+        /**
+         * Ensure the correct colour is always set on the row,
+         * as the colour could also change if we delete a row above,
+         * so we need to ensure the colour picker stays up to date
+         *
+         * @param { string } newValue - the new colour value
+         */
+        colour(newValue) {
+            this.$el.value = newValue;
+            // as we manually set the value, we need to manually trigger the input event: https://coloris.js.org/
+            document.querySelector(`#${this.uid}`).dispatchEvent(new Event("input", { bubbles: true }));
         },
     },
 
     mounted() {
-        // this.setDefaultColour();
         this.initColourPicker();
     },
 
-    // watch: {
-    //     /**
-    //      * Ensure the correct colour is always set on the row,
-    //      * as the colour could also change if we delete a row above,
-    //      * so we need to ensure the colour picker stays up to date
-    //      */
-    //     colour(newValue) {
-    //         // $(this.$el).spectrum("set", newValue);
-    //     },
-    // },
-
     methods: {
-        /**
-         * We don't want to save a row without ensuring a default colour is set
-         * As then references that may expect a colour would be blank instead
-         */
-        // setDefaultColour() {
-        //     if (this.colour === "") {
-        //         this.$emit("input", "#000000");
-        //     }
-        // },
+        ...mapActions(useAdminListStore, ["getNewColourPickerId"]),
 
         /**
-         * Set up the jQuery spectrum colour picker and emit changes
+         * Set up the Coloris colour picker, passing in the required parameters
+         * Refer to https://coloris.js.org/ for further info
          */
         initColourPicker() {
             document.dispatchEvent(
+                // dispatched to www/static/js/colour-picker/colour-picker.ts
                 new CustomEvent("colourPickerInitialize", {
                     detail: {
-                        target: `#coloris-${this.rowId}`,
+                        target: `#${this.uid}`,
                         options: {
-                            // onChange: (colour) => {
-                            //     console.log(this.$el, colour)
-                            //     this.$emit("input", colour);
-                            // },
+                            format: "hex",
+                            alpha: false,
                         },
                     },
                 })
@@ -77,5 +76,5 @@ export default {
 </script>
 
 <template>
-    <input type="text" :id="`coloris-${rowId}`" :placeholder="caption" :value="colour" />
+    <input :id="uid" v-model="row[field.id]" type="text" :placeholder="field.caption" />
 </template>

@@ -10,6 +10,7 @@ export const useAdminListStore = defineStore("main", {
         rowToDelete: {}, // to track which row could be deleted
         isPopOutOpen: false, // to open and close the list
         selectedPopOutName: "", // to highlight all other rows that have that permission
+        colorPickerId: 0, // to get a new colour picker id
     }),
 
     getters: {
@@ -161,6 +162,16 @@ export const useAdminListStore = defineStore("main", {
                 });
             });
             return valid;
+        },
+
+        /**
+         * To get a new colour picker id
+         *
+         * @return { number }
+         */
+        getNewColourPickerId() {
+            this.colorPickerId++;
+            return this.colorPickerId;
         },
     },
 });

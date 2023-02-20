@@ -3,26 +3,26 @@ import Coloris from "@melloware/coloris";
 import "./colour-picker.css";
 
 const colorPickerDefaults = {
-    theme: 'pill',
+    theme: "pill",
     margin: 10,
-    format: 'rgb',
+    format: "rgb",
     alpha: true,
     focusInput: true,
-    defaultColor: '#000000',
+    defaultColor: "#000000",
     swatches: [
-      '#264653',
-      '#2a9d8f',
-      '#e9c46a',
-      '#f4a261',
-      '#e76f51',
-      '#d62828',
-      '#023e8a',
-      '#0077b6',
-      '#0096c7',
-      '#00b4d8',
-      '#48cae4',
-      '#86acff'
-    ]
+        "#264653",
+        "#2a9d8f",
+        "#e9c46a",
+        "#f4a261",
+        "#e76f51",
+        "#d62828",
+        "#023e8a",
+        "#0077b6",
+        "#0096c7",
+        "#00b4d8",
+        "#48cae4",
+        "#86acff",
+    ],
 };
 
 Coloris.init();
@@ -32,6 +32,6 @@ document.addEventListener("colourPickerInitialize", (e) => {
 
     Coloris({
         el: e.detail.target,
-        ...options
+        ...options,
     });
 });
