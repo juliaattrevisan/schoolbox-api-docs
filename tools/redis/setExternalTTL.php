@@ -41,7 +41,7 @@ $app = new class extends CliTool\App {
         $cursor  = null;
 
         while ($cursor !== '0') {
-            [$cursor, $elements] = $redis->scan($cursor, ['MATCH' => $this->getCacheKey()]);
+            [$cursor, $elements] = $redis->scan($cursor, ['MATCH' => $this->getLikeCacheKey()]);
             foreach ($elements as $cacheKey) {
                 $currentTtl = $redis->ttl($cacheKey);
                 $this->getLogger()->info("Cache TTL for $cacheKey is: $currentTtl seconds");
@@ -62,7 +62,11 @@ $app = new class extends CliTool\App {
         return $value === null ? null : (int)$value;
     }
 
-    private function getCacheKey()
+    /**
+     * Get the string match like token for searching for redis keys
+     * @return string
+     */
+    private function getLikeCacheKey(): string
     {
         return sprintf("%s:%s:%s", Redis::FUNCTION_CALL_CACHE_PREFIX, INSTANCE_ID, self::EXTERNAL_DB_KEY_PATTERN);
     }
