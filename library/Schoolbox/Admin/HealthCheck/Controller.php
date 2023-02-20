@@ -194,6 +194,7 @@ class Controller extends Base
             menu_top_campus mtc on mtc.menu_top_id = mt.id
         LEFT JOIN
             luCampus lc on mtc.campus_id = lc.id
+        WHERE mt.deleted_at IS NULL
         ORDER BY
             sort_order asc; ");
         $statement->execute();
@@ -230,6 +231,7 @@ class Controller extends Base
             menu_side_campus msc on msc.menu_side_id = ms.id
         LEFT JOIN
             luCampus lc on msc.campus_id = lc.id
+        WHERE ms.deleted_at IS NULL
         GROUP BY
             ms.title, ms.url
         ORDER BY
