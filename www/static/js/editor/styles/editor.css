@@ -116,3 +116,99 @@
 /* .ck.ck-editor .media {
     max-width: 500px;
 } */
+
+/**
+ * Custom Styles
+ * You'll find our custom styles defined below
+ */
+
+/* Callouts */
+.ck.ck-editor .s-callout {
+    border-radius: 0.25rem;
+    display: block;
+    font-weight: 600;
+    overflow: hidden;
+    padding: 1em 1em 1em 4rem;
+    position: relative;
+}
+
+.ck.ck-editor .s-callout--neutral {
+    border: 1px solid #dddddd;
+    color: #666666;
+}
+
+.ck.ck-editor .s-callout--warning {
+    border: 1px solid #fa4a47;
+    color: #fa4a47;
+}
+
+.ck.ck-editor .s-callout--success {
+    border: 1px solid #4fa74f;
+    color: #4fa74f;
+}
+
+.ck.ck-editor .s-callout:before {
+    align-items: center;
+    background-color: #dddddd;
+    display: flex;
+    font-family: "schoolbox";
+    font-size: 1.25rem;
+    font-weight: 400;
+    height: 100%;
+    justify-content: center;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 3rem;
+}
+
+.ck.ck-editor .s-callout--neutral:before {
+    background-color: #dddddd;
+    color: #666666;
+    content: "\e639";
+}
+
+.ck.ck-editor .s-callout--warning:before {
+    background-color: #fa4a47;
+    color: white;
+    content: "\e602";
+}
+
+.ck.ck-editor .s-callout--success:before {
+    background-color: #4fa74f;
+    color: white;
+    content: "\e604";
+}
+
+.ck.ck-editor .s-sticky-note {
+    background-color: #ffdf8d;
+    background-image: url("../../../images/ckeditor/styles/sticky_note_top.svg");
+    background-position: top;
+    background-repeat: repeat-x;
+    background-size: 1rem;
+    color: #444444;
+    padding: 1.5em 1em 1em 1em;
+    position: relative;
+}
+
+.ck.ck-editor .s-sticky-note:before {
+    color: #bf1f2e;
+    content: "\e913";
+    font-family: "schoolbox";
+    font-size: 24px;
+    left: calc(50% - 0.5em);
+    position: absolute;
+    top: -20px;
+}
+
+.ck.ck-editor .s-sticky-note:after {
+    background-image: url("../../../images/ckeditor/styles/sticky_note_corner.svg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    bottom: 0;
+    content: "";
+    height: 18px;
+    position: absolute;
+    right: 0;
+    width: 18px;
+}

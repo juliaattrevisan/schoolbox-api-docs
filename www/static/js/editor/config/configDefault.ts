@@ -204,6 +204,31 @@ export function getDefault() {
                     element: "span",
                     classes: ["highlighted-note"],
                 },
+                {
+                    name: "Ribbon",
+                    element: "span",
+                    classes: ["s-ribbon"],
+                },
+                {
+                    name: "Callout",
+                    element: "span",
+                    classes: ["s-callout", "s-callout--neutral"],
+                },
+                {
+                    name: "Warning Callout",
+                    element: "span",
+                    classes: ["s-callout", "s-callout--warning"],
+                },
+                {
+                    name: "Success Callout",
+                    element: "span",
+                    classes: ["s-callout", "s-callout--success"],
+                },
+                {
+                    name: "Sticky Note",
+                    element: "p",
+                    classes: ["s-sticky-note"],
+                },
             ],
         },
         heading: {
