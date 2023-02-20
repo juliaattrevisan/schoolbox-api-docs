@@ -10,34 +10,35 @@ import { useDeleteNodesStore } from "./store/mcDeleteNodesStore";
 import { useEnableNodesStore } from "./store/mcEnableNodesStore";
 import { useUpdateNodeStore } from "../activeNode/store/mcUpdateNodeStore";
 import { useAddSubsectionStore } from "../activeNode/store/mcAddSubsectionStore";
+import { useNodeDetailsStore } from "../activeNode/store/mcNodeDetailsStore";
 import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vue";
 import McSelectedNode from "./mc-selected-node.vue";
 
-const selectedNodesStore = useSelectedNodesStore(); //to keep track of selected nodes
+const selectedNodesStore = useSelectedNodesStore(); // to keep track of selected nodes
 const deleteNodesStore = useDeleteNodesStore();
 const enableNodesStore = useEnableNodesStore();
-const updateNodeStore = useUpdateNodeStore(); //so the bottom-drawer is not visible while we are updating a node
-const addSubsectionStore = useAddSubsectionStore(); //so the bottom-drawer is not visible while we are adding a node
+const updateNodeStore = useUpdateNodeStore(); // so the bottom-drawer is not visible while we are updating a node
+const addSubsectionStore = useAddSubsectionStore(); // so the bottom-drawer is not visible while we are adding a node
+const nodeDetailsStore = useNodeDetailsStore(); // so the bottom-drawer is not visible while we are viewing the details of a node
 
 /**
  * For proper count display, eg: 'No nodes / 1 Member' / '4 nodes'
  *
- * @returns { String }
+ * @returns { string }
  */
 const selectedNodesSummary = computed(() => {
     if (selectedNodesStore.hasNoNodes) {
         return `No nodes`;
-    } else {
-        return selectedNodesStore.singleOrPlural;
     }
+    return selectedNodesStore.singleOrPlural;
 });
 
 /**
  * So the selected nodes can be enabled / disabled
  *
- * @param { boolean }
+ * @param { boolean } enabled - true to enable, false to disable
  */
-function onEnableNodesSelected(enabled) {
+function onEnableNodesSelected(enabled: boolean) {
     enableNodesStore.prompt(enabled);
 }
 
@@ -52,7 +53,12 @@ function onDeleteNodesSelected() {
 <template>
     <div class="small-12 island">
         <bottom-drawer
-            :showDrawer="selectedNodesStore.hasNodes && !updateNodeStore.isOpen && !addSubsectionStore.isOpen"
+            :showDrawer="
+                selectedNodesStore.hasNodes &&
+                !updateNodeStore.isOpen &&
+                !addSubsectionStore.isOpen &&
+                !nodeDetailsStore.isOpen
+            "
         >
             <div v-if="selectedNodesStore.hasNodes" class="selected-nodes-container" data-test-nodes-container>
                 <mc-selected-node v-for="node in selectedNodesStore.nodes" :key="node.id" :node="node" data-test-node />

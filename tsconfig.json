@@ -8,6 +8,7 @@
         "moduleResolution": "node",
         "paths": {
             "@schoolboxCurriculum/*": ["library/Schoolbox/Curriculum/templates/*"],
+            "@schoolboxBadge/*": ["library/Schoolbox/Learning/Badge/*"],
             "@schoolboxVue/*": ["vue/*"],
             "@js/*": ["www/static/js/*"]
         },

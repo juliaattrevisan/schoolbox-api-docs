@@ -12,6 +12,7 @@ import type {
 } from "@schoolboxCurriculum/types/Node";
 import { ActivityTypes } from "@schoolboxCurriculum/types/Node";
 import { getUsageHref, getUsageIcon } from "@schoolboxCurriculum/js/nodeUtils";
+import BadgeImage from "@schoolboxBadge/vue/badge-image";
 
 interface Props {
     usage: Usage; // the usage to display
@@ -24,6 +25,12 @@ const props = defineProps<Props>();
     <li class="usage">
         <a :href="`${getUsageHref(props.usage)}`" :title="props.usage.object.title">
             <div class="usage__container">
+                <!-- <div
+                    v-if="props.usage.discriminator === ActivityTypes.BADGE"
+                    :class="`usage__badge-container ${getUsageIcon(props.usage.discriminator)}`"
+                >
+                    <badge-image :badge="award.badge" :css="award.isGoal ? 'badge goal' : 'badge'"></badge-image>
+                </div> -->
                 <div :class="`usage__icon-container ${getUsageIcon(props.usage.discriminator)} size-24`"></div>
                 <div class="usage__title-container">
                     <p v-if="props.usage.discriminator === ActivityTypes.BADGE">{{ props.usage.object.name }}</p>
@@ -69,6 +76,18 @@ const props = defineProps<Props>();
     position: relative;
     &:before {
         padding: 0;
+    }
+}
+
+:deep(.usage__badge-container) {
+    //v-deep is used so can target the img succesfully
+    position: relative;
+    flex: 0 0 50px;
+    padding: 0.25rem 0.5rem;
+    background-color: #f6f6f6;
+    img {
+        width: 40px;
+        height: auto;
     }
 }
 
