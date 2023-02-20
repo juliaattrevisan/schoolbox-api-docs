@@ -195,6 +195,10 @@ export function getUsageIcon(type: ActivityTypes) {
         [ActivityTypes.COURSE]: "icon-course-builder",
         [ActivityTypes.UNIT]: "icon-unit",
         [ActivityTypes.LEARNING_ACTIVITY]: "icon-due-work",
+        [ActivityTypes.LEARNING_ACTIVITY_PROJECT]: "icon-project",
+        [ActivityTypes.LEARNING_ACTIVITY_DUE_WORK]: "icon-due-work",
+        [ActivityTypes.LEARNING_ACTIVITY_TASK]: "icon-task",
+        [ActivityTypes.LEARNING_ACTIVITY_QUIZ]: "icon-quiz",
         [ActivityTypes.BADGE]: "icon-badge",
     };
     return icons[type];

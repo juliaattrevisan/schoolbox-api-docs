@@ -55,38 +55,33 @@ const searchStore = useSearchStore();
 /**
  * To disable selection on certain sitatuions
  *
- * @returns { Boolean }
+ * @returns { boolean }
  */
 const isDisabled = computed(() => {
-    if (props.isActive) {
-        //while the node is being updated
+    if (props.isActive || nodesStore.isLoading) {
+        // while the node is being updated
         return true;
-    } else if (nodesStore.isLoading) {
-        //or while a load is in progress
-        return true;
-    } else {
-        return false;
     }
+    return false;
 });
 
 /**
  * To distinguish the parent node
  *
- * @returns { Boolean }
+ * @returns { boolean }
  */
 const isParentNode = computed(() => {
     if (props.depth === 0) {
         return true;
-    } else {
-        return false;
     }
+    return false;
 });
 
 /**
  * To help distinguish those nodes that aren't selectable,
  * we disable and remove the default button colour
  *
- * @returns { Boolean }
+ * @returns { boolean }
  */
 const isButton = computed(() => {
     if (searchStore.isActive) {
@@ -118,10 +113,10 @@ const fontWeight = computed(() => (isParentNode.value && !searchStore.isActive ?
  */
 function onNameSelected() {
     if (searchStore.isActive) {
-        //reset the structure and move to the selected searched node
+        // reset the structure and move to the selected searched node
         viewNodesStore.toId(props.node.id);
     } else {
-        //traverse to the next node level
+        // traverse to the next node level
         viewNodesStore.setNextSelected(props.node.id);
     }
 }
@@ -129,25 +124,23 @@ function onNameSelected() {
 /**
  * To highlight any search selections in the code / title
  *
- * @returns { HTML }
+ * @returns { string } - the highlighted title
  */
 const highlightTitleSearch = computed(() => {
     if (searchStore.isActive) {
         return highlightSearchInElement(props.title);
-    } else {
-        return props.title;
     }
+    return props.title;
 });
 
 /**
  * To highlight where the search string matches within the settings result
  * (?![^>]*>) is used to check we are not inside an element node
  *
- * @params { String } the string to find all instanced of the current search string in
- *
- * @returns { String } string for v-html with <mark></mark> wrapped around each found result
+ * @param { string } toHighlight - the string to find all instanced of the current search string in
+ * @returns { string } string for v-html with <mark></mark> wrapped around each found result
  */
-function highlightSearchInElement(toHighlight) {
+function highlightSearchInElement(toHighlight: string) {
     let highlighted = toHighlight;
     searchStore.queryWordList.forEach((wordInSearch) => {
         highlighted = highlighted.replace(RegExp(`${escapeRegExp(wordInSearch)}(?![^mark>]*mark>)`, "ig"), (match) => {

@@ -40,6 +40,10 @@ export enum ActivityTypes {
     COURSE = "course",
     UNIT = "unit",
     LEARNING_ACTIVITY = "assessment",
+    LEARNING_ACTIVITY_PROJECT = "project",
+    LEARNING_ACTIVITY_DUE_WORK = "dueWork",
+    LEARNING_ACTIVITY_TASK = "task",
+    LEARNING_ACTIVITY_QUIZ = "quiz",
     BADGE = "badge",
 }
 
@@ -94,6 +98,7 @@ export interface LearningActivityUsageObject extends UsageObject {
     _links: {
         view: string;
     };
+    type: string;
     unit: {
         title: string;
     };

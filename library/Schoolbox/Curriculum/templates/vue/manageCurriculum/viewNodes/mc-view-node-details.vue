@@ -107,12 +107,15 @@ function onViewToggleSelected() {
     color: #008600;
 }
 
-.icon-unit::before,
-.icon-due-work::before {
+.icon-unit::before {
     color: var(--body-foreground);
 }
 
+.icon-due-work::before {
+    color: #c1009e;
+}
+
 .icon-badge::before {
-    color: #ffd100;
+    color: #ff7c00;
 }
 </style>

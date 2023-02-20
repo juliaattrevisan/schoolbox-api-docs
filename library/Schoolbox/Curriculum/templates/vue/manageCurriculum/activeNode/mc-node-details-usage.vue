@@ -3,6 +3,7 @@
  * To display a single activity linked to a node
  */
 
+import { computed } from "vue";
 import type {
     Usage,
     CourseUsageObject,
@@ -19,6 +20,13 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+
+const badgeIcon = computed(() => {
+    if (props.usage.discriminator === ActivityTypes.LEARNING_ACTIVITY) {
+        return getUsageIcon(props.usage.object.type);
+    }
+    return getUsageIcon(props.usage.discriminator);
+});
 </script>
 
 <template>
@@ -31,7 +39,7 @@ const props = defineProps<Props>();
                 >
                     <badge-image :badge="award.badge" :css="award.isGoal ? 'badge goal' : 'badge'"></badge-image>
                 </div> -->
-                <div :class="`usage__icon-container ${getUsageIcon(props.usage.discriminator)} size-24`"></div>
+                <div :class="`usage__icon-container ${badgeIcon} size-24`"></div>
                 <div class="usage__title-container">
                     <p v-if="props.usage.discriminator === ActivityTypes.BADGE">{{ props.usage.object.name }}</p>
                     <p v-else>{{ props.usage.object.title }}</p>

@@ -316,7 +316,7 @@ const showDetails = computed(() => props.node.id !== UNSET_ID && !searchStore.is
 }
 
 .name-container {
-    width: 100%; // so the name can stretch to fill the space
+    width: 100%; // so the name can stretch to fill the space#
 }
 
 [data-is-inactive="true"] {
