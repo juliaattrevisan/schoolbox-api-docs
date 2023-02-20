@@ -25,6 +25,7 @@ use Custom\Tigs\Summative\SubjectReport\Components\AcademicAchievementSummary;
 use Custom\Tigs\Summative\SubjectReport\Components\HscAssessmentMatrix;
 use Custom\Tigs\Summative\SubjectReport\Components\HscAssessmentRank;
 use Custom\Tigs\Summative\SubjectReport\Components\HscAssessmentTasks;
+use Custom\Tigs\Summative\SubjectReport\Components\LearningProfile;
 use Custom\Tigs\Summative\SubjectReport\Components\MiddleYearsAssessmentRank;
 use Custom\Tigs\Summative\SubjectReport\Components\MiddleYearsAssessmentTasks;
 use Custom\Tigs\Summative\SubjectReport\Components\NesaScoreGraphHSC;
@@ -213,7 +214,7 @@ class Report
             $middleYearsTaskMarks = $this->buildMiddleYearsTaskMarksData($folder, $attributes, $courseSpec, $user, $roleTypeOverride);
             $middleYearsRankData = $this->buildMiddleYearsAssessmentRankData($folder, $attributes, $courseSpec, $user, $roleTypeOverride);
 
-            $learningProfileData = $this->buildLearningProfileData($folder, $attributes, $user, $roleTypeOverride);
+            $learningProfileData = $this->buildLearningProfileData($folder, $attributes, $unitSpecs, $courseSpec, $user, $roleTypeOverride);
 
             // Filter out unit specs without any data
             $unitSpecsWithData = new Collection();
@@ -1053,10 +1054,13 @@ class Report
     private function buildLearningProfileData(
         Folder\Model $folder,
         StudentAttributes $attributes,
+        GenericCollection $unitSpecs,
+        CourseSpec\Model $courseSpec,
         User $student,
         ?string $roleTypeOverride
     ): ?array {
         // Which work type?
+        // Furthermore: for previous semesters does all have to be loaded?
         $workTypeConfig = null;
         $yearLevel      = $attributes->getYearLevel();
         $term           = $attributes->getTerm();
@@ -1115,6 +1119,32 @@ class Report
         }
 
         // Now find the item with this name
+        $assessments = $this->loadAssessmentsAndParticipation(
+            $courseSpec,
+            [$workTypeId],
+            $attributes,
+            1,
+            2,
+        );
+
+        foreach ($assessments as $assessment) {
+            $profile = new LearningProfile(
+                $attributes,
+                $unitSpecs,
+                $student,
+                $folder,
+                $this->visibility,
+                $this->viewer,
+                $workTypeId,
+                $this->rubricMapper,
+                $this->authorizer,
+                $this->router,
+                $roleTypeOverride,
+            );
+        }
+
+        // Do something with them
+        return [];
     }
 
     /**
@@ -1204,6 +1234,8 @@ class Report
         int $semesterTo
     ): GenericCollection {
         // Find relevant assessments and participation and insert into units
+        // TODO this really relies upon the assessment cache,
+        //      and is bound to fail due to SA-1951
         $cohortUnitImpls = $this->findCohortUnitImpls($courseSpec);
         $assessables     = $this->assessmentMapperProxy->findAllByIds($this->findAssessmentIds($cohortUnitImpls, $workTypeIds, $attributes, $semesterFrom, $semesterTo));
         $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessables);
