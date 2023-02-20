@@ -7,8 +7,7 @@
     isEditable                bool        - Is the form editable?
     postRoute:                string      - Where to post form to
 #}
-<link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/vendors/spectrum/spectrum.css?v={{ config.site_version }}" />
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/spectrum.js?v={{ siteVersion }}"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/bundle/colourPicker.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ siteVersion }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ siteVersion }}"></script>
 
@@ -48,18 +47,16 @@
         let settingsForm = $('#settings');
 
         {% if hasColourPicker %}
-        $("[data-colour-picker]").spectrum(
-            $.extend(
-                {},
-                window.sbProps.spectrum,
-                {
-                    change: function (color) {if (color !== null) {$(this).val(color.toRgbString());}},
-                    hide: function (color) {if (color !== null) {$(this).val(color.toRgbString());}},
-                    preferredFormat: 'rgb',
-                    showAlpha: true
-                }
+        document.querySelectorAll("[data-colour-picker]").forEach((el) => {
+            document.dispatchEvent(
+                new CustomEvent("colourPickerInitialize", {
+                    detail: {
+                        target: `#${el.id}`,
+                        options: {}
+                    }
+                })
             )
-        );
+        });
         {% endif %}
 
         {% if hasHtmlEditor %}

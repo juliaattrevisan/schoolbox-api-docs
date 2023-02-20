@@ -1,11 +1,14 @@
-.clr-field button:after {
-    visibility: inherit !important;
+.clr-field {
+    min-width: 2.5rem;
 }
 .clr-field button {
     width: 30px !important;
     height: 30px !important;
     right: 5px !important;
     min-height: 0px !important;
+}
+.clr-field button:after {
+    visibility: inherit !important;
 }
 .clr-swatches button {
     min-height: auto !important;
