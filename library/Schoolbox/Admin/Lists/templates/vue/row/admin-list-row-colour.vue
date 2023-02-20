@@ -64,8 +64,8 @@ export default {
                     detail: {
                         target: `#${this.uid}`,
                         options: {
-                            format: "hex",
                             alpha: false,
+                            clearButton: true,
                         },
                     },
                 })

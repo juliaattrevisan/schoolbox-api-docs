@@ -5,10 +5,9 @@ import "./colour-picker.css";
 const colorPickerDefaults = {
     theme: "pill",
     margin: 10,
-    format: "rgb",
+    format: "hex",
     alpha: true,
     focusInput: true,
-    defaultColor: "#000000",
     swatches: [
         "#264653",
         "#2a9d8f",
