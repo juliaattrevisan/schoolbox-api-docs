@@ -64,12 +64,6 @@ function onViewToggleSelected() {
             title="Badges"
             >{{ props.node._usageCounts.badge }}</span
         >
-        <span
-            v-if="props.node._usageCounts?.folder > 0"
-            :class="`label neutral ${getUsageIcon(ActivityTypes.FOLDER)}`"
-            title="Folders"
-            >{{ props.node._usageCounts.folder }}</span
-        >
     </button>
     <button
         :class="`button-action-option ${props.isViewing ? 'icon-close' : 'icon-curriculum-details'}`"

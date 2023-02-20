@@ -9,7 +9,6 @@ import type {
     UnitUsageObject,
     AssessmentUsageObject,
     BadgeUsageObject,
-    FolderUsageObject,
 } from "@schoolboxCurriculum/types/Node";
 import { ActivityTypes } from "@schoolboxCurriculum/types/Node";
 import { getUsageHref, getUsageIcon } from "@schoolboxCurriculum/js/nodeUtils";
@@ -40,9 +39,6 @@ const props = defineProps<Props>();
                     </p>
                     <p v-else-if="props.usage.discriminator === ActivityTypes.BADGE" class="meta">
                         {{ (props.usage.object as BadgeUsageObject).category.name }}
-                    </p>
-                    <p v-else-if="props.usage.discriminator === ActivityTypes.FOLDER" class="meta">
-                        {{ (props.usage.object as FolderUsageObject).parent?.title }}
                     </p>
                 </div>
             </div>

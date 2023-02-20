@@ -22,7 +22,8 @@ export const useNodeDetailsStore = defineStore("mcNodeDetails", () => {
             const usageResponse = await fetch(activeNodeStore.node._links.getUsage);
             if (usageResponse.ok) {
                 const usage = (await usageResponse.json()) as JSON;
-                activeNodeStore.node.usage = usage.data as Usage[];
+                const withoutFolders = usage.data.filter((item: Usage) => item.discriminator !== "folder");
+                activeNodeStore.node.usage = withoutFolders as Usage[];
             } else {
                 hasLoadError.value = true;
             }

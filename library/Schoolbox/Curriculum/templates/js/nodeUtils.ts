@@ -9,7 +9,6 @@ import type {
     UnitUsageObject,
     AssessmentUsageObject,
     BadgeUsageObject,
-    FolderUsageObject,
 } from "@schoolboxCurriculum/types/Node";
 import { ActivityTypes } from "@schoolboxCurriculum/types/Node";
 import type { Breadcrumb } from "@schoolboxCurriculum/types/Breadcrumb";
@@ -168,8 +167,7 @@ export function hasUsage(node: Node) {
         node._usageCounts.course > 0 ||
         node._usageCounts.unit > 0 ||
         node._usageCounts.assessment > 0 ||
-        node._usageCounts.badge > 0 ||
-        node._usageCounts.folder > 0
+        node._usageCounts.badge > 0
     ) {
         return true;
     }
@@ -183,13 +181,7 @@ export function hasUsage(node: Node) {
  * @returns { number } - the total count
  */
 export function getTotalUsage(node: Node) {
-    return (
-        node._usageCounts.course +
-        node._usageCounts.unit +
-        node._usageCounts.assessment +
-        node._usageCounts.badge +
-        node._usageCounts.folder
-    );
+    return node._usageCounts.course + node._usageCounts.unit + node._usageCounts.assessment + node._usageCounts.badge;
 }
 
 /**
@@ -204,7 +196,6 @@ export function getUsageIcon(type: ActivityTypes) {
         [ActivityTypes.UNIT]: "icon-unit",
         [ActivityTypes.ASSESSMENT]: "icon-due-work",
         [ActivityTypes.BADGE]: "icon-badge",
-        [ActivityTypes.FOLDER]: "icon-folder",
     };
     return icons[type];
 }
@@ -221,7 +212,6 @@ export function getUsageHref(usage: Usage) {
         [ActivityTypes.UNIT]: () => (usage.object as UnitUsageObject).folder._links.view,
         [ActivityTypes.ASSESSMENT]: () => (usage.object as AssessmentUsageObject)._links.view,
         [ActivityTypes.BADGE]: () => "#",
-        [ActivityTypes.FOLDER]: () => (usage.object as FolderUsageObject)._links.view,
     };
-    return icons[usage.discriminator]();
+    return icons[usage.discriminator] && icons[usage.discriminator]();
 }

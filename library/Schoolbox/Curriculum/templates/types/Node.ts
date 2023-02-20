@@ -41,20 +41,14 @@ export enum ActivityTypes {
     UNIT = "unit",
     ASSESSMENT = "assessment",
     BADGE = "badge",
-    FOLDER = "folder",
 }
 
 /**
  * An activity linked to the node
  */
 export type Usage = {
-    discriminator:
-        | ActivityTypes.COURSE
-        | ActivityTypes.UNIT
-        | ActivityTypes.ASSESSMENT
-        | ActivityTypes.FOLDER
-        | ActivityTypes.BADGE;
-    object: CourseUsageObject | UnitUsageObject | AssessmentUsageObject | BadgeUsageObject | FolderUsageObject;
+    discriminator: ActivityTypes.COURSE | ActivityTypes.UNIT | ActivityTypes.ASSESSMENT | ActivityTypes.BADGE;
+    object: CourseUsageObject | UnitUsageObject | AssessmentUsageObject | BadgeUsageObject;
 };
 
 /**
