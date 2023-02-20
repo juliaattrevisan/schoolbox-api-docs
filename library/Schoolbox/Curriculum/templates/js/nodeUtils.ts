@@ -7,7 +7,7 @@ import type {
     Usage,
     CourseUsageObject,
     UnitUsageObject,
-    AssessmentUsageObject,
+    LearningActivityUsageObject,
     BadgeUsageObject,
 } from "@schoolboxCurriculum/types/Node";
 import { ActivityTypes } from "@schoolboxCurriculum/types/Node";
@@ -194,7 +194,7 @@ export function getUsageIcon(type: ActivityTypes) {
     const icons = {
         [ActivityTypes.COURSE]: "icon-course-builder",
         [ActivityTypes.UNIT]: "icon-unit",
-        [ActivityTypes.ASSESSMENT]: "icon-due-work",
+        [ActivityTypes.LEARNING_ACTIVITY]: "icon-due-work",
         [ActivityTypes.BADGE]: "icon-badge",
     };
     return icons[type];
@@ -210,7 +210,7 @@ export function getUsageHref(usage: Usage) {
     const icons = {
         [ActivityTypes.COURSE]: () => (usage.object as CourseUsageObject).folder._links.view,
         [ActivityTypes.UNIT]: () => (usage.object as UnitUsageObject).folder._links.view,
-        [ActivityTypes.ASSESSMENT]: () => (usage.object as AssessmentUsageObject)._links.view,
+        [ActivityTypes.LEARNING_ACTIVITY]: () => (usage.object as LearningActivityUsageObject)._links.view,
         [ActivityTypes.BADGE]: () => "#",
     };
     return icons[usage.discriminator] && icons[usage.discriminator]();

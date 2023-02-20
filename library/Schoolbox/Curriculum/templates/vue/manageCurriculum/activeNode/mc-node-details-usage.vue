@@ -7,7 +7,7 @@ import type {
     Usage,
     CourseUsageObject,
     UnitUsageObject,
-    AssessmentUsageObject,
+    LearningActivityUsageObject,
     BadgeUsageObject,
 } from "@schoolboxCurriculum/types/Node";
 import { ActivityTypes } from "@schoolboxCurriculum/types/Node";
@@ -34,8 +34,8 @@ const props = defineProps<Props>();
                     <p v-else-if="props.usage.discriminator === ActivityTypes.UNIT" class="meta">
                         {{ (props.usage.object as UnitUsageObject).folder?.parent?.title }}
                     </p>
-                    <p v-else-if="props.usage.discriminator === ActivityTypes.ASSESSMENT" class="meta">
-                        {{ (props.usage.object as AssessmentUsageObject).unit?.title }}
+                    <p v-else-if="props.usage.discriminator === ActivityTypes.LEARNING_ACTIVITY" class="meta">
+                        {{ (props.usage.object as LearningActivityUsageObject).unit?.title }}
                     </p>
                     <p v-else-if="props.usage.discriminator === ActivityTypes.BADGE" class="meta">
                         {{ (props.usage.object as BadgeUsageObject).category.name }}

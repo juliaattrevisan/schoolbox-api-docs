@@ -39,7 +39,7 @@ export type Node = {
 export enum ActivityTypes {
     COURSE = "course",
     UNIT = "unit",
-    ASSESSMENT = "assessment",
+    LEARNING_ACTIVITY = "assessment",
     BADGE = "badge",
 }
 
@@ -47,8 +47,8 @@ export enum ActivityTypes {
  * An activity linked to the node
  */
 export type Usage = {
-    discriminator: ActivityTypes.COURSE | ActivityTypes.UNIT | ActivityTypes.ASSESSMENT | ActivityTypes.BADGE;
-    object: CourseUsageObject | UnitUsageObject | AssessmentUsageObject | BadgeUsageObject;
+    discriminator: ActivityTypes.COURSE | ActivityTypes.UNIT | ActivityTypes.LEARNING_ACTIVITY | ActivityTypes.BADGE;
+    object: CourseUsageObject | UnitUsageObject | LearningActivityUsageObject | BadgeUsageObject;
 };
 
 /**
@@ -90,7 +90,7 @@ export interface UnitUsageObject extends UsageObject {
 /**
  * The further details of the the assessment usage
  */
-export interface AssessmentUsageObject extends UsageObject {
+export interface LearningActivityUsageObject extends UsageObject {
     _links: {
         view: string;
     };

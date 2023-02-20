@@ -54,8 +54,8 @@ function onViewToggleSelected() {
         >
         <span
             v-if="props.node._usageCounts?.assessment > 0"
-            :class="`label neutral ${getUsageIcon(ActivityTypes.ASSESSMENT)}`"
-            title="Assessment"
+            :class="`label neutral ${getUsageIcon(ActivityTypes.LEARNING_ACTIVITY)}`"
+            title="Learning activity"
             >{{ props.node._usageCounts.assessment }}</span
         >
         <span
