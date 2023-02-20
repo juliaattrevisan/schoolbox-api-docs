@@ -168,6 +168,12 @@ Update the controller and have a play with the contents of `FAVOURITE_WARCRY`.
 
 When you're ready, we'll start moving onto more complex stuff.
 
+## Change dataset to have some valid data
+
+Lets start by changing to a old sales dataset, which contains some wiki data for us to use
+in your `vagrant.yaml` update the `data_filename:` to `sales.tar.gz`
+then make sure to `vagrant provision` to load that dataset into your vagrant.
+
 ### The Handler
 Let's summon a known Handler and have it interact with the database and fetch some data for us in an array, and then we can work on pushing out to the screen. Modification of the controller below results in some content being dumped out using `var_dump()`
 
@@ -943,6 +949,9 @@ class Module extends BaseModule
 ```
 
 The only methods you really need to think about for now is `initRoutes()` and `initRoutePermissions()`. Respectively, these determine urls and who can access those urls. We'll look at those later.
+
+Generate the route table cache inside vagrant `vagrant ssh` then:
+`php /usr/share/schoolbox/tools/module/refresh-cache.php`
 
 ### Controller
 Now we need something to harness the power of Mappers, Models and the Module itself. The Controller manipulates the Mapper and Model(s) and produces output for twig, which can be accessed via the Module. This is where all the pieces come together and we'll finally be able to access it from the browser.
