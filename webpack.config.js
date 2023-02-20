@@ -277,6 +277,9 @@ module.exports = {
         // Slideshow
         slideshow: "./www/static/js/slideshow/slideshow.ts",
 
+        // Colour Picker
+        colourPicker: "./www/static/js/colour-picker/colour-picker.ts",
+
         // Markbook Pop Out
         popOutMenuMarkbook: "./vue/components/menu/popOutMenuMarkbook.js",
     },
