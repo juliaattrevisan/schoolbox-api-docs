@@ -60,7 +60,11 @@ export default {
                     this.deleteRowConfirmed(deletedRow);
                     this.$refs.toast.timeout("Row Deleted", true, 2000);
                 } else {
-                    this.$refs.toast.timeout("Unable to delete", false, 2000);
+                    if (undefined === responseData.message) {
+                        this.$refs.toast.timeout("Unable to delete", false, 2000);
+                    } else {
+                        this.$refs.toast.timeout(responseData.message, false, 2000);
+                    }
                 }
             } catch (error) {
                 console.warn(error);
