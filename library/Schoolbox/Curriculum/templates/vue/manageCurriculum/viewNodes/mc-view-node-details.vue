@@ -101,4 +101,17 @@ function onViewToggleSelected() {
         margin: 0;
     }
 }
+
+.icon-course-builder::before {
+    color: #008600;
+}
+
+.icon-unit::before,
+.icon-due-work::before {
+    color: var(--body-foreground);
+}
+
+.icon-badge::before {
+    color: #ffd100;
+}
 </style>
