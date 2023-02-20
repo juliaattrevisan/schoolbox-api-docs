@@ -229,6 +229,11 @@ class Controller extends Base\Base
             $errors[] = 'The proposed course folder is a child of ' . $courseParent->getFolder()->getTitle();
         }
 
+        // Is $courseFolder a child of a unit?
+        if ($courseParent->getUnitSpecification() instanceof UnitSpecification) {
+            $errors[] = 'The proposed course folder is a child of ' . $courseParent->getFolder()->getTitle();
+        }
+
         if (\count($errors)) {
             $this->returnJson($errors, 400);
             return;
