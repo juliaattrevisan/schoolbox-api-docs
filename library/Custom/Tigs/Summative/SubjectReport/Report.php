@@ -1060,7 +1060,7 @@ class Report
         ?string $roleTypeOverride
     ): ?array {
         // Which work type?
-        // Furthermore: for previous semesters does all have to be loaded?
+        // Furthermore: for previous semesters all previous have to be loaded.
         $workTypeConfig = null;
         $yearLevel      = $attributes->getYearLevel();
         $term           = $attributes->getTerm();
@@ -1074,6 +1074,7 @@ class Report
             };
         } elseif ($yearLevel === 11) {
             // What happens to Year 11 term 4?
+            // (It shows in Year 12, as term 4 in previous year)
             $workTypeConfig = match ($term) {
                 1       => Config::_TIGS_WORK_TYPE_YEAR_11_TERM_1_LEARNING_PROFILE,
                 2       => Config::_TIGS_WORK_TYPE_YEAR_11_TERM_2_LEARNING_PROFILE,
@@ -1081,6 +1082,7 @@ class Report
                 default => null,
             };
         } elseif ($yearLevel === 12) {
+            // Need to consider how Year 12 terms are labelled
             $workTypeConfig = match ($term) {
                 1       => Config::_TIGS_WORK_TYPE_YEAR_12_TERM_1_LEARNING_PROFILE,
                 2       => Config::_TIGS_WORK_TYPE_YEAR_12_TERM_2_LEARNING_PROFILE,
@@ -1118,8 +1120,7 @@ class Report
             return ['error' => $e->getMessage()];
         }
 
-        // Now find the item with this name
-        $assessments = $this->loadAssessmentsAndParticipation(
+        $this->loadAssessmentsAndParticipation(
             $courseSpec,
             [$workTypeId],
             $attributes,
@@ -1127,24 +1128,20 @@ class Report
             2,
         );
 
-        foreach ($assessments as $assessment) {
-            $profile = new LearningProfile(
-                $attributes,
-                $unitSpecs,
-                $student,
-                $folder,
-                $this->visibility,
-                $this->viewer,
-                $workTypeId,
-                $this->rubricMapper,
-                $this->authorizer,
-                $this->router,
-                $roleTypeOverride,
-            );
-        }
-
-        // Do something with them
-        return [];
+        $profile = new LearningProfile(
+            $attributes,
+            $unitSpecs,
+            $student,
+            $folder,
+            $this->visibility,
+            $this->viewer,
+            $workTypeId,
+            $this->rubricMapper,
+            $this->authorizer,
+            $this->router,
+            $roleTypeOverride,
+        );
+        return $profile->toContext();
     }
 
     /**
