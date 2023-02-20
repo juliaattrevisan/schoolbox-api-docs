@@ -66,6 +66,7 @@ function onViewToggleSelected() {
         >
     </button>
     <button
+        v-if="getTotalUsage(props.node) > 0 || node.description !== ''"
         :class="`button-action-option ${props.isViewing ? 'icon-close' : 'icon-curriculum-details'}`"
         :title="`View ${props.title}`"
         :disabled="props.isUpdating || props.isAdding"
