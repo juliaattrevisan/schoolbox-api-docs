@@ -49,12 +49,12 @@
                                     <input type="hidden" name="type" value="modify"/>
                                     <input type="hidden" name="userID" value="{{ user.id }}"/>
 
-                                    <div class="small-12 medium-4 island">
+                                    {# SA-12610 explains why profile-image-override exists. #}
+                                    <div class="small-12 medium-4 island profile-image-override">
                                         <label>Portrait Image</label>
-
                                         {# If the user has a picture, show it
                                         #}
-                                        {% if user.portrait %}
+                                        {% if user.portrait and not portraitZone %}
                                             <div id="portraitImage">
                                                 {% include 'include/portrait.twig' with {user: user, render: 'large', appendQueryParam: '&cb=' ~ date().timestamp} only %}
                                             </div>
@@ -1088,4 +1088,3 @@
         });
     });
 </script>
-
