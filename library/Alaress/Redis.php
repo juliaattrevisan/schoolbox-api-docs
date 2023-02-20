@@ -320,6 +320,8 @@ class Redis
 
     /**
      * Build a common redis key for inserting and returning cached data
+     * If updating, will also have to update the format at:
+     * tools/redis/setExternalTTL.php::getLikeCacheKey
      *
      * @param string   $base_key The base of the key to store the result in.
      * @param mixed    $params   A parameter to pass to $callback. This is also

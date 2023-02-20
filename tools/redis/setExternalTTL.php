@@ -64,6 +64,9 @@ $app = new class extends CliTool\App {
 
     /**
      * Get the string match like token for searching for redis keys
+     *
+     * Based off the format of \Alaress\Redis::getRedisKey
+     *
      * @return string
      */
     private function getLikeCacheKey(): string
