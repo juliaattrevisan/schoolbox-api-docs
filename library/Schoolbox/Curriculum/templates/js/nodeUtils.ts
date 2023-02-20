@@ -215,3 +215,14 @@ export function getUsageHref(usage: Usage) {
     };
     return icons[usage.discriminator] && icons[usage.discriminator]();
 }
+
+/**
+ * To only return the usages of the specified type
+ *
+ * @param { Usage[] } usages - the usages
+ * @param { type } type - the activity type
+ * @returns { Usage[] } - the usages of the specified type
+ */
+export function getSpecificUsages(usages: Usage[], type: string) {
+    return usages.filter((usage) => usage.discriminator === type);
+}

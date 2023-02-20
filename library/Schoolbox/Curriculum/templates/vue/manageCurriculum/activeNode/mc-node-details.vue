@@ -4,9 +4,10 @@
  */
 
 import { computed } from "vue";
-import { getTotalUsage } from "@schoolboxCurriculum/js/nodeUtils";
+import type { Usage } from "@schoolboxCurriculum/types/Node";
+import { ActivityTypes } from "@schoolboxCurriculum/types/Node";
+import { getSpecificUsages } from "@schoolboxCurriculum/js/nodeUtils";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
-import HorizontalScoller from "@schoolboxVue/components/scroll/horizontal-scoller";
 import { useActiveNodeStore } from "./store/mcActiveNodeStore";
 import { useNodeDetailsStore } from "./store/mcNodeDetailsStore";
 import McNodeDetailsUsage from "./mc-node-details-usage.vue";
@@ -61,16 +62,46 @@ function onRefreshSelected() {
             <fieldset class="content">
                 <div v-html="activeNodeStore.node.description"></div>
                 <div v-if="hasUsage" class="usage-list-container">
-                    <h4>Connected Material ({{ getTotalUsage(activeNodeStore.node) }})</h4>
-                    <horizontal-scoller :has-buttons="false" :height="80" :has-content-change="false">
+                    <div v-if="activeNodeStore.node._usageCounts.course > 0">
+                        <h4>Courses ({{ activeNodeStore.node._usageCounts.course }})</h4>
                         <ul class="usage-list">
                             <mc-node-details-usage
-                                v-for="(usage, index) in activeNodeStore.node.usage"
+                                v-for="(usage, index) in getSpecificUsages(activeNodeStore.node.usage as Usage[], ActivityTypes.COURSE)"
                                 :key="index"
                                 :usage="usage"
                             />
                         </ul>
-                    </horizontal-scoller>
+                    </div>
+                    <div v-if="activeNodeStore.node._usageCounts.unit > 0">
+                        <h4>Units ({{ activeNodeStore.node._usageCounts.unit }})</h4>
+                        <ul class="usage-list">
+                            <mc-node-details-usage
+                                v-for="(usage, index) in getSpecificUsages(activeNodeStore.node.usage as Usage[], ActivityTypes.UNIT)"
+                                :key="index"
+                                :usage="usage"
+                            />
+                        </ul>
+                    </div>
+                    <div v-if="activeNodeStore.node._usageCounts.assessment > 0">
+                        <h4>Learning Activities ({{ activeNodeStore.node._usageCounts.assessment }})</h4>
+                        <ul class="usage-list">
+                            <mc-node-details-usage
+                                v-for="(usage, index) in getSpecificUsages(activeNodeStore.node.usage as Usage[], ActivityTypes.LEARNING_ACTIVITY)"
+                                :key="index"
+                                :usage="usage"
+                            />
+                        </ul>
+                    </div>
+                    <div v-if="activeNodeStore.node._usageCounts.badge > 0">
+                        <h4>Badges ({{ activeNodeStore.node._usageCounts.badge }})</h4>
+                        <ul class="usage-list">
+                            <mc-node-details-usage
+                                v-for="(usage, index) in getSpecificUsages(activeNodeStore.node.usage as Usage[], ActivityTypes.BADGE)"
+                                :key="index"
+                                :usage="usage"
+                            />
+                        </ul>
+                    </div>
                 </div>
             </fieldset>
         </section>
@@ -84,8 +115,15 @@ function onRefreshSelected() {
     margin: 0;
 }
 .usage-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem 0;
     padding-top: 1rem;
+    h4 {
+        margin-bottom: 0.5rem;
+    }
 }
+
 .usage-list {
     margin: 0;
 }

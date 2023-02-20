@@ -57,7 +57,7 @@ const props = defineProps<Props>();
 .usage {
     border: 1px solid #ededed;
     display: inline-block;
-    height: 64px;
+    height: 100px;
     margin: 0px 0.25rem;
     padding: 0;
     width: 180px;
