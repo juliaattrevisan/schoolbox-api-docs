@@ -5,6 +5,9 @@
  * See: https://vuejs.org/v2/guide/components.html#Using-v-model-on-Components
  */
 
+import "@melloware/coloris/dist/coloris.css";
+import Coloris from "@melloware/coloris";
+
 export default {
     props: {
         caption: {
@@ -17,47 +20,54 @@ export default {
             type: String,
             required: false,
         },
+        rowId: {
+            //the id of the row
+            type: Number,
+            required: true,
+        },
     },
 
     mounted() {
-        this.setDefaultColour();
+        // this.setDefaultColour();
         this.initColourPicker();
     },
 
-    watch: {
-        /**
-         * Ensure the correct colour is always set on the row,
-         * as the colour could also change if we delete a row above,
-         * so we need to ensure the colour picker stays up to date
-         */
-        colour(newValue) {
-            $(this.$el).spectrum("set", newValue);
-        },
-    },
+    // watch: {
+    //     /**
+    //      * Ensure the correct colour is always set on the row,
+    //      * as the colour could also change if we delete a row above,
+    //      * so we need to ensure the colour picker stays up to date
+    //      */
+    //     colour(newValue) {
+    //         // $(this.$el).spectrum("set", newValue);
+    //     },
+    // },
 
     methods: {
         /**
          * We don't want to save a row without ensuring a default colour is set
          * As then references that may expect a colour would be blank instead
          */
-        setDefaultColour() {
-            if (this.colour === "") {
-                this.$emit("input", "#000000");
-            }
-        },
+        // setDefaultColour() {
+        //     if (this.colour === "") {
+        //         this.$emit("input", "#000000");
+        //     }
+        // },
 
         /**
          * Set up the jQuery spectrum colour picker and emit changes
          */
         initColourPicker() {
-            $(this.$el).spectrum(
-                $.extend({}, window.sbProps.spectrum, {
-                    allowEmpty: true,
-                    change: (color) => {
-                        this.$emit("input", color ? color.toHexString() : null);
-                    },
-                    hide: (color) => {
-                        this.$emit("input", color ? color.toHexString() : null);
+            document.dispatchEvent(
+                new CustomEvent("colourPickerInitialize", {
+                    detail: {
+                        target: `#coloris-${this.rowId}`,
+                        options: {
+                            // onChange: (colour) => {
+                            //     console.log(this.$el, colour)
+                            //     this.$emit("input", colour);
+                            // },
+                        },
                     },
                 })
             );
@@ -67,5 +77,5 @@ export default {
 </script>
 
 <template>
-    <input type="text" :placeholder="caption" :value="colour" data-colour-picker />
+    <input type="text" :id="`coloris-${rowId}`" :placeholder="caption" :value="colour" />
 </template>

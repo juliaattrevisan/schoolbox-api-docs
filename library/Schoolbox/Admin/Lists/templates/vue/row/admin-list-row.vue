@@ -104,6 +104,7 @@ export default {
                         <admin-list-row-colour
                             :caption="field.caption"
                             :colour="row[field.id]"
+                            :row-id="row.id"
                             @input="row[field.id] = $event"
                         />
                     </template>

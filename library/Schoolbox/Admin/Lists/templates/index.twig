@@ -1,5 +1,4 @@
-<link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/vendors/spectrum/spectrum.css?v={{ config.site_version }}" />
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/spectrum.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/bundle/colourPicker.js?v={{ config.site_version }}"></script>
 
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
@@ -11,7 +10,7 @@
 
     <div class="admin-content">
         <div id="admin-list">
-            <admin-list 
+            <admin-list
                 table-name="{{ table }}"
             />
         </div>
