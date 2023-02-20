@@ -238,7 +238,7 @@ class Cursor implements ICursor
                     )
             );
         } elseif ($this->sortOption === self::SORT_OPTION_OCCURRED) {
-            // updated: occurred on DESC, then created DESC, then id DESC
+            // occurred on: occurred on DESC, then created DESC, then id DESC
             if ($occurred === null) {
                 $pb = $pb->any(
                     $this->dataSource

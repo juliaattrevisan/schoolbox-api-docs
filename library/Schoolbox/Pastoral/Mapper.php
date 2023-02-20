@@ -843,23 +843,17 @@ class Mapper extends BaseMapper
         $orderSql = '';
 
         if ($before_date instanceof Alaress_Date_Format) {
-            $this->bindings[':beforeDate1'] = $before_date->endOfDay()->toIso8601String();
-            $this->bindings[':beforeDate2'] = $before_date->endOfDay()->toIso8601String();
+            $this->bindings[':beforeDate'] = $before_date->endOfDay()
+                                                         ->toIso8601String();
 
-            $this->filters[] = '
-                ((`pastoral`.`occurred_on` IS NULL AND `pastoral`.`created_at` <= :beforeDate1)
-                  OR
-                 (`pastoral`.`occurred_on` IS NOT NULL AND `pastoral`.`occurred_on` <= :beforeDate2))';
+            $this->filters[] = '(COALESCE(`pastoral`.`occurred_on`, `pastoral`.`created_at` <= :beforeDate))';
         }
 
         if ($after_date instanceof Alaress_Date_Format) {
-            $this->bindings[':afterDate1'] = $after_date->startOfDay()->toIso8601String();
-            $this->bindings[':afterDate2'] = $after_date->startOfDay()->toIso8601String();
+            $this->bindings[':afterDate'] = $after_date->startOfDay()
+                                                       ->toIso8601String();
 
-            $this->filters[] = '
-                ((`pastoral`.`occurred_on` IS NULL AND `pastoral`.`created_at` >= :afterDate1)
-                  OR
-                 (`pastoral`.`occurred_on` IS NOT NULL AND `pastoral`.`occurred_on` >= :afterDate2))';
+            $this->filters[] = '(COALESCE(`pastoral`.`occurred_on`, `pastoral`.`created_at`) >= :afterDate)';
         }
 
         if ($severity && $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_SEVERITY_ENABLED)) {
