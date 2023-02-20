@@ -116,7 +116,7 @@ Data:
 
                     <li class="subject-list-item">
                         <a href="{{ routeLookup('tigsSubjectReport.getReport', {userId: student.id, folderId: subject.folderId, reportDate: reportDate}) }}" class="link-row">
-                            <div class="card small-12 medium-6">
+                            <div class="card small-12">
 
                                 {% if firstTeacher %}
                                 <img src="/portrait.php?id={{ firstTeacher.id }}&amp;size=square64" width="48" alt="{{ firstTeacher.fullName }}">
