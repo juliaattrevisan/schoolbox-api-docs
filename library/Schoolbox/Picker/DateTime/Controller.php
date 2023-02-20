@@ -21,6 +21,7 @@ use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Campus;
 use Schoolbox\Collection;
+use Schoolbox\External\Importer\Endpoint\ValidUsesSudsTimetable;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\Permission\Access\UserAccess;
@@ -100,7 +101,12 @@ class Controller extends Base
      */
     public function getPicker($type, $element, $id, $value)
     {
-        $timetable = $this->getUserTimetable();
+        if ((new ValidUsesSudsTimetable())->isSatisfiedBy($this->getConfigLoader()->get('external_type'), $this->getConfigLoader()->get('schooldata_import_data_source'))) {
+            $timetable = false;
+        } else {
+            $timetable = $this->getUserTimetable();
+        }
+
         $terms = $this->getTerms();
 
         try {
