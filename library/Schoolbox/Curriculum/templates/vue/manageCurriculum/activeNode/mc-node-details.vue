@@ -125,6 +125,11 @@ function onRefreshSelected() {
 }
 
 .usage-list {
+    display: flex; // so the items can be the same height when the text content within varies
+    gap: 0.5rem;
     margin: 0;
+    li {
+        display: inline-block;
+    }
 }
 </style>

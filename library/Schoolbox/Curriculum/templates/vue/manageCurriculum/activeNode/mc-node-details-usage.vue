@@ -56,9 +56,6 @@ const props = defineProps<Props>();
 <style lang="scss" scoped>
 .usage {
     border: 1px solid #ededed;
-    display: inline-block;
-    height: 100px;
-    margin: 0px 0.25rem;
     padding: 0;
     width: 180px;
 }
