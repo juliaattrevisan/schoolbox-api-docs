@@ -58,7 +58,7 @@ class Model implements ISoftDeletable
     private $autoMarked;
 
     /**
-     * @var Alaress_Date_Format
+     * @var Alaress_Date_Format|null
      */
     private $updatedAt;
 
@@ -174,7 +174,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
     public function getUpdatedAt()
     {
@@ -182,10 +182,10 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param Alaress_Date_Format $updatedAt
+     * @param Alaress_Date_Format|null $updatedAt
      * @return static
      */
-    public function setUpdatedAt(Alaress_Date_Format $updatedAt)
+    public function setUpdatedAt(?Alaress_Date_Format $updatedAt)
     {
         $this->updatedAt = $updatedAt;
         return $this;
