@@ -113,6 +113,24 @@
                             });
                         </script>
                     </div>
+                    <div class="small-12 columns">
+                        <script type="text/javascript" src="{CDN_PREFIX}/js/bundle/colourPicker.js?v={SITE_VERSION}"></script>
+                        <label for="text">
+                            <span>Colour Picker</span>
+                        </label>
+
+                        <input type="text" id="pantry-colour-picker" value="#86ACFF" required />
+                        <script>
+                            document.dispatchEvent(
+                                new CustomEvent("colourPickerInitialize", {
+                                    detail: {
+                                        target: `#pantry-colour-picker`,
+                                        options: {},
+                                    },
+                                })
+                            );
+                        </script>
+                    </div>
                 </fieldset>
                 <fieldset class="content">
                     <legend>Disabled &amp; Readonly</legend>
@@ -821,4 +839,3 @@
         </form>
     </div>
 </div>
-
