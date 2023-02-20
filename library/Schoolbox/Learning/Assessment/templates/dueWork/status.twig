@@ -349,9 +349,13 @@
              role="dialog">
             <h2>Download All Submissions</h2>
             <p>Download all submissions from these students:</p>
+            <div>
+                <input id="mass-download-select-all" type="checkbox" data-selected checked/>
+                <label class="checkbox-label" onclick="onClickMassDownloadSelectAll()">Select all</label>
+            </div>
             <section class="checklist" id="mass-download-list">
                 <div data-template>{# this will get detached from the DOM on pageload (jquery.bulky.js) #}
-                    <input type="checkbox" data-selected checked/>
+                    <input type="checkbox" data-selected checked onchange="updateMassDownloadSelectAllCheckbox()"/>
                     <label class="checkbox-label" data-participant-name>{# populated by JS (jquery.bulky.js) #}</label>
                 </div>
             </section>
@@ -756,6 +760,23 @@
                         }
                     }
                 });
+
+                function onClickMassDownloadSelectAll() {
+                    $('#mass-download-list input:checkbox:not(:disabled)').prop(
+                        'checked',
+                        !allEnabledMassDownloadCheckboxesAreChecked()
+                    );
+                    updateMassDownloadSelectAllCheckbox();
+                }
+
+                function updateMassDownloadSelectAllCheckbox() {
+                    $('#mass-download-select-all').prop('checked', allEnabledMassDownloadCheckboxesAreChecked());
+                }
+
+                function allEnabledMassDownloadCheckboxesAreChecked() {
+                    // If none are not checked, then all must be checked.
+                    return ($('#mass-download-list input:checkbox:not(:disabled):not(:checked)').length === 0);
+                }
             </script>
         {% endautoescape %}
 
