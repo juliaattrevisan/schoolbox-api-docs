@@ -121,7 +121,7 @@ class GroupPermissionCest
 
         $manageGroup->waitManageGroupTitleToBePresented();
         $manageGroup->setAccessPermission('type-2');
-        $manageGroup->clickUpdateButton();;
+        $manageGroup->clickUpdateButton();
 
         //getting logged in as a junior student to check the group is presented to them
         $i->impersonate($studentJunior);
@@ -177,7 +177,7 @@ class GroupPermissionCest
 
         $manageGroup->waitManageGroupTitleToBePresented();
         $manageGroup->setAccessPermission('type-1');
-        $manageGroup->clickUpdateButton();;
+        $manageGroup->clickUpdateButton();
 
         //getting logged in as a junior student to check the group is NOT presented to them
         $i->impersonate($studentJunior);

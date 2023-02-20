@@ -12,7 +12,6 @@ use Codeception\Util\Locator;
 use Page\Folder\CreateFolder;
 use Page\Homepage;
 use Exception;
-use Page\ModalFilePicker\ResourcesMyFilesPicker;
 use Page\Resources\Resources;
 
 /**
@@ -84,8 +83,6 @@ class TextboxCest
         $i->amOnPage($createFolder::URL_RESOURCES);
         $i->waitForText($folderName);
         $resources->clickFolderName($folderName);
-//        $testHomepage = Locator::contains('a.jstree-anchor', 'Test TextBox Homepage');
-//        $i->click($testHomepage);
 
         $i->waitForText("Homepage", 5);
         sleep(1);
