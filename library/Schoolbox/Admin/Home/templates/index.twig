@@ -486,16 +486,8 @@
                                 </li>
                             {% endif %}
 
-                            {# Show ssh + SSL cert status if not cloud hosted #}
+                            {# Show SSL cert status if not cloud hosted #}
                             {% if not is_cloud %}
-                                <li>
-                                    <div class="small-5 columns content">
-                                        Support Available
-                                    </div>
-                                    <div class="small-7 columns content">
-                                        <span class="full-width {{ ssh_light }} label" data-light="ssh">{{ ssh_status }}</span>
-                                    </div>
-                                </li>
                                 <li>
                                     <div class="small-5 columns content">
                                         SSL Certificate
