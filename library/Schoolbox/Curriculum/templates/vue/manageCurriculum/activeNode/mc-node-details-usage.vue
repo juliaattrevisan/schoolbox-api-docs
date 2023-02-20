@@ -21,8 +21,12 @@ interface Props {
 
 const props = defineProps<Props>();
 
+/**
+ * To get the icon for the usage
+ */
 const badgeIcon = computed(() => {
     if (props.usage.discriminator === ActivityTypes.LEARNING_ACTIVITY) {
+        // there's various types of learning activity icons
         return getUsageIcon(props.usage.object.type);
     }
     return getUsageIcon(props.usage.discriminator);
