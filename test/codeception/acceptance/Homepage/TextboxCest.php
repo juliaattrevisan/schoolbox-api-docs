@@ -63,49 +63,97 @@ class TextboxCest
     /**
      * Test that a news item I create retains the settings I chose
      *
-     * as jcoles I will navigate to a homepage,
+     * as alaress I will navigate to a homepage,
      * add a textbox component with heading and content
      * and verify it is properly presented
      *
      * @param AcceptanceTester     $i
      * @param Homepage             $homepage
      * @param Homepage\TextboxForm $textboxForm
+     *
      * @beforeSuite
      * @depends createHomepage
      * @throws Exception
      */
     public function createTextbox(AcceptanceTester $i, Homepage $homepage, Homepage\TextboxForm $textboxForm): void
     {
-        $i->login("jcoles", "password");
+        $i->loginAsAdmin();
         $createFolder = new createFolder($i);
         $resources = new Resources($i);
         $folderName = "Test TextBox Homepage";
+
+        $i->amGoingTo("Navigate to the Test TextBox Homepage via resources browser");
         $i->amOnPage($createFolder::URL_RESOURCES);
         $i->waitForText($folderName);
         $resources->clickFolderName($folderName);
 
         $i->waitForText("Homepage", 5);
-        sleep(1);
-        $i->click("a.icon-home");
+        $resources->clickMenuItem('home');
 
+        $i->amGoingTo("Add a new component in the homepage");
         $homepage->addComponent(Homepage::ELEMENT_ADD_COMPONENT_SECTION_INFORMATION, 'Text Box');
 
-        // Enter content into the new component
+        $i->amGoingTo("Enter content into the new component");
         $layout   = Homepage::ELEMENT_COMPONENT_LAYOUT_TOP;
         $position = 1;
 
         $homepage->clickComponentEmptyStateLink($layout, $position);
         sleep(2);
         $heading = 'Test Text Box Title';
-        $content = 'I am textbox content';
+        $content = 'Testing this text box';
         $textboxForm
             ->fillHeading($heading)
             ->submit()
             ->fillContent($content)
             ->save();
 
-        // Verify what I entered is the heading and body
-        $i->canSee("Test Text Box Title");
-        $i->canSee("I am textbox content");
+        $i->amGoingTo("Verify what I entered is the heading and body");
+        $i->canSee($heading);
+        $i->canSee($content);
+
+        $i->amGoingTo("to create another text box with content Jana Reed");
+        $i->click('Manage All');
+        $i->waitForText("Manage Text Boxes");
+        $i->click('a.icon-add.button');
+        $i->fillField('input[name="textbox[1][heading]"]', 'Second Text Box');
+        $i->fillCkEditorById('textbox-1-body', 'Test');
+        $i->click('a.icon-add.button');
+        $i->fillField('input[name="textbox[2][heading]"]', 'Third Text Box');
+        $i->fillCkEditorById('textbox-2-body', 'Jana Reed');
+        $i->click('input[type=submit]');
+
+        $i->impersonate('Jack Coles');
+        $i->click('label.icon-search.no-text');
+        $i->fillField('input#search-field', 'Jana Reed');
+        $i->click('label.icon-search.no-text');
+        $i->click('a[data-section="textbox"]');
+        $i->canSee('Jana Reed');
+        $i->canSee('Third Text Box');
+
+        $i->click('label.icon-search.no-text');
+        $i->fillField('input#search-field', 'testing');
+        $i->click('label.icon-search.no-text');
+        $i->click('a[data-section="textbox"]');
+        $i->cantSee('Second testing');
+        $i->cantSee('Second Text Box');
+        $i->canSee('Test Text Box Title');
+        $i->canSee('Testing this text box');
+
+        $i->impersonate('Jana Reed');
+        $i->click('label.icon-search.no-text');
+        $i->fillField('input#search-field', 'Jana Reed');
+        $i->click('label.icon-search.no-text');
+        $i->click('a[data-section="textbox"]');
+        $i->cantSee('Jana Reed');
+        $i->cantSee('Third Text Box');
+
+        $i->click('label.icon-search.no-text');
+        $i->fillField('input#search-field', 'testing');
+        $i->click('label.icon-search.no-text');
+        $i->click('a[data-section="textbox"]');
+        $i->cantSee('Second testing');
+        $i->cantSee('Second Text Box');
+        $i->canSee('Test Text Box Title');
+        $i->canSee('Testing this text box');
     }
 }

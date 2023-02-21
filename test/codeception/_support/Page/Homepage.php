@@ -84,6 +84,7 @@ class Homepage
         $this->tester->disableAnimation();
 
         // Open the component tab
+        sleep(2);
         $this->openTabPanel(self::ELEMENT_ADD_COMPONENT_TAB);
 
         // Which component section is it in?

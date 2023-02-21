@@ -48,4 +48,15 @@ class Resources
     {
         $this->tester->click(Locator::contains('a.jstree-anchor', $folderName));
     }
+
+    /**
+     * clicks on the right side menu options to a folder:
+     * home, modify, drop-box, files, folder, link, download, upload, delete
+     * @param string $menuItem
+     * @throws Exception
+     */
+    public function clickMenuItem(string $menuItem): void
+    {
+        $this->tester->click('a.icon-' . $menuItem);
+    }
 }
