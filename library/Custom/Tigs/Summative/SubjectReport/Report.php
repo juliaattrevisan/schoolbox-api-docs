@@ -195,7 +195,7 @@ class Report
             }
             $errors[]  = $error;
             $unitSpecsWithData = $aamData = $aasData = $hscTaskMarks = $hscTaskMatrix = $middleYearsTaskMarks = [];
-            $nesaGraphData = $courseSpec = $hscRankData = $middleYearsRankData = $courseDescription = null;
+            $nesaGraphData = $courseSpec = $hscRankData = $middleYearsRankData = $courseDescription = $learningProfileData = null;
         } else {
             $this->loadParticipation($courseImplsWithUnits);
             $unitSpecs = $this->getUnitSpecs($courseImplsWithUnits);
@@ -213,7 +213,6 @@ class Report
             $hscRankData   = $this->buildHscAssessmentRankData($folder, $attributes, $courseSpec, $user, $roleTypeOverride);
             $middleYearsTaskMarks = $this->buildMiddleYearsTaskMarksData($folder, $attributes, $courseSpec, $user, $roleTypeOverride);
             $middleYearsRankData = $this->buildMiddleYearsAssessmentRankData($folder, $attributes, $courseSpec, $user, $roleTypeOverride);
-
             $learningProfileData = $this->buildLearningProfileData($folder, $attributes, $unitSpecs, $courseSpec, $user, $roleTypeOverride);
 
             // Filter out unit specs without any data
@@ -286,7 +285,8 @@ class Report
             'hscTaskMatrix'             => $hscTaskMatrix,
             'hscRankData'               => $hscRankData,
             'middleYearsTaskMarks'      => $middleYearsTaskMarks,
-            'middleYearsRankData'       => $middleYearsRankData
+            'middleYearsRankData'       => $middleYearsRankData,
+            'learningProfileData'       => $learningProfileData,
         ];
     }
 
