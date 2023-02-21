@@ -10,7 +10,6 @@ use Schoolbox\Permission\Access\UserAccess;
 
 class Component_Dashboard_ImageGalleryController extends Component_Dashboard_ControllerAbstract
 {
-
     /**
      * File mapper
      *
