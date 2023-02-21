@@ -1064,7 +1064,37 @@ class Report
         $workTypeConfig = null;
         $yearLevel      = $attributes->getYearLevel();
         $term           = $attributes->getTerm();
+        $searches       = [];
         if ($attributes->isMiddleYear()) {
+            if ($term >= 1) {
+                $searches[] = [
+                    'workType' => Config::_TIGS_WORK_TYPE_YEAR_7_10_TERM_1_LEARNING_PROFILE,
+                    'semester' => 1,
+                    'term'     => 1,
+                ];
+            }
+            if ($term >= 2) {
+                $searches[] = [
+                    'workType' => Config::_TIGS_WORK_TYPE_YEAR_7_10_TERM_2_LEARNING_PROFILE,
+                    'semester' => 1,
+                    'term'     => 2,
+                ];
+            }
+            if ($term >= 3) {
+                $searches[] = [
+                    'workType' => Config::_TIGS_WORK_TYPE_YEAR_7_10_TERM_3_LEARNING_PROFILE,
+                    'semester' => 2,
+                    'term'     => 3,
+                ];
+            }
+            if ($term >= 4) {
+                $searches[] = [
+                    'workType' => Config::_TIGS_WORK_TYPE_YEAR_7_10_TERM_4_LEARNING_PROFILE,
+                    'semester' => 2,
+                    'term'     => 4,
+                ];
+            }
+
             $workTypeConfig = match ($term) {
                 1       => Config::_TIGS_WORK_TYPE_YEAR_7_10_TERM_1_LEARNING_PROFILE,
                 2       => Config::_TIGS_WORK_TYPE_YEAR_7_10_TERM_2_LEARNING_PROFILE,
@@ -1072,24 +1102,24 @@ class Report
                 4       => Config::_TIGS_WORK_TYPE_YEAR_7_10_TERM_4_LEARNING_PROFILE,
                 default => null,
             };
-        } elseif ($yearLevel === 11) {
-            // What happens to Year 11 term 4?
-            // (It shows in Year 12, as term 4 in previous year)
-            $workTypeConfig = match ($term) {
-                1       => Config::_TIGS_WORK_TYPE_YEAR_11_TERM_1_LEARNING_PROFILE,
-                2       => Config::_TIGS_WORK_TYPE_YEAR_11_TERM_2_LEARNING_PROFILE,
-                3       => Config::_TIGS_WORK_TYPE_YEAR_11_TERM_3_LEARNING_PROFILE,
-                default => null,
-            };
-        } elseif ($yearLevel === 12) {
-            // Need to consider how Year 12 terms are labelled
-            $workTypeConfig = match ($term) {
-                1       => Config::_TIGS_WORK_TYPE_YEAR_12_TERM_1_LEARNING_PROFILE,
-                2       => Config::_TIGS_WORK_TYPE_YEAR_12_TERM_2_LEARNING_PROFILE,
-                3       => Config::_TIGS_WORK_TYPE_YEAR_12_TERM_3_LEARNING_PROFILE,
-                4       => Config::_TIGS_WORK_TYPE_YEAR_12_TERM_4_LEARNING_PROFILE,
-                default => null,
-            };
+//        } elseif ($yearLevel === 11) {
+//            // What happens to Year 11 term 4?
+//            // (It shows in Year 12, as term 4 in previous year)
+//            $workTypeConfig = match ($term) {
+//                1       => Config::_TIGS_WORK_TYPE_YEAR_11_TERM_1_LEARNING_PROFILE,
+//                2       => Config::_TIGS_WORK_TYPE_YEAR_11_TERM_2_LEARNING_PROFILE,
+//                3       => Config::_TIGS_WORK_TYPE_YEAR_11_TERM_3_LEARNING_PROFILE,
+//                default => null,
+//            };
+//        } elseif ($yearLevel === 12) {
+//            // Need to consider how Year 12 terms are labelled
+//            $workTypeConfig = match ($term) {
+//                1       => Config::_TIGS_WORK_TYPE_YEAR_12_TERM_1_LEARNING_PROFILE,
+//                2       => Config::_TIGS_WORK_TYPE_YEAR_12_TERM_2_LEARNING_PROFILE,
+//                3       => Config::_TIGS_WORK_TYPE_YEAR_12_TERM_3_LEARNING_PROFILE,
+//                4       => Config::_TIGS_WORK_TYPE_YEAR_12_TERM_4_LEARNING_PROFILE,
+//                default => null,
+//            };
         }
 
         if ($workTypeConfig === null) {
@@ -1127,8 +1157,6 @@ class Report
             1,
             2,
         );
-
-        new \Alaress_Probe($unitSpecs->getPropertyValues('id'),$unitSpecs->getPropertyValues('title'),);
 
         $profile = new LearningProfile(
             $attributes,

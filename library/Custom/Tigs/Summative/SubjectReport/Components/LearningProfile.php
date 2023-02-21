@@ -12,6 +12,7 @@ namespace Custom\Tigs\Summative\SubjectReport\Components;
 use Aura\Router;
 use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
 use Schoolbox\Learning\Assessment\DueWork;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Mapper\Exception as MapperException;
 
 /**
@@ -31,23 +32,15 @@ class LearningProfile extends AbstractMatrix
      */
     private const CAPABILITY_NAME = 'Learning Profile';
 
-
-    /**
-     * Build AAS data from the specified due work
-     *
-     * If no feedback, or viewer not permitted to view feedback, empty marks returned
-     *
-     * @param DueWork\Model $dueWork
-     * @return null|array
-     * @throws MapperException
-     * @throws Router\Exception\RouteNotFound
-     */
     public function buildAssessmentData(DueWork\Model $dueWork): array
     {
+        // Need every due work
+
         // Fetch the grid
         $dueWork->setRubricGrid($this->rubricMapper->retrieveGrid($dueWork, false));
 
         $data = [
+            'assessment' => $dueWork,
 //            'grid'                => $dueWork->getRubricGrid(),
 //            'useMarkRange'        => $dueWork->getUseMarkRange(),
 //            'showDescriptorValue' => true,
