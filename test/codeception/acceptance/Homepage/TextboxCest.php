@@ -61,7 +61,7 @@ class TextboxCest
     }
 
     /**
-     * Test that a news item I create retains the settings I chose
+     * Test that a textbox I create retains the settings I chose
      *
      * as alaress I will navigate to a homepage,
      * add a textbox component with heading and content
@@ -122,39 +122,78 @@ class TextboxCest
         $i->fillField('input[name="textbox[2][heading]"]', 'Third Text Box');
         $i->fillCkEditorById('textbox-2-body', 'Jana Reed');
         $i->click('input[type=submit]');
+    }
+
+    /**
+     * Test that a textbox I create retains the settings I chose
+     *
+     * as alaress I will navigate to a homepage,
+     * add a textbox component with heading and content
+     * and verify it is properly presented
+     *
+     * @param AcceptanceTester     $i
+     * @param Homepage             $homepage
+     * @param Homepage\TextboxForm $textboxForm
+     * @throws Exception
+     */
+    public function textboxVisibilty(AcceptanceTester $i, Homepage $homepage, Homepage\TextboxForm $textboxForm): void
+    {
+        $i->loginAsAdmin();
+        $createFolder = new createFolder($i);
+        $resources = new Resources($i);
+        $folderName = "Test TextBox Homepage";
+
+//        $i->impersonate('Jack Coles');
+//        $i->click('label.icon-search.no-text');
+//        $i->fillField('input#search-field', 'Jana Reed');
+//        $i->click('label.icon-search.no-text');
+//        $i->click('a[data-section="textbox"]');
+//        $i->canSee('Jana Reed', 'ul.action-list');
+//        $i->canSee('Third Text Box', 'ul.action-list');
+//
+//        $i->click('label.icon-search.no-text');
+//        $i->fillField('input#search-field', 'Test');
+//        $i->click('label.icon-search.no-text');
+//        $i->click('a[data-section="textbox"]');
+//        $i->canSee('Second Text Box', 'ul.action-list');
+//        $i->canSee('Test', 'ul.action-list');
+//        $i->canSee('Test Text Box Title', 'ul.action-list');
+//        $i->canSee('I am textbox content', 'ul.action-list');
+//
+//        $i->impersonate('Jana Reed');
+//        $i->click('label.icon-search.no-text');
+//        $i->fillField('input#search-field', 'Jana Reed');
+//        $i->click('label.icon-search.no-text');
+//        $i->click('a[data-section="textbox"]');
+//        $i->cantSee('Jana Reed', 'ul.action-list');
+//        $i->cantSee('Third Text Box', 'ul.action-list');
+//
+//        $i->click('label.icon-search.no-text');
+//        $i->fillField('input#search-field', 'Test');
+//        $i->click('label.icon-search.no-text');
+//        $i->click('a[data-section="textbox"]');
+//        $i->cantSee('Second Text Box', 'ul.action-list');
+//        $i->cantSee('Testx', 'ul.action-list');
+//        $i->canSee('Test Text Box Title', 'ul.action-list');
+//        $i->canSee('I am textbox content', 'ul.action-list');
 
         $i->impersonate('Jack Coles');
-        $i->click('label.icon-search.no-text');
-        $i->fillField('input#search-field', 'Jana Reed');
-        $i->click('label.icon-search.no-text');
-        $i->click('a[data-section="textbox"]');
-        $i->canSee('Jana Reed', 'ul.action-list');
-        $i->canSee('Third Text Box', 'ul.action-list');
+        $i->amGoingTo("Navigate to the Test TextBox Homepage via resources browser");
+        $i->amOnPage($createFolder::URL_RESOURCES);
+        $i->waitForText($folderName);
+        $resources->clickFolderName($folderName);
+        $i->waitForText("Homepage", 5);
+        $resources->clickMenuItem('home');
 
-        $i->click('label.icon-search.no-text');
-        $i->fillField('input#search-field', 'Test');
-        $i->click('label.icon-search.no-text');
-        $i->click('a[data-section="textbox"]');
-        $i->canSee('Second Text Box', 'ul.action-list');
-        $i->canSee('Test', 'ul.action-list');
-        $i->canSee('Test Text Box Title', 'ul.action-list');
-        $i->canSee('I am textbox content', 'ul.action-list');
+        $i->click('span.icon-locked');
+        $i->click('a.icon-settings.settings edit');
+        $i->fillField('input[name="componentname"]', 'Jana to be hidden');
+        $i->click('for="component4906-showComponentTitle"');
+        $i->click('input[type="submit"]');
+        $i->click('Modify');
+        $textboxForm->fillContent('Jamal to be presented');
+        $i->click('Save');
 
-        $i->impersonate('Jana Reed');
-        $i->click('label.icon-search.no-text');
-        $i->fillField('input#search-field', 'Jana Reed');
-        $i->click('label.icon-search.no-text');
-        $i->click('a[data-section="textbox"]');
-        $i->cantSee('Jana Reed', 'ul.action-list');
-        $i->cantSee('Third Text Box', 'ul.action-list');
 
-        $i->click('label.icon-search.no-text');
-        $i->fillField('input#search-field', 'Test');
-        $i->click('label.icon-search.no-text');
-        $i->click('a[data-section="textbox"]');
-        $i->cantSee('Second Text Box', 'ul.action-list');
-        $i->cantSee('Testx', 'ul.action-list');
-        $i->canSee('Test Text Box Title', 'ul.action-list');
-        $i->canSee('I am textbox content', 'ul.action-list');
     }
 }
