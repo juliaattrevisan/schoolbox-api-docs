@@ -105,28 +105,7 @@ export interface LearningActivityUsageObject extends UsageObject {
 }
 
 /**
- * The further details of the the folder usage
- */
-export interface FolderUsageObject extends UsageObject {
-    _links: {
-        view: string;
-    };
-    parent: {
-        title: string;
-    };
-}
-
-/**
- * Just the field properties that can be updated
- */
-export type NodeToUpdate = {
-    code: string | null;
-    description: string | null;
-    name: string;
-};
-
-/**
- * The further details of the badge usage
+ * The further details of the the badge usage
  */
 export interface BadgeUsageObject {
     id: number;
@@ -155,3 +134,12 @@ export interface BadgeUsageObject {
         icon: string;
     };
 }
+
+/**
+ * Just the field properties that can be updated
+ */
+export type NodeToUpdate = {
+    code: string | null;
+    description: string | null;
+    name: string;
+};
