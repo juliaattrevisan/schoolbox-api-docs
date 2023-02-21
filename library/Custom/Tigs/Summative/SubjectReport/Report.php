@@ -1156,6 +1156,10 @@ class Report
             }
         }
 
+        if ($workTypeIds === []) {
+            return ['error' => 'No work types found'];
+        }
+
         // Load participation into course specs
         $this->loadAssessmentsAndParticipation(
             $courseSpec,
