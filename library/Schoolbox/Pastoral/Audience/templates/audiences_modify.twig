@@ -180,10 +180,11 @@
                                 [firstname], [preferredname], [surname], [fullname], [year], [house]
                             </p>
 
-                            <script type="text/javascript"
+                            {# <script type="text/javascript"
                                     src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
                             <script type="text/javascript"
-                                    src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
+                                    src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script> #}
+                            <script src="{{ CDN_PREFIX }}/js/bundle/editorDefault.js?v={{ config.site_version }}"></script>
                             <link rel="stylesheet" type="text/css"
                                   href="{{ CDN_PREFIX }}/css/vendors/spectrum/spectrum.css?v={{ config.site_version }}"/>
                             <script type="text/javascript"
@@ -191,7 +192,12 @@
                             <script type="text/javascript">
                                 {% autoescape 'js' %}
                                 $(function () {
-                                    $('#formPastoral').alaressEditor($.alaressEditorConfigWithUserTokens());
+                                    //$('#formPastoral').alaressEditor($.alaressEditorConfigWithUserTokens());
+                                    document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+                                        detail: {
+                                            targetElements: ["#template", "#templatePrivate"],
+                                        }
+                                    }));
 
                                     let colorInput = document.getElementById('pastoralColor'),
                                             iconSelect = document.getElementById('pastoralIcon'),
