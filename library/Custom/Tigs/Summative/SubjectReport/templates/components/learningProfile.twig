@@ -4,6 +4,7 @@ Renders a single learning profile.
 Data:
     assessment:                   IAssessable - the assessment which contains the learning profile data.
     link:                         string      - a link to the submission history for that student.
+    term:                         int         - the term the learning profile is for.
     levels[].name:                string      - the name of each "level" in the assessment's rubric.
                                                 Not actual rubric levels: instead, derived from the first indicator's
                                                 available descriptors.
@@ -15,9 +16,12 @@ Data:
 <div class="column small-12">
     <h2 class="subheader">
         {% if link is defined %}
-            <a href="{{ link }}"><span class="icon-link linked-unit-heading"></span>{{ assessment.title }}</a>
+            <a href="{{ link }}" title="View source assessment &ldquo;{{ assessment.title }}&ldquo;">
+                <span class="icon-link linked-unit-heading"></span>
+                Term {{ term }} Learning Profile
+            </a>
         {% else %}
-            {{ assessment.title }}
+            Term {{ term }} Learning Profile
         {% endif %}
     </h2>
     <p class="meta">Due {{ assessment.dueAt.localShort }}</p>

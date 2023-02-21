@@ -95,7 +95,7 @@ class LearningProfile extends BaseComponent
 
                         // For each filtered assessment: build data I guess
                         foreach ($filteredAssessments as $assessment) {
-                            $data[$assessment->getId()] = $this->buildAssessmentData($assessment);
+                            $data[$assessment->getId()] = $this->buildAssessmentData($assessment, $search);
                         }
                     }
                 }
@@ -105,13 +105,16 @@ class LearningProfile extends BaseComponent
         return ['data' => $data];
     }
 
-    public function buildAssessmentData(DueWork\Model $dueWork): array
+    public function buildAssessmentData(DueWork\Model $dueWork, array $search): array
     {
         // Fetch the grid
         $dueWork->setRubricGrid($this->rubricMapper->retrieveGrid($dueWork, false));
 
         $data = [
             'assessment' => $dueWork,
+            'term'       => $search['term'] ?? null,
+            'semester'   => $search['semester'] ?? null,
+            'workType'   => $search['workType'] ?? null,
 //            'grid'                => $dueWork->getRubricGrid(),
 //            'useMarkRange'        => $dueWork->getUseMarkRange(),
 //            'showDescriptorValue' => true,
