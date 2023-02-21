@@ -548,15 +548,28 @@
                     {# Mass download submissions #}
                     $('#mass-download').bulky({
                         invalidOptionText: 'nothing to download',
-                        submitText: function (len, all) {
-                            if (!len) {
-                                return 'Download None';
+                        submitText: (
+                            /**
+                             * @param len - Number of enabled, checked checkboxes.
+                             * @param all - Number of enabled checkboxes.
+                             */
+                            function (len, all) {
+                                // The 'select all' checkbox has been counted in len and all, and we do not wish for it
+                                // to be counted.  So, adjust the counts to not include the 'select all' checkbox.
+                                --all;
+                                if ($('#mass-download-select-all').prop('checked')) {
+                                    --len;
+                                }
+
+                                if (!len) {
+                                    return 'Download None';
+                                }
+                                if (len === all) {
+                                    return 'Download All';
+                                }
+                                return 'Download ' + len + ' of ' + all;
                             }
-                            if (len === all) {
-                                return 'Download All';
-                            }
-                            return 'Download ' + len + ' of ' + all;
-                        },
+                        ),
                         userSelector: '[data-mass-download]',
                         userList: $userList,
                         checkboxConditionality: function (id) {
