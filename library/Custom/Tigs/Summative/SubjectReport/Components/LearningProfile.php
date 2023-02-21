@@ -9,11 +9,19 @@ declare(strict_types=1);
 
 namespace Custom\Tigs\Summative\SubjectReport\Components;
 
+use Alaress\Authorizer\Authorizer;
 use Aura\Router;
+use Custom\Tigs\Summative\StudentAttributes;
+use Custom\Tigs\Summative\SubjectReport\BaseComponent;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork;
+use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Resource\Folder;
+use Schoolbox\User;
 
 /**
  * Learning profile component for TIGS subject report.
@@ -25,12 +33,60 @@ use Schoolbox\Mapper\Exception as MapperException;
  *   * display a rubric for the due work which matches that work type, and is
  *     due within that year+semester
  */
-class LearningProfile extends AbstractMatrix
+class LearningProfile extends BaseComponent
 {
+
     /**
      * The capability name which the learning profile component uses.
      */
     private const CAPABILITY_NAME = 'Learning Profile';
+
+    /**
+     * Constructor
+     *
+     * @param StudentAttributes $attributes
+     * @param GenericCollection|UnitSpec\Model[] $unitSpecs
+     * @param User              $student
+     * @param Folder\Model      $folder
+     * @param array<array{workTypeId: int, term: int}> $searches
+     * @param Visibility        $visibility
+     * @param User              $viewer
+     * @param RubricDataSource  $rubricMapper
+     * @param Authorizer        $authorizer
+     * @param Router\Router     $router
+     * @param string|null       $roleTypeOverride
+     */
+    public function __construct(
+        StudentAttributes $attributes,
+        private GenericCollection $unitSpecs,
+        private User $student,
+        private Folder\Model $folder,
+        private array $searches,
+        private Visibility $visibility,
+        User $viewer,
+        private RubricDataSource $rubricMapper,
+        private Authorizer $authorizer,
+        private Router\Router $router,
+        ?string $roleTypeOverride
+    ) {
+        parent::__construct($attributes, $viewer, $roleTypeOverride);
+    }
+
+    public function toContext(): ?array
+    {
+        // Do something with each search
+        $data = [];
+        foreach ($this->unitSpecs as $unitSpec) {
+            foreach ($this->searches as $search) {
+                // Search within unit spec for due works matching search
+                foreach ($unitSpec->getUnitImplementations() as $implementation) {
+
+                }
+            }
+        }
+
+        return ['data' => $data];
+    }
 
     public function buildAssessmentData(DueWork\Model $dueWork): array
     {
