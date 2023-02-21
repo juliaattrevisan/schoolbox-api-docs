@@ -62,10 +62,22 @@ export default class SchoolboxResourceUI extends Plugin {
                                             imageUtils.insertImage({
                                                 src: `/storage/image.php?hash=${responseText.hash}`,
                                                 alt: message.data[0].title,
+                                            });
+                                        } else if (responseText.type === "video") {
+                                            const imageUtils = this.editor.plugins.get("ImageUtils");
+                                            imageUtils.insertImage({
+                                                src: `/storage/image.php?hash=${responseText.hash}`,
+                                                alt: message.data[0].title,
                                                 title: message.data[0].title,
+                                                "data-schoolboxresource-type": "video",
+                                                // "data-schoolboxresource-filesystem",
+                                                // "data-schoolboxresource-thumbnail",
+                                                // "data-schoolboxresource-source",
+                                                // "data-schoolboxresource-width",
+                                                // "data-schoolboxresource-height",
+                                                // "data-schoolboxresource-fullwidth",
                                             });
                                         }
-
                                         /* Shut file picker modal, go back to Dialog
                                          */
                                         $("#file-picker").foundation("reveal", "close");
