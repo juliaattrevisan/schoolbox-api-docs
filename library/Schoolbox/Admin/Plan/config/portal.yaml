@@ -103,6 +103,8 @@ config:
   office365_tenant_id : { hide : false }
   office365_immersive_reader_name : { hide : false }
   googleapps_api_key: { hide: false }
+  turnitin_api_key: {value: '', hide: true}
+  turnitin_api_host: {value: '', hide: true}
 
 topMenu:
   hide:
@@ -135,4 +137,3 @@ components:
    - Schoolbox\Learning\Assessment\Task\Component\Homepage\Controller
    - Schoolbox\Learning\Moment\StudentToolkit\Component\Dashboard\Controller
    - Schoolbox\Learning\Assessment\Lti\Component\Homepage\Controller
-

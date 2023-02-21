@@ -3,16 +3,16 @@ config:
   site_plan : { value : PortalPlus }
 
   #Modules
-  teams_enabled: {edit: true,}
+  teams_enabled: {edit: true}
   curriculum_tagging_enabled: {value: false, edit: false}
-  eotc_enabled: {edit: true}
+  eotc_enabled: {value: false, edit: false}
   learning_moments_enabled : {edit: true}
   badges_enabled : {value: false, edit: false}
   fixtures_enabled: {edit: true}
   clipboard_enabled: {edit: true}
   pastoral_enabled : {value: false, edit: false}
   resource_booking_enabled: {edit: true}
-  external_document_report_enabled : { value : false, edit : false }
+  external_document_report_enabled : { edit : true }
   webdav_enable: {edit: true}
   kami_enabled: {value: false, edit: false}
   geosnapshot_enabled: {edit: true}
@@ -103,6 +103,8 @@ config:
   office365_tenant_id : { hide : false }
   office365_immersive_reader_name : { hide : false }
   googleapps_api_key: { hide: false }
+  turnitin_api_key: {value: '', hide: true}
+  turnitin_api_host: {value: '', hide: true}
 
 topMenu:
   hide:
