@@ -102,6 +102,7 @@ class Component_Dashboard_ImageGalleryController extends Component_Dashboard_Con
                         'THUMBNAIL_DESCRIPTION' => $currentImage->getTitle(),
                         'THUMBNAIL_SIZE' => $this->getConfig('pixel') ? $this->getConfig('pixel') : Config::get('thumbnail_size'),
                         'IMAGE_HEIGHT' => $this->getConfig('pixel') ? $this->getConfig('pixel') : Config::get('thumbnail_size'),
+                        'IMAGE_WIDTH' => $this->getConfig('pixel') ? $this->getConfig('pixel') : Config::get('thumbnail_size'),
                     )
                 );
 

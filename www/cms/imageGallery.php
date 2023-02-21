@@ -59,6 +59,7 @@ if (is_numeric($this->arg[0])) {
         $this->setVar(
             array(
                 'IMAGE_HEIGHT' => Config::get('thumbnail_size'),
+                'IMAGE_WIDTH' => Config::get('thumbnail_size'),
             )
         );
     } else {
