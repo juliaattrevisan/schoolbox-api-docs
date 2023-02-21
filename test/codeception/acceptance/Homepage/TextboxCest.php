@@ -70,6 +70,7 @@ class TextboxCest
      * @param AcceptanceTester     $i
      * @param Homepage             $homepage
      * @param Homepage\TextboxForm $textboxForm
+     * @depends createHomepage
      *
      * @beforeSuite
      * @depends createHomepage
@@ -100,7 +101,7 @@ class TextboxCest
         $homepage->clickComponentEmptyStateLink($layout, $position);
         sleep(2);
         $heading = 'Test Text Box Title';
-        $content = 'Testing this text box';
+        $content = 'I am textbox content';
         $textboxForm
             ->fillHeading($heading)
             ->submit()
@@ -111,7 +112,7 @@ class TextboxCest
         $i->canSee($heading);
         $i->canSee($content);
 
-        $i->amGoingTo("to create another text box with content Jana Reed");
+        $i->amGoingTo("Create another text box with content Jana Reed");
         $i->click('Manage All');
         $i->waitForText("Manage Text Boxes");
         $i->click('a.icon-add.button');
@@ -127,33 +128,33 @@ class TextboxCest
         $i->fillField('input#search-field', 'Jana Reed');
         $i->click('label.icon-search.no-text');
         $i->click('a[data-section="textbox"]');
-        $i->canSee('Jana Reed');
-        $i->canSee('Third Text Box');
+        $i->canSee('Jana Reed', 'ul.action-list');
+        $i->canSee('Third Text Box', 'ul.action-list');
 
         $i->click('label.icon-search.no-text');
-        $i->fillField('input#search-field', 'testing');
+        $i->fillField('input#search-field', 'Test');
         $i->click('label.icon-search.no-text');
         $i->click('a[data-section="textbox"]');
-        $i->cantSee('Second testing');
-        $i->cantSee('Second Text Box');
-        $i->canSee('Test Text Box Title');
-        $i->canSee('Testing this text box');
+        $i->canSee('Second Text Box', 'ul.action-list');
+        $i->canSee('Test', 'ul.action-list');
+        $i->canSee('Test Text Box Title', 'ul.action-list');
+        $i->canSee('I am textbox content', 'ul.action-list');
 
         $i->impersonate('Jana Reed');
         $i->click('label.icon-search.no-text');
         $i->fillField('input#search-field', 'Jana Reed');
         $i->click('label.icon-search.no-text');
         $i->click('a[data-section="textbox"]');
-        $i->cantSee('Jana Reed');
-        $i->cantSee('Third Text Box');
+        $i->cantSee('Jana Reed', 'ul.action-list');
+        $i->cantSee('Third Text Box', 'ul.action-list');
 
         $i->click('label.icon-search.no-text');
-        $i->fillField('input#search-field', 'testing');
+        $i->fillField('input#search-field', 'Test');
         $i->click('label.icon-search.no-text');
         $i->click('a[data-section="textbox"]');
-        $i->cantSee('Second testing');
-        $i->cantSee('Second Text Box');
-        $i->canSee('Test Text Box Title');
-        $i->canSee('Testing this text box');
+        $i->cantSee('Second Text Box', 'ul.action-list');
+        $i->cantSee('Testx', 'ul.action-list');
+        $i->canSee('Test Text Box Title', 'ul.action-list');
+        $i->canSee('I am textbox content', 'ul.action-list');
     }
 }
