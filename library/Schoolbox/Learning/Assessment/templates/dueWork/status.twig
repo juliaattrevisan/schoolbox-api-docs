@@ -562,13 +562,16 @@
                         checkboxConditionality: (
                             // Exclude students with no downloadable work.
                             function (id) {
+                                // NOTE: #mark will not be present if the assessment has Mark Type 'None'.
+                                let $mark = $('#mark-' + id);
+
                                 return (
                                     // Downloadable data will exist for students if:
                                     //  * A 'Preview Submission' link exists in that student's block OR
                                     //  * A non-blank feedback comment exists for that student.
                                     $('[data-participant=' + id + '] [data-previewable]').length != 0 ||
                                     $('#comment-' + id).val().trim() != '' ||
-                                    $('#mark-' + id).val().trim() != ''
+                                    ($mark.length !== 0 && $mark.val().trim() != '')
                                 );
                             }
                         ),
