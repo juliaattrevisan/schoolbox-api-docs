@@ -1,5 +1,6 @@
 // Countdown timer used on homepages
 
+import confetti from "canvas-confetti";
 import CountdownTimer from "./CountdownTimer";
 
 const countdownElements = document.querySelectorAll('[data-countdown="elements"]');
@@ -7,7 +8,6 @@ countdownElements.forEach((element) => {
     const targetDate = new Date(element.getAttribute("data-target-date"));
     const targetElement = element;
     const countdownTimer = new CountdownTimer(targetDate);
-
     // Avoid duplicate timers on the same element
     if (targetElement.getAttribute("started") === "true") {
         return;
@@ -36,8 +36,24 @@ countdownElements.forEach((element) => {
     };
 
     countdownTimer.onCountdownFinished = () => {
-        targetElement.innerHTML = "Countdown has been reached!";
-        targetElement.parentElement.classList.add("disabled");
+        if (targetElement.parentElement.classList.contains('disabled')) {
+            return; // Prevent multiple confetti explosions
+        }
+        targetElement.innerHTML = '<li class="count">Countdown has been reached!</li>';
+        targetElement.parentElement.classList.add('disabled');
+
+        if (targetElement.getAttribute("data-finish-animation") === "1") {
+            const boundRect = targetElement.getBoundingClientRect();
+            confetti({
+                particleCount: 300,
+                spread: 360,
+                ticks: 200,
+                origin: {
+                    x: ((boundRect.left + (boundRect.width / 2)) / window.innerWidth),
+                    y: ((boundRect.top + (boundRect.height / 2)) / window.innerHeight),
+                }
+            });
+        }
     };
 
     countdownTimer.start();

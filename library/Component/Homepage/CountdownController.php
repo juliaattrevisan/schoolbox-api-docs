@@ -81,6 +81,7 @@ class Component_Homepage_CountdownController extends Component_Homepage_Controll
             $this->setVar(
                 [
                     'DEADLINE_ISO'   => $deadline->toIso8601String(),
+                    'COMPONENT_CONFIG_FINISHANIMATION' => $this->getConfig('finishAnimation'),
                 ]
             );
 
