@@ -46,7 +46,7 @@ class Hydrator
         private Assessment\DataModel\MapperProxy $assessmentDataSource,
         private Translator\Assessment\ModelToArray $assessmentTranslator,
         private Badge\Mapper $badgeMapper,
-        private Badge\Translator\Curriculum\ModelToArray $badgeTranslator,
+        private Badge\Translator\ModelToArray $badgeTranslator,
     ) {
     }
 
