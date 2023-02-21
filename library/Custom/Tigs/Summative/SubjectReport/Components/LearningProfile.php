@@ -23,7 +23,6 @@ use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 
@@ -131,8 +130,8 @@ class LearningProfile extends BaseComponent
                 $data['levels']     = $this->buildLevels($feedback->getRubricMarkedGrid());
             }
         }
-        $data['dueDate'] = $dueWork->getDueAt();
-//        $data['link']    = $this->getAasLink($dueWork);
+//        $data['dueDate'] = $dueWork->getDueAt();
+        $data['link']    = $this->getLink($dueWork);
         return $data;
     }
 
@@ -272,5 +271,29 @@ class LearningProfile extends BaseComponent
             ->endOfDay();
 
         return $assessment->getDueAt()->between($startDate, $endDate);
+    }
+
+    /**
+     * Retrieve a link to the due work.
+     *
+     * @param DueWork\Model $dueWork
+     * @return string|null
+     * @throws Router\Exception\RouteNotFound
+     */
+    private function getLink(DueWork\Model $dueWork): ?string
+    {
+        // Build the link for the unit title
+        $path        = 'learningAssessment.getSummary';
+        $routeParams = [
+            'assessmentId' => $dueWork->getId(),
+            'assessment'   => $dueWork,
+            'studentId'    => $this->student->getId(),
+            'student'      => $this->student,
+        ];
+
+        if ($this->authorizer->isPathAuthorizedForUser($path, $routeParams, $this->getViewer())) {
+            return $this->router->generate($path, $routeParams);
+        }
+        return null;
     }
 }
