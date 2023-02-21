@@ -51,7 +51,7 @@ class LearningProfile extends BaseComponent
      * @param GenericCollection|UnitSpec\Model[] $unitSpecs
      * @param User              $student
      * @param Folder\Model      $folder
-     * @param array<array{workTypeId: int, term: int}> $searches
+     * @param array<array{workTypeId: int, term: int, semester: int}> $searches
      * @param Visibility        $visibility
      * @param User              $viewer
      * @param RubricDataSource  $rubricMapper
@@ -66,12 +66,12 @@ class LearningProfile extends BaseComponent
         private Folder\Model $folder,
         private array $searches,
         private Visibility $visibility,
-        User $viewer,
+        private User $viewer,
         private RubricDataSource $rubricMapper,
         private Authorizer $authorizer,
         private Router\Router $router,
         private IConfigLoader $config,
-        ?string $roleTypeOverride
+        private ?string $roleTypeOverride
     ) {
         parent::__construct($attributes, $viewer, $roleTypeOverride);
     }
@@ -84,16 +84,19 @@ class LearningProfile extends BaseComponent
             foreach ($unitSpec->getUnitImplementations() as $implementation) {
                 foreach ($this->searches as $search) {
                     // Search within unit spec for due works matching search
-                    $filteredAssessments = $implementation->getAssessables()
-                        ->filter(fn (IAssessable $assessment) => $assessment instanceof DueWork\Model)
-                        ->filter(fn (DueWork\Model $assessment) => $assessment->getWorkType()?->getId() === $search['workTypeId'])
-                        ->filter(fn (DueWork\Model $assessment) => $assessment->isParticipant($this->student))
-                        ->filter(fn (DueWork\Model $assessment) => $this->isDueWithinTermWindow($assessment, $search['term']))
-                        ->sortByCallback(fn (DueWork\Model $a1, DueWork\Model $a2) => $a1->getDueAt()->lt($a2->getDueAt()));
+                    if ($implementation->getFolder()->getId() === $this->folder->getId()) {
+                        $filteredAssessments = $implementation->getAssessables()
+                            ->filter(fn (IAssessable $assessment) => $assessment instanceof DueWork\Model)
+                            ->filter(fn (DueWork\Model $assessment) => $assessment->getWorkType()?->getId() === $search['workTypeId'])
+                            ->filter(fn (DueWork\Model $assessment) => $assessment->isParticipant($this->student))
+                            ->filter(fn (DueWork\Model $assessment) => $this->isDueWithinTermWindow($assessment, $search['term']))
+                            ->filter(fn (DueWork\Model $assessment) => $assessment->isFeedbackVisibleToRoleType($this->roleTypeOverride ?? $this->viewer->getRole()->getType()))
+                            ->sortByCallback(fn (DueWork\Model $a1, DueWork\Model $a2) => $a1->getDueAt()->lt($a2->getDueAt()));
 
-                    // For each filtered assessment: build data I guess
-                    foreach ($filteredAssessments as $assessment) {
-                        $data[$assessment->getId()] = $this->buildAssessmentData($assessment);
+                        // For each filtered assessment: build data I guess
+                        foreach ($filteredAssessments as $assessment) {
+                            $data[$assessment->getId()] = $this->buildAssessmentData($assessment);
+                        }
                     }
                 }
             }
@@ -104,8 +107,6 @@ class LearningProfile extends BaseComponent
 
     public function buildAssessmentData(DueWork\Model $dueWork): array
     {
-        // Need every due work
-
         // Fetch the grid
         $dueWork->setRubricGrid($this->rubricMapper->retrieveGrid($dueWork, false));
 
