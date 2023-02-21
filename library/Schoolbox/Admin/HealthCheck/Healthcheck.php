@@ -563,6 +563,8 @@ class Healthcheck
         // Pastoral care tables (only if module enabled).
         if ($this->configMapper->get(ConfigMapper::NAME_PASTORAL_ENABLED)) {
             $allPastoralTables = [
+                'luPastoralCareCategory',
+                'luPastoralCareType',
                 'PastoralCareComments',
                 'PastoralCareContacts',
                 'PastoralCareActions',
