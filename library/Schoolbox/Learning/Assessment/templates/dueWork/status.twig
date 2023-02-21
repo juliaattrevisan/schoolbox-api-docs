@@ -226,7 +226,7 @@
                 {% set meta = meta|merge(['file' ~ (fileCount > 1 ? 's' : '') ]) %}
             {% endif %}
 
-            {% set attachedMsg = 'Feedback also includes <a href="' ~ pActionResponses ~ '" data-rubric-link>' %}
+            {% set attachedMsg = 'Feedback also includes <a href="' ~ pActionResponses ~ '">' %}
             {% for mataLabel in meta %}
                 {% set attachedMsg = attachedMsg ~ mataLabel %}
                 {% if loop.revindex0 > 1 %}
