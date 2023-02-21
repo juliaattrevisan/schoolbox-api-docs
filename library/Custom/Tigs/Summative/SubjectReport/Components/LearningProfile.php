@@ -122,9 +122,8 @@ class LearningProfile extends BaseComponent
         // Load rubric marks if they exist and current user is permitted to view grades
         $participant = $dueWork->getParticipantIfExtant($this->student);
         if ($participant && !$participant->isExcluded()) {
-            /** @var DueWork\Feedback\Model|null $feedback */
             $feedback = $participant->getAuthoritativeFeedback(true);
-            if ($feedback) {
+            if ($feedback instanceof DueWork\Feedback\Model) {
                 $feedback->setRubricMarkedGrid($this->rubricMapper->retrieveMarkedGrid($feedback));
 //                $data['markedGrid']      = $feedback->getRubricMarkedGrid();
                 $data['capabilityMarks'] = $this->buildCapabilityMarks($feedback->getRubricMarkedGrid());
