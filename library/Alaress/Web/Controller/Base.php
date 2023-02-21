@@ -344,7 +344,7 @@ abstract class Base
         foreach ($queryStringKeys as $queryStringKey) {
             $queryStringValue = $this->request->query->get($queryStringKey);
             if (isset($queryStringValue)) {
-                $url = $url->addQueryParameter($queryStringKey, $queryStringValue);
+                $url = $url->appendQueryParameters([$queryStringKey => $queryStringValue]);
             }
         }
         return (string)$url;

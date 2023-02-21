@@ -191,10 +191,9 @@ class Controller extends Base
             } else {
                 // Redirect somewhere (locally only?)
                 $page = $this->getRequest()->query->get('redirect');
-                $pageUri = new Uri($page);
 
                 //Determine if page redirect is valid
-                if ($page && $pageUri->isAbsolutePath()) {
+                if ($page && (new Uri($page))->isAbsolutePath()) {
                     $this->response->redirect->to($page);
                 } else {
                     $this->response->redirect->to('/');
