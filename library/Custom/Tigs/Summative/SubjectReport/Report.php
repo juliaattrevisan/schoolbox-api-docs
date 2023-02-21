@@ -1061,10 +1061,9 @@ class Report
     ): ?array {
         // Which work type?
         // Furthermore: for previous semesters all previous have to be loaded.
-        $workTypeConfig = null;
-        $yearLevel      = $attributes->getYearLevel();
-        $term           = $attributes->getTerm();
-        $searches       = [];
+        $yearLevel = $attributes->getYearLevel();
+        $term      = $attributes->getTerm();
+        $searches  = [];
         if ($attributes->isMiddleYear()) {
             if ($term >= 1) {
                 $searches[] = [
