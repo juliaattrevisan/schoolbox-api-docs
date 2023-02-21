@@ -89,7 +89,7 @@ class LearningProfile extends BaseComponent
                             ->filter(fn (IAssessable $assessment) => $assessment instanceof DueWork\Model)
                             ->filter(fn (DueWork\Model $assessment) => $assessment->getWorkType()?->getId() === $search['workTypeId'])
                             ->filter(fn (DueWork\Model $assessment) => $assessment->isParticipant($this->student))
-                            ->filter(fn (DueWork\Model $assessment) => $this->isDueWithinTermWindow($assessment, $search['term']))
+                            ->filter(fn (DueWork\Model $assessment) => $this->isDueWithinReportWindow($assessment, $search['semester']))
                             ->filter(fn (DueWork\Model $assessment) => $assessment->isFeedbackVisibleToRoleType($this->roleTypeOverride ?? $this->viewer->getRole()->getType()))
                             ->sortByCallback(fn (DueWork\Model $a1, DueWork\Model $a2) => $a1->getDueAt()->lt($a2->getDueAt()));
 
