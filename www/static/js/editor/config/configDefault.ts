@@ -55,6 +55,7 @@ import Alignment from "@ckeditor/ckeditor5-alignment/src/alignment";
 import FindAndReplace from "@ckeditor/ckeditor5-find-and-replace/src/findandreplace";
 import SourceEditing from "@ckeditor/ckeditor5-source-editing/src/sourceediting";
 import WordCount from "@ckeditor/ckeditor5-word-count/src/wordcount";
+import Mention from "@ckeditor/ckeditor5-mention/src/mention";
 import UploadAdapter from "../plugin/UploadAdapter";
 import { getDefaultColors } from "@js/editor/config/configDefaultColors";
 
@@ -131,6 +132,7 @@ export function getDefault() {
             FindAndReplace,
             SourceEditing,
             WordCount,
+            Mention,
         ],
         extraPlugins: [UploadAdapterPlugin],
         toolbar: [
@@ -339,6 +341,15 @@ export function getDefault() {
                 "Times New Roman, Times, serif",
                 "Trebuchet MS, Helvetica, sans-serif",
                 "Verdana, Geneva, sans-serif",
+            ],
+        },
+        mention: {
+            feeds: [
+                {
+                    marker: "[",
+                    feed: ["[firstname]", "[preferredname]", "[surname]", "[fullname]", "[house]", "[year]"],
+                    minimumCharacters: 0,
+                },
             ],
         },
     };
