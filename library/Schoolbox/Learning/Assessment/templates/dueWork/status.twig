@@ -355,6 +355,10 @@
             </div>
             <section class="checklist" id="mass-download-list">
                 <div data-template>{# this will get detached from the DOM on pageload (jquery.bulky.js) #}
+                    <!--
+                        NOTE: We use onchange rather than onclick below to ensure the function is called *after* the
+                        checkbox has changed state instead of before.
+                     -->
                     <input type="checkbox" data-selected checked onchange="updateMassDownloadSelectAllCheckbox()"/>
                     <label class="checkbox-label" data-participant-name>{# populated by JS (jquery.bulky.js) #}</label>
                 </div>
