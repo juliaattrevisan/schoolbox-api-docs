@@ -1128,6 +1128,8 @@ class Report
             2,
         );
 
+        new \Alaress_Probe($unitSpecs->getPropertyValues('id'),$unitSpecs->getPropertyValues('title'),);
+
         $profile = new LearningProfile(
             $attributes,
             $unitSpecs,
