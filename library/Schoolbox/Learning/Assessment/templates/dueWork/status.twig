@@ -559,24 +559,10 @@
                         },
                         userSelector: '[data-mass-download]',
                         userList: $userList,
-                        checkboxConditionality: (
+                        checkboxConditionality: function (id) {
                             // Exclude students with no downloadable work.
-                            function (id) {
-                                // NOTE: #mark will not be present if the assessment has Mark Type 'None'.
-                                let $mark = $('#mark-' + id);
-
-                                return (
-                                    // Downloadable data will exist for students if:
-                                    //  * A 'Preview Submission' link exists in that student's block OR
-                                    //  * A non-blank feedback comment exists for that student OR
-                                    //  * A link to rubric info exists for that student
-                                    $('[data-participant=' + id + '] [data-previewable]').length != 0 ||
-                                    $('#comment-' + id).val().trim() != '' ||
-                                    ($mark.length !== 0 && $mark.val().trim() != '') ||
-                                    $('[data-participant=' + id + '] [data-rubric-link]').length > 0
-                                );
-                            }
-                        ),
+                            return ($('[data-participant=' + id + ']').attr('data-status') !== 'incomplete');
+                        },
                         onSubmit: function (toSubmit) {
                             $('body').confirmDialog({
                                 header: 'Download all feedback and submissions?',
