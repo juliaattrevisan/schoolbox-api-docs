@@ -1177,6 +1177,7 @@ class Report
             $this->rubricMapper,
             $this->authorizer,
             $this->router,
+            $this->config,
             $roleTypeOverride,
         );
 

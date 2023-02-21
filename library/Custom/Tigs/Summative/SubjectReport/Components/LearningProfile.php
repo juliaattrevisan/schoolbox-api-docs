@@ -10,13 +10,17 @@ declare(strict_types=1);
 namespace Custom\Tigs\Summative\SubjectReport\Components;
 
 use Alaress\Authorizer\Authorizer;
+use Alaress_Date_Format;
 use Aura\Router;
+use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\StudentAttributes;
 use Custom\Tigs\Summative\SubjectReport\BaseComponent;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
 use Schoolbox\GenericCollection;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DueWork;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -67,6 +71,7 @@ class LearningProfile extends BaseComponent
         private RubricDataSource $rubricMapper,
         private Authorizer $authorizer,
         private Router\Router $router,
+        private IConfigLoader $config,
         ?string $roleTypeOverride
     ) {
         parent::__construct($attributes, $viewer, $roleTypeOverride);
@@ -77,10 +82,19 @@ class LearningProfile extends BaseComponent
         // Do something with each search
         $data = [];
         foreach ($this->unitSpecs as $unitSpec) {
-            foreach ($this->searches as $search) {
-                // Search within unit spec for due works matching search
-                foreach ($unitSpec->getUnitImplementations() as $implementation) {
+            foreach ($unitSpec->getUnitImplementations() as $implementation) {
+                foreach ($this->searches as $search) {
+                    // Search within unit spec for due works matching search
+                    $filteredAssessments = $implementation->getAssessables()
+                        ->filter(fn (IAssessable $assessment) => $assessment instanceof DueWork\Model)
+                        ->filter(fn (DueWork\Model $assessment) => $assessment->getWorkType()?->getId() === $search['workTypeId'])
+                        ->filter(fn (DueWork\Model $assessment) => $assessment->isParticipant($this->student))
+                        ->filter(fn (DueWork\Model $assessment) => $this->isDueWithinTermWindow($assessment, $search['term']));
 
+                    // For each filtered assessment: build data I guess
+                    foreach ($filteredAssessments as $assessment) {
+                        $data[$assessment->getId()] = $this->buildAssessmentData($assessment);
+                    }
                 }
             }
         }
@@ -176,5 +190,82 @@ class LearningProfile extends BaseComponent
             }
         }
         return null;
+    }
+
+    private function isDueWithinTermWindow(IAssessable $assessment, int $term): bool
+    {
+        $startYearOffset = 0;
+        $endYearOffset   = 0;
+        switch ($term) {
+            case 1:
+                $startConfig = $this->config->get(Config::_TIGS_START_TERM_1);
+                $endConfig   = $this->config->get(Config::_TIGS_START_TERM_2);
+//                $startDate = (new Alaress_Date_Format())
+//                    ->setYear($reportYear)
+//                    ->modify($this->config->get(Config::_TIGS_START_TERM_1))
+//                    ->startOfDay();
+//                $endDate = (new Alaress_Date_Format())
+//                    ->setYear($reportYear)
+//                    ->modify($this->config->get(Config::_TIGS_START_TERM_2))
+//                    ->addDays(-1)
+//                    ->endOfDay();
+                break;
+            case 2:
+                $startConfig = $this->config->get(Config::_TIGS_START_TERM_2);
+                $endConfig   = $this->config->get(Config::_TIGS_START_TERM_3);
+//                $startDate = (new Alaress_Date_Format())
+//                    ->setYear($reportYear)
+//                    ->modify($this->config->get(Config::_TIGS_START_TERM_2))
+//                    ->startOfDay();
+//                $endDate = (new Alaress_Date_Format())
+//                    ->setYear($reportYear)
+//                    ->modify($this->config->get(Config::_TIGS_START_TERM_3))
+//                    ->addDays(-1)
+//                    ->endOfDay();
+                break;
+            case 3:
+                $startConfig = $this->config->get(Config::_TIGS_START_TERM_3);
+                $endConfig   = $this->config->get(Config::_TIGS_START_TERM_4);
+//                $startDate = (new Alaress_Date_Format())
+//                    ->setYear($reportYear)
+//                    ->modify($this->config->get(Config::_TIGS_START_TERM_3))
+//                    ->startOfDay();
+//                $endDate = (new Alaress_Date_Format())
+//                    ->setYear($reportYear)
+//                    ->endOfDay()
+//                    ->modify($this->config->get(Config::_TIGS_START_TERM_4))
+//                    ->addDays(-1)
+//                    ->endOfDay();
+                break;
+            case 4:
+                $startConfig   = $this->config->get(Config::_TIGS_START_TERM_4);
+                $endConfig     = $this->config->get(Config::_TIGS_START_TERM_1);
+                $endYearOffset = 1;
+//                $startDate = (new Alaress_Date_Format())
+//                    ->setYear($reportYear)
+//                    ->modify($this->config->get(Config::_TIGS_START_TERM_4))
+//                    ->startOfDay();
+//                $endDate = (new Alaress_Date_Format())
+//                    ->setYear($reportYear + 1)
+//                    ->modify($this->config->get(Config::_TIGS_START_TERM_1))
+//                    ->addDays(-1)
+//                    ->endOfDay();
+                break;
+            default:
+                return false;
+        }
+
+        $reportYear = $this->getAttributes()->getCalendarYear();
+        $startDate  = (new Alaress_Date_Format())
+            ->setYear($reportYear + $startYearOffset)
+            ->modify($startConfig)
+            ->startOfDay();
+        $endDate   = (new Alaress_Date_Format())
+            ->setYear($reportYear + $endYearOffset)
+            ->modify($endConfig)
+            ->addDays(-1)
+            ->endOfDay();
+
+        return $assessment->getDueAt()->between($startDate, $endDate);
     }
 }
