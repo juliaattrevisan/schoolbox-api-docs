@@ -5,6 +5,7 @@ namespace Schoolbox\Admin\Home;
 use Alaress\Exception\UnreachableException;
 use Alaress_Date_Format;
 use Alaress_Saml_Cache;
+use InvalidArgumentException;
 use Schoolbox\Url\Uri;
 use OneLogin\Saml2\IdPMetadataParser;
 use OneLogin\Saml2\Utils;
@@ -76,7 +77,7 @@ class SamlCertHelper
         } else {
             try {
                 $metadataXml = $this->fetchMetadataXml($idpMetadataUrl);
-            } catch (\InvalidArgumentException | SchoolboxException\Exception $e) {
+            } catch (InvalidArgumentException | UnreachableException | SchoolboxException\Exception $e) {
                 // Invalid URL | Unable to connect.
                 $metadataXml = null;
             }
@@ -102,14 +103,13 @@ class SamlCertHelper
      *
      * @param string $idpMetadataUrl
      * @return string|null
-     * @throws \InvalidArgumentException             If $idpMetadataUrl cannot be recognised as a URL
-     * @throws SchoolboxException\Exception    If we cannot connect to ULR
+     * @throws UnreachableException
      */
     private function fetchMetadataXml(string $idpMetadataUrl): ?string
     {
         try {
             $url = new Uri($idpMetadataUrl);
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             // Should never get here. Only thrown in $idpMetadataUrl is not a string, which is
             // impossible due to method's param type declaration.
             throw new UnreachableException($e);
@@ -119,7 +119,7 @@ class SamlCertHelper
 
         try {
             $idpMetadataCache = $this->samlCache->init($validUrl);
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             // Should never get here. Only thrown in $idpMetadataUrl is not a string, which is
             // impossible due to method's param type declaration.
             throw new UnreachableException($e);
