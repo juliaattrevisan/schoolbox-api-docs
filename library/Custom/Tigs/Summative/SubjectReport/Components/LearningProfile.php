@@ -122,7 +122,7 @@ class LearningProfile extends BaseComponent
         // Load rubric marks if they exist and current user is permitted to view grades
         $participant = $dueWork->getParticipantIfExtant($this->student);
         if ($participant && !$participant->isExcluded()) {
-            /** @var DueWork\Feedback\Model $feedback */
+            /** @var DueWork\Feedback\Model|null $feedback */
             $feedback = $participant->getAuthoritativeFeedback(true);
             if ($feedback) {
                 $feedback->setRubricMarkedGrid($this->rubricMapper->retrieveMarkedGrid($feedback));
@@ -194,6 +194,11 @@ class LearningProfile extends BaseComponent
 
     private function isDueWithinTermWindow(IAssessable $assessment, int $term): bool
     {
+        // Consider semester search instead?
+        // As it happens: the terms 1 and 2 work types are always different,
+        // as are the terms 3 and 4 work types.
+        // This means we may get away with picking both term 1 and 2 due works
+        // from semester 1, and term 3 and 4 from semester 2?
         $startYearOffset = 0;
         $endYearOffset   = 0;
         switch ($term) {
