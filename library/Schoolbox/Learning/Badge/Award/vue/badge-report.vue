@@ -52,6 +52,10 @@ export default {
             type: String,
             required: true,
         },
+        hasAwardPermissions: { // does the current user have permissions to award badges?
+            type: Boolean,
+            required: true
+        }
     },
 
     data() {
@@ -221,7 +225,7 @@ export default {
     <div class="small-12 island badge-report">
         <div v-if="isDataLoaded && hasStudents">
             <section class="content">
-                <badge-report-header
+                <badge-report-header v-if="hasAwardPermissions"
                     :has-some-students-selected="hasSomeStudentsSelected"
                     :are-all-students-selected="areAllStudentsSelected"
                     @on-select-all-selected="onSelectAllSelected"
@@ -232,6 +236,7 @@ export default {
                         :key="student.id"
                         :student="student"
                         :selected-students="selectedStudents"
+                        :has-award-permissions="hasAwardPermissions"
                         @on-student-selected="onStudentSelected"
                         @on-badge-selected="onBadgeSelected"
                     />
@@ -255,7 +260,7 @@ export default {
         </div>
 
         <div v-else class="loader"></div>
-        <bottom-drawer :showDrawer="hasSelectedStudents">
+        <bottom-drawer :showDrawer="hasSelectedStudents && hasAwardPermissions">
             <h3 class="selected-count">
                 <em>{{ selectedStudentsCount }} selected</em>
             </h3>
