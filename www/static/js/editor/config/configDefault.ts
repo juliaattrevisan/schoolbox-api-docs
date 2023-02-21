@@ -57,6 +57,7 @@ import SourceEditing from "@ckeditor/ckeditor5-source-editing/src/sourceediting"
 import WordCount from "@ckeditor/ckeditor5-word-count/src/wordcount";
 import Mention from "@ckeditor/ckeditor5-mention/src/mention";
 import UploadAdapter from "../plugin/UploadAdapter";
+import Tokens from "../plugin/tokens/Tokens";
 import { getDefaultColors } from "@js/editor/config/configDefaultColors";
 
 /**
@@ -133,6 +134,7 @@ export function getDefault() {
             SourceEditing,
             WordCount,
             Mention,
+            Tokens,
         ],
         extraPlugins: [UploadAdapterPlugin],
         toolbar: [
@@ -165,7 +167,15 @@ export function getDefault() {
             {
                 label: "Insert",
                 icon: "plus",
-                items: ["insertImage", "mediaEmbed", "insertTable", "specialCharacters", "emoji", "horizontalLine"],
+                items: [
+                    "insertImage",
+                    "mediaEmbed",
+                    "insertTable",
+                    "specialCharacters",
+                    "tokens",
+                    "emoji",
+                    "horizontalLine",
+                ],
             },
             "|",
             {
