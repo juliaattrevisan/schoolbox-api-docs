@@ -177,24 +177,27 @@ class Controller extends Base
             mt.text as 'Icon Name',
             mt.title as 'Tooltip',
             mt.url as 'Destination URL',
-            lc.name as 'Campus',
+            (SELECT
+                group_concat(c.name)
+            FROM
+                `luCampus` c
+            JOIN
+                menu_top_campus mtc on mtc.menu_top_id = mt.id AND mtc.campus_id = c.id
+            WHERE
+                c.deleted_at IS NULL
+            ) AS 'Campus',
             (SELECT
                 group_concat(g.name)
             FROM `groups` g
-            LEFT JOIN
-                menu_top_role mtr ON mtr.menu_top_id = mt.id
+            JOIN
+                menu_top_role mtr ON mtr.menu_top_id = mt.id AND mtr.role_id = g.id
             WHERE
-                mtr.role_id = g.id
-            AND
                 g.deleted_at IS NULL
             ) as 'Role'
         FROM
             menu_top mt
-        LEFT JOIN
-            menu_top_campus mtc on mtc.menu_top_id = mt.id
-        LEFT JOIN
-            luCampus lc on mtc.campus_id = lc.id
-        WHERE mt.deleted_at IS NULL
+        WHERE
+            mt.deleted_at is NULL
         ORDER BY
             sort_order asc; ");
         $statement->execute();
@@ -213,12 +216,22 @@ class Controller extends Base
         SELECT
             ms.title as 'Side Menu Item',
             ms.url as 'URL',
-            lc.name as 'Campus',
+            (SELECT
+                group_concat(c.name)
+            FROM
+                `luCampus` c
+            JOIN
+                menu_side_campus msc on msc.menu_side_id = ms.id
+            WHERE
+                msc.campus_id = c.id
+            AND
+                c.deleted_at IS NULL
+            ) AS 'Campus',
             (SELECT
                 group_concat(g.name)
             FROM
                 `groups` g
-            LEFT JOIN
+            JOIN
                 menu_side_role msr on msr.menu_side_id = ms.id
             WHERE
                 msr.role_id = g.id
@@ -227,15 +240,12 @@ class Controller extends Base
             ) AS 'Role'
         FROM
             menu_side ms
-        LEFT JOIN
-            menu_side_campus msc on msc.menu_side_id = ms.id
-        LEFT JOIN
-            luCampus lc on msc.campus_id = lc.id
-        WHERE ms.deleted_at IS NULL
+        WHERE
+            ms.deleted_at is NULL
         GROUP BY
-            ms.title, ms.url
+            ms.title,ms.url
         ORDER BY
-            ms.title, lc.name;
+            ms.title,'Campus';
             ");
         $statement->execute();
         $help = new Helper();
