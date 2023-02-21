@@ -89,7 +89,8 @@ class LearningProfile extends BaseComponent
                         ->filter(fn (IAssessable $assessment) => $assessment instanceof DueWork\Model)
                         ->filter(fn (DueWork\Model $assessment) => $assessment->getWorkType()?->getId() === $search['workTypeId'])
                         ->filter(fn (DueWork\Model $assessment) => $assessment->isParticipant($this->student))
-                        ->filter(fn (DueWork\Model $assessment) => $this->isDueWithinTermWindow($assessment, $search['term']));
+                        ->filter(fn (DueWork\Model $assessment) => $this->isDueWithinTermWindow($assessment, $search['term']))
+                        ->sortByCallback(fn (DueWork\Model $a1, DueWork\Model $a2) => $a1->getDueAt()->lt($a2->getDueAt()));
 
                     // For each filtered assessment: build data I guess
                     foreach ($filteredAssessments as $assessment) {
@@ -126,8 +127,8 @@ class LearningProfile extends BaseComponent
             if ($feedback instanceof DueWork\Feedback\Model) {
                 $feedback->setRubricMarkedGrid($this->rubricMapper->retrieveMarkedGrid($feedback));
 //                $data['markedGrid']      = $feedback->getRubricMarkedGrid();
-                $data['capabilityMarks'] = $this->buildCapabilityMarks($feedback->getRubricMarkedGrid());
-                $data['levels']          = $this->buildLevels($feedback->getRubricMarkedGrid());
+                $data['indicators'] = $this->buildIndicatorMarks($feedback->getRubricMarkedGrid());
+                $data['levels']     = $this->buildLevels($feedback->getRubricMarkedGrid());
             }
         }
         $data['dueDate'] = $dueWork->getDueAt();
@@ -141,7 +142,7 @@ class LearningProfile extends BaseComponent
      * @param MarkedGrid|null $markedGrid
      * @return null|array
      */
-    private function buildCapabilityMarks(?MarkedGrid $markedGrid): ?array
+    private function buildIndicatorMarks(?MarkedGrid $markedGrid): ?array
     {
         $capabilityMarks = null;
         if ($markedGrid) {

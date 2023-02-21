@@ -19,6 +19,7 @@ Data:
     hscTaskMarks['data']      array                 - Optional. If present, the per-unit data. Indexed by unitSpec.id
     hscRankData               array                 - Data to render the 'HSC Assessment Rank' component
     nesaGraphData             array                 - Data to render the NESA Grade Graph component
+    learningProfileData       array                 - Data to render the learning profile
     showErrors                bool                  - Should we render errors?
     dataAttributeError      string                - A string to apply as a data attribute to error alerts
 #}
@@ -99,6 +100,11 @@ Data:
                     {{ hscTaskMarks.error|raw }}
                 </div>
             {% endif %}
+            {% if learningProfileData.error is defined and showErrors %}
+                <div data-alert {{ dataAttributeError }} class="alert-box alert">
+                    {{ learningProfileData.error|raw }}
+                </div>
+            {% endif %}
         </div>
     </div>
 
@@ -159,6 +165,10 @@ Data:
             </div>
             {% endfor %}
         {% endif %}
+
+        {% for assessmentId, learningProfile in (learningProfileData.data ?? []) %}
+            {% include '@tigsSubjectReport/components/learningProfile.twig' with learningProfile only %}
+        {% endfor %}
 
         {% for unitSpec in unitSpecs %}
             {% set unitSpecId = unitSpec.id %}

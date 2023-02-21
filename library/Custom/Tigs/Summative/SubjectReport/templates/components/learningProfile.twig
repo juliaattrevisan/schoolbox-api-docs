@@ -1,0 +1,40 @@
+{#
+Renders a single learning profile.
+
+Data:
+    assessment:                   IAssessable - the assessment which contains the learning profile data.
+    levels[].name:                string      - the name of each "level" in the assessment's rubric.
+                                                Not actual rubric levels: instead, derived from the first indicator's
+                                                available descriptors.
+    indicators[].name:            string      - the name of each indicator in the assessment's rubric.
+                                                Only indicators within the capability "Learning Profile" are included in
+                                                the learning profile.
+    indicators[].descriptor.name: string      - the name of the selected descriptor in the indicator.
+#}
+<div class="column small-12">
+    <h2 class="subheader">{{ assessment.title }}</h2>
+    <p class="meta">Due {{ assessment.dueAt.localShort }}</p>
+
+    <table>
+        <thead>
+        <tr>
+            <th>&nbsp;</th>
+            {% for level in levels %}
+                <th>{{ level.name }}</th>
+            {% endfor %}
+        </tr>
+        </thead>
+        <tbody>
+        {% for indicator in indicators %}
+            <tr>
+                <th>{{ indicator.name }}</th>
+                {% for level in levels %}
+                    <td>
+                        {% if level.name is same as indicator.descriptor.name %}&check;{% else %}&nbsp;{% endif %}
+                    </td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
