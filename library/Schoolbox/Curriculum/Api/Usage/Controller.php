@@ -8,9 +8,12 @@
 namespace Schoolbox\Curriculum\Api\Usage;
 
 use Alaress\Database\Connector\IConnector;
+use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Web\Controller\Base;
+use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\Learning\Assessment;
+use Schoolbox\Learning\Badge\Translator\Links as BadgeLinksTranslator;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Learning\Badge as Badge;
@@ -81,7 +84,15 @@ class Controller extends Base
             $this->getUser(),
             $unitTranslator,
         );
-        $badgeTranslator = new Badge\Translator\Curriculum\ModelToArray();
+        $prefixGenerator = new PrefixGenerator($this->getConfigLoader());
+        $badgeTranslator = new Badge\Translator\Curriculum\ModelToArray(
+            new \Schoolbox\Learning\Badge\Translator\ModelToArray(
+                new \Schoolbox\User\Translator\Author\ModelToArray(),
+                new \Schoolbox\Resource\Storage\Translator\ModelToArray($prefixGenerator),
+                new ScrubAdapter(),
+                new BadgeLinksTranslator($this->router, $this->authorizer, $this->getUser(), $prefixGenerator)
+            ),
+        );
 
         $hydrator = new Hydrator(
             $this->folderMapper,

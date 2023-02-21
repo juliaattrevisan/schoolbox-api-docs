@@ -7,6 +7,13 @@ use Schoolbox\Learning\Badge\Model;
 class ModelToArray
 {
     /**
+     * @param \Schoolbox\Learning\Badge\Translator\ModelToArray $badgeTranslater
+     */
+    public function __construct(private \Schoolbox\Learning\Badge\Translator\ModelToArray $badgeTranslater)
+    {
+    }
+
+    /**
      * @param Model $model
      * @return array
      */
@@ -17,7 +24,8 @@ class ModelToArray
             'title'     => $model->getName(),
             'category'  => $model->getCategory()->getName(),
             'icon'      => $model->getIcon() ?: "/storage/image.php?hash={$model->getImage()->getHash()}",
-            'yearLevel' => $model->getYearLevels() ? $model->getYearLevels()->getPropertyValues('name') : []
+            'yearLevel' => $model->getYearLevels() ? $model->getYearLevels()->getPropertyValues('name') : [],
+            'object'    => call_user_func($this->badgeTranslater, $model),
         ];
     }
 
