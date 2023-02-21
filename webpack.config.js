@@ -272,6 +272,9 @@ module.exports = {
         // Slideshow
         slideshow: "./www/static/js/slideshow/slideshow.ts",
 
+        // Image Lightbox
+        imageLightbox: "./www/static/js/image-lightbox/image-lightbox.ts",
+
         // Colour Picker
         colourPicker: "./www/static/js/colour-picker/colour-picker.ts",
 
