@@ -110,8 +110,30 @@ export type NodeToUpdate = {
 /**
  * The further details of the badge usage
  */
-export interface BadgeUsageObject extends UsageObject {
-    category: string;
+export interface BadgeUsageObject {
+    id: number;
+    name: string;
+    category: {
+        id: number;
+        name: string;
+    };
     yearLevel: string;
-    icon: string;
+    image: string | null;
+    icon: string | null;
+    body: string;
+    createdAt: string;
+    updatedAt: string;
+    allowAsGoal: boolean;
+    animate: boolean;
+    achievementExpiry: string | null;
+    goalExpiry: string | null;
+    _links: {
+        update: string;
+        delete: string;
+        achievementRecipients: string;
+        goalRecipients: string;
+        achievementWithdraw: string;
+        goalWithdraw: string;
+        icon: string;
+    };
 }
