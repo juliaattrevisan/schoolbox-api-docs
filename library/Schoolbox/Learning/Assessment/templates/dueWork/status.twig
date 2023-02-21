@@ -398,7 +398,7 @@
                         statusPending: '{{ statusPending }}',
                         statusReviewed: '{{ statusReviewed }}',
                         reviewedText: '{{ labelReviewed }}',
-                        onPreDraftCallback: function(){
+                        onPreDraftCallback: function () {
                         },
                         onDraftCallback: function (userId, isSuccess, message, feedbackId) {
                             let $actionBar = $('[data-participant=' + userId + '] [data-action-bar]'),
@@ -407,7 +407,7 @@
                             $actionBar.attr('data-mass-publish', '');
                             $actionBar.removeAttr('data-mass-submit');
                         },
-                        onPrePublishCallback: function(){
+                        onPrePublishCallback: function () {
                         },
                         onPublishCallback: function (userId) {
                             let $actionBar = $('[data-participant=' + userId + '] [data-action-bar]'),
@@ -755,7 +755,7 @@
                         $feedbackButtons.fadeOut();
 
                         // Slide up if no meta to display
-                        if(!$extraMeta.length){
+                        if (!$extraMeta.length) {
                             $actionBar.slideUp();
                         }
                     }
