@@ -226,7 +226,7 @@
                 {% set meta = meta|merge(['file' ~ (fileCount > 1 ? 's' : '') ]) %}
             {% endif %}
 
-            {% set attachedMsg = 'Feedback also includes <a href="' ~ pActionResponses ~ '">' %}
+            {% set attachedMsg = 'Feedback also includes <a href="' ~ pActionResponses ~ '" data-rubric-link>' %}
             {% for mataLabel in meta %}
                 {% set attachedMsg = attachedMsg ~ mataLabel %}
                 {% if loop.revindex0 > 1 %}
@@ -568,10 +568,12 @@
                                 return (
                                     // Downloadable data will exist for students if:
                                     //  * A 'Preview Submission' link exists in that student's block OR
-                                    //  * A non-blank feedback comment exists for that student.
+                                    //  * A non-blank feedback comment exists for that student OR
+                                    //  * A link to rubric info exists for that student
                                     $('[data-participant=' + id + '] [data-previewable]').length != 0 ||
                                     $('#comment-' + id).val().trim() != '' ||
-                                    ($mark.length !== 0 && $mark.val().trim() != '')
+                                    ($mark.length !== 0 && $mark.val().trim() != '') ||
+                                    $('[data-participant' + id + '] [data-rubric-link]').length > 0
                                 );
                             }
                         ),
