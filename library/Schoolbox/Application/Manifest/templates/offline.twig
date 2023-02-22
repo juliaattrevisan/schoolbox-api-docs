@@ -46,7 +46,7 @@
          */
         function checkServiceRestored() {
             let xHttp = new XMLHttpRequest();
-            xHttp.addEventListener("load", onXHttpResponse);
+            xHttp.addEventListener("loadend", onXHttpResponse);
             xHttp.open("GET", "/ping");
             xHttp.send();
         }
