@@ -85,16 +85,16 @@ class RepositoryFactory
     {
         // Configure a platform
         // https://oat-sa.github.io/doc-lti1p3/libraries/lib-lti1p3-core/doc/quickstart/configuration/#configure-a-platform
-        $baseUrl  = (new UrlFactory($this->config))->buildFullyQualified()->setScheme('https');
+        $baseUrl  = (new UrlFactory($this->config))->buildFullyQualified()->withScheme('https');
         $platform = new Platform(
             'schoolbox',
             'Schoolbox Platform',
-            $baseUrl->toString(),
-            (clone $baseUrl)->setPath($this->oidcAuthenticationPath)->toString(),
-            (clone $baseUrl)->setPath($this->oAuth2AccessTokenPath)->toString(),
+            (string)$baseUrl,
+            (string)(clone $baseUrl)->withPath($this->oidcAuthenticationPath),
+            (string)(clone $baseUrl)->withPath($this->oAuth2AccessTokenPath),
         );
 
-        $jsonWebKeySetPath = (clone $baseUrl)->setPath($this->jsonWebKeySetPath)->toString();
+        $jsonWebKeySetPath = (string)(clone $baseUrl)->withPath($this->jsonWebKeySetPath);
 
         // Build a registration out of each tool
         $registrations = [];

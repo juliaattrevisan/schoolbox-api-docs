@@ -269,12 +269,12 @@ abstract class Alaress_Cache_Abstract
              * so lets just replace that here to http. and hope the remote server will redirect to https
              * not just error out, or serve the data on http.
              */
-            $url = new \Laminas\Uri\Uri($url);
+            $url = new \Schoolbox\Url\Uri($url);
             if ('webcal' === $url->getScheme()) {
-                $url->setScheme('http');
+                $url = $url->withScheme('http');
             }
-            $httpClient->get($url->toString(), ['headers' => $headers, 'sink' => $this->cachedFile]);
-        } catch (RequestException | GuzzleException\ConnectException $e) {
+            $httpClient->get($url, ['headers' => $headers, 'sink' => $this->cachedFile]);
+        } catch (RequestException | GuzzleException\ConnectException | GuzzleException\GuzzleException $e) {
             throw new SchoolboxException("Guzzle Exception occurred", 0, $e);
         }
 

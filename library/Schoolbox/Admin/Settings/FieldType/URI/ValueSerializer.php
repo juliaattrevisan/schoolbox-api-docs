@@ -10,11 +10,10 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Settings\FieldType\URI;
 
 use Schoolbox\Admin\Settings\IFieldValueSerializer;
-use Laminas\Uri\Uri;
+use Schoolbox\Url\Uri;
 
 class ValueSerializer implements IFieldValueSerializer
 {
-
     /**
      * @inheritdoc
      */
@@ -24,8 +23,9 @@ class ValueSerializer implements IFieldValueSerializer
         if ($value === '') {
             return '';
         }
-        $url = new Uri($value);
-        if (!$url->isValid()) {
+        try {
+            $url = new Uri($value);
+        } catch (\InvalidArgumentException $e) {
             throw new \UnexpectedValueException("Invalid URL supplied");
         }
         return $value;

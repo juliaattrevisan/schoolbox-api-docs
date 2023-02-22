@@ -10,8 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Example\Base\Endpoint;
 
 use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
-use Laminas\Uri\Exception\InvalidArgumentException;
-use Laminas\Uri\Exception\InvalidUriPartException;
 
 /**
  * Class Specification
@@ -22,7 +20,6 @@ use Laminas\Uri\Exception\InvalidUriPartException;
  */
 class Specification
 {
-
     /**
      * @var Api
      */
@@ -45,8 +42,6 @@ class Specification
      *
      * @return array
      *
-     * @throws InvalidArgumentException
-     * @throws InvalidUriPartException
      */
     public function check(): array
     {

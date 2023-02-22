@@ -11,7 +11,6 @@ namespace Schoolbox\Learning\Assessment\DueWork\Download;
 
 use Alaress_Date_Format;
 use Aura\Router\Router;
-use Laminas\Uri\UriInterface;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as DueWorkResponseFile;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
@@ -24,6 +23,7 @@ use Schoolbox\Learning\Turnitin\File\Api;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\TaskDaemon\Request\DownloadPages\MessageFactory as BaseMessageFactory;
 use Schoolbox\TaskDaemon\Request\Message;
+use Schoolbox\Url\Uri;
 use Schoolbox\User;
 use Schoolbox\User\Translator\ModelToArray as UserTranslator;
 
@@ -46,7 +46,7 @@ class MessageFactory
      * Constructor
      *
      * @param BaseMessageFactory $baseMessageFactory Required to actually build messages.
-     * @param UriInterface       $urlBase            Required to build URIs which point back to this instance.
+     * @param Uri                $urlBase            Required to build URIs which point back to this instance.
      * @param RosettaStone       $rosettaStone       Required to translate the term "due work" for this instance.
      * @param Router             $router             Required to build routes to download various due work parts.
      * @param UserTranslator     $userTranslator     Required to translate the viewer to an array representation for
@@ -55,7 +55,7 @@ class MessageFactory
      */
     public function __construct(
         private BaseMessageFactory $baseMessageFactory,
-        private UriInterface $urlBase,
+        private Uri $urlBase,
         private RosettaStone $rosettaStone,
         private Router $router,
         private UserTranslator $userTranslator,
@@ -272,10 +272,9 @@ class MessageFactory
      */
     private function generateResponseFileUrl(IStorage $responseFile): string
     {
-        return $this->urlBase
-            ->setPath('/storage/fetch.php')
-            ->setQuery(['hash' => $responseFile->getHash()])
-            ->toString();
+        return (string)$this->urlBase
+            ->withPath('/storage/fetch.php')
+            ->appendQueryParameters(['hash' => $responseFile->getHash()]);
     }
 
     /**
@@ -361,9 +360,8 @@ class MessageFactory
                 'studentId'    => $participant->getUser()->getId(),
             ],
         );
-        return $this->urlBase
-            ->setPath($submissionHistoryPath)
-            ->toString();
+        return (string)$this->urlBase
+            ->withPath($submissionHistoryPath);
     }
 
     /**
@@ -382,10 +380,8 @@ class MessageFactory
             'apiusernotify.apiUserNotify',
             ['userId' => $viewer->getId()]
         );
-        return $this->urlBase
-            ->setPath($callbackPath)
-            ->setQuery(null)
-            ->toString();
+        return (string)$this->urlBase
+            ->withPath($callbackPath);
     }
 
     /**

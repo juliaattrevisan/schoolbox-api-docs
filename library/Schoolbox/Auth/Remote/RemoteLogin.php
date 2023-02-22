@@ -11,7 +11,7 @@ namespace Schoolbox\Auth\Remote;
 
 use GuzzleHttp\ClientInterface;
 use Schoolbox\Realtime\Pipe\PipeManager;
-use Laminas\Uri\UriInterface;
+use Psr\Http\Message\UriInterface;
 
 /**
  * Class for creating a session which is authenticated as a particular user.
@@ -61,7 +61,7 @@ class RemoteLogin
      */
     public function authenticate(string $username, string $password): ?string
     {
-        $url      = $this->baseUrl->setPath('/login')->toString();
+        $url      = (string)$this->baseUrl->withPath('/login');
         $headers  = ['Origin' => $this->baseUrl->getHost()];
         $postData = [
             'page'     => '/login/',

@@ -28,7 +28,7 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 use Sentry\State\HubInterface;
 use Throwable;
-use Laminas\Uri\Uri;
+use Schoolbox\Url\Uri;
 
 abstract class Base
 {
@@ -340,15 +340,14 @@ abstract class Base
      */
     protected function addQueryStringParamsToPath(string $path, array $queryStringKeys): string
     {
-        $url   = new Uri($path);
-        $query = $url->getQueryAsArray();
+        $url = new Uri($path);
         foreach ($queryStringKeys as $queryStringKey) {
             $queryStringValue = $this->request->query->get($queryStringKey);
             if (isset($queryStringValue)) {
-                $query[$queryStringKey] = $queryStringValue;
+                $url = $url->appendQueryParameters([$queryStringKey => $queryStringValue]);
             }
         }
-        return $url->setQuery($query)->toString();
+        return (string)$url;
     }
 
 

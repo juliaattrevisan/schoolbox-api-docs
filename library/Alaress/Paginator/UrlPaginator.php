@@ -12,11 +12,10 @@
 namespace Alaress\Paginator;
 
 use OutOfRangeException;
-use Laminas\Uri\Uri;
+use Schoolbox\Url\Uri;
 
 class UrlPaginator implements IUrlPaginator
 {
-
     /**
      * The URL to use to generate page URLs.
      *
@@ -47,14 +46,8 @@ class UrlPaginator implements IUrlPaginator
      */
     public function getUrlForPage($page)
     {
-        // Building a URL using PHP builtins is a complete pain!
-        // (There's no http_build_str equivalent for parse_str)
-        // That's why I use Laminas\Uri internally.
-        $url = new Uri($this->url);
-        $query = $url->getQueryAsArray();
-        $query[$this->param] = $page;
-        $url->setQuery($query);
-        return $url->toString();
+        return (string)(new Uri($this->url))
+            ->appendQueryParameters([$this->param => $page]);
     }
 
     /**

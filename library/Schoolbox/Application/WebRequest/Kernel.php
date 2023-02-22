@@ -32,7 +32,7 @@ use Schoolbox\Application\Login\Controller as LoginController;
 use Schoolbox\Application\WebKernelAbstract;
 use Schoolbox\Mapper\Exception\Deleted;
 use Throwable;
-use Laminas\Uri\Uri;
+use Schoolbox\Url\Uri;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Alaress\DebugBar\DataCollector\TidewaysCollector;
 use Database;
@@ -97,7 +97,6 @@ class Kernel extends WebKernelAbstract
      * @throws \Aura\Web\Exception\InvalidStatusCode
      * @throws \DebugBar\DebugBarException
      * @throws \ReflectionException
-     * @throws \Laminas\Uri\Exception\InvalidArgumentException
      */
     public function run()
     {
@@ -145,14 +144,14 @@ class Kernel extends WebKernelAbstract
             // can get redirected back to what they requested when they log in.
             /** @var Request $request */
             $request  = $this->di->get('webFactory')->newRequest();
-            $uri      = new Uri($path);
             $query    = [];
             foreach ($request->query as $key => $value) {
                 if (!in_array($key, ['page', 'samlAuth'])) {
                     $query[$key] = $value;
                 }
             }
-            $uri->setQuery($query);
+            // using http_build_query to handle array in filters
+            $uri = (new Uri($path))->withQuery(http_build_query($query));
 
             // Start constructing a response
             /** @var Response $response */
@@ -248,7 +247,6 @@ class Kernel extends WebKernelAbstract
      * @throws \Aura\Web\Exception\InvalidStatusCode
      * @throws \DebugBar\DebugBarException
      * @throws \ReflectionException
-     * @throws \Laminas\Uri\Exception\InvalidArgumentException
      * @throws Throwable
      */
     private function outputAuraContent(Route $route, array $server): void

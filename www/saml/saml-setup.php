@@ -47,8 +47,8 @@ if (Config::get('saml_auth_context') !== 'unspecified') {
 SAMLDebugLog(json_encode($settingsInfo));
 
 try {
-    $url = new \Laminas\Uri\Uri(Config::get('saml_idp_metadata_url'));
-    $idpMetadataUrl = $url->toString();
+    $url = new \Schoolbox\Url\Uri(Config::get('saml_idp_metadata_url'));
+    $idpMetadataUrl = (string)$url;
 
     $cache = new Alaress_Saml_Cache();
     $idpMetadata = $cache->init($idpMetadataUrl);

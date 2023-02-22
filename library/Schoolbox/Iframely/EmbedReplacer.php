@@ -14,7 +14,7 @@ use DiDom\Element;
 use DiDom\Exceptions\InvalidSelectorException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
-use Laminas\Uri\Uri;
+use Schoolbox\Url\Uri;
 use ValueError;
 
 /**
@@ -174,9 +174,9 @@ class EmbedReplacer
             if ($srcUrl->getHost() === self::IFRAMELY_CDN_HOST) {
                 foreach (self::IFRAMELY_API_PARAMS_SETS as $paramsSet) {
                     $apiUrl = (new Uri(self::IFRAMELY_API_ENDPOINT))
-                        ->setQuery($paramsSet + $srcUrl->getQueryAsArray());
+                        ->appendQueryParameters($paramsSet + $srcUrl->getQueryAsArray());
                     try {
-                        $response = $this->httpClient->get($apiUrl->toString());
+                        $response = $this->httpClient->get($apiUrl);
                     } catch (GuzzleException) {
                         // Something went wrong whilst making the new request,
                         // e.g. this request return a 417 Expectation Failed:

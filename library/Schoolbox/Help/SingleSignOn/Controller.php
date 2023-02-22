@@ -12,17 +12,11 @@ namespace Schoolbox\Help\SingleSignOn;
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use Authenticator;
-use DomainException;
-use Firebase\JWT\BeforeValidException;
-use Firebase\JWT\ExpiredException;
-use Firebase\JWT\SignatureInvalidException;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\API\Token\JwtParser;
 use Schoolbox\Application\Exception\NotAuthenticated;
-use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Mapper\Exception as MapperException;
-use UnexpectedValueException;
-use Laminas\Uri\Uri;
+use Schoolbox\Url\Uri;
 
 /**
  * Controller for SSO endpoints
@@ -101,13 +95,15 @@ class Controller extends Base
 
         /** @noinspection PhpUnhandledExceptionInspection */
         $url = (new Uri($this->getConfigLoader()->get('schoolbox_help_url')))
-            ->setPath($this->router->generate('helpSso.receiveTokenFromInstance'))
-            ->setQuery([
-                self::QUERY_STRING_JWT  => $jwt,
-                self::QUERY_STRING_PAGE => $this->determinePageQueryStringValue(),
-            ]);
+            ->withPath($this->router->generate('helpSso.receiveTokenFromInstance'))
+            ->appendQueryParameters(
+                [
+                    self::QUERY_STRING_JWT  => $jwt,
+                    self::QUERY_STRING_PAGE => $this->determinePageQueryStringValue(),
+                ]
+            );
 
-        $this->response->redirect->seeOther($url->toString());
+        $this->response->redirect->seeOther($url);
     }
 
     /**
@@ -176,8 +172,8 @@ class Controller extends Base
         );
 
         // Don't allow non-relative redirects
-        return $url->isValidRelative()
-            ? $url->toString()
+        return $url->isAbsolutePath()
+            ? (string)$url
             : self::QUERY_STRING_PAGE_DEFAULT;
     }
 
@@ -202,7 +198,7 @@ class Controller extends Base
     private function redirectToLogin(string $page): void
     {
         $loginUrl = (new Uri($this->router->generate('login.getLogin')))
-            ->setQuery(['page' => $page]);
-        $this->response->redirect->seeOther($loginUrl->toString());
+            ->appendQueryParameters(['page' => $page]);
+        $this->response->redirect->seeOther($loginUrl);
     }
 }

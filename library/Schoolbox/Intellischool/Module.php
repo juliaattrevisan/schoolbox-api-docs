@@ -128,7 +128,7 @@ class Module extends BaseModule
                 $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_DEPLOYMENT_ID),
                 $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_LEARNER_DASHBOARD_BASE_URL),
                 $this->getConfig()->get(ConfigMapper::NAME_INTELLISCHOOL_COHORT_DASHBOARD_BASE_URL),
-                (new Factory($this->getConfig()))->buildFullyQualified()->toString()
+                (string)(new Factory($this->getConfig()))->buildFullyQualified()
             )
         );
     }

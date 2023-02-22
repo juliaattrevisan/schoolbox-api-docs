@@ -1,6 +1,6 @@
 <?php
 
-use Laminas\Uri\Uri;
+use Schoolbox\Url\Uri;
 
 /**
  * Base class for queries to the iSAMS Batch API.
@@ -48,10 +48,10 @@ class External_Isams_Batch_BaseApi
     public function retrieveDocument($filter = '')
     {
         $url = new Uri();
-        $url->setScheme('https')
-            ->setHost($this->getHost())
-            ->setPath('/api/batch/1.0/xml.ashx')
-            ->setQuery(['apikey' => $this->getApiKey()])
+        $url->withScheme('https')
+            ->withHost($this->getHost())
+            ->withPath('/api/batch/1.0/xml.ashx')
+            ->appendQueryParameters(['apikey' => $this->getApiKey()])
         ;
         $curl         = new Alaress_Curl_Url($url);
         $filterString = "$filter";

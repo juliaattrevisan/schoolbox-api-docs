@@ -79,14 +79,14 @@ class Survey_Notification
                             [
                                 'messages' => [
                                     [
-                                        'icon' => $baseUrl->setPath('/images/icon.php')->setQuery(
+                                        'icon' => (string)$baseUrl->withPath('/images/icon.php')->appendQueryParameters(
                                             [
                                                 'size' => 64,
                                                 'icon' => 'report',
                                             ]
-                                        )->toString(),
+                                        ),
                                         'title' => sprintf('A response was submitted to %s. You may access this response', Scrub::text($this->getSurveyTitle())),
-                                        'href' => $baseUrl->setPath(sprintf('/survey/review/%d/%d/%d', $this->survey['assess_id'], $firstSection['section_id'], $this->attempt['attempt_id']))->toString(),
+                                        'href' => (string)$baseUrl->withPath(sprintf('/survey/review/%d/%d/%d', $this->survey['assess_id'], $firstSection['section_id'], $this->attempt['attempt_id'])),
                                         'meta' => null,
                                     ],
                                 ],

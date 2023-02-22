@@ -9,11 +9,11 @@ declare(strict_types=1);
 
 namespace Schoolbox\Url\Test;
 
+use Psr\Http\Message\UriInterface;
 use Schoolbox\Config\TestLoader;
 use Schoolbox\Url\Factory;
 use PHPUnit\Framework\TestCase;
-use Laminas\Uri\Uri;
-use Laminas\Uri\UriInterface;
+use Schoolbox\Url\Uri;
 
 /**
  * @covers \Schoolbox\Url\Factory
@@ -46,11 +46,11 @@ class FactoryTest extends TestCase
     {
         return [
             'no site_hostname, no site_domain' => [
-                (new Uri())->setHost(''),
+                (new Uri())->withHost(''),
                 [],
             ],
             'empty site_hostname, empty site_domain' => [
-                (new Uri())->setHost(''),
+                (new Uri())->withHost(''),
                 ['site_hostname' => '', 'site_domain' => '',],
             ],
             'empty site_hostname, non-empty site_domain' => [

@@ -50,7 +50,7 @@ class RegistrationRepositoryFactory
     public function build(): RegistrationRepository
     {
         return new RegistrationRepository(
-            (new Factory($this->config))->buildFullyQualified()->setScheme('https'),
+            (new Factory($this->config))->buildFullyQualified()->withScheme('https'),
             $this->config->get(ConfigMapper::NAME_JWT_PUBLIC_KEY),
             $this->config->get(ConfigMapper::NAME_JWT_PRIVATE_KEY),
             $this->toolMapper->findByColumn('lti_version', ToolModel::LTI_VERSION_1_3)

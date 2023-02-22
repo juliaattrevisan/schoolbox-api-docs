@@ -13,7 +13,6 @@ use Schoolbox\Application\CliTool;
 use Schoolbox\Geosnapshot\Api;
 use Schoolbox\Geosnapshot\Payload\RedactedPhotoList;
 
-
 require_once __DIR__ . '/../../conf/core/require.php';
 
 /**
@@ -29,7 +28,6 @@ require_once __DIR__ . '/../../conf/core/require.php';
  */
 $app = new class extends CliTool\App
 {
-
     /**
      * --help
      *
@@ -120,7 +118,7 @@ HELP;
          */
         $this->getLogger()->info('Geosnapshot Redactions.');
 
-        $fqdn = (new Schoolbox\Url\Factory($this->getConfig()))->buildFullyQualified()->toString();
+        $fqdn = (string)(new Schoolbox\Url\Factory($this->getConfig()))->buildFullyQualified();
         $redactionList = (new External_User())->getPhotoRedactionList();
 
         /* Generate a list of guys who are about to be redacted

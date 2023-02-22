@@ -155,7 +155,7 @@ class Controller extends Base
 
             $urlBase = (new Factory($this->getConfigLoader()))
                 ->buildFullyQualified()
-                ->setPath($this->router->generate('api.initSessionFromQueryString'));
+                ->withPath($this->router->generate('api.initSessionFromQueryString'));
         }
 
         $students = [];
@@ -176,7 +176,7 @@ class Controller extends Base
             $students[] = [
                 'id'          => $user->getId(),
                 'fullname'    => $user->getFullName(),
-                'qrCodeValue' => ($userJwtId && $urlBase) ? $urlBase->setQuery($params)->toString() : null,
+                'qrCodeValue' => ($userJwtId && $urlBase) ? (string)$urlBase->appendQueryParameters($params) : null,
             ];
         }
 

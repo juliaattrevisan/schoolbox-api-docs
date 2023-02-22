@@ -12,12 +12,11 @@ namespace Alaress\Paginator\Test;
 
 use Alaress\Paginator\Paginator;
 use Alaress\Paginator\UrlPaginator;
-use Laminas\Uri\Uri;
+use Schoolbox\Url\Uri;
 use PHPUnit\Framework\TestCase;
 
 class UrlPaginatorTest extends TestCase
 {
-
     /**
      * Simple factory for a test UrlPaginator object.
      *
@@ -56,8 +55,8 @@ class UrlPaginatorTest extends TestCase
     public function testBasicUrl()
     {
         $paginator = $this->buildPaginator(50, 300, 'https://www.google.com', 'p');
-        $this->assertEquals('https://www.google.com/?p=1', $paginator->getUrlForPage(1));
-        $this->assertEquals('https://www.google.com/?p=2', $paginator->getUrlForPage(2));
+        $this->assertEquals('https://www.google.com?p=1', $paginator->getUrlForPage(1));
+        $this->assertEquals('https://www.google.com?p=2', $paginator->getUrlForPage(2));
     }
 
     /**

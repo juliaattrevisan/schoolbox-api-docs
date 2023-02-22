@@ -9,9 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Profile;
 
-use Laminas\Uri\Exception\InvalidUriException;
-use Laminas\Uri\Exception\InvalidUriPartException;
-use Laminas\Uri\Uri;
+use Schoolbox\Url\Uri;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
 use ZipArchive;
 
@@ -88,8 +86,6 @@ class PhotoDownloader
      * Download student photos
      *
      * @return void
-     * @throws InvalidUriException
-     * @throws InvalidUriPartException
      * @throws \RuntimeException
      */
     public function downloadStudentPhotos(): void
@@ -102,8 +98,6 @@ class PhotoDownloader
      * Download staff photos
      *
      * @return void
-     * @throws InvalidUriException
-     * @throws InvalidUriPartException
      * @throws \RuntimeException
      */
     public function downloadStaffPhotos(): void
@@ -118,8 +112,6 @@ class PhotoDownloader
      * @param string $path
      * @param string $key
      * @return void
-     * @throws InvalidUriException
-     * @throws InvalidUriPartException
      * @throws \RuntimeException
      */
     private function download(string $path, string $key): void
@@ -140,12 +132,12 @@ class PhotoDownloader
         $filepointer = fopen($filename, 'wb+');
 
         $url = (new Uri())
-            ->setScheme('https')
-            ->setHost(rtrim($this->host, "/ \n\r\t\v\x00"))
-            ->setPath("/{$path}")
-            ->setQuery(['apikey' => $key]);
+            ->withScheme('https')
+            ->withHost(rtrim($this->host, "/ \n\r\t\v\x00"))
+            ->withPath("/{$path}")
+            ->appendQueryParameters(['apikey' => $key]);
 
-        $curl = new \Alaress_Curl_Url($url->toString());
+        $curl = new \Alaress_Curl_Url((string)$url);
         $curl->exec();
 
         if (empty($curl->getErrors())) {

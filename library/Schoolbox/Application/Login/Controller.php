@@ -15,7 +15,7 @@ use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\User;
 use Session;
 use Symfony\Component\HttpFoundation\IpUtils;
-use Laminas\Uri\Uri;
+use Schoolbox\Url\Uri;
 
 class Controller extends Base
 {
@@ -62,7 +62,7 @@ class Controller extends Base
 
         $samlAuth = $this->getRequest()->query->get('samlAuth');
         $page = $page ?: $this->getRequest()->query->get('page');
-        $pageUri = new Uri($page);
+        $pageUri = $page ? new Uri($page) : null;
 
         // Don't output login screen if XHR request
         if ($this->isJsonRequest() || $this->isXhrRequest()) {
@@ -82,7 +82,7 @@ class Controller extends Base
             && (!$this->samlBlacklist() || $samlAuth === '1')
         ) {
             $redirectUrl = '/saml/index.php';
-            if ($pageUri->isValidRelative()) {
+            if ($pageUri && $pageUri->isAbsolutePath()) {
                 $redirectUrl .= '?page=' . rawurlencode($pageUri);
             }
             $this->getResponse()->redirect->to($redirectUrl, 303);
@@ -93,8 +93,8 @@ class Controller extends Base
         $data['requestParams'] = http_build_query($getParams);
 
         //Determine if page redirect is valid
-        if ($pageUri->isValidRelative() && $page !== '/login' && $page !== '/login/') {
-            $data['page'] = $pageUri->toString();
+        if ($pageUri && $pageUri->isAbsolutePath() && $page !== '/login' && $page !== '/login/') {
+            $data['page'] = (string)$pageUri;
         } else {
             $data['page'] = '';
         }
@@ -141,7 +141,6 @@ class Controller extends Base
         $username = trim($this->request->post->get('username', ''));
         $password = $this->request->post->get('password', '');
         $page = $this->request->post->get('page');
-        $pageUri = new Uri($page);
         $tandc = $this->request->post->get('tandc') === '1';
         $remember = $this->request->post->get('rememberme') === '1';
 
@@ -182,8 +181,8 @@ class Controller extends Base
                 }
                 if ($authenticated) {
                     if (
-                        strlen($page)
-                        && $pageUri->isValidRelative()
+                        $page
+                        && (new Uri($page))->isAbsolutePath()
                         && $page !== '/'
                         && $page !== '/login'
                         && $page !== '/login/'

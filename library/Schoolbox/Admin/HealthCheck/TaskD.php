@@ -3,13 +3,13 @@
 namespace Schoolbox\Admin\HealthCheck;
 
 use Aura\Router\Router;
-use Laminas\Uri\UriInterface;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Gotenberg\Client;
 use Schoolbox\IConfigLoader;
 use Schoolbox\TaskDaemon\Producer;
 use Schoolbox\TaskDaemon\Request\MessageFactory;
+use Schoolbox\Url\Uri;
 use Schoolbox\User;
 use Schoolbox\User\Translator\Author\ModelToArray;
 use Scrub;
@@ -23,7 +23,7 @@ class TaskD
     private Jwt $tokenBuilder;
     private IConfigLoader $config;
     private Router $router;
-    private UriInterface $urlBase;
+    private Uri $urlBase;
     private MessageFactory $messageFactory;
     private Producer $producer;
 
@@ -92,9 +92,8 @@ class TaskD
                     ],
                 ],
             ],
-            $this->urlBase->setPath($this->router->generate('apiusernotify.apiUserNotify', ['userId' => $user->getId()]))
-                    ->setQuery(null)
-                    ->toString(),
+            (string)$this->urlBase->withPath($this->router->generate('apiusernotify.apiUserNotify', ['userId' => $user->getId()]))
+                    ->appendQueryParameters(null),
             [
                 'message' => sprintf('Your Healthcheck %s is ready to download', $this->config->get(ConfigMapper::NAME_REPORT_TITLE)),
                 'from'    => call_user_func($userSerializer, $user),
@@ -113,7 +112,7 @@ class TaskD
 
         //if passed url is null, generate a local url
         if (null === $url) {
-            $url = $urlBase->setPath($this->router->generate('adminHealthCheckExport.' . $report))->toString();
+            $url = $urlBase->withPath($this->router->generate('adminHealthCheckExport.' . $report));
         }
         $this->sources[] = [
             'filename' => sprintf(
@@ -121,7 +120,7 @@ class TaskD
                 $folder,
                 mb_substr($report, 0, self::FILENAME_MAX_LENGTH, 'UTF-8'),
             ),
-            'source'     => $url,
+            'source' => $url,
         ];
     }
 }

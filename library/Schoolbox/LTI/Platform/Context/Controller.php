@@ -205,19 +205,18 @@ class Controller extends BaseController
 
         // Return URL:
         // this is somewhere else
-        $baseUrl   = (new Factory($this->getConfigLoader()))->buildFullyQualified()->setScheme('https');
+        $baseUrl   = (new Factory($this->getConfigLoader()))->buildFullyQualified()->withScheme('https');
         $returnUrl = (clone $baseUrl)
-            ->setPath(
+            ->withPath(
                 $this->router->generate('ltiPlatform.getReceiveDeepLinkingResponse', ['toolId' => $tool->getId()])
             )
             // If a context was passed in the query string:
             // add it to the return URL
-            ->setQuery(['context' => $this->request->query->get('context')])
-            ->toString();
+            ->appendQueryParameters(['context' => $this->request->query->get('context')]);
 
         // Standard deep linking settings
         $deepLinkingSettings = new DeepLinkingSettings(
-            $returnUrl,
+            (string)$returnUrl,
             [LtiResourceLinkInterface::TYPE,],
             [$tool->getTarget(),],
             null,
@@ -337,14 +336,13 @@ class Controller extends BaseController
 
         // Claim about folder memberships
         $nrpsClaim = new NrpsClaim(
-            (clone $baseUrl)
-                ->setPath(
+            (string)(clone $baseUrl)
+                ->withPath(
                     $this->router->generate(
                         'ltiPlatformContext.getMembershipsForFolder',
                         ['folderId' => $folder->getId()]
                     )
                 )
-                ->toString(),
         );
 
         $claims = [$contextClaim, $platformInstanceClaim, $nrpsClaim];
@@ -384,10 +382,9 @@ class Controller extends BaseController
             $tool->getTarget(),
             $component->getConfig(LtiComponent::COMPONENT_CONFIG_HEIGHT),
             null,
-            $baseUrl
-                ->setPath(sprintf('/homepage/%d', $component->getInstance()->getIdentifier()))
-                ->setFragment(sprintf('component%d', $component->getInstance()->getId()))
-                ->toString(),
+            (string)$baseUrl
+                ->withPath(sprintf('/homepage/%d', $component->getInstance()->getIdentifier()))
+                ->withFragment(sprintf('component%d', $component->getInstance()->getId())),
         );
     }
 }
