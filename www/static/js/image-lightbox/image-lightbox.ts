@@ -6,10 +6,13 @@ import "./image-lightbox.css";
 
 const imageLightboxDefaults = {
     plugins: [lgAutoplay],
-    speed: 0
+    speed: 0,
+    zoom: true,
+    zoomSize: "contain",
+    actualSize: false,
 };
 
-const lightboxElements = document.querySelectorAll('[data-image-lightbox]');
+const lightboxElements = document.querySelectorAll("[data-image-lightbox]");
 lightboxElements.forEach((element) => {
     const targetElement = element;
 
@@ -20,4 +23,4 @@ lightboxElements.forEach((element) => {
     targetElement.setAttribute("data-lightbox-loaded", "true");
 
     const lightbox = lightGallery(targetElement, imageLightboxDefaults);
-}
+});
