@@ -136,7 +136,7 @@ class TextboxCest
      * @param Homepage\TextboxForm $textboxForm
      * @throws Exception
      */
-    public function textboxVisibilty(AcceptanceTester $i, Homepage $homepage, Homepage\TextboxForm $textboxForm): void
+    public function textboxVisibility(AcceptanceTester $i, Homepage $homepage, Homepage\TextboxForm $textboxForm): void
     {
         $i->loginAsAdmin();
         $createFolder = new createFolder($i);
@@ -176,23 +176,45 @@ class TextboxCest
 //        $i->cantSee('Testx', 'ul.action-list');
 //        $i->canSee('Test Text Box Title', 'ul.action-list');
 //        $i->canSee('I am textbox content', 'ul.action-list');
+//
+//        $i->impersonate('Jack Coles');
+//        $i->amGoingTo("Navigate to the Test TextBox Homepage via resources browser");
+//        $i->amOnPage($createFolder::URL_RESOURCES);
+//        $i->waitForText($folderName);
+//        $resources->clickFolderName($folderName);
+//        $i->waitForText("Homepage", 5);
+//        $resources->clickMenuItem('home');
+//
+//        $i->click('span.icon-locked');
+//        $i->click('a.icon-settings.settings.edit');
+//        $i->fillField('input[name="componentname"]', 'Jana to be hidden');
+//        $i->uncheckOption('#component4906-showComponentTitle');
+//        $i->click('input[type="submit"]');
+//        $i->click('Modify');
+//        $textboxForm->fillContent('Jamal to be presented');
+//        $textboxForm->save();
 
-        $i->impersonate('Jack Coles');
+        $i->impersonate('Jana Reed');
+        $i->click('label.icon-search.no-text');
+        $i->fillField('input#search-field', 'Jamal');
+        $i->click('label.icon-search.no-text');
+        $i->click('a[data-section="textbox"]');
+        $i->canSee('Jamal to be presented', 'ul.action-list');
+        $i->click('label.icon-search.no-text');
+        $i->fillField('input#search-field', 'Jana');
+        $i->click('label.icon-search.no-text');
+//        $i->click('a[data-section="textbox"]');
+//        $i->cantSee('Jana to be hidden', 'ul.action-list');
+        $i->cantSee('Text Boxes');
         $i->amGoingTo("Navigate to the Test TextBox Homepage via resources browser");
         $i->amOnPage($createFolder::URL_RESOURCES);
         $i->waitForText($folderName);
         $resources->clickFolderName($folderName);
         $i->waitForText("Homepage", 5);
         $resources->clickMenuItem('home');
+        $i->canSee('Jamal to be presented');
+        $i->cantSee('Jana to be hidden');
 
-        $i->click('span.icon-locked');
-        $i->click('a.icon-settings.settings edit');
-        $i->fillField('input[name="componentname"]', 'Jana to be hidden');
-        $i->click('for="component4906-showComponentTitle"');
-        $i->click('input[type="submit"]');
-        $i->click('Modify');
-        $textboxForm->fillContent('Jamal to be presented');
-        $i->click('Save');
 
 
     }
