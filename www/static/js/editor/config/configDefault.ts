@@ -230,9 +230,9 @@ export function getDefault() {
                     classes: ["s-banner-3"],
                 },
                 {
-                    name: "Callout",
+                    name: "Info Callout",
                     element: "p",
-                    classes: ["s-callout", "s-callout--neutral"],
+                    classes: ["s-callout", "s-callout--info"],
                 },
                 {
                     name: "Warning Callout",
@@ -243,6 +243,16 @@ export function getDefault() {
                     name: "Success Callout",
                     element: "p",
                     classes: ["s-callout", "s-callout--success"],
+                },
+                {
+                    name: "Target Callout",
+                    element: "p",
+                    classes: ["s-callout", "s-callout--target"],
+                },
+                {
+                    name: "Question Callout",
+                    element: "p",
+                    classes: ["s-callout", "s-callout--question"],
                 },
                 {
                     name: "Sticky Note",

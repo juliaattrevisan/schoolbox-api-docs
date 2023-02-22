@@ -242,13 +242,13 @@
 .ck.ck-editor .s-banner-3::before {
     bottom: -20px;
     left: -26px;
-    background-image: url("../../../images/ckeditor/styles/banner_left.svg");
+    background-image: url("../../../images/ckeditor/styles/banner-left.svg");
 }
 
 .ck.ck-editor .s-banner-3::after {
     bottom: -20px;
     right: -26px;
-    background-image: url("../../../images/ckeditor/styles/banner_right.svg");
+    background-image: url("../../../images/ckeditor/styles/banner-right.svg");
 }
 
 /* Callouts */
@@ -258,9 +258,11 @@
     overflow: hidden;
     padding: 1em 1em 1em 4rem;
     position: relative;
+    border: 1px solid #888888;
+    color: #888888;
 }
 
-.ck.ck-editor .s-callout--neutral {
+.ck.ck-editor .s-callout--info {
     border: 1px solid #0068b3;
     color: #0068b3;
 }
@@ -275,9 +277,16 @@
     color: #4fa74f;
 }
 
+.ck.ck-editor .s-callout--target {
+}
+
+.ck.ck-editor .s-callout--question {
+}
+
 .ck.ck-editor .s-callout:before {
     align-items: center;
-    background-color: #dddddd;
+    background-color: #888888;
+    color: white;
     display: flex;
     font-family: "schoolbox";
     font-size: 1.25rem;
@@ -290,7 +299,7 @@
     width: 3rem;
 }
 
-.ck.ck-editor .s-callout--neutral:before {
+.ck.ck-editor .s-callout--info:before {
     background-color: #0068b3;
     color: white;
     content: "\e639";
@@ -308,10 +317,18 @@
     content: "\e604";
 }
 
+.ck.ck-editor .s-callout--target:before {
+    content: "\e919";
+}
+
+.ck.ck-editor .s-callout--question:before {
+    content: "\e632";
+}
+
 /* Sticky note */
 .ck.ck-editor .s-sticky-note {
     background-color: #ffdf8d;
-    background-image: url("../../../images/ckeditor/styles/sticky_note_top.svg");
+    background-image: url("../../../images/ckeditor/styles/sticky-note-top-black.svg");
     background-position: top;
     background-repeat: repeat-x;
     background-size: 1rem;
@@ -319,6 +336,8 @@
     padding: 1.5rem 1rem 1rem 1rem;
     position: relative;
     margin-top: 1.5rem;
+    display: block;
+    width: max-content;
 }
 
 .ck.ck-editor .s-sticky-note:before {
@@ -332,7 +351,7 @@
 }
 
 .ck.ck-editor .s-sticky-note:after {
-    background-image: url("../../../images/ckeditor/styles/sticky_note_corner.svg");
+    background-image: url("../../../images/ckeditor/styles/sticky-note-corner-black.svg");
     background-repeat: no-repeat;
     background-size: cover;
     bottom: 0;
