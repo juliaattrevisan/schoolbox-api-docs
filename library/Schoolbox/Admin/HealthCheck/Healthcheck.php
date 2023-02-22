@@ -582,6 +582,7 @@ class Healthcheck
             }
             $this->selectTest($allPastoralTables);
             $this->insertTest($writablePastoralTables);
+            $this->deleteTest($writablePastoralTables);
         }
 
         $tables = array_merge($tables, $this->customUPSTest());
