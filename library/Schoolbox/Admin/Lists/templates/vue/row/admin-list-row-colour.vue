@@ -20,7 +20,6 @@ export default {
         },
         colour: {
             // the colour chosen
-            type: String,
             required: true,
         },
     },
