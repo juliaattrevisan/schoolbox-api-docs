@@ -19,6 +19,7 @@ import Superscript from "@ckeditor/ckeditor5-basic-styles/src/superscript";
 import BlockQuote from "@ckeditor/ckeditor5-block-quote/src/blockquote";
 import Font from "@ckeditor/ckeditor5-font/src/font";
 import RemoveFormat from "@ckeditor/ckeditor5-remove-format/src/removeformat";
+import CodeBlock from "@ckeditor/ckeditor5-code-block/src/codeblock";
 import Image from "@ckeditor/ckeditor5-image/src/image";
 import ImageToolbar from "@ckeditor/ckeditor5-image/src/imagetoolbar";
 import ImageCaption from "@ckeditor/ckeditor5-image/src/imagecaption";
@@ -97,6 +98,7 @@ export function getDefault() {
             BlockQuote,
             Font,
             RemoveFormat,
+            CodeBlock,
             Image,
             ImageToolbar,
             ImageCaption,
@@ -163,7 +165,15 @@ export function getDefault() {
             {
                 label: "Insert",
                 icon: "plus",
-                items: ["insertImage", "mediaEmbed", "insertTable", "specialCharacters", "emoji", "horizontalLine"],
+                items: [
+                    "insertImage",
+                    "mediaEmbed",
+                    "insertTable",
+                    "codeblock",
+                    "specialCharacters",
+                    "emoji",
+                    "horizontalLine",
+                ],
             },
             "|",
             {
@@ -205,29 +215,49 @@ export function getDefault() {
                     classes: ["highlighted-note"],
                 },
                 {
-                    name: "Ribbon",
-                    element: "span",
-                    classes: ["s-ribbon"],
+                    name: "Banner",
+                    element: "p",
+                    classes: ["s-banner"],
+                },
+                {
+                    name: "Banner 2",
+                    element: "p",
+                    classes: ["s-banner-2"],
+                },
+                {
+                    name: "Banner 3",
+                    element: "p",
+                    classes: ["s-banner-3"],
                 },
                 {
                     name: "Callout",
-                    element: "span",
+                    element: "p",
                     classes: ["s-callout", "s-callout--neutral"],
                 },
                 {
                     name: "Warning Callout",
-                    element: "span",
+                    element: "p",
                     classes: ["s-callout", "s-callout--warning"],
                 },
                 {
                     name: "Success Callout",
-                    element: "span",
+                    element: "p",
                     classes: ["s-callout", "s-callout--success"],
                 },
                 {
                     name: "Sticky Note",
                     element: "p",
                     classes: ["s-sticky-note"],
+                },
+                {
+                    name: "Construction",
+                    element: "p",
+                    classes: ["s-construction"],
+                },
+                {
+                    name: "Construction 2",
+                    element: "p",
+                    classes: ["s-construction-2"],
                 },
             ],
         },

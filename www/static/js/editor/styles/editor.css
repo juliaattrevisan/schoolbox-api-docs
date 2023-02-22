@@ -117,24 +117,152 @@
     max-width: 500px;
 } */
 
+/* Reset the stacking context, otherwise our custom banner breaks because of z-index rules.
+ * Read more - https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Positioning/Understanding_z_index/The_stacking_context
+ */
+.ck.ck-content {
+    position: relative;
+    z-index: 1;
+}
+
 /**
  * Custom Styles
  * You'll find our custom styles defined below
+ * TODO - Cleanup and reorder CSS after feedback.
  */
+
+/* Banner */
+.ck.ck-editor .s-banner {
+    display: block;
+    background-color: #f35b5b;
+    color: white;
+    padding: 1rem;
+    position: relative;
+    border-radius: 0.25rem 0 0.25rem 0;
+    box-shadow: 0px 5px 5px 0px rgba(0, 0, 0, 0.15);
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+.ck.ck-editor .s-banner::before,
+.ck.ck-editor .s-banner::after {
+    background-color: #d74545;
+    width: 3em;
+    height: 2em;
+    display: block;
+    transform: skewY(20deg);
+    position: absolute;
+    z-index: -1;
+    content: "";
+}
+
+.ck.ck-editor .s-banner::before {
+    bottom: -10px;
+    border-radius: 0 0.25rem 0 0.25rem;
+    left: 0;
+}
+
+.ck.ck-editor .s-banner::after {
+    top: -10px;
+    border-radius: 0 0.25rem 0 0.25rem;
+    right: 0;
+}
+
+/* Banner 2 */
+.ck.ck-editor .s-banner-2 {
+    display: block;
+    background-color: #4fa74f;
+    color: white;
+    padding: 1rem;
+    position: relative;
+    border-radius: 0.25rem 0.25rem 0 0;
+    box-shadow: 0px 5px 5px 0px rgba(0, 0, 0, 0.15);
+    margin-bottom: 2rem;
+    margin-top: 1rem;
+}
+
+.ck.ck-editor .s-banner-2::before,
+.ck.ck-editor .s-banner-2::after {
+    background-color: #337533;
+    width: 3em;
+    height: 2em;
+    display: block;
+    position: absolute;
+    z-index: -1;
+    content: "";
+}
+
+.ck.ck-editor .s-banner-2::before {
+    transform: skewY(20deg);
+    bottom: -10px;
+    border-radius: 0 0 0 0.25rem;
+    left: 0;
+}
+
+.ck.ck-editor .s-banner-2::after {
+    transform: skewY(-20deg);
+    bottom: -10px;
+    border-radius: 0 0 0.25rem 0;
+    right: 0;
+}
+
+/* Banner 3 */
+.ck.ck-editor .s-banner-3 {
+    display: block;
+    background-color: #0068b3;
+    color: white;
+    padding: 1rem;
+    position: relative;
+    border-radius: 0.25rem 0.25rem 0 0;
+    box-shadow: 0px 5px 5px 0px rgba(0, 0, 0, 0.15);
+    width: calc(100% - 4em);
+    margin: auto;
+    margin-bottom: 2rem;
+    margin-top: 1rem;
+}
+
+.ck.ck-editor .s-banner-3::selection {
+    color: #0068b3;
+    background-color: white;
+}
+
+.ck.ck-editor .s-banner-3::before,
+.ck.ck-editor .s-banner-3::after {
+    width: 3em;
+    height: 3em;
+    display: block;
+    position: absolute;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: contain;
+    z-index: -1;
+    content: "";
+}
+
+.ck.ck-editor .s-banner-3::before {
+    bottom: -20px;
+    left: -26px;
+    background-image: url("../../../images/ckeditor/styles/banner_left.svg");
+}
+
+.ck.ck-editor .s-banner-3::after {
+    bottom: -20px;
+    right: -26px;
+    background-image: url("../../../images/ckeditor/styles/banner_right.svg");
+}
 
 /* Callouts */
 .ck.ck-editor .s-callout {
     border-radius: 0.25rem;
     display: block;
-    font-weight: 600;
     overflow: hidden;
     padding: 1em 1em 1em 4rem;
     position: relative;
 }
 
 .ck.ck-editor .s-callout--neutral {
-    border: 1px solid #dddddd;
-    color: #666666;
+    border: 1px solid #0068b3;
+    color: #0068b3;
 }
 
 .ck.ck-editor .s-callout--warning {
@@ -163,8 +291,8 @@
 }
 
 .ck.ck-editor .s-callout--neutral:before {
-    background-color: #dddddd;
-    color: #666666;
+    background-color: #0068b3;
+    color: white;
     content: "\e639";
 }
 
@@ -180,19 +308,21 @@
     content: "\e604";
 }
 
+/* Sticky note */
 .ck.ck-editor .s-sticky-note {
     background-color: #ffdf8d;
     background-image: url("../../../images/ckeditor/styles/sticky_note_top.svg");
     background-position: top;
     background-repeat: repeat-x;
     background-size: 1rem;
-    color: #444444;
-    padding: 1.5em 1em 1em 1em;
+    color: #3d2b26;
+    padding: 1.5rem 1rem 1rem 1rem;
     position: relative;
+    margin-top: 1.5rem;
 }
 
 .ck.ck-editor .s-sticky-note:before {
-    color: #bf1f2e;
+    color: #d74545;
     content: "\e913";
     font-family: "schoolbox";
     font-size: 24px;
@@ -211,4 +341,126 @@
     position: absolute;
     right: 0;
     width: 18px;
+}
+
+/* Construction */
+.ck.ck-editor .s-construction {
+    padding: 1rem;
+    background-color: #ff7045;
+    color: white;
+    position: relative;
+    border: 1px solid #ff7045;
+    box-shadow: 0px 5px 5px 0px rgba(0, 0, 0, 0.15);
+}
+
+.ck.ck-editor .s-construction::before,
+.ck.ck-editor .s-construction::after {
+    content: "";
+    height: 0.75rem;
+    width: 100%;
+    background: repeating-linear-gradient(45deg, #ff7045, #ff7045 10px, white 10px, white 20px);
+    position: absolute;
+}
+
+.ck.ck-editor .s-construction::before {
+    top: 0;
+    left: 0;
+}
+
+.ck.ck-editor .s-construction::after {
+    bottom: 0;
+    left: 0;
+}
+
+/* Construction 2 */
+.ck.ck-editor .s-construction-2 {
+    padding: 1rem;
+    background: linear-gradient(transparent, #ffce00 0.75rem, #ffce00 calc(100% - 0.75rem), transparent 100%);
+    color: #3d2b26;
+    position: relative;
+    border: 1px solid #ffce00;
+    box-shadow: 0px 5px 5px 0px rgba(0, 0, 0, 0.15);
+}
+
+.ck.ck-editor .s-construction-2::before,
+.ck.ck-editor .s-construction-2::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+}
+
+.ck.ck-editor .s-construction-2::before {
+    background: repeating-linear-gradient(45deg, #ffce00, #ffce00 10px, white 10px, white 20px);
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+}
+
+.ck.ck-editor .s-construction-2::after {
+    /* bottom: -1rem;
+    left: 0;
+    height: 1rem;
+    width: calc(100% - 2rem);
+    margin-left: 1rem;
+    box-sizing: border-box;
+    border-left: 0.75rem solid #555a66;
+    border-right: 0.75rem solid #333940; */
+}
+
+/* Blockquote */
+.ck.ck-editor blockquote {
+    border: 1px solid #0068b3;
+    border-left: 0.75rem solid #0068b3;
+    color: #0068b3;
+    padding-left: 2.5rem;
+    background-color: #f8fcff;
+    position: relative;
+}
+
+.ck.ck-editor blockquote p {
+    color: #0068b3;
+}
+
+.ck.ck-editor blockquote::before {
+    font-size: 3rem;
+    position: absolute;
+    left: 0;
+    top: 0;
+    vertical-align: baseline;
+    line-height: normal;
+    height: 3rem;
+    z-index: 1;
+    color: #0068b3;
+    font-family: serif;
+}
+
+/* Code blocks */
+.ck.ck-editor pre[data-language] {
+    padding-top: 1.5rem;
+    background-color: #272822;
+    border: none;
+    border-radius: 0.25rem;
+    margin-bottom: 1rem;
+}
+
+.ck.ck-editor pre[data-language]::after {
+    background-color: rgba(255, 255, 255, 0.25);
+    width: 100%;
+    color: white;
+    text-transform: uppercase;
+    font-weight: 600;
+    left: 0;
+    padding-left: 1rem;
+    top: 0;
+}
+
+.ck.ck-editor pre[data-language] code {
+    /* Override the code rules in typography.scss */
+    border: none;
+    color: white;
+    font-family: monospace;
+    font-size: 12px;
+    font-weight: 400;
+    padding: 0;
 }
