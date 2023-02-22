@@ -33,7 +33,7 @@
             {% for file in article.getImages %}
                 <li>
                     <a href="/storage/image.php?hash={{ file.hash }}&size=maxsize" rel="lightbox[{{ identifier }}]" title="{{ file.filename }}">
-                        <img src="/storage/image.php?hash={{ file.hash }}&size=square128" title="{{ file.filename }}">
+                        <img src="/storage/image.php?hash={{ file.hash }}&size=square128" title="{{ file.filename }}" style="width: 128px">
                     </a>
                 </li>
             {% endfor %}
