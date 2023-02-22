@@ -1126,33 +1126,38 @@ class Report
                 ];
             }
         } elseif ($yearLevel === 12) {
-            if ($term >= 1) {
-                $searches[] = [
-                    'workType' => Config::_TIGS_WORK_TYPE_YEAR_12_TERM_1_LEARNING_PROFILE,
-                    'semester' => 1,
-                    'term'     => 1,
-                ];
-            }
-            if ($term >= 2) {
-                $searches[] = [
-                    'workType' => Config::_TIGS_WORK_TYPE_YEAR_12_TERM_2_LEARNING_PROFILE,
-                    'semester' => 1,
-                    'term'     => 2,
-                ];
-            }
-            if ($term >= 3) {
-                $searches[] = [
-                    'workType' => Config::_TIGS_WORK_TYPE_YEAR_12_TERM_3_LEARNING_PROFILE,
-                    'semester' => 2,
-                    'term'     => 3,
-                ];
-            }
-            if ($term >= 4) {
-                $searches[] = [
-                    'workType' => Config::_TIGS_WORK_TYPE_YEAR_12_TERM_4_LEARNING_PROFILE,
-                    'semester' => 2,
-                    'term'     => 4,
-                ];
+            // Year 12 starts at term 4 previous year:
+            // always include that term
+            $searches[] = [
+                'workType'   => Config::_TIGS_WORK_TYPE_YEAR_12_TERM_4_LEARNING_PROFILE,
+                'semester'   => 1,
+                'term'       => 4,
+                'yearOffset' => -1,
+            ];
+
+            // If actually in term 1, 2 or 3: include those terms
+            if ($term < 4) {
+                if ($term >= 1) {
+                    $searches[] = [
+                        'workType' => Config::_TIGS_WORK_TYPE_YEAR_12_TERM_1_LEARNING_PROFILE,
+                        'semester' => 1,
+                        'term'     => 1,
+                    ];
+                }
+                if ($term >= 2) {
+                    $searches[] = [
+                        'workType' => Config::_TIGS_WORK_TYPE_YEAR_12_TERM_2_LEARNING_PROFILE,
+                        'semester' => 2,
+                        'term'     => 2,
+                    ];
+                }
+                if ($term >= 3) {
+                    $searches[] = [
+                        'workType' => Config::_TIGS_WORK_TYPE_YEAR_12_TERM_3_LEARNING_PROFILE,
+                        'semester' => 2,
+                        'term'     => 3,
+                    ];
+                }
             }
 //            // Need to consider how Year 12 terms are labelled
 //            $workTypeConfig = match ($term) {
@@ -1174,7 +1179,7 @@ class Report
 //            ];
 //        }
 
-        $workTypeIds     = [];
+        $workTypeIds = [];
 //        $workTypeConfigs = array_unique(array_column($searches, 'workType'));
 
         foreach ($searches as $i => $search) {
