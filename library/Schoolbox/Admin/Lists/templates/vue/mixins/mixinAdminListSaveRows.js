@@ -80,6 +80,22 @@ export default {
         },
 
         /**
+         * Previously spectrum.js was used to set the colour, but this is no longer used.
+         * When the colour was cleaed with spectrum.js, it would set the colour value to null.
+         * Coloris.js instead sets this to an empty string, so need to replace all instances of "" with null.
+         * This is to ensure the colour is set to null in the db, so if somewhere else expects null, we don't have an any side effects.
+         * It feels a bit dity, but it's the easiest way to ensure the colour is set to null without getting into the weeds.
+         *
+         * @param { string } rows - the rows data
+         * @returns { string } - rows data with nulls instead of empty strings
+         */
+        getRowsWithNullColours(rows) {
+            let rowsWithNulls = rows.replace(/"hexColour":""/g, '"hexColour":null');
+            rowsWithNulls = rows.replace(/"color":""/g, '"color":null');
+            return rowsWithNulls;
+        },
+
+        /**
          * Send through the data to save the whole list
          *
          * @returns { FormData }
@@ -87,7 +103,7 @@ export default {
         getSaveAllFormData() {
             const formData = new FormData();
             formData.append("table", this.tableName);
-            formData.append("rows", JSON.stringify(this.rows));
+            formData.append("rows", this.getRowsWithNullColours(JSON.stringify(this.rows)));
             return formData;
         },
 
