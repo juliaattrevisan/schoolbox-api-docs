@@ -289,7 +289,10 @@
  #}
 {% block scripts %}
     {% if not readonly %}
-        <script type="application/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.bulky.js?v={{ config.site_version }}"></script>
+        <script type="text/javascript" src="{{ CDN_PREFIX }}/js/select-all/jquery.select-all.basic.js"></script>
+        <script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.bulky.js?v={{ config.site_version }}"></script>
+
+        {# The div below is used by bulky.js to create the mass-publish modal. #}
         <div id="mass-publish" class="reveal-modal" data-reveal data-list-id="mass-publish-list" aria-hidden="true"
              role="dialog">
             <h2>Publish Drafts</h2>
@@ -298,7 +301,7 @@
             <section class="checklist" id="mass-publish-list">
                 <div data-template>{# this will get detached from the DOM on pageload (jquery.bulky.js) #}
                     <input type="checkbox" data-selected checked/>
-                    <label class="checkbox-label" data-participant-name>{# populated by JS (jquery.bulky.js) #}</label>
+                    <label class="checkbox-label" data-participant-name></label>
                 </div>
             </section>
             <div class="component-action">
@@ -312,6 +315,7 @@
             <a class="close-reveal-modal" aria-label="Close">&#215;</a>
         </div>
 
+        {# The div below is used by bulky.js to create the mass-submit modal. #}
         <div id="mass-submit" class="reveal-modal" data-reveal data-list-id="mass-submit-list" aria-hidden="true"
              role="dialog">
             <h2>Acknowledge Receipt of Submission</h2>
@@ -345,21 +349,14 @@
             <a class="close-reveal-modal" aria-label="Close">&#215;</a>
         </div>
 
+        {# The div below is used by bulky.js to create the mass-download modal. #}
         <div id="mass-download" class="reveal-modal" data-reveal data-list-id="mass-download-list" aria-hidden="true"
              role="dialog">
             <h2>Download All Submissions</h2>
             <p>Download all submissions from these students:</p>
-            <div>
-                <input id="mass-download-select-all" type="checkbox" data-selected checked/>
-                <label class="checkbox-label" onclick="onClickMassDownloadSelectAll()">Select all</label>
-            </div>
             <section class="checklist" id="mass-download-list">
                 <div data-template>{# this will get detached from the DOM on pageload (jquery.bulky.js) #}
-                    <!--
-                        NOTE: We use onchange rather than onclick below to ensure the function is called *after* the
-                        checkbox has changed state instead of before.
-                     -->
-                    <input type="checkbox" data-selected checked onchange="updateMassDownloadSelectAllCheckbox()"/>
+                    <input type="checkbox" data-selected checked/>
                     <label class="checkbox-label" data-participant-name>{# populated by JS (jquery.bulky.js) #}</label>
                 </div>
             </section>
@@ -551,9 +548,22 @@
 
                     {# Mass download submissions #}
                     $('#mass-download').bulky({
+                        includeSelectAllCheckbox: true,
                         invalidOptionText: 'nothing to download',
+                        /**
+                         * @param len - the number of enabled checkboxes that are checked.
+                         * @param all - the number of enabled checkboxes.
+                         *
+                         * Neither of the counts include the 'select all' checkbox.
+                         */
                         submitText: function (len, all) {
-                            return getMassDownloadSubmitButtonText(len, all);
+                            if (len === 0) {
+                                return 'Download None';
+                            }
+                            if (len === all) {
+                                return 'Download All';
+                            }
+                            return 'Download ' + len + ' of ' + all;
                         },
                         userSelector: '[data-mass-download]',
                         userList: $userList,
@@ -749,54 +759,6 @@
                         }
                     }
                 });
-
-                function onClickMassDownloadSelectAll() {
-                    $('#mass-download-list input:checkbox:not(:disabled)').prop(
-                        'checked',
-                        !allEnabledMassDownloadCheckboxesAreChecked()
-                    );
-                    updateMassDownloadSelectAllCheckbox();
-
-                    // Get the count of enabled, checked checkboxes, and the count of enabled checkboxes.
-                    // NOTE: Both counts deliberately include the 'select all' checkbox.
-                    let len = $('#mass-download-list input:checkbox:not(:disabled):checked').length;
-                    let all = $('#mass-download-list input:checkbox:not(:disabled)').length;
-
-                    $('#download-submissions').html(getMassDownloadSubmitButtonText(len, all));
-                }
-
-                function updateMassDownloadSelectAllCheckbox() {
-                    $('#mass-download-select-all').prop('checked', allEnabledMassDownloadCheckboxesAreChecked());
-                }
-
-                function allEnabledMassDownloadCheckboxesAreChecked() {
-                    // If none are not checked, then all must be checked.
-                    return ($('#mass-download-list input:checkbox:not(:disabled):not(:checked)').length === 0);
-                }
-
-                /**
-                 * Return text to be placed on the submit button of the mass download modal.
-                 *
-                 * @param len - Number of enabled, checked checkboxes (including the 'select all' checkbox).
-                 * @param all - Number of enabled checkboxes (including the 'select all' checkbox).
-                 */
-                function getMassDownloadSubmitButtonText(len, all) {
-                    // The 'select all' checkbox has been counted in len and all, and we do not wish for it
-                    // to be counted.  So, adjust the counts to not include the 'select all' checkbox.
-                    --all;
-                    if ($('#mass-download-select-all').prop('checked')) {
-                        --len;
-                    }
-
-                    if (len === 0) {
-                        return 'Download None';
-                    }
-                    if (len === all) {
-                        return 'Download All';
-                    }
-                    return 'Download ' + len + ' of ' + all;
-                }
-
             </script>
         {% endautoescape %}
 
