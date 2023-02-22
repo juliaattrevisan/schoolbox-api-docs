@@ -1125,7 +1125,35 @@ class Report
                     'term'     => 3,
                 ];
             }
-//        } elseif ($yearLevel === 12) {
+        } elseif ($yearLevel === 12) {
+            if ($term >= 1) {
+                $searches[] = [
+                    'workType' => Config::_TIGS_WORK_TYPE_YEAR_12_TERM_1_LEARNING_PROFILE,
+                    'semester' => 1,
+                    'term'     => 1,
+                ];
+            }
+            if ($term >= 2) {
+                $searches[] = [
+                    'workType' => Config::_TIGS_WORK_TYPE_YEAR_12_TERM_2_LEARNING_PROFILE,
+                    'semester' => 1,
+                    'term'     => 2,
+                ];
+            }
+            if ($term >= 3) {
+                $searches[] = [
+                    'workType' => Config::_TIGS_WORK_TYPE_YEAR_12_TERM_3_LEARNING_PROFILE,
+                    'semester' => 2,
+                    'term'     => 3,
+                ];
+            }
+            if ($term >= 4) {
+                $searches[] = [
+                    'workType' => Config::_TIGS_WORK_TYPE_YEAR_12_TERM_4_LEARNING_PROFILE,
+                    'semester' => 2,
+                    'term'     => 4,
+                ];
+            }
 //            // Need to consider how Year 12 terms are labelled
 //            $workTypeConfig = match ($term) {
 //                1       => Config::_TIGS_WORK_TYPE_YEAR_12_TERM_1_LEARNING_PROFILE,
