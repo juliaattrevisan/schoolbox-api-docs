@@ -45,6 +45,12 @@ class Homepage
     public const ELEMENT_COMPONENT_CONTENT = '.content';
     public const ELEMENT_COMPONENT_ACTION_BAR = '.component-action';
 
+    public const ELEMENT_LOCK_TOGGLE = '#component-lock-switch';
+
+    public const ELEMENT_COMPONENT_SETTINGS = 'a.icon-settings.settings.edit';
+
+    public const ELEMENT_COMPONENT_EDIT_HEADING = 'input[name="componentname"]';
+
     /**
      * @var AcceptanceTester
      */
@@ -205,5 +211,50 @@ class Homepage
     public function checkComponentIcon(string $icon): void
     {
         $this->tester->canSeeElement(['css' => 'span[class=size-32\ icon-masonry\ icon-masonry-' . $icon . ']']);
+    }
+
+    /**
+     * Click the lock toggle
+     */
+    public function clickLockToggle(): void
+    {
+        $this->tester->click(self::ELEMENT_LOCK_TOGGLE);
+    }
+
+    /**
+     * Click the component settings
+     */
+    public function clickComponentSettings(): void
+    {
+        $this->tester->click(self::ELEMENT_COMPONENT_SETTINGS);
+    }
+
+    /**
+     * type a heading text
+     * @param string $headingText
+     * @return $this
+     */
+    public function typeTextBoxHeading(string $headingText): self
+    {
+        $this->tester->fillField(self::ELEMENT_COMPONENT_EDIT_HEADING, $headingText);
+        return $this;
+    }
+
+    /**
+     * uncheck the component checkbox: collapse, showComponentTitle
+     * @param int $id
+     * @param string $componentElement
+     */
+    public function uncheckComponentCheckbox(int $id, string $componentElement): void
+    {
+        $this->tester->uncheckOption('#component' . $id . '-' . $componentElement);
+    }
+
+    /**
+     * check the component checkbox: collapse, showComponentTitle
+     */
+    public function checkComponentCheckbox(int $id, string $componentElement): void
+    {
+        $this->tester->checkOption('#component' . $id . '-' . $componentElement);
     }
 }

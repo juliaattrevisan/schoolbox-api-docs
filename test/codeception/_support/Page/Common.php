@@ -7,20 +7,28 @@
  * Time: 11:44 AM
  */
 
+declare(strict_types=1);
+
 namespace Page;
+
+use AcceptanceTester;
 
 class Common
 {
-    //legacy data
-    public const USER_ZANE = 'Mr Zane Smith';
-    public const USER_ID_ZANE = 151;
-    public const USER_RACHEL = 'Rachel Rhodes';
-    public const USER_ID_RACHEL = 229;
-    public const USER_DAVID = 'David Rhodes';
-    public const USER_ID_DAVID = 230;
+    /**
+     * @var AcceptanceTester
+     */
+    protected $tester;
 
-    public const CLASS_CHEMISTRY_1_3 = 'Chemistry 1 3';
-    public const CLASS_ID_CHEMISTRY_1_3 = 176;
+    /**
+     * Constructor
+     *
+     * @param AcceptanceTester $i
+     */
+    public function __construct(AcceptanceTester $i)
+    {
+        $this->tester = $i;
+    }
 
     //sales data
     public const USER_JACKCOLES = 'Mr Jack Coles';
@@ -52,6 +60,12 @@ class Common
      * Top menu selector. This is where the configurable top menu items go.
      */
     public const ELEMENT_TOP_MENU = '#top-menu';
+
+    /**
+     * Search icon selector
+     */
+    public const SEARCH_ICON = 'label.icon-search.no-text';
+
 
     /**
      * Search field selector; used as a text input for site searches.
@@ -116,5 +130,27 @@ class Common
         $name = str_replace(['Mr ', 'Mrs '], '', $fullname);
         $parts = explode(' ', $name);
         return $parts[1] . ', ' . $parts[0];
+    }
+
+    /**
+     * search by typing a text in the search bar
+     * @param string $text
+     * @return $this
+     */
+    public function search(string $text): self
+    {
+        $this->tester->click(self::SEARCH_ICON);
+        $this->tester->fillField(self::ELEMENT_SEARCH, $text);
+        $this->tester->click(self::SEARCH_ICON);
+        return $this;
+    }
+
+    /**
+     * click a section in the search results:
+     * all, file, folder, textbox
+     */
+    public function clickSearchResultsSection(string $tabOption): void
+    {
+        $this->tester->click('a[data-section="' . $tabOption . '"]');
     }
 }
