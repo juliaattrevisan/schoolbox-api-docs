@@ -582,7 +582,9 @@ class Healthcheck
             }
             $this->selectTest($allPastoralTables);
             $this->insertTest($writablePastoralTables);
-            $this->deleteTest($writablePastoralTables);
+            if ($this->configMapper->get(ConfigMapper::NAME_PASTORAL_EXTERNAL_DELETE)) {
+                $this->deleteTest($writablePastoralTables);
+            }
         }
 
         $tables = array_merge($tables, $this->customUPSTest());

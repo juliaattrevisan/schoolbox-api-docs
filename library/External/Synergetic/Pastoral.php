@@ -1066,7 +1066,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
     public function deletePastoral(Pastoral $pastoral): bool
     {
         // Option to delete pastoral records from Synergetic has to be explicitly allowed in the schools configuration
-        if ($this->config->get('pastoral_external_delete')) {
+        if ($this->config->get(ConfigMapper::NAME_PASTORAL_EXTERNAL_DELETE)) {
             // Make sure the pastoral record has a valid external ID
             if ($this->isExternalIdValid($pastoral->getExternalId())) {
                 // These must be done in order due to FK constraints in Synergetic database
