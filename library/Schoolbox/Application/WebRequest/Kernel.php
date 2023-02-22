@@ -107,16 +107,6 @@ class Kernel extends WebKernelAbstract
         // take a copy
         $server = $_SERVER;
 
-        // service-worker.js should just be served as is...
-        if ('/service-worker.js' === $path) {
-            $sw = sprintf("%s%s", $server['DOCUMENT_ROOT'], $path);
-            $content = file_get_contents($sw);
-            header('Content-Type: application/javascript');
-            header('Content-Length: ' . strlen($content));
-            header('Content-Disposition: attachment; filename="' . $sw . '"');
-            echo $content;
-            exit;
-        }
         // check for a method override and act accordingly
         if (!empty($server['HTTP_X_HTTP_METHOD_OVERRIDE'])) {
             $server['REQUEST_METHOD'] = strtoupper($server['HTTP_X_HTTP_METHOD_OVERRIDE']);

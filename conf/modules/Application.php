@@ -22,7 +22,6 @@ class Application extends ModuleLoader
         $this->loadModule($di, Schoolbox\Application\Login\Module::class, '/login');
         $this->loadModule($di, Schoolbox\Application\Feedback\Module::class, '/feedback');
         $this->loadModule($di, Schoolbox\Application\Policy\Module::class, '/policy');
-        $this->loadModule($di, Schoolbox\Application\Manifest\Module::class, '/manifest');
-
+        $this->loadModule($di, Schoolbox\Application\Manifest\Module::class, '/');
     }
 }

@@ -12,7 +12,6 @@ use Schoolbox\MobileApp\ServiceMapper;
 
 class Controller extends Base
 {
-
     /**
      * @var ServiceMapper
      */
@@ -37,9 +36,9 @@ class Controller extends Base
 
 
     /**
-     * Schoolbox policy page, can be accessed with and without a session
-     * @api   GET /policy
-     * @since 18.2
+     * Schoolbox PWA manifest file, can be accessed with and without a session
+     * @api   GET /manifest
+     * @since 23.0
      *
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
@@ -109,14 +108,13 @@ class Controller extends Base
 
         $serviceList = $this->serviceMapper->findAll();
 
-        if(count($serviceList)) {
+        if (count($serviceList)) {
             $manifest['prefer_related_applications'] = true;
-            foreach($serviceList as $application) {
-
+            foreach ($serviceList as $application) {
                 $url = '';
 
-                if($application->getProviderName() === 'GCM') {
-                    $url = 'https://play.google.com/store/apps/details?id='.$application->getAppIdentifier();
+                if ($application->getProviderName() === 'GCM') {
+                    $url = 'https://play.google.com/store/apps/details?id=' . $application->getAppIdentifier();
                 }
 
                 $manifest['related_applications'][] = [
@@ -130,8 +128,34 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildJsonOutput($manifest));
     }
 
+    /**
+     * Schoolbox PWA offline page, can be accessed with and without a session
+     * @api   GET /manifest/offline
+     * @since 23.0
+     *
+     * @return void
+     */
     public function getOffline(): void
     {
         $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@manifest/offline.twig', []));
+    }
+
+    /**
+     * Schoolbox PWA service worker file, can be accessed with and without a session
+     *
+     * This needs to exist as close to the web root as it can, so it can service the full system (everything below it)
+     * We also need to use the `CDN_PREFIX` to link to the correct fail whale image
+     *
+     * @see https://web.dev/learn/pwa/service-workers/#scope
+     *
+     * @api   GET /service-worker.js
+     * @since 23.0
+     *
+     * @return void
+     */
+    public function getServiceWorker(): void
+    {
+        $this->getResponse()->headers->set('Content-Type', 'application/javascript');
+        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@manifest/service-worker.js', []));
     }
 }

@@ -26,8 +26,9 @@ class Module extends BaseModule
      */
     protected function registerRoutes()
     {
-        $this->register('GET', '', 'getManifest', null, null);
-        $this->register('GET', '/offline', 'getOffline', null, null);
+        $this->register('GET', 'manifest', 'getManifest', null, null);
+        $this->register('GET', 'manifest/offline', 'getOffline', null, null);
+        $this->register('GET', 'service-worker.js', 'getServiceWorker', null, null);
     }
 
 
