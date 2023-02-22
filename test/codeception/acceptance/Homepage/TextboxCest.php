@@ -8,7 +8,6 @@
 namespace Homepage;
 
 use AcceptanceTester;
-use Codeception\Util\Locator;
 use Page\Common;
 use Page\Folder\CreateFolder;
 use Page\Homepage;
@@ -154,8 +153,6 @@ class TextboxCest
     public function textboxVisibility(AcceptanceTester $i, Homepage $homepage, Homepage\TextboxForm $textboxForm): void
     {
         $i->loginAsAdmin();
-        $createFolder = new createFolder($i);
-        $resources = new Resources($i);
         $folderName = "Test TextBox Homepage";
         $common = new Common($i);
         $manageAll = new ManageAllTextbox($i);

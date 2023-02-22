@@ -20,6 +20,7 @@ class GroupPermissionCest
      */
     public function _before(AcceptanceTester $i)
     {
+        $i->amGoingTo('Get logged in and navigate to learninng/badge page');
         $i->logout();
         $i->loginAsAdmin();
         $createFolder = new createFolder($i);
@@ -49,16 +50,17 @@ class GroupPermissionCest
         $studentMiddle = 'Louisa Smith';
         $studentSenior = 'Tim Reed';
 
+        $i->amGoingTo('create a group with write permission to teachers');
         $createFolder->typeName($folderName);
         $createFolder->setHomepageTemplate($homepageTemplateOption);
         $createFolder->setAccessPermission('groupWrite1');
         $createFolder->setAccessPermission('groupWrite2');
-        //senior student write permission
+        $i->amGoingTo('set write permission to senior student');
         $createFolder->setAccessPermission('groupWrite3');
         $createFolder->setAccessPermission('groupWrite4');
-        //junior student read permission
+        $i->amGoingTo('set write permission to junior student');
         $createFolder->setAccessPermission('groupRead5');
-        //middle student none permission
+        $i->amGoingTo('set none permission to middle student');
         $createFolder->setAccessPermission('groupNone6');
         $createFolder->clickCreateGroupToggle();
         $createFolder->clickCreateFolderButton();
@@ -67,17 +69,17 @@ class GroupPermissionCest
         $manageGroup->setAccessPermission('type-3');
         $manageGroup->clickUpdateButton();
 
-        //getting logged in as a junior student to check the group is presented to them
+        $i->amGoingTo('get logged in as a junior student to check the group is presented to them');
         $i->impersonate($studentJunior);
         $i->amOnUrl('https://vagrant.dev.schoolbox.cloud/groups#groups-i-can-join');
         $i->canSee('Group Free');
 
-        //getting logged in as a middle student to check the group is NOT presented to them
+        $i->amGoingTo('get logged in as a middle student to check the group is NOT presented to them');
         $i->impersonateViaModifyUserPage($studentMiddle);
         $i->amOnUrl('https://vagrant.dev.schoolbox.cloud/groups#groups-i-can-join');
         $i->cantSee('Group Free');
 
-        //getting logged in as a senior student to check the group is presented to them
+        $i->amGoingTo('get logged in as a senior student to check the group is presented to them');
         $i->impersonateViaModifyUserPage($studentSenior);
         $i->amOnUrl('https://vagrant.dev.schoolbox.cloud/groups#groups-i-can-join');
         $i->canSee('Group Free');
@@ -105,16 +107,17 @@ class GroupPermissionCest
         $studentMiddle = 'Louisa Smith';
         $studentSenior = 'Tim Reed';
 
+        $i->amGoingTo('create a group with write permission to teachers');
         $createFolder->typeName($folderName);
         $createFolder->setHomepageTemplate($homepageTemplateOption);
         $createFolder->setAccessPermission('groupWrite1');
         $createFolder->setAccessPermission('groupWrite2');
-        //senior student write permission
+        $i->amGoingTo('set write permission to senior student');
         $createFolder->setAccessPermission('groupWrite3');
         $createFolder->setAccessPermission('groupWrite4');
-        //junior student read permission
+        $i->amGoingTo('set read permission to junior student');
         $createFolder->setAccessPermission('groupRead5');
-        //middle student none permission
+        $i->amGoingTo('set none permission to middle student');
         $createFolder->setAccessPermission('groupNone6');
         $createFolder->clickCreateGroupToggle();
         $createFolder->clickCreateFolderButton();
@@ -123,17 +126,17 @@ class GroupPermissionCest
         $manageGroup->setAccessPermission('type-2');
         $manageGroup->clickUpdateButton();
 
-        //getting logged in as a junior student to check the group is presented to them
+        $i->amGoingTo('get logged in as a junior student to check the group is presented to them');
         $i->impersonate($studentJunior);
         $i->amOnUrl('https://vagrant.dev.schoolbox.cloud/groups#groups-i-can-join');
         $i->canSee('Group Moderated');
 
-        //getting logged in as a middle student to check the group is NOT presented to them
+        $i->amGoingTo('get  logged in as a middle student to check the group is NOT presented to them');
         $i->impersonateViaModifyUserPage($studentMiddle);
         $i->amOnUrl('https://vagrant.dev.schoolbox.cloud/groups#groups-i-can-join');
         $i->cantSee('Group Moderated');
 
-        //getting logged in as a senior student to check the group is presented to them
+        $i->amGoingTo('get  logged in as a senior student to check the group is presented to them');
         $i->impersonateViaModifyUserPage($studentSenior);
         $i->amOnUrl('https://vagrant.dev.schoolbox.cloud/groups#groups-i-can-join');
         $i->canSee('Group Moderated');
@@ -161,16 +164,17 @@ class GroupPermissionCest
         $studentMiddle = 'Louisa Smith';
         $studentSenior = 'Tim Reed';
 
+        $i->amGoingTo('create a group with write permission to teachers');
         $createFolder->typeName($folderName);
         $createFolder->setHomepageTemplate($homepageTemplateOption);
         $createFolder->setAccessPermission('groupWrite1');
         $createFolder->setAccessPermission('groupWrite2');
-        //senior student write permission
+        $i->amGoingTo('set write permission to senior student');
         $createFolder->setAccessPermission('groupWrite3');
         $createFolder->setAccessPermission('groupWrite4');
-        //junior student read permission
+        $i->amGoingTo('set read permission to jjunior student');
         $createFolder->setAccessPermission('groupRead5');
-        //middle student none permission
+        $i->amGoingTo('set none permission to middle student');
         $createFolder->setAccessPermission('groupNone6');
         $createFolder->clickCreateGroupToggle();
         $createFolder->clickCreateFolderButton();
@@ -179,17 +183,17 @@ class GroupPermissionCest
         $manageGroup->setAccessPermission('type-1');
         $manageGroup->clickUpdateButton();
 
-        //getting logged in as a junior student to check the group is NOT presented to them
+        $i->amGoingTo('get logged in as a junior student to check the group is NOT presented to them');
         $i->impersonate($studentJunior);
         $i->amOnUrl('https://vagrant.dev.schoolbox.cloud/groups#groups-i-can-join');
         $i->cantSee('Group Restricted');
 
-        //getting logged in as a middle student to check the group is NOT presented to them
+        $i->amGoingTo('get logged in as a middle student to check the group is NOT presented to them');
         $i->impersonateViaModifyUserPage($studentMiddle);
         $i->amOnUrl('https://vagrant.dev.schoolbox.cloud/groups#groups-i-can-join');
         $i->cantSee('Group Restricted');
 
-        //getting logged in as a senior student to check the group is NOT presented to them
+        $i->amGoingTo('get logged in as a senior student to check the group is NOT presented to them');
         $i->impersonateViaModifyUserPage($studentSenior);
         $i->amOnUrl('https://vagrant.dev.schoolbox.cloud/groups#groups-i-can-join');
         $i->cantSee('Group Restricted');
