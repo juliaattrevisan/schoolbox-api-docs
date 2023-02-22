@@ -37,7 +37,7 @@ class Controller extends Component_Homepage_ControllerAbstract
             'folder' => $this->getSource(),
             'key' => $this->getUser()->getKey(),
             'referrer' => News\Statistics\Mapper::REFERRER_HOMEPAGE,
-            'readonly' => $this->getContextPermission() < UserAccess::ACCESS_WRITE
+            'readonly' => $this->getContentPermission() < UserAccess::ACCESS_WRITE
         ]);
     }
 }
