@@ -33,9 +33,15 @@ $app = new class extends CliTool\App {
         ],
         [
             'name'        => 'tigs_crp_work_type_year_12_term_%d_learning_profile',
+            'title'       => 'Work Type: Learning Profile Year 12, Term %d (previous year)',
+            'description' => 'Work type to use for the Learning Profile for year 12, term %d (previous year)',
+            'terms'       => [4],
+        ],
+        [
+            'name'        => 'tigs_crp_work_type_year_12_term_%d_learning_profile',
             'title'       => 'Work Type: Learning Profile Year 12, Term %d',
             'description' => 'Work type to use for the Learning Profile for year 12, term %d',
-            'terms'       => [1, 2, 3, 4],
+            'terms'       => [1, 2, 3],
         ],
     ];
 
