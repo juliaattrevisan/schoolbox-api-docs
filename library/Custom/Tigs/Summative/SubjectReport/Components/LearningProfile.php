@@ -157,14 +157,15 @@ class LearningProfile extends BaseComponent
             foreach ($markedGrid->getCapabilityMarks() as $capabilityMark) {
                 $capabilityName = $capabilityMark->getCapabilityUsage()->getCapability()->getName();
                 if ($capabilityName === self::CAPABILITY_NAME) {
-                    foreach ($capabilityMark->getIndicatorMarks() as $indicatorMark) {
+                    foreach ($capabilityMark->getCapabilityUsage()->getIndicatorUsages() as $indicatorUsage) {
+                        $indicatorMark = $capabilityMark->retrieveIndicatorMark($indicatorUsage);
                         $capabilityMarks ??= [];
                         $capabilityMarks[] = [
-                            'id'   => $indicatorMark->getIndicatorUsage()->getIndicator()->getId(),
-                            'name' => $indicatorMark->getIndicatorUsage()->getIndicator()->getName(),
+                            'id'   => $indicatorUsage->getIndicator()->getId(),
+                            'name' => $indicatorUsage->getIndicator()->getName(),
                             'descriptor' => [
-                                'id'   => $indicatorMark->getDescriptor()->getId(),
-                                'name' => $indicatorMark->getDescriptor()->getDescription(),
+                                'id'   => $indicatorMark?->getDescriptor()->getId(),
+                                'name' => $indicatorMark?->getDescriptor()->getDescription(),
                             ]
                         ];
                     }
