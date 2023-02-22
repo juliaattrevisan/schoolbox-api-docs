@@ -52,7 +52,9 @@
                 new CustomEvent("colourPickerInitialize", {
                     detail: {
                         target: `#${el.id}`,
-                        options: {}
+                        options: {
+                            format: "rgb",
+                        }
                     }
                 })
             )
