@@ -64,7 +64,9 @@ class Component_Eportfolio_ImageListController extends Component_Eportfolio_Cont
             foreach ($allImages as $currentImage) {
                 $this->setVar(array(
                     'IMAGE_ID' => $currentImage->getFileId(),
-                    'IMAGE_DESCRIPTION' => Scrub::text('')
+                    'IMAGE_DESCRIPTION' => Scrub::text(''),
+                    'IMAGE_HEIGHT' => $this->getConfig('pixel') ? $this->getConfig('pixel') : Config::get('thumbnail_size'),
+                    'IMAGE_WIDTH' => $this->getConfig('pixel') ? $this->getConfig('pixel') : Config::get('thumbnail_size'),
                 ));
 
                 $this->parse('list_item_block', 'list_item', true);
