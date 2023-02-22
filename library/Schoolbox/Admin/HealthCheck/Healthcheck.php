@@ -563,6 +563,8 @@ class Healthcheck
         // Pastoral care tables (only if module enabled).
         if ($this->configMapper->get(ConfigMapper::NAME_PASTORAL_ENABLED)) {
             $allPastoralTables = [
+                'luPastoralCareCategory',
+                'luPastoralCareType',
                 'PastoralCareComments',
                 'PastoralCareContacts',
                 'PastoralCareActions',
@@ -580,6 +582,9 @@ class Healthcheck
             }
             $this->selectTest($allPastoralTables);
             $this->insertTest($writablePastoralTables);
+            if ($this->configMapper->get(ConfigMapper::NAME_PASTORAL_EXTERNAL_DELETE)) {
+                $this->deleteTest($writablePastoralTables);
+            }
         }
 
         $tables = array_merge($tables, $this->customUPSTest());
