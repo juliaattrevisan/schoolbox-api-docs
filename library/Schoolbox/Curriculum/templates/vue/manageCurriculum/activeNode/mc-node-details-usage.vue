@@ -20,6 +20,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const emit = defineEmits(["select"]);
 
 /**
  * To get the icon for the usage
@@ -31,11 +32,27 @@ const badgeIcon = computed(() => {
     }
     return getUsageIcon(props.usage.discriminator);
 });
+
+/**
+ * dispatch to parent so can either navigate to another page
+ * or open the badge modal
+ */
+function onSelect() {
+    if (props.usage.discriminator === ActivityTypes.BADGE) {
+        emit("select", props.usage);
+    }
+}
 </script>
 
 <template>
     <li class="usage">
-        <a :href="`${getUsageHref(props.usage)}`" :title="props.usage.object.title">
+        <a
+            :href="props.usage.discriminator === ActivityTypes.BADGE ? null : getUsageHref(props.usage)"
+            :title="
+                props.usage.discriminator === ActivityTypes.BADGE ? props.usage.object.name : props.usage.object.title
+            "
+            @click="onSelect"
+        >
             <div class="usage__container">
                 <div v-if="props.usage.discriminator === ActivityTypes.BADGE" class="usage__badge-container">
                     <badge-image :badge="props.usage.object" css="badge"></badge-image>

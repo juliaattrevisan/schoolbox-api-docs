@@ -3,15 +3,15 @@
  * to view a nodes description and all the places the node is used
  */
 
-import { computed } from "vue";
-import type { Usage } from "@schoolboxCurriculum/types/Node";
+import { ref, computed } from "vue";
+import type { BadgeUsageObject, Usage } from "@schoolboxCurriculum/types/Node";
 import { ActivityTypes } from "@schoolboxCurriculum/types/Node";
-import { getSpecificUsages } from "@schoolboxCurriculum/js/nodeUtils";
+import { getSpecificUsages, getUsageHref } from "@schoolboxCurriculum/js/nodeUtils";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
+import BadgeModal from "@schoolboxBadge/vue/badge-modal";
 import { useActiveNodeStore } from "./store/mcActiveNodeStore";
 import { useNodeDetailsStore } from "./store/mcNodeDetailsStore";
 import McNodeDetailsUsage from "./mc-node-details-usage.vue";
-import BadgeModal from "@schoolboxBadge/vue/badge-modal";
 
 interface Props {
     depth: number; // to gradually add more marginLeft to indicate node level depth
@@ -20,6 +20,8 @@ interface Props {
 const props = defineProps<Props>();
 const activeNodeStore = useActiveNodeStore();
 const nodeDetailsStore = useNodeDetailsStore();
+const isBadgeModalOpen = ref(false); // whether the modal to display the badge details is open
+const currentBadge = ref<BadgeUsageObject | null>(null); // the badge to display in the modal when a badge usage is selected
 
 /**
  * to gradually and more marginLeft to indicate node level depth
@@ -29,7 +31,7 @@ const nodeDetailsStore = useNodeDetailsStore();
 const marginLeft = computed(() => `calc(${props.depth * 2}rem)`);
 
 /**
- * Whether we should show the usage list
+ * Whether we should show the usage lists
  *
  * @returns { boolean }
  */
@@ -38,11 +40,13 @@ const hasUsage = computed(() => {
 });
 
 /**
- * Reload the page to try loading again
+ * An activity to display in the usage list
  */
-function onRefreshSelected() {
-    location.reload();
-}
+type ActiveUsageType = {
+    title: string;
+    count: number;
+    usages: Usage[];
+};
 
 /**
  * Return the list of active usages, grouped by type
@@ -50,7 +54,7 @@ function onRefreshSelected() {
  * @returns { Array }
  */
 const activeUsages = computed(() => {
-    const usages = [];
+    const usages: ActiveUsageType[] = [];
     if (activeNodeStore.node._usageCounts.course > 0) {
         usages.push({
             title: "Courses",
@@ -81,6 +85,40 @@ const activeUsages = computed(() => {
     }
     return usages;
 });
+
+/**
+ * Reload the page to try loading again
+ */
+function onRefreshSelected() {
+    window.location.reload();
+}
+
+/**
+ * Opens a modal window for viewing this badge's full details.
+ *
+ * @param { BadgeUsageObject } badge - the badge to display
+ */
+function openDetailModal(badge: BadgeUsageObject) {
+    currentBadge.value = badge;
+    isBadgeModalOpen.value = true;
+}
+
+/**
+ * Open a new page or open the badge modal
+ *
+ * @param { Usage } usage - the selected usage
+ */
+function onUsageSelected(usage: Usage) {
+    openDetailModal(usage.object as BadgeUsageObject);
+}
+
+/**
+ * the badge modal is closed, so we should set the boolean to
+ * false so we can open it again
+ */
+function onDetailModalClosed() {
+    isBadgeModalOpen.value = false;
+}
 </script>
 
 <template>
@@ -108,12 +146,14 @@ const activeUsages = computed(() => {
                                 v-for="(usage, index) in activeUsage.usages"
                                 :key="index"
                                 :usage="usage"
+                                @select="onUsageSelected"
                             />
                         </ul>
                     </div>
                 </div>
             </fieldset>
         </section>
+        <badge-modal :is-open="isBadgeModalOpen" :badge="currentBadge" @closed="onDetailModalClosed" />
     </div>
 </template>
 
