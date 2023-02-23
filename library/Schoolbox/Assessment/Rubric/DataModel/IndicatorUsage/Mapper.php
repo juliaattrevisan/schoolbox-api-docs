@@ -36,6 +36,9 @@ class Mapper extends BaseMapper
     }
 
     /**
+     * Switches off this usage's due work's rubric if there are no remaining
+     * usages of any indicator for this due work.
+     *
      * @param Model $indicatorUsage
      */
     public function toggleUseRubric(Model $indicatorUsage)

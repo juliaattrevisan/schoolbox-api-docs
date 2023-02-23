@@ -202,7 +202,12 @@ class Mapper extends BaseMapper
      */
     public function deleteUsages(Model $indicator): void
     {
-        IndicatorUsageMapper::getInstance()->deleteByColumn('rubric_indicator_id', $indicator->getId());
+        $usageMapper = IndicatorUsageMapper::getInstance();
+        $usages      = $usageMapper->findByColumn('rubric_indicator_id', $indicator->getId());
+        $usageMapper->delete($usages);
+        foreach ($usages as $usage) {
+            $usageMapper->toggleUseRubric($usage);
+        }
     }
 
 
