@@ -167,6 +167,8 @@ class Controller extends Base
             }
         }
 
+        // Don't store to the history
+        $this->setAllowBackToTheFuture(false);
         $this->getResponse()->content->set($this->buildJsonOutput($manifest));
     }
 
@@ -197,6 +199,8 @@ class Controller extends Base
      */
     public function getServiceWorker(): void
     {
+        // Don't store to the history
+        $this->setAllowBackToTheFuture(false);
         $this->getResponse()->headers->set('Content-Type', 'application/javascript');
         $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@manifest/service-worker.js', []));
     }
