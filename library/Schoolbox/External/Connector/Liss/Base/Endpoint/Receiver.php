@@ -381,9 +381,9 @@ class Receiver
     public function hello(Request $message): Response
     {
         $message = new Value([
-            'SIS'         => new Value(self::AGENT_NAME, 'string'),
-            'LissVersion' => new Value(self::LISS_VERSION, 'int'),
-        ], 'struct');
+            'SIS'         => new Value(self::AGENT_NAME, Value::$xmlrpcString),
+            'LissVersion' => new Value(self::LISS_VERSION, Value::$xmlrpcInt),
+        ], Value::$xmlrpcStruct);
         return new Response($message);
     }
 
