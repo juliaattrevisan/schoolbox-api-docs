@@ -42,7 +42,6 @@ function onRemoveSelected() {
             class="remove-button icon-close"
             :title="`Remove ${props.result.name}`"
             @click.prevent="onRemoveSelected"
-            @keyup.enter="onRemoveSelected"
         ></button>
     </div>
 </template>

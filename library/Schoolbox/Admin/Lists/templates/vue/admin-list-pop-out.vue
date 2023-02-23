@@ -178,7 +178,6 @@ export default {
                 href="#close-pop-out"
                 class="close-button icon-close"
                 @click.prevent="onCloseSelected"
-                @keyup.enter="onCloseSelected"
                 :disabled="saveRows_isProcessing"
                 title="close pop out"
             ></button>
@@ -206,7 +205,7 @@ export default {
                     >
                 </li>
             </ul>
-            <button @click.prevent="saveRows_onSaveSelected" @keyup.enter="saveRows_onSaveSelected" class="save-button">
+            <button @click.prevent="saveRows_onSaveSelected" class="save-button">
                 {{ saveRows_saveStatus }} {{ headerField.caption }}
             </button>
         </div>

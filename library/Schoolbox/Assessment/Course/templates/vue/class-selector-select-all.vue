@@ -43,7 +43,7 @@ function onSelectAll() {
 </script>
 
 <template>
-    <button class="search-result" @click.prevent="onSelectAll" @keyup.enter="onSelectAll">
+    <button class="search-result" @click.prevent="onSelectAll">
         <div class="checklist">
             <input
                 id="checkbox-select-all"

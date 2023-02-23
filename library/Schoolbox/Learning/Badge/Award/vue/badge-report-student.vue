@@ -221,7 +221,6 @@ export default {
                         <a
                             href="#open-award-modal"
                             @click.prevent="badgeSelected(award)"
-                            @keyup.enter="badgeSelected(award)"
                             :title="award.badge.name"
                         >
                             <div class="award__container">

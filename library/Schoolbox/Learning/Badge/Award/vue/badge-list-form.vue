@@ -445,14 +445,13 @@ export default {
                 <li>
                     <button
                         @click.prevent="onClearSelectedBadges"
-                        @keyup.enter="onClearSelectedBadges"
                         class="button-clear"
                     >
                         Clear selection
                     </button>
                 </li>
                 <li>
-                    <button @click.prevent="onConfirmSelected" @keyup.enter="onConfirmSelected" class="submit">
+                    <button @click.prevent="onConfirmSelected" class="submit">
                         {{ confirmButtonText }}
                     </button>
                 </li>
@@ -500,7 +499,6 @@ export default {
                         :title="submitButtonText"
                         :isProcessing="isProcessing"
                         @click.prevent="onSubmit"
-                        @keyup.enter="onSubmit"
                     >
                         {{ submitButtonText }}
                     </button>

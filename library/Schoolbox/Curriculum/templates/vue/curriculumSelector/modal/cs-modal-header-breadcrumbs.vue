@@ -28,7 +28,6 @@ function onSelected(depth, id) {
                 :href="`/curriculum/#${breadcrumb.id}`"
                 :title="`View ${breadcrumb.name}`"
                 @click.prevent="onSelected(breadcrumb.depth, breadcrumb.id)"
-                @keyup.enter="onSelected(breadcrumb.depth, breadcrumb.id)"
             >
                 {{ shortenLength(breadcrumb.name, maxNameLength) }}
             </a>

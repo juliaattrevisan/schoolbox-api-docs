@@ -59,7 +59,6 @@ async function onLeave(el, done) {
                     :class="`icon ${addCurriculumStore.isOpen ? 'icon-close' : 'icon-add'}`"
                     title="Create New Curriculum"
                     @click.prevent="onCreateNewSelected"
-                    @keyup.enter="onCreateNewSelected"
                 >
                 </a>
                 <a href="/curriculum/import" class="icon icon-upload" title="Import Curriculum"></a>

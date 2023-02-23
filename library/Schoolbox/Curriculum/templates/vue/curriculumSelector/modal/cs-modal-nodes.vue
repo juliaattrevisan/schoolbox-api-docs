@@ -52,7 +52,6 @@ watch(
         <p>No Curriculum matches your current search.</p>
         <button
             @click.prevent="onClearSearchSelected"
-            @keyup.enter="onClearSearchSelected"
             title="Clear the current search"
         >
             Clear search

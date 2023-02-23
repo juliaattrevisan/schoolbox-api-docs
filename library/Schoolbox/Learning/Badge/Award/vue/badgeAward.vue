@@ -350,7 +350,7 @@ export default {
                 >
                     Award with Evidence
                 </a>
-                <button :disabled="isSubmitButtonDisabled" @click.prevent="onSubmit" @keyup.enter="onSubmit">
+                <button :disabled="isSubmitButtonDisabled" @click.prevent="onSubmit">
                     <slot name="confirmButton">Award</slot>
                 </button>
             </section>

@@ -83,7 +83,7 @@ function onSelected() {
 </script>
 
 <template>
-    <button class="search-result" :title="title" @click.prevent="onSelected" @keyup.enter="onSelected">
+    <button class="search-result" :title="title" @click.prevent="onSelected">
         <div class="checklist">
             <input :id="`checkbox-${result.id}`" type="checkbox" :checked="isNodeSelected" />
             <label :for="`checkbox-${result.id}`"></label>

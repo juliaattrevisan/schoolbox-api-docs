@@ -58,7 +58,6 @@ function onRemoveSelected() {
             :title="`View ${props.node.name}`"
             :disabled="isDisabled"
             @click.prevent="onTitleSelected"
-            @keyup.enter="onTitleSelected"
             data-test-title-button
         >
             {{ props.node.code }}
@@ -69,7 +68,6 @@ function onRemoveSelected() {
             class="remove-button icon-close"
             :title="`Remove ${props.node.name}`"
             @click.prevent="onRemoveSelected"
-            @keyup.enter="onRemoveSelected"
             data-test-remove-button
         ></button>
     </div>

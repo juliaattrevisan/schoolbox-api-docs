@@ -274,7 +274,7 @@ export default {
                 possible please upgrade your browser.
             </div>
             <div v-else class="alert-box alert">Sorry, an unknown error has occured.</div>
-            <button @click.prevent="onCloseErrorModalSelected" @keyup.enter="onCloseErrorModalSelected">Close</button>
+            <button @click.prevent="onCloseErrorModalSelected">Close</button>
         </over-media-modal>
     </div>
 </template>

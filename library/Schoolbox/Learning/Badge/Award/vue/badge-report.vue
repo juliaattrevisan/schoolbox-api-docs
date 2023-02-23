@@ -261,7 +261,6 @@ export default {
             </h3>
             <button
                 @click.prevent="onClearStudentSelection"
-                @keyup.enter="onClearStudentSelection"
                 class="button-clear"
             >
                 Clear selection

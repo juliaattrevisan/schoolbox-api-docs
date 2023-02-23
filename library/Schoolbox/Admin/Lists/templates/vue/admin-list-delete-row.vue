@@ -114,7 +114,6 @@ export default {
                 <li>
                     <a
                         @click.prevent="onConfirmDeleteRowSelected"
-                        @keyup.enter="onConfirmDeleteRowSelected"
                         class="button submit"
                         >Yes</a
                     >
@@ -122,7 +121,6 @@ export default {
                 <li>
                     <a
                         @click.prevent="onCancelDeleteRowSelected"
-                        @keyup.enter="onCancelDeleteRowSelected"
                         class="button"
                         >Cancel</a
                     >

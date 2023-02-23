@@ -227,7 +227,6 @@ export default {
                 class="button"
                 :disabled="currentXPos >= 0"
                 @click.prevent="onPreviousButtonSelected"
-                @keyup.enter="onPreviousButtonSelected"
             >
                 &lt;
             </button>
@@ -245,7 +244,6 @@ export default {
                 class="button"
                 :disabled="currentXPos <= minX"
                 @click.prevent="onNextButtonSelected"
-                @keyup.enter="onNextButtonSelected"
             >
                 &gt;
             </button>

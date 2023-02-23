@@ -761,7 +761,6 @@ export default {
                     type="text"
                     :value="event.title"
                     @change="updateFormSubmittable"
-                    @keyup="updateFormSubmittable"
                     maxlength="250"
                 />
 
@@ -772,7 +771,6 @@ export default {
                         name="detail"
                         :value="eventExtendedProps.detail"
                         @change="updateFormSubmittable"
-                        @keyup="updateFormSubmittable"
                     ></textarea>
                 </label>
 

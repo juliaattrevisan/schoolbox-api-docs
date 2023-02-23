@@ -35,7 +35,6 @@ function onSelected() {
             :href="`/curriculum/#${props.breadcrumb.id}`"
             :title="`View ${props.breadcrumb.name}`"
             @click.prevent="onSelected()"
-            @keyup.enter="onSelected()"
         >
             {{ shortenLength(props.breadcrumb.name as string, maxNameLength) }}
         </a>
