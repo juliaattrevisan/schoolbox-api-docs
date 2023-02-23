@@ -56,6 +56,10 @@
                                     </div>
                                 </div>
                                 <nav>
+                                    {# Fudge some accessibility text here later, I guess #}
+                                    {% set enableRoute = '#' %}
+                                    <a class="icon-view" href="{{ enableRoute }}" title="This lesson plan template is enabled"></a>
+
                                     {% if updateRoute %}
                                         <a class="icon-modify" href="{{ updateRoute }}" title="Modify"></a>
                                     {% endif %}
