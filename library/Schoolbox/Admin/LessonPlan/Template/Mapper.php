@@ -47,10 +47,10 @@ class Mapper extends \Schoolbox\Mapper
     /**
      * {@inheritdoc}
      *
-     * @return string|void
+     * @return string
      * @throws \Schoolbox\Mapper\DefinitionException
      */
-    protected function getSelectString()
+    protected function getSelectString(): string
     {
         return "
             SELECT
@@ -74,7 +74,7 @@ class Mapper extends \Schoolbox\Mapper
      * @throws Exception
      * @throws \UnexpectedValueException
      */
-    protected function hydrateSelect(PDOStatement $statement)
+    protected function hydrateSelect(PDOStatement $statement): Model|GenericCollection
     {
         $collection = $this->createCollection();
 
