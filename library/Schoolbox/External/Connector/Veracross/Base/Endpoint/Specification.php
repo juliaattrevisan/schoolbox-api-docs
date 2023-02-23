@@ -207,7 +207,6 @@ class Specification
                     ];
                 }
             ],
-
         ];
 
         $endpoints = [];
