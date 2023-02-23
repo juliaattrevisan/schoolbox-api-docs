@@ -73,21 +73,29 @@ class Mapper extends \Schoolbox\Mapper
                 {$this->getJoinColumnString('recipient.role', 'rr')},
                 {$this->getJoinColumnString('awardedBy', 'a')},
                 {$this->getJoinColumnString('awardedBy.role', 'ar')},
+                {$this->getJoinColumnString('reasonedBy', 'rb')},
+                {$this->getJoinColumnString('reasonedBy.role', 'rbr')},
                 {$this->getJoinColumnString('award', 'aw')},
                 {$this->getJoinColumnString('award.recipient', 'awr')},
                 {$this->getJoinColumnString('award.recipient.role', 'awrr')},
                 {$this->getJoinColumnString('award.awardedBy', 'awa')},
-                {$this->getJoinColumnString('award.awardedBy.role', 'awar')}
+                {$this->getJoinColumnString('award.awardedBy.role', 'awar')},
+                {$this->getJoinColumnString('award.reasonedBy', 'awrb')},
+                {$this->getJoinColumnString('award.reasonedBy.role', 'awrbr')}
             FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
             INNER JOIN {$this->getJoinSql('recipient', '', 'r', true)}
             INNER JOIN {$this->getJoinSql('recipient.role', 'r', 'rr')}
             INNER JOIN {$this->getJoinSql('awardedBy', '', 'a', true)}
             INNER JOIN {$this->getJoinSql('awardedBy.role', 'a', 'ar')}
+            INNER JOIN {$this->getJoinSql('reasonedBy', '', 'rb', true)}
+            INNER JOIN {$this->getJoinSql('reasonedBy.role', 'a', 'rbr')}
             LEFT  JOIN {$this->getJoinSql('award', '', 'aw')}
             LEFT  JOIN {$this->getJoinSql('award.recipient', 'aw', 'awr', true)}
             LEFT  JOIN {$this->getJoinSql('award.recipient.role', 'awr', 'awrr')}
             LEFT  JOIN {$this->getJoinSql('award.awardedBy', 'aw', 'awa', true)}
             LEFT  JOIN {$this->getJoinSql('award.awardedBy.role', 'awa', 'awar')}
+            LEFT  JOIN {$this->getJoinSql('award.reasonedBy', 'aw', 'awrb', true)}
+            LEFT  JOIN {$this->getJoinSql('award.reasonedBy.role', 'awrb', 'awrbr')}
         ";
     }
 
@@ -163,10 +171,24 @@ class Mapper extends \Schoolbox\Mapper
                 $award->setAwardedBy($awardedBy);
             }
 
+            /* Set the $reasonedBy and also their role
+             */
+            $reasonedBy = $this->hydrateJoin($row, 'reasonedBy', 'rb');
+
+            if ($reasonedBy instanceof User) {
+                $role = $this->hydrateJoin($row, 'reasonedBy.role', 'rbr');
+
+                if ($role instanceof Role) {
+                    $reasonedBy->setRole($role);
+                }
+
+                $award->setReasonedBy($reasonedBy);
+            }
+
             $award->setBadge($badgeById[$badgeId]);
 
             // If there is a parent award:
-            // Hydrate it, and its awarded by and recipient
+            // Hydrate it, and its awarded by, reasoned by, and recipient
             if ($row['aw.id']) {
                 $parentAward = $this->hydrateJoin($row, 'award', 'aw');
                 if ($parentAward instanceof Model) {
@@ -177,6 +199,15 @@ class Mapper extends \Schoolbox\Mapper
                             $parentAwardedBy->setRole($parentAwardedByRole);
                         }
                         $parentAward->setAwardedBy($parentAwardedBy);
+                    }
+
+                    $parentReasonedBy = $this->hydrateJoin($row, 'award.reasonedBy', 'awrb');
+                    if ($parentReasonedBy instanceof User) {
+                        $parentReasonedByRole = $this->hydrateJoin($row, 'award.reasonedBy.role', 'awrbr');
+                        if ($parentReasonedByRole instanceof Role) {
+                            $parentReasonedBy->setRole($parentReasonedByRole);
+                        }
+                        $parentAward->setReasonedBy($parentReasonedBy);
                     }
 
                     // Parent recipient will usually be the same as this award's:
