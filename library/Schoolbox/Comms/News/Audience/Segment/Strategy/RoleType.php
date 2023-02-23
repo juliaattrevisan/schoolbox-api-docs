@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
-use Schoolbox\Comms\News\Audience;
 use Schoolbox\Comms\News\Audience\Segment\TranslateSql;
 use Schoolbox\Comms\News\Audience\Segment\UserResolutionSql;
 use Schoolbox\GenericCollection;
@@ -20,7 +19,6 @@ use function in_array;
 
 class RoleType extends SimpleStrategy
 {
-
     public static function getEntityType(): string
     {
         return 'role_type';

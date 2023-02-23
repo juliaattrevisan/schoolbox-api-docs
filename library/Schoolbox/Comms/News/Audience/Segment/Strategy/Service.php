@@ -19,7 +19,6 @@ use function in_array;
 
 class Service extends SimpleStrategy
 {
-
     /**
      * @return string
      */
