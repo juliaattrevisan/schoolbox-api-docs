@@ -148,6 +148,9 @@ abstract class SimpleStrategy implements ISimpleStrategy
 //                $users = User::createCollection()->add($user);
 //                return count(array_intersect($this->getValues($users), $entityValues)) > 0;
             case Audience\Model::RELATIONSHIP_PARENTS_OF:
+                if (!$user->getRole()->isParent()) {
+                    return false;
+                }
                 return $this->isParentInAudienceValues($user, $entityValues);
 //                if (!$user->getRole()->isParent()) {
 //                    return false;
@@ -157,6 +160,9 @@ abstract class SimpleStrategy implements ISimpleStrategy
 //                }
 //                return count(array_intersect($this->getValues($user->getChildren()), $entityValues)) > 0;
             case Audience\Model::RELATIONSHIP_TEACHERS_OF:
+                if (!$user->getRole()->isStaff()) {
+                    return false;
+                }
                 return $this->isTeacherInAudienceValues($user, $entityValues);
 //                if (!$user->getRole()->isStaff()) {
 //                    return false;
@@ -174,6 +180,9 @@ abstract class SimpleStrategy implements ISimpleStrategy
     /**
      * Is the current user in the audience for this strategy?
      *
+     * By default: they are in the audience if `getValues()` returns a value
+     * which is in `$entityValues`
+     *
      * @param User  $user
      * @param array $entityValues
      * @return bool|null
@@ -188,15 +197,15 @@ abstract class SimpleStrategy implements ISimpleStrategy
      * Is the current user in the audience for this strategy, via being the
      * parent of a user in the audience?
      *
+     * By default: they are in the audience if `getValues()` returns a value
+     * which is in `$entityValues` for one of their children.
+     *
      * @param User  $user
      * @param array $entityValues
      * @return bool|null
      */
     protected function isParentInAudienceValues(User $user, array $entityValues): ?bool
     {
-        if (!$user->getRole()->isParent()) {
-            return false;
-        }
         /* Must not hit the DB... ummm is there a different way of doing this?
          * should we put the parents children back into the session/ user object? or cache this somewhere???
         */
@@ -211,21 +220,15 @@ abstract class SimpleStrategy implements ISimpleStrategy
      * Is the current user in the audience for this strategy, via being the
      * teacher of a user in the audience?
      *
+     * By default: they are not checked for whether they are in the audience.
+     * Sub-classes may check if they are in the audience?
+     *
      * @param User  $user
      * @param array $entityValues
      * @return bool|null
      */
     protected function isTeacherInAudienceValues(User $user, array $entityValues): ?bool
     {
-        if (!$user->getRole()->isStaff()) {
-            return false;
-        }
-
-        // TODO check the class
-//        // This teacher's classes are all loaded:
-//        // now load all of their students
-//        $user->getSubjectCollection()->getAll();
-
         return null;
     }
 

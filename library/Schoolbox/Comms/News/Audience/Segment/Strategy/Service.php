@@ -122,25 +122,63 @@ class Service extends SimpleStrategy
     }
 
 
+//    /**
+//     * @inheritDoc
+//     */
+//    public function isUserInAudienceValues(User $user, array $entityValues, string $relationship): ?bool
+//    {
+//        switch ($relationship) {
+//            case Audience\Model::RELATIONSHIP_SELF:
+//                return null;
+//            case Audience\Model::RELATIONSHIP_PARENTS_OF:
+//                if (!$user->getRole()->isParent()) {
+//                    return false;
+//                }
+//                return null;
+//            case Audience\Model::RELATIONSHIP_TEACHERS_OF:
+//                if (!$user->getRole()->isStaff()) {
+//                    return false;
+//                }
+//                return null;
+//        }
+//        return null;
+//    }
+
     /**
-     * @inheritDoc
+     * Users are not checked directly for whether they have service access.
+     *
+     * @param User  $user
+     * @param array $entityValues
+     * @return bool|null
      */
-    public function isUserInAudienceValues(User $user, array $entityValues, string $relationship): ?bool
+    protected function isSelfInAudienceValues(User $user, array $entityValues): ?bool
     {
-        switch ($relationship) {
-            case Audience\Model::RELATIONSHIP_SELF:
-                return null;
-            case Audience\Model::RELATIONSHIP_PARENTS_OF:
-                if (!$user->getRole()->isParent()) {
-                    return false;
-                }
-                return null;
-            case Audience\Model::RELATIONSHIP_TEACHERS_OF:
-                if (!$user->getRole()->isStaff()) {
-                    return false;
-                }
-                return null;
-        }
+        return null;
+    }
+
+    /**
+     * Parents are not checked directly for whether their children have service
+     * access.
+     *
+     * @param User  $user
+     * @param array $entityValues
+     * @return bool|null
+     */
+    protected function isParentInAudienceValues(User $user, array $entityValues): ?bool
+    {
+        return null;
+    }
+
+    /**
+     * Teachers are not checked directly for whether their students have service
+     * access.
+     *
+     * @param User  $user
+     * @param array $entityValues
+     * @return bool|null
+     */
+    protected function isTeacherInAudienceValues(User $user, array $entityValues): ?bool
+    {
         return null;
     }
 }

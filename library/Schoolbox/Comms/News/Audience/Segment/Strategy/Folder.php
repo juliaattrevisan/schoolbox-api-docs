@@ -567,6 +567,14 @@ class Folder extends SimpleStrategy
 //        return null;
 //    }
 
+    /**
+     * Users are in the folder audience if they are a member of the folder via
+     * their list of subjects.
+     *
+     * @param User  $user
+     * @param array $entityValues
+     * @return bool|null
+     */
     protected function isSelfInAudienceValues(User $user, array $entityValues): ?bool
     {
         if ($user->getSubjectCollection() === null) {
@@ -576,11 +584,16 @@ class Folder extends SimpleStrategy
         return count(array_intersect($this->parseSubjectIds($user), $entityValues)) ? true : null;
     }
 
+    /**
+     * Parents are in the folder audience if they are a member of the folder via
+     * one of their children's subjects.
+     *
+     * @param User  $user
+     * @param array $entityValues
+     * @return bool|null
+     */
     protected function isParentInAudienceValues(User $user, array $entityValues): ?bool
     {
-        if (!$user->getRole()->isParent()) {
-            return false;
-        }
         /* Must not hit the DB... ummm is there a different way of doing this?
          * should we put the parents children back into the session/ user object? or cache this somewhere???
         */
@@ -598,15 +611,6 @@ class Folder extends SimpleStrategy
         }
         return null;
     }
-
-    protected function isTeacherInAudienceValues(User $user, array $entityValues): ?bool
-    {
-        if (!$user->getRole()->isStaff()) {
-            return false;
-        }
-        return null;
-    }
-
 
     /**
      * Parse subject/class folder ids from a user's subject collection

@@ -100,25 +100,61 @@ class RoleType extends SimpleStrategy
     }
 
 
+//    /**
+//     * @inheritDoc
+//     */
+//    public function isUserInAudienceValues(User $user, array $entityValues, string $relationship): ?bool
+//    {
+//        switch ($relationship) {
+//            case Audience\Model::RELATIONSHIP_SELF:
+//                return $user->getRole() ? in_array($user->getRole()->getType(), $entityValues, true) : null;
+//            case Audience\Model::RELATIONSHIP_PARENTS_OF:
+//                if (!$user->getRole()->isParent()) {
+//                    return false;
+//                }
+//                return null;
+//            case Audience\Model::RELATIONSHIP_TEACHERS_OF:
+//                if (!$user->getRole()->isStaff()) {
+//                    return false;
+//                }
+//                return null;
+//        }
+//        return null;
+//    }
+
     /**
-     * @inheritDoc
+     * User role types are checked directly.
+     *
+     * @param User  $user
+     * @param array $entityValues
+     * @return bool|null
      */
-    public function isUserInAudienceValues(User $user, array $entityValues, string $relationship): ?bool
+    protected function isSelfInAudienceValues(User $user, array $entityValues): ?bool
     {
-        switch ($relationship) {
-            case Audience\Model::RELATIONSHIP_SELF:
-                return $user->getRole() ? in_array($user->getRole()->getType(), $entityValues, true) : null;
-            case Audience\Model::RELATIONSHIP_PARENTS_OF:
-                if (!$user->getRole()->isParent()) {
-                    return false;
-                }
-                return null;
-            case Audience\Model::RELATIONSHIP_TEACHERS_OF:
-                if (!$user->getRole()->isStaff()) {
-                    return false;
-                }
-                return null;
-        }
+        return $user->getRole() ? in_array($user->getRole()->getType(), $entityValues, true) : null;
+    }
+
+    /**
+     * Parents are not checked for their children's role.
+     *
+     * @param User  $user
+     * @param array $entityValues
+     * @return bool|null
+     */
+    protected function isParentInAudienceValues(User $user, array $entityValues): ?bool
+    {
+        return null;
+    }
+
+    /**
+     * Teachers are not checked for their student's role.
+     *
+     * @param User  $user
+     * @param array $entityValues
+     * @return bool|null
+     */
+    protected function isTeacherInAudienceValues(User $user, array $entityValues): ?bool
+    {
         return null;
     }
 }

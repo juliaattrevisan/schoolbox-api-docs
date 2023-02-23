@@ -107,28 +107,70 @@ class ResHouse extends SimpleStrategy
     }
 
 
+//    /**
+//     * @inheritDoc
+//     */
+//    public function isUserInAudienceValues(User $user, array $entityValues, string $relationship): ?bool
+//    {
+//        switch ($relationship) {
+//            case Audience\Model::RELATIONSHIP_SELF:
+//                if ($user->getResidentialHouse() === null) {
+//                    return self::isValidNullEntityValue() && in_array(null, $entityValues, true);
+//                }
+//                return in_array($user->getResidentialHouse()->getId(), $entityValues, false);
+//            case Audience\Model::RELATIONSHIP_PARENTS_OF:
+//                if (!$user->getRole()->isParent()) {
+//                    return false;
+//                }
+//                return null;
+//            case Audience\Model::RELATIONSHIP_TEACHERS_OF:
+//                if (!$user->getRole()->isStaff()) {
+//                    return false;
+//                }
+//                return null;
+//        }
+//        return null;
+//    }
+
     /**
-     * @inheritDoc
+     * Users are in the residential house audience if they are a member of the
+     * residential house.
+     *
+     * @param User  $user
+     * @param array $entityValues
+     * @return bool|null
      */
-    public function isUserInAudienceValues(User $user, array $entityValues, string $relationship): ?bool
+    protected function isSelfInAudienceValues(User $user, array $entityValues): ?bool
     {
-        switch ($relationship) {
-            case Audience\Model::RELATIONSHIP_SELF:
-                if ($user->getResidentialHouse() === null) {
-                    return self::isValidNullEntityValue() && in_array(null, $entityValues, true);
-                }
-                return in_array($user->getResidentialHouse()->getId(), $entityValues, false);
-            case Audience\Model::RELATIONSHIP_PARENTS_OF:
-                if (!$user->getRole()->isParent()) {
-                    return false;
-                }
-                return null;
-            case Audience\Model::RELATIONSHIP_TEACHERS_OF:
-                if (!$user->getRole()->isStaff()) {
-                    return false;
-                }
-                return null;
+        if ($user->getResidentialHouse() === null) {
+            return self::isValidNullEntityValue() && in_array(null, $entityValues, true);
         }
+        return in_array($user->getResidentialHouse()->getId(), $entityValues, false);
+    }
+
+    /**
+     * Parents are not checked for whether their children are in a residential
+     * house.
+     *
+     * @param User  $user
+     * @param array $entityValues
+     * @return bool|null
+     */
+    protected function isParentInAudienceValues(User $user, array $entityValues): ?bool
+    {
+        return null;
+    }
+
+    /**
+     * Teachers are not checked for whether their students are in a residential
+     * house.
+     *
+     * @param User  $user
+     * @param array $entityValues
+     * @return bool|null
+     */
+    protected function isTeacherInAudienceValues(User $user, array $entityValues): ?bool
+    {
         return null;
     }
 }
