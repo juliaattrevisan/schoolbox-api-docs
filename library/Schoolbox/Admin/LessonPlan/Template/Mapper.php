@@ -10,7 +10,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\LessonPlan\Template;
 
+use PDOStatement;
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 /**
@@ -38,5 +41,81 @@ class Mapper extends \Schoolbox\Mapper
         $this->joins('updated_by', UserMapper::class, 'id', null, null, 'updatedBy', 'updatedBy');
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
         $this->joins('deleted_by', UserMapper::class, 'id', null, null, 'deletedBy', 'deletedBy');
+    }
+
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return string|void
+     * @throws \Schoolbox\Mapper\DefinitionException
+     */
+    protected function getSelectString()
+    {
+        return "
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('createdBy', 'createdBy')},
+                {$this->getJoinColumnString('updatedBy', 'updatedBy')},
+                {$this->getJoinColumnString('deletedBy', 'deletedBy')}
+            FROM {$this->getTable()}
+            INNER JOIN {$this->getJoinSql('createdBy', '', 'createdBy')}
+            INNER JOIN {$this->getJoinSql('updatedBy', '', 'updatedBy')}
+            LEFT JOIN {$this->getJoinSql('deletedBy', '', 'deletedBy')}
+        ";
+    }
+
+
+    /**
+     * Hydrate joins added in `getSelectString`.
+     *
+     * @param PDOStatement $statement
+     * @return GenericCollection|Model
+     * @throws Exception
+     * @throws \UnexpectedValueException
+     */
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        $collection = $this->createCollection();
+
+        foreach ($statement as $row) {
+            $template = $this->hydrate($row);
+
+            /* Arbitrarily died; this shouldn't happen tho
+             */
+            if (!$template) {
+                continue;
+            }
+
+            /* Various effectors
+             *
+             * Not sure how deletedBy gets used yet; may be superfluous
+             * in this contextual usage
+             */
+            /** @var User $createdBy */
+            $createdBy = $this->hydrateJoin($row, 'createdBy', 'createdBy');
+
+            /** @var User $createdBy */
+            $updatedBy = $this->hydrateJoin($row, 'updatedBy', 'updatedBy');
+
+            /** @var User $createdBy */
+            $deletedBy = $this->hydrateJoin($row, 'deletedBy', 'deletedBy');
+
+            if ($createdBy) {
+                $template->setCreatedBy($createdBy);
+            }
+
+            if ($updatedBy) {
+                $template->setUpdatedBy($updatedBy);
+            }
+
+            if ($deletedBy) {
+                $template->setDeletedBy($deletedBy);
+            }
+
+            $collection->add($template);
+        }
+
+        return $collection;
     }
 }
