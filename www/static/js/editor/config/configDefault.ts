@@ -359,14 +359,5 @@ export function getDefault(config: EditorDefaultConfig) {
             ],
         },
         ...getTokensSettings(config),
-        // mention: {
-        //     feeds: [
-        //         {
-        //             marker: "[",
-        //             feed: ["[firstname]", "[preferredname]", "[surname]", "[fullname]", "[house]", "[year]"],
-        //             minimumCharacters: 0,
-        //         },
-        //     ],
-        // },
     };
 }
