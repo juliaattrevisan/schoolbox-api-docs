@@ -9,6 +9,7 @@
 namespace Schoolbox\Application\Manifest;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\MobileApp\ServiceMapper;
 
 class Controller extends Base
@@ -45,6 +46,7 @@ class Controller extends Base
      */
     public function getManifest(): void
     {
+        $cdnPrefixGenerator = new PrefixGenerator($this->getConfigLoader());
         $manifest = [
             'id'                          => INSTANCE_ID,
             'name'                        => $this->getConfigLoader()->get('title'),
@@ -53,7 +55,7 @@ class Controller extends Base
             'background_color'            => $this->getConfigLoader()->get('skin_colour_navigation_background'),
             'display'                     => 'minimal-ui',
             'Scope'                       => '/',
-            'start_url'                   => '/login/',
+            'start_url'                   => '/',
             'icons'                       => [
                 [
                     'src'     => '/images/logo.php?logo=skin_logo_square&size=apple72',
@@ -106,6 +108,44 @@ class Controller extends Base
                 ],
             ],
             'splash_pages'                => null,
+            'shortcuts'     => [
+                [
+                    'name'          => 'Timetable',
+                    'short_name'    => 'Timetable',
+                    'description'   => 'View your timetable',
+                    'url'           => '/timetable',
+                    'icons'         => [
+                        [
+                            "src" => $cdnPrefixGenerator->generate() . "/images/icons/192x192/timetable.png",
+                            "sizes" => "192x192"
+                        ],
+                    ]
+                ],
+                [
+                    'name'          => 'News',
+                    'short_name'    => 'News',
+                    'description'   => 'Open the News',
+                    'url'           => '/news',
+                    'icons'         => [
+                        [
+                            "src" => $cdnPrefixGenerator->generate() . "/images/icons/192x192/news.png",
+                            "sizes" => "192x192"
+                        ],
+                    ]
+                ],
+                [
+                    'name'          => 'Calendar',
+                    'short_name'    => 'Calendar',
+                    'description'   => 'View your Calendar',
+                    'url'           => '/calendar',
+                    'icons'         => [
+                        [
+                            "src" => $cdnPrefixGenerator->generate() . "/images/icons/192x192/calendar.png",
+                            "sizes" => "192x192"
+                        ],
+                    ]
+                ],
+            ],
         ];
 
         $serviceList = $this->serviceMapper->findAll();
