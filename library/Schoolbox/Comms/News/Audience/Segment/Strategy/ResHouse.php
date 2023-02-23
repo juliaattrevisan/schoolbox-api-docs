@@ -106,32 +106,6 @@ class ResHouse extends SimpleStrategy
         return new UserResolutionSql('', $pb);
     }
 
-
-//    /**
-//     * @inheritDoc
-//     */
-//    public function isUserInAudienceValues(User $user, array $entityValues, string $relationship): ?bool
-//    {
-//        switch ($relationship) {
-//            case Audience\Model::RELATIONSHIP_SELF:
-//                if ($user->getResidentialHouse() === null) {
-//                    return self::isValidNullEntityValue() && in_array(null, $entityValues, true);
-//                }
-//                return in_array($user->getResidentialHouse()->getId(), $entityValues, false);
-//            case Audience\Model::RELATIONSHIP_PARENTS_OF:
-//                if (!$user->getRole()->isParent()) {
-//                    return false;
-//                }
-//                return null;
-//            case Audience\Model::RELATIONSHIP_TEACHERS_OF:
-//                if (!$user->getRole()->isStaff()) {
-//                    return false;
-//                }
-//                return null;
-//        }
-//        return null;
-//    }
-
     /**
      * Users are in the residential house audience if they are a member of the
      * residential house.

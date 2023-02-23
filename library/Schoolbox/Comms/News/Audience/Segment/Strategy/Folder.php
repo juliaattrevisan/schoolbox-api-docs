@@ -529,44 +529,6 @@ class Folder extends SimpleStrategy
         return $mutedUsersPerFolder;
     }
 
-
-//    /**
-//     * @inheritDoc
-//     */
-//    public function isUserInAudienceValues(User $user, array $entityValues, string $relationship): ?bool
-//    {
-//        switch ($relationship) {
-//            case Audience\Model::RELATIONSHIP_SELF:
-//                if ($user->getSubjectCollection() === null) {
-//                    return null;
-//                }
-//                // Cannot conclude false, because groups are not provided
-//                return count(array_intersect($this->parseSubjectIds($user), $entityValues)) ? true : null;
-//            case Audience\Model::RELATIONSHIP_PARENTS_OF:
-//                if (!$user->getRole()->isParent()) {
-//                    return false;
-//                }
-//                if ($user->getChildren() === null) {
-//                    return null;
-//                }
-//                foreach ($user->getChildren() as $child) {
-//                    if ($child->getSubjectCollection() === null) {
-//                        continue;
-//                    }
-//                    if (count(array_intersect($this->parseSubjectIds($child), $entityValues))) {
-//                        return true;
-//                    }
-//                }
-//                return null;
-//            case Audience\Model::RELATIONSHIP_TEACHERS_OF:
-//                if (!$user->getRole()->isStaff()) {
-//                    return false;
-//                }
-//                return null;
-//        }
-//        return null;
-//    }
-
     /**
      * Users are in the folder audience if they are a member of the folder via
      * their list of subjects.

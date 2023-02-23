@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
-use Schoolbox\Comms\News\Audience;
 use Schoolbox\Comms\News\Audience\Segment\TranslateSql;
 use Schoolbox\Comms\News\Audience\Segment\UserResolutionSql;
 use Schoolbox\GenericCollection;
@@ -120,29 +119,6 @@ class Service extends SimpleStrategy
 
         return new UserResolutionSql($join, $pb);
     }
-
-
-//    /**
-//     * @inheritDoc
-//     */
-//    public function isUserInAudienceValues(User $user, array $entityValues, string $relationship): ?bool
-//    {
-//        switch ($relationship) {
-//            case Audience\Model::RELATIONSHIP_SELF:
-//                return null;
-//            case Audience\Model::RELATIONSHIP_PARENTS_OF:
-//                if (!$user->getRole()->isParent()) {
-//                    return false;
-//                }
-//                return null;
-//            case Audience\Model::RELATIONSHIP_TEACHERS_OF:
-//                if (!$user->getRole()->isStaff()) {
-//                    return false;
-//                }
-//                return null;
-//        }
-//        return null;
-//    }
 
     /**
      * Users are not checked directly for whether they have service access.
