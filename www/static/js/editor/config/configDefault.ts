@@ -55,10 +55,10 @@ import Alignment from "@ckeditor/ckeditor5-alignment/src/alignment";
 import FindAndReplace from "@ckeditor/ckeditor5-find-and-replace/src/findandreplace";
 import SourceEditing from "@ckeditor/ckeditor5-source-editing/src/sourceediting";
 import WordCount from "@ckeditor/ckeditor5-word-count/src/wordcount";
-import Mention from "@ckeditor/ckeditor5-mention/src/mention";
 import UploadAdapter from "../plugin/UploadAdapter";
-import Tokens from "../plugin/tokens/Tokens";
 import { getDefaultColors } from "@js/editor/config/configDefaultColors";
+import { getTokensPlugins } from "@js/editor/plugin/TokensPlugins";
+import { getTokensSettings } from "@js/editor/settings/TokensSettings";
 
 /**
  * Add our custom upload adapter
@@ -76,7 +76,7 @@ const API_KEY = "94aa8fc28ac1089a2dfb28";
 
 export interface EditorDefaultConfig {
     targetElements: string[]; // the elements to target for the editor
-    hasTokens: boolean; // whether or not to enable the tokens plugin
+    hasTokens?: boolean; // whether or not to enable the tokens plugin
 }
 
 /**
@@ -139,8 +139,7 @@ export function getDefault(config: EditorDefaultConfig) {
             FindAndReplace,
             SourceEditing,
             WordCount,
-            Mention,
-            Tokens,
+            ...getTokensPlugins(config),
         ],
         extraPlugins: [UploadAdapterPlugin],
         toolbar: [
@@ -359,14 +358,15 @@ export function getDefault(config: EditorDefaultConfig) {
                 "Verdana, Geneva, sans-serif",
             ],
         },
-        mention: {
-            feeds: [
-                {
-                    marker: "[",
-                    feed: ["[firstname]", "[preferredname]", "[surname]", "[fullname]", "[house]", "[year]"],
-                    minimumCharacters: 0,
-                },
-            ],
-        },
+        ...getTokensSettings(config),
+        // mention: {
+        //     feeds: [
+        //         {
+        //             marker: "[",
+        //             feed: ["[firstname]", "[preferredname]", "[surname]", "[fullname]", "[house]", "[year]"],
+        //             minimumCharacters: 0,
+        //         },
+        //     ],
+        // },
     };
 }
