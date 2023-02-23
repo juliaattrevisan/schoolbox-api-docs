@@ -36,23 +36,36 @@ countdownElements.forEach((element) => {
     };
 
     countdownTimer.onCountdownFinished = () => {
-        if (targetElement.parentElement.classList.contains('disabled')) {
+        if (targetElement.parentElement.classList.contains("disabled")) {
             return; // Prevent multiple confetti explosions
         }
         targetElement.innerHTML = '<li class="count">Countdown has been reached!</li>';
-        targetElement.parentElement.classList.add('disabled');
+        targetElement.parentElement.classList.add("disabled");
 
         if (targetElement.getAttribute("data-finish-animation") === "1") {
-            const boundRect = targetElement.getBoundingClientRect();
-            confetti({
-                particleCount: 300,
-                spread: 360,
-                ticks: 200,
-                origin: {
-                    x: ((boundRect.left + (boundRect.width / 2)) / window.innerWidth),
-                    y: ((boundRect.top + (boundRect.height / 2)) / window.innerHeight),
-                }
-            });
+            let hasTriggered = false;
+            const observer = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting && !hasTriggered) {
+                            hasTriggered = true;
+                            let boundRect = targetElement.getBoundingClientRect();
+                            confetti({
+                                particleCount: 300,
+                                spread: 360,
+                                ticks: 200,
+                                origin: {
+                                    x: (boundRect.left + boundRect.width / 2) / window.innerWidth,
+                                    y: (boundRect.top + boundRect.height / 2) / window.innerHeight,
+                                },
+                            });
+                        }
+                    });
+                },
+                { rootMargin: "0px", threshold: 1.0 }
+            );
+
+            observer.observe(targetElement);
         }
     };
 
