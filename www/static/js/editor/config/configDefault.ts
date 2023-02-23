@@ -74,12 +74,18 @@ function UploadAdapterPlugin(editor) {
 const IFRAME_SRC = "//cdn.iframe.ly/api/iframe";
 const API_KEY = "94aa8fc28ac1089a2dfb28";
 
+export interface EditorDefaultConfig {
+    targetElements: string[]; // the elements to target for the editor
+    hasTokens: boolean; // whether or not to enable the tokens plugin
+}
+
 /**
  * Return the default configuration
  *
+ * @param { EditorDefaultConfig } config - the default config
  * @returns { EditorConfig } - refer to https://ckeditor.com/docs/ckeditor5/latest/api/module_core_editor_editorconfig-EditorConfig.html
  */
-export function getDefault() {
+export function getDefault(config: EditorDefaultConfig) {
     return {
         plugins: [
             // list all the plugins we'll use in the editor
