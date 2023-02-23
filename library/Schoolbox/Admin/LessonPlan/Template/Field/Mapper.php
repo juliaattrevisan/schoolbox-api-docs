@@ -10,8 +10,12 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\LessonPlan\Template\Field;
 
+use PDOStatement;
 use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
+use Schoolbox\Admin\LessonPlan\Template\Model as LessonPlanTemplate;
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\Exception;
+
 
 /**
  * @method Model createModel($idValue = null)
@@ -37,5 +41,60 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+    }
+
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return string|void
+     * @throws \Schoolbox\Mapper\DefinitionException
+     */
+    protected function getSelectString()
+    {
+        return "
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('lessonPlanTemplate', 'lpt')}
+            FROM {$this->getTable()}
+            INNER JOIN {$this->getJoinSql('lessonPlanTemplate', '', 'lpt')}
+        ";
+    }
+
+
+    /**
+     * Hydrate joins added in `getSelectString`.
+     *
+     * @param PDOStatement $statement
+     * @return GenericCollection|Model
+     * @throws Exception
+     * @throws \UnexpectedValueException
+     */
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        $collection = $this->createCollection();
+
+        foreach ($statement as $row) {
+            $field = $this->hydrate($row);
+
+            /* Arbitrarily died; this shouldn't happen tho
+             */
+            if (!$field) {
+                continue;
+            }
+
+            /* Lesson Plan Template parent object
+             */
+            /** @var LessonPlanTemplate $template */
+            $template = $this->hydrateJoin($row, 'lessonPlanTemplate', 'lpt');
+
+            if ($template) {
+                $field->setLessonPlanTemplate($template);
+            }
+
+            $collection->add($field);
+        }
+
+        return $collection;
     }
 }
