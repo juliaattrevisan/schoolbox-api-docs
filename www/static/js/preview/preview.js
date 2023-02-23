@@ -77,6 +77,17 @@
                                     items: {
                                         src: response.fragment,
                                         type: "image",
+                                        image: {
+                                            markup: '<div class="mfp-figure" style="min-width: 128px">'+
+                                                '<div class="mfp-close"></div>'+
+                                                '<div class="mfp-img"></div>'+
+                                                '<div class="mfp-bottom-bar">'+
+                                                '<div class="mfp-title"></div>'+
+                                                '<div class="mfp-counter"></div>'+
+                                                '</div>'+
+                                                '</div>', // Popup HTML markup. `.mfp-img` div will be replaced with img tag, `.mfp-close` by close button
+                                            verticalFit: true
+                                        }
                                     },
                                 });
                             } else if (response.type == "iframe") {
