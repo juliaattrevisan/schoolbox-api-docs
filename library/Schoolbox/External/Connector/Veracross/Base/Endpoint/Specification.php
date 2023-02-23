@@ -58,26 +58,25 @@ class Specification
             [
                 'name' => 'Student Profiles: List (student)',
                 'func' => function() {
-                    return $this->trial('students', Profile::SCOPE);
+                    return $this->trial('students');
                 }
             ],
             [
                 'name' => 'Student Profiles: Medical Lookup (health/patients)',
                 'func' => function() {
-                    return $this->trial('health/patients', Profile::SCOPE);
+                    return $this->trial('health/patients');
                 }
             ],
             [
                 'name' => 'Student Profiles: Languages Lookup (admission/languages)',
                 'func' => function() {
-                    return $this->trial('admission/languages', Profile::SCOPE);
+                    return $this->trial('admission/languages');
                 }
             ],
-
             [
                 'name' => 'Student Profiles: Emergency Contacts Lookup (emergency_contacts)',
                 'func' => function() {
-                    return $this->trial('emergency_contacts', Profile::SCOPE);
+                    return $this->trial('emergency_contacts');
                 }
             ],
 
@@ -88,19 +87,19 @@ class Specification
             [
                 'name' => 'Parent Profiles: Household Lookup (parents)',
                 'func' => function() {
-                    return $this->trial('parents', Profile::SCOPE);
+                    return $this->trial('parents');
                 }
             ],
             [
                 'name' => 'Parent Profiles: Relationship Lookup (relationships)',
                 'func' => function() {
-                    return $this->trial('relationships', Profile::SCOPE);
+                    return $this->trial('relationships');
                 }
             ],
             [
                 'name' => 'Parent/Staff Profiles: Contact Info Lookup (contact_info)',
                 'func' => function() {
-                    return $this->trial('contact_info', Profile::SCOPE);
+                    return $this->trial('contact_info');
                 }
             ],
 
@@ -111,7 +110,7 @@ class Specification
             [
                 'name' => 'Staff Profiles: List (staff_faculty)',
                 'func' => function() {
-                    return $this->trial('staff_faculty', Profile::SCOPE);
+                    return $this->trial('staff_faculty');
                 }
             ],
 
@@ -245,10 +244,9 @@ class Specification
      * Try accessing $endpoint, caching its output if it succeeds
      *
      * @param string $endpoint
-     * @param string $scope
      * @return array
      */
-    private function trial(string $endpoint, string $scope): array
+    private function trial(string $endpoint): array
     {
         $errorMessage = '';
         $result = true;
@@ -257,7 +255,7 @@ class Specification
          * Only need the first record on first page
          */
         try {
-            $payload = $this->api->retrieveOne('GET', $endpoint, $scope, 1, 1);
+            $payload = $this->api->retrieveOne('GET', $endpoint, Profile::SCOPE, 1, 1);
 
             /* Remember this for later
              */
