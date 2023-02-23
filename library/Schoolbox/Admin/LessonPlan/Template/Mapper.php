@@ -92,13 +92,13 @@ class Mapper extends \Schoolbox\Mapper
              * Not sure how deletedBy gets used yet; may be superfluous
              * in this contextual usage
              */
-            /** @var User $createdBy */
+            /** @var User|null $createdBy */
             $createdBy = $this->hydrateJoin($row, 'createdBy', 'createdBy');
 
-            /** @var User $createdBy */
+            /** @var User|null $createdBy */
             $updatedBy = $this->hydrateJoin($row, 'updatedBy', 'updatedBy');
 
-            /** @var User $createdBy */
+            /** @var User|null $createdBy */
             $deletedBy = $this->hydrateJoin($row, 'deletedBy', 'deletedBy');
 
             if ($createdBy) {

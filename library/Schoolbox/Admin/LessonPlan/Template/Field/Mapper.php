@@ -85,7 +85,7 @@ class Mapper extends \Schoolbox\Mapper
 
             /* Lesson Plan Template parent object
              */
-            /** @var LessonPlanTemplate $template */
+            /** @var LessonPlanTemplate|null $template */
             $template = $this->hydrateJoin($row, 'lessonPlanTemplate', 'lpt');
 
             if ($template) {
