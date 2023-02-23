@@ -11,6 +11,7 @@ import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import { useActiveNodeStore } from "./store/mcActiveNodeStore";
 import { useNodeDetailsStore } from "./store/mcNodeDetailsStore";
 import McNodeDetailsUsage from "./mc-node-details-usage.vue";
+import BadgeModal from "@schoolboxBadge/vue/badge-modal";
 
 interface Props {
     depth: number; // to gradually add more marginLeft to indicate node level depth
@@ -42,6 +43,44 @@ const hasUsage = computed(() => {
 function onRefreshSelected() {
     location.reload();
 }
+
+/**
+ * Return the list of active usages, grouped by type
+ *
+ * @returns { Array }
+ */
+const activeUsages = computed(() => {
+    const usages = [];
+    if (activeNodeStore.node._usageCounts.course > 0) {
+        usages.push({
+            title: "Courses",
+            count: activeNodeStore.node._usageCounts.course,
+            usages: getSpecificUsages(activeNodeStore.node.usage as Usage[], ActivityTypes.COURSE),
+        });
+    }
+    if (activeNodeStore.node._usageCounts.unit > 0) {
+        usages.push({
+            title: "Units",
+            count: activeNodeStore.node._usageCounts.unit,
+            usages: getSpecificUsages(activeNodeStore.node.usage as Usage[], ActivityTypes.UNIT),
+        });
+    }
+    if (activeNodeStore.node._usageCounts.assessment > 0) {
+        usages.push({
+            title: "Learning Activities",
+            count: activeNodeStore.node._usageCounts.assessment,
+            usages: getSpecificUsages(activeNodeStore.node.usage as Usage[], ActivityTypes.LEARNING_ACTIVITY),
+        });
+    }
+    if (activeNodeStore.node._usageCounts.badge > 0) {
+        usages.push({
+            title: "Badges",
+            count: activeNodeStore.node._usageCounts.badge,
+            usages: getSpecificUsages(activeNodeStore.node.usage as Usage[], ActivityTypes.BADGE),
+        });
+    }
+    return usages;
+});
 </script>
 
 <template>
@@ -62,41 +101,11 @@ function onRefreshSelected() {
             <fieldset class="content">
                 <div v-html="activeNodeStore.node.description"></div>
                 <div v-if="hasUsage" class="usage-list-container">
-                    <div v-if="activeNodeStore.node._usageCounts.course > 0">
-                        <h4>Courses ({{ activeNodeStore.node._usageCounts.course }})</h4>
+                    <div v-for="activeUsage in activeUsages">
+                        <h4>{{ activeUsage.title }} ({{ activeUsage.count }})</h4>
                         <ul class="usage-list">
                             <mc-node-details-usage
-                                v-for="(usage, index) in getSpecificUsages(activeNodeStore.node.usage as Usage[], ActivityTypes.COURSE)"
-                                :key="index"
-                                :usage="usage"
-                            />
-                        </ul>
-                    </div>
-                    <div v-if="activeNodeStore.node._usageCounts.unit > 0">
-                        <h4>Units ({{ activeNodeStore.node._usageCounts.unit }})</h4>
-                        <ul class="usage-list">
-                            <mc-node-details-usage
-                                v-for="(usage, index) in getSpecificUsages(activeNodeStore.node.usage as Usage[], ActivityTypes.UNIT)"
-                                :key="index"
-                                :usage="usage"
-                            />
-                        </ul>
-                    </div>
-                    <div v-if="activeNodeStore.node._usageCounts.assessment > 0">
-                        <h4>Learning Activities ({{ activeNodeStore.node._usageCounts.assessment }})</h4>
-                        <ul class="usage-list">
-                            <mc-node-details-usage
-                                v-for="(usage, index) in getSpecificUsages(activeNodeStore.node.usage as Usage[], ActivityTypes.LEARNING_ACTIVITY)"
-                                :key="index"
-                                :usage="usage"
-                            />
-                        </ul>
-                    </div>
-                    <div v-if="activeNodeStore.node._usageCounts.badge > 0">
-                        <h4>Badges ({{ activeNodeStore.node._usageCounts.badge }})</h4>
-                        <ul class="usage-list">
-                            <mc-node-details-usage
-                                v-for="(usage, index) in getSpecificUsages(activeNodeStore.node.usage as Usage[], ActivityTypes.BADGE)"
+                                v-for="(usage, index) in activeUsage.usages"
                                 :key="index"
                                 :usage="usage"
                             />

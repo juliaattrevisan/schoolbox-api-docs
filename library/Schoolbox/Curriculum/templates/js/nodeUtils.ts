@@ -215,7 +215,7 @@ export function getUsageHref(usage: Usage) {
         [ActivityTypes.COURSE]: () => (usage.object as CourseUsageObject).folder._links.view,
         [ActivityTypes.UNIT]: () => (usage.object as UnitUsageObject).folder._links.view,
         [ActivityTypes.LEARNING_ACTIVITY]: () => (usage.object as LearningActivityUsageObject)._links.view,
-        [ActivityTypes.BADGE]: () => "#",
+        [ActivityTypes.BADGE]: () => "#view-badge-details", // opens the badge modal
     };
     return icons[usage.discriminator] && icons[usage.discriminator]();
 }
