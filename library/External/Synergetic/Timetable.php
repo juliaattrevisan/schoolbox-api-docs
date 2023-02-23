@@ -210,11 +210,24 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             } elseif ($period['DayNumber'] !== $fileTypeDayNumberMap[$period['FileType']]) {
                 continue;
             }
-            $timetableDef['desc'][]     = $period['Description'];
-            $timetableDef['start'][]    = date("g:ia", strtotime($period['TimeFrom']));
-            $timetableDef['end'][]      = date("g:ia", strtotime($period['TimeTo']));
-            $timetableDef['number'][]   = $period['PeriodNumber'];
-            $timetableDef['sequence'][] = $period['PeriodNumberSeq'];
+
+            /* Stack classes happening per period,
+             * indexed by (time from, time to) tuple identifier,
+             * ordered by PeriodNumberSeq
+             *
+             * PeriodNumber is not unique.
+             * Periods may not manifest in a human-sensible order.
+             */
+            $index = sprintf('%s - %s',
+                $period['TimeFrom'],
+                $period['TimeTo']
+            );
+
+            $timetableDef['desc'][$index]     = $period['Description'];
+            $timetableDef['start'][$index]    = date("g:ia", strtotime($period['TimeFrom']));
+            $timetableDef['end'][$index]      = date("g:ia", strtotime($period['TimeTo']));
+            $timetableDef['number'][$index]   = $period['PeriodNumber'];
+            $timetableDef['sequence'][$index] = $period['PeriodNumberSeq'];
             $periodCount++;
         }
 
@@ -225,6 +238,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
         $timetableDef['periodCount'] = $periodCount;
         $timetableDef['dayCount']    = $this->getTotalDays($campus);
+new \Alaress_Probe($timetableDef);
         return $timetableDef;
     }
 
