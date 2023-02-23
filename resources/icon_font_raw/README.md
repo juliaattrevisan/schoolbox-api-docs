@@ -20,11 +20,17 @@ readd the glyph that had been 'overwritten'.
 
 # Files
 
-* schoolbox_icons_concepts.ai -
-* schoolbox_icons_final.ai -
-* selection.json -
-* style.css -
-* schoolbox-v1.0.zip -
+* schoolbox_icons_concepts.ai - The Adobe Illustrator file that contains raw versions
+  of each icon. This is where the icons are 'designed'.
+* schoolbox_icons_final.ai - The final Illustrator file, containing individual,
+  completed icons organised on named layers sorted alphabetically on a 512px grid.
+* selection.json - The file used by IcoMoon to generate the Schoolbox icon set.
+  Effectively the current 'state' of the icon font.
+* style.css - Holds a record of all the codes used as part of the icon font and
+  the classes that will apply the icon style in CSS.
+* schoolbox-v1.0.zip - The compiled, zipped version of the font and supporting files,
+  such as selection.json and style.css. Kept mainly as a reference of the most recent,
+  entire package generated from IcoMoon.
 
 # How do I use these files / How do I update the icon font?
 
