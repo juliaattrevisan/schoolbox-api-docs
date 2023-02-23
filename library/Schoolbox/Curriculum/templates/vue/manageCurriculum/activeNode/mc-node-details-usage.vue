@@ -37,13 +37,10 @@ const badgeIcon = computed(() => {
     <li class="usage">
         <a :href="`${getUsageHref(props.usage)}`" :title="props.usage.object.title">
             <div class="usage__container">
-                <!-- <div
-                    v-if="props.usage.discriminator === ActivityTypes.BADGE"
-                    :class="`usage__badge-container ${getUsageIcon(props.usage.discriminator)}`"
-                >
-                    <badge-image :badge="award.badge" :css="award.isGoal ? 'badge goal' : 'badge'"></badge-image>
-                </div> -->
-                <div :class="`usage__icon-container ${badgeIcon} size-24`"></div>
+                <div v-if="props.usage.discriminator === ActivityTypes.BADGE" class="usage__badge-container">
+                    <badge-image :badge="props.usage.object" css="badge"></badge-image>
+                </div>
+                <div v-else :class="`usage__icon-container ${badgeIcon} size-24`"></div>
                 <div class="usage__title-container">
                     <p v-if="props.usage.discriminator === ActivityTypes.BADGE">{{ props.usage.object.name }}</p>
                     <p v-else>{{ props.usage.object.title }}</p>
