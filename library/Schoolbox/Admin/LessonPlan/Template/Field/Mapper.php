@@ -16,7 +16,6 @@ use Schoolbox\Admin\LessonPlan\Template\Model as LessonPlanTemplate;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception;
 
-
 /**
  * @method Model createModel($idValue = null)
  * @method GenericCollection|Model[] findAll($options = [])
