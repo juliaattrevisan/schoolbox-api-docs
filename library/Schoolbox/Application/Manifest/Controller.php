@@ -46,6 +46,7 @@ class Controller extends Base
     public function getManifest(): void
     {
         $manifest = [
+            'id'                          => INSTANCE_ID,
             'name'                        => $this->getConfigLoader()->get('title'),
             'short_name'                  => $this->getConfigLoader()->get('title'),
             'theme_color'                 => $this->getConfigLoader()->get('skin_colour_navigation_background'),
