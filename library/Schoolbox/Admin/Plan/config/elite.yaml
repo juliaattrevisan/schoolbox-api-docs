@@ -103,7 +103,7 @@ config:
   office365_tenant_id: {hide: false}
   office365_immersive_reader_name: {hide: false}
   googleapps_api_key: { hide: false }
-  turnitin_api_key: {hide: false}
+  turnitin_api_key: {hide: true}
   turnitin_api_host: {hide: false}
 
 topMenu:
