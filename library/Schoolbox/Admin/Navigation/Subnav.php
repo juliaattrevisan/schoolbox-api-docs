@@ -383,17 +383,17 @@ class Subnav
                         'children'    => [],
                         'description' => 'Configure which Synergetic DocMan documents are visible via the Academic Reports button on the students profile.',
                     ],
-                    '/adminv2/summative-report'              => [
-                        'name'        => 'Summative Reports',
-                        'visible'     => $this->configLoader->get(ConfigMapper::NAME_SUMMATIVE_REPORT_ENABLED),
-                        'children'    => [],
-                        'description' => 'Configure a batch of student summative reports to be printed to PDF for reporting purposes.',
-                    ],
                     '/adminv2/grades'                        => [
                         'name'        => 'Grades',
                         'visible'     => $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
                         'children'    => [],
                         'description' => 'Configure the available grade scales that can be used for assessment and marking.',
+                    ],
+                    '/adminv2/lesson-plan/template'          => [
+                        'name'        => 'Lesson Plan Templates',
+                        'visible'     => true,
+                        'children'    => [],
+                        'description' => 'Configure lesson plan templates.',
                     ],
                     '/adminv2/setting/LMS%20Policy'          => [
                         'name'        => 'LMS Policy',
@@ -412,6 +412,12 @@ class Subnav
                         'visible'     => $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
                         'description' => 'Setup quick fill results for rubrics to help quickly build a rubric with generic level descriptors.',
                         'children'    => []
+                    ],
+                    '/adminv2/summative-report'              => [
+                        'name'        => 'Summative Reports',
+                        'visible'     => $this->configLoader->get(ConfigMapper::NAME_SUMMATIVE_REPORT_ENABLED),
+                        'children'    => [],
+                        'description' => 'Configure a batch of student summative reports to be printed to PDF for reporting purposes.',
                     ],
                 ],
             ],
