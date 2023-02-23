@@ -193,18 +193,14 @@ class Receiver
     public function start(): void
     {
         new Server([
-            // this is for liss.hello connection test
-            'liss.hello' => [
-                'function' => [$this,'hello'],
-            ],
             /* A test that appears on the Authorisation tab in the
              * liss client app; checks whether your authorisation
              * settings were correct but gives no user feedback:
              * response window opens and shuts immediately of its
              * own accord.
              */
-            'liss.getHello' => [
-                'function' => [$this,'getRooms'],
+            'liss.hello' => [
+                'function' => [$this,'hello'],
             ],
 
             /* Time-based variant of timetable data is found here
