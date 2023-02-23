@@ -73,7 +73,7 @@ export default {
             const newSequenceList = [];
             const allRowElements = document.querySelector("[data-list]").children;
             Array.from(allRowElements).forEach((rowElement) => {
-                //loop through each row in order to set the latest correct sequence
+                // loop through each row in order to set the latest correct sequence
                 newSequenceList.push(rowElement.dataset.rowId);
             });
             this.updateSequence(newSequenceList);
