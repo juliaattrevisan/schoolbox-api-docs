@@ -10,8 +10,8 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Veracross\Base\Endpoint;
 
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Profile\Profile;
+use Schoolbox\External\Connector\Veracross\Base\Endpoint\TimetableCalendar\Classes;
 use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
-
 
 /**
  * Class Specification
@@ -58,26 +58,26 @@ class Specification
             [
                 'name' => 'Student Profiles: List (student)',
                 'func' => function() {
-                    return $this->trial('students');
+                    return $this->trial('students', Profile::SCOPE);
                 }
             ],
             [
                 'name' => 'Student Profiles: Medical Lookup (health/patients)',
                 'func' => function() {
-                    return $this->trial('health/patients');
+                    return $this->trial('health/patients', Profile::SCOPE);
                 }
             ],
             [
                 'name' => 'Student Profiles: Languages Lookup (admission/languages)',
                 'func' => function() {
-                    return $this->trial('admission/languages');
+                    return $this->trial('admission/languages', Profile::SCOPE);
                 }
             ],
 
             [
                 'name' => 'Student Profiles: Emergency Contacts Lookup (emergency_contacts)',
                 'func' => function() {
-                    return $this->trial('emergency_contacts');
+                    return $this->trial('emergency_contacts', Profile::SCOPE);
                 }
             ],
 
@@ -88,19 +88,19 @@ class Specification
             [
                 'name' => 'Parent Profiles: Household Lookup (parents)',
                 'func' => function() {
-                    return $this->trial('parents');
+                    return $this->trial('parents', Profile::SCOPE);
                 }
             ],
             [
                 'name' => 'Parent Profiles: Relationship Lookup (relationships)',
                 'func' => function() {
-                    return $this->trial('relationships');
+                    return $this->trial('relationships', Profile::SCOPE);
                 }
             ],
             [
                 'name' => 'Parent/Staff Profiles: Contact Info Lookup (contact_info)',
                 'func' => function() {
-                    return $this->trial('contact_info');
+                    return $this->trial('contact_info', Profile::SCOPE);
                 }
             ],
 
@@ -111,17 +111,104 @@ class Specification
             [
                 'name' => 'Staff Profiles: List (staff_faculty)',
                 'func' => function() {
-                    return $this->trial('staff_faculty');
+                    return $this->trial('staff_faculty', Profile::SCOPE);
                 }
             ],
-//
-//
-//            /**
-//             * Timetable nodes
-//             */
-//            [
-//                'name' => 'Timetable Classes',
-//            ],
+
+
+            /**
+             * Timetable nodes
+             */
+            [
+                'name' => 'Timetable: Enrolments (academics/enrollments)',
+                'func' => function() {
+                    $endpoint = 'academics/enrollments';
+                    $errorMessage = '';
+                    $result = true;
+
+                    /* If we couldn't access students lookup,
+                     * we cannot get anything about external ids; just leave
+                     */
+                    $personPayload = $this->registry->recall('students');
+
+                    if (null === $personPayload) {
+                        return [
+                            'errorMessage' => 'Could not access students list for an external id.',
+                            'result' => false,
+                        ];
+                    }
+
+                    /* Assumption:
+                     * Only need the first record on first page
+                     */
+                    try {
+                        $payload = $this->api->retrieveOne('GET', $endpoint, Classes::SCOPE, 1, 1, [
+                            'person_id' => $personPayload[0]['id']
+                        ]);
+
+                        /* Remember this for later
+                         */
+                        $this->registry->remember($endpoint, $payload['data']);
+                    } catch (\DomainException | \JsonException | \RuntimeException $e) {
+                        $errorMessage = $e->getMessage();
+                        $result = false;
+                    }
+
+                    return [
+                        'errorMessage' => $errorMessage,
+                        'result' => $result,
+                    ];
+                }
+            ],
+            [
+                'name' => 'Timetable: Meeting TImes (academics/classes/.../meeting_times)',
+                'func' => function() {
+                    $errorMessage = '';
+                    $result = true;
+
+                    /* If we couldn't access academics/enrollments lookup,
+                     * we cannot get anything about Veracross class internal ids; just leave
+                     */
+                    $enrolmentPayload = $this->registry->recall('academics/enrollments');
+
+                    if (null === $enrolmentPayload) {
+                        return [
+                            'errorMessage' => 'Could not access academics/enrollments for class identifier information.',
+                            'result' => false,
+                        ];
+                    }
+
+                    /* Continue using something we found out from before
+                     */
+                    $endpoint = sprintf(
+                        'academics/classes/%s/meeting_times',
+                        $enrolmentPayload[0]['internal_class_id']
+                    );
+
+                    /* Assumption:
+                     * Only need the first record on first page
+                     */
+                    try {
+                        $payload = $this->api->retrieveOne('GET', $endpoint, Classes::SCOPE, 1, 1, [
+                            'on_or_after_date' => \Alaress_Date_Format::now()->startOfDay()->getDatabaseDate(),
+                            'on_or_before_date' => \Alaress_Date_Format::now()->endOfDay()->getDatabaseDate(),
+                        ]);
+
+                        /* Remember this for later
+                         */
+                        $this->registry->remember($endpoint, $payload['data']);
+                    } catch (\DomainException | \JsonException | \RuntimeException $e) {
+                        $errorMessage = $e->getMessage();
+                        $result = false;
+                    }
+
+                    return [
+                        'errorMessage' => $errorMessage,
+                        'result' => $result,
+                    ];
+                }
+            ],
+
         ];
 
         $endpoints = [];
@@ -158,9 +245,10 @@ class Specification
      * Try accessing $endpoint, caching its output if it succeeds
      *
      * @param string $endpoint
+     * @param string $scope
      * @return array
      */
-    private function trial(string $endpoint): array
+    private function trial(string $endpoint, string $scope): array
     {
         $errorMessage = '';
         $result = true;
@@ -169,7 +257,7 @@ class Specification
          * Only need the first record on first page
          */
         try {
-            $payload = $this->api->retrieveOne('GET', $endpoint, Profile::SCOPE, 1, 1);
+            $payload = $this->api->retrieveOne('GET', $endpoint, $scope, 1, 1);
 
             /* Remember this for later
              */
