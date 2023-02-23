@@ -76,6 +76,7 @@ class Mapper extends \Schoolbox\Mapper
                 {$this->getJoinColumnString('reasonedBy', 'rb')},
                 {$this->getJoinColumnString('reasonedBy.role', 'rbr')},
                 {$this->getJoinColumnString('award', 'aw')},
+                {$this->getJoinColumnString('award.badge', 'awb')},
                 {$this->getJoinColumnString('award.recipient', 'awr')},
                 {$this->getJoinColumnString('award.recipient.role', 'awrr')},
                 {$this->getJoinColumnString('award.awardedBy', 'awa')},
@@ -90,6 +91,7 @@ class Mapper extends \Schoolbox\Mapper
             INNER JOIN {$this->getJoinSql('reasonedBy', '', 'rb', true)}
             INNER JOIN {$this->getJoinSql('reasonedBy.role', 'a', 'rbr')}
             LEFT  JOIN {$this->getJoinSql('award', '', 'aw')}
+            LEFT  JOIN {$this->getJoinSql('award.badge', 'aw', 'awb')}
             LEFT  JOIN {$this->getJoinSql('award.recipient', 'aw', 'awr', true)}
             LEFT  JOIN {$this->getJoinSql('award.recipient.role', 'awr', 'awrr')}
             LEFT  JOIN {$this->getJoinSql('award.awardedBy', 'aw', 'awa', true)}
@@ -116,7 +118,8 @@ class Mapper extends \Schoolbox\Mapper
         // Create array of badgeIds, de-duping as we go.
         $badgeIdsAsKeys = [];
         foreach ($rows as $row) {
-            $badgeIdsAsKeys[$row['badge_id']] = null; // Store as keys so we de-dupe as we store.
+            $badgeIdsAsKeys[$row['badge_id']] = null;    // Store as keys so we de-dupe as we store.
+            $badgeIdsAsKeys[$row['aw.badge_id']] = null; // Store as keys so we de-dupe as we store.
         }
 
         // Create array of badges, indexed by badgeId.
@@ -140,7 +143,6 @@ class Mapper extends \Schoolbox\Mapper
         /* A lookup, because badge hydration is a dog
          */
         foreach ($rows as $row) {
-            $badgeId = $row['badge_id'];
             $award = $this->hydrate($row);
 
             /* Set the $recipient and also their role
@@ -185,10 +187,10 @@ class Mapper extends \Schoolbox\Mapper
                 $award->setReasonedBy($reasonedBy);
             }
 
-            $award->setBadge($badgeById[$badgeId]);
+            $award->setBadge($badgeById[$row['badge_id']]);
 
             // If there is a parent award:
-            // Hydrate it, and its awarded by, reasoned by, and recipient
+            // Hydrate it, and its awarded by, reasoned by, recipient, and badge.
             if ($row['aw.id']) {
                 $parentAward = $this->hydrateJoin($row, 'award', 'aw');
                 if ($parentAward instanceof Model) {
@@ -220,6 +222,8 @@ class Mapper extends \Schoolbox\Mapper
                         }
                         $parentAward->setRecipient($parentRecipient);
                     }
+
+                    $parentAward->setBadge($badgeById[$row['aw.badge_id']]);
 
                     $award->setAward($parentAward);
                 }
