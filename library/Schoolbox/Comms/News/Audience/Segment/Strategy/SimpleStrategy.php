@@ -47,8 +47,12 @@ abstract class SimpleStrategy implements ISimpleStrategy
      * @param bool             $staffCanPost
      * @param bool             $moderationRequired
      */
-    public function __construct(UserAccessMapper $userAccessMapper, Access $access, bool $staffCanPost, bool $moderationRequired)
-    {
+    public function __construct(
+        UserAccessMapper $userAccessMapper,
+        Access $access,
+        bool $staffCanPost,
+        bool $moderationRequired,
+    ) {
         $this->userAccessMapper   = $userAccessMapper;
         $this->access             = $access;
         $this->staffCanPost       = $staffCanPost;
@@ -140,29 +144,66 @@ abstract class SimpleStrategy implements ISimpleStrategy
         // In most cases, the user and their children (if relevant), will have sufficient hydration.
         switch ($relationship) {
             case Audience\Model::RELATIONSHIP_SELF:
-                $users = User::createCollection()->add($user);
-                return count(array_intersect($this->getValues($users), $entityValues)) > 0;
+                return $this->isSelfInAudienceValues($user, $entityValues);
+//                $users = User::createCollection()->add($user);
+//                return count(array_intersect($this->getValues($users), $entityValues)) > 0;
             case Audience\Model::RELATIONSHIP_PARENTS_OF:
-                if (!$user->getRole()->isParent()) {
-                    return false;
-                }
-                /* Must not hit the DB... ummm is there a different way of doing this?
-                 * should we put the parents children back into the session/ user object? or cache this somewhere???
-                */
-                (new \Schoolbox\External\User())->loadChildren([$user]);
-                if ($user->getChildren()->count() === 0) {
-                    return null;
-                }
-                return count(array_intersect($this->getValues($user->getChildren()), $entityValues)) > 0;
+                return $this->isParentInAudienceValues($user, $entityValues);
+//                if (!$user->getRole()->isParent()) {
+//                    return false;
+//                }
+//                if ($user->getChildren() === null) {
+//                    return null;
+//                }
+//                return count(array_intersect($this->getValues($user->getChildren()), $entityValues)) > 0;
             case Audience\Model::RELATIONSHIP_TEACHERS_OF:
-                if (!$user->getRole()->isStaff()) {
-                    return false;
-                }
-                return null;
+                return $this->isTeacherInAudienceValues($user, $entityValues);
+//                if (!$user->getRole()->isStaff()) {
+//                    return false;
+//                }
+//
+//                // This teacher's classes are all loaded:
+//                // now load all of their students
+//                $user->getSubjectCollection()->getAll();
+//
+//                return null;
         }
         return null;
     }
 
+    protected function isSelfInAudienceValues(User $user, array $entityValues): ?bool
+    {
+        $users = User::createCollection()->add($user);
+        return count(array_intersect($this->getValues($users), $entityValues)) > 0;
+    }
+
+    protected function isParentInAudienceValues(User $user, array $entityValues): ?bool
+    {
+        if (!$user->getRole()->isParent()) {
+            return false;
+        }
+        /* Must not hit the DB... ummm is there a different way of doing this?
+         * should we put the parents children back into the session/ user object? or cache this somewhere???
+        */
+        (new \Schoolbox\External\User())->loadChildren([$user]);
+        if ($user->getChildren()->count() === 0) {
+            return null;
+        }
+        return count(array_intersect($this->getValues($user->getChildren()), $entityValues)) > 0;
+    }
+
+    protected function isTeacherInAudienceValues(User $user, array $entityValues): ?bool
+    {
+        if (!$user->getRole()->isStaff()) {
+            return false;
+        }
+
+        // This teacher's classes are all loaded:
+        // now load all of their students
+        $user->getSubjectCollection()->getAll();
+
+        return null;
+    }
 
     /**
      * @return bool
