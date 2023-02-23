@@ -171,12 +171,27 @@ abstract class SimpleStrategy implements ISimpleStrategy
         return null;
     }
 
+    /**
+     * Is the current user in the audience for this strategy?
+     *
+     * @param User  $user
+     * @param array $entityValues
+     * @return bool|null
+     */
     protected function isSelfInAudienceValues(User $user, array $entityValues): ?bool
     {
         $users = User::createCollection()->add($user);
         return count(array_intersect($this->getValues($users), $entityValues)) > 0;
     }
 
+    /**
+     * Is the current user in the audience for this strategy, via being the
+     * parent of a user in the audience?
+     *
+     * @param User  $user
+     * @param array $entityValues
+     * @return bool|null
+     */
     protected function isParentInAudienceValues(User $user, array $entityValues): ?bool
     {
         if (!$user->getRole()->isParent()) {
@@ -192,15 +207,24 @@ abstract class SimpleStrategy implements ISimpleStrategy
         return count(array_intersect($this->getValues($user->getChildren()), $entityValues)) > 0;
     }
 
+    /**
+     * Is the current user in the audience for this strategy, via being the
+     * teacher of a user in the audience?
+     *
+     * @param User  $user
+     * @param array $entityValues
+     * @return bool|null
+     */
     protected function isTeacherInAudienceValues(User $user, array $entityValues): ?bool
     {
         if (!$user->getRole()->isStaff()) {
             return false;
         }
 
-        // This teacher's classes are all loaded:
-        // now load all of their students
-        $user->getSubjectCollection()->getAll();
+        // TODO check the class
+//        // This teacher's classes are all loaded:
+//        // now load all of their students
+//        $user->getSubjectCollection()->getAll();
 
         return null;
     }
