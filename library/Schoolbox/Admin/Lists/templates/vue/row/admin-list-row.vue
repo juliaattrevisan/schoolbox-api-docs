@@ -101,11 +101,7 @@ export default {
                     </template>
 
                     <template v-else-if="field.colour">
-                        <admin-list-row-colour
-                            :caption="field.caption"
-                            :colour="row[field.id]"
-                            @input="row[field.id] = $event"
-                        />
+                        <admin-list-row-colour :field="field" :row="row" :colour="row[field.id]" />
                     </template>
 
                     <template v-else-if="field.isPopOutList">

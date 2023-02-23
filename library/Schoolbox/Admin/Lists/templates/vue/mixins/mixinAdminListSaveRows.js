@@ -25,12 +25,6 @@ export default {
          */
         async saveRows_onSaveSelected() {
             try {
-                // First close any open colour selectors by auto-clicking 'choose'.  This ensures that the colour
-                // selectors will be in a state consistent with the database after the save action has been performed.
-                // Note that this is required even though the buttons may not be visible due to 'showButtons' having
-                // been set to false in the spectrum color-picker config.
-                $("button.sp-choose").click();
-
                 this.saveRows_isProcessing = true;
                 //check rows for valid / invalid data
                 if (!this.isValidated()) {
@@ -79,10 +73,26 @@ export default {
             const newSequenceList = [];
             const allRowElements = document.querySelector("[data-list]").children;
             Array.from(allRowElements).forEach((rowElement) => {
-                //loop through each row in order to set the latest correct sequence
+                // loop through each row in order to set the latest correct sequence
                 newSequenceList.push(rowElement.dataset.rowId);
             });
             this.updateSequence(newSequenceList);
+        },
+
+        /**
+         * Previously spectrum.js was used to set the colour, but this is no longer used.
+         * When the colour was cleaed with spectrum.js, it would set the colour value to null.
+         * Coloris.js instead sets this to an empty string, so need to replace all instances of "" with null.
+         * This is to ensure the colour is set to null in the db, so if somewhere else expects null, we don't have an any side effects.
+         * It feels a bit dity, but it's the easiest way to ensure the colour is set to null without getting into the weeds.
+         *
+         * @param { string } rows - the rows data
+         * @returns { string } - rows data with nulls instead of empty strings
+         */
+        getRowsWithNullColours(rows) {
+            let rowsWithNulls = rows.replace(/"hexColour":""/g, '"hexColour":null');
+            rowsWithNulls = rows.replace(/"color":""/g, '"color":null');
+            return rowsWithNulls;
         },
 
         /**
@@ -93,7 +103,7 @@ export default {
         getSaveAllFormData() {
             const formData = new FormData();
             formData.append("table", this.tableName);
-            formData.append("rows", JSON.stringify(this.rows));
+            formData.append("rows", this.getRowsWithNullColours(JSON.stringify(this.rows)));
             return formData;
         },
 

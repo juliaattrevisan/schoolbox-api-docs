@@ -1,27 +1,33 @@
 <script>
 /**
- * Pass in the jQuery spectrum colour picker
- * Make use of Using v-model on Components to simulate v-model like input change
- * See: https://vuejs.org/v2/guide/components.html#Using-v-model-on-Components
+ * To initiate the Coloris colour picker and keep track of the colour changes
+ * Make use of v-model to keep track of <input> changes
  */
+import { mapActions } from "pinia";
+import { useAdminListStore } from "../store/adminListStore";
 
 export default {
     props: {
-        caption: {
-            //just shown prior to load
-            type: String,
+        field: {
+            // field the lookup is linked to
+            type: Object,
+            required: true,
+        },
+        row: {
+            // the data for the lookup
+            type: Object,
             required: true,
         },
         colour: {
-            //the colour chosen
-            type: String,
-            required: false,
+            // the colour chosen
+            required: true,
         },
     },
 
-    mounted() {
-        this.setDefaultColour();
-        this.initColourPicker();
+    data() {
+        return {
+            uid: `coloris-${this.getNewColourPickerId()}`, // generate a unique id for the colour picker
+        };
     },
 
     watch: {
@@ -29,35 +35,37 @@ export default {
          * Ensure the correct colour is always set on the row,
          * as the colour could also change if we delete a row above,
          * so we need to ensure the colour picker stays up to date
+         *
+         * @param { string } newValue - the new colour value
          */
         colour(newValue) {
-            $(this.$el).spectrum("set", newValue);
+            this.$el.value = newValue;
+            // as we manually set the value, we need to manually trigger the input event: https://coloris.js.org/
+            document.querySelector(`#${this.uid}`).dispatchEvent(new Event("input", { bubbles: true }));
         },
     },
 
+    mounted() {
+        this.initColourPicker();
+    },
+
     methods: {
-        /**
-         * We don't want to save a row without ensuring a default colour is set
-         * As then references that may expect a colour would be blank instead
-         */
-        setDefaultColour() {
-            if (this.colour === "") {
-                this.$emit("input", "#000000");
-            }
-        },
+        ...mapActions(useAdminListStore, ["getNewColourPickerId"]),
 
         /**
-         * Set up the jQuery spectrum colour picker and emit changes
+         * Set up the Coloris colour picker, passing in the required parameters
+         * Refer to https://coloris.js.org/ for further info
          */
         initColourPicker() {
-            $(this.$el).spectrum(
-                $.extend({}, window.sbProps.spectrum, {
-                    allowEmpty: true,
-                    change: (color) => {
-                        this.$emit("input", color ? color.toHexString() : null);
-                    },
-                    hide: (color) => {
-                        this.$emit("input", color ? color.toHexString() : null);
+            document.dispatchEvent(
+                // dispatched to www/static/js/colour-picker/colour-picker.ts
+                new CustomEvent("colourPickerInitialize", {
+                    detail: {
+                        target: `#${this.uid}`,
+                        options: {
+                            alpha: false,
+                            clearButton: true,
+                        },
                     },
                 })
             );
@@ -67,5 +75,5 @@ export default {
 </script>
 
 <template>
-    <input type="text" :placeholder="caption" :value="colour" data-colour-picker />
+    <input :id="uid" v-model="row[field.id]" type="text" :placeholder="field.caption" />
 </template>
