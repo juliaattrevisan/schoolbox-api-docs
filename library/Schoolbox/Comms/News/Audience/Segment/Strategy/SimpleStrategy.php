@@ -147,34 +147,16 @@ abstract class SimpleStrategy implements ISimpleStrategy
         switch ($relationship) {
             case Audience\Model::RELATIONSHIP_SELF:
                 return $this->isSelfInAudienceValues($user, $entityValues);
-//                $users = User::createCollection()->add($user);
-//                return count(array_intersect($this->getValues($users), $entityValues)) > 0;
             case Audience\Model::RELATIONSHIP_PARENTS_OF:
                 if (!$user->getRole()->isParent()) {
                     return false;
                 }
                 return $this->isParentInAudienceValues($user, $entityValues);
-//                if (!$user->getRole()->isParent()) {
-//                    return false;
-//                }
-//                if ($user->getChildren() === null) {
-//                    return null;
-//                }
-//                return count(array_intersect($this->getValues($user->getChildren()), $entityValues)) > 0;
             case Audience\Model::RELATIONSHIP_TEACHERS_OF:
                 if (!$user->getRole()->isStaff()) {
                     return false;
                 }
                 return $this->isTeacherInAudienceValues($user, $entityValues);
-//                if (!$user->getRole()->isStaff()) {
-//                    return false;
-//                }
-//
-//                // This teacher's classes are all loaded:
-//                // now load all of their students
-//                $user->getSubjectCollection()->getAll();
-//
-//                return null;
         }
         return null;
     }
@@ -266,7 +248,7 @@ abstract class SimpleStrategy implements ISimpleStrategy
         // TODO inject
         $students = UserMapper::getInstance()->findByColumnList(
             [
-                'synergy_id' => array_column($externalStudents, 'synergy_id'),
+                'synergy_id'   => array_column($externalStudents, 'synergy_id'),
                 'g.group_type' => \Schoolbox\Role::STUDENT,
             ]
         );
