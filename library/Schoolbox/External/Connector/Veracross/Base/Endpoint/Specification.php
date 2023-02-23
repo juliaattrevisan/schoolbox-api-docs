@@ -52,35 +52,32 @@ class Specification
     public function check(): array
     {
         $paths = [
-
             /**
              * Student Profile nodes
              */
             [
-                'name' => 'Student Profiles: student',
+                'name' => 'Student Profiles: List (student)',
                 'func' => function() {
-                    $endpoint = 'student';
-                    $errorMessage = '';
-                    $result = true;
+                    return $this->trial('students');
+                }
+            ],
+            [
+                'name' => 'Student Profiles: Medical Lookup (health/patients)',
+                'func' => function() {
+                    return $this->trial('health/patients');
+                }
+            ],
+            [
+                'name' => 'Student Profiles: Languages Lookup (admission/languages)',
+                'func' => function() {
+                    return $this->trial('admission/languages');
+                }
+            ],
 
-                    /* Assumption:
-                     * Only need the first record on first page
-                     */
-                    try {
-                        $payload = $this->api->retrieveOne('GET', $endpoint, Profile::SCOPE, 1, 1);
-
-                        /* Remember this for later
-                         */
-                        $this->registry->remember($endpoint, $payload['data']);
-                    } catch (\DomainException | \JsonException | \RuntimeException $e) {
-                        $errorMessage = $e->getMessage();
-                        $result = false;
-                    }
-
-                    return [
-                        'errorMessage' => $errorMessage,
-                        'result' => $result,
-                    ];
+            [
+                'name' => 'Student Profiles: Emergency Contacts Lookup (emergency_contacts)',
+                'func' => function() {
+                    return $this->trial('emergency_contacts');
                 }
             ],
 
@@ -89,23 +86,42 @@ class Specification
              * Parent Profile nodes
              */
             [
-                'name' => 'Parent Profiles',
+                'name' => 'Parent Profiles: Household Lookup (parents)',
+                'func' => function() {
+                    return $this->trial('parents');
+                }
             ],
+            [
+                'name' => 'Parent Profiles: Relationship Lookup (relationships)',
+                'func' => function() {
+                    return $this->trial('relationships');
+                }
+            ],
+            [
+                'name' => 'Parent/Staff Profiles: Contact Info Lookup (contact_info)',
+                'func' => function() {
+                    return $this->trial('contact_info');
+                }
+            ],
+
 
             /**
              * Staff Profile nodes
              */
             [
-                'name' => 'Staff Profiles',
+                'name' => 'Staff Profiles: List (staff_faculty)',
+                'func' => function() {
+                    return $this->trial('staff_faculty');
+                }
             ],
-
-
-            /**
-             * Timetable nodes
-             */
-            [
-                'name' => 'Timetable Classes',
-            ],
+//
+//
+//            /**
+//             * Timetable nodes
+//             */
+//            [
+//                'name' => 'Timetable Classes',
+//            ],
         ];
 
         $endpoints = [];
@@ -135,5 +151,37 @@ class Specification
         }
 
         return $endpoints;
+    }
+
+
+    /**
+     * Try accessing $endpoint, caching its output if it succeeds
+     *
+     * @param string $endpoint
+     * @return array
+     */
+    private function trial(string $endpoint): array
+    {
+        $errorMessage = '';
+        $result = true;
+
+        /* Assumption:
+         * Only need the first record on first page
+         */
+        try {
+            $payload = $this->api->retrieveOne('GET', $endpoint, Profile::SCOPE, 1, 1);
+
+            /* Remember this for later
+             */
+            $this->registry->remember($endpoint, $payload['data']);
+        } catch (\DomainException | \JsonException | \RuntimeException $e) {
+            $errorMessage = $e->getMessage();
+            $result = false;
+        }
+
+        return [
+            'errorMessage' => $errorMessage,
+            'result' => $result,
+        ];
     }
 }
