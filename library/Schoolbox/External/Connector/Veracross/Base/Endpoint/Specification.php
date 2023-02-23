@@ -57,25 +57,25 @@ class Specification
              */
             [
                 'name' => 'Student Profiles: List (student)',
-                'func' => function() {
+                'func' => function () {
                     return $this->trial('students');
                 }
             ],
             [
                 'name' => 'Student Profiles: Medical Lookup (health/patients)',
-                'func' => function() {
+                'func' => function () {
                     return $this->trial('health/patients');
                 }
             ],
             [
                 'name' => 'Student Profiles: Languages Lookup (admission/languages)',
-                'func' => function() {
+                'func' => function () {
                     return $this->trial('admission/languages');
                 }
             ],
             [
                 'name' => 'Student Profiles: Emergency Contacts Lookup (emergency_contacts)',
-                'func' => function() {
+                'func' => function () {
                     return $this->trial('emergency_contacts');
                 }
             ],
@@ -86,19 +86,19 @@ class Specification
              */
             [
                 'name' => 'Parent Profiles: Household Lookup (parents)',
-                'func' => function() {
+                'func' => function () {
                     return $this->trial('parents');
                 }
             ],
             [
                 'name' => 'Parent Profiles: Relationship Lookup (relationships)',
-                'func' => function() {
+                'func' => function () {
                     return $this->trial('relationships');
                 }
             ],
             [
                 'name' => 'Parent/Staff Profiles: Contact Info Lookup (contact_info)',
-                'func' => function() {
+                'func' => function () {
                     return $this->trial('contact_info');
                 }
             ],
@@ -109,7 +109,7 @@ class Specification
              */
             [
                 'name' => 'Staff Profiles: List (staff_faculty)',
-                'func' => function() {
+                'func' => function () {
                     return $this->trial('staff_faculty');
                 }
             ],
@@ -120,7 +120,7 @@ class Specification
              */
             [
                 'name' => 'Timetable: Enrolments (academics/enrollments)',
-                'func' => function() {
+                'func' => function () {
                     $endpoint = 'academics/enrollments';
                     $errorMessage = '';
                     $result = true;
@@ -161,7 +161,7 @@ class Specification
             ],
             [
                 'name' => 'Timetable: Meeting TImes (academics/classes/.../meeting_times)',
-                'func' => function() {
+                'func' => function () {
                     $errorMessage = '';
                     $result = true;
 
