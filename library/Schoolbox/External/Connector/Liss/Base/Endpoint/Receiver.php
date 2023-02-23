@@ -49,6 +49,16 @@ class Receiver
      */
     private const AUTHENTICATION_FAILED = 'Authentication failed; check username/password/schoolCode in your instance.';
 
+    /**
+     * LISS Protocol Version
+     * @see https://liss.net.au/docs/common/authentication/
+     */
+    private const LISS_VERSION = 10000;
+
+    /**
+     * Name of agent (i.e. us)
+     */
+    private const AGENT_NAME = 'Schoolbox';
 
     /**
      * Whether the external db was enabled
@@ -189,8 +199,8 @@ class Receiver
              * response window opens and shuts immediately of its
              * own accord.
              */
-            'liss.getHello' => [
-                'function' => [$this,'getRooms'],
+            'liss.hello' => [
+                'function' => [$this,'hello'],
             ],
 
             /* Time-based variant of timetable data is found here
@@ -360,6 +370,21 @@ class Receiver
              */
             throw $e;
         }
+    }
+
+
+    /**
+     * https://liss.net.au/docs/api/hello/
+     * @param Request $message
+     * @return Response
+     */
+    public function hello(Request $message): Response
+    {
+        $message = new Value([
+            'SIS'         => new Value(self::AGENT_NAME, Value::$xmlrpcString),
+            'LissVersion' => new Value(self::LISS_VERSION, Value::$xmlrpcInt),
+        ], Value::$xmlrpcStruct);
+        return new Response($message);
     }
 
 
