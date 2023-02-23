@@ -1,18 +1,22 @@
 .clr-field {
     min-width: 2.5rem;
 }
+.clr-field input {
+    cursor: pointer;
+    font-size: 0;
+}
 .clr-field button {
-    width: 30px !important;
-    height: 30px !important;
-    right: 5px !important;
-    min-height: 0px !important;
+    height: 30px;
+    min-height: 0px;
+    right: 5px;
+    width: 30px;
 }
 .clr-field button:after {
-    visibility: inherit !important;
+    visibility: inherit;
 }
 .clr-swatches button {
-    min-height: auto !important;
+    min-height: auto;
 }
 .clr-format label {
-    margin: auto !important;
+    margin: auto;
 }
