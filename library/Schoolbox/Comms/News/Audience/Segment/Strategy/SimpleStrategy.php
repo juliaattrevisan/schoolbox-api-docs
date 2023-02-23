@@ -17,7 +17,9 @@ use Schoolbox\Comms\News\Audience\Segment\UserResolutionSql;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Folder;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 use Schoolbox\Comms\News\Audience\Segment\ISimpleStrategy;
 
 use function array_intersect;
@@ -236,10 +238,40 @@ abstract class SimpleStrategy implements ISimpleStrategy
 
         // Load the students for each subject
         // (one query)
-        $subjectCodes = $user->getSubjectCollection()->map(fn ($x) => $x['code']);
+        $subjectFolderIds = $user->getSubjectCollection()->map(fn ($x) => $x['id']);
+        if (count($subjectFolderIds) === 0) {
+            return false;
+        }
 
+        // TODO inject
+        $folders = Folder\Mapper::getInstance()->findByColumn('id', $subjectFolderIds);
+        if (count($folders) === 0) {
+            return false;
+        }
 
-        return null;
+        // TODO inject
+        $externalClass    = new \External_Class();
+        $externalStudents = $externalClass->getStudents(
+            implode(
+                ',',
+                $folders
+                    ->map(fn (Folder\Model $x) => $x->getCodeString())
+                    ->getAll()
+            )
+        );
+        if (count($externalStudents) === 0) {
+            return false;
+        }
+
+        // TODO inject
+        $students = UserMapper::getInstance()->findByColumnList(
+            [
+                'synergy_id' => array_column($externalStudents, 'synergy_id'),
+                'g.group_type' => \Schoolbox\Role::STUDENT,
+            ]
+        );
+
+        return count(array_intersect($this->getValues($students), $entityValues)) > 0;
     }
 
     /**
