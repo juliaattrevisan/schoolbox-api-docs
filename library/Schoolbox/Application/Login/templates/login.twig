@@ -8,12 +8,21 @@
 <meta http-equiv="Content-Language" content="en-au" />
 <meta name="author" content="Schoolbox Pty Ltd"/>
 <meta name="application-name" content="{{ config.school_name }}" />
+<link rel="manifest" href="/manifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="application-name" content="{{ config.title }}">
+<meta name="theme-color" content="{{ config.skin_colour_navigation_background }}">
+<meta name="msapplication-navbutton-color" content="{{ config.skin_colour_navigation_background }}">
+<meta name="msapplication-starturl" content="/">
 <meta name="msapplication-TileColor" content="#0066b0" />
 <meta name="msapplication-square70x70logo" content="/images/logo.php?logo=skin_logo_square&size=tile70" />
 <meta name="msapplication-square150x150logo" content="/images/logo.php?logo=skin_logo_square&size=tile150" />
 <meta name="msapplication-wide310x150logo" content="/images/logo.php?logo=skin_logo_login&size=tile310" />
 <meta name="msapplication-square310x310logo" content="/images/logo.php?logo=skin_logo_large&size=tile310" />
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="viewport" content="initial-scale=1, maximum-scale=1", shrink-to-fit=no">
+<meta name="apple-mobile-web-app-title" content="{{ config.title }}">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" sizes="57x57" href="/images/logo.php?logo=skin_logo_square&size=apple57">
 <link rel="apple-touch-icon" sizes="60x60" href="/images/logo.php?logo=skin_logo_square&size=apple60">
 <link rel="apple-touch-icon" sizes="72x72" href="/images/logo.php?logo=skin_logo_square&size=apple72">
@@ -180,6 +189,15 @@
                 $('#error-msg').remove();
             }
         });
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                        .then((reg) => {
+                            console.log('Service worker registered.', reg);
+                        });
+            });
+        }
     });
 </script>
 {{ config.site_analytics | replace({'{USER_ROLE}':''}) | raw }}

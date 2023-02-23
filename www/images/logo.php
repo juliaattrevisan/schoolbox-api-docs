@@ -51,6 +51,11 @@ $logoSizes = [
         'apple144' => [144, 144, '/core/m-hercules.png'],
         'apple152' => [152, 152, '/core/m-hercules.png'],
         'apple180' => [180, 180, '/core/m-hercules.png'],
+        'google96'  => [96,96, '/core/m-hercules.png'],
+        'google128' => [128,128, '/core/m-hercules.png'],
+        'google192' => [192,192, '/core/m-hercules.png'],
+        'google384' => [384,384, '/core/m-hercules.png'],
+        'google512' => [512,512, '/core/m-hercules.png'],
     ],
     'skin_logo_large'  => [
         'favicon' => [64, 64, '/core/hercules-64x64.png'],
