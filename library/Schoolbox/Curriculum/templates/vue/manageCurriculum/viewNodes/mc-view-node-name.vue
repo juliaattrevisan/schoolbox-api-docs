@@ -182,6 +182,7 @@ function highlightSearchInElement(toHighlight: string) {
     opacity: 1;
     font-size: 1rem;
     font-weight: v-bind(fontWeight);
+    line-height: 2.5;
     width: 100%;
 }
 </style>
