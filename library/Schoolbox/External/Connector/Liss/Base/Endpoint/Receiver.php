@@ -49,6 +49,16 @@ class Receiver
      */
     private const AUTHENTICATION_FAILED = 'Authentication failed; check username/password/schoolCode in your instance.';
 
+    /**
+     * LISS Protocol Version
+     * @see https://liss.net.au/docs/common/authentication/
+     */
+    private const LISS_VERSION = 10000;
+
+    /**
+     * Name of agent (i.e. us)
+     */
+    private const AGENT_NAME = 'Schoolbox';
 
     /**
      * Whether the external db was enabled
@@ -183,6 +193,10 @@ class Receiver
     public function start(): void
     {
         new Server([
+            // this is for liss.hello connection test
+            'liss.hello' => [
+                'function' => [$this,'hello'],
+            ],
             /* A test that appears on the Authorisation tab in the
              * liss client app; checks whether your authorisation
              * settings were correct but gives no user feedback:
@@ -360,6 +374,21 @@ class Receiver
              */
             throw $e;
         }
+    }
+
+
+    /**
+     * https://liss.net.au/docs/api/hello/
+     * @param Request $message
+     * @return Response
+     */
+    public function hello(Request $message): Response
+    {
+        $message = new Value([
+            'SIS'         => new Value(self::AGENT_NAME, 'string'),
+            'LissVersion' => new Value(self::LISS_VERSION, 'int'),
+        ], 'struct');
+        return new Response($message);
     }
 
 
