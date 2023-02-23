@@ -229,6 +229,16 @@ abstract class SimpleStrategy implements ISimpleStrategy
      */
     protected function isTeacherInAudienceValues(User $user, array $entityValues): ?bool
     {
+        // Load this teacher's classes
+        if ($user->getSubjectCollection() === null) {
+            return null;
+        }
+
+        // Load the students for each subject
+        // (one query)
+        $subjectCodes = $user->getSubjectCollection()->map(fn ($x) => $x['code']);
+
+
         return null;
     }
 
