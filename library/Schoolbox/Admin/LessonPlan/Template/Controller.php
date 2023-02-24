@@ -116,9 +116,18 @@ class Controller extends Base
      *
      * @param Model $lessonPlanTemplate
      * @return void
+     * @throws RouteNotFound
      */
     public function getUpdate(Model $lessonPlanTemplate): void
     {
+        $this->getResponse()->content->set([
+            'template' => '@adminLessonPlanTemplate/create.twig',
+            'data' => [
+                'pageCurrent' => $this->router->generate('adminLessonPlanTemplate.getList'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminLessonPlanTemplate.getList')),
+                'lessonPlanTemplate' => $lessonPlanTemplate,
+            ]
+        ]);
     }
 
 

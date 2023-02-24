@@ -29,8 +29,7 @@
                 <section>
                     <ul class="information-list">
                         {% for lessonPlanTemplate in lessonPlanTemplates %}
-                            {#  {% set updateRoute = routeLookupIfAuthorized('adminSummativeReport.getUpdate', {reportId: report.id}) %}#}
-                            {% set updateRoute = '#' %}
+                            {% set updateRoute = routeLookupIfAuthorized('adminLessonPlanTemplate.getUpdate', {lessonPlanTemplateId: lessonPlanTemplate.id}) %}
 
                             <li class="actions-small-3">
                                 <div class="list-item">
