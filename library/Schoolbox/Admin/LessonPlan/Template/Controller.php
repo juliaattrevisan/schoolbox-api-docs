@@ -90,7 +90,10 @@ class Controller extends Base
     public function postCreate(): void
     {
         $postData = $this->getRequest()->post->getArrayCopy();
+        $sequence = 1;
 
+        /* This didn't exist before so I guess we spawn it
+         */
         $template = $this->templateMapper->createModel()
             ->setTitle($postData['title'])
             ->setEnabled(true)
@@ -99,21 +102,24 @@ class Controller extends Base
 
         $this->templateMapper->save($template);
 
-        $numFields = \count($postData['field-new-title']);
+        /* Figure out the combined set of new rows and existing rows
+         */
+        $fieldIds = \array_keys($postData['field-title']);
 
-        for ($i = 1; $i <= $numFields; $i++) {
-            $visibility = Role::STAFF;
+        foreach ($fieldIds as $fieldId) {
+            /* Determine visibility setting, translating ui bool into schema's enum
+             */
+            $visibility = 'on' === $postData['field-visibility'][$fieldId] ? Role::STUDENT : Role::STAFF;
 
-            if ('on' === $postData['field-new-visibility'][$i]) {
-                $visibility = Role::STUDENT;
-            }
-
+            /* Update all the pieces
+             * This is the Create endpoint so we can presume new models are always required
+             */
             $field = $this->fieldMapper->createModel()
-                ->setTitle($postData['field-new-title'][$i])
-                ->setBody($postData['field-new-body'][$i])
+                ->setTitle($postData['field-title'][$fieldId])
+                ->setBody($postData['field-body'][$fieldId])
                 ->setLessonPlanTemplate($template)
                 ->setVisibility($visibility)
-                ->setSequence($i);
+                ->setSequence($sequence++);
 
             $this->fieldMapper->save($field);
         }
@@ -164,8 +170,7 @@ class Controller extends Base
         $fieldIds = \array_keys($postData['field-title']);
 
         foreach ($fieldIds as $fieldId) {
-            /* Determine visibility setting, translating ui bool
-             * into schema's enum
+            /* Determine visibility setting, translating ui bool into schema's enum
              */
             $visibility = 'on' === $postData['field-visibility'][$fieldId] ? Role::STUDENT : Role::STAFF;
 
