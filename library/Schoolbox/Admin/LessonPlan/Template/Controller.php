@@ -195,10 +195,15 @@ class Controller extends Base
         }
 
         /* Then update the template's title in case that might have changed
+         * Technically you, the updater, might be different to the guy who
+         * originally created this LPT
          */
-        $lessonPlanTemplate->setTitle($postData['title']);
+        if (trim((string)$postData['title']) !== trim($lessonPlanTemplate->getTitle())) {
+            $lessonPlanTemplate->setTitle($postData['title'])
+                ->setUpdatedBy($this->getUser());
 
-        $this->templateMapper->save($lessonPlanTemplate);
+            $this->templateMapper->save($lessonPlanTemplate);
+        }
 
         /* Go back to list
          */
