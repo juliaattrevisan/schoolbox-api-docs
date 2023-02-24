@@ -52,7 +52,6 @@ class Mapper extends \Schoolbox\Mapper
                 'multiple'  => true,
             ]
         );
-
     }
 
 

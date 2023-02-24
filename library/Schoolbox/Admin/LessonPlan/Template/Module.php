@@ -16,7 +16,6 @@ use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Mapper\Exception\NotFound;
 
-
 class Module extends BaseModule
 {
     /**
