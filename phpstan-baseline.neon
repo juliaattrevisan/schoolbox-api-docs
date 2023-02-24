@@ -2751,11 +2751,6 @@ parameters:
 			path: library/Schoolbox/Comms/News/Audience/Segment/Strategy/Folder.php
 
 		-
-			message: "#^Strict comparison using \\=\\=\\= between iterable\\<Schoolbox\\\\External\\\\Subject\\>&Schoolbox\\\\External\\\\SubjectCollection and null will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Audience/Segment/Strategy/Folder.php
-
-		-
 			message: "#^Strict comparison using \\=\\=\\= between HouseResidential and null will always evaluate to false\\.$#"
 			count: 1
 			path: library/Schoolbox/Comms/News/Audience/Segment/Strategy/ResHouse.php
