@@ -9,3 +9,5 @@
 **/www/static/js/bundle
 **/www/static/js/ckeditor
 **/www/static/js/vendors
+**/resources/icon_font_raw
+**/stories/assets/mockServiceWorker.js
