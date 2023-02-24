@@ -11,7 +11,6 @@ namespace Schoolbox\Comms\News\Audience\Segment\Strategy\Helper;
 
 use External_ClassInterface;
 use Schoolbox\GenericCollection;
-use Schoolbox\Resource\Folder;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -35,12 +34,10 @@ class StudentLocator
      * Constructor
      *
      * @param UserMapper              $userMapper
-     * @param Folder\Mapper           $folderMapper
      * @param External_ClassInterface $externalClass
      */
     public function __construct(
         private UserMapper $userMapper,
-        private Folder\Mapper $folderMapper,
         private External_ClassInterface $externalClass,
     ) {
     }
@@ -69,30 +66,22 @@ class StudentLocator
      */
     private function internalLocateStudents(User $teacher): GenericCollection
     {
-        // Load the folder IDs for all given subjects
-        $subjectFolderIds = $teacher->getSubjectCollection()
-                                    ->filter(fn ($x) => !empty($x['id']))
-                                    ->map(fn ($x) => $x['id']);
-        if (count($subjectFolderIds) === 0) {
+        // Load the subject codes for all given subjects
+        $subjectCodes  = $teacher->getSubjectCollection()
+            ->filter(fn ($x) => !empty($x['id']))
+            ->map(
+                function ($x) {
+                    return ($x['campusCode'] ?? '') === ''
+                        ? $x['code']
+                        : ($x['campusCode'] . '/' . $x['code']);
+                }
+            )->getAll();
+        if (count($subjectCodes) === 0) {
             return $this->userMapper->createCollection();
         }
 
-        // Load the folders themselves
-        // TODO is folder mapper even necessary? I have subject codes
-        $folders = $this->folderMapper->findByColumn('id', $subjectFolderIds);
-        if (count($folders) === 0) {
-            return $this->userMapper->createCollection();
-        }
-
-        // Load the external students for this teacher
-        $externalStudents = $this->externalClass->getStudents(
-            implode(
-                ',',
-                $folders
-                    ->map(fn (Folder\Model $x) => $x->getCodeString())
-                    ->getAll()
-            )
-        );
+        // Load the external students for this teacher's subjects
+        $externalStudents = $this->externalClass->getStudents(implode(',', $subjectCodes));
         if (count($externalStudents) === 0) {
             return $this->userMapper->createCollection();
         }
