@@ -139,5 +139,8 @@ class Controller extends Base
      */
     public function postUpdate(Model $lessonPlanTemplate): void
     {
+        $postData = $this->getRequest()->post->getArrayCopy();
+
+        new \Alaress_Probe($postData);
     }
 }
