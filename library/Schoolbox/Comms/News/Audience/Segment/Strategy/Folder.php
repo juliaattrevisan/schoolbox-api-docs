@@ -114,9 +114,10 @@ class Folder extends SimpleStrategy
         FolderMapper $folderMapper,
         RoleAccessMapper $roleAccessMapper,
         External_UserInterface $externalUser,
-        array $knownUserSubjects
+        array $knownUserSubjects,
+        Audience\Segment\Strategy\Helper\StudentLocator $studentLocator,
     ) {
-        parent::__construct($userAccessMapper, $access, $staffCanPost, $moderationRequired);
+        parent::__construct($userAccessMapper, $access, $staffCanPost, $moderationRequired, $studentLocator);
         $this->canTargetTeachersOfUsersInFolder = $canTargetTeachersOfUsersInFolder;
         $this->folderMapper                     = $folderMapper;
         $this->roleAccessMapper                 = $roleAccessMapper;

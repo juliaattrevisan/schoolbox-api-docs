@@ -98,7 +98,8 @@ class StrategyFactory
         Access $access,
         External_UserInterface $externalUser,
         IConnector $db,
-        array $knownUserSubjects
+        array $knownUserSubjects,
+        private Strategy\Helper\StudentLocator $studentLocator,
     ) {
         $this->userAccessMapper                 = $userAccessMapper;
         $this->staffCanPost                     = $staffCanPost;
@@ -257,6 +258,7 @@ class StrategyFactory
                     $this->access,
                     $this->staffCanPost,
                     $this->moderationRequired,
+                    $this->studentLocator,
                 );
             case Strategy\Super::getEntityType():
                 return new Strategy\Super(
@@ -264,6 +266,7 @@ class StrategyFactory
                     $this->access,
                     $this->staffCanPost,
                     $this->moderationRequired,
+                    $this->studentLocator,
                 );
             case Strategy\Campus::getEntityType():
                 return new Strategy\Campus(
@@ -271,6 +274,7 @@ class StrategyFactory
                     $this->access,
                     $this->staffCanPost,
                     $this->moderationRequired,
+                    $this->studentLocator,
                 );
             case Strategy\Role::getEntityType():
                 return new Strategy\Role(
@@ -278,6 +282,7 @@ class StrategyFactory
                     $this->access,
                     $this->staffCanPost,
                     $this->moderationRequired,
+                    $this->studentLocator,
                 );
             case Strategy\RoleType::getEntityType():
                 return new Strategy\RoleType(
@@ -285,6 +290,7 @@ class StrategyFactory
                     $this->access,
                     $this->staffCanPost,
                     $this->moderationRequired,
+                    $this->studentLocator,
                 );
             case Strategy\SchoolHouse::getEntityType():
                 return new Strategy\SchoolHouse(
@@ -292,6 +298,7 @@ class StrategyFactory
                     $this->access,
                     $this->staffCanPost,
                     $this->moderationRequired,
+                    $this->studentLocator,
                 );
             case Strategy\ResHouse::getEntityType():
                 return new Strategy\ResHouse(
@@ -299,6 +306,7 @@ class StrategyFactory
                     $this->access,
                     $this->staffCanPost,
                     $this->moderationRequired,
+                    $this->studentLocator,
                 );
             case Strategy\Year::getEntityType():
                 return new Strategy\Year(
@@ -306,6 +314,7 @@ class StrategyFactory
                     $this->access,
                     $this->staffCanPost,
                     $this->moderationRequired,
+                    $this->studentLocator,
                 );
             case Strategy\Service::getEntityType():
                 return new Strategy\Service(
@@ -313,6 +322,7 @@ class StrategyFactory
                     $this->access,
                     $this->staffCanPost,
                     $this->moderationRequired,
+                    $this->studentLocator,
                 );
             case Strategy\Folder::getEntityType():
                 return new Strategy\Folder(
@@ -325,6 +335,7 @@ class StrategyFactory
                     $this->roleAccessMapper,
                     $this->externalUser,
                     $this->knownUserSubjects,
+                    $this->studentLocator,
                 );
             case Strategy\FixturesTeam::getEntityType():
                 return new Strategy\FixturesTeam(
@@ -334,6 +345,7 @@ class StrategyFactory
                     $this->moderationRequired,
                     $this->isFixturesEnabled,
                     $this->db,
+                    $this->studentLocator,
                 );
         }
 

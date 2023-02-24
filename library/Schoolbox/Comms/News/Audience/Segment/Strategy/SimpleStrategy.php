@@ -64,6 +64,7 @@ abstract class SimpleStrategy implements ISimpleStrategy
         Access $access,
         bool $staffCanPost,
         bool $moderationRequired,
+        private Helper\StudentLocator $studentLocator,
     ) {
         $this->userAccessMapper   = $userAccessMapper;
         $this->access             = $access;
@@ -228,56 +229,12 @@ abstract class SimpleStrategy implements ISimpleStrategy
             return null;
         }
 
-        self::$teacherStudentCache[$user->getId()] ??= $this->loadTeacherStudents($user);
-        return count(array_intersect($this->getValues(self::$teacherStudentCache[$user->getId()]), $entityValues)) > 0;
-    }
-
-    /**
-     * Helper for loading a teacher user's list of students.
-     *
-     * @param User $user
-     * @return GenericCollection|User[] A list of students
-     */
-    private function loadTeacherStudents(User $user): GenericCollection
-    {
-        // Load the folder IDs for all given subjects
-        $subjectFolderIds = $user->getSubjectCollection()
-            ->filter(fn ($x) => !empty($x['id']))
-            ->map(fn ($x) => $x['id']);
-        if (count($subjectFolderIds) === 0) {
-            return User::createCollection();
-        }
-
-        // Load the folders themselves
-        // TODO inject folder mapper
-        $folders = Folder\Mapper::getInstance()->findByColumn('id', $subjectFolderIds);
-        if (count($folders) === 0) {
-            return User::createCollection();
-        }
-
-        // Load the external students for this teacher
-        // TODO inject SIS class lookup
-        $externalClass    = new \External_Class();
-        $externalStudents = $externalClass->getStudents(
-            implode(
-                ',',
-                $folders
-                    ->map(fn (Folder\Model $x) => $x->getCodeString())
-                    ->getAll()
+        return count(
+            array_intersect(
+                $this->getValues($this->studentLocator->locateStudents($user)),
+                $entityValues
             )
-        );
-        if (count($externalStudents) === 0) {
-            return User::createCollection();
-        }
-
-        // Load the actual user objects
-        // TODO inject user mapper
-        return UserMapper::getInstance()->findByColumnList(
-            [
-                'synergy_id'   => array_column($externalStudents, 'synergy_id'),
-                'g.group_type' => \Schoolbox\Role::STUDENT,
-            ]
-        );
+        ) > 0;
     }
 
     /**
