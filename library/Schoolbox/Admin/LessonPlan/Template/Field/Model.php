@@ -37,6 +37,14 @@ class Model implements ISoftDeletable
 
 
     /**
+     * The body text for a field
+     *
+     * @var string|null
+     */
+    private ?string $body = null;
+
+
+    /**
      * Visibility in the list screen
      * Corresponds to Role::STUDENT or Role::STAFF
      *
@@ -89,6 +97,26 @@ class Model implements ISoftDeletable
     public function setTitle(?string $title): self
     {
         $this->title = $title;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getBody(): ?string
+    {
+        return $this->body;
+    }
+
+
+    /**
+     * @param string|null $body
+     * @return Model
+     */
+    public function setBody(?string $body): self
+    {
+        $this->body = $body;
         return $this;
     }
 

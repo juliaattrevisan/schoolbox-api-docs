@@ -34,6 +34,7 @@ CREATE TABLE `lesson_plan_template_field` (
  `id` INT NOT NULL AUTO_INCREMENT,
  `lesson_plan_template_id` INT NOT NULL,
  `title` VARCHAR(255) NOT NULL,
+ `body` TEXT NOT NULL,
  `visibility` ENUM('student', 'staff') NOT NULL,
  `sequence` INT NOT NULL,
  `created_at` DATETIME NOT NULL,

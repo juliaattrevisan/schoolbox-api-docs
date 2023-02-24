@@ -70,8 +70,9 @@ class Controller extends Base
      * Persist a new lesson plan template
      *
      * @return void
-     * @throws \PDOException
      * @throws Exception
+     * @throws RouteNotFound
+     * @throws \PDOException
      * @throws \UnexpectedValueException
      */
     public function postCreate(): void
@@ -97,6 +98,7 @@ class Controller extends Base
 
             $field = $this->fieldMapper->createModel()
                 ->setTitle($postData['field-new-title'][$i])
+                ->setBody($postData['field-new-body'][$i])
                 ->setLessonPlanTemplate($template)
                 ->setVisibility($visibility)
                 ->setSequence($i);
