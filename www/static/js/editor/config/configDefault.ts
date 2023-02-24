@@ -204,11 +204,11 @@ export function getDefault() {
                     element: "tt",
                     classes: [""],
                 },
-                {
+                /* {
                     name: "Computer Code",
                     element: "code",
                     classes: [""],
-                },
+                }, */
                 {
                     name: "Highlighted Note",
                     element: "span",
@@ -218,16 +218,6 @@ export function getDefault() {
                     name: "Banner",
                     element: "p",
                     classes: ["s-banner"],
-                },
-                {
-                    name: "Banner 2",
-                    element: "p",
-                    classes: ["s-banner-2"],
-                },
-                {
-                    name: "Banner 3",
-                    element: "p",
-                    classes: ["s-banner-3"],
                 },
                 {
                     name: "Info Callout",
@@ -263,11 +253,6 @@ export function getDefault() {
                     name: "Construction",
                     element: "p",
                     classes: ["s-construction"],
-                },
-                {
-                    name: "Construction 2",
-                    element: "p",
-                    classes: ["s-construction-2"],
                 },
             ],
         },
