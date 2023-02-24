@@ -83,25 +83,25 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
 
 
     /**
-     * @dataProvider provider_validSimpleRootSegment
+     * @dataProvider providerValidSimpleRootSegment
      * @param Audience\Model $segment
      * @throws PHPUnit\Framework\AssertionFailedError
      */
-    public function test_validSimpleRootSegment(Audience\Model $segment): void
+    public function testValidSimpleRootSegment(Audience\Model $segment): void
     {
         $this->assertTrue($this->validSegmentSpec->isSatisfiedBy($segment));
     }
 
 
     /**
-     * @dataProvider provider_invalidSimpleRootSegment
+     * @dataProvider providerInvalidSimpleRootSegment
      * @param Audience\Model $segment
      * @param string         $expected
      * @param string         $message
      * @throws PHPUnit\Framework\AssertionFailedError
      * @throws PHPUnit\Framework\Exception
      */
-    public function test_invalidSimpleRootSegment(Audience\Model $segment, string $expected, string $message): void
+    public function testInvalidSimpleRootSegment(Audience\Model $segment, string $expected, string $message): void
     {
         $this->assertFalse($this->validSegmentSpec->isSatisfiedBy($segment), $message);
 
@@ -112,11 +112,11 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
 
 
     /**
-     * @dataProvider provider_invalidSegmentTrees
+     * @dataProvider providerInvalidSegmentTrees
      * @param Audience\Model $segment
      * @throws PHPUnit\Framework\Exception
      */
-    public function test_invalidSegmentTree(Audience\Model $segment): void
+    public function testInvalidSegmentTree(Audience\Model $segment): void
     {
         $this->assertFalse($this->validSegmentSpec->isSatisfiedBy($segment));
 
@@ -131,7 +131,7 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function provider_validSimpleRootSegment(): array
+    public function providerValidSimpleRootSegment(): array
     {
         return [
             [
@@ -173,7 +173,7 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function provider_invalidSimpleRootSegment(): array
+    public function providerInvalidSimpleRootSegment(): array
     {
         return [
             [
@@ -221,7 +221,7 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function provider_invalidSegmentTrees(): array
+    public function providerInvalidSegmentTrees(): array
     {
         // Straight chain
         $grandparent = (new Audience\Model())
