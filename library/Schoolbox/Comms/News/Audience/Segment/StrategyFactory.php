@@ -28,7 +28,6 @@ use External_UserInterface;
  */
 class StrategyFactory
 {
-
     /** @var UserAccessMapper */
     private $userAccessMapper;
 
