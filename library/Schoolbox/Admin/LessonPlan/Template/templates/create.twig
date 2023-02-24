@@ -22,7 +22,21 @@
             <div class="small-12 island">
                 <section>
                     <fieldset class="content">
-                        I guess the form goes here
+                        <div class="small-12 columns">
+                            <label for="lesson-plan-template-title" class="required">Title</label>
+                            {# This maxlength corresponds to the schema field length #}
+                            <input type="text" id="lesson-plan-template-title" name="title" maxlength="255" value="{{ lessonPlanTemplate.title ?? ''}}" />
+                        </div>
+                    </fieldset>
+                    <fieldset class="content">
+                        <legend>Fields</legend>
+
+                        <ul id="fields" class="information-list lesson-plan-template-fields">
+                        </ul>
+
+                        <div class="small-12 columns">
+                            <a class='icon-add button full-width' id="add-field">Add a new field</a>
+                        </div>
                     </fieldset>
                 </section>
             </div>
@@ -34,3 +48,69 @@
         </form>
     </div>
 </div>
+
+<div id="field-blueprint" style="display:none">
+    <div>
+        <label for="field-title" class="required">Title</label>
+        <input type="text" id="field-title" maxlength="255" value="" />
+    </div>
+    <div>
+        <label for="field-body" class="required">Body</label>
+        <textarea id="field-body" rows="5"></textarea>
+    </div>
+    <div>
+        <input id="field-visibility" type="checkbox" />
+        <label for="field-visibility" class="checkbox-label">Visible to students</label>
+    </div>
+</div>
+
+<script>
+    $(function() {
+        $('#add-field').on('click', function() {
+            /* Make a clone
+             */
+            let clone = $($('#field-blueprint').html());
+
+            /* Update the ids and name attributes
+             */
+            let fieldCount = $('#fields').find('li').length + 1;
+
+            let titleId = 'field-title-' + fieldCount;
+            let titleName = 'field-title[' + fieldCount + ']';
+
+            let bodyId = 'field-body-' + fieldCount;
+            let bodyName = 'field-body[' + fieldCount + ']';
+
+            let visibilityId = 'field-visibility-' + fieldCount;
+            let visibilityName = 'field-visibility[' + fieldCount + ']';
+
+            clone.find('input[id="field-title"]').attr('name', titleName);
+            clone.find('input[id="field-title"]').attr('id', titleId);
+            clone.find('label[for="field-title"]').attr('for', titleId);
+
+            clone.find('textarea[id="field-body"]').attr('name', bodyName);
+            clone.find('textarea[id="field-body"]').attr('id', bodyId);
+            clone.find('label[for="field-body"]').attr('for', bodyId);
+
+            clone.find('input[id="field-visibility"]').attr('name', visibilityName);
+            clone.find('input[id="field-visibility"]').attr('id', visibilityId);
+            clone.find('label[for="field-visibility"]').attr('for', visibilityId);
+
+            /* Inject it into the stack
+             */
+            let li = $('<li></li>');
+            li.append(clone);
+
+            $('#fields').append(li);
+        });
+    });
+</script>
+
+<style type="text/css">
+    .lesson-plan-template-fields li {
+        list-style: none;
+        border-bottom: 1px solid #ddd;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+</style>
