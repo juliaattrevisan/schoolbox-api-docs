@@ -68,6 +68,9 @@ class Controller extends Base
      */
     public function postCreate(): void
     {
+        $postData = $this->getRequest()->post->getArrayCopy();
+
+        new \Alaress_Probe($postData);
     }
 
 

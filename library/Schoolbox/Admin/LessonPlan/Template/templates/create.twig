@@ -59,6 +59,7 @@
         <textarea id="field-body" rows="5"></textarea>
     </div>
     <div>
+        <input type="hidden" value="off" />
         <input id="field-visibility" type="checkbox" />
         <label for="field-visibility" class="checkbox-label">Visible to students</label>
     </div>
@@ -95,6 +96,10 @@
             clone.find('input[id="field-visibility"]').attr('name', visibilityName);
             clone.find('input[id="field-visibility"]').attr('id', visibilityId);
             clone.find('label[for="field-visibility"]').attr('for', visibilityId);
+
+            /* Placeholder
+             */
+            clone.find('input[type="hidden"]').attr('name', visibilityName);
 
             /* Inject it into the stack
              */
