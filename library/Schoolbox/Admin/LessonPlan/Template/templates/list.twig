@@ -38,10 +38,18 @@
                                     <div class="card small-12">
                                         {% if updateRoute %}
                                             <a href="{{ updateRoute }}">
-                                                <h3>{{ lessonPlanTemplate.title }}</h3>
+                                                {% if lessonPlanTemplate.enabled %}
+                                                    <h3>{{ lessonPlanTemplate.title }}</h3>
+                                                {% else %}
+                                                    <h3><del>{{ lessonPlanTemplate.title }}</del></h3>
+                                                {% endif %}
                                             </a>
                                         {% else %}
-                                            <h3>{{ lessonPlanTemplate.title }}</h3>
+                                            {% if lessonPlanTemplate.enabled %}
+                                                <h3>{{ lessonPlanTemplate.title }}</h3>
+                                            {% else %}
+                                                <h3><del>{{ lessonPlanTemplate.title }}</del></h3>
+                                            {% endif %}
                                         {% endif %}
                                         <p class="meta">
                                             Last modified by
