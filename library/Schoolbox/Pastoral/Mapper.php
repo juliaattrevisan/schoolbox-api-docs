@@ -846,7 +846,7 @@ class Mapper extends BaseMapper
             $this->bindings[':beforeDate'] = $before_date->endOfDay()
                                                          ->toIso8601String();
 
-            $this->filters[] = '(COALESCE(`pastoral`.`occurred_on`, `pastoral`.`created_at` <= :beforeDate))';
+            $this->filters[] = '(COALESCE(`pastoral`.`occurred_on`, `pastoral`.`created_at`) <= :beforeDate)';
         }
 
         if ($after_date instanceof Alaress_Date_Format) {
