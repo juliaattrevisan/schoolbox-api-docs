@@ -109,8 +109,17 @@ export const useViewNodesStore = defineStore("mcViewNodes", () => {
 
     /**
      * So if the page is refreshed the current node view is maintained
+     * and to allow for browser back and forward buttons
      */
     function updateHash() {
+        /**
+         * don't update the history state while we are traversing the tree,
+         * this occurs while moving to a selected searched node or moving to the node id via the initial page hash,
+         * otherwise each node traversal will be added to the history
+         */
+        if (useNodesStore().isLoadingAllChildren) {
+            return;
+        }
         if (current.value.id === UNSET_ID) {
             window.history.pushState({ nodeId: UNSET_ID }, "", "");
         } else {

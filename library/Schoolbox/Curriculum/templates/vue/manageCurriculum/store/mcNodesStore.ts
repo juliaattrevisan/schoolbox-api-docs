@@ -22,6 +22,7 @@ export const useNodesStore = defineStore("mcNodes", () => {
     const nodes = ref<Node>(getEmptyNode()); // all the nodes currently loaded
     const isLoading = ref(false); // to display loading note
     const hasLoadError = ref(false); // to display loading error
+    const isLoadingAllChildren = ref(false); // to distinguish when we are traversing through multiple trees
 
     /**
      * If there's only no Curriculum, display an empty state
@@ -83,11 +84,10 @@ export const useNodesStore = defineStore("mcNodes", () => {
      * load in all the children required to reach the depth of the node,
      * avoiding loading those nodes that are already loaded
      *
-     * @todo - this setup currently assumes we are already in the node tree of the passed through node
-     * it currently doesnt handle an entirely new node tree
      * @param { Node } node - the Node to load all children of
      */
     async function loadAllChildren(node: Node) {
+        isLoadingAllChildren.value = true;
         const breadcrumbs = getBreadcrumbs(node, []);
         breadcrumbs.push({ id: node.id, name: node.name }); // add in the actual node as the last
         const viewNodesStore = useViewNodesStore();
@@ -100,6 +100,9 @@ export const useNodesStore = defineStore("mcNodes", () => {
         );
         for (let i = 0; i < onlyInactiveBreadcrumbs.length; i += 1) {
             // recursively load in each node and traverse down
+            if (i === onlyInactiveBreadcrumbs.length - 1) {
+                isLoadingAllChildren.value = false;
+            }
             await useViewNodesStore().setNextSelected(onlyInactiveBreadcrumbs[i].id);
         }
     }
@@ -144,6 +147,7 @@ export const useNodesStore = defineStore("mcNodes", () => {
         updateNodes($nodes);
         const store = useStore();
         if (store.hasId) {
+            // if we have an id passed via the url hash, we load that
             await loadId(store.id);
         } else if (hasSingleCurriculum.value) {
             // we jump straight to the only node available if there's only one
@@ -252,6 +256,7 @@ export const useNodesStore = defineStore("mcNodes", () => {
         nodes,
         isLoading,
         hasLoadError,
+        isLoadingAllChildren,
         hasNoCurriculum,
         hasSingleCurriculum,
         load,

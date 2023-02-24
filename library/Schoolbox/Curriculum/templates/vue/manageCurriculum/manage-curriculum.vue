@@ -64,12 +64,23 @@ function initErrorListener() {
 }
 
 /**
+ * So we can traverse the history when moving forward and back
+ * through the node tree
+ */
+function initHistoryListener() {
+    window.addEventListener("popstate", (event) => {
+        console.warn(event);
+    });
+}
+
+/**
  * Start loading the curriculum data
  */
 onMounted(async () => {
     await store.init(props.dataEndpoint, props.isReadOnly, props.uiLimit, toastEl);
     if (store.hasId) {
         initErrorListener();
+        initHistoryListener();
     }
 });
 
