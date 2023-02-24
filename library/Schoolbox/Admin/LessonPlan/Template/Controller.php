@@ -12,12 +12,23 @@ namespace Schoolbox\Admin\LessonPlan\Template;
 
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
+use DebugBar\DebugBarException;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Mapper\Exception;
-
+use Schoolbox\Role;
 
 class Controller extends Base
 {
+    /**
+     * An arbitrarily chosen prefix for new Field rows in the
+     * create/update screens, which distinguishes new rows
+     * from pre-existing ones since the ui lets you spawn new
+     * rows and mix-and-match them with existing ones in some
+     * arbitrary user-chosen order.
+     */
+    private const NEW_KEYWORD = 'new';
+
+
     /**
      * Controller constructor.
      *
@@ -91,10 +102,10 @@ class Controller extends Base
         $numFields = \count($postData['field-new-title']);
 
         for ($i = 1; $i <= $numFields; $i++) {
-            $visibility = \Schoolbox\Role::STAFF;
+            $visibility = Role::STAFF;
 
             if ('on' === $postData['field-new-visibility'][$i]) {
-                $visibility = \Schoolbox\Role::STUDENT;
+                $visibility = Role::STUDENT;
             }
 
             $field = $this->fieldMapper->createModel()
@@ -107,6 +118,8 @@ class Controller extends Base
             $this->fieldMapper->save($field);
         }
 
+        /* Go back to list
+         */
         $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminLessonPlanTemplate.getList'));
     }
 
@@ -136,11 +149,54 @@ class Controller extends Base
      *
      * @param Model $lessonPlanTemplate
      * @return void
+     * @throws Exception
+     * @throws RouteNotFound
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
     public function postUpdate(Model $lessonPlanTemplate): void
     {
         $postData = $this->getRequest()->post->getArrayCopy();
+        $sequence = 1;
 
-        new \Alaress_Probe($postData);
+        /* Figure out the combined set of new rows and existing rows
+         */
+        $fieldIds = \array_keys($postData['field-title']);
+
+        foreach ($fieldIds as $fieldId) {
+            /* Determine visibility setting, translating ui bool
+             * into schema's enum
+             */
+            $visibility = 'on' === $postData['field-visibility'][$fieldId] ? Role::STUDENT : Role::STAFF;
+
+            /* This is either a new row that was spawned by user,
+             * or it's a pre-existing row we can get from $lessonPlanTemplate
+             */
+            if (str_contains((string)$fieldId, self::NEW_KEYWORD)) {
+                $field = $this->fieldMapper->createModel();
+            } else {
+                $field = $lessonPlanTemplate->getFields()->getBy('id', $fieldId);
+            }
+
+            /* Update all the pieces
+             */
+            $field->setTitle($postData['field-title'][$fieldId])
+                ->setBody($postData['field-body'][$fieldId])
+                ->setLessonPlanTemplate($lessonPlanTemplate)
+                ->setVisibility($visibility)
+                ->setSequence($sequence++);
+
+            $this->fieldMapper->save($field);
+        }
+
+        /* Then update the template's title in case that might have changed
+         */
+        $lessonPlanTemplate->setTitle($postData['title']);
+
+        $this->templateMapper->save($lessonPlanTemplate);
+
+        /* Go back to list
+         */
+        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminLessonPlanTemplate.getList'));
     }
 }
