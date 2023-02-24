@@ -210,3 +210,32 @@ export function getUsageHref(usage: Usage) {
     };
     return icons[usage.discriminator]();
 }
+
+/**
+ * To return the hash of the current url as a node id
+ *
+ * @returns { number } - the node id
+ */
+export function getIdHash() {
+    const documentURL = document.URL;
+    return Number(documentURL.substring(documentURL.indexOf("#") + 1, documentURL.length));
+}
+
+/**
+ * a node id could be passed into the page via the hash,
+ * if so we need to traverse to this node on load if the hash
+ * is a valid node id
+ *
+ * @returns { boolean } - whether the hash is valid
+ */
+export function isValidHash() {
+    const documentURL = document.URL;
+    const hashCount = (documentURL.match(/#/g) || []).length; // the number of # found in the url
+    const idHash = getIdHash();
+    const isIdNumber = Number.isInteger(idHash);
+    // we check if there's an #, and the string proceeding it is a number
+    if (hashCount === 1 && isIdNumber && idHash !== UNSET_ID) {
+        return true;
+    }
+    return false;
+}
