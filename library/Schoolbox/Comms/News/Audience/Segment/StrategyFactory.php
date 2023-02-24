@@ -252,23 +252,68 @@ class StrategyFactory
             case Strategy\Composite::getEntityType():
                 return new Strategy\Composite();
             case Strategy\User::getEntityType():
-                return new Strategy\User($this->userAccessMapper, $this->access, $this->staffCanPost, $this->moderationRequired);
+                return new Strategy\User(
+                    $this->userAccessMapper,
+                    $this->access,
+                    $this->staffCanPost,
+                    $this->moderationRequired,
+                );
             case Strategy\Super::getEntityType():
-                return new Strategy\Super($this->userAccessMapper, $this->access, $this->staffCanPost, $this->moderationRequired);
+                return new Strategy\Super(
+                    $this->userAccessMapper,
+                    $this->access,
+                    $this->staffCanPost,
+                    $this->moderationRequired,
+                );
             case Strategy\Campus::getEntityType():
-                return new Strategy\Campus($this->userAccessMapper, $this->access, $this->staffCanPost, $this->moderationRequired);
+                return new Strategy\Campus(
+                    $this->userAccessMapper,
+                    $this->access,
+                    $this->staffCanPost,
+                    $this->moderationRequired,
+                );
             case Strategy\Role::getEntityType():
-                return new Strategy\Role($this->userAccessMapper, $this->access, $this->staffCanPost, $this->moderationRequired);
+                return new Strategy\Role(
+                    $this->userAccessMapper,
+                    $this->access,
+                    $this->staffCanPost,
+                    $this->moderationRequired,
+                );
             case Strategy\RoleType::getEntityType():
-                return new Strategy\RoleType($this->userAccessMapper, $this->access, $this->staffCanPost, $this->moderationRequired);
+                return new Strategy\RoleType(
+                    $this->userAccessMapper,
+                    $this->access,
+                    $this->staffCanPost,
+                    $this->moderationRequired,
+                );
             case Strategy\SchoolHouse::getEntityType():
-                return new Strategy\SchoolHouse($this->userAccessMapper, $this->access, $this->staffCanPost, $this->moderationRequired);
+                return new Strategy\SchoolHouse(
+                    $this->userAccessMapper,
+                    $this->access,
+                    $this->staffCanPost,
+                    $this->moderationRequired,
+                );
             case Strategy\ResHouse::getEntityType():
-                return new Strategy\ResHouse($this->userAccessMapper, $this->access, $this->staffCanPost, $this->moderationRequired);
+                return new Strategy\ResHouse(
+                    $this->userAccessMapper,
+                    $this->access,
+                    $this->staffCanPost,
+                    $this->moderationRequired,
+                );
             case Strategy\Year::getEntityType():
-                return new Strategy\Year($this->userAccessMapper, $this->access, $this->staffCanPost, $this->moderationRequired);
+                return new Strategy\Year(
+                    $this->userAccessMapper,
+                    $this->access,
+                    $this->staffCanPost,
+                    $this->moderationRequired,
+                );
             case Strategy\Service::getEntityType():
-                return new Strategy\Service($this->userAccessMapper, $this->access, $this->staffCanPost, $this->moderationRequired);
+                return new Strategy\Service(
+                    $this->userAccessMapper,
+                    $this->access,
+                    $this->staffCanPost,
+                    $this->moderationRequired,
+                );
             case Strategy\Folder::getEntityType():
                 return new Strategy\Folder(
                     $this->userAccessMapper,
@@ -279,7 +324,7 @@ class StrategyFactory
                     $this->folderMapper,
                     $this->roleAccessMapper,
                     $this->externalUser,
-                    $this->knownUserSubjects
+                    $this->knownUserSubjects,
                 );
             case Strategy\FixturesTeam::getEntityType():
                 return new Strategy\FixturesTeam(
