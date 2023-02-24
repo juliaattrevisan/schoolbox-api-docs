@@ -20,7 +20,8 @@ const props = defineProps<Props>();
             <div class="usage__container">
                 <div :class="`usage__icon-container ${getUsageIcon(props.usage)} size-24`"></div>
                 <div class="usage__title-container">
-                    <p>{{ props.usage.object.title }}</p>
+                    <p v-if="props.usage.discriminator === ActivityTypes.BADGE">{{ props.usage.object.name }}</p>
+                    <p v-else>{{ props.usage.object.title }}</p>
                     <p v-if="props.usage.discriminator === ActivityTypes.COURSE" class="meta">
                         {{ (props.usage.object as CourseUsageObject).folder?.parent?.title }}
                     </p>
@@ -31,7 +32,7 @@ const props = defineProps<Props>();
                         {{ (props.usage.object as FolderUsageObject).parent?.title }}
                     </p>
                     <p v-else-if="props.usage.discriminator === ActivityTypes.BADGE" class="meta">
-                        {{ (props.usage.object as BadgeUsageObject).category }}
+                        {{ (props.usage.object as BadgeUsageObject).category.name }}
                     </p>
                 </div>
             </div>
