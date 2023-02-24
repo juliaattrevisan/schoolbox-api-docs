@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Comms\News\Audience\Test;
 
 use Alaress\Database\Connector\IConnector;
+use External_Offline_Class;
 use PHPUnit;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Audience;
@@ -23,6 +24,7 @@ use Alaress\Specification;
 use Schoolbox\Comms\News\Audience\Validation;
 use Schoolbox\Resource\Folder;
 use External_Offline_User;
+use Schoolbox\UserMapper;
 
 /**
  * For testing a segment is inherently validly constructed, as opposed to any user authorisation logic
@@ -66,7 +68,11 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
             ),
             new External_Offline_User(),
             $mockConnector,
-            []
+            [],
+            new Audience\Segment\Strategy\Helper\StudentLocator(
+                UserMapper::getInstance(),
+                new External_Offline_Class(),
+            )
         ))->getValidRelationshipModifiers();
 
         // Either not targeted to NULL, or targeted to NULL but that's valid for the segment's entity
