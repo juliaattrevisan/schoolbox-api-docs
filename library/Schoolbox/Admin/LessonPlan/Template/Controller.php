@@ -12,7 +12,6 @@ namespace Schoolbox\Admin\LessonPlan\Template;
 
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
-use DebugBar\DebugBarException;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Role;
