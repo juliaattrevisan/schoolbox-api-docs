@@ -1,0 +1,36 @@
+{##
+ # Create Lesson Plan Templates
+ #
+ # @param LessonPlan/Template/Model $lessonPlanTemplate
+ #}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
+<div class="admin-container row">
+
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation(pageCurrent) }}
+
+    {% if lessonPlanTemplate and lessonPlanTemplate.id %}
+        {% set formAction = routeLookupIfAuthorized('adminLessonPlanTemplate.postUpdate', {lessonPlanTemplate: lessonPlanTemplate, lessonPlanTemplateId: lessonPlanTemplate.id}) %}
+    {% else %}
+        {% set formAction = routeLookupIfAuthorized('adminLessonPlanTemplate.postCreate') %}
+    {% endif %}
+
+    <div class="admin-content">
+        <form id="lesson-plan-template-form" action="{{ formAction }}" method="post">
+            <div class="small-12 island">
+                <section>
+                    <fieldset class="content">
+                        I guess the form goes here
+                    </fieldset>
+                </section>
+            </div>
+            <div class="small-12 columns">
+                <section>
+                    <input type="submit" value="Save" />
+                </section>
+            </div>
+        </form>
+    </div>
+</div>

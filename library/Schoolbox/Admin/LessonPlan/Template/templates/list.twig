@@ -2,7 +2,7 @@
  # List of Lesson Plan Templates
  #
  # @param GenericCollection $lessonPlanTemplates  A list of LessonPlan/Template/Model instances
-#}
+ #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
 
@@ -11,8 +11,7 @@
     {# Shared navigation menu #}
     {{ renderAdminNavigation(pageCurrent) }}
 
-    {# {% set createRoute = routeLookupIfAuthorized('adminLessonPlanTemplate.getCreate') %}#}
-    {% set createRoute = '#' %}
+    {% set createRoute = routeLookupIfAuthorized('adminLessonPlanTemplate.getCreate') %}
 
     <div class="admin-content">
         {% if lessonPlanTemplates|length %}

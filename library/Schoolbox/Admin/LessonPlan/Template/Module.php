@@ -40,6 +40,8 @@ class Module extends BaseModule
         );
 
         $this->register('GET', '', 'getList', $getPerms);
+        $this->register('GET', '/create', 'getCreate', $getPerms);
+        $this->register('POST', '/create', 'postCreate', $postPerms);
     }
 
 
