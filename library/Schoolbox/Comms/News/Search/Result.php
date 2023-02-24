@@ -11,6 +11,7 @@
 namespace Schoolbox\Comms\News\Search;
 
 use Alaress\Database\Connector\IConnector;
+use External_Class;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Audience\Segment;
@@ -23,6 +24,7 @@ use Schoolbox\Resource\Search\MapperResult\Base;
 use Schoolbox\Resource\Search\Sanitiser;
 use Schoolbox\User;
 use External_User;
+use Schoolbox\UserMapper;
 
 class Result extends Base
 {
@@ -182,7 +184,11 @@ class Result extends Base
             Access\Access::getInstance(),
             new External_User(),
             $this->database,
-            []
+            [],
+            new Segment\Strategy\Helper\StudentLocator(
+                UserMapper::getInstance(),
+                new External_Class(),
+            )
         );
 
         /* Is $user in the audience of the article?
