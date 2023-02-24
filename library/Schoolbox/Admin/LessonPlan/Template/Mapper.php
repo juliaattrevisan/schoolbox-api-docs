@@ -12,6 +12,7 @@ namespace Schoolbox\Admin\LessonPlan\Template;
 
 use PDOStatement;
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -41,6 +42,17 @@ class Mapper extends \Schoolbox\Mapper
         $this->joins('updated_by', UserMapper::class, 'id', null, null, 'updatedBy', 'updatedBy');
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
         $this->joins('deleted_by', UserMapper::class, 'id', null, null, 'deletedBy', 'deletedBy');
+
+        $this->hasJoin(
+            'field',
+            [
+                'mapper'    => Field\Mapper::class,
+                'this_key'  => 'id',
+                'other_key' => 'lesson_plan_template_id',
+                'multiple'  => true,
+            ]
+        );
+
     }
 
 
@@ -57,11 +69,13 @@ class Mapper extends \Schoolbox\Mapper
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('createdBy', 'createdBy')},
                 {$this->getJoinColumnString('updatedBy', 'updatedBy')},
-                {$this->getJoinColumnString('deletedBy', 'deletedBy')}
+                {$this->getJoinColumnString('deletedBy', 'deletedBy')},
+                {$this->getJoinColumnString('field', 'field')}
             FROM {$this->getTable()}
             INNER JOIN {$this->getJoinSql('createdBy', '', 'createdBy')}
             INNER JOIN {$this->getJoinSql('updatedBy', '', 'updatedBy')}
             LEFT JOIN {$this->getJoinSql('deletedBy', '', 'deletedBy')}
+            LEFT JOIN {$this->getJoinSql('field', '', 'field')}
         ";
     }
 
@@ -72,19 +86,23 @@ class Mapper extends \Schoolbox\Mapper
      * @param PDOStatement $statement
      * @return GenericCollection|Model
      * @throws Exception
+     * @throws DefinitionException
      * @throws \UnexpectedValueException
      */
     protected function hydrateSelect(PDOStatement $statement): Model|GenericCollection
     {
-        $collection = $this->createCollection();
+        $fieldMapper = $this->getJoinMapper('field');
+
+        /** @var Model[] $templates */
+        $templates = [];
 
         foreach ($statement as $row) {
-            $template = $this->hydrate($row);
+            if (!isset($templates[$row['id']])) {
+                /** @var Model|null $template */
+                $template = $this->hydrate($row);
+                $template->setFields($fieldMapper->createCollection());
 
-            /* Arbitrarily died; this shouldn't happen tho
-             */
-            if (!$template) {
-                continue;
+                $templates[$row['id']] = $template;
             }
 
             /* Various effectors
@@ -95,27 +113,39 @@ class Mapper extends \Schoolbox\Mapper
             /** @var User|null $createdBy */
             $createdBy = $this->hydrateJoin($row, 'createdBy', 'createdBy');
 
-            /** @var User|null $createdBy */
+            /** @var User|null $updatedBy */
             $updatedBy = $this->hydrateJoin($row, 'updatedBy', 'updatedBy');
 
-            /** @var User|null $createdBy */
+            /** @var User|null $deletedBy */
             $deletedBy = $this->hydrateJoin($row, 'deletedBy', 'deletedBy');
 
             if ($createdBy) {
-                $template->setCreatedBy($createdBy);
+                $templates[$row['id']]->setCreatedBy($createdBy);
             }
 
             if ($updatedBy) {
-                $template->setUpdatedBy($updatedBy);
+                $templates[$row['id']]->setUpdatedBy($updatedBy);
             }
 
             if ($deletedBy) {
-                $template->setDeletedBy($deletedBy);
+                $templates[$row['id']]->setDeletedBy($deletedBy);
             }
 
-            $collection->add($template);
+            /* Stack up all the adjoining fields
+             */
+            $field = $fieldMapper->hydrate($row, 'field');
+
+            if ($field instanceof Field\Model) {
+                $templates[$row['id']]->addField($field);
+            }
         }
 
-        return $collection;
+        /* Sort sequentially
+         */
+        foreach ($templates as $template) {
+            $template->getFields()->sortBy('sequence', 'asc');
+        }
+
+        return $this->createCollection(array_values($templates));
     }
 }

@@ -32,6 +32,23 @@
                         <legend>Fields</legend>
 
                         <ul id="fields" class="information-list lesson-plan-template-fields">
+                            {% for field in fields %}
+                            <li>
+                                <div>
+                                    <label for="field-title-{{ field.id }}" class="required">Title</label>
+                                    <input type="text" id="field-title-{{ field.id }}" maxlength="255" value="{{ field.title }}" />
+                                </div>
+                                <div>
+                                    <label for="field-body-{{ field.id }}" class="required">Body</label>
+                                    <textarea id="field-body-{{ field.id }}" rows="5">{{ field.body }}</textarea>
+                                </div>
+                                <div>
+                                    <input type="hidden" value="off" />
+                                    <input id="field-new-visibility" type="checkbox" />
+                                    <label for="field-new-visibility" class="checkbox-label">Visible to students</label>
+                                </div>
+                            </li>
+                            {% endfor %}
                         </ul>
 
                         <div class="small-12 columns">

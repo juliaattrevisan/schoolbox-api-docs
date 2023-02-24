@@ -60,7 +60,8 @@ class Controller extends Base
             'data' => [
                 'pageCurrent' => $this->router->generate('adminLessonPlanTemplate.getList'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminLessonPlanTemplate.getList')),
-                'lessonPlanTemplate' => null
+                'lessonPlanTemplate' => null,
+                'fields' => null
             ]
         ]);
     }

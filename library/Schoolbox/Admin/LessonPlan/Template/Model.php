@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\LessonPlan\Template;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
 use Schoolbox\User;
@@ -60,6 +61,14 @@ class Model implements ISoftDeletable
      * @var User|null
      */
     private ?User $deletedBy = null;
+
+
+    /**
+     * A set of related Field\Model instances
+     *
+     * @var GenericCollection|null
+     */
+    private ?GenericCollection $fields = null;
 
 
     /**
@@ -158,6 +167,40 @@ class Model implements ISoftDeletable
     public function setDeletedBy(?User $deletedBy): self
     {
         $this->deletedBy = $deletedBy;
+        return $this;
+    }
+
+
+    /**
+     * @return GenericCollection|null
+     */
+    public function getFields(): ?GenericCollection
+    {
+        return $this->fields;
+    }
+
+
+    /**
+     * @param GenericCollection|null $fields
+     * @return Model
+     */
+    public function setFields(?GenericCollection $fields): self
+    {
+        $this->fields = $fields;
+        return $this;
+    }
+
+
+    /**
+     * Add a template field to this template
+     *
+     * @param Field\Model $field
+     * @return $this
+     * @throws \UnexpectedValueException
+     */
+    public function addField(Field\Model $field): self
+    {
+        $this->fields->add($field);
         return $this;
     }
 }
