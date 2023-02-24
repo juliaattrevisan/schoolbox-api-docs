@@ -51,17 +51,17 @@
 
 <div id="field-blueprint" style="display:none">
     <div>
-        <label for="field-title" class="required">Title</label>
-        <input type="text" id="field-title" maxlength="255" value="" />
+        <label for="field-new-title" class="required">Title</label>
+        <input type="text" id="field-new-title" maxlength="255" value="" />
     </div>
     <div>
-        <label for="field-body" class="required">Body</label>
-        <textarea id="field-body" rows="5"></textarea>
+        <label for="field-new-body" class="required">Body</label>
+        <textarea id="field-new-body" rows="5"></textarea>
     </div>
     <div>
         <input type="hidden" value="off" />
-        <input id="field-visibility" type="checkbox" />
-        <label for="field-visibility" class="checkbox-label">Visible to students</label>
+        <input id="field-new-visibility" type="checkbox" />
+        <label for="field-new-visibility" class="checkbox-label">Visible to students</label>
     </div>
 </div>
 
@@ -76,26 +76,26 @@
              */
             let fieldCount = $('#fields').find('li').length + 1;
 
-            let titleId = 'field-title-' + fieldCount;
-            let titleName = 'field-title[' + fieldCount + ']';
+            let titleId = 'field-new-title-' + fieldCount;
+            let titleName = 'field-new-title[' + fieldCount + ']';
 
-            let bodyId = 'field-body-' + fieldCount;
-            let bodyName = 'field-body[' + fieldCount + ']';
+            let bodyId = 'field-new-body-' + fieldCount;
+            let bodyName = 'field-new-body[' + fieldCount + ']';
 
-            let visibilityId = 'field-visibility-' + fieldCount;
-            let visibilityName = 'field-visibility[' + fieldCount + ']';
+            let visibilityId = 'field-new-visibility-' + fieldCount;
+            let visibilityName = 'field-new-visibility[' + fieldCount + ']';
 
-            clone.find('input[id="field-title"]').attr('name', titleName);
-            clone.find('input[id="field-title"]').attr('id', titleId);
-            clone.find('label[for="field-title"]').attr('for', titleId);
+            clone.find('input[id="field-new-title"]').attr('name', titleName);
+            clone.find('input[id="field-new-title"]').attr('id', titleId);
+            clone.find('label[for="field-new-title"]').attr('for', titleId);
 
-            clone.find('textarea[id="field-body"]').attr('name', bodyName);
-            clone.find('textarea[id="field-body"]').attr('id', bodyId);
-            clone.find('label[for="field-body"]').attr('for', bodyId);
+            clone.find('textarea[id="field-new-body"]').attr('name', bodyName);
+            clone.find('textarea[id="field-new-body"]').attr('id', bodyId);
+            clone.find('label[for="field-new-body"]').attr('for', bodyId);
 
-            clone.find('input[id="field-visibility"]').attr('name', visibilityName);
-            clone.find('input[id="field-visibility"]').attr('id', visibilityId);
-            clone.find('label[for="field-visibility"]').attr('for', visibilityId);
+            clone.find('input[id="field-new-visibility"]').attr('name', visibilityName);
+            clone.find('input[id="field-new-visibility"]').attr('id', visibilityId);
+            clone.find('label[for="field-new-visibility"]').attr('for', visibilityId);
 
             /* Placeholder
              */

@@ -13,6 +13,8 @@ namespace Schoolbox\Admin\LessonPlan\Template;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Admin\Navigation\Subnav;
+use Schoolbox\Mapper\Exception;
+
 
 class Controller extends Base
 {
@@ -20,9 +22,12 @@ class Controller extends Base
      * Controller constructor.
      *
      * @param Mapper $templateMapper
+     * @param Field\Mapper $fieldMapper
      */
-    public function __construct(private Mapper $templateMapper)
-    {
+    public function __construct(
+        private Mapper $templateMapper,
+        private Field\Mapper $fieldMapper
+    ) {
     }
 
 
@@ -65,12 +70,41 @@ class Controller extends Base
      * Persist a new lesson plan template
      *
      * @return void
+     * @throws \PDOException
+     * @throws Exception
+     * @throws \UnexpectedValueException
      */
     public function postCreate(): void
     {
         $postData = $this->getRequest()->post->getArrayCopy();
 
-        new \Alaress_Probe($postData);
+        $template = $this->templateMapper->createModel()
+            ->setTitle($postData['title'])
+            ->setEnabled(true)
+            ->setCreatedBy($this->getUser())
+            ->setUpdatedBy($this->getUser());
+
+        $this->templateMapper->save($template);
+
+        $numFields = \count($postData['field-new-title']);
+
+        for ($i = 1; $i <= $numFields; $i++) {
+            $visibility = \Schoolbox\Role::STAFF;
+
+            if ('on' === $postData['field-new-visibility'][$i]) {
+                $visibility = \Schoolbox\Role::STUDENT;
+            }
+
+            $field = $this->fieldMapper->createModel()
+                ->setTitle($postData['field-new-title'][$i])
+                ->setLessonPlanTemplate($template)
+                ->setVisibility($visibility)
+                ->setSequence($i);
+
+            $this->fieldMapper->save($field);
+        }
+
+        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminLessonPlanTemplate.getList'));
     }
 
 

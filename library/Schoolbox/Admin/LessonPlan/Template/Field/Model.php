@@ -38,10 +38,11 @@ class Model implements ISoftDeletable
 
     /**
      * Visibility in the list screen
+     * Corresponds to Role::STUDENT or Role::STAFF
      *
-     * @var bool|null
+     * @var string|null
      */
-    private ?bool $visibility = null;
+    private ?string $visibility = null;
 
 
     /**
@@ -93,19 +94,19 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return bool|null
+     * @return string|null
      */
-    public function getVisibility(): ?bool
+    public function getVisibility(): ?string
     {
         return $this->visibility;
     }
 
 
     /**
-     * @param bool|null $visibility
+     * @param string|null $visibility
      * @return Model
      */
-    public function setVisibility(?bool $visibility): self
+    public function setVisibility(?string $visibility): self
     {
         $this->visibility = $visibility;
         return $this;
