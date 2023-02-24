@@ -14,6 +14,7 @@ use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Database\Quoter\Mysql\Quoter;
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\Comms\News\Audience\Segment\UserResolutionSql;
+use Schoolbox\GenericCollection;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -42,6 +43,15 @@ abstract class SimpleStrategy implements ISimpleStrategy
     /** @var bool */
     protected bool $moderationRequired;
 
+    /**
+     * Cache for the students which a teacher is a teacher of.
+     *
+     * This is an expensive lookup (requiring two SIS calls), therefore it
+     * should be cached.
+     *
+     * @var array<int, GenericCollection|User[]>
+     */
+    protected static array $teacherStudentCache;
 
     /**
      * @param UserAccessMapper $userAccessMapper
@@ -213,25 +223,40 @@ abstract class SimpleStrategy implements ISimpleStrategy
      */
     protected function isTeacherInAudienceValues(User $user, array $entityValues): ?bool
     {
-        // Load this teacher's classes
+        // Load this teacher's classes, if set
         if ($user->getSubjectCollection() === null) {
             return null;
         }
 
-        // Load the students for each subject
-        // (one query)
-        $subjectFolderIds = $user->getSubjectCollection()->map(fn ($x) => $x['id']);
+        self::$teacherStudentCache[$user->getId()] ??= $this->loadTeacherStudents($user);
+        return count(array_intersect($this->getValues(self::$teacherStudentCache[$user->getId()]), $entityValues)) > 0;
+    }
+
+    /**
+     * Helper for loading a teacher user's list of students.
+     *
+     * @param User $user
+     * @return GenericCollection|User[] A list of students
+     */
+    private function loadTeacherStudents(User $user): GenericCollection
+    {
+        // Load the folder IDs for all given subjects
+        $subjectFolderIds = $user->getSubjectCollection()
+            ->filter(fn ($x) => !empty($x['id']))
+            ->map(fn ($x) => $x['id']);
         if (count($subjectFolderIds) === 0) {
-            return false;
+            return User::createCollection();
         }
 
-        // TODO inject
+        // Load the folders themselves
+        // TODO inject folder mapper
         $folders = Folder\Mapper::getInstance()->findByColumn('id', $subjectFolderIds);
         if (count($folders) === 0) {
-            return false;
+            return User::createCollection();
         }
 
-        // TODO inject
+        // Load the external students for this teacher
+        // TODO inject SIS class lookup
         $externalClass    = new \External_Class();
         $externalStudents = $externalClass->getStudents(
             implode(
@@ -242,18 +267,17 @@ abstract class SimpleStrategy implements ISimpleStrategy
             )
         );
         if (count($externalStudents) === 0) {
-            return false;
+            return User::createCollection();
         }
 
-        // TODO inject
-        $students = UserMapper::getInstance()->findByColumnList(
+        // Load the actual user objects
+        // TODO inject user mapper
+        return UserMapper::getInstance()->findByColumnList(
             [
                 'synergy_id'   => array_column($externalStudents, 'synergy_id'),
                 'g.group_type' => \Schoolbox\Role::STUDENT,
             ]
         );
-
-        return count(array_intersect($this->getValues($students), $entityValues)) > 0;
     }
 
     /**
