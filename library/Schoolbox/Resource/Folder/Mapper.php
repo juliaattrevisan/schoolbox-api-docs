@@ -1373,14 +1373,12 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 {$this->getColumnString('c')},
                 {$this->getJoinColumnString('homepages', 'h')},
                 {$this->getJoinColumnString('codes', 'cc')},
-                {$this->getJoinColumnString('groups', 'g')},
-                {$this->getJoinColumnString('folder_year_level', 'yl')}
+                {$this->getJoinColumnString('groups', 'g')}
             FROM {$this->getTable()} c
             INNER JOIN userAccess a ON c.id = a.sid AND a.service = :service AND a.uid = :user
             LEFT JOIN {$this->getJoinSql('codes', 'c', 'cc')}
             LEFT JOIN {$this->getJoinSql('homepages', 'c', 'h')}
             LEFT JOIN {$this->getJoinSql('groups', 'c', 'g')}
-            LEFT JOIN {$this->getJoinSql('folder_year_level', 'c', 'yl')}
             WHERE c.deleted_at IS NULL
         ";
         if ($exactAccess) {
@@ -1423,13 +1421,11 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                                 {$this->getColumnString('c')},
                                 {$this->getJoinColumnString('homepages', 'h')},
                                 {$this->getJoinColumnString('codes', 'cc')},
-                                {$this->getJoinColumnString('groups', 'g')},
-                                {$this->getJoinColumnString('folder_year_level', 'yl')}
+                                {$this->getJoinColumnString('groups', 'g')}
                             FROM {$this->getTable()} c
                             INNER JOIN {$this->getJoinSql('codes', 'c', 'cc')}
                             LEFT JOIN {$this->getJoinSql('homepages', 'c', 'h')}
                             LEFT JOIN {$this->getJoinSql('groups', 'c', 'g')}
-                            LEFT JOIN {$this->getJoinSql('folder_year_level', 'c', 'yl')}
                             WHERE c.deleted_at IS NULL
                         ";
                     if ($requireHomepage) {
@@ -1511,9 +1507,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         /** @var Code\Mapper $folderCodeMapper */
         $folderCodeMapper = $this->getJoinMapper('codes');
 
-        /** @var YearLevel\Mapper $yearLevelMapper */
-        $yearLevelMapper = $this->getJoinMapper('folder_year_level');
-
         $collection = $this->createCollection();
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             $id = $row['c.id'];
@@ -1522,7 +1515,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             if (!isset($collection[$id])) {
                 $collection[$id] = $this->hydrate($row, 'c');
                 $collection[$id]->setCodes($folderCodeMapper->createCollection());
-                $collection[$id]->setYearLevels($yearLevelMapper->createCollection());
             }
 
             $folder = $collection[$id];
@@ -1556,14 +1548,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 $codeModel = $this->hydrateJoin($row, 'codes', 'cc');
                 $collection[$id]->getCodes()[$codeModel->getCode()] = $codeModel;
                 $codeModel->setFolder($collection[$id]);
-            }
-
-            // Add year level only if it's not empty
-            $yearLevel = $row['yl.id'];
-            if (isset($yearLevel)) {
-                /** @var YearLevel\Model $yearLevelModel */
-                $yearLevelModel = $this->hydrateJoin($row, 'folder_year_level', 'yl');
-                $collection[$id]->getYearLevels()[$yearLevelModel->getId()] = $yearLevelModel;
             }
         }
         $collection->reindex();
