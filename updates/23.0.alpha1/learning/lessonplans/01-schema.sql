@@ -42,7 +42,6 @@ CREATE TABLE `lesson_plan_template_field` (
  `deleted_at` DATETIME NULL,
  PRIMARY KEY (`id`),
  INDEX `fk_lesson_plan_template_idx` (`lesson_plan_template_id` ASC),
- INDEX `lesson_plan_template_title` (`title` ASC),
  CONSTRAINT `fk_lesson_plan_template`
      FOREIGN KEY (`lesson_plan_template_id`)
          REFERENCES `lesson_plan_template` (`id`)
