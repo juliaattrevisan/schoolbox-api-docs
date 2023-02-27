@@ -191,10 +191,10 @@
                 // If the modal has been closed and then reopened, we may have already added the select-all checkbox.
                 if (0 === $("#data-bulky-select-all-checkbox").length) {
                     bulky.list.before(
-                        "</div>" +
-                            "<input id='data-bulky-select-all-checkbox' type='checkbox'/>" +
-                            "<label for='data-bulky-select-all-checkbox' class='checkbox-label'>Select all</label>" +
-                            "<div>"
+                        "<div>" +
+                        "<input id='data-bulky-select-all-checkbox' type='checkbox'/>" +
+                        "<label for='data-bulky-select-all-checkbox' class='checkbox-label'>Select all</label>" +
+                        "</div>"
                     );
                 }
 
