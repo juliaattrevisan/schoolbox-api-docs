@@ -33,12 +33,12 @@ class Mapper extends BaseMapper
         $this->uses('sequence', self::TYPE_INTEGER);
         $this->joins('rubric_indicator_id', Indicator\Mapper::class, 'id', null, null, 'indicator', 'indicator');
         $this->joins('submission_box_id', SubmissionBoxMapper::class, 'id', null, null, 'submissionBox', 'submission_box');
-
-        // Indicator usages are hard-deleted, so we have to use CALLBACK_POSTDELETE not CALLBACK_POSTSOFTDELETE
-        $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'toggleUseRubric']);
     }
 
     /**
+     * Switches off this usage's due work's rubric if there are no remaining
+     * usages of any indicator for this due work.
+     *
      * @param Model $indicatorUsage
      */
     public function toggleUseRubric(Model $indicatorUsage)
