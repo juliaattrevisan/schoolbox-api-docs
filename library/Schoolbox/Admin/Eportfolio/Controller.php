@@ -285,7 +285,7 @@ class Controller extends Base
             $import = true;
 
             if (!($destUser->getEportfolioEnable())) {
-                if ($post['enableEportfolios'] == '1') {
+                if (isset($post['enableEportfolios']) && $post['enableEportfolios'] == '1') {
                     // If this is a dry run, don't enable eportfolio either
                     if ($dryRun) {
                         $this->log('Eportfolio was disabled. Would have enabled for user.', $logId);
@@ -309,7 +309,7 @@ class Controller extends Base
 
                     // Check this user doesn't already have this page.
 
-                    if ($post['skipDuplicates']) {
+                    if (isset($post['skipDuplicates'])) {
                         $existingPageList = $this->eportfolioPageMapper->findByColumnList(
                             [
                                 'uid' => $destUserId,
