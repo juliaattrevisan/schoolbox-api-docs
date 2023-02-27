@@ -175,6 +175,7 @@ function onDetailModalClosed() {
 
 .usage-list {
     display: flex; // so the items can be the same height when the text content within varies
+    flex-wrap: wrap;
     gap: 0.5rem;
     margin: 0;
     li {
