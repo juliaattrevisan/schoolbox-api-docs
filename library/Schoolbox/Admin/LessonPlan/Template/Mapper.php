@@ -52,6 +52,8 @@ class Mapper extends \Schoolbox\Mapper
                 'multiple'  => true,
             ]
         );
+
+        $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteFields']);
     }
 
 
@@ -146,5 +148,26 @@ class Mapper extends \Schoolbox\Mapper
         }
 
         return $this->createCollection(array_values($templates));
+    }
+
+
+    /**
+     * Delete the fields that were associated with $lessonPlanTemplate
+     *
+     * @param Model $lessonPlanTemplate
+     * @return void
+     * @throws DefinitionException
+     * @throws Exception
+     */
+    protected function softDeleteFields(Model $lessonPlanTemplate): void
+    {
+        /* Remember who deleted this thing, in a dirty doubletap
+         */
+        $lessonPlanTemplate->setDeletedBy($this->getSessionUser());
+        $this->save($lessonPlanTemplate);
+
+        /* Dump away any associated Fields too
+         */
+        $this->getJoinMapper('field')->delete($lessonPlanTemplate->getFields());
     }
 }

@@ -71,8 +71,7 @@
                                         <a class="icon-modify" href="{{ updateRoute }}" title="Modify"></a>
                                     {% endif %}
 
-                                    {# {% set deleteRoute = routeLookupIfAuthorized('adminLessonPlanTemplate.postDelete', {lessonPlanTemplate: lessonPlanTemplate, lessonPlanTemplateId: lessonPlanTemplate.id}) %}#}
-                                    {% set deleteRoute = '#' %}
+                                    {% set deleteRoute = routeLookupIfAuthorized('adminLessonPlanTemplate.postDelete', {lessonPlanTemplate: lessonPlanTemplate, lessonPlanTemplateId: lessonPlanTemplate.id}) %}
                                     {% if deleteRoute %}
                                         <script>
                                             $(function() {

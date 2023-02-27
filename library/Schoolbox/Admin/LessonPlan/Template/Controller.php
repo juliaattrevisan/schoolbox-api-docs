@@ -240,4 +240,17 @@ class Controller extends Base
          */
         $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminLessonPlanTemplate.getList'));
     }
+
+
+    /**
+     * Delete a LPT and also its Fields
+     *
+     * @param Model $lessonPlanTemplate
+     * @return void
+     * @throws Exception
+     */
+    public function postDelete(Model $lessonPlanTemplate): void
+    {
+        $this->templateMapper->delete($lessonPlanTemplate);
+    }
 }

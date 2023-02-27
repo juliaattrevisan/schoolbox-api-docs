@@ -49,6 +49,7 @@ class Module extends BaseModule
         $this->register('POST', '/create', 'postCreate', $postPerms);
         $this->register('GET', '/update/{lessonPlanTemplateId}', 'getUpdate', $getPerms, $preloadLessonPlanTemplate);
         $this->register('POST', '/update/{lessonPlanTemplateId}', 'postUpdate', $postPerms, $preloadLessonPlanTemplate);
+        $this->register('POST', '/delete/{lessonPlanTemplateId}', 'postDelete', $postPerms, $preloadLessonPlanTemplate);
     }
 
 
