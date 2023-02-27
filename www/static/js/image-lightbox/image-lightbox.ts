@@ -1,26 +1,13 @@
-import lightGallery from "lightgallery";
-import lgAutoplay from "lightgallery/plugins/autoplay";
-import "lightgallery/css/lightgallery-bundle.min.css";
+/**
+ * To have only one LightGallery instance on a page, we need to store it globally
+ * Refer to www/static/js/image-lightbox/imageLightboxUtils.ts::checkForLightGallery for how
+ * this is used.
+ */
 
+import lightGallery from "lightgallery";
+import "lightgallery/css/lightgallery-bundle.min.css";
 import "./image-lightbox.css";
 
-const imageLightboxDefaults = {
-    plugins: [lgAutoplay],
-    speed: 0,
-    zoom: true,
-    zoomSize: "contain",
-    actualSize: false,
-};
+window.sbProps.lightGallery = lightGallery;
 
-const lightboxElements = document.querySelectorAll("[data-image-lightbox]");
-lightboxElements.forEach((element) => {
-    const targetElement = element;
-
-    // Avoid duplicate lightboxes on the same element
-    if (targetElement.getAttribute("data-lightbox-loaded") === "true") {
-        return;
-    }
-    targetElement.setAttribute("data-lightbox-loaded", "true");
-
-    const lightbox = lightGallery(targetElement, imageLightboxDefaults);
-});
+document.dispatchEvent(new CustomEvent("IMAGE-LIGHTBOX__LOADED"));

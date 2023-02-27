@@ -1,18 +1,23 @@
 /**
  * Any global variables that we wont TS to recognise should be set up here:
- * https://bobbyhadz.com/blog/typescript-extend-window
+ * https://ilikekillnerds.com/2022/09/how-to-extend-the-window-object-in-typescript/
  */
 
+export {};
+
 declare global {
-    let cdnPrefix: string;
-    let siteVersion: string;
-    let CKEDITOR: any;
     interface Window {
+        cdnPrefix: string;
+        siteVersion: string;
+        CKEDITOR: any;
         STORYBOOK_ENV: string;
+        sbProps: {
+            lightGallery: Function;
+        };
     }
 }
 
-declare module 'jquery' {
+declare module "jquery" {
     export = $;
 }
 

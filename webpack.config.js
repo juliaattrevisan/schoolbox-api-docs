@@ -274,6 +274,7 @@ module.exports = {
 
         // Image Lightbox
         imageLightbox: "./www/static/js/image-lightbox/image-lightbox.ts",
+        imageLightboxInit: "./www/static/js/image-lightbox/image-lightbox-init.ts",
 
         // Colour Picker
         colourPicker: "./www/static/js/colour-picker/colour-picker.ts",
