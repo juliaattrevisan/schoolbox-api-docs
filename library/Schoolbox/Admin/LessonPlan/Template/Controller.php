@@ -223,7 +223,7 @@ class Controller extends Base
 
             $this->fieldMapper->deleteByPredicates($pb);
         } else {
-            /* Remove all fields, since none exist in this payload we ca only
+            /* Remove all fields, since none exist in this payload we can only
              * infer that the user meant to clear everything out...
              */
             $this->fieldMapper->deleteByColumn('lesson_plan_template_id', $lessonPlanTemplate->getId());
