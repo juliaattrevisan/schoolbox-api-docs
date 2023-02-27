@@ -226,12 +226,12 @@ class Controller extends Base\Base
         // Is $courseFolder a child of a course?
         $courseParent = $this->folderMapper->findById($courseFolder->getParent()->getId());
         if ($courseParent->getCourseSpecification() instanceof CourseSpecification) {
-            $errors[] = 'The proposed course folder is a child of ' . $courseParent->getFolder()->getTitle();
+            $errors[] = 'The proposed course folder is a child of Course: ' . $courseParent->getFolder()->getTitle();
         }
 
         // Is $courseFolder a child of a unit?
         if ($courseParent->getUnitSpecification() instanceof UnitSpecification) {
-            $errors[] = 'The proposed course folder is a child of ' . $courseParent->getFolder()->getTitle();
+            $errors[] = 'The proposed course folder is a child of Unit: ' . $courseParent->getFolder()->getTitle();
         }
 
         if (\count($errors)) {
