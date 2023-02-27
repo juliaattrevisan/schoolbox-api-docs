@@ -15,7 +15,7 @@ import { useStore } from "../store/manageCurriculumStore";
 import { useViewNodesStore, DIRECTION } from "./store/mcViewNodesStore";
 import { useActiveNodeStore } from "../activeNode/store/mcActiveNodeStore";
 import { useAddCurriculumStore } from "../store/mcAddCurriculumStore";
-import { useNodeDetailsStore } from "../activeNode/store/mcNodeDetailsStore";
+import { useNodeUsageStore } from "../activeNode/store/mcNodeUsageStore";
 import { useAddSubsectionStore } from "../activeNode/store/mcAddSubsectionStore";
 import { useUpdateNodeStore } from "../activeNode/store/mcUpdateNodeStore";
 import { useSearchStore } from "../store/mcSearchStore";
@@ -37,7 +37,7 @@ const store = useStore();
 const viewNodesStore = useViewNodesStore();
 const activeNodeStore = useActiveNodeStore();
 const addCurriculumStore = useAddCurriculumStore();
-const nodeDetailsStore = useNodeDetailsStore();
+const nodeUsageStore = useNodeUsageStore();
 const addSubsectionStore = useAddSubsectionStore();
 const updateNodeStore = useUpdateNodeStore();
 const searchStore = useSearchStore();
@@ -148,14 +148,14 @@ const borderBottomColour = computed(() => {
  *
  * @returns { boolean }
  */
-const isViewing = computed(() => nodeDetailsStore.isOpen && activeNodeStore.node.id === props.node.id);
+const isViewing = computed(() => nodeUsageStore.isOpen && activeNodeStore.node.id === props.node.id);
 
 /**
  * If there's another node being viewed
  *
  * @returns { boolean }
  */
-const isViewingAnother = computed(() => nodeDetailsStore.isOpen && activeNodeStore.node.id !== props.node.id);
+const isViewingAnother = computed(() => nodeUsageStore.isOpen && activeNodeStore.node.id !== props.node.id);
 
 /**
  * If this is the active node being updated

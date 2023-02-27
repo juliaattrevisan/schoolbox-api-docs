@@ -10,7 +10,7 @@ import { getSpecificUsages, getUsageHref } from "@schoolboxCurriculum/js/nodeUti
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import BadgeModal from "@schoolboxBadge/vue/badge-modal";
 import { useActiveNodeStore } from "./store/mcActiveNodeStore";
-import { useNodeDetailsStore } from "./store/mcNodeDetailsStore";
+import { useNodeUsageStore } from "./store/mcNodeUsageStore";
 import McNodeDetailsUsage from "./mc-node-details-usage.vue";
 
 interface Props {
@@ -19,7 +19,7 @@ interface Props {
 
 const props = defineProps<Props>();
 const activeNodeStore = useActiveNodeStore();
-const nodeDetailsStore = useNodeDetailsStore();
+const nodeUsageStore = useNodeUsageStore();
 const isBadgeModalOpen = ref(false); // whether the modal to display the badge details is open
 const currentBadge = ref<BadgeUsageObject | null>(null); // the badge to display in the modal when a badge usage is selected
 
@@ -123,8 +123,8 @@ function onDetailModalClosed() {
 
 <template>
     <div class="node-container" :style="{ marginLeft: marginLeft }">
-        <loading-table v-if="nodeDetailsStore.isProcessing" :rows="2" />
-        <section v-else-if="nodeDetailsStore.hasLoadError">
+        <loading-table v-if="nodeUsageStore.isProcessing" :rows="2" />
+        <section v-else-if="nodeUsageStore.hasLoadError">
             <fieldset class="content">
                 <div class="alert-box alert">
                     Sorry, we are currently unable to load the Curriculum usage data. Please

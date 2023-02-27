@@ -10,7 +10,7 @@ import { useDeleteNodesStore } from "./store/mcDeleteNodesStore";
 import { useEnableNodesStore } from "./store/mcEnableNodesStore";
 import { useUpdateNodeStore } from "../activeNode/store/mcUpdateNodeStore";
 import { useAddSubsectionStore } from "../activeNode/store/mcAddSubsectionStore";
-import { useNodeDetailsStore } from "../activeNode/store/mcNodeDetailsStore";
+import { useNodeUsageStore } from "../activeNode/store/mcNodeUsageStore";
 import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vue";
 import McSelectedNode from "./mc-selected-node.vue";
 
@@ -19,7 +19,7 @@ const deleteNodesStore = useDeleteNodesStore();
 const enableNodesStore = useEnableNodesStore();
 const updateNodeStore = useUpdateNodeStore(); // so the bottom-drawer is not visible while we are updating a node
 const addSubsectionStore = useAddSubsectionStore(); // so the bottom-drawer is not visible while we are adding a node
-const nodeDetailsStore = useNodeDetailsStore(); // so the bottom-drawer is not visible while we are viewing the details of a node
+const nodeUsageStore = useNodeUsageStore(); // so the bottom-drawer is not visible while we are viewing the details of a node
 
 /**
  * For proper count display, eg: 'No nodes / 1 Member' / '4 nodes'
@@ -57,7 +57,7 @@ function onDeleteNodesSelected() {
                 selectedNodesStore.hasNodes &&
                 !updateNodeStore.isOpen &&
                 !addSubsectionStore.isOpen &&
-                !nodeDetailsStore.isOpen
+                !nodeUsageStore.isOpen
             "
         >
             <div v-if="selectedNodesStore.hasNodes" class="selected-nodes-container" data-test-nodes-container>

@@ -7,7 +7,7 @@ import { defineStore } from "pinia";
 import { useActiveNodeStore } from "@schoolboxCurriculum/vue/manageCurriculum/activeNode/store/mcActiveNodeStore";
 import type { Node, Usage } from "@schoolboxCurriculum/types/Node";
 
-export const useNodeDetailsStore = defineStore("mcNodeDetails", () => {
+export const useNodeUsageStore = defineStore("mcNodeUsage", () => {
     const isProcessing = ref(false);
     const isOpen = ref(false); // to notify that the prompt is opened / closed
     const hasLoadError = ref(false);

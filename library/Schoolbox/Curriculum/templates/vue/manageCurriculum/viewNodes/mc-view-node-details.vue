@@ -7,7 +7,7 @@
 import type { Node } from "@schoolboxCurriculum/types/Node";
 import { ActivityTypes } from "@schoolboxCurriculum/types/Node";
 import { getUsageIcon, getTotalUsage } from "@schoolboxCurriculum/js/nodeUtils";
-import { useNodeDetailsStore } from "../activeNode/store/mcNodeDetailsStore";
+import { useNodeUsageStore } from "../activeNode/store/mcNodeUsageStore";
 
 interface Props {
     node: Node; // the assigned node to display
@@ -18,16 +18,16 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const nodeDetailsStore = useNodeDetailsStore();
+const nodeUsageStore = useNodeUsageStore();
 
 /**
  * to open up or close the view modal
  */
 function onViewToggleSelected() {
     if (props.isViewing) {
-        nodeDetailsStore.cancel();
+        nodeUsageStore.cancel();
     } else {
-        nodeDetailsStore.prompt(props.node);
+        nodeUsageStore.prompt(props.node);
     }
 }
 </script>
