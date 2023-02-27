@@ -223,6 +223,17 @@ class Controller extends Base\Base
             }
         }
 
+        // Is $courseFolder a child of a course?
+        $courseParent = $this->folderMapper->findById($courseFolder->getParent()->getId());
+        if ($courseParent->getCourseSpecification() instanceof CourseSpecification) {
+            $errors[] = 'The proposed course folder is a child of course: ' . $courseParent->getFolder()->getTitle();
+        }
+
+        // Is $courseFolder a child of a unit?
+        if ($courseParent->getUnitSpecification() instanceof UnitSpecification) {
+            $errors[] = 'The proposed course folder is a child of unit: ' . $courseParent->getFolder()->getTitle();
+        }
+
         if (\count($errors)) {
             $this->returnJson($errors, 400);
             return;
