@@ -6,7 +6,7 @@
 
 import lightGallery from "lightgallery";
 import "lightgallery/css/lightgallery-bundle.min.css";
-import "./image-lightbox.css";
+import "./imageLightbox.css";
 
 window.sbProps.lightGallery = lightGallery;
 
