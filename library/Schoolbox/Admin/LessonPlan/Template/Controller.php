@@ -253,4 +253,27 @@ class Controller extends Base
     {
         $this->templateMapper->delete($lessonPlanTemplate);
     }
+
+
+    /**
+     * Toggle the Enabled state of an LPT
+     *
+     * @param Model $lessonPlanTemplate
+     * @return void
+     * @throws Exception
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
+     */
+    public function postToggleEnableState(Model $lessonPlanTemplate): void
+    {
+        if ($lessonPlanTemplate->getEnabled()) {
+            $lessonPlanTemplate->setEnabled(false);
+        } else {
+            $lessonPlanTemplate->setEnabled(true);
+        }
+
+        /* TODO should changing enabledness also change the Updated by?
+         */
+        $this->templateMapper->save($lessonPlanTemplate);
+    }
 }

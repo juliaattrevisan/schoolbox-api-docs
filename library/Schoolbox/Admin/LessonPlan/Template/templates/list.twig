@@ -64,8 +64,53 @@
                                 </div>
                                 <nav>
                                     {# Fudge some accessibility text here later, I guess #}
-                                    {% set enableRoute = '#' %}
-                                    <a class="icon-view" href="{{ enableRoute }}" title="This lesson plan template is enabled"></a>
+                                    {% set enableRoute = routeLookupIfAuthorized('adminLessonPlanTemplate.postToggleEnableState', {lessonPlanTemplate: lessonPlanTemplate, lessonPlanTemplateId: lessonPlanTemplate.id}) %}
+                                    {% if enableRoute %}
+                                        {% if lessonPlanTemplate.enabled %}
+                                            {% set icon = 'icon-view-hollow' %}
+                                            {% set action = 'Disable' %}
+                                        {% else %}
+                                            {% set icon = 'icon-view' %}
+                                            {% set action = 'Enable' %}
+                                        {% endif %}
+                                        <a class="{{ icon }}" href="{{ enableRoute }}" title="{{ action }} this lesson plan template" data-toggle-enable-state="{{ lessonPlanTemplate.id }}"></a>
+                                        <script>
+                                            $(function() {
+                                                $('#container').on('click', 'a[data-toggle-enable-state="{{ lessonPlanTemplate.id }}"]', function(event) {
+                                                    let toast = $('#toast');
+
+                                                    event.preventDefault();
+
+                                                    /* Activate indicator label
+                                                     */
+                                                    toast.toastActivate({
+                                                        text: "Changing enabled state..."
+                                                    });
+
+                                                    let element = $(this);
+
+                                                    $.post(element.attr('href'), function() {
+                                                    })
+                                                        .done(function() {
+                                                            toast.toastTimeout({
+                                                                text: 'Saved',
+                                                                css: 'success'
+                                                            });
+
+                                                            location.reload();
+                                                        })
+                                                        .fail(function(response) {
+                                                            let temp = $.parseJSON(response.responseText);
+
+                                                            toast.toastTimeout({
+                                                                text: 'Could not save: ' + temp.error,
+                                                                css: 'alert'
+                                                            });
+                                                        });
+                                                });
+                                            });
+                                        </script>
+                                    {% endif %}
 
                                     {% if updateRoute %}
                                         <a class="icon-modify" href="{{ updateRoute }}" title="Modify"></a>
@@ -75,9 +120,9 @@
                                     {% if deleteRoute %}
                                         <script>
                                             $(function() {
-                                                let toast = $('#toast');
-
                                                 $('#container').on('click', 'a[data-delete="{{ lessonPlanTemplate.id }}"]', function(event) {
+                                                    let toast = $('#toast');
+
                                                     event.preventDefault();
 
                                                     /* Activate indicator label
