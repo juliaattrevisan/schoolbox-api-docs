@@ -206,16 +206,19 @@ class Controller extends Base
 
                 $seenFieldIds[] = $field->getId();
             }
+
+            /* Anything that wasn't seen needs to be removed
+             */
+            $pb = $this->fieldMapper->getPredicateBuilder()
+                ->notIn('id', $seenFieldIds);
+
+            $this->fieldMapper->deleteByPredicates($pb);
+        } else {
+            /* Remove all fields, since none exist in this payload we ca only
+             * infer that the user meant to clear everything out...
+             */
+            $this->fieldMapper->deleteByColumn('lesson_plan_template_id', $lessonPlanTemplate->getId());
         }
-
-        /* Anything that wasn't seen needs to be removed
-         */
-        $pb = $this->fieldMapper->getPredicateBuilder()
-            ->notIn('id', $seenFieldIds);
-
-        $deadFields = $this->fieldMapper->findByPredicates($pb);
-
-        $this->fieldMapper->delete($deadFields);
 
         /* Then update the template's title in case that might have changed
          * Technically you, the updater, might be different to the guy who
