@@ -143,6 +143,18 @@ class External_Synergetic_Timetable implements External_TimetableInterface
      */
     private function fetchTimetableDefinition(?string $externalUserId, Campus $campus, $day = 0, $date = null): array
     {
+        /* initialise stack
+         */
+        $timetableDef = [
+            'desc' => [],
+            'start' => [],
+            'end' => [],
+            'number' => [],
+            'sequence' => [],
+            'periodCount' => 0,
+            'dayCount' => 0
+        ];
+
         // check if there is a calendar event remapping the day number for this specific date
         $dateObject = null;
         if ($date != null) {
@@ -176,6 +188,18 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             $params = array_merge($params, $fileTypeBindings->getParams());
         }
 
+        /* Why are we arbitrarily skipping PeriodSeq 2 rows?
+         *
+         * I recognise that they're typically non-academic periods of some kind
+         * but...why not show that? Anyway, timetable.php tries to enforce
+         * this across all cyclic timetable implementations but this is a
+         * kind of mistake. Every connector should be responsible for providing
+         * the information that should show, not leave it up to timetable.php
+         *
+         * Anyway, continue skipping this magic 2 like it has always been skipped
+         * This time, remove it from the Definition; why bother getting it just
+         * so we can specifically disregard it later?
+         */
         $query = "SELECT TimetableDefinition.PeriodNumber,
                          TimetableDefinition.PeriodNumberSeq,
                          TimetableDefinition.TimeFrom,
@@ -188,7 +212,8 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                         TimetableDefinition.FileSemester = :fileSemester AND
                         TimetableDefinition.TimetableGroup = :timetableGroup AND
                         {$allowedFileTypesSql}
-                        TimetableDefinition.DayNumber IN (:day, '0')
+                        TimetableDefinition.DayNumber IN (:day, '0') AND
+                        TimetableDefinition.PeriodNumberSeq = 1
                     ORDER BY TimetableDefinition.FileType,
                              TimetableDefinition.DayNumber DESC,
                              TimetableDefinition.PeriodNumber,
@@ -196,8 +221,6 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                     ";
         unset($statement);
         $statement = $this->getDatabase()->query($query, $params);
-
-        $periodCount = 0;
 
         // If there are more than one FileTypes, dayNumber can be different (either the actual day number or default 0)
         // This map stores the dayNumber for each FileType
@@ -210,13 +233,43 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             } elseif ($period['DayNumber'] !== $fileTypeDayNumberMap[$period['FileType']]) {
                 continue;
             }
-            $timetableDef['desc'][]     = $period['Description'];
-            $timetableDef['start'][]    = date("g:ia", strtotime($period['TimeFrom']));
-            $timetableDef['end'][]      = date("g:ia", strtotime($period['TimeTo']));
-            $timetableDef['number'][]   = $period['PeriodNumber'];
-            $timetableDef['sequence'][] = $period['PeriodNumberSeq'];
-            $periodCount++;
+
+            /* Stack classes happening per period,
+             * indexed by (time from, time to) tuple identifier,
+             * ordered by PeriodNumberSeq
+             *
+             * NOTE PeriodNumber is not unique.
+             * The same PeriodNumber can exist for multiple rows,
+             * where each row begins at a different time; or, for
+             * multiple FileTypes
+             *
+             * NOTE Periods might not manifest in a human-sensible order.
+             */
+            $index = sprintf('%s - %s',
+                $period['TimeFrom'],
+                $period['TimeTo']
+            );
+
+            $timetableDef['desc'][$index]     = $period['Description'];
+            $timetableDef['start'][$index]    = date("g:ia", strtotime($period['TimeFrom']));
+            $timetableDef['end'][$index]      = date("g:ia", strtotime($period['TimeTo']));
+            $timetableDef['number'][$index]   = $period['PeriodNumber'];
+            $timetableDef['sequence'][$index] = $period['PeriodNumberSeq'];
         }
+
+        /* There may have been dupe rows inside the $timetableDef,
+         * causing the old $periodCount to be incorrect; arbitrarily
+         * decide $periodCount after constructing everything
+         */
+        $periodCount = \count($timetableDef['desc']);
+
+        /* Remove key association
+         */
+        $timetableDef['desc'] = array_values($timetableDef['desc']);
+        $timetableDef['start'] = array_values($timetableDef['start']);
+        $timetableDef['end'] = array_values($timetableDef['end']);
+        $timetableDef['number'] = array_values($timetableDef['number']);
+        $timetableDef['sequence'] = array_values($timetableDef['sequence']);
 
         //Fall back to day 0 if nothing found
         if ($periodCount == 0 && $day != 0) {
@@ -225,6 +278,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
         $timetableDef['periodCount'] = $periodCount;
         $timetableDef['dayCount']    = $this->getTotalDays($campus);
+
         return $timetableDef;
     }
 
