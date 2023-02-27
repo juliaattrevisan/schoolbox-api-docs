@@ -4,14 +4,14 @@
  */
 
 import { computed } from "vue";
-import { useNodeDetailsStore } from "../activeNode/store/mcNodeDetailsStore";
+import { useNodeUsageStore } from "../activeNode/store/mcNodeUsageStore";
 import { useUpdateNodeStore } from "../activeNode/store/mcUpdateNodeStore";
 import { useAddSubsectionStore } from "../activeNode/store/mcAddSubsectionStore";
 import { useNodesStore } from "../store/mcNodesStore";
 import McViewHeaderBreadcrumbs from "./mc-view-header-breadcrumbs.vue";
 import McViewHeaderSearchInput from "./mc-view-header-search-input.vue";
 
-const nodeDetailsStore = useNodeDetailsStore();
+const nodeUsageStore = useNodeUsageStore();
 const updateNodeStore = useUpdateNodeStore();
 const addSubsectionStore = useAddSubsectionStore();
 const nodesStore = useNodesStore();
@@ -23,7 +23,7 @@ const nodesStore = useNodesStore();
  * @returns { boolean }
  */
 const isDisabled = computed(
-    () => nodeDetailsStore.isOpen || updateNodeStore.isOpen || addSubsectionStore.isOpen || nodesStore.isLoading
+    () => nodeUsageStore.isOpen || updateNodeStore.isOpen || addSubsectionStore.isOpen || nodesStore.isLoading
 );
 </script>
 

@@ -470,6 +470,7 @@ module.exports = {
                 "library/Schoolbox/Learning/Moment/Evidence/vue"
             ),
             "@schoolboxCurriculum": path.resolve(__dirname, "library/Schoolbox/Curriculum/templates/"),
+            "@schoolboxBadge": path.resolve(__dirname, "library/Schoolbox/Learning/Badge/"),
             "@schoolboxVue": path.resolve(__dirname, "vue"),
             "@js": path.resolve(__dirname, "www/static/js"),
             "@css": path.resolve(__dirname, "www/static/css"),

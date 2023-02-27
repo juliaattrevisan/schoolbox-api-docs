@@ -15,15 +15,15 @@ import { useStore } from "../store/manageCurriculumStore";
 import { useViewNodesStore, DIRECTION } from "./store/mcViewNodesStore";
 import { useActiveNodeStore } from "../activeNode/store/mcActiveNodeStore";
 import { useAddCurriculumStore } from "../store/mcAddCurriculumStore";
-import { useNodeDetailsStore } from "../activeNode/store/mcNodeDetailsStore";
+import { useNodeUsageStore } from "../activeNode/store/mcNodeUsageStore";
 import { useAddSubsectionStore } from "../activeNode/store/mcAddSubsectionStore";
 import { useUpdateNodeStore } from "../activeNode/store/mcUpdateNodeStore";
 import { useSearchStore } from "../store/mcSearchStore";
 import McViewNodeCheckbox from "./mc-view-node-checkbox.vue";
 import McViewNodeName from "./mc-view-node-name.vue";
-import McViewNodeDetails from "./mc-view-node-details.vue";
+import McViewNodeUsage from "./mc-view-node-usage.vue";
 import McViewNodeActions from "./mc-view-node-actions.vue";
-import McNodeDetails from "../activeNode/mc-node-details.vue";
+import McNodeUsage from "../activeNode/mc-node-usage.vue";
 import McAddSubsection from "../activeNode/mc-add-subsection.vue";
 import McUpdateNode from "../activeNode/mc-update-node.vue";
 
@@ -37,7 +37,7 @@ const store = useStore();
 const viewNodesStore = useViewNodesStore();
 const activeNodeStore = useActiveNodeStore();
 const addCurriculumStore = useAddCurriculumStore();
-const nodeDetailsStore = useNodeDetailsStore();
+const nodeUsageStore = useNodeUsageStore();
 const addSubsectionStore = useAddSubsectionStore();
 const updateNodeStore = useUpdateNodeStore();
 const searchStore = useSearchStore();
@@ -148,14 +148,14 @@ const borderBottomColour = computed(() => {
  *
  * @returns { boolean }
  */
-const isViewing = computed(() => nodeDetailsStore.isOpen && activeNodeStore.node.id === props.node.id);
+const isViewing = computed(() => nodeUsageStore.isOpen && activeNodeStore.node.id === props.node.id);
 
 /**
  * If there's another node being viewed
  *
  * @returns { boolean }
  */
-const isViewingAnother = computed(() => nodeDetailsStore.isOpen && activeNodeStore.node.id !== props.node.id);
+const isViewingAnother = computed(() => nodeUsageStore.isOpen && activeNodeStore.node.id !== props.node.id);
 
 /**
  * If this is the active node being updated
@@ -224,51 +224,55 @@ const title = computed(() =>
 const showActions = computed(() => !store.isReadOnly && props.node.id !== UNSET_ID && !searchStore.isActive);
 
 /**
- * Whether the details should be displayed, shouldn't be if we are at the root level node,
+ * Whether the usage should be displayed, shouldn't be if we are at the root level node,
  * or if the search is active
  *
  * @returns { boolean }
  */
-const showDetails = computed(() => props.node.id !== UNSET_ID && !searchStore.isActive);
+const showUsage = computed(() => props.node.id !== UNSET_ID && !searchStore.isActive);
 </script>
 
 <template>
     <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
         <li v-if="showNode" ref="viewNodeEl" data-test-node>
             <div
-                class="buttons-container"
+                class="container"
                 :data-enabled="props.node.enabled"
                 :data-is-inactive="`${isViewingAnother || isUpdatingAnother || isAddingAnother ? true : false}`"
                 :data-is-new="isNew"
                 :data-just-updated="justUpdated"
             >
-                <mc-view-node-checkbox v-if="showActions" :node="props.node" :is-active="isActive" />
-                <mc-view-node-name
-                    :node="props.node"
-                    :depth="props.depth"
-                    :title="title"
-                    :is-active="isActive"
-                    data-test-view-node-name
-                />
-                <mc-view-node-details
-                    v-if="showDetails"
-                    :node="props.node"
-                    :title="title"
-                    :is-viewing="isViewing"
-                    :is-updating="isUpdating"
-                    :is-adding="isAdding"
-                />
-                <mc-view-node-actions
-                    v-if="showActions"
-                    :node="props.node"
-                    :title="title"
-                    :is-viewing="isViewing"
-                    :is-updating="isUpdating"
-                    :is-adding="isAdding"
-                />
+                <div class="inner-containers name-container">
+                    <mc-view-node-checkbox v-if="showActions" :node="props.node" :is-active="isActive" />
+                    <mc-view-node-name
+                        :node="props.node"
+                        :depth="props.depth"
+                        :title="title"
+                        :is-active="isActive"
+                        data-test-view-node-name
+                    />
+                </div>
+                <div class="inner-containers">
+                    <mc-view-node-usage
+                        v-if="showUsage"
+                        :node="props.node"
+                        :title="title"
+                        :is-viewing="isViewing"
+                        :is-updating="isUpdating"
+                        :is-adding="isAdding"
+                    />
+                    <mc-view-node-actions
+                        v-if="showActions"
+                        :node="props.node"
+                        :title="title"
+                        :is-viewing="isViewing"
+                        :is-updating="isUpdating"
+                        :is-adding="isAdding"
+                    />
+                </div>
             </div>
             <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
-                <mc-node-details v-if="isViewing" :depth="props.depth" />
+                <mc-node-usage v-if="isViewing" :depth="props.depth" />
             </Transition>
             <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
                 <mc-add-subsection v-if="isAdding" :depth="props.depth" />
@@ -290,7 +294,7 @@ const showDetails = computed(() => props.node.id !== UNSET_ID && !searchStore.is
 </template>
 
 <style lang="scss" scoped>
-.buttons-container {
+.container {
     align-items: center;
     border-bottom: 1px solid v-bind(borderBottomColour);
     display: flex;
@@ -300,6 +304,19 @@ const showDetails = computed(() => props.node.id !== UNSET_ID && !searchStore.is
     padding: 2px;
     position: relative;
     transition: opacity 0.3s;
+    @media (max-width: 500px) {
+        // to allow more space for the name / buttons on mobile
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
+.inner-containers {
+    display: flex;
+}
+
+.name-container {
+    width: 100%; // so the name can stretch to fill the space#
 }
 
 [data-is-inactive="true"] {

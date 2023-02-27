@@ -1,0 +1,17 @@
+.icon-course-builder::before {
+    color: #008600;
+}
+
+.icon-unit::before {
+    color: var(--body-foreground);
+}
+
+.icon-due-work::before,
+.icon-task::before,
+.icon-quiz::before {
+    color: #c1009e;
+}
+
+.icon-badge::before {
+    color: #ff7c00;
+}

@@ -7,7 +7,7 @@ import type {
     Usage,
     CourseUsageObject,
     UnitUsageObject,
-    FolderUsageObject,
+    LearningActivityUsageObject,
     BadgeUsageObject,
 } from "@schoolboxCurriculum/types/Node";
 import { ActivityTypes } from "@schoolboxCurriculum/types/Node";
@@ -163,7 +163,12 @@ export function getBreadcrumbs(node: Node, currentBreadcrumbs: Breadcrumb[]): Br
  * @returns { boolean } - whether theres any usage assigned on the node
  */
 export function hasUsage(node: Node) {
-    if (node._usageCounts.course > 0 || node._usageCounts.unit > 0 || node._usageCounts.folder > 0) {
+    if (
+        node._usageCounts.course > 0 ||
+        node._usageCounts.unit > 0 ||
+        node._usageCounts.assessment > 0 ||
+        node._usageCounts.badge > 0
+    ) {
         return true;
     }
     return false;
@@ -176,23 +181,27 @@ export function hasUsage(node: Node) {
  * @returns { number } - the total count
  */
 export function getTotalUsage(node: Node) {
-    return node._usageCounts.course + node._usageCounts.unit + node._usageCounts.folder;
+    return node._usageCounts.course + node._usageCounts.unit + node._usageCounts.assessment + node._usageCounts.badge;
 }
 
 /**
  * To distinguish the activity type
  *
- * @param { Usage } usage - the usage
- * @returns { string } - the href to return
+ * @param { ActivityTypes } type - the activity type
+ * @returns { string } - the icon to return
  */
-export function getUsageIcon(usage: Usage) {
+export function getUsageIcon(type: ActivityTypes) {
     const icons = {
-        [ActivityTypes.COURSE]: "icon-course",
+        [ActivityTypes.COURSE]: "icon-course-builder",
         [ActivityTypes.UNIT]: "icon-unit",
-        [ActivityTypes.FOLDER]: "icon-folder",
+        [ActivityTypes.LEARNING_ACTIVITY]: "icon-due-work",
+        [ActivityTypes.LEARNING_ACTIVITY_PROJECT]: "icon-project",
+        [ActivityTypes.LEARNING_ACTIVITY_DUE_WORK]: "icon-due-work",
+        [ActivityTypes.LEARNING_ACTIVITY_TASK]: "icon-task",
+        [ActivityTypes.LEARNING_ACTIVITY_QUIZ]: "icon-quiz",
         [ActivityTypes.BADGE]: "icon-badge",
     };
-    return icons[usage.discriminator];
+    return icons[type];
 }
 
 /**
@@ -205,8 +214,19 @@ export function getUsageHref(usage: Usage) {
     const icons = {
         [ActivityTypes.COURSE]: () => (usage.object as CourseUsageObject).folder._links.view,
         [ActivityTypes.UNIT]: () => (usage.object as UnitUsageObject).folder._links.view,
-        [ActivityTypes.FOLDER]: () => (usage.object as FolderUsageObject)._links.view,
-        [ActivityTypes.BADGE]: () => "#",
+        [ActivityTypes.LEARNING_ACTIVITY]: () => (usage.object as LearningActivityUsageObject)._links.view,
+        [ActivityTypes.BADGE]: () => "#view-badge-details", // opens the badge modal
     };
-    return icons[usage.discriminator]();
+    return icons[usage.discriminator] && icons[usage.discriminator]();
+}
+
+/**
+ * To only return the usages of the specified type
+ *
+ * @param { Usage[] } usages - the usages
+ * @param { type } type - the activity type
+ * @returns { Usage[] } - the usages of the specified type
+ */
+export function getSpecificUsages(usages: Usage[], type: string) {
+    return usages.filter((usage) => usage.discriminator === type);
 }

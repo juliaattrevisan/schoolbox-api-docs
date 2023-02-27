@@ -3,22 +3,61 @@
  * To display a single activity linked to a node
  */
 
-import type { Usage, CourseUsageObject, UnitUsageObject, FolderUsageObject, BadgeUsageObject } from "@schoolboxCurriculum/types/Node";
+import { computed } from "vue";
+import type {
+    Usage,
+    CourseUsageObject,
+    UnitUsageObject,
+    LearningActivityUsageObject,
+    BadgeUsageObject,
+} from "@schoolboxCurriculum/types/Node";
 import { ActivityTypes } from "@schoolboxCurriculum/types/Node";
 import { getUsageHref, getUsageIcon } from "@schoolboxCurriculum/js/nodeUtils";
+import BadgeImage from "@schoolboxBadge/vue/badge-image";
 
 interface Props {
     usage: Usage; // the usage to display
 }
 
 const props = defineProps<Props>();
+const emit = defineEmits(["select"]);
+
+/**
+ * To get the icon for the usage
+ */
+const usageIcon = computed(() => {
+    if (props.usage.discriminator === ActivityTypes.LEARNING_ACTIVITY) {
+        // there's various types of learning activity icons
+        return getUsageIcon(props.usage.object.type);
+    }
+    return getUsageIcon(props.usage.discriminator);
+});
+
+/**
+ * dispatch to parent so can either navigate to another page
+ * or open the badge modal
+ */
+function onSelect() {
+    if (props.usage.discriminator === ActivityTypes.BADGE) {
+        emit("select", props.usage);
+    }
+}
 </script>
 
 <template>
     <li class="usage">
-        <a :href="`${getUsageHref(props.usage)}`" :title="props.usage.object.title">
+        <a
+            :href="props.usage.discriminator === ActivityTypes.BADGE ? null : getUsageHref(props.usage)"
+            :title="
+                props.usage.discriminator === ActivityTypes.BADGE ? props.usage.object.name : props.usage.object.title
+            "
+            @click="onSelect"
+        >
             <div class="usage__container">
-                <div :class="`usage__icon-container ${getUsageIcon(props.usage)} size-24`"></div>
+                <div v-if="props.usage.discriminator === ActivityTypes.BADGE" class="usage__badge-container">
+                    <badge-image :badge="props.usage.object" css="badge"></badge-image>
+                </div>
+                <div v-else :class="`usage__icon-container ${usageIcon} size-24`"></div>
                 <div class="usage__title-container">
                     <p v-if="props.usage.discriminator === ActivityTypes.BADGE">{{ props.usage.object.name }}</p>
                     <p v-else>{{ props.usage.object.title }}</p>
@@ -28,8 +67,8 @@ const props = defineProps<Props>();
                     <p v-else-if="props.usage.discriminator === ActivityTypes.UNIT" class="meta">
                         {{ (props.usage.object as UnitUsageObject).folder?.parent?.title }}
                     </p>
-                    <p v-else-if="props.usage.discriminator === ActivityTypes.FOLDER" class="meta">
-                        {{ (props.usage.object as FolderUsageObject).parent?.title }}
+                    <p v-else-if="props.usage.discriminator === ActivityTypes.LEARNING_ACTIVITY" class="meta">
+                        {{ (props.usage.object as LearningActivityUsageObject).unit?.title }}
                     </p>
                     <p v-else-if="props.usage.discriminator === ActivityTypes.BADGE" class="meta">
                         {{ (props.usage.object as BadgeUsageObject).category.name }}
@@ -41,13 +80,12 @@ const props = defineProps<Props>();
 </template>
 
 <style lang="scss" scoped>
+@import "../style/mcIconColours";
 .usage {
     border: 1px solid #ededed;
-    display: inline-block;
-    height: 64px;
-    margin: 0px 0.25rem;
     padding: 0;
-    width: 180px;
+    min-width: 160px;
+    max-width: 220px;
 }
 
 .usage__container {
@@ -63,6 +101,18 @@ const props = defineProps<Props>();
     position: relative;
     &:before {
         padding: 0;
+    }
+}
+
+:deep(.usage__badge-container) {
+    //v-deep is used so can target the img succesfully
+    position: relative;
+    flex: 0 0 50px;
+    padding: 0.25rem 0.5rem;
+    background-color: #f6f6f6;
+    img {
+        width: 40px;
+        height: auto;
     }
 }
 

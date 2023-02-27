@@ -24,9 +24,10 @@ export type Node = {
     _usageCounts: {
         // just the counts for each acitivity type
         course: number;
-        folder: number;
         unit: number;
+        assessment: number;
         badge: number;
+        folder: number;
     };
     usage?: Usage[]; // all the details for all the places the node has been used
     usageCount?: number; // the total number of linked activities (not just the currently loaded)
@@ -38,7 +39,11 @@ export type Node = {
 export enum ActivityTypes {
     COURSE = "course",
     UNIT = "unit",
-    FOLDER = "folder",
+    LEARNING_ACTIVITY = "assessment",
+    LEARNING_ACTIVITY_PROJECT = "project",
+    LEARNING_ACTIVITY_DUE_WORK = "dueWork",
+    LEARNING_ACTIVITY_TASK = "task",
+    LEARNING_ACTIVITY_QUIZ = "quiz",
     BADGE = "badge",
 }
 
@@ -46,8 +51,8 @@ export enum ActivityTypes {
  * An activity linked to the node
  */
 export type Usage = {
-    discriminator: ActivityTypes.COURSE | ActivityTypes.UNIT | ActivityTypes.FOLDER | ActivityTypes.BADGE;
-    object: CourseUsageObject | UnitUsageObject | FolderUsageObject | BadgeUsageObject;
+    discriminator: ActivityTypes.COURSE | ActivityTypes.UNIT | ActivityTypes.LEARNING_ACTIVITY | ActivityTypes.BADGE;
+    object: CourseUsageObject | UnitUsageObject | LearningActivityUsageObject | BadgeUsageObject;
 };
 
 /**
@@ -87,28 +92,20 @@ export interface UnitUsageObject extends UsageObject {
 }
 
 /**
- * The further details of the the folder usage
+ * The further details of the the assessment usage
  */
-export interface FolderUsageObject extends UsageObject {
+export interface LearningActivityUsageObject extends UsageObject {
     _links: {
         view: string;
     };
-    parent: {
+    type: string;
+    unit: {
         title: string;
     };
 }
 
 /**
- * Just the field properties that can be updated
- */
-export type NodeToUpdate = {
-    code: string | null;
-    description: string | null;
-    name: string;
-};
-
-/**
- * The further details of the badge usage
+ * The further details of the the badge usage
  */
 export interface BadgeUsageObject {
     id: number;
@@ -137,3 +134,12 @@ export interface BadgeUsageObject {
         icon: string;
     };
 }
+
+/**
+ * Just the field properties that can be updated
+ */
+export type NodeToUpdate = {
+    code: string | null;
+    description: string | null;
+    name: string;
+};
