@@ -208,7 +208,6 @@
                 });
 
                 let $selectAllCheckbox = $("#data-bulky-select-all-checkbox");
-                let $checkboxes = bulky.element.find(opt.checkboxSelector).filter(":enabled");
 
                 // Set initial state of 'select all' checkbox.  The modal contents are rebuilt from scratch every time
                 // the modal is opened (see the open.fndtn.reveal event handler), so when this function is called all
