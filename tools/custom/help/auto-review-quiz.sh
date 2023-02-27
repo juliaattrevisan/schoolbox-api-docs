@@ -104,7 +104,26 @@ WHERE
 ORDER BY aa.finish DESC;")
     for attempt in $list; do
       echo "-- reviewing attempt $attempt"
-      review=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_db" -BNe "UPDATE assess_attempt SET reviewed_at = finish WHERE attempt_id='$attempt';" 2>&1)
+      review=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_db" -BNe "
+      UPDATE assess_attempt,
+          (SELECT
+               if((SUM(ar.mark) >= 9999999999999.99), if((SUM(aq.marks) >= 9999999999999.99), 9999999999999.99, SUM(aq.marks)), SUM(ar.mark))  AS mark,
+               if((SUM(aq.marks) >= 9999999999999.99), 9999999999999.99, SUM(aq.marks))  AS max_mark,
+               aa.attempt_id
+           FROM assess_attempt aa
+                    JOIN assess q ON q.assess_id = aa.assess_id
+                    LEFT JOIN assess_response ar ON aa.attempt_id  = ar.attempt_id
+                    LEFT JOIN assess_question aq ON ar.question_id = aq.question_id
+           WHERE aa.attempt_id = '$attempt'
+             AND ar.deleted_at IS NULL
+             AND aq.deleted_at IS NULL
+           GROUP BY aa.assess_id, aa.attempt_id) as newVal
+      SET
+          assess_attempt.max_mark = newVal.max_mark,
+          assess_attempt.mark  = newVal.mark,
+          assess_attempt.reviewed_at = assess_attempt.finish
+      WHERE assess_attempt.attempt_id = newVal.attempt_id;
+      " 2>&1)
       if [ $? -ne 0 ]; then
         echo "Error: $review"
       fi
