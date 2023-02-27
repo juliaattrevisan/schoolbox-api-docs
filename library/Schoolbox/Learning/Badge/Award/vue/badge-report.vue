@@ -230,7 +230,7 @@ export default {
                     :are-all-students-selected="areAllStudentsSelected"
                     @on-select-all-selected="onSelectAllSelected"
                 />
-                <ul class="action-list">
+                <ul class="action-list" :class="{'noHeader' : !hasAwardPermissions}">
                     <badge-report-student
                         v-for="student in studentsData"
                         :key="student.id"
@@ -282,6 +282,11 @@ export default {
 </template>
 
 <style lang="scss" scoped>
+
+.noHeader { //shows when the user does not have badge perms, so we need to increase the top margin
+    margin-top: 1rem;
+}
+
 .badge-report {
     padding-bottom: 100px; // allow space for bottom-drawer at the bottom
 }
