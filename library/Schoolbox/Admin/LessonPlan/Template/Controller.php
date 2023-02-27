@@ -103,25 +103,30 @@ class Controller extends Base
         $this->templateMapper->save($template);
 
         /* Figure out the combined set of new rows and existing rows
+         *
+         * This POST key won't exist if the user just tried to save a template
+         * without spawning any new fields
          */
-        $fieldIds = \array_keys($postData['field-title']);
+        if (isset($postData['field-title'])) {
+            $fieldIds = \array_keys($postData['field-title']);
 
-        foreach ($fieldIds as $fieldId) {
-            /* Determine visibility setting, translating ui bool into schema's enum
-             */
-            $visibility = 'on' === $postData['field-visibility'][$fieldId] ? Role::STUDENT : Role::STAFF;
+            foreach ($fieldIds as $fieldId) {
+                /* Determine visibility setting, translating ui bool into schema's enum
+                 */
+                $visibility = 'on' === $postData['field-visibility'][$fieldId] ? Role::STUDENT : Role::STAFF;
 
-            /* Update all the pieces
-             * This is the Create endpoint so we can presume new models are always required
-             */
-            $field = $this->fieldMapper->createModel()
-                ->setTitle($postData['field-title'][$fieldId])
-                ->setBody($postData['field-body'][$fieldId])
-                ->setLessonPlanTemplate($template)
-                ->setVisibility($visibility)
-                ->setSequence($sequence++);
+                /* Update all the pieces
+                 * This is the Create endpoint so we can presume new models are always required
+                 */
+                $field = $this->fieldMapper->createModel()
+                    ->setTitle($postData['field-title'][$fieldId])
+                    ->setBody($postData['field-body'][$fieldId])
+                    ->setLessonPlanTemplate($template)
+                    ->setVisibility($visibility)
+                    ->setSequence($sequence++);
 
-            $this->fieldMapper->save($field);
+                $this->fieldMapper->save($field);
+            }
         }
 
         /* Go back to list
@@ -176,7 +181,7 @@ class Controller extends Base
 
         /* Figure out the combined set of new rows and existing rows
          *
-         * (This field won't exist if the user removed all the fields,
+         * (This POST key won't exist if the user removed all the fields,
          * at which point we can presume they actually meant to do that)
          */
         if (isset($postData['field-title'])) {
