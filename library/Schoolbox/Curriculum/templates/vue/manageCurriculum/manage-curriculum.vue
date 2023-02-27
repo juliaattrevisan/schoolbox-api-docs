@@ -8,6 +8,7 @@ import { ref, onMounted } from "vue";
 import { useStore } from "./store/manageCurriculumStore";
 import { useNodesStore } from "./store/mcNodesStore";
 import { useSelectedNodesStore } from "./selectedNodes/store/mcSelectedNodesStore";
+import { useViewNodesStore } from "./viewNodes/store/mcViewNodesStore";
 import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
 import McHeader from "./mc-header.vue";
 import McView from "./mc-view.vue";
@@ -69,7 +70,7 @@ function initErrorListener() {
  */
 function initHistoryListener() {
     window.addEventListener("popstate", (event) => {
-        console.warn(event);
+        useViewNodesStore().updateOnPopState(event.state);
     });
 }
 
@@ -80,8 +81,8 @@ onMounted(async () => {
     await store.init(props.dataEndpoint, props.isReadOnly, props.uiLimit, toastEl);
     if (store.hasId) {
         initErrorListener();
-        initHistoryListener();
     }
+    initHistoryListener();
 });
 
 /**

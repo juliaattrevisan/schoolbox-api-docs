@@ -16,11 +16,20 @@ export const DIRECTION = {
     BACKWARDS: "backwards",
 };
 
+/**
+ * To allow for browser back and forward buttons,
+ * we need to pass around the node id to know where to move to
+ */
+type PopState = {
+    nodeId: number;
+};
+
 export const useViewNodesStore = defineStore("mcViewNodes", () => {
     const idList = ref<number[]>([]); // ids of the selected nodes
     const currentDepth = ref(0); // track how far down the tree we are
     const currentDirection = ref(DIRECTION.FORWARDS); // which direction we are currently travelling in the tree
     const showDisabled = ref(true); // whether only enabled nodes should appear
+    const isBrowserAction = ref(false); // whether the current action is a browser action (backward or forward press)
 
     /**
      * Can now use the search input when we have selected at least one node
@@ -112,18 +121,22 @@ export const useViewNodesStore = defineStore("mcViewNodes", () => {
      * and to allow for browser back and forward buttons
      */
     function updateHash() {
+        // we dont need to update the browser state if this is already a browser action
+        if (isBrowserAction.value) {
+            return;
+        }
         /**
          * don't update the history state while we are traversing the tree,
          * this occurs while moving to a selected searched node or moving to the node id via the initial page hash,
-         * otherwise each node traversal will be added to the history
+         * otherwise each single node traversal will be added to the history
          */
         if (useNodesStore().isLoadingAllChildren) {
             return;
         }
         if (current.value.id === UNSET_ID) {
-            window.history.pushState({ nodeId: UNSET_ID }, "", "");
+            window.history.pushState({ nodeId: UNSET_ID } as PopState, "", window.location.pathname);
         } else {
-            window.history.pushState({ nodeId: current.value.id }, "", `#${current.value.id}`);
+            window.history.pushState({ nodeId: current.value.id } as PopState, "", `#${current.value.id}`);
         }
     }
 
@@ -182,6 +195,32 @@ export const useViewNodesStore = defineStore("mcViewNodes", () => {
         await useNodesStore().loadId(id);
     }
 
+    /**
+     * To responsd to browser backward and forward button actions
+     *
+     * @param { object } state -
+     */
+    async function updateOnPopState(state: PopState) {
+        // if the state contains a valid node id then move to that node id
+        if (state && state.nodeId && Number.isInteger(state.nodeId) && state.nodeId !== UNSET_ID) {
+            // check if the nodeId is currently in the idList, if so move backward to that index
+            isBrowserAction.value = true;
+            const index = idList.value.indexOf(state.nodeId);
+            if (index > -1) {
+                setSelected(index + 1, state.nodeId);
+            } else {
+                // otherwise move forward to the node id
+                await toId(state.nodeId);
+            }
+            isBrowserAction.value = false;
+        } else {
+            // otherwise just reset to the base level
+            isBrowserAction.value = true;
+            setSelected(0, UNSET_ID);
+            isBrowserAction.value = false;
+        }
+    }
+
     return {
         showDisabled,
         currentDirection,
@@ -193,5 +232,6 @@ export const useViewNodesStore = defineStore("mcViewNodes", () => {
         checkDeletedNode,
         setNextSelected,
         toId,
+        updateOnPopState,
     };
 });
