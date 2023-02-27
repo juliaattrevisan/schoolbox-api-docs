@@ -87,7 +87,7 @@ class Cursor implements ICursor
      * @param int                      $limit          The maximum number of results to fetch in one query.
      * @param IConfigLoader            $config
      * @param ICodec|null              $codec          The codec for encoding/decoding a cursor.
-     * @param string                   $encodedFilter  Base64 encoded JSON encoded Javascript array.
+     * @param string|null              $encodedFilter  Base64 encoded JSON encoded Javascript array.
      */
     public function __construct(
         private IConnector $database,
