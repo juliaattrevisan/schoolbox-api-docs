@@ -25,8 +25,12 @@ export default {
         selectedStudents: {
             //to clear a students selection when cleared by badge-report
             type: Array,
-            required: true,
+            required: true
         },
+        hasAwardPermissions: { // does the current user have permissions to award badges?
+            type: Boolean,
+            required: true
+        }
     },
 
     data() {
@@ -169,7 +173,7 @@ export default {
 
 <template>
     <li class="awards student">
-        <div class="student__select">
+        <div v-if="hasAwardPermissions" class="student__select">
             <div class="checklist">
                 <input
                     :id="`checkbox-${student.id}`"
