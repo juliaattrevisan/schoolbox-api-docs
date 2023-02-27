@@ -32,7 +32,7 @@
                         <legend>Fields</legend>
 
                         <ul id="fields" class="information-list lesson-plan-template-fields">
-                            {% if lessonPlanTemplate is not null%}
+                            {% if lessonPlanTemplate is not null %}
                                 {% for field in lessonPlanTemplate.fields %}
                                 <li>
                                     <div>
@@ -129,9 +129,38 @@
 
             $('#fields').append(li);
 
+            /* Apply validator rules
+             */
+            $('input[name="'+titleName+'"]').rules('add', 'requiredNotBlank');
+            $('textarea[name="'+bodyName+'"]').rules('add', 'requiredNotBlank');
+
             /* Postincrement in preparation for another new row
              */
             fieldCount++;
+        });
+
+        /* A dynamic mix-it-up of fields that already exist
+         * and fields which were just spawned
+         */
+        $('#lesson-plan-template-form').alaressValidate({
+            rules: {
+                {% if lessonPlanTemplate is not null %}
+                    {% for field in lessonPlanTemplate.fields %}
+                        'field-title[{{ field.id }}]': {
+                            requiredNotBlank: true
+                        },
+                        'field-body[{{ field.id }}]': {
+                            requiredNotBlank: true
+                        },
+                    {% endfor %}
+                {% endif %}
+
+                /* LPT title is always required
+                 */
+                'title' : {
+                    requiredNotBlank: true
+                }
+            }
         });
     });
 </script>
