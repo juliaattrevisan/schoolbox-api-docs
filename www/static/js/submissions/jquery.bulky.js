@@ -185,14 +185,18 @@
             refreshModalHeight.call(window);
 
             if (opt.includeSelectAllCheckbox) {
-                // Insert a 'select all' checkbox at the top of the other checkboxes,
-                // and use jquery.selectAllBasic() to control its behaviour.
-                bulky.list.before(
-                    "</div>" +
-                        "<input id='data-bulky-select-all-checkbox' type='checkbox'/>" +
-                        "<label for='data-bulky-select-all-checkbox' class='checkbox-label'>Select all</label>" +
-                        "<div>"
-                );
+                // Insert a 'select all' checkbox at the top of the other checkboxes, and use jquery.selectAllBasic()
+                // to control its behaviour.
+
+                // If the modal has been closed and then reopened, we may have already added the select-all checkbox.
+                if (0 === $("#data-bulky-select-all-checkbox").length) {
+                    bulky.list.before(
+                        "</div>" +
+                            "<input id='data-bulky-select-all-checkbox' type='checkbox'/>" +
+                            "<label for='data-bulky-select-all-checkbox' class='checkbox-label'>Select all</label>" +
+                            "<div>"
+                    );
+                }
 
                 // We restrict to enabled here so that when all enabled checkboxes are checked (and there are some
                 // disabled checkboxes), jquery.selectAllBasic() will give the 'select all' checkbox the tick instead
