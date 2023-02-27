@@ -108,20 +108,18 @@ class Controller extends Base
          * This POST key won't exist if the user just tried to save a template
          * without spawning any new fields
          */
-        if (isset($postData['field-title'])) {
-            $fieldIds = \array_keys($postData['field-title']);
-
-            foreach ($fieldIds as $fieldId) {
+        if (isset($postData['field'])) {
+            foreach ($postData['field'] as $fieldId => $fieldData) {
                 /* Determine visibility setting, translating ui bool into schema's enum
                  */
-                $visibility = 'on' === $postData['field-visibility'][$fieldId] ? Role::STUDENT : Role::STAFF;
+                $visibility = 'on' === $fieldData['visibility'] ? Role::STUDENT : Role::STAFF;
 
                 /* Update all the pieces
                  * This is the Create endpoint so we can presume new models are always required
                  */
                 $field = $this->fieldMapper->createModel()
-                    ->setTitle($postData['field-title'][$fieldId])
-                    ->setBody($postData['field-body'][$fieldId])
+                    ->setTitle($fieldData['title'])
+                    ->setBody($fieldData['body'])
                     ->setLessonPlanTemplate($template)
                     ->setVisibility($visibility)
                     ->setSequence($sequence++);
@@ -186,13 +184,11 @@ class Controller extends Base
          * (This POST key won't exist if the user removed all the fields,
          * at which point we can presume they actually meant to do that)
          */
-        if (isset($postData['field-title'])) {
-            $fieldIds = \array_keys($postData['field-title']);
-
-            foreach ($fieldIds as $fieldId) {
+        if (isset($postData['field'])) {
+            foreach ($postData['field'] as $fieldId => $fieldData) {
                 /* Determine visibility setting, translating ui bool into schema's enum
                  */
-                $visibility = 'on' === $postData['field-visibility'][$fieldId] ? Role::STUDENT : Role::STAFF;
+                $visibility = 'on' === $fieldData['visibility'] ? Role::STUDENT : Role::STAFF;
 
                 /* This is either a new row that was spawned by user,
                  * or it's a pre-existing row we can get from $lessonPlanTemplate
@@ -205,8 +201,8 @@ class Controller extends Base
 
                 /* Update all the pieces
                  */
-                $field->setTitle($postData['field-title'][$fieldId])
-                    ->setBody($postData['field-body'][$fieldId])
+                $field->setTitle($fieldData['title'])
+                    ->setBody($fieldData['body'])
                     ->setLessonPlanTemplate($lessonPlanTemplate)
                     ->setVisibility($visibility)
                     ->setSequence($sequence++);

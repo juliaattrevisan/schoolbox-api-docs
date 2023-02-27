@@ -39,15 +39,15 @@
                                 <li>
                                     <div>
                                         <label for="field-title-{{ field.id }}" class="required">Title</label>
-                                        <input type="text" id="field-title-{{ field.id }}" name="field-title[{{ field.id }}]" maxlength="255" value="{{ field.title }}" />
+                                        <input type="text" id="field-title-{{ field.id }}" name="field[{{ field.id }}][title]" maxlength="255" value="{{ field.title }}" />
                                     </div>
                                     <div>
                                         <label for="field-body-{{ field.id }}">Body</label>
-                                        <textarea id="field-body-{{ field.id }}" name="field-body[{{ field.id }}]" rows="5">{{ field.body }}</textarea>
+                                        <textarea id="field-body-{{ field.id }}" name="field[{{ field.id }}][body]" rows="5">{{ field.body }}</textarea>
                                     </div>
                                     <div>
                                         <input type="hidden" name="field-visibility[{{ field.id }}]" value="off" />
-                                        <input id="field-new-visibility-{{ field.id }}" name="field-visibility[{{ field.id }}]" type="checkbox" {% if field.visibility == studentRole %}checked="checked"{% endif %}/>
+                                        <input id="field-new-visibility-{{ field.id }}" name="field[{{ field.id }}][visibility]" type="checkbox" {% if field.visibility == studentRole %}checked="checked"{% endif %}/>
                                         <label for="field-new-visibility-{{ field.id }}" class="checkbox-label">Visible to students</label>
                                     </div>
                                     <a class="button icon-delete" data-delete></a>
@@ -104,13 +104,13 @@
             let newId = '{{ newKeyword  }}' + fieldCount;
 
             let titleId = 'field-title-' + newId;
-            let titleName = 'field-title[' + newId + ']';
+            let titleName = 'field[' + newId + '][title]';
 
             let bodyId = 'field-body-' + newId;
-            let bodyName = 'field-body[' + newId + ']';
+            let bodyName = 'field[' + newId + '][body]';
 
             let visibilityId = 'field-visibility-' + newId;
-            let visibilityName = 'field-visibility[' + newId + ']';
+            let visibilityName = 'field[' + newId + '][visibility]';
 
             clone.find('input[id="field-title"]').attr('name', titleName);
             clone.find('input[id="field-title"]').attr('id', titleId);
@@ -159,7 +159,7 @@
             rules: {
                 {% if lessonPlanTemplate is not null %}
                     {% for field in lessonPlanTemplate.fields %}
-                        'field-title[{{ field.id }}]': {
+                        'field[{{ field.id }}][title]': {
                             requiredNotBlank: true
                         },
                     {% endfor %}
