@@ -79,6 +79,7 @@ function onViewToggleSelected() {
 
 <style lang="scss" scoped>
 @import "./style/mcViewNode";
+@import "../style/mcIconColours";
 .button-action-option {
     @extend .button;
     color: var(--content-ui-foreground);
@@ -101,21 +102,5 @@ function onViewToggleSelected() {
         padding: 0.375rem 0.25rem;
         margin: 0;
     }
-}
-
-.icon-course-builder::before {
-    color: #008600;
-}
-
-.icon-unit::before {
-    color: var(--body-foreground);
-}
-
-.icon-due-work::before {
-    color: #c1009e;
-}
-
-.icon-badge::before {
-    color: #ff7c00;
 }
 </style>

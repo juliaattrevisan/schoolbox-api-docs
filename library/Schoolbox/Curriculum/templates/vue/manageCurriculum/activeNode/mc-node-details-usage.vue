@@ -25,7 +25,7 @@ const emit = defineEmits(["select"]);
 /**
  * To get the icon for the usage
  */
-const badgeIcon = computed(() => {
+const usageIcon = computed(() => {
     if (props.usage.discriminator === ActivityTypes.LEARNING_ACTIVITY) {
         // there's various types of learning activity icons
         return getUsageIcon(props.usage.object.type);
@@ -57,7 +57,7 @@ function onSelect() {
                 <div v-if="props.usage.discriminator === ActivityTypes.BADGE" class="usage__badge-container">
                     <badge-image :badge="props.usage.object" css="badge"></badge-image>
                 </div>
-                <div v-else :class="`usage__icon-container ${badgeIcon} size-24`"></div>
+                <div v-else :class="`usage__icon-container ${usageIcon} size-24`"></div>
                 <div class="usage__title-container">
                     <p v-if="props.usage.discriminator === ActivityTypes.BADGE">{{ props.usage.object.name }}</p>
                     <p v-else>{{ props.usage.object.title }}</p>
@@ -80,6 +80,7 @@ function onSelect() {
 </template>
 
 <style lang="scss" scoped>
+@import "../style/mcIconColours";
 .usage {
     border: 1px solid #ededed;
     padding: 0;
