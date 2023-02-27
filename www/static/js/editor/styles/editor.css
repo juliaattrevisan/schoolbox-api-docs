@@ -127,7 +127,8 @@
 
 /**
  * Custom Styles
- * You'll find our custom styles defined below
+ * You'll find our custom styles defined below. I added some colour custom properties
+ * as I spoke to James and he said none of these should respond to skin config.
  * TODO - Replace colour definitions with custom properties when they're implemented.
  */
 
