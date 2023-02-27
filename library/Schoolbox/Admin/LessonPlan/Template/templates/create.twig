@@ -1,7 +1,8 @@
 {##
  # Create Lesson Plan Templates
  #
- # @param LessonPlan/Template/Model $lessonPlanTemplate
+ # @param Template/Model $lessonPlanTemplate  A Lesson Plan Template instance, with its Fields
+ # @param string $studentRole                 The const corresponding to the Student roletype
  #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
@@ -45,7 +46,7 @@
                                     </div>
                                     <div>
                                         <input type="hidden" name="field-visibility[{{ field.id }}]" value="off" />
-                                        <input id="field-new-visibility-{{ field.id }}" name="field-visibility[{{ field.id }}]" type="checkbox" {% if field.visibility == 'student' %}checked="checked"{% endif %}/>
+                                        <input id="field-new-visibility-{{ field.id }}" name="field-visibility[{{ field.id }}]" type="checkbox" {% if field.visibility == studentRole %}checked="checked"{% endif %}/>
                                         <label for="field-new-visibility-{{ field.id }}" class="checkbox-label">Visible to students</label>
                                     </div>
                                     <a class="button icon-delete" data-delete></a>
