@@ -565,4 +565,13 @@ class Model implements ISoftDeletable, IModel
         $this->occurredOn = $occurredOn;
         return $this;
     }
+
+    /**
+     * Returns occurred on if set, created at otherwise
+     * @return Alaress_Date_Format|null
+     */
+    public function getRecordDate(): ?Alaress_Date_Format
+    {
+        return $this->occurredOn ?? $this->createdAt;
+    }
 }

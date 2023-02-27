@@ -1414,7 +1414,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
         $params = [
             'studentExternalId' => $studentExternalId,
-            'itemDate' => $pastoral->getOccurredOn() ? $pastoral->getOccurredOn()->getDatabase() : $pastoral->getCreatedAt()->getDatabase(),
+            'itemDate' => $pastoral->getRecordDate()->getDatabase(),
             'publicBody' => mb_substr($bodyPublicText, 0, 8000, self::CHARACTER_ENCODING),
             'privateBody' => mb_substr($bodyPrivateText, 0, 8000, self::CHARACTER_ENCODING),
             'pastoralTypeCode' => mb_substr($pastoralTypeCode, 0, 15, self::CHARACTER_ENCODING),

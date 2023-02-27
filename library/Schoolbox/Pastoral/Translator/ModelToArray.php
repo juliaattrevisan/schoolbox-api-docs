@@ -153,10 +153,10 @@ class ModelToArray
             // Excluded for now: access, related records, revisions
 
             // Ownership, last modifying user and time
-            'createdBy'          => $this->translateUser($model->getOwner()),
-            'createdAt'          => $model->getCreatedAt()->toRfc3339String(),
-            'updatedBy'          => $this->translateUser($model->getModifiedBy()),
-            'updatedAt'          => $model->getUpdatedAtDisplay()->toRfc3339String(),
+            'createdBy' => $this->translateUser($model->getOwner()),
+            'createdAt' => $model->getRecordDate()->toRfc3339String(),
+            'updatedBy' => $this->translateUser($model->getModifiedBy()),
+            'updatedAt' => $model->getUpdatedAtDisplay()->toRfc3339String(),
 
             // Links
             '_links'             => [

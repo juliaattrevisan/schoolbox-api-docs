@@ -41,6 +41,30 @@ class Model implements ISoftDeletable
      */
     public const ABSOLUTE_DATE = 'absolute';
 
+    public const ORDER_STUDENT     = 'student';
+    public const ORDER_SEVERITY    = 'severity';
+    public const ORDER_CREATED_AT  = 'date';
+    public const ORDER_OCCURRED_ON = 'occurredOn';
+    public const ORDER_TYPE        = 'type';
+    public const ORDER_SUBTYPE     = 'subtype';
+    public const ORDER_POINTS      = 'points';
+    public const ORDER_YEAR        = 'year';
+    public const ORDER_AUTHOR      = 'author';
+    public const ORDER_HOUSE       = 'house';
+    public const ORDER_CAMPUS = 'campus';
+
+    public const ORDER_FIELDS = [
+        self::ORDER_CREATED_AT  => 'Created Date',
+        self::ORDER_OCCURRED_ON => 'Occurred On',
+        self::ORDER_STUDENT     => 'Student Name',
+        self::ORDER_TYPE        => 'Type',
+        self::ORDER_SUBTYPE     => 'Sub-Type',
+        self::ORDER_AUTHOR      => 'Author Name',
+        self::ORDER_POINTS      => 'Points',
+        self::ORDER_YEAR        => 'Year Level',
+        self::ORDER_HOUSE       => 'House',
+        self::ORDER_CAMPUS       => 'Campus',
+    ];
 
     /** @var bool $dashboard */
     protected bool $dashboard = false;

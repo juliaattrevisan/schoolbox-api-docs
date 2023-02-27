@@ -33,6 +33,7 @@ class Cursor implements ICursor
     private ICodec $codec;
 
     public const SORT_OPTION_CREATED = 'created';
+    public const SORT_OPTION_OCCURRED = 'occurred';
     public const SORT_OPTION_UPDATED = 'updated';
     public const SORT_OPTION_SEVERITY = 'severity';
 
@@ -81,9 +82,10 @@ class Cursor implements ICursor
 
         if ($lastRecord instanceof Model) {
             $nextCursor = $this->codec->encode([
-                'severity' => $lastRecord->getSeverity()?->getSequence(),
-                'created'  => $lastRecord->getCreatedAt()->toRfc3339String(),
-                'updated'  => $lastRecord->getUpdatedAt()->toRfc3339String(),
+                self::SORT_OPTION_SEVERITY => $lastRecord->getSeverity()?->getSequence(),
+                self::SORT_OPTION_CREATED  => $lastRecord->getCreatedAt()->toRfc3339String(),
+                self::SORT_OPTION_UPDATED  => $lastRecord->getUpdatedAt()->toRfc3339String(),
+                self::SORT_OPTION_OCCURRED => $lastRecord->getOccurredOn()?->toRfc3339String(),
                 'id'       => $lastRecord->getId(),
             ]);
         }
@@ -156,6 +158,11 @@ class Cursor implements ICursor
                 'p.created_at' => Mapper::SORT_ORDER_DESC,
                 'p.id'         => Mapper::SORT_ORDER_DESC,
             ],
+            self::SORT_OPTION_OCCURRED => [
+                'p.occurred_on' => Mapper::SORT_ORDER_DESC,
+                'p.created_at'  => Mapper::SORT_ORDER_DESC,
+                'p.id'          => Mapper::SORT_ORDER_DESC,
+            ],
             default => [
                 'p.created_at' => Mapper::SORT_ORDER_DESC,
                 'p.id'         => Mapper::SORT_ORDER_DESC,
@@ -180,10 +187,11 @@ class Cursor implements ICursor
 
         $cursor = $this->codec->decode($encodedCursor);
         $cursorSeverity = key_exists('severity', $cursor) ? (int)$cursor['severity'] : null;
-        if (!isset($cursorSeverity, $cursor['created'], $cursor['updated'], $cursor['id'])) {
+        if (!isset($cursorSeverity, $cursor['created'], $cursor['updated'], $cursor['id']) || !key_exists('occurred', $cursor)) {
             return $pb;
         }
         $created = (new Alaress_Date_Format($cursor['created'], DateTimeInterface::RFC3339))->getDatabase();
+        $occurred = $cursor['occurred'] ? (new Alaress_Date_Format($cursor['occurred'], DateTimeInterface::RFC3339))->getDatabase() : null;
         $updated = (new Alaress_Date_Format($cursor['updated'], DateTimeInterface::RFC3339))->getDatabase();
 
         // The difficulty of creating an ORDER BY statement which fetches all
@@ -229,6 +237,43 @@ class Cursor implements ICursor
                             ->lessThan('p.id', $cursor['id'])
                     )
             );
+        } elseif ($this->sortOption === self::SORT_OPTION_OCCURRED) {
+            // occurred on: occurred on DESC, then created DESC, then id DESC
+            if ($occurred === null) {
+                $pb = $pb->any(
+                    $this->dataSource
+                        ->getPredicateBuilder()
+                        ->all(
+                            $this->dataSource->getPredicateBuilder()
+                                             ->isNull('p.occurred_on')
+                                             ->lessThan('p.created_at', $created)
+                        )
+                        ->all(
+                            $this->dataSource->getPredicateBuilder()
+                                             ->isNull('p.occurred_on')
+                                             ->equals('p.created_at', $created)
+                                             ->lessThan('p.id', $cursor['id'])
+                        )
+                );
+            } else {
+                $pb = $pb->any(
+                    $this->dataSource
+                        ->getPredicateBuilder()
+                        ->isNull('p.occurred_on')
+                        ->lessThan('p.occurred_on', $occurred)
+                        ->all(
+                            $this->dataSource->getPredicateBuilder()
+                                             ->equals('p.occurred_on', $occurred)
+                                             ->lessThan('p.created_at', $created)
+                        )
+                        ->all(
+                            $this->dataSource->getPredicateBuilder()
+                                             ->equals('p.occurred_on', $occurred)
+                                             ->equals('p.created_at', $created)
+                                             ->lessThan('p.id', $cursor['id'])
+                        )
+                );
+            }
         } else {
             // created: created DESC, then id DESC
             $pb = $pb->any(

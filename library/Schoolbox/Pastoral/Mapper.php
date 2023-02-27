@@ -23,6 +23,7 @@ use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Action\Model as Action;
 use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
 use Schoolbox\Pastoral\Comment\Mapper as PastoralCommentMapper;
+use Schoolbox\Pastoral\Report\Model as Report;
 use Schoolbox\Pastoral\Revision\Mapper as PastoralRevisionMapper;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\Severity\Model as PastoralSeverity;
@@ -842,13 +843,17 @@ class Mapper extends BaseMapper
         $orderSql = '';
 
         if ($before_date instanceof Alaress_Date_Format) {
-            $this->bindings[':beforeDate'] = $before_date->endOfDay()->toIso8601String();
-            $this->filters[]               = '`pastoral`.`created_at` <= :beforeDate';
+            $this->bindings[':beforeDate'] = $before_date->endOfDay()
+                                                         ->toIso8601String();
+
+            $this->filters[] = '(COALESCE(`pastoral`.`occurred_on`, `pastoral`.`created_at`) <= :beforeDate)';
         }
 
         if ($after_date instanceof Alaress_Date_Format) {
-            $this->bindings[':afterDate'] = $after_date->startOfDay()->toIso8601String();
-            $this->filters[]              = '`pastoral`.`created_at` >= :afterDate';
+            $this->bindings[':afterDate'] = $after_date->startOfDay()
+                                                       ->toIso8601String();
+
+            $this->filters[] = '(COALESCE(`pastoral`.`occurred_on`, `pastoral`.`created_at`) >= :afterDate)';
         }
 
         if ($severity && $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_SEVERITY_ENABLED)) {
@@ -876,32 +881,38 @@ class Mapper extends BaseMapper
         $orderParts = [];
         foreach ($order as $orderCurrent) {
             switch ($orderCurrent) {
-                case 'student':
+                case Report::ORDER_STUDENT:
                     $orderParts[] = "`s`.lastname, `s`.chosen_name";
                     break;
-                case 'severity':
+                case Report::ORDER_SEVERITY:
                     $orderParts[] = "`sv`.sequence";
                     break;
-                case 'date':
+                case Report::ORDER_CREATED_AT:
                     $orderParts[] = "`pastoral`.created_at desc";
                     break;
-                case 'type':
+                case Report::ORDER_OCCURRED_ON:
+                    $orderParts[] = "`pastoral`.occurred_on desc";
+                    break;
+                case Report::ORDER_TYPE:
                     $orderParts[] = "`t`.name";
                     break;
-                case 'subtype':
+                case Report::ORDER_SUBTYPE:
                     $orderParts[] = "`c`.name";
                     break;
-                case 'points':
+                case Report::ORDER_POINTS:
                     $orderParts[] = "`pastoral`.points";
                     break;
-                case 'year':
+                case Report::ORDER_YEAR:
                     $orderParts[] = "`sy`.sequence asc";
                     break;
-                case 'author':
+                case Report::ORDER_AUTHOR:
                     $orderParts[] = "`o`.lastname, `o`.chosen_name";
                     break;
-                case 'house':
+                case Report::ORDER_HOUSE:
                     $orderParts[] = "`s`.`house`";
+                    break;
+                case Report::ORDER_CAMPUS:
+                    $orderParts[] = '`sc`.`name`';
                     break;
             }
         }

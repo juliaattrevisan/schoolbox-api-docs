@@ -5,11 +5,13 @@ import { stringify } from "qs";
 import { reactive } from "vue";
 
 const SORT_OPTION_CREATED = "created";
+const SORT_OPTION_OCCURRED = "occurred";
 const SORT_OPTION_UPDATED = "updated";
 const SORT_OPTION_SEVERITY = "severity";
 const SORT_OPTION_DEFAULT = SORT_OPTION_CREATED;
 const SORT_OPTIONS = [
     { value: SORT_OPTION_CREATED, label: "Created" },
+    { value: SORT_OPTION_OCCURRED, label: "Occurred on" },
     { value: SORT_OPTION_UPDATED, label: "Updated" },
     { value: SORT_OPTION_SEVERITY, label: "Severity" },
 ];

@@ -47,7 +47,7 @@
                                 <p class="meta">
                                     {# Pastoral event type #}
                                     {{ record.type.name }} {% if record.subtype.name is defined %}({{ record.subtype.name }}){% endif %} |
-                                    Posted by <a
+                                    Created by <a
                                             href="/search/user/{{ record.owner.id }}">{{ record.owner.fullName }}</a> {{ record.createdAt.short }}
 
                                     {# Pastoral action #}
