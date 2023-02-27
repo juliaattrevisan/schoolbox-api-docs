@@ -87,9 +87,7 @@
 
         /* Event listener to change button text
          */
-        this.element.on("change", opt.checkboxSelector, function () {
-            setupActionButton();
-        });
+        this.element.on("change", opt.checkboxSelector, setupActionButton);
 
         /**
          * When the modal opens
@@ -214,10 +212,7 @@
                 // ordinary checkboxes will always be checked, and so the select-all checkbox should be checked.
                 $selectAllCheckbox.prop("checked", true);
 
-                $selectAllCheckbox.click(function () {
-                    let $checkboxes = $(ordinaryCheckboxJqSelector);
-                    refreshSubmitText.call(bulky, $checkboxes.filter(":checked").length, $checkboxes.length);
-                });
+                $selectAllCheckbox.click(setupActionButton);
             }
         });
 
