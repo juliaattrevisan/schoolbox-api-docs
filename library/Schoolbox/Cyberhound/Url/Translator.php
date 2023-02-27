@@ -91,18 +91,18 @@ class Translator
 
             try {
                 $urlObject = new Uri($url);
-                if ($urlObject->isAbsolutePath()) {
+                if (!$urlObject->isAbsolutePath()) {
                     // If using Cyberhound: redirect to its proxy rather than the URL directly.
                     // Only redirect for non-local links though.
 
-                    $cyberHoundUrl = new Uri($this->apiUrl);
-                    $cyberHoundUrl
+                    $cyberHoundUrl = (new Uri($this->apiUrl))
                         ->withPath('/api/overrideurl')
                         ->appendQueryParameters([
                             'key'       => hash('sha256', $_SERVER['REQUEST_TIME'] . $url . $this->apiSharedKey),
                             'time'      => $_SERVER['REQUEST_TIME'],
                             'base64url' => base64_encode($url),
                         ]);
+
                     $url = (string)$cyberHoundUrl;
                 }
             } catch (\InvalidArgumentException $e) {
