@@ -1921,6 +1921,24 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             throw $errorMapper->generateException(ErrorMapper::ERROR_COURSE_FOLDER_INVALID);
         }
 
+        // Make sure that a unit is not being moved into a folder (not course)
+        if ($movedFolder->hasUnitSpecification()) {
+            // hydrate parent folder parent
+            $parentFolder->setParent($folderMapper->findById($parentFolder->getParent()->getId()));
+            // check if the parentFolder is a child folder of a course or unit?
+            // (grandparent (parents parent)) of $movedFolder should not be a Unit / Course (If $movedFolder is a unit)
+            if ($parentFolder->getParent()->hasCourseSpecification() || $parentFolder->getParent()->hasUnitSpecification()) {
+                throw $errorMapper->generateException(ErrorMapper::ERROR_COURSE_FOLDER_INVALID);
+            }
+            // Check if the $parentFolder has any Course's as children, and stop the move
+            $parentsChildren = $folderMapper->findAllChildren($parentFolder->getId());
+            foreach ($parentsChildren as $childFolder) {
+                if ($childFolder->hasCourseSpecification()) {
+                    throw $errorMapper->generateException(ErrorMapper::ERROR_COURSE_FOLDER_INVALID);
+                }
+            }
+        }
+
         $folderMapper->save($movedFolder->setParent($parentFolder));
     }
 
