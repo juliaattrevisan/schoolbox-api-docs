@@ -45,8 +45,8 @@
                                     </div>
                                     <div>
                                         <input type="hidden" name="field-visibility[{{ field.id }}]" value="off" />
-                                        <input id="field-new-visibility" name="field-visibility[{{ field.id }}]" type="checkbox" {% if field.visibility == 'student' %}checked="checked"{% endif %}/>
-                                        <label for="field-new-visibility" class="checkbox-label">Visible to students</label>
+                                        <input id="field-new-visibility-{{ field.id }}" name="field-visibility[{{ field.id }}]" type="checkbox" {% if field.visibility == 'student' %}checked="checked"{% endif %}/>
+                                        <label for="field-new-visibility-{{ field.id }}" class="checkbox-label">Visible to students</label>
                                     </div>
                                     <a class="button icon-delete" data-delete></a>
                                 </li>
