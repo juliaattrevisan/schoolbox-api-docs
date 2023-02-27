@@ -85,7 +85,7 @@ class Controller extends Base
             $this->database,
             $user,
             $this->getUser(),
-            (($encodedFilters === '')? null: $encodedFilters),
+            (($encodedFilters === '') ? null : $encodedFilters),
             null,
             self::FEED_ITEMS_PER_PAGE,
             $this->getConfigLoader(),
