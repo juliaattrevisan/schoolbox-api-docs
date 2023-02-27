@@ -289,7 +289,7 @@
  #}
 {% block scripts %}
     {% if not readonly %}
-        <script type="text/javascript" src="{{ CDN_PREFIX }}/js/select-all/jquery.select-all.basic.js"></script>
+        <script type="text/javascript" src="{{ CDN_PREFIX }}/js/select-all/jquery.select-all.basic.js?v={{ config.site_version }}"></script>
         <script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.bulky.js?v={{ config.site_version }}"></script>
 
         {# The div below is used by bulky.js to create the mass-publish modal. #}
