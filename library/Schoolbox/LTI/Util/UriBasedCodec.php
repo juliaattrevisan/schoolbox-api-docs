@@ -52,8 +52,8 @@ abstract class UriBasedCodec implements ICodec
     {
         return (string)(clone $this->baseUri)
             ->withPath($this->retrieveBasePath() . self::SEPARATOR . $rawValue)
-            ->withQuery(null)
-            ->withFragment(null);
+            ->withQuery('')
+            ->withFragment('');
     }
 
     /**
