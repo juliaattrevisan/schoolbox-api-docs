@@ -696,7 +696,6 @@ class Controller extends ConfigController
                                 ['userId' => $this->getUser()->getId()]
                             )
                         )
-                        ->withQuery('')
                 )
                 ->setCallbackParams([
                     'message' => sprintf(
