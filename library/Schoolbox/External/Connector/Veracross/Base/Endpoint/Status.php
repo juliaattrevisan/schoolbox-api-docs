@@ -9,8 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Veracross\Base\Endpoint;
 
-//use Schoolbox\External\Connector\Veracross\Base\Endpoint\Specification;
-//use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
+use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
 use Schoolbox\External\Importer\Endpoint\Status\IStatus;
 
 /**
@@ -63,19 +62,16 @@ class Status implements IStatus
      */
     public function getReport(): array
     {
-        return [];
-//        try {
-//            $api = new Api($this->host, $this->key);
-//        } catch (\DomainException $e) {
-//            return [[
-//                'message' => 'Cannot access api endpoint',
-//                'reason' => $e->getMessage(),
-//                'status' => ISpecification::STATUS_ERROR
-//            ]];
-//        }
-//
-//        $specification = new Specification($api);
-//
-//        return $specification->check();
+        try {
+            $api = new Api($this->host, $this->key);
+        } catch (\DomainException | \InvalidArgumentException $e) {
+            return [[
+                'message' => 'Cannot access api endpoint',
+                'reason' => $e->getMessage(),
+                'status' => ISpecification::STATUS_ERROR
+            ]];
+        }
+
+        return (new Specification($api))->check();
     }
 }

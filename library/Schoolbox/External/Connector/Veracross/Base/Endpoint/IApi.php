@@ -17,7 +17,7 @@ namespace Schoolbox\External\Connector\Veracross\Base\Endpoint;
 interface IApi
 {
     /**
-     * Retrieves data from an endpoint
+     * Iteratively retrieves all pages of data from an endpoint
      *
      * @param string $method
      * @param string $endpoint
@@ -26,6 +26,23 @@ interface IApi
      * @return \Generator
      */
     public function retrieve(string $method, string $endpoint, string $scope, array $params = []): \Generator;
+
+
+    /**
+     * Retrieves a single page of data from an endpoint
+     *
+     * @param string $method
+     * @param string $endpoint
+     * @param string $scope
+     * @param int    $pageNum
+     * @param int    $pageSize
+     * @param array  $params
+     * @return array
+     * @throws \DomainException
+     * @throws \JsonException
+     * @throws \RuntimeException
+     */
+    public function retrieveOne(string $method, string $endpoint, string $scope, int $pageNum, int $pageSize, array $params = []): array;
 
 
     /**
