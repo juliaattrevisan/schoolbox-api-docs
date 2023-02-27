@@ -26,8 +26,6 @@ export default {
     },
     data() {
         return {
-            videoWidth: null,
-            videoHeight: null,
             player: null,
         };
     },
@@ -40,13 +38,17 @@ export default {
             case "video":
                 this.player = new this.MediaElementPlayer(this.$el);
 
-                // Work around what I think is an issue with mediaelement not
-                // knowing what to do when the player loads.
-                // The video isn't set to the same size as the player.
                 let container = this.$el.closest(".mejs__container");
                 if (container) {
-                    this.videoWidth = container.clientWidth;
-                    this.videoHeight = container.clientHeight;
+                    // The two lines below:
+                    //  * Ensure the video dimensions match the container dimensions both when the video is initially
+                    //    displayed and when it is playing.
+                    //  * Ensure the video poster fills the container with the correct aspect ratio, and has black bars
+                    //    added on the top/bottom or sides if necessary instead of having a hidden part overflow the
+                    //    bounds of the container.
+                    // Documentation: https://github.com/mediaelement/mediaelement/blob/master/docs/usage.md
+                    this.player.setPlayerSize($(container).width(), $(container).height());
+                    $(container).find(".mejs__poster").attr("style", "");
                 }
                 break;
 
@@ -87,8 +89,6 @@ export default {
         preload="none"
         style="width: 100%; height: 100%"
         :poster="storage._links.poster"
-        :width="videoWidth"
-        :height="videoHeight"
     >
         <source type="video/mp4" :src="storage._links.stream" />
     </video>
