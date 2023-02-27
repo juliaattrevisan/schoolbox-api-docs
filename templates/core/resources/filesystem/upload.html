@@ -57,9 +57,11 @@ $(function () {
                 */
                 this.on('addedfile', function (file) {
                     var img = $(file.previewElement).find('img[data-dz-thumbnail]');
-                    img.attr('src', '{CDN_PREFIX}/images/mime'.concat('/', file.type.replaceAll('/','-')).concat('.','svg'));
-                    //when the image errors out, if the mimetype does not exist (exactly), then don't error just show the default image
-                    img.attr('onerror', "this.onerror=null;this.src='{CDN_PREFIX}/images/mime/none.svg';");
+                    img.attr('src', '/ajax/mime/' + file.type);
+                    /**
+                     * Don't trust the client browser to serve the correct mimetype, to hit the static file (cdn) directly.
+                     * we should revert back to the /ajax/mime.php file to check from the db which filetype icon we should use
+                     */
                 });
 
                 /* Remove a file from the staging area
@@ -144,8 +146,39 @@ $(function () {
             accept: function (file, done) {
                 done();
                 checkState.call(this);
-            }
-        });
+            },
+
+            // Called when a thumbnail has been generated
+            // Receives `file` and `dataUrl`
+            thumbnail(file, dataUrl) {
+                if (file.previewElement) {
+                    file.previewElement.classList.remove("dz-file-preview");
+                    for (let thumbnailElement of file.previewElement.querySelectorAll(
+                            "[data-dz-thumbnail]"
+                    )) {
+                        thumbnailElement.alt = file.name;
+                        thumbnailElement.src = dataUrl;
+                        if (dataUrl.target) {
+                            /**
+                             * From my testing this is pre us getting data back from asyncUpload, so again we are using the browser to give us the mimetype
+                             * we are also given a dataUrl, which usually is a base64 string of the image object.
+                             * On occasion this dataUrl is actually a javascript event, from what I could work out,
+                             * this occurs when the file is something the browser is unable to preview (no base64 string object of the file/image)
+                             * to prevent us sending [object Event] to the cdn or schoolbox instance url,
+                             * we should catch this exception and use the browser specified mimetype and request from the server a filetype icon to use
+                             */
+                            thumbnailElement.src = '/ajax/mime/' + file.type;
+                        }
+                    }
+
+                    return setTimeout(
+                            () => file.previewElement.classList.add("dz-image-preview"),
+                            1
+                    );
+                }
+            },
+
+            });
 
     } catch (error) {
         //noop
