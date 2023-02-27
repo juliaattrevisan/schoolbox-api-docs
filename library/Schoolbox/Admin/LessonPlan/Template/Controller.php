@@ -70,7 +70,10 @@ class Controller extends Base
             'template' => '@adminLessonPlanTemplate/create.twig',
             'data' => [
                 'pageCurrent' => $this->router->generate('adminLessonPlanTemplate.getList'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminLessonPlanTemplate.getList')),
+                'allBreadcrumbs' => array_merge(
+                    (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminLessonPlanTemplate.getList')),
+                    [['Create', null]]
+                ),
                 'lessonPlanTemplate' => null,
                 'studentRole' => Role::STUDENT,
                 'newKeyword' => self::NEW_KEYWORD
@@ -147,7 +150,10 @@ class Controller extends Base
             'template' => '@adminLessonPlanTemplate/create.twig',
             'data' => [
                 'pageCurrent' => $this->router->generate('adminLessonPlanTemplate.getList'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminLessonPlanTemplate.getList')),
+                'allBreadcrumbs' => array_merge(
+                    (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminLessonPlanTemplate.getList')),
+                    [['Modify', null]]
+                ),
                 'lessonPlanTemplate' => $lessonPlanTemplate,
                 'studentRole' => Role::STUDENT,
                 'newKeyword' => self::NEW_KEYWORD
