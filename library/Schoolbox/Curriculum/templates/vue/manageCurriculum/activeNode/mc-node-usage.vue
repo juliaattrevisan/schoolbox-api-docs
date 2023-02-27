@@ -6,12 +6,12 @@
 import { ref, computed } from "vue";
 import type { BadgeUsageObject, Usage } from "@schoolboxCurriculum/types/Node";
 import { ActivityTypes } from "@schoolboxCurriculum/types/Node";
-import { getSpecificUsages, getUsageHref } from "@schoolboxCurriculum/js/nodeUtils";
+import { getSpecificUsages } from "@schoolboxCurriculum/js/nodeUtils";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import BadgeModal from "@schoolboxBadge/vue/badge-modal";
 import { useActiveNodeStore } from "./store/mcActiveNodeStore";
 import { useNodeUsageStore } from "./store/mcNodeUsageStore";
-import McNodeDetailsUsage from "./mc-node-details-usage.vue";
+import McNodeUsageItem from "./mc-node-usage-item.vue";
 
 interface Props {
     depth: number; // to gradually add more marginLeft to indicate node level depth
@@ -142,7 +142,7 @@ function onDetailModalClosed() {
                     <div v-for="activeUsage in activeUsages">
                         <h4>{{ activeUsage.title }} ({{ activeUsage.count }})</h4>
                         <ul class="usage-list">
-                            <mc-node-details-usage
+                            <mc-node-usage-item
                                 v-for="(usage, index) in activeUsage.usages"
                                 :key="index"
                                 :usage="usage"

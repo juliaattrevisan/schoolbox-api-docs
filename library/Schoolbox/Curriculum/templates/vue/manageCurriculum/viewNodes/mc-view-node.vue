@@ -21,9 +21,9 @@ import { useUpdateNodeStore } from "../activeNode/store/mcUpdateNodeStore";
 import { useSearchStore } from "../store/mcSearchStore";
 import McViewNodeCheckbox from "./mc-view-node-checkbox.vue";
 import McViewNodeName from "./mc-view-node-name.vue";
-import McViewNodeDetails from "./mc-view-node-details.vue";
+import McViewNodeUsage from "./mc-view-node-usage.vue";
 import McViewNodeActions from "./mc-view-node-actions.vue";
-import McNodeDetails from "../activeNode/mc-node-details.vue";
+import McNodeUsage from "../activeNode/mc-node-usage.vue";
 import McAddSubsection from "../activeNode/mc-add-subsection.vue";
 import McUpdateNode from "../activeNode/mc-update-node.vue";
 
@@ -224,12 +224,12 @@ const title = computed(() =>
 const showActions = computed(() => !store.isReadOnly && props.node.id !== UNSET_ID && !searchStore.isActive);
 
 /**
- * Whether the details should be displayed, shouldn't be if we are at the root level node,
+ * Whether the usage should be displayed, shouldn't be if we are at the root level node,
  * or if the search is active
  *
  * @returns { boolean }
  */
-const showDetails = computed(() => props.node.id !== UNSET_ID && !searchStore.isActive);
+const showUsage = computed(() => props.node.id !== UNSET_ID && !searchStore.isActive);
 </script>
 
 <template>
@@ -253,8 +253,8 @@ const showDetails = computed(() => props.node.id !== UNSET_ID && !searchStore.is
                     />
                 </div>
                 <div class="inner-containers">
-                    <mc-view-node-details
-                        v-if="showDetails"
+                    <mc-view-node-usage
+                        v-if="showUsage"
                         :node="props.node"
                         :title="title"
                         :is-viewing="isViewing"
@@ -272,7 +272,7 @@ const showDetails = computed(() => props.node.id !== UNSET_ID && !searchStore.is
                 </div>
             </div>
             <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
-                <mc-node-details v-if="isViewing" :depth="props.depth" />
+                <mc-node-usage v-if="isViewing" :depth="props.depth" />
             </Transition>
             <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
                 <mc-add-subsection v-if="isAdding" :depth="props.depth" />
