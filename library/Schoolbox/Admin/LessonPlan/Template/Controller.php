@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\LessonPlan\Template;
 
+use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Admin\Navigation\Subnav;
@@ -155,13 +156,21 @@ class Controller extends Base
      * @return void
      * @throws Exception
      * @throws RouteNotFound
+     * @throws InvalidColumnException
      * @throws \PDOException
+     * @throws \UnderflowException
      * @throws \UnexpectedValueException
      */
     public function postUpdate(Model $lessonPlanTemplate): void
     {
         $postData = $this->getRequest()->post->getArrayCopy();
         $sequence = 1;
+
+        /* Remember this list of ids that we have either updated
+         * or persisted to the db; anything outside this set needs
+         * to be deleted, since they weren't seen in this payload
+         */
+        $seenFieldIds = [];
 
         /* Figure out the combined set of new rows and existing rows
          */
@@ -190,7 +199,18 @@ class Controller extends Base
                 ->setSequence($sequence++);
 
             $this->fieldMapper->save($field);
+
+            $seenFieldIds[] = $field->getId();
         }
+
+        /* Anything that wasn't seen needs to be removed
+         */
+        $pb = $this->fieldMapper->getPredicateBuilder()
+            ->notIn('id', $seenFieldIds);
+
+        $deadFields = $this->fieldMapper->findByPredicates($pb);
+
+        $this->fieldMapper->delete($deadFields);
 
         /* Then update the template's title in case that might have changed
          * Technically you, the updater, might be different to the guy who
