@@ -48,6 +48,7 @@
                                         <input id="field-new-visibility" name="field-visibility[{{ field.id }}]" type="checkbox" />
                                         <label for="field-new-visibility" class="checkbox-label">Visible to students</label>
                                     </div>
+                                    <a class="button icon-delete" data-delete></a>
                                 </li>
                                 {% endfor %}
                             {% endif %}
@@ -82,6 +83,7 @@
         <input id="field-visibility" type="checkbox" />
         <label for="field-visibility" class="checkbox-label">Visible to students</label>
     </div>
+    <a class="button icon-delete" data-delete></a>
 </div>
 
 <script>
@@ -161,6 +163,12 @@
                     requiredNotBlank: true
                 }
             }
+        });
+
+        /* Delete a field
+         */
+        $('[data-delete]').on('click', function() {
+            $(this).parents('li').remove();
         });
     });
 </script>

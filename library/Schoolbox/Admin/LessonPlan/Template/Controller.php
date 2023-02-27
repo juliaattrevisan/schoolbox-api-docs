@@ -173,34 +173,39 @@ class Controller extends Base
         $seenFieldIds = [];
 
         /* Figure out the combined set of new rows and existing rows
+         *
+         * (This field won't exist if the user removed all the fields,
+         * at which point we can presume they actually meant to do that)
          */
-        $fieldIds = \array_keys($postData['field-title']);
+        if (isset($postData['field-title'])) {
+            $fieldIds = \array_keys($postData['field-title']);
 
-        foreach ($fieldIds as $fieldId) {
-            /* Determine visibility setting, translating ui bool into schema's enum
-             */
-            $visibility = 'on' === $postData['field-visibility'][$fieldId] ? Role::STUDENT : Role::STAFF;
+            foreach ($fieldIds as $fieldId) {
+                /* Determine visibility setting, translating ui bool into schema's enum
+                 */
+                $visibility = 'on' === $postData['field-visibility'][$fieldId] ? Role::STUDENT : Role::STAFF;
 
-            /* This is either a new row that was spawned by user,
-             * or it's a pre-existing row we can get from $lessonPlanTemplate
-             */
-            if (str_contains((string)$fieldId, self::NEW_KEYWORD)) {
-                $field = $this->fieldMapper->createModel();
-            } else {
-                $field = $lessonPlanTemplate->getFields()->getBy('id', $fieldId);
+                /* This is either a new row that was spawned by user,
+                 * or it's a pre-existing row we can get from $lessonPlanTemplate
+                 */
+                if (str_contains((string)$fieldId, self::NEW_KEYWORD)) {
+                    $field = $this->fieldMapper->createModel();
+                } else {
+                    $field = $lessonPlanTemplate->getFields()->getBy('id', $fieldId);
+                }
+
+                /* Update all the pieces
+                 */
+                $field->setTitle($postData['field-title'][$fieldId])
+                    ->setBody($postData['field-body'][$fieldId])
+                    ->setLessonPlanTemplate($lessonPlanTemplate)
+                    ->setVisibility($visibility)
+                    ->setSequence($sequence++);
+
+                $this->fieldMapper->save($field);
+
+                $seenFieldIds[] = $field->getId();
             }
-
-            /* Update all the pieces
-             */
-            $field->setTitle($postData['field-title'][$fieldId])
-                ->setBody($postData['field-body'][$fieldId])
-                ->setLessonPlanTemplate($lessonPlanTemplate)
-                ->setVisibility($visibility)
-                ->setSequence($sequence++);
-
-            $this->fieldMapper->save($field);
-
-            $seenFieldIds[] = $field->getId();
         }
 
         /* Anything that wasn't seen needs to be removed
