@@ -263,6 +263,14 @@ class External_Synergetic_Timetable implements External_TimetableInterface
          */
         $periodCount = \count($timetableDef['desc']);
 
+        /* Remove key association
+         */
+        $timetableDef['desc'] = array_values($timetableDef['desc']);
+        $timetableDef['start'] = array_values($timetableDef['start']);
+        $timetableDef['end'] = array_values($timetableDef['end']);
+        $timetableDef['number'] = array_values($timetableDef['number']);
+        $timetableDef['sequence'] = array_values($timetableDef['sequence']);
+
         //Fall back to day 0 if nothing found
         if ($periodCount == 0 && $day != 0) {
             return $this->getTimetableDefinition($externalUserId, $campus);
