@@ -204,6 +204,10 @@ class Controller extends Base
 
             foreach ($displayGradesForFolders as $folder) {
                 if ($workPerFolder->keyExists($folder->getId())) {
+                    // there are rare cases where year levels are not hydrated
+                    if (null === $folder->getYearLevels()) {
+                        $folder = $this->folderMapper->findById($folder->getId());
+                    }
                     $markScheme = $markSchemeFactory->spawnForFolder($folder, $isStaff);
                     $markbook   = new Markbook($workPerFolder[$folder->getId()], $markScheme, $this->getUser());
                     $subjects[$folder->getId()]['grade'] = $markbook->getStudentStatistics()[$student->getId()];
