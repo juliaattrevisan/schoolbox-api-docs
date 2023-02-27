@@ -58,6 +58,10 @@ $(function () {
                 this.on('addedfile', function (file) {
                     var img = $(file.previewElement).find('img[data-dz-thumbnail]');
                     img.attr('src', '/ajax/mime/' + file.type);
+                    /**
+                     * Don't trust the client browser to serve the correct mimetype, to hit the static file (cdn) directly.
+                     * we should revert back to the /ajax/mime.php file to check from the db which filetype icon we should use
+                     */
                 });
 
                 /* Remove a file from the staging area
@@ -155,7 +159,14 @@ $(function () {
                         thumbnailElement.alt = file.name;
                         thumbnailElement.src = dataUrl;
                         if (dataUrl.target) {
-                            //if dataUrl is an event, this is probably an issue with CORS, so lets try again
+                            /**
+                             * From my testing this is pre us getting data back from asyncUpload, so again we are using the browser to give us the mimetype
+                             * we are also given a dataUrl, which usually is a base64 string of the image object.
+                             * On occasion this dataUrl is actually a javascript event, from what I could work out,
+                             * this occurs when the file is something the browser is unable to preview (no base64 string object of the file/image)
+                             * to prevent us sending [object Event] to the cdn or schoolbox instance url,
+                             * we should catch this exception and use the browser specified mimetype and request from the server a filetype icon to use
+                             */
                             thumbnailElement.src = '/ajax/mime/' + file.type;
                         }
                     }
