@@ -10,4 +10,4 @@
 **/www/static/js/ckeditor
 **/www/static/js/vendors
 **/resources/icon_font_raw
-**/stories/assets/mockServiceWorker.js
+stories/assets/mockServiceWorker.js
