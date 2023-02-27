@@ -123,7 +123,8 @@
                         $chk.attr("id", id);
                         $lbl.attr("for", id);
 
-                        // So we can identify ordinary checkboxes using a selector in jquery.selectAllBasic() below.
+                        // Add attribute 'data-bulky-ordinary-checkbox' to allow use to identify all checkboxes except
+                        // the select-all checkbox (that will be added if opt.includeSelectAllCheckbox is true).
                         $chk.attr("data-bulky-ordinary-checkbox", "");
 
                         // apply the name
@@ -209,7 +210,7 @@
 
                 // Set initial state of 'select all' checkbox.  The modal contents are rebuilt from scratch every time
                 // the modal is opened (see the open.fndtn.reveal event handler), so when this function is called all
-                // ordinary checkboxes will always be checked, and so the select-all checkbox should be checked.
+                // ordinary checkboxes will always be checked, and so the select-all checkbox should also be checked.
                 $selectAllCheckbox.prop("checked", true);
 
                 $selectAllCheckbox.click(setupActionButton);
