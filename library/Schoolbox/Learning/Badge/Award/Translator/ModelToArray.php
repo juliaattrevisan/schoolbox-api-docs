@@ -118,7 +118,7 @@ class ModelToArray
             'awardedBy'  => $awardedBy,
             'awardedAt'  => $model->getAwardedAt()->getUsingFormat(DATE_ATOM),
             'reasonedBy' => $reasonedBy,
-            'reasonedAt' => $model->getReasonedAt()->getUsingFormat(DATE_ATOM),
+            'reasonedAt' => $model->getReasonedAt()?->getUsingFormat(DATE_ATOM),
             'expiresAt'  => $model->getExpiresAt()?->getUsingFormat(Alaress_Date_Format::DATABASE_DATE_FORMAT),
             'viewedOn'   => $model->getViewedOn()?->getUsingFormat(Alaress_Date_Format::DATABASE_DATE_FORMAT),
             '_links'     => call_user_func($this->linkTranslator, $model),
