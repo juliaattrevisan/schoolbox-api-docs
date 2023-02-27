@@ -73,6 +73,7 @@ class Controller extends Base
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminLessonPlanTemplate.getList')),
                 'lessonPlanTemplate' => null,
                 'studentRole' => Role::STUDENT,
+                'newKeyword' => self::NEW_KEYWORD
             ]
         ]);
     }
@@ -151,6 +152,7 @@ class Controller extends Base
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminLessonPlanTemplate.getList')),
                 'lessonPlanTemplate' => $lessonPlanTemplate,
                 'studentRole' => Role::STUDENT,
+                'newKeyword' => self::NEW_KEYWORD
             ]
         ]);
     }

@@ -3,6 +3,7 @@
  #
  # @param Template/Model $lessonPlanTemplate  A Lesson Plan Template instance, with its Fields
  # @param string $studentRole                 The const corresponding to the Student roletype
+ # @param string $newKeyword                  The const corresponding to the New Keyword in backend
  #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
@@ -100,7 +101,7 @@
 
             /* Update the ids and name attributes
              */
-            let newId = 'new' + fieldCount;
+            let newId = '{{ newKeyword  }}' + fieldCount;
 
             let titleId = 'field-title-' + newId;
             let titleName = 'field-title[' + newId + ']';
