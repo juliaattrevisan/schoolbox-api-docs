@@ -210,18 +210,10 @@
                 let $selectAllCheckbox = $("#data-bulky-select-all-checkbox");
                 let $checkboxes = bulky.element.find(opt.checkboxSelector).filter(":enabled");
 
-                // Set initial state of 'select all' checkbox.
-                switch ($checkboxes.filter(":checked").length) {
-                    case $checkboxes.length:
-                        $selectAllCheckbox.prop("checked", true).removeClass("indeterminate");
-                        break;
-                    case 0:
-                        $selectAllCheckbox.prop("checked", false).removeClass("indeterminate");
-                        break;
-                    default:
-                        $selectAllCheckbox.prop("checked", false).addClass("indeterminate");
-                        break;
-                }
+                // Set initial state of 'select all' checkbox.  The modal contents are rebuilt from scratch every time
+                // the modal is opened (see the open.fndtn.reveal event handler), so when this function is called all
+                // ordinary checkboxes will always be checked, and so the select-all checkbox should be checked.
+                $selectAllCheckbox.prop("checked", true);
 
                 $selectAllCheckbox.click(function () {
                     let $checkboxes = $(ordinaryCheckboxJqSelector);
