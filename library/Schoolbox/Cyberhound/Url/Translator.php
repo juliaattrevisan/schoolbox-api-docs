@@ -91,7 +91,7 @@ class Translator
 
             try {
                 $urlObject = new Uri($url);
-                if (!$urlObject->isAbsolutePath()) {
+                if ($urlObject->isAbsolutePath()) {
                     // If using Cyberhound: redirect to its proxy rather than the URL directly.
                     // Only redirect for non-local links though.
 
