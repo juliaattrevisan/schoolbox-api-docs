@@ -202,7 +202,7 @@ abstract class SimpleStrategy implements ISimpleStrategy
      */
     protected function isUserInAudienceValuesAsParent(User $parent, array $entityValues): ?bool
     {
-        /* Must not hit the DB... ummm is there a different way of doing this?
+        /* Should not hit the DB... ummm is there a different way of doing this?
          * should we put the parents children back into the session/ user object? or cache this somewhere???
         */
         (new \Schoolbox\External\User())->loadChildren([$parent]);
