@@ -146,14 +146,15 @@
     --ck-custom-grey: #888888;
     --ck-custom-white: #ffffff;
     --ck-custom-black: #000000;
-    --ck-custom-drop-shadow: rgba(0, 0, 0, 0.15);
+    --ck-custom-shadow: rgba(0, 0, 0, 0.15);
+    --ck-custom-shadow-white: rgba(255, 255, 255, 0.15);
 }
 
 /* Banner */
 .ck.ck-editor .s-banner {
     background-color: var(--ck-custom-blue);
     border-radius: 0.25rem 0.25rem 0 0;
-    box-shadow: 0px 5px 5px 0px var(--ck-custom-drop-shadow);
+    box-shadow: 0px 5px 5px 0px var(--ck-custom-shadow);
     color: var(--ck-custom-white);
     display: block;
     margin: auto;
@@ -308,7 +309,7 @@
 .ck.ck-editor .s-construction {
     background-color: var(--ck-custom-orange);
     border: 1px solid var(--ck-custom-orange);
-    box-shadow: 0px 5px 5px 0px var(--ck-custom-drop-shadow);
+    box-shadow: 0px 5px 5px 0px var(--ck-custom-shadow);
     color: var(--ck-custom-white);
     padding: 1rem;
     position: relative;
@@ -339,32 +340,32 @@
     left: 0;
 }
 
-/* Code blocks */
-.ck.ck-editor pre[data-language] {
+/* Code block styling */
+
+.ck.ck-editor p.s-code-block {
     background-color: var(--ck-custom-code-bg);
     border: none;
     border-radius: 0.25rem;
-    margin-bottom: 1rem;
-    padding-top: 1.5rem;
-}
-
-.ck.ck-editor pre[data-language]::after {
-    background-color: rgba(255, 255, 255, 0.25);
     color: var(--ck-custom-white);
-    font-weight: 600;
-    left: 0;
-    padding-left: 1rem;
-    top: 0;
-    text-transform: uppercase;
-    width: 100%;
-}
-
-.ck.ck-editor pre[data-language] code {
-    /* Override the code rules in typography.scss */
-    border: none;
-    color: var(--ck-custom-white);
+    display: block;
     font-family: monospace;
     font-size: 12px;
     font-weight: 400;
-    padding: 0;
+    padding: 1rem;
+    padding-top: 2rem;
+    position: relative;
+    tab-size: 4;
+    white-space: pre;
+    unicode-bidi: embed;
+}
+
+.ck.ck-editor p.s-code-block:before {
+    background-color: var(--ck-custom-shadow-white);
+    border-top-right-radius: 0.25rem;
+    content: "";
+    height: 1rem;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
 }
