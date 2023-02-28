@@ -101,11 +101,7 @@ class Controller extends Base
      */
     public function getPicker($type, $element, $id, $value)
     {
-        if ((new ValidUsesSudsTimetable())->isSatisfiedBy($this->getConfigLoader()->get('external_type'), $this->getConfigLoader()->get('schooldata_import_data_source'))) {
-            $timetable = false;
-        } else {
-            $timetable = $this->getUserTimetable();
-        }
+        $timetable = $this->getUserTimetable();
 
         $terms = $this->getTerms();
 
@@ -270,16 +266,22 @@ class Controller extends Base
     }
 
     /**
-     * Return an array of all timetables and campus data
+     * Return an array of all timetables and campus data if it exists, or
+     * false if the sis is using a event timetable, or the user has hideTimetable set.
      *
-     * @return array
+     * @return array|false
      */
-    public function getUserTimetable()
+    public function getUserTimetable(): bool|array
     {
         $timetable  = [];
         $campusInfo = [];
 
         $user = $this->getUser();
+
+        // Only cycle based timetable should be returned
+        if ((new ValidUsesSudsTimetable())->isSatisfiedBy($this->getConfigLoader()->get('external_type'), $this->getConfigLoader()->get('schooldata_import_data_source'))) {
+            return false;
+        }
 
         foreach ($user->getCampusCollection() as $campus) {
             $campusTimetable = $this->timetableHandler->getTimetableDefinition(null, $campus);
