@@ -10,11 +10,11 @@
     var currentlyOpenModal = null;
 
     var defaults = {
-
+        includeSelectAllCheckbox: false,
         onSubmit: $.noop, // action-bar DOM element
         onClose: null, // Supply a function if you want non-default behaviour on close of the modal.
         submitText: $.noop, // checkedCount, totalCount
-        invalidOptionText: 'invalid',
+        invalidOptionText: "invalid",
         userList: null,
         templateSelector: "[data-template]",
         submitSelector: "[data-submit]",
@@ -70,7 +70,7 @@
          * Determine how many items were selected and update the button text accordingly
          */
         function setupActionButton() {
-            var $checks = bulky.element.find(opt.checkboxSelector);
+            var $checks = bulky.element.find(opt.checkboxSelector).filter(":enabled");
 
             // see if the list has anything selected
             var all = $checks.length,
@@ -87,9 +87,7 @@
 
         /* Event listener to change button text
          */
-        this.element.on("change", opt.checkboxSelector, function () {
-            setupActionButton();
-        });
+        this.element.on("change", opt.checkboxSelector, setupActionButton);
 
         /**
          * When the modal opens
@@ -116,7 +114,7 @@
                         var $item = bulky.template.clone(),
                             tag = $item.prop("tagName").toLowerCase(),
                             $lbl = $item.find(opt.labelSelector),
-                            $chk = $item.find(opt.checkboxSelector),
+                            $chk = $item.find(opt.checkboxSelector).filter(":enabled"),
                             id = $(this).closest(opt.participantSelector).data("participant"),
                             html;
 
@@ -125,6 +123,10 @@
                         $chk.attr("id", id);
                         $lbl.attr("for", id);
 
+                        // Add attribute 'data-bulky-checkbox' to allow selection of all checkboxes except
+                        // the select-all checkbox (that will be added if opt.includeSelectAllCheckbox is true).
+                        $chk.attr("data-bulky-checkbox", "");
+
                         // apply the name
                         $lbl.text($(this).data("participantName"));
 
@@ -132,7 +134,7 @@
                          */
                         if (!opt.checkboxConditionality(id)) {
                             $chk.prop("disabled", true).removeAttr("checked");
-                            $lbl.text($lbl.text() + ' (' + opt.invalidOptionText + ')');
+                            $lbl.text($lbl.text() + " (" + opt.invalidOptionText + ")");
 
                             numInvalid++;
                         }
@@ -180,6 +182,39 @@
             // start listening
             $(window).on("resize", refreshModalHeight);
             refreshModalHeight.call(window);
+
+            if (opt.includeSelectAllCheckbox) {
+                // Insert a 'select all' checkbox at the top of the other checkboxes, and use jquery.selectAllBasic()
+                // to control its behaviour.
+
+                // If the modal has been closed and then reopened, we may have already added the select-all checkbox.
+                if (0 === $("#data-bulky-select-all-checkbox").length) {
+                    bulky.list.before(
+                        "<div>" +
+                        "<input id='data-bulky-select-all-checkbox' type='checkbox'/>" +
+                        "<label for='data-bulky-select-all-checkbox' class='checkbox-label'>Select all</label>" +
+                        "</div>"
+                    );
+                }
+
+                // We restrict to enabled here so that when all enabled checkboxes are checked (and there are some
+                // disabled checkboxes), jquery.selectAllBasic() will give the 'select all' checkbox the tick instead
+                // of the indeterminate state.
+                $("#data-bulky-select-all-checkbox").selectAllBasic({
+                    selector: "[data-bulky-checkbox]:enabled"
+                });
+
+                let $selectAllCheckbox = $("#data-bulky-select-all-checkbox");
+
+                // Set initial state of 'select all' checkbox.  The modal contents are rebuilt from scratch every time
+                // the modal is opened (see the open.fndtn.reveal event handler), so when this function is called all
+                // ordinary checkboxes will always be checked, and so the select-all checkbox should also be checked.
+                // We need to ensure the 'indeterminate' class is removed as well, because although the ordinary
+                // checkboxes are rebuilt every time the modal opens, the select-all checkbox is not.
+                $selectAllCheckbox.prop("checked", true).removeClass("indeterminate");
+
+                $selectAllCheckbox.click(setupActionButton);
+            }
         });
 
         /**
@@ -219,12 +254,12 @@
          * Typically it's "Cancel" or the Action button itself, after which
          * the modal can be dismissed
          */
-        this.element.on('click', '.button', function () {
+        this.element.on("click", ".button", function () {
             if (opt.onClose === null) {
                 // Do the default thing, which is to close the modal.  Note that this will close any other open
                 // foundation modals as well due to the firing of the closeme.zf.reveal event.
                 // Documentation: https://get.foundation/sites/docs/reveal.html#js-events
-                bulky.element.foundation('reveal', 'close');
+                bulky.element.foundation("reveal", "close");
             } else {
                 opt.onClose();
             }
@@ -233,6 +268,11 @@
 
     /**
      * Private method; expects to be applied to Bulky
+     *
+     * @param len - the number of enabled checkboxes that are checked.
+     * @param all - the number of enabled checkboxes.
+     *
+     * Neither of the counts include the 'select all' checkbox.
      */
     function refreshSubmitText(len, all) {
         var text = this.options.submitText.call(this, len, all);

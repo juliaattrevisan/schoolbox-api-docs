@@ -289,7 +289,10 @@
  #}
 {% block scripts %}
     {% if not readonly %}
-        <script type="application/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.bulky.js?v={{ config.site_version }}"></script>
+        <script type="text/javascript" src="{{ CDN_PREFIX }}/js/select-all/jquery.select-all.basic.js?v={{ config.site_version }}"></script>
+        <script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.bulky.js?v={{ config.site_version }}"></script>
+
+        {# The div below is used by bulky.js to create the mass-publish modal. #}
         <div id="mass-publish" class="reveal-modal" data-reveal data-list-id="mass-publish-list" aria-hidden="true"
              role="dialog">
             <h2>Publish Drafts</h2>
@@ -298,7 +301,7 @@
             <section class="checklist" id="mass-publish-list">
                 <div data-template>{# this will get detached from the DOM on pageload (jquery.bulky.js) #}
                     <input type="checkbox" data-selected checked/>
-                    <label class="checkbox-label" data-participant-name>{# populated by JS (jquery.bulky.js) #}</label>
+                    <label class="checkbox-label" data-participant-name></label>
                 </div>
             </section>
             <div class="component-action">
@@ -312,6 +315,7 @@
             <a class="close-reveal-modal" aria-label="Close">&#215;</a>
         </div>
 
+        {# The div below is used by bulky.js to create the mass-submit modal. #}
         <div id="mass-submit" class="reveal-modal" data-reveal data-list-id="mass-submit-list" aria-hidden="true"
              role="dialog">
             <h2>Acknowledge Receipt of Submission</h2>
@@ -345,6 +349,7 @@
             <a class="close-reveal-modal" aria-label="Close">&#215;</a>
         </div>
 
+        {# The div below is used by bulky.js to create the mass-download modal. #}
         <div id="mass-download" class="reveal-modal" data-reveal data-list-id="mass-download-list" aria-hidden="true"
              role="dialog">
             <h2>Download All Submissions</h2>
@@ -394,7 +399,7 @@
                         statusPending: '{{ statusPending }}',
                         statusReviewed: '{{ statusReviewed }}',
                         reviewedText: '{{ labelReviewed }}',
-                        onPreDraftCallback: function(){
+                        onPreDraftCallback: function () {
                         },
                         onDraftCallback: function (userId, isSuccess, message, feedbackId) {
                             let $actionBar = $('[data-participant=' + userId + '] [data-action-bar]'),
@@ -403,7 +408,7 @@
                             $actionBar.attr('data-mass-publish', '');
                             $actionBar.removeAttr('data-mass-submit');
                         },
-                        onPrePublishCallback: function(){
+                        onPrePublishCallback: function () {
                         },
                         onPublishCallback: function (userId) {
                             let $actionBar = $('[data-participant=' + userId + '] [data-action-bar]'),
@@ -543,9 +548,16 @@
 
                     {# Mass download submissions #}
                     $('#mass-download').bulky({
-                        invalidOptionText: 'Not Submitted',
+                        includeSelectAllCheckbox: true,
+                        invalidOptionText: 'nothing to download',
+                        /**
+                         * @param len - the number of enabled checkboxes that are checked.
+                         * @param all - the number of enabled checkboxes.
+                         *
+                         * Neither of the counts include the 'select all' checkbox.
+                         */
                         submitText: function (len, all) {
-                            if (!len) {
+                            if (len === 0) {
                                 return 'Download None';
                             }
                             if (len === all) {
@@ -555,18 +567,10 @@
                         },
                         userSelector: '[data-mass-download]',
                         userList: $userList,
-                        checkboxConditionality: (
+                        checkboxConditionality: function (id) {
                             // Exclude students with no downloadable work.
-                            function (id) {
-                                return (
-                                    // Downloadable data will exist for students if:
-                                    //  * A 'Preview Submission' link exists in that student's block OR
-                                    //  * A non-blank feedback comment exists for that student.
-                                    $('[data-participant=' + id + '] [data-previewable]').length != 0 ||
-                                    $('#comment-' + id).text().trim() != ''
-                                );
-                            }
-                        ),
+                            return ($('[data-participant=' + id + ']').attr('data-status') !== 'incomplete');
+                        },
                         onSubmit: function (toSubmit) {
                             $('body').confirmDialog({
                                 header: 'Download all feedback and submissions?',
@@ -750,7 +754,7 @@
                         $feedbackButtons.fadeOut();
 
                         // Slide up if no meta to display
-                        if(!$extraMeta.length){
+                        if (!$extraMeta.length) {
                             $actionBar.slideUp();
                         }
                     }
