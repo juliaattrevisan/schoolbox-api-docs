@@ -10,14 +10,12 @@ declare(strict_types=1);
 namespace Custom\Tigs\Summative;
 
 use Alaress_Date_Format;
+use InvalidArgumentException;
+use Schoolbox\IConfigLoader;
+use Schoolbox\User;
 
 use function in_array;
 use function is_numeric;
-
-use Schoolbox\IConfigLoader;
-use Schoolbox\User;
-use InvalidArgumentException;
-
 use function strtotime;
 
 /**

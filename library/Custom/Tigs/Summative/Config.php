@@ -14,7 +14,6 @@ namespace Custom\Tigs\Summative;
  */
 class Config
 {
-
     // A data attribute to identify errors on the reports
     public const ERROR_DATA_ATTRIBUTE = 'data-tigs-crp-error-state';
 

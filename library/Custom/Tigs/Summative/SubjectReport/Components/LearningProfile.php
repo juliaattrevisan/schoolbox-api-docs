@@ -38,7 +38,6 @@ use Schoolbox\User;
  */
 class LearningProfile extends BaseComponent
 {
-
     /**
      * The capability name which the learning profile component uses.
      */
