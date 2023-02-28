@@ -27,39 +27,35 @@ const config = {
          */
         nodeinfo: "/editor/nodeInfo.php",
     },
-
     /* Video urls and regex
      */
     video: {
         source: function (id, filesystem) {
-            return "/cms/sendVideo.php?id=" + id + "&type=" + filesystem;
+            return `/cms/sendVideo.php?id=${id}&type=${filesystem}`;
         },
         thumbnail: function (id, filesystem) {
             /* Ridiculous quick fix
              */
             filesystem = filesystem.replace("browse", "sbfs").replace("store", "storage");
-
-            return "/cms/videoThumb.php?size=poster&id=" + id + "&type=" + filesystem;
+            return `/cms/videoThumb.php?size=poster&id=${id}&type=${filesystem}`;
         },
         regex: /^\/cms\/sendVideo/,
     },
-
     /* Audio urls and regex
      */
     audio: {
         source: function (id, filesystem) {
-            return "/cms/sendVideo.php?id=" + id + "&type=" + filesystem;
+            return `/cms/sendVideo.php?id=${id}&type=${filesystem}`;
         },
-        thumbnail: window.cdnPrefix + "/images/core/component/audio-thumbnail-processing.gif?v=" + window.siteVersion,
+        thumbnail: `${window.cdnPrefix}/images/core/component/audio-thumbnail-processing.gif?v=${window.siteVersion}`,
         regex: /^\/cms\/sendVideo/,
     },
-
     /* Image urls and regex
      * No thumbnails are used for images
      */
     image: {
         source: function (hash) {
-            return "/storage/image.php?hash=" + hash;
+            return `/storage/image.php?hash=${hash}`;
         },
         regex: /^\/storage\/image/,
     },
@@ -106,7 +102,7 @@ export default class SchoolboxResourceUI extends Plugin {
                                         const imageUtils = this.editor.plugins.get("ImageUtils");
                                         imageUtils.insertImage(
                                             {
-                                                src: `/storage/image.php?hash=${responseText.hash}`,
+                                                src: config.image.source(responseText.hash),
                                                 alt: message.data[0].title,
                                             },
                                             this.editor.model.document.selection,
@@ -118,7 +114,6 @@ export default class SchoolboxResourceUI extends Plugin {
                                             {
                                                 src: config.video.thumbnail(responseText.id, responseText.filesystem),
                                                 alt: message.data[0].title,
-                                                title: message.data[0].title,
                                                 "data-schoolboxresource-type": responseText.type,
                                                 "data-schoolboxresource-filesystem": responseText.filesystem,
                                                 "data-schoolboxresource-thumbnail": config.video.thumbnail(
@@ -142,7 +137,6 @@ export default class SchoolboxResourceUI extends Plugin {
                                             {
                                                 src: config.audio.thumbnail,
                                                 alt: message.data[0].title,
-                                                title: message.data[0].title,
                                                 "data-schoolboxresource-type": responseText.type,
                                                 "data-schoolboxresource-filesystem": responseText.filesystem,
                                                 "data-schoolboxresource-thumbnail": config.audio.thumbnail,
