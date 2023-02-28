@@ -13,7 +13,6 @@
                 "@ckeditor/ckeditor5-alignment": "~35.4.0",
                 "@ckeditor/ckeditor5-basic-styles": "~35.4.0",
                 "@ckeditor/ckeditor5-block-quote": "~35.4.0",
-                "@ckeditor/ckeditor5-code-block": "^35.4.0",
                 "@ckeditor/ckeditor5-editor-classic": "~35.4.0",
                 "@ckeditor/ckeditor5-essentials": "~35.4.0",
                 "@ckeditor/ckeditor5-find-and-replace": "~35.4.0",
@@ -2169,18 +2168,6 @@
                 "@ckeditor/ckeditor5-utils": "^35.4.0",
                 "@ckeditor/ckeditor5-widget": "^35.4.0",
                 "lodash-es": "^4.17.11"
-            },
-            "engines": {
-                "node": ">=14.0.0",
-                "npm": ">=5.7.1"
-            }
-        },
-        "node_modules/@ckeditor/ckeditor5-code-block": {
-            "version": "35.4.0",
-            "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-code-block/-/ckeditor5-code-block-35.4.0.tgz",
-            "integrity": "sha512-En7FBmyyEj8zdt48fUJhlY023LAxEKoi1vUHsr7gK+3E8UKvzWdO2KkTvC2f4YB3rHXYkw8dK2WSJ2LIwID+Ng==",
-            "dependencies": {
-                "ckeditor5": "^35.4.0"
             },
             "engines": {
                 "node": ">=14.0.0",
@@ -44398,14 +44385,6 @@
                 "@ckeditor/ckeditor5-utils": "^35.4.0",
                 "@ckeditor/ckeditor5-widget": "^35.4.0",
                 "lodash-es": "^4.17.11"
-            }
-        },
-        "@ckeditor/ckeditor5-code-block": {
-            "version": "35.4.0",
-            "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-code-block/-/ckeditor5-code-block-35.4.0.tgz",
-            "integrity": "sha512-En7FBmyyEj8zdt48fUJhlY023LAxEKoi1vUHsr7gK+3E8UKvzWdO2KkTvC2f4YB3rHXYkw8dK2WSJ2LIwID+Ng==",
-            "requires": {
-                "ckeditor5": "^35.4.0"
             }
         },
         "@ckeditor/ckeditor5-core": {
