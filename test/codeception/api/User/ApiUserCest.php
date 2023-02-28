@@ -97,83 +97,9 @@ class ApiUserCest
         ];
         yield [
             'filter' => [
-                'folder' => [
-                    [
-                        'code' => '9ENGA',
-                    ],
-                ],
-            ],
-            'valid'  => false,
-        ];
-        yield [
-            'filter' => [
-                'roleType' => Role::GUEST,
-            ],
-            'valid'  => false,
-        ];
-        yield [
-            'filter' => [
-                'subjectCode' => ['English'],
+                'roleType' => Role::STAFF,
             ],
             'valid'  => true,
-        ];
-        yield [
-            'filter' => [
-                'weighted' => false,
-            ],
-            'valid'  => true,
-        ];
-        yield [
-            'filter' => [
-                'weighted' => 'xxx',
-            ],
-            'valid'  => false,
-        ];
-        yield [
-            'filter' => [
-                'workType' => [
-                    'id' => 1,
-                ],
-            ],
-            'valid'  => true,
-        ];
-        yield [
-            'filter' => [
-                'workType' => [
-                    'name' => 'Quiz',
-                ],
-            ],
-            'valid'  => true,
-        ];
-        yield [
-            'filter' => [
-                'dueDate' => [
-                    'from' => '2010-01-30T21:00:00.000Z',
-                ],
-            ],
-            'valid'  => true,
-        ];
-        yield [
-            'filter' => [
-                'dueDate' => [
-                    'to' => '2022-01-30T21:00:00.000Z',
-                ],
-            ],
-            'valid'  => true,
-        ];
-        yield [
-            'filter' => [
-                'dueDate' => '2010-01-30T21:00:00.000Z',
-            ],
-            'valid'  => false,
-        ];
-        yield [
-            'filter' => [
-                'due Date' => [
-                    'from' => '2010-01-30T21:00:00.000Z',
-                ],
-            ],
-            'valid'  => false,
         ];
     }
 }
