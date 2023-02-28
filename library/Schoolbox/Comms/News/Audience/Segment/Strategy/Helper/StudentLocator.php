@@ -11,6 +11,7 @@ namespace Schoolbox\Comms\News\Audience\Segment\Strategy\Helper;
 
 use External_ClassInterface;
 use Schoolbox\GenericCollection;
+use Schoolbox\Resource\Folder\Code\IClassMatcher;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -35,10 +36,12 @@ class StudentLocator
      *
      * @param UserMapper              $userMapper
      * @param External_ClassInterface $externalClass
+     * @param IClassMatcher           $classMatcher
      */
     public function __construct(
         private UserMapper $userMapper,
         private External_ClassInterface $externalClass,
+        private IClassMatcher $classMatcher,
     ) {
     }
 
@@ -69,13 +72,8 @@ class StudentLocator
         // Load the subject codes for all given subjects
         $subjectCodes  = $teacher->getSubjectCollection()
             ->filter(fn ($x) => !empty($x['id']))
-            ->map(
-                function ($x) {
-                    return ($x['campusCode'] ?? '') === ''
-                        ? $x['code']
-                        : ($x['campusCode'] . '/' . $x['code']);
-                }
-            )->getAll();
+            ->map(fn ($x) => $this->classMatcher::generateFolderCode($x['campusCode'], $x['code']))
+            ->getAll();
         if (count($subjectCodes) === 0) {
             return $this->userMapper->createCollection();
         }

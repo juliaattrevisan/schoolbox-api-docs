@@ -20,6 +20,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Folder\Code\ClassCodeMatchFactory;
 use Schoolbox\Resource\Search\MapperResult\Base;
 use Schoolbox\Resource\Search\Sanitiser;
 use Schoolbox\User;
@@ -188,6 +189,7 @@ class Result extends Base
             new Segment\Strategy\Helper\StudentLocator(
                 UserMapper::getInstance(),
                 new External_Class(),
+                (new ClassCodeMatchFactory())->build($config->get(ConfigMapper::NAME_EXTERNAL_TYPE)),
             )
         );
 
