@@ -54,7 +54,7 @@ class Module extends BaseModule
             new Rule\IsLoggedIn(),
             new Any(
                 new IsSuperuser(),
-                new Event\Authorizer\CanViewEvent()
+                new Event\Authorizer\CanViewEvent($this->getConfig())
             )
         );
 

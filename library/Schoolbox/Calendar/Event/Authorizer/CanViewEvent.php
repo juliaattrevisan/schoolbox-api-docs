@@ -9,23 +9,31 @@
 
 namespace Schoolbox\Calendar\Event\Authorizer;
 
-use Alaress\Authorizer\Failure\Unauthenticated;
 use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule\IAuthorizationRule;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\Relation\Role;
 use Schoolbox\Campus;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 class CanViewEvent implements IAuthorizationRule
 {
     /**
-     * @param array $params
-     * @param User  $user
-     * @throws Unauthenticated
+     * @param IConfigLoader $config
+     */
+    public function __construct(private IConfigLoader $config)
+    {
+    }
+
+    /**
+     * @param array     $params
+     * @param User|null $user
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function authorize(array $params = [], User $user = null): void
     {
@@ -35,6 +43,13 @@ class CanViewEvent implements IAuthorizationRule
 
         /** @var Event $event */
         $event = $params['event'];
+
+        (new \Schoolbox\External\User(
+            $this->config->get('external_type'),
+            new \External_Class(),
+            new \External_User(),
+            UserMapper::getInstance()
+        ))->loadChildren([$user]);
 
         /**
          * Personal Event: owner, parent of owner, staff, or invited guest, can see event

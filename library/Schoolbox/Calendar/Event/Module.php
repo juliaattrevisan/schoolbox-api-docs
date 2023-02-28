@@ -23,16 +23,12 @@ use InvalidArgumentException;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\EventTypeMapper;
-use Schoolbox\Calendar\Relation\Role;
-use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
 
@@ -62,7 +58,7 @@ class Module extends BaseModule
                 new IsLoggedIn(),
                 new Any(
                     new IsSuperuser(),
-                    new Event\Authorizer\CanViewEvent()
+                    new Event\Authorizer\CanViewEvent($this->getConfig())
                 )
             );
         });
