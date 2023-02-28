@@ -267,7 +267,7 @@ class Controller extends Base
 
     /**
      * Return an array of all timetables and campus data if it exists, or
-     * false if the sis is using a event timetable, or the user has hideTimetable set.
+     * false if the sis is using an event timetable, or the user has hideTimetable set.
      *
      * @return array|false
      */
