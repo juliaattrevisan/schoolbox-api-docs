@@ -442,7 +442,7 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
             for ($i = 0; $i < count($allAnswers); $i++) {
                 $currentAnswer = $allAnswers[$i];
 
-                if ($right[$i] == $currentAnswer->answerRight) {
+                if ($right[$i] ?? null == $currentAnswer->answerRight) {
                     $correct   = $this->getCorrectClass();
                     $isCorrect = true;
                     $title = 'Respondent ordered this correctly';
@@ -455,7 +455,7 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
                 $page->setVar(
                     array(
                         'ANSWER_LEFT_VALUE'             => Scrub::text($currentAnswer->answerLeft),
-                        'ANSWER_RIGHT_VALUE'            => $right[$i],
+                        'ANSWER_RIGHT_VALUE'            => $right[$i] ?? null,
                         'ANSWER_CORRECT_RESPONSE_VALUE' => Scrub::text($currentAnswer->answerRight),
                         'CORRECT'                       => $correct,
                         'ANSWER_ICON_CLASS'             => $isCorrect
