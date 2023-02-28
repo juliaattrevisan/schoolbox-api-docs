@@ -150,7 +150,6 @@ function highlightSearchInElement(toHighlight) {
         :title="`View ${props.title}`"
         :disabled="isDisabled"
         @click.prevent="onNameSelected"
-        @keyup.enter="onNameSelected"
     >
         {{ props.title }}
     </button>

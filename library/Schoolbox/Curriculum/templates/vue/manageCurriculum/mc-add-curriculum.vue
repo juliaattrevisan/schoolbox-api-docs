@@ -115,7 +115,6 @@ const isAddDisabled = computed(() => {
                                     class="button icon-close"
                                     :disabled="addCurriculumStore.isProcessing"
                                     @click.prevent="onCancelSelected"
-                                    @keyup.enter="onCancelSelected"
                                 >
                                     Cancel
                                 </button>
@@ -126,7 +125,6 @@ const isAddDisabled = computed(() => {
                                     data-test-add-curriculum
                                     :disabled="isAddDisabled"
                                     @click.prevent="onAddSubsectionSelected"
-                                    @keyup.enter="onAddSubsectionSelected"
                                 >
                                     {{ addButtonText }}
                                 </button>

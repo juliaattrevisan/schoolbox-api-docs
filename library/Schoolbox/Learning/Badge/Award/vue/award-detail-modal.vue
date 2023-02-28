@@ -428,7 +428,6 @@ export default {
                             <button
                                 v-if="hasGoalAwardLink() && isUnawardedGoal()"
                                 @click.prevent="awardAchievement"
-                                @keyup.enter="awardAchievement"
                             >
                                 Award
                             </button>

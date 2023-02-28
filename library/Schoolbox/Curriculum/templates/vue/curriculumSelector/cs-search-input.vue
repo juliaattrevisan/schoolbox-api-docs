@@ -153,7 +153,6 @@ function onBrowseSelected() {
             class="button icon-curriculum"
             title="Browse and select from the Curriculum"
             @click.prevent="onBrowseSelected"
-            @keyup.enter="onBrowseSelected"
         >
             Browse
         </button>

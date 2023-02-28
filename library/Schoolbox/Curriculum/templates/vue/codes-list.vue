@@ -32,7 +32,6 @@ function onCodeSelected(node) {
             class="meta-button"
             title="View details"
             @click.prevent="onCodeSelected(node)"
-            @keyup.enter="onCodeSelected(node)"
         >
             {{ node.code }}</button
         ><template v-if="index + 1 < props.nodes.length">, </template>

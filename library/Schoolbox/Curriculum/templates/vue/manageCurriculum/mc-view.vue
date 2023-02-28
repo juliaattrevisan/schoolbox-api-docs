@@ -49,7 +49,6 @@ function onCreateNewSelected() {
                     <a
                         href="#create-curriculum"
                         @click.prevent="onCreateNewSelected"
-                        @keyup.enter="onCreateNewSelected"
                         title="Create a new Curriculum"
                         >Create a new Curriculum</a
                     >

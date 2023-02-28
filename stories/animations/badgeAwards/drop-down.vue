@@ -52,7 +52,7 @@ export default {
                 <img src="../../assets/badge-award-sample.svg" ref="badgeImage" alt="badge sample" />
             </div>
         </div>
-        <button @click="animateBadgeImage" @keyup.enter="animateBadgeImage">Replay</button>
+        <button @click="animateBadgeImage">Replay</button>
     </div>
 </template>
 

@@ -127,7 +127,6 @@ const isUpdateDisabled = computed(() => {
                                 class="button icon-close"
                                 :disabled="updateNodeStore.isProcessing"
                                 @click.prevent="onCancelSelected"
-                                @keyup.enter="onCancelSelected"
                             >
                                 Cancel
                             </button>
@@ -138,7 +137,6 @@ const isUpdateDisabled = computed(() => {
                                 :disabled="isUpdateDisabled"
                                 data-test-update-node
                                 @click.prevent="onUpdateSelected"
-                                @keyup.enter="onUpdateSelected"
                             >
                                 {{ updateButtonText }}
                             </button>

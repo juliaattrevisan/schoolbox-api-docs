@@ -158,7 +158,6 @@ function highlightSearchInElement(toHighlight: string) {
         :title="`Expand ${props.title}`"
         :disabled="isDisabled"
         @click.prevent="onNameSelected"
-        @keyup.enter="onNameSelected"
     >
         <span v-html="highlightTitleSearch"></span>
     </button>

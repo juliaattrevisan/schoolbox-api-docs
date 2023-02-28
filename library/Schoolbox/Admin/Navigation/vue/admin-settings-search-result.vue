@@ -129,7 +129,6 @@ export default {
         @mouseover="mouseOverResult"
         @focus="mouseOverResult"
         @click.prevent="selectResult"
-        @keyup.enter="selectResult"
     >
         <h4 class="result-title" v-html="highlightTitleSearch"></h4>
         <p class="result-description" v-if="result.description" v-html="highlightDescriptionSearch"></p>

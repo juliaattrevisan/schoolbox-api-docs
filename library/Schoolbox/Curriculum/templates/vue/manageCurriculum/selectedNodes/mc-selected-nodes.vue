@@ -72,7 +72,6 @@ function onDeleteNodesSelected() {
                         class="button icon-view-hollow"
                         data-test-disable-nodes
                         @click.prevent="onEnableNodesSelected(false)"
-                        @keyup.enter="onEnableNodesSelected(false)"
                     >
                         Disable {{ selectedNodesSummary }}
                     </button>
@@ -82,7 +81,6 @@ function onDeleteNodesSelected() {
                         class="button icon-view"
                         data-test-enable-nodes
                         @click.prevent="onEnableNodesSelected(true)"
-                        @keyup.enter="onEnableNodesSelected(true)"
                     >
                         Enable {{ selectedNodesSummary }}
                     </button>
@@ -92,7 +90,6 @@ function onDeleteNodesSelected() {
                         class="button icon-delete alert"
                         data-test-delete-nodes
                         @click.prevent="onDeleteNodesSelected"
-                        @keyup.enter="onDeleteNodesSelected"
                     >
                         Delete {{ selectedNodesSummary }}
                     </button>

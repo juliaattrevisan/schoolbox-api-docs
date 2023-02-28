@@ -51,7 +51,6 @@ watch(
                 title="Clear the current search"
                 data-test-clear-search
                 @click.prevent="onClearSearchSelected"
-                @keyup.enter="onClearSearchSelected"
             >
                 Clear search
             </button>

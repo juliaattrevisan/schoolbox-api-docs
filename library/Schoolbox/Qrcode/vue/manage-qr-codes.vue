@@ -275,7 +275,6 @@ export default {
             </h3>
             <button
                 @click.prevent="onToggleStudentSelection"
-                @keyup.enter="onToggleStudentSelection"
                 class="button-toggle-selection"
             >
                 {{ toggleStudentSelectionStatus }}

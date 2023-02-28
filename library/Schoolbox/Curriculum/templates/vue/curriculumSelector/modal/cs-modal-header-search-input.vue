@@ -75,7 +75,6 @@ function onClearSearchSelected() {
             title="Clear the current search"
             class="button icon-close"
             @click.prevent="onClearSearchSelected"
-            @keyup.enter="onClearSearchSelected"
         >
             Clear
         </button>

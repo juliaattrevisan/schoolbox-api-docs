@@ -128,7 +128,6 @@ export default {
             <nav v-if="canDelete">
                 <a
                     @click.prevent="onDeleteRowSelected"
-                    @keyup.enter="onDeleteRowSelected"
                     class="delete-row-button icon-delete"
                     href="#delete-row"
                     title="Delete Row"

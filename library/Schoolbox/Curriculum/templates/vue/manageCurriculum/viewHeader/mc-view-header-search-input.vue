@@ -89,7 +89,6 @@ function onClearSearchSelected() {
                 :disabled="isDisabled"
                 data-test-clear-search
                 @click.prevent="onClearSearchSelected"
-                @keyup.enter="onClearSearchSelected"
             >
                 Clear
             </button>
