@@ -429,6 +429,7 @@
 
                     {# Mass publish draft feedbacks #}
                     $('#mass-publish').bulky({
+                        name: 'mass-publish',
                         submitText: function (len, all) {
                             if (!len) {
                                 return 'None Selected';
@@ -519,6 +520,7 @@
 
                     {# Mass acknowledge receipt of submissions #}
                     $('#mass-submit').bulky({
+                        name: 'mass-submit',
                         submitText: function (len, all) {
                             if ((Date.now() / 1000) > Number('{{ assessment.dueAt.unixTimestamp }}')) {
                                 $('#checkbox-switch-container').show();
@@ -548,6 +550,7 @@
 
                     {# Mass download submissions #}
                     $('#mass-download').bulky({
+                        name: 'mass-download',
                         includeSelectAllCheckbox: true,
                         invalidOptionText: 'nothing to download',
                         /**
