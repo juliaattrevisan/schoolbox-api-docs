@@ -21,6 +21,7 @@ use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Campus;
 use Schoolbox\Collection;
+use Schoolbox\External\Importer\Endpoint\ValidUsesSudsTimetable;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\Permission\Access\UserAccess;
@@ -101,6 +102,7 @@ class Controller extends Base
     public function getPicker($type, $element, $id, $value)
     {
         $timetable = $this->getUserTimetable();
+
         $terms = $this->getTerms();
 
         try {
@@ -264,16 +266,27 @@ class Controller extends Base
     }
 
     /**
-     * Return an array of all timetables and campus data
+     * Return an array of all timetables and campus data if it exists, or
+     * false if the sis is using an event timetable, or the user has hideTimetable set.
      *
-     * @return array
+     * @return array|false
      */
-    public function getUserTimetable()
+    public function getUserTimetable(): bool|array
     {
         $timetable  = [];
         $campusInfo = [];
 
         $user = $this->getUser();
+
+        // Only cycle based timetable should be returned
+        if ((new ValidUsesSudsTimetable())->isSatisfiedBy($this->getConfigLoader()->get('external_type'), $this->getConfigLoader()->get('schooldata_import_data_source'))) {
+            return false;
+        }
+
+        // If the user is hiding their timetable then don't show it
+        if ($user->getHideTimetable()) {
+            return false;
+        }
 
         foreach ($user->getCampusCollection() as $campus) {
             $campusTimetable = $this->timetableHandler->getTimetableDefinition(null, $campus);
