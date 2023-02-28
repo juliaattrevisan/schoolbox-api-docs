@@ -88,8 +88,8 @@ class Mapper extends \Schoolbox\Mapper
             INNER JOIN {$this->getJoinSql('recipient.role', 'r', 'rr')}
             INNER JOIN {$this->getJoinSql('awardedBy', '', 'a', true)}
             INNER JOIN {$this->getJoinSql('awardedBy.role', 'a', 'ar')}
-            INNER JOIN {$this->getJoinSql('reasonedBy', '', 'rb', true)}
-            INNER JOIN {$this->getJoinSql('reasonedBy.role', 'a', 'rbr')}
+            LEFT  JOIN {$this->getJoinSql('reasonedBy', '', 'rb', true)}
+            LEFT  JOIN {$this->getJoinSql('reasonedBy.role', 'a', 'rbr')}
             LEFT  JOIN {$this->getJoinSql('award', '', 'aw')}
             LEFT  JOIN {$this->getJoinSql('award.badge', 'aw', 'awb')}
             LEFT  JOIN {$this->getJoinSql('award.recipient', 'aw', 'awr', true)}
