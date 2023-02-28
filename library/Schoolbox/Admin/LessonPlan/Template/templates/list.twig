@@ -52,7 +52,7 @@
                                         {% endif %}
                                         <p class="meta">
                                             Last modified by
-                                            {% if lessonPlanTemplate.updatedBy.deleted %}
+                                            {% if lessonPlanTemplate.updatedBy %}
                                                 {{ lessonPlanTemplate.updatedBy.fullname }}
                                             {% else %}
                                                 <a href="/search/user/{{ lessonPlanTemplate.updatedBy.id }}" title="{{ lessonPlanTemplate.updatedBy.fullname }}">{{ lessonPlanTemplate.updatedBy.fullname }}</a>
