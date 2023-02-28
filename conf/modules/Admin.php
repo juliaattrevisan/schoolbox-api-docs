@@ -121,5 +121,8 @@ class Admin extends ModuleLoader
 
         // Rubrics
         $this->loadModule($di, \Schoolbox\Admin\RubricResultSet\Module::class, '/adminv2/rubric-result-set');
+
+        // Lesson Plan Template
+        $this->loadModule($di, \Schoolbox\Admin\LessonPlan\Template\Module::class, '/adminv2/lesson-plan/template');
     }
 }
