@@ -172,15 +172,7 @@ export function getDefault(config: EditorDefaultConfig) {
             {
                 label: "Insert",
                 icon: "plus",
-                items: [
-                    "insertImage",
-                    "mediaEmbed",
-                    "insertTable",
-                    "specialCharacters",
-                    "tokens",
-                    "emoji",
-                    "horizontalLine",
-                ],
+                items: ["insertImage", "mediaEmbed", "insertTable", "specialCharacters", "emoji", "horizontalLine"],
             },
             "|",
             {

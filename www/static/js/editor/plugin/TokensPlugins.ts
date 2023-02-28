@@ -3,7 +3,6 @@
  */
 
 import Mention from "@ckeditor/ckeditor5-mention/src/mention";
-import Tokens from "./tokens/Tokens";
 
 import { EditorDefaultConfig } from "@js/editor/config/configDefault";
 
@@ -15,7 +14,7 @@ import { EditorDefaultConfig } from "@js/editor/config/configDefault";
  */
 export function getTokensPlugins(config: EditorDefaultConfig) {
     if (config.hasTokens) {
-        return [Mention, Tokens];
+        return [Mention];
     }
     return [];
 }
