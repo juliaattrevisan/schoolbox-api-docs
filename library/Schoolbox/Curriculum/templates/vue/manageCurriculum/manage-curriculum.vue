@@ -8,6 +8,7 @@ import { ref, onMounted } from "vue";
 import { useStore } from "./store/manageCurriculumStore";
 import { useNodesStore } from "./store/mcNodesStore";
 import { useSelectedNodesStore } from "./selectedNodes/store/mcSelectedNodesStore";
+import { useViewNodesStore } from "./viewNodes/store/mcViewNodesStore";
 import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
 import McHeader from "./mc-header.vue";
 import McView from "./mc-view.vue";
@@ -64,6 +65,16 @@ function initErrorListener() {
 }
 
 /**
+ * So we can traverse the history when moving forward and back
+ * through the node tree
+ */
+function initHistoryListener() {
+    window.addEventListener("popstate", (event) => {
+        useViewNodesStore().updateOnPopState(event.state);
+    });
+}
+
+/**
  * Start loading the curriculum data
  */
 onMounted(async () => {
@@ -71,6 +82,7 @@ onMounted(async () => {
     if (store.hasId) {
         initErrorListener();
     }
+    initHistoryListener();
 });
 
 /**

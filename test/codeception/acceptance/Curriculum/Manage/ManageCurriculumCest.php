@@ -12,6 +12,7 @@ use Page\Curriculum\Manage\Action\DisableNodes;
 use Page\Curriculum\Manage\Action\DeleteNodes;
 use Page\Curriculum\Manage\Action\SearchNodes;
 use Page\Curriculum\Manage\Action\UpdateNode;
+use Page\Curriculum\Manage\Action\NavigateWithBrowserButtons;
 use Exception;
 
 class ManageCurriculumCest
@@ -207,5 +208,49 @@ class ManageCurriculumCest
         for ($index = 1; $index <= count($nodeList) - 1; $index++) {
             $i->assertStringContainsString($expectedOrder[$index - 1], $nodeList[$index]);
         }
+    }
+
+    /**
+     * @param AcceptanceTester $i
+     * @throws Exception
+     *
+     * on https://vagrant.dev.schoolbox.cloud/curriculum update a node
+     */
+    public function navigateWithBrowserButtons(AcceptanceTester $i)
+    {
+        $i->amGoingTo('use the browser backward and forward buttons to traverse the curriculum');
+        $i->amGoingTo('traverse to "Curricula > English > Year 9 > Literature > Creating literature" and ensure "ACELT1773" is visible');
+        $navigate = new NavigateWithBrowserButtons($i);
+        $navigate->clickDisplay('English');
+        $navigate->clickDisplay('Year 9');
+        $navigate->clickDisplay('Literature');
+        $navigate->clickDisplay('Creating literature');
+        $i->canSee('ACELT1773');
+        $i->amGoingTo('press backwards twice to "Curricula > English > Year 9" and ensure "Achievement standard" is visible');
+        $navigate->moveBackwards();
+        $navigate->moveBackwards();
+        $i->canSee('Achievement standard');
+        $i->amGoingTo('press backwards twice again to Curricula and ensure "Years 9 and 10 French" is visible');
+        $navigate->moveBackwards();
+        $navigate->moveBackwards();
+        $i->canSee('Years 9 and 10 French');
+        $i->amGoingTo('press forwards three times to "Curricula > English > Year 9 > Literature" and ensure "Responding to literature" is visible');
+        $navigate->moveForwards();
+        $navigate->moveForwards();
+        $navigate->moveForwards();
+        $i->canSee('Responding to literature');
+        $i->amGoingTo('press back twice to "Curricula > English" then search for "ACELT1638", select it and ensure "ELBE1201" is visible');
+        $navigate->moveBackwards();
+        $navigate->moveBackwards();
+        $searchNodes = new SearchNodes($i);
+        $searchNodes->fillSearch('ACELT1638');
+        $navigate->clickDisplay('[ACELT1638] Experiment with the ways that language features, image and sound can be adapted in literary texts, for example the effects of stereotypical characters and settings, the playfulness of humour and pun and the use of hyperlink');
+        $i->canSee('ELBE1201');
+        $i->amGoingTo('press backwards once to "Curricula > English" and ensure "Year 9" is visible');
+        $navigate->moveBackwards();
+        $i->canSee('Year 9');
+        $i->amGoingTo('press forwards once to "Curricula > English > Year 9 > Literature > Creating literature" and ensure "ELBE1202" is visible');
+        $navigate->moveForwards();
+        $i->canSee('ELBE1202');
     }
 }

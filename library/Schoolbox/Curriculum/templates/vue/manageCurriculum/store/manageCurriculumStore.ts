@@ -4,7 +4,7 @@
 
 import { ref, computed } from "vue";
 import { defineStore } from "pinia";
-import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
+import { UNSET_ID, getIdHash, isValidHash } from "@schoolboxCurriculum/js/nodeUtils";
 import { useNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/mcNodesStore";
 import { useViewNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/viewNodes/store/mcViewNodesStore";
 import { useActiveNodeStore } from "@schoolboxCurriculum/vue/manageCurriculum/activeNode/store/mcActiveNodeStore";
@@ -47,22 +47,6 @@ export const useStore = defineStore("manageCurriculum", () => {
     }
 
     /**
-     * a node id could be passed into the page via the hash,
-     * if so we need to traverse to this node on load
-     */
-    function checkForNodeHash() {
-        const documentURL = document.URL;
-        const hashCount = (documentURL.match(/#/g) || []).length; // the number of # found in the url
-        const idHash = Number(documentURL.substring(documentURL.indexOf("#") + 1, documentURL.length));
-        const isIdNumber = Number.isInteger(idHash);
-        if (hashCount === 1 && isIdNumber && idHash !== UNSET_ID) {
-            // we check if there's an #, and the string proceeding it is a number
-            hasId.value = true;
-            id.value = idHash;
-        }
-    }
-
-    /**
      * When switching between stories, we need to reset the data models
      * as they persist between the stories otherwise
      */
@@ -88,7 +72,10 @@ export const useStore = defineStore("manageCurriculum", () => {
         dataUiLimit: number,
         toastElement: typeof Toast
     ): Promise<void> {
-        checkForNodeHash();
+        if (isValidHash()) {
+            hasId.value = true;
+            id.value = getIdHash();
+        }
         checkForStorybook();
         isReadOnly.value = $isReadOnly;
         toastEl.value = toastElement;
