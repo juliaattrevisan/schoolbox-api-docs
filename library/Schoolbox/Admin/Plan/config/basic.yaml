@@ -129,4 +129,4 @@ components:
    - Schoolbox\Fixtures\Component\Homepage\Controller
    - Schoolbox\Fixtures\Component\Dashboard\Controller
    - Schoolbox\Learning\Moment\StudentToolkit\Component\Dashboard\Controller
-
+   - Component_Dashboard_CanvasAssignmentsController

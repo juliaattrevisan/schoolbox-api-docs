@@ -137,3 +137,4 @@ components:
    - Schoolbox\Learning\Assessment\Task\Component\Homepage\Controller
    - Schoolbox\Learning\Moment\StudentToolkit\Component\Dashboard\Controller
    - Schoolbox\Learning\Assessment\Lti\Component\Homepage\Controller
+   - Component_Dashboard_CanvasAssignmentsController
