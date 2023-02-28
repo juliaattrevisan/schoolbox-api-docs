@@ -73,7 +73,7 @@
                                             {% set icon = 'icon-view' %}
                                             {% set action = 'Enable' %}
                                         {% endif %}
-                                        <a class="{{ icon }}" href="{{ enableRoute }}" title="{{ action }} this lesson plan template" data-toggle-enable-state="{{ lessonPlanTemplate.id }}"></a>
+                                        <a class="{{ icon }}" href="{{ enableRoute }}" title="{{ action }}" data-toggle-enable-state="{{ lessonPlanTemplate.id }}"></a>
                                         <script>
                                             $(function() {
                                                 $('#container').on('click', 'a[data-toggle-enable-state="{{ lessonPlanTemplate.id }}"]', function(event) {
