@@ -211,7 +211,9 @@
                 // Set initial state of 'select all' checkbox.  The modal contents are rebuilt from scratch every time
                 // the modal is opened (see the open.fndtn.reveal event handler), so when this function is called all
                 // ordinary checkboxes will always be checked, and so the select-all checkbox should also be checked.
-                $selectAllCheckbox.prop("checked", true);
+                // We need to ensure the 'indeterminate' class is removed as well, because although the ordinary
+                // checkboxes are rebuilt every time the modal opens, the select-all checkbox is not.
+                $selectAllCheckbox.prop("checked", true).removeClass("indeterminate");
 
                 $selectAllCheckbox.click(setupActionButton);
             }
