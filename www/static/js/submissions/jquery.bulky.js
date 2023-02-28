@@ -10,7 +10,6 @@
     var currentlyOpenModal = null;
 
     var defaults = {
-        name: '', // Supply to differentiate from other bulky selectors on the same page.
         includeSelectAllCheckbox: false,
         onSubmit: $.noop, // action-bar DOM element
         onClose: null, // Supply a function if you want non-default behaviour on close of the modal.
@@ -189,11 +188,11 @@
                 // to control its behaviour.
 
                 // If the modal has been closed and then reopened, we may have already added the select-all checkbox.
-                if (0 === $("#data-bulky-select-all-checkbox-" + opt.name).length) {
+                if (0 === $("#data-bulky-select-all-checkbox").length) {
                     bulky.list.before(
                         "<div>" +
-                        "<input id='data-bulky-select-all-checkbox-" + opt.name + "' type='checkbox'/>" +
-                        "<label for='data-bulky-select-all-checkbox-" + opt.name + "' class='checkbox-label'>Select all</label>" +
+                        "<input id='data-bulky-select-all-checkbox' type='checkbox'/>" +
+                        "<label for='data-bulky-select-all-checkbox' class='checkbox-label'>Select all</label>" +
                         "</div>"
                     );
                 }
@@ -201,11 +200,11 @@
                 // We restrict to enabled here so that when all enabled checkboxes are checked (and there are some
                 // disabled checkboxes), jquery.selectAllBasic() will give the 'select all' checkbox the tick instead
                 // of the indeterminate state.
-                $("#data-bulky-select-all-checkbox-" + opt.name).selectAllBasic({
-                    selector: "[data-bulky-checkbox]:enabled",
+                $("#data-bulky-select-all-checkbox").selectAllBasic({
+                    selector: "[data-bulky-checkbox]:enabled"
                 });
 
-                let $selectAllCheckbox = $("#data-bulky-select-all-checkbox-" + opt.name);
+                let $selectAllCheckbox = $("#data-bulky-select-all-checkbox");
 
                 // Set initial state of 'select all' checkbox.  The modal contents are rebuilt from scratch every time
                 // the modal is opened (see the open.fndtn.reveal event handler), so when this function is called all
