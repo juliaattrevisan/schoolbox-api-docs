@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @copyright   Copyright 2022, Schoolbox Pty Ltd
@@ -45,6 +46,4 @@ class ApiRegisterProviderCest
             $i->seeResponseCodeIs(401);
         }
     }
-
 }
-

@@ -19,7 +19,8 @@ use Schoolbox\User;
  */
 class ApiAssessmentCest
 {
-    private Folder  $folder;
+    private Folder $folder;
+
     private DueWork $dueWork;
 
     public function _before(\ApiTester $i)
