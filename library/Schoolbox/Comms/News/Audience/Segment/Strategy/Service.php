@@ -135,11 +135,11 @@ class Service extends SimpleStrategy
      * Parents are not checked directly for whether their children have service
      * access.
      *
-     * @param User  $user
+     * @param User  $parent
      * @param array $entityValues
      * @return bool|null
      */
-    protected function isParentInAudienceValues(User $user, array $entityValues): ?bool
+    protected function isUserInAudienceValuesAsParent(User $parent, array $entityValues): ?bool
     {
         return null;
     }
@@ -148,11 +148,11 @@ class Service extends SimpleStrategy
      * Teachers are not checked directly for whether their students have service
      * access.
      *
-     * @param User  $user
+     * @param User  $teacher
      * @param array $entityValues
      * @return bool|null
      */
-    protected function isTeacherInAudienceValues(User $user, array $entityValues): ?bool
+    protected function isUserInAudienceValuesAsTeacher(User $teacher, array $entityValues): ?bool
     {
         return null;
     }

@@ -162,21 +162,22 @@ abstract class SimpleStrategy implements ISimpleStrategy
                 if (!$user->getRole()->isParent()) {
                     return false;
                 }
-                return $this->isParentInAudienceValues($user, $entityValues);
+                return $this->isUserInAudienceValuesAsParent($user, $entityValues);
             case Audience\Model::RELATIONSHIP_TEACHERS_OF:
                 if (!$user->getRole()->isStaff()) {
                     return false;
                 }
-                return $this->isTeacherInAudienceValues($user, $entityValues);
+                return $this->isUserInAudienceValuesAsTeacher($user, $entityValues);
         }
         return null;
     }
 
     /**
-     * Is the current user in the audience for this strategy?
+     * Is the current user in the audience for this strategy, via being
+     * in the direct audience?
      *
-     * By default: they are in the audience if `getValues()` returns a value
-     * which is in `$entityValues`
+     * By default: they are in the audience if `getValues($user)` returns a
+     * value which is in `$entityValues`.
      *
      * @param User  $user
      * @param array $entityValues
@@ -189,49 +190,49 @@ abstract class SimpleStrategy implements ISimpleStrategy
     }
 
     /**
-     * Is the current user in the audience for this strategy, via being the
-     * parent of a user in the audience?
+     * Is the current user in the audience for this strategy, via being
+     * the parent of a student who is in the audience?
      *
-     * By default: they are in the audience if `getValues()` returns a value
-     * which is in `$entityValues` for one of their children.
+     * By default: they are in the audience if `getValues($child)` returns a
+     * value which is in `$entityValues` for one of their children.
      *
-     * @param User  $user
+     * @param User  $parent
      * @param array $entityValues
      * @return bool|null
      */
-    protected function isParentInAudienceValues(User $user, array $entityValues): ?bool
+    protected function isUserInAudienceValuesAsParent(User $parent, array $entityValues): ?bool
     {
         /* Must not hit the DB... ummm is there a different way of doing this?
          * should we put the parents children back into the session/ user object? or cache this somewhere???
         */
-        (new \Schoolbox\External\User())->loadChildren([$user]);
-        if ($user->getChildren()->count() === 0) {
+        (new \Schoolbox\External\User())->loadChildren([$parent]);
+        if ($parent->getChildren()->count() === 0) {
             return null;
         }
-        return count(array_intersect($this->getValues($user->getChildren()), $entityValues)) > 0;
+        return count(array_intersect($this->getValues($parent->getChildren()), $entityValues)) > 0;
     }
 
     /**
      * Is the current user in the audience for this strategy, via being the
-     * teacher of a user in the audience?
+     * teacher of a student in the audience?
      *
-     * By default: they are not checked for whether they are in the audience.
-     * Sub-classes may check if they are in the audience?
+     * By default: they are in the audience if `getValues($student)` returns a
+     * value which is in `$entityValues` for one of their students.
      *
-     * @param User  $user
+     * @param User  $teacher
      * @param array $entityValues
      * @return bool|null
      */
-    protected function isTeacherInAudienceValues(User $user, array $entityValues): ?bool
+    protected function isUserInAudienceValuesAsTeacher(User $teacher, array $entityValues): ?bool
     {
         // Load this teacher's classes, if set
-        if ($user->getSubjectCollection() === null) {
+        if ($teacher->getSubjectCollection() === null) {
             return null;
         }
 
         return count(
             array_intersect(
-                $this->getValues($this->studentLocator->locateStudents($user)),
+                $this->getValues($this->studentLocator->locateStudents($teacher)),
                 $entityValues
             )
         ) > 0;

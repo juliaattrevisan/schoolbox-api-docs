@@ -124,11 +124,11 @@ class ResHouse extends SimpleStrategy
      * Parents are not checked for whether their children are in a residential
      * house.
      *
-     * @param User  $user
+     * @param User  $parent
      * @param array $entityValues
      * @return bool|null
      */
-    protected function isParentInAudienceValues(User $user, array $entityValues): ?bool
+    protected function isUserInAudienceValuesAsParent(User $parent, array $entityValues): ?bool
     {
         return null;
     }
@@ -137,11 +137,11 @@ class ResHouse extends SimpleStrategy
      * Teachers are not checked for whether their students are in a residential
      * house.
      *
-     * @param User  $user
+     * @param User  $teacher
      * @param array $entityValues
      * @return bool|null
      */
-    protected function isTeacherInAudienceValues(User $user, array $entityValues): ?bool
+    protected function isUserInAudienceValuesAsTeacher(User $teacher, array $entityValues): ?bool
     {
         return null;
     }

@@ -112,11 +112,11 @@ class RoleType extends SimpleStrategy
     /**
      * Parents are not checked for their children's role.
      *
-     * @param User  $user
+     * @param User  $parent
      * @param array $entityValues
      * @return bool|null
      */
-    protected function isParentInAudienceValues(User $user, array $entityValues): ?bool
+    protected function isUserInAudienceValuesAsParent(User $parent, array $entityValues): ?bool
     {
         return null;
     }
@@ -124,11 +124,11 @@ class RoleType extends SimpleStrategy
     /**
      * Teachers are not checked for their student's role.
      *
-     * @param User  $user
+     * @param User  $teacher
      * @param array $entityValues
      * @return bool|null
      */
-    protected function isTeacherInAudienceValues(User $user, array $entityValues): ?bool
+    protected function isUserInAudienceValuesAsTeacher(User $teacher, array $entityValues): ?bool
     {
         return null;
     }

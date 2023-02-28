@@ -132,11 +132,11 @@ class Super extends SimpleStrategy
      * Parents are not checked directly for whether their children are
      * superusers.
      *
-     * @param User  $user
+     * @param User  $parent
      * @param array $entityValues
      * @return bool|null
      */
-    protected function isParentInAudienceValues(User $user, array $entityValues): ?bool
+    protected function isUserInAudienceValuesAsParent(User $parent, array $entityValues): ?bool
     {
         return null;
     }
@@ -145,11 +145,11 @@ class Super extends SimpleStrategy
      * Teachers are not checked directly for whether their students are
      * superusers.
      *
-     * @param User  $user
+     * @param User  $teacher
      * @param array $entityValues
      * @return bool|null
      */
-    protected function isTeacherInAudienceValues(User $user, array $entityValues): ?bool
+    protected function isUserInAudienceValuesAsTeacher(User $teacher, array $entityValues): ?bool
     {
         return null;
     }

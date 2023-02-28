@@ -551,20 +551,20 @@ class Folder extends SimpleStrategy
      * Parents are in the folder audience if they are a member of the folder via
      * one of their children's subjects.
      *
-     * @param User  $user
+     * @param User  $parent
      * @param array $entityValues
      * @return bool|null
      */
-    protected function isParentInAudienceValues(User $user, array $entityValues): ?bool
+    protected function isUserInAudienceValuesAsParent(User $parent, array $entityValues): ?bool
     {
         /* Must not hit the DB... ummm is there a different way of doing this?
          * should we put the parents children back into the session/ user object? or cache this somewhere???
         */
-        (new \Schoolbox\External\User())->loadChildren([$user]);
-        if ($user->getChildren()->count() === 0) {
+        (new \Schoolbox\External\User())->loadChildren([$parent]);
+        if ($parent->getChildren()->count() === 0) {
             return null;
         }
-        foreach ($user->getChildren() as $child) {
+        foreach ($parent->getChildren() as $child) {
             if ($child->getSubjectCollection() === null) {
                 continue;
             }
