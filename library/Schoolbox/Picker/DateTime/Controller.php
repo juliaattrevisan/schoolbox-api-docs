@@ -283,6 +283,11 @@ class Controller extends Base
             return false;
         }
 
+        // If the user is hiding their timetable then don't show it
+        if ($user->getHideTimetable()) {
+            return false;
+        }
+
         foreach ($user->getCampusCollection() as $campus) {
             $campusTimetable = $this->timetableHandler->getTimetableDefinition(null, $campus);
 
