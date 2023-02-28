@@ -1,4 +1,5 @@
 import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
+import InsertSchoolboxResourceCommand from "./InsertSchoolboxResourceCommand";
 import { getDataAttributes } from "./schoolboxResourceConfig";
 
 export default class SchoolboxResourceEditing extends Plugin {
@@ -8,6 +9,7 @@ export default class SchoolboxResourceEditing extends Plugin {
     init() {
         this.updateSchema();
         this.defineConverters();
+        this.editor.commands.add("insertSchoolboxResource", new InsertSchoolboxResourceCommand(this.editor));
     }
 
     /**
