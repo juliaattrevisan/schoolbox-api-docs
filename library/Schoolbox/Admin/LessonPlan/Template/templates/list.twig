@@ -91,22 +91,22 @@
 
                                                     $.post(element.attr('href'), function() {
                                                     })
-                                                        .done(function() {
-                                                            toast.toastTimeout({
-                                                                text: 'Saved',
-                                                                css: 'success'
-                                                            });
-
-                                                            location.reload();
-                                                        })
-                                                        .fail(function(response) {
-                                                            let temp = $.parseJSON(response.responseText);
-
-                                                            toast.toastTimeout({
-                                                                text: 'Could not save: ' + temp.error,
-                                                                css: 'alert'
-                                                            });
+                                                    .done(function() {
+                                                        toast.toastTimeout({
+                                                            text: 'Saved',
+                                                            css: 'success'
                                                         });
+
+                                                        location.reload();
+                                                    })
+                                                    .fail(function(response) {
+                                                        let temp = $.parseJSON(response.responseText);
+
+                                                        toast.toastTimeout({
+                                                            text: 'Could not save: ' + temp.error,
+                                                            css: 'alert'
+                                                        });
+                                                    });
                                                 });
                                             });
                                         </script>
