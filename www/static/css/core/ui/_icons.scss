@@ -469,6 +469,11 @@
     font-family: $font-family-icon;
 }
 
+.icon-lesson-plan:before {
+    content: "\e92c";
+    font-family: $font-family-icon;
+}
+
 .icon-link:before {
     content: "\e63a";
     font-family: $font-family-icon;
