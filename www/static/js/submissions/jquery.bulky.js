@@ -124,9 +124,9 @@
                         $chk.attr("id", id);
                         $lbl.attr("for", id);
 
-                        // Add attribute 'data-bulky-ordinary-checkbox' to allow use to identify all checkboxes except
+                        // Add attribute 'data-bulky-checkbox' to allow selection of all checkboxes except
                         // the select-all checkbox (that will be added if opt.includeSelectAllCheckbox is true).
-                        $chk.attr("data-bulky-ordinary-checkbox", "");
+                        $chk.attr("data-bulky-checkbox", "");
 
                         // apply the name
                         $lbl.text($(this).data("participantName"));
@@ -201,10 +201,8 @@
                 // We restrict to enabled here so that when all enabled checkboxes are checked (and there are some
                 // disabled checkboxes), jquery.selectAllBasic() will give the 'select all' checkbox the tick instead
                 // of the indeterminate state.
-                let ordinaryCheckboxJqSelector = "[data-bulky-ordinary-checkbox]:enabled";
-
                 $("#data-bulky-select-all-checkbox-" + opt.name).selectAllBasic({
-                    selector: ordinaryCheckboxJqSelector,
+                    selector: "[data-bulky-checkbox]:enabled",
                 });
 
                 let $selectAllCheckbox = $("#data-bulky-select-all-checkbox-" + opt.name);
