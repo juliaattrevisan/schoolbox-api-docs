@@ -1,11 +1,17 @@
 <?php
 
+/**
+ * @copyright Copyright 2023, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
 namespace Schoolbox\APIAssessment;
 
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\GenericCollection;
 use Alaress\Database\Predicate\Builder;
 use PDO;
+use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\YearLevel\Mapper as YearLevelMapper;
 use Schoolbox\YearLevel\Model as YearLevelModel;
 
@@ -126,9 +132,9 @@ class Helper
                 ];
             }
         }
-        //if there are no assessments, just return an error, saying the assessment does not exist?
+        //if there are no assessments, return empty string. This is a valid query and should return 200.
         if (empty($output)) {
-            throw new SchoolboxException("No assessments found");
+            return [];
         }
         //get feedback items
         $feedbacks = $this->getAssessmentFeedback(array_keys($output));
@@ -773,5 +779,117 @@ order by `assessment_id`, `student_id`;
         }
         $output['capabilities'] = array_values($output['capabilities']);
         return $output;
+    }
+
+    /**
+     * @param array $filter
+     * @return bool
+     */
+    public function validateFilter(array $filter): bool
+    {
+        $stringFields  = [
+            'title'       => true,
+            'folder'      => ['code'],
+            'subjectCode' => [],
+            'workType'    => ['name'],
+            'yearLevel'   => ['name'],
+        ];
+        $numericFields = [
+            'assessmentId' => true,
+            'folder'       => ['id'],
+            'workType'     => ['id'],
+            'yearLevel'    => ['id'],
+            'project'      => ['id'],
+        ];
+        $enumFields    = [
+            'assessmentType' => [
+                AssessmentType::TYPE_TASK,
+                AssessmentType::TYPE_QUIZ,
+                AssessmentType::TYPE_LTI_ASSESSMENT,
+                AssessmentType::TYPE_DUE_WORK,
+                AssessmentType::TYPE_PROJECT,
+            ],
+        ];
+        $dateFields    = [
+            'dueDate' => ['from', 'to'],
+        ];
+        $booleanFields = [
+            'weighted' => true,
+        ];
+        foreach ($filter as $filterName => $filterValue) {
+            $found = false;
+            // string
+            if (isset($stringFields[$filterName])) {
+                if (is_array($stringFields[$filterName])) {
+                    if (!is_array($filterValue)) {
+                        throw new SchoolboxException("Filter $filterName must be an array.");
+                    }
+                    foreach ($stringFields[$filterName] as $fieldAttribute) {
+                        if (isset($filterValue[$fieldAttribute]) && !is_string($filterValue[$fieldAttribute])) {
+                            throw new SchoolboxException("Filter $filterName - $filterValue[$fieldAttribute] must be a string.");
+                        }
+                    }
+                } elseif (!is_string($filterValue)) {
+                    throw new SchoolboxException("Filter $filterName - $filterName must be a string.");
+                }
+                $found = true;
+            }
+            // numeric
+            if (isset($numericFields[$filterName])) {
+                if (is_array($numericFields[$filterName])) {
+                    foreach ($numericFields[$filterName] as $fieldAttribute) {
+                        if (isset($filterValue[$fieldAttribute]) && !is_numeric($filterValue[$fieldAttribute])) {
+                            throw new SchoolboxException("Filter $filterName - $filterValue[$fieldAttribute] must be a number.");
+                        }
+                    }
+                } elseif (!is_numeric($filterValue)) {
+                    throw new SchoolboxException("Filter $filterName - $filterValue must be a number.");
+                }
+                $found = true;
+            }
+            // bool
+            if (isset($booleanFields[$filterName])) {
+                if (!is_bool($filterValue)) {
+                    throw new SchoolboxException("Filter $filterName - $filterValue must be a boolean.");
+                }
+                $found = true;
+            }
+            // date
+            if (isset($dateFields[$filterName])) {
+                if (is_array($dateFields[$filterName])) {
+                    if (!is_array($filterValue)) {
+                        throw new SchoolboxException("Filter $filterName must be an array.");
+                    }
+                    foreach ($dateFields[$filterName] as $fieldAttribute) {
+                        if (!isset($filterValue[$fieldAttribute])) {
+                            continue;
+                        }
+                        if (!is_string($filterValue[$fieldAttribute])) {
+                            throw new SchoolboxException("Filter $filterName - $fieldAttribute must be a string.");
+                        }
+                        try {
+                            $date = new \Alaress_Date_Format($filterValue[$fieldAttribute], [
+                                DATE_RFC3339,
+                                DATE_RFC3339_EXTENDED,
+                            ]);
+                        } catch (\Exception $e) {
+                            throw new SchoolboxException("Failed to parse date from $filterName - {$filterValue[$fieldAttribute]}.");
+                        }
+                    }
+                    $found = true;
+                }
+            }
+            // enum
+            if (isset($enumFields[$filterName])) {
+                if (!in_array($filterValue, $enumFields[$filterName])) {
+                    throw new SchoolboxException("$filterValue must be one of " . implode(',', $enumFields[$filterName]));
+                }
+                $found = true;
+            }
+            if (!$found) {
+                throw new SchoolboxException("Unknown filter $filterName.");
+            }
+        }
+        return true;
     }
 }

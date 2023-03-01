@@ -170,6 +170,7 @@ class Controller extends Base
                 });
             }
 
+            $this->response->status->setCode(201);
             $this->response->content->set($this->buildAuthenticatedJsonOutput($sessionUser));
         }
     }

@@ -119,6 +119,7 @@ class Module extends BaseModule
         } catch (MapperException $e) {
             throw new SchoolboxException('Group Does not Exist', 404, null, 404);
         }
+        $group->setFolder($folder);
         return $group;
     }
 

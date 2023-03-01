@@ -23,16 +23,12 @@ use InvalidArgumentException;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\EventTypeMapper;
-use Schoolbox\Calendar\Relation\Role;
-use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
 
@@ -62,84 +58,7 @@ class Module extends BaseModule
                 new IsLoggedIn(),
                 new Any(
                     new IsSuperuser(),
-                    new Callback(function (array $params) {
-                        if (!array_key_exists('event', $params)) {
-                            throw new InvalidArgumentException("Expected array key 'event' does not exist.");
-                        }
-
-                        /** @var Event $event */
-                        $event = $params['event'];
-
-                        $loggedInUser = $this->getAuthorizer()->getUser();
-                        (new \Schoolbox\External\User(
-                            $this->getConfig()->get('external_type'),
-                            new \External_Class(),
-                            new \External_User(),
-                            $this->getMapperFactory()->get(UserMapper::class)
-                        ))->loadChildren([$loggedInUser]);
-
-                        /**
-                         * Personal Event: owner, parent of owner, staff, or invited guest, can see event
-                         * Group: READ+ members of group can see event
-                         * Campus: user can see event if in campus and roles
-                         */
-                        if ($event->isPersonalLevel()) {
-                            $isStaff        = $loggedInUser->getRole()->isStaff();
-                            $isOwner        = $event->getOwner()->getId() === $loggedInUser->getId();
-                            $isParentOfUser = $loggedInUser->isParentOf($event->getAuthor());
-
-                            /* I suppose if you're on the invited list,
-                             * you should be able to see it
-                             */
-                            $isAttendee = $this->getMapperFactory()->get(Attendance\Mapper::class)->countByColumnList([
-                                'event_id' => $event->getId(),
-                                'user_id' => $loggedInUser->getId()
-                            ]);
-
-                            if ($isOwner || $isStaff || $isParentOfUser || $isAttendee) {
-                                return true;
-                            }
-                        } elseif ($event->isGroupLevel()) {
-                            /** @var Folder $folder */
-                            foreach ($event->getFolderCollection()->getAll() as $folder) {
-                                if (Access::getInstance()->getFolderAccess($loggedInUser, $folder->getId()) >= UserAccess::ACCESS_READ) {
-                                    return true;
-                                }
-                            }
-                        } elseif ($event->isCampusLevel()) {
-                            $inRole = false;
-                            $inCampus = false;
-
-                            foreach ($loggedInUser->getAccessList()->filterBy('service', UserAccess::SERVICE_CALENDAR) as $access) {
-                                if ($access->getAccessLevel() >= UserAccess::ACCESS_READ) {
-                                    /** @var Campus $campus */
-                                    foreach ($event->getCampusCollection()->getAll() as $campus) {
-                                        if ($campus->getId() === $access->getServiceIdentifier()) {
-                                            return true;
-                                        }
-                                    }
-                                }
-                            }
-
-                            /** @var Campus $campus */
-                            foreach ($event->getCampusCollection() as $campus) {
-                                if ($loggedInUser->isInCampus($campus)) {
-                                    $inCampus = true;
-                                    break;
-                                }
-                            }
-
-                            if ($event->getRoleCollection()->getBy('roleId', $loggedInUser->getRole()->getId()) instanceof Role) {
-                                $inRole = true;
-                            }
-
-                            if ($inCampus && $inRole) {
-                                return true;
-                            }
-                        }
-
-                        throw new Unauthorized();
-                    })
+                    new Event\Authorizer\CanViewEvent($this->getConfig())
                 )
             );
         });

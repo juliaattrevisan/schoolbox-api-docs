@@ -51,7 +51,11 @@ class Module extends BaseModule
         /* Anyone can see the form
          */
         $getPerms = new Rule\All(
-            new Rule\IsLoggedIn()
+            new Rule\IsLoggedIn(),
+            new Any(
+                new IsSuperuser(),
+                new Event\Authorizer\CanViewEvent($this->getConfig())
+            )
         );
 
         /* Permissions for modifying an event

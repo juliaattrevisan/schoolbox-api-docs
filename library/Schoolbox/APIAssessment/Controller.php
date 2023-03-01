@@ -10,12 +10,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\APIAssessment;
 
-use Alaress\Database\Connector\IConnector;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Alaress\Web\Controller\Base;
 use Crell\ApiProblem\ApiProblem;
 use Schoolbox\YearLevel\Mapper;
-use PDO;
 
 class Controller extends Base
 {
@@ -47,7 +45,7 @@ class Controller extends Base
                 ->asArray();
             $this->getResponse()->status->setCode(404);
             $this->getResponse()->content->set($this->buildJsonOutput($problem));
-            return; //exit early the user is part of the group.
+            return;
         }
 
         //get all assessment info for object
@@ -59,7 +57,7 @@ class Controller extends Base
                 ->asArray();
             $this->getResponse()->status->setCode(404);
             $this->getResponse()->content->set($this->buildJsonOutput($problem));
-            return; //exit early the user is part of the group.
+            return;
         }
 
         /**
@@ -101,11 +99,12 @@ class Controller extends Base
         }
 
         try {
+            $this->assessmentHelper->validateFilter($filter);
             $output = $this->assessmentHelper->searchForAssessments($filter, $limit, $cursor);
             $count = $this->assessmentHelper->searchForAssessmentsCount($filter);
         } catch (SchoolboxException $e) {
-            $output = [];
-            $count = 0;
+            $this->sendJsonError('Failed to get assessments: ' . $e->getMessage(), 400);
+            return;
         }
 
         /**
