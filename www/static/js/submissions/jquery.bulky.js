@@ -191,9 +191,9 @@
                 if (0 === $("#data-bulky-select-all-checkbox").length) {
                     bulky.list.before(
                         "<div>" +
-                        "<input id='data-bulky-select-all-checkbox' type='checkbox'/>" +
-                        "<label for='data-bulky-select-all-checkbox' class='checkbox-label'>Select all</label>" +
-                        "</div>"
+                            "<input id='data-bulky-select-all-checkbox' type='checkbox'/>" +
+                            "<label for='data-bulky-select-all-checkbox' class='checkbox-label'>Select All</label>" +
+                            "</div>"
                     );
                 }
 
@@ -201,7 +201,7 @@
                 // disabled checkboxes), jquery.selectAllBasic() will give the 'select all' checkbox the tick instead
                 // of the indeterminate state.
                 $("#data-bulky-select-all-checkbox").selectAllBasic({
-                    selector: "[data-bulky-checkbox]:enabled"
+                    selector: "[data-bulky-checkbox]:enabled",
                 });
 
                 let $selectAllCheckbox = $("#data-bulky-select-all-checkbox");
