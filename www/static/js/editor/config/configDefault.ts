@@ -61,11 +61,7 @@ import { getTokensPlugins } from "@js/editor/plugin/tokensPlugins";
 import { getMediaEmbedSettings } from "@js/editor/settings/mediaEmbedSettings";
 import { getTokensSettings } from "@js/editor/settings/tokensSettings";
 
-import Abbreviation from "../abbreviation/abbreviation";
 import SchoolboxResource from "../plugin/schoolboxResource/SchoolboxResource";
-
-import SimpleBox from "../simpleBox/SimpleBox";
-import AddVideo from "../video/AddVideo";
 
 /**
  * Add our custom upload adapter
@@ -147,8 +143,6 @@ export function getDefault(config: EditorDefaultConfig) {
             Timestamp,
             Abbreviation,
             SchoolboxResource,
-            SimpleBox,
-            AddVideo,
         ],
         extraPlugins: [UploadAdapterPlugin],
         toolbar: [
@@ -198,10 +192,7 @@ export function getDefault(config: EditorDefaultConfig) {
             "findAndReplace",
             "|",
             "sourceEditing",
-            "abbreviation",
             "schoolboxResource",
-            "simpleBox",
-            "addVideo",
         ],
         style: {
             // the list of styles provided: https://ckeditor.com/docs/ckeditor5/latest/features/style.html
