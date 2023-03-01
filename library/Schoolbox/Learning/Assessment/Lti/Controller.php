@@ -488,12 +488,19 @@ class Controller extends Assessment\Controller
      * @param User  $actingUser  The user who the current user is acting as:
      *                           if not themselves, it may be a student.
      * @return LtiMessageInterface
+     * @throws \Schoolbox\Mapper\Exception
      */
     private function buildLaunchResourceLinkMessage(
         Model $assessment,
         User $currentUser,
         User $actingUser
     ): LtiMessageInterface {
+        // if assessment's lti tool is not hydrated properly, hydrate
+        if ($assessment->getLtiTool() && empty($assessment->getLtiTool()->getDeploymentId())) {
+            $ltiTool = $this->ltiToolMapper->findById($assessment->getLtiTool()->getId());
+            $assessment->setLtiTool($ltiTool);
+        }
+
         return (new LaunchFactory(
             $this->registrations,
             $this->getAccess(),
