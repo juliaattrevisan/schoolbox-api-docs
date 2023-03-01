@@ -3,7 +3,7 @@ import Coloris from "@melloware/coloris";
 import "./colour-picker.css";
 
 const colorPickerDefaults = {
-    theme: "pill",
+    theme: "default",
     margin: 10,
     format: "hex",
     alpha: true,
