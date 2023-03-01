@@ -85,11 +85,7 @@ class LearningProfile extends BaseComponent
                     // Search within unit spec for due works matching search
                     if ($implementation->getFolder()->getId() === $this->folder->getId()) {
                         $filteredAssessments = $implementation->getAssessables()
-                            ->filter(fn (IAssessable $assessment) => $assessment instanceof DueWork\Model)
-                            ->filter(fn (DueWork\Model $assessment) => $assessment->getWorkType()?->getId() === $search['workTypeId'])
-                            ->filter(fn (DueWork\Model $assessment) => $assessment->isParticipant($this->student))
-                            ->filter(fn (DueWork\Model $assessment) => $this->isDueWithinReportWindow($assessment, $search['semester']))
-                            ->filter(fn (DueWork\Model $assessment) => $assessment->isFeedbackVisibleToRoleType($this->roleTypeOverride ?? $this->viewer->getRole()->getType()))
+                            ->filter($this->createAssessmentFilter($search))
                             ->sortByCallback(fn (DueWork\Model $a1, DueWork\Model $a2) => $a1->getDueAt()->lt($a2->getDueAt()));
 
                         // For each filtered assessment: build data I guess
@@ -143,6 +139,48 @@ class LearningProfile extends BaseComponent
         return $data;
     }
 
+    /**
+     * Create a filter callback for this set of search parameters.
+     *
+     * The assessment will be included only if all the below conditions are met:
+     * * it's a due work
+     * * its work type matches the one being searched for
+     * * the current student is a participant
+     * * it's due within the report window for the semester being searched for
+     * * its feedback is visible to the current role type
+     * * it's visible to the user or one of the user's children
+     *
+     * @param array $search
+     * @return callable(IAssessable): bool
+     */
+    private function createAssessmentFilter(array $search): callable
+    {
+        return function (IAssessable $assessment) use ($search) {
+            if (!$assessment instanceof DueWork\Model) {
+                return false;
+            }
+            if (!$assessment->getWorkType()?->getId() === $search['workTypeId']) {
+                return false;
+            }
+            if (!$assessment->isParticipant($this->student)) {
+                return false;
+            }
+            if (!$this->isDueWithinReportWindow($assessment, $search['semester'])) {
+                return false;
+            }
+            if (
+                !$assessment->isFeedbackVisibleToRoleType(
+                    $this->roleTypeOverride ?? $this->viewer->getRole()->getType()
+                )
+            ) {
+                return false;
+            }
+            if (!$this->visibility->isVisibleToUserOrChildOfUser($assessment, $this->viewer, true, null, false)) {
+                return false;
+            }
+            return true;
+        };
+    }
 
     /**
      *
