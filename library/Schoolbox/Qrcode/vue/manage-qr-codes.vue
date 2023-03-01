@@ -396,6 +396,10 @@ export default {
 }
 
 @media print {
+    .students {
+        display: block !important; /* This is required for '.student break-inside: avoid' to work (in manage-qr-codes-student.vue) */
+    }
+
     body,
     .manage-qrcodes {
         background: white; /* ensure white background, may have been changed by custom styles */
