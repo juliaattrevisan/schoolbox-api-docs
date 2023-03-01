@@ -511,7 +511,7 @@ export default {
                         <div class="checklist">
                             <label class="title">Filter to:</label>
                             <ul class="option-list">
-                                <li>
+                                <li class="narrow">
                                     <input
                                         type="checkbox"
                                         data-filter-checkbox
@@ -535,7 +535,7 @@ export default {
                                     />
                                     <label for="filter-learningMoments">Learning Moments</label>
                                 </li>
-                                <li>
+                                <li class="narrow">
                                     <input
                                         type="checkbox"
                                         data-filter-checkbox
@@ -983,6 +983,10 @@ export default {
     text-decoration: underline;
 }
 
+.checklist {
+    padding-left: 0.5rem;
+}
+
 .checklist > label,
 .checklist > ul,
 .option-list > li {
@@ -992,6 +996,12 @@ export default {
 .checklist > label,
 .option-list > li {
     margin-right: 2rem;
+}
+
+@media (max-width: 500px) {
+    .option-list > li.narrow {
+        width: 7rem;
+    }
 }
 
 .filters-description {
