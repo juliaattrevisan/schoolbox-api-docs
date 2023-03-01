@@ -522,7 +522,7 @@ export default {
                                     />
                                     <label for="filter-learningMoments">Learning Moments</label>
                                 </li>
-                                <li class="narrow">
+                                <li>
                                     <input
                                         type="checkbox"
                                         data-filter-checkbox
@@ -535,7 +535,7 @@ export default {
                                     />
                                     <label for="filter-goals">Goals</label>
                                 </li>
-                                <li class="narrow">
+                                <li>
                                     <input
                                         type="checkbox"
                                         data-filter-checkbox
@@ -999,8 +999,8 @@ export default {
 }
 
 @media (max-width: 500px) {
-    .option-list > li.narrow {
-        width: 7rem;
+    .option-list > li:nth-child(odd) {
+        width: 9rem;
     }
 }
 
