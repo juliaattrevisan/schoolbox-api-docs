@@ -99,21 +99,29 @@ class ModelToArray
             $awardedBy = null;
         }
 
+        try {
+            $reasonedBy = call_user_func($this->userTranslator, $model->getReasonedBy());
+        } catch (Error $e) {
+            $reasonedBy = null;
+        }
+
         return [
-            'id'        => $model->getId(),
-            'badge'     => call_user_func($this->badgeTranslator, $model->getBadge()),
-            'status'    => $model->getStatus(),
-            'reason'    => $model->getReason(),
-            'isGoal'    => $model->isGoal(),
-            'award'     => $translateParentAward && $model->getAward()
+            'id'         => $model->getId(),
+            'badge'      => call_user_func($this->badgeTranslator, $model->getBadge()),
+            'status'     => $model->getStatus(),
+            'reason'     => $model->getReason(),
+            'isGoal'     => $model->isGoal(),
+            'award'      => $translateParentAward && $model->getAward()
                 ? $this->__invoke($model->getAward(), false)
                 : null,
-            'recipient' => $recipient,
-            'awardedBy' => $awardedBy,
-            'awardedAt' => $model->getAwardedAt()->getUsingFormat(DATE_ATOM),
-            'expiresAt' => $model->getExpiresAt()?->getUsingFormat(Alaress_Date_Format::DATABASE_DATE_FORMAT),
-            'viewedOn'  => $model->getViewedOn()?->getUsingFormat(Alaress_Date_Format::DATABASE_DATE_FORMAT),
-            '_links'    => call_user_func($this->linkTranslator, $model),
+            'recipient'  => $recipient,
+            'awardedBy'  => $awardedBy,
+            'awardedAt'  => $model->getAwardedAt()->getUsingFormat(DATE_ATOM),
+            'reasonedBy' => $reasonedBy,
+            'reasonedAt' => $model->getReasonedAt()?->getUsingFormat(DATE_ATOM),
+            'expiresAt'  => $model->getExpiresAt()?->getUsingFormat(Alaress_Date_Format::DATABASE_DATE_FORMAT),
+            'viewedOn'   => $model->getViewedOn()?->getUsingFormat(Alaress_Date_Format::DATABASE_DATE_FORMAT),
+            '_links'     => call_user_func($this->linkTranslator, $model),
         ];
     }
 }

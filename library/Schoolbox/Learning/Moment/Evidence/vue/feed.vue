@@ -81,12 +81,12 @@ export default {
             // NOTE: event.state will be null unless the state has been saved using history.pushState().
             this.setSelectedTagAndFiltersToMatchState(event.state);
 
-            await nextTick(); // Wait for Vue to sync checkboxes to match this.selectedTag.
+            await nextTick(); // Wait for Vue to sync checkboxes to match this.selectedFilters (due to 'v-model' attribute on relevant HTML input).
             this.onChangeFilters(this.selectedTag, false);
         };
 
         this.setSelectedTagAndFiltersToMatchState(this.getFiltersStateFromUrl());
-        await nextTick(); // Wait for Vue to sync checkboxes to match this.selectedFilters.
+        await nextTick(); // Wait for Vue to sync checkboxes to match this.selectedFilters (due to 'v-model' attribute on relevant HTML input).
         this.onChangeFilters(this.selectedTag, false);
     },
     methods: {
@@ -941,7 +941,10 @@ export default {
                 </template>
             </div>
 
-            <div class="feed-load-more content" v-else-if="metadata.cursor.next && metadata.count > data.length">
+            <div
+                class="feed-load-more content"
+                v-else-if="metadata.cursor.next && metadata.count > data.length && data.length > 0"
+            >
                 <button class="load-more expand" @click="append(metadata.cursor.next)" title="Load more">
                     Load more
                 </button>
