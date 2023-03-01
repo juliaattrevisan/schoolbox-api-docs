@@ -1,9 +1,0 @@
-###
-
-# curl -X GET "https://demo.schoolbox.com.au/learning/evidenceFeed/user/"
-# -H "Accept: application/json"
-GET https://vagrant.dev.schoolbox.cloud/learning/evidenceFeed/user/6?filter=eyJmaWx0ZXJOYW1lcyI6WyJnb2FscyIsImxlYXJuaW5nTW9tZW50cyIsImFjaGlldmVtZW50cyIsImZlZWRiYWNrIl0sInRhZyI6IiJ9
-Accept: application/json
-
-###
-
