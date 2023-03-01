@@ -185,6 +185,8 @@ export default {
 @media print {
     .student {
         border: 1px dashed black; //change to 'scissor cut' guide lines
+        break-inside: avoid;
+        display: inline-block;
         margin: 0 -1px -1px 0;
         padding: 2.5rem 1rem;
     }
