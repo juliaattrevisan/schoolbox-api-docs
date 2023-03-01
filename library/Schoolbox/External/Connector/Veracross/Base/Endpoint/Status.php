@@ -36,10 +36,7 @@ class Status implements IStatus
      * @inheritDoc
      *
      * @return bool
-     * @throws \DomainException
-     * @throws \GuzzleHttp\Exception\InvalidArgumentException
      * @throws \JsonException
-     * @throws \RuntimeException
      */
     public function isReachable(): bool
     {
@@ -49,7 +46,11 @@ class Status implements IStatus
          */
         $scope = 'students:list';
 
-        (new Api($this->host, $this->key))->retrieveOne('GET', 'students', $scope, 1, 1, []);
+        try {
+            (new Api($this->host, $this->key))->retrieveOne('GET', 'students', $scope, 1, 1, []);
+        } catch (\DomainException | \InvalidArgumentException | \RuntimeException $e) {
+            return false;
+        }
 
         return true;
     }
