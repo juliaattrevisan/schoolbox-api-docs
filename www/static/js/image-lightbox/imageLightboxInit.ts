@@ -1,12 +1,12 @@
 import lgAutoplay from "lightgallery/plugins/autoplay";
+import lgFullScreen from "lightgallery/plugins/fullscreen";
+import lgVideo from "lightgallery/plugins/video";
+
 import { checkForLightGallery } from "@js/image-lightbox/imageLightboxUtils";
 
 const imageLightboxDefaults = {
-    plugins: [lgAutoplay],
+    plugins: [lgAutoplay, lgFullScreen, lgVideo],
     speed: 0,
-    zoom: true,
-    zoomSize: "contain",
-    actualSize: false,
 };
 
 /**

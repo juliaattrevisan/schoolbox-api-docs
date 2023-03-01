@@ -9,3 +9,9 @@
 .lg-autoplay-button:after {
     content: "\e01d" !important;
 }
+.lg-autoplay-button:after {
+    content: "\e01d" !important;
+}
+.lg-fullscreen:after {
+    content: "\e20c" !important;
+}
