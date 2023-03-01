@@ -1,8 +1,7 @@
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
-{# <script type="text/javascript" src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script> #}
-{# <script type="text/javascript" src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script> #}
-<script src="{{ CDN_PREFIX }}/js/bundle/editorDefault.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/select-all/attacher.select-all.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/chained/jquery.chained.min.js?v={{ config.site_version }}"></script>
 {% autoescape('js') %}
@@ -11,14 +10,8 @@
 
         {# Setup ckEditor #}
 
-        //$.fn.alaressEditor($.alaressEditorConfigWithUserTokens({targetElements: $('#body_public')}));
-        //$.fn.alaressEditor($.alaressEditorConfigWithUserTokens({targetElements: $('#body_private')}));
-        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
-            detail: {
-                targetElements: ["#body_public", "#body_private"],
-                hasTokens: true,
-            }
-        }));
+        $.fn.alaressEditor($.alaressEditorConfigWithUserTokens({targetElements: $('#body_public')}));
+        $.fn.alaressEditor($.alaressEditorConfigWithUserTokens({targetElements: $('#body_private')}));
 
         {# Pastoral Tag Selectize #}
 
@@ -305,8 +298,8 @@
          */
         const typeDropdown = $('#typeId');
         const subtypeDropdown = $('#subtypeId');
-        const generalTemplate = window.sbProps.editorInstances['body_public'];
-        const confidentialTemplate = window.sbProps.editorInstances['body_private'];
+        const generalTemplate = CKEDITOR.instances['body_public'];
+        const confidentialTemplate = CKEDITOR.instances['body_private'];
 
         /* The template html that was most recently chosen
          */
@@ -388,3 +381,4 @@
     });
 </script>
 {% endautoescape %}
+
