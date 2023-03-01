@@ -29,6 +29,15 @@ use Schoolbox\Url\Uri;
 class Controller extends Base
 {
     /**
+     * Expire sessions created via the API after 5 minutes, instead of the
+     * (presumably longer!) default expiry.
+     *
+     * (If a session created via the API is reused, its expiry will be extended
+     * as per normal.)
+     */
+    private const API_SESSION_EXPIRY = 300;
+
+    /**
      * Authenticator, for creating a user session.
      */
     private Authenticator $auth;
@@ -361,6 +370,6 @@ class Controller extends Base
         // Session must be closed before setting its expiry, as the Redis key
         // doesn't exist before it is closed.
         session_write_close();
-        $this->sessionRedis->expire(PipeManager::REDIS_SESSION_PREFIX . session_id(), 300);
+        $this->sessionRedis->expire(PipeManager::REDIS_SESSION_PREFIX . session_id(), self::API_SESSION_EXPIRY);
     }
 }
