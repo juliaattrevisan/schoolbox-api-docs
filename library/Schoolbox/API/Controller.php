@@ -349,12 +349,18 @@ class Controller extends Base
     /**
      * Shortens the lifetime of the current session.
      *
+     * This exists so that sessions created with one of the `init*` methods are
+     * by default short-lived, thus protecting against repeated calls to these
+     * methods creating multiple sessions for the same user (and thus causing a
+     * denial-of-service by exhausting Redis' memory).
+     *
      * @return void
      */
     private function shortenSessionLifetime(): void
     {
-        // Was a new session created here?
-        // If so cut its expiry short
+        // Session must be closed before setting its expiry, as the Redis key
+        // doesn't exist before it is closed.
+        session_write_close();
         $this->sessionRedis->expire(PipeManager::REDIS_SESSION_PREFIX . session_id(), 300);
     }
 }
