@@ -511,6 +511,17 @@ export default {
                         <div class="checklist">
                             <label class="title">Filter to:</label>
                             <ul class="option-list">
+                                <li v-if="config.routes.getCreateEvidenceForm">
+                                    <input
+                                        type="checkbox"
+                                        data-filter-checkbox
+                                        id="filter-learningMoments"
+                                        name="includeLearningMoments"
+                                        @click="onChangeFilters('', true)"
+                                        v-model="selectedFilters.learningMoments"
+                                    />
+                                    <label for="filter-learningMoments">Learning Moments</label>
+                                </li>
                                 <li class="narrow">
                                     <input
                                         type="checkbox"
@@ -523,17 +534,6 @@ export default {
                                         :false-value="false"
                                     />
                                     <label for="filter-goals">Goals</label>
-                                </li>
-                                <li v-if="config.routes.getCreateEvidenceForm">
-                                    <input
-                                        type="checkbox"
-                                        data-filter-checkbox
-                                        id="filter-learningMoments"
-                                        name="includeLearningMoments"
-                                        @click="onChangeFilters('', true)"
-                                        v-model="selectedFilters.learningMoments"
-                                    />
-                                    <label for="filter-learningMoments">Learning Moments</label>
                                 </li>
                                 <li class="narrow">
                                     <input
