@@ -352,20 +352,9 @@
     font-size: 12px;
     font-weight: 400;
     padding: 1rem;
-    padding-top: 2rem;
     position: relative;
     tab-size: 4;
     white-space: pre;
     unicode-bidi: embed;
-}
-
-.ck.ck-editor p.s-code-block:before {
-    background-color: var(--ck-custom-shadow-white);
-    border-top-right-radius: 0.25rem;
-    content: "";
-    height: 1rem;
-    left: 0;
-    position: absolute;
-    top: 0;
-    width: 100%;
+    overflow-x: auto;
 }
