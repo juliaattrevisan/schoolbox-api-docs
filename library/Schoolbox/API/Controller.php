@@ -9,9 +9,9 @@
 namespace Schoolbox\API;
 
 use Alaress\Web\Controller\Base;
-use Alaress\Web\Output;
 use Alaress_Date_Format;
 use Authenticator;
+use Predis\ClientInterface;
 use Schoolbox\API\Token\JwtParser;
 use Schoolbox\Application\Exception\AccessDenied as SchoolboxAccessDeniedException;
 use Schoolbox\Application\Exception\AccountDisabled as SchoolboxAccountDisabledException;
@@ -22,6 +22,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\MobileApp\Registry;
 use Schoolbox\MobileApp\RegistryMapper;
 use Schoolbox\MobileApp\ServiceMapper;
+use Schoolbox\Realtime\Pipe\PipeManager;
 use Schoolbox\User;
 use Schoolbox\Url\Uri;
 
@@ -60,12 +61,15 @@ class Controller extends Base
      * @param RegistryMapper    $registryMapper
      * @param ServiceMapper     $serviceMapper
      * @param JwtParser\IParser $jwtParser
+     * @param ClientInterface   $sessionRedis The Redis instance which stores session data:
+     *                                        required so that if a session is created it is cut short.
      */
     public function __construct(
         Authenticator $auth,
         RegistryMapper $registryMapper,
         ServiceMapper $serviceMapper,
-        JwtParser\IParser $jwtParser
+        JwtParser\IParser $jwtParser,
+        private ClientInterface $sessionRedis,
     ) {
         $this->auth           = $auth;
         $this->registryMapper = $registryMapper;
@@ -199,6 +203,10 @@ class Controller extends Base
                 } else {
                     $this->response->redirect->to('/');
                 }
+                $this->response->content->set([
+                    'format'     => 'noContent',
+                    'postOutput' => [fn () => $this->shortenSessionLifetime()],
+                ]);
             }
         }
     }
@@ -322,15 +330,31 @@ class Controller extends Base
      *
      * @param User $user The user to build output for.
      *                   In practise this will always be the logged-in user.
-     * @return Output\Json
+     * @return array
      */
-    private function buildAuthenticatedJsonOutput(User $user): Output\Json
+    private function buildAuthenticatedJsonOutput(User $user): array
     {
-        return $this->buildJsonOutput([
-            'id'       => $user->getId(),
-            'key'      => $user->getKey(),
-            'role'     => $user->getRole()->getType(),
-            'username' => $user->getUsername(),
-        ]);
+        return [
+            'type' => 'json',
+            'data' => [
+                'id'       => $user->getId(),
+                'key'      => $user->getKey(),
+                'role'     => $user->getRole()->getType(),
+                'username' => $user->getUsername(),
+            ],
+            'postOutput' => [fn () => $this->shortenSessionLifetime()],
+        ];
+    }
+
+    /**
+     * Shortens the lifetime of the current session.
+     *
+     * @return void
+     */
+    private function shortenSessionLifetime(): void
+    {
+        // Was a new session created here?
+        // If so cut its expiry short
+        $this->sessionRedis->expire(PipeManager::REDIS_SESSION_PREFIX . session_id(), 300);
     }
 }
