@@ -1,15 +1,15 @@
 import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
-import InsertSchoolboxResourceCommand from "./InsertSchoolboxResourceCommand";
-import { getDataAttributes } from "./schoolboxResourceConfig";
+import InsertResourceCommand from "./InsertResourceCommand";
+import { getDataAttributes } from "./resourceConfig";
 
-export default class SchoolboxResourceEditing extends Plugin {
+export default class ResourceEditing extends Plugin {
     /**
      * Runs on startup, defines the schema and converters
      */
     init() {
         this.updateSchema();
         this.defineConverters();
-        this.editor.commands.add("insertSchoolboxResource", new InsertSchoolboxResourceCommand(this.editor));
+        this.editor.commands.add("insertResource", new InsertResourceCommand(this.editor));
     }
 
     /**

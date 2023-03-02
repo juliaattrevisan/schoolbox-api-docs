@@ -61,7 +61,7 @@ import { getTokensPlugins } from "@js/editor/plugin/tokensPlugins";
 import { getMediaEmbedSettings } from "@js/editor/settings/mediaEmbedSettings";
 import { getTokensSettings } from "@js/editor/settings/tokensSettings";
 
-import SchoolboxResource from "../plugin/schoolboxResource/SchoolboxResource";
+import Resource from "../plugin/resource/Resource";
 
 /**
  * Add our custom upload adapter
@@ -140,8 +140,6 @@ export function getDefault(config: EditorDefaultConfig) {
             SourceEditing,
             WordCount,
             ...getTokensPlugins(config),
-            Timestamp,
-            Abbreviation,
             SchoolboxResource,
         ],
         extraPlugins: [UploadAdapterPlugin],
@@ -192,7 +190,7 @@ export function getDefault(config: EditorDefaultConfig) {
             "findAndReplace",
             "|",
             "sourceEditing",
-            "schoolboxResource",
+            "resource",
         ],
         style: {
             // the list of styles provided: https://ckeditor.com/docs/ckeditor5/latest/features/style.html

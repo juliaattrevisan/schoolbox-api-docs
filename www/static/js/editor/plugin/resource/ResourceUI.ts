@@ -21,14 +21,14 @@ function getButton() {
     return button;
 }
 
-export default class SchoolboxResourceUI extends Plugin {
+export default class ResourceUI extends Plugin {
     /**
      * Register the button in the editor's UI component factory.
      */
     init() {
-        this.editor.ui.componentFactory.add("schoolboxResource", () => {
+        this.editor.ui.componentFactory.add("resource", () => {
             const button = getButton();
-            button.on("execute", () => this.editor.execute("insertSchoolboxResource"));
+            button.on("execute", () => this.editor.execute("insertResource"));
             return button;
         });
     }
