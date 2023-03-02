@@ -10,11 +10,19 @@ import type { Resource } from "./resourceUtils";
  * Display the resource modal to select a file from
  */
 function displayResourceModal() {
+    /**
+     * Homepages have a hidden input field containing the homepage id
+     * If that exists, use it; otherwise assume root node 0
+     */
+    const defaultFolderSelector = $("#categoryID").val() ? $("#categoryID").val() : 0;
+    /**
+     * Fire of the jQuery plugin to display the resource modal
+     */
     $.fn.schoolboxResource({
         allowedFilesystems: "files",
         allowedFiles: "image/*,audio/*,video/*,.heic,.heics,.heif",
         useFolder: false,
-        // defaultFolderSelector: defaultFolderSelector,
+        defaultFolderSelector,
     });
 }
 
