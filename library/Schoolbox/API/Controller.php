@@ -184,7 +184,7 @@ class Controller extends Base
             }
 
             $this->response->status->setCode(201);
-            $this->response->content->set($this->buildAuthenticatedJsonOutput($sessionUser));
+            $this->assignJsonResponseForAuthenticatedUser($sessionUser);
         }
     }
 
@@ -201,21 +201,9 @@ class Controller extends Base
         $sessionUser = $this->authenticate(true);
         if ($sessionUser) {
             if ($this->isJsonRequest()) {
-                $this->response->content->set($this->buildAuthenticatedJsonOutput($sessionUser));
+                $this->assignJsonResponseForAuthenticatedUser($sessionUser);
             } else {
-                // Redirect somewhere (locally only?)
-                $page = $this->getRequest()->query->get('redirect');
-
-                //Determine if page redirect is valid
-                if ($page && (new Uri($page))->isAbsolutePath()) {
-                    $this->response->redirect->to($page);
-                } else {
-                    $this->response->redirect->to('/');
-                }
-                $this->response->content->set([
-                    'format'     => 'noContent',
-                    'postOutput' => [fn () => $this->shortenSessionLifetime()],
-                ]);
+                $this->assignRedirectResponseForAuthenticatedUser((string)$this->getRequest()->query->get('redirect'));
             }
         }
     }
@@ -333,17 +321,16 @@ class Controller extends Base
         return $user;
     }
 
-
     /**
-     * Build JSON output for an authenticated user.
+     * Assigns JSON response (headers and output) for an authenticated user.
      *
      * @param User $user The user to build output for.
      *                   In practise this will always be the logged-in user.
-     * @return array
      */
-    private function buildAuthenticatedJsonOutput(User $user): array
+    private function assignJsonResponseForAuthenticatedUser(User $user): void
     {
-        return [
+        $this->response->headers->set('Content-Type', 'application/json');
+        $this->response->content->set([
             'type' => 'json',
             'data' => [
                 'id'       => $user->getId(),
@@ -352,7 +339,26 @@ class Controller extends Base
                 'username' => $user->getUsername(),
             ],
             'postOutput' => [fn () => $this->shortenSessionLifetime()],
-        ];
+        ]);
+    }
+
+    /**
+     * Assigns redirect response (headers and output) for an authenticated user.
+     *
+     * @param string $page The (relative) path to redirect to.
+     */
+    private function assignRedirectResponseForAuthenticatedUser(string $page): void
+    {
+        // Redirect somewhere (locally only)
+        if ($page && (new Uri($page))->isAbsolutePath()) {
+            $this->response->redirect->to($page);
+        } else {
+            $this->response->redirect->to('/');
+        }
+        $this->response->content->set([
+            'format'     => 'noContent',
+            'postOutput' => [fn () => $this->shortenSessionLifetime()],
+        ]);
     }
 
     /**
