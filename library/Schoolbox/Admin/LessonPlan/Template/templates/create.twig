@@ -5,6 +5,7 @@
  # @param string $studentRole                 The const corresponding to the Student roletype
  # @param string $newKeyword                  The const corresponding to the New Keyword in backend
  #}
+
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
 
@@ -20,7 +21,7 @@
     {% endif %}
 
     <div class="admin-content">
-        <form id="lesson-plan-template-form" action="{{ formAction }}" method="post">
+        <form id="lesson-plan-template-form" class="lesson-plan-template-form" action="{{ formAction }}" method="post">
             <div class="small-12 island">
                 <section>
                     <fieldset class="content">
@@ -33,24 +34,35 @@
                     <fieldset class="content">
                         <legend>Fields</legend>
 
-                        <ul id="fields" class="information-list lesson-plan-template-fields">
+                        <ul id="fields" class="information-list sortable ui-sortable lesson-plan-template-fields" data-sortable data-list>
                             {% if lessonPlanTemplate is not null %}
                                 {% for field in lessonPlanTemplate.fields %}
                                 <li>
-                                    <div>
-                                        <label for="field-title-{{ field.id }}" class="required">Title</label>
-                                        <input type="text" id="field-title-{{ field.id }}" name="field[{{ field.id }}][title]" maxlength="255" value="{{ field.title }}" />
+                                    <div class="s-topbar">
+                                        <div class="grip ui-sortable-handle">
+                                        </div>
+                                        <nav>
+                                            <a class="button icon-delete" data-delete></a>
+                                        </nav>
+                                    </div>
+                                     <div>
+                                        <div class="s-title-row">
+                                            <div class="s-field-title">
+                                                <label for="field-title-{{ field.id }}" class="required">Field Title</label>
+                                                <input type="text" id="field-title-{{ field.id }}" name="field[{{ field.id }}][title]" maxlength="255" value="{{ field.title }}" />
+                                            </div>
+                                            <div class="s-field-visibility">
+                                                <input type="hidden" name="field-visibility[{{ field.id }}]" value="off" />
+                                                <input id="field-new-visibility-{{ field.id }}" name="field[{{ field.id }}][visibility]" type="checkbox" {% if field.visibility == studentRole %}checked="checked"{% endif %}/>
+                                                <label for="field-new-visibility-{{ field.id }}" class="checkbox-label">Field visible to students?</label>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div>
                                         <label for="field-body-{{ field.id }}">Body</label>
-                                        <textarea id="field-body-{{ field.id }}" name="field[{{ field.id }}][body]" rows="5">{{ field.body }}</textarea>
+                                        <textarea id="field-body-{{ field.id }}" name="field[{{ field.id }}][body]" rows="5">{{  field.body }}</textarea>
                                     </div>
-                                    <div>
-                                        <input type="hidden" name="field-visibility[{{ field.id }}]" value="off" />
-                                        <input id="field-new-visibility-{{ field.id }}" name="field[{{ field.id }}][visibility]" type="checkbox" {% if field.visibility == studentRole %}checked="checked"{% endif %}/>
-                                        <label for="field-new-visibility-{{ field.id }}" class="checkbox-label">Visible to students</label>
-                                    </div>
-                                    <a class="button icon-delete" data-delete></a>
+
                                 </li>
                                 {% endfor %}
                             {% endif %}
@@ -64,35 +76,58 @@
             </div>
             <div class="small-12 columns">
                 <section>
-                    <input type="submit" value="Save" />
+                    <input id="save-button" type="submit" value="Save" />
                 </section>
             </div>
         </form>
     </div>
+
 </div>
 
 <div id="field-blueprint" style="display:none">
-    <div>
-        <label for="field-title" class="required">Title</label>
-        <input type="text" id="field-title" maxlength="255" value="" />
-    </div>
-    <div>
-        <label for="field-body">Body</label>
-        <textarea id="field-body" rows="5"></textarea>
-    </div>
-    <div>
-        <input type="hidden" value="off" />
-        <input id="field-visibility" type="checkbox" checked="checked" />
-        <label for="field-visibility" class="checkbox-label">Visible to students</label>
-    </div>
-    <a class="button icon-delete" data-delete></a>
+    <!-- Declare as a section to avoid some weird inheritance rules on div elements
+    -->
+    <section class="field-content" data-menu-section>
+        <div class="s-topbar">
+            <div class="grip ui-sortable-handle"></div>
+            <nav>
+                <a class="button icon-delete" data-delete></a>
+            </nav>
+        </div>
+        <div>
+            <div class="s-title-row">
+                <div class="s-field-title">
+                    <label for="field-title" class="required">Field Title</label>
+                    <input type="text" id="field-title" maxlength="255" value="" />
+                </div>
+                <div class="s-field-visibility">
+                    <input type="hidden" value="off" />
+                    <input id="field-visibility" type="checkbox" checked="checked" />
+                    <label for="field-visibility" class="checkbox-label">Field visible to students?</label>
+                </div>
+            </div>
+        </div>
+        <div>
+            <label for="field-body">Body</label>
+            <textarea id="field-body" rows="5"></textarea>
+        </div>
+    </section>
 </div>
 
 <script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 <script src="{{ CDN_PREFIX }}/js/bundle/helloCKEditor.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/sportsfixtures/jquery.mightyList.js?v={{ config.site_version }}"></script>
+
 <script>
     $(function() {
         let fieldCount = 1;
+
+        // Set up draggable menu
+        $('#fields').mightyList({});
+        $('#fields').sortable({
+            handle: '.grip',
+            axis: 'y',
+        });
 
         $('#add-field').on('click', function() {
             /* Make a clone
