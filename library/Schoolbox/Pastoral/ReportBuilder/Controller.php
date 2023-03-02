@@ -566,6 +566,17 @@ class Controller extends Base
     public function postReportModify(PastoralReport $report): void
     {
         $post = $this->request->post;
+        foreach ($post as $key => $options) {
+            if (is_array($options)) {
+                // Filter out the options we have been instructed to ignore.
+                $post[$key] = array_filter(
+                    $options,
+                    function ($v) {
+                        return ($v !== 'server-ignore-this-value');
+                    }
+                );
+            }
+        }
 
         /* User must supply name, types, years and houses
          */

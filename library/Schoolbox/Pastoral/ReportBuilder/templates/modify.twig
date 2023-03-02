@@ -348,7 +348,14 @@
                             <div class="checklist">
                                 <ul class="option-list">
                                     <li>
-                                        <input id="year-all" type="checkbox" data-check-all-year>
+                                        {#
+                                            We include this input in "years[]" so that the validation function will run even if years is empty.
+                                            We want the validation function to run in that case because the validation rule is:
+                                                "You must select at least one year level to show in the report (or the 'No Year Level' option)",
+                                            (the second part of that rule still needs to be checked if there are no years).
+                                            We mark this option as 'server-ignore-this-value' so the server will know to ignore it.
+                                        #}
+                                        <input id="year-all" name="years[]" type="checkbox" value="server-ignore-this-value" data-check-all-year>
                                         <label for="year-all">Select All</label>
                                     </li>
                                     <li>
@@ -392,7 +399,14 @@
                             <div class="checklist">
                                 <ul class="option-list">
                                     <li>
-                                        <input id="house-all" type="checkbox" data-check-all-house>
+                                        {#
+                                            We include this input in "houses[]" so that the validation function will run even if houses is empty.
+                                            We want the validation function to run in that case because the validation rule is:
+                                                "You must select at least one house to show in the report (or the 'No House' option)",
+                                            (the second part of that rule still needs to be checked if there are no houses).
+                                            Also we mark this option as 'server-ignore-this-value' so the server will know to ignore it.
+                                        #}
+                                        <input id="house-all" name="houses[]" type="checkbox" value="server-ignore-this-value" data-check-all-house>
                                         <label for="house-all">Select All</label>
                                     </li>
                                     <li>
@@ -727,17 +741,18 @@
             },
             messages: {
                 'types[]': 'You must select at least one record type to show in the report',
-                'years[]': 'You must select at least one year level to show in the report',
-                'houses[]': 'You must select at least one house to show in the report',
+                'years[]': "You must select at least one year level to show in the report (or the 'No Year Level' option)",
+                'houses[]': "You must select at least one house to show in the report (or the 'No House' option)",
                 'campuses[]': 'You must select at least one campus to show in the report'
             },
             submitHandler: function (form) {
                 {# Prior to submitting the form we need to set the hidden `order` #}
                 var order = $.makeArray(
-                        $('#sort-order').children('li')
-                                .map(function () {
-                                    return $(this).data('order');
-                                })
+                    $('#sort-order').children('li').map(
+                        function () {
+                            return $(this).data('order');
+                        }
+                    )
                 );
 
                 $('#order').val(order.join(','));
