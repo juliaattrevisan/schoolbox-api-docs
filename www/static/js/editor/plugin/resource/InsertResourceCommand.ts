@@ -197,15 +197,19 @@ function onResourceReturned(event: MessageEvent, editor) {
 }
 
 export default class InsertResourceCommand extends Command {
+    /**
+     * display the resource modal and listen for if a resource is returned
+     */
     execute() {
-        /**
-         * display the resource modal and listen for if a resource is returned
-         */
         displayResourceModal();
         window.removeEventListener("message", onResourceReturned);
         window.addEventListener("message", (event) => onResourceReturned(event, this.editor));
     }
 
+    /**
+     * is called on various events to determine if the command is enabled
+     * we use the same method the image plugin uses to determine if the command is enabled
+     */
     refresh() {
         this.isEnabled = this.editor.plugins.get("ImageUtils").isImageAllowed();
     }
