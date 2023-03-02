@@ -1,3 +1,8 @@
+/**
+ * To extend imageBlock and imageInline to allow for additional data attributes
+ * and add the insertResource command to the editor
+ */
+
 import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
 import InsertResourceCommand from "./InsertResourceCommand";
 import { getDataAttributes } from "./resourceConfig";

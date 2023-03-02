@@ -1,3 +1,7 @@
+/**
+ * Handles the insertion of a resource into the editor
+ */
+
 import Command from "@ckeditor/ckeditor5-core/src/command";
 
 const config = {
@@ -200,5 +204,9 @@ export default class InsertResourceCommand extends Command {
         displayResourceModal();
         window.removeEventListener("message", onResourceReturned);
         window.addEventListener("message", (event) => onResourceReturned(event, this.editor));
+    }
+
+    refresh() {
+        this.isEnabled = this.editor.plugins.get("ImageUtils").isImageAllowed();
     }
 }

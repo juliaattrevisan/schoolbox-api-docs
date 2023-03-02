@@ -1,5 +1,6 @@
 /**
- * The Schoolbox Resource button
+ * The Resource button, setting up the button to be displayed in the toolbar
+ * and to trigger he insertResource command on selection
  */
 
 import Plugin from "@ckeditor/ckeditor5-core/src/plugin";

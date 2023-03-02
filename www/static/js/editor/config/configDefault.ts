@@ -173,7 +173,15 @@ export function getDefault(config: EditorDefaultConfig) {
             {
                 label: "Insert",
                 icon: "plus",
-                items: ["insertImage", "mediaEmbed", "insertTable", "specialCharacters", "emoji", "horizontalLine"],
+                items: [
+                    "insertImage",
+                    "mediaEmbed",
+                    "resource",
+                    "insertTable",
+                    "specialCharacters",
+                    "emoji",
+                    "horizontalLine",
+                ],
             },
             "|",
             {
@@ -190,7 +198,6 @@ export function getDefault(config: EditorDefaultConfig) {
             "findAndReplace",
             "|",
             "sourceEditing",
-            "resource",
         ],
         style: {
             // the list of styles provided: https://ckeditor.com/docs/ckeditor5/latest/features/style.html
