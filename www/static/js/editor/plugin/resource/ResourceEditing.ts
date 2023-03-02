@@ -5,7 +5,7 @@
 
 import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
 import InsertResourceCommand from "./InsertResourceCommand";
-import { getDataAttributes } from "./resourceConfig";
+import { getDataAttributes } from "./resourceUtils";
 
 export default class ResourceEditing extends Plugin {
     /**
