@@ -1,0 +1,44 @@
+/**
+ * Returns the setting for the mediaEmbed plugin, which rely primarily
+ * on our use of iframely to embed media.
+ */
+
+const IFRAME_SRC = "//cdn.iframe.ly/api/iframe";
+const API_KEY = "94aa8fc28ac1089a2dfb28";
+
+/**
+ * Returns the settings for the mediaEmbed plugin.
+ *
+ * @returns { object } - the media embed settings
+ */
+export function getMediaEmbedSettings() {
+    return {
+        // Configure 'mediaEmbed' with Iframely previews.
+        mediaEmbed: {
+            // Previews are always enabled if there’s a provider for a URL (below regex catches all URLs)
+            // By default `previewsInData` are disabled, but let’s set it to `false` explicitely to be sure
+            previewsInData: false,
+            providers: [
+                {
+                    name: "iframely previews", // hint: this is just for previews. Get actual HTML codes by making API calls from your CMS
+                    url: /.+/, // Match all URLs or just the ones you need
+                    html: (match: string) => {
+                        const url = match[0];
+                        const iframeUrl = `${IFRAME_SRC}?app=1&api_key=${API_KEY}&url=${encodeURIComponent(url)}`;
+                        // alternatively, use &key= instead of &api_key with the MD5 hash of your api_key
+                        // more about it: https://iframely.com/docs/allow-origins
+                        return (
+                            // If you need, set maxwidth and other styles for 'iframely-embed' class - it's yours to customize
+                            `<div class="iframely-embed">
+                                <div class="iframely-responsive">
+                                    <iframe src="${iframeUrl}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen>
+                                    </iframe>
+                                </div>
+                            </div>`
+                        );
+                    },
+                },
+            ],
+        },
+    };
+}

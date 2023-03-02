@@ -57,6 +57,9 @@ import SourceEditing from "@ckeditor/ckeditor5-source-editing/src/sourceediting"
 import WordCount from "@ckeditor/ckeditor5-word-count/src/wordcount";
 import UploadAdapter from "../plugin/UploadAdapter";
 import { getDefaultColors } from "@js/editor/config/configDefaultColors";
+import { getTokensPlugins } from "@js/editor/plugin/tokensPlugins";
+import { getMediaEmbedSettings } from "@js/editor/settings/mediaEmbedSettings";
+import { getTokensSettings } from "@js/editor/settings/tokensSettings";
 
 /**
  * Add our custom upload adapter
@@ -69,15 +72,18 @@ function UploadAdapterPlugin(editor) {
     };
 }
 
-const IFRAME_SRC = "//cdn.iframe.ly/api/iframe";
-const API_KEY = "94aa8fc28ac1089a2dfb28";
+export interface EditorDefaultConfig {
+    targetElements: string[]; // the elements to target for the editor
+    hasTokens?: boolean; // whether or not to enable the tokens plugin
+}
 
 /**
  * Return the default configuration
  *
+ * @param { EditorDefaultConfig } config - the default config
  * @returns { EditorConfig } - refer to https://ckeditor.com/docs/ckeditor5/latest/api/module_core_editor_editorconfig-EditorConfig.html
  */
-export function getDefault() {
+export function getDefault(config: EditorDefaultConfig) {
     return {
         plugins: [
             // list all the plugins we'll use in the editor
@@ -131,6 +137,7 @@ export function getDefault() {
             FindAndReplace,
             SourceEditing,
             WordCount,
+            ...getTokensPlugins(config),
         ],
         extraPlugins: [UploadAdapterPlugin],
         toolbar: [
@@ -282,33 +289,6 @@ export function getDefault() {
                 "resizeImage",
             ],
         },
-        // Configure 'mediaEmbed' with Iframely previews.
-        mediaEmbed: {
-            // Previews are always enabled if there’s a provider for a URL (below regex catches all URLs)
-            // By default `previewsInData` are disabled, but let’s set it to `false` explicitely to be sure
-            previewsInData: false,
-            providers: [
-                {
-                    name: "iframely previews", // hint: this is just for previews. Get actual HTML codes by making API calls from your CMS
-                    url: /.+/, // Match all URLs or just the ones you need
-                    html: (match: string) => {
-                        const url = match[0];
-                        const iframeUrl = `${IFRAME_SRC}?app=1&api_key=${API_KEY}&url=${encodeURIComponent(url)}`;
-                        // alternatively, use &key= instead of &api_key with the MD5 hash of your api_key
-                        // more about it: https://iframely.com/docs/allow-origins
-                        return (
-                            // If you need, set maxwidth and other styles for 'iframely-embed' class - it's yours to customize
-                            `<div class="iframely-embed">
-                                <div class="iframely-responsive">
-                                    <iframe src="${iframeUrl}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen>
-                                    </iframe>
-                                </div>
-                            </div>`
-                        );
-                    },
-                },
-            ],
-        },
         table: {
             // the table controls provided: https://ckeditor.com/docs/ckeditor5/latest/features/table.html
             contentToolbar: [
@@ -341,5 +321,7 @@ export function getDefault() {
                 "Verdana, Geneva, sans-serif",
             ],
         },
+        ...getMediaEmbedSettings(),
+        ...getTokensSettings(config),
     };
 }

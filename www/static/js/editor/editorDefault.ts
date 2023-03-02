@@ -3,7 +3,7 @@
  */
 
 import ClassicEditor from "@ckeditor/ckeditor5-editor-classic/src/classiceditor";
-import { getDefault } from "@js/editor/config/configDefault";
+import { getDefault, EditorDefaultConfig } from "@js/editor/config/configDefault";
 import CKEditorInspector from "@ckeditor/ckeditor5-inspector";
 import { insertElementAfter, injectScript } from "@js/util/domUtils";
 import "@js/editor/styles/editor.css"; // to overwrite some of the styles
@@ -36,6 +36,17 @@ function removeValidation() {
 }
 
 /**
+ * Add the editor to the global scope so it can be accessed
+ * in other twig files etc
+ *
+ * @param { CKEditor } editor - the CKEditor instance
+ * @param { string } elementId - the id to reference the editor by
+ */
+function addEditorToGlobalScope(editor, elementId) {
+    window.sbProps.editorInstances[elementId] = editor;
+}
+
+/**
  * Add the iFramely embed code in order for iframe embeds to work
  * For more info: https://iframely.com/docs/ckeditor
  */
@@ -52,6 +63,7 @@ async function addIframelyEmbed() {
 async function onEditorCreated(textarea: HTMLTextAreaElement, editor) {
     insertWordCount(textarea, editor);
     removeValidation();
+    addEditorToGlobalScope(editor, textarea.id);
     await addIframelyEmbed();
     CKEditorInspector.attach(editor);
     document.dispatchEvent(
@@ -67,10 +79,11 @@ async function onEditorCreated(textarea: HTMLTextAreaElement, editor) {
 /**
  * create the ckeditor instance
  *
+ * @param { EditorDefaultConfig } config - the config to use when creating the editor
  * @param { HTMLTextAreaElement } textarea - the textarea the CKEditor will replace
  */
-function createEditor(textarea: HTMLTextAreaElement) {
-    ClassicEditor.create(textarea, getDefault())
+function createEditor(textarea: HTMLTextAreaElement, config: EditorDefaultConfig) {
+    ClassicEditor.create(textarea, getDefault(config))
         .then((editor) => {
             onEditorCreated(textarea, editor);
         })
@@ -85,11 +98,12 @@ function createEditor(textarea: HTMLTextAreaElement) {
  * @param { CustomEvent } event - the custom event
  */
 function onCreate(event: CustomEvent) {
-    const targetElements = event.detail.targetElements as string[];
+    const config = event.detail as EditorDefaultConfig;
+    const { targetElements } = config;
     targetElements.forEach((targetElement) => {
         // assume that each targetElement could contain multiple instances
         document.querySelectorAll(targetElement).forEach((textarea) => {
-            createEditor(textarea as HTMLTextAreaElement);
+            createEditor(textarea as HTMLTextAreaElement, config);
         });
     });
 }

@@ -13,6 +13,9 @@
     --ck-color-base-border: var(--form-border-color);
     /* Button hover colour */
     --ck-color-button-default-hover-background: var(--form-bg-hover-color);
+    /* Change the colour of the mentions */
+    --ck-color-mention-background: var(--accent-background);
+    --ck-color-mention-text: #222222;
 }
 
 /**

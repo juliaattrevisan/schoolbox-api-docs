@@ -135,7 +135,7 @@ module.exports = {
 
             "./www/static/js/calendar/jquery.getExportCalendarLink.js",
 
-            "./www/static/js/global/sb_props.js",
+            "./www/static/js/global/sbProps.js",
         ],
         spectrum: {
             import: [
