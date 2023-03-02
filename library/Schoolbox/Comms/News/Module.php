@@ -28,6 +28,7 @@ use Schoolbox\Permission\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
+use Schoolbox\Comms\News\Audience\Segment\Strategy;
 
 class Module extends BaseModule
 {
@@ -62,7 +63,22 @@ class Module extends BaseModule
                 new Rule\Any(
                     new Rule\IsSuperuser(),
                     new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_WRITE),
-                    new Authorizer\Rule\HasAudiencesAvailable($this->getStrategyFactory()->makeAllSimpleStrategies(), $db)
+                    new Authorizer\Rule\HasAudiencesAvailable($this->getStrategyFactory()->makeAllSimpleStrategies(), $db),
+                    // check homepage write access, to make this rule match $canCreateInFolder
+                    new Rule\HasHomepageAccess(
+                        UserAccess::ACCESS_WRITE,
+                        function ($params) {
+                            $query = $this->injector->get('webFactory')->newRequest()->query;
+                            if (
+                                $query->get(Querystring::ENTITY_TYPE) === Strategy\Folder::getEntityType()
+                                && $query->get(Querystring::FOLDER)
+                            ) {
+                                return $query->get(Querystring::FOLDER);
+                            }
+                            throw new Unauthorized();
+                        },
+                        Access\Access::getInstance()
+                    )
                 )
             );
         });
