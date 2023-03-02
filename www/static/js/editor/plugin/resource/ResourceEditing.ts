@@ -5,7 +5,7 @@
 
 import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
 import InsertResourceCommand from "./InsertResourceCommand";
-import { getDataAttributes } from "./resourceUtils";
+import { getExtraAttributes } from "./resourceUtils";
 
 export default class ResourceEditing extends Plugin {
     /**
@@ -25,22 +25,22 @@ export default class ResourceEditing extends Plugin {
     updateSchema() {
         const schema = this.editor.model.schema;
         schema.extend("imageBlock", {
-            allowAttributes: [...getDataAttributes()],
+            allowAttributes: [...getExtraAttributes()],
         });
         schema.extend("imageInline", {
-            allowAttributes: [...getDataAttributes()],
+            allowAttributes: [...getExtraAttributes()],
         });
     }
 
     /**
-     * Define the converters for the data attributes, so that they are translated from the model to the view (downcast) and vice versa (upcast)
+     * Define the converters for the extra attributes, so that they are translated from the model to the view (downcast) and vice versa (upcast)
      * https://ckeditor.com/docs/ckeditor5/latest/api/module_engine_conversion_conversion-Conversion.html
      */
     defineConverters() {
         const conversion = this.editor.conversion;
 
-        const dataAttributes = getDataAttributes();
-        dataAttributes.forEach((attribute) => {
+        const attributes = getExtraAttributes();
+        attributes.forEach((attribute) => {
             conversion.for("downcast").attributeToAttribute({
                 model: {
                     name: "imageBlock",
