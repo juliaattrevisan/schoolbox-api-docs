@@ -56,10 +56,14 @@ import FindAndReplace from "@ckeditor/ckeditor5-find-and-replace/src/findandrepl
 import SourceEditing from "@ckeditor/ckeditor5-source-editing/src/sourceediting";
 import WordCount from "@ckeditor/ckeditor5-word-count/src/wordcount";
 import UploadAdapter from "../plugin/UploadAdapter";
-import { getDefaultColors } from "@js/editor/config/configDefaultColors";
 import { getTokensPlugins } from "@js/editor/plugin/tokensPlugins";
 import { getMediaEmbedSettings } from "@js/editor/settings/mediaEmbedSettings";
 import { getTokensSettings } from "@js/editor/settings/tokensSettings";
+import { getStyleSettings } from "@js/editor/settings/styleSettings";
+import { getImageSettings } from "@js/editor/settings/imageSettings";
+import { getTableSettings } from "@js/editor/settings/tableSettings";
+import { getHeadingSettings } from "@js/editor/settings/getHeadingSettings";
+import { getFontSettings } from "@js/editor/settings/getFontSettings";
 import Resource from "../plugin/resource/Resource";
 
 /**
@@ -198,140 +202,11 @@ export function getDefault(config: EditorDefaultConfig) {
             "|",
             "sourceEditing",
         ],
-        style: {
-            // the list of styles provided: https://ckeditor.com/docs/ckeditor5/latest/features/style.html
-            definitions: [
-                {
-                    name: "Small",
-                    element: "small",
-                    classes: [""],
-                },
-                {
-                    name: "Typewriter",
-                    element: "tt",
-                    classes: [""],
-                },
-                /* {
-                    name: "Computer Code",
-                    element: "code",
-                    classes: [""],
-                }, */
-                {
-                    name: "Highlighted Note",
-                    element: "span",
-                    classes: ["highlighted-note"],
-                },
-                {
-                    name: "Banner",
-                    element: "p",
-                    classes: ["s-banner"],
-                },
-                {
-                    name: "Info Callout",
-                    element: "p",
-                    classes: ["s-callout", "s-callout--info"],
-                },
-                {
-                    name: "Warning Callout",
-                    element: "p",
-                    classes: ["s-callout", "s-callout--warning"],
-                },
-                {
-                    name: "Success Callout",
-                    element: "p",
-                    classes: ["s-callout", "s-callout--success"],
-                },
-                {
-                    name: "Target Callout",
-                    element: "p",
-                    classes: ["s-callout", "s-callout--target"],
-                },
-                {
-                    name: "Question Callout",
-                    element: "p",
-                    classes: ["s-callout", "s-callout--question"],
-                },
-                {
-                    name: "Sticky Note",
-                    element: "p",
-                    classes: ["s-sticky-note"],
-                },
-                {
-                    name: "Construction",
-                    element: "p",
-                    classes: ["s-construction"],
-                },
-                { name: "Code block", element: "p", classes: ["s-code-block"] },
-            ],
-        },
-        heading: {
-            // the list of headings provided: https://ckeditor.com/docs/ckeditor5/latest/features/headings.html
-            options: [
-                { model: "paragraph", title: "Paragraph", class: "ck-heading_paragraph" },
-                { model: "heading2", view: "h2", title: "Heading 2", class: "ck-heading_heading2" },
-                { model: "heading3", view: "h3", title: "Heading 3", class: "ck-heading_heading3" },
-                { model: "heading4", view: "h4", title: "Heading 4", class: "ck-heading_heading4" },
-                { model: "heading5", view: "h5", title: "Heading 5", class: "ck-heading_heading5" },
-            ],
-        },
-        image: {
-            // image setup: https://ckeditor.com/docs/ckeditor5/latest/features/images/images-overview.html
-            toolbar: [
-                "imageTextAlternative",
-                "toggleImageCaption",
-                "linkImage",
-                "|",
-                "imageStyle:inline",
-                {
-                    name: "imageStyle:wrapText",
-                    title: "Wrap text",
-                    items: ["imageStyle:alignLeft", "imageStyle:alignRight"],
-                    defaultItem: "imageStyle:alignLeft",
-                },
-                {
-                    name: "imageStyle:breakText",
-                    title: "Break text",
-                    items: ["imageStyle:alignBlockLeft", "imageStyle:block", "imageStyle:alignBlockRight"],
-                    defaultItem: "imageStyle:block",
-                },
-                "imageStyle:side",
-                "|",
-                "resizeImage",
-            ],
-        },
-        table: {
-            // the table controls provided: https://ckeditor.com/docs/ckeditor5/latest/features/table.html
-            contentToolbar: [
-                "tableColumn",
-                "tableRow",
-                "mergeTableCells",
-                "tableProperties",
-                "tableCellProperties",
-                "toggleTableCaption",
-            ],
-        },
-        fontColor: {
-            columns: 12,
-            colors: getDefaultColors(),
-        },
-        fontBackgroundColor: {
-            columns: 12,
-            colors: getDefaultColors(),
-        },
-        fontFamily: {
-            options: [
-                "default",
-                "Arial, Helvetica, sans-serif",
-                "Comic Sans MS, Comic Sans, cursive",
-                "Courier New, Courier, monospace",
-                "Georgia, serif",
-                "Lucida Sans Unicode, Lucida Grande, sans-serif",
-                "Tahoma, Geneva, sans-serif",
-                "Times New Roman, Times, serif",
-                "Trebuchet MS, Helvetica, sans-serif",
-                "Verdana, Geneva, sans-serif",
-            ],
-        },
+        ...getFontSettings(),
+        ...getStyleSettings(),
+        ...getHeadingSettings(),
+        ...getImageSettings(),
+        ...getTableSettings(),
         ...getMediaEmbedSettings(),
         ...getTokensSettings(config),
     };
