@@ -31,17 +31,7 @@ import MediaEmbed from "@ckeditor/ckeditor5-media-embed/src/mediaembed";
 import Table from "@ckeditor/ckeditor5-table/src/table";
 import SpecialCharacters from "@ckeditor/ckeditor5-special-characters/src/specialcharacters";
 import SpecialCharactersEssentials from "@ckeditor/ckeditor5-special-characters/src/specialcharactersessentials";
-import {
-    Emoji,
-    EmojiActivity,
-    EmojiFlags,
-    EmojiFood,
-    EmojiNature,
-    EmojiObjects,
-    EmojiPeople,
-    EmojiPlaces,
-    EmojiSymbols,
-} from "@phudak/ckeditor5-emoji/src";
+import { getEmojiPlugins } from "@js/editor/plugin/emojiPlugins";
 import HorizontalLine from "@ckeditor/ckeditor5-horizontal-line/src/horizontalline";
 import TableToolbar from "@ckeditor/ckeditor5-table/src/tabletoolbar";
 import TableProperties from "@ckeditor/ckeditor5-table/src/tableproperties";
@@ -55,7 +45,7 @@ import Alignment from "@ckeditor/ckeditor5-alignment/src/alignment";
 import FindAndReplace from "@ckeditor/ckeditor5-find-and-replace/src/findandreplace";
 import SourceEditing from "@ckeditor/ckeditor5-source-editing/src/sourceediting";
 import WordCount from "@ckeditor/ckeditor5-word-count/src/wordcount";
-import UploadAdapter from "../plugin/UploadAdapter";
+import UploadAdapter from "@js/editor/plugin/UploadAdapter";
 import { getTokensPlugins } from "@js/editor/plugin/tokensPlugins";
 import { getMediaEmbedSettings } from "@js/editor/settings/mediaEmbedSettings";
 import { getTokensSettings } from "@js/editor/settings/tokensSettings";
@@ -64,7 +54,7 @@ import { getImageSettings } from "@js/editor/settings/imageSettings";
 import { getTableSettings } from "@js/editor/settings/tableSettings";
 import { getHeadingSettings } from "@js/editor/settings/getHeadingSettings";
 import { getFontSettings } from "@js/editor/settings/getFontSettings";
-import Resource from "../plugin/resource/Resource";
+import Resource from "@js/editor/plugin/resource/Resource";
 
 /**
  * Add our custom upload adapter
@@ -125,15 +115,6 @@ export function getDefault(config: EditorDefaultConfig) {
             TableCaption,
             SpecialCharacters,
             SpecialCharactersEssentials,
-            Emoji,
-            EmojiPeople,
-            EmojiNature,
-            EmojiFood,
-            EmojiPlaces,
-            EmojiActivity,
-            EmojiObjects,
-            EmojiSymbols,
-            EmojiFlags,
             HorizontalLine,
             Link,
             List,
@@ -142,8 +123,9 @@ export function getDefault(config: EditorDefaultConfig) {
             FindAndReplace,
             SourceEditing,
             WordCount,
-            ...getTokensPlugins(config),
             Resource,
+            ...getEmojiPlugins(),
+            ...getTokensPlugins(config),
         ],
         extraPlugins: [UploadAdapterPlugin],
         toolbar: [
