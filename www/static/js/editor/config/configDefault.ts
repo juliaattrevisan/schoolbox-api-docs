@@ -60,7 +60,6 @@ import { getDefaultColors } from "@js/editor/config/configDefaultColors";
 import { getTokensPlugins } from "@js/editor/plugin/tokensPlugins";
 import { getMediaEmbedSettings } from "@js/editor/settings/mediaEmbedSettings";
 import { getTokensSettings } from "@js/editor/settings/tokensSettings";
-
 import Resource from "../plugin/resource/Resource";
 
 /**
@@ -140,7 +139,7 @@ export function getDefault(config: EditorDefaultConfig) {
             SourceEditing,
             WordCount,
             ...getTokensPlugins(config),
-            SchoolboxResource,
+            Resource,
         ],
         extraPlugins: [UploadAdapterPlugin],
         toolbar: [

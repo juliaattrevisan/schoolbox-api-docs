@@ -26,10 +26,9 @@ function displayResourceModal() {
  *
  * See www/static/js/editor/jquery.proxy-replacement.js for how this occurs
  *
- * @param { Editor } editor - The editor instance
  * @param { string } hash - the hash of the stored file
  */
-async function getResourceInfo(editor, hash: string) {
+async function getResourceInfo(hash: string) {
     try {
         const response = await fetch(`/editor/nodeInfo.php?identifier=${hash}`, {
             headers: {
@@ -51,9 +50,9 @@ async function getResourceInfo(editor, hash: string) {
  * Handle the returned resource from the resource modal
  *
  * @param { MessageEvent } event - the event
- * @param { Editor } editor - the editor instance
  */
-function onResourceReturned(event: MessageEvent, editor) {
+function onResourceReturned(event: MessageEvent) {
+    window.removeEventListener("message", onResourceReturned);
     let message;
     try {
         message = JSON.parse(event.data);
@@ -62,7 +61,7 @@ function onResourceReturned(event: MessageEvent, editor) {
     }
     if (message.data != undefined) {
         if (0 in message.data && "hash" in message.data[0]) {
-            getResourceInfo(editor, message.data[0].hash as string);
+            getResourceInfo(message.data[0].hash as string);
         } else {
             // The file was rejected, probably cause it was the wrong mimetype.
             // Do nothing
@@ -72,14 +71,17 @@ function onResourceReturned(event: MessageEvent, editor) {
     }
 }
 
+let editor; // the editor instance
+
 export default class InsertResourceCommand extends Command {
     /**
      * display the resource modal and listen for if a resource is returned
      */
     execute() {
+        editor = this.editor;
         displayResourceModal();
         window.removeEventListener("message", onResourceReturned);
-        window.addEventListener("message", (event) => onResourceReturned(event, this.editor));
+        window.addEventListener("message", onResourceReturned);
     }
 
     /**
