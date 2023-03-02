@@ -146,15 +146,8 @@
                     <p><a href="{{ archiveRoute ~ '?' ~archiveRouteSuffix }}">View the {{ locale.news }} archive.</a></p>
                 {% endif %}
             {% else %}
-                {% set createNewsQuerystringParams = [
-                    'groupId=' ~ folderId,
-                    'type=folder'
-                ]|join('&') %}
-
-                {% set createRouteFullPath = createRoute ~ "?" ~ createNewsQuerystringParams %}
-
                 {% set emptyStateMessage = [
-                    '<a href="'~ createRouteFullPath ~ '">Post a ' ~ locale.news ~ ' article</a> to share new information on this homepage'
+                    '<a href="'~ createRoute ~ '">Post a ' ~ locale.news ~ ' article</a> to share new information on this homepage'
                 ] %}
 
                 {% if archiveRoute and showArchiveNewsLink %}
