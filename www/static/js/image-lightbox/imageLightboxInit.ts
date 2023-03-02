@@ -6,6 +6,7 @@ import { checkForLightGallery } from "@js/image-lightbox/imageLightboxUtils";
 
 const imageLightboxDefaults = {
     plugins: [lgAutoplay, lgFullScreen, lgVideo],
+    licenseKey: "B3EFE861-7F3F-43AA-9B2C-98540F09D470",
     speed: 0,
 };
 
