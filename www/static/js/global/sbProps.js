@@ -23,5 +23,4 @@ window.sbProps = {
         showInitial: true,
         showInput: true,
     },
-    editorInstances: {}, // we still need to be able to access our CKEditor instances from outside bundle scope
 };

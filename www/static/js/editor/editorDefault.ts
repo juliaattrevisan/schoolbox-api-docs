@@ -36,17 +36,6 @@ function removeValidation() {
 }
 
 /**
- * Add the editor to the global scope so it can be accessed
- * in other twig files etc
- *
- * @param { CKEditor } editor - the CKEditor instance
- * @param { string } elementId - the id to reference the editor by
- */
-function addEditorToGlobalScope(editor, elementId) {
-    window.sbProps.editorInstances[elementId] = editor;
-}
-
-/**
  * Add the iFramely embed code in order for iframe embeds to work
  * For more info: https://iframely.com/docs/ckeditor
  */
@@ -63,10 +52,9 @@ async function addIframelyEmbed() {
 async function onEditorCreated(textarea: HTMLTextAreaElement, editor) {
     insertWordCount(textarea, editor);
     removeValidation();
-    addEditorToGlobalScope(editor, textarea.id);
     await addIframelyEmbed();
     CKEditorInspector.attach(editor);
-    document.dispatchEvent(
+    textarea.dispatchEvent(
         new CustomEvent("EDITOR__CREATED", {
             detail: {
                 editor,
