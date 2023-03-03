@@ -4,6 +4,15 @@
     $(function() {
 
         /**
+         * Demonstrates how the editor instance can be accssed once it's been created
+         */
+        document.getElementById("defaultCKEditor").addEventListener("EDITOR__CREATED", onEditorCreated);
+        function onEditorCreated(event) {
+            const editor = event.detail.editor;
+            editor.setData('<p>Some <strong>sample</strong> text added after the editor is initiated</p>');
+        }
+
+        /**
          * Initialise the editor
          */
         document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {

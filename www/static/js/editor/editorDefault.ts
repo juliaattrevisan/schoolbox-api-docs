@@ -3,45 +3,11 @@
  */
 
 import ClassicEditor from "@ckeditor/ckeditor5-editor-classic/src/classiceditor";
-import { getDefault, EditorDefaultConfig } from "@js/editor/config/configDefault";
+import { getDefault } from "@js/editor/config/configDefault";
+import { EditorDefaultConfig } from "@js/editor/types/editorTypes";
+import { insertWordCount, removeValidation, addIframelyEmbed } from "@js/editor/util/editorUtils";
 import CKEditorInspector from "@ckeditor/ckeditor5-inspector";
-import { insertElementAfter, injectScript } from "@js/util/domUtils";
 import "@js/editor/styles/editor.css"; // to overwrite some of the styles
-
-/**
- * Add the word count UI to the bottom of the editor
- * Its assumed this method is called once the editor has been created,
- * so editorTextArea.nextSibling will be the newly created editor instance
- *
- * @param { HTMLTextAreaElement } textarea - the textarea the CKEditor has replaced
- * @param { CKEditor } editor - the CKEditor instance
- */
-function insertWordCount(textarea: HTMLTextAreaElement, editor) {
-    const wordCountPlugin = editor.plugins.get("WordCount");
-    insertElementAfter(textarea.nextSibling, wordCountPlugin.wordCountContainer);
-}
-
-/**
- * Prevent jquery.validator trying to access ckeditor instances
- * as it throws an error on focus in / out
- *
- * @todo - review this, there may be a better way to handle this
- */
-function removeValidation() {
-    $("form").each(function () {
-        if ($(this).data("validator")) {
-            $(this).data("validator").settings.ignore = ".ck";
-        }
-    });
-}
-
-/**
- * Add the iFramely embed code in order for iframe embeds to work
- * For more info: https://iframely.com/docs/ckeditor
- */
-async function addIframelyEmbed() {
-    await injectScript("//cdn.iframe.ly/embed.js?cancel=0");
-}
 
 /**
  * Add in any additional setup required and then dispatch that the editor is ready

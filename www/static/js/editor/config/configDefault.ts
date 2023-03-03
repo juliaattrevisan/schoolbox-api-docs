@@ -52,8 +52,9 @@ import { getTokensSettings } from "@js/editor/settings/tokensSettings";
 import { getStyleSettings } from "@js/editor/settings/styleSettings";
 import { getImageSettings } from "@js/editor/settings/imageSettings";
 import { getTableSettings } from "@js/editor/settings/tableSettings";
-import { getHeadingSettings } from "@js/editor/settings/getHeadingSettings";
-import { getFontSettings } from "@js/editor/settings/getFontSettings";
+import { getHeadingSettings } from "@js/editor/settings/headingSettings";
+import { getFontSettings } from "@js/editor/settings/fontSettings";
+import { EditorDefaultConfig } from "@js/editor/types/editorTypes";
 import Resource from "@js/editor/plugin/resource/Resource";
 
 /**
@@ -65,11 +66,6 @@ function UploadAdapterPlugin(editor) {
     editor.plugins.get("FileRepository").createUploadAdapter = (loader) => {
         return new UploadAdapter(loader);
     };
-}
-
-export interface EditorDefaultConfig {
-    targetElements: string[]; // the elements to target for the editor
-    hasTokens?: boolean; // whether or not to enable the tokens plugin
 }
 
 /**
