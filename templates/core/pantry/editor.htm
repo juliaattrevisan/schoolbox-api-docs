@@ -4,20 +4,39 @@
     $(function() {
 
         /**
-         * Demonstrates how the editor instance can be accssed once it's been created
+         * Demonstrates how the default editor instance can be accssed once it's been created
          */
-        document.getElementById("defaultCKEditor").addEventListener("EDITOR__CREATED", onEditorCreated);
-        function onEditorCreated(event) {
+        document.getElementById("defaultCKEditor").addEventListener("EDITOR__CREATED", onDefaultEditorCreated);
+        function onDefaultEditorCreated(event) {
             const editor = event.detail.editor;
-            editor.setData('<p>Some <strong>sample</strong> text added after the editor is initiated</p>');
+            editor.setData("<p>Some <strong>sample</strong> text added after the editor is initiated</p>");
         }
 
         /**
-         * Initialise the editor
+         * Initialise the default editor
          */
         document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
             detail: {
                 targetElements: ['#defaultCKEditor'],
+            }
+        }));
+
+        /**
+         * Demonstrates how the comment editor instance can be accssed once it's been created
+         */
+        document.getElementById("commentCKEditor").addEventListener("EDITOR__CREATED", onCommentEditorCreated);
+        function onCommentEditorCreated(event) {
+            const editor = event.detail.editor;
+            editor.setData("<p>Here is a comment. Blah blah blah</p>");
+        }
+
+        /**
+         * Initialise the comment editor
+         */
+        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+            detail: {
+                targetElements: ['#commentCKEditor'],
+                isComment: true,
             }
         }));
 
@@ -59,7 +78,7 @@
 
 <div class="row">
     <div class="small-12 columns">
-        <h2 class="subheader">Schoolbox CKE Wrapper</h2>
+        <h2 class="subheader">Default Editor</h2>
         <p class="meta">
             This is the default usage of our ckeditor. There are a few special plugins that we made for our Mr Matt Modal:
             Link, Embed Video/Audio, Iframe. You can test their usage here.
@@ -70,7 +89,28 @@
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <textarea id='defaultCKEditor' name='defaultCKEditor' rows="10"></textarea>
+                        <textarea id='defaultCKEditor'></textarea>
+                    </div>
+                </fieldset>
+            </section>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 columns">
+        <h2 class="subheader">Comment Editor</h2>
+        <p class="meta">
+            This is the comment usage of our ckeditor. There are a few special plugins that we made for our Mr Matt Modal:
+            Link, Embed Video/Audio, Iframe. You can test their usage here.
+        </p>
+    </div>
+    <div class="small-12 island">
+        <form action="/testAjax.php" method="post">
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <textarea id='commentCKEditor'></textarea>
                     </div>
                 </fieldset>
             </section>
