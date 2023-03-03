@@ -27,7 +27,7 @@ import Alignment from "@ckeditor/ckeditor5-alignment/src/alignment";
 import FindAndReplace from "@ckeditor/ckeditor5-find-and-replace/src/findandreplace";
 import SourceEditing from "@ckeditor/ckeditor5-source-editing/src/sourceediting";
 import WordCount from "@ckeditor/ckeditor5-word-count/src/wordcount";
-import UploadAdapter from "@js/editor/plugin/UploadAdapter";
+import UploadAdapterPlugin from "@js/editor/plugin/UploadAdapterPlugin";
 import { getMediaEmbedSettings } from "@js/editor/settings/mediaEmbedSettings";
 import { getTokensSettings } from "@js/editor/settings/tokensSettings";
 import { getStyleSettings } from "@js/editor/settings/styleSettings";
@@ -37,17 +37,6 @@ import { getHeadingSettings } from "@js/editor/settings/headingSettings";
 import { getFontSettings } from "@js/editor/settings/fontSettings";
 import { EditorDefaultConfig } from "@js/editor/types/editorTypes";
 import Resource from "@js/editor/plugin/resource/Resource";
-
-/**
- * Add our custom upload adapter
- *
- * @param { CKEditor } editor - the CKEditor instance
- */
-function UploadAdapterPlugin(editor) {
-    editor.plugins.get("FileRepository").createUploadAdapter = (loader) => {
-        return new UploadAdapter(loader);
-    };
-}
 
 /**
  * Return the default configuration
