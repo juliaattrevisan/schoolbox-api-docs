@@ -60,7 +60,6 @@ async function getResourceInfo(hash: string) {
  * @param { MessageEvent } event - the event
  */
 function onResourceReturned(event: MessageEvent) {
-    window.removeEventListener("message", onResourceReturned);
     let message;
     try {
         message = JSON.parse(event.data);
@@ -69,13 +68,14 @@ function onResourceReturned(event: MessageEvent) {
     }
     if (message.data != undefined) {
         if (0 in message.data && "hash" in message.data[0]) {
+            window.removeEventListener("message", onResourceReturned);
             getResourceInfo(message.data[0].hash as string);
         } else {
             // The file was rejected, probably cause it was the wrong mimetype.
             // Do nothing
         }
     } else {
-        // Connecting to your Google Drive
+        // Connecting to your Google Drive (event is fired when the drive is first accessed)
     }
 }
 
