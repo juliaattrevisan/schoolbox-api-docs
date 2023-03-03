@@ -263,7 +263,7 @@ module.exports = {
         typescriptTest: "./library/Schoolbox/Greenhouse/templates/ts/typescriptTest.ts",
 
         //CKEditor
-        editorDefault: "./www/static/js/editor/editorDefault.ts",
+        editor: "./www/static/js/editor/editor.ts",
 
         //Countdown
         countdown: "./www/static/js/countdown/countdown.ts", // For countdown component on homepage
@@ -271,7 +271,7 @@ module.exports = {
 
         //Sass
         core: "./www/static/css/core/core.scss",
-        editor: "./www/static/css/core/editor.scss",
+        // editor: "./www/static/css/core/editor.scss",
 
         // Slideshow
         slideshow: "./www/static/js/slideshow/slideshow.ts",

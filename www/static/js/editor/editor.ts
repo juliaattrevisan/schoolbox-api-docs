@@ -15,7 +15,7 @@ import "@js/editor/styles/editor.css"; // to overwrite some of the styles
  * @param { HTMLTextAreaElement } textarea - the textarea the CKEditor will replace
  * @param { CKEditor } editor - the CKEditor instance
  */
-async function onEditorCreated(textarea: HTMLTextAreaElement, editor) {
+async function onCreated(textarea: HTMLTextAreaElement, editor) {
     insertWordCount(textarea, editor);
     removeValidation();
     await addIframelyEmbed();
@@ -36,10 +36,10 @@ async function onEditorCreated(textarea: HTMLTextAreaElement, editor) {
  * @param { EditorDefaultConfig } config - the config to use when creating the editor
  * @param { HTMLTextAreaElement } textarea - the textarea the CKEditor will replace
  */
-function createEditor(textarea: HTMLTextAreaElement, config: EditorDefaultConfig) {
+function create(textarea: HTMLTextAreaElement, config: EditorDefaultConfig) {
     ClassicEditor.create(textarea, getDefault(config))
         .then((editor) => {
-            onEditorCreated(textarea, editor);
+            onCreated(textarea, editor);
         })
         .catch((error) => {
             console.error(error.stack);
@@ -57,7 +57,7 @@ function onCreate(event: CustomEvent) {
     targetElements.forEach((targetElement) => {
         // assume that each targetElement could contain multiple instances
         document.querySelectorAll(targetElement).forEach((textarea) => {
-            createEditor(textarea as HTMLTextAreaElement, config);
+            create(textarea as HTMLTextAreaElement, config);
         });
     });
 }
