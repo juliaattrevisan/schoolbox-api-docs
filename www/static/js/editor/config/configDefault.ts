@@ -28,13 +28,14 @@ import FindAndReplace from "@ckeditor/ckeditor5-find-and-replace/src/findandrepl
 import SourceEditing from "@ckeditor/ckeditor5-source-editing/src/sourceediting";
 import WordCount from "@ckeditor/ckeditor5-word-count/src/wordcount";
 import UploadAdapterPlugin from "@js/editor/plugin/UploadAdapterPlugin";
-import { getMediaEmbedSettings } from "@js/editor/settings/mediaEmbedSettings";
-import { getTokensSettings } from "@js/editor/settings/tokensSettings";
+import { getLinkSettings } from "@js/editor/settings/linkSettings";
+import { getFontSettings } from "@js/editor/settings/fontSettings";
 import { getStyleSettings } from "@js/editor/settings/styleSettings";
+import { getHeadingSettings } from "@js/editor/settings/headingSettings";
 import { getImageSettings } from "@js/editor/settings/imageSettings";
 import { getTableSettings } from "@js/editor/settings/tableSettings";
-import { getHeadingSettings } from "@js/editor/settings/headingSettings";
-import { getFontSettings } from "@js/editor/settings/fontSettings";
+import { getMediaEmbedSettings } from "@js/editor/settings/mediaEmbedSettings";
+import { getTokensSettings } from "@js/editor/settings/tokensSettings";
 import { EditorDefaultConfig } from "@js/editor/types/editorTypes";
 import Resource from "@js/editor/plugin/resource/Resource";
 
@@ -131,6 +132,7 @@ export function getDefault(config: EditorDefaultConfig) {
             "|",
             "sourceEditing",
         ],
+        ...getLinkSettings(),
         ...getFontSettings(),
         ...getStyleSettings(),
         ...getHeadingSettings(),
