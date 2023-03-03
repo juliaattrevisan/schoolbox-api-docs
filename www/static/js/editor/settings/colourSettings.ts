@@ -23,7 +23,7 @@ function getSkinColours() {
  *
  * @returns { Array } - refer to https://ckeditor.com/docs/ckeditor5/latest/features/font.html#specifying-available-colors
  */
-export function getDefaultColors() {
+export function getColours() {
     return [
         ...getSkinColours(),
         { label: "Red 50", color: "#ffebee" },
