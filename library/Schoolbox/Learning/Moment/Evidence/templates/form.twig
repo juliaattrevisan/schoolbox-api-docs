@@ -79,8 +79,7 @@
 
 
 {# Set up CKEditor #}
-<script src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
-<script src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/bundle/editorDefault.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
 {% block formJs %}
@@ -121,21 +120,15 @@
 
     $(function () {
 
-        let editorId = 'evidence-body';
-
-        // Add the user token config.
-        // (Maybe only staff should get this, or only if there's more than one user?)
-        let baseConfig = {
-            targetElements: $('#' + editorId)
-        };
-        {% if USER.role.staff %}
-            $.fn.alaressEditor($.alaressEditorConfigWithUserTokens(baseConfig));
-        {% else %}
-            $.fn.alaressEditor(baseConfig);
-        {% endif %}
-
-        // Update the editor's form input on change
-        CKEDITOR.instances[editorId].on('change', CKEDITOR.instances[editorId].updateElement);
+        /**
+         * Initialise the editor, adding in the tokens if the user is staff
+         */
+        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+            detail: {
+                targetElements: ['#evidence-body'],
+                {% if USER.role.staff %}hasTokens: true,{% endif %}
+            }
+        }));
 
         /**
          * To determine whether a media recording has to be uploaded prior to continuing with form submission
