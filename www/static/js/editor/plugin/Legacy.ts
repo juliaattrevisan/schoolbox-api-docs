@@ -7,6 +7,10 @@ import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
 
 /**
  * Referenced from: https://github.com/ckeditor/ckeditor5/blob/96d53e7cfca358d54d4a154dd9f6fd7f5f2cc524/packages/ckeditor5-link/src/utils.js
+ *
+ * @param { string } id - the id to use as the anchor link
+ * @param { module:engine/conversion/downcastdispatcher~DowncastConversionApi } conversionApi - the conversion api
+ * @returns { module:engine/view/attributeelement~AttributeElement } - the link element
  */
 export function createLinkElement(id, { writer }) {
     const linkElement = writer.createAttributeElement("a", { id }, { priority: 5 });
