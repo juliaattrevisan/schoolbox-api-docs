@@ -264,7 +264,6 @@ module.exports = {
 
         //CKEditor
         editorDefault: "./www/static/js/editor/editorDefault.ts",
-        helloCKEditor: "./library/Schoolbox/Greenhouse/templates/ts/helloCKEditor.ts",
 
         //Countdown
         countdown: "./www/static/js/countdown/countdown.ts", // For countdown component on homepage
