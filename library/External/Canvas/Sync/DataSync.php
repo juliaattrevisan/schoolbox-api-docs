@@ -44,171 +44,71 @@ use UnexpectedValueException;
  */
 class DataSync
 {
-    /** @var IConnector */
-    private IConnector $canvasDb;
-
-    /** @var IConnector */
-    private IConnector $schoolboxDb;
-
-    /** @var External_ClassInterface */
-    private External_ClassInterface $externalClass;
-
-    /** @var External_UserInterface */
-    private External_UserInterface $externalUser;
-
-    /** @var MarkTypeMapper */
-    private MarkTypeMapper $markTypeMapper;
-
-    /** @var WorkType\Mapper */
-    private WorkType\Mapper $workTypeMapper;
-
-    /** @var Quiz\Mapper */
-    private Quiz\Mapper $quizMapper;
-
-    /** @var QuizSection\Mapper */
-    private QuizSection\Mapper $quizSectionMapper;
-
-    /** @var QuizQuestion\Mapper */
-    private QuizQuestion\Mapper $quizQuestionMapper;
-
-    /** @var QuestionType\Mapper */
-    private QuestionType\Mapper $quizQuestionTypeMapper;
-
-    /** @var QuizSolution\Mapper */
-    private QuizSolution\Mapper $quizSolutionMapper;
-
-    /** @var SubmissionBoxMapper */
-    private SubmissionBoxMapper $submissionBoxMapper;
-
-    /** @var Assessment\Mapper */
-    private Assessment\Mapper $assessmentMapper;
-
-    /** @var ReturnedWorkMapper */
-    private ReturnedWorkMapper $returnedWorkMapper;
-
-    /** @var Assessment\MapperProxy */
-    private Assessment\MapperProxy $assessmentDataSource;
-
-    /** @var Participant\Plan\Mapper */
-    private Participant\Plan\Mapper $planMapper;
-
-    /** @var Participant\Mapper */
-    private Participant\Mapper $participantMapper;
-
-    /** @var Folder\Mapper */
-    private Folder\Mapper $folderMapper;
-
-    /** @var UserMapper */
-    private UserMapper $userMapper;
-
-    /** @var CourseImpl\Mapper */
-    private CourseImpl\Mapper $courseImplMapper;
-
-    /** @var CourseImpl\Mapper */
-    private $courseSpecMapper;
-
-    /** @var UnitImpl\Mapper */
-    private UnitImpl\Mapper $unitImplMapper;
-
-    /** @var UnitImpl\Mapper */
-    private $unitSpecMapper;
-
-    /** @var IConfigLoader */
-    private IConfigLoader $config;
-
-    /** @var IConnector */
-    private $persist;
-
-    /** @var LoggerInterface */
-    private LoggerInterface $log;
-
     /** @var string */
     private string $siteSchoolCode;
 
     private string $schoolboxTimezone;
 
     /**
-     * @param IConnector              $canvasDb
-     * @param IConnector              $schoolboxDb
-     * @param External_ClassInterface $externalClass
-     * @param External_UserInterface  $externalUser
-     * @param MarkTypeMapper          $markTypeMapper
-     * @param WorkType\Mapper         $workTypeMapper
-     * @param Quiz\Mapper             $quizMapper
-     * @param QuizSection\Mapper      $quizSectionMapper
-     * @param QuizQuestion\Mapper     $quizQuestionMapper
-     * @param QuestionType\Mapper     $quizQuestionTypeMapper
-     * @param QuizSolution\Mapper     $quizSolutionMapper
-     * @param SubmissionBoxMapper     $submissionBoxMapper
-     * @param ReturnedWorkMapper      $returnedWorkMapper
-     * @param Assessment\MapperProxy  $assessmentDataSource
-     * @param Assessment\Mapper       $assessmentMapper
-     * @param Participant\Plan\Mapper $planMapper
-     * @param Participant\Mapper      $participantMapper
-     * @param Folder\Mapper           $folderMapper
-     * @param UserMapper              $userMapper
-     * @param CourseImpl\Mapper       $courseImplMapper
-     * @param CourseSpec\Mapper       $courseSpecMapper
-     * @param UnitImpl\Mapper         $unitImplMapper
-     * @param UnitSpec\Mapper         $unitSpecMapper
-     * @param IConfigLoader           $config
-     * @param bool                    $persist Whether to persist changes to schoolbox database
-     * @param LoggerInterface         $log
+     * @param IConnector                 $canvasDb
+     * @param IConnector                 $schoolboxDb
+     * @param External_ClassInterface    $externalClass
+     * @param External_UserInterface     $externalUser
+     * @param MarkTypeMapper             $markTypeMapper
+     * @param WorkType\Mapper            $workTypeMapper
+     * @param Quiz\Mapper                $quizMapper
+     * @param QuizSection\Mapper         $quizSectionMapper
+     * @param QuizQuestion\Mapper        $quizQuestionMapper
+     * @param QuestionType\Mapper        $quizQuestionTypeMapper
+     * @param QuizSolution\Mapper        $quizSolutionMapper
+     * @param Quiz\Attempt\Mapper        $quizAttemptMapper
+     * @param Quiz\Attempt\Answer\Mapper $quizAnswerMapper
+     * @param SubmissionBoxMapper        $submissionBoxMapper
+     * @param ReturnedWorkMapper         $returnedWorkMapper
+     * @param Assessment\MapperProxy     $assessmentDataSource
+     * @param Assessment\Mapper          $assessmentMapper
+     * @param Participant\Plan\Mapper    $planMapper
+     * @param Participant\Mapper         $participantMapper
+     * @param Folder\Mapper              $folderMapper
+     * @param UserMapper                 $userMapper
+     * @param CourseImpl\Mapper          $courseImplMapper
+     * @param CourseSpec\Mapper          $courseSpecMapper
+     * @param UnitImpl\Mapper            $unitImplMapper
+     * @param UnitSpec\Mapper            $unitSpecMapper
+     * @param IConfigLoader              $config
+     * @param bool                       $persist Whether to persist changes to schoolbox database
+     * @param LoggerInterface            $log
      */
     public function __construct(
-        IConnector $canvasDb,
-        IConnector $schoolboxDb,
-        External_ClassInterface $externalClass,
-        External_UserInterface $externalUser,
-        MarkTypeMapper $markTypeMapper,
-        WorkType\Mapper $workTypeMapper,
-        Quiz\Mapper $quizMapper,
-        QuizSection\Mapper $quizSectionMapper,
-        QuizQuestion\Mapper $quizQuestionMapper,
-        QuestionType\Mapper $quizQuestionTypeMapper,
-        QuizSolution\Mapper $quizSolutionMapper,
-        SubmissionBoxMapper $submissionBoxMapper,
-        ReturnedWorkMapper $returnedWorkMapper,
-        Assessment\MapperProxy $assessmentDataSource,
-        Assessment\Mapper $assessmentMapper,
-        Participant\Plan\Mapper $planMapper,
-        Participant\Mapper $participantMapper,
-        Folder\Mapper $folderMapper,
-        UserMapper $userMapper,
-        CourseImpl\Mapper $courseImplMapper,
-        CourseSpec\Mapper $courseSpecMapper,
-        UnitImpl\Mapper $unitImplMapper,
-        UnitSpec\Mapper $unitSpecMapper,
-        IConfigLoader $config,
-        bool $persist,
-        LoggerInterface $log
+        private IConnector $canvasDb,
+        private IConnector $schoolboxDb,
+        private External_ClassInterface $externalClass,
+        private External_UserInterface $externalUser,
+        private MarkTypeMapper $markTypeMapper,
+        private WorkType\Mapper $workTypeMapper,
+        private Quiz\Mapper $quizMapper,
+        private QuizSection\Mapper $quizSectionMapper,
+        private QuizQuestion\Mapper $quizQuestionMapper,
+        private QuestionType\Mapper $quizQuestionTypeMapper,
+        private QuizSolution\Mapper $quizSolutionMapper,
+        private Quiz\Attempt\Mapper $quizAttemptMapper,
+        private Quiz\Attempt\Answer\Mapper $quizAnswerMapper,
+        private SubmissionBoxMapper $submissionBoxMapper,
+        private ReturnedWorkMapper $returnedWorkMapper,
+        private Assessment\MapperProxy $assessmentDataSource,
+        private Assessment\Mapper $assessmentMapper,
+        private Participant\Plan\Mapper $planMapper,
+        private Participant\Mapper $participantMapper,
+        private Folder\Mapper $folderMapper,
+        private UserMapper $userMapper,
+        private CourseImpl\Mapper $courseImplMapper,
+        private CourseSpec\Mapper $courseSpecMapper,
+        private UnitImpl\Mapper $unitImplMapper,
+        private UnitSpec\Mapper $unitSpecMapper,
+        private IConfigLoader $config,
+        private bool $persist,
+        private LoggerInterface $log
     ) {
-        $this->canvasDb               = $canvasDb;
-        $this->schoolboxDb            = $schoolboxDb;
-        $this->externalClass          = $externalClass;
-        $this->externalUser           = $externalUser;
-        $this->markTypeMapper         = $markTypeMapper;
-        $this->workTypeMapper         = $workTypeMapper;
-        $this->quizMapper             = $quizMapper;
-        $this->quizSectionMapper      = $quizSectionMapper;
-        $this->quizQuestionMapper     = $quizQuestionMapper;
-        $this->quizQuestionTypeMapper = $quizQuestionTypeMapper;
-        $this->quizSolutionMapper     = $quizSolutionMapper;
-        $this->submissionBoxMapper    = $submissionBoxMapper;
-        $this->returnedWorkMapper     = $returnedWorkMapper;
-        $this->assessmentDataSource   = $assessmentDataSource;
-        $this->assessmentMapper       = $assessmentMapper;
-        $this->planMapper             = $planMapper;
-        $this->participantMapper      = $participantMapper;
-        $this->folderMapper           = $folderMapper;
-        $this->userMapper             = $userMapper;
-        $this->courseImplMapper       = $courseImplMapper;
-        $this->courseSpecMapper       = $courseSpecMapper;
-        $this->unitImplMapper         = $unitImplMapper;
-        $this->unitSpecMapper         = $unitSpecMapper;
-        $this->config                 = $config;
-        $this->persist                = $persist;
-        $this->log                    = $log;
         $this->siteSchoolCode         = strtolower($config->get('site_school_code'));
         $this->schoolboxTimezone      = $config->get('date_timezone');
     }
@@ -265,7 +165,6 @@ class DataSync
         $this->syncCourseSections($courseBridge, $courseGroupBridge, $sectionBridge);
         $this->syncClassAssignments($assignmentDatesBridge, $courseBridge, $sectionBridge, $assignmentOverrideBridge);
         $this->syncClassQuiz($assignmentDatesBridge, $courseBridge, $sectionBridge, $assignmentOverrideBridge);
-        $this->syncSubmission($assignmentDatesBridge, $courseBridge, $sectionBridge, $assignmentOverrideBridge);
 
         if (!$this->persist) {
             $this->schoolboxDb->rollBack();
@@ -442,6 +341,7 @@ class DataSync
             $this->unitImplMapper,
             $this->unitSpecMapper,
             $this->submissionBoxMapper,
+            $this->returnedWorkMapper,
             $this->assessmentMapper,
             $this->planMapper,
             $this->participantMapper,
@@ -451,7 +351,8 @@ class DataSync
             $courseBridge,
             $courseSectionBridge,
             $assignmentOverrideBridge,
-            $this->schoolboxTimezone
+            $this->schoolboxTimezone,
+            $this->assessmentDataSource
         ))->synchronise();
     }
 
@@ -485,6 +386,8 @@ class DataSync
             $this->quizSectionMapper,
             $this->quizQuestionMapper,
             $this->quizSolutionMapper,
+            $this->quizAttemptMapper,
+            $this->quizAnswerMapper,
             $this->assessmentMapper,
             $this->planMapper,
             $this->participantMapper,
@@ -494,43 +397,8 @@ class DataSync
             $courseBridge,
             $courseSectionBridge,
             $assignmentOverrideBridge,
-            $this->schoolboxTimezone
-        ))->synchronise();
-    }
-
-    /**
-     * @param Bridge\AssignmentDates    $assignmentDatesBridge
-     * @param Bridge\Course             $courseBridge
-     * @param Bridge\CourseSection      $courseSectionBridge
-     * @param Bridge\AssignmentOverride $assignmentOverrideBridge
-     * @throws Mapper\Exception
-     */
-    private function syncSubmission(
-        Bridge\AssignmentDates $assignmentDatesBridge,
-        Bridge\Course $courseBridge,
-        Bridge\CourseSection $courseSectionBridge,
-        Bridge\AssignmentOverride $assignmentOverrideBridge
-    ): void {
-        (new ImportStage\Submission(
-            $this->canvasDb,
-            $this->schoolboxDb,
-            $this->externalClass,
-            $this->externalUser->getCurrentYear(),
-            $this->unitImplMapper,
-            $this->unitSpecMapper,
-            $this->submissionBoxMapper,
-            $this->assessmentMapper,
-            $this->planMapper,
-            $this->participantMapper,
-            $this->userMapper,
-            $this->log,
-            $assignmentDatesBridge,
-            $courseBridge,
-            $courseSectionBridge,
-            $assignmentOverrideBridge,
-            $this->returnedWorkMapper,
-            $this->assessmentDataSource,
-            $this->schoolboxTimezone
+            $this->schoolboxTimezone,
+            $this->assessmentDataSource
         ))->synchronise();
     }
 }

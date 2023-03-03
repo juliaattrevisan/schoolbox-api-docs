@@ -91,6 +91,16 @@ class CliImporter extends CliTool\App
         'submission_dim',
         'submission_fact',
         'submission_comment_dim',
+        'quiz_question_answer_dim',
+        'quiz_question_answer_fact',
+        'quiz_question_dim',
+        'quiz_question_fact',
+        'quiz_question_group_dim',
+        'quiz_question_group_fact',
+        'quiz_submission_dim',
+        'quiz_submission_fact',
+        'quiz_submission_historical_dim',
+        'quiz_submission_historical_fact',
     ];
 
     /** @inheritdoc */
@@ -336,6 +346,10 @@ class CliImporter extends CliTool\App
         $quizQuestionTypeMapper = $mapperFactory->get(QuestionType\Mapper::class);
         /** @var QuizSolution\Mapper */
         $quizSolutionMapper = $mapperFactory->get(QuizSolution\Mapper::class);
+        /** @var Quiz\Attempt\Mapper $quizAttemptMapper */
+        $quizAttemptMapper = $mapperFactory->get(Quiz\Attempt\Mapper::class);
+        /** @var Quiz\Attempt\Answer\Mapper $quizAnswerMapper */
+        $quizAnswerMapper = $mapperFactory->get(Quiz\Attempt\Answer\Mapper::class);
         /** @var SubmissionBoxMapper */
         $submissionBoxMapper = $mapperFactory->get(SubmissionBoxMapper::class);
         /** @var Assessment\Mapper */
@@ -370,6 +384,8 @@ class CliImporter extends CliTool\App
             $quizQuestionMapper,
             $quizQuestionTypeMapper,
             $quizSolutionMapper,
+            $quizAttemptMapper,
+            $quizAnswerMapper,
             $submissionBoxMapper,
             $returnedWorkMapper,
             $assessmentDataSource,
