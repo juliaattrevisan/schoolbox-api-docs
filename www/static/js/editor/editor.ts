@@ -3,8 +3,8 @@
  */
 
 import ClassicEditor from "@ckeditor/ckeditor5-editor-classic/src/classiceditor";
-import { getDefault } from "@js/editor/config/configDefault";
-import { EditorDefaultConfig } from "@js/editor/types/editorTypes";
+import { getConfig } from "@js/editor/config/editorConfig";
+import { EditorConfig } from "@js/editor/types/editorTypes";
 import { insertWordCount, removeValidation, addIframelyEmbed } from "@js/editor/util/editorUtils";
 import CKEditorInspector from "@ckeditor/ckeditor5-inspector";
 import "@js/editor/styles/editor.css"; // to overwrite some of the styles
@@ -33,11 +33,11 @@ async function onCreated(textarea: HTMLTextAreaElement, editor) {
 /**
  * create the ckeditor instance
  *
- * @param { EditorDefaultConfig } config - the config to use when creating the editor
+ * @param { EditorConfig } config - the config to use when creating the editor
  * @param { HTMLTextAreaElement } textarea - the textarea the CKEditor will replace
  */
-function create(textarea: HTMLTextAreaElement, config: EditorDefaultConfig) {
-    ClassicEditor.create(textarea, getDefault(config))
+function create(textarea: HTMLTextAreaElement, config: EditorConfig) {
+    ClassicEditor.create(textarea, getConfig(config))
         .then((editor) => {
             onCreated(textarea, editor);
         })
@@ -52,7 +52,7 @@ function create(textarea: HTMLTextAreaElement, config: EditorDefaultConfig) {
  * @param { CustomEvent } event - the custom event
  */
 function onCreate(event: CustomEvent) {
-    const config = event.detail as EditorDefaultConfig;
+    const config = event.detail as EditorConfig;
     const { targetElements } = config;
     targetElements.forEach((targetElement) => {
         // assume that each targetElement could contain multiple instances

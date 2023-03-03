@@ -28,6 +28,7 @@ import FindAndReplace from "@ckeditor/ckeditor5-find-and-replace/src/findandrepl
 import SourceEditing from "@ckeditor/ckeditor5-source-editing/src/sourceediting";
 import WordCount from "@ckeditor/ckeditor5-word-count/src/wordcount";
 import UploadAdapterPlugin from "@js/editor/plugin/UploadAdapterPlugin";
+import { getToolbar } from "@js/editor/toolbar/editorToolbar";
 import { getLinkSettings } from "@js/editor/settings/linkSettings";
 import { getFontSettings } from "@js/editor/settings/fontSettings";
 import { getStyleSettings } from "@js/editor/settings/styleSettings";
@@ -36,16 +37,16 @@ import { getImageSettings } from "@js/editor/settings/imageSettings";
 import { getTableSettings } from "@js/editor/settings/tableSettings";
 import { getMediaEmbedSettings } from "@js/editor/settings/mediaEmbedSettings";
 import { getTokensSettings } from "@js/editor/settings/tokensSettings";
-import { EditorDefaultConfig } from "@js/editor/types/editorTypes";
+import { EditorConfig } from "@js/editor/types/editorTypes";
 import Resource from "@js/editor/plugin/resource/Resource";
 
 /**
  * Return the default configuration
  *
- * @param { EditorDefaultConfig } config - the default config
+ * @param { EditorConfig } config - the default config
  * @returns { EditorConfig } - refer to https://ckeditor.com/docs/ckeditor5/latest/api/module_core_editor_editorconfig-EditorConfig.html
  */
-export function getDefault(config: EditorDefaultConfig) {
+export function getConfig(config: EditorConfig) {
     return {
         plugins: [
             // list all the plugins we'll use in the default editor
@@ -76,62 +77,7 @@ export function getDefault(config: EditorDefaultConfig) {
             Resource,
         ],
         extraPlugins: [UploadAdapterPlugin],
-        toolbar: [
-            // what displays in the default toolbar in order, are either single buttons or groups via objects
-            "bold",
-            "italic",
-            {
-                label: "Styles",
-                icon: "text",
-                items: [
-                    "underline",
-                    "strikethrough",
-                    "subscript",
-                    "superscript",
-                    "blockQuote",
-                    "fontColor",
-                    "fontBackgroundColor",
-                    "fontSize",
-                    "fontFamily",
-                ],
-            },
-            "removeFormat",
-            "|",
-            "style",
-            "|",
-            "heading",
-            "|",
-            "link",
-            "|",
-            {
-                label: "Insert",
-                icon: "plus",
-                items: [
-                    "insertImage",
-                    "mediaEmbed",
-                    "resource",
-                    "insertTable",
-                    "specialCharacters",
-                    "emoji",
-                    "horizontalLine",
-                ],
-            },
-            "|",
-            {
-                label: "Lists",
-                icon: "threeVerticalDots",
-                items: ["numberedList", "bulletedList", "todoList"],
-            },
-            "|",
-            "alignment",
-            "|",
-            "undo",
-            "redo",
-            "|",
-            "findAndReplace",
-            "|",
-            "sourceEditing",
-        ],
+        toolbar: getToolbar(config),
         ...getLinkSettings(),
         ...getFontSettings(),
         ...getStyleSettings(),
