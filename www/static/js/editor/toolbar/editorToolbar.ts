@@ -19,7 +19,7 @@ export function getToolbar(config: EditorConfig) {
             {
                 label: "Styles",
                 icon: "text",
-                items: ["underline", "strikethrough"],
+                items: ["underline", "strikethrough", "blockQuote"],
             },
             "|",
             "link",
