@@ -38,3 +38,14 @@ export function removeValidation() {
 export async function addIframelyEmbed() {
     await injectScript("//cdn.iframe.ly/embed.js?cancel=0");
 }
+
+/**
+ * Add the editor to the global scope so it can be accessed
+ * in other twig files etc
+ *
+ * @param { CKEditor } editor - the CKEditor instance
+ * @param { string } elementId - the id to reference the editor by
+ */
+export function addToGlobalScope(editor, elementId) {
+    window.sbProps.editors[elementId] = editor;
+}
