@@ -9,7 +9,7 @@ let __isFirstCKEditorLoad = true; //so a page only loads the CKEditor scripts on
 
 import cdnPrefixMixin from "@schoolboxVue/components/cdn-prefix-mixin";
 import { injectScript } from "@js/util/domUtils";
-import configTypes from "@js/editor/editorConfigTypes";
+import { EditorEvent } from "@js/editor/event/editorEvent";
 
 export default {
     mixins: [cdnPrefixMixin],
@@ -100,9 +100,9 @@ export default {
                     await injectScript(`${this.cdnPrefix}/js/bundle/editor.js?v=${this.siteVersion}`);
                     __isFirstCKEditorLoad = false;
                 }
-                this.$refs.comment.addEventListener("EDITOR__CREATED", this.onEditorCreated);
+                this.$refs.comment.addEventListener(EditorEvent.EDITOR__CREATED, this.onEditorCreated);
                 document.dispatchEvent(
-                    new CustomEvent("EDITOR__CREATE", {
+                    new CustomEvent(EditorEvent.EDITOR__CREATE, {
                         detail: {
                             targetElements: [`#comment-${this.uniqueId}`],
                             isComment: true,

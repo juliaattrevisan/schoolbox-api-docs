@@ -6,6 +6,7 @@ import ClassicEditor from "@ckeditor/ckeditor5-editor-classic/src/classiceditor"
 import { getConfig } from "@js/editor/config/editorConfig";
 import { EditorConfig } from "@js/editor/types/editorTypes";
 import { insertWordCount, removeValidation, addIframelyEmbed } from "@js/editor/util/editorUtils";
+import { EditorEvent } from "@js/editor/event/editorEvent";
 import CKEditorInspector from "@ckeditor/ckeditor5-inspector";
 import "@js/editor/styles/editor.css"; // to overwrite some of the styles
 
@@ -21,7 +22,7 @@ async function onCreated(textarea: HTMLTextAreaElement, editor) {
     await addIframelyEmbed();
     CKEditorInspector.attach(editor);
     textarea.dispatchEvent(
-        new CustomEvent("EDITOR__CREATED", {
+        new CustomEvent(EditorEvent.EDITOR__CREATED, {
             detail: {
                 editor,
                 textarea,
@@ -62,4 +63,4 @@ function onCreate(event: CustomEvent) {
     });
 }
 
-document.addEventListener("EDITOR__CREATE", onCreate);
+document.addEventListener(EditorEvent.EDITOR__CREATE, onCreate);
