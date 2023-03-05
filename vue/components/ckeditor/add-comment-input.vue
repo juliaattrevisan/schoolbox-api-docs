@@ -86,24 +86,29 @@ export default {
         /**
          * To initialise the CKEditor, passing in the preset config options that exist globally on the $ jQuery object
          */
-        onAddCommentSelected() {
-            this.init(configTypes.FOR_COMMENTS);
+        async onAddCommentSelected() {
+            await this.init();
         },
 
         /**
          * Loads ckeditor only when required rather than on page load
-         *
-         * @param { String } editorTypes an option within editorTypes.js to determine which config options to pass to CKEditor
          */
-        async init(editorType) {
+        async init() {
             try {
-                this.isCKEditorLoading = true; //to replace 'Add a Comment' with 'Loading' once the prompt button is selected
+                this.isCKEditorLoading = true; // to replace 'Add a Comment' with 'Loading' once the prompt button is selected
                 if (__isFirstCKEditorLoad) {
-                    await injectScript(`${this.cdnPrefix}/js/ckeditor/ckeditor.js?v=${this.siteVersion}`);
-                    await injectScript(`${this.cdnPrefix}/js/editor/jquery.editor.js?v=${this.siteVersion}`);
+                    await injectScript(`${this.cdnPrefix}/js/bundle/editor.js?v=${this.siteVersion}`);
                     __isFirstCKEditorLoad = false;
                 }
-                $.fn.alaressEditor(this.getConfigOptions(editorType));
+                this.$refs.comment.addEventListener("EDITOR__CREATED", this.onEditorCreated);
+                document.dispatchEvent(
+                    new CustomEvent("EDITOR__CREATE", {
+                        detail: {
+                            targetElements: [`#comment-${this.uniqueId}`],
+                            isComment: true,
+                        },
+                    })
+                );
             } catch (error) {
                 this.isCKEditorLoading = false;
                 this.$emit("on-load-error");
@@ -111,51 +116,19 @@ export default {
         },
 
         /**
-         * Return the appropriate config to display consistency depending on the editorType
-         * these '$.alaress' methods are created and attached to the jQuery $ object in jquery.editor.js
+         * Once the CKEditor has been created, we track any data input changes to keep
+         * the comment in sync and assign focus so the user can start typing
          *
-         * @param { String } editorTypes an option within editorTypes.js to determine which config options to pass to CKEditor
-         *
-         * @returns { Object }
+         * @param { CustomEvent } event - the event object, containing the editor instance
          */
-        getConfigOptions(editorType) {
-            const configOptions = {
-                //use computed property names to retrieve the appropriate config options: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Object_initializer#computed_property_names
-                [configTypes.DEFAULT]: $.alaressEditorConfig(this.getVueSpecificConfig()),
-                [configTypes.FOR_COMMENTS]: $.alaressEditorConfigForComments(this.getVueSpecificConfig()),
-                [configTypes.WITH_USER_TOKENS]: $.alaressEditorConfigWithUserTokens(this.getVueSpecificConfig()),
-            };
-            return configOptions[editorType] || $.alaressEditorConfig(this.getVueSpecificConfig());
-        },
-
-        /**
-         * The config that needs to be passed to CKEditor in order to for it to work in Vue land
-         *
-         * @returns { Object }
-         */
-        getVueSpecificConfig() {
-            return {
-                on: {
-                    change: () => {
-                        // Bind the content of CKEditor into the comment model on change
-                        this.newComment = CKEDITOR.instances[`comment-${this.uniqueId}`].getData();
-                    },
-                    instanceReady: (event) => {
-                        //can display the loaded CKEditor now
-                        const ckeditor = event.editor.container.$;
-                        /**
-                         * removing the Equation editor button via the 'removeButtons' in the config settings is currently preventing the drag and drop from working
-                         * so we manually remove the button once the ckeditor instance is loaded
-                         */
-                        const eqnEditorButton = ckeditor.querySelector(".cke_button__eqneditor");
-                        eqnEditorButton.style.display = "none";
-                        this.isCKEditorLoading = false;
-                        this.isCKEditorLoaded = true;
-                    },
-                },
-                startupFocus: true,
-                targetElements: $(`#comment-${this.uniqueId}`),
-            };
+        onEditorCreated(event) {
+            this.editor = event.detail.editor;
+            this.editor.model.document.on("change:data", () => {
+                this.newComment = this.editor.getData();
+            });
+            this.editor.editing.view.focus();
+            this.isCKEditorLoading = false;
+            this.isCKEditorLoaded = true;
         },
 
         /**
@@ -165,7 +138,7 @@ export default {
             const comment = this.newComment;
             this.$emit("on-post-comment", comment);
             this.newComment = "";
-            CKEDITOR.instances[`comment-${this.uniqueId}`].setData(this.newComment); //clear out the CKEditor for another possible post
+            this.editor.setData(this.newComment); // clear out the CKEditor for another possible post
         },
     },
 };
@@ -177,7 +150,7 @@ export default {
             {{ getAddCommentButtonText }}
         </button>
         <div :style="getStyles">
-            <textarea :id="`comment-${uniqueId}`" rows="4"></textarea>
+            <textarea :id="`comment-${uniqueId}`" ref="comment"></textarea>
             <button class="button submit" @click="postComment" :disabled="isPostCommentDisabled">Post comment</button>
         </div>
     </div>
