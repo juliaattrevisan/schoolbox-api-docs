@@ -11,6 +11,31 @@ use Schoolbox\Permission\Access\UserAccess;
 
 class Component_Homepage_ScrollerController extends Component_Homepage_ControllerAbstract
 {
+
+    /**
+     * @var Schoolbox\Resource\File\Mapper
+     */
+    private $fileMapper;
+
+
+    /**
+     * Available sort fields for this component.
+     *
+     * @var string[]
+     */
+    protected $sortFields = array('name', 'date');
+
+    /**
+     * Prepares data for the render function. Business logic.
+     *
+     * @return bool Whether to continue on and attempt Component render
+     */
+    public function execute()
+    {
+        $this->setFileMapper(Schoolbox\Resource\File\Mapper::getInstance());
+        return true;
+    }
+
     /**
      * Renders the data into the SitePage. Presentation logic.
      * @param String $templateHandle
@@ -28,10 +53,14 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
         $this->parseConfig();
 
         // Load images for the current homepage
-        $allFiles = $this->getFolderMapper()->findImages($this->getSource(), (int)$this->getConfigLoader()->get('image_slideshow_max'));
+        $opts = [
+            'filter' => 'image',
+            'size' => (int)$this->getConfigLoader()->get('image_slideshow_max'),
+            'sort' => $this->getConfig('sort'),
+            'sortdir' => $this->getConfig('sortdir')
+        ];
 
-        // Sort in a human way
-        $allFiles = $allFiles->sortNaturally('title');
+        $allFiles = $this->fileMapper->findForFolders([$this->getSource()->getId()], $opts);
 
         // Have update form to back to this homepage, not the gallery's homepage
         $this->setVar('IMAGESCROLLER_CATEGORY_ID', $this->getSource()->getId());
@@ -68,12 +97,14 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
             // Set up component name
             $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
 
+            $pixel = $this->getConfig('pixel') ? $this->getConfig('pixel') : 800;
+            $imageRatio = $this->getConfig('imageRatio') ? $this->getConfig('imageRatio') : 'auto';
 
             $this->setVar(
                 [
                     'COMPONENT_CONFIG_TIMING_VALUE_MS'       => $this->getConfig('timing') ? $this->getConfig('timing') * 1000 : '2000',
                     'COMPONENT_CONFIG_RANDOM_STARTING_SLIDE' => $this->getConfig('randomStartingSlide'),
-                    'COMPONENT_CONFIG_IMAGE_RATIO'           => $this->getConfig('imageRatio') ? $this->getConfig('imageRatio') : 'square',
+                    'COMPONENT_CONFIG_IMAGE_RATIO'           => $imageRatio,
                     'COMPONENT_CONFIG_SLIDESHOWTRANSITION'  => $this->getConfig('transition') ? $this->getConfig('transition') : 'swipe',
                 ]
             );
@@ -116,8 +147,16 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
                         'IMAGE_ID'   => $currentFile->getId(),
                         'IMAGE_NAME' => Scrub::text($currentFile->getTitle()),
                         'IMAGE_URL'  => $url,
+                        'IMAGE_DIMENSION' => $imageRatio === 'auto' ? $pixel : 0,
                     ]
                 );
+
+                // Display captions
+                if ($this->getConfig('captionState') == 'Active') {
+                    $this->parse('show_caption_block', 'show_caption');
+                } else {
+                    $this->setVar('show_caption_block', '');
+                }
 
                 /* Link image */
                 if ($url) {
@@ -128,13 +167,6 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
                     $this->setVar('linked_image_block', '');
                 }
 
-                // Display captions
-                if ($this->getConfig('captionState') == 'Active') {
-                    $this->parse('show_caption_block', 'show_caption');
-                } else {
-                    $this->setVar('show_caption_block', '');
-                }
-
                 $this->parse('image_scroller_block', 'image_scroller', true);
             }
             $this->parse('source_folder_exists_block', 'source_folder_exists');
@@ -143,5 +175,28 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
         }
 
         return true; // everything went according to plan
+    }
+
+    /* Getters/Setters
+     */
+
+
+    /**
+     * @return \Schoolbox\Resource\File\Mapper
+     */
+    public function getFileMapper()
+    {
+        return $this->fileMapper;
+    }
+
+
+    /**
+     * @param \Schoolbox\Resource\File\Mapper $fileMapper
+     * @return static
+     */
+    public function setFileMapper($fileMapper)
+    {
+        $this->fileMapper = $fileMapper;
+        return $this;
     }
 }

@@ -83,7 +83,6 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
 
         $this->setVar(
             array(
-                'COMPONENT_ALIGN'                  => $this->getConfig('align'),
                 'COMPONENT_CONFIG_TIMING_VALUE_MS' => $this->getConfig('timing') ? $this->getConfig(
                     'timing'
                 ) * 1000 : '2000',
@@ -112,7 +111,6 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
             'sortdir' => $this->getConfig('sortdir')
         ];
 
-        // $allFiles = $this->getFolderMapper()->findImages($this->getSource(), (int)$this->getConfigLoader()->get('image_slideshow_max'));
         $allFiles = $this->fileMapper->findForFolders([$this->getSource()->getId()], $opts);
 
         if ($this->getConfig('randomStartingSlide')) {
