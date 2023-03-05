@@ -16,25 +16,15 @@ export function getToolbar(config: EditorConfig) {
         return [
             "bold",
             "italic",
-            {
-                label: "Styles",
-                icon: "text",
-                items: ["underline", "strikethrough", "blockQuote"],
-            },
-            "|",
-            "link",
-            "|",
-            {
-                label: "Insert",
-                icon: "plus",
-                items: ["insertImage", "mediaEmbed", "resource", "emoji"],
-            },
-            "|",
-            {
-                label: "Lists",
-                icon: "threeVerticalDots",
-                items: ["numberedList", "bulletedList"],
-            },
+            "underline",
+            "strikethrough",
+            "blockQuote",
+            "insertImage",
+            "mediaEmbed",
+            "resource",
+            "emoji",
+            "numberedList",
+            "bulletedList",
         ];
     }
     return [
