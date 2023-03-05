@@ -5,24 +5,35 @@
     <h2 class="subheader">{COMPONENT_NAME}</h2>
     <!-- END has_header -->
 
-    <section class="swiper" id="component{COMPONENT_INSTANCE_ID}-imageslider">
-        <div class="swiper-wrapper">
-            <!-- BEGIN image_scroller -->
-            <div class="swiper-slide">
-                <div class="{COMPONENT_CONFIG_IMAGE_RATIO}">
-                    <img src="/cms/image.php?id={IMAGE_ID}&height=2048&width=2048" loading="lazy" />
-                    <div class="loader"></div>
+    <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
+        <div class="small-12 columns">
+            <div class="swiper" id="component{COMPONENT_INSTANCE_ID}-imageslider">
+                <div class="swiper-wrapper">
+                    <!-- BEGIN image_scroller -->
+                    <div class="swiper-slide">
+                        <div class="{COMPONENT_CONFIG_IMAGE_RATIO}">
+                            <!-- BEGIN linked_image -->
+                            <a href="{IMAGE_URL}">
+                                <img src="/cms/image.php?id={IMAGE_ID}&height=2048&width=2048" loading="lazy" data-max-height="{IMAGE_DIMENSION}"/>
+                            </a>
+                            <!-- END linked_image -->
+                            <!-- BEGIN unlinked_image -->
+                            <img src="/cms/image.php?id={IMAGE_ID}&height=2048&width=2048" loading="lazy" data-max-height="{IMAGE_DIMENSION}"/>
+                            <!-- END unlinked_image -->
+                            <div class="loader"></div>
+                        </div>
+                        <!-- BEGIN show_caption -->
+                        <p class="meta">{IMAGE_NAME}</p>
+                        <!-- END show_caption -->
+                    </div>
+                    <!-- END image_scroller -->
                 </div>
-                <!-- BEGIN show_caption -->
-                <p class="meta">{IMAGE_NAME}</p>
-                <!-- END show_caption -->
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
+                <div class="swiper-pagination"></div>
             </div>
-            <!-- END image_scroller -->
         </div>
-        <div class="swiper-button-next"></div>
-        <div class="swiper-button-prev"></div>
-        <div class="swiper-pagination"></div>
-    </section>
+    </div>
     <script src="{CDN_PREFIX}/js/bundle/slideshow.js"></script>
     <script>
         (function() {
