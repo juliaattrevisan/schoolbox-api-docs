@@ -234,7 +234,7 @@ class QuizSubmission extends SubmissionAbstract
         $startTime    = $this->convertTime((string)$canvasSubmission['started_at']);
         $finishTime   = $this->convertTime((string)$canvasSubmission['finished_at']);
 
-        /** @var Quiz\Model $section */
+        /** @var QuizSection\Model $section */
         $section = $quiz->getSections()->first();
         /** @var QuizQuestion\Model $question */
         $question = $section->getQuestions()?->first();

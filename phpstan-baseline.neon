@@ -1731,16 +1731,6 @@ parameters:
 			path: library/External/Canvas/Sync/ImportStage/SectionQuiz.php
 
 		-
-			message: "#^Call to protected method populateSaveTimestamps\\(\\) of class Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/Submission.php
-
-		-
-			message: "#^Call to protected method populateUuids\\(\\) of class Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/Submission.php
-
-		-
 			message: "#^Property External_Doublefirst_Class\\:\\:\\$externalUser is never read, only written\\.$#"
 			count: 1
 			path: library/External/Doublefirst/Class.php
@@ -5084,11 +5074,6 @@ parameters:
 			message: "#^PHPDoc tag @return with type Schoolbox\\\\Mapper is not subtype of native type Schoolbox\\\\Learning\\\\Quiz\\\\Mapper\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Quiz/Attempt/Mapper.php
-
-		-
-			message: "#^PHPDoc tag @param for parameter \\$answers with type array\\<Schoolbox\\\\Learning\\\\Quiz\\\\Attempt\\\\Answer\\\\Model\\>\\|\\(iterable\\<Schoolbox\\\\Learning\\\\Quiz\\\\Attempt\\\\Answer\\\\Model\\>&Schoolbox\\\\GenericCollection\\) is not subtype of native type Schoolbox\\\\GenericCollection\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Quiz/Attempt/Model.php
 
 		-
 			message: "#^Variable \\$assess in PHPDoc tag @var does not exist\\.$#"

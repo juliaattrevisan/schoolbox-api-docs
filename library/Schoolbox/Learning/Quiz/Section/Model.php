@@ -198,7 +198,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return QuizQuestion[]|GenericCollection<QuizQuestion>
+     * @return QuizQuestion[]|GenericCollection<QuizQuestion>|null
      */
     public function getQuestions()
     {

@@ -66,7 +66,7 @@ class Model extends AbstractResponse
 
 
     /**
-     * @return Interval
+     * @return Interval|null
      */
     public function getDuration()
     {
