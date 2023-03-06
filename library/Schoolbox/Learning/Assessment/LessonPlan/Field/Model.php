@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\LessonPlan\Field;
 
+use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
 use Schoolbox\Admin\LessonPlan\Template\Field\Model as LessonPlanTemplateField;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
@@ -24,7 +25,15 @@ class Model implements ISoftDeletable
 
 
     /**
-     * A lesson plan template field
+     * The Lesson Plan to which this Lesson Plan Field is related
+     *
+     * @var LessonPlan|null
+     */
+    private ?LessonPlan $lessonPlan = null;
+
+
+    /**
+     * A Lesson Plan Template Field from which this instance originates
      */
     private ?LessonPlanTemplateField $lessonPlanTemplateField = null;
 
@@ -52,6 +61,26 @@ class Model implements ISoftDeletable
      * @var int|null
      */
     private ?int $sequence = null;
+
+
+    /**
+     * @return LessonPlan|null
+     */
+    public function getLessonPlan(): ?LessonPlan
+    {
+        return $this->lessonPlan;
+    }
+
+
+    /**
+     * @param LessonPlan|null $lessonPlan
+     * @return Model
+     */
+    public function setLessonPlan(?LessonPlan $lessonPlan): self
+    {
+        $this->lessonPlan = $lessonPlan;
+        return $this;
+    }
 
 
     /**

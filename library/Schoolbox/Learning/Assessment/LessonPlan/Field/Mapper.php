@@ -11,8 +11,10 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\LessonPlan\Field;
 
 use PDOStatement;
+use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
+use Schoolbox\Learning\Assessment\LessonPlan\Mapper as LessonPlanMapper;
 use Schoolbox\Admin\LessonPlan\Template\Field\Mapper as LessonPlanTemplateFieldMapper;
-use Schoolbox\Admin\LessonPlan\Template\Model as LessonPlanTemplate;
+use Schoolbox\Admin\LessonPlan\Template\Field\Model as LessonPlanTemplateField;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception;
 
@@ -34,6 +36,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasTable('lesson_plan_field');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->joins('lesson_plan_id', LessonPlanMapper::class, 'id', null, null, 'lessonPlan', 'lessonPlan');
         $this->joins('lesson_plan_template_field_id', LessonPlanTemplateFieldMapper::class, 'id', null, null, 'lessonPlanTemplateField', 'lessonPlanTemplateField');
         $this->uses('body', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
@@ -50,13 +53,17 @@ class Mapper extends \Schoolbox\Mapper
      */
     protected function getSelectString(): string
     {
-        return "
+        $selectString = "
             SELECT
                 {$this->getColumnString()},
+                {$this->getJoinColumnString('lessonPlan', 'lessonPlan')},
                 {$this->getJoinColumnString('lessonPlanTemplateField', 'lessonPlanTemplateField')}
             FROM {$this->getTable()}
+            INNER JOIN {$this->getJoinSql('lessonPlan', '', 'lessonPlan')}
             INNER JOIN {$this->getJoinSql('lessonPlanTemplateField', '', 'lessonPlanTemplateField')}
         ";
+
+        return $selectString;
     }
 
 
@@ -73,6 +80,7 @@ class Mapper extends \Schoolbox\Mapper
         $collection = $this->createCollection();
 
         foreach ($statement as $row) {
+            /** @var Model|null $field */
             $field = $this->hydrate($row);
 
             /* Arbitrarily died; this shouldn't happen tho
@@ -81,13 +89,22 @@ class Mapper extends \Schoolbox\Mapper
                 continue;
             }
 
-            /* Lesson Plan Template parent object
+            /* Lesson Plan parent object
+             *
+             * TODO: Work out how much detail you actually need here
+             *  since some of it is shared from the AssessmentModel
              */
-            /** @var LessonPlanTemplate|null $template */
-            $template = $this->hydrateJoin($row, 'lessonPlanTemplate', 'lpt');
+            /** @var LessonPlan $lessonPlan */
+            $lessonPlan = $this->hydrateJoin($row, 'lessonPlan');
+            $field->setLessonPlan($lessonPlan);
 
-            if ($template) {
-                $field->setLessonPlanTemplate($template);
+            /* Lesson Plan Template Field parent object
+             */
+            /** @var LessonPlanTemplateField|null $templateField */
+            $templateField = $this->hydrateJoin($row, 'lessonPlanTemplateField', 'lessonPlanTemplateField');
+
+            if ($templateField) {
+                $field->setLessonPlanTemplateField($templateField);
             }
 
             $collection->add($field);
