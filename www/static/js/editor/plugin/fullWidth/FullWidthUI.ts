@@ -32,7 +32,7 @@ export default class FullWidthUI extends Plugin {
             const button = getButton();
             button.on("execute", () => this.editor.execute("toggleFullWidth"));
             // Disable the button when the command is disabled
-            const command = this.editor.commands.get("insertResource");
+            const command = this.editor.commands.get("toggleFullWidth");
             button.bind("isOn", "isEnabled").to(command, "value", "isEnabled");
             return button;
         });

@@ -23,6 +23,7 @@ export default class FullWidthEditing extends Plugin {
      */
     updateSchema() {
         const schema = this.editor.model.schema;
+        console.warn(schema);
         schema.extend("imageBlock", {
             allowAttributes: ["data-is-full-width"],
         });
