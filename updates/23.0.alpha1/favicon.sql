@@ -2,7 +2,7 @@ INSERT INTO config (
                     name, value, title, description, field_id, type_id, editable, hidden, required, module, sequence
                     )
 VALUES (
-        'skin_config',
+        'skin_favicon',
         null,
         'App Icon',
         'This image will be used as the favicon  shown in browser tabs, bookmarks and when the app is installed on a device. Please provide a square 192px PNG image.',
