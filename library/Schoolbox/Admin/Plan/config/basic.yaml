@@ -103,6 +103,8 @@ config:
   office365_tenant_id: {hide: true}
   office365_immersive_reader_name: {hide: true}
   googleapps_api_key: { hide: false }
+  turnitin_api_key: {value: '', hide: true}
+  turnitin_api_host: {value: '', hide: true}
 
 topMenu:
   hide:
@@ -121,9 +123,10 @@ components:
    - Component_Homepage_ClickviewController
    - Component_Homepage_ChatController
    - Component_Homepage_EtherpadController
+   - Component_Homepage_PinterestController
    - Schoolbox\Curriculum\Component\CurriculumDetailsController
    - Schoolbox\Curriculum\Component\CurriculumOverviewController
    - Schoolbox\Fixtures\Component\Homepage\Controller
    - Schoolbox\Fixtures\Component\Dashboard\Controller
    - Schoolbox\Learning\Moment\StudentToolkit\Component\Dashboard\Controller
-
+   - Component_Dashboard_CanvasAssignmentsController
