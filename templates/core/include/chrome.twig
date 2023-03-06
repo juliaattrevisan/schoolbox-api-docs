@@ -35,94 +35,92 @@
     <link rel="apple-touch-icon" sizes="152x152" href="/images/logo.php?logo=skin_favicon&size=apple152">
     <link rel="apple-touch-icon" sizes="180x180" href="/images/logo.php?logo=skin_favicon&size=apple180">
 
-    {% block mainHeader %}
-        {% include 'include/skin.twig' with { config: config } only %}
-        <link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/vendors/fullcalendar/datepicker.css?v={{ config.site_version }}" />
+    {% include 'include/skin.twig' with { config: config } only %}
+    <link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/vendors/fullcalendar/datepicker.css?v={{ config.site_version }}" />
 
-        {% if tour.data is defined and not user.impersonated %}
-        {% autoescape 'js' %}
-        <script type="text/javascript">
-            window.tourData = {{ tour.data|json_encode|raw }};
-        </script>
-        {% endautoescape %}
-        {% endif %}
-        <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/main.js?v={{ config.site_version }}"></script>
-        <script type="text/javascript" src="{{ CDN_PREFIX }}/js/fullcalendar/schoolbox-fullcalendar.min.js?v={{ config.site_version }}"></script>
-        <script type="text/javascript" src="/service-worker.js?v={{ config.site_version }}"></script>
+    {% if tour.data is defined and not user.impersonated %}
+    {% autoescape 'js' %}
+    <script type="text/javascript">
+        window.tourData = {{ tour.data|json_encode|raw }};
+    </script>
+    {% endautoescape %}
+    {% endif %}
+    <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/main.js?v={{ config.site_version }}"></script>
+    <script type="text/javascript" src="{{ CDN_PREFIX }}/js/fullcalendar/schoolbox-fullcalendar.min.js?v={{ config.site_version }}"></script>
+    <script type="text/javascript" src="/service-worker.js?v={{ config.site_version }}"></script>
 
 
-        <script src="{{ CDN_PREFIX }}/js/browser/browser-redirect.js?v={{ config.site_version }}"></script>
-        <script type="text/javascript" src="{{ CDN_PREFIX }}/js/math/jscurry-0.3.0.js?v={{ config.site_version }}"></script>
-        <script type="text/javascript" src="{{ CDN_PREFIX }}/js/math/jqmath-0.4.0.js?v={{ config.site_version }}"></script>
-        <script async charset="utf-8" src="//cdn.iframe.ly/embed.js?api_key=94aa8fc28ac1089a2dfb28" crossorigin></script>
+    <script src="{{ CDN_PREFIX }}/js/browser/browser-redirect.js?v={{ config.site_version }}"></script>
+    <script type="text/javascript" src="{{ CDN_PREFIX }}/js/math/jscurry-0.3.0.js?v={{ config.site_version }}"></script>
+    <script type="text/javascript" src="{{ CDN_PREFIX }}/js/math/jqmath-0.4.0.js?v={{ config.site_version }}"></script>
+    <script async charset="utf-8" src="//cdn.iframe.ly/embed.js?api_key=94aa8fc28ac1089a2dfb28" crossorigin></script>
 
-        {% autoescape 'js' %}
-        <script type="text/javascript">
-            // Disable $ formula encoding
-            M.$mathQ = false;
+    {% autoescape 'js' %}
+    <script type="text/javascript">
+        // Disable $ formula encoding
+        M.$mathQ = false;
 
-            // Date formats (global variable)
-            var siteLocation = "{{ config.site_school_code }}";
+        // Date formats (global variable)
+        var siteLocation = "{{ config.site_school_code }}";
 
-            var dateDisplayFormats = {
-                dayjs:          "{{ config.date_local | dayjsFormat }}",
-                dayjsDatetime:  "{{ (config.date_local ~ ' ' ~ config.date_time) | dayjsFormat }}",
-                dayjsDateLong:  "{{ config.date_long | dayjsFormat }}",
-                dayjsTime:      "{{ config.date_time | dayjsFormat}}",
-                localDate:         "{{ config.date_local }}",
-                localDateTime:     "{{ config.date_local ~ ' ' ~ config.date_time }}",
-                calendarStartTime: "{{ config.calendar_start_time }}",
-                localTime:         "{{ config.date_time }}",
-            };
+        var dateDisplayFormats = {
+            dayjs:          "{{ config.date_local | dayjsFormat }}",
+            dayjsDatetime:  "{{ (config.date_local ~ ' ' ~ config.date_time) | dayjsFormat }}",
+            dayjsDateLong:  "{{ config.date_long | dayjsFormat }}",
+            dayjsTime:      "{{ config.date_time | dayjsFormat}}",
+            localDate:         "{{ config.date_local }}",
+            localDateTime:     "{{ config.date_local ~ ' ' ~ config.date_time }}",
+            calendarStartTime: "{{ config.calendar_start_time }}",
+            localTime:         "{{ config.date_time }}",
+        };
 
-            // This schoolboxUser is here for custom scripts.
-            var schoolboxUser            = {{ user.current | json_encode | raw }};
-            schoolboxUser.name           = "{{ user.current.formatName }}";
-            schoolboxUser.email          = "{{ user.current.email }}";
-            schoolboxUser.year           = "{{ user.current.year.name ?? '' }}";
-            schoolboxUser.role           = {{ user.current.role | json_encode | raw }};
-            schoolboxUser.impersonated   = Boolean('{{ user.impersonated }}');
-            schoolboxUser.communityLogin = Boolean('{{ user.communityLogin }}');
+        // This schoolboxUser is here for custom scripts.
+        var schoolboxUser            = {{ user.current | json_encode | raw }};
+        schoolboxUser.name           = "{{ user.current.formatName }}";
+        schoolboxUser.email          = "{{ user.current.email }}";
+        schoolboxUser.year           = "{{ user.current.year.name ?? '' }}";
+        schoolboxUser.role           = {{ user.current.role | json_encode | raw }};
+        schoolboxUser.impersonated   = Boolean('{{ user.impersonated }}');
+        schoolboxUser.communityLogin = Boolean('{{ user.communityLogin }}');
 
-            // Reluctantly add the CDN prefix and site version as global JS variables
-            window.cdnPrefix = "{{ CDN_PREFIX }}";
-            window.siteVersion = "{{ config.site_version }}";
+        // Reluctantly add the CDN prefix and site version as global JS variables
+        window.cdnPrefix = "{{ CDN_PREFIX }}";
+        window.siteVersion = "{{ config.site_version }}";
 
-        </script>
-        {% endautoescape %}
+    </script>
+    {% endautoescape %}
 
-        {% if config.site_usage_tracking %}
-        {% autoescape 'js' %}
-        <!-- Google Tag Manager -->
-        <script>
-            window.dataLayer = window.dataLayer || [];
-            dataLayer.push({
-                'event': 'page_view',
-                'site_school_code': '{{ config. site_school_code }}',
-                'site_type': '{{ config.site_type }}',
-                'site_version': '{{ config.site_version }}',
-                {% if user.current.id %}
-                'role_name': '{{ user.current.role.name }}',
-                'role_type': '{{ user.current.role.type }}',
-                {% if user.current.role.isStudent %}
-                'user_year': '{{ user.current.year.name ?? '' }}',
-                {% endif %}
-                'impersonated': {{ user.impersonated ? 1 : 0 }},
-                {% endif %}
-            });
-        </script>
-        <script>
-            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-                        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-                    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-                    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-            })(window,document,'script','dataLayer','GTM-N8R6VLV');
-        </script>
-        <!-- End Google Tag Manager -->
-        {% endautoescape %}
-        {% endif %}
-        {{ scripts.header | raw }}
-    {% endblock mainHeader %}
+    {% if config.site_usage_tracking %}
+    {% autoescape 'js' %}
+    <!-- Google Tag Manager -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        dataLayer.push({
+            'event': 'page_view',
+            'site_school_code': '{{ config. site_school_code }}',
+            'site_type': '{{ config.site_type }}',
+            'site_version': '{{ config.site_version }}',
+            {% if user.current.id %}
+            'role_name': '{{ user.current.role.name }}',
+            'role_type': '{{ user.current.role.type }}',
+            {% if user.current.role.isStudent %}
+            'user_year': '{{ user.current.year.name ?? '' }}',
+            {% endif %}
+            'impersonated': {{ user.impersonated ? 1 : 0 }},
+            {% endif %}
+        });
+    </script>
+    <script>
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+                    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+                j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+                'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-N8R6VLV');
+    </script>
+    <!-- End Google Tag Manager -->
+    {% endautoescape %}
+    {% endif %}
+    {{ scripts.header | raw }}
 </head>
 <body class="{{ ws.enabled ? '' : 'disableNotifications' }}">
 <div class="off-canvas-wrap" id="off-canvas-wrap" data-offcanvas data-transition="overlap">
