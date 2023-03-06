@@ -1,35 +1,42 @@
 /**
  * Returns the settings for the Images
  *
+ * @todo - there's currently an issue with preserving extra attributes on the imageBlock element
+ * as imageInline appears to work fine, all images are currently set to imageInline, so all imageBlock
+ * related functionality is currently disabled
  * @returns { object } - the image settings
  */
 export function getImageSettings() {
     return {
         image: {
             // image setup: https://ckeditor.com/docs/ckeditor5/latest/features/images/images-overview.html
-            toolbar: [
-                "imageTextAlternative",
-                "toggleImageCaption",
-                "linkImage",
-                "|",
-                "imageStyle:inline",
-                {
-                    name: "imageStyle:wrapText",
-                    title: "Wrap text",
-                    items: ["imageStyle:alignLeft", "imageStyle:alignRight"],
-                    defaultItem: "imageStyle:alignLeft",
-                },
-                {
-                    name: "imageStyle:breakText",
-                    title: "Break text",
-                    items: ["imageStyle:alignBlockLeft", "imageStyle:block", "imageStyle:alignBlockRight"],
-                    defaultItem: "imageStyle:block",
-                },
-                "imageStyle:side",
-                "|",
-                "resizeImage",
-                "fullWidth",
-            ],
+            toolbar: ["linkImage", "|", "resizeImage", "fullWidth"],
+            // toolbar: [
+            //     "imageTextAlternative",
+            //     "toggleImageCaption",
+            //     "linkImage",
+            //     "|",
+            //     "imageStyle:inline",
+            //     {
+            //         name: "imageStyle:wrapText",
+            //         title: "Wrap text",
+            //         items: ["imageStyle:alignLeft", "imageStyle:alignRight"],
+            //         defaultItem: "imageStyle:alignLeft",
+            //     },
+            //     {
+            //         name: "imageStyle:breakText",
+            //         title: "Break text",
+            //         items: ["imageStyle:alignBlockLeft", "imageStyle:block", "imageStyle:alignBlockRight"],
+            //         defaultItem: "imageStyle:block",
+            //     },
+            //     "imageStyle:side",
+            //     "|",
+            //     "resizeImage",
+            //     "fullWidth",
+            // ],
+            insert: {
+                type: "inline",
+            },
             resizeOptions: [
                 {
                     name: "resizeImage:original",
