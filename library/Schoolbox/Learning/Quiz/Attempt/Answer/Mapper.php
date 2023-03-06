@@ -18,7 +18,7 @@ use Schoolbox\Learning\Quiz\Section\Question\Mapper as QuizQuestionMapper;
  * Represents a Students Answer to a Quiz Questions
  * 'Answers' were formerly known as 'Responses'.
  * Name changed to avoid naming collision with Quiz IResponse
- * 
+ *
  * @method Model createModel($idValue = null)
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  * @method Model findById($identifierValue)

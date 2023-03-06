@@ -121,8 +121,7 @@ class QuizSubmission extends SubmissionAbstract
             foreach ($assessmentImpl->getPlans() as $plan) {
                 foreach ($plan->getParticipants() as $participant) {
                     foreach ($canvasSubmissions as $canvasSubmission) {
-                        if ($canvasSubmission['reviewee_id'] !== $participant->getUser()
-                                                                             ->getExternalId()) {
+                        if ($canvasSubmission['reviewee_id'] !== $participant->getUser()->getExternalId()) {
                             // current canvas submission is not for this participant
                             continue;
                         }

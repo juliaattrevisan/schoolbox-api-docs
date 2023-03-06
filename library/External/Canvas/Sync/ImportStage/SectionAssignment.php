@@ -452,7 +452,7 @@ class SectionAssignment extends SectionAssessmentAbstract
     /**
      * @return SubmissionAbstract
      */
-    function getSubmissionImporter(): SubmissionAbstract
+    public function getSubmissionImporter(): SubmissionAbstract
     {
         if (!$this->submissionimporter) {
             $this->submissionimporter =

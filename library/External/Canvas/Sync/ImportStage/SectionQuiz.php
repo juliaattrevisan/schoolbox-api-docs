@@ -718,7 +718,7 @@ class SectionQuiz extends SectionAssessmentAbstract
         return array_map($callback, $this->schoolboxDb->executeQuery($sql)->fetchAll(PDO::FETCH_COLUMN));
     }
 
-    function getSubmissionImporter(): SubmissionAbstract
+    public function getSubmissionImporter(): SubmissionAbstract
     {
         if (!$this->submissionimporter) {
             $this->submissionimporter =

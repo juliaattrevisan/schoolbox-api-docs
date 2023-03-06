@@ -421,7 +421,7 @@ abstract class SectionAssessmentAbstract
         $this->printCounts();
     }
 
-    abstract function getSubmissionImporter(): SubmissionAbstract;
+    abstract public function getSubmissionImporter(): SubmissionAbstract;
 
     /**
      * Resets all results to 0

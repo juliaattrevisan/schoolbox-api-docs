@@ -59,8 +59,7 @@ abstract class SubmissionAbstract
         protected UserMapper $userMapper,
         protected LoggerInterface $log,
         protected Assessment\MapperProxy $assessmentDataSource,
-    )
-    {
+    ) {
     }
 
     abstract public function sync($canvasAssessment, $assessmentCanvasId);
@@ -196,7 +195,7 @@ abstract class SubmissionAbstract
      * @param string               $feedbackTime
      * @return mixed
      */
-    abstract function syncFeedback(
+    abstract public function syncFeedback(
         IAssessableDataModel $iAssessable,
         User $reviewer,
         User $reviewee,
