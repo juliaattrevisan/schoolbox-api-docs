@@ -11,8 +11,26 @@ import { EditorConfig } from "@js/editor/types/editorTypes";
  * @returns { Array } - the toolbar display
  */
 export function getToolbar(config: EditorConfig) {
+    // what displays in the default toolbar in order, are either single buttons or groups via objects
+    if (config.isComment) {
+        return [
+            "bold",
+            "italic",
+            "underline",
+            "strikethrough",
+            "blockQuote",
+            "|",
+            "link",
+            "|",
+            "resource",
+            "mediaEmbed",
+            "emoji",
+            "|",
+            "numberedList",
+            "bulletedList",
+        ];
+    }
     return [
-        // what displays in the default toolbar in order, are either single buttons or groups via objects
         "bold",
         "italic",
         {
