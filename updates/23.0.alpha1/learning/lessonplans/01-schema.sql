@@ -68,10 +68,7 @@ CONSTRAINT `fk_lesson_plan_lesson_plan_template`
 CREATE TABLE `lesson_plan_field` (
 `id` INT NOT NULL AUTO_INCREMENT,
 `lesson_plan_template_field_id` INT NOT NULL,
-`title` VARCHAR(255) NOT NULL,
 `body` TEXT NULL,
-`visibility` ENUM('student', 'staff') NOT NULL,
-`sequence` INT NOT NULL,
 `created_at` DATETIME NOT NULL,
 `updated_at` DATETIME NOT NULL,
 `deleted_at` DATETIME NULL DEFAULT NULL,
