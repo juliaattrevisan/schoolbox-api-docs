@@ -115,3 +115,13 @@ export const humanFileSize = (bytes, dp = 1) => {
 
     return bytes.toFixed(dp) + " " + units[u];
 };
+
+/**
+ * Returns the HTML of a given URL
+ *
+ * @param { string } url - address for the HTML to fetch
+ * @return { string } the resulting HTML string fragment
+ */
+export async function fetchHtmlAsText(url) {
+    return await (await fetch(url)).text();
+}

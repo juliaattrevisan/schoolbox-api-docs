@@ -1,14 +1,25 @@
-<script type="text/javascript" src="{CDN_PREFIX}/js/ckeditor/ckeditor.js?v={SITE_VERSION}"></script>
-<script type="text/javascript" src="{CDN_PREFIX}/js/editor/jquery.editor.js?v={SITE_VERSION}"></script>
+<script src="{CDN_PREFIX}/js/bundle/editor.js?v={SITE_VERSION}"></script>
 
 <script type="text/javascript">
     $(function() {
 
-        /* Schoolbox CkE Wrapper
+        /**
+         * Demonstrates how the editor instance can be accssed once it's been created
          */
-        $.fn.alaressEditor({
-            targetElements: $('#defaultCKEditor')
-        });
+        document.getElementById("defaultCKEditor").addEventListener("EDITOR__CREATED", onEditorCreated);
+        function onEditorCreated(event) {
+            const editor = event.detail.editor;
+            editor.setData('<p>Some <strong>sample</strong> text added after the editor is initiated</p>');
+        }
+
+        /**
+         * Initialise the editor
+         */
+        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+            detail: {
+                targetElements: ['#defaultCKEditor'],
+            }
+        }));
 
 
         /* Schoolbox Link Modal
@@ -20,31 +31,6 @@
             }
         });
 
-        /* Custom Plugins
-         *
-         * http://stackoverflow.com/questions/1957156/how-to-add-a-custom-button-to-the-toolbar-that-calls-a-javascript-function
-         * http://docs.ckeditor.com/#!/api/CKEDITOR.ui-method-addButton
-         */
-        $.fn.alaressEditor({
-            targetElements: $('#customPlugin'),
-            start: function(element) {
-
-                /* Add special unique buttons
-                 */
-                CKEDITOR.instances['customPlugin'].addCommand("exampleCommand", { // create named command
-                    exec: function(editorInstance) {
-                        alert(editorInstance.getData());
-                    }
-                });
-
-                CKEDITOR.instances['customPlugin'].ui.addButton('SomeGenericIdentifier', { // add new button and bind our command
-                    label: "Example Label",
-                    command: 'exampleCommand',
-                    toolbar: 'schoolbox',
-                    icon: 'https://avatars1.githubusercontent.com/u/1073167?v=3&amp;s=460'
-                });
-            }
-        });
     });
 </script>
 
@@ -84,9 +70,7 @@
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <label>
-                            <textarea id='defaultCKEditor' name='defaultCKEditor' rows="10"></textarea>
-                        </label>
+                        <textarea id='defaultCKEditor' name='defaultCKEditor' rows="10"></textarea>
                     </div>
                 </fieldset>
             </section>
@@ -108,29 +92,6 @@
         </div>
 
         <p><span class="meta">Current selection:</span> <span id="modalLinkName">none</span></p>
-    </div>
-</div>
-
-<div class="row">
-    <div class="small-12 columns">
-        <h2 class="subheader">Custom Plugins</h2>
-        <p class="meta">
-            There's a James button in the toolbar which has a custom action on it. Type something in the editor, then
-            click the button.
-        </p>
-    </div>
-    <div class="small-12 island">
-        <form action="/test.php" method="post">
-            <section>
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        <label>
-                            <textarea id='customPlugin' name='customPlugin' rows="10"></textarea>
-                        </label>
-                    </div>
-                </fieldset>
-            </section>
-        </form>
     </div>
 </div>
 

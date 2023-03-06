@@ -4,15 +4,15 @@
 
 import Mention from "@ckeditor/ckeditor5-mention/src/mention";
 
-import { EditorDefaultConfig } from "@js/editor/config/configDefault";
+import { EditorConfig } from "@js/editor/types/editorTypes";
 
 /**
  * If tokens are enabled, return the tokens settings
  *
- * @param { EditorDefaultConfig } config - the config to use when creating the editor
+ * @param { EditorConfig } config - the config to use when creating the editor
  * @returns { object } - the tokens settings
  */
-export function getTokensPlugins(config: EditorDefaultConfig) {
+export function getTokensPlugins(config: EditorConfig) {
     if (config.hasTokens) {
         return [Mention];
     }
