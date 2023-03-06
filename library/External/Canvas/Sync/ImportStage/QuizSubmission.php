@@ -126,14 +126,6 @@ class QuizSubmission extends SubmissionAbstract
                             // current canvas submission is not for this participant
                             continue;
                         }
-                        // save participant, if not exists
-                        if (!$participant->getId()) {
-                            $this->saveParticipant(
-                                $plan,
-                                $participant->getUser(),
-                                $this->convertTime($canvasSubmission['finished_at'])
-                            );
-                        }
 
                         // $participant should be a school box user with this reviewee_id as their external_id
                         $reviewee = $participant->getUser();
@@ -148,6 +140,14 @@ class QuizSubmission extends SubmissionAbstract
                         } else {
                             $reviewer     = $this->findUserByCanvasUserId($canvasSubmission['grader_user_id']);
                             $feedbackTime = $canvasSubmission['graded_at'];
+                        }
+                        // save participant, if not exists
+                        if (!$participant->getId()) {
+                            $this->saveParticipant(
+                                $plan,
+                                $participant->getUser(),
+                                $this->convertTime($feedbackTime)
+                            );
                         }
 
                         $feedback = $this->syncFeedback(
@@ -168,7 +168,7 @@ class QuizSubmission extends SubmissionAbstract
                     }
                 }
             }
-//                    $this->deleteUnSynchronisedFeedbacks($existingFeedbacks, $syncedFeedbackIds);
+            $this->deleteUnSynchronisedFeedbacks($attempts, $syncedFeedbackIds);
         }
         if (!$hasMarkToSync) {
             $this->log->debug("This Canvas assignment has no marks to sync");
@@ -212,33 +212,26 @@ class QuizSubmission extends SubmissionAbstract
             $this->log->debug(sprintf('Converting max mark: [%s] to null for %s', (string)$canvasSubmission['max_mark'], $quiz->getId()));
             $maxMark = null;
         }
-//        if ($quiz->getMaxMark()) {
-//            $normMark = ($normMark / $quiz) * 100;
-//        }
-//        $readableMark = $canvasSubmission['mark'];
-//        if ($submissionBox->getMarkType()->getSlug() !== SubmissionBox\MarkType::SLUG_NONE) {
-//            $readableMark = $markScheme->getHumanReadableMark($normMark);
-//        }
         /** @var Quiz\Attempt\Model $attempt */
         foreach ($existingFeedbacks as $attempt) {
+            /** @var Quiz\Attempt\Answer\Model|null $response */
             $response = $attempt->getAnswers()?->first();
             // check whether the rest are the same
             if (
                 $response
                 && $attempt->getUser()->getId() === $reviewee->getId()
                 && $attempt->getReviewer()->getId() === $reviewer->getId()
-//                && $attempt->gegetComment() == $canvasSubmission['comment']
-//                && $attempt->getFinish()->getHumanReadableMark() == $readableMark
-//                && $attempt->getNormalizedMark() == $normMark
+                && $response->getMark() === (float)$normMark
+                && $response->getComment() === (string)$canvasSubmission['comment']
             ) {
                 return $attempt;
             }
         }
 
         // time string from Canvas is coming in UTC
-        $feedbackTime = date_create("{$feedbackTime} UTC");
-        $startTime    = date_create("{$canvasSubmission['started_at']} UTC");
-        $finishTime   = date_create("{$canvasSubmission['finished_at']} UTC");
+        $feedbackTime = $this->convertTime($feedbackTime);
+        $startTime    = $this->convertTime((string)$canvasSubmission['started_at']);
+        $finishTime   = $this->convertTime((string)$canvasSubmission['finished_at']);
 
         $section = $quiz->getSections()->first();
         /** @var QuizQuestion\Model $question */
@@ -251,22 +244,18 @@ class QuizSubmission extends SubmissionAbstract
                                           ->setComment($canvasSubmission['comment'])
                                           ->setAutoMarked(false)
                                           ->setQuestion($question)
-                                          ->setUpdatedAt(Alaress_Date_Format::newFromTimestamp($feedbackTime->getTimestamp()));
+                                          ->setUpdatedAt($feedbackTime);
         // Couldn't find. Creating a new feedback
         $attempt = $this->quizAttemptMapper->createModel()
                                            ->setQuiz($quiz)
                                            ->setReviewer($reviewer)
                                            ->setUser($reviewee)
-//                 ->setReviewRoute(SubmissionBox\ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
-//                 ->setComment($canvasSubmission['comment'])
                                            ->setMark($normMark)
                                            ->setMaxMark($maxMark)
                                            ->setAnswers($answers)
-                                           ->setReviewed(Alaress_Date_Format::newFromTimestamp($feedbackTime->getTimestamp()))
-                                           ->setStart(Alaress_Date_Format::newFromTimestamp($startTime->getTimestamp()))
-                                           ->setFinish(Alaress_Date_Format::newFromTimestamp($finishTime->getTimestamp()));
-//                 ->setPublishedAt(Alaress_Date_Format::newFromTimestamp($feedbackTime->getTimestamp()))
-//                 ->setUpdatedAt(Alaress_Date_Format::newFromTimestamp($feedbackTime->getTimestamp()));
+                                           ->setReviewed($feedbackTime)
+                                           ->setStart($startTime)
+                                           ->setFinish($finishTime);
 
 
         /* Cannot use mappers here to save because:
@@ -301,8 +290,7 @@ class QuizSubmission extends SubmissionAbstract
     private function deleteUnSynchronisedFeedbacks(GenericCollection $existingFeedbacks, array $syncedFeedbackIds)
     {
         $deleteIds = array_diff($existingFeedbacks->getPropertyValues('id'), $syncedFeedbackIds);
-        // TODO: check!
-        $this->quizAttemptMapper->deleteByColumn('id', $deleteIds);
+        $this->quizAttemptMapper->deleteByColumn('assess_id', $deleteIds);
     }
 
 
@@ -325,13 +313,12 @@ class QuizSubmission extends SubmissionAbstract
                 assignment_dim.canvas_id,
                 submission_dim.id as submission_id,
                 submission_dim.published_grade as mark,
-                submission_fact.published_score as norm_mark_2, -- ???
-                quiz_submission_fact.score as norm_mark, -- ???
-                quiz_submission_fact.quiz_points_possible as max_mark, -- ???
+                quiz_submission_fact.score as norm_mark,
+                quiz_submission_fact.quiz_points_possible as max_mark,
                 CONVERT_TZ(quiz_submission_dim.started_at, 'UTC', :timezone) as started_at,
                 CONVERT_TZ(quiz_submission_dim.finished_at, 'UTC', :timezone) as finished_at,
                 reviewee.sis_user_id as reviewee_id,
-                submission_dim.grader_id as grader_user_id, -- ???
+                submission_dim.grader_id as grader_user_id,
                 CONVERT_TZ(submission_dim.graded_at, 'UTC', :timezone) as graded_at,
                 submission_comment_dim.comment as comment,
                 submission_comment_dim.author_id as commenter_id,

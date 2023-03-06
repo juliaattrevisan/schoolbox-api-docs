@@ -1671,26 +1671,6 @@ parameters:
 			path: library/External/Canvas/Sync/CliImporter.php
 
 		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 3
-			path: library/External/Canvas/Sync/DataSync.php
-
-		-
-			message: "#^Property External\\\\Canvas\\\\Sync\\\\DataSync\\:\\:\\$courseSpecMapper \\(Schoolbox\\\\Learning\\\\Course\\\\DataModel\\\\Implementation\\\\Mapper\\) does not accept Schoolbox\\\\Learning\\\\Course\\\\DataModel\\\\Specification\\\\Mapper\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/DataSync.php
-
-		-
-			message: "#^Property External\\\\Canvas\\\\Sync\\\\DataSync\\:\\:\\$persist \\(Alaress\\\\Database\\\\Connector\\\\IConnector\\) does not accept bool\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/DataSync.php
-
-		-
-			message: "#^Property External\\\\Canvas\\\\Sync\\\\DataSync\\:\\:\\$unitSpecMapper \\(Schoolbox\\\\Learning\\\\Course\\\\DataModel\\\\Implementation\\\\Unit\\\\Mapper\\) does not accept Schoolbox\\\\Learning\\\\Course\\\\DataModel\\\\Specification\\\\Unit\\\\Mapper\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/DataSync.php
-
-		-
 			message: "#^Call to protected method populateSaveTimestamps\\(\\) of class Schoolbox\\\\Mapper\\.$#"
 			count: 1
 			path: library/External/Canvas/Sync/ImportStage/CourseAssessmentAbstract.php
@@ -1801,11 +1781,6 @@ parameters:
 			path: library/External/Canvas/Sync/ImportStage/SectionQuiz.php
 
 		-
-			message: "#^Property External\\\\Canvas\\\\Sync\\\\ImportStage\\\\SectionQuiz\\:\\:\\$questionTypeMapper is unused\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/SectionQuiz.php
-
-		-
 			message: "#^Right side of && is always true\\.$#"
 			count: 1
 			path: library/External/Canvas/Sync/ImportStage/SectionQuiz.php
@@ -1822,11 +1797,6 @@ parameters:
 
 		-
 			message: "#^Call to protected method populateUuids\\(\\) of class Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/Submission.php
-
-		-
-			message: "#^Property External\\\\Canvas\\\\Sync\\\\ImportStage\\\\Submission\\:\\:\\$schoolboxAdmin \\(Schoolbox\\\\User\\) in empty\\(\\) is not falsy\\.$#"
 			count: 1
 			path: library/External/Canvas/Sync/ImportStage/Submission.php
 

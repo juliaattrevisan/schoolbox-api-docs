@@ -114,14 +114,6 @@ class Submission extends SubmissionAbstract
                             // current canvas submission is not for this participant
                             continue;
                         }
-                        // save participant, if not exists
-                        if (!$participant->getId()) {
-                            $this->saveParticipant(
-                                $plan,
-                                $participant->getUser(),
-                                $this->convertTime($canvasSubmission['finished_at'])
-                            );
-                        }
                         // $participant should be a school box user with this reviewee_id as their external_id
                         $reviewee = $participant->getUser();
                         if (
@@ -135,6 +127,14 @@ class Submission extends SubmissionAbstract
                         } else {
                             $reviewer     = $this->findUserByCanvasUserId($canvasSubmission['grader_user_id']);
                             $feedbackTime = $canvasSubmission['graded_at'];
+                        }
+                        // save participant, if not exists
+                        if (!$participant->getId()) {
+                            $this->saveParticipant(
+                                $plan,
+                                $participant->getUser(),
+                                $this->convertTime($feedbackTime)
+                            );
                         }
 
                         $feedback = $this->syncFeedback(
@@ -188,7 +188,6 @@ class Submission extends SubmissionAbstract
         string $feedbackTime
     ): ?SubmissionBox\ReturnedWork {
         $normMark = $canvasSubmission['norm_mark'];
-        /** @var SubmissionBox $submissionBox */
         if ($submissionBox->getMaxMark()) {
             $normMark = ($normMark / $submissionBox->getMaxMark()) * 100;
         }
@@ -202,9 +201,9 @@ class Submission extends SubmissionAbstract
             if (
                 $existingFeedback->getOwner()->getId() === $reviewee->getId()
                 && $existingFeedback->getMarker()->getId() === $reviewer->getId()
-                && $existingFeedback->getComment() == $canvasSubmission['comment']
-                && $existingFeedback->getHumanReadableMark() == $readableMark
-                && $existingFeedback->getNormalizedMark() == $normMark
+                && (string)$existingFeedback->getComment() === (string)$canvasSubmission['comment']
+                && (string)$existingFeedback->getHumanReadableMark() === (string)$readableMark
+                && (float)$existingFeedback->getNormalizedMark() === (float)$normMark
             ) {
                 return $existingFeedback;
             }

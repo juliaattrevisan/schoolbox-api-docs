@@ -12,8 +12,6 @@ namespace External\Canvas\Sync\ImportStage;
 
 use Alaress\Database\Connector\IConnector;
 use Psr\Log\LoggerInterface;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -22,13 +20,9 @@ use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Alaress\Database;
-use External\Canvas\Sync\Bridge;
 use External\Canvas\Sync\ImportStage\Traits\ModelSaveTrait;
-use External_ClassInterface;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Assessment\Participant;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Mapper;
 
 /**
@@ -58,23 +52,10 @@ abstract class SubmissionAbstract
     public function __construct(
         protected IConnector $canvasDb,
         protected IConnector $schoolboxDb,
-//        protected External_ClassInterface $externalClass,
-//        protected ?string $currentFileYear,
-//        protected UnitImpl\Mapper $unitImplMapper,
-//        protected UnitSpec\Mapper $unitSpecMapper,
-//        protected SubmissionBoxMapper $submissionBoxMapper,
-//        protected Assessment\Mapper $assessmentMapper,
-//        protected Participant\Plan\Mapper $planMapper,
         protected Participant\Mapper $participantMapper,
         protected UserMapper $userMapper,
         protected LoggerInterface $log,
-//        protected Bridge\AssignmentDates $assignmentDatesBridge,
-//        protected Bridge\Course $courseBridge,
-//        protected Bridge\CourseSection $courseSectionBridge,
-//        protected Bridge\AssignmentOverride $assignmentOverrideBridge,
-//        protected ReturnedWorkMapper $returnedWorkMapper,
         protected Assessment\MapperProxy $assessmentDataSource,
-//        protected string $schoolboxTimezone,
     )
     {
     }
@@ -87,7 +68,7 @@ abstract class SubmissionAbstract
      * @param int $assessmentSpecId
      * @return GenericCollection|IAssessable[]
      */
-    protected function findAllImplementationsBySpecificationId(int $assessmentSpecId)
+    protected function findAllImplementationsBySpecificationId(int $assessmentSpecId): array|GenericCollection
     {
         $query     = '
                 SELECT implementation_assessment_id
@@ -99,6 +80,10 @@ abstract class SubmissionAbstract
         return $this->assessmentDataSource->findAllByIds($ids);
     }
 
+    /**
+     * @param IAssessable $assessmentImpl
+     * @return IAssessable|null
+     */
     protected function loadParticipants(IAssessable $assessmentImpl): ?IAssessable
     {
         $assessmentCollection = $this->assessmentDataSource->createCollection()
@@ -126,16 +111,6 @@ abstract class SubmissionAbstract
      */
     public function saveParticipant(Plan $planModel, User $user, \Alaress_Date_Format $createdAt): void
     {
-//        $existing = $this->participantMapper->findByColumnList(
-//            [
-//                'participant_plan_id' => $planModel->getId(),
-//                'user_id'             => $user->getId(),
-//            ]
-//        )->first();
-//        if ($existing) {
-//            return;
-//        }
-
         $plan        = (new Participant\Plan\Model())->setId($planModel->getId());
         $participant = $this->participantMapper->createModel()
                                                ->setUser($user)
