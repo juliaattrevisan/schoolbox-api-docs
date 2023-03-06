@@ -8,7 +8,7 @@
     postRoute:                string      - Where to post form to
 #}
 <script type="text/javascript" src="{{CDN_PREFIX}}/js/bundle/colourPicker.js?v={{ config.site_version }}"></script>
-<script src="{CDN_PREFIX}/js/bundle/editor.js?v={SITE_VERSION}"></script>
+<script src="{{CDN_PREFIX}}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 
 <script type="text/javascript">
     $(function() {
@@ -66,7 +66,7 @@
          */
         document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
             detail: {
-                targetElements: [settingsForm.find('[data-html-editor]')],
+                targetElements: ['[data-html-editor]'],
                 baseHref: settingsForm.find('[data-html-editor]')[0].dataset.href
             }
         }));
