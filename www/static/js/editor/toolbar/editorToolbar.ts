@@ -41,15 +41,7 @@ export function getToolbar(config: EditorConfig) {
         {
             label: "Insert",
             icon: "plus",
-            items: [
-                "insertImage",
-                "mediaEmbed",
-                "resource",
-                "insertTable",
-                "specialCharacters",
-                "emoji",
-                "horizontalLine",
-            ],
+            items: ["resource", "mediaEmbed", "insertTable", "specialCharacters", "emoji", "horizontalLine"],
         },
         "|",
         {
