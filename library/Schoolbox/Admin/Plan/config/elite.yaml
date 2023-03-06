@@ -104,7 +104,7 @@ config:
   office365_immersive_reader_name: {hide: false}
   googleapps_api_key: { hide: false }
   turnitin_api_key: {hide: true}
-  turnitin_api_host: {hide: false}
+  turnitin_api_host: {hide: true}
 
 topMenu:
   hide:
@@ -119,4 +119,4 @@ topMenu:
     - /pastoral
 components:
   hide:
-
+   - Component_Dashboard_CanvasAssignmentsController
