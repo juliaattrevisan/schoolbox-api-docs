@@ -111,7 +111,8 @@
         "guzzlehttp/psr7": "^2.4",
         "learnosity/learnosity-sdk-php": "^1.0",
         "fileeye/pel": "^0.9",
-        "ramsey/uuid": "^4.7"
+        "ramsey/uuid": "^4.7",
+        "steverhoades/oauth2-openid-connect-client": "^2.0"
     },
     "autoload-dev": {
       "psr-4": {
