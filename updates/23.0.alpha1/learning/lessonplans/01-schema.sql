@@ -67,12 +67,19 @@ CONSTRAINT `fk_lesson_plan_lesson_plan_template`
 
 CREATE TABLE `lesson_plan_field` (
 `id` INT NOT NULL AUTO_INCREMENT,
+`lesson_plan_id` INT NOT NULL,
 `lesson_plan_template_field_id` INT NOT NULL,
 `body` TEXT NULL,
 `created_at` DATETIME NOT NULL,
 `updated_at` DATETIME NOT NULL,
 `deleted_at` DATETIME NULL DEFAULT NULL,
 PRIMARY KEY (`id`),
+INDEX `fk_lesson_plan_field_lesson_plan_idx` (`lesson_plan_id` ASC),
+CONSTRAINT `fk_lesson_plan_field_lesson_plan`
+    FOREIGN KEY (`lesson_plan_id`)
+        REFERENCES `lesson_plan` (`id`)
+        ON DELETE NO ACTION
+        ON UPDATE NO ACTION,
 INDEX `fk_lesson_plan_field_lesson_plan_template_field_idx` (`lesson_plan_template_field_id` ASC),
 CONSTRAINT `fk_lesson_plan_field_lesson_plan_template_field`
     FOREIGN KEY (`lesson_plan_template_field_id`)
