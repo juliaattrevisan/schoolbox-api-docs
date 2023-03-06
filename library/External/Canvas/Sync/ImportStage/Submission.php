@@ -168,18 +168,18 @@ class Submission extends SubmissionAbstract
     /**
      * Finds or creates Schoolbox Feedback corresponding to the given canvas submission
      *
-     * @param SubmissionBox     $submissionBox
-     * @param User              $reviewer
-     * @param User              $reviewee
-     * @param array             $canvasSubmission
-     * @param GenericCollection $existingFeedbacks
-     * @param IMarkScheme       $markScheme
-     * @param string            $feedbackTime
+     * @param Assessment\IAssessableDataModel $iAssessable
+     * @param User $reviewer
+     * @param User                $reviewee
+     * @param array               $canvasSubmission
+     * @param GenericCollection   $existingFeedbacks
+     * @param IMarkScheme         $markScheme
+     * @param string              $feedbackTime
      * @return SubmissionBox\ReturnedWork|null
      * @throws Mapper\Exception
      */
     public function syncFeedback(
-        $submissionBox,
+        Assessment\IAssessableDataModel $iAssessable,
         User $reviewer,
         User $reviewee,
         array $canvasSubmission,
@@ -187,6 +187,8 @@ class Submission extends SubmissionAbstract
         IMarkScheme $markScheme,
         string $feedbackTime
     ): ?SubmissionBox\ReturnedWork {
+        /** @var SubmissionBox $submissionBox */
+        $submissionBox = $iAssessable;
         $normMark = $canvasSubmission['norm_mark'];
         if ($submissionBox->getMaxMark()) {
             $normMark = ($normMark / $submissionBox->getMaxMark()) * 100;

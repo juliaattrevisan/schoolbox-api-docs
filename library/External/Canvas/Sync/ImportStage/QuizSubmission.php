@@ -11,9 +11,9 @@ declare(strict_types=1);
 namespace External\Canvas\Sync\ImportStage;
 
 use Alaress\Database\Connector\IConnector;
-use Alaress_Date_Format;
 use Psr\Log\LoggerInterface;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\User;
@@ -181,18 +181,18 @@ class QuizSubmission extends SubmissionAbstract
     /**
      * Finds or creates Schoolbox Feedback corresponding to the given canvas submission
      *
-     * @param Quiz\Model        $quiz
-     * @param User              $reviewer
-     * @param User              $reviewee
-     * @param array             $canvasSubmission
-     * @param GenericCollection $existingFeedbacks
-     * @param IMarkScheme       $markScheme
-     * @param string            $feedbackTime
+     * @param IAssessableDataModel $iAssessable
+     * @param User                 $reviewer
+     * @param User                 $reviewee
+     * @param array                $canvasSubmission
+     * @param GenericCollection    $existingFeedbacks
+     * @param IMarkScheme          $markScheme
+     * @param string               $feedbackTime
      * @return Quiz\Attempt\Model|null
      * @throws Mapper\Exception
      */
     public function syncFeedback(
-        $quiz,
+        IAssessableDataModel $iAssessable,
         User $reviewer,
         User $reviewee,
         array $canvasSubmission,
@@ -200,6 +200,8 @@ class QuizSubmission extends SubmissionAbstract
         IMarkScheme $markScheme,
         string $feedbackTime
     ): ?Quiz\Attempt\Model {
+        /** @var Quiz\Model $quiz */
+        $quiz = $iAssessable;
         if (is_numeric($canvasSubmission['norm_mark'])) {
             $normMark = (float)$canvasSubmission['norm_mark'];
         } else {
@@ -233,6 +235,7 @@ class QuizSubmission extends SubmissionAbstract
         $startTime    = $this->convertTime((string)$canvasSubmission['started_at']);
         $finishTime   = $this->convertTime((string)$canvasSubmission['finished_at']);
 
+        /** @var Quiz\Model $section */
         $section = $quiz->getSections()->first();
         /** @var QuizQuestion\Model $question */
         $question = $section->getQuestions()?->first();

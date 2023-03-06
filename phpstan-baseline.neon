@@ -1671,39 +1671,9 @@ parameters:
 			path: library/External/Canvas/Sync/CliImporter.php
 
 		-
-			message: "#^Call to protected method populateSaveTimestamps\\(\\) of class Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/CourseAssessmentAbstract.php
-
-		-
-			message: "#^Call to protected method populateUuids\\(\\) of class Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/CourseAssessmentAbstract.php
-
-		-
-			message: "#^Call to protected method populateSaveTimestamps\\(\\) of class Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/CourseAssignments.php
-
-		-
-			message: "#^Call to protected method populateUuids\\(\\) of class Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/CourseAssignments.php
-
-		-
 			message: "#^Property External\\\\Canvas\\\\Sync\\\\ImportStage\\\\CourseAssignments\\:\\:\\$accountBridge is unused\\.$#"
 			count: 1
 			path: library/External/Canvas/Sync/ImportStage/CourseAssignments.php
-
-		-
-			message: "#^Call to protected method populateSaveTimestamps\\(\\) of class Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/CourseQuiz.php
-
-		-
-			message: "#^Call to protected method populateUuids\\(\\) of class Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/CourseQuiz.php
 
 		-
 			message: "#^Left side of && is always true\\.$#"
@@ -1736,39 +1706,9 @@ parameters:
 			path: library/External/Canvas/Sync/ImportStage/CourseQuiz.php
 
 		-
-			message: "#^Call to protected method populateSaveTimestamps\\(\\) of class Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/SectionAssessmentAbstract.php
-
-		-
-			message: "#^Call to protected method populateUuids\\(\\) of class Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/SectionAssessmentAbstract.php
-
-		-
 			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
 			path: library/External/Canvas/Sync/ImportStage/SectionAssessmentAbstract.php
-
-		-
-			message: "#^Call to protected method populateSaveTimestamps\\(\\) of class Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/SectionAssignment.php
-
-		-
-			message: "#^Call to protected method populateUuids\\(\\) of class Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/SectionAssignment.php
-
-		-
-			message: "#^Call to protected method populateSaveTimestamps\\(\\) of class Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/SectionQuiz.php
-
-		-
-			message: "#^Call to protected method populateUuids\\(\\) of class Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/SectionQuiz.php
 
 		-
 			message: "#^Left side of && is always true\\.$#"
@@ -4829,11 +4769,6 @@ parameters:
 			message: "#^Method Schoolbox\\\\Learning\\\\Assessment\\\\Quiz\\\\Attempt\\\\MapperProxy\\:\\:transformModels\\(\\) should return iterable\\<Schoolbox\\\\Learning\\\\Assessment\\\\Quiz\\\\Attempt\\\\Model\\>&Schoolbox\\\\GenericCollection but returns array\\<Schoolbox\\\\Learning\\\\Assessment\\\\Quiz\\\\Attempt\\\\Model\\>\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Quiz/Attempt/MapperProxy.php
-
-		-
-			message: "#^Method Schoolbox\\\\Learning\\\\Assessment\\\\Quiz\\\\Attempt\\\\Model\\:\\:getDuration\\(\\) should return Alaress\\\\Date\\\\Interval but returns null\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Quiz/Attempt/Model.php
 
 		-
 			message: "#^Property Schoolbox\\\\Learning\\\\Assessment\\\\Quiz\\\\Controller\\:\\:\\$quizAttemptMapper is never read, only written\\.$#"
