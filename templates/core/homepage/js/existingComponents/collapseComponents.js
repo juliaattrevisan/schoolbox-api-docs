@@ -59,7 +59,9 @@ export async function open(component) {
     gsap.to(collapseButton, { rotation: 0, transformOrigin: "20px 20px", duration: ANIMATE_SPEED });
     const collapsePanel = component.querySelector(PANEL_SELECTOR);
     collapsePanel.setAttribute("data-collapse-state", "uncollapsed");
+    collapsePanel.dispatchEvent(new CustomEvent("expandStart.collapsable"));
     await slideDown(collapsePanel, ANIMATE_SPEED);
+    collapsePanel.dispatchEvent(new CustomEvent("expandStop.collapsable"));
 }
 
 /**
@@ -72,7 +74,9 @@ export async function close(component) {
     gsap.to(collapseButton, { rotation: 180, transformOrigin: "20px 20px", duration: ANIMATE_SPEED });
     const collapsePanel = component.querySelector(PANEL_SELECTOR);
     collapsePanel.setAttribute("data-collapse-state", "collapsed");
+    collapsePanel.dispatchEvent(new CustomEvent("collapseStart.collapsable"));
     await slideUp(collapsePanel, ANIMATE_SPEED);
+    collapsePanel.dispatchEvent(new CustomEvent("collapseStop.collapsable"));
 }
 
 /**
