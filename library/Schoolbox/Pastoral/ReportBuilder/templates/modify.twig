@@ -323,7 +323,7 @@
                                 involved tick the checkbox below.
                             </p>
                             <input id="involved" name="involved" value="1" type="checkbox"
-                                   {% if report.involved %}checked{% endif %}>
+                               {% if report.involved %}checked{% endif %}>
                             <label for="involved">
                                 Only show records in which you are the author or an audience member
                             </label>
@@ -342,41 +342,45 @@
                         </h2>
                     </label>
                     <p class="meta">Select the year levels you want included in the report</p>
-
-                    <section>
-                        <div class="small-12 columns content">
-                            <div class="checklist">
-                                <ul class="option-list">
-                                    <li>
-                                        <input id="year-all" type="checkbox" data-check-all-year>
-                                        <label for="year-all">Select All</label>
-                                    </li>
-                                    <li>
-                                        <input id="includeStudentsWithoutYear"
-                                               name="includeStudentsWithoutYear"
-                                               value="1"
-                                               type="checkbox"
-                                               {% if report.includeStudentsWithoutYear %}checked{% endif %}
-                                               data-check-year
-                                        >
-                                        <label for="includeStudentsWithoutYear">(No Year Level)</label>
-                                    </li>
-                                    {% for year in years %}
+                    {% if years is not empty %}
+                        <section>
+                            <div class="small-12 columns content">
+                                <div class="checklist">
+                                    <ul class="option-list">
                                         <li>
-                                            <input id="year-{{ year.id }}"
-                                                   name="years[]"
-                                                   value="{{ year.id }}"
+                                            <input id="year-all" type="checkbox" data-check-all-year>
+                                            <label for="year-all">Select All</label>
+                                        </li>
+                                        <li>
+                                            <input id="includeStudentsWithoutYear"
+                                                   name="includeStudentsWithoutYear"
+                                                   value="1"
                                                    type="checkbox"
-                                                   {% for yearSelected in (report.years ?? []) |filter(yearSelected => yearSelected.id == year.id ) %}checked{% endfor %}
+                                                   {% if report.includeStudentsWithoutYear %}checked{% endif %}
                                                    data-check-year
                                             >
-                                            <label for="year-{{ year.id }}">{{ year.longname }}</label>
+                                            <label for="includeStudentsWithoutYear">(No Year Level)</label>
                                         </li>
-                                    {% endfor %}
-                                </ul>
+                                        {% for year in years %}
+                                            <li>
+                                                <input id="year-{{ year.id }}"
+                                                       name="years[]"
+                                                       value="{{ year.id }}"
+                                                       type="checkbox"
+                                                       {% for yearSelected in (report.years ?? []) |filter(yearSelected => yearSelected.id == year.id ) %}checked{% endfor %}
+                                                       data-check-year
+                                                >
+                                                <label for="year-{{ year.id }}">{{ year.longname }}</label>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
                             </div>
-                        </div>
-                    </section>
+                        </section>
+                    {% else %}
+                        {# TODO: add empty state box #}
+                        <p>No years are available because none exist</p>
+                    {% endif %}
                 </div>
 
                 <div class="small-12 medium-6 columns">
@@ -387,41 +391,47 @@
                     </label>
                     <p class="meta">Select the houses you want included in the report</p>
 
-                    <section>
-                        <div class="small-12 columns content">
-                            <div class="checklist">
-                                <ul class="option-list">
-                                    <li>
-                                        <input id="house-all" type="checkbox" data-check-all-house>
-                                        <label for="house-all">Select All</label>
-                                    </li>
-                                    <li>
-                                        <input id="includeStudentsWithoutHouse"
-                                               name="includeStudentsWithoutHouse"
-                                               value="1"
-                                               type="checkbox"
-                                               {% if report.includeStudentsWithoutHouse %}checked{% endif %}
-                                               data-check-house
-                                        >
-                                        <label for="includeStudentsWithoutHouse">(No House)</label>
-                                    </li>
-                                    {% for house in houses %}
+                    {% if houses is not empty %}
+                        <section>
+                            <div class="small-12 columns content">
+                                <div class="checklist">
+                                    <ul class="option-list">
                                         <li>
-                                            <input id="house-{{ house.id }}"
-                                                   name="houses[]"
-                                                   value="{{ house.id }}"
+                                            <input id="house-all" type="checkbox" data-check-all-house>
+                                            <label for="house-all">Select All</label>
+                                        </li>
+                                        <li>
+                                            <input id="includeStudentsWithoutHouse"
+                                                   name="includeStudentsWithoutHouse"
+                                                   value="1"
                                                    type="checkbox"
-                                                   {% for houseSelected in (report.houses ?? []) | filter(houseSelected => houseSelected == house) %}checked{% endfor %}
+                                                   {% if report.includeStudentsWithoutHouse %}checked{% endif %}
                                                    data-check-house
                                             >
-                                            <label for="house-{{ house.id }}">{{ house.house }}</label>
+                                            <label for="includeStudentsWithoutHouse">(No House)</label>
                                         </li>
-                                    {% endfor %}
-                                </ul>
+                                        {% for house in houses %}
+                                            <li>
+                                                <input id="house-{{ house.id }}"
+                                                       name="houses[]"
+                                                       value="{{ house.id }}"
+                                                       type="checkbox"
+                                                       {% for houseSelected in (report.houses ?? []) | filter(houseSelected => houseSelected == house) %}checked{% endfor %}
+                                                       data-check-house
+                                                >
+                                                <label for="house-{{ house.id }}">{{ house.house }}</label>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
                             </div>
-                        </div>
-                    </section>
+                        </section>
+                    {% else %}
+                        {# TODO: add empty state box #}
+                        <p>No houses are available because none exist</p>
+                    {% endif %}
                 </div>
+
                 <div class="small-12 medium-6 columns">
                     <label>
                         <h2 class="subheader">

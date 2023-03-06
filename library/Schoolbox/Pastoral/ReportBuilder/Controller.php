@@ -567,10 +567,11 @@ class Controller extends Base
     {
         $post = $this->request->post;
 
-        /* User must supply name, types, years and houses
+        /* If no years/houses exist in the database, the form will not display any for the user to select, and so none
+         * will be submitted.  In that case, include all students not linked to any years/houses.
          */
-        $includeStudentsWithoutYear  = $post->getBool('includeStudentsWithoutYear', false);
-        $includeStudentsWithoutHouse = $post->getBool('includeStudentsWithoutHouse', false);
+        $includeStudentsWithoutYear  = $post->getBool('includeStudntsWithoutYear', true);
+        $includeStudentsWithoutHouse = $post->getBool('includeStudentsWithoutHouse', true);
         // For years and houses, either no-house/year or years/houses need to be selected
         if (
             !strlen($post->get('name'))
