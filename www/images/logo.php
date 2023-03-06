@@ -36,6 +36,27 @@ $kernel->getShutdownHandler()->registerFunction(
 );
 
 $logoSizes = [
+    ConfigMapper::NAME_SKIN_FAVICON => [
+        'normal'   => [72, 72, '/core/m-hercules.png'],
+        'hidpi'    => [160, 160, '/core/m-hercules.png'],
+        'favicon'  => [64, 64, '/core/m-hercules.png'],
+        'tile70'   => [70, 70, '/core/m-hercules.png'],
+        'tile150'  => [150, 150, '/core/m-hercules.png'],
+        'apple57'  => [57, 57, '/core/m-hercules.png'],
+        'apple60'  => [60, 60, '/core/m-hercules.png'],
+        'apple72'  => [72, 72, '/core/m-hercules.png'],
+        'apple76'  => [76, 76, '/core/m-hercules.png'],
+        'apple114' => [114, 114, '/core/m-hercules.png'],
+        'apple120' => [120, 120, '/core/m-hercules.png'],
+        'apple144' => [144, 144, '/core/m-hercules.png'],
+        'apple152' => [152, 152, '/core/m-hercules.png'],
+        'apple180' => [180, 180, '/core/m-hercules.png'],
+        'google96'  => [96,96, '/core/m-hercules.png'],
+        'google128' => [128,128, '/core/m-hercules.png'],
+        'google192' => [192,192, '/core/m-hercules.png'],
+        'google384' => [384,384, '/core/m-hercules.png'],
+        'google512' => [512,512, '/core/m-hercules.png'],
+    ],
     'skin_logo_square' => [
         'normal'   => [72, 72, '/core/m-hercules.png'],
         'hidpi'    => [160, 160, '/core/m-hercules.png'],
@@ -83,17 +104,23 @@ if (!array_key_exists($logo, $logoSizes) || !array_key_exists($size, $logoSizes[
 
 $myImage = new MyImage();
 $key     = $myImage->getCacheKey($logoSizes[$logo][$size][0], $logoSizes[$logo][$size][1]);
+/** @var IConfigLoader $config */
+$config = $kernel->get('config');
 try {
     /* Choose a caching method to use
      */
-    $hash            = Config::get($logo);
-    if (!$hash) {
-        // Quick hack to prevent avoidable db query (shouldn't be throwing exceptions for this)
-        throw new Exception("No hash configured for logo '$logo'");
+
+    $hash            = $config->get($logo);
+    if ('' === trim((string)$hash)) {
+        // If user has not set a favicon, then use the default NAME_SKIN_LOGO_SQUARE or just fail
+        $hash = $config->get(ConfigMapper::NAME_SKIN_LOGO_SQUARE);
+
+        if ('' === trim((string)$hash)) {
+            // Quick hack to prevent avoidable db query (shouldn't be throwing exceptions for this)
+            throw new Exception("No hash configured for logo '$logo'");
+        }
     }
     $resource = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($hash);
-    /** @var IConfigLoader $config */
-    $config = $kernel->get('config');
     if ($config->get(ConfigMapper::NAME_OTFS_ADAPTER) === FilesystemFactory::FILE_SYSTEM_ADAPTER_AWS_S3) {
         if ($config->get(ConfigMapper::NAME_IMAGE_S3_PRESIGNED_URL_ENABLED)) {
             $preSignedUrlService = new PreSignedUrlService($config);
