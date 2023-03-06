@@ -274,9 +274,10 @@
                 var documentHeight = $(document).height();
                 /**
                  * because offsets can return fractional values, we want to always round up.
+                 * the height of the target element must also be included in the calculation as the dropdown will be rendered below the target.
                  * also make sure that when we grab the outerheight, we include any margins
                  */
-                var targetRelativeHeight = Math.ceil(target.offset().top) + dropdown.outerHeight(true);
+                var targetRelativeHeight = Math.ceil(target.offset().top) + target.height() + dropdown.outerHeight(true);
 
                 /**
                  * the relative position and height of the dropdown exceeds the document height
