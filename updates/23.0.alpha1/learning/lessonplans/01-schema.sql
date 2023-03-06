@@ -54,7 +54,6 @@ CREATE TABLE `lesson_plan` (
 `id` INT NOT NULL AUTO_INCREMENT,
 `lesson_plan_template_id` INT NOT NULL,
 `assessment_id` INT(10) UNSIGNED NOT NULL,
-`visibility` ENUM('student', 'staff') NOT NULL,
 `created_by` INT NOT NULL,
 `updated_by` INT NOT NULL,
 `deleted_by` INT NULL DEFAULT NULL,

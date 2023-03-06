@@ -18,7 +18,6 @@ use Schoolbox\Mapper\Exception;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
-
 /**
  * @method Model createModel($idValue = null)
  * @method GenericCollection|Model[] findAll($options = [])
