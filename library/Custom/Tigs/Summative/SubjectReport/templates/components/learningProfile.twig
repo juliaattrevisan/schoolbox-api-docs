@@ -13,34 +13,38 @@ Data:
                                                 the learning profile.
     indicators[].descriptor.name: string      - the name of the selected descriptor in the indicator.
 #}
-<div class="column small-12">
-    <h2 class="subheader">
-        {% if link is defined %}
-            <a href="{{ link }}" title="View source assessment &ldquo;{{ assessment.title }}&ldquo;">
-                <span class="icon-link linked-unit-heading"></span>
-                Term {{ term }} Learning Profile
-            </a>
-        {% else %}
-            Term {{ term }} Learning Profile
-        {% endif %}
-    </h2>
-    <p class="meta">Due {{ assessment.dueAt.localShort }}</p>
 
-    <table>
+<style>
+    .tigs-crp .learning-profile-level {
+        text-align: left;
+    }
+    .tigs-crp .learning-profile-indicator {
+        text-align: left;
+    }
+    .tigs-crp .learning-profile-check {
+        text-align: center;
+    }
+</style>
+
+<div class="column small-12">
+    <h2 class="subheader">Term {{ term }} Learning Profile</h2>
+    <h3 class="subheader">{{ assessment.title }}</h3>
+
+    <table class="learning-profile">
         <thead>
         <tr>
             <th>&nbsp;</th>
             {% for level in levels %}
-                <th>{{ level.name }}</th>
+                <th class="learning-profile-level">{{ level.name }}</th>
             {% endfor %}
         </tr>
         </thead>
         <tbody>
         {% for indicator in indicators %}
             <tr>
-                <th>{{ indicator.name }}</th>
+                <th class="learning-profile-indicator">{{ indicator.name }}</th>
                 {% for level in levels %}
-                    <td>
+                    <td class="learning-profile-check">
                         {% if level.name is same as indicator.descriptor.name %}&check;{% else %}&nbsp;{% endif %}
                     </td>
                 {% endfor %}
