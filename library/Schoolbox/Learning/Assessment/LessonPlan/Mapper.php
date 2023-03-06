@@ -60,6 +60,16 @@ class Mapper extends \Schoolbox\Mapper
             'assessmentModel',
         );
 
+        $this->hasJoin(
+            'files',
+            [
+                'multiple'  => true,
+                'mapper'    => File\Mapper::class,
+                'this_key'  => 'id',
+                'other_key' => 'lesson_plan_id',
+            ]
+        );
+
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteFields']);
     }
 
@@ -183,6 +193,10 @@ class Mapper extends \Schoolbox\Mapper
             /* Reference it in the Lesson Plan Template Fields as well
              */
             $lessonPlans[$row['id']]->getLessonPlanTemplate()->addField($lessonPlanTemplateField);
+
+            /* Augment with attached files
+             */
+            $lessonPlans[$row['id']]->setAttachments($this->getJoinMapper('files')->findByColumn('lesson_plan_id', $lessonPlans[$row['id']]->getId()));
         }
 
         /* Sort sequentially
@@ -192,6 +206,17 @@ class Mapper extends \Schoolbox\Mapper
         }
 
         return $this->createCollection(array_values($lessonPlans));
+    }
+
+
+    /**
+     * Persist Lesson Plan files.
+     *
+     * @param Model $lessonPlan
+     */
+    public function saveFiles(Model $lessonPlan): void
+    {
+        $this->cascadeJoin('files', ['lesson_plan_id' => $lessonPlan->getId()], $lessonPlan->getAttachments());
     }
 
 

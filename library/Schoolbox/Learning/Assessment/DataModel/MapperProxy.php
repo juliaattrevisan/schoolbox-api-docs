@@ -1328,7 +1328,10 @@ class MapperProxy
         } elseif ($subObject instanceof LtiAssessment\Model) {
             LtiAssessment\Mapper::getInstance()->save($subObject);
         } elseif ($subObject instanceof \Schoolbox\Learning\Assessment\LessonPlan\Model) {
-            \Schoolbox\Learning\Assessment\LessonPlan\Mapper::getInstance()->save($subObject);
+            $lessonPlanMapper = \Schoolbox\Learning\Assessment\LessonPlan\Mapper::getInstance();
+
+            $lessonPlanMapper->save($subObject);
+            $lessonPlanMapper->saveFiles($subObject);
         } elseif ($subObject instanceof Project) {
             ProjectMapper::getInstance()->save($subObject);
         }

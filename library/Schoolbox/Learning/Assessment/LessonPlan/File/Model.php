@@ -1,0 +1,70 @@
+<?php
+
+/**
+ * @copyright Copyright 2023, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
+declare(strict_types=1);
+
+namespace Schoolbox\Learning\Assessment\LessonPlan\File;
+
+use Schoolbox\ISoftDeletable;
+use Schoolbox\Learning\Assessment\LessonPlan;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
+use Schoolbox\Resource\File\IFile;
+use Schoolbox\Resource\File\StorableTrait;
+use Schoolbox\User;
+
+/**
+ * File attached to a Lesson Plan.
+ */
+class Model implements IFile, ISoftDeletable
+{
+    use StorableTrait;
+    use CreatedAtDate;
+    use UpdatedAtDate;
+    use DeletedAtDate;
+
+
+    /**
+     * @var LessonPlan\Model
+     */
+    private LessonPlan\Model $lessonPlan;
+
+
+    /**
+     * @return LessonPlan\Model
+     */
+    public function getLessonPlan(): LessonPlan\Model
+    {
+        return $this->lessonPlan;
+    }
+
+
+    /**
+     * @param LessonPlan\Model $lessonPlan
+     * @return $this
+     */
+    public function setLessonPlan(LessonPlan\Model $lessonPlan): self
+    {
+        $this->lessonPlan = $lessonPlan;
+        return $this;
+    }
+
+
+    /**
+     * I suppose the Lesson Plan creator remains the owner
+     * regardless of who most recently updates it
+     *
+     * (no transfer of ownership when it comes to Lesson Plan Files)
+     *
+     * @return User
+     */
+    public function getOwner(): User
+    {
+        return $this->lessonPlan->getCreatedBy();
+    }
+}

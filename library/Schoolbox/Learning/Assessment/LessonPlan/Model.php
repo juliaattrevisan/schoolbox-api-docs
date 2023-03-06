@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\LessonPlan;
 
 use InvalidArgumentException;
+use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
@@ -64,6 +65,14 @@ class Model extends AbstractAssessment
      * @var GenericCollection|null
      */
     private ?GenericCollection $fields = null;
+
+
+    /**
+     * Optionally attached Files
+     *
+     * @var Collection|null
+     */
+    protected ?Collection $attachments = null;
 
 
     /**
@@ -213,6 +222,15 @@ class Model extends AbstractAssessment
 
 
     /**
+     * @return string
+     */
+    public static function getDefaultTypeName(): string
+    {
+        return 'Lesson Plan';
+    }
+
+
+    /**
      * This model's "kind of assessment" used to identify it
      * among the family of AbstractAssessment subclasses
      *
@@ -306,5 +324,25 @@ class Model extends AbstractAssessment
             'due'     => $this->getDueAt(),
             'late'    => $this->getCloseAt()
         ]);
+    }
+
+
+    /**
+     * @return Collection|null
+     */
+    public function getAttachments(): ?Collection
+    {
+        return $this->attachments;
+    }
+
+
+    /**
+     * @param Collection|null $attachments
+     * @return $this
+     */
+    public function setAttachments(?Collection $attachments): self
+    {
+        $this->attachments = $attachments;
+        return $this;
     }
 }

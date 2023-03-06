@@ -113,3 +113,28 @@ CONSTRAINT `fk_lesson_plan`
       ON DELETE NO ACTION
       ON UPDATE NO ACTION
 );
+
+
+CREATE TABLE `lesson_plan_file` (
+`id` INT NOT NULL AUTO_INCREMENT,
+`lesson_plan_id` INT NOT NULL,
+`storage_hash` VARCHAR(100) CHARACTER SET 'ascii' COLLATE 'ascii_general_ci' NULL,
+`realname` VARCHAR(255),
+`created_at` DATETIME NOT NULL,
+`updated_at` DATETIME NOT NULL,
+`deleted_at` DATETIME NULL,
+PRIMARY KEY (`id`),
+INDEX `lesson_plan_id` (`lesson_plan_id` ASC),
+CONSTRAINT `fk_lesson_plan_file`
+    FOREIGN KEY (`storage_hash`)
+        REFERENCES `storage` (`hash`)
+        ON DELETE NO ACTION
+        ON UPDATE NO ACTION,
+CONSTRAINT `fk_lesson_plan_file_lesson_plan`
+    FOREIGN KEY (`lesson_plan_id`)
+        REFERENCES `lesson_plan` (`id`)
+        ON DELETE NO ACTION
+        ON UPDATE NO ACTION
+);
+
+
