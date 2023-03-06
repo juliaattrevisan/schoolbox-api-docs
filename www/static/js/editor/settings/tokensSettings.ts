@@ -4,6 +4,7 @@
 
 import { EditorConfig } from "@js/editor/types/editorTypes";
 
+const DEFAULT_TOKENS = ["[firstname]", "[preferredname]", "[surname]", "[fullname]", "[house]", "[year]"];
 /**
  * If tokens are enabled, return the tokens settings
  *
@@ -17,7 +18,7 @@ export function getTokensSettings(config: EditorConfig) {
                 feeds: [
                     {
                         marker: "[",
-                        feed: ["[firstname]", "[preferredname]", "[surname]", "[fullname]", "[house]", "[year]"],
+                        feed: config.tokenList ?? DEFAULT_TOKENS,
                         minimumCharacters: 0,
                     },
                 ],
