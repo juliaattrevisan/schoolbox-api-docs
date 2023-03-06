@@ -5,7 +5,7 @@ VALUES (
         'skin_favicon',
         null,
         'App Icon',
-        'This image will be used as the favicon  shown in browser tabs, bookmarks and when the app is installed on a device. Please provide a square 192px PNG image.',
+        'Upload a square image of at least 192x192 pixels, that will be used as the favicon shown in browser tabs, bookmarks and when the app is installed on a device.',
         (select id from lu_config_field where field = 'file'),
         (select id from lu_config_type where type = 'Skin Config'),
         'true',
