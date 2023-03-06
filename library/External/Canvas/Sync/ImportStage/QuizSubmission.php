@@ -265,8 +265,7 @@ class QuizSubmission extends SubmissionAbstract
          * 2. Too many inappropriate pre/post save callbacks on mappers which cannot be altered in a master feature.
          */
         try {
-            $attempt->getAnswers()
-                    ->add($answer);
+            $attempt->getAnswers()->add($answer);
         } catch (\Exception $e) {
             $this->log->error($e->getMessage());
             return null;
