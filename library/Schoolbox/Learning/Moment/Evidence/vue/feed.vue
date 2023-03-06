@@ -511,6 +511,17 @@ export default {
                         <div class="checklist">
                             <label class="title">Filter to:</label>
                             <ul class="option-list">
+                                <li v-if="config.routes.getCreateEvidenceForm">
+                                    <input
+                                        type="checkbox"
+                                        data-filter-checkbox
+                                        id="filter-learningMoments"
+                                        name="includeLearningMoments"
+                                        @click="onChangeFilters('', true)"
+                                        v-model="selectedFilters.learningMoments"
+                                    />
+                                    <label for="filter-learningMoments">Learning Moments</label>
+                                </li>
                                 <li>
                                     <input
                                         type="checkbox"
@@ -523,17 +534,6 @@ export default {
                                         :false-value="false"
                                     />
                                     <label for="filter-goals">Goals</label>
-                                </li>
-                                <li v-if="config.routes.getCreateEvidenceForm">
-                                    <input
-                                        type="checkbox"
-                                        data-filter-checkbox
-                                        id="filter-learningMoments"
-                                        name="includeLearningMoments"
-                                        @click="onChangeFilters('', true)"
-                                        v-model="selectedFilters.learningMoments"
-                                    />
-                                    <label for="filter-learningMoments">Learning Moments</label>
                                 </li>
                                 <li>
                                     <input
@@ -983,6 +983,10 @@ export default {
     text-decoration: underline;
 }
 
+.checklist {
+    padding-left: 0.5rem;
+}
+
 .checklist > label,
 .checklist > ul,
 .option-list > li {
@@ -992,6 +996,12 @@ export default {
 .checklist > label,
 .option-list > li {
     margin-right: 2rem;
+}
+
+@media (max-width: 500px) {
+    .option-list > li:nth-child(odd) {
+        width: 9rem;
+    }
 }
 
 .filters-description {
