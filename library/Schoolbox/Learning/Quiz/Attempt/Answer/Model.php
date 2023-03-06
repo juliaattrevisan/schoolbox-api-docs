@@ -120,7 +120,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getComment()
     {

@@ -201,6 +201,7 @@ class QuizSubmission extends SubmissionAbstract
     ): ?Quiz\Attempt\Model {
         /** @var Quiz\Model $quiz */
         $quiz = $iAssessable;
+        $this->log->debug(sprintf('Processing marks for quiz: assess_id:%s', $quiz->getId()));
         if (is_numeric($canvasSubmission['norm_mark'])) {
             $normMark = (float)$canvasSubmission['norm_mark'];
         } else {
@@ -213,18 +214,26 @@ class QuizSubmission extends SubmissionAbstract
             $this->log->debug(sprintf('Converting max mark: [%s] to null for %s', (string)$canvasSubmission['max_mark'], $quiz->getId()));
             $maxMark = null;
         }
+
+        $responses = $this->quizAnswerMapper->findByColumn('attempt_id', $existingFeedbacks->getPropertyValues('id'));
+        // should there be one response to one attempt
+        $responses = $responses->indexByCallback(static function(Quiz\Attempt\Answer\Model $res) {
+            return $res->getAttempt()->getId();
+        });
+
         /** @var Quiz\Attempt\Model $attempt */
         foreach ($existingFeedbacks as $attempt) {
             /** @var Quiz\Attempt\Answer\Model|null $response */
-            $response = $attempt->getAnswers()?->first();
+            $response = $responses->offsetGet($attempt->getId());
             // check whether the rest are the same
             if (
                 $response
                 && $attempt->getUser()->getId() === $reviewee->getId()
                 && $attempt->getReviewer()->getId() === $reviewer->getId()
                 && $response->getMark() === (float)$normMark
-                && $response->getComment() === (string)$canvasSubmission['comment']
+                && (string)$response->getComment() === (string)$canvasSubmission['comment']
             ) {
+                $this->log->debug(sprintf('Feedback already exists for attempt: [%s]', $attempt->getId()));
                 return $attempt;
             }
         }
@@ -274,6 +283,7 @@ class QuizSubmission extends SubmissionAbstract
             $attempt = $this->saveModel($this->quizAttemptMapper, $attempt, false, false);
             $answer->setAttempt($attempt);
             $answer = $this->saveModel($this->quizAnswerMapper, $answer, false, false);
+            $this->log->debug(sprintf('Attempt saved: [%s]', $attempt->getId()));
             return $attempt;
         } catch (\Exception $e) {
             $this->log->error($e->getMessage());

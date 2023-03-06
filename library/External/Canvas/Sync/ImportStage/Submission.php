@@ -189,6 +189,7 @@ class Submission extends SubmissionAbstract
     ): ?SubmissionBox\ReturnedWork {
         /** @var SubmissionBox $submissionBox */
         $submissionBox = $iAssessable;
+        $this->log->debug(sprintf('Processing marks for submission_box: box_id:%s', $submissionBox->getId()));
         $normMark = $canvasSubmission['norm_mark'];
         if ($submissionBox->getMaxMark()) {
             $normMark = ($normMark / $submissionBox->getMaxMark()) * 100;
@@ -207,6 +208,7 @@ class Submission extends SubmissionAbstract
                 && (string)$existingFeedback->getHumanReadableMark() === (string)$readableMark
                 && (float)$existingFeedback->getNormalizedMark() === (float)$normMark
             ) {
+                $this->log->debug(sprintf('Feedback already exists : submission_return_id:%s', $existingFeedback->getId()));
                 return $existingFeedback;
             }
         }
@@ -232,7 +234,9 @@ class Submission extends SubmissionAbstract
          * 2. Too many inappropriate pre/post save callbacks on mappers which cannot be altered in a master feature.
          */
         try {
-            return $this->saveModel($this->returnedWorkMapper, $feedback, false, false);
+            $feedback = $this->saveModel($this->returnedWorkMapper, $feedback, false, false);
+            $this->log->debug(sprintf('Submission return saved: [%s]', $feedback->getId()));
+            return $feedback;
         } catch (\Exception $e) {
             $this->log->error($e->getMessage());
             return null;
