@@ -10,7 +10,7 @@ VALUES (
         (select id from lu_config_type where type = 'Skin Config'),
         'true',
         'false',
-        'true',
+        'false',
         'settings',
         (SELECT max(sequence) + 1
          FROM config c
