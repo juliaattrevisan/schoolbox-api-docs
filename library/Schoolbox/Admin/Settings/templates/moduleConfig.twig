@@ -8,8 +8,7 @@
     postRoute:                string      - Where to post form to
 #}
 <script type="text/javascript" src="{{CDN_PREFIX}}/js/bundle/colourPicker.js?v={{ config.site_version }}"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ siteVersion }}"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ siteVersion }}"></script>
+<script src="{CDN_PREFIX}/js/bundle/editor.js?v={SITE_VERSION}"></script>
 
 <script type="text/javascript">
     $(function() {
@@ -62,9 +61,14 @@
         {% endif %}
 
         {% if hasHtmlEditor %}
-        $.fn.alaressEditor($.alaressEditorConfigWithUserEmailTokens({
-            targetElements: settingsForm.find('[data-html-editor]'),
-            baseHref: settingsForm.find('[data-html-editor]')[0].dataset.href
+        /**
+         * Initialise the editor
+         */
+        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+            detail: {
+                targetElements: [settingsForm.find('[data-html-editor]')],
+                baseHref: settingsForm.find('[data-html-editor]')[0].dataset.href
+            }
         }));
         {% endif %}
 
