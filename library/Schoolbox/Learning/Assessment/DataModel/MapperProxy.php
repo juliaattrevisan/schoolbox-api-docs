@@ -52,7 +52,6 @@ use TypeError;
 use UnderflowException;
 use UnexpectedValueException;
 
-
 /**
  * Proxy mapper for IAssessable objects.
  *
