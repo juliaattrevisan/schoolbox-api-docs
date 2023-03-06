@@ -46,7 +46,8 @@ CREATE TABLE `lesson_plan_template_field` (
      FOREIGN KEY (`lesson_plan_template_id`)
          REFERENCES `lesson_plan_template` (`id`)
          ON DELETE NO ACTION
-         ON UPDATE NO ACTION);
+         ON UPDATE NO ACTION
+);
 
 
 CREATE TABLE `lesson_plan` (
@@ -62,7 +63,8 @@ CONSTRAINT `fk_lesson_plan_lesson_plan_template`
     FOREIGN KEY (`lesson_plan_template_id`)
         REFERENCES `lesson_plan_template` (`id`)
         ON DELETE NO ACTION
-        ON UPDATE NO ACTION);
+        ON UPDATE NO ACTION
+);
 
 
 CREATE TABLE `lesson_plan_field` (
@@ -86,4 +88,22 @@ CONSTRAINT `fk_lesson_plan_field_lesson_plan_template_field`
         REFERENCES `lesson_plan_template_field` (`id`)
         ON DELETE NO ACTION
         ON UPDATE NO ACTION
+);
+
+
+CREATE TABLE `lesson_plan_assessment` (
+`lesson_plan_id` INT NOT NULL,
+`assessment_id` INT(10) UNSIGNED NOT NULL,
+INDEX `lesson_plan_id` (`lesson_plan_id` ASC),
+INDEX `assessment_id` (`assessment_id` ASC),
+CONSTRAINT `fk_lesson_plan_assessment`
+  FOREIGN KEY (`assessment_id`)
+      REFERENCES `assessment` (`id`)
+      ON DELETE NO ACTION
+      ON UPDATE NO ACTION,
+CONSTRAINT `fk_lesson_plan`
+  FOREIGN KEY (`lesson_plan_id`)
+      REFERENCES `lesson_plan` (`id`)
+      ON DELETE NO ACTION
+      ON UPDATE NO ACTION
 );
