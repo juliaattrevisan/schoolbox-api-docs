@@ -221,10 +221,10 @@ abstract class Evaluation_Section extends DeprecatedModel
             $numQuestions = "SELECT
                                  COUNT(assess_response.question_id) AS num
                              FROM assess_response
-                             LEFT JOIN assess_section on assess_section.section_id = assess_question.section_id
                              LEFT JOIN assess_question on assess_response.question_id = assess_question.question_id
+                             LEFT JOIN assess_section on assess_section.section_id = assess_question.section_id
                              WHERE attempt_id = '{$this->db->quote($attemptId)}'
-                             AND assess_question.section_id = '{$this->db->quote($currentSection['section_id'])}'
+                             AND assess_section.section_id = '{$this->db->quote($currentSection['section_id'])}'
                              AND assess_response.deleted_at IS NULL
                              AND assess_section.deleted_at IS NULL
                              AND assess_question.deleted_at IS NULL";

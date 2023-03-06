@@ -138,6 +138,7 @@ abstract class Evaluation_Attempt extends DeprecatedModel
                   LEFT JOIN `user` ON assess_attempt.user_id = user.id
                   LEFT JOIN assess ON assess_attempt.assess_id = assess.assess_id
                   LEFT JOIN assess_response ON assess_attempt.attempt_id = assess_response.attempt_id
+                  LEFT JOIN assess_question ON assess_response.question_id = assess_question.question_id
                   WHERE assess.assess_id = " . $this->db->smartQuote($assess_id) . "
                   AND assess_question.section_id = '$section_id'
                   AND assess_response.deleted_at IS NULL
