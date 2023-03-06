@@ -378,8 +378,16 @@
                             </div>
                         </section>
                     {% else %}
-                        {# TODO: add empty state box #}
-                        <p>No years are available because none exist</p>
+                        <div class="empty-state no-margin">
+                            <i class="icon-list"></i>
+                            <p>No year levels are selectable because none exist.</p>
+                            {% set yearsRoute = routeLookupIfAuthorized('adminLists.getIndex', {table: 'year-levels'}) %}
+                            {% if yearsRoute %}
+                                <p><a href="{{ yearsRoute }}" title="Add years">Add year levels</a></p>
+                            {% else %}
+                                <p>To add year levels you need admin privileges.</p>
+                            {% endif %}
+                        </div>
                     {% endif %}
                 </div>
 
@@ -427,8 +435,16 @@
                             </div>
                         </section>
                     {% else %}
-                        {# TODO: add empty state box #}
-                        <p>No houses are available because none exist</p>
+                        <div class="empty-state no-margin">
+                            <i class="icon-list"></i>
+                            <p>No houses are selectable because none exist.</p>
+                            {% set housesRoute = routeLookupIfAuthorized('adminLists.getIndex', {table: 'house'}) %}
+                            {% if housesRoute %}
+                                <p><a href="{{ housesRoute }}" title="Add houses">Add houses</a></p>
+                            {% else %}
+                                <p>To add houses you need admin privileges.</p>
+                            {% endif %}
+                        </div>
                     {% endif %}
                 </div>
 
