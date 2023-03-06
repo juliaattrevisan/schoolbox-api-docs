@@ -16,20 +16,20 @@ export default class ToggleFullWidthCommand extends Command {
         const imageUtils = editor.plugins.get("ImageUtils");
         const imageElement = imageUtils.getClosestSelectedImageElement(model.document.selection);
 
-        if (!imageElement.hasAttribute("data-is-full-width")) {
+        if (!imageElement.hasAttribute("data-schoolboxresource-fullwidth")) {
             editor.execute("resizeImage", { width: "100%" });
             model.change((writer) => {
-                writer.setAttribute("data-is-full-width", true, imageElement);
+                writer.setAttribute("data-schoolboxresource-fullwidth", true, imageElement);
             });
-        } else if (imageElement.getAttribute("data-is-full-width") === true) {
+        } else if (imageElement.getAttribute("data-schoolboxresource-fullwidth") === true) {
             editor.execute("resizeImage", { width: null });
             model.change((writer) => {
-                writer.setAttribute("data-is-full-width", false, imageElement);
+                writer.setAttribute("data-schoolboxresource-fullwidth", false, imageElement);
             });
         } else {
             editor.execute("resizeImage", { width: "100%" });
             model.change((writer) => {
-                writer.setAttribute("data-is-full-width", true, imageElement);
+                writer.setAttribute("data-schoolboxresource-fullwidth", true, imageElement);
             });
         }
 
