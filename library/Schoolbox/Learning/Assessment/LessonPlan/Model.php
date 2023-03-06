@@ -8,7 +8,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\LessonPlan;
+namespace Schoolbox\Learning\Assessment\LessonPlan;
 
 use InvalidArgumentException;
 use Schoolbox\GenericCollection;
@@ -19,6 +19,7 @@ use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\User;
+
 
 class Model extends AbstractAssessment
 {
@@ -189,11 +190,11 @@ class Model extends AbstractAssessment
     /**
      * Add a template field to this template
      *
-     * @param Field\Model $field
+     * @param \Schoolbox\Learning\Assessment\LessonPlan\Field\Model $field
      * @return $this
      * @throws \UnexpectedValueException
      */
-    public function addField(Field\Model $field): self
+    public function addField(\Schoolbox\Learning\Assessment\LessonPlan\Field\Model $field): self
     {
         $this->fields->add($field);
         return $this;

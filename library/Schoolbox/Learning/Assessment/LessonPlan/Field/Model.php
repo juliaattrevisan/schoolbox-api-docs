@@ -8,11 +8,12 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\LessonPlan\Field;
+namespace Schoolbox\Learning\Assessment\LessonPlan\Field;
 
 use Schoolbox\Admin\LessonPlan\Template\Field\Model as LessonPlanTemplateField;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
+
 
 class Model implements ISoftDeletable
 {

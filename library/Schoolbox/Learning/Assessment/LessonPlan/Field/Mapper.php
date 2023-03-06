@@ -8,13 +8,14 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\LessonPlan\Field;
+namespace Schoolbox\Learning\Assessment\LessonPlan\Field;
 
 use PDOStatement;
 use Schoolbox\Admin\LessonPlan\Template\Field\Mapper as LessonPlanTemplateFieldMapper;
 use Schoolbox\Admin\LessonPlan\Template\Model as LessonPlanTemplate;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception;
+
 
 /**
  * @method Model createModel($idValue = null)

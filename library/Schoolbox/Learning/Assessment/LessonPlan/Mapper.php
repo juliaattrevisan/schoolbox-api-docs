@@ -8,7 +8,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\LessonPlan;
+namespace Schoolbox\Learning\Assessment\LessonPlan;
 
 use PDOStatement;
 use Schoolbox\GenericCollection;
@@ -17,6 +17,7 @@ use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+
 
 /**
  * @method Model createModel($idValue = null)
@@ -43,7 +44,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasJoin(
             'lessonPlanField',
             [
-                'mapper'    => \Schoolbox\Learning\LessonPlan\Field\Mapper::class,
+                'mapper'    => \Schoolbox\Learning\Assessment\LessonPlan\Field\Mapper::class,
                 'this_key'  => 'id',
                 'other_key' => 'lesson_plan_id',
                 'multiple'  => true,
@@ -170,7 +171,7 @@ class Mapper extends \Schoolbox\Mapper
              */
             $lessonPlanField = $fieldMapper->hydrate($row, 'lessonPlanField');
 
-            if ($lessonPlanField instanceof Field\Model) {
+            if ($lessonPlanField instanceof \Schoolbox\Learning\Assessment\LessonPlan\Field\Model) {
                 $lessonPlans[$row['id']]->addField($lessonPlanField);
             }
 

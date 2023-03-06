@@ -10,10 +10,12 @@ namespace Schoolbox\Learning\Assessment;
 
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
 use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\AssessmentContext;
+
 
 /**
  * Encapsulates the mapping between Assessment Types and:
@@ -38,6 +40,7 @@ class AssessmentType implements IType
     const TYPE_TASK = 'task';
     const TYPE_QUIZ = 'quiz';
     const TYPE_LTI_ASSESSMENT = 'lti';
+    public const TYPE_LESSON_PLAN = 'lessonPlan';
 
     /**
      * Get twig template directory for a given IAssessable
@@ -57,6 +60,8 @@ class AssessmentType implements IType
             return self::TYPE_QUIZ;
         } elseif ($assessment instanceof LtiAssessment) {
             return self::TYPE_LTI_ASSESSMENT;
+        } elseif ($assessment instanceof LessonPlan) {
+            return self::TYPE_LESSON_PLAN;
         }
         throw new \UnexpectedValueException('Unknown IAssessable: ' . get_class($assessment));
     }
@@ -87,6 +92,8 @@ class AssessmentType implements IType
             return (new Quiz())->setContext($context);
         } elseif (self::TYPE_LTI_ASSESSMENT === $stringVal) {
             return (new LtiAssessment())->setContext($context);
+        } elseif (self::TYPE_LESSON_PLAN === $stringVal) {
+            return (new \Schoolbox\Learning\Assessment\LessonPlan\Model())->setContext($context);
         }
 
         throw new \UnexpectedValueException("Unknown Assessment: $stringVal");
