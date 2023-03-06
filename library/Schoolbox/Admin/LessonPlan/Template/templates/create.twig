@@ -122,12 +122,28 @@
     $(function() {
         let fieldCount = 1;
 
+        // Collapse our items to make it MUCH easier to drag them between each other
+        document.querySelector('#fields').addEventListener('mousedown', (e) => {
+          document.querySelector('#fields').classList.add('s-is-dragging');
+        });
+
+        // TODO - Change this to be set on window or document and handle bubbling
+        //   so that the release is detected even if you drag outside of the list
+        document.querySelector('#fields').addEventListener('mouseup', (e) => {
+          document.querySelector('#fields').classList.remove('s-is-dragging');
+        });
+
         // Set up draggable menu
         $('#fields').mightyList({});
         $('#fields').sortable({
             handle: '.grip',
             axis: 'y',
         });
+
+        $('#fields').on("activate", (e) => {
+            $('fields').sortable("refreshPositions");
+        });
+
 
         $('#add-field').on('click', function() {
             /* Make a clone
