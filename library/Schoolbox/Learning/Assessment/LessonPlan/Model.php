@@ -20,7 +20,6 @@ use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\User;
 
-
 class Model extends AbstractAssessment
 {
     /**

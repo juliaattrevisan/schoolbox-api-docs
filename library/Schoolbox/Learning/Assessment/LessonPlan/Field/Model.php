@@ -15,7 +15,6 @@ use Schoolbox\Admin\LessonPlan\Template\Field\Model as LessonPlanTemplateField;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
 
-
 class Model implements ISoftDeletable
 {
     use ModelTrait\Id;
