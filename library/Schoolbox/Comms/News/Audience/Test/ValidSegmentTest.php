@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Comms\News\Audience\Test;
 
 use Alaress\Database\Connector\IConnector;
+use External_Offline_Class;
 use PHPUnit;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Audience;
@@ -23,6 +24,7 @@ use Alaress\Specification;
 use Schoolbox\Comms\News\Audience\Validation;
 use Schoolbox\Resource\Folder;
 use External_Offline_User;
+use Schoolbox\UserMapper;
 
 /**
  * For testing a segment is inherently validly constructed, as opposed to any user authorisation logic
@@ -66,7 +68,12 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
             ),
             new External_Offline_User(),
             $mockConnector,
-            []
+            [],
+            new Audience\Segment\Strategy\Helper\StudentLocator(
+                UserMapper::getInstance(),
+                new External_Offline_Class(),
+                new Folder\Code\ClassMatcherBase(),
+            )
         ))->getValidRelationshipModifiers();
 
         // Either not targeted to NULL, or targeted to NULL but that's valid for the segment's entity
@@ -77,25 +84,25 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
 
 
     /**
-     * @dataProvider provider_validSimpleRootSegment
+     * @dataProvider providerValidSimpleRootSegment
      * @param Audience\Model $segment
      * @throws PHPUnit\Framework\AssertionFailedError
      */
-    public function test_validSimpleRootSegment(Audience\Model $segment): void
+    public function testValidSimpleRootSegment(Audience\Model $segment): void
     {
         $this->assertTrue($this->validSegmentSpec->isSatisfiedBy($segment));
     }
 
 
     /**
-     * @dataProvider provider_invalidSimpleRootSegment
+     * @dataProvider providerInvalidSimpleRootSegment
      * @param Audience\Model $segment
      * @param string         $expected
      * @param string         $message
      * @throws PHPUnit\Framework\AssertionFailedError
      * @throws PHPUnit\Framework\Exception
      */
-    public function test_invalidSimpleRootSegment(Audience\Model $segment, string $expected, string $message): void
+    public function testInvalidSimpleRootSegment(Audience\Model $segment, string $expected, string $message): void
     {
         $this->assertFalse($this->validSegmentSpec->isSatisfiedBy($segment), $message);
 
@@ -106,11 +113,11 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
 
 
     /**
-     * @dataProvider provider_invalidSegmentTrees
+     * @dataProvider providerInvalidSegmentTrees
      * @param Audience\Model $segment
      * @throws PHPUnit\Framework\Exception
      */
-    public function test_invalidSegmentTree(Audience\Model $segment): void
+    public function testInvalidSegmentTree(Audience\Model $segment): void
     {
         $this->assertFalse($this->validSegmentSpec->isSatisfiedBy($segment));
 
@@ -125,7 +132,7 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function provider_validSimpleRootSegment(): array
+    public function providerValidSimpleRootSegment(): array
     {
         return [
             [
@@ -167,7 +174,7 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function provider_invalidSimpleRootSegment(): array
+    public function providerInvalidSimpleRootSegment(): array
     {
         return [
             [
@@ -215,7 +222,7 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public function provider_invalidSegmentTrees(): array
+    public function providerInvalidSegmentTrees(): array
     {
         // Straight chain
         $grandparent = (new Audience\Model())

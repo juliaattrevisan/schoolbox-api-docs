@@ -18,7 +18,6 @@ use UnderflowException;
  */
 interface ISimpleStrategy extends IStrategy
 {
-
     /**
      * Gets an sql fragment for the ISearch instance.
      *
@@ -120,14 +119,17 @@ interface ISimpleStrategy extends IStrategy
 
 
     /**
-     * Returns whether we can conclude that a user is a match against a set of entity values
-     * by examining supplied parameters only. Must not hit the DB. This method exists
-     * as a performance short-circuit that is called prior to hitting the DB as a method of last resort.
+     * Returns whether we can efficiently conclude that a user is a match
+     * against a set of entity values.
+     *
+     * This method should avoid database queries where practical, as this method
+     * exists as a performance short-circuit that is called prior to querying
+     * the database for the article's entire audience.
      *
      * Returns:
      * * TRUE  - if user does match values
      * * FALSE - if user does not match values
-     * * NULL  - if we cannot tell whether users matches values and relationship using supplied parameters
+     * * NULL  - if we cannot tell whether users matches values and relationship
      *
      * @param User   $user
      * @param array  $entityValues

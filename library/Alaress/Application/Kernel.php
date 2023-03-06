@@ -698,7 +698,7 @@ abstract class Kernel
                             $externalUser,
                             $folderMapper,
                             $externalClass,
-                            (new ClassCodeMatchFactory())->build($di->get('config')->get('external_type'))
+                            (new ClassCodeMatchFactory())->build($di->get('config')->get(ConfigMapper::NAME_EXTERNAL_TYPE))
                         ),
                         $strategyFactory->makeAllSimpleStrategies(),
                         $complexMapper,
@@ -779,6 +779,15 @@ abstract class Kernel
                     /** @var External_UserInterface $externalUser */
                     $externalUser = $di->get('externalUser');
 
+                    /** @var External_ClassInterface $externalClass */
+                    $externalClass = $di->get('externalClass');
+
+                    $studentLocator = new News\Audience\Segment\Strategy\Helper\StudentLocator(
+                        $mapperFactory->get(UserMapper::class),
+                        $externalClass,
+                        (new ClassCodeMatchFactory())->build($config->get(ConfigMapper::NAME_EXTERNAL_TYPE)),
+                    );
+
                     /** @var IConnector $db */
                     $db = $di->get('databaseInternal');
 
@@ -795,7 +804,8 @@ abstract class Kernel
                         $access,
                         $externalUser,
                         $db,
-                        $knownUserClasses
+                        $knownUserClasses,
+                        $studentLocator,
                     );
                 }
             )

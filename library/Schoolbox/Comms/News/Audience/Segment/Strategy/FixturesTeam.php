@@ -49,9 +49,10 @@ class FixturesTeam extends SimpleStrategy
         bool $staffCanPost,
         bool $moderationRequired,
         bool $isFixturesEnabled,
-        IConnector $db
+        IConnector $db,
+        Audience\Segment\Strategy\Helper\StudentLocator $studentLocator,
     ) {
-        parent::__construct($userAccessMapper, $access, $staffCanPost, $moderationRequired);
+        parent::__construct($userAccessMapper, $access, $staffCanPost, $moderationRequired, $studentLocator);
         $this->isFixturesEnabled = $isFixturesEnabled;
         $this->db = $db;
     }

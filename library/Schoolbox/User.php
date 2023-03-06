@@ -187,7 +187,11 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     private $displayGradeGraph;
 
     /**
-     * @var SubjectCollection|Subject[]
+     * This user's collection of subjects.
+     *
+     * Not guaranteed to have been loaded: thus, this may be null.
+     *
+     * @var SubjectCollection|Subject[]|null
      */
     protected $subject_collection;
 
@@ -1043,7 +1047,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     }
 
     /**
-     * @return SubjectCollection|Subject[]
+     * @return SubjectCollection|Subject[]|null
      */
     public function getSubjectCollection()
     {

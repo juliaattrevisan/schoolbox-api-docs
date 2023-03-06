@@ -14,10 +14,13 @@ use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Database\Quoter\Mysql\Quoter;
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\Comms\News\Audience\Segment\UserResolutionSql;
+use Schoolbox\GenericCollection;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Folder;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 use Schoolbox\Comms\News\Audience\Segment\ISimpleStrategy;
 
 use function array_intersect;
@@ -40,6 +43,15 @@ abstract class SimpleStrategy implements ISimpleStrategy
     /** @var bool */
     protected bool $moderationRequired;
 
+    /**
+     * Cache for the students which a teacher is a teacher of.
+     *
+     * This is an expensive lookup (requiring two SIS calls), therefore it
+     * should be cached.
+     *
+     * @var array<int, GenericCollection|User[]>
+     */
+    protected static array $teacherStudentCache;
 
     /**
      * @param UserAccessMapper $userAccessMapper
@@ -47,8 +59,13 @@ abstract class SimpleStrategy implements ISimpleStrategy
      * @param bool             $staffCanPost
      * @param bool             $moderationRequired
      */
-    public function __construct(UserAccessMapper $userAccessMapper, Access $access, bool $staffCanPost, bool $moderationRequired)
-    {
+    public function __construct(
+        UserAccessMapper $userAccessMapper,
+        Access $access,
+        bool $staffCanPost,
+        bool $moderationRequired,
+        private Helper\StudentLocator $studentLocator,
+    ) {
         $this->userAccessMapper   = $userAccessMapper;
         $this->access             = $access;
         $this->staffCanPost       = $staffCanPost;
@@ -140,29 +157,86 @@ abstract class SimpleStrategy implements ISimpleStrategy
         // In most cases, the user and their children (if relevant), will have sufficient hydration.
         switch ($relationship) {
             case Audience\Model::RELATIONSHIP_SELF:
-                $users = User::createCollection()->add($user);
-                return count(array_intersect($this->getValues($users), $entityValues)) > 0;
+                return $this->isSelfInAudienceValues($user, $entityValues);
             case Audience\Model::RELATIONSHIP_PARENTS_OF:
                 if (!$user->getRole()->isParent()) {
                     return false;
                 }
-                /* Must not hit the DB... ummm is there a different way of doing this?
-                 * should we put the parents children back into the session/ user object? or cache this somewhere???
-                */
-                (new \Schoolbox\External\User())->loadChildren([$user]);
-                if ($user->getChildren()->count() === 0) {
-                    return null;
-                }
-                return count(array_intersect($this->getValues($user->getChildren()), $entityValues)) > 0;
+                return $this->isUserInAudienceValuesAsParent($user, $entityValues);
             case Audience\Model::RELATIONSHIP_TEACHERS_OF:
                 if (!$user->getRole()->isStaff()) {
                     return false;
                 }
-                return null;
+                return $this->isUserInAudienceValuesAsTeacher($user, $entityValues);
         }
         return null;
     }
 
+    /**
+     * Is the current user in the audience for this strategy, via being
+     * in the direct audience?
+     *
+     * By default: they are in the audience if `getValues($user)` returns a
+     * value which is in `$entityValues`.
+     *
+     * @param User  $user
+     * @param array $entityValues
+     * @return bool|null
+     */
+    protected function isSelfInAudienceValues(User $user, array $entityValues): ?bool
+    {
+        $users = User::createCollection()->add($user);
+        return count(array_intersect($this->getValues($users), $entityValues)) > 0;
+    }
+
+    /**
+     * Is the current user in the audience for this strategy, via being
+     * the parent of a student who is in the audience?
+     *
+     * By default: they are in the audience if `getValues($child)` returns a
+     * value which is in `$entityValues` for one of their children.
+     *
+     * @param User  $parent
+     * @param array $entityValues
+     * @return bool|null
+     */
+    protected function isUserInAudienceValuesAsParent(User $parent, array $entityValues): ?bool
+    {
+        /* Should not hit the DB... ummm is there a different way of doing this?
+         * should we put the parents children back into the session/ user object? or cache this somewhere???
+        */
+        (new \Schoolbox\External\User())->loadChildren([$parent]);
+        if ($parent->getChildren()->count() === 0) {
+            return null;
+        }
+        return count(array_intersect($this->getValues($parent->getChildren()), $entityValues)) > 0;
+    }
+
+    /**
+     * Is the current user in the audience for this strategy, via being the
+     * teacher of a student in the audience?
+     *
+     * By default: they are in the audience if `getValues($student)` returns a
+     * value which is in `$entityValues` for one of their students.
+     *
+     * @param User  $teacher
+     * @param array $entityValues
+     * @return bool|null
+     */
+    protected function isUserInAudienceValuesAsTeacher(User $teacher, array $entityValues): ?bool
+    {
+        // Load this teacher's classes, if set
+        if ($teacher->getSubjectCollection() === null) {
+            return null;
+        }
+
+        return count(
+            array_intersect(
+                $this->getValues($this->studentLocator->locateStudents($teacher)),
+                $entityValues
+            )
+        ) > 0;
+    }
 
     /**
      * @return bool

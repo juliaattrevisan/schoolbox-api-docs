@@ -114,9 +114,10 @@ class Folder extends SimpleStrategy
         FolderMapper $folderMapper,
         RoleAccessMapper $roleAccessMapper,
         External_UserInterface $externalUser,
-        array $knownUserSubjects
+        array $knownUserSubjects,
+        Audience\Segment\Strategy\Helper\StudentLocator $studentLocator,
     ) {
-        parent::__construct($userAccessMapper, $access, $staffCanPost, $moderationRequired);
+        parent::__construct($userAccessMapper, $access, $staffCanPost, $moderationRequired, $studentLocator);
         $this->canTargetTeachersOfUsersInFolder = $canTargetTeachersOfUsersInFolder;
         $this->folderMapper                     = $folderMapper;
         $this->roleAccessMapper                 = $roleAccessMapper;
@@ -529,48 +530,50 @@ class Folder extends SimpleStrategy
         return $mutedUsersPerFolder;
     }
 
+    /**
+     * Users are in the folder audience if they are a member of the folder via
+     * their list of subjects.
+     *
+     * @param User  $user
+     * @param array $entityValues
+     * @return bool|null
+     */
+    protected function isSelfInAudienceValues(User $user, array $entityValues): ?bool
+    {
+        if ($user->getSubjectCollection() === null) {
+            return null;
+        }
+        // Cannot conclude false, because groups are not provided
+        return count(array_intersect($this->parseSubjectIds($user), $entityValues)) ? true : null;
+    }
 
     /**
-     * @inheritDoc
+     * Parents are in the folder audience if they are a member of the folder via
+     * one of their children's subjects.
+     *
+     * @param User  $parent
+     * @param array $entityValues
+     * @return bool|null
      */
-    public function isUserInAudienceValues(User $user, array $entityValues, string $relationship): ?bool
+    protected function isUserInAudienceValuesAsParent(User $parent, array $entityValues): ?bool
     {
-        switch ($relationship) {
-            case Audience\Model::RELATIONSHIP_SELF:
-                if ($user->getSubjectCollection() === null) {
-                    return null;
-                }
-                // Cannot conclude false, because groups are not provided
-                return count(array_intersect($this->parseSubjectIds($user), $entityValues)) ? true : null;
-            case Audience\Model::RELATIONSHIP_PARENTS_OF:
-                if (!$user->getRole()->isParent()) {
-                    return false;
-                }
-                /* Must not hit the DB... ummm is there a different way of doing this?
-                 * should we put the parents children back into the session/ user object? or cache this somewhere???
-                */
-                (new \Schoolbox\External\User())->loadChildren([$user]);
-                if ($user->getChildren()->count() === 0) {
-                    return null;
-                }
-                foreach ($user->getChildren() as $child) {
-                    if ($child->getSubjectCollection() === null) {
-                        continue;
-                    }
-                    if (count(array_intersect($this->parseSubjectIds($child), $entityValues))) {
-                        return true;
-                    }
-                }
-                return null;
-            case Audience\Model::RELATIONSHIP_TEACHERS_OF:
-                if (!$user->getRole()->isStaff()) {
-                    return false;
-                }
-                return null;
+        /* Should not hit the DB... ummm is there a different way of doing this?
+         * should we put the parents children back into the session/ user object? or cache this somewhere???
+        */
+        (new \Schoolbox\External\User())->loadChildren([$parent]);
+        if ($parent->getChildren()->count() === 0) {
+            return null;
+        }
+        foreach ($parent->getChildren() as $child) {
+            if ($child->getSubjectCollection() === null) {
+                continue;
+            }
+            if (count(array_intersect($this->parseSubjectIds($child), $entityValues))) {
+                return true;
+            }
         }
         return null;
     }
-
 
     /**
      * Parse subject/class folder ids from a user's subject collection
