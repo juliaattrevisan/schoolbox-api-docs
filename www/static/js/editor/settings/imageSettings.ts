@@ -28,6 +28,7 @@ export function getImageSettings() {
                 "imageStyle:side",
                 "|",
                 "resizeImage",
+                "fullWidth",
             ],
             resizeOptions: [
                 {
