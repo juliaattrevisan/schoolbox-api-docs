@@ -11,7 +11,6 @@
  */
 abstract class Evaluation_Section extends DeprecatedModel
 {
-
     /**
      * POOL_SIZE_ALL Indicates to use all questions in section
      */

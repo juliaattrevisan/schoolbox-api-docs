@@ -217,7 +217,7 @@ class QuizSubmission extends SubmissionAbstract
 
         $responses = $this->quizAnswerMapper->findByColumn('attempt_id', $existingFeedbacks->getPropertyValues('id'));
         // should there be one response to one attempt
-        $responses = $responses->indexByCallback(static function(Quiz\Attempt\Answer\Model $res) {
+        $responses = $responses->indexByCallback(static function (Quiz\Attempt\Answer\Model $res) {
             return $res->getAttempt()->getId();
         });
 
