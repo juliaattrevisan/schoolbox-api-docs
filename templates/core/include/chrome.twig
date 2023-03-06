@@ -24,6 +24,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="apple-mobile-web-app-title" content="{{ config.title }}">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="icon" href="/images/logo.php?logo=skin_favicon&size=favicon"/>
     <link rel="apple-touch-icon" sizes="57x57" href="/images/logo.php?logo=skin_favicon&size=apple57">
     <link rel="apple-touch-icon" sizes="60x60" href="/images/logo.php?logo=skin_favicon&size=apple60">
     <link rel="apple-touch-icon" sizes="72x72" href="/images/logo.php?logo=skin_favicon&size=apple72">
@@ -37,7 +38,7 @@
     {% block mainHeader %}
         {% include 'include/skin.twig' with { config: config } only %}
         <link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/vendors/fullcalendar/datepicker.css?v={{ config.site_version }}" />
-        <link rel="Shortcut Icon" href="/images/logo.php?logo=skin_favicon&size=favicon" type="image/x-icon" />
+
         {% if tour.data is defined and not user.impersonated %}
         {% autoescape 'js' %}
         <script type="text/javascript">
