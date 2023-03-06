@@ -12,6 +12,7 @@ namespace Schoolbox\Learning\LessonPlan;
 
 use PDOStatement;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\User;
@@ -49,6 +50,16 @@ class Mapper extends \Schoolbox\Mapper
             ]
         );
 
+        $this->joins(
+            'assessment_id',
+            AssessmentMapper::class,
+            'id',
+            null,
+            null,
+            'assessmentModel',
+            'assessmentModel',
+        );
+
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteFields']);
     }
 
@@ -69,8 +80,10 @@ class Mapper extends \Schoolbox\Mapper
                 {$this->getJoinColumnString('deletedBy', 'deletedBy')},
                 {$this->getJoinColumnString('lessonPlanTemplate', 'lessonPlanTemplate')},
                 {$this->getJoinColumnString('lessonPlanField', 'lessonPlanField')},
-                {$this->getJoinColumnString('lessonPlanField.lessonPlanTemplateField', 'lessonPlanTemplateField')}
+                {$this->getJoinColumnString('lessonPlanField.lessonPlanTemplateField', 'lessonPlanTemplateField')},
+                {$this->getJoinColumnString('assessmentModel', 'assessmentModel')}
             FROM {$this->getTable()}
+            INNER JOIN {$this->getJoinSql('assessmentModel', '', 'assessmentModel')}
             INNER JOIN {$this->getJoinSql('lessonPlanTemplate', '', 'lessonPlanTemplate', true)} 
             INNER JOIN {$this->getJoinSql('createdBy', '', 'createdBy', true)}
             INNER JOIN {$this->getJoinSql('updatedBy', '', 'updatedBy', true)}
@@ -101,9 +114,6 @@ class Mapper extends \Schoolbox\Mapper
         /** @var Model[] $lessonPlans */
         $lessonPlans = [];
 
-        /** @var \Schoolbox\Admin\LessonPlan\Template\Model[] $templates */
-        $templates = [];
-
         foreach ($statement as $row) {
             if (!isset($lessonPlans[$row['id']])) {
                 /** @var Model|null $lessonPlan */
@@ -116,7 +126,14 @@ class Mapper extends \Schoolbox\Mapper
                 $template = $templateMapper->hydrate($row, 'lessonPlanTemplate', 'lessonPlanTemplate');
                 $template->setFields($templateFieldMapper->createCollection());
 
+                /* Slap in a Template that's ready to receive Template Fields
+                 */
                 $lessonPlan->setLessonPlanTemplate($template);
+
+                /* Bolt on the IAssessable instance
+                 */
+                $assessment =  $this->hydrateJoin($row, 'assessmentModel', 'assessmentModel');
+                $lessonPlan->setAssessmentModel($assessment);
 
                 /* Stack it up
                  */
@@ -185,6 +202,8 @@ class Mapper extends \Schoolbox\Mapper
      * @return void
      * @throws DefinitionException
      * @throws Exception
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
     protected function softDeleteFields(Model $lessonPlanTemplate): void
     {

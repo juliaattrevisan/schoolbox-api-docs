@@ -53,6 +53,7 @@ CREATE TABLE `lesson_plan_template_field` (
 CREATE TABLE `lesson_plan` (
 `id` INT NOT NULL AUTO_INCREMENT,
 `lesson_plan_template_id` INT NOT NULL,
+`assessment_id` INT(10) UNSIGNED NOT NULL,
 `visibility` ENUM('student', 'staff') NOT NULL,
 `created_by` INT NOT NULL,
 `updated_by` INT NOT NULL,
@@ -62,6 +63,12 @@ INDEX `fk_lesson_plan_lesson_plan_template_idx` (`lesson_plan_template_id` ASC),
 CONSTRAINT `fk_lesson_plan_lesson_plan_template`
     FOREIGN KEY (`lesson_plan_template_id`)
         REFERENCES `lesson_plan_template` (`id`)
+        ON DELETE NO ACTION
+        ON UPDATE NO ACTION,
+INDEX `assessment_id` (`assessment_id` ASC),
+CONSTRAINT `fk_lesson_plan_assessment`
+    FOREIGN KEY (`assessment_id`)
+        REFERENCES `assessment` (`id`)
         ON DELETE NO ACTION
         ON UPDATE NO ACTION
 );
@@ -96,7 +103,7 @@ CREATE TABLE `lesson_plan_assessment` (
 `assessment_id` INT(10) UNSIGNED NOT NULL,
 INDEX `lesson_plan_id` (`lesson_plan_id` ASC),
 INDEX `assessment_id` (`assessment_id` ASC),
-CONSTRAINT `fk_lesson_plan_assessment`
+CONSTRAINT `fk_lesson_plan_activity`
   FOREIGN KEY (`assessment_id`)
       REFERENCES `assessment` (`id`)
       ON DELETE NO ACTION

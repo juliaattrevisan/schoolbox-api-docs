@@ -13,6 +13,7 @@ namespace Schoolbox\Learning\LessonPlan;
 use InvalidArgumentException;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\AbstractAssessment;
+use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
@@ -25,6 +26,12 @@ class Model extends AbstractAssessment
      * @var \Schoolbox\Admin\LessonPlan\Template\Model|null
      */
     private ?\Schoolbox\Admin\LessonPlan\Template\Model $lessonPlanTemplate = null;
+
+
+    /**
+     * The IAssessable associated with this Lesson Plan
+     */
+    private ?AssessmentModel $assessmentModel = null;
 
 
     /**
@@ -75,6 +82,26 @@ class Model extends AbstractAssessment
     public function setLessonPlanTemplate(?\Schoolbox\Admin\LessonPlan\Template\Model $lessonPlanTemplate): self
     {
         $this->lessonPlanTemplate = $lessonPlanTemplate;
+        return $this;
+    }
+
+
+    /**
+     * @return AssessmentModel|null
+     */
+    public function getAssessmentModel(): ?AssessmentModel
+    {
+        return $this->assessmentModel;
+    }
+
+
+    /**
+     * @param AssessmentModel|null $assessmentModel
+     * @return static
+     */
+    public function setAssessmentModel(AssessmentModel $assessmentModel = null): self
+    {
+        $this->assessmentModel = $assessmentModel;
         return $this;
     }
 
