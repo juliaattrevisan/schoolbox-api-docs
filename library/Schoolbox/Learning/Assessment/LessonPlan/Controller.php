@@ -16,9 +16,19 @@ use Schoolbox\User;
 
 class Controller extends Assessment\Controller
 {
+    /**
+     * Construct an arbitrary array of data for twig rendering
+     *
+     * @param IAssessable $assessment
+     * @return array
+     */
     protected function getAssessmentTwigData(IAssessable $assessment): array
     {
-        // TODO: Implement getAssessmentTwigData() method.
+        $zoneFactory = new Assessment\Attachzone\Factory();
+
+        return [
+            'attachzone' => $zoneFactory->buildForAssessment($assessment)->getTwigContext(),
+        ];
     }
 
 
