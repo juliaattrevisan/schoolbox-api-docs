@@ -557,10 +557,11 @@ class CourseSections
      */
     private function createUnitImpl(CourseImpl\Model $courseImpl, UnitSpec\Model $unitSpec, string $startAt, string $endAt): UnitImpl\Model
     {
+        $unitSpecFolder = $this->folderMapper->findCheaplyById($unitSpec->getFolder()->getId());
         $unitImpl = (new UnitImpl\Model())
             ->setCourse($courseImpl)
             ->setSpecification($unitSpec)
-            ->setTitle($unitSpec->getFolder()->getName())
+            ->setTitle($unitSpecFolder->getName())
             ->setOpenDate(Alaress_Date_Format::newDatabaseDate($startAt))
             ->setDueDate(Alaress_Date_Format::newDatabaseDate($endAt));
 
