@@ -191,8 +191,7 @@ Data:
                         {{ unitSpec.title }} {% if assessmentTitle %} - {{ assessmentTitle }}{% endif %}
                     {%- endset -%}
 
-                    {# Do we have a link to an AAS assessment for this unit? #}
-                    {% set unitRoute = (aasData.data is defined and aasData.data[unitSpecId] is defined) ? aasData.data[unitSpecId].link : '' %}
+                    {% set unitRoute = middleYearsTaskMarks.data[unitSpecId].link ?? hscTaskMarks.data[unitSpecId].link ?? '' %}
                     {% if unitRoute %}
                         <h2 class="subheader"><a href="{{ unitRoute }}"><span class="icon-link linked-unit-heading"></span>{{ unitSpecTitle }}</a></h2>
                     {% else %}
