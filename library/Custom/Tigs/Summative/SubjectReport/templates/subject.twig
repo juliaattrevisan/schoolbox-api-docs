@@ -188,7 +188,7 @@ Data:
                     {%- endset -%}
 
                     {%- set unitSpecTitle -%}
-                        {{ unitSpec.title }} {%- if assessmentTitle -%}({{ assessmentTitle }}){%- endif -%}
+                        {{ unitSpec.title }} {% if assessmentTitle %} - {{ assessmentTitle }}{% endif %}
                     {%- endset -%}
 
                     {# Do we have a link to an AAS assessment for this unit? #}
