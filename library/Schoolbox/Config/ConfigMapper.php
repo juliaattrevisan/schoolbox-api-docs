@@ -217,6 +217,44 @@ class ConfigMapper extends Mapper
     public const NAME_NAME_FORMAT = 'name_format';
 
     /**
+     * Skin Config Fields
+     */
+    public const NAME_HOMEPAGE_COLOUR_HEAD_FONT = 'homepage_colour_head_font';
+    public const NAME_HOMEPAGE_COLOUR_HEAD_BG = 'homepage_colour_head_bg';
+    public const NAME_HOMEPAGE_COLOUR_FONT = 'homepage_colour_font';
+    public const NAME_HOMEPAGE_COLOUR_BG_PRIMARY = 'homepage_colour_bg_primary';
+    public const NAME_SKIN_COLOUR_NAVIGATION_FOREGROUND = 'skin_colour_navigation_foreground';
+    public const NAME_SKIN_COLOUR_NAVIGATION_BACKGROUND = 'skin_colour_navigation_background';
+    public const NAME_SKIN_COLOUR_NAVIGATION_HOVER = 'skin_colour_navigation_hover';
+    public const NAME_SKIN_COLOUR_OFFCANVAS_FOREGROUND = 'skin_colour_offcanvas_foreground';
+    public const NAME_SKIN_COLOUR_OFFCANVAS_BACKGROUND = 'skin_colour_offcanvas_background';
+    public const NAME_SKIN_COLOUR_OFFCANVAS_HOVER = 'skin_colour_offcanvas_hover';
+    public const NAME_ACCOUNTS_MENU_BG_COLOUR = 'accounts_menu_bg_colour';
+    public const NAME_SKIN_COLOUR_CONTENT_UI_FOREGROUND = 'skin_colour_content_ui_foreground';
+    public const NAME_SKIN_COLOUR_CONTENT_UI_BACKGROUND = 'skin_colour_content_ui_background';
+    public const NAME_SKIN_COLOUR_CONTENT_UI_HOVER = 'skin_colour_content_ui_hover';
+    public const NAME_SKIN_COLOUR_CONTENT_UI_SELECTED = 'skin_colour_content_ui_selected';
+    public const NAME_SKIN_COLOUR_CONTENT_UI_SUBMIT_FOREGROUND = 'skin_colour_content_ui_submit_foreground';
+    public const NAME_SKIN_COLOUR_CONTENT_UI_SUBMIT_BACKGROUND = 'skin_colour_content_ui_submit_background';
+    public const NAME_SKIN_COLOUR_ACCENT_FOREGROUND = 'skin_colour_accent_foreground';
+    public const NAME_SKIN_COLOUR_ACCENT_BACKGROUND = 'skin_colour_accent_background';
+    public const NAME_SKIN_COLOUR_ACCENT_HOVER = 'skin_colour_accent_hover';
+    public const NAME_SKIN_COLOUR_LOGO_BACKGROUND = 'skin_colour_logo_background';
+    public const NAME_SKIN_COLOUR_BODY_BG = 'skin_colour_body_bg';
+    public const NAME_SKIN_LOGO_SQUARE = 'skin_logo_square';
+    public const NAME_SKIN_LOGO_LARGE = 'skin_logo_large';
+    public const NAME_SKIN_LOGO_LOGIN = 'skin_logo_login';
+    public const NAME_SKIN_LOGIN_BG = 'skin_login_bg';
+    public const NAME_SKIN_CUSTOM_CSS = 'skin_custom_css';
+    public const NAME_SKIN_COLOUR_LOGIN_BACKGROUND = 'skin_colour_login_background';
+    public const NAME_SKIN_COLOUR_FORM_INPUT_BORDER_COLOR = 'skin_colour_form_input_border_color';
+    public const NAME_SKIN_COLOUR_FORM_BACKGROUND_HOVER_COLOR = 'skin_colour_form_background_hover_color';
+    public const NAME_ACCOUNTS_MENU_TEXT_COLOUR = 'accounts_menu_text_colour';
+    public const NAME_ACCOUNTS_MENU_HOVER_COLOUR = 'accounts_menu_hover_colour';
+    public const NAME_EMAIL_BANNER_IMAGE = 'email_banner_image';
+    public const NAME_SKIN_FAVICON = 'skin_favicon';
+
+    /**
      * Config settings which may affect the behaviour of the router daemon.
      *
      * If any of these settings change: send a reload message to the router

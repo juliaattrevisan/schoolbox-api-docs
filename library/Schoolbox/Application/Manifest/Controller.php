@@ -58,50 +58,50 @@ class Controller extends Base
             'start_url'                   => '/',
             'icons'                       => [
                 [
-                    'src'     => '/images/logo.php?logo=skin_logo_square&size=apple72',
+                    'src'     => '/images/logo.php?logo=skin_favicon&size=apple72',
                     'sizes'   => '72x72',
                     'type'    => 'image/png',
                     'purpose' => 'maskable any',
                 ],
                 [
-                    'src'     => '/images/logo.php?logo=skin_logo_square&size=google96',
+                    'src'     => '/images/logo.php?logo=skin_favicon&size=google96',
                     'sizes'   => '96x96',
                     'type'    => 'image/png',
                     'purpose' => 'maskable any',
 
                 ],
                 [
-                    'src'     => '/images/logo.php?logo=skin_logo_square&size=google128',
+                    'src'     => '/images/logo.php?logo=skin_favicon&size=google128',
                     'sizes'   => '128x128',
                     'type'    => 'image/png',
                     'purpose' => 'maskable any',
                 ],
                 [
-                    'src'     => '/images/logo.php?logo=skin_logo_square&size=apple144',
+                    'src'     => '/images/logo.php?logo=skin_favicon&size=apple144',
                     'sizes'   => '144x144',
                     'type'    => 'image/png',
                     'purpose' => 'maskable any',
                 ],
                 [
-                    'src'     => '/images/logo.php?logo=skin_logo_square&size=apple152',
+                    'src'     => '/images/logo.php?logo=skin_favicon&size=apple152',
                     'sizes'   => '152x152',
                     'type'    => 'image/png',
                     'purpose' => 'maskable any',
                 ],
                 [
-                    'src'     => '/images/logo.php?logo=skin_logo_square&size=google192',
+                    'src'     => '/images/logo.php?logo=skin_favicon&size=google192',
                     'sizes'   => '192x192',
                     'type'    => 'image/png',
                     'purpose' => 'maskable any',
                 ],
                 [
-                    'src'     => '/images/logo.php?logo=skin_logo_square&size=google384',
+                    'src'     => '/images/logo.php?logo=skin_favicon&size=google384',
                     'sizes'   => '384x384',
                     'type'    => 'image/png',
                     'purpose' => 'maskable any',
                 ],
                 [
-                    'src'     => '/images/logo.php?logo=skin_logo_square&size=google512',
+                    'src'     => '/images/logo.php?logo=skin_favicon&size=google512',
                     'sizes'   => '512x512',
                     'type'    => 'image/png',
                     'purpose' => 'maskable any',
