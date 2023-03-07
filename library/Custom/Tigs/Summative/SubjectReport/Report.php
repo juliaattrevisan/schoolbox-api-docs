@@ -1093,14 +1093,6 @@ class Report
                     'term'     => 4,
                 ];
             }
-
-//            $workTypeConfig = match ($term) {
-//                1       => Config::_TIGS_WORK_TYPE_YEAR_7_10_TERM_1_LEARNING_PROFILE,
-//                2       => Config::_TIGS_WORK_TYPE_YEAR_7_10_TERM_2_LEARNING_PROFILE,
-//                3       => Config::_TIGS_WORK_TYPE_YEAR_7_10_TERM_3_LEARNING_PROFILE,
-//                4       => Config::_TIGS_WORK_TYPE_YEAR_7_10_TERM_4_LEARNING_PROFILE,
-//                default => null,
-//            };
         } elseif ($yearLevel === 11) {
             // What happens to Year 11 term 4?
             // (It shows in Year 12, as term 4 in previous year)
@@ -1159,29 +1151,10 @@ class Report
                     ];
                 }
             }
-//            // Need to consider how Year 12 terms are labelled
-//            $workTypeConfig = match ($term) {
-//                1       => Config::_TIGS_WORK_TYPE_YEAR_12_TERM_1_LEARNING_PROFILE,
-//                2       => Config::_TIGS_WORK_TYPE_YEAR_12_TERM_2_LEARNING_PROFILE,
-//                3       => Config::_TIGS_WORK_TYPE_YEAR_12_TERM_3_LEARNING_PROFILE,
-//                4       => Config::_TIGS_WORK_TYPE_YEAR_12_TERM_4_LEARNING_PROFILE,
-//                default => null,
-//            };
         }
 
-//        if ($workTypeConfig === null) {
-//            return [
-//                'error' => sprintf(
-//                    'Cannot render Learning Profile components. Unknown year/term %d/%d.',
-//                    $yearLevel,
-//                    $term,
-//                )
-//            ];
-//        }
 
         $workTypeIds = [];
-//        $workTypeConfigs = array_unique(array_column($searches, 'workType'));
-
         foreach ($searches as $i => $search) {
             try {
                 $workTypeIds[$search['workType']] ??= $this->checkWorkType(
@@ -1228,7 +1201,6 @@ class Report
             $this->rubricMapper,
             $this->authorizer,
             $this->router,
-            $this->config,
             $roleTypeOverride,
         );
 

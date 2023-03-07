@@ -10,19 +10,18 @@ declare(strict_types=1);
 namespace Custom\Tigs\Summative\SubjectReport\Components;
 
 use Alaress\Authorizer\Authorizer;
-use Alaress_Date_Format;
 use Aura\Router;
-use Custom\Tigs\Summative\Config;
+use Aura\Router\Exception\RouteNotFound;
 use Custom\Tigs\Summative\StudentAttributes;
 use Custom\Tigs\Summative\SubjectReport\BaseComponent;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
 use Schoolbox\GenericCollection;
-use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 
@@ -69,12 +68,19 @@ class LearningProfile extends BaseComponent
         private RubricDataSource $rubricMapper,
         private Authorizer $authorizer,
         private Router\Router $router,
-        private IConfigLoader $config,
         private ?string $roleTypeOverride
     ) {
         parent::__construct($attributes, $viewer, $roleTypeOverride);
     }
 
+    /**
+     * Converts the unit specs for this component into a data set.
+     *
+     * @return array{data: array}|null
+     * @throws Router\Exception\RouteNotFound if somehow a route wasn't found
+     * @throws MapperException                if something went wrong whilst
+     *                                        fetching a rubric
+     */
     public function toContext(): ?array
     {
         // Do something with each search
@@ -102,6 +108,16 @@ class LearningProfile extends BaseComponent
         return ['data' => $data];
     }
 
+    /**
+     * Builds data for a single assessment.
+     *
+     * @param DueWork\Model $dueWork
+     * @param array         $search
+     * @return array|null
+     * @throws Router\Exception\RouteNotFound if somehow a route wasn't found
+     * @throws MapperException                if something went wrong whilst
+     *                                        fetching a rubric
+     */
     public function buildAssessmentData(DueWork\Model $dueWork, array $search): ?array
     {
         // Fetch the grid
@@ -112,12 +128,6 @@ class LearningProfile extends BaseComponent
             'term'       => $search['term'] ?? null,
             'semester'   => $search['semester'] ?? null,
             'workTypeId' => $search['workTypeId'] ?? null,
-//            'grid'                => $dueWork->getRubricGrid(),
-//            'useMarkRange'        => $dueWork->getUseMarkRange(),
-//            'showDescriptorValue' => true,
-//            'showGroupTotal'      => $dueWork->isMarkPerCapability(),
-//            'showRubricTotal'     => true,
-//            'capabilityMarks'     => null,
         ];
 
         // Load rubric marks if they exist and current user is permitted to view grades
@@ -126,15 +136,13 @@ class LearningProfile extends BaseComponent
             $feedback = $participant->getAuthoritativeFeedback(true);
             if ($feedback instanceof DueWork\Feedback\Model) {
                 $feedback->setRubricMarkedGrid($this->rubricMapper->retrieveMarkedGrid($feedback));
-//                $data['markedGrid']      = $feedback->getRubricMarkedGrid();
                 $data['indicators'] = $this->buildIndicatorMarks($feedback->getRubricMarkedGrid());
                 $data['levels']     = $this->buildLevels($feedback->getRubricMarkedGrid());
             } else {
                 return null;
             }
         }
-//        $data['dueDate'] = $dueWork->getDueAt();
-        $data['link']    = $this->getLink($dueWork);
+        $data['link'] = $this->getLink($dueWork);
         return $data;
     }
 
@@ -182,9 +190,10 @@ class LearningProfile extends BaseComponent
     }
 
     /**
+     * Build a set of indicator marks for the given rubric marked grid.
      *
      * @param MarkedGrid|null $markedGrid
-     * @return null|array
+     * @return null|array<array{id: int, name: string, descriptor: array{id: int, name: string}}>
      */
     private function buildIndicatorMarks(?MarkedGrid $markedGrid): ?array
     {
@@ -197,8 +206,8 @@ class LearningProfile extends BaseComponent
                         $indicatorMark = $capabilityMark->retrieveIndicatorMark($indicatorUsage);
                         $capabilityMarks ??= [];
                         $capabilityMarks[] = [
-                            'id'   => $indicatorUsage->getIndicator()->getId(),
-                            'name' => $indicatorUsage->getIndicator()->getName(),
+                            'id'         => $indicatorUsage->getIndicator()->getId(),
+                            'name'       => $indicatorUsage->getIndicator()->getName(),
                             'descriptor' => [
                                 'id'   => $indicatorMark?->getDescriptor()->getId(),
                                 'name' => $indicatorMark?->getDescriptor()->getDescription(),
@@ -211,7 +220,15 @@ class LearningProfile extends BaseComponent
         return $capabilityMarks;
     }
 
-
+    /**
+     * Build a set of indicator levels for the given rubric marked grid.
+     *
+     * The levels are derived from the capability's descriptors, not the actual
+     * levels of the rubric.
+     *
+     * @param MarkedGrid|null $markedGrid
+     * @return null|array<array{name: string}>
+     */
     private function buildLevels(?MarkedGrid $markedGrid): ?array
     {
         // The rubrics do not have levels:
@@ -242,7 +259,7 @@ class LearningProfile extends BaseComponent
      *
      * @param DueWork\Model $dueWork
      * @return string|null
-     * @throws Router\Exception\RouteNotFound
+     * @throws Router\Exception\RouteNotFound if somehow the route wasn't found
      */
     private function getLink(DueWork\Model $dueWork): ?string
     {
