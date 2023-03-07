@@ -184,29 +184,23 @@
                                     src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
                             <script type="text/javascript"
                                     src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
-                            <link rel="stylesheet" type="text/css"
-                                  href="{{ CDN_PREFIX }}/css/vendors/spectrum/spectrum.css?v={{ config.site_version }}"/>
-                            <script type="text/javascript"
-                                    src="{{ CDN_PREFIX }}/js/bundle/spectrum.js?v={{ config.site_version }}"></script>
+                            <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/colourPicker.js?v={{ config.site_version }}"></script>
                             <script type="text/javascript">
                                 {% autoescape 'js' %}
                                 $(function () {
                                     $('#formPastoral').alaressEditor($.alaressEditorConfigWithUserTokens());
 
                                     let colorInput = document.getElementById('pastoralColor'),
-                                            iconSelect = document.getElementById('pastoralIcon'),
-                                            flagPreview = document.getElementById('pastoralFlagPreview');
-                                    $(colorInput).spectrum(
-                                        $.extend(
-                                            {},
-                                            window.sbProps.spectrum,
-                                            {
-                                                allowEmpty: true,
-                                                change: function (color) {if (color !== null) {$(this).val(color.toRgbString());}},
-                                                hide: function (color) {if (color !== null) {$(this).val(color.toRgbString());}},
-                                                preferredFormat: 'rgb'
-                                            }
-                                        )
+                                        iconSelect = document.getElementById('pastoralIcon'),
+                                        flagPreview = document.getElementById('pastoralFlagPreview');
+
+                                    document.dispatchEvent(
+                                        new CustomEvent("colourPickerInitialize", {
+                                            detail: {
+                                                target: `#pastoralColor`,
+                                                options: {},
+                                            },
+                                        })
                                     );
 
                                     $().add(colorInput).add(iconSelect).on('change', function () {
