@@ -240,12 +240,13 @@ HELP;
             echo "Since we are running at school '$schoolCode', updating '$term' to '{$valueByKey['title']}'...";
             $dbc->executeQuery(
                 "UPDATE localisation SET
-                 title=:title,
-                 singular_form=:singularForm,
-                 plural_form=:pluralForm,
-                 capitalise_first=:capitaliseFirst,
-                 indefinite_article=:indefiniteArticle
-                 WHERE term=:term", [
+                title=:title,
+                singular_form=:singularForm,
+                plural_form=:pluralForm,
+                capitalise_first=:capitaliseFirst,
+                indefinite_article=:indefiniteArticle
+                WHERE term=:term",
+                [
                     'title' => $valueByKey['title'],
                     'singularForm' => $valueByKey['singular_form'],
                     'pluralForm' => $valueByKey['plural_form'],
