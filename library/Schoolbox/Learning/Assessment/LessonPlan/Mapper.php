@@ -211,7 +211,7 @@ class Mapper extends \Schoolbox\Mapper
 
 
     /**
-     * Persist Lesson Plan files.
+     * Persist Lesson Plan attachments/files.
      *
      * @param Model $lessonPlan
      */
@@ -220,6 +220,16 @@ class Mapper extends \Schoolbox\Mapper
         $this->cascadeJoin('files', ['lesson_plan_id' => $lessonPlan->getId()], $lessonPlan->getAttachments());
     }
 
+
+    /**
+     * Persist Lesson Plan Fields.
+     *
+     * @param Model $lessonPlan
+     */
+    public function saveFields(Model $lessonPlan): void
+    {
+        $this->cascadeJoin('lessonPlanField', ['lesson_plan_id' => $lessonPlan->getId()], $lessonPlan->getFields());
+    }
 
     /**
      * Delete the fields that were associated with $lessonPlanTemplate
