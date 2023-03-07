@@ -51,7 +51,7 @@ HELP;
 
         $valueByKeyByTerm = [];
 
-        switch ($schoolCode) {
+        switch (strtolower($schoolCode)) {
             case 'cccl':
                 $valueByKeyByTerm['tutorGroup'] = [
                     'title' => 'NESA Number',
