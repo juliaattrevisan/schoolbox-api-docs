@@ -112,7 +112,7 @@ class LearningProfile extends BaseComponent
             'assessment' => $dueWork,
             'term'       => $search['term'] ?? null,
             'semester'   => $search['semester'] ?? null,
-            'workType'   => $search['workType'] ?? null,
+            'workTypeId' => $search['workTypeId'] ?? null,
 //            'grid'                => $dueWork->getRubricGrid(),
 //            'useMarkRange'        => $dueWork->getUseMarkRange(),
 //            'showDescriptorValue' => true,
@@ -159,7 +159,7 @@ class LearningProfile extends BaseComponent
             if (!$assessment instanceof DueWork\Model) {
                 return false;
             }
-            if (!$assessment->getWorkType()?->getId() === $search['workTypeId']) {
+            if (!($assessment->getWorkType()?->getId() === $search['workTypeId'])) {
                 return false;
             }
             if (!$assessment->isParticipant($this->student)) {
