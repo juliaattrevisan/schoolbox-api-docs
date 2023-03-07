@@ -100,7 +100,8 @@ CONSTRAINT `fk_lesson_plan_field_lesson_plan_template_field`
         ON UPDATE NO ACTION
 );
 
-
+-- This is for when we add Activities to a Lesson Plan,
+-- similar to how Projects do it for their Activities.
 CREATE TABLE `lesson_plan_assessment` (
 `lesson_plan_id` INT NOT NULL,
 `assessment_id` INT(10) UNSIGNED NOT NULL,
