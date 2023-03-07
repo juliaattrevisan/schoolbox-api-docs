@@ -1,0 +1,24 @@
+{##
+ # Select a Lesson Plan Template
+ #
+ # This lets users select a Lesson Plan Template upon which to base their
+ # Lesson Plan, which is a modified version of the Lesson Plan Template with
+ # customisations etc.
+ #
+ # @param LessonPlan\Template\Model[] $lessonPlanTemplates['recent']
+ # @param LessonPlan\Template\Model[] $lessonPlanTemplates['all']
+#}
+<div class="row">
+    <div class="small-12 columns">
+        <p>A list of Recent Templates</p>
+        <p>A list of all templates, ordered alphabetically naturally</p>
+
+        {% for recentLessonPlanTemplate in lessonPlanTemplates.recent %}
+            {{ recentLessonPlanTemplate }}
+        {% endfor %}
+
+        {% for lessonPlanTemplate in lessonPlanTemplates.all %}
+            {{ lessonPlanTemplate }}
+        {% endfor %}
+    </div>
+</div>

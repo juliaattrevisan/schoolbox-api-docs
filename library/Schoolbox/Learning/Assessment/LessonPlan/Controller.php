@@ -32,6 +32,16 @@ class Controller extends Assessment\Controller
     }
 
 
+    /**
+     * Endpoint for selecting a Lesson Plan Template
+     *
+     * @return void
+     */
+    public function getSelection()
+    {
+    }
+
+
     public function getStatus(IAssessable $assessment)
     {
         // TODO: Implement getStatus() method.

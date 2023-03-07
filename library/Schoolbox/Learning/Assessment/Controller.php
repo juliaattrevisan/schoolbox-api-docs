@@ -255,6 +255,14 @@ abstract class Controller extends ListController implements IAssessmentControlle
             'isReadonly' => $courseManagedFields->isReadonly(),
         ];
 
+        /* A list of lesson plans
+         * We've literally been piling everything into this one controller method!
+         */
+        $data['lessonPlanTemplates'] = [
+            'recent' => ['AA', 'BB', 'CC'],
+            'all' => ['aaa', 'bbb', 'ccc', 'ddd', 'eee', 'fff']
+        ];
+
         // either output the fragment to the mage, or use the synchronous form
         if ($this->getRequest()->isXhr()) {
             $content = $this->buildUnthemedHtmlOutput("@learningAssessment/$type/create.twig", $data);
