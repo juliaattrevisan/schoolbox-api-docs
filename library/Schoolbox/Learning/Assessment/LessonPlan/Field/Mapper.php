@@ -81,8 +81,6 @@ class Mapper extends \Schoolbox\Mapper
     {
         $collection = $this->createCollection();
 
-        $lessonPlanMapper = $this->getJoinMapper('lessonPlan');
-
         foreach ($statement as $row) {
             /** @var Model|null $field */
             $field = $this->hydrate($row);
@@ -99,7 +97,7 @@ class Mapper extends \Schoolbox\Mapper
              *  since some of it is shared from the AssessmentModel
              */
             /** @var LessonPlan $lessonPlan */
-            $lessonPlan = $lessonPlanMapper->hydrate($row, 'lessonPlan');
+            $lessonPlan = $this->hydrateJoin($row, 'lessonPlan', 'lessonPlan');
             $field->setLessonPlan($lessonPlan);
 
             /* Lesson Plan Template Field parent object
