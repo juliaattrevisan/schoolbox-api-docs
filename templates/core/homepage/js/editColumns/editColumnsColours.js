@@ -154,7 +154,7 @@ function updateColourPickerColours(columnCheckboxes) {
         const areAllColoursTheSame = colourList.every((value, index, array) => value === array[0]); //are all colour values within the array the same as the first value in the array
 
         const initialColour = areAllColoursTheSame ? colourList[0] : null; //if all the colours aren't the same, set to null
-        console.log("initialColour", initialColour)
+
         colourPicker.value = initialColour;
         colourPicker.dispatchEvent(new Event('input', { bubbles: true }));
 

@@ -42,20 +42,31 @@
 
         opt = this.options;
 
-        $(this.element)
-            .find(this.options.inputSelector)
-            .spectrum(
-                $.extend({}, window.sbProps.spectrum, {
-                    allowEmpty: true,
-                    change: function (colorObject) {
-                        mspec.onColorChange(this, colorObject);
+        const currentPickerId = 0;
+        const colourPickers = this.element.querySelectorAll(this.options.inputSelector);
+        colourPickers.forEach((colourPicker) => {
+            // Ensure each picker has a unique ID to use as a target
+            if (colourPicker.id === "") {
+                colourPicker.id = `colourPicker${currentPickerId}`;
+                currentPickerId += 1;
+            }
+
+            document.dispatchEvent(
+                new CustomEvent("colourPickerInitialize", {
+                    detail: {
+                        target: `#${colourPicker.id}`,
+                        options: {},
                     },
-                    move: function (colorObject) {
-                        mspec.onColorChange(this, colorObject);
-                    },
-                    showAlpha: true,
                 })
             );
+
+            colourPicker.addEventListener("input", (event) => {
+                mspec.onColorChange(event.currentTarget, event.currentTarget.value);
+            });
+            colourPicker.addEventListener("change", (event) => {
+                mspec.onColorChange(event.currentTarget, event.currentTarget.value);
+            });
+        });
 
         // setup colour selectors
         this.loadColorpickerColors();
@@ -146,16 +157,11 @@
      * @param {*} element
      * @param {tinycolor} colorObject
      */
-    MasonrySpectrum.prototype.onColorChange = function (element, colorObject) {
+    MasonrySpectrum.prototype.onColorChange = function (element, color) {
         // Change the colors for the selected items
-        var color = colorObject.toRgbString(),
-            id = element.id,
+        let id = element.id,
             pickers = this.options.colours.pickers,
             mspec = this;
-
-        if (!(colorObject instanceof tinycolor)) {
-            return;
-        }
 
         this.getSelectedColumns().forEach(function (column) {
             var colorId = column + "_" + id;
@@ -176,8 +182,7 @@
         $(this.element)
             .find(this.options.inputSelector)
             .each(function () {
-                var element = $(this),
-                    id = this.id;
+                var element = this, id = this.id;
 
                 var colors = columns.map(function (column) {
                     return pickers[column + "_" + id];
@@ -190,9 +195,11 @@
                 });
 
                 if (uniqueColors.length === 1) {
-                    element.spectrum("set", uniqueColors.pop());
+                    element.value = uniqueColors.pop();
+                    element.dispatchEvent(new Event('input', { bubbles: true }));
                 } else {
-                    element.spectrum("set", null);
+                    element.value = "";
+                    element.dispatchEvent(new Event('input', { bubbles: true }));
                 }
             });
     };
@@ -244,11 +251,9 @@
      */
     MasonrySpectrum.prototype.updateColor = function (element, color) {
         // 1: column, 2: element to update
-        var tinyColor = new tinycolor(color),
-            colorString = tinyColor.toRgbString();
         // Set the value of the CSS var on the masonry's element,
         // as that's where the color vars are defined
-        this.masonry.element.style.setProperty("--" + element.replace(/_/g, "-"), colorString);
+        this.masonry.element.style.setProperty("--" + element.replace(/_/g, "-"), color);
     };
 
     /**
