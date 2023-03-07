@@ -229,12 +229,8 @@ class Report
                  */
                 $latestDueDate = null;
                 $dueDateHsc    = $hscTaskMarks['data'][$unitSpecId]['dueDate'] ?? null;
-
-                /** @var Alaress_Date_Format|null $dueDate */
-                foreach ([$dueDateHsc] as $dueDate) {
-                    if ($dueDate && (!$latestDueDate || $dueDate->gt($latestDueDate))) {
-                        $latestDueDate = $dueDate;
-                    }
+                if ($dueDateHsc && (!$latestDueDate || $dueDateHsc->gt($latestDueDate))) {
+                    $latestDueDate = $dueDateHsc;
                 }
 
                 $unitSpecsWithData->add(['id' => $unitSpecId, 'dueDate' => $latestDueDate, 'title' => $unitSpec->getTitle()]);
