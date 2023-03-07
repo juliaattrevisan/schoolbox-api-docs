@@ -5,7 +5,7 @@
  * @link        https://schoolbox.com.au/
  */
 (function ($, window, document, undefined) {
-    var pluginName = "masonrySpectrum",
+    var pluginName = "masonryColourPicker",
         interactionState = "interaction-state";
 
     var defaults = {
@@ -32,13 +32,13 @@
      * @param {Masonry} masonry
      * @constructor
      */
-    function MasonrySpectrum(element, masonry) {
+    function MasonryColourPicker(element, masonry) {
         var mspec = this,
             opt;
 
         this.element = element;
         this.masonry = masonry;
-        this.options = $.extend(true, {}, defaults, masonry.options.spectrum);
+        this.options = $.extend(true, {}, defaults, masonry.options.colourPicker);
 
         opt = this.options;
 
@@ -157,7 +157,7 @@
      * @param {*} element
      * @param {tinycolor} colorObject
      */
-    MasonrySpectrum.prototype.onColorChange = function (element, color) {
+    MasonryColourPicker.prototype.onColorChange = function (element, color) {
         // Change the colors for the selected items
         let id = element.id,
             pickers = this.options.colours.pickers,
@@ -175,7 +175,7 @@
      * If multiple columns are selected, and their colors are different,
      * the colorpicker will be blank.
      */
-    MasonrySpectrum.prototype.loadColorpickerColors = function () {
+    MasonryColourPicker.prototype.loadColorpickerColors = function () {
         var columns = this.getSelectedColumns(),
             pickers = this.options.colours.pickers;
 
@@ -209,7 +209,7 @@
      *
      * @returns {*}
      */
-    MasonrySpectrum.prototype.getSelectedColumns = function () {
+    MasonryColourPicker.prototype.getSelectedColumns = function () {
         return $(this.options.columnSelectorSelector)
             .filter(":checked")
             .map(function () {
@@ -222,7 +222,7 @@
      * @param {object} colours
      * @returns {boolean}
      */
-    MasonrySpectrum.prototype.resetColours = function (colours) {
+    MasonryColourPicker.prototype.resetColours = function (colours) {
         //noinspection AssignmentToFunctionParameterJS
         var masonry = this;
         colours = colours || this.options.colours.defaults;
@@ -235,7 +235,7 @@
     /**
      * @returns {boolean}
      */
-    MasonrySpectrum.prototype.resetWidth = function () {
+    MasonryColourPicker.prototype.resetWidth = function () {
         // Note: foundation slider's set_value is buggy and causes the slider
         // to stop sending change events.
         this.masonry.slider.foundation("slider", "set_value", this.masonry.slider.data("original-value"));
@@ -249,7 +249,7 @@
      * @param color   Color to update to
      * @returns {*}
      */
-    MasonrySpectrum.prototype.updateColor = function (element, color) {
+    MasonryColourPicker.prototype.updateColor = function (element, color) {
         // 1: column, 2: element to update
         // Set the value of the CSS var on the masonry's element,
         // as that's where the color vars are defined
@@ -267,7 +267,7 @@
             var mspec;
 
             if (!$.data(this, "plugin_" + pluginName)) {
-                $.data(this, "plugin_" + pluginName, new MasonrySpectrum(this, masonry));
+                $.data(this, "plugin_" + pluginName, new MasonryColourPicker(this, masonry));
             } else if (typeof masonry == "string") {
                 mspec = $.data(this, "plugin_" + pluginName);
 
