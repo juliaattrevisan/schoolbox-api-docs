@@ -68,10 +68,10 @@
                                     {% if enableRoute %}
                                         {% if lessonPlanTemplate.enabled %}
                                             {% set icon = 'icon-view' %}
-                                            {% set action = 'Toggle visibility' %}
+                                            {% set action = 'Disable visibility' %}
                                         {% else %}
                                             {% set icon = 'icon-view-hollow' %}
-                                            {% set action = 'Toggle visibility' %}
+                                            {% set action = 'Enable visibility' %}
                                         {% endif %}
                                         <a class="{{ icon }}" href="{{ enableRoute }}" title="{{ action }}" data-toggle-enable-state="{{ lessonPlanTemplate.id }}"></a>
                                         <script>
@@ -169,7 +169,7 @@
             </div>
         {% else %}
             <div class="empty-state">
-                <i class="icon-progress"></i>
+                <i class="icon-lesson-plan"></i>
                 <p>No lesson plan templates have been created.</p>
                 {% if createRoute %}
                     <p><a href="{{ createRoute }}">Click here</a> to build a lesson plan template.</p>

@@ -1,7 +1,7 @@
 .lesson-plan-template-fields {
     &.s-is-dragging {
         div:nth-child(3) {
-            display: none;
+            //display: none;
         }
     }
 
@@ -87,8 +87,8 @@
             left: 1rem !important;
 
             div:nth-child(3) {
-                display: none;
-                height: 0 !important;
+                //display: none;
+                //height: 0 !important;
             }
         }
 
