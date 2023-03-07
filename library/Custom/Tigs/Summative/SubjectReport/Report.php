@@ -20,8 +20,6 @@ use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Router;
 use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\StudentAttributes;
-use Custom\Tigs\Summative\SubjectReport\Components\AcademicAchievementMatrix;
-use Custom\Tigs\Summative\SubjectReport\Components\AcademicAchievementSummary;
 use Custom\Tigs\Summative\SubjectReport\Components\HscAssessmentMatrix;
 use Custom\Tigs\Summative\SubjectReport\Components\HscAssessmentRank;
 use Custom\Tigs\Summative\SubjectReport\Components\HscAssessmentTasks;
@@ -194,7 +192,7 @@ class Report
                 $error .= \sprintf(' <a href="%s">Manage Course imports</a>', $route);
             }
             $errors[]  = $error;
-            $unitSpecsWithData = $aamData = $aasData = $hscTaskMarks = $hscTaskMatrix = $middleYearsTaskMarks = [];
+            $unitSpecsWithData = $hscTaskMarks = $hscTaskMatrix = $middleYearsTaskMarks = [];
             $nesaGraphData = $courseSpec = $hscRankData = $middleYearsRankData = $courseDescription = $learningProfileData = null;
         } else {
             $this->loadParticipation($courseImplsWithUnits);
@@ -206,8 +204,6 @@ class Report
             // Build component data
             $courseDescription = $this->buildCourseDescription($courseSpec);
             $nesaGraphData = $this->buildNesaScoreGraphData($folder, $attributes, $courseSpec, $user, $roleTypeOverride);
-            $aamData       = $this->buildAcademicAchievementMatrixData($folder, $attributes, $unitSpecs, $user, $roleTypeOverride);
-            $aasData       = $this->buildAcademicAchievementSummaryData($folder, $attributes, $unitSpecs, $user, $roleTypeOverride);
             $hscTaskMarks  = $this->buildHscTaskMarksData($folder, $attributes, $courseSpec, $user, $roleTypeOverride);
             $hscTaskMatrix = $this->buildHscTaskMatrixData($folder, $attributes, $unitSpecs, $courseSpec, $user, $roleTypeOverride);
             $hscRankData   = $this->buildHscAssessmentRankData($folder, $attributes, $courseSpec, $user, $roleTypeOverride);
@@ -220,8 +216,6 @@ class Report
             foreach ($unitSpecs as $unitSpecId => $unitSpec) {
                 // We do need to keep data for units that contain error messages, but which lack dates
                 $hasData =
-                    isset($aasData['data'][$unitSpecId]) ||
-                    isset($aamData['data'][$unitSpecId]) ||
                     isset($hscTaskMarks['data'][$unitSpecId]) ||
                     isset($middleYearsTaskMarks['data'][$unitSpecId]);
 
@@ -231,17 +225,13 @@ class Report
 
                 /**
                  * @var Alaress_Date_Format|null $latestDueDate
-                 * @var Alaress_Date_Format|null $dueDateAas
-                 * @var Alaress_Date_Format|null $dueDateAam
                  * @var Alaress_Date_Format|null $dueDateHsc
                  */
                 $latestDueDate = null;
-                $dueDateAas    = $aasData['data'][$unitSpecId]['dueDate'] ?? null;
-                $dueDateAam    = $aamData['data'][$unitSpecId]['dueDate'] ?? null;
                 $dueDateHsc    = $hscTaskMarks['data'][$unitSpecId]['dueDate'] ?? null;
 
                 /** @var Alaress_Date_Format|null $dueDate */
-                foreach ([$dueDateAas, $dueDateAam, $dueDateHsc] as $dueDate) {
+                foreach ([$dueDateHsc] as $dueDate) {
                     if ($dueDate && (!$latestDueDate || $dueDate->gt($latestDueDate))) {
                         $latestDueDate = $dueDate;
                     }
@@ -278,8 +268,6 @@ class Report
             'errors'                    => $errors,
             'unitSpecs'                 => $unitSpecsWithData,
             'courseDescription'         => $courseDescription,
-            'aamData'                   => $aamData,
-            'aasData'                   => $aasData,
             'nesaGraphData'             => $nesaGraphData,
             'hscTaskMarks'              => $hscTaskMarks,
             'hscTaskMatrix'             => $hscTaskMatrix,
@@ -412,168 +400,6 @@ class Report
             }
         }
         return $cohortUnitImpls;
-    }
-
-
-    /**
-     * Builds data for rendering the AAM components.
-     *
-     * @param Folder\Model                       $folder
-     * @param StudentAttributes                  $attributes
-     * @param GenericCollection|UnitSpec\Model[] $unitSpecs
-     * @param User                               $student
-     * @param string|null                        $roleTypeOverride
-     * @return array
-     * @throws InvalidArgumentException
-     * @throws RouteNotFound
-     * @throws MapperException
-     */
-    private function buildAcademicAchievementMatrixData(
-        Folder\Model $folder,
-        StudentAttributes $attributes,
-        GenericCollection $unitSpecs,
-        User $student,
-        ?string $roleTypeOverride
-    ): array {
-        // HSC Yr 11 students uses rubric from Hsc Task Mark
-        if ($attributes->getYearLevel() === 11 && $attributes->isHsc()) {
-            return [];
-        }
-
-        /* The Academic Achievement Matrix searches for assessments that have a
-         * particular work type. These work types differ depending on whether you're
-         * in the Middle Years Program or whether you're in HSC, producing a different
-         * list accordingly.
-         *
-         * The assessments and their units' links depends on this being configured
-         * and searched in this particular way. Misconfiguration results in units not
-         * having their titles linked.
-         */
-        $identifier = null;
-
-        if ($attributes->isMiddleYear()) {
-            $identifier = Config::_TIGS_WORK_TYPE_7_10_ASSESSMENT_TASK;
-        } elseif ($attributes->isHsc()) {
-            $identifier = Config::_TIGS_WORK_TYPE_HSC_ASSESSMENT_TASK;
-        }
-
-        /* Error early when you can't detect which work type you're supposed to use
-         */
-        if (null === $identifier) {
-            return ['error' => 'Cannot identify whether this student is in Middle Years program or HSC. Academic Achievement Summary not available.'];
-        }
-
-        /* Otherwise check that the work type existed somewhere in the config
-         */
-        try {
-            $workTypeId = $this->checkWorkType(
-                $identifier,
-                'Cannot render Approaches to Learning components. Work type not set.',
-                'Set Approaches to Learning Work Type'
-            );
-        } catch (UnexpectedValueException $e) {
-            return ['error' => $e->getMessage()];
-        }
-
-        /* Produce the Academic Achievement Matrix which is the rubric grid that correspond
-         * their assessments which used a particular work type
-         */
-        $aam = new AcademicAchievementMatrix(
-            $attributes,
-            $unitSpecs,
-            $student,
-            $folder,
-            $this->visibility,
-            $this->viewer,
-            $workTypeId,
-            $this->rubricMapper,
-            $this->authorizer,
-            $this->router,
-            $roleTypeOverride
-        );
-
-        /* Generically build an array of data via AbstractMatrix
-         */
-        return $aam->toContext();
-    }
-
-
-    /**
-     * Builds data for rendering the AAS components.
-     *
-     * @param Folder\Model                       $folder
-     * @param StudentAttributes                  $attributes
-     * @param GenericCollection|UnitSpec\Model[] $unitSpecs
-     * @param User                               $student
-     * @param string|null                        $roleTypeOverride
-     * @return array
-     * @throws InvalidArgumentException
-     * @throws RouteNotFound
-     * @throws MapperException
-     */
-    private function buildAcademicAchievementSummaryData(
-        Folder\Model $folder,
-        StudentAttributes $attributes,
-        GenericCollection $unitSpecs,
-        User $student,
-        ?string $roleTypeOverride
-    ): array {
-
-        /* The Academic Achievement Summary searches for assessments that have a
-         * particular work type. These work types differ depending on whether you're
-         * in the Middle Years Program or whether you're in HSC, producing a different
-         * list accordingly.
-         *
-         * The assessments and their units' links depends on this being configured
-         * and searched in this particular way. Misconfiguration results in units not
-         * having their titles linked.
-         */
-        $identifier = null;
-
-        if ($attributes->isMiddleYear()) {
-            $identifier = Config::_TIGS_WORK_TYPE_7_10_ASSESSMENT_TASK;
-        } elseif ($attributes->isHsc()) {
-            $identifier = Config::_TIGS_WORK_TYPE_HSC_ASSESSMENT_TASK;
-        }
-
-        /* Error early when you can't detect which work type you're supposed to use
-         */
-        if (null === $identifier) {
-            return ['error' => 'Cannot identify whether this student is in Middle Years program or HSC. Academic Achievement Summary not available.'];
-        }
-
-        /* Otherwise check that the work type existed somewhere in the config
-         */
-        try {
-            $workTypeId = $this->checkWorkType(
-                $identifier,
-                'Cannot render Academic Achievement Summary components. Work type not set.',
-                'Set 7-10 Assessment Task Work Type for Middle School, or HSC Assessment Task for other people'
-            );
-        } catch (UnexpectedValueException $e) {
-            return ['error' => $e->getMessage()];
-        }
-
-        /* Produce the Academic Achievement Summary which is the list of Units that contain
-         * their assessments which used a particular work type
-         */
-        $aas = new AcademicAchievementSummary(
-            $attributes,
-            $unitSpecs,
-            $student,
-            $folder,
-            $this->visibility,
-            $this->viewer,
-            $workTypeId,
-            $this->rubricMapper,
-            $this->authorizer,
-            $this->router,
-            $roleTypeOverride
-        );
-
-        /* Generically build an array of data via AbstractMatrix
-         */
-        return $aas->toContext();
     }
 
 
