@@ -48,9 +48,16 @@ export default class ToggleFullWidthCommand extends Command {
         const editor = this.editor;
         const model = editor.model;
         const imageUtils = editor.plugins.get("ImageUtils");
+        const imageResize = editor.plugins.get("ImageResize");
         const imageElement = imageUtils.getClosestSelectedImageElement(model.document.selection);
         if (imageElement && imageElement.getAttribute("data-schoolboxresource-fullwidth") === "true") {
             this.set("isOn", true);
+
+            // console.warn(editor.ui.view.toolbar.items.find((item) => item.label && item.label.startsWith("Bold")));
+            // console.warn(editor.plugins.get("ImageToolbar"));
+            imageResize.remove();
+            // console.warn(editor.ui.componentFactory.get("resizeImage"));
+            // editor.ui.componentFactory.get("resizeImage").isEnabled = false;
         } else {
             this.set("isOn", false);
         }
