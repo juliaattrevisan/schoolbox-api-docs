@@ -12,7 +12,6 @@ namespace Schoolbox;
 
 use BadMethodCallException;
 use CallbackFilterIterator;
-use Schoolbox\Learning\Assessment\LessonPlan\Mapper;
 
 use function array_key_exists;
 
