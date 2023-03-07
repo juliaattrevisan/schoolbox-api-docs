@@ -29,6 +29,7 @@ use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\DueWork\Decorator\DueWorkTrait;
 use Schoolbox\Learning\Assessment\DueWork\Decorator\Decorator as DueWorkDecorator;
 use Schoolbox\Learning\Assessment\DueWork\Decorator\CourseManagedDecorator as DueWorkCourseManagedDecorator;
+use Schoolbox\Learning\Assessment\LessonPlan;
 use Schoolbox\Learning\Assessment\Quiz\Decorator\QuizTrait;
 use Schoolbox\Learning\Assessment\Quiz\Decorator\Decorator as QuizDecorator;
 use Schoolbox\Learning\Assessment\Task\Decorator\TaskTrait;
@@ -406,6 +407,12 @@ class Factory
                 $this->getCustomFields(),
                 $this->getLineItemResourceId(),
                 $this->getLineItemScoreMaximum()
+            );
+        } elseif ($assessment instanceof LessonPlan\Model) {
+            /* TODO Add other fields that are LessonPlan specific
+             */
+            $decorator = new LessonPlan\Decorator\Decorator(
+                $this->getAttachedFiles()
             );
         } else {
             throw new DomainException('Please select an assessment type');
