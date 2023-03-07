@@ -75,11 +75,10 @@ function initFormChangeListeners() {
 
     function onEditorCreated(event) {
         const editor = event.detail.editor;
-        editor.on(
-            "change:data",
+        editor.model.document.on("change:data",
             debounce((changeEvent) => {
                 //update the linked <textarea>, which doesn't update until form save otherwise
-                document.getElementById(changeEvent.editor.name).textContent = changeEvent.editor.getData();
+                event.detail.textarea.textContent = editor.getData();
                 onFormDataChange();
             }, 350)
         );
