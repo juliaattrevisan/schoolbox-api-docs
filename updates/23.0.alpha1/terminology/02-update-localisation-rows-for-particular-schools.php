@@ -43,11 +43,23 @@ HELP;
         }
 
         $dbc = $this->getDatabaseInternal();
+        $logger = $this->getLogger();
+        $scriptName = 'Localisation updater';
 
-        echo 'Getting school code...';
-        $rows = $dbc->executeQuery("SELECT value FROM config WHERE name='site_school_code'")->fetchAll();
-        $schoolCode = $rows[0]['value'];
-        echo "done.  Found '$schoolCode'.\n\n";
+        try {
+            $rows = $dbc->executeQuery("SELECT value FROM config WHERE name='site_school_code'")->fetchAll();
+            $schoolCode = $rows[0]['value'];
+        } catch (Exception $e) {
+            printf("%s: Could not find school code.  Stopping.\n", $scriptName);
+            $logger->info('{scriptName}: Could not find school code.  Stopping.', ['scriptName' => $scriptName]);
+            die;
+        }
+
+        printf("%s: Found school code '%s'.\n", $scriptName, $schoolCode);
+        $logger->info(
+            "{scriptName}: Found school code '{schoolCode}.",
+            ['scriptName' => $scriptName, 'schoolCode' => $schoolCode]
+        );
 
         $valueByKeyByTerm = [];
 
@@ -233,12 +245,15 @@ HELP;
                 break;
 
             default:
-                echo "Nothing to do.\n\n";
+                printf("%s: No localisation terms require update.\n", $scriptName);
+                $logger->info(
+                    "{scriptName}: No localisation terms require update.",
+                    ['scriptName' => $scriptName]
+                );
         }
 
         foreach ($valueByKeyByTerm as $term => $valueByKey) {
-            echo "Since we are running at school '$schoolCode', updating '$term' to '{$valueByKey['title']}'...";
-            $dbc->executeQuery(
+            $statement = $dbc->executeQuery(
                 "UPDATE localisation SET
                 title=:title,
                 singular_form=:singularForm,
@@ -255,7 +270,32 @@ HELP;
                     'term' => $term
                 ]
             );
-            echo "done.\n";
+
+            $nRowsAffected = $statement->rowCount();
+
+            switch ($nRowsAffected) {
+                case 0:
+                    printf("%s: No rows affected when trying to update '%s' to '%s'.  Probably already updated.\n", $scriptName, $term, $valueByKey['title']);
+                    $logger->info(
+                        "{scriptName}: No rows affected when trying to update '{term}' to '{title}'.  Probably already updated.",
+                        ['scriptName' => $scriptName, 'term' => $term, 'title' => $valueByKey['title']]
+                    );
+                    break;
+                case 1:
+                    printf("%s: Updated '%s' to '%s'.\n", $scriptName, $term, $valueByKey['title']);
+                    $logger->info(
+                        "{scriptName}: Updated '{term}' to '{title}'.",
+                        ['scriptName' => $scriptName, 'term' => $term, 'title' => $valueByKey['title']]
+                    );
+                    break;
+                default:
+                    printf("%s: Updated '%s' to '%s', but multiple rows affected.  Not good.\n", $scriptName, $term, $valueByKey['title']);
+                    $logger->info(
+                        "{scriptName}: Updated '{term}' to '{title}', but multiple rows affected.  Not good.",
+                        ['scriptName' => $scriptName, 'term' => $term, 'title' => $valueByKey['title']]
+                    );
+                    break;
+            }
         }
 
         echo "\n";
