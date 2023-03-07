@@ -1329,6 +1329,8 @@ class MapperProxy
         } elseif ($subObject instanceof \Schoolbox\Learning\Assessment\LessonPlan\Model) {
             $lessonPlanMapper = \Schoolbox\Learning\Assessment\LessonPlan\Mapper::getInstance();
 
+            /* TODO save all the Lesson Plan Fields' values here, too, I think
+             */
             $lessonPlanMapper->save($subObject);
             $lessonPlanMapper->saveFiles($subObject);
         } elseif ($subObject instanceof Project) {
