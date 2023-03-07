@@ -20,7 +20,6 @@ use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Router;
 use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\StudentAttributes;
-use Custom\Tigs\Summative\SubjectReport\Components\HscAssessmentMatrix;
 use Custom\Tigs\Summative\SubjectReport\Components\HscAssessmentRank;
 use Custom\Tigs\Summative\SubjectReport\Components\HscAssessmentTasks;
 use Custom\Tigs\Summative\SubjectReport\Components\LearningProfile;
@@ -192,7 +191,7 @@ class Report
                 $error .= \sprintf(' <a href="%s">Manage Course imports</a>', $route);
             }
             $errors[]  = $error;
-            $unitSpecsWithData = $hscTaskMarks = $hscTaskMatrix = $middleYearsTaskMarks = [];
+            $unitSpecsWithData = $hscTaskMarks = $middleYearsTaskMarks = [];
             $nesaGraphData = $courseSpec = $hscRankData = $middleYearsRankData = $courseDescription = $learningProfileData = null;
         } else {
             $this->loadParticipation($courseImplsWithUnits);
@@ -205,7 +204,6 @@ class Report
             $courseDescription = $this->buildCourseDescription($courseSpec);
             $nesaGraphData = $this->buildNesaScoreGraphData($folder, $attributes, $courseSpec, $user, $roleTypeOverride);
             $hscTaskMarks  = $this->buildHscTaskMarksData($folder, $attributes, $courseSpec, $user, $roleTypeOverride);
-            $hscTaskMatrix = $this->buildHscTaskMatrixData($folder, $attributes, $unitSpecs, $courseSpec, $user, $roleTypeOverride);
             $hscRankData   = $this->buildHscAssessmentRankData($folder, $attributes, $courseSpec, $user, $roleTypeOverride);
             $middleYearsTaskMarks = $this->buildMiddleYearsTaskMarksData($folder, $attributes, $courseSpec, $user, $roleTypeOverride);
             $middleYearsRankData = $this->buildMiddleYearsAssessmentRankData($folder, $attributes, $courseSpec, $user, $roleTypeOverride);
@@ -266,7 +264,6 @@ class Report
             'courseDescription'         => $courseDescription,
             'nesaGraphData'             => $nesaGraphData,
             'hscTaskMarks'              => $hscTaskMarks,
-            'hscTaskMatrix'             => $hscTaskMatrix,
             'hscRankData'               => $hscRankData,
             'middleYearsTaskMarks'      => $middleYearsTaskMarks,
             'middleYearsRankData'       => $middleYearsRankData,
@@ -616,58 +613,6 @@ class Report
         return $reports;
     }
 
-
-    /**
-     * @param Folder\Model                       $folder
-     * @param StudentAttributes                  $attributes
-     * @param GenericCollection|UnitSpec\Model[] $unitSpecs
-     * @param CourseSpec\Model                   $courseSpec
-     * @param User                               $student
-     * @param string|null                        $roleTypeOverride
-     * @return array|null
-     * @throws RouteNotFound
-     * @throws MapperException
-     */
-    private function buildHscTaskMatrixData(
-        Folder\Model $folder,
-        StudentAttributes $attributes,
-        GenericCollection $unitSpecs,
-        CourseSpec\Model $courseSpec,
-        User $student,
-        ?string $roleTypeOverride
-    ): ?array {
-        // Only relevant for HSC Yr 11 students
-        if ($attributes->getYearLevel() !== 11 || !$attributes->isHsc()) {
-            return null;
-        }
-
-        try {
-            $workTypeId = $this->checkWorkType(
-                Config::_TIGS_WORK_TYPE_HSC_ASSESSMENT_TASK,
-                "Cannot render 'HSC Task Marks' components. Work type not set.",
-                "Set 'HSC Assessment Task' Work Type"
-            );
-        } catch (UnexpectedValueException $e) {
-            return ['error' => $e->getMessage()];
-        }
-
-        $this->loadAssessmentsAndParticipation($courseSpec, [$workTypeId], $attributes, 1, $attributes->getCurriculumSemester());
-
-        $hscTaskMarks = new HscAssessmentMatrix(
-            $attributes,
-            $unitSpecs,
-            $student,
-            $folder,
-            $this->visibility,
-            $this->viewer,
-            $workTypeId,
-            $this->rubricMapper,
-            $this->authorizer,
-            $this->router,
-            $roleTypeOverride
-        );
-        return $hscTaskMarks->toContext();
-    }
 
     /**
      * This is a little table of information for each Middle Years student
