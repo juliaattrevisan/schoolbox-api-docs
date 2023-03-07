@@ -407,6 +407,8 @@ class Factory
                 $this->getLineItemResourceId(),
                 $this->getLineItemScoreMaximum()
             );
+        } elseif ($assessment instanceof LessonPlan\Model) {
+            // TODO: Use LessonPlan Decorator
         } else {
             throw new DomainException('Please select an assessment type');
         }
