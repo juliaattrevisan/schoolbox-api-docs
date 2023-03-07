@@ -56,7 +56,7 @@ export function getAttributes(resource: Resource) {
  */
 const image = {
     source(hash: string) {
-        return `/storage/image.php?hash=${hash}`;
+        return getUrl(`/storage/image.php?hash=${hash}`);
     },
     regex: /^\/storage\/image/,
 };
@@ -69,7 +69,7 @@ const image = {
  */
 function getImageAttributes(resource: Resource) {
     return {
-        src: image.source(resource.hash),
+        src: getUrl(image.source(resource.hash)),
         alt: resource.name,
     };
 }
@@ -79,13 +79,13 @@ function getImageAttributes(resource: Resource) {
  */
 const video = {
     source(id: string, filesystem: string) {
-        return `/cms/sendVideo.php?id=${id}&type=${filesystem}`;
+        return getUrl(`/cms/sendVideo.php?id=${id}&type=${filesystem}`);
     },
     thumbnail(id: string, filesystem: string) {
         /* Ridiculous quick fix
          */
         const filesystemWithReplaces = filesystem.replace("browse", "sbfs").replace("store", "storage");
-        return `/cms/videoThumb.php?size=poster&id=${id}&type=${filesystemWithReplaces}`;
+        return getUrl(`/cms/videoThumb.php?size=poster&id=${id}&type=${filesystemWithReplaces}`);
     },
     regex: /^\/cms\/sendVideo/,
 };
@@ -99,7 +99,7 @@ const video = {
  */
 function getVideoAttributes(resource: Resource) {
     return {
-        src: video.thumbnail(resource.id, resource.filesystem),
+        src: getUrl(video.thumbnail(resource.id, resource.filesystem)),
         alt: resource.name,
         "data-schoolboxresource-type": resource.type,
         "data-schoolboxresource-filesystem": resource.filesystem,
@@ -116,7 +116,7 @@ function getVideoAttributes(resource: Resource) {
  */
 const audio = {
     source(id: string, filesystem: string) {
-        return `/cms/sendVideo.php?id=${id}&type=${filesystem}`;
+        return getUrl(`/cms/sendVideo.php?id=${id}&type=${filesystem}`);
     },
     thumbnail: `${window.cdnPrefix}/images/core/component/audio-thumbnail-processing.gif?v=${window.siteVersion}`,
     regex: /^\/cms\/sendVideo/,
@@ -130,7 +130,7 @@ const audio = {
  */
 function getAudioAttributes(resource: Resource) {
     return {
-        src: audio.thumbnail,
+        src: getUrl(audio.thumbnail),
         alt: resource.name,
         "data-schoolboxresource-type": resource.type,
         "data-schoolboxresource-filesystem": resource.filesystem,
@@ -140,4 +140,17 @@ function getAudioAttributes(resource: Resource) {
         "data-schoolboxresource-height": 64,
         "data-schoolboxresource-fullwidth": "false",
     };
+}
+
+/**
+ * Get the url of the resource, and if we have specified a baseHref, to then use that
+ *
+ * @param { string } url - the url to reformat
+ * @param { object } config - the CKEditor instance
+ */
+export function getUrl(url: string, config: object) {
+    if (config.config.sbConfig) {
+        return new URL(url, config.config.sbConfig).toString();
+    }
+    return url;
 }

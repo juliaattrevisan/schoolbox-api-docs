@@ -15,12 +15,14 @@ import "@js/editor/styles/editor.css"; // to overwrite some of the styles
  *
  * @param { HTMLTextAreaElement } textarea - the textarea the CKEditor will replace
  * @param { CKEditor } editor - the CKEditor instance
+ * @param { object } config - the CKEditor config object
  */
-async function onCreated(textarea: HTMLTextAreaElement, editor) {
+async function onCreated(textarea: HTMLTextAreaElement, editor, config: object) {
     insertWordCount(textarea, editor);
     removeValidation();
     await addIframelyEmbed();
     addToGlobalScope(editor, textarea);
+    editor.config.sbConfig = config;
     CKEditorInspector.attach(editor);
     textarea.dispatchEvent(
         new CustomEvent(EditorEvent.EDITOR__CREATED, {
@@ -41,7 +43,7 @@ async function onCreated(textarea: HTMLTextAreaElement, editor) {
 function create(textarea: HTMLTextAreaElement, config: EditorConfig) {
     ClassicEditor.create(textarea, getConfig(config))
         .then((editor) => {
-            onCreated(textarea, editor);
+            onCreated(textarea, editor, config);
         })
         .catch((error) => {
             console.error(error.stack);
