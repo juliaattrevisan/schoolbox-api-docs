@@ -18,6 +18,7 @@ export default class ToggleFullWidthCommand extends Command {
 
         if (!imageElement.hasAttribute("data-schoolboxresource-fullwidth")) {
             editor.execute("resizeImage", { width: "100%" });
+            editor.execute("imageStyle", { value: "fullWidth" });
             model.change((writer) => {
                 writer.setAttribute("data-schoolboxresource-fullwidth", true, imageElement);
             });

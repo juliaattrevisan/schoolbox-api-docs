@@ -10,10 +10,10 @@ export function getImageSettings() {
     return {
         image: {
             // image setup: https://ckeditor.com/docs/ckeditor5/latest/features/images/images-overview.html
-            toolbar: ["linkImage", "|", "resizeImage", "fullWidth"],
+            toolbar: ["linkImage", "|", "resizeImage", "fullWidth", "imageStyle:fullWidth"],
             // toolbar: [
             //     "imageTextAlternative",
-            //     "toggleImageCaption",
+            //     // "toggleImageCaption",
             //     "linkImage",
             //     "|",
             //     "imageStyle:inline",
@@ -29,7 +29,7 @@ export function getImageSettings() {
             //         items: ["imageStyle:alignBlockLeft", "imageStyle:block", "imageStyle:alignBlockRight"],
             //         defaultItem: "imageStyle:block",
             //     },
-            //     "imageStyle:side",
+            //     // "imageStyle:blue",
             //     "|",
             //     "resizeImage",
             //     "fullWidth",
@@ -64,6 +64,18 @@ export function getImageSettings() {
                     icon: "large",
                 },
             ],
+            styles: {
+                // Defining custom styling options for the images.
+                options: [
+                    {
+                        name: "fullWidth",
+                        modelElements: ["imageInline"],
+                        title: "Full width",
+                        icon: "full",
+                        className: "full-width",
+                    },
+                ],
+            },
         },
     };
 }
