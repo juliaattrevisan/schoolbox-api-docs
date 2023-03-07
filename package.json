@@ -69,7 +69,6 @@
         "pinia": "~2.0.29",
         "qrcode.vue": "~3.3.3",
         "qs": "~6.10.3",
-        "spectrum-colorpicker": "~1.8.1",
         "strtotime": "~1.0.0",
         "swiper": "^9.0.4",
         "tinycolor2": "~1.5.2",
