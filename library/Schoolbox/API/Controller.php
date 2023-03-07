@@ -331,8 +331,8 @@ class Controller extends Base
     {
         $this->response->headers->set('Content-Type', 'application/json');
         $this->response->content->set([
-            'type' => 'json',
-            'data' => [
+            'format' => 'json',
+            'data'   => [
                 'id'       => $user->getId(),
                 'key'      => $user->getKey(),
                 'role'     => $user->getRole()->getType(),
