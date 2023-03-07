@@ -37,7 +37,10 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('lesson_plan_id', LessonPlanMapper::class, 'id', null, null, 'lessonPlan', 'lessonPlan');
         $this->joins('lesson_plan_template_field_id', LessonPlanTemplateFieldMapper::class, 'id', null, null, 'lessonPlanTemplateField', 'lessonPlanTemplateField');
+        $this->uses('title', self::TYPE_STRING);
         $this->uses('body', self::TYPE_STRING);
+        $this->uses('visibility', self::TYPE_STRING);
+        $this->uses('sequence', self::TYPE_INTEGER);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);

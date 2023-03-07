@@ -36,6 +36,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('lesson_plan_template_id', \Schoolbox\Admin\LessonPlan\Template\Mapper::class, 'id', null, null, 'lessonPlanTemplate', 'lessonPlanTemplate');
+        $this->uses('visibility', self::TYPE_STRING);
         $this->joins('created_by', UserMapper::class, 'id', null, null, 'createdBy', 'createdBy');
         $this->joins('updated_by', UserMapper::class, 'id', null, null, 'updatedBy', 'updatedBy');
         $this->joins('deleted_by', UserMapper::class, 'id', null, null, 'deletedBy', 'deletedBy');

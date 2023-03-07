@@ -38,6 +38,30 @@ class Model implements ISoftDeletable
 
 
     /**
+     * The title of the field
+     *
+     * @var string|null
+     */
+    private ?string $title = null;
+
+
+    /**
+     * Corresponds to Role::STUDENT or Role::STAFF
+     *
+     * @var string|null
+     */
+    private ?string $visibility = null;
+
+
+    /**
+     * An ordering field
+     *
+     * @var int|null
+     */
+    private ?int $sequence = null;
+
+
+    /**
      * The body text for a field
      *
      * @var string|null
@@ -87,13 +111,26 @@ class Model implements ISoftDeletable
 
     /**
      * Title is readonly in Lesson Plan Fields.
-     * They are derived from the original Lesson Plan Template Field.
+     *
+     * This is derived from the original Lesson Plan Template Field,
+     * but in the db they are copies of the Lesson Plan Template's value.
      *
      * @return string|null
      */
     public function getTitle(): ?string
     {
-        return $this->lessonPlanTemplateField->getTitle() ?? null;
+        return $this->title;
+    }
+
+
+    /**
+     * @param string|null $title
+     * @return Model
+     */
+    public function setTitle(?string $title): self
+    {
+        $this->title = $title;
+        return $this;
     }
 
 
@@ -119,24 +156,50 @@ class Model implements ISoftDeletable
 
     /**
      * Visibility is readonly in Lesson Plan Fields.
-     * They are derived from the original Lesson Plan Template Field.
+     *
+     * This is derived from the original Lesson Plan Template Field,
+     * but in the db they are copies of the Lesson Plan Template's value.
      *
      * @return string|null
      */
     public function getVisibility(): ?string
     {
-        return $this->lessonPlanTemplateField->getVisibility() ?? null;
+        return $this->visibility;
+    }
+
+
+    /**
+     * @param string|null $visibility
+     * @return Model
+     */
+    public function setVisibility(?string $visibility): self
+    {
+        $this->visibility = $visibility;
+        return $this;
     }
 
 
     /**
      * Sequence is readonly in Lesson Plan Fields.
-     * They are derived from the original Lesson Plan Template Field.
+     *
+     * This is derived from the original Lesson Plan Template Field,
+     * but in the db they are copies of the Lesson Plan Template's value.
      *
      * @return int|null
      */
     public function getSequence(): ?int
     {
-        return $this->lessonPlanTemplateField->getSequence() ?? null;
+        return $this->sequence;
+    }
+
+
+    /**
+     * @param int|null $sequence
+     * @return Model
+     */
+    public function setSequence(?int $sequence): self
+    {
+        $this->sequence = $sequence;
+        return $this;
     }
 }

@@ -76,6 +76,24 @@ class Model extends AbstractAssessment
 
 
     /**
+     * Visibility to students or staff.
+     * Corresponds to Role::STUDENT or Role::STAFF
+     *
+     * Teachers might make Lesson Plans that are only available to teachers,
+     * not students; like a reference material for what the student was meant
+     * to accomplish. Students have no such use of this kind of Lesson Plan
+     * and shouldn't see it.
+     *
+     * We've used Publish Date to decide visibility to students and control
+     * visibility in other parts of schoolbox but the real reason this exists
+     * is to prevent students from seeing a teacher-only Lesson Plan.
+     *
+     * @var string|null
+     */
+    private ?string $visibility = null;
+
+
+    /**
      * @return \Schoolbox\Admin\LessonPlan\Template\Model|null
      */
     public function getLessonPlanTemplate(): ?\Schoolbox\Admin\LessonPlan\Template\Model
@@ -171,6 +189,26 @@ class Model extends AbstractAssessment
     public function setDeletedBy(?User $deletedBy): self
     {
         $this->deletedBy = $deletedBy;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getVisibility(): ?string
+    {
+        return $this->visibility;
+    }
+
+
+    /**
+     * @param string|null $visibility
+     * @return Model
+     */
+    public function setVisibility(?string $visibility): self
+    {
+        $this->visibility = $visibility;
         return $this;
     }
 
