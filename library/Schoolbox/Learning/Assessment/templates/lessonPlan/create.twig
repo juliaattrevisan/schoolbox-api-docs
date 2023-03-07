@@ -7,18 +7,57 @@
  #
  # @param LessonPlan\Template\Model[] $lessonPlanTemplates['recent']
  # @param LessonPlan\Template\Model[] $lessonPlanTemplates['all']
-#}
-<div class="row">
-    <div class="small-12 columns">
-        <p>A list of Recent Templates</p>
-        <p>A list of all templates, ordered alphabetically naturally</p>
-
-        {% for recentLessonPlanTemplate in lessonPlanTemplates.recent %}
-            {{ recentLessonPlanTemplate }}
-        {% endfor %}
-
-        {% for lessonPlanTemplate in lessonPlanTemplates.all %}
-            {{ lessonPlanTemplate }}
-        {% endfor %}
+ #}
+{% if lessonPlanTemplates.recent|length %}
+    <div class="row">
+        <div class="small-12 columns">
+            <h2 class="subheader">Recently Used Templates</h2>
+        </div>
     </div>
-</div>
+    <div class="row">
+        <div class="small-12 columns">
+            <ul class="information-list">
+                {% for recentLessonPlanTemplate in lessonPlanTemplates.recent %}
+                    <li class="actions-small-1">
+                        <div class="list-item">
+                            <div class="card small-12">
+                                <a href="#">{{ recentLessonPlanTemplate }}</a>
+                            </div>
+                        </div>
+                        <nav>
+                            <a class="icon-search"></a>
+                        </nav>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <hr />
+{% endif %}
+
+{% if lessonPlanTemplates.all|length %}
+    <div class="row">
+        <div class="small-12 columns">
+            <h2 class="subheader">All Templates</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="small-12 columns">
+            <ul class="information-list">
+                {% for lessonPlanTemplate in lessonPlanTemplates.all %}
+                    <li class="actions-small-1">
+                        <div class="list-item">
+                            <div class="card small-12">
+                                <a href="#">{{ lessonPlanTemplate }}</a>
+                            </div>
+                        </div>
+                        <nav>
+                            <a class="icon-search"></a>
+                        </nav>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% endif %}
