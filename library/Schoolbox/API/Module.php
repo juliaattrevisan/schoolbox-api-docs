@@ -39,6 +39,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(RegistryMapper::class),
             $this->getMapperFactory()->get(ServiceMapper::class),
             $this->injector->get('user.jwtParser'),
+            $this->injector->get('redis.storage'),
         );
     }
 }

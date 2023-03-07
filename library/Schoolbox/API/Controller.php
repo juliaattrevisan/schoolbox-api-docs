@@ -9,9 +9,9 @@
 namespace Schoolbox\API;
 
 use Alaress\Web\Controller\Base;
-use Alaress\Web\Output;
 use Alaress_Date_Format;
 use Authenticator;
+use Predis\ClientInterface;
 use Schoolbox\API\Token\JwtParser;
 use Schoolbox\Application\Exception\AccessDenied as SchoolboxAccessDeniedException;
 use Schoolbox\Application\Exception\AccountDisabled as SchoolboxAccountDisabledException;
@@ -22,11 +22,21 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\MobileApp\Registry;
 use Schoolbox\MobileApp\RegistryMapper;
 use Schoolbox\MobileApp\ServiceMapper;
+use Schoolbox\Realtime\Pipe\PipeManager;
 use Schoolbox\User;
 use Schoolbox\Url\Uri;
 
 class Controller extends Base
 {
+    /**
+     * Expire sessions created via the API after 5 minutes, instead of the
+     * (presumably longer!) default expiry.
+     *
+     * (If a session created via the API is reused, its expiry will be extended
+     * as per normal.)
+     */
+    private const API_SESSION_EXPIRY = 300;
+
     /**
      * Authenticator, for creating a user session.
      */
@@ -60,12 +70,15 @@ class Controller extends Base
      * @param RegistryMapper    $registryMapper
      * @param ServiceMapper     $serviceMapper
      * @param JwtParser\IParser $jwtParser
+     * @param ClientInterface   $sessionRedis The Redis instance which stores session data:
+     *                                        required so that if a session is created it is cut short.
      */
     public function __construct(
         Authenticator $auth,
         RegistryMapper $registryMapper,
         ServiceMapper $serviceMapper,
-        JwtParser\IParser $jwtParser
+        JwtParser\IParser $jwtParser,
+        private ClientInterface $sessionRedis,
     ) {
         $this->auth           = $auth;
         $this->registryMapper = $registryMapper;
@@ -171,7 +184,7 @@ class Controller extends Base
             }
 
             $this->response->status->setCode(201);
-            $this->response->content->set($this->buildAuthenticatedJsonOutput($sessionUser));
+            $this->assignJsonResponseForAuthenticatedUser($sessionUser);
         }
     }
 
@@ -188,17 +201,9 @@ class Controller extends Base
         $sessionUser = $this->authenticate(true);
         if ($sessionUser) {
             if ($this->isJsonRequest()) {
-                $this->response->content->set($this->buildAuthenticatedJsonOutput($sessionUser));
+                $this->assignJsonResponseForAuthenticatedUser($sessionUser);
             } else {
-                // Redirect somewhere (locally only?)
-                $page = $this->getRequest()->query->get('redirect');
-
-                //Determine if page redirect is valid
-                if ($page && (new Uri($page))->isAbsolutePath()) {
-                    $this->response->redirect->to($page);
-                } else {
-                    $this->response->redirect->to('/');
-                }
+                $this->assignRedirectResponseForAuthenticatedUser((string)$this->getRequest()->query->get('redirect'));
             }
         }
     }
@@ -316,21 +321,61 @@ class Controller extends Base
         return $user;
     }
 
-
     /**
-     * Build JSON output for an authenticated user.
+     * Assigns JSON response (headers and output) for an authenticated user.
      *
      * @param User $user The user to build output for.
      *                   In practise this will always be the logged-in user.
-     * @return Output\Json
      */
-    private function buildAuthenticatedJsonOutput(User $user): Output\Json
+    private function assignJsonResponseForAuthenticatedUser(User $user): void
     {
-        return $this->buildJsonOutput([
-            'id'       => $user->getId(),
-            'key'      => $user->getKey(),
-            'role'     => $user->getRole()->getType(),
-            'username' => $user->getUsername(),
+        $this->response->headers->set('Content-Type', 'application/json');
+        $this->response->content->set([
+            'format' => 'json',
+            'data'   => [
+                'id'       => $user->getId(),
+                'key'      => $user->getKey(),
+                'role'     => $user->getRole()->getType(),
+                'username' => $user->getUsername(),
+            ],
+            'postOutput' => [fn () => $this->shortenSessionLifetime()],
         ]);
+    }
+
+    /**
+     * Assigns redirect response (headers and output) for an authenticated user.
+     *
+     * @param string $page The (relative) path to redirect to.
+     */
+    private function assignRedirectResponseForAuthenticatedUser(string $page): void
+    {
+        // Redirect somewhere (locally only)
+        if ($page && (new Uri($page))->isAbsolutePath()) {
+            $this->response->redirect->to($page);
+        } else {
+            $this->response->redirect->to('/');
+        }
+        $this->response->content->set([
+            'format'     => 'noContent',
+            'postOutput' => [fn () => $this->shortenSessionLifetime()],
+        ]);
+    }
+
+    /**
+     * Shortens the lifetime of the current session.
+     *
+     * This exists so that sessions created with one of the `init*` methods are
+     * by default short-lived, thus protecting against repeated calls to these
+     * methods creating multiple sessions for the same user (and thus causing a
+     * denial-of-service by exhausting Redis' memory).
+     *
+     * @return void
+     */
+    private function shortenSessionLifetime(): void
+    {
+        // Session must be closed before setting its expiry, as the Redis key
+        // doesn't exist before it is closed.
+        session_write_close();
+        $this->sessionRedis->expire(PipeManager::REDIS_SESSION_PREFIX . session_id(), self::API_SESSION_EXPIRY);
     }
 }
