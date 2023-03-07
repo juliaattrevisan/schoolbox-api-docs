@@ -46,23 +46,6 @@ class Model implements ISoftDeletable
 
 
     /**
-     * Visibility in the list screen
-     * Corresponds to Role::STUDENT or Role::STAFF
-     *
-     * @var string|null
-     */
-    private ?string $visibility = null;
-
-
-    /**
-     * An ordering field
-     *
-     * @var int|null
-     */
-    private ?int $sequence = null;
-
-
-    /**
      * @return LessonPlan|null
      */
     public function getLessonPlan(): ?LessonPlan
@@ -103,6 +86,9 @@ class Model implements ISoftDeletable
 
 
     /**
+     * Title is readonly in Lesson Plan Fields.
+     * They are derived from the original Lesson Plan Template Field.
+     *
      * @return string|null
      */
     public function getTitle(): ?string
@@ -132,6 +118,9 @@ class Model implements ISoftDeletable
 
 
     /**
+     * Visibility is readonly in Lesson Plan Fields.
+     * They are derived from the original Lesson Plan Template Field.
+     *
      * @return string|null
      */
     public function getVisibility(): ?string
@@ -141,6 +130,9 @@ class Model implements ISoftDeletable
 
 
     /**
+     * Sequence is readonly in Lesson Plan Fields.
+     * They are derived from the original Lesson Plan Template Field.
+     *
      * @return int|null
      */
     public function getSequence(): ?int
