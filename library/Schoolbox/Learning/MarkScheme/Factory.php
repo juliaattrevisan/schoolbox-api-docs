@@ -17,6 +17,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group;
 use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
@@ -87,6 +88,14 @@ class Factory
 
 
     /**
+     * Lesson Plans are never marked. They don't have feedback or responses.
+     *
+     * @var string[]
+     */
+    private static array $markTypesLessonPlan = [];
+
+
+    /**
      * @var Group\Mapper
      */
     private $gradeLevelGroupMapper;
@@ -143,6 +152,10 @@ class Factory
 
         if ($assessable instanceof Project) {
             return $this->spawnForProject($assessable);
+        }
+
+        if ($assessable instanceof LessonPlan) {
+            return $this->spawnForLessonPlan($assessable);
         }
 
         throw new InvalidArgumentException('Unknown IAssessable class: ' . \get_class($assessable));
@@ -291,6 +304,16 @@ class Factory
 
 
     /**
+     * @param LessonPlan $lessonPlan
+     * @return null
+     */
+    protected function spawnForLessonPlan(LessonPlan $lessonPlan)
+    {
+        return null;
+    }
+
+
+    /**
      * @param IAssessable $assessable
      * @return string[] Indexed by MarkType.id
      * @throws UnexpectedValueException If $assessment class is not registered
@@ -315,6 +338,10 @@ class Factory
 
         if ($assessable instanceof LtiAssessment) {
             return self::$markTypesLtiAssessment;
+        }
+
+        if ($assessable instanceof LessonPlan) {
+            return self::$markTypesLessonPlan;
         }
 
         throw new UnexpectedValueException('Unknown IAssessable: ' . get_class($assessable));
