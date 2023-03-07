@@ -85,8 +85,7 @@ class LearningProfile extends BaseComponent
                     // Search within unit spec for due works matching search
                     if ($implementation->getFolder()->getId() === $this->folder->getId()) {
                         $filteredAssessments = $implementation->getAssessables()
-                            ->filter($this->createAssessmentFilter($search))
-                            ->sortByCallback(fn (DueWork\Model $a1, DueWork\Model $a2) => $a1->getDueAt()->lt($a2->getDueAt()));
+                            ->filter($this->createAssessmentFilter($search));
 
                         // For each filtered assessment: build data I guess
                         foreach ($filteredAssessments as $assessment) {
