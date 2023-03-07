@@ -562,9 +562,10 @@ $allow-sidebar-stash: $large-up;
 // Common account menu styles (sidebar & top menu variations)
 .account-menu-mobile,
 .account-drop {
+    background-color: $accounts-menu-background;
+
     a {
         color: $accounts-menu-foreground;
-        background-color: $accounts-menu-background;
         display: block;
         padding: 0.625rem 0.8125rem;
         font-size: 1rem;
@@ -582,20 +583,14 @@ $allow-sidebar-stash: $large-up;
     .separator {
         // DONE alpha of foreground is fine
         color: css-scale-color($accounts-menu-foreground, $alpha: -65%);
-        background: $accounts-menu-background;
         padding: 0.625rem 0.8125rem;
         font-weight: 300;
         text-transform: uppercase;
         cursor: default;
         font-size: 0.8125rem;
-
-        &:hover {
-            background: $accounts-menu-background;
-        }
     }
 
     .user {
-        background: $accounts-menu-background;
         overflow: auto;
 
         &:hover {
