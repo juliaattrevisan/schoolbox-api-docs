@@ -10,7 +10,7 @@ export function getImageSettings() {
     return {
         image: {
             // image setup: https://ckeditor.com/docs/ckeditor5/latest/features/images/images-overview.html
-            toolbar: ["linkImage", "|", "resizeImage", "fullWidth", "imageStyle:fullWidth"],
+            toolbar: ["linkImage", "|", "resizeImage", "fullWidth"],
             // toolbar: [
             //     "imageTextAlternative",
             //     // "toggleImageCaption",
@@ -65,7 +65,11 @@ export function getImageSettings() {
                 },
             ],
             styles: {
-                // Defining custom styling options for the images.
+                /**
+                 * We define this style so users can enforce the media to be full width in display view
+                 * This class is picked up in www/static/js/editor/jquery.proxy-replacement.js to determine
+                 * whether the media is displayed as full width
+                 */
                 options: [
                     {
                         name: "fullWidth",

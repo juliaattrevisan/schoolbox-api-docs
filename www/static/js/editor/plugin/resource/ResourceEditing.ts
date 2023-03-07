@@ -1,6 +1,10 @@
 /**
  * To extend imageBlock and imageInline to allow for additional data attributes
  * and add the insertResource command to the editor
+ *
+ * @todo - there's currently an issue with preserving extra attributes on the imageBlock element
+ * as imageInline appears to work fine, all images are currently set to imageInline, so all imageBlock
+ * related functionality is currently disabled
  */
 
 import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
@@ -24,9 +28,9 @@ export default class ResourceEditing extends Plugin {
      */
     updateSchema() {
         const schema = this.editor.model.schema;
-        schema.extend("imageBlock", {
-            allowAttributes: [...getExtraAttributes()],
-        });
+        // schema.extend("imageBlock", {
+        //     allowAttributes: [...getExtraAttributes()],
+        // });
         schema.extend("imageInline", {
             allowAttributes: [...getExtraAttributes()],
         });
@@ -41,26 +45,26 @@ export default class ResourceEditing extends Plugin {
 
         const attributes = getExtraAttributes();
         attributes.forEach((attribute) => {
-            conversion.for("downcast").attributeToAttribute({
-                model: {
-                    name: "imageBlock",
-                    key: attribute,
-                },
-                view: {
-                    name: "img",
-                    key: attribute,
-                },
-            });
-            conversion.for("upcast").attributeToAttribute({
-                view: {
-                    name: "img",
-                    key: attribute,
-                },
-                model: {
-                    name: "imageBlock",
-                    key: attribute,
-                },
-            });
+            // conversion.for("downcast").attributeToAttribute({
+            //     model: {
+            //         name: "imageBlock",
+            //         key: attribute,
+            //     },
+            //     view: {
+            //         name: "img",
+            //         key: attribute,
+            //     },
+            // });
+            // conversion.for("upcast").attributeToAttribute({
+            //     view: {
+            //         name: "img",
+            //         key: attribute,
+            //     },
+            //     model: {
+            //         name: "imageBlock",
+            //         key: attribute,
+            //     },
+            // });
             conversion.for("downcast").attributeToAttribute({
                 model: {
                     name: "imageInline",
