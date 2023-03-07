@@ -31,26 +31,22 @@
     {% set action = 'Modify' %}
 {% endif %}
 
-<link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/vendors/spectrum/spectrum.css?v={{ config.site_version }}" />
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/spectrum.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/colourPicker.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
 
 {% autoescape 'js' %}
 <script type="text/javascript">
     $(function() {
-
-        $("[data-colour-picker]").spectrum(
-            $.extend(
-                {},
-                window.sbProps.spectrum,
-                {
-                    allowEmpty: true,
-                    change: function (color) {if (color !== null) {$(this).val(color.toRgbString());}},
-                    hide: function (color) {if (color !== null) {$(this).val(color.toRgbString());}},
-                    preferredFormat: 'rgb'
-                }
-            )
+        document.dispatchEvent(
+            new CustomEvent("colourPickerInitialize", {
+                detail: {
+                    target: `#colour`,
+                    options: {
+                        alpha: false,
+                    },
+                },
+            })
         );
 
         var writePermission = {{ write }};
@@ -304,7 +300,7 @@
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select a colour that will be used for this folder">?</span>
                             <div class="row collapse">
                                 <div class="small-12 columns">
-                                    <input type="text" value="{{ folder.colour.asRgb ?? '' }}" id="colour" name="colour" data-colour-picker />
+                                    <input type="text" value="{{ folder.colour.asRgb ?? '' }}" id="colour" name="colour" />
                                 </div>
                             </div>
                         </label>
