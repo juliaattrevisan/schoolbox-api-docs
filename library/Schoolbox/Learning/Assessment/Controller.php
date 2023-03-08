@@ -280,6 +280,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 /* You need to Select an LPT
                  */
                 $data['template'] = null;
+                $data['type'] = $type;
 
                 if ($this->getRequest()->isXhr()) {
                     $content = $this->buildUnthemedHtmlOutput(sprintf(

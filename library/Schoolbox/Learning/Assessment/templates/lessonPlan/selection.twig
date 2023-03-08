@@ -7,6 +7,7 @@
  #
  # @param LessonPlan\Template\Model[] $lessonPlanTemplates['recent']
  # @param LessonPlan\Template\Model[] $lessonPlanTemplates['all']
+ # @param string $type                Corresponds to the const 'lessonPlan' in AssessmentType
  #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 
@@ -45,7 +46,9 @@
                                 <li class="actions-small-1">
                                     <div class="list-item">
                                         <div class="card small-12">
-                                            <a href="#"><h3>{{ recentLessonPlanTemplate.title }}</h3></a>
+                                            {% set createRoute = routeLookup('learningAssessment.getCreateAssessmentForm', { contextType: contextType, contextId: context.id, context: context }) ~ '?lpt=' ~ recentLessonPlanTemplate.id ~ '&type=' ~ type %}
+
+                                            <a href="{{ createRoute }}"><h3>{{ recentLessonPlanTemplate.title }}</h3></a>
                                             <p class="meta">
                                                 Last modified by
                                                 {% if recentLessonPlanTemplate.updatedBy.deleted %}
@@ -87,7 +90,9 @@
                                 <li class="actions-small-1">
                                     <div class="list-item">
                                         <div class="card small-12">
-                                            <a href=""><h3>{{ lessonPlanTemplate.title }}</h3></a>
+                                            {% set createRoute = routeLookup('learningAssessment.getCreateAssessmentForm', { contextType: contextType, contextId: context.id, context: context }) ~ '?lpt=' ~ lessonPlanTemplate.id ~ '&type=' ~ type %}
+
+                                            <a href="{{ createRoute }}"><h3>{{ lessonPlanTemplate.title }}</h3></a>
                                             <p class="meta">
                                                 Last modified by
                                                 {% if lessonPlanTemplate.updatedBy.deleted %}
@@ -141,7 +146,9 @@
             {% endfor %}
         </ul>
 
-        <a href="#" class="submit button">Use this lesson plan template</a>
+        {% set createRoute = routeLookup('learningAssessment.getCreateAssessmentForm', { contextType: contextType, contextId: context.id, context: context }) ~ '?lpt=' ~ lessonPlanTemplate.id ~ '&type=' ~ type %}
+
+        <a href="{{ createRoute }}" class="submit button">Use this lesson plan template</a>
         <a class="close-reveal-modal">&#215;</a>
     </div>
 {% endfor %}
