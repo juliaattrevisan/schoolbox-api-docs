@@ -241,6 +241,8 @@ class Mapper extends \Schoolbox\Mapper
      */
     public function findRecentlyUsed(\Schoolbox\User $user): GenericCollection
     {
+        $lessonPlanTemplateMapper = $this->getJoinMapper('lessonPlanTemplate');
+
         /* For the given user,
          *
          * Find all the Lesson Plans they created, ordered by created_at,
@@ -254,6 +256,25 @@ class Mapper extends \Schoolbox\Mapper
          *
          * Make a unique query to do that, I guess, to save some hydration
          */
+        $query = "
+            SELECT 
+                {$this->getJoinColumnString('lessonPlanTemplate', 'lessonPlanTemplate')},
+                updater.id AS `updater.id`,
+                updater.title AS `updater.title`,
+                updater.firstname AS `updater.firstname`,
+                updater.preferred_name AS `updater.preferred_name`,
+                updater.chosen_name AS `updaetr.chosen_name`,
+                updater.lastname AS `updater.lastname`
+            FROM lesson_plan
+            INNER JOIN assessment ON lesson_plan.assessment_id = assessment.id
+            INNER JOIN lesson_plan_template AS lessonPlanTemplate ON lesson_plan.lesson_plan_template_id = lessonPlanTemplate.id
+            INNER JOIN `user` updater ON lessonPlanTemplate.created_by = updater.id
+            WHERE lessonPlanTemplate.enabled = 1
+            GROUP BY lesson_plan_template_id
+            ORDER BY assessment.created_at DESC LIMIT 3
+        ";
+
+        new \Alaress_Probe($query);
     }
 
 
