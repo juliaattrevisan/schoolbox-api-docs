@@ -152,6 +152,66 @@ class Mapper extends \Schoolbox\Mapper
 
 
     /**
+     * Find the most recent unique Lesson Plan Templates' ids from which
+     * the $user spawned Lesson Plans. This can be used to find the fully
+     * hydrated LPTs themselves via the LPT mapper.
+     *
+     * @param User $user
+     * @param int  $limit
+     * @return GenericCollection
+     * @throws \PDOException
+     */
+    public function findRecentlyUsed(\Schoolbox\User $user, int $limit = 3): GenericCollection
+    {
+        $params = [
+            'creatorId' => $user->getId(),
+            'enabled' => true,
+        ];
+
+        /* For the given user,
+         *
+         * Find all the Lesson Plans they created, ordered by created_at,
+         * along with all the Lesson Plan Templates used to create them.
+         *
+         * NOTE: Only care about enabled templates; disabled templates
+         * shouldn't appear in any list anywhere, I guess
+         *
+         * Pick the top three unique Lesson Plan Templates and discard
+         * the rest.
+         *
+         * Make a unique query to do that, I guess, to save some hydration
+         */
+        $query = "
+            SELECT {$this->getColumnString('lessonPlanTemplate')} 
+            FROM lesson_plan
+            INNER JOIN assessment ON lesson_plan.assessment_id = assessment.id
+            INNER JOIN {$this->getTable()} AS lessonPlanTemplate ON lesson_plan.lesson_plan_template_id = lessonPlanTemplate.id
+            WHERE lesson_plan.created_by = :creatorId
+            AND lessonPlanTemplate.enabled = :enabled
+            GROUP BY lesson_plan_template_id
+            ORDER BY assessment.created_at DESC LIMIT :limit
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->bindValue('limit', $limit, \PDO::PARAM_INT);
+
+        foreach ($params as $label => $value) {
+            $statement->bindValue($label, $value);
+        }
+
+        $statement->execute();
+
+        $ids = [];
+
+        while ($row = $statement->fetchColumn()) {
+            $ids[] = $row;
+        }
+
+        return $this->findByColumn('id', $ids);
+    }
+
+
+    /**
      * Delete the fields that were associated with $lessonPlanTemplate
      *
      * @param Model $lessonPlanTemplate

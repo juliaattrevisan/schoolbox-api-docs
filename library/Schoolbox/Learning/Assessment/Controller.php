@@ -259,8 +259,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
          * We've literally been piling everything into this one controller method!
          */
         $data['lessonPlanTemplates'] = [
-            'recent' => ['AA', 'BB', 'CC'],
-            'all' => ['aaa', 'bbb', 'ccc', 'ddd', 'eee', 'fff']
+            'recent' => \Schoolbox\Admin\LessonPlan\Template\Mapper::getInstance()->findRecentlyUsed($this->getUser()),
+            'all' => \Schoolbox\Admin\LessonPlan\Template\Mapper::getInstance()->findAll()
         ];
 
         // either output the fragment to the mage, or use the synchronous form
