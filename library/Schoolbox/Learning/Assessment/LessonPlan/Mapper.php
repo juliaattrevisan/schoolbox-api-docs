@@ -231,6 +231,32 @@ class Mapper extends \Schoolbox\Mapper
         $this->cascadeJoin('lessonPlanField', ['lesson_plan_id' => $lessonPlan->getId()], $lessonPlan->getFields());
     }
 
+
+    /**
+     * Find the most recent unique Lesson Plan Templates from which
+     * the $user spawned Lesson Plans.
+     *
+     * @param User $user
+     * @return GenericCollection
+     */
+    public function findRecentlyUsed(\Schoolbox\User $user): GenericCollection
+    {
+        /* For the given user,
+         *
+         * Find all the Lesson Plans they created, ordered by created_at,
+         * along with all the Lesson Plan Templates used to create them.
+         *
+         * NOTE: Only care about enabled templates; disabled templates
+         * shouldn't appear in any list anywhere, I guess
+         *
+         * Pick the top three unique Lesson Plan Templates and discard
+         * the rest.
+         *
+         * Make a unique query to do that, I guess, to save some hydration
+         */
+    }
+
+
     /**
      * Delete the fields that were associated with $lessonPlanTemplate
      *
