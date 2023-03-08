@@ -11,8 +11,7 @@ Data:
     errorMessage:   null|string                  If re-loading this page because user attempted to upload bad MIME types
 #}
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 
 {% set isSubmitOnBehalfOf = USER.id != student.id %}
 
@@ -70,7 +69,7 @@ Data:
         let autosavePresubmit = function () {
 
             // Has anything changed? If not check again later (re-init the autosave counter)
-            currentSubmissionContent = CKEDITOR.instances['editor-body'].getData(); //start with grabbing the ckeditor content
+            currentSubmissionContent = window.sbProps.editors['editor-body'].getData(); //start with grabbing the ckeditor content
             const formData = new FormData(document.getElementById('editor-form')); //then retrieve any dropzone, rubric and self-assessment changes
             formData.forEach((value) => currentSubmissionContent += value); //loop through and grab all the form values, creating a single string
 
@@ -93,7 +92,7 @@ Data:
             let formContents = $form.serializeArray();
             formContents.push({name: 'saveDraft', value: '1'});
             if (acceptsOnline) {
-                formContents.push({name: 'body', value: CKEDITOR.instances['editor-body'].getData()});
+                formContents.push({name: 'body', value: window.sbProps.editors['editor-body'].getData()});
             }
             $formSaveLabel.toastActivate({
                 text: 'Autosaving'
@@ -145,7 +144,7 @@ Data:
             if (!acceptsOnline) {
                 return true;
             }
-            let inlineLen = CKEDITOR.instances['editor-body'].getData().length,
+            let inlineLen = window.sbProps.editors['editor-body'].getData().length,
                 filesLen  = $('#files-zone').data('plugin_resourceAttach').dropzone.getAcceptedFiles().length;
             return (Boolean)(inlineLen || filesLen || $form.find('#editor-submittedInPerson').prop('checked'));
         };
@@ -188,13 +187,25 @@ Data:
 
         /* Spawn editors
          */
-        $.fn.alaressEditor({
+        {# $.fn.alaressEditor({
             targetElements: $('textarea[name=body]'),
             start: function (element) {
                 initAutosave(element);
                 autosavePresubmit(element);
             }
-        });
+        }); #}
+        document.getElementById("editor-body").addEventListener("EDITOR__CREATED", onDefaultEditorCreated);
+        function onDefaultEditorCreated(event) {
+            initAutosave(event.detail.textarea);
+            autosavePresubmit(event.detail.textarea);
+        }
+
+        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+            detail: {
+                targetElements: ['#editor-body'],
+            }
+        }));
+
 
         // Empty submission dialog
         let $emptyDialog = $('#empty-dialog');
@@ -219,7 +230,7 @@ Data:
                 // Make the form's inputs readonly (NOT disabled)
                 $form.find('input, select, textarea').prop('readonly', true);
                 if (acceptsOnline) {
-                    CKEDITOR.instances['editor-body'].setReadOnly(true);
+                    window.sbProps.editors['editor-body'].enableReadOnlyMode('editor-body');
                 }
                 // Disable draft autosaving
                 suspendAutosave();
@@ -267,7 +278,7 @@ Data:
                 $('#submission-upload').hide('slow');
                 $('[name="{{ attachzone.fileVar }}"]').attr('disabled', true);
                 $('#editor-body').attr('disabled', true);
-                if (CKEDITOR.instances['editor-body'].getData().length || $('[name="{{ attachzone.fileVar }}"]').val()) {
+                if (window.sbProps.editors['editor-body'].getData().length || $('[name="{{ attachzone.fileVar }}"]').val()) {
                     $('#submit-warning').show('slow');
                 } else {
                     $('#submit-warning').hide('slow');
