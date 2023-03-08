@@ -233,15 +233,21 @@ class Mapper extends \Schoolbox\Mapper
 
 
     /**
-     * Find the most recent unique Lesson Plan Templates from which
-     * the $user spawned Lesson Plans.
+     * Find the most recent unique Lesson Plan Templates' ids from which
+     * the $user spawned Lesson Plans. This can be used to find the fully
+     * hydrated LPTs themselves via the LPT mapper.
      *
      * @param User $user
-     * @return GenericCollection
+     * @param int  $limit
+     * @return array
+     * @throws \PDOException
      */
-    public function findRecentlyUsed(\Schoolbox\User $user): GenericCollection
+    public function findRecentlyUsedTemplateIds(\Schoolbox\User $user, int $limit = 3): array
     {
-        $lessonPlanTemplateMapper = $this->getJoinMapper('lessonPlanTemplate');
+        $params = [
+            'creatorId' => $user->getId(),
+            'enabled' => true,
+        ];
 
         /* For the given user,
          *
@@ -258,32 +264,32 @@ class Mapper extends \Schoolbox\Mapper
          */
         $query = "
             SELECT 
-                {$this->getJoinColumnString('lessonPlanTemplate', 'lessonPlanTemplate')},
-                updater.id AS `updater.id`,
-                updater.title AS `updater.title`,
-                updater.firstname AS `updater.firstname`,
-                updater.preferred_name AS `updater.preferred_name`,
-                updater.chosen_name AS `updaetr.chosen_name`,
-                updater.lastname AS `updater.lastname`
+                {$this->getJoinColumnString('lessonPlanTemplate', 'lessonPlanTemplate')}
             FROM lesson_plan
             INNER JOIN assessment ON lesson_plan.assessment_id = assessment.id
             INNER JOIN lesson_plan_template AS lessonPlanTemplate ON lesson_plan.lesson_plan_template_id = lessonPlanTemplate.id
-            INNER JOIN `user` updater ON lessonPlanTemplate.created_by = updater.id
-            WHERE lessonPlanTemplate.enabled = 1
+            WHERE lesson_plan.created_by = :creatorId
+            AND lessonPlanTemplate.enabled = :enabled
             GROUP BY lesson_plan_template_id
-            ORDER BY assessment.created_at DESC LIMIT 3
+            ORDER BY assessment.created_at DESC LIMIT :limit
         ";
 
-        /* The $query above presumes a minimum level of information about updater
-         * so when you add more firstnames they'll be ignored here. You could alternatively
-         * just fetch the lesson_plan_template ids, then another query to fetch a properly
-         * hydrated set of those templates
-         *
-         * But you're about to fetch them all anyway....
-         */
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->bindValue('limit', $limit, \PDO::PARAM_INT);
 
+        foreach ($params as $label => $value) {
+            $statement->bindValue($label, $value);
+        }
 
-        new \Alaress_Probe($query);
+        $statement->execute();
+
+        $ids = [];
+
+        while ($row = $statement->fetchColumn()) {
+            $ids[] = $row;
+        }
+
+        return $ids;
     }
 
 
