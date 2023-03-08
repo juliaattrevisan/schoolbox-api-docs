@@ -107,7 +107,7 @@ function getVideoAttributes(resource: Resource) {
         "data-schoolboxresource-source": video.source(resource.id, resource.filesystem),
         "data-schoolboxresource-width": 512,
         "data-schoolboxresource-height": 288,
-        "data-schoolboxresource-fullwidth": "true",
+        "data-schoolboxresource-fullwidth": "false",
     };
 }
 
@@ -138,6 +138,6 @@ function getAudioAttributes(resource: Resource) {
         "data-schoolboxresource-source": audio.source(resource.id, resource.filesystem),
         "data-schoolboxresource-width": 64,
         "data-schoolboxresource-height": 64,
-        "data-schoolboxresource-fullwidth": "true",
+        "data-schoolboxresource-fullwidth": "false",
     };
 }
