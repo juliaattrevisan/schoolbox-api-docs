@@ -1,8 +1,29 @@
 .lesson-plan-template-fields {
     &.s-is-dragging {
-        div:nth-child(3) {
-            //display: none;
+        li {
         }
+
+        .ui-sortable-helper {
+            height: 2.5rem !important;
+            overflow: hidden;
+        }
+
+        .s-field-contents {
+            display: none;
+            height: 2.5rem !important;
+        }
+
+        .s-topbar {
+            .s-name-display {
+                display: block;
+            }
+        }
+    }
+
+    .s-placeholder {
+        height: 2.5rem !important;
+        padding: 0;
+        background-color: var(--content-ui-selected);
     }
 
     & li {
@@ -36,6 +57,12 @@
             display: flex;
             align-items: center;
             justify-content: flex-end;
+
+            .s-name-display {
+                position: absolute;
+                left: 2.5rem;
+                display: none;
+            }
 
             nav {
                 height: 2.5rem;
@@ -85,11 +112,6 @@
         &.ui-sortable-helper {
             margin-left: 1rem !important;
             left: 1rem !important;
-
-            div:nth-child(3) {
-                //display: none;
-                //height: 0 !important;
-            }
         }
 
         @media #{$small-only} {
