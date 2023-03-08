@@ -218,23 +218,23 @@ HELP;
                     'indefinite_article' => 'a'
                 ];
                 $valueByKeyByTerm['tutorGroup'] = [
-                    'title' => 'Tutor-Group-TEST',
-                    'singular_form' => 'Tutor-Group-TEST',
-                    'plural_form' => 'Tutor-Group-TESTs',
+                    'title' => 'Mentor Group',
+                    'singular_form' => 'Mentor Group',
+                    'plural_form' => 'Mentor Groups',
                     'capitalise_first' => 1,
                     'indefinite_article' => 'a'
                 ];
                 $valueByKeyByTerm['yearLevelCoordinator'] = [
-                    'title' => 'Year-Level-Coordinator-TEST',
-                    'singular_form' => 'Year-Level-Coordinator-TEST',
-                    'plural_form' => 'Year-Level-Coordinator-TESTs',
+                    'title' => 'Year Level Head',
+                    'singular_form' => 'Year Level Head',
+                    'plural_form' => 'Year Level Heads',
                     'capitalise_first' => 1,
                     'indefinite_article' => 'a'
                 ];
                 $valueByKeyByTerm['headOfHouse'] = [
-                    'title' => 'Head-of-House-TEST',
-                    'singular_form' => 'Head-of-House-TEST',
-                    'plural_form' => 'Head-of-House-TESTs',
+                    'title' => 'House Head',
+                    'singular_form' => 'House Head',
+                    'plural_form' => 'House Heads',
                     'capitalise_first' => 1,
                     'indefinite_article' => 'a'
                 ];
