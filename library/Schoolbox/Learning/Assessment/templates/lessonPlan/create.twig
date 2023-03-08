@@ -90,6 +90,9 @@
     </div>
 {% endif %}
 
+{# Recent Lesson Plan Templates is always a subset of All Lesson Plan Templates
+ # so we can save ourselves and async request and just render all the LPTs here
+ #}
 {% for lessonPlanTemplate in lessonPlanTemplates.all %}
     <div id="lpt-preview-{{ lessonPlanTemplate.id }}" class="reveal-modal" data-reveal>
         <h1 class="no-margin lpt-preview-header">{{ lessonPlanTemplate.title }}</h1>
