@@ -1,14 +1,17 @@
 {# I need some way of adding custom_head #}
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/select-all/attacher.select-all.js?v={{ config.site_version }}"></script>
 
 <script type="text/javascript">
     (function($){
         $(function(){
-            $.fn.alaressEditor();
+            document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+                detail: {
+                    targetElements: ['#resource-booking-description'],
+                }
+            }));
 
             // Hijack save form to allow delete
             var form = $('#resource-form');
@@ -168,7 +171,7 @@
 
                         <label>
                             Description
-                            <textarea name="description">{{ item.description }}</textarea>
+                            <textarea name="description" id="resource-booking-description">{{ item.description }}</textarea>
                         </label>
 
                         <label>
