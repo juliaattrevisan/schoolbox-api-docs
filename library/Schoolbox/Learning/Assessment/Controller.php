@@ -201,12 +201,12 @@ abstract class Controller extends ListController implements IAssessmentControlle
      *
      * @api   GET /learning/{contextType}/{contextId}/assessments/new?type
      * @since 165
-     *
      * @param AssessmentContext $context
      * @throws DefinitionException If unable to locate a specified mapper join
      * @throws DomainException If user has interaction but not participant record
      * @throws InvalidArgumentException
-     * @throws UnexpectedValueException If unable to derive a project's participant collection
+     * @throws UnexpectedValueException If unable to derive a project's participant collection*@throws \PDOException*@throws \PDOException
+     * @throws \PDOException
      */
     public function getCreateAssessmentForm(AssessmentContext $context): void
     {
@@ -263,11 +263,61 @@ abstract class Controller extends ListController implements IAssessmentControlle
             'all' => \Schoolbox\Admin\LessonPlan\Template\Mapper::getInstance()->findAll()->sortNaturally('title', 'asc')
         ];
 
-        // either output the fragment to the mage, or use the synchronous form
-        if ($this->getRequest()->isXhr()) {
-            $content = $this->buildUnthemedHtmlOutput("@learningAssessment/$type/create.twig", $data);
+        /* Note that the Lesson Plan assessment type has a preceding step which none
+         * of the other assessment types utilise: selection of a template. Once that's
+         * chosen, only then can you start to actually do something with the Lesson Plan
+         */
+        if (AssessmentType::TYPE_LESSON_PLAN === $type) {
+            /* Lesson Plan creational phase looks at the querystring param.
+             * if the querystring param "lpt" exists, then we've chosen
+             * our template and can actually start using it
+             *
+             * Embrace both the asynchronous and synchronous access mechanisms
+             */
+            $templateId = trim((string)$this->getRequest()->query->get('lpt'));
+
+            if ('' === $templateId) {
+                /* You need to Select an LPT
+                 */
+                $data['template'] = null;
+
+                if ($this->getRequest()->isXhr()) {
+                    $content = $this->buildUnthemedHtmlOutput(sprintf(
+                        '@learningAssessment/%s/selection.twig',
+                        AssessmentType::TYPE_LESSON_PLAN
+                    ), $data);
+                } else {
+                    /* TODO where is this even used
+                     */
+                    $content = $this->buildHtmlOutput(sprintf(
+                        '@learningAssessment/%s/selection.twig',
+                        AssessmentType::TYPE_LESSON_PLAN
+                    ), $data);
+                }
+            } else {
+                /* Customise the selected LPT
+                 */
+                $data['template'] = \Schoolbox\Admin\LessonPlan\Template\Mapper::getInstance()->findById((int)$templateId);
+
+                if ($this->getRequest()->isXhr()) {
+                    $content = $this->buildUnthemedHtmlOutput(sprintf(
+                        "@learningAssessment/%s/create.twig",
+                        AssessmentType::TYPE_LESSON_PLAN
+                    ), $data);
+                } else {
+                    $content = $this->buildHtmlOutput(sprintf(
+                        "@learningAssessment/%s/create.twig",
+                        AssessmentType::TYPE_LESSON_PLAN
+                    ), $data);
+                }
+            }
         } else {
-            $content = $this->buildHtmlOutput('@learningAssessment/create.twig', $data);
+            // either output the fragment to the mage, or use the synchronous form
+            if ($this->getRequest()->isXhr()) {
+                $content = $this->buildUnthemedHtmlOutput("@learningAssessment/$type/create.twig", $data);
+            } else {
+                $content = $this->buildHtmlOutput('@learningAssessment/create.twig', $data);
+            }
         }
 
         $this->getResponse()->content->set($content);

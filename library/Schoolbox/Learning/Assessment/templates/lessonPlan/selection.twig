@@ -1,0 +1,143 @@
+{##
+ # Select a Lesson Plan Template
+ #
+ # This lets users select a Lesson Plan Template upon which to base their
+ # Lesson Plan, which is a modified version of the Lesson Plan Template with
+ # customisations etc.
+ #
+ # @param LessonPlan\Template\Model[] $lessonPlanTemplates['recent']
+ # @param LessonPlan\Template\Model[] $lessonPlanTemplates['all']
+ #}
+{% import 'sub/breadcrumbs.twig' as bread %}
+
+{{ bread.crumbsArray(breadcrumbs) }}
+
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>Create
+                {% if assessment.typeName is defined %}
+                    {% if attribute(locale, assessment.typeName|lower) is defined %}
+                        {{ attribute(locale, assessment.typeName|lower).proper }}
+                    {% else %}
+                        {{ assessment.typeName }}
+                    {% endif %}
+                {% else %}
+                    Activity
+                {% endif %}</h1>
+        </div>
+    </div>
+</div>
+
+{% if lessonPlanTemplates.recent|length %}
+    <div class="row">
+        <div class="small-12 columns">
+            <h2 class="subheader content">Recently Used Templates</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="small-12 columns island">
+            <section>
+                <div class="row">
+                    <div class="small-12 columns">
+                        <ul class="information-list">
+                            {% for recentLessonPlanTemplate in lessonPlanTemplates.recent %}
+                                <li class="actions-small-1">
+                                    <div class="list-item">
+                                        <div class="card small-12">
+                                            <a href="#"><h3>{{ recentLessonPlanTemplate.title }}</h3></a>
+                                            <p class="meta">
+                                                Last modified by
+                                                {% if recentLessonPlanTemplate.updatedBy.deleted %}
+                                                    {{ recentLessonPlanTemplate.updatedBy.fullname }}
+                                                {% else %}
+                                                    <a href="/search/user/{{ recentLessonPlanTemplate.updatedBy.id }}">{{ recentLessonPlanTemplate.updatedBy.fullname }}</a>
+                                                {% endif %}
+
+                                                <time title="{{ recentLessonPlanTemplate.updatedAt.short }}">{{ recentLessonPlanTemplate.updatedAt.relativeTime }}</time>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <nav>
+                                        <a class="icon-view" data-reveal-id="lpt-preview-{{ recentLessonPlanTemplate.id }}"></a>
+                                    </nav>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+{% endif %}
+
+{% if lessonPlanTemplates.all|length %}
+    <div class="row">
+        <div class="small-12 columns">
+            <h2 class="subheader content">All Templates</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="small-12 columns island">
+            <section>
+                <div class="row">
+                    <div class="small-12 columns">
+                        <ul class="information-list">
+                            {% for lessonPlanTemplate in lessonPlanTemplates.all %}
+                                <li class="actions-small-1">
+                                    <div class="list-item">
+                                        <div class="card small-12">
+                                            <a href=""><h3>{{ lessonPlanTemplate.title }}</h3></a>
+                                            <p class="meta">
+                                                Last modified by
+                                                {% if lessonPlanTemplate.updatedBy.deleted %}
+                                                    {{ lessonPlanTemplate.updatedBy.fullname }}
+                                                {% else %}
+                                                    <a href="/search/user/{{ lessonPlanTemplate.updatedBy.id }}">{{ lessonPlanTemplate.updatedBy.fullname }}</a>
+                                                {% endif %}
+
+                                                <time title="{{ lessonPlanTemplate.updatedAt.short }}">{{ lessonPlanTemplate.updatedAt.relativeTime }}</time>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <nav>
+                                        <a class="icon-view" data-reveal-id="lpt-preview-{{ lessonPlanTemplate.id }}"></a>
+                                    </nav>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+{% else %}
+    <div class="empty-state">
+        <i class="icon-lesson-plan"></i>
+        <p>
+            There are no available lesson plan templates. If you expect to find some here, please contact
+            a user with administration privileges at your school for assistance.
+        </p>
+    </div>
+{% endif %}
+
+{# Recent Lesson Plan Templates is always a subset of All Lesson Plan Templates
+ # so we can save ourselves and async request and just render all the LPTs here
+ #}
+{% for lessonPlanTemplate in lessonPlanTemplates.all %}
+    <div id="lpt-preview-{{ lessonPlanTemplate.id }}" class="reveal-modal" data-reveal>
+        <h1 class="no-margin lpt-preview-header">{{ lessonPlanTemplate.title }}</h1>
+
+        <ul class="information-list lpt-preview">
+            {% for field in lessonPlanTemplate.fields %}
+            <li class="content">
+                <h2>{{ field.title }}</h2>
+                <div>{{ field.body|purify }}</div>
+            </li>
+            {% endfor %}
+        </ul>
+
+        <a href="#" class="submit button">Use this lesson plan template</a>
+        <a class="close-reveal-modal">&#215;</a>
+    </div>
+{% endfor %}
