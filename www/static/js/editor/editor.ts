@@ -3,6 +3,7 @@
  */
 
 import ClassicEditor from "@ckeditor/ckeditor5-editor-classic/src/classiceditor";
+import type { Editor } from "@ckeditor/ckeditor5-core";
 import { getConfig } from "@js/editor/config/editorConfig";
 import { EditorConfig } from "@js/editor/types/editorTypes";
 import {
@@ -22,7 +23,7 @@ import "@js/editor/styles/editor.css"; // to overwrite some of the styles
  * @param { CKEditor } editor - the CKEditor instance
  * @param { EditorConfig } config - the CKEditor config object
  */
-async function onCreated(textarea: HTMLTextAreaElement, editor, config: EditorConfig) {
+async function onCreated(textarea: HTMLTextAreaElement, editor: Editor, config: EditorConfig) {
     insertWordCount(textarea, editor);
     removeValidation();
     await addIframelyEmbed();

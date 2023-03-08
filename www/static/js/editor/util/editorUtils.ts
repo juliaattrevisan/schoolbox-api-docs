@@ -3,7 +3,7 @@
  */
 
 import { insertElementAfter, injectScript } from "@js/util/domUtils";
-// import CKEditorInspector from "@ckeditor/ckeditor5-inspector";
+import type { Editor } from "@ckeditor/ckeditor5-core";
 
 /**
  * Add the word count UI to the bottom of the editor
@@ -11,9 +11,9 @@ import { insertElementAfter, injectScript } from "@js/util/domUtils";
  * so editorTextArea.nextSibling will be the newly created editor instance
  *
  * @param { HTMLTextAreaElement } textarea - the textarea the CKEditor has replaced
- * @param { CKEditor } editor - the CKEditor instance
+ * @param { Editor } editor - the CKEditor instance
  */
-export function insertWordCount(textarea: HTMLTextAreaElement, editor) {
+export function insertWordCount(textarea: HTMLTextAreaElement, editor: Editor) {
     const wordCountPlugin = editor.plugins.get("WordCount");
     insertElementAfter(textarea.nextSibling, wordCountPlugin.wordCountContainer);
 }
@@ -62,9 +62,9 @@ export function addToGlobalScope(editor, textarea) {
  * https://webpack.js.org/configuration/mode/
  * so it will only be imported in development mode, not in production
  *
- * @param { CKEditor } editor - the CKEditor instance
+ * @param { Editor } editor - the CKEditor instance
  */
-export async function attachInspector(editor) {
+export async function attachInspector(editor: Editor) {
     if (process.env.NODE_ENV === "development") {
         const inspector = await import("@ckeditor/ckeditor5-inspector");
         inspector.default.attach(editor);
