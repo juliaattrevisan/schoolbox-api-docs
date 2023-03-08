@@ -1,21 +1,6 @@
 {% extends '@core/user/student.twig' %}
 {% set achievementsTabLabel = 'Achieved Badges' %}
 
-{% block details_hohTeacher %}
-    {% if showClasses %}
-        {% if hohTeacher %}
-            <dt class="small-12 medium-3">Staff House Leader:</dt>
-            <dd class="small-12 medium-9">
-                {% if hohTeacher.getId() %}
-                    <a href="{{ session.mailhandle }}{{ hohTeacher.getEmail() }}">{{ hohTeacher.formatName() }}</a>
-                {% else %}
-                    {{ hohTeacher.formatName() }}
-                {% endif %}
-            </dd>
-        {% endif %}
-    {% endif %}
-{% endblock details_hohTeacher %}
-
 {% block details_studiesCode %}
     {% if showDetails and externalUser.StudentStudiesCode is defined and externalUser.StudentStudiesCode %}
         <dt class="no-margin small-6 medium-3">NSN</dt>
