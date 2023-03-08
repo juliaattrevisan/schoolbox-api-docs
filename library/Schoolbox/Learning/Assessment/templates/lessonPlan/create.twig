@@ -11,7 +11,7 @@
 {% if lessonPlanTemplates.recent|length %}
     <div class="row">
         <div class="small-12 columns">
-            <h2 class="subheader">Recently Used Templates</h2>
+            <h2 class="subheader content">Recently Used Templates</h2>
         </div>
     </div>
     <div class="row">
@@ -21,7 +21,17 @@
                     <li class="actions-small-1">
                         <div class="list-item">
                             <div class="card small-12">
-                                <a href="#">{{ recentLessonPlanTemplate }}</a>
+                                <a data-preview="{{ recentLessonPlanTemplate.id }}"><h3>{{ recentLessonPlanTemplate.title }}</h3></a>
+                                <p class="meta">
+                                    Last modified by
+                                    {% if recentLessonPlanTemplate.updatedBy.deleted %}
+                                        {{ recentLessonPlanTemplate.updatedBy.fullname }}
+                                    {% else %}
+                                        <a href="/search/user/{{ recentLessonPlanTemplate.updatedBy.id }}">{{ recentLessonPlanTemplate.updatedBy.fullname }}</a>
+                                    {% endif %}
+
+                                    <time title="{{ recentLessonPlanTemplate.updatedAt.short }}">{{ recentLessonPlanTemplate.updatedAt.relativeTime }}</time>
+                                </p>
                             </div>
                         </div>
                         <nav>
@@ -39,7 +49,7 @@
 {% if lessonPlanTemplates.all|length %}
     <div class="row">
         <div class="small-12 columns">
-            <h2 class="subheader">All Templates</h2>
+            <h2 class="subheader content">All Templates</h2>
         </div>
     </div>
     <div class="row">
@@ -49,7 +59,17 @@
                     <li class="actions-small-1">
                         <div class="list-item">
                             <div class="card small-12">
-                                <a href="#">{{ lessonPlanTemplate }}</a>
+                                <a data-preview="{{ lessonPlanTemplate.id }}"><h3>{{ lessonPlanTemplate.title }}</h3></a>
+                                <p class="meta">
+                                    Last modified by
+                                    {% if lessonPlanTemplate.updatedBy.deleted %}
+                                        {{ lessonPlanTemplate.updatedBy.fullname }}
+                                    {% else %}
+                                        <a href="/search/user/{{ lessonPlanTemplate.updatedBy.id }}">{{ lessonPlanTemplate.updatedBy.fullname }}</a>
+                                    {% endif %}
+
+                                    <time title="{{ lessonPlanTemplate.updatedAt.short }}">{{ lessonPlanTemplate.updatedAt.relativeTime }}</time>
+                                </p>
                             </div>
                         </div>
                         <nav>

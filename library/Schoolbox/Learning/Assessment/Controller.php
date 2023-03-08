@@ -260,7 +260,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
          */
         $data['lessonPlanTemplates'] = [
             'recent' => \Schoolbox\Admin\LessonPlan\Template\Mapper::getInstance()->findRecentlyUsed($this->getUser()),
-            'all' => \Schoolbox\Admin\LessonPlan\Template\Mapper::getInstance()->findAll()
+            'all' => \Schoolbox\Admin\LessonPlan\Template\Mapper::getInstance()->findAll()->sortNaturally('title', 'asc')
         ];
 
         // either output the fragment to the mage, or use the synchronous form
