@@ -21,7 +21,7 @@
                     <li class="actions-small-1">
                         <div class="list-item">
                             <div class="card small-12">
-                                <a data-reveal-id="lpt-preview-{{ recentLessonPlanTemplate.id }}"><h3>{{ recentLessonPlanTemplate.title }}</h3></a>
+                                <a href="#"><h3>{{ recentLessonPlanTemplate.title }}</h3></a>
                                 <p class="meta">
                                     Last modified by
                                     {% if recentLessonPlanTemplate.updatedBy.deleted %}
@@ -35,7 +35,7 @@
                             </div>
                         </div>
                         <nav>
-                            <a class="icon-search" data-reveal-id="lpt-preview-{{ recentLessonPlanTemplate.id }}"></a>
+                            <a class="icon-view" data-reveal-id="lpt-preview-{{ recentLessonPlanTemplate.id }}"></a>
                         </nav>
                     </li>
                 {% endfor %}
@@ -59,7 +59,7 @@
                     <li class="actions-small-1">
                         <div class="list-item">
                             <div class="card small-12">
-                                <a data-reveal-id="lpt-preview-{{ lessonPlanTemplate.id }}"><h3>{{ lessonPlanTemplate.title }}</h3></a>
+                                <a href=""><h3>{{ lessonPlanTemplate.title }}</h3></a>
                                 <p class="meta">
                                     Last modified by
                                     {% if lessonPlanTemplate.updatedBy.deleted %}
@@ -73,7 +73,7 @@
                             </div>
                         </div>
                         <nav>
-                            <a class="icon-search" data-reveal-id="lpt-preview-{{ lessonPlanTemplate.id }}"></a>
+                            <a class="icon-view" data-reveal-id="lpt-preview-{{ lessonPlanTemplate.id }}"></a>
                         </nav>
                     </li>
                 {% endfor %}
@@ -106,6 +106,7 @@
             {% endfor %}
         </ul>
 
+        <a href="#" class="submit button">Use this lesson plan template</a>
         <a class="close-reveal-modal">&#215;</a>
     </div>
 {% endfor %}
