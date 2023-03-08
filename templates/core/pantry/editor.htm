@@ -40,6 +40,25 @@
             }
         }));
 
+        /**
+         * Demonstrates how the comment editor instance can be accssed once it's been created
+         */
+        document.getElementById("simpleCKEditor").addEventListener("EDITOR__CREATED", onSimpleEditorCreated);
+        function onSimpleEditorCreated(event) {
+            const editor = event.detail.editor;
+            editor.setData("<p>Here is a simple blurb. Blah blah blah</p>");
+        }
+
+        /**
+         * Initialise the simple editor
+         */
+        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+            detail: {
+                targetElements: ['#simpleCKEditor'],
+                isSimple: true,
+            }
+        }));
+
 
         /* Schoolbox Link Modal
          */
@@ -80,7 +99,7 @@
     <div class="small-12 columns">
         <h2 class="subheader">Default Editor</h2>
         <p class="meta">
-            This is the default usage of our ckeditor. There are a few special plugins that we made for our Mr Matt Modal:
+            This is the <b>default</b> usage of our ckeditor. There are a few special plugins that we made for our Mr Matt Modal:
             Link, Embed Video/Audio, Iframe. You can test their usage here.
         </p>
     </div>
@@ -101,7 +120,7 @@
     <div class="small-12 columns">
         <h2 class="subheader">Comment Editor</h2>
         <p class="meta">
-            This is the comment usage of our ckeditor. There are a few special plugins that we made for our Mr Matt Modal:
+            This is the <b>comment</b> usage of our ckeditor. There are a few special plugins that we made for our Mr Matt Modal:
             Link, Embed Video/Audio, Iframe. You can test their usage here.
         </p>
     </div>
@@ -111,6 +130,26 @@
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <textarea id='commentCKEditor'></textarea>
+                    </div>
+                </fieldset>
+            </section>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 columns">
+        <h2 class="subheader">Simple Editor</h2>
+        <p class="meta">
+            This is the <b>simple</b> usage of our ckeditor. As there's no resource embedding it's designed for placeds like email usage and blurbs in news.
+        </p>
+    </div>
+    <div class="small-12 island">
+        <form action="/testAjax.php" method="post">
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <textarea id='simpleCKEditor'></textarea>
                     </div>
                 </fieldset>
             </section>
