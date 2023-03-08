@@ -528,7 +528,7 @@ class Controller extends Base
             $report->getIncludeStudentsWithoutYear(),
             $report->getIncludeStudentsWithoutHouse(),
             $report->getIncludeRecordsWithoutAction(),
-            $report->getIncludeUncompletedActionsOnly()
+            $report->getActionStatus()
         );
     }
 
@@ -628,7 +628,7 @@ class Controller extends Base
         if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
             $report->setActionsCsv($this->getCsv($post->get('actions')));
             $report->setIncludeRecordsWithoutAction($post->getBool('includeRecordsWithoutAction', false));
-            $report->setIncludeUncompletedActionsOnly($post->getBool('includeUncompletedActionsOnly', false));
+            $report->setActionStatus($post->get('actionStatus'));
         }
 
         // Save groups the report is shared with

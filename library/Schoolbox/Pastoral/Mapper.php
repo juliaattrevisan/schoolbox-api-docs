@@ -812,8 +812,7 @@ class Mapper extends BaseMapper
      * @param bool                     $includeStudentsWithoutYear
      * @param bool                     $includeStudentsWithoutHouse
      * @param bool                     $includeReportsWithoutAction
-     * @param bool                     $includeUncompletedActionsOnly
-     *
+     * @param string|null              $actionStatus
      * @return Collection|Model[]
      */
     public function getReportData(
@@ -835,7 +834,7 @@ class Mapper extends BaseMapper
         bool $includeStudentsWithoutYear,
         bool $includeStudentsWithoutHouse,
         bool $includeReportsWithoutAction,
-        bool $includeUncompletedActionsOnly
+        ?string $actionStatus
     ) {
         $this->bindings = [];
         $this->filters  = [];
@@ -871,11 +870,11 @@ class Mapper extends BaseMapper
         $join = '';
         if (
             $this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)
-            && ($actions->count() > 0 || $includeReportsWithoutAction)
+            && ($actions->count() > 0 || $includeReportsWithoutAction || $actionStatus)
         ) {
             $join = ($includeReportsWithoutAction ? ' LEFT ' : ' INNER ')
                 . " JOIN {$this->getJoinSql('recordActions', '', 'a')} ";
-            $this->addActionFilter($actions, $includeReportsWithoutAction, $includeUncompletedActionsOnly);
+            $this->addActionFilter($actions, $includeReportsWithoutAction, $actionStatus);
         }
 
         $orderParts = [];
@@ -1133,9 +1132,11 @@ class Mapper extends BaseMapper
     /**
      * Filter the report on action.
      *
-     * @param Collection|Action[] $actions
+     * @param Collection  $actions
+     * @param bool        $includeReportsWithoutAction
+     * @param string|null $actionStatus
      */
-    private function addActionFilter(Collection $actions, bool $includeReportsWithoutAction, bool $includeUncompletedActionsOnly): void
+    private function addActionFilter(Collection $actions, bool $includeReportsWithoutAction, ?string $actionStatus): void
     {
         $filter = '';
         if ($actions->count() > 0) {
@@ -1148,9 +1149,11 @@ class Mapper extends BaseMapper
             $this->bindings = array_merge($this->bindings, $pbArray['bindings']);
 
             $filter = "`a`.`action_id` IN ({$pbArray['placeholders']})";
-            if ($includeUncompletedActionsOnly) {
-                $filter .= " AND `a`.`completed` = 0 ";
-            }
+        }
+        if ($actionStatus) {
+            $filter = ($filter === '' ? '' : "{$filter} AND ") . " `a`.`completed` = :actionStatus ";
+
+            $this->bindings['actionStatus'] = (int)($actionStatus === \Schoolbox\Pastoral\Report\Model::ACTION_STATUS_COMPLETED);
         }
         if ($includeReportsWithoutAction) {
             $filter = ($filter === '' ? '' : "({$filter}) OR") . " `a`.`action_id` IS NULL ";
