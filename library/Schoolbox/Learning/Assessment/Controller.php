@@ -260,7 +260,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
          */
         $data['lessonPlanTemplates'] = [
             'recent' => \Schoolbox\Admin\LessonPlan\Template\Mapper::getInstance()->findRecentlyUsed($this->getUser()),
-            'all' => \Schoolbox\Admin\LessonPlan\Template\Mapper::getInstance()->findAll()->sortNaturally('title', 'asc')
+            'all' => \Schoolbox\Admin\LessonPlan\Template\Mapper::getInstance()->findEnabled()
         ];
 
         /* Note that the Lesson Plan assessment type has a preceding step which none

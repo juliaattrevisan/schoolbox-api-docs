@@ -212,12 +212,26 @@ class Mapper extends \Schoolbox\Mapper
 
 
     /**
+     * Find all the Lesson Plan Templates that are actually enabled
+     *
+     * @return GenericCollection
+     * @throws \InvalidArgumentException
+     */
+    public function findEnabled(): GenericCollection
+    {
+        return $this->findByColumn('enabled', true)->sortNaturally('title', 'asc');
+    }
+
+
+    /**
      * Delete the fields that were associated with $lessonPlanTemplate
      *
      * @param Model $lessonPlanTemplate
      * @return void
      * @throws DefinitionException
      * @throws Exception
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
     protected function softDeleteFields(Model $lessonPlanTemplate): void
     {
