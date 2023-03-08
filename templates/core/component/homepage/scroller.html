@@ -164,12 +164,12 @@
                             );
                         }
 
-                        var component = $("#component{COMPONENT_INSTANCE_ID}");
-                        var collapser = component.find('[data-collapsable="true"]');
-                        if (collapser.data('collapseState') === 'uncollapsed') {
+                        const component = document.getElementById("component{COMPONENT_INSTANCE_ID}");
+                        const collapser = component.querySelector('[data-collapsable="true"]');
+                        if (collapser.dataset.collapseState === 'uncollapsed') {
                             init();
                         } else {
-                            collapser.one('expandStop.collapsable', init);
+                            collapser.addEventListener('expandStop.collapsable', init);
                         }
                     </script>
                     <ul data-dz-container class="inline-list dz-container no-margin">
