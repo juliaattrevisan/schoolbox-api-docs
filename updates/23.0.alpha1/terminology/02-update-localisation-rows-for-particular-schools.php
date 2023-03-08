@@ -50,16 +50,11 @@ HELP;
             $rows = $dbc->executeQuery("SELECT value FROM config WHERE name='site_school_code'")->fetchAll();
             $schoolCode = $rows[0]['value'];
         } catch (Exception $e) {
-            printf("%s: Could not find school code.  Stopping.\n", $scriptName);
-            $logger->info('{scriptName}: Could not find school code.  Stopping.', ['scriptName' => $scriptName]);
+            $logger->info(sprintf('%s: Could not find school code.  Stopping.', $scriptName));
             die;
         }
 
-        printf("%s: Found school code '%s'.\n", $scriptName, $schoolCode);
-        $logger->info(
-            "{scriptName}: Found school code '{schoolCode}.",
-            ['scriptName' => $scriptName, 'schoolCode' => $schoolCode]
-        );
+        $logger->info(sprintf("%s: Found school code '%s'.", $scriptName, $schoolCode));
 
         $valueByKeyByTerm = [];
 
@@ -215,9 +210,9 @@ HELP;
 
             case 'vagrant':
                 $valueByKeyByTerm['tutor'] = [
-                    'title' => 'Tutor-TEST',
-                    'singular_form' => 'Tutor-TEST',
-                    'plural_form' => 'Tutor-TESTs',
+                    'title' => 'Mentor',
+                    'singular_form' => 'Mentor',
+                    'plural_form' => 'Mentors',
                     'capitalise_first' => 1,
                     'indefinite_article' => 'a'
                 ];
@@ -245,11 +240,7 @@ HELP;
                 break;
 
             default:
-                printf("%s: No localisation terms require update.\n", $scriptName);
-                $logger->info(
-                    "{scriptName}: No localisation terms require update.",
-                    ['scriptName' => $scriptName]
-                );
+                $logger->info(sprintf("%s: No localisation terms require update.", $scriptName));
         }
 
         foreach ($valueByKeyByTerm as $term => $valueByKey) {
@@ -275,25 +266,19 @@ HELP;
 
             switch ($nRowsAffected) {
                 case 0:
-                    printf("%s: No rows affected when trying to update '%s' to '%s'.  Probably already updated.\n", $scriptName, $term, $valueByKey['title']);
-                    $logger->info(
-                        "{scriptName}: No rows affected when trying to update '{term}' to '{title}'.  Probably already updated.",
-                        ['scriptName' => $scriptName, 'term' => $term, 'title' => $valueByKey['title']]
-                    );
+                    $logger->info(sprintf(
+                        "%s: No rows affected when trying to update '%s' to '%s'.  Probably already updated.",
+                        $scriptName, $term, $valueByKey['title']
+                    ));
                     break;
                 case 1:
-                    printf("%s: Updated '%s' to '%s'.\n", $scriptName, $term, $valueByKey['title']);
-                    $logger->info(
-                        "{scriptName}: Updated '{term}' to '{title}'.",
-                        ['scriptName' => $scriptName, 'term' => $term, 'title' => $valueByKey['title']]
-                    );
+                    $logger->info(sprintf("%s: Updated '%s' to '%s'.", $scriptName, $term, $valueByKey['title']));
                     break;
                 default:
-                    printf("%s: Updated '%s' to '%s', but multiple rows affected.  Not good.\n", $scriptName, $term, $valueByKey['title']);
-                    $logger->info(
-                        "{scriptName}: Updated '{term}' to '{title}', but multiple rows affected.  Not good.",
-                        ['scriptName' => $scriptName, 'term' => $term, 'title' => $valueByKey['title']]
-                    );
+                    $logger->info(sprintf(
+                        "%s: Updated '%s' to '%s', but multiple rows affected.  Not good.",
+                        $scriptName, $term, $valueByKey['title']
+                    ));
                     break;
             }
         }
@@ -310,5 +295,12 @@ HELP;
     }
 };
 
+/* OPTION_ERRORS => E_ALL causes all notices and errors to fatally crash your script
+ *
+ * You should generally try to fix those, even though in some special cases php will throw notices
+ * for its own expected behaviours which will inadvertently cause this to fail
+ */
+$options = [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
+
 /** @noinspection PhpUnhandledExceptionInspection */
-(new Schoolbox\Application\CliTool\Kernel($app))->runApp();
+(new Schoolbox\Application\CliTool\Kernel($app, $options))->runApp();
