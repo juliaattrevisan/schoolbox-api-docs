@@ -274,6 +274,15 @@ class Mapper extends \Schoolbox\Mapper
             ORDER BY assessment.created_at DESC LIMIT 3
         ";
 
+        /* The $query above presumes a minimum level of information about updater
+         * so when you add more firstnames they'll be ignored here. You could alternatively
+         * just fetch the lesson_plan_template ids, then another query to fetch a properly
+         * hydrated set of those templates
+         *
+         * But you're about to fetch them all anyway....
+         */
+
+
         new \Alaress_Probe($query);
     }
 
