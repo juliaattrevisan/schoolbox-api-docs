@@ -32,29 +32,30 @@ $app = new class extends CliTool\App
     {
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
+
 This script will update the following localisation terms for particular schools:
  * tutor
  * tutorGroup
  * yearLevelCoordinator
  * headOfHouse
+
 HELP;
-            echo "\n\nUsage: php " . __FILE__ . "\n\n";
+            echo "\nUsage: php " . __FILE__ . "\n\n";
             exit;
         }
 
         $dbc = $this->getDatabaseInternal();
         $logger = $this->getLogger();
-        $scriptName = 'Localisation updater';
 
         try {
             $rows = $dbc->executeQuery("SELECT value FROM config WHERE name='site_school_code'")->fetchAll();
             $schoolCode = $rows[0]['value'];
         } catch (Exception $e) {
-            $logger->info(sprintf('%s: Could not find school code.  Stopping.', $scriptName));
+            $logger->info("Could not find school code.  Stopping.\n");
             die;
         }
 
-        $logger->info(sprintf("%s: Found school code '%s'.", $scriptName, $schoolCode));
+        $logger->info("Found school code '$schoolCode'.\n");
 
         $valueByKeyByTerm = [];
 
@@ -240,7 +241,7 @@ HELP;
                 break;
 
             default:
-                $logger->info(sprintf("%s: No localisation terms require update.", $scriptName));
+                $logger->info("No localisation terms require update.\n");
         }
 
         foreach ($valueByKeyByTerm as $term => $valueByKey) {
@@ -263,22 +264,17 @@ HELP;
             );
 
             $nRowsAffected = $statement->rowCount();
+            $title = $valueByKey['title'];
 
             switch ($nRowsAffected) {
                 case 0:
-                    $logger->info(sprintf(
-                        "%s: No rows affected when trying to update '%s' to '%s'.  Probably already updated.",
-                        $scriptName, $term, $valueByKey['title']
-                    ));
+                    $logger->info("No rows affected when trying to update '$term' to '$title'.  Probably already updated.\n");
                     break;
                 case 1:
-                    $logger->info(sprintf("%s: Updated '%s' to '%s'.", $scriptName, $term, $valueByKey['title']));
+                    $logger->info("Updated '$term' to '$title'.");
                     break;
                 default:
-                    $logger->info(sprintf(
-                        "%s: Updated '%s' to '%s', but multiple rows affected.  Not good.",
-                        $scriptName, $term, $valueByKey['title']
-                    ));
+                    $logger->info("Updated '$term' to '$title', but multiple rows affected.  Not good.\n");
                     break;
             }
         }
