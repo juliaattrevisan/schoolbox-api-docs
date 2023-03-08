@@ -24,14 +24,17 @@
  # @param array      $campuses      A list of available and selected Campuses
  # @param string     $returnUrl     A Redirect-encoded string (you go here after saving the form)
  #}
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/calendar/jquery.eventModify.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/attacher/attacher.hide-watch.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/select-all/attacher.select-all.js?v={{ config.site_version }}"></script>
 <script type="text/javascript">
     $(function() {
-        $.fn.alaressEditor();
+        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+            detail: {
+                targetElements: ['#event-detail'],
+            }
+        }));
 
         $('#eventForm').eventModify({
             functionLabel: "{{ action ?? '' }}",
@@ -183,7 +186,7 @@
                     <div class="small-12 column">
                         <label>
                             Details
-                            <textarea class='event-detail' name="detail">{{ event.detail }}</textarea>
+                            <textarea class='event-detail' name="detail" id="event-detail">{{ event.detail }}</textarea>
                         </label>
                     </div>
                 </fieldset>
@@ -391,4 +394,3 @@
         <li><a href="#" class="button" data-action="cancel">Cancel</a></li>
     </ul>
 </div>
-

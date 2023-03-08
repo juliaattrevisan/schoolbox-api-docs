@@ -1,6 +1,5 @@
 
-<script type="text/javascript" src="{CDN_PREFIX}/js/ckeditor/ckeditor.js?v={SITE_VERSION}"></script>
-<script type="text/javascript" src="{CDN_PREFIX}/js/editor/jquery.editor.js?v={SITE_VERSION}"></script>
+<script type="text/javascript" src="{CDN_PREFIX}/js/bundle/editor.js?v={SITE_VERSION}"></script>
 <script type="text/javascript" src="{CDN_PREFIX}/js/eotc/jquery.eventModify.js?v={SITE_VERSION}"></script>
 
 <script type="text/javascript" src="{CDN_PREFIX}/js/vendors/selectize/selectize.min.js?v={SITE_VERSION}"></script>
@@ -8,9 +7,11 @@
 
 <script type="text/javascript">
     $(function() {
-        $.fn.alaressEditor({
-            targetElements: $('[data-html-editor]')
-        });
+        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+            detail: {
+                targetElements: ['[data-html-editor]'],
+            }
+        }));
 
         $('[data-suggest=staff]').userSelectizeSelector({
             ajax: {
@@ -423,4 +424,3 @@
         <li><a data-rams-cancel class="button icon-close">Cancel</a></li>
     </ul>
 </div>
-
