@@ -46,7 +46,7 @@
                                 <li class="actions-small-1">
                                     <div class="list-item">
                                         <div class="card small-12">
-                                            {% set createRoute = routeLookup('learningAssessment.getCreateAssessmentForm', { contextType: contextType, contextId: context.id, context: context }) ~ '?lpt=' ~ recentLessonPlanTemplate.id ~ '&type=' ~ type %}
+                                            {% set createRoute = routeLookup('learningAssessment.getCreateAssessmentForm', { contextType: contextType, contextId: context.id, context: context }) ~ '?lpt=' ~ recentLessonPlanTemplate.id ~ '&type=' ~ type ~ '&returnUrl=' ~ returnUrl %}
 
                                             <a href="{{ createRoute }}"><h3>{{ recentLessonPlanTemplate.title }}</h3></a>
                                             <p class="meta">
@@ -90,7 +90,7 @@
                                 <li class="actions-small-1">
                                     <div class="list-item">
                                         <div class="card small-12">
-                                            {% set createRoute = routeLookup('learningAssessment.getCreateAssessmentForm', { contextType: contextType, contextId: context.id, context: context }) ~ '?lpt=' ~ lessonPlanTemplate.id ~ '&type=' ~ type %}
+                                            {% set createRoute = routeLookup('learningAssessment.getCreateAssessmentForm', { contextType: contextType, contextId: context.id, context: context }) ~ '?lpt=' ~ lessonPlanTemplate.id ~ '&type=' ~ type ~ '&returnUrl=' ~ returnUrl %}
 
                                             <a href="{{ createRoute }}"><h3>{{ lessonPlanTemplate.title }}</h3></a>
                                             <p class="meta">
@@ -146,7 +146,7 @@
             {% endfor %}
         </ul>
 
-        {% set createRoute = routeLookup('learningAssessment.getCreateAssessmentForm', { contextType: contextType, contextId: context.id, context: context }) ~ '?lpt=' ~ lessonPlanTemplate.id ~ '&type=' ~ type %}
+        {% set createRoute = routeLookup('learningAssessment.getCreateAssessmentForm', { contextType: contextType, contextId: context.id, context: context }) ~ '?lpt=' ~ lessonPlanTemplate.id ~ '&type=' ~ type ~ '&returnUrl=' ~ returnUrl %}
 
         <a href="{{ createRoute }}" class="submit button">Use this lesson plan template</a>
         <a class="close-reveal-modal">&#215;</a>
