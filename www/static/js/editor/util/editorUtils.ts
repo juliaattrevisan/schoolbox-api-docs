@@ -3,6 +3,7 @@
  */
 
 import { insertElementAfter, injectScript } from "@js/util/domUtils";
+// import CKEditorInspector from "@ckeditor/ckeditor5-inspector";
 
 /**
  * Add the word count UI to the bottom of the editor
@@ -51,5 +52,21 @@ export function addToGlobalScope(editor, textarea) {
         window.sbProps.editors[textarea.id] = editor;
     } else if (textarea.name) {
         window.sbProps.editors[textarea.name] = editor;
+    }
+}
+
+/**
+ * Add the inspector to the editor to help with debugging
+ * in development mode: https://ckeditor.com/docs/ckeditor5/latest/framework/development-tools.html
+ * The process.env.NODE_ENV is built into node/webpack:
+ * https://webpack.js.org/configuration/mode/
+ * so it will only be imported in development mode, not in production
+ *
+ * @param { CKEditor } editor - the CKEditor instance
+ */
+export async function attachInspector(editor) {
+    if (process.env.NODE_ENV === "development") {
+        const inspector = await import("@ckeditor/ckeditor5-inspector");
+        inspector.default.attach(editor);
     }
 }
