@@ -618,6 +618,9 @@ class Controller extends Base
         if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
             $report->setActionsCsv($this->getCsv($post->get('actions')));
             $report->setIncludeRecordsWithoutAction($post->getBool('includeRecordsWithoutAction', true));
+
+            // In general we want the default behaviour to be 'include all records'.  The default for this option is
+            // false, because 'true' for this option means 'exclude records with completed actions'.
             $report->setIncludeUncompletedActionsOnly($post->getBool('includeUncompletedActionsOnly', false));
         }
 
