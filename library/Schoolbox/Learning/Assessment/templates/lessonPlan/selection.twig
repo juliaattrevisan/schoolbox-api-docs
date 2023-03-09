@@ -146,5 +146,7 @@
         });
     </script>
 
-    {{ mage.submitRow(actionLabel ?? 'Create', 'part-2', 'end') }}
+    {% if lessonPlanTemplates.all|length %}
+        {{ mage.submitRow(actionLabel ?? 'Create', 'part-2', 'end') }}
+    {% endif %}
 </fieldset>
