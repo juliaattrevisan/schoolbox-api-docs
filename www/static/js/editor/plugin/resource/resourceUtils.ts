@@ -149,8 +149,9 @@ function getAudioAttributes(resource: Resource) {
  * @param { object } config - the CKEditor instance config
  */
 export function getUrl(url: string, config: object) {
-    if (config.config.sbConfig) {
-        return new URL(url, config.config.sbConfig).toString();
+    // If we are requesting a baseHref to exist, we should be using it...
+    if (config.sbConfig.baseHref) {
+        url = new URL(url, config.sbConfig.baseHref);
     }
     return url;
 }

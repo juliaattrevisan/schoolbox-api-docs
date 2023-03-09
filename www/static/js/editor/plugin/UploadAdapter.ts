@@ -1,3 +1,5 @@
+import { getUrl } from "@js/editor/plugin/resource/resourceUtils";
+
 /**
  * Our custom CKEditor 5 image uploader, heavily referenced from
  * https://ckeditor.com/docs/ckeditor5/latest/framework/guides/deep-dive/upload-adapter.html
@@ -61,13 +63,8 @@ export default class UploadAdapter {
         if (!response || !response.success) {
             return reject(response && response.error ? response.message : genericErrorText);
         }
-        let url = response.meta.file._links.image;
-        // If we are requesting a baseHref to exist, we should be using it...
-        if (this.editor.config.sbConfig.baseHref) {
-            url = new URL(response.meta.file._links.image, this.editor.config.sbConfig.baseHref);
-        }
         resolve({
-            default: url,
+            default: getUrl(response.meta.file._links.image, this.editor.config),
         });
     }
 
