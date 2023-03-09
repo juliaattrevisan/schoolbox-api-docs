@@ -8,14 +8,18 @@ export default class UploadAdapter {
 
     xhr: XMLHttpRequest;
 
+    editor: object;
+
     /**
      * Create a new instance of MyUploadAdapter
      *
      * @param { FileLoader } loader - see https://ckeditor.com/docs/ckeditor5/latest/api/module_upload_filerepository-FileLoader.html
+     * @param { CKEditor } editor - the CKEditor instance
      */
-    constructor(loader) {
+    constructor(loader, editor) {
         this.loader = loader;
         this.xhr = new XMLHttpRequest();
+        this.editor = editor;
     }
 
     /**

@@ -12,6 +12,6 @@ import UploadAdapter from "@js/editor/plugin/UploadAdapter";
  */
 export default function UploadAdapterPlugin(editor) {
     editor.plugins.get("FileRepository").createUploadAdapter = (loader) => {
-        return new UploadAdapter(loader);
+        return new UploadAdapter(loader, editor);
     };
 }
