@@ -30,7 +30,6 @@ use UnexpectedValueException;
  */
 class Factory
 {
-
     /**
      * MarkTypes available for Projects
      *
