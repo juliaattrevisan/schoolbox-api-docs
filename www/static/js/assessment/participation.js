@@ -238,7 +238,7 @@
                 var planDetails = {
                     id: newPlan ? newPlanId : oldPlanId,
                     name: $customiseModal.find("#plan-name").val(),
-                    description: CKEDITOR.instances["plan-desc"].getData(),
+                    description: window.sbProps.editors["plan-desc"].getData(),
                     publishDate: $customiseModal.find("#plan-publish-date").val(),
                     openDate: $customiseModal.find("#plan-open-date").val(),
                     dueDate: $customiseModal.find("#plan-due-date").val(),
@@ -404,8 +404,8 @@
      */
     function reinitCKE() {
         var $planDesc = $(defaults.customiseModal).find("#plan-desc");
-        if (CKEDITOR.instances["plan-desc"]) {
-            CKEDITOR.instances["plan-desc"].destroy();
+        if (window.sbProps.editors["plan-desc"]) {
+            window.sbProps.editors["plan-desc"].destroy();
         }
         $.fn.alaressEditor({
             targetElements: $planDesc,
@@ -650,7 +650,7 @@
             $planOpenDate.val(planData["openDate"]);
             $planDueDate.val(planData["dueDate"]);
             $planCloseDate.val(planData["closeDate"]);
-            CKEDITOR.instances["plan-desc"].setData(planData["description"]);
+            window.sbProps.editors["plan-desc"].setData(planData["description"]);
         } else {
             $modalHeader.text("Create New Learning Plan");
             $planId.val(0);
@@ -658,7 +658,7 @@
             $planOpenDate.val($("#openDate").val());
             $planDueDate.val($("#dueDate").val());
             $planCloseDate.val($("#closeDate").val());
-            CKEDITOR.instances["plan-desc"].setData(CKEDITOR.instances["assessment-description"].getData());
+            window.sbProps.editors["plan-desc"].setData(window.sbProps.editors["assessment-description"].getData());
         }
 
         var $participantCustomiseModal = $("#participant-customise-modal");

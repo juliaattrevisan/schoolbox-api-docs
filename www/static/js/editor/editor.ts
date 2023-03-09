@@ -20,7 +20,7 @@ async function onCreated(textarea: HTMLTextAreaElement, editor) {
     insertWordCount(textarea, editor);
     removeValidation();
     await addIframelyEmbed();
-    addToGlobalScope(editor, textarea.id);
+    addToGlobalScope(editor, textarea);
     CKEditorInspector.attach(editor);
     textarea.dispatchEvent(
         new CustomEvent(EditorEvent.EDITOR__CREATED, {

@@ -407,7 +407,7 @@ import { getLoadedHTML } from "@js/util/domUtils";
      */
     function copyCkEditorValues(elem) {
         // Is CkEditor running on this page?
-        if (typeof CKEDITOR == "undefined" || typeof CKEDITOR.instances == "undefined") {
+        if (Object.keys(window.sbProps.editors).length === 0) {
             return;
         }
 
@@ -417,8 +417,8 @@ import { getLoadedHTML } from "@js/util/domUtils";
 
         $textAreas.each(function (idx, elem) {
             var $textArea = $(elem);
-            var $ckEditorById = CKEDITOR.instances[$textArea.attr("id")];
-            var $ckEditorByName = CKEDITOR.instances[$textArea.attr("name")];
+            var ckEditorById = window.sbProps.editors[$textArea.attr("id")];
+            var ckEditorByName = window.sbProps.editors[$textArea.attr("name")];
 
             // Does there exist a CK Editor instance for this text area?
             //
@@ -426,7 +426,7 @@ import { getLoadedHTML } from "@js/util/domUtils";
             // handle textarea.val() as part of form serialization
 
             /* Note that ckeditors can spawn via an id or a name attribute.
-             * The attribute that was used when they spawned is the array key for CKEDITOR.instances[] literal.
+             * The attribute that was used when they spawned is the array key for window.sbProps.editors[] literal.
              *
              * Name and id attributes do not have to be identical, so we have to check both because at this location
              * we don't know how a ckeditor was spawned/initialised
@@ -440,12 +440,12 @@ import { getLoadedHTML } from "@js/util/domUtils";
              * Check by id first, then check by name to stay synonymous with editor.js start();
              * It doesn't really matter which order you choose, for for the sake of similarity...
              */
-            if ($ckEditorById !== undefined) {
-                $textArea.html($ckEditorById.getData());
-                $textArea.val($ckEditorById.getData());
-            } else if ($ckEditorByName !== undefined) {
-                $textArea.html($ckEditorByName.getData());
-                $textArea.val($ckEditorByName.getData());
+            if (ckEditorById !== undefined) {
+                $textArea.html(ckEditorById.getData());
+                $textArea.val(ckEditorById.getData());
+            } else if (ckEditorByName !== undefined) {
+                $textArea.html(ckEditorByName.getData());
+                $textArea.val(ckEditorByName.getData());
             }
         });
     }

@@ -32,12 +32,19 @@
          * Initialise tiny
          */
         function initChange() {
-            $.fn.alaressEditor({
-                targetElements: $("#" + config.editorSelector),
-                blur: function (element) {
+            document.getElementById(config.editorSelector).addEventListener("EDITOR__CREATED", onEditorCreated);
+            function onEditorCreated(event) {
+                event.detail.editor.editing.view.document.on("blur", function () {
+                    console.log("blur")
                     $.fn.evaluationRichText.saveOne(config.questionForm);
-                },
-            });
+                });
+            }
+
+            document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+                detail: {
+                    targetElements: ["#" + config.editorSelector],
+                }
+            }));
         }
     };
 
@@ -50,8 +57,8 @@
     $.fn.evaluationRichText.saveOne = function (element) {
         element.find("textarea[id]").each(function () {
             var identifier = this.id;
-            if (identifier in CKEDITOR.instances) {
-                CKEDITOR.instances[identifier].updateElement();
+            if (identifier in window.sbProps.editors) {
+                window.sbProps.editors[identifier].updateSourceElement();
             }
         });
 
