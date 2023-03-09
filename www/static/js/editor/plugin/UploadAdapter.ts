@@ -22,8 +22,8 @@ export default class UploadAdapter {
      */
     constructor(loader, editor) {
         this.loader = loader;
-        this.xhr = new XMLHttpRequest();
         this.editor = editor;
+        this.xhr = new XMLHttpRequest();
     }
 
     /**

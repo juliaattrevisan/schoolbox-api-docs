@@ -15,9 +15,9 @@ import "@js/editor/styles/editor.css"; // to overwrite some of the styles
  *
  * @param { HTMLTextAreaElement } textarea - the textarea the CKEditor will replace
  * @param { CKEditor } editor - the CKEditor instance
- * @param { object } config - the CKEditor config object
+ * @param { EditorConfig } config - the CKEditor config object
  */
-async function onCreated(textarea: HTMLTextAreaElement, editor, config: object) {
+async function onCreated(textarea: HTMLTextAreaElement, editor, config: EditorConfig) {
     insertWordCount(textarea, editor);
     removeValidation();
     await addIframelyEmbed();
