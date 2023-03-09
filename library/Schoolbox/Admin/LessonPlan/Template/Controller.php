@@ -221,6 +221,7 @@ class Controller extends Base
             /* Anything that wasn't seen needs to be removed
              */
             $pb = $this->fieldMapper->getPredicateBuilder()
+                ->equals('lesson_plan_template_id', $lessonPlanTemplate->getId())
                 ->notIn('id', $seenFieldIds);
 
             $this->fieldMapper->deleteByPredicates($pb);
