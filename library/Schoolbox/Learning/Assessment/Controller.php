@@ -281,6 +281,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
                  */
                 $data['template'] = null;
                 $data['type'] = $type;
+                $data['mageAsync'] = false;
 
                 /* If $part-1 is set in the query string param, you came here from the
                  * Activity Selection screen via Course Builder component. This part
@@ -304,6 +305,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
                         ), $data);
                     }
                 } else {
+                    $data['mageAsync'] = true;
+
                     if ($this->getRequest()->isXhr()) {
                         $content = $this->buildUnthemedHtmlOutput(sprintf(
                             '@learningAssessment/%s/selection.twig',
