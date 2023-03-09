@@ -18,9 +18,9 @@
     }
 
     .s-placeholder {
+        background-color: var(--content-ui-selected);
         height: 2.5rem !important;
         padding: 0;
-        background-color: var(--content-ui-selected);
     }
 
     & li {
@@ -28,16 +28,19 @@
             padding: 0;
         }
 
-        position: relative;
+        border: 1px solid var(--body-background);
+        margin-bottom: 1rem;
         margin-left: 0;
         margin-right: 0;
-        margin-bottom: 1rem;
-        border: 1px solid var(--body-background);
+        position: relative;
 
         &:last-child {
             border-bottom: 1px solid var(--body-background);
         }
 
+        /* Sections are used because some other definition in the system is cascading its rules
+        into the .information-list on divs and the specificity on that rule is pretty intense.
+        */
         section {
             margin-bottom: 0rem;
 
@@ -47,35 +50,35 @@
         }
 
         .s-topbar {
-            width: 100%;
+            align-items: center;
             background-color: var(--body-background);
             display: flex;
-            align-items: center;
             justify-content: flex-end;
+            width: 100%;
 
             .s-name-display {
-                position: absolute;
-                left: 2.5rem;
                 display: none;
+                left: 2.5rem;
                 max-width: calc(100% - 5rem);
                 overflow: hidden;
+                position: absolute;
                 text-overflow: ellipsis;
                 white-space: nowrap;
             }
 
             nav {
-                height: 2.5rem;
                 display: flex;
+                height: 2.5rem;
 
                 .button {
-                    width: 2.5rem;
-                    display: flex;
                     align-items: center;
-                    justify-content: center;
                     background-color: transparent;
+                    display: flex;
+                    justify-content: center;
                     margin-bottom: 0;
                     opacity: 0.7;
                     transition: 0.15s;
+                    width: 2.5rem;
 
                     &:hover {
                         opacity: 1;
@@ -95,10 +98,10 @@
         }
 
         .s-title-row {
-            display: flex;
-            width: 100%;
             align-items: center;
+            display: flex;
             margin-bottom: 1rem;
+            width: 100%;
         }
 
         .s-field-title {
@@ -113,8 +116,8 @@
 
         // Styles whilst an item is being dragged
         &.ui-sortable-helper {
-            margin-left: 1rem !important;
             left: 1rem !important;
+            margin-left: 1rem !important;
         }
 
         @media #{$small-only} {
@@ -123,8 +126,8 @@
             }
 
             &.ui-sortable-helper {
-                margin-left: 0.5rem !important;
                 left: 0.5rem !important;
+                margin-left: 0.5rem !important;
             }
         }
 
@@ -134,8 +137,8 @@
             }
 
             &.ui-sortable-helper {
-                margin-left: 0.75rem !important;
                 left: 0.75rem !important;
+                margin-left: 0.75rem !important;
             }
         }
 
