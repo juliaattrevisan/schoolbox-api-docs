@@ -140,7 +140,6 @@ class Controller extends Base
      */
     public function postModify(EportfolioPageModel $page, EportfolioBlogModel $blog)
     {
-
         // Update details and save the record
         $blog->setBody($this->getRequest()->post->get("body"));
         $blog->setHeading($this->getRequest()->post->get("heading"));
@@ -256,13 +255,13 @@ class Controller extends Base
     /**
      * Create new blog comment
      * @param EportfolioBlogModel $blog
-     * @throws MapperException
+     * @throws MapperException|\Aura\Router\Exception\RouteNotFound
      */
-    public function postCommentInsert(EportfolioBlogModel $blog)
+    public function postCommentInsert(EportfolioBlogModel $blog): void
     {
-        // Comments must not be empty
+        // Comments must not be empty.
         if (strlen(trim($this->getRequest()->post["commentBody"]))) {
-            // Create the comment and save
+            // Create the comment and save.
 
             /** @var EportfolioBlogCommentModel $comment */
             $comment = $this->getEportfolioBlogCommentMapper()->createModel();
@@ -277,14 +276,38 @@ class Controller extends Base
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
-        $this->getResponse()->redirect->afterPost(
-            $this->getRouter()->generate(
-                'eportfolioBlog.getItem',
-                ['pageId' => $blog->getPage()->getPageId(), 'id' => $blog->getId(),]
-            )
-        );
-    }
+        // Blog comments can be added from a few different pages, so the redirection URL depends on the referrer.
+        $referrer = $_SERVER['HTTP_REFERER'] ?? '';
+        $blogPage = $blog->getPage();
+        $blogPageId = $blogPage->getPageId();
+        if (str_contains($referrer, 'eportfolio/blog/archive')) {
+            $blogCreatedAt = $blog->getCreatedAt();
+            $redirectParams = ['pageId' => $blogPageId];
 
+            // Field eportfolio_component_blog.created_at is nullable in the DB, so account for this case.  Also, if
+            // blank year and month are included in the redirect URL, an error results.  So we must include them only
+            // if created_at is non-null.
+            if ($blogCreatedAt !== null) {
+                $redirectParams['year'] = $blogCreatedAt->getYear();
+                $redirectParams['month'] = $blogCreatedAt->getMonth();
+            }
+            $redirectUrl = $this->getRouter()->generate('eportfolioBlog.getArchive', $redirectParams);
+        } elseif (str_contains($referrer, 'eportfolio/blog')) {
+            $redirectUrl = $this->getRouter()->generate(
+                'eportfolioBlog.getItem',
+                ['pageId' => $blogPageId, 'id' => $blog->getId()]
+            );
+        } elseif (str_contains($referrer, 'eportfolio')) {
+            $redirectUrl = '/eportfolio/' . $blog->getOwner()->getId() . '/' . $blogPageId;
+        } else {
+            $redirectUrl = $this->getRouter()->generate(
+                'eportfolioBlog.getItem',
+                ['pageId' => $blogPageId, 'id' => $blog->getId()]
+            );
+        }
+
+        $this->getResponse()->redirect->afterPost($redirectUrl);
+    }
 
     /**
      * Delete blog comment
