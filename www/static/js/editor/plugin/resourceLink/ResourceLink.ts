@@ -1,5 +1,11 @@
+/**
+ * Add a button to the link form view to open the resource modal.
+ * Selecting a link within the modal will update the link form view's URL field.
+ */
+
 import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
 import ButtonView from "@ckeditor/ckeditor5-ui/src/button/buttonview";
+import { insertElementAfter } from "@js/util/domUtils";
 
 export default class ResourceLink extends Plugin {
     init() {
@@ -14,7 +20,8 @@ export default class ResourceLink extends Plugin {
                 // Register the button under the link form view, it will handle its destruction.
                 this.linkFormView.registerChild(this.button);
                 // Inject the element into DOM.
-                this.linkFormView.element.insertBefore(this.button.element, this.linkFormView.saveButtonView.element);
+                // this.linkFormView.element.insertBefore(this.button.element, this.linkFormView.saveButtonView.element);
+                insertElementAfter(this.linkFormView.urlInputView.fieldView.element, this.button.element);
             }
         });
     }
@@ -25,9 +32,10 @@ export default class ResourceLink extends Plugin {
         const linkCommand = editor.commands.get("link");
 
         button.set({
-            label: "Internal link",
+            label: "Browse",
             withText: true,
             tooltip: true,
+            class: "ck-button-resource-link",
         });
 
         // Probably this button should be also disabled when the link command is disabled.
