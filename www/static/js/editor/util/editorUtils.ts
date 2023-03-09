@@ -44,10 +44,10 @@ export async function addIframelyEmbed() {
  * Add the editor to the global scope so it can be accessed
  * in other twig files etc
  *
- * @param { CKEditor } editor - the CKEditor instance
+ * @param { Editor } editor - the CKEditor instance
  * @param { HTMLTextAreaElement } textarea - the textarea the CKEditor will replace
  */
-export function addToGlobalScope(editor, textarea) {
+export function addToGlobalScope(editor: Editor, textarea: HTMLTextAreaElement) {
     if (textarea.id) {
         window.sbProps.editors[textarea.id] = editor;
     } else if (textarea.name) {
