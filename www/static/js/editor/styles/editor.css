@@ -129,7 +129,7 @@
 }
 
 /**
- * Custom Styles
+ * Custom CKEditor Styles
  * You'll find our custom styles defined below. I added some colour custom properties
  * as I spoke to James and he said none of these should respond to skin config.
  * TODO - Replace colour definitions with custom properties when they're implemented.
@@ -154,7 +154,7 @@
 }
 
 /* Banner */
-.ck.ck-editor .s-banner {
+.ck-s-banner {
     background-color: var(--ck-custom-blue);
     border-radius: 0.25rem 0.25rem 0 0;
     box-shadow: 0px 5px 5px 0px var(--ck-custom-shadow);
@@ -168,14 +168,14 @@
     width: calc(100% - 4em);
 }
 
-.ck.ck-editor .s-banner::selection,
-.ck.ck-editor .s-banner *::selection {
+.ck-s-banner::selection,
+.ck-s-banner *::selection {
     background-color: var(--ck-custom-white);
     color: var(--ck-custom-blue);
 }
 
-.ck.ck-editor .s-banner::before,
-.ck.ck-editor .s-banner::after {
+.ck-s-banner::before,
+.ck-s-banner::after {
     background-position: center center;
     background-repeat: no-repeat;
     background-size: contain;
@@ -188,20 +188,20 @@
 }
 
 /* SVG colours are currently hardcoded inside the SVG */
-.ck.ck-editor .s-banner::before {
+.ck-s-banner::before {
     background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB2aWV3Qm94PSIxOTUuMTggMTA5LjU3NiA0Mi40IDQyLjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6Yng9Imh0dHBzOi8vYm94eS1zdmcuY29tIj4KICA8ZyBzdHlsZT0iIiB0cmFuc2Zvcm09Im1hdHJpeCgtMS4wMDEwMTUsIDAsIDAsIDEuMDEyMDA1LCAzNzkuOTg5MjI3LCAtMS4zMTU1MDEpIj4KICAgIDxwYXRoIGQ9Ik0gMTQyLjI2NSAxMDkuNTc2IEwgMTg0LjYyMiAxMDkuNTc2IEwgMTg0LjYyMiAxMDkuODIyIEwgMTY0LjA5MSAxMzAuMzUyIEwgMTg0LjYyMiAxNTAuODgzIEwgMTg0LjYyMiAxNTEuNDczIEwgMTQyLjI2NSAxNTEuNDczIEwgMTQyLjI2NSAxMDkuNTc2IFoiIHN0eWxlPSJmaWxsOiByZ2IoNiwgNzgsIDEyOSk7Ii8+CiAgICA8cGF0aCBkPSJNIC0xNDIuNDE5IC0xNTAuNTUzIEwgLTE0Mi40MTkgLTEzMC4xMDYgTCAtMTU2LjY5MiAtMTMwLjEwNiBMIC0xNDIuNDE5IC0xNTAuNTUzIFoiIHN0eWxlPSJmaWxsLW9wYWNpdHk6IDAuMzsiIHRyYW5zZm9ybT0ibWF0cml4KC0xLCAwLCAwLCAtMSwgMCwgMCkiIGJ4OnNoYXBlPSJ0cmlhbmdsZSAtMTU2LjY5MiAtMTUwLjU1MyAxNC4yNzMgMjAuNDQ3IDEgMCAxQDViYzI4MzViIi8+CiAgPC9nPgo8L3N2Zz4K");
     bottom: -20px;
     left: -26px;
 }
 
-.ck.ck-editor .s-banner::after {
+.ck-s-banner::after {
     background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB2aWV3Qm94PSIxNDUuOTMxIDExNS41NTcgNDIuNCA0Mi40IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOmJ4PSJodHRwczovL2JveHktc3ZnLmNvbSI+CiAgPGcgc3R5bGU9IiIgdHJhbnNmb3JtPSJtYXRyaXgoMS4wMDEwMTUsIDAsIDAsIDEuMDEyMDA1LCAzLjUyMTQ4NSwgNC42NjU3OTIpIj4KICAgIDxwYXRoIGQ9Ik0gMTQyLjI2NSAxMDkuNTc2IEwgMTg0LjYyMiAxMDkuNTc2IEwgMTg0LjYyMiAxMDkuODIyIEwgMTY0LjA5MSAxMzAuMzUyIEwgMTg0LjYyMiAxNTAuODgzIEwgMTg0LjYyMiAxNTEuNDczIEwgMTQyLjI2NSAxNTEuNDczIEwgMTQyLjI2NSAxMDkuNTc2IFoiIHN0eWxlPSJmaWxsOiByZ2IoNiwgNzgsIDEyOSk7Ii8+CiAgICA8cGF0aCBkPSJNIC0xNDIuNDE5IC0xNTAuNTUzIEwgLTE0Mi40MTkgLTEzMC4xMDYgTCAtMTU2LjY5MiAtMTMwLjEwNiBMIC0xNDIuNDE5IC0xNTAuNTUzIFoiIHN0eWxlPSJmaWxsLW9wYWNpdHk6IDAuMzsiIHRyYW5zZm9ybT0ibWF0cml4KC0xLCAwLCAwLCAtMSwgMCwgMCkiIGJ4OnNoYXBlPSJ0cmlhbmdsZSAtMTU2LjY5MiAtMTUwLjU1MyAxNC4yNzMgMjAuNDQ3IDEgMCAxQDViYzI4MzViIi8+CiAgPC9nPgo8L3N2Zz4K");
     bottom: -20px;
     right: -26px;
 }
 
 /* Callouts */
-.ck.ck-editor .s-callout {
+.ck-s-callout {
     border: 1px solid var(--ck-custom-grey);
     border-radius: 0.25rem;
     color: var(--ck-custom-grey);
@@ -211,27 +211,27 @@
     position: relative;
 }
 
-.ck.ck-editor .s-callout--info {
+.ck-s-callout--info {
     border-color: var(--ck-custom-blue);
     color: var(--ck-custom-blue);
 }
 
-.ck.ck-editor .s-callout--warning {
+.ck-s-callout--warning {
     border-color: var(--ck-custom-red);
     color: var(--ck-custom-red);
 }
 
-.ck.ck-editor .s-callout--success {
+.ck-s-callout--success {
     border-color: var(--ck-custom-green);
     color: var(--ck-custom-green);
 }
 
-.ck.ck-editor .s-callout--target {
+.ck-s-callout--target {
     border-color: var(--ck-custom-yellow);
     color: var(--ck-custom-yellow-text);
 }
 
-.ck.ck-editor .s-callout:before {
+.ck-s-callout:before {
     align-items: center;
     background-color: var(--ck-custom-grey);
     color: var(--ck-custom-white);
@@ -247,32 +247,32 @@
     width: 3rem;
 }
 
-.ck.ck-editor .s-callout--info:before {
+.ck-s-callout--info:before {
     background-color: var(--ck-custom-blue);
     content: "\e639";
 }
 
-.ck.ck-editor .s-callout--warning:before {
+.ck-s-callout--warning:before {
     background-color: var(--ck-custom-red);
     content: "\e602";
 }
 
-.ck.ck-editor .s-callout--success:before {
+.ck-s-callout--success:before {
     background-color: var(--ck-custom-green);
     content: "\e604";
 }
 
-.ck.ck-editor .s-callout--target:before {
+.ck-s-callout--target:before {
     background-color: var(--ck-custom-yellow);
     content: "\e919";
 }
 
-.ck.ck-editor .s-callout--question:before {
+.ck-s-callout--question:before {
     content: "\e632";
 }
 
 /* Sticky note */
-.ck.ck-editor .s-sticky-note {
+.ck-s-sticky-note {
     background-color: var(--ck-custom-sticky-bg);
     background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB2aWV3Qm94PSIzNDcuNjUzIDEyNC4zNjMgMzMuMzQ5IDMxLjQ0NiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB4PSIzNDcuNjUzIiB5PSIxMjQuMzYzIiB3aWR0aD0iMzMuMzQ5IiBoZWlnaHQ9IjMxLjQ0NiIgc3R5bGU9ImZpbGwtb3BhY2l0eTogMC4wNzsiLz4KPC9zdmc+Cg==");
     background-position: top;
@@ -287,7 +287,7 @@
     width: max-content;
 }
 
-.ck.ck-editor .s-sticky-note:before {
+.ck-s-sticky-note:before {
     color: var(--ck-custom-red);
     content: "\e913";
     font-family: "schoolbox";
@@ -297,7 +297,7 @@
     top: -20px;
 }
 
-.ck.ck-editor .s-sticky-note:after {
+.ck-s-sticky-note:after {
     background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB2aWV3Qm94PSIxNTEuODQ1IDE1Ni4zMDYgMTgxLjE5MiAxODEuMzI0IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOmJ4PSJodHRwczovL2JveHktc3ZnLmNvbSI+CiAgPHBhdGggZD0iTSAzMzMuMDM3IDE1Ni4zMDYgTCAzMzMuMDM3IDMzNy40NzggTCAxNTEuODY1IDMzNy40NzggTCAzMzMuMDM3IDE1Ni4zMDYgWiIgc3R5bGU9ImZpbGw6IHJnYigyNTUsIDI1NSwgMjU1KTsiIGJ4OnNoYXBlPSJ0cmlhbmdsZSAxNTEuODY1IDE1Ni4zMDYgMTgxLjE3MiAxODEuMTcyIDEgMCAxQGQzYjJkNjY5Ii8+CiAgPHBhdGggZD0iTSAtMTUxLjg0NSAtMzM3LjYzIEwgLTE1MS44NDUgLTE1Ni40NTggTCAtMzMzLjAxNyAtMTU2LjQ1OCBMIC0xNTEuODQ1IC0zMzcuNjMgWiIgc3R5bGU9ImZpbGwtb3BhY2l0eTogMC4wNzsiIHRyYW5zZm9ybT0ibWF0cml4KC0xLCAwLCAwLCAtMSwgMCwgMCkiIGJ4OnNoYXBlPSJ0cmlhbmdsZSAtMzMzLjAxNyAtMzM3LjYzIDE4MS4xNzIgMTgxLjE3MiAxIDAgMUA5MWZkMjhjMSIvPgo8L3N2Zz4K");
     background-repeat: no-repeat;
     background-size: cover;
@@ -310,7 +310,7 @@
 }
 
 /* Construction */
-.ck.ck-editor .s-construction {
+.ck-s-construction {
     background-color: var(--ck-custom-orange);
     border: 1px solid var(--ck-custom-orange);
     box-shadow: 0px 5px 5px 0px var(--ck-custom-shadow);
@@ -319,8 +319,8 @@
     position: relative;
 }
 
-.ck.ck-editor .s-construction::before,
-.ck.ck-editor .s-construction::after {
+.ck-s-construction::before,
+.ck-s-construction::after {
     background: repeating-linear-gradient(
         45deg,
         var(--ck-custom-orange),
@@ -334,19 +334,19 @@
     width: 100%;
 }
 
-.ck.ck-editor .s-construction::before {
+.ck-s-construction::before {
     left: 0;
     top: 0;
 }
 
-.ck.ck-editor .s-construction::after {
+.ck-s-construction::after {
     bottom: 0;
     left: 0;
 }
 
 /* Code block styling */
 
-.ck.ck-editor p.s-code-block {
+p.ck-s-code-block {
     background-color: var(--ck-custom-code-bg);
     border: none;
     border-radius: 0.25rem;
