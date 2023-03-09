@@ -187,13 +187,6 @@ Data:
 
         /* Spawn editors
          */
-        {# $.fn.alaressEditor({
-            targetElements: $('textarea[name=body]'),
-            start: function (element) {
-                initAutosave(element);
-                autosavePresubmit(element);
-            }
-        }); #}
         document.getElementById("editor-body").addEventListener("EDITOR__CREATED", onDefaultEditorCreated);
         function onDefaultEditorCreated(event) {
             initAutosave(event.detail.textarea);
