@@ -296,11 +296,6 @@
             }
         }));
 
-        // Update the editor's form input on change
-        // (required so that validation triggers)
-        CKEDITOR.instances[editorId].on('change', CKEDITOR.instances[editorId].updateElement);
-
-
         // Disable goal expiry input if this badge isn't a goal
         let $badgeGoalExpiryInput = $('#badge-goal-expiry');
         $('#badge-allow-as-goal').on('change', function () {
