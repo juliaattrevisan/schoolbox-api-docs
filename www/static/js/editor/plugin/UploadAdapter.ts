@@ -3,18 +3,26 @@
  * https://ckeditor.com/docs/ckeditor5/latest/framework/guides/deep-dive/upload-adapter.html
  *
  */
+
+import { getURL } from "@js/editor/plugin/resource/resourceUtils";
+import type { EditorConfig } from "@js/editor/types/editorTypes";
+
 export default class UploadAdapter {
     loader: unknown;
 
     xhr: XMLHttpRequest;
 
+    editor: object;
+
     /**
      * Create a new instance of MyUploadAdapter
      *
-     * @param { FileLoader } loader - see https://ckeditor.com/docs/ckeditor5/latest/api/module_upload_filerepository-FileLoader.html
+     * @param { unknown } loader - see https://ckeditor.com/docs/ckeditor5/latest/api/module_upload_filerepository-FileLoader.html
+     * @param { CKEditor } editor - the CKEditor instance
      */
-    constructor(loader) {
+    constructor(loader, editor) {
         this.loader = loader;
+        this.editor = editor;
         this.xhr = new XMLHttpRequest();
     }
 
@@ -58,7 +66,7 @@ export default class UploadAdapter {
             return reject(response && response.error ? response.message : genericErrorText);
         }
         resolve({
-            default: response.meta.file._links.image,
+            default: getURL(response.meta.file._links.image, this.editor.config.sbConfig as EditorConfig),
         });
     }
 
