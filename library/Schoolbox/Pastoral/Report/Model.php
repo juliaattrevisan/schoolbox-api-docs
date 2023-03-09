@@ -276,7 +276,7 @@ class Model implements ISoftDeletable
     /**
      * @return string
      */
-    public function getTypesCsv(): string
+    public function getTypesCsv(): ?string
     {
         return $this->typesCsv;
     }
