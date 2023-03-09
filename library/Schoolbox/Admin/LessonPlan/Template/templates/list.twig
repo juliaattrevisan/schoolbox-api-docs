@@ -31,24 +31,16 @@
                         {% for lessonPlanTemplate in lessonPlanTemplates %}
                             {% set updateRoute = routeLookupIfAuthorized('adminLessonPlanTemplate.getUpdate', {lessonPlanTemplateId: lessonPlanTemplate.id}) %}
 
-                            <li class="actions-small-3">
+                            <li class="actions-small-3 {% if not lessonPlanTemplate.enabled %}faded{% endif %}">
                                 <div class="list-item">
                                     <div class="card small-12">
                                         {# TODO Redo this <del> style properly. This isn't what a <del> tag is supposed to represent. #}
                                         {% if updateRoute %}
                                             <a href="{{ updateRoute }}">
-                                                {% if lessonPlanTemplate.enabled %}
-                                                    <h3>{{ lessonPlanTemplate.title }}</h3>
-                                                {% else %}
-                                                    <h3><del>{{ lessonPlanTemplate.title }}</del></h3>
-                                                {% endif %}
+                                                <h3>{{ lessonPlanTemplate.title }}</h3>
                                             </a>
                                         {% else %}
-                                            {% if lessonPlanTemplate.enabled %}
-                                                <h3>{{ lessonPlanTemplate.title }}</h3>
-                                            {% else %}
-                                                <h3><del>{{ lessonPlanTemplate.title }}</del></h3>
-                                            {% endif %}
+                                            <h3>{{ lessonPlanTemplate.title }}</h3>
                                         {% endif %}
                                         <p class="meta">
                                             Last modified by

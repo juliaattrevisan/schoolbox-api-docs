@@ -38,33 +38,36 @@
                             {% if lessonPlanTemplate is not null %}
                                 {% for field in lessonPlanTemplate.fields %}
                                 <li>
-                                    <div class="s-topbar" data-topbar>
-                                        <div class="grip ui-sortable-handle">
+                                    <!-- See further down the file for why we use section here -->
+                                    <section data-template-section>
+                                        <div class="s-topbar" data-topbar>
+                                            <div class="grip ui-sortable-handle">
+                                            </div>
+                                            <div class="s-name-display" data-name-display>{{ field.title }}</div>
+                                            <nav>
+                                                <a class="button icon-delete" data-delete></a>
+                                            </nav>
                                         </div>
-                                        <div class="s-name-display" data-display>{{ field.title }}</div>
-                                        <nav>
-                                            <a class="button icon-delete" data-delete></a>
-                                        </nav>
-                                    </div>
-                                    <div class="s-field-contents">
-                                        <div>
-                                            <div class="s-title-row">
-                                                <div class="s-field-title">
-                                                    <label for="field-title-{{ field.id }}" class="required">Field Title</label>
-                                                    <input type="text" id="field-title-{{ field.id }}" name="field[{{ field.id }}][title]" maxlength="255" value="{{ field.title }}" />
-                                                </div>
-                                                <div class="s-field-visibility">
-                                                    <input type="hidden" name="field-visibility[{{ field.id }}]" value="off" />
-                                                    <input id="field-new-visibility-{{ field.id }}" name="field[{{ field.id }}][visibility]" type="checkbox" {% if field.visibility == studentRole %}checked="checked"{% endif %}/>
-                                                    <label for="field-new-visibility-{{ field.id }}" class="checkbox-label">Field visible to students?</label>
+                                        <div class="s-field-contents">
+                                            <div>
+                                                <div class="s-title-row">
+                                                    <div class="s-field-title">
+                                                        <label for="field-title-{{ field.id }}" class="required">Field Title</label>
+                                                        <input type="text" id="field-title-{{ field.id }}" name="field[{{ field.id }}][title]" data-field-title maxlength="255" value="{{ field.title }}" />
+                                                    </div>
+                                                    <div class="s-field-visibility">
+                                                        <input type="hidden" name="field-visibility[{{ field.id }}]" value="off" />
+                                                        <input id="field-new-visibility-{{ field.id }}" name="field[{{ field.id }}][visibility]" type="checkbox" {% if field.visibility == studentRole %}checked="checked"{% endif %}/>
+                                                        <label for="field-new-visibility-{{ field.id }}" class="checkbox-label">Field visible to students?</label>
+                                                    </div>
                                                 </div>
                                             </div>
+                                            <div>
+                                                <label for="field-body-{{ field.id }}">Body</label>
+                                                <textarea id="field-body-{{ field.id }}" name="field[{{ field.id }}][body]" rows="5">{{  field.body }}</textarea>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <label for="field-body-{{ field.id }}">Body</label>
-                                            <textarea id="field-body-{{ field.id }}" name="field[{{ field.id }}][body]" rows="5">{{  field.body }}</textarea>
-                                        </div>
-                                    </div>
+                                    </section>
                                 </li>
                                 {% endfor %}
                             {% endif %}
@@ -86,10 +89,15 @@
 
 </div>
 
+<!--
+    We use a section below avoid some weird inheritance rules cascading
+    on div elements (coming from .information-list - we shouldn't be using
+    inheritance selectors if a parent class isn't explicitly encapsulating
+    the scope to the component we want it to appear in. Otherwise you get
+    stuff leaking out when it ought to stay put instead.)
+-->
 <div id="field-blueprint" style="display:none">
-    <!-- Declare as a section to avoid some weird inheritance rules on div elements
-    -->
-    <section class="field-content" data-menu-section>
+    <section class="field-content" data-template-section>
         <div class="s-topbar" data-topbar>
             <div class="grip ui-sortable-handle"></div>
             <div class="s-name-display" data-name-display></div>
@@ -102,7 +110,7 @@
                 <div class="s-title-row">
                     <div class="s-field-title">
                         <label for="field-title" class="required">Field Title</label>
-                        <input type="text" id="field-title" maxlength="255" value="" />
+                        <input type="text" id="field-title" data-field-title maxlength="255" value="" />
                     </div>
                     <div class="s-field-visibility">
                         <input type="hidden" value="off" />
@@ -120,7 +128,6 @@
 </div>
 
 <script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
-<script src="{{ CDN_PREFIX }}/js/bundle/helloCKEditor.js?v={{ config.site_version }}"></script>
 <script src="{{ CDN_PREFIX }}/js/sportsfixtures/jquery.mightyList.js?v={{ config.site_version }}"></script>
 
 <script>
@@ -135,11 +142,22 @@
             tolerance: 'pointer',
             placeholder: 's-placeholder',
             forcePlaceholderSize: true,
-            start: () => {
+            start: (e) => {
+                //Get all our field sections, but don't select the one in the 'blueprint'
+                const items = document.querySelector('#fields').querySelectorAll('[data-template-section]') || [];
+                //Update the topbar name display for each of our fields
+                items.forEach(field => {
+                    const nameDisplay = field.querySelector('[data-name-display]');
+                    const nameInput = field.querySelector('[data-field-title]').value;
+                    nameDisplay.innerHTML = nameInput;
+                });
+
+                //Add a class to apply our rules whilst we're dragging
                 document.querySelector('#fields').classList.add('s-is-dragging');
                 $('#fields').sortable('refreshPositions');
             },
             stop: () => {
+                //Remove the class applying our draggable rules
                 document.querySelector('#fields').classList.remove('s-is-dragging');
             }
         });

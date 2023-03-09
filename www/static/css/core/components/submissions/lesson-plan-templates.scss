@@ -38,8 +38,12 @@
             border-bottom: 1px solid var(--body-background);
         }
 
-        & > section.field-content {
-            display: block;
+        section {
+            margin-bottom: 0rem;
+
+            &.field-content {
+                display: block;
+            }
         }
 
         .s-topbar {

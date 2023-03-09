@@ -109,6 +109,25 @@
     overflow-y: auto;
 }
 
+// Styling for the lesson plan template list specifically
+.information-list {
+    li.faded {
+        background-color: $vapor;
+
+        .card.small-12 {
+            opacity: 0.75;
+
+            h3 {
+                font-style: italic;
+            }
+
+            .meta {
+                color: $aluminum;
+            }
+        }
+    }
+}
+
 $container-bg: white;
 %container {
     background-color: $container-bg;
