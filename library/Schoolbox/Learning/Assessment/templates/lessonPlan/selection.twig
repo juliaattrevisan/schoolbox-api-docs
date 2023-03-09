@@ -8,6 +8,7 @@
  # @param LessonPlan\Template\Model[] $lessonPlanTemplates['recent']
  # @param LessonPlan\Template\Model[] $lessonPlanTemplates['all']
  # @param string $type                Corresponds to the const 'lessonPlan' in AssessmentType
+ # @param LessonPlan\Template\Model   A querystring param that exists after a user chose a template
  #}
 {% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
 
@@ -124,7 +125,7 @@
         });
     </script>
 
-    {% if lessonPlanTemplates.all|length %}
+    {% if lessonPlanTemplates.all|length and template %}
         {{ mage.submitRow(actionLabel ?? 'Create', 'part-2', 'end') }}
     {% endif %}
 </fieldset>
