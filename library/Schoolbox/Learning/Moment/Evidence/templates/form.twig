@@ -127,7 +127,7 @@
             detail: {
                 targetElements: ['#evidence-body'],
                 {% if USER.role.staff %}hasTokens: true,{% endif %}
-                {% if momentType in ['video', 'audio', 'photo', 'upload']%}isSimple: true,{% endif %}
+                isSimple: true,
             }
         }));
 

@@ -20,7 +20,7 @@ import "@js/editor/styles/editor.css"; // to overwrite some of the styles
  * Add in any additional setup required and then dispatch that the editor is ready
  *
  * @param { HTMLTextAreaElement } textarea - the textarea the CKEditor will replace
- * @param { CKEditor } editor - the CKEditor instance
+ * @param { Editor } editor - the CKEditor instance
  * @param { EditorConfig } config - the CKEditor config object
  */
 async function onCreated(textarea: HTMLTextAreaElement, editor: Editor, config: EditorConfig) {
