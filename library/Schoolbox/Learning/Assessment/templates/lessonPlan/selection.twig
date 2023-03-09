@@ -10,6 +10,7 @@
  # @param string $type                Corresponds to the const 'lessonPlan' in AssessmentType
  #}
 {% import 'sub/breadcrumbs.twig' as bread %}
+{% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
 
 {{ bread.crumbsArray(breadcrumbs) }}
 
@@ -152,3 +153,5 @@
         <a class="close-reveal-modal">&#215;</a>
     </div>
 {% endfor %}
+
+{{ mage.submitRow(actionLabel ?? 'Create', 'part-2', 'end') }}

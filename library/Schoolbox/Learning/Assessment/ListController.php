@@ -548,6 +548,15 @@ class ListController extends Web\Controller\Base
                 'icon'  => 'quiz',
                 'title' => 'Ask a series of questions with automatic marking',
             ],
+            /* TODO what's the tooltip for this?
+             */
+            [
+                'id'    => 'lesson-plan',
+                'value' => AssessmentType::TYPE_LESSON_PLAN,
+                'label' => 'Lesson Plan',
+                'icon'  => 'lesson-plan',
+                'title' => 'Create a lesson plan',
+            ],
         ];
         if ($this->getConfigLoader()->get('lti_assessments_enable')) {
             $data['types'][] = [

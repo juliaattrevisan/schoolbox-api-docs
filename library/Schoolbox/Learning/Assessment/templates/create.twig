@@ -200,7 +200,11 @@
 
                     <div class="small-12 columns {% if assessmentType is not defined or not assessmentType|length %}hide{% endif %}" data-mage-collapsed data-assessment-details>
                         {% if assessmentType is defined and assessmentType|length %}
-                            {% include '@learningAssessment/'~assessmentType~'/create.twig' with {stage: 2} %}
+                            {% if assessmentType == 'lessonPlan' %}
+                                {% include '@learningAssessment/'~assessmentType~'/selection.twig' %}
+                            {% else %}
+                                {% include '@learningAssessment/'~assessmentType~'/create.twig' with {stage: 2} %}
+                            {% endif %}
                         {% endif %}
                     </div>
                 </fieldset>
