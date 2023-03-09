@@ -401,7 +401,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
                         'code'               => $classCode,
                         'campus'             => $timePeriod,
                         'room'               => $dayClass['ROOM'],
-                        'staffID'            => $dayClass['TEACHER_CODE'],
+                        'staffID'            => $dayClass['TEACHER_CODE'] ?? '',
                     ];
                 }
             }
@@ -499,7 +499,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
                     'code'               => $classCode,
                     'campus'             => $timePeriod,
                     'room'               => $dayClass['ROOM'],
-                    'staffID'            => $dayClass['TEACHER_CODE'],
+                    'staffID'            => $dayClass['TEACHER_CODE'] ?? '',
                 ];
             }
         }
