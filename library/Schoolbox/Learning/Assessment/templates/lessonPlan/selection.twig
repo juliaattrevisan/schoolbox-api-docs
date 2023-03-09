@@ -132,6 +132,10 @@
 
     {% if lessonPlanTemplates.all|length %}
         {% if template or mageAsync %}
+            {# submit button is only available if any of the following are true:
+             #   * a template is selected
+             #   * you're in a Part 2 of mage, because in that one particular mage usage Part 1 was the selection screen
+             #}
             {{ mage.submitRow(actionLabel ?? 'Create', 'part-2', 'end') }}
         {% endif %}
     {% endif %}
