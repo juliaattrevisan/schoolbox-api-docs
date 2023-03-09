@@ -91,7 +91,7 @@ class Module extends BaseModule
             ->addRoutePreload($matcher, '.*', function ($params) {
 
                 if (array_key_exists('userId', $params)) {
-                    $params['user'] = $this->getUserMapper()->findByIdWithFallback($params['userId']);
+                    $params['user'] = $this->getUserMapper()->findById($params['userId']);
                 }
 
                 if (array_key_exists('folderId', $params)) {
