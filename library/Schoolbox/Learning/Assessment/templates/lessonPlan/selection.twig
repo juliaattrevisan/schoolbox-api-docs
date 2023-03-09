@@ -131,7 +131,7 @@
             {% set createRoute = routeLookup('learningAssessment.getCreateAssessmentForm', { contextType: contextType, contextId: context.id, context: context }) ~ '?lpt=' ~ lessonPlanTemplate.id ~ '&type=' ~ type ~ '&returnUrl=' ~ returnUrl %}
 
             <ul class="flex-list buttons">
-                <li><a href="#" class="button" data-cancel>Cancel</a></li>
+                <li><a class="button" data-cancel>Cancel</a></li>
                 <li><a href="{{ createRoute }}" class="button submit">Use this lesson plan template</a></li>
             </ul>
 
