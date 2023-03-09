@@ -71,6 +71,7 @@ class Mapper extends BaseMapper
         $this->uses('action_status', self::TYPE_STRING, self::COLUMN_ENUM, null, [
             Model::ACTION_STATUS_PENDING,
             Model::ACTION_STATUS_COMPLETED,
+            null
         ]);
         $this->uses('notification_enabled', self::TYPE_BOOLEAN);
 

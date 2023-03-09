@@ -628,7 +628,10 @@ class Controller extends Base
         if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
             $report->setActionsCsv($this->getCsv($post->get('actions')));
             $report->setIncludeRecordsWithoutAction($post->getBool('includeRecordsWithoutAction', false));
-            $report->setActionStatus($post->get('actionStatus'));
+            $actionStatus = in_array($post->get('actionStatus'), [PastoralReport::ACTION_STATUS_PENDING, PastoralReport::ACTION_STATUS_COMPLETED])
+                ? $post->get('actionStatus')
+                : null;
+            $report->setActionStatus($actionStatus);
         }
 
         // Save groups the report is shared with
