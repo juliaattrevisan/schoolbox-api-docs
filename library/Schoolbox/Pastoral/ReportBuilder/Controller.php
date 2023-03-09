@@ -567,18 +567,7 @@ class Controller extends Base
     {
         $post = $this->request->post;
 
-        /* If no years/houses exist in the database, the form will not display any for the user to select, and so none
-         * will be submitted.  In that case, include all students not linked to any years/houses.
-         */
-        $includeStudentsWithoutYear  = $post->getBool('includeStudntsWithoutYear', true);
-        $includeStudentsWithoutHouse = $post->getBool('includeStudentsWithoutHouse', true);
-        // For years and houses, either no-house/year or years/houses need to be selected
-        if (
-            !strlen($post->get('name'))
-            || empty($post->get('types'))
-            || (!$includeStudentsWithoutYear && empty($post->get('years')))
-            || (!$includeStudentsWithoutHouse && empty($post->get('houses')))
-        ) {
+        if (trim($post->get('name')) === '') {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
@@ -623,8 +612,8 @@ class Controller extends Base
         $report->setCampusesCsv($this->getCsv($post->get('campuses')));
         $report->setFoldersCsv(empty($post->get('import_folders')) ? null : $post->get('import_folders'));
 
-        $report->setIncludeStudentsWithoutYear($includeStudentsWithoutYear);
-        $report->setIncludeStudentsWithoutHouse($includeStudentsWithoutHouse);
+        $report->setIncludeStudentsWithoutYear($post->getBool('includeStudentsWithoutYear', true));
+        $report->setIncludeStudentsWithoutHouse($post->getBool('includeStudentsWithoutHouse', true));
 
         if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
             $report->setActionsCsv($this->getCsv($post->get('actions')));
