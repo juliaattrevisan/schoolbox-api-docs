@@ -235,7 +235,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             }
 
             /* Stack classes happening per period,
-             * indexed by (time from, time to) tuple identifier,
+             * indexed by (time from, time to, PeriodNumber) tuple identifier,
              * ordered by PeriodNumberSeq
              *
              * NOTE PeriodNumber is not unique.
@@ -243,11 +243,15 @@ class External_Synergetic_Timetable implements External_TimetableInterface
              * where each row begins at a different time; or, for
              * multiple FileTypes
              *
+             * In appendPeriodsToTimetable, classes are appended to slot based on PeriodNumber.
+             * We should not stack periods with different PeriodNumber.
+             *
              * NOTE Periods might not manifest in a human-sensible order.
              */
-            $index = sprintf('%s - %s',
+            $index = sprintf('%s - %s - %03d',
                 $period['TimeFrom'],
-                $period['TimeTo']
+                $period['TimeTo'],
+                $period['PeriodNumber']
             );
 
             $timetableDef['desc'][$index]     = $period['Description'];
