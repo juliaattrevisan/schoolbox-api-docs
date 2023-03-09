@@ -40,18 +40,18 @@
             <div class="alert-box">
                 {{ config.forgotten_password_desc|purify }}
             </div>
-        {% endif %}
 
-        <form novalidate id="forgottenPassword" action="{{ routeLookup('userPasswordReset.createRequest') }}" method="post" class="top">
-            <section>
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        <label for="email">Email / Username</label>
-                        <input type="text" name="email" id="email" value="{{ email|e('html_attr') }}" />
-                    </div>
-                </fieldset>
-            </section>
-            <input type="submit" value="Send" />
-        </form>
+            <form novalidate id="forgottenPassword" action="{{ routeLookup('userPasswordReset.createRequest') }}" method="post" class="top">
+                <section>
+                    <fieldset class="content">
+                        <div class="small-12 columns">
+                            <label for="email">Email / Username</label>
+                            <input type="text" name="email" id="email" value="{{ email|e('html_attr') }}" />
+                        </div>
+                    </fieldset>
+                </section>
+                <input type="submit" value="Send" />
+            </form>
+        {% endif %}
     </div>
 </div>
