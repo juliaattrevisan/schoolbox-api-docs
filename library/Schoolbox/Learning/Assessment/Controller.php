@@ -282,18 +282,39 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 $data['template'] = null;
                 $data['type'] = $type;
 
-                if ($this->getRequest()->isXhr()) {
-                    $content = $this->buildUnthemedHtmlOutput(sprintf(
-                        '@learningAssessment/%s/selection.twig',
-                        AssessmentType::TYPE_LESSON_PLAN
-                    ), $data);
+                /* If $part-1 is set in the query string param, you came here from the
+                 * Activity Selection screen via Course Builder component. This part
+                 * loads the LPT list asynchronously and injects it into a parent container
+                 *
+                 * Otherwise you need to load the container itself because you came here
+                 * via the Course Creation process...
+                 */
+                if ('' === trim((string)$this->getRequest()->query->get('part-1'))) {
+                    if ($this->getRequest()->isXhr()) {
+                        $content = $this->buildUnthemedHtmlOutput(sprintf(
+                            '@learningAssessment/%s/selectionContainer.twig',
+                            AssessmentType::TYPE_LESSON_PLAN
+                        ), $data);
+                    } else {
+                        /* TODO where is this even used
+                         */
+                        $content = $this->buildHtmlOutput(sprintf(
+                            '@learningAssessment/%s/selectionContainer.twig',
+                            AssessmentType::TYPE_LESSON_PLAN
+                        ), $data);
+                    }
                 } else {
-                    /* TODO where is this even used
-                     */
-                    $content = $this->buildHtmlOutput(sprintf(
-                        '@learningAssessment/%s/selection.twig',
-                        AssessmentType::TYPE_LESSON_PLAN
-                    ), $data);
+                    if ($this->getRequest()->isXhr()) {
+                        $content = $this->buildUnthemedHtmlOutput(sprintf(
+                            '@learningAssessment/%s/selection.twig',
+                            AssessmentType::TYPE_LESSON_PLAN
+                        ), $data);
+                    } else {
+                        $content = $this->buildHtmlOutput(sprintf(
+                            '@learningAssessment/%s/selection.twig',
+                            AssessmentType::TYPE_LESSON_PLAN
+                        ), $data);
+                    }
                 }
             } else {
                 /* Customise the selected LPT
