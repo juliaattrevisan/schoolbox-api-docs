@@ -73,7 +73,7 @@ class Assess_Attempt extends Evaluation_Attempt
         }
         foreach ($rows as $row) {
             $userId = $row['user_id'];
-            if ($excludeReviewed && $results['reviewed_at'] !== null) {
+            if ($excludeReviewed && $row['reviewed_at'] !== null) {
                 continue;
             }
             if (!isset($results[$userId])) {
