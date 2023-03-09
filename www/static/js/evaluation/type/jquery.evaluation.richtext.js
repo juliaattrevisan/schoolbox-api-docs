@@ -1,3 +1,5 @@
+import { CLIENT_RENEG_WINDOW } from "tls";
+
 (function ($) {
     /**
      * Constructor
@@ -50,8 +52,8 @@
     $.fn.evaluationRichText.saveOne = function (element) {
         element.find("textarea[id]").each(function () {
             var identifier = this.id;
-            if (identifier in CKEDITOR.instances) {
-                CKEDITOR.instances[identifier].updateElement();
+            if (identifier in window.sbProps.editors) {
+                window.sbProps.editors[identifier].updateElement();
             }
         });
 
