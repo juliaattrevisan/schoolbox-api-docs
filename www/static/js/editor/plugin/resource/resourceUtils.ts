@@ -2,6 +2,23 @@
  * Various utility functions/helpers for the resource plugin
  */
 
+import type { EditorConfig } from "@js/editor/types/editorTypes";
+
+/**
+ * Get the url of the resource, and if we have specified a baseHref, to then use that
+ *
+ * @param { string } url - the url to reformat
+ * @param { EditorConfig } config - the CKEditor instance config
+ * @returns { URL|string } - the url with the baseHref conditionally added
+ */
+export function getURL(url: string, config: EditorConfig) {
+    // If we are requesting a baseHref to exist, we should be using it...
+    if (config.baseHref) {
+        return new URL(url, config.baseHref);
+    }
+    return url;
+}
+
 /**
  * Returns the extra data attributes that are used to play embedded audio/video
  *
@@ -20,7 +37,7 @@ export function getExtraAttributes() {
 }
 
 /**
- * The resource object, detaling the options returned from the server
+ * The resource object, detailing the options returned from the server
  */
 export type Resource = {
     filesystem: string;
@@ -35,17 +52,18 @@ export type Resource = {
  * Get the image attributes
  *
  * @param { Resource } resource - the resource
+ * @param { EditorConfig } config - the editor config
  * @returns { object } - the image attributes
  */
-export function getAttributes(resource: Resource) {
+export function getAttributes(resource: Resource, config: EditorConfig) {
     if (resource.type === "image") {
-        return getImageAttributes(resource);
+        return getImageAttributes(resource, config);
     }
     if (resource.type === "video") {
-        return getVideoAttributes(resource);
+        return getVideoAttributes(resource, config);
     }
     if (resource.type === "audio") {
-        return getAudioAttributes(resource);
+        return getAudioAttributes(resource, config);
     }
     return {};
 }
@@ -65,11 +83,12 @@ const image = {
  * Get the image attributes
  *
  * @param { Resource } resource - the resource
+ * @param { EditorConfig } config - the editor config
  * @returns { object } - the image attributes
  */
-function getImageAttributes(resource: Resource) {
+function getImageAttributes(resource: Resource, config: EditorConfig) {
     return {
-        src: image.source(resource.hash),
+        src: getURL(image.source(resource.hash), config),
         alt: resource.name,
     };
 }
@@ -95,16 +114,18 @@ const video = {
  * "video processing" image if the video is not yet ready
  *
  * @param { Resource } resource - the resource
+ * @param { EditorConfig } config - the editor config
  * @returns { object } - the image attributes
  */
-function getVideoAttributes(resource: Resource) {
+function getVideoAttributes(resource: Resource, config: EditorConfig) {
+    const thumbnail = getURL(video.thumbnail(resource.id, resource.filesystem), config);
     return {
-        src: video.thumbnail(resource.id, resource.filesystem),
+        src: thumbnail,
         alt: resource.name,
         "data-schoolboxresource-type": resource.type,
         "data-schoolboxresource-filesystem": resource.filesystem,
-        "data-schoolboxresource-thumbnail": video.thumbnail(resource.id, resource.filesystem),
-        "data-schoolboxresource-source": video.source(resource.id, resource.filesystem),
+        "data-schoolboxresource-thumbnail": thumbnail,
+        "data-schoolboxresource-source": getURL(video.source(resource.id, resource.filesystem), config),
         "data-schoolboxresource-width": 512,
         "data-schoolboxresource-height": 288,
         "data-schoolboxresource-fullwidth": "false",
@@ -126,32 +147,20 @@ const audio = {
  * Get the audio attributes, with the src just being of a speaker
  *
  * @param { Resource } resource - the resource
+ * @param { EditorConfig } config - the editor config
  * @returns { object } - the audio attributes
  */
-function getAudioAttributes(resource: Resource) {
+function getAudioAttributes(resource: Resource, config: EditorConfig) {
+    const thumbnail = getURL(audio.thumbnail, config);
     return {
-        src: audio.thumbnail,
+        src: thumbnail,
         alt: resource.name,
         "data-schoolboxresource-type": resource.type,
         "data-schoolboxresource-filesystem": resource.filesystem,
-        "data-schoolboxresource-thumbnail": audio.thumbnail,
-        "data-schoolboxresource-source": audio.source(resource.id, resource.filesystem),
+        "data-schoolboxresource-thumbnail": thumbnail,
+        "data-schoolboxresource-source": getURL(audio.source(resource.id, resource.filesystem), config),
         "data-schoolboxresource-width": 64,
         "data-schoolboxresource-height": 64,
         "data-schoolboxresource-fullwidth": "false",
     };
-}
-
-/**
- * Get the url of the resource, and if we have specified a baseHref, to then use that
- *
- * @param { string } url - the url to reformat
- * @param { object } config - the CKEditor instance config
- */
-export function getUrl(url: string, config: object) {
-    // If we are requesting a baseHref to exist, we should be using it...
-    if (config.sbConfig.baseHref) {
-        url = new URL(url, config.sbConfig.baseHref);
-    }
-    return url;
 }

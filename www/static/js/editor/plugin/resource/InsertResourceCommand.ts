@@ -5,6 +5,7 @@
 import Command from "@ckeditor/ckeditor5-core/src/command";
 import { getAttributes } from "./resourceUtils";
 import type { Resource } from "./resourceUtils";
+import type { EditorConfig } from "@js/editor/types/editorTypes";
 
 /**
  * Display the resource modal to select a file from
@@ -44,7 +45,7 @@ async function getResourceInfo(hash: string) {
             },
         });
         const resource = (await response.json()) as Resource;
-        const attributes = getAttributes(resource);
+        const attributes = getAttributes(resource, editor.config.sbConfig as EditorConfig);
         const imageUtils = editor.plugins.get("ImageUtils");
         imageUtils.insertImage(attributes, editor.model.document.selection, "imageInline");
     } catch (error) {
@@ -66,7 +67,7 @@ function onResourceReturned(event: MessageEvent) {
     } catch (error: SyntaxError) {
         message = event.data;
     }
-    if (message.data != undefined) {
+    if (message.data !== undefined) {
         if (0 in message.data && "hash" in message.data[0]) {
             window.removeEventListener("message", onResourceReturned);
             getResourceInfo(message.data[0].hash as string);
