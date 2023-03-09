@@ -1,5 +1,4 @@
-<script src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
-<script src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 {% set awardType = isGoal ? 'goal' : 'achievement' %}
 {% set title = 'Award ' ~ (awardType | capitalize) ~ ((badges | length > 1) ? 's' : '') %}
 {% import 'sub/breadcrumbs.twig' as bread %}

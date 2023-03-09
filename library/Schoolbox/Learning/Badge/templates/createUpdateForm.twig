@@ -278,8 +278,7 @@
     </div>
 </div>
 
-<script src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
-<script src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
 {% autoescape 'js' %}
@@ -288,15 +287,14 @@
     $(function () {
         // Set up editor
         let editorId = 'badge-body';
-        $.fn.alaressEditor({
-            targetElements: $('#' + editorId)
-        });
-
-
-        // Update the editor's form input on change
-        // (required so that validation triggers)
-        CKEDITOR.instances[editorId].on('change', CKEDITOR.instances[editorId].updateElement);
-
+        /**
+         * Initialise the editor
+         */
+        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+            detail: {
+                targetElements: ['#' + editorId],
+            }
+        }));
 
         // Disable goal expiry input if this badge isn't a goal
         let $badgeGoalExpiryInput = $('#badge-goal-expiry');

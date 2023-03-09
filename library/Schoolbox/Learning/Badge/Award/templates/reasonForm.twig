@@ -38,18 +38,17 @@
 </div>
 <script>
 
-    /**
-     * Add the ckeditor config, adding the user token if the user is an admin
-     */
-    const baseConfig = {
-        targetElements: $('#reason')
-    };
-    {% if USER.role.staff %}
-    $.fn.alaressEditor($.alaressEditorConfigWithUserTokens(baseConfig));
-    {% else %}
-    $.fn.alaressEditor(baseConfig);
-    {% endif %}
-
+    $(function () {
+        /**
+         * Initialise the editor, enabling tokens if the user is staff
+         */
+        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+            detail: {
+                targetElements: ['#reason'],
+                {% if USER.role.staff %}hasTokens: true,{% endif %}
+            }
+        }));
+    });
     $('#evidence-form').alaressValidate();
 
 </script>
