@@ -1,12 +1,16 @@
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/select-all/attacher.select-all.js?v={{ config.site_version }}"></script>
 
 <script type="text/javascript">
     $(function() {
-        $.fn.alaressEditor({
-            file_browser_category_id : {% if record is defined %}{{ record.getFolder.getId }}{% else %}{{ folder.getId }}{% endif %}
-        });
+        /**
+         * Initialise the editor, enabling tokens if the user is staff
+         */
+        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+            detail: {
+                targetElements: ['#body'],
+            }
+        }));
 
         $('#blogForm').alaressValidate();
 
