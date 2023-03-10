@@ -68,7 +68,11 @@ class Mapper extends BaseMapper
         $this->uses('include_students_without_house', self::TYPE_BOOLEAN);
 
         $this->uses('include_records_without_action', self::TYPE_BOOLEAN);
-        $this->uses('include_uncompleted_actions_only', self::TYPE_BOOLEAN);
+        $this->uses('action_status', self::TYPE_STRING, self::COLUMN_ENUM, null, [
+            Model::ACTION_STATUS_PENDING,
+            Model::ACTION_STATUS_COMPLETED,
+            null
+        ]);
         $this->uses('notification_enabled', self::TYPE_BOOLEAN);
 
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
@@ -330,7 +334,7 @@ class Mapper extends BaseMapper
 
         // Folder
         $folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
-        $folderIds = $folderMapper->findFolderIdsForUser(
+        $folderIds    = $folderMapper->findFolderIdsForUser(
             $pastoral->getStudent(),
             true,
             UserAccess::ACCESS_READ,
@@ -347,19 +351,31 @@ class Mapper extends BaseMapper
 
         // Action
         if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
-            $actionWheres = [];
-            foreach ($pastoral->getRecordActions() as $i => $action) {
-                if ($action->getCompleted()) {
-                    $actionWheres[] = "(CONCAT(',', `actions`, ',') LIKE :actionLike$i AND `include_uncompleted_actions_only` = 0)";
-                } else {
-                    $actionWheres[] = "CONCAT(',', `actions`, ',') LIKE :actionLike$i";
-                }
-                $params["actionLike$i"] = "%,{$action->getAction()->getId()},%";
-            }
             if ($pastoral->getRecordActions()->count() === 0) {
                 $wheres[] = "(`actions` IS NULL OR `include_records_without_action` = 1)";
             } else {
+                $actionWheres       = [];
+                $hasCompletedAction = false;
+                $hasPendingAction   = false;
+                /** @var \Schoolbox\Pastoral\RecordAction\Model $action */
+                foreach ($pastoral->getRecordActions() as $i => $action) {
+                    if ($action->getCompleted()) {
+                        $hasCompletedAction = true;
+                    } else {
+                        $hasPendingAction = true;
+                    }
+                    $actionWheres[]         = "CONCAT(',', `actions`, ',') LIKE :actionLike$i";
+                    $params["actionLike$i"] = "%,{$action->getAction()->getId()},%";
+                }
                 $wheres[] = sprintf("(`actions` IS NULL OR %s)", implode(' OR ', $actionWheres));
+                // if this record has both completed and pending, this should appear regardless of report's action status setting
+                if ($hasPendingAction && !$hasCompletedAction) {
+                    // must not appear on completed only report
+                    $wheres[] = sprintf("(`action_status` != '%s')", Model::ACTION_STATUS_COMPLETED);
+                } elseif (!$hasPendingAction && $hasCompletedAction) {
+                    // must not appear on pending only report
+                    $wheres[] = sprintf("(`action_status` != '%s')", Model::ACTION_STATUS_PENDING);
+                }
             }
         }
 

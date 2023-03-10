@@ -51,7 +51,7 @@ class Model implements ISoftDeletable
     public const ORDER_YEAR        = 'year';
     public const ORDER_AUTHOR      = 'author';
     public const ORDER_HOUSE       = 'house';
-    public const ORDER_CAMPUS = 'campus';
+    public const ORDER_CAMPUS      = 'campus';
 
     public const ORDER_FIELDS = [
         self::ORDER_CREATED_AT  => 'Created Date',
@@ -63,8 +63,11 @@ class Model implements ISoftDeletable
         self::ORDER_POINTS      => 'Points',
         self::ORDER_YEAR        => 'Year Level',
         self::ORDER_HOUSE       => 'House',
-        self::ORDER_CAMPUS       => 'Campus',
+        self::ORDER_CAMPUS      => 'Campus',
     ];
+
+    public const ACTION_STATUS_PENDING   = 'pending';
+    public const ACTION_STATUS_COMPLETED = 'completed';
 
     /** @var bool $dashboard */
     protected bool $dashboard = false;
@@ -214,9 +217,9 @@ class Model implements ISoftDeletable
     /**
      * Are completed actions excluded in this report?
      *
-     * @var bool
+     * @var string|null
      */
-    private bool $includeUncompletedActionsOnly = false;
+    private ?string $actionStatus = null;
 
     private bool $notificationEnabled = false;
 
@@ -233,7 +236,7 @@ class Model implements ISoftDeletable
         $this->subTypes = new GenericCollection(PastoralSubType\Model::class);
         $this->houses   = new GenericCollection(House::class);
         $this->campuses = new GenericCollection(Campus::class);
-        $this->folders = new GenericCollection(Folder::class);
+        $this->folders  = new GenericCollection(Folder::class);
         $this->actions  = new GenericCollection(Action::class);
         $this->years    = new GenericCollection(\Schoolbox\YearLevel\Model::class);
 
@@ -904,21 +907,21 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return bool
+     * @param string|null $actionStatus
+     * @return static
      */
-    public function getIncludeUncompletedActionsOnly(): bool
+    public function setActionStatus(?string $actionStatus): self
     {
-        return $this->includeUncompletedActionsOnly;
+        $this->actionStatus = $actionStatus;
+        return $this;
     }
 
     /**
-     * @param bool $includeUncompletedActionsOnly
-     * @return static
+     * @return ?string
      */
-    public function setIncludeUncompletedActionsOnly(bool $includeUncompletedActionsOnly): self
+    public function getActionStatus(): string|null
     {
-        $this->includeUncompletedActionsOnly = $includeUncompletedActionsOnly;
-        return $this;
+        return $this->actionStatus;
     }
 
     /**
