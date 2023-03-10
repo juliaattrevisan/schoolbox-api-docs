@@ -102,75 +102,77 @@
                     </div>
                     <script src="{CDN_PREFIX}/js/bundle/slideshow.js"></script>
                     <script>
-                        var init = function() {
-                            let transitionConfig = {
-                                effect: 'slide',
-                            };
+                        (function () {
+                            var init = function() {
+                                let transitionConfig = {
+                                    effect: 'slide',
+                                };
 
-                            switch ('{COMPONENT_CONFIG_SLIDESHOWTRANSITION}') {
-                                case 'fade':
-                                    transitionConfig = {
-                                        effect: 'fade',
-                                        fadeEffect: {
-                                            crossFade: true
-                                        }
-                                    };
-                                    break;
-                                case 'flip':
-                                    transitionConfig = {
-                                        effect: 'flip',
-                                        flipEffect: {
-                                            slideShadows : false,
-                                            limitRotation: true,
-                                        }
-                                    };
-                                    break;
-                                case 'cube':
-                                    transitionConfig = {
-                                        effect: 'cube',
-                                        cubeEffect: {
-                                            slideShadows : false,
-                                            shadow: false,
-                                        }
-                                    };
-                                    break;
-                                case 'creative':
-                                    transitionConfig = {
-                                        effect: 'creative',
-                                        creativeEffect: {
-                                            prev: {
-                                                translate: [0, 0, -400]
-                                            },
-                                            next: {
-                                                translate: ['100%', 0, 0],
+                                switch ('{COMPONENT_CONFIG_SLIDESHOWTRANSITION}') {
+                                    case 'fade':
+                                        transitionConfig = {
+                                            effect: 'fade',
+                                            fadeEffect: {
+                                                crossFade: true
                                             }
+                                        };
+                                        break;
+                                    case 'flip':
+                                        transitionConfig = {
+                                            effect: 'flip',
+                                            flipEffect: {
+                                                slideShadows : false,
+                                                limitRotation: true,
+                                            }
+                                        };
+                                        break;
+                                    case 'cube':
+                                        transitionConfig = {
+                                            effect: 'cube',
+                                            cubeEffect: {
+                                                slideShadows : false,
+                                                shadow: false,
+                                            }
+                                        };
+                                        break;
+                                    case 'creative':
+                                        transitionConfig = {
+                                            effect: 'creative',
+                                            creativeEffect: {
+                                                prev: {
+                                                    translate: [0, 0, -400]
+                                                },
+                                                next: {
+                                                    translate: ['100%', 0, 0],
+                                                }
+                                            }
+                                        };
+                                        break;
+                                }
+
+                                document.dispatchEvent(
+                                    new CustomEvent("swiperInitialize", {
+                                        detail : {
+                                            target: document.getElementById("component{COMPONENT_INSTANCE_ID}-imageslider"),
+                                            options: Object.assign({
+                                                initialSlide: {COMPONENT_RANDOM_SLIDE},
+                                                autoplay: {
+                                                    delay: {COMPONENT_CONFIG_TIMING_VALUE_MS}
+                                                }
+                                            }, transitionConfig)
                                         }
-                                    };
-                                    break;
+                                    })
+                                );
                             }
 
-                            document.dispatchEvent(
-                                new CustomEvent("swiperInitialize", {
-                                    detail : {
-                                        target: document.getElementById("component{COMPONENT_INSTANCE_ID}-imageslider"),
-                                        options: Object.assign({
-                                            initialSlide: {COMPONENT_RANDOM_SLIDE},
-                                            autoplay: {
-                                                delay: {COMPONENT_CONFIG_TIMING_VALUE_MS}
-                                            }
-                                        }, transitionConfig)
-                                    }
-                                })
-                            );
-                        }
-
-                        const component = document.getElementById("component{COMPONENT_INSTANCE_ID}");
-                        const collapser = component.querySelector('[data-collapsable="true"]');
-                        if (collapser.dataset.collapseState === 'uncollapsed') {
-                            init();
-                        } else {
-                            collapser.addEventListener('expandStop.collapsable', init);
-                        }
+                            const component = document.getElementById("component{COMPONENT_INSTANCE_ID}");
+                            const collapser = component.querySelector('[data-collapsable="true"]');
+                            if (collapser.dataset.collapseState === 'uncollapsed') {
+                                init();
+                            } else {
+                                collapser.addEventListener('expandStop.collapsable', init);
+                            }
+                        })();
                     </script>
                     <ul data-dz-container class="inline-list dz-container no-margin">
                         <!-- THIS TEMPLATE WILL BE DETACHED, DON'T WORRY ABOUT THE BAD DOM -->
