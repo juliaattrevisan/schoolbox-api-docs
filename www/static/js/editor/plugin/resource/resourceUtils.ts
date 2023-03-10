@@ -1,5 +1,5 @@
 /**
- * Various utility functions/helpers for the resource plugin
+ * Various utility functions/helpers for the resource plugins
  */
 
 import type { EditorConfig } from "@js/editor/types/editorTypes";
@@ -45,8 +45,19 @@ export type Resource = {
     id: string;
     mime: string;
     name: string;
-    type: string;
+    type: "image" | "video" | "audio" | "folder";
 };
+
+/**
+ * Get the image src
+ *
+ * @param { Resource } resource - the resource
+ * @param { EditorConfig } config - the editor config
+ * @returns { string } - the image src
+ */
+function getImageSrc(resource: Resource, config: EditorConfig) {
+    return getURL(`/storage/image.php?hash=${resource.hash}`, config);
+}
 
 /**
  * Get the image attributes
@@ -54,6 +65,112 @@ export type Resource = {
  * @param { Resource } resource - the resource
  * @param { EditorConfig } config - the editor config
  * @returns { object } - the image attributes
+ */
+function getImageAttributes(resource: Resource, config: EditorConfig) {
+    return {
+        src: getImageSrc(resource, config),
+        alt: resource.name,
+    };
+}
+
+/**
+ * Get the video src
+ *
+ * @param { Resource } resource - the resource
+ * @param { EditorConfig } config - the editor config
+ * @returns { string } - the video src
+ */
+function getVideoSrc(resource: Resource, config: EditorConfig) {
+    return getURL(`/cms/sendVideo.php?id=${resource.id}&type=${resource.filesystem}`, config);
+}
+
+/**
+ * Get the video thumbnail src
+ *
+ * @param { Resource } resource - the resource
+ * @param { EditorConfig } config - the editor config
+ * @returns { string } - the video thumbnail src
+ */
+function getVideoThumb(resource: Resource, config: EditorConfig) {
+    const filesystemWithReplaces = resource.filesystem.replace("browse", "sbfs").replace("store", "storage");
+    return getURL(`/cms/videoThumb.php?size=poster&id=${resource.id}&type=${filesystemWithReplaces}`, config);
+}
+
+/**
+ * Get the video attributes, with the src as a thumbnail of the loaded video or the
+ * "video processing" image if the video is not yet ready
+ *
+ * @param { Resource } resource - the resource
+ * @param { EditorConfig } config - the editor config
+ * @returns { object } - the image attributes
+ */
+function getVideoAttributes(resource: Resource, config: EditorConfig) {
+    const thumbnail = getVideoThumb(resource, config);
+    return {
+        src: thumbnail,
+        alt: resource.name,
+        "data-schoolboxresource-type": resource.type,
+        "data-schoolboxresource-filesystem": resource.filesystem,
+        "data-schoolboxresource-thumbnail": thumbnail,
+        "data-schoolboxresource-source": getVideoSrc(resource, config),
+        "data-schoolboxresource-width": 512,
+        "data-schoolboxresource-height": 288,
+        "data-schoolboxresource-fullwidth": "false",
+    };
+}
+
+/**
+ * Get the audio src
+ *
+ * @param { Resource } resource - the resource
+ * @param { EditorConfig } config - the editor config
+ * @returns { string } - the audio src
+ */
+function getAudioSrc(resource: Resource, config: EditorConfig) {
+    return getURL(`/cms/sendVideo.php?id=${resource.id}&type=${resource.filesystem}`, config);
+}
+
+/**
+ * Get the audio thumbnail src, which is just a generic speaker
+ *
+ * @param { EditorConfig } config - the editor config
+ * @returns { string } - the audio thumbnail src
+ */
+function getAudioThumb(config: EditorConfig) {
+    return getURL(
+        `${window.cdnPrefix}/images/core/component/audio-thumbnail-processing.gif?v=${window.siteVersion}`,
+        config
+    );
+}
+
+/**
+ * Get the audio attributes, with the src just being of a speaker
+ *
+ * @param { Resource } resource - the resource
+ * @param { EditorConfig } config - the editor config
+ * @returns { object } - the audio attributes
+ */
+function getAudioAttributes(resource: Resource, config: EditorConfig) {
+    const thumbnail = getAudioThumb(config);
+    return {
+        src: thumbnail,
+        alt: resource.name,
+        "data-schoolboxresource-type": resource.type,
+        "data-schoolboxresource-filesystem": resource.filesystem,
+        "data-schoolboxresource-thumbnail": thumbnail,
+        "data-schoolboxresource-source": getAudioSrc(resource, config),
+        "data-schoolboxresource-width": 64,
+        "data-schoolboxresource-height": 64,
+        "data-schoolboxresource-fullwidth": "false",
+    };
+}
+
+/**
+ * Get the resource attributes
+ *
+ * @param { Resource } resource - the resource
+ * @param { EditorConfig } config - the editor config
+ * @returns { object } - the resource attributes
  */
 export function getAttributes(resource: Resource, config: EditorConfig) {
     if (resource.type === "image") {
@@ -66,101 +183,4 @@ export function getAttributes(resource: Resource, config: EditorConfig) {
         return getAudioAttributes(resource, config);
     }
     return {};
-}
-
-/**
- * Image urls and regex
- * No thumbnails are used for images
- */
-const image = {
-    source(hash: string) {
-        return `/storage/image.php?hash=${hash}`;
-    },
-    regex: /^\/storage\/image/,
-};
-
-/**
- * Get the image attributes
- *
- * @param { Resource } resource - the resource
- * @param { EditorConfig } config - the editor config
- * @returns { object } - the image attributes
- */
-function getImageAttributes(resource: Resource, config: EditorConfig) {
-    return {
-        src: getURL(image.source(resource.hash), config),
-        alt: resource.name,
-    };
-}
-
-/**
- * Video urls and regex
- */
-const video = {
-    source(id: string, filesystem: string) {
-        return `/cms/sendVideo.php?id=${id}&type=${filesystem}`;
-    },
-    thumbnail(id: string, filesystem: string) {
-        /* Ridiculous quick fix
-         */
-        const filesystemWithReplaces = filesystem.replace("browse", "sbfs").replace("store", "storage");
-        return `/cms/videoThumb.php?size=poster&id=${id}&type=${filesystemWithReplaces}`;
-    },
-    regex: /^\/cms\/sendVideo/,
-};
-
-/**
- * Get the video attributes, with the src as a thumbnail of the loaded video or the
- * "video processing" image if the video is not yet ready
- *
- * @param { Resource } resource - the resource
- * @param { EditorConfig } config - the editor config
- * @returns { object } - the image attributes
- */
-function getVideoAttributes(resource: Resource, config: EditorConfig) {
-    const thumbnail = getURL(video.thumbnail(resource.id, resource.filesystem), config);
-    return {
-        src: thumbnail,
-        alt: resource.name,
-        "data-schoolboxresource-type": resource.type,
-        "data-schoolboxresource-filesystem": resource.filesystem,
-        "data-schoolboxresource-thumbnail": thumbnail,
-        "data-schoolboxresource-source": getURL(video.source(resource.id, resource.filesystem), config),
-        "data-schoolboxresource-width": 512,
-        "data-schoolboxresource-height": 288,
-        "data-schoolboxresource-fullwidth": "false",
-    };
-}
-
-/**
- * Audio urls and regex
- */
-const audio = {
-    source(id: string, filesystem: string) {
-        return `/cms/sendVideo.php?id=${id}&type=${filesystem}`;
-    },
-    thumbnail: `${window.cdnPrefix}/images/core/component/audio-thumbnail-processing.gif?v=${window.siteVersion}`,
-    regex: /^\/cms\/sendVideo/,
-};
-
-/**
- * Get the audio attributes, with the src just being of a speaker
- *
- * @param { Resource } resource - the resource
- * @param { EditorConfig } config - the editor config
- * @returns { object } - the audio attributes
- */
-function getAudioAttributes(resource: Resource, config: EditorConfig) {
-    const thumbnail = getURL(audio.thumbnail, config);
-    return {
-        src: thumbnail,
-        alt: resource.name,
-        "data-schoolboxresource-type": resource.type,
-        "data-schoolboxresource-filesystem": resource.filesystem,
-        "data-schoolboxresource-thumbnail": thumbnail,
-        "data-schoolboxresource-source": getURL(audio.source(resource.id, resource.filesystem), config),
-        "data-schoolboxresource-width": 64,
-        "data-schoolboxresource-height": 64,
-        "data-schoolboxresource-fullwidth": "false",
-    };
 }

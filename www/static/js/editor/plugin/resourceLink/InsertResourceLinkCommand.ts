@@ -12,18 +12,11 @@ import type { EditorConfig } from "@js/editor/types/editorTypes";
  */
 function displayResourceModal() {
     /**
-     * Homepages have a hidden input field containing the homepage id
-     * If that exists, use it; otherwise assume root node 0
-     */
-    const defaultFolderSelector = $("#categoryID").val() ? $("#categoryID").val() : 0;
-    /**
      * Fire of the jQuery plugin to display the resource modal
      */
     $.fn.schoolboxResource({
-        allowedFilesystems: "files",
-        allowedFiles: "image/*,audio/*,video/*,.heic,.heics,.heif",
-        useFolder: false,
-        defaultFolderSelector,
+        allowedFilesystems: "link",
+        allowedFiles: null,
     });
 }
 
@@ -45,9 +38,10 @@ async function getResourceInfo(hash: string) {
             },
         });
         const resource = (await response.json()) as Resource;
-        const attributes = getAttributes(resource, editor.config.sbConfig as EditorConfig);
-        const imageUtils = editor.plugins.get("ImageUtils");
-        imageUtils.insertImage(attributes, editor.model.document.selection, "imageInline");
+        console.warn(resource);
+        // const attributes = getAttributes(resource, editor.config.sbConfig as EditorConfig);
+        // const imageUtils = editor.plugins.get("ImageUtils");
+        // imageUtils.insertImage(attributes, editor.model.document.selection, "imageInline");
     } catch (error) {
         console.error(error);
     }
