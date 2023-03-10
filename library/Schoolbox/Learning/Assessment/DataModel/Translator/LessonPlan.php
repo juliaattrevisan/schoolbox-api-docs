@@ -12,6 +12,7 @@ use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Model as LessonPlanModel;
 use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlanObject;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 
 /**
@@ -64,12 +65,34 @@ class LessonPlan implements IAssessmentTypeTranslator
     /**
      * Copies all attributes from the domainObject to dataModel
      *
-     * @param IAssessable|LessonPlanObject         $domainObject
-     * @param IAssessableDataModel|LessonPlanModel $dataModel
+     * @param IAssessable          $domainObject  A LessonPlanObject instance
+     * @param IAssessableDataModel $dataModel     A LessonPlanModel instance
      * @throws InsufficientHydrationException If domain object is insufficiently hydrated for translation
+     * @throws Exception
      */
     public function translateToDataModel(IAssessable $domainObject, IAssessableDataModel $dataModel): void
     {
+        $lessonPlanFieldMapper = \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Field\Mapper::getInstance();
+
+        /* Remember the Lesson Plan Template that was chosen
+         */
+        $dataModel->setLessonPlanTemplate($domainObject->getLessonPlanTemplate());
+
+        /* Convert each Lesson Plan Template Field to a Lesson Plan Field
+         */
+        $dataModel->setFields($lessonPlanFieldMapper->createCollection());
+
+        foreach ($domainObject->getLessonPlanTemplate()->getFields() as $lessonPlanTemplateField) {
+            $lessonPlanField = $lessonPlanFieldMapper->createModel()
+                ->setLessonPlanTemplateField($lessonPlanTemplateField)
+                ->setTitle($lessonPlanTemplateField->getTitle())
+                ->setBody($lessonPlanTemplateField->getBody())
+                ->setVisibility($lessonPlanTemplateField->getVisibility())
+                ->setSequence($lessonPlanTemplateField->getSequence());
+
+            $dataModel->getFields()->add($lessonPlanField);
+        }
+
         /* TODO whatever this is meant to do, like Tasks
          */
 //        // Translate files
