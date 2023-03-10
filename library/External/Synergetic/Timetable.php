@@ -248,10 +248,11 @@ class External_Synergetic_Timetable implements External_TimetableInterface
              *
              * NOTE Periods might not manifest in a human-sensible order.
              */
-            $index = sprintf('%s - %s - %03d',
+            $index = sprintf(
+                '%s - %s - %03d',
                 $period['TimeFrom'],
                 $period['TimeTo'],
-                $period['PeriodNumber']
+                $period['PeriodNumber'],
             );
 
             $timetableDef['desc'][$index]     = $period['Description'];
