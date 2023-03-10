@@ -25,6 +25,7 @@ use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\CourseManagedFields;
+use Schoolbox\Learning\Assessment\DataModel\LessonPlan;
 use Schoolbox\Learning\Assessment\DataModel\Project\Mapper as ProjectMapper;
 use Schoolbox\Learning\Assessment\DataModel\Project\Model as Project;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkObject;
@@ -1325,8 +1326,8 @@ class MapperProxy
             QuizMapper::getInstance()->save($subObject);
         } elseif ($subObject instanceof LtiAssessment\Model) {
             LtiAssessment\Mapper::getInstance()->save($subObject);
-        } elseif ($subObject instanceof \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Model) {
-            $lessonPlanMapper = \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper::getInstance();
+        } elseif ($subObject instanceof LessonPlan\Model) {
+            $lessonPlanMapper = LessonPlan\Mapper::getInstance();
 
             /* TODO save all the Lesson Plan Fields' values here, too, I think
              */

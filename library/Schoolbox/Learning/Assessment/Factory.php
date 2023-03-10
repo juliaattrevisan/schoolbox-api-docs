@@ -41,7 +41,6 @@ use Schoolbox\Resource\Exception as ResourceException;
 use Schoolbox\User;
 use UnexpectedValueException;
 
-
 /**
  * Class Factory
  *
@@ -260,6 +259,7 @@ class Factory
         /* Lesson Plans
          */
         $this->setLessonPlanTemplateId((int)($post['lessonPlanTemplateId'] ?? null));
+        $this->setLessonPlanFields($post['field'] ?? []);
 
         // Ensure custom fields is an array if it's set
         $customFields = $post['customFields'] ?? null;
@@ -420,6 +420,7 @@ class Factory
              */
             $decorator = new LessonPlan\Decorator\Decorator(
                 $this->getLessonPlanTemplateId(),
+                $this->getLessonPlanFields(),
                 $this->getAttachedFiles()
             );
         } else {

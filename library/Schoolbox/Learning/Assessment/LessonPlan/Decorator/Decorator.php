@@ -35,6 +35,7 @@ class Decorator implements DecoratorInterface
      */
     public function __construct(
         private int $lessonPlanTemplateId,
+        private array $lessonPlanFields,
         private array $attachedFiles
     ) {
     }
@@ -51,9 +52,34 @@ class Decorator implements DecoratorInterface
     {
         /* Slap in the Lesson Plan Template chosen
          */
-        $lessonPlanTemplatemapper = \Schoolbox\Admin\LessonPlan\Template\Mapper::getInstance();
+        $lessonPlanFieldMapper = \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Field\Mapper::getInstance();
+        $lessonPlanTemplateMapper = \Schoolbox\Admin\LessonPlan\Template\Mapper::getInstance();
 
-        $assessment->setLessonPlanTemplate($lessonPlanTemplatemapper->findById($this->lessonPlanTemplateId));
+        /* Hydrate all the template's fields too
+         * We need to remember where a Lesson Plan Field came from,
+         * and also which Lesson Plan Template was used
+         */
+        $lessonPlanTemplate = $lessonPlanTemplateMapper->findById($this->lessonPlanTemplateId);
+
+        $assessment->setLessonPlanTemplate($lessonPlanTemplate);
+
+        /* Convert each Lesson Plan Template Field into a Lesson Plan Field
+         * along with any customisations provided by the user
+         */
+        $assessment->setFields($lessonPlanFieldMapper->createCollection());
+
+        foreach ($this->lessonPlanFields as $fieldId => $field) {
+            $lessonPlanTemplateField = $lessonPlanTemplate->getFields()->getBy('id', $fieldId);
+
+            $lessonPlanField = $lessonPlanFieldMapper->createModel()
+                ->setLessonPlanTemplateField($lessonPlanTemplateField)
+                ->setTItle($lessonPlanTemplateField->getTitle())
+                ->setBody($field['body'])
+                ->setVisibility($lessonPlanTemplateField->getVisibility())
+                ->setSequence($lessonPlanTemplateField->getSequence());
+
+            $assessment->getFields()->add($lessonPlanField);
+        }
 
         /* Process each of attached files separately
          */

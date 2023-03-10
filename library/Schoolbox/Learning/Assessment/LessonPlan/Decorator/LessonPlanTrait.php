@@ -20,6 +20,12 @@ trait LessonPlanTrait
 
 
     /**
+     * @var array
+     */
+    private ?array $lessonPlanFields = null;
+
+
+    /**
      * @return int|null
      */
     public function getLessonPlanTemplateId(): ?int
@@ -35,6 +41,26 @@ trait LessonPlanTrait
     public function setLessonPlanTemplateId(?int $lessonPlanTemplateId): self
     {
         $this->lessonPlanTemplateId = $lessonPlanTemplateId;
+        return $this;
+    }
+
+
+    /**
+     * @return array|null
+     */
+    public function getLessonPlanFields(): ?array
+    {
+        return $this->lessonPlanFields;
+    }
+
+
+    /**
+     * @param array|null $lessonPlanFields
+     * @return Factory|LessonPlanTrait
+     */
+    public function setLessonPlanFields(?array $lessonPlanFields): self
+    {
+        $this->lessonPlanFields = $lessonPlanFields;
         return $this;
     }
 }
