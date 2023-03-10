@@ -26,6 +26,14 @@ trait LessonPlanTrait
 
 
     /**
+     * Whether this Lesson Plan is visible to students or just staff
+     *
+     * @var string|null
+     */
+    private ?string $lessonPlanVisibility = null;
+
+
+    /**
      * @return int|null
      */
     public function getLessonPlanTemplateId(): ?int
@@ -61,6 +69,26 @@ trait LessonPlanTrait
     public function setLessonPlanFields(?array $lessonPlanFields): self
     {
         $this->lessonPlanFields = $lessonPlanFields;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getLessonPlanVisibility(): ?string
+    {
+        return $this->lessonPlanVisibility;
+    }
+
+
+    /**
+     * @param string|null $lessonPlanVisibility
+     * @return Factory|LessonPlanTrait
+     */
+    public function setLessonPlanVisibility(?string $lessonPlanVisibility): self
+    {
+        $this->lessonPlanVisibility = $lessonPlanVisibility;
         return $this;
     }
 }

@@ -82,6 +82,8 @@ class LessonPlan implements IAssessmentTypeTranslator
          */
         $dataModel->setFields($lessonPlanFieldMapper->createCollection());
 
+        $dataModel->setVisibility($domainObject->getVisibility());
+
         foreach ($domainObject->getLessonPlanTemplate()->getFields() as $lessonPlanTemplateField) {
             $lessonPlanField = $lessonPlanFieldMapper->createModel()
                 ->setLessonPlanTemplateField($lessonPlanTemplateField)

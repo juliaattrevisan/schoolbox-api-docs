@@ -260,6 +260,7 @@ class Factory
          */
         $this->setLessonPlanTemplateId((int)($post['lessonPlanTemplateId'] ?? null));
         $this->setLessonPlanFields($post['field'] ?? []);
+        $this->setLessonPlanVisibility($post['lessonPlanVisibility'] ?? \Schoolbox\Role::STUDENT);
 
         // Ensure custom fields is an array if it's set
         $customFields = $post['customFields'] ?? null;
@@ -421,6 +422,7 @@ class Factory
             $decorator = new LessonPlan\Decorator\Decorator(
                 $this->getLessonPlanTemplateId(),
                 $this->getLessonPlanFields(),
+                $this->getLessonPlanVisibility(),
                 $this->getAttachedFiles()
             );
         } else {

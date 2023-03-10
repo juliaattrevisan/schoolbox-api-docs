@@ -17,7 +17,6 @@ use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 
-
 /**
  * Class Decorator
  *
@@ -36,6 +35,7 @@ class Decorator implements DecoratorInterface
     public function __construct(
         private int $lessonPlanTemplateId,
         private array $lessonPlanFields,
+        private string $lessonPlanVisibility,
         private array $attachedFiles
     ) {
     }
@@ -62,6 +62,10 @@ class Decorator implements DecoratorInterface
         $lessonPlanTemplate = $lessonPlanTemplateMapper->findById($this->lessonPlanTemplateId);
 
         $assessment->setLessonPlanTemplate($lessonPlanTemplate);
+
+        /* Decide whether students can see this Lesson Plan
+         */
+        $assessment->setVisibility($this->lessonPlanVisibility);
 
         /* Convert each Lesson Plan Template Field into a Lesson Plan Field
          * along with any customisations provided by the user

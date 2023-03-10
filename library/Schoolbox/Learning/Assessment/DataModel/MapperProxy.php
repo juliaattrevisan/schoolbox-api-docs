@@ -1268,6 +1268,7 @@ class MapperProxy
         ;
         // Save sub-objects
         $subObject = $dataModel->getSubObject();
+
         if ($subObject) {
             $subObject->setId($this->getSubObjectPrimaryKeyValue($subObject));
         } else {
@@ -1332,6 +1333,8 @@ class MapperProxy
             /* TODO save all the Lesson Plan Fields' values here, too, I think
              */
             $lessonPlanMapper->save($subObject);
+
+//            $lessonPlanMapper->saveFields($subObject);
             // $lessonPlanMapper->saveFiles($subObject);
         } elseif ($subObject instanceof Project) {
             ProjectMapper::getInstance()->save($subObject);
