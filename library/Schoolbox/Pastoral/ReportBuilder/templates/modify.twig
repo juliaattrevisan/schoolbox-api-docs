@@ -175,11 +175,7 @@
             </section>
             <div class="row">
                 <div class="small-12  {% if config.pastoral_action_enable %}medium-6{% endif %} columns">
-                    <label>
-                        <h2 class="subheader">
-                            <span class="required-with-tip">Record Types</span>
-                        </h2>
-                    </label>
+                    <label><h2 class="subheader"><span>Record Types</span></h2></label>
                     <p class="meta">Select the record types you want to appear in the report</p>
                     <section>
                         <div class="small-12 columns content">
@@ -289,7 +285,7 @@
                                                        {% if report.includeRecordsWithoutAction %}checked{% endif %}
                                                        data-check-action
                                                 >
-                                                <label for="includeRecordsWithoutAction">(No action)</label>
+                                                <label for="includeRecordsWithoutAction">(No Action)</label>
                                             </li>
                                             {% for action in actions %}
                                                 <li>
@@ -329,7 +325,7 @@
                                 involved tick the checkbox below.
                             </p>
                             <input id="involved" name="involved" value="1" type="checkbox"
-                                   {% if report.involved %}checked{% endif %}>
+                               {% if report.involved %}checked{% endif %}>
                             <label for="involved">
                                 Only show records in which you are the author or an audience member
                             </label>
@@ -342,13 +338,8 @@
 
             <div class="row">
                 <div class="small-12 medium-6 columns">
-                    <label>
-                        <h2 class="subheader">
-                            <span class="required-with-tip">Year Levels</span>
-                        </h2>
-                    </label>
+                    <label><h2 class="subheader"><span>Year Levels</span></h2></label>
                     <p class="meta">Select the year levels you want included in the report</p>
-
                     <section>
                         <div class="small-12 columns content">
                             <div class="checklist">
@@ -386,13 +377,8 @@
                 </div>
 
                 <div class="small-12 medium-6 columns">
-                    <label>
-                        <h2 class="subheader">
-                            <span class="required-with-tip">Houses</span>
-                        </h2>
-                    </label>
+                    <label><h2 class="subheader"><span>Houses</span></h2></label>
                     <p class="meta">Select the houses you want included in the report</p>
-
                     <section>
                         <div class="small-12 columns content">
                             <div class="checklist">
@@ -428,12 +414,9 @@
                         </div>
                     </section>
                 </div>
+
                 <div class="small-12 medium-6 columns">
-                    <label>
-                        <h2 class="subheader">
-                            <span class="required-with-tip">Campuses</span>
-                        </h2>
-                    </label>
+                    <label><h2 class="subheader"><span>Campuses</span></h2></label>
                     <p class="meta">Select the campuses you want included in the report</p>
 
                     <section>
@@ -700,22 +683,6 @@
         $reportForm.alaressValidate({
             rules: {
                 'name': 'required',
-                'types[]': 'required',
-                'years[]': {
-                    required: {
-                        depends: function () {
-                            return $('#includeStudentsWithoutYear').prop('checked') === false;
-                        }
-                    }
-                },
-                'houses[]': {
-                    required: {
-                        depends: function () {
-                            return $('#includeStudentsWithoutHouse').prop('checked') === false;
-                        }
-                    }
-                },
-                'campuses[]': 'required',
                 'after': {
                     datepickerDate: {
                         depends: function (element) {
@@ -731,19 +698,12 @@
                     }
                 }
             },
-            messages: {
-                'types[]': 'You must select at least one record type to show in the report',
-                'years[]': 'You must select at least one year level to show in the report',
-                'houses[]': 'You must select at least one house to show in the report',
-                'campuses[]': 'You must select at least one campus to show in the report'
-            },
             submitHandler: function (form) {
                 {# Prior to submitting the form we need to set the hidden `order` #}
                 var order = $.makeArray(
-                        $('#sort-order').children('li')
-                                .map(function () {
-                                    return $(this).data('order');
-                                })
+                    $('#sort-order').children('li').map(function () {
+                        return $(this).data('order');
+                    })
                 );
 
                 $('#order').val(order.join(','));

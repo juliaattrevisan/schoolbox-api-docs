@@ -310,18 +310,18 @@ class Mapper extends BaseMapper
 
         // Year level
         if ($pastoral->getStudent()->getYear()) {
-            $wheres[]           = "CONCAT(',', `years`, ',') LIKE :yearLike";
+            $wheres[]           = "`years` IS NULL OR CONCAT(',', `years`, ',') LIKE :yearLike";
             $params["yearLike"] = "%,{$pastoral->getStudent()->getYear()->getId()},%";
         } else {
-            $wheres[] = "`include_students_without_year` = 1";
+            $wheres[] = "`years` IS NULL OR `include_students_without_year` = 1";
         }
 
         // House
         if ($pastoral->getStudent()->getSchoolHouse()) {
-            $wheres[]            = "CONCAT(',', `houses`, ',') LIKE :houseLike";
+            $wheres[]            = "`houses` IS NULL OR CONCAT(',', `houses`, ',') LIKE :houseLike";
             $params["houseLike"] = "%,{$pastoral->getStudent()->getSchoolHouse()->getId()},%";
         } else {
-            $wheres[] = "`include_students_without_house` = 1";
+            $wheres[] = "`houses` IS NULL OR `include_students_without_house` = 1";
         }
 
         // Campus
@@ -330,6 +330,7 @@ class Mapper extends BaseMapper
             $campusWheres[]         = "CONCAT(',', `campuses`, ',') LIKE :campusLike$i";
             $params["campusLike$i"] = "%,{$campus->getId()},%";
         }
+        $campusWheres[] = "`campuses` IS NULL ";
         $wheres[] = sprintf("(%s)", implode(' OR ', $campusWheres));
 
         // Folder

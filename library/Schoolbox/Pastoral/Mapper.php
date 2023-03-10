@@ -841,6 +841,10 @@ class Mapper extends BaseMapper
 
         $orderSql = '';
 
+        // Desired behaviour of filters:
+        //  * If no option at all is selected in any particular section, no filters should be applied
+        //    (so in effect, we want 'WHERE TRUE' for that section).
+
         if ($before_date instanceof Alaress_Date_Format) {
             $this->bindings[':beforeDate'] = $before_date->endOfDay()
                                                          ->toIso8601String();
@@ -861,10 +865,23 @@ class Mapper extends BaseMapper
         }
 
         $this->addFilter($students, '`student_id`');
-        $this->addYearFilter($years, $includeStudentsWithoutYear);
-        $this->addHouseFilter($houses, $includeStudentsWithoutHouse);
-        $this->addCampusFilter($campuses);
-        $this->addTypeFilter($types, $subtypes);
+
+        if ($includeStudentsWithoutYear || $years->count() > 0) {
+            $this->addYearFilter($years, $includeStudentsWithoutYear);
+        }
+
+        if ($includeStudentsWithoutHouse || $houses->count() > 0) {
+            $this->addHouseFilter($houses, $includeStudentsWithoutHouse);
+        }
+
+        if ($campuses->count() > 0) {
+            $this->addCampusFilter($campuses);
+        }
+
+        if ($types->count() > 0) {
+            $this->addTypeFilter($types, $subtypes);
+        }
+
         $this->addFilter($authors, '`owner_id`');
 
         $join = '';
@@ -951,7 +968,7 @@ class Mapper extends BaseMapper
         $criteriaSql = ' WHERE pastoral.deleted_at IS NULL ';
 
         if (!empty($criteriaParts)) {
-            $criteriaSql .= ' AND' . implode(' AND ', $criteriaParts);
+            $criteriaSql .= ' AND ' . implode(' AND ', $criteriaParts);
         }
 
         // Execute SQL

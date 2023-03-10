@@ -567,17 +567,7 @@ class Controller extends Base
     {
         $post = $this->request->post;
 
-        /* User must supply name, types, years and houses
-         */
-        $includeStudentsWithoutYear  = $post->getBool('includeStudentsWithoutYear', false);
-        $includeStudentsWithoutHouse = $post->getBool('includeStudentsWithoutHouse', false);
-        // For years and houses, either no-house/year or years/houses need to be selected
-        if (
-            !strlen($post->get('name'))
-            || empty($post->get('types'))
-            || (!$includeStudentsWithoutYear && empty($post->get('years')))
-            || (!$includeStudentsWithoutHouse && empty($post->get('houses')))
-        ) {
+        if (trim($post->get('name')) === '') {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
@@ -622,8 +612,8 @@ class Controller extends Base
         $report->setCampusesCsv($this->getCsv($post->get('campuses')));
         $report->setFoldersCsv(empty($post->get('import_folders')) ? null : $post->get('import_folders'));
 
-        $report->setIncludeStudentsWithoutYear($includeStudentsWithoutYear);
-        $report->setIncludeStudentsWithoutHouse($includeStudentsWithoutHouse);
+        $report->setIncludeStudentsWithoutYear($post->getBool('includeStudentsWithoutYear', false));
+        $report->setIncludeStudentsWithoutHouse($post->getBool('includeStudentsWithoutHouse', false));
 
         if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
             $report->setActionsCsv($this->getCsv($post->get('actions')));
