@@ -38,6 +38,8 @@ class TransformFormat
      */
     private const FORMAT_MAP = [
         'image/heif'    => 'jpg',
+        'image/avif'    => 'jpg',
+        'image/jfif'    => 'jpg',
         'image/heic'    => 'jpg',
         'image/tiff'    => 'jpg',
         'image/jpeg'    => 'jpg',
