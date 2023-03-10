@@ -12,6 +12,9 @@ use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\AttachedFilesTrait;
 use Schoolbox\Learning\Assessment\DecoratorInterface;
 use Schoolbox\Learning\Assessment\LessonPlan;
+use Schoolbox\Learning\Assessment\LessonPlan\Model;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 
 
@@ -30,18 +33,28 @@ class Decorator implements DecoratorInterface
      *
      * @param array|string[] $attachedFiles
      */
-    public function __construct(private array $attachedFiles)
-    {
+    public function __construct(
+        private int $lessonPlanTemplateId,
+        private array $attachedFiles
+    ) {
     }
 
 
     /**
-     * @param \Schoolbox\Learning\Assessment\LessonPlan\Model $assessment
+     * @param Model $assessment
      * @throws \InvalidArgumentException
+     * @throws Exception
+     * @throws Deleted
      * @throws \UnexpectedValueException
      */
     public function decorate($assessment): void
     {
+        /* Slap in the Lesson Plan Template chosen
+         */
+        $lessonPlanTemplatemapper = \Schoolbox\Admin\LessonPlan\Template\Mapper::getInstance();
+
+        $assessment->setLessonPlanTemplate($lessonPlanTemplatemapper->findById($this->lessonPlanTemplateId));
+
         /* Process each of attached files separately
          */
         $newList = new Collection();

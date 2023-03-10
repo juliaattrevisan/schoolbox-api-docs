@@ -24,6 +24,7 @@ use Schoolbox\Learning\Assessment\LessonPlan;
 use Schoolbox\Learning\Assessment\Lti\Decorator\Decorator as LtiDecorator;
 use Schoolbox\Learning\Assessment\Lti\Decorator\LtiTrait;
 use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
+use Schoolbox\Learning\Assessment\LessonPlan\Decorator\LessonPlanTrait;
 use Schoolbox\Learning\Assessment\Project\Decorator\Decorator as ProjectDecorator;
 use Schoolbox\Learning\Assessment\Project\Decorator\ProjectTrait;
 use Schoolbox\Learning\Assessment\Quiz\Decorator\Decorator as QuizDecorator;
@@ -59,6 +60,7 @@ class Factory
     use ProjectTrait;
     use AttachedFilesTrait;
     use LtiTrait;
+    use LessonPlanTrait;
 
     /**
      * Unique identifier
@@ -255,6 +257,10 @@ class Factory
         $this->setLtiAssessmentText($post['ltiAssessmentText'] ?? null);
         $this->setLtiToolId(filter_var($post['ltiToolId'] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE));
 
+        /* Lesson Plans
+         */
+        $this->setLessonPlanTemplateId((int)($post['lessonPlanTemplateId'] ?? null));
+
         // Ensure custom fields is an array if it's set
         $customFields = $post['customFields'] ?? null;
         if (isset($customFields)) {
@@ -413,6 +419,7 @@ class Factory
             /* TODO Add other fields that are LessonPlan specific
              */
             $decorator = new LessonPlan\Decorator\Decorator(
+                $this->getLessonPlanTemplateId(),
                 $this->getAttachedFiles()
             );
         } else {

@@ -1325,7 +1325,7 @@ class MapperProxy
             QuizMapper::getInstance()->save($subObject);
         } elseif ($subObject instanceof LtiAssessment\Model) {
             LtiAssessment\Mapper::getInstance()->save($subObject);
-        } elseif ($subObject instanceof \Schoolbox\Learning\Assessment\LessonPlan\Model) {
+        } elseif ($subObject instanceof \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Model) {
             $lessonPlanMapper = \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper::getInstance();
 
             /* TODO save all the Lesson Plan Fields' values here, too, I think
