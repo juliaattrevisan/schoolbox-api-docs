@@ -94,8 +94,7 @@
 {% endif %}
 
 {# le scripts #}
-<script src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
-<script src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 {% if isAutoSavable %}
     <script src="{{ CDN_PREFIX }}/js/comms/draft.js?v={{ config.site_version }}"></script>
 {% endif %}
@@ -111,24 +110,18 @@
 
     $(function () {
         {# CKEditors #}
-        $.fn.alaressEditor({
-            targetElements: $('#createForm textarea[name=body]')
-        });
+        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+            detail: {
+                targetElements: ["#createForm textarea[name=body]"],
+            }
+        }));
 
-        $.fn.alaressEditor({
-            targetElements: $('#createForm textarea[name=blurb]'),
-            removePlugins: 'uploadimage,schoolboxresource,schoolboxiframe,link,autolink,autoembed',
-            toolbarGroups: [
-                {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
-                {name: 'links', groups: ['links']},
-                /* Custom schoolbox-specific plugin stuff can go here
-                 * This is a hole into which you may put once-off abilities
-                 * for the ckeditor (such as Make Blank, in Quiz/Fillgap)
-                 * This is typically not used for anything else for now
-                 */
-                {name: 'schoolbox', groups: ['schoolboxlink']},
-            ]
-        });
+        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+            detail: {
+                targetElements: ["#createForm textarea[name=blurb]"],
+                isSimple: true,
+            }
+        }));
 
         $('[data-collapser]').collapsable();
 
@@ -212,6 +205,7 @@
             staller: $submitButton
         });
 
+        console.log("Hi {{ isAutoSavable }}")
 
         {% if isAutoSavable %}
         // Init draft plugin

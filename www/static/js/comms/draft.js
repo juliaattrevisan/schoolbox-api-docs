@@ -79,7 +79,19 @@
             var i;
             for (i = 0; i < config.textareas.length; i++) {
                 var key = config.textareas[i];
-                CKEDITOR.instances[key].on("change", checkForChanges); // CKE seems to trigger change on keyup so no need to listen for that here
+                if (key in window.sbProps.editors) {
+                    window.sbProps.editors[key].editing.view.document.on("blur", function () {
+                        checkForChanges();
+                    });
+                } else {
+                    // If the editor hasn't been created yet, wait for it to be created
+                    document.getElementById(key).addEventListener("EDITOR__CREATED", onEditorCreated);
+                    function onEditorCreated(event) {
+                        event.detail.editor.editing.view.document.on("blur", function () {
+                            checkForChanges();
+                        });
+                    }
+                }
             }
 
             // Listen for changes to attachzones
@@ -141,7 +153,7 @@
 
                 formContents.push({
                     name: key,
-                    value: CKEDITOR.instances[key].getData(),
+                    value: window.sbProps.editors[key].getData(),
                 });
             }
 
