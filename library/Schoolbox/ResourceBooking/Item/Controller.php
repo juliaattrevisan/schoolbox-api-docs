@@ -307,7 +307,7 @@ class Controller extends Base
     {
         $this->mapper->delete($item);
         $this->getResponse()->redirect->afterPost(
-            $this->getRouter()->generate('resourceItem.browse', [])
+            $this->getRouter()->generate('resourceItem.browse', ['format' => ''])
         );
     }
 
