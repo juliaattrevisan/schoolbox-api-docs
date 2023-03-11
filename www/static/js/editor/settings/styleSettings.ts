@@ -31,44 +31,44 @@ export function getStyleSettings() {
                 {
                     name: "Banner",
                     element: "p",
-                    classes: ["s-banner"],
+                    classes: ["ck-s-banner"],
                 },
                 {
                     name: "Info Callout",
                     element: "p",
-                    classes: ["s-callout", "s-callout--info"],
+                    classes: ["ck-s-callout", "ck-s-callout--info"],
                 },
                 {
                     name: "Warning Callout",
                     element: "p",
-                    classes: ["s-callout", "s-callout--warning"],
+                    classes: ["ck-s-callout", "ck-s-callout--warning"],
                 },
                 {
                     name: "Success Callout",
                     element: "p",
-                    classes: ["s-callout", "s-callout--success"],
+                    classes: ["ck-s-callout", "ck-s-callout--success"],
                 },
                 {
                     name: "Target Callout",
                     element: "p",
-                    classes: ["s-callout", "s-callout--target"],
+                    classes: ["ck-s-callout", "ck-s-callout--target"],
                 },
                 {
                     name: "Question Callout",
                     element: "p",
-                    classes: ["s-callout", "s-callout--question"],
+                    classes: ["ck-s-callout", "ck-s-callout--question"],
                 },
                 {
                     name: "Sticky Note",
                     element: "p",
-                    classes: ["s-sticky-note"],
+                    classes: ["ck-s-sticky-note"],
                 },
                 {
                     name: "Construction",
                     element: "p",
-                    classes: ["s-construction"],
+                    classes: ["ck-s-construction"],
                 },
-                { name: "Code block", element: "p", classes: ["s-code-block"] },
+                { name: "Code block", element: "p", classes: ["ck-s-code-block"] },
             ],
         },
     };
