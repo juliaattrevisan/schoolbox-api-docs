@@ -1,6 +1,5 @@
 {# I need some way of adding custom_head #}
-<link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/vendors/spectrum/spectrum.css?v={{ config.site_version }}" />
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/spectrum.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/colourPicker.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/attacher/attacher.hide-watch.js?v={{ config.site_version }}"></script>
 <script type="text/javascript">
 (function($) {
@@ -10,30 +9,23 @@
         form.alaressValidate();
 
         // Init colorpickers
-        $('input[data-colorpicker]').spectrum(
-            $.extend(
-                {},
-                window.sbProps.spectrum,
-                {
-                    allowEmpty: true,
-                    change: function (color) {if (color !== null) {$(this).val(color.toRgbString());}},
-                    hide: function (color) {if (color !== null) {$(this).val(color.toRgbString());}},
-                    preferredFormat: 'rgb',
-                    showAlpha: true
-                }
-            )
-        ).each(function() {
-            // when I select a color on a transparent element,
-            // what I really mean is I want to select an opaque color.
-            // Setting the color to an opaque equivalent, then clearing it,
-            // preserves the alpha channel for when I next select a color.
-            var element = $(this);
-            var color   = element.spectrum('get');
-            if (color.getAlpha() == 0) {
-                color.setAlpha(1);
-                element.spectrum('set', color);
-                element.spectrum('set', null);
+        const currentPickerId = 0;
+        const colourPickers = document.querySelectorAll("input[data-colorpicker]");
+        colourPickers.forEach((colourPicker) => {
+            // Ensure each picker has a unique ID to use as a target
+            if (colourPicker.id === "") {
+                colourPicker.id = `colourPicker${currentPickerId}`;
+                currentPickerId += 1;
             }
+
+            document.dispatchEvent(
+                new CustomEvent("colourPickerInitialize", {
+                    detail: {
+                        target: `#${colourPicker.id}`,
+                        options: {},
+                    },
+                })
+            );
         });
     })
 })(jQuery);
@@ -432,4 +424,3 @@
         </form>
     </div>
 </div>
-

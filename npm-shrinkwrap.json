@@ -73,7 +73,6 @@
                 "pinia": "~2.0.29",
                 "qrcode.vue": "~3.3.3",
                 "qs": "~6.10.3",
-                "spectrum-colorpicker": "~1.8.1",
                 "strtotime": "~1.0.0",
                 "swiper": "^9.0.4",
                 "tinycolor2": "~1.5.2",
@@ -39235,11 +39234,6 @@
             "resolved": "https://registry.npmjs.org/spdx-license-ids/-/spdx-license-ids-3.0.11.tgz",
             "integrity": "sha512-Ctl2BrFiM0X3MANYgj3CkygxhRmr9mi6xhejbdO960nF6EDJApTYpn0BQnDKlnNBULKiCN1n3w9EBkHK8ZWg+g=="
         },
-        "node_modules/spectrum-colorpicker": {
-            "version": "1.8.1",
-            "resolved": "https://registry.npmjs.org/spectrum-colorpicker/-/spectrum-colorpicker-1.8.1.tgz",
-            "integrity": "sha512-x1picQ5giVso71ESII7jZ3+ZFdit8WthNkzwJqLNdPDPzrltKUQGpTohWyPfSAID+bK1zGdO6bDbSh1S6GoLYA=="
-        },
         "node_modules/split-string": {
             "version": "3.1.0",
             "resolved": "https://registry.npmjs.org/split-string/-/split-string-3.1.0.tgz",
@@ -73185,11 +73179,6 @@
             "version": "3.0.11",
             "resolved": "https://registry.npmjs.org/spdx-license-ids/-/spdx-license-ids-3.0.11.tgz",
             "integrity": "sha512-Ctl2BrFiM0X3MANYgj3CkygxhRmr9mi6xhejbdO960nF6EDJApTYpn0BQnDKlnNBULKiCN1n3w9EBkHK8ZWg+g=="
-        },
-        "spectrum-colorpicker": {
-            "version": "1.8.1",
-            "resolved": "https://registry.npmjs.org/spectrum-colorpicker/-/spectrum-colorpicker-1.8.1.tgz",
-            "integrity": "sha512-x1picQ5giVso71ESII7jZ3+ZFdit8WthNkzwJqLNdPDPzrltKUQGpTohWyPfSAID+bK1zGdO6bDbSh1S6GoLYA=="
         },
         "split-string": {
             "version": "3.1.0",

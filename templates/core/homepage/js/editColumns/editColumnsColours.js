@@ -60,17 +60,30 @@ function getSelectedColumnCheckboxes() {
  * Initiate the colour pickers
  */
 function initColourPickers() {
-    $(COLOUR_PICKERS_SELECTOR).spectrum(
-        $.extend({}, window.sbProps.spectrum, {
-            allowEmpty: true,
-            showAlpha: true,
-        })
-    );
-    $(COLOUR_PICKERS_SELECTOR).on("change.spectrum, move.spectrum", (event, colour) => {
-        // Apply when there's a colour selected, otherwise set the colour as black transparent,
-        // as the 'Clear Color Selection' button has been selected.
-        const colourAsRGB = colour instanceof tinycolor ? colour.toRgbString() : "rgba(0, 0, 0, 0)";
-        onColourChange(event.currentTarget, colourAsRGB);
+    const currentPickerId = 0;
+    const colourPickers = getAllColourPickers();
+    colourPickers.forEach((colourPicker) => {
+        // Ensure each picker has a unique ID to use as a target
+        if (colourPicker.id === "") {
+            colourPicker.id = `colourPicker${currentPickerId}`;
+            currentPickerId += 1;
+        }
+
+        document.dispatchEvent(
+            new CustomEvent("colourPickerInitialize", {
+                detail: {
+                    target: `#${colourPicker.id}`,
+                    options: {},
+                },
+            })
+        );
+
+        colourPicker.addEventListener("input", (event) => {
+            onColourChange(event.currentTarget, event.currentTarget.value);
+        });
+        colourPicker.addEventListener("change", (event) => {
+            onColourChange(event.currentTarget, event.currentTarget.value);
+        });
     });
 }
 
@@ -81,13 +94,13 @@ function initColourPickers() {
  * @param { Element }
  * @param { String }
  */
-function onColourChange(element, colourAsRGB) {
+function onColourChange(element, colour) {
     const elementId = element.id;
     const selectedColumnCheckboxes = getSelectedColumnCheckboxes();
     for (let i = 0; i < selectedColumnCheckboxes.length; i++) {
         //run though each selected column and apply the colour change
         const colourId = `${selectedColumnCheckboxes[i].id}_${elementId}`; //for example 'top_head_font'
-        updateColour(colourId, colourAsRGB);
+        updateColour(colourId, colour);
     }
 }
 
@@ -98,11 +111,11 @@ function onColourChange(element, colourAsRGB) {
  * @param { Element }
  * @param { String }
  */
-function updateColour(colourId, colourAsRGB) {
-    COLOURS.pickers[colourId] = colourAsRGB; //update the object for possible future save / reset / undo
+function updateColour(colourId, colour) {
+    COLOURS.pickers[colourId] = colour; //update the object for possible future save / reset / undo
     const colourProperty = `--${colourId.replace(/_/g, "-")}`;
     const homepage = document.getElementById("component-layout");
-    homepage.style.setProperty(colourProperty, colourAsRGB);
+    homepage.style.setProperty(colourProperty, colour);
 }
 
 /**
@@ -139,8 +152,12 @@ function updateColourPickerColours(columnCheckboxes) {
         const checkboxes = columnCheckboxes; //use to retrieve the relevant colours
         const colourList = checkboxes.map((checkbox) => COLOURS.pickers[`${checkbox.id}_${colourPicker.id}`]); //for example top_head_font, left_head_font and right_head_font
         const areAllColoursTheSame = colourList.every((value, index, array) => value === array[0]); //are all colour values within the array the same as the first value in the array
+
         const initialColour = areAllColoursTheSame ? colourList[0] : null; //if all the colours aren't the same, set to null
-        $(colourPicker).spectrum("set", initialColour);
+
+        colourPicker.value = initialColour;
+        colourPicker.dispatchEvent(new Event('input', { bubbles: true }));
+
     });
 }
 
@@ -187,11 +204,13 @@ export function undoColourChanges() {
  * @param { Object }
  */
 function updateAllColours(colourList) {
-    for (const [key, value] of Object.entries(colourList)) {
+    for (let [key, value] of Object.entries(colourList)) {
         //loop through the key/value pairs to revert all colours back
-        //need to ensure assigned colour is always rgb, as if we are moving from rgba to hex, the alpha will not convert
-        const colourAsRGB = tinycolor(value).toRgbString();
-        updateColour(key, colourAsRGB); //in this case key is 'top_head_font' and value could be 'rgba()'
+
+        // If value is of format "ffffff" then append "#" to correct HEX format, otherwise leave as is
+        value = value.length === 6 ? `#${value}` : value;
+
+        updateColour(key, value); //in this case key is 'top_head_font' and value could be 'rgba()'
     }
     displayDefaultColourPickerColours(); //update the colour pickers to reflect the reset
 }

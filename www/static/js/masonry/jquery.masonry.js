@@ -4,7 +4,7 @@
  * as well as the palettes of items from which they can be instantiated.
  *
  * @require     jquery, jquery.qtip
- * @optional    jquery.slider, jquery.sortable, jquery.spectrum, jquery.tabs
+ * @optional    jquery.slider, jquery.sortable, jquery.tabs, colourPicker
  *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -90,10 +90,10 @@
                 $(".saved-layout").hide().slideDown(150).delay(2000).slideUp(150);
             },
         },
-        // Colour control: if `spectrum` or `spectrum.selector` is null, no colour JS will be loaded
-        spectrum: {
+        // Colour control: if `colourPicker` or `colourPicker.selector` is null, no colour JS will be loaded
+        colourPicker: {
             selector: null,
-            // remainder inherited from jquery.masonry.spectrum.js
+            // remainder inherited from jquery.masonry.colourPicker.js
             colours: {},
             url: null,
             inputSelector: "input[data-colorpicker]",
@@ -147,7 +147,7 @@
         this.columns = $(this.element).find(this.options.column.selector);
         this.slider = null;
         this.palette = null;
-        this.spectrum = null;
+        this.colourPicker = null;
 
         /**
          * Decide whether the current page is being displayed on a
@@ -192,8 +192,8 @@
             this.initSlider();
         }
 
-        if (this.options.spectrum && this.options.spectrum.selector) {
-            this.initSpectrum();
+        if (this.options.colourPicker && this.options.colourPicker.selector) {
+            this.initColourPicker();
         }
 
         if (this.options.templateSelector && this.options.templateSelector.selector) {
@@ -456,8 +456,8 @@
                     masonry.saveSorting(element).done(function (response) {
                         masonry.insertComponentInstance($(response), ui.item, false, false);
                     });
-                    if (masonry.spectrum) {
-                        masonry.spectrum.masonrySpectrum("reapplyColors");
+                    if (masonry.colourPicker) {
+                        masonry.colourPicker.masonryColourPicker("reapplyColors");
                     }
                 }
             },
@@ -644,8 +644,8 @@
                 masonry.saveSorting();
             }
             masonry.refreshPalette();
-            if (masonry.spectrum) {
-                masonry.spectrum.masonrySpectrum("reapplyColors");
+            if (masonry.colourPicker) {
+                masonry.colourPicker.masonryColourPicker("reapplyColors");
             }
 
             if (animate) {
@@ -794,15 +794,15 @@
     };
 
     /**
-     * Initialise the Spectrum sub-library
+     * Initialise the colourPicker sub-library
      */
-    Masonry.prototype.initSpectrum = function () {
-        if (this.spectrum) {
-            throw new Error("Spectrum is already initialised");
+    Masonry.prototype.initColourPicker = function () {
+        if (this.colourPicker) {
+            throw new Error("colourPicker is already initialised");
         }
 
         // this sub-library is too big and complicated to live inside here, so it's been split out
-        this.spectrum = $(this.options.spectrum.selector).masonrySpectrum(this);
+        this.colourPicker = $(this.options.colourPicker.selector).masonryColourPicker(this);
     };
 
     /**

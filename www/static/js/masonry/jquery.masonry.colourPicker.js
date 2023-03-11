@@ -5,7 +5,7 @@
  * @link        https://schoolbox.com.au/
  */
 (function ($, window, document, undefined) {
-    var pluginName = "masonrySpectrum",
+    var pluginName = "masonryColourPicker",
         interactionState = "interaction-state";
 
     var defaults = {
@@ -32,30 +32,41 @@
      * @param {Masonry} masonry
      * @constructor
      */
-    function MasonrySpectrum(element, masonry) {
+    function MasonryColourPicker(element, masonry) {
         var mspec = this,
             opt;
 
         this.element = element;
         this.masonry = masonry;
-        this.options = $.extend(true, {}, defaults, masonry.options.spectrum);
+        this.options = $.extend(true, {}, defaults, masonry.options.colourPicker);
 
         opt = this.options;
 
-        $(this.element)
-            .find(this.options.inputSelector)
-            .spectrum(
-                $.extend({}, window.sbProps.spectrum, {
-                    allowEmpty: true,
-                    change: function (colorObject) {
-                        mspec.onColorChange(this, colorObject);
+        const currentPickerId = 0;
+        const colourPickers = this.element.querySelectorAll(this.options.inputSelector);
+        colourPickers.forEach((colourPicker) => {
+            // Ensure each picker has a unique ID to use as a target
+            if (colourPicker.id === "") {
+                colourPicker.id = `colourPicker${currentPickerId}`;
+                currentPickerId += 1;
+            }
+
+            document.dispatchEvent(
+                new CustomEvent("colourPickerInitialize", {
+                    detail: {
+                        target: `#${colourPicker.id}`,
+                        options: {},
                     },
-                    move: function (colorObject) {
-                        mspec.onColorChange(this, colorObject);
-                    },
-                    showAlpha: true,
                 })
             );
+
+            colourPicker.addEventListener("input", (event) => {
+                mspec.onColorChange(event.currentTarget, event.currentTarget.value);
+            });
+            colourPicker.addEventListener("change", (event) => {
+                mspec.onColorChange(event.currentTarget, event.currentTarget.value);
+            });
+        });
 
         // setup colour selectors
         this.loadColorpickerColors();
@@ -146,16 +157,11 @@
      * @param {*} element
      * @param {tinycolor} colorObject
      */
-    MasonrySpectrum.prototype.onColorChange = function (element, colorObject) {
+    MasonryColourPicker.prototype.onColorChange = function (element, color) {
         // Change the colors for the selected items
-        var color = colorObject.toRgbString(),
-            id = element.id,
+        let id = element.id,
             pickers = this.options.colours.pickers,
             mspec = this;
-
-        if (!(colorObject instanceof tinycolor)) {
-            return;
-        }
 
         this.getSelectedColumns().forEach(function (column) {
             var colorId = column + "_" + id;
@@ -169,15 +175,14 @@
      * If multiple columns are selected, and their colors are different,
      * the colorpicker will be blank.
      */
-    MasonrySpectrum.prototype.loadColorpickerColors = function () {
+    MasonryColourPicker.prototype.loadColorpickerColors = function () {
         var columns = this.getSelectedColumns(),
             pickers = this.options.colours.pickers;
 
         $(this.element)
             .find(this.options.inputSelector)
             .each(function () {
-                var element = $(this),
-                    id = this.id;
+                var element = this, id = this.id;
 
                 var colors = columns.map(function (column) {
                     return pickers[column + "_" + id];
@@ -190,9 +195,11 @@
                 });
 
                 if (uniqueColors.length === 1) {
-                    element.spectrum("set", uniqueColors.pop());
+                    element.value = uniqueColors.pop();
+                    element.dispatchEvent(new Event('input', { bubbles: true }));
                 } else {
-                    element.spectrum("set", null);
+                    element.value = "";
+                    element.dispatchEvent(new Event('input', { bubbles: true }));
                 }
             });
     };
@@ -202,7 +209,7 @@
      *
      * @returns {*}
      */
-    MasonrySpectrum.prototype.getSelectedColumns = function () {
+    MasonryColourPicker.prototype.getSelectedColumns = function () {
         return $(this.options.columnSelectorSelector)
             .filter(":checked")
             .map(function () {
@@ -215,7 +222,7 @@
      * @param {object} colours
      * @returns {boolean}
      */
-    MasonrySpectrum.prototype.resetColours = function (colours) {
+    MasonryColourPicker.prototype.resetColours = function (colours) {
         //noinspection AssignmentToFunctionParameterJS
         var masonry = this;
         colours = colours || this.options.colours.defaults;
@@ -228,7 +235,7 @@
     /**
      * @returns {boolean}
      */
-    MasonrySpectrum.prototype.resetWidth = function () {
+    MasonryColourPicker.prototype.resetWidth = function () {
         // Note: foundation slider's set_value is buggy and causes the slider
         // to stop sending change events.
         this.masonry.slider.foundation("slider", "set_value", this.masonry.slider.data("original-value"));
@@ -242,13 +249,11 @@
      * @param color   Color to update to
      * @returns {*}
      */
-    MasonrySpectrum.prototype.updateColor = function (element, color) {
+    MasonryColourPicker.prototype.updateColor = function (element, color) {
         // 1: column, 2: element to update
-        var tinyColor = new tinycolor(color),
-            colorString = tinyColor.toRgbString();
         // Set the value of the CSS var on the masonry's element,
         // as that's where the color vars are defined
-        this.masonry.element.style.setProperty("--" + element.replace(/_/g, "-"), colorString);
+        this.masonry.element.style.setProperty("--" + element.replace(/_/g, "-"), color);
     };
 
     /**
@@ -262,7 +267,7 @@
             var mspec;
 
             if (!$.data(this, "plugin_" + pluginName)) {
-                $.data(this, "plugin_" + pluginName, new MasonrySpectrum(this, masonry));
+                $.data(this, "plugin_" + pluginName, new MasonryColourPicker(this, masonry));
             } else if (typeof masonry == "string") {
                 mspec = $.data(this, "plugin_" + pluginName);
 
