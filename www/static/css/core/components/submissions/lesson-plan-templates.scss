@@ -1,12 +1,159 @@
-.lesson-plan-template-fields li {
-    padding: 1rem;
-    margin-bottom: 1rem;
+.lesson-plan-template-fields {
+    &.s-is-dragging {
+        .ui-sortable-helper {
+            height: 2.5rem !important;
+            overflow: hidden;
+        }
 
-    @media #{$small-only} {
-        padding: 0.5rem;
+        .s-field-contents {
+            display: none;
+            height: 2.5rem !important;
+        }
+
+        .s-topbar {
+            .s-name-display {
+                display: block;
+            }
+        }
     }
 
-    @media #{$medium-only} {
-        padding: 0.75rem;
+    .s-placeholder {
+        background-color: var(--content-ui-selected);
+        height: 2.5rem !important;
+        padding: 0;
+    }
+
+    & li {
+        &:first-child {
+            padding: 0;
+        }
+
+        border: 1px solid var(--body-background);
+        margin-bottom: 1rem;
+        margin-left: 0;
+        margin-right: 0;
+        position: relative;
+
+        &:last-child {
+            border-bottom: 1px solid var(--body-background);
+        }
+
+        /* Sections are used because some other definition in the system is cascading its rules
+        into the .information-list on divs and the specificity on that rule is pretty intense.
+        */
+        section {
+            margin-bottom: 0rem;
+
+            &.field-content {
+                display: block;
+            }
+        }
+
+        .s-topbar {
+            align-items: center;
+            background-color: var(--body-background);
+            display: flex;
+            justify-content: flex-end;
+            width: 100%;
+
+            .s-name-display {
+                display: none;
+                left: 2.5rem;
+                max-width: calc(100% - 5rem);
+                overflow: hidden;
+                position: absolute;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            nav {
+                display: flex;
+                height: 2.5rem;
+
+                .button {
+                    align-items: center;
+                    background-color: transparent;
+                    display: flex;
+                    justify-content: center;
+                    margin-bottom: 0;
+                    opacity: 0.7;
+                    transition: 0.15s;
+                    width: 2.5rem;
+
+                    &:hover {
+                        opacity: 1;
+                    }
+                }
+
+                &:hover {
+                    .button:not(:hover) {
+                        opacity: 0.5;
+                    }
+                }
+            }
+        }
+
+        .s-field-contents {
+            padding: 1rem;
+        }
+
+        .s-title-row {
+            align-items: center;
+            display: flex;
+            margin-bottom: 1rem;
+            width: 100%;
+        }
+
+        .s-field-title {
+            flex: 1;
+            margin-right: 2rem;
+        }
+
+        // Adjust the checkbox to sit closer to what is visually vertically centered
+        .s-field-visibility {
+            align-self: flex-end;
+        }
+
+        // Styles whilst an item is being dragged
+        &.ui-sortable-helper {
+            left: 1rem !important;
+            margin-left: 1rem !important;
+        }
+
+        @media #{$small-only} {
+            .s-field-contents {
+                padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+            }
+
+            &.ui-sortable-helper {
+                left: 0.5rem !important;
+                margin-left: 0.5rem !important;
+            }
+        }
+
+        @media #{$medium-only} {
+            .s-field-contents {
+                padding: 0.75rem;
+            }
+
+            &.ui-sortable-helper {
+                left: 0.75rem !important;
+                margin-left: 0.75rem !important;
+            }
+        }
+
+        @media #{$small-only} {
+            .s-title-row {
+                display: block;
+            }
+
+            .s-field-title {
+                margin-right: 0;
+            }
+
+            .s-field-visibility {
+                margin-bottom: 1rem;
+            }
+        }
     }
 }
