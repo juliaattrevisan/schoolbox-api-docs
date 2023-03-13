@@ -5,7 +5,7 @@
 import ClassicEditor from "@ckeditor/ckeditor5-editor-classic/src/classiceditor";
 import type { Editor } from "@ckeditor/ckeditor5-core";
 import { getConfig } from "@js/editor/config/editorConfig";
-import { EditorConfig } from "@js/editor/types/editorTypes";
+import { EditorConfig, EditorToolbar } from "@js/editor/types/editorTypes";
 import {
     insertWordCount,
     removeValidation,
@@ -47,6 +47,10 @@ async function onCreated(textarea: HTMLTextAreaElement, editor: Editor, config: 
  * @param { EditorConfig } config - the config to use when creating the editor
  */
 function create(textarea: HTMLTextAreaElement, config: EditorConfig) {
+    // if no toolbar is specified, use the full toolbar
+    if (config.toolbar === undefined) {
+        config.toolbar = EditorToolbar.FULL;
+    }
     ClassicEditor.create(textarea, getConfig(config))
         .then((editor) => {
             onCreated(textarea, editor, config);

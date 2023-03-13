@@ -2,7 +2,7 @@
  * Returns the tokens plugins for the editor
  */
 
-import { EditorConfig } from "@js/editor/types/editorTypes";
+import { EditorConfig, EditorToolbar } from "@js/editor/types/editorTypes";
 
 /**
  * Display the toolbar options based on config
@@ -12,7 +12,7 @@ import { EditorConfig } from "@js/editor/types/editorTypes";
  */
 export function getToolbar(config: EditorConfig) {
     // what displays in the default toolbar in order, are either single buttons or groups via objects
-    if (config.isSimple) {
+    if (config.toolbar === EditorToolbar.SIMPLE) {
         return [
             "bold",
             "italic",
@@ -28,7 +28,7 @@ export function getToolbar(config: EditorConfig) {
             "bulletedList",
         ];
     }
-    if (config.isComment) {
+    if (config.toolbar === EditorToolbar.COMMENT) {
         return [
             "bold",
             "italic",

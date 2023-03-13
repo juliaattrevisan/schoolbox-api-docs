@@ -105,7 +105,7 @@ export default {
                     new CustomEvent(EditorEvent.EDITOR__CREATE, {
                         detail: {
                             targetElements: [`#comment-${this.uniqueId}`],
-                            isComment: true,
+                            toolbar: "comment",
                         },
                     })
                 );

@@ -55,7 +55,7 @@
         document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
             detail: {
                 targetElements: ['#commentCKEditor'],
-                isComment: true,
+                toolbar: "comment",
             }
         }));
 
@@ -74,7 +74,7 @@
         document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
             detail: {
                 targetElements: ['#simpleCKEditor'],
-                isSimple: true,
+                toolbar: "simple",
             }
         }));
 
