@@ -88,16 +88,50 @@ function onCreate(event: CustomEvent) {
  * @returns { string } - the string with the tokens surrounded by the span element
  */
 function surroundUnsurroundedTokens(str: string, tokens: string[]): string {
-    const tokensRegex = new RegExp(tokens.map(token => `\\${token}`).join('|'), 'g');
-    const newStr = str.replace(tokensRegex, (match: string) => {
-      // Check if the keyword is already surrounded by the span element
-      if (!str.includes(`&lt;span class="mention" data-mention="${match}"&gt;`)) {
-        // If not, surround it with the span element
-        return `&lt;span class="mention" data-mention="${match}"&gt;${match}&lt;/span&gt;`;
-      }
-      return match;
+    // Regular expression for matching existing mentions
+    const mentionRegex = /<span class="mention" data-mention="(\w+)"\/?>/g;
+
+    let formattedStr = str;
+    tokens.forEach(token => {
+        // Regular expression for matching the token, exclude tokens that are already surrounded by a data-mention
+        const tokenRegex = new RegExp(`(?<!data-mention=")\\${token}`, 'g');
+        let match;
+        let lastIndex = 0;
+        let tempStr = "";
+
+        // Search for and replace all instances of the token in the formatted string
+        while (true) {
+            match = tokenRegex.exec(formattedStr);
+            if (match === null) {
+                break;
+            }
+
+            // Append any unmodified text between the last match and the current match
+            tempStr += formattedStr.slice(lastIndex, match.index);
+
+            // Check if the token is already surrounded by a mention
+            const mentionMatch = mentionRegex.exec(tempStr.slice(match.index - 50, match.index));
+            if (!mentionMatch || mentionMatch[1] !== token.slice(1, -1)) {
+                // If the token is not already surrounded by a mention, add the mention tags
+                tempStr += `<span class="mention" data-mention="${token.slice(1, -1)}">`;
+                tempStr += match[0];
+                tempStr += `</span>`;
+            } else {
+                // If the token is already surrounded by a mention, use the existing tags
+                tempStr += match[0];
+            }
+
+            // Update the lastIndex variable to continue searching after the current match
+            lastIndex = tokenRegex.lastIndex;
+        }
+
+        // Append any remaining unmodified text after the last match and update the formatted string
+        //  to the version with the current token surrounded by mention tags
+        tempStr += formattedStr.slice(lastIndex);
+        formattedStr = tempStr;
     });
-    return newStr;
+
+    return formattedStr;
 }
 
 document.addEventListener(EditorEvent.EDITOR__CREATE, onCreate);
