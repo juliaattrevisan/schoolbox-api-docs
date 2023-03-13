@@ -73,17 +73,4 @@ function onCreate(event: CustomEvent) {
     });
 }
 
-/**
- * Listen for update tokens events to update the tokens in the editor
- *
- * @param { CustomEvent } event - the custom event
- */
-function onEditorUpdateTokens(event: CustomEvent) {
-    const editor = window.sbProps.editors[event.target.id || event.target.name];
-
-    if (editor.config.sbConfig.tokenList) {
-        editor.setData(surroundUnsurroundedTokens(editor.getData(), editor.config.sbConfig.tokenList));
-    }
-}
-
 document.addEventListener(EditorEvent.EDITOR__CREATE, onCreate);
