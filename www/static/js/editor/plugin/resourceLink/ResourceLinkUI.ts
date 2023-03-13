@@ -10,6 +10,8 @@ import { insertElementAfter } from "@js/util/domUtils";
 export default class ResourceLinkUI extends Plugin {
     button: ButtonView; // the button to open the resource modal
 
+    isInit = false; // whether the plugin has been initialized
+
     /**
      * Initialize the plugin
      */
@@ -49,18 +51,24 @@ export default class ResourceLinkUI extends Plugin {
         const contextualBalloon = this.editor.plugins.get("ContextualBalloon");
         const linkUI = this.editor.plugins.get("LinkUI");
         contextualBalloon.on("change:visibleView", (eventInfo, name, value, oldValue) => {
-            if (value.element.classList.contains("ck-link-form")) {
-                contextualBalloon._view.on("change:isVisible", (eventInfo, name, value, oldValue) => {
-                    console.warn(value);
-                });
+            // if (value === null && this.isInit) {
+            //     console.warn("show again");
+            //     linkUI._showUI(true);
+            // }
+            if (value?.element?.classList.contains("ck-link-form") && !this.isInit) {
+                this.isInit = true;
+                // contextualBalloon._view.on("change:isVisible", (eventInfo, name, value, oldValue) => {
+                //     if (value === false) {
+                //         linkUI._showUI(true);
+                //     }
+                // });
                 this.linkFormView = value;
                 this.button.render();
                 this.linkFormView.registerChild(this.button);
                 // insert the button next to the URL field
                 insertElementAfter(this.linkFormView.urlInputView.fieldView.element, this.button.element);
                 // no longer need to listen for changes in the visible view
-                contextualBalloon.off("change:visibleView");
-                console.warn(linkUI);
+                // contextualBalloon.off("change:visibleView");
             }
         });
     }
