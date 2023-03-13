@@ -920,6 +920,8 @@ class Report
             }
         }
 
+        // Show learning profiles most recent first
+        $searches = array_reverse($searches);
 
         $workTypeIds = [];
         foreach ($searches as $i => $search) {
