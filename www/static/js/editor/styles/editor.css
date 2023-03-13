@@ -132,6 +132,18 @@
     z-index: 1;
 }
 
+/**
+ * The custom button to the right of the Link URL that allows you to
+ * open our resource modal
+ */
+.ck.ck-button-resource-link {
+    margin-left: var(--ck-spacing-large);
+    min-width: 4rem;
+}
+
+/**
+ * add a background colour to the make blank button used in Cloze questions
+ */
 .ck.ck-toolbar .ck-button__schoolboxmakeblank {
     background-color: #cae9b9;
 }

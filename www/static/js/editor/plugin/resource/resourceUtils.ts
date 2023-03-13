@@ -166,6 +166,17 @@ function getAudioAttributes(resource: Resource, config: EditorConfig) {
 }
 
 /**
+ * Get the folder src
+ *
+ * @param { Resource } resource - the resource
+ * @param { EditorConfig } config - the editor config
+ * @returns { string } - the folder src
+ */
+function getFolderSrc(resource: Resource, config: EditorConfig) {
+    return getURL(`/homepage/${resource.id}`, config);
+}
+
+/**
  * Get the resource attributes
  *
  * @param { Resource } resource - the resource
@@ -181,6 +192,29 @@ export function getAttributes(resource: Resource, config: EditorConfig) {
     }
     if (resource.type === "audio") {
         return getAudioAttributes(resource, config);
+    }
+    return {};
+}
+
+/**
+ * Get the resource attributes
+ *
+ * @param { Resource } resource - the resource
+ * @param { EditorConfig } config - the editor config
+ * @returns { object } - the resource attributes
+ */
+export function getSrc(resource: Resource, config: EditorConfig) {
+    if (resource.type === "image") {
+        return getImageSrc(resource, config);
+    }
+    if (resource.type === "video") {
+        return getVideoSrc(resource, config);
+    }
+    if (resource.type === "audio") {
+        return getAudioSrc(resource, config);
+    }
+    if (resource.type === "folder") {
+        return getFolderSrc(resource, config);
     }
     return {};
 }

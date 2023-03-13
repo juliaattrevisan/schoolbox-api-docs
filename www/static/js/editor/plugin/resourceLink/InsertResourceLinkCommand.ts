@@ -3,7 +3,7 @@
  */
 
 import Command from "@ckeditor/ckeditor5-core/src/command";
-import { getAttributes } from "@js/editor/plugin/resource/resourceUtils";
+import { getSrc } from "@js/editor/plugin/resource/resourceUtils";
 import type { Resource } from "@js/editor/plugin/resource/resourceUtils";
 import type { EditorConfig } from "@js/editor/types/editorTypes";
 
@@ -38,10 +38,8 @@ async function getResourceInfo(hash: string) {
             },
         });
         const resource = (await response.json()) as Resource;
-        console.warn(resource);
-        // const attributes = getAttributes(resource, editor.config.sbConfig as EditorConfig);
-        // const imageUtils = editor.plugins.get("ImageUtils");
-        // imageUtils.insertImage(attributes, editor.model.document.selection, "imageInline");
+        const src = getSrc(resource, editor.config.sbConfig as EditorConfig);
+        console.warn(src);
     } catch (error) {
         console.error(error);
     }

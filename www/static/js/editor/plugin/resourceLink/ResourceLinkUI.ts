@@ -33,6 +33,8 @@ export default class ResourceLinkUI extends Plugin {
         // Disable the button when the command is disabled
         // const command = this.editor.commands.get("insertResourceLink");
         // this.button.bind("isOn", "isEnabled").to(command, "value", "isEnabled");
+        // add the returned resource to the link form view
+        // this.linkFormView.urlInputView.fieldView.element.value = "Some URL";
     }
 
     /**
@@ -45,8 +47,12 @@ export default class ResourceLinkUI extends Plugin {
      */
     addButton() {
         const contextualBalloon = this.editor.plugins.get("ContextualBalloon");
+        const linkUI = this.editor.plugins.get("LinkUI");
         contextualBalloon.on("change:visibleView", (eventInfo, name, value, oldValue) => {
             if (value.element.classList.contains("ck-link-form")) {
+                contextualBalloon._view.on("change:isVisible", (eventInfo, name, value, oldValue) => {
+                    console.warn(value);
+                });
                 this.linkFormView = value;
                 this.button.render();
                 this.linkFormView.registerChild(this.button);
@@ -54,6 +60,7 @@ export default class ResourceLinkUI extends Plugin {
                 insertElementAfter(this.linkFormView.urlInputView.fieldView.element, this.button.element);
                 // no longer need to listen for changes in the visible view
                 contextualBalloon.off("change:visibleView");
+                console.warn(linkUI);
             }
         });
     }
