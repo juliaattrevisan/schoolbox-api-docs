@@ -71,9 +71,33 @@ function onCreate(event: CustomEvent) {
     targetElements.forEach((targetElement) => {
         // assume that each targetElement could contain multiple instances
         document.querySelectorAll(targetElement).forEach((textarea) => {
+            if (config.tokenList) {
+                textarea.innerHTML = surroundUnsurroundedTokens(textarea.innerHTML, config.tokenList);
+            }
+
             create(textarea as HTMLTextAreaElement, config);
         });
     });
+}
+
+/**
+ * Surround tokens with span element
+ *
+ * @param { string } str - the string to search
+ * @param { string[] } tokens - the tokens to search for
+ * @returns { string } - the string with the tokens surrounded by the span element
+ */
+function surroundUnsurroundedTokens(str: string, tokens: string[]): string {
+    const tokensRegex = new RegExp(tokens.map(token => `\\${token}`).join('|'), 'g');
+    const newStr = str.replace(tokensRegex, (match: string) => {
+      // Check if the keyword is already surrounded by the span element
+      if (!str.includes(`&lt;span class="mention" data-mention="${match}"&gt;`)) {
+        // If not, surround it with the span element
+        return `&lt;span class="mention" data-mention="${match}"&gt;${match}&lt;/span&gt;`;
+      }
+      return match;
+    });
+    return newStr;
 }
 
 document.addEventListener(EditorEvent.EDITOR__CREATE, onCreate);
