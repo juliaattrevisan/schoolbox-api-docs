@@ -75,19 +75,22 @@
             // Listen for changes on inputs
             config.element.on("change keyup", config.inputs.join(", "), checkForChanges);
 
-            // Listen for changes on CKEditors
+            /**
+             * Loop through the textareas and listen for changes on them
+             * via the CKEditor's model.document.on("change:data") event
+             */
             var i;
             for (i = 0; i < config.textareas.length; i++) {
                 var key = config.textareas[i];
                 if (key in window.sbProps.editors) {
-                    window.sbProps.editors[key].editing.view.document.on("blur", function () {
+                    window.sbProps.editors[key].model.document.on("change:data", () => {
                         checkForChanges();
                     });
                 } else {
                     // If the editor hasn't been created yet, wait for it to be created
                     document.getElementById(key).addEventListener("EDITOR__CREATED", onEditorCreated);
                     function onEditorCreated(event) {
-                        event.detail.editor.editing.view.document.on("blur", function () {
+                        event.detail.editor.model.document.on("change:data", () => {
                             checkForChanges();
                         });
                     }
