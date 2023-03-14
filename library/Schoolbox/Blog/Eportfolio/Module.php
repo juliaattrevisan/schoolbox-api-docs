@@ -116,7 +116,6 @@ class Module extends BaseModule
     protected function buildAuthorizationRule($method)
     {
         $callback = function ($params, User $loggedInUser) use ($method) {
-            // Allow owner of either blog or comment to do stuff
             if (($params['comment'] ?? null) instanceof EportfolioBlogCommentModel) {
                 $commentOwner = $params['comment']->getOwner();
                 $commentOwnerRole = $commentOwner->getRole();
@@ -126,11 +125,20 @@ class Module extends BaseModule
                 $roleMapper = new RoleMapper();
                 $commentOwnerRole = $roleMapper->findById($commentOwnerRole->getId());
 
-                if ($commentOwner->getId() == $loggedInUser->getId()) {
-                    return;
-                } elseif ($commentOwnerRole->isStaff()) {
+                if ($commentOwnerRole->isStaff()) {
+                    // Comment owner is staff - authorize only if logged-in user is superuser or staff.
                     $loggedInUserRole = $loggedInUser->getRole();
                     if ($loggedInUser->isSuperuser() || $loggedInUserRole->isStaff()) {
+                        return;
+                    } else {
+                        throw new Unauthorized();
+                    }
+                } else {
+                    // Comment owner is not staff - authorize only if logged-in user is comment owner or blog owner.
+                    if (
+                        $loggedInUser->getId() === $commentOwner->getId() ||
+                        $loggedInUser->getId() === $params['blog']->getOwner()->getId()
+                    ) {
                         return;
                     } else {
                         throw new Unauthorized();
