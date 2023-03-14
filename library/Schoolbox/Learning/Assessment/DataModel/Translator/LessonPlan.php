@@ -84,6 +84,7 @@ class LessonPlan implements IAssessmentTypeTranslator
 
         $dataModel->setVisibility($domainObject->getVisibility());
 
+        /* TODO Domain Object and Data Model don't know about the auditor fields.
         foreach ($domainObject->getLessonPlanTemplate()->getFields() as $lessonPlanTemplateField) {
             $lessonPlanField = $lessonPlanFieldMapper->createModel()
                 ->setLessonPlanTemplateField($lessonPlanTemplateField)
