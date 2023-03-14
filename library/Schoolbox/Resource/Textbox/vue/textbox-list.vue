@@ -2,6 +2,7 @@
 import axios from "axios";
 import Toast from "@schoolboxVue/components/toast";
 import RevealModal from "@schoolboxVue/components/reveal-modal";
+import { EditorEvent } from "@js/editor/event/editorEvent";
 
 const EVENT_ADD_TEXTBOX = "textbox-list-add";
 const EVENT_BEFORE_UNLOAD = "beforeunload";
@@ -232,17 +233,23 @@ export default {
             let $form = jQuery(this.$refs.form),
                 self = this;
             $form.find("textarea").each(function () {
-                if (!(this.id in window.CKEDITOR.instances)) {
-                    jQuery.fn.alaressEditor({
-                        targetElements: $(this),
-                        change: () => {
+                if (!(this.id in window.sbProps.editors)) {
+                    document.getElementById(this.id).addEventListener(EditorEvent.EDITOR__CREATED, () => {
+                        window.sbProps.editors[this.id].model.document.on("change:data", () => {
                             // When this editor's content changes, mark it as dirty
                             let index = self.retrieveIndexForEditorId(this.id);
                             if (index !== null) {
                                 self.markAsDirty(index);
                             }
-                        },
+                        });
                     });
+                    document.dispatchEvent(
+                        new CustomEvent(EditorEvent.EDITOR__CREATE, {
+                            detail: {
+                                targetElements: [`#${this.id}`],
+                            },
+                        })
+                    );
                 }
             });
         },
@@ -341,7 +348,7 @@ export default {
          * @returns {CKEDITOR.editor|null} The editor, or null if not found
          */
         retrieveEditorForIndex(index) {
-            return this.window.CKEDITOR.instances["textbox-" + String(index) + "-body"] ?? null;
+            return this.window.sbProps.editors["textbox-" + String(index) + "-body"] ?? null;
         },
 
         /**
