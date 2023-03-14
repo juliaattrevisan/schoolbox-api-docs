@@ -1330,12 +1330,12 @@ class MapperProxy
         } elseif ($subObject instanceof LessonPlan\Model) {
             $lessonPlanMapper = LessonPlan\Mapper::getInstance();
 
-            /* TODO save all the Lesson Plan Fields' values here, too, I think
-             */
             $lessonPlanMapper->save($subObject);
 
+            /* TODO Re-enable this logic
+             */
 //            $lessonPlanMapper->saveFields($subObject);
-            // $lessonPlanMapper->saveFiles($subObject);
+//             $lessonPlanMapper->saveFiles($subObject);
         } elseif ($subObject instanceof Project) {
             ProjectMapper::getInstance()->save($subObject);
         }

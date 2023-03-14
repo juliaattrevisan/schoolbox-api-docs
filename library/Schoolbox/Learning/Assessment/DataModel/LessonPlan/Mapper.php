@@ -71,6 +71,7 @@ class Mapper extends \Schoolbox\Mapper
             ]
         );
 
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'auditorFields']);
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteFields']);
     }
 
@@ -252,5 +253,20 @@ class Mapper extends \Schoolbox\Mapper
         /* Dump away any associated Fields too
          */
         $this->getJoinMapper('field')->delete($lessonPlanTemplate->getFields());
+    }
+
+
+    /**
+     * Prefill auditor fields (the Swamp shouldn't need to know about this)
+     */
+    protected function auditorFields(Model $lessonPlan): void
+    {
+        if (null === $lessonPlan->getCreatedBy()) {
+            $lessonPlan->setCreatedBy($this->getSessionUser());
+        }
+
+        if (null === $lessonPlan->getUpdatedBy()) {
+            $lessonPlan->setUpdatedBy($this->getSessionUser());
+        }
     }
 }
