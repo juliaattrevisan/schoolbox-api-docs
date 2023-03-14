@@ -20,6 +20,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as Grade
 use Schoolbox\Assessment\Term\Mapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Feedback\Visibility as FeedbackVisibility;
+use Schoolbox\Learning\Assessment\LessonPlan;
 use Schoolbox\Learning\Assessment\Participant\DataSource;
 use Schoolbox\Learning\Assessment\Seb\Payload;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
@@ -256,14 +257,18 @@ abstract class Controller extends ListController implements IAssessmentControlle
              */
             $templateId = trim((string)$this->getRequest()->query->get('lpt'));
 
+            /* Some metadata for the Lesson Plan workflow
+             * This encapsulates the myriad of combinations which is really really awkward
+             */
+            $data['lessonPlanMeta']['template'] = null;
+            $data['lessonPlanMeta']['type'] = $type;
+            $data['lessonPlanMeta']['mageAsync'] = false;
+            $data['lessonPlanMeta']['includeBreadcrumbs'] = true;
+
             if ('' === $templateId) {
                 /* You need to Select an LPT
-                 */
-                $data['lessonPlanMeta']['template'] = null;
-                $data['lessonPlanMeta']['type'] = $type;
-                $data['lessonPlanMeta']['mageAsync'] = false;
-
-                /* If $part-1 is set in the query string param, you came here from the
+                 *
+                 * If $part-1 is set in the query string param, you came here from the
                  * Activity Selection screen via Course Builder component. This part
                  * loads the LPT list asynchronously and injects it into a parent container
                  *
@@ -365,11 +370,14 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         /* Lesson Plan Template metadata, used to construct forms
          */
-        $data['lessonPlanMeta'] =[
-            'template'  => $assessment->getLessonPlanTemplate(),
-            'type' => AssessmentType::TYPE_LESSON_PLAN,
-            'mageAsync' => false
-        ];
+        if ($assessment instanceof LessonPlan\Model) {
+            $data['lessonPlanMeta'] = [
+                'template' => $assessment->getLessonPlanTemplate(),
+                'type' => AssessmentType::TYPE_LESSON_PLAN,
+                'mageAsync' => false,
+                'includeBreadcrumbs' => false
+            ];
+        }
 
         $data['courseManaged'] = [
             'isVisible' => $courseManagedFields->isVisible(),

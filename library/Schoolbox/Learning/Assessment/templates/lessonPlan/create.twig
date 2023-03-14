@@ -7,19 +7,22 @@
  # @param LessonPlan\Template\Model $lessonPlanMeta[template]  The LessonPlan Template for this assessment
  # @param string $lessonPlanMeta[type]                         Corresponds to the const 'lessonPlan' in AssessmentType
  # @param string $lessonPlanMeta[mageAsync]                    Whether this was a Mage Step 2 async form fragment (always false here)
- #
+ # @param bool $lessonplanMeta[includeBreadcrumbs]             Whether to include breadcrumbs (create requires it; update does not)
  # @param array $breadcrumbs                                   A set of nodes to render as breadcrumb elements
  #}
-{% import 'sub/breadcrumbs.twig' as bread %}
-{{ bread.crumbsArray(breadcrumbs) }}
 
-<div class="actions-small-1 row">
-    <div class="list-item">
-        <div class="small-12 column">
-            <h1>Create Lesson Plan</h1>
+{% if lessonPlanMeta.includeBreadcrumbs %}
+    {% import 'sub/breadcrumbs.twig' as bread %}
+    {{ bread.crumbsArray(breadcrumbs) }}
+
+    <div class="actions-small-1 row">
+        <div class="list-item">
+            <div class="small-12 column">
+                <h1>Create Lesson Plan</h1>
+            </div>
         </div>
     </div>
-</div>
+{% endif %}
 
 {% if assessment.id %}
     {% set formAction = routeLookup('learningAssessment.postUpdateAssessment', { assessmentId: assessment.id, assessment: assessment })  %}
