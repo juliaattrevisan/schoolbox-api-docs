@@ -15,6 +15,8 @@ use PDOStatement;
 use Schoolbox\Blog\Eportfolio;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Role;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 /**
@@ -61,13 +63,17 @@ class Mapper extends BaseMapper
      */
     protected function getSelectString()
     {
-        return "
+        $sql = "
             SELECT
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('owner', 'u')}
+                {$this->getJoinColumnString('owner', 'u')},
+                {$this->getJoinColumnString('owner.role', 'ur')}
             FROM {$this->database->getQuoter()->quoteIdentifier($this->table)}
             INNER JOIN {$this->getJoinSql('owner', '', 'u', true)}
+            INNER JOIN {$this->getJoinSql('owner.role', 'u', 'ur')}
         ";
+
+        return $sql;
     }
 
     /**
@@ -85,7 +91,11 @@ class Mapper extends BaseMapper
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             $model = $this->hydrate($row);
-            $model->setOwner($userMapper->hydrate($row, 'u'));
+            $owner = $userMapper->hydrate($row, 'u');
+            $ownerRole = $this->hydrateJoin($row, 'owner.role', 'ur');
+            $owner->setRole($ownerRole);
+            $model->setOwner($owner);
+
             $collection[$model->getId()] = $model;
         }
         return $collection;

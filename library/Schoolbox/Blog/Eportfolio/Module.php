@@ -120,11 +120,6 @@ class Module extends BaseModule
                 $commentOwner = $params['comment']->getOwner();
                 $commentOwnerRole = $commentOwner->getRole();
 
-                // Hydrate commentOwnerRole object the quick and dirty way for now.
-                // TODO: Hydrate in mapper instead.
-                $roleMapper = new RoleMapper();
-                $commentOwnerRole = $roleMapper->findById($commentOwnerRole->getId());
-
                 if ($commentOwnerRole->isStaff()) {
                     // Comment owner is staff - authorize only if logged-in user is superuser or staff.
                     $loggedInUserRole = $loggedInUser->getRole();
