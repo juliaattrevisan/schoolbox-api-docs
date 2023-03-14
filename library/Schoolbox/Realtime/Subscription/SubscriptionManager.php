@@ -22,24 +22,24 @@ use Psr\Log\LoggerInterface;
 class SubscriptionManager implements ISubscriptionManager
 {
     /** @var ISubscriptionFactory */
-    private $factory;
+    private ISubscriptionFactory $factory;
 
     /** @var LoggerInterface */
-    private $log;
+    private LoggerInterface $log;
 
     /**
-     * A cache of subscriptions, indexed by user ID
+     * A cache of subscriptions, indexed by instance ID and then by user ID
      *
-     * @var ISubscription[]
+     * @var array<string, array<int, ISubscription>>
      */
-    private $subscriptions = [];
+    private array $subscriptions = [];
 
     /**
      * @param string               $instanceId
      * @param ISubscriptionFactory $factory
      * @param LoggerInterface      $log
      */
-    public function __construct($instanceId, ISubscriptionFactory $factory, LoggerInterface $log)
+    public function __construct(string $instanceId, ISubscriptionFactory $factory, LoggerInterface $log)
     {
         $this->instanceId = $instanceId;
         $this->factory    = $factory;
