@@ -86,8 +86,15 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
     /** @var Dispatcher */
     private $taskDispatcher;
 
-    /** @var Transaction[][] */
-    private $pushTransactions;
+    /**
+     * Push transactions (whatever those are), indexed by:
+     * * instance ID
+     * * user ID
+     * * pipe ID
+     *
+     * @var array<string, array<int, array<string, Transaction>>>
+     */
+    private array $pushTransactions = [];
 
     /**
      * User timeouts, indexed by instance ID and then by user ID
@@ -458,11 +465,13 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      */
     private function getTransaction(PipeInterface $pipe)
     {
-        $userId = $pipe->getUserId();
-        $pipeId = $pipe->getSocketKey();
+        // TODO extract from pipe
+        $instanceId = INSTANCE_ID;
+        $userId     = $pipe->getUserId();
+        $pipeId     = $pipe->getSocketKey();
 
-        if (empty($this->pushTransactions[$userId][$pipeId])) {
-            $this->pushTransactions[$userId][$pipeId] = new Transaction(
+        if (empty($this->pushTransactions[$instanceId][$userId][$pipeId])) {
+            $this->pushTransactions[$instanceId][$userId][$pipeId] = new Transaction(
                 $this->reactLoop,
                 function ($data) use ($pipe, $userId) {
 
@@ -481,7 +490,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
             );
         }
 
-        return $this->pushTransactions[$userId][$pipeId];
+        return $this->pushTransactions[$instanceId][$userId][$pipeId];
     }
 
 
@@ -699,7 +708,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
             $pipe->close();
         }
 
-        unset($this->userTimeouts[$instanceId][$userId], $this->pushTransactions[$userId]);
+        unset($this->userTimeouts[$instanceId][$userId], $this->pushTransactions[$instanceId][$userId]);
     }
 
 
