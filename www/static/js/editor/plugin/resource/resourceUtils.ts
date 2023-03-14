@@ -177,6 +177,39 @@ function getFolderSrc(resource: Resource, config: EditorConfig) {
 }
 
 /**
+ * Get the storage src
+ *
+ * @param { Resource } resource - the resource
+ * @param { EditorConfig } config - the editor config
+ * @returns { string } - the storage src
+ */
+function getStorageSrc(resource: Resource, config: EditorConfig) {
+    return getURL(`/storage/fetch.php?hash=${resource.hash}`, config);
+}
+
+/**
+ * Get the web dav src
+ *
+ * @param { Resource } resource - the resource
+ * @param { EditorConfig } config - the editor config
+ * @returns { string } - the web dav src
+ */
+function getWebDavSrc(resource: Resource, config: EditorConfig) {
+    return getURL(`/cms/sendNetworkFile.php?id=${resource.hash}`, config);
+}
+
+/**
+ * Get the file src
+ *
+ * @param { Resource } resource - the resource
+ * @param { EditorConfig } config - the editor config
+ * @returns { string } - the file src
+ */
+function getFileSrc(resource: Resource, config: EditorConfig) {
+    return getURL(`/send.php?id=${resource.hash}`, config);
+}
+
+/**
  * Get the resource attributes
  *
  * @param { Resource } resource - the resource
@@ -216,5 +249,31 @@ export function getSrc(resource: Resource, config: EditorConfig) {
     if (resource.type === "folder") {
         return getFolderSrc(resource, config);
     }
-    return {};
+    // When you Upload A File via the modal's dropzone
+    if (resource.filesystem === "store") {
+        return getStorageSrc(resource, config);
+    }
+    // When you select a file via Resource Browser
+    if (resource.filesystem === "browse") {
+        return getStorageSrc(resource, config);
+    }
+    // When you select a file via Office365
+    if (resource.filesystem === "office365") {
+        return getStorageSrc(resource, config);
+    }
+    // When you select a My File
+    if (resource.filesystem === "myfile") {
+        return getStorageSrc(resource, config);
+    }
+    // When you select a WebDAV file
+    if (resource.filesystem === "webdav") {
+        return getWebDavSrc(resource, config);
+    }
+    // When you select a Microsoft Teams meeting url
+    // normally empty, don't need to touch it
+    if (resource.type === "meetingUrl") {
+        return resource.id;
+    }
+    // Default assumption (not sure where this manifests anymore, sorry)
+    return getFileSrc(resource, config);
 }

@@ -22,49 +22,60 @@ export default class InsertResourceLinkCommand extends Command {
      * display the resource modal and listen for if a resource is returned
      */
     execute() {
-        console.warn(this);
         this.set("isOn", true);
-        this.displayResourceModal();
+        this.displayModal();
         window.removeEventListener("message", this.onResourceReturned.bind(this));
         window.addEventListener("message", this.onResourceReturned.bind(this));
     }
 
     /**
      * is called on various events to determine if the command is enabled
-     * we use the same method the image plugin uses to determine if the command is enabled
+     * we use the same method as the image command to determine
      */
     refresh() {
-        this.isEnabled = this.editor.plugins.get("ImageUtils").isImageAllowed();
+        const linkCommand = this.editor.commands.get("link");
+        this.isEnabled = linkCommand.isEnabled;
     }
 
     /**
      * Display the resource modal to select a file from
      */
-    displayResourceModal() {
+    displayModal() {
         /**
          * Fire of the jQuery plugin to display the resource modal
          */
         $.fn.schoolboxResource({
             allowedFilesystems: "link",
             allowedFiles: null,
-            onAfterClose: () => {
-                console.warn("closed eh");
+            onModalClosed: () => {
+                // Once the modal is completely closed, the LinkUI can be closed again
+                this.set("isOn", false);
             },
-        });
-        // this.modal.foundation("reveal", "open", { close_on_background_click: this.closeOnBackgroundClick });
-        $(document).on("closed.fndtn.reveal", "[data-reveal]", (event) => {
-            console.warn("closed yay");
-            // $(document).off("closed.fndtn.reveal");
         });
     }
 
     /**
-     * Get the resource information from the server and
-     * then insert the image/video/audio into the editor using the ImageUtils plugin.
-     * Note that all three are inserted as images, but the extra attributes added to
-     * audio/video will be used to display outside editing mode.
+     * to close the resource modal and allow the LinkUI to be also closed again
+     */
+    closeModal() {
+        $("#file-picker").foundation("reveal", "close");
+        this.set("isOn", false);
+    }
+
+    /**
+     * Update the link in the LinkUI to the selected resource
      *
-     * See www/static/js/editor/jquery.proxy-replacement.js for how this occurs
+     * @param { string } value - the value to update the link to
+     */
+    updateLink(value: string) {
+        const linkUI = this.editor.plugins.get("LinkUI");
+        linkUI.formView.urlInputView.fieldView.focus();
+        linkUI.formView.urlInputView.fieldView.element.value = value;
+    }
+
+    /**
+     * Get the resource information from the server and
+     * then insert the link into the editor
      *
      * @param { string } hash - the hash of the stored file
      */
@@ -77,12 +88,11 @@ export default class InsertResourceLinkCommand extends Command {
             });
             const resource = (await response.json()) as Resource;
             const src = getSrc(resource, this.editor.config.sbConfig as EditorConfig);
-            console.warn(src);
+            this.updateLink(src);
         } catch (error) {
             console.error(error);
         }
-        // to close the resource modal
-        $("#file-picker").foundation("reveal", "close");
+        this.closeModal();
     }
 
     /**
@@ -91,7 +101,6 @@ export default class InsertResourceLinkCommand extends Command {
      * @param { MessageEvent } event - the event
      */
     onResourceReturned(event: MessageEvent) {
-        this.set("isOn", false);
         let message;
         try {
             message = JSON.parse(event.data);
@@ -99,9 +108,22 @@ export default class InsertResourceLinkCommand extends Command {
             message = event.data;
         }
         if (message.data !== undefined) {
+            // if the data is an array, it is a file
             if (0 in message.data && "hash" in message.data[0]) {
-                window.removeEventListener("message", this.onResourceReturned);
-                this.getResourceInfo(message.data[0].hash as string);
+                let status = "success";
+                if ("status" in message.data[0]) {
+                    status = message.data[0].status;
+                }
+                if (status === "success") {
+                    window.removeEventListener("message", this.onResourceReturned);
+                    this.getResourceInfo(message.data[0].hash as string);
+                } else {
+                    // Unknown status: assume error and do nothing, as the modal already shows the error
+                }
+                // Microsoft Teams meetings url format
+            } else if ("meetingUrl" in message.data) {
+                this.updateLink(message.data.meetingUrl);
+                this.closeModal();
             } else {
                 // The file was rejected, probably cause it was the wrong mimetype.
                 // Do nothing
