@@ -13,7 +13,8 @@ import ButtonView from "@ckeditor/ckeditor5-ui/src/button/buttonview";
 import ContextualBalloon from "@ckeditor/ckeditor5-ui/src/panel/balloon/contextualballoon";
 import clickOutsideHandler from "@ckeditor/ckeditor5-ui/src/bindings/clickoutsidehandler";
 import { isWidget } from "@ckeditor/ckeditor5-widget/src/utils";
-import LinkFormView from "@ckeditor/ckeditor5-link/src/ui/linkformview";
+// import LinkFormView from "@ckeditor/ckeditor5-link/src/ui/linkformview";
+import LinkFormView from "@js/editor/plugin/link/LinkFormView";
 import LinkActionsView from "@ckeditor/ckeditor5-link/src/ui/linkactionsview";
 import { addLinkProtocolIfApplicable, isLinkElement, LINK_KEYSTROKE } from "@ckeditor/ckeditor5-link/src/utils";
 
@@ -48,7 +49,6 @@ export default class LinkUI extends Plugin {
      * @inheritDoc
      */
     init() {
-        console.warn("custom link");
         const editor = this.editor;
 
         editor.editing.view.addObserver(ClickObserver);
