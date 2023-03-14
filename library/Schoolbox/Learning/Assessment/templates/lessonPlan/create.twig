@@ -3,6 +3,7 @@
  #
  # Create a Lesson Plan based on a customised version of a Lesson Plan Template
  #
+ # @param IAssessable $assessment                              The Lesson Plan itself, a subclass of AbstractAssessment
  # @param array $lessonPlanMeta                                An arbitrary array struct of Lesson Plan metadata
  # @param LessonPlan\Template\Model $lessonPlanMeta[template]  The LessonPlan Template for this assessment
  # @param string $lessonPlanMeta[type]                         Corresponds to the const 'lessonPlan' in AssessmentType
@@ -11,43 +12,30 @@
  # @param array $breadcrumbs                                   A set of nodes to render as breadcrumb elements
  #}
 
-{% if assessment.id %}
-    {% set formAction = routeLookup('learningAssessment.postUpdateAssessment', { assessmentId: assessment.id, assessment: assessment })  %}
-{% else %}
-    {% set formAction = routeLookup('learningAssessment.postCreateAssessment', { contextType: contextType, contextId: context.id, context: context }) %}
-{% endif %}
+<input type="hidden" name="lessonPlanTemplateId" value="{{ lessonPlanMeta.template.id }}" />
 
-<div class="row">
-    <div class="small-12 island">
-        <form action="{{ formAction }}" method="post">
-            <input type="hidden" name="contextType" value="{{ contextType }}" />
-            <input type="hidden" name="contextId" value="{{ context.id }}" />
-            <input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
-            <input type="hidden" name="returnUrl" value="{{ returnUrl }}" />
-            <input type="hidden" name="lessonPlanTemplateId" value="{{ lessonPlanMeta.template.id }}" />
-
-            <section>
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        <label class="required" for="title">Title</label>
-                        <input id="title" type="text" name="title" value="" />
-                    </div>
-                </fieldset>
-
-                {% for field in lessonPlanMeta.template.fields %}
-                    <fieldset class="content">
-                        <div class="small-12 columns">
-                            <h2>{{ field.title }}</h2>
-                            <textarea id="field-body-{{ field.id }}" name="field[{{ field.id }}][body]">{{ field.body }}</textarea>
-                        </div>
-                    </fieldset>
-                {% endfor %}
-            </section>
-
-            <input type="submit" value="Save">
-        </form>
+<fieldset>
+    <div class="row">
+        <div class="small-12 columns">
+            <label class="required" for="title">Title</label>
+            <input id="title" type="text" name="title" value="{% if assessment.id %}{{ assessment.title }}{% endif %}" />
+        </div>
     </div>
-</div>
+</fieldset>
+
+{% for field in lessonPlanMeta.template.fields %}
+    <fieldset>
+        <div class="row">
+            <div class="small-12 columns">
+                <h2>{{ field.title }}</h2>
+                <textarea id="field-body-{{ field.id }}" name="field[{{ field.id }}][body]">{{ field.body }}</textarea>
+            </div>
+        </div>
+    </fieldset>
+{% endfor %}
+
+<input type="submit" value="Save">
+
 
 <script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 <script>
