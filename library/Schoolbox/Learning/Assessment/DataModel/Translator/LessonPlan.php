@@ -87,15 +87,31 @@ class LessonPlan implements IAssessmentTypeTranslator
         $dataModel->setVisibility($domainObject->getVisibility());
 
         /* TODO Domain Object and Data Model don't know about the auditor fields.
-        foreach ($domainObject->getLessonPlanTemplate()->getFields() as $lessonPlanTemplateField) {
-            $lessonPlanField = $lessonPlanFieldMapper->createModel()
+         */
+//        foreach ($domainObject->getLessonPlanTemplate()->getFields() as $lessonPlanTemplateField) {
+//            $lessonPlanField = $lessonPlanFieldMapper->createModel()
+//                ->setLessonPlanTemplateField($lessonPlanTemplateField)
+//                ->setTitle($lessonPlanTemplateField->getTitle())
+//                ->setBody($lessonPlanTemplateField->getBody())
+//                ->setVisibility($lessonPlanTemplateField->getVisibility())
+//                ->setSequence($lessonPlanTemplateField->getSequence());
+//
+//            $dataModel->getFields()->add($lessonPlanField);
+//        }
+
+        foreach ($domainObject->getFields() as $lessonPlanField) {
+            $lessonPlanTemplateFieldId = $lessonPlanField->getLessonPlanTemplateField()->getId();
+            $lessonPlanTemplateField = $domainObject->getLessonPlanTemplate()->getFields()->getBy('id', $lessonPlanTemplateFieldId);
+
+            $field = $lessonPlanFieldMapper->createModel()
+                ->setLessonPlan($dataModel)
                 ->setLessonPlanTemplateField($lessonPlanTemplateField)
                 ->setTitle($lessonPlanTemplateField->getTitle())
-                ->setBody($lessonPlanTemplateField->getBody())
+                ->setBody($lessonPlanField->getBody())
                 ->setVisibility($lessonPlanTemplateField->getVisibility())
                 ->setSequence($lessonPlanTemplateField->getSequence());
 
-            $dataModel->getFields()->add($lessonPlanField);
+            $dataModel->getFields()->add($field);
         }
 
         /* TODO whatever this is meant to do, like Tasks

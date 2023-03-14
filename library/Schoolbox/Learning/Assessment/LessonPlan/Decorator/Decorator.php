@@ -73,11 +73,14 @@ class Decorator implements DecoratorInterface
         $assessment->setFields($lessonPlanFieldMapper->createCollection());
 
         foreach ($this->lessonPlanFields as $fieldId => $field) {
+            /* TODO repair this. Create and update share different workflows
+             *  Deconflict identifiers somehow
+             */
             $lessonPlanTemplateField = $lessonPlanTemplate->getFields()->getBy('id', $fieldId);
 
             $lessonPlanField = $lessonPlanFieldMapper->createModel()
                 ->setLessonPlanTemplateField($lessonPlanTemplateField)
-                ->setTItle($lessonPlanTemplateField->getTitle())
+                ->setTitle($lessonPlanTemplateField->getTitle())
                 ->setBody($field['body'])
                 ->setVisibility($lessonPlanTemplateField->getVisibility())
                 ->setSequence($lessonPlanTemplateField->getSequence());
