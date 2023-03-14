@@ -260,6 +260,7 @@ class Module extends BaseModule
             AssessmentType::TYPE_QUIZ           => Assessment\Quiz\Controller::class,
             AssessmentType::TYPE_TASK           => Assessment\Task\Controller::class,
             AssessmentType::TYPE_LTI_ASSESSMENT => Assessment\Lti\Controller::class,
+            AssessmentType::TYPE_LESSON_PLAN    => Assessment\LessonPlan\Controller::class,
         ];
 
         // set the controller class for later
