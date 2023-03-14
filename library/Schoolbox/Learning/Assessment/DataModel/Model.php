@@ -278,6 +278,9 @@ class Model implements ISoftDeletable
         if ($this->hasProject()) {
             $this->project = clone $this->project;
         }
+        if ($this->hasLessonPlan()) {
+            $this->lessonPlan = clone $this->lessonPlan;
+        }
     }
 
     /**
@@ -411,7 +414,7 @@ class Model implements ISoftDeletable
      */
     public function hasSubObject(): bool
     {
-        return $this->hasTask() || $this->hasDueWork() || $this->hasQuiz() || $this->hasProject();
+        return $this->hasTask() || $this->hasDueWork() || $this->hasQuiz() || $this->hasProject() || $this->hasLessonPlan();
     }
 
     /**
