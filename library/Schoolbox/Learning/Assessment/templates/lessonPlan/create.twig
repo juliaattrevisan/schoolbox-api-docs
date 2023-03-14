@@ -3,8 +3,12 @@
  #
  # Create a Lesson Plan based on a customised version of a Lesson Plan Template
  #
- # @param LessonPlan\Template\Model $template
- # @param array $breadcrumbs        A set of nodes to render as breadcrumb elements
+ # @param array $lessonPlanMeta                                An arbitrary array struct of Lesson Plan metadata
+ # @param LessonPlan\Template\Model $lessonPlanMeta[template]  The LessonPlan Template for this assessment
+ # @param string $lessonPlanMeta[type]                         Corresponds to the const 'lessonPlan' in AssessmentType
+ # @param string $lessonPlanMeta[mageAsync]                    Whether this was a Mage Step 2 async form fragment (always false here)
+ #
+ # @param array $breadcrumbs                                   A set of nodes to render as breadcrumb elements
  #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(breadcrumbs) }}
@@ -30,7 +34,7 @@
             <input type="hidden" name="contextId" value="{{ context.id }}" />
             <input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
             <input type="hidden" name="returnUrl" value="{{ returnUrl }}" />
-            <input type="hidden" name="lessonPlanTemplateId" value="{{ template.id }}" />
+            <input type="hidden" name="lessonPlanTemplateId" value="{{ lessonPlanMeta.template.id }}" />
 
             <section>
                 <fieldset class="content">
@@ -40,7 +44,7 @@
                     </div>
                 </fieldset>
 
-                {% for field in template.fields %}
+                {% for field in lessonPlanMeta.template.fields %}
                     <fieldset class="content">
                         <div class="small-12 columns">
                             <h2>{{ field.title }}</h2>
@@ -62,7 +66,7 @@
     document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
         detail: {
             targetElements: [
-                {% for field in template.fields %}
+                {% for field in lessonPlanMeta.template.fields %}
                 '#field-body-{{ field.id }}',
                 {% endfor %}
             ],

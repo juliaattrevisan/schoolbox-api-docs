@@ -82,6 +82,8 @@ class LessonPlan implements IAssessmentTypeTranslator
          */
         $dataModel->setFields($lessonPlanFieldMapper->createCollection());
 
+        /* The visibility of this Lesson Plan to its students
+         */
         $dataModel->setVisibility($domainObject->getVisibility());
 
         /* TODO Domain Object and Data Model don't know about the auditor fields.
@@ -127,6 +129,16 @@ class LessonPlan implements IAssessmentTypeTranslator
      */
     public function translateToDomainModel(IAssessableDataModel $dataModel, IAssessable $domainObject): void
     {
+        /* Lesson Plan Template associated with this assessment
+         */
+        $domainObject->setLessonPlanTemplate($dataModel->getLessonPlanTemplate());
+
+        /* Auditor fields
+         */
+        $domainObject->setCreatedBy($dataModel->getCreatedBy());
+        $domainObject->setUpdatedBy($dataModel->getUpdatedBy());
+        $domainObject->setDeletedBy($dataModel->getDeletedBy());
+
         /* TODO whatever this is meant to do, like Tasks
          */
 //        // Convert attachments

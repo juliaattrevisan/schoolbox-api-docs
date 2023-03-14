@@ -259,9 +259,9 @@ abstract class Controller extends ListController implements IAssessmentControlle
             if ('' === $templateId) {
                 /* You need to Select an LPT
                  */
-                $data['template'] = null;
-                $data['type'] = $type;
-                $data['mageAsync'] = false;
+                $data['lessonPlanMeta']['template'] = null;
+                $data['lessonPlanMeta']['type'] = $type;
+                $data['lessonPlanMeta']['mageAsync'] = false;
 
                 /* If $part-1 is set in the query string param, you came here from the
                  * Activity Selection screen via Course Builder component. This part
@@ -302,7 +302,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             } else {
                 /* Customise the selected LPT
                  */
-                $data['template'] = \Schoolbox\Admin\LessonPlan\Template\Mapper::getInstance()->findById((int)$templateId);
+                $data['lessonPlanMeta']['template'] = \Schoolbox\Admin\LessonPlan\Template\Mapper::getInstance()->findById((int)$templateId);
 
                 if ($this->getRequest()->isXhr()) {
                     $content = $this->buildUnthemedHtmlOutput(sprintf(
@@ -362,6 +362,14 @@ abstract class Controller extends ListController implements IAssessmentControlle
         /* Course Managed Field and associated checkbox in the ui
          */
         $courseManagedFields = new CourseManagedFields($this->getUser(), $assessment);
+
+        /* Lesson Plan Template metadata, used to construct forms
+         */
+        $data['lessonPlanMeta'] =[
+            'template'  => $assessment->getLessonPlanTemplate(),
+            'type' => AssessmentType::TYPE_LESSON_PLAN,
+            'mageAsync' => false
+        ];
 
         $data['courseManaged'] = [
             'isVisible' => $courseManagedFields->isVisible(),
