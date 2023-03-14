@@ -11,28 +11,27 @@ namespace Schoolbox\Realtime\Subscription;
 
 interface ISubscriptionManager
 {
+    /**
+     * @param int $userId
+     * @return bool
+     */
+    public function subscribeUser(int $userId): bool;
 
     /**
      * @param int $userId
      * @return bool
      */
-    public function subscribeUser($userId);
-
-    /**
-     * @param int $userId
-     * @return bool
-     */
-    public function userHasSubscription($userId);
+    public function userHasSubscription(int $userId): bool;
 
     /**
      * @param int $userId
      * @return ISubscription
      */
-    public function getUserSubscription($userId);
+    public function getUserSubscription(int $userId): ISubscription;
 
     /**
      * @param int $userId
      * @return bool
      */
-    public function removeSubscription($userId);
+    public function removeSubscription(int $userId): bool;
 }

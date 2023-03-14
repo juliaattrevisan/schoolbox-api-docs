@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -19,7 +21,6 @@ use Psr\Log\LoggerInterface;
  */
 class SubscriptionManager implements ISubscriptionManager
 {
-
     /** @var string */
     private $instanceId;
 
@@ -52,7 +53,7 @@ class SubscriptionManager implements ISubscriptionManager
      * @param int $userId
      * @return bool
      */
-    public function subscribeUser($userId)
+    public function subscribeUser(int $userId): bool
     {
         if ($this->userHasSubscription($userId)) {
             $this->log->info("User $userId is already subscribed");
@@ -73,7 +74,7 @@ class SubscriptionManager implements ISubscriptionManager
      * @param int $userId
      * @return bool
      */
-    public function userHasSubscription($userId)
+    public function userHasSubscription(int $userId): bool
     {
         return array_key_exists($userId, $this->subscriptions);
     }
@@ -83,7 +84,7 @@ class SubscriptionManager implements ISubscriptionManager
      * @param int $userId
      * @return ISubscription
      */
-    public function getUserSubscription($userId)
+    public function getUserSubscription(int $userId): ISubscription
     {
         if (!$this->userHasSubscription($userId)) {
             // doesn't exist: create it
@@ -98,7 +99,7 @@ class SubscriptionManager implements ISubscriptionManager
      * @param int $userId
      * @return bool
      */
-    public function removeSubscription($userId)
+    public function removeSubscription(int $userId): bool
     {
         if (!$this->userHasSubscription($userId)) {
             return false;
