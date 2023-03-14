@@ -30,6 +30,7 @@ async function onCreated(textarea: HTMLTextAreaElement, editor: Editor, config: 
     addToGlobalScope(editor, textarea);
     editor.config.sbConfig = config;
     attachInspector(editor);
+    textarea.addEventListener(EditorEvent.EDITOR__UPDATETOKENS, onEditorUpdateTokens);
     textarea.dispatchEvent(
         new CustomEvent(EditorEvent.EDITOR__CREATED, {
             detail: {
@@ -80,10 +81,8 @@ function onCreate(event: CustomEvent) {
     });
 }
 
-/**
- * Surround tokens with span element
- *
- * @param { string } str - the string to search
+/**editor.ts:227
+
  * @param { string[] } tokens - the tokens to search for
  * @returns { string } - the string with the tokens surrounded by the span element
  */
@@ -132,6 +131,19 @@ function surroundUnsurroundedTokens(str: string, tokens: string[]): string {
     });
 
     return formattedStr;
+}
+
+/**
+ * Listen for update tokens events to update the tokens in the editor
+ *
+ * @param { CustomEvent } event - the custom event
+ */
+function onEditorUpdateTokens(event: CustomEvent) {
+    const editor = window.sbProps.editors[event.target.id || event.target.name];
+
+    if (editor.config.sbConfig.tokenList) {
+        editor.setData(surroundUnsurroundedTokens(editor.getData(), editor.config.sbConfig.tokenList));
+    }
 }
 
 document.addEventListener(EditorEvent.EDITOR__CREATE, onCreate);

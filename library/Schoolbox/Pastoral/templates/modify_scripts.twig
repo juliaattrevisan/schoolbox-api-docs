@@ -21,7 +21,8 @@
         document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
             detail: {
                 targetElements: editorIdsToLoad,
-                hasTokens: true
+                hasTokens: true,
+                tokenList: ["[firstname]", "[preferredname]", "[surname]", "[fullname]", "[year]", "[house]"]
             }
         }));
 
@@ -400,12 +401,15 @@
              */
             if (current === '' || publicEditorIsTemplate) {
                 window.sbProps.editors['body_public'].setData(template);
+                window.sbProps.editors['body_public'].sourceElement.dispatchEvent(new CustomEvent("EDITOR__UPDATETOKENS"));
                 publicEditorIsTemplate = true;
             }
             if (currentPrivate === '' || privateEditorIsTemplate) {
                 window.sbProps.editors['body_private'].setData(templatePrivate);
+                window.sbProps.editors['body_private'].sourceElement.dispatchEvent(new CustomEvent("EDITOR__UPDATETOKENS"));
                 privateEditorIsTemplate = true;
             }
+
         }
     });
 </script>
