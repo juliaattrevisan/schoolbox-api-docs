@@ -186,20 +186,26 @@ class Submission extends SubmissionAbstract
     ): ?SubmissionBox\ReturnedWork {
         /** @var SubmissionBox $submissionBox */
         $submissionBox = $iAssessable;
-        $this->log->debug(sprintf('Processing marks for submission_box: box_id:%s', $submissionBox->getId()));
+        $this->log->debug(sprintf('Processing marks for submission_box: box_id:%s student:%d', $submissionBox->getId(), $reviewee->getId()));
         $normMark = $canvasSubmission['norm_mark'];
         $readableMark = $canvasSubmission['mark'];
 
-        // If only published mark exists, try to get norm_mark from it
-        if (!$normMark && $readableMark) {
-            $normMark = $markScheme->getNormalisedMark($readableMark);
-        } elseif ($submissionBox->getMaxMark()) {
+        if ($normMark !== null && $submissionBox->getMaxMark()) {
             $normMark = ($normMark / $submissionBox->getMaxMark()) * 100;
+        } elseif ($readableMark !== null && $submissionBox->getMarkType()->getSlug() !== SubmissionBox\MarkType::SLUG_NONE) {
+            // If submission_dim.published_grade exists but submission_fact.published_score doesn't,
+            // try to get norm_mark from published_grade
+            try {
+                $normMark = $markScheme->getNormalisedMark($readableMark);
+            } catch (\Exception $e) {
+                $this->log->debug(sprintf('Could not normalise mark %s for student:%d :%s', $readableMark, $reviewee->getId(), $e->getMessage()));
+            }
         }
 
         if ($submissionBox->getMarkType()->getSlug() !== SubmissionBox\MarkType::SLUG_NONE) {
             $readableMark = $markScheme->getHumanReadableMark($normMark);
         }
+
         /** @var SubmissionBox\ReturnedWork $existingFeedback */
         foreach ($existingFeedbacks as $existingFeedback) {
             // check whether the rest are the same
