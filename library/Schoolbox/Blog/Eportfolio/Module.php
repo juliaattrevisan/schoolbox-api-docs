@@ -27,6 +27,7 @@ use Schoolbox\Blog\Eportfolio\Post\Mapper as EportfolioBlogMapper;
 use Schoolbox\Blog\Eportfolio\Post\Model as EportfolioBlogModel;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Alaress\Twig\Loader\IChainLoader;
@@ -114,21 +115,36 @@ class Module extends BaseModule
      */
     protected function buildAuthorizationRule($method)
     {
-        $callback = function ($params, User $user) use ($method) {
+        $callback = function ($params, User $loggedInUser) use ($method) {
             // Allow owner of either blog or comment to do stuff
             if (($params['comment'] ?? null) instanceof EportfolioBlogCommentModel) {
-                if ($params['comment']->getOwner()->getId() == $user->getId()) {
+                $commentOwner = $params['comment']->getOwner();
+                $commentOwnerRole = $commentOwner->getRole();
+
+                // Hydrate commentOwnerRole object the quick and dirty way for now.
+                // TODO: Hydrate in mapper instead.
+                $roleMapper = new RoleMapper();
+                $commentOwnerRole = $roleMapper->findById($commentOwnerRole->getId());
+
+                if ($commentOwner->getId() == $loggedInUser->getId()) {
                     return;
+                } elseif ($commentOwnerRole->isStaff()) {
+                    $loggedInUserRole = $loggedInUser->getRole();
+                    if ($loggedInUser->isSuperuser() || $loggedInUserRole->isStaff()) {
+                        return;
+                    } else {
+                        throw new Unauthorized();
+                    }
                 }
             }
             if (($params['blog'] ?? null) instanceof EportfolioBlogModel) {
-                if ($params['blog']->getOwner()->getId() == $user->getId()) {
+                if ($params['blog']->getOwner()->getId() == $loggedInUser->getId()) {
                     return;
                 }
             }
             if (($params['page'] ?? null) instanceof EportfolioPageModel) {
                 $auth = new Eportfolio_Authenticator(
-                    $user,
+                    $loggedInUser,
                     $params['page']->getOwner(),
                     $params['page']->getPageId()
                 );
