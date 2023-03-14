@@ -9,7 +9,7 @@
 
 import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
 import LinkEditing from "@ckeditor/ckeditor5-link/src/linkediting";
-// import LinkUI from "@ckeditor/ckeditor5-link/src/linkui";
+import ResourceLinkEditing from "@js/editor/plugin/resourceLink/ResourceLinkEditing";
 import LinkUI from "@js/editor/plugin/link/LinkUI";
 import AutoLink from "@ckeditor/ckeditor5-link/src/autolink";
 
@@ -26,7 +26,7 @@ export default class Link extends Plugin {
      * @inheritDoc
      */
     static get requires() {
-        return [LinkEditing, LinkUI, AutoLink];
+        return [LinkEditing, ResourceLinkEditing, LinkUI, AutoLink];
     }
 
     /**

@@ -13,7 +13,6 @@ import ButtonView from "@ckeditor/ckeditor5-ui/src/button/buttonview";
 import ContextualBalloon from "@ckeditor/ckeditor5-ui/src/panel/balloon/contextualballoon";
 import clickOutsideHandler from "@ckeditor/ckeditor5-ui/src/bindings/clickoutsidehandler";
 import { isWidget } from "@ckeditor/ckeditor5-widget/src/utils";
-// import LinkFormView from "@ckeditor/ckeditor5-link/src/ui/linkformview";
 import LinkFormView from "@js/editor/plugin/link/LinkFormView";
 import LinkActionsView from "@ckeditor/ckeditor5-link/src/ui/linkactionsview";
 import { addLinkProtocolIfApplicable, isLinkElement, LINK_KEYSTROKE } from "@ckeditor/ckeditor5-link/src/utils";
@@ -186,6 +185,9 @@ export default class LinkUI extends Plugin {
         // Form elements should be read-only when corresponding commands are disabled.
         formView.urlInputView.bind("isReadOnly").to(linkCommand, "isEnabled", (value) => !value);
         formView.saveButtonView.bind("isEnabled").to(linkCommand);
+
+        // Open up the resource browser when clicking the "Browse" button.
+        formView.resourceButtonView.on("execute", () => editor.execute("insertResourceLink"));
 
         // Execute link command after clicking the "Save" button.
         this.listenTo(formView, "submit", () => {
@@ -478,6 +480,14 @@ export default class LinkUI extends Plugin {
         }
 
         const editor = this.editor;
+
+        /**
+         * while the resource modal is open, prevent the link ui from hiding
+         */
+        const resourceLinkCommand = this.editor.commands.get("insertResourceLink");
+        if (resourceLinkCommand.isOn) {
+            return;
+        }
 
         this.stopListening(editor.ui, "update");
         this.stopListening(this._balloon, "change:visibleView");

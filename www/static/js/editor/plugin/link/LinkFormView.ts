@@ -19,6 +19,7 @@ import submitHandler from "@ckeditor/ckeditor5-ui/src/bindings/submithandler";
 import FocusTracker from "@ckeditor/ckeditor5-utils/src/focustracker";
 import KeystrokeHandler from "@ckeditor/ckeditor5-utils/src/keystrokehandler";
 import { icons } from "@ckeditor/ckeditor5-core/src/index";
+import { insertElementAfter } from "@js/util/domUtils";
 
 // See: #8833.
 // eslint-disable-next-line ckeditor5-rules/ckeditor-imports
@@ -69,6 +70,17 @@ export default class LinkFormView extends View {
          * @member {module:ui/labeledfield/labeledfieldview~LabeledFieldView}
          */
         this.urlInputView = this._createUrlInput();
+
+        /**
+         * Add a button next to the URL input view to browse for a resource
+         */
+        this.resourceButtonView = new ButtonView(this.locale);
+        this.resourceButtonView.set({
+            label: "Browse",
+            withText: true,
+            tooltip: true,
+            class: "ck-button-resource-link",
+        });
 
         /**
          * The Save button view.
@@ -197,6 +209,9 @@ export default class LinkFormView extends View {
 
         // Start listening for the keystrokes coming from #element.
         this.keystrokes.listenTo(this.element);
+
+        // add the resource button after the url input
+        insertElementAfter(this.urlInputView.fieldView.element, this.resourceButtonView.element);
     }
 
     /**
@@ -317,6 +332,7 @@ export default class LinkFormView extends View {
         const children = this.createCollection();
 
         children.add(this.urlInputView);
+        children.add(this.resourceButtonView);
 
         if (manualDecorators.length) {
             const additionalButtonsView = new View();

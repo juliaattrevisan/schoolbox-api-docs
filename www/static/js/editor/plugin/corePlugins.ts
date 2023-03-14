@@ -9,7 +9,7 @@ import Underline from "@ckeditor/ckeditor5-basic-styles/src/underline";
 import Strikethrough from "@ckeditor/ckeditor5-basic-styles/src/strikethrough";
 // import Link from "@ckeditor/ckeditor5-link/src/link";
 import Link from "@js/editor/plugin/link/Link";
-import ResourceLink from "@js/editor/plugin/resourceLink/ResourceLink";
+// import ResourceLink from "@js/editor/plugin/resourceLink/ResourceLink";
 import List from "@ckeditor/ckeditor5-list/src/list";
 import BlockQuote from "@ckeditor/ckeditor5-block-quote/src/blockquote";
 import GeneralHtmlSupport from "@ckeditor/ckeditor5-html-support/src/generalhtmlsupport";
@@ -28,7 +28,7 @@ export function getCorePlugins() {
         Underline,
         Strikethrough,
         Link,
-        ResourceLink,
+        // ResourceLink,
         List,
         BlockQuote,
         GeneralHtmlSupport,
