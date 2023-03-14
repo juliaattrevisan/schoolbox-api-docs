@@ -825,13 +825,18 @@ class Mapper extends BaseMapper
                  */
                 $lessonPlanField = $this->hydrateJoin($row, 'lessonPlan.lessonPlanField', 'lessonPlanField');
 
-                /* Init collection before shanking stuff in
+                /* $lessonPlanField can be null when there aren't any;
+                 * they don't exist yet, or you're creating them for the first time
                  */
-                if (null == $lessonPlan->getFields()) {
-                    $lessonPlan->setFields(\Schoolbox\Learning\Assessment\DataModel\LessonPlan\Field\Mapper::getInstance()->createCollection());
-                }
+                if (null !== $lessonPlanField) {
+                    /* Init collection before shanking stuff in
+                     */
+                    if (null === $lessonPlan->getFields()) {
+                        $lessonPlan->setFields(\Schoolbox\Learning\Assessment\DataModel\LessonPlan\Field\Mapper::getInstance()->createCollection());
+                    }
 
-                $lessonPlan->addField($lessonPlanField);
+                    $lessonPlan->addField($lessonPlanField);
+                }
             } else {
                 $model->setLessonPlan(null);
             }
