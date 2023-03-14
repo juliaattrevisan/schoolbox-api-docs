@@ -84,8 +84,7 @@ class Submission extends SubmissionAbstract
         $sbSubmissionBoxSpec = $this->submissionBoxMapper->findOneByColumn('external_id', $assessmentCanvasId);
 
         $assessmentImpls   = $this->findAllImplementationsBySpecificationId(
-            $sbSubmissionBoxSpec->getAssessmentModel()
-                                ->getId()
+            $sbSubmissionBoxSpec->getAssessmentModel()->getId()
         );
         $canvasSubmissions = $this->loadCanvasSubmissions($assessmentCanvasId);
         $this->log->info("Processing submissions for Canvas Assignment '{$canvasAssessment['title']}' (CanvasId: $assessmentCanvasId)");
@@ -100,9 +99,7 @@ class Submission extends SubmissionAbstract
 
             // get existing marks for this assessment
             $submissionBox     = $this->submissionBoxMapper->findOneByColumn('assessment_id', $assessmentImpl->getId());
-            $existingFeedbacks = $this->returnedWorkMapper->findByColumnList([
-                                                                                 'box_id' => $submissionBox->getId(),
-                                                                             ]);
+            $existingFeedbacks = $this->returnedWorkMapper->findByColumnList(['box_id' => $submissionBox->getId()]);
             $syncedFeedbackIds = [];
 
             $markScheme = $markSchemaFactory->spawnMarkSchemeFor($assessmentImpl);
@@ -191,10 +188,15 @@ class Submission extends SubmissionAbstract
         $submissionBox = $iAssessable;
         $this->log->debug(sprintf('Processing marks for submission_box: box_id:%s', $submissionBox->getId()));
         $normMark = $canvasSubmission['norm_mark'];
-        if ($submissionBox->getMaxMark()) {
+        $readableMark = $canvasSubmission['mark'];
+
+        // If only published mark exists, try to get norm_mark from it
+        if (!$normMark && $readableMark) {
+            $normMark = $markScheme->getNormalisedMark($readableMark);
+        } elseif ($submissionBox->getMaxMark()) {
             $normMark = ($normMark / $submissionBox->getMaxMark()) * 100;
         }
-        $readableMark = $canvasSubmission['mark'];
+
         if ($submissionBox->getMarkType()->getSlug() !== SubmissionBox\MarkType::SLUG_NONE) {
             $readableMark = $markScheme->getHumanReadableMark($normMark);
         }

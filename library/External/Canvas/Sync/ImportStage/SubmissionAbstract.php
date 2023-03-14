@@ -12,14 +12,12 @@ namespace External\Canvas\Sync\ImportStage;
 
 use Alaress\Database\Connector\IConnector;
 use Psr\Log\LoggerInterface;
-use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Plan;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
-use Schoolbox\Learning\Quiz\Model;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Alaress\Database;
