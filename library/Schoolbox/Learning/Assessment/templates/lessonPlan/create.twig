@@ -11,19 +11,6 @@
  # @param array $breadcrumbs                                   A set of nodes to render as breadcrumb elements
  #}
 
-{% if lessonPlanMeta.includeBreadcrumbs %}
-    {% import 'sub/breadcrumbs.twig' as bread %}
-    {{ bread.crumbsArray(breadcrumbs) }}
-
-    <div class="actions-small-1 row">
-        <div class="list-item">
-            <div class="small-12 column">
-                <h1>Create Lesson Plan</h1>
-            </div>
-        </div>
-    </div>
-{% endif %}
-
 {% if assessment.id %}
     {% set formAction = routeLookup('learningAssessment.postUpdateAssessment', { assessmentId: assessment.id, assessment: assessment })  %}
 {% else %}

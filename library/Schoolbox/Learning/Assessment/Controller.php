@@ -315,10 +315,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
                         AssessmentType::TYPE_LESSON_PLAN
                     ), $data);
                 } else {
-                    $content = $this->buildHtmlOutput(sprintf(
-                        "@learningAssessment/%s/create.twig",
-                        AssessmentType::TYPE_LESSON_PLAN
-                    ), $data);
+                    $content = $this->buildHtmlOutput('@learningAssessment/create.twig', $data);
                 }
             }
         } else {
