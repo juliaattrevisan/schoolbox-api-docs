@@ -772,17 +772,30 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
 
     /**
-     * @param string              $externalUserId
-     * @param int                 $userId
-     * @param int                 $dayNumber
-     * @param array|string[]|null $fileTypes
-     * @param string              $fileSemester
-     * @param string              $fileYear
-     * @param Campus              $campus
+     * Load timetable periods for a given user.
+     *
+     * @param string              $externalUserId The user's external ID
+     * @param int                 $userId         The user's Schoolbox ID: used to determine if user is student or staff
+     * @param int                 $dayNumber      The day number to load periods for
+     * @param array|string[]|null $fileTypes      The timetable file types to load, in addition to what is configured in
+     *                                            `config.external_synergetic_allowed_file_types`
+     * @param string|null         $fileSemester   The file semester to load periods for: if null, return an empty result
+     * @param string|null         $fileYear       The file year to load periods for: if null, return an empty result
+     * @param Campus              $campus         The campus to load periods for
      * @return array
      */
-    private function getTimetablePeriods(string $externalUserId, int $userId, int $dayNumber, ?array $fileTypes, string $fileSemester, string $fileYear, Campus $campus): array
-    {
+    private function getTimetablePeriods(
+        string $externalUserId,
+        int $userId,
+        int $dayNumber,
+        ?array $fileTypes,
+        ?string $fileSemester,
+        ?string $fileYear,
+        Campus $campus,
+    ): array {
+        if (!isset($fileSemester, $fileYear)) {
+            return [];
+        }
         $externalUserId = $this->database->legacyQuote($externalUserId);
         $fileSemester   = $this->database->legacyQuote($fileSemester);
         $fileYear       = $this->database->legacyQuote($fileYear);
