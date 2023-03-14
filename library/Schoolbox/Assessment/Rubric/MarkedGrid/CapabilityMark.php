@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\MarkedGrid;
 
+use InvalidArgumentException;
 use RangeException;
 use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
 use Schoolbox\Assessment\Rubric\Grid\IndicatorUsage;
@@ -136,11 +137,19 @@ class CapabilityMark
     /**
      * Retrieves a form input value from this mark's human-readable value.
      *
+     * If the HR value can't be converted to a form input value: the HR value
+     * will be returned. The form should then render that the input value is
+     * invalid.
+     *
      * @return string|null
      */
     public function retrieveHumanReadableValueAsFormInput()
     {
-        return $this->markScheme->convertHumanReadableMarkToFormInput($this->humanReadableValue);
+        try {
+            return $this->markScheme->convertHumanReadableMarkToFormInput($this->humanReadableValue);
+        } catch (InvalidArgumentException) {
+            return $this->humanReadableValue;
+        }
     }
 
 
