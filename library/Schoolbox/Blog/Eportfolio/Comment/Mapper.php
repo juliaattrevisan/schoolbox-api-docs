@@ -63,7 +63,7 @@ class Mapper extends BaseMapper
      */
     protected function getSelectString()
     {
-        $sql = "
+        return "
             SELECT
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('owner', 'u')},
@@ -72,8 +72,6 @@ class Mapper extends BaseMapper
             INNER JOIN {$this->getJoinSql('owner', '', 'u', true)}
             INNER JOIN {$this->getJoinSql('owner.role', 'u', 'ur')}
         ";
-
-        return $sql;
     }
 
     /**
