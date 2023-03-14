@@ -512,7 +512,9 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      */
     public function handleResponse($pipe, $command, $data)
     {
-        $userId = $pipe->getUserId();
+        // TODO extract from pipe
+        $instanceId = INSTANCE_ID;
+        $userId     = $pipe->getUserId();
 
         $this->log->notice("Handling a worker response: $command");
 
@@ -521,11 +523,11 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         switch (strtolower($command)) {
             // deal with this yourself
             case self::PIPE_METHOD_SUBSCRIBE:
-                if ($this->subscriptionManager->subscribeUser($userId)) {
+                if ($this->subscriptionManager->subscribeUser($instanceId, $userId)) {
                     $this->sendToPipe($pipe, [ self::PIPE_METHOD_SUBSCRIBE => true ]);
 
                     $this->enqueueInstances($pipe, $this->subscriptionManager
-                        ->getUserSubscription($userId)
+                        ->getUserSubscription($instanceId, $userId)
                         ->getUnread());
                 } else {
                     // could not subscribe the user, rabbit-offline has already been reported, just inform the user
@@ -546,7 +548,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
 
             // deal with this yourself
             case self::PIPE_METHOD_ACKNOWLEDGE:
-                if ($subscription = $this->subscriptionManager->getUserSubscription($userId)) {
+                if ($subscription = $this->subscriptionManager->getUserSubscription($instanceId, $userId)) {
                     $markAsRead = [];
                     foreach ((array)$data[1] as $msgId) {
                         if ($subscription->acknowledgeMessage($msgId)) {
