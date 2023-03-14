@@ -54,10 +54,9 @@ class Assess_Attempt extends Evaluation_Attempt
      * * aren't yet reviewed
      *
      * @param int $assessId
-     * @param bool $excludeReviewed
      * @return array
      */
-    public function retrieveLatestReviewableAttemptIds($assessId, $excludeReviewed = false)
+    public function retrieveLatestReviewableAttemptIds($assessId)
     {
         $query = "
             SELECT user_id, attempt_id, reviewed_at
@@ -73,9 +72,6 @@ class Assess_Attempt extends Evaluation_Attempt
         }
         foreach ($rows as $row) {
             $userId = $row['user_id'];
-            if ($excludeReviewed && $row['reviewed_at'] !== null) {
-                continue;
-            }
             if (!isset($results[$userId])) {
                 $results[$userId] = $row['attempt_id'];
             }

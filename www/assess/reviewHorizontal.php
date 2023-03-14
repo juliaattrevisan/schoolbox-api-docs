@@ -114,8 +114,7 @@ if (!isset($this->arg[1])) {
 
     // Retrieve all attempts
     $attemptMapper = QuizAttemptMapper::getInstance();
-    $attempts = $attemptHandler->retrieveLatestReviewableAttemptIds($assess['assess_id'], true);
-
+    $attempts = $attemptHandler->retrieveLatestReviewableAttemptIds($assess['assess_id']);
     // Review them right now
     // (Don't update review date of anything already reviewed)
     $quizzes = [];
