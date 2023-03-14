@@ -89,8 +89,12 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
     /** @var Transaction[][] */
     private $pushTransactions;
 
-    /** @var TimerInterface[] */
-    private $userTimeouts = [];
+    /**
+     * User timeouts, indexed by instance ID and then by user ID
+     *
+     * @var array<string, array<int, TimerInterface>>
+     */
+    private array $userTimeouts = [];
 
     /** @var int */
     private $fdLimit;
@@ -267,8 +271,10 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
             throw new ErrorException("Unrecognised pipe: '$socketKey'");
         }
 
-        $userId    = $pipe->getUserId();
-        $sessionId = $pipe->getSession();
+        // TODO extract instance ID from pipe
+        $instanceId = INSTANCE_ID;
+        $userId     = $pipe->getUserId();
+        $sessionId  = $pipe->getSession();
 
         $this->log->info(
             sprintf(
@@ -307,7 +313,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
             $pipe->lock($command);
 
             // flag the user as active
-            $this->refreshUser($userId);
+            $this->refreshUser($instanceId, $userId);
 
             try {
                 // don't flatly spawn a new worker: add the request to a queue
@@ -648,41 +654,52 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
 
 
     /**
-     * @param int $userId
+     * @param string $instanceId
+     * @param int    $userId
      * @return void
      */
-    private function refreshUser($userId)
+    private function refreshUser(string $instanceId, int $userId)
     {
-        if (isset($this->userTimeouts[$userId]) && $this->userTimeouts[$userId] instanceof TimerInterface) {
-            $this->reactLoop->cancelTimer($this->userTimeouts[$userId]);
-            unset($this->userTimeouts[$userId]);
+        if (
+            isset($this->userTimeouts[$instanceId][$userId])
+            && $this->userTimeouts[$instanceId][$userId] instanceof TimerInterface
+        ) {
+            $this->reactLoop->cancelTimer($this->userTimeouts[$instanceId][$userId]);
+            unset($this->userTimeouts[$instanceId][$userId]);
         }
 
-        $this->userTimeouts[$userId] = $this->reactLoop->addTimer(
+        $this->userTimeouts[$instanceId][$userId] = $this->reactLoop->addTimer(
             self::INACTIVE_TIMEOUT,
-            function () use ($userId) {
-                $this->onTimeout($userId);
+            function () use ($instanceId, $userId) {
+                $this->onTimeout($instanceId, $userId);
             }
         );
     }
 
 
     /**
-     * @param int $userId
+     * @param string $instanceId
+     * @param int    $userId
      * @return void
      */
-    private function onTimeout($userId)
+    private function onTimeout(string $instanceId, int $userId)
     {
-        $success = $this->subscriptionManager->removeSubscription($userId);
-        $this->log->info("User $userId has timed out, " . ($success ? 'unsubscribed' : 'failed to unsubscribe'));
+        $success = $this->subscriptionManager->removeSubscription($instanceId, $userId);
 
+        // TODO consider parameterised logging
+        $this->log->info(
+            "User $userId for instance $instanceId has timed out, "
+            . ($success ? 'unsubscribed' : 'failed to unsubscribe')
+        );
+
+        // TODO fetch pipes by instance + user ID
         foreach ($this->pipes->getPipesByUserId($userId) as $pipe) {
             $this->sendHeader($pipe, 401);
             $this->pipes->unregisterPipe($pipe->getSocketKey());
             $pipe->close();
         }
 
-        unset($this->userTimeouts[$userId], $this->pushTransactions[$userId]);
+        unset($this->userTimeouts[$instanceId][$userId], $this->pushTransactions[$userId]);
     }
 
 

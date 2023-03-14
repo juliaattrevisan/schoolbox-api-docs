@@ -77,6 +77,7 @@ class PipeCollection implements Countable
         $pipe->setUserId($userId);
 
         // index pipe in triplicate
+        // TODO index by instance ID as well
         $this->pipesBySocketKey[$socketKey]             = $pipe;
         $this->pipesBySessionId[$sessionId][$socketKey] = $pipe;
         $this->pipesByUserId[$userId][$socketKey]       = $pipe;
