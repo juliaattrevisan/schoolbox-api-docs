@@ -1,4 +1,10 @@
 /**
+ * This is primarily a copy of the original LinkUI plugin from CKEditor 5
+ * modified to display a browse button that opens our resource modal to select
+ * a resource to link to
+ */
+
+/**
  * @license Copyright (c) 2003-2023, CKSource Holding sp. z o.o. All rights reserved.
  * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
  */
