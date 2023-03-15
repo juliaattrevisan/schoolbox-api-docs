@@ -1330,9 +1330,6 @@ class MapperProxy
         } elseif ($subObject instanceof LessonPlan\Model) {
             $lessonPlanMapper = LessonPlan\Mapper::getInstance();
 
-            /* TODO $subObject never has an id when updating a Lesson Plan, for some reason...
-             *  This causes new Lesson Plans to spawn when updating
-             */
             $lessonPlanMapper->save($subObject);
             $lessonPlanMapper->saveFields($subObject);
 //             $lessonPlanMapper->saveFiles($subObject);
