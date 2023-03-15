@@ -1,12 +1,13 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="{CDN_PREFIX}/js/ckeditor/ckeditor.js?v={SITE_VERSION}"></script>
-<script type="text/javascript" src="{CDN_PREFIX}/js/editor/jquery.editor.js?v={SITE_VERSION}"></script>
+<script type="text/javascript" src="{CDN_PREFIX}/js/bundle/editor.js?v={SITE_VERSION}"></script>
 
 <script type="text/javascript">
     $(function() {
-        $.fn.alaressEditor({
-            file_browser_category_id: '{ASSESS_CATEGORY_ID}'
-        });
+        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+            detail: {
+                targetElements: ['#description'],
+            }
+        }));
 
         $('#createSection').alaressValidate({
             rules: {
@@ -48,7 +49,7 @@
 
                 <label>
                     Description
-                    <textarea name="description"></textarea>
+                    <textarea name="description" id="description"></textarea>
                 </label>
             </section>
             <div class="row">

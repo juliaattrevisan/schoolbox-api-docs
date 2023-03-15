@@ -1,16 +1,16 @@
 <link rel="stylesheet" href="{CDN_PREFIX}/js/vendors/jstree/dist/themes/default/style.css?v={SITE_VERSION}" />
 <script type="text/javascript" src="{CDN_PREFIX}/js/vendors/jstree/dist/jstree.min.js?v={SITE_VERSION}"></script>
-<script type="text/javascript" src="{CDN_PREFIX}/js/ckeditor/ckeditor.js?v={SITE_VERSION}"></script>
-<script type="text/javascript" src="{CDN_PREFIX}/js/editor/jquery.editor.js?v={SITE_VERSION}"></script>
+<script type="text/javascript" src="{CDN_PREFIX}/js/bundle/editor.js?v={SITE_VERSION}"></script>
 <script type="text/javascript">
     $(function() {
 
         /* For the question part itself
          */
-        $.fn.alaressEditor({
-            targetElements: $('textarea[name=question]'),
-            file_browser_category_id: '{ASSESS_CATEGORY_ID}'
-        });
+        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+            detail: {
+                targetElements: ['#question'],
+            }
+        }));
 
         /* Enforce two decimal places
          */
@@ -82,7 +82,7 @@
 
                 <label>
                     Question
-                    <textarea name="question">{QUESTION}</textarea>
+                    <textarea name="question" id="question">{QUESTION}</textarea>
                 </label>
 
                 <!-- BEGIN has_answer_configuration -->
@@ -116,4 +116,3 @@
         </form>
     </div>
 </div>
-

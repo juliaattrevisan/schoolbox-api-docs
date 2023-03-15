@@ -109,8 +109,8 @@
             $(config.element)
                 .submit(function () {
                     // update underlying textareas before submit validation
-                    $.each(CKEDITOR.instances, function (prop, val) {
-                        CKEDITOR.instances[prop].updateElement();
+                    $.each(window.sbProps.editors, function (prop, val) {
+                        window.sbProps.editors[prop].updateSourceElement();
                     });
                 })
                 .alaressValidate({
@@ -360,7 +360,7 @@
             $(config.element)
                 .submit(function () {
                     // update underlying textarea before submit validation
-                    CKEDITOR.instances.question.updateElement();
+                    window.sbProps.editors["question"].updateSourceElement();
                 })
                 .alaressValidate({
                     onfocusout: false,
@@ -399,7 +399,7 @@
                          * Common data
                          */
                         var data = {
-                            question: CKEDITOR.instances.question.getData(),
+                            question: window.sbProps.editors["question"].getData(),
                             sequence: theForm.find("input[name=sequence]").val(),
                             allAnswers: JSON.stringify(answerCollection),
                             configuration: JSON.stringify(
@@ -436,8 +436,8 @@
 
                                 redirect = "/" + config.availability + "/summary/" + data.assess_id;
                             } else {
-                            /* Modify directly in the Question Bank
-                             */
+                                /* Modify directly in the Question Bank
+                                 */
                                 data.type_id = theForm.find("input[name=type_id]").val();
                                 data.question_bank_id = theForm.find("input[name=question_bank_id]").val();
                                 data.assess_id = theForm.find("input[name=assess_id]").val();
@@ -495,12 +495,12 @@
                         } else if (typeof isAnswerOption !== typeof undefined && isAnswerOption !== false) {
                             error.insertAfter(element.closest(config.answerCollectionList));
                         } else if (element.is("textarea") && element.next().hasClass("mceEditor")) {
-                        /* If the error was found on the Marks field, just leave it
-                         * to spawn naturally
-                         *
-                         * If the error was found on one of the answer options,
-                         * spawn it naturally
-                         */
+                            /* If the error was found on the Marks field, just leave it
+                             * to spawn naturally
+                             *
+                             * If the error was found on one of the answer options,
+                             * spawn it naturally
+                             */
                             error.insertAfter(element.next());
                         } else {
                             error.insertAfter(element);
@@ -574,7 +574,7 @@
                 },
 
                 start: function (element) {
-                    var instance = CKEDITOR.instances["answerBox"];
+                    var instance = window.sbProps.editors["answerBox"];
 
                     /* Add special unique buttons
                      */
