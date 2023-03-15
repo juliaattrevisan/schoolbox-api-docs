@@ -26,48 +26,6 @@ use Schoolbox\Realtime\Subscription;
 class PipeManagerFactory
 {
     /**
-     * @var LoopInterface
-     */
-    private $loop;
-    /**
-     * @var LoggerInterface
-     */
-    private $log;
-    /**
-     * @var ClientInterface
-     */
-    private $redis;
-    /**
-     * @var Async\Client
-     */
-    private $asyncRedis;
-    /**
-     * @var int
-     */
-    private $sessionLength;
-    /**
-     * @var IConnector
-     */
-    private $db;
-    /**
-     * @var string
-     */
-    private $instanceId;
-    /**
-     * @var DispatchStrategyInterface
-     */
-    private $strat;
-    /**
-     * @var HandlerInterface
-     */
-    private $handler;
-    /**
-     * @var int
-     */
-    private $fdLimit;
-
-
-    /**
      * Take all the root dependencies, ready for composing into more complex object
      *
      * @param LoopInterface             $loop
@@ -77,32 +35,20 @@ class PipeManagerFactory
      * @param Async\Client              $asyncRedis
      * @param int                       $sessionLength
      * @param IConnector                $db
-     * @param string                    $instanceId
      * @param DispatchStrategyInterface $strat
      * @param int                       $fdLimit
      */
     public function __construct(
-        LoopInterface $loop,
-        HandlerInterface $handler,
-        LoggerInterface $log,
-        ClientInterface $redis,
-        Async\Client $asyncRedis,
-        int $sessionLength,
-        IConnector $db,
-        string $instanceId,
-        DispatchStrategyInterface $strat,
-        int $fdLimit
+        private LoopInterface $loop,
+        private HandlerInterface $handler,
+        private LoggerInterface $log,
+        private ClientInterface $redis,
+        private Async\Client $asyncRedis,
+        private int $sessionLength,
+        private IConnector $db,
+        private DispatchStrategyInterface $strat,
+        private int $fdLimit,
     ) {
-        $this->loop          = $loop;
-        $this->handler       = $handler;
-        $this->log           = $log;
-        $this->redis         = $redis;
-        $this->asyncRedis    = $asyncRedis;
-        $this->sessionLength = $sessionLength;
-        $this->db            = $db;
-        $this->instanceId    = $instanceId;
-        $this->strat         = $strat;
-        $this->fdLimit       = $fdLimit;
     }
 
 

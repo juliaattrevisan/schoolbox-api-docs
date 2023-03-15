@@ -61,7 +61,6 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
         $asyncRedis,
         $config->get('session_length'),
         $db,
-        INSTANCE_ID,
         $stratBuilder->build($flags),
         $kernel->getHardLimit(Kernel::RLIMIT_FILE_DESCRIPTORS)
     ))->build();
