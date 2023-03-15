@@ -770,6 +770,7 @@ class Mapper extends BaseMapper
         $projectIds        = [];
         $taskIds           = [];
         $contextProjectIds = [];
+        $lessonPlanIds     = [];
 
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
@@ -814,6 +815,8 @@ class Mapper extends BaseMapper
             }
             // Lesson Plan?
             if ($row['lessonPlan.id']) {
+                $lessonPlanIds[] = $row['lessonPlan.id'];
+
                 $lessonPlan = $this->hydrateJoin($row, 'lessonPlan', 'lessonPlan');
                 $lessonPlanTemplate = $this->hydrateJoin($row, 'lessonPlan.lessonPlanTemplate', 'lessonPlanTemplate');
                 $lessonPlan->setLessonPlanTemplate($lessonPlanTemplate);
@@ -904,6 +907,7 @@ class Mapper extends BaseMapper
 
         /* TODO Augment with Lesson Plan Files
          */
+        $modelList = $this->augmentWithLessonPlanFields($modelList, $lessonPlanIds);
 
         // Project contexts
         if ($hydrateProjectContext) {
@@ -1248,6 +1252,26 @@ class Mapper extends BaseMapper
 
         return $modelList;
     }
+
+
+    /**
+     * Assign Lesson Plan Fields to each Lesson Plan instance
+     *
+     * @param Collection $modelList
+     * @param array      $lessonPlanIds
+     * @return Collection
+     */
+    private function augmentWithLessonPlanFields(Collection $modelList, array $lessonPlanIds): Collection
+    {
+        $lessonPlanFieldMapper = \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Field\Mapper::getInstance();
+
+        foreach ($modelList as $model) {
+            $model->getLessonPlan()->setFields($lessonPlanFieldMapper->findByColumn('lesson_plan_id', $model->getLessonPlan()->getId()));
+        }
+
+        return $modelList;
+    }
+
 
     /**
      * Sets `$specAssessmentId` as the spec assessment for `$implAssessmentId`,
