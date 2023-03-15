@@ -13,7 +13,7 @@ import { EditorConfig, EditorToolbar } from "@js/editor/types/editorTypes";
  */
 export function getToolbar(config: EditorConfig) {
     // what displays in the default toolbar in order, are either single buttons or groups via objects
-    let toolbar = [];
+    let toolbar: Array<string | object> = [];
     if (config.toolbar === EditorToolbar.SIMPLE) {
         toolbar = [
             "bold",

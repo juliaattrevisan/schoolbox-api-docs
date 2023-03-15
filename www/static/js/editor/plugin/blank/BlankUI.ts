@@ -23,16 +23,23 @@ function getButton() {
     return button;
 }
 
-export default class ResourceUI extends Plugin {
+export default class BlankUI extends Plugin {
     /**
      * Register the button in the editor's UI component factory.
      */
     init() {
+        const editor = this.editor;
         this.editor.ui.componentFactory.add("blank", () => {
             // Create the button and bind it to the command
             const button = getButton();
             button.on("execute", () => {
-                console.warn("execute makeBlank");
+                // wrap the selected text in the blank element
+                editor.model.change((writer) => {
+                    const blank = writer.createElement("blank");
+                    for (const range of editor.model.document.selection.getRanges()) {
+                        writer.wrap(range, blank);
+                    }
+                });
             });
             // Disable the button when the command is disabled
             // const command = this.editor.commands.get("makeBlank");

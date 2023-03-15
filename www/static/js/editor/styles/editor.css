@@ -129,6 +129,13 @@
 }
 
 /**
+ * to highlight the blank words when using the 'Make Blank' button
+ */
+.ck.ck-content span.selected-word {
+    background: #cae9b9;
+}
+
+/**
  * Custom CKEditor Styles
  * You'll find our custom styles defined below. I added some colour custom properties
  * as I spoke to James and he said none of these should respond to skin config.
