@@ -1,13 +1,15 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="{CDN_PREFIX}/js/ckeditor/ckeditor.js?v={SITE_VERSION}"></script>
-<script type="text/javascript" src="{CDN_PREFIX}/js/editor/jquery.editor.js?v={SITE_VERSION}"></script>
+<script type="text/javascript" src="{CDN_PREFIX}/js/bundle/editor.js?v={SITE_VERSION}"></script>
 <script type="text/javascript">
     $(function () {
-        $.fn.alaressEditor({
-            file_browser_category_id: '{CATEGORY_ID}'
-        });
+        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+            detail: {
+                targetElements: ['#body'],
+            }
+        }));
+
         jQuery.validator.addMethod("textMaxLength", function () {
-            let bodyData = CKEDITOR.instances.forumBody.getData();
+            let bodyData = window.sbProps.editors['body'].getData();
             return bodyData.length < 65535;
         }, jQuery.validator.format("Message is too long."));
         $('form[data-validatable]').alaressValidate({
@@ -39,15 +41,15 @@
                 <fieldset class="content">
                     <!-- BEGIN title -->
                     <div class="small-12 columns">
-                        <label for="forumTitle" class="required">Title</label>
-                        <input type="text" name="title" id="forumTitle" maxlength="100" value="{THREAD_TITLE}" required />
+                        <label for="title" class="required">Title</label>
+                        <input type="text" name="title" id="title" maxlength="100" value="{THREAD_TITLE}" required />
                     </div>
                     <!-- END title -->
 
                     <div class="small-12 columns">
-                        <label for="forumBody">
+                        <label for="body">
                             Message
-                            <textarea id="forumBody" name="body" style="height: 16rem;">
+                            <textarea id="body" name="body" style="height: 16rem;">
                                 <!-- BEGIN quote -->
                                 <blockquote class="mceNonEditable">
                                     {QUOTE_BODY}
@@ -69,4 +71,3 @@
         </form>
     </div>
 </div>
-
