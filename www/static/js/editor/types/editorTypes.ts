@@ -1,7 +1,19 @@
+/**
+ * The different types of toolbars that can be used for the editor
+ */
+export enum EditorToolbar {
+    FULL = "full",
+    COMMENT = "comment",
+    SIMPLE = "simple",
+}
+
+/**
+ * The config object for the editor
+ */
 export interface EditorConfig {
     targetElements: string[]; // the elements to target for the editor
+    toolbar?: EditorToolbar.FULL | EditorToolbar.COMMENT | EditorToolbar.SIMPLE; // the toolbar to use for the editor
     hasTokens?: boolean; // whether or not to enable the tokens plugin
-    isComment?: boolean; // show the comment toolbar
     tokenList?: string[]; // the list of tokens to use for the ckeditor
     baseHref?: string; // the base url to be prepended to relative links or assets included in the ckeditor
 }

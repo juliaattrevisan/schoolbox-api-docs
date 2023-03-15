@@ -29,22 +29,27 @@
         }
 
         /**
-         * Initialise tiny
+         * Initialise editor
          */
         function initChange() {
             document.getElementById(config.editorSelector).addEventListener("EDITOR__CREATED", onEditorCreated);
             function onEditorCreated(event) {
-                event.detail.editor.editing.view.document.on("blur", function () {
-                    console.log("blur")
+                const editor = event.detail.editor;
+                /**
+                 * Save the form when the editor loses focus
+                 */
+                editor.editing.view.document.on("blur", function () {
                     $.fn.evaluationRichText.saveOne(config.questionForm);
                 });
             }
 
-            document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
-                detail: {
-                    targetElements: ["#" + config.editorSelector],
-                }
-            }));
+            document.dispatchEvent(
+                new CustomEvent("EDITOR__CREATE", {
+                    detail: {
+                        targetElements: ["#" + config.editorSelector],
+                    },
+                })
+            );
         }
     };
 

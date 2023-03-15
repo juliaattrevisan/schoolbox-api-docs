@@ -3,27 +3,33 @@
  */
 
 import ClassicEditor from "@ckeditor/ckeditor5-editor-classic/src/classiceditor";
+import type { Editor } from "@ckeditor/ckeditor5-core";
 import { getConfig } from "@js/editor/config/editorConfig";
-import { EditorConfig } from "@js/editor/types/editorTypes";
-import { insertWordCount, removeValidation, addIframelyEmbed, addToGlobalScope } from "@js/editor/util/editorUtils";
+import { EditorConfig, EditorToolbar } from "@js/editor/types/editorTypes";
+import {
+    insertWordCount,
+    removeValidation,
+    addIframelyEmbed,
+    addToGlobalScope,
+    attachInspector,
+} from "@js/editor/util/editorUtils";
 import { EditorEvent } from "@js/editor/event/editorEvent";
-import CKEditorInspector from "@ckeditor/ckeditor5-inspector";
 import "@js/editor/styles/editor.css"; // to overwrite some of the styles
 
 /**
  * Add in any additional setup required and then dispatch that the editor is ready
  *
  * @param { HTMLTextAreaElement } textarea - the textarea the CKEditor will replace
- * @param { CKEditor } editor - the CKEditor instance
+ * @param { Editor } editor - the CKEditor instance
  * @param { EditorConfig } config - the CKEditor config object
  */
-async function onCreated(textarea: HTMLTextAreaElement, editor, config: EditorConfig) {
+async function onCreated(textarea: HTMLTextAreaElement, editor: Editor, config: EditorConfig) {
     insertWordCount(textarea, editor);
     removeValidation();
     await addIframelyEmbed();
     addToGlobalScope(editor, textarea);
     editor.config.sbConfig = config;
-    CKEditorInspector.attach(editor);
+    attachInspector(editor);
     textarea.dispatchEvent(
         new CustomEvent(EditorEvent.EDITOR__CREATED, {
             detail: {
@@ -37,10 +43,14 @@ async function onCreated(textarea: HTMLTextAreaElement, editor, config: EditorCo
 /**
  * create the ckeditor instance
  *
- * @param { EditorConfig } config - the config to use when creating the editor
  * @param { HTMLTextAreaElement } textarea - the textarea the CKEditor will replace
+ * @param { EditorConfig } config - the config to use when creating the editor
  */
 function create(textarea: HTMLTextAreaElement, config: EditorConfig) {
+    // if no toolbar is specified, use the full toolbar
+    if (config.toolbar === undefined) {
+        config.toolbar = EditorToolbar.FULL;
+    }
     ClassicEditor.create(textarea, getConfig(config))
         .then((editor) => {
             onCreated(textarea, editor, config);

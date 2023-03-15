@@ -10,6 +10,16 @@
         function onDefaultEditorCreated(event) {
             const editor = event.detail.editor;
             editor.setData("<p>Some <strong>sample</strong> text added after the editor is initiated</p>");
+            /**
+             * editors can also be accessed globally via the window.sbProps.editors object
+             */
+            window.sbProps.editors['defaultCKEditor'].setData(editor.getData() + "<p>Some more global text</p>");
+            /**
+             * to listen for changes in the editor, use the editor's change event
+             */
+            editor.model.document.on("change:data", (event) => {
+                console.warn(editor.getData());
+            });
         }
 
         /**
@@ -18,8 +28,17 @@
         document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
             detail: {
                 targetElements: ['#defaultCKEditor'],
+                hasTokens: true,
             }
         }));
+
+        /**
+         * Other usage notes:
+         * - Previously updateElement() (https://ckeditor.com/docs/ckeditor4/latest/api/CKEDITOR_editor.html#method-updateElement was sometimes used
+         * to update the textarea with the editor's data. This is no longer necessary as the editor will automatically update the textarea.
+         * - editor.setReadOnly(true) can be replaced with editor.enableReadOnlyMode('my-feature-id')
+         * https://ckeditor.com/docs/ckeditor5/latest/api/module_core_editor_editor-Editor.html#function-enableReadOnlyMode
+         */
 
         /**
          * Demonstrates how the comment editor instance can be accssed once it's been created
@@ -36,7 +55,26 @@
         document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
             detail: {
                 targetElements: ['#commentCKEditor'],
-                isComment: true,
+                toolbar: "comment",
+            }
+        }));
+
+        /**
+         * Demonstrates how the comment editor instance can be accssed once it's been created
+         */
+        document.getElementById("simpleCKEditor").addEventListener("EDITOR__CREATED", onSimpleEditorCreated);
+        function onSimpleEditorCreated(event) {
+            const editor = event.detail.editor;
+            editor.setData("<p>Here is a simple blurb. Blah blah blah</p>");
+        }
+
+        /**
+         * Initialise the simple editor
+         */
+        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+            detail: {
+                targetElements: ['#simpleCKEditor'],
+                toolbar: "simple",
             }
         }));
 
@@ -80,8 +118,11 @@
     <div class="small-12 columns">
         <h2 class="subheader">Default Editor</h2>
         <p class="meta">
-            This is the default usage of our ckeditor. There are a few special plugins that we made for our Mr Matt Modal:
-            Link, Embed Video/Audio, Iframe. You can test their usage here.
+            This is the <b>default</b> usage of our ckeditor. There are a few special plugins that we made for our resource modal:
+            Link and Embed Resource allow users to open the modal to select files already within Schoolbox.
+        </p>
+        <p class="meta">
+            Tokens can also be used. Typing <i>[</i> in the editor will bring up the default list of tokens available.
         </p>
     </div>
     <div class="small-12 island">
@@ -101,8 +142,7 @@
     <div class="small-12 columns">
         <h2 class="subheader">Comment Editor</h2>
         <p class="meta">
-            This is the comment usage of our ckeditor. There are a few special plugins that we made for our Mr Matt Modal:
-            Link, Embed Video/Audio, Iframe. You can test their usage here.
+            This is the <b>comment</b> usage of our ckeditor, a simplified version of the default editor. It's designed for places like comments and forum posts.
         </p>
     </div>
     <div class="small-12 island">
@@ -111,6 +151,26 @@
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <textarea id='commentCKEditor'></textarea>
+                    </div>
+                </fieldset>
+            </section>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 columns">
+        <h2 class="subheader">Simple Editor</h2>
+        <p class="meta">
+            This is the <b>simple</b> usage of our ckeditor. As there's no resource embedding it's designed for places like email usage and blurbs in news.
+        </p>
+    </div>
+    <div class="small-12 island">
+        <form action="/testAjax.php" method="post">
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <textarea id='simpleCKEditor'></textarea>
                     </div>
                 </fieldset>
             </section>
