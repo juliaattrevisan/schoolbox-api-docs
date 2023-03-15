@@ -226,7 +226,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return QuizAnswer[]|GenericCollection<QuizAnswer>
+     * @return QuizAnswer[]|GenericCollection<QuizAnswer>|null
      */
     public function getAnswers()
     {
@@ -234,7 +234,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param QuizAnswer[]|GenericCollection<QuizAnswer> $answers
+     * @param GenericCollection<QuizAnswer> $answers
      * @return static
      */
     public function setAnswers(GenericCollection $answers)

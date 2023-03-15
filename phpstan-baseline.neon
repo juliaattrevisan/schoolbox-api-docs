@@ -1671,59 +1671,9 @@ parameters:
 			path: library/External/Canvas/Sync/CliImporter.php
 
 		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 3
-			path: library/External/Canvas/Sync/DataSync.php
-
-		-
-			message: "#^Property External\\\\Canvas\\\\Sync\\\\DataSync\\:\\:\\$courseSpecMapper \\(Schoolbox\\\\Learning\\\\Course\\\\DataModel\\\\Implementation\\\\Mapper\\) does not accept Schoolbox\\\\Learning\\\\Course\\\\DataModel\\\\Specification\\\\Mapper\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/DataSync.php
-
-		-
-			message: "#^Property External\\\\Canvas\\\\Sync\\\\DataSync\\:\\:\\$persist \\(Alaress\\\\Database\\\\Connector\\\\IConnector\\) does not accept bool\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/DataSync.php
-
-		-
-			message: "#^Property External\\\\Canvas\\\\Sync\\\\DataSync\\:\\:\\$unitSpecMapper \\(Schoolbox\\\\Learning\\\\Course\\\\DataModel\\\\Implementation\\\\Unit\\\\Mapper\\) does not accept Schoolbox\\\\Learning\\\\Course\\\\DataModel\\\\Specification\\\\Unit\\\\Mapper\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/DataSync.php
-
-		-
-			message: "#^Call to protected method populateSaveTimestamps\\(\\) of class Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/CourseAssessmentAbstract.php
-
-		-
-			message: "#^Call to protected method populateUuids\\(\\) of class Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/CourseAssessmentAbstract.php
-
-		-
-			message: "#^Call to protected method populateSaveTimestamps\\(\\) of class Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/CourseAssignments.php
-
-		-
-			message: "#^Call to protected method populateUuids\\(\\) of class Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/CourseAssignments.php
-
-		-
 			message: "#^Property External\\\\Canvas\\\\Sync\\\\ImportStage\\\\CourseAssignments\\:\\:\\$accountBridge is unused\\.$#"
 			count: 1
 			path: library/External/Canvas/Sync/ImportStage/CourseAssignments.php
-
-		-
-			message: "#^Call to protected method populateSaveTimestamps\\(\\) of class Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/CourseQuiz.php
-
-		-
-			message: "#^Call to protected method populateUuids\\(\\) of class Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/CourseQuiz.php
 
 		-
 			message: "#^Left side of && is always true\\.$#"
@@ -1756,39 +1706,9 @@ parameters:
 			path: library/External/Canvas/Sync/ImportStage/CourseQuiz.php
 
 		-
-			message: "#^Call to protected method populateSaveTimestamps\\(\\) of class Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/SectionAssessmentAbstract.php
-
-		-
-			message: "#^Call to protected method populateUuids\\(\\) of class Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/SectionAssessmentAbstract.php
-
-		-
 			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
 			path: library/External/Canvas/Sync/ImportStage/SectionAssessmentAbstract.php
-
-		-
-			message: "#^Call to protected method populateSaveTimestamps\\(\\) of class Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/SectionAssignment.php
-
-		-
-			message: "#^Call to protected method populateUuids\\(\\) of class Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/SectionAssignment.php
-
-		-
-			message: "#^Call to protected method populateSaveTimestamps\\(\\) of class Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/SectionQuiz.php
-
-		-
-			message: "#^Call to protected method populateUuids\\(\\) of class Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/SectionQuiz.php
 
 		-
 			message: "#^Left side of && is always true\\.$#"
@@ -1801,11 +1721,6 @@ parameters:
 			path: library/External/Canvas/Sync/ImportStage/SectionQuiz.php
 
 		-
-			message: "#^Property External\\\\Canvas\\\\Sync\\\\ImportStage\\\\SectionQuiz\\:\\:\\$questionTypeMapper is unused\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/SectionQuiz.php
-
-		-
 			message: "#^Right side of && is always true\\.$#"
 			count: 1
 			path: library/External/Canvas/Sync/ImportStage/SectionQuiz.php
@@ -1814,21 +1729,6 @@ parameters:
 			message: "#^Strict comparison using \\=\\=\\= between Schoolbox\\\\Learning\\\\Assessment\\\\WorkType\\\\Model and null will always evaluate to false\\.$#"
 			count: 2
 			path: library/External/Canvas/Sync/ImportStage/SectionQuiz.php
-
-		-
-			message: "#^Call to protected method populateSaveTimestamps\\(\\) of class Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/Submission.php
-
-		-
-			message: "#^Call to protected method populateUuids\\(\\) of class Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/Submission.php
-
-		-
-			message: "#^Property External\\\\Canvas\\\\Sync\\\\ImportStage\\\\Submission\\:\\:\\$schoolboxAdmin \\(Schoolbox\\\\User\\) in empty\\(\\) is not falsy\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/Submission.php
 
 		-
 			message: "#^Property External_Doublefirst_Class\\:\\:\\$externalUser is never read, only written\\.$#"
@@ -4861,11 +4761,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Quiz/Attempt/MapperProxy.php
 
 		-
-			message: "#^Method Schoolbox\\\\Learning\\\\Assessment\\\\Quiz\\\\Attempt\\\\Model\\:\\:getDuration\\(\\) should return Alaress\\\\Date\\\\Interval but returns null\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Quiz/Attempt/Model.php
-
-		-
 			message: "#^Property Schoolbox\\\\Learning\\\\Assessment\\\\Quiz\\\\Controller\\:\\:\\$quizAttemptMapper is never read, only written\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Quiz/Controller.php
@@ -5179,11 +5074,6 @@ parameters:
 			message: "#^PHPDoc tag @return with type Schoolbox\\\\Mapper is not subtype of native type Schoolbox\\\\Learning\\\\Quiz\\\\Mapper\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Quiz/Attempt/Mapper.php
-
-		-
-			message: "#^PHPDoc tag @param for parameter \\$answers with type array\\<Schoolbox\\\\Learning\\\\Quiz\\\\Attempt\\\\Answer\\\\Model\\>\\|\\(iterable\\<Schoolbox\\\\Learning\\\\Quiz\\\\Attempt\\\\Answer\\\\Model\\>&Schoolbox\\\\GenericCollection\\) is not subtype of native type Schoolbox\\\\GenericCollection\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Quiz/Attempt/Model.php
 
 		-
 			message: "#^Variable \\$assess in PHPDoc tag @var does not exist\\.$#"

@@ -23,12 +23,12 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Assessment\Participant;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Learning\Quiz;
 use Schoolbox\Learning\Quiz\Section as QuizSection;
 use Schoolbox\Learning\Quiz\Section\Question as QuizQuestion;
-use Schoolbox\Learning\Quiz\Section\Question\QuestionType;
 use Schoolbox\Learning\Quiz\Section\Question\Solution as QuizSolution;
 use Schoolbox\Mapper;
 use Schoolbox\User;
@@ -51,52 +51,40 @@ class SectionQuiz extends SectionAssessmentAbstract
 {
     use ModelSaveTrait;
 
-    /** @var Quiz\Mapper */
-    private $quizMapper;
-
-    /** @var QuizSection\Mapper */
-    private $quizSectionMapper;
-
-    /** @var QuizQuestion\Mapper */
-    private $quizQuestionMapper;
-
-    /** @var QuestionType\Mapper */
-    private $questionTypeMapper;
-
-    /** @var QuizSolution\Mapper */
-    private $quizSolutionMapper;
-
     /** @var Quiz\Model[] $quizSpecCache Indexed by Canvas `assess`.`canvas_id` */
-    private $quizSpecCache = [];
+    private array $quizSpecCache = [];
 
     /** @var int */
-    private $countQuizSectionsCreated;
+    private int $countQuizSectionsCreated;
 
     /** @var int */
-    private $countQuizSectionsDeleted;
+    private int $countQuizSectionsDeleted;
 
 
     /**
-     * @param IConnector                $canvasDb
-     * @param IConnector                $schoolboxDb
-     * @param External_ClassInterface   $externalClass
-     * @param string|null               $currentFileYear
-     * @param UnitImpl\Mapper           $unitImplMapper
-     * @param UnitSpec\Mapper           $unitSpecMapper
-     * @param Quiz\Mapper               $quizMapper
-     * @param QuizSection\Mapper        $quizSectionMapper
-     * @param QuizQuestion\Mapper       $quizQuestionMapper
-     * @param QuizSolution\Mapper       $quizSolutionMapper
-     * @param Assessment\Mapper         $assessmentMapper
-     * @param Participant\Plan\Mapper   $planMapper
-     * @param Participant\Mapper        $participantMapper
-     * @param UserMapper                $userMapper
-     * @param LoggerInterface           $log
-     * @param Bridge\AssignmentDates    $assignmentDatesBridge
-     * @param Bridge\Course             $courseBridge
-     * @param Bridge\CourseSection      $courseSectionBridge
-     * @param Bridge\AssignmentOverride $assignmentOverrideBridge
-     * @param string                    $schoolboxTimezone
+     * @param IConnector                 $canvasDb
+     * @param IConnector                 $schoolboxDb
+     * @param External_ClassInterface    $externalClass
+     * @param string|null                $currentFileYear
+     * @param UnitImpl\Mapper            $unitImplMapper
+     * @param UnitSpec\Mapper            $unitSpecMapper
+     * @param Quiz\Mapper                $quizMapper
+     * @param QuizSection\Mapper         $quizSectionMapper
+     * @param QuizQuestion\Mapper        $quizQuestionMapper
+     * @param QuizSolution\Mapper        $quizSolutionMapper
+     * @param Quiz\Attempt\Mapper        $quizAttemptMapper
+     * @param Quiz\Attempt\Answer\Mapper $quizAnswerMapper
+     * @param Assessment\Mapper          $assessmentMapper
+     * @param Participant\Plan\Mapper    $planMapper
+     * @param Participant\Mapper         $participantMapper
+     * @param UserMapper                 $userMapper
+     * @param LoggerInterface            $log
+     * @param Bridge\AssignmentDates     $assignmentDatesBridge
+     * @param Bridge\Course              $courseBridge
+     * @param Bridge\CourseSection       $courseSectionBridge
+     * @param Bridge\AssignmentOverride  $assignmentOverrideBridge
+     * @param string                     $schoolboxTimezone
+     * @param MapperProxy                $assessmentDataSource
      */
     public function __construct(
         IConnector $canvasDb,
@@ -105,10 +93,12 @@ class SectionQuiz extends SectionAssessmentAbstract
         ?string $currentFileYear,
         UnitImpl\Mapper $unitImplMapper,
         UnitSpec\Mapper $unitSpecMapper,
-        Quiz\Mapper $quizMapper,
-        QuizSection\Mapper $quizSectionMapper,
-        QuizQuestion\Mapper $quizQuestionMapper,
-        QuizSolution\Mapper $quizSolutionMapper,
+        private Quiz\Mapper $quizMapper,
+        private QuizSection\Mapper $quizSectionMapper,
+        private QuizQuestion\Mapper $quizQuestionMapper,
+        private QuizSolution\Mapper $quizSolutionMapper,
+        private Quiz\Attempt\Mapper $quizAttemptMapper,
+        private Quiz\Attempt\Answer\Mapper $quizAnswerMapper,
         Assessment\Mapper $assessmentMapper,
         Participant\Plan\Mapper $planMapper,
         Participant\Mapper $participantMapper,
@@ -118,7 +108,8 @@ class SectionQuiz extends SectionAssessmentAbstract
         Bridge\Course $courseBridge,
         Bridge\CourseSection $courseSectionBridge,
         Bridge\AssignmentOverride $assignmentOverrideBridge,
-        string $schoolboxTimezone
+        string $schoolboxTimezone,
+        MapperProxy $assessmentDataSource
     ) {
         parent::__construct(
             $canvasDb,
@@ -136,12 +127,9 @@ class SectionQuiz extends SectionAssessmentAbstract
             $courseBridge,
             $courseSectionBridge,
             $assignmentOverrideBridge,
-            $schoolboxTimezone
+            $schoolboxTimezone,
+            $assessmentDataSource
         );
-        $this->quizMapper            = $quizMapper;
-        $this->quizSectionMapper     = $quizSectionMapper;
-        $this->quizQuestionMapper    = $quizQuestionMapper;
-        $this->quizSolutionMapper    = $quizSolutionMapper;
     }
 
 
@@ -728,5 +716,27 @@ class SectionQuiz extends SectionAssessmentAbstract
             return (int)$externalId;
         };
         return array_map($callback, $this->schoolboxDb->executeQuery($sql)->fetchAll(PDO::FETCH_COLUMN));
+    }
+
+    public function getSubmissionImporter(): SubmissionAbstract
+    {
+        if (!$this->submissionimporter) {
+            $this->submissionimporter =
+                (new QuizSubmission(
+                    $this->canvasDb,
+                    $this->schoolboxDb,
+                    $this->quizMapper,
+                    $this->quizSectionMapper,
+                    $this->quizQuestionMapper,
+                    $this->quizAttemptMapper,
+                    $this->quizAnswerMapper,
+                    $this->participantMapper,
+                    $this->userMapper,
+                    $this->log,
+                    $this->assessmentDataSource,
+                    $this->schoolboxTimezone
+                ));
+        }
+        return $this->submissionimporter;
     }
 }

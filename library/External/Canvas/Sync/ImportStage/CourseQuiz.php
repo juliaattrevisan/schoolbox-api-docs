@@ -157,6 +157,7 @@ class CourseQuiz extends CourseAssessmentAbstract
                CONVERT_TZ(quiz.updated_at, 'UTC', :timezone) 'quiz.updated_at',
                quiz_fact.points_possible   'quiz.points_possible',
                quiz.quiz_type              'quiz.quiz_type',
+               quiz.show_results           'quiz.show_results',
                quiz.anonymous_submissions  'quiz.anonymous_submissions',
                quiz_fact.time_limit        'quiz_fact.time_limit',
                quiz_fact.allowed_attempts  'quiz_fact.allowed_attempts'
@@ -194,8 +195,8 @@ class CourseQuiz extends CourseAssessmentAbstract
                     'points_possible'       => $row['quiz.points_possible'] === null ? null : (float)$row['quiz.points_possible'],
                     'created_at'            => $row['quiz.created_at'],
                     'updated_at'            => $row['quiz.updated_at'],
-                    'muted'                 => false,
-                    // TODO this has been deprecated by Canvas, will always be FALSE here
+                    // muted flag has been deprecated by Canvas, will always be FALSE, checking show_results for quiz
+                    'muted'                 => $row['quiz.show_results'] === 'never',
                     'quiz_type'             => $row['quiz.quiz_type'],
                     'anonymous_submissions' => $row['quiz.anonymous_submissions'] === 'allow_anonymous_submissions',
                     'time_limit'            => $row['quiz_fact.time_limit'] === null ? null : (int)$row['quiz_fact.time_limit'],

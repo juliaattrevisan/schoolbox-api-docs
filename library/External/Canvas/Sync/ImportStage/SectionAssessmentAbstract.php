@@ -23,6 +23,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Assessment\Participant;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Mapper;
@@ -123,6 +124,7 @@ abstract class SectionAssessmentAbstract
     private $countParticipantsDeleted;
 
     protected string $schoolboxTimezone;
+    public $submissionimporter = null;
 
     /**
      * @param IConnector                $canvasDb
@@ -141,6 +143,7 @@ abstract class SectionAssessmentAbstract
      * @param Bridge\CourseSection      $courseSectionBridge
      * @param Bridge\AssignmentOverride $assignmentOverrideBridge
      * @param string                    $schoolboxTimezone
+     * @param MapperProxy               $assessmentDataSource
      */
     public function __construct(
         IConnector $canvasDb,
@@ -158,7 +161,8 @@ abstract class SectionAssessmentAbstract
         Bridge\Course $courseBridge,
         Bridge\CourseSection $courseSectionBridge,
         Bridge\AssignmentOverride $assignmentOverrideBridge,
-        string $schoolboxTimezone
+        string $schoolboxTimezone,
+        protected MapperProxy $assessmentDataSource
     ) {
         $this->canvasDb                 = $canvasDb;
         $this->schoolboxDb              = $schoolboxDb;
@@ -212,7 +216,7 @@ abstract class SectionAssessmentAbstract
         $this->resetCounts();
 
         $sectionSisSourceIds   = $this->courseSectionBridge->getMappedSisSourceIds();
-        $coursesSectionData    = $this->loadCanvasSectionStudentData($sectionSisSourceIds);
+        $coursesSectionData    = $this->courseSectionBridge->loadCanvasSectionStudentData($sectionSisSourceIds);
         $coursesAssessmentData = $this->loadCanvasAssessmentAndOverrideData($sectionSisSourceIds);
 
         /** @var UnitImpl\Model[] $unitImplCache Indexed by `section`.`sisSourceId` */
@@ -399,6 +403,15 @@ abstract class SectionAssessmentAbstract
                         $plansSynchronised[$plan->getId()] = $plan;
                     }
                 }
+
+                // sync marks
+                if (!$this->courseSectionBridge->syncCanvasMarks()) {
+                    $this->log->info('Skipping syncing Canvas Submissions');
+                    return;
+                }
+
+                $this->log->notice("Synchronising Canvas Submissions");
+                $this->getSubmissionImporter()->sync($assessment, $assessmentCanvasId);
             }
         }
 
@@ -408,6 +421,7 @@ abstract class SectionAssessmentAbstract
         $this->printCounts();
     }
 
+    abstract public function getSubmissionImporter(): SubmissionAbstract;
 
     /**
      * Resets all results to 0
@@ -985,78 +999,6 @@ abstract class SectionAssessmentAbstract
         $this->log->notice($this->countParticipantsCreated . " Schoolbox {$schoolboxEntity} Impl Participants created");
         $this->log->notice($this->countParticipantsUpdated . " Schoolbox {$schoolboxEntity} Impl Participants updated");
         $this->log->notice($this->countParticipantsDeleted . " Schoolbox {$schoolboxEntity} Impl Participants deleted");
-    }
-
-
-    /**
-     * Load and return Canvas Section student data from canvas DB in a nested array
-     *
-     * @param string[] $sectionSisSourceIds
-     * @return array
-     * @throws Database\Exception
-     * @throws InvalidColumnException
-     * @throws UnderflowException
-     * @internal string      $return[$courseCanvasId]['name']
-     * @internal string      $return[$courseCanvasId]['sections'][$sectionCanvasId]['sis_source_id']
-     * @internal string      $return[$courseCanvasId]['sections'][$sectionCanvasId]['students'][$sectionStudentCanvasId]['sis_user_id']
-     */
-    protected function loadCanvasSectionStudentData(array $sectionSisSourceIds): array
-    {
-        if (!count($sectionSisSourceIds)) {
-            return [];
-        }
-
-        $mySqlQuoter = new Database\Quoter\Mysql\Quoter();
-        $pb          = (new Builder($mySqlQuoter, ''))->in('section.sis_source_id', $sectionSisSourceIds);
-        $whereClause = implode(' AND ', $pb->getWhere());
-        $sql         = "
-            SELECT
-                course.canvas_id            'course.canvas_id',
-                course.name                 'course.name',
-                section.canvas_id           'section.canvas_id',
-                section.sis_source_id       'section.sis_source_id',
-                section_student.canvas_id   'section_student.canvas_id',
-                section_student.sis_user_id 'section_student.sis_user_id'
-            FROM course_dim course
-            JOIN course_section_dim section ON course.id = section.course_id
-            LEFT JOIN enrollment_dim enrollment ON enrollment.course_section_id = section.id AND enrollment.type = 'StudentEnrollment' AND enrollment.workflow_state = 'active'
-            LEFT JOIN pseudonym_dim section_student ON section_student.user_id = enrollment.user_id AND section_student.sis_user_id IS NOT NULL
-            WHERE {$whereClause}
-            ORDER BY course.code, course.canvas_id, section.canvas_id
-        ";
-
-        $data      = [];
-        $statement = $this->canvasDb->executeQuery($sql, $pb->getParams());
-        while ($row = $statement->fetch()) {
-            $courseCanvasId         = $row['course.canvas_id'];
-            $sectionCanvasId        = $row['section.canvas_id'];
-            $sectionStudentCanvasId = $row['section_student.canvas_id'];
-
-            // First time we've seen course?
-            if (!array_key_exists($courseCanvasId, $data)) {
-                $data[$courseCanvasId] = [
-                    'name'     => $row['course.name'],
-                    'sections' => [],
-                ];
-            }
-            // First time we've seen section?
-            if (!array_key_exists($sectionCanvasId, $data[$courseCanvasId]['sections'])) {
-                $data[$courseCanvasId]['sections'][$sectionCanvasId] = [
-                    'sis_source_id' => $row['section.sis_source_id'],
-                    'students'      => [],
-                ];
-            }
-            // First time we've seen student?
-            if (
-                $sectionStudentCanvasId !== null &&
-                !array_key_exists($sectionStudentCanvasId, $data[$courseCanvasId]['sections'][$sectionCanvasId]['students'])
-            ) {
-                $data[$courseCanvasId]['sections'][$sectionCanvasId]['students'][$sectionStudentCanvasId] = [
-                    'sis_user_id' => $row['section_student.sis_user_id'],
-                ];
-            }
-        }
-        return $data;
     }
 
 

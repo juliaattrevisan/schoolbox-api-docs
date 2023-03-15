@@ -22,6 +22,7 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Assessment\Participant;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Mapper;
@@ -45,30 +46,29 @@ class SectionAssignment extends SectionAssessmentAbstract
 {
     use ModelSaveTrait;
 
-    /** @var SubmissionBoxMapper */
-    protected $submissionBoxMapper;
-
     /** @var SubmissionBox[] $submissionBoxSpecCache Indexed by Canvas `assignment`.`canvas_id` */
-    private $submissionBoxSpecCache = [];
+    private array $submissionBoxSpecCache = [];
 
     /**
-     * @param IConnector                $canvasDb
-     * @param IConnector                $schoolboxDb
-     * @param External_ClassInterface   $externalClass
-     * @param string|null               $currentFileYear
-     * @param UnitImpl\Mapper           $unitImplMapper
-     * @param UnitSpec\Mapper           $unitSpecMapper
-     * @param SubmissionBoxMapper       $submissionBoxMapper
-     * @param Assessment\Mapper         $assessmentMapper
-     * @param Participant\Plan\Mapper   $planMapper
-     * @param Participant\Mapper        $participantMapper
-     * @param UserMapper                $userMapper
-     * @param LoggerInterface           $log
-     * @param Bridge\AssignmentDates    $assignmentDatesBridge
-     * @param Bridge\Course             $courseBridge
-     * @param Bridge\CourseSection      $courseSectionBridge
-     * @param Bridge\AssignmentOverride $assignmentOverrideBridge
-     * @param string                    $schoolboxTimezone
+     * @param IConnector                       $canvasDb
+     * @param IConnector                       $schoolboxDb
+     * @param External_ClassInterface          $externalClass
+     * @param string|null                      $currentFileYear
+     * @param UnitImpl\Mapper                  $unitImplMapper
+     * @param UnitSpec\Mapper                  $unitSpecMapper
+     * @param SubmissionBoxMapper              $submissionBoxMapper
+     * @param SubmissionBox\ReturnedWorkMapper $returnedWorkMapper
+     * @param Assessment\Mapper                $assessmentMapper
+     * @param Participant\Plan\Mapper          $planMapper
+     * @param Participant\Mapper               $participantMapper
+     * @param UserMapper                       $userMapper
+     * @param LoggerInterface                  $log
+     * @param Bridge\AssignmentDates           $assignmentDatesBridge
+     * @param Bridge\Course                    $courseBridge
+     * @param Bridge\CourseSection             $courseSectionBridge
+     * @param Bridge\AssignmentOverride        $assignmentOverrideBridge
+     * @param string                           $schoolboxTimezone
+     * @param MapperProxy                      $assessmentDataSource
      */
     public function __construct(
         IConnector $canvasDb,
@@ -77,7 +77,8 @@ class SectionAssignment extends SectionAssessmentAbstract
         ?string $currentFileYear,
         UnitImpl\Mapper $unitImplMapper,
         UnitSpec\Mapper $unitSpecMapper,
-        SubmissionBoxMapper $submissionBoxMapper,
+        private SubmissionBoxMapper $submissionBoxMapper,
+        private SubmissionBox\ReturnedWorkMapper $returnedWorkMapper,
         Assessment\Mapper $assessmentMapper,
         Participant\Plan\Mapper $planMapper,
         Participant\Mapper $participantMapper,
@@ -87,7 +88,8 @@ class SectionAssignment extends SectionAssessmentAbstract
         Bridge\Course $courseBridge,
         Bridge\CourseSection $courseSectionBridge,
         Bridge\AssignmentOverride $assignmentOverrideBridge,
-        string $schoolboxTimezone
+        string $schoolboxTimezone,
+        MapperProxy $assessmentDataSource
     ) {
         parent::__construct(
             $canvasDb,
@@ -105,9 +107,9 @@ class SectionAssignment extends SectionAssessmentAbstract
             $courseBridge,
             $courseSectionBridge,
             $assignmentOverrideBridge,
-            $schoolboxTimezone
+            $schoolboxTimezone,
+            $assessmentDataSource
         );
-        $this->submissionBoxMapper   = $submissionBoxMapper;
     }
 
     /** @inheritDoc */
@@ -391,7 +393,20 @@ class SectionAssignment extends SectionAssessmentAbstract
         $callback = static function (string $externalId): int {
             return (int)$externalId;
         };
-        return array_map($callback, $this->schoolboxDb->executeQuery($sql)->fetchAll(PDO::FETCH_COLUMN));
+        $submissionBoxes = array_map($callback, $this->schoolboxDb->executeQuery($sql)->fetchAll(PDO::FETCH_COLUMN));
+
+        $sql      = "
+            SELECT assess.external_id
+            FROM assessment a
+            JOIN assess assess on a.id = assess.assessment_id
+            WHERE assess.external_id IS NOT NULL AND a.deleted_at IS NULL;
+        ";
+        $callback = static function (string $externalId): int {
+            return (int)$externalId;
+        };
+        $quizes = array_map($callback, $this->schoolboxDb->executeQuery($sql)->fetchAll(PDO::FETCH_COLUMN));
+
+        return array_merge($submissionBoxes, $quizes);
     }
 
 
@@ -431,5 +446,28 @@ class SectionAssignment extends SectionAssessmentAbstract
             JOIN submission_box sb ON sb.assessment_id = a.id
         ";
         return array_map('intval', $this->schoolboxDb->executeQuery($sql)->fetchAll(PDO::FETCH_COLUMN));
+    }
+
+
+    /**
+     * @return SubmissionAbstract
+     */
+    public function getSubmissionImporter(): SubmissionAbstract
+    {
+        if (!$this->submissionimporter) {
+            $this->submissionimporter =
+                new Submission(
+                    $this->canvasDb,
+                    $this->schoolboxDb,
+                    $this->submissionBoxMapper,
+                    $this->returnedWorkMapper,
+                    $this->participantMapper,
+                    $this->userMapper,
+                    $this->log,
+                    $this->assessmentDataSource,
+                    $this->schoolboxTimezone
+                );
+        }
+        return $this->submissionimporter;
     }
 }

@@ -11,7 +11,6 @@
  */
 abstract class Evaluation_Section extends DeprecatedModel
 {
-
     /**
      * POOL_SIZE_ALL Indicates to use all questions in section
      */
@@ -155,7 +154,7 @@ abstract class Evaluation_Section extends DeprecatedModel
     public function getQuestions($attempt_id, $section_id)
     {
         $query = "SELECT
-        			  assess_response.section_id,
+                      assess_question.section_id,
                       assess_response.question_id,
                       assess_question.type_id,
                       assess_question.sequence,
@@ -167,7 +166,7 @@ abstract class Evaluation_Section extends DeprecatedModel
                   LEFT JOIN assess_luQuestionType ON assess_question.type_id = assess_luQuestionType.type_id
                   LEFT JOIN assess_section ON assess_question.section_id = assess_section.section_id
                   WHERE assess_response.attempt_id = " . $this->db->smartQuote($attempt_id) . "
-                  AND assess_response.section_id = " . $this->db->smartQuote($section_id) . "
+                  AND assess_question.section_id = " . $this->db->smartQuote($section_id) . "
                   AND assess_response.deleted_at IS NULL
                   AND assess_question.deleted_at IS NULL
                   ORDER BY IF(assess_section.random = '1', assess_response.response_id, assess_question.sequence)";
@@ -222,10 +221,10 @@ abstract class Evaluation_Section extends DeprecatedModel
             $numQuestions = "SELECT
                                  COUNT(assess_response.question_id) AS num
                              FROM assess_response
-                             LEFT JOIN assess_section on assess_section.section_id = assess_response.section_id
                              LEFT JOIN assess_question on assess_response.question_id = assess_question.question_id
+                             LEFT JOIN assess_section on assess_section.section_id = assess_question.section_id
                              WHERE attempt_id = '{$this->db->quote($attemptId)}'
-                             AND assess_response.section_id = '{$this->db->quote($currentSection['section_id'])}'
+                             AND assess_section.section_id = '{$this->db->quote($currentSection['section_id'])}'
                              AND assess_response.deleted_at IS NULL
                              AND assess_section.deleted_at IS NULL
                              AND assess_question.deleted_at IS NULL";

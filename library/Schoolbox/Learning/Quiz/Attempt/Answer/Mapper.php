@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Learning\Quiz\Attempt\Answer;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Learning\Quiz\Attempt\Answer\Model as QuizAnswer;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
@@ -17,6 +18,11 @@ use Schoolbox\Learning\Quiz\Section\Question\Mapper as QuizQuestionMapper;
  * Represents a Students Answer to a Quiz Questions
  * 'Answers' were formerly known as 'Responses'.
  * Name changed to avoid naming collision with Quiz IResponse
+ *
+ * @method Model createModel($idValue = null)
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method Model findById($identifierValue)
+ * @method GenericCollection|Model[] findByColumn($columnName, $columnValue, $options = [])
  */
 class Mapper extends BaseMapper
 {

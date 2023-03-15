@@ -4243,7 +4243,7 @@ abstract class Mapper implements IMapper, Serializable
      * @param Collection $collection
      * @return Collection
      */
-    protected function populateSaveTimestamps(Collection $collection): Collection
+    public function populateSaveTimestamps(Collection $collection): Collection
     {
         // Does the mapper have 'created_at' or 'updated_at' timestamps?
         if (!$this->createdMap && !$this->updatedMap) {
@@ -4299,7 +4299,7 @@ abstract class Mapper implements IMapper, Serializable
      * @param Collection $collection
      * @return Collection
      */
-    protected function populateUuids(Collection $collection): Collection
+    public function populateUuids(Collection $collection): Collection
     {
         // First figure out which properties are actually UUIDs
         $uuidProperties = [];
