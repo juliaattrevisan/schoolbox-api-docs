@@ -15,7 +15,6 @@ namespace Schoolbox\Realtime\Pipe;
  */
 interface PipeInterface
 {
-
     /**
      * @return void
      */
@@ -36,6 +35,19 @@ interface PipeInterface
      */
     public function getSocketKey();
 
+    /**
+     * Get the instance ID associated with this pipe.
+     *
+     * @return string
+     */
+    public function getInstanceId(): string;
+
+    /**
+     * Get the instance ID associated with this pipe.
+     *
+     * @return self
+     */
+    public function setInstanceId(string $instanceId): self;
 
     /**
      * @return int

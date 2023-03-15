@@ -19,7 +19,6 @@ use Ratchet\ConnectionInterface;
  */
 class Pipe implements PipeInterface
 {
-
     /**
      * @var string
      */
@@ -31,6 +30,10 @@ class Pipe implements PipeInterface
      */
     protected $socketConnection;
 
+    /**
+     * @var string
+     */
+    protected string $instanceId;
 
     /**
      * @var int
@@ -143,6 +146,23 @@ class Pipe implements PipeInterface
         return $this;
     }
 
+    /**
+     * @return string
+     */
+    public function getInstanceId(): string
+    {
+        return $this->instanceId;
+    }
+
+    /**
+     * @param string $instanceId
+     * @return self
+     */
+    public function setInstanceId(string $instanceId): self
+    {
+        $this->instanceId = $instanceId;
+        return $this;
+    }
 
     /**
      * @return int

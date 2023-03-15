@@ -16,15 +16,27 @@ use Schoolbox\Realtime\SessionException;
 
 class PipeCollection implements Countable
 {
+    /**
+     * Pipes grouped by socket key.
+     * (Socket keys should be unique across all instance IDs.)
+     *
+     * @var array<string, Pipe>
+     */
+    protected array $pipesBySocketKey = [];
 
-    /** @var Pipe[] */
-    protected $pipesBySocketKey = [];
+    /**
+     * Pipes grouped by instance ID, session ID and then socket key.
+     *
+     * @var array<string, array<string, array<string, Pipe>>>
+     */
+    protected array $pipesBySessionId = [];
 
-    /** @var Pipe[][] */
-    protected $pipesBySessionId = [];
-
-    /** @var Pipe[][] */
-    protected $pipesByUserId    = [];
+    /**
+     * Pipes grouped by instance ID, user ID and then socket key.
+     *
+     * @var array<string, array<int, array<string, Pipe>>>
+     */
+    protected array $pipesByUserId = [];
 
     /** @var LoggerInterface */
     protected $log;
@@ -56,6 +68,10 @@ class PipeCollection implements Countable
         $sessionId = $pipe->getSession();
         $remember  = $pipe->getCookie('remember');
 
+        // TODO extract instance ID from pipe
+        $instanceId = INSTANCE_ID;
+
+        // Extract user ID
         try {
             if (!($sessionId || $remember)) {
                 throw new SessionException('No session or remember-me token, no user.');
@@ -75,12 +91,13 @@ class PipeCollection implements Countable
         }
 
         $pipe->setUserId($userId);
+        $pipe->setInstanceId($instanceId);
 
         // index pipe in triplicate
         // TODO index by instance ID as well
-        $this->pipesBySocketKey[$socketKey]             = $pipe;
-        $this->pipesBySessionId[$sessionId][$socketKey] = $pipe;
-        $this->pipesByUserId[$userId][$socketKey]       = $pipe;
+        $this->pipesBySocketKey[$socketKey]                          = $pipe;
+        $this->pipesBySessionId[$instanceId][$sessionId][$socketKey] = $pipe;
+        $this->pipesByUserId[$instanceId][$userId][$socketKey]       = $pipe;
 
         $sess = $sessionId ?: 'sessionless';
 
@@ -96,19 +113,20 @@ class PipeCollection implements Countable
     public function unregisterPipe($socketKey)
     {
         if ($this->containsPipe($socketKey)) {
-            $pipe = $this->pipesBySocketKey[$socketKey];
+            $pipe       = $this->pipesBySocketKey[$socketKey];
+            $instanceId = $pipe->getInstanceId();
 
             if ($userId = $pipe->getUserId()) {
-                unset($this->pipesByUserId[$userId][$socketKey]);
-                if (empty($this->pipesByUserId[$userId])) {
-                    unset($this->pipesByUserId[$userId]);
+                unset($this->pipesByUserId[$instanceId][$userId][$socketKey]);
+                if (empty($this->pipesByUserId[$instanceId][$userId])) {
+                    unset($this->pipesByUserId[$instanceId][$userId]);
                 }
             }
 
             if ($sessionId = $pipe->getSession()) {
-                unset($this->pipesBySessionId[$sessionId][$socketKey]);
-                if (empty($this->pipesBySessionId[$sessionId])) {
-                    unset($this->pipesBySessionId[$sessionId]);
+                unset($this->pipesBySessionId[$instanceId][$sessionId][$socketKey]);
+                if (empty($this->pipesBySessionId[$instanceId][$sessionId])) {
+                    unset($this->pipesBySessionId[$instanceId][$sessionId]);
                 }
             }
 
