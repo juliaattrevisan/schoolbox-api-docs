@@ -1253,16 +1253,16 @@ class Mapper extends BaseMapper
 
         foreach ($modelList as $model) {
             $model->getLessonPlan()->setFields($lessonPlanFieldMapper->findByColumn('lesson_plan_id', $model->getLessonPlan()->getId()));
+
+            /* Fetch all the Lesson Plan Template + Lesson Plan Template Fields too
+             * (Fields need to know about their Template Fields)
+             */
+            $lessonPlanTemplateMapper = \Schoolbox\Admin\LessonPlan\Template\Mapper::getInstance();
+
+            $lessonPlanTemplate = $lessonPlanTemplateMapper->findById($model->getLessonPlan()->getLessonPlanTemplate()->getId());
+
+            $model->getLessonPlan()->setLessonPlanTemplate($lessonPlanTemplate);
         }
-
-        /* Fetch all the Lesson Plan Template + Lesson Plan Template Fields too
-         * (Fields need to know about their Template Fields)
-         */
-        $lessonPlanTemplateMapper = \Schoolbox\Admin\LessonPlan\Template\Mapper::getInstance();
-
-        $lessonPlanTemplate = $lessonPlanTemplateMapper->findById($model->getLessonPlan()->getLessonPlanTemplate()->getId());
-
-        $model->getLessonPlan()->setLessonPlanTemplate($lessonPlanTemplate);
 
         return $modelList;
     }
