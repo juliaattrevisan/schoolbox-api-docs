@@ -261,7 +261,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
              * This encapsulates the myriad of combinations which is really really awkward
              */
             $data['lessonPlanMeta']['template'] = null;
-            $data['lessonPlanMeta']['fields'] = $type;
+            $data['lessonPlanMeta']['fields'] = [];
             $data['lessonPlanMeta']['type'] = $type;
             $data['lessonPlanMeta']['mageAsync'] = false;
             $data['lessonPlanMeta']['includeBreadcrumbs'] = true;
@@ -313,7 +313,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 /* Field list contains the ones from the Lesson Plan Template when creating
                  * WHen updating, it's actually fields from the Lesson Plan instance itself
                  */
-                $data['lessonPlanMeta']['fields'] = $data['lessonPlanMeta']['template']->getFields();
+                $data['lessonPlanMeta']['fields'] = [];
 
                 if ($this->getRequest()->isXhr()) {
                     $content = $this->buildUnthemedHtmlOutput(sprintf(

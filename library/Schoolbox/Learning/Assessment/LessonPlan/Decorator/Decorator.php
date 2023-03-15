@@ -28,6 +28,16 @@ class Decorator implements DecoratorInterface
 
 
     /**
+     * An arbitrarily chosen prefix for new Field rows in the
+     * create/update screens, which distinguishes new rows
+     * from pre-existing ones since the ui lets you spawn new
+     * rows and mix-and-match them with existing ones in some
+     * arbitrary user-chosen order.
+     */
+    private const NEW_KEYWORD = 'new';
+
+
+    /**
      * Decorator constructor.
      *
      * @param array|string[] $attachedFiles
@@ -73,10 +83,13 @@ class Decorator implements DecoratorInterface
         $assessment->setFields($lessonPlanFieldMapper->createCollection());
 
         foreach ($this->lessonPlanFields as $fieldId => $field) {
-            /* TODO repair this. Create and update share different workflows
-             *  Deconflict identifiers somehow
+            /* Figure out which Lesson Plan Template Field is related to this Lesson Plan Field
+             *
+             * FIXME It could be possible that someone deletes the LPT Field while this is saving,
+             *  resulting in this field going missing, due to multiplayer schoolbox. Is this
+             *  something that happens often enough to safeguard further, and in what manner?
              */
-            $lessonPlanTemplateField = $lessonPlanTemplate->getFields()->getBy('id', $fieldId);
+            $lessonPlanTemplateField = $lessonPlanTemplate->getFields()->getBy('id', $field['template']);
 
             $lessonPlanField = $lessonPlanFieldMapper->createModel()
                 ->setLessonPlanTemplateField($lessonPlanTemplateField)
@@ -84,6 +97,12 @@ class Decorator implements DecoratorInterface
                 ->setBody($field['body'])
                 ->setVisibility($lessonPlanTemplateField->getVisibility())
                 ->setSequence($lessonPlanTemplateField->getSequence());
+
+            /* If it's not a new Lesson Plan Field, recycle its identifier
+             */
+            if (!str_contains($fieldId, self::NEW_KEYWORD)) {
+                $lessonPlanField->setId($fieldId);
+            }
 
             $assessment->getFields()->add($lessonPlanField);
         }

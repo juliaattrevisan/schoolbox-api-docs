@@ -30,17 +30,32 @@
     </div>
 </fieldset>
 
-{# TODO Deconflict identifiers somehow #}
-{% for field in fields %}
-    <fieldset>
-        <div class="row">
-            <div class="small-12 columns">
-                <h2>{{ field.title }}</h2>
-                <textarea id="field-body-{{ field.id }}" name="field[{{ field.id }}][body]">{{ field.body }}</textarea>
+{% if assessment.id %}
+    {# Update a Lesson Plan. The fields' data already exist as Lesson Plan Fields, but we
+     # need to remember the Lesson Plan Template from which they spawned.
+     #}
+{% else %}
+    {# Create a new Lesson Plan. The fields are derived from the Lesson Plan Template's fields
+     # but they won't have any Lesson Plan Field identifiers at this point.
+     #}
+    {% for field in lessonPlanMeta.template.fields %}
+        {% set newFieldIdentifier = 'new' ~ loop.index %}
+
+        <fieldset>
+            <div class="row">
+                <div class="small-12 columns">
+                    <h2>{{ field.title }}</h2>
+                    {# The Lesson Plan Template field which is related to this Lesson Plan Field
+                     # Because of the swamp you need to know both since the same function fulfils
+                     # create and update phases in mapperProxy->save()
+                     #}
+                    <input type="hidden" name="field[{{ newFieldIdentifier }}][template]" value="{{ field.id }}" />
+                    <textarea id="field-body-{{ newFieldIdentifier }}" name="field[{{ newFieldIdentifier }}][body]" data-cke>{{ field.body }}</textarea>
+                </div>
             </div>
-        </div>
-    </fieldset>
-{% endfor %}
+        </fieldset>
+    {% endfor %}
+{% endif %}
 
 <input type="submit" value="Save">
 
@@ -51,11 +66,7 @@
      */
     document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
         detail: {
-            targetElements: [
-                {% for field in lessonPlanMeta.template.fields %}
-                '#field-body-{{ field.id }}',
-                {% endfor %}
-            ],
+            targetElements: ['[data-cke]']
         }
     }));
 </script>
