@@ -386,18 +386,15 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      */
     private function convertMessageToAction(Async\Event\Message $msg)
     {
-        // TODO This needs to be made instance-aware too?
-        //      Looks like there's a channel which could be extracted here, but
-        //      I don't know where this comes from?
-        if (preg_match('`^msg:.*:(\d+):(.*)$`', $msg->getChannel(), $matches)) {
-            $userId = $matches[1];
+        if (preg_match('`^msg:(.*?):(\d+):(.*)$`', $msg->getChannel(), $matches)) {
+            [$instanceId, $userId, $method] = $matches;
 
-            $this->log->debug("Received {$matches[2]} for {$userId}", [ 'char' => '>' ]);
+            $this->log->debug("Received $method for $userId instance $instanceId", [ 'char' => '>' ]);
 
             // in all cases, we expect the payload to be a standard message
-            $instance  = Instance::jsonUnserialize($msg->getPayload());
+            $instance = Instance::jsonUnserialize($msg->getPayload());
 
-            switch ($matches[2]) {
+            switch ($method) {
                 case static::PIPE_METHOD_PUSH:
                     return new Action\Push($userId, $instance);
 
@@ -418,9 +415,9 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      * @param int $userId
      * @return Pipe
      */
-    private function getFirstPipeForUser($userId)
+    private function getFirstPipeForInstanceAndUser(string $instanceId, int $userId)
     {
-        return reset($this->pipes->getPipesByInstanceAndUserId($userId));
+        return reset($this->pipes->getPipesByInstanceAndUserId($instanceId, $userId));
     }
 
 
@@ -438,27 +435,29 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
 
 
     /**
+     * @param string $instanceId
      * @param int    $userId
      * @param string $command
      * @param mixed  $payload
      * @throws QueueingException
      * @return void
      */
-    public function enqueueUser($userId, $command, $payload)
+    public function enqueueUser(string $instanceId, int $userId, $command, $payload): void
     {
-        $this->enqueue($this->getFirstPipeForUser($userId), $command, $payload);
+        $this->enqueue($this->getFirstPipeForInstanceAndUser($instanceId, $userId), $command, $payload);
     }
 
 
     /**
+     * @param string $instanceId
      * @param int    $userId
      * @param string $key
      * @param mixed  $payload
      * @return void
      */
-    public function transactUser($userId, $key, $payload)
+    public function transactUser(string $instanceId, int $userId, $key, $payload): void
     {
-        $this->getTransaction($this->getFirstPipeForUser($userId))->put($key, $payload);
+        $this->getTransaction($this->getFirstPipeForInstanceAndUser($instanceId, $userId))->put($key, $payload);
     }
 
 

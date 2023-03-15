@@ -13,7 +13,6 @@ use Schoolbox\Realtime\Pipe\PipeManager;
 
 class Push extends AbstractAction
 {
-
     /**
      * @param PipeManager $manager
      * @return void
@@ -21,6 +20,7 @@ class Push extends AbstractAction
     public function execute(PipeManager $manager)
     {
         $manager->transactUser(
+            $this->getInstanceId(),
             $this->getUserId(),
             $this->getMessageInstance()->getBaseHash(),
             $this->getMessageInstance()
