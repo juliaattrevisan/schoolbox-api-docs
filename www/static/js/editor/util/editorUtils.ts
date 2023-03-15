@@ -2,7 +2,7 @@
  * Misc editor utils that can be used by any editor type
  */
 
-import { insertElementAfter, injectScript } from "@js/util/domUtils";
+import { insertElementAfter, injectScript, isScriptAdded } from "@js/util/domUtils";
 import type { Editor } from "@ckeditor/ckeditor5-core";
 
 /**
@@ -37,7 +37,10 @@ export function removeValidation() {
  * For more info: https://iframely.com/docs/ckeditor
  */
 export async function addIframelyEmbed() {
-    await injectScript("//cdn.iframe.ly/embed.js?cancel=0");
+    const script = "//cdn.iframe.ly/embed.js?cancel=0";
+    if (!isScriptAdded(script)) {
+        await injectScript(script);
+    }
 }
 
 /**
