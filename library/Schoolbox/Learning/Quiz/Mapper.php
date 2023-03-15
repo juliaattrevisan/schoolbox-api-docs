@@ -119,9 +119,12 @@ class Mapper extends BaseMapper
      */
     protected function getFromString(): string
     {
+        // TODO: Why is `assessment` AS `am` joined via INNER JOIN when assess.assessment_id is nullable?
+        //       It probably follows from the definition of a quiz in the database, but that definition needs to be
+        //       stated somewhere.  Probably at the top of this file.
         return "
             FROM       {$this->getTable()}
-            LEFT JOIN {$this->getJoinSql('am', '', 'am', true)}
+            INNER JOIN {$this->getJoinSql('am', '', 'am', true)}
             INNER JOIN {$this->getJoinSql('user', '', 'u', true)}
         ";
     }
