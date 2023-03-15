@@ -80,8 +80,10 @@
         window.cdnPrefix = "{{ CDN_PREFIX }}";
         window.siteVersion = "{{ config.site_version }}";
 
-    </script>
-    {% endautoescape %}
+        window.sbProps.imageLightboxLicenseKey = "{{ config.image_lightbox_license_key }}";
+
+        </script>
+        {% endautoescape %}
 
     {% if config.site_usage_tracking %}
     {% autoescape 'js' %}
