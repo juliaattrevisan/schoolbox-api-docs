@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Pastoral\Report;
 
+use Alaress\Database\Predicate\Builder;
 use PDOStatement;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
@@ -16,6 +17,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Report\Access\Mapper as ReportAccessMapper;
+use Schoolbox\Pastoral\Report\Model as PastoralReport;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\Severity\Model as PastoralSeverity;
 use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
@@ -241,33 +243,38 @@ class Mapper extends BaseMapper
      */
     public function findForRecord(\Schoolbox\Pastoral\Model $pastoral, bool $notificationEnabledOnly): GenericCollection
     {
-        // For now, this does not check date, when uses_relative_date is true.
-
         $sql = "
             SELECT {$this->getColumnString('report')},
                    {$this->getJoinColumnString('access', 'access')}
             FROM `{$this->getTable()}` `report`
             LEFT JOIN `pastoral_report_access` `access` ON `access`.`pastoral_report_id` = `report`.`id`
             WHERE `report`.`deleted_at` IS NULL
-                  AND (
-                      `report`.`uses_relative_date` = 1
-                      OR
-                      (
-                          (`report`.`after_date` IS NULL OR `report`.`after_date` <= :createdAt)
-                          AND
-                          (`report`.`before_date` IS NULL OR :createdAt <= `report`.`before_date`)
-                      )
-                  )
                   AND (`report`.`authors` IS NULL OR CONCAT(',', `report`.`authors`, ',') LIKE :authorLike)
                   AND (`report`.`students` IS NULL OR CONCAT(',', `report`.`students`, ',') LIKE :studentLike)
      ";
 
         $wheres = [];
         $params = [
-            'createdAt'   => $pastoral->getRecordDate()->getDatabase(),
             'authorLike'  => "%,{$pastoral->getOwner()->getId()},%",
             'studentLike' => "%,{$pastoral->getStudent()->getId()},%",
         ];
+
+        // Date
+        $dateWheres           = [
+            ' (`report`.`uses_relative_date` = 0
+              AND (`report`.`after_date` IS NULL OR `report`.`after_date` <= :createdAt1 )
+              AND (`report`.`before_date` IS NULL OR :createdAt2 <= `report`.`before_date`))',
+        ];
+        $params['createdAt1'] = $pastoral->getRecordDate()->getDatabase();
+        $params['createdAt2'] = $pastoral->getRecordDate()->getDatabase();
+        $relativeDates        = $this->getMatchedRelativeDates($pastoral);
+        if (!empty($relativeDates)) {
+            $bindings     = Builder::getBindings($relativeDates, 'rds');
+            $dateWheres[] = " (`report`.`uses_relative_date` = 1
+                               AND `report`.`relative_date_string` IN ({$bindings->getPlaceholder()}))";
+            $params       = array_merge($params, $bindings->getParams());
+        }
+        $wheres[] = sprintf("(%s)", implode(' OR ', $dateWheres));
 
         // Severity
         if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_SEVERITY_ENABLED)) {
@@ -473,5 +480,69 @@ class Mapper extends BaseMapper
             $collection->offsetSet($row['report.id'], $model);
         }
         return $collection->sortNaturally('name');
+    }
+
+    /**
+     * Finds relative date strings that matches given pastoral record's occurred date/created date
+     * @param \Schoolbox\Pastoral\Model $pastoral
+     * @return array
+     */
+    private function getMatchedRelativeDates(\Schoolbox\Pastoral\Model $pastoral): array
+    {
+        $now        = \Alaress_Date_Format::now();
+        $thisTerm   = \Schoolbox\Assessment\Term\Mapper::getInstance()->findForToday();
+        $dateParams = [];
+
+        $dates = [
+            PastoralReport::THIS_YEAR      =>
+                [
+                    'start' => (clone $now)->startOfYear(),
+                    'end'   => (clone $now)->endOfYear(),
+                ],
+            PastoralReport::THIS_TERM      =>
+                [
+                    'start' => $thisTerm->getStart(),
+                    'end'   => $thisTerm->getActualFinish(),
+                ],
+            PastoralReport::PAST_6_MONTHS  =>
+                [
+                    'start' => \Alaress_Date_Format::newFromTimestamp(strtotime(PastoralReport::PAST_6_MONTHS)),
+                    'end'   => $now,
+                ],
+            PastoralReport::PAST_3_MONTHS  =>
+                [
+                    'start' => \Alaress_Date_Format::newFromTimestamp(strtotime(PastoralReport::PAST_3_MONTHS)),
+                    'end'   => $now,
+                ],
+            PastoralReport::PAST_MONTH     =>
+                [
+                    'start' => \Alaress_Date_Format::newFromTimestamp(strtotime(PastoralReport::PAST_MONTH)),
+                    'end'   => $now,
+                ],
+            PastoralReport::PAST_FORTNIGHT =>
+                [
+                    'start' => \Alaress_Date_Format::newFromTimestamp(strtotime(PastoralReport::PAST_FORTNIGHT)),
+                    'end'   => $now,
+                ],
+            PastoralReport::PAST_WEEK      =>
+                [
+                    'start' => \Alaress_Date_Format::newFromTimestamp(strtotime(PastoralReport::PAST_WEEK)),
+                    'end'   => $now,
+                ],
+            PastoralReport::TODAY          =>
+                [
+                    'start' => (clone $now)->startOfDay(),
+                    'end'   => (clone $now)->endOfDay(),
+                ],
+        ];
+        foreach ($dates as $name => $date) {
+            if (
+                ($date['end'] && $pastoral->getRecordDate()->between($date['start'], $date['end']))
+                || $pastoral->getRecordDate()->gte($date['start'])
+            ) {
+                $dateParams[] = $name;
+            }
+        }
+        return $dateParams;
     }
 }

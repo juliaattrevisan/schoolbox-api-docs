@@ -45,28 +45,6 @@ use Schoolbox\YearLevel;
 
 class Controller extends Base
 {
-    // Strings that can be converted to actual dates using strtotime
-    private const THIS_YEAR      = 'first day of january';
-    private const THIS_TERM      = 'this term'; // this is the only one that isn't a strtotime string
-    private const PAST_6_MONTHS  = '6 months ago';
-    private const PAST_3_MONTHS  = '3 months ago';
-    private const PAST_MONTH     = '1 month ago';
-    private const PAST_FORTNIGHT = '14 days ago';
-    private const PAST_WEEK      = '7 days ago';
-    private const TODAY          = 'today';
-
-    // Mappings of strings to labels that will be shown in the UI
-    private const RELATIVE_DATE_PRESETS = [
-        self::THIS_YEAR      => 'This year',
-        self::THIS_TERM      => 'This term',
-        self::PAST_6_MONTHS  => 'Past 6 months',
-        self::PAST_3_MONTHS  => 'Past 3 months',
-        self::PAST_MONTH     => 'Past month',
-        self::PAST_FORTNIGHT => 'Past fortnight',
-        self::PAST_WEEK      => 'Past week',
-        self::TODAY          => 'Today',
-    ];
-
     /**
      * Constructor
      *
@@ -272,7 +250,7 @@ class Controller extends Base
 
         // Default to using relative date
         $report->setUsesRelativeDate($report->getUsesRelativeDate() ?? true);
-        $report->setRelativeDateString($report->getRelativeDateString() ?? self::THIS_YEAR);
+        $report->setRelativeDateString($report->getRelativeDateString() ?? PastoralReport::THIS_YEAR);
 
         /* A stack of all YearLevel instances, ordered by sequence from the admin area
          */
@@ -310,7 +288,7 @@ class Controller extends Base
                     'actionsSelected'      => $actionsSelected,
                     'foldersSelected'      => $foldersSelected,
                     'report'               => $report,
-                    'datePresets'          => self::RELATIVE_DATE_PRESETS,
+                    'datePresets'          => PastoralReport::RELATIVE_DATE_PRESETS,
                     'selectedRelativeDate' => $report->getRelativeDateString(),
                     'record'               => $fakeRecord,
                     'moderatorIds'         => $this->userMapper->findByAccess(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ)->getPropertyValues('id'),
@@ -476,10 +454,10 @@ class Controller extends Base
     {
         // Get matching records
 
-        $beforeDate = Alaress_Date_Format::now();
         // Special case for the current term relative date, which is not a strtotime-able thingy
         if ($report->getUsesRelativeDate()) {
-            if ($report->getRelativeDateString() === self::THIS_TERM) {
+            $beforeDate = Alaress_Date_Format::now();
+            if ($report->getRelativeDateString() === PastoralReport::THIS_TERM) {
                 $afterDate = $this->termMapper->findForToday()->getStart();
             } else {
                 $afterDate = Alaress_Date_Format::newFromTimestamp(strtotime($report->getRelativeDateString()));
@@ -593,11 +571,11 @@ class Controller extends Base
             }
         } else {
             $report->setUsesRelativeDate(true);
-            $report->setRelativeDateString(self::THIS_YEAR);
+            $report->setRelativeDateString(PastoralReport::THIS_YEAR);
 
             // Update with POSTed relative date if it's valid
             $relativeDateString = $post->get('relative-dates-dropdown');
-            if (!empty($relativeDateString) && array_key_exists($relativeDateString, self::RELATIVE_DATE_PRESETS)) {
+            if (!empty($relativeDateString) && array_key_exists($relativeDateString, PastoralReport::RELATIVE_DATE_PRESETS)) {
                 $report->setRelativeDateString($relativeDateString);
             }
         }
