@@ -36,7 +36,7 @@ class PipeCollection implements Countable
      *
      * @var array<string, array<int, array<string, Pipe>>>
      */
-    protected array $pipesByUserId = [];
+    protected array $pipesByInstanceAndUserId = [];
 
     /** @var LoggerInterface */
     protected $log;
@@ -94,10 +94,12 @@ class PipeCollection implements Countable
         $pipe->setInstanceId($instanceId);
 
         // index pipe in triplicate
-        // TODO index by instance ID as well
+        // Socket key is presumed to be unique between instances:
+        // session ID could be presumed to be unique as well.
+        // User ID is not unique between instances.
         $this->pipesBySocketKey[$socketKey]                          = $pipe;
         $this->pipesBySessionId[$instanceId][$sessionId][$socketKey] = $pipe;
-        $this->pipesByUserId[$instanceId][$userId][$socketKey]       = $pipe;
+        $this->pipesByInstanceAndUserId[$instanceId][$userId][$socketKey]       = $pipe;
 
         $sess = $sessionId ?: 'sessionless';
 
@@ -117,9 +119,9 @@ class PipeCollection implements Countable
             $instanceId = $pipe->getInstanceId();
 
             if ($userId = $pipe->getUserId()) {
-                unset($this->pipesByUserId[$instanceId][$userId][$socketKey]);
-                if (empty($this->pipesByUserId[$instanceId][$userId])) {
-                    unset($this->pipesByUserId[$instanceId][$userId]);
+                unset($this->pipesByInstanceAndUserId[$instanceId][$userId][$socketKey]);
+                if (empty($this->pipesByInstanceAndUserId[$instanceId][$userId])) {
+                    unset($this->pipesByInstanceAndUserId[$instanceId][$userId]);
                 }
             }
 
@@ -157,22 +159,22 @@ class PipeCollection implements Countable
      */
     public function userPipeCount($userId)
     {
-        return array_key_exists($userId, $this->pipesByUserId)
-            ? count($this->pipesByUserId[$userId])
+        return array_key_exists($userId, $this->pipesByInstanceAndUserId)
+            ? count($this->pipesByInstanceAndUserId[$userId])
             : 0;
     }
 
 
-    /**
-     * @param string $sessionId
-     * @return int
-     */
-    public function sessionPipeCount($sessionId)
-    {
-        return array_key_exists($sessionId, $this->pipesBySessionId)
-            ? count($this->pipesBySessionId[$sessionId])
-            : 0;
-    }
+//    /**
+//     * @param string $sessionId
+//     * @return int
+//     */
+//    public function sessionPipeCount($sessionId)
+//    {
+//        return array_key_exists($sessionId, $this->pipesBySessionId)
+//            ? count($this->pipesBySessionId[$sessionId])
+//            : 0;
+//    }
 
 
     /**
@@ -190,31 +192,28 @@ class PipeCollection implements Countable
 
 
     /**
+     * @param string $instanceId
      * @param int $userId
      * @return Pipe[]
      */
-    public function getPipesByUserId($userId)
+    public function getPipesByInstanceAndUserId(string $instanceId, int $userId): array
     {
-        if ($this->userPipeCount($userId)) {
-            return $this->pipesByUserId[$userId];
-        }
-
-        return [];
+        return $this->pipesByInstanceAndUserId[$instanceId][$userId] ?? [];
     }
 
 
-    /**
-     * @param string $sessionId
-     * @return Pipe[]
-     */
-    public function getPipesBySessionId($sessionId)
-    {
-        if ($this->sessionPipeCount($sessionId)) {
-            return $this->pipesBySessionId[$sessionId];
-        }
-
-        return [];
-    }
+//    /**
+//     * @param string $sessionId
+//     * @return Pipe[]
+//     */
+//    public function getPipesBySessionId($sessionId)
+//    {
+//        if ($this->sessionPipeCount($sessionId)) {
+//            return $this->pipesBySessionId[$sessionId];
+//        }
+//
+//        return [];
+//    }
 
 
     /**

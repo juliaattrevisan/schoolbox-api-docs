@@ -417,7 +417,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      */
     private function getFirstPipeForUser($userId)
     {
-        return reset($this->pipes->getPipesByUserId($userId));
+        return reset($this->pipes->getPipesByInstanceAndUserId($userId));
     }
 
 
@@ -527,8 +527,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      */
     public function handleResponse($pipe, $command, $data)
     {
-        // TODO extract from pipe
-        $instanceId = INSTANCE_ID;
+        $instanceId = $pipe->getInstanceId();
         $userId     = $pipe->getUserId();
 
         $this->log->notice("Handling a worker response: $command");
@@ -557,7 +556,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
                 break;
 
             case self::PIPE_METHOD_PUSH:
-                $this->sendToUser($userId, [ $command => $data ]);
+                $this->sendToUser($instanceId, $userId, [ $command => $data ]);
                 $release = false;
                 break;
 
@@ -571,13 +570,13 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
                         }
                     }
 
-                    $this->sendToUser($userId, [ $command => $markAsRead ]);
+                    $this->sendToUser($instanceId, $userId, [ $command => $markAsRead ]);
                 }
                 break;
 
             // alert behaves like push + ack
             case self::PIPE_METHOD_ALERT:
-                $this->sendToUser($userId, [ $command => $data ]);
+                $this->sendToUser($instanceId, $userId, [ $command => $data ]);
                 $release = false;
                 break;
         }
@@ -654,9 +653,9 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      * @param array $data
      * @return void
      */
-    private function sendToUser($userId, $data)
+    private function sendToUser(string $instanceId, int $userId, array $data): void
     {
-        foreach ($this->pipes->getPipesByUserId($userId) as $pipe) {
+        foreach ($this->pipes->getPipesByInstanceAndUserId($instanceId, $userId) as $pipe) {
             $this->sendToPipe($pipe, $data);
         }
     }
@@ -701,8 +700,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
             . ($success ? 'unsubscribed' : 'failed to unsubscribe')
         );
 
-        // TODO fetch pipes by instance + user ID
-        foreach ($this->pipes->getPipesByUserId($userId) as $pipe) {
+        foreach ($this->pipes->getPipesByInstanceAndUserId($instanceId, $userId) as $pipe) {
             $this->sendHeader($pipe, 401);
             $this->pipes->unregisterPipe($pipe->getSocketKey());
             $pipe->close();
