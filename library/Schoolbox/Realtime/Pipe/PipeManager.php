@@ -386,6 +386,9 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      */
     private function convertMessageToAction(Async\Event\Message $msg)
     {
+        // TODO This needs to be made instance-aware too?
+        //      Looks like there's a channel which could be extracted here, but
+        //      I don't know where this comes from?
         if (preg_match('`^msg:.*:(\d+):(.*)$`', $msg->getChannel(), $matches)) {
             $userId = $matches[1];
 
