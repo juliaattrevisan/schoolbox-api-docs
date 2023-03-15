@@ -257,7 +257,7 @@ EXAMPLES:
 
        2. To undelete children of a non-soft-deleted folder with ID = 123. Restore children deleted within
           one hour before or after '2000-01-01 00:00:00':
-            {$green}$file {$yellow}-t '$table' -i 123 -o '2000-01-01 00:00:00' -w 7200 -p{$white}
+            {$green}$file {$yellow}-t '$table' -i 123 -d '2000-01-01 00:00:00' -w 7200 -p{$white}
 
 ";
             echo $helpMsg;
