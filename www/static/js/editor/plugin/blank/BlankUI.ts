@@ -28,7 +28,7 @@ export default class ResourceUI extends Plugin {
      * Register the button in the editor's UI component factory.
      */
     init() {
-        this.editor.ui.componentFactory.add("makeBlank", () => {
+        this.editor.ui.componentFactory.add("blank", () => {
             // Create the button and bind it to the command
             const button = getButton();
             button.on("execute", () => {
