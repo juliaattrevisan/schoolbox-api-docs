@@ -22,7 +22,6 @@ class Assignment extends \External\Canvas\Sync\Bridge\Assignment
         if ($muted) {
             return SubmissionBox::MARK_VISIBILITY_STAFF_ONLY;
         }
-        // default to exclude parent for now
-        return SubmissionBox::MARK_VISIBILITY_STAFF_AND_STUDENT;
+        return SubmissionBox::MARK_VISIBILITY_STAFF_STUDENT_PARENT;
     }
 }
