@@ -19,7 +19,7 @@ function getButton() {
     button.tooltip = true;
     button.withText = false;
     button.icon = icon;
-    button.class = "cke_button__schoolboxmakeblank";
+    button.class = "ck-button__schoolboxmakeblank";
     return button;
 }
 
