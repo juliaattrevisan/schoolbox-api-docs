@@ -21,12 +21,6 @@ use Psr\Log\LoggerInterface;
  */
 class SubscriptionManager implements ISubscriptionManager
 {
-    /** @var ISubscriptionFactory */
-    private ISubscriptionFactory $factory;
-
-    /** @var LoggerInterface */
-    private LoggerInterface $log;
-
     /**
      * A cache of subscriptions, indexed by instance ID and then by user ID
      *
@@ -35,15 +29,13 @@ class SubscriptionManager implements ISubscriptionManager
     private array $subscriptions = [];
 
     /**
-     * @param string               $instanceId
-     * @param ISubscriptionFactory $factory
-     * @param LoggerInterface      $log
+     * Constructor
+     *
+     * @param ISubscriptionFactory $factory Subscription factory
+     * @param LoggerInterface      $log     Logger
      */
-    public function __construct(string $instanceId, ISubscriptionFactory $factory, LoggerInterface $log)
+    public function __construct(private ISubscriptionFactory $factory, private LoggerInterface $log)
     {
-        $this->instanceId = $instanceId;
-        $this->factory    = $factory;
-        $this->log        = $log;
     }
 
     /**
@@ -119,7 +111,7 @@ class SubscriptionManager implements ISubscriptionManager
      * @param ISubscription $subscription
      * @return void
      */
-    private function putSubscription(string $instanceId, int $userId, ISubscription $subscription)
+    private function putSubscription(string $instanceId, int $userId, ISubscription $subscription): void
     {
         $this->subscriptions[$instanceId][$userId] = $subscription;
     }

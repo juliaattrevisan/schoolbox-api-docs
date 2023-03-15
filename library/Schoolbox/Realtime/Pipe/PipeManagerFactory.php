@@ -114,7 +114,7 @@ class PipeManagerFactory
         $validator   = new SessionValidator($this->redis, $this->handler, $this->sessionLength, $this->db);
         $pipes       = new PipeCollection($validator, $this->log);
         $subFactory  = new Subscription\Redis\SubscriptionFactory($this->redis, $this->asyncRedis);
-        $subManager  = new Subscription\SubscriptionManager($this->instanceId, $subFactory, $this->log);
+        $subManager  = new Subscription\SubscriptionManager($subFactory, $this->log);
         $pipeManager = new PipeManager($this->loop, $pipes, $subManager, $this->log, $this->strat, $this->fdLimit);
 
         // setup the listener
