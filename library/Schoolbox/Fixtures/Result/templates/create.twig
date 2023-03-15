@@ -1,7 +1,6 @@
 {% import '@sportsfixturesMatch/macro/heading.twig' as matchHeading %}
 
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 
 <script type="text/javascript">
     $(function() {
@@ -20,7 +19,14 @@
             }
         });
 
-        $('#resultForm').find('[data-description]').alaressEditor();
+        /**
+         * Initialise the editor
+         */
+        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+            detail: {
+                targetElements: ['[data-description]'],
+            }
+        }));
     });
 </script>
 
