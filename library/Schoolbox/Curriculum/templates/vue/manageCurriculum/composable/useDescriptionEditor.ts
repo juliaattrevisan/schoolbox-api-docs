@@ -21,46 +21,18 @@ export function useDescriptionEditor($initialValue: string, $ckeditorInstance: s
     const ckeditorInstance = $ckeditorInstance;
 
     /**
-     * Remove these buttons as media shouldn't be added to the description
-     *
-     * @typedef HTMLElement
-     * @param { HTMLElement } ckeditor - the ckeditor instance in the DOM
+     * When a new editor is created
      */
-    function removeMediaEmbedButtons(ckeditor: HTMLElement) {
-        const videoAudioButton = ckeditor.querySelector(".cke_button__schoolboxresourcemedia") as HTMLElement;
-        videoAudioButton.style.display = "none";
-        const imageButton = ckeditor.querySelector(".cke_button__schoolboxresourceimage") as HTMLElement;
-        imageButton.style.display = "none";
-        const eqnEditorButton = ckeditor.querySelector(".cke_button__eqneditor") as HTMLElement;
-        eqnEditorButton.style.display = "none";
-    }
+    function onEditorCreated(event) {
+        const editor = event.detail.editor;
 
-    /**
-     * The config that needs to be passed to CKEditor in order to for it to work in Vue land
-     *
-     * @returns { object } - configuration specific to Vue
-     */
-    function getVueSpecificConfig() {
-        return {
-            on: {
-                change: () => {
-                    // Bind the content of CKEditor into the description model on change
-                    initialValue.value = CKEDITOR.instances[ckeditorInstance].getData() as string;
-                },
-                instanceReady: (event) => {
-                    // can display the loaded CKEditor now
-                    if (initialValue.value !== null) {
-                        event.editor.setData(initialValue.value); // set the initial data
-                        removeMediaEmbedButtons(event.editor.container.$ as HTMLElement);
-                    }
-                },
-                drop: (event) => {
-                    // prevent drag and drop from functioning (haven't been able to disable it prior in any other config setting)
-                    event.stop();
-                },
-            },
-            targetElements: $(`#${ckeditorInstance}`),
-        };
+        if (initialValue.value !== null) {
+            editor.setData(initialValue.value); // set the initial data
+        }
+
+        editor.model.document.on("change:data",() => {
+            initialValue.value = editor.getData() as string;
+        });
     }
 
     /**
@@ -68,15 +40,19 @@ export function useDescriptionEditor($initialValue: string, $ckeditorInstance: s
      */
     async function loadCKEditor() {
         try {
-            const ckeditorScript = `${cdnPrefix}/js/ckeditor/ckeditor.js?v=${siteVersion}`; // cdnPrefix and siteVersion are global vars from chrome.twig
+            const ckeditorScript = `${cdnPrefix}/js/bundle/editor.js?v=${siteVersion}`; // cdnPrefix and siteVersion are global vars from chrome.twig
             if (!isScriptAdded(ckeditorScript)) {
                 await injectScript(ckeditorScript);
             }
-            const jqueryEditorScript = `${cdnPrefix}/js/editor/jquery.editor.js?v=${siteVersion}`; // cdnPrefix and siteVersion are global vars from chrome.twig
-            if (!isScriptAdded(jqueryEditorScript)) {
-                await injectScript(jqueryEditorScript);
-            }
-            $.fn.alaressEditor($.alaressEditorConfigForComments(getVueSpecificConfig()));
+            document.getElementById(ckeditorInstance).addEventListener("EDITOR__CREATED", onEditorCreated);
+            document.dispatchEvent(
+                new CustomEvent("EDITOR__CREATE", {
+                    detail: {
+                        targetElements: [`#${ckeditorInstance}`],
+                        toolbar: "simple"
+                    },
+                })
+            );
         } catch (error) {
             throw new Error(error);
         }
