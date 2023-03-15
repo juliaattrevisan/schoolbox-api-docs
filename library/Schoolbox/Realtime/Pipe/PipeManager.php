@@ -386,8 +386,8 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      */
     private function convertMessageToAction(Async\Event\Message $msg)
     {
-        if (preg_match('`^msg:(.*?):(\d+):(.*)$`', $msg->getChannel(), $matches)) {
-            [$instanceId, $userId, $method] = $matches;
+        if (preg_match('`^msg:(.+?):(\d+):(.*)$`', $msg->getChannel(), $matches)) {
+            [, $instanceId, $userId, $method] = $matches;
 
             $this->log->debug("Received $method for $userId instance $instanceId", [ 'char' => '>' ]);
 
@@ -396,10 +396,10 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
 
             switch ($method) {
                 case static::PIPE_METHOD_PUSH:
-                    return new Action\Push($userId, $instance);
+                    return new Action\Push($instanceId, $userId, $instance);
 
                 case static::PIPE_METHOD_ALERT:
-                    return new Action\Alert($userId, $instance);
+                    return new Action\Alert($instanceId, $userId, $instance);
             }
         }
 
