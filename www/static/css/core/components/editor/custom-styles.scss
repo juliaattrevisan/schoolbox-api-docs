@@ -51,6 +51,20 @@
 }
 
 .ck-s {
+    /* Applies to all custom styles. */
+    &-banner,
+    &-callout--info,
+    &-callout--warning,
+    &-callout--success,
+    &-callout-target,
+    &-callout--question,
+    &-sticky-note,
+    &-construction,
+    &-code-block {
+        //max-width: fit-content;
+        word-break: break-word;
+    }
+
     /* Banner */
     &-banner {
         background-color: var(--ck-custom-blue);
@@ -113,8 +127,10 @@
         &--success,
         &--target,
         &--question {
+            background-color: white;
             border: 1px solid var(--ck-custom-grey);
             border-radius: 0.25rem;
+            box-shadow: 0px 5px 5px 0px var(--ck-custom-shadow);
             color: var(--ck-custom-grey);
             display: block;
             overflow: hidden;
@@ -198,7 +214,8 @@
         max-width: 100%;
         padding: 1.5rem 1rem 1rem 1rem;
         position: relative;
-        width: max-content;
+        width: -moz-fit-content;
+        width: fit-content;
 
         &::before {
             color: var(--ck-custom-red);
@@ -267,12 +284,48 @@ p.ck-s-code-block {
     color: var(--ck-custom-white);
     display: block;
     font-family: monospace;
-    font-size: 12px;
     font-weight: 400;
     padding: 1rem;
     position: relative;
     tab-size: 4;
-    white-space: pre;
-    unicode-bidi: embed;
+
+    /* background-color: var(--ck-custom-code-bg);
+    border: none;
+    border-radius: 0.25rem;
+    color: var(--ck-custom-white);
+    display: block;
+    font-family: monospace;
+    font-size: 12px;
+    font-weight: 400;
     overflow-x: auto;
+    padding: 1rem;
+    position: relative;
+    tab-size: 4;
+    unicode-bidi: embed;
+    width: fit-content; */
+
+    /* background-color: var(--ck-custom-code-bg);
+    border: none;
+    border-radius: 0.25rem;
+    color: var(--ck-custom-white);
+    display: block;
+    font-family: monospace;
+    font-weight: 400;
+    overflow-x: auto;
+    white-space: pre-line;
+    padding: 1rem;
+    tab-size: 4;
+    unicode-bidi: embed; */
 }
+
+/*
+
+ border: 1px solid var(--ck-custom-grey);
+            border-radius: 0.25rem;
+            color: var(--ck-custom-grey);
+            display: block;
+            overflow: hidden;
+            padding: 1em 1em 1em 4rem;
+            position: relative;
+
+*/
