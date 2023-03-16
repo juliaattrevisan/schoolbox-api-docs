@@ -1475,8 +1475,6 @@ class MapperProxy
              */
             $subModel->setDeletedBy($this->baseMapper->getSessionUser());
 
-            print_r($subModel);
-
             $lessonPlanMapper->save($subModel);
             $lessonPlanMapper->delete($subModel);
         } else {
