@@ -1,3 +1,5 @@
+/* Admin area; list of Fields in a Lesson Plan Template
+ */
 .lesson-plan-template-fields {
     &.s-is-dragging {
         .ui-sortable-helper {
@@ -156,4 +158,18 @@
             }
         }
     }
+}
+
+/* Create Lesson Plan for the usual user
+ *
+ * There's a list where you can preview the contents of an LPT
+ * This helps the rendering of each LPT and its Fields look less awful
+ */
+.lpt-preview-header {
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #ddd;
+}
+
+.information-list.lpt-preview li {
+    padding: 1rem 0 1rem 0;
 }

@@ -21,7 +21,7 @@
                     <li class="actions-small-1">
                         <div class="list-item">
                             <div class="card small-12">
-                                <a data-preview="{{ recentLessonPlanTemplate.id }}"><h3>{{ recentLessonPlanTemplate.title }}</h3></a>
+                                <a data-reveal-id="lpt-preview-{{ recentLessonPlanTemplate.id }}"><h3>{{ recentLessonPlanTemplate.title }}</h3></a>
                                 <p class="meta">
                                     Last modified by
                                     {% if recentLessonPlanTemplate.updatedBy.deleted %}
@@ -35,7 +35,7 @@
                             </div>
                         </div>
                         <nav>
-                            <a class="icon-search"></a>
+                            <a class="icon-search" data-reveal-id="lpt-preview-{{ recentLessonPlanTemplate.id }}"></a>
                         </nav>
                     </li>
                 {% endfor %}
@@ -59,7 +59,7 @@
                     <li class="actions-small-1">
                         <div class="list-item">
                             <div class="card small-12">
-                                <a data-preview="{{ lessonPlanTemplate.id }}"><h3>{{ lessonPlanTemplate.title }}</h3></a>
+                                <a data-reveal-id="lpt-preview-{{ lessonPlanTemplate.id }}"><h3>{{ lessonPlanTemplate.title }}</h3></a>
                                 <p class="meta">
                                     Last modified by
                                     {% if lessonPlanTemplate.updatedBy.deleted %}
@@ -73,7 +73,7 @@
                             </div>
                         </div>
                         <nav>
-                            <a class="icon-search"></a>
+                            <a class="icon-search" data-reveal-id="lpt-preview-{{ lessonPlanTemplate.id }}"></a>
                         </nav>
                     </li>
                 {% endfor %}
@@ -89,3 +89,20 @@
         </p>
     </div>
 {% endif %}
+
+{% for lessonPlanTemplate in lessonPlanTemplates.all %}
+    <div id="lpt-preview-{{ lessonPlanTemplate.id }}" class="reveal-modal" data-reveal>
+        <h1 class="no-margin lpt-preview-header">{{ lessonPlanTemplate.title }}</h1>
+
+        <ul class="information-list lpt-preview">
+            {% for field in lessonPlanTemplate.fields %}
+            <li class="content">
+                <h2>{{ field.title }}</h2>
+                <div>{{ field.body|purify }}</div>
+            </li>
+            {% endfor %}
+        </ul>
+
+        <a class="close-reveal-modal">&#215;</a>
+    </div>
+{% endfor %}
