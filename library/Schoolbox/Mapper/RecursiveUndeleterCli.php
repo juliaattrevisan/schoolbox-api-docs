@@ -18,7 +18,7 @@
  *  ShortOpt | LongOpt
  *  -p       | --perform   *without* this flag, un-delete will only perform a dry-run
  *  -m       | --mapper    which mapper class does the root entity belong to?
- *  -i       | --id        Comma-separated list of IDs to un-delete, eg '1' or '1,2,3'. Use '*' to get all.
+ *  -i       | --id        Comma-separated list of IDs to un-delete, eg '1' or '1,2,3'. Use '*' (including quotes) to get all.
  *  -w       | --window    duration in seconds in which to match deletedAt dates. Children deleted outside span will not be restored.
  *  -v       | --verbose   verbosity:   how much activity will be logged.
  */
@@ -230,7 +230,7 @@ DESCRIPTION
        Mandatory arguments to long options are mandatory for short options too.
 
        {$yellow}-i, --id=ID...{$white}
-              comma-separated list of IDs to un-delete, eg '1' or '1,2,3'. Use '*' to get all.
+              comma-separated list of IDs to un-delete, eg '1' or '1,2,3'. Use '*' (including quotes) to get all.
               If any entity with a specified ID is not soft-deleted, it will be ignored.
 
        {$yellow}-t, --table=TABLE{$white}
@@ -299,7 +299,7 @@ EXAMPLES:
 
         // Ensure it only contains integers and commas
         if ('*' !== $idString && preg_match('/[^0-9,]/', $idString, $matches)) {
-            $errors[] = "only use integers and commas when specifying IDs - no spaces (or '*' for all)";
+            $errors[] = "only use integers and commas when specifying IDs - no spaces (or '*' (including quotes) for all)";
             return $errors;
         }
 
