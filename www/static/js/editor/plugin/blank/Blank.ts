@@ -8,6 +8,8 @@ import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
 import BlankUI from "./BlankUI";
 import BlankEditing from "./BlankEditing";
 
+export const MAKE_BLANK = "makeBlank";
+
 export default class Blank extends Plugin {
     static get requires() {
         return [BlankUI, BlankEditing];

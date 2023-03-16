@@ -6,6 +6,8 @@
 import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
 import ButtonView from "@ckeditor/ckeditor5-ui/src/button/buttonview";
 import fontBackgroundColorIcon from "@ckeditor/ckeditor5-font/theme/icons/font-background.svg";
+import { MAKE_BLANK } from "./Blank";
+import { getCopyOnEnterAttributes } from "@ckeditor/ckeditor5-enter/src/utils";
 
 export default class BlankUI extends Plugin {
     /**
@@ -15,18 +17,17 @@ export default class BlankUI extends Plugin {
         const editor = this.editor;
         this.editor.ui.componentFactory.add("blank", () => {
             // Create the button and bind it to the command
-            const command = this.editor.commands.get("makeBlank");
+            const command = editor.commands.get(MAKE_BLANK);
             const button = new ButtonView();
             button.label = "Make Blank";
             button.tooltip = true;
             button.withText = false;
             button.icon = fontBackgroundColorIcon;
             button.class = "ck-button__schoolboxmakeblank";
-            button.on("execute", () => this.editor.execute("makeBlank"));
-            /// highlight whether the button is on or off (adds .ck-on class to button)
-            // button.bind("isOn").to(command, "isOn");
-            // don't allow the button to be selected if the command is disabled
-            // button.bind("isEnabled").to(command, "isEnabled");
+            button.isToggable = true;
+            button.on("execute", () => editor.execute(MAKE_BLANK));
+            // bind isOn and isEnabled to the values in the command - determined by AttributeCommand
+            button.bind("isOn", "isEnabled").to(command, "value", "isEnabled");
             return button;
         });
     }
