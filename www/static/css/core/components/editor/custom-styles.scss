@@ -98,29 +98,44 @@
     }
 
     /* Callout */
+    /*  Previously these styles used two classes - a base 'ck-s-callout' class
+     *  and then a '--modifier' class to apply anything unique to that particular style.
+     *  This caused an issue when an end user accidentally added two callout styles at
+     *  the same time and then removed one of them, CKEditor5 would also remove that base
+     *  class even though the remaining style still required it.
+     *
+     *  The code is split out like this to prevent that error from occurring
+     *  so that now there's only a single class applied to the styles.
+     */
     &-callout {
-        border: 1px solid var(--ck-custom-grey);
-        border-radius: 0.25rem;
-        color: var(--ck-custom-grey);
-        display: block;
-        overflow: hidden;
-        padding: 1em 1em 1em 4rem;
-        position: relative;
+        &--info,
+        &--warning,
+        &--success,
+        &--target,
+        &--question {
+            border: 1px solid var(--ck-custom-grey);
+            border-radius: 0.25rem;
+            color: var(--ck-custom-grey);
+            display: block;
+            overflow: hidden;
+            padding: 1em 1em 1em 4rem;
+            position: relative;
 
-        &::before {
-            align-items: center;
-            background-color: var(--ck-custom-grey);
-            color: var(--ck-custom-white);
-            display: flex;
-            font-family: "schoolbox";
-            font-size: 1.25rem;
-            font-weight: 400;
-            height: 100%;
-            justify-content: center;
-            left: 0;
-            position: absolute;
-            top: 0;
-            width: 3rem;
+            &::before {
+                align-items: center;
+                background-color: var(--ck-custom-grey);
+                color: var(--ck-custom-white);
+                display: flex;
+                font-family: "schoolbox";
+                font-size: 1.25rem;
+                font-weight: 400;
+                height: 100%;
+                justify-content: center;
+                left: 0;
+                position: absolute;
+                top: 0;
+                width: 3rem;
+            }
         }
 
         &--info {

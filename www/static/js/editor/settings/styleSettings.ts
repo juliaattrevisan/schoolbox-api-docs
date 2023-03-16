@@ -36,27 +36,27 @@ export function getStyleSettings() {
                 {
                     name: "Info Callout",
                     element: "p",
-                    classes: ["ck-s-callout", "ck-s-callout--info"],
+                    classes: ["ck-s-callout--info"],
                 },
                 {
                     name: "Warning Callout",
                     element: "p",
-                    classes: ["ck-s-callout", "ck-s-callout--warning"],
+                    classes: ["ck-s-callout--warning"],
                 },
                 {
                     name: "Success Callout",
                     element: "p",
-                    classes: ["ck-s-callout", "ck-s-callout--success"],
+                    classes: ["ck-s-callout--success"],
                 },
                 {
                     name: "Target Callout",
                     element: "p",
-                    classes: ["ck-s-callout", "ck-s-callout--target"],
+                    classes: ["ck-s-callout--target"],
                 },
                 {
                     name: "Question Callout",
                     element: "p",
-                    classes: ["ck-s-callout", "ck-s-callout--question"],
+                    classes: ["ck-s-callout--question"],
                 },
                 {
                     name: "Sticky Note",
