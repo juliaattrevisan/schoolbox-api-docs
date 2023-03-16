@@ -192,9 +192,6 @@ class RecursiveUndeleterCli extends CliTool\App
     }
 
 
-
-
-
     /**
      * Either successfully load all command line args, or print and error message and exit
      */
@@ -627,6 +624,7 @@ EXAMPLES:
 
         return $deDuplicatedResults;
     }
+
 
     /**
      * Return a single line string of IDs
