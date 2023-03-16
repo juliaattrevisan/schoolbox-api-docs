@@ -1458,6 +1458,16 @@ class MapperProxy
             // The composite object is responsible for deleting its components
             // TODO - roll out this methodology to other assessment types
             SubmissionBoxMapper::getInstance()->delete($subModel);
+        } elseif ($subModel instanceof LessonPlan\Model) {
+            /* TODO Delete the fields via the Lesson Plan Field Mapper
+             */
+
+            /* TODO Delete the files. Maybe
+             */
+
+            /* TODO Set the Deleted By to the current user when deleting
+             *  the Lesson Plan Itself
+             */
         } else {
             $this->baseMapper->delete($dataModel);
         }
