@@ -455,16 +455,20 @@ class Controller extends Base
         // Get matching records
 
         // Special case for the current term relative date, which is not a strtotime-able thingy
-        if ($report->getUsesRelativeDate()) {
-            $beforeDate = Alaress_Date_Format::now();
-            if ($report->getRelativeDateString() === PastoralReport::THIS_TERM) {
-                $afterDate = $this->termMapper->findForToday()->getStart();
-            } else {
-                $afterDate = Alaress_Date_Format::newFromTimestamp(strtotime($report->getRelativeDateString()));
-            }
-        } else {
+        if (!$report->getUsesRelativeDate()) {
             $beforeDate = $report->getBeforeDate();
             $afterDate  = $report->getAfterDate();
+        } elseif ($report->getRelativeDateString() === PastoralReport::THIS_TERM) {
+            $currentTerm = $this->termMapper->findForToday();
+            $beforeDate  = $currentTerm->getActualFinish();
+            $afterDate   = $currentTerm->getStart();
+        } elseif ($report->getRelativeDateString() === PastoralReport::THIS_YEAR) {
+            $now        = Alaress_Date_Format::now();
+            $beforeDate = (clone $now)->endOfYear();
+            $afterDate  = (clone $now)->startOfYear();
+        } else {
+            $beforeDate = Alaress_Date_Format::now();
+            $afterDate = Alaress_Date_Format::newFromTimestamp(strtotime($report->getRelativeDateString()));
         }
 
         $students = $report->getStudents();
