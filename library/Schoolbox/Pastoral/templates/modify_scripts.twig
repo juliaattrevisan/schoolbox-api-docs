@@ -398,15 +398,18 @@
              * then you're safe to swap it to another template
              *
              * If the current data is empty, you can fill it with another template
+             *
+             * When we change the data in the editor, we need to trigger the EDITOR__CHECK_DATA event
+             * to make sure that old tokens from CKEditor4 are migrated to format correctly in CKEditor5
              */
             if (current === '' || publicEditorIsTemplate) {
                 window.sbProps.editors['body_public'].setData(template);
-                window.sbProps.editors['body_public'].sourceElement.dispatchEvent(new CustomEvent("EDITOR__UPDATETOKENS"));
+                window.sbProps.editors['body_public'].sourceElement.dispatchEvent(new CustomEvent("EDITOR__CHECK_DATA"));
                 publicEditorIsTemplate = true;
             }
             if (currentPrivate === '' || privateEditorIsTemplate) {
                 window.sbProps.editors['body_private'].setData(templatePrivate);
-                window.sbProps.editors['body_private'].sourceElement.dispatchEvent(new CustomEvent("EDITOR__UPDATETOKENS"));
+                window.sbProps.editors['body_private'].sourceElement.dispatchEvent(new CustomEvent("EDITOR__CHECK_DATA"));
                 privateEditorIsTemplate = true;
             }
 
