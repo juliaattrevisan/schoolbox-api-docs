@@ -99,6 +99,9 @@ class LessonPlan implements IAssessmentTypeTranslator
 //            $dataModel->getFields()->add($lessonPlanField);
 //        }
 
+        /* Work out why deletes need/don't need Fields
+         */
+        new \Alaress_Probe($domainObject->getFields());die();
         foreach ($domainObject->getFields() as $lessonPlanField) {
             $lessonPlanTemplateFieldId = $lessonPlanField->getLessonPlanTemplateField()->getId();
             $lessonPlanTemplateField = $domainObject->getLessonPlanTemplate()->getFields()->getBy('id', $lessonPlanTemplateFieldId);
