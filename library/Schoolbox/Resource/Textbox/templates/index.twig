@@ -8,6 +8,7 @@
 {{ bread.crumbsArray(allBreadcrumbs) }}
 
 <div class="row">
+    <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
     <div class="button-action small-12 columns">
         <h1>Manage Text Boxes on {{ folder.title }}</h1>
         <a href="#" class="icon-add button" title="Create Text Box" data-action="addTextbox">Create Text Box</a>
@@ -25,8 +26,6 @@
         </div>
 
         <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/textboxList.js?v={{ config.site_version }}"></script>
-        <script type="text/javascript" src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
-        <script type="text/javascript" src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
         <script type="text/javascript">
             $(function () {
                 $('a[data-action="addTextbox"]').click(function (event) {
