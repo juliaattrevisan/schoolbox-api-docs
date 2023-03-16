@@ -369,7 +369,7 @@ class Mapper extends BaseMapper
      */
     public function softDeleteLessonPlan(Model $assessment): bool
     {
-        if ($assessment->getLessonPlan() instanceof \Schoolbox\Learning\Assessment\LessonPlan\Model) {
+        if ($assessment->getLessonPlan() instanceof \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Model) {
             $lessonPlanMapper = $this->getJoinMapper('lessonPlan');
             $lessonPlans      = $lessonPlanMapper->findByColumn('assessment_id', $assessment->getId());
             $lessonPlanMapper->softDelete($lessonPlans);

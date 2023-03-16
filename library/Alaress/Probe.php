@@ -19,7 +19,6 @@ use Alaress\DebugBar\Instance as DebugBar;
 
 class Alaress_Probe
 {
-
     /**
      * Alaress_Probe constructor.
      * @param null $_
