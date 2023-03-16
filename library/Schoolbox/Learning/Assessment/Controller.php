@@ -291,7 +291,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
                         ), $data);
                     }
                 } else {
-                    $data['mageAsync'] = true;
+                    $data['lessonPlanMeta']['mageAsync'] = true;
 
                     if ($this->getRequest()->isXhr()) {
                         $content = $this->buildUnthemedHtmlOutput(sprintf(
