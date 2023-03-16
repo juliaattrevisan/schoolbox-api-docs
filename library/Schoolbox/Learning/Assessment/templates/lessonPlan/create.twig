@@ -1,5 +1,59 @@
-<div class="row">
-    <div class="small-12 columns">
-        <h1>yoghurt</h1>
+{##
+ # Customise a selected Lesson Plan Template
+ #
+ # Create a Lesson Plan based on a customised version of a Lesson Plan Template
+ #
+ # @param LessonPlan\Template\Model $template
+ # @param array $breadcrumbs        A set of nodes to render as breadcrumb elements
+ #}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(breadcrumbs) }}
+
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>Create Lesson Plan</h1>
+        </div>
     </div>
 </div>
+
+<div class="row">
+    <div class="small-12 island">
+        <form>
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label class="required" for="title">Title</label>
+                        <input id="title" type="text" name="title" value="{{ template.title }}" />
+                    </div>
+                </fieldset>
+
+                {% for field in template.fields %}
+                    <fieldset class="content">
+                        <div class="small-12 columns">
+                            <h2>{{ field.title }}</h2>
+                            <textarea id="field-body-{{ field.id }}" name="field[{{ field.id }}][body]">{{ field.body }}</textarea>
+                        </div>
+                    </fieldset>
+                {% endfor %}
+            </section>
+
+            <input type="submit" value="Save">
+        </form>
+    </div>
+</div>
+
+<script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
+<script>
+    /* Spawn multiple ckeditors for fields which already existed
+     */
+    document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+        detail: {
+            targetElements: [
+                {% for field in template.fields %}
+                '#field-body-{{ field.id }}',
+                {% endfor %}
+            ],
+        }
+    }));
+</script>
