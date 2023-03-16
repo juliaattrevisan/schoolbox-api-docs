@@ -102,8 +102,8 @@ export function getToolbar(config: EditorConfig) {
      * if it is an object we filter out the items that match the pluginName
      * then we filter out any null values
      */
-    if (config.removePlugins) {
-        config.removePlugins.forEach((pluginName) => {
+    if (config.removeFromToolbar) {
+        config.removeFromToolbar.forEach((pluginName) => {
             toolbar = toolbar
                 .map((item) => {
                     if (typeof item === "string") {
@@ -119,8 +119,8 @@ export function getToolbar(config: EditorConfig) {
      * add any individual plugins for specific use cases for example
      * the Blank plugin for Quiz cloze questions
      */
-    if (config.addPlugins) {
-        toolbar = [...toolbar, ...config.addPlugins];
+    if (config.addToToolbar) {
+        toolbar = [...toolbar, ...config.addToToolbar];
     }
     return toolbar;
 }
