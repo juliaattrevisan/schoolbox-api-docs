@@ -172,6 +172,10 @@ class RecursiveUndeleter
             QuizSection\Mapper::class => 'assess_id',
             QuizAttempt\Mapper::class => 'assess_id',
         ],
+        \Schoolbox\Survey\Mapper::class => [
+            QuizSection\Mapper::class => 'assess_id',
+            \Schoolbox\Survey\Attempt\Mapper::class => 'assess_id',
+        ],
         SubmissionBoxMapper::class          => [
             SubmissionMapper::class    => 'box_id',
             ReturnedWorkMapper::class  => 'box_id',
@@ -191,6 +195,9 @@ class RecursiveUndeleter
             QuizQuestion\Mapper::class => 'section_id',
         ],
         QuizAttempt\Mapper::class           => [
+            QuizAnswer\Mapper::class => 'attempt_id',
+        ],
+        \Schoolbox\Survey\Attempt\Mapper::class => [
             QuizAnswer\Mapper::class => 'attempt_id',
         ],
         SubmissionMapper::class             => [
@@ -343,10 +350,12 @@ class RecursiveUndeleter
      * Load an instance of the root mapper from the table name
      * @param string $table
      * @throws UnexpectedValueException
-     * @return IMapper
+     * @return array
      */
-    public function loadMapper(string $table): IMapper
+    public function loadMappers(string $table): array
     {
+        $results = [];
+
         // Use the specified root table to find the root mapper
         foreach (self::$softDeleteRegistry as $mapperClass => $children) {
             // A bit of house keeping to try to keep things in order
@@ -358,11 +367,15 @@ class RecursiveUndeleter
                 /** @var IMapper $mapperClass */
                 $mapperInstance = $mapperClass::getInstance();
                 if ($mapperInstance->getTable() === $table) {
-                    return $mapperInstance;
+                    $results[] = $mapperInstance;
                 }
             } catch (\Exception $e) {
                 $this->logger->warning($e->getMessage());
             }
+        }
+
+        if (!empty($results)) {
+            return $results;
         }
 
         $this->logger->error("No mapper found in registry with table: '{$table}'");

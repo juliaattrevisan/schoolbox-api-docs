@@ -120,11 +120,13 @@ class RecursiveUndeleterCli extends CliTool\App
             $this->connectToDatabase();
 
             $recursiveUndeleter = new RecursiveUndeleter($this->logger, $this->deletedAtWindow, $this->explicitDeletionDate);
-            $this->rootMapper = $recursiveUndeleter->loadMapper($this->rootTable);
+
+            $softDeletedModels = [];
+            foreach ($recursiveUndeleter->loadMappers($this->rootTable) as $mapper) {
+                $softDeletedModels = array_merge($softDeletedModels, $recursiveUndeleter->findDeletedModels($mapper, $this->rootIds));
+            }
 
             $this->checkRestoreAllRequested();
-
-            $softDeletedModels = $recursiveUndeleter->findDeletedModels($this->rootMapper, $this->rootIds);
 
             $this->printResults($softDeletedModels);
             $this->printDeletedAtDates($softDeletedModels);
