@@ -535,7 +535,7 @@
         function init(options, element) {
             var defaults = {
                 element: element,
-                targetElements: $("#answerBox"),
+                targetElements: ["#answerBox"],
                 file_browser_category_id: 0,
             };
 
@@ -554,49 +554,15 @@
          * Set everything up
          */
         function start() {
-            $.fn.alaressEditor({
-                targetElements: config.targetElements,
-                file_browser_category_id: config.file_browser_category_id,
-
-                toolbarGroups: [
-                    { name: "schoolbox", groups: [] },
-                    { name: "basicstyles", groups: ["cleanup"] },
-                ],
-
-                allowedContent:
-                    "img[!src,data-schoolboxresource-fullwidth,data-schoolboxresource-width,data-schoolboxresource-height,data-schoolboxresource-filesystem,data-schoolboxresource-type,data-schoolboxresource-thumbnail,data-schoolboxresource-source];" +
-                    "span(selected-word)",
-
-                /* Words to "make blank" in fillgap
-                 */
-                load: function () {
-                    CKEDITOR.addCss(config.css);
-                },
-
-                start: function (element) {
-                    var instance = window.sbProps.editors["answerBox"];
-
-                    /* Add special unique buttons
-                     */
-                    instance.addCommand("makeBlank", {
-                        exec: function (editorInstance) {
-                            var selectedContent = editorInstance.getSelection().getSelectedText();
-                            var updatedContent = '<span class="selected-word">' + selectedContent + "</span>";
-
-                            /* Replace selected content in editor
-                             */
-                            editorInstance.insertHtml(updatedContent, "html");
-                        },
-                    });
-
-                    instance.ui.addButton("schoolboxMakeBlank", {
-                        // add new button and bind our command
-                        label: "Make Blank",
-                        command: "makeBlank",
-                        toolbar: "schoolbox",
-                    });
-                },
-            });
+            document.dispatchEvent(
+                new CustomEvent("EDITOR__CREATE", {
+                    detail: {
+                        targetElements: config.targetElements,
+                        toolbar: "simple",
+                        addToToolbar: ["|", "blank"],
+                    },
+                })
+            );
 
             $("#createQuestionForm").shortCreate({
                 rules: {
