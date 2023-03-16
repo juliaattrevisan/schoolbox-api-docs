@@ -99,9 +99,6 @@ class LessonPlan implements IAssessmentTypeTranslator
 //            $dataModel->getFields()->add($lessonPlanField);
 //        }
 
-        /* Work out why deletes need/don't need Fields
-         */
-        new \Alaress_Probe($domainObject->getFields());die();
         foreach ($domainObject->getFields() as $lessonPlanField) {
             $lessonPlanTemplateFieldId = $lessonPlanField->getLessonPlanTemplateField()->getId();
             $lessonPlanTemplateField = $domainObject->getLessonPlanTemplate()->getFields()->getBy('id', $lessonPlanTemplateFieldId);
@@ -148,6 +145,8 @@ class LessonPlan implements IAssessmentTypeTranslator
      */
     public function translateToDomainModel(IAssessableDataModel $dataModel, IAssessable $domainObject): void
     {
+        $lessonPlanFieldMapper = \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Field\Mapper::getInstance();
+
         /* Lesson Plan Template associated with this assessment
          */
         $domainObject->setLessonPlanTemplate($dataModel->getLessonPlanTemplate());
@@ -157,6 +156,27 @@ class LessonPlan implements IAssessmentTypeTranslator
         $domainObject->setCreatedBy($dataModel->getCreatedBy());
         $domainObject->setUpdatedBy($dataModel->getUpdatedBy());
         $domainObject->setDeletedBy($dataModel->getDeletedBy());
+
+        /* Convert each Lesson Plan Template Field to a Lesson Plan Field
+         */
+        $domainObject->setFields($lessonPlanFieldMapper->createCollection());
+
+        /* Take datamodel fields and shank them into domain fields
+         */
+        foreach($dataModel->getFields() as $lessonPlanField) {
+            $lessonPlanTemplateFieldId = $lessonPlanField->getLessonPlanTemplateField()->getId();
+            $lessonPlanTemplateField = $domainObject->getLessonPlanTemplate()->getFields()->getBy('id', $lessonPlanTemplateFieldId);
+
+            $field = $lessonPlanFieldMapper->createModel()
+                ->setLessonPlan($dataModel)
+                ->setLessonPlanTemplateField($lessonPlanTemplateField)
+                ->setTitle($lessonPlanTemplateField->getTitle())
+                ->setBody($lessonPlanField->getBody())
+                ->setVisibility($lessonPlanTemplateField->getVisibility())
+                ->setSequence($lessonPlanTemplateField->getSequence());
+
+            $domainObject->getFields()->add($field);
+        }
 
         /* TODO whatever this is meant to do, like Tasks
          */
