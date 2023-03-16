@@ -78,6 +78,12 @@ class LessonPlan implements IAssessmentTypeTranslator
          */
         $dataModel->setLessonPlanTemplate($domainObject->getLessonPlanTemplate());
 
+        /* Auditor fields
+         */
+        $dataModel->setCreatedBy($domainObject->getCreatedBy());
+        $dataModel->setUpdatedBy($domainObject->getUpdatedBy());
+        $dataModel->setDeletedBy($domainObject->getDeletedBy());
+
         /* Convert each Lesson Plan Template Field to a Lesson Plan Field
          */
         $dataModel->setFields($lessonPlanFieldMapper->createCollection());
@@ -85,19 +91,6 @@ class LessonPlan implements IAssessmentTypeTranslator
         /* The visibility of this Lesson Plan to its students
          */
         $dataModel->setVisibility($domainObject->getVisibility());
-
-        /* TODO Domain Object and Data Model don't know about the auditor fields.
-         */
-//        foreach ($domainObject->getLessonPlanTemplate()->getFields() as $lessonPlanTemplateField) {
-//            $lessonPlanField = $lessonPlanFieldMapper->createModel()
-//                ->setLessonPlanTemplateField($lessonPlanTemplateField)
-//                ->setTitle($lessonPlanTemplateField->getTitle())
-//                ->setBody($lessonPlanTemplateField->getBody())
-//                ->setVisibility($lessonPlanTemplateField->getVisibility())
-//                ->setSequence($lessonPlanTemplateField->getSequence());
-//
-//            $dataModel->getFields()->add($lessonPlanField);
-//        }
 
         foreach ($domainObject->getFields() as $lessonPlanField) {
             $lessonPlanTemplateFieldId = $lessonPlanField->getLessonPlanTemplateField()->getId();
@@ -160,6 +153,10 @@ class LessonPlan implements IAssessmentTypeTranslator
         /* Convert each Lesson Plan Template Field to a Lesson Plan Field
          */
         $domainObject->setFields($lessonPlanFieldMapper->createCollection());
+
+        /* The visibility of this Lesson Plan to its students
+         */
+        $domainObject->setVisibility($dataModel->getVisibility());
 
         /* Take datamodel fields and shank them into domain fields
          */

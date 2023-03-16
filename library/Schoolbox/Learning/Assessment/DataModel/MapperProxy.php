@@ -1453,24 +1453,36 @@ class MapperProxy
         // Delete assessment
         $dataModel = $this->translateToDataModel($assessable);
         $subModel  = $dataModel->getSubObject();
+
         if ($subModel instanceof SubmissionBox) {
             // The assessment model is a component of the submission box.
             // The composite object is responsible for deleting its components
             // TODO - roll out this methodology to other assessment types
             SubmissionBoxMapper::getInstance()->delete($subModel);
         } elseif ($subModel instanceof LessonPlan\Model) {
-            /* TODO Delete the fields via the Lesson Plan Field Mapper
+            /* Delete the fields via the Lesson Plan Field Mapper
              */
+            $lessonPlanFieldMapper = \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Field\Mapper::getInstance();
+            $lessonPlanMapper = \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper::getInstance();
+
+            $lessonPlanFieldMapper->deletebyColumn('lesson_plan_id', $subModel->getId());
 
             /* TODO Delete the files. Maybe
              */
 
-            /* TODO Set the Deleted By to the current user when deleting
-             *  the Lesson Plan Itself
+            /* Set the Deleted By to the current user when deleting
+             * the Lesson Plan Itself
              */
+            $subModel->setDeletedBy($this->baseMapper->getSessionUser());
+
+            print_r($subModel);
+
+            $lessonPlanMapper->save($subModel);
+            $lessonPlanMapper->delete($subModel);
         } else {
             $this->baseMapper->delete($dataModel);
         }
+
         $assessable->setDeletedAt($dataModel->getDeletedAt());
         // I don't think I need to delete sub-objects.
         // The assessable itself is all that should need deletion
