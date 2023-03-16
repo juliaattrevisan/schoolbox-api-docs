@@ -149,3 +149,15 @@ WHERE
             class = 'Component_Homepage_ScrollerController'
     )
     AND `key` = 'imageRatio';
+
+UPDATE component_definition
+SET
+    description = "Display an animated image carousel"
+WHERE
+    class = "Component_Dashboard_ScrollerController";
+
+UPDATE component_definition
+SET
+    description = "Display an animated image carousel"
+WHERE
+    class = "Component_Homepage_ScrollerController";
