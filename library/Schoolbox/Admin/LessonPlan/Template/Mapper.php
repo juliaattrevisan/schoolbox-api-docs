@@ -207,7 +207,7 @@ class Mapper extends \Schoolbox\Mapper
             $ids[] = $row;
         }
 
-        return $this->findByColumn('id', $ids);
+        return $this->findByColumn('id', $ids)->sortNaturally('title', 'asc');
     }
 
 
