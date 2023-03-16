@@ -25,7 +25,6 @@ use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use UnexpectedValueException;
 
-
 /**
  * Spawns an appropriate MarkScheme for a given Assessment
  */

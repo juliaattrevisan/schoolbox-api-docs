@@ -160,7 +160,7 @@ class LessonPlan implements IAssessmentTypeTranslator
 
         /* Take datamodel fields and shank them into domain fields
          */
-        foreach($dataModel->getFields() as $lessonPlanField) {
+        foreach ($dataModel->getFields() as $lessonPlanField) {
             $lessonPlanTemplateFieldId = $lessonPlanField->getLessonPlanTemplateField()->getId();
             $lessonPlanTemplateField = $domainObject->getLessonPlanTemplate()->getFields()->getBy('id', $lessonPlanTemplateFieldId);
 

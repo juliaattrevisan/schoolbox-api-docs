@@ -16,6 +16,7 @@ use Alaress\DebugBar\Instance as DebugBar;
  * Multiple columns get individual scroll capability so you can compare columns
  * of varying lengths without having to fight with just one scrollbar
  */
+
 class Alaress_Probe
 {
 
