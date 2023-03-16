@@ -1,0 +1,32 @@
+{##
+ # Preview lesson plan templates in a modal
+ #
+ # @param LessonPlan\Template\Model[] $lessonPlanTemplates  A collection of LPT models for which to render preview modals
+ # @param bool $hasActions                                  Optionally show some interactivity buttons
+ #}
+{% for lessonPlanTemplate in lessonPlanTemplates %}
+    <div id="lpt-preview-{{ lessonPlanTemplate.id }}" class="reveal-modal" data-reveal>
+        <h1 class="no-margin lpt-preview-header">{{ lessonPlanTemplate.title }}</h1>
+
+        <ul class="information-list lpt-preview">
+            {% for field in lessonPlanTemplate.fields %}
+                <li class="content">
+                    <h2>{{ field.title }}</h2>
+                    <div>{{ field.body|purify }}</div>
+                </li>
+            {% endfor %}
+        </ul>
+
+        {# Optionally show some interactivity buttons #}
+        {% if hasActions is defined and hasActions %}
+            {% set createRoute = routeLookup('learningAssessment.getCreateAssessmentForm', { contextType: contextType, contextId: context.id, context: context }) ~ '?lpt=' ~ lessonPlanTemplate.id ~ '&type=' ~ type ~ '&returnUrl=' ~ returnUrl %}
+
+            <ul class="flex-list buttons">
+                <li><a class="button" data-cancel>Cancel</a></li>
+                <li><a href="{{ createRoute }}" class="button submit">Use template</a></li>
+            </ul>
+        {% endif %}
+
+        <a class="close-reveal-modal">&#215;</a>
+    </div>
+{% endfor %}

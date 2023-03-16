@@ -115,29 +115,7 @@
     {# Recent Lesson Plan Templates is always a subset of All Lesson Plan Templates
      # so we can save ourselves and async request and just render all the LPTs here
      #}
-    {% for lessonPlanTemplate in lessonPlanTemplates.all %}
-        <div id="lpt-preview-{{ lessonPlanTemplate.id }}" class="reveal-modal" data-reveal>
-            <h1 class="no-margin lpt-preview-header">{{ lessonPlanTemplate.title }}</h1>
-
-            <ul class="information-list lpt-preview">
-                {% for field in lessonPlanTemplate.fields %}
-                    <li class="content">
-                        <h2>{{ field.title }}</h2>
-                        <div>{{ field.body|purify }}</div>
-                    </li>
-                {% endfor %}
-            </ul>
-
-            {% set createRoute = routeLookup('learningAssessment.getCreateAssessmentForm', { contextType: contextType, contextId: context.id, context: context }) ~ '?lpt=' ~ lessonPlanTemplate.id ~ '&type=' ~ type ~ '&returnUrl=' ~ returnUrl %}
-
-            <ul class="flex-list buttons">
-                <li><a class="button" data-cancel>Cancel</a></li>
-                <li><a href="{{ createRoute }}" class="button submit">Use template</a></li>
-            </ul>
-
-            <a class="close-reveal-modal">&#215;</a>
-        </div>
-    {% endfor %}
+    {% include '@adminLessonPlanTemplate/preview.twig' with {lessonPlanTemplates: lessonPlanTemplates.all, hasActions: true} %}
     <script>
         $(function() {
             $('[data-cancel]').on('click', function() {
