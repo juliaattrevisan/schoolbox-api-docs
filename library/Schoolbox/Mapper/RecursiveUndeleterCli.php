@@ -679,17 +679,6 @@ EXAMPLES:
      */
     private function getIdString(array $ids): string
     {
-        $string = '[';
-        $first  = true;
-        foreach ($ids as $id) {
-            if (!$first) {
-                $string .= ',';
-            }
-            $string .= $id;
-            $first  = false;
-        }
-        $string .= ']';
-
-        return $string;
+        return '[' . implode(',', $ids) . ']';
     }
 }
