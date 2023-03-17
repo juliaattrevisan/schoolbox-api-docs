@@ -1,11 +1,3 @@
-<script type="text/javascript" src="{CDN_PREFIX}/js/ckeditor/ckeditor.js?v={SITE_VERSION}"></script>
-<script type="text/javascript" src="{CDN_PREFIX}/js/editor/jquery.editor.js?v={SITE_VERSION}"></script>
-<script type="text/javascript">
-    $(function () {
-        $.fn.alaressEditor();
-    });
-</script>
-
 <div class="row">
     <div class="small-12 columns">
         <h1>{TPL_LOCAL_EOTC_PC} Configuration Settings</h1>
@@ -109,3 +101,14 @@
         </form>
     </div>
 </div>
+<script src="{CDN_PREFIX}/js/bundle/editor.js?v={SITE_VERSION}"></script>
+<script type="text/javascript">
+    /**
+     * Initialise the editors
+     */
+    document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+        detail: {
+            targetElements: ['[name="policy"]', '[name="ramsWarning"]'],
+        }
+    }));
+</script>
