@@ -481,7 +481,7 @@ EXAMPLES:
                 $ids[] = $this->buildId($mapper, $model);
             }
 
-            $idsString = $this->getIdString($ids);
+            $idsString = '[' . implode(',', $ids) . ']';
 
             $maxCountLength       = max($maxCountLength, strlen($count));
             $maxTableLength       = max($maxTableLength, strlen($table));
@@ -668,17 +668,5 @@ EXAMPLES:
         }
 
         return $deDuplicatedResults;
-    }
-
-
-    /**
-     * Return a single line string of IDs
-     *
-     * @param int[] $ids
-     * @return string
-     */
-    private function getIdString(array $ids): string
-    {
-        return '[' . implode(',', $ids) . ']';
     }
 }
