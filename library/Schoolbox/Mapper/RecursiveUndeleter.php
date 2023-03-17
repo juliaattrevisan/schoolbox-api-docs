@@ -611,12 +611,7 @@ class RecursiveUndeleter
 
         $childMappers = self::$softDeleteRegistry[$mapperClass];
         $parentIds    = $deletedParentModels->getPropertyValues($parentMapper->getIdentifierProperty());
-        $this->logger->info(
-            sprintf(
-                "$prefix * Finding children of mapper '%s' with ids %s",
-                $mapperClass, '[' . implode(',', $parentIds) . ']'
-            )
-        );
+        $this->logger->info(sprintf("$prefix * Finding children of mapper '%s' with ids %s", $mapperClass, $this->getIdsString($parentIds)));
 
         // For each child entity of this parent entity
         foreach ($childMappers as $key => $val) {
@@ -643,7 +638,7 @@ class RecursiveUndeleter
 
             $this->logger->info(sprintf("$prefix * Child mapper identifier column '%s'", $childModelIdentifier));
             $childModelIds = $deletedChildModels->getPropertyValues($childMapper->getIdentifierProperty());
-            $this->logger->debug(sprintf('Child model IDs: %s', '[' . implode(',', $childModelIds) . ']'));
+            $this->logger->debug(sprintf('Child model IDs: %s', $this->getIdsString($childModelIds)));
 
             if (0 === count($childModelIds)) {
                 $this->logger->debug('No children found, skipping...');
@@ -680,5 +675,17 @@ class RecursiveUndeleter
         }
 
         $this->modelsByMapperClass[$mapperClass] = $this->modelsByMapperClass[$mapperClass]->merge($deletedModels);
+    }
+
+
+    /**
+     * Return a single line string of IDs
+     *
+     * @param int[] $ids
+     * @return string
+     */
+    private function getIdsString(array $ids): string
+    {
+        return '[' . implode(',', $ids) . ']';
     }
 }
