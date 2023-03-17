@@ -110,7 +110,7 @@ class Report extends CliTool\App
     /**
      * Recognised key patterns
      */
-    private const KEY_PATTERNS = [
+    public const KEY_PATTERNS = [
         // Cache-only patterns go here
         Redis::INSTANCE_CACHE => [
             // Old and new scrub
