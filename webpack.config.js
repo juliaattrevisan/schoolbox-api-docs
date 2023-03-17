@@ -254,7 +254,12 @@ module.exports = {
         typescriptTest: "./library/Schoolbox/Greenhouse/templates/ts/typescriptTest.ts",
 
         //CKEditor
-        editor: "./www/static/js/editor/editor.ts",
+        editor: {
+            import: ["./www/static/js/editor/editor.ts"],
+            // ensure main is loaded first to avoid webpack bundle errors when the 'mage' bundle is on the same page
+            // from what I can tell adding dependOn scopes the bundle differently so there's no conflicts
+            dependOn: "main",
+        },
 
         //Countdown
         countdown: "./www/static/js/countdown/countdown.ts", // For countdown component on homepage
