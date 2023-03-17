@@ -460,7 +460,6 @@ EXAMPLES:
         $maxIdFieldWidth = 100; // with two space chars adjacent
 
         $deDuplicatedResults = $this->buildDeDuplicatedResults($modelByIdByMapperClass);
-//        $deDuplicatedResults = $modelByIdByMapperClass;
 
         // How wide do columns need to be?
         $maxCountLength       = strlen('COUNT');
