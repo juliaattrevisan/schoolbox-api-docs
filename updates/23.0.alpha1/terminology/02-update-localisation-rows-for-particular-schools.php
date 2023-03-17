@@ -209,37 +209,6 @@ HELP;
                 ];
                 break;
 
-            case 'vagrant':
-                $valueByKeyByTerm['tutor'] = [
-                    'title' => 'Mentor',
-                    'singular_form' => 'Mentor',
-                    'plural_form' => 'Mentors',
-                    'capitalise_first' => 1,
-                    'indefinite_article' => 'a'
-                ];
-                $valueByKeyByTerm['tutorGroup'] = [
-                    'title' => 'Mentor Group',
-                    'singular_form' => 'Mentor Group',
-                    'plural_form' => 'Mentor Groups',
-                    'capitalise_first' => 1,
-                    'indefinite_article' => 'a'
-                ];
-                $valueByKeyByTerm['yearLevelCoordinator'] = [
-                    'title' => 'Year Level Head',
-                    'singular_form' => 'Year Level Head',
-                    'plural_form' => 'Year Level Heads',
-                    'capitalise_first' => 1,
-                    'indefinite_article' => 'a'
-                ];
-                $valueByKeyByTerm['headOfHouse'] = [
-                    'title' => 'House Head',
-                    'singular_form' => 'House Head',
-                    'plural_form' => 'House Heads',
-                    'capitalise_first' => 1,
-                    'indefinite_article' => 'a'
-                ];
-                break;
-
             default:
                 $logger->info("No localisation terms require update.\n");
         }
