@@ -24,6 +24,7 @@ class Storage implements ITransformFactory
 {
     use HasTranscodePathTrait;
 
+    public const TRANSFORM_CONSTRAIN64 = 'constrain64';
     public const TRANSFORM_SQUARE64 = 'square64';
 
     private const SIZES = [
@@ -31,6 +32,7 @@ class Storage implements ITransformFactory
         self::TRANSFORM_SQUARE64,
         'square128',
         'square200',
+        self::TRANSFORM_CONSTRAIN64,
         'constrain200',
         'constrain300',
         'rectangle',
@@ -60,6 +62,8 @@ class Storage implements ITransformFactory
                 return new Square(128);
             case 'square200':
                 return new Square(200);
+            case 'constrain64':
+                return new Constrain(64, 64);
             case 'constrain200':
                 return new Constrain(200, 300);
             case 'constrain300':

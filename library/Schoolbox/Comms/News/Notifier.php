@@ -564,8 +564,8 @@ class Notifier extends AbstractModuleNotifier
 
         if (is_object($article->getFeatureImage())) {
             $hash  = $article->getFeatureImage()->getHash();
-            $icon  = "/storage/image.php?hash=$hash&size=square64";
-            $thumb = "/storage/image.php?hash=$hash&size=square200";
+            $icon  = "/storage/image.php?hash=$hash&size=constrain64";
+            $thumb = "/storage/image.php?hash=$hash&size=constrain200";
         } else {
             $icon  = $this->getUserIcon($author);
             $thumb = $this->prefixGenerator->generate() . '/images/emails/spacer.gif';
