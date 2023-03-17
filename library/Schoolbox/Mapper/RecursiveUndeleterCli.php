@@ -178,13 +178,13 @@ class RecursiveUndeleterCli extends CliTool\App
      *     So in that case, $modelsByMapperClassByRootMapperClass will contain two key:value pairs, like so:
      *     [
      *         'Schoolbox\Learning\Quiz\Mapper' => [
-     *             'ChildClass1' => [id1 => Madel1, id2 => Model2, ...], // Array of ids (integers)
-     *             'ChildClass2' => [id1 => Model1, id2 => Model2, ...], // Array of ids (integers)
+     *             'ChildClass1' => [Madel1, Model2, ...],
+     *             'ChildClass2' => [Model1, Model2, ...],
      *             ...
      *         ],
      *         'Schoolbox\Survey\Mapper' => [
-     *             'ChildClass1' => [id1 => Madel1, id2 => Model2, ...], // Array of ids (integers)
-     *             'ChildClass2' => [id1 => Model1, id2 => Model2, ...], // Array of ids (integers)
+     *             'ChildClass1' => [Madel1, Model2, ...],
+     *             'ChildClass2' => [Model1, Model2, ...],
      *             ...
      *         ]
      *     ]
