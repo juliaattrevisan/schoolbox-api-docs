@@ -1,6 +1,10 @@
 <script>
 /**
  * Lazy load the CKEditor instance on demand
+ * NOTE:
+ * This component was ditched mid-way through and is not used anywhere.
+ * As a result its functionality cannot be guaranteed.
+ * However as we may want to use it or something similar in the future, it's being kept for now.
  */
 
 let __uniqueId = 0; //to ensure multiple instances of CKEditor on the same page have unique ids
@@ -22,7 +26,7 @@ export default {
          *
          * Note that when you try to extract a ckeditor's contents from outside
          * of this dynemic-input component you need to reference that ckeditor
-         * by its id in CKEDITOR.instances[id], directly - so if you programmatically
+         * by its id in window.sbProps.editors[id], directly - so if you programmatically
          * generate them it's a bit annoying.
          */
         presetUniqueId: {
@@ -190,15 +194,22 @@ export default {
          *
          * @param { String } editorType an option within editorTypes.js to determine which config options to pass to CKEditor
          */
-        async init(editorType) {
+        async init() {
             try {
                 this.isCKEditorLoading = true; //to replace 'Add a Comment' with 'Loading' once the prompt button is selected
                 if (__isFirstCKEditorLoad) {
-                    await injectScript(`${this.cdnPrefix}/js/ckeditor/ckeditor.js?v=${this.siteVersion}`);
-                    await injectScript(`${this.cdnPrefix}/js/editor/jquery.editor.js?v=${this.siteVersion}`);
+                    await injectScript(`${this.cdnPrefix}/js/bundle/editor.js?v=${this.siteVersion}`);
                     __isFirstCKEditorLoad = false;
                 }
-                $.fn.alaressEditor(this.getConfigOptions(editorType));
+                this.$refs.comment.addEventListener(EditorEvent.EDITOR__CREATED, this.onEditorCreated);
+                document.dispatchEvent(
+                    new CustomEvent(EditorEvent.EDITOR__CREATE, {
+                        detail: {
+                            targetElements: [`#${this.presetUniqueId}`],
+                            toolbar: "comment",
+                        },
+                    })
+                );
             } catch (error) {
                 console.warn(error);
                 this.isCKEditorLoading = false;
@@ -207,61 +218,27 @@ export default {
         },
 
         /**
-         * Return the appropriate config to display consistency depending on the editorType
-         * these '$.alaress' methods are created and attached to the jQuery $ object in jquery.editor.js
+         * Once the CKEditor has been created, we track any data input changes to keep
+         * the comment in sync and assign focus so the user can start typing
          *
-         * @param { String } editorType an option within editorTypes.js to determine which config options to pass to CKEditor
-         *
-         * @returns { Object }
+         * @param { CustomEvent } event - the event object, containing the editor instance
          */
-        getConfigOptions(editorType) {
-            const vueSpecificConfig = this.getVueSpecificConfig();
-
-            const configOptions = {
-                //use computed property names to retrieve the appropriate config options: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Object_initializer#computed_property_names
-                [configTypes.DEFAULT]: $.alaressEditorConfig(vueSpecificConfig),
-                [configTypes.FOR_COMMENTS]: $.alaressEditorConfigForComments(vueSpecificConfig),
-                [configTypes.WITH_USER_TOKENS]: $.alaressEditorConfigWithUserTokens(vueSpecificConfig),
-                [configTypes.BASIC]: $.alaressEditorConfigBasic(vueSpecificConfig),
-            };
-            return configOptions[editorType] || $.alaressEditorConfig(vueSpecificConfig);
-        },
-
-        /**
-         * The config that needs to be passed to CKEditor in order to for it to work in Vue land
-         *
-         * @returns { Object }
-         */
-        getVueSpecificConfig() {
-            return {
-                on: {
-                    change: () => {
-                        // Bind the content of CKEditor into the comment model on change
-                        this.$emit("value-changed", CKEDITOR.instances[this.inputName].getData()); //notifying of any changes for a parent to maintain state
-                    },
-                    instanceReady: (event) => {
-                        //can display the loaded CKEditor now
-                        const ckeditor = event.editor.container.$;
-                        /**
-                         * removing the Equation editor button via the 'removeButtons' in the config settings is currently preventing the drag and drop from working
-                         * so we manually remove the button once the ckeditor instance is loaded
-                         */
-                        const eqnEditorButton = ckeditor.querySelector(".cke_button__eqneditor");
-                        eqnEditorButton.style.display = "none";
-                        this.isCKEditorLoading = false;
-                        this.isCKEditorLoaded = true;
-                    },
-                },
-                startupFocus: true,
-                targetElements: $(`#${this.presetUniqueId}`),
-            };
+        onEditorCreated(event) {
+            this.editor = event.detail.editor;
+            this.editor.model.document.on("change:data", () => {
+                this.newComment = this.editor.getData();
+                this.$emit("value-changed", window.sbPropbs.editors[this.presetUniqueId].getData()); // notifying of any changes for a parent to maintain state
+            });
+            this.editor.editing.view.focus();
+            this.isCKEditorLoading = false;
+            this.isCKEditorLoaded = true;
         },
 
         /**
          * Notify the parent to submit the form
          */
         postItem() {
-            const value = CKEDITOR.instances[this.inputName].getData();
+            const value = window.sbPropbs.editors[this.presetUniqueId].getData();
             this.$emit("post", value);
         },
     },
