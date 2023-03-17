@@ -402,13 +402,19 @@
     /**
      * Destroy and reinit CKEditor
      */
-    function reinitCKE() {
-        var $planDesc = $(defaults.customiseModal).find("#plan-desc");
-        if (window.sbProps.editors["plan-desc"]) {
-            window.sbProps.editors["plan-desc"].destroy();
-        }
-        $.fn.alaressEditor({
-            targetElements: $planDesc,
+    async function reinitCKE() {
+        return new Promise((resolve) => {
+            if (window.sbProps.editors["plan-desc"]) {
+                window.sbProps.editors["plan-desc"].destroy();
+            }
+            document.getElementById("plan-desc").addEventListener("EDITOR__CREATED", function () {
+                resolve();
+            });
+            document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+                detail: {
+                    targetElements: ["#plan-desc"],
+                }
+            }));
         });
     }
 
@@ -540,7 +546,7 @@
         }
     }
 
-    function openPlanModal(planData, options) {
+    async function openPlanModal(planData, options) {
         var $planParticipants = $("#plan-participants");
         var $customiseModal = $(defaults.customiseModal);
         var $participants = $(defaults.participants);
@@ -579,7 +585,7 @@
         var participantSelectize = $planParticipants[0].selectize;
 
         // Destroy and reinit CKEditor
-        reinitCKE();
+        await reinitCKE();
 
         // Disable/hide dates if they aren't in the config
         if ($.inArray("publish", dates) == -1) {
