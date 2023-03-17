@@ -226,7 +226,7 @@
                                     {% block details_tutorTeacher %}
                                         {% if showClasses %}
                                             {% if tutorTeacher %}
-                                                <dt class="small-4 medium-3 columns">Tutor:</dt>
+                                                <dt class="small-4 medium-3 columns">{{ locale.tutor.proper }}:</dt>
                                                 <dd class="small-8 medium-9 columns">
                                                     {% if tutorTeacher.id %}
                                                         <a href="{{ session.mailhandle }}{{ tutorTeacher.email }}">{{ tutorTeacher.formatName }}</a>
@@ -240,7 +240,7 @@
 
                                     {% block details_coordTeacher %}
                                         {% if coordTeacher %}
-                                        <dt class="small-4 medium-3 columns">Year Coordinator:</dt>
+                                        <dt class="small-4 medium-3 columns">{{ locale.yearLevelCoordinator.proper }}:</dt>
                                         <dd class="small-8 medium-9 columns">
                                         {% if coordTeacher.id %}
                                         <a href="{{ session.mailhandle }}{{ coordTeacher.email }}">{{ coordTeacher.formatName }}</a>
@@ -261,7 +261,7 @@
                                     {% block details_tutorGroup %}
                                         {% if showClasses %}
                                             {% if externalUser.StudentTutorDescription ?? false %}
-                                                <dt class="small-4 medium-3 columns">Tutor Group:</dt>
+                                                <dt class="small-4 medium-3 columns">{{ locale.tutorGroup.proper }}:</dt>
                                                 <dd class="small-8 medium-9 columns">{{ externalUser.StudentTutorDescription }}</dd>
                                             {% endif %}
                                         {% endif %}
@@ -270,7 +270,7 @@
                                     {% block details_hohTeacher %}
                                         {% if showClasses %}
                                             {% if hohTeacher %}
-                                                <dt class="small-4 medium-3 columns">Head of House:</dt>
+                                                <dt class="small-4 medium-3 columns">{{ locale.headOfHouse.proper }}:</dt>
                                                 <dd class="small-8 medium-9 columns">
                                                     {% if hohTeacher.id %}
                                                         <a href="{{ session.mailhandle }}{{ hohTeacher.email }}">{{ hohTeacher.formatName }}</a>
