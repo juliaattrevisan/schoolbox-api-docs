@@ -60,7 +60,7 @@ class RecursiveUndeleterCli extends CliTool\App
     private $rootTable;
 
     /** @var array the ids that were supplied in a command-line argument (array of integers or ['*']) */
-    private $rootIdsSupplied;
+    private $rootIds;
 
     /** @var Database */
     private $database;
@@ -119,7 +119,7 @@ class RecursiveUndeleterCli extends CliTool\App
             $recursiveUndeleter = new RecursiveUndeleter($this->logger, $this->deletedAtWindow, $this->explicitDeletionDate);
 
             $modelByIdByMapperClassByRootMapperClass = $this->getModelByIdByMapperClassByRootMapperClass(
-                $this->rootIdsSupplied,
+                $this->rootIds,
                 $recursiveUndeleter
             );
 
@@ -193,11 +193,11 @@ class RecursiveUndeleterCli extends CliTool\App
      * TODO: Update this param type to something properly descriptive.
      * @return array
      */
-    private function getModelByIdByMapperClassByRootMapperClass($rootIdsSupplied, RecursiveUndeleter $recursiveUndeleter): array
+    private function getModelByIdByMapperClassByRootMapperClass($rootIds, RecursiveUndeleter $recursiveUndeleter): array
     {
         $this->logger->debug("Examining IDs argument to see if user requested all ('*') root objects");
 
-        $allIdsRequested = (1 === count($rootIdsSupplied) && '*' === $rootIdsSupplied[0]);
+        $allIdsRequested = (1 === count($rootIds) && '*' === $rootIds[0]);
 
         if (!$allIdsRequested) {
             $this->logger->debug("User did not request all ('*') root ids");
@@ -214,7 +214,7 @@ class RecursiveUndeleterCli extends CliTool\App
 
             $modelByIdByMapperClassByRootMapperClass[get_class($mapper)] = $recursiveUndeleter->findDeletedModels(
                 $mapper,
-                ($allIdsRequested ? $mapper->findAllIds(['deleted' => true]) : $rootIdsSupplied)
+                ($allIdsRequested ? $mapper->findAllIds(['deleted' => true]) : $rootIds)
             );
         }
 
@@ -336,7 +336,7 @@ EXAMPLES:
             return $errors;
         }
 
-        $this->rootIdsSupplied = explode(',', $idString);
+        $this->rootIds = explode(',', $idString);
 
         return $errors;
     }
