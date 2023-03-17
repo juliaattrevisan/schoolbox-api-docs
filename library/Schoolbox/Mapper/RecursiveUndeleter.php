@@ -497,13 +497,7 @@ class RecursiveUndeleter
         });
 
         // Add these to our 'found' set
-        $mapperClass = get_class($mapper);
-        if (!array_key_exists($mapperClass, $this->modelsByMapperClass)) {
-            $this->modelsByMapperClass[$mapperClass] = new Collection();
-        }
-        foreach ($deletedRootModels as $model) {
-            $this->modelsByMapperClass[$mapperClass][] = $model;
-        }
+        $this->registerDeletedModels($mapper, $deletedRootModels);
 
         /**
          * If an override deletion date was specified, traverse all root models, else only deleted root models
@@ -632,13 +626,7 @@ class RecursiveUndeleter
             $deletedChildModels = $this->findDeletedChildModels($childMapper, $foreignKeyColumn, $parentIds, $after, $before, $prefix);
 
             // Add these models to our results
-            $mapperClass = get_class($childMapper);
-            if (!array_key_exists($mapperClass, $this->modelsByMapperClass)) {
-                $this->modelsByMapperClass[$mapperClass] = new Collection();
-            }
-            foreach ($deletedChildModels as $model) {
-                $this->modelsByMapperClass[$mapperClass][$model->getId()] = $model;
-            }
+            $this->registerDeletedModels($childMapper, $deletedChildModels);
 
             // Does child model have primary key identifier? (weak entities like folderCode do not)
             $childModelIdentifier = $childMapper->getIdentifierColumn();
@@ -670,14 +658,13 @@ class RecursiveUndeleter
     /**
      * Adds the models to our results, for later processing.
      * Models are grouped by mapper, BUT NOT INDEXED TO ACCOUNT FOR MODELS WITHOUT IDENTIFIER COLUMNS
-     * TODO: IMPORTANT!  Account for this ^.
      *
      * This means we can get duplicate logical entities if our model graph is acyclic.
      * We'll have to de-dupe later for reporting.
      *
      * @param IMapper                            $mapper
      * @param GenericCollection|ISoftDeletable[] $deletedModels
-     *
+     */
     private function registerDeletedModels(IMapper $mapper, GenericCollection $deletedModels): void
     {
         $mapperClass = get_class($mapper);
@@ -687,11 +674,8 @@ class RecursiveUndeleter
             $this->modelsByMapperClass[$mapperClass] = new Collection();
         }
 
-        foreach ($deletedModels as $model) {
-            $this->modelsByMapperClass[$mapperClass][$model->getId()] = $model;
-        }
+        $this->modelsByMapperClass[$mapperClass] = $this->modelsByMapperClass[$mapperClass]->merge($deletedModels);
     }
-     */
 
 
     /**
