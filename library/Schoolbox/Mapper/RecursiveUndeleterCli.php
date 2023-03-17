@@ -59,11 +59,8 @@ class RecursiveUndeleterCli extends CliTool\App
     /** @var string */
     private $rootTable;
 
-    /** @var IMapper */
-    private $rootMapper;
-
-    /** @var int[] */
-    private $rootIds;
+    /** @var array the ids that were supplied in a command-line argument (array of integers or ['*']) */
+    private $rootIdsSupplied;
 
     /** @var Database */
     private $database;
@@ -121,25 +118,27 @@ class RecursiveUndeleterCli extends CliTool\App
 
             $recursiveUndeleter = new RecursiveUndeleter($this->logger, $this->deletedAtWindow, $this->explicitDeletionDate);
 
-            $softDeletedModels = [];
-            foreach ($recursiveUndeleter->loadMappers($this->rootTable) as $mapper) {
-                $softDeletedModels = array_merge($softDeletedModels, $recursiveUndeleter->findDeletedModels($mapper, $this->rootIds));
+            $modelByIdByMapperClassByRootMapperClass = $this->getModelByIdByMapperClassByRootMapperClass(
+                $this->rootIdsSupplied,
+                $recursiveUndeleter
+            );
+
+            foreach ($modelByIdByMapperClassByRootMapperClass as $rootMapperClass => $modelByIdByMapperClass) {
+                $this->printResults("Root mapper: $rootMapperClass", $modelByIdByMapperClass);
+                $this->printDeletedAtDates($modelByIdByMapperClass);
             }
-
-            $this->checkRestoreAllRequested();
-
-            $this->printResults($softDeletedModels);
-            $this->printDeletedAtDates($softDeletedModels);
 
             if ($this->perform()) {
                 $this->database->beginTransaction();
-                try {
-                    $recursiveUndeleter->restoreSoftDeletedModels();
-                } catch (Throwable $e) {
-                    $this->logger->critical("Unable to restore models, rolling back.", ['exception' => $e]);
-                    $this->logger->error($e->getTraceAsString());
-                    $this->database->rollBack();
-                    exit(1);
+                foreach ($modelByIdByMapperClassByRootMapperClass as $rootMapperClass => $modelByIdByMapperClass) {
+                    try {
+                        $recursiveUndeleter->restoreSoftDeletedModels($modelByIdByMapperClass);
+                    } catch (Throwable $e) {
+                        $this->logger->critical("Unable to restore models, rolling back.", ['exception' => $e]);
+                        $this->logger->error($e->getTraceAsString());
+                        $this->database->rollBack();
+                        exit(1);
+                    }
                 }
                 $this->database->commit();
             }
@@ -171,24 +170,55 @@ class RecursiveUndeleterCli extends CliTool\App
 
 
     /**
-     * If the user specified all IDs ('*') on command line, load all ids for the specified mapper.
-     *
+     * Given the list of ids that were supplied on the cammand-line, generate and return the data structure specified below.
      * Log error and exit if specified mapper does not have an ID field registered.
+     *
+     * Eg. If ids are supplied for the `assess` table, those ids might correspond to Quiz or Survey objects, since
+     *     both Quizzes and Surveys are defined in the `assess` table.
+     *     So in that case, $modelByIdByMapperClassByRootMapperClass will contain two key:value pairs, like so:
+     *     [
+     *         'Schoolbox\Learning\Quiz\Mapper' => [
+     *             'ChildClass1' => [id1 => Madel1, id2 => Model2, ...], // Array of ids (integers)
+     *             'ChildClass2' => [id1 => Model1, id2 => Model2, ...], // Array of ids (integers)
+     *             ...
+     *         ],
+     *         'Schoolbox\Survey\Mapper' => [
+     *             'ChildClass1' => [id1 => Madel1, id2 => Model2, ...], // Array of ids (integers)
+     *             'ChildClass2' => [id1 => Model1, id2 => Model2, ...], // Array of ids (integers)
+     *             ...
+     *         ]
+     *     ]
+     *     If only one type of object is defined by rows in the table, the array will contain only one key:value pair.
+     *
+     * TODO: Update this param type to something properly descriptive.
+     * @return array
      */
-    private function checkRestoreAllRequested(): void
+    private function getModelByIdByMapperClassByRootMapperClass($rootIdsSupplied, RecursiveUndeleter $recursiveUndeleter): array
     {
         $this->logger->debug("Examining IDs argument to see if user requested all ('*') root objects");
-        if (1 === count($this->rootIds) && '*' === $this->rootIds[0]) {
-            if (!$this->rootMapper->getIdentifierColumn()) {
-                $this->logger->error(sprintf("Unable to find all IDs for root mapper '%s'. No ID column", get_class($this->rootMapper)));
+
+        $allIdsRequested = (1 === count($rootIdsSupplied) && '*' === $rootIdsSupplied[0]);
+
+        if (!$allIdsRequested) {
+            $this->logger->debug("User did not request all ('*') root ids");
+        }
+
+        $rootMappers = $recursiveUndeleter->loadMappers($this->rootTable);
+
+        $modelByIdByMapperClassByRootMapperClass = [];
+        foreach ($rootMappers as $mapper) {
+            if (!$mapper->getIdentifierColumn()) {
+                $this->logger->error(sprintf(" * Unable to find all IDs for root mapper '%s'. No ID column", get_class($mapper)));
                 exit(1);
             }
-            $this->logger->info("User requested all ('*') root objects. Fetching all root IDs");
-            $this->rootIds = $this->rootMapper->findAllIds(['deleted' => true]);
-            $this->logger->debug(sprintf('Root IDs updated to %s', $this->getIdString($this->rootIds)));
-        } else {
-            $this->logger->debug("User did not request all ('*') root Ids");
+
+            $modelByIdByMapperClassByRootMapperClass[get_class($mapper)] = $recursiveUndeleter->findDeletedModels(
+                $mapper,
+                ($allIdsRequested ? $mapper->findAllIds(['deleted' => true]) : $rootIdsSupplied)
+            );
         }
+
+        return $modelByIdByMapperClassByRootMapperClass;
     }
 
 
@@ -306,7 +336,8 @@ EXAMPLES:
             return $errors;
         }
 
-        $this->rootIds = explode(',', $idString);
+        $this->rootIdsSupplied = explode(',', $idString);
+
         return $errors;
     }
 
@@ -421,13 +452,15 @@ EXAMPLES:
     /**
      * Print the results with nicely-aligned columns
      *
-     * @param object[][]|Collection[] $softDeletedModels
+     * TODO: Update this param type to something properly descriptive.
+     * @param array $modelByIdByMapperClass
      */
-    private function printResults(array $softDeletedModels): void
+    private function printResults($heading, array $modelByIdByMapperClass): void
     {
         $maxIdFieldWidth = 100; // with two space chars adjacent
 
-        $deDuplicatedResults = $this->buildDeDuplicatedResults($softDeletedModels);
+        $deDuplicatedResults = $this->buildDeDuplicatedResults($modelByIdByMapperClass);
+//        $deDuplicatedResults = $modelByIdByMapperClass;
 
         // How wide do columns need to be?
         $maxCountLength       = strlen('COUNT');
@@ -454,14 +487,16 @@ EXAMPLES:
         $runType       = $this->perform() ? 'LIVE RUN' : 'DRY RUN';
         $runTypeLength = strlen($runType);
 
-        $countLeadingHyphens  = (int)(($reportWidth - $runTypeLength - 4) / 2);
-        $countTrailingHyphens = $reportWidth - $runTypeLength - 4 - $countLeadingHyphens;
+        $countColumns         = 4;
+        $countLeadingHyphens  = (int)(($reportWidth - $runTypeLength - $countColumns) / 2);
+        $countTrailingHyphens = $reportWidth - $runTypeLength - $countColumns - $countLeadingHyphens;
         $leadingHyphens       = str_repeat('-', $countLeadingHyphens);
         $trailingHyphens      = str_repeat('-', $countTrailingHyphens);
 
         $report = "\n$leadingHyphens Results - $runType $trailingHyphens\n";
 
         // Print table header
+        $report .= sprintf("| %-" . ($reportWidth + $countColumns) . "s |\n", $heading);
         $report .= sprintf(
             "| %{$maxCountLength}s | %-{$maxTableLength}s | %-{$maxMapperClassLength}s | %-{$maxIdsStringLength}s |\n",
             'COUNT',
@@ -519,11 +554,12 @@ EXAMPLES:
     /**
      * Print the results with nicely-aligned columns
      *
-     * @param object[][]|Collection[] $softDeletedModels
+     * TODO: Update this param type to something properly descriptive.
+     * @param array $modelByIdByMapperClassByRootMapperClass
      */
-    private function printDeletedAtDates(array $softDeletedModels): void
+    private function printDeletedAtDates(array $modelByIdByMapperClassByRootMapperClass): void
     {
-        $deDuplicatedResults = $this->buildDeDuplicatedResults($softDeletedModels);
+        $deDuplicatedResults = $this->buildDeDuplicatedResults($modelByIdByMapperClassByRootMapperClass);
 
         $firstLoop = true;
 
@@ -604,20 +640,23 @@ EXAMPLES:
      * It's theoretically possible for our graph to be acyclic, meaning the one logical entity may be present as
      * multiple models.
      *
-     * For tables without a ID, we will need to dummy up our own for reporting and de-duplication
+     * For tables without an ID, we will need to dummy up our own for reporting and de-duplication
      *
-     * @param array $softDeletedModels
+     * @param array $modelByIdByMapperClass
      * @return object[][]|Collection[]
      */
-    private function buildDeDuplicatedResults(array $softDeletedModels): array
+    private function buildDeDuplicatedResults(array $modelByIdByMapperClass): array
     {
         $deDuplicatedResults = [];
         /** @var IMapper $mapperClass */
-        foreach ($softDeletedModels as $mapperClass => $models) {
-            $deDuplicatedResults[$mapperClass] = new Collection();
-            $mapper                            = $mapperClass::getInstance();
+        foreach ($modelByIdByMapperClass as $mapperClass => $models) {
+            if (!array_key_exists($mapperClass, $deDuplicatedResults)) {
+                $deDuplicatedResults[$mapperClass] = new Collection();
+            }
+
+            $mapperInner = $mapperClass::getInstance();
             foreach ($models as $model) {
-                $id                                     = $this->buildId($mapper, $model);
+                $id = $this->buildId($mapperInner, $model);
                 $deDuplicatedResults[$mapperClass][$id] = $model;
             }
         }

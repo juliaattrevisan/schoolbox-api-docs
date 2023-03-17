@@ -112,12 +112,14 @@ class RecursiveUndeleter
     /** @var Logger */
     private $logger;
 
+
     /**
      * Sets of deleted Models, grouped by mapperClass, indexed by ID (or field concat if no ID)
      *
      * @var object[][]|Collection[]
      */
-    private $softDeletedModels = [];
+    private array $modelByIdByMapperClass = [];
+
 
     /**
      * Flat registry of soft-delete hooks in system.
@@ -346,6 +348,7 @@ class RecursiveUndeleter
         $this->logger->debug(sprintf("Mapper '%s' has child mappers defined in registry", $mapperClass));
     }
 
+
     /**
      * Load an instance of the root mapper from the table name
      * @param string $table
@@ -358,7 +361,7 @@ class RecursiveUndeleter
 
         // Use the specified root table to find the root mapper
         foreach (self::$softDeleteRegistry as $mapperClass => $children) {
-            // A bit of house keeping to try to keep things in order
+            // A bit of housekeeping to try to keep things in order
             if (!class_exists($mapperClass)) {
                 $this->logger->warning("Registry corruption detected. Mapper class does not exist: {$mapperClass}");
             }
@@ -419,7 +422,8 @@ class RecursiveUndeleter
         $foreignKeyColumn,
         array $parentIds,
         Alaress_Date_Format $deletedAfter = null,
-        Alaress_Date_Format $deletedBefore = null
+        Alaress_Date_Format $deletedBefore = null,
+        $logMessagePrefix
     ) {
         $childModels = $childMapper
             ->findByColumn($foreignKeyColumn, $parentIds, ['deleted' => true])
@@ -434,7 +438,7 @@ class RecursiveUndeleter
                 return $deletedAt->between($deletedAfter, $deletedBefore);
             });
         }
-        $this->logger->info(sprintf('%d deleted child models found', $childModels->count()));
+        $this->logger->info(sprintf("$logMessagePrefix * %d deleted child models found", $childModels->count()));
         return $childModels;
     }
 
@@ -493,7 +497,13 @@ class RecursiveUndeleter
         });
 
         // Add these to our 'found' set
-        $this->registerDeletedModels($mapper, $deletedRootModels);
+        $mapperClass = get_class($mapper);
+        if (!array_key_exists($mapperClass, $this->modelByIdByMapperClass)) {
+            $this->modelByIdByMapperClass[$mapperClass] = new Collection();
+        }
+        foreach ($deletedRootModels as $model) {
+            $this->modelByIdByMapperClass[$mapperClass][$model->getId()] = $model;
+        }
 
         /**
          * If an override deletion date was specified, traverse all root models, else only deleted root models
@@ -511,7 +521,10 @@ class RecursiveUndeleter
             $this->recursiveFindDeletedModels($mapper, $mapper->getModelAsCollection($rootModel), $deletedAfter, $deletedBefore);
         }
 
-        return $this->softDeletedModels;
+        $returnValue = $this->modelByIdByMapperClass;
+        $this->modelByIdByMapperClass = []; // Reset state so object will be ready for next call to this function.
+
+        return $returnValue;
     }
 
 
@@ -551,16 +564,16 @@ class RecursiveUndeleter
     /**
      * Restores the soft-deleted models we found earlier
      */
-    public function restoreSoftDeletedModels(): void
+    public function restoreSoftDeletedModels($modelByIdByMapperClass): void
     {
         /**  @var IMapper $mapperClass */
-        foreach ($this->softDeletedModels as $mapperClass => $models) {
+        foreach ($modelByIdByMapperClass as $mapperClass => $modelById) {
             $mapper      = $mapperClass::getInstance();
-            $countModels = $models->count();
+            $countModels = $modelById->count();
             if (0 === $countModels) {
                 $this->logger->debug(
                     sprintf(
-                        "No soft-deleted models found for table '%s' (mapper '%s'), skipping...",
+                        " * No soft-deleted models found for table '%s' (mapper '%s'), skipping...",
                         $mapper->getTable(),
                         $mapperClass
                     )
@@ -569,13 +582,13 @@ class RecursiveUndeleter
             }
             $this->logger->info(
                 sprintf(
-                    "Restoring %d soft-deleted models for table '%s' (mapper '%s')...",
-                    $models->count(),
+                    " * Restoring %d soft-deleted models for table '%s' (mapper '%s')...",
+                    $modelById->count(),
                     $mapper->getTable(),
                     $mapperClass
                 )
             );
-            $mapper->restoreSoftDeleted($models);
+            $mapper->restoreSoftDeleted($modelById);
         }
     }
 
@@ -594,14 +607,17 @@ class RecursiveUndeleter
         IMapper $parentMapper,
         Collection $deletedParentModels,
         Alaress_Date_Format $after = null,
-        Alaress_Date_Format $before = null
+        Alaress_Date_Format $before = null,
+        $recursionDepth = 0
     ): void {
+        $prefix = str_repeat(' *', $recursionDepth);
+
         $mapperClass = get_class($parentMapper);
         $this->checkRegistry($mapperClass);
 
         $childMappers = self::$softDeleteRegistry[$mapperClass];
         $parentIds    = $deletedParentModels->getPropertyValues($parentMapper->getIdentifierProperty());
-        $this->logger->info(sprintf("Finding children of mapper '%s' with ids %s", $mapperClass, $this->getIdString($parentIds)));
+        $this->logger->info(sprintf("$prefix * Finding children of mapper '%s' with ids %s", $mapperClass, $this->getIdString($parentIds)));
 
         // For each child entity of this parent entity
         foreach ($childMappers as $key => $val) {
@@ -611,22 +627,28 @@ class RecursiveUndeleter
              */
             [$childMapper, $foreignKeyColumn] = $this->getMapperClassAndForeignKeyFromRegistryPair($parentMapper, $key, $val);
             $mapperClass = get_class($childMapper);
-            $this->logger->info(sprintf("Fetching children from mapper '%s'", $mapperClass));
+            $this->logger->info(sprintf("$prefix * Fetching children from mapper '%s'", $mapperClass));
 
-            $deletedChildModels = $this->findDeletedChildModels($childMapper, $foreignKeyColumn, $parentIds, $after, $before);
+            $deletedChildModels = $this->findDeletedChildModels($childMapper, $foreignKeyColumn, $parentIds, $after, $before, $prefix);
 
             // Add these models to our results
-            $this->registerDeletedModels($childMapper, $deletedChildModels);
+            $mapperClass = get_class($childMapper);
+            if (!array_key_exists($mapperClass, $this->modelByIdByMapperClass)) {
+                $this->modelByIdByMapperClass[$mapperClass] = new Collection();
+            }
+            foreach ($deletedChildModels as $model) {
+                $this->modelByIdByMapperClass[$mapperClass][$model->getId()] = $model;
+            }
 
             // Does child model have primary key identifier? (weak entities like folderCode do not)
             $childModelIdentifier = $childMapper->getIdentifierColumn();
             if (!$childModelIdentifier) {
                 $this->checkNoIdentifier($val);
-                $this->logger->info(sprintf("Mapper '%s' does not have an identifier, therefore cannot have children", $val));
+                $this->logger->info(sprintf("$prefix * Mapper '%s' does not have an identifier, therefore cannot have children", $val));
                 continue;
             }
 
-            $this->logger->info(sprintf("Child mapper identifier column '%s'", $childModelIdentifier));
+            $this->logger->info(sprintf("$prefix * Child mapper identifier column '%s'", $childModelIdentifier));
             $childModelIds = $deletedChildModels->getPropertyValues($childMapper->getIdentifierProperty());
             $this->logger->debug(sprintf('Child model IDs: %s', $this->getIdString($childModelIds)));
 
@@ -640,7 +662,7 @@ class RecursiveUndeleter
             }
 
             // Recurse!!
-            $this->recursiveFindDeletedModels($childMapper, $deletedChildModels, $after, $before);
+            $this->recursiveFindDeletedModels($childMapper, $deletedChildModels, $after, $before, $recursionDepth + 1);
         }
     }
 
@@ -648,24 +670,28 @@ class RecursiveUndeleter
     /**
      * Adds the models to our results, for later processing.
      * Models are grouped by mapper, BUT NOT INDEXED TO ACCOUNT FOR MODELS WITHOUT IDENTIFIER COLUMNS
+     * TODO: IMPORTANT!  Account for this ^.
      *
      * This means we can get duplicate logical entities if our model graph is acyclic.
      * We'll have to de-dupe later for reporting.
      *
      * @param IMapper                            $mapper
      * @param GenericCollection|ISoftDeletable[] $deletedModels
-     */
+     *
     private function registerDeletedModels(IMapper $mapper, GenericCollection $deletedModels): void
     {
         $mapperClass = get_class($mapper);
 
         // Do we yet have results for this mapper ?
-        if (!array_key_exists($mapperClass, $this->softDeletedModels)) {
-            $this->softDeletedModels[$mapperClass] = new Collection();
+        if (!array_key_exists($mapperClass, $this->modelByIdByMapperClass)) {
+            $this->modelByIdByMapperClass[$mapperClass] = new Collection();
         }
 
-        $this->softDeletedModels[$mapperClass] = $this->softDeletedModels[$mapperClass]->merge($deletedModels);
+        foreach ($deletedModels as $model) {
+            $this->modelByIdByMapperClass[$mapperClass][$model->getId()] = $model;
+        }
     }
+     */
 
 
     /**
