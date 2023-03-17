@@ -118,21 +118,21 @@ class RecursiveUndeleterCli extends CliTool\App
 
             $recursiveUndeleter = new RecursiveUndeleter($this->logger, $this->deletedAtWindow, $this->explicitDeletionDate);
 
-            $modelByIdByMapperClassByRootMapperClass = $this->getModelByIdByMapperClassByRootMapperClass(
+            $modelsByMapperClassByRootMapperClass = $this->getModelByIdByMapperClassByRootMapperClass(
                 $this->rootIds,
                 $recursiveUndeleter
             );
 
-            foreach ($modelByIdByMapperClassByRootMapperClass as $rootMapperClass => $modelByIdByMapperClass) {
-                $this->printResults("Root mapper: $rootMapperClass", $modelByIdByMapperClass);
-                $this->printDeletedAtDates($modelByIdByMapperClass);
+            foreach ($modelsByMapperClassByRootMapperClass as $rootMapperClass => $modelsByMapperClass) {
+                $this->printResults("Root mapper: $rootMapperClass", $modelsByMapperClass);
+                $this->printDeletedAtDates($modelsByMapperClass);
             }
 
             if ($this->perform()) {
                 $this->database->beginTransaction();
-                foreach ($modelByIdByMapperClassByRootMapperClass as $rootMapperClass => $modelByIdByMapperClass) {
+                foreach ($modelsByMapperClassByRootMapperClass as $modelsByMapperClass) {
                     try {
-                        $recursiveUndeleter->restoreSoftDeletedModels($modelByIdByMapperClass);
+                        $recursiveUndeleter->restoreSoftDeletedModels($modelsByMapperClass);
                     } catch (Throwable $e) {
                         $this->logger->critical("Unable to restore models, rolling back.", ['exception' => $e]);
                         $this->logger->error($e->getTraceAsString());
@@ -175,7 +175,7 @@ class RecursiveUndeleterCli extends CliTool\App
      *
      * Eg. If ids are supplied for the `assess` table, those ids might correspond to Quiz or Survey objects, since
      *     both Quizzes and Surveys are defined in the `assess` table.
-     *     So in that case, $modelByIdByMapperClassByRootMapperClass will contain two key:value pairs, like so:
+     *     So in that case, $modelsByMapperClassByRootMapperClass will contain two key:value pairs, like so:
      *     [
      *         'Schoolbox\Learning\Quiz\Mapper' => [
      *             'ChildClass1' => [id1 => Madel1, id2 => Model2, ...], // Array of ids (integers)
@@ -205,20 +205,20 @@ class RecursiveUndeleterCli extends CliTool\App
 
         $rootMappers = $recursiveUndeleter->loadMappers($this->rootTable);
 
-        $modelByIdByMapperClassByRootMapperClass = [];
+        $modelsByMapperClassByRootMapperClass = [];
         foreach ($rootMappers as $mapper) {
             if (!$mapper->getIdentifierColumn()) {
                 $this->logger->error(sprintf(" * Unable to find all IDs for root mapper '%s'. No ID column", get_class($mapper)));
                 exit(1);
             }
 
-            $modelByIdByMapperClassByRootMapperClass[get_class($mapper)] = $recursiveUndeleter->findDeletedModels(
+            $modelsByMapperClassByRootMapperClass[get_class($mapper)] = $recursiveUndeleter->findDeletedModels(
                 $mapper,
                 ($allIdsRequested ? $mapper->findAllIds(['deleted' => true]) : $rootIds)
             );
         }
 
-        return $modelByIdByMapperClassByRootMapperClass;
+        return $modelsByMapperClassByRootMapperClass;
     }
 
 
@@ -453,13 +453,13 @@ EXAMPLES:
      * Print the results with nicely-aligned columns
      *
      * TODO: Update this param type to something properly descriptive.
-     * @param array $modelByIdByMapperClass
+     * @param array $modelsByMapperClass
      */
-    private function printResults($heading, array $modelByIdByMapperClass): void
+    private function printResults($heading, array $modelsByMapperClass): void
     {
         $maxIdFieldWidth = 100; // with two space chars adjacent
 
-        $deDuplicatedResults = $this->buildDeDuplicatedResults($modelByIdByMapperClass);
+        $deDuplicatedResults = $this->buildDeDuplicatedResults($modelsByMapperClass);
 
         // How wide do columns need to be?
         $maxCountLength       = strlen('COUNT');
@@ -560,11 +560,11 @@ EXAMPLES:
      * Print the results with nicely-aligned columns
      *
      * TODO: Update this param type to something properly descriptive.
-     * @param array $modelByIdByMapperClassByRootMapperClass
+     * @param array $modelsByMapperClassByRootMapperClass
      */
-    private function printDeletedAtDates(array $modelByIdByMapperClassByRootMapperClass): void
+    private function printDeletedAtDates(array $modelsByMapperClassByRootMapperClass): void
     {
-        $deDuplicatedResults = $this->buildDeDuplicatedResults($modelByIdByMapperClassByRootMapperClass);
+        $deDuplicatedResults = $this->buildDeDuplicatedResults($modelsByMapperClassByRootMapperClass);
 
         $firstLoop = true;
 
@@ -647,14 +647,14 @@ EXAMPLES:
      *
      * For tables without an ID, we will need to dummy up our own for reporting and de-duplication
      *
-     * @param array $modelByIdByMapperClass
+     * @param array $modelsByMapperClass
      * @return object[][]|Collection[]
      */
-    private function buildDeDuplicatedResults(array $modelByIdByMapperClass): array
+    private function buildDeDuplicatedResults(array $modelsByMapperClass): array
     {
         $deDuplicatedResults = [];
         /** @var IMapper $mapperClass */
-        foreach ($modelByIdByMapperClass as $mapperClass => $models) {
+        foreach ($modelsByMapperClass as $mapperClass => $models) {
             if (!array_key_exists($mapperClass, $deDuplicatedResults)) {
                 $deDuplicatedResults[$mapperClass] = new Collection();
             }

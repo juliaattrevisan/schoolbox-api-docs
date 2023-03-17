@@ -118,7 +118,7 @@ class RecursiveUndeleter
      *
      * @var object[][]|Collection[]
      */
-    private array $modelByIdByMapperClass = [];
+    private array $modelsByMapperClass = [];
 
 
     /**
@@ -498,11 +498,11 @@ class RecursiveUndeleter
 
         // Add these to our 'found' set
         $mapperClass = get_class($mapper);
-        if (!array_key_exists($mapperClass, $this->modelByIdByMapperClass)) {
-            $this->modelByIdByMapperClass[$mapperClass] = new Collection();
+        if (!array_key_exists($mapperClass, $this->modelsByMapperClass)) {
+            $this->modelsByMapperClass[$mapperClass] = new Collection();
         }
         foreach ($deletedRootModels as $model) {
-            $this->modelByIdByMapperClass[$mapperClass][$model->getId()] = $model;
+            $this->modelsByMapperClass[$mapperClass][] = $model;
         }
 
         /**
@@ -521,8 +521,8 @@ class RecursiveUndeleter
             $this->recursiveFindDeletedModels($mapper, $mapper->getModelAsCollection($rootModel), $deletedAfter, $deletedBefore);
         }
 
-        $returnValue = $this->modelByIdByMapperClass;
-        $this->modelByIdByMapperClass = []; // Reset state so object will be ready for next call to this function.
+        $returnValue = $this->modelsByMapperClass;
+        $this->modelsByMapperClass = []; // Reset state so object will be ready for next call to this function.
 
         return $returnValue;
     }
@@ -564,12 +564,12 @@ class RecursiveUndeleter
     /**
      * Restores the soft-deleted models we found earlier
      */
-    public function restoreSoftDeletedModels($modelByIdByMapperClass): void
+    public function restoreSoftDeletedModels($modelsByMapperClass): void
     {
         /**  @var IMapper $mapperClass */
-        foreach ($modelByIdByMapperClass as $mapperClass => $modelById) {
+        foreach ($modelsByMapperClass as $mapperClass => $models) {
             $mapper      = $mapperClass::getInstance();
-            $countModels = $modelById->count();
+            $countModels = $models->count();
             if (0 === $countModels) {
                 $this->logger->debug(
                     sprintf(
@@ -583,12 +583,12 @@ class RecursiveUndeleter
             $this->logger->info(
                 sprintf(
                     " * Restoring %d soft-deleted models for table '%s' (mapper '%s')...",
-                    $modelById->count(),
+                    $models->count(),
                     $mapper->getTable(),
                     $mapperClass
                 )
             );
-            $mapper->restoreSoftDeleted($modelById);
+            $mapper->restoreSoftDeleted($models);
         }
     }
 
@@ -633,11 +633,11 @@ class RecursiveUndeleter
 
             // Add these models to our results
             $mapperClass = get_class($childMapper);
-            if (!array_key_exists($mapperClass, $this->modelByIdByMapperClass)) {
-                $this->modelByIdByMapperClass[$mapperClass] = new Collection();
+            if (!array_key_exists($mapperClass, $this->modelsByMapperClass)) {
+                $this->modelsByMapperClass[$mapperClass] = new Collection();
             }
             foreach ($deletedChildModels as $model) {
-                $this->modelByIdByMapperClass[$mapperClass][$model->getId()] = $model;
+                $this->modelsByMapperClass[$mapperClass][$model->getId()] = $model;
             }
 
             // Does child model have primary key identifier? (weak entities like folderCode do not)
@@ -683,12 +683,12 @@ class RecursiveUndeleter
         $mapperClass = get_class($mapper);
 
         // Do we yet have results for this mapper ?
-        if (!array_key_exists($mapperClass, $this->modelByIdByMapperClass)) {
-            $this->modelByIdByMapperClass[$mapperClass] = new Collection();
+        if (!array_key_exists($mapperClass, $this->modelsByMapperClass)) {
+            $this->modelsByMapperClass[$mapperClass] = new Collection();
         }
 
         foreach ($deletedModels as $model) {
-            $this->modelByIdByMapperClass[$mapperClass][$model->getId()] = $model;
+            $this->modelsByMapperClass[$mapperClass][$model->getId()] = $model;
         }
     }
      */
