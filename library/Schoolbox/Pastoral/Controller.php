@@ -1374,7 +1374,7 @@ class Controller extends Base
      * @api   POST /record/{recordId:\d+}/action/update
      * @since 21.1
      */
-    public function postActionUpdate(): void
+    public function postActionUpdate(Model $record): void
     {
         $recordActionId = (int)$this->request->post->get('recordActionId');
         $checked        = (bool)$this->request->post->get('checked');
@@ -1383,6 +1383,7 @@ class Controller extends Base
         try {
             $recordAction = $this->pastoralRecordActionMapper->findById($recordActionId);
             $recordAction->setCompleted($checked)
+                         ->setPastoral($record)
                          ->setUpdatedBy($this->getUser());
             $this->pastoralRecordActionMapper->save($recordAction);
             $data = ($this->pastoralTranslator)($recordAction->getPastoral());
