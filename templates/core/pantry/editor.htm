@@ -78,26 +78,6 @@
             }
         }));
 
-        /**
-         * Demonstrates how the comment editor instance can be accssed once it's been created
-         */
-        document.getElementById("simpleCKEditor").addEventListener("EDITOR__CREATED", onSimpleEditorCreated);
-        function onSimpleEditorCreated(event) {
-            const editor = event.detail.editor;
-            editor.setData("<p>Here is a simple blurb. Blah blah blah</p>");
-        }
-
-        /**
-         * Initialise the simple editor
-         */
-        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
-            detail: {
-                targetElements: ['#simpleCKEditor'],
-                toolbar: "simple",
-            }
-        }));
-
-
         /* Schoolbox Link Modal
          */
         $('#modalLinkButton').schoolboxLink({
