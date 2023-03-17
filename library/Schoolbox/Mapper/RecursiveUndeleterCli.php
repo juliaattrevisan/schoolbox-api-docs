@@ -472,14 +472,21 @@ EXAMPLES:
         /** @var IMapper $mapperClass */
         foreach ($deDuplicatedResults as $mapperClass => $models) {
             $count            = (string)count($models);
-            $table            = $mapperClass::getInstance()->getTable();
+            $mapper           = $mapperClass::getInstance();
+            $table            = $mapper->getTable();
             $rTrimMapperClass = preg_replace('/Mapper$/i', '', $mapperClass);
-            $ids              = $this->getIdString($models->keys());
+
+            $ids = [];
+            foreach ($models as $model) {
+                $ids[] = $this->buildId($mapper, $model);
+            }
+
+            $idsString = $this->getIdString($ids);
 
             $maxCountLength       = max($maxCountLength, strlen($count));
             $maxTableLength       = max($maxTableLength, strlen($table));
             $maxMapperClassLength = max($maxMapperClassLength, strlen($rTrimMapperClass));
-            $maxIdsStringLength   = max($maxIdsStringLength, min($maxIdFieldWidth, strlen($ids)));
+            $maxIdsStringLength   = max($maxIdsStringLength, min($maxIdFieldWidth, strlen($idsString)));
         }
 
         $reportWidth = 5 + $maxCountLength + $maxTableLength + $maxMapperClassLength + $maxIdsStringLength;
@@ -508,8 +515,7 @@ EXAMPLES:
         // Print table rows
         foreach ($deDuplicatedResults as $mapperClass => $models) {
             $count            = (string)count($models);
-            $table            = $mapperClass::getInstance()
-                                            ->getTable();
+            $table            = $mapperClass::getInstance()->getTable();
             $rTrimMapperClass = preg_replace('/(\\\)?Mapper$/i', '', $mapperClass);
 
             // Print the first 3 non-wrapping columns
@@ -629,7 +635,7 @@ EXAMPLES:
             if (!$first) {
                 $id .= '_';
             }
-            $id    .= $mapper->getModelProperty($model, $property);
+            $id   .= $mapper->getModelProperty($model, $property);
             $first = false;
         }
         return $id;
