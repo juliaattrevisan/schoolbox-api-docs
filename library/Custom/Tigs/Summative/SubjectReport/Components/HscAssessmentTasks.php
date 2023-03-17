@@ -224,7 +224,7 @@ class HscAssessmentTasks extends BaseComponent
 //        ]);
 
         return [
-            'assessmentTitle' => $statistics['assessmentTitle'],
+            'assessmentTitle' => $statistics['assessmentTitle'] ?? $classAssessment->getTitle(),
             'studentMark'     => $statistics['studentMark'],
             'cohortRank'      => $statistics['cohortRank'],
             'cohortAverage'   => $statistics['cohortAverage'],

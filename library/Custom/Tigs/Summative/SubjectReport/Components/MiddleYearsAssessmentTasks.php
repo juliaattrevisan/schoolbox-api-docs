@@ -218,7 +218,7 @@ class MiddleYearsAssessmentTasks extends BaseComponent
 //        ]);
 
         return [
-            'assessmentTitle' => $statistics['assessmentTitle'],
+            'assessmentTitle' => $statistics['assessmentTitle'] ?? $classAssessment->getTitle(),
             'studentMark'     => $statistics['studentMark'],
             'cohortAverage'   => $statistics['cohortAverage'],
             'publishAt'       => $feedback?->getPublishedAt()->getDatabase(),
