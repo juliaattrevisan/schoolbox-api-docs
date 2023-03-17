@@ -180,15 +180,17 @@
                                 [firstname], [preferredname], [surname], [fullname], [year], [house]
                             </p>
 
-                            <script type="text/javascript"
-                                    src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
-                            <script type="text/javascript"
-                                    src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
                             <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/colourPicker.js?v={{ config.site_version }}"></script>
+                            <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
                             <script type="text/javascript">
                                 {% autoescape 'js' %}
                                 $(function () {
-                                    $('#formPastoral').alaressEditor($.alaressEditorConfigWithUserTokens());
+                                    document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+                                        detail : {
+                                            targetElements: ["#template", "#templatePrivate"],
+                                            hasTokens: true
+                                        }
+                                    }))
 
                                     let colorInput = document.getElementById('pastoralColor'),
                                         iconSelect = document.getElementById('pastoralIcon'),

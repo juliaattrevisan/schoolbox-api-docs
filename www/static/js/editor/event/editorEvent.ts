@@ -4,4 +4,5 @@
 export enum EditorEvent {
     EDITOR__CREATE = "EDITOR__CREATE",
     EDITOR__CREATED = "EDITOR__CREATED",
+    EDITOR__CHECK_DATA = "EDITOR__CHECK_DATA",
 }

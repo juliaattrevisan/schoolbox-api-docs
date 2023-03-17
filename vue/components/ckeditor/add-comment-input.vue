@@ -5,10 +5,9 @@
  */
 
 let __uniqueId = 0; //to ensure multiple instances of CKEditor on the same page have unique ids
-let __isFirstCKEditorLoad = true; //so a page only loads the CKEditor scripts once
 
 import cdnPrefixMixin from "@schoolboxVue/components/cdn-prefix-mixin";
-import { injectScript } from "@js/util/domUtils";
+import { injectScript, isScriptAdded } from "@js/util/domUtils";
 import { EditorEvent } from "@js/editor/event/editorEvent";
 
 export default {
@@ -96,9 +95,9 @@ export default {
         async init() {
             try {
                 this.isCKEditorLoading = true; // to replace 'Add a Comment' with 'Loading' once the prompt button is selected
-                if (__isFirstCKEditorLoad) {
-                    await injectScript(`${this.cdnPrefix}/js/bundle/editor.js?v=${this.siteVersion}`);
-                    __isFirstCKEditorLoad = false;
+                const editorScript = `${this.cdnPrefix}/js/bundle/editor.js?v=${this.siteVersion}`;
+                if (!isScriptAdded(editorScript)) {
+                    await injectScript(editorScript);
                 }
                 this.$refs.comment.addEventListener(EditorEvent.EDITOR__CREATED, this.onEditorCreated);
                 document.dispatchEvent(

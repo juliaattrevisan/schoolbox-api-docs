@@ -1,7 +1,5 @@
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
-{# <script type="text/javascript" src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script> #}
-{# <script type="text/javascript" src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script> #}
 <script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/select-all/attacher.select-all.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/chained/jquery.chained.min.js?v={{ config.site_version }}"></script>
@@ -9,15 +7,52 @@
 <script type="text/javascript">
     $(function () {
 
+
         {# Setup ckEditor #}
 
-        //$.fn.alaressEditor($.alaressEditorConfigWithUserTokens({targetElements: $('#body_public')}));
-        //$.fn.alaressEditor($.alaressEditorConfigWithUserTokens({targetElements: $('#body_private')}));
+        // Track whether the current content inside the editor is a template or not
+        // This allows us to know whether or not to replace the content when changing the type
+        let publicEditorIsTemplate = false;
+        let privateEditorIsTemplate = false;
+
+        let editorIdsToLoad = ["#body_public", "#body_private"];
         document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
             detail: {
-                targetElements: ["#body_public", "#body_private"],
+                targetElements: editorIdsToLoad,
+                hasTokens: true,
             }
         }));
+
+        /* Also Initialise upon load of both editors*/
+        document.getElementById("body_public").addEventListener("EDITOR__CREATED", onPublicEditorCreated);
+        document.getElementById("body_private").addEventListener("EDITOR__CREATED", onPrivateEditorCreated);
+
+        function onPublicEditorCreated(event) {
+            onEditorCreated(event);
+            // Add event listener for editor changes
+            event.detail.editor.model.document.on("change:data", function () {
+                publicEditorIsTemplate = false;
+            });
+        }
+
+        function onPrivateEditorCreated(event) {
+            onEditorCreated(event);
+            // Add event listener for editor changes
+            event.detail.editor.model.document.on("change:data", function () {
+                privateEditorIsTemplate = false;
+            });
+        }
+
+        function onEditorCreated(event) {
+            editorIdsToLoad = editorIdsToLoad.filter(function (item) {
+                return item !== event.detail.textarea.id;
+            });
+
+            if (editorIdsToLoad.length === 0) {
+                // All editors have been loaded
+                init(typeDropdown.val(), subtypeDropdown.val());
+            }
+        }
 
         {# Pastoral Tag Selectize #}
 
@@ -288,10 +323,7 @@
         window.hasChanged = true;
         {% endif %}
         loadAudience();
-});
-</script>
-<script>
-    {# $(function() {
+
 
         /* Sequential dependency on loadAudience()
          */
@@ -304,13 +336,6 @@
          */
         const typeDropdown = $('#typeId');
         const subtypeDropdown = $('#subtypeId');
-        const generalTemplate = CKEDITOR.instances['body_public'];
-        const confidentialTemplate = CKEDITOR.instances['body_private'];
-
-        /* The template html that was most recently chosen
-         */
-        let lastTemplate = '';
-        let lastTemplatePrivate = '';
 
         /* Whenever Subtype changes, see if the now-selected subtypeId is null
          * Decide which template to load
@@ -318,10 +343,6 @@
         subtypeDropdown.on('change', function(event) {
             init(typeDropdown.val(), subtypeDropdown.val());
         });
-
-        /* Also Initialise upon load
-         */
-        init(typeDropdown.val(), subtypeDropdown.val());
 
         /**
          * If this Type has a Subtype template, change to that
@@ -367,23 +388,29 @@
             let normalizeSpace = function (value) {
                 return $.trim(value.replace(/\s+/g, ' '));
             };
-            let current = normalizeSpace(generalTemplate.getData());
-            let currentPrivate = normalizeSpace(confidentialTemplate.getData());
+            let current = normalizeSpace(window.sbProps.editors['body_public'].getData());
+            let currentPrivate = normalizeSpace(window.sbProps.editors['body_private'].getData());
 
             /* If the current data is the same as the template contents,
              * then you're safe to swap it to another template
              *
              * If the current data is empty, you can fill it with another template
+             *
+             * When we change the data in the editor, we need to trigger the EDITOR__CHECK_DATA event
+             * to make sure that old tokens from CKEditor4 are migrated to format correctly in CKEditor5
              */
-            if (current === '' || current === normalizeSpace(lastTemplate)) {
-                generalTemplate.setData(template);
-                lastTemplate = template;
+            if (current === '' || publicEditorIsTemplate) {
+                window.sbProps.editors['body_public'].setData(template);
+                window.sbProps.editors['body_public'].sourceElement.dispatchEvent(new CustomEvent("EDITOR__CHECK_DATA"));
+                publicEditorIsTemplate = true;
             }
-            if (currentPrivate === '' || currentPrivate === normalizeSpace(lastTemplatePrivate)) {
-                confidentialTemplate.setData(templatePrivate);
-                lastTemplatePrivate = templatePrivate;
+            if (currentPrivate === '' || privateEditorIsTemplate) {
+                window.sbProps.editors['body_private'].setData(templatePrivate);
+                window.sbProps.editors['body_private'].sourceElement.dispatchEvent(new CustomEvent("EDITOR__CHECK_DATA"));
+                privateEditorIsTemplate = true;
             }
+
         }
-    }); #}
+    });
 </script>
 {% endautoescape %}

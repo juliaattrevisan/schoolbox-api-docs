@@ -6,14 +6,9 @@ import ClassicEditor from "@ckeditor/ckeditor5-editor-classic/src/classiceditor"
 import type { Editor } from "@ckeditor/ckeditor5-core";
 import { getConfig } from "@js/editor/config/editorConfig";
 import { EditorConfig, EditorToolbar } from "@js/editor/types/editorTypes";
-import {
-    insertWordCount,
-    removeValidation,
-    addIframelyEmbed,
-    addToGlobalScope,
-    attachInspector,
-} from "@js/editor/util/editorUtils";
+import { insertWordCount, removeValidation, addIframelyEmbed, addToGlobalScope, attachInspector } from "@js/editor/util/editorUtils";
 import { EditorEvent } from "@js/editor/event/editorEvent";
+import { initCheckData } from "@js/editor/config/editorCheckData";
 import "@js/editor/styles/editor.css"; // to overwrite some of the styles
 
 /**
@@ -71,6 +66,7 @@ function onCreate(event: CustomEvent) {
     targetElements.forEach((targetElement) => {
         // assume that each targetElement could contain multiple instances
         document.querySelectorAll(targetElement).forEach((textarea) => {
+            initCheckData(textarea, config);
             create(textarea as HTMLTextAreaElement, config);
         });
     });
