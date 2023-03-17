@@ -446,9 +446,9 @@ class Mapper extends BaseMapper
             JOIN  {$this->getJoinSql('quiz.attempt', 'q', 'qa')} AND qa.user_id = :userId
                   {$planJoin}
             WHERE {$where}
-            
-            UNION 
-            
+
+            UNION
+
             SELECT DISTINCT a.id
             FROM  {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())} a
             JOIN  {$this->getJoinSql('lessonPlan', 'a', 'lessonPlan', true)}
@@ -1251,17 +1251,19 @@ class Mapper extends BaseMapper
          */
         $lessonPlanFieldMapper = \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Field\Mapper::getInstance();
 
+        /* Fetch all the Lesson Plan Template + Lesson Plan Template Fields too
+         * (Fields need to know about their Template Fields)
+         */
+        $lessonPlanTemplateMapper = \Schoolbox\Admin\LessonPlan\Template\Mapper::getInstance();
+
         foreach ($modelList as $model) {
-            $model->getLessonPlan()->setFields($lessonPlanFieldMapper->findByColumn('lesson_plan_id', $model->getLessonPlan()->getId()));
+            if ($model instanceof \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Model) {
+                $model->getLessonPlan()->setFields($lessonPlanFieldMapper->findByColumn('lesson_plan_id', $model->getLessonPlan()->getId()));
 
-            /* Fetch all the Lesson Plan Template + Lesson Plan Template Fields too
-             * (Fields need to know about their Template Fields)
-             */
-            $lessonPlanTemplateMapper = \Schoolbox\Admin\LessonPlan\Template\Mapper::getInstance();
+                $lessonPlanTemplate = $lessonPlanTemplateMapper->findById($model->getLessonPlan()->getLessonPlanTemplate()->getId());
 
-            $lessonPlanTemplate = $lessonPlanTemplateMapper->findById($model->getLessonPlan()->getLessonPlanTemplate()->getId());
-
-            $model->getLessonPlan()->setLessonPlanTemplate($lessonPlanTemplate);
+                $model->getLessonPlan()->setLessonPlanTemplate($lessonPlanTemplate);
+            }
         }
 
         return $modelList;
