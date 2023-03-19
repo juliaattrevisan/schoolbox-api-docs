@@ -68,7 +68,7 @@
     /* Banner */
     &-banner {
         background-color: var(--ck-custom-blue);
-        border-radius: 0.25rem 0.25rem 0 0;
+        //border-radius: 0.25rem 0.25rem 0 0;
         box-shadow: 0px 5px 5px 0px var(--ck-custom-shadow);
         color: var(--ck-custom-white);
         display: block;
@@ -86,28 +86,25 @@
 
         &::before,
         &::after {
-            background-position: center center;
-            background-repeat: no-repeat;
-            background-size: contain;
-            content: "";
-            display: block;
-            height: 3em;
             position: absolute;
-            width: 3em;
-            z-index: -1;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 100%;
+            content: "";
+            top: 0;
+            // Add one pixel to width so it overlays and prevents a line appearing between
+            width: calc(1.5rem + 1px);
+            background-size: 100% 100%;
         }
 
-        /* SVG colours are currently hardcoded inside the SVG */
         &::before {
-            background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB2aWV3Qm94PSIxOTUuMTggMTA5LjU3NiA0Mi40IDQyLjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6Yng9Imh0dHBzOi8vYm94eS1zdmcuY29tIj4KICA8ZyBzdHlsZT0iIiB0cmFuc2Zvcm09Im1hdHJpeCgtMS4wMDEwMTUsIDAsIDAsIDEuMDEyMDA1LCAzNzkuOTg5MjI3LCAtMS4zMTU1MDEpIj4KICAgIDxwYXRoIGQ9Ik0gMTQyLjI2NSAxMDkuNTc2IEwgMTg0LjYyMiAxMDkuNTc2IEwgMTg0LjYyMiAxMDkuODIyIEwgMTY0LjA5MSAxMzAuMzUyIEwgMTg0LjYyMiAxNTAuODgzIEwgMTg0LjYyMiAxNTEuNDczIEwgMTQyLjI2NSAxNTEuNDczIEwgMTQyLjI2NSAxMDkuNTc2IFoiIHN0eWxlPSJmaWxsOiByZ2IoNiwgNzgsIDEyOSk7Ii8+CiAgICA8cGF0aCBkPSJNIC0xNDIuNDE5IC0xNTAuNTUzIEwgLTE0Mi40MTkgLTEzMC4xMDYgTCAtMTU2LjY5MiAtMTMwLjEwNiBMIC0xNDIuNDE5IC0xNTAuNTUzIFoiIHN0eWxlPSJmaWxsLW9wYWNpdHk6IDAuMzsiIHRyYW5zZm9ybT0ibWF0cml4KC0xLCAwLCAwLCAtMSwgMCwgMCkiIGJ4OnNoYXBlPSJ0cmlhbmdsZSAtMTU2LjY5MiAtMTUwLjU1MyAxNC4yNzMgMjAuNDQ3IDEgMCAxQDViYzI4MzViIi8+CiAgPC9nPgo8L3N2Zz4K");
-            bottom: -20px;
-            left: -26px;
+            left: -1.5rem;
+            background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB2aWV3Qm94PSIyMzkgMTYwIDI2IDQ4IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHByZXNlcnZlQXNwZWN0UmF0aW89Im5vbmUiPgogIDxwYXRoIGQ9Ik0gMjM5IDIwOCBMIDI2NSAyMDggTCAyNjUgMTYwIEwgMjM5IDE2MCBMIDIzOSAxNjAuMDU5IEwgMjYyLjk0MSAxODQgTCAyMzkgMjA3Ljk0MSBMIDIzOSAyMDggWiIgc3R5bGU9ImZpbGw6IHJnYigwLCAxMDQsIDE3OSk7Ii8+Cjwvc3ZnPg==");
         }
 
         &::after {
-            background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB2aWV3Qm94PSIxNDUuOTMxIDExNS41NTcgNDIuNCA0Mi40IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOmJ4PSJodHRwczovL2JveHktc3ZnLmNvbSI+CiAgPGcgc3R5bGU9IiIgdHJhbnNmb3JtPSJtYXRyaXgoMS4wMDEwMTUsIDAsIDAsIDEuMDEyMDA1LCAzLjUyMTQ4NSwgNC42NjU3OTIpIj4KICAgIDxwYXRoIGQ9Ik0gMTQyLjI2NSAxMDkuNTc2IEwgMTg0LjYyMiAxMDkuNTc2IEwgMTg0LjYyMiAxMDkuODIyIEwgMTY0LjA5MSAxMzAuMzUyIEwgMTg0LjYyMiAxNTAuODgzIEwgMTg0LjYyMiAxNTEuNDczIEwgMTQyLjI2NSAxNTEuNDczIEwgMTQyLjI2NSAxMDkuNTc2IFoiIHN0eWxlPSJmaWxsOiByZ2IoNiwgNzgsIDEyOSk7Ii8+CiAgICA8cGF0aCBkPSJNIC0xNDIuNDE5IC0xNTAuNTUzIEwgLTE0Mi40MTkgLTEzMC4xMDYgTCAtMTU2LjY5MiAtMTMwLjEwNiBMIC0xNDIuNDE5IC0xNTAuNTUzIFoiIHN0eWxlPSJmaWxsLW9wYWNpdHk6IDAuMzsiIHRyYW5zZm9ybT0ibWF0cml4KC0xLCAwLCAwLCAtMSwgMCwgMCkiIGJ4OnNoYXBlPSJ0cmlhbmdsZSAtMTU2LjY5MiAtMTUwLjU1MyAxNC4yNzMgMjAuNDQ3IDEgMCAxQDViYzI4MzViIi8+CiAgPC9nPgo8L3N2Zz4K");
-            bottom: -20px;
-            right: -26px;
+            right: -1.5rem;
+            background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB2aWV3Qm94PSIyMzkgMTYwIDI2IDQ4IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHByZXNlcnZlQXNwZWN0UmF0aW89Im5vbmUiPgogIDxwYXRoIGQ9Ik0gMjQwIDIwOCBMIDI2NiAyMDggTCAyNjYgMTYwIEwgMjQwIDE2MCBMIDI0MCAxNjAuMDU5IEwgMjYzLjk0MSAxODQgTCAyNDAgMjA3Ljk0MSBMIDI0MCAyMDggWiIgc3R5bGU9ImZpbGw6IHJnYigwLCAxMDQsIDE3OSk7IiB0cmFuc2Zvcm09Im1hdHJpeCgtMSwgMCwgMCwgLTEsIDUwNSwgMzY4KSIvPgo8L3N2Zz4=");
         }
     }
 
