@@ -442,7 +442,7 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
             for ($i = 0; $i < count($allAnswers); $i++) {
                 $currentAnswer = $allAnswers[$i];
 
-                if ($right[$i] ?? null == $currentAnswer->answerRight) {
+                if (($right[$i] ?? null) == $currentAnswer->answerRight) {
                     $correct   = $this->getCorrectClass();
                     $isCorrect = true;
                     $title = 'Respondent ordered this correctly';
