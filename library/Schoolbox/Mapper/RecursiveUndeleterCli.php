@@ -130,8 +130,9 @@ class RecursiveUndeleterCli extends CliTool\App
 
             if ($this->perform()) {
                 $this->database->beginTransaction();
-                foreach ($modelsByMapperClassByRootMapperClass as $modelsByMapperClass) {
+                foreach ($modelsByMapperClassByRootMapperClass as $rootMapperClass => $modelsByMapperClass) {
                     try {
+                        $this->logger->info(sprintf("--- Restoring %s models ---", $rootMapperClass));
                         $recursiveUndeleter->restoreSoftDeletedModels($modelsByMapperClass);
                     } catch (Throwable $e) {
                         $this->logger->critical("Unable to restore models, rolling back.", ['exception' => $e]);

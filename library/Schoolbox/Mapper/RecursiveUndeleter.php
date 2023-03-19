@@ -566,7 +566,7 @@ class RecursiveUndeleter
             if (0 === $countModels) {
                 $this->logger->debug(
                     sprintf(
-                        " * No soft-deleted models found for table '%s' (mapper '%s'), skipping...",
+                        "No soft-deleted models found for table '%s' (mapper '%s'), skipping...",
                         $mapper->getTable(),
                         $mapperClass
                     )
@@ -575,7 +575,7 @@ class RecursiveUndeleter
             }
             $this->logger->info(
                 sprintf(
-                    " * Restoring %d soft-deleted models for table '%s' (mapper '%s')...",
+                    "Restoring %d soft-deleted models for table '%s' (mapper '%s')...",
                     $models->count(),
                     $mapper->getTable(),
                     $mapperClass
