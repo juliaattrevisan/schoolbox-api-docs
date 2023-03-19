@@ -91,7 +91,11 @@ class Module extends BaseModule
             ->addRoutePreload($matcher, '.*', function ($params) {
 
                 if (array_key_exists('userId', $params)) {
-                    $params['user'] = $this->getUserMapper()->findByIdWithFallback($params['userId']);
+                    if (null === $params['userId']) { // When posting from the create user form, userId is null, we should create a new user for here
+                        $params['user'] = $this->getUserMapper()->createModel();
+                        return $params; // creating new user, exit early
+                    }
+                    $params['user'] = $this->getUserMapper()->findById($params['userId']);
                 }
 
                 if (array_key_exists('folderId', $params)) {
