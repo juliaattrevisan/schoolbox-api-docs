@@ -190,7 +190,6 @@ class RecursiveUndeleterCli extends CliTool\App
      *     ]
      *     If only one type of object is defined by rows in the table, the array will contain only one key:value pair.
      *
-     * TODO: Update this param type to something properly descriptive.
      * @return array
      */
     private function getModelByIdByMapperClassByRootMapperClass($rootIds, RecursiveUndeleter $recursiveUndeleter): array
@@ -452,7 +451,6 @@ EXAMPLES:
     /**
      * Print the results with nicely-aligned columns
      *
-     * TODO: Update this param type to something properly descriptive.
      * @param array $modelsByMapperClass
      */
     private function printResults($heading, array $modelsByMapperClass): void
@@ -559,7 +557,6 @@ EXAMPLES:
     /**
      * Print the results with nicely-aligned columns
      *
-     * TODO: Update this param type to something properly descriptive.
      * @param array $modelsByMapperClassByRootMapperClass
      */
     private function printDeletedAtDates(array $modelsByMapperClassByRootMapperClass): void
