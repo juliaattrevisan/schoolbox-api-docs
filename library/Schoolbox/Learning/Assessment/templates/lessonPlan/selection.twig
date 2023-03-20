@@ -1,0 +1,142 @@
+{##
+ # Select a Lesson Plan Template
+ #
+ # This lets users select a Lesson Plan Template upon which to base their
+ # Lesson Plan, which is a modified version of the Lesson Plan Template with
+ # customisations etc.
+ #
+ # @param LessonPlan\Template\Model[] $lessonPlanTemplates['recent']
+ # @param LessonPlan\Template\Model[] $lessonPlanTemplates['all']
+ # @param string $type                                                Corresponds to the const 'lessonPlan' in AssessmentType
+ # @param LessonPlan\Template\Model $template                         A querystring param that exists after a user chose a template
+ # @param bool $mageAsync                                             A querystring param that says you came from a Mage form
+ #
+ # $template and $mageAsync indicate conditionals based on a particular workflow;
+ # such as coming from a Course Builder Empty State,
+ # or a Create a Course where you chose an activity
+ #}
+{% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
+
+<fieldset class="no-pad no-margin">
+    {% if lessonPlanTemplates.recent|length %}
+        <div class="row">
+            <div class="small-12 columns">
+                <h2 class="subheader content">Recently Used Templates</h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="small-12 columns island">
+                <section>
+                    <div class="row">
+                        <div class="small-12 columns">
+                            <ul class="information-list">
+                                {% for recentLessonPlanTemplate in lessonPlanTemplates.recent %}
+                                    <li class="actions-small-1">
+                                        <div class="list-item">
+                                            <div class="card small-12">
+                                                {% set createRoute = routeLookup('learningAssessment.getCreateAssessmentForm', { contextType: contextType, contextId: context.id, context: context }) ~ '?lpt=' ~ recentLessonPlanTemplate.id ~ '&type=' ~ type ~ '&returnUrl=' ~ returnUrl %}
+
+                                                <a href="{{ createRoute }}"><h3>{{ recentLessonPlanTemplate.title }}</h3></a>
+                                                <p class="meta">
+                                                    Last modified by
+                                                    {% if recentLessonPlanTemplate.updatedBy.deleted %}
+                                                        {{ recentLessonPlanTemplate.updatedBy.fullname }}
+                                                    {% else %}
+                                                        <a href="/search/user/{{ recentLessonPlanTemplate.updatedBy.id }}">{{ recentLessonPlanTemplate.updatedBy.fullname }}</a>
+                                                    {% endif %}
+
+                                                    <time title="{{ recentLessonPlanTemplate.updatedAt.short }}">{{ recentLessonPlanTemplate.updatedAt.relativeTime }}</time>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <nav>
+                                            <a class="icon-view" data-reveal-id="lpt-preview-{{ recentLessonPlanTemplate.id }}"></a>
+                                        </nav>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if lessonPlanTemplates.all|length %}
+        <div class="row">
+            <div class="small-12 columns">
+                <h2 class="subheader content">All Templates</h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="small-12 columns island">
+                <section>
+                    <div class="row">
+                        <div class="small-12 columns">
+                            <ul class="information-list">
+                                {% for lessonPlanTemplate in lessonPlanTemplates.all %}
+                                    <li class="actions-small-1">
+                                        <div class="list-item">
+                                            <div class="card small-12">
+                                                {% set createRoute = routeLookup('learningAssessment.getCreateAssessmentForm', { contextType: contextType, contextId: context.id, context: context }) ~ '?lpt=' ~ lessonPlanTemplate.id ~ '&type=' ~ type ~ '&returnUrl=' ~ returnUrl %}
+
+                                                <a href="{{ createRoute }}"><h3>{{ lessonPlanTemplate.title }}</h3></a>
+                                                <p class="meta">
+                                                    Last modified by
+                                                    {% if lessonPlanTemplate.updatedBy.deleted %}
+                                                        {{ lessonPlanTemplate.updatedBy.fullname }}
+                                                    {% else %}
+                                                        <a href="/search/user/{{ lessonPlanTemplate.updatedBy.id }}">{{ lessonPlanTemplate.updatedBy.fullname }}</a>
+                                                    {% endif %}
+
+                                                    <time title="{{ lessonPlanTemplate.updatedAt.short }}">{{ lessonPlanTemplate.updatedAt.relativeTime }}</time>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <nav>
+                                            <a class="icon-view" data-reveal-id="lpt-preview-{{ lessonPlanTemplate.id }}"></a>
+                                        </nav>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    {% else %}
+        <div class="row">
+            <div class="small-12 columns">
+                <div class="empty-state">
+                    <i class="icon-lesson-plan"></i>
+                    <p>
+                        There are no available lesson plan templates. If you expect to find some here, please contact
+                        a user with administration privileges at your school for assistance.
+                    </p>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    {# Recent Lesson Plan Templates is always a subset of All Lesson Plan Templates
+     # so we can save ourselves and async request and just render all the LPTs here
+     #}
+    {% include '@adminLessonPlanTemplate/preview.twig' with {lessonPlanTemplates: lessonPlanTemplates.all, hasActions: true} %}
+    <script>
+        $(function() {
+            $('[data-cancel]').on('click', function() {
+                $('[data-reveal]').foundation("reveal", "close");
+            });
+        });
+    </script>
+
+    {% if lessonPlanTemplates.all|length %}
+        {% if template or mageAsync %}
+            {# submit button is only available if any of the following are true:
+             #   * a template is selected
+             #   * you're in a Part 2 of mage, because in that one particular mage usage Part 1 was the selection screen
+             #}
+            {{ mage.submitRow(actionLabel ?? 'Create', 'part-2', 'end') }}
+        {% endif %}
+    {% endif %}
+</fieldset>

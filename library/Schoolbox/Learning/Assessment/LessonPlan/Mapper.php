@@ -231,6 +231,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->cascadeJoin('lessonPlanField', ['lesson_plan_id' => $lessonPlan->getId()], $lessonPlan->getFields());
     }
 
+
     /**
      * Delete the fields that were associated with $lessonPlanTemplate
      *

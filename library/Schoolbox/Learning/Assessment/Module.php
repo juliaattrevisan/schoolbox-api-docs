@@ -555,6 +555,24 @@ class Module extends BaseModule
                     $projectResultCacheMapper
                 );
 
+            case Assessment\LessonPlan\Controller::class:
+                return new Assessment\LessonPlan\Controller(
+                    $userMapper,
+                    $errorMapper,
+                    $assessmentDataSource,
+                    $workTypeMapper,
+                    $this->getAccess(),
+                    $transactor,
+                    $bakery,
+                    $termMapper,
+                    $participantDataSource,
+                    $courseSpecMapper,
+                    $unitSpecMapper,
+                    $replicator,
+                    $viewLatestMapper,
+                    $projectResultCacheMapper
+                );
+
             default:
                 throw new InvalidArgumentException(
                     sprintf('Assessment controller for class "%s" not found', $className),
@@ -595,6 +613,10 @@ class Module extends BaseModule
 
             case AssessmentType::TYPE_LTI_ASSESSMENT:
                 $controller = $this->buildControllerForClass(Assessment\Lti\Controller::class);
+                break;
+
+            case AssessmentType::TYPE_LESSON_PLAN:
+                $controller = $this->buildControllerForClass(Assessment\LessonPlan\Controller::class);
                 break;
 
             default:

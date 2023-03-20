@@ -1,0 +1,28 @@
+{##
+ # Select a Lesson Plan Template
+ #
+ # This lets users select a Lesson Plan Template upon which to base their
+ # Lesson Plan, which is a modified version of the Lesson Plan Template with
+ # customisations etc.
+ #
+ # This is a container page for Selecting an LPT, because the inner form elements
+ # are used when creating from the Course Outline component and those inner
+ # form elements are asynchronously added to the page.
+ #
+ # @param LessonPlan\Template\Model[] $lessonPlanTemplates['recent']
+ # @param LessonPlan\Template\Model[] $lessonPlanTemplates['all']
+ # @param string $type                Corresponds to the const 'lessonPlan' in AssessmentType
+ # @param array $breadcrumbs          A set of nodes to render as breadcrumb elements
+ #}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(breadcrumbs) }}
+
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>Create Lesson Plan</h1>
+        </div>
+    </div>
+</div>
+
+{% include '@learningAssessment/lessonPlan/selection.twig' %}
