@@ -743,8 +743,7 @@ class MapperProxy
         try {
             $builder = $this->convertOptionsToPredicateBuilder($options, false)
                             ->equals('us.id', $unitSpecId);
-            $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
-            return $x;
+            return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
         } catch (UnderflowException $e) {
             return $this->createCollection();
         }

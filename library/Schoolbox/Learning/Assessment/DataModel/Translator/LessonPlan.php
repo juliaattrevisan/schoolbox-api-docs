@@ -92,19 +92,28 @@ class LessonPlan implements IAssessmentTypeTranslator
          */
         $dataModel->setVisibility($domainObject->getVisibility());
 
-        foreach ($domainObject->getFields() as $lessonPlanField) {
-            $lessonPlanTemplateFieldId = $lessonPlanField->getLessonPlanTemplateField()->getId();
-            $lessonPlanTemplateField = $domainObject->getLessonPlanTemplate()->getFields()->getBy('id', $lessonPlanTemplateFieldId);
+        /* Take domain fields and shank them into datamodel fields
+         *
+         * Note that some methods go directly to the Schoolbox Mapper to find resultsets,
+         * bypassing augmentWith* method entirely, so objects might not be fully hydrated here.
+         * (Lesson Plans on the Course Modify screen, for example; in this case there's no
+         * utilisation of a Lesson Plan's fields anyway)
+         */
+        if (null !== $domainObject->getFields()) {
+            foreach ($domainObject->getFields() as $lessonPlanField) {
+                $lessonPlanTemplateFieldId = $lessonPlanField->getLessonPlanTemplateField()->getId();
+                $lessonPlanTemplateField   = $domainObject->getLessonPlanTemplate()->getFields()->getBy('id', $lessonPlanTemplateFieldId);
 
-            $field = $lessonPlanFieldMapper->createModel()
-                ->setLessonPlan($dataModel)
-                ->setLessonPlanTemplateField($lessonPlanTemplateField)
-                ->setTitle($lessonPlanTemplateField->getTitle())
-                ->setBody($lessonPlanField->getBody())
-                ->setVisibility($lessonPlanTemplateField->getVisibility())
-                ->setSequence($lessonPlanTemplateField->getSequence());
+                $field = $lessonPlanFieldMapper->createModel()
+                    ->setLessonPlan($dataModel)
+                    ->setLessonPlanTemplateField($lessonPlanTemplateField)
+                    ->setTitle($lessonPlanTemplateField->getTitle())
+                    ->setBody($lessonPlanField->getBody())
+                    ->setVisibility($lessonPlanTemplateField->getVisibility())
+                    ->setSequence($lessonPlanTemplateField->getSequence());
 
-            $dataModel->getFields()->add($field);
+                $dataModel->getFields()->add($field);
+            }
         }
 
         /* TODO whatever this is meant to do, like Tasks
@@ -159,20 +168,27 @@ class LessonPlan implements IAssessmentTypeTranslator
         $domainObject->setVisibility($dataModel->getVisibility());
 
         /* Take datamodel fields and shank them into domain fields
+         *
+         * Note that some methods go directly to the Schoolbox Mapper to find resultsets,
+         * bypassing augmentWith* method entirely, so objects might not be fully hydrated here.
+         * (Lesson Plans on the Course Modify screen, for example; in this case there's no
+         * utilisation of a Lesson Plan's fields anyway)
          */
-        foreach ($dataModel->getFields() as $lessonPlanField) {
-            $lessonPlanTemplateFieldId = $lessonPlanField->getLessonPlanTemplateField()->getId();
-            $lessonPlanTemplateField = $domainObject->getLessonPlanTemplate()->getFields()->getBy('id', $lessonPlanTemplateFieldId);
+        if (null !== $dataModel->getFields()) {
+            foreach ($dataModel->getFields() as $lessonPlanField) {
+                $lessonPlanTemplateFieldId = $lessonPlanField->getLessonPlanTemplateField()->getId();
+                $lessonPlanTemplateField   = $domainObject->getLessonPlanTemplate()->getFields()->getBy('id', $lessonPlanTemplateFieldId);
 
-            $field = $lessonPlanFieldMapper->createModel()
-                ->setLessonPlan($dataModel)
-                ->setLessonPlanTemplateField($lessonPlanTemplateField)
-                ->setTitle($lessonPlanTemplateField->getTitle())
-                ->setBody($lessonPlanField->getBody())
-                ->setVisibility($lessonPlanTemplateField->getVisibility())
-                ->setSequence($lessonPlanTemplateField->getSequence());
+                $field = $lessonPlanFieldMapper->createModel()
+                    ->setLessonPlan($dataModel)
+                    ->setLessonPlanTemplateField($lessonPlanTemplateField)
+                    ->setTitle($lessonPlanTemplateField->getTitle())
+                    ->setBody($lessonPlanField->getBody())
+                    ->setVisibility($lessonPlanTemplateField->getVisibility())
+                    ->setSequence($lessonPlanTemplateField->getSequence());
 
-            $domainObject->getFields()->add($field);
+                $domainObject->getFields()->add($field);
+            }
         }
 
         /* TODO whatever this is meant to do, like Tasks
