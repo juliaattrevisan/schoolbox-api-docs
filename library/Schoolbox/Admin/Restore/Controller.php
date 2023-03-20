@@ -20,7 +20,6 @@ use Schoolbox\Learning\Assessment\DataModel\Model as Assessment;
 
 class Controller extends Base
 {
-
     /**
      * Period of time that you can restore items, older than this will not be displayed
      */
