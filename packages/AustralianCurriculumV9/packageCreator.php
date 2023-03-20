@@ -7,7 +7,7 @@
  * @param $lastSubject_id
  * @return void
  */
-function processRowsSubStrand($handle, $output_rows, $lastSubject_id)
+function processRowsSubStrand($handle, &$output_rows, $lastSubject_id)
 {
     // Set last references to.
     $lastYear_id = $lastStrand_id = $lastSubStrand_id = 0;
@@ -63,7 +63,7 @@ function processRowsSubStrand($handle, $output_rows, $lastSubject_id)
  * @param $lastSubject_id
  * @return void
  */
-function processRowsStrand($handle, $output_rows, $lastSubject_id)
+function processRowsStrand($handle, &$output_rows, $lastSubject_id)
 {
     // Set last references to.
     $lastYear_id = $lastStrand_id = 0;
