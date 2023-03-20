@@ -41,6 +41,9 @@ class Mapper extends \Schoolbox\Mapper
         $this->joins('updated_by', UserMapper::class, 'id', null, null, 'updatedBy', 'updatedBy');
         $this->joins('deleted_by', UserMapper::class, 'id', null, null, 'deletedBy', 'deletedBy');
 
+        // This column is duplicate of assessment.deleted_at, but is required to ensure soft-deletion on this table.
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
         $this->hasJoin(
             'lessonPlanField',
             [
