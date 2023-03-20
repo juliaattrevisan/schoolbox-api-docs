@@ -9,12 +9,8 @@ declare(strict_types=1);
 
 namespace Custom\Tigs\Summative\SubjectReport\Components;
 
-use function array_key_exists;
-use function count;
-
 use Custom\Tigs\Summative\StudentAttributes;
 use Custom\Tigs\Summative\SubjectReport\BaseComponent;
-use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\Visibility;
@@ -24,14 +20,14 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
-
-use function sprintf;
-
 use UnexpectedValueException;
+
+use function array_key_exists;
+use function count;
+use function sprintf;
 
 class HscAssessmentTasks extends BaseComponent
 {
-
     /** @var CourseSpec\Model */
     private $courseSpec;
 

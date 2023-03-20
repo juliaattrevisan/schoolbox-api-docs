@@ -29,7 +29,6 @@ use function count;
 
 class MiddleYearsAssessmentTasks extends BaseComponent
 {
-
     /** @var CourseSpec\Model */
     private $courseSpec;
 
