@@ -197,15 +197,16 @@
                     $('#ltiAssessmentTitleDisplay').text(title);
                     $('#ltiAssessmentTextDisplay').text(text);
                     $('#custom-fields').val(JSON.stringify(customFields ?? {}));
-                    $('#line-item-score-maximum').val(lineItemScoreMaximum ?? '');
-                    if (lineItemResourceId) {
-                        // This resource link has a line item, and a resource ID?
-                        // Close the modal
-                        $('#line-item-resource-id').val(lineItemResourceId);
+                    $('#line-item-resource-id').val(lineItemResourceId ?? '');
+
+                    // This resource link should have a line item score.
+                    // If it doesn't: warn that this isn't an assessment, and
+                    // thus can't be graded.
+                    // I guess still let it be used though.
+                    if (lineItemScoreMaximum) {
+                        $('#line-item-score-maximum').val(lineItemScoreMaximum ?? '');
                         $toolModal.foundation('reveal', 'close');
                     } else {
-                        // Raise some warning that this isn't an assessment, and thus can't be graded.
-                        // I guess still let it be used though.
                         $resourceLinkMissingLineItemModal.foundation('reveal', 'open');
                     }
 
