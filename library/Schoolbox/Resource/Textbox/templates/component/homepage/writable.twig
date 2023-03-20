@@ -93,29 +93,8 @@
                 beforeUnloadListener  = null,
                 addTextboxModal       = $('#addTextboxModal-{{ component.instance.id }}'),
                 addTextboxForm        = $('#addTextboxModal-{{ component.instance.id }}-form'),
-                toast                 = $('#toast-{{ component.instance.id }}'),
-                editorInline          = false,
-                editorInstanceOptions = $.alaressEditorConfig({
-                    // Always start file browser from current folder, instead of the alt source
-                    file_browser_category_id: Number("{{ context.id }}"),
-                    title:                    '',
-                },
+                toast                 = $('#toast-{{ component.instance.id }}')
             );
-
-            // If using the inline version of the editor:
-            // Remove wordcount as it looks awkward
-            if (editorInline) {
-                if (!editorInstanceOptions.removePlugins) {
-                    editorInstanceOptions.removePlugins = 'wordcount';
-                } else {
-                    editorInstanceOptions.removePlugins += ',wordcount';
-                }
-
-                // Restore source dialog plugin
-                if (editorInstanceOptions.removeButtons) {
-                    editorInstanceOptions.removeButtons = editorInstanceOptions.removeButtons.replace(/sourcedialog/i, '');
-                }
-            }
 
             const inlineTextboxEditor = component.inlineTextboxEditor({
                 modifyButton:          '[data-action="modify"]',
@@ -123,7 +102,6 @@
                 saveButton:            '[data-action="save"]',
                 editorInstance:        '[data-content]',
                 editorInstanceOptions: editorInstanceOptions,
-                editorInline:          editorInline,
             });
 
 
