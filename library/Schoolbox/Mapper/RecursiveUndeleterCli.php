@@ -649,7 +649,7 @@ EXAMPLES:
      * For tables without an ID, we will need to dummy up our own for reporting and de-duplication
      *
      * @param array $modelsByMapperClass
-     * @return object[][]|Collection[]
+     * @return array
      */
     private function buildDeDuplicatedResults(array $modelsByMapperClass): array
     {
@@ -660,9 +660,9 @@ EXAMPLES:
                 $deDuplicatedResults[$mapperClass] = new Collection();
             }
 
-            $mapperInner = $mapperClass::getInstance();
+            $mapper = $mapperClass::getInstance();
             foreach ($models as $model) {
-                $id = $this->buildId($mapperInner, $model);
+                $id = $this->buildId($mapper, $model);
                 $deDuplicatedResults[$mapperClass][$id] = $model;
             }
         }
