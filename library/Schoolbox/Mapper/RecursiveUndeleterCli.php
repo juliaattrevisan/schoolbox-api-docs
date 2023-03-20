@@ -570,8 +570,11 @@ EXAMPLES:
         foreach ($deDuplicatedResults as $mapperClass => $models) {
             $firstModel = $models->first();
 
-            // No models, or does not have a 'getDeletedAt()' method?
-            if (!$firstModel || !method_exists($firstModel, 'getDeletedAt')) {
+            if (!$firstModel) {
+                continue;
+            }
+            if (!method_exists($firstModel, 'getDeletedAt')) {
+                $this->logger->info(sprintf("Skipping '%s' because no getDeletedAt() method.", $mapperClass));
                 continue;
             }
             $mapper = $mapperClass::getInstance();
