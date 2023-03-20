@@ -4,8 +4,8 @@
 
 import { ref } from "vue";
 import { defineStore } from "pinia";
-import { useModalActiveNodeStore } from "./csModalActiveNodeStore";
 import type { Node, Usage } from "@schoolboxCurriculum/types/Node";
+import { useModalActiveNodeStore } from "./csModalActiveNodeStore";
 
 export const useModalNodeUsageStore = defineStore("csModalNodeUsage", () => {
     const isProcessing = ref(false);
