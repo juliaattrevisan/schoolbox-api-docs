@@ -1477,6 +1477,13 @@ class MapperProxy
 
             $lessonPlanMapper->save($subModel);
             $lessonPlanMapper->delete($subModel);
+
+            /* FIXME but why did I have to do this? SubmissionBox doesn't have a deleted_at,
+             *  but Task does; specifically, to accommodate a deletion. In this case, $assessable
+             *  tries to use a deleted_at from a thing that wasn't deleted ($dataModel->getDeletedAt())
+             *  so I have to ensure dataModel knows when the subModel was deleted...wtf
+             */
+            $dataModel->setDeletedAt($subModel->getDeletedAt());
         } else {
             $this->baseMapper->delete($dataModel);
         }
