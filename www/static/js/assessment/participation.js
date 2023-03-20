@@ -105,14 +105,6 @@
         });
 
         /**
-         * On open of the custom plan modal - destroy and re-init CKEditor
-         * This was implemented because when you go into a datepicker, then return to the custom plan modal - ckeditor breaks
-         */
-        $customiseModal.on("open.fndtn.reveal", function () {
-            reinitCKE();
-        });
-
-        /**
          *  Including/excluding students
          */
         $participantSettings.on("click", "a[data-participant-change]", function (event) {
@@ -400,12 +392,12 @@
     }
 
     /**
-     * Destroy and reinit CKEditor
+     * Initialise CKEditor
      */
-    async function reinitCKE() {
+    async function initCKE() {
         return new Promise((resolve) => {
             if (window.sbProps.editors["plan-desc"]) {
-                window.sbProps.editors["plan-desc"].destroy();
+                return resolve();
             }
             document.getElementById("plan-desc").addEventListener("EDITOR__CREATED", function () {
                 resolve();
@@ -584,8 +576,8 @@
         });
         var participantSelectize = $planParticipants[0].selectize;
 
-        // Destroy and reinit CKEditor
-        await reinitCKE();
+        // Wait for CKE to init to ensure we can set its value correctly below
+        await initCKE();
 
         // Disable/hide dates if they aren't in the config
         if ($.inArray("publish", dates) == -1) {
