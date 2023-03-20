@@ -558,11 +558,11 @@ EXAMPLES:
     /**
      * Print the results with nicely-aligned columns
      *
-     * @param array $modelsByMapperClassByRootMapperClass
+     * @param array $modelsByMapperClass
      */
-    private function printDeletedAtDates(array $modelsByMapperClassByRootMapperClass): void
+    private function printDeletedAtDates(array $modelsByMapperClass): void
     {
-        $deDuplicatedResults = $this->buildDeDuplicatedResults($modelsByMapperClassByRootMapperClass);
+        $deDuplicatedResults = $this->buildDeDuplicatedResults($modelsByMapperClass);
 
         $firstLoop = true;
 
