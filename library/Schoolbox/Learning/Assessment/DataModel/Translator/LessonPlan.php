@@ -108,6 +108,7 @@ class LessonPlan implements IAssessmentTypeTranslator
                  *  otherwise it spawns new ones everywhere
                  */
                 $field = $lessonPlanFieldMapper->createModel()
+                    ->setId($lessonPlanField->getId())
                     ->setLessonPlan($dataModel)
                     ->setLessonPlanTemplateField($lessonPlanTemplateField)
                     ->setTitle($lessonPlanTemplateField->getTitle())
