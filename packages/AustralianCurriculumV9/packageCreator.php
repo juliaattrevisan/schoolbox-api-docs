@@ -32,7 +32,7 @@ function processRowsSubStrand($handle, &$output_rows, $lastSubject_id)
                 // If the row contains a strand, create a new node in the output CSV file
                 $strand_name   = trim(substr($row[0], 7));
                 $output_rows[] = [$node_id, $lastYear_id, $strand_name, null, 0, null];
-                $lastStrand_id = $node_id;
+                $lastStrand_id = $lastSubStrand_id = $node_id; //some nodes, aren't under a substrand but just a strand... so lets catch them here...
             } else {
                 if (str_starts_with($row[0], 'Sub-strand:')) {
                     // If the row contains a sub-strand or an achievement standard, create a new node in the output CSV file
@@ -119,7 +119,7 @@ $subjectFiles = [
     'Humanities and Social Sciences' => [
         'HASS' => 'humanities-and-social-sciences-hass-f-6-scope-and-sequence-v9.csv',
         'Civics and Citizenship' => 'humanities-and-social-sciences-civics-and-citizenship-scope-and-sequence-v9.csv',
-//        'Economics and Business' => 'humanities-and-social-sciences-economics-and-business-scope-and-sequence-v9.csv', TODO: both strands with no sub strands, and sub stand content exists....
+        'Economics and Business' => 'humanities-and-social-sciences-economics-and-business-scope-and-sequence-v9.csv',
         'Geography' => 'humanities-and-social-sciences-geography-scope-and-sequence-v9.csv',
         'History' => 'humanities-and-social-sciences-history-scope-and-sequence-v9.csv'
     ]
