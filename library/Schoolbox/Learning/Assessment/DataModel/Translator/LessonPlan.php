@@ -104,6 +104,9 @@ class LessonPlan implements IAssessmentTypeTranslator
                 $lessonPlanTemplateFieldId = $lessonPlanField->getLessonPlanTemplateField()->getId();
                 $lessonPlanTemplateField   = $domainObject->getLessonPlanTemplate()->getFields()->getBy('id', $lessonPlanTemplateFieldId);
 
+                /* TODO Updating a Lesson Plan means we shouldn't use CreateModel() to populate this Field set
+                 *  otherwise it spawns new ones everywhere
+                 */
                 $field = $lessonPlanFieldMapper->createModel()
                     ->setLessonPlan($dataModel)
                     ->setLessonPlanTemplateField($lessonPlanTemplateField)
