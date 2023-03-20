@@ -28,18 +28,17 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["closed"]);
-
-const sequenceIndex = ref(1);
+const isNextSelected = ref(false);
 const selectedNodeDetails = ref(getEmptyNode());
 
 /**
  * a code has been selected in the detail modal
  *
- * @pararm { object }
+ * @param { object } node - the selected node
  */
 function onCodeSelected(node) {
     selectedNodeDetails.value = node;
-    sequenceIndex.value++;
+    isNextSelected.value = true;
 }
 
 /**
@@ -53,14 +52,15 @@ function onModalClosed() {
 <template>
     <sequential-reveal-modal
         size="medium"
-        :isOpen="props.isOpen"
-        :sequence-index="sequenceIndex"
+        :is-open="props.isOpen"
+        :is-next-selected="isNextSelected"
+        @next-opened="isNextSelected = false"
         @closed="onModalClosed"
     >
-        <template v-slot:sequence-1>
+        <template #sequence-1>
             <badge-detail v-if="props.badge" :badge="props.badge" @code-selected="onCodeSelected" />
         </template>
-        <template v-slot:sequence-2>
+        <template #sequence-2>
             <node-details :node="selectedNodeDetails" />
         </template>
     </sequential-reveal-modal>
