@@ -50,7 +50,7 @@ $this->setVar(array(
     'ASSESS_DESCRIPTION'   => Scrub::html($survey['description']),
     'ASSESS_START'         => $assessStartDate->getShort(),
     'ASSESS_FINISH'        => $assessFinishDate->getShort(),
-    'FIRST_SECTION'        => $allSections[0]['section_id'],
+    'FIRST_SECTION'        => $allSections[0]['section_id'] ?? null,
     'ASSESS_CATEGORY_ID'   => $folder->getId(),
     'ASSESS_CATEGORY_NAME' => Scrub::text($folder->getName()),
     'RETURN_URL_NAME'      => Redirect::RETURN_URL,

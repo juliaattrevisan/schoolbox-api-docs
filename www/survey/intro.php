@@ -102,7 +102,7 @@ $this->setVar(array(
     'ASSESS_DESCRIPTION' => Scrub::html($survey['description']),
     'ASSESS_START' => $assessStartDate->getShort(),
     'ASSESS_FINISH' => $assessFinishDate->getShort(),
-    'FIRST_SECTION' => $allSections[0]['section_id'],
+    'FIRST_SECTION' => $allSections[0]['section_id'] ?? null,
     'ASSESS_AUTHOR' => Scrub::text($author->formatName()),
     'ASSESS_AUTHOR_ID' => $author->getId(),
     'ASSESS_AUTHOR_EXT_ID' => $author->getExternalId(),
