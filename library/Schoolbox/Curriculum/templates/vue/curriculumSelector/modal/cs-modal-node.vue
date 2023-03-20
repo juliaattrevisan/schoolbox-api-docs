@@ -119,6 +119,13 @@ const hasCode = computed(() => props.node.code && props.node.code !== "");
 const title = computed(() => (hasCode.value ? `[${props.node.code}] ${props.node.name}` : `${props.node.name}`));
 
 /**
+ * If there's another node being viewed
+ *
+ * @returns { boolean }
+ */
+const isViewingAnother = computed(() => modalNodeUsageStore.isOpen && modalActiveNodeStore.node.id !== props.node.id);
+
+/**
  * Whether the usage should be displayed, shouldn't be if the modal is currently closed,
  * we are at the root level node or if the search is active
  *
@@ -132,20 +139,13 @@ const showUsage = computed(() => modalStore.isOpen && props.node.id !== UNSET_ID
  * @returns { boolean }
  */
 const isViewing = computed(() => modalNodeUsageStore.isOpen && modalActiveNodeStore.node.id === props.node.id);
-
-/**
- * If there's another node being viewed
- *
- * @returns { boolean }
- */
-const isViewingAnother = computed(() => modalNodeUsageStore.isOpen && modalActiveNodeStore.node.id !== props.node.id);
 </script>
 
 <template>
     <li ref="viewNodeEl">
         <div :class="`buttons-container`" :data-is-inactive="isViewingAnother">
             <cs-modal-node-checkbox :node="props.node" />
-            <cs-modal-node-name :node="props.node" :depth="props.depth" :title="title" />
+            <cs-modal-node-name :node="props.node" :depth="props.depth" :title="title" :is-active="isViewing" />
             <cs-modal-node-usage-summary
                 v-if="showUsage"
                 :node="props.node"

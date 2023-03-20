@@ -39,6 +39,13 @@ const props = defineProps({
         type: String,
         required: true,
     },
+    /**
+     * to disable certain events when editing is taking place
+     */
+    isActive: {
+        type: Boolean,
+        required: true,
+    },
 });
 
 const nodesStore = useNodesStore();
@@ -48,15 +55,14 @@ const modalSearchStore = useModalSearchStore();
 /**
  * To disable selection on certain sitatuions
  *
- * @returns { Boolean }
+ * @returns { boolean }
  */
 const isDisabled = computed(() => {
-    if (nodesStore.isLoading) {
-        //while a load is in progress
+    if (props.isActive || nodesStore.isLoading) {
+        // while the node is being updated
         return true;
-    } else {
-        return false;
     }
+    return false;
 });
 
 /**

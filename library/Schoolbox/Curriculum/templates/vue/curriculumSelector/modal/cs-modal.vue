@@ -26,7 +26,7 @@ watch(
 );
 
 /**
- * close the modal
+ * close the modal, also closing the node usage if it's open
  */
 function onModalClosed() {
     modalStore.cancel();
