@@ -21,10 +21,15 @@ import "@js/editor/styles/editor.css"; // to overwrite some of the styles
 async function onCreated(textarea: HTMLTextAreaElement, editor: Editor, config: EditorConfig) {
     insertWordCount(textarea, editor);
     removeValidation();
-    await addIframelyEmbed();
     addToGlobalScope(editor, textarea);
     editor.config.sbConfig = config;
     attachInspector(editor);
+    if (config.toolbar === EditorToolbar.SIMPLE) {
+        editor.plugins.get("DragDrop").forceDisabled("disableDragDrop");
+        editor.plugins.get("AutoMediaEmbed").destroy();
+    } else {
+        await addIframelyEmbed();
+    }
     textarea.dispatchEvent(
         new CustomEvent(EditorEvent.EDITOR__CREATED, {
             detail: {
