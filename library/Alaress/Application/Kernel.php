@@ -785,6 +785,7 @@ abstract class Kernel
                     $studentLocator = new News\Audience\Segment\Strategy\Helper\StudentLocator(
                         $mapperFactory->get(UserMapper::class),
                         $externalClass,
+                        $externalUser,
                         (new ClassCodeMatchFactory())->build($config->get(ConfigMapper::NAME_EXTERNAL_TYPE)),
                     );
 

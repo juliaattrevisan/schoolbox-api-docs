@@ -189,6 +189,7 @@ class Result extends Base
             new Segment\Strategy\Helper\StudentLocator(
                 UserMapper::getInstance(),
                 new External_Class(),
+                new External_User(),
                 (new ClassCodeMatchFactory())->build($config->get(ConfigMapper::NAME_EXTERNAL_TYPE)),
             )
         );
