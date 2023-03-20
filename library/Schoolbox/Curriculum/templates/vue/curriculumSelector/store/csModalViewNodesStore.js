@@ -1,9 +1,10 @@
 /**
- * Manages the currently visible nodes in mc-modal-nodes
+ * Manages the currently visible nodes in mc-modal-nodes,
+ * handling the traversal of the node tree and the breadcrumbs
  */
 
 import { defineStore } from "pinia";
-import { useNodesStore } from "../store/csNodesStore";
+import { useNodesStore } from "./csNodesStore";
 import { findById } from "@schoolboxCurriculum/js/nodeUtils";
 import { useModalSearchStore } from "./csModalSearchStore";
 
@@ -12,7 +13,7 @@ export const DIRECTION = {
     BACKWARDS: "backwards",
 };
 
-export const useModalActiveNodesStore = defineStore(`csModelActiveNodes`, {
+export const useModalViewNodesStore = defineStore(`csModalViewNodes`, {
     state: () => ({
         idList: [], //ids of the selected nodes
         currentDepth: 0, //track how far down the tree we are

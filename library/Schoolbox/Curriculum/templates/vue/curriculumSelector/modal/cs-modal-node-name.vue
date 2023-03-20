@@ -7,7 +7,7 @@
 import { computed } from "vue";
 import { escapeRegExp } from "@js/util/jsUtils";
 import { useNodesStore } from "../store/csNodesStore";
-import { useModalActiveNodesStore } from "../store/csModalActiveNodesStore";
+import { useModalViewNodesStore } from "../store/csModalViewNodesStore";
 import { useModalSearchStore } from "../store/csModalSearchStore";
 
 const props = defineProps({
@@ -42,7 +42,7 @@ const props = defineProps({
 });
 
 const nodesStore = useNodesStore();
-const modalActiveNodesStore = useModalActiveNodesStore();
+const modalViewNodesStore = useModalViewNodesStore();
 const modalSearchStore = useModalSearchStore();
 
 /**
@@ -107,7 +107,7 @@ const fontWeight = computed(() => (isParentNode.value && !modalSearchStore.isAct
  * traverse to the next nodel level
  */
 function onNameSelected() {
-    modalActiveNodesStore.setNextSelected(props.node.id);
+    modalViewNodesStore.setNextSelected(props.node.id);
 }
 
 /**

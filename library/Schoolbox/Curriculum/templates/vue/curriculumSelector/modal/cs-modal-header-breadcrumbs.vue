@@ -5,9 +5,9 @@
  */
 
 import { shortenLength } from "@js/util/stringUtils";
-import { useModalActiveNodesStore } from "../store/csModalActiveNodesStore";
+import { useModalViewNodesStore } from "../store/csModalViewNodesStore";
 
-const modalActiveNodesStore = useModalActiveNodesStore();
+const modalViewNodesStore = useModalViewNodesStore();
 const maxNameLength = 100;
 
 /**
@@ -17,13 +17,13 @@ const maxNameLength = 100;
  * @param { number }
  */
 function onSelected(depth, id) {
-    modalActiveNodesStore.setSelected(depth, parseInt(id));
+    modalViewNodesStore.setSelected(depth, parseInt(id));
 }
 </script>
 
 <template>
     <TransitionGroup name="list" class="breadcrumb" tag="ul">
-        <li v-for="breadcrumb in modalActiveNodesStore.breadcrumbs" :key="breadcrumb.id">
+        <li v-for="breadcrumb in modalViewNodesStore.breadcrumbs" :key="breadcrumb.id">
             <a
                 :href="`/curriculum/#${breadcrumb.id}`"
                 :title="`View ${breadcrumb.name}`"

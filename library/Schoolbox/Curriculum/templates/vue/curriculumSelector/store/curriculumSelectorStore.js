@@ -7,7 +7,7 @@ import { useNodesStore } from "./csNodesStore";
 import { useSelectedNodesStore } from "./csSelectedNodesStore";
 import { useSearchStore } from "./csSearchStore";
 import { useModalStore } from "./csModalStore";
-import { useModalActiveNodesStore } from "./csModalActiveNodesStore";
+import { useModalViewNodesStore } from "./csModalViewNodesStore";
 
 export let apiEndpoint = "";
 
@@ -72,7 +72,7 @@ export const useStore = defineStore(`curriculumSelector`, {
                 useSelectedNodesStore().$reset();
                 useSearchStore().$reset();
                 useModalStore().$reset();
-                useModalActiveNodesStore().$reset();
+                useModalViewNodesStore().$reset();
                 this.$reset();
             }
         },

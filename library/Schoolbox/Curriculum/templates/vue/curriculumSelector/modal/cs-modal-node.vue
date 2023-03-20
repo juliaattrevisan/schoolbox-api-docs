@@ -6,7 +6,7 @@
 
 import { ref, computed, onMounted } from "vue";
 import { gsap } from "gsap/all";
-import { useModalActiveNodesStore, DIRECTION } from "../store/csModalActiveNodesStore";
+import { useModalViewNodesStore, DIRECTION } from "../store/csModalViewNodesStore";
 import { useModalSearchStore } from "../store/csModalSearchStore";
 import CsModalNodeCheckbox from "./cs-modal-node-checkbox.vue";
 import CsModalNodeName from "./cs-modal-node-name.vue";
@@ -35,7 +35,7 @@ const props = defineProps({
     },
 });
 
-const modalActiveNodesStore = useModalActiveNodesStore();
+const modalViewNodesStore = useModalViewNodesStore();
 const modalSearchStore = useModalSearchStore();
 const viewNodeEl = ref(null); //to animate the node
 
@@ -54,7 +54,7 @@ onMounted(() => {
  * fade on the node and slide it from forwards/backwards depending on the currentDirection
  */
 function animateOn() {
-    const xStart = modalActiveNodesStore.currentDirection === DIRECTION.FORWARDS ? -10 : 10;
+    const xStart = modalViewNodesStore.currentDirection === DIRECTION.FORWARDS ? -10 : 10;
     gsap.set(viewNodeEl.value, {
         opacity: 0,
         x: xStart,

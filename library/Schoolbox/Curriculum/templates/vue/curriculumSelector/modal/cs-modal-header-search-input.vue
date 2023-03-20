@@ -5,10 +5,8 @@
 
 import { computed, watch } from "vue";
 import debounce from "lodash/debounce";
-import { useModalActiveNodesStore } from "../store/csModalActiveNodesStore";
 import { useModalSearchStore, DEBOUNCE_AMOUNT } from "../store/csModalSearchStore";
 
-const modalActiveNodesStore = useModalActiveNodesStore();
 const modalSearchStore = useModalSearchStore();
 
 /**
@@ -16,7 +14,7 @@ const modalSearchStore = useModalSearchStore();
  *
  * @returns { Boolean }
  */
-const isDisabled = computed(() => !modalActiveNodesStore.isActive);
+const isDisabled = computed(() => !modalViewNodesStore.isActive);
 
 /**
  * Only enable search once a first node is selected

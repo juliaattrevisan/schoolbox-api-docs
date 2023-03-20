@@ -5,7 +5,7 @@
 import { defineStore } from "pinia";
 import { apiEndpoint } from "./curriculumSelectorStore";
 import { useSelectedNodesStore } from "./csSelectedNodesStore";
-import { useModalActiveNodesStore } from "./csModalActiveNodesStore";
+import { useModalViewNodesStore } from "./csModalViewNodesStore";
 
 const MIN_QUERY_LENGTH = 2; //the amount of characters typed before the search becomes active
 export const DEBOUNCE_AMOUNT = 350; //the amount in ms to hold off on searching, to allow the user to keep typing
@@ -78,9 +78,9 @@ export const useModalSearchStore = defineStore(`csModalSearch`, {
         async search() {
             this.isLoading = true;
             try {
-                const modalActiveNodesStore = useModalActiveNodesStore();
+                const modalViewNodesStore = useModalViewNodesStore();
                 const response = await fetch(
-                    `${apiEndpoint}?parentId=${modalActiveNodesStore.current.id}&query=${this.query}&enabled=1&limit=50`,
+                    `${apiEndpoint}?parentId=${modalViewNodesStore.current.id}&query=${this.query}&enabled=1&limit=50`,
                     {
                         method: "GET",
                         headers: {
