@@ -22,6 +22,7 @@ export const useNodeUsageStore = defineStore("mcNodeUsage", () => {
             const usageResponse = await fetch(activeNodeStore.node._links.getUsage);
             if (usageResponse.ok) {
                 const usage = (await usageResponse.json()) as JSON;
+                // we are not currently displaying folders in the usage list
                 const withoutFolders = usage.data.filter((item: Usage) => item.discriminator !== "folder");
                 activeNodeStore.node.usage = withoutFolders as Usage[];
             } else {

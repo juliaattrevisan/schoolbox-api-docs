@@ -1,28 +1,24 @@
 <script setup lang="ts">
 /**
- * to view a nodes description and all the places the node is used
+ * to view a nodes description and all the activities the node is linked to in the curriculum
  */
 
-import { ref, computed } from "vue";
-import type { Node, BadgeUsageObject, Usage } from "@schoolboxCurriculum/types/Node";
+import { computed } from "vue";
+import type { Node, Usage } from "@schoolboxCurriculum/types/Node";
 import { ActivityTypes } from "@schoolboxCurriculum/types/Node";
 import { getSpecificUsages } from "@schoolboxCurriculum/js/nodeUtils";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
-import BadgeModal from "@schoolboxBadge/vue/badge-modal";
-// import { useActiveNodeStore } from "./store/mcActiveNodeStore";
-import { useNodeUsageStore } from "@schoolboxCurriculum/vue/manageCurriculum/activeNode/store/mcNodeUsageStore";
 import NodeUsageDetailsItem from "./node-usage-details-item.vue";
 
 interface Props {
     node: Node; // the assigned node to display
     depth: number; // to gradually add more marginLeft to indicate node level depth
+    isProcessing: boolean; // whether we are currently loading the node usage
+    hasLoadError: boolean; // whether there was an error loading the node usage
 }
 
 const props = defineProps<Props>();
-// const activeNodeStore = useActiveNodeStore();
-const nodeUsageStore = useNodeUsageStore();
-const isBadgeModalOpen = ref(false); // whether the modal to display the badge details is open
-const currentBadge = ref<BadgeUsageObject | null>(null); // the badge to display in the modal when a badge usage is selected
+const emit = defineEmits(["select"]);
 
 /**
  * to gradually and more marginLeft to indicate node level depth
@@ -30,6 +26,13 @@ const currentBadge = ref<BadgeUsageObject | null>(null); // the badge to display
  * @returns { number }
  */
 const marginLeft = computed(() => `calc(${props.depth * 2}rem)`);
+
+/**
+ * Reload the page to try loading again
+ */
+function onRefreshSelected() {
+    window.location.reload();
+}
 
 /**
  * Whether we should show the usage lists
@@ -86,46 +89,12 @@ const activeUsages = computed(() => {
     }
     return usages;
 });
-
-/**
- * Reload the page to try loading again
- */
-function onRefreshSelected() {
-    window.location.reload();
-}
-
-/**
- * Opens a modal window for viewing this badge's full details.
- *
- * @param { BadgeUsageObject } badge - the badge to display
- */
-function openDetailModal(badge: BadgeUsageObject) {
-    currentBadge.value = badge;
-    isBadgeModalOpen.value = true;
-}
-
-/**
- * Open a new page or open the badge modal
- *
- * @param { Usage } usage - the selected usage
- */
-function onUsageSelected(usage: Usage) {
-    openDetailModal(usage.object as BadgeUsageObject);
-}
-
-/**
- * the badge modal is closed, so we should set the boolean to
- * false so we can open it again
- */
-function onDetailModalClosed() {
-    isBadgeModalOpen.value = false;
-}
 </script>
 
 <template>
     <div class="node-container" :style="{ marginLeft: marginLeft }">
-        <loading-table v-if="nodeUsageStore.isProcessing" :rows="2" />
-        <section v-else-if="nodeUsageStore.hasLoadError">
+        <loading-table v-if="props.isProcessing" :rows="2" />
+        <section v-else-if="props.hasLoadError">
             <fieldset class="content">
                 <div class="alert-box alert">
                     Sorry, we are currently unable to load the Curriculum usage data. Please
@@ -147,14 +116,13 @@ function onDetailModalClosed() {
                                 v-for="(usage, index) in activeUsage.usages"
                                 :key="index"
                                 :usage="usage"
-                                @select="onUsageSelected"
+                                @select="emit('select', usage)"
                             />
                         </ul>
                     </div>
                 </div>
             </fieldset>
         </section>
-        <badge-modal :is-open="isBadgeModalOpen" :badge="currentBadge" @closed="onDetailModalClosed" />
     </div>
 </template>
 
