@@ -16,6 +16,8 @@
     /* Change the colour of the mentions */
     --ck-color-mention-background: var(--accent-background);
     --ck-color-mention-text: #222222;
+    /* Ensure correct z-index on modals */
+    --ck-z-modal: 1010;
 }
 
 /**
