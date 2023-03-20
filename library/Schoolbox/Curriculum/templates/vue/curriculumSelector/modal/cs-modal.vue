@@ -5,6 +5,7 @@
 
 import { ref, watch } from "vue";
 import { useModalStore } from "../store/csModalStore";
+import { useModalNodeUsageStore } from "../store/csModalNodeUsageStore";
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import CsModalHeader from "./cs-modal-header.vue";
 import CsModalNodes from "./cs-modal-nodes.vue";
@@ -12,6 +13,7 @@ import CsModalFooter from "./cs-modal-footer.vue";
 
 const modalStore = useModalStore();
 const modalEl = ref(null);
+const modalNodeUsageStore = useModalNodeUsageStore();
 
 /**
  * to open the modal when requested
@@ -28,6 +30,9 @@ watch(
  */
 function onModalClosed() {
     modalStore.cancel();
+    if (modalNodeUsageStore.isOpen) {
+        modalNodeUsageStore.cancel();
+    }
 }
 </script>
 
