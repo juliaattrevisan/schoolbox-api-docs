@@ -6,7 +6,7 @@
  * As this is a combination of Vue and Foundation for now, things are a little more complicated then they ideally should be
  * This is primarily due to having to track the opening and closing of modals and determining whether moving forwards or
  * backwards in sequence or close the modal entirely.
- * Also note we currently only handle two in the sequence as that's all that's need to be done for now.
+ * Also note we currently only handle two in the sequence as that's all that's needed to be done for now.
  */
 
 import { ref, watch } from "vue";

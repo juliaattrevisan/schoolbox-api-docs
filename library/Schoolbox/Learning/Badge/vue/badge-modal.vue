@@ -51,9 +51,14 @@ function onModalClosed() {
 </script>
 
 <template>
-    <sequential-reveal-modal size="medium" :isOpen="isOpen" :sequence-index="sequenceIndex" @closed="onModalClosed">
+    <sequential-reveal-modal
+        size="medium"
+        :isOpen="props.isOpen"
+        :sequence-index="sequenceIndex"
+        @closed="onModalClosed"
+    >
         <template v-slot:sequence-1>
-            <badge-detail v-if="badge" :badge="badge" @code-selected="onCodeSelected" />
+            <badge-detail v-if="props.badge" :badge="props.badge" @code-selected="onCodeSelected" />
         </template>
         <template v-slot:sequence-2>
             <node-details :node="selectedNodeDetails" />
