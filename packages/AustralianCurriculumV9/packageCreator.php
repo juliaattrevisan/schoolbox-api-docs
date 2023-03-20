@@ -116,6 +116,13 @@ $subjectFiles = [
         'Design and Technologies' => 'technologies-design-and-technologies-scope-and-sequence-f-10-v9.csv',
         'Digital Technologies' => 'technologies-digital-technologies-scope-and-sequence-f-10-v9.csv'
     ],
+    'Humanities and Social Sciences' => [
+        'HASS' => 'humanities-and-social-sciences-hass-f-6-scope-and-sequence-v9.csv',
+        'Civics and Citizenship' => 'humanities-and-social-sciences-civics-and-citizenship-scope-and-sequence-v9.csv',
+//        'Economics and Business' => 'humanities-and-social-sciences-economics-and-business-scope-and-sequence-v9.csv', TODO: both strands with no sub strands, and sub stand content exists....
+        'Geography' => 'humanities-and-social-sciences-geography-scope-and-sequence-v9.csv',
+        'History' => 'humanities-and-social-sciences-history-scope-and-sequence-v9.csv'
+    ]
 ];
 
 // Subject Array
@@ -174,7 +181,13 @@ foreach ($subjectFiles as $subject => $filesArray) {
                     //create the subject
                     $node_name     = $subSubject;
                     $output_rows[] = [$node_id, $seenSubjects[$subject], $node_name, null, 0, null];
-
+                    processRowsSubStrand($handle, $output_rows, $node_id);
+                    break;
+                case "Humanities and Social Sciences":
+                    $node_id = count($output_rows) + 1;
+                    //create the subject
+                    $node_name     = $subSubject;
+                    $output_rows[] = [$node_id, $seenSubjects[$subject], $node_name, null, 0, null];
                     processRowsSubStrand($handle, $output_rows, $node_id);
                     break;
                 default:
