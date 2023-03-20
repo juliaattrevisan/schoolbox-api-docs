@@ -741,7 +741,7 @@ class ListController extends Web\Controller\Base
                 $planData['close_date'] = $planData['due_date'];
             }
 
-            if ($planId > 0) {
+            if ($planId > 0 && isset($plans[$planId])) {
                 // existing plan updates
                 $plans[$planId]
                     ->setName($planData['name'])
