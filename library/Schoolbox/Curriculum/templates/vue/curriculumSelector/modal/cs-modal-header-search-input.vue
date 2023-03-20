@@ -6,8 +6,10 @@
 import { computed, watch } from "vue";
 import debounce from "lodash/debounce";
 import { useModalSearchStore, DEBOUNCE_AMOUNT } from "../store/csModalSearchStore";
+import { useModalViewNodesStore } from "../store/csModalViewNodesStore";
 
 const modalSearchStore = useModalSearchStore();
+const modalViewNodesStore = useModalViewNodesStore();
 
 /**
  * Only enable search once a first node is selected

@@ -1,10 +1,10 @@
 /**
  * Manage the currently active curriculum node.
- * An 'active' node is toggled when we choose to
- * update or add a subsection to an existing node.
+ * An 'active' node is toggled when we select the node
+ * to view it usage details and description
  *
- * This is different to a 'selected' node handled with mcSelectedNodesStore,
- * which is used to bulk enable or delete MULTIPLE nodes
+ * This is different to a 'selected' node handled with csModalSelectedNodesStore,
+ * within the modal and csSelectedNodesStore, outside the modal
  */
 
 import { ref, computed } from "vue";

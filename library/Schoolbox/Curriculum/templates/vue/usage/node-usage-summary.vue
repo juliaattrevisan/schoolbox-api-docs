@@ -53,7 +53,7 @@ const emit = defineEmits(["selected"]);
         >
     </button>
     <button
-        v-if="getTotalUsage(props.node) > 0 || node.description !== ''"
+        v-if="getTotalUsage(props.node) > 0 || props.node.description !== ''"
         :class="`button-action-option ${props.isViewing ? 'icon-close' : 'icon-curriculum-details'}`"
         :title="`View ${props.title}`"
         :disabled="props.isDisabled"

@@ -7,9 +7,14 @@
 import { ref, computed, onMounted } from "vue";
 import { gsap } from "gsap/all";
 import { useModalViewNodesStore, DIRECTION } from "../store/csModalViewNodesStore";
+import { useModalStore } from "../store/csModalStore";
 import { useModalSearchStore } from "../store/csModalSearchStore";
+import { useModalNodeUsageStore } from "../store/csModalNodeUsageStore";
+import { useModalActiveNodeStore } from "../store/csModalActiveNodeStore";
+import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 import CsModalNodeCheckbox from "./cs-modal-node-checkbox.vue";
 import CsModalNodeName from "./cs-modal-node-name.vue";
+import CsModalNodeUsage from "./cs-modal-node-usage.vue";
 
 const props = defineProps({
     /**
@@ -35,8 +40,11 @@ const props = defineProps({
     },
 });
 
+const modalStore = useModalStore();
 const modalViewNodesStore = useModalViewNodesStore();
+const modalActiveNodeStore = useModalActiveNodeStore();
 const modalSearchStore = useModalSearchStore();
+const modalNodeUsageStore = useModalNodeUsageStore();
 const viewNodeEl = ref(null); //to animate the node
 
 /**
@@ -107,6 +115,21 @@ const hasCode = computed(() => props.node.code && props.node.code !== "");
  * @returns { String }
  */
 const title = computed(() => (hasCode.value ? `[${props.node.code}] ${props.node.name}` : `${props.node.name}`));
+
+/**
+ * Whether the usage should be displayed, shouldn't be if the modal is currently closed,
+ * we are at the root level node or if the search is active
+ *
+ * @returns { boolean }
+ */
+const showUsage = computed(() => modalStore.isOpen && props.node.id !== UNSET_ID && !modalSearchStore.isActive);
+
+/**
+ * If this is the active node being viewed
+ *
+ * @returns { boolean }
+ */
+const isViewing = computed(() => modalNodeUsageStore.isOpen && modalActiveNodeStore.node.id === props.node.id);
 </script>
 
 <template>
@@ -114,6 +137,14 @@ const title = computed(() => (hasCode.value ? `[${props.node.code}] ${props.node
         <div :class="`buttons-container`">
             <cs-modal-node-checkbox :node="props.node" />
             <cs-modal-node-name :node="props.node" :depth="props.depth" :title="title" />
+            <cs-modal-node-usage
+                v-if="showUsage"
+                :node="props.node"
+                :title="title"
+                :is-viewing="isViewing"
+                :is-updating="false"
+                :is-adding="false"
+            />
         </div>
         <ul v-if="showChildren">
             <cs-modal-node v-for="node in props.node.children" :key="node.id" :node="node" :depth="props.depth + 1" />

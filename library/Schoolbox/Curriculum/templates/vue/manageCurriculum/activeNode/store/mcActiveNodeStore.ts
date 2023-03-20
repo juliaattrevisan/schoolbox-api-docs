@@ -1,7 +1,8 @@
 /**
  * Manage the currently active curriculum node.
  * An 'active' node is toggled when we choose to
- * update or add a subsection to an existing node.
+ * update or add a subsection to an existing node
+ * or view it usage details and description
  *
  * This is different to a 'selected' node handled with mcSelectedNodesStore,
  * which is used to bulk enable or delete MULTIPLE nodes
