@@ -3,10 +3,9 @@
  * to view a nodes description and all the places the node is used
  */
 
-import { ref } from "vue";
 import type { BadgeUsageObject, Usage } from "@schoolboxCurriculum/types/Node";
 import NodeUsageDetails from "@schoolboxCurriculum/vue/usage/node-usage-details.vue";
-import BadgeModal from "@schoolboxBadge/vue/badge-modal";
+import { useModalStore } from "../store/csModalStore";
 import { useModalNodeUsageStore } from "../store/csModalNodeUsageStore";
 import { useModalActiveNodeStore } from "../store/csModalActiveNodeStore";
 
@@ -15,36 +14,19 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const modalStore = useModalStore();
 const modalActiveNodeStore = useModalActiveNodeStore();
 const modalNodeUsageStore = useModalNodeUsageStore();
-const isBadgeModalOpen = ref(false); // whether the modal to display the badge details is open
-const currentBadge = ref<BadgeUsageObject | null>(null); // the badge to display in the modal when a badge usage is selected
 
 /**
- * Opens a modal window for viewing this badge's full details.
- *
- * @param { BadgeUsageObject } badge - the badge to display
- */
-function openDetailModal(badge: BadgeUsageObject) {
-    currentBadge.value = badge;
-    isBadgeModalOpen.value = true;
-}
-
-/**
- * Open a new page or open the badge modal
+ * This will trigger the sequential reveal modal in cs-modal to
+ * move to the next in sequence, hiding the curriculum browser
+ * and showing the badge modal
  *
  * @param { Usage } usage - the selected usage
  */
 function onUsageSelected(usage: Usage) {
-    openDetailModal(usage.object as BadgeUsageObject);
-}
-
-/**
- * the badge modal is closed, so we should set the boolean to
- * false so we can open it again
- */
-function onDetailModalClosed() {
-    isBadgeModalOpen.value = false;
+    modalStore.selectedBadge = usage.object as BadgeUsageObject;
 }
 </script>
 
@@ -57,6 +39,5 @@ function onDetailModalClosed() {
             :has-load-error="modalNodeUsageStore.hasLoadError"
             @select="onUsageSelected"
         />
-        <badge-modal :is-open="isBadgeModalOpen" :badge="currentBadge" @closed="onDetailModalClosed" />
     </div>
 </template>
