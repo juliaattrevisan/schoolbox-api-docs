@@ -10,7 +10,7 @@
  * But to add more would just be a case of adding more slots in the template.
  */
 
-import { ref, watch, onMounted } from "vue";
+import { ref, watch } from "vue";
 import { generateUUID } from "@js/util/jsUtils";
 
 const props = defineProps({
@@ -67,75 +67,75 @@ const emit = defineEmits(["closed", "nextOpened"]);
 const uuid = generateUUID();
 const elementId = ref(`reveal-modal-${uuid}`);
 const sequenceIndex = ref(1); // to help track the current sequence index independent of the prop
-let $modal;
+// let $modal;
 
 /**
  * to open the first modal in sequence
  */
-watch(
-    () => props.isOpen,
-    (isOpen) => {
-        if (isOpen) {
-            sequenceIndex.value = 1;
-            open();
-            addClosedListener();
-        } else {
-            sequenceIndex.value = 1;
-            close();
-        }
-    }
-);
+// watch(
+//     () => props.isOpen,
+//     (isOpen) => {
+//         if (isOpen) {
+//             sequenceIndex.value = 1;
+//             open();
+//             addClosedListener();
+//         } else {
+//             sequenceIndex.value = 1;
+//             close();
+//         }
+//     }
+// );
 
 /**
  * to move to the next modal in sequence
  */
-watch(
-    () => props.isNextSelected,
-    (isNextSelected) => {
-        if (isNextSelected) {
-            close();
-        }
-    }
-);
+// watch(
+//     () => props.isNextSelected,
+//     (isNextSelected) => {
+//         if (isNextSelected) {
+//             close();
+//         }
+//     }
+// );
 
 /**
  * open the current modal in sequence
  */
-function open() {
-    $modal = $(`#${sequenceIndex.value}-${elementId.value}`);
-    $modal.foundation("reveal", "open", { close_on_background_click: props.closeOnBackgroundClick });
-}
+// function open() {
+//     $modal = $(`#${sequenceIndex.value}-${elementId.value}`);
+//     $modal.foundation("reveal", "open", { close_on_background_click: props.closeOnBackgroundClick });
+// }
 
 /**
  * manage the closing of the modal, as we are closing a modal and potentially
  * moving forwards or backwards in sequence, things are a little more complicated
  * while we still use foundations modal setup
  */
-function addClosedListener() {
-    $(document).off("closed.fndtn.reveal");
-    $(document).on("closed.fndtn.reveal", "[data-reveal]", (event) => {
-        // to respond to the modal closing when requried
-        if (!event.target.id.includes(elementId.value)) {
-            // can be multiple modals open at once
-            return;
-        }
-        if (props.isNextSelected) {
-            // moving to the next in sequence, we emit nextOpened so the props.isNextSelected can be set to false again in the parent
-            sequenceIndex.value += 1;
-            open();
-            emit("nextOpened");
-            return;
-        }
-        if (sequenceIndex.value > 1) {
-            // moving backwards in sequence
-            sequenceIndex.value -= 1;
-            open();
-            return;
-        }
-        // otherwise we are closing the modal entirely
-        emit("closed");
-    });
-}
+// function addClosedListener() {
+//     $(document).off("closed.fndtn.reveal");
+//     $(document).on("closed.fndtn.reveal", "[data-reveal]", (event) => {
+//         // to respond to the modal closing when requried
+//         if (!event.target.id.includes(elementId.value)) {
+//             // can be multiple modals open at once
+//             return;
+//         }
+//         if (props.isNextSelected) {
+//             // moving to the next in sequence, we emit nextOpened so the props.isNextSelected can be set to false again in the parent
+//             sequenceIndex.value += 1;
+//             open();
+//             emit("nextOpened");
+//             return;
+//         }
+//         if (sequenceIndex.value > 1) {
+//             // moving backwards in sequence
+//             sequenceIndex.value -= 1;
+//             open();
+//             return;
+//         }
+//         // otherwise we are closing the modal entirely
+//         emit("closed");
+//     });
+// }
 
 /**
  * To prevent the modal being closed when it should be disabled
@@ -152,9 +152,9 @@ function onCloseSelected(event) {
  * Close the current modal, which will trigger addClosedListener
  * once close is complete
  */
-function close() {
-    $modal.foundation("reveal", "close");
-}
+// function close() {
+//     $modal.foundation("reveal", "close");
+// }
 </script>
 
 <template>

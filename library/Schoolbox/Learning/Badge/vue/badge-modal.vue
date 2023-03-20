@@ -5,10 +5,10 @@
  */
 
 import { ref } from "vue";
-import SequentialRevealModal from "@schoolboxVue/components/sequential-reveal-modal";
-import BadgeDetail from "./badgeDetail";
-import NodeDetails from "@schoolboxCurriculum/vue/node-details";
+import SequentialRevealModal from "@schoolboxVue/components/sequential-reveal-modal.vue";
+import NodeDetails from "@schoolboxCurriculum/vue/node-details.vue";
 import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
+import BadgeDetail from "./badgeDetail.vue";
 
 const props = defineProps({
     /**

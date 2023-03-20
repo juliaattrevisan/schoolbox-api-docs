@@ -16,14 +16,32 @@ beforeEach(async () => {
         nodes: {
             id: 0,
             name: "My Node",
+            _usageCounts: {
+                course: 0,
+                unit: 0,
+                assessment: 0,
+                badge: 0,
+            },
             children: [
                 {
                     id: 1,
                     name: "My Second Node",
+                    _usageCounts: {
+                        course: 0,
+                        unit: 0,
+                        assessment: 0,
+                        badge: 0,
+                    },
                     children: [
                         {
                             id: 2,
                             name: "My Third Node",
+                            _usageCounts: {
+                                course: 0,
+                                unit: 0,
+                                assessment: 0,
+                                badge: 0,
+                            },
                         },
                     ],
                 },

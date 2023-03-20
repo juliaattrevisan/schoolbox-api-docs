@@ -3,6 +3,7 @@ module.exports = {
     moduleNameMapper: {
         // map any required webpack aliases across
         "^@schoolboxCurriculum(.*)$": "<rootDir>/library/Schoolbox/Curriculum/templates$1",
+        "^@schoolboxBadge(.*)$": "<rootDir>/library/Schoolbox/Learning/Badge$1",
         "^@schoolboxVue(.*)$": "<rootDir>/vue$1",
         "^@js(.*)$": "<rootDir>/www/static/js$1",
         "^.+\\.(css|scss)$": "<rootDir>/jest-cssStub.js",
