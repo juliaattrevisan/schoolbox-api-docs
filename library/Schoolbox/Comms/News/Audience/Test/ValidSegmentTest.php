@@ -72,6 +72,7 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
             new Audience\Segment\Strategy\Helper\StudentLocator(
                 UserMapper::getInstance(),
                 new External_Offline_Class(),
+                new External_Offline_User(),
                 new Folder\Code\ClassMatcherBase(),
             )
         ))->getValidRelationshipModifiers();

@@ -565,6 +565,7 @@ class Folder extends SimpleStrategy
             return null;
         }
         foreach ($parent->getChildren() as $child) {
+            // TODO: Child subject collection is not populated at this point
             if ($child->getSubjectCollection() === null) {
                 continue;
             }

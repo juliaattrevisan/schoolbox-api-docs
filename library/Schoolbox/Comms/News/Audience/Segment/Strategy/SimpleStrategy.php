@@ -18,9 +18,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Resource\Folder;
 use Schoolbox\User;
-use Schoolbox\UserMapper;
 use Schoolbox\Comms\News\Audience\Segment\ISimpleStrategy;
 
 use function array_intersect;
@@ -225,11 +223,6 @@ abstract class SimpleStrategy implements ISimpleStrategy
      */
     protected function isUserInAudienceValuesAsTeacher(User $teacher, array $entityValues): ?bool
     {
-        // Load this teacher's classes, if set
-        if ($teacher->getSubjectCollection() === null) {
-            return null;
-        }
-
         return count(
             array_intersect(
                 $this->getValues($this->studentLocator->locateStudents($teacher)),
