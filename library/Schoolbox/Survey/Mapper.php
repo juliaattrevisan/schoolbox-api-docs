@@ -23,6 +23,13 @@ use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Survey\Attempt\Mapper as SurveyAttemptMapper;
 
 /**
+ * Database definition of a survey
+ * -------------------------------
+ * A Survey is defined in the database as:
+ *  * a row of the `assess` table, in which assess.availabilty === 'survey'.
+ *  * note that for survey rows, assess.assessment_id may be NULL
+ *  * contrast with the database definition of a Quiz (library/Schoolbox/Survey/Mapper.php).
+ *
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  */
 class Mapper extends BaseMapper
