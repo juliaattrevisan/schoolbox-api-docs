@@ -108,11 +108,14 @@ $output_file = 'AustralianCurriculumV9.csv';
 
 // Files
 $subjectFiles = [
-    'English' => ['english-scope-and-sequence-f-10-v9.csv'],
-    'Health and Physical Education' => ['health-and-physical-education-scope-and-sequence-f-10-v9.csv'],
-    'Mathematics' => ['mathematics-scope-and-sequence-f-10-v9.csv'],
-    'Science' => ['science-scope-and-sequence-f-10-v9.csv'],
-    'Technologies' => [],
+    'English' => ['English' => 'english-scope-and-sequence-f-10-v9.csv'],
+    'Health and Physical Education' => ['Health and Physical Education' => 'health-and-physical-education-scope-and-sequence-f-10-v9.csv'],
+    'Mathematics' => ['Mathematics' => 'mathematics-scope-and-sequence-f-10-v9.csv'],
+    'Science' => ['Science' => 'science-scope-and-sequence-f-10-v9.csv'],
+    'Technologies' => [
+        'Design and Technologies' => 'technologies-design-and-technologies-scope-and-sequence-f-10-v9.csv',
+        'Digital Technologies' => 'technologies-digital-technologies-scope-and-sequence-f-10-v9.csv'
+    ],
 ];
 
 // Subject Array
@@ -138,6 +141,9 @@ $lastStrand_id = 0;
 // Define the seen sub strand id
 $lastSubStrand_id = 0;
 
+// Seen subject list
+$seenSubjects = [];
+
 // Define a 2-dimensional array to store the rows of the output CSV file
 $output_rows = [];
 
@@ -146,20 +152,30 @@ $output_rows[] = [1, 0, 'Australian Curriculum - V9', null, 0, null];
 // For each file, do things...
 foreach ($subjectFiles as $subject => $filesArray) {
     // Open the input CSV file and create a CSV reader object
-    foreach ($filesArray as $fileName) {
+    foreach ($filesArray as $subSubject => $fileName) {
         if (($handle = fopen($fileName, "r")) !== false) {
-            $node_id = count($output_rows) + 1;
-            //create the subject
-            $node_name      = $subject;
-            $output_rows[]  = [$node_id, $topParentId, $node_name, null, 0, null];
-            $lastStrand_id  = $lastSubStrand_id = $lastYear_id = null;
-            $lastSubject_id = $node_id;
+            // Don't create a new entry for a subject that we have already seen
+            if (!array_key_exists($subject, $seenSubjects)) {
+                $node_id = count($output_rows) + 1;
+                //create the subject
+                $node_name      = $subject;
+                $output_rows[]  = [$node_id, $topParentId, $node_name, null, 0, null];
+                $lastStrand_id  = $lastSubStrand_id = $lastYear_id = null;
+                $lastSubject_id = $node_id;
+                $seenSubjects[$subject] = $node_id;
+            }
 
             switch ($subject) {
                 case "Mathematics":
                     processRowsStrand($handle, $output_rows, $lastSubject_id);
                     break;
                 case "Technologies":
+                    $node_id = count($output_rows) + 1;
+                    //create the subject
+                    $node_name     = $subSubject;
+                    $output_rows[] = [$node_id, $seenSubjects[$subject], $node_name, null, 0, null];
+
+                    processRowsSubStrand($handle, $output_rows, $node_id);
                     break;
                 default:
                     processRowsSubStrand($handle, $output_rows, $lastSubject_id);
