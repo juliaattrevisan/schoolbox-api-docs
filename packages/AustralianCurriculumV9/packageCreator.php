@@ -107,11 +107,12 @@ function processRowsStrand($handle, &$output_rows, $lastSubject_id)
 $output_file = 'AustralianCurriculumV9.csv';
 
 // Files
-$filesArray = [
-    'English' => 'english-scope-and-sequence-f-10-v9.csv',
-    'Health and Physical Education' => 'health-and-physical-education-scope-and-sequence-f-10-v9.csv',
-    'Mathematics' => 'mathematics-scope-and-sequence-f-10-v9.csv',
-    'Science' => 'science-scope-and-sequence-f-10-v9.csv',
+$subjectFiles = [
+    'English' => ['english-scope-and-sequence-f-10-v9.csv'],
+    'Health and Physical Education' => ['health-and-physical-education-scope-and-sequence-f-10-v9.csv'],
+    'Mathematics' => ['mathematics-scope-and-sequence-f-10-v9.csv'],
+    'Science' => ['science-scope-and-sequence-f-10-v9.csv'],
+    'Technologies' => [],
 ];
 
 // Subject Array
@@ -143,24 +144,28 @@ $output_rows = [];
 $output_rows[] = [1, 0, 'Australian Curriculum - V9', null, 0, null];
 
 // For each file, do things...
-foreach ($filesArray as $subject => $fileName) {
+foreach ($subjectFiles as $subject => $filesArray) {
     // Open the input CSV file and create a CSV reader object
-    if (($handle = fopen($fileName, "r")) !== false) {
-        $node_id = count($output_rows) + 1;
-        //create the subject
-        $node_name      = $subject;
-        $output_rows[]  = [$node_id, $topParentId, $node_name, null, 0, null];
-        $lastStrand_id  = $lastSubStrand_id = $lastYear_id = null;
-        $lastSubject_id = $node_id;
+    foreach ($filesArray as $fileName) {
+        if (($handle = fopen($fileName, "r")) !== false) {
+            $node_id = count($output_rows) + 1;
+            //create the subject
+            $node_name      = $subject;
+            $output_rows[]  = [$node_id, $topParentId, $node_name, null, 0, null];
+            $lastStrand_id  = $lastSubStrand_id = $lastYear_id = null;
+            $lastSubject_id = $node_id;
 
-        switch ($subject) {
-            case "Mathematics":
-                processRowsStrand($handle, $output_rows, $lastSubject_id);
-                break;
-            default:
-                processRowsSubStrand($handle, $output_rows, $lastSubject_id);
+            switch ($subject) {
+                case "Mathematics":
+                    processRowsStrand($handle, $output_rows, $lastSubject_id);
+                    break;
+                case "Technologies":
+                    break;
+                default:
+                    processRowsSubStrand($handle, $output_rows, $lastSubject_id);
+            }
+            fclose($handle);
         }
-        fclose($handle);
     }
 }
 
