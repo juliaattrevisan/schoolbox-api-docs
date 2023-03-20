@@ -132,11 +132,18 @@ const showUsage = computed(() => modalStore.isOpen && props.node.id !== UNSET_ID
  * @returns { boolean }
  */
 const isViewing = computed(() => modalNodeUsageStore.isOpen && modalActiveNodeStore.node.id === props.node.id);
+
+/**
+ * If there's another node being viewed
+ *
+ * @returns { boolean }
+ */
+const isViewingAnother = computed(() => modalNodeUsageStore.isOpen && modalActiveNodeStore.node.id !== props.node.id);
 </script>
 
 <template>
     <li ref="viewNodeEl">
-        <div :class="`buttons-container`">
+        <div :class="`buttons-container`" :data-is-inactive="isViewingAnother">
             <cs-modal-node-checkbox :node="props.node" />
             <cs-modal-node-name :node="props.node" :depth="props.depth" :title="title" />
             <cs-modal-node-usage-summary
@@ -168,6 +175,11 @@ const isViewing = computed(() => modalNodeUsageStore.isOpen && modalActiveNodeSt
     padding: 2px;
     position: relative;
     transition: 0.3s;
+}
+
+[data-is-inactive="true"] {
+    opacity: 0.2;
+    pointer-events: none;
 }
 
 ul {
