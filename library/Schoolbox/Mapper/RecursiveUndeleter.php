@@ -601,7 +601,6 @@ class RecursiveUndeleter
         Collection $deletedParentModels,
         Alaress_Date_Format $after = null,
         Alaress_Date_Format $before = null,
-        $recursionDepth = 0
     ): void {
         $mapperClass = get_class($parentMapper);
         $this->checkRegistry($mapperClass);
@@ -647,7 +646,7 @@ class RecursiveUndeleter
             }
 
             // Recurse!!
-            $this->recursiveFindDeletedModels($childMapper, $deletedChildModels, $after, $before, $recursionDepth + 1);
+            $this->recursiveFindDeletedModels($childMapper, $deletedChildModels, $after, $before);
         }
     }
 
