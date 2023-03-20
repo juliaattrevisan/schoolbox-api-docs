@@ -27,6 +27,7 @@ class Controller extends Assessment\Controller
         $zoneFactory = new Assessment\Attachzone\Factory();
 
         return [
+            'acceptingResponses' => 'maybe',
             'attachzone' => $zoneFactory->buildForAssessment($assessment)->getTwigContext(),
         ];
     }

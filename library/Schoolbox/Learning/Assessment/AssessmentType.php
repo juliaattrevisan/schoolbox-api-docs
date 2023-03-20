@@ -113,6 +113,7 @@ class AssessmentType implements IType
             self::TYPE_TASK,
             self::TYPE_QUIZ,
             self::TYPE_LTI_ASSESSMENT,
+            self::TYPE_LESSON_PLAN
         ];
     }
 }

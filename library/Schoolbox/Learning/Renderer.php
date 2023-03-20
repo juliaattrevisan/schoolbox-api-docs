@@ -18,6 +18,7 @@ use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\Lti\Model as Lti;
+use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
 use Twig\SimpleTest;
 use Twig\TwigTest;
 use Twig\Extension\AbstractExtension;
@@ -69,6 +70,9 @@ class Renderer extends AbstractExtension
             }),
             new TwigTest('lti', function ($assessable) {
                 return $assessable instanceof Lti;
+            }),
+            new TwigTest('lessonPlan', function ($assessable) {
+                return $assessable instanceof LessonPlan;
             }),
 
             new TwigTest('response', function ($interaction) {
