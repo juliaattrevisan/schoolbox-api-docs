@@ -743,7 +743,8 @@ class MapperProxy
         try {
             $builder = $this->convertOptionsToPredicateBuilder($options, false)
                             ->equals('us.id', $unitSpecId);
-            return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
+            $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
+            return $x;
         } catch (UnderflowException $e) {
             return $this->createCollection();
         }
@@ -1757,6 +1758,9 @@ class MapperProxy
                 case AssessmentType::TYPE_PROJECT:
                     $builder->notNull('p.id');
                     break;
+
+                /* TODO Does Lesson Plans appear here?
+                 */
 
                 default:
                     break;
