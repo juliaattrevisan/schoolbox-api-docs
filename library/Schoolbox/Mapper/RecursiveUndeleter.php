@@ -600,7 +600,7 @@ class RecursiveUndeleter
         IMapper $parentMapper,
         Collection $deletedParentModels,
         Alaress_Date_Format $after = null,
-        Alaress_Date_Format $before = null,
+        Alaress_Date_Format $before = null
     ): void {
         $mapperClass = get_class($parentMapper);
         $this->checkRegistry($mapperClass);
@@ -634,10 +634,10 @@ class RecursiveUndeleter
 
             $this->logger->info(sprintf("Child mapper identifier column '%s'", $childModelIdentifier));
             $childModelIds = $deletedChildModels->getPropertyValues($childMapper->getIdentifierProperty());
-            $this->logger->debug(sprintf("Child model IDs: %s", $this->getIdsString($childModelIds)));
+            $this->logger->debug(sprintf('Child model IDs: %s', $this->getIdsString($childModelIds)));
 
             if (0 === count($childModelIds)) {
-                $this->logger->debug("No children found, skipping...");
+                $this->logger->debug('No children found, skipping...');
                 continue;
             }
 
