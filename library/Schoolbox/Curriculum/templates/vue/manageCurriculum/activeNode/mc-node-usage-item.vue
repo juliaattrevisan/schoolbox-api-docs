@@ -80,7 +80,7 @@ function onSelect() {
 </template>
 
 <style lang="scss" scoped>
-@import "../style/mcIconColours";
+@import "@schoolboxCurriculum/vue/usage/style/iconColours";
 .usage {
     border: 1px solid #ededed;
     padding: 0;
