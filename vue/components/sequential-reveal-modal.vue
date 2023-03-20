@@ -79,6 +79,9 @@ watch(
             sequenceIndex.value = 1;
             open();
             addClosedListener();
+        } else {
+            sequenceIndex.value = 1;
+            close();
         }
     }
 );
