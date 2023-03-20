@@ -131,6 +131,7 @@ const activeUsages = computed(() => {
 
 .content {
     margin: 0;
+    padding-right: 1rem;
 }
 .usage-list-container {
     display: flex;

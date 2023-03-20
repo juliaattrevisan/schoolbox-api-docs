@@ -6,6 +6,7 @@
 
 import { ref, computed, onMounted } from "vue";
 import { gsap } from "gsap/all";
+import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/transitions";
 import { useModalViewNodesStore, DIRECTION } from "../store/csModalViewNodesStore";
 import { useModalStore } from "../store/csModalStore";
 import { useModalSearchStore } from "../store/csModalSearchStore";
@@ -14,7 +15,8 @@ import { useModalActiveNodeStore } from "../store/csModalActiveNodeStore";
 import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 import CsModalNodeCheckbox from "./cs-modal-node-checkbox.vue";
 import CsModalNodeName from "./cs-modal-node-name.vue";
-import CsModalNodeUsage from "./cs-modal-node-usage.vue";
+import CsModalNodeUsageSummary from "./cs-modal-node-usage-summary.vue";
+import CsModalNodeUsageDetails from "./cs-modal-node-usage-details.vue";
 
 const props = defineProps({
     /**
@@ -137,7 +139,7 @@ const isViewing = computed(() => modalNodeUsageStore.isOpen && modalActiveNodeSt
         <div :class="`buttons-container`">
             <cs-modal-node-checkbox :node="props.node" />
             <cs-modal-node-name :node="props.node" :depth="props.depth" :title="title" />
-            <cs-modal-node-usage
+            <cs-modal-node-usage-summary
                 v-if="showUsage"
                 :node="props.node"
                 :title="title"
@@ -146,6 +148,9 @@ const isViewing = computed(() => modalNodeUsageStore.isOpen && modalActiveNodeSt
                 :is-adding="false"
             />
         </div>
+        <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
+            <cs-modal-node-usage-details v-if="isViewing" :depth="props.depth" />
+        </Transition>
         <ul v-if="showChildren">
             <cs-modal-node v-for="node in props.node.children" :key="node.id" :node="node" :depth="props.depth + 1" />
         </ul>
@@ -158,6 +163,8 @@ const isViewing = computed(() => modalNodeUsageStore.isOpen && modalActiveNodeSt
     border-bottom: 1px solid v-bind(borderBottomColour);
     display: flex;
     margin: 0 0 0 v-bind(marginLeft);
+    min-height: 52px;
+    overflow: hidden;
     padding: 2px;
     position: relative;
     transition: 0.3s;

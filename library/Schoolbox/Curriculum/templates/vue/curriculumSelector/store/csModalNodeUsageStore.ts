@@ -4,7 +4,7 @@
 
 import { ref } from "vue";
 import { defineStore } from "pinia";
-import { useActiveNodeStore } from "@schoolboxCurriculum/vue/manageCurriculum/activeNode/store/mcActiveNodeStore";
+import { useModalActiveNodeStore } from "./csModalActiveNodeStore";
 import type { Node, Usage } from "@schoolboxCurriculum/types/Node";
 
 export const useModalNodeUsageStore = defineStore("csModalNodeUsage", () => {
@@ -18,13 +18,13 @@ export const useModalNodeUsageStore = defineStore("csModalNodeUsage", () => {
     async function view() {
         try {
             isProcessing.value = true;
-            const activeNodeStore = useActiveNodeStore();
-            const usageResponse = await fetch(activeNodeStore.node._links.getUsage);
+            const modalActiveNodeStore = useModalActiveNodeStore();
+            const usageResponse = await fetch(modalActiveNodeStore.node._links.getUsage);
             if (usageResponse.ok) {
                 const usage = (await usageResponse.json()) as JSON;
                 // we are not currently displaying folders in the usage list
                 const withoutFolders = usage.data.filter((item: Usage) => item.discriminator !== "folder");
-                activeNodeStore.node.usage = withoutFolders as Usage[];
+                modalActiveNodeStore.node.usage = withoutFolders as Usage[];
             } else {
                 hasLoadError.value = true;
             }
@@ -41,7 +41,7 @@ export const useModalNodeUsageStore = defineStore("csModalNodeUsage", () => {
      * @param { Node } node - node to update
      */
     async function prompt(node: Node) {
-        useActiveNodeStore().set(node);
+        useModalActiveNodeStore().set(node);
         isOpen.value = true;
         await view();
     }
@@ -50,7 +50,7 @@ export const useModalNodeUsageStore = defineStore("csModalNodeUsage", () => {
      * to hide the nodes usage details
      */
     function cancel() {
-        useActiveNodeStore().unset();
+        useModalActiveNodeStore().unset();
         isOpen.value = false;
     }
 

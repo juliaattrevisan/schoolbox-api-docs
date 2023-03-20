@@ -4,7 +4,7 @@
 
 import { ref } from "vue";
 import { defineStore } from "pinia";
-import { useActiveNodeStore } from "@schoolboxCurriculum/vue/manageCurriculum/activeNode/store/mcActiveNodeStore";
+import { useActiveNodeStore } from "./mcActiveNodeStore";
 import type { Node, Usage } from "@schoolboxCurriculum/types/Node";
 
 export const useNodeUsageStore = defineStore("mcNodeUsage", () => {
