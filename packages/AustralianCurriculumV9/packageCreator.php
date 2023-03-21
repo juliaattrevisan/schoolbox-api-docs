@@ -7,7 +7,7 @@
  * @param $lastSubject_id
  * @return void
  */
-function processRowsSubStrand($handle, &$output_rows, $lastSubject_id)
+function processRowsSubStrand($handle, &$output_rows, $lastSubject_id): void
 {
     // Set last references to.
     $lastYear_id = $lastStrand_id = $lastSubStrand_id = 0;
@@ -17,7 +17,7 @@ function processRowsSubStrand($handle, &$output_rows, $lastSubject_id)
         /**
          * then years
          * then strands
-         * then substrands
+         * then substrands (if they exist, if not just use the strand Maths is like this)
          * then dump in the curric code
          */
         if (str_starts_with($row[0], 'Year') || 'Foundation' === $row[0]) {
@@ -62,13 +62,6 @@ $output_file = 'AustralianCurriculumV9.csv';
 // Files
 $subjectFiles = [
     'English' => ['English' => 'english-scope-and-sequence-f-10-v9.csv'],
-    'Health and Physical Education' => ['Health and Physical Education' => 'health-and-physical-education-scope-and-sequence-f-10-v9.csv'],
-    'Mathematics' => ['Mathematics' => 'mathematics-scope-and-sequence-f-10-v9.csv'],
-    'Science' => ['Science' => 'science-scope-and-sequence-f-10-v9.csv'],
-    'Technologies' => [
-        'Design and Technologies' => 'technologies-design-and-technologies-scope-and-sequence-f-10-v9.csv',
-        'Digital Technologies' => 'technologies-digital-technologies-scope-and-sequence-f-10-v9.csv'
-    ],
     'Humanities and Social Sciences' => [
         'HASS' => 'humanities-and-social-sciences-hass-f-6-scope-and-sequence-v9.csv',
         'Civics and Citizenship' => 'humanities-and-social-sciences-civics-and-citizenship-scope-and-sequence-v9.csv',
@@ -76,6 +69,7 @@ $subjectFiles = [
         'Geography' => 'humanities-and-social-sciences-geography-scope-and-sequence-v9.csv',
         'History' => 'humanities-and-social-sciences-history-scope-and-sequence-v9.csv'
     ],
+    'Health and Physical Education' => ['Health and Physical Education' => 'health-and-physical-education-scope-and-sequence-f-10-v9.csv'],
     'Languages' => [
         'Chinese' => 'languages-chinese-scope-and-sequence-f-10-7-10-v9.csv',
         'French' => 'languages-french-scope-and-sequence-f-10-7-10-v9.csv',
@@ -86,6 +80,12 @@ $subjectFiles = [
         'Korean' => 'languages-korean-scope-and-sequence-f-10-7-10-v9.csv',
         'Modern Greek' => 'languages-modern-greek-scope-and-sequence-f-10-7-10-v9.csv',
         'Spanish' => 'languages-spanish-scope-and-sequence-f-10-7-10-v9.csv',
+    ],
+    'Mathematics' => ['Mathematics' => 'mathematics-scope-and-sequence-f-10-v9.csv'],
+    'Science' => ['Science' => 'science-scope-and-sequence-f-10-v9.csv'],
+    'Technologies' => [
+        'Design and Technologies' => 'technologies-design-and-technologies-scope-and-sequence-f-10-v9.csv',
+        'Digital Technologies' => 'technologies-digital-technologies-scope-and-sequence-f-10-v9.csv'
     ],
     'The Arts' => [
         'Dance' => 'the-arts-dance-scope-and-sequence-f-10-v9.csv',
