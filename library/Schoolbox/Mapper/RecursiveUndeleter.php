@@ -353,7 +353,7 @@ class RecursiveUndeleter
      * Load an instance of the root mapper from the table name
      * @param string $table
      * @throws UnexpectedValueException
-     * @return array
+     * @return array<iMapper>
      */
     public function loadMappers(string $table): array
     {
