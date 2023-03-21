@@ -44,7 +44,7 @@ trait LessonPlanTrait
 
     /**
      * @param int|null $lessonPlanTemplateId
-     * @return Factory|LessonPlanTrait
+     * @return $this
      */
     public function setLessonPlanTemplateId(?int $lessonPlanTemplateId): self
     {
@@ -64,7 +64,7 @@ trait LessonPlanTrait
 
     /**
      * @param array|null $lessonPlanFields
-     * @return Factory|LessonPlanTrait
+     * @return $this
      */
     public function setLessonPlanFields(?array $lessonPlanFields): self
     {
@@ -84,7 +84,7 @@ trait LessonPlanTrait
 
     /**
      * @param string|null $lessonPlanVisibility
-     * @return Factory|LessonPlanTrait
+     * @return $this
      */
     public function setLessonPlanVisibility(?string $lessonPlanVisibility): self
     {

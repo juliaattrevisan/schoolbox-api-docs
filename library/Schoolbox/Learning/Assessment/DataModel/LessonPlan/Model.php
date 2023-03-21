@@ -220,4 +220,24 @@ class Model implements IAssessableDataModel, ISoftDeletable
         $this->getFields()->add($field);
         return $this;
     }
+
+
+    /**
+     * @return Collection|null
+     */
+    public function getAttachments(): ?Collection
+    {
+        return $this->attachments;
+    }
+
+
+    /**
+     * @param Collection|null $attachments
+     * @return Model
+     */
+    public function setAttachments(?Collection $attachments): self
+    {
+        $this->attachments = $attachments;
+        return $this;
+    }
 }
