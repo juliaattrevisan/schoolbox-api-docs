@@ -42,9 +42,14 @@ class Copy extends CliTool\App
     /** @var ClientInterface $sourceRedis */
     private ClientInterface $sourceRedis;
 
-    private int  $totalLength = 0;
-    private int  $count       = 0;
-    private bool $isDelete    = false;
+    // total size of data
+    private int $totalLength = 0;
+
+    // total number of data
+    private int $count = 0;
+
+    // whether this is to delete keys
+    private bool $isDelete = false;
 
     /**
      * @inheritdoc
@@ -144,7 +149,8 @@ Copies an instance's redis data to the specified server
         $keyPatterns = Redis\CommandLineTool\Report::KEY_PATTERNS[Redis::INSTANCE_STORAGE];
 
         // Skipping keys which doesn't have INSTANCE_ID
-        $keyPatterns = array_filter($keyPatterns,
+        $keyPatterns = array_filter(
+            $keyPatterns,
             static function (string $pattern) {
                 return str_contains($pattern, INSTANCE_ID);
             }
