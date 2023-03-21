@@ -22,6 +22,7 @@ use Schoolbox\Blog\Eportfolio\Post\Mapper as EportfolioBlogMapper;
 use Schoolbox\Blog\Eportfolio\Post\Model as EportfolioBlogModel;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -276,37 +277,20 @@ class Controller extends Base
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
-        // Blog comments can be added from a few different pages, so the redirection URL depends on the referrer.
-        $referrer = $_SERVER['HTTP_REFERER'] ?? '';
-        $blogPage = $blog->getPage();
-        $blogPageId = $blogPage->getPageId();
-        if (str_contains($referrer, 'eportfolio/blog/archive')) {
-            $blogCreatedAt = $blog->getCreatedAt();
-            $redirectParams = ['pageId' => $blogPageId];
+        $returnUrlEncoded = $this->getRequest()->post['returnUrl'];
 
-            // Field eportfolio_component_blog.created_at is nullable in the DB, so account for this case.  Also, if
-            // blank year and month are included in the redirect URL, an error results.  So we must include them only
-            // if created_at is non-null.
-            if ($blogCreatedAt !== null) {
-                $redirectParams['year'] = $blogCreatedAt->getYear();
-                $redirectParams['month'] = $blogCreatedAt->getMonth();
-            }
-            $redirectUrl = $this->getRouter()->generate('eportfolioBlog.getArchive', $redirectParams);
-        } elseif (str_contains($referrer, 'eportfolio/blog')) {
-            $redirectUrl = $this->getRouter()->generate(
-                'eportfolioBlog.getItem',
-                ['pageId' => $blogPageId, 'id' => $blog->getId()]
-            );
-        } elseif (str_contains($referrer, 'eportfolio')) {
-            $redirectUrl = '/eportfolio/' . $blog->getOwner()->getId() . '/' . $blogPageId;
+        if ($returnUrlEncoded !== null) {
+            $returnUrl = Redirect::decode($returnUrlEncoded);
         } else {
-            $redirectUrl = $this->getRouter()->generate(
+            // If no return URL supplied, redirect to the Blog on which the comment was added.
+            $blogPage = $blog->getPage();
+            $returnUrl = $this->getRouter()->generate(
                 'eportfolioBlog.getItem',
-                ['pageId' => $blogPageId, 'id' => $blog->getId()]
+                ['pageId' => $blogPage->getPageId(), 'id' => $blog->getId()]
             );
         }
 
-        $this->getResponse()->redirect->afterPost($redirectUrl);
+        $this->getResponse()->redirect->afterPost($returnUrl);
     }
 
     /**
