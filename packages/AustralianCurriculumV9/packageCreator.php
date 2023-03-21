@@ -56,53 +56,6 @@ function processRowsSubStrand($handle, &$output_rows, $lastSubject_id)
     }
 }
 
-/**
- * Function to work with 'standard' subjects, that have strands with NO sub strands
- * @param $handle
- * @param $output_rows
- * @param $lastSubject_id
- * @return void
- */
-function processRowsStrand($handle, &$output_rows, $lastSubject_id)
-{
-    // Set last references to.
-    $lastYear_id = $lastStrand_id = 0;
-
-    while (($row = fgetcsv($handle)) !== false) {
-        $node_id = count($output_rows) + 1;
-        /**
-         * then years
-         * then strands
-         * then dump in the curric code
-         */
-        if (str_starts_with($row[0], 'Year') || 'Foundation' === $row[0]) {
-            /**
-             * if cell starts with Year or is 'Foundation' then new year level
-             */
-            $node_name     = trim($row[0]);
-            $output_rows[] = [$node_id, $lastSubject_id, $node_name, null, 0, null];
-            $lastYear_id   = $node_id;
-        } else {
-            if (str_starts_with($row[0], 'Strand:')) {
-                // If the row contains a strand, create a new node in the output CSV file
-                $strand_name   = trim(substr($row[0], 7));
-                $output_rows[] = [$node_id, $lastYear_id, $strand_name, null, 0, null];
-                $lastStrand_id = $node_id;
-            } else {
-                //this will just be a code... hopefully....
-                $nodeFormat = mb_split('\n', $row[0]);
-                $node_name  = trim($nodeFormat[0]);
-                if (!isset($nodeFormat[1])) {
-                    $node_code = null;
-                    var_dump($nodeFormat);
-                } else {
-                    $node_code = trim($nodeFormat[1]);
-                }
-                $output_rows[] = [$node_id, $lastStrand_id, $node_name, $node_code, 0, null];
-            }
-        }
-    }
-}
 // Define input and output file paths
 $output_file = 'AustralianCurriculumV9.csv';
 
@@ -191,13 +144,11 @@ foreach ($subjectFiles as $subject => $filesArray) {
             }
 
             switch ($subject) {
-                case "Mathematics":
-                    processRowsStrand($handle, $output_rows, $lastSubject_id);
-                    break;
                 case "Languages":
                 case "Humanities and Social Sciences":
                 case "Technologies":
                 case "The Arts":
+                    // Subjects with sub subjects... need to have a sub subject specified
                     $node_id = count($output_rows) + 1;
                     //create the subject
                     $node_name     = $subSubject;
@@ -205,6 +156,7 @@ foreach ($subjectFiles as $subject => $filesArray) {
                     processRowsSubStrand($handle, $output_rows, $node_id);
                     break;
                 default:
+                    // Subjects with no sub subject
                     processRowsSubStrand($handle, $output_rows, $lastSubject_id);
             }
             fclose($handle);
