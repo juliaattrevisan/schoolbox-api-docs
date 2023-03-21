@@ -13,6 +13,9 @@ function processRowsSubStrand($handle, &$output_rows, $lastSubject_id): void
     $lastYear_id = $lastStrand_id = $lastSubStrand_id = $nodeParent = 0;
 
     while (($row = fgetcsv($handle)) !== false) {
+        // Sanitize the description, and remove the nbsp characters...
+        $row[0] = str_replace(' ', ' ', $row[0]);
+
         $node_id = count($output_rows) + 1;
         /**
          * then years
