@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\LTI\Membership;
 
 use Closure;
+use Psr\Http\Message\UriInterface;
 use Schoolbox\Url\Uri;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Role\RoleInterface;
@@ -494,9 +495,9 @@ class Builder implements MembershipServiceServerBuilderInterface
     /**
      * Build a base URL.
      *
-     * @return Uri
+     * @return UriInterface
      */
-    private function buildBaseUrl(): Uri
+    private function buildBaseUrl(): UriInterface
     {
         return (new Factory($this->config))->buildFullyQualified()->withScheme('https');
     }
