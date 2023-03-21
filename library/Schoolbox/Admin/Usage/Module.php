@@ -85,7 +85,7 @@ class Module extends BaseModule
     private function preloadUser(array $params): array
     {
         try {
-            $user = $this->getUserMapper()->findById($params['userId']);
+            $user = $this->getUserMapper()->findByIdWithFallback($params['userId']);
         } catch (MapperException $e) {
             throw new NotFound();
         }
