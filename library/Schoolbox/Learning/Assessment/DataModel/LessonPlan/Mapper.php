@@ -239,23 +239,23 @@ class Mapper extends \Schoolbox\Mapper
     /**
      * Delete the fields that were associated with $lessonPlanTemplate
      *
-     * @param Model $lessonPlanTemplate
+     * @param Model $lessonPlan
      * @return void
      * @throws DefinitionException
      * @throws Exception
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    protected function softDeleteFields(Model $lessonPlanTemplate): void
+    protected function softDeleteFields(Model $lessonPlan): void
     {
         /* Remember who deleted this thing, in a dirty doubletap
          */
-        $lessonPlanTemplate->setDeletedBy($this->getSessionUser());
-        $this->save($lessonPlanTemplate);
+        $lessonPlan->setDeletedBy($this->getSessionUser());
+        $this->save($lessonPlan);
 
         /* Dump away any associated Fields too
          */
-        $this->getJoinMapper('field')->delete($lessonPlanTemplate->getFields());
+        $this->getJoinMapper('lessonPlanField')->delete($lessonPlan->getFields());
     }
 
 
