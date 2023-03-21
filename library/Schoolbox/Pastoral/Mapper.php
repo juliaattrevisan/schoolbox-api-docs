@@ -1167,7 +1167,8 @@ class Mapper extends BaseMapper
 
             $filter = "`a`.`action_id` IN ({$pbArray['placeholders']})";
         }
-        if ($actionStatus) {
+        // action status should not be effective when only "no action" is selected
+        if ($actionStatus && ($actions->count() > 0 || !$includeReportsWithoutAction)) {
             $filter = ($filter === '' ? '' : "{$filter} AND ") . " `a`.`completed` = :actionStatus ";
 
             $this->bindings['actionStatus'] = (int)($actionStatus === \Schoolbox\Pastoral\Report\Model::ACTION_STATUS_COMPLETED);
