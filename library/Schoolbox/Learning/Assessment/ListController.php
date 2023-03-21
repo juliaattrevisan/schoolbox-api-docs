@@ -725,11 +725,12 @@ class ListController extends Web\Controller\Base
 
         $planMap = $this->participantDataSource->getPlanMapper();
 
-        // preload the plans list with the dyna-plan
-        $plans = $planMap->findByColumnList([ 'is_dynamic' => true, 'assessment_id' => $assessmentId ])->indexBy('id');
+        // preload the plans list
+        $plans = $planMap->findByColumnList([ 'assessment_id' => $assessmentId ])
+                         ->indexBy('id');
 
         // obtain this reference for later
-        $dynaPlan = $plans->first();
+        $dynaPlan = $plans->filterBy('isDynamic', true)->first();
         // within $postPlans, any positive index is the ID of an existing plan; any negative index is a new plan
         foreach ($postPlans as $planId => $planData) {
             // if planId == 0, it's either the dyna-plan or invalid data, but ignorable either way
@@ -740,10 +741,9 @@ class ListController extends Web\Controller\Base
                 $planData['close_date'] = $planData['due_date'];
             }
 
-            if ($planId > 0) {
+            if ($planId > 0 && isset($plans[$planId])) {
                 // existing plan updates
-                $plans[$planId] = $planMap
-                    ->createModel($planId)
+                $plans[$planId]
                     ->setName($planData['name'])
                     ->setDescription($planData['description'])
                     ->setPublishDate(Alaress_Date_Format::newLocal($planData['publish_date']))
