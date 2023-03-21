@@ -12,7 +12,7 @@ namespace Schoolbox\Learning\Assessment\DataModel\LessonPlan\Field;
 
 use Schoolbox\Admin\LessonPlan\Template\Field\Model as LessonPlanTemplateField;
 use Schoolbox\ISoftDeletable;
-use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
+use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Model as LessonPlan;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
 
 class Model implements ISoftDeletable

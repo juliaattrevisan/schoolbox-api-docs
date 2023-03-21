@@ -10,6 +10,13 @@
  # @param string $lessonPlanMeta[mageAsync]                    Whether this was a Mage Step 2 async form fragment (always false here)
  # @param bool $lessonplanMeta[includeBreadcrumbs]             Whether to include breadcrumbs (create requires it; update does not)
  # @param array $breadcrumbs                                   A set of nodes to render as breadcrumb elements
+ #
+ # @param LessonPlan\Field\Model|LessonPplan\Template\Field\Model $lessonPlanMeta[fields]
+ #     A set of Lesson Plan Fields to render here (could be Template Fields) due to somewhat
+ #     enforced polymorphism across our AbstractAssessment implementations; create and update
+ #     are intricately tied together, but one workflow shows the Template Fields so you can
+ #     modify them; but another workflow shows you the Lesson Plan Fields that you had previously
+ #     spawned and altered
  #}
 
 <input type="hidden" name="lessonPlanTemplateId" value="{{ lessonPlanMeta.template.id }}" />
@@ -23,7 +30,7 @@
     </div>
 </fieldset>
 
-{% for field in lessonPlanMeta.template.fields %}
+{% for field in lessonPlanMeta.fields %}
     <fieldset>
         <div class="row">
             <div class="small-12 columns">

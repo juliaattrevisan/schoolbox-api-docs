@@ -261,6 +261,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
              * This encapsulates the myriad of combinations which is really really awkward
              */
             $data['lessonPlanMeta']['template'] = null;
+            $data['lessonPlanMeta']['fields'] = $type;
             $data['lessonPlanMeta']['type'] = $type;
             $data['lessonPlanMeta']['mageAsync'] = false;
             $data['lessonPlanMeta']['includeBreadcrumbs'] = true;
@@ -308,6 +309,11 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 /* Customise the selected LPT
                  */
                 $data['lessonPlanMeta']['template'] = \Schoolbox\Admin\LessonPlan\Template\Mapper::getInstance()->findById((int)$templateId);
+
+                /* Field list contains the ones from the Lesson Plan Template when creating
+                 * WHen updating, it's actually fields from the Lesson Plan instance itself
+                 */
+                $data['lessonPlanMeta']['fields'] = $data['lessonPlanMeta']['template']->getFields();
 
                 if ($this->getRequest()->isXhr()) {
                     $content = $this->buildUnthemedHtmlOutput(sprintf(
@@ -368,8 +374,15 @@ abstract class Controller extends ListController implements IAssessmentControlle
         /* Lesson Plan Template metadata, used to construct forms
          */
         if ($assessment instanceof LessonPlan\Model) {
+            /* TODO Get the fields separately instead of joining everything in the swamp
+             *  because that's just asking for megaquery troubles. We only need the
+             *  Lesson Plan fields here
+             */
+            $lessonPlan = \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper::getInstance()->findOneByColumn('assessment_id', $assessment->getId());
+
             $data['lessonPlanMeta'] = [
-                'template' => $assessment->getLessonPlanTemplate(),
+                'template' => $lessonPlan->getLessonPlanTemplate(),
+                'fields' => $lessonPlan->getFields(),
                 'type' => AssessmentType::TYPE_LESSON_PLAN,
                 'mageAsync' => false,
                 'includeBreadcrumbs' => false

@@ -493,6 +493,7 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('ltiAssessment.ltiTool', 'ltool')},
                 {$this->getJoinColumnString('lessonPlan', 'lessonPlan')},
                 {$this->getJoinColumnString('lessonPlan.lessonPlanTemplate', 'lessonPlanTemplate')},
+                {$this->getJoinColumnString('lessonPlan.lessonPlanField', 'lessonPlanField')},
                 {$this->getJoinColumnString('project', 'p')},
                 {$this->getJoinColumnString('assessment_folder', 'f')},
                 {$this->getJoinColumnString('assessment_course_unit_specification', 'us')},
@@ -518,6 +519,7 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('ltiAssessment.ltiTool', 'l', 'ltool', true)}
             LEFT JOIN {$this->getJoinSql('lessonPlan', '', 'lessonPlan', true)}
             LEFT JOIN {$this->getJoinSql('lessonPlan.lessonPlanTemplate', 'lessonPlan', 'lessonPlanTemplate', true)}
+            LEFT JOIN {$this->getJoinSql('lessonPlan.lessonPlanField', 'lessonPlan', 'lessonPlanField', true)}            
             LEFT JOIN {$this->getJoinSql('project', '', 'p', true)}
             LEFT JOIN {$this->getJoinSql('assessment_folder', '', 'f', true)}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification', '', 'us', true)}
@@ -818,6 +820,18 @@ class Mapper extends BaseMapper
                 $lessonPlan->setLessonPlanTemplate($lessonPlanTemplate);
 
                 $model->setLessonPlan($lessonPlan);
+
+                /* Grab the fields too
+                 */
+                $lessonPlanField = $this->hydrateJoin($row, 'lessonPlan.lessonPlanField', 'lessonPlanField');
+
+                /* Init collection before shanking stuff in
+                 */
+                if (null == $lessonPlan->getFields()) {
+                    $lessonPlan->setFields(\Schoolbox\Learning\Assessment\DataModel\LessonPlan\Field\Mapper::getInstance()->createCollection());
+                }
+
+                $lessonPlan->addField($lessonPlanField);
             } else {
                 $model->setLessonPlan(null);
             }

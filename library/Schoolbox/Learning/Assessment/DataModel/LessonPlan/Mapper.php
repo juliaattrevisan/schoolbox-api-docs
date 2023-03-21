@@ -184,21 +184,21 @@ class Mapper extends \Schoolbox\Mapper
 
             if ($lessonPlanField instanceof Field\Model) {
                 $lessonPlans[$row['id']]->addField($lessonPlanField);
+
+                /* Hydrate and supply the original Lesson Plan Template Field
+                 */
+                /** @var \Schoolbox\Admin\LessonPlan\Template\Field\Model $lessonPlanTemplateField */
+                $lessonPlanTemplateField = $templateFieldMapper->hydrate($row, 'lessonPlanTemplateField', 'lessonPlanTemplateField');
+                $lessonPlanField->setLessonPlanTemplateField($lessonPlanTemplateField);
+
+                /* Reference it in the Lesson Plan Template Fields as well
+                 */
+                $lessonPlans[$row['id']]->getLessonPlanTemplate()->addField($lessonPlanTemplateField);
             }
 
-            /* Hydrate and supply the original Lesson Plan Template Field
+            /* TODO: Augment with attached files
              */
-            /** @var \Schoolbox\Admin\LessonPlan\Template\Field\Model $lessonPlanTemplateField */
-            $lessonPlanTemplateField = $templateFieldMapper->hydrate($row, 'lessonPlanTemplateField', 'lessonPlanTemplateField');
-            $lessonPlanField->setLessonPlanTemplateField($lessonPlanTemplateField);
-
-            /* Reference it in the Lesson Plan Template Fields as well
-             */
-            $lessonPlans[$row['id']]->getLessonPlanTemplate()->addField($lessonPlanTemplateField);
-
-            /* Augment with attached files
-             */
-            $lessonPlans[$row['id']]->setAttachments($this->getJoinMapper('files')->findByColumn('lesson_plan_id', $lessonPlans[$row['id']]->getId()));
+            // $lessonPlans[$row['id']]->setAttachments($this->getJoinMapper('files')->findByColumn('lesson_plan_id', $lessonPlans[$row['id']]->getId()));
         }
 
         /* Sort sequentially
