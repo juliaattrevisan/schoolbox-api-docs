@@ -19,3 +19,269 @@
         background-position: 0 0;
     }
 }
+
+/*  CKEditor5 custom styles */
+/*  These have been declared out here as including them in the editor.css
+ *  file prevents the styles from being used elsewhere as that style sheet
+ *  is not imported unless a CKEditor5 area is set up on a page.
+ *  I added some colour custom properties as I spoke to James and he said
+ *  none of these should respond to skin config.
+ *
+ *  TODO - Replace our colour definitions with custom properties when they're
+ *  implemented in the platform (aka use globally accessible custom properties,
+ *  don't have them defined in this file.)
+ */
+
+:root {
+    --ck-custom-blue: #0068b3;
+    --ck-custom-red: #fa4a47;
+    --ck-custom-green: #4fa74f;
+    --ck-custom-yellow: #e4b144;
+    /* Yellow text has horrible readability on a white background, so darken it. */
+    --ck-custom-yellow-text: #b58d36;
+    --ck-custom-orange: #ff7045;
+    --ck-custom-sticky-bg: #ffdf8d;
+    --ck-custom-sticky-text: #3d2b26;
+    --ck-custom-code-bg: #272822;
+    --ck-custom-grey: #888888;
+    --ck-custom-white: #ffffff;
+    --ck-custom-black: #000000;
+    --ck-custom-shadow: rgba(0, 0, 0, 0.15);
+    --ck-custom-shadow-white: rgba(255, 255, 255, 0.15);
+}
+
+.ck-s {
+    /* Applies to all custom styles. */
+    &-banner,
+    &-callout--info,
+    &-callout--warning,
+    &-callout--success,
+    &-callout-target,
+    &-callout--question,
+    &-sticky-note,
+    &-construction,
+    &-code-block {
+        //max-width: fit-content;
+        word-break: break-word;
+    }
+
+    /* Banner */
+    &-banner {
+        background-color: var(--ck-custom-blue);
+        box-shadow: 0px 5px 5px 0px var(--ck-custom-shadow);
+        color: var(--ck-custom-white);
+        display: block;
+        // Important needs to be used here to clobber rules inheriting from .island styles
+        margin: 1rem auto 2rem auto !important;
+        padding: 1rem;
+        position: relative;
+        width: calc(100% - 4em);
+
+        &::selection,
+        & *::selection {
+            background-color: var(--ck-custom-white);
+            color: var(--ck-custom-blue);
+        }
+
+        &::before,
+        &::after {
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-size: contain;
+            bottom: -24px;
+            content: "";
+            display: block;
+            height: 3rem;
+            position: absolute;
+            width: 2.5rem;
+        }
+
+        &::before {
+            background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB2aWV3Qm94PSIxNDUuOTI1IDExNS41NjYgNDIuNTAzIDQyLjM5MSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8ZyBzdHlsZT0iIiB0cmFuc2Zvcm09Im1hdHJpeCgtMS4wMDEwMTUsIDAsIDAsIDEuMDEyMDA1LCAzMzAuODMxMzYsIDQuNjY1NzkyKSI+CiAgICA8cGF0aCBkPSJNIDE1Ni43MTkgMTA5LjYxOCBMIDE4NC43MTkgMTA5LjU4NSBMIDE2NC4xODggMTMwLjM1MiBMIDE4NC43MTkgMTUxLjQ3MyBMIDE0Mi4zNjIgMTUxLjQ3MyBMIDE0Mi4zMzQgMTMwLjA3MyBMIDE1Ni43MTkgMTMwLjA3MyBMIDE1Ni43MTkgMTA5LjYxOCBaIiBzdHlsZT0iZmlsbDogcmdiKDYsIDc4LCAxMjkpOyIvPgogICAgPHBhdGggZD0iTSAtMTQyLjI1OSAtMTUwLjU1MyBMIC0xNDIuMjU5IC0xMzAuMTA2IEwgLTE1Ni44MTIgLTEzMC4xMDYgTCAtMTQyLjI1OSAtMTUwLjU1MyBaIiBzdHlsZT0iZmlsbC1vcGFjaXR5OiAwLjM7IiB0cmFuc2Zvcm09Im1hdHJpeCgtMSwgMCwgMCwgLTEsIDAsIDApIi8+CiAgICA8cGF0aCBkPSJNIDE0Mi4zMzQgMTMwLjA3MyBMIDE0Mi4zMDQgMTI3LjA1MyBMIDE1My43MjIgMTI3LjA1MyBMIDE1My43MjIgMTA5LjYyNCBMIDE1Ni44MTkgMTA5LjYxOCBMIDE1Ni44MTkgMTMwLjE3MiBMIDE0Mi4zMzQgMTMwLjE3MiBMIDE0Mi4zMzQgMTMwLjA3MyBaIiBzdHlsZT0iZmlsbDogcmdiKDAsIDEwNCwgMTc5KTsiLz4KICA8L2c+Cjwvc3ZnPg==");
+            left: -26px;
+        }
+
+        &::after {
+            background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB2aWV3Qm94PSIxNDUuOTI1IDExNS41NjYgNDIuNTAzIDQyLjM5MSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8ZyBzdHlsZT0iIiB0cmFuc2Zvcm09Im1hdHJpeCgxLjAwMTAxNSwgMCwgMCwgMS4wMTIwMDUsIDMuNTIxNDg1LCA0LjY2NTc5MikiPgogICAgPHBhdGggZD0iTSAxNTYuNzE5IDEwOS42MTggTCAxODQuNzE5IDEwOS41ODUgTCAxNjQuMTg4IDEzMC4zNTIgTCAxODQuNzE5IDE1MS40NzMgTCAxNDIuMzYyIDE1MS40NzMgTCAxNDIuMzM0IDEzMC4wNzMgTCAxNTYuNzE5IDEzMC4wNzMgTCAxNTYuNzE5IDEwOS42MTggWiIgc3R5bGU9ImZpbGw6IHJnYig2LCA3OCwgMTI5KTsiLz4KICAgIDxwYXRoIGQ9Ik0gLTE0Mi4yNTkgLTE1MC41NTMgTCAtMTQyLjI1OSAtMTMwLjEwNiBMIC0xNTYuODEyIC0xMzAuMTA2IEwgLTE0Mi4yNTkgLTE1MC41NTMgWiIgc3R5bGU9ImZpbGwtb3BhY2l0eTogMC4zOyIgdHJhbnNmb3JtPSJtYXRyaXgoLTEsIDAsIDAsIC0xLCAwLCAwKSIvPgogICAgPHBhdGggZD0iTSAxNDIuMzM0IDEzMC4wNzMgTCAxNDIuMzA0IDEyNy4wNTMgTCAxNTMuNzIyIDEyNy4wNTMgTCAxNTMuNzIyIDEwOS42MjQgTCAxNTYuODE5IDEwOS42MTggTCAxNTYuODE5IDEzMC4xNzIgTCAxNDIuMzM0IDEzMC4xNzIgTCAxNDIuMzM0IDEzMC4wNzMgWiIgc3R5bGU9ImZpbGw6IHJnYigwLCAxMDQsIDE3OSk7Ii8+CiAgPC9nPgo8L3N2Zz4=");
+            right: -26px;
+        }
+    }
+
+    /* Callout */
+    /*  Previously these styles used two classes - a base 'ck-s-callout' class
+     *  and then a '--modifier' class to apply anything unique to that particular style.
+     *  This caused an issue when an end user accidentally added two callout styles at
+     *  the same time and then removed one of them, CKEditor5 would also remove that base
+     *  class even though the remaining style still required it.
+     *
+     *  The code is split out like this to prevent that error from occurring
+     *  so that now there's only a single class applied to the styles.
+     */
+    &-callout {
+        &--info,
+        &--warning,
+        &--success,
+        &--target,
+        &--question {
+            background-color: white;
+            border: 1px solid var(--ck-custom-grey);
+            border-radius: 0.25rem;
+            box-shadow: 0px 5px 5px 0px var(--ck-custom-shadow);
+            color: var(--ck-custom-grey);
+            display: block;
+            overflow: hidden;
+            padding: 1em 1em 1em 4rem;
+            position: relative;
+
+            &::before {
+                align-items: center;
+                background-color: var(--ck-custom-grey);
+                color: var(--ck-custom-white);
+                display: flex;
+                font-family: "schoolbox";
+                font-size: 1.25rem;
+                font-weight: 400;
+                height: 100%;
+                justify-content: center;
+                left: 0;
+                position: absolute;
+                top: 0;
+                width: 3rem;
+            }
+        }
+
+        &--info {
+            border-color: var(--ck-custom-blue);
+            color: var(--ck-custom-blue);
+
+            &::before {
+                background-color: var(--ck-custom-blue);
+                content: "\e639";
+            }
+        }
+
+        &--warning {
+            border-color: var(--ck-custom-red);
+            color: var(--ck-custom-red);
+
+            &::before {
+                background-color: var(--ck-custom-red);
+                content: "\e602";
+            }
+        }
+
+        &--success {
+            border-color: var(--ck-custom-green);
+            color: var(--ck-custom-green);
+
+            &::before {
+                background-color: var(--ck-custom-green);
+                content: "\e604";
+            }
+        }
+
+        &--target {
+            border-color: var(--ck-custom-yellow);
+            color: var(--ck-custom-yellow-text);
+
+            &::before {
+                background-color: var(--ck-custom-yellow);
+                content: "\e919";
+            }
+        }
+
+        &--question {
+            &::before {
+                content: "\e632";
+            }
+        }
+    }
+
+    /* Sticky note */
+    &-sticky-note {
+        background-color: var(--ck-custom-sticky-bg);
+        background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB2aWV3Qm94PSIzNDcuNjUzIDEyNC4zNjMgMzMuMzQ5IDMxLjQ0NiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB4PSIzNDcuNjUzIiB5PSIxMjQuMzYzIiB3aWR0aD0iMzMuMzQ5IiBoZWlnaHQ9IjMxLjQ0NiIgc3R5bGU9ImZpbGwtb3BhY2l0eTogMC4wNzsiLz4KPC9zdmc+Cg==");
+        background-position: top;
+        background-repeat: repeat-x;
+        background-size: 1rem;
+        color: var(--ck-custom-sticky-text);
+        display: block;
+        margin-top: 1.5rem;
+        max-width: 100%;
+        padding: 1.5rem 1rem 1rem 1rem;
+        position: relative;
+        width: -moz-fit-content;
+        width: fit-content;
+
+        &::before {
+            color: var(--ck-custom-red);
+            content: "\e913";
+            font-family: "schoolbox";
+            font-size: 24px;
+            left: calc(50% - 0.5em);
+            position: absolute;
+            top: -20px;
+        }
+
+        &::after {
+            background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB2aWV3Qm94PSIxNTEuODQ1IDE1Ni4zMDYgMTgxLjE5MiAxODEuMzI0IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOmJ4PSJodHRwczovL2JveHktc3ZnLmNvbSI+CiAgPHBhdGggZD0iTSAzMzMuMDM3IDE1Ni4zMDYgTCAzMzMuMDM3IDMzNy40NzggTCAxNTEuODY1IDMzNy40NzggTCAzMzMuMDM3IDE1Ni4zMDYgWiIgc3R5bGU9ImZpbGw6IHJnYigyNTUsIDI1NSwgMjU1KTsiIGJ4OnNoYXBlPSJ0cmlhbmdsZSAxNTEuODY1IDE1Ni4zMDYgMTgxLjE3MiAxODEuMTcyIDEgMCAxQGQzYjJkNjY5Ii8+CiAgPHBhdGggZD0iTSAtMTUxLjg0NSAtMzM3LjYzIEwgLTE1MS44NDUgLTE1Ni40NTggTCAtMzMzLjAxNyAtMTU2LjQ1OCBMIC0xNTEuODQ1IC0zMzcuNjMgWiIgc3R5bGU9ImZpbGwtb3BhY2l0eTogMC4wNzsiIHRyYW5zZm9ybT0ibWF0cml4KC0xLCAwLCAwLCAtMSwgMCwgMCkiIGJ4OnNoYXBlPSJ0cmlhbmdsZSAtMzMzLjAxNyAtMzM3LjYzIDE4MS4xNzIgMTgxLjE3MiAxIDAgMUA5MWZkMjhjMSIvPgo8L3N2Zz4K");
+            background-repeat: no-repeat;
+            background-size: cover;
+            bottom: 0;
+            content: "";
+            height: 18px;
+            position: absolute;
+            right: 0;
+            width: 18px;
+        }
+    }
+
+    /* Construction */
+    &-construction {
+        background-color: var(--ck-custom-orange);
+        border: 1px solid var(--ck-custom-orange);
+        box-shadow: 0px 5px 5px 0px var(--ck-custom-shadow);
+        color: var(--ck-custom-white);
+        padding: 1rem;
+        position: relative;
+
+        &::before,
+        &::after {
+            background: repeating-linear-gradient(
+                45deg,
+                var(--ck-custom-orange),
+                var(--ck-custom-orange) 10px,
+                var(--ck-custom-white) 10px,
+                var(--ck-custom-white) 20px
+            );
+            content: "";
+            height: 0.75rem;
+            position: absolute;
+            width: 100%;
+        }
+
+        &::before {
+            left: 0;
+            top: 0;
+        }
+
+        &::after {
+            bottom: 0;
+            left: 0;
+        }
+    }
+}
+
+/* Code block styling */
+p.ck-s-code-block {
+    background-color: var(--ck-custom-code-bg);
+    border: none;
+    border-radius: 0.25rem;
+    color: var(--ck-custom-white);
+    display: block;
+    font-family: monospace;
+    font-weight: 400;
+    padding: 1rem;
+    position: relative;
+    tab-size: 4;
+}
