@@ -41,6 +41,10 @@ function create(textarea: HTMLTextAreaElement, config: EditorConfig) {
     if (config.toolbar === undefined) {
         config.toolbar = EditorToolbar.FULL;
     }
+    if (config.maxCharCount === undefined) {
+        // config.maxCharCount = 65000;
+        config.maxCharCount = 20;
+    }
     ClassicEditor.create(textarea, getConfig(config))
         .then((editor) => {
             onCreated(textarea, editor, config);

@@ -88,5 +88,18 @@ export function getConfig(config: EditorConfig) {
         ...getTableSettings(),
         ...getMediaEmbedSettings(),
         ...getTokensSettings(config),
+        wordCount: {
+            onUpdate: (stats) => {
+                const isLimitExceeded = stats.characters > config.maxCharCount;
+
+                // Display the number of characters in the progress chart. When the limit is exceeded,
+                // display how many characters should be removed.
+                if (isLimitExceeded) {
+                    // console.warn("limit exceeded");
+                } else {
+                    // charactersBox.textContent = stats.characters;
+                }
+            },
+        },
     };
 }

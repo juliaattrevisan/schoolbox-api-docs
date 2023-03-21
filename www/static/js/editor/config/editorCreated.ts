@@ -33,6 +33,18 @@ function addSBConfigToEditor(editor: Editor, config: EditorConfig) {
 }
 
 /**
+ *
+ * @param { EditorConfig } config - the CKEditor config object
+ * @returns { HTMLDivElement } - the limit warning element
+ */
+function getLimitWarningElement(config: EditorConfig) {
+    const limitWarningElement = document.createElement("div");
+    limitWarningElement.classList.add("ck-word-count__limit-warning");
+    limitWarningElement.innerHTML = `<b>Warning:</b> The limit of ${config.maxCharCount} Characters has been reached. Please reduce the content to below the limit to save.`;
+    return limitWarningElement;
+}
+
+/**
  * Add the word count UI to the bottom of the editor
  * Its assumed this method is called once the editor has been created,
  * so editorTextArea.nextSibling will be the newly created editor instance
@@ -42,9 +54,13 @@ function addSBConfigToEditor(editor: Editor, config: EditorConfig) {
  * @param { EditorConfig } config - the CKEditor config object
  */
 function insertWordCount(textarea: HTMLTextAreaElement, editor: Editor, config: EditorConfig) {
-    if (config.toolbar === EditorToolbar.FULL) {
-        const wordCountPlugin = editor.plugins.get("WordCount");
-        insertElementAfter(textarea.nextSibling, wordCountPlugin.wordCountContainer);
+    const wordCountPlugin = editor.plugins.get("WordCount");
+    wordCountPlugin.wordCountContainer.setAttribute("data-word-count-id", editor.id);
+    insertElementAfter(textarea.nextSibling, wordCountPlugin.wordCountContainer);
+    const wordCountElement = document.querySelector(`[data-word-count-id='${editor.id}']`) as HTMLDivElement;
+    insertElementAfter(wordCountElement.lastChild, getLimitWarningElement(config));
+    if (config.toolbar !== EditorToolbar.FULL) {
+        wordCountElement.style.display = "none";
     }
 }
 
