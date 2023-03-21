@@ -103,11 +103,22 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
             $j = 0;
 
             foreach ($allRss as $currentRss) {
+                /*
+                 * check if $currentRss['content'] exists, sometimes the rss feed does not send this option
+                 * if it does exist and is not empty then display the $currentRss['content']
+                 * if it does not exist, then display the $currentRss['description']
+                 * no matter if it contains content or not.
+                 * We also have not seen it never exist, so lets assume it will always exist...
+                 */
+                $rssContent = $currentRss['content'] ?? '';
+                $rssDescription = $currentRss['description'];
+                $rssBreif = ('' !== $rssContent) ? $rssContent : $rssDescription;
+
                 $this->setVar(
                     [
                         'RSS_TITLE'              => Scrub::text($currentRss['title']),
                         'RSS_URL'                => urlencode(base64_encode($currentRss['link'])),
-                        'RSS_BRIEF'              => Scrub::html($currentRss['content'] ?? $currentRss['description']),
+                        'RSS_BRIEF'              => Scrub::html($rssBreif),
                         'rss_brief_output_block' => '',
                     ]
                 );
