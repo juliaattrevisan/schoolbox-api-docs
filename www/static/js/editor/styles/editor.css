@@ -16,6 +16,8 @@
     /* Change the colour of the mentions */
     --ck-color-mention-background: var(--accent-background);
     --ck-color-mention-text: #222222;
+    /* Ensure correct z-index on modals */
+    --ck-z-modal: 1010;
 }
 
 /**
@@ -126,6 +128,17 @@
 .ck.ck-content {
     position: relative;
     z-index: 1;
+}
+
+.ck.ck-toolbar .ck-button__schoolboxmakeblank {
+    background-color: #cae9b9;
+}
+
+/**
+ * to highlight the blank words when using the 'Make Blank' button
+ */
+.ck.ck-content span.selected-word {
+    background: #cae9b9;
 }
 
 /**

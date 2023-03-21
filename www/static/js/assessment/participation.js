@@ -105,14 +105,6 @@
         });
 
         /**
-         * On open of the custom plan modal - destroy and re-init CKEditor
-         * This was implemented because when you go into a datepicker, then return to the custom plan modal - ckeditor breaks
-         */
-        $customiseModal.on("open.fndtn.reveal", function () {
-            reinitCKE();
-        });
-
-        /**
          *  Including/excluding students
          */
         $participantSettings.on("click", "a[data-participant-change]", function (event) {
@@ -400,15 +392,22 @@
     }
 
     /**
-     * Destroy and reinit CKEditor
+     * Initialise CKEditor
      */
-    function reinitCKE() {
-        var $planDesc = $(defaults.customiseModal).find("#plan-desc");
-        if (window.sbProps.editors["plan-desc"]) {
-            window.sbProps.editors["plan-desc"].destroy();
-        }
-        $.fn.alaressEditor({
-            targetElements: $planDesc,
+    async function initCKE() {
+        return new Promise((resolve) => {
+            if (window.sbProps.editors["plan-desc"]) {
+                return resolve();
+            }
+            document.getElementById("plan-desc").addEventListener("EDITOR__CREATED", function () {
+                resolve();
+            });
+            document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+                detail: {
+                    targetElements: ["#plan-desc"],
+                    toolbar: "simple"
+                }
+            }));
         });
     }
 
@@ -540,7 +539,7 @@
         }
     }
 
-    function openPlanModal(planData, options) {
+    async function openPlanModal(planData, options) {
         var $planParticipants = $("#plan-participants");
         var $customiseModal = $(defaults.customiseModal);
         var $participants = $(defaults.participants);
@@ -578,8 +577,8 @@
         });
         var participantSelectize = $planParticipants[0].selectize;
 
-        // Destroy and reinit CKEditor
-        reinitCKE();
+        // Wait for CKE to init to ensure we can set its value correctly below
+        await initCKE();
 
         // Disable/hide dates if they aren't in the config
         if ($.inArray("publish", dates) == -1) {

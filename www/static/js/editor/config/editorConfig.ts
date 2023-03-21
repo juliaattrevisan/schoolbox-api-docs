@@ -39,6 +39,7 @@ import { getMediaEmbedSettings } from "@js/editor/settings/mediaEmbedSettings";
 import { getTokensSettings } from "@js/editor/settings/tokensSettings";
 import { EditorConfig } from "@js/editor/types/editorTypes";
 import Resource from "@js/editor/plugin/resource/Resource";
+import Blank from "@js/editor/plugin/blank/Blank";
 
 /**
  * Return the default configuration
@@ -75,6 +76,7 @@ export function getConfig(config: EditorConfig) {
             SourceEditing,
             WordCount,
             Resource,
+            Blank,
         ],
         extraPlugins: [UploadAdapterPlugin],
         toolbar: getToolbar(config),
