@@ -20,6 +20,45 @@
     }
 }
 
+/**
+ *  CKEditor custom font sizes - they exist internally inside an editor.css file
+ *  but that file isn't imported onto a page unless you explicitly import it or
+ *  there's a CKEditor instance on the page.
+**/
+.text-tiny {
+    font-size: 0.7em;
+}
+
+.text-small {
+    font-size: 0.85em;
+}
+
+.text-big {
+    font-size: 1.4em;
+}
+
+.text-huge {
+    font-size: 1.8em;
+}
+
+/**
+ *  Custom block quote styles so that paragraph tags behave like paragraph
+ *  tags but still wrap properly around the " mark
+**/
+blockquote {
+    &:before {
+        float: left;
+        height: 3.25rem;
+        line-height: normal;
+        margin-right: 1rem;
+        vertical-align: middle;
+    }
+
+    & p {
+        display: block;
+    }
+}
+
 /*  CKEditor5 custom styles */
 /*  These have been declared out here as including them in the editor.css
  *  file prevents the styles from being used elsewhere as that style sheet
