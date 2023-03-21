@@ -10,6 +10,8 @@
         icon-due-work
     {% elseif assessment is lti %}
         icon-lti
+    {% elseif assessment is lessonPlan %}
+        icon-lesson-plan
     {% endif %}
 {% endapply %}
 {% endmacro %}
