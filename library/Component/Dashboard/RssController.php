@@ -56,12 +56,23 @@ class Component_Dashboard_RssController extends Component_Dashboard_ControllerAb
         $j = 0;
         if (count($allRss)) {
             foreach ($allRss as $item) {
+                /*
+                 * check if $item['content'] exists, sometimes the rss feed does not send this option
+                 * if it does exist and is not empty then display the $item['content']
+                 * if it does not exist, then display the $item['description']
+                 * no matter if it contains content or not.
+                 * We also have not seen it never exist, so lets assume it will always exist...
+                 */
+                $rssContent = $item['content'] ?? '';
+                $rssDescription = $item['description'];
+                $rssBreif = ('' !== $rssContent) ? $rssContent : $rssDescription;
+
                 $this->setVar(
                     array(
                         'ON_OFF' => ++$j % 2 ? '' : 'dark',
                         'RSS_TITLE' => Scrub::text($item['title']),
                         'RSS_URL' => urlencode(base64_encode($item['link'])),
-                        'RSS_BRIEF' => Scrub::html($item['content'] ?? $item['description']),
+                        'RSS_BRIEF' => Scrub::html($rssBreif),
                         'rss_brief_output_block' => '',
                     )
                 );
