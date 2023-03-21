@@ -1460,6 +1460,17 @@ class MapperProxy
             // TODO - roll out this methodology to other assessment types
             SubmissionBoxMapper::getInstance()->delete($subModel);
         } elseif ($subModel instanceof LessonPlan\Model) {
+            /* For some absurd reason, we're delegating Assessment Deletion to subobjects' mappers
+             * so the Submission Box mapper knows how to delete an assessment instance...that's why
+             * there's no assessment deletion methods in this area
+             *
+             * There's also a weird sequential dependency here. baseMapper->delete() has to occur
+             * before lessonPlanMapper->save() otherwise the assessment.deleted_at never saves
+             *
+             * TODO (idk why that is; it was a wild guess that this was the cause)
+             */
+            $this->baseMapper->delete($dataModel);
+
             /* Delete the fields via the Lesson Plan Field Mapper
              */
             $lessonPlanFieldMapper = \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Field\Mapper::getInstance();
@@ -1475,16 +1486,10 @@ class MapperProxy
              *
              * Also try to bypass a dirty doubletap
              */
-            $subModel->setDeletedBy($this->baseMapper->getSessionUser());
-            $subModel->setDeletedAt(\Alaress_Date_Format::now());
+            $subModel->setDeletedBy($this->baseMapper->getSessionUser())
+                ->setDeletedAt(\Alaress_Date_Format::now());
 
             $lessonPlanMapper->save($subModel);
-
-            /* For some absurd reason, we're delegating Assessment Deletion to subobjects' mappers
-             * so the Submission Box mapper knows how to delete an assessment instance...that's why
-             * there's no assessment deletion methods in this area
-             */
-            $this->baseMapper->delete($dataModel);
         } else {
             $this->baseMapper->delete($dataModel);
         }
