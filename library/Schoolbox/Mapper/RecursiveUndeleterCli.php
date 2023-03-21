@@ -118,6 +118,13 @@ class RecursiveUndeleterCli extends CliTool\App
 
             $recursiveUndeleter = new RecursiveUndeleter($this->logger, $this->deletedAtWindow, $this->explicitDeletionDate);
 
+            $failureReason = $this->checkThatUndeletionIsPossible($this->rootIds, $recursiveUndeleter);
+
+            if ($failureReason !== '') {
+                $this->logger->error($failureReason);
+                exit(1);
+            }
+
             $modelsByMapperClassByRootMapperClass = $this->getModelsByMapperClassByRootMapperClass(
                 $this->rootIds,
                 $recursiveUndeleter
@@ -171,6 +178,28 @@ class RecursiveUndeleterCli extends CliTool\App
 
 
     /**
+     * Check as best we can that all requirements are met for the undeletion process.
+     * If so, return a blank string. If not, return the reason why not as a string.
+     *
+     * @param                    $rootIds
+     * @param RecursiveUndeleter $recursiveUndeleter
+     * @return String
+     */
+    private function checkThatUndeletionIsPossible($rootIds, RecursiveUndeleter $recursiveUndeleter): string
+    {
+        $rootMappers = $recursiveUndeleter->loadMappers($this->rootTable);
+
+        foreach ($rootMappers as $mapper) {
+            if (!$mapper->getIdentifierColumn()) {
+                return sprintf("Unable to find all IDs for root mapper '%s'. No ID column.", get_class($mapper));
+            }
+        }
+
+        return '';
+    }
+
+
+    /**
      * Given the list of ids that were supplied on the cammand-line, generate and return the data structure specified below.
      * Log error and exit if specified mapper does not have an ID field registered.
      *
@@ -207,11 +236,6 @@ class RecursiveUndeleterCli extends CliTool\App
 
         $modelsByMapperClassByRootMapperClass = [];
         foreach ($rootMappers as $mapper) {
-            if (!$mapper->getIdentifierColumn()) {
-                $this->logger->error(sprintf(" * Unable to find all IDs for root mapper '%s'. No ID column", get_class($mapper)));
-                exit(1);
-            }
-
             $modelsByMapperClassByRootMapperClass[get_class($mapper)] = $recursiveUndeleter->findDeletedModels(
                 $mapper,
                 ($allIdsRequested ? $mapper->findAllIds(['deleted' => true]) : $rootIds)
