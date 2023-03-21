@@ -96,11 +96,6 @@ $subjectFiles = [
     ]
 ];
 
-// Subject Array
-$subjects = [
-    'English',
-];
-
 // Define the header for the output CSV file
 $output_header = ['id', 'curriculum_node_parent_id', 'name', 'code', 'order', 'description'];
 
@@ -109,15 +104,6 @@ $topParentId = 1;
 
 // Define the last seen Subject ID
 $lastSubject_id = 0;
-
-// Define the last seen Year id
-$lastYear_id = 0;
-
-// Define the seen strand id
-$lastStrand_id = 0;
-
-// Define the seen sub strand id
-$lastSubStrand_id = 0;
 
 // Seen subject list
 $seenSubjects = [];
