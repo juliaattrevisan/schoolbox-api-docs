@@ -236,11 +236,11 @@ class Model extends AbstractAssessment
     /**
      * Add a template field to this template
      *
-     * @param \Schoolbox\Learning\Assessment\LessonPlan\Field\Model $field
+     * @param \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Field\Model $field
      * @return $this
      * @throws \UnexpectedValueException
      */
-    public function addField(\Schoolbox\Learning\Assessment\LessonPlan\Field\Model $field): self
+    public function addField(\Schoolbox\Learning\Assessment\DataModel\LessonPlan\Field\Model $field): self
     {
         $this->fields->add($field);
         return $this;

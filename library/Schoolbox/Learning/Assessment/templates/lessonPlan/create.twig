@@ -17,9 +17,20 @@
     </div>
 </div>
 
+{% if assessment.id %}
+    {% set formAction = routeLookup('learningAssessment.postUpdateAssessment', { assessmentId: assessment.id, assessment: assessment })  %}
+{% else %}
+    {% set formAction = routeLookup('learningAssessment.postCreateAssessment', { contextType: contextType, contextId: context.id, context: context }) %}
+{% endif %}
+
 <div class="row">
     <div class="small-12 island">
-        <form>
+        <form action="{{ formAction }}" method="post">
+            <input type="hidden" name="contextType" value="{{ contextType }}" />
+            <input type="hidden" name="contextId" value="{{ context.id }}" />
+            <input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
+            <input type="hidden" name="returnUrl" value="{{ returnUrl }}" />
+
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">

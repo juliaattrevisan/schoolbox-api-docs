@@ -13,32 +13,33 @@ namespace Schoolbox\Learning\Assessment;
 use Alaress_Date_Format;
 use DomainException;
 use InvalidArgumentException;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\DueWork\Decorator\CourseManagedDecorator as DueWorkCourseManagedDecorator;
+use Schoolbox\Learning\Assessment\DueWork\Decorator\Decorator as DueWorkDecorator;
+use Schoolbox\Learning\Assessment\DueWork\Decorator\DueWorkTrait;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\LessonPlan;
 use Schoolbox\Learning\Assessment\Lti\Decorator\Decorator as LtiDecorator;
 use Schoolbox\Learning\Assessment\Lti\Decorator\LtiTrait;
-use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
+use Schoolbox\Learning\Assessment\Project\Decorator\Decorator as ProjectDecorator;
+use Schoolbox\Learning\Assessment\Project\Decorator\ProjectTrait;
+use Schoolbox\Learning\Assessment\Quiz\Decorator\Decorator as QuizDecorator;
+use Schoolbox\Learning\Assessment\Quiz\Decorator\QuizTrait;
+use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
+use Schoolbox\Learning\Assessment\Summator\Factory as SummatorFactory;
+use Schoolbox\Learning\Assessment\Task\Decorator\Decorator as TaskDecorator;
+use Schoolbox\Learning\Assessment\Task\Decorator\TaskTrait;
+use Schoolbox\Learning\Assessment\Task\Model as Task;
+use Schoolbox\Learning\AssessmentContext;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Exception as ResourceException;
 use Schoolbox\User;
-use Schoolbox\Learning\Assessment\Summator\Factory as SummatorFactory;
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use Schoolbox\Learning\Assessment\Task\Model as Task;
-use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
-use Schoolbox\Learning\Assessment\DueWork\Decorator\DueWorkTrait;
-use Schoolbox\Learning\Assessment\DueWork\Decorator\Decorator as DueWorkDecorator;
-use Schoolbox\Learning\Assessment\DueWork\Decorator\CourseManagedDecorator as DueWorkCourseManagedDecorator;
-use Schoolbox\Learning\Assessment\LessonPlan;
-use Schoolbox\Learning\Assessment\Quiz\Decorator\QuizTrait;
-use Schoolbox\Learning\Assessment\Quiz\Decorator\Decorator as QuizDecorator;
-use Schoolbox\Learning\Assessment\Task\Decorator\TaskTrait;
-use Schoolbox\Learning\Assessment\Task\Decorator\Decorator as TaskDecorator;
-use Schoolbox\Learning\Assessment\Project\Decorator\ProjectTrait;
-use Schoolbox\Learning\Assessment\Project\Decorator\Decorator as ProjectDecorator;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
-use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use UnexpectedValueException;
+
 
 /**
  * Class Factory
@@ -408,7 +409,7 @@ class Factory
                 $this->getLineItemResourceId(),
                 $this->getLineItemScoreMaximum()
             );
-        } elseif ($assessment instanceof LessonPlan\Model) {
+        } elseif ($assessment instanceof \Schoolbox\Learning\Assessment\LessonPlan\Model) {
             /* TODO Add other fields that are LessonPlan specific
              */
             $decorator = new LessonPlan\Decorator\Decorator(

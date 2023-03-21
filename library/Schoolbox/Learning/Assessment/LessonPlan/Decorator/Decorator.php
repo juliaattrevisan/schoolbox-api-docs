@@ -14,6 +14,7 @@ use Schoolbox\Learning\Assessment\DecoratorInterface;
 use Schoolbox\Learning\Assessment\LessonPlan;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 
+
 /**
  * Class Decorator
  *
@@ -35,7 +36,7 @@ class Decorator implements DecoratorInterface
 
 
     /**
-     * @param LessonPlan\Model $assessment
+     * @param \Schoolbox\Learning\Assessment\LessonPlan\Model $assessment
      * @throws \InvalidArgumentException
      * @throws \UnexpectedValueException
      */

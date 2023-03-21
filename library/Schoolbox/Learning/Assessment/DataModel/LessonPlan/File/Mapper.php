@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Assessment\LessonPlan\File;
+namespace Schoolbox\Learning\Assessment\DataModel\LessonPlan\File;
 
 use PDOStatement;
 use Schoolbox\Collection;
@@ -16,8 +16,8 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Resource\Storage\Model as Storage;
 
 /**
  *  Mapper for files attached to a task.
@@ -40,7 +40,7 @@ class Mapper extends BaseMapper
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
 
-        $this->joins('lesson_plan_id', \Schoolbox\Learning\Assessment\LessonPlan\Mapper::class, 'id', null, null, 'lessonPlan', 'lessonPlan');
+        $this->joins('lesson_plan_id', \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper::class, 'id', null, null, 'lessonPlan', 'lessonPlan');
         $this->joins('storage_hash', StorageMapper::class, 'hash', null, null, 'storage', 'storage');
         $this->uses('realname', self::TYPE_STRING, null, 'filename');
         $this->uses('created_at', self::TYPE_DATETIME);

@@ -34,7 +34,6 @@ use Schoolbox\Learning\Assessment\Project as ProjectObject;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
-use Schoolbox\Learning\LessonPlan;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Learning\MarkScheme\Percentage;
@@ -1327,12 +1326,12 @@ class MapperProxy
         } elseif ($subObject instanceof LtiAssessment\Model) {
             LtiAssessment\Mapper::getInstance()->save($subObject);
         } elseif ($subObject instanceof \Schoolbox\Learning\Assessment\LessonPlan\Model) {
-            $lessonPlanMapper = \Schoolbox\Learning\Assessment\LessonPlan\Mapper::getInstance();
+            $lessonPlanMapper = \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper::getInstance();
 
             /* TODO save all the Lesson Plan Fields' values here, too, I think
              */
             $lessonPlanMapper->save($subObject);
-            $lessonPlanMapper->saveFiles($subObject);
+            // $lessonPlanMapper->saveFiles($subObject);
         } elseif ($subObject instanceof Project) {
             ProjectMapper::getInstance()->save($subObject);
         }

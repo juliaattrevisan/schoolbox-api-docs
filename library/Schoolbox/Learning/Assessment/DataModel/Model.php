@@ -9,23 +9,24 @@
 namespace Schoolbox\Learning\Assessment\DataModel;
 
 use Alaress_Date_Format;
-use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWork;
 use Schoolbox\Assessment\Course\Task;
+use Schoolbox\Assessment\Participant\Plan;
+use Schoolbox\Curriculum\Node;
+use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\Assessment\DataModel\Project\Model as Project;
+use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Model as LessonPlan;
+use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Learning\Quiz\Model as Quiz;
+use Schoolbox\LTI\Assessment\Model as LtiAssessment;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Resource\Folder\Model as Folder;
-use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
-use Schoolbox\LTI\Assessment\Model as LtiAssessment;
-use Schoolbox\Assessment\Participant\Plan;
-use Schoolbox\Curriculum\Node;
 use TypeError;
 
 /**
@@ -165,10 +166,23 @@ class Model implements ISoftDeletable
      * The LTI assessment which may or may not be associated with this
      * assessment.
      *
-     * Only one of task, due work, quiz, LTI assessment or project may be
+     * Only one of task, due work, quiz, LTI assessment, Lesson Plan or project may be
      * associated with a single assessment.
+
      */
     private ?LtiAssessment $ltiAssessment = null;
+
+
+    /**
+     * The Lesson Plan which might exist for this assessment
+     *
+     * Only one of task, due work, quiz, LTI assessment, Lesson Plan or project may be
+     * associated with a single assessment.
+     *
+     * @var LessonPlan|null
+     */
+    private ?LessonPlan $lessonPlan = null;
+
 
     /**
      * The project which may or may not be associated with this assessment.
@@ -233,8 +247,10 @@ class Model implements ISoftDeletable
      */
     private $curriculumNodes;
 
+
     /** @var Plan\Model[]|GenericCollection */
     private $plans;
+
 
     /**
      * Constructor
@@ -287,10 +303,11 @@ class Model implements ISoftDeletable
         return null;
     }
 
+
     /**
      * Helper method for getting this assessment data model's context.
      *
-     * @param IAssessmentContextDataModel $context
+     * @param IAssessmentContextDataModel|null $context
      * @return static
      */
     public function setAssessmentContext(IAssessmentContextDataModel $context = null)
@@ -328,7 +345,7 @@ class Model implements ISoftDeletable
      *
      * @return bool
      */
-    public function hasTask()
+    public function hasTask(): bool
     {
         return ($this->getTask() instanceof Task);
     }
@@ -338,7 +355,7 @@ class Model implements ISoftDeletable
      *
      * @return bool
      */
-    public function hasQuiz()
+    public function hasQuiz(): bool
     {
         return ($this->getQuiz() instanceof Quiz);
     }
@@ -348,7 +365,7 @@ class Model implements ISoftDeletable
      *
      * @return bool
      */
-    public function hasDueWork()
+    public function hasDueWork(): bool
     {
         return ($this->getDueWork() instanceof DueWork);
     }
@@ -358,7 +375,7 @@ class Model implements ISoftDeletable
      *
      * @return bool
      */
-    public function hasLtiAssessment()
+    public function hasLtiAssessment(): bool
     {
         return ($this->getLtiAssessment() instanceof LtiAssessment);
     }
@@ -370,17 +387,29 @@ class Model implements ISoftDeletable
      *
      * @return bool
      */
-    public function hasProject()
+    public function hasProject(): bool
     {
         return ($this->getProject() instanceof Project);
     }
+
+
+    /**
+     * Does this have a Lesson Plan
+     *
+     * @return bool
+     */
+    public function hasLessonPlan(): bool
+    {
+        return ($this->getLessonPlan() instanceof LessonPlan);
+    }
+
 
     /**
      * Does this have any sub-objects?
      *
      * @return bool
      */
-    public function hasSubObject()
+    public function hasSubObject(): bool
     {
         return $this->hasTask() || $this->hasDueWork() || $this->hasQuiz() || $this->hasProject();
     }
@@ -411,6 +440,9 @@ class Model implements ISoftDeletable
             // this test must go last because old course-based quizzes and works register as "task == true" :(
             return $this->getTask();
         }
+        if ($this->hasLessonPlan()) {
+            return $this->getLessonPlan();
+        }
 
         return null;
     }
@@ -433,7 +465,10 @@ class Model implements ISoftDeletable
             return $this->setLtiAssessment($subObject);
         } elseif ($subObject instanceof Project) {
             return $this->setProject($subObject);
+        } else if ($subObject instanceof LessonPlan) {
+            return $this->setLessonPlan($subObject);
         }
+
         return $this;
     }
 
@@ -693,6 +728,27 @@ class Model implements ISoftDeletable
         $this->ltiAssessment = $ltiAssessment;
         return $this;
     }
+
+
+    /**
+     * @return LessonPlan|null
+     */
+    public function getLessonPlan(): ?LessonPlan
+    {
+        return $this->lessonPlan;
+    }
+
+
+    /**
+     * @param LessonPlan|null $lessonPlan
+     * @return $this
+     */
+    public function setLessonPlan(?LessonPlan $lessonPlan = null): self
+    {
+        $this->lessonPlan = $lessonPlan;
+        return $this;
+    }
+
 
     /**
      * @return null|Project

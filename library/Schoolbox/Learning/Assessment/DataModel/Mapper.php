@@ -77,11 +77,13 @@ class Mapper extends BaseMapper
         // * quiz
         // * project
         // * LTI assessment
+        // * Lesson Plan
         $this->joinsReverseSingle('assessment_id', TaskMapper::class, 'task', 'task');
         $this->joinsReverseSingle('assessment_id', SubmissionBoxMapper::class, 'duework', 'duework');
         $this->joinsReverseSingle('assessment_id', Quiz\Mapper::class, 'quiz', 'quiz');
         $this->joinsReverseSingle('assessment_id', Project\Mapper::class, 'project', 'project');
         $this->joinsReverseSingle('assessment_id', LtiAssessment\Mapper::class, 'ltiAssessment', 'ltiAssessment');
+        $this->joinsReverseSingle('assessment_id', LessonPlan\Mapper::class, 'lessonPlan', 'lessonPlan');
 
         // Participation plan join
         $this->joinsReverseMulti('assessment_id', Plan\Mapper::class, 'plans', 'plans');
@@ -176,6 +178,7 @@ class Mapper extends BaseMapper
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteProject']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteDueWork']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteLtiAssessment']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteLessonPlan']);
     }
 
     /**
@@ -356,6 +359,25 @@ class Mapper extends BaseMapper
 
 
     /**
+     * Delete all of a Lesson Plan's subobjects
+     *
+     * @param Model $assessment
+     * @return bool
+     * @throws BaseMapper\DefinitionException
+     */
+    public function softDeleteLessonPlan(Model $assessment): bool
+    {
+        if ($assessment->getLessonPlan() instanceof \Schoolbox\Learning\Assessment\LessonPlan\Model) {
+            $lessonPlanMapper = $this->getJoinMapper('lessonPlan');
+            $lessonPlans      = $lessonPlanMapper->findByColumn('assessment_id', $assessment->getId());
+            $lessonPlanMapper->softDelete($lessonPlans);
+        }
+
+        return true;
+    }
+
+
+    /**
      * Somewhat efficient query for retrieving the assessments which this student has participated in.
      *
      * @param User                     $student
@@ -422,6 +444,13 @@ class Mapper extends BaseMapper
             JOIN  {$this->getJoinSql('quiz.attempt', 'q', 'qa')} AND qa.user_id = :userId
                   {$planJoin}
             WHERE {$where}
+            
+            UNION 
+            
+            SELECT DISTINCT a.id
+            FROM  {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())} a
+            JOIN  {$this->getJoinSql('lessonPlan', 'a', 'lessonPlan', true)}
+            WHERE {$where}
 
             UNION
 
@@ -462,6 +491,7 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('quiz', 'q')},
                 {$this->getJoinColumnString('ltiAssessment', 'l')},
                 {$this->getJoinColumnString('ltiAssessment.ltiTool', 'ltool')},
+                {$this->getJoinColumnString('lessonPlan', 'lessonPlan')},
                 {$this->getJoinColumnString('project', 'p')},
                 {$this->getJoinColumnString('assessment_folder', 'f')},
                 {$this->getJoinColumnString('assessment_course_unit_specification', 'us')},
@@ -485,6 +515,7 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('quiz', '', 'q', true)}
             LEFT JOIN {$this->getJoinSql('ltiAssessment', '', 'l', true)}
             LEFT JOIN {$this->getJoinSql('ltiAssessment.ltiTool', 'l', 'ltool', true)}
+            LEFT JOIN {$this->getJoinSql('lessonPlan', '', 'lessonPlan', true)}
             LEFT JOIN {$this->getJoinSql('project', '', 'p', true)}
             LEFT JOIN {$this->getJoinSql('assessment_folder', '', 'f', true)}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification', '', 'us', true)}
@@ -778,6 +809,12 @@ class Mapper extends BaseMapper
             } else {
                 $model->setLtiAssessment(null);
             }
+            // Lesson Plan?
+            if ($row['lessonPlan.id']) {
+                $model->setLessonPlan($this->hydrateJoin($row, 'lessonPlan', 'lessonPlan'));
+            } else {
+                $model->setLessonPlan(null);
+            }
             // Project?
             if ($row['p.id']) {
                 $projectIds[$row['p.id']] = true;
@@ -840,6 +877,9 @@ class Mapper extends BaseMapper
         /* Task files
          */
         $modelList = $this->augmentListWithTaskFiles($modelList, $taskIds);
+
+        /* TODO Augment with Lesson Plan Files
+         */
 
         // Project contexts
         if ($hydrateProjectContext) {
