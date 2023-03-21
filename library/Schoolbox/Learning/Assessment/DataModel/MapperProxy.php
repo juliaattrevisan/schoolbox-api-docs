@@ -1478,14 +1478,6 @@ class MapperProxy
             /* TODO Delete the files. Maybe
              */
 
-            /* Set the Deleted By to the current user when deleting
-             * the Lesson Plan Itself
-             *
-             * Also try to bypass a dirty doubletap
-             */
-            $subModel->setDeletedBy($this->baseMapper->getSessionUser());
-
-            $lessonPlanMapper->save($subModel);
             $lessonPlanMapper->delete($subModel);
         } else {
             $this->baseMapper->delete($dataModel);
