@@ -7,16 +7,59 @@ import { EditorConfig, EditorToolbar } from "@js/editor/types/editorTypes";
 import { insertElementAfter, injectScript, isScriptAdded } from "@js/util/domUtils";
 
 /**
+ * Add the editor to the global scope so it can be accessed
+ * in other twig files etc
+ *
+ * @param { Editor } editor - the CKEditor instance
+ * @param { HTMLTextAreaElement } textarea - the textarea the CKEditor will replace
+ */
+function addToGlobalScope(editor: Editor, textarea: HTMLTextAreaElement) {
+    if (textarea.id) {
+        window.sbProps.editors[textarea.id] = editor;
+    } else if (textarea.name) {
+        window.sbProps.editors[textarea.name] = editor;
+    }
+}
+
+/**
+ * To be able to access our editor config from within the editor,
+ * we just append the .sbConfig to the editor config instance
+ *
+ * @param { Editor } editor - the CKEditor instance
+ * @param { EditorConfig } config - the CKEditor config object
+ */
+function addSBConfigToEditor(editor: Editor, config: EditorConfig) {
+    editor.config.sbConfig = config;
+}
+
+/**
  * Add the word count UI to the bottom of the editor
  * Its assumed this method is called once the editor has been created,
  * so editorTextArea.nextSibling will be the newly created editor instance
  *
  * @param { HTMLTextAreaElement } textarea - the textarea the CKEditor has replaced
  * @param { Editor } editor - the CKEditor instance
+ * @param { EditorConfig } config - the CKEditor config object
  */
-export function insertWordCount(textarea: HTMLTextAreaElement, editor: Editor) {
-    const wordCountPlugin = editor.plugins.get("WordCount");
-    insertElementAfter(textarea.nextSibling, wordCountPlugin.wordCountContainer);
+function insertWordCount(textarea: HTMLTextAreaElement, editor: Editor, config: EditorConfig) {
+    if (config.toolbar === EditorToolbar.FULL) {
+        const wordCountPlugin = editor.plugins.get("WordCount");
+        insertElementAfter(textarea.nextSibling, wordCountPlugin.wordCountContainer);
+    }
+}
+
+/**
+ * For the simple editor, we need to disable the drag and drop
+ * and the ability for the editor to auto embed media
+ *
+ * @param { Editor } editor - the CKEditor instance
+ * @param { EditorConfig } config - the CKEditor config object
+ */
+function disableAutoMedia(editor: Editor, config: EditorConfig) {
+    if (config.toolbar === EditorToolbar.SIMPLE) {
+        editor.plugins.get("DragDrop").forceDisabled("disableDragDrop");
+        editor.plugins.get("AutoMediaEmbed").destroy();
+    }
 }
 
 /**
@@ -25,7 +68,7 @@ export function insertWordCount(textarea: HTMLTextAreaElement, editor: Editor) {
  *
  * @todo - review this, there may be a better way to handle this
  */
-export function removeValidation() {
+function removeValidation() {
     $("form").each(function () {
         if ($(this).data("validator")) {
             $(this).data("validator").settings.ignore = ".ck";
@@ -36,26 +79,15 @@ export function removeValidation() {
 /**
  * Add the iFramely embed code in order for iframe embeds to work
  * For more info: https://iframely.com/docs/ckeditor
- */
-export async function addIframelyEmbed() {
-    const script = "//cdn.iframe.ly/embed.js?cancel=0";
-    if (!isScriptAdded(script)) {
-        await injectScript(script);
-    }
-}
-
-/**
- * Add the editor to the global scope so it can be accessed
- * in other twig files etc
  *
- * @param { Editor } editor - the CKEditor instance
- * @param { HTMLTextAreaElement } textarea - the textarea the CKEditor will replace
+ * @param { EditorConfig } config - the CKEditor config object
  */
-export function addToGlobalScope(editor: Editor, textarea: HTMLTextAreaElement) {
-    if (textarea.id) {
-        window.sbProps.editors[textarea.id] = editor;
-    } else if (textarea.name) {
-        window.sbProps.editors[textarea.name] = editor;
+async function addIframelyEmbed(config: EditorConfig) {
+    if (config.toolbar === EditorToolbar.FULL || config.toolbar === EditorToolbar.COMMENT) {
+        const script = "//cdn.iframe.ly/embed.js?cancel=0";
+        if (!isScriptAdded(script)) {
+            await injectScript(script);
+        }
     }
 }
 
@@ -68,7 +100,7 @@ export function addToGlobalScope(editor: Editor, textarea: HTMLTextAreaElement) 
  *
  * @param { Editor } editor - the CKEditor instance
  */
-export async function attachInspector(editor: Editor) {
+async function attachInspector(editor: Editor) {
     if (process.env.NODE_ENV === "development") {
         const inspector = await import("@ckeditor/ckeditor5-inspector");
         inspector.default.attach(editor);
@@ -83,15 +115,11 @@ export async function attachInspector(editor: Editor) {
  * @param { EditorConfig } config - the CKEditor config object
  */
 export async function modifyEditor(textarea: HTMLTextAreaElement, editor: Editor, config: EditorConfig) {
-    insertWordCount(textarea, editor);
-    removeValidation();
     addToGlobalScope(editor, textarea);
-    editor.config.sbConfig = config;
-    attachInspector(editor);
-    if (config.toolbar === EditorToolbar.SIMPLE) {
-        editor.plugins.get("DragDrop").forceDisabled("disableDragDrop");
-        editor.plugins.get("AutoMediaEmbed").destroy();
-    } else {
-        await addIframelyEmbed();
-    }
+    addSBConfigToEditor(editor, config);
+    insertWordCount(textarea, editor, config);
+    disableAutoMedia(editor, config);
+    removeValidation();
+    await addIframelyEmbed(config);
+    await attachInspector(editor);
 }
