@@ -32,6 +32,8 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Learning\Quiz;
 use Schoolbox\LTI\Assessment as LtiAssessment;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 use UnderflowException;
@@ -492,7 +494,6 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('ltiAssessment', 'l')},
                 {$this->getJoinColumnString('ltiAssessment.ltiTool', 'ltool')},
                 {$this->getJoinColumnString('lessonPlan', 'lessonPlan')},
-                {$this->getJoinColumnString('lessonPlan.lessonPlanTemplate', 'lessonPlanTemplate')},
                 {$this->getJoinColumnString('project', 'p')},
                 {$this->getJoinColumnString('assessment_folder', 'f')},
                 {$this->getJoinColumnString('assessment_course_unit_specification', 'us')},
@@ -518,8 +519,6 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('ltiAssessment.ltiTool', 'l', 'ltool', true)}
             LEFT JOIN {$this->getJoinSql('project', '', 'p', true)}
             LEFT JOIN {$this->getJoinSql('lessonPlan', '', 'lessonPlan', true)}
-            LEFT JOIN {$this->getJoinSql('lessonPlan.lessonPlanTemplate', 'lessonPlan', 'lessonPlanTemplate', true)}
-            LEFT JOIN {$this->getJoinSql('lessonPlan.lessonPlanField', 'lessonPlan', 'lessonPlanField', true)}            
             LEFT JOIN {$this->getJoinSql('assessment_folder', '', 'f', true)}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification', '', 'us', true)}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification.folder', 'us', 'usf', true)}
@@ -776,6 +775,7 @@ class Mapper extends BaseMapper
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             /** @var Model $model */
             $model = $this->hydrate($row);
+
             $model->setWorkType($this->hydrateJoin($row, 'work_type', 'wt'));
 
             // Task?
@@ -818,27 +818,8 @@ class Mapper extends BaseMapper
                 $lessonPlanIds[] = $row['lessonPlan.id'];
 
                 $lessonPlan = $this->hydrateJoin($row, 'lessonPlan', 'lessonPlan');
-                $lessonPlanTemplate = $this->hydrateJoin($row, 'lessonPlan.lessonPlanTemplate', 'lessonPlanTemplate');
-                $lessonPlan->setLessonPlanTemplate($lessonPlanTemplate);
 
                 $model->setLessonPlan($lessonPlan);
-
-                /* Grab the fields too
-                 */
-                $lessonPlanField = $this->hydrateJoin($row, 'lessonPlan.lessonPlanField', 'lessonPlanField');
-
-                /* $lessonPlanField can be null when there aren't any;
-                 * they don't exist yet, or you're creating them for the first time
-                 */
-                if (null !== $lessonPlanField) {
-                    /* Init collection before shanking stuff in
-                     */
-                    if (null === $lessonPlan->getFields()) {
-                        $lessonPlan->setFields(\Schoolbox\Learning\Assessment\DataModel\LessonPlan\Field\Mapper::getInstance()->createCollection());
-                    }
-
-                    $lessonPlan->addField($lessonPlanField);
-                }
             } else {
                 $model->setLessonPlan(null);
             }
@@ -907,6 +888,7 @@ class Mapper extends BaseMapper
 
         /* TODO Augment with Lesson Plan Files
          */
+
         $modelList = $this->augmentWithLessonPlanFields($modelList, $lessonPlanIds);
 
         // Project contexts
@@ -1260,14 +1242,27 @@ class Mapper extends BaseMapper
      * @param Collection $modelList
      * @param array      $lessonPlanIds
      * @return Collection
+     * @throws Exception
+     * @throws Deleted
      */
     private function augmentWithLessonPlanFields(Collection $modelList, array $lessonPlanIds): Collection
     {
+        /* Fetch all the Lesson Plan Fields used by this Lesson Plan
+         */
         $lessonPlanFieldMapper = \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Field\Mapper::getInstance();
 
         foreach ($modelList as $model) {
             $model->getLessonPlan()->setFields($lessonPlanFieldMapper->findByColumn('lesson_plan_id', $model->getLessonPlan()->getId()));
         }
+
+        /* Fetch all the Lesson Plan Template + Lesson Plan Template Fields too
+         * (Fields need to know about their Template Fields)
+         */
+        $lessonPlanTemplateMapper = \Schoolbox\Admin\LessonPlan\Template\Mapper::getInstance();
+
+        $lessonPlanTemplate = $lessonPlanTemplateMapper->findById($model->getLessonPlan()->getLessonPlanTemplate()->getId());
+
+        $model->getLessonPlan()->setLessonPlanTemplate($lessonPlanTemplate);
 
         return $modelList;
     }
