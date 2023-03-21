@@ -181,7 +181,7 @@ class RecursiveUndeleterCli extends CliTool\App
      * Check as best we can that all requirements are met for the undeletion process.
      * If so, return a blank string. If not, return the reason why not as a string.
      *
-     * @param                    $rootIds
+     * @param array              $rootIds
      * @param RecursiveUndeleter $recursiveUndeleter
      * @return String
      */
