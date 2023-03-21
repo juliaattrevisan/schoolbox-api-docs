@@ -493,7 +493,6 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('ltiAssessment.ltiTool', 'ltool')},
                 {$this->getJoinColumnString('lessonPlan', 'lessonPlan')},
                 {$this->getJoinColumnString('lessonPlan.lessonPlanTemplate', 'lessonPlanTemplate')},
-                {$this->getJoinColumnString('lessonPlan.lessonPlanField', 'lessonPlanField')},
                 {$this->getJoinColumnString('project', 'p')},
                 {$this->getJoinColumnString('assessment_folder', 'f')},
                 {$this->getJoinColumnString('assessment_course_unit_specification', 'us')},
@@ -517,10 +516,10 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('quiz', '', 'q', true)}
             LEFT JOIN {$this->getJoinSql('ltiAssessment', '', 'l', true)}
             LEFT JOIN {$this->getJoinSql('ltiAssessment.ltiTool', 'l', 'ltool', true)}
+            LEFT JOIN {$this->getJoinSql('project', '', 'p', true)}
             LEFT JOIN {$this->getJoinSql('lessonPlan', '', 'lessonPlan', true)}
             LEFT JOIN {$this->getJoinSql('lessonPlan.lessonPlanTemplate', 'lessonPlan', 'lessonPlanTemplate', true)}
             LEFT JOIN {$this->getJoinSql('lessonPlan.lessonPlanField', 'lessonPlan', 'lessonPlanField', true)}            
-            LEFT JOIN {$this->getJoinSql('project', '', 'p', true)}
             LEFT JOIN {$this->getJoinSql('assessment_folder', '', 'f', true)}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification', '', 'us', true)}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification.folder', 'us', 'usf', true)}
