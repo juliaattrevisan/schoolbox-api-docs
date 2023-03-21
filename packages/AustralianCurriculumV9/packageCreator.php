@@ -133,7 +133,6 @@ $subjectFiles = [
         'Korean' => 'languages-korean-scope-and-sequence-f-10-7-10-v9.csv',
         'Modern Greek' => 'languages-modern-greek-scope-and-sequence-f-10-7-10-v9.csv',
         'Spanish' => 'languages-spanish-scope-and-sequence-f-10-7-10-v9.csv',
-
     ]
 ];
 
@@ -188,15 +187,9 @@ foreach ($subjectFiles as $subject => $filesArray) {
                 case "Mathematics":
                     processRowsStrand($handle, $output_rows, $lastSubject_id);
                     break;
-                case "Technologies":
-                    $node_id = count($output_rows) + 1;
-                    //create the subject
-                    $node_name     = $subSubject;
-                    $output_rows[] = [$node_id, $seenSubjects[$subject], $node_name, null, 0, null];
-                    processRowsSubStrand($handle, $output_rows, $node_id);
-                    break;
-                case "Humanities and Social Sciences":
                 case "Languages":
+                case "Humanities and Social Sciences":
+                case "Technologies":
                     $node_id = count($output_rows) + 1;
                     //create the subject
                     $node_name     = $subSubject;
