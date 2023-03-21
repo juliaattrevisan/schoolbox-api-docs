@@ -7,7 +7,7 @@
  * @param $lastSubject_id
  * @return void
  */
-function processRowsSubStrand($handle, &$output_rows, $lastSubject_id): void
+function processRowsSubStrand($handle, &$output_rows, $lastSubject_id, &$seenCodes): void
 {
     // Set last references to.
     $lastYear_id = $lastStrand_id = $lastSubStrand_id = $nodeParent = 0;
@@ -61,7 +61,13 @@ function processRowsSubStrand($handle, &$output_rows, $lastSubject_id): void
                     } else {
                         $node_code = trim($nodeFormat[1]);
                     }
+                    // If the curriculum code was already used, don't use it again...
+                    if (in_array($node_code, $seenCodes)) {
+                        echo sprintf("Duped code: '%s'\n", $node_code);
+                        continue;
+                    }
                     $output_rows[] = [$node_id, $lastSubStrand_id, $node_name, $node_code, 0, null];
+                    $seenCodes[] = $node_code;
                 }
             }
         }
@@ -120,6 +126,9 @@ $lastSubject_id = 0;
 // Seen subject list
 $seenSubjects = [];
 
+// Seen curriculum codes
+$node_code = [];
+
 // Define a 2-dimensional array to store the rows of the output CSV file
 $output_rows = [];
 
@@ -151,11 +160,11 @@ foreach ($subjectFiles as $subject => $filesArray) {
                     //create the subject
                     $node_name     = $subSubject;
                     $output_rows[] = [$node_id, $seenSubjects[$subject], $node_name, null, 0, null];
-                    processRowsSubStrand($handle, $output_rows, $node_id);
+                    processRowsSubStrand($handle, $output_rows, $node_id, $node_code);
                     break;
                 default:
                     // Subjects with no sub subject
-                    processRowsSubStrand($handle, $output_rows, $lastSubject_id);
+                    processRowsSubStrand($handle, $output_rows, $lastSubject_id, $node_code);
             }
             fclose($handle);
         }
