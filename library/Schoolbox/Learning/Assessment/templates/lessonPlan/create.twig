@@ -29,6 +29,16 @@
     </div>
 </fieldset>
 
+{# Assessment dates; basically shanked from another assessment type's create.twig
+ # You have to manually do it every time you add a new assessment type. Only implementations
+ # can have dates, not specifications.
+ #
+ # TODO What is the ordering of this form - do the dates come before or after the Lesson Plan Fields?
+ #}
+{% if context.baseContext is not unitSpecification %}
+    {% include '@learningAssessment/fragments/dates.twig' %}
+{% endif %}
+
 {% if assessment.id %}
     {# Update a Lesson Plan. The fields' data already exist as Lesson Plan Fields, but we
      # need to remember the Lesson Plan Template from which they spawned.
