@@ -3,11 +3,12 @@
 /**
  * Function to work with 'standard' subjects, that have strands and substrands
  * @param $handle
- * @param $output_rows
- * @param $lastSubject_id
+ * @param array    $output_rows
+ * @param int      $lastSubject_id
+ * @param array    $seenCodes
  * @return void
  */
-function processRowsSubStrand($handle, &$output_rows, $lastSubject_id, &$seenCodes): void
+function processRowsSubStrand($handle, array &$output_rows, int $lastSubject_id, array &$seenCodes): void
 {
     // Set last references to.
     $lastYear_id = $lastStrand_id = $lastSubStrand_id = $nodeParent = 0;
@@ -127,7 +128,7 @@ $lastSubject_id = 0;
 $seenSubjects = [];
 
 // Seen curriculum codes
-$node_code = [];
+$seenCodes = [];
 
 // Define a 2-dimensional array to store the rows of the output CSV file
 $output_rows = [];
@@ -160,11 +161,11 @@ foreach ($subjectFiles as $subject => $filesArray) {
                     //create the subject
                     $node_name     = $subSubject;
                     $output_rows[] = [$node_id, $seenSubjects[$subject], $node_name, null, 0, null];
-                    processRowsSubStrand($handle, $output_rows, $node_id, $node_code);
+                    processRowsSubStrand($handle, $output_rows, $node_id, $seenCodes);
                     break;
                 default:
                     // Subjects with no sub subject
-                    processRowsSubStrand($handle, $output_rows, $lastSubject_id, $node_code);
+                    processRowsSubStrand($handle, $output_rows, $lastSubject_id, $seenCodes);
             }
             fclose($handle);
         }
