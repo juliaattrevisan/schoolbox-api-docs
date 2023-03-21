@@ -1,5 +1,5 @@
 import type { Editor } from "@ckeditor/ckeditor5-core";
-import { EditorConfig, EditorToolbar } from "@js/editor/types/editorTypes";
+import { EditorConfig } from "@js/editor/types/editorTypes";
 import { insertElementAfter } from "@js/util/domUtils";
 
 /**
@@ -25,6 +25,7 @@ export function getWordCountSettings() {
 function getCharacterElement() {
     const characterElement = document.createElement("div");
     characterElement.classList.add("ck-word-count__characters");
+    characterElement.style.display = "none";
     return characterElement;
 }
 
@@ -38,6 +39,7 @@ function getLimitWarningElement(config: EditorConfig) {
     const limitWarningElement = document.createElement("div");
     limitWarningElement.classList.add("ck-word-count__limit-warning");
     limitWarningElement.innerHTML = `<b>Warning:</b> The limit of ${config.maxCharCount} Characters has been reached. Please reduce the content to below the limit to save.`;
+    limitWarningElement.style.display = "none";
     return limitWarningElement;
 }
 
@@ -50,13 +52,16 @@ function getLimitWarningElement(config: EditorConfig) {
  */
 function updateWordCount(editor: Editor, config: EditorConfig, wordCountContainer: HTMLDivElement) {
     const characterCountElement = wordCountContainer.querySelector(".ck-word-count__characters") as HTMLDivElement;
-    editor.plugins.get("WordCount").on("update", (event, stats) => {
+    const limitWarningElement = wordCountContainer.querySelector(".ck-word-count__limit-warning") as HTMLDivElement;
+    editor.plugins.get("WordCount").on("update", () => {
         const currentCharacterLength = editor.getData().length;
         characterCountElement.innerText = `Characters: ${currentCharacterLength}`;
         if (currentCharacterLength > config.maxCharCount) {
-            wordCountContainer.style.display = "flex";
+            characterCountElement.style.display = "block";
+            limitWarningElement.style.display = "block";
         } else {
-            wordCountContainer.style.display = "none";
+            characterCountElement.style.display = "none";
+            limitWarningElement.style.display = "none";
         }
     });
 }
@@ -72,9 +77,13 @@ function updateWordCount(editor: Editor, config: EditorConfig, wordCountContaine
  */
 export function insertWordCount(textarea: HTMLTextAreaElement, editor: Editor, config: EditorConfig) {
     const wordCountContainer = editor.plugins.get("WordCount").wordCountContainer as HTMLDivElement;
-    wordCountContainer.setAttribute("data-word-count-id", editor.id);
     insertElementAfter(textarea.nextSibling, wordCountContainer);
     insertElementAfter(wordCountContainer.lastChild, getCharacterElement());
     insertElementAfter(wordCountContainer.lastChild, getLimitWarningElement(config));
+    if (config.showWordCount) {
+        wordCountContainer.style.display = "flex";
+    } else {
+        wordCountContainer.style.display = "none";
+    }
     updateWordCount(editor, config, wordCountContainer);
 }

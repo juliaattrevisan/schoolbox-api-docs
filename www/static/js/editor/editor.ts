@@ -31,20 +31,27 @@ async function onCreated(textarea: HTMLTextAreaElement, editor: Editor, config: 
 }
 
 /**
+ * set up any default config when it's not been defined
+ *
+ * @param { EditorConfig } config - the config to use when creating the editor
+ */
+function addDefaultConfig(config: EditorConfig) {
+    if (config.toolbar === undefined) {
+        config.toolbar = EditorToolbar.FULL;
+    }
+    if (config.maxCharCount === undefined) {
+        config.maxCharCount = 65000;
+    }
+}
+
+/**
  * create the ckeditor instance
  *
  * @param { HTMLTextAreaElement } textarea - the textarea the CKEditor will replace
  * @param { EditorConfig } config - the config to use when creating the editor
  */
 function create(textarea: HTMLTextAreaElement, config: EditorConfig) {
-    // if no toolbar is specified, use the full toolbar
-    if (config.toolbar === undefined) {
-        config.toolbar = EditorToolbar.FULL;
-    }
-    if (config.maxCharCount === undefined) {
-        // config.maxCharCount = 65000;
-        config.maxCharCount = 20;
-    }
+    addDefaultConfig(config);
     ClassicEditor.create(textarea, getConfig(config))
         .then((editor) => {
             onCreated(textarea, editor, config);
@@ -65,7 +72,7 @@ function onCreate(event: CustomEvent) {
     targetElements.forEach((targetElement) => {
         // assume that each targetElement could contain multiple instances
         document.querySelectorAll(targetElement).forEach((textarea) => {
-            initCheckData(textarea, config);
+            initCheckData(textarea as HTMLTextAreaElement, config);
             create(textarea as HTMLTextAreaElement, config);
         });
     });
