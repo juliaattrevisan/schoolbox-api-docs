@@ -461,6 +461,7 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('duework.rubric_capability_grade_group_id', 'rcgg')},
                 {$this->getJoinColumnString('quiz', 'q')},
                 {$this->getJoinColumnString('ltiAssessment', 'l')},
+                {$this->getJoinColumnString('ltiAssessment.ltiTool', 'ltool')},
                 {$this->getJoinColumnString('project', 'p')},
                 {$this->getJoinColumnString('assessment_folder', 'f')},
                 {$this->getJoinColumnString('assessment_course_unit_specification', 'us')},
@@ -483,6 +484,7 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('duework.rubric_capability_grade_group_id', 'd', 'rcgg', true)}
             LEFT JOIN {$this->getJoinSql('quiz', '', 'q', true)}
             LEFT JOIN {$this->getJoinSql('ltiAssessment', '', 'l', true)}
+            LEFT JOIN {$this->getJoinSql('ltiAssessment.ltiTool', 'l', 'ltool', true)}
             LEFT JOIN {$this->getJoinSql('project', '', 'p', true)}
             LEFT JOIN {$this->getJoinSql('assessment_folder', '', 'f', true)}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification', '', 'us', true)}
@@ -769,7 +771,10 @@ class Mapper extends BaseMapper
             }
             // LTI assessment?
             if ($row['l.id']) {
-                $model->setLtiAssessment($this->hydrateJoin($row, 'ltiAssessment', 'l'));
+                $model->setLtiAssessment(
+                    $this->hydrateJoin($row, 'ltiAssessment', 'l')
+                        ->setLtiTool($this->hydrateJoin($row, 'ltiAssessment.ltiTool', 'ltool'))
+                );
             } else {
                 $model->setLtiAssessment(null);
             }
