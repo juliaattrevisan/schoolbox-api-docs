@@ -126,8 +126,14 @@ $subjectFiles = [
     'Languages' => [
         'Chinese' => 'languages-chinese-scope-and-sequence-f-10-7-10-v9.csv',
         'French' => 'languages-french-scope-and-sequence-f-10-7-10-v9.csv',
+        'German' => 'languages-german-scope-and-sequence-f-10-7-10-v9.csv',
+        'Indonesian' => 'languages-indonesian-scope-and-sequence-f-10-7-10-v9.csv',
         'Italian' => 'languages-italian-scope-and-sequence-f-10-7-10-v9.csv',
         'Japanese' => 'languages-japanese-scope-and-sequence-f-10-7-10-v9.csv',
+        'Korean' => 'languages-korean-scope-and-sequence-f-10-7-10-v9.csv',
+        'Modern Greek' => 'languages-modern-greek-scope-and-sequence-f-10-7-10-v9.csv',
+        'Spanish' => 'languages-spanish-scope-and-sequence-f-10-7-10-v9.csv',
+
     ]
 ];
 
