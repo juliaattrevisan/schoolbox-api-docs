@@ -13,19 +13,23 @@
 {% endif %}
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/clipboard.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/clipboard/jquery.clipboard-selector.js?v={{ config.site_version }}"></script>
 <script type="text/javascript">
     $(function() {
 
         // Disable iFrame embed on mail content
-        $.fn.alaressEditor({
-            targetElements: $('#body'),
-            removePlugins: 'autoembed,uploadimage,schoolboxresource,schoolboxiframe',
-            baseHref: "{{ baseHref }}"
-        });
+        /**
+         * Initialise the editor
+         */
+        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+            detail: {
+                targetElements: ['#body'],
+                toolbar: "simple",
+                baseHref: "{{ baseHref }}",
+            }
+        }));
 
         var options = {
             ajax: {
