@@ -125,7 +125,7 @@ class RecursiveUndeleterCli extends CliTool\App
                 exit(1);
             }
 
-            $modelsByMapperClassByRootMapperClass = $this->getModelsByMapperClassByRootMapperClass(
+            $modelsByMapperClassByRootMapperClass = $this->getDataStructureForAllRootModels(
                 $this->rootIds,
                 $recursiveUndeleter
             );
@@ -222,7 +222,7 @@ class RecursiveUndeleterCli extends CliTool\App
      *
      * @return array<class-string, array<class-string, Collection|IMapper[]>>
      */
-    private function getModelsByMapperClassByRootMapperClass($rootIds, RecursiveUndeleter $recursiveUndeleter): array
+    private function getDataStructureForAllRootModels($rootIds, RecursiveUndeleter $recursiveUndeleter): array
     {
         $this->logger->debug("Examining IDs argument to see if user requested all ('*') root objects");
 
