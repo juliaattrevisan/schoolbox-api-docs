@@ -1,9 +1,10 @@
 /**
- * Misc editor utils that can be used by any editor type
+ * Once the editor has been created, we can add in any additional setup required
  */
 
-import { insertElementAfter, injectScript, isScriptAdded } from "@js/util/domUtils";
 import type { Editor } from "@ckeditor/ckeditor5-core";
+import { EditorConfig, EditorToolbar } from "@js/editor/types/editorTypes";
+import { insertElementAfter, injectScript, isScriptAdded } from "@js/util/domUtils";
 
 /**
  * Add the word count UI to the bottom of the editor
@@ -71,5 +72,26 @@ export async function attachInspector(editor: Editor) {
     if (process.env.NODE_ENV === "development") {
         const inspector = await import("@ckeditor/ckeditor5-inspector");
         inspector.default.attach(editor);
+    }
+}
+
+/**
+ * Add in any additional setup required and then dispatch that the editor is ready
+ *
+ * @param { HTMLTextAreaElement } textarea - the textarea the CKEditor will replace
+ * @param { Editor } editor - the CKEditor instance
+ * @param { EditorConfig } config - the CKEditor config object
+ */
+export async function modifyEditor(textarea: HTMLTextAreaElement, editor: Editor, config: EditorConfig) {
+    insertWordCount(textarea, editor);
+    removeValidation();
+    addToGlobalScope(editor, textarea);
+    editor.config.sbConfig = config;
+    attachInspector(editor);
+    if (config.toolbar === EditorToolbar.SIMPLE) {
+        editor.plugins.get("DragDrop").forceDisabled("disableDragDrop");
+        editor.plugins.get("AutoMediaEmbed").destroy();
+    } else {
+        await addIframelyEmbed();
     }
 }

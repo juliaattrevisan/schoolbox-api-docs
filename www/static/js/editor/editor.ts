@@ -6,9 +6,9 @@ import ClassicEditor from "@ckeditor/ckeditor5-editor-classic/src/classiceditor"
 import type { Editor } from "@ckeditor/ckeditor5-core";
 import { getConfig } from "@js/editor/config/editorConfig";
 import { EditorConfig, EditorToolbar } from "@js/editor/types/editorTypes";
-import { insertWordCount, removeValidation, addIframelyEmbed, addToGlobalScope, attachInspector } from "@js/editor/util/editorUtils";
 import { EditorEvent } from "@js/editor/event/editorEvent";
 import { initCheckData } from "@js/editor/config/editorCheckData";
+import { modifyEditor } from "@js/editor/config/editorCreated";
 import "@js/editor/styles/editor.css"; // to overwrite some of the styles
 
 /**
@@ -19,17 +19,7 @@ import "@js/editor/styles/editor.css"; // to overwrite some of the styles
  * @param { EditorConfig } config - the CKEditor config object
  */
 async function onCreated(textarea: HTMLTextAreaElement, editor: Editor, config: EditorConfig) {
-    insertWordCount(textarea, editor);
-    removeValidation();
-    addToGlobalScope(editor, textarea);
-    editor.config.sbConfig = config;
-    attachInspector(editor);
-    if (config.toolbar === EditorToolbar.SIMPLE) {
-        editor.plugins.get("DragDrop").forceDisabled("disableDragDrop");
-        editor.plugins.get("AutoMediaEmbed").destroy();
-    } else {
-        await addIframelyEmbed();
-    }
+    await modifyEditor(textarea, editor, config);
     textarea.dispatchEvent(
         new CustomEvent(EditorEvent.EDITOR__CREATED, {
             detail: {
