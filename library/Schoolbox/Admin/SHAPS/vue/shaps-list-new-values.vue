@@ -53,8 +53,10 @@ export default {
         updateButtonText() {
             if (this.isProcessing) {
                 return `<em>Processing, please wait...</em>`;
-            } else {
+            } else if (this.courses.length > 0) {
                 return `Update Selected`;
+            } else {
+                return 'Provision Selected';
             }
         },
     },
@@ -165,8 +167,8 @@ export default {
             </div>
             <div v-else>
                 <div>
-                    <h2>Provision {{ selectedRowsCountWithRowName }} selected</h2>
-                    <label> Course Involvement </label>
+                    <h2>Provision to Schoolbox Help - {{ selectedRowsCountWithRowName }} selected</h2>
+                    <label v-if="courses.length > 0"> Course Involvement </label>
                     <div v-for="course in courses">
                         <label :for="'apply_course-' + String(course.id)">{{ course.name }}</label>
                         <select
