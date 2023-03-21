@@ -122,6 +122,12 @@ $subjectFiles = [
         'Economics and Business' => 'humanities-and-social-sciences-economics-and-business-scope-and-sequence-v9.csv',
         'Geography' => 'humanities-and-social-sciences-geography-scope-and-sequence-v9.csv',
         'History' => 'humanities-and-social-sciences-history-scope-and-sequence-v9.csv'
+    ],
+    'Languages' => [
+        'Chinese' => 'languages-chinese-scope-and-sequence-f-10-7-10-v9.csv',
+        'French' => 'languages-french-scope-and-sequence-f-10-7-10-v9.csv',
+        'Italian' => 'languages-italian-scope-and-sequence-f-10-7-10-v9.csv',
+        'Japanese' => 'languages-japanese-scope-and-sequence-f-10-7-10-v9.csv',
     ]
 ];
 
@@ -184,6 +190,7 @@ foreach ($subjectFiles as $subject => $filesArray) {
                     processRowsSubStrand($handle, $output_rows, $node_id);
                     break;
                 case "Humanities and Social Sciences":
+                case "Languages":
                     $node_id = count($output_rows) + 1;
                     //create the subject
                     $node_name     = $subSubject;
