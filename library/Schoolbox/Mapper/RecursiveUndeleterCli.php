@@ -191,7 +191,7 @@ class RecursiveUndeleterCli extends CliTool\App
      *     ]
      *     If only one type of object is defined by rows in the table, the array will contain only one key:value pair.
      *
-     * @return array
+     * @return array<class-string, array<class-string, Collection|IMapper[]>>
      */
     private function getModelsByMapperClassByRootMapperClass($rootIds, RecursiveUndeleter $recursiveUndeleter): array
     {
