@@ -82,8 +82,28 @@
 
         window.sbProps.imageLightboxLicenseKey = "{{ config.image_lightbox_license_key }}";
 
-        </script>
-        {% endautoescape %}
+        window.sbProps.colourDefaults = [
+            "{{ config.skin_colour_navigation_background }}",
+            "{{ config.skin_colour_content_ui_foreground }}",
+            "{{ config.skin_colour_content_ui_background }}",
+            "rgb(0, 128, 255)",
+            "rgb(0, 173, 237)",
+            "rgb(77, 199, 235)",
+            "rgb(0, 227, 143)",
+            "rgb(0, 158, 178)",
+            "rgb(28, 158, 28)",
+            "rgb(114, 198, 0)",
+            "rgb(204, 227, 0)",
+            "rgb(255, 209, 0)",
+            "rgb(255, 125, 0)",
+            "rgb(191, 31, 46)",
+            "rgb(255, 0, 0)",
+            "rgb(255, 74, 115)",
+            "rgb(194, 0, 158)",
+            "rgb(105, 0, 176)",
+        ]
+    </script>
+    {% endautoescape %}
 
     {% if config.site_usage_tracking %}
     {% autoescape 'js' %}
