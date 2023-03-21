@@ -19,8 +19,7 @@
 </style>
 <!-- BEGIN modify_layout -->
 <script type="text/javascript" src="{CDN_PREFIX}/js/bundle/colourPicker.js?v={SITE_VERSION}"></script>
-<script type="text/javascript" src="{CDN_PREFIX}/js/ckeditor/ckeditor.js?v={SITE_VERSION}"></script>
-<script type="text/javascript" src="{CDN_PREFIX}/js/editor/jquery.editor.js?v={SITE_VERSION}"></script>
+<script type="text/javascript" src="{CDN_PREFIX}/js/bundle/editor.js?v={SITE_VERSION}"></script>
 <script type="text/javascript" src="{CDN_PREFIX}/js/vendors/selectize/selectize.min.js?v={SITE_VERSION}"></script>
 <script type="text/javascript" src="{CDN_PREFIX}/js/vendors/selectize/jquery.selectize-selector.js?v={SITE_VERSION}"></script>
 <script type="text/javascript" src="{CDN_PREFIX}/js/bundle/masonry.js?v={SITE_VERSION}"></script>
@@ -112,10 +111,6 @@
             tab.foundation('reflow');
         });
 
-		$.fn.alaressEditor({
-            targetElements: $('[data-html-editor]')
-		});
-
 		// all forms should submit without prevention
 		$("#component-layout").on('submit', 'form',  function() {
 			window.check = false;
@@ -131,6 +126,14 @@
 				dataType: 'json'
 			}
 		});
+
+        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+            detail: {
+                targetElements: ['[data-html-editor]'],
+                toolbar: "comment",
+            }
+        }));
+
 
         $('[data-interaction="delete"]').click(function(e){
             e.preventDefault();
@@ -158,6 +161,7 @@
                 eportfolio.removeClass('show-empty');
             }
         });
+
     });
 </script>
 <!-- END modify_layout -->
