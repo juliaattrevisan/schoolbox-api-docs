@@ -179,11 +179,7 @@ class LessonPlan implements IAssessmentTypeTranslator
          * utilisation of a Lesson Plan's fields anyway)
          */
         if (null !== $dataModel->getFields()) {
-            /* Note: findByIdForReview() uses findByColumn but won't hydrate Lesson Plans' Fields
-             * so this collection will be empty - operating on fields might require you to do it
-             * somewhat explicitly and manually
-             *
-             * findByIdForReview() is used by the project result cache and also the Assessment Module.php
+            /* findByIdForReview() is used by the project result cache and also the Assessment Module.php
              * to facilitate preloads. Such preloads might be incomplete.
              */
             foreach ($dataModel->getFields() as $lessonPlanField) {

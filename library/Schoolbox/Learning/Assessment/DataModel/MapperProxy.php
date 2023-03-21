@@ -1472,15 +1472,8 @@ class MapperProxy
             $this->baseMapper->delete($dataModel);
 
             /* Delete the fields via the Lesson Plan Field Mapper
-             *
-             * Note: findByIdForReview() uses findByColumn but won't hydrate Lesson Plans' Fields
-             * so this collection will be empty - operating on fields might require you to do it
-             * somewhat explicitly and manually
              */
-            $lessonPlanFieldMapper = \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Field\Mapper::getInstance();
             $lessonPlanMapper = \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper::getInstance();
-
-            $lessonPlanFieldMapper->deletebyColumn('lesson_plan_id', $subModel->getId());
 
             /* TODO Delete the files. Maybe
              */

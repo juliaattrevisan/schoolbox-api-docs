@@ -1257,7 +1257,7 @@ class Mapper extends BaseMapper
         $lessonPlanTemplateMapper = \Schoolbox\Admin\LessonPlan\Template\Mapper::getInstance();
 
         foreach ($modelList as $model) {
-            if ($model instanceof \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Model) {
+            if ($model->getSubObject() instanceof \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Model) {
                 $model->getLessonPlan()->setFields($lessonPlanFieldMapper->findByColumn('lesson_plan_id', $model->getLessonPlan()->getId()));
 
                 $lessonPlanTemplate = $lessonPlanTemplateMapper->findById($model->getLessonPlan()->getLessonPlanTemplate()->getId());
