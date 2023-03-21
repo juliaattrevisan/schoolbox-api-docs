@@ -7,7 +7,6 @@
      * @param {jQuery}  modifyButton
      * @param {jQuery}  saveButton
      * @param {jQuery}  deleteButton
-     * @param {Object}  editorInstanceOptions
      * @constructor
      */
     var InlineTextboxEditor = function (
@@ -15,9 +14,7 @@
         editorInstance,
         modifyButton,
         saveButton,
-        deleteButton,
-        editorInstanceOptions,
-        editorInline
+        deleteButton
     ) {
         var self = this;
         self.states = {
@@ -34,7 +31,6 @@
         self.modifyButton = modifyButton;
         self.saveButton = saveButton;
         self.deleteButton = deleteButton;
-        self.editorInstanceOptions = editorInstanceOptions;
         self.editor = null;
 
         // Set up events
@@ -181,31 +177,33 @@
         /* When you click the Modify button, the ckeditor spawns
          */
         self.element.trigger("inlineTextboxEditor.preEditorCreate", [self]);
-        self.editor = window.CKEDITOR.replace(editorInstanceId, self.editorInstanceOptions);
 
-        self.editor.on("instanceReady", function (event) {
-            // Focus on the editor
-            event.editor.setReadOnly(false);
-            event.editor.focus();
+        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+            detail: {
+                targetElements: ['#' + editorInstanceId],
+                replace: true,
+            }
+        }));
+
+        // wait for the editor to be created
+        document.getElementById(editorInstanceId).addEventListener("EDITOR__CREATED", () => {
+            self.editor = window.sbProps.editors[editorInstanceId];
+            self.editor.focus(); // focus on the editor
+
+            /* If you change the content, you're dirty; show the little Changes Not Saved
+             * thing by entering dirtyModify state
+             */
+            self.editor.model.document.on("change:data", () => {
+                self.switchState(self.states.dirtyModify);
+                self.element.trigger("inlineTextboxEditor.change", [self]);
+            });
+
+            /* The Modify button should never be available initially, once you've already
+             * clicked it to enter the Modify workflow
+             */
+            self.switchState(self.states.cleanModify);
+
             self.element.trigger("inlineTextboxEditor.editorCreate", [self]);
-        });
-
-        // File upload response callback can't be set on config, but request can?
-        if (self.editorInstanceOptions.fileUploadResponse) {
-            self.editor.on("fileUploadResponse", self.editorInstanceOptions.fileUploadResponse);
-        }
-
-        /* The Modify button should never be available initially, once you've already
-         * clicked it to enter the Modify workflow
-         */
-        self.switchState(self.states.cleanModify);
-
-        /* If you change the content, you're dirty; show the little Changes Not Saved
-         * thing by entering dirtyModify state
-         */
-        self.editor.on("change", function () {
-            self.switchState(self.editor.checkDirty() ? self.states.dirtyModify : self.states.cleanModify);
-            self.element.trigger("inlineTextboxEditor.change", [self]);
         });
     };
 
@@ -225,7 +223,9 @@
         })
             .done(function () {
                 // Editor value is now persisted: the current state is now clean
+                const articleContent = self.editor.getData();
                 self.editor.destroy();
+                self.editorInstance.html(articleContent);
                 self.editorInstance.removeAttr("contentEditable");
                 self.switchState(self.states.clean);
                 self.element.trigger("inlineTextboxEditor.editorDestroy", [self]);
@@ -271,8 +271,7 @@
             modifyButton: '[data-action="modify"]',
             deleteButton: '[data-action="delete"]',
             saveButton: '[data-action="save"]',
-            content: "[data-content]",
-            editorInstanceOptions: {}
+            content: "[data-content]"
         };
         var derivedOptions = $.extend(true, {}, defaults, options);
         this.each(function () {
@@ -286,8 +285,7 @@
                     $editorInstance,
                     $modifyButton,
                     $saveButton,
-                    $deleteButton,
-                    derivedOptions.editorInstanceOptions
+                    $deleteButton
                 );
             $this.data("inlineTextboxEditor", inlineTextboxEditor);
         });

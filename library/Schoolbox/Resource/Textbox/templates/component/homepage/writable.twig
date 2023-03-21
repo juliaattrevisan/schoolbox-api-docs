@@ -79,8 +79,7 @@
 
 <div id="toast-{{ component.instance.id }}" class="toast"></div>
 
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/textbox/jquery.inlineTextboxEditor.js?v={{ config.site_version }}"></script>
 {% autoescape 'js' %}
     <script type="text/javascript">
@@ -93,15 +92,13 @@
                 beforeUnloadListener  = null,
                 addTextboxModal       = $('#addTextboxModal-{{ component.instance.id }}'),
                 addTextboxForm        = $('#addTextboxModal-{{ component.instance.id }}-form'),
-                toast                 = $('#toast-{{ component.instance.id }}')
-            );
+                toast                 = $('#toast-{{ component.instance.id }}');
 
             const inlineTextboxEditor = component.inlineTextboxEditor({
                 modifyButton:          '[data-action="modify"]',
                 deleteButton:          '[data-action="delete"]',
                 saveButton:            '[data-action="save"]',
                 editorInstance:        '[data-content]',
-                editorInstanceOptions: editorInstanceOptions,
             });
 
 
