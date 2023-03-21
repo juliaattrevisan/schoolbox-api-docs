@@ -477,7 +477,8 @@ class Builder implements MembershipServiceServerBuilderInterface
         $membershipId = $contextId . '/memberships';
         if (isset($resourceLinkIdentifier)) {
             $membershipId = (new Uri($membershipId))
-                ->appendQueryParameters(['rlid' => $resourceLinkIdentifier]);
+                ->appendQueryParameters(['rlid' => $resourceLinkIdentifier])
+                ->__toString();
         }
         return new Membership(
             $membershipId,
