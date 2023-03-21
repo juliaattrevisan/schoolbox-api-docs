@@ -10,7 +10,7 @@
 function processRowsSubStrand($handle, &$output_rows, $lastSubject_id): void
 {
     // Set last references to.
-    $lastYear_id = $lastStrand_id = $lastSubStrand_id = 0;
+    $lastYear_id = $lastStrand_id = $lastSubStrand_id = $nodeParent = 0;
 
     while (($row = fgetcsv($handle)) !== false) {
         $node_id = count($output_rows) + 1;
@@ -26,12 +26,17 @@ function processRowsSubStrand($handle, &$output_rows, $lastSubject_id): void
              */
             $node_name     = trim($row[0]);
             $output_rows[] = [$node_id, $lastSubject_id, $node_name, null, 0, null];
-            $lastYear_id   = $node_id;
+            $lastYear_id   = $nodeParent = $node_id;
+        } elseif ('Content descriptions' === trim($row[0])) {
+            // weird english thing...
+            $node_name        = trim($row[0]);
+            $output_rows[]    = [$node_id, $lastYear_id, $node_name, null, 0, null];
+            $nodeParent = $node_id;
         } else {
             if (str_starts_with($row[0], 'Strand:')) {
                 // If the row contains a strand, create a new node in the output CSV file
                 $strand_name   = trim(substr($row[0], 7));
-                $output_rows[] = [$node_id, $lastYear_id, $strand_name, null, 0, null];
+                $output_rows[] = [$node_id, $nodeParent, $strand_name, null, 0, null];
                 $lastStrand_id = $lastSubStrand_id = $node_id; //some nodes, aren't under a substrand but just a strand... so lets catch them here...
             } else {
                 if (str_starts_with($row[0], 'Sub-strand:')) {
@@ -40,6 +45,10 @@ function processRowsSubStrand($handle, &$output_rows, $lastSubject_id): void
                     $output_rows[]    = [$node_id, $lastStrand_id, $node_name, null, 0, null];
                     $lastSubStrand_id = $node_id;
                 } else {
+                    // if there is no entry (blank line), ignore and move along...
+                    if ('' === trim((string)$row[0])) {
+                        continue;
+                    }
                     //this will just be a code... hopefully....
                     $nodeFormat = mb_split('\n', $row[0]);
                     $node_name  = trim($nodeFormat[0]);
