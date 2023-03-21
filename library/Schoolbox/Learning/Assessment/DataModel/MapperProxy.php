@@ -1480,13 +1480,6 @@ class MapperProxy
 
             $lessonPlanMapper->save($subModel);
 
-            /* FIXME but why did I have to do this? SubmissionBox doesn't have a deleted_at,
-             *  but Task does; specifically, to accommodate a deletion. In this case, $assessable
-             *  tries to use a deleted_at from a thing that wasn't deleted ($dataModel->getDeletedAt())
-             *  so I have to ensure dataModel knows when the subModel was deleted...wtf
-             */
-            $dataModel->setDeletedAt(\Alaress_Date_Format::now());
-
             /* For some absurd reason, we're delegating Assessment Deletion to subobjects' mappers
              * so the Submission Box mapper knows how to delete an assessment instance...that's why
              * there's no assessment deletion methods in this area
