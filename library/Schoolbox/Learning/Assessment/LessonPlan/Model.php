@@ -383,4 +383,26 @@ class Model extends AbstractAssessment
         $this->attachments = $attachments;
         return $this;
     }
+
+
+    /**
+     * The Open date is the same as the Publish date for Lesson Plans.
+     *
+     * @return \Alaress_Date_Format|null
+     */
+    public function getOpenAt(): ?\Alaress_Date_Format
+    {
+        return $this->getPublishAt();
+    }
+
+
+    /**
+     * The Close date is the same as the Due date for Lesson Plans.
+     *
+     * @return \Alaress_Date_Format|null
+     */
+    public function getCloseAt(): ?\Alaress_Date_Format
+    {
+        return $this->getDueAt();
+    }
 }

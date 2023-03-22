@@ -99,7 +99,7 @@
          # $acceptingResponses is passed quietly and implicitly into fragments/dates.twig
          # (not mentioned in this twig file) where it's used to decide which natpickers to show
          #}
-        {% set acceptingResponses   = assessment is quiz or (assessment is dueWork and not assessment.acceptNone) or assessment is lti or assessment is lessonPlan %}
+        {% set acceptingResponses   = assessment is quiz or (assessment is dueWork and not assessment.acceptNone) or assessment is lti %}
         {% set publishDateSync      = (acceptingResponses) ? 'open' : 'due' %}
         {% set dueSyncStart         = (acceptingResponses) ? 'open' : 'publish' %}
         {% set dueSyncEnd           = (acceptingResponses) ? 'close' : '' %}
