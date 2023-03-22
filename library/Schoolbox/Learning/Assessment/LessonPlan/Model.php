@@ -94,6 +94,31 @@ class Model extends AbstractAssessment
 
 
     /**
+     * Creates a clone of this assessment.
+     *
+     * This clone must be able to be persisted to create a copy of this assessment,
+     * without further modification.
+     *
+     * @return static
+     * @throws \UnexpectedValueException
+     */
+    public function cloneForCopy()
+    {
+        $clone = parent::cloneForCopy();
+        $clone->setFields($clone->getFields()->emptyClone());
+
+        foreach ($this->getFields() as $field) {
+            $newField = clone $field;
+            $newField->setId(null);
+
+            $clone->addField($newField);
+        }
+
+        return $clone;
+    }
+
+
+    /**
      * @return \Schoolbox\Admin\LessonPlan\Template\Model|null
      */
     public function getLessonPlanTemplate(): ?\Schoolbox\Admin\LessonPlan\Template\Model
