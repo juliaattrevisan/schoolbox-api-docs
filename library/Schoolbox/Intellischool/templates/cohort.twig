@@ -4,7 +4,7 @@
 
 {% block breadcrumbs %}
     {{ bread.crumbs(
-        ['Classes', '/course/list'],
+        ['Courses', routeLookup('course.courseList')],
         ['Cohort Analytics']
     ) }}
 {% endblock breadcrumbs %}
