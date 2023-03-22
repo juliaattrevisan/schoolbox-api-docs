@@ -166,7 +166,7 @@ Data:
         </div>
         <nav>
             {% if hasCollapser %}
-                <a href="#" class="icon-{{ collapsed ? 'up' : 'down' }}-arrow" data-collapser="feedback-{{ responseId }}-{{ currentFeedback.id }}"></a>
+                <a href="#" class="icon-{{ collapsed ? 'down' : 'up' }}-arrow" data-collapser="feedback-{{ responseId }}-{{ currentFeedback.id }}"></a>
             {% endif %}
             {% if deleteRoute and deleteIcon %}
                 <a class="icon-delete" data-delete="{{ deleteRoute }}"></a>
