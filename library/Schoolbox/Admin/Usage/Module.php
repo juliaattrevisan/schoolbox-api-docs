@@ -88,7 +88,9 @@ class Module extends BaseModule
             $user = $this->getUserMapper()->findByIdWithFallback($params['userId']);
         } catch (Mapper\Exception\Deleted $e) {
             $user = $e->getDeletedObject();
-        } catch (MapperException $e) {
+        }
+
+        if ($user->getId() === null) {
             throw new NotFound('User not found among normal or deleted users.');
         }
 
