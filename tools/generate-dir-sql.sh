@@ -35,7 +35,7 @@ instance_data_dir="$(echo "$1" | sed 's:/*$::')"
 # Instance-specific configs
 echo "UPDATE config SET value='$instance_data_dir/purifier'       WHERE name='purifier_cache_dir';"
 echo "UPDATE config SET value='$instance_data_dir/twig'           WHERE name='twig_cache_dir';"
-echo "UPDATE config SET value='$instance_data_dir/files'          WHERE name='backup_dir';"
+echo "UPDATE config SET value='$instance_data_dir/backups'        WHERE name='backup_dir';"
 echo "UPDATE config SET value='$instance_data_dir/cache/zip'      WHERE name='zip_dir';"
 echo "UPDATE config SET value='$instance_data_dir/cache/stream'   WHERE name='stream_dir';"
 echo "UPDATE config SET value='$instance_data_dir/cache/portrait' WHERE name='portrait_dir';"
