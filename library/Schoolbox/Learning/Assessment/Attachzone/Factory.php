@@ -105,9 +105,14 @@ class Factory
          * the storage table
          *
          * This seems really obscure, not sure if intentionally obscure? Anyway
+         *
+         * getAttachments() can return null during the creational phase where the
+         * GenericCollection isn't ever set.
          */
-        foreach ($lessonPlan->getAttachments() as $file) {
-            $hashes[] = $file;
+        if (null !== $lessonPlan->getAttachments()) {
+            foreach ($lessonPlan->getAttachments() as $file) {
+                $hashes[] = $file;
+            }
         }
 
         return (new Zone('files'))
