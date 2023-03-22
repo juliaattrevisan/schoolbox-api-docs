@@ -143,12 +143,11 @@ class Renderer
             }
         }
 
-        /*
-         * $travelLogs['data'][0] may be null, so calling array index 0 will fail
-         *
-         * Check if that exists, or just call the date as '' (empty string)
+        /* $travelLogs might successfully return an empty data set, when a student doesn't have any bus-related data yet (or if it's been cleared in the third party).
+         * We can't presume to use the first date in this case.
+         * The previous check only verified you didn't have an error struct.
          */
-        $date = empty($travelLogs['data'][0]['timestamp']) ? '' : $travelLogs['data'][0]['timestamp'];
+        $date = $travelLogs['data'][0]['timestamp'] ?? '';
 
         return !empty($travelLogs) ? $twig->render('travelLog.twig', [
             'travelLogs' => $travelLogs['data'],
