@@ -144,9 +144,16 @@ class Renderer
             }
         }
 
+        /*
+         * $travelLogs['data'][0] may be null, so calling array index 0 will fail
+         *
+         * Check if that exists, or just call the date as '' (empty string)
+         */
+        $date = empty($travelLogs['data'][0]['timestamp']) ? '' : $travelLogs['data'][0]['timestamp'];
+
         return !empty($travelLogs) ? $twig->render('travelLog.twig', [
             'travelLogs' => $travelLogs['data'],
-            'date' => $showDate ? $travelLogs['data'][0]['timestamp'] : ''
+            'date' => $showDate ? $date : ''
         ]) : '';
     }
 
