@@ -82,7 +82,7 @@
         {# Iterate each unit and create checkbox and dates #}
 
         {% for unitImpl in unitsImpls %}
-            {% set canReadUnitSpec = canReadUnitSpecs[unitImpl.specification.id] %}
+            {% set canReadUnitSpec = canReadUnitSpecs[unitImpl.specification.id] ?? false %}
             {% set showUnitRow     = canReadUnitSpec or unitImpl.id %}
             {% if showUnitRow %}
                 <li>
