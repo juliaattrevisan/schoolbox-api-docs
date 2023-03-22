@@ -528,6 +528,12 @@ class Kernel extends WebKernelAbstract
         // AFAIK this isn't fakeable, and this gets called by some CLI scripts
         // despite it being the WebRequest bootstrap. (Go figure.)
 
+        // Hack around iSAMS OIDC provider POSTing to root path:
+        // otherwise, this would trigger a CSRF rejection.
+        if (($_POST['state'] ?? '') === 'oidc') {
+            return;
+        }
+
         $di             = $this->getDependencyInjector();
 
         /** @var IConfigLoader $config */
