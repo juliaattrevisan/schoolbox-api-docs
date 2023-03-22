@@ -184,7 +184,7 @@ class Controller extends Base
                 name ASC; ");
         $statement->execute();
         $help = new Helper();
-        $help->queryToCSV($statement, 'HomepageTempates.csv');
+        $help->queryToCSV($statement, 'HomepageTemplates.csv');
     }
 
     /**
