@@ -14,7 +14,6 @@ require_once __DIR__ . '/../../conf/core/require.php';
  * Update log location to be instance specific location in /var/log/schoolbox
  */
 $app = new class extends CliTool\App {
-
     /** Hands off execution over to the App */
     public function run(): void
     {
