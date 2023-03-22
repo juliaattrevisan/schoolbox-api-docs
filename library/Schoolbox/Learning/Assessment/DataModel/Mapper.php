@@ -451,13 +451,6 @@ class Mapper extends BaseMapper
 
             SELECT DISTINCT a.id
             FROM  {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())} a
-            JOIN  {$this->getJoinSql('lessonPlan', 'a', 'lessonPlan', true)}
-            WHERE {$where}
-
-            UNION
-
-            SELECT DISTINCT a.id
-            FROM  {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())} a
             JOIN  {$this->getJoinSql('ltiAssessment', 'a', 'l', true)}
             JOIN  {$this->getJoinSql('ltiAssessment.scores', 'l', 'ls')} AND ls.student_id = :userId
                   {$planJoin}
