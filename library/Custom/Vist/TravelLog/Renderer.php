@@ -20,7 +20,6 @@ use Twig\Error\SyntaxError;
  */
 class Renderer
 {
-
     /**
      * Student's Travel Log should be requested and displayed only for verso school
      */
