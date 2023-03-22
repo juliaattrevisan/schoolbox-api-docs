@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Assessment\Attachzone;
 
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\LessonPlan\Model;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
@@ -27,13 +28,20 @@ class Factory
      * @param IAssessable $assessment
      * @return Zone
      */
-    public function buildForAssessment(IAssessable $assessment)
+    public function buildForAssessment(IAssessable $assessment): Zone
     {
         if ($assessment instanceof Task) {
             return $this->buildForTask($assessment);
-        } elseif ($assessment instanceof DueWork) {
+        }
+
+        if ($assessment instanceof \Schoolbox\Learning\Assessment\LessonPlan\Model) {
+            return $this->buildForLessonPlan($assessment);
+        }
+
+        if ($assessment instanceof DueWork) {
             return $this->buildForDueWork($assessment);
         }
+
         return $this->buildGeneric();
     }
 
@@ -42,7 +50,7 @@ class Factory
      *
      * @return Zone
      */
-    protected function buildGeneric()
+    protected function buildGeneric(): Zone
     {
         return new Zone('files');
     }
@@ -53,7 +61,7 @@ class Factory
      * @param Task $task
      * @return Zone
      */
-    protected function buildForTask(Task $task)
+    protected function buildForTask(Task $task): Zone
     {
         $hashes = [];
 
@@ -77,13 +85,45 @@ class Factory
              ->attachFiles($hashes);
     }
 
+
+    /**
+     * Build an attachzone with any Attached Files preloaded into the attachzone
+     *
+     * @param Model $lessonPlan
+     * @return Zone
+     */
+    protected function buildForLessonPlan(\Schoolbox\Learning\Assessment\LessonPlan\Model $lessonPlan): Zone
+    {
+        $hashes = [];
+
+        /* Take advantage of a somewhat obscure implementation inside the Attachzone
+         * see Zone.php:99, where it will just use an IStorage instance with whatever its
+         * contents are. If you provide it a hash, it'll go to the storage table and extract
+         * the last known details about the file (including its latest name)
+         *
+         * If you give it the IStorage instance, it'll just blindly use that without visiting
+         * the storage table
+         *
+         * This seems really obscure, not sure if intentionally obscure? Anyway
+         */
+        foreach ($lessonPlan->getAttachments() as $file) {
+            $hashes[] = $file;
+        }
+
+        return (new Zone('files'))
+            ->setMulti(true)
+            ->setAttachmentsLabel('')
+            ->attachFiles($hashes);
+    }
+
+
     /**
      * Build an attachzone with any Attached Files preloaded into the attachzone
      *
      * @param DueWork $dueWork
      * @return Zone
      */
-    protected function buildForDueWork(DueWork $dueWork)
+    protected function buildForDueWork(DueWork $dueWork): Zone
     {
         $zone = new Zone('files');
         $zone->setMulti(true)
@@ -99,7 +139,7 @@ class Factory
      * @param \Schoolbox\Learning\Assessment\DueWork\Response\Model $response
      * @return Zone
      */
-    public function buildForDueWorkResponse(Submission $response)
+    public function buildForDueWorkResponse(Submission $response): Zone
     {
         $zone = new Zone('files');
         $zone->setMulti(true)
@@ -129,7 +169,7 @@ class Factory
      * @param Feedback|null $feedback If null, build an empty attachzone
      * @return Zone
      */
-    public function buildForDueWorkFeedback(Feedback $feedback = null)
+    public function buildForDueWorkFeedback(Feedback $feedback = null): Zone
     {
         $zone = (new Zone('feedbackFiles'))
             ->setMulti(true)

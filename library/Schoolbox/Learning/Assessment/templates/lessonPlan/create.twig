@@ -89,7 +89,12 @@
  # It implicitly constructs an attachments[] POST key which contains
  # all the hashes of the files you uploaded via the Mr Matt's Modal
  #}
-{% include 'sub/attachzone.twig' %}
+<div class="row">
+    <div class="small-12 columns">
+        <label>Attach Files</label>
+        {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+    </div>
+</div>
 
 {# Toggle for deciding whether this Lesson Plan is visible to students
  # or if it's restricted to staff eyes only
