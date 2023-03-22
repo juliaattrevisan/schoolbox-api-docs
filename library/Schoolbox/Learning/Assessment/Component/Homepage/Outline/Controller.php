@@ -209,7 +209,8 @@ class Controller extends Component_Homepage_ControllerAbstract
                 $specFolderIds[] = $this->courseImplementation->getSpecification()->getFolder()->getId();
             }
             // gather folder ids the current user can access
-            $accessibleFolderIds = array_filter($specFolderIds,
+            $accessibleFolderIds = array_filter(
+                $specFolderIds,
                 function (int $folderId) {
                     try {
                         return $this->getAccess()->getFolderAccess($this->getUser(), $folderId) >= UserAccess::ACCESS_READ;
