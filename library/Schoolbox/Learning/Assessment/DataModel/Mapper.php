@@ -1249,13 +1249,35 @@ class Mapper extends BaseMapper
          */
         $lessonPlanTemplateMapper = \Schoolbox\Admin\LessonPlan\Template\Mapper::getInstance();
 
+        /* Collate and group all the Lesson Plan Fields by the Lesson Plan id to which they belong
+         */
+        $fields = $lessonPlanFieldMapper->findByColumn('lesson_plan_id', $lessonPlanIds)
+            ->groupByCallback(
+                function ($item) {
+                    return $item->getLessonPlan()->getId();
+                }
+            );
+
+        /* Collate and group all the Lesson Plan Templates by the Lesson Plan id to which they belong
+         */
+        $templateIds = [];
+
         foreach ($modelList as $model) {
             if ($model->getSubObject() instanceof \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Model) {
-                $model->getLessonPlan()->setFields($lessonPlanFieldMapper->findByColumn('lesson_plan_id', $model->getLessonPlan()->getId()));
+                $templateIds[] = $model->getLessonPlan()->getLessonPlanTemplate()->getId();
+            }
+        }
 
-                $lessonPlanTemplate = $lessonPlanTemplateMapper->findById($model->getLessonPlan()->getLessonPlanTemplate()->getId());
+        $templates = $lessonPlanTemplateMapper->findByColumn('id', $templateIds)->indexBy('id');
 
-                $model->getLessonPlan()->setLessonPlanTemplate($lessonPlanTemplate);
+        /* Assign Lesson Plan Fields and Lesson Plan Templates to each instance of a Lesson Plan
+         * This is used when grabbing stuff out of the db via the custom query elsewhere in this
+         * class so you have to do all these microhydrations manually
+         */
+        foreach ($modelList as $model) {
+            if ($model->getSubObject() instanceof \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Model) {
+                $model->getLessonPlan()->setFields($fields->getOffset($model->getLessonPlan()->getId()))
+                    ->setLessonPlanTemplate($templates->getOffset($model->getLessonPlan()->getLessonPlanTemplate()->getId()));
             }
         }
 
