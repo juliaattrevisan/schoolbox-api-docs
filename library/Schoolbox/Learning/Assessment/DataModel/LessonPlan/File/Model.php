@@ -29,25 +29,25 @@ class Model implements IFile, ISoftDeletable
 
 
     /**
-     * @var \Schoolbox\Learning\Assessment\LessonPlan\Model
+     * @var \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Model
      */
-    private \Schoolbox\Learning\Assessment\LessonPlan\Model $lessonPlan;
+    private \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Model $lessonPlan;
 
 
     /**
-     * @return \Schoolbox\Learning\Assessment\LessonPlan\Model
+     * @return \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Model
      */
-    public function getLessonPlan(): \Schoolbox\Learning\Assessment\LessonPlan\Model
+    public function getLessonPlan(): \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Model
     {
         return $this->lessonPlan;
     }
 
 
     /**
-     * @param \Schoolbox\Learning\Assessment\LessonPlan\Model $lessonPlan
+     * @param \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Model $lessonPlan
      * @return $this
      */
-    public function setLessonPlan(\Schoolbox\Learning\Assessment\LessonPlan\Model $lessonPlan): self
+    public function setLessonPlan(\Schoolbox\Learning\Assessment\DataModel\LessonPlan\Model $lessonPlan): self
     {
         $this->lessonPlan = $lessonPlan;
         return $this;

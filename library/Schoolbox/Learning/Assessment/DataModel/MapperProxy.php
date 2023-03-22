@@ -1332,7 +1332,7 @@ class MapperProxy
 
             $lessonPlanMapper->save($subObject);
             $lessonPlanMapper->saveFields($subObject);
-//             $lessonPlanMapper->saveFiles($subObject);
+            $lessonPlanMapper->saveFiles($subObject);
         } elseif ($subObject instanceof Project) {
             ProjectMapper::getInstance()->save($subObject);
         }

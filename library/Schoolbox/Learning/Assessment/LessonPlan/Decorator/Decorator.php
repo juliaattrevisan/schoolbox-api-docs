@@ -116,7 +116,7 @@ class Decorator implements DecoratorInterface
         if (count($this->getAttachedFiles())) {
             /* These are the lesson_plan_file relations we already know about
              */
-            $existing = $assessment->getAttachments()->indexBy('hash')->getAll();
+            $existing = $assessment->getAttachments()?->indexBy('hash')->getAll();
 
             $factory     = new CollectorFactory();
             $attachments = $factory->build($this->getAttachedFiles())->getAll();

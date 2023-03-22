@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Learning\Assessment\DataModel\Translator;
 
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Model as LessonPlanModel;
@@ -120,26 +121,26 @@ class LessonPlan implements IAssessmentTypeTranslator
             }
         }
 
-        /* TODO whatever this is meant to do, like Tasks
-         */
-//        // Translate files
-//        if ($domainObject->getAttachedFiles() !== null) {
-//            $now = \Alaress_Date_Format::now();
-//
-//            $dataModel->setAttachments(new GenericCollection(LessonPlanFileModel::class));
-//
-//            foreach ($domainObject->getAttachedFiles() as $file) {
-//                $dataModel->getAttachments()->add(
-//                    (new LessonPlanFileModel())
-//                        ->setId($file->getId())
-//                        ->setTask($dataModel)
-//                        ->setStorage($file->getStorage())
-//                        ->setBasename($file->getBasename())
-//                        ->setCreatedAt($now)
-//                        ->setUpdatedAt($now)
-//                );
-//            }
-//        }
+        // Translate files
+        if ($domainObject->getAttachments() !== null) {
+            $fileMapper = \Schoolbox\Learning\Assessment\DataModel\LessonPlan\File\Mapper::getInstance();
+
+            $now = \Alaress_Date_Format::now();
+
+            $dataModel->setAttachments(new GenericCollection(\Schoolbox\Learning\Assessment\DataModel\LessonPlan\File\Model::class));
+
+            foreach ($domainObject->getAttachments() as $file) {
+                $dataModel->getAttachments()->add(
+                    ($fileMapper->createModel())
+                        ->setId($file->getId())
+                        ->setLessonPlan($dataModel)
+                        ->setStorage($file->getStorage())
+                        ->setBasename($file->getBasename())
+                        ->setCreatedAt($now)
+                        ->setUpdatedAt($now)
+                );
+            }
+        }
     }
 
 
@@ -199,25 +200,25 @@ class LessonPlan implements IAssessmentTypeTranslator
             }
         }
 
-        /* TODO whatever this is meant to do, like Tasks
-         */
-//        // Convert attachments
-//        $domainObject->setAttachedFiles($domainObject->getAttachedFiles()->emptyClone());
-//
-//        if ($dataModel->getAttachments() !== null) {
-//            $domainObject->setAttachedFiles(new GenericCollection(LessonPlanFile::class));
-//
-//            foreach ($dataModel->getAttachments() as $attachment) {
-//                $domainObject->getAttachedFiles()->add(
-//                    (new LessonPlanFile())
-//                        ->setId($attachment->getId())
-//                        ->setFilename($attachment->getFilename())
-//                        ->setStorage($attachment)
-//                        ->setCreatedAt($attachment->getCreatedAt())
-//                        ->setUpdatedAt($attachment->getUpdatedAt())
-//                        ->setDeletedAt($attachment->getDeletedAt())
-//                );
-//            }
-//        }
+        // Convert attachments
+        $domainObject->setAttachments(new GenericCollection(\Schoolbox\Learning\Assessment\DataModel\LessonPlan\File\Model::class));
+
+        if ($dataModel->getAttachments() !== null) {
+            $fileMapper = \Schoolbox\Learning\Assessment\DataModel\LessonPlan\File\Mapper::getInstance();
+
+            $domainObject->setAttachments(new GenericCollection(\Schoolbox\Learning\Assessment\DataModel\LessonPlan\File\Model::class));
+
+            foreach ($dataModel->getAttachments() as $attachment) {
+                $domainObject->getAttachments()->add(
+                    ($fileMapper->createModel())
+                        ->setId($attachment->getId())
+                        ->setFilename($attachment->getFilename())
+                        ->setStorage($attachment)
+                        ->setCreatedAt($attachment->getCreatedAt())
+                        ->setUpdatedAt($attachment->getUpdatedAt())
+                        ->setDeletedAt($attachment->getDeletedAt())
+                );
+            }
+        }
     }
 }

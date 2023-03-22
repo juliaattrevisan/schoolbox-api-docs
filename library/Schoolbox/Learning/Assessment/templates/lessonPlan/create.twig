@@ -85,6 +85,12 @@
     {% endfor %}
 {% endif %}
 
+{# Attach random files to this Lesson Plan
+ # It implicitly constructs an attachments[] POST key which contains
+ # all the hashes of the files you uploaded via the Mr Matt's Modal
+ #}
+{% include 'sub/attachzone.twig' %}
+
 {# Toggle for deciding whether this Lesson Plan is visible to students
  # or if it's restricted to staff eyes only
  #}

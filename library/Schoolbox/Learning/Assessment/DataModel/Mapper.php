@@ -879,9 +879,9 @@ class Mapper extends BaseMapper
          */
         $modelList = $this->augmentListWithTaskFiles($modelList, $taskIds);
 
-        /* TODO Augment with Lesson Plan Files
+        /* Augment with Lesson Plan Files and Lesson Plan Fields
          */
-
+        $modelList = $this->augmentListWithLessonPlanFiles($modelList, $lessonPlanIds);
         $modelList = $this->augmentWithLessonPlanFields($modelList, $lessonPlanIds);
 
         // Project contexts
@@ -1074,6 +1074,43 @@ class Mapper extends BaseMapper
                         $submodel->setAttachments($files[$submodel->getId()]);
                     } else {
                         $submodel->setAttachments($this->getJoinMapper('task.files')->createCollection());
+                    }
+                }
+            }
+        }
+        return $modelList;
+    }
+
+
+    /**
+     * Augments the list from hydrateSelect() with Lesson Plan Files.
+     *
+     * @param Collection $modelList
+     * @param array|int[]        $lessonPlanIds
+     * @return Collection
+     * @throws BaseMapper\DefinitionException If join name is not on this mapper
+     * @throws BaseMapper\Exception  If join $name isn't on this mapper
+     */
+    protected function augmentListWithLessonPlanFiles(Collection $modelList, array  $lessonPlanIds)
+    {
+        if (!empty($lessonPlanIds)) {
+            /* Retrieve and sort list of Lesson Plan Files
+             */
+            $files = $this->getJoinMapper('lessonPlan.files')
+                ->findByColumn('lesson_plan_id', $lessonPlanIds)
+                ->groupByCallback(function (\Schoolbox\Learning\Assessment\DataModel\LessonPlan\File\Model $file) {
+                    return $file->getLessonPlan()->getId();
+                });
+
+            // Augment list with due work files
+            foreach ($modelList as $model) {
+                $submodel = $model->getSubObject();
+
+                if ($submodel instanceof \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Model) {
+                    if (!empty($files[$submodel->getId()])) {
+                        $submodel->setAttachments($files[$submodel->getId()]);
+                    } else {
+                        $submodel->setAttachments($this->getJoinMapper('lessonPlan.files')->createCollection());
                     }
                 }
             }
