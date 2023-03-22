@@ -74,7 +74,6 @@ class LessonPlan implements IAssessmentTypeTranslator
     {
         $lessonPlanFieldMapper = \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Field\Mapper::getInstance();
 
-        /** @var LessonPlanModel $dataModel */
         /* Remember the Lesson Plan Template that was chosen
          */
         $dataModel->setLessonPlanTemplate($domainObject->getLessonPlanTemplate());
