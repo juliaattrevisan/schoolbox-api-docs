@@ -114,29 +114,37 @@ if (!isset($_POST['code'])) {
 
 // Step 2: if there is a code, swap it for an auth token
 try {
-    echo '<a href="/oidc.php">Try again</a>';
-
-
     // client id / secret gets passed via Basic auth
     $accessToken = $oauthProvider->getAccessToken(
         'authorization_code',
         ['code' => $_POST['code']]
     );
-    echo '<h1>Access Token</h1>';
-    echo '<pre>' . json_encode($accessToken, JSON_PRETTY_PRINT) . '</pre>';
+    $loginUri = (new Uri())
+        ->withPath('/api/session')
+        ->withQuery(http_build_query(['jwt' => $accessToken->getIdToken()->toString()]));
+    header('Location: ' . $loginUri->__toString());
+    http_response_code(302);
+    exit;
 
-
-    echo '<h2>Parsed JWT</h2>';
-    echo '<pre>' . json_encode($accessToken->getIdToken()->claims()->all(), JSON_PRETTY_PRINT) . '</pre>';
-
-    // Now, attempt to sign in with this token
-    echo <<<FORM
-    <form action="/api/session" method="post">
-        <textarea type="text" name="jwt" style="width: 100%">{$accessToken->getIdToken()->toString()}</textarea>
-        <br/>
-        <button type="submit">Sign in as "{$accessToken->getIdToken()->claims()->get($idClaim)}"</button>
-    </form>
-    FORM;
+    // Debug code
+//    echo '<a href="/oidc.php">Try again</a>';
+//
+//
+//    echo '<h1>Access Token</h1>';
+//    echo '<pre>' . json_encode($accessToken, JSON_PRETTY_PRINT) . '</pre>';
+//
+//
+//    echo '<h2>Parsed JWT</h2>';
+//    echo '<pre>' . json_encode($accessToken->getIdToken()->claims()->all(), JSON_PRETTY_PRINT) . '</pre>';
+//
+//    // Now, attempt to sign in with this token
+//    echo <<<FORM
+//    <form action="/api/session" method="post">
+//        <textarea type="text" name="jwt" style="width: 100%">{$accessToken->getIdToken()->toString()}</textarea>
+//        <br/>
+//        <button type="submit">Sign in as "{$accessToken->getIdToken()->claims()->get($idClaim)}"</button>
+//    </form>
+//    FORM;
 } catch (IdentityProviderException $e) {
     // Failed to get the access token or user details
     exit($e->getMessage());
