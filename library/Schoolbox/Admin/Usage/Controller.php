@@ -14,6 +14,7 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Redis;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Admin\Navigation\Subnav;
+use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Resource\FilesystemFactory;
@@ -74,6 +75,13 @@ class Controller extends Base
      */
     public function getSpecificUser(User $user): void
     {
+        // This page needs to work for deleted users, so Admin/Usage/Module->preloadUser() uses User/Mapper->findByIdWithFallback()
+        // to get the user identified in the URL.  A consequence of that is if no matching user or deleted user was found, a
+        // empty object will still be returned.  In that case we inform the user so they don't assume the user must have been deleted.
+        if ($user->getId() === null) {
+            throw new Exception('User not found among normal or deleted users.', ErrorMapper::ERROR_USER_NOT_FOUND);
+        }
+
         $crumbs = (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminUsage.getIndex'));
         $crumbs[] = [$user->getFullName(), ''];
 
