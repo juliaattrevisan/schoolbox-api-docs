@@ -91,6 +91,13 @@
          # They however must have their dates synced, to avoid an andyland enforcement
          # that an open date must exist. Having acceptingResponses evaluate to (bool)true
          # allows date syncs to execute. There are alternative, but equally bad, syntaxes.
+         #
+         # Note: unused var in backend
+         #
+         # There's an array key 'acceptingResponses' that isn't used in this Course Import
+         # workflow so don't change that expecting it to affect behaviours here.
+         # $acceptingResponses is passed quietly and implicitly into fragments/dates.twig
+         # (not mentioned in this twig file) where it's used to decide which natpickers to show
          #}
         {% set acceptingResponses   = assessment is quiz or (assessment is dueWork and not assessment.acceptNone) or assessment is lti or assessment is lessonPlan %}
         {% set publishDateSync      = (acceptingResponses) ? 'open' : 'due' %}
