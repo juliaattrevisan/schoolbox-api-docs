@@ -300,6 +300,7 @@ function updateSelectedMembers() {
 .VueTables__table .access-td {
     padding-left: 0; //bring it inline with the right side border
     width: 25rem; //keep the edit icon on the right side
+    min-width: 7.5rem; //ensure the column is always wide enough
 }
 
 .change-animation {
