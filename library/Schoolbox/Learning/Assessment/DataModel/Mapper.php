@@ -25,6 +25,7 @@ use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\Project;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\DataModel\LessonPlan;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
@@ -369,7 +370,7 @@ class Mapper extends BaseMapper
      */
     public function softDeleteLessonPlan(Model $assessment): bool
     {
-        if ($assessment->getLessonPlan() instanceof \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Model) {
+        if ($assessment->getLessonPlan() instanceof LessonPlan\Model) {
             $lessonPlanMapper = $this->getJoinMapper('lessonPlan');
             $lessonPlans      = $lessonPlanMapper->findByColumn('assessment_id', $assessment->getId());
             $lessonPlanMapper->softDelete($lessonPlans);
@@ -1098,7 +1099,7 @@ class Mapper extends BaseMapper
              */
             $files = $this->getJoinMapper('lessonPlan.files')
                 ->findByColumn('lesson_plan_id', $lessonPlanIds)
-                ->groupByCallback(function (\Schoolbox\Learning\Assessment\DataModel\LessonPlan\File\Model $file) {
+                ->groupByCallback(function (LessonPlan\File\Model $file) {
                     return $file->getLessonPlan()->getId();
                 });
 
@@ -1106,7 +1107,7 @@ class Mapper extends BaseMapper
             foreach ($modelList as $model) {
                 $submodel = $model->getSubObject();
 
-                if ($submodel instanceof \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Model) {
+                if ($submodel instanceof LessonPlan\Model) {
                     if (!empty($files[$submodel->getId()])) {
                         $submodel->setAttachments($files[$submodel->getId()]);
                     } else {
@@ -1279,7 +1280,7 @@ class Mapper extends BaseMapper
     {
         /* Fetch all the Lesson Plan Fields used by this Lesson Plan
          */
-        $lessonPlanFieldMapper = \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Field\Mapper::getInstance();
+        $lessonPlanFieldMapper = LessonPlan\Field\Mapper::getInstance();
 
         /* Fetch all the Lesson Plan Template + Lesson Plan Template Fields too
          * (Fields need to know about their Template Fields)
@@ -1300,7 +1301,7 @@ class Mapper extends BaseMapper
         $templateIds = [];
 
         foreach ($modelList as $model) {
-            if ($model->getSubObject() instanceof \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Model) {
+            if ($model->getSubObject() instanceof LessonPlan\Model) {
                 $templateIds[] = $model->getLessonPlan()->getLessonPlanTemplate()->getId();
             }
         }
@@ -1312,7 +1313,7 @@ class Mapper extends BaseMapper
          * class so you have to do all these microhydrations manually
          */
         foreach ($modelList as $model) {
-            if ($model->getSubObject() instanceof \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Model) {
+            if ($model->getSubObject() instanceof LessonPlan\Model) {
                 $model->getLessonPlan()->setFields($fields->getOffset($model->getLessonPlan()->getId()))
                     ->setLessonPlanTemplate($templates->getOffset($model->getLessonPlan()->getLessonPlanTemplate()->getId()));
             }

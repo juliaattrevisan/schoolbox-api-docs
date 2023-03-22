@@ -15,6 +15,7 @@ use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
+use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Field\Model as LessonPlanFieldModel;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
@@ -261,11 +262,11 @@ class Model extends AbstractAssessment
     /**
      * Add a template field to this template
      *
-     * @param \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Field\Model $field
+     * @param LessonPlanFieldModel $field
      * @return $this
      * @throws \UnexpectedValueException
      */
-    public function addField(\Schoolbox\Learning\Assessment\DataModel\LessonPlan\Field\Model $field): self
+    public function addField(LessonPlanFieldModel $field): self
     {
         $this->fields->add($field);
         return $this;

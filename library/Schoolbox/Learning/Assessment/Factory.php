@@ -416,7 +416,7 @@ class Factory
                 $this->getLineItemResourceId(),
                 $this->getLineItemScoreMaximum()
             );
-        } elseif ($assessment instanceof \Schoolbox\Learning\Assessment\LessonPlan\Model) {
+        } elseif ($assessment instanceof LessonPlan\Model) {
             /* TODO Add other fields that are LessonPlan specific
              */
             $decorator = new LessonPlan\Decorator\Decorator(

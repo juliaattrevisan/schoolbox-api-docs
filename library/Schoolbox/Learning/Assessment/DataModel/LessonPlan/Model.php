@@ -215,7 +215,7 @@ class Model implements IAssessableDataModel, ISoftDeletable
      * @return Model
      * @throws \UnexpectedValueException
      */
-    public function addField(\Schoolbox\Learning\Assessment\DataModel\LessonPlan\Field\Model $field): self
+    public function addField(Field\Model $field): self
     {
         $this->getFields()->add($field);
         return $this;

@@ -13,6 +13,9 @@ use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Model as LessonPlanModel;
 use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlanObject;
+use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Field\Mapper as LessonPlanFieldMapper;
+use Schoolbox\Learning\Assessment\DataModel\LessonPlan\File\Model as LessonPlanFileModel;
+use Schoolbox\Learning\Assessment\DataModel\LessonPlan\File\Mapper as LessonPlanFileMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 
@@ -73,7 +76,7 @@ class LessonPlan implements IAssessmentTypeTranslator
      */
     public function translateToDataModel(IAssessable $domainObject, IAssessableDataModel $dataModel): void
     {
-        $lessonPlanFieldMapper = \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Field\Mapper::getInstance();
+        $lessonPlanFieldMapper = LessonPlanFieldMapper::getInstance();
 
         /* Remember the Lesson Plan Template that was chosen
          */
@@ -123,11 +126,11 @@ class LessonPlan implements IAssessmentTypeTranslator
 
         // Translate files
         if ($domainObject->getAttachments() !== null) {
-            $fileMapper = \Schoolbox\Learning\Assessment\DataModel\LessonPlan\File\Mapper::getInstance();
+            $fileMapper = LessonPlanFileMapper::getInstance();
 
             $now = \Alaress_Date_Format::now();
 
-            $dataModel->setAttachments(new GenericCollection(\Schoolbox\Learning\Assessment\DataModel\LessonPlan\File\Model::class));
+            $dataModel->setAttachments(new GenericCollection(LessonPlanFileModel::class));
 
             foreach ($domainObject->getAttachments() as $file) {
                 $dataModel->getAttachments()->add(
@@ -152,7 +155,7 @@ class LessonPlan implements IAssessmentTypeTranslator
      */
     public function translateToDomainModel(IAssessableDataModel $dataModel, IAssessable $domainObject): void
     {
-        $lessonPlanFieldMapper = \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Field\Mapper::getInstance();
+        $lessonPlanFieldMapper = LessonPlanFieldMapper::getInstance();
 
         /* Lesson Plan Template associated with this assessment
          */
@@ -201,12 +204,12 @@ class LessonPlan implements IAssessmentTypeTranslator
         }
 
         // Convert attachments
-        $domainObject->setAttachments(new GenericCollection(\Schoolbox\Learning\Assessment\DataModel\LessonPlan\File\Model::class));
+        $domainObject->setAttachments(new GenericCollection(LessonPlanFileModel::class));
 
         if ($dataModel->getAttachments() !== null) {
-            $fileMapper = \Schoolbox\Learning\Assessment\DataModel\LessonPlan\File\Mapper::getInstance();
+            $fileMapper = LessonPlanFileMapper::getInstance();
 
-            $domainObject->setAttachments(new GenericCollection(\Schoolbox\Learning\Assessment\DataModel\LessonPlan\File\Model::class));
+            $domainObject->setAttachments(new GenericCollection(LessonPlanFileModel::class));
 
             foreach ($dataModel->getAttachments() as $attachment) {
                 $domainObject->getAttachments()->add(

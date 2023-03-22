@@ -68,7 +68,7 @@ class Mapper extends \Schoolbox\Mapper
             'files',
             [
                 'multiple'  => true,
-                'mapper'    => \Schoolbox\Learning\Assessment\DataModel\LessonPlan\File\Mapper::class,
+                'mapper'    => File\Mapper::class,
                 'this_key'  => 'id',
                 'other_key' => 'lesson_plan_id',
             ]

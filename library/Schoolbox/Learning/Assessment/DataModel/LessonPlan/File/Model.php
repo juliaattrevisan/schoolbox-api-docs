@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\DataModel\LessonPlan\File;
 
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Learning\Assessment\DataModel\LessonPlan;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
@@ -29,25 +30,25 @@ class Model implements IFile, ISoftDeletable
 
 
     /**
-     * @var \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Model
+     * @var LessonPlan\Model
      */
-    private \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Model $lessonPlan;
+    private LessonPlan\Model $lessonPlan;
 
 
     /**
-     * @return \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Model
+     * @return LessonPlan\Model
      */
-    public function getLessonPlan(): \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Model
+    public function getLessonPlan(): LessonPlan\Model
     {
         return $this->lessonPlan;
     }
 
 
     /**
-     * @param \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Model $lessonPlan
+     * @param LessonPlan\Model $lessonPlan
      * @return $this
      */
-    public function setLessonPlan(\Schoolbox\Learning\Assessment\DataModel\LessonPlan\Model $lessonPlan): self
+    public function setLessonPlan(LessonPlan\Model $lessonPlan): self
     {
         $this->lessonPlan = $lessonPlan;
         return $this;

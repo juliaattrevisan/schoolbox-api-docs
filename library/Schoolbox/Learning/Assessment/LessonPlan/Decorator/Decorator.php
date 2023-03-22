@@ -9,10 +9,12 @@
 namespace Schoolbox\Learning\Assessment\LessonPlan\Decorator;
 
 use Schoolbox\Collection;
+use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
 use Schoolbox\Learning\Assessment\AttachedFilesTrait;
 use Schoolbox\Learning\Assessment\DecoratorInterface;
 use Schoolbox\Learning\Assessment\LessonPlan;
 use Schoolbox\Learning\Assessment\LessonPlan\Model;
+use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Field\Mapper as LessonPlanFieldMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
@@ -62,8 +64,8 @@ class Decorator implements DecoratorInterface
     {
         /* Slap in the Lesson Plan Template chosen
          */
-        $lessonPlanFieldMapper = \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Field\Mapper::getInstance();
-        $lessonPlanTemplateMapper = \Schoolbox\Admin\LessonPlan\Template\Mapper::getInstance();
+        $lessonPlanFieldMapper = LessonPlanFieldMapper::getInstance();
+        $lessonPlanTemplateMapper = LessonPlanTemplateMapper::getInstance();
 
         /* Hydrate all the template's fields too
          * We need to remember where a Lesson Plan Field came from,
