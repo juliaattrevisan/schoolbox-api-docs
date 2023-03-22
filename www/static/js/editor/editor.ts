@@ -40,7 +40,7 @@ function addDefaultConfig(config: EditorConfig) {
         config.toolbar = EditorToolbar.FULL;
     }
     if (config.maxCharCount === undefined) {
-        config.maxCharCount = 65000;
+        config.maxCharCount = 65_000;
     }
 }
 
