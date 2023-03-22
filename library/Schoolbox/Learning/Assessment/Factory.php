@@ -260,7 +260,7 @@ class Factory
          */
         $this->setLessonPlanTemplateId((int)($post['lessonPlanTemplateId'] ?? null));
         $this->setLessonPlanFields($post['field'] ?? []);
-        $this->setLessonPlanVisibility($post['lessonPlanVisibility'] ?? \Schoolbox\Role::STUDENT);
+        $this->setLessonPlanVisibility('on' === ($post['lessonPlanVisibility'] ?? null) ? \Schoolbox\Role::STUDENT : \Schoolbox\Role::STAFF);
 
         // Ensure custom fields is an array if it's set
         $customFields = $post['customFields'] ?? null;

@@ -85,6 +85,30 @@
     {% endfor %}
 {% endif %}
 
+{# Toggle for deciding whether this Lesson Plan is visible to students
+ # or if it's restricted to staff eyes only
+ #}
+<fieldset>
+    <div class="row">
+        <div class="small-12 columns">
+            <input type="hidden" name="lessonPlanVisibility" value="staff" />
+
+            <label for="lessonPlanVisibility" class="inline-block">Visible to students <span class="hint has-tip tip-top" title="If on, students will be able to see this lesson plan and its contents" data-tooltip>?</span></label>
+            <div class="switch">
+                <input id="lessonPlanVisibility"
+                       name="lessonPlanVisibility"
+                       type="checkbox"
+                        {{ 'student' == assessment.visibility ? 'checked' : '' }}
+                >
+                <label for="lessonPlanVisibility">
+                    <span>On</span>
+                    <span>Off</span>
+                </label>
+            </div>
+        </div>
+    </div>
+</fieldset>
+
 <input type="submit" value="Save">
 
 <script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
