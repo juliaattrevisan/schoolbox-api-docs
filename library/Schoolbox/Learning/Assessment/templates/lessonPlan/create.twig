@@ -106,10 +106,19 @@
 
             <label for="lessonPlanVisibility" class="inline-block">Visible to students <span class="hint has-tip tip-top" title="If on, students will be able to see this lesson plan and its contents" data-tooltip>?</span></label>
             <div class="switch">
+                {# The Lesson Plan is visible to students based on this toggle under two circumstances:
+                 #     * by default, Lesson Plans are visible to students (assessment.visibility == '')
+                 #     * or When assessment.visibility == student
+                 #}
+                {% set visibility = '' %}
+
+                {% if '' == assessment.visibility or 'student' == assessment.visibility %}
+                    {% set visibility = 'checked' %}
+                {% endif %}
                 <input id="lessonPlanVisibility"
                        name="lessonPlanVisibility"
                        type="checkbox"
-                        {{ 'student' == assessment.visibility ? 'checked' : '' }}
+                        {{ visibility }}
                 >
                 <label for="lessonPlanVisibility">
                     <span>On</span>
