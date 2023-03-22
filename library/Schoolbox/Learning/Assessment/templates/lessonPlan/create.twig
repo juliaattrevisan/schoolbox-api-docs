@@ -109,6 +109,14 @@
     </div>
 </fieldset>
 
+{# Curriculum Codes
+ # This is the same include used by everything else. The entity type is some textual
+ # representation, randomly hardcoded here
+ #}
+{% include '@learningAssessment/fragments/curriculumCodes.twig' with {
+    entityType: 'Lesson Plan'
+} %}
+
 <input type="submit" value="Save">
 
 <script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
