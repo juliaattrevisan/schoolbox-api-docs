@@ -73,7 +73,9 @@ function initColourPickers() {
             new CustomEvent("colourPickerInitialize", {
                 detail: {
                     target: `#${colourPicker.id}`,
-                    options: {},
+                    options: {
+                        clearButton: true
+                    },
                 },
             })
         );
@@ -82,6 +84,9 @@ function initColourPickers() {
             onColourChange(event.currentTarget, event.currentTarget.value);
         });
         colourPicker.addEventListener("change", (event) => {
+            if (event.currentTarget.value === "") {
+                event.currentTarget.value = "#00000000";
+            }
             onColourChange(event.currentTarget, event.currentTarget.value);
         });
     });
