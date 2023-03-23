@@ -10,14 +10,12 @@ declare(strict_types=1);
 namespace Custom\Tigs\Summative;
 
 use Alaress_Date_Format;
+use InvalidArgumentException;
+use Schoolbox\IConfigLoader;
+use Schoolbox\User;
 
 use function in_array;
 use function is_numeric;
-
-use Schoolbox\IConfigLoader;
-use Schoolbox\User;
-use InvalidArgumentException;
-
 use function strtotime;
 
 /**
@@ -472,6 +470,7 @@ class StudentAttributes
             $reportYear--;
         }
 
+        // Looks like Year 11 Term 4 === Year 12 Term 1?
         if ($yearLevel === 11 && $term === 4) {
             $start = $config->get(Config::_TIGS_START_TERM_4) . " $reportYear";
         } elseif ($yearLevel === 12) {

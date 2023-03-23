@@ -1066,16 +1066,6 @@ parameters:
 			path: library/Custom/Tigs/Summative/SubjectReport/Components/AbstractMatrix.php
 
 		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Custom/Tigs/Summative/SubjectReport/Components/AcademicAchievementSummary.php
-
-		-
-			message: "#^PHPDoc tag @return with type array\\|null is not subtype of native type array\\.$#"
-			count: 1
-			path: library/Custom/Tigs/Summative/SubjectReport/Components/AcademicAchievementSummary.php
-
-		-
 			message: "#^Method Custom\\\\Tigs\\\\Summative\\\\SubjectReport\\\\Components\\\\HscAssessmentRank\\:\\:deriveCohortAverage\\(\\) is unused\\.$#"
 			count: 1
 			path: library/Custom/Tigs/Summative/SubjectReport/Components/HscAssessmentRank.php

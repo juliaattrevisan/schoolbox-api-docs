@@ -14,7 +14,6 @@ namespace Custom\Tigs\Summative;
  */
 class Config
 {
-
     // A data attribute to identify errors on the reports
     public const ERROR_DATA_ATTRIBUTE = 'data-tigs-crp-error-state';
 
@@ -46,4 +45,19 @@ class Config
     public const _TIGS_WORK_TYPE_7_10_ASSESSMENT_TASK = self::PREFIX_TIGS_CRP . 'work_type_7_10_assessment_task';
     public const _TIGS_WORK_TYPE_DEANS_COMMENT = self::PREFIX_TIGS_CRP . 'work_type_deans_comment';
     public const _TIGS_YEAR_GROUP_CLASS_CODE_SUFFIX = self::PREFIX_TIGS_CRP . 'year_group_class_code_suffix';
+
+    // Work types for learning profiles
+    // There's no year 11 term 4 profile, as year 11 term 4 is year 12 term 1
+    public const _TIGS_WORK_TYPE_YEAR_7_10_TERM_1_LEARNING_PROFILE = self::PREFIX_TIGS_CRP . 'work_type_year_7_10_term_1_learning_profile';
+    public const _TIGS_WORK_TYPE_YEAR_7_10_TERM_2_LEARNING_PROFILE = self::PREFIX_TIGS_CRP . 'work_type_year_7_10_term_2_learning_profile';
+    public const _TIGS_WORK_TYPE_YEAR_7_10_TERM_3_LEARNING_PROFILE = self::PREFIX_TIGS_CRP . 'work_type_year_7_10_term_3_learning_profile';
+    public const _TIGS_WORK_TYPE_YEAR_7_10_TERM_4_LEARNING_PROFILE = self::PREFIX_TIGS_CRP . 'work_type_year_7_10_term_4_learning_profile';
+    public const _TIGS_WORK_TYPE_YEAR_11_TERM_1_LEARNING_PROFILE = self::PREFIX_TIGS_CRP . 'work_type_year_11_term_1_learning_profile';
+    public const _TIGS_WORK_TYPE_YEAR_11_TERM_2_LEARNING_PROFILE = self::PREFIX_TIGS_CRP . 'work_type_year_11_term_2_learning_profile';
+    public const _TIGS_WORK_TYPE_YEAR_11_TERM_3_LEARNING_PROFILE = self::PREFIX_TIGS_CRP . 'work_type_year_11_term_3_learning_profile';
+//    public const _TIGS_WORK_TYPE_YEAR_11_TERM_4_LEARNING_PROFILE = self::PREFIX_TIGS_CRP . 'work_type_year_11_term_4_learning_profile';
+    public const _TIGS_WORK_TYPE_YEAR_12_TERM_1_LEARNING_PROFILE = self::PREFIX_TIGS_CRP . 'work_type_year_12_term_1_learning_profile';
+    public const _TIGS_WORK_TYPE_YEAR_12_TERM_2_LEARNING_PROFILE = self::PREFIX_TIGS_CRP . 'work_type_year_12_term_2_learning_profile';
+    public const _TIGS_WORK_TYPE_YEAR_12_TERM_3_LEARNING_PROFILE = self::PREFIX_TIGS_CRP . 'work_type_year_12_term_3_learning_profile';
+    public const _TIGS_WORK_TYPE_YEAR_12_TERM_4_LEARNING_PROFILE = self::PREFIX_TIGS_CRP . 'work_type_year_12_term_4_learning_profile';
 }
