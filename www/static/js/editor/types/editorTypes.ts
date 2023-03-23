@@ -18,4 +18,6 @@ export interface EditorConfig {
     baseHref?: string; // the base url to be prepended to relative links or assets included in the ckeditor
     addToToolbar?: string[]; // the list of extra plugins to add to the ckeditor outside of the scope of the EditorToolbar options
     removeFromToolbar?: string[]; // the list of plugins to remove from the ckeditor outside of the scope of the EditorToolbar options
+    maxCharCount?: number; // the maximum number of characters allowed in the editor
+    showWordCount?: boolean; // whether or not to show the word count
 }

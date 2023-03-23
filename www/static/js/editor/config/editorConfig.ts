@@ -37,6 +37,7 @@ import { getImageSettings } from "@js/editor/settings/imageSettings";
 import { getTableSettings } from "@js/editor/settings/tableSettings";
 import { getMediaEmbedSettings } from "@js/editor/settings/mediaEmbedSettings";
 import { getTokensSettings } from "@js/editor/settings/tokensSettings";
+import { getWordCountSettings } from "@js/editor/settings/wordCountSettings";
 import { EditorConfig } from "@js/editor/types/editorTypes";
 import Resource from "@js/editor/plugin/resource/Resource";
 import Blank from "@js/editor/plugin/blank/Blank";
@@ -88,5 +89,6 @@ export function getConfig(config: EditorConfig) {
         ...getTableSettings(),
         ...getMediaEmbedSettings(),
         ...getTokensSettings(config),
+        ...getWordCountSettings(),
     };
 }

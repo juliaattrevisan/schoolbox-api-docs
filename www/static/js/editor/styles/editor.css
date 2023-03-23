@@ -85,6 +85,12 @@
     margin-right: var(--ck-spacing-standard);
 }
 
+.ck.ck-word-count .ck-word-count__limit-warning {
+    color: var(--ck-custom-red);
+    font-style: italic;
+    margin-left: var(--ck-spacing-standard);
+}
+
 /**
  * Our foundation styles does some funky things with
  * checkboxes, hiding the <input> and using the <label>
