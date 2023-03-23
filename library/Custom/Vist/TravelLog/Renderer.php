@@ -20,7 +20,6 @@ use Twig\Error\SyntaxError;
  */
 class Renderer
 {
-
     /**
      * Student's Travel Log should be requested and displayed only for verso school
      */
@@ -144,9 +143,15 @@ class Renderer
             }
         }
 
+        /* $travelLogs might successfully return an empty data set, when a student doesn't have any bus-related data yet (or if it's been cleared in the third party).
+         * We can't presume to use the first date in this case.
+         * The previous check only verified you didn't have an error struct.
+         */
+        $date = $travelLogs['data'][0]['timestamp'] ?? '';
+
         return !empty($travelLogs) ? $twig->render('travelLog.twig', [
             'travelLogs' => $travelLogs['data'],
-            'date' => $showDate ? $travelLogs['data'][0]['timestamp'] : ''
+            'date' => $showDate ? $date : ''
         ]) : '';
     }
 
