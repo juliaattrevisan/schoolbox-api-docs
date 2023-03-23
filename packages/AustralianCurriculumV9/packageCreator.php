@@ -133,7 +133,7 @@ $seenCodes = [];
 // Define a 2-dimensional array to store the rows of the output CSV file
 $output_rows = [];
 
-$output_rows[] = [1, 0, 'Australian Curriculum - V9', null, 0, null];
+$output_rows[] = [1, 0, 'Australian Curriculum (v9)', null, 0, null];
 
 // For each file, do things...
 foreach ($subjectFiles as $subject => $filesArray) {
