@@ -132,7 +132,7 @@ class Module extends BaseModule
                     // Comment owner is not staff - authorize only if logged-in user is comment owner or blog owner.
                     if (
                         $loggedInUser->getId() === $commentOwner->getId() ||
-                        $loggedInUser->getId() === $params['blog']->getOwner()->getId()
+                        $loggedInUser->getId() === $params['comment']->getBlog()->getOwner()->getId()
                     ) {
                         return;
                     } else {
