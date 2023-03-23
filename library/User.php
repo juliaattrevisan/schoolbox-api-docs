@@ -403,7 +403,7 @@ class User extends DeprecatedModel
     }
 
     /**
-     * @param $username
+     * @param string $username
      * @param int $limit
      * @return array|bool
      */
