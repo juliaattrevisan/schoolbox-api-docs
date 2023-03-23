@@ -122,8 +122,8 @@ class Module extends BaseModule
 
                 if ($commentOwnerRole->isStaff()) {
                     // Comment owner is staff - authorize only if logged-in user is superuser or staff.
-                    $loggedInUserRole = $loggedInUser->getRole();
-                    if ($loggedInUser->isSuperuser() || $loggedInUserRole->isStaff()) {
+                    // Superusers are always authorized (see return line at bottom of this function), so we only need to check isStaff().
+                    if ($loggedInUser->getRole()->isStaff()) {
                         return;
                     } else {
                         throw new Unauthorized();
