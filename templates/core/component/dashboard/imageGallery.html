@@ -7,23 +7,14 @@
         <div class="small-12 island">
             <h2 class="subheader">{COMPONENT_NAME}</h2>
             <section class="content">
-                <ul class="img-gallery" data-image-gallery>
+                <ul class="img-gallery" data-image-lightbox>
                     <!-- BEGIN image_gallery -->
-                    <li>
-                        <a href="/cms/image.php?id={THUMBNAIL_ID}&height=2048&width=2048"
-                           rel="lightbox[homepage-{COMPONENT_INSTANCE_ID}]" style="height:{IMAGE_HEIGHT}px; width:{IMAGE_WIDTH}px;"
-                           alt="{THUMBNAIL_DESCRIPTION}" title="{THUMBNAIL_DESCRIPTION}">
-                            <img src="/cms/image.php?id={THUMBNAIL_ID}&height={THUMBNAIL_SIZE}&width={THUMBNAIL_SIZE}&resample=0" alt="{THUMBNAIL_DESCRIPTION}" />
-                        </a>
+                    <li href="/cms/image.php?id={THUMBNAIL_ID}&height=2048&width=2048">
+                        <a><img src="/cms/image.php?id={THUMBNAIL_ID}&height={THUMBNAIL_SIZE}&width={THUMBNAIL_SIZE}&resample=0" alt="{THUMBNAIL_DESCRIPTION}" /></a>
                     </li>
                     <!-- END image_gallery -->
                 </ul>
-                <script type="text/javascript">
-                    $('[data-image-gallery] li').magnificPopup({
-                        delegate: 'a',
-                        type: 'image'
-                    });
-                </script>
+                <script src="{CDN_PREFIX}/js/bundle/imageLightboxInit.js?v={SITE_VERSION}"></script>
             </section>
             <div class="component-action">
                 <section>

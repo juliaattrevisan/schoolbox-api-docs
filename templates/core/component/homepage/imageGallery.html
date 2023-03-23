@@ -52,16 +52,8 @@
                                 $(file.previewElement).find('img.dz-pending').remove();
                             }
                         });
-                        $('[data-image-gallery]').each(function() {
-                            $(this).magnificPopup({
-                                delegate: 'a',
-                                type: 'image',
-                                gallery:{
-                                    enabled:true
-                                }
-                            });
-                        });
                     </script>
+                    <script src="{CDN_PREFIX}/js/bundle/imageLightboxInit.js?v={SITE_VERSION}"></script>
                 </div>
 
             </div>
@@ -87,18 +79,14 @@
                                 </div>
                             </li>
                         </ul>
-                        <ul class="img-gallery" data-dz-container data-image-gallery="homepage-{COMPONENT_INSTANCE_ID}">
+                        <ul class="img-gallery" data-dz-container data-image-lightbox>
                             <!-- BEGIN image_gallery -->
-                            <li>
-                                <a href="/cms/image.php?id={THUMBNAIL_ID}&height=2048&width=2048"
-                                   rel="lightbox[homepage-{COMPONENT_INSTANCE_ID}]" style="height:{IMAGE_HEIGHT}px; width:{IMAGE_WIDTH}px;"
-                                   alt="{THUMBNAIL_DESCRIPTION}" title="{THUMBNAIL_DESCRIPTION}">
-                                    <img src="/cms/image.php?id={THUMBNAIL_ID}&height={THUMBNAIL_SIZE}&width={THUMBNAIL_SIZE}&resample=0"
-                                         alt="{THUMBNAIL_DESCRIPTION}"/>
-                                </a>
+                            <li href="/cms/image.php?id={THUMBNAIL_ID}&height=2048&width=2048">
+                                <a><img src="/cms/image.php?id={THUMBNAIL_ID}&height={THUMBNAIL_SIZE}&width={THUMBNAIL_SIZE}&resample=0"alt="{THUMBNAIL_DESCRIPTION}"/></a>
                             </li>
                             <!-- END image_gallery -->
                         </ul>
+                        <script src="{CDN_PREFIX}/js/bundle/imageLightboxInit.js?v={SITE_VERSION}"></script>
                     </div>
 
                     <div class="component-action">
@@ -125,12 +113,7 @@
                                         $(file.previewElement).find('img.dz-pending').remove();
                                     }
                                 });
-                                $('[data-image-gallery] li').magnificPopup({
-                                    delegate: 'a',
-                                    type: 'image'
-                                });
                             </script>
-
                             <p><a href="/cms/file/new/{IMAGEGALLERY_CATEGORY_ID}">Select an image</a> or drag and drop multiple onto this component</p>
                             <!-- END submit_image_gallery -->
                             <a href="/cms/imageGallery/{IMAGEGALLERY_CATEGORY_ID}?returnId={ID}" class="button">View Full Gallery</a>
