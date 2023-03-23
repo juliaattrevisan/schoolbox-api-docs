@@ -14,7 +14,6 @@ require_once __DIR__ . '/../../conf/core/require.php';
  * Update log location to be instance specific location in /var/log/schoolbox
  */
 $app = new class extends CliTool\App {
-
     /** Hands off execution over to the App */
     public function run(): void
     {
@@ -25,7 +24,7 @@ $app = new class extends CliTool\App {
         );
 
         $this->getDatabaseInternal()->executeQuery(
-            "UPDATE config SET value = 'purifier_cache_dir:purifier;twig_cache_dir:twig;backup_dir:files;zip_dir:cache/zip;stream_dir:cache/stream;portrait_dir:cache/portrait;storage_dir:storage' WHERE name = 'data_dirs_defaults'",
+            "UPDATE config SET value = 'purifier_cache_dir:purifier;twig_cache_dir:twig;backup_dir:backups;zip_dir:cache/zip;stream_dir:cache/stream;portrait_dir:cache/portrait;storage_dir:storage' WHERE name = 'data_dirs_defaults'",
         );
 
         if (!is_dir($logsDir)) {
