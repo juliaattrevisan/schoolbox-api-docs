@@ -284,7 +284,8 @@ class Scrub
                 $def->addAttribute('iframe', 'allow', 'Text');
                 $def->addAttribute('iframe', 'allowfullscreen', 'Bool');
 
-                //new ckeditor5 additions
+                // CKEditor5
+                // Don't Scrub these bits. CKEditor5 needs them...
                 $def->addAttribute('a', 'download', 'Text');
                 $def->addAttribute('img', 'style', 'Text');
                 $figure = $def->addElement(
