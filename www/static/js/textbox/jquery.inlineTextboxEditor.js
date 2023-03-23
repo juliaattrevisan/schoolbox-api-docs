@@ -178,13 +178,6 @@
          */
         self.element.trigger("inlineTextboxEditor.preEditorCreate", [self]);
 
-        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
-            detail: {
-                targetElements: ['#' + editorInstanceId],
-                replace: true,
-            }
-        }));
-
         // wait for the editor to be created
         document.getElementById(editorInstanceId).addEventListener("EDITOR__CREATED", () => {
             self.editor = window.sbProps.editors[editorInstanceId];
@@ -205,6 +198,13 @@
 
             self.element.trigger("inlineTextboxEditor.editorCreate", [self]);
         });
+
+        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+            detail: {
+                targetElements: ['#' + editorInstanceId],
+                replace: true,
+            }
+        }));
     };
 
     InlineTextboxEditor.prototype.onClickSave = function () {
