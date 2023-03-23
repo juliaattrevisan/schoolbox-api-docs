@@ -141,7 +141,7 @@ class Module extends BaseModule
                 }
             }
             if (($params['blog'] ?? null) instanceof EportfolioBlogModel) {
-                if ($params['blog']->getOwner()->getId() == $loggedInUser->getId()) {
+                if ($params['blog']->getOwner()->getId() === $loggedInUser->getId()) {
                     return;
                 }
             }
