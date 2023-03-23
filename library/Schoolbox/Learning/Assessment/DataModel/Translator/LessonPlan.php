@@ -8,13 +8,11 @@
 
 namespace Schoolbox\Learning\Assessment\DataModel\Translator;
 
-use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Model as LessonPlanModel;
 use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlanObject;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Field\Mapper as LessonPlanFieldMapper;
-use Schoolbox\Learning\Assessment\DataModel\LessonPlan\File\Model as LessonPlanFileModel;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\File\Mapper as LessonPlanFileMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
@@ -77,6 +75,7 @@ class LessonPlan implements IAssessmentTypeTranslator
     public function translateToDataModel(IAssessable $domainObject, IAssessableDataModel $dataModel): void
     {
         $lessonPlanFieldMapper = LessonPlanFieldMapper::getInstance();
+        $lessonPlanFileMapper = LessonPlanFileMapper::getInstance();
 
         /* Remember the Lesson Plan Template that was chosen
          */
@@ -126,15 +125,13 @@ class LessonPlan implements IAssessmentTypeTranslator
 
         // Translate files
         if ($domainObject->getAttachments() !== null) {
-            $fileMapper = LessonPlanFileMapper::getInstance();
-
             $now = \Alaress_Date_Format::now();
 
-            $dataModel->setAttachments(new GenericCollection(LessonPlanFileModel::class));
+            $dataModel->setAttachments($lessonPlanFileMapper->createCollection());
 
             foreach ($domainObject->getAttachments() as $file) {
                 $dataModel->getAttachments()->add(
-                    ($fileMapper->createModel())
+                    ($lessonPlanFileMapper->createModel())
                         ->setId($file->getId())
                         ->setLessonPlan($dataModel)
                         ->setStorage($file->getStorage())
@@ -150,12 +147,15 @@ class LessonPlan implements IAssessmentTypeTranslator
     /**
      * Copies all attributes from the dataModel to domainObject
      *
-     * @param IAssessableDataModel|LessonPlanModel $dataModel
-     * @param IAssessable|LessonPlanObject         $domainObject
+     * @param IAssessableDataModel $dataModel
+     * @param IAssessable          $domainObject
+     * @throws Exception
+     * @throws \UnexpectedValueException
      */
     public function translateToDomainModel(IAssessableDataModel $dataModel, IAssessable $domainObject): void
     {
         $lessonPlanFieldMapper = LessonPlanFieldMapper::getInstance();
+        $lessonPlanFileMapper = LessonPlanFileMapper::getInstance();
 
         /* Lesson Plan Template associated with this assessment
          */
@@ -204,16 +204,14 @@ class LessonPlan implements IAssessmentTypeTranslator
         }
 
         // Convert attachments
-        $domainObject->setAttachments(new GenericCollection(LessonPlanFileModel::class));
+        $domainObject->setAttachments($lessonPlanFileMapper->createCollection());
 
         if ($dataModel->getAttachments() !== null) {
-            $fileMapper = LessonPlanFileMapper::getInstance();
-
-            $domainObject->setAttachments(new GenericCollection(LessonPlanFileModel::class));
+            $domainObject->setAttachments($lessonPlanFileMapper->createCollection());
 
             foreach ($dataModel->getAttachments() as $attachment) {
                 $domainObject->getAttachments()->add(
-                    ($fileMapper->createModel())
+                    ($lessonPlanFileMapper->createModel())
                         ->setId($attachment->getId())
                         ->setFilename($attachment->getFilename())
                         ->setStorage($attachment)
