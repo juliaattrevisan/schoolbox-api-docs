@@ -10,7 +10,10 @@ table.rb {
 
     .markdown {
         li {
-            white-space: pre-wrap;
+            white-space: normal;
+            a {
+                line-height: inherit;
+            }
         }
         p {
             white-space: pre-wrap;
