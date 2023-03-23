@@ -303,7 +303,7 @@ class Scrub
                     'Empty',
                     'Common',
                     [
-                        'url' => 'Text'
+                        'url' => 'URI'
                     ]
                 );
                 //to-do list
