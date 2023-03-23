@@ -21,7 +21,7 @@ function displayResourceModal() {
      */
     $.fn.schoolboxResource({
         allowedFilesystems: "files",
-        allowedFiles: "image/*,audio/*,video/*,.heic,.heics,.heif",
+        allowedFiles: "*/*",
         useFolder: false,
         defaultFolderSelector,
     });
