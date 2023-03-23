@@ -91,7 +91,7 @@ class Module extends BaseModule
         }
 
         if ($user->getId() === null) {
-            throw new NotFound('User not found among normal or deleted users.');
+            throw new NotFound();
         }
 
         return [
