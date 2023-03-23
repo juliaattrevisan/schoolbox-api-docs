@@ -328,6 +328,13 @@ class Scrub
                         'disabled' => 'Text',
                     ]
                 );
+                //table caption
+                $tableCaption = $def->addElement(
+                    'figcaption',
+                    'Block',
+                    'Flow',
+                    false
+                );
 
 
                 //
