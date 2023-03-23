@@ -76,6 +76,7 @@ class Mapper extends \Schoolbox\Mapper
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'auditorFields']);
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteFields']);
+        $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteAttachments']);
     }
 
 
@@ -256,6 +257,19 @@ class Mapper extends \Schoolbox\Mapper
         /* Dump away any associated Fields too
          */
         $this->getJoinMapper('lessonPlanField')->delete($lessonPlan->getFields());
+    }
+
+
+    /**
+     * Delete the files (attachments) associated with a Lesson Plan
+     *
+     * @param Model $lessonPlan
+     * @return void
+     * @throws DefinitionException
+     */
+    protected function softDeleteAttachments(Model $lessonPlan): void
+    {
+        $this->getJoinMapper('files')->deleteByColumn('lesson_plan_id', $lessonPlan->getId());
     }
 
 
