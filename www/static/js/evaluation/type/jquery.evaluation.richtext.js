@@ -47,6 +47,7 @@
                 new CustomEvent("EDITOR__CREATE", {
                     detail: {
                         targetElements: ["#" + config.editorSelector],
+                        showWordCount: true,
                     },
                 })
             );
