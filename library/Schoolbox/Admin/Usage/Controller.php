@@ -14,7 +14,6 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Redis;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Admin\Navigation\Subnav;
-use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Resource\FilesystemFactory;
