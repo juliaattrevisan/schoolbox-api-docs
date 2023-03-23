@@ -181,7 +181,18 @@
         // wait for the editor to be created
         document.getElementById(editorInstanceId).addEventListener("EDITOR__CREATED", () => {
             self.editor = window.sbProps.editors[editorInstanceId];
-            self.editor.focus(); // focus on the editor
+
+            // Focus on the editor, then set the cursor to the end of the content
+            self.editor.focus();
+            self.editor.model.change((writer) => {
+                writer.setSelection(writer.createPositionAt(self.editor.model.document.getRoot(), "end"));
+            });
+
+            // Scroll the editor into view, specifically, use the action buttons as the anchor point and bring them to the centre of the page if possible.
+            // To prevent odd scrolling behaviour, we have to wait a small amount of time for the editor to be rendered fully before we can scroll the view.
+            setTimeout(() => {
+                self.element.find(".component-action")[0].scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
+            }, 50);
 
             /* If you change the content, you're dirty; show the little Changes Not Saved
              * thing by entering dirtyModify state
@@ -227,6 +238,15 @@
                 self.editor.destroy();
                 self.editorInstance.html(articleContent);
                 self.editorInstance.removeAttr("contentEditable");
+
+                // When the editor is destroyed and replaced with html content, the browser can scroll the view to a random point in the page.
+                // This could be quite confusing for the user, the best solution to this is to bring the action buttons back into view after the editor is destroyed.
+                // As the user just interacted with one of these buttons, they should be able to follow the flow of the page.
+                // We must wait a small amount of time for the editor to be destroyed and new content rendered before we can scroll the view.
+                setTimeout(() => {
+                    self.element.find(".component-action")[0].scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
+                }, 50);
+
                 self.switchState(self.states.clean);
                 self.element.trigger("inlineTextboxEditor.editorDestroy", [self]);
                 self.element.trigger("inlineTextboxEditor.save", [self]);
