@@ -39,8 +39,8 @@
 					<div class="small-12 columns">
 						<label class="required" for="heading">Title</label>
 						<input type="text" required id="heading" name="heading" size="60" maxlength="200" value="{HEADING}"/>
-						<label>
-							Body
+						<div>
+							<label>Body</label>
 							<span data-reveal-id="tipModal" class="hint has-tip tip-top" title="Click/tap to find out more">?</span>
 							<div id="tipModal" class="reveal-modal" data-reveal>
 								<p>
@@ -67,9 +67,8 @@
                                     Links will remain in red until the content has been updated in the new document.
                                 </p>
 							</div>
-
 							<textarea name="body" id="body">{BODY}</textarea>
-						</label>
+						</div>
 					</div>
 				</fieldset>
 			</section>
