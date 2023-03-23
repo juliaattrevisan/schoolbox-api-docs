@@ -23,10 +23,10 @@ case "$1" in
         date >> /var/log/schoolbox/upgrade.log;
         echo "Schoolbox Upgrade" >> /var/log/schoolbox/upgrade.log;
 
-        # Modify newly-deployed package files to be owned by 'alaress' user.
+        # Modify newly-deployed package files to be owned by 'schoolboxsuper' user.
         # In theory, package files should be root-owned, but this assists Support/Devs using FTP to manipulate files.
         # https://www.debian.org/doc/debian-policy/ch-files.html#permissions-and-owners
-        chown -R alaress:alaress /usr/share/schoolbox 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
+        chown -R schoolboxsuper:schoolboxsuper /usr/share/schoolbox 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
 
         # Puppet will use `exec` resources to:
         # - upgrade the SQL of each instance
