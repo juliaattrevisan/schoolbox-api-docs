@@ -22,7 +22,9 @@
                 new CustomEvent("colourPickerInitialize", {
                     detail: {
                         target: `#${colourPicker.id}`,
-                        options: {},
+                        options: {
+                            clearButton: true,
+                        },
                     },
                 })
             );
