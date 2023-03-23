@@ -170,7 +170,7 @@ function getAudioAttributes(resource: Resource, config: EditorConfig) {
  *
  * @param { Resource } resource - the resource
  * @param { EditorConfig } config - the editor config
- * @returns { object } - the image attributes
+ * @returns { object } - the document attributes
  */
 function getDocumentAttributes(resource: Resource, config: EditorConfig) {
     return {
