@@ -402,7 +402,12 @@ class User extends DeprecatedModel
         return $this->db->getAll($query);
     }
 
-    public function getUserLogins($username, $limit = 10)
+    /**
+     * @param string $username
+     * @param int $limit
+     * @return array|bool
+     */
+    public function getUserLogins($username, int $limit = 10): array|bool
     {
         $query = "SELECT date, ip, login FROM login_log WHERE username like "
             . $this->db->smartQuote($username)

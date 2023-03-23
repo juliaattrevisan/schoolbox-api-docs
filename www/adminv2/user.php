@@ -35,7 +35,7 @@ if (is_array($superuserList)) {
             'SUPERUSER_NAME' => $userHandler->formatName($superuser),
             'SUPERUSER_LOGIN' => (
                 // Login logs are often purged to save space, so we must handle the case where no login logs exist.
-                (count($loginLog) === 0) ? '' : date(Config::get('date_short'), strtotime($loginLog[0]['date']))
+                empty($loginLog) ? '' : date(Config::get('date_short'), strtotime($loginLog[0]['date']))
             ),
             'SUPERUSER_ID' => $superuser['uid']
         );
