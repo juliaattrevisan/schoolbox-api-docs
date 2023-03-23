@@ -115,10 +115,8 @@
                 $.fn.schoolboxResource_RestoreAllPlaceholders(component);
             })
             // On create/destroy of editor:
-            // add/remove no-pad class to its container, to offset padding
-            // Also: put the media players back when the editor is destroyed
+            // put the media players back when the editor is destroyed
             .on('inlineTextboxEditor.editorCreate', function (event, inlineTextboxEditor) {
-                content.addClass('no-pad');
                 // Add beforeUnload, which will trigger if this is dirty
                 beforeUnloadListener = function (event) {
                     if (inlineTextboxEditor.isDirty()) {
@@ -131,7 +129,6 @@
                 window.addEventListener('beforeunload', beforeUnloadListener);
             })
             .on('inlineTextboxEditor.editorDestroy', function () {
-                content.removeClass('no-pad');
                 window.removeEventListener('beforeunload', beforeUnloadListener);
                 $.fn.schoolboxResource_ProxyReplacement(component);
             })
