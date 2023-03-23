@@ -79,8 +79,7 @@
 
 <div id="toast-{{ component.instance.id }}" class="toast"></div>
 
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/textbox/jquery.inlineTextboxEditor.js?v={{ config.site_version }}"></script>
 {% autoescape 'js' %}
     <script type="text/javascript">
@@ -93,37 +92,13 @@
                 beforeUnloadListener  = null,
                 addTextboxModal       = $('#addTextboxModal-{{ component.instance.id }}'),
                 addTextboxForm        = $('#addTextboxModal-{{ component.instance.id }}-form'),
-                toast                 = $('#toast-{{ component.instance.id }}'),
-                editorInline          = false,
-                editorInstanceOptions = $.alaressEditorConfig({
-                    // Always start file browser from current folder, instead of the alt source
-                    file_browser_category_id: Number("{{ context.id }}"),
-                    title:                    '',
-                },
-            );
-
-            // If using the inline version of the editor:
-            // Remove wordcount as it looks awkward
-            if (editorInline) {
-                if (!editorInstanceOptions.removePlugins) {
-                    editorInstanceOptions.removePlugins = 'wordcount';
-                } else {
-                    editorInstanceOptions.removePlugins += ',wordcount';
-                }
-
-                // Restore source dialog plugin
-                if (editorInstanceOptions.removeButtons) {
-                    editorInstanceOptions.removeButtons = editorInstanceOptions.removeButtons.replace(/sourcedialog/i, '');
-                }
-            }
+                toast                 = $('#toast-{{ component.instance.id }}');
 
             const inlineTextboxEditor = component.inlineTextboxEditor({
                 modifyButton:          '[data-action="modify"]',
                 deleteButton:          '[data-action="delete"]',
                 saveButton:            '[data-action="save"]',
                 editorInstance:        '[data-content]',
-                editorInstanceOptions: editorInstanceOptions,
-                editorInline:          editorInline,
             });
 
 
@@ -140,10 +115,8 @@
                 $.fn.schoolboxResource_RestoreAllPlaceholders(component);
             })
             // On create/destroy of editor:
-            // add/remove no-pad class to its container, to offset padding
-            // Also: put the media players back when the editor is destroyed
+            // put the media players back when the editor is destroyed
             .on('inlineTextboxEditor.editorCreate', function (event, inlineTextboxEditor) {
-                content.addClass('no-pad');
                 // Add beforeUnload, which will trigger if this is dirty
                 beforeUnloadListener = function (event) {
                     if (inlineTextboxEditor.isDirty()) {
@@ -156,7 +129,6 @@
                 window.addEventListener('beforeunload', beforeUnloadListener);
             })
             .on('inlineTextboxEditor.editorDestroy', function () {
-                content.removeClass('no-pad');
                 window.removeEventListener('beforeunload', beforeUnloadListener);
                 $.fn.schoolboxResource_ProxyReplacement(component);
             })
