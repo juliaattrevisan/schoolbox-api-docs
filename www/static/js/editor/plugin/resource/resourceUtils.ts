@@ -45,7 +45,7 @@ export type Resource = {
     id: string;
     mime: string;
     name: string;
-    type: "image" | "video" | "audio" | "folder";
+    type: "image" | "video" | "audio" | "folder" | "document";
 };
 
 /**
@@ -166,6 +166,21 @@ function getAudioAttributes(resource: Resource, config: EditorConfig) {
 }
 
 /**
+ * Get the document attributes
+ *
+ * @param { Resource } resource - the resource
+ * @param { EditorConfig } config - the editor config
+ * @returns { object } - the image attributes
+ */
+function getDocumentAttributes(resource: Resource, config: EditorConfig) {
+    return {
+        src: getURL(`/ajax/mime/${resource.mime}`, config),
+        alt: resource.name,
+        linkHref: getURL(`/storage/fetch.php?hash=${resource.hash}`, config),
+    };
+}
+
+/**
  * Get the folder src
  *
  * @param { Resource } resource - the resource
@@ -225,6 +240,9 @@ export function getAttributes(resource: Resource, config: EditorConfig) {
     }
     if (resource.type === "audio") {
         return getAudioAttributes(resource, config);
+    }
+    if (resource.type === "document") {
+        return getDocumentAttributes(resource, config);
     }
     return {};
 }
