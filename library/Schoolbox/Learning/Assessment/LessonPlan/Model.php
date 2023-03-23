@@ -103,19 +103,73 @@ class Model extends AbstractAssessment
      * @return static
      * @throws \UnexpectedValueException
      */
-    public function cloneForCopy()
+    public function cloneForCopy(): self
     {
         $clone = parent::cloneForCopy();
-        $clone->setFields($clone->getFields()->emptyClone());
 
-        foreach ($this->getFields() as $field) {
+        /* Copy Lesson Plan Fields completely and save them
+         * as entirely new Lesson Plan Fields in the db
+         */
+        $clone->copyFields($this);
+
+        // copy attachments
+        $clone->copyAttachedFiles($this);
+
+        return $clone;
+    }
+
+
+    /**
+     * Copy Lesson Plan Fields from $source into $this,
+     * where $this is actually the clone.
+     *
+     * The clone copies from the $source into itself.
+     *
+     * @param Model $source
+     * @return $this
+     * @throws \UnexpectedValueException
+     */
+    private function copyFields(self $source): self
+    {
+        /* Clone out the Collection datatype from the source
+         */
+        $this->setFields($source->getFields()->emptyClone());
+
+        /* Clone every field found in the source,
+         * clear its id so it saves a new record
+         */
+        foreach ($source->getFields() as $field) {
             $newField = clone $field;
             $newField->setId(null);
 
-            $clone->addField($newField);
+            $this->addField($newField);
         }
 
-        return $clone;
+        return $this;
+    }
+
+
+    /**
+     * Copy attached files from `$source` into this object.
+     *
+     * @param self $source
+     * @return $this
+     */
+    private function copyAttachedFiles(self $source): self
+    {
+        $newFiles = new Collection();
+
+        foreach ($source->getAttachments() as $file) {
+            $newFiles->add(
+                (new File())
+                    ->setStorage($file->getStorage())
+                    ->setBasename($file->getBasename())
+            );
+        }
+
+        $this->setAttachments($newFiles);
+
+        return $this;
     }
 
 
