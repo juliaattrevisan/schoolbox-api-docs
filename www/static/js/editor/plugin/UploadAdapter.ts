@@ -65,9 +65,12 @@ export default class UploadAdapter {
         if (!response || !response.success) {
             return reject(response && response.error ? response.message : genericErrorText);
         }
-        resolve({
-            default: getURL(response.meta.file._links.image, this.editor.config.sbConfig as EditorConfig),
-        });
+        console.warn(response.meta);
+        if (response.meta.type === "image") {
+            resolve({
+                default: getURL(response.meta.file._links.image, this.editor.config.sbConfig as EditorConfig),
+            });
+        }
     }
 
     /**
