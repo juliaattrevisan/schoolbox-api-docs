@@ -24,6 +24,7 @@ use Schoolbox\Application\Exception\AccessDenied;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Application\WebRequest\RequestUriParser;
+use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\Comms\News\Discussion\ThreadLocator;
@@ -594,10 +595,15 @@ class Controller extends Base
             // mutate the default map slightly
             $map = $article->getDefaultJsonMap();
             $map['featureImage'] = [ 'size', 'mime' ];
+            $map[] = 'attachedFiles';
 
             $data = [
-                'article' => $article->jsonSerialize(
-                    new PropertyDecorator($map, new LinkDecorator($this->router, $this->authorizer, $this->getUser()))
+                'article'         => $article->jsonSerialize(
+                    new PropertyDecorator(
+                        $map,
+                        new LinkDecorator($this->router, $this->authorizer, $this->getUser()),
+                        new FileDecorator(new Storage\Translator\ModelToArray(new PrefixGenerator($this->getConfigLoader())))
+                    )
                 ),
                 'isSavedForLater' => $isSavedForLater,
             ];
