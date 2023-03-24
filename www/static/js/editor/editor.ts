@@ -28,15 +28,6 @@ async function onCreated(textarea: HTMLTextAreaElement, editor: Editor, config: 
             },
         })
     );
-
-    const fileRepository = editor.plugins.get("FileRepository");
-    editor.editing.view.document.on("clipboardInput", (evt, data) => {
-        const files = Array.from(data.dataTransfer._files);
-        files.forEach((file) => {
-            const loader = fileRepository.createLoader(file);
-            loader.upload();
-        });
-    });
 }
 
 /**

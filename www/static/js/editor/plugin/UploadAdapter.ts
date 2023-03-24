@@ -65,11 +65,28 @@ export default class UploadAdapter {
         if (!response || !response.success) {
             return reject(response && response.error ? response.message : genericErrorText);
         }
-        console.warn(response.meta);
-        if (response.meta.type === "image") {
+        const meta = response.meta as JSON;
+        const config = this.editor.config.sbConfig as EditorConfig;
+        console.warn(meta);
+        if (meta.file.type === "image") {
             resolve({
-                default: getURL(response.meta.file._links.image, this.editor.config.sbConfig as EditorConfig),
+                default: getURL(meta.file._links.image, config),
             });
+        }
+        if (meta.file.type === "document") {
+            const mediaEmbed = this.editor.plugins.get("MediaEmbed");
+            mediaEmbed.forceDisabled("addResourceText");
+            this.editor.model.change((writer) => {
+                // Insert the text at the user's current position.
+                this.editor.model.insertContent(writer.createText(`${meta.name}: `));
+            });
+            const attributes = {
+                src: getURL(meta.file._links.icon, config),
+                alt: meta.name,
+                linkHref: getURL(meta.file._links.fetch, config),
+            };
+            const imageUtils = this.editor.plugins.get("ImageUtils");
+            imageUtils.insertImage(attributes, this.editor.model.document.selection, "imageInline");
         }
     }
 
