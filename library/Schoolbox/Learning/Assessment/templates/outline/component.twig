@@ -38,10 +38,12 @@
 <section>
 
     {% if (courseImplementation.units ?? [])|length %}
-        {% set href = (courseSpecification.folder.id in accessibleFolderIds) ? ('/homepage/' ~ courseSpecification.folder.id) : '#' %}
-
         <p class="component-titlebar meta">
-            <a class="icon-course" href="{{ href }}" title="Visit course page">{{ courseSpecification.title }}</a>
+            {% if courseSpecification.folder.id in accessibleFolderIds %}
+                <a class="icon-course" href="{{ '/homepage/' ~ courseSpecification.folder.id }}" title="Visit course page">{{ courseSpecification.title }}</a>
+            {% else %}
+                <span class="icon-course">{{ courseSpecification.title }}</span>
+            {% endif %}
         </p>
 
         {% include '@learningAssessment/outline/unit.twig' %}

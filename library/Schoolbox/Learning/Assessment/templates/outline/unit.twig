@@ -5,7 +5,6 @@
         {% set expanded = unit.isOpen == true %}
         {% set expanded_icon = expanded ? 'icon-up-arrow' :'icon-down-arrow'  %}
         {% set expanded_state = expanded ? 'expanded' :'collapsed' %}
-        {% set unitHref = (unit.specification.folder.id in accessibleFolderIds) ? '/homepage/' ~ unit.specification.folder.id : '#' %}
 
         <li class="interact {{ expanded_state }}" data-unit="{{ unit.id }}" data-open_date="{{ unit.openDate.databaseDate }}" data-due_date="{{ unit.dueDate.databaseDate }}">
             <div class="actions-small-1">
@@ -13,8 +12,12 @@
                     <div class="card small-12">
                         <h3>
                             {% if unit.isBeforeOpenDate==false or readOnly == false %}
-                            <a class="expand-link {{ expanded_icon }}" data-interaction="toggle-expanded" data-interaction-state="{{ expanded_state }}"></a>
-                            <a href="{{ unitHref }}">{{ unit.title }}</a>
+                                <a class="expand-link {{ expanded_icon }}" data-interaction="toggle-expanded" data-interaction-state="{{ expanded_state }}"></a>
+                                {% if unit.specification.folder.id in accessibleFolderIds %}
+                                    <a href="{{ '/homepage/' ~ unit.specification.folder.id }}">{{ unit.title }}</a>
+                                {% else %}
+                                    {{ unit.title }}
+                                {% endif %}
                             {% else %}
                                 {{ unit.title }}
                             {% endif %}
