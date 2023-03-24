@@ -169,10 +169,12 @@
                         <label for="name" class="required">Name</label>
                         <input name="name" id="name" type="text" value="{{ item.name }}" maxlength="250" required />
 
-                        <label>
+                        <label for="resource-booking-description">
                             Description
-                            <textarea name="description" id="resource-booking-description">{{ item.description }}</textarea>
                         </label>
+                        <div>
+                            <textarea name="description" id="resource-booking-description">{{ item.description }}</textarea>
+                        </div>
 
                         <label>
                             Room Code

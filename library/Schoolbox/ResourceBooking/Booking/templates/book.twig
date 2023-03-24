@@ -474,10 +474,12 @@ $(function() {
 
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <label>
+                        <label for="resource-booking-notes">
                             Notes
-                            <textarea name="notes" id="resource-booking-notes" data-notes>{{ item.notes }}</textarea>
                         </label>
+                        <div>
+                            <textarea name="notes" id="resource-booking-notes" data-notes>{{ item.notes }}</textarea>
+                        </div>
 
                         {# Only a user who may moderate this item may ignore the rules. #}
                         {% if allowOverride %}
