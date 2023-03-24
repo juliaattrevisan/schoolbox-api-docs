@@ -37,6 +37,17 @@ export function getExtraAttributes() {
 }
 
 /**
+ * The types of resources that can be returned from the server
+ */
+export enum ResourceTypes {
+    IMAGE = "image",
+    VIDEO = "video",
+    AUDIO = "audio",
+    FOLDER = "folder",
+    DOCUMENT = "document",
+}
+
+/**
  * The resource object, detailing the options returned from the server
  */
 export type Resource = {
@@ -45,7 +56,12 @@ export type Resource = {
     id: string;
     mime: string;
     name: string;
-    type: "image" | "video" | "audio" | "folder" | "document";
+    type:
+        | ResourceTypes.IMAGE
+        | ResourceTypes.VIDEO
+        | ResourceTypes.AUDIO
+        | ResourceTypes.FOLDER
+        | ResourceTypes.DOCUMENT;
 };
 
 /**
@@ -232,16 +248,16 @@ function getFileSrc(resource: Resource, config: EditorConfig) {
  * @returns { object } - the resource attributes
  */
 export function getAttributes(resource: Resource, config: EditorConfig) {
-    if (resource.type === "image") {
+    if (resource.type === ResourceTypes.IMAGE) {
         return getImageAttributes(resource, config);
     }
-    if (resource.type === "video") {
+    if (resource.type === ResourceTypes.VIDEO) {
         return getVideoAttributes(resource, config);
     }
-    if (resource.type === "audio") {
+    if (resource.type === ResourceTypes.AUDIO) {
         return getAudioAttributes(resource, config);
     }
-    if (resource.type === "document") {
+    if (resource.type === ResourceTypes.DOCUMENT) {
         return getDocumentAttributes(resource, config);
     }
     return {};
@@ -255,16 +271,16 @@ export function getAttributes(resource: Resource, config: EditorConfig) {
  * @returns { object } - the resource attributes
  */
 export function getSrc(resource: Resource, config: EditorConfig) {
-    if (resource.type === "image") {
+    if (resource.type === ResourceTypes.IMAGE) {
         return getImageSrc(resource, config);
     }
-    if (resource.type === "video") {
+    if (resource.type === ResourceTypes.VIDEO) {
         return getVideoSrc(resource, config);
     }
-    if (resource.type === "audio") {
+    if (resource.type === ResourceTypes.AUDIO) {
         return getAudioSrc(resource, config);
     }
-    if (resource.type === "folder") {
+    if (resource.type === ResourceTypes.FOLDER) {
         return getFolderSrc(resource, config);
     }
     // When you Upload A File via the modal's dropzone
