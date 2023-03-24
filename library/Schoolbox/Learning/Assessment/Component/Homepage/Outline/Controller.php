@@ -190,15 +190,45 @@ class Controller extends Component_Homepage_ControllerAbstract
             return $this->renderContextInvalidEmptyState($templateHandle, $hasUnitSpec, $hasCourseSpec);
         }
 
+        // Find folders which the current user can access (not deleted and permitted)
+        $accessibleFolderIds = [];
+        if ($this->courseImplementation) {
+            // unit spec folder ids which are not deleted
+            $specFolderIds = $this->courseImplementation
+                ->getUnits()
+                ->filter(static function (\Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model $unit) {
+                    return !$unit->getSpecification()->getFolder()->isDeleted();
+                })
+                ->map(static function (\Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model $unit) {
+                    return $unit->getSpecification()->getFolder()->getId();
+                })->getAll();
+            // course spec folder id, if not deleted
+            if (!$this->courseImplementation->getSpecification()->getFolder()->isDeleted()) {
+                $specFolderIds[] = $this->courseImplementation->getSpecification()->getFolder()->getId();
+            }
+            // gather folder ids the current user can access
+            $accessibleFolderIds = array_filter(
+                $specFolderIds,
+                function (int $folderId) {
+                    try {
+                        return $this->getAccess()->getFolderAccess($this->getUser(), $folderId) >= UserAccess::ACCESS_READ;
+                    } catch (MapperException $e) {
+                    }
+                    return false;
+                }
+            );
+        }
+
         $data = [
             'readOnly'             => $this->readOnly,
             'canWrite'             => $this->canWrite,
             'context'              => $this->getContext(),
             'courseSpecification'  => $this->courseImplementation ? $this->courseImplementation->getSpecification() : null,
             'courseImplementation' => $this->courseImplementation,
+            'accessibleFolderIds'  => $accessibleFolderIds,
             'componentInstance'    => $this->getInstance(),
             'returnUrlName'        => Redirect::RETURN_URL,
-            'encodedReturnUrl'     => Redirect::encode('/homepage/' . $this->getContext()->getId() . '#component' . $this->getInstance()->getId())
+            'encodedReturnUrl'     => Redirect::encode('/homepage/' . $this->getContext()->getId() . '#component' . $this->getInstance()->getId()),
         ];
 
         return $this->renderTwigTemplate(
