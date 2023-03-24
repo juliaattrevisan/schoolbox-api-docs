@@ -7,6 +7,8 @@
 import { getURL } from "@js/editor/plugin/resource/resourceUtils";
 import type { EditorConfig } from "@js/editor/types/editorTypes";
 
+import { getWithoutExtension } from "@js/util/fileUtils";
+
 export default class UploadAdapter {
     loader: unknown;
 
@@ -67,19 +69,12 @@ export default class UploadAdapter {
         }
         const meta = response.meta as JSON;
         const config = this.editor.config.sbConfig as EditorConfig;
-        console.warn(meta);
         if (meta.file.type === "image") {
             resolve({
                 default: getURL(meta.file._links.image, config),
             });
         }
         if (meta.file.type === "document") {
-            const mediaEmbed = this.editor.plugins.get("MediaEmbed");
-            mediaEmbed.forceDisabled("addResourceText");
-            this.editor.model.change((writer) => {
-                // Insert the text at the user's current position.
-                this.editor.model.insertContent(writer.createText(`${meta.name}: `));
-            });
             const attributes = {
                 src: getURL(meta.file._links.icon, config),
                 alt: meta.name,
@@ -87,6 +82,14 @@ export default class UploadAdapter {
             };
             const imageUtils = this.editor.plugins.get("ImageUtils");
             imageUtils.insertImage(attributes, this.editor.model.document.selection, "imageInline");
+            this.editor.model.change((writer) => {
+                this.editor.model.insertContent(
+                    writer.createText(`${getWithoutExtension(meta.name)}: `, { bold: true })
+                );
+                const image = imageUtils.insertImage(attributes, this.editor.model.document.selection, "imageInline");
+                writer.setSelection(image.parent, "end");
+                this.editor.execute("enter");
+            });
         }
     }
 

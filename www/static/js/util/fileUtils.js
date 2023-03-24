@@ -125,3 +125,19 @@ export const humanFileSize = (bytes, dp = 1) => {
 export async function fetchHtmlAsText(url) {
     return await (await fetch(url)).text();
 }
+
+/**
+ * Strip file extension
+ *
+ * @param { string } url - address for the HTML to fetch
+ * @return { string } the resulting HTML string fragment
+ */
+export function getWithoutExtension(filename) {
+    let lastDotIndex = filename.lastIndexOf(".");
+    if (lastDotIndex === -1) {
+        // Filename has no extension
+        return filename;
+    } else {
+        return filename.slice(0, lastDotIndex);
+    }
+}
