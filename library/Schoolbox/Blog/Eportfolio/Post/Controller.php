@@ -261,21 +261,18 @@ class Controller extends Base
     public function postCommentInsert(EportfolioBlogModel $blog): void
     {
         // Comments must not be empty.
-        if (strlen(trim($this->getRequest()->post["commentBody"]))) {
-            // Create the comment and save.
-
-            /** @var EportfolioBlogCommentModel $comment */
-            $comment = $this->getEportfolioBlogCommentMapper()->createModel();
-
-            $comment->setOwner($this->getUser());
-            $comment->setBlog($blog);
-            $comment->setBody($this->getRequest()->post['commentBody']);
-            $comment->setCreatedAt(\Alaress_Date_Format::now());
-
-            $this->getEportfolioBlogCommentMapper()->save($comment);
-        } else {
+        if (strlen(trim($this->getRequest()->post["commentBody"])) === 0) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
+
+        /** @var EportfolioBlogCommentModel $comment */
+        $comment = $this->getEportfolioBlogCommentMapper()->createModel();
+        $comment->setOwner($this->getUser());
+        $comment->setBlog($blog);
+        $comment->setBody($this->getRequest()->post['commentBody']);
+        $comment->setCreatedAt(\Alaress_Date_Format::now());
+
+        $this->getEportfolioBlogCommentMapper()->save($comment);
 
         $returnUrlEncoded = $this->getRequest()->post['returnUrl'];
 
