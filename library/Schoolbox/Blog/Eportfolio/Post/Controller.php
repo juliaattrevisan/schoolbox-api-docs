@@ -261,7 +261,7 @@ class Controller extends Base
     public function postCommentInsert(EportfolioBlogModel $blog): void
     {
         // Comments must not be empty.
-        if (strlen(trim($this->getRequest()->post["commentBody"])) === 0) {
+        if (strlen(trim($this->getRequest()->post['commentBody'])) === 0) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
