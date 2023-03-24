@@ -107,8 +107,8 @@
     {% endif %}
     {% if isRouteAuthorized('eportfolioBlog.postCommentInsert', {blog: record, page: page}) %}
         <form id="commentForm" action="{{ routeLookup('eportfolioBlog.postCommentInsert', {id: record.getId}) }}" method="post">
+            <input type="hidden" name="returnUrl" value="{{ RETURN_URL.current }}">
             <section class="content">
-                <input type="hidden" name="returnUrl" value="{{ RETURN_URL.current }}">
                 <input type="hidden" name="pageId" value="{{ page.getPageId }}">
                 <label>
                     <textarea name="commentBody" class="no-margin" rows="2" cols="100" placeholder="Add a comment"></textarea>
