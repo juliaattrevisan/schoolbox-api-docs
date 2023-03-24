@@ -1,6 +1,6 @@
 INSERT INTO package (title, description, location, installed, hidden)
-VALUES ('Australian Currciulum (v9)',
-        'Attaches codes to the Australian Currciulum (v9) to allow for the mapping of these to learning resources.',
+VALUES ('Australian Curriculum (v9)',
+        'Attaches codes to the Australian Curriculum (v9) to allow for the mapping of these to learning resources.',
         'AustralianCurriculumV9', 0, 'false');
 
 ### update existing historic Australian Curriculum packages to have the version in the names V8
