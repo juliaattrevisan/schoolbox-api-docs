@@ -7,8 +7,6 @@
 import { getURL } from "@js/editor/plugin/resource/resourceUtils";
 import type { EditorConfig } from "@js/editor/types/editorTypes";
 
-import { getWithoutExtension } from "@js/util/fileUtils";
-
 export default class UploadAdapter {
     loader: unknown;
 
@@ -64,6 +62,7 @@ export default class UploadAdapter {
      */
     onLoaded(resolve: Function, reject: Function, genericErrorText: string) {
         const response = this.xhr.response as JSON;
+        console.warn(response);
         if (!response || !response.success) {
             return reject(response && response.error ? response.message : genericErrorText);
         }
@@ -83,10 +82,9 @@ export default class UploadAdapter {
             const imageUtils = this.editor.plugins.get("ImageUtils");
             imageUtils.insertImage(attributes, this.editor.model.document.selection, "imageInline");
             this.editor.model.change((writer) => {
-                this.editor.model.insertContent(
-                    writer.createText(`${getWithoutExtension(meta.name)}: `, { bold: true })
-                );
+                this.editor.model.insertContent(writer.createText(`${meta.name}: `, { bold: true }));
                 const image = imageUtils.insertImage(attributes, this.editor.model.document.selection, "imageInline");
+                this.editor.execute("resizeImage", { width: "36px" });
                 writer.setSelection(image.parent, "end");
                 this.editor.execute("enter");
             });
