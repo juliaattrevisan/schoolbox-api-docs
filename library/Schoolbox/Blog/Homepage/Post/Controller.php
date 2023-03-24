@@ -12,6 +12,7 @@
 namespace Schoolbox\Blog\Homepage\Post;
 
 use Alaress\Web\Controller\Base;
+use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Blog\Homepage\Comment\Mapper as BlogCommentMapper;
 use Schoolbox\Blog\Homepage\Comment\Model as BlogCommentModel;
 use Schoolbox\Blog\Homepage\Image\Mapper as BlogImageMapper;
@@ -276,6 +277,7 @@ class Controller extends Base
      * Create new blog comment
      * @param BlogModel $blog
      * @throws MapperException
+     * @throws RouteNotFound
      */
     public function postCommentInsert(BlogModel $blog)
     {
@@ -293,8 +295,16 @@ class Controller extends Base
 
         $this->getBlogCommentMapper()->save($comment);
 
-        // Redirect back to the blog page
-        $this->getResponse()->redirect->afterPost("/blog/{$blog->getId()}");
+        $returnUrlEncoded = $this->getRequest()->post['returnUrl'];
+
+        if ($returnUrlEncoded !== null) {
+            $returnUrl = Redirect::decode($returnUrlEncoded);
+        } else {
+            // If no return URL supplied, redirect to the Blog on which the comment was added.
+            $returnUrl = $this->getRouter()->generate('blog.getItem', ['id' => $blog->getId()]);
+        }
+
+        $this->getResponse()->redirect->afterPost($returnUrl);
     }
 
     /**

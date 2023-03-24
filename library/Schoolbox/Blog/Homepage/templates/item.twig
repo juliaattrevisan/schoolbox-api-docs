@@ -104,6 +104,7 @@
         {% endif %}
         {% if isRouteAuthorized('blog.postCommentInsert', { blog: record, folder: record.getFolder }) %}
         <form id="commentForm" method="post" action="{{ routeLookup('blog.postCommentInsert', { id: record.getId }) }}" class="no-pad">
+            <input type="hidden" name="returnUrl" value="{{ RETURN_URL.current }}">
             <section class="content">
                 <label>
                     <textarea name="commentBody" class="no-margin" rows="2" cols="100" placeholder="Add a comment"></textarea>
