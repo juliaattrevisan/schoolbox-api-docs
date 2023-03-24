@@ -11,7 +11,7 @@ import Link from "@js/editor/plugin/link/Link";
 import List from "@ckeditor/ckeditor5-list/src/list";
 import BlockQuote from "@ckeditor/ckeditor5-block-quote/src/blockquote";
 import GeneralHtmlSupport from "@ckeditor/ckeditor5-html-support/src/generalhtmlsupport";
-import Legacy from "@js/editor/plugin/Legacy";
+import Legacy from "@js/editor/plugin/legacy/Legacy";
 
 /**
  * All the core plugins
