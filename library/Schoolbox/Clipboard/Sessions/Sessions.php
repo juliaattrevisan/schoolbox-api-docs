@@ -634,7 +634,7 @@ class Sessions implements IStrategy
         /* Empty array means neither 'guardian' nor 'student' was listed here
          * so it should be hidden from schoolbox
          */
-        return empty(array_intersect($visibleToSchoolbox, $metadataField['showToUserTypes'] ?? []));
+        return !empty(array_intersect($visibleToSchoolbox, $metadataField['showToUserTypes'] ?? []));
     }
 
 
