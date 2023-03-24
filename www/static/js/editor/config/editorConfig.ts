@@ -26,7 +26,7 @@ import Alignment from "@ckeditor/ckeditor5-alignment/src/alignment";
 import FindAndReplace from "@ckeditor/ckeditor5-find-and-replace/src/findandreplace";
 import SourceEditing from "@ckeditor/ckeditor5-source-editing/src/sourceediting";
 import WordCount from "@ckeditor/ckeditor5-word-count/src/wordcount";
-import UploadAdapterPlugin from "@js/editor/plugin/UploadAdapterPlugin";
+import UploadAdapterPlugin from "@js/editor/plugin/uploadAdapter/UploadAdapterPlugin";
 import { getToolbar } from "@js/editor/toolbar/editorToolbar";
 import { getLinkSettings } from "@js/editor/settings/linkSettings";
 import { getFontSettings } from "@js/editor/settings/fontSettings";
