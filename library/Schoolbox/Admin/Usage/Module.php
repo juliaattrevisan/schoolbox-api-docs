@@ -84,14 +84,10 @@ class Module extends BaseModule
     private function preloadUser(array $params): array
     {
         try {
-            $user = $this->getUserMapper()->findByIdWithFallback($params['userId']);
+            $user = $this->getUserMapper()->findById($params['userId']);
+        } catch (Mapper\Exception\Deleted $e) {
+            $user = $e->getDeletedObject();
         } catch (Mapper\Exception $e) {
-            throw new NotFound();
-        }
-
-        if ($user->getId() === null) {
-            // Function findByIdWithCallback() will return an empty User object if no user is found.
-            // An empty User object is no use to us, so we throw a NotFound exception.
             throw new NotFound();
         }
 
