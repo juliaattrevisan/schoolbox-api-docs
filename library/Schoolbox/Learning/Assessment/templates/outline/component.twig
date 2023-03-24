@@ -42,7 +42,7 @@
             {% if courseSpecification.folder.id in accessibleFolderIds %}
                 <a class="icon-course" href="{{ '/homepage/' ~ courseSpecification.folder.id }}" title="Visit course page">{{ courseSpecification.title }}</a>
             {% else %}
-                <span class="icon-course">{{ courseSpecification.title }}</span>
+                <a class="icon-course">{{ courseSpecification.title }}</a>
             {% endif %}
         </p>
 
