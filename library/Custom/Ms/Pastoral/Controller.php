@@ -246,7 +246,10 @@ class Controller extends Base
                 'tutorGroupReport' => $tutorGroup,
                 'subjectReport'    => $subject,
                 'tutorGroupList'   => $tutorGroupList,
-                'subjectList'      => $subjectList,
+                'subjectList'      => array_filter(
+                    $subjectList,
+                    fn (Subject\Base $subject) => $subject->getDisplayed(),
+                ),
                 'roleTypeOverride' => $roleTypeOverride,
             ],
             'template'   => $template,
