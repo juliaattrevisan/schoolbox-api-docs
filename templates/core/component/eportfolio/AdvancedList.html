@@ -89,13 +89,13 @@
                                     <input type='hidden' name='componentInstanceId' value='{COMPONENT_INSTANCE_ID}' />
                                     <input type='hidden' name='listItemId' value='{LIST_ITEM_ID}' />
 
-                                    <label>
+                                    <label for="title">
                                         Title
-                                        <input type='text' name='title' value="{LIST_ITEM_TITLE}" data-first-focus />
+                                        <input type='text' id="title" name='title' value="{LIST_ITEM_TITLE}" data-first-focus />
                                     </label>
 
                                     <div>
-                                        <label>Content</label>
+                                        <label for='modifyList-{COMPONENT_INSTANCE_ID}-{LIST_ITEM_ID}'>Content</label>
                                         <textarea id='modifyList-{COMPONENT_INSTANCE_ID}-{LIST_ITEM_ID}' name='content' data-html-editor>{LIST_ITEM_CONTENT}</textarea>
                                     </div>
 
@@ -138,13 +138,13 @@
                         <input type='hidden' name='pageId' value='{PAGE_ID}' />
                         <input type='hidden' name='componentInstanceId' value='{COMPONENT_INSTANCE_ID}' />
 
-                        <label>
+                        <label for="create_title">
                             Title
-                            <input type='text' name='title' value='' />
+                            <input type='text' id="create_title" name='title' value='' />
                         </label>
 
                         <div>
-                            <label>Content</label>
+                            <label for="createList-{COMPONENT_INSTANCE_ID}">Content</label>
                             <textarea id='createList-{COMPONENT_INSTANCE_ID}' name='content' data-html-editor></textarea>
                         </div>
 
