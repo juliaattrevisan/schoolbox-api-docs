@@ -125,9 +125,9 @@ class Module extends BaseModule
                     // Superusers are always authorized (see return line at bottom of this function), so we only need to check isStaff().
                     if ($loggedInUser->getRole()->isStaff()) {
                         return;
-                    } else {
-                        throw new Unauthorized();
                     }
+
+                    throw new Unauthorized();
                 } else {
                     // Comment owner is not staff - authorize only if logged-in user is comment owner or blog owner.
                     if (
@@ -135,9 +135,9 @@ class Module extends BaseModule
                         $loggedInUser->getId() === $params['comment']->getBlog()->getOwner()->getId()
                     ) {
                         return;
-                    } else {
-                        throw new Unauthorized();
                     }
+
+                    throw new Unauthorized();
                 }
             }
             if (($params['blog'] ?? null) instanceof EportfolioBlogModel) {
