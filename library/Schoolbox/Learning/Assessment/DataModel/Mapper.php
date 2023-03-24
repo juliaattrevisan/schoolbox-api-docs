@@ -1092,7 +1092,7 @@ class Mapper extends BaseMapper
      * @throws BaseMapper\DefinitionException If join name is not on this mapper
      * @throws BaseMapper\Exception  If join $name isn't on this mapper
      */
-    protected function augmentListWithLessonPlanFiles(Collection $modelList, array  $lessonPlanIds)
+    protected function augmentListWithLessonPlanFiles(Collection $modelList, array $lessonPlanIds)
     {
         if (!empty($lessonPlanIds)) {
             /* Retrieve and sort list of Lesson Plan Files
