@@ -3,10 +3,17 @@
         <dt class="small-12 medium-4">Uploaded by</dt>
         <dd class="small-12 medium-8">
             <div class="tiny card small-12">
-                <a href="/search/user/{{ file.owner.id }}">
-                    <img src="{{ portrait ~ file.owner.id }}" alt="{{ file.owner.formatName }}" />
-                    <p>{{ file.owner.formatName }}</p>
-                </a>
+                {% if file.owner.isDeleted %}
+                    <span>
+                        <img src="{{ portrait ~ file.owner.id }}" alt="{{ file.owner.formatName }}" />
+                        <p>{{ file.owner.formatName }}</p>
+                    </span>
+                {% else %}
+                    <a href="/search/user/{{ file.owner.id }}">
+                        <img src="{{ portrait ~ file.owner.id }}" alt="{{ file.owner.formatName }}" />
+                        <p>{{ file.owner.formatName }}</p>
+                    </a>
+                {% endif %}
             </div>
         </dd>
     {% endif %}

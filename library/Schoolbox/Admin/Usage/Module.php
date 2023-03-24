@@ -19,7 +19,6 @@ use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 
 /**
@@ -86,7 +85,9 @@ class Module extends BaseModule
     {
         try {
             $user = $this->getUserMapper()->findById($params['userId']);
-        } catch (MapperException $e) {
+        } catch (Mapper\Exception\Deleted $e) {
+            $user = $e->getDeletedObject();
+        } catch (Mapper\Exception $e) {
             throw new NotFound();
         }
 
