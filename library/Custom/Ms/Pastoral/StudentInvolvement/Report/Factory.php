@@ -536,7 +536,8 @@ class Factory
                     ->setName($row['sub_desc'])
                     ->setStudent($student)
                     ->setYear($row['yr_study'])
-                    ->setSubjectCode($row['code']);
+                    ->setSubjectCode($row['code'])
+                    ->setDisplayed($this->isReportWithSubjectCodeDisplayed($row['code']));
             } else {
                 $subject = new Subject\Standard();
                 $subject
@@ -544,7 +545,8 @@ class Factory
                     ->setStudent($student)
                     ->setYear($row['yr_study'])
                     ->setSubjectCode($row['code'])
-                    ->setTeachers($row['teachers']);
+                    ->setTeachers($row['teachers'])
+                    ->setDisplayed($this->isReportWithSubjectCodeDisplayed($row['code']));
                 $subjects[$row['code']] = $subject;
             }
         }
