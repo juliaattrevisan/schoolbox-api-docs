@@ -39,12 +39,13 @@ export function getExtraAttributes() {
 /**
  * The types of resources that can be returned from the server
  */
-export enum ResourceTypes {
+export enum ResourceType {
     IMAGE = "image",
     VIDEO = "video",
     AUDIO = "audio",
     FOLDER = "folder",
     DOCUMENT = "document",
+    MEETING_URL = "meetingUrl",
 }
 
 /**
@@ -56,12 +57,7 @@ export type Resource = {
     id: string;
     mime: string;
     name: string;
-    type:
-        | ResourceTypes.IMAGE
-        | ResourceTypes.VIDEO
-        | ResourceTypes.AUDIO
-        | ResourceTypes.FOLDER
-        | ResourceTypes.DOCUMENT;
+    type: ResourceType.IMAGE | ResourceType.VIDEO | ResourceType.AUDIO | ResourceType.FOLDER | ResourceType.DOCUMENT;
 };
 
 /**
@@ -248,16 +244,16 @@ function getFileSrc(resource: Resource, config: EditorConfig) {
  * @returns { object } - the resource attributes
  */
 export function getAttributes(resource: Resource, config: EditorConfig) {
-    if (resource.type === ResourceTypes.IMAGE) {
+    if (resource.type === ResourceType.IMAGE) {
         return getImageAttributes(resource, config);
     }
-    if (resource.type === ResourceTypes.VIDEO) {
+    if (resource.type === ResourceType.VIDEO) {
         return getVideoAttributes(resource, config);
     }
-    if (resource.type === ResourceTypes.AUDIO) {
+    if (resource.type === ResourceType.AUDIO) {
         return getAudioAttributes(resource, config);
     }
-    if (resource.type === ResourceTypes.DOCUMENT) {
+    if (resource.type === ResourceType.DOCUMENT) {
         return getDocumentAttributes(resource, config);
     }
     return {};
@@ -271,16 +267,16 @@ export function getAttributes(resource: Resource, config: EditorConfig) {
  * @returns { object } - the resource attributes
  */
 export function getSrc(resource: Resource, config: EditorConfig) {
-    if (resource.type === ResourceTypes.IMAGE) {
+    if (resource.type === ResourceType.IMAGE) {
         return getImageSrc(resource, config);
     }
-    if (resource.type === ResourceTypes.VIDEO) {
+    if (resource.type === ResourceType.VIDEO) {
         return getVideoSrc(resource, config);
     }
-    if (resource.type === ResourceTypes.AUDIO) {
+    if (resource.type === ResourceType.AUDIO) {
         return getAudioSrc(resource, config);
     }
-    if (resource.type === ResourceTypes.FOLDER) {
+    if (resource.type === ResourceType.FOLDER) {
         return getFolderSrc(resource, config);
     }
     // When you Upload A File via the modal's dropzone
@@ -305,7 +301,7 @@ export function getSrc(resource: Resource, config: EditorConfig) {
     }
     // When you select a Microsoft Teams meeting url
     // normally empty, don't need to touch it
-    if (resource.type === "meetingUrl") {
+    if (resource.type === ResourceType.MEETING_URL) {
         return resource.id;
     }
     // Default assumption (not sure where this manifests anymore, sorry)
