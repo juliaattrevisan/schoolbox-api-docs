@@ -126,8 +126,6 @@ class Module extends BaseModule
                     if ($loggedInUser->getRole()->isStaff()) {
                         return;
                     }
-
-                    throw new Unauthorized();
                 } else {
                     // Comment owner is not staff - authorize only if logged-in user is comment owner or blog owner.
                     if (
@@ -136,9 +134,8 @@ class Module extends BaseModule
                     ) {
                         return;
                     }
-
-                    throw new Unauthorized();
                 }
+                throw new Unauthorized();
             }
             if (($params['blog'] ?? null) instanceof EportfolioBlogModel) {
                 if ($params['blog']->getOwner()->getId() === $loggedInUser->getId()) {
