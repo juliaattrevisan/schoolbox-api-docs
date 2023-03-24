@@ -7,9 +7,11 @@
  #
  # @param LessonPlan\Template\Model[] $lessonPlanTemplates['recent']
  # @param LessonPlan\Template\Model[] $lessonPlanTemplates['all']
- # @param string $type                                                Corresponds to the const 'lessonPlan' in AssessmentType
- # @param LessonPlan\Template\Model $template                         A querystring param that exists after a user chose a template
- # @param bool $mageAsync                                             A querystring param that says you came from a Mage form
+ #
+ # @param array $lessonPlanMeta                                An arbitrary array struct of Lesson Plan metadata
+ # @param LessonPlan\Template\Model $lessonPlanMeta[template]  A querystring param that exists after a user chose a template
+ # @param string $lessonPlanMeta[type]                         Corresponds to the const 'lessonPlan' in AssessmentType
+ # @param string $lessonPlanMeta[mageAsync]                    A querystring param that says you came from a Mage form
  #
  # $template and $mageAsync indicate conditionals based on a particular workflow;
  # such as coming from a Course Builder Empty State,
@@ -34,7 +36,7 @@
                                     <li class="actions-small-1">
                                         <div class="list-item">
                                             <div class="card small-12">
-                                                {% set createRoute = routeLookup('learningAssessment.getCreateAssessmentForm', { contextType: contextType, contextId: context.id, context: context }) ~ '?lpt=' ~ recentLessonPlanTemplate.id ~ '&type=' ~ type ~ '&returnUrl=' ~ returnUrl %}
+                                                {% set createRoute = routeLookup('learningAssessment.getCreateAssessmentForm', { contextType: contextType, contextId: context.id, context: context }) ~ '?lpt=' ~ recentLessonPlanTemplate.id ~ '&type=' ~ lessonPlanMeta.type ~ '&returnUrl=' ~ returnUrl %}
 
                                                 <a href="{{ createRoute }}"><h3>{{ recentLessonPlanTemplate.title }}</h3></a>
                                                 <p class="meta">
@@ -78,7 +80,7 @@
                                     <li class="actions-small-1">
                                         <div class="list-item">
                                             <div class="card small-12">
-                                                {% set createRoute = routeLookup('learningAssessment.getCreateAssessmentForm', { contextType: contextType, contextId: context.id, context: context }) ~ '?lpt=' ~ lessonPlanTemplate.id ~ '&type=' ~ type ~ '&returnUrl=' ~ returnUrl %}
+                                                {% set createRoute = routeLookup('learningAssessment.getCreateAssessmentForm', { contextType: contextType, contextId: context.id, context: context }) ~ '?lpt=' ~ lessonPlanTemplate.id ~ '&type=' ~ lessonPlanMeta.type ~ '&returnUrl=' ~ returnUrl %}
 
                                                 <a href="{{ createRoute }}"><h3>{{ lessonPlanTemplate.title }}</h3></a>
                                                 <p class="meta">
@@ -131,12 +133,20 @@
     </script>
 
     {% if lessonPlanTemplates.all|length %}
-        {% if template or mageAsync %}
-            {# submit button is only available if any of the following are true:
-             #   * a template is selected
-             #   * you're in a Part 2 of mage, because in that one particular mage usage Part 1 was the selection screen
-             #}
+        {# submit button is only available if any of the following are true:
+         #   * a template is selected
+         #   * you're in a Part 2 of mage, because in that one particular mage usage Part 1 was the selection screen
+         #}
+        {% if lessonPlanMeta.template %}
             {{ mage.submitRow(actionLabel ?? 'Create', 'part-2', 'end') }}
+        {% elseif lessonPlanMeta.mageAsync %}
+            {# Don't provide a Create button at the bottom; users must choose a template,
+             # not submit a form, in this Selection step. They have to do it by clicking
+             # the title or Use Template via the modal.
+             #}
+            <div class="hide">
+                {{ mage.submitRow(actionLabel ?? 'Create', 'part-2', 'end') }}
+            </div>
         {% endif %}
     {% endif %}
 </fieldset>

@@ -7,10 +7,10 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Assessment\LessonPlan\File;
+namespace Schoolbox\Learning\Assessment\DataModel\LessonPlan\File;
 
 use Schoolbox\ISoftDeletable;
-use Schoolbox\Learning\Assessment\LessonPlan;
+use Schoolbox\Learning\Assessment\DataModel\LessonPlan;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;

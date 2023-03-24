@@ -3,45 +3,141 @@
  #
  # Create a Lesson Plan based on a customised version of a Lesson Plan Template
  #
- # @param LessonPlan\Template\Model $template
- # @param array $breadcrumbs        A set of nodes to render as breadcrumb elements
+ # @param IAssessable $assessment                              The Lesson Plan itself, a subclass of AbstractAssessment
+ # @param array $lessonPlanMeta                                An arbitrary array struct of Lesson Plan metadata
+ # @param LessonPlan\Template\Model $lessonPlanMeta[template]  The LessonPlan Template for this assessment
+ # @param string $lessonPlanMeta[type]                         Corresponds to the const 'lessonPlan' in AssessmentType
+ # @param string $lessonPlanMeta[mageAsync]                    Whether this was a Mage Step 2 async form fragment (always false here)
+ # @param bool $lessonplanMeta[includeBreadcrumbs]             Whether to include breadcrumbs (create requires it; update does not)
+ # @param array $breadcrumbs                                   A set of nodes to render as breadcrumb elements
+ #
+ # @param LessonPlan\Field\Model|LessonPplan\Template\Field\Model $lessonPlanMeta[fields]
+ #     A set of Lesson Plan Fields to render here (could be Template Fields) due to somewhat
+ #     enforced polymorphism across our AbstractAssessment implementations; create and update
+ #     are intricately tied together, but one workflow shows the Template Fields so you can
+ #     modify them; but another workflow shows you the Lesson Plan Fields that you had previously
+ #     spawned and altered
  #}
-{% import 'sub/breadcrumbs.twig' as bread %}
-{{ bread.crumbsArray(breadcrumbs) }}
+<input type="hidden" name="lessonPlanTemplateId" value="{{ lessonPlanMeta.template.id }}" />
 
-<div class="actions-small-1 row">
-    <div class="list-item">
-        <div class="small-12 column">
-            <h1>Create Lesson Plan</h1>
+<fieldset>
+    <div class="row">
+        <div class="small-12 columns">
+            <label class="required" for="title">Title</label>
+            <input id="title" type="text" name="title" value="{% if assessment.id %}{{ assessment.title }}{% endif %}" />
         </div>
     </div>
-</div>
+</fieldset>
 
+{# Assessment dates; basically shanked from another assessment type's create.twig
+ # You have to manually do it every time you add a new assessment type. Only implementations
+ # can have dates, not specifications.
+ #
+ # TODO What is the ordering of this form - do the dates come before or after the Lesson Plan Fields?
+ #}
+{% if context.baseContext is not unitSpecification %}
+    {% include '@learningAssessment/fragments/dates.twig' %}
+{% endif %}
+
+{% if assessment.id %}
+    {# Update a Lesson Plan. The fields' data already exist as Lesson Plan Fields, but we
+     # need to remember the Lesson Plan Template from which they spawned.
+     #}
+    {% for field in lessonPlanMeta.fields %}
+        <fieldset>
+            <div class="row">
+                <div class="small-12 columns">
+                    <h2>{{ field.title }}</h2>
+                    {% if 'student' != field.visibility %}<p class="meta"><span class="icon-view-hollow"></span>This field is not visible to students</p>{% endif %}
+
+                    {# The Lesson Plan Template field which is related to this Lesson Plan Field
+                     # Because of the swamp you need to know both since the same function fulfils
+                     # create and update phases in mapperProxy->save()
+                     #}
+                    <input type="hidden" name="field[{{ field.id }}][template]" value="{{ field.lessonPlanTemplateField.id }}" />
+                    <textarea id="field-body-{{ field.id }}" name="field[{{ field.id }}][body]" data-cke>{{ field.body }}</textarea>
+                </div>
+            </div>
+        </fieldset>
+    {% endfor %}
+{% else %}
+    {# Create a new Lesson Plan. The fields are derived from the Lesson Plan Template's fields
+     # but they won't have any Lesson Plan Field identifiers at this point.
+     #}
+    {% for field in lessonPlanMeta.template.fields %}
+        {% set newFieldIdentifier = 'new' ~ loop.index %}
+
+        <fieldset>
+            <div class="row">
+                <div class="small-12 columns">
+                    <h2>{{ field.title }}</h2>
+                    {% if 'student' != field.visibility %}<p class="meta"><span class="icon-view-hollow"></span>This field is not visible to students</p>{% endif %}
+
+                    {# The Lesson Plan Template field which is related to this Lesson Plan Field
+                     # Because of the swamp you need to know both since the same function fulfils
+                     # create and update phases in mapperProxy->save()
+                     #}
+                    <input type="hidden" name="field[{{ newFieldIdentifier }}][template]" value="{{ field.id }}" />
+                    <textarea id="field-body-{{ newFieldIdentifier }}" name="field[{{ newFieldIdentifier }}][body]" data-cke>{{ field.body }}</textarea>
+                </div>
+            </div>
+        </fieldset>
+    {% endfor %}
+{% endif %}
+
+{# Attach random files to this Lesson Plan
+ # It implicitly constructs an attachments[] POST key which contains
+ # all the hashes of the files you uploaded via the Mr Matt's Modal
+ #}
 <div class="row">
-    <div class="small-12 island">
-        <form>
-            <section>
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        <label class="required" for="title">Title</label>
-                        <input id="title" type="text" name="title" value="" />
-                    </div>
-                </fieldset>
-
-                {% for field in template.fields %}
-                    <fieldset class="content">
-                        <div class="small-12 columns">
-                            <h2>{{ field.title }}</h2>
-                            <textarea id="field-body-{{ field.id }}" name="field[{{ field.id }}][body]">{{ field.body }}</textarea>
-                        </div>
-                    </fieldset>
-                {% endfor %}
-            </section>
-
-            <input type="submit" value="Save">
-        </form>
+    <div class="small-12 columns">
+        <label>Attach Files</label>
+        {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
     </div>
 </div>
+
+{# Toggle for deciding whether this Lesson Plan is visible to students
+ # or if it's restricted to staff eyes only
+ #}
+<fieldset>
+    <div class="row">
+        <div class="small-12 columns">
+            <input type="hidden" name="lessonPlanVisibility" value="staff" />
+
+            <label for="lessonPlanVisibility" class="inline-block">Visible to students <span class="hint has-tip tip-top" title="If on, students will be able to see this lesson plan and its contents" data-tooltip>?</span></label>
+            <div class="switch">
+                {# The Lesson Plan is visible to students based on this toggle under two circumstances:
+                 #     * by default, Lesson Plans are visible to students (assessment.visibility == '')
+                 #     * or When assessment.visibility == student
+                 #}
+                {% set visibility = '' %}
+
+                {% if '' == assessment.visibility or 'student' == assessment.visibility %}
+                    {% set visibility = 'checked' %}
+                {% endif %}
+                <input id="lessonPlanVisibility"
+                       name="lessonPlanVisibility"
+                       type="checkbox"
+                        {{ visibility }}
+                >
+                <label for="lessonPlanVisibility">
+                    <span>On</span>
+                    <span>Off</span>
+                </label>
+            </div>
+        </div>
+    </div>
+</fieldset>
+
+{# Curriculum Codes
+ # This is the same include used by everything else. The entity type is some textual
+ # representation, randomly hardcoded here
+ #}
+{% include '@learningAssessment/fragments/curriculumCodes.twig' with {
+    entityType: 'Lesson Plan'
+} %}
+
+<input type="submit" value="Save">
 
 <script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 <script>
@@ -49,11 +145,7 @@
      */
     document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
         detail: {
-            targetElements: [
-                {% for field in template.fields %}
-                '#field-body-{{ field.id }}',
-                {% endfor %}
-            ],
+            targetElements: ['[data-cke]']
         }
     }));
 </script>

@@ -15,6 +15,7 @@ use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
+use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Field\Model as LessonPlanFieldModel;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
@@ -91,6 +92,85 @@ class Model extends AbstractAssessment
      * @var string|null
      */
     private ?string $visibility = null;
+
+
+    /**
+     * Creates a clone of this assessment.
+     *
+     * This clone must be able to be persisted to create a copy of this assessment,
+     * without further modification.
+     *
+     * @return static
+     * @throws \UnexpectedValueException
+     */
+    public function cloneForCopy(): self
+    {
+        $clone = parent::cloneForCopy();
+
+        /* Copy Lesson Plan Fields completely and save them
+         * as entirely new Lesson Plan Fields in the db
+         */
+        $clone->copyFields($this);
+
+        // copy attachments
+        $clone->copyAttachedFiles($this);
+
+        return $clone;
+    }
+
+
+    /**
+     * Copy Lesson Plan Fields from $source into $this,
+     * where $this is actually the clone.
+     *
+     * The clone copies from the $source into itself.
+     *
+     * @param Model $source
+     * @return $this
+     * @throws \UnexpectedValueException
+     */
+    private function copyFields(self $source): self
+    {
+        /* Clone out the Collection datatype from the source
+         */
+        $this->setFields($source->getFields()->emptyClone());
+
+        /* Clone every field found in the source,
+         * clear its id so it saves a new record
+         */
+        foreach ($source->getFields() as $field) {
+            $newField = clone $field;
+            $newField->setId(null);
+
+            $this->addField($newField);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * Copy attached files from `$source` into this object.
+     *
+     * @param self $source
+     * @return $this
+     */
+    private function copyAttachedFiles(self $source): self
+    {
+        $newFiles = new Collection();
+
+        foreach ($source->getAttachments() as $file) {
+            $newFiles->add(
+                (new File())
+                    ->setStorage($file->getStorage())
+                    ->setBasename($file->getBasename())
+            );
+        }
+
+        $this->setAttachments($newFiles);
+
+        return $this;
+    }
 
 
     /**
@@ -236,11 +316,11 @@ class Model extends AbstractAssessment
     /**
      * Add a template field to this template
      *
-     * @param \Schoolbox\Learning\Assessment\LessonPlan\Field\Model $field
+     * @param LessonPlanFieldModel $field
      * @return $this
      * @throws \UnexpectedValueException
      */
-    public function addField(\Schoolbox\Learning\Assessment\LessonPlan\Field\Model $field): self
+    public function addField(LessonPlanFieldModel $field): self
     {
         $this->fields->add($field);
         return $this;
@@ -382,5 +462,27 @@ class Model extends AbstractAssessment
     {
         $this->attachments = $attachments;
         return $this;
+    }
+
+
+    /**
+     * The Open date is the same as the Publish date for Lesson Plans.
+     *
+     * @return \Alaress_Date_Format|null
+     */
+    public function getOpenAt(): ?\Alaress_Date_Format
+    {
+        return $this->getPublishAt();
+    }
+
+
+    /**
+     * The Close date is the same as the Due date for Lesson Plans.
+     *
+     * @return \Alaress_Date_Format|null
+     */
+    public function getCloseAt(): ?\Alaress_Date_Format
+    {
+        return $this->getDueAt();
     }
 }

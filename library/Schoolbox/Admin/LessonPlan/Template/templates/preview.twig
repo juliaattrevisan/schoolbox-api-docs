@@ -19,7 +19,7 @@
 
         {# Optionally show some interactivity buttons #}
         {% if hasActions is defined and hasActions %}
-            {% set createRoute = routeLookup('learningAssessment.getCreateAssessmentForm', { contextType: contextType, contextId: context.id, context: context }) ~ '?lpt=' ~ lessonPlanTemplate.id ~ '&type=' ~ type ~ '&returnUrl=' ~ returnUrl %}
+            {% set createRoute = routeLookup('learningAssessment.getCreateAssessmentForm', { contextType: contextType, contextId: context.id, context: context }) ~ '?lpt=' ~ lessonPlanTemplate.id ~ '&type=' ~ lessonPlanMeta.type ~ '&returnUrl=' ~ returnUrl %}
 
             <ul class="flex-list buttons">
                 <li><a class="button" data-cancel>Cancel</a></li>

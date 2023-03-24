@@ -1340,6 +1340,7 @@ abstract class Kernel
                     ->addSubTranslator(new AssessmentDataModelTranslator\DueWork())
                     ->addSubTranslator(new AssessmentDataModelTranslator\Quiz())
                     ->addSubTranslator(new AssessmentDataModelTranslator\Lti())
+                    ->addSubTranslator(new AssessmentDataModelTranslator\LessonPlan())
                     ->addSubTranslator(new AssessmentDataModelTranslator\Project($translator))
                 ;
                 return $translator;

@@ -58,6 +58,7 @@ CREATE TABLE `lesson_plan` (
 `created_by` INT NOT NULL,
 `updated_by` INT NOT NULL,
 `deleted_by` INT NULL DEFAULT NULL,
+`deleted_at` DATETIME NULL,
 PRIMARY KEY (`id`),
 INDEX `fk_lesson_plan_lesson_plan_template_idx` (`lesson_plan_template_id` ASC),
 CONSTRAINT `fk_lesson_plan_lesson_plan_template`

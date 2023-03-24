@@ -25,6 +25,7 @@ use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\CourseManagedFields;
+use Schoolbox\Learning\Assessment\DataModel\LessonPlan;
 use Schoolbox\Learning\Assessment\DataModel\Project\Mapper as ProjectMapper;
 use Schoolbox\Learning\Assessment\DataModel\Project\Model as Project;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkObject;
@@ -34,7 +35,6 @@ use Schoolbox\Learning\Assessment\Project as ProjectObject;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
-use Schoolbox\Learning\LessonPlan;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Learning\MarkScheme\Percentage;
@@ -1268,6 +1268,7 @@ class MapperProxy
         ;
         // Save sub-objects
         $subObject = $dataModel->getSubObject();
+
         if ($subObject) {
             $subObject->setId($this->getSubObjectPrimaryKeyValue($subObject));
         } else {
@@ -1326,12 +1327,11 @@ class MapperProxy
             QuizMapper::getInstance()->save($subObject);
         } elseif ($subObject instanceof LtiAssessment\Model) {
             LtiAssessment\Mapper::getInstance()->save($subObject);
-        } elseif ($subObject instanceof \Schoolbox\Learning\Assessment\LessonPlan\Model) {
-            $lessonPlanMapper = \Schoolbox\Learning\Assessment\LessonPlan\Mapper::getInstance();
+        } elseif ($subObject instanceof LessonPlan\Model) {
+            $lessonPlanMapper = LessonPlan\Mapper::getInstance();
 
-            /* TODO save all the Lesson Plan Fields' values here, too, I think
-             */
             $lessonPlanMapper->save($subObject);
+            $lessonPlanMapper->saveFields($subObject);
             $lessonPlanMapper->saveFiles($subObject);
         } elseif ($subObject instanceof Project) {
             ProjectMapper::getInstance()->save($subObject);
@@ -1427,6 +1427,8 @@ class MapperProxy
                 $mapper = ProjectMapper::getInstance();
             } elseif ($subObject instanceof LtiAssessment\Model) {
                 $mapper = LtiAssessment\Mapper::getInstance();
+            } elseif ($subObject instanceof LessonPlan\Model) {
+                $mapper = LessonPlan\Mapper::getInstance();
             } else {
                 return null;
             }
@@ -1451,14 +1453,36 @@ class MapperProxy
         // Delete assessment
         $dataModel = $this->translateToDataModel($assessable);
         $subModel  = $dataModel->getSubObject();
+
         if ($subModel instanceof SubmissionBox) {
             // The assessment model is a component of the submission box.
             // The composite object is responsible for deleting its components
             // TODO - roll out this methodology to other assessment types
             SubmissionBoxMapper::getInstance()->delete($subModel);
+        } elseif ($subModel instanceof LessonPlan\Model) {
+            /* For some absurd reason, we're delegating Assessment Deletion to subobjects' mappers
+             * so the Submission Box mapper knows how to delete an assessment instance...that's why
+             * there's no assessment deletion methods in this area
+             *
+             * There's also a weird sequential dependency here. baseMapper->delete() has to occur
+             * before lessonPlanMapper->save() otherwise the assessment.deleted_at never saves
+             *
+             * TODO (idk why that is; it was a wild guess that this was the cause)
+             */
+            $this->baseMapper->delete($dataModel);
+
+            /* Delete the fields via the Lesson Plan Field Mapper
+             */
+            $lessonPlanMapper = \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper::getInstance();
+
+            /* TODO Delete the files. Maybe
+             */
+
+            $lessonPlanMapper->delete($subModel);
         } else {
             $this->baseMapper->delete($dataModel);
         }
+
         $assessable->setDeletedAt($dataModel->getDeletedAt());
         // I don't think I need to delete sub-objects.
         // The assessable itself is all that should need deletion
@@ -1735,6 +1759,9 @@ class MapperProxy
                 case AssessmentType::TYPE_PROJECT:
                     $builder->notNull('p.id');
                     break;
+
+                /* TODO Does Lesson Plans appear here?
+                 */
 
                 default:
                     break;

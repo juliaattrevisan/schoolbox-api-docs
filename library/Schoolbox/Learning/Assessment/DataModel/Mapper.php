@@ -25,6 +25,7 @@ use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\Project;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\DataModel\LessonPlan;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
@@ -32,6 +33,8 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Learning\Quiz;
 use Schoolbox\LTI\Assessment as LtiAssessment;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 use UnderflowException;
@@ -77,11 +80,13 @@ class Mapper extends BaseMapper
         // * quiz
         // * project
         // * LTI assessment
+        // * Lesson Plan
         $this->joinsReverseSingle('assessment_id', TaskMapper::class, 'task', 'task');
         $this->joinsReverseSingle('assessment_id', SubmissionBoxMapper::class, 'duework', 'duework');
         $this->joinsReverseSingle('assessment_id', Quiz\Mapper::class, 'quiz', 'quiz');
         $this->joinsReverseSingle('assessment_id', Project\Mapper::class, 'project', 'project');
         $this->joinsReverseSingle('assessment_id', LtiAssessment\Mapper::class, 'ltiAssessment', 'ltiAssessment');
+        $this->joinsReverseSingle('assessment_id', LessonPlan\Mapper::class, 'lessonPlan', 'lessonPlan');
 
         // Participation plan join
         $this->joinsReverseMulti('assessment_id', Plan\Mapper::class, 'plans', 'plans');
@@ -176,6 +181,7 @@ class Mapper extends BaseMapper
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteProject']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteDueWork']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteLtiAssessment']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteLessonPlan']);
     }
 
     /**
@@ -356,6 +362,25 @@ class Mapper extends BaseMapper
 
 
     /**
+     * Delete all of a Lesson Plan's subobjects
+     *
+     * @param Model $assessment
+     * @return bool
+     * @throws BaseMapper\DefinitionException
+     */
+    public function softDeleteLessonPlan(Model $assessment): bool
+    {
+        if ($assessment->getLessonPlan() instanceof LessonPlan\Model) {
+            $lessonPlanMapper = $this->getJoinMapper('lessonPlan');
+            $lessonPlans      = $lessonPlanMapper->findByColumn('assessment_id', $assessment->getId());
+            $lessonPlanMapper->softDelete($lessonPlans);
+        }
+
+        return true;
+    }
+
+
+    /**
      * Somewhat efficient query for retrieving the assessments which this student has participated in.
      *
      * @param User                     $student
@@ -462,6 +487,7 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('quiz', 'q')},
                 {$this->getJoinColumnString('ltiAssessment', 'l')},
                 {$this->getJoinColumnString('ltiAssessment.ltiTool', 'ltool')},
+                {$this->getJoinColumnString('lessonPlan', 'lessonPlan')},
                 {$this->getJoinColumnString('project', 'p')},
                 {$this->getJoinColumnString('assessment_folder', 'f')},
                 {$this->getJoinColumnString('assessment_course_unit_specification', 'us')},
@@ -486,6 +512,7 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('ltiAssessment', '', 'l', true)}
             LEFT JOIN {$this->getJoinSql('ltiAssessment.ltiTool', 'l', 'ltool', true)}
             LEFT JOIN {$this->getJoinSql('project', '', 'p', true)}
+            LEFT JOIN {$this->getJoinSql('lessonPlan', '', 'lessonPlan', true)}
             LEFT JOIN {$this->getJoinSql('assessment_folder', '', 'f', true)}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification', '', 'us', true)}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification.folder', 'us', 'usf', true)}
@@ -736,11 +763,13 @@ class Mapper extends BaseMapper
         $projectIds        = [];
         $taskIds           = [];
         $contextProjectIds = [];
+        $lessonPlanIds     = [];
 
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             /** @var Model $model */
             $model = $this->hydrate($row);
+
             $model->setWorkType($this->hydrateJoin($row, 'work_type', 'wt'));
 
             // Task?
@@ -777,6 +806,16 @@ class Mapper extends BaseMapper
                 );
             } else {
                 $model->setLtiAssessment(null);
+            }
+            // Lesson Plan?
+            if ($row['lessonPlan.id']) {
+                $lessonPlanIds[] = $row['lessonPlan.id'];
+
+                $lessonPlan = $this->hydrateJoin($row, 'lessonPlan', 'lessonPlan');
+
+                $model->setLessonPlan($lessonPlan);
+            } else {
+                $model->setLessonPlan(null);
             }
             // Project?
             if ($row['p.id']) {
@@ -840,6 +879,11 @@ class Mapper extends BaseMapper
         /* Task files
          */
         $modelList = $this->augmentListWithTaskFiles($modelList, $taskIds);
+
+        /* Augment with Lesson Plan Files and Lesson Plan Fields
+         */
+        $modelList = $this->augmentListWithLessonPlanFiles($modelList, $lessonPlanIds);
+        $modelList = $this->augmentWithLessonPlanFields($modelList, $lessonPlanIds);
 
         // Project contexts
         if ($hydrateProjectContext) {
@@ -1038,6 +1082,43 @@ class Mapper extends BaseMapper
         return $modelList;
     }
 
+
+    /**
+     * Augments the list from hydrateSelect() with Lesson Plan Files.
+     *
+     * @param Collection $modelList
+     * @param array|int[]        $lessonPlanIds
+     * @return Collection
+     * @throws BaseMapper\DefinitionException If join name is not on this mapper
+     * @throws BaseMapper\Exception  If join $name isn't on this mapper
+     */
+    protected function augmentListWithLessonPlanFiles(Collection $modelList, array $lessonPlanIds)
+    {
+        if (!empty($lessonPlanIds)) {
+            /* Retrieve and sort list of Lesson Plan Files
+             */
+            $files = $this->getJoinMapper('lessonPlan.files')
+                ->findByColumn('lesson_plan_id', $lessonPlanIds)
+                ->groupByCallback(function (LessonPlan\File\Model $file) {
+                    return $file->getLessonPlan()->getId();
+                });
+
+            // Augment list with due work files
+            foreach ($modelList as $model) {
+                $submodel = $model->getSubObject();
+
+                if ($submodel instanceof LessonPlan\Model) {
+                    if (!empty($files[$submodel->getId()])) {
+                        $submodel->setAttachments($files[$submodel->getId()]);
+                    } else {
+                        $submodel->setAttachments($this->getJoinMapper('lessonPlan.files')->createCollection());
+                    }
+                }
+            }
+        }
+        return $modelList;
+    }
+
     /**
      * Augments the list from hydrateSelect() with context projects.
      *
@@ -1184,6 +1265,63 @@ class Mapper extends BaseMapper
 
         return $modelList;
     }
+
+
+    /**
+     * Assign Lesson Plan Fields to each Lesson Plan instance
+     *
+     * @param Collection $modelList
+     * @param array      $lessonPlanIds
+     * @return Collection
+     * @throws Exception
+     * @throws Deleted
+     */
+    private function augmentWithLessonPlanFields(Collection $modelList, array $lessonPlanIds): Collection
+    {
+        /* Fetch all the Lesson Plan Fields used by this Lesson Plan
+         */
+        $lessonPlanFieldMapper = LessonPlan\Field\Mapper::getInstance();
+
+        /* Fetch all the Lesson Plan Template + Lesson Plan Template Fields too
+         * (Fields need to know about their Template Fields)
+         */
+        $lessonPlanTemplateMapper = \Schoolbox\Admin\LessonPlan\Template\Mapper::getInstance();
+
+        /* Collate and group all the Lesson Plan Fields by the Lesson Plan id to which they belong
+         */
+        $fields = $lessonPlanFieldMapper->findByColumn('lesson_plan_id', $lessonPlanIds)
+            ->groupByCallback(
+                function ($item) {
+                    return $item->getLessonPlan()->getId();
+                }
+            );
+
+        /* Collate and group all the Lesson Plan Templates by the Lesson Plan id to which they belong
+         */
+        $templateIds = [];
+
+        foreach ($modelList as $model) {
+            if ($model->getSubObject() instanceof LessonPlan\Model) {
+                $templateIds[] = $model->getLessonPlan()->getLessonPlanTemplate()->getId();
+            }
+        }
+
+        $templates = $lessonPlanTemplateMapper->findByColumn('id', $templateIds)->indexBy('id');
+
+        /* Assign Lesson Plan Fields and Lesson Plan Templates to each instance of a Lesson Plan
+         * This is used when grabbing stuff out of the db via the custom query elsewhere in this
+         * class so you have to do all these microhydrations manually
+         */
+        foreach ($modelList as $model) {
+            if ($model->getSubObject() instanceof LessonPlan\Model) {
+                $model->getLessonPlan()->setFields($fields->getOffset($model->getLessonPlan()->getId()))
+                    ->setLessonPlanTemplate($templates->getOffset($model->getLessonPlan()->getLessonPlanTemplate()->getId()));
+            }
+        }
+
+        return $modelList;
+    }
+
 
     /**
      * Sets `$specAssessmentId` as the spec assessment for `$implAssessmentId`,

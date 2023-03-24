@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Learning\Assessment;
 
+use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web\Controller\Exception as ControllerException;
 use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
@@ -16,7 +17,11 @@ use InvalidArgumentException;
 use LogicException;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeSchemeMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeScheme;
+use Schoolbox\Assessment\Term\Mapper;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Feedback\Visibility as FeedbackVisibility;
+use Schoolbox\Learning\Assessment\LessonPlan;
+use Schoolbox\Learning\Assessment\Participant\DataSource;
 use Schoolbox\Learning\Assessment\Seb\Payload;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Collection;
@@ -26,6 +31,7 @@ use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -48,68 +54,40 @@ use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
 abstract class Controller extends ListController implements IAssessmentController
 {
     /**
-     * @var WorkTypeMapper
-     */
-    private $workTypeMapper;
-
-
-    /**
-     * @var Term\Mapper
-     */
-    private $termMapper;
-
-    /** @var CourseSpecificationMapper */
-    private $courseSpecificationMapper;
-
-    /** @var Replicator */
-    private $replicator;
-
-    /**
-     * @var LatestViewMapper
-     */
-    protected LatestViewMapper $latestViewMapper;
-
-    /**
      * Controller constructor.
      *
-     * @param UserMapper             $userMapper
-     * @param ErrorMapper            $errorMapper
-     * @param DataModel\MapperProxy  $assessmentMapper
-     * @param WorkTypeMapper         $workTypeMapper
-     * @param Access                 $access
-     * @param Transactor             $transactor
-     * @param BreadcrumbFactory      $bakery
-     * @param Term\Mapper            $termMapper
-     * @param Participant\DataSource $participantDataSource
-     * @param CourseSpecificationMapper $courseSpecificationMapper
-     * @param UnitSpecificationMapper $unitSpecificationMapper
-     * @param Replicator    $replicator
-     * @param LatestViewMapper       $latestViewMapper
+     * @param UserMapper                 $userMapper
+     * @param ErrorMapper                $errorMapper
+     * @param MapperProxy                $assessmentMapper
+     * @param WorkTypeMapper             $workTypeMapper
+     * @param Access                     $access
+     * @param Transactor                 $transactor
+     * @param BreadcrumbFactory          $bakery
+     * @param Mapper                     $termMapper
+     * @param DataSource                 $participantDataSource
+     * @param CourseSpecificationMapper  $courseSpecificationMapper
+     * @param UnitSpecificationMapper    $unitSpecificationMapper
+     * @param Replicator                 $replicator
+     * @param LatestViewMapper           $latestViewMapper
+     * @param Project\ResultCache\Mapper $projectResultCacheMapper
      */
     public function __construct(
         UserMapper $userMapper,
         ErrorMapper $errorMapper,
         DataModel\MapperProxy $assessmentMapper,
-        WorkTypeMapper $workTypeMapper,
+        private WorkTypeMapper $workTypeMapper,
         Access $access,
         Transactor $transactor,
-        BreadcrumbFactory $bakery,
-        Term\Mapper $termMapper,
+        protected BreadcrumbFactory $bakery,
+        private Term\Mapper $termMapper,
         Participant\DataSource $participantDataSource,
-        CourseSpecificationMapper $courseSpecificationMapper,
+        private CourseSpecificationMapper $courseSpecificationMapper,
         UnitSpecificationMapper $unitSpecificationMapper,
-        Replicator $replicator,
-        LatestViewMapper $latestViewMapper,
+        private Replicator $replicator,
+        protected LatestViewMapper $latestViewMapper,
         protected Project\ResultCache\Mapper $projectResultCacheMapper
     ) {
         parent::__construct($userMapper, $errorMapper, $assessmentMapper, $access, $transactor, $participantDataSource, $unitSpecificationMapper, $this->projectResultCacheMapper);
-
-        $this->bakery                    = $bakery;
-        $this->workTypeMapper            = $workTypeMapper;
-        $this->termMapper                = $termMapper;
-        $this->replicator                = $replicator;
-        $this->courseSpecificationMapper = $courseSpecificationMapper;
-        $this->latestViewMapper          = $latestViewMapper;
     }
 
 
@@ -203,8 +181,11 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @since 165
      * @param AssessmentContext $context
      * @throws DefinitionException If unable to locate a specified mapper join
+     * @throws Deleted
      * @throws DomainException If user has interaction but not participant record
      * @throws InvalidArgumentException
+     * @throws MapperException
+     * @throws RouteNotFound
      * @throws UnexpectedValueException If unable to derive a project's participant collection*@throws \PDOException*@throws \PDOException
      * @throws \PDOException
      */
@@ -276,14 +257,19 @@ abstract class Controller extends ListController implements IAssessmentControlle
              */
             $templateId = trim((string)$this->getRequest()->query->get('lpt'));
 
+            /* Some metadata for the Lesson Plan workflow
+             * This encapsulates the myriad of combinations which is really really awkward
+             */
+            $data['lessonPlanMeta']['template'] = null;
+            $data['lessonPlanMeta']['fields'] = [];
+            $data['lessonPlanMeta']['type'] = $type;
+            $data['lessonPlanMeta']['mageAsync'] = false;
+            $data['lessonPlanMeta']['includeBreadcrumbs'] = true;
+
             if ('' === $templateId) {
                 /* You need to Select an LPT
-                 */
-                $data['template'] = null;
-                $data['type'] = $type;
-                $data['mageAsync'] = false;
-
-                /* If $part-1 is set in the query string param, you came here from the
+                 *
+                 * If $part-1 is set in the query string param, you came here from the
                  * Activity Selection screen via Course Builder component. This part
                  * loads the LPT list asynchronously and injects it into a parent container
                  *
@@ -305,7 +291,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
                         ), $data);
                     }
                 } else {
-                    $data['mageAsync'] = true;
+                    $data['lessonPlanMeta']['mageAsync'] = true;
 
                     if ($this->getRequest()->isXhr()) {
                         $content = $this->buildUnthemedHtmlOutput(sprintf(
@@ -322,7 +308,12 @@ abstract class Controller extends ListController implements IAssessmentControlle
             } else {
                 /* Customise the selected LPT
                  */
-                $data['template'] = \Schoolbox\Admin\LessonPlan\Template\Mapper::getInstance()->findById((int)$templateId);
+                $data['lessonPlanMeta']['template'] = \Schoolbox\Admin\LessonPlan\Template\Mapper::getInstance()->findById((int)$templateId);
+
+                /* Field list contains the ones from the Lesson Plan Template when creating
+                 * WHen updating, it's actually fields from the Lesson Plan instance itself
+                 */
+                $data['lessonPlanMeta']['fields'] = [];
 
                 if ($this->getRequest()->isXhr()) {
                     $content = $this->buildUnthemedHtmlOutput(sprintf(
@@ -330,10 +321,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
                         AssessmentType::TYPE_LESSON_PLAN
                     ), $data);
                 } else {
-                    $content = $this->buildHtmlOutput(sprintf(
-                        "@learningAssessment/%s/create.twig",
-                        AssessmentType::TYPE_LESSON_PLAN
-                    ), $data);
+                    $content = $this->buildHtmlOutput('@learningAssessment/create.twig', $data);
                 }
             }
         } else {
@@ -356,6 +344,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @since 165
      * @param IAssessable $assessment
      * @throws InvalidArgumentException
+     * @throws RouteNotFound
      * @throws UnexpectedValueException
      */
     public function getUpdateAssessmentForm(IAssessable $assessment): void
@@ -382,6 +371,24 @@ abstract class Controller extends ListController implements IAssessmentControlle
          */
         $courseManagedFields = new CourseManagedFields($this->getUser(), $assessment);
 
+        /* Lesson Plan Template metadata, used to construct forms
+         */
+        if ($assessment instanceof LessonPlan\Model) {
+            /* TODO Get the fields separately instead of joining everything in the swamp
+             *  because that's just asking for megaquery troubles. We only need the
+             *  Lesson Plan fields here
+             */
+            $lessonPlan = \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper::getInstance()->findOneByColumn('assessment_id', $assessment->getId());
+
+            $data['lessonPlanMeta'] = [
+                'template' => $lessonPlan->getLessonPlanTemplate(),
+                'fields' => $lessonPlan->getFields(),
+                'type' => AssessmentType::TYPE_LESSON_PLAN,
+                'mageAsync' => false,
+                'includeBreadcrumbs' => false
+            ];
+        }
+
         $data['courseManaged'] = [
             'isVisible' => $courseManagedFields->isVisible(),
             'isMutable' => $courseManagedFields->isMutable(),
@@ -391,53 +398,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/update.twig", $data));
     }
 
-
-    /**
-     * Gets a list of units and projects, to which the assessment can be moved
-     * @api   /learning/assessments/:assessmentId/locations
-     * @since 201
-     * @param IAssessable $assessment
-     */
-    public function getLocationForm(IAssessable $assessment): void
-    {
-        if ($assessment->isImplementation()) {
-            // not interested
-            return;
-        }
-
-        $currentUnitSpec = $assessment->getBaseContext();
-        try {
-            $currentCourseSpec = $this->courseSpecificationMapper->findByFolderId($currentUnitSpec->getFolder()->getParent()->getId());
-        } catch (MapperException $e) {
-            return;
-        }
-        $allUnitSpecs = $currentCourseSpec->getUnits();
-
-        $unitProjects = new Collection();
-
-        // if this assessment is not a project, add projects tp relocatable locations
-        if (!$assessment instanceof Project) {
-            foreach ($allUnitSpecs as $unitSpec) {
-                $projects    = $this->getAssessmentMapper()->createCollection();
-                $assessables = $this->getAssessmentMapper()->findAllByUnitSpecificationId($unitSpec->getId());
-                foreach ($assessables as $assessable) {
-                    if (!$assessable instanceof Project) {
-                        continue;
-                    }
-                    $projects->add($assessable);
-                }
-                $unitProjects->offsetSet($unitSpec->getId(), $projects);
-            }
-        }
-        $this->getResponse()->content->set($this->buildContent(
-            '@learningAssessment/fragments/assessmentLocationList.twig',
-            [
-                'units'        => $allUnitSpecs,
-                'unitProjects' => $unitProjects,
-                'current'      => $assessment->getContext()->getLocationId()
-            ]
-        ));
-    }
 
     /**
      * Save the data when creating a specific kind of Assessment
@@ -494,27 +454,68 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
 
     /**
-     * Get an overview of rubric marks
+     * Gets a list of units and projects, to which the assessment can be moved
      *
+     * @api   /learning/assessments/:assessmentId/locations
+     * @since 201
      * @param IAssessable $assessment
-     * @throws \Exception
+     * @throws LogicException
+     * @throws UnexpectedValueException
+     * @throws InvalidColumnException
      */
-    public function getOverview(IAssessable $assessment): void
+    public function getLocationForm(IAssessable $assessment): void
     {
-        // For now, only DueWork uses this route.
-        throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+        if ($assessment->isImplementation()) {
+            // not interested
+            return;
+        }
+
+        $currentUnitSpec = $assessment->getBaseContext();
+        try {
+            $currentCourseSpec = $this->courseSpecificationMapper->findByFolderId($currentUnitSpec->getFolder()->getParent()->getId());
+        } catch (MapperException $e) {
+            return;
+        }
+        $allUnitSpecs = $currentCourseSpec->getUnits();
+
+        $unitProjects = new Collection();
+
+        // if this assessment is not a project, add projects tp relocatable locations
+        if (!$assessment instanceof Project) {
+            foreach ($allUnitSpecs as $unitSpec) {
+                $projects    = $this->getAssessmentMapper()->createCollection();
+                $assessables = $this->getAssessmentMapper()->findAllByUnitSpecificationId($unitSpec->getId());
+                foreach ($assessables as $assessable) {
+                    if (!$assessable instanceof Project) {
+                        continue;
+                    }
+                    $projects->add($assessable);
+                }
+                $unitProjects->offsetSet($unitSpec->getId(), $projects);
+            }
+        }
+        $this->getResponse()->content->set($this->buildContent(
+            '@learningAssessment/fragments/assessmentLocationList.twig',
+            [
+                'units'        => $allUnitSpecs,
+                'unitProjects' => $unitProjects,
+                'current'      => $assessment->getContext()->getLocationId()
+            ]
+        ));
     }
 
 
     /**
-     * Download overview of rubric marks
+     * Update particular fields of an existing IAssessable
+     *
+     * Default Abstract implementation does nothing, Concrete class to override.
      *
      * @param IAssessable $assessment
+     * @return void
      * @throws \Exception
      */
-    public function downloadOverview(IAssessable $assessment): void
+    public function patchUpdateAssessment(IAssessable $assessment): void
     {
-        // For now, only DueWork uses this route.
         throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
     }
 
@@ -529,10 +530,15 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @since 165
      * @param IAssessable $assessment
      * @return void
+     * @throws DefinitionException
+     * @throws DomainException
+     * @throws InvalidArgumentException
      * @throws LogicException
+     * @throws MapperException
+     * @throws Deleted
      * @throws RouteNotFound
      * @throws UnexpectedValueException
-     * @throws MapperException
+     * @throws \PDOException
      */
     public function postDeleteAssessment(IAssessable $assessment): void
     {
@@ -576,11 +582,19 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
 
     /**
+     * @param IAssessable $assessment
+     * @return array
+     */
+    abstract protected function getAssessmentTwigData(IAssessable $assessment): array;
+
+
+    /**
      * @param AssessmentContext $context
      * @param IAssessable       $assessment
      * @return array
-     * @throws UnexpectedValueException
      * @throws InvalidArgumentException
+     * @throws RouteNotFound
+     * @throws UnexpectedValueException
      */
     private function getAssessmentAsTwigArray(AssessmentContext $context, IAssessable $assessment): array
     {
@@ -635,6 +649,32 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
 
     /**
+     * Get an overview of rubric marks
+     *
+     * @param IAssessable $assessment
+     * @throws \Exception
+     */
+    public function getOverview(IAssessable $assessment): void
+    {
+        // For now, only DueWork uses this route.
+        throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+    }
+
+
+    /**
+     * Download overview of rubric marks
+     *
+     * @param IAssessable $assessment
+     * @throws \Exception
+     */
+    public function downloadOverview(IAssessable $assessment): void
+    {
+        // For now, only DueWork uses this route.
+        throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+    }
+
+
+    /**
      * All the possible Mark Types to choose from for this particular $assessmentType
      *
      * @param IAssessable $assessable
@@ -658,13 +698,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
     {
         return GradeSchemeMapper::getInstance()->findAllWithGradeLevels();
     }
-
-
-    /**
-     * @param IAssessable $assessment
-     * @return array
-     */
-    abstract protected function getAssessmentTwigData(IAssessable $assessment): array;
 
 
     /**
@@ -706,21 +739,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
     {
         $c = get_class($scheme);
         return substr($c, strrpos($c, '\\') + 1);
-    }
-
-
-    /**
-     * Update particular fields of an existing IAssessable
-     *
-     * Default Abstract implementation does nothing, Concrete class to override.
-     *
-     * @param IAssessable $assessment
-     * @return void
-     * @throws \Exception
-     */
-    public function patchUpdateAssessment(IAssessable $assessment): void
-    {
-        throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
     }
 
 

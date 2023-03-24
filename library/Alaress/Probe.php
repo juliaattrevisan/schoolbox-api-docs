@@ -16,9 +16,9 @@ use Alaress\DebugBar\Instance as DebugBar;
  * Multiple columns get individual scroll capability so you can compare columns
  * of varying lengths without having to fight with just one scrollbar
  */
+
 class Alaress_Probe
 {
-
     /**
      * Alaress_Probe constructor.
      * @param null $_
@@ -48,7 +48,7 @@ class Alaress_Probe
             for ($i = 0; $i < $numArgs; $i++) {
                 $contents = func_get_arg($i);
 
-                echo "<div style='width:{$width}%;float:left;display:block;overflow:auto;{$height}'>";
+                echo "<div style='width:{$width}%;float:left;display:block;overflow:auto;{$height};font-size:12px;'>";
                 echo "<pre>";
 
                 /* Also accommodate bools/nulls

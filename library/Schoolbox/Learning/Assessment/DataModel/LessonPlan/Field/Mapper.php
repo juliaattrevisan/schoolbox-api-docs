@@ -8,14 +8,14 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Assessment\LessonPlan\Field;
+namespace Schoolbox\Learning\Assessment\DataModel\LessonPlan\Field;
 
 use PDOStatement;
-use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
-use Schoolbox\Learning\Assessment\LessonPlan\Mapper as LessonPlanMapper;
 use Schoolbox\Admin\LessonPlan\Template\Field\Mapper as LessonPlanTemplateFieldMapper;
 use Schoolbox\Admin\LessonPlan\Template\Field\Model as LessonPlanTemplateField;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanMapper;
+use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
 use Schoolbox\Mapper\Exception;
 
 /**

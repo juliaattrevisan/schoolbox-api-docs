@@ -8,7 +8,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Assessment\LessonPlan;
+namespace Schoolbox\Learning\Assessment\DataModel\LessonPlan;
 
 use PDOStatement;
 use Schoolbox\GenericCollection;
@@ -41,10 +41,13 @@ class Mapper extends \Schoolbox\Mapper
         $this->joins('updated_by', UserMapper::class, 'id', null, null, 'updatedBy', 'updatedBy');
         $this->joins('deleted_by', UserMapper::class, 'id', null, null, 'deletedBy', 'deletedBy');
 
+        // This column is duplicate of assessment.deleted_at, but is required to ensure soft-deletion on this table.
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
         $this->hasJoin(
             'lessonPlanField',
             [
-                'mapper'    => \Schoolbox\Learning\Assessment\LessonPlan\Field\Mapper::class,
+                'mapper'    => Field\Mapper::class,
                 'this_key'  => 'id',
                 'other_key' => 'lesson_plan_id',
                 'multiple'  => true,
@@ -71,7 +74,9 @@ class Mapper extends \Schoolbox\Mapper
             ]
         );
 
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'auditorFields']);
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteFields']);
+        $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteAttachments']);
     }
 
 
@@ -181,23 +186,23 @@ class Mapper extends \Schoolbox\Mapper
              */
             $lessonPlanField = $fieldMapper->hydrate($row, 'lessonPlanField');
 
-            if ($lessonPlanField instanceof \Schoolbox\Learning\Assessment\LessonPlan\Field\Model) {
+            if ($lessonPlanField instanceof Field\Model) {
                 $lessonPlans[$row['id']]->addField($lessonPlanField);
+
+                /* Hydrate and supply the original Lesson Plan Template Field
+                 */
+                /** @var \Schoolbox\Admin\LessonPlan\Template\Field\Model $lessonPlanTemplateField */
+                $lessonPlanTemplateField = $templateFieldMapper->hydrate($row, 'lessonPlanTemplateField', 'lessonPlanTemplateField');
+                $lessonPlanField->setLessonPlanTemplateField($lessonPlanTemplateField);
+
+                /* Reference it in the Lesson Plan Template Fields as well
+                 */
+                $lessonPlans[$row['id']]->getLessonPlanTemplate()->addField($lessonPlanTemplateField);
             }
 
-            /* Hydrate and supply the original Lesson Plan Template Field
+            /* TODO: Augment with attached files
              */
-            /** @var \Schoolbox\Admin\LessonPlan\Template\Field\Model $lessonPlanTemplateField */
-            $lessonPlanTemplateField = $templateFieldMapper->hydrate($row, 'lessonPlanTemplateField', 'lessonPlanTemplateField');
-            $lessonPlanField->setLessonPlanTemplateField($lessonPlanTemplateField);
-
-            /* Reference it in the Lesson Plan Template Fields as well
-             */
-            $lessonPlans[$row['id']]->getLessonPlanTemplate()->addField($lessonPlanTemplateField);
-
-            /* Augment with attached files
-             */
-            $lessonPlans[$row['id']]->setAttachments($this->getJoinMapper('files')->findByColumn('lesson_plan_id', $lessonPlans[$row['id']]->getId()));
+            // $lessonPlans[$row['id']]->setAttachments($this->getJoinMapper('files')->findByColumn('lesson_plan_id', $lessonPlans[$row['id']]->getId()));
         }
 
         /* Sort sequentially
@@ -235,22 +240,50 @@ class Mapper extends \Schoolbox\Mapper
     /**
      * Delete the fields that were associated with $lessonPlanTemplate
      *
-     * @param Model $lessonPlanTemplate
+     * @param Model $lessonPlan
      * @return void
      * @throws DefinitionException
      * @throws Exception
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    protected function softDeleteFields(Model $lessonPlanTemplate): void
+    protected function softDeleteFields(Model $lessonPlan): void
     {
         /* Remember who deleted this thing, in a dirty doubletap
          */
-        $lessonPlanTemplate->setDeletedBy($this->getSessionUser());
-        $this->save($lessonPlanTemplate);
+        $lessonPlan->setDeletedBy($this->getSessionUser());
+        $this->save($lessonPlan);
 
         /* Dump away any associated Fields too
          */
-        $this->getJoinMapper('field')->delete($lessonPlanTemplate->getFields());
+        $this->getJoinMapper('lessonPlanField')->delete($lessonPlan->getFields());
+    }
+
+
+    /**
+     * Delete the files (attachments) associated with a Lesson Plan
+     *
+     * @param Model $lessonPlan
+     * @return void
+     * @throws DefinitionException
+     */
+    protected function softDeleteAttachments(Model $lessonPlan): void
+    {
+        $this->getJoinMapper('files')->deleteByColumn('lesson_plan_id', $lessonPlan->getId());
+    }
+
+
+    /**
+     * Prefill auditor fields (the Swamp shouldn't need to know about this)
+     */
+    protected function auditorFields(Model $lessonPlan): void
+    {
+        if (null === $lessonPlan->getCreatedBy()) {
+            $lessonPlan->setCreatedBy($this->getSessionUser());
+        }
+
+        if (null === $lessonPlan->getUpdatedBy()) {
+            $lessonPlan->setUpdatedBy($this->getSessionUser());
+        }
     }
 }

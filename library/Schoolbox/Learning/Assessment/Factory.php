@@ -13,31 +13,32 @@ namespace Schoolbox\Learning\Assessment;
 use Alaress_Date_Format;
 use DomainException;
 use InvalidArgumentException;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\DueWork\Decorator\CourseManagedDecorator as DueWorkCourseManagedDecorator;
+use Schoolbox\Learning\Assessment\DueWork\Decorator\Decorator as DueWorkDecorator;
+use Schoolbox\Learning\Assessment\DueWork\Decorator\DueWorkTrait;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\LessonPlan;
 use Schoolbox\Learning\Assessment\Lti\Decorator\Decorator as LtiDecorator;
 use Schoolbox\Learning\Assessment\Lti\Decorator\LtiTrait;
-use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
+use Schoolbox\Learning\Assessment\LessonPlan\Decorator\LessonPlanTrait;
+use Schoolbox\Learning\Assessment\Project\Decorator\Decorator as ProjectDecorator;
+use Schoolbox\Learning\Assessment\Project\Decorator\ProjectTrait;
+use Schoolbox\Learning\Assessment\Quiz\Decorator\Decorator as QuizDecorator;
+use Schoolbox\Learning\Assessment\Quiz\Decorator\QuizTrait;
+use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
+use Schoolbox\Learning\Assessment\Summator\Factory as SummatorFactory;
+use Schoolbox\Learning\Assessment\Task\Decorator\Decorator as TaskDecorator;
+use Schoolbox\Learning\Assessment\Task\Decorator\TaskTrait;
+use Schoolbox\Learning\Assessment\Task\Model as Task;
+use Schoolbox\Learning\AssessmentContext;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Exception as ResourceException;
 use Schoolbox\User;
-use Schoolbox\Learning\Assessment\Summator\Factory as SummatorFactory;
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use Schoolbox\Learning\Assessment\Task\Model as Task;
-use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
-use Schoolbox\Learning\Assessment\DueWork\Decorator\DueWorkTrait;
-use Schoolbox\Learning\Assessment\DueWork\Decorator\Decorator as DueWorkDecorator;
-use Schoolbox\Learning\Assessment\DueWork\Decorator\CourseManagedDecorator as DueWorkCourseManagedDecorator;
-use Schoolbox\Learning\Assessment\LessonPlan;
-use Schoolbox\Learning\Assessment\Quiz\Decorator\QuizTrait;
-use Schoolbox\Learning\Assessment\Quiz\Decorator\Decorator as QuizDecorator;
-use Schoolbox\Learning\Assessment\Task\Decorator\TaskTrait;
-use Schoolbox\Learning\Assessment\Task\Decorator\Decorator as TaskDecorator;
-use Schoolbox\Learning\Assessment\Project\Decorator\ProjectTrait;
-use Schoolbox\Learning\Assessment\Project\Decorator\Decorator as ProjectDecorator;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
-use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use UnexpectedValueException;
 
 /**
@@ -58,6 +59,7 @@ class Factory
     use ProjectTrait;
     use AttachedFilesTrait;
     use LtiTrait;
+    use LessonPlanTrait;
 
     /**
      * Unique identifier
@@ -254,6 +256,12 @@ class Factory
         $this->setLtiAssessmentText($post['ltiAssessmentText'] ?? null);
         $this->setLtiToolId(filter_var($post['ltiToolId'] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE));
 
+        /* Lesson Plans
+         */
+        $this->setLessonPlanTemplateId((int)($post['lessonPlanTemplateId'] ?? null));
+        $this->setLessonPlanFields($post['field'] ?? []);
+        $this->setLessonPlanVisibility('on' === ($post['lessonPlanVisibility'] ?? null) ? \Schoolbox\Role::STUDENT : \Schoolbox\Role::STAFF);
+
         // Ensure custom fields is an array if it's set
         $customFields = $post['customFields'] ?? null;
         if (isset($customFields)) {
@@ -412,6 +420,9 @@ class Factory
             /* TODO Add other fields that are LessonPlan specific
              */
             $decorator = new LessonPlan\Decorator\Decorator(
+                $this->getLessonPlanTemplateId(),
+                $this->getLessonPlanFields(),
+                $this->getLessonPlanVisibility(),
                 $this->getAttachedFiles()
             );
         } else {
