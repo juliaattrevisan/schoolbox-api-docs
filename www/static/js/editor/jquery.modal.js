@@ -116,9 +116,13 @@
                  */
                 onBeforeOpen: function () {},
 
-                /* Executes after picker modal shuts
+                /* Executes after picker modal is first shut, either from a cancel click or file selection
                  */
                 onAfterClose: function () {},
+
+                /* Executes after picker modal is completely closed and removed from the dom
+                 */
+                onModalClosed: function () {},
             };
 
             return $.extend(defaults, options);
@@ -306,9 +310,10 @@
                     if (undefined !== config.previousModal) {
                         config.previousModal.removeClass("hide");
                     }
-
                     // Show the cke dialog overlay again
                     $(".cke_dialog_background_cover").removeClass("hide");
+
+                    config.onModalClosed();
                 });
 
             singletonModal.on("click", ".cancel[role=button]", function (e) {
@@ -587,6 +592,7 @@
                 defaultFolderSelector: config.defaultFolderSelector,
                 onBeforeOpen: config.onBeforeOpen,
                 onAfterClose: config.onAfterClose,
+                onModalClosed: config.onModalClosed,
                 restoreModal: config.restoreModal,
             });
 
