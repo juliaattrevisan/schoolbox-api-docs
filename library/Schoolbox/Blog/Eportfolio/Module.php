@@ -118,9 +118,8 @@ class Module extends BaseModule
         $callback = function ($params, User $loggedInUser) use ($method) {
             if (($params['comment'] ?? null) instanceof EportfolioBlogCommentModel) {
                 $commentOwner = $params['comment']->getOwner();
-                $commentOwnerRole = $commentOwner->getRole();
 
-                if ($commentOwnerRole->isStaff()) {
+                if ($commentOwner->getRole()->isStaff()) {
                     // Comment owner is staff - authorize only if logged-in user is superuser or staff.
                     // Superusers are always authorized (see return line at bottom of this function), so we only need to check isStaff().
                     if ($loggedInUser->getRole()->isStaff()) {
