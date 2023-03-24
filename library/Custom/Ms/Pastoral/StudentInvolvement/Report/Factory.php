@@ -1076,6 +1076,6 @@ class Factory
     private function isReportWithSubjectCodeDisplayed(string $subjectCode): bool
     {
         [, $code,] = explode('-', $subjectCode);
-        return in_array((int)$code, self::HIDDEN_SUBJECTS);
+        return !in_array((int)$code, self::HIDDEN_SUBJECTS);
     }
 }
