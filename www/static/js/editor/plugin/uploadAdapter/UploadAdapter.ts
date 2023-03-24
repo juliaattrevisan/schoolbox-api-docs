@@ -78,14 +78,20 @@ export default class UploadAdapter {
                 src: getURL(meta.file._links.icon, config),
                 alt: meta.name,
                 linkHref: getURL(meta.file._links.fetch, config),
+                linkToggleDownloadable: "true",
             };
             const imageUtils = this.editor.plugins.get("ImageUtils");
             imageUtils.insertImage(attributes, this.editor.model.document.selection, "imageInline");
             this.editor.model.change((writer) => {
-                this.editor.model.insertContent(writer.createText(`${meta.name}: `, { bold: true }));
                 const image = imageUtils.insertImage(attributes, this.editor.model.document.selection, "imageInline");
-                this.editor.execute("resizeImage", { width: "36px" });
+                this.editor.execute("resizeImage", { width: "24px" });
                 writer.setSelection(image.parent, "end");
+                this.editor.model.insertContent(
+                    writer.createText(` - ${meta.name}`, {
+                        linkHref: getURL(meta.file._links.fetch, config),
+                        linkToggleDownloadable: "true",
+                    })
+                );
                 this.editor.execute("enter");
             });
         }
