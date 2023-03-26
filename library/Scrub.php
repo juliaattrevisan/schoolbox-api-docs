@@ -435,6 +435,11 @@ class Scrub
                     'html_input'         => CommonMark\Util\HtmlFilter::STRIP,
                     'allow_unsafe_links' => false,
                     'max_nesting_level'  => 10,
+                    'renderer'           => [
+                        'block_separator' => "\n",
+                        'inner_separator' => "\n",
+                        'soft_break'      => "\n"
+                    ]
                 ]
             );
             $environment->addExtension(new CommonMark\Extension\CommonMark\CommonMarkCoreExtension());
@@ -454,7 +459,10 @@ class Scrub
      */
     public static function markdown(?string $text): string
     {
-        return self::getMarkdownConverter()->convertToHtml((string)$text)->getContent();
+        $html = self::getMarkdownConverter()->convertToHtml((string)$text)->getContent();
+
+        // Ensure no linebreak exists between <li> and <a> tags.  (See SA-15196).
+        return str_replace("<li>\n<a ", "<li> <a ", $html);
     }
 
 
