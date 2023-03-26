@@ -12,7 +12,6 @@ import ImageToolbar from "@ckeditor/ckeditor5-image/src/imagetoolbar";
 import ImageStyle from "@ckeditor/ckeditor5-image/src/imagestyle";
 import ImageResize from "@ckeditor/ckeditor5-image/src/imageresize";
 import LinkImage from "@js/editor/plugin/link/LinkImage";
-import ImageInsert from "@ckeditor/ckeditor5-image/src/imageinsert";
 import FullWidth from "@js/editor/plugin/fullWidth/FullWidth";
 
 /**
@@ -22,5 +21,5 @@ import FullWidth from "@js/editor/plugin/fullWidth/FullWidth";
  */
 export function getImagePlugins() {
     // return [Image, ImageToolbar, ImageCaption, ImageStyle, ImageResize, LinkImage, ImageInsert, FullWidth];
-    return [Image, ImageToolbar, ImageStyle, ImageResize, LinkImage, ImageInsert, FullWidth];
+    return [Image, ImageToolbar, ImageStyle, ImageResize, LinkImage, FullWidth];
 }
