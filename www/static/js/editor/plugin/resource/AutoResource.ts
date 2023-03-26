@@ -12,10 +12,16 @@ export default class ResourceEditing extends Plugin {
     init() {
         const editor = this.editor;
         const fileRepository = editor.plugins.get("FileRepository");
-        editor.editing.view.document.on("clipboardInput", (evt, data) => {
+        editor.editing.view.document.on("clipboardInput", (event, data) => {
             const files = Array.from(data.dataTransfer._files);
             files.forEach((file) => {
                 const loader = fileRepository.createLoader(file);
+                loader.on("change:status", (evt, name, value) => {
+                    console.warn("change:status: " + value);
+                });
+                loader.on("change:uploadedPercent", (evt, name, value) => {
+                    console.warn("change:uploadedPercent: " + value);
+                });
                 loader.upload();
             });
         });
