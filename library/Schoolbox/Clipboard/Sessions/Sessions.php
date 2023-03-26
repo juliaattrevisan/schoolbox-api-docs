@@ -440,6 +440,22 @@ class Sessions implements IStrategy
                              */
                             $label = $customFieldsMetadata[$key]['label'];
 
+                            /* We only care when Custom Fields are viewable by schoolbox users:
+                             *     * guardian
+                             *     * student
+                             *
+                             * Schools sometimes use staff-only custom metadata fields which
+                             * aren't intended for schoolbox users to see
+                             */
+                            if (!$this->visibleCustomMetadataField($customFieldsMetadata[$key])) {
+                                $this->log->debug(sprintf(
+                                    'Skipping custom field metadata for "%s"; it was not meant for students/parents',
+                                    $label
+                                ));
+
+                                continue;
+                            }
+
                             /* If there's a meaningful value, stack it up
                              * Otherwise ignore it
                              */
@@ -592,6 +608,33 @@ class Sessions implements IStrategy
         }
 
         return $venue;
+    }
+
+
+    /**
+     * This decides whether a metadata field was visible to schoolbox users.
+     * Any metadata field with EITHER 'guardian' and/or 'student' will be imported
+     * into the $notes for a Matchup.
+     *
+     * The clipboard ui seems to put 'guardian' and 'student' into this array together,
+     * but there might be some other place which only puts one of those values here
+     *
+     * The array_intersect() + empty() will cover both use cases
+     *
+     * @param array $metadataField
+     * @return bool
+     */
+    private function visibleCustomMetadataField(array $metadataField): bool
+    {
+        /* Maybe one day this is significant enough to warrant evolution into private const
+         * but this is its only usage so far
+         */
+        $visibleToSchoolbox = ['guardian', 'student'];
+
+        /* Empty array means neither 'guardian' nor 'student' was listed here
+         * so it should be hidden from schoolbox
+         */
+        return !empty(array_intersect($visibleToSchoolbox, $metadataField['showToUserTypes'] ?? []));
     }
 
 
