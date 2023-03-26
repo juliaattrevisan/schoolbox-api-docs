@@ -434,12 +434,7 @@ class Scrub
                 [
                     'html_input'         => CommonMark\Util\HtmlFilter::STRIP,
                     'allow_unsafe_links' => false,
-                    'max_nesting_level'  => 10,
-                    'renderer'           => [
-                        'block_separator' => "\n",
-                        'inner_separator' => "\n",
-                        'soft_break'      => "\n"
-                    ]
+                    'max_nesting_level'  => 10
                 ]
             );
             $environment->addExtension(new CommonMark\Extension\CommonMark\CommonMarkCoreExtension());
