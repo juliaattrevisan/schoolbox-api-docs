@@ -4,20 +4,31 @@ namespace Duework;
 
 use AcceptanceTester;
 use Codeception\Util\Locator;
-use Facebook\WebDriver\WebDriverKeys;
 
 class DueWorkInitialCest
 {
     public $home_page_url;
 
     /**
-     * @throws \Codeception\Exception\ModuleException
+     * @param AcceptanceTester $i
+     * @return void
+     */
+    public function _before(AcceptanceTester $i)
+    {
+        $i->logout();
+        $i->loginAsAdmin();
+    }
+
+    /**
+     * @param AcceptanceTester $i
+     * @return void
+     * @beforeSuite
+     * @throws \Exception
      */
     public function create2Assessments(AcceptanceTester $i)
     {
         $teacher = 'Jack Coles';
         $student = 'Eden Reed';
-        $i->login('alaress', 'alaress');
         $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resource/folder/0/create");
         $i->selectOption("template", "Blank");
         $folderName = 'Test Class Homepage ' . time();
@@ -91,10 +102,15 @@ class DueWorkInitialCest
         $i->canSee('Test Due Work2');
     }
 
+    /**
+     * @param AcceptanceTester $i
+     * @return void
+     * @beforeSuite
+     * @throws \Exception
+     */
     public function deleteAssessment(AcceptanceTester $i)
     {
         $teacher = 'Jack Coles';
-        $i->login('alaress', 'alaress');
         $i->impersonate($teacher);
         $i->amOnUrl($this->home_page_url);
         $i->click('Test Due Work2');
@@ -107,10 +123,15 @@ class DueWorkInitialCest
     }
 
 
+    /**
+     * @param AcceptanceTester $i
+     * @return void
+     * @beforeSuite
+     * @throws \Exception
+     */
     public function viewClassWork(AcceptanceTester $i)
     {
         $student = 'Eden Reed';
-        $i->login('alaress', 'alaress');
         $i->impersonate($student);
         $i->amOnUrl($this->home_page_url);
         $i->canSee('Test Due Work');
@@ -118,10 +139,15 @@ class DueWorkInitialCest
         $i->canSee('Test Due Work');
     }
 
+    /**
+     * @param AcceptanceTester $i
+     * @return void
+     * @beforeSuite
+     * @throws \Exception
+     */
     public function submitWorkInPersonByStudent(AcceptanceTester $i)
     {
         $student = 'Eden Reed';
-        $i->login('alaress', 'alaress');
         $i->impersonate($student);
         $i->amOnUrl($this->home_page_url);
         $i->waitForText('Test Due Work', 5);
@@ -134,10 +160,15 @@ class DueWorkInitialCest
         $i->canSee('Submitted in person by Ms Eden Reed');
     }
 
+    /**
+     * @param AcceptanceTester $i
+     * @return void
+     * @beforeSuite
+     * @throws \Exception
+     */
     public function viewSubmission(AcceptanceTester $i)
     {
         $teacher = 'Jack Coles';
-        $i->login('alaress', 'alaress');
         $i->impersonate($teacher);
         $i->amOnUrl($this->home_page_url);
         $i->click('Test Due Work');
@@ -152,10 +183,15 @@ class DueWorkInitialCest
         $i->canSee('Grading Test Due Work');
     }
 
+    /**
+     * @param AcceptanceTester $i
+     * @return void
+     * @beforeSuite
+     * @throws \Exception
+     */
     public function markSubmission(AcceptanceTester $i)
     {
         $teacher = 'Jack Coles';
-        $i->login('alaress', 'alaress');
         $i->impersonate($teacher);
         $i->amOnUrl($this->home_page_url);
         $i->click('Test Due Work');
@@ -175,10 +211,15 @@ class DueWorkInitialCest
         $i->canSee('Reviewed');
     }
 
+    /**
+     * @param AcceptanceTester $i
+     * @return void
+     * @beforeSuite
+     * @throws \Exception
+     */
     public function viewMarkedSubmission(AcceptanceTester $i)
     {
         $student = 'Eden Reed';
-        $i->login('alaress', 'alaress');
         $i->impersonate($student);
         $i->amOnPage('learning/grades/6');
         $link_marks_class_test = Locator::contains('a.flex-grade.link-row', 'Test Class Homepage');
@@ -196,10 +237,15 @@ class DueWorkInitialCest
     }
 
 
+    /**
+     * @param AcceptanceTester $i
+     * @return void
+     * @beforeSuite
+     * @throws \Exception
+     */
     public function submitWorkTypingSomethingByTeacher(AcceptanceTester $i)
     {
         $teacher = 'Jack Coles';
-        $i->login('alaress', 'alaress');
         $i->impersonate($teacher);
         $i->amOnUrl($this->home_page_url);
         $i->waitForText('Test Due Work', 5);
@@ -212,9 +258,14 @@ class DueWorkInitialCest
         $i->canSee('Submission by Mr Jack Coles');
     }
 
+    /**
+     * @param AcceptanceTester $i
+     * @return void
+     * @beforeSuite
+     * @throws \Exception
+     */
     public function submitWorkTypingSomethingByAdmin(AcceptanceTester $i)
     {
-        $i->login('alaress', 'alaress');
         $i->amOnUrl($this->home_page_url);
         $i->waitForText('Test Due Work', 5);
         $i->click('Test Due Work');

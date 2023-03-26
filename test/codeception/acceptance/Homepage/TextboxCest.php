@@ -9,7 +9,6 @@ namespace Homepage;
 
 use AcceptanceTester;
 use Codeception\Util\Locator;
-use Page\Common;
 use Page\Homepage;
 
 /**
@@ -17,11 +16,20 @@ use Page\Homepage;
  */
 class TextboxCest
 {
-
     var $createFolderUrl = 'https://vagrant.dev.schoolbox.cloud/resource/folder/0/create';
 
     /**
      * @param AcceptanceTester $i
+     * @return void
+     */
+    public function _before(AcceptanceTester $i)
+    {
+        $i->logout();
+    }
+
+    /**
+     * @param AcceptanceTester $i
+     * @beforeSuite
      */
     public function createHomepage(AcceptanceTester $i): void
     {
@@ -63,6 +71,7 @@ class TextboxCest
      * @param AcceptanceTester     $i
      * @param Homepage             $homepage
      * @param Homepage\TextboxForm $textboxForm
+     * @beforeSuite
      * @depends createHomepage
      * @throws \Exception
      */

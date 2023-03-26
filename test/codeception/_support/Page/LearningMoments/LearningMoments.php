@@ -128,10 +128,9 @@ class LearningMoments
      */
     public function typeComment(): void
     {
-        $this->tester->waitForElementVisible(['css' => 'div#cke_1_contents'], 5);
-        $this->tester->fillCkEditorById('1_contents', 'Well done. This is my first comment in this learning moment!');
-        $this->tester->click('a#cke_11');
+        $this->tester->fillCkEditorById('comment-0', 'Well done. This is my first comment in this learning moment!');
     }
+
     /**
      * click add a comment
      */

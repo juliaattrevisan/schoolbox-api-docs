@@ -14,8 +14,9 @@ class Badges
     public const DROPDOWN_DELETE = 'a.icon-delete';
     public const BUTTON_CONFIRM_DELETE = 'a.button.submit';
     public const LIST_BOX_GOAL = "input[aria-controls='vs2__listbox']";
-    public const LIST_BOX_AWARD = "input[aria-controls='vs1__listbox']";
-    public const SELECTED_STUDENT = 'span.selected.d-center';
+    public const LIST_BOX_AWARD   = "input[aria-controls='vs1__listbox']";
+    public const USER_DROPDOWN    = "ul[role='listbox']";
+    public const SELECTED_STUDENT = 'span.d-center';
     public const MODAL_BUTTON_SET_GOAL_ACHIEVEMENT = 'button';
 
     private AcceptanceTester $tester;
@@ -75,9 +76,9 @@ class Badges
      * click an option in the dropdown (Award Achievement, Set Goal, etc)
      * options are: achievement, goal, withdraw-achievement, close, modify, delete
      */
-    public function clickDropdownOptionFirstElement($dropdownOption): void
+    public function clickDropdownOptionFirstElement($badgeId, $dropdownOption): void
     {
-        $this->tester->click(Locator::firstElement('a.icon-' . $dropdownOption));
+        $this->tester->click(Locator::firstElement("#badge-{$badgeId}-dropdown a.icon-" . $dropdownOption));
     }
 
     /**
@@ -111,6 +112,7 @@ class Badges
     public function selectStudentSetGoal(string $studentName): void
     {
         $this->tester->fillField(self::LIST_BOX_GOAL, $studentName);
+        $this->tester->waitForElement(self::USER_DROPDOWN);
         $this->tester->pressKey(self::LIST_BOX_GOAL, \Facebook\WebDriver\WebDriverKeys::ENTER);
         $this->tester->click(self::SELECTED_STUDENT);
     }
@@ -121,6 +123,7 @@ class Badges
     public function selectStudentAwardAchievement(string $studentName): void
     {
         $this->tester->fillField(self::LIST_BOX_AWARD, $studentName);
+        $this->tester->waitForElement(self::USER_DROPDOWN);
         $this->tester->pressKey(self::LIST_BOX_AWARD, \Facebook\WebDriver\WebDriverKeys::ENTER);
         $this->tester->click(self::SELECTED_STUDENT);
     }

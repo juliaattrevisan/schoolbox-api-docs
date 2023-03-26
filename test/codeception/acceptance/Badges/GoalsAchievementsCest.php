@@ -52,20 +52,22 @@ class GoalsAchievementsCest
      */
     public function setGoals(AcceptanceTester $i): void
     {
-
         $createBadge = new CreateBadge($i);
         $badges = new Badges($i);
         $profilePage = new ProfilePage($i);
         $badgeName = 'Automation Badge created to set goal from Badges page';
         $student = 'Jana Reed';
         $studentId = 25;
-        $i->amGoingTo('Create a Badge');
-        $createBadge->createBadge($i, $badgeName);
-        $i->amGoingTo('Set a Goal to Jana Reed');
         $badgeId = $i->grabFromDatabase('badge', 'id', ['deleted_at' => null,'name like' => $badgeName]);
+        if (!$badgeId) {
+            $i->amGoingTo('Create a Badge');
+            $createBadge->createBadge($i, $badgeName);
+            $badgeId = $i->grabFromDatabase('badge', 'id', ['deleted_at' => null,'name like' => $badgeName]);
+        }
+        $i->amGoingTo('Set a Goal to Jana Reed');
         $i->amGoingTo('click the 3-dot menu and click Set Goal');
         $badges->clickBadgeDropdown($badgeId);
-        $badges->clickDropdownOptionLastElement('goal');
+        $badges->clickDropdownOptionFirstElement($badgeId, 'goal');
         $i->amGoingTo('search and select Jana Reed on the modal');
         $badges->selectStudentSetGoal($student);
         $i->amGoingTo('click Set Goal button on the modal');
@@ -89,19 +91,21 @@ class GoalsAchievementsCest
      */
     public function awardAchievement(AcceptanceTester $i): void
     {
-
         $createBadge = new CreateBadge($i);
         $badges = new Badges($i);
         $badgeName = 'Automation Badge created for award achievement from Badges page';
         $student = 'Jana Reed';
         $studentProfilePage = '/search/user/25';
-        $i->amGoingTo('Create a Badge');
-        $createBadge->createBadge($i, $badgeName);
-        $i->amGoingTo('Award achievement to Jana Reed');
         $badgeId = $i->grabFromDatabase('badge', 'id', ['deleted_at' => null,'name like' => $badgeName]);
+        if (!$badgeId) {
+            $i->amGoingTo('Create a Badge');
+            $createBadge->createBadge($i, $badgeName);
+            $badgeId = $i->grabFromDatabase('badge', 'id', ['deleted_at' => null,'name like' => $badgeName]);
+        }
+        $i->amGoingTo('Award achievement to Jana Reed');
         $i->amGoingTo('click the 3-dot menu and click Award Achievement');
         $badges->clickBadgeDropdown($badgeId);
-        $badges->clickDropdownOptionFirstElement('achievement');
+        $badges->clickDropdownOptionFirstElement($badgeId, 'achievement');
         $i->amGoingTo('search and select Jana Reed on the modal');
         $badges->selectStudentAwardAchievement($student);
         $i->amGoingTo('click Award achievement button on the modal');
@@ -124,7 +128,6 @@ class GoalsAchievementsCest
      */
     public function removeGoalWithdrawAchievement(AcceptanceTester $i): void
     {
-
         $badges = new Badges($i);
         $profilePage = new ProfilePage($i);
         $badgeNameGoal = 'Automation Badge created to set goal from Badges page';
@@ -153,7 +156,7 @@ class GoalsAchievementsCest
         $i->cantSee($badgeNameAchievement);
         $badgeIdGoal = $i->grabFromDatabase('badge', 'id', ['deleted_at' => null,'name like' => $badgeNameGoal]);
         $profilePage->clickBadgeGoalDropdown($badgeIdGoal);
-        $badges->clickDropdownOptionFirstElement('close');
+        $badges->clickDropdownOptionLastElement('close');
         $badges->clickConfirm();
         $i->cantSee($badgeNameGoal);
         $profilePage->clickTab('activity');
@@ -164,6 +167,7 @@ class GoalsAchievementsCest
     /**
      * @param AcceptanceTester $i
      * @throws Exception
+     * @beforeSuite
      * @depends setGoals
      * set a goal, add an evidence, view the evidence, edit it, check it is updated, award it and check the evidence is presented
      * withdraw the achievement, remove the evidence, award it again with evidence, check the evidence, update the evidence, check the evidence is presented properly
@@ -180,7 +184,7 @@ class GoalsAchievementsCest
         $badgeId = $i->grabFromDatabase('badge', 'id', ['deleted_at' => null,'name like' => $badgeNameGoal]);
         $i->amGoingTo('click the 3-dot menu and click Set Goal');
         $badges->clickBadgeDropdown($badgeId);
-        $badges->clickDropdownOptionLastElement('goal');
+        $badges->clickDropdownOptionFirstElement($badgeId, 'goal');
         $i->amGoingTo('search and select Jana Reed on the modal');
         $badges->selectStudentSetGoal($student);
         $i->amGoingTo('click Set Goal button on the modal');

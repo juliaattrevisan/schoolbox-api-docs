@@ -569,6 +569,14 @@ class Acceptance extends \Codeception\Module
     }
 
     /**
+     * @return string
+     */
+    public function getUuid(): string
+    {
+        return uniqid((string)mt_rand(), true);
+    }
+
+    /**
      * Return DB module in a type-safe manner.
      * @return Db
      * @throws ModuleException
