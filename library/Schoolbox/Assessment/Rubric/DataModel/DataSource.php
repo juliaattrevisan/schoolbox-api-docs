@@ -1364,6 +1364,7 @@ class DataSource
         $indicatorMapper       = IndicatorMapper::getInstance();
         $capabilityUsageMapper = CapabilityUsageMapper::getInstance();
         $indicatorUsageMapper  = IndicatorUsageMapper::getInstance();
+        $unitSpecMapper        = UnitSpecificationMapper::getInstance();
 
         $sourceBox = $boxMapper->findOneByColumn('assessment_id', $sourceAssessmentId);
 
@@ -1432,7 +1433,9 @@ class DataSource
 
         // If the rubric is being duped into a unit spec:
         // also fetch the list of course-level capabilities and indicators
-        $unitSpec = $dstFolder->getUnitSpecification();
+        $unitSpecs = $unitSpecMapper->findByColumn('folder_id', $dstFolder->getId());
+        /** @var UnitSpecification|null $unitSpec */
+        $unitSpec = $unitSpecs->first();
         if ($unitSpec) {
             $existingIndicators = $existingIndicators->merge(
                 $indicatorMapper->findForParent(
