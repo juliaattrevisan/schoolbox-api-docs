@@ -1418,9 +1418,6 @@ class DataSource
          *
          * If during destination object graph build, we detect that a source descriptor
          * already exists on destination, use the destination version instead of creating a new indicator
-         *
-         * For now, need to by-pass cache, as we may have inserted indicators during previous call to this function.
-         * //TODO - the mappers should be invalidating the SELECT cache on INSERT/UPDATE @see SA-1951
          */
         /** @var DescriptorModel $firstSrcDescriptor */
         $firstSrcDescriptor = $srcDescriptors->first();
@@ -1428,7 +1425,6 @@ class DataSource
         $existingIndicators = $indicatorMapper->findForParent(
             $dstFolder->getId(),
             $parentType,
-            false
         );
 
         // If the rubric is being duped into a unit spec:
@@ -1441,7 +1437,6 @@ class DataSource
                 $indicatorMapper->findForParent(
                     $unitSpec->getFolder()->getParent()->getId(),
                     $parentType,
-                    false
                 )
             );
         }
