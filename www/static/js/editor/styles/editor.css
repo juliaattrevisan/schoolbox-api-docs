@@ -21,6 +21,10 @@
     --ck-input-width: 19rem;
 }
 
+.ck.ck-editor {
+    margin-bottom: 1rem;
+}
+
 /**
  * add a min and max height to the editable area
  */
@@ -79,6 +83,7 @@
     font: normal normal normal var(--ck-font-size-base) / var(--ck-line-height-base) var(--ck-font-face);
     justify-content: flex-end;
     margin-bottom: 1rem;
+    margin-top: -1rem; /* to butt up against the bottom of the editor */
     padding: var(--ck-spacing-small) var(--ck-spacing-standard);
 }
 
