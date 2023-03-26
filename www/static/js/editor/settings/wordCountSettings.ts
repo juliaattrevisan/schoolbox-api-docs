@@ -38,7 +38,7 @@ function getCharacterElement() {
 function getLimitWarningElement(config: EditorConfig) {
     const limitWarningElement = document.createElement("div");
     limitWarningElement.classList.add("ck-word-count__limit-warning");
-    limitWarningElement.innerHTML = `<b>Warning:</b> The limit of ${config.maxCharCount} Characters has been reached. Please reduce the content to below the limit to save.`;
+    limitWarningElement.innerHTML = `<b>Warning:</b> The limit of ${config.maxCharCount} Characters has been reached. Please reduce the content to below the limit to ensure save.`;
     limitWarningElement.style.display = "none";
     return limitWarningElement;
 }
@@ -51,6 +51,10 @@ function getLimitWarningElement(config: EditorConfig) {
  * @param { HTMLDivElement } wordCountContainer - the word count container
  */
 function updateWordCount(editor: Editor, config: EditorConfig, wordCountContainer: HTMLDivElement) {
+    // if the max character count is -1 then we don't want to show the character count as the limit is disabled
+    if (config.maxCharCount === -1) {
+        return;
+    }
     const characterCountElement = wordCountContainer.querySelector(".ck-word-count__characters") as HTMLDivElement;
     const limitWarningElement = wordCountContainer.querySelector(".ck-word-count__limit-warning") as HTMLDivElement;
     editor.plugins.get("WordCount").on("update", () => {
@@ -59,9 +63,15 @@ function updateWordCount(editor: Editor, config: EditorConfig, wordCountContaine
         if (currentCharacterLength > config.maxCharCount) {
             characterCountElement.style.display = "block";
             limitWarningElement.style.display = "block";
+            if (!config.showWordCount) {
+                wordCountContainer.style.display = "flex";
+            }
         } else {
             characterCountElement.style.display = "none";
             limitWarningElement.style.display = "none";
+            if (!config.showWordCount) {
+                wordCountContainer.style.display = "none";
+            }
         }
     });
 }
