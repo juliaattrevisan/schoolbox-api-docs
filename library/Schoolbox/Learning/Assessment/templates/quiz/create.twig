@@ -46,10 +46,10 @@
     {# ----------------------------------------------------------- #}
     {# Description #}
     {# ----------------------------------------------------------- #}
-    <label>
+    <label for="assessment-description">
         Description<span class="hint has-tip tip-top" data-tooltip title="This content will be shown to users before they begin to attempt the quiz.">?</span>
-        <textarea name="description" id="assessment-description">{{ assessment.description }}</textarea>
     </label>
+    <textarea name="description" id="assessment-description">{{ assessment.description }}</textarea>
 
     {# ----------------------------------------------------------- #}
     {# Assessment Location #}
@@ -61,11 +61,10 @@
     {# ----------------------------------------------------------- #}
     {# Completion Message #}
     {# ----------------------------------------------------------- #}
-    <label>
+    <label for="completion_message">
         Completion Message<span class="hint has-tip tip-top" data-tooltip title="This content will be shown to users when they complete the quiz.">?</span>
-        <textarea name="completion_message">{{ assessment.completionMessage }}</textarea>
     </label>
-
+    <textarea name="completion_message" id="completion_message">{{ assessment.completionMessage }}</textarea>
 
     {# ----------------------------------------------------------- #}
     {# Max Attempts #}

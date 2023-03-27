@@ -16,9 +16,9 @@
             <input name="{RETURN_URL_NAME}" type="hidden" value="{RETURN_URL}" />
 
             <section class="content">
-                <label>
+                <label for="section_title">
                     Section Title
-                    <input name="title" type="text" maxlength="255" value="{SECTION_TITLE}" />
+                    <input name="title" id="section_title" type="text" maxlength="255" value="{SECTION_TITLE}" />
                 </label>
 
                 <label>
@@ -33,15 +33,15 @@
                     </label>
                 </div>
 
-                <label class="hide" data-max-questions-prompt>
+                <label class="hide" for="max_questions" data-max-questions-prompt>
                     Maximum number of questions to show
-                    <input name="pool" disabled="disabled" type="text" data-max-questions value="{POOL}" />
+                    <input name="pool" id="max_questions" disabled="disabled" type="text" data-max-questions value="{POOL}" />
                 </label>
 
-                <label>
+                <label for="description">
                     Description
-                    <textarea name="description">{DESCRIPTION}</textarea>
                 </label>
+                <textarea id="description" name="description">{DESCRIPTION}</textarea>
             </section>
             <div class="row">
                 <div class="small-12 columns">

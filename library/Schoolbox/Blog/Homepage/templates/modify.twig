@@ -70,18 +70,16 @@
                         <label for="heading" class="required">Title </label>
                         <input type="text" name="heading" id="heading" maxlength="100" value="{{ record.getHeading ?? '' }}" required />
 
-                        <label>
-                            Body
-                            <textarea id="body" name="body">{{ record.getBody ?? '' }}</textarea>
-                        </label>
+                        <label for="body">Body</label>
+                        <textarea id="body" name="body">{{ record.getBody ?? '' }}</textarea>
                     </div>
                 </fieldset>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <label>
+                        <label for="image_gallery">
                             Image Gallery
                         </label>
-                        <section>
+                        <section id="image_gallery">
                             {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
                         </section>
                     </div>

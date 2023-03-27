@@ -77,10 +77,9 @@
         {% endif %}
     </div>
 
-    <label>
-        Description
-        <textarea name="description" id="assessment-description">{{ assessment.description }}</textarea>
-    </label>
+    <label for="assessment-description">Description</label>
+    <textarea name="description" id="assessment-description">{{ assessment.description }}</textarea>
+
 
     {% include 'sub/attachzone.twig' %}
 
