@@ -7,7 +7,11 @@
  #}
 {% macro renderFields(assessment, view) %}
     {% if assessment.fields|length %}
-        <div class="content">
+        {# This lets you toggle the views on the Summary screen
+         #}
+        {% set identifier = 'lessonPlan-' ~ view %}
+
+        <div class="content" id="{{ identifier }}" style="display:none">
             {% for field in assessment.fields %}
                 {% if 'staff' == view or ('student' == view and 'student' == field.visibility) %}
                     {# Student view: only show fields that are visible to students
