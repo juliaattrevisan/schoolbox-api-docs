@@ -141,6 +141,12 @@
 
 <script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 <script>
+    $(function() {
+        /* Apply validator rules
+         */
+        $('input[name="title"]').rules('add', 'requiredNotBlank');
+    });
+
     /* Spawn multiple ckeditors for fields which already existed
      */
     document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
