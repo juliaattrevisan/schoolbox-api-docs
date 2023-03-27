@@ -182,9 +182,13 @@ class EmbedReplacer
                 if ('oembed' === $srcNode->tagName()) {
                     // We are in an oembed ckeditor5 object so we need to add different query strings
                     $apiUrl = $apiUrl->appendQueryParameters($paramsSet + ['api_key' => self::IFRAMELY_API_KEY, 'url' => $srcNode->getAttribute($attribute)]);
-                } else {
+                } else if ($srcUrl->getHost() === self::IFRAMELY_CDN_HOST) {
                     //ckeditor4 the iframe tag contains the required iframe url with the key already there
                     $apiUrl = $apiUrl->appendQueryParameters($paramsSet + $srcUrl->getQueryAsArray());
+                } else {
+                    // not supposed to be here... don't iframely non iframely iframes...
+                    // lets just continue without editing the current node.
+                    continue;
                 }
                 try {
                     $response = $this->httpClient->get($apiUrl);
