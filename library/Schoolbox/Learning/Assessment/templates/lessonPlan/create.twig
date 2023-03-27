@@ -65,7 +65,7 @@
      # but they won't have any Lesson Plan Field identifiers at this point.
      #}
     {% for field in lessonPlanMeta.template.fields %}
-        {% set newFieldIdentifier = 'new' ~ loop.index %}
+        {% set newFieldIdentifier = lessonPlanMeta.newKeyword ~ loop.index %}
 
         <fieldset>
             <div class="row">

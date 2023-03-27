@@ -260,6 +260,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             /* Some metadata for the Lesson Plan workflow
              * This encapsulates the myriad of combinations which is really really awkward
              */
+            $data['lessonPlanMeta']['newKeyword'] = LessonPlan\Decorator\Decorator::NEW_KEYWORD;
             $data['lessonPlanMeta']['template'] = null;
             $data['lessonPlanMeta']['fields'] = [];
             $data['lessonPlanMeta']['type'] = $type;
