@@ -118,7 +118,7 @@ class RecursiveUndeleterCli extends CliTool\App
 
             $recursiveUndeleter = new RecursiveUndeleter($this->logger, $this->deletedAtWindow, $this->explicitDeletionDate);
 
-            $failureReason = $this->checkThatUndeletionIsPossible($this->rootIds, $recursiveUndeleter);
+            $failureReason = $this->checkThatUndeletionIsPossible($recursiveUndeleter);
 
             if ($failureReason !== '') {
                 $this->logger->error($failureReason);
@@ -181,11 +181,10 @@ class RecursiveUndeleterCli extends CliTool\App
      * Check as best we can that all requirements are met for the undeletion process.
      * If so, return a blank string. If not, return the reason why not as a string.
      *
-     * @param array              $rootIds
      * @param RecursiveUndeleter $recursiveUndeleter
      * @return String
      */
-    private function checkThatUndeletionIsPossible($rootIds, RecursiveUndeleter $recursiveUndeleter): string
+    private function checkThatUndeletionIsPossible(RecursiveUndeleter $recursiveUndeleter): string
     {
         $rootMappers = $recursiveUndeleter->loadMappers($this->rootTable);
 
