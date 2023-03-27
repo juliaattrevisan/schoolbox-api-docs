@@ -68,9 +68,19 @@ export default class UploadAdapter {
         }
         const meta = response.meta as JSON;
         const config = this.editor.config.sbConfig as EditorConfig;
+        const imageUtils = this.editor.plugins.get("ImageUtils");
         if (meta.file.type === "image") {
-            resolve({
-                default: getURL(meta.file._links.image, config),
+            // resolve({
+            //     default: getURL(meta.file._links.image, config),
+            // });
+            const attributes = {
+                src: getURL(meta.file._links.image, config),
+                alt: meta.name,
+            };
+            this.editor.model.change((writer) => {
+                const image = imageUtils.insertImage(attributes, this.editor.model.document.selection, "imageInline");
+                writer.setSelection(image.parent, "end");
+                this.editor.execute("enter");
             });
         }
         if (meta.file.type === "document") {
@@ -80,14 +90,13 @@ export default class UploadAdapter {
                 linkHref: getURL(meta.file._links.fetch, config),
                 linkToggleDownloadable: "true",
             };
-            const imageUtils = this.editor.plugins.get("ImageUtils");
             imageUtils.insertImage(attributes, this.editor.model.document.selection, "imageInline");
             this.editor.model.change((writer) => {
                 const image = imageUtils.insertImage(attributes, this.editor.model.document.selection, "imageInline");
                 this.editor.execute("resizeImage", { width: "24px" });
                 writer.setSelection(image.parent, "end");
                 this.editor.model.insertContent(
-                    writer.createText(` - ${meta.name}`, {
+                    writer.createText(`${meta.name}`, {
                         linkHref: getURL(meta.file._links.fetch, config),
                         linkToggleDownloadable: "true",
                     })

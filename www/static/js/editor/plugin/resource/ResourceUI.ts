@@ -8,6 +8,15 @@ import ButtonView from "@ckeditor/ckeditor5-ui/src/button/buttonview";
 
 export default class ResourceUI extends Plugin {
     /**
+     * Get the plugin name, so can access with editor.plugins.get("ResourceUI")
+     *
+     * @returns { string } the plugin name
+     */
+    static get pluginName() {
+        return "ResourceUI";
+    }
+
+    /**
      * Register the button in the editor's UI component factory.
      */
     init() {
@@ -36,4 +45,10 @@ export default class ResourceUI extends Plugin {
             return button;
         });
     }
+
+    /**
+     * To display the upload progress of each resource being added to the editor.
+     * This sits below the bottom of the editor and shows the progress of each resource.
+     */
+    initContainer() {}
 }
