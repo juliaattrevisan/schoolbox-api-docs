@@ -45,6 +45,13 @@ class Factory
     private const LATERAL_LEARNING_SUBJECT_NAME_REGEX = '/Lateral\\s+Learning/i';
 
     /**
+     * Subjects with one of these codes are hidden from the list of selectable
+     * subjects in the eReport: their data must be fetched though, as it may
+     * contribute to the Lateral Learning report.
+     */
+    private const HIDDEN_SUBJECTS = [4099];
+
+    /**
      * The year levels for the Middle School variant of the report.
      */
     private const REPORT_YEARS_MIDDLE_SCHOOL = [7, 8, 9];
@@ -329,7 +336,8 @@ class Factory
             ->setTeachers($externalData['teachers'])
             ->setStudent($student)
             ->setYear($year)
-            ->setSubjectCode($subjectCode);
+            ->setSubjectCode($subjectCode)
+            ->setDisplayed($this->isReportWithSubjectCodeDisplayed($subjectCode));
 
         // Add grades for the class page
         $publishedOnly = !$this->doesDraftFeedbackContribute($year);
@@ -402,7 +410,8 @@ class Factory
             ->setStudent($student)
             ->setYear($year)
             ->setSubjectCode($subjectCode)
-            ->setFolder($folder);
+            ->setFolder($folder)
+            ->setDisplayed($this->isReportWithSubjectCodeDisplayed($subjectCode));
 
 
         // Put together all the stuff for the lateral learning report
@@ -527,7 +536,8 @@ class Factory
                     ->setName($row['sub_desc'])
                     ->setStudent($student)
                     ->setYear($row['yr_study'])
-                    ->setSubjectCode($row['code']);
+                    ->setSubjectCode($row['code'])
+                    ->setDisplayed($this->isReportWithSubjectCodeDisplayed($row['code']));
             } else {
                 $subject = new Subject\Standard();
                 $subject
@@ -535,7 +545,8 @@ class Factory
                     ->setStudent($student)
                     ->setYear($row['yr_study'])
                     ->setSubjectCode($row['code'])
-                    ->setTeachers($row['teachers']);
+                    ->setTeachers($row['teachers'])
+                    ->setDisplayed($this->isReportWithSubjectCodeDisplayed($row['code']));
                 $subjects[$row['code']] = $subject;
             }
         }
@@ -1056,5 +1067,17 @@ class Factory
             $allGrades[] = $folderWithGrades['grades'];
         }
         return array_merge(...$allGrades);
+    }
+
+    /**
+     * Is this subject hidden from view?
+     *
+     * @param string $subjectCode
+     * @return bool
+     */
+    private function isReportWithSubjectCodeDisplayed(string $subjectCode): bool
+    {
+        [, $code,] = explode('-', $subjectCode);
+        return !in_array((int)$code, self::HIDDEN_SUBJECTS);
     }
 }
