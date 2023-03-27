@@ -260,12 +260,17 @@ abstract class Controller extends ListController implements IAssessmentControlle
             /* Some metadata for the Lesson Plan workflow
              * This encapsulates the myriad of combinations which is really really awkward
              */
-            $data['lessonPlanMeta']['newKeyword'] = LessonPlan\Decorator\Decorator::NEW_KEYWORD;
-            $data['lessonPlanMeta']['template'] = null;
-            $data['lessonPlanMeta']['fields'] = [];
-            $data['lessonPlanMeta']['type'] = $type;
-            $data['lessonPlanMeta']['mageAsync'] = false;
-            $data['lessonPlanMeta']['includeBreadcrumbs'] = true;
+            $data['lessonPlanMeta'] = [
+                'newKeyword' => LessonPlan\Decorator\Decorator::NEW_KEYWORD,
+                'consts' => [
+                    'student' => \Schoolbox\Role::STUDENT
+                ],
+                'template' => null,
+                'fields' => [],
+                'type' => $type,
+                'mageAsync' => false,
+                'includeBreadcrumbs' => true
+            ];
 
             if ('' === $templateId) {
                 /* You need to Select an LPT
@@ -382,6 +387,10 @@ abstract class Controller extends ListController implements IAssessmentControlle
             $lessonPlan = \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper::getInstance()->findOneByColumn('assessment_id', $assessment->getId());
 
             $data['lessonPlanMeta'] = [
+                'newKeyword' => LessonPlan\Decorator\Decorator::NEW_KEYWORD,
+                'consts' => [
+                    'student' => \Schoolbox\Role::STUDENT
+                ],
                 'template' => $lessonPlan->getLessonPlanTemplate(),
                 'fields' => $lessonPlan->getFields(),
                 'type' => AssessmentType::TYPE_LESSON_PLAN,
