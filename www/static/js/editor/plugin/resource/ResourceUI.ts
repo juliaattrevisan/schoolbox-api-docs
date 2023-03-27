@@ -8,6 +8,7 @@ import ButtonView from "@ckeditor/ckeditor5-ui/src/button/buttonview";
 import { insertElementAfter } from "@js/util/domUtils";
 
 export default class ResourceUI extends Plugin {
+    uploadContainer: HTMLDivElement; // the container for the upload progress bars
     /**
      * Get the plugin name, so can access with editor.plugins.get("ResourceUI")
      *
@@ -22,7 +23,7 @@ export default class ResourceUI extends Plugin {
      */
     init() {
         this.createButton();
-        this.initContainer();
+        this.addUploadContainer();
     }
 
     /**
@@ -52,10 +53,60 @@ export default class ResourceUI extends Plugin {
      * To display the upload progress of each resource being added to the editor.
      * This sits below the bottom of the editor and shows the progress of each resource.
      */
-    initContainer() {
+    addUploadContainer() {
+        this.uploadContainer = document.createElement("div");
+        this.uploadContainer.classList.add("dropzone-wrap", "resource-upload-container");
+        this.uploadContainer.style.display = "none";
+        insertElementAfter(this.editor.sourceElement, this.uploadContainer);
+    }
+
+    /**
+     * To display the progress of a resource being uploaded, based off the already
+     * existing dropzone usages:
+     * <div class="card small-12">
+     *      <img
+     *          data-dz-thumbnail=""
+     *          class="mime"
+     *          src="/static/images/foundation/preloader.gif"
+     *          alt="file loading spinner"
+     *      />
+     *      <p>big-file.zip</p>
+     *      <p class="meta" data-dz-status>Uploading...</p>
+     *      <div class="progress">
+     *          <span class="meter" style="width: 50%"></span>
+     *      </div>
+     * </div>
+     *
+     * @param { File } file - the file being uploaded
+     * @returns { HTMLDivElement } the element to display the progress
+     */
+    getProgressElement(file: File) {
         const container = document.createElement("div");
-        container.classList.add("dropzone-wrap", "resource-upload-container");
-        container.style.display = "none";
-        insertElementAfter(this.editor.sourceElement, container);
+        container.classList.add("card", "small-12");
+        const img = document.createElement("img");
+        img.setAttribute("data-dz-thumbnail", "");
+        img.classList.add("mime");
+        img.src = "/static/images/foundation/preloader.gif";
+        img.alt = "file loading spinner";
+        container.appendChild(img);
+        const title = document.createElement("p");
+        title.innerText = file.name;
+        container.appendChild(title);
+        const status = document.createElement("p");
+        status.classList.add("meta");
+        status.setAttribute("data-dz-status", "");
+        status.innerText = "Uploading...";
+        container.appendChild(status);
+        const progress = document.createElement("div");
+        progress.classList.add("progress");
+        container.appendChild(progress);
+        const meter = document.createElement("span");
+        meter.classList.add("meter");
+        meter.style.width = "0%";
+        meter.setAttribute("data-progress-meter", "");
+        progress.appendChild(meter);
+        this.uploadContainer.style.display = "block";
+        this.uploadContainer.appendChild(container);
+        return container;
     }
 }

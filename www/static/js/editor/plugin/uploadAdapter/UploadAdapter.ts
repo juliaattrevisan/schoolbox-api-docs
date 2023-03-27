@@ -70,9 +70,6 @@ export default class UploadAdapter {
         const config = this.editor.config.sbConfig as EditorConfig;
         const imageUtils = this.editor.plugins.get("ImageUtils");
         if (meta.file.type === "image") {
-            // resolve({
-            //     default: getURL(meta.file._links.image, config),
-            // });
             const attributes = {
                 src: getURL(meta.file._links.image, config),
                 alt: meta.name,
