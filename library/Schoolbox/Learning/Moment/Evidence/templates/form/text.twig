@@ -8,6 +8,48 @@
         {{ parent() }}
     {% endblock formInputBodyMeta %}
     <textarea name="body" id="evidence-body" required>{{ isCreate ? '' : evidence.body }}</textarea>
+    <div class="dropzone-wrap resource-container">
+        <div class="card small-12">
+            <img
+                data-dz-thumbnail=""
+                class="mime"
+                src="/static/images/foundation/preloader.gif"
+                alt="file loading spinner"
+            />
+            <p>big-file.zip</p>
+            <p class="meta" data-dz-status>Uploading...</p>
+            <div class="progress">
+                <span class="meter" style="width: 50%"></span>
+            </div>
+        </div>
+        <div class="card small-12">
+            <img
+                data-dz-thumbnail=""
+                class="mime"
+                src="/static/images/foundation/preloader.gif"
+                alt="file loading spinner"
+            />
+            <p>big-file-2.zip</p>
+            <p class="meta" data-dz-status="">Uploading...</p>
+            <div class="progress">
+                <span class="meter" style="width: 30%"></span>
+            </div>
+        </div>
+    </div>
+    <style>
+    .resource-container {
+        border: 1px solid var(--ck-color-toolbar-border);
+        border-top-width: 0;
+        margin-bottom: 1rem;
+        margin-top: -1rem;
+        padding-bottom: 0.5rem;
+    }
+
+    .resource-container .card {
+        float: none;
+        margin-bottom: 0.5rem;
+    }
+    </style>
 {% endblock formInputBody %}
 
 {% block formJs %}
