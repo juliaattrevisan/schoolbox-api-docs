@@ -96,6 +96,12 @@
                         });
                     });
                 </script>
+            {% else %}
+                <script>
+                    $(function() {
+                        $('#lessonPlan-student').show();
+                    });
+                </script>
             {% endif %}
 
             {# Attached files #}
