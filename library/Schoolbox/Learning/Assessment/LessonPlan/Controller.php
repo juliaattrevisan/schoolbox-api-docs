@@ -39,18 +39,14 @@ class Controller extends Assessment\Controller
 
 
     /**
-     * Endpoint for selecting a Lesson Plan Template
+     * Lesson Plans don't have any feedbacks.
      *
+     * @param IAssessable $assessment
      * @return void
      */
-    public function getSelection()
+    public function getStatus(IAssessable $assessment): void
     {
-    }
-
-
-    public function getStatus(IAssessable $assessment)
-    {
-        // TODO: Implement getStatus() method.
+        // noop
     }
 
 
@@ -138,14 +134,28 @@ class Controller extends Assessment\Controller
     }
 
 
+    /**
+     * Lesson Plans don't have any responses.
+     *
+     * @param IAssessable $assessment
+     * @param User        $student
+     * @return void
+     */
     public function getCreateResponseForm(IAssessable $assessment, User $student): void
     {
-        // TODO: Implement getCreateResponseForm() method.
+        // noop
     }
 
 
+    /**
+     * Lesson Plans don't have any responses.
+     *
+     * @param IAssessable $assessment
+     * @param User        $student
+     * @return void
+     */
     public function postCreateResponse(IAssessable $assessment, User $student): void
     {
-        // TODO: Implement postCreateResponse() method.
+        // noop
     }
 }
