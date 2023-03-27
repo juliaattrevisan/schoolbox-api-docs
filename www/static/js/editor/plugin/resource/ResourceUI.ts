@@ -5,6 +5,7 @@
 
 import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
 import ButtonView from "@ckeditor/ckeditor5-ui/src/button/buttonview";
+import { insertElementAfter } from "@js/util/domUtils";
 
 export default class ResourceUI extends Plugin {
     /**
@@ -21,6 +22,7 @@ export default class ResourceUI extends Plugin {
      */
     init() {
         this.createButton();
+        this.initContainer();
     }
 
     /**
@@ -50,5 +52,10 @@ export default class ResourceUI extends Plugin {
      * To display the upload progress of each resource being added to the editor.
      * This sits below the bottom of the editor and shows the progress of each resource.
      */
-    initContainer() {}
+    initContainer() {
+        const container = document.createElement("div");
+        container.classList.add("dropzone-wrap", "resource-upload-container");
+        container.style.display = "none";
+        insertElementAfter(this.editor.sourceElement, container);
+    }
 }

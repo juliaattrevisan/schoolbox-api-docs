@@ -34,19 +34,6 @@ function addSBConfigToEditor(editor: Editor, config: EditorConfig) {
 }
 
 /**
- * To display the upload progress of each resource being added to the editor.
- *
- * @param { Editor } editor - the CKEditor instance
- * @param { EditorConfig } config - the CKEditor config object
- */
-function insertResourceContainer(editor: Editor, config: EditorConfig) {
-    if (config.toolbar === EditorToolbar.FULL || config.toolbar === EditorToolbar.COMMENT) {
-        const resourceUI = editor.plugins.get("ResourceUI");
-        resourceUI.initContainer();
-    }
-}
-
-/**
  * For the simple editor, we need to disable the drag and drop
  * and the ability for the editor to auto embed media
  *
@@ -126,7 +113,6 @@ async function attachInspector(editor: Editor) {
 export async function modifyEditor(textarea: HTMLTextAreaElement, editor: Editor, config: EditorConfig) {
     addToGlobalScope(editor, textarea);
     addSBConfigToEditor(editor, config);
-    insertResourceContainer(editor, config);
     insertWordCount(textarea, editor, config);
     disableAutoMedia(editor, config);
     removeValidation();
