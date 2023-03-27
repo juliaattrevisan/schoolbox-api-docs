@@ -271,8 +271,7 @@ class CreateAndVerifyCest
             $this->getAudienceText($timReed),
             $this->getAudienceText($jenniReed),
             'Primary',
-            'Demo Class Page 1 (DEMO1)']
-        );
+            'Demo Class Page 1 (DEMO1)']);
 
         $formPage->selectAudienceOption('Year Levels', 'Year 9', ['audience-select-parents']);
         $formPage->createCompositeAudience('House', 'Team', ['primary-IjEi','secondary-IjIi']);

@@ -16,7 +16,7 @@ use Page\Homepage;
  */
 class TextboxCest
 {
-    private string $createFolderUrl = 'https://vagrant.dev.schoolbox.cloud/resource/folder/0/create';
+    private const CREATE_FOLDER_URL = 'https://vagrant.dev.schoolbox.cloud/resource/folder/0/create';
 
     /**
      * @param AcceptanceTester $i
@@ -34,7 +34,7 @@ class TextboxCest
     public function createHomepage(AcceptanceTester $i): void
     {
         $i->login("alaress", "alaress");
-        $i->amOnUrl($this->createFolderUrl);
+        $i->amOnUrl(self::CREATE_FOLDER_URL);
         $i->selectOption("template", "Blank");
         $i->fillField(['name' => 'name'], 'Test TextBox Homepage');
         $i->click(['css' => 'label[class=radio-label][for=groupWrite1]']);
