@@ -477,9 +477,7 @@ $(function() {
                         <label for="resource-booking-notes">
                             Notes
                         </label>
-                        <div>
-                            <textarea name="notes" id="resource-booking-notes" data-notes>{{ item.notes }}</textarea>
-                        </div>
+                        <textarea name="notes" id="resource-booking-notes" data-notes>{{ item.notes }}</textarea>
 
                         {# Only a user who may moderate this item may ignore the rules. #}
                         {% if allowOverride %}
