@@ -80,6 +80,12 @@ class ServiceServer implements RequestHandlerInterface
             return $this->factory->createResponse(401, null, [], $validationResult->getError());
         }
 
+        // The original implementation wraps this block in a try/catch:
+        // on catch it creates a 500 response.
+        // IMO this is a questionable design decision.
+        // `handleValidatedServiceRequest` will be called outside of this
+        // library, and will likely contain code external to the library:
+        // therefore this should allow the calling code to handle exceptions.
         $response = $this->handler->handleValidatedServiceRequest($validationResult, $request);
         $this->logger->info(sprintf('%s service success', $this->handler->getServiceName()));
         return $response;
