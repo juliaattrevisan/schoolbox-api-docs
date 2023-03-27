@@ -1364,6 +1364,7 @@ class DataSource
         $indicatorMapper       = IndicatorMapper::getInstance();
         $capabilityUsageMapper = CapabilityUsageMapper::getInstance();
         $indicatorUsageMapper  = IndicatorUsageMapper::getInstance();
+        $unitSpecMapper        = UnitSpecificationMapper::getInstance();
 
         $sourceBox = $boxMapper->findOneByColumn('assessment_id', $sourceAssessmentId);
 
@@ -1417,9 +1418,6 @@ class DataSource
          *
          * If during destination object graph build, we detect that a source descriptor
          * already exists on destination, use the destination version instead of creating a new indicator
-         *
-         * For now, need to by-pass cache, as we may have inserted indicators during previous call to this function.
-         * //TODO - the mappers should be invalidating the SELECT cache on INSERT/UPDATE @see SA-1951
          */
         /** @var DescriptorModel $firstSrcDescriptor */
         $firstSrcDescriptor = $srcDescriptors->first();
@@ -1427,18 +1425,18 @@ class DataSource
         $existingIndicators = $indicatorMapper->findForParent(
             $dstFolder->getId(),
             $parentType,
-            false
         );
 
         // If the rubric is being duped into a unit spec:
         // also fetch the list of course-level capabilities and indicators
-        $unitSpec = $dstFolder->getUnitSpecification();
+        $unitSpecs = $unitSpecMapper->findByColumn('folder_id', $dstFolder->getId());
+        /** @var UnitSpecification|null $unitSpec */
+        $unitSpec = $unitSpecs->first();
         if ($unitSpec) {
             $existingIndicators = $existingIndicators->merge(
                 $indicatorMapper->findForParent(
                     $unitSpec->getFolder()->getParent()->getId(),
                     $parentType,
-                    false
                 )
             );
         }
