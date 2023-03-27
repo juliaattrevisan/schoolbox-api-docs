@@ -386,16 +386,18 @@ class Module extends BaseModule
     public function buildControllerForClass(string $className): Base
     {
         // Common dependencies across the controllers this module _may_ create.
-        $userMapper               = $this->getMapperFactory()->get(UserMapper::class);
-        $errorMapper              = $this->getMapperFactory()->get(ErrorMapper::class);
-        $workTypeMapper           = $this->getMapperFactory()->get(WorkTypeMapper::class);
-        $courseSpecMapper         = $this->getMapperFactory()->get(CourseSpecificationMapper::class);
-        $unitSpecMapper           = $this->getMapperFactory()->get(UnitSpecificationMapper::class);
-        $folderMapper             = $this->getMapperFactory()->get(FolderMapper::class);
-        $termMapper               = $this->getMapperFactory()->get(Term\Mapper::class);
-        $viewLatestMapper         = $this->getMapperFactory()->get(LatestViewMapper::class);
-        $stateMapper              = $this->getMapperFactory()->get(StateMapper::class);
-        $projectResultCacheMapper = $this->getMapperFactory()->get(Assessment\Project\ResultCache\Mapper::class);
+        $userMapper                = $this->getMapperFactory()->get(UserMapper::class);
+        $errorMapper               = $this->getMapperFactory()->get(ErrorMapper::class);
+        $workTypeMapper            = $this->getMapperFactory()->get(WorkTypeMapper::class);
+        $courseSpecMapper          = $this->getMapperFactory()->get(CourseSpecificationMapper::class);
+        $unitSpecMapper            = $this->getMapperFactory()->get(UnitSpecificationMapper::class);
+        $folderMapper              = $this->getMapperFactory()->get(FolderMapper::class);
+        $termMapper                = $this->getMapperFactory()->get(Term\Mapper::class);
+        $viewLatestMapper          = $this->getMapperFactory()->get(LatestViewMapper::class);
+        $stateMapper               = $this->getMapperFactory()->get(StateMapper::class);
+        $projectResultCacheMapper  = $this->getMapperFactory()->get(Assessment\Project\ResultCache\Mapper::class);
+        $lessonPlanTemplateMapper  = $this->getMapperFactory()->get(\Schoolbox\Admin\LessonPlan\Template\Mapper::class);
+        $lessonPlanDataModelMapper = $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper::class);
 
         /** @var AssessmentMapperProxy $assessmentDataSource */
         $assessmentDataSource = $this->injector->get('assessmentDataSource');
@@ -529,7 +531,9 @@ class Module extends BaseModule
                     $unitSpecMapper,
                     $replicator,
                     $viewLatestMapper,
-                    $projectResultCacheMapper
+                    $projectResultCacheMapper,
+                    $lessonPlanTemplateMapper,
+                    $lessonPlanDataModelMapper
                 );
 
             case Assessment\Lti\Controller::class:
@@ -571,7 +575,9 @@ class Module extends BaseModule
                     $unitSpecMapper,
                     $replicator,
                     $viewLatestMapper,
-                    $projectResultCacheMapper
+                    $projectResultCacheMapper,
+                    $lessonPlanTemplateMapper,
+                    $lessonPlanDataModelMapper
                 );
 
             default:

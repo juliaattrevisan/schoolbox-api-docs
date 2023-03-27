@@ -15,9 +15,11 @@ use Aura\Router\Exception\RouteNotFound;
 use DomainException;
 use InvalidArgumentException;
 use LogicException;
+use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeSchemeMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeScheme;
 use Schoolbox\Assessment\Term\Mapper;
+use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanDataModelMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Feedback\Visibility as FeedbackVisibility;
 use Schoolbox\Learning\Assessment\LessonPlan;
@@ -70,6 +72,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @param Replicator                 $replicator
      * @param LatestViewMapper           $latestViewMapper
      * @param Project\ResultCache\Mapper $projectResultCacheMapper
+     * @param LessonPlanTemplateMapper   $lessonPlanTemplateMapper
+     * @param LessonPlanDataModelMapper  $lessonPlanDataModelMapper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -85,7 +89,9 @@ abstract class Controller extends ListController implements IAssessmentControlle
         UnitSpecificationMapper $unitSpecificationMapper,
         private Replicator $replicator,
         protected LatestViewMapper $latestViewMapper,
-        protected Project\ResultCache\Mapper $projectResultCacheMapper
+        protected Project\ResultCache\Mapper $projectResultCacheMapper,
+        protected LessonPlanTemplateMapper $lessonPlanTemplateMapper,
+        protected LessonPlanDataModelMapper $lessonPlanDataModelMapper
     ) {
         parent::__construct($userMapper, $errorMapper, $assessmentMapper, $access, $transactor, $participantDataSource, $unitSpecificationMapper, $this->projectResultCacheMapper);
     }
@@ -240,8 +246,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
          * We've literally been piling everything into this one controller method!
          */
         $data['lessonPlanTemplates'] = [
-            'recent' => \Schoolbox\Admin\LessonPlan\Template\Mapper::getInstance()->findRecentlyUsed($this->getUser()),
-            'all' => \Schoolbox\Admin\LessonPlan\Template\Mapper::getInstance()->findEnabled()
+            'recent' => $this->lessonPlanTemplateMapper->findRecentlyUsed($this->getUser()),
+            'all' => $this->lessonPlanTemplateMapper->findEnabled()
         ];
 
         /* Note that the Lesson Plan assessment type has a preceding step which none
@@ -314,7 +320,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             } else {
                 /* Customise the selected LPT
                  */
-                $data['lessonPlanMeta']['template'] = \Schoolbox\Admin\LessonPlan\Template\Mapper::getInstance()->findById((int)$templateId);
+                $data['lessonPlanMeta']['template'] = $this->lessonPlanTemplateMapper->findById((int)$templateId);
 
                 /* Field list contains the ones from the Lesson Plan Template when creating
                  * WHen updating, it's actually fields from the Lesson Plan instance itself
@@ -346,12 +352,14 @@ abstract class Controller extends ListController implements IAssessmentControlle
     /**
      * Get the form to update an existing Assessment's details
      *
-     * @api   /learning/assessments/:assessmentId/modify
-     * @since 165
      * @param IAssessable $assessment
+     * @throws Deleted
      * @throws InvalidArgumentException
+     * @throws MapperException
      * @throws RouteNotFound
      * @throws UnexpectedValueException
+     * @api   /learning/assessments/:assessmentId/modify
+     * @since 165
      */
     public function getUpdateAssessmentForm(IAssessable $assessment): void
     {
@@ -384,7 +392,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
              *  because that's just asking for megaquery troubles. We only need the
              *  Lesson Plan fields here
              */
-            $lessonPlan = \Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper::getInstance()->findOneByColumn('assessment_id', $assessment->getId());
+            $lessonPlan = $this->lessonPlanDataModelMapper->findOneByColumn('assessment_id', $assessment->getId());
 
             $data['lessonPlanMeta'] = [
                 'newKeyword' => LessonPlan\Decorator\Decorator::NEW_KEYWORD,
