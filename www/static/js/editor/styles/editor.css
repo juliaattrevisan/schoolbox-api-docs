@@ -98,6 +98,23 @@
 }
 
 /**
+ * To display the resource being uploaded when one
+ * is dragged and dropped into the editor
+ */
+.resource-upload-container {
+    border: 1px solid var(--ck-color-toolbar-border);
+    border-top-width: 0;
+    margin-bottom: 1rem;
+    margin-top: -1rem; /* to butt up against the bottom of the editor */
+    padding-bottom: 0.5rem;
+}
+
+.resource-upload-container .card {
+    float: none;
+    margin-bottom: 0.5rem;
+}
+
+/**
  * Our foundation styles does some funky things with
  * checkboxes, hiding the <input> and using the <label>
  * instead, so we need to revert them to a

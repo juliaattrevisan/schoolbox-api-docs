@@ -8,7 +8,7 @@
         {{ parent() }}
     {% endblock formInputBodyMeta %}
     <textarea name="body" id="evidence-body" required>{{ isCreate ? '' : evidence.body }}</textarea>
-    <div class="dropzone-wrap resource-container">
+    <div class="dropzone-wrap resource-upload-container">
         <div class="card small-12">
             <img
                 data-dz-thumbnail=""
@@ -36,20 +36,6 @@
             </div>
         </div>
     </div>
-    <style>
-    .resource-container {
-        border: 1px solid var(--ck-color-toolbar-border);
-        border-top-width: 0;
-        margin-bottom: 1rem;
-        margin-top: -1rem;
-        padding-bottom: 0.5rem;
-    }
-
-    .resource-container .card {
-        float: none;
-        margin-bottom: 0.5rem;
-    }
-    </style>
 {% endblock formInputBody %}
 
 {% block formJs %}
