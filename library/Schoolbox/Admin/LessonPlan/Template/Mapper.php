@@ -180,16 +180,35 @@ class Mapper extends \Schoolbox\Mapper
          * the rest.
          *
          * Make a unique query to do that, I guess, to save some hydration
+         *
+         * Note: this is a groupwise maximum.
          */
         $query = "
-            SELECT {$this->getColumnString('lessonPlanTemplate')} 
-            FROM lesson_plan
-            INNER JOIN assessment ON lesson_plan.assessment_id = assessment.id
-            INNER JOIN {$this->getTable()} AS lessonPlanTemplate ON lesson_plan.lesson_plan_template_id = lessonPlanTemplate.id
-            WHERE lesson_plan.created_by = :creatorId
-            AND lessonPlanTemplate.enabled = :enabled
-            GROUP BY lesson_plan_template_id
-            ORDER BY assessment.created_at DESC LIMIT :limit
+            SELECT q1.id
+            FROM (
+                SELECT 
+                a1.created_at,
+                lpt1.id
+                FROM lesson_plan lp1
+                INNER JOIN assessment a1 ON lp1.assessment_id = a1.id
+                INNER JOIN {$this->getTable()} lpt1 ON lp1.lesson_plan_template_id = lpt1.id
+                WHERE lp1.created_by = :creatorId
+                AND lpt1.enabled = :enabled
+                ORDER BY a1.created_at DESC
+            ) q1 LEFT JOIN (
+                SELECT 
+                a2.created_at,
+                lpt2.id
+                FROM lesson_plan lp2
+                INNER JOIN assessment a2 ON lp2.assessment_id = a2.id
+                INNER JOIN {$this->getTable()} lpt2 ON lp2.lesson_plan_template_id = lpt2.id
+                WHERE lp2.created_by = :creatorId
+                AND lpt2.enabled = :enabled
+                ORDER BY a2.created_at DESC
+            ) q2 ON q1.id = q2.id AND q1.created_at < q2.created_at
+            WHERE q2.id is null
+            ORDER BY q1.created_at DESC 
+            LIMIT :limit
         ";
 
         $statement = $this->getDatabase()->prepare($query);
