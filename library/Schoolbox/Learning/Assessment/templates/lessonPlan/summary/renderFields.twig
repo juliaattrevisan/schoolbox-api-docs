@@ -1,0 +1,22 @@
+{##
+ # renderFields
+ #
+ # Renders all the fields of a Lesson Plan assessment
+ #
+ # @param LessonPlan\Model $assessment  A Lesson Plan domain object instance, fully hydrated
+ #}
+{% macro renderFields(assessment, view) %}
+    {% if assessment.fields|length %}
+        <div class="content">
+            {% for field in assessment.fields %}
+                {% if 'staff' == view or ('student' == view and 'student' == field.visibility) %}
+                    {# Student view: only show fields that are visible to students
+                     # Staff view: show all the fields and their data
+                     #}
+                    <h3>{{ field.title|purify }}</h3>
+                    <div>{{ field.body|purify }}</div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endmacro %}

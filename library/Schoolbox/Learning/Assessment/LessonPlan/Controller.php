@@ -12,6 +12,7 @@ namespace Schoolbox\Learning\Assessment\LessonPlan;
 
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\User;
 
 class Controller extends Assessment\Controller
@@ -55,7 +56,43 @@ class Controller extends Assessment\Controller
 
     public function getSummary(IAssessable $assessment, User $student): void
     {
-        // TODO: Implement getSummary() method.
+        if ($this->getRequest()->query->get(Redirect::RETURN_URL)) {
+            $returnUrl = Redirect::decode($this->getRequest()->query->get(Redirect::RETURN_URL));
+        } else {
+            $returnUrl = '/homepage/' . $assessment->getBaseContext()->getFolder()->getId();
+        }
+
+        /**
+         * record view
+         */
+        $isViewerAnInstructor = $this->getAccess()->isInstructor($this->getUser(), $assessment->getBaseContext()->getFolder());
+
+        $lastView = new Assessment\Views\LatestView(
+            $this->latestViewMapper,
+            new \Schoolbox\External\User(
+                $this->getConfigLoader()->get('external_type'),
+                new \External_Class(),
+                new \External_User(),
+                $this->getUserMapper()
+            )
+        );
+
+        $lastView->addNewView($assessment, $student, $this->getUser());
+
+        $twigData = [
+            'lastViews'    => $lastView->getTwigViews($assessment, $student, $isViewerAnInstructor),
+            'breadcrumbs'  => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
+            'assessment'   => $assessment,
+            'student'      => $student,
+            'returnUrl'    => $returnUrl,
+        ];
+
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput(
+                '@learningAssessment/lessonPlan/summary/student.twig',
+                $twigData
+            )
+        );
     }
 
 
