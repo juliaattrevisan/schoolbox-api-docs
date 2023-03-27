@@ -9,6 +9,7 @@ import { insertElementAfter } from "@js/util/domUtils";
 
 export default class ResourceUI extends Plugin {
     uploadContainer: HTMLDivElement; // the container for the upload progress bars
+
     /**
      * Get the plugin name, so can access with editor.plugins.get("ResourceUI")
      *
@@ -56,8 +57,15 @@ export default class ResourceUI extends Plugin {
     addUploadContainer() {
         this.uploadContainer = document.createElement("div");
         this.uploadContainer.classList.add("dropzone-wrap", "resource-upload-container");
-        this.uploadContainer.style.display = "none";
+        this.checkUploadContainer();
         insertElementAfter(this.editor.sourceElement, this.uploadContainer);
+    }
+
+    /**
+     * To hide/show the upload container based on if there are any uploads in progress
+     */
+    checkUploadContainer() {
+        this.uploadContainer.style.display = this.uploadContainer.children.length ? "block" : "none";
     }
 
     /**
