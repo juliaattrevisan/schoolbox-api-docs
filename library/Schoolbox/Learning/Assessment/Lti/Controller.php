@@ -12,6 +12,7 @@ namespace Schoolbox\Learning\Assessment\Lti;
 use Alaress_Date_Format;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
+use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Error;
@@ -19,6 +20,7 @@ use Schoolbox\Error\Mapper;
 use Schoolbox\Instance;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory;
+use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanDataModelMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
@@ -100,6 +102,8 @@ class Controller extends Assessment\Controller
      * @param UserCodec                             $userCodec
      * @param LatestViewMapper                      $latestViewMapper
      * @param Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
+     * @param LessonPlanTemplateMapper              $lessonPlanTemplateMapper
+     * @param LessonPlanDataModelMapper             $lessonPlanDataModelMapper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -121,7 +125,9 @@ class Controller extends Assessment\Controller
         Instance $instance,
         UserCodec $userCodec,
         LatestViewMapper $latestViewMapper,
-        protected Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
+        protected Assessment\Project\ResultCache\Mapper $projectResultCacheMapper,
+        protected LessonPlanTemplateMapper $lessonPlanTemplateMapper,
+        protected LessonPlanDataModelMapper $lessonPlanDataModelMapper
     ) {
         parent::__construct(
             $userMapper,
@@ -137,7 +143,9 @@ class Controller extends Assessment\Controller
             $unitSpecificationMapper,
             $replicator,
             $latestViewMapper,
-            $this->projectResultCacheMapper
+            $this->projectResultCacheMapper,
+            $lessonPlanTemplateMapper,
+            $lessonPlanDataModelMapper
         );
         $this->ltiToolMapper            = $ltiToolMapper;
         $this->ltiAssessmentMapper      = $ltiAssessmentMapper;

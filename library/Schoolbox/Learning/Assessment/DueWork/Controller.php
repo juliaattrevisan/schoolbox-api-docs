@@ -25,9 +25,14 @@ use Interop\Queue\Exception\InvalidMessageException;
 use InvalidArgumentException;
 use LogicException;
 use PDOException;
+use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Error\Mapper;
 use Schoolbox\L10n\RosettaStone;
+use Schoolbox\Learning\Assessment\Breadcrumb\Factory;
+use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanDataModelMapper;
+use Schoolbox\Learning\Assessment\DueWork\Download\MessageFactory;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Replicator;
@@ -65,6 +70,7 @@ use Schoolbox\Learning\Assessment\Timeline\Full as FullTimeline;
 use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\InlineGrader\Kami;
+use Schoolbox\Learning\InlineGrader\Kami\Connector;
 use Schoolbox\Learning\InlineGrader\StudentCarousel;
 use Schoolbox\Learning\Turnitin;
 use Schoolbox\Learning\Turnitin\Api;
@@ -93,35 +99,38 @@ use function count;
 class Controller extends Assessment\Controller
 {
     /**
-     * @param UserMapper                        $userMapper
-     * @param Error\Mapper                      $errorMapper
-     * @param AssessmentDataSource              $assessmentMapper
-     * @param WorkTypeMapper                    $workTypeMapper
-     * @param Access                            $access
-     * @param Transactor                        $transactor
-     * @param Assessment\Breadcrumb\Factory     $bakery
-     * @param RubricDataSource                  $rubricMapper
-     * @param RubricResultSetMapper             $resultSetMapper
-     * @param DueWorkResponseMapper             $dueWorkResponseMapper
-     * @param ParticipantMapper                 $participantMapper
-     * @param Term\Mapper                       $termMapper
-     * @param SingleFile\Mapper                 $submissionFileMapper
-     * @param Kami\Connector                    $kamiConnector
-     * @param Kami\Mapper                       $kamiMapper
-     * @param ParticipantMapper                 $participantDataSource
-     * @param CourseSpecificationMapper         $courseSpecificationMapper
-     * @param UnitSpecificationMapper           $unitSpecificationMapper
-     * @param Replicator                        $replicator
-     * @param Producer                          $producer       for sending the message created by `$messageFactory` to
-     *                                                          taskd
-     * @param Turnitin\File\Mapper              $turnitinFileMapper - for generating the Similarity Report.
-     * @param IFeedbackDataSource               $feedbackDataSource
-     * @param \Schoolbox\Resource\Folder\Mapper $folderMapper
-     * @param LatestViewMapper                  $latestViewMapper
-     * @param FilesystemProxy                   $filesystemProxy
-     * @param StateMapper                       $stateMapper
-     * @param Download\MessageFactory           $dueWorkDownloadMessageFactory
+     * @param UserMapper                            $userMapper
+     * @param Mapper                                $errorMapper
+     * @param AssessmentDataSource                  $assessmentMapper
+     * @param WorkTypeMapper                        $workTypeMapper
+     * @param Access                                $access
+     * @param Transactor                            $transactor
+     * @param Factory                               $bakery
+     * @param RubricDataSource                      $rubricMapper
+     * @param RubricResultSetMapper                 $resultSetMapper
+     * @param DueWorkResponseMapper                 $dueWorkResponseMapper
+     * @param ParticipantMapper                     $participantMapper
+     * @param Term\Mapper                           $termMapper
+     * @param SingleFile\Mapper                     $submissionFileMapper
+     * @param Connector                             $kamiConnector
+     * @param Kami\Mapper                           $kamiMapper
+     * @param ParticipantMapper                     $participantDataSource
+     * @param CourseSpecificationMapper             $courseSpecificationMapper
+     * @param UnitSpecificationMapper               $unitSpecificationMapper
+     * @param Replicator                            $replicator
+     * @param Producer                              $producer           for sending the message created by `$messageFactory` to
+     *                                                                  taskd
+     * @param Turnitin\File\Mapper                  $turnitinFileMapper - for generating the Similarity Report.
+     * @param IFeedbackDataSource                   $feedbackDataSource
+     * @param \Schoolbox\Resource\Folder\Mapper     $folderMapper
+     * @param LatestViewMapper                      $latestViewMapper
+     * @param FilesystemProxy                       $filesystemProxy
+     * @param StateMapper                           $stateMapper
+     * @param RosettaStone                          $rosettaStone
+     * @param MessageFactory                        $dueWorkDownloadMessageFactory
      * @param Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
+     * @param LessonPlanTemplateMapper              $lessonPlanTemplateMapper
+     * @param LessonPlanDataModelMapper             $lessonPlanDataModelMapper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -152,7 +161,9 @@ class Controller extends Assessment\Controller
         private StateMapper $stateMapper,
         private RosettaStone $rosettaStone,
         private Download\MessageFactory $dueWorkDownloadMessageFactory,
-        protected Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
+        protected Assessment\Project\ResultCache\Mapper $projectResultCacheMapper,
+        protected LessonPlanTemplateMapper $lessonPlanTemplateMapper,
+        protected LessonPlanDataModelMapper $lessonPlanDataModelMapper
     ) {
         parent::__construct(
             $userMapper,
@@ -168,7 +179,9 @@ class Controller extends Assessment\Controller
             $unitSpecificationMapper,
             $replicator,
             $latestViewMapper,
-            $this->projectResultCacheMapper
+            $this->projectResultCacheMapper,
+            $lessonPlanTemplateMapper,
+            $lessonPlanDataModelMapper
         );
     }
 

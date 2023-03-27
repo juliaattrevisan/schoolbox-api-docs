@@ -14,6 +14,7 @@ use Aura\Router\Exception\RouteNotFound;
 use DomainException;
 use External\Canvas\Importer\CanvasDb;
 use PDOException;
+use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Term\Mapper;
@@ -21,6 +22,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel;
+use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanDataModelMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
@@ -103,6 +105,8 @@ class Controller extends Assessment\Controller
      * @param \Schoolbox\Resource\Folder\Mapper     $folderMapper
      * @param LatestViewMapper                      $latestViewMapper
      * @param Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
+     * @param LessonPlanTemplateMapper              $lessonPlanTemplateMapper
+     * @param LessonPlanDataModelMapper             $lessonPlanDataModelMapper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -122,7 +126,9 @@ class Controller extends Assessment\Controller
         Replicator $replicator,
         \Schoolbox\Resource\Folder\Mapper $folderMapper,
         LatestViewMapper $latestViewMapper,
-        protected Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
+        protected Assessment\Project\ResultCache\Mapper $projectResultCacheMapper,
+        protected LessonPlanTemplateMapper $lessonPlanTemplateMapper,
+        protected LessonPlanDataModelMapper $lessonPlanDataModelMapper
     ) {
         parent::__construct(
             $userMapper,
@@ -138,7 +144,9 @@ class Controller extends Assessment\Controller
             $unitSpecificationMapper,
             $replicator,
             $latestViewMapper,
-            $this->projectResultCacheMapper
+            $this->projectResultCacheMapper,
+            $lessonPlanTemplateMapper,
+            $lessonPlanDataModelMapper
         );
         $this->quizMapper        = $quizMapper;
         $this->quizSectionMapper = $quizSectionMapper;

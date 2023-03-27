@@ -472,7 +472,9 @@ class Module extends BaseModule
                     $stateMapper,
                     $this->injector->get('l10n'),
                     $dueWorkDownloadMessageFactory,
-                    $projectResultCacheMapper
+                    $projectResultCacheMapper,
+                    $lessonPlanTemplateMapper,
+                    $lessonPlanDataModelMapper
                 );
 
             case Assessment\Project\Controller::class:
@@ -490,7 +492,9 @@ class Module extends BaseModule
                     $unitSpecMapper,
                     $replicator,
                     $viewLatestMapper,
-                    $projectResultCacheMapper
+                    $projectResultCacheMapper,
+                    $lessonPlanTemplateMapper,
+                    $lessonPlanDataModelMapper
                 );
 
             case Assessment\Quiz\Controller::class:
@@ -512,7 +516,9 @@ class Module extends BaseModule
                     $replicator,
                     $folderMapper,
                     $viewLatestMapper,
-                    $projectResultCacheMapper
+                    $projectResultCacheMapper,
+                    $lessonPlanTemplateMapper,
+                    $lessonPlanDataModelMapper
                 );
 
             case Assessment\Task\Controller::class:
@@ -557,7 +563,9 @@ class Module extends BaseModule
                     $this->injector->get('instance'),
                     $this->injector->get('lti.userCodec'),
                     $viewLatestMapper,
-                    $projectResultCacheMapper
+                    $projectResultCacheMapper,
+                    $lessonPlanTemplateMapper,
+                    $lessonPlanDataModelMapper
                 );
 
             case Assessment\LessonPlan\Controller::class:
