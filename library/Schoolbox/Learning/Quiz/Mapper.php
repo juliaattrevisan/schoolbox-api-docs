@@ -31,6 +31,13 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 /**
+ * Database definition of a quiz
+ * -----------------------------
+ * A Quiz is defined in the database as:
+ *  * a row of the `assess` table, in which assess.availabilty === 'assess'.
+ *  * note that quizzes are expected to have assess.assessment_id NOT NULL
+ *  * contrast with the database definition of a Survey (library/Schoolbox/Survey/Mapper.php).
+ *
  * @method Model createModel($id = null)
  * @method Model findOneByColumn($columnName, $columnValue, array $options = [])
  * @method GenericCollection|Model[] findByColumnList($columnList, $options = [])
@@ -119,6 +126,11 @@ class Mapper extends BaseMapper
      */
     protected function getFromString(): string
     {
+        // Note on INNER JOIN to assessment table
+        // --------------------------------------
+        // Why is table `assessment` AS `am` is joined via INNER JOIN when assess.assessment_id is nullable?
+        // This has been done deliberately.  The reason follows from the definition of a quiz in the database, which is
+        // given in a comment at the top of this class.
         return "
             FROM       {$this->getTable()}
             INNER JOIN {$this->getJoinSql('am', '', 'am', true)}

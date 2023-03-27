@@ -5236,21 +5236,6 @@ parameters:
 			path: library/Schoolbox/Mapper/RecursiveUndeleterCli.php
 
 		-
-			message: "#^Property Schoolbox\\\\Mapper\\\\RecursiveUndeleterCli\\:\\:\\$rootIds \\(array\\<int\\>\\) does not accept array\\<int, string\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/Mapper/RecursiveUndeleterCli.php
-
-		-
-			message: "#^Result of && is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/Mapper/RecursiveUndeleterCli.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between '\\*' and int will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Mapper/RecursiveUndeleterCli.php
-
-		-
 			message: "#^Method Schoolbox\\\\Module\\\\RestfulModule\\:\\:findById\\(\\) should return object but returns null\\.$#"
 			count: 1
 			path: library/Schoolbox/Module/RestfulModule.php
