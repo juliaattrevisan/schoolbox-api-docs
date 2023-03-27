@@ -115,6 +115,7 @@
             <li class="row hide" id="commentform-{{ blog.getId }}">
                 <div class="editPanel socialstream-new-post">
                     <form action="{{ routeLookup('eportfolioBlog.postCommentInsert', {id: blog.getId}) }}" method="post" data-blog-comment-form>
+                        <input type="hidden" name="returnUrl" value="{{ RETURN_URL.current }}">
                         <input type="hidden" name="pageId" value="{{ page.getPageId }}">
                         <textarea name="commentBody" rows="2" cols="100" placeholder="Add a comment"></textarea>
                         <input type="submit" name="comment" value="Post comment"/>

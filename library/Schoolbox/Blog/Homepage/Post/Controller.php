@@ -12,6 +12,7 @@
 namespace Schoolbox\Blog\Homepage\Post;
 
 use Alaress\Web\Controller\Base;
+use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Blog\Homepage\Comment\Mapper as BlogCommentMapper;
 use Schoolbox\Blog\Homepage\Comment\Model as BlogCommentModel;
 use Schoolbox\Blog\Homepage\Image\Mapper as BlogImageMapper;
@@ -20,6 +21,7 @@ use Schoolbox\Blog\Homepage\Post\Mapper as BlogMapper;
 use Schoolbox\Blog\Homepage\Post\Model as BlogModel;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -34,7 +36,6 @@ use Schoolbox\UserMapper;
 
 class Controller extends Base
 {
-
     /**
      * @var UserAccessMapper
      */
@@ -275,27 +276,34 @@ class Controller extends Base
      * Create new blog comment
      * @param BlogModel $blog
      * @throws MapperException
+     * @throws RouteNotFound
      */
     public function postCommentInsert(BlogModel $blog)
     {
-        // Add the comment
-        /** @var BlogCommentModel $comment */
-        $comment = $this->getBlogCommentMapper()->createModel();
-
-        $comment->setOwner($this->getUser());
-        $comment->setBlog($blog);
         // Comments must not be empty
-        if (strlen(trim($this->getRequest()->post["commentBody"]))) {
-            $comment->setBody($this->getRequest()->post["commentBody"]);
-        } else {
+        if (strlen(trim($this->getRequest()->post['commentBody'])) === 0) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
+
+        /** @var BlogCommentModel $comment */
+        $comment = $this->getBlogCommentMapper()->createModel();
+        $comment->setOwner($this->getUser());
+        $comment->setBlog($blog);
+        $comment->setBody($this->getRequest()->post['commentBody']);
         $comment->setCreatedAt(\Alaress_Date_Format::now());
+
         $this->getBlogCommentMapper()->save($comment);
 
-        // Redirect back to the blog page
+        $returnUrlEncoded = $this->getRequest()->post['returnUrl'];
 
-        $this->getResponse()->redirect->afterPost("/blog/{$blog->getId()}");
+        if ($returnUrlEncoded !== null) {
+            $returnUrl = Redirect::decode($returnUrlEncoded);
+        } else {
+            // If no return URL supplied, redirect to the Blog on which the comment was added.
+            $returnUrl = $this->getRouter()->generate('blog.getItem', ['id' => $blog->getId()]);
+        }
+
+        $this->getResponse()->redirect->afterPost($returnUrl);
     }
 
     /**

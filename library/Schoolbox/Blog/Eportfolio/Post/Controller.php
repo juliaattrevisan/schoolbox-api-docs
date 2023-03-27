@@ -22,6 +22,7 @@ use Schoolbox\Blog\Eportfolio\Post\Mapper as EportfolioBlogMapper;
 use Schoolbox\Blog\Eportfolio\Post\Model as EportfolioBlogModel;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -140,7 +141,6 @@ class Controller extends Base
      */
     public function postModify(EportfolioPageModel $page, EportfolioBlogModel $blog)
     {
-
         // Update details and save the record
         $blog->setBody($this->getRequest()->post->get("body"));
         $blog->setHeading($this->getRequest()->post->get("heading"));
@@ -256,35 +256,39 @@ class Controller extends Base
     /**
      * Create new blog comment
      * @param EportfolioBlogModel $blog
-     * @throws MapperException
+     * @throws MapperException|\Aura\Router\Exception\RouteNotFound
      */
-    public function postCommentInsert(EportfolioBlogModel $blog)
+    public function postCommentInsert(EportfolioBlogModel $blog): void
     {
-        // Comments must not be empty
-        if (strlen(trim($this->getRequest()->post["commentBody"]))) {
-            // Create the comment and save
-
-            /** @var EportfolioBlogCommentModel $comment */
-            $comment = $this->getEportfolioBlogCommentMapper()->createModel();
-
-            $comment->setOwner($this->getUser());
-            $comment->setBlog($blog);
-            $comment->setBody($this->getRequest()->post['commentBody']);
-            $comment->setCreatedAt(\Alaress_Date_Format::now());
-
-            $this->getEportfolioBlogCommentMapper()->save($comment);
-        } else {
+        // Comments must not be empty.
+        if (strlen(trim($this->getRequest()->post['commentBody'])) === 0) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
-        $this->getResponse()->redirect->afterPost(
-            $this->getRouter()->generate(
-                'eportfolioBlog.getItem',
-                ['pageId' => $blog->getPage()->getPageId(), 'id' => $blog->getId(),]
-            )
-        );
-    }
+        /** @var EportfolioBlogCommentModel $comment */
+        $comment = $this->getEportfolioBlogCommentMapper()->createModel();
+        $comment->setOwner($this->getUser());
+        $comment->setBlog($blog);
+        $comment->setBody($this->getRequest()->post['commentBody']);
+        $comment->setCreatedAt(\Alaress_Date_Format::now());
 
+        $this->getEportfolioBlogCommentMapper()->save($comment);
+
+        $returnUrlEncoded = $this->getRequest()->post['returnUrl'];
+
+        if ($returnUrlEncoded !== null) {
+            $returnUrl = Redirect::decode($returnUrlEncoded);
+        } else {
+            // If no return URL supplied, redirect to the Blog on which the comment was added.
+            $blogPage = $blog->getPage();
+            $returnUrl = $this->getRouter()->generate(
+                'eportfolioBlog.getItem',
+                ['pageId' => $blogPage->getPageId(), 'id' => $blog->getId()]
+            );
+        }
+
+        $this->getResponse()->redirect->afterPost($returnUrl);
+    }
 
     /**
      * Delete blog comment
