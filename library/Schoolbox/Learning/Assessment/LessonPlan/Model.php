@@ -16,6 +16,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Field\Model as LessonPlanFieldModel;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
@@ -97,6 +98,9 @@ class Model extends AbstractAssessment
     /**
      * Creates a clone of this assessment.
      *
+     * This is used when you create a new assessment in a course and you want to
+     * Export To Classes
+     *
      * This clone must be able to be persisted to create a copy of this assessment,
      * without further modification.
      *
@@ -116,6 +120,45 @@ class Model extends AbstractAssessment
         $clone->copyAttachedFiles($this);
 
         return $clone;
+    }
+
+
+    /**
+     * Overwrite fields from `$source` into this object.
+     *
+     * This is used when you edit an assessment in a course that was already imported
+     * and you want to Save To Course
+     *
+     * This implementation overwrites the additional fields over and above the
+     * base implementation:
+     *    * attached files
+     *    * field bodies
+     *    * visibility to students
+     *
+     * This implementation does _not_ overwrite:
+     * * external ID: this uniquely identifies the base assessment within
+     *   another system, so it should not be copied
+     *
+
+     *
+     * @param self $source
+     * @return $this
+     * @throws \UnexpectedValueException
+     */
+    public function overwrite(IAssessable $source): IAssessable
+    {
+        parent::overwrite($source);
+        $this->visibility = $source->visibility;
+
+        /* Copy Lesson Plan Fields completely and save them
+         * as entirely new Lesson Plan Fields in the db
+         */
+        $this->copyFields($source);
+
+        // Copy attachments
+        $this->copyAttachedFiles($source);
+
+        return $this;
     }
 
 
