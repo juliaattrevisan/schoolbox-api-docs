@@ -6,6 +6,7 @@
 
 import { getURL } from "@js/editor/plugin/resource/resourceUtils";
 import type { EditorConfig } from "@js/editor/types/editorTypes";
+import { getWithoutExtension } from "@js/util/fileUtils";
 
 export default class UploadAdapter {
     loader: unknown;
@@ -92,8 +93,10 @@ export default class UploadAdapter {
                 const image = imageUtils.insertImage(attributes, this.editor.model.document.selection, "imageInline");
                 this.editor.execute("resizeImage", { width: "24px" });
                 writer.setSelection(image.parent, "end");
+                // we get without extension for now to avoid a copy/paste issue in ckeditor
+                // pasting with the extension will cause ckeditor to look to embed the file again
                 this.editor.model.insertContent(
-                    writer.createText(`${meta.name}`, {
+                    writer.createText(`${getWithoutExtension(meta.name)}`, {
                         linkHref: getURL(meta.file._links.fetch, config),
                         linkToggleDownloadable: "true",
                     })
