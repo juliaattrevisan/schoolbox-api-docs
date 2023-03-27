@@ -176,16 +176,19 @@ class EmbedReplacer
                 continue;
             }
             $srcUrl = new Uri($srcNode->getAttribute($attribute));
-            if ($srcUrl->getHost() !== self::IFRAMELY_CDN_HOST) {
-                //if the embedded object is not an iframely link, lets assume it should be...
-                $srcUrl = new Uri(sprintf("https://iframe.ly/api/oembed?api_key=%s&url=%s", self::IFRAMELY_API_KEY, $srcNode->getAttribute($attribute)));
-            }
+
             foreach (self::IFRAMELY_API_PARAMS_SETS as $paramsSet) {
-                $apiUrl = (new Uri(self::IFRAMELY_API_ENDPOINT))
-                    ->appendQueryParameters($paramsSet + $srcUrl->getQueryAsArray());
+                $apiUrl = (new Uri(self::IFRAMELY_API_ENDPOINT));
+                if ('oembed' === $srcNode->tagName()) {
+                    // We are in an oembed ckeditor5 object so we need to add different query strings
+                    $apiUrl = $apiUrl->appendQueryParameters($paramsSet + ['api_key' => self::IFRAMELY_API_KEY, 'url' => $srcNode->getAttribute($attribute)]);
+                } else {
+                    //ckeditor4 the iframe tag contains the required iframe url with the key already there
+                    $apiUrl = $apiUrl->appendQueryParameters($paramsSet + $srcUrl->getQueryAsArray());
+                }
                 try {
                     $response = $this->httpClient->get($apiUrl);
-                } catch (GuzzleException) {
+                } catch (GuzzleException $e) {
                     // Something went wrong whilst making the new request,
                     // e.g. this request return a 417 Expectation Failed:
                     // this means Iframely doesn't know how to output this
