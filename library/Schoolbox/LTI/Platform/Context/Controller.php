@@ -22,7 +22,6 @@ use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLink;
 use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLinkInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\AccessTokenRepository;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\RequestAccessTokenValidator;
-use OAT\Library\Lti1p3Core\Service\Server\LtiServiceServer;
 use OAT\Library\Lti1p3DeepLinking\Message\Launch\Builder\DeepLinkingLaunchRequestBuilder;
 use OAT\Library\Lti1p3DeepLinking\Settings\DeepLinkingSettings;
 use OAT\Library\Lti1p3Nrps\Service\Server\Handler\MembershipServiceServerRequestHandler;
@@ -35,6 +34,7 @@ use Schoolbox\LTI\Context\Folder as ContextFolder;
 use Schoolbox\LTI\Custom\ClaimFactory as CustomClaimFactory;
 use Schoolbox\LTI\Membership\Builder;
 use Schoolbox\LTI\Platform\Instance\ClaimFactory as PlatformInstanceClaimFactory;
+use Schoolbox\LTI\Platform\Server\ServiceServer;
 use Schoolbox\LTI\Provider\Model as ToolModel;
 use Schoolbox\LTI\ResourceLink\LaunchFactory;
 use Schoolbox\LTI\Role\ClaimFactory as RoleClaimFactory;
@@ -292,7 +292,7 @@ class Controller extends BaseController
             ),
         );
         $handler = new MembershipServiceServerRequestHandler($builder);
-        $server  = new LtiServiceServer($validator, $handler);
+        $server  = new ServiceServer($validator, $handler);
         $this->populateResponseFromPsr7Response($server->handle($request));
     }
 

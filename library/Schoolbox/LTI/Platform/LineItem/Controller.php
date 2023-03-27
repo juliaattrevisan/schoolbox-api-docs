@@ -15,15 +15,14 @@ use OAT\Library\Lti1p3Ags\Service\Score\Server\Handler\ScoreServiceServerRequest
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\AccessTokenRepository;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\RequestAccessTokenValidator;
-use OAT\Library\Lti1p3Core\Service\Server\LtiServiceServer;
 use Psr\Cache\CacheItemPoolInterface;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Instance;
 use Schoolbox\Learning\Assessment\Lti\Model;
 use Schoolbox\LTI\Assessment as LtiAssessment;
 use Schoolbox\LTI\Assessment\Score as LtiAssessmentScore;
 use Schoolbox\LTI\LineItem\SingleAssessmentRepository;
+use Schoolbox\LTI\Platform\Server\ServiceServer;
 use Schoolbox\LTI\Score\SingleAssessmentScoreRepository;
 use Schoolbox\LTI\User\Codec as UserCodec;
 use Schoolbox\LTI\Util\ServerRequestFactory;
@@ -141,7 +140,7 @@ class Controller extends BaseController
 
         // Handle the request: this validates the request body
         $handler = new ScoreServiceServerRequestHandler($lineItemRepository, $scoreRepository);
-        $server  = new LtiServiceServer($validator, $handler);
+        $server  = new ServiceServer($validator, $handler);
         $this->populateResponseFromPsr7Response($server->handle($request));
     }
 }
