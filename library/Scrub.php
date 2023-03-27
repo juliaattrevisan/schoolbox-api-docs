@@ -457,7 +457,7 @@ class Scrub
         $html = self::getMarkdownConverter()->convertToHtml((string)$text)->getContent();
 
         // Ensure no linebreak exists between <li> and <a> tags.  (See SA-15196).
-        return str_replace("<li>\n<a ", "<li> <a ", $html);
+        return str_replace("<li>\n<a ", "<li><a ", $html);
     }
 
 
