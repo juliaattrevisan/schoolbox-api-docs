@@ -5,6 +5,7 @@
 
 import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
 import { slideUp } from "@js/util/animateUtils";
+import { isHtmlIncluded } from "@ckeditor/ckeditor5-image/src/imageupload/imageuploadediting";
 
 export default class ResourceEditing extends Plugin {
     /**
@@ -15,6 +16,15 @@ export default class ResourceEditing extends Plugin {
         const fileRepository = editor.plugins.get("FileRepository");
         const resourceUI = editor.plugins.get("ResourceUI");
         editor.editing.view.document.on("clipboardInput", (event, data) => {
+            /**
+             * Skip if non empty HTML data is included.
+             * https://github.com/ckeditor/ckeditor5-upload/issues/68
+             * Also seems to prevent uploading the same file twice when dragging an existing image
+             * in the editor to a new spot
+             */
+            if (isHtmlIncluded(data.dataTransfer)) {
+                return;
+            }
             const files = Array.from(data.dataTransfer._files);
             files.forEach((file) => {
                 this.displayUploadProgress(fileRepository, resourceUI, file as File);
