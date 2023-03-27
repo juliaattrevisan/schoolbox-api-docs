@@ -24,7 +24,7 @@
     <div class="row">
         <div class="small-12 columns">
             <label class="required" for="title">Title</label>
-            <input id="title" type="text" name="title" value="{% if assessment.id %}{{ assessment.title }}{% endif %}" required />
+            <input id="title" type="text" name="title" maxlength="255" value="{% if assessment.id %}{{ assessment.title }}{% endif %}" required />
         </div>
     </div>
 </fieldset>
