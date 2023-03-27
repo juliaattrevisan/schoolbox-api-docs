@@ -34,7 +34,7 @@ class Item
     public const ELEMENT_META_AUTHOR   = Common::ELEMENT_CONTENT . ' .card > .meta:nth-of-type(1)';
     public const ELEMENT_META_DATE     = Common::ELEMENT_CONTENT . ' .card > .meta:nth-of-type(2)';
     public const ELEMENT_FEATURE_IMAGE = Common::ELEMENT_CONTENT . ' .large-3 img';
-    public const ELEMENT_ARTICLE       = Common::ELEMENT_CONTENT . ' .large-9 article';
+    public const ELEMENT_ARTICLE       = Common::ELEMENT_CONTENT . ' article';
 
     /**
      * @var AcceptanceTester

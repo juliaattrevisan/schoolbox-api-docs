@@ -195,7 +195,7 @@ class Acceptance extends \Codeception\Module
     {
         $wd = $this->getWebDriverModule();
         $wd->executeJS(
-            sprintf('CKEDITOR.instances["%s"].setData("%s")', addslashes($field), addslashes($value))
+            sprintf('window.sbProps.editors["%s"].setData("%s")', addslashes($field), addslashes($value))
         );
     }
 
@@ -211,7 +211,7 @@ class Acceptance extends \Codeception\Module
         // $field could've been set as plain text, without <p> tags.
         // Test both the raw field, and the normalized value too.
         $expectedValue = $this->getWebDriverModule()->executeJS(
-            sprintf('return CKEDITOR.instances["%s"].getData()', addslashes($field))
+            sprintf('return window.sbProps.editors["%s"].getData()', addslashes($field))
         );
         $this->assertEquals($this->normalizeSpace($value), $this->normalizeSpace($expectedValue));
     }

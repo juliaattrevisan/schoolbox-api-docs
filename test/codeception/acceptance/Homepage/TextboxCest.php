@@ -16,7 +16,7 @@ use Page\Homepage;
  */
 class TextboxCest
 {
-    var $createFolderUrl = 'https://vagrant.dev.schoolbox.cloud/resource/folder/0/create';
+    private string $createFolderUrl = 'https://vagrant.dev.schoolbox.cloud/resource/folder/0/create';
 
     /**
      * @param AcceptanceTester $i
