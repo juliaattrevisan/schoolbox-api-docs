@@ -85,6 +85,13 @@ class Controller extends Assessment\Controller
             'assessment'   => $assessment,
             'student'      => $student,
             'returnUrl'    => $returnUrl,
+
+            /* FIXME Controversial:
+             *  whether "staff-only fields" really means "instructor-only fields",
+             *  or whether it's strictly for the Role::STAFF demographic? Non-staff
+             *  roletypes can end up fulfilling Instructor responsibilities
+             */
+            'isInstructor' => $isViewerAnInstructor,
         ];
 
         $this->getResponse()->content->set(
