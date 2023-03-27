@@ -54,8 +54,33 @@ class Controller extends Assessment\Controller
     }
 
 
+    /**
+     * Assessment Summary Screen for a Lesson Plan
+     *
+     * @param IAssessable $assessment
+     * @param User        $student
+     * @return void
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @throws \Schoolbox\Application\Exception\Exception
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
     public function getSummary(IAssessable $assessment, User $student): void
     {
+        $isViewerAnInstructor = $this->getAccess()->isInstructor($this->getUser(), $assessment->getBaseContext()->getFolder());
+
+        /* If you're a student,
+         * and the Lesson Plan $assessment isn't visible to students,
+         * error(19) for now
+         */
+        if (!$isViewerAnInstructor && \Schoolbox\Role::STUDENT !== $assessment->getVisibility()) {
+            throw $this->getErrorMapper()->generateException(\Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW);
+        }
+
+        /* Craft a returnUrl, to redirect back to the place from whence you came
+         */
         if ($this->getRequest()->query->get(Redirect::RETURN_URL)) {
             $returnUrl = Redirect::decode($this->getRequest()->query->get(Redirect::RETURN_URL));
         } else {
@@ -65,8 +90,6 @@ class Controller extends Assessment\Controller
         /**
          * record view
          */
-        $isViewerAnInstructor = $this->getAccess()->isInstructor($this->getUser(), $assessment->getBaseContext()->getFolder());
-
         $lastView = new Assessment\Views\LatestView(
             $this->latestViewMapper,
             new \Schoolbox\External\User(
