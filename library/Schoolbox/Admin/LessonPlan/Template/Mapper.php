@@ -159,6 +159,7 @@ class Mapper extends \Schoolbox\Mapper
      * @param User $user
      * @param int  $limit
      * @return GenericCollection
+     * @throws \InvalidArgumentException
      * @throws \PDOException
      */
     public function findRecentlyUsed(\Schoolbox\User $user, int $limit = 3): GenericCollection
