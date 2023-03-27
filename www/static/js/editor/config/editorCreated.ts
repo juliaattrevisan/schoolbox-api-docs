@@ -66,13 +66,24 @@ function removeValidation() {
  * For more info: https://iframely.com/docs/ckeditor
  *
  * @param { EditorConfig } config - the CKEditor config object
+ * @param { Editor } editor - the CKEditor instance
  */
-async function addIframelyEmbed(config: EditorConfig) {
+async function addIframelyEmbed(config: EditorConfig, editor: Editor) {
     if (config.toolbar === EditorToolbar.FULL || config.toolbar === EditorToolbar.COMMENT) {
         const script = "//cdn.iframe.ly/embed.js?cancel=0";
         if (!isScriptAdded(script)) {
             await injectScript(script);
         }
+        /**
+         * If the link fails to unfurl and be presented in the editor as an embed,
+         * we should pull out the embed attempt and just add a link to the failed url instead
+         * See https://iframely.com/docs/embedjs - "Act when unfurling fails" for further details
+         * We can use the undo tool to undo the embed action
+         */
+        window.iframely.on("cancel", (url: string) => {
+            editor.execute("undo");
+            editor.execute("link", url);
+        });
     }
 }
 
@@ -105,6 +116,6 @@ export async function modifyEditor(textarea: HTMLTextAreaElement, editor: Editor
     insertWordCount(textarea, editor, config);
     disableAutoMedia(editor, config);
     removeValidation();
-    await addIframelyEmbed(config);
+    await addIframelyEmbed(config, editor);
     await attachInspector(editor);
 }

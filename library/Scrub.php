@@ -147,6 +147,8 @@ class Scrub
             }
 
             $config = HTMLPurifier_Config::createDefault();
+            // TODO: remove this clear cache call
+            $config->set('Cache.DefinitionImpl', null);
 
             /* http://htmlpurifier.org/phorum/read.php?3,6724
              */
@@ -281,6 +283,58 @@ class Scrub
                 $def->addAttribute('blockquote', 'data-id', 'Text');
                 $def->addAttribute('iframe', 'allow', 'Text');
                 $def->addAttribute('iframe', 'allowfullscreen', 'Bool');
+
+                // CKEditor5
+                // Don't Scrub these bits. CKEditor5 needs them...
+                $def->addAttribute('a', 'download', 'Text');
+                $def->addAttribute('img', 'style', 'Text');
+                $figure = $def->addElement(
+                    'figure',
+                    'Block',
+                    'Flow',
+                    'Common',
+                    [
+                        'class' => 'Text'
+                    ]
+                );
+                $oembed = $def->addElement(
+                    'oembed',
+                    'Block',
+                    'Empty',
+                    'Common',
+                    [
+                        'url' => 'URI'
+                    ]
+                );
+                //to-do list
+                $label = $def->addElement(
+                    'label',
+                    'Inline',
+                    'Empty',
+                    'Common',
+                    [
+                        'class' => 'Text',
+                    ]
+                );
+                $checkBox = $def->addElement(
+                    'input',
+                    'Inline',
+                    'Empty',
+                    'Common',
+                    [
+                        'type' => 'Text',
+                        'tabindex' => 'Text',
+                        'checked' => 'Text',
+                        'disabled' => 'Text',
+                    ]
+                );
+                //table caption
+                $tableCaption = $def->addElement(
+                    'figcaption',
+                    'Block',
+                    'Flow',
+                    false
+                );
 
 
                 //

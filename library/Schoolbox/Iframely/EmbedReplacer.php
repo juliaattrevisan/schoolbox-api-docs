@@ -32,13 +32,13 @@ class EmbedReplacer
      * The query selector which identifies an Iframely embed container within
      * the HTML.
      */
-    private const IFRAMELY_EMBED_CONTAINER_ELEMENT_SELECTOR = 'div[data-oembed-url]';
+    private const IFRAMELY_EMBED_CONTAINER_ELEMENT_SELECTOR = 'div[data-oembed-url],oembed';
 
     /**
      * The attributes which may contain the source to create a link to within
      * each embed container.
      */
-    private const IFRAMELY_EMBED_CONTAINER_SOURCE_ATTRIBUTES = ['src', 'data-iframely-url'];
+    private const IFRAMELY_EMBED_CONTAINER_SOURCE_ATTRIBUTES = ['src', 'data-iframely-url', 'url'];
 
     /**
      * Iframely's CDN host: any embeds which contain this host name will be
@@ -52,6 +52,11 @@ class EmbedReplacer
      * @see https://iframely.com/docs/iframely-api
      */
     private const IFRAMELY_API_ENDPOINT = 'https://iframe.ly/api/iframely';
+
+    /**
+     * API Key for fetching URL information.
+     */
+    private const IFRAMELY_API_KEY = '94aa8fc28ac1089a2dfb28';
 
     /**
      * A set of additional parameters for the API endpoint, to be attempted in
@@ -171,24 +176,33 @@ class EmbedReplacer
                 continue;
             }
             $srcUrl = new Uri($srcNode->getAttribute($attribute));
-            if ($srcUrl->getHost() === self::IFRAMELY_CDN_HOST) {
-                foreach (self::IFRAMELY_API_PARAMS_SETS as $paramsSet) {
-                    $apiUrl = (new Uri(self::IFRAMELY_API_ENDPOINT))
-                        ->appendQueryParameters($paramsSet + $srcUrl->getQueryAsArray());
-                    try {
-                        $response = $this->httpClient->get($apiUrl);
-                    } catch (GuzzleException) {
-                        // Something went wrong whilst making the new request,
-                        // e.g. this request return a 417 Expectation Failed:
-                        // this means Iframely doesn't know how to output this
-                        // content without the iframe helper.
-                        // Try the next param set.
-                        continue;
-                    }
-                    $responseBody = json_decode($response->getBody()->getContents(), true);
-                    if (isset($responseBody['html'])) {
-                        return $responseBody['html'];
-                    }
+
+            foreach (self::IFRAMELY_API_PARAMS_SETS as $paramsSet) {
+                $apiUrl = (new Uri(self::IFRAMELY_API_ENDPOINT));
+                if ('oembed' === $srcNode->tagName()) {
+                    // We are in an oembed ckeditor5 object so we need to add different query strings
+                    $apiUrl = $apiUrl->appendQueryParameters($paramsSet + ['api_key' => self::IFRAMELY_API_KEY, 'url' => $srcNode->getAttribute($attribute)]);
+                } else if ($srcUrl->getHost() === self::IFRAMELY_CDN_HOST) {
+                    //ckeditor4 the iframe tag contains the required iframe url with the key already there
+                    $apiUrl = $apiUrl->appendQueryParameters($paramsSet + $srcUrl->getQueryAsArray());
+                } else {
+                    // not supposed to be here... don't iframely non iframely iframes...
+                    // lets just continue without editing the current node.
+                    continue;
+                }
+                try {
+                    $response = $this->httpClient->get($apiUrl);
+                } catch (GuzzleException $e) {
+                    // Something went wrong whilst making the new request,
+                    // e.g. this request return a 417 Expectation Failed:
+                    // this means Iframely doesn't know how to output this
+                    // content without the iframe helper.
+                    // Try the next param set.
+                    continue;
+                }
+                $responseBody = json_decode($response->getBody()->getContents(), true);
+                if (isset($responseBody['html'])) {
+                    return $responseBody['html'];
                 }
             }
         }
