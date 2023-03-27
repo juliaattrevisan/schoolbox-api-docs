@@ -31,44 +31,44 @@ export function getStyleSettings() {
                 {
                     name: "Banner",
                     element: "p",
-                    classes: ["ck-s-banner"],
+                    classes: ["schoolbox-ck-banner"],
                 },
                 {
                     name: "Info Callout",
                     element: "p",
-                    classes: ["ck-s-callout--info"],
+                    classes: ["schoolbox-ck-callout--info"],
                 },
                 {
                     name: "Warning Callout",
                     element: "p",
-                    classes: ["ck-s-callout--warning"],
+                    classes: ["schoolbox-ck-callout--warning"],
                 },
                 {
                     name: "Success Callout",
                     element: "p",
-                    classes: ["ck-s-callout--success"],
+                    classes: ["schoolbox-ck-callout--success"],
                 },
                 {
                     name: "Target Callout",
                     element: "p",
-                    classes: ["ck-s-callout--target"],
+                    classes: ["schoolbox-ck-callout--target"],
                 },
                 {
                     name: "Question Callout",
                     element: "p",
-                    classes: ["ck-s-callout--question"],
+                    classes: ["schoolbox-ck-callout--question"],
                 },
                 {
                     name: "Sticky Note",
                     element: "p",
-                    classes: ["ck-s-sticky-note"],
+                    classes: ["schoolbox-ck-sticky-note"],
                 },
                 {
                     name: "Construction",
                     element: "p",
-                    classes: ["ck-s-construction"],
+                    classes: ["schoolbox-ck-construction"],
                 },
-                { name: "Code block", element: "p", classes: ["ck-s-code-block"] },
+                { name: "Code block", element: "p", classes: ["schoolbox-ck-code-block"] },
             ],
         },
     };
