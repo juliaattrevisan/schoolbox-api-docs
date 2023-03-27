@@ -35,10 +35,15 @@ function addSBConfigToEditor(editor: Editor, config: EditorConfig) {
 
 /**
  * To display the upload progress of each resource being added to the editor.
+ *
+ * @param { Editor } editor - the CKEditor instance
+ * @param { EditorConfig } config - the CKEditor config object
  */
-function insertResourceContainer() {
-    const resourceUI = editor.plugins.get("ResourceUI");
-    resourceUI.initContainer();
+function insertResourceContainer(editor: Editor, config: EditorConfig) {
+    if (config.toolbar === EditorToolbar.FULL || config.toolbar === EditorToolbar.COMMENT) {
+        const resourceUI = editor.plugins.get("ResourceUI");
+        resourceUI.initContainer();
+    }
 }
 
 /**
@@ -121,7 +126,7 @@ async function attachInspector(editor: Editor) {
 export async function modifyEditor(textarea: HTMLTextAreaElement, editor: Editor, config: EditorConfig) {
     addToGlobalScope(editor, textarea);
     addSBConfigToEditor(editor, config);
-    insertResourceContainer();
+    insertResourceContainer(editor, config);
     insertWordCount(textarea, editor, config);
     disableAutoMedia(editor, config);
     removeValidation();
