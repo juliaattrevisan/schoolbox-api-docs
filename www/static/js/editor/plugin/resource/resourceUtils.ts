@@ -84,6 +84,7 @@ function getImageAttributes(resource: Resource, config: EditorConfig) {
     return {
         src: getImageSrc(resource, config),
         alt: resource.name,
+        linkHref: getImageSrc(resource, config),
     };
 }
 
