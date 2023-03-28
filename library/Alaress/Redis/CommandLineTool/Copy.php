@@ -10,10 +10,12 @@ declare(strict_types=1);
 namespace Alaress\Redis\CommandLineTool;
 
 use Alaress\Redis;
+use GuzzleHttp\Psr7\Uri;
 use Predis;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 use Predis\ClientInterface;
+use Schoolbox\Config\ConfigMapper;
 
 /**
  * Migrates data in a redis server to another redis server
@@ -26,6 +28,7 @@ class Copy extends CliTool\App
     private const OPT_LONG_PORT   = 'port:';
     private const OPT_LONG_MOVE   = 'move';
     private const OPT_LONG_DELETE = 'delete';
+    private const OPT_LONG_UPDATE_CONFIG = 'update-config';
 
     private const REDIS_DEFAULT_PORT = 6379;
     private const TARGET_KEY         = '';
@@ -70,6 +73,7 @@ class Copy extends CliTool\App
             self::OPT_LONG_PORT,
             self::OPT_LONG_MOVE,
             self::OPT_LONG_DELETE,
+            self::OPT_LONG_UPDATE_CONFIG,
         ];
     }
 
@@ -87,6 +91,7 @@ Copies an instance's redis data to the specified server
 --port [PORT] Port of destination redis server. Default to 6379 if not provided
 --move Delete moved keys from source redis server, if provided
 --delete Delete keys from source server which are already copied to destination server
+--update-config Update config.redis_url to the destination redis server
 --perform Without this flag, tool will run in dry-run mode
 ";
         fwrite(STDOUT, $help);
@@ -118,9 +123,9 @@ Copies an instance's redis data to the specified server
          * Prepare redis server connections
          */
         $this->sourceRedis = $this->getDi()->get('redis.storage');
-        $sourceRedisUrl    = new \Schoolbox\Url\Uri($this->getConfig()->get('redis_url'));
+        $sourceRedisUrl    = new Uri($this->getConfig()->get(ConfigMapper::NAME_REDIS_URL));
 
-        $targetRedisUrl = (new \Schoolbox\Url\Uri())
+        $targetRedisUrl = (new Uri())
             ->withScheme('tcp')
             ->withHost($this->getOpt(self::OPT_LONG_HOST))
             ->withPort($this->getOpt(self::OPT_LONG_PORT) ?? self::REDIS_DEFAULT_PORT);
@@ -146,7 +151,7 @@ Copies an instance's redis data to the specified server
         }
 
         // See library/Alaress/Redis/CommandLineTool/Report.php for patterns
-        $keyPatterns = Redis\CommandLineTool\Report::KEY_PATTERNS[Redis::INSTANCE_STORAGE];
+        $keyPatterns = Registry::KEY_PATTERNS[Redis::INSTANCE_STORAGE];
 
         // Skipping keys which doesn't have INSTANCE_ID
         $keyPatterns = array_filter(
@@ -217,8 +222,21 @@ Copies an instance's redis data to the specified server
             }
         }
         if ($this->perform()) {
+            if ($this->getOpt(self::OPT_LONG_UPDATE_CONFIG)) {
+                $this->getDatabaseInternal()->executeQuery(
+                    "UPDATE config SET value = :newRedisUrl WHERE name = :redisConfig",
+                    [
+                        'newRedisUrl' => (string)$targetRedisUrl,
+                        'redisConfig' => ConfigMapper::NAME_REDIS_URL,
+                    ]
+                );
+                $this->getLogger()->info(sprintf('Config %s is updated from %s to %s.', ConfigMapper::NAME_REDIS_URL, $sourceRedisUrl, $targetRedisUrl));
+            }
             $this->getLogger()->info(sprintf('%d Keys %s. Total size: %d', $this->count, $this->isDelete ? 'deleted' : 'migrated', $this->totalLength));
         } else {
+            if ($this->getOpt(self::OPT_LONG_UPDATE_CONFIG)) {
+                $this->getLogger()->info(sprintf('Config %s will be updated from %s to %s.', ConfigMapper::NAME_REDIS_URL, $sourceRedisUrl, $targetRedisUrl));
+            }
             $this->getLogger()->info(sprintf('%d Keys will be %s. Total size: %d', $this->count, $this->isDelete ? 'deleted' : 'migrated', $this->totalLength));
         }
     }
