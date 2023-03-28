@@ -452,6 +452,19 @@ $allow-sidebar-stash: $large-up;
         }
     }
 
+    /**
+     *  Here to resolve SA-10992, without these rules...
+     *  a) Submenus calculate 100% as 100% of screen height, so they may not cover the menu
+     *  b) Submenus don't position themselves properly
+    **/
+    nav#nav > ul {
+        position: relative;
+
+        ul.left-submenu {
+            position: fixed;
+        }
+    }
+
     // Left nav arrow override
     ul.off-canvas-list {
         li {
