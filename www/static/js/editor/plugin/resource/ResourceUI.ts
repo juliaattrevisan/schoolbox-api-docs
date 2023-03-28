@@ -72,12 +72,6 @@ export default class ResourceUI extends Plugin {
      * To display the progress of a resource being uploaded, based off the already
      * existing dropzone usages:
      * <div class="card small-12">
-     *      <img
-     *          data-dz-thumbnail=""
-     *          class="mime"
-     *          src="/static/images/foundation/preloader.gif"
-     *          alt="file loading spinner"
-     *      />
      *      <p>big-file.zip</p>
      *      <p class="meta" data-dz-status>Uploading...</p>
      *      <div class="progress">
@@ -91,12 +85,6 @@ export default class ResourceUI extends Plugin {
     getProgressElement(file: File) {
         const container = document.createElement("div");
         container.classList.add("card", "small-12");
-        const img = document.createElement("img");
-        img.setAttribute("data-dz-thumbnail", "");
-        img.classList.add("mime");
-        img.src = "/static/images/foundation/preloader.gif";
-        img.alt = "file loading spinner";
-        container.appendChild(img);
         const title = document.createElement("p");
         title.innerText = file.name;
         container.appendChild(title);
