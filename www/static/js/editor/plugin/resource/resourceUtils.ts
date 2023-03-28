@@ -48,6 +48,7 @@ export enum ResourceType {
     FOLDER = "folder",
     DOCUMENT = "document",
     MEETING_URL = "meetingUrl",
+    OTHER = "other",
 }
 
 /**
@@ -58,7 +59,13 @@ export type Resource = {
     hash: string;
     mime: string;
     name: string;
-    type: ResourceType.IMAGE | ResourceType.VIDEO | ResourceType.AUDIO | ResourceType.FOLDER | ResourceType.DOCUMENT;
+    type:
+        | ResourceType.IMAGE
+        | ResourceType.VIDEO
+        | ResourceType.AUDIO
+        | ResourceType.FOLDER
+        | ResourceType.DOCUMENT
+        | ResourceType.OTHER;
     id?: string;
 };
 
@@ -198,6 +205,23 @@ function getDocumentAttributes(resource: Resource, config: EditorConfig) {
 }
 
 /**
+ * Get the other attributes, which is a file type for "other" files...
+ *
+ * @param { Resource } resource - the resource
+ * @param { EditorConfig } config - the editor config
+ * @returns { object } - the document attributes
+ */
+function getOtherAttributes(resource: Resource, config: EditorConfig) {
+    return {
+        src: getURL(`/ajax/mime/${resource.mime}`, config),
+        alt: resource.name,
+        linkHref: getURL(`/storage/fetch.php?hash=${resource.hash}`, config),
+        linkToggleDownloadable: "true",
+        width: "24px",
+    };
+}
+
+/**
  * Get the folder src
  *
  * @param { Resource } resource - the resource
@@ -261,6 +285,9 @@ export function getAttributes(resource: Resource, config: EditorConfig) {
     if (resource.type === ResourceType.DOCUMENT) {
         return getDocumentAttributes(resource, config);
     }
+    if (resource.type === ResourceType.OTHER) {
+        return getOtherAttributes(resource, config);
+    }
     return {};
 }
 
@@ -322,6 +349,7 @@ export function getSrc(resource: Resource, config: EditorConfig) {
 export function addResource(editor: Editor, resource: Resource) {
     const config = editor.config.get("sbConfig");
     const imageUtils = editor.plugins.get("ImageUtils");
+    console.warn(resource);
     editor.model.change((writer) => {
         const image = imageUtils.insertImage(
             getAttributes(resource, config),
@@ -329,11 +357,11 @@ export function addResource(editor: Editor, resource: Resource) {
             "imageInline"
         );
         writer.setSelection(image.parent, "end"); // deselect the selected image, otherwise further actions will overwrite it
-        if (resource.type === ResourceType.DOCUMENT) {
+        if (resource.type === ResourceType.DOCUMENT || resource.type === ResourceType.OTHER) {
             // we get without extension for now to avoid a copy/paste issue in ckeditor
             // pasting with the extension will cause ckeditor to look to embed the file again
             editor.model.insertContent(
-                writer.createText(`${getWithoutExtension(resource.name)}`, getDocumentAttributes(resource, config))
+                writer.createText(`${getWithoutExtension(resource.name)}`, getAttributes(resource, config))
             );
         }
         editor.execute("enter");
