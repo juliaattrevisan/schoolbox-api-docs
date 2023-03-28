@@ -63,7 +63,6 @@ export default class UploadAdapter {
      */
     onLoaded(resolve: Function, reject: Function, genericErrorText: string) {
         const response = this.xhr.response as JSON;
-        console.warn(response);
         if (!response || !response.success) {
             return reject(response && response.error ? response.message : genericErrorText);
         }
@@ -96,6 +95,7 @@ export default class UploadAdapter {
 
     /**
      * Prepares the data and sends the request.
+     *
      * @todo - Important note: This is the right place to implement security mechanisms
      * like authentication and CSRF protection. For instance, you can use
      * XMLHttpRequest.setRequestHeader() to set the request headers containing
