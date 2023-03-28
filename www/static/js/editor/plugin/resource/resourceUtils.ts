@@ -317,9 +317,11 @@ export function getSrc(resource: Resource, config: EditorConfig) {
  *
  * @param { Editor } editor - the ckeditor instance
  * @param { Resource } resource - the resource
- * @param { EditorConfig } config - the editor config
  */
-export function addResource(editor: Editor, resource: Resource, config: EditorConfig) {
+export function addResource(editor: Editor, resource: Resource) {
+    // const config = editor.config.sbConfig as EditorConfig;
+    const config = editor.config.get("sbConfig");
+    console.warn(config);
     const imageUtils = editor.plugins.get("ImageUtils");
     editor.model.change((writer) => {
         const image = imageUtils.insertImage(
@@ -327,7 +329,7 @@ export function addResource(editor: Editor, resource: Resource, config: EditorCo
             editor.model.document.selection,
             "imageInline"
         );
-        writer.setSelection(image.parent, "end");
+        writer.setSelection(image.parent, "end"); // deselect the selected image, otherwise further actions will overwrite it
         if (resource.type === ResourceType.DOCUMENT) {
             // we get without extension for now to avoid a copy/paste issue in ckeditor
             // pasting with the extension will cause ckeditor to look to embed the file again

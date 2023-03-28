@@ -1,4 +1,3 @@
-
 import { EditorEvent } from "@js/editor/event/editorEvent";
 import { EditorConfig } from "@js/editor/types/editorTypes";
 import { surroundUnsurroundedTokens } from "@js/editor/settings/tokensSettings";
@@ -27,7 +26,7 @@ export function initCheckData(textarea: HTMLTextAreaElement, config: EditorConfi
 function onEditorCheckData(event: CustomEvent) {
     const editor = window.sbProps.editors[event.target.id || event.target.name];
 
-    if (editor.config.sbConfig.hasTokens) {
-        editor.setData(surroundUnsurroundedTokens(editor.getData(), editor.config.sbConfig));
+    if (editor.config.get("sbConfig").hasTokens) {
+        editor.setData(surroundUnsurroundedTokens(editor.getData(), editor.config.get("sbConfig")));
     }
 }

@@ -74,8 +74,7 @@ export default class UploadAdapter {
             name: response.meta.name,
             type: response.meta.file.type,
         };
-        const config = this.editor.config.sbConfig as EditorConfig;
-        addResource(this.editor, resource, config);
+        addResource(this.editor, resource);
     }
 
     /**

@@ -67,7 +67,7 @@ export default class InsertResourceCommand extends Command {
                 },
             });
             const resource = (await response.json()) as Resource;
-            addResource(this.editor, resource, this.editor.config.sbConfig as EditorConfig);
+            addResource(this.editor, resource);
         } catch (error) {
             console.warn(error);
         }

@@ -90,5 +90,6 @@ export function getConfig(config: EditorConfig) {
         ...getTokensSettings(config),
         ...getWordCountSettings(),
         ...getHTMLSupportSettings(),
+        sbConfig: { ...config }, // to be able to access our editor config from within the editor,
     };
 }

@@ -23,17 +23,6 @@ function addToGlobalScope(editor: Editor, textarea: HTMLTextAreaElement) {
 }
 
 /**
- * To be able to access our editor config from within the editor,
- * we just append the .sbConfig to the editor config instance
- *
- * @param { Editor } editor - the CKEditor instance
- * @param { EditorConfig } config - the CKEditor config object
- */
-function addSBConfigToEditor(editor: Editor, config: EditorConfig) {
-    editor.config.sbConfig = config;
-}
-
-/**
  * For the simple editor, we need to disable the drag and drop
  * and the ability for the editor to auto embed media
  *
@@ -112,7 +101,7 @@ async function attachInspector(editor: Editor) {
  */
 export async function modifyEditor(textarea: HTMLTextAreaElement, editor: Editor, config: EditorConfig) {
     addToGlobalScope(editor, textarea);
-    addSBConfigToEditor(editor, config);
+    // addSBConfigToEditor(editor, config);
     insertWordCount(textarea, editor, config);
     disableAutoMedia(editor, config);
     removeValidation();

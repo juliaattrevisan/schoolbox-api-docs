@@ -93,7 +93,7 @@ export default class InsertResourceLinkCommand extends Command {
                 },
             });
             const resource = (await response.json()) as Resource;
-            const src = getSrc(resource, this.editor.config.sbConfig as EditorConfig);
+            const src = getSrc(resource, this.editor.config.get("sbConfig") as EditorConfig);
             this.updateLink(src);
         } catch (error) {
             console.error(error);
