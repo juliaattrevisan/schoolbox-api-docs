@@ -21,9 +21,9 @@ import { useUpdateNodeStore } from "../activeNode/store/mcUpdateNodeStore";
 import { useSearchStore } from "../store/mcSearchStore";
 import McViewNodeCheckbox from "./mc-view-node-checkbox.vue";
 import McViewNodeName from "./mc-view-node-name.vue";
-import McViewNodeUsage from "./mc-view-node-usage.vue";
+import McViewNodeUsageSummary from "./mc-view-node-usage-summary.vue";
 import McViewNodeActions from "./mc-view-node-actions.vue";
-import McNodeUsage from "../activeNode/mc-node-usage.vue";
+import McNodeUsageDetails from "../activeNode/mc-node-usage-details.vue";
 import McAddSubsection from "../activeNode/mc-add-subsection.vue";
 import McUpdateNode from "../activeNode/mc-update-node.vue";
 
@@ -253,7 +253,7 @@ const showUsage = computed(() => props.node.id !== UNSET_ID && !searchStore.isAc
                     />
                 </div>
                 <div class="inner-containers">
-                    <mc-view-node-usage
+                    <mc-view-node-usage-summary
                         v-if="showUsage"
                         :node="props.node"
                         :title="title"
@@ -272,7 +272,7 @@ const showUsage = computed(() => props.node.id !== UNSET_ID && !searchStore.isAc
                 </div>
             </div>
             <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
-                <mc-node-usage v-if="isViewing" :depth="props.depth" />
+                <mc-node-usage-details v-if="isViewing" :depth="props.depth" />
             </Transition>
             <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
                 <mc-add-subsection v-if="isAdding" :depth="props.depth" />

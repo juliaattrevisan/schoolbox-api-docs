@@ -5,10 +5,10 @@
  */
 
 import { ref } from "vue";
-import SequentialRevealModal from "@schoolboxVue/components/sequential-reveal-modal";
-import BadgeDetail from "./badgeDetail";
-import NodeDetails from "@schoolboxCurriculum/vue/node-details";
+import SequentialRevealModal from "@schoolboxVue/components/sequential-reveal-modal.vue";
+import NodeDetails from "@schoolboxCurriculum/vue/node-details.vue";
 import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
+import BadgeDetail from "./badgeDetail.vue";
 
 const props = defineProps({
     /**
@@ -28,18 +28,17 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["closed"]);
-
-const sequenceIndex = ref(1);
+const isNextSelected = ref(false);
 const selectedNodeDetails = ref(getEmptyNode());
 
 /**
  * a code has been selected in the detail modal
  *
- * @pararm { object }
+ * @param { object } node - the selected node
  */
 function onCodeSelected(node) {
     selectedNodeDetails.value = node;
-    sequenceIndex.value++;
+    isNextSelected.value = true;
 }
 
 /**
@@ -51,11 +50,17 @@ function onModalClosed() {
 </script>
 
 <template>
-    <sequential-reveal-modal size="medium" :isOpen="isOpen" :sequence-index="sequenceIndex" @closed="onModalClosed">
-        <template v-slot:sequence-1>
-            <badge-detail v-if="badge" :badge="badge" @code-selected="onCodeSelected" />
+    <sequential-reveal-modal
+        size="medium"
+        :is-open="props.isOpen"
+        :is-next-selected="isNextSelected"
+        @next-opened="isNextSelected = false"
+        @closed="onModalClosed"
+    >
+        <template #sequence-1>
+            <badge-detail v-if="props.badge" :badge="props.badge" @code-selected="onCodeSelected" />
         </template>
-        <template v-slot:sequence-2>
+        <template #sequence-2>
             <node-details :node="selectedNodeDetails" />
         </template>
     </sequential-reveal-modal>

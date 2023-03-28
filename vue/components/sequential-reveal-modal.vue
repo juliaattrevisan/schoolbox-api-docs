@@ -1,12 +1,13 @@
 <script setup>
 /**
  * A sequential modal reveal using Foundations reveal modal: https://get.foundation/sites/docs-v5/bundle/reveal.html
- * Being sequential, when the 1st modal is open and the 2nd is selected, the 1st is closed and then the 2nd is displayed
- * and when the 2nd is closed, the 1st is displayed again
- * As this is a combination of Vue and Foundation for now, things are a little more complicated then they ideally should be
- * This is primarily due to having to track the opening and closing of modals and determining whether moving forwards or
- * backwards in sequence or close the modal entirely.
- * Also note we currently only handle two in the sequence as that's all that's need to be done for now.
+ * Being sequential, when the 1st modal is open and the 2nd is selected, the 1st is closed and then the 2nd is displayed.
+ * And when the 2nd is closed, the 1st is displayed again and on it goes.
+ * As this is a combination of Vue and Foundation, things are a little more complicated then they ideally should be.
+ * This is primarily due to having to track the opening and closing of modals and determining whether we are moving
+ * forwards or backwards in sequence or if we are closing the modal entirely.
+ * Also note we currently only handle three in the sequence as that's all that's needed for now.
+ * But to add more would just be a case of adding more slots in the template.
  */
 
 import { ref, watch } from "vue";
@@ -22,11 +23,11 @@ const props = defineProps({
         default: false,
     },
     /**
-     * The requested sequence index
+     * To move to the next in sequence
      */
-    sequenceIndex: {
-        type: Number,
-        default: 1,
+    isNextSelected: {
+        type: Boolean,
+        default: false,
     },
     /**
      * The size of the modal to display.
@@ -62,15 +63,14 @@ const props = defineProps({
     },
 });
 
-const emit = defineEmits(["closed"]);
+const emit = defineEmits(["closed", "nextOpened"]);
 const uuid = generateUUID();
 const elementId = ref(`reveal-modal-${uuid}`);
-const sequenceIndex = ref(props.sequenceIndex); //to help track the current sequence index independant of the prop
-const isNextSelected = ref(false); //to determine whether we need to move to the next in sequence
+const sequenceIndex = ref(1); // to help track the current sequence index independent of the prop
 let $modal;
 
 /**
- * to open the first modal in the sequence
+ * to open the first modal in sequence
  */
 watch(
     () => props.isOpen,
@@ -78,24 +78,21 @@ watch(
         if (isOpen) {
             sequenceIndex.value = 1;
             open();
-            addCloseListener();
-        } else if (!isOpen) {
-            //this can also be toggled when emit('closed') is dispatched, however if the modal is already closed nothing will happen
+            addClosedListener();
+        } else {
+            sequenceIndex.value = 1;
             close();
         }
     }
 );
 
 /**
- * the next in the sequence has been selected,
- * so close the current so we can move to the next
+ * to move to the next modal in sequence
  */
 watch(
-    () => props.sequenceIndex,
-    (newSequenceIndex) => {
-        if (sequenceIndex.value != newSequenceIndex) {
-            isNextSelected.value = true;
-            sequenceIndex.value++;
+    () => props.isNextSelected,
+    (isNextSelected) => {
+        if (isNextSelected) {
             close();
         }
     }
@@ -114,33 +111,36 @@ function open() {
  * moving forwards or backwards in sequence, things are a little more complicated
  * while we still use foundations modal setup
  */
-function addCloseListener() {
+function addClosedListener() {
+    $(document).off("closed.fndtn.reveal");
     $(document).on("closed.fndtn.reveal", "[data-reveal]", (event) => {
-        //to respond to the modal closing when requried
+        // to respond to the modal closing when requried
         if (!event.target.id.includes(elementId.value)) {
-            //can be multiple modals open at once
+            // can be multiple modals open at once
+            return;
+        }
+        if (props.isNextSelected) {
+            // moving to the next in sequence, we emit nextOpened so the props.isNextSelected can be set to false again in the parent
+            sequenceIndex.value += 1;
+            open();
+            emit("nextOpened");
             return;
         }
         if (sequenceIndex.value > 1) {
-            //the 1st is closed and the 2nd is active, so we open up the 2nd
+            // moving backwards in sequence
+            sequenceIndex.value -= 1;
             open();
-            sequenceIndex.value--; //so we can close target the 1st once the 2nd is closed
-        } else if (isNextSelected.value && sequenceIndex.value == 1) {
-            //the 2nd has been selected and is closed, so we open up the 1st
-            open();
-            isNextSelected.value = false; //so we can close the 1st
-        } else {
-            //the 1st is closed, and we aren't opening the 2nd so the modal is closed
-            emit("closed");
-            $(document).off("closed.fndtn.reveal");
+            return;
         }
+        // otherwise we are closing the modal entirely
+        emit("closed");
     });
 }
 
 /**
  * To prevent the modal being closed when it should be disabled
  *
- * @param { Event } select event
+ * @param { Event } event - the close event
  */
 function onCloseSelected(event) {
     if (props.isCloseDisabled) {
@@ -149,7 +149,8 @@ function onCloseSelected(event) {
 }
 
 /**
- * Close this modal
+ * Close the current modal, which will trigger addClosedListener
+ * once close is complete
  */
 function close() {
     $modal.foundation("reveal", "close");
@@ -172,6 +173,18 @@ function close() {
     >
         <!-- @slot Reveal modal content goes into this slot -->
         <slot name="sequence-2">Sequential Reveal 2</slot>
+        <a class="close-reveal-modal" aria-label="Close" @click.prevent="onCloseSelected">&#8592;</a>
+    </div>
+    <div
+        :id="`3-${elementId}`"
+        :class="`reveal-modal ${props.size}`"
+        data-reveal
+        :data-reveal-reopen="`2-${elementId}`"
+        aria-hidden="true"
+        role="dialog"
+    >
+        <!-- @slot Reveal modal content goes into this slot -->
+        <slot name="sequence-3">Sequential Reveal 3</slot>
         <a class="close-reveal-modal" aria-label="Close" @click.prevent="onCloseSelected">&#8592;</a>
     </div>
 </template>

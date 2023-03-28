@@ -6,10 +6,17 @@
 
 import { ref, computed, onMounted } from "vue";
 import { gsap } from "gsap/all";
-import { useModalActiveNodesStore, DIRECTION } from "../store/csModalActiveNodesStore";
+import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/transitions";
+import { useModalViewNodesStore, DIRECTION } from "../store/csModalViewNodesStore";
+import { useModalStore } from "../store/csModalStore";
 import { useModalSearchStore } from "../store/csModalSearchStore";
+import { useModalNodeUsageStore } from "../store/csModalNodeUsageStore";
+import { useModalActiveNodeStore } from "../store/csModalActiveNodeStore";
+import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 import CsModalNodeCheckbox from "./cs-modal-node-checkbox.vue";
 import CsModalNodeName from "./cs-modal-node-name.vue";
+import CsModalNodeUsageSummary from "./cs-modal-node-usage-summary.vue";
+import CsModalNodeUsageDetails from "./cs-modal-node-usage-details.vue";
 
 const props = defineProps({
     /**
@@ -35,8 +42,11 @@ const props = defineProps({
     },
 });
 
-const modalActiveNodesStore = useModalActiveNodesStore();
+const modalStore = useModalStore();
+const modalViewNodesStore = useModalViewNodesStore();
+const modalActiveNodeStore = useModalActiveNodeStore();
 const modalSearchStore = useModalSearchStore();
+const modalNodeUsageStore = useModalNodeUsageStore();
 const viewNodeEl = ref(null); //to animate the node
 
 /**
@@ -54,7 +64,7 @@ onMounted(() => {
  * fade on the node and slide it from forwards/backwards depending on the currentDirection
  */
 function animateOn() {
-    const xStart = modalActiveNodesStore.currentDirection === DIRECTION.FORWARDS ? -10 : 10;
+    const xStart = modalViewNodesStore.currentDirection === DIRECTION.FORWARDS ? -10 : 10;
     gsap.set(viewNodeEl.value, {
         opacity: 0,
         x: xStart,
@@ -107,14 +117,47 @@ const hasCode = computed(() => props.node.code && props.node.code !== "");
  * @returns { String }
  */
 const title = computed(() => (hasCode.value ? `[${props.node.code}] ${props.node.name}` : `${props.node.name}`));
+
+/**
+ * If there's another node being viewed
+ *
+ * @returns { boolean }
+ */
+const isViewingAnother = computed(() => modalNodeUsageStore.isOpen && modalActiveNodeStore.node.id !== props.node.id);
+
+/**
+ * Whether the usage should be displayed, shouldn't be if the modal is currently closed,
+ * we are at the root level node or if the search is active
+ *
+ * @returns { boolean }
+ */
+const showUsage = computed(() => modalStore.isOpen && props.node.id !== UNSET_ID && !modalSearchStore.isActive);
+
+/**
+ * If this is the active node being viewed
+ *
+ * @returns { boolean }
+ */
+const isViewing = computed(() => modalNodeUsageStore.isOpen && modalActiveNodeStore.node.id === props.node.id);
 </script>
 
 <template>
     <li ref="viewNodeEl">
-        <div :class="`buttons-container`">
+        <div :class="`buttons-container`" :data-is-inactive="isViewingAnother">
             <cs-modal-node-checkbox :node="props.node" />
-            <cs-modal-node-name :node="props.node" :depth="props.depth" :title="title" />
+            <cs-modal-node-name :node="props.node" :depth="props.depth" :title="title" :is-active="isViewing" />
+            <cs-modal-node-usage-summary
+                v-if="showUsage"
+                :node="props.node"
+                :title="title"
+                :is-viewing="isViewing"
+                :is-updating="false"
+                :is-adding="false"
+            />
         </div>
+        <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
+            <cs-modal-node-usage-details v-if="isViewing" :depth="props.depth" />
+        </Transition>
         <ul v-if="showChildren">
             <cs-modal-node v-for="node in props.node.children" :key="node.id" :node="node" :depth="props.depth + 1" />
         </ul>
@@ -127,9 +170,16 @@ const title = computed(() => (hasCode.value ? `[${props.node.code}] ${props.node
     border-bottom: 1px solid v-bind(borderBottomColour);
     display: flex;
     margin: 0 0 0 v-bind(marginLeft);
+    min-height: 52px;
+    overflow: hidden;
     padding: 2px;
     position: relative;
     transition: 0.3s;
+}
+
+[data-is-inactive="true"] {
+    opacity: 0.2;
+    pointer-events: none;
 }
 
 ul {

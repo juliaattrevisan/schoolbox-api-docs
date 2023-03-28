@@ -4,38 +4,35 @@
  * move backwards through the tree
  */
 
-import { shortenLength } from "@js/util/stringUtils";
-import { useModalActiveNodesStore } from "../store/csModalActiveNodesStore";
+import { useModalViewNodesStore } from "../store/csModalViewNodesStore";
+import CsModalHeaderBreadcrumb from "./cs-modal-header-breadcrumb.vue";
 
-const modalActiveNodesStore = useModalActiveNodesStore();
-const maxNameLength = 100;
+const props = defineProps({
+    /**
+     * to disable certain events when editing is taking place
+     */
+    isDisabled: {
+        type: Boolean,
+        required: true,
+    },
+});
 
-/**
- * to display the just selected node
- *
- * @param { number }
- * @param { number }
- */
-function onSelected(depth, id) {
-    modalActiveNodesStore.setSelected(depth, parseInt(id));
-}
+const modalViewNodesStore = useModalViewNodesStore();
 </script>
 
 <template>
     <TransitionGroup name="list" class="breadcrumb" tag="ul">
-        <li v-for="breadcrumb in modalActiveNodesStore.breadcrumbs" :key="breadcrumb.id">
-            <a
-                :href="`/curriculum/#${breadcrumb.id}`"
-                :title="`View ${breadcrumb.name}`"
-                @click.prevent="onSelected(breadcrumb.depth, breadcrumb.id)"
-            >
-                {{ shortenLength(breadcrumb.name, maxNameLength) }}
-            </a>
-        </li>
+        <cs-modal-header-breadcrumb
+            v-for="breadcrumb in modalViewNodesStore.breadcrumbs"
+            :key="breadcrumb.id"
+            :breadcrumb="breadcrumb"
+            :is-disabled="props.isDisabled"
+        />
     </TransitionGroup>
 </template>
 
 <style lang="scss" scoped>
+//animate on/off the breadcrumbs, sliding in when added, sliding out when removed
 .list-enter-active,
 .list-leave-active {
     transition: all 0.3s ease;

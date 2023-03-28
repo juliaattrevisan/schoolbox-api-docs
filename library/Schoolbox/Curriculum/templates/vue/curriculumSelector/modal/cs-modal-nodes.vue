@@ -4,14 +4,14 @@
  * From here curriclum nodes can be selected
  */
 
-import { ref, computed, watch } from "vue";
-import { useModalActiveNodesStore } from "../store/csModalActiveNodesStore";
+import { ref, watch } from "vue";
+import { useModalViewNodesStore } from "../store/csModalViewNodesStore";
 import { useNodesStore } from "../store/csNodesStore";
 import { useModalSearchStore } from "../store/csModalSearchStore";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import CsModalNode from "./cs-modal-node.vue";
 
-const modalActiveNodesStore = useModalActiveNodesStore();
+const modalViewNodesStore = useModalViewNodesStore();
 const modalSearchStore = useModalSearchStore();
 const nodesStore = useNodesStore();
 const depth = ref(0); //to increment each time we go down the node tree to visually indicate children
@@ -29,7 +29,7 @@ function onClearSearchSelected() {
  * scroll may be at the bottom on change, which is a bit odd
  */
 watch(
-    () => modalActiveNodesStore.nodes,
+    () => modalViewNodesStore.nodes,
     () => {
         if (nodesContainerEl.value) {
             //may not always exists in the dom
@@ -50,15 +50,10 @@ watch(
     <div v-else-if="modalSearchStore.hasNoResults" class="empty-state-flex-centered">
         <i class="icon-curriculum"></i>
         <p>No Curriculum matches your current search.</p>
-        <button
-            @click.prevent="onClearSearchSelected"
-            title="Clear the current search"
-        >
-            Clear search
-        </button>
+        <button @click.prevent="onClearSearchSelected" title="Clear the current search">Clear search</button>
     </div>
     <ul v-else ref="nodesContainerEl">
-        <cs-modal-node v-for="node in modalActiveNodesStore.nodes" :key="node.id" :node="node" :depth="depth" />
+        <cs-modal-node v-for="node in modalViewNodesStore.nodes" :key="node.id" :node="node" :depth="depth" />
     </ul>
 </template>
 

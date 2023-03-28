@@ -7,29 +7,16 @@
 import type { Node } from "@schoolboxCurriculum/types/Node";
 import { ActivityTypes } from "@schoolboxCurriculum/types/Node";
 import { getUsageIcon, getTotalUsage } from "@schoolboxCurriculum/js/nodeUtils";
-import { useNodeUsageStore } from "../activeNode/store/mcNodeUsageStore";
 
 interface Props {
     node: Node; // the assigned node to display
     title: string; // the already computed node title
     isViewing: boolean; // to disable certain events when viewing the node
-    isUpdating: boolean; // to disable certain events when updating the node
-    isAdding: boolean; // to disable certain events when adding a node
+    isDisabled: boolean; // to disable certain events when updating the node
 }
 
 const props = defineProps<Props>();
-const nodeUsageStore = useNodeUsageStore();
-
-/**
- * to open up or close the view modal
- */
-function onViewToggleSelected() {
-    if (props.isViewing) {
-        nodeUsageStore.cancel();
-    } else {
-        nodeUsageStore.prompt(props.node);
-    }
-}
+const emit = defineEmits(["selected"]);
 </script>
 
 <template>
@@ -37,8 +24,8 @@ function onViewToggleSelected() {
         v-if="getTotalUsage(props.node) > 0"
         class="usage-counts"
         :title="`View ${props.title}`"
-        :disabled="props.isUpdating || props.isAdding"
-        @click.prevent="onViewToggleSelected"
+        :disabled="props.isDisabled"
+        @click.prevent="emit('selected')"
     >
         <span
             v-if="props.node._usageCounts?.course > 0"
@@ -66,20 +53,20 @@ function onViewToggleSelected() {
         >
     </button>
     <button
-        v-if="getTotalUsage(props.node) > 0 || node.description !== ''"
+        v-if="getTotalUsage(props.node) > 0 || props.node.description !== ''"
         :class="`button-action-option ${props.isViewing ? 'icon-close' : 'icon-curriculum-details'}`"
         :title="`View ${props.title}`"
-        :disabled="props.isUpdating || props.isAdding"
+        :disabled="props.isDisabled"
         data-test-view
-        @click.prevent="onViewToggleSelected"
+        @click.prevent="emit('selected')"
     >
         View {{ props.title }}
     </button>
 </template>
 
 <style lang="scss" scoped>
-@import "./style/mcViewNode";
-@import "../style/mcIconColours";
+@import "@schoolboxCurriculum/vue/style/viewNode";
+@import "./style/iconColours";
 .button-action-option {
     @extend .button;
     color: var(--content-ui-foreground);

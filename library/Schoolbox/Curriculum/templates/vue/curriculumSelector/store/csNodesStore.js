@@ -5,7 +5,7 @@
 import { defineStore } from "pinia";
 import { UNSET_ID, findById } from "@schoolboxCurriculum/js/nodeUtils";
 import { useStore, apiEndpoint } from "./curriculumSelectorStore";
-import { useModalActiveNodesStore } from "./csModalActiveNodesStore";
+import { useModalViewNodesStore } from "./csModalViewNodesStore";
 
 export const useNodesStore = defineStore(`csNodes`, {
     state: () => ({
@@ -70,7 +70,7 @@ export const useNodesStore = defineStore(`csNodes`, {
             if (this.hasSingleCurriculum) {
                 //we jump straight to the only node available if there's only one
                 const singleCurriculumId = this.nodes.children[0].id;
-                await useModalActiveNodesStore().setNextSelected(singleCurriculumId); //load in its children for initial display
+                await useModalViewNodesStore().setNextSelected(singleCurriculumId); //load in its children for initial display
             }
         },
 

@@ -76,7 +76,7 @@ export default {
     data() {
         return {
             isModalOpen: false, //trigger to open/close the modal
-            modalIndex: 1, //the sequence number the sequential modal is currently on
+            isNextSelected: false, // to trigger the next selection in the sequential reveal modal
             award: {},
             canvasWidth: 0,
             canvasHeight: 0,
@@ -219,7 +219,7 @@ export default {
          */
         onCodeSelected(node) {
             this.selectedNode = node;
-            this.modalIndex++;
+            this.isNextSelected = true;
         },
 
         /**
@@ -346,7 +346,13 @@ export default {
 };
 </script>
 <template>
-    <sequential-reveal-modal size="medium" :isOpen="isModalOpen" :sequence-index="modalIndex" @closed="onModalClosed">
+    <sequential-reveal-modal
+        size="medium"
+        :is-open="isModalOpen"
+        :is-next-selected="isNextSelected"
+        @next-opened="isNextSelected = false"
+        @closed="onModalClosed"
+    >
         <template v-slot:sequence-1>
             <template v-if="award.badge">
                 <div class="badge-modal">
@@ -425,10 +431,7 @@ export default {
                             >
                                 Award with Evidence
                             </a>
-                            <button
-                                v-if="hasGoalAwardLink() && isUnawardedGoal()"
-                                @click.prevent="awardAchievement"
-                            >
+                            <button v-if="hasGoalAwardLink() && isUnawardedGoal()" @click.prevent="awardAchievement">
                                 Award
                             </button>
                         </section>

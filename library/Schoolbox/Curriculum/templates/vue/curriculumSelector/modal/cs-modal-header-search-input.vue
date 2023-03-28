@@ -5,18 +5,28 @@
 
 import { computed, watch } from "vue";
 import debounce from "lodash/debounce";
-import { useModalActiveNodesStore } from "../store/csModalActiveNodesStore";
 import { useModalSearchStore, DEBOUNCE_AMOUNT } from "../store/csModalSearchStore";
+import { useModalViewNodesStore } from "../store/csModalViewNodesStore";
 
-const modalActiveNodesStore = useModalActiveNodesStore();
+const props = defineProps({
+    /**
+     * to disable certain events when editing is taking place
+     */
+    isDisabled: {
+        type: Boolean,
+        required: true,
+    },
+});
+
 const modalSearchStore = useModalSearchStore();
+const modalViewNodesStore = useModalViewNodesStore();
 
 /**
  * Only enable search once a first node is selected
  *
  * @returns { Boolean }
  */
-const isDisabled = computed(() => !modalActiveNodesStore.isActive);
+const isDisabled = computed(() => !modalViewNodesStore.isActive || props.isDisabled);
 
 /**
  * Only enable search once a first node is selected
@@ -24,7 +34,7 @@ const isDisabled = computed(() => !modalActiveNodesStore.isActive);
  * @returns { String }
  */
 const placeholder = computed(() => {
-    if (isDisabled.value) {
+    if (!modalViewNodesStore.isActive) {
         return "Expand a curriculum to enable search...";
     } else {
         return `Search for codes or keywords...`;
@@ -74,6 +84,7 @@ function onClearSearchSelected() {
             v-if="modalSearchStore.query !== ''"
             title="Clear the current search"
             class="button icon-close"
+            :disabled="isDisabled"
             @click.prevent="onClearSearchSelected"
         >
             Clear
