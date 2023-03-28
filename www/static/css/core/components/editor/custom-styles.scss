@@ -112,7 +112,7 @@ blockquote {
     --ck-custom-shadow-white: rgba(255, 255, 255, 0.15);
 }
 
-.schoolbox-ck {
+.sb-ck {
     /* Applies to all custom styles. */
     &-banner,
     &-callout--info,
@@ -335,7 +335,7 @@ blockquote {
 }
 
 /* Code block styling */
-p.schoolbox-ck-code-block {
+p.sb-ck-code-block {
     background-color: var(--ck-custom-code-bg);
     border: none;
     border-radius: 0.25rem;
