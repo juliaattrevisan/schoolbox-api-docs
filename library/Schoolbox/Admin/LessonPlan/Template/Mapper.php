@@ -159,6 +159,7 @@ class Mapper extends \Schoolbox\Mapper
      * @param User $user
      * @param int  $limit
      * @return GenericCollection
+     * @throws \InvalidArgumentException
      * @throws \PDOException
      */
     public function findRecentlyUsed(\Schoolbox\User $user, int $limit = 3): GenericCollection
@@ -180,16 +181,19 @@ class Mapper extends \Schoolbox\Mapper
          * the rest.
          *
          * Make a unique query to do that, I guess, to save some hydration
+         *
+         * Note: this is a groupwise maximum.
          */
         $query = "
-            SELECT {$this->getColumnString('lessonPlanTemplate')} 
-            FROM lesson_plan
-            INNER JOIN assessment ON lesson_plan.assessment_id = assessment.id
-            INNER JOIN {$this->getTable()} AS lessonPlanTemplate ON lesson_plan.lesson_plan_template_id = lessonPlanTemplate.id
-            WHERE lesson_plan.created_by = :creatorId
-            AND lessonPlanTemplate.enabled = :enabled
-            GROUP BY lesson_plan_template_id
-            ORDER BY assessment.created_at DESC LIMIT :limit
+            SELECT lpt.id, MAX(a.created_at) AS created_at
+            FROM assessment a
+            INNER JOIN lesson_plan lp ON a.id = lp.assessment_id
+            INNER JOIN {$this->getTable()} lpt ON lp.lesson_plan_template_id = lpt.id
+            WHERE lp.created_by = :creatorId
+            AND lpt.enabled = :enabled
+            GROUP BY lpt.id
+            ORDER BY created_at DESC
+            LIMIT :limit
         ";
 
         $statement = $this->getDatabase()->prepare($query);

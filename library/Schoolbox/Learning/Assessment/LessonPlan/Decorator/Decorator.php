@@ -36,7 +36,7 @@ class Decorator implements DecoratorInterface
      * rows and mix-and-match them with existing ones in some
      * arbitrary user-chosen order.
      */
-    private const NEW_KEYWORD = 'new';
+    public const NEW_KEYWORD = 'new';
 
 
     /**

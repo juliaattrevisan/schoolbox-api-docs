@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Assessment\Task;
 
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Web\Exception\InvalidStatusCode;
+use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Course\Task\Completion as TaskCompletion;
 use Schoolbox\Cyberhound\Url\Translator;
@@ -17,6 +18,7 @@ use Schoolbox\Error;
 use Schoolbox\Error\Mapper;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory;
+use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanDataModelMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Participant;
@@ -71,6 +73,8 @@ class Controller extends Assessment\Controller
      * @param Replicator                            $replicator
      * @param LatestViewMapper                      $latestViewMapper
      * @param Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
+     * @param LessonPlanTemplateMapper              $lessonPlanTemplateMapper
+     * @param LessonPlanDataModelMapper             $lessonPlanDataModelMapper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -87,7 +91,9 @@ class Controller extends Assessment\Controller
         UnitSpecificationMapper $unitSpecificationMapper,
         Replicator $replicator,
         LatestViewMapper $latestViewMapper,
-        protected Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
+        protected Assessment\Project\ResultCache\Mapper $projectResultCacheMapper,
+        protected LessonPlanTemplateMapper $lessonPlanTemplateMapper,
+        protected LessonPlanDataModelMapper $lessonPlanDataModelMapper
     ) {
         parent::__construct(
             $userMapper,
@@ -103,7 +109,9 @@ class Controller extends Assessment\Controller
             $unitSpecificationMapper,
             $replicator,
             $latestViewMapper,
-            $projectResultCacheMapper
+            $projectResultCacheMapper,
+            $lessonPlanTemplateMapper,
+            $lessonPlanDataModelMapper
         );
         $this->taskResponseDataSource = $taskResponseDataSource;
     }

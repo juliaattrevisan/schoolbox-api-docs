@@ -12,6 +12,7 @@ use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
 use InvalidArgumentException;
 use LogicException;
+use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -19,6 +20,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel;
+use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanDataModelMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Project;
@@ -56,7 +58,9 @@ class Controller extends Assessment\Controller
         UnitSpecificationMapper $unitSpecificationMapper,
         Replicator $replicator,
         LatestViewMapper $latestViewMapper,
-        protected Project\ResultCache\Mapper $projectResultCacheMapper
+        protected Project\ResultCache\Mapper $projectResultCacheMapper,
+        protected LessonPlanTemplateMapper $lessonPlanTemplateMapper,
+        protected LessonPlanDataModelMapper $lessonPlanDataModelMapper
     ) {
         parent::__construct(
             $userMapper,
@@ -72,7 +76,9 @@ class Controller extends Assessment\Controller
             $unitSpecificationMapper,
             $replicator,
             $latestViewMapper,
-            $this->projectResultCacheMapper
+            $this->projectResultCacheMapper,
+            $lessonPlanTemplateMapper,
+            $lessonPlanDataModelMapper
         );
     }
 
