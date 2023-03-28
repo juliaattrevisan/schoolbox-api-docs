@@ -12,7 +12,6 @@ use Schoolbox\Resource\File\Mapper as FileMapper;
 
 class Component_Homepage_ScrollerController extends Component_Homepage_ControllerAbstract
 {
-
     /**
      * @var FileMapper
      */

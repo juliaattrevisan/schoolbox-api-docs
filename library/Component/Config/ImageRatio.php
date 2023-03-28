@@ -8,7 +8,6 @@
  */
 class Component_Config_ImageRatio extends Component_Config_Abstract
 {
-
     protected $options       = array('auto', 'portrait', 'square', 'landscape', 'panorama', 'banner');
     protected $showAllOption = true;
 

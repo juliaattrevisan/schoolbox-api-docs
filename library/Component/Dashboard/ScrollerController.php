@@ -15,7 +15,6 @@ use Schoolbox\Resource\File\Mapper as FileMapper;
 
 class Component_Dashboard_ScrollerController extends Component_Dashboard_ControllerAbstract
 {
-
     /**
      * @var FileMapper
      */
