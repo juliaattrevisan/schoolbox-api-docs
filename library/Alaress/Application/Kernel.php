@@ -267,7 +267,7 @@ abstract class Kernel
     protected function postInstallDependencies(): void
     {
         $config = new ConfigLoader();
-        session_save_path(PipeManager::getSessionSavePath($config->get('redis_url')));
+        session_save_path(PipeManager::getSessionSavePath($config->get(ConfigMapper::NAME_REDIS_URL)));
     }
 
     /**
@@ -392,7 +392,7 @@ abstract class Kernel
         });
 
         // Redis storage (persisted to disk)
-        Redis::getStorageInstance()->connect($config->get('redis_url'), null, INSTANCE_ID);
+        Redis::getStorageInstance()->connect($config->get(ConfigMapper::NAME_REDIS_URL), null, INSTANCE_ID);
         $di->set('redis.storage', function () {
             return Redis::getStorageClientInstance();
         });

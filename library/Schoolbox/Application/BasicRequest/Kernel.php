@@ -93,7 +93,7 @@ class Kernel extends WebKernelAbstract
         $di->set('redis.cache', Redis::getCacheClientInstance());
 
         // Redis storage (persisted to disk)
-        Redis::getStorageInstance()->connect($config->get('redis_url'), null, INSTANCE_ID);
+        Redis::getStorageInstance()->connect($config->get(ConfigMapper::NAME_REDIS_URL), null, INSTANCE_ID);
         $di->set('redis.storage', Redis::getStorageClientInstance());
 
         // Redis queue publish (not persistent)
