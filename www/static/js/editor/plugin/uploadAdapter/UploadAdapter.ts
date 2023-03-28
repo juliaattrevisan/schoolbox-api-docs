@@ -4,10 +4,9 @@
  *
  */
 
-import { getURL } from "@js/editor/plugin/resource/resourceUtils";
 import type { EditorConfig } from "@js/editor/types/editorTypes";
 import type { Resource } from "@js/editor/plugin/resource/resourceUtils";
-import { getWithoutExtension } from "@js/util/fileUtils";
+import { addResource } from "@js/editor/plugin/resource/resourceUtils";
 
 export default class UploadAdapter {
     loader: unknown;
@@ -68,43 +67,15 @@ export default class UploadAdapter {
         if (!response || !response.success) {
             return reject(response && response.error ? response.message : genericErrorText);
         }
-        const meta = response.meta as JSON;
+        const resource: Resource = {
+            filesystem: "store",
+            hash: response.meta.file.hash,
+            mime: response.meta.file.mime,
+            name: response.meta.name,
+            type: response.meta.file.type,
+        };
         const config = this.editor.config.sbConfig as EditorConfig;
-        const imageUtils = this.editor.plugins.get("ImageUtils");
-        if (meta.file.type === "image") {
-            const attributes = {
-                src: getURL(meta.file._links.image, config),
-                alt: meta.name,
-            };
-            this.editor.model.change((writer) => {
-                const image = imageUtils.insertImage(attributes, this.editor.model.document.selection, "imageInline");
-                writer.setSelection(image.parent, "end");
-                this.editor.execute("enter");
-            });
-        }
-        if (meta.file.type === "document") {
-            const attributes = {
-                src: getURL(meta.file._links.icon, config),
-                alt: meta.name,
-                linkHref: getURL(meta.file._links.fetch, config),
-                linkToggleDownloadable: "true",
-            };
-            imageUtils.insertImage(attributes, this.editor.model.document.selection, "imageInline");
-            this.editor.model.change((writer) => {
-                const image = imageUtils.insertImage(attributes, this.editor.model.document.selection, "imageInline");
-                this.editor.execute("resizeImage", { width: "24px" });
-                writer.setSelection(image.parent, "end");
-                // we get without extension for now to avoid a copy/paste issue in ckeditor
-                // pasting with the extension will cause ckeditor to look to embed the file again
-                this.editor.model.insertContent(
-                    writer.createText(`${getWithoutExtension(meta.name)}`, {
-                        linkHref: getURL(meta.file._links.fetch, config),
-                        linkToggleDownloadable: "true",
-                    })
-                );
-                this.editor.execute("enter");
-            });
-        }
+        addResource(this.editor, resource, config);
     }
 
     /**

@@ -3,7 +3,7 @@
  */
 
 import Command from "@ckeditor/ckeditor5-core/src/command";
-import { getAttributes } from "./resourceUtils";
+import { getAttributes, addResource } from "./resourceUtils";
 import type { Resource } from "./resourceUtils";
 import type { EditorConfig } from "@js/editor/types/editorTypes";
 
@@ -64,11 +64,9 @@ export default class InsertResourceCommand extends Command {
                 },
             });
             const resource = (await response.json()) as Resource;
-            const attributes = getAttributes(resource, this.editor.config.sbConfig as EditorConfig);
-            const imageUtils = this.editor.plugins.get("ImageUtils");
-            imageUtils.insertImage(attributes, this.editor.model.document.selection, "imageInline");
+            addResource(this.editor, resource, this.editor.config.sbConfig as EditorConfig);
         } catch (error) {
-            console.error(error);
+            console.warn(error);
         }
         // to close the resource modal
         $("#file-picker").foundation("reveal", "close");

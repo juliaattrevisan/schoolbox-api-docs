@@ -3,6 +3,8 @@
  */
 
 import type { EditorConfig } from "@js/editor/types/editorTypes";
+import type { Editor } from "@ckeditor/ckeditor5-core";
+import { getWithoutExtension } from "@js/util/fileUtils";
 
 /**
  * Get the url of the resource, and if we have specified a baseHref, to then use that
@@ -54,7 +56,6 @@ export enum ResourceType {
 export type Resource = {
     filesystem: string;
     hash: string;
-    id: string;
     mime: string;
     name: string;
     type: ResourceType.IMAGE | ResourceType.VIDEO | ResourceType.AUDIO | ResourceType.FOLDER | ResourceType.DOCUMENT;
@@ -189,6 +190,7 @@ function getDocumentAttributes(resource: Resource, config: EditorConfig) {
         src: getURL(`/ajax/mime/${resource.mime}`, config),
         alt: resource.name,
         linkHref: getURL(`/storage/fetch.php?hash=${resource.hash}`, config),
+        linkToggleDownloadable: "true",
     };
 }
 
@@ -306,4 +308,42 @@ export function getSrc(resource: Resource, config: EditorConfig) {
     }
     // Default assumption (not sure where this manifests anymore, sorry)
     return getFileSrc(resource, config);
+}
+
+/**
+ * Add a resource into the editor
+ *
+ * @param { Editor } editor - the ckeditor instance
+ * @param { Resource } resource - the resource
+ * @param { EditorConfig } config - the editor config
+ */
+export function addResource(editor: Editor, resource: Resource, config: EditorConfig) {
+    const imageUtils = editor.plugins.get("ImageUtils");
+    if (resource.type === ResourceType.IMAGE) {
+        editor.model.change((writer) => {
+            const image = imageUtils.insertImage(
+                getImageAttributes(resource, config),
+                editor.model.document.selection,
+                "imageInline"
+            );
+            writer.setSelection(image.parent, "end");
+            editor.execute("enter");
+        });
+    }
+    if (resource.type === ResourceType.DOCUMENT) {
+        editor.model.change((writer) => {
+            const image = imageUtils.insertImage(
+                { ...getDocumentAttributes(resource, config), width: "24px" },
+                editor.model.document.selection,
+                "imageInline"
+            );
+            writer.setSelection(image.parent, "end");
+            // we get without extension for now to avoid a copy/paste issue in ckeditor
+            // pasting with the extension will cause ckeditor to look to embed the file again
+            editor.model.insertContent(
+                writer.createText(`${getWithoutExtension(resource.name)}`, getDocumentAttributes(resource, config))
+            );
+            editor.execute("enter");
+        });
+    }
 }
