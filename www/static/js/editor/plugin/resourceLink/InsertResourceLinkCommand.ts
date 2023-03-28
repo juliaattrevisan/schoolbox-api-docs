@@ -9,6 +9,8 @@ import type { Resource } from "@js/editor/plugin/resource/resourceUtils";
 import type { EditorConfig } from "@js/editor/types/editorTypes";
 
 export default class InsertResourceLinkCommand extends Command {
+    messageBinding; // as .bind() returns a new function object, we need to store it in a variable
+
     /**
      * To open the Resource modal and insert the selected resource into the editor
      *
@@ -27,8 +29,9 @@ export default class InsertResourceLinkCommand extends Command {
     execute() {
         this.set("isOn", true);
         this.displayModal();
-        window.removeEventListener("message", this.onResourceReturned.bind(this));
-        window.addEventListener("message", this.onResourceReturned.bind(this));
+        this.messageBinding = this.onResourceReturned.bind(this);
+        window.removeEventListener("message", this.messageBinding);
+        window.addEventListener("message", this.messageBinding);
     }
 
     /**
@@ -118,7 +121,7 @@ export default class InsertResourceLinkCommand extends Command {
                     status = message.data[0].status;
                 }
                 if (status === "success") {
-                    window.removeEventListener("message", this.onResourceReturned);
+                    window.removeEventListener("message", this.messageBinding);
                     this.getResourceInfo(message.data[0].hash as string);
                 } else {
                     // Unknown status: assume error and do nothing, as the modal already shows the error
