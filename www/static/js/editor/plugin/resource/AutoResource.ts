@@ -44,8 +44,33 @@ export default class ResourceEditing extends Plugin {
         const meta = element.querySelector("[data-progress-meter]");
         const loader = fileRepository.createLoader(file);
         loader.on("change:uploadedPercent", (evt, name, value) => this.onUploadProgress(value, element, meta));
-        loader.upload();
-        resourceUI.checkUploadContainer();
+        // loader.upload();
+        loader
+            .read()
+            .then(() => {
+                const promise = loader.upload();
+                resourceUI.checkUploadContainer();
+                return promise;
+            })
+            .then((data) => {
+                console.warn("resource uploaded");
+            })
+            .catch((error) => {
+                // If status is not 'error' nor 'aborted' - throw error because it means that something else went wrong,
+                // it might be generic error and it would be real pain to find what is going on.
+                if (loader.status !== "error" && loader.status !== "aborted") {
+                    throw error;
+                }
+
+                // Might be 'aborted'.
+                if (loader.status === "error" && error) {
+                    notification.showWarning(error, {
+                        title: t("Upload failed"),
+                        namespace: "upload",
+                    });
+                }
+            });
+        // resourceUI.checkUploadContainer();
     }
 
     /**
