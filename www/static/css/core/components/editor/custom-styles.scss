@@ -44,6 +44,22 @@
 }
 
 /**
+ *  The below styles apply some sort of custom styling to the CK Editor toolbar itself.
+**/
+.ck-body-wrapper .ck {
+    button.ck-button-resource-link {
+        background-color: var(--ck-color-button-on-active-background);
+        color: var(--ck-color-button-on-color);
+
+        &:hover,
+        &:active {
+            color: white;
+            background-color: var(--ck-color-button-on-color);
+        }
+    }
+}
+
+/**
  *  CKEditor custom font sizes - they exist internally inside an editor.css file
  *  but that file isn't imported onto a page unless you explicitly import it or
  *  there's a CKEditor instance on the page.
