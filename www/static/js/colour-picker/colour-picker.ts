@@ -3,13 +3,25 @@ import Coloris from "@melloware/coloris";
 import tinycolor from "tinycolor2";
 import "./colour-picker.css";
 
+// These are for the colour picker swatches
+// We want to use the first 3 unique colours from skin config, and then add the constant colours
+const skinColours: string[] = window.sbProps.colourDefaults["skin"];
+const constantColours: string[] = window.sbProps.colourDefaults["constant"];
+
+// We only want the first 3 unique skinColours, if there are less than 3 unique colours, we'll use the first 3 colours but bias towards the unique colours
+const uniqueSkinColours = [...new Set(skinColours)];
+const chosenSkinColours =
+    uniqueSkinColours.length > 3
+        ? uniqueSkinColours.slice(0, 3)
+        : [...uniqueSkinColours, ...skinColours].slice(0, 3);
+
 const colorPickerDefaults = {
     theme: "default",
     margin: 10,
     format: "hex",
     alpha: true,
     focusInput: true,
-    swatches: window.sbProps.colourDefaults
+    swatches: [...chosenSkinColours, ...constantColours],
 };
 
 Coloris.init();
