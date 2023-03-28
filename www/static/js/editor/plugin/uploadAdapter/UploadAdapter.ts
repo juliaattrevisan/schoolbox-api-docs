@@ -4,9 +4,7 @@
  *
  */
 
-import type { EditorConfig } from "@js/editor/types/editorTypes";
 import type { Resource } from "@js/editor/plugin/resource/resourceUtils";
-import { addResource } from "@js/editor/plugin/resource/resourceUtils";
 
 export default class UploadAdapter {
     loader: unknown;
@@ -73,7 +71,7 @@ export default class UploadAdapter {
             name: response.meta.name,
             type: response.meta.file.type,
         };
-        addResource(this.editor, resource);
+        resolve(resource);
     }
 
     /**
@@ -85,8 +83,14 @@ export default class UploadAdapter {
      */
     initListeners(resolve: Function, reject: Function, file: File) {
         const genericErrorText = `Couldn't upload file: ${file.name}.`;
-        this.xhr.addEventListener("error", () => reject(genericErrorText));
-        this.xhr.addEventListener("abort", () => reject());
+        this.xhr.addEventListener("error", (event) => {
+            debugger;
+            return reject(genericErrorText);
+        });
+        this.xhr.addEventListener("abort", () => {
+            debugger;
+            return reject();
+        });
         if (this.xhr.upload) {
             this.xhr.upload.addEventListener("progress", (event: ProgressEvent) => this.onLoading(event));
         }

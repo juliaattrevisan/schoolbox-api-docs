@@ -6,6 +6,8 @@
 import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
 import { slideUp } from "@js/util/animateUtils";
 import { isHtmlIncluded } from "@ckeditor/ckeditor5-image/src/imageupload/imageuploadediting";
+import type { Resource } from "@js/editor/plugin/resource/resourceUtils";
+import { addResource } from "@js/editor/plugin/resource/resourceUtils";
 
 export default class ResourceEditing extends Plugin {
     /**
@@ -27,7 +29,7 @@ export default class ResourceEditing extends Plugin {
             }
             const files = Array.from(data.dataTransfer._files);
             files.forEach((file) => {
-                this.displayUploadProgress(fileRepository, resourceUI, file as File);
+                this.loadResource(fileRepository, resourceUI, file as File);
             });
         });
     }
@@ -39,51 +41,21 @@ export default class ResourceEditing extends Plugin {
      * @param { ResourceUI } resourceUI - the resource UI plugin
      * @param { File } file - the file to upload
      */
-    displayUploadProgress(fileRepository, resourceUI, file: File) {
+    async loadResource(fileRepository, resourceUI, file: File) {
         const element = resourceUI.getProgressElement(file);
         const meta = element.querySelector("[data-progress-meter]");
         const loader = fileRepository.createLoader(file);
-        loader.on("change:uploadedPercent", (evt, name, value) => this.onUploadProgress(value, element, meta));
-        // loader.upload();
-        loader
-            .read()
-            .then(() => {
-                const promise = loader.upload();
-                resourceUI.checkUploadContainer();
-                return promise;
-            })
-            .then((data) => {
-                console.warn("resource uploaded");
-            })
-            .catch((error) => {
-                // If status is not 'error' nor 'aborted' - throw error because it means that something else went wrong,
-                // it might be generic error and it would be real pain to find what is going on.
-                if (loader.status !== "error" && loader.status !== "aborted") {
-                    throw error;
-                }
-
-                // Might be 'aborted'.
-                if (loader.status === "error" && error) {
-                    notification.showWarning(error, {
-                        title: t("Upload failed"),
-                        namespace: "upload",
-                    });
-                }
-            });
-        // resourceUI.checkUploadContainer();
-    }
-
-    /**
-     * To update the progress of the upload
-     *
-     * @param { number } value - the percentage of the upload
-     * @param { HTMLDivElement } element - the element to update
-     * @param { HTMLDivElement } meta - the element to update
-     */
-    onUploadProgress(value, element, meta) {
-        meta.style.width = `${value}%`;
-        if (value === 100) {
+        try {
+            loader.on("change:uploadedPercent", (event, name, value) => (meta.style.width = `${value}%`));
+            const resource: Resource = await loader.upload();
+            addResource(this.editor, resource);
             this.removeUploadProgress(element);
+        } catch (error) {
+            if (error === "aborted") {
+                console.warn("Uploading aborted.");
+            } else {
+                console.warn("Uploading error.", error);
+            }
         }
     }
 

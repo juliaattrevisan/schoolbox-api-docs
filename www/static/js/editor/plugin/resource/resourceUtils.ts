@@ -349,7 +349,6 @@ export function getSrc(resource: Resource, config: EditorConfig) {
 export function addResource(editor: Editor, resource: Resource) {
     const config = editor.config.get("sbConfig");
     const imageUtils = editor.plugins.get("ImageUtils");
-    console.warn(resource);
     editor.model.change((writer) => {
         const image = imageUtils.insertImage(
             getAttributes(resource, config),

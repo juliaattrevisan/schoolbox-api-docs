@@ -12,6 +12,7 @@ import List from "@ckeditor/ckeditor5-list/src/list";
 import BlockQuote from "@ckeditor/ckeditor5-block-quote/src/blockquote";
 import GeneralHtmlSupport from "@ckeditor/ckeditor5-html-support/src/generalhtmlsupport";
 import Legacy from "@js/editor/plugin/legacy/Legacy";
+import Notifcation from "@ckeditor/ckeditor5-ui/src/notification/notification";
 
 /**
  * All the core plugins
@@ -19,5 +20,17 @@ import Legacy from "@js/editor/plugin/legacy/Legacy";
  * @returns { object } - the core plugins
  */
 export function getCorePlugins() {
-    return [Essentials, Bold, Italic, Underline, Strikethrough, Link, List, BlockQuote, GeneralHtmlSupport, Legacy];
+    return [
+        Essentials,
+        Bold,
+        Italic,
+        Underline,
+        Strikethrough,
+        Link,
+        List,
+        BlockQuote,
+        GeneralHtmlSupport,
+        Legacy,
+        Notifcation,
+    ];
 }
