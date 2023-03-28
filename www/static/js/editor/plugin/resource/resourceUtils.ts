@@ -192,6 +192,7 @@ function getDocumentAttributes(resource: Resource, config: EditorConfig) {
         alt: resource.name,
         linkHref: getURL(`/storage/fetch.php?hash=${resource.hash}`, config),
         linkToggleDownloadable: "true",
+        width: "24px",
     };
 }
 
@@ -321,41 +322,19 @@ export function getSrc(resource: Resource, config: EditorConfig) {
 export function addResource(editor: Editor, resource: Resource, config: EditorConfig) {
     const imageUtils = editor.plugins.get("ImageUtils");
     editor.model.change((writer) => {
-        if (resource.type === ResourceType.IMAGE) {
-            const image = imageUtils.insertImage(
-                getImageAttributes(resource, config),
-                editor.model.document.selection,
-                "imageInline"
-            );
-            writer.setSelection(image.parent, "end");
-            editor.execute("enter");
-            return;
-        }
-        if (resource.type === ResourceType.VIDEO) {
-            const image = imageUtils.insertImage(
-                getVideoAttributes(resource, config),
-                editor.model.document.selection,
-                "imageInline"
-            );
-            console.warn(getVideoAttributes(resource, config));
-            writer.setSelection(image.parent, "end");
-            editor.execute("enter");
-            return;
-        }
+        const image = imageUtils.insertImage(
+            getAttributes(resource, config),
+            editor.model.document.selection,
+            "imageInline"
+        );
+        writer.setSelection(image.parent, "end");
         if (resource.type === ResourceType.DOCUMENT) {
-            const image = imageUtils.insertImage(
-                { ...getDocumentAttributes(resource, config), width: "24px" },
-                editor.model.document.selection,
-                "imageInline"
-            );
-            writer.setSelection(image.parent, "end");
             // we get without extension for now to avoid a copy/paste issue in ckeditor
             // pasting with the extension will cause ckeditor to look to embed the file again
             editor.model.insertContent(
                 writer.createText(`${getWithoutExtension(resource.name)}`, getDocumentAttributes(resource, config))
             );
-            editor.execute("enter");
-            return;
         }
+        editor.execute("enter");
     });
 }
