@@ -110,8 +110,9 @@
 }
 
 .resource-upload-container .card {
+    border-bottom: 1px solid var(--body-background);
     float: none;
-    margin-bottom: 1rem;
+    padding-bottom: 1rem;
 }
 
 /**
