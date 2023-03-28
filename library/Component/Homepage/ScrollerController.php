@@ -8,22 +8,15 @@
  */
 
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\File\Mapper as FileMapper;
 
 class Component_Homepage_ScrollerController extends Component_Homepage_ControllerAbstract
 {
 
     /**
-     * @var Schoolbox\Resource\File\Mapper
+     * @var FileMapper
      */
-    private $fileMapper;
-
-
-    /**
-     * Available sort fields for this component.
-     *
-     * @var string[]
-     */
-    protected $sortFields = array('name', 'date');
+    private FileMapper $fileMapper;
 
     /**
      * Prepares data for the render function. Business logic.
@@ -32,7 +25,7 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
      */
     public function execute()
     {
-        $this->setFileMapper(Schoolbox\Resource\File\Mapper::getInstance());
+        $this->fileMapper = FileMapper::getInstance();
         return true;
     }
 
@@ -95,17 +88,19 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
             $this->setVar('source_folder_deleted_block', '');
 
             // Set up component name
-            $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
+            $this->setComponentName(strlen(trim($this->getConfig('componentname')))
+                ? $this->getConfig('componentname') : $this->getComponentName());
 
-            $pixel = $this->getConfig('pixel') ? $this->getConfig('pixel') : 800;
-            $imageRatio = $this->getConfig('imageRatio') ? $this->getConfig('imageRatio') : 'auto';
+            $pixel = $this->getConfig('pixel') ?: 800;
+            $imageRatio = $this->getConfig('imageRatio') ?: 'auto';
 
             $this->setVar(
                 [
-                    'COMPONENT_CONFIG_TIMING_VALUE_MS'       => $this->getConfig('timing') ? $this->getConfig('timing') * 1000 : '2000',
+                    'COMPONENT_CONFIG_TIMING_VALUE_MS'       => $this->getConfig('timing')
+                        ? $this->getConfig('timing') * 1000 : '2000',
                     'COMPONENT_CONFIG_RANDOM_STARTING_SLIDE' => $this->getConfig('randomStartingSlide'),
                     'COMPONENT_CONFIG_IMAGE_RATIO'           => $imageRatio,
-                    'COMPONENT_CONFIG_SLIDESHOWTRANSITION'  => $this->getConfig('transition') ? $this->getConfig('transition') : 'swipe',
+                    'COMPONENT_CONFIG_SLIDESHOWTRANSITION'  => $this->getConfig('transition') ?: 'swipe',
                 ]
             );
 
@@ -175,28 +170,5 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
         }
 
         return true; // everything went according to plan
-    }
-
-    /* Getters/Setters
-     */
-
-
-    /**
-     * @return \Schoolbox\Resource\File\Mapper
-     */
-    public function getFileMapper()
-    {
-        return $this->fileMapper;
-    }
-
-
-    /**
-     * @param \Schoolbox\Resource\File\Mapper $fileMapper
-     * @return static
-     */
-    public function setFileMapper($fileMapper)
-    {
-        $this->fileMapper = $fileMapper;
-        return $this;
     }
 }

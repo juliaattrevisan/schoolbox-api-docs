@@ -11,15 +11,15 @@
  */
 
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\File\Mapper as FileMapper;
 
 class Component_Dashboard_ScrollerController extends Component_Dashboard_ControllerAbstract
 {
 
     /**
-     * @var Schoolbox\Resource\File\Mapper
+     * @var FileMapper
      */
-    private $fileMapper;
-
+    private FileMapper $fileMapper;
 
     /**
      * Available sort fields for this component.
@@ -39,7 +39,7 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
             return false;
         }
 
-        $this->setFileMapper(Schoolbox\Resource\File\Mapper::getInstance());
+        $this->fileMapper = FileMapper::getInstance();
         return true;
     }
 
@@ -78,8 +78,8 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
             $this->parse('has_header_block', 'has_header');
         }
 
-        $pixel = $this->getConfig('pixel') ? $this->getConfig('pixel') : 800;
-        $imageRatio = $this->getConfig('imageRatio') ? $this->getConfig('imageRatio') : 'auto';
+        $pixel = $this->getConfig('pixel') ?: 800;
+        $imageRatio = $this->getConfig('imageRatio') ?: 'auto';
 
         $this->setVar(
             array(
@@ -88,7 +88,7 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
                 ) * 1000 : '2000',
                 'COMPONENT_CONFIG_RANDOM_STARTING_SLIDE' => $this->getConfig('randomStartingSlide'),
                 'COMPONENT_CONFIG_IMAGE_RATIO'          => $imageRatio,
-                'COMPONENT_CONFIG_SLIDESHOWTRANSITION'  => $this->getConfig('transition') ? $this->getConfig('transition') : 'swipe',
+                'COMPONENT_CONFIG_SLIDESHOWTRANSITION'  => $this->getConfig('transition') ?: 'swipe',
             )
         );
 
@@ -169,28 +169,5 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
         }
 
         return true; // everything went according to plan
-    }
-
-    /* Getters/Setters
-     */
-
-
-    /**
-     * @return \Schoolbox\Resource\File\Mapper
-     */
-    public function getFileMapper()
-    {
-        return $this->fileMapper;
-    }
-
-
-    /**
-     * @param \Schoolbox\Resource\File\Mapper $fileMapper
-     * @return static
-     */
-    public function setFileMapper($fileMapper)
-    {
-        $this->fileMapper = $fileMapper;
-        return $this;
     }
 }
