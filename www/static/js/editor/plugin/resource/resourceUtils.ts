@@ -59,6 +59,7 @@ export type Resource = {
     mime: string;
     name: string;
     type: ResourceType.IMAGE | ResourceType.VIDEO | ResourceType.AUDIO | ResourceType.FOLDER | ResourceType.DOCUMENT;
+    id?: string;
 };
 
 /**
@@ -94,7 +95,7 @@ function getImageAttributes(resource: Resource, config: EditorConfig) {
  * @returns { string } - the video src
  */
 function getVideoSrc(resource: Resource, config: EditorConfig) {
-    return getURL(`/cms/sendVideo.php?id=${resource.id}&type=${resource.filesystem}`, config);
+    return getURL(`/cms/sendVideo.php?id=${resource.hash}&type=${resource.filesystem}`, config);
 }
 
 /**
@@ -106,7 +107,7 @@ function getVideoSrc(resource: Resource, config: EditorConfig) {
  */
 function getVideoThumb(resource: Resource, config: EditorConfig) {
     const filesystemWithReplaces = resource.filesystem.replace("browse", "sbfs").replace("store", "storage");
-    return getURL(`/cms/videoThumb.php?size=poster&id=${resource.id}&type=${filesystemWithReplaces}`, config);
+    return getURL(`/cms/videoThumb.php?size=poster&id=${resource.hash}&type=${filesystemWithReplaces}`, config);
 }
 
 /**
@@ -140,7 +141,7 @@ function getVideoAttributes(resource: Resource, config: EditorConfig) {
  * @returns { string } - the audio src
  */
 function getAudioSrc(resource: Resource, config: EditorConfig) {
-    return getURL(`/cms/sendVideo.php?id=${resource.id}&type=${resource.filesystem}`, config);
+    return getURL(`/cms/sendVideo.php?id=${resource.hash}&type=${resource.filesystem}`, config);
 }
 
 /**
@@ -319,8 +320,8 @@ export function getSrc(resource: Resource, config: EditorConfig) {
  */
 export function addResource(editor: Editor, resource: Resource, config: EditorConfig) {
     const imageUtils = editor.plugins.get("ImageUtils");
-    if (resource.type === ResourceType.IMAGE) {
-        editor.model.change((writer) => {
+    editor.model.change((writer) => {
+        if (resource.type === ResourceType.IMAGE) {
             const image = imageUtils.insertImage(
                 getImageAttributes(resource, config),
                 editor.model.document.selection,
@@ -328,10 +329,20 @@ export function addResource(editor: Editor, resource: Resource, config: EditorCo
             );
             writer.setSelection(image.parent, "end");
             editor.execute("enter");
-        });
-    }
-    if (resource.type === ResourceType.DOCUMENT) {
-        editor.model.change((writer) => {
+            return;
+        }
+        if (resource.type === ResourceType.VIDEO) {
+            const image = imageUtils.insertImage(
+                getVideoAttributes(resource, config),
+                editor.model.document.selection,
+                "imageInline"
+            );
+            console.warn(getVideoAttributes(resource, config));
+            writer.setSelection(image.parent, "end");
+            editor.execute("enter");
+            return;
+        }
+        if (resource.type === ResourceType.DOCUMENT) {
             const image = imageUtils.insertImage(
                 { ...getDocumentAttributes(resource, config), width: "24px" },
                 editor.model.document.selection,
@@ -344,6 +355,7 @@ export function addResource(editor: Editor, resource: Resource, config: EditorCo
                 writer.createText(`${getWithoutExtension(resource.name)}`, getDocumentAttributes(resource, config))
             );
             editor.execute("enter");
-        });
-    }
+            return;
+        }
+    });
 }
