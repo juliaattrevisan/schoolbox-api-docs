@@ -93,8 +93,8 @@ class AcceptanceTester extends Actor
     public function impersonate($fullname)
     {
         $i = $this;
-        $i->amOnPage('/user/recoverSession');
-        $i->waitForElement('a.icon-locked');
+        $i->logout();
+        $i->loginAsAdmin();
         $i->click(['css' => 'a[title=Schoolbox\ Admin]']);
         $i->executeJS("var scrollableDiv = document.getElementById('account-content');
         scrollableDiv.scrollTop=scrollableDiv.scrollHeight - scrollableDiv.offsetHeight;");
@@ -130,8 +130,8 @@ class AcceptanceTester extends Actor
     public function impersonateViaModifyUserPage($fullname)
     {
         $i = $this;
-        $i->amOnPage('/user/recoverSession');
-        $i->waitForElement('a.icon-locked');
+        $i->logout();
+        $i->loginAsAdmin();
         $i->searchBar($fullname);
         $i->click('a[title="Modify User"]');
         $i->click('a.icon-more');
