@@ -185,30 +185,14 @@ class Mapper extends \Schoolbox\Mapper
          * Note: this is a groupwise maximum.
          */
         $query = "
-            SELECT q1.id
-            FROM (
-                SELECT 
-                a1.created_at,
-                lpt1.id
-                FROM lesson_plan lp1
-                INNER JOIN assessment a1 ON lp1.assessment_id = a1.id
-                INNER JOIN {$this->getTable()} lpt1 ON lp1.lesson_plan_template_id = lpt1.id
-                WHERE lp1.created_by = :creatorId
-                AND lpt1.enabled = :enabled
-                ORDER BY a1.created_at DESC
-            ) q1 LEFT JOIN (
-                SELECT 
-                a2.created_at,
-                lpt2.id
-                FROM lesson_plan lp2
-                INNER JOIN assessment a2 ON lp2.assessment_id = a2.id
-                INNER JOIN {$this->getTable()} lpt2 ON lp2.lesson_plan_template_id = lpt2.id
-                WHERE lp2.created_by = :creatorId
-                AND lpt2.enabled = :enabled
-                ORDER BY a2.created_at DESC
-            ) q2 ON q1.id = q2.id AND q1.created_at < q2.created_at
-            WHERE q2.id is null
-            ORDER BY q1.created_at DESC 
+            SELECT lpt.id, MAX(a.created_at) AS created_at
+            FROM assessment a
+            INNER JOIN lesson_plan lp ON a.id = lp.assessment_id
+            INNER JOIN {$this->getTable()} lpt ON lp.lesson_plan_template_id = lpt.id
+            WHERE lp.created_by = :creatorId
+            AND lpt.enabled = :enabled
+            GROUP BY lpt.id
+            ORDER BY created_at DESC
             LIMIT :limit
         ";
 
