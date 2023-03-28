@@ -93,7 +93,7 @@ class TaskD
                 ],
             ],
             (string)$this->urlBase->withPath($this->router->generate('apiusernotify.apiUserNotify', ['userId' => $user->getId()]))
-                    ->appendQueryParameters(null),
+                    ->appendQueryParameters([]),
             [
                 'message' => sprintf('Your Healthcheck %s is ready to download', $this->config->get(ConfigMapper::NAME_REPORT_TITLE)),
                 'from'    => call_user_func($userSerializer, $user),
