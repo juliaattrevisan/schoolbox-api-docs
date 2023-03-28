@@ -27,7 +27,6 @@ use Schoolbox\Blog\Eportfolio\Post\Mapper as EportfolioBlogMapper;
 use Schoolbox\Blog\Eportfolio\Post\Model as EportfolioBlogModel;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Alaress\Twig\Loader\IChainLoader;
