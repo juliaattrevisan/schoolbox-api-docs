@@ -31,12 +31,12 @@
                         {% for lessonPlanTemplate in lessonPlanTemplates %}
                             {% set updateRoute = routeLookupIfAuthorized('adminLessonPlanTemplate.getUpdate', {lessonPlanTemplateId: lessonPlanTemplate.id}) %}
 
-                            <li class="actions-small-4 {% if not lessonPlanTemplate.enabled %}faded{% endif %}">
+                            <li class="actions-small-3 {% if not lessonPlanTemplate.enabled %}faded{% endif %}">
                                 <div class="list-item">
                                     <div class="card small-12">
                                         {# TODO Redo this <del> style properly. This isn't what a <del> tag is supposed to represent. #}
                                         {% if updateRoute %}
-                                            <a href="{{ updateRoute }}">
+                                            <a data-reveal-id="lpt-preview-{{ lessonPlanTemplate.id }}">
                                                 {% if lessonPlanTemplate.enabled %}
                                                     <h3>{{ lessonPlanTemplate.title }}</h3>
                                                 {% else %}
@@ -45,7 +45,7 @@
                                             </a>
                                         {% else %}
                                             {% if lessonPlanTemplate.enabled %}
-                                                <h3>{{ lessonPlanTemplate.title }}</h3>
+                                                <h3 data-reveal-id="lpt-preview-{{ lessonPlanTemplate.id }}">{{ lessonPlanTemplate.title }}</h3>
                                             {% else %}
                                                 <h3><del>{{ lessonPlanTemplate.title }}</del></h3>
                                             {% endif %}
@@ -63,8 +63,6 @@
                                     </div>
                                 </div>
                                 <nav>
-                                    <a class="icon-view" data-reveal-id="lpt-preview-{{ lessonPlanTemplate.id }}" title="Preview"></a>
-
                                     {# Fudge some accessibility text here later, I guess #}
                                     {% set enableRoute = routeLookupIfAuthorized('adminLessonPlanTemplate.postToggleEnableState', {lessonPlanTemplate: lessonPlanTemplate, lessonPlanTemplateId: lessonPlanTemplate.id}) %}
                                     {% if enableRoute %}
