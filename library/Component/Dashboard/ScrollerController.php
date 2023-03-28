@@ -11,9 +11,21 @@
  */
 
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\File\Mapper as FileMapper;
 
 class Component_Dashboard_ScrollerController extends Component_Dashboard_ControllerAbstract
 {
+    /**
+     * @var FileMapper
+     */
+    private FileMapper $fileMapper;
+
+    /**
+     * Available sort fields for this component.
+     *
+     * @var string[]
+     */
+    protected $sortFields = array('name', 'date');
 
     /**
      * Prepares data for the render function. Business logic.
@@ -26,6 +38,7 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
             return false;
         }
 
+        $this->fileMapper = FileMapper::getInstance();
         return true;
     }
 
@@ -47,8 +60,10 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
         $this->parseConfig();
 
         $this->setBlock($templateHandle, 'image_scroller', 'image_scroller_block');
-        $this->setBlock($templateHandle, 'has_header', 'has_header_block');
+        $this->setBlock('image_scroller', 'linked_image', 'linked_image_block');
+        $this->setBlock('image_scroller', 'unlinked_image', 'unlinked_image_block');
         $this->setBlock('image_scroller', 'show_caption', 'show_caption_block');
+        $this->setBlock($templateHandle, 'has_header', 'has_header_block');
 
         /* Hide header bar if desired
          */
@@ -62,14 +77,17 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
             $this->parse('has_header_block', 'has_header');
         }
 
+        $pixel = $this->getConfig('pixel') ?: 800;
+        $imageRatio = $this->getConfig('imageRatio') ?: 'auto';
+
         $this->setVar(
             array(
                 'COMPONENT_CONFIG_TIMING_VALUE_MS' => $this->getConfig('timing') ? $this->getConfig(
                     'timing'
                 ) * 1000 : '2000',
                 'COMPONENT_CONFIG_RANDOM_STARTING_SLIDE' => $this->getConfig('randomStartingSlide'),
-                'COMPONENT_CONFIG_IMAGE_RATIO'          => $this->getConfig('imageRatio') ? $this->getConfig('imageRatio') : 'square',
-                'COMPONENT_CONFIG_SLIDESHOWTRANSITION'  => $this->getConfig('transition') ? $this->getConfig('transition') : 'swipe',
+                'COMPONENT_CONFIG_IMAGE_RATIO'          => $imageRatio,
+                'COMPONENT_CONFIG_SLIDESHOWTRANSITION'  => $this->getConfig('transition') ?: 'swipe',
             )
         );
 
@@ -85,7 +103,14 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
         $this->setVar('image_scroller_block', '');
 
         // Load images for the current homepage
-        $allFiles = $this->getFolderMapper()->findImages($this->getSource(), (int)$this->getConfigLoader()->get('image_slideshow_max'));
+        $opts = [
+            'filter' => 'image',
+            'size' => (int)$this->getConfigLoader()->get('image_slideshow_max'),
+            'sort' => $this->getConfig('sort'),
+            'sortdir' => $this->getConfig('sortdir')
+        ];
+
+        $allFiles = $this->fileMapper->findForFolders([$this->getSource()->getId()], $opts);
 
         if ($this->getConfig('randomStartingSlide')) {
             $this->setVar('COMPONENT_RANDOM_SLIDE', rand(0, count($allFiles) - 1));
@@ -97,26 +122,49 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
         $this->setVar('IMAGESCROLLER_CATEGORY_ID', $this->getSource()->getId());
 
         // Iterate
-        if ($allFiles->count()) {
-            foreach ($allFiles as $currentFile) {
-                $this->setVar(
-                    array(
-                        'IMAGE_ID'        => $currentFile->getId(),
-                        'IMAGE_NAME'      => $currentFile->getTitle(),
-                    )
-                );
+        if (!$allFiles->count()) {
+            return false; // No images to display
+        }
 
-                // Display captions
-                if ($this->getConfig('captionState') == 'Active') {
-                    $this->parse('show_caption_block', 'show_caption');
-                } else {
-                    $this->setVar('show_caption_block', '');
+        foreach ($allFiles as $currentFile) {
+            $url = '';
+
+            // sanitise url
+            if ($currentFile->getDescription()) {
+                $description = $currentFile->getDescription();
+                if (filter_var($description, FILTER_VALIDATE_URL)) {
+                    $url = $description;
+                } elseif (filter_var('http://localhost/' . $description, FILTER_VALIDATE_URL)) {
+                    // it might be referencing inside schoolbox, so simulate that to the validator
+                    $url = $description;
                 }
-
-                $this->parse('image_scroller_block', 'image_scroller', true);
             }
-        } else {
-            return false;
+
+            $this->setVar(
+                array(
+                    'IMAGE_ID'        => $currentFile->getId(),
+                    'IMAGE_NAME'      => $currentFile->getTitle(),
+                    'IMAGE_URL'       => $url,
+                    'IMAGE_DIMENSION' => $imageRatio === 'auto' ? $pixel : 0,
+                )
+            );
+
+            // Display captions
+            if ($this->getConfig('captionState') == 'Active') {
+                $this->parse('show_caption_block', 'show_caption');
+            } else {
+                $this->setVar('show_caption_block', '');
+            }
+
+            if ($url) {
+                $this->parse('linked_image_block', 'linked_image');
+                $this->setVar('unlinked_image_block', '');
+            } else {
+                $this->parse('unlinked_image_block', 'unlinked_image');
+                $this->setVar('linked_image_block', '');
+            }
+
+            $this->parse('image_scroller_block', 'image_scroller', true);
         }
 
         return true; // everything went according to plan
