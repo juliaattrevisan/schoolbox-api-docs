@@ -456,8 +456,16 @@ class Scrub
     {
         $html = self::getMarkdownConverter()->convertToHtml((string)$text)->getContent();
 
-        // Ensure no linebreak exists between <li> and <a> tags.  (See SA-15196).
-        return str_replace("<li>\n<a ", "<li><a ", $html);
+        // Ensure no linebreak exists between <li> and any other immediately following tag.  (See SA-15196).
+        // Eg. "<li>\n<a href='google.com'>Link</a>" needs to become "<li><a href='google.com'>Link</a>".
+        // The '$1' in the replacement text requests the text metching the first parenthesised expression in the pattern.
+        $htmlModified = preg_replace("/<li>\n<([^>]*)>/", "<li><$1>", $html);
+
+        if ($htmlModified === null) {
+            $htmlModified = '[This markdown string could not be converted to HTML]';
+        }
+
+        return $htmlModified;
     }
 
 
