@@ -38,7 +38,7 @@
         "ezyang/htmlpurifier": "^4.14.0",
         "twig/twig": "^3.4.1",
         "maximebf/debugbar": "^1.17.3",
-        "predis/predis": "^1.1",
+        "predis/predis": "^1.0",
         "monolog/monolog": "^2.3.5",
         "league/flysystem": "^3.5.2",
         "league/flysystem-aws-s3-v3": "^3.5",
