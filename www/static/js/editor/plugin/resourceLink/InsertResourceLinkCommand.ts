@@ -3,16 +3,19 @@
  */
 
 import Command from "@ckeditor/ckeditor5-core/src/command";
+import type { Editor } from "@ckeditor/ckeditor5-core";
 import { getSrc } from "@js/editor/plugin/resource/resourceUtils";
 import type { Resource } from "@js/editor/plugin/resource/resourceUtils";
 import type { EditorConfig } from "@js/editor/types/editorTypes";
 
 export default class InsertResourceLinkCommand extends Command {
-    editor; // the editor instance
-
-    constructor(editor) {
+    /**
+     * To open the Resource modal and insert the selected resource into the editor
+     *
+     * @param { Editor } editor - the editor instance
+     */
+    constructor(editor: Editor) {
         super(editor);
-        editor = this.editor;
         // add an isOn property that will be used to determine if the resource modal is open
         // refer to https://github.com/ckeditor/ckeditor5/blob/bfe5a4c8fcbfe4292c51462cf595923d23b554d3/packages/ckeditor5-core/_src/command.js
         this.set("isOn", false);

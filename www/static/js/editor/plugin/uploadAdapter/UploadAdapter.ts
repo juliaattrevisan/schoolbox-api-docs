@@ -6,6 +6,7 @@
 
 import { getURL } from "@js/editor/plugin/resource/resourceUtils";
 import type { EditorConfig } from "@js/editor/types/editorTypes";
+import type { Resource } from "@js/editor/plugin/resource/resourceUtils";
 import { getWithoutExtension } from "@js/util/fileUtils";
 
 export default class UploadAdapter {
