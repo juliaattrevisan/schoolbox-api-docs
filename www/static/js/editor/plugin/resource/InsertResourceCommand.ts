@@ -91,9 +91,7 @@ export default class InsertResourceCommand extends Command {
             if (0 in message.data) {
                 window.removeEventListener("message", this.messageBinding);
                 // for each resource returned, get the resource info and insert it into the editor
-                const resources = message.data.filter(
-                    (resource) => resource.hash !== undefined && resource.status === "success"
-                );
+                const resources = message.data.filter((resource) => resource.hash !== undefined);
                 resources.forEach((resource) => {
                     this.getResourceInfo(resource.hash as string);
                 });
