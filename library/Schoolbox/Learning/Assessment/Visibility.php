@@ -9,9 +9,11 @@
 namespace Schoolbox\Learning\Assessment;
 
 use Schoolbox\User;
+use Schoolbox\Learning\Assessment\LessonPlan;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Alaress_Date_Format;
+
 
 class Visibility
 {
@@ -57,11 +59,10 @@ class Visibility
         $now = $now ?? Alaress_Date_Format::now();
 
         /* Lesson Plans can be hidden from students via a Visibility switch
+         * If you're a student, hide any lesson plans that were hidden from you
          */
-        if ($viewer->getRole()->isStudent() && $assessment instanceof \Schoolbox\Learning\Assessment\LessonPlan\Model) {
-            if (\Schoolbox\Role::STUDENT !== $assessment->getVisibility()) {
-                return false;
-            }
+        if ($assessment instanceof LessonPlan\Model && $viewer->getRole()->isStudent() && \Schoolbox\Role::STUDENT !== $assessment->getVisibility()) {
+            return false;
         }
 
         /** @noinspection NotOptimalIfConditionsInspection */

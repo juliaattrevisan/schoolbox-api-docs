@@ -158,23 +158,6 @@ class Controller extends Component_Homepage_ControllerAbstract
                 $assessments = $this->assessmentMapperProxy->findAllByUnitImplementationIdsForCourseOutline($uiIds);
             }
 
-            /* If you're a student, hide any lesson plans that were hidden from you
-             * Ideally this would be done deeper in, but it goes into Andyland Participation
-             * and then the Swamp - a most unholy alliance
-             *
-             * This exclusion needs to occur before groupByCallback turns $assessments into
-             * a Collection of Collections
-             */
-            if ($this->getUser()->getRole()->isStudent()) {
-                $assessments = $assessments->filter(static function(IAssessable $assessment) {
-                    if ($assessment instanceof LessonPlan\Model) {
-                        return \Schoolbox\Role::STUDENT === $assessment->getVisibility();
-                    }
-
-                    return true;
-                });
-            }
-
             // And then add them to the displayed course impl
             $assessments = $assessments
                 ->groupByCallback(function (IAssessable $assessment) {
