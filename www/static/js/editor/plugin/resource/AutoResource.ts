@@ -42,7 +42,8 @@ export default class ResourceEditing extends Plugin {
      * @param { File } file - the file to upload
      */
     async loadResource(fileRepository, resourceUI, file: File) {
-        const element = resourceUI.getProgressElement(file);
+        const element = resourceUI.getUploadElement(file);
+        resourceUI.checkUploadContainer();
         const meta = element.querySelector("[data-progress-meter]");
         const loader = fileRepository.createLoader(file);
         try {
@@ -51,11 +52,10 @@ export default class ResourceEditing extends Plugin {
             addResource(this.editor, resource);
             this.removeUploadProgress(element);
         } catch (error) {
-            if (error === "aborted") {
-                console.warn("Uploading aborted.");
-            } else {
-                console.warn("Uploading error.", error);
-            }
+            resourceUI.showUploadErrorElement(
+                element,
+                "Sorry, the file could not be upload as an unknown error has occurred."
+            );
         }
     }
 

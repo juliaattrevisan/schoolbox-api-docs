@@ -83,14 +83,8 @@ export default class UploadAdapter {
      */
     initListeners(resolve: Function, reject: Function, file: File) {
         const genericErrorText = `Couldn't upload file: ${file.name}.`;
-        this.xhr.addEventListener("error", (event) => {
-            debugger;
-            return reject(genericErrorText);
-        });
-        this.xhr.addEventListener("abort", () => {
-            debugger;
-            return reject();
-        });
+        this.xhr.addEventListener("error", () => reject(genericErrorText));
+        this.xhr.addEventListener("abort", () => reject("aborted"));
         if (this.xhr.upload) {
             this.xhr.upload.addEventListener("progress", (event: ProgressEvent) => this.onLoading(event));
         }
