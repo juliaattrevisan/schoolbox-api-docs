@@ -355,7 +355,7 @@ export function addResource(editor: Editor, resource: Resource) {
             editor.model.document.selection,
             "imageInline"
         );
-        writer.setSelection(image.parent, "end"); // deselect the selected image, otherwise further actions will overwrite it
+        writer.setSelection(image, "after"); // deselect the selected image, otherwise further actions will overwrite it
         if (resource.type === ResourceType.DOCUMENT || resource.type === ResourceType.OTHER) {
             // we get without extension for now to avoid a copy/paste issue in ckeditor
             // pasting with the extension will cause ckeditor to look to embed the file again
