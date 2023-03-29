@@ -469,7 +469,7 @@ class Scrub
         $htmlModified = preg_replace("/<li>\n<([^>]*)>/", "<li><$1>", $html);
 
         if ($htmlModified === null) {
-            $htmlModified = '[This markdown string could not be converted to HTML]';
+            $htmlModified = '';
         }
 
         return $htmlModified;
