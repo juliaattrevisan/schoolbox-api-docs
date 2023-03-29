@@ -30,24 +30,10 @@
         viewRoute: null,
         modifyRoute: modifyRoute,
         canShowcase: false,
-        isShowcased: false
+        isShowcased: false,
+        hasStudentView: isInstructor
     } %}
 </div>
-
-{# Optionally provide a student view if you're an instructor #}
-{% if isInstructor %}
-    <div class="row">
-        <div class="small-12 columns">
-            <div class="long switch">
-                <input id="lessonPlanToggle" type="checkbox">
-                <label for="lessonPlanToggle">
-                    <span>Student</span>
-                    <span>Staff</span>
-                </label>
-            </div>
-        </div>
-    </div>
-{% endif %}
 
 <div class="row">
     <div class="small-12 island">
@@ -67,30 +53,11 @@
 
                 <script>
                     $(function() {
-                        /* Toggle teacher-only fields
-                         */
-                        function showFields(toggle) {
-                            if ($(toggle).prop('checked')) {
-                                $('#lessonPlan-staff').hide();
-                                $('#lessonPlan-student').show();
-                            } else {
-                                $('#lessonPlan-staff').show();
-                                $('#lessonPlan-student').hide();
-                            }
-                        }
-
-                        /* Initial state
-                         */
-                        showFields();
-
-                        /* Dynamic state
-                         */
-                        $('#lessonPlanToggle').on('click', function(event) {
-                            showFields($(this));
-                        });
+                        $('#lessonPlan-staff').show();
                     });
                 </script>
             {% else %}
+                {# Forcibly render the student view #}
                 <script>
                     $(function() {
                         $('#lessonPlan-student').show();

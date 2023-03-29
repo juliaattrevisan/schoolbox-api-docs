@@ -76,5 +76,33 @@
         {% if modifyRoute %}
             <li><a href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-modify">Modify</a></li>
         {% endif %}
+
+        {# Lesson Plan lets you swap divs
+         # This lets you see student-visible versions of an LPT
+         # TODO Arguably Lesson Plan's modifyTot should be a subclass of this modifyTot?
+         #}
+        {% if hasStudentView is defined and hasStudentView %}
+            <li><a class="icon-view" data-has-student-view="staff">Switch to student view</a></li>
+
+            <script>
+                $(function() {
+                    $('[data-has-student-view]').on('click', function() {
+                        if ($(this).attr('data-has-student-view') == 'staff') {
+                            $(this).text('Switch to staff view');
+                            $(this).attr('data-has-student-view', 'student');
+
+                            $('#lessonPlan-staff').hide();
+                            $('#lessonPlan-student').show();
+                        } else {
+                            $(this).text('Switch to student view');
+                            $(this).attr('data-has-student-view', 'staff');
+
+                            $('#lessonPlan-staff').show();
+                            $('#lessonPlan-student').hide();
+                        }
+                    });
+                });
+            </script>
+        {% endif %}
     </ul>
 {% endif %}
