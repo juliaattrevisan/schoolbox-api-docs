@@ -71,6 +71,15 @@ class Module extends BaseModule
     }
 
     /**
+     * Historical context
+     * ------------------
+     * The way the Eportfolio/Authenticator and Eportfolio/Module files work together to determine permissions is a
+     * little odd.  This permissions system has evolved as it has is because different parts of eportfolio have been
+     * developed using different paradigms (most of it is Sitepage, whilst the blogs are Aura).
+     *    In an ideal world the eportfolio module would be written completely in Aura, and thus all permissions would be
+     * handled within the module.  There might still be a class similar to Eportfolio_Authenticator for determining
+     * base-level permissions to eportfolio content, but this would only be used within the module permission functions.
+     *
      * {@inheritdoc}
      */
     public function initRoutePermissions(Authorizer $authorizer)
