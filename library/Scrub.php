@@ -508,7 +508,25 @@ class Scrub
      */
     public static function markdown(?string $text): string
     {
-        return self::getMarkdownConverter()->convertToHtml((string)$text)->getContent();
+        $html = self::getMarkdownConverter()->convertToHtml((string)$text)->getContent();
+
+        // Ensure no linebreak exists between <li> and any other immediately following tag.  (See SA-15196).
+        // Eg. "<li>\n<a href='google.com'>Link</a>" needs to become "<li><a href='google.com'>Link</a>".
+        //
+        // NOTES:
+        //  * The '$1' in the replacement text requests the text matching the first parenthesised expression in the pattern.
+        //  * Since we are here only dealing with HTML that is generated from Markdown text (and any HTML code included
+        //    in the Markdown has already been stripped by CommonMark due to the CommonMark\Util\HtmlFilter::STRIP option),
+        //    the simple regex below should work just fine.  Tags in HTML generated from Markdown will only ever contain
+        //    'href' attributes, and those should never contain greater-than symbols (which would otherwise cause problems
+        //    for the regex used here).
+        $htmlModified = preg_replace("/<li>\n<([^>]*)>/", "<li><$1>", $html);
+
+        if ($htmlModified === null) {
+            $htmlModified = '';
+        }
+
+        return $htmlModified;
     }
 
 
