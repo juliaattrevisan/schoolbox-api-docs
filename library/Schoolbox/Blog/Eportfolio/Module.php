@@ -213,30 +213,25 @@ class Module extends BaseModule
                 new Rule\IsSuperuser(),
                 new Rule\Callback(
                     function ($params, User $loggedInUser) {
-                        // If a blog comment parameter exists, permissions depend on the blog comment's owner.
-                        if (($params['comment'] ?? null) instanceof EportfolioBlogCommentModel) {
-                            $commentOwner = $params['comment']->getOwner();
+                        $commentOwner = $params['comment']->getOwner();
 
-                            if ($commentOwner->getRole()->isStaff()) {
-                                if (!$loggedInUser->getRole()->isStaff()) {
-                                    throw new Unauthorized();
-                                }
-                            } else {
-                                if ($loggedInUser->getId() === $commentOwner->getId()) {
-                                    return;
-                                }
+                        if ($commentOwner->getRole()->isStaff()) {
+                            if (!$loggedInUser->getRole()->isStaff()) {
+                                throw new Unauthorized();
                             }
-
-                            $auth = new Eportfolio_Authenticator(
-                                $loggedInUser,
-                                $params['page']->getOwner(),
-                                $params['page']->getPageId()
-                            );
-
-                            if ($auth->canModify()) {
+                        } else {
+                            if ($loggedInUser->getId() === $commentOwner->getId()) {
                                 return;
                             }
                         }
+
+                        $page = $params['comment']->getBlog()->getPage();
+                        $auth = new Eportfolio_Authenticator($loggedInUser, $page->getOwner(), $page->getPageId());
+
+                        if ($auth->canModify()) {
+                            return;
+                        }
+
                         // Otherwise, not authorised.
                         throw new Unauthorized();
                     }
