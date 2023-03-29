@@ -67,11 +67,11 @@
                                     {% set enableRoute = routeLookupIfAuthorized('adminLessonPlanTemplate.postToggleEnableState', {lessonPlanTemplate: lessonPlanTemplate, lessonPlanTemplateId: lessonPlanTemplate.id}) %}
                                     {% if enableRoute %}
                                         {% if lessonPlanTemplate.enabled %}
-                                            {% set icon = 'icon-view' %}
-                                            {% set action = 'Disable visibility' %}
+                                            {% set icon = 'icon-archive' %}
+                                            {% set action = 'Archive template' %}
                                         {% else %}
-                                            {% set icon = 'icon-view-hollow' %}
-                                            {% set action = 'Enable visibility' %}
+                                            {% set icon = 'icon-undo' %}
+                                            {% set action = 'Restore template' %}
                                         {% endif %}
                                         <a class="{{ icon }}" href="{{ enableRoute }}" title="{{ action }}" data-toggle-enable-state="{{ lessonPlanTemplate.id }}"></a>
                                         <script>

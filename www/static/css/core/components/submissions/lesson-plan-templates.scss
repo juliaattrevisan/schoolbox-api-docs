@@ -25,7 +25,7 @@
         padding: 0;
     }
 
-    & li {
+    & > li {
         &:first-child {
             padding: 0;
         }
@@ -160,6 +160,27 @@
     }
 }
 
+/**
+ * Styles specifically for the Lesson Plan Template previews
+ */
+.lpt-preview {
+    li {
+        border-bottom: 1px solid $gainsboro;
+
+        p.meta {
+            font-weight: 600;
+        }
+
+        &:first-child {
+            border-top: 1px solid $gainsboro;
+        }
+    }
+
+    .not-visible-students {
+        background-color: $vapor;
+    }
+}
+
 /* Create Lesson Plan for the usual user
  *
  * There's a list where you can preview the contents of an LPT
@@ -167,9 +188,9 @@
  */
 .lpt-preview-header {
     padding-bottom: 1rem;
-    border-bottom: 1px solid #ddd;
+    ///border-bottom: 1px solid #ddd;
 }
 
 .information-list.lpt-preview li {
-    padding: 1rem 0 1rem 0;
+    padding: 1rem;
 }
