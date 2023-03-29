@@ -274,6 +274,10 @@ class CourseAssignments extends CourseAssessmentAbstract
         $maxMark           = $this->assignmentBridge->getMaxMark($pointsPossible);
         $markType          = $this->assignmentBridge->getMarkType($gradingType, $pointsPossible);
         $gradeGroup        = $this->assignmentBridge->getGradeGroup($gradingType);
+        if (!$gradeGroup && $markType->getSlug() === SubmissionBox\MarkType::SLUG_LETTER) {
+            $markType = $this->assignmentBridge->getMarkType(null, $pointsPossible);
+        }
+
         $acceptOnline      = $this->assignmentBridge->getAcceptOnline($submissionTypes);
         $acceptMultiple    = $this->assignmentBridge->getAcceptMultiple($submissionTypes);
         $markVisibility    = $this->assignmentBridge->getMarkVisibility($muted);
