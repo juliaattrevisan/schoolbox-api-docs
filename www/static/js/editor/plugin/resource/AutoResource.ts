@@ -10,6 +10,10 @@ import type { Resource } from "@js/editor/plugin/resource/resourceUtils";
 import { addResource } from "@js/editor/plugin/resource/resourceUtils";
 
 export default class ResourceEditing extends Plugin {
+    totalUploadCount = 0; // the total number of files to upload
+
+    uploadedCount = 0; // the number of files that have been uploaded so far
+
     /**
      * Runs on startup, start listening for clipboardInput, which is fired when
      * a file is dragged and dropped into the editor
@@ -30,6 +34,9 @@ export default class ResourceEditing extends Plugin {
                 return;
             }
             const files = Array.from(data.dataTransfer._files);
+            this.totalUploadCount = files.length;
+            this.uploadedCount = 0;
+            this.editor.enableReadOnlyMode("auto-resource");
             files.forEach((file) => {
                 this.loadResource(fileRepository, resourceUI, file as File);
             });
@@ -63,6 +70,11 @@ export default class ResourceEditing extends Plugin {
             );
             const remove = uploadElement.querySelector("[data-remove-upload]");
             remove.addEventListener("click", () => this.removeUploadProgress(uploadElement));
+        } finally {
+            this.uploadedCount++;
+            if (this.uploadedCount === this.totalUploadCount) {
+                this.editor.disableReadOnlyMode("auto-resource");
+            }
         }
     }
 
