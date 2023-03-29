@@ -209,11 +209,11 @@ Copies an instance's redis data to the specified server
                                 continue;
                             }
                         } else {
+                            $this->logKey($key);
                             if ($this->perform()) {
                                 $migrate->setArguments(array_merge($args, [$key]));
                                 $this->sourceRedis->executeCommand($migrate);
                             }
-                            $this->logKey($key);
                         }
                     } catch (\Exception $e) {
                         $this->getLogger()->warning("Failed to migrate {$key}: {$e->getMessage()}");
