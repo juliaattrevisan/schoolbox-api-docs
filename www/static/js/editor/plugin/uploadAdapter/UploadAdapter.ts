@@ -1,7 +1,7 @@
 /**
  * Our custom CKEditor 5 image uploader, heavily referenced from
  * https://ckeditor.com/docs/ckeditor5/latest/framework/guides/deep-dive/upload-adapter.html
- *
+ * It calls asyncUpload.php and then returns the resource object
  */
 
 import type { Resource } from "@js/editor/plugin/resource/resourceUtils";

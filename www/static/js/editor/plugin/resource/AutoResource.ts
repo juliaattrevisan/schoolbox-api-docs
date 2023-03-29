@@ -11,7 +11,9 @@ import { addResource } from "@js/editor/plugin/resource/resourceUtils";
 
 export default class ResourceEditing extends Plugin {
     /**
-     * Runs on startup, defines the schema and converters
+     * Runs on startup, start listening for clipboardInput, which is fired when
+     * a file is dragged and dropped into the editor
+     * When files are added, upload them and add them to the editor
      */
     init() {
         const editor = this.editor;
@@ -35,29 +37,32 @@ export default class ResourceEditing extends Plugin {
     }
 
     /**
-     * Add an element to display the upload progress of the resource
+     * Add an element to display the upload progress of the resource.
+     * Once the resource is uploaded the upload element display is closed.
+     * If there's an error the display will change to an error state.
      *
      * @param { FileRepository } fileRepository - the file repository
      * @param { ResourceUI } resourceUI - the resource UI plugin
      * @param { File } file - the file to upload
      */
     async loadResource(fileRepository, resourceUI, file: File) {
-        const element = resourceUI.getUploadElement(file, this.onCloseClicked);
+        const uploadElement = resourceUI.getUploadElement(file, this.onCloseClicked);
         resourceUI.checkUploadContainer();
-        const meta = element.querySelector("[data-progress-meter]");
+        const meta = uploadElement.querySelector("[data-progress-meter]");
         const loader = fileRepository.createLoader(file);
         try {
             loader.on("change:uploadedPercent", (event, name, value) => (meta.style.width = `${value}%`));
+            // www/static/js/editor/plugin/uploadAdapter/UploadAdapter.ts is the adapter that uploads files to the server
             const resource: Resource = await loader.upload();
             addResource(this.editor, resource);
-            this.removeUploadProgress(element);
+            this.removeUploadProgress(uploadElement);
         } catch (error) {
             resourceUI.showUploadErrorElement(
-                element,
+                uploadElement,
                 "Sorry, the file could not be upload as an unknown error has occurred."
             );
-            const remove = element.querySelector("[data-remove-upload]");
-            remove.addEventListener("click", () => this.removeUploadProgress(element));
+            const remove = uploadElement.querySelector("[data-remove-upload]");
+            remove.addEventListener("click", () => this.removeUploadProgress(uploadElement));
         }
     }
 
@@ -65,11 +70,11 @@ export default class ResourceEditing extends Plugin {
      * To remove the upload progress element, removing the upload container if
      * there are no more uploads in progress
      *
-     * @param { HTMLDivElement } element - the element to remove
+     * @param { HTMLDivElement } uploadElement - the element to remove
      */
-    async removeUploadProgress(element) {
-        await slideUp(element);
-        element.remove();
+    async removeUploadProgress(uploadElement) {
+        await slideUp(uploadElement);
+        uploadElement.remove();
         this.editor.plugins.get("ResourceUI").checkUploadContainer();
     }
 }
