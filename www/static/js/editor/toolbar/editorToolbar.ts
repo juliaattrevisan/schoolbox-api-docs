@@ -82,7 +82,7 @@ export function getToolbar(config: EditorConfig) {
             {
                 label: "Lists",
                 icon: "threeVerticalDots",
-                items: ["numberedList", "bulletedList", "todoList"],
+                items: ["numberedList", "bulletedList"],
             },
             "|",
             "alignment",
