@@ -14,7 +14,6 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Alaress_Date_Format;
 
-
 class Visibility
 {
     /**
