@@ -12,9 +12,20 @@
         window.location.href = url + pageConfigKey;
     }
 
-    if (typeof (SafeExamBrowser) !== 'undefined') {
-        window.addEventListener('load', displaySEBSecurityInfo);
-    } else {
-        window.location.href = url;
-    }
+    window.addEventListener(
+        'load',
+        function () {
+            window.setTimeout(
+                function () {
+                    if (typeof SafeExamBrowser !== 'undefined') {
+                        displaySEBSecurityInfo();
+                    } else {
+                        window.location.href = url;
+                    }
+                },
+                1,
+            )
+        },
+    )
+
 </script>
