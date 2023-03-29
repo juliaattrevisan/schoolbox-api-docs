@@ -73,98 +73,129 @@ class Module extends BaseModule
     /**
      * Historical context
      * ------------------
-     * The way the Eportfolio/Authenticator and Eportfolio/Module files work together to determine permissions is a
+     * The way the Eportfolio_Authenticator and Eportfolio/Module files work together to determine permissions is a
      * little odd.  This permissions system has evolved as it has is because different parts of eportfolio have been
-     * developed using different paradigms (most of it is Sitepage, whilst the blogs are Aura).
+     * developed using different paradigms (most of it is Sitepage, whilst the blogs are Aura).  The Eportfolio_Authenticator
+     * already existed when the blogs were added using the Aura paradigm, so to avoid duplicating permissions code, as
+     * much as possible we want to defer permissions handling logic to the Eportfolio_Authenticator class.
      *    In an ideal world the eportfolio module would be written completely in Aura, and thus all permissions would be
      * handled within the module.  There might still be a class similar to Eportfolio_Authenticator for determining
      * base-level permissions to eportfolio content, but this would only be used within the module permission functions.
      *
      * {@inheritdoc}
      */
-    public function initRoutePermissions(Authorizer $authorizer)
+    public function initRoutePermissions(Authorizer $authorizer): void
     {
         // All routes: must be logged in
         $this->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn());
 
-        // getInsert: Eportfolio_Authenticator->canCreate on page
+        // Affected routes are listed here with the expected parameters (from Blog\Eportfolio\Post\Controller).
+        //  * getInsert(EportfolioPageModel $page): Eportfolio_Authenticator->canCreate on page
         $this->addRoutePermission(
             $authorizer,
             'getInsert',
-            $this->buildAuthorizationRule('canCreate')
-        );
-
-        // getArchive: Eportfolio_Authenticator->canView on page
-        // getItem: Eportfolio_Authenticator->canView on blog's page
-        // postCommentInsert: Eportfolio_Authenticator->canView on blog's page
-        $this->addRoutePermission(
-            $authorizer,
-            '(getArchive|getItem|postCommentInsert)',
-            $this->buildAuthorizationRule('canView')
-        );
-
-        // getModify: Eportfolio_Authenticator->canModify on blog's page || isOwner of post
-        // postDelete: Eportfolio_Authenticator->canModify on blog's page || isOwner of post
-        // postInsert: Eportfolio_Authenticator->canModify on page
-        // postModify: Eportfolio_Authenticator->canModify on blog's page || isOwner of post
-        // postCommentDelete: Eportfolio_Authenticator->canModify on comment's blog's page || isOwner of comment
-        $this->addRoutePermission(
-            $authorizer,
-            '(getModify|postDelete|postInsert|postModify|postCommentDelete)',
-            $this->buildAuthorizationRule('canModify')
-        );
-    }
-
-    /**
-     * @param string $method `Eportfolio_Authenticator` method to call:
-     *                       should be 'canCreate', 'canView', 'canModify'
-     *
-     * @return Rule\IAuthorizationRule
-     */
-    protected function buildAuthorizationRule($method)
-    {
-        return new Rule\Any(
-            new Rule\IsSuperuser(),
-            new Rule\Callback(
-                function ($params, User $loggedInUser) use ($method) {
-                    if (($params['comment'] ?? null) instanceof EportfolioBlogCommentModel) {
-                        $commentOwner = $params['comment']->getOwner();
-
-                        if ($commentOwner->getRole()->isStaff()) {
-                            if (!$loggedInUser->getRole()->isStaff()) {
-                                throw new Unauthorized();
-                            }
-                        } else {
-                            if ($loggedInUser->getId() === $commentOwner->getId()) {
-                                return;
-                            }
-                        }
-                    }
-                    if (($params['blog'] ?? null) instanceof EportfolioBlogModel) {
-                        if ($params['blog']->getOwner()->getId() === $loggedInUser->getId()) {
-                            return;
-                        }
-                    }
-                    if (($params['page'] ?? null) instanceof EportfolioPageModel) {
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\Callback(
+                    function ($params, User $loggedInUser) {
+                        // Use Eportfolio_Authenticator->canCreate() to determine permissions.
                         $auth = new Eportfolio_Authenticator(
                             $loggedInUser,
                             $params['page']->getOwner(),
                             $params['page']->getPageId()
                         );
-                        if (!method_exists($auth, $method)) {
-                            throw new \InvalidArgumentException(
-                                sprintf(
-                                    'Method "Eportfolio_Authenticator::%s" does not exist',
-                                    $method
-                                )
-                            );
-                        }
-                        if ($auth->$method()) {
-                            return;
+
+                        if (!$auth->canCreate()) {
+                            throw new Unauthorized();
                         }
                     }
-                    throw new Unauthorized();
-                }
+                )
+            )
+        );
+
+        // Affected routes are listed here with the expected parameters (from Blog\Eportfolio\Post\Controller).
+        //  * getArchive(EportfolioPageModel $page, $year, $month): Eportfolio_Authenticator->canView on page
+        //  * getItem(EportfolioPageModel $page, EportfolioBlogModel $blog): Eportfolio_Authenticator->canView on blog's page
+        //  * postCommentInsert(EportfolioBlogModel $blog): Eportfolio_Authenticator->canView on blog's page
+        $this->addRoutePermission(
+            $authorizer,
+            '(getArchive|getItem|postCommentInsert)',
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\Callback(
+                    function ($params, User $loggedInUser) {
+                        // If a blog parameter exists, permissions depend on the blog's owner.
+                        if (($params['blog'] ?? null) instanceof EportfolioBlogModel) {
+                            if ($params['blog']->getOwner()->getId() === $loggedInUser->getId()) {
+                                return;
+                            }
+                        }
+                        // If a page parameter exists, use Eportfolio_Authenticator->canView() to determine permissions.
+                        if (($params['page'] ?? null) instanceof EportfolioPageModel) {
+                            $auth = new Eportfolio_Authenticator(
+                                $loggedInUser,
+                                $params['page']->getOwner(),
+                                $params['page']->getPageId()
+                            );
+                            if ($auth->canView()) {
+                                return;
+                            }
+                        }
+                        // Otherwise, not authorised.
+                        throw new Unauthorized();
+                    }
+                )
+            )
+        );
+
+        // Affected routes are listed here with the expected parameters (from Blog\Eportfolio\Post\Controller).
+        //  * getModify(EportfolioPageModel $page, EportfolioBlogModel $blog): Eportfolio_Authenticator->canModify on blog's page || isOwner of post
+        //  * postDelete(EportfolioBlogModel $blog): Eportfolio_Authenticator->canModify on blog's page || isOwner of post
+        //  * postInsert(EportfolioPageModel $page): Eportfolio_Authenticator->canModify on page
+        //  * postModify(EportfolioPageModel $page, EportfolioBlogModel $blog): Eportfolio_Authenticator->canModify on blog's page || isOwner of post
+        //  * postCommentDelete(EportfolioBlogCommentModel $comment): Eportfolio_Authenticator->canModify on comment's blog's page || isOwner of comment
+        $this->addRoutePermission(
+            $authorizer,
+            '(getModify|postDelete|postInsert|postModify|postCommentDelete)',
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\Callback(
+                    function ($params, User $loggedInUser) {
+                        // If a blog comment parameter exists, permissions depend on the blog comment's owner.
+                        if (($params['comment'] ?? null) instanceof EportfolioBlogCommentModel) {
+                            $commentOwner = $params['comment']->getOwner();
+
+                            if ($commentOwner->getRole()->isStaff()) {
+                                if (!$loggedInUser->getRole()->isStaff()) {
+                                    throw new Unauthorized();
+                                }
+                            } else {
+                                if ($loggedInUser->getId() === $commentOwner->getId()) {
+                                    return;
+                                }
+                            }
+                        }
+                        // If a blog parameter exists, permissions depend on the blog's owner.
+                        if (($params['blog'] ?? null) instanceof EportfolioBlogModel) {
+                            if ($params['blog']->getOwner()->getId() === $loggedInUser->getId()) {
+                                return;
+                            }
+                        }
+                        // If a page parameter exists, use Eportfolio_Authenticator->canModify() to determine permissions.
+                        if (($params['page'] ?? null) instanceof EportfolioPageModel) {
+                            $auth = new Eportfolio_Authenticator(
+                                $loggedInUser,
+                                $params['page']->getOwner(),
+                                $params['page']->getPageId()
+                            );
+                            if ($auth->canModify()) {
+                                return;
+                            }
+                        }
+                        // Otherwise, not authorised.
+                        throw new Unauthorized();
+                    }
+                )
             )
         );
     }
