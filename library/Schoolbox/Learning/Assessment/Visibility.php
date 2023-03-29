@@ -56,6 +56,14 @@ class Visibility
     {
         $now = $now ?? Alaress_Date_Format::now();
 
+        /* Lesson Plans can be hidden from students via a Visibility switch
+         */
+        if ($viewer->getRole()->isStudent() && $assessment instanceof \Schoolbox\Learning\Assessment\LessonPlan\Model) {
+            if (\Schoolbox\Role::STUDENT !== $assessment->getVisibility()) {
+                return false;
+            }
+        }
+
         /** @noinspection NotOptimalIfConditionsInspection */
         if ($viewer->getRole()->isStaff() && $this->isVisibleToStaff($assessment, $viewer, $showClosed, $now)) {
             return true;
