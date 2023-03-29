@@ -17,7 +17,7 @@
                 {% for field in assessment.fields %}
                     {% if 'staff' == view %}
                         {# Staff view: show all the fields and their data #}
-                        <h3>{{ field.title|purify }}</h3>
+                        <h3>{{ field.title }}</h3>
 
                         {# This field is only visible to staff #}
                         {% if 'staff' == field.visibility %}
@@ -27,7 +27,7 @@
                         <div>{{ field.body|purify }}</div>
                     {% elseif 'student' == view and 'student' == field.visibility %}
                         {# Student view: only show fields that are visible to students #}
-                        <h3>{{ field.title|purify }}</h3>
+                        <h3>{{ field.title }}</h3>
                         <div>{{ field.body|purify }}</div>
                     {% endif %}
                 {% endfor %}
