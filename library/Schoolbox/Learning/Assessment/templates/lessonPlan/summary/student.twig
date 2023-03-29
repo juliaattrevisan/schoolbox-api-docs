@@ -140,28 +140,3 @@
         <a href="{{ returnUrl }}" class="submit button full-width">Return</a>
     </div>
 </div>
-
-{% if preview.type is not defined or preview.type in ['image', 'file', 'redirect'] %}
-    {# noop
-     #
-     # Unknown preview types are just ignored
-     # Images and other Files now render in their own list
-     # Links/urls (preview.type redirect) are rendered further up the screen under the description
-     #}
-{% elseif preview.type == 'iframe' %}
-    {# a task link should display as a link regardless of whether iframe safe url or not #}
-    <section>
-        <div class="card small-12">
-            <a href="{{ preview.fragment }}" target="_blank" title="Visit {{ preview.fragment }}">
-                <div class="icon-link"></div>
-                <h3>{{ assessment.title }}</h3>
-                <p class="meta">{{ preview.fragment }}</p>
-            </a>
-        </div>
-    </section>
-{% elseif preview.fragment|length %}
-    {# This usage of raw is because the embedded code is raw html for embedding external content etc using oEmbed or multimedia videos #}
-    <section class="content">
-        {{ preview.fragment | raw }}
-    </section>
-{% endif %}
