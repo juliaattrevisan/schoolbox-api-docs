@@ -165,6 +165,42 @@ class Module extends BaseModule
         //    Rule : Eportfolio_Authenticator->canModify on page
         //  * Route: postModify(EportfolioPageModel $page, EportfolioBlogModel $blog)
         //    Rule : Eportfolio_Authenticator->canModify on blog's page || isOwner of post
+        $this->addRoutePermission(
+            $authorizer,
+            '(getModify|postDelete|postInsert|postModify)',
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\Callback(
+                    function ($params, User $loggedInUser) {
+                        // If a blog parameter exists, permissions depend on the blog's owner.
+                        if (($params['blog'] ?? null) instanceof EportfolioBlogModel) {
+                            if ($params['blog']->getOwner()->getId() === $loggedInUser->getId()) {
+                                return;
+                            }
+                            // Ensure $params['page'] exists, so we can fall back to the 'page' case below.
+                            if (!array_key_exists('page', $params)) {
+                                $params['page'] = $params['blog']->getPage();
+                            }
+                        }
+                        // If a page parameter exists, use Eportfolio_Authenticator->canModify() to determine permissions.
+                        if (($params['page'] ?? null) instanceof EportfolioPageModel) {
+                            $auth = new Eportfolio_Authenticator(
+                                $loggedInUser,
+                                $params['page']->getOwner(),
+                                $params['page']->getPageId()
+                            );
+                            if ($auth->canModify()) {
+                                return;
+                            }
+                        }
+                        // Otherwise, not authorised.
+                        throw new Unauthorized();
+                    }
+                )
+            )
+        );
+
+        // Affected routes are listed here with the expected parameters (from Blog\Eportfolio\Post\Controller).
         //  * Route: postCommentDelete(EportfolioBlogCommentModel $comment)
         //    Rule : if comment owner is staff
         //            * Eportfolio_Authenticator->canModify on comment's blog's page || isStaff
@@ -172,7 +208,7 @@ class Module extends BaseModule
         //            * Eportfolio_Authenticator->canModify on comment's blog's page || isOwner of comment
         $this->addRoutePermission(
             $authorizer,
-            '(getModify|postDelete|postInsert|postModify|postCommentDelete)',
+            'postCommentDelete',
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\Callback(
@@ -191,28 +227,12 @@ class Module extends BaseModule
                                 }
                             }
 
-                            // Ensure $params['page'] exists, so we can fall back to the 'page' case below.
-                            if (!array_key_exists('page', $params)) {
-                                $params['page'] = $params['comment']->getBlog()->getPage();
-                            }
-                        }
-                        // If a blog parameter exists, permissions depend on the blog's owner.
-                        if (($params['blog'] ?? null) instanceof EportfolioBlogModel) {
-                            if ($params['blog']->getOwner()->getId() === $loggedInUser->getId()) {
-                                return;
-                            }
-                            // Ensure $params['page'] exists, so we can fall back to the 'page' case below.
-                            if (!array_key_exists('page', $params)) {
-                                $params['page'] = $params['blog']->getPage();
-                            }
-                        }
-                        // If a page parameter exists, use Eportfolio_Authenticator->canModify() to determine permissions.
-                        if (($params['page'] ?? null) instanceof EportfolioPageModel) {
                             $auth = new Eportfolio_Authenticator(
                                 $loggedInUser,
                                 $params['page']->getOwner(),
                                 $params['page']->getPageId()
                             );
+
                             if ($auth->canModify()) {
                                 return;
                             }
