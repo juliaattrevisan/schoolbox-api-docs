@@ -33,12 +33,20 @@ export default class ResourceEditing extends Plugin {
             if (isHtmlIncluded(data.dataTransfer)) {
                 return;
             }
-            const files = Array.from(data.dataTransfer._files);
-            this.totalUploadCount = files.length;
-            this.uploadedCount = 0;
-            this.editor.enableReadOnlyMode("auto-resource");
-            files.forEach((file) => {
-                this.loadResource(fileRepository, resourceUI, file as File);
+            editor.model.change((writer) => {
+                // Set selection to paste target, to ensure files are most accurately placed
+                if (data.targetRanges) {
+                    writer.setSelection(
+                        data.targetRanges.map((viewRange) => editor.editing.mapper.toModelRange(viewRange))
+                    );
+                }
+                const files = Array.from(data.dataTransfer._files);
+                this.totalUploadCount = files.length;
+                this.uploadedCount = 0;
+                this.editor.enableReadOnlyMode("auto-resource");
+                files.forEach((file) => {
+                    this.loadResource(fileRepository, resourceUI, file as File);
+                });
             });
         });
     }
