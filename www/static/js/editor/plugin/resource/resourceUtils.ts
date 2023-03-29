@@ -360,9 +360,8 @@ export function addResource(editor: Editor, resource: Resource) {
             // we get without extension for now to avoid a copy/paste issue in ckeditor
             // pasting with the extension will cause ckeditor to look to embed the file again
             editor.model.insertContent(
-                writer.createText(`${getWithoutExtension(resource.name)}`, getAttributes(resource, config))
+                writer.createText(`${getWithoutExtension(resource.name)} `, getAttributes(resource, config))
             );
         }
-        editor.execute("enter");
     });
 }
