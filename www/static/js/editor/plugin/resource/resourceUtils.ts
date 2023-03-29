@@ -303,10 +303,10 @@ export function getSrc(resource: Resource, config: EditorConfig) {
         return getImageSrc(resource, config);
     }
     if (resource.type === ResourceType.VIDEO) {
-        return getVideoSrc(resource, config);
+        return getStorageSrc(resource, config);
     }
     if (resource.type === ResourceType.AUDIO) {
-        return getAudioSrc(resource, config);
+        return getStorageSrc(resource, config);
     }
     if (resource.type === ResourceType.FOLDER) {
         return getFolderSrc(resource, config);
