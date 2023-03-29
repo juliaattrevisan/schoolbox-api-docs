@@ -114,53 +114,50 @@ class Module extends BaseModule
      */
     protected function buildAuthorizationRule($method)
     {
-        $callback = function ($params, User $loggedInUser) use ($method) {
-            if (($params['comment'] ?? null) instanceof EportfolioBlogCommentModel) {
-                $commentOwner = $params['comment']->getOwner();
+        return new Rule\Any(
+            new Rule\IsSuperuser(),
+            new Rule\Callback(
+                function ($params, User $loggedInUser) use ($method) {
+                    if (($params['comment'] ?? null) instanceof EportfolioBlogCommentModel) {
+                        $commentOwner = $params['comment']->getOwner();
 
-                if ($commentOwner->getRole()->isStaff()) {
-                    // Comment owner is staff - authorize only if logged-in user is superuser or staff.
-                    // Superusers are always authorized (see return line at bottom of this function), so we only need to check isStaff().
-                    if ($loggedInUser->getRole()->isStaff()) {
-                        return;
+                        if ($commentOwner->getRole()->isStaff()) {
+                            if (!$loggedInUser->getRole()->isStaff()) {
+                                throw new Unauthorized();
+                            }
+                        } else {
+                            if ($loggedInUser->getId() === $commentOwner->getId()) {
+                                return;
+                            }
+                        }
                     }
-                } else {
-                    // Comment owner is not staff - authorize only if logged-in user is comment owner or blog owner.
-                    if (
-                        $loggedInUser->getId() === $commentOwner->getId() ||
-                        $loggedInUser->getId() === $params['comment']->getBlog()->getOwner()->getId()
-                    ) {
-                        return;
+                    if (($params['blog'] ?? null) instanceof EportfolioBlogModel) {
+                        if ($params['blog']->getOwner()->getId() === $loggedInUser->getId()) {
+                            return;
+                        }
                     }
+                    if (($params['page'] ?? null) instanceof EportfolioPageModel) {
+                        $auth = new Eportfolio_Authenticator(
+                            $loggedInUser,
+                            $params['page']->getOwner(),
+                            $params['page']->getPageId()
+                        );
+                        if (!method_exists($auth, $method)) {
+                            throw new \InvalidArgumentException(
+                                sprintf(
+                                    'Method "Eportfolio_Authenticator::%s" does not exist',
+                                    $method
+                                )
+                            );
+                        }
+                        if ($auth->$method()) {
+                            return;
+                        }
+                    }
+                    throw new Unauthorized();
                 }
-                throw new Unauthorized();
-            }
-            if (($params['blog'] ?? null) instanceof EportfolioBlogModel) {
-                if ($params['blog']->getOwner()->getId() === $loggedInUser->getId()) {
-                    return;
-                }
-            }
-            if (($params['page'] ?? null) instanceof EportfolioPageModel) {
-                $auth = new Eportfolio_Authenticator(
-                    $loggedInUser,
-                    $params['page']->getOwner(),
-                    $params['page']->getPageId()
-                );
-                if (!method_exists($auth, $method)) {
-                    throw new \InvalidArgumentException(
-                        sprintf(
-                            'Method "Eportfolio_Authenticator::%s" does not exist',
-                            $method
-                        )
-                    );
-                }
-                if ($auth->$method()) {
-                    return;
-                }
-            }
-            throw new Unauthorized();
-        };
-        return new Rule\Any(new Rule\IsSuperuser(), new Rule\Callback($callback));
+            )
+        );
     }
 
     /**
