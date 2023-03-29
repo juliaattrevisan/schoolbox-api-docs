@@ -97,17 +97,19 @@ abstract class CourseAssessmentAbstract
      * @param string              $title
      * @param string|null         $description
      * @param WorkType\Model|null $workType
+     * @param float               $weight
      * @param string              $createdAt
      * @param string              $updatedAt
      * @param int                 $position
      * @return Assessment\Model
-     * @throws Database\Exception
+     * @throws \Schoolbox\Mapper\Exception
      */
     protected function createAssessment(
         UnitSpec\Model $unitSpec,
         string $title,
         ?string $description,
         ?WorkType\Model $workType,
+        float $weight,
         string $createdAt,
         string $updatedAt,
         int $position
@@ -118,6 +120,7 @@ abstract class CourseAssessmentAbstract
             ->setTitle($title)
             ->setDescription($description)
             ->setWorkType($workType)
+            ->setWeight($weight)
             ->setCreatedAt(Alaress_Date_Format::newDatabaseDate($createdAt))
             ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate($updatedAt))
             ->setSequence($position);

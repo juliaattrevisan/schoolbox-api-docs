@@ -460,7 +460,7 @@ class CourseQuiz extends CourseAssessmentAbstract
         ?string $description,
         int $duration,
         int $maxAttempts,
-        int $weight,
+        float $weight,
         bool $anonymousSubmissions,
         int $markVisibility,
         string $createdAt,
@@ -728,7 +728,7 @@ class CourseQuiz extends CourseAssessmentAbstract
      * @param bool                $anonymousSubmissions
      * @param int                 $duration
      * @param int                 $maxAttempts
-     * @param int                 $weight
+     * @param float               $weight
      * @param int                 $position
      * @param int                 $markVisibility
      * @return Quiz\Model
@@ -746,7 +746,7 @@ class CourseQuiz extends CourseAssessmentAbstract
         bool $anonymousSubmissions,
         int $duration,
         int $maxAttempts,
-        int $weight,
+        float $weight,
         int $position,
         int $markVisibility
     ): Quiz\Model {
@@ -755,6 +755,7 @@ class CourseQuiz extends CourseAssessmentAbstract
             $title,
             $description,
             $workType,
+            $weight,
             $createdAt,
             $updatedAt,
             $position

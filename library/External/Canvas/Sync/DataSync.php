@@ -17,6 +17,8 @@ use InvalidArgumentException;
 use Alaress\Database;
 use PDOException;
 use Psr\Log\LoggerInterface;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeLevelGroupMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Mapper as GradeLevelMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
@@ -55,6 +57,8 @@ class DataSync
      * @param External_ClassInterface    $externalClass
      * @param External_UserInterface     $externalUser
      * @param MarkTypeMapper             $markTypeMapper
+     * @param GradeLevelGroupMapper      $gradeLevelGroupMapper
+     * @param GradeLevelMapper           $gradeLevelMapper
      * @param WorkType\Mapper            $workTypeMapper
      * @param Quiz\Mapper                $quizMapper
      * @param QuizSection\Mapper         $quizSectionMapper
@@ -85,6 +89,8 @@ class DataSync
         private External_ClassInterface $externalClass,
         private External_UserInterface $externalUser,
         private MarkTypeMapper $markTypeMapper,
+        private GradeLevelGroupMapper $gradeLevelGroupMapper,
+        private GradeLevelMapper $gradeLevelMapper,
         private WorkType\Mapper $workTypeMapper,
         private Quiz\Mapper $quizMapper,
         private QuizSection\Mapper $quizSectionMapper,
@@ -143,6 +149,7 @@ class DataSync
             $this->markTypeMapper->findAll(),
             $this->workTypeMapper->findAll()
         );
+        $assignmentBridge->prepareLetterGrades($this->gradeLevelGroupMapper, $this->gradeLevelMapper, $this->userMapper);
         $courseBridge             = $bridgeFactory->getCourse($this->canvasDb, $this->schoolboxDb);
         $courseGroupBridge        = new Bridge\CourseGroup($this->schoolboxDb, $accountBridge);
         $assignmentDatesBridge    = $bridgeFactory->getAssignmentDates();

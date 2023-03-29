@@ -61,9 +61,9 @@ class DataRestorer
         foreach ($schema as $tableIndex => $tableData) {
             $columns     = $tableData['columns'];
             $tableName   = $tableData['tableName'];
-            if (!in_array($tableName, $this->tableNames)) {
-                continue;
-            }
+//            if (!in_array($tableName, $this->tableNames)) {
+//                continue;
+//            }
             $description = str_replace('"', '\"', $tableData['description'] ?? '');
 
             // https://dev.mysql.com/doc/workbench/en/wb-migration-database-postgresql-typemapping.html
@@ -109,12 +109,14 @@ class DataRestorer
      *
      * @param string $tableName
      * @param string $tableFile
-     * @throws Database\Exception
+     * @param int    $index
      */
-    public function restoreTableData(string $tableName, string $tableFile): void
+    public function restoreTableData(string $tableName, string $tableFile, int $index): void
     {
-        $sql = "TRUNCATE {$this->canvasDbName}.{$tableName}";
-        $this->executeIfPersisting($sql);
+        if ($index === 0) {
+            $sql = "TRUNCATE {$this->canvasDbName}.{$tableName}";
+            $this->executeIfPersisting($sql);
+        }
 
         $sql = "SET STATEMENT max_statement_time=0 FOR LOAD DATA INFILE '$tableFile' INTO TABLE {$this->canvasDbName}.{$tableName}";
         try {

@@ -103,20 +103,34 @@ abstract class SubmissionAbstract
 
 
     /**
-     * @param Plan                 $planModel
-     * @param User                 $user
-     * @param \Alaress_Date_Format $createdAt
+     * @param Plan                                       $planModel
+     * @param \Schoolbox\Learning\Assessment\Participant $participant
+     * @param \Alaress_Date_Format                       $createdAt
+     * @param array                                      $canvasSubmission
      * @return void
      * @throws Mapper\Exception
      */
-    public function saveParticipant(Plan $planModel, User $user, \Alaress_Date_Format $createdAt): void
+    public function saveParticipant(Plan $planModel, \Schoolbox\Learning\Assessment\Participant $participant, \Alaress_Date_Format $createdAt, array $canvasSubmission): void
     {
-        $plan        = (new Participant\Plan\Model())->setId($planModel->getId());
-        $participant = $this->participantMapper->createModel()
-                                               ->setUser($user)
-                                               ->setPlan($plan)
-                                               ->setCreatedAt($createdAt);
-        $this->saveModel($this->participantMapper, $participant, true, false);
+        $excluded = $canvasSubmission['excused'] === 'excused_submission';
+        if ($participant->getId() && ($participant->isExcluded() === $excluded)) {
+            // no need to change
+            return;
+        }
+
+        $plan             = (new Participant\Plan\Model())->setId($planModel->getId());
+        $participantModel = $this->participantMapper->createModel()
+                                                    ->setUser($participant->getUser())
+                                                    ->setPlan($plan)
+                                                    ->setCreatedAt($createdAt);
+        if ($participant->getId()) {
+            $participantModel->setId($participant->getId());
+        }
+        if ($excluded) {
+            $participantModel->setExcludedAt($createdAt);
+        }
+
+        $this->saveModel($this->participantMapper, $participantModel, true, false);
     }
 
     /**

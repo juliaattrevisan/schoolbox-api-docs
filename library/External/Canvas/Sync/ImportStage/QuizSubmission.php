@@ -140,14 +140,12 @@ class QuizSubmission extends SubmissionAbstract
                             $reviewer     = $this->findUserByCanvasUserId($canvasSubmission['grader_user_id']);
                             $feedbackTime = $canvasSubmission['graded_at'];
                         }
-                        // save participant, if not exists
-                        if (!$participant->getId()) {
-                            $this->saveParticipant(
-                                $plan,
-                                $participant->getUser(),
-                                $this->convertTime($feedbackTime)
-                            );
-                        }
+                        $this->saveParticipant(
+                            $plan,
+                            $participant,
+                            $this->convertTime($feedbackTime),
+                            $canvasSubmission
+                        );
 
                         $feedback = $this->syncFeedback(
                             $quiz,
@@ -315,7 +313,7 @@ class QuizSubmission extends SubmissionAbstract
     {
         $mySqlQuoter = new Database\Quoter\Mysql\Quoter();
         $pb          = (new Builder($mySqlQuoter, ''))->equals('quiz_dim.canvas_id', $assignmentCanvasId);
-        $pb->notNull('submission_dim.published_grade');
+        $pb->equals('submission_dim.workflow_state', 'graded');
         $whereClause = implode(' AND ', $pb->getWhere());
 
         $sql = "
@@ -324,6 +322,7 @@ class QuizSubmission extends SubmissionAbstract
                 assignment_dim.canvas_id,
                 submission_dim.id as submission_id,
                 submission_dim.published_grade as mark,
+                submission_dim.excused as excused,
                 quiz_submission_fact.score as norm_mark,
                 quiz_submission_fact.quiz_points_possible as max_mark,
                 CONVERT_TZ(quiz_submission_dim.started_at, 'UTC', :timezone) as started_at,

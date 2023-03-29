@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace External\Canvas\Sync\ImportStage;
 
 use Alaress\Database\Connector\IConnector;
+use External\Canvas\Sync\Bridge\Assignment;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
@@ -125,14 +126,13 @@ class Submission extends SubmissionAbstract
                             $reviewer     = $this->findUserByCanvasUserId($canvasSubmission['grader_user_id']);
                             $feedbackTime = $canvasSubmission['graded_at'];
                         }
-                        // save participant, if not exists
-                        if (!$participant->getId()) {
-                            $this->saveParticipant(
-                                $plan,
-                                $participant->getUser(),
-                                $this->convertTime($feedbackTime)
-                            );
-                        }
+                        // save participant
+                        $this->saveParticipant(
+                            $plan,
+                            $participant,
+                            $this->convertTime($feedbackTime),
+                            $canvasSubmission
+                        );
 
                         $feedback = $this->syncFeedback(
                             $submissionBox,
@@ -166,12 +166,12 @@ class Submission extends SubmissionAbstract
      * Finds or creates Schoolbox Feedback corresponding to the given canvas submission
      *
      * @param Assessment\IAssessableDataModel $iAssessable
-     * @param User $reviewer
-     * @param User                $reviewee
-     * @param array               $canvasSubmission
-     * @param GenericCollection   $existingFeedbacks
-     * @param IMarkScheme         $markScheme
-     * @param string              $feedbackTime
+     * @param User                            $reviewer
+     * @param User                            $reviewee
+     * @param array                           $canvasSubmission
+     * @param GenericCollection               $existingFeedbacks
+     * @param IMarkScheme                     $markScheme
+     * @param string                          $feedbackTime
      * @return SubmissionBox\ReturnedWork|null
      * @throws Mapper\Exception
      */
@@ -187,10 +187,16 @@ class Submission extends SubmissionAbstract
         /** @var SubmissionBox $submissionBox */
         $submissionBox = $iAssessable;
         $this->log->debug(sprintf('Processing marks for submission_box: box_id:%s student:%d', $submissionBox->getId(), $reviewee->getId()));
-        $normMark = $canvasSubmission['norm_mark'];
+        $normMark     = $canvasSubmission['norm_mark'];
         $readableMark = $canvasSubmission['mark'];
 
-        if ($normMark !== null && $submissionBox->getMaxMark()) {
+        if ($submissionBox->getMarkType()->getSlug() === SubmissionBox\MarkType::SLUG_LETTER && in_array($readableMark, [
+                Assignment::MARK_COMPLETE,
+                Assignment::MARK_INCOMPLETE,
+            ])) {
+            // there are complete marks with 0 points, which confuses SB
+            $normMark = $readableMark === Assignment::MARK_COMPLETE ? 100 : 0;
+        } elseif ($normMark !== null && $submissionBox->getMaxMark()) {
             $normMark = ($normMark / $submissionBox->getMaxMark()) * 100;
         } elseif ($readableMark !== null && $submissionBox->getMarkType()->getSlug() !== SubmissionBox\MarkType::SLUG_NONE) {
             // If submission_dim.published_grade exists but submission_fact.published_score doesn't,
@@ -274,7 +280,7 @@ class Submission extends SubmissionAbstract
     {
         $mySqlQuoter = new Database\Quoter\Mysql\Quoter();
         $pb          = (new Builder($mySqlQuoter, ''))->equals('assignment_dim.canvas_id', $assignmentCanvasId);
-        $pb->notNull('submission_dim.published_grade');
+        $pb->equals('submission_dim.workflow_state', 'graded');
         $whereClause = implode(' AND ', $pb->getWhere());
 
         $sql = "
@@ -283,6 +289,7 @@ class Submission extends SubmissionAbstract
                 assignment_dim.canvas_id,
                 submission_dim.id as submission_id,
                 submission_dim.published_grade as mark,
+                submission_dim.excused as excused,
                 submission_fact.published_score as norm_mark,
                 reviewee.sis_user_id as reviewee_id,
                 submission_dim.grader_id as grader_user_id,
