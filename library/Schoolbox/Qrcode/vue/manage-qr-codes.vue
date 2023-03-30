@@ -130,6 +130,8 @@ export default {
 
     mounted() {
         this.loadStudents();
+        // As vue loads the template after foundation has been initialised, we need to reinitialise the tooltips
+        $(document).foundation('tooltip', 'reflow');
     },
 
     methods: {
