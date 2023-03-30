@@ -1,5 +1,8 @@
 /**
  * A list of 120 colors for use when choosing a color in the editor
+ * @todo - pull this out from the font/background colour for now, as colour pickers in the
+ * insert table UI do not support multiple columns like they do in font/background colour.
+ * And as such they looks pretty funky if not in the 12 column configuration.
  */
 
 /**
