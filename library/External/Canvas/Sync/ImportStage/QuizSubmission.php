@@ -335,10 +335,10 @@ class QuizSubmission extends SubmissionAbstract
                 CONVERT_TZ(submission_comment_dim.created_at, 'UTC', :timezone) as comment_created_at,
                 CONVERT_TZ(submission_comment_dim.updated_at, 'UTC', :timezone) as comment_updated_at
             FROM assignment_dim
-            LEFT JOIN submission_dim ON assignment_dim.id = submission_dim.assignment_id
             JOIN quiz_dim ON quiz_dim.assignment_id = assignment_dim.id
-            JOIN quiz_submission_dim ON quiz_submission_dim.id = submission_dim.quiz_submission_id
-            JOIN quiz_submission_fact ON quiz_submission_fact.quiz_submission_id = quiz_submission_dim.id
+            LEFT JOIN submission_dim ON assignment_dim.id = submission_dim.assignment_id
+            LEFT JOIN quiz_submission_dim ON quiz_submission_dim.id = submission_dim.quiz_submission_id
+            LEFT JOIN quiz_submission_fact ON quiz_submission_fact.quiz_submission_id = quiz_submission_dim.id
             LEFT JOIN submission_comment_dim ON submission_comment_dim.submission_id = submission_dim.id
                                              AND submission_comment_dim.author_id <> submission_dim.user_id
             LEFT JOIN pseudonym_dim as reviewee ON reviewee.user_id = submission_dim.user_id AND reviewee.workflow_state = 'active'

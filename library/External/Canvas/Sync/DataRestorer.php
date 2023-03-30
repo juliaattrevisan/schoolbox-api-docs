@@ -61,9 +61,9 @@ class DataRestorer
         foreach ($schema as $tableIndex => $tableData) {
             $columns     = $tableData['columns'];
             $tableName   = $tableData['tableName'];
-//            if (!in_array($tableName, $this->tableNames)) {
-//                continue;
-//            }
+            if (!in_array($tableName, $this->tableNames)) {
+                continue;
+            }
             $description = str_replace('"', '\"', $tableData['description'] ?? '');
 
             // https://dev.mysql.com/doc/workbench/en/wb-migration-database-postgresql-typemapping.html
@@ -113,6 +113,7 @@ class DataRestorer
      */
     public function restoreTableData(string $tableName, string $tableFile, int $index): void
     {
+        // truncate only if this is the first data for the table
         if ($index === 0) {
             $sql = "TRUNCATE {$this->canvasDbName}.{$tableName}";
             $this->executeIfPersisting($sql);

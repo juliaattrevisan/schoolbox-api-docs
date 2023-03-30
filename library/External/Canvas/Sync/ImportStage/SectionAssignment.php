@@ -252,7 +252,8 @@ class SectionAssignment extends SectionAssessmentAbstract
             $assessableImpl->getSelfReviewability() === $assessableSpec->getSelfReviewability() &&
             $assessableImpl->getOwner()->getId() === $owner->getId() &&
             $assessableImpl->getCategory()->getId() === $unitImpl->getFolder()->getId() &&
-            $assessableImpl->getMarkType()->getId() === $assessableSpec->getMarkType()->getId()
+            $assessableImpl->getMarkType()->getId() === $assessableSpec->getMarkType()->getId() &&
+            $assessableImpl->getGradeGroup()?->getId() === $assessableSpec->getGradeGroup()?->getId()
         ) {
             return false;
         }
@@ -265,7 +266,8 @@ class SectionAssignment extends SectionAssessmentAbstract
             ->setSelfReviewability($assessableSpec->getSelfReviewability())
             ->setOwner($owner)
             ->setCategory($unitImpl->getFolder())
-            ->setMarkType($assessableSpec->getMarkType());
+            ->setMarkType($assessableSpec->getMarkType())
+            ->setGradeGroup($assessableSpec->getGradeGroup());
         $this->submissionBoxMapper->save($assessableImpl);
         return true;
     }

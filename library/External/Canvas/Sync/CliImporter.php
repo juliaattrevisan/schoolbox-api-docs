@@ -290,15 +290,16 @@ class CliImporter extends CliTool\App
             if ($tableGzFile === '..' || $tableGzFile === '.') {
                 continue;
             }
+            // Table file name format should be <table name>.<index>.gz
             $tableFileParts = explode('.', $tableGzFile);
             if (count($tableFileParts) !== 3) {
                 continue;
             }
             $tableName = $tableFileParts[0];
             $index = (int)$tableFileParts[1];
-//            if (!in_array($tableName, self::TABLES_TO_IMPORT)) {
-//                continue;
-//            }
+            if (!in_array($tableName, self::TABLES_TO_IMPORT)) {
+                continue;
+            }
             $tableFile = "$tempDir/$tableName.$index";
             $this->getLogger()->debug("Loading $tableFile.");
 
@@ -452,11 +453,11 @@ class CliImporter extends CliTool\App
     {
         $client = new Client();
         foreach ($tableList as $tableName => $tableData) {
-//            if (!in_array($tableName, self::TABLES_TO_IMPORT) || !count($tableData['files'])) {
-            if (!count($tableData['files'])) {
+            if (!in_array($tableName, self::TABLES_TO_IMPORT) || !count($tableData['files'])) {
                 continue;
             }
-            $tableFiles     = $tableData['files'];
+            // there can be multiple files
+            $tableFiles = $tableData['files'];
             foreach ($tableFiles as $index => $tableFile) {
                 $fileName      = "$tempDir/$tableName.$index.gz";
                 $tableDataFile = fopen(($this->perform() || !file_exists($fileName)) ? $fileName  : '/dev/null', 'wb');
