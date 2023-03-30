@@ -12,7 +12,6 @@ namespace External\Canvas\Sync\ImportStage;
 use Alaress\Database;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
-use Alaress_Date_Format;
 use External\Canvas\Sync\Bridge;
 use External\Canvas\Sync\Helpers\CourseTeachers;
 use External\Canvas\Sync\ImportStage\Traits\ModelSaveTrait;
@@ -321,6 +320,7 @@ class CourseAssignments extends CourseAssessmentAbstract
             $description,
             $position,
             $workType,
+            $weight,
             $createdAt,
             $updatedAt
         );
@@ -500,55 +500,6 @@ class CourseAssignments extends CourseAssessmentAbstract
 
         return true;
     }
-
-    /**
-     * Check if an assessment has changed, and update it in the DB if it has.
-     *
-     * Returns whether any changes were made.
-     *
-     * @param Assessment\Model    $assessment
-     * @param string              $title
-     * @param string|null         $description
-     * @param int                 $position
-     * @param WorkType\Model|null $workType
-     * @param string              $createdAt
-     * @param string              $updatedAt
-     * @return bool
-     * @throws Database\Exception
-     */
-    private function checkAssessmentForChanges(
-        Assessment\Model $assessment,
-        string $title,
-        ?string $description,
-        int $position,
-        ?WorkType\Model $workType,
-        string $createdAt,
-        string $updatedAt
-    ): bool {
-        // Do all attributes align?
-        if (
-            $assessment->getTitle() === $title &&
-            $assessment->getDescription() === $description &&
-            $assessment->getSequence() === $position &&
-            (($assessment->getWorkType() === null) === ($workType === null)) &&
-            $assessment->getCreatedAt()->getDatabase() === $createdAt &&
-            $assessment->getUpdatedAt()->getDatabase() === $updatedAt &&
-            (!$assessment->getWorkType() || !$workType || $assessment->getWorkType()->getId() === $workType->getId())
-        ) {
-            return false;
-        }
-        $assessment->setTitle($title)
-                   ->setDescription($description)
-                   ->setCreatedAt(Alaress_Date_Format::newDatabaseDate($createdAt))
-                   ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate($updatedAt))
-                   ->setSequence($position)
-                   ->setWorkType($workType);
-
-        $this->saveModel($this->assessmentMapper, $assessment, false, false);
-
-        return true;
-    }
-
 
     /**
      * Moves an assessment from its current unitSpec to the specified unitSpec

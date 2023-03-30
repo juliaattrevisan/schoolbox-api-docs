@@ -471,21 +471,20 @@ class SectionQuiz extends SectionAssessmentAbstract
     ): bool {
         if (
             // Does any attribute no longer align?
-            $quizImpl->getAvailability() === Quiz\Model::AVAILABILITY_ASSESS &&
-            (($quizImpl->getWorkType() === null) === ($quizSpec->getWorkType() === null)) &&
+            $quizImpl->getCategory()->getId() === $unitImpl->getFolder()->getId() &&
+            $quizImpl->getUser()->getId() === $owner->getId() &&
+            $quizImpl->getWorkType()?->getId() === $quizSpec->getWorkType()?->getId() &&
             $quizImpl->getTitle() === $quizSpec->getTitle() &&
             $quizImpl->getDescription() === $quizSpec->getDescription() &&
+            $quizImpl->getStart()->getDatabase() === $openDate &&
+            $quizImpl->getFinish()->getDatabase() === $dueDate &&
             $quizImpl->getDuration() === $quizSpec->getDuration() &&
             $quizImpl->getMaxAttempts() === $quizSpec->getMaxAttempts() &&
             $quizImpl->getWeight() === $quizSpec->getWeight() &&
+            $quizImpl->getAvailability() === Quiz\Model::AVAILABILITY_ASSESS &&
             $quizImpl->getAnonymousResult() === $quizSpec->getAnonymousResult() &&
             $quizImpl->getMarkVisibility() === $quizSpec->getMarkVisibility() &&
-            $quizImpl->getStart()->getDatabase() === $openDate &&
-            $quizImpl->getFinish()->getDatabase() === $dueDate &&
-            $quizImpl->getUser()->getId() === $owner->getId() &&
-            $quizImpl->getCreated()->getDatabase() === $quizSpec->getCreated()->getDatabase() &&
-            $quizImpl->getCategory()->getId() === $unitImpl->getFolder()->getId() &&
-            ($quizImpl->getWorkType() && $quizSpec->getWorkType() && $quizImpl->getWorkType()->getId() === $quizSpec->getWorkType()->getId())
+            $quizImpl->getCreated()->getDatabase() === $quizSpec->getCreated()->getDatabase()
         ) {
             return false;
         }

@@ -141,6 +141,57 @@ abstract class CourseAssessmentAbstract
     }
 
     /**
+     * Check if an assessment has changed, and update it in the DB if it has.
+     *
+     * Returns whether any changes were made.
+     *
+     * @param Assessment\Model    $assessment
+     * @param string              $title
+     * @param string|null         $description
+     * @param int                 $position
+     * @param WorkType\Model|null $workType
+     * @param float               $weight
+     * @param string              $createdAt
+     * @param string              $updatedAt
+     * @return bool
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    protected function checkAssessmentForChanges(
+        Assessment\Model $assessment,
+        string $title,
+        ?string $description,
+        int $position,
+        ?WorkType\Model $workType,
+        float $weight,
+        string $createdAt,
+        string $updatedAt
+    ): bool {
+        // Do all attributes align?
+        if (
+            $assessment->getTitle() === $title &&
+            $assessment->getDescription() === $description &&
+            $assessment->getSequence() === $position &&
+            $assessment->getWorkType()?->getId() === $workType?->getId() &&
+            (float)$assessment->getWeight() === $weight &&
+            $assessment->getCreatedAt()->getDatabase() === $createdAt &&
+            $assessment->getUpdatedAt()->getDatabase() === $updatedAt
+        ) {
+            return false;
+        }
+        $assessment->setTitle($title)
+                   ->setDescription($description)
+                   ->setSequence($position)
+                   ->setWorkType($workType)
+                   ->setWeight($weight)
+                   ->setCreatedAt(Alaress_Date_Format::newDatabaseDate($createdAt))
+                   ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate($updatedAt));
+
+        $this->saveModel($this->assessmentMapper, $assessment, false, false);
+
+        return true;
+    }
+
+    /**
      * Returns the canvas ids of the Canvas courses to import
      *
      * Course must:

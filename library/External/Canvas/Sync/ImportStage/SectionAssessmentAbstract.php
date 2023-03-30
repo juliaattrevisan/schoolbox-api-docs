@@ -11,7 +11,6 @@ namespace External\Canvas\Sync\ImportStage;
 
 use Alaress\Database;
 use Alaress\Database\Connector\IConnector;
-use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress_Date_Format;
 use External\Canvas\Sync\Bridge;
@@ -954,6 +953,8 @@ abstract class SectionAssessmentAbstract
             $assessmentImpl->getTitle() === $assessmentSpec->getTitle() &&
             $assessmentImpl->getDescription() === $assessmentSpec->getDescription() &&
             $assessmentImpl->getSequence() === $assessmentSpec->getSequence() &&
+            $assessmentImpl->getWorkType()?->getId() === $assessmentSpec->getWorkType()?->getId() &&
+            $assessmentImpl->getWeight() === $assessmentSpec->getWeight() &&
             $assessmentImpl->getPublishDate()->getDatabase() === $publishDate &&
             $assessmentImpl->getOpenDate()->getDatabase() === $openDate &&
             $assessmentImpl->getDueDate()->getDatabase() === $dueDate &&
@@ -966,11 +967,13 @@ abstract class SectionAssessmentAbstract
         $assessmentImpl
             ->setTitle($assessmentSpec->getTitle())
             ->setDescription($assessmentSpec->getDescription())
+            ->setSequence($assessmentSpec->getSequence())
+            ->setWorkType($assessmentSpec->getWorkType())
+            ->setWeight($assessmentSpec->getWeight())
             ->setPublishDate(Alaress_Date_Format::newDatabaseDate($publishDate))
             ->setOpenDate(Alaress_Date_Format::newDatabaseDate($openDate))
             ->setDueDate(Alaress_Date_Format::newDatabaseDate($dueDate))
-            ->setCloseDate(Alaress_Date_Format::newDatabaseDate($closeDate))
-            ->setSequence($assessmentSpec->getSequence());
+            ->setCloseDate(Alaress_Date_Format::newDatabaseDate($closeDate));
         $this->saveModel($this->assessmentMapper, $assessmentImpl, false, false);
         return true;
     }

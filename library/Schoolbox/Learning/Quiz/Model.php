@@ -550,7 +550,7 @@ class Model implements ISoftDeletable, IAssessableDataModel
     }
 
     /**
-    * @return WorkType
+    * @return WorkType|null
     */
     public function getWorkType()
     {
