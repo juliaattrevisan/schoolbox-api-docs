@@ -210,6 +210,10 @@ Copies an instance's redis data to the specified server
                             }
                         } else {
                             $this->logKey($key);
+                            if ($targetRedis->exists($key)) {
+                                $this->getLogger()->warning("Key {$key} already exists on {$targetRedisUrl}. Skipping.");
+                                continue;
+                            }
                             if ($this->perform()) {
                                 $migrate->setArguments(array_merge($args, [$key]));
                                 $this->sourceRedis->executeCommand($migrate);
