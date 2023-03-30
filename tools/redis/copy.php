@@ -15,4 +15,4 @@ require_once __DIR__ . '/../../conf/core/require.php';
 
 /**
  */
-(new CliTool\Kernel(new Copy(), [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::NOTICE]))->runApp();
+(new CliTool\Kernel(new Copy(), [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO]))->runApp();
