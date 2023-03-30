@@ -37,7 +37,7 @@ async function onCreated(textarea: HTMLTextAreaElement, editor: Editor, config: 
  */
 function addDefaultConfig(config: EditorConfig) {
     if (config.toolbar === undefined) {
-        config.toolbar = EditorToolbar.FULL;
+        config.toolbar = EditorToolbar.DEFAULT;
     }
     if (config.maxCharCount === undefined) {
         config.maxCharCount = 65_000;
