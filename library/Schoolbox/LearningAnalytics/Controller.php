@@ -13,6 +13,7 @@ namespace Schoolbox\LearningAnalytics;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
+use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Analytics\CohortAnalysis;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -303,7 +304,7 @@ class Controller extends Base
             foreach ($courseImpl->getUnits() as $unitImpl) {
                 foreach ($unitImpl->getAssessables() as $a) {
                     // Is Assessment a Task or has MarkType of 'None' ?
-                    if ($a instanceof Task || MarkType::SLUG_NONE === $a->getMarkType()->getSlug()) {
+                    if ($a instanceof Task || $a instanceof LessonPlan|| MarkType::SLUG_NONE === $a->getMarkType()->getSlug()) {
                         continue;
                     }
 
