@@ -1666,23 +1666,8 @@ parameters:
 			path: library/External/Canvas/Sync/ImportStage/CourseAssignments.php
 
 		-
-			message: "#^Left side of && is always true\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/CourseQuiz.php
-
-		-
 			message: "#^Result of \\|\\| is always true\\.$#"
 			count: 2
-			path: library/External/Canvas/Sync/ImportStage/CourseQuiz.php
-
-		-
-			message: "#^Right side of && is always true\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/CourseQuiz.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between Schoolbox\\\\Learning\\\\Assessment\\\\WorkType\\\\Model and null will always evaluate to false\\.$#"
-			count: 1
 			path: library/External/Canvas/Sync/ImportStage/CourseQuiz.php
 
 		-
@@ -1691,23 +1676,8 @@ parameters:
 			path: library/External/Canvas/Sync/ImportStage/SectionAssessmentAbstract.php
 
 		-
-			message: "#^Left side of && is always true\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/SectionQuiz.php
-
-		-
 			message: "#^Method External\\\\Canvas\\\\Sync\\\\ImportStage\\\\SectionQuiz\\:\\:findAssessableImpl\\(\\) should return Schoolbox\\\\Assessment\\\\Component\\\\SubmissionBox\\|null but returns Schoolbox\\\\Learning\\\\Quiz\\\\Model\\.$#"
 			count: 1
-			path: library/External/Canvas/Sync/ImportStage/SectionQuiz.php
-
-		-
-			message: "#^Right side of && is always true\\.$#"
-			count: 1
-			path: library/External/Canvas/Sync/ImportStage/SectionQuiz.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between Schoolbox\\\\Learning\\\\Assessment\\\\WorkType\\\\Model and null will always evaluate to false\\.$#"
-			count: 2
 			path: library/External/Canvas/Sync/ImportStage/SectionQuiz.php
 
 		-
@@ -5089,11 +5059,6 @@ parameters:
 			message: "#^Property Schoolbox\\\\Learning\\\\Quiz\\\\Controller\\:\\:\\$quizSolutionMapper is never read, only written\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Quiz/Controller.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Quiz/Mapper.php
 
 		-
 			message: "#^Property Schoolbox\\\\Learning\\\\Quiz\\\\Model\\:\\:\\$attempts \\(array\\<Schoolbox\\\\Learning\\\\Quiz\\\\Attempt\\\\Model\\>\\|\\(iterable\\<Schoolbox\\\\Learning\\\\Quiz\\\\Attempt\\\\Model\\>&Schoolbox\\\\GenericCollection\\)\\) does not accept null\\.$#"
