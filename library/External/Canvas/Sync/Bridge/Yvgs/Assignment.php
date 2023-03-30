@@ -33,7 +33,6 @@ class Assignment extends \External\Canvas\Sync\Bridge\Assignment
                 [
                     self::MARK_COMPLETE   => 100,
                     self::MARK_INCOMPLETE => 0,
-
                 ],
             self::GRADE_LETTER_GRADE =>
                 [
@@ -49,7 +48,6 @@ class Assignment extends \External\Canvas\Sync\Bridge\Assignment
                     'E'  => 39.5,
                     'UG' => 0,
                 ],
-
         ];
 
     /**
