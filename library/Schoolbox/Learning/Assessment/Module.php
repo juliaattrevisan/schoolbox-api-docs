@@ -861,6 +861,15 @@ class Module extends BaseModule
             new Rule\IsLoggedIn(),
             new AssessmentNotDeleted(),
             $this->buildAuthRuleHasInstructorAccess(),
+            /* Exclude Lesson Plans from the Status screen in Course Outline
+             */
+            new ValidAssessmentType([
+                AssessmentType::TYPE_DUE_WORK,
+                AssessmentType::TYPE_TASK,
+                AssessmentType::TYPE_QUIZ,
+                AssessmentType::TYPE_LTI_ASSESSMENT,
+                AssessmentType::TYPE_PROJECT
+            ]),
             new Rule\Any(
                 new IsImplementation(),
                 new ValidAssessmentType([AssessmentType::TYPE_PROJECT])
