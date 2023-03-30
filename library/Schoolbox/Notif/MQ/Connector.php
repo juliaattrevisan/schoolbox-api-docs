@@ -64,6 +64,9 @@ class Connector extends AMQPConnector
      */
     protected function getConnection(): AbstractConnection
     {
+        if ($this->conn?->isConnected()) {
+            $this->closeConnection();
+        }
         if (!$this->conn) {
             $this->conn = AMQPStreamConnection::create_connection(
                 [
