@@ -304,7 +304,7 @@ class Controller extends Base
             foreach ($courseImpl->getUnits() as $unitImpl) {
                 foreach ($unitImpl->getAssessables() as $a) {
                     // Is Assessment a Task or has MarkType of 'None' ?
-                    if ($a instanceof Task || $a instanceof LessonPlan|| MarkType::SLUG_NONE === $a->getMarkType()->getSlug()) {
+                    if ($a instanceof Task || $a instanceof LessonPlan || MarkType::SLUG_NONE === $a->getMarkType()->getSlug()) {
                         continue;
                     }
 
