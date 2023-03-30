@@ -26,6 +26,14 @@
  *  while being edited and to bring it closer to what the display will look like.
 **/
 .ck.ck-content {
+    p,
+    blockquote,
+    figure,
+    table,
+    img {
+        clear: both;
+    }
+
     & > p:first-child {
         margin-top: 0;
     }
@@ -65,7 +73,11 @@ article {
         margin-top: 1rem;
     }
 
-    p {
+    blockquote,
+    figure,
+    img,
+    p,
+    table {
         clear: both;
     }
 
@@ -74,8 +86,8 @@ article {
     }
 
     table {
-        margin-top: 1rem;
         margin-bottom: 1rem;
+        margin-top: 1rem;
 
         th {
             background-color: rgba(0, 0, 0, 0.05);
@@ -135,16 +147,28 @@ article {
  *  tags but still wrap properly around the " mark
 **/
 blockquote {
+    border-left: 6px solid $base !important;
+    position: relative;
+    padding-left: 2.5rem !important;
+
     &:before {
-        float: left;
-        height: 3.25rem;
+        font-size: 3.5rem;
+        font-style: normal;
+        height: 3rem;
+        left: 0.5rem;
         line-height: normal;
-        margin-right: 1rem;
+        position: absolute;
+        top: 0;
         vertical-align: middle;
     }
 
     & p {
         display: block;
+    }
+
+    & figure,
+    table {
+        font-style: initial;
     }
 }
 
