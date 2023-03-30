@@ -1,0 +1,85 @@
+/**
+ *  Unify all the blockquote style in one file instead of spreading them across
+ *  multiple areas.
+**/
+
+$blockquote-cite-font-color: scale-color($header-font-color, $lightness: 23%);
+blockquote {
+    background-color: $vapor;
+    border-#{$default-float}: 6px solid $base;
+    font-size: rem-calc(($base-font-size - 3));
+    margin: 0 0 $paragraph-margin-bottom;
+    padding: rem-calc(9 20 9 19);
+    &:before {
+        color: $base;
+        content: "\201C";
+        font-family: Georgia, serif;
+        font-size: 4rem;
+        line-height: 0.1rem;
+        margin-right: 0.4rem;
+        vertical-align: -2rem;
+    }
+    cite {
+        color: $blockquote-cite-font-color;
+        display: block;
+        font-size: rem-calc(13);
+        &:before {
+            content: "\2014 \2009";
+        }
+        a,
+        a:visited {
+            color: $blockquote-cite-font-color;
+        }
+    }
+    p {
+        display: inline;
+        font-style: italic;
+        word-wrap: break-word;
+    }
+}
+
+blockquote,
+blockquote p {
+    color: scale-color($header-font-color, $lightness: 35%);
+    line-height: $paragraph-line-height;
+}
+
+/**
+ *  Custom block quote styles so that paragraph tags behave like paragraph
+ *  tags but still wrap properly around the " mark
+**/
+blockquote {
+    border-left: 6px solid $base !important;
+    position: relative;
+    padding-left: 2.5rem !important;
+
+    &:before {
+        font-size: 3.5rem;
+        font-style: normal;
+        height: 3rem;
+        left: 0.5rem;
+        line-height: normal;
+        position: absolute;
+        top: 0;
+        vertical-align: middle;
+    }
+
+    & p {
+        display: block;
+    }
+
+    & figure,
+    table {
+        font-style: initial;
+    }
+}
+
+@media #{$small-only} {
+    blockquote {
+        padding-left: 1rem !important;
+
+        &:before {
+            display: none;
+        }
+    }
+}
