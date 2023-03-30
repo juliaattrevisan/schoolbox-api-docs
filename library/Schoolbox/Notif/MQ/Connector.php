@@ -101,7 +101,11 @@ class Connector extends AMQPConnector
     public function closeConnection(): self
     {
         if ($this->conn) {
-            $this->conn->close();
+            try {
+                $this->conn->close();
+            } catch (\Exception) {
+                // ignore errors raised when attempting to close the connection
+            }
             $this->conn = null;
         }
         return $this;

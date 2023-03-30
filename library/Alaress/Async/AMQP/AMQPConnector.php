@@ -143,7 +143,11 @@ abstract class AMQPConnector implements AMQPInterface
         // has since been disconnected?
         $channel = $this->channels[$idkey] ?? null;
         if ($channel && $channel->getConnection() && !$channel->getConnection()->isConnected()) {
-            $channel->close();
+            try {
+                $channel->close();
+            } catch (\Exception) {
+                // ignore errors raised when attempting to close the channel
+            }
             unset($channel);
             $channel = null;
         }
