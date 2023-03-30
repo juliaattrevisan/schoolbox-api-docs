@@ -208,10 +208,10 @@ class LessonPlan implements IAssessmentTypeTranslator
                     ->setId($lessonPlanField->getId())
                     ->setLessonPlan($dataModel)
                     ->setLessonPlanTemplateField($lessonPlanTemplateField)
-                    ->setTitle($lessonPlanTemplateField->getTitle())
+                    ->setTitle($lessonPlanField->getTitle())
                     ->setBody($lessonPlanField->getBody())
-                    ->setVisibility($lessonPlanTemplateField->getVisibility())
-                    ->setSequence($lessonPlanTemplateField->getSequence());
+                    ->setVisibility($lessonPlanField->getVisibility())
+                    ->setSequence($lessonPlanField->getSequence());
 
                 $domainObject->getFields()->add($field);
             }
