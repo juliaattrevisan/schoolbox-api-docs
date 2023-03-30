@@ -66,12 +66,20 @@ function updateWordCount(editor: Editor, config: EditorConfig, wordCountContaine
             if (!config.showWordCount) {
                 wordCountContainer.style.display = "flex";
             }
+            if (config.maxCharCountExceededCallback !== undefined) {
+                config.maxCharCountExceededCallback(currentCharacterLength);
+            }
+            editor.maxCharCountExceededAtLastCheck = true;
         } else {
             characterCountElement.style.display = "none";
             limitWarningElement.style.display = "none";
             if (!config.showWordCount) {
                 wordCountContainer.style.display = "none";
             }
+            if (editor.maxCharCountExceededAtLastCheck && config.maxCharCountNoLongerExceededCallback !== undefined) {
+                config.maxCharCountNoLongerExceededCallback(currentCharacterLength);
+            }
+            editor.maxCharCountExceededAtLastCheck = false;
         }
     });
 }

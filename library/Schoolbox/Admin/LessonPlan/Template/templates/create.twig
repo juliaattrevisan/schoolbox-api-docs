@@ -269,6 +269,12 @@
                     {% endfor %}
                 {% endif %}
             ],
+            maxCharCountExceededCallback: function (currentCharCount) {
+                $('#save-button').prop('disabled', true).attr('title', 'Cannot save because max character count exceeded.');
+            },
+            maxCharCountNoLongerExceededCallback: function (currentCharCount) {
+                $('#save-button').prop('disabled', false).attr('title', '');
+            }
         }
     }));
 </script>
