@@ -118,9 +118,9 @@ class Module extends BaseModule
         //  * Route: getArchive(EportfolioPageModel $page, $year, $month)
         //    Rule : Eportfolio_Authenticator->canView on page
         //  * Route: getItem(EportfolioPageModel $page, EportfolioBlogModel $blog)
-        //    Rule : Eportfolio_Authenticator->canView on blog's page
+        //    Rule : isOwner of post OR Eportfolio_Authenticator->canView on blog's page
         //  * Route: postCommentInsert(EportfolioBlogModel $blog)
-        //    Rule : Eportfolio_Authenticator->canView on blog's page
+        //    Rule : isOwner of post OR Eportfolio_Authenticator->canView on blog's page
         $this->addRoutePermission(
             $authorizer,
             '(getArchive|getItem|postCommentInsert)',
@@ -158,13 +158,13 @@ class Module extends BaseModule
 
         // Affected routes are listed here with the expected parameters (from Blog\Eportfolio\Post\Controller).
         //  * Route: getModify(EportfolioPageModel $page, EportfolioBlogModel $blog)
-        //    Rule : Eportfolio_Authenticator->canModify on blog's page || isOwner of post
+        //    Rule : isOwner of post OR Eportfolio_Authenticator->canModify on blog's page
         //  * Route: postDelete(EportfolioBlogModel $blog)
-        //    Rule : Eportfolio_Authenticator->canModify on blog's page || isOwner of post
+        //    Rule : isOwner of post OR Eportfolio_Authenticator->canModify on blog's page
         //  * Route: postInsert(EportfolioPageModel $page)
         //    Rule : Eportfolio_Authenticator->canModify on page
         //  * Route: postModify(EportfolioPageModel $page, EportfolioBlogModel $blog)
-        //    Rule : Eportfolio_Authenticator->canModify on blog's page || isOwner of post
+        //    Rule : isOwner of post OR Eportfolio_Authenticator->canModify on blog's page
         $this->addRoutePermission(
             $authorizer,
             '(getModify|postDelete|postInsert|postModify)',
@@ -203,9 +203,9 @@ class Module extends BaseModule
         // Affected routes are listed here with the expected parameters (from Blog\Eportfolio\Post\Controller).
         //  * Route: postCommentDelete(EportfolioBlogCommentModel $comment)
         //    Rule : if comment owner is staff
-        //            * Eportfolio_Authenticator->canModify on comment's blog's page || isStaff
+        //            * isStaff AND Eportfolio_Authenticator->canModify on comment's blog's page
         //           else
-        //            * Eportfolio_Authenticator->canModify on comment's blog's page || isOwner of comment
+        //            * isOwner of comment OR Eportfolio_Authenticator->canModify on comment's blog's page
         $this->addRoutePermission(
             $authorizer,
             'postCommentDelete',
