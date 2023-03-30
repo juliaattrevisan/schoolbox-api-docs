@@ -21,6 +21,7 @@ use Schoolbox\Collection;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Learning\Assessment\LessonPlan;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Permission\Access\Access;
@@ -121,6 +122,7 @@ class Factory
         return $breadcrumbs;
     }
 
+
     /**
      * Produce breadcrumb trail for a new IAssessable $assessment
      *
@@ -129,10 +131,11 @@ class Factory
      *
      * @param AssessmentContext $context
      * @param IAssessable|null  $assessment
+     * @param User              $user
      * @return Collection
      * @throws RouteNotFound
      */
-    public function produceFromContext(AssessmentContext $context, IAssessable $assessment = null): Collection
+    public function produceFromContext(AssessmentContext $context, IAssessable $assessment = null, \Schoolbox\User $user): Collection
     {
         $trail = new Collection();
         $trail->add(['Learning', $this->router->generate('learning.getClasses')]);
@@ -144,7 +147,15 @@ class Factory
         } elseif ($context instanceof UnitSpecification) {
             $trail->add([$context->getTitle(), "/homepage/{$context->getFolder()->getId()}"]);
         } elseif ($context instanceof Project) {
-            $trail->add([$context->getTitle(), $this->router->generate('learningAssessment.getSummary', ['assessmentId' => $context->getId()])]);
+            /* Lesson Plans introduced a preceding Selection step so the project breadcumb
+             * becomes clickable. None of the other assessment types do this, so the studentId
+             * has never actually been needed; this route was never visible in that usage
+             */
+            if ($assessment instanceof LessonPlan\Model) {
+                $trail->add([$context->getTitle(), $this->router->generate('learningAssessment.getSummary', ['assessmentId' => $context->getId(), 'studentId' => $user->getId()])]);
+            } else {
+                $trail->add([$context->getTitle(), $this->router->generate('learningAssessment.getSummary', ['assessmentId' => $context->getId()])]);
+            }
         }
 
         $assessmentType = $assessment instanceof IAssessable ? $assessment->getTypeName() : 'Activity';
