@@ -1,5 +1,3 @@
-import { getColours } from "@js/editor/settings/colourSettings";
-
 /**
  * Returns the settings for the font options
  *
@@ -7,19 +5,11 @@ import { getColours } from "@js/editor/settings/colourSettings";
  */
 export function getFontSettings() {
     return {
-        fontColor: {
-            columns: 12,
-            colors: getColours(),
-        },
-        fontBackgroundColor: {
-            columns: 12,
-            colors: getColours(),
-        },
         fontFamily: {
             options: [
                 "default",
                 "Arial, Helvetica, sans-serif",
-                "Comic Sans MS, Comic Sans, cursive",
+                "Comic Sans, Comic Sans MS, Chalkboard, ChalkboardSE-Regular, sans-serif",
                 "Courier New, Courier, monospace",
                 "Georgia, serif",
                 "Lucida Sans Unicode, Lucida Grande, sans-serif",

@@ -7,7 +7,6 @@ import TableToolbar from "@ckeditor/ckeditor5-table/src/tabletoolbar";
 import TableProperties from "@ckeditor/ckeditor5-table/src/tableproperties";
 import TableCellProperties from "@ckeditor/ckeditor5-table/src/tablecellproperties";
 import TableColumnResize from "@ckeditor/ckeditor5-table/src/tablecolumnresize";
-import TableCaption from "@ckeditor/ckeditor5-table/src/tablecaption";
 
 /**
  * All the table plugins
@@ -15,5 +14,5 @@ import TableCaption from "@ckeditor/ckeditor5-table/src/tablecaption";
  * @returns { object } - the table plugins
  */
 export function getTablePlugins() {
-    return [Table, TableToolbar, TableProperties, TableCellProperties, TableColumnResize, TableCaption];
+    return [Table, TableToolbar, TableProperties, TableCellProperties, TableColumnResize];
 }

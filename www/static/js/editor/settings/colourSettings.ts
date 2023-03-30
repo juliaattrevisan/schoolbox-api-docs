@@ -1,9 +1,14 @@
 /**
  * A list of 120 colors for use when choosing a color in the editor
+ * @todo - pull this out from the font/background colour for now, as colour pickers in the
+ * insert table UI do not support multiple columns like they do in font/background colour.
+ * And as such they looks pretty funky if not in the 12 column configuration.
  */
 
 /**
  * Return the lsit of skin colours for use
+ * @todo - pull this out from the list for now.
+ * We may revisit this when we try to use the new coloris ui as the colour picker in the future.
  *
  * @returns { Array } - refer to https://ckeditor.com/docs/ckeditor5/latest/features/font.html#specifying-available-colors
  */
@@ -25,7 +30,6 @@ function getSkinColours() {
  */
 export function getColours() {
     return [
-        ...getSkinColours(),
         { label: "Red 50", color: "#ffebee" },
         { label: "Purple 50", color: "#f3e5f5" },
         { label: "Indigo 50", color: "#e8eaf6" },

@@ -69,7 +69,7 @@ function removeValidation() {
  * @param { Editor } editor - the CKEditor instance
  */
 async function addIframelyEmbed(config: EditorConfig, editor: Editor) {
-    if (config.toolbar === EditorToolbar.FULL || config.toolbar === EditorToolbar.COMMENT) {
+    if (config.toolbar === EditorToolbar.DEFAULT || config.toolbar === EditorToolbar.COMMENT) {
         const script = "//cdn.iframe.ly/embed.js?cancel=0";
         if (!isScriptAdded(script)) {
             await injectScript(script);

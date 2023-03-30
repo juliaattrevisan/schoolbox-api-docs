@@ -22,7 +22,6 @@ import MediaEmbed from "@ckeditor/ckeditor5-media-embed/src/mediaembed";
 import SpecialCharacters from "@ckeditor/ckeditor5-special-characters/src/specialcharacters";
 import SpecialCharactersEssentials from "@ckeditor/ckeditor5-special-characters/src/specialcharactersessentials";
 import HorizontalLine from "@ckeditor/ckeditor5-horizontal-line/src/horizontalline";
-import TodoList from "@ckeditor/ckeditor5-list/src/todolist";
 import Alignment from "@ckeditor/ckeditor5-alignment/src/alignment";
 import FindAndReplace from "@ckeditor/ckeditor5-find-and-replace/src/findandreplace";
 import SourceEditing from "@ckeditor/ckeditor5-source-editing/src/sourceediting";
@@ -72,7 +71,6 @@ export function getConfig(config: EditorConfig) {
             SpecialCharacters,
             SpecialCharactersEssentials,
             HorizontalLine,
-            TodoList,
             Alignment,
             FindAndReplace,
             SourceEditing,
