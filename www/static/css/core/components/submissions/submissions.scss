@@ -233,3 +233,16 @@ table.rubric {
 .draftSubmission {
     opacity: 50%;
 }
+
+
+/* Assessment Type moshpit
+ * You can choose which assessment type to add in Modify Course
+ * (This is a long list of buttons)
+ *
+ * This behaviour only applies to this one specific usage
+ */
+#unit-info .flex-list.buttons {
+    @media #{$small-only} {
+        flex-direction: column;
+    }
+}
