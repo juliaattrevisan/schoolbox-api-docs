@@ -172,6 +172,16 @@ blockquote {
     }
 }
 
+@media #{$small-only} {
+    blockquote {
+        padding-left: 1rem !important;
+
+        &:before {
+            display: none;
+        }
+    }
+}
+
 /*  CKEditor5 custom styles */
 /*  These have been declared out here as including them in the editor.css
  *  file prevents the styles from being used elsewhere as that style sheet
