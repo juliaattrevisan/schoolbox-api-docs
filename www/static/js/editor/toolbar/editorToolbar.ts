@@ -13,9 +13,9 @@ import { EditorConfig, EditorToolbar } from "@js/editor/types/editorTypes";
  */
 export function getToolbar(config: EditorConfig) {
     // what displays in the default toolbar in order, are either single buttons or groups via objects
-    let toolbar: Array<string | object> = [];
+    let items: Array<string | object> = [];
     if (config.toolbar === EditorToolbar.SIMPLE) {
-        toolbar = [
+        items = [
             "bold",
             "italic",
             "underline",
@@ -30,7 +30,7 @@ export function getToolbar(config: EditorConfig) {
             "bulletedList",
         ];
     } else if (config.toolbar === EditorToolbar.COMMENT) {
-        toolbar = [
+        items = [
             "bold",
             "italic",
             "underline",
@@ -47,7 +47,7 @@ export function getToolbar(config: EditorConfig) {
             "bulletedList",
         ];
     } else {
-        toolbar = [
+        items = [
             "bold",
             "italic",
             {
@@ -104,7 +104,7 @@ export function getToolbar(config: EditorConfig) {
      */
     if (config.removeFromToolbar) {
         config.removeFromToolbar.forEach((pluginName) => {
-            toolbar = toolbar
+            items = items
                 .map((item) => {
                     if (typeof item === "string") {
                         return item !== pluginName ? item : null;
@@ -120,7 +120,10 @@ export function getToolbar(config: EditorConfig) {
      * the Blank plugin for Quiz cloze questions
      */
     if (config.addToToolbar) {
-        toolbar = [...toolbar, ...config.addToToolbar];
+        items = [...items, ...config.addToToolbar];
     }
+    const toolbar = {
+        items,
+    };
     return toolbar;
 }
