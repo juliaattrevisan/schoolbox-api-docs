@@ -8,6 +8,7 @@ import { slideUp } from "@js/util/animateUtils";
 import { isHtmlIncluded } from "@ckeditor/ckeditor5-image/src/imageupload/imageuploadediting";
 import type { Resource } from "@js/editor/plugin/resource/resourceUtils";
 import { addResource } from "@js/editor/plugin/resource/resourceUtils";
+import { EditorConfig, EditorToolbar } from "@js/editor/types/editorTypes";
 
 export default class ResourceEditing extends Plugin {
     totalUploadCount = 0; // the total number of files to upload
@@ -20,6 +21,11 @@ export default class ResourceEditing extends Plugin {
      * When files are added, upload them and add them to the editor
      */
     init() {
+        const config = this.editor.config.get("sbConfig") as EditorConfig;
+        // prevent adding resources if the toolbar is set to simple
+        if (config.toolbar === EditorToolbar.SIMPLE) {
+            return;
+        }
         const editor = this.editor;
         const fileRepository = editor.plugins.get("FileRepository");
         const resourceUI = editor.plugins.get("ResourceUI");
