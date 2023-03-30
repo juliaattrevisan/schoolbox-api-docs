@@ -441,7 +441,7 @@ class CourseQuiz extends CourseAssessmentAbstract
      * @param string|null         $description
      * @param int                 $duration
      * @param int                 $maxAttempts
-     * @param int                 $weight
+     * @param float               $weight
      * @param bool                $anonymousSubmissions
      * @param int                 $markVisibility
      * @param string              $createdAt
@@ -449,8 +449,6 @@ class CourseQuiz extends CourseAssessmentAbstract
      * @param Folder\Model        $unitSpecFolder
      * @return bool
      * @throws Mapper\Exception
-     * @throws UnexpectedValueException
-     * @throws PDOException
      */
     private function checkQuizForChanges(
         int $quizCanvasId,

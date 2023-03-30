@@ -19,7 +19,6 @@ use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Mapper as GradeLevel
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Learning\Quiz;
-
 use Schoolbox\UserMapper;
 
 use function array_filter;

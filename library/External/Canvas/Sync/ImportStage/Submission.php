@@ -190,10 +190,10 @@ class Submission extends SubmissionAbstract
         $normMark     = $canvasSubmission['norm_mark'];
         $readableMark = $canvasSubmission['mark'];
 
-        if ($submissionBox->getMarkType()->getSlug() === SubmissionBox\MarkType::SLUG_LETTER && in_array($readableMark, [
-                Assignment::MARK_COMPLETE,
-                Assignment::MARK_INCOMPLETE,
-            ])) {
+        if (
+            $submissionBox->getMarkType()->getSlug() === SubmissionBox\MarkType::SLUG_LETTER
+            && in_array($readableMark, [Assignment::MARK_COMPLETE, Assignment::MARK_INCOMPLETE,])
+        ) {
             // there are complete marks with 0 points, which confuses SB
             $normMark = $readableMark === Assignment::MARK_COMPLETE ? 100 : 0;
         } elseif ($normMark !== null && $submissionBox->getMaxMark()) {
