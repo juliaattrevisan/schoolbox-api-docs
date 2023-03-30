@@ -97,23 +97,11 @@ export function getToolbar(config: EditorConfig) {
     }
     /**
      * remove any individual plugins for specific use cases
-     * for each pluginName we loop through the toolbar, if the item is a string
-     * we check if it matches the pluginName, if it does we replace it with null
-     * if it is an object we filter out the items that match the pluginName
-     * then we filter out any null values
+     * refer to removeItems at: https://ckeditor.com/docs/ckeditor5/latest/features/toolbar/toolbar.html
      */
+    let removeItems: Array<string> = [];
     if (config.removeFromToolbar) {
-        config.removeFromToolbar.forEach((pluginName) => {
-            items = items
-                .map((item) => {
-                    if (typeof item === "string") {
-                        return item !== pluginName ? item : null;
-                    }
-                    const newItems = item.items.filter((subItem) => subItem !== pluginName);
-                    return { ...item, items: newItems };
-                })
-                .filter((item) => item !== null);
-        });
+        removeItems = config.removeFromToolbar;
     }
     /**
      * add any individual plugins for specific use cases for example
@@ -124,6 +112,7 @@ export function getToolbar(config: EditorConfig) {
     }
     const toolbar = {
         items,
+        removeItems,
     };
     return toolbar;
 }
