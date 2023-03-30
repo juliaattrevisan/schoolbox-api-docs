@@ -4,6 +4,8 @@
 
 /**
  * Return the lsit of skin colours for use
+ * @todo - pull this out from the list for now.
+ * We may revisit this when we try to use the new coloris ui as the colour picker in the future.
  *
  * @returns { Array } - refer to https://ckeditor.com/docs/ckeditor5/latest/features/font.html#specifying-available-colors
  */
@@ -25,7 +27,6 @@ function getSkinColours() {
  */
 export function getColours() {
     return [
-        ...getSkinColours(),
         { label: "Red 50", color: "#ffebee" },
         { label: "Purple 50", color: "#f3e5f5" },
         { label: "Indigo 50", color: "#e8eaf6" },

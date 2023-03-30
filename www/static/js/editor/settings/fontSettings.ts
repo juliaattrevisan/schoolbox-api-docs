@@ -1,5 +1,3 @@
-import { getColours } from "@js/editor/settings/colourSettings";
-
 /**
  * Returns the settings for the font options
  *
@@ -7,14 +5,6 @@ import { getColours } from "@js/editor/settings/colourSettings";
  */
 export function getFontSettings() {
     return {
-        fontColor: {
-            columns: 12,
-            colors: getColours(),
-        },
-        fontBackgroundColor: {
-            columns: 12,
-            colors: getColours(),
-        },
         fontFamily: {
             options: [
                 "default",
