@@ -9,7 +9,7 @@ export function getFontSettings() {
             options: [
                 "default",
                 "Arial, Helvetica, sans-serif",
-                "Comic Sans MS, Comic Sans, cursive",
+                "Comic Sans, Comic Sans MS, Chalkboard, ChalkboardSE-Regular, sans-serif",
                 "Courier New, Courier, monospace",
                 "Georgia, serif",
                 "Lucida Sans Unicode, Lucida Grande, sans-serif",
