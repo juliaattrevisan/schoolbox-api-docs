@@ -83,19 +83,24 @@
          # TODO Arguably Lesson Plan's modifyTot should be a subclass of this modifyTot?
          #}
         {% if hasStudentView is defined and hasStudentView %}
-            <li><a class="icon-view" data-has-student-view="staff">Switch to student view</a></li>
+            <li class="separator" data-has-student-view-separator>You are in Teacher View</li>
+            <li><a class="icon-view" data-has-student-view="staff">Switch to Student View</a></li>
 
             <script>
                 $(function() {
                     $('[data-has-student-view]').on('click', function() {
                         if ($(this).attr('data-has-student-view') == 'staff') {
-                            $(this).text('Switch to staff view');
+                            $('[data-has-student-view-separator]').text('You are in Student View');
+                            $(this).text('Switch to Teacher View');
+                            $(this).removeClass().addClass('icon-teacher');
                             $(this).attr('data-has-student-view', 'student');
 
                             $('#lessonPlan-staff').hide();
                             $('#lessonPlan-student').show();
                         } else {
-                            $(this).text('Switch to student view');
+                            $('[data-has-student-view-separator]').text('You are in Teacher View');
+                            $(this).text('Switch to Student View');
+                            $(this).removeClass().addClass('icon-staff-students');
                             $(this).attr('data-has-student-view', 'staff');
 
                             $('#lessonPlan-staff').show();
