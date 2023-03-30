@@ -66,11 +66,15 @@ class Mapper extends BaseMapper
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('owner', 'o')},
                 {$this->getJoinColumnString('owner.role', 'or')},
-                {$this->getJoinColumnString('blog', 'b')}
+                {$this->getJoinColumnString('blog', 'b')},
+                {$this->getJoinColumnString('blog.owner', 'bo')},
+                {$this->getJoinColumnString('blog.owner.role', 'bor')}
             FROM {$this->database->getQuoter()->quoteIdentifier($this->table)}
             INNER JOIN {$this->getJoinSql('owner', '', 'o', true)}
             INNER JOIN {$this->getJoinSql('owner.role', 'o', 'or')}
             INNER JOIN {$this->getJoinSql('blog', '', 'b', true)}
+            INNER JOIN {$this->getJoinSql('blog.owner', '', 'bo', true)}
+            INNER JOIN {$this->getJoinSql('blog.owner.role', 'bo', 'bor')}
         ";
     }
 
