@@ -492,6 +492,7 @@ class ImportFactory
                 sdw.assessment_id     AS 'sdw.id',
                 sdw.accept_submission AS 'sdw.accept_submission',
                 sdw.multi_submission  AS 'sdw.multi_submission',
+                sa.id                 AS 'spr.id',
                 sqz.assessment_id     AS 'sqz.id',
                 stk.assessment_id     AS 'stk.id',
                 slt.assessment_id     AS 'slt.id',
