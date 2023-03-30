@@ -12,6 +12,7 @@ namespace Schoolbox\Learning\Analytics;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\LearningAnalytics\Rubrics\AllRubrics;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -597,7 +598,7 @@ class CohortAnalysis
      */
     protected function isExcludedForGrades(IAssessable $assessment)
     {
-        return $assessment instanceof Task || MarkType::SLUG_NONE === $assessment->getMarkType()->getSlug();
+        return $assessment instanceof Task || $assessment instanceof LessonPlan || MarkType::SLUG_NONE === $assessment->getMarkType()->getSlug();
     }
 
 
