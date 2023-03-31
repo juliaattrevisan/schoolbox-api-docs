@@ -11,6 +11,7 @@ namespace Schoolbox\Pastoral\Report\Access;
 
 use PDOStatement;
 use Schoolbox\Pastoral\Group\Mapper as GroupMapper;
+use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -44,6 +45,7 @@ class Mapper extends \Schoolbox\Mapper
         return "
             SELECT    {$this->getColumnString()},
                       {$this->getJoinColumnString('user', 'u')},
+                      {$this->getJoinColumnString('user.role', 'ur')},
                       {$this->getJoinColumnString('group', 'g')}
         ";
     }
@@ -56,6 +58,7 @@ class Mapper extends \Schoolbox\Mapper
         return "
             FROM      {$this->getTable()}
             LEFT JOIN {$this->getJoinSql('user', '', 'u')}
+            LEFT JOIN {$this->getJoinSql('user.role', 'u', 'ur')}
             LEFT JOIN {$this->getJoinSql('group', '', 'g')}
         ";
     }
@@ -78,6 +81,9 @@ class Mapper extends \Schoolbox\Mapper
             if ($user instanceof User) {
                 $access->setUser($user);
                 $accessValid = true;
+                /** @var Role $role */
+                $role = $this->hydrateJoin($row, 'user.role', 'ur');
+                $user->setRole($role);
             }
             // set group
             $group = $this->hydrateJoin($row, 'group', 'g');
