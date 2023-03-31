@@ -1,0 +1,12 @@
+{##
+ # Lesson Plan View indicator
+ #
+ # This tells you what view you're in, when you're looking at a Lesson Plan
+ # Staff can switch between student view and staff view
+ #
+ # @param LessonPlan\Model $assessment
+ # @param \Schoolbox\User $student
+ #}
+{% if assessment is lessonPlan and USER.role.isStaff %}
+    <li data-has-student-view-meta></li>
+{% endif %}

@@ -83,28 +83,58 @@
          # TODO Arguably Lesson Plan's modifyTot should be a subclass of this modifyTot?
          #}
         {% if hasStudentView is defined and hasStudentView %}
-            <li class="separator" data-has-student-view-separator>You are in Teacher View</li>
-            <li><a class="icon-view" data-has-student-view="staff">Switch to Student View</a></li>
+            <li class="separator" data-has-student-view-separator>You are in Student View</li>
+            <li><a class="icon-view" data-has-student-view="student">Switch to Teacher View</a></li>
 
             <script>
                 $(function() {
+                    /**
+                     * Enable student view of a Lesson Plan
+                     */
+                    function lessonPlanStudentView(elem) {
+                        $('[data-has-student-view-separator]').text('You are in Student View');
+                        $('[data-has-student-view-meta]').text('Student view')
+                            .removeClass()
+                            .addClass('icon-staff-students');
+
+                        $(elem)
+                            .text('Switch to Teacher View')
+                            .removeClass()
+                            .addClass('icon-teacher')
+                            .attr('data-has-student-view', 'student');
+
+                        $('#lessonPlan-staff').hide();
+                        $('#lessonPlan-student').show();
+                    }
+
+
+                    /**
+                     * Enable staff view of a Lesson Plan
+                     */
+                    function lessonPlanStaffView(elem) {
+                        $('[data-has-student-view-separator]').text('You are in Teacher View');
+                        $('[data-has-student-view-meta]').text('Teacher view')
+                            .removeClass()
+                            .addClass('icon-teacher');
+
+                        $(elem)
+                            .text('Switch to Student View')
+                            .removeClass()
+                            .addClass('icon-staff-students')
+                            .attr('data-has-student-view', 'staff');
+
+                        $('#lessonPlan-staff').show();
+                        $('#lessonPlan-student').hide();
+                    }
+
+                    /* Update the meta only when you're toggling views,
+                     * so students see an authentic representation
+                     */
                     $('[data-has-student-view]').on('click', function() {
                         if ($(this).attr('data-has-student-view') == 'staff') {
-                            $('[data-has-student-view-separator]').text('You are in Student View');
-                            $(this).text('Switch to Teacher View');
-                            $(this).removeClass().addClass('icon-teacher');
-                            $(this).attr('data-has-student-view', 'student');
-
-                            $('#lessonPlan-staff').hide();
-                            $('#lessonPlan-student').show();
+                            lessonPlanStudentView($(this));
                         } else {
-                            $('[data-has-student-view-separator]').text('You are in Teacher View');
-                            $(this).text('Switch to Student View');
-                            $(this).removeClass().addClass('icon-staff-students');
-                            $(this).attr('data-has-student-view', 'staff');
-
-                            $('#lessonPlan-staff').show();
-                            $('#lessonPlan-student').hide();
+                            lessonPlanStaffView($(this));
                         }
                     });
                 });
