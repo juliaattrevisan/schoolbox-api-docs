@@ -1,6 +1,7 @@
 import type { Editor } from "@ckeditor/ckeditor5-core";
 import { EditorConfig } from "@js/editor/types/editorTypes";
 import { insertElementAfter } from "@js/util/domUtils";
+import { EditorEvent } from "@js/editor/event/editorEvent";
 
 /**
  * Returns the settings for the word count plugin
@@ -50,7 +51,12 @@ function getLimitWarningElement(config: EditorConfig) {
  * @param { EditorConfig } config - the CKEditor config object
  * @param { HTMLDivElement } wordCountContainer - the word count container
  */
-function updateWordCount(editor: Editor, config: EditorConfig, wordCountContainer: HTMLDivElement) {
+function updateWordCount(
+    textarea: HTMLTextAreaElement,
+    editor: Editor,
+    config: EditorConfig,
+    wordCountContainer: HTMLDivElement
+) {
     // if the max character count is -1 then we don't want to show the character count as the limit is disabled
     if (config.maxCharCount === -1) {
         return;
@@ -66,9 +72,14 @@ function updateWordCount(editor: Editor, config: EditorConfig, wordCountContaine
             if (!config.showWordCount) {
                 wordCountContainer.style.display = "flex";
             }
-            if (config.maxCharCountExceededCallback !== undefined) {
-                config.maxCharCountExceededCallback(currentCharacterLength);
-            }
+            textarea.dispatchEvent(
+                new CustomEvent(EditorEvent.EDITOR__MAX_CHAR_COUNT_EXCEEDED, {
+                    detail: {
+                        editor,
+                        textarea,
+                    },
+                })
+            );
             editor.maxCharCountExceededAtLastCheck = true;
         } else {
             characterCountElement.style.display = "none";
@@ -76,8 +87,15 @@ function updateWordCount(editor: Editor, config: EditorConfig, wordCountContaine
             if (!config.showWordCount) {
                 wordCountContainer.style.display = "none";
             }
-            if (editor.maxCharCountExceededAtLastCheck && config.maxCharCountNoLongerExceededCallback !== undefined) {
-                config.maxCharCountNoLongerExceededCallback(currentCharacterLength);
+            if (editor.maxCharCountExceededAtLastCheck) {
+                textarea.dispatchEvent(
+                    new CustomEvent(EditorEvent.EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED, {
+                        detail: {
+                            editor,
+                            textarea,
+                        },
+                    })
+                );
             }
             editor.maxCharCountExceededAtLastCheck = false;
         }
@@ -103,5 +121,5 @@ export function insertWordCount(textarea: HTMLTextAreaElement, editor: Editor, c
     } else {
         wordCountContainer.style.display = "none";
     }
-    updateWordCount(editor, config, wordCountContainer);
+    updateWordCount(textarea, editor, config, wordCountContainer);
 }
