@@ -391,7 +391,7 @@ class Subnav
                     ],
                     '/adminv2/lesson-plan/template'          => [
                         'name'        => 'Lesson Plan Templates',
-                        'visible'     => true,
+                        'visible'     => $this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
                         'children'    => [],
                         'description' => 'Configure lesson plan templates.',
                     ],
