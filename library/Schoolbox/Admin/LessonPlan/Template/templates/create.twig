@@ -264,7 +264,7 @@
             function () {
                 const input = document.querySelector('#save-button');
                 input.disabled = true;
-                input.setAttribute('title', 'Cannot save because max character count exceeded.');
+                input.setAttribute('value', 'Save (disabled because maximum character count exceeded)');
             }
         );
         el.addEventListener(
@@ -272,7 +272,7 @@
             function () {
                 const input = document.querySelector('#save-button');
                 input.disabled = false;
-                input.setAttribute('title', '');
+                input.setAttribute('value', 'Save');
             }
         );
     });
