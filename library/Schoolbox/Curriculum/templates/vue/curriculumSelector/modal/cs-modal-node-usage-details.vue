@@ -26,7 +26,7 @@ const modalNodeUsageStore = useModalNodeUsageStore();
  * @param { Usage } usage - the selected usage
  */
 function onUsageSelected(usage: Usage) {
-    modalStore.selectedBadge = usage.object as BadgeUsageObject;
+    modalStore.setSelectedBadge(usage.object as BadgeUsageObject);
 }
 </script>
 
