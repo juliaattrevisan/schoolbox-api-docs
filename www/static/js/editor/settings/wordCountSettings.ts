@@ -72,14 +72,7 @@ function updateWordCount(
             if (!config.showWordCount) {
                 wordCountContainer.style.display = "flex";
             }
-            textarea.dispatchEvent(
-                new CustomEvent(EditorEvent.EDITOR__MAX_CHAR_COUNT_EXCEEDED, {
-                    detail: {
-                        editor,
-                        textarea,
-                    },
-                })
-            );
+            textarea.dispatchEvent(new CustomEvent(EditorEvent.EDITOR__MAX_CHAR_COUNT_EXCEEDED));
             editor.maxCharCountExceededAtLastCheck = true;
         } else {
             characterCountElement.style.display = "none";
@@ -88,14 +81,7 @@ function updateWordCount(
                 wordCountContainer.style.display = "none";
             }
             if (editor.maxCharCountExceededAtLastCheck) {
-                textarea.dispatchEvent(
-                    new CustomEvent(EditorEvent.EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED, {
-                        detail: {
-                            editor,
-                            textarea,
-                        },
-                    })
-                );
+                textarea.dispatchEvent(new CustomEvent(EditorEvent.EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED));
             }
             editor.maxCharCountExceededAtLastCheck = false;
         }
