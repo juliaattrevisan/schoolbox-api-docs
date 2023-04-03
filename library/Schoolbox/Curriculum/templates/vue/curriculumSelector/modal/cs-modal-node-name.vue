@@ -85,7 +85,10 @@ const isParentNode = computed(() => {
  * @returns { Boolean }
  */
 const isButton = computed(() => {
-    if (isParentNode.value) {
+    if (modalSearchStore.isActive) {
+        //when search is active, we can jump to the selected node
+        return true;
+    } else if (isParentNode.value) {
         //is the parent node, which we don't
         return false;
     } else if (props.node.children === null) {
@@ -93,9 +96,6 @@ const isButton = computed(() => {
         return false;
     } else if (props.node.children?.length === 0) {
         //there's no children to display, so no point going further
-        return false;
-    } else if (modalSearchStore.isActive) {
-        //cant do any navigation while search is active
         return false;
     } else {
         return true;
@@ -113,7 +113,13 @@ const fontWeight = computed(() => (isParentNode.value && !modalSearchStore.isAct
  * traverse to the next nodel level
  */
 function onNameSelected() {
-    modalViewNodesStore.setNextSelected(props.node.id);
+    if (modalSearchStore.isActive) {
+        // reset the structure and move to the selected searched node
+        modalViewNodesStore.toId(props.node.id);
+    } else {
+        // traverse to the next node level
+        modalViewNodesStore.setNextSelected(props.node.id);
+    }
 }
 
 /**

@@ -3,7 +3,7 @@
  */
 
 import { defineStore } from "pinia";
-import { UNSET_ID, findById } from "@schoolboxCurriculum/js/nodeUtils";
+import { UNSET_ID, findById, getBreadcrumbs } from "@schoolboxCurriculum/js/nodeUtils";
 import { useStore, apiEndpoint } from "./curriculumSelectorStore";
 import { useModalViewNodesStore } from "./csModalViewNodesStore";
 
@@ -56,6 +56,81 @@ export const useNodesStore = defineStore(`csNodes`, {
                 store.hasLoadError = true; //show the load error display state
             } finally {
                 store.isLoading = false; //otherwise show the tree
+            }
+        },
+
+        /**
+         * load the single curriculum for display straight away
+         */
+        async loadSingleCurriculum() {
+            if (this.nodes?.children !== null) {
+                const singleCurriculumId = this.nodes?.children[0]?.id;
+                await useModalViewNodesStore().setNextSelected(singleCurriculumId);
+            }
+        },
+
+        /**
+         * load the node, retrieving all its parents, so we can traverse directly to it
+         *
+         * @param { number } id - the id of the Node to load
+         */
+        async loadId(id) {
+            try {
+                this.isLoading = true;
+                const response = await fetch(`${apiEndpoint}/${id}?ancestors=99`); // just use 99 as hopefully there's no tree that deep...
+                if (response.ok) {
+                    const nodeWithParents = await response.json();
+                    await this.loadAllChildren(nodeWithParents);
+                } else {
+                    // useStore().hasId = false; // as the id couldn't be found
+                    if (this.hasSingleCurriculum) {
+                        // we should still jump straight to the only node available if there's only one
+                        await this.loadSingleCurriculum();
+                    }
+                    if (response.status === 404) {
+                        // and we assume the id can't be found, displaying an error
+                        throw new Error(`No node id matching ${id} has been found`);
+                    }
+                }
+            } catch (error) {
+                this.hasLoadError = true;
+                throw new Error(error.message, error.options);
+            } finally {
+                this.isLoading = false;
+            }
+        },
+
+        /**
+         * to only load the nodes that aren't already active
+         *
+         * @param { Breadcrumb[] } activeBreadcrumbs - the active breadcrumbs
+         * @param { Breadcrumb } newBreadcrumb - breadcrumb to add
+         * @returns { boolean } whether the breadcrumb is active
+         */
+        isActiveBreadcrumb(activeBreadcrumbs, newBreadcrumb) {
+            return !activeBreadcrumbs.some((activeBreadcrumb) => newBreadcrumb.id === activeBreadcrumb.id);
+        },
+
+        /**
+         * load in all the children required to reach the depth of the node,
+         * avoiding loading those nodes that are already loaded
+         *
+         * @param { Node } node - the Node to load all children of
+         */
+        async loadAllChildren(node) {
+            const breadcrumbs = getBreadcrumbs(node, []);
+            breadcrumbs.push({ id: node.id, name: node.name }); // add in the actual node as the last
+            const modalViewNodesStore = useModalViewNodesStore();
+            const activeBreadcrumbs = [
+                ...modalViewNodesStore.breadcrumbs,
+                { id: modalViewNodesStore.current.id, name: modalViewNodesStore.current.name },
+            ];
+            const onlyInactiveBreadcrumbs = breadcrumbs.filter((newBreadcrumb) =>
+                this.isActiveBreadcrumb(activeBreadcrumbs, newBreadcrumb)
+            );
+            for (let i = 0; i < onlyInactiveBreadcrumbs.length; i += 1) {
+                // recursively load in each node and traverse down
+                await modalViewNodesStore.setNextSelected(onlyInactiveBreadcrumbs[i].id);
             }
         },
 
