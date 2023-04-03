@@ -108,8 +108,8 @@ class Report_StaffDepartment extends Report_Abstract
             $previousDepartment = '';
 
             foreach ($allStaff as $key => $currentStaff) {
-                $department = trim(Scrub::text($currentStaff['StaffDepartment']));
-                $role = trim(Scrub::text(implode(', ', $currentStaff['JobPositionDescription'])));
+                $department = trim($currentStaff['StaffDepartment'] ?? '');
+                $role = trim(implode(', ', $currentStaff['JobPositionDescription'] ?? []));
 
                 // Remove staff with unknown departments
                 if ($department === '' || $role === '' || strtolower($department) === 'not selected') {
@@ -167,7 +167,7 @@ class Report_StaffDepartment extends Report_Abstract
                     'STAFF_FIRSTNAME'  => Scrub::text($currentStaff['StaffPreferredName'] ?? ''),
                     'STAFF_SURNAME'    => Scrub::text($currentStaff['StaffSurname'] ?? ''),
                     'STAFF_ROLE'       => Scrub::text(implode(', ', $currentStaff['JobPositionDescription'] ?? [])), // NOTE: $currentStaff['JobPositionDescription'] is an array, not a string.
-                    'STAFF_DEPARTMENT' => $currentStaff['StaffDepartment'],
+                    'STAFF_DEPARTMENT' => Scrub::text($currentStaff['StaffDepartment']),
                     'STAFF_CAMPUS'     => Scrub::text($currentStaff['StaffCampusDescription'] ?? ''),
                     'STAFF_EXTENSION'  => (
                         (Scrub::text($currentStaff['StaffExtension'] ?? '') === '') ? '' : '(x' . Scrub::text($currentStaff['StaffExtension']) . ')'
