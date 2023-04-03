@@ -67,26 +67,6 @@ class Controller extends Assessment\Controller
     {
         $isViewerAnInstructor = $this->getAccess()->isInstructor($this->getUser(), $assessment->getBaseContext()->getFolder());
 
-        /* If you're a student,
-         * and the Lesson Plan $assessment isn't visible to students;
-         * error(19) for now
-         */
-        if (!$isViewerAnInstructor && \Schoolbox\Role::STUDENT !== $assessment->getVisibility()) {
-            throw $this->getErrorMapper()->generateException(\Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW);
-        }
-
-        /* If you're a student,
-         * and the publish date is in the future,
-         * or the due date is in the past,
-         * this Lesson Plan $assessment is not available;
-         * error(19) for now
-         */
-        if (!$isViewerAnInstructor) {
-            if ($assessment->getPublishAt()->isFuture() || $assessment->getDueAt()->isPast()) {
-                throw $this->getErrorMapper()->generateException(\Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW);
-            }
-        }
-
         /* Craft a returnUrl, to redirect back to the place from whence you came
          */
         if ($this->getRequest()->query->get(Redirect::RETURN_URL)) {
