@@ -404,6 +404,7 @@ class CourseQuiz extends CourseAssessmentAbstract
             $description,
             $position,
             $workType,
+            $weight,
             $createdAt,
             $updatedAt
         );
@@ -441,7 +442,7 @@ class CourseQuiz extends CourseAssessmentAbstract
      * @param string|null         $description
      * @param int                 $duration
      * @param int                 $maxAttempts
-     * @param int                 $weight
+     * @param float               $weight
      * @param bool                $anonymousSubmissions
      * @param int                 $markVisibility
      * @param string              $createdAt
@@ -449,8 +450,6 @@ class CourseQuiz extends CourseAssessmentAbstract
      * @param Folder\Model        $unitSpecFolder
      * @return bool
      * @throws Mapper\Exception
-     * @throws UnexpectedValueException
-     * @throws PDOException
      */
     private function checkQuizForChanges(
         int $quizCanvasId,
@@ -460,7 +459,7 @@ class CourseQuiz extends CourseAssessmentAbstract
         ?string $description,
         int $duration,
         int $maxAttempts,
-        int $weight,
+        float $weight,
         bool $anonymousSubmissions,
         int $markVisibility,
         string $createdAt,
@@ -469,7 +468,9 @@ class CourseQuiz extends CourseAssessmentAbstract
     ): bool {
         if (
             // Does any attribute no longer align?
-            (($quiz->getWorkType() === null) === ($workType === null)) &&
+            $quiz->getCategory()->getId() === $unitSpecFolder->getId() &&
+            $quiz->getUser()->getId() === $quizOwnerId &&
+            $quiz->getWorkType()?->getId() === $workType?->getId() &&
             $quiz->getTitle() === $title &&
             $quiz->getDescription() === $description &&
             $quiz->getDuration() === $duration &&
@@ -478,10 +479,7 @@ class CourseQuiz extends CourseAssessmentAbstract
             $quiz->getAvailability() === Quiz\Model::AVAILABILITY_ASSESS &&
             $quiz->getAnonymousResult() === $anonymousSubmissions &&
             $quiz->getMarkVisibility() === $markVisibility &&
-            $quiz->getCreated()->getDatabase() === $createdAt &&
-            $quiz->getUser()->getId() === $quizOwnerId &&
-            $quiz->getCategory()->getId() === $unitSpecFolder->getId() &&
-            ($quiz->getWorkType() && $workType && $quiz->getWorkType()->getId() === $workType->getId())
+            $quiz->getCreated()->getDatabase() === $createdAt
         ) {
             return false;
         }
@@ -728,7 +726,7 @@ class CourseQuiz extends CourseAssessmentAbstract
      * @param bool                $anonymousSubmissions
      * @param int                 $duration
      * @param int                 $maxAttempts
-     * @param int                 $weight
+     * @param float               $weight
      * @param int                 $position
      * @param int                 $markVisibility
      * @return Quiz\Model
@@ -746,7 +744,7 @@ class CourseQuiz extends CourseAssessmentAbstract
         bool $anonymousSubmissions,
         int $duration,
         int $maxAttempts,
-        int $weight,
+        float $weight,
         int $position,
         int $markVisibility
     ): Quiz\Model {
@@ -755,6 +753,7 @@ class CourseQuiz extends CourseAssessmentAbstract
             $title,
             $description,
             $workType,
+            $weight,
             $createdAt,
             $updatedAt,
             $position
@@ -807,55 +806,6 @@ class CourseQuiz extends CourseAssessmentAbstract
 
         return true;
     }
-
-    /**
-     * Check if an assessment has changed, and update it in the DB if it has.
-     *
-     * Returns whether any changes were made.
-     *
-     * @param Assessment\Model    $assessment
-     * @param string              $title
-     * @param string|null         $description
-     * @param int                 $position
-     * @param WorkType\Model|null $workType
-     * @param string              $createdAt
-     * @param string              $updatedAt
-     * @return bool
-     * @throws Database\Exception
-     */
-    private function checkAssessmentForChanges(
-        Assessment\Model $assessment,
-        string $title,
-        ?string $description,
-        int $position,
-        ?WorkType\Model $workType,
-        string $createdAt,
-        string $updatedAt
-    ): bool {
-        // Do all attributes align?
-        if (
-            $assessment->getTitle() === $title &&
-            $assessment->getDescription() === $description &&
-            $assessment->getSequence() === $position &&
-            (($assessment->getWorkType() === null) === ($workType === null)) &&
-            $assessment->getCreatedAt()->getDatabase() === $createdAt &&
-            $assessment->getUpdatedAt()->getDatabase() === $updatedAt &&
-            (!$assessment->getWorkType() || !$workType || $assessment->getWorkType()->getId() === $workType->getId())
-        ) {
-            return false;
-        }
-        $assessment->setTitle($title)
-                   ->setDescription($description)
-                   ->setCreatedAt(Alaress_Date_Format::newDatabaseDate($createdAt))
-                   ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate($updatedAt))
-                   ->setSequence($position)
-                   ->setWorkType($workType);
-
-        $this->saveModel($this->assessmentMapper, $assessment, false, false);
-
-        return true;
-    }
-
 
     /**
      * Moves an assessment from its current unitSpec to the specified unitSpec

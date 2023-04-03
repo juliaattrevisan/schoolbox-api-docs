@@ -21,6 +21,8 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeLevelGroupMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Mapper as GradeLevelMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
@@ -285,19 +287,24 @@ class CliImporter extends CliTool\App
             exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
         }
         foreach ($tableGzFiles as $tableGzFile) {
-            $posExt = strpos($tableGzFile, '.gz');
-            if (!$posExt) {
+            if ($tableGzFile === '..' || $tableGzFile === '.') {
                 continue;
             }
-            $tableName = substr($tableGzFile, 0, $posExt);
+            // Table file name format should be <table name>.<index>.gz
+            $tableFileParts = explode('.', $tableGzFile);
+            if (count($tableFileParts) !== 3) {
+                continue;
+            }
+            $tableName = $tableFileParts[0];
+            $index = (int)$tableFileParts[1];
             if (!in_array($tableName, self::TABLES_TO_IMPORT)) {
                 continue;
             }
-            $tableFile = "$tempDir/$tableName";
+            $tableFile = "$tempDir/$tableName.$index";
             $this->getLogger()->debug("Loading $tableFile.");
 
             exec("gunzip -f -k " . escapeshellarg("$tempDir/$tableGzFile")); // force overwrite of existing files, keep original
-            $dataRestorer->restoreTableData($tableName, $tableFile);
+            $dataRestorer->restoreTableData($tableName, $tableFile, $index);
             if (file_exists($tableFile)) {
                 unlink($tableFile);
             } else {
@@ -334,6 +341,10 @@ class CliImporter extends CliTool\App
         $externalUser  = $this->getDi()->get('externalUser');
         /** @var MarkTypeMapper */
         $markTypeMapper = $mapperFactory->get(MarkTypeMapper::class);
+        /** @var GradeLevelGroupMapper $gradeLevelGroupMapper */
+        $gradeLevelGroupMapper = $mapperFactory->get(GradeLevelGroupMapper::class);
+        /** @var GradeLevelMapper $gradeLevelMapper */
+        $gradeLevelMapper = $mapperFactory->get(GradeLevelMapper::class);
         /** @var WorkType\Mapper */
         $workTypeMapper = $mapperFactory->get(WorkType\Mapper::class);
         /** @var Quiz\Mapper */
@@ -378,6 +389,8 @@ class CliImporter extends CliTool\App
             $externalClass,
             $externalUser,
             $markTypeMapper,
+            $gradeLevelGroupMapper,
+            $gradeLevelMapper,
             $workTypeMapper,
             $quizMapper,
             $quizSectionMapper,
@@ -443,14 +456,17 @@ class CliImporter extends CliTool\App
             if (!in_array($tableName, self::TABLES_TO_IMPORT) || !count($tableData['files'])) {
                 continue;
             }
-            $tableFile     = $tableData['files'][0];
-            $fileName      = "$tempDir/$tableName.gz";
-            $tableDataFile = fopen(($this->perform() || !file_exists($fileName)) ? $fileName  : '/dev/null', 'wb');
-            try {
-                $this->getLogger()->debug("Downloading $tableName to $fileName");
-                $client->get($tableFile['url'], ['sink' => $tableDataFile]);
-            } catch (GuzzleException $e) {
-                $this->getLogger()->warning("Failed to download $fileName: {$e->getMessage()}");
+            // there can be multiple files
+            $tableFiles = $tableData['files'];
+            foreach ($tableFiles as $index => $tableFile) {
+                $fileName      = "$tempDir/$tableName.$index.gz";
+                $tableDataFile = fopen(($this->perform() || !file_exists($fileName)) ? $fileName  : '/dev/null', 'wb');
+                try {
+                    $this->getLogger()->debug("Downloading $tableName to $fileName");
+                    $client->get($tableFile['url'], ['sink' => $tableDataFile]);
+                } catch (GuzzleException $e) {
+                    $this->getLogger()->warning("Failed to download $fileName: {$e->getMessage()}");
+                }
             }
         }
     }

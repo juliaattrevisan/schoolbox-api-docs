@@ -140,14 +140,12 @@ class QuizSubmission extends SubmissionAbstract
                             $reviewer     = $this->findUserByCanvasUserId($canvasSubmission['grader_user_id']);
                             $feedbackTime = $canvasSubmission['graded_at'];
                         }
-                        // save participant, if not exists
-                        if (!$participant->getId()) {
-                            $this->saveParticipant(
-                                $plan,
-                                $participant->getUser(),
-                                $this->convertTime($feedbackTime)
-                            );
-                        }
+                        $this->saveParticipant(
+                            $plan,
+                            $participant,
+                            $this->convertTime($feedbackTime),
+                            $canvasSubmission
+                        );
 
                         $feedback = $this->syncFeedback(
                             $quiz,
@@ -315,7 +313,7 @@ class QuizSubmission extends SubmissionAbstract
     {
         $mySqlQuoter = new Database\Quoter\Mysql\Quoter();
         $pb          = (new Builder($mySqlQuoter, ''))->equals('quiz_dim.canvas_id', $assignmentCanvasId);
-        $pb->notNull('submission_dim.published_grade');
+        $pb->equals('submission_dim.workflow_state', 'graded');
         $whereClause = implode(' AND ', $pb->getWhere());
 
         $sql = "
@@ -324,6 +322,7 @@ class QuizSubmission extends SubmissionAbstract
                 assignment_dim.canvas_id,
                 submission_dim.id as submission_id,
                 submission_dim.published_grade as mark,
+                submission_dim.excused as excused,
                 quiz_submission_fact.score as norm_mark,
                 quiz_submission_fact.quiz_points_possible as max_mark,
                 CONVERT_TZ(quiz_submission_dim.started_at, 'UTC', :timezone) as started_at,
@@ -336,10 +335,10 @@ class QuizSubmission extends SubmissionAbstract
                 CONVERT_TZ(submission_comment_dim.created_at, 'UTC', :timezone) as comment_created_at,
                 CONVERT_TZ(submission_comment_dim.updated_at, 'UTC', :timezone) as comment_updated_at
             FROM assignment_dim
-            LEFT JOIN submission_dim ON assignment_dim.id = submission_dim.assignment_id
             JOIN quiz_dim ON quiz_dim.assignment_id = assignment_dim.id
-            JOIN quiz_submission_dim ON quiz_submission_dim.id = submission_dim.quiz_submission_id
-            JOIN quiz_submission_fact ON quiz_submission_fact.quiz_submission_id = quiz_submission_dim.id
+            LEFT JOIN submission_dim ON assignment_dim.id = submission_dim.assignment_id
+            LEFT JOIN quiz_submission_dim ON quiz_submission_dim.id = submission_dim.quiz_submission_id
+            LEFT JOIN quiz_submission_fact ON quiz_submission_fact.quiz_submission_id = quiz_submission_dim.id
             LEFT JOIN submission_comment_dim ON submission_comment_dim.submission_id = submission_dim.id
                                              AND submission_comment_dim.author_id <> submission_dim.user_id
             LEFT JOIN pseudonym_dim as reviewee ON reviewee.user_id = submission_dim.user_id AND reviewee.workflow_state = 'active'

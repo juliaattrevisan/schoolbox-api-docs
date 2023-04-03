@@ -12,7 +12,6 @@ namespace External\Canvas\Sync\ImportStage;
 use Alaress\Database;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
-use Alaress_Date_Format;
 use External\Canvas\Sync\Bridge;
 use External\Canvas\Sync\Helpers\CourseTeachers;
 use External\Canvas\Sync\ImportStage\Traits\ModelSaveTrait;
@@ -273,6 +272,7 @@ class CourseAssignments extends CourseAssessmentAbstract
         // Translate Canvas attributes to SB attributes if not a 1:1 between systems
         $maxMark           = $this->assignmentBridge->getMaxMark($pointsPossible);
         $markType          = $this->assignmentBridge->getMarkType($gradingType, $pointsPossible);
+        $gradeGroup        = $this->assignmentBridge->getGradeGroup($gradingType);
         $acceptOnline      = $this->assignmentBridge->getAcceptOnline($submissionTypes);
         $acceptMultiple    = $this->assignmentBridge->getAcceptMultiple($submissionTypes);
         $markVisibility    = $this->assignmentBridge->getMarkVisibility($muted);
@@ -294,6 +294,7 @@ class CourseAssignments extends CourseAssessmentAbstract
                 $description,
                 $maxMark,
                 $markType,
+                $gradeGroup,
                 $acceptOnline,
                 $acceptMultiple,
                 $weight,
@@ -319,6 +320,7 @@ class CourseAssignments extends CourseAssessmentAbstract
             $description,
             $position,
             $workType,
+            $weight,
             $createdAt,
             $updatedAt
         );
@@ -326,20 +328,22 @@ class CourseAssignments extends CourseAssessmentAbstract
         $isBoxUpdated = false;
         if (
             // Does any attribute no longer align?
-            $submissionBox->getWeight() !== $weight ||
+            (float)$submissionBox->getWeight() !== $weight ||
             $submissionBox->getMaxMark() !== $maxMark ||
             $submissionBox->getAcceptOnline() !== $acceptOnline ||
             $submissionBox->getAcceptMultiple() !== $acceptMultiple ||
             $submissionBox->getMarkVisibility() !== $markVisibility ||
             $submissionBox->getSelfReviewability() !== $selfReviewability ||
             $submissionBox->getCategory()->getId() !== $unitSpecFolder->getId() ||
-            $submissionBox->getMarkType()->getId() !== $markType->getId()
+            $submissionBox->getMarkType()->getId() !== $markType->getId() ||
+            $submissionBox->getGradeGroup()?->getId() !== $gradeGroup?->getId()
         ) {
             // Update all attributes and update
             $submissionBox
                 ->setCategory($unitSpecFolder)
                 ->setMaxMark($maxMark)
                 ->setMarkType($markType)
+                ->setGradeGroup($gradeGroup)
                 ->setAcceptOnline($acceptOnline)
                 ->setAcceptMultiple($acceptMultiple)
                 ->setWeight($weight)
@@ -402,27 +406,25 @@ class CourseAssignments extends CourseAssessmentAbstract
     /**
      * Creates and returns a SubmissionBox spec.
      *
-     * @param Folder\Model           $unitSpecFolder
-     * @param int                    $canvasId
-     * @param int                    $boxOwnerId
-     * @param string                 $title
-     * @param string|null            $description
-     * @param float|null             $maxMark
-     * @param SubmissionBox\MarkType $markType
-     * @param bool                   $acceptOnline
-     * @param bool                   $acceptMultiple
-     * @param int                    $weight
-     * @param string                 $createdAt
-     * @param string                 $updatedAt
-     * @param int                    $markVisibility
-     * @param int                    $position
-     * @param string                 $selfReviewability
-     * @param WorkType\Model|null    $workType
+     * @param Folder\Model                              $unitSpecFolder
+     * @param int                                       $canvasId
+     * @param int                                       $boxOwnerId
+     * @param string                                    $title
+     * @param string|null                               $description
+     * @param float|null                                $maxMark
+     * @param SubmissionBox\MarkType                    $markType
+     * @param SubmissionBox\GradeLevel\Group\Model|null $gradeGroup
+     * @param bool                                      $acceptOnline
+     * @param bool                                      $acceptMultiple
+     * @param float                                     $weight
+     * @param string                                    $createdAt
+     * @param string                                    $updatedAt
+     * @param int                                       $markVisibility
+     * @param int                                       $position
+     * @param string                                    $selfReviewability
+     * @param WorkType\Model|null                       $workType
      * @return SubmissionBox
-     * @throws Database\Exception
      * @throws Mapper\Exception
-     * @throws PDOException
-     * @throws UnexpectedValueException
      */
     private function createSubmissionBoxSpec(
         Folder\Model $unitSpecFolder,
@@ -432,9 +434,10 @@ class CourseAssignments extends CourseAssessmentAbstract
         ?string $description,
         ?float $maxMark,
         SubmissionBox\MarkType $markType,
+        ?SubmissionBox\GradeLevel\Group\Model $gradeGroup,
         bool $acceptOnline,
         bool $acceptMultiple,
-        int $weight,
+        float $weight,
         string $createdAt,
         string $updatedAt,
         int $markVisibility,
@@ -447,6 +450,7 @@ class CourseAssignments extends CourseAssessmentAbstract
             $title,
             $description,
             $workType,
+            $weight,
             $createdAt,
             $updatedAt,
             $position
@@ -458,6 +462,7 @@ class CourseAssignments extends CourseAssessmentAbstract
             ->setMaxMark($maxMark)
             ->setCategory($unitSpecFolder)
             ->setMarkType($markType)
+            ->setGradeGroup($gradeGroup)
             ->setAcceptOnline($acceptOnline)
             ->setAcceptMultiple($acceptMultiple)
             ->setWeight($weight)
@@ -495,55 +500,6 @@ class CourseAssignments extends CourseAssessmentAbstract
 
         return true;
     }
-
-    /**
-     * Check if an assessment has changed, and update it in the DB if it has.
-     *
-     * Returns whether any changes were made.
-     *
-     * @param Assessment\Model    $assessment
-     * @param string              $title
-     * @param string|null         $description
-     * @param int                 $position
-     * @param WorkType\Model|null $workType
-     * @param string              $createdAt
-     * @param string              $updatedAt
-     * @return bool
-     * @throws Database\Exception
-     */
-    private function checkAssessmentForChanges(
-        Assessment\Model $assessment,
-        string $title,
-        ?string $description,
-        int $position,
-        ?WorkType\Model $workType,
-        string $createdAt,
-        string $updatedAt
-    ): bool {
-        // Do all attributes align?
-        if (
-            $assessment->getTitle() === $title &&
-            $assessment->getDescription() === $description &&
-            $assessment->getSequence() === $position &&
-            (($assessment->getWorkType() === null) === ($workType === null)) &&
-            $assessment->getCreatedAt()->getDatabase() === $createdAt &&
-            $assessment->getUpdatedAt()->getDatabase() === $updatedAt &&
-            (!$assessment->getWorkType() || !$workType || $assessment->getWorkType()->getId() === $workType->getId())
-        ) {
-            return false;
-        }
-        $assessment->setTitle($title)
-                   ->setDescription($description)
-                   ->setCreatedAt(Alaress_Date_Format::newDatabaseDate($createdAt))
-                   ->setUpdatedAt(Alaress_Date_Format::newDatabaseDate($updatedAt))
-                   ->setSequence($position)
-                   ->setWorkType($workType);
-
-        $this->saveModel($this->assessmentMapper, $assessment, false, false);
-
-        return true;
-    }
-
 
     /**
      * Moves an assessment from its current unitSpec to the specified unitSpec

@@ -14,9 +14,12 @@ use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Database\Quoter\Mysql\Quoter;
 use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeLevelGroupMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Mapper as GradeLevelMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Learning\Quiz;
+use Schoolbox\UserMapper;
 
 use function array_filter;
 use function array_key_exists;
@@ -34,6 +37,10 @@ class Assignment
     public const QUIZ_TYPE_GRADED_SURVEY = 'graded_survey';
     public const QUIZ_TYPE_SURVEY        = 'survey';
 
+    public const MARK_COMPLETE = 'complete';
+    public const MARK_INCOMPLETE = 'incomplete';
+
+    protected array $gradeGroups = [];
 
     /** @var GenericCollection|SubmissionBox\MarkType[] */
     protected $markTypes;
@@ -69,6 +76,16 @@ class Assignment
         return $pointsPossible ?? 0.0; // TODO think about this some more, and upgrade to documented constant
     }
 
+    /**
+     * @param GradeLevelGroupMapper $gradeLevelGroupMapper
+     * @param GradeLevelMapper      $gradeLevelMapper
+     * @param UserMapper            $userMapper
+     * @return void
+     */
+    public function prepareLetterGrades(GradeLevelGroupMapper $gradeLevelGroupMapper, GradeLevelMapper $gradeLevelMapper, UserMapper $userMapper): void
+    {
+        // do nothing
+    }
 
     /**
      * Returns a predicate for finding a suitable question type
@@ -127,9 +144,9 @@ class Assignment
     /**
      * Returns the weight to assign to Submission Boxes
      *
-     * @return int
+     * @return float
      */
-    public function getSubmissionBoxWeight(): int
+    public function getSubmissionBoxWeight(): float
     {
         return 1;
     }
@@ -138,9 +155,9 @@ class Assignment
     /**
      * Returns the weight to assign to Quizzes
      *
-     * @return int
+     * @return float
      */
-    public function getQuizWeight(): int
+    public function getQuizWeight(): float
     {
         return 1;
     }
@@ -206,6 +223,14 @@ class Assignment
         }
     }
 
+    /**
+     * @param string|null $gradingType
+     * @return SubmissionBox\GradeLevel\Group\Model|null
+     */
+    public function getGradeGroup(?string $gradingType): ?SubmissionBox\GradeLevel\Group\Model
+    {
+        return null;
+    }
 
     /**
      * Returns whether a canvas assignment's submissionTypes indicates it can be submitted online

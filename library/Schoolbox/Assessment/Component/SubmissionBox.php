@@ -681,7 +681,7 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     }
 
     /**
-     * @return GradeLevel\Group\Model
+     * @return GradeLevel\Group\Model|null
      */
     public function getGradeGroup()
     {

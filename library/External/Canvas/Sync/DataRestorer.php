@@ -109,12 +109,15 @@ class DataRestorer
      *
      * @param string $tableName
      * @param string $tableFile
-     * @throws Database\Exception
+     * @param int    $index
      */
-    public function restoreTableData(string $tableName, string $tableFile): void
+    public function restoreTableData(string $tableName, string $tableFile, int $index): void
     {
-        $sql = "TRUNCATE {$this->canvasDbName}.{$tableName}";
-        $this->executeIfPersisting($sql);
+        // truncate only if this is the first data for the table
+        if ($index === 0) {
+            $sql = "TRUNCATE {$this->canvasDbName}.{$tableName}";
+            $this->executeIfPersisting($sql);
+        }
 
         $sql = "SET STATEMENT max_statement_time=0 FOR LOAD DATA INFILE '$tableFile' INTO TABLE {$this->canvasDbName}.{$tableName}";
         try {
