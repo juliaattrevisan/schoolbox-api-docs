@@ -15,6 +15,8 @@
 namespace Schoolbox\Learning\Assessment\Component\Homepage\Outline;
 
 use Component_Instance;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant\AssessmentListMutator;
@@ -25,7 +27,6 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplem
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
-use Schoolbox\Learning\Assessment\LessonPlan;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Learning\Assessment\Redirect;
@@ -80,12 +81,16 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     private $userAccessMapper;
 
+
     /**
      * Controller constructor.
      *
      * @param Component_Instance $instance
-     * @param User $user
-     * @param SitePage $sitepage
+     * @param User               $user
+     * @param SitePage           $sitepage
+     * @throws \InvalidArgumentException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function __construct(Component_Instance $instance, User $user, SitePage $sitepage)
     {
