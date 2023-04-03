@@ -153,12 +153,18 @@
         el.addEventListener(
             "EDITOR__MAX_CHAR_COUNT_EXCEEDED",
             function () {
-                $('input[type=submit]').prop('disabled', true).attr('title', 'Cannot save because max character count exceeded.');
+                const input = document.querySelector('input[type=submit]');
+                input.disabled = true;
+                input.setAttribute('title', 'Cannot save because max character count exceeded.');
             }
         );
         el.addEventListener(
             "EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED",
-            function () {$('input[type=submit]').prop('disabled', false).attr('title', '');}
+            function () {
+                const input = document.querySelector('input[type=submit]');
+                input.disabled = false;
+                input.setAttribute('title', '');
+            }
         );
     });
 </script>

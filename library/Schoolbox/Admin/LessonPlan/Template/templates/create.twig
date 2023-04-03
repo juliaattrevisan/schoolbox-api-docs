@@ -261,11 +261,19 @@
     document.querySelectorAll('[id^=field-body-]').forEach((el) => {
         el.addEventListener(
             "EDITOR__MAX_CHAR_COUNT_EXCEEDED",
-            function () {$('#save-button').prop('disabled', true).attr('title', 'Cannot save because max character count exceeded.');}
+            function () {
+                const input = document.querySelector('#save-button');
+                input.disabled = true;
+                input.setAttribute('title', 'Cannot save because max character count exceeded.');
+            }
         );
         el.addEventListener(
             "EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED",
-            function () {$('#save-button').prop('disabled', false).attr('title', '');}
+            function () {
+                const input = document.querySelector('#save-button');
+                input.disabled = false;
+                input.setAttribute('title', '');
+            }
         );
     });
 
