@@ -115,6 +115,9 @@
                 /* To allow multiple file selections
                  */
                 allowMulti: false,
+                /*
+                 */
+                fileBrowserCategoryId: 0,
 
                 /* Executes before picker modal opens
                  */
@@ -177,6 +180,10 @@
              */
             if (config.defaultFolderSelector) {
                 qString += "&fid=" + config.defaultFolderSelector;
+            }
+
+            if (config.fileBrowserCategoryId && config.fileBrowserCategoryId > 0) {
+                qString += "&fid=" + config.fileBrowserCategoryId;
             }
 
             return qString;
@@ -569,6 +576,7 @@
                 allowedFiles: null,
                 allowedFilesystems: "link",
                 defaultFolderSelector: null,
+                fileBrowserCategoryId: null,
             },
 
             /* Combine with modal configuration requirements
@@ -596,6 +604,7 @@
                 allowedFilesystems: config.allowedFilesystems,
                 allowDetachment: config.allowDetachment,
                 defaultFolderSelector: config.defaultFolderSelector,
+                fileBrowserCategoryId: config.fileBrowserCategoryId,
                 onBeforeOpen: config.onBeforeOpen,
                 onAfterClose: config.onAfterClose,
                 onModalClosed: config.onModalClosed,
