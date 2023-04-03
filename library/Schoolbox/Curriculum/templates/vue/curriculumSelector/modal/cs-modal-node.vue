@@ -131,7 +131,7 @@ const isViewingAnother = computed(() => modalNodeUsageStore.isOpen && modalActiv
  *
  * @returns { boolean }
  */
-const showUsage = computed(() => modalStore.isOpen && props.node.id !== UNSET_ID && !modalSearchStore.isActive);
+const showUsage = computed(() => modalStore.isOpen && props.node.id !== UNSET_ID);
 
 /**
  * If this is the active node being viewed
