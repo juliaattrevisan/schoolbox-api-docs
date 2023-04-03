@@ -145,5 +145,15 @@ export const useModalViewNodesStore = defineStore(`csModalViewNodes`, {
             await nodesStore.loadChildren(id);
             this.setSelected(this.currentDepth + 1, id);
         },
+
+        /**
+         * To traverse to a specified id, regardless of where it is
+         * in the current tree structure
+         *
+         * @param { number } id - id of the Node to move to
+         */
+        async toId(id) {
+            await useNodesStore().loadId(id);
+        },
     },
 });

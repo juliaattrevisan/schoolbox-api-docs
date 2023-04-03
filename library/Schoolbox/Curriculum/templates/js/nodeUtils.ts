@@ -8,7 +8,6 @@ import type {
     CourseUsageObject,
     UnitUsageObject,
     LearningActivityUsageObject,
-    BadgeUsageObject,
 } from "@schoolboxCurriculum/types/Node";
 import { ActivityTypes } from "@schoolboxCurriculum/types/Node";
 import type { Breadcrumb } from "@schoolboxCurriculum/types/Breadcrumb";
@@ -199,6 +198,8 @@ export function getUsageIcon(type: ActivityTypes) {
         [ActivityTypes.LEARNING_ACTIVITY_DUE_WORK]: "icon-due-work",
         [ActivityTypes.LEARNING_ACTIVITY_TASK]: "icon-task",
         [ActivityTypes.LEARNING_ACTIVITY_QUIZ]: "icon-quiz",
+        [ActivityTypes.LEARNING_ACTIVITY_LESSON_PLAN]: "icon-lesson-plan",
+        [ActivityTypes.LEARNING_ACTIVITY_LTI]: "icon-lti",
         [ActivityTypes.BADGE]: "icon-badge",
     };
     return icons[type];

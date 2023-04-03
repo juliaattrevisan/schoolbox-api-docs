@@ -63,7 +63,7 @@ const props = defineProps({
     },
 });
 
-const emit = defineEmits(["closed", "nextOpened"]);
+const emit = defineEmits(["closed", "nextOpened", "previousOpened"]);
 const uuid = generateUUID();
 const elementId = ref(`reveal-modal-${uuid}`);
 const sequenceIndex = ref(1); // to help track the current sequence index independent of the prop
@@ -123,13 +123,14 @@ function addClosedListener() {
             // moving to the next in sequence, we emit nextOpened so the props.isNextSelected can be set to false again in the parent
             sequenceIndex.value += 1;
             open();
-            emit("nextOpened");
+            emit("nextOpened", sequenceIndex.value);
             return;
         }
         if (sequenceIndex.value > 1) {
             // moving backwards in sequence
             sequenceIndex.value -= 1;
             open();
+            emit("previousOpened", sequenceIndex.value);
             return;
         }
         // otherwise we are closing the modal entirely

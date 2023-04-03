@@ -38,5 +38,14 @@ export const useModalStore = defineStore(`csModal`, {
             this.isOpen = false;
             useModalSelectedNodesStore().empty();
         },
+
+        /**
+         * to set the selected badge in the modal
+         *
+         * @param { BadgeUsageObject } badge
+         */
+        setSelectedBadge(badge) {
+            this.selectedBadge = badge;
+        },
     },
 });

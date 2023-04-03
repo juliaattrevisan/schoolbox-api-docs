@@ -33,6 +33,18 @@ watch(
 );
 
 /**
+ * when the badge-detail is closed, we need to reset the selected badge,
+ * otherwise we can't re-open the same badge
+ *
+ * @param { number } sequenceIndex - the sequence index of the modal, with 1 being the curriculum browser
+ */
+function onOpenPrevious(sequenceIndex) {
+    if (sequenceIndex === 1) {
+        modalStore.setSelectedBadge(null);
+    }
+}
+
+/**
  * a code has been selected in the detail modal
  *
  * @param { object } node - the selected node
@@ -61,6 +73,7 @@ function onModalClosed() {
         :is-open="modalStore.isOpen"
         :is-next-selected="isNextSelected"
         @next-opened="isNextSelected = false"
+        @previous-opened="onOpenPrevious"
         @closed="onModalClosed"
     >
         <template #sequence-1>
