@@ -229,7 +229,7 @@ const showActions = computed(() => !store.isReadOnly && props.node.id !== UNSET_
  *
  * @returns { boolean }
  */
-const showUsage = computed(() => props.node.id !== UNSET_ID && !searchStore.isActive);
+const showUsage = computed(() => props.node.id !== UNSET_ID);
 </script>
 
 <template>
