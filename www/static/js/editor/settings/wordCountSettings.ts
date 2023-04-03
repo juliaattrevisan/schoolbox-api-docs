@@ -66,24 +66,24 @@ function updateWordCount(
     editor.plugins.get("WordCount").on("update", () => {
         const currentCharacterLength = editor.getData().length;
         characterCountElement.innerText = `Characters: ${currentCharacterLength}`;
-        if (currentCharacterLength > config.maxCharCount) {
+        if (config.maxCharCount !== undefined && currentCharacterLength > config.maxCharCount) {
             characterCountElement.style.display = "block";
             limitWarningElement.style.display = "block";
             if (!config.showWordCount) {
                 wordCountContainer.style.display = "flex";
             }
             textarea.dispatchEvent(new CustomEvent(EditorEvent.EDITOR__MAX_CHAR_COUNT_EXCEEDED));
-            editor.maxCharCountExceededAtLastCheck = true;
+            wordCountContainer.setAttribute("data-maxCharCountExceededAtLastCheck", "1");
         } else {
             characterCountElement.style.display = "none";
             limitWarningElement.style.display = "none";
             if (!config.showWordCount) {
                 wordCountContainer.style.display = "none";
             }
-            if (editor.maxCharCountExceededAtLastCheck) {
+            if (wordCountContainer.getAttribute("data-maxCharCountExceededAtLastCheck") === "1") {
                 textarea.dispatchEvent(new CustomEvent(EditorEvent.EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED));
             }
-            editor.maxCharCountExceededAtLastCheck = false;
+            wordCountContainer.setAttribute("data-maxCharCountExceededAtLastCheck", "0");
         }
     });
 }
