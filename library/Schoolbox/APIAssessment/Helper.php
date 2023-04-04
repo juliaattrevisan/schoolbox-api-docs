@@ -364,153 +364,171 @@ WHERE
     private function getAssessmentFeedback(array $assessmentIds): array
     {
         $bindings = Builder::getBindings($assessmentIds, 'ids');
-        $statement = $this->mapper->getDatabase()->query("
-        (select `sb`.`assessment_id` AS `assessment_id`,
-        'submission_return'  AS `feedback_table`,
-        max(`sr1`.`id`)      AS `feedback_id`,
-        `sr1`.`owner`        AS `student_id`,
-        `sr1`.`published_at` AS `completionDate`,
-        `sr1`.`comment`      AS `comment`,
-        `sr1`.`mark`         AS `mark`,
-        `sr1`.`norm_mark`    AS `norm_mark`,
-        `student`.`title` as `studentTitle`,
-        `student`.`firstname` as `studentFirstname`,
-        `student`.`preferred_name` as `studentPreferredName`,
-        `student`.`lastname` as `studentLastname`,
-        `student`.`synergy_id` as `studentExternalId`,
-        `staff`.`id` as `staffId`,
-        `staff`.`title` as `staffTitle`,
-        `staff`.`firstname` as `staffFirstname`,
-        `staff`.`preferred_name` as `staffPreferredName`,
-        `staff`.`lastname` as `staffLastname`,
-        `staff`.`synergy_id` as `staffExternalId`
- from ((`submission_return` `sr1`
-     join `submission_box` `sb` on (`sr1`.`box_id` = `sb`.`id`))
-     left join `submission_return` `sr2` on (
-                 `sr1`.`box_id` = `sr2`.`box_id`
-             and `sr1`.`owner` = `sr2`.`owner`
-             and `sr1`.`review_route` = `sr2`.`review_route`
-             and `sr2`.`published_at` is not null
-             and `sr2`.`deleted_at` is null
-             and `sr1`.`published_at` < `sr2`.`published_at`)
-     LEFT JOIN `user` `student` on `sr1`.`owner` = `student`.`id`
-     LEFT JOIN `user` `staff` on `sr1`.`marker` = `staff`.`id`)
- where `sr1`.`published_at` is not null
-   and `sr1`.`deleted_at` is null
-   and `sr2`.`id` is null
-   and `sr1`.`review_route` = 'instructor'
-   and `sb`.`assessment_id` in ({$bindings->getPlaceholder()})
- group by `sb`.`assessment_id`, `sr1`.`owner`, `sr1`.`review_route`, `sr1`.`published_at`)
-union
-(select `ass`.`assessment_id`   AS `assessment_id`,
-        'assess_attempt'        AS `feedback_table`,
-        max(`aa1`.`attempt_id`) AS `feedback_id`,
-        `aa1`.`user_id`         AS `student_id`,
-        `aa1`.`reviewed_at`     AS `completionDate`,
-        null                    AS `comment`,
-        `aa1`.`mark`            AS `mark`,
-        (`aa1`.`mark` / `aa1`.`max_mark` * 100)    AS `norm_mark`,
-        `student`.`title` as `studentTitle`,
-        `student`.`firstname` as `studentFirstname`,
-        `student`.`preferred_name` as `studentPreferredName`,
-        `student`.`lastname` as `studentLastname`,
-        `student`.`synergy_id` as `studentExternalId`,
-        `staff`.`id` as `staffId`,
-        `staff`.`title` as `staffTitle`,
-        `staff`.`firstname` as `staffFirstname`,
-        `staff`.`preferred_name` as `staffPreferredName`,
-        `staff`.`lastname` as `staffLastname`,
-        `staff`.`synergy_id` as `staffExternalId`
- from ((`assess_attempt` `aa1`
-     join `assess` `ass` on (`aa1`.`assess_id` = `ass`.`assess_id`))
-     left join `assess_attempt` `aa2` on (
-                 `aa1`.`assess_id` = `aa2`.`assess_id`
-             and `aa1`.`user_id` = `aa2`.`user_id`
-             and `aa2`.`reviewed_at` is not null
-             and `aa2`.`deleted_at` is null
-             and `aa1`.`reviewed_at` < `aa2`.`reviewed_at`)
-     LEFT JOIN `user` `student` on `aa1`.`user_id` = `student`.`id`
-     LEFT JOIN `user` `staff` on `aa1`.`reviewer_id` = `staff`.`id`)
- where `aa1`.`reviewed_at` is not null
-   and `aa1`.`deleted_at` is null
-   and `aa2`.`attempt_id` is null
-   and `ass`.`assessment_id` is not null
-   and `ass`.`assessment_id` in ({$bindings->getPlaceholder()})
- group by `ass`.`assessment_id`, `aa1`.`user_id`, `aa1`.`reviewed_at`)
-union
-(select `t`.`assessment_id`     AS `assessment_id`,
-        'task_completion'       AS `feedback_table`,
-        max(`tc1`.`id`)         AS `feedback_id`,
-        `tc1`.`student_id`      AS `student_id`,
-        `tc1`.`completion_date` AS `completionDate`,
-        null                    AS `comment`,
-        null                    AS `mark`,
-        null                    AS `norm_mark`,
-        `student`.`title` as `studentTitle`,
-        `student`.`firstname` as `studentFirstname`,
-        `student`.`preferred_name` as `studentPreferredName`,
-        `student`.`lastname` as `studentLastname`,
-        `student`.`synergy_id` as `studentExternalId`,
-        `staff`.`id` as `staffId`,
-        `staff`.`title` as `staffTitle`,
-        `staff`.`firstname` as `staffFirstname`,
-        `staff`.`preferred_name` as `staffPreferredName`,
-        `staff`.`lastname` as `staffLastname`,
-        `staff`.`synergy_id` as `staffExternalId`
- from ((`task_completion` `tc1`
-     join `task` `t` on (`tc1`.`task_id` = `t`.`id`))
-     left join `task_completion` `tc2` on (
-                 `tc1`.`task_id` = `tc2`.`task_id`
-             and `tc1`.`student_id` = `tc2`.`student_id`
-             and `tc1`.`completion_status` = `tc2`.`completion_status`
-             and `tc2`.`deleted_at` is null
-             and `tc1`.`completion_date` < `tc2`.`completion_date`)
-     LEFT JOIN `user` `student` on `tc1`.`student_id` = `student`.`id`
-     LEFT JOIN `user` `staff` on `tc1`.`marking_user_id` = `staff`.`id`)
- where `tc1`.`completion_date` is not null
-   and `tc1`.`deleted_at` is null
-   and `tc2`.`id` is null
-   and `tc1`.`completion_status` = 3
-   and `t`.`assessment_id` in ({$bindings->getPlaceholder()})
- group by `t`.`assessment_id`, `tc1`.`student_id`, `tc1`.`completion_date`)
-union
-(select `la`.`assessment_id`   AS `assessment_id`,
-        'lti_assessment_score' AS `feedback_table`,
-        max(`sc1`.`id`)        AS `feedback_id`,
-        `sc1`.`student_id`     AS `student_id`,
-        `sc1`.`created_at`     AS `completionDate`,
-        `sc1`.`comment`        AS `comment`,
-        `sc1`.`score_given`            AS `mark`,
-        (`sc1`.`score_given` / `sc1`.`score_maximum` * 100)    AS `norm_mark`,
-        `student`.`title` as `studentTitle`,
-        `student`.`firstname` as `studentFirstname`,
-        `student`.`preferred_name` as `studentPreferredName`,
-        `student`.`lastname` as `studentLastname`,
-        `student`.`synergy_id` as `studentExternalId`,
-        `staff`.`id` as `staffId`,
-        `staff`.`title` as `staffTitle`,
-        `staff`.`firstname` as `staffFirstname`,
-        `staff`.`preferred_name` as `staffPreferredName`,
-        `staff`.`lastname` as `staffLastname`,
-        `staff`.`synergy_id` as `staffExternalId`
- from ((`lti_assessment_score` `sc1`
-     join `lti_assessment` `la` on (`sc1`.`lti_assessment_id` = `la`.`id`))
-     left join `lti_assessment_score` `sc2` on (
-                 `sc1`.`lti_assessment_id` = `sc2`.`lti_assessment_id`
-             and `sc1`.`student_id` = `sc2`.`student_id`
-             and `sc2`.`created_at` is not null
-             and `sc2`.`deleted_at` is null
-             and `sc1`.`created_at` < `sc2`.`created_at`)
-     LEFT JOIN `user` `student` on `sc1`.`student_id` = `student`.`id`
-     LEFT JOIN `user` `staff` on `sc1`.`marking_user_id` = `staff`.`id`)
- where `sc1`.`created_at` is not null
-   and `sc1`.`deleted_at` is null
-   and `sc1`.`is_feedback` = 1
-   and `sc2`.`id` is null
-and `la`.`assessment_id` in ({$bindings->getPlaceholder()})
- group by `la`.`assessment_id`, `sc1`.`student_id`, `sc1`.`created_at`)
-order by `assessment_id`, `student_id`;
-            ", $bindings->getParams());
+        $statement = $this->mapper->getDatabase()->query(
+            <<<QUERY
+            (select
+                `sb`.`assessment_id`       AS `assessment_id`,
+                'submission_return'        AS `feedback_table`,
+                max(`sr1`.`id`)            AS `feedback_id`,
+                `sr1`.`owner`              AS `student_id`,
+                `sr1`.`published_at`       AS `completionDate`,
+                `sr1`.`comment`            AS `comment`,
+                `sr1`.`mark`               AS `mark`,
+                `sr1`.`norm_mark`          AS `norm_mark`,
+                `student`.`title`          as `studentTitle`,
+                `student`.`firstname`      as `studentFirstname`,
+                `student`.`preferred_name` as `studentPreferredName`,
+                `student`.`lastname`       as `studentLastname`,
+                `student`.`synergy_id`     as `studentExternalId`,
+                `staff`.`id`               as `staffId`,
+                `staff`.`title`            as `staffTitle`,
+                `staff`.`firstname`        as `staffFirstname`,
+                `staff`.`preferred_name`   as `staffPreferredName`,
+                `staff`.`lastname`         as `staffLastname`,
+                `staff`.`synergy_id`       as `staffExternalId`
+            from (
+                (`submission_return` `sr1` join `submission_box` `sb` on (`sr1`.`box_id` = `sb`.`id`))
+                left join `submission_return` `sr2` on (
+                    `sr1`.`box_id` = `sr2`.`box_id`
+                    and `sr1`.`owner` = `sr2`.`owner`
+                    and `sr1`.`review_route` = `sr2`.`review_route`
+                    and `sr2`.`published_at` is not null
+                    and `sr2`.`deleted_at` is null
+                    and `sr1`.`published_at` < `sr2`.`published_at`
+                )
+                LEFT JOIN `user` `student` on `sr1`.`owner` = `student`.`id`
+                LEFT JOIN `user` `staff` on `sr1`.`marker` = `staff`.`id`
+            )
+            where `sr1`.`published_at` is not null
+              and `sr1`.`deleted_at` is null
+              and `sr2`.`id` is null
+              and `sr1`.`review_route` = 'instructor'
+              and `sb`.`assessment_id` in ({$bindings->getPlaceholder()})
+            group by `sb`.`assessment_id`, `sr1`.`owner`, `sr1`.`review_route`, `sr1`.`published_at`)
+
+            union
+            (select
+                `ass`.`assessment_id`   AS `assessment_id`,
+                'assess_attempt'        AS `feedback_table`,
+                max(`aa1`.`attempt_id`) AS `feedback_id`,
+                `aa1`.`user_id`         AS `student_id`,
+                `aa1`.`reviewed_at`     AS `completionDate`,
+                null                    AS `comment`,
+                `aa1`.`mark`            AS `mark`,
+                (`aa1`.`mark` / `aa1`.`max_mark` * 100)    AS `norm_mark`,
+                `student`.`title` as `studentTitle`,
+                `student`.`firstname` as `studentFirstname`,
+                `student`.`preferred_name` as `studentPreferredName`,
+                `student`.`lastname` as `studentLastname`,
+                `student`.`synergy_id` as `studentExternalId`,
+                `staff`.`id` as `staffId`,
+                `staff`.`title` as `staffTitle`,
+                `staff`.`firstname` as `staffFirstname`,
+                `staff`.`preferred_name` as `staffPreferredName`,
+                `staff`.`lastname` as `staffLastname`,
+                `staff`.`synergy_id` as `staffExternalId`
+            from (
+                (`assess_attempt` `aa1` join `assess` `ass` on (`aa1`.`assess_id` = `ass`.`assess_id`))
+                left join `assess_attempt` `aa2` on (
+                    `aa1`.`assess_id` = `aa2`.`assess_id`
+                    and `aa1`.`user_id` = `aa2`.`user_id`
+                    and `aa2`.`reviewed_at` is not null
+                    and `aa2`.`deleted_at` is null
+                    and `aa1`.`reviewed_at` < `aa2`.`reviewed_at`
+                )
+                LEFT JOIN `user` `student` on `aa1`.`user_id` = `student`.`id`
+                LEFT JOIN `user` `staff` on `aa1`.`reviewer_id` = `staff`.`id`
+            )
+            where `aa1`.`reviewed_at` is not null
+              and `aa1`.`deleted_at` is null
+              and `aa2`.`attempt_id` is null
+              and `ass`.`assessment_id` is not null
+              and `ass`.`assessment_id` in ({$bindings->getPlaceholder()})
+            group by `ass`.`assessment_id`, `aa1`.`user_id`, `aa1`.`reviewed_at`)
+
+            union
+            (select
+                `t`.`assessment_id`     AS `assessment_id`,
+                'task_completion'       AS `feedback_table`,
+                max(`tc1`.`id`)         AS `feedback_id`,
+                `tc1`.`student_id`      AS `student_id`,
+                `tc1`.`completion_date` AS `completionDate`,
+                null                    AS `comment`,
+                null                    AS `mark`,
+                null                    AS `norm_mark`,
+                `student`.`title` as `studentTitle`,
+                `student`.`firstname` as `studentFirstname`,
+                `student`.`preferred_name` as `studentPreferredName`,
+                `student`.`lastname` as `studentLastname`,
+                `student`.`synergy_id` as `studentExternalId`,
+                `staff`.`id` as `staffId`,
+                `staff`.`title` as `staffTitle`,
+                `staff`.`firstname` as `staffFirstname`,
+                `staff`.`preferred_name` as `staffPreferredName`,
+                `staff`.`lastname` as `staffLastname`,
+                `staff`.`synergy_id` as `staffExternalId`
+            from (
+                (`task_completion` `tc1` join `task` `t` on (`tc1`.`task_id` = `t`.`id`))
+                left join `task_completion` `tc2` on (
+                    `tc1`.`task_id` = `tc2`.`task_id`
+                    and `tc1`.`student_id` = `tc2`.`student_id`
+                    and `tc1`.`completion_status` = `tc2`.`completion_status`
+                    and `tc2`.`deleted_at` is null
+                    and `tc1`.`completion_date` < `tc2`.`completion_date`
+                )
+                LEFT JOIN `user` `student` on `tc1`.`student_id` = `student`.`id`
+                LEFT JOIN `user` `staff` on `tc1`.`marking_user_id` = `staff`.`id`
+            )
+            where `tc1`.`completion_date` is not null
+              and `tc1`.`deleted_at` is null
+              and `tc2`.`id` is null
+              and `tc1`.`completion_status` = 3
+              and `t`.`assessment_id` in ({$bindings->getPlaceholder()})
+            group by `t`.`assessment_id`, `tc1`.`student_id`, `tc1`.`completion_date`)
+
+            union
+            (select
+                `la`.`assessment_id`   AS `assessment_id`,
+                'lti_assessment_score' AS `feedback_table`,
+                max(`sc1`.`id`)        AS `feedback_id`,
+                `sc1`.`student_id`     AS `student_id`,
+                `sc1`.`created_at`     AS `completionDate`,
+                `sc1`.`comment`        AS `comment`,
+                `sc1`.`score_given`            AS `mark`,
+                (`sc1`.`score_given` / `sc1`.`score_maximum` * 100)    AS `norm_mark`,
+                `student`.`title` as `studentTitle`,
+                `student`.`firstname` as `studentFirstname`,
+                `student`.`preferred_name` as `studentPreferredName`,
+                `student`.`lastname` as `studentLastname`,
+                `student`.`synergy_id` as `studentExternalId`,
+                `staff`.`id` as `staffId`,
+                `staff`.`title` as `staffTitle`,
+                `staff`.`firstname` as `staffFirstname`,
+                `staff`.`preferred_name` as `staffPreferredName`,
+                `staff`.`lastname` as `staffLastname`,
+                `staff`.`synergy_id` as `staffExternalId`
+            from (
+                (`lti_assessment_score` `sc1` join `lti_assessment` `la` on (`sc1`.`lti_assessment_id` = `la`.`id`))
+                left join `lti_assessment_score` `sc2` on (
+                    `sc1`.`lti_assessment_id` = `sc2`.`lti_assessment_id`
+                    and `sc1`.`student_id` = `sc2`.`student_id`
+                    and `sc2`.`created_at` is not null
+                    and `sc2`.`deleted_at` is null
+                    and `sc1`.`created_at` < `sc2`.`created_at`)
+                LEFT JOIN `user` `student` on `sc1`.`student_id` = `student`.`id`
+                LEFT JOIN `user` `staff` on `sc1`.`marking_user_id` = `staff`.`id`
+            )
+            where `sc1`.`created_at` is not null
+              and `sc1`.`deleted_at` is null
+              and `sc1`.`is_feedback` = 1
+              and `sc2`.`id` is null
+              and `la`.`assessment_id` in ({$bindings->getPlaceholder()})
+            group by `la`.`assessment_id`, `sc1`.`student_id`, `sc1`.`created_at`)
+
+            order by `assessment_id`, `student_id`;
+            QUERY,
+            $bindings->getParams()
+        );
         $statement->execute();
         $feedbackItems = [];
         foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
