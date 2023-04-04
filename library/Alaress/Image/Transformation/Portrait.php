@@ -31,6 +31,7 @@ class Portrait implements ITransformFactory
         'constrain64',
         'constrain128',
         'constrain200',
+        'constrain500',
         'profile',
         'rectangle',
     ];
@@ -61,6 +62,8 @@ class Portrait implements ITransformFactory
                 return new Constrain(128, 400);
             case 'constrain200':
                 return new Constrain(200, 300);
+            case 'constrain500':
+                return new Constrain(500, 750);
             case 'profile':
                 return new Constrain(250, 300);
             case 'rectangle':
