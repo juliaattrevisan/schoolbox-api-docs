@@ -165,3 +165,83 @@
 .ck.ck-content span.selected-word {
     background: #cae9b9;
 }
+
+/**
+ *  The below styles apply some sort of custom styling to the CK Editor toolbar itself.
+**/
+.ck-body-wrapper .ck button.ck-button-resource-link {
+    background-color: var(--ck-color-button-on-active-background);
+    color: var(--ck-color-button-on-color);
+}
+
+.ck-body-wrapper .ck button.ck-button-resource-link:hover,
+.ck-body-wrapper .ck button.ck-button-resource-link:active {
+    color: white;
+    background-color: var(--ck-color-button-on-color);
+}
+
+/**
+ *  CKEditor custom font sizes - they exist internally inside an editor.css file
+ *  but that file isn't imported onto a page unless you explicitly import it or
+ *  there's a CKEditor instance on the page.
+**/
+.text-tiny {
+    font-size: 0.7em;
+}
+
+.text-small {
+    font-size: 0.85em;
+}
+
+.text-big {
+    font-size: 1.4em;
+}
+
+.text-huge {
+    font-size: 1.8em;
+}
+
+/**
+ *  The below styles only apply to content when viewed within the editor - this spot
+ *  is pretty much exclusive to resolving bugs with how CKEditor changes things
+ *  while being edited and to bring it closer to what the display will look like.
+**/
+
+/* Stop overlapping of floating elements */
+.ck.ck-content p,
+.ck.ck-content blockquote,
+.ck.ck-content figure,
+.ck.ck-content table,
+.ck.ck-content img {
+    clear: both;
+}
+
+.ck.ck-content p:first-child {
+    margin-top: 0;
+}
+
+.ck.ck-content p:last-child {
+    margin-bottom: 0.75rem;
+}
+
+.ck.ck-content table {
+    margin-bottom: 0;
+}
+
+.ck.ck-content table th p {
+    font-weight: 600;
+}
+
+.ck.ck-content table th,
+.ck.ck-content table tr,
+.ck.ck-content table td {
+    vertical-align: middle;
+}
+
+.ck.ck-content hr {
+    height: 1px;
+}
+
+.ck.ck-content figure {
+    margin-top: 0 !important;
+}

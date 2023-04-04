@@ -9,6 +9,9 @@ blockquote {
     border-#{$default-float}: 6px solid $base;
     font-size: rem-calc(($base-font-size - 3));
     margin: 0 0 $paragraph-margin-bottom;
+    /*  Necessary to encase floating elements within a blockquote (tables).
+        Otherwise, they end up floating outside the table...*/
+    overflow: hidden;
     padding: rem-calc(9 20 9 19);
     &:before {
         color: $base;
