@@ -323,7 +323,12 @@ class Controller extends WebController\Base
     private function buildCourseMarkbook(CourseSpec\Model $courseSpec, array $assessmentIds): CourseMarkbook
     {
         // Fetch assessments & participants
-        $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds)->indexBy('id');
+        $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds)
+            ->filter(static function (\Schoolbox\Learning\Assessment\IAssessable $assessment) {
+                return !$assessment instanceof \Schoolbox\Learning\Assessment\LessonPlan\Model;
+            })
+            ->indexBy('id');
+
         $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments, null, true);
 
         // Build a course markbook
