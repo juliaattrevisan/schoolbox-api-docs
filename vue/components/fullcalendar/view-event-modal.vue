@@ -395,6 +395,15 @@ export default {
              */
             this.$refs.modal.open();
 
+            /**
+             * Enusre video/audio files can be played in the modal
+             * when it's opened. We call ProxyReplacement() again as
+             * the modal isn't in the DOM when it's called initially.
+             */
+            this.$nextTick(() => {
+                $.fn.schoolboxResource_ProxyReplacement(`#${this.$el.id}`);
+            });
+
             /* Non-numeric eventIds are ignored
              * These could be hashes sourced from a third party, like the sis or a subscription
              * In those cases, we can't do anything about their attendance
