@@ -518,15 +518,10 @@ order by `assessment_id`, `student_id`;
                 $feedbackItems[$row['assessment_id']] = [];
             }
             $rubric = $this->getRubricFeedback($row['assessment_id'], $row['feedback_id']);
-            $feedbackItems[$row['assessment_id']][$row['student_id']] = [
-                'learner'        => [
-                    'id'            => $row['student_id'],
-                    'title'         => $row['studentTitle'],
-                    'firstName'     => $row['studentFirstname'],
-                    'preferredName' => $row['studentPreferredName'],
-                    'lastName'      => $row['studentLastname'],
-                    'externalId'    => $row['studentExternalId'],
-                ],
+
+            // Feedback fields are duplicated in the base key of the feedback
+            // item, as well as in "feedback".
+            $feedbackFields = [
                 'mark'           => $row['mark'],
                 'normalisedMark' => $row['norm_mark'],
                 'comment'        => $row['comment'],
@@ -541,6 +536,17 @@ order by `assessment_id`, `student_id`;
                 ],
                 'rubric'         => $rubric,
             ];
+            $feedbackItems[$row['assessment_id']][$row['student_id']] = [
+                'learner'  => [
+                    'id'            => $row['student_id'],
+                    'title'         => $row['studentTitle'],
+                    'firstName'     => $row['studentFirstname'],
+                    'preferredName' => $row['studentPreferredName'],
+                    'lastName'      => $row['studentLastname'],
+                    'externalId'    => $row['studentExternalId'],
+                ],
+                'feedback' => $feedbackFields,
+            ] + $feedbackFields;
         }
         return $feedbackItems;
     }
