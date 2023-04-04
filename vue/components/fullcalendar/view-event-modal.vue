@@ -431,24 +431,24 @@ export default {
                 responseType: "json",
             };
 
-            // fetch(request)
-            //     .then((response) => {
-            //         if (response.ok) {
-            //             return response.json();
-            //         } else {
-            //             throw new Error(response.statusText);
-            //         }
-            //     })
-            //     .then((data) => {
-            //         self.payload = data;
-            //     })
-            //     .catch((error) => {
-            //         /* Attendance won't be available for some events such as those
-            //          * streamed from a third party source, or a sis; looking for their
-            //          * identifying hashes will result in 404 because they won't exist
-            //          * in our local db
-            //          */
-            //     });
+            fetch(request)
+                .then((response) => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        throw new Error(response.statusText);
+                    }
+                })
+                .then((data) => {
+                    self.payload = data;
+                })
+                .catch((error) => {
+                    /* Attendance won't be available for some events such as those
+                     * streamed from a third party source, or a sis; looking for their
+                     * identifying hashes will result in 404 because they won't exist
+                     * in our local db
+                     */
+                });
         },
 
         /**
