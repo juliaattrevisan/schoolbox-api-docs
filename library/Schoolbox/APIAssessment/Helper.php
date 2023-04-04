@@ -507,9 +507,6 @@ WHERE
             LTI,
         ];
 
-
-
-
         $statement = $this->mapper->getDatabase()->query(
             implode(' union ', $feedbackQueries) . 'order by `assessment_id`, `student_id`',
             $bindings->getParams(),
@@ -551,6 +548,8 @@ WHERE
                 'feedback' => [ 'id' => $row['feedback_id'],] + $feedbackFields,
             ] + $feedbackFields;
         }
+        $statement->closeCursor();
+
 
         // Also fetch most recent response for this item
         // Format:
@@ -562,6 +561,138 @@ WHERE
         // "files": [
         //     {`standard files object`}
         // ]
+        $responseQueries = [
+            <<<DUEWORK
+            select
+                `sb`.`assessment_id`       AS `assessment_id`,
+                'student_submission'       AS `response_table`,
+                max(ss1.`id`)              AS `response_id`,
+                ss1.`owner`                AS `student_id`,
+                ss1.`submitted_at`         AS `completionDate`,
+                null                       AS `comment`,
+                null                       AS `mark`,
+                null                       AS `norm_mark`,
+                $studentFields,
+                $staffFields
+            from (
+                (`student_submission` ss1 join `submission_box` `sb` on (ss1.`box_id` = `sb`.`id`))
+                left join `student_submission` ss2 on (
+                    ss1.`box_id` = ss2.`box_id`
+                    and ss1.`owner` = ss2.`owner`
+                    and ss2.`submitted_at` is not null
+                    and ss2.`deleted_at` is null
+                    and ss1.`submitted_at` < ss2.`submitted_at`
+                )
+                LEFT JOIN `user` `student` on ss1.`owner` = `student`.`id`
+                LEFT JOIN `user` `staff` on ss1.`submitted_by` = `staff`.`id`
+            )
+            where ss1.`submitted_at` is not null
+              and ss1.`deleted_at` is null
+              and ss2.`id` is null
+              and `sb`.`assessment_id` in ({$bindings->getPlaceholder()})
+            group by `sb`.`assessment_id`, ss1.`owner`, ss1.`submitted_at`
+            DUEWORK,
+            <<<QUIZ
+            select
+                `ass`.`assessment_id`   AS `assessment_id`,
+                'assess_attempt'        AS `response_table`,
+                max(`aa1`.`attempt_id`) AS `response_id`,
+                `aa1`.`user_id`         AS `student_id`,
+                `aa1`.`reviewed_at`     AS `completionDate`,
+                null                    AS `comment`,
+                `aa1`.`mark`            AS `mark`,
+                (`aa1`.`mark` / `aa1`.`max_mark` * 100)    AS `norm_mark`,
+                $studentFields,
+                $staffFields
+            from (
+                (`assess_attempt` `aa1` join `assess` `ass` on (`aa1`.`assess_id` = `ass`.`assess_id`))
+                left join `assess_attempt` `aa2` on (
+                    `aa1`.`assess_id` = `aa2`.`assess_id`
+                    and `aa1`.`user_id` = `aa2`.`user_id`
+                    and `aa2`.`reviewed_at` is null
+                    and `aa2`.`deleted_at` is null
+                )
+                LEFT JOIN `user` `student` on `aa1`.`user_id` = `student`.`id`
+                LEFT JOIN `user` `staff` on `aa1`.`reviewer_id` = `staff`.`id`
+            )
+            where `aa1`.`reviewed_at` is null
+              and `aa1`.`deleted_at` is null
+              and `aa2`.`attempt_id` is null
+              and `ass`.`assessment_id` is not null
+              and `ass`.`assessment_id` in ({$bindings->getPlaceholder()})
+            group by `ass`.`assessment_id`, `aa1`.`user_id`, `aa1`.`reviewed_at`
+            QUIZ,
+            <<<TASK
+            select
+                `t`.`assessment_id`     AS `assessment_id`,
+                'task_completion'       AS `response_table`,
+                max(`tc1`.`id`)         AS `response_id`,
+                `tc1`.`student_id`      AS `student_id`,
+                `tc1`.`completion_date` AS `completionDate`,
+                null                    AS `comment`,
+                null                    AS `mark`,
+                null                    AS `norm_mark`,
+                $studentFields,
+                $staffFields
+            from (
+                (`task_completion` `tc1` join `task` `t` on (`tc1`.`task_id` = `t`.`id`))
+                left join `task_completion` `tc2` on (
+                    `tc1`.`task_id` = `tc2`.`task_id`
+                    and `tc1`.`student_id` = `tc2`.`student_id`
+                    and `tc1`.`completion_status` = `tc2`.`completion_status`
+                    and `tc2`.`deleted_at` is null
+                    and `tc1`.`completion_date` < `tc2`.`completion_date`
+                )
+                LEFT JOIN `user` `student` on `tc1`.`student_id` = `student`.`id`
+                LEFT JOIN `user` `staff` on `tc1`.`marking_user_id` = `staff`.`id`
+            )
+            where `tc1`.`completion_date` is not null
+              and `tc1`.`deleted_at` is null
+              and `tc2`.`id` is null
+              and `tc1`.`completion_status` = 2
+              and `t`.`assessment_id` in ({$bindings->getPlaceholder()})
+            group by `t`.`assessment_id`, `tc1`.`student_id`, `tc1`.`completion_date`
+            TASK,
+            <<<LTI
+            select
+                `la`.`assessment_id`   AS `assessment_id`,
+                'lti_assessment_score' AS `response_table`,
+                max(`sc1`.`id`)        AS `response_id`,
+                `sc1`.`student_id`     AS `student_id`,
+                `sc1`.`created_at`     AS `completionDate`,
+                `sc1`.`comment`        AS `comment`,
+                `sc1`.`score_given`            AS `mark`,
+                (`sc1`.`score_given` / `sc1`.`score_maximum` * 100)    AS `norm_mark`,
+                $studentFields,
+                $staffFields
+            from (
+                (`lti_assessment_score` `sc1` join `lti_assessment` `la` on (`sc1`.`lti_assessment_id` = `la`.`id`))
+                left join `lti_assessment_score` `sc2` on (
+                    `sc1`.`lti_assessment_id` = `sc2`.`lti_assessment_id`
+                    and `sc1`.`student_id` = `sc2`.`student_id`
+                    and `sc2`.`deleted_at` is null
+                    and `sc1`.`created_at` < `sc2`.`created_at`)
+                LEFT JOIN `user` `student` on `sc1`.`student_id` = `student`.`id`
+                LEFT JOIN `user` `staff` on `sc1`.`marking_user_id` = `staff`.`id`
+            )
+            where `sc1`.`deleted_at` is null
+              and `sc1`.`is_feedback` = 1
+              and `sc2`.`id` is null
+              and `la`.`assessment_id` in ({$bindings->getPlaceholder()})
+            group by `la`.`assessment_id`, `sc1`.`student_id`, `sc1`.`created_at`;
+            LTI,
+        ];
+
+        $responseStatement = $this->mapper->getDatabase()->query(
+            implode(' union ', $feedbackQueries) . 'order by `assessment_id`, `student_id`',
+            $bindings->getParams(),
+        );
+        $responseStatement->execute();
+        foreach ($responseStatement as $row) {
+            // do something
+        }
+
+
         return $participationItems;
     }
 
