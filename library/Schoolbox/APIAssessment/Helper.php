@@ -503,12 +503,12 @@ WHERE
               and `sc1`.`is_feedback` = 1
               and `sc2`.`id` is null
               and `la`.`assessment_id` in ({$bindings->getPlaceholder()})
-            group by `la`.`assessment_id`, `sc1`.`student_id`, `sc1`.`created_at`;
+            group by `la`.`assessment_id`, `sc1`.`student_id`, `sc1`.`created_at`
             LTI,
         ];
 
         $statement = $this->mapper->getDatabase()->query(
-            implode(' union ', $feedbackQueries) . 'order by `assessment_id`, `student_id`',
+            '(' . implode(') union (', $feedbackQueries) . ') order by `assessment_id`, `student_id`',
             $bindings->getParams(),
         );
         $statement->execute();
@@ -545,7 +545,7 @@ WHERE
                     'lastName'      => $row['studentLastname'],
                     'externalId'    => $row['studentExternalId'],
                 ],
-                'feedback' => [ 'id' => $row['feedback_id'],] + $feedbackFields,
+                'feedback' => ['id' => $row['feedback_id']] + $feedbackFields,
             ] + $feedbackFields;
         }
         $statement->closeCursor();
@@ -679,12 +679,12 @@ WHERE
               and `sc1`.`is_feedback` = 1
               and `sc2`.`id` is null
               and `la`.`assessment_id` in ({$bindings->getPlaceholder()})
-            group by `la`.`assessment_id`, `sc1`.`student_id`, `sc1`.`created_at`;
+            group by `la`.`assessment_id`, `sc1`.`student_id`, `sc1`.`created_at`
             LTI,
         ];
 
         $responseStatement = $this->mapper->getDatabase()->query(
-            implode(' union ', $feedbackQueries) . 'order by `assessment_id`, `student_id`',
+            '(' . implode(') union (', $responseQueries) . ') order by `assessment_id`, `student_id`',
             $bindings->getParams(),
         );
         $responseStatement->execute();
