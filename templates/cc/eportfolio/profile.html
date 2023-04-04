@@ -180,13 +180,14 @@
                 <h2 class="subheader">Recent Photos</h2>
                 <section>
                     <!-- BEGIN recent_photo -->
-                    <a href="/cms/myImage.php?id={RECENT_PHOTO_FILE_ID}&amp;key=eportfolioImageGalleryLarge" title="{RECENT_PHOTO_FILE_DESC}" rel="lightbox-eportfolio">
+                    <a href="/cms/myImage.php?id={RECENT_PHOTO_FILE_ID}&amp;key=eportfolioImageGalleryLarge" title="{RECENT_PHOTO_FILE_DESC}" rel="lightbox[eportfolio]">
                         <img alt="{RECENT_PHOTO_FILE_DESC}" src='/cms/myImage.php?id={RECENT_PHOTO_FILE_ID}&amp;key=eportfolioRecentPhoto' />
                     </a>
                     <!-- END recent_photo -->
                 </section>
             </div>
         </div>
+        <script src="{CDN_PREFIX}/js/bundle/imageLightboxInit.js?v={SITE_VERSION}"></script>
         <!-- END has_recent_photo -->
 
         <!-- BEGIN no_recent_photo -->
