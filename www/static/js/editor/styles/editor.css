@@ -18,8 +18,6 @@
     --ck-color-mention-text: #222222;
     /* make a little longer, only seen in the Link plugin for Link URL */
     --ck-input-width: 19rem;
-
-    --ck-z-modal: 1010;
 }
 
 .ck.ck-editor {

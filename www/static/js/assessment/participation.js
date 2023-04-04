@@ -407,6 +407,7 @@
                     detail: {
                         targetElements: ["#plan-desc"],
                         toolbar: "simple",
+                        removeFromToolbar: "link",
                     },
                 })
             );
