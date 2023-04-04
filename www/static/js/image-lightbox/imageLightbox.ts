@@ -9,5 +9,6 @@ import "lightgallery/css/lightgallery-bundle.min.css";
 import "./imageLightbox.css";
 
 window.sbProps.lightGallery = lightGallery;
+window.sbProps.lightGalleries = {};
 
 document.dispatchEvent(new CustomEvent("IMAGE-LIGHTBOX__LOADED"));

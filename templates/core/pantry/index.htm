@@ -710,17 +710,25 @@
     <div class="small-12 island">
         <h2 class="subheader" id="lightbox">Lightbox</h2>
         <section class="content">
-            <ul class="img-gallery" data-image-gallery>
-                <li><a href="/send.php?id=215" title="Image 1" rel="lightbox-1"><img src="/send.php?id=215" width="100" alt="Image 1"></a></li>
-                <li><a href="/send.php?id=216" title="Image 2" rel="lightbox-2"><img src="/send.php?id=216" width="100" alt="Image 2"></a></li>
+            <ul class="img-gallery" data-image-lightbox="lightbox[pantry]">
+                <li>
+                    <a href="https://source.unsplash.com/ZCHj_2lJP00/1920" title="Image 1" rel="lightbox[pantry]">
+                        <img src="https://source.unsplash.com/ZCHj_2lJP00/100" alt="Image 1">
+                    </a>
+                </li>
+                <li>
+                    <a href="https://source.unsplash.com/2JcixB1Ky3I/2622" title="Image 1" rel="lightbox[pantry]">
+                        <img src="https://source.unsplash.com/2JcixB1Ky3I/100" alt="Image 1">
+                    </a>
+                </li>
+                <li>
+                    <a href="https://source.unsplash.com/46TvM-BVrRI/2574" title="Image 1" rel="lightbox[pantry]">
+                        <img src="https://source.unsplash.com/46TvM-BVrRI/100" alt="Image 1">
+                    </a>
+                </li>
             </ul>
         </section>
-        <script type="text/javascript">
-            $('[data-image-gallery] li').magnificPopup({
-                delegate: 'a',
-                type: 'image'
-            });
-        </script>
+        <script src="{CDN_PREFIX}/js/bundle/imageLightboxInit.js?v={SITE_VERSION}"></script>
     </div>
 </div>
 
