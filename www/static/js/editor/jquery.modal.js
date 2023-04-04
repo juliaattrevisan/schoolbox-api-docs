@@ -115,9 +115,10 @@
                 /* To allow multiple file selections
                  */
                 allowMulti: false,
-                /*
+
+                /* To traverse directly to a specific folder in the Resources section of the resource modal
                  */
-                fileBrowserCategoryId: 0,
+                fileBrowserCategoryId: null,
 
                 /* Executes before picker modal opens
                  */
@@ -180,9 +181,7 @@
              */
             if (config.defaultFolderSelector) {
                 qString += "&fid=" + config.defaultFolderSelector;
-            }
-
-            if (config.fileBrowserCategoryId && config.fileBrowserCategoryId > 0) {
+            } else if (config.fileBrowserCategoryId) {
                 qString += "&fid=" + config.fileBrowserCategoryId;
             }
 

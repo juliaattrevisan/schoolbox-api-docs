@@ -9,6 +9,7 @@
         document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
             detail: {
                 targetElements: ['#body'],
+                fileBrowserCategoryId : {% if record is defined %}{{ record.getFolder.getId }}{% else %}{{ folder.getId }}{% endif %}
             }
         }));
 
