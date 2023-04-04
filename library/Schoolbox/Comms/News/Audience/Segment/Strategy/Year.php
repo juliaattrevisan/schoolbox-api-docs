@@ -38,7 +38,8 @@ class Year extends SimpleStrategy
         RosettaStone $l10n,
     ) {
         parent::__construct($userAccessMapper, $access, $staffCanPost, $moderationRequired, $studentLocator);
-        $this->quotedYearPrefix = $userAccessMapper->getDatabase()->quote($l10n->translate('year', false, true));
+        $yearPrefix             = $l10n->translate('year', false, true);
+        $this->quotedYearPrefix = $yearPrefix ? $userAccessMapper->getDatabase()->quote($yearPrefix) : 'Year';
     }
 
     public static function getEntityType(): string
