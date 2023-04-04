@@ -1,6 +1,7 @@
 import type { Editor } from "@ckeditor/ckeditor5-core";
 import { EditorConfig } from "@js/editor/types/editorTypes";
 import { insertElementAfter } from "@js/util/domUtils";
+import { EditorEvent } from "@js/editor/event/editorEvent";
 
 /**
  * Returns the settings for the word count plugin
@@ -50,7 +51,12 @@ function getLimitWarningElement(config: EditorConfig) {
  * @param { EditorConfig } config - the CKEditor config object
  * @param { HTMLDivElement } wordCountContainer - the word count container
  */
-function updateWordCount(editor: Editor, config: EditorConfig, wordCountContainer: HTMLDivElement) {
+function updateWordCount(
+    textarea: HTMLTextAreaElement,
+    editor: Editor,
+    config: EditorConfig,
+    wordCountContainer: HTMLDivElement
+) {
     // if the max character count is -1 then we don't want to show the character count as the limit is disabled
     if (config.maxCharCount === -1) {
         return;
@@ -60,18 +66,24 @@ function updateWordCount(editor: Editor, config: EditorConfig, wordCountContaine
     editor.plugins.get("WordCount").on("update", () => {
         const currentCharacterLength = editor.getData().length;
         characterCountElement.innerText = `Characters: ${currentCharacterLength}`;
-        if (currentCharacterLength > config.maxCharCount) {
+        if (config.maxCharCount !== undefined && currentCharacterLength > config.maxCharCount) {
             characterCountElement.style.display = "block";
             limitWarningElement.style.display = "block";
             if (!config.showWordCount) {
                 wordCountContainer.style.display = "flex";
             }
+            textarea.dispatchEvent(new CustomEvent(EditorEvent.EDITOR__MAX_CHAR_COUNT_EXCEEDED));
+            wordCountContainer.setAttribute("data-maxCharCountExceededAtLastCheck", "1");
         } else {
             characterCountElement.style.display = "none";
             limitWarningElement.style.display = "none";
             if (!config.showWordCount) {
                 wordCountContainer.style.display = "none";
             }
+            if (wordCountContainer.getAttribute("data-maxCharCountExceededAtLastCheck") === "1") {
+                textarea.dispatchEvent(new CustomEvent(EditorEvent.EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED));
+            }
+            wordCountContainer.setAttribute("data-maxCharCountExceededAtLastCheck", "0");
         }
     });
 }
@@ -95,5 +107,5 @@ export function insertWordCount(textarea: HTMLTextAreaElement, editor: Editor, c
     } else {
         wordCountContainer.style.display = "none";
     }
-    updateWordCount(editor, config, wordCountContainer);
+    updateWordCount(textarea, editor, config, wordCountContainer);
 }

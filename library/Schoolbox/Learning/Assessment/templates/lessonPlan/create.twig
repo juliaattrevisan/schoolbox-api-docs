@@ -154,4 +154,23 @@
             targetElements: ['[data-cke]']
         }
     }));
+
+    document.querySelectorAll('[id^=field-body-]').forEach((el) => {
+        el.addEventListener(
+            "EDITOR__MAX_CHAR_COUNT_EXCEEDED",
+            function () {
+                const input = document.querySelector('input[type=submit]');
+                input.disabled = true;
+                input.setAttribute('value', 'Save (disabled because maximum character count exceeded)');
+            }
+        );
+        el.addEventListener(
+            "EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED",
+            function () {
+                const input = document.querySelector('input[type=submit]');
+                input.disabled = false;
+                input.setAttribute('value', 'Save');
+            }
+        );
+    });
 </script>
