@@ -181,27 +181,6 @@
 }
 
 /**
- *  CKEditor custom font sizes - they exist internally inside an editor.css file
- *  but that file isn't imported onto a page unless you explicitly import it or
- *  there's a CKEditor instance on the page.
-**/
-.text-tiny {
-    font-size: 0.7em;
-}
-
-.text-small {
-    font-size: 0.85em;
-}
-
-.text-big {
-    font-size: 1.4em;
-}
-
-.text-huge {
-    font-size: 1.8em;
-}
-
-/**
  *  The below styles only apply to content when viewed within the editor - this spot
  *  is pretty much exclusive to resolving bugs with how CKEditor changes things
  *  while being edited and to bring it closer to what the display will look like.
