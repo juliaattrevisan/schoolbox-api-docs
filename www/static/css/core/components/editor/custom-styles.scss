@@ -20,6 +20,48 @@
     }
 }
 
+/**
+ *  Rules specific for content being displayed that has been created within CKEditor.
+ *  Basically replicate the CKEditor styles over to our own content;
+**/
+article {
+    // Clobber rules inheriting from article rules elsewhere.
+    & > figure:first-child {
+        margin-top: 1rem;
+    }
+
+    blockquote,
+    figure,
+    img,
+    p,
+    table {
+        clear: both;
+    }
+
+    figure {
+        margin: auto;
+    }
+
+    table {
+        margin-bottom: 1rem;
+
+        th {
+            background-color: rgba(0, 0, 0, 0.05);
+            p {
+                font-weight: 600;
+            }
+        }
+
+        tr th,
+        tr,
+        td {
+            border: 1px solid rgb(179, 179, 179);
+            padding: 0.4em;
+            vertical-align: middle;
+        }
+    }
+}
+
 /*  CKEditor5 custom styles */
 /*  These have been declared out here as including them in the editor.css
  *  file prevents the styles from being used elsewhere as that style sheet
@@ -50,7 +92,28 @@
     --ck-custom-shadow-white: rgba(255, 255, 255, 0.15);
 }
 
-.ck-s {
+/**
+ *  CKEditor custom font sizes - they exist internally inside an editor.css file
+ *  but that file isn't imported onto a page unless you explicitly import it or
+ *  there's a CKEditor instance on the page.
+**/
+.text-tiny {
+    font-size: 0.7em;
+}
+
+.text-small {
+    font-size: 0.85em;
+}
+
+.text-big {
+    font-size: 1.4em;
+}
+
+.text-huge {
+    font-size: 1.8em;
+}
+
+.sb-ck {
     /* Applies to all custom styles. */
     &-banner,
     &-callout--info,
@@ -206,7 +269,7 @@
         background-size: 1rem;
         color: var(--ck-custom-sticky-text);
         display: block;
-        margin-top: 1.5rem;
+        margin-top: 1rem !important;
         max-width: 100%;
         padding: 1.5rem 1rem 1rem 1rem;
         position: relative;
@@ -273,7 +336,7 @@
 }
 
 /* Code block styling */
-p.ck-s-code-block {
+p.sb-ck-code-block {
     background-color: var(--ck-custom-code-bg);
     border: none;
     border-radius: 0.25rem;

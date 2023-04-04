@@ -144,15 +144,6 @@
 }
 
 /**
- * The custom button to the right of the Link URL that allows you to
- * open our resource modal
- */
-.ck.ck-button-resource-link {
-    margin-left: var(--ck-spacing-large);
-    min-width: 4rem;
-}
-
-/**
  * add a background colour to the make blank button used in Cloze questions
  */
 .ck.ck-toolbar .ck-button__schoolboxmakeblank {
@@ -164,4 +155,67 @@
  */
 .ck.ck-content span.selected-word {
     background: #cae9b9;
+}
+
+/**
+ *  The below styles apply some sort of custom styling to the CK Editor toolbar itself.
+ *  This is the custom button to the right of the Link URL that allows you to open our
+ *  resource modal
+**/
+.ck-body-wrapper .ck button.ck-button-resource-link {
+    margin-left: var(--ck-spacing-large);
+    min-width: 4rem;
+    background-color: var(--ck-color-button-on-active-background);
+    color: var(--ck-color-button-on-color);
+}
+
+.ck-body-wrapper .ck button.ck-button-resource-link:hover,
+.ck-body-wrapper .ck button.ck-button-resource-link:active {
+    color: white;
+    background-color: var(--ck-color-button-on-color);
+}
+
+/**
+ *  The below styles only apply to content when viewed within the editor - this spot
+ *  is pretty much exclusive to resolving bugs with how CKEditor changes things
+ *  while being edited and to bring it closer to what the display will look like.
+**/
+
+/* Stop overlapping of floating elements */
+.ck.ck-content p,
+.ck.ck-content blockquote,
+.ck.ck-content figure,
+.ck.ck-content table,
+.ck.ck-content img {
+    clear: both;
+}
+
+.ck.ck-content p:first-child {
+    margin-top: 0;
+}
+
+.ck.ck-content p:last-child {
+    margin-bottom: 0.75rem;
+}
+
+.ck.ck-content table {
+    margin-bottom: 0;
+}
+
+.ck.ck-content table th p {
+    font-weight: 600;
+}
+
+.ck.ck-content table th,
+.ck.ck-content table tr,
+.ck.ck-content table td {
+    vertical-align: middle;
+}
+
+.ck.ck-content hr {
+    height: 1px;
+}
+
+.ck.ck-content figure {
+    margin-top: 0 !important;
 }

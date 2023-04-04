@@ -163,7 +163,7 @@
                 <fieldset class="content">
                     <legend>Event Details</legend>
                     <div class="small-12 column">
-                        <label>
+                        <label for="type">
                             Type
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select the type of event. This will be represented via different colours">?</span>
                             {% if eventTypes|length %}
@@ -173,14 +173,14 @@
                                     {% endfor %}
                                 </select>
                             {% else %}
-                                <input type="hidden" name="type" value="{{ event.type.id }}" />
+                                <input type="hidden" id="type" name="type" value="{{ event.type.id }}" />
                             {% endif %}
                         </label>
                     </div>
                     <div class="small-12 column">
-                        <label>
+                        <label for="location">
                             Location
-                            <input name="location" type="text" value="{{ event.location }}" maxlength="250"/>
+                            <input name="location" id="location" type="text" value="{{ event.location }}" maxlength="250"/>
                         </label>
                     </div>
                     <div class="small-12 column">
