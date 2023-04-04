@@ -16,6 +16,8 @@ use PHPUnit;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\Config\TestLoader;
+use Schoolbox\L10n\Mapper as L10nMapper;
+use Schoolbox\L10n\RosettaStoneFactory;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -48,6 +50,7 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
         /** @var IConnector $mockConnector */
         $mockConnector = $this->createMock(IConnector::class);
 
+        $stoneFactory = new RosettaStoneFactory();
         // Ensure the relationship is valid for the segment's entity type
         $validRelationships = (new Audience\Segment\StrategyFactory(
             UserAccessMapper::getInstance(),
@@ -74,7 +77,8 @@ class ValidSegmentTest extends PHPUnit\Framework\TestCase
                 new External_Offline_Class(),
                 new External_Offline_User(),
                 new Folder\Code\ClassMatcherBase(),
-            )
+            ),
+            $stoneFactory->build(L10nMapper::getInstance())
         ))->getValidRelationshipModifiers();
 
         // Either not targeted to NULL, or targeted to NULL but that's valid for the segment's entity

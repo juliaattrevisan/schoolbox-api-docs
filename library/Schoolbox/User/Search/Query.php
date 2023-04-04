@@ -36,8 +36,7 @@ class Query
         private IConnector $db,
         private IConfigLoader $config,
         private RosettaStone $l18n
-    )
-    {
+    ) {
     }
 
     /**

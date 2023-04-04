@@ -34,8 +34,7 @@ class Result extends Base
         private IConnector $database,
         private RosettaStone $l10n,
         \Schoolbox\Permission\Access\Access $accessor = null
-    )
-    {
+    ) {
         parent::__construct($accessor);
     }
 
