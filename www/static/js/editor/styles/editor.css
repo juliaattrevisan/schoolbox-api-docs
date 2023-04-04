@@ -144,15 +144,6 @@
 }
 
 /**
- * The custom button to the right of the Link URL that allows you to
- * open our resource modal
- */
-.ck.ck-button-resource-link {
-    margin-left: var(--ck-spacing-large);
-    min-width: 4rem;
-}
-
-/**
  * add a background colour to the make blank button used in Cloze questions
  */
 .ck.ck-toolbar .ck-button__schoolboxmakeblank {
@@ -168,8 +159,12 @@
 
 /**
  *  The below styles apply some sort of custom styling to the CK Editor toolbar itself.
+ *  This is the custom button to the right of the Link URL that allows you to open our
+ *  resource modal
 **/
 .ck-body-wrapper .ck button.ck-button-resource-link {
+    margin-left: var(--ck-spacing-large);
+    min-width: 4rem;
     background-color: var(--ck-color-button-on-active-background);
     color: var(--ck-color-button-on-color);
 }
