@@ -407,7 +407,6 @@
                     detail: {
                         targetElements: ["#plan-desc"],
                         toolbar: "simple",
-                        removeFromToolbar: "link",
                     },
                 })
             );
@@ -664,7 +663,6 @@
         }
 
         var $participantCustomiseModal = $("#participant-customise-modal");
-        var $ckeDialogBgCover = $(".cke_dialog_background_cover");
 
         // Open modal
         $customiseModal.foundation("reveal", "open", {
@@ -677,12 +675,10 @@
                 } else {
                     $participantCustomiseModal.css("z-index", "10000");
                 }
-                $ckeDialogBgCover.addClass("hide");
             },
             closed: function () {
                 $participantCustomiseModal.attr("modal-status", "closed");
                 $participantCustomiseModal.css("z-index", "1001");
-                $ckeDialogBgCover.removeClass("hide");
             },
         });
     }
