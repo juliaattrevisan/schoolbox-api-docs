@@ -131,10 +131,10 @@ class Helper
         if (empty($output)) {
             return [];
         }
-        //get feedback items
-        $feedbacks = $this->getAssessmentFeedback(array_keys($output));
-        foreach ($feedbacks as $assessmentID => $feedback) {
-            $output[$assessmentID]['participants'] = array_values($feedback);
+        //get participation (feedback + responses)
+        $participationItemsByAssessment = $this->getAssessmentParticipation(array_keys($output));
+        foreach ($participationItemsByAssessment as $assessmentID => $participationItems) {
+            $output[$assessmentID]['participants'] = array_values($participationItems);
         }
         return array_values($output);
     }
@@ -361,7 +361,7 @@ WHERE
     * @param array $assessmentIds
     * @return array
     */
-    private function getAssessmentFeedback(array $assessmentIds): array
+    private function getAssessmentParticipation(array $assessmentIds): array
     {
         $bindings        = Builder::getBindings($assessmentIds, 'ids');
         $feedbackQueries = [
@@ -512,29 +512,31 @@ WHERE
                 left join `lti_assessment_score` `sc2` on (
                     `sc1`.`lti_assessment_id` = `sc2`.`lti_assessment_id`
                     and `sc1`.`student_id` = `sc2`.`student_id`
-                    and `sc2`.`created_at` is not null
                     and `sc2`.`deleted_at` is null
                     and `sc1`.`created_at` < `sc2`.`created_at`)
                 LEFT JOIN `user` `student` on `sc1`.`student_id` = `student`.`id`
                 LEFT JOIN `user` `staff` on `sc1`.`marking_user_id` = `staff`.`id`
             )
-            where `sc1`.`created_at` is not null
-              and `sc1`.`deleted_at` is null
+            where `sc1`.`deleted_at` is null
               and `sc1`.`is_feedback` = 1
               and `sc2`.`id` is null
               and `la`.`assessment_id` in ({$bindings->getPlaceholder()})
             group by `la`.`assessment_id`, `sc1`.`student_id`, `sc1`.`created_at`;
             LTI,
         ];
+
+
+
+
         $statement = $this->mapper->getDatabase()->query(
             implode(' union ', $feedbackQueries) . 'order by `assessment_id`, `student_id`',
             $bindings->getParams(),
         );
         $statement->execute();
-        $feedbackItems = [];
+        $participationItems = [];
         foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
-            if (!isset($feedbackItems[$row['assessment_id']])) {
-                $feedbackItems[$row['assessment_id']] = [];
+            if (!isset($participationItems[$row['assessment_id']])) {
+                $participationItems[$row['assessment_id']] = [];
             }
             $rubric = $this->getRubricFeedback($row['assessment_id'], $row['feedback_id']);
 
@@ -555,7 +557,7 @@ WHERE
                 ],
                 'rubric'         => $rubric,
             ];
-            $feedbackItems[$row['assessment_id']][$row['student_id']] = [
+            $participationItems[$row['assessment_id']][$row['student_id']] = [
                 'learner'  => [
                     'id'            => $row['student_id'],
                     'title'         => $row['studentTitle'],
@@ -578,7 +580,7 @@ WHERE
         // "files": [
         //     {`standard files object`}
         // ]
-        return $feedbackItems;
+        return $participationItems;
     }
 
     /**
