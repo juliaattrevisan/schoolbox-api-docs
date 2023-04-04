@@ -2,6 +2,13 @@
     background-color: rgba(0, 0, 0, 0.83) !important;
 }
 
+/*  Overriding the internal lightbox focus-visible styling to bring it
+    closer to default Chrome/Chromium/Firefox tab focus styling */
+.lg-container button:focus-visible,
+.lg-container .lg-toolbar a:focus-visible {
+    outline: 2px solid white;
+}
+
 .lg-container .lg-toolbar,
 .lg-container .lg-sub-html,
 button.lg-next:focus,
