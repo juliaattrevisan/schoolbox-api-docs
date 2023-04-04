@@ -1,0 +1,68 @@
+{##
+ # Student Summary Screen for Lesson Plan
+ #
+ # @param array $breadcrumbs           A set of nodes to render as breadcrumb elements
+ # @param LessonPlan\Model $assesment  A Lesson Plan assessment domain object instance
+ # @param \Schoolbox\User $student     A \Schoolbox\User instance
+ # @param string $returnUrl            A string for where you go when you hit Return
+ # @param bool $isInstructor           A bool for whether currently logged in user is instructor (they see staff-only fields)
+ #}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(breadcrumbs) }}
+
+<div class="row actions-small-1">
+    <div class="small-12 columns">
+        <h1>{{ assessment.title }}</h1>
+        {% include '@learningAssessment/meta.twig' with {
+            assessment: assessment,
+            submissionsBlocked: '',
+            student: student,
+            icon: 'icon-lesson-plan',
+            canShowcase: false,
+            isShowcased: false,
+            lastViews: lastViews
+        } only %}
+    </div>
+
+    {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}) %}
+    {% include '@learningAssessment/fragments/modifyTot.twig' with {
+        gradeRoute: false,
+        viewRoute: null,
+        modifyRoute: modifyRoute,
+        canShowcase: false,
+        isShowcased: false,
+        hasStudentView: isInstructor
+    } %}
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <section>
+            {# Decide how to render fields, depending on your current view
+             # (students get a different view to staff)
+             #
+             # These render as hidden divs initially
+             #}
+            {% import '@learningAssessment/lessonPlan/summary/renderFields.twig' as renderFields %}
+
+            {# Forcibly render the student view by default, for everyone#}
+            {{ renderFields.renderFields(assessment, 'student') }}
+
+            {# Optionally provide a student view if you're an instructor #}
+            {% if isInstructor %}
+                {{ renderFields.renderFields(assessment, 'staff') }}
+            {% else %}
+                <script>
+                    $(function() {
+                        $('#lessonPlan-student').show();
+                    });
+                </script>
+            {% endif %}
+
+            {# Attached files #}
+            {% include '@learningAssessment/fragments/attachments.twig' with { attachments: assessment.attachments } %}
+        </section>
+
+        <a href="{{ returnUrl }}" class="submit button full-width">Return</a>
+    </div>
+</div>

@@ -558,14 +558,15 @@ class ListController extends Web\Controller\Base
                 'title' => 'Connect an assessment provided by an LTI tool',
             ];
         }
-        /* TODO what's the tooltip for this?
+        /* The tooltip for Lesson Plans came from the slack channel
+         * https://alaress.slack.com/archives/C04R588EKPS/p1678336098480059
          */
         $data['types'][] = [
             'id'    => 'lesson-plan',
             'value' => AssessmentType::TYPE_LESSON_PLAN,
             'label' => 'Lesson Plan',
             'icon'  => 'lesson-plan',
-            'title' => 'Create a lesson plan',
+            'title' => 'A detailed guide that outlines a lesson\'s purpose and activities',
         ];
 
         // TODO, 'types' should just be the 3 objects, and twig should do the rest

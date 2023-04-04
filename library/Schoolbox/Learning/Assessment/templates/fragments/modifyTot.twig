@@ -11,8 +11,9 @@
  # @param bool          $canShowcase            a boolean for students' ability to Showcase to their eportfolio
  # @param bool          $isShowcased            whether this assessment is already showcased on a user's eportfolio
  # @param array         $externalRedirectUrl    A third party redirect url/application name tuple (url, name)
+ # @param bool          $hasStudentView         For Lesson Plan specifically, where a toggle shows student/staff views of a Lesson Plan
  #}
-{% if gradeRoute or viewRoute or modifyRoute or (canShowcase is defined and canShowcase) or (externalRedirectUrl is defined and externalRedirectUrl) %}
+{% if gradeRoute or viewRoute or modifyRoute or (canShowcase is defined and canShowcase) or (externalRedirectUrl is defined and externalRedirectUrl) or (hasStudentView is defined and hasStudentView) %}
     <nav>
         {% if externalRedirectUrl is defined and externalRedirectUrl %}
             <a href="{{ externalRedirectUrl.url }}" class="icon-view alert" title="{{ externalRedirectUrl.name }}"></a>
@@ -75,6 +76,71 @@
         {% endif %}
         {% if modifyRoute %}
             <li><a href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-modify">Modify</a></li>
+        {% endif %}
+
+        {# Lesson Plan lets you swap divs
+         # This lets you see student-visible versions of an LPT
+         # TODO Arguably Lesson Plan's modifyTot should be a subclass of this modifyTot?
+         #}
+        {% if hasStudentView is defined and hasStudentView %}
+            <li class="separator" data-has-student-view-separator>You are in Student View</li>
+            <li><a class="icon-view" data-has-student-view="student">Switch to Teacher View</a></li>
+
+            <script>
+                $(function() {
+                    /**
+                     * Enable student view of a Lesson Plan
+                     */
+                    function lessonPlanStudentView(elem) {
+                        $('[data-has-student-view-separator]').text('You are in Student View');
+                        $('[data-has-student-view-meta]').text('Student view')
+                            .removeClass()
+                            .addClass('icon-staff-students');
+
+                        $(elem)
+                            .text('Switch to Teacher View')
+                            .removeClass()
+                            .addClass('icon-teacher')
+                            .attr('data-has-student-view', 'student');
+
+                        $('#lessonPlan-staff').hide();
+                        $('#lessonPlan-student').show();
+                    }
+
+
+                    /**
+                     * Enable staff view of a Lesson Plan
+                     */
+                    function lessonPlanStaffView(elem) {
+                        $('[data-has-student-view-separator]').text('You are in Teacher View');
+                        $('[data-has-student-view-meta]').text('Teacher view')
+                            .removeClass()
+                            .addClass('icon-teacher');
+
+                        $(elem)
+                            .text('Switch to Student View')
+                            .removeClass()
+                            .addClass('icon-staff-students')
+                            .attr('data-has-student-view', 'staff');
+
+                        $('#lessonPlan-staff').show();
+                        $('#lessonPlan-student').hide();
+                    }
+
+                    /* Update the meta only when you're toggling views,
+                     * so students see an authentic representation
+                     */
+                    lessonPlanStudentView($(this));
+
+                    $('[data-has-student-view]').on('click', function() {
+                        if ($(this).attr('data-has-student-view') == 'staff') {
+                            lessonPlanStudentView($(this));
+                        } else {
+                            lessonPlanStaffView($(this));
+                        }
+                    });
+                });
+            </script>
         {% endif %}
     </ul>
 {% endif %}

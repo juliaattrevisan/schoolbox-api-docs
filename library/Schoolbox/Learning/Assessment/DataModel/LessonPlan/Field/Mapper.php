@@ -62,7 +62,7 @@ class Mapper extends \Schoolbox\Mapper
                 {$this->getJoinColumnString('lessonPlanTemplateField', 'lessonPlanTemplateField')}
             FROM {$this->getTable()}
             INNER JOIN {$this->getJoinSql('lessonPlan', '', 'lessonPlan')}
-            INNER JOIN {$this->getJoinSql('lessonPlanTemplateField', '', 'lessonPlanTemplateField')}
+            INNER JOIN {$this->getJoinSql('lessonPlanTemplateField', '', 'lessonPlanTemplateField', true)}
         ";
 
         return $selectString;

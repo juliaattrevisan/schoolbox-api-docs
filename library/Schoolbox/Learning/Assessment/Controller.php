@@ -275,7 +275,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 'fields' => [],
                 'type' => $type,
                 'mageAsync' => false,
-                'includeBreadcrumbs' => true
+                'includeBreadcrumbs' => true,
             ];
 
             if ('' === $templateId) {
@@ -645,7 +645,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             'context'                  => $context,
             'contextType'              => $contextType,
             'baseContextType'          => AssessmentContextType::objectToString($context->getBaseContext()),
-            'breadcrumbs'              => $this->getBakery()->produceFromContext($context, $assessment),
+            'breadcrumbs'              => $this->getBakery()->produceFromContext($context, $assessment, $this->getUser()),
             'assessment'               => $assessment,
             'folder'                   => $context->getFolder(),
             'assessmentType'           => AssessmentType::objectToString($assessment),

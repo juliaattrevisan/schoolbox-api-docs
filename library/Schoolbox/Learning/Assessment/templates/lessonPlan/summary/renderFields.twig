@@ -1,0 +1,37 @@
+{##
+ # renderFields
+ #
+ # Renders all the fields of a Lesson Plan assessment
+ #
+ # @param LessonPlan\Model $assessment  A Lesson Plan domain object instance, fully hydrated
+ # @param string $view                  A string corresponding to 'student' or 'staff', representing the field visibilty state
+ #}
+{% macro renderFields(assessment, view) %}
+    {% if assessment.fields|length %}
+        {# This lets you toggle the views on the Summary screen
+         #}
+        {% set identifier = 'lessonPlan-' ~ view %}
+
+        <div class="content" id="{{ identifier }}" style="display:none">
+            <article>
+                {% for field in assessment.fields %}
+                    {% if 'staff' == view %}
+                        {# Staff view: show all the fields and their data #}
+                        <h3>{{ field.title }}</h3>
+
+                        {# This field is only visible to staff #}
+                        {% if 'staff' == field.visibility %}
+                            <p class="meta"><span class="icon-view-hollow"></span>This field is not visible to students</p>
+                        {% endif %}
+
+                        <div>{{ field.body|purify }}</div>
+                    {% elseif 'student' == view and 'student' == field.visibility %}
+                        {# Student view: only show fields that are visible to students #}
+                        <h3>{{ field.title }}</h3>
+                        <div>{{ field.body|purify }}</div>
+                    {% endif %}
+                {% endfor %}
+            </article>
+        </div>
+    {% endif %}
+{% endmacro %}

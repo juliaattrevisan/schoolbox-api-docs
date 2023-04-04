@@ -8,6 +8,7 @@
  # @param null|Participant\Model        participant         an instance if the student is excluded from the assessment or deleted
  #}
 {% import '@learning/macro/dueDate.twig' as dueDate %}
+{% apply spaceless %}
 <ul class="meta">
     {% if isShowcased %}
     <li class="icon-eportfolio">Published to ePortfolio</li>
@@ -49,4 +50,6 @@
     {% endfor %}
     {% endif %}
     {% include '@learning/fragments/meta/curriculumCodes.twig' %}
+    {% include '@learning/fragments/meta/lessonPlanStudentView.twig' %}
 </ul>
+{% endapply %}

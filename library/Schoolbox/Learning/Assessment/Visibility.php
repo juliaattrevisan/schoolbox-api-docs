@@ -9,6 +9,7 @@
 namespace Schoolbox\Learning\Assessment;
 
 use Schoolbox\User;
+use Schoolbox\Learning\Assessment\LessonPlan;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Alaress_Date_Format;
@@ -55,6 +56,13 @@ class Visibility
     public function isVisibleToUser(IAssessable $assessment, User $viewer, bool $showClosed, Alaress_Date_Format $now = null, bool $respectSivo = true): bool
     {
         $now = $now ?? Alaress_Date_Format::now();
+
+        /* Lesson Plans can be hidden from students via a Visibility switch
+         * If you're a student, hide any lesson plans that were hidden from you
+         */
+        if ($assessment instanceof LessonPlan\Model && $viewer->getRole()->isStudent() && \Schoolbox\Role::STUDENT !== $assessment->getVisibility()) {
+            return false;
+        }
 
         /** @noinspection NotOptimalIfConditionsInspection */
         if ($viewer->getRole()->isStaff() && $this->isVisibleToStaff($assessment, $viewer, $showClosed, $now)) {

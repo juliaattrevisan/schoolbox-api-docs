@@ -14,6 +14,7 @@ use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Model as LessonPlanModel;
 use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlanObject;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Field\Mapper as LessonPlanFieldMapper;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\File\Mapper as LessonPlanFileMapper;
+use Schoolbox\Learning\MarkScheme\None;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 
@@ -95,6 +96,13 @@ class LessonPlan implements IAssessmentTypeTranslator
          */
         $dataModel->setVisibility($domainObject->getVisibility());
 
+        /* Lesson Plans don't have any marking-related stuff
+         * Andy's Filters and the Andy Markbook requires it for all assessment types
+         * but we're hardcoding a None markscheme for LPs
+         *
+         * $dataModel->setMarkScheme(new None());
+         */
+
         /* Take domain fields and shank them into datamodel fields
          *
          * Note that some methods go directly to the Schoolbox Mapper to find resultsets,
@@ -175,6 +183,12 @@ class LessonPlan implements IAssessmentTypeTranslator
          */
         $domainObject->setVisibility($dataModel->getVisibility());
 
+        /* Lesson Plans don't have any marking-related stuff
+         * Andy's Filters and the Andy Markbook requires it for all assessment types
+         * but we're hardcoding a None markscheme for LPs
+         */
+        $domainObject->setMarkScheme(new None());
+
         /* Take datamodel fields and shank them into domain fields
          *
          * Note that some methods go directly to the Schoolbox Mapper to find resultsets,
@@ -194,10 +208,10 @@ class LessonPlan implements IAssessmentTypeTranslator
                     ->setId($lessonPlanField->getId())
                     ->setLessonPlan($dataModel)
                     ->setLessonPlanTemplateField($lessonPlanTemplateField)
-                    ->setTitle($lessonPlanTemplateField->getTitle())
+                    ->setTitle($lessonPlanField->getTitle())
                     ->setBody($lessonPlanField->getBody())
-                    ->setVisibility($lessonPlanTemplateField->getVisibility())
-                    ->setSequence($lessonPlanTemplateField->getSequence());
+                    ->setVisibility($lessonPlanField->getVisibility())
+                    ->setSequence($lessonPlanField->getSequence());
 
                 $domainObject->getFields()->add($field);
             }

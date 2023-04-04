@@ -17,12 +17,6 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
      */
     private FileMapper $fileMapper;
 
-    /**
-     * Available sort fields for this component.
-     *
-     * @var string[]
-     */
-    protected $sortFields = array('name', 'date');
 
     /**
      * Prepares data for the render function. Business logic.
@@ -32,6 +26,8 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
     public function execute()
     {
         $this->fileMapper = FileMapper::getInstance();
+        $this->sortFields = ['name', 'date'];
+
         return true;
     }
 

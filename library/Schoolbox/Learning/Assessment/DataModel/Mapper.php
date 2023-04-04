@@ -1289,8 +1289,11 @@ class Mapper extends BaseMapper
 
         /* Collate and group all the Lesson Plan Fields by the Lesson Plan id to which they belong
          */
-        $fields = $lessonPlanFieldMapper->findByColumn('lesson_plan_id', $lessonPlanIds)
-            ->groupByCallback(
+        $fields = $lessonPlanFieldMapper->findByColumn('lesson_plan_id', $lessonPlanIds, [
+            'deleted' => true,
+            'order' => [
+                'sequence' => 'asc'
+            ]])->groupByCallback(
                 function ($item) {
                     return $item->getLessonPlan()->getId();
                 }
@@ -1306,7 +1309,7 @@ class Mapper extends BaseMapper
             }
         }
 
-        $templates = $lessonPlanTemplateMapper->findByColumn('id', $templateIds)->indexBy('id');
+        $templates = $lessonPlanTemplateMapper->findByColumn('id', $templateIds, ['deleted' => true])->indexBy('id');
 
         /* Assign Lesson Plan Fields and Lesson Plan Templates to each instance of a Lesson Plan
          * This is used when grabbing stuff out of the db via the custom query elsewhere in this
