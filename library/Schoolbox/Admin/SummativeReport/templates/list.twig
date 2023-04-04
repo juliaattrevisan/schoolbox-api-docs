@@ -83,17 +83,17 @@
                                             $('#container').on('click', 'a[data-delete="{{ report.id }}"]', function(event) {
                                                 event.preventDefault();
 
-                                                /* Activate indicator label
-                                                 */
-                                                toast.toastActivate({
-                                                    text: "Deleting..."
-                                                });
-
                                                 let element = $(this);
 
                                                 element.confirmDialog({
                                                     text: 'Are you sure you want to delete this summative report?',
                                                     confirmEvent: function() {
+                                                        /* Activate indicator label
+                                                         */
+                                                        toast.toastActivate({
+                                                            text: "Deleting..."
+                                                        });
+
                                                         $.post(element.attr('href'), function() {
                                                             })
                                                             .done(function() {
