@@ -21,15 +21,6 @@
 {%- endmacro %}
 
 {% macro imageSquare200(user) -%}
-    <script>
-        $(document).ready(
-                function () {
-                    console.info('window width: ', $(window).width());
-                    console.info('img width: ', $('img.full-width').width());
-                    console.info('img currentSrc: ', $('img.full-width').prop('currentSrc'));
-                }
-        );
-    </script>
     <img class="full-width"
          height="200"
          width="200"
