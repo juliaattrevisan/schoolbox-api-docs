@@ -363,7 +363,25 @@ WHERE
     */
     private function getAssessmentParticipation(array $assessmentIds): array
     {
+        // May need to redo this completely.
+        // Don't be too clever: just fetch all feedback/responses, and plug in
+        // rubric where needed.
         $bindings        = Builder::getBindings($assessmentIds, 'ids');
+        $studentFields   = '
+            `student`.`title`          as `studentTitle`,
+            `student`.`firstname`      as `studentFirstname`,
+            `student`.`preferred_name` as `studentPreferredName`,
+            `student`.`lastname`       as `studentLastname`,
+            `student`.`synergy_id`     as `studentExternalId`
+        ';
+        $staffFields     = '
+            `staff`.`id`               as `staffId`,
+            `staff`.`title`            as `staffTitle`,
+            `staff`.`firstname`        as `staffFirstname`,
+            `staff`.`preferred_name`   as `staffPreferredName`,
+            `staff`.`lastname`         as `staffLastname`,
+            `staff`.`synergy_id`       as `staffExternalId`
+        ';
         $feedbackQueries = [
             <<<DUEWORK
             select
@@ -375,17 +393,8 @@ WHERE
                 `sr1`.`comment`            AS `comment`,
                 `sr1`.`mark`               AS `mark`,
                 `sr1`.`norm_mark`          AS `norm_mark`,
-                `student`.`title`          as `studentTitle`,
-                `student`.`firstname`      as `studentFirstname`,
-                `student`.`preferred_name` as `studentPreferredName`,
-                `student`.`lastname`       as `studentLastname`,
-                `student`.`synergy_id`     as `studentExternalId`,
-                `staff`.`id`               as `staffId`,
-                `staff`.`title`            as `staffTitle`,
-                `staff`.`firstname`        as `staffFirstname`,
-                `staff`.`preferred_name`   as `staffPreferredName`,
-                `staff`.`lastname`         as `staffLastname`,
-                `staff`.`synergy_id`       as `staffExternalId`
+                $studentFields,
+                $staffFields
             from (
                 (`submission_return` `sr1` join `submission_box` `sb` on (`sr1`.`box_id` = `sb`.`id`))
                 left join `submission_return` `sr2` on (
@@ -416,17 +425,8 @@ WHERE
                 null                    AS `comment`,
                 `aa1`.`mark`            AS `mark`,
                 (`aa1`.`mark` / `aa1`.`max_mark` * 100)    AS `norm_mark`,
-                `student`.`title` as `studentTitle`,
-                `student`.`firstname` as `studentFirstname`,
-                `student`.`preferred_name` as `studentPreferredName`,
-                `student`.`lastname` as `studentLastname`,
-                `student`.`synergy_id` as `studentExternalId`,
-                `staff`.`id` as `staffId`,
-                `staff`.`title` as `staffTitle`,
-                `staff`.`firstname` as `staffFirstname`,
-                `staff`.`preferred_name` as `staffPreferredName`,
-                `staff`.`lastname` as `staffLastname`,
-                `staff`.`synergy_id` as `staffExternalId`
+                $studentFields,
+                $staffFields
             from (
                 (`assess_attempt` `aa1` join `assess` `ass` on (`aa1`.`assess_id` = `ass`.`assess_id`))
                 left join `assess_attempt` `aa2` on (
@@ -456,17 +456,8 @@ WHERE
                 null                    AS `comment`,
                 null                    AS `mark`,
                 null                    AS `norm_mark`,
-                `student`.`title` as `studentTitle`,
-                `student`.`firstname` as `studentFirstname`,
-                `student`.`preferred_name` as `studentPreferredName`,
-                `student`.`lastname` as `studentLastname`,
-                `student`.`synergy_id` as `studentExternalId`,
-                `staff`.`id` as `staffId`,
-                `staff`.`title` as `staffTitle`,
-                `staff`.`firstname` as `staffFirstname`,
-                `staff`.`preferred_name` as `staffPreferredName`,
-                `staff`.`lastname` as `staffLastname`,
-                `staff`.`synergy_id` as `staffExternalId`
+                $studentFields,
+                $staffFields
             from (
                 (`task_completion` `tc1` join `task` `t` on (`tc1`.`task_id` = `t`.`id`))
                 left join `task_completion` `tc2` on (
@@ -496,17 +487,8 @@ WHERE
                 `sc1`.`comment`        AS `comment`,
                 `sc1`.`score_given`            AS `mark`,
                 (`sc1`.`score_given` / `sc1`.`score_maximum` * 100)    AS `norm_mark`,
-                `student`.`title` as `studentTitle`,
-                `student`.`firstname` as `studentFirstname`,
-                `student`.`preferred_name` as `studentPreferredName`,
-                `student`.`lastname` as `studentLastname`,
-                `student`.`synergy_id` as `studentExternalId`,
-                `staff`.`id` as `staffId`,
-                `staff`.`title` as `staffTitle`,
-                `staff`.`firstname` as `staffFirstname`,
-                `staff`.`preferred_name` as `staffPreferredName`,
-                `staff`.`lastname` as `staffLastname`,
-                `staff`.`synergy_id` as `staffExternalId`
+                $studentFields,
+                $staffFields
             from (
                 (`lti_assessment_score` `sc1` join `lti_assessment` `la` on (`sc1`.`lti_assessment_id` = `la`.`id`))
                 left join `lti_assessment_score` `sc2` on (
