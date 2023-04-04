@@ -536,17 +536,24 @@ WHERE
                 ],
                 'rubric'         => $rubric,
             ];
-            $participationItems[$row['assessment_id']][$row['student_id']] = [
-                'learner'  => [
-                    'id'            => $row['student_id'],
-                    'title'         => $row['studentTitle'],
-                    'firstName'     => $row['studentFirstname'],
-                    'preferredName' => $row['studentPreferredName'],
-                    'lastName'      => $row['studentLastname'],
-                    'externalId'    => $row['studentExternalId'],
-                ],
-                'feedback' => ['id' => $row['feedback_id']] + $feedbackFields,
+
+            // Add learner details
+            $participationItems[$row['assessment_id']][$row['student_id']]['learner'] ??= [
+                'id'            => $row['student_id'],
+                'title'         => $row['studentTitle'],
+                'firstName'     => $row['studentFirstname'],
+                'preferredName' => $row['studentPreferredName'],
+                'lastName'      => $row['studentLastname'],
+                'externalId'    => $row['studentExternalId'],
+            ];
+
+            // Add feedback details
+            $participationItems[$row['assessment_id']][$row['student_id']]['feedback'] = [
+                'id' => $row['feedback_id'],
             ] + $feedbackFields;
+
+            // Add feedback details in a deprecated place
+            $participationItems[$row['assessment_id']][$row['student_id']] += $feedbackFields;
         }
         $statement->closeCursor();
 
