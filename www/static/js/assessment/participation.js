@@ -402,12 +402,15 @@
             document.getElementById("plan-desc").addEventListener("EDITOR__CREATED", function () {
                 resolve();
             });
-            document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
-                detail: {
-                    targetElements: ["#plan-desc"],
-                    toolbar: "simple"
-                }
-            }));
+            document.dispatchEvent(
+                new CustomEvent("EDITOR__CREATE", {
+                    detail: {
+                        targetElements: ["#plan-desc"],
+                        toolbar: "simple",
+                        removeFromToolbar: "link",
+                    },
+                })
+            );
         });
     }
 
