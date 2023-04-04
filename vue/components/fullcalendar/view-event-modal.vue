@@ -395,6 +395,15 @@ export default {
              */
             this.$refs.modal.open();
 
+            /**
+             * Enusre video/audio files can be played in the modal
+             * when it's opened. We call ProxyReplacement() again as
+             * the modal isn't in the DOM when it's called initially.
+             */
+            this.$nextTick(() => {
+                $.fn.schoolboxResource_ProxyReplacement(`#${this.$el.id}`);
+            });
+
             /* Non-numeric eventIds are ignored
              * These could be hashes sourced from a third party, like the sis or a subscription
              * In those cases, we can't do anything about their attendance
@@ -422,24 +431,24 @@ export default {
                 responseType: "json",
             };
 
-            fetch(request)
-                .then((response) => {
-                    if (response.ok) {
-                        return response.json();
-                    } else {
-                        throw new Error(response.statusText);
-                    }
-                })
-                .then((data) => {
-                    self.payload = data;
-                })
-                .catch((error) => {
-                    /* Attendance won't be available for some events such as those
-                     * streamed from a third party source, or a sis; looking for their
-                     * identifying hashes will result in 404 because they won't exist
-                     * in our local db
-                     */
-                });
+            // fetch(request)
+            //     .then((response) => {
+            //         if (response.ok) {
+            //             return response.json();
+            //         } else {
+            //             throw new Error(response.statusText);
+            //         }
+            //     })
+            //     .then((data) => {
+            //         self.payload = data;
+            //     })
+            //     .catch((error) => {
+            //         /* Attendance won't be available for some events such as those
+            //          * streamed from a third party source, or a sis; looking for their
+            //          * identifying hashes will result in 404 because they won't exist
+            //          * in our local db
+            //          */
+            //     });
         },
 
         /**
