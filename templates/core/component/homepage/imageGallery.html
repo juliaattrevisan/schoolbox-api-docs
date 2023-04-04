@@ -53,7 +53,6 @@
                             }
                         });
                     </script>
-                    <script src="{CDN_PREFIX}/js/bundle/imageLightboxInit.js?v={SITE_VERSION}"></script>
                 </div>
 
             </div>
@@ -79,10 +78,12 @@
                                 </div>
                             </li>
                         </ul>
-                        <ul class="img-gallery" data-dz-container data-image-lightbox>
+                        <ul class="img-gallery" data-dz-container data-image-lightbox="lightbox[gallery-{COMPONENT_INSTANCE_ID}]">
                             <!-- BEGIN image_gallery -->
-                            <li href="/cms/image.php?id={THUMBNAIL_ID}&height=2048&width=2048">
-                                <a><img src="/cms/image.php?id={THUMBNAIL_ID}&height={THUMBNAIL_SIZE}&width={THUMBNAIL_SIZE}&resample=0"alt="{THUMBNAIL_DESCRIPTION}"/></a>
+                            <li>
+                                <a href="/cms/image.php?id={THUMBNAIL_ID}&height=2048&width=2048" rel="lightbox[gallery-{COMPONENT_INSTANCE_ID}]">
+                                    <img src="/cms/image.php?id={THUMBNAIL_ID}&height={THUMBNAIL_SIZE}&width={THUMBNAIL_SIZE}&resample=0"alt="{THUMBNAIL_DESCRIPTION}"/>
+                                </a>
                             </li>
                             <!-- END image_gallery -->
                         </ul>

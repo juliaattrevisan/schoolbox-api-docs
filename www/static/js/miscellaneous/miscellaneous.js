@@ -112,30 +112,6 @@ $(function () {
         $(this).css({ top: $(window).scrollTop() + modalTop + "px" });
     });
 
-    // Set up lightboxes globally, group galleries by lightbox relation.
-    var lightboxGroups = {};
-
-    $("a[rel^='lightbox']").each(function () {
-        var rel = $(this).attr("rel");
-
-        if (!lightboxGroups[rel]) {
-            lightboxGroups[rel] = [];
-        }
-
-        lightboxGroups[rel].push(this);
-    });
-
-    $.each(lightboxGroups, function (i, v) {
-        $(v).magnificPopup({
-            type: "image",
-            removalDelay: 300,
-            mainClass: "mfp-fade",
-            gallery: {
-                enabled: true,
-            },
-        });
-    });
-
     /**
      * Hack into Phpdebugbar to add a twig templates button
      */

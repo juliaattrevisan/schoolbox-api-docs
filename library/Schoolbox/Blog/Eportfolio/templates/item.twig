@@ -1,11 +1,5 @@
 <script type="text/javascript">
     $(function() {
-
-        $('[data-image-gallery] li').magnificPopup({
-            delegate: 'a',
-            type: 'image'
-        });
-
         $('[data-interaction="delete"]').click(function(event) {
             event.preventDefault();
 
@@ -32,6 +26,7 @@
         });
     });
 </script>
+<script src="{{ CDN_PREFIX }}/js/bundle/imageLightboxInit.js?v={{ config.site_version }}"></script>
 
 <ul class="breadcrumb">
     <li><a href="/eportfolio/{{ pageOwner.id }}">{{ pageOwner.getFullName }}'s ePortfolio</a></li>
