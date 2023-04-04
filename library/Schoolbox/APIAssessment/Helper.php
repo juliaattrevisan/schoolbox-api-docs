@@ -363,10 +363,10 @@ WHERE
     */
     private function getAssessmentFeedback(array $assessmentIds): array
     {
-        $bindings = Builder::getBindings($assessmentIds, 'ids');
-        $statement = $this->mapper->getDatabase()->query(
-            <<<QUERY
-            (select
+        $bindings        = Builder::getBindings($assessmentIds, 'ids');
+        $feedbackQueries = [
+            <<<DUEWORK
+            select
                 `sb`.`assessment_id`       AS `assessment_id`,
                 'submission_return'        AS `feedback_table`,
                 max(`sr1`.`id`)            AS `feedback_id`,
@@ -404,10 +404,10 @@ WHERE
               and `sr2`.`id` is null
               and `sr1`.`review_route` = 'instructor'
               and `sb`.`assessment_id` in ({$bindings->getPlaceholder()})
-            group by `sb`.`assessment_id`, `sr1`.`owner`, `sr1`.`review_route`, `sr1`.`published_at`)
-
-            union
-            (select
+            group by `sb`.`assessment_id`, `sr1`.`owner`, `sr1`.`review_route`, `sr1`.`published_at`
+            DUEWORK,
+            <<<QUIZ
+            select
                 `ass`.`assessment_id`   AS `assessment_id`,
                 'assess_attempt'        AS `feedback_table`,
                 max(`aa1`.`attempt_id`) AS `feedback_id`,
@@ -444,10 +444,10 @@ WHERE
               and `aa2`.`attempt_id` is null
               and `ass`.`assessment_id` is not null
               and `ass`.`assessment_id` in ({$bindings->getPlaceholder()})
-            group by `ass`.`assessment_id`, `aa1`.`user_id`, `aa1`.`reviewed_at`)
-
-            union
-            (select
+            group by `ass`.`assessment_id`, `aa1`.`user_id`, `aa1`.`reviewed_at`
+            QUIZ,
+            <<<TASK
+            select
                 `t`.`assessment_id`     AS `assessment_id`,
                 'task_completion'       AS `feedback_table`,
                 max(`tc1`.`id`)         AS `feedback_id`,
@@ -484,10 +484,10 @@ WHERE
               and `tc2`.`id` is null
               and `tc1`.`completion_status` = 3
               and `t`.`assessment_id` in ({$bindings->getPlaceholder()})
-            group by `t`.`assessment_id`, `tc1`.`student_id`, `tc1`.`completion_date`)
-
-            union
-            (select
+            group by `t`.`assessment_id`, `tc1`.`student_id`, `tc1`.`completion_date`
+            TASK,
+            <<<LTI
+            select
                 `la`.`assessment_id`   AS `assessment_id`,
                 'lti_assessment_score' AS `feedback_table`,
                 max(`sc1`.`id`)        AS `feedback_id`,
@@ -523,11 +523,12 @@ WHERE
               and `sc1`.`is_feedback` = 1
               and `sc2`.`id` is null
               and `la`.`assessment_id` in ({$bindings->getPlaceholder()})
-            group by `la`.`assessment_id`, `sc1`.`student_id`, `sc1`.`created_at`)
-
-            order by `assessment_id`, `student_id`;
-            QUERY,
-            $bindings->getParams()
+            group by `la`.`assessment_id`, `sc1`.`student_id`, `sc1`.`created_at`;
+            LTI,
+        ];
+        $statement = $this->mapper->getDatabase()->query(
+            implode(' union ', $feedbackQueries) . 'order by `assessment_id`, `student_id`',
+            $bindings->getParams(),
         );
         $statement->execute();
         $feedbackItems = [];
@@ -563,9 +564,20 @@ WHERE
                     'lastName'      => $row['studentLastname'],
                     'externalId'    => $row['studentExternalId'],
                 ],
-                'feedback' => $feedbackFields,
+                'feedback' => [ 'id' => $row['feedback_id'],] + $feedbackFields,
             ] + $feedbackFields;
         }
+
+        // Also fetch most recent response for this item
+        // Format:
+        // "id": 10,
+        // "date": "2022-01-30T21:00:00.000Z",
+        // "mark": "B",
+        // "normalisedMark": "30",
+        // "rubric": {...},
+        // "files": [
+        //     {`standard files object`}
+        // ]
         return $feedbackItems;
     }
 
