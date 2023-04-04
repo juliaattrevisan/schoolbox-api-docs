@@ -554,6 +554,9 @@ WHERE
 
             // Add feedback details in a deprecated place
             $participationItems[$row['assessment_id']][$row['student_id']] += $feedbackFields;
+
+            // Add empty response if nothing there
+            $participationItems[$row['assessment_id']][$row['student_id']]['response'] ??= null;
         }
         $statement->closeCursor();
 
@@ -696,7 +699,32 @@ WHERE
         );
         $responseStatement->execute();
         foreach ($responseStatement as $row) {
-            // do something
+            // Add learner details
+            $participationItems[$row['assessment_id']][$row['student_id']]['learner'] ??= [
+                'id'            => $row['student_id'],
+                'title'         => $row['studentTitle'],
+                'firstName'     => $row['studentFirstname'],
+                'preferredName' => $row['studentPreferredName'],
+                'lastName'      => $row['studentLastname'],
+                'externalId'    => $row['studentExternalId'],
+            ];
+
+            // Add response details
+            $participationItems[$row['assessment_id']][$row['student_id']]['response'] = [
+                'id'        => $row['response_id'],
+                'date'      => (new \Alaress_Date_Format($row['completionDate'], \Alaress_Date_Format::DATABASE_FORMAT))->toIso8601String(),
+                'submitter' => [
+                    'id'            => $row['staffId'],
+                    'title'         => $row['staffTitle'],
+                    'firstName'     => $row['staffFirstname'],
+                    'preferredName' => $row['staffPreferredName'],
+                    'lastName'      => $row['staffLastname'],
+                    'externalId'    => $row['staffExternalId'],
+                ],
+            ];
+
+            // Add empty feedback if nothing there
+            $participationItems[$row['assessment_id']][$row['student_id']]['feedback'] ??= null;
         }
 
 
