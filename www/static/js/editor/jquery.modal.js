@@ -118,7 +118,7 @@
 
                 /* To traverse directly to a specific folder in the Resources section of the resource modal
                  */
-                fileBrowserCategoryId: null,
+                fileBrowserCategoryId: 0,
 
                 /* Executes before picker modal opens
                  */
