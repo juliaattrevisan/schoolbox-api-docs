@@ -16,7 +16,6 @@ use AcceptanceTester;
  */
 class QuestionForm
 {
-
     public const URL = '/assess/question/modify/{question_id}';
     // http://192.168.36.10/assess/question/create/{section_id}
 
@@ -26,7 +25,7 @@ class QuestionForm
     public const SELECTOR_BUTTON_MODIFY = self::FORM . ' [type=submit][value="Modify"]';
     public const SELECTOR_TYPE_ID = self::FORM . ' select[name="type_id"]';
     public const SELECTOR_SECTION_ID = 'input[name="section_id"]';
-    public const SELECTOR_DESCRIPTION = '#cke_question';
+    public const SELECTOR_DESCRIPTION = '#question + div.ck';
 
     public const TYPE_YESNO = 10;
     public const TYPE_SHORT_SIGNATURE = 16;

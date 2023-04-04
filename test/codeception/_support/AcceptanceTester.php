@@ -1,8 +1,6 @@
 <?php
 
 use Codeception\Actor;
-use Facebook\WebDriver\Remote\RemoteWebDriver;
-use Codeception\Module;
 
 /**
  * Inherited Methods
@@ -39,6 +37,7 @@ class AcceptanceTester extends Actor
     public function logout()
     {
         $i = $this;
+        $i->deleteSessionSnapshot('login:' . 'alaress');
         $i->amOnPage(self::$logoutURL);
     }
     /**
@@ -94,7 +93,8 @@ class AcceptanceTester extends Actor
     public function impersonate($fullname)
     {
         $i = $this;
-        $i->amOnPage('/user/recoverSession');
+        $i->logout();
+        $i->loginAsAdmin();
         $i->click(['css' => 'a[title=Schoolbox\ Admin]']);
         $i->executeJS("var scrollableDiv = document.getElementById('account-content');
         scrollableDiv.scrollTop=scrollableDiv.scrollHeight - scrollableDiv.offsetHeight;");
@@ -130,7 +130,8 @@ class AcceptanceTester extends Actor
     public function impersonateViaModifyUserPage($fullname)
     {
         $i = $this;
-        $i->amOnPage('/user/recoverSession');
+        $i->logout();
+        $i->loginAsAdmin();
         $i->searchBar($fullname);
         $i->click('a[title="Modify User"]');
         $i->click('a.icon-more');
@@ -155,24 +156,18 @@ class AcceptanceTester extends Actor
     }
 
     /**
-     * Fill in CKEditor
-     * @param $element_id
+     * Fill in CKEditor 5
+     * @param $elementId
      * @param $content
      * @throws Exception
      */
-    public function fillCkEditorById($element_id, $content)
+    public function fillCkEditorById($elementId, $content)
     {
-        $i = $this;
-        $i->waitForElement('#cke_' . $element_id);
-        $this->fillRteEditor(
-            \Facebook\WebDriver\WebDriverBy::cssSelector(
-                '#cke_' . $element_id . ' .cke_wysiwyg_frame'
-            ),
-            $content
-        );
+        $this->executeJS(sprintf('window.sbProps.editors["%s"].setData("<p>%s</p>");', $elementId, $content));
     }
+
     /**
-     * Fill in CKEditor
+     * Fill in CKEditor - this is for CKEditor 4 and will not work for CkEditor 5
      * @param $element_name
      * @param $content
      */
@@ -185,6 +180,7 @@ class AcceptanceTester extends Actor
             $content
         );
     }
+
     /**
      * Fill in TinyMice editor
      * @param $id

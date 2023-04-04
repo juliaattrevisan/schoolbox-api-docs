@@ -85,7 +85,7 @@ class CreateAndVerifyCest
         $i->amGoingTo("Fill in form values");
         $timestamp = time();
         $headline     = "Acceptance Test News Article Testing " . $timestamp;
-        $article = "<h2>Random Article</h2> <p>Random article text</p>";
+        $article = "<h2>Random Article</h2><p>Random article text</p>";
         $blurb     = "<p>Blurb</p>";
         $image     = __DIR__ . '/upload/test.jpg';
         $topic     = 'General';
@@ -271,8 +271,7 @@ class CreateAndVerifyCest
             $this->getAudienceText($timReed),
             $this->getAudienceText($jenniReed),
             'Primary',
-            'Demo Class Page 1 (DEMO1)']
-        );
+            'Demo Class Page 1 (DEMO1)']);
 
         $formPage->selectAudienceOption('Year Levels', 'Year 9', ['audience-select-parents']);
         $formPage->createCompositeAudience('House', 'Team', ['primary-IjEi','secondary-IjIi']);

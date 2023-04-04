@@ -10,14 +10,22 @@ use Exception;
 
 class NewsInitialCest
 {
+    /**
+     * @param AcceptanceTester $i
+     * @return void
+     */
+    public function _before(AcceptanceTester $i)
+    {
+        $i->logout();
+        $i->loginAsAdmin();
+    }
 
     /**
      * @throws Exception
+     * @beforeSuite
      */
     public function createNews(AcceptanceTester $i)
     {
-        $i->amOnPage('/login/');
-        $i->login("alaress", "alaress");
         $i->amOnPage('/news');
         $i->waitForElementVisible(['css' => 'a.icon-add[title=Create\ news]'], 5);
         $i->clickWithLeftButton(['css' => 'a.icon-add[title=Create\ news]']);
@@ -42,11 +50,10 @@ class NewsInitialCest
 
     /**
      * @throws Exception
+     * @beforeSuite
      */
     public function unpublishNews(AcceptanceTester $i)
     {
-        $i->amOnPage('/login/');
-        $i->login("alaress", "alaress");
         $i->amOnPage('/news');
         $element = Locator::contains('div.small-12.card h3 a', 'Test News Title');
         $i->waitForElementVisible($element, 5);
@@ -62,11 +69,10 @@ class NewsInitialCest
 
     /**
      * @throws Exception
+     * @beforeSuite
      */
     public function publishNews(AcceptanceTester $i)
     {
-        $i->amOnPage('/login/');
-        $i->login("alaress", "alaress");
         $i->amOnPage('/news/me?status=Rejected');
         $element = Locator::contains('div.small-12.card h3 a', 'Test News Title');
         $i->waitForElementVisible($element, 5);
@@ -76,11 +82,10 @@ class NewsInitialCest
 
     /**
      * @throws Exception
+     * @beforeSuite
      */
     public function audienceViewsNewsFeed(AcceptanceTester $i)
     {
-        $i->amOnPage('/login/');
-        $i->login("alaress", "alaress");
         $i->impersonate("Jana Reed");
         $i->amOnPage('/news');
         $element = Locator::contains('div.small-12.card h3 a', 'Test News Title');
@@ -90,11 +95,10 @@ class NewsInitialCest
 
     /**
      * @throws Exception
+     * @beforeSuite
      */
     public function audienceViewsNewsItem(AcceptanceTester $i)
     {
-        $i->amOnPage('/login/');
-        $i->login("alaress", "alaress");
         $i->impersonate("Jana Reed");
         $i->amOnPage('/news');
         $element = Locator::contains('div.small-12.card h3 a', 'Test News Title');
@@ -105,11 +109,10 @@ class NewsInitialCest
 
     /**
      * @throws Exception
+     * @beforeSuite
      */
     public function enableNewsComments(AcceptanceTester $i)
     {
-        $i->amOnPage('/login/');
-        $i->login("alaress", "alaress");
         $i->amOnPage('/news');
         $element = Locator::contains('div.small-12.card h3 a', 'Test News Title');
         $i->waitForElementVisible($element, 5);
@@ -121,11 +124,10 @@ class NewsInitialCest
 
     /**
      * @throws Exception
+     * @beforeSuite
      */
     public function addTwoNewsComments(AcceptanceTester $i)
     {
-        $i->amOnPage('/login/');
-        $i->login("alaress", "alaress");
         $i->amOnPage('/news');
         $element = Locator::contains('div.small-12.card h3 a', 'Test News Title');
         $i->waitForElementVisible($element, 5);
@@ -133,12 +135,12 @@ class NewsInitialCest
         //$i->waitForElementVisible(['css'=>'div#cke_comment'], 5);
         $i->waitForElementVisible(['css' => 'button.show-ckeditor-button'], 5);
         $i->click(['css' => 'button.show-ckeditor-button']);
-        $i->waitForElementVisible(['css' => 'div#cke_comment-0'], 5);
-        $i->executeJS('CKEDITOR.instances[\'comment-0\'].setData("indeed this is interesting news");');
+        $i->waitForElementVisible(['css' => '#comment-0 + div.ck'], 5);
+        $i->fillCkEditorById('comment-0', "indeed this is interesting news");
         sleep(2);
         $i->click(['css' => 'button[class=button\ submit]']);
         sleep(3);
-        $i->executeJS('CKEDITOR.instances[\'comment-0\'].setData("its poop, like your face");');
+        $i->fillCkEditorById('comment-0', "its poop, like your face");
         sleep(2);
         $i->click(['css' => 'button[class=button\ submit]']);
         sleep(3);
@@ -146,11 +148,10 @@ class NewsInitialCest
 
     /**
      * @throws Exception
+     * @beforeSuite
      */
     public function deleteNewsComments(AcceptanceTester $i)
     {
-        $i->amOnPage('/login/');
-        $i->login("alaress", "alaress");
         $i->amOnPage('/news');
         $element = Locator::contains('div.small-12.card h3 a', 'Test News Title');
         $i->waitForElementVisible($element, 5);
@@ -162,11 +163,10 @@ class NewsInitialCest
 
     /**
      * @throws Exception
+     * @beforeSuite
      */
     public function disableNewsComments(AcceptanceTester $i)
     {
-        $i->amOnPage('/login/');
-        $i->login("alaress", "alaress");
         $i->amOnPage('/news');
         $element = Locator::contains('div.small-12.card h3 a', 'Test News Title');
         $i->waitForElementVisible($element, 5);
@@ -177,11 +177,10 @@ class NewsInitialCest
 
     /**
      * @throws Exception
+     * @beforeSuite
      */
     public function deleteNews(AcceptanceTester $i)
     {
-        $i->amOnPage('/login/');
-        $i->login("alaress", "alaress");
         $i->amOnPage('/news');
         $element = Locator::contains('div.small-12.card h3 a', 'Test News Title');
         $i->waitForElementVisible($element, 5);
@@ -194,5 +193,3 @@ class NewsInitialCest
         $i->click('#confirm-dialog-confirm-button');
     }
 }
-
-//descendant-or-self::button[@class and contains(concat(' ', normalize-space(@class), ' '), ' button-block ')][contains(., 'Year Levels')]

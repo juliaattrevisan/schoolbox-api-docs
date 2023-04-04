@@ -16,7 +16,6 @@ namespace acceptance;
 
 use AcceptanceTester;
 use Page\Fixture;
-use Page\Common;
 use Exception;
 
 class FixtureCest
@@ -152,7 +151,7 @@ class FixtureCest
        //== Match in future - No instant notification ==
         $matchName1 = 'Sixth Cest Match';
         $start = new \DateTime();
-        $start->modify('+ 1 day 2 minutes');
+        $start->modify('+ 1 day 10 minutes');
         $finish->modify('+ 1 day 120 minutes');
         $matchId = $fixturePage->createMatch(
             [
@@ -174,7 +173,10 @@ class FixtureCest
 
         //Change title and save - Updated notification ==
         $matchName2 = 'Third Cest Modified Sixth';
-        $fixturePage->updateMatch($matchId, [Fixture::SELECTOR_NAME => $matchName2], []);
+        $fixturePage->updateMatch($matchId, [
+            Fixture::SELECTOR_NAME => $matchName2,
+            Fixture::SELECTOR_START_AT => (new \DateTime())->modify('+ 1 day 2 minutes'),
+        ], []);
         $fixturePage->assertNotifNotExists('Your upcoming Basketball match ' . $matchName2 . ' has been updated');
 
         // wait 2 minutes and should receive upcoming notification

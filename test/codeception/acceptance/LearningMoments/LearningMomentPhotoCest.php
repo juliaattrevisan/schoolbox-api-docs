@@ -78,7 +78,7 @@ class LearningMomentPhotoCest
         //checking the learning moment is presented in the student activity feed
         $i->waitForText('This is a learning moments test to be commented');
         $learningMoments->clickAddComment();
-        $i->waitForElementVisible(['css' => 'div#cke_1_contents'], 5);
+        $i->waitForElementVisible(['css' => '#comment-0 + div.ck'], 5);
         $learningMoments->typeComment();
         sleep(2);
         $learningMoments->clickSubmitComment();
@@ -144,7 +144,6 @@ class LearningMomentPhotoCest
         //checking the learning moment is presented in the student activity feed
         $i->waitForText('This is a learning moments test to get comments deleted');
         $learningMoments->clickAddComment();
-        $i->waitForElementVisible(['css' => 'div#cke_1_contents'], 5);
         $learningMoments->typeComment();
         sleep(2);
         $learningMoments->clickSubmitComment();

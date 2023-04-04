@@ -4,24 +4,36 @@ namespace Duework;
 
 use AcceptanceTester;
 use Codeception\Util\Locator;
-use Facebook\WebDriver\WebDriverKeys;
 
 class DueWorkInitialCest
 {
-    public $home_page_url;
+    private string $homepageUrl;
+    private string $folderName;
 
     /**
-     * @throws \Codeception\Exception\ModuleException
+     * @param AcceptanceTester $i
+     * @return void
+     */
+    public function _before(AcceptanceTester $i)
+    {
+        $i->logout();
+        $i->loginAsAdmin();
+    }
+
+    /**
+     * @param AcceptanceTester $i
+     * @return void
+     * @beforeSuite
+     * @throws \Exception
      */
     public function create2Assessments(AcceptanceTester $i)
     {
         $teacher = 'Jack Coles';
         $student = 'Eden Reed';
-        $i->login('alaress', 'alaress');
         $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resource/folder/0/create");
         $i->selectOption("template", "Blank");
-        $folderName = 'Test Class Homepage ' . time();
-        $i->fillField(['name' => 'name'], $folderName);
+        $this->folderName = 'Test Class Homepage ' . $i->getUuid();
+        $i->fillField(['name' => 'name'], $this->folderName);
         $i->click(['css' => 'label[class=radio-label][for=groupWrite1]']);
         $i->click(['css' => 'label[class=radio-label][for=groupWrite2]']);
         $i->click(['css' => 'label[class=radio-label][for=groupRead3]']);
@@ -31,11 +43,11 @@ class DueWorkInitialCest
 
         // Navigate to the new folder, store its location for later tests
         $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resources/");
-        $i->canSee($folderName);
-        $i->click($folderName);
+        $i->canSee($this->folderName);
+        $i->click($this->folderName);
         $i->waitForText("Homepage", 5);
         $i->click("Homepage");
-        $this->home_page_url = $i->getCurrentUrl();
+        $this->homepageUrl = $i->getCurrentUrl();
 
         $i->click('a#all-actions.icon-more');
         $i->clickWithLeftButton('#tab-control > div > div > ul > li a.icon-group');
@@ -52,7 +64,7 @@ class DueWorkInitialCest
         sleep(1);
         $i->selectOption('tr.VueTables__row:first-child select', 'admin');
         sleep(5);
-        $i->amOnUrl($this->home_page_url);
+        $i->amOnUrl($this->homepageUrl);
         $i->click(['css' => 'label[for=component-lock-toggle]']);
         $i->canSeeElement(['css' => 'span[class=icon-unlocked]']);
         $i->click(['css' => 'a#add-component']);
@@ -65,7 +77,7 @@ class DueWorkInitialCest
         sleep(5);
         $i->canSeeElement(['css' => 'div[class=component-container\ Schoolbox_Learning_Assessment_DueWork_Component_Homepage_Controller]']);
         $i->impersonate($teacher);
-        $i->amOnUrl($this->home_page_url);
+        $i->amOnUrl($this->homepageUrl);
         $i->waitForElementVisible(['css' => 'div[class=component-container\ Schoolbox_Learning_Assessment_DueWork_Component_Homepage_Controller]'], 5);
         $i->click('Create due work');
         $i->waitForText("Create Due Work", 5);
@@ -91,39 +103,54 @@ class DueWorkInitialCest
         $i->canSee('Test Due Work2');
     }
 
+    /**
+     * @param AcceptanceTester $i
+     * @return void
+     * @beforeSuite
+     * @throws \Exception
+     */
     public function deleteAssessment(AcceptanceTester $i)
     {
         $teacher = 'Jack Coles';
-        $i->login('alaress', 'alaress');
         $i->impersonate($teacher);
-        $i->amOnUrl($this->home_page_url);
+        $i->amOnUrl($this->homepageUrl);
         $i->click('Test Due Work2');
         $currentURL = $i->getCurrentUrl();
         $assessmentID = substr(strrchr(substr($currentURL, 0, strrpos($currentURL, '/')), '/'), 1);
-        $i->amOnUrl($this->home_page_url);
+        $i->amOnUrl($this->homepageUrl);
         $i->click('#component-assessment-' . $assessmentID . ' > nav:nth-child(2) > a:nth-child(1)');
         $i->click('#component-assessment-' . $assessmentID . ' a.icon-delete');
         $i->click('div.reveal-modal.open a.button.submit');
     }
 
 
+    /**
+     * @param AcceptanceTester $i
+     * @return void
+     * @beforeSuite
+     * @throws \Exception
+     */
     public function viewClassWork(AcceptanceTester $i)
     {
         $student = 'Eden Reed';
-        $i->login('alaress', 'alaress');
         $i->impersonate($student);
-        $i->amOnUrl($this->home_page_url);
+        $i->amOnUrl($this->homepageUrl);
         $i->canSee('Test Due Work');
         $i->click('Test Due Work');
         $i->canSee('Test Due Work');
     }
 
+    /**
+     * @param AcceptanceTester $i
+     * @return void
+     * @beforeSuite
+     * @throws \Exception
+     */
     public function submitWorkInPersonByStudent(AcceptanceTester $i)
     {
         $student = 'Eden Reed';
-        $i->login('alaress', 'alaress');
         $i->impersonate($student);
-        $i->amOnUrl($this->home_page_url);
+        $i->amOnUrl($this->homepageUrl);
         $i->waitForText('Test Due Work', 5);
         $i->click('Test Due Work');
         $i->waitForText('Test Due Work', 5);
@@ -134,16 +161,21 @@ class DueWorkInitialCest
         $i->canSee('Submitted in person by Ms Eden Reed');
     }
 
+    /**
+     * @param AcceptanceTester $i
+     * @return void
+     * @beforeSuite
+     * @throws \Exception
+     */
     public function viewSubmission(AcceptanceTester $i)
     {
         $teacher = 'Jack Coles';
-        $i->login('alaress', 'alaress');
         $i->impersonate($teacher);
-        $i->amOnUrl($this->home_page_url);
+        $i->amOnUrl($this->homepageUrl);
         $i->click('Test Due Work');
         $currentURL = $i->getCurrentUrl();
         $assessmentID = substr(strrchr(substr($currentURL, 0, strrpos($currentURL, '/')), '/'), 1);
-        $i->amOnUrl($this->home_page_url);
+        $i->amOnUrl($this->homepageUrl);
         $i->click('#component-assessment-' . $assessmentID . ' > nav:nth-child(2) > a:nth-child(1)');
         $i->click('#component-assessment-' . $assessmentID . ' a.icon-progress');
         sleep(1);
@@ -152,56 +184,72 @@ class DueWorkInitialCest
         $i->canSee('Grading Test Due Work');
     }
 
+    /**
+     * @param AcceptanceTester $i
+     * @return void
+     * @beforeSuite
+     * @throws \Exception
+     */
     public function markSubmission(AcceptanceTester $i)
     {
         $teacher = 'Jack Coles';
-        $i->login('alaress', 'alaress');
         $i->impersonate($teacher);
-        $i->amOnUrl($this->home_page_url);
+        $i->amOnUrl($this->homepageUrl);
         $i->click('Test Due Work');
         $currentURL = $i->getCurrentUrl();
         $assessmentID = substr(strrchr(substr($currentURL, 0, strrpos($currentURL, '/')), '/'), 1);
-        $i->amOnUrl($this->home_page_url);
+        $i->amOnUrl($this->homepageUrl);
         $i->click('#component-assessment-' . $assessmentID . ' > nav:nth-child(2) > a:nth-child(1)');
         $i->click('#component-assessment-' . $assessmentID . ' a.icon-progress');
         $i->click('ul.information-list li div.small-12.column div.row.actions-small-2 nav a.icon-more');
         $i->click('a.icon-task');
         $i->fillField('textarea[name=comment]', 'Not bad, but you should work on your spelling.');
         $i->fillField('input[name=mark]', '65');
-        sleep(1);
-        $this->studentWeAreMarkingUrl = $i->getCurrentUrl();
+        $i->wait(3);
+        $studentWeAreMarkingUrl = $i->getCurrentUrl();
         $i->click('a.button[data-draft=publish]');
-        $i->amOnUrl($this->studentWeAreMarkingUrl);
+        $i->waitForElementNotVisible('Eden');
+        $i->amOnUrl($studentWeAreMarkingUrl);
         $i->canSee('Reviewed');
     }
 
+    /**
+     * @param AcceptanceTester $i
+     * @return void
+     * @beforeSuite
+     * @throws \Exception
+     */
     public function viewMarkedSubmission(AcceptanceTester $i)
     {
         $student = 'Eden Reed';
-        $i->login('alaress', 'alaress');
         $i->impersonate($student);
         $i->amOnPage('learning/grades/6');
-        $link_marks_class_test = Locator::contains('a.flex-grade.link-row', 'Test Class Homepage');
-        $i->click($link_marks_class_test);
+        $linkMarksClassTest = Locator::contains('a.flex-grade.link-row', $this->folderName);
+        $i->click($linkMarksClassTest);
         $i->waitForText('Test Due Work', 5);
-        $link_test_due_work = Locator::contains('a', 'Test Due Work');
-        $i->scrollTo($link_test_due_work);
+        $linkTestDueWork = Locator::contains('a', 'Test Due Work');
+        $i->scrollTo($linkTestDueWork);
         sleep(2);
         $i->canSee('Test Due Work');
         $i->canSee('65 %');
-        $i->click('Test Due Work');
+        $i->click($linkTestDueWork);
         $i->canSee('Feedback by Mr Jack Coles');
         $i->canSee('Submitted in person by Ms Eden Reed');
         $i->canSee('65 %');
     }
 
 
+    /**
+     * @param AcceptanceTester $i
+     * @return void
+     * @beforeSuite
+     * @throws \Exception
+     */
     public function submitWorkTypingSomethingByTeacher(AcceptanceTester $i)
     {
         $teacher = 'Jack Coles';
-        $i->login('alaress', 'alaress');
         $i->impersonate($teacher);
-        $i->amOnUrl($this->home_page_url);
+        $i->amOnUrl($this->homepageUrl);
         $i->waitForText('Test Due Work', 5);
         $i->click('Test Due Work');
         $i->waitForText('Test Due Work', 5);
@@ -212,10 +260,15 @@ class DueWorkInitialCest
         $i->canSee('Submission by Mr Jack Coles');
     }
 
+    /**
+     * @param AcceptanceTester $i
+     * @return void
+     * @beforeSuite
+     * @throws \Exception
+     */
     public function submitWorkTypingSomethingByAdmin(AcceptanceTester $i)
     {
-        $i->login('alaress', 'alaress');
-        $i->amOnUrl($this->home_page_url);
+        $i->amOnUrl($this->homepageUrl);
         $i->waitForText('Test Due Work', 5);
         $i->click('Test Due Work');
         $i->waitForText('Test Due Work', 5);

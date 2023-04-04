@@ -77,7 +77,7 @@ class TextboxForm
      */
     public function fillContent(string $content): self
     {
-        $this->tester->executeJS('for(var i in CKEDITOR.instances) { CKEDITOR.instances[i].setData(\'' . $content . '\')}');
+        $this->tester->executeJS('for(var i in window.sbProps.editors) { window.sbProps.editors[i].setData(\'' . $content . '\')}');
         return $this;
     }
 
