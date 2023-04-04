@@ -8,10 +8,13 @@
 namespace Schoolbox\APIAssessment;
 
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission;
+use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\GenericCollection;
 use Alaress\Database\Predicate\Builder;
 use PDO;
 use Schoolbox\Learning\Assessment\AssessmentType;
+use Schoolbox\Resource\Storage\Translator\ModelToArray;
 use Schoolbox\YearLevel\Mapper as YearLevelMapper;
 use Schoolbox\YearLevel\Model as YearLevelModel;
 
@@ -698,7 +701,9 @@ WHERE
             $bindings->getParams(),
         );
         $responseStatement->execute();
-        foreach ($responseStatement as $row) {
+        $studentSubmissionIds = [];
+        $responseRows = $responseStatement->fetchAll();
+        foreach ($responseRows as $row) {
             // Add learner details
             $participationItems[$row['assessment_id']][$row['student_id']]['learner'] ??= [
                 'id'            => $row['student_id'],
@@ -721,10 +726,37 @@ WHERE
                     'lastName'      => $row['staffLastname'],
                     'externalId'    => $row['staffExternalId'],
                 ],
+                'files'     => null,
             ];
+
+            // Track files (due work responses only):
+            // these will be fetched in a later query
+            if ($row['response_table'] === 'student_submission') {
+                $participationItems[$row['assessment_id']][$row['student_id']]['response']['files'] = [];
+                $studentSubmissionIds[] = $row['response_id'];
+            }
 
             // Add empty feedback if nothing there
             $participationItems[$row['assessment_id']][$row['student_id']]['feedback'] ??= null;
+        }
+
+        // Load submissions, and thus their files
+        // TODO inject
+        // TODO add filename to file translator?
+        $submissionMapper = Submission\SubmissionMapper::getInstance();
+        $fileTranslator   = new ModelToArray(new PrefixGenerator($submissionMapper->getConfigLoader()));
+        if (!empty($studentSubmissionIds)) {
+            /** @var iterable<Submission\Submission> $studentSubmissions */
+            $studentSubmissions = $submissionMapper->findByColumn('id', $studentSubmissionIds);
+            foreach ($studentSubmissions as $studentSubmission) {
+                $assessmentId = $studentSubmission->getSubmissionBox()->getAssessmentModel()->getId();
+                $studentId    = $studentSubmission->getOwner()->getId();
+                $participationItems[$assessmentId][$studentId]['response']['files'] = $studentSubmission
+                    ->getFiles()
+                    ->map(fn (Submission\SingleFile\Model $file) => $file->getStorage())
+                    ->map($fileTranslator)
+                    ->reindex();
+            }
         }
 
 
