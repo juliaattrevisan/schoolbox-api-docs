@@ -66,7 +66,7 @@
             value: {{ options.yearLevels|json_encode|raw }},
             selectize: {
                 create: false,
-                placeholder: 'Search year levels',
+                placeholder: 'Search {{ locale.yearLevel.plural }}',
                 preload: true,
                 persist: true,
                 hideSelected: true,
@@ -316,7 +316,7 @@
 
                             <div class="row">
                                 <div class="small-12 large-6 columns">
-                                    <label for="report-year-levels">Year Levels</label>
+                                    <label for="report-year-levels">{{ locale.yearLevel.properPlural }}</label>
                                     <input type="text" id="report-year-levels" name="yearLevels" />
                                 </div>
                                 <div class="small-12 large-6 columns">

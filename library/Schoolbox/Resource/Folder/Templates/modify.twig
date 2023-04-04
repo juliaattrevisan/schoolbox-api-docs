@@ -435,30 +435,30 @@
                     <div class="small-12 large-{{ columnWidth }} columns">
                         <div>
                             {% if editYearLevelUsage %}
-                                {% set toolTipTitle = 'Select the year levels to associate with this folder' %}
+                                {% set toolTipTitle = 'Select the ' ~ locale.yearLevel.plural ~ ' to associate with this folder' %}
                             {% else %}
-                                {% set toolTipTitle = "Only superusers may manage a folder's year level association" %}
+                                {% set toolTipTitle = "Only superusers may manage a folder's " ~ locale.yearLevel ~ " association" %}
                             {% endif %}
                             <label>
-                                Year Levels
+                                {{ locale.yearLevel.properPlural }}
                                 <span data-tooltip class="hint has-tip tip-top" data-width="200" title="{{ toolTipTitle }}">?</span>
                             </label>
 
                             {% if editYearLevelUsage %}
-                                <input title="Year Levels" id="yearLevels" name="yearLevelIds" placeholder="Select year Levels" tabindex="-1" class="selectized" type="text">
+                                <input title="{{ locale.yearLevel.properPlural }}" id="yearLevels" name="yearLevelIds" placeholder="Select {{ locale.yearLevel.properPlural }}" tabindex="-1" class="selectized" type="text">
                             {% else %}
                                 {% set yearLevels = [] %}
                                 {% for yearLevel in folder.yearLevels %}
                                     {% set yearLevels = yearLevels|merge([yearLevel.name]) %}
                                 {% endfor %}
-                                <input title="Year Level usages" value="{{ yearLevels|join(', ') }}" readonly="readonly">
+                                <input title="{{ locale.yearLevel.proper }} usages" value="{{ yearLevels|join(', ') }}" readonly="readonly">
                             {% endif %}
                         </div>
 
                         {% if editYearLevelUsage and action == 'Modify' %}
                             <div>
                                 <input type="checkbox" id="recursive-year-levels" name="recursive-year-levels" value="1" />
-                                <label for="recursive-year-levels" class="checkbox-label">Copy these year level associations to all subfolders</label>
+                                <label for="recursive-year-levels" class="checkbox-label">Copy these {{ locale.yearLevel }} associations to all subfolders</label>
                             </div>
                         {% endif %}
 

@@ -81,7 +81,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
                 'STUDENT_ID' => $userChild->getId(),
                 'STUDENT_EXTERNAL_ID' => $userChild->getExternalId(),
                 'STUDENT_NAME' => Scrub::text($child['name']),
-                'STUDENT_YEAR' => $userChild->getYear() ? Scrub::text($userChild->getYear()->getLongName()) : '',
+                'STUDENT_YEAR' => $userChild->getYear() ? Scrub::text($userChild->getYear()->getLongName($this->getSitePage()->getLocalisedTerm('year', false, true))) : '',
                 'STUDENT_YEAR_LEVEL' => $userChild->getYear() ? Scrub::text($userChild->getYear()->getName()) : '',
                 'TRAVEL_LOG' => $travelLogRenderer->render($this->getSitePage()->getTwig(), $userChild->getExternalId(), true)
             ]);

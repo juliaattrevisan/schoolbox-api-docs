@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Group\Manage\ModelToArray;
 
 use Schoolbox\GenericCollection;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User as UserModel;
 use Schoolbox\User\Translator\ModelToArray;
@@ -20,6 +21,10 @@ use Schoolbox\User\Translator\ModelToArray;
  */
 class User extends ModelToArray
 {
+    public function __construct(private RosettaStone $l10n)
+    {
+    }
+
     /**
      * @param UserModel                                 $user
      * @param GenericCollection|UserAccess[]|array|bool $groups
@@ -39,7 +44,7 @@ class User extends ModelToArray
             'role'          => $user->getRole()->getName(),
             'isStaff'       => $user->getRole()->isStaff(),
             'campus'        => implode(', ', $user->getCampusCollection()->getPropertyValues('name')),
-            'yearLevel'     => $user->getYear() ? $user->getYear()->getLongName() : "",
+            'yearLevel'     => $user->getYear() ? $user->getYear()->getLongName($this->l10n->translate('year', false, true)) : "",
             'house'         => $user->getSchoolHouse() ? $user->getSchoolHouse()->getHouse() : '',
         ];
     }

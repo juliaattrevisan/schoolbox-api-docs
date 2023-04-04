@@ -685,7 +685,8 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         // TODO snap this outside the mapper
         /** @var IConnector $database */
         $database = self::getDi()->get('databaseInternal');
-        $searcher = new Search\Result($database);
+        $l10n = self::getDi()->get('l10n');
+        $searcher = new Search\Result($database, $l10n);
         $searcher->search($articleResolver, $user, $this, $keyword, $sortProperty, $sortDirection, $offset, $limit);
 
         return $searcher;

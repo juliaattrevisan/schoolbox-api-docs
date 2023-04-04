@@ -15,6 +15,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Group\Manage\ArrayToModel;
 use Schoolbox\Group\GroupsHelper;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccess as UserAccessModel;
@@ -48,6 +49,7 @@ class Controller extends Base
         private RoleMapper $roleMapper,
         \Timetable_ColourMapper $timetableColourMapper,
         RerouteOverrideMapper $rerouteOverrideMapper,
+        private RosettaStone $l10n,
     ) {
         $this->groupsHelper = new GroupsHelper(
             $groupMapper,
@@ -106,7 +108,7 @@ class Controller extends Base
                 /** @var UserAccess $userAccess */
                 $userAccess = $userAccessList->offsetGet($user->getId());
                 // setting user attributes and accessType to be the same level to keep the member table searchable
-                $member               = (new ModelToArray\User())($user);
+                $member               = (new ModelToArray\User($this->l10n))($user);
                 $member['accessType'] = UserAccessModel::ACCESS_LEVEL_TO_NAME[$userAccess->getAccessLevel()];
                 $members[]            = $member;
             }
@@ -195,7 +197,7 @@ class Controller extends Base
             $this->buildJsonOutput(
                 [
                     'members' => $userAccesses->map(function ($userAccess) {
-                        $array               = (new ModelToArray\User())($userAccess->getUser());
+                        $array               = (new ModelToArray\User($this->l10n))($userAccess->getUser());
                         $array['accessType'] = UserAccessModel::ACCESS_LEVEL_TO_NAME[$userAccess->getAccessLevel()];
                         return $array;
                     }),
@@ -257,7 +259,7 @@ class Controller extends Base
             $this->buildJsonOutput(
                 [
                     'newMembers' => $newAccesses->map(function ($userAccess) {
-                        $array               = (new ModelToArray\User())($userAccess->getUser());
+                        $array               = (new ModelToArray\User($this->l10n))($userAccess->getUser());
                         $array['accessType'] = UserAccessModel::ACCESS_LEVEL_TO_NAME[$userAccess->getAccessLevel()];
                         return $array;
                     }),
@@ -413,6 +415,8 @@ class Controller extends Base
             }
         }
 
+        $yearPrefix = $this->l10n->translate('year', false, true);
+
         /** @var User $user */
         foreach ($users as $user) {
             if (in_array($user->getRole()->getType(), $excludeRoles)) {
@@ -420,7 +424,7 @@ class Controller extends Base
             }
             $meta = '';
             if ($user->getYear()) {
-                $meta .= $user->getYear()->getLongName() . ', ';
+                $meta .= $user->getYear()->getLongName($yearPrefix) . ', ';
             }
             $meta .= $user->getRole()->getName();
             if ($user->getExternalId() !== null) {

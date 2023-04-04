@@ -89,6 +89,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(RoleMapper::class),
             $this->getMapperFactory()->get(\Timetable_ColourMapper::class),
             $this->getMapperFactory()->get(RerouteOverrideMapper::class),
+            $this->injector->get('l10n'),
         );
     }
 

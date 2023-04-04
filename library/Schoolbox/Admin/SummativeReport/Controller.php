@@ -20,6 +20,7 @@ use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
@@ -77,103 +78,49 @@ class Controller extends ConfigController
      */
     private const NO_YEAR_LEVEL_ID = 0;
 
-
-    /**
-     * This tuple corresponds to a fictitious option "No Year Level"
-     * which doesn't exist in a lookup
-     */
-    private const NO_YEAR_LEVEL_TUPLE = [
-        'id' => self::NO_YEAR_LEVEL_ID, 'name' => 'No Year Level'
-    ];
-
-
-    /**
-     * @var \Schoolbox\Error\Mapper
-     */
-    private \Schoolbox\Error\Mapper $errorMapper;
-
-    private Mapper $reportMapper;
-
-    private UserMapper $userMapper;
-
-    private TermMapper $termMapper;
-
-    private YearLevelMapper $yearLevelMapper;
-
-    private CampusMapper $campusMapper;
-
-    private WorkTypeMapper $workTypeMapper;
-
-    private FolderMapper $folderMapper;
-
-    private AssessmentMapperProxy $assessmentMapperProxy;
-
-    private RubricDataSource $rubricDataSource;
-
-    private Access $access;
-
-    private UserBulkMapper $userBulkMapper;
-
-    private RoleMapper $roleMapper;
-
-    private \Schoolbox\External\User $externalUser;
-
-
     /**
      * Constructor
      *
-     * @param \Schoolbox\Error\Mapper $errorMapper
-     * @param Mapper                  $reportMapper
-     * @param UserMapper              $userMapper
-     * @param TermMapper              $termMapper
-     * @param YearLevelMapper         $yearLevelMapper
-     * @param CampusMapper            $campusMapper
-     * @param WorkTypeMapper          $workTypeMapper
-     * @param FolderMapper            $folderMapper
-     * @param AssessmentMapperProxy   $assessmentMapperProxy
-     * @param RubricDataSource        $rubricDataSource
-     * @param Access                  $access
-     * @param UserBulkMapper          $userBulkMapper
-     * @param RoleMapper              $roleMapper
-     * @param ConfigMapper            $configMapper
-     * @param FieldStrategyFactory    $fieldStrategyFactory
-     * @param Rebuilder               $rebuilder
+     * @param \Schoolbox\Error\Mapper  $errorMapper
+     * @param Mapper                   $reportMapper
+     * @param UserMapper               $userMapper
+     * @param TermMapper               $termMapper
+     * @param YearLevelMapper          $yearLevelMapper
+     * @param CampusMapper             $campusMapper
+     * @param WorkTypeMapper           $workTypeMapper
+     * @param FolderMapper             $folderMapper
+     * @param AssessmentMapperProxy    $assessmentMapperProxy
+     * @param RubricDataSource         $rubricDataSource
+     * @param Access                   $access
+     * @param UserBulkMapper           $userBulkMapper
+     * @param RoleMapper               $roleMapper
+     * @param ConfigMapper             $configMapper
+     * @param FieldStrategyFactory     $fieldStrategyFactory
+     * @param Rebuilder                $rebuilder
      * @param \Schoolbox\External\User $externalUser
+     * @param RosettaStone             $l10n
      */
     public function __construct(
-        \Schoolbox\Error\Mapper $errorMapper,
-        Mapper $reportMapper,
-        UserMapper $userMapper,
-        TermMapper $termMapper,
-        YearLevelMapper $yearLevelMapper,
-        CampusMapper $campusMapper,
-        WorkTypeMapper $workTypeMapper,
-        FolderMapper $folderMapper,
-        AssessmentMapperProxy $assessmentMapperProxy,
-        RubricDataSource $rubricDataSource,
-        Access $access,
-        UserBulkMapper $userBulkMapper,
-        RoleMapper $roleMapper,
+        private \Schoolbox\Error\Mapper $errorMapper,
+        private Mapper $reportMapper,
+        private UserMapper $userMapper,
+        private TermMapper $termMapper,
+        private YearLevelMapper $yearLevelMapper,
+        private CampusMapper $campusMapper,
+        private WorkTypeMapper $workTypeMapper,
+        private FolderMapper $folderMapper,
+        private AssessmentMapperProxy $assessmentMapperProxy,
+        private RubricDataSource $rubricDataSource,
+        private Access $access,
+        private UserBulkMapper $userBulkMapper,
+        private RoleMapper $roleMapper,
         ConfigMapper $configMapper,
         FieldStrategyFactory $fieldStrategyFactory,
         Rebuilder $rebuilder,
-        \Schoolbox\External\User $externalUser,
+        private \Schoolbox\External\User $externalUser,
+        private RosettaStone $l10n,
     ) {
         parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder);
-        $this->errorMapper           = $errorMapper;
-        $this->reportMapper          = $reportMapper;
-        $this->userMapper            = $userMapper;
-        $this->termMapper            = $termMapper;
-        $this->yearLevelMapper       = $yearLevelMapper;
-        $this->campusMapper          = $campusMapper;
-        $this->workTypeMapper        = $workTypeMapper;
-        $this->folderMapper          = $folderMapper;
-        $this->assessmentMapperProxy = $assessmentMapperProxy;
-        $this->rubricDataSource      = $rubricDataSource;
-        $this->access                = $access;
-        $this->userBulkMapper        = $userBulkMapper;
-        $this->roleMapper            = $roleMapper;
-        $this->externalUser          = $externalUser;
     }
 
 
@@ -413,7 +360,7 @@ class Controller extends ConfigController
          */
         if (\in_array(self::NO_YEAR_LEVEL_ID, $optionsPayload['yearLevels'], false)) {
             $options['yearLevels'] = [
-                self::NO_YEAR_LEVEL_TUPLE
+                $this->getNoYearLevelTuple()
             ];
         }
 
@@ -512,7 +459,7 @@ class Controller extends ConfigController
      */
     public function getYearLevels(): void
     {
-        $output = [self::NO_YEAR_LEVEL_TUPLE];
+        $output = [$this->getNoYearLevelTuple()];
 
         $yearLevels = $this->yearLevelMapper->findAll()->sortBy('sequence', 'ASC');
 
@@ -958,5 +905,17 @@ class Controller extends ConfigController
             //redirect user to report preview
             $this->getResponse()->redirect->to($reports[0]['url']);
         }
+    }
+
+    /**
+     * Returns tuple corresponds to a fictitious option "No Year Level"
+     * which doesn't exist in a lookup
+     */
+    private function getNoYearLevelTuple(): array
+    {
+        return [
+            'id'   => self::NO_YEAR_LEVEL_ID,
+            'name' => sprintf('No %s', $this->l10n->translate('yearLevel', false, true)),
+        ];
     }
 }

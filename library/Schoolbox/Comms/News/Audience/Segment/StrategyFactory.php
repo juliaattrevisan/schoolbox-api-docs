@@ -14,6 +14,7 @@ use Schoolbox\Comms\News\Audience\Model;
 use Schoolbox\Comms\News\Audience\Segment\Strategy\Composite;
 use Schoolbox\Comms\News\Exceptions\UnknownEntityTypeException;
 use Schoolbox\GenericCollection;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
@@ -74,17 +75,19 @@ class StrategyFactory
     /**
      * Constructor
      *
-     * @param UserAccessMapper       $userAccessMapper
-     * @param bool                   $staffCanPost
-     * @param bool                   $moderationRequired
-     * @param bool                   $canTargetTeachersOfUsersInFolder
-     * @param bool                   $isFixturesEnabled
-     * @param Folder\Mapper          $folderMapper
-     * @param RoleAccessMapper       $roleAccessMapper
-     * @param Access                 $access
-     * @param External_UserInterface $externalUser
-     * @param IConnector             $db
-     * @param array[][]              $knownUserSubjects
+     * @param UserAccessMapper               $userAccessMapper
+     * @param bool                           $staffCanPost
+     * @param bool                           $moderationRequired
+     * @param bool                           $canTargetTeachersOfUsersInFolder
+     * @param bool                           $isFixturesEnabled
+     * @param Folder\Mapper                  $folderMapper
+     * @param RoleAccessMapper               $roleAccessMapper
+     * @param Access                         $access
+     * @param External_UserInterface         $externalUser
+     * @param IConnector                     $db
+     * @param array[][]                      $knownUserSubjects
+     * @param Strategy\Helper\StudentLocator $studentLocator
+     * @param RosettaStone                   $l10n
      */
     public function __construct(
         UserAccessMapper $userAccessMapper,
@@ -99,6 +102,7 @@ class StrategyFactory
         IConnector $db,
         array $knownUserSubjects,
         private Strategy\Helper\StudentLocator $studentLocator,
+        private RosettaStone $l10n,
     ) {
         $this->userAccessMapper                 = $userAccessMapper;
         $this->staffCanPost                     = $staffCanPost;
@@ -314,6 +318,7 @@ class StrategyFactory
                     $this->staffCanPost,
                     $this->moderationRequired,
                     $this->studentLocator,
+                    $this->l10n,
                 );
             case Strategy\Service::getEntityType():
                 return new Strategy\Service(

@@ -18,6 +18,7 @@ use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Audience\ColorHelper;
 use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
@@ -40,6 +41,7 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\YearLevel;
 
@@ -66,6 +68,7 @@ class Controller extends Base
      * @param UserMapper                    $userMapper
      * @param RoleMapper                    $roleMapper
      * @param UserAccessMapper              $userAccessMapper
+     * @param RosettaStone                  $l10n
      */
     public function __construct(
         private ErrorMapper $errorMapper,
@@ -86,6 +89,7 @@ class Controller extends Base
         private UserMapper $userMapper,
         private RoleMapper $roleMapper,
         private UserAccessMapper $userAccessMapper,
+        private RosettaStone $l10n,
     ) {
     }
 
@@ -152,13 +156,15 @@ class Controller extends Base
         // Students
 
         $studentsSelected = [];
+        $yearPrefix = $this->l10n->translate('year', false, true);
 
+        /** @var User $student */
         foreach ($report->getStudents() as $student) {
-            $year = $student->getYear() ? $student->getYear()->getName() : 'unknown';
+            $year = $student->getYear() ? $student->getYear()->getLongName($yearPrefix) : '';
 
             $studentsSelected[] = [
                 'id'   => $student->getId(),
-                'name' => "{$student->getFullName()} - Year {$year} {$student->getRole()->getName()} " .
+                'name' => "{$student->getFullName()} - {$year} {$student->getRole()->getName()} " .
                     "({$student->getExternalId()})",
             ];
         }
@@ -387,19 +393,19 @@ class Controller extends Base
         $records  = $this->getReportData($report);
         $exporter = new \Report_Exporter($report->getName());
         $headings = [
-            'Pastoral ID'  => 'Pastoral ID',
+            'Pastoral ID'  => sprintf('%s ID', $this->l10n->translate('pastoral', false, true)),
             'Student Name' => 'Student Name',
             'Student ID'   => 'Student ID',
             'House'        => 'House',
             'Campus'       => 'Campus',
-            'Year'         => 'Year',
+            'Year'         => $this->l10n->translate('yearLevel', false, true),
             'Title'        => 'Title',
             'Type'         => 'Type',
             'Sub-Type'     => 'Sub-Type',
             'Occurred On'  => 'Occurred On',
         ];
         if ($this->getConfigLoader()->get('pastoral_severity')) {
-            $headings['Severity'] = 'Severity';
+            $headings['Severity'] = $this->l10n->translate('severity', false, true);
         }
         $headings = array_merge($headings, [
             'Tags'         => 'Tags',

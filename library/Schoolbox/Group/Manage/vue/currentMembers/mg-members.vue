@@ -6,6 +6,7 @@
 import { ref, watch, nextTick } from "vue";
 import { EventBus } from "v-tables-3-select-rows";
 import { useMembersStore } from "../store/mgMembersStore";
+import { useStore } from "../store/manageGroupStore";
 import { updateFooterUI } from "@schoolboxVue/components/vueTables2/useFooterUI";
 import MgMembersFilters from "./mg-members-filters.vue";
 import MgMembersName from "./mg-members-name.vue";
@@ -20,6 +21,7 @@ import AccessTypes from "./mgAccessTypes";
  ****************************************************************/
 
 const membersStore = useMembersStore();
+const store = useStore();
 const tableEl = ref(null);
 const tableColumns = [
     "name",
@@ -143,7 +145,7 @@ async function addSearchNote() {
     const searchNote = document.createElement("p");
     searchNote.classList.add("meta");
     searchNote.style.marginTop = "0.25rem";
-    searchNote.innerText = "The Group can be searched by name, year level, house, campus, role or access.";
+    searchNote.innerText = "The Group can be searched by name, " + store.yearLevelLabel + ", house, campus, role or access.";
     const searchInput = document.querySelector(".VueTables__search__input"); //safe to assume only one, despite class selection
     searchInput.parentElement.appendChild(searchNote);
 }

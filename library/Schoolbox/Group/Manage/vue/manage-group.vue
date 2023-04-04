@@ -88,6 +88,13 @@ const props = defineProps({
         type: String,
         required: true,
     },
+    /**
+     * localised word for year level
+     */
+    yearLevelLabel: {
+        type: String,
+        required: true,
+    }
 });
 
 const store = useStore();
@@ -116,6 +123,7 @@ onMounted(() => {
     store.groupStaffOnly = props.groupStaffOnly;
     // NOTE: Endpoints.SEND_EMAIL will be blank if the route is not authorised for the user
     store.emailEnabled = props.emailEnabled && Endpoints.SEND_EMAIL;
+    store.yearLevelLabel = props.yearLevelLabel
     checkForStorybook();
     store.loadData();
 });

@@ -25,7 +25,7 @@
                             </dd>
                             <dt class="small-4 medium-3 columns">Campus</dt>
                             <dd class="small-8 medium-9 columns">{% for campus in student.campusCollection %}{{ campus.name }} {% endfor %}</dd>
-                            <dt class="small-4 medium-3 columns">Year Level</dt>
+                            <dt class="small-4 medium-3 columns">{{ locale.yearLevel.proper }}</dt>
                             <dd class="small-8 medium-9 columns">{{ student.year.name | default('Unknown') }}</dd>
                             <dt class="small-4 medium-3 columns">House</dt>
                             <dd class="small-8 medium-9 columns">{{ student.schoolhouse.house | default('Unknown') }}</dd>

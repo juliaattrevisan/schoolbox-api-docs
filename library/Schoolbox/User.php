@@ -436,39 +436,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     }
 
 
-    /**
-     * Outputs a metadata line for this student.
-     *
-     * This is the same line that shows in search results underneath a student's name.
-     *
-     * @todo allow schools to set the format as they can with `$this->formatName`
-     *
-     * @return string
-     */
-    public function formatMetadata()
-    {
-        // For now, just show role name
-        if (!empty($this->positionTitle)) {
-            return $this->positionTitle;
-        }
-
-        $metadata = '';
-        $role     = $this->getRole()->getName();
-
-        /* This made a massive assumption that everyone's year level
-         * begins with "Year", which means anyone using "ELC" in lu_year_level.name
-         * would get metadata like "Year ELC"
-         *
-         * See inside getLongName() which checks whether it's just an integer on its own
-         * before trying to prepend something
-         */
-        if (!empty($this->year)) {
-            $metadata .= $this->year->getLongName();
-        }
-        return "{$metadata} {$role}";
-    }
-
-    /**
+   /**
      * @param string $altEmail
      * @return self
      */

@@ -513,6 +513,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
         }
 
         // ...and get their records
+        $yearPrefix = $this->getPage()->getLocalisedTerm('year');
 
         $individualList = [];
         if (count($selectedIndividualIds)) {
@@ -529,7 +530,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
                 ];
 
                 if (null !== $currentIndividual->getYear()) {
-                    $personData[] = $currentIndividual->getYear()->getLongName();
+                    $personData[] = $currentIndividual->getYear()->getLongName($yearPrefix);
                     $personData[] = ', ';
                 }
 

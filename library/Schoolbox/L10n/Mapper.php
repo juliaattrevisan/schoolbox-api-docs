@@ -9,7 +9,6 @@
 namespace Schoolbox\L10n;
 
 use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\Mapper\Exception as MapperException;
 
 class Mapper extends BaseMapper
 {

@@ -114,6 +114,7 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && (str
     }
 
     if (is_array($userList)) {
+        $yearPrefix = $pageHandler->getLocalisedTerm('year', false, true);
         foreach ($userList as $user) {
             $userId = intval($user['uid']);
             if ($userId === $excludeID) {
@@ -158,7 +159,7 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && (str
                 $person = "{$fullName} - ";
 
                 if ($user['year']) {
-                    $person .= "Year {$user['year']}, ";
+                    $person .= "$yearPrefix {$user['year']}, ";
                 }
 
                 if ($showCampus) {

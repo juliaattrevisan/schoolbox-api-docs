@@ -435,8 +435,8 @@
 
             {# Only show year if it was ever set and meaningful
              #}
-            {% if student.year and student.year.longName != '' %}
-            <p class="year">{{ student.year.longName }}</p>
+            {% if student.year and student.year.longName(locale.year.proper) != '' %}
+            <p class="year">{{ student.year.longName(locale.year.proper) }}</p>
             {% endif %}
         </div>
     </div>

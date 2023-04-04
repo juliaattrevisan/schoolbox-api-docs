@@ -173,7 +173,8 @@ class Module extends BaseModule
                 new \External_Class(),
                 new \External_User(),
                 $this->getMapperFactory()->get(UserMapper::class)
-            )
+            ),
+            $this->injector->get('l10n'),
         );
     }
 

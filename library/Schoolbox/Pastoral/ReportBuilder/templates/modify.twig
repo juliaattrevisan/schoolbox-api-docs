@@ -336,8 +336,8 @@
 
             <div class="row">
                 <div class="small-12 medium-6 columns">
-                    <label><h2 class="subheader"><span>Year Levels</span></h2></label>
-                    <p class="meta">Select the year levels you want included in the report</p>
+                    <label><h2 class="subheader"><span>{{ locale.yearLevel.properPlural }}</span></h2></label>
+                    <p class="meta">Select the {{ locale.yearLevel.plural }} you want included in the report</p>
                     <section>
                         <div class="small-12 columns content">
                             <div class="checklist">
@@ -354,7 +354,7 @@
                                                {% if report.includeStudentsWithoutYear %}checked{% endif %}
                                                data-check-year
                                         >
-                                        <label for="includeStudentsWithoutYear">(No Year Level)</label>
+                                        <label for="includeStudentsWithoutYear">(No {{ locale.year.proper }})</label>
                                     </li>
                                     {% for year in years %}
                                         <li>
@@ -365,7 +365,7 @@
                                                    {% for yearSelected in (report.years ?? []) |filter(yearSelected => yearSelected.id == year.id ) %}checked{% endfor %}
                                                    data-check-year
                                             >
-                                            <label for="year-{{ year.id }}">{{ year.longname }}</label>
+                                            <label for="year-{{ year.id }}">{{ year.longname(locale.year.proper) }}</label>
                                         </li>
                                     {% endfor %}
                                 </ul>
