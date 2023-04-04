@@ -189,6 +189,7 @@
         document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
             detail: {
                 targetElements: ['textarea[name=description]', 'textarea[name=completion_message]'],
+                fileBrowserCategoryId: {% if record is defined %}{{ record.getFolder.getId }}{% else %}{{ folder.getId }}{% endif %},
             }
         }));
 
