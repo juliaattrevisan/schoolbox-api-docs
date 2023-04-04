@@ -23,6 +23,14 @@ div.lg-counter {
     color: #eee;
 }
 
+.lg-container .lg-progress-bar {
+    background-color: #111111;
+}
+
+.lg-container .lg-progress {
+    background-color: rgb(238, 238, 238) !important;
+}
+
 .lg-container .lg-icon:after {
     visibility: inherit !important;
     display: inline !important;
