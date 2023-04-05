@@ -611,7 +611,7 @@ WHERE
                 'assess_attempt'        AS `response_table`,
                 max(`aa1`.`attempt_id`) AS `response_id`,
                 `aa1`.`user_id`         AS `student_id`,
-                `aa1`.`reviewed_at`     AS `completionDate`,
+                `aa1`.`finish`          AS `completionDate`,
                 null                    AS `comment`,
                 `aa1`.`mark`            AS `mark`,
                 (`aa1`.`mark` / `aa1`.`max_mark` * 100)    AS `norm_mark`,
@@ -622,13 +622,14 @@ WHERE
                 left join `assess_attempt` `aa2` on (
                     `aa1`.`assess_id` = `aa2`.`assess_id`
                     and `aa1`.`user_id` = `aa2`.`user_id`
-                    and `aa2`.`reviewed_at` is null
+                    and `aa2`.`finish` is not null
                     and `aa2`.`deleted_at` is null
+                    and `aa1`.`finish` < `aa2`.`finish`
                 )
                 LEFT JOIN `user` `student` on `aa1`.`user_id` = `student`.`id`
                 LEFT JOIN `user` `staff` on `aa1`.`reviewer_id` = `staff`.`id`
             )
-            where `aa1`.`reviewed_at` is null
+            where `aa1`.`finish` is not null
               and `aa1`.`deleted_at` is null
               and `aa2`.`attempt_id` is null
               and `ass`.`assessment_id` is not null
