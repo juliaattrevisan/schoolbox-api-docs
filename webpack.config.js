@@ -83,9 +83,6 @@ module.exports = {
             "./www/static/js/socialstream/browser/browser.js",
             "./node_modules/dropzone/dist/dropzone.js",
 
-            // Magnific Popup Lightbox
-            "./node_modules/magnific-popup/dist/jquery.magnific-popup.js",
-
             // Notifier
             "./www/static/js/notifications/jquery.notifier.js",
 
