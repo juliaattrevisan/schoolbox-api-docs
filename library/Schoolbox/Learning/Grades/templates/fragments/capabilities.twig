@@ -11,33 +11,33 @@
 <div class="scrollable">
     <table class="rb">
         <thead>
-        <tr><td>&nbsp;</td>
-            {% for activity_id, activity in rubricAssessmentList  %}
-                {% if activity.rubric_capability_mark_type_id %}
-                <td>
-                    {% set activityAssessment = assessments.by('id', activity_id) %}
-                    {% if activityAssessment %}
-                        {%- set activityHref = routeLookupIfAuthorized(
-                            'learningAssessment.getSummary',
-                            {
-                                assessmentId: activity_id,
-                                studentId: student.id,
-                                student: student,
-                                assessment: activityAssessment,
-                            }
-                            ) -%}
-                    {% else %}
-                        {%- set activityHref = '' -%}
+            <tr><td>&nbsp;</td>
+                {% for activity_id, activity in rubricAssessmentList  %}
+                    {% if activity.rubric_capability_mark_type_id %}
+                    <td>
+                        {% set activityAssessment = assessments.by('id', activity_id) %}
+                        {% if activityAssessment %}
+                            {%- set activityHref = routeLookupIfAuthorized(
+                                'learningAssessment.getSummary',
+                                {
+                                    assessmentId: activity_id,
+                                    studentId: student.id,
+                                    student: student,
+                                    assessment: activityAssessment,
+                                }
+                                ) -%}
+                        {% else %}
+                            {%- set activityHref = '' -%}
+                        {% endif %}
+                        {%- if activityHref -%}
+                            <a href="{{ activityHref }}{{ returnUrlSuffix }}">{{ activity.name }}</a>
+                        {%- else -%}
+                            {{ activity.name }}
+                        {%- endif -%}
+                    </td>
                     {% endif %}
-                    {%- if activityHref -%}
-                        <a href="{{ activityHref }}{{ returnUrlSuffix }}">{{ activity.name }}</a>
-                    {%- else -%}
-                        {{ activity.name }}
-                    {%- endif -%}
-                </td>
-                {% endif %}
-            {% endfor %}
-        </tr>
+                {% endfor %}
+            </tr>
         </thead>
         {% for capability in longitudinalRubric %}
             <tr>
