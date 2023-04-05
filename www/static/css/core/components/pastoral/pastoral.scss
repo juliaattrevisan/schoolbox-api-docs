@@ -14,3 +14,22 @@
         }
     }
 }
+
+.pastoral-incident {
+    .content {
+        // Force the content to expand
+        width: 100%;
+        overflow-x: auto;
+
+        /**
+        *  Should only happen if you're using a word so long it can't possibly be broken.
+        *  Useful for tables which already fill a decent chunk of space.
+        **/
+        overflow-x: auto;
+
+        table {
+            //Stop tables expanding beyond the bounds of the parent .content container
+            max-width: 100%;
+        }
+    }
+}

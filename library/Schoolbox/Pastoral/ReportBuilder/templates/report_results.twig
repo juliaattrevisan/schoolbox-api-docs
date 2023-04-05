@@ -29,7 +29,7 @@
             {% for record in results %}
                 <section>
                     <ul class="information-list threaded">
-                        <li>
+                        <li class="pastoral-incident">
                             <div class="small-12 card wrap-down">
                                 {# Theres no need for the all the twig access checks like the list page, if the user got to this screen they can view everything #}
                                 <a href="{{ profile.link(record.student) }}">
