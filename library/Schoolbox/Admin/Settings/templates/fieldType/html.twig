@@ -1,2 +1,2 @@
 {% extends '@settings/fieldType/textArea.twig' %}
-{% block extraAttributes %}data-html-editor data-href={{ BASE_HREF }}{% endblock %}
+{% block extraAttributes %}data-html-editor data-href="{{ BASE_HREF }}" {% if hasTokens %}data-has-tokens=1{% endif %}{% endblock %}
