@@ -16,21 +16,17 @@ export default {
          *                            false once they are finished.
          */
         fullCalendarHelper_onLoading(isLoading) {
-            // TODO find a non-jQuery dependent way to do this
             if (isLoading === true) {
                 // this.$refs.toast.activate('Loading...');
-                this.jQuery.magnificPopup.open({
-                    showCloseBtn: false,
-                    closeOnBgClick: false,
-                    enableEscapeKey: false,
-                    items: {
-                        src: "<div class='preview loader'></div>",
-                        type: "inline",
-                    },
-                });
+                const overlayLoaderHTML = `
+                <div data-loader-overlay style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); z-index: 10000">
+                    <div class="preview loader" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"></div>
+                </div>`;
+
+                document.body.insertAdjacentHTML('beforeend', overlayLoaderHTML);
             } else {
                 // this.$refs.toast.timeout('Done', true, 3000, 2000);
-                this.jQuery.magnificPopup.close();
+                document.querySelector("[data-loader-overlay]")?.remove()
             }
         },
 
