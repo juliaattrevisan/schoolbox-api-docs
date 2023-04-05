@@ -37,6 +37,7 @@ class Definition extends Filter\AbstractDefinition
     public const KEY_DUE_WORK = AssessmentType::TYPE_DUE_WORK;
     public const KEY_TASK = AssessmentType::TYPE_TASK;
     public const KEY_LTI_ASSESSMENT = AssessmentType::TYPE_LTI_ASSESSMENT;
+    public const KEY_LESSON_PLAN = AssessmentType::TYPE_LESSON_PLAN;
 
     /** @var Collection|string[] */
     private $assessmentTypes;
@@ -91,6 +92,8 @@ class Definition extends Filter\AbstractDefinition
                 return 'Task';
             case self::KEY_LTI_ASSESSMENT:
                 return '3rd Party Assessment';
+            case self::KEY_LESSON_PLAN:
+                return 'Lesson Plan';
         }
         throw new InvalidArgumentException("Unknown AssessmentType key: $key");
     }
