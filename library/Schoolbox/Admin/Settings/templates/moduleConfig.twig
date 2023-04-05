@@ -64,14 +64,16 @@
         /**
          * Initialise the editor
          */
-        document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
-            detail: {
-                targetElements: ['[data-html-editor]'],
-                baseHref: settingsForm.find('[data-html-editor]')[0].dataset.href,
-                hasTokens: true,
-                tokenList: ["[title]", "[firstname]", "[preferredname]", "[surname]", "[fullname]", "[email]", "[position]"], //surname as that is the language we are using in admin user modify
-            }
-        }));
+        document.querySelectorAll("[data-html-editor]").forEach((el) => {
+            document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+                detail: {
+                    targetElements: [`#${el.id}`],
+                    baseHref: $(`#${el.id}`).data('href'),
+                    hasTokens: ($(`#${el.id}`).data('has-tokens') === 1),
+                    tokenList: ["[title]", "[firstname]", "[preferredname]", "[surname]", "[fullname]", "[email]", "[position]"], //surname as that is the language we are using in admin user modify
+                }
+            }))
+        });
         {% endif %}
 
         {% if hasResourcePicker %}
