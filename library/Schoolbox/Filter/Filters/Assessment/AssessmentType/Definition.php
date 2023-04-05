@@ -120,6 +120,29 @@ class Definition extends Filter\AbstractDefinition
             if (self::KEY_PROJECT === $option->getKey() && Filter\Page\Model::PAGE_PENDING_ASSESSMENTS === $pageFilter->getPage()) {
                 $cleanPageOptions->offsetUnset($idx);
             }
+
+            // Don't permit lesson plans on:
+            // * any markbook
+            // * grades
+            // * pending assessments
+            // This means lesson plans are permitted on:
+            // * upcoming assessments
+            // * assessment calendar
+            if (
+                self::KEY_LESSON_PLAN === $option->getKey()
+                && in_array(
+                    $pageFilter->getPage(),
+                    [
+                        Filter\Page\Model::PAGE_PENDING_ASSESSMENTS,
+                        Filter\Page\Model::PAGE_GRADES,
+                        Filter\Page\Model::PAGE_CLASS_MARK_BOOK,
+                        Filter\Page\Model::PAGE_COURSE_MARK_BOOK,
+                    ],
+                    true,
+                )
+            ) {
+                $cleanPageOptions->offsetUnset($idx);
+            }
         }
         return $cleanPageOptions;
     }
