@@ -311,7 +311,9 @@ function toggleExclusion() {
 async function onMenuItemSelected(target: string, action: string|null = null) {
     // No specific action, just redirect
     if (null === action) {
-        window.location.href = target;
+        // we should append the returnUrl, for all calls, so we can get back to the markbook on save.
+        let returnUrl = '?returnUrl=' + btoa(window.location.pathname);
+        window.location.href = target + returnUrl;
         return;
     }
 

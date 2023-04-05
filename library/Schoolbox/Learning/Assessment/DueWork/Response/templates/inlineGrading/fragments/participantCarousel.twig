@@ -138,6 +138,14 @@
             nextUrl = '{{ routeLookup("learningAssessment.getStatus", {assessmentId: assessment.id}) }}';
         }
 
+        {# if we have a returnURL then lets use that, else do the default
+        #}
+        let params = new URLSearchParams(window.location.search);
+        let returnUrl = params.get('returnUrl');
+        if (null !== returnUrl) {
+            nextUrl = atob(returnUrl);
+        }
+
         $('#continue-button').attr('href', nextUrl);
     });
 </script>

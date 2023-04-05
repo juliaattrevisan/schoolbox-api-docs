@@ -20,6 +20,13 @@
             publishedText: '{{ publishedText }}',
 
             onPublishCallback: function () {
+                {# if we have a returnURL then lets use that, else do the default
+                #}
+                let params = new URLSearchParams(window.location.search);
+                let returnUrl = params.get('returnUrl');
+                if (null !== returnUrl) {
+                    nextUrl = atob(returnUrl);
+                }
                 window.location.href = nextUrl;
             }
         });

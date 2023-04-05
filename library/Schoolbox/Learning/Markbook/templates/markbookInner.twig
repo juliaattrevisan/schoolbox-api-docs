@@ -210,7 +210,9 @@
                             {% if not participant or participant.isExcluded %} excluded
                             {% endif %} student-grade-cell"
                             data-assessment="{{ assessment.id }}"
+                            {% if assessment.getDefaultTypeName != 'Task' %}
                             data-pop-out-menu
+                            {% endif %}
                             data-assessment-type="{{ assessment.getDefaultTypeName }}"
                             data-endpoint="{{ routeLookupIfAuthorized('learningAssessmentTimeline.getFullTimeline', {assessment: assessment, assessmentId: assessment.id, userId: student.id }) }}"
                             data-update-route="{{ routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', {assessment: assessment, assessmentId:assessment.id, student: student, studentId:student.id }) }}"
