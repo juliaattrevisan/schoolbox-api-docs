@@ -30,12 +30,12 @@ class Query
      *
      * @param IConnector    $db
      * @param IConfigLoader $config
-     * @param RosettaStone  $l18n
+     * @param RosettaStone  $l10n
      */
     public function __construct(
         private IConnector $db,
         private IConfigLoader $config,
-        private RosettaStone $l18n
+        private RosettaStone $l10n
     ) {
     }
 
@@ -257,7 +257,7 @@ class Query
          * before trying to prepend something
          */
         if ($user->getYear()) {
-            $metadata .= $user->getYear()->getLongName($this->l18n->translate('year', false, true));
+            $metadata .= $user->getYear()->getLongName($this->l10n->translate('year', false, true));
         }
         return "{$metadata} {$role}";
     }
