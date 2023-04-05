@@ -393,19 +393,19 @@ class Controller extends Base
         $records  = $this->getReportData($report);
         $exporter = new \Report_Exporter($report->getName());
         $headings = [
-            'Pastoral ID'  => sprintf('%s ID', $this->l10n->translate('pastoral', false, true)),
+            'Pastoral ID'  => 'Pastoral ID',
             'Student Name' => 'Student Name',
             'Student ID'   => 'Student ID',
             'House'        => 'House',
             'Campus'       => 'Campus',
-            'Year'         => $this->l10n->translate('yearLevel', false, true),
+            'Year'         => 'Year',
             'Title'        => 'Title',
             'Type'         => 'Type',
             'Sub-Type'     => 'Sub-Type',
             'Occurred On'  => 'Occurred On',
         ];
         if ($this->getConfigLoader()->get('pastoral_severity')) {
-            $headings['Severity'] = $this->l10n->translate('severity', false, true);
+            $headings['Severity'] = 'Severity';
         }
         $headings = array_merge($headings, [
             'Tags'         => 'Tags',
