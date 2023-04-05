@@ -829,17 +829,12 @@ class MapperProxy
                 $options
             );
         } else {
-            /* Specifically remove Lesson Plans from markbook grid
-             * without affecting Course Outline, coupled via Assessment List Mutator
-             */
             $assessments = $this->baseMapper->findAllForFolderId(
                 $folderId,
                 $this->convertOptionsToPredicateBuilder($options, false),
                 [],
                 $options
-            )->filter(static function (\Schoolbox\Learning\Assessment\DataModel\Model $assessment) {
-                return !$assessment->hasLessonPlan();
-            });
+            );
         }
 
         // User's participation cannot be assumed: they cannot be assumed to be in the folder
