@@ -61,6 +61,7 @@
 
                             {# Show article body #}
                             <div class="content">
+                                <article>
                                 {% if record.bodyPublic is not empty %}
                                     {{ record.bodyPublic | purify }}
                                 {% endif %}
@@ -90,6 +91,7 @@
                                         {% endif %}
                                     </p>
                                 {% endif %}
+                                </article>
                             </div>
 
                             {% if record.comments | length %}
