@@ -66,43 +66,55 @@
     {% set userParameter = "userId=" ~ externalId %}
 {%  endif %}
 
-{# prefer the use a semantic name for the portrait (tiny, small, medium, large, menuMobile)#}
-{# establish small as the default rendering method #}
-{% if render == "tiny" %}
-    {% set sizeParameter = sizeParameter ~ "square32" %}
-{% elseif render == "small" %}
-    {% set sizeParameter = sizeParameter ~ "square64" %}
-{% elseif render == "medium" %}
-    {% set sizeParameter = sizeParameter ~ "constrain200" %}
-    {% set limitHeight = 200 %}
-    {% set limitWidth = 200 %}
-    {% set class = "full-width" %}
-{% elseif render == "menuMobile" %}
-    {% set sizeParameter = sizeParameter ~ "square72" %}
-    {% set limitHeight = 72 %}
-    {% set limitWidth = 72 %}
-{% elseif render == "large" %}
-    {% set sizeParameter = sizeParameter ~ "profile" %}
-    {% set class = "full-width" %}
-{% else %}
-    {% set sizeParameter = sizeParameter ~ "square64" %}
-{% endif %}
 
-<img src="/portrait.php?{{ userParameter }}{{ sizeParameter }}{{ appendQueryParam }}"
+{% if render == "medium" %}
+    {# handle 'medium' case separately because here we use a srcset. #}
+    <img src="/portrait.php?{{ userParameter }}{{ appendQueryParam }}"
+        srcset="/portrait.php?{{ userParameter }}&amp;size=constrain200 200w, /portrait.php?{{ userParameter }}&amp;size=constrain500 500w"
+        sizes="(max-width: 1300px) 200px, 500px"
+        src="/portrait.php?id={{ user.id }}&amp;size=constrain200"
     {% if class is not empty %}
         class="{{ class }}"
     {% endif %}
-
-    {% if limitHeight is not empty %}
-        height="{{ limitHeight }}"
-    {% endif %}
-
-    {% if limitWidth is not empty %}
-        width="{{ limitWidth }}"
-    {% endif %}
-
     {% if userDescription is not empty %}
         alt="{{ userDescription }}"
         title="{{ userDescription }}"
     {% endif %}
-/>
+    />
+{% else %}
+    {# prefer the use a semantic name for the portrait (tiny, small, medium, large, menuMobile)#}
+    {# establish small as the default rendering method #}
+    {% if render == "tiny" %}
+        {% set sizeParameter = sizeParameter ~ "square32" %}
+    {% elseif render == "small" %}
+        {% set sizeParameter = sizeParameter ~ "square64" %}
+    {% elseif render == "menuMobile" %}
+        {% set sizeParameter = sizeParameter ~ "square72" %}
+        {% set limitHeight = 72 %}
+        {% set limitWidth = 72 %}
+    {% elseif render == "large" %}
+        {% set sizeParameter = sizeParameter ~ "profile" %}
+        {% set class = "full-width" %}
+    {% else %}
+        {% set sizeParameter = sizeParameter ~ "square64" %}
+    {% endif %}
+
+    <img src="/portrait.php?{{ userParameter }}{{ sizeParameter }}{{ appendQueryParam }}"
+        {% if class is not empty %}
+            class="{{ class }}"
+        {% endif %}
+
+        {% if limitHeight is not empty %}
+            height="{{ limitHeight }}"
+        {% endif %}
+
+        {% if limitWidth is not empty %}
+            width="{{ limitWidth }}"
+        {% endif %}
+
+        {% if userDescription is not empty %}
+            alt="{{ userDescription }}"
+            title="{{ userDescription }}"
+        {% endif %}
+    />
+{% endif %}
