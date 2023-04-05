@@ -8,49 +8,53 @@
         assessments           IAssessable[]
         returnUrlSuffix       string
 #}
-<table class="rb">
-    <tr><td>&nbsp;</td>
-        {% for activity_id, activity in rubricAssessmentList  %}
-            {% if activity.rubric_capability_mark_type_id %}
-            <td>
-                {% set activityAssessment = assessments.by('id', activity_id) %}
-                {% if activityAssessment %}
-                    {%- set activityHref = routeLookupIfAuthorized(
-                        'learningAssessment.getSummary',
-                        {
-                            assessmentId: activity_id,
-                            studentId: student.id,
-                            student: student,
-                            assessment: activityAssessment,
-                        }
-                        ) -%}
-                {% else %}
-                    {%- set activityHref = '' -%}
-                {% endif %}
-                {%- if activityHref -%}
-                    <a href="{{ activityHref }}{{ returnUrlSuffix }}">{{ activity.name }}</a>
-                {%- else -%}
-                    {{ activity.name }}
-                {%- endif -%}
-            </td>
-            {% endif %}
-        {% endfor %}
-    </tr>
-    {% for capability in longitudinalRubric %}
-        <tr>
-            <th class="rb-group-name markdown">{{ capability.name | markdown }}</th>
-            {% for activity_id, activity in rubricAssessmentList %}
-                {% if activity.rubric_capability_mark_type_id %}
-                {% set activity = indicator is defined and indicator.activities[activity_id] %}
-                <td>
-                    {% if capability.mark is defined and capability.mark[activity_id] is defined %}
-                        {{ capability.mark[activity_id] }}
-                    {% else %}
-                        &nbsp;
+<div class="scrollable">
+    <table class="rb">
+        <thead>
+            <tr><td>&nbsp;</td>
+                {% for activity_id, activity in rubricAssessmentList  %}
+                    {% if activity.rubric_capability_mark_type_id %}
+                    <td>
+                        {% set activityAssessment = assessments.by('id', activity_id) %}
+                        {% if activityAssessment %}
+                            {%- set activityHref = routeLookupIfAuthorized(
+                                'learningAssessment.getSummary',
+                                {
+                                    assessmentId: activity_id,
+                                    studentId: student.id,
+                                    student: student,
+                                    assessment: activityAssessment,
+                                }
+                                ) -%}
+                        {% else %}
+                            {%- set activityHref = '' -%}
+                        {% endif %}
+                        {%- if activityHref -%}
+                            <a href="{{ activityHref }}{{ returnUrlSuffix }}">{{ activity.name }}</a>
+                        {%- else -%}
+                            {{ activity.name }}
+                        {%- endif -%}
+                    </td>
                     {% endif %}
-                </td>
-                {% endif %}
-            {% endfor %}
-        </tr>
-    {% endfor %}
-</table>
+                {% endfor %}
+            </tr>
+        </thead>
+        {% for capability in longitudinalRubric %}
+            <tr>
+                <th class="rb-group-name markdown">{{ capability.name | markdown }}</th>
+                {% for activity_id, activity in rubricAssessmentList %}
+                    {% if activity.rubric_capability_mark_type_id %}
+                    {% set activity = indicator is defined and indicator.activities[activity_id] %}
+                    <td>
+                        {% if capability.mark is defined and capability.mark[activity_id] is defined %}
+                            {{ capability.mark[activity_id] }}
+                        {% else %}
+                            &nbsp;
+                        {% endif %}
+                    </td>
+                    {% endif %}
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+</div>
