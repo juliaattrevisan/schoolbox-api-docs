@@ -14,6 +14,9 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
+use Schoolbox\Cdn\PrefixGenerator;
+use Schoolbox\Resource\Storage;
 use Schoolbox\YearLevel\Mapper as YearLevelMapper;
 
 class Module extends BaseModule
@@ -49,8 +52,10 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
-        return new Controller(
-            $this->getMapperFactory()->get(YearLevelMapper::class)
-        );
+        $yearLevelMapper     = $this->getMapperFactory()->get(YearLevelMapper::class);
+        $submissionMapper    = $this->getMapperFactory()->get(SubmissionMapper::class);
+        $storageTranslator   = new Storage\Translator\ModelToArray(new PrefixGenerator($this->getConfig()));
+        $apiAssessmentHelper = new Helper($yearLevelMapper, $submissionMapper, $storageTranslator);
+        return new Controller($apiAssessmentHelper);
     }
 }

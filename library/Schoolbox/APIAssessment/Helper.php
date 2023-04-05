@@ -9,34 +9,45 @@ namespace Schoolbox\APIAssessment;
 
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
-use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\GenericCollection;
 use Alaress\Database\Predicate\Builder;
 use PDO;
 use Schoolbox\Learning\Assessment\AssessmentType;
-use Schoolbox\Resource\Storage\Translator\ModelToArray;
+use Schoolbox\Resource\Storage;
 use Schoolbox\YearLevel\Mapper as YearLevelMapper;
 use Schoolbox\YearLevel\Model as YearLevelModel;
 
 class Helper
 {
     /**
+     * Cache for list of year levels
+     *
      * @var GenericCollection | YearLevelModel[] | null
      */
     protected ?GenericCollection $yearLevels = null;
 
-    protected YearLevelMapper $mapper;
-
+    /**
+     * Cache for already looked-up folder codes
+     *
+     * @var array|null
+     */
     protected ?array $folderCodes = null;
 
     /**
-     * YearLevel Mapper is being used to get the collection of year levels,
-     * and provide the database interface for building specific queries
-     * @param YearLevelMapper $mapper
+     * Constructor
+     *
+     * @param YearLevelMapper                 $mapper            Used to get the collection of year levels, and allow
+     *                                                           direct DB access
+     * @param Submission\SubmissionMapper     $submissionMapper  Used to fetch student submissions, and thus attached
+     *                                                           files
+     * @param Storage\Translator\ModelToArray $storageTranslator Used to translate student submission files into a
+     *                                                           standard array format
      */
-    public function __construct(YearLevelMapper $mapper)
-    {
-        $this->mapper = $mapper;
+    public function __construct(
+        private YearLevelMapper $mapper,
+        private Submission\SubmissionMapper $submissionMapper,
+        private Storage\Translator\ModelToArray $storageTranslator,
+    ) {
     }
 
     /**
@@ -742,20 +753,17 @@ WHERE
         }
 
         // Load submissions, and thus their files
-        // TODO inject
         // TODO add filename to file translator?
-        $submissionMapper = Submission\SubmissionMapper::getInstance();
-        $fileTranslator   = new ModelToArray(new PrefixGenerator($submissionMapper->getConfigLoader()));
         if (!empty($studentSubmissionIds)) {
             /** @var iterable<Submission\Submission> $studentSubmissions */
-            $studentSubmissions = $submissionMapper->findByColumn('id', $studentSubmissionIds);
+            $studentSubmissions = $this->submissionMapper->findByColumn('id', $studentSubmissionIds);
             foreach ($studentSubmissions as $studentSubmission) {
                 $assessmentId = $studentSubmission->getSubmissionBox()->getAssessmentModel()->getId();
                 $studentId    = $studentSubmission->getOwner()->getId();
                 $participationItems[$assessmentId][$studentId]['response']['files'] = $studentSubmission
                     ->getFiles()
                     ->map(fn (Submission\SingleFile\Model $file) => $file->getStorage())
-                    ->map($fileTranslator)
+                    ->map($this->storageTranslator)
                     ->reindex();
             }
         }
