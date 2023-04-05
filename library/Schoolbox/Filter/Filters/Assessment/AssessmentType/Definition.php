@@ -28,7 +28,6 @@ use Schoolbox\Learning\Assessment\AssessmentType;
  */
 class Definition extends Filter\AbstractDefinition
 {
-
     // The name to expose in the UI
     protected const NAME = 'Activity Type';
 

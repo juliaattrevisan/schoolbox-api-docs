@@ -17,7 +17,6 @@ use Schoolbox\Filter;
  */
 class Factory extends Filter\AbstractFactory
 {
-
     /**
      * @inheritdoc
      * @param Filter\Model $filter
