@@ -56,6 +56,7 @@ class Factory extends Filter\AbstractFactory
             Definition::KEY_DUE_WORK,
             Definition::KEY_TASK,
             Definition::KEY_LTI_ASSESSMENT,
+            Definition::KEY_LESSON_PLAN,
         ]);
     }
 }

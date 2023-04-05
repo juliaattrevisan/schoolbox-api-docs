@@ -604,6 +604,16 @@ class IdFinder extends Filter\AbstractIdFinder
             }
         }
 
+        // Lesson plans
+        if ($aTypes && $aTypes->keyExists(AssessmentType\Definition::KEY_LESSON_PLAN)) {
+            $joinClause .= "
+                $joinType JOIN lesson_plan lessonPlan ON lessonPlan.assessment_id = a.id
+            ";
+            if ($builder) {
+                $builder->notNull('lessonPlan.id');
+            }
+        }
+
         // Project
         if ($aTypes && $aTypes->keyExists(AssessmentType\Definition::KEY_PROJECT)) {
             $joinClause .= "

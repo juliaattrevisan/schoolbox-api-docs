@@ -37,6 +37,7 @@ class Definition extends Filter\AbstractDefinition
     public const KEY_DUE_WORK = AssessmentType::TYPE_DUE_WORK;
     public const KEY_TASK = AssessmentType::TYPE_TASK;
     public const KEY_LTI_ASSESSMENT = AssessmentType::TYPE_LTI_ASSESSMENT;
+    public const KEY_LESSON_PLAN = AssessmentType::TYPE_LESSON_PLAN;
 
     /** @var Collection|string[] */
     private $assessmentTypes;
@@ -91,6 +92,8 @@ class Definition extends Filter\AbstractDefinition
                 return 'Task';
             case self::KEY_LTI_ASSESSMENT:
                 return '3rd Party Assessment';
+            case self::KEY_LESSON_PLAN:
+                return 'Lesson Plan';
         }
         throw new InvalidArgumentException("Unknown AssessmentType key: $key");
     }
@@ -115,6 +118,29 @@ class Definition extends Filter\AbstractDefinition
         foreach ($cleanPageOptions as $idx => $option) {
             // Do not permit 'projects' on the 'pendingAssessments' page
             if (self::KEY_PROJECT === $option->getKey() && Filter\Page\Model::PAGE_PENDING_ASSESSMENTS === $pageFilter->getPage()) {
+                $cleanPageOptions->offsetUnset($idx);
+            }
+
+            // Don't permit lesson plans on:
+            // * any markbook
+            // * grades
+            // * pending assessments
+            // This means lesson plans are permitted on:
+            // * upcoming assessments
+            // * assessment calendar
+            if (
+                self::KEY_LESSON_PLAN === $option->getKey()
+                && in_array(
+                    $pageFilter->getPage(),
+                    [
+                        Filter\Page\Model::PAGE_PENDING_ASSESSMENTS,
+                        Filter\Page\Model::PAGE_GRADES,
+                        Filter\Page\Model::PAGE_CLASS_MARK_BOOK,
+                        Filter\Page\Model::PAGE_COURSE_MARK_BOOK,
+                    ],
+                    true,
+                )
+            ) {
                 $cleanPageOptions->offsetUnset($idx);
             }
         }
