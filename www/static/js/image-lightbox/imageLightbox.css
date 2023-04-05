@@ -1,17 +1,53 @@
-.lg-backdrop {
-    background-color: rgb(0 0 0 / 83%) !important;
+.lg-container .lg-backdrop {
+    background-color: rgba(0, 0, 0, 0.83) !important;
 }
 
-.lg-icon:after {
+/*  Overriding the internal lightbox focus-visible styling to bring it
+    closer to default Chrome/Chromium/Firefox tab focus styling */
+.lg-container button:focus-visible,
+.lg-container .lg-toolbar a:focus-visible {
+    outline: 2px solid white;
+}
+
+.lg-container .lg-toolbar,
+.lg-container .lg-sub-html,
+button.lg-next:focus,
+button.lg-prev:focus {
+    background-color: rgba(0, 0, 0, 0.45);
+}
+
+button.lg-next:hover,
+button.lg-prev:hover {
+    background-color: rgba(0, 0, 0, 0.65);
+}
+
+button.lg-next:active,
+button.lg-prev:active {
+    background-color: rgb(0, 0, 0);
+}
+
+div.lg-counter {
+    color: #eee;
+}
+
+.lg-container .lg-progress-bar {
+    background-color: #111111;
+}
+
+.lg-container .lg-progress {
+    background-color: rgb(238, 238, 238) !important;
+}
+
+.lg-container .lg-icon:after {
     visibility: inherit !important;
     display: inline !important;
 }
-.lg-autoplay-button:after {
+.lg-container .lg-autoplay-button:after {
     content: "\e01d" !important;
 }
-.lg-autoplay-button:after {
+.lg-container .lg-autoplay-button:after {
     content: "\e01d" !important;
 }
-.lg-fullscreen:after {
+.lg-container .lg-fullscreen:after {
     content: "\e20c" !important;
 }
