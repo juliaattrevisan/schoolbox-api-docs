@@ -56,74 +56,98 @@
                     if (event.which <= 1) {
                         event.preventDefault();
 
-                        $.magnificPopup.open({
-                            showCloseBtn: false,
-                            items: {
-                                src: "<div class='preview loader'></div>",
-                                type: "inline",
-                            },
-                        });
+                        const overlayLoaderHTML = `
+                        <div data-loader-overlay style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); z-index: 10000">
+                            <div class="preview loader" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"></div>
+                        </div>`;
+
+                        document.body.insertAdjacentHTML('beforeend', overlayLoaderHTML);
 
                         var href = $(this).attr(config.attribute);
                         var url = config.baseUrl + "/" + encodeURIComponent(href);
 
                         $.get(url, function (response) {
-                            $.magnificPopup.close();
+                            document.querySelector("[data-loader-overlay]")?.remove()
 
                             if (response.type == "redirect") {
                                 window.location.href = response.fragment;
                             } else if (response.type == "image") {
-                                $.magnificPopup.open({
-                                    items: {
-                                        src: response.fragment,
-                                        type: "image",
-                                    },
-                                    image: {
-                                        markup:
-                                            '<div class="mfp-figure" style="min-width: 128px">' +
-                                            '<div class="mfp-close"></div>' +
-                                            '<div class="mfp-img"></div>' +
-                                            '<div class="mfp-bottom-bar">' +
-                                            '<div class="mfp-title"></div>' +
-                                            '<div class="mfp-counter"></div>' +
-                                            "</div>" +
-                                            "</div>", // Popup HTML markup. `.mfp-img` div will be replaced with img tag, `.mfp-close` by close button
-                                        verticalFit: true,
-                                    },
-                                });
+                                document.dispatchEvent(new CustomEvent("IMAGE-LIGHTBOX__CREATE", {
+                                    detail: {
+                                        targetKey: "preview-image",
+                                        options: {
+                                            dynamic: true,
+                                            dynamicEl: [
+                                                {
+                                                    src: response.fragment
+                                                }
+                                            ]
+                                        },
+                                        onCreated: function (gallery) {
+                                            gallery.openGallery();
+                                        }
+                                    }
+                                }));
                             } else if (response.type == "iframe") {
-                                // The iframe is always sandboxed, which prevents
-                                // scripts running within it.
-                                // The full sandbox will be appropriate for the main
-                                // use-case for iframes (HTML and text uploaded to
-                                // storage), but could interfere with another case
-                                // (link component links pointing to non-embeddable
-                                //  safe iframes)
-                                $.magnificPopup.open({
-                                    items: {
-                                        src: response.fragment,
-                                        type: "iframe",
-                                    },
-                                    iframe: {
-                                        markup:
-                                            '<div class="mfp-iframe-scaler">' +
-                                            '<div class="mfp-close"></div>' +
-                                            '<iframe class="mfp-iframe" src="//about:blank" frameborder="0" allowfullscreen sandbox></iframe>' +
-                                            "</div>",
-                                    },
-                                });
+                                document.dispatchEvent(new CustomEvent("IMAGE-LIGHTBOX__CREATE", {
+                                    detail: {
+                                        targetKey: "preview-iframe",
+                                        options: {
+                                            dynamic: true,
+                                            dynamicEl: [
+                                                {
+                                                    src: response.fragment,
+                                                    iframe: true
+                                                }
+                                            ],
+                                            iframeWidth: "80%",
+                                            iframeHeight: "80%",
+                                        },
+                                        onCreated : function(gallery) {
+                                            gallery.openGallery();
+                                        }
+                                    }
+                                }));
                             } else {
-                                $.magnificPopup.open({
-                                    items: {
-                                        src: "<div class='preview fragment'>" + response.fragment + "</div>",
-                                        type: "inline",
-                                    },
-                                });
+                                document.dispatchEvent(new CustomEvent("IMAGE-LIGHTBOX__CREATE", {
+                                    detail: {
+                                        targetKey: "preview-custom",
+                                        options: {
+                                            dynamic: true,
+                                            dynamicEl: [
+                                                {
+                                                    src: "/static/images/foundation/preloader.gif"
+                                                }
+                                            ],
+                                        },
+                                        onCreated: function (gallery) {
+                                            // The fragment sent back can contain scripts, so it is important that we
+                                            // append it to the DOM in a way that will execute the scripts as well.
+                                            const fragmentDiv = document.createRange().createContextualFragment(
+                                                `<div class="lg-video-cont" style="width:80%;max-width:100%;max-height:100%;">
+                                                    <div class="preview fragment">${response.fragment}</div>
+                                                </div>`
+                                            );
+
+                                            // This is a slight workaround to display the content properly, as LightGallery
+                                            // has no way of adding custom HTML to the lightbox, this replaces the preloader
+                                            // image with the content we want to load.
+                                            gallery.el.addEventListener("lgAfterOpen", function () {
+                                                if (!gallery.$inner.selector.querySelector(".lg-current")) { return; }
+
+                                                gallery.$inner.selector.querySelector(".lg-current").innerHTML = "";
+                                                gallery.$inner.selector.querySelector(".lg-current").appendChild(fragmentDiv);
+                                            });
+
+                                            gallery.openGallery();
+                                        }
+                                    }
+                                }));
                             }
                         }).fail(function () {
                             // Did something break?
                             // Just pretend this preview never happened.
-                            $.magnificPopup.close();
+                            document.querySelector("[data-loader-overlay]")?.remove()
                             window.location.href = href;
                         });
                     }

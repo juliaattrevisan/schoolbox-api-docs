@@ -1,21 +1,5 @@
-import lgAutoplay from "lightgallery/plugins/autoplay";
-import lgFullScreen from "lightgallery/plugins/fullscreen";
-import lgVideo from "lightgallery/plugins/video";
-
+import imageLightboxDefaults from "./imageLightboxDefaults";
 import { checkForLightGallery } from "@js/image-lightbox/imageLightboxUtils";
-
-// Define the default settings for lightGallery
-interface LightGalleryDefaults {
-  plugins: any[];
-  licenseKey: string;
-  speed: number;
-}
-
-const imageLightboxDefaults: LightGalleryDefaults = {
-    plugins: [lgAutoplay, lgFullScreen, lgVideo],
-    licenseKey: window.sbProps.imageLightboxLicenseKey,
-    speed: 0,
-};
 
 /**
  * Initialize lightGallery using a elements with rel="lightbox" as the source
@@ -66,7 +50,10 @@ function initLightGallery(): void {
                 };
             }),
         };
-        window.sbProps.lightGalleries[key] = window.sbProps.lightGallery(lightboxElement, Object.assign(imageLightboxDefaults, lightboxSettings));
+        window.sbProps.lightGalleries[key] = window.sbProps.lightGallery(
+            lightboxElement,
+            Object.assign(imageLightboxDefaults, lightboxSettings)
+        );
 
         // For each image, add a click event to open the lightbox
         lightboxGroups[key].forEach((image, index) => {

@@ -15,3 +15,6 @@
 .lg-fullscreen:after {
     content: "\e20c" !important;
 }
+.lg-has-iframe {
+    background-color: #FFF;
+}

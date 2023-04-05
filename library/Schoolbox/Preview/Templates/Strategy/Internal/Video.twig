@@ -10,7 +10,7 @@
 
 <script type="text/javascript">
     $(function(){
-        $("#schoolbox_video_preview").mediaelementplayer();
+        $("#schoolbox_video_preview_{{ hash }}").mediaelementplayer();
 
         {# Hide the interactives if the video's not actually playable
          # Eventually shank this into a css stylesheet somewhere
@@ -21,7 +21,7 @@
         {% endif %}
     });
 </script>
-<video id="schoolbox_video_preview"
+<video id="schoolbox_video_preview_{{ hash }}"
        controls
        preload="none"
        poster="/cms/videoThumb.php?type={{ type }}&id={{ hash }}&size=poster"
@@ -31,4 +31,3 @@
        >
     <source src="/cms/sendVideo.php?type={{ type }}&id={{ hash }}" type='video/mp4'>
 </video>
-
