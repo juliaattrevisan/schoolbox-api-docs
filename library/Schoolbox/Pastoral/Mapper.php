@@ -814,6 +814,7 @@ class Mapper extends BaseMapper
      * @param bool                     $includeReportsWithoutAction
      * @param string|null              $actionStatus
      * @return Collection|Model[]
+     * @throws MapperException
      */
     public function getReportData(
         User $user,
@@ -978,8 +979,8 @@ class Mapper extends BaseMapper
         );
         $statement->execute($this->bindings);
 
-        // Hydrate records for return
-        $results = $this->hydrateSelect($statement);
+        // Hydrate records for return. No need to get related records
+        $results = $this->hydrateSelectInternal($statement, false);
 
         // If there are no tags to filter, just return the results now
         if ($tags->count() == 0) {
