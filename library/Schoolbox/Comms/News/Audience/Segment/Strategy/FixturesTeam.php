@@ -107,7 +107,7 @@ class FixturesTeam extends SimpleStrategy
      */
     public function getAudiencingSql(User $user, string $searchPlaceholder = null): ?string
     {
-        $keywordFilter = null === $searchPlaceholder ? '' : "AND st.`name` LIKE :{$searchPlaceholder}";
+        $keywordFilter = null === $searchPlaceholder ? '' : "AND CONCAT(st.name, ' (', sd.name, ', ', ss.name, ')') LIKE :{$searchPlaceholder}";
 
         $entityType = self::getEntityType();
 
