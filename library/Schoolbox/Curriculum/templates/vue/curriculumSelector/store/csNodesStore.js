@@ -6,7 +6,14 @@ import { defineStore } from "pinia";
 import { UNSET_ID, findById, getBreadcrumbs } from "@schoolboxCurriculum/js/nodeUtils";
 import { useStore, apiEndpoint } from "./curriculumSelectorStore";
 import { useModalViewNodesStore } from "./csModalViewNodesStore";
-import { hasRootNodes, getRootNodes, setRootNodes } from "@schoolboxCurriculum/js/sessionStorage";
+import {
+    hasStoredNodes,
+    isStoringNodes,
+    setIsStoringNodes,
+    getStoredNodes,
+    setStoredNodes,
+    NODES_STORED,
+} from "@schoolboxCurriculum/js/sessionStorage";
 
 export const useNodesStore = defineStore(`csNodes`, {
     state: () => ({
@@ -44,16 +51,17 @@ export const useNodesStore = defineStore(`csNodes`, {
         async load() {
             const store = useStore();
             try {
-                if (hasRootNodes()) {
+                if (hasStoredNodes()) {
                     // if we have the root nodes stored in session storage, load them
-                    this.nodes = getRootNodes();
-                    if (this.hasSingleCurriculum) {
-                        const singleCurriculumId = this.nodes.children[0].id;
-                        const modalViewNodesStore = useModalViewNodesStore();
-                        modalViewNodesStore.setSelected(modalViewNodesStore.currentDepth + 1, singleCurriculumId);
-                    }
+                    this.loadStored();
+                } else if (isStoringNodes()) {
+                    // if we've already requested the root nodes, don't request them again
+                    document.addEventListener(NODES_STORED, () => {
+                        this.loadStored();
+                    });
                 } else {
                     console.warn("load remote");
+                    setIsStoringNodes();
                     // otherwise load them from the api
                     await this.loadRemote();
                 }
@@ -61,7 +69,19 @@ export const useNodesStore = defineStore(`csNodes`, {
                 console.warn(error);
                 store.hasLoadError = true; // show the load error display state
             } finally {
-                store.isLoading = false; //otherwise show the tree
+                store.isLoading = false; // otherwise show the tree
+            }
+        },
+
+        /**
+         * load in the top level nodes from the session storage
+         */
+        async loadStored() {
+            this.nodes = getStoredNodes();
+            if (this.hasSingleCurriculum) {
+                const singleCurriculumId = this.nodes.children[0].id;
+                const modalViewNodesStore = useModalViewNodesStore();
+                modalViewNodesStore.setSelected(modalViewNodesStore.currentDepth + 1, singleCurriculumId);
             }
         },
 
@@ -75,7 +95,7 @@ export const useNodesStore = defineStore(`csNodes`, {
                 if (response.ok) {
                     const topLevelNodes = await response.json();
                     await this.setTopLevel(topLevelNodes);
-                    setRootNodes(this.nodes); // store the root nodes in session storage
+                    setStoredNodes(this.nodes); // store the root nodes in session storage
                 } else {
                     console.warn(response);
                     store.hasLoadError = true; //show the load error display state
