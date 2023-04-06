@@ -231,9 +231,9 @@
         })
             .done(function () {
                 // Editor value is now persisted: the current state is now clean
+                self.editor.destroy();
                 self.editorInstance.removeAttr("contentEditable");
                 self.editorInstance.html(`<div class="loader"></div>`);
-                self.editor.destroy();
 
                 const textboxId = self.editorInstance.attr("id").replace("textBoxBody", "");
 
@@ -256,7 +256,7 @@
                     self.editorInstance.parent().html(`
                         <div class="alert-box alert">
                             Sorry, we are currently unable to load the text box content.
-                            <a href="#refresh-page" title="refresh the page" @click.prevent="location.reload()">refresh the page</a>
+                            <a href="#${self.editorInstance.attr("id")}" onclick="location.reload()">Click here to refresh the page</a>
                             to try again and contact your support if the problem persists.
                         </div>`);
                 });
