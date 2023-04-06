@@ -98,6 +98,9 @@ module.exports = {
             // Image/File previewing
             "./www/static/js/preview/preview.js",
 
+            // Image Lightbox
+            "./www/static/js/image-lightbox/imageLightboxInit.ts",
+
             // Course selector
             "./www/static/js/course/jquery.course-selector.js",
 

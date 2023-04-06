@@ -13,6 +13,7 @@ declare global {
         STORYBOOK_ENV: string;
         sbProps: {
             lightGallery: Function;
+            lightGalleryInit: Function;
             lightGalleries: { [key: string]: any };
             imageLightboxLicenseKey: string;
         };
