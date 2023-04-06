@@ -45,14 +45,25 @@
 
 <script type="text/javascript">
     (function($) {
-        // Cheat's responsive text size:
-        // Constrain font size based on width of tile
-        $(function() {
-            var resizeTitles = function() {
-                $('#{{ componentId }}-tile-{{ tile.id }}').tileResize({minSize: {{ tile.getTitleTextMinSize()/100 }}, maxSize: {{ tile.getTitleTextMaxSize()/100 }}, unit: 'rem'});
-            };
-            resizeTitles();
-            $(window).resize(resizeTitles);
+        const resizeTileTitles = function () {
+            $('#{{ componentId }}-tile-{{ tile.id }}').tileResize({minSize: {{ tile.getTitleTextMinSize()/100 }}, maxSize: {{ tile.getTitleTextMaxSize()/100 }}, unit: 'rem'});
+        };
+
+        $(function () {
+            // Cheat's responsive text size:
+            // Constrain font size based on width of tile
+            resizeTileTitles();
+            $(window).resize(resizeTileTitles);
+
+            // Also run the resizeTileTitles() after the tile contents have been expanded.
+            // This is necessary because the calculation for the new font-size depends on the tile width, and the tile width
+            // cannot be ascertained when the tile is hidden.
+            const $collapsable = $('#{{ componentId }}-tile-{{ tile.id }}').closest('.component-container').find('[data-collapsable=true]');
+            if ($collapsable.length > 0) {
+                $collapsable[0].addEventListener("expandStop.collapsable", function () {
+                    resizeTileTitles();
+                });
+            }
         });
     })(jQuery);
 </script>

@@ -27,23 +27,29 @@
         $(this).each(function () {
             var tile = $(this);
             var tileTitle = tile.find(settings.titleSelector);
-            var width = Math.max(settings.minSize, Math.min(settings.getSize(tile, settings), settings.maxSize));
-            tileTitle.css({
-                fontSize: String(width) + settings.unit,
-                padding: String(width / 4) + settings.unit,
-            });
+            var size = Math.max(settings.minSize, Math.min(settings.getSize(tile, settings), settings.maxSize));
 
-            // If the title is taller than the tile:
-            // reduce the tile's top and bottom padding so it fits.
-            var titleHeight = tileTitle.outerHeight();
-            var tileHeight = tile.outerHeight();
-            if (titleHeight > tileHeight) {
-                var heightDifference = tileHeight - tileTitle.height();
-                var newPadding = String(heightDifference / 2) + "px";
+            // Variable size will be zero for collapsed tiles if the default getSize() function is used.
+            // The tile size is not actually zero, we just can't measure it if the tile is collapsed.
+            // We cannot calculate the new font-size and padding if we do not know the tile size.
+            if (size !== 0) {
                 tileTitle.css({
-                    paddingTop: newPadding,
-                    paddingBottom: newPadding,
+                    fontSize: String(size) + settings.unit,
+                    padding: String(size / 4) + settings.unit,
                 });
+
+                // If the title is taller than the tile:
+                // reduce the tile's top and bottom padding so it fits.
+                var titleHeight = tileTitle.outerHeight();
+                var tileHeight = tile.outerHeight();
+                if (titleHeight > tileHeight) {
+                    var heightDifference = tileHeight - tileTitle.height();
+                    var newPadding = String(heightDifference / 2) + "px";
+                    tileTitle.css({
+                        paddingTop: newPadding,
+                        paddingBottom: newPadding,
+                    });
+                }
             }
         });
     };
