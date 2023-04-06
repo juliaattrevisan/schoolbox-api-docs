@@ -88,8 +88,6 @@ export default {
 
     mounted() {
         this.updateFieldsOriginal = Object.assign({}, this.updateFields); //to reset to original values
-        // As vue loads the template after foundation has been initialised, we need to reinitialise the tooltips
-        $(document).foundation('tooltip', 'reflow');
     },
 
     methods: {

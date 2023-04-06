@@ -55,6 +55,7 @@ export default {
         $(document).foundation("tooltip", "reflow");
     },
 };
+alert('hI')
 </script>
 <template>
     <a :href="destinationUrl">
