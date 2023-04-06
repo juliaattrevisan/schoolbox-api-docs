@@ -10,7 +10,6 @@ namespace Calendar\Event\Type\Fixtures\Renderer;
 
 class Javascript extends Base
 {
-
     /**
      * Visitor
      *

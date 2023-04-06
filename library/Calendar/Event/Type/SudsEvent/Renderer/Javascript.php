@@ -10,7 +10,6 @@ namespace Calendar\Event\Type\SudsEvent\Renderer;
 
 class Javascript extends Base
 {
-
     /**
      * Visitor
      *
