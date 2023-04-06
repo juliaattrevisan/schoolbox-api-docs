@@ -94,6 +94,14 @@ export default {
         },
 
         /**
+         * Localised label for the "year level" column of the student table.
+         */
+        yearLevelLabel: {
+            type: String,
+            default: "Year Level",
+        },
+
+        /**
          * Should the "House" column be shown in the student table?
          */
         showHouseColumn: {
@@ -604,7 +612,7 @@ export default {
                             </th>
                             <th width="84"></th>
                             <th>Name</th>
-                            <th class="show-for-large-up">Year Level</th>
+                            <th class="show-for-large-up">{{ yearLevelLabel }}</th>
                             <th class="show-for-large-up" v-if="showTutorGroupColumn">Tutor Group</th>
                             <th class="show-for-medium-up" v-if="showCoreGroupColumn">Core Group</th>
                             <th class="show-for-medium-up" v-if="showHouseColumn">{{ houseLabel }}</th>

@@ -16,7 +16,7 @@ if (isset($this)) {
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
-/** @var SitePage $page */
+/** @var SitePage $pageHandler */
 $pageHandler = $kernel->get('sitePage');
 $pageHandler->initSession();
 
@@ -28,15 +28,15 @@ if (isset($_GET['query']) && strlen($_GET['query']) && isset($_GET['groupID']) &
     $userMapper = new Schoolbox\UserMapper();
 
     $allStudents = $userMapper->findByNameAndGroup($_GET['query'], $groupIdArray);
+    $yearPrefix  = $pageHandler->getLocalisedTerm('year', false, true);
 
     if ($allStudents->count()) {
+        /** @var \Schoolbox\User $currentStudent */
         foreach ($allStudents as $currentStudent) {
             $person = $currentStudent->getFullname() . ' - ';
 
-            $userYear = $currentStudent->getYear() ? $currentStudent->getYear()->getName() : '';
-
-            if (is_numeric($userYear)) {
-                $person .= "{$currentStudent->getYear()->getLongName()}, ";
+            if ($currentStudent->getYear()) {
+                $person .= "{$currentStudent->getYear()->getLongName($yearPrefix)}, ";
             }
 
             $person .= $currentStudent->getRole()->getName();

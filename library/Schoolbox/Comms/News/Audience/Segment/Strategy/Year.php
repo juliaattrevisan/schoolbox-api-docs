@@ -15,16 +15,33 @@ use Schoolbox\Comms\News\Audience;
 use Schoolbox\Comms\News\Audience\Segment\TranslateSql;
 use Schoolbox\Comms\News\Audience\Segment\UserResolutionSql;
 use Schoolbox\GenericCollection;
+use Schoolbox\L10n\RosettaStone;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User;
 use UnderflowException;
 
 use function array_filter;
 use function count;
-use function implode;
 use function in_array;
 
 class Year extends SimpleStrategy
 {
+    private string $quotedYearPrefix;
+
+    public function __construct(
+        UserAccessMapper $userAccessMapper,
+        Access $access,
+        bool $staffCanPost,
+        bool $moderationRequired,
+        Helper\StudentLocator $studentLocator,
+        RosettaStone $l10n,
+    ) {
+        parent::__construct($userAccessMapper, $access, $staffCanPost, $moderationRequired, $studentLocator);
+        $yearPrefix             = $l10n->translate('year', false, true);
+        $this->quotedYearPrefix = $yearPrefix ? $userAccessMapper->getDatabase()->quote($yearPrefix) : 'Year';
+    }
+
     public static function getEntityType(): string
     {
         return 'year';
@@ -66,13 +83,13 @@ class Year extends SimpleStrategy
              * because the column values for years are typically stored as a number, we want to make it easy for users
              * to search for either: "9" or "year 9" and get the same results
              */
-            $keywordFilter = "AND (lu_year_level.name LIKE :{$searchPlaceholder} or concat('Year ', lu_year_level.name) LIKE :{$searchPlaceholder})";
+            $keywordFilter = "AND (lu_year_level.name LIKE :{$searchPlaceholder} or concat({$this->quotedYearPrefix}, ' ', lu_year_level.name) LIKE :{$searchPlaceholder})";
         }
 
         return "
             SELECT DISTINCT
               lu_year_level.name AS id,
-              IF(lu_year_level.name REGEXP '^[0-9]+$', CONCAT('Year ', lu_year_level.name), lu_year_level.name) AS name,
+              IF(lu_year_level.name REGEXP '^[0-9]+$', CONCAT({$this->quotedYearPrefix}, ' ', lu_year_level.name), lu_year_level.name) AS name,
               '{$entityType}' AS entity_type,
               null as entity_meta
             FROM lu_year_level
@@ -98,7 +115,7 @@ class Year extends SimpleStrategy
             SELECT
                 '{$entityType}' entity_type,
                 lu_year_level.name AS entity_value,
-                IF(lu_year_level.name REGEXP '^[0-9]+$', CONCAT('Year ', lu_year_level.name), lu_year_level.name) name
+                IF(lu_year_level.name REGEXP '^[0-9]+$', CONCAT({$this->quotedYearPrefix}, ' ', lu_year_level.name), lu_year_level.name) name
             FROM lu_year_level
             WHERE {$pb->getWhereIntersect()}
         ";
@@ -115,7 +132,11 @@ class Year extends SimpleStrategy
      */
     public function getValidRelationshipModifiers(string $entityMeta = null): array
     {
-        return [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF];
+        return [
+            Audience\Model::RELATIONSHIP_SELF,
+            Audience\Model::RELATIONSHIP_PARENTS_OF,
+            Audience\Model::RELATIONSHIP_TEACHERS_OF,
+        ];
     }
 
     /**

@@ -117,12 +117,13 @@ class Model implements ISoftDeletable, Sequential, ValueLabelInterface
      * to prepend "Year " in front of it, because this is how it will
      * manifest in a UI somewhere.
      *
+     * @param string $yearPrefix
      * @return string
      */
-    public function getLongName(): string
+    public function getLongName(string $yearPrefix): string
     {
         if (preg_match('/^[0-9]+$/', $this->getName())) {
-            return "Year {$this->getName()}";
+            return "{$yearPrefix} {$this->getName()}";
         }
 
         return $this->getName();

@@ -47,7 +47,7 @@ $timetableHandler = new External_Timetable();
 $categoryMapper   = new \Schoolbox\Resource\Folder\Mapper();
 $userMapper       = new \Schoolbox\UserMapper();
 
-
+/** @var SitePage $this */
 $this->setFile(TEMPLATE_content, 'class/timetable.html');
 $this->setTitle('Timetable');
 $this->setTab('timetable');
@@ -108,6 +108,7 @@ if ($_SESSION['user']->getRole()->isParent()) {
     }
 }
 
+$yearPrefix = $this->getLocalisedTerm('year', false, true);
 foreach ($userList as $user) {
     $checkedCampusList = [];
 
@@ -163,12 +164,12 @@ foreach ($userList as $user) {
                 /* Only display subnav elements for timetables that contain data
                  */
                 $this->setVar([
-                    'TIMETABLE_PERSON'  => $user->formatName(),
-                    'TIMETABLE_YEAR'    => $user->getYear() ? ', ' . $user->getYear()->getLongName() : '',
-                    'TIMETABLE_USER_ID' => $user->getId(),
-                    'CAMPUS_ID'         => $campus->getId(),
-                    'CAMPUS_CODE'       => $campus->getExtTimetableCode(),
-                    'CAMPUS_NAME'       => $campus->getName(),
+                                  'TIMETABLE_PERSON'  => $user->formatName(),
+                                  'TIMETABLE_YEAR'    => $user->getYear() ? ', ' . $user->getYear()->getLongName($yearPrefix) : '',
+                                  'TIMETABLE_USER_ID' => $user->getId(),
+                                  'CAMPUS_ID'         => $campus->getId(),
+                                  'CAMPUS_CODE'       => $campus->getExtTimetableCode(),
+                                  'CAMPUS_NAME'       => $campus->getName(),
                 ]);
 
                 $this->parse('timetable_person_block', 'timetable_person', true);

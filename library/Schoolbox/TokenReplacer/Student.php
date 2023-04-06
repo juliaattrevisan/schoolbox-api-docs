@@ -56,7 +56,7 @@ class Student
                 '[preferredname]' => $student->getPreferredName() ?? $student->getFirstname(),
                 '[surname]'       => $student->getLastname(),
                 '[fullname]'      => $student->getFullName(),
-                '[year]'          => $student->getYear() ? $student->getYear()->getLongName() : '',
+                '[year]'          => $student->getYear() ? $student->getYear()->getName() : '',
                 '[house]'         => $student->getSchoolHouse() ? $student->getSchoolHouse()->getHouse() : '',
             ]
         );

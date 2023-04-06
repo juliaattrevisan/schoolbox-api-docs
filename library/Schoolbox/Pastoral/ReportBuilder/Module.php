@@ -130,6 +130,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(UserMapper::class),
             $this->getMapperFactory()->get(RoleMapper::class),
             $this->getMapperFactory()->get(UserAccessMapper::class),
+            $this->injector->get('l10n'),
         );
     }
 

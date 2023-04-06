@@ -247,12 +247,12 @@
                         </select>
                     </div>
                     <div class="small-12 columns">
-                        {% set toolTipTitle = 'Select the year levels to associate with this badge to allow filtering.' %}
+                        {% set toolTipTitle = 'Select the ' ~ locale.yearLevel.plural ~ ' to associate with this badge to allow filtering.' %}
                         <label>
-                            Year Levels
+                            {{ locale.yearLevel.properPlural }}
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="{{ toolTipTitle }}">?</span>
                         </label>
-                        <input title="Year Levels" id="yearLevels" name="yearLevelIds" placeholder="Select year Levels"
+                        <input title="{{ locale.yearLevel.properPlural }}" id="yearLevels" name="yearLevelIds" placeholder="Select {{ locale.yearLevel.plural }}"
                                tabindex="-1" class="selectized" type="text">
                     </div>
                     {% if curriculumTaggingEnabled %}

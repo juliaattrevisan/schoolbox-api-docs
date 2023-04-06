@@ -19,6 +19,7 @@ export const useStore = defineStore("manageGroup", {
         showSetting: false, // display setting modal
         groupStaffOnly: false, // restrict only staff to be group admin
         emailEnabled: false, // email enabled
+        yearLevelLabel: "", // localised label for "year level"
     }),
 
     getters: {

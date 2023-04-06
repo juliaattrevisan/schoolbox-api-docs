@@ -218,7 +218,7 @@
 
                                     {% block details_yearLevel %}
                                         {% if externalUser.StudentYearLevel is defined %}
-                                            <dt class="small-4 medium-3 columns">Year Level:</dt>
+                                            <dt class="small-4 medium-3 columns">{{ locale.yearLevel.proper }}:</dt>
                                             <dd class="small-8 medium-9 columns">{{ externalUser.StudentYearLevel }}</dd>
                                         {% endif %}
                                     {% endblock details_yearLevel %}

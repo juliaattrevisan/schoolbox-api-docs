@@ -789,6 +789,9 @@ abstract class Kernel
                         (new ClassCodeMatchFactory())->build($config->get(ConfigMapper::NAME_EXTERNAL_TYPE)),
                     );
 
+                    /** @var RosettaStone $l10n */
+                    $l10n = $di->get('l10n');
+
                     /** @var IConnector $db */
                     $db = $di->get('databaseInternal');
 
@@ -807,6 +810,7 @@ abstract class Kernel
                         $db,
                         $knownUserClasses,
                         $studentLocator,
+                        $l10n,
                     );
                 }
             )

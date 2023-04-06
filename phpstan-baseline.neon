@@ -6266,11 +6266,6 @@ parameters:
 			path: library/Schoolbox/User.php
 
 		-
-			message: "#^Variable \\$result might not be defined\\.$#"
-			count: 1
-			path: library/Schoolbox/User/Controller.php
-
-		-
 			message: "#^Left side of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/User/Password/Reset/Controller.php

@@ -39,6 +39,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\GenericCollection;
 use Schoolbox\Json\Decorator\LinkDecorator;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Comms\News\Topic;
@@ -63,26 +64,10 @@ use function array_merge;
  */
 class Controller extends Base
 {
-    private Mapper $newsMapper;
-    private Topic\Mapper $topicMapper;
-    private SaveForLater\Mapper $saveForLaterMapper;
-    private Statistics\Mapper $statisticsMapper;
-    private Statistics\Cumulative\Mapper $statisticsCumulativeMapper;
-    private IConnector $databaseInternal;
-    private Folder\Mapper $folderMapper;
-    private Audience\Mapper $audienceMapper;
-    private Audience\ArticleResolver $articleResolver;
-    private Audience\Segment\StrategyFactory $strategyFactory;
-    private Access $access;
-    private Thread\Mapper $threadMapper;
-    private CommentMapper $commentMapper;
-    private File\Mapper $fileMapper;
-
     /**
      * Default number of items to display in case config is broken
      */
     private const DEFAULT_SEARCH_LIMIT = 10;
-
 
     /**
      * @param Mapper                           $newsMapper
@@ -100,38 +85,26 @@ class Controller extends Base
      * @param CommentMapper                    $commentMapper
      * @param File\Mapper                      $fileMapper
      * @param ValidChangeStickyStatus          $validChangeStickyStatus Spec pattern for if sticky status may be changed
+     * @param RosettaStone                     $l10n
      */
     public function __construct(
-        Mapper $newsMapper,
-        Topic\Mapper $topicMapper,
-        SaveForLater\Mapper $saveForLaterMapper,
-        Statistics\Mapper $statisticsMapper,
-        Statistics\Cumulative\Mapper $statisticsCumulativeMapper,
-        Audience\Mapper $audienceMapper,
-        Folder\Mapper $folderMapper,
-        IConnector $databaseInternal,
-        Audience\ArticleResolver $articleResolver,
-        Audience\Segment\StrategyFactory $strategyFactory,
-        Access $access,
-        Thread\Mapper $threadMapper,
-        CommentMapper $commentMapper,
-        File\Mapper $fileMapper,
+        private Mapper $newsMapper,
+        private Topic\Mapper $topicMapper,
+        private SaveForLater\Mapper $saveForLaterMapper,
+        private Statistics\Mapper $statisticsMapper,
+        private Statistics\Cumulative\Mapper $statisticsCumulativeMapper,
+        private Audience\Mapper $audienceMapper,
+        private Folder\Mapper $folderMapper,
+        private IConnector $databaseInternal,
+        private Audience\ArticleResolver $articleResolver,
+        private Audience\Segment\StrategyFactory $strategyFactory,
+        private Access $access,
+        private Thread\Mapper $threadMapper,
+        private CommentMapper $commentMapper,
+        private File\Mapper $fileMapper,
         private ValidChangeStickyStatus $validChangeStickyStatus,
+        private RosettaStone $l10n,
     ) {
-        $this->newsMapper                 = $newsMapper;
-        $this->topicMapper                = $topicMapper;
-        $this->saveForLaterMapper         = $saveForLaterMapper;
-        $this->statisticsMapper           = $statisticsMapper;
-        $this->statisticsCumulativeMapper = $statisticsCumulativeMapper;
-        $this->audienceMapper             = $audienceMapper;
-        $this->folderMapper               = $folderMapper;
-        $this->databaseInternal           = $databaseInternal;
-        $this->articleResolver            = $articleResolver;
-        $this->strategyFactory            = $strategyFactory;
-        $this->access                     = $access;
-        $this->threadMapper               = $threadMapper;
-        $this->commentMapper              = $commentMapper;
-        $this->fileMapper                 = $fileMapper;
     }
 
     /* CRUD actions */
@@ -1390,10 +1363,10 @@ class Controller extends Base
                 'isMulti'       =>  false,
             ],
             'year' => [
-                'name'          =>  'Year Level',
-                'namePlural'    =>  'Year Levels',
+                'name'          =>  $this->l10n->translate('yearLevel', false, true),
+                'namePlural'    =>  $this->l10n->translate('yearLevel', true, true),
                 'icon'          =>  'teacher',
-                'selfModifier'  =>  'Users in year level/s',
+                'selfModifier'  =>  sprintf('Users in %s', $this->l10n->translate('yearLevel', true, true)),
                 'hideFromModal' =>  false,
                 'isMulti'       =>  false,
             ],

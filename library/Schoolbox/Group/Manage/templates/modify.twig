@@ -12,6 +12,7 @@
             update-settings-endpoint="{{ routeLookupIfAuthorized('group.updateSettings', {'folderId': folder.id, 'folder': folder}) }}"
             disband-group-endpoint="{{ routeLookupIfAuthorized('group.disband', {'folderId': folder.id, 'folder': folder}) }}"
             send-email-endpoint="{{ routeLookupIfAuthorized('mail.getCreateMail') }}"
+            year-level-label="{{ locale.yearLevel }}"
     />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/manageGroup.js?v={{ config.site_version }}"></script>

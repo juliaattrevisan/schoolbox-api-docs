@@ -137,12 +137,13 @@ class Controller extends Base
     public function search()
     {
         $keyword = $this->request->query['keyword'];
+        $result = [];
 
         if ($keyword !== null) {
             try {
                 /** @var IConnector $db */
                 $db = $this->di->get('databaseInternal');
-                $userSearchService = new User\Search\Query($db, $this->getConfigLoader());
+                $userSearchService = new User\Search\Query($db, $this->getConfigLoader(), $this->getDi()->get('l10n'));
                 $result = $userSearchService->fetchResults($keyword, $this->getUser());
             } catch (\Exception $exception) {
                 // noop

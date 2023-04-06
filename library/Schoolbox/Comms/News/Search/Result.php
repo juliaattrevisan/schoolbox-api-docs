@@ -17,6 +17,7 @@ use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Audience\Segment;
 use Schoolbox\Comms\News\Model;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access;
 use Schoolbox\Resource\Folder;
@@ -29,15 +30,13 @@ use Schoolbox\UserMapper;
 
 class Result extends Base
 {
-    /** @var IConnector */
-    private $database;
-
-    public function __construct(IConnector $database, \Schoolbox\Permission\Access\Access $accessor = null)
-    {
+    public function __construct(
+        private IConnector $database,
+        private RosettaStone $l10n,
+        \Schoolbox\Permission\Access\Access $accessor = null
+    ) {
         parent::__construct($accessor);
-        $this->database = $database;
     }
-
 
     /**
      * Get all the search results
@@ -191,7 +190,8 @@ class Result extends Base
                 new External_Class(),
                 new External_User(),
                 (new ClassCodeMatchFactory())->build($config->get(ConfigMapper::NAME_EXTERNAL_TYPE)),
-            )
+            ),
+            $this->l10n
         );
 
         /* Is $user in the audience of the article?

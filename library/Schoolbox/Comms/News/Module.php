@@ -238,6 +238,7 @@ class Module extends BaseModule
                 $this->getMapperFactory()->get(Access\Access::class),
                 $this->getConfig()->get(ConfigMapper::COMMS_STICKY_ENABLED),
             ),
+            $this->injector->get('l10n'),
         );
     }
 

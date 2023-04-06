@@ -128,13 +128,15 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
     {
         $house = $this->getUserHouse();
 
-        $this->getPage()->setVar(array(
-            'USER_EXTERNAL_ID' => $this->getExternalUserId(),
-            'USER_FULLNAME' => $this->getUserName(),
-            'USER_CAMPUS' => Scrub::text(' ' . $this->getUserCampusName()),
-            'USER_YEAR_LEVEL' => $this->getUserYear() != '' ? Scrub::text($this->getUserYear()) : '',
-            'USER_HOUSE' => $house != '' ? Scrub::text(', ' . $this->getUserHouse()) : '' ,
-        ));
+        $this->getPage()->setVar(
+            [
+                'USER_EXTERNAL_ID' => $this->getExternalUserId(),
+                'USER_FULLNAME'    => $this->getUserName(),
+                'USER_CAMPUS'      => Scrub::text(' ' . $this->getUserCampusName()),
+                'USER_YEAR_LEVEL'  => $this->getUser()->getYear() ? Scrub::text($this->getUser()->getYear()->getLongName($this->getPage()->getLocalisedTerm('year', false, true))) : '',
+                'USER_HOUSE'       => $house != '' ? Scrub::text(', ' . $this->getUserHouse()) : '',
+            ]
+        );
     }
 
     /**
@@ -481,16 +483,6 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
         }
 
         return '';
-    }
-
-    /**
-     * Get a user's year level
-     *
-     * @return mixed
-     */
-    private function getUserYear()
-    {
-        return $this->user->getYear() ? $this->user->getYear()->getLongName() : '';
     }
 
     /**

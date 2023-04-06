@@ -11,6 +11,7 @@ namespace Schoolbox\User\Search;
 
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\IConfigLoader;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -25,25 +26,17 @@ class Query
     public const MIN_SEARCH_LENGTH = 2;
 
     /**
-     * @var IConnector
-     */
-    private $db;
-
-    /**
-     * @var IConfigLoader
-     */
-    private $config;
-
-    /**
      * Query constructor.
      *
      * @param IConnector    $db
      * @param IConfigLoader $config
+     * @param RosettaStone  $l10n
      */
-    public function __construct(IConnector $db, IConfigLoader $config)
-    {
-        $this->db     = $db;
-        $this->config = $config;
+    public function __construct(
+        private IConnector $db,
+        private IConfigLoader $config,
+        private RosettaStone $l10n
+    ) {
     }
 
     /**
@@ -102,7 +95,7 @@ class Query
             $result[$key]['preferredName']  = $user->getPreferredName();
             $result[$key]['lastname']       = $user->getLastname();
             $result[$key]['formattedName']  = $user->formatName();
-            $result[$key]['metadata']       = $user->formatMetadata();
+            $result[$key]['metadata']       = $this->formatMetadata($user);
             $result[$key]['year']           = $user->getYear() ? $user->getYear()->getName() : '';
         }
 
@@ -234,5 +227,38 @@ class Query
         $params['guestType'] = Role::GUEST;
 
         return [' WHERE ' . implode(' AND ', $whereParts), $params];
+    }
+
+    /**
+     * Outputs a metadata line for this student.
+     *
+     * This is the same line that shows in search results underneath a student's name.
+     *
+     * @param User $user
+     * @return string
+     * @todo allow schools to set the format as they can with `$this->formatName`
+     *
+     */
+    private function formatMetadata(User $user): string
+    {
+        // For now, just show role name
+        if (!empty($user->getPositionTitle())) {
+            return $user->getPositionTitle();
+        }
+
+        $metadata = '';
+        $role     = $user->getRole()->getName();
+
+        /* This made a massive assumption that everyone's year level
+         * begins with "Year", which means anyone using "ELC" in lu_year_level.name
+         * would get metadata like "Year ELC"
+         *
+         * See inside getLongName() which checks whether it's just an integer on its own
+         * before trying to prepend something
+         */
+        if ($user->getYear()) {
+            $metadata .= $user->getYear()->getLongName($this->l10n->translate('year', false, true));
+        }
+        return "{$metadata} {$role}";
     }
 }
