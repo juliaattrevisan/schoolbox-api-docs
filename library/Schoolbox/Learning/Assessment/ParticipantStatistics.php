@@ -122,7 +122,7 @@ class ParticipantStatistics
             $this->cacheCountFeedbackRequired = 0;
             $user                             = $this->participant->getUser();
             foreach ($this->assessmentAndDescendants as $assessable) {
-                if ($assessable instanceof Project) {
+                if ($assessable instanceof Project || $assessable instanceof LessonPlan\Model) {
                     continue;
                 }
                 $subParticipant = $assessable->getParticipantIfExtant($user);
@@ -144,7 +144,7 @@ class ParticipantStatistics
             $this->cacheCountReviewComplete = 0;
             $user                           = $this->participant->getUser();
             foreach ($this->assessmentAndDescendants as $assessable) {
-                if ($assessable instanceof Project) {
+                if ($assessable instanceof Project || $assessable instanceof LessonPlan\Model) {
                     continue;
                 }
                 $subParticipant = $assessable->getParticipantIfExtant($user);
