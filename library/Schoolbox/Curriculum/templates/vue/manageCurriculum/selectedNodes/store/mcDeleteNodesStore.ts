@@ -6,6 +6,7 @@ import { ref } from "vue";
 import { defineStore } from "pinia";
 import { capitalizeFirstLetter } from "@js/util/stringUtils";
 import { useSelectedNodesStore } from "./mcSelectedNodesStore";
+import { removeStoredNodes } from "@schoolboxCurriculum/js/sessionStorage";
 
 export const useDeleteNodesStore = defineStore("mcDeleteNodes", () => {
     const isProcessing = ref(false);
@@ -72,6 +73,7 @@ export const useDeleteNodesStore = defineStore("mcDeleteNodes", () => {
             if (isAllResponsesOk) {
                 const successMessage = getSuccessMessage();
                 useSelectedNodesStore().deleteNodes();
+                removeStoredNodes();
                 cancel();
                 return successMessage;
             }

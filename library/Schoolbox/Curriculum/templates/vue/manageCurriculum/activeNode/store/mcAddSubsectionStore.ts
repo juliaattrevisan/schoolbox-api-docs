@@ -7,6 +7,7 @@ import { defineStore } from "pinia";
 import { useActiveNodeStore } from "@schoolboxCurriculum/vue/manageCurriculum/activeNode/store/mcActiveNodeStore";
 import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/selectedNodes/store/mcSelectedNodesStore";
 import type { Node } from "@schoolboxCurriculum/types/Node";
+import { removeStoredNodes } from "@schoolboxCurriculum/js/sessionStorage";
 
 const UNSET_ID = -1;
 
@@ -84,6 +85,7 @@ export const useAddSubsectionStore = defineStore("mcAddSubsection", () => {
                 id.value = newNode.id;
                 useSelectedNodesStore().checkIfSelected(newNode); // the parent node could be selected, so this node will need to be selected as well
                 await activeNodeStore.addSubsection(newNode);
+                removeStoredNodes();
                 cancel();
                 return { id: newNode.id, message: "Subsection successfully added" };
             }

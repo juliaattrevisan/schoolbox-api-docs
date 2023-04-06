@@ -52,3 +52,11 @@ export function setStoredNodes(nodes: Node[]) {
     window.sessionStorage.setItem(SB_NODES, JSON.stringify(nodes));
     document.dispatchEvent(new Event(NODES_STORED));
 }
+
+/**
+ * Remove the root curriculum nodes
+ */
+export function removeStoredNodes() {
+    window.sessionStorage.removeItem(SB_NODES);
+    window.sessionStorage.removeItem(SB_IS_STORING_NODES);
+}
