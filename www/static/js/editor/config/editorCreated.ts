@@ -101,7 +101,6 @@ async function attachInspector(editor: Editor) {
  */
 export async function modifyEditor(textarea: HTMLTextAreaElement, editor: Editor, config: EditorConfig) {
     addToGlobalScope(editor, textarea);
-    // addSBConfigToEditor(editor, config);
     insertWordCount(textarea, editor, config);
     disableAutoMedia(editor, config);
     removeValidation();
