@@ -65,7 +65,7 @@ if (isset($_POST['userGroup']) && isset($_POST['campusList'])) {
     if ($allEvents && count($allEvents)) {
         foreach ($allEvents as $currentEvent) {
             $this->setVar([
-                'EVENT_NAME' => $currentEvent['name'],
+                'EVENT_NAME' => \Scrub::text($currentEvent['name']),
                 'EVENT_STATUS' => $currentEvent['status'],
                 'EVENT_ERROR' => $currentEvent['error'],
             ]);

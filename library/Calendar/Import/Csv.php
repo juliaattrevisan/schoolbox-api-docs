@@ -88,7 +88,7 @@ class Csv extends Base
              */
             if (!strlen(trim($name))) {
                 $output[] = array(
-                    'name'   => \Scrub::text($name),
+                    'name'   => $name,
                     'status' => 'Not Added',
                     'error'  => 'Event name not provided',
                 );
@@ -100,7 +100,7 @@ class Csv extends Base
              */
             if (!strlen(trim($start_date))) {
                 $output[] = array(
-                    'name'   => \Scrub::text($name),
+                    'name'   => $name,
                     'status' => 'Not Added',
                     'error'  => 'Start date not provided',
                 );
@@ -124,7 +124,7 @@ class Csv extends Base
                 }
             } catch (\InvalidArgumentException $e) {
                 $output[] = array(
-                    'name'   => \Scrub::text($name),
+                    'name'   => $name,
                     'status' => 'Not Added',
                     'error'  => 'Invalid date time supplied',
                 );
@@ -152,7 +152,7 @@ class Csv extends Base
                 $eventType = $eventTypeMapper->findById($event_type);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $output[] = array(
-                    'name'   => \Scrub::text($name),
+                    'name'   => $name,
                     'status' => 'Not Added',
                     'error'  => 'Event type not set',
                 );
@@ -178,7 +178,7 @@ class Csv extends Base
                 $startDatetimeString = "{$start_date} {$start_time}:00";
             } else {
                 $output[] = array(
-                    'name'   => \Scrub::text($name),
+                    'name'   => $name,
                     'status' => 'Not Added',
                     'error'  => 'Invalid start date and/or times (use 24-hour h:m format)',
                 );
@@ -190,7 +190,7 @@ class Csv extends Base
                 $startDatetime = new Alaress_Date_Format($startDatetimeString, 'd/m/Y H:i:s');
             } catch (\InvalidArgumentException $e) {
                 $output[] = [
-                    'name'   => \Scrub::text($name),
+                    'name'   => $name,
                     'status' => 'Not Added',
                     'error'  => 'Invalid start date time supplied',
                 ];
@@ -207,7 +207,7 @@ class Csv extends Base
                 $finishDatetimeString = "{$finish_date} {$finish_time}:00";
             } else {
                 $output[] = array(
-                    'name'   => \Scrub::text($name),
+                    'name'   => $name,
                     'status' => 'Not Added',
                     'error'  => 'Invalid finish date and/or times (use 24-hour h:m format)',
                 );
@@ -219,7 +219,7 @@ class Csv extends Base
                 $finishDatetime = new Alaress_Date_Format($finishDatetimeString, 'd/m/Y H:i:s');
             } catch (\InvalidArgumentException $e) {
                 $output[] = [
-                    'name'   => \Scrub::text($name),
+                    'name'   => $name,
                     'status' => 'Not Added',
                     'error'  => 'Invalid finish date time supplied',
                 ];
@@ -230,7 +230,7 @@ class Csv extends Base
              */
             if ($startDatetime->getUnixTimeStamp() > $finishDatetime->getUnixTimeStamp()) {
                 $output[] = array(
-                    'name'   => \Scrub::text($name),
+                    'name'   => $name,
                     'status' => 'Not Added',
                     'error'  => 'Invalid date and/or times',
                 );
@@ -263,7 +263,7 @@ class Csv extends Base
                     $publishDate = new Alaress_Date_Format($publish_date, 'd/m/Y');
                 } catch (\InvalidArgumentException $e) {
                     $output[] = [
-                        'name'   => \Scrub::text($name),
+                        'name'   => $name,
                         'status' => 'Not Added',
                         'error'  => 'Invalid publish date supplied',
                     ];
@@ -298,13 +298,13 @@ class Csv extends Base
 
             if (is_array($result) && count($result)) {
                 $output[] = array(
-                    'name'   => \Scrub::text($event->getTitle()),
+                    'name'   => $event->getTitle(),
                     'status' => 'Added',
                     'error'  => 'OK',
                 );
             } else {
                 $output[] = array(
-                    'name'   => \Scrub::text($event->getTitle()),
+                    'name'   => $event->getTitle(),
                     'status' => 'Not Added',
                     'error'  => 'Could not create event',
                 );
