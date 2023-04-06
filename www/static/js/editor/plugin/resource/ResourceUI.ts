@@ -70,17 +70,7 @@ export default class ResourceUI extends Plugin {
 
     /**
      * To display the progress of a resource being uploaded, based off the already
-     * existing dropzone usages:
-     * <div class="card small-12 sb-ck-resource-upload-container__upload">
-     *    <p>example.zip</p>
-     *    <p class="meta" data-status>Uploading...</p>
-     *    <div class="progress">
-     *        <span class="meter" style="width: 50%"></span>
-     *    </div>
-     *    <nav>
-     *        <a href="#" data-remove-upload="" title="Remove" class="icon-close"></a>
-     *     </nav>
-     * </div>
+     * existing dropzone usages
      *
      * @param { File } file - the file being uploaded
      * @returns { HTMLDivElement } the element to display the progress
@@ -88,29 +78,16 @@ export default class ResourceUI extends Plugin {
     getUploadElement(file: File) {
         const container = document.createElement("div");
         container.classList.add("card", "small-12", "sb-ck-resource-upload-container__upload");
-        const title = document.createElement("p");
-        title.innerText = file.name;
-        container.appendChild(title);
-        const status = document.createElement("p");
-        status.classList.add("meta");
-        status.setAttribute("data-status", "");
-        status.innerText = "Uploading...";
-        container.appendChild(status);
-        const progress = document.createElement("div");
-        progress.classList.add("progress");
-        container.appendChild(progress);
-        const meter = document.createElement("span");
-        meter.classList.add("meter");
-        meter.style.width = "0%";
-        meter.setAttribute("data-progress-meter", "");
-        progress.appendChild(meter);
-        const nav = document.createElement("nav");
-        const remove = document.createElement("a");
-        remove.classList.add("icon-close");
-        remove.setAttribute("data-remove-upload", "");
-        remove.setAttribute("title", "Remove");
-        nav.appendChild(remove);
-        container.appendChild(nav);
+        container.innerHTML = `
+            <p>${file.name}</p>
+            <p class="meta" data-status>Uploading...</p>
+            <div class="progress">
+                <span class="meter" style="width: 0%" data-progress-meter></span>
+            </div>
+            <nav>
+                <a href="#" data-remove-upload="" title="Remove" class="icon-close"></a>
+            </nav>
+        `;
         this.uploadContainer.appendChild(container);
         return container;
     }
