@@ -19,7 +19,6 @@ use Schoolbox\GenericCollection;
  */
 class ParticipantStatistics
 {
-
     /** @var Participant */
     private $participant;
 
