@@ -1,5 +1,5 @@
 /**
- * Manange a commponents ability to open and close
+ * Manage a component's ability to open and close
  *
  */
 
@@ -24,7 +24,7 @@ export function initCollapseComponents() {
 /**
  * Open and close a component
  *
- * @param { Element }
+ * @param component { Element }
  */
 function init(component) {
     const collapseButton = component.querySelector(BUTTON_SELECTOR);
@@ -60,7 +60,7 @@ export async function open(component) {
     const collapsePanel = component.querySelector(PANEL_SELECTOR);
     collapsePanel.setAttribute("data-collapse-state", "uncollapsed");
     collapsePanel.dispatchEvent(new CustomEvent("expandStart.collapsable"));
-    await slideDown(collapsePanel, ANIMATE_SPEED);
+    await slideDown(collapsePanel, ANIMATE_SPEED, "expandStarted.collapsable");
     collapsePanel.dispatchEvent(new CustomEvent("expandStop.collapsable"));
 }
 

@@ -66,7 +66,7 @@
             // cannot be ascertained when the tile is hidden.
             const $collapsable = $('#{{ componentId }}-tile-{{ tile.id }}').closest('.component-container').find('[data-collapsable=true]');
             if ($collapsable.length > 0) {
-                $collapsable[0].addEventListener("expandStop.collapsable", function () {
+                $collapsable[0].addEventListener("expandStarted.collapsable", function () {
                     resizeTileTitles();
                 });
             }

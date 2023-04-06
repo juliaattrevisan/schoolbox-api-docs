@@ -12,15 +12,20 @@ const PADDING_BOTTOM_ATTRIBUTE = "data-padding-bottom";
  * Replicates jQuery's slideDown - Display the element with a sliding motion.
  * Assumes the element is hidden with display: none;
  *
- * @params { DOMElement }
- * @params { Number } in seconds, so 0.3 is 300ms
+ * @param element { DOMElement }
+ * @param duration { Number } in seconds, so 0.3 is 300ms
+ * @param eventToFireWhenElementVisible { ?String } name of CustomEvent to be fired when the element first becomes visible.
  */
-export async function slideDown(element, duration = 0.3) {
+export async function slideDown(element, duration = 0.3, eventToFireWhenElementVisible = null) {
     if (element.classList.contains("hide")) element.classList.remove("hide");
 
     element.style.display = "block";
     element.style.height = "auto";
     element.style.overflow = "hidden";
+
+    if (eventToFireWhenElementVisible !== null) {
+        element.dispatchEvent(new CustomEvent(eventToFireWhenElementVisible));
+    }
 
     const paddingTop = getPaddingTop(element);
     element.style.paddingTop = 0;
