@@ -16,6 +16,7 @@
         <div class="small-12 island">
             {% if not (body is empty and attachments is empty) %}
                 <section class="content">
+                    <article>
                     {{ body | purify }}
                     {% if attachments | length %}
                         {% for attachment in attachments %}
@@ -33,6 +34,7 @@
                             </div>
                         {% endfor %}
                     {% endif %}
+                    </article>
                 </section>
             {% endif %}
         </div>
