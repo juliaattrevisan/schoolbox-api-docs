@@ -100,7 +100,10 @@ class QuizSubmission extends SubmissionAbstract
         foreach ($assessmentImpls as $assessmentImpl) {
             // load participants
             $assessmentImpl = $this->loadParticipants($assessmentImpl);
-
+            if (!$assessmentImpl instanceof IAssessable) {
+                continue;
+            }
+            $posted = false;
 
             // get existing marks for this assessment
             $quiz     = $this->quizMapper->findOneByColumn('assessment_id', $assessmentImpl->getId());
@@ -159,11 +162,21 @@ class QuizSubmission extends SubmissionAbstract
                         if (!$feedback) {
                             continue;
                         }
+                        if ($canvasSubmission['posted_at']) {
+                            $posted = true;
+                        }
                         $syncedFeedbackIds[] = $feedback->getId();
                         $syncMarkCount++;
                         $hasMarkToSync = true;
                     }
                 }
+            }
+            if (!$posted) {
+                $this->log->debug("Changed to private");
+                $assessableDataModel = $this->assessmentDataSource->translateToDataModel($assessmentImpl);
+                $quiz = $assessableDataModel->getQuiz();
+                $quiz->setMarkVisibility(IAssessable::MARK_VISIBILITY_PRIVATE);
+                $this->saveModel($this->quizMapper, $quiz, false, false);
             }
             $this->deleteUnSynchronisedFeedbacks($attempts, $syncedFeedbackIds);
         }
@@ -323,6 +336,7 @@ class QuizSubmission extends SubmissionAbstract
                 submission_dim.id as submission_id,
                 submission_dim.published_grade as mark,
                 submission_dim.excused as excused,
+                submission_dim.posted_at as posted_at,
                 quiz_submission_fact.score as norm_mark,
                 quiz_submission_fact.quiz_points_possible as max_mark,
                 CONVERT_TZ(quiz_submission_dim.started_at, 'UTC', :timezone) as started_at,

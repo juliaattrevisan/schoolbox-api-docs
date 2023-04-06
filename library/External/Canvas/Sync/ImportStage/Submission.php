@@ -97,6 +97,7 @@ class Submission extends SubmissionAbstract
             if (!$assessmentImpl instanceof IAssessable) {
                 continue;
             }
+            $posted = false;
 
             // get existing marks for this assessment
             $submissionBox     = $this->submissionBoxMapper->findOneByColumn('assessment_id', $assessmentImpl->getId());
@@ -146,11 +147,22 @@ class Submission extends SubmissionAbstract
                         if (!$feedback) {
                             continue;
                         }
+                        if ($canvasSubmission['posted_at']) {
+                            $posted = true;
+                        }
+
                         $syncedFeedbackIds[] = $feedback->getId();
                         $syncMarkCount++;
                         $hasMarkToSync = true;
                     }
                 }
+            }
+            if (!$posted) {
+                $this->log->debug("Changed to private");
+                $assessableDataModel = $this->assessmentDataSource->translateToDataModel($assessmentImpl);
+                $dueWork = $assessableDataModel->getDueWork();
+                $dueWork->setMarkVisibility(IAssessable::MARK_VISIBILITY_PRIVATE);
+                $this->saveModel($this->submissionBoxMapper, $dueWork, false, false);
             }
             $this->deleteUnSynchronisedFeedbacks($existingFeedbacks, $syncedFeedbackIds);
         }
@@ -290,6 +302,7 @@ class Submission extends SubmissionAbstract
                 submission_dim.id as submission_id,
                 submission_dim.published_grade as mark,
                 submission_dim.excused as excused,
+                submission_dim.posted_at as posted_at,
                 submission_fact.published_score as norm_mark,
                 reviewee.sis_user_id as reviewee_id,
                 submission_dim.grader_id as grader_user_id,
