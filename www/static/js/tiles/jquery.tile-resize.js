@@ -23,7 +23,7 @@
 
                 if (tileWidth === 0) {
                     // Jquery could not calculate tile width, so we cannot calculate font size.
-                    // This happens when the tile has been collapsed (hidden).
+                    // This happens when the tile has been collapsed (when css 'display' is 'none').
                     return null;
                 }
 
