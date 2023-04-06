@@ -29,8 +29,6 @@ if (window.sbProps?.imageLightboxLicenseKey) {
     checkForLightGallery(initLightGallery);
 } else {
     document.addEventListener("DOMContentLoaded", () => {
-        console.log("DOM LOADED")
-        console.log(window.sbProps?.imageLightboxLicenseKey)
         checkForLightGallery(initLightGallery);
     });
 }
