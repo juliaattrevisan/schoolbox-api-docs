@@ -32,6 +32,8 @@
             // Variable size will be zero for collapsed tiles if the default getSize() function is used.
             // The tile size is not actually zero, we just can't measure it if the tile is collapsed.
             // We cannot calculate the new font-size and padding if we do not know the tile size.
+            // To work around this problem, this function should be run also after the tile is expanded.  An event
+            // handler for this purpose is set up in library/Schoolbox/Tile/templates/sub/tile.twig.
             if (size !== 0) {
                 tileTitle.css({
                     fontSize: String(size) + settings.unit,
