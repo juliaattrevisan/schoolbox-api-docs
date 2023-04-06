@@ -1,5 +1,5 @@
 {% set participant = assessable.getParticipantIfExtant(student) %}
-{% if participant %}
+{% if participant and assessable is not lessonPlan %}
     {% set pStatusText %}
         {% apply spaceless %}
             {% if participant.responseRequired %}
@@ -56,4 +56,6 @@
           class="progress-tick no-text tiny {{ pStatusClass }}" title="{{ pTooltip }}"></span>
     <span data-status-label
           data-assessment-status-text>{{ pStatusText }}</span>
+{% else %}
+    <span class="meta">No submissions required</span>
 {% endif %}
