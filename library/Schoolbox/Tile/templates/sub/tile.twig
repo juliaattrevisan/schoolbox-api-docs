@@ -46,7 +46,13 @@
 <script type="text/javascript">
     (function($) {
         const resizeTileTitles = function () {
-            $('#{{ componentId }}-tile-{{ tile.id }}').tileResize({minSize: {{ tile.getTitleTextMinSize()/100 }}, maxSize: {{ tile.getTitleTextMaxSize()/100 }}, unit: 'rem'});
+            $('#{{ componentId }}-tile-{{ tile.id }}').resizeTileTitle(
+                {
+                    minFontSize: {{ tile.getTitleTextMinSize()/100 }},
+                    maxFontSize: {{ tile.getTitleTextMaxSize()/100 }},
+                    unit: 'rem'
+                }
+            );
         };
 
         $(function () {
