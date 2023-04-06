@@ -24,7 +24,6 @@ use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
 
 class Csv extends Base
 {
-
     /**
      * Load all events into schoolbox, generate outcome array
      */
