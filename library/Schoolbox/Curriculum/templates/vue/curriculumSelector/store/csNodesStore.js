@@ -6,6 +6,7 @@ import { defineStore } from "pinia";
 import { UNSET_ID, findById, getBreadcrumbs } from "@schoolboxCurriculum/js/nodeUtils";
 import { useStore, apiEndpoint } from "./curriculumSelectorStore";
 import { useModalViewNodesStore } from "./csModalViewNodesStore";
+import { hasRootNodes, getRootNodes, setRootNodes } from "@schoolboxCurriculum/js/sessionStorage";
 
 export const useNodesStore = defineStore(`csNodes`, {
     state: () => ({
@@ -43,10 +44,38 @@ export const useNodesStore = defineStore(`csNodes`, {
         async load() {
             const store = useStore();
             try {
+                if (hasRootNodes()) {
+                    // if we have the root nodes stored in session storage, load them
+                    this.nodes = getRootNodes();
+                    if (this.hasSingleCurriculum) {
+                        const singleCurriculumId = this.nodes.children[0].id;
+                        const modalViewNodesStore = useModalViewNodesStore();
+                        modalViewNodesStore.setSelected(modalViewNodesStore.currentDepth + 1, singleCurriculumId);
+                    }
+                } else {
+                    console.warn("load remote");
+                    // otherwise load them from the api
+                    await this.loadRemote();
+                }
+            } catch (error) {
+                console.warn(error);
+                store.hasLoadError = true; // show the load error display state
+            } finally {
+                store.isLoading = false; //otherwise show the tree
+            }
+        },
+
+        /**
+         * load in the top level nodes from the api
+         */
+        async loadRemote() {
+            const store = useStore();
+            try {
                 const response = await fetch(`${apiEndpoint}/?topLevelOnly=1&enabled=1&descendants=1&limit=50`);
                 if (response.ok) {
                     const topLevelNodes = await response.json();
                     await this.setTopLevel(topLevelNodes);
+                    setRootNodes(this.nodes); // store the root nodes in session storage
                 } else {
                     console.warn(response);
                     store.hasLoadError = true; //show the load error display state
@@ -54,8 +83,6 @@ export const useNodesStore = defineStore(`csNodes`, {
             } catch (error) {
                 console.warn(error);
                 store.hasLoadError = true; //show the load error display state
-            } finally {
-                store.isLoading = false; //otherwise show the tree
             }
         },
 
@@ -81,6 +108,7 @@ export const useNodesStore = defineStore(`csNodes`, {
                 if (response.ok) {
                     const nodeWithParents = await response.json();
                     await this.loadAllChildren(nodeWithParents);
+                    sessionStorage.setItem(SB_SETTINGS_LIST, JSON.stringify(this.settingsList)); //session storage vars need to be saved as strings only
                 } else {
                     // useStore().hasId = false; // as the id couldn't be found
                     if (this.hasSingleCurriculum) {
