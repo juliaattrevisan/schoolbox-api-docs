@@ -248,7 +248,7 @@ class Csv extends Base
             $event->setStartDateTime($startDatetime);
             $event->setEndDateTime($finishDatetime);
             $event->setTitle($name);
-            $event->setDetail(nl2br(\Scrub::html($detail)));
+            $event->setDetail($detail);
             $event->setLocation($location);
             $event->setAllDay($all_day);
             $event->setType($eventType);
