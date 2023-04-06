@@ -112,13 +112,13 @@
                  */
                 defaultFolderSelector: 0,
 
-                /* To allow multiple file selections
-                 */
-                allowMulti: false,
-
                 /* To traverse directly to a specific folder in the Resources section of the resource modal
                  */
                 fileBrowserCategoryId: 0,
+
+                /* To allow multiple file selections
+                 */
+                allowMulti: false,
 
                 /* Executes before picker modal opens
                  */
