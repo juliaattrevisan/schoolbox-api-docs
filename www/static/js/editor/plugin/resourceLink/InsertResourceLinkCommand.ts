@@ -53,7 +53,7 @@ export default class InsertResourceLinkCommand extends Command {
         $.fn.schoolboxResource({
             allowedFilesystems: "link",
             allowedFiles: null,
-            fileBrowserCategoryId: this.editor.config.sbConfig.fileBrowserCategoryId,
+            fileBrowserCategoryId: this.editor.config.get("sbConfig").fileBrowserCategoryId,
             onModalClosed: () => {
                 // Once the modal is completely closed, the LinkUI can be closed again
                 this.set("isOn", false);
