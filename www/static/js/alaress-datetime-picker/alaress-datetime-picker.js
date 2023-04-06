@@ -5,7 +5,7 @@
     adtp.dayjsFormats = {
         database: "YYYY-MM-DD HH:mm:ss",
         databaseShort: "YYYY-MM-DD",
-        nice: "dddd, MMM D, Y",
+        nice: "dddd, MMM D, YYYY",
     };
 
     // Use global counter in case multiple alaressDateTimePicker() have been called from one page
