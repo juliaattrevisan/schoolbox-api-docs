@@ -60,7 +60,6 @@ export const useNodesStore = defineStore(`csNodes`, {
                         this.loadStored();
                     });
                 } else {
-                    console.warn("load remote");
                     setIsStoringNodes();
                     // otherwise load them from the api
                     await this.loadRemote();
@@ -128,7 +127,6 @@ export const useNodesStore = defineStore(`csNodes`, {
                 if (response.ok) {
                     const nodeWithParents = await response.json();
                     await this.loadAllChildren(nodeWithParents);
-                    sessionStorage.setItem(SB_SETTINGS_LIST, JSON.stringify(this.settingsList)); //session storage vars need to be saved as strings only
                 } else {
                     // useStore().hasId = false; // as the id couldn't be found
                     if (this.hasSingleCurriculum) {
