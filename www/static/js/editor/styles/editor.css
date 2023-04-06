@@ -98,6 +98,53 @@
 }
 
 /**
+ * To display resources being uploaded when they
+ * are dragged and dropped / copy pasted into the editor
+ */
+.sb-ck-resource-upload-container {
+    border: 1px solid var(--ck-color-toolbar-border);
+    border-top-width: 0;
+    min-height: auto;
+    margin-bottom: 1rem;
+    margin-top: -1rem; /* to butt up against the bottom of the editor */
+}
+
+.sb-ck-resource-upload-container__upload {
+    border-bottom: 1px solid var(--body-background);
+    float: none;
+    padding-bottom: 1rem;
+}
+
+.sb-ck-resource-upload-container__upload nav {
+    display: none; /* is shown when there is an error */
+}
+
+/**
+ * When there's an upload error the display changes to
+ * show an error state and provides the user with a way to
+ * close the display.
+ */
+.sb-ck-resource-upload-container__upload[data-has-error] {
+    background-color: #fff8f8;
+}
+
+.sb-ck-resource-upload-container__upload[data-has-error] nav {
+    display: block;
+    position: absolute;
+    right: 0;
+    top: 0.5rem;
+}
+
+.sb-ck-resource-upload-container__upload[data-has-error] nav a,
+.sb-ck-resource-upload-container__upload[data-has-error] p {
+    color: #fa4a47;
+}
+
+.sb-ck-resource-upload-container__upload[data-has-error] .progress {
+    display: none;
+}
+
+/**
  * Our foundation styles does some funky things with
  * checkboxes, hiding the <input> and using the <label>
  * instead, so we need to revert them to a

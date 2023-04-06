@@ -112,6 +112,10 @@
                  */
                 defaultFolderSelector: 0,
 
+                /* To allow multiple file selections
+                 */
+                allowMulti: false,
+
                 /* Executes before picker modal opens
                  */
                 onBeforeOpen: function () {},
@@ -134,7 +138,9 @@
          * @returns {string}
          */
         function getQueryString() {
-            var qString = "multi=0";
+            /* If we're allowing multiple file selections, add the multi=1 querystring param
+             */
+            var qString = `multi=${config.allowMulti ? 1 : 0}`;
 
             /* Didn't specify a mimetype for files; display folders and all files via the empty string
              * Or, if you specified an allowedFiles string, use that as a filter

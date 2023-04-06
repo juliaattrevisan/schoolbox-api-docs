@@ -7,9 +7,10 @@
 import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
 import ResourceUI from "./ResourceUI";
 import ResourceEditing from "./ResourceEditing";
+import AutoResource from "./AutoResource";
 
 export default class Resource extends Plugin {
     static get requires() {
-        return [ResourceUI, ResourceEditing];
+        return [ResourceUI, ResourceEditing, AutoResource];
     }
 }

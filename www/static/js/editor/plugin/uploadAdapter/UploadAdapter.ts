@@ -1,11 +1,10 @@
 /**
  * Our custom CKEditor 5 image uploader, heavily referenced from
  * https://ckeditor.com/docs/ckeditor5/latest/framework/guides/deep-dive/upload-adapter.html
- *
+ * It calls asyncUpload.php and then returns the resource object
  */
 
-import { getURL } from "@js/editor/plugin/resource/resourceUtils";
-import type { EditorConfig } from "@js/editor/types/editorTypes";
+import type { Resource } from "@js/editor/plugin/resource/resourceUtils";
 
 export default class UploadAdapter {
     loader: unknown;
@@ -65,9 +64,14 @@ export default class UploadAdapter {
         if (!response || !response.success) {
             return reject(response && response.error ? response.message : genericErrorText);
         }
-        resolve({
-            default: getURL(response.meta.file._links.image, this.editor.config.sbConfig as EditorConfig),
-        });
+        const resource: Resource = {
+            filesystem: "store",
+            hash: response.meta.file.hash,
+            mime: response.meta.file.mime,
+            name: response.meta.name,
+            type: response.meta.file.type,
+        };
+        resolve(resource);
     }
 
     /**
@@ -80,7 +84,7 @@ export default class UploadAdapter {
     initListeners(resolve: Function, reject: Function, file: File) {
         const genericErrorText = `Couldn't upload file: ${file.name}.`;
         this.xhr.addEventListener("error", () => reject(genericErrorText));
-        this.xhr.addEventListener("abort", () => reject());
+        this.xhr.addEventListener("abort", () => reject("aborted"));
         if (this.xhr.upload) {
             this.xhr.upload.addEventListener("progress", (event: ProgressEvent) => this.onLoading(event));
         }
@@ -89,6 +93,7 @@ export default class UploadAdapter {
 
     /**
      * Prepares the data and sends the request.
+     *
      * @todo - Important note: This is the right place to implement security mechanisms
      * like authentication and CSRF protection. For instance, you can use
      * XMLHttpRequest.setRequestHeader() to set the request headers containing

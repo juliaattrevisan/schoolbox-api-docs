@@ -3,16 +3,21 @@
  */
 
 import Command from "@ckeditor/ckeditor5-core/src/command";
+import type { Editor } from "@ckeditor/ckeditor5-core";
 import { getSrc } from "@js/editor/plugin/resource/resourceUtils";
 import type { Resource } from "@js/editor/plugin/resource/resourceUtils";
 import type { EditorConfig } from "@js/editor/types/editorTypes";
 
 export default class InsertResourceLinkCommand extends Command {
-    editor; // the editor instance
+    messageBinding; // as .bind() returns a new function object, we need to store it in a variable
 
-    constructor(editor) {
+    /**
+     * To open the Resource modal and insert the selected resource into the editor
+     *
+     * @param { Editor } editor - the editor instance
+     */
+    constructor(editor: Editor) {
         super(editor);
-        editor = this.editor;
         // add an isOn property that will be used to determine if the resource modal is open
         // refer to https://github.com/ckeditor/ckeditor5/blob/bfe5a4c8fcbfe4292c51462cf595923d23b554d3/packages/ckeditor5-core/_src/command.js
         this.set("isOn", false);
@@ -24,8 +29,9 @@ export default class InsertResourceLinkCommand extends Command {
     execute() {
         this.set("isOn", true);
         this.displayModal();
-        window.removeEventListener("message", this.onResourceReturned.bind(this));
-        window.addEventListener("message", this.onResourceReturned.bind(this));
+        this.messageBinding = this.onResourceReturned.bind(this);
+        window.removeEventListener("message", this.messageBinding);
+        window.addEventListener("message", this.messageBinding);
     }
 
     /**
@@ -87,7 +93,7 @@ export default class InsertResourceLinkCommand extends Command {
                 },
             });
             const resource = (await response.json()) as Resource;
-            const src = getSrc(resource, this.editor.config.sbConfig as EditorConfig);
+            const src = getSrc(resource, this.editor.config.get("sbConfig") as EditorConfig);
             this.updateLink(src);
         } catch (error) {
             console.error(error);
@@ -115,7 +121,7 @@ export default class InsertResourceLinkCommand extends Command {
                     status = message.data[0].status;
                 }
                 if (status === "success") {
-                    window.removeEventListener("message", this.onResourceReturned);
+                    window.removeEventListener("message", this.messageBinding);
                     this.getResourceInfo(message.data[0].hash as string);
                 } else {
                     // Unknown status: assume error and do nothing, as the modal already shows the error

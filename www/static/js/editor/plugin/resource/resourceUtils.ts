@@ -3,6 +3,8 @@
  */
 
 import type { EditorConfig } from "@js/editor/types/editorTypes";
+import type { Editor } from "@ckeditor/ckeditor5-core";
+import { getWithoutExtension } from "@js/util/fileUtils";
 
 /**
  * Get the url of the resource, and if we have specified a baseHref, to then use that
@@ -37,15 +39,34 @@ export function getExtraAttributes() {
 }
 
 /**
+ * The types of resources that can be returned from the server
+ */
+export enum ResourceType {
+    IMAGE = "image",
+    VIDEO = "video",
+    AUDIO = "audio",
+    FOLDER = "folder",
+    DOCUMENT = "document",
+    MEETING_URL = "meetingUrl",
+    OTHER = "other",
+}
+
+/**
  * The resource object, detailing the options returned from the server
  */
 export type Resource = {
     filesystem: string;
     hash: string;
-    id: string;
     mime: string;
     name: string;
-    type: "image" | "video" | "audio" | "folder";
+    type:
+        | ResourceType.IMAGE
+        | ResourceType.VIDEO
+        | ResourceType.AUDIO
+        | ResourceType.FOLDER
+        | ResourceType.DOCUMENT
+        | ResourceType.OTHER;
+    id?: string;
 };
 
 /**
@@ -70,6 +91,7 @@ function getImageAttributes(resource: Resource, config: EditorConfig) {
     return {
         src: getImageSrc(resource, config),
         alt: resource.name,
+        linkHref: getImageSrc(resource, config),
     };
 }
 
@@ -81,7 +103,7 @@ function getImageAttributes(resource: Resource, config: EditorConfig) {
  * @returns { string } - the video src
  */
 function getVideoSrc(resource: Resource, config: EditorConfig) {
-    return getURL(`/cms/sendVideo.php?id=${resource.id}&type=${resource.filesystem}`, config);
+    return getURL(`/cms/sendVideo.php?id=${resource.hash}&type=${resource.filesystem}`, config);
 }
 
 /**
@@ -93,7 +115,7 @@ function getVideoSrc(resource: Resource, config: EditorConfig) {
  */
 function getVideoThumb(resource: Resource, config: EditorConfig) {
     const filesystemWithReplaces = resource.filesystem.replace("browse", "sbfs").replace("store", "storage");
-    return getURL(`/cms/videoThumb.php?size=poster&id=${resource.id}&type=${filesystemWithReplaces}`, config);
+    return getURL(`/cms/videoThumb.php?size=poster&id=${resource.hash}&type=${filesystemWithReplaces}`, config);
 }
 
 /**
@@ -127,7 +149,7 @@ function getVideoAttributes(resource: Resource, config: EditorConfig) {
  * @returns { string } - the audio src
  */
 function getAudioSrc(resource: Resource, config: EditorConfig) {
-    return getURL(`/cms/sendVideo.php?id=${resource.id}&type=${resource.filesystem}`, config);
+    return getURL(`/cms/sendVideo.php?id=${resource.hash}&type=${resource.filesystem}`, config);
 }
 
 /**
@@ -162,6 +184,40 @@ function getAudioAttributes(resource: Resource, config: EditorConfig) {
         "data-schoolboxresource-width": 64,
         "data-schoolboxresource-height": 64,
         "data-schoolboxresource-fullwidth": "false",
+    };
+}
+
+/**
+ * Get the document attributes
+ *
+ * @param { Resource } resource - the resource
+ * @param { EditorConfig } config - the editor config
+ * @returns { object } - the document attributes
+ */
+function getDocumentAttributes(resource: Resource, config: EditorConfig) {
+    return {
+        src: getURL(`/ajax/mime/${resource.mime}`, config),
+        alt: resource.name,
+        linkHref: getURL(`/storage/fetch.php?hash=${resource.hash}`, config),
+        linkToggleDownloadable: "true",
+        width: "24px",
+    };
+}
+
+/**
+ * Get the other attributes, which is a file type for "other" files...
+ *
+ * @param { Resource } resource - the resource
+ * @param { EditorConfig } config - the editor config
+ * @returns { object } - the document attributes
+ */
+function getOtherAttributes(resource: Resource, config: EditorConfig) {
+    return {
+        src: getURL(`/ajax/mime/${resource.mime}`, config),
+        alt: resource.name,
+        linkHref: getURL(`/storage/fetch.php?hash=${resource.hash}`, config),
+        linkToggleDownloadable: "true",
+        width: "24px",
     };
 }
 
@@ -217,14 +273,20 @@ function getFileSrc(resource: Resource, config: EditorConfig) {
  * @returns { object } - the resource attributes
  */
 export function getAttributes(resource: Resource, config: EditorConfig) {
-    if (resource.type === "image") {
+    if (resource.type === ResourceType.IMAGE) {
         return getImageAttributes(resource, config);
     }
-    if (resource.type === "video") {
+    if (resource.type === ResourceType.VIDEO) {
         return getVideoAttributes(resource, config);
     }
-    if (resource.type === "audio") {
+    if (resource.type === ResourceType.AUDIO) {
         return getAudioAttributes(resource, config);
+    }
+    if (resource.type === ResourceType.DOCUMENT) {
+        return getDocumentAttributes(resource, config);
+    }
+    if (resource.type === ResourceType.OTHER) {
+        return getOtherAttributes(resource, config);
     }
     return {};
 }
@@ -237,16 +299,16 @@ export function getAttributes(resource: Resource, config: EditorConfig) {
  * @returns { object } - the resource attributes
  */
 export function getSrc(resource: Resource, config: EditorConfig) {
-    if (resource.type === "image") {
+    if (resource.type === ResourceType.IMAGE) {
         return getImageSrc(resource, config);
     }
-    if (resource.type === "video") {
-        return getVideoSrc(resource, config);
+    if (resource.type === ResourceType.VIDEO) {
+        return getStorageSrc(resource, config);
     }
-    if (resource.type === "audio") {
-        return getAudioSrc(resource, config);
+    if (resource.type === ResourceType.AUDIO) {
+        return getStorageSrc(resource, config);
     }
-    if (resource.type === "folder") {
+    if (resource.type === ResourceType.FOLDER) {
         return getFolderSrc(resource, config);
     }
     // When you Upload A File via the modal's dropzone
@@ -271,9 +333,35 @@ export function getSrc(resource: Resource, config: EditorConfig) {
     }
     // When you select a Microsoft Teams meeting url
     // normally empty, don't need to touch it
-    if (resource.type === "meetingUrl") {
+    if (resource.type === ResourceType.MEETING_URL) {
         return resource.id;
     }
     // Default assumption (not sure where this manifests anymore, sorry)
     return getFileSrc(resource, config);
+}
+
+/**
+ * Add a resource into the editor
+ *
+ * @param { Editor } editor - the ckeditor instance
+ * @param { Resource } resource - the resource
+ */
+export function addResource(editor: Editor, resource: Resource) {
+    const config = editor.config.get("sbConfig");
+    const imageUtils = editor.plugins.get("ImageUtils");
+    editor.model.change((writer) => {
+        const image = imageUtils.insertImage(
+            getAttributes(resource, config),
+            editor.model.document.selection,
+            "imageInline"
+        );
+        writer.setSelection(image, "after"); // deselect the selected image, otherwise further actions will overwrite it
+        if (resource.type === ResourceType.DOCUMENT || resource.type === ResourceType.OTHER) {
+            // we get without extension for now to avoid a copy/paste issue in ckeditor
+            // pasting with the extension will cause ckeditor to look to embed the file again
+            editor.model.insertContent(
+                writer.createText(`${getWithoutExtension(resource.name)} `, getAttributes(resource, config))
+            );
+        }
+    });
 }

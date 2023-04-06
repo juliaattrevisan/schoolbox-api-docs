@@ -3,7 +3,7 @@
  * uploaded to the server
  */
 
-import UploadAdapter from "@js/editor/plugin/UploadAdapter";
+import UploadAdapter from "@js/editor/plugin/uploadAdapter/UploadAdapter";
 
 /**
  * Add our custom upload adapter
