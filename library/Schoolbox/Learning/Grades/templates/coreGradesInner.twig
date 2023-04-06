@@ -85,6 +85,7 @@
                                     {% include '@learningGrades/fragments/assessmentGrade.twig' with {
                                         assessment:  assessment.assessment,
                                         student:     student,
+                                        includeLessonPlans: false
                                     } only %}
                                     <ul>
                                         {% for projectAssessment in assessment.assessments %}
@@ -92,6 +93,7 @@
                                             {% include '@learningGrades/fragments/assessmentGrade.twig' with {
                                                 assessment:  projectAssessment,
                                                 student:     student,
+                                                includeLessonPlans: false
                                             } only %}
                                         </li>
                                         {% endfor %}
@@ -102,6 +104,7 @@
                                     {% include '@learningGrades/fragments/assessmentGrade.twig' with {
                                         assessment:  assessment.assessment,
                                         student:     student,
+                                        includeLessonPlans: false
                                     } only %}
                                 </li>
                                 {% endif %}

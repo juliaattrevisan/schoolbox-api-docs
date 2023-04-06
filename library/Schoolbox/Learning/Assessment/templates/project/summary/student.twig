@@ -114,7 +114,8 @@
                         {% include '@learningGrades/fragments/assessmentGrade.twig' with {
                             assessment: assessable,
                             student: student,
-                            returnUrlSuffix: returnUrlSuffix
+                            returnUrlSuffix: returnUrlSuffix,
+                            includeLessonPlans: true
                         } only %}
                     </li>
                     {% endfor %}

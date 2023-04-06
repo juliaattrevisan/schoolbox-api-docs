@@ -4,6 +4,11 @@
  # Params:
  # * assessment:  IAssessable - The assessment object
  # * student:     User        - The user record for the student
+ #
+ # @param bool $includeLessonPlans  Decide whether to include lesson plans in this fragment.
+ # This fragment is shared among the Grades page (where Lesson Plans are hidden) and the Project
+ # Summary screen, where Lesson Plans are visible. These usages are mutually exclusive though
+ # they share the same twig template, necessitating this arbitrary bool
  #}
 {% import '@learning/macro/dueDate.twig' as dueDate %}
 {% import '@learning/macro/urgency.twig' as urgency %}
@@ -14,7 +19,7 @@
 {# Lesson Plans do not appear in the Grades page
  # cos nothing to do about Responses or Feedbacks
  #}
-{% if assessment is not lessonPlan %}
+{% if includeLessonPlans or assessment is not lessonPlan %}
     <div class="flex-grade">
         <div class="small-12 card columns">
             {% set summaryRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {
