@@ -80,7 +80,7 @@ export default class ResourceEditing extends Plugin {
         } catch (error) {
             resourceUI.showUploadErrorElement(
                 uploadElement,
-                "Sorry, the file could not be upload as an unknown error has occurred."
+                "Sorry, the file could not be uploaded as an unknown error has occurred."
             );
             const remove = uploadElement.querySelector("[data-remove-upload]");
             remove.addEventListener("click", () => this.removeUploadProgress(uploadElement));
