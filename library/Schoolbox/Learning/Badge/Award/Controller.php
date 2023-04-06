@@ -22,6 +22,7 @@ use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Badge\Award\Model as AwardModel;
 use Schoolbox\Learning\Badge\Mapper as BadgeMapper;
@@ -95,7 +96,8 @@ class Controller extends Base
         Filter\IFactoryFactory $filterFactoryFactory,
         Filter\Mapper $filterMapper,
         Filter\Selection\Mapper $filterSelectionMapper,
-        UserMapper $userMapper
+        UserMapper $userMapper,
+        private RosettaStone $l10n,
     ) {
         $this->badgeMapper           = $badgeMapper;
         $this->mapper                = $mapper;
@@ -645,7 +647,8 @@ class Controller extends Base
 
         /* For now, just search for student recipients
          */
-        $users = $this->mapper->findRecipients($keyword, $badge, AwardModel::AWARD_STATUS_ACHIEVEMENT, Role::STUDENT);
+        $yearPrefix = $this->l10n->translate('year', false, true);
+        $users = $this->mapper->findRecipients($keyword, $badge, AwardModel::AWARD_STATUS_ACHIEVEMENT, Role::STUDENT, $yearPrefix);
 
         $this->response->content->set($this->buildJsonOutput($users));
     }
@@ -667,7 +670,8 @@ class Controller extends Base
 
         /* For now, just search for student recipients
          */
-        $users = $this->mapper->findRecipients($keyword, $badge, AwardModel::AWARD_STATUS_GOAL, Role::STUDENT);
+        $yearPrefix = $this->l10n->translate('year', false, true);
+        $users = $this->mapper->findRecipients($keyword, $badge, AwardModel::AWARD_STATUS_GOAL, Role::STUDENT, $yearPrefix);
 
         $this->response->content->set($this->buildJsonOutput($users));
     }

@@ -421,6 +421,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(FilterMapper::class),
             $this->getMapperFactory()->get(FilterSelectionMapper::class),
             $this->getMapperFactory()->get(UserMapper::class),
+            $this->injector->get('l10n'),
         );
     }
 }

@@ -51,7 +51,7 @@ class Renderer extends Handler
     private function getLongName(string $yearName): string
     {
         if (preg_match('/^[0-9]+$/', $yearName)) {
-            return "Year {$yearName}";
+            return sprintf("%s %s", $this->getPage()->getLocalisedTerm('year', false, true), $yearName);
         }
 
         return $yearName;
