@@ -29,7 +29,7 @@
             {% for record in results %}
                 <section>
                     <ul class="information-list threaded">
-                        <li class="pastoral-incident">
+                        <li>
                             <div class="small-12 card wrap-down">
                                 {# Theres no need for the all the twig access checks like the list page, if the user got to this screen they can view everything #}
                                 <a href="{{ profile.link(record.student) }}">
@@ -60,8 +60,7 @@
                             </div>
 
                             {# Show article body #}
-                            <div class="content">
-                                <article>
+                            <article>
                                 {% if record.bodyPublic is not empty %}
                                     {{ record.bodyPublic | purify }}
                                 {% endif %}
@@ -82,8 +81,8 @@
                                         {% if record.tags | length > 0 %}
                                             {% for tag in record.tags %}
                                                 <a class="neutral label hide-on-print"
-                                                   href="{{ routeLookup('pastoralReportBuilder.getReportTags', {tagId: tag.id}) }}"
-                                                   class="neutral label">
+                                                    href="{{ routeLookup('pastoralReportBuilder.getReportTags', {tagId: tag.id}) }}"
+                                                    class="neutral label">
                                                     {{ tag.name }}
                                                 </a>
                                                 <b class="show-for-print"> {{ tag.name }}</b>
@@ -91,8 +90,7 @@
                                         {% endif %}
                                     </p>
                                 {% endif %}
-                                </article>
-                            </div>
+                            </article>
 
                             {% if record.comments | length %}
 

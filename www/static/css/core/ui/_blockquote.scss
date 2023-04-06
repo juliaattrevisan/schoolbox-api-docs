@@ -77,6 +77,14 @@ blockquote {
     }
 }
 
+/* Make last child in quote block not have bottom margin */
+blockquote > p:last-child,
+blockquote > figure:last-child,
+blockquote > img:last-child,
+blockquote > table:last-child {
+    margin-bottom: 0;
+}
+
 @media #{$small-only} {
     blockquote {
         padding-left: 1rem !important;
