@@ -13,7 +13,7 @@ import {
     getStoredNodes,
     setStoredNodes,
     NODES_STORED,
-} from "@schoolboxCurriculum/js/sessionStorage";
+} from "@schoolboxCurriculum/js/globalStorage";
 
 export const useNodesStore = defineStore(`csNodes`, {
     state: () => ({

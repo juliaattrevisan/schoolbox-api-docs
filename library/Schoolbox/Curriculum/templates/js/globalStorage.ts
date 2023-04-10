@@ -1,5 +1,5 @@
 /**
- * Save the root nodes of the curriculum in session storage
+ * Save the root nodes of the curriculum in global storage
  */
 
 import type { Node } from "@schoolboxCurriculum/types/Node";
@@ -7,25 +7,25 @@ import type { Node } from "@schoolboxCurriculum/types/Node";
 export const NODES_STORED = "sb_rootNodesStored";
 
 /**
- * check if the nodes are in the session storage
+ * check if the nodes are in the global storage
  *
- * @returns { boolean } - true if the nodes are in the session storage
+ * @returns { boolean } - true if the nodes are in the global storage
  */
 export function hasStoredNodes() {
     return window.sbProps.storedNodes;
 }
 
 /**
- * check if the nodes are being stored in the session storage
+ * check if the nodes are being stored in the global storage
  *
- * @returns { boolean } - true if the nodes are being stored in the session storage
+ * @returns { boolean } - true if the nodes are being stored in the global storage
  */
 export function isStoringNodes() {
     return window.sbProps.isStoringNodes;
 }
 
 /**
- * Set the nodes are being stored in the session storage
+ * Set the nodes are being stored in the global storage
  */
 export function setIsStoringNodes() {
     window.sbProps.isStoringNodes = true;
