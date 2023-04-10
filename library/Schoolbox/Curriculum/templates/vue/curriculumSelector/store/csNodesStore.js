@@ -52,7 +52,7 @@ export const useNodesStore = defineStore(`csNodes`, {
             const store = useStore();
             try {
                 if (hasStoredNodes()) {
-                    // if we have the root nodes stored in session storage, load them
+                    // if we have the root nodes stored in global storage, load them
                     this.loadStored();
                 } else if (isStoringNodes()) {
                     // if we've already requested the root nodes, don't request them again
@@ -73,7 +73,7 @@ export const useNodesStore = defineStore(`csNodes`, {
         },
 
         /**
-         * load in the top level nodes from the session storage
+         * load in the top level nodes from the global storage
          */
         async loadStored() {
             this.nodes = getStoredNodes();
@@ -94,7 +94,7 @@ export const useNodesStore = defineStore(`csNodes`, {
                 if (response.ok) {
                     const topLevelNodes = await response.json();
                     await this.setTopLevel(topLevelNodes);
-                    setStoredNodes(this.nodes); // store the root nodes in session storage
+                    setStoredNodes(this.nodes); // store the root nodes in global storage
                 } else {
                     console.warn(response);
                     store.hasLoadError = true; //show the load error display state
@@ -182,7 +182,7 @@ export const useNodesStore = defineStore(`csNodes`, {
 
         /**
          * set the top level nodes, passed through either from loading or
-         * the already stored session storage
+         * the already stored global storage
          *
          * @param { object }
          */
