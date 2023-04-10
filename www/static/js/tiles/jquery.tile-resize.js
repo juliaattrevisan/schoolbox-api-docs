@@ -17,7 +17,10 @@
         const defaults = {
             minFontSize: 1,
             maxFontSize: 6,
-            unit: "em",
+            unit: "rem",
+            /**
+             * Override this function if you want the font size in a unit other than 'rem'.
+             */
             getFontSize: function (tile, settings) {
                 const tileWidth = tile.width();
 
@@ -27,7 +30,7 @@
                     return null;
                 }
 
-                return tileWidth / 120;
+                return tileWidth / 120; // Units 'rem'.
             },
             titleSelector: ".title",
         };
@@ -35,12 +38,10 @@
         $(this).each(function () {
             const tile = $(this);
             const tileTitle = tile.find(settings.titleSelector);
-            const fontSize = Math.max(
-                settings.minFontSize,
-                Math.min(settings.getFontSize(tile, settings), settings.maxFontSize)
-            );
 
-            if (fontSize === null) {
+            let newFontSize = settings.getFontSize(tile, settings);
+
+            if (newFontSize === null) {
                 // If we could not calculate the fontSize, there is nothing more we can do.
                 // To work around the problem of the fontSize not being calculable when the tile is collapsed, this
                 // function should be run when the tile is no longer hidden (after the expand event).
@@ -48,18 +49,26 @@
                 return;
             }
 
+            if (newFontSize < settings.minFontSize) {
+                newFontSize = settings.minFontSize;
+            }
+
+            if (newFontSize > settings.maxFontSize) {
+                newFontSize = settings.maxFontSize;
+            }
+
             tileTitle.css({
-                fontSize: String(fontSize) + settings.unit,
+                fontSize: String(newFontSize) + settings.unit,
                 padding: String(fontSize / 4) + settings.unit,
             });
 
             // If the title is taller than the tile:
             // reduce the tile's top and bottom padding so it fits.
-            var titleHeight = tileTitle.outerHeight();
-            var tileHeight = tile.outerHeight();
+            const titleHeight = tileTitle.outerHeight();
+            const tileHeight = tile.outerHeight();
             if (titleHeight > tileHeight) {
-                var heightDifference = tileHeight - tileTitle.height();
-                var newPadding = String(heightDifference / 2) + "px";
+                const heightDifference = tileHeight - tileTitle.height();
+                const newPadding = String(heightDifference / 2) + "px";
                 tileTitle.css({
                     paddingTop: newPadding,
                     paddingBottom: newPadding,
