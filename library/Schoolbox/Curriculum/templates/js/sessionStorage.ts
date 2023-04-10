@@ -14,7 +14,7 @@ export const NODES_STORED = "sb_rootNodesStored";
  * @returns { boolean } - true if the nodes are in the session storage
  */
 export function hasStoredNodes() {
-    return window.sessionStorage.getItem(SB_NODES);
+    return window.sbProps.storedNodes;
 }
 
 /**
@@ -23,14 +23,14 @@ export function hasStoredNodes() {
  * @returns { boolean } - true if the nodes are being stored in the session storage
  */
 export function isStoringNodes() {
-    return window.sessionStorage.getItem(SB_IS_STORING_NODES);
+    return window.sbProps.isStoringNodes;
 }
 
 /**
  * Set the nodes are being stored in the session storage
  */
 export function setIsStoringNodes() {
-    window.sessionStorage.setItem(SB_IS_STORING_NODES, "true");
+    window.sbProps.isStoringNodes = true;
 }
 
 /**
@@ -39,8 +39,7 @@ export function setIsStoringNodes() {
  * @returns { JSON } - the root nodes of the curriculum
  */
 export function getStoredNodes() {
-    const nodes = window.sessionStorage.getItem(SB_NODES);
-    return JSON.parse(nodes as string) as Node[]; // convert the saved string var back to JSON
+    return window.sbProps.storedNodes;
 }
 
 /**
@@ -49,7 +48,7 @@ export function getStoredNodes() {
  * @param { Node[] } nodes - the root nodes of the curriculum
  */
 export function setStoredNodes(nodes: Node[]) {
-    window.sessionStorage.setItem(SB_NODES, JSON.stringify(nodes));
+    window.sbProps.storedNodes = nodes;
     document.dispatchEvent(new Event(NODES_STORED));
 }
 
