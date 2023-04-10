@@ -4,8 +4,6 @@
 
 import type { Node } from "@schoolboxCurriculum/types/Node";
 
-const SB_NODES = "sb_rootNodes";
-const SB_IS_STORING_NODES = "sb_isStoringRootNodes";
 export const NODES_STORED = "sb_rootNodesStored";
 
 /**
@@ -50,12 +48,4 @@ export function getStoredNodes() {
 export function setStoredNodes(nodes: Node[]) {
     window.sbProps.storedNodes = nodes;
     document.dispatchEvent(new Event(NODES_STORED));
-}
-
-/**
- * Remove the root curriculum nodes
- */
-export function removeStoredNodes() {
-    window.sessionStorage.removeItem(SB_NODES);
-    window.sessionStorage.removeItem(SB_IS_STORING_NODES);
 }
