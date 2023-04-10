@@ -6,7 +6,6 @@ import { ref } from "vue";
 import { defineStore } from "pinia";
 import { useActiveNodeStore } from "@schoolboxCurriculum/vue/manageCurriculum/activeNode/store/mcActiveNodeStore";
 import type { Node, NodeToUpdate } from "@schoolboxCurriculum/types/Node";
-import { removeStoredNodes } from "@schoolboxCurriculum/js/sessionStorage";
 
 /**
  * Create a copy so the data is only updated once actually saved
@@ -77,7 +76,6 @@ export const useUpdateNodeStore = defineStore("mcUpdateNode", () => {
             const responseJson: Node = (await response.json()) as Node;
             if (response.ok) {
                 activeNodeStore.update(activeNodeCopy.value);
-                removeStoredNodes();
                 isProcessing.value = false;
                 cancel();
                 return { id: activeNodeStore.node.id, message: "Node successfully updated" };

@@ -8,7 +8,6 @@ import { useStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/manage
 import { useNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/mcNodesStore";
 import { useViewNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/viewNodes/store/mcViewNodesStore";
 import type { Node } from "@schoolboxCurriculum/types/Node";
-import { removeStoredNodes } from "@schoolboxCurriculum/js/sessionStorage";
 
 const UNSET_ID = -1;
 
@@ -80,7 +79,6 @@ export const useAddCurriculumStore = defineStore("mcAddCurriculum", () => {
                 const nodesStore = useNodesStore();
                 nodesStore.addNewCurriculum(newCurriculum);
                 useViewNodesStore().setSelected(0);
-                removeStoredNodes();
                 isProcessing.value = false;
                 cancel();
                 return { id: newCurriculum.id, message: "Curriculum successfully added" };

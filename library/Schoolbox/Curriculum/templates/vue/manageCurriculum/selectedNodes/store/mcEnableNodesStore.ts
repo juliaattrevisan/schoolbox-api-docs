@@ -5,7 +5,6 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
 import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/selectedNodes/store/mcSelectedNodesStore";
-import { removeStoredNodes } from "@schoolboxCurriculum/js/sessionStorage";
 
 export const useEnableNodesStore = defineStore("mcEnableNodes", () => {
     const isProcessing = ref(false);
@@ -82,7 +81,6 @@ export const useEnableNodesStore = defineStore("mcEnableNodes", () => {
                 const successMessage = getSuccessMessage();
                 useSelectedNodesStore().enableNodes();
                 isProcessing.value = false;
-                removeStoredNodes();
                 cancel();
                 return successMessage;
             }
