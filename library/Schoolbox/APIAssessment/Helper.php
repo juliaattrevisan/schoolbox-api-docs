@@ -390,23 +390,23 @@ WHERE
             `participant`.`synergy_id`     as `participant_external_id`
         ';
         $reviewerFields    = '
-            `reviewer`.`id`               as `reviewer_id`,
-            `reviewer`.`title`            as `reviewer_title`,
-            `reviewer`.`firstname`        as `reviewer_first_name`,
-            `reviewer`.`preferred_name`   as `reviewer_preferred_name`,
-            `reviewer`.`lastname`         as `reviewer_last_name`,
-            `reviewer`.`synergy_id`       as `reviewer_external_id`
+            `reviewer`.`id`             as `reviewer_id`,
+            `reviewer`.`title`          as `reviewer_title`,
+            `reviewer`.`firstname`      as `reviewer_first_name`,
+            `reviewer`.`preferred_name` as `reviewer_preferred_name`,
+            `reviewer`.`lastname`       as `reviewer_last_name`,
+            `reviewer`.`synergy_id`     as `reviewer_external_id`
         ';
         $feedbackQueries = [
             <<<DUEWORK
             select
-                `sb`.`assessment_id`       AS `assessment_id`,
-                'submission_return'        AS `feedback_table`,
-                max(`sr1`.`id`)            AS `feedback_id`,
-                `sr1`.`published_at`       AS `completion_date`,
-                `sr1`.`comment`            AS `comment`,
-                `sr1`.`mark`               AS `mark`,
-                `sr1`.`norm_mark`          AS `norm_mark`,
+                `sb`.`assessment_id` AS `assessment_id`,
+                'submission_return'  AS `feedback_table`,
+                max(`sr1`.`id`)      AS `feedback_id`,
+                `sr1`.`published_at` AS `completion_date`,
+                `sr1`.`comment`      AS `comment`,
+                `sr1`.`mark`         AS `mark`,
+                `sr1`.`norm_mark`    AS `norm_mark`,
                 $participantFields,
                 $reviewerFields
             from (
@@ -419,8 +419,8 @@ WHERE
                     and `sr2`.`deleted_at` is null
                     and `sr1`.`published_at` < `sr2`.`published_at`
                 )
-                LEFT JOIN `user` `participant` on `sr1`.`owner` = `participant`.`id`
-                LEFT JOIN `user` `reviewer` on `sr1`.`marker` = `reviewer`.`id`
+                LEFT JOIN `user` `participant` on `sr1`.`owner`  = `participant`.`id`
+                LEFT JOIN `user` `reviewer`    on `sr1`.`marker` = `reviewer`.`id`
             )
             where `sr1`.`published_at` is not null
               and `sr1`.`deleted_at` is null
@@ -431,13 +431,13 @@ WHERE
             DUEWORK,
             <<<QUIZ
             select
-                `ass`.`assessment_id`   AS `assessment_id`,
-                'assess_attempt'        AS `feedback_table`,
-                max(`aa1`.`attempt_id`) AS `feedback_id`,
-                `aa1`.`reviewed_at`     AS `completion_date`,
-                null                    AS `comment`,
-                `aa1`.`mark`            AS `mark`,
-                (`aa1`.`mark` / `aa1`.`max_mark` * 100)    AS `norm_mark`,
+                `ass`.`assessment_id`                   AS `assessment_id`,
+                'assess_attempt'                        AS `feedback_table`,
+                max(`aa1`.`attempt_id`)                 AS `feedback_id`,
+                `aa1`.`reviewed_at`                     AS `completion_date`,
+                null                                    AS `comment`,
+                `aa1`.`mark`                            AS `mark`,
+                (`aa1`.`mark` / `aa1`.`max_mark` * 100) AS `norm_mark`,
                 $participantFields,
                 $reviewerFields
             from (
@@ -449,8 +449,8 @@ WHERE
                     and `aa2`.`deleted_at` is null
                     and `aa1`.`reviewed_at` < `aa2`.`reviewed_at`
                 )
-                LEFT JOIN `user` `participant` on `aa1`.`user_id` = `participant`.`id`
-                LEFT JOIN `user` `reviewer` on `aa1`.`reviewer_id` = `reviewer`.`id`
+                LEFT JOIN `user` `participant` on `aa1`.`user_id`     = `participant`.`id`
+                LEFT JOIN `user` `reviewer`    on `aa1`.`reviewer_id` = `reviewer`.`id`
             )
             where `aa1`.`reviewed_at` is not null
               and `aa1`.`deleted_at` is null
@@ -479,8 +479,8 @@ WHERE
                     and `tc2`.`deleted_at` is null
                     and `tc1`.`completion_date` < `tc2`.`completion_date`
                 )
-                LEFT JOIN `user` `participant` on `tc1`.`student_id` = `participant`.`id`
-                LEFT JOIN `user` `reviewer` on `tc1`.`marking_user_id` = `reviewer`.`id`
+                LEFT JOIN `user` `participant` on `tc1`.`student_id`      = `participant`.`id`
+                LEFT JOIN `user` `reviewer`    on `tc1`.`marking_user_id` = `reviewer`.`id`
             )
             where `tc1`.`completion_date` is not null
               and `tc1`.`deleted_at` is null
@@ -491,13 +491,13 @@ WHERE
             TASK,
             <<<LTI
             select
-                `la`.`assessment_id`   AS `assessment_id`,
-                'lti_assessment_score' AS `feedback_table`,
-                max(`sc1`.`id`)        AS `feedback_id`,
-                `sc1`.`created_at`     AS `completion_date`,
-                `sc1`.`comment`        AS `comment`,
-                `sc1`.`score_given`            AS `mark`,
-                (`sc1`.`score_given` / `sc1`.`score_maximum` * 100)    AS `norm_mark`,
+                `la`.`assessment_id`                                AS `assessment_id`,
+                'lti_assessment_score'                              AS `feedback_table`,
+                max(`sc1`.`id`)                                     AS `feedback_id`,
+                `sc1`.`created_at`                                  AS `completion_date`,
+                `sc1`.`comment`                                     AS `comment`,
+                `sc1`.`score_given`                                 AS `mark`,
+                (`sc1`.`score_given` / `sc1`.`score_maximum` * 100) AS `norm_mark`,
                 $participantFields,
                 $reviewerFields
             from (
@@ -507,8 +507,8 @@ WHERE
                     and `sc1`.`student_id` = `sc2`.`student_id`
                     and `sc2`.`deleted_at` is null
                     and `sc1`.`created_at` < `sc2`.`created_at`)
-                LEFT JOIN `user` `participant` on `sc1`.`student_id` = `participant`.`id`
-                LEFT JOIN `user` `reviewer` on `sc1`.`marking_user_id` = `reviewer`.`id`
+                LEFT JOIN `user` `participant` on `sc1`.`student_id`      = `participant`.`id`
+                LEFT JOIN `user` `reviewer`    on `sc1`.`marking_user_id` = `reviewer`.`id`
             )
             where `sc1`.`deleted_at` is null
               and `sc1`.`is_feedback` = 1
@@ -583,23 +583,23 @@ WHERE
         //     {`standard files object`}
         // ]
         $submitterFields    = '
-            `submitter`.`id`               as `submitter_id`,
-            `submitter`.`title`            as `submitter_title`,
-            `submitter`.`firstname`        as `submitter_first_name`,
-            `submitter`.`preferred_name`   as `submitter_preferred_name`,
-            `submitter`.`lastname`         as `submitter_last_name`,
-            `submitter`.`synergy_id`       as `submitter_external_id`
+            `submitter`.`id`             as `submitter_id`,
+            `submitter`.`title`          as `submitter_title`,
+            `submitter`.`firstname`      as `submitter_first_name`,
+            `submitter`.`preferred_name` as `submitter_preferred_name`,
+            `submitter`.`lastname`       as `submitter_last_name`,
+            `submitter`.`synergy_id`     as `submitter_external_id`
         ';
         $responseQueries = [
             <<<DUEWORK
             select
-                `sb`.`assessment_id`       AS `assessment_id`,
-                'student_submission'       AS `response_table`,
-                max(ss1.`id`)              AS `response_id`,
-                ss1.`submitted_at`         AS `completion_date`,
-                null                       AS `comment`,
-                null                       AS `mark`,
-                null                       AS `norm_mark`,
+                `sb`.`assessment_id` AS `assessment_id`,
+                'student_submission' AS `response_table`,
+                max(ss1.`id`)        AS `response_id`,
+                ss1.`submitted_at`   AS `completion_date`,
+                null                 AS `comment`,
+                null                 AS `mark`,
+                null                 AS `norm_mark`,
                 $participantFields,
                 $submitterFields
             from (
@@ -611,8 +611,8 @@ WHERE
                     and ss2.`deleted_at` is null
                     and ss1.`submitted_at` < ss2.`submitted_at`
                 )
-                LEFT JOIN `user` `participant` on ss1.`owner` = `participant`.`id`
-                LEFT JOIN `user` `submitter` on ss1.`submitted_by` = `submitter`.`id`
+                LEFT JOIN `user` `participant` on ss1.`owner`        = `participant`.`id`
+                LEFT JOIN `user` `submitter`   on ss1.`submitted_by` = `submitter`.`id`
             )
             where ss1.`submitted_at` is not null
               and ss1.`deleted_at` is null
@@ -622,13 +622,13 @@ WHERE
             DUEWORK,
             <<<QUIZ
             select
-                `ass`.`assessment_id`   AS `assessment_id`,
-                'assess_attempt'        AS `response_table`,
-                max(`aa1`.`attempt_id`) AS `response_id`,
-                `aa1`.`finish`          AS `completion_date`,
-                null                    AS `comment`,
-                `aa1`.`mark`            AS `mark`,
-                (`aa1`.`mark` / `aa1`.`max_mark` * 100)    AS `norm_mark`,
+                `ass`.`assessment_id`                   AS `assessment_id`,
+                'assess_attempt'                        AS `response_table`,
+                max(`aa1`.`attempt_id`)                 AS `response_id`,
+                `aa1`.`finish`                          AS `completion_date`,
+                null                                    AS `comment`,
+                `aa1`.`mark`                            AS `mark`,
+                (`aa1`.`mark` / `aa1`.`max_mark` * 100) AS `norm_mark`,
                 $participantFields,
                 $submitterFields
             from (
@@ -640,8 +640,8 @@ WHERE
                     and `aa2`.`deleted_at` is null
                     and `aa1`.`finish` < `aa2`.`finish`
                 )
-                LEFT JOIN `user` `participant` on `aa1`.`user_id` = `participant`.`id`
-                LEFT JOIN `user` `submitter` on `aa1`.`reviewer_id` = `submitter`.`id`
+                LEFT JOIN `user` `participant` on `aa1`.`user_id`     = `participant`.`id`
+                LEFT JOIN `user` `submitter`   on `aa1`.`reviewer_id` = `submitter`.`id`
             )
             where `aa1`.`finish` is not null
               and `aa1`.`deleted_at` is null
@@ -670,8 +670,8 @@ WHERE
                     and `tc2`.`deleted_at` is null
                     and `tc1`.`completion_date` < `tc2`.`completion_date`
                 )
-                LEFT JOIN `user` `participant` on `tc1`.`student_id` = `participant`.`id`
-                LEFT JOIN `user` `submitter` on `tc1`.`marking_user_id` = `submitter`.`id`
+                LEFT JOIN `user` `participant` on `tc1`.`student_id`      = `participant`.`id`
+                LEFT JOIN `user` `submitter`   on `tc1`.`marking_user_id` = `submitter`.`id`
             )
             where `tc1`.`completion_date` is not null
               and `tc1`.`deleted_at` is null
@@ -682,13 +682,13 @@ WHERE
             TASK,
             <<<LTI
             select
-                `la`.`assessment_id`   AS `assessment_id`,
-                'lti_assessment_score' AS `response_table`,
-                max(`sc1`.`id`)        AS `response_id`,
-                `sc1`.`created_at`     AS `completion_date`,
-                `sc1`.`comment`        AS `comment`,
-                `sc1`.`score_given`            AS `mark`,
-                (`sc1`.`score_given` / `sc1`.`score_maximum` * 100)    AS `norm_mark`,
+                `la`.`assessment_id`                                AS `assessment_id`,
+                'lti_assessment_score'                              AS `response_table`,
+                max(`sc1`.`id`)                                     AS `response_id`,
+                `sc1`.`created_at`                                  AS `completion_date`,
+                `sc1`.`comment`                                     AS `comment`,
+                `sc1`.`score_given`                                 AS `mark`,
+                (`sc1`.`score_given` / `sc1`.`score_maximum` * 100) AS `norm_mark`,
                 $participantFields,
                 $submitterFields
             from (
@@ -698,8 +698,8 @@ WHERE
                     and `sc1`.`student_id` = `sc2`.`student_id`
                     and `sc2`.`deleted_at` is null
                     and `sc1`.`created_at` < `sc2`.`created_at`)
-                LEFT JOIN `user` `participant` on `sc1`.`student_id` = `participant`.`id`
-                LEFT JOIN `user` `submitter` on `sc1`.`marking_user_id` = `submitter`.`id`
+                LEFT JOIN `user` `participant` on `sc1`.`student_id`      = `participant`.`id`
+                LEFT JOIN `user` `submitter`   on `sc1`.`marking_user_id` = `submitter`.`id`
             )
             where `sc1`.`deleted_at` is null
               and `sc1`.`is_feedback` = 1
