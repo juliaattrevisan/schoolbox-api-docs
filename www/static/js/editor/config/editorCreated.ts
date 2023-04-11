@@ -64,14 +64,31 @@ async function addIframelyEmbed(config: EditorConfig, editor: Editor) {
             await injectScript(script);
         }
         /**
+         * Track copy/paste to add an extra undo step if the link fails to unfurl
+         */
+        let isCopied = false;
+        editor.editing.view.document.on("clipboardInput", (event, data) => {
+            isCopied = true;
+        });
+        /**
          * If the link fails to unfurl and be presented in the editor as an embed,
          * we should pull out the embed attempt and just add a link to the failed url instead
          * See https://iframely.com/docs/embedjs - "Act when unfurling fails" for further details
          * We can use the undo tool to undo the embed action
          */
         window.iframely.on("cancel", (url: string) => {
-            editor.execute("undo");
-            editor.execute("link", url);
+            // there can be multiple editors on a page, so need to ensure we have the right editor, as each will listen for the dispatch event
+            if (editor.editing.view.hasDomSelection) {
+                // the first undo removed the media embed
+                editor.execute("undo");
+                // and if copy/paste undo again removes the copied text added to the editor
+                if (isCopied) {
+                    editor.execute("undo");
+                    isCopied = false;
+                }
+                // and finally add the link
+                editor.execute("link", url);
+            }
         });
     }
 }
