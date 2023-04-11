@@ -219,7 +219,7 @@ class RecogniseCacheKeyTest extends TestCase
             'constrain64',
             'constrain128',
             'constrain200',
-            'profile',
+            'constrain500',
             'rectangle',
         ];
         $data  = [];
