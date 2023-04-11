@@ -390,12 +390,12 @@ WHERE
             `participant`.`synergy_id`     as `participantExternalId`
         ';
         $creatorFields     = '
-            `staff`.`id`               as `staffId`,
-            `staff`.`title`            as `staffTitle`,
-            `staff`.`firstname`        as `staffFirstname`,
-            `staff`.`preferred_name`   as `staffPreferredName`,
-            `staff`.`lastname`         as `staffLastname`,
-            `staff`.`synergy_id`       as `staffExternalId`
+            `creator`.`id`               as `creatorId`,
+            `creator`.`title`            as `creatorTitle`,
+            `creator`.`firstname`        as `creatorFirstname`,
+            `creator`.`preferred_name`   as `creatorPreferredName`,
+            `creator`.`lastname`         as `creatorLastname`,
+            `creator`.`synergy_id`       as `creatorExternalId`
         ';
         $feedbackQueries = [
             <<<DUEWORK
@@ -421,7 +421,7 @@ WHERE
                     and `sr1`.`published_at` < `sr2`.`published_at`
                 )
                 LEFT JOIN `user` `participant` on `sr1`.`owner` = `participant`.`id`
-                LEFT JOIN `user` `staff` on `sr1`.`marker` = `staff`.`id`
+                LEFT JOIN `user` `creator` on `sr1`.`marker` = `creator`.`id`
             )
             where `sr1`.`published_at` is not null
               and `sr1`.`deleted_at` is null
@@ -452,7 +452,7 @@ WHERE
                     and `aa1`.`reviewed_at` < `aa2`.`reviewed_at`
                 )
                 LEFT JOIN `user` `participant` on `aa1`.`user_id` = `participant`.`id`
-                LEFT JOIN `user` `staff` on `aa1`.`reviewer_id` = `staff`.`id`
+                LEFT JOIN `user` `creator` on `aa1`.`reviewer_id` = `creator`.`id`
             )
             where `aa1`.`reviewed_at` is not null
               and `aa1`.`deleted_at` is null
@@ -483,7 +483,7 @@ WHERE
                     and `tc1`.`completion_date` < `tc2`.`completion_date`
                 )
                 LEFT JOIN `user` `participant` on `tc1`.`student_id` = `participant`.`id`
-                LEFT JOIN `user` `staff` on `tc1`.`marking_user_id` = `staff`.`id`
+                LEFT JOIN `user` `creator` on `tc1`.`marking_user_id` = `creator`.`id`
             )
             where `tc1`.`completion_date` is not null
               and `tc1`.`deleted_at` is null
@@ -512,7 +512,7 @@ WHERE
                     and `sc2`.`deleted_at` is null
                     and `sc1`.`created_at` < `sc2`.`created_at`)
                 LEFT JOIN `user` `participant` on `sc1`.`student_id` = `participant`.`id`
-                LEFT JOIN `user` `staff` on `sc1`.`marking_user_id` = `staff`.`id`
+                LEFT JOIN `user` `creator` on `sc1`.`marking_user_id` = `creator`.`id`
             )
             where `sc1`.`deleted_at` is null
               and `sc1`.`is_feedback` = 1
@@ -542,12 +542,12 @@ WHERE
                 'comment'        => $row['comment'],
                 'date'           => (new \Alaress_Date_Format($row['completionDate'], \Alaress_Date_Format::DATABASE_FORMAT))->toIso8601String(),
                 'instructor'     => [
-                    'id'            => $row['staffId'],
-                    'title'         => $row['staffTitle'],
-                    'firstName'     => $row['staffFirstname'],
-                    'preferredName' => $row['staffPreferredName'],
-                    'lastName'      => $row['staffLastname'],
-                    'externalId'    => $row['staffExternalId'],
+                    'id'            => $row['creatorId'],
+                    'title'         => $row['creatorTitle'],
+                    'firstName'     => $row['creatorFirstname'],
+                    'preferredName' => $row['creatorPreferredName'],
+                    'lastName'      => $row['creatorLastname'],
+                    'externalId'    => $row['creatorExternalId'],
                 ],
                 'rubric'         => $rubric,
             ];
@@ -609,7 +609,7 @@ WHERE
                     and ss1.`submitted_at` < ss2.`submitted_at`
                 )
                 LEFT JOIN `user` `participant` on ss1.`owner` = `participant`.`id`
-                LEFT JOIN `user` `staff` on ss1.`submitted_by` = `staff`.`id`
+                LEFT JOIN `user` `creator` on ss1.`submitted_by` = `creator`.`id`
             )
             where ss1.`submitted_at` is not null
               and ss1.`deleted_at` is null
@@ -639,7 +639,7 @@ WHERE
                     and `aa1`.`finish` < `aa2`.`finish`
                 )
                 LEFT JOIN `user` `participant` on `aa1`.`user_id` = `participant`.`id`
-                LEFT JOIN `user` `staff` on `aa1`.`reviewer_id` = `staff`.`id`
+                LEFT JOIN `user` `creator` on `aa1`.`reviewer_id` = `creator`.`id`
             )
             where `aa1`.`finish` is not null
               and `aa1`.`deleted_at` is null
@@ -670,7 +670,7 @@ WHERE
                     and `tc1`.`completion_date` < `tc2`.`completion_date`
                 )
                 LEFT JOIN `user` `participant` on `tc1`.`student_id` = `participant`.`id`
-                LEFT JOIN `user` `staff` on `tc1`.`marking_user_id` = `staff`.`id`
+                LEFT JOIN `user` `creator` on `tc1`.`marking_user_id` = `creator`.`id`
             )
             where `tc1`.`completion_date` is not null
               and `tc1`.`deleted_at` is null
@@ -699,7 +699,7 @@ WHERE
                     and `sc2`.`deleted_at` is null
                     and `sc1`.`created_at` < `sc2`.`created_at`)
                 LEFT JOIN `user` `participant` on `sc1`.`student_id` = `participant`.`id`
-                LEFT JOIN `user` `staff` on `sc1`.`marking_user_id` = `staff`.`id`
+                LEFT JOIN `user` `creator` on `sc1`.`marking_user_id` = `creator`.`id`
             )
             where `sc1`.`deleted_at` is null
               and `sc1`.`is_feedback` = 1
@@ -732,12 +732,12 @@ WHERE
                 'id'        => $row['response_id'],
                 'date'      => (new \Alaress_Date_Format($row['completionDate'], \Alaress_Date_Format::DATABASE_FORMAT))->toIso8601String(),
                 'submitter' => [
-                    'id'            => $row['staffId'],
-                    'title'         => $row['staffTitle'],
-                    'firstName'     => $row['staffFirstname'],
-                    'preferredName' => $row['staffPreferredName'],
-                    'lastName'      => $row['staffLastname'],
-                    'externalId'    => $row['staffExternalId'],
+                    'id'            => $row['creatorId'],
+                    'title'         => $row['creatorTitle'],
+                    'firstName'     => $row['creatorFirstname'],
+                    'preferredName' => $row['creatorPreferredName'],
+                    'lastName'      => $row['creatorLastname'],
+                    'externalId'    => $row['creatorExternalId'],
                 ],
                 'files'     => null,
             ];
