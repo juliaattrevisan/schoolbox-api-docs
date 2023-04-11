@@ -18,8 +18,9 @@
          */
         document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
             detail: {
-                targetElements: ['#report-introduction']
-            }
+                targetElements: ['#report-introduction'],
+                toolbar: "print"
+            },
         }));
 
         $('#summative-report-form').alaressValidate({

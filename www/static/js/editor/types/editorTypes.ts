@@ -4,6 +4,7 @@
 export enum EditorToolbar {
     DEFAULT = "default",
     COMMENT = "comment",
+    PRINT = "print",
     SIMPLE = "simple",
 }
 
