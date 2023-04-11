@@ -402,12 +402,14 @@
             document.getElementById("plan-desc").addEventListener("EDITOR__CREATED", function () {
                 resolve();
             });
-            document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
-                detail: {
-                    targetElements: ["#plan-desc"],
-                    toolbar: "simple"
-                }
-            }));
+            document.dispatchEvent(
+                new CustomEvent("EDITOR__CREATE", {
+                    detail: {
+                        targetElements: ["#plan-desc"],
+                        toolbar: "simple",
+                    },
+                })
+            );
         });
     }
 
@@ -661,7 +663,6 @@
         }
 
         var $participantCustomiseModal = $("#participant-customise-modal");
-        var $ckeDialogBgCover = $(".cke_dialog_background_cover");
 
         // Open modal
         $customiseModal.foundation("reveal", "open", {
@@ -674,12 +675,10 @@
                 } else {
                     $participantCustomiseModal.css("z-index", "10000");
                 }
-                $ckeDialogBgCover.addClass("hide");
             },
             closed: function () {
                 $participantCustomiseModal.attr("modal-status", "closed");
                 $participantCustomiseModal.css("z-index", "1001");
-                $ckeDialogBgCover.removeClass("hide");
             },
         });
     }
