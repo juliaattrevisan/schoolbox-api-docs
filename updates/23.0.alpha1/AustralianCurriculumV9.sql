@@ -1,7 +1,11 @@
 INSERT INTO package (title, description, location, installed, hidden)
 VALUES ('Australian Curriculum (v9)',
         'Attaches codes to the Australian Curriculum (v9) to allow for the mapping of these to learning resources.',
-        'AustralianCurriculumV9', 0, 'false');
+        'AustralianCurriculumV9', 0, 'false'),
+       ('Australian Curriculum (v9) - General Capabilities',
+        'Attaches codes to the Australian Curriculum (v9) - General Capabilities, to allow for the mapping of these to learning resources. This is required to install the Australian Curriculum (v9) - General Capability Badge set.',
+        'AustralianCurriculumV9GeneralCapabilities', 0, 'false')
+    ;
 
 ### update existing historic Australian Curriculum packages to have the version in the names V8
 UPDATE package
