@@ -37,7 +37,7 @@ export function setIsStoringNodes() {
  * @returns { JSON } - the root nodes of the curriculum
  */
 export function getStoredNodes() {
-    return window.sbProps.storedNodes;
+    return JSON.parse(window.sbProps.storedNodes as string) as Node[]; // convert the saved string var back to JSON
 }
 
 /**
@@ -46,6 +46,6 @@ export function getStoredNodes() {
  * @param { Node[] } nodes - the root nodes of the curriculum
  */
 export function setStoredNodes(nodes: Node[]) {
-    window.sbProps.storedNodes = nodes;
+    window.sbProps.storedNodes = JSON.stringify(nodes);
     document.dispatchEvent(new Event(NODES_STORED));
 }
