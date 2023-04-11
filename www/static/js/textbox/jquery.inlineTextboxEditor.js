@@ -7,6 +7,7 @@
      * @param {jQuery}  modifyButton
      * @param {jQuery}  saveButton
      * @param {jQuery}  deleteButton
+     * @param {number}  fileBrowserCategoryId
      * @constructor
      */
     var InlineTextboxEditor = function (
