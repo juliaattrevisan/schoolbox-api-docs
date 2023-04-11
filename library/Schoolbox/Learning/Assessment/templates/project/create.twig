@@ -9,7 +9,7 @@
         document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
             detail: {
                 targetElements: ['textarea[name="description"]'],
-                fileBrowserCategoryId: {% if record is defined %}{{ record.getFolder.getId }}{% else %}{{ folder.getId }}{% endif %},
+                fileBrowserCategoryId: {{ context.baseContext.folder.id ?? 0 }},
             }
         }));
     });
