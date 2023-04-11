@@ -403,7 +403,6 @@ WHERE
                 `sb`.`assessment_id`       AS `assessment_id`,
                 'submission_return'        AS `feedback_table`,
                 max(`sr1`.`id`)            AS `feedback_id`,
-                `sr1`.`owner`              AS `participant_id`,
                 `sr1`.`published_at`       AS `completionDate`,
                 `sr1`.`comment`            AS `comment`,
                 `sr1`.`mark`               AS `mark`,
@@ -435,7 +434,6 @@ WHERE
                 `ass`.`assessment_id`   AS `assessment_id`,
                 'assess_attempt'        AS `feedback_table`,
                 max(`aa1`.`attempt_id`) AS `feedback_id`,
-                `aa1`.`user_id`         AS `participant_id`,
                 `aa1`.`reviewed_at`     AS `completionDate`,
                 null                    AS `comment`,
                 `aa1`.`mark`            AS `mark`,
@@ -466,7 +464,6 @@ WHERE
                 `t`.`assessment_id`     AS `assessment_id`,
                 'task_completion'       AS `feedback_table`,
                 max(`tc1`.`id`)         AS `feedback_id`,
-                `tc1`.`student_id`      AS `participant_id`,
                 `tc1`.`completion_date` AS `completionDate`,
                 null                    AS `comment`,
                 null                    AS `mark`,
@@ -497,7 +494,6 @@ WHERE
                 `la`.`assessment_id`   AS `assessment_id`,
                 'lti_assessment_score' AS `feedback_table`,
                 max(`sc1`.`id`)        AS `feedback_id`,
-                `sc1`.`student_id`     AS `participant_id`,
                 `sc1`.`created_at`     AS `completionDate`,
                 `sc1`.`comment`        AS `comment`,
                 `sc1`.`score_given`            AS `mark`,
@@ -553,7 +549,7 @@ WHERE
             ];
 
             // Add learner details
-            $participationItems[$row['assessment_id']][$row['participant_id']]['learner'] ??= [
+            $participationItems[$row['assessment_id']][$row['participantId']]['learner'] ??= [
                 'id'            => $row['participantId'],
                 'title'         => $row['participantTitle'],
                 'firstName'     => $row['participantFirstname'],
@@ -592,7 +588,6 @@ WHERE
                 `sb`.`assessment_id`       AS `assessment_id`,
                 'student_submission'       AS `response_table`,
                 max(ss1.`id`)              AS `response_id`,
-                ss1.`owner`                AS `participant_id`,
                 ss1.`submitted_at`         AS `completionDate`,
                 null                       AS `comment`,
                 null                       AS `mark`,
@@ -622,7 +617,6 @@ WHERE
                 `ass`.`assessment_id`   AS `assessment_id`,
                 'assess_attempt'        AS `response_table`,
                 max(`aa1`.`attempt_id`) AS `response_id`,
-                `aa1`.`user_id`         AS `participant_id`,
                 `aa1`.`finish`          AS `completionDate`,
                 null                    AS `comment`,
                 `aa1`.`mark`            AS `mark`,
@@ -653,7 +647,6 @@ WHERE
                 `t`.`assessment_id`     AS `assessment_id`,
                 'task_completion'       AS `response_table`,
                 max(`tc1`.`id`)         AS `response_id`,
-                `tc1`.`student_id`      AS `participant_id`,
                 `tc1`.`completion_date` AS `completionDate`,
                 null                    AS `comment`,
                 null                    AS `mark`,
@@ -684,7 +677,6 @@ WHERE
                 `la`.`assessment_id`   AS `assessment_id`,
                 'lti_assessment_score' AS `response_table`,
                 max(`sc1`.`id`)        AS `response_id`,
-                `sc1`.`student_id`     AS `participant_id`,
                 `sc1`.`created_at`     AS `completionDate`,
                 `sc1`.`comment`        AS `comment`,
                 `sc1`.`score_given`            AS `mark`,
