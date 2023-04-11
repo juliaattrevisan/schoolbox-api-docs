@@ -640,8 +640,10 @@ WHERE
                     and `aa2`.`deleted_at` is null
                     and `aa1`.`finish` < `aa2`.`finish`
                 )
-                LEFT JOIN `user` `participant` on `aa1`.`user_id`     = `participant`.`id`
-                LEFT JOIN `user` `submitter`   on `aa1`.`reviewer_id` = `submitter`.`id`
+                -- Submitting user is always the same as the participant:
+                -- teachers can't submit on behalf of a student
+                LEFT JOIN `user` `participant` on `aa1`.`user_id` = `participant`.`id`
+                LEFT JOIN `user` `submitter`   on `aa1`.`user_id` = `submitter`.`id`
             )
             where `aa1`.`finish` is not null
               and `aa1`.`deleted_at` is null
