@@ -67,8 +67,8 @@
 {%  endif %}
 
 
-{% if render == "medium" %}
-    {# handle 'medium' case separately because here we use a srcset. #}
+{% if render == "profile" %}
+    {# handle 'profile' case separately because here we use a srcset. #}
     <img src="/portrait.php?{{ userParameter }}{{ appendQueryParam }}"
         height="200"
         width="200"
@@ -94,9 +94,6 @@
         {% set sizeParameter = sizeParameter ~ "square72" %}
         {% set limitHeight = 72 %}
         {% set limitWidth = 72 %}
-    {% elseif render == "large" %}
-        {% set sizeParameter = sizeParameter ~ "profile" %}
-        {% set class = "full-width" %}
     {% else %}
         {% set sizeParameter = sizeParameter ~ "square64" %}
     {% endif %}

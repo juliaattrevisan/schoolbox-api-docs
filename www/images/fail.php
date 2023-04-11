@@ -73,8 +73,8 @@ switch ($transformType) {
             $transform = $transforms->retrieve($size);
             $cache_key = $transforms->getCacheKey($size);
         } catch (\OutOfBoundsException $e) {
-            $transform = $transforms->retrieve('profile');
-            $cache_key = $transforms->getCacheKey('profile');
+            $transform = $transforms->retrieve('constrain500');
+            $cache_key = $transforms->getCacheKey('constrain500');
         }
         break;
 
