@@ -7,7 +7,7 @@
  *                     Defaults to a range of 1-6 em
  * * unit:             the unit minFontSize, maxFontSize and getSize are measured in.
  *                     Defaults to em.
- * * getFontSize:          a callback for retrieving the font size
+ * * getFontSize:      a callback for retrieving the font size
  *                     Defaults to width of the tile in px, / 120
  * * titleSelector:    a selector for getting the title from the tile.
  *                     Defaults to ".title"
