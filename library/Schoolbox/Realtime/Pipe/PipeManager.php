@@ -278,8 +278,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
             throw new ErrorException("Unrecognised pipe: '$socketKey'");
         }
 
-        // TODO extract instance ID from pipe
-        $instanceId = INSTANCE_ID;
+        $instanceId = $pipe->getInstanceId();
         $userId     = $pipe->getUserId();
         $sessionId  = $pipe->getSession();
 
@@ -467,8 +466,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      */
     private function getTransaction(PipeInterface $pipe)
     {
-        // TODO extract from pipe
-        $instanceId = INSTANCE_ID;
+        $instanceId = $pipe->getInstanceId();
         $userId     = $pipe->getUserId();
         $pipeId     = $pipe->getSocketKey();
 
@@ -710,52 +708,4 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
 
         unset($this->userTimeouts[$instanceId][$userId], $this->pushTransactions[$instanceId][$userId]);
     }
-//
-//
-//    /**
-//     * @unused
-//     * Send data to all pipes associated with a specific session.
-//     *
-//     * @param string $sessionId
-//     * @param string $data
-//     * @return void
-//     */
-//    protected function sendToSession($sessionId, $data)
-//    {
-//        foreach ($this->pipes->getPipesBySessionId($sessionId) as $pipe) {
-//            $this->sendToPipe($pipe, $data);
-//        }
-//    }
-//
-//
-//    /**
-//     * @unused
-//     * Unregister all pipes associated with a session.
-//     *
-//     * @param string $sessionId
-//     * @return void
-//     */
-//    protected function unregisterAllPipesBySessionId($sessionId)
-//    {
-//        foreach ($this->pipes->getPipesBySessionId($sessionId) as $pipe) {
-//            $this->pipes->unregisterPipe($pipe->getSocketKey());
-//            $pipe->close();
-//        }
-//    }
-//
-//
-//    /**
-//     * @unused
-//     * Unregister all pipes associated with a user.
-//     *
-//     * @param int $userId
-//     * @return void
-//     */
-//    protected function unregisterAllPipesByUserId($userId)
-//    {
-//        foreach ($this->pipes->getPipesByUserId($userId) as $pipe) {
-//            $this->pipes->unregisterPipe($pipe->getSocketKey());
-//            $pipe->close();
-//        }
-//    }
 }

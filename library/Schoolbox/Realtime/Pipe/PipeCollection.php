@@ -164,19 +164,6 @@ class PipeCollection implements Countable
             : 0;
     }
 
-
-//    /**
-//     * @param string $sessionId
-//     * @return int
-//     */
-//    public function sessionPipeCount($sessionId)
-//    {
-//        return array_key_exists($sessionId, $this->pipesBySessionId)
-//            ? count($this->pipesBySessionId[$sessionId])
-//            : 0;
-//    }
-
-
     /**
      * @param string $socketKey
      * @return Pipe
@@ -200,20 +187,6 @@ class PipeCollection implements Countable
     {
         return $this->pipesByInstanceAndUserId[$instanceId][$userId] ?? [];
     }
-
-
-//    /**
-//     * @param string $sessionId
-//     * @return Pipe[]
-//     */
-//    public function getPipesBySessionId($sessionId)
-//    {
-//        if ($this->sessionPipeCount($sessionId)) {
-//            return $this->pipesBySessionId[$sessionId];
-//        }
-//
-//        return [];
-//    }
 
 
     /**
