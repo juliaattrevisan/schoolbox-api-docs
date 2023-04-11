@@ -64,12 +64,10 @@ class PipeCollection implements Countable
      */
     public function registerPipe(Pipe $pipe)
     {
-        $socketKey = $pipe->getSocketKey();
-        $sessionId = $pipe->getSession();
-        $remember  = $pipe->getCookie('remember');
-
-        // TODO extract instance ID from pipe
-        $instanceId = INSTANCE_ID;
+        $socketKey  = $pipe->getSocketKey();
+        $sessionId  = $pipe->getSession();
+        $remember   = $pipe->getCookie('remember');
+        $instanceId = $pipe->getInstanceId();
 
         // Extract user ID
         try {
@@ -91,7 +89,6 @@ class PipeCollection implements Countable
         }
 
         $pipe->setUserId($userId);
-        $pipe->setInstanceId($instanceId);
 
         // index pipe in triplicate
         // Socket key is presumed to be unique between instances:

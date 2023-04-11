@@ -43,13 +43,6 @@ interface PipeInterface
     public function getInstanceId(): string;
 
     /**
-     * Get the instance ID associated with this pipe.
-     *
-     * @return self
-     */
-    public function setInstanceId(string $instanceId): self;
-
-    /**
      * @return int
      */
     public function getUserId();

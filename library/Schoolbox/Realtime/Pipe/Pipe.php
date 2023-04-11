@@ -151,17 +151,8 @@ class Pipe implements PipeInterface
      */
     public function getInstanceId(): string
     {
+        // TODO instance ID is extracted from connection
         return $this->instanceId;
-    }
-
-    /**
-     * @param string $instanceId
-     * @return self
-     */
-    public function setInstanceId(string $instanceId): self
-    {
-        $this->instanceId = $instanceId;
-        return $this;
     }
 
     /**
