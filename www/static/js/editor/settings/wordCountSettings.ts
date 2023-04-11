@@ -38,6 +38,7 @@ function getCharacterElement() {
  */
 function getLimitWarningElement(config: EditorConfig) {
     const limitWarningElement = document.createElement("div");
+    limitWarningElement.setAttribute("data-charLimitWarning", "");
     limitWarningElement.classList.add("ck-word-count__limit-warning");
     limitWarningElement.innerHTML = `<b>Warning:</b> The limit of ${config.maxCharCount} Characters has been reached. Please reduce the content to below the limit to ensure save.`;
     limitWarningElement.style.display = "none";
