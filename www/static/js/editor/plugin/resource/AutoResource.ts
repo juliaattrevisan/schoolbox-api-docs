@@ -39,6 +39,11 @@ export default class ResourceEditing extends Plugin {
             if (isHtmlIncluded(data.dataTransfer)) {
                 return;
             }
+            const files = Array.from(data.dataTransfer._files);
+            // Ensure there are files to upload
+            if (files.length === 0) {
+                return;
+            }
             editor.model.change((writer) => {
                 // Set selection to paste target, to ensure files are most accurately placed
                 if (data.targetRanges) {
@@ -46,7 +51,6 @@ export default class ResourceEditing extends Plugin {
                         data.targetRanges.map((viewRange) => editor.editing.mapper.toModelRange(viewRange))
                     );
                 }
-                const files = Array.from(data.dataTransfer._files);
                 this.totalUploadCount = files.length;
                 this.uploadedCount = 0;
                 this.editor.enableReadOnlyMode("auto-resource");
