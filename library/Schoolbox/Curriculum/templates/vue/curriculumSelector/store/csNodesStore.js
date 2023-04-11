@@ -6,6 +6,14 @@ import { defineStore } from "pinia";
 import { UNSET_ID, findById, getBreadcrumbs } from "@schoolboxCurriculum/js/nodeUtils";
 import { useStore, apiEndpoint } from "./curriculumSelectorStore";
 import { useModalViewNodesStore } from "./csModalViewNodesStore";
+import {
+    hasStoredNodes,
+    isStoringNodes,
+    setIsStoringNodes,
+    getStoredNodes,
+    setStoredNodes,
+    NODES_STORED,
+} from "@schoolboxCurriculum/js/globalStorage";
 
 export const useNodesStore = defineStore(`csNodes`, {
     state: () => ({
@@ -43,10 +51,50 @@ export const useNodesStore = defineStore(`csNodes`, {
         async load() {
             const store = useStore();
             try {
+                if (hasStoredNodes()) {
+                    // if we have the root nodes stored in global storage, load them
+                    this.loadStored();
+                } else if (isStoringNodes()) {
+                    // if we've already requested the root nodes, don't request them again
+                    document.addEventListener(NODES_STORED, () => {
+                        this.loadStored();
+                    });
+                } else {
+                    setIsStoringNodes();
+                    // otherwise load them from the api
+                    await this.loadRemote();
+                }
+            } catch (error) {
+                console.warn(error);
+                store.hasLoadError = true; // show the load error display state
+            } finally {
+                store.isLoading = false; // otherwise show the tree
+            }
+        },
+
+        /**
+         * load in the top level nodes from the global storage
+         */
+        async loadStored() {
+            this.nodes = getStoredNodes();
+            if (this.hasSingleCurriculum) {
+                const singleCurriculumId = this.nodes.children[0].id;
+                const modalViewNodesStore = useModalViewNodesStore();
+                modalViewNodesStore.setSelected(modalViewNodesStore.currentDepth + 1, singleCurriculumId);
+            }
+        },
+
+        /**
+         * load in the top level nodes from the api
+         */
+        async loadRemote() {
+            const store = useStore();
+            try {
                 const response = await fetch(`${apiEndpoint}/?topLevelOnly=1&enabled=1&descendants=1&limit=50`);
                 if (response.ok) {
                     const topLevelNodes = await response.json();
                     await this.setTopLevel(topLevelNodes);
+                    setStoredNodes(this.nodes); // store the root nodes in global storage
                 } else {
                     console.warn(response);
                     store.hasLoadError = true; //show the load error display state
@@ -54,8 +102,6 @@ export const useNodesStore = defineStore(`csNodes`, {
             } catch (error) {
                 console.warn(error);
                 store.hasLoadError = true; //show the load error display state
-            } finally {
-                store.isLoading = false; //otherwise show the tree
             }
         },
 
@@ -136,7 +182,7 @@ export const useNodesStore = defineStore(`csNodes`, {
 
         /**
          * set the top level nodes, passed through either from loading or
-         * the already stored session storage
+         * the already stored global storage
          *
          * @param { object }
          */
