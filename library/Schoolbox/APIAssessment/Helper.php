@@ -389,13 +389,13 @@ WHERE
             `participant`.`lastname`       as `participant_last_name`,
             `participant`.`synergy_id`     as `participant_external_id`
         ';
-        $creatorFields     = '
-            `creator`.`id`               as `creator_id`,
-            `creator`.`title`            as `creator_title`,
-            `creator`.`firstname`        as `creator_first_name`,
-            `creator`.`preferred_name`   as `creator_preferred_name`,
-            `creator`.`lastname`         as `creator_last_name`,
-            `creator`.`synergy_id`       as `creator_external_id`
+        $reviewerFields    = '
+            `reviewer`.`id`               as `reviewer_id`,
+            `reviewer`.`title`            as `reviewer_title`,
+            `reviewer`.`firstname`        as `reviewer_first_name`,
+            `reviewer`.`preferred_name`   as `reviewer_preferred_name`,
+            `reviewer`.`lastname`         as `reviewer_last_name`,
+            `reviewer`.`synergy_id`       as `reviewer_external_id`
         ';
         $feedbackQueries = [
             <<<DUEWORK
@@ -408,7 +408,7 @@ WHERE
                 `sr1`.`mark`               AS `mark`,
                 `sr1`.`norm_mark`          AS `norm_mark`,
                 $participantFields,
-                $creatorFields
+                $reviewerFields
             from (
                 (`submission_return` `sr1` join `submission_box` `sb` on (`sr1`.`box_id` = `sb`.`id`))
                 left join `submission_return` `sr2` on (
@@ -420,7 +420,7 @@ WHERE
                     and `sr1`.`published_at` < `sr2`.`published_at`
                 )
                 LEFT JOIN `user` `participant` on `sr1`.`owner` = `participant`.`id`
-                LEFT JOIN `user` `creator` on `sr1`.`marker` = `creator`.`id`
+                LEFT JOIN `user` `reviewer` on `sr1`.`marker` = `reviewer`.`id`
             )
             where `sr1`.`published_at` is not null
               and `sr1`.`deleted_at` is null
@@ -439,7 +439,7 @@ WHERE
                 `aa1`.`mark`            AS `mark`,
                 (`aa1`.`mark` / `aa1`.`max_mark` * 100)    AS `norm_mark`,
                 $participantFields,
-                $creatorFields
+                $reviewerFields
             from (
                 (`assess_attempt` `aa1` join `assess` `ass` on (`aa1`.`assess_id` = `ass`.`assess_id`))
                 left join `assess_attempt` `aa2` on (
@@ -450,7 +450,7 @@ WHERE
                     and `aa1`.`reviewed_at` < `aa2`.`reviewed_at`
                 )
                 LEFT JOIN `user` `participant` on `aa1`.`user_id` = `participant`.`id`
-                LEFT JOIN `user` `creator` on `aa1`.`reviewer_id` = `creator`.`id`
+                LEFT JOIN `user` `reviewer` on `aa1`.`reviewer_id` = `reviewer`.`id`
             )
             where `aa1`.`reviewed_at` is not null
               and `aa1`.`deleted_at` is null
@@ -469,7 +469,7 @@ WHERE
                 null                    AS `mark`,
                 null                    AS `norm_mark`,
                 $participantFields,
-                $creatorFields
+                $reviewerFields
             from (
                 (`task_completion` `tc1` join `task` `t` on (`tc1`.`task_id` = `t`.`id`))
                 left join `task_completion` `tc2` on (
@@ -480,7 +480,7 @@ WHERE
                     and `tc1`.`completion_date` < `tc2`.`completion_date`
                 )
                 LEFT JOIN `user` `participant` on `tc1`.`student_id` = `participant`.`id`
-                LEFT JOIN `user` `creator` on `tc1`.`marking_user_id` = `creator`.`id`
+                LEFT JOIN `user` `reviewer` on `tc1`.`marking_user_id` = `reviewer`.`id`
             )
             where `tc1`.`completion_date` is not null
               and `tc1`.`deleted_at` is null
@@ -499,7 +499,7 @@ WHERE
                 `sc1`.`score_given`            AS `mark`,
                 (`sc1`.`score_given` / `sc1`.`score_maximum` * 100)    AS `norm_mark`,
                 $participantFields,
-                $creatorFields
+                $reviewerFields
             from (
                 (`lti_assessment_score` `sc1` join `lti_assessment` `la` on (`sc1`.`lti_assessment_id` = `la`.`id`))
                 left join `lti_assessment_score` `sc2` on (
@@ -508,7 +508,7 @@ WHERE
                     and `sc2`.`deleted_at` is null
                     and `sc1`.`created_at` < `sc2`.`created_at`)
                 LEFT JOIN `user` `participant` on `sc1`.`student_id` = `participant`.`id`
-                LEFT JOIN `user` `creator` on `sc1`.`marking_user_id` = `creator`.`id`
+                LEFT JOIN `user` `reviewer` on `sc1`.`marking_user_id` = `reviewer`.`id`
             )
             where `sc1`.`deleted_at` is null
               and `sc1`.`is_feedback` = 1
@@ -538,12 +538,12 @@ WHERE
                 'comment'        => $row['comment'],
                 'date'           => (new \Alaress_Date_Format($row['completion_date'], \Alaress_Date_Format::DATABASE_FORMAT))->toIso8601String(),
                 'instructor'     => [
-                    'id'            => $row['creator_id'],
-                    'title'         => $row['creator_title'],
-                    'firstName'     => $row['creator_first_name'],
-                    'preferredName' => $row['creator_preferred_name'],
-                    'lastName'      => $row['creator_last_name'],
-                    'externalId'    => $row['creator_external_id'],
+                    'id'            => $row['reviewer_id'],
+                    'title'         => $row['reviewer_title'],
+                    'firstName'     => $row['reviewer_first_name'],
+                    'preferredName' => $row['reviewer_preferred_name'],
+                    'lastName'      => $row['reviewer_last_name'],
+                    'externalId'    => $row['reviewer_external_id'],
                 ],
                 'rubric'         => $rubric,
             ];
@@ -582,6 +582,14 @@ WHERE
         // "files": [
         //     {`standard files object`}
         // ]
+        $submitterFields    = '
+            `submitter`.`id`               as `submitter_id`,
+            `submitter`.`title`            as `submitter_title`,
+            `submitter`.`firstname`        as `submitter_first_name`,
+            `submitter`.`preferred_name`   as `submitter_preferred_name`,
+            `submitter`.`lastname`         as `submitter_last_name`,
+            `submitter`.`synergy_id`       as `submitter_external_id`
+        ';
         $responseQueries = [
             <<<DUEWORK
             select
@@ -593,7 +601,7 @@ WHERE
                 null                       AS `mark`,
                 null                       AS `norm_mark`,
                 $participantFields,
-                $creatorFields
+                $submitterFields
             from (
                 (`student_submission` ss1 join `submission_box` `sb` on (ss1.`box_id` = `sb`.`id`))
                 left join `student_submission` ss2 on (
@@ -604,7 +612,7 @@ WHERE
                     and ss1.`submitted_at` < ss2.`submitted_at`
                 )
                 LEFT JOIN `user` `participant` on ss1.`owner` = `participant`.`id`
-                LEFT JOIN `user` `creator` on ss1.`submitted_by` = `creator`.`id`
+                LEFT JOIN `user` `submitter` on ss1.`submitted_by` = `submitter`.`id`
             )
             where ss1.`submitted_at` is not null
               and ss1.`deleted_at` is null
@@ -622,7 +630,7 @@ WHERE
                 `aa1`.`mark`            AS `mark`,
                 (`aa1`.`mark` / `aa1`.`max_mark` * 100)    AS `norm_mark`,
                 $participantFields,
-                $creatorFields
+                $submitterFields
             from (
                 (`assess_attempt` `aa1` join `assess` `ass` on (`aa1`.`assess_id` = `ass`.`assess_id`))
                 left join `assess_attempt` `aa2` on (
@@ -633,7 +641,7 @@ WHERE
                     and `aa1`.`finish` < `aa2`.`finish`
                 )
                 LEFT JOIN `user` `participant` on `aa1`.`user_id` = `participant`.`id`
-                LEFT JOIN `user` `creator` on `aa1`.`reviewer_id` = `creator`.`id`
+                LEFT JOIN `user` `submitter` on `aa1`.`reviewer_id` = `submitter`.`id`
             )
             where `aa1`.`finish` is not null
               and `aa1`.`deleted_at` is null
@@ -652,7 +660,7 @@ WHERE
                 null                    AS `mark`,
                 null                    AS `norm_mark`,
                 $participantFields,
-                $creatorFields
+                $submitterFields
             from (
                 (`task_completion` `tc1` join `task` `t` on (`tc1`.`task_id` = `t`.`id`))
                 left join `task_completion` `tc2` on (
@@ -663,7 +671,7 @@ WHERE
                     and `tc1`.`completion_date` < `tc2`.`completion_date`
                 )
                 LEFT JOIN `user` `participant` on `tc1`.`student_id` = `participant`.`id`
-                LEFT JOIN `user` `creator` on `tc1`.`marking_user_id` = `creator`.`id`
+                LEFT JOIN `user` `submitter` on `tc1`.`marking_user_id` = `submitter`.`id`
             )
             where `tc1`.`completion_date` is not null
               and `tc1`.`deleted_at` is null
@@ -682,7 +690,7 @@ WHERE
                 `sc1`.`score_given`            AS `mark`,
                 (`sc1`.`score_given` / `sc1`.`score_maximum` * 100)    AS `norm_mark`,
                 $participantFields,
-                $creatorFields
+                $submitterFields
             from (
                 (`lti_assessment_score` `sc1` join `lti_assessment` `la` on (`sc1`.`lti_assessment_id` = `la`.`id`))
                 left join `lti_assessment_score` `sc2` on (
@@ -691,7 +699,7 @@ WHERE
                     and `sc2`.`deleted_at` is null
                     and `sc1`.`created_at` < `sc2`.`created_at`)
                 LEFT JOIN `user` `participant` on `sc1`.`student_id` = `participant`.`id`
-                LEFT JOIN `user` `creator` on `sc1`.`marking_user_id` = `creator`.`id`
+                LEFT JOIN `user` `submitter` on `sc1`.`marking_user_id` = `submitter`.`id`
             )
             where `sc1`.`deleted_at` is null
               and `sc1`.`is_feedback` = 1
@@ -724,12 +732,12 @@ WHERE
                 'id'        => $row['response_id'],
                 'date'      => (new \Alaress_Date_Format($row['completion_date'], \Alaress_Date_Format::DATABASE_FORMAT))->toIso8601String(),
                 'submitter' => [
-                    'id'            => $row['creator_id'],
-                    'title'         => $row['creator_title'],
-                    'firstName'     => $row['creator_first_name'],
-                    'preferredName' => $row['creator_preferred_name'],
-                    'lastName'      => $row['creator_last_name'],
-                    'externalId'    => $row['creator_external_id'],
+                    'id'            => $row['submitter_id'],
+                    'title'         => $row['submitter_title'],
+                    'firstName'     => $row['submitter_first_name'],
+                    'preferredName' => $row['submitter_preferred_name'],
+                    'lastName'      => $row['submitter_last_name'],
+                    'externalId'    => $row['submitter_external_id'],
                 ],
                 'files'     => null,
             ];
