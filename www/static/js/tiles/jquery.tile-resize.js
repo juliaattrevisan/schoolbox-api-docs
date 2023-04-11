@@ -39,9 +39,9 @@
             const tile = $(this);
             const tileTitle = tile.find(settings.titleSelector);
 
-            let newFontSize = settings.getFontSize(tile, settings);
+            let fontSize = settings.getFontSize(tile, settings);
 
-            if (newFontSize === null) {
+            if (fontSize === null) {
                 // If we could not calculate the fontSize, there is nothing more we can do.
                 // To work around the problem of the fontSize not being calculable when the tile is collapsed, this
                 // function should be run when the tile is no longer hidden (after the expand event).
@@ -49,16 +49,16 @@
                 return;
             }
 
-            if (newFontSize < settings.minFontSize) {
-                newFontSize = settings.minFontSize;
+            if (fontSize < settings.minFontSize) {
+                fontSize = settings.minFontSize;
             }
 
-            if (newFontSize > settings.maxFontSize) {
-                newFontSize = settings.maxFontSize;
+            if (fontSize > settings.maxFontSize) {
+                fontSize = settings.maxFontSize;
             }
 
             tileTitle.css({
-                fontSize: String(newFontSize) + settings.unit,
+                fontSize: String(fontSize) + settings.unit,
                 padding: String(fontSize / 4) + settings.unit,
             });
 
