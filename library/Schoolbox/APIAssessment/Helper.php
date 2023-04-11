@@ -382,20 +382,20 @@ WHERE
         // rubric where needed.
         $bindings          = Builder::getBindings($assessmentIds, 'ids');
         $participantFields = '
-            `participant`.`id`             as `participantId`,
-            `participant`.`title`          as `participantTitle`,
-            `participant`.`firstname`      as `participantFirstname`,
-            `participant`.`preferred_name` as `participantPreferredName`,
-            `participant`.`lastname`       as `participantLastname`,
-            `participant`.`synergy_id`     as `participantExternalId`
+            `participant`.`id`             as `participant_id`,
+            `participant`.`title`          as `participant_title`,
+            `participant`.`firstname`      as `participant_first_name`,
+            `participant`.`preferred_name` as `participant_preferred_name`,
+            `participant`.`lastname`       as `participant_last_name`,
+            `participant`.`synergy_id`     as `participant_external_id`
         ';
         $creatorFields     = '
-            `creator`.`id`               as `creatorId`,
-            `creator`.`title`            as `creatorTitle`,
-            `creator`.`firstname`        as `creatorFirstname`,
-            `creator`.`preferred_name`   as `creatorPreferredName`,
-            `creator`.`lastname`         as `creatorLastname`,
-            `creator`.`synergy_id`       as `creatorExternalId`
+            `creator`.`id`               as `creator_id`,
+            `creator`.`title`            as `creator_title`,
+            `creator`.`firstname`        as `creator_first_name`,
+            `creator`.`preferred_name`   as `creator_preferred_name`,
+            `creator`.`lastname`         as `creator_last_name`,
+            `creator`.`synergy_id`       as `creator_external_id`
         ';
         $feedbackQueries = [
             <<<DUEWORK
@@ -403,7 +403,7 @@ WHERE
                 `sb`.`assessment_id`       AS `assessment_id`,
                 'submission_return'        AS `feedback_table`,
                 max(`sr1`.`id`)            AS `feedback_id`,
-                `sr1`.`published_at`       AS `completionDate`,
+                `sr1`.`published_at`       AS `completion_date`,
                 `sr1`.`comment`            AS `comment`,
                 `sr1`.`mark`               AS `mark`,
                 `sr1`.`norm_mark`          AS `norm_mark`,
@@ -434,7 +434,7 @@ WHERE
                 `ass`.`assessment_id`   AS `assessment_id`,
                 'assess_attempt'        AS `feedback_table`,
                 max(`aa1`.`attempt_id`) AS `feedback_id`,
-                `aa1`.`reviewed_at`     AS `completionDate`,
+                `aa1`.`reviewed_at`     AS `completion_date`,
                 null                    AS `comment`,
                 `aa1`.`mark`            AS `mark`,
                 (`aa1`.`mark` / `aa1`.`max_mark` * 100)    AS `norm_mark`,
@@ -464,7 +464,7 @@ WHERE
                 `t`.`assessment_id`     AS `assessment_id`,
                 'task_completion'       AS `feedback_table`,
                 max(`tc1`.`id`)         AS `feedback_id`,
-                `tc1`.`completion_date` AS `completionDate`,
+                `tc1`.`completion_date` AS `completion_date`,
                 null                    AS `comment`,
                 null                    AS `mark`,
                 null                    AS `norm_mark`,
@@ -494,7 +494,7 @@ WHERE
                 `la`.`assessment_id`   AS `assessment_id`,
                 'lti_assessment_score' AS `feedback_table`,
                 max(`sc1`.`id`)        AS `feedback_id`,
-                `sc1`.`created_at`     AS `completionDate`,
+                `sc1`.`created_at`     AS `completion_date`,
                 `sc1`.`comment`        AS `comment`,
                 `sc1`.`score_given`            AS `mark`,
                 (`sc1`.`score_given` / `sc1`.`score_maximum` * 100)    AS `norm_mark`,
@@ -519,7 +519,7 @@ WHERE
         ];
 
         $statement = $this->mapper->getDatabase()->query(
-            '(' . implode(') union (', $feedbackQueries) . ') order by `assessment_id`, `participantId`',
+            '(' . implode(') union (', $feedbackQueries) . ') order by `assessment_id`, `participant_id`',
             $bindings->getParams(),
         );
         $statement->execute();
@@ -536,38 +536,38 @@ WHERE
                 'mark'           => $row['mark'],
                 'normalisedMark' => $row['norm_mark'],
                 'comment'        => $row['comment'],
-                'date'           => (new \Alaress_Date_Format($row['completionDate'], \Alaress_Date_Format::DATABASE_FORMAT))->toIso8601String(),
+                'date'           => (new \Alaress_Date_Format($row['completion_date'], \Alaress_Date_Format::DATABASE_FORMAT))->toIso8601String(),
                 'instructor'     => [
-                    'id'            => $row['creatorId'],
-                    'title'         => $row['creatorTitle'],
-                    'firstName'     => $row['creatorFirstname'],
-                    'preferredName' => $row['creatorPreferredName'],
-                    'lastName'      => $row['creatorLastname'],
-                    'externalId'    => $row['creatorExternalId'],
+                    'id'            => $row['creator_id'],
+                    'title'         => $row['creator_title'],
+                    'firstName'     => $row['creator_first_name'],
+                    'preferredName' => $row['creator_preferred_name'],
+                    'lastName'      => $row['creator_last_name'],
+                    'externalId'    => $row['creator_external_id'],
                 ],
                 'rubric'         => $rubric,
             ];
 
             // Add learner details
-            $participationItems[$row['assessment_id']][$row['participantId']]['learner'] ??= [
-                'id'            => $row['participantId'],
-                'title'         => $row['participantTitle'],
-                'firstName'     => $row['participantFirstname'],
-                'preferredName' => $row['participantPreferredName'],
-                'lastName'      => $row['participantLastname'],
-                'externalId'    => $row['participantExternalId'],
+            $participationItems[$row['assessment_id']][$row['participant_id']]['learner'] ??= [
+                'id'            => $row['participant_id'],
+                'title'         => $row['participant_title'],
+                'firstName'     => $row['participant_first_name'],
+                'preferredName' => $row['participant_preferred_name'],
+                'lastName'      => $row['participant_last_name'],
+                'externalId'    => $row['participant_external_id'],
             ];
 
             // Add feedback details
-            $participationItems[$row['assessment_id']][$row['participantId']]['feedback'] = [
+            $participationItems[$row['assessment_id']][$row['participant_id']]['feedback'] = [
                 'id' => $row['feedback_id'],
             ] + $feedbackFields;
 
             // Add feedback details in a deprecated place
-            $participationItems[$row['assessment_id']][$row['participantId']] += $feedbackFields;
+            $participationItems[$row['assessment_id']][$row['participant_id']] += $feedbackFields;
 
             // Add empty response if nothing there
-            $participationItems[$row['assessment_id']][$row['participantId']]['response'] ??= null;
+            $participationItems[$row['assessment_id']][$row['participant_id']]['response'] ??= null;
         }
         $statement->closeCursor();
 
@@ -588,7 +588,7 @@ WHERE
                 `sb`.`assessment_id`       AS `assessment_id`,
                 'student_submission'       AS `response_table`,
                 max(ss1.`id`)              AS `response_id`,
-                ss1.`submitted_at`         AS `completionDate`,
+                ss1.`submitted_at`         AS `completion_date`,
                 null                       AS `comment`,
                 null                       AS `mark`,
                 null                       AS `norm_mark`,
@@ -617,7 +617,7 @@ WHERE
                 `ass`.`assessment_id`   AS `assessment_id`,
                 'assess_attempt'        AS `response_table`,
                 max(`aa1`.`attempt_id`) AS `response_id`,
-                `aa1`.`finish`          AS `completionDate`,
+                `aa1`.`finish`          AS `completion_date`,
                 null                    AS `comment`,
                 `aa1`.`mark`            AS `mark`,
                 (`aa1`.`mark` / `aa1`.`max_mark` * 100)    AS `norm_mark`,
@@ -647,7 +647,7 @@ WHERE
                 `t`.`assessment_id`     AS `assessment_id`,
                 'task_completion'       AS `response_table`,
                 max(`tc1`.`id`)         AS `response_id`,
-                `tc1`.`completion_date` AS `completionDate`,
+                `tc1`.`completion_date` AS `completion_date`,
                 null                    AS `comment`,
                 null                    AS `mark`,
                 null                    AS `norm_mark`,
@@ -677,7 +677,7 @@ WHERE
                 `la`.`assessment_id`   AS `assessment_id`,
                 'lti_assessment_score' AS `response_table`,
                 max(`sc1`.`id`)        AS `response_id`,
-                `sc1`.`created_at`     AS `completionDate`,
+                `sc1`.`created_at`     AS `completion_date`,
                 `sc1`.`comment`        AS `comment`,
                 `sc1`.`score_given`            AS `mark`,
                 (`sc1`.`score_given` / `sc1`.`score_maximum` * 100)    AS `norm_mark`,
@@ -702,7 +702,7 @@ WHERE
         ];
 
         $responseStatement = $this->mapper->getDatabase()->query(
-            '(' . implode(') union (', $responseQueries) . ') order by `assessment_id`, `participantId`',
+            '(' . implode(') union (', $responseQueries) . ') order by `assessment_id`, `participant_id`',
             $bindings->getParams(),
         );
         $responseStatement->execute();
@@ -710,26 +710,26 @@ WHERE
         $responseRows = $responseStatement->fetchAll();
         foreach ($responseRows as $row) {
             // Add learner details
-            $participationItems[$row['assessment_id']][$row['participantId']]['learner'] ??= [
-                'id'            => $row['participantId'],
-                'title'         => $row['participantTitle'],
-                'firstName'     => $row['participantFirstname'],
-                'preferredName' => $row['participantPreferredName'],
-                'lastName'      => $row['participantLastname'],
-                'externalId'    => $row['participantExternalId'],
+            $participationItems[$row['assessment_id']][$row['participant_id']]['learner'] ??= [
+                'id'            => $row['participant_id'],
+                'title'         => $row['participant_title'],
+                'firstName'     => $row['participant_first_name'],
+                'preferredName' => $row['participant_preferred_name'],
+                'lastName'      => $row['participant_last_name'],
+                'externalId'    => $row['participant_external_id'],
             ];
 
             // Add response details
-            $participationItems[$row['assessment_id']][$row['participantId']]['response'] = [
+            $participationItems[$row['assessment_id']][$row['participant_id']]['response'] = [
                 'id'        => $row['response_id'],
-                'date'      => (new \Alaress_Date_Format($row['completionDate'], \Alaress_Date_Format::DATABASE_FORMAT))->toIso8601String(),
+                'date'      => (new \Alaress_Date_Format($row['completion_date'], \Alaress_Date_Format::DATABASE_FORMAT))->toIso8601String(),
                 'submitter' => [
-                    'id'            => $row['creatorId'],
-                    'title'         => $row['creatorTitle'],
-                    'firstName'     => $row['creatorFirstname'],
-                    'preferredName' => $row['creatorPreferredName'],
-                    'lastName'      => $row['creatorLastname'],
-                    'externalId'    => $row['creatorExternalId'],
+                    'id'            => $row['creator_id'],
+                    'title'         => $row['creator_title'],
+                    'firstName'     => $row['creator_first_name'],
+                    'preferredName' => $row['creator_preferred_name'],
+                    'lastName'      => $row['creator_last_name'],
+                    'externalId'    => $row['creator_external_id'],
                 ],
                 'files'     => null,
             ];
@@ -737,12 +737,12 @@ WHERE
             // Track files (due work responses only):
             // these will be fetched in a later query
             if ($row['response_table'] === 'student_submission') {
-                $participationItems[$row['assessment_id']][$row['participantId']]['response']['files'] = [];
+                $participationItems[$row['assessment_id']][$row['participant_id']]['response']['files'] = [];
                 $studentSubmissionIds[] = $row['response_id'];
             }
 
             // Add empty feedback if nothing there
-            $participationItems[$row['assessment_id']][$row['participantId']]['feedback'] ??= null;
+            $participationItems[$row['assessment_id']][$row['participant_id']]['feedback'] ??= null;
         }
 
         // Load submissions, and thus their files
