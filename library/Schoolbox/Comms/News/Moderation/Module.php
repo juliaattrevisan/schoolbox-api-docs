@@ -20,6 +20,7 @@ use Schoolbox\Comms\News\Authorizer\Rule\CanModerateAudience;
 use Schoolbox\Comms\News\Authorizer\Rule\IsModerationEnabled;
 use Schoolbox\Comms\News\Authorizer\Rule\IsArticleAuthor;
 use Schoolbox\Comms\News;
+use Schoolbox\Comms\News\Authorizer\Rule\isAwaitingPublication;
 use Schoolbox\Comms\News\Authorizer\Rule\IsPublishedOrExpired;
 use Schoolbox\Error;
 use Schoolbox\Mapper;
@@ -95,7 +96,10 @@ class Module extends BaseModule
                     new Rule\All(
                         new IsArticleAuthor(),
                         new CanModerateAudience($this->getStrategyFactory()),
-                        new IsPublishedOrExpired()
+                        new Rule\Any(
+                            new IsPublishedOrExpired(),
+                            new IsAwaitingPublication()
+                        )
                     ),
                 )
             );
