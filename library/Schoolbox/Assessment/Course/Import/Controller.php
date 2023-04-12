@@ -296,7 +296,7 @@ class Controller extends Base\Base
         $post = $this->getRequest()->post;
 
         $action           = trim($post['action']);
-        $encodedReturnUrl = trim($post[Redirect::RETURN_URL]);
+        $encodedReturnUrl = trim($post[Redirect::RETURN_URL] ?? '');
         $courseSpecId     = trim($post['course_spec_id']);
         $targetFolderIds  = $this->parseFolderIds($this->getRequest()->post['import_folders']);
         $courseImplId     = trim($post['course_impl_id']);
