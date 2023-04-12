@@ -13,9 +13,8 @@ use Schoolbox\User;
 use Alaress\Authorizer\Failure\Unauthorized;
 use UnexpectedValueException;
 
-class isAwaitingPublication extends ArticleAttribute
+class IsAwaitingPublication extends ArticleAttribute
 {
-
     /**
      * @param array     $params
      * @param User|null $user
