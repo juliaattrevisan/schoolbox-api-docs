@@ -72,7 +72,7 @@ function updateWordCount(
                 currentProportionOfMaxLength = currentByteLength / config.maxCharCount,
                 currentPercentageOfMaxLength = (currentProportionOfMaxLength * 100).toFixed(2);
             characterCountElement.innerText = `Size: ${currentPercentageOfMaxLength}% of limit`;
-            if (currentProportionOfMaxLength > 1) {
+            if (currentProportionOfMaxLength > 0.9) {
                 characterCountElement.style.display = "block";
                 limitWarningElement.style.display = "block";
                 if (!config.showWordCount) {
