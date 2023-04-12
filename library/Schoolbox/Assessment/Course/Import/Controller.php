@@ -296,7 +296,6 @@ class Controller extends Base\Base
         $post = $this->getRequest()->post;
 
         $action           = trim($post['action']);
-        $encodedReturnUrl = trim($post[Redirect::RETURN_URL]);
         $courseSpecId     = trim($post['course_spec_id']);
         $targetFolderIds  = $this->parseFolderIds($this->getRequest()->post['import_folders']);
         $courseImplId     = trim($post['course_impl_id']);
@@ -439,16 +438,14 @@ class Controller extends Base\Base
 
         // respond with stage 4: coursework list
         $this->tpl('course', 'unitImportResults', [
-            'action'            => $action,
-            'returnUrlName'     => Redirect::RETURN_URL,
-            'encodedReturnUrl'  => $encodedReturnUrl,
-            'courseSpecId'      => $courseSpecId,
-            'courseImplId'      => $courseImplId,
-            'componentId'       => $componentId,
-            'folderIds'         => $targetFolderIds,
-            'dto'               => $dto,
-            'canReadCourseSpec' => $canReadCourseSpec,
-            'canReadUnitSpecs'  => $canReadUnitSpecs,
+            'action'              => $action,
+            'canReadCourseSpec'   => $canReadCourseSpec,
+            'canReadUnitSpecs'    => $canReadUnitSpecs,
+            'componentId'         => $componentId,
+            'courseImplId'        => $courseImplId,
+            'courseSpecId'        => $courseSpecId,
+            'dto'                 => $dto,
+            'folderIds'           => $targetFolderIds,
             'unitDefaultDueDates' => $unitDefaultDueDates,
         ]);
     }
