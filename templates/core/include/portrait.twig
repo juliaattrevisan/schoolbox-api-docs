@@ -5,7 +5,7 @@
     - externalId:       string allows you to manually specify a preferred externalId
     - limitHeight:      int constrain the image tag height
     - limitWidth:       int constrain the image tab width
-    - render:           enum [tiny, small, medium, large, menuMobile] (default is `small`)
+    - render:           enum [tiny, small, menuMobile, profile] (default is `small`)
     - description:      string a descriptor used for alt and title attributes
     - appendQueryParam: string query params you want appended to the image tag
     - class:            string optional class(es) to apply to the img tag
@@ -14,7 +14,6 @@
 {# portrait image tag is composed of... #}
 {% set sizeParameter = '&size=' %}
 {% set userParameter = '' %}
-{% set userFullname = '' %}
 {% set limitHeight = '' %}
 {% set limitWidth = '' %}
 {% if appendQueryParam is not defined %}
@@ -70,12 +69,6 @@
 {% if render == "profile" %}
     {# handle 'profile' case separately because here we use a srcset. #}
     <img src="/portrait.php?{{ userParameter }}{{ appendQueryParam }}"
-    {% if limitHeight is not empty %}
-        height="{{ limitHeight }}"
-    {% endif %}
-    {% if limitWidth is not empty %}
-        width="{{ limitWidth }}"
-    {% endif %}
         srcset="/portrait.php?{{ userParameter }}&amp;size=constrain200 200w, /portrait.php?{{ userParameter }}&amp;size=constrain500 500w"
         sizes="(max-width: 1300px) 200px, 500px"
     {% if class is not empty %}
