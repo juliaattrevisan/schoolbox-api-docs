@@ -63,11 +63,13 @@ function updateWordCount(
     if (config.maxCharCount === -1) {
         return;
     }
-
+    const characterCountElement = wordCountContainer.querySelector(".ck-word-count__characters") as HTMLDivElement;
+    const limitWarningElement = wordCountContainer.querySelector(".ck-word-count__limit-warning") as HTMLDivElement;
+    const textEncoder = new TextEncoder();
     const onUpdateText = function () {
-        const currentCharacterLength = editor.getData().length;
-        characterCountElement.innerText = `Characters: ${currentCharacterLength}`;
-        if (config.maxCharCount !== undefined && currentCharacterLength > config.maxCharCount) {
+        const currentByteLength = textEncoder.encode(editor.getData()).length;
+        characterCountElement.innerText = `Size: ${currentByteLength} / `;
+        if (config.maxCharCount !== undefined && currentByteLength > config.maxCharCount) {
             characterCountElement.style.display = "block";
             limitWarningElement.style.display = "block";
             if (!config.showWordCount) {
@@ -88,8 +90,6 @@ function updateWordCount(
         }
     };
 
-    const characterCountElement = wordCountContainer.querySelector(".ck-word-count__characters") as HTMLDivElement;
-    const limitWarningElement = wordCountContainer.querySelector(".ck-word-count__limit-warning") as HTMLDivElement;
     editor.plugins.get("WordCount").on("update", onUpdateText);
 
     onUpdateText(); // Run once initially in case max char count already exceeded due to content loaded from database.
