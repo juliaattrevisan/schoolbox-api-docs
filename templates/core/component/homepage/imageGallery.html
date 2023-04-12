@@ -87,7 +87,9 @@
                             </li>
                             <!-- END image_gallery -->
                         </ul>
-                        <script>window.sbProps.lightGalleryInit();</script>
+                        <script>
+                            if (window.sbProps.lightGalleryInit) { window.sbProps.lightGalleryInit(); }
+                        </script>
                     </div>
 
                     <div class="component-action">
