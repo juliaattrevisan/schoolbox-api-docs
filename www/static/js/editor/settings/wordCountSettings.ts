@@ -40,7 +40,7 @@ function getLimitWarningElement(config: EditorConfig) {
     const limitWarningElement = document.createElement("div");
     limitWarningElement.setAttribute("data-charLimitWarning", "");
     limitWarningElement.classList.add("ck-word-count__limit-warning");
-    limitWarningElement.innerHTML = `<b>Warning:</b> The character limit has been reached. Please reduce the content to below the limit to ensure save.`;
+    limitWarningElement.innerHTML = `<span class="ck-word-count__limit-exceeded"><b>Warning:</b> The character limit has been reached. Please reduce the content to below the limit to ensure save.</span>`;
     limitWarningElement.style.display = "none";
     return limitWarningElement;
 }
@@ -65,6 +65,7 @@ function updateWordCount(
     }
     const characterCountElement = wordCountContainer.querySelector(".ck-word-count__characters") as HTMLDivElement;
     const limitWarningElement = wordCountContainer.querySelector(".ck-word-count__limit-warning") as HTMLDivElement;
+    const limitExceededElement = wordCountContainer.querySelector(".ck-word-count__limit-exceeded") as HTMLSpanElement;
     const textEncoder = new TextEncoder();
     const onUpdateText = function () {
         if (config.maxCharCount !== undefined && config.maxCharCount > 0) {
@@ -72,28 +73,38 @@ function updateWordCount(
                 currentProportionOfMaxLength = currentByteLength / config.maxCharCount,
                 currentPercentageOfMaxLength = (currentProportionOfMaxLength * 100).toFixed(2);
             characterCountElement.innerText = `Size: ${currentPercentageOfMaxLength}% of limit`;
+
+            // Thresholds:
+            // if < 90% full, hide the limit notice
+            // if 90-100% full, show the limit but hide the exceeded error
+            // if > 100% full, show the limit and the exceeded error
             if (currentProportionOfMaxLength > 0.9) {
                 characterCountElement.style.display = "block";
                 limitWarningElement.style.display = "block";
                 if (!config.showWordCount) {
                     wordCountContainer.style.display = "flex";
                 }
+            } else {
+                characterCountElement.style.display = "none";
+                limitWarningElement.style.display = "none";
+                if (!config.showWordCount) {
+                    wordCountContainer.style.display = "none";
+                }
+            }
+
+            //
+            if (currentProportionOfMaxLength > 1) {
+                limitExceededElement.style.display = 'inline';
                 sourceElement.dispatchEvent(new CustomEvent(EditorEvent.EDITOR__MAX_CHAR_COUNT_EXCEEDED));
                 wordCountContainer.setAttribute("data-maxCharCountExceededAtLastCheck", "1");
-                return;
+            } else {
+                limitExceededElement.style.display = 'none';
+                if (wordCountContainer.getAttribute("data-maxCharCountExceededAtLastCheck") === "1") {
+                    sourceElement.dispatchEvent(new CustomEvent(EditorEvent.EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED));
+                }
+                wordCountContainer.setAttribute("data-maxCharCountExceededAtLastCheck", "0");
             }
         }
-
-        // Fallback: character count is not exceeded
-        characterCountElement.style.display = "none";
-        limitWarningElement.style.display = "none";
-        if (!config.showWordCount) {
-            wordCountContainer.style.display = "none";
-        }
-        if (wordCountContainer.getAttribute("data-maxCharCountExceededAtLastCheck") === "1") {
-            sourceElement.dispatchEvent(new CustomEvent(EditorEvent.EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED));
-        }
-        wordCountContainer.setAttribute("data-maxCharCountExceededAtLastCheck", "0");
     };
 
     editor.plugins.get("WordCount").on("update", onUpdateText);
