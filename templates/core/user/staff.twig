@@ -31,10 +31,7 @@
             <div class="profile content">
                 <div class="row no-margin">
                     <div class="small-12 medium-2 columns no-pad">
-                        <img class="full-width"
-                         srcset="/portrait.php?id={{ user.id }}&amp;size=constrain200 200w, /portrait.php?id={{ user.id }}&amp;size=constrain500 500w"
-                         sizes="(max-width: 1300px) 200px, 500px"
-                         src="/portrait.php?id={{ user.id }}&amp;size=constrain200"/>
+                        {% include 'include/portrait.twig' with {user: user, render: 'profile', class: 'full-width', description: ''} only %}
                     </div>
 
                     <div class="small-12 medium-10 columns">
