@@ -208,7 +208,7 @@ Data:
                                 <div class="small-12 compact card columns">
                                     {# cache to prevent repeated traversals #}
                                     <a href="{{ routeLookup('learningAssessment.getSummary', { assessmentId: assessment.id, studentId: participant.user.id}) }}">
-                                        {% include 'include/portrait.twig' with {user: participant.user, limitWidth: 48} only %}
+                                        {% include 'include/portrait.twig' with {user: participant.user} only %}
                                         <p>
                                             {{ participant.user.formatName }}
                                             <span class="pipe meta">

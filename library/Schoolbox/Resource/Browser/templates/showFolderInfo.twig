@@ -209,7 +209,7 @@
                 <dd class="small-12 medium-8{% if i > 0 %} medium-offset-4{% endif %}">
                     <div class="card tiny">
                         <a href="/search/user/{{ teacher.id }}">
-                            {% include 'include/portrait.twig' with {user: teacher, description: teacher.formatName, limitWidth: '48', limitHeight: '48'} only %}
+                            {% include 'include/portrait.twig' with {user: teacher, description: teacher.formatName} only %}
                             <p>{{ teacher.formatName }}</p>
                         </a>
                     </div>

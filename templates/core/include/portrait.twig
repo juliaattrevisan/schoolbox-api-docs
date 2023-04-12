@@ -3,8 +3,6 @@
     - user:             User|false checks for user.id or user.externalId - otherwise false renders a blank avatar
     - userId:           int allows you to manually specify a preferred userId
     - externalId:       string allows you to manually specify a preferred externalId
-    - limitHeight:      int constrain the image tag height
-    - limitWidth:       int constrain the image tab width
     - render:           enum [tiny, small, menuMobile, profile] (default is `small`)
     - description:      string a descriptor used for alt and title attributes
     - appendQueryParam: string query params you want appended to the image tag
@@ -12,6 +10,7 @@
 #}
 
 {# portrait image tag is composed of... #}
+{# NOTE: Since the variables below are initialised here, they are for internal use only. #}
 {% set sizeParameter = '&size=' %}
 {% set userParameter = '' %}
 {% set limitHeight = '' %}
