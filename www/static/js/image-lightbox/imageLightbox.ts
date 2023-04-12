@@ -10,7 +10,7 @@ import "lightgallery/css/lightgallery-bundle.min.css";
 import "./imageLightbox.css";
 
 window.sbProps.lightGallery = lightGallery;
-window.sbProps.lightGalleryInit = initLightGallery;
+window.sbProps.lightGalleryInit = initLightGallery; // Allow other scripts to call this function to reinit lightGallery
 window.sbProps.lightGalleries = {};
 
 /**
@@ -79,8 +79,20 @@ function initLightGallery(): void {
     });
 }
 
+/**
+ * Allow pages to create a lightbox dynamically using the IMAGE-LIGHTBOX__CREATE event
+ * This is useful for pages which need create a new lightbox after the page has already loaded
+ * For example, preview.js needs to create a lightbox
+ *
+ * The event detail should contain the following:
+ * - targetKey: the rel key to distinguish the lightbox
+ * - options: options to pass to lightGallery
+ */
 document.addEventListener("IMAGE-LIGHTBOX__CREATE", (e) => {
     let targetElement = document.querySelector("[data-image-lightbox='" + e.detail.targetKey + "']") as HTMLElement;
+
+    // Create a new element for the lightbox, hidden on the page
+    // this is to ensure that we have a usable element to pass to lightGallery
     if (targetElement === null) {
         targetElement = document.createElement("div");
         targetElement.setAttribute("data-image-lightbox", e.detail.targetKey);
@@ -88,6 +100,7 @@ document.addEventListener("IMAGE-LIGHTBOX__CREATE", (e) => {
         document.body.appendChild(targetElement);
     }
 
+    // Overwrite an existing lightbox to avoid creating duplicate lightboxes
     if (window.sbProps.lightGalleries[e.detail.targetKey]) {
         window.sbProps.lightGalleries[e.detail.targetKey].destroy(true);
     }
@@ -99,6 +112,7 @@ document.addEventListener("IMAGE-LIGHTBOX__CREATE", (e) => {
     );
 
     document.dispatchEvent(new CustomEvent("IMAGE-LIGHTBOX__CREATED", { detail: { targetKey: e.detail.targetKey } }));
+    // If the caller wants to do something after the lightbox is created, run the callback
     if (e.detail.onCreated) {
         e.detail.onCreated(window.sbProps.lightGalleries[e.detail.targetKey]);
     }
