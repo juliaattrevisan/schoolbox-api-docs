@@ -10,6 +10,7 @@ www/static/css/core/main.css
 www/static/css/core/core.css
 www/static/css/core/chromeFoundation.css
 www/static/css/core/editor.css
+www/static/css/core/schoolbox-ck-content.css
 *.log
 vendor/
 # Webpack bundle export directory

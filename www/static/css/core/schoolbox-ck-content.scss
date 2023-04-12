@@ -1,0 +1,14 @@
+/**
+ *  The main purpose of this file is to wrap up all of the rules that may
+ *  apply when viewing content created from CKEditor - the reason this file
+ *  specifically exists though is because we have some areas (such as PDF
+ *  exports from Gotenberg) that don't naturally pull across these styles,
+ *  meaning that the content looks weird when it's exported from Schoolbox
+ *
+ *  Encapsulating it all within a single .css file means we...
+ *  a) can add these styles inside the relevant files in a single line
+ *  b) don't need to copy paste / duplicate our code, so we...
+ *  c) have a much easier time when updating / maintaining the classes
+**/
+
+$cdn-prefix: "../../";

@@ -267,6 +267,7 @@ module.exports = {
 
         //Sass
         core: "./www/static/css/core/core.scss",
+        schoolboxCkStyles: "./www/static/css/core/schoolbox-ck-content.scss",
         // editor: "./www/static/css/core/editor.scss",
 
         // Slideshow
