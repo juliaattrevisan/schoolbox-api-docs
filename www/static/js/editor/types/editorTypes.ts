@@ -20,4 +20,5 @@ export interface EditorConfig {
     removeFromToolbar?: string[]; // the list of plugins to remove from the ckeditor outside of the scope of the EditorToolbar options
     maxCharCount?: number; // the maximum number of characters allowed in the editor
     showWordCount?: boolean; // whether or not to show the word count
+    fileBrowserCategoryId?: number; // to traverse directly to a specific folder in the Resources section of the resource modal
 }

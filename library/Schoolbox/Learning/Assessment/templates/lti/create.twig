@@ -339,6 +339,7 @@
         document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
             detail: {
                 targetElements: ['textarea[name="description"]'],
+                fileBrowserCategoryId: {{ context.baseContext.folder.id ?? 0 }},
             }
         }));
     });

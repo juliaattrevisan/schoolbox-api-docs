@@ -151,7 +151,8 @@
      */
     document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
         detail: {
-            targetElements: ['[data-cke]']
+            targetElements: ['[data-cke]'],
+            fileBrowserCategoryId: {{ context.baseContext.folder.id ?? 0 }},
         }
     }));
 

@@ -2,7 +2,9 @@
 <script type='text/javascript' src="{CDN_PREFIX}/js/evaluation/jquery.evaluation.validation.js?v={SITE_VERSION}"></script>
 <script type="text/javascript">
     $(function() {
-        $.fn.fillgapCreate();
+        $.fn.fillgapCreate({
+            fileBrowserCategoryId: '{ASSESS_CATEGORY_ID}',
+        });
     });
 </script>
 

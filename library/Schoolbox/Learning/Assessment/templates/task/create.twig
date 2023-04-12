@@ -144,6 +144,7 @@
         document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
             detail: {
                 targetElements: ['#assessment-description'],
+                fileBrowserCategoryId: {{ context.baseContext.folder.id ?? 0 }},
             }
         }));
     });

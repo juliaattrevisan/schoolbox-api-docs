@@ -112,6 +112,10 @@
                  */
                 defaultFolderSelector: 0,
 
+                /* To traverse directly to a specific folder in the Resources section of the resource modal
+                 */
+                fileBrowserCategoryId: 0,
+
                 /* To allow multiple file selections
                  */
                 allowMulti: false,
@@ -177,6 +181,8 @@
              */
             if (config.defaultFolderSelector) {
                 qString += "&fid=" + config.defaultFolderSelector;
+            } else if (config.fileBrowserCategoryId) {
+                qString += "&fid=" + config.fileBrowserCategoryId;
             }
 
             return qString;
@@ -569,6 +575,7 @@
                 allowedFiles: null,
                 allowedFilesystems: "link",
                 defaultFolderSelector: null,
+                fileBrowserCategoryId: null,
             },
 
             /* Combine with modal configuration requirements
@@ -596,6 +603,7 @@
                 allowedFilesystems: config.allowedFilesystems,
                 allowDetachment: config.allowDetachment,
                 defaultFolderSelector: config.defaultFolderSelector,
+                fileBrowserCategoryId: config.fileBrowserCategoryId,
                 onBeforeOpen: config.onBeforeOpen,
                 onAfterClose: config.onAfterClose,
                 onModalClosed: config.onModalClosed,

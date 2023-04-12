@@ -536,7 +536,7 @@
             var defaults = {
                 element: element,
                 targetElements: ["#answerBox"],
-                file_browser_category_id: 0,
+                fileBrowserCategoryId: 0,
             };
 
             var derived = {
@@ -560,6 +560,7 @@
                         targetElements: config.targetElements,
                         toolbar: "simple",
                         addToToolbar: ["|", "blank"],
+                        fileBrowserCategoryId: config.fileBrowserCategoryId,
                     },
                 })
             );

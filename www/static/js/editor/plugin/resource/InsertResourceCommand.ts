@@ -46,6 +46,7 @@ export default class InsertResourceCommand extends Command {
             allowMulti: true,
             useFolder: false,
             defaultFolderSelector,
+            fileBrowserCategoryId: this.editor.config.get("sbConfig").fileBrowserCategoryId,
         });
     }
 

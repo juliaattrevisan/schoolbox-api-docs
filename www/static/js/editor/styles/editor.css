@@ -16,8 +16,7 @@
     /* Change the colour of the mentions */
     --ck-color-mention-background: var(--accent-background);
     --ck-color-mention-text: #222222;
-    /* Ensure correct z-index on modals */
-    --ck-z-modal: 1010;
+    /* make a little longer, only seen in the Link plugin for Link URL */
     --ck-input-width: 19rem;
 }
 
@@ -29,7 +28,6 @@
  * add a min and max height to the editable area
  */
 .ck.ck-editor__editable_inline {
-    /* max-height: 400px; */
     min-height: 100px;
     padding: 0.5rem;
 }

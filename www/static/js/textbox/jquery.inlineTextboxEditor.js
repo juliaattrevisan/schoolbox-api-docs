@@ -7,9 +7,17 @@
      * @param {jQuery}  modifyButton
      * @param {jQuery}  saveButton
      * @param {jQuery}  deleteButton
+     * @param {number}  fileBrowserCategoryId
      * @constructor
      */
-    var InlineTextboxEditor = function (element, editorInstance, modifyButton, saveButton, deleteButton) {
+    var InlineTextboxEditor = function (
+        element,
+        editorInstance,
+        modifyButton,
+        saveButton,
+        deleteButton,
+        fileBrowserCategoryId
+    ) {
         var self = this;
         self.states = {
             clean: "clean",
@@ -25,6 +33,7 @@
         self.modifyButton = modifyButton;
         self.saveButton = saveButton;
         self.deleteButton = deleteButton;
+        self.fileBrowserCategoryId = fileBrowserCategoryId;
         self.editor = null;
 
         // Set up events
@@ -210,6 +219,7 @@
             new CustomEvent("EDITOR__CREATE", {
                 detail: {
                     targetElements: ["#" + editorInstanceId],
+                    fileBrowserCategoryId: self.fileBrowserCategoryId,
                 },
             })
         );
@@ -320,12 +330,14 @@
                 $deleteButton = $this.find(derivedOptions.deleteButton),
                 $saveButton = $this.find(derivedOptions.saveButton),
                 $editorInstance = $this.find(derivedOptions.editorInstance),
+                fileBrowserCategoryId = derivedOptions.fileBrowserCategoryId,
                 inlineTextboxEditor = new InlineTextboxEditor(
                     $this,
                     $editorInstance,
                     $modifyButton,
                     $saveButton,
-                    $deleteButton
+                    $deleteButton,
+                    fileBrowserCategoryId
                 );
             $this.data("inlineTextboxEditor", inlineTextboxEditor);
         });
