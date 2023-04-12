@@ -1,15 +1,13 @@
 {# Usage:
     {% include '@course/unitImportResults.twig' with {
-        action:                                     string {'import'|'modify'},
-        canReadCourseSpec:                          bool
-        canReadUnitSpec[unitSpecId]:                bool
-        componentId:                                int|null,
-        courseImplId:                               int|null,
-        courseSpecId:                               int,
-        dto:                                        DataTransferObject,
-        folderIds:                                  null|int[] - null if a 'modify''. List of folder IDs if 'import'
-        returnUrlName                               string
-        unitDefaultDueDates:                        array
+        action:                      string {'import'|'modify'},
+        canReadUnitSpec[unitSpecId]: bool
+        componentId:                 int|null,
+        courseImplId:                int|null,
+        courseSpecId:                int,
+        dto:                         DataTransferObject,
+        folderIds:                   null|int[] - null if a 'modify''. List of folder IDs if 'import'
+        unitDefaultDueDates:         array
     } only %}
 #}
 <script>
