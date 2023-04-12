@@ -25,14 +25,13 @@
         {% endif %}
     </nav>
 </div>
-
 <div class="row">
     <div class="small-12 island">
         <section class="no-pad">
             <div class="profile content">
                 <div class="row no-margin">
                     <div class="small-12 medium-2 columns no-pad">
-                        <img class="full-width" src="/portrait.php?id={{ user.id }}&amp;size=constrain200"/>
+                        {% include 'include/portrait.twig' with {user: user, render: 'profile', class: 'full-width', description: ''} only %}
                     </div>
 
                     <div class="small-12 medium-10 columns">

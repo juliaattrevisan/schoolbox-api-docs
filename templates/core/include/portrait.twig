@@ -3,18 +3,16 @@
     - user:             User|false checks for user.id or user.externalId - otherwise false renders a blank avatar
     - userId:           int allows you to manually specify a preferred userId
     - externalId:       string allows you to manually specify a preferred externalId
-    - limitHeight:      int constrain the image tag height
-    - limitWidth:       int constrain the image tab width
-    - render:           enum [tiny, small, medium, large, menuMobile] (default is `small`)
+    - render:           enum [tiny, small, menuMobile, profile] (default is `small`)
     - description:      string a descriptor used for alt and title attributes
     - appendQueryParam: string query params you want appended to the image tag
     - class:            string optional class(es) to apply to the img tag
 #}
 
 {# portrait image tag is composed of... #}
+{# NOTE: Since the variables below are initialised here, they are for internal use only. #}
 {% set sizeParameter = '&size=' %}
 {% set userParameter = '' %}
-{% set userFullname = '' %}
 {% set limitHeight = '' %}
 {% set limitWidth = '' %}
 {% if appendQueryParam is not defined %}
@@ -66,43 +64,51 @@
     {% set userParameter = "userId=" ~ externalId %}
 {%  endif %}
 
-{# prefer the use a semantic name for the portrait (tiny, small, medium, large, menuMobile)#}
-{# establish small as the default rendering method #}
-{% if render == "tiny" %}
-    {% set sizeParameter = sizeParameter ~ "square32" %}
-{% elseif render == "small" %}
-    {% set sizeParameter = sizeParameter ~ "square64" %}
-{% elseif render == "medium" %}
-    {% set sizeParameter = sizeParameter ~ "constrain200" %}
-    {% set limitHeight = 200 %}
-    {% set limitWidth = 200 %}
-    {% set class = "full-width" %}
-{% elseif render == "menuMobile" %}
-    {% set sizeParameter = sizeParameter ~ "square72" %}
-    {% set limitHeight = 72 %}
-    {% set limitWidth = 72 %}
-{% elseif render == "large" %}
-    {% set sizeParameter = sizeParameter ~ "profile" %}
-    {% set class = "full-width" %}
-{% else %}
-    {% set sizeParameter = sizeParameter ~ "square64" %}
-{% endif %}
 
-<img src="/portrait.php?{{ userParameter }}{{ sizeParameter }}{{ appendQueryParam }}"
+{% if render == "profile" %}
+    {# handle 'profile' case separately because here we use a srcset. #}
+    <img src="/portrait.php?{{ userParameter }}{{ appendQueryParam }}"
+        srcset="/portrait.php?{{ userParameter }}&amp;size=constrain200 200w, /portrait.php?{{ userParameter }}&amp;size=constrain500 500w"
+        sizes="(max-width: 1300px) 200px, 500px"
     {% if class is not empty %}
         class="{{ class }}"
     {% endif %}
-
-    {% if limitHeight is not empty %}
-        height="{{ limitHeight }}"
-    {% endif %}
-
-    {% if limitWidth is not empty %}
-        width="{{ limitWidth }}"
-    {% endif %}
-
     {% if userDescription is not empty %}
         alt="{{ userDescription }}"
         title="{{ userDescription }}"
     {% endif %}
-/>
+    />
+{% else %}
+    {# prefer the use a semantic name for the portrait (tiny, small, menuMobile)#}
+    {# establish small as the default rendering method #}
+    {% if render == "tiny" %}
+        {% set sizeParameter = sizeParameter ~ "square32" %}
+    {% elseif render == "small" %}
+        {% set sizeParameter = sizeParameter ~ "square64" %}
+    {% elseif render == "menuMobile" %}
+        {% set sizeParameter = sizeParameter ~ "square72" %}
+        {% set limitHeight = 72 %}
+        {% set limitWidth = 72 %}
+    {% else %}
+        {% set sizeParameter = sizeParameter ~ "square64" %}
+    {% endif %}
+
+    <img src="/portrait.php?{{ userParameter }}{{ sizeParameter }}{{ appendQueryParam }}"
+        {% if class is not empty %}
+            class="{{ class }}"
+        {% endif %}
+
+        {% if limitHeight is not empty %}
+            height="{{ limitHeight }}"
+        {% endif %}
+
+        {% if limitWidth is not empty %}
+            width="{{ limitWidth }}"
+        {% endif %}
+
+        {% if userDescription is not empty %}
+            alt="{{ userDescription }}"
+            title="{{ userDescription }}"
+        {% endif %}
+    />
+{% endif %}

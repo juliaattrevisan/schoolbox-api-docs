@@ -20,13 +20,15 @@
          title="{{ user.fullName }}">
 {%- endmacro %}
 
-{% macro imageSquare200(user) -%}
+{% macro imageSquare(user) -%}
     <img class="full-width"
-         src="/portrait.php?id={{ user.id }}&size=constrain200"
          height="200"
          width="200"
+         srcset="/portrait.php?id={{ user.id }}&amp;size=constrain200 200w, /portrait.php?id={{ user.id }}&amp;size=constrain500 500w"
+         sizes="(max-width: 1300px) 200px, 500px"
+         src="/portrait.php?id={{ user.id }}&amp;size=constrain200"
          alt="{{ user.fullName }}"
-         title="{{ user.fullName }}">
+         title="{{ user.fullName }}"/>
 {%- endmacro %}
 
 {% macro link(user) -%}
