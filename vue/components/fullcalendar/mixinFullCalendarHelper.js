@@ -18,15 +18,10 @@ export default {
         fullCalendarHelper_onLoading(isLoading) {
             if (isLoading === true) {
                 // this.$refs.toast.activate('Loading...');
-                const overlayLoaderHTML = `
-                <div data-loader-overlay style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); z-index: 10000">
-                    <div class="preview loader" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"></div>
-                </div>`;
-
-                document.body.insertAdjacentHTML('beforeend', overlayLoaderHTML);
+                document.dispatchEvent(new Event("OVERLAY_LOADER_SHOW"));
             } else {
                 // this.$refs.toast.timeout('Done', true, 3000, 2000);
-                document.querySelector("[data-loader-overlay]")?.remove()
+                document.dispatchEvent(new Event("OVERLAY_LOADER_HIDE"));
             }
         },
 

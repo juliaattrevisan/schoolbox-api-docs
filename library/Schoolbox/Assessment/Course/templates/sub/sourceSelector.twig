@@ -13,13 +13,7 @@
          */
         $('[data-course-parent-selector]').on('click', function (e) {
             e.preventDefault();
-
-            const overlayLoaderHTML = `
-            <div data-loader-overlay style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); z-index: 10000">
-                <div class="preview loader" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"></div>
-            </div>`;
-
-            document.body.insertAdjacentHTML('beforeend', overlayLoaderHTML);
+            document.dispatchEvent(new Event("OVERLAY_LOADER_SHOW"));
 
             let $selector = $(this),
                 target = $selector.data('source'),
@@ -47,7 +41,7 @@
             });
 
             $(document).on('opened.fndtn.reveal', '[data-reveal]', function () {
-                document.querySelector("[data-loader-overlay]")?.remove()
+                document.dispatchEvent(new Event("OVERLAY_LOADER_HIDE"));
             });
         });
     })

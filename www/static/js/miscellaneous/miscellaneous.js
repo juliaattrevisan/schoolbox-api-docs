@@ -206,6 +206,28 @@ $(function () {
         this.clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(updateTopNavItems, 100);
     });
+
+    // Full screen loader overlay
+    document.addEventListener("OVERLAY_LOADER_SHOW", function (e) {
+        const existingLoader = document.querySelector("[data-loader-overlay]");
+
+        if (!existingLoader) {
+            const overlayLoaderHTML = `
+            <div data-loader-overlay class="loader-overlay">
+                <div class="preview loader"></div>
+            </div>`;
+
+            document.body.insertAdjacentHTML("beforeend", overlayLoaderHTML);
+        }
+    });
+
+    document.addEventListener("OVERLAY_LOADER_HIDE", function (e) {
+        const existingLoader = document.querySelector("[data-loader-overlay]");
+
+        if (existingLoader) {
+            existingLoader.remove();
+        }
+    });
 });
 
 /**

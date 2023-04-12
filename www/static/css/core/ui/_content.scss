@@ -443,6 +443,24 @@ span.loader {
     height: 1rem;
 }
 
+// Full page loader, show above all other content
+.loader-overlay {
+    background-color: rgba(0, 0, 0, 0.8);
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: 0;
+    position: fixed;
+    z-index: 10000;
+
+    .loader {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+}
+
 .progress-tick-form {
     transition: all 240ms cubic-bezier(0.15, 1.4, 0.7, 1.35);
     &[disabled] {

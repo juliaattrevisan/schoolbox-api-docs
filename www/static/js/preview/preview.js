@@ -55,19 +55,13 @@
                 .click(function (event) {
                     if (event.which <= 1) {
                         event.preventDefault();
-
-                        const overlayLoaderHTML = `
-                        <div data-loader-overlay style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); z-index: 10000">
-                            <div class="preview loader" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"></div>
-                        </div>`;
-
-                        document.body.insertAdjacentHTML('beforeend', overlayLoaderHTML);
+                        document.dispatchEvent(new Event("OVERLAY_LOADER_SHOW"));
 
                         var href = $(this).attr(config.attribute);
                         var url = config.baseUrl + "/" + encodeURIComponent(href);
 
                         $.get(url, function (response) {
-                            document.querySelector("[data-loader-overlay]")?.remove()
+                            document.dispatchEvent(new Event("OVERLAY_LOADER_HIDE"));
 
                             if (response.type == "redirect") {
                                 window.location.href = response.fragment;
@@ -147,7 +141,7 @@
                         }).fail(function () {
                             // Did something break?
                             // Just pretend this preview never happened.
-                            document.querySelector("[data-loader-overlay]")?.remove()
+                            document.dispatchEvent(new Event("OVERLAY_LOADER_HIDE"));
                             window.location.href = href;
                         });
                     }
