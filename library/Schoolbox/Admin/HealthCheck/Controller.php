@@ -895,20 +895,20 @@ class Controller extends Base
         $database = FolderMapper::getInstance()->getDatabase();
         $statement = $database->prepare("
         SELECT
-            ll.username as 'Username',
-            g.name as 'Role',
-            concat((MONTHNAME(ll.date)),'',(YEAR(ll.date))) AS Month,
-            count(*) as 'Login Count'
+          ll.username as 'Username',
+          g.name as 'Role',
+          concat((MONTHNAME(ll.date)),' ',(YEAR(ll.date))) AS Month,
+          count(*) as 'Login Count'
         FROM
-            login_log ll
+          login_log ll
         JOIN
-            user u on ll.username = u.username
+          user u on ll.username = u.username
         JOIN
-            groups g on u.group_id = g.id
+          groups g on u.group_id = g.id and not g.id in (2,9)
         GROUP BY
-            username,month
+          username,month
         ORDER BY
-            ll.username,month;
+          ll.username,month;
         ");
         $statement->execute();
         $help = new Helper();
@@ -924,20 +924,18 @@ class Controller extends Base
         $database = FolderMapper::getInstance()->getDatabase();
         $statement = $database->prepare("
         SELECT
-            ll.username as 'Username',
-            g.name as 'Role',
-            concat((MONTHNAME(ll.date)),'',(YEAR(ll.date))) AS Month,
-            count(*) as 'Login Count'
+            cnas.article_id as 'News ID',
+            cna.title as 'News Title',
+            count(*) as 'Total Views',
+            cna.publish_at as 'Publish Date'
         FROM
-            login_log ll
-        JOIN
-            user u on ll.username = u.username
-        JOIN
-            groups g on u.group_id = g.id
-        GROUP BY
-            username,month
-        ORDER BY
-            ll.username,month;
+            comms_news_article_statistics cnas
+        LEFT JOIN
+            comms_news_article cna on cnas.article_id = cna.id
+        WHERE
+            cnas.deleted_at is NULL
+        group by
+            article_id;
         ");
         $statement->execute();
         $help = new Helper();
@@ -968,7 +966,7 @@ class Controller extends Base
         FROM
             comms_news_article_statistics cnas
         JOIN
-            groups g on cnas.role_id = g.id
+            groups g on cnas.role_id = g.id and not g.id in (2,9)
         JOIN
             comms_news_article cna on cnas.article_id = cna.id
         GROUP BY
@@ -1052,6 +1050,9 @@ class Controller extends Base
         $help = new Helper();
         $help->queryToCSV($statement, 'svaNewsArticleViewsPerMonthByActiveAlumni.csv');
     }
+    // ===============================================================================================
+    // =================== TO DO: ADD 'News Article Views (Specific)' Here ===========================
+    // ===============================================================================================
     /**
      * SVA
      * svaNewsCreatedBySVATeam.csv
@@ -1061,29 +1062,19 @@ class Controller extends Base
         $database = FolderMapper::getInstance()->getDatabase();
         $statement = $database->prepare("
         SELECT
-            article_id as 'News ID',
-            cna.title as 'News Title',
-            coalesce((SELECT
-            group_concat(nt.name)
+            concat((MONTHNAME(cna.created_at)),' ',(YEAR(cna.created_at))) AS Month,
+            concat(u.firstname,' ',u.lastname,' (',u.id,')') as 'Author',
+            count(*) as 'Create Count'
         FROM
-            newsTopic nt
+            comms_news_article cna
         JOIN
-            comms_news_article_topic cnat on nt.newsTopicID = cnat.topic_id
+            user u on cna.author_id = u.id
         WHERE
-            cnat.article_id = cna.id),'No Topic Listed') as 'Topics',
-            concat((MONTHNAME(cnas.created_at)),' ',(YEAR(cnas.created_at))) AS Month,
-            count(DISTINCT user_id) as 'View Count',
-            cna.publish_at as 'Publish Date'
-        FROM
-            comms_news_article_statistics cnas
-        JOIN
-            user u on cnas.user_id = u.id
-        JOIN
-            comms_news_article cna on cnas.article_id = cna.id
-        WHERE
-            u.group_id = '12'
-        group by
-            cnas.article_id, month;
+            author_id in (4,13,111,110,5,6)
+        GROUP BY
+            author_id,month
+        ORDER BY
+            cna.created_at;
         ");
         $statement->execute();
         $help = new Helper();
@@ -1105,7 +1096,7 @@ class Controller extends Base
         FROM
             homepage_visits hv
         JOIN
-            groups g on hv.user_group_id = g.id
+            groups g on hv.user_group_id = g.id and not g.id in (2,9)
         JOIN
             folder f on hv.category_id = f.id
         WHERE
@@ -1135,7 +1126,7 @@ class Controller extends Base
         FROM
             homepage_visits hv
         JOIN
-            groups g on hv.user_group_id = g.id
+            groups g on hv.user_group_id = g.id and not g.id in (2,9)
         JOIN
             folder f on hv.category_id = f.id
         GROUP BY
@@ -1147,6 +1138,9 @@ class Controller extends Base
         $help = new Helper();
         $help->queryToCSV($statement, 'svaHomepageViewsByAllPerRolePerMonth.csv');
     }
+    // ===============================================================================================
+    // ====================== TO DO: ADD 'Homepage views per user' Here ==============================
+    // ===============================================================================================
     /**
      * SVA
      * svaHomepageViewsForCommunityForumsPage.csv
@@ -1163,11 +1157,11 @@ class Controller extends Base
         FROM
             homepage_visits hv
         JOIN
-            groups g on hv.user_group_id = g.id
+            groups g on hv.user_group_id = g.id and not g.id in (2,9)
         JOIN
             folder f on hv.category_id = f.id
         WHERE
-            hv.category_id = '59'
+            hv.category_id = '831'
         GROUP BY
             concat((MONTHNAME(hv.date)),' ',(YEAR(hv.date))),hv.user_group_id,hv.category_id
         ORDER BY
@@ -1193,7 +1187,7 @@ class Controller extends Base
         FROM
             homepage_visits hv
         JOIN
-            groups g on hv.user_group_id = g.id
+            groups g on hv.user_group_id = g.id and not g.id in (2,9)
         JOIN
             folder f on hv.category_id = f.id
         WHERE
@@ -1216,22 +1210,26 @@ class Controller extends Base
         $database = FolderMapper::getInstance()->getDatabase();
         $statement = $database->prepare("
         SELECT
-            concat((MONTHNAME(hv.date)),' ',(YEAR(hv.date))) AS Month,
-            f.name as 'Homepage',
             g.name as 'Role',
+            concat(f.name,' (',f.id,')') as 'Homepage',
+            concat((MONTHNAME(hv.date)),' ',(YEAR(hv.date))) AS Month,
             SUM(hv.hitcount) as 'Sum Hitcount'
         FROM
             homepage_visits hv
         JOIN
-            groups g on hv.user_group_id = g.id
+            groups g on hv.user_group_id = g.id and not g.id in (2,9)
         JOIN
             folder f on hv.category_id = f.id
         WHERE
-            hv.category_id = '18'
+            (
+            f.id = 676
+            OR
+            f.parent = 676
+            )
         GROUP BY
             concat((MONTHNAME(hv.date)),' ',(YEAR(hv.date))),hv.user_group_id,hv.category_id
         ORDER BY
-            hv.date,hv.category_id,hv.user_group_id;
+            hv.user_group_id,hv.category_id,hv.date;
         ");
         $statement->execute();
         $help = new Helper();
@@ -1253,7 +1251,7 @@ class Controller extends Base
         FROM
             homepage_visits hv
         JOIN
-            groups g on hv.user_group_id = g.id
+            groups g on hv.user_group_id = g.id and not g.id in (2,9)
         JOIN
             folder f on hv.category_id = f.id
         WHERE
@@ -1283,7 +1281,7 @@ class Controller extends Base
         FROM
             homepage_visits hv
         JOIN
-            groups g on hv.user_group_id = g.id
+            groups g on hv.user_group_id = g.id and not g.id in (2,9)
         JOIN
             folder f on hv.category_id = f.id
         WHERE
@@ -1317,7 +1315,7 @@ class Controller extends Base
         FROM
             homepage_visits hv
         JOIN
-            groups g on hv.user_group_id = g.id
+            groups g on hv.user_group_id = g.id and not g.id in (2,9)
         JOIN
             folder f on hv.category_id = f.id
         WHERE
@@ -1382,7 +1380,10 @@ class Controller extends Base
         ORDER BY
             ft.threadID,ft.date;
         ");
-        $statement->execute();
+        // ===============================================================================================
+        // ============= TO DO: ADD 'Social Stream Posts (per month, per page)' Here =====================
+        // ===============================================================================================
+                $statement->execute();
         $help = new Helper();
         $help->queryToCSV($statement, 'svaForumReplies.csv');
     }
