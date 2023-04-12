@@ -2,9 +2,10 @@
     A single UnitImplementation. Displayed in the final stage of the Course import/modify screen.
 
     Data:
-        unitImpl:        UnitImplementation,
-        dto:             DataTransferObject,
-        canReadUnitSpec: bool,
+        unitImpl:            UnitImplementation,
+        canReadUnitSpec:     bool,
+        dto:                 DataTransferObject,
+        unitDefaultDueDates: array
 #}
 
 {% set unitSpec                    = unitImpl.specification %}

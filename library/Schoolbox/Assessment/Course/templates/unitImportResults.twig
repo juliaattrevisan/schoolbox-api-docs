@@ -1,18 +1,15 @@
 {# Usage:
-    {% include '@course/unitImportResullts.twig' with {
-        action:       string {'import'|'modify'},
-        courseSpecId: int,
-        folderIds:        null|int[]                                       - null if a 'modify''. List of folder IDs if 'import'
-        courseImplId: int|null,
-        units:        array,
-        units[unitSpecId]['unitSpec']: UnitSpecification,
-        units[unitSpecId]['unitImpl']: UnitImplementation | null,
-        units[unitSpecId]['assessments']: array,
-        units[unitSpecId]['assessments'][]['spec']: IAssessable | null,
-        units[unitSpecId]['assessments'][]['impl']: IAssessable | null,
-        componentId:  int|null,
-        canReadCourseSpec: bool
-        canReadUnitSpec[unitSpecId]: bool
+    {% include '@course/unitImportResults.twig' with {
+        action:                                     string {'import'|'modify'},
+        canReadCourseSpec:                          bool
+        canReadUnitSpec[unitSpecId]:                bool
+        componentId:                                int|null,
+        courseImplId:                               int|null,
+        courseSpecId:                               int,
+        dto:                                        DataTransferObject,
+        folderIds:                                  null|int[] - null if a 'modify''. List of folder IDs if 'import'
+        returnUrlName                               string
+        unitDefaultDueDates:                        array
     } only %}
 #}
 <script>
