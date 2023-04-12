@@ -59,14 +59,27 @@ class Installer implements IPackageInstall
         $csv = (new CsvReader($path))->setLoadFromFirst(true);
         $curriculumMapper = Node\Mapper::getInstance();
         $parentLookup = [];
+        /**
+         * on occasion node parents will be edited or created after the node was created (in the original export...)
+         * This will help fix those relationships...
+         * {'node' = curricNode, 'parentID' = id of the parent object}
+         */
+        $missingParents = [];
 
         /* Special cast for broken csv
          * I had to forcibly insert Victorian Curriculum as node 0
          * Hence the specific check for !== 'NULL'
          */
         foreach ($csv as $row) {
-            $node = $curriculumMapper->createModel()
-                ->setParent($row['curriculum_node_parent_id'] ? $parentLookup[$row['curriculum_node_parent_id']] : null)
+            $node = $curriculumMapper->createModel();
+            //check if parent exists? if missing then save these details so we can go back later
+            if (isset($parentLookup[$row['curriculum_node_parent_id']])) {
+                $node->setParent($row['curriculum_node_parent_id'] ? $parentLookup[$row['curriculum_node_parent_id']] : null);
+            } else {
+                $node->setParent(null);
+                $missingParents[] = ['node' => $node, 'parentID' => $row['curriculum_node_parent_id'] ];
+            }
+                $node
                 ->setName($row['name'])
                 ->setDescription($row['description'])
                 ->setCode(trim($row['code']))
@@ -76,6 +89,14 @@ class Installer implements IPackageInstall
 
             // Store the inserted ID so we can link children to it
             $parentLookup[$row['id']] = $node;
+        }
+
+        // fix for parents that were added later in the csv
+        foreach ($missingParents as $orphan) {
+            if (isset($parentLookup[$orphan['parentID']])) {
+                $orphan['node']->setParent($orphan['parentID'] ? $parentLookup[$orphan['parentID']] : null);
+                $curriculumMapper->save($orphan['node']);
+            }
         }
     }
 }
