@@ -37,10 +37,15 @@ function getCharacterElement() {
  * @returns { HTMLDivElement } - the limit warning element
  */
 function getLimitWarningElement(config: EditorConfig) {
+    const limitExceededElement = document.createElement('span');
+    limitExceededElement.setAttribute("data-charLimitExceeded", "");
+    limitExceededElement.classList.add("ck-word-count__limit-exceeded");
+    limitExceededElement.innerHTML = '<b>Warning:</b> The character limit has been reached. Please reduce the content to below the limit to ensure save.';
+
     const limitWarningElement = document.createElement("div");
     limitWarningElement.setAttribute("data-charLimitWarning", "");
     limitWarningElement.classList.add("ck-word-count__limit-warning");
-    limitWarningElement.innerHTML = `<span class="ck-word-count__limit-exceeded"><b>Warning:</b> The character limit has been reached. Please reduce the content to below the limit to ensure save.</span>`;
+    limitWarningElement.append(limitExceededElement);
     limitWarningElement.style.display = "none";
     return limitWarningElement;
 }

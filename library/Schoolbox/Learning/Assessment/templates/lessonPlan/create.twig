@@ -186,7 +186,7 @@
             function () {
                 // Only enable save button if no char limit warnings are showing on any ckeditor field.
                 // NOTE: ':visible' selector only works in jQuery.
-                if ($("[data-charLimitWarning]:visible").length === 0) {
+                if ($("[data-charLimitExceeded]:visible").length === 0) {
                     const input = document.querySelector('input[type=submit]');
                     input.disabled = false;
                     input.setAttribute('value', 'Save');
