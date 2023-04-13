@@ -82,7 +82,7 @@ class Decorator implements DecoratorInterface
         /* Convert each Lesson Plan Template Field into a Lesson Plan Field
          * along with any customisations provided by the user
          */
-        $assessment->setFields($lessonPlanFieldMapper->createCollection());
+        $newFields = $lessonPlanFieldMapper->createCollection();
 
         foreach ($this->lessonPlanFields as $fieldId => $field) {
             /* Figure out which Lesson Plan Template Field is related to this Lesson Plan Field
@@ -91,23 +91,39 @@ class Decorator implements DecoratorInterface
              *  resulting in this field going missing, due to multiplayer schoolbox. Is this
              *  something that happens often enough to safeguard further, and in what manner?
              */
-            $lessonPlanTemplateField = $lessonPlanTemplate->getFields()->getBy('id', $field['template']);
+            if (str_contains($fieldId, self::NEW_KEYWORD)) {
+                /* This is a new field, so we need to remember from whence it came and all
+                 * the details associated with its originating Lesson Plan Template Field
+                 */
+                $lessonPlanTemplateField = $lessonPlanTemplate->getFields()->getBy('id', $field['template']);
 
-            $lessonPlanField = $lessonPlanFieldMapper->createModel()
-                ->setLessonPlanTemplateField($lessonPlanTemplateField)
-                ->setTitle($lessonPlanTemplateField->getTitle())
-                ->setBody($field['body'])
-                ->setVisibility($lessonPlanTemplateField->getVisibility())
-                ->setSequence($lessonPlanTemplateField->getSequence());
-
-            /* If it's not a new Lesson Plan Field, recycle its identifier
-             */
-            if (!str_contains($fieldId, self::NEW_KEYWORD)) {
-                $lessonPlanField->setId($fieldId);
+                $updatedField = $lessonPlanFieldMapper->createModel()
+                    ->setLessonPlanTemplateField($lessonPlanTemplate->getFields()->getBy('id', $field['template']))
+                    ->setTitle($lessonPlanTemplateField->getTitle())
+                    ->setVisibility($lessonPlanTemplateField->getVisibility())
+                    ->setSequence($lessonPlanTemplateField->getSequence());
+            } else {
+                /* This is an existing field; we only need to change its body
+                 * Everything else remains unchanged
+                 */
+                $updatedField = $assessment->getFields()->getBy('id', $fieldId);
             }
 
-            $assessment->getFields()->add($lessonPlanField);
+            /* Existing Lesson Plan Fields can only get their Body contents updated
+             *
+             * Everything else remains the same, as enforced by the Lesson Plan Template Field
+             * from which it spawned.
+             */
+            $updatedField->setBody($field['body']);
+
+            /* Pile it into the stack
+             */
+            $newFields->add($updatedField);
         }
+
+        /* Overwrite what was originally there
+         */
+        $assessment->setFields($newFields);
 
         /* Process each of attached files separately
          */
