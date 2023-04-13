@@ -253,10 +253,12 @@ class ClassResults
          * $assessments and $this->assessments are ordered similarly, by same specification id
          * so we can ASSUME something here about the sequence of $assessment
          */
+        $specsWithPublishedMarks = array_values($this->tuples);
+
         foreach ($this->assessments as $assessment) {
             /* Skip assessment specs whose descendent assessments haven't got any published marks yet
              */
-            if (!in_array($assessment->getSpecificationAssessment()->getId(), array_values($this->tuples), false)) {
+            if (!in_array($assessment->getSpecificationAssessment()->getId(), $specsWithPublishedMarks, false)) {
                 continue;
             }
 
