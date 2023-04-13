@@ -247,6 +247,7 @@ export default {
                         new CustomEvent(EditorEvent.EDITOR__CREATE, {
                             detail: {
                                 targetElements: [`#${this.id}`],
+                                fileBrowserCategoryId: self.folderId,
                             },
                         })
                     );
