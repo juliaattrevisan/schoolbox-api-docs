@@ -78,6 +78,15 @@ class Controller extends ConfigController
      */
     private const NO_YEAR_LEVEL_ID = 0;
 
+
+    /**
+     * This tuple corresponds to a fictitious option "No Year Level"
+     * which doesn't exist in a lookup
+     */
+    private const NO_YEAR_LEVEL_TUPLE = [
+        'id' => self::NO_YEAR_LEVEL_ID, 'name' => 'No Year Level'
+    ];
+
     /**
      * Constructor
      *
@@ -98,7 +107,6 @@ class Controller extends ConfigController
      * @param FieldStrategyFactory     $fieldStrategyFactory
      * @param Rebuilder                $rebuilder
      * @param \Schoolbox\External\User $externalUser
-     * @param RosettaStone             $l10n
      */
     public function __construct(
         private \Schoolbox\Error\Mapper $errorMapper,
@@ -118,7 +126,6 @@ class Controller extends ConfigController
         FieldStrategyFactory $fieldStrategyFactory,
         Rebuilder $rebuilder,
         private \Schoolbox\External\User $externalUser,
-        private RosettaStone $l10n,
     ) {
         parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder);
     }
@@ -360,7 +367,7 @@ class Controller extends ConfigController
          */
         if (\in_array(self::NO_YEAR_LEVEL_ID, $optionsPayload['yearLevels'], false)) {
             $options['yearLevels'] = [
-                $this->getNoYearLevelTuple()
+                self::NO_YEAR_LEVEL_TUPLE
             ];
         }
 
@@ -459,7 +466,7 @@ class Controller extends ConfigController
      */
     public function getYearLevels(): void
     {
-        $output = [$this->getNoYearLevelTuple()];
+        $output = [self::NO_YEAR_LEVEL_TUPLE];
 
         $yearLevels = $this->yearLevelMapper->findAll()->sortBy('sequence', 'ASC');
 
@@ -905,17 +912,5 @@ class Controller extends ConfigController
             //redirect user to report preview
             $this->getResponse()->redirect->to($reports[0]['url']);
         }
-    }
-
-    /**
-     * Returns tuple corresponds to a fictitious option "No Year Level"
-     * which doesn't exist in a lookup
-     */
-    private function getNoYearLevelTuple(): array
-    {
-        return [
-            'id'   => self::NO_YEAR_LEVEL_ID,
-            'name' => sprintf('No %s', $this->l10n->translate('yearLevel', false, true)),
-        ];
     }
 }

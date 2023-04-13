@@ -376,15 +376,17 @@ class Mapper extends \Schoolbox\Mapper
 
     /**
      * If the year's name contains only an integer, presume the user wanted
-     * to prepend "Year " in front of it, because this is how it will
+     * to prepend "Year " prefix given in front of it, because this is how it will
      * manifest in a UI somewhere.
      *
+     * @param string|null $yearName
+     * @param string      $yearPrefix
      * @return string
      */
-    private function getLongName(?string $yearName): string
+    private function getLongName(?string $yearName, string $yearPrefix): string
     {
         if (preg_match('/^[0-9]+$/', $yearName)) {
-            return "Year {$yearName}";
+            return sprintf("%s %s", $yearPrefix, $yearName);
         }
 
         return $yearName;
@@ -400,11 +402,10 @@ class Mapper extends \Schoolbox\Mapper
      * @param Badge\Model $badge
      * @param string      $awardStatus
      * @param string      $roleType
+     * @param string      $yearPrefix
      * @return array
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \PDOException
      */
-    public function findRecipients(string $keyword, Badge\Model $badge, string $awardStatus, string $roleType): array
+    public function findRecipients(string $keyword, Badge\Model $badge, string $awardStatus, string $roleType, string $yearPrefix): array
     {
         /* No keyword provided; nothing to search
          */
@@ -469,7 +470,7 @@ class Mapper extends \Schoolbox\Mapper
             $person = "{$fullName} - ";
 
             if (isset($row['year'])) {
-                $person .= $this->getLongName($row['year']) . ', ';
+                $person .= $this->getLongName($row['year'], $yearPrefix) . ', ';
             }
 
             $person .= $row['role'];
