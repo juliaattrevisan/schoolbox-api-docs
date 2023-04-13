@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Grades\Cohort;
 
+use Alaress\Database\Predicate\InvalidColumnException;
 use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Analytics\BoxPlot\Summary;
@@ -25,7 +26,6 @@ use Schoolbox\User;
  */
 class ClassResults
 {
-
     /**
      * @var bool
      */
@@ -99,12 +99,9 @@ class ClassResults
      * The resultant assessments' order is then made the same as the input's order.
      *
      * @return array
-     * @throws \DomainException
-     * @throws \InvalidArgumentException
-     * @throws \LogicException
+     * @throws InvalidColumnException
      * @throws \PDOException
-     * @throws \Schoolbox\Mapper\DefinitionException
-     * @throws \UnexpectedValueException
+     * @throws \UnderflowException
      */
     private function getCohortAssessmentSet(): array
     {
