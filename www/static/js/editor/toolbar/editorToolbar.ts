@@ -20,15 +20,11 @@ export function getToolbar(config: EditorConfig) {
             "italic",
             "underline",
             "strikethrough",
-            "blockQuote",
+            "subscript",
+            "superscript",
             "removeFormat",
             "|",
             "link",
-            "|",
-            "emoji",
-            "|",
-            "numberedList",
-            "bulletedList",
         ];
     } else if (config.toolbar === EditorToolbar.COMMENT) {
         items = [
