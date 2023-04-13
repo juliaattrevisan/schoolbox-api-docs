@@ -10,7 +10,6 @@ namespace Calendar\Event\Type\SudsEvent\Renderer;
 
 class Javascript extends Base
 {
-
     /**
      * Visitor
      *
@@ -71,7 +70,7 @@ class Javascript extends Base
                     'editable'    => false,
                     'eventId'     => $this->event->getEventId(),
                     'time'        => $this->event->getTime(),
-                    'detail'      => $this->event->getDetail(),
+                    'detail'      => \Scrub::html($this->event->getDetail()),
                     'location'    => $this->event->getLocation(),
                     'eventTypeId' => $this->event->getType(),
                     'eventType'   => 'type' . $this->event->getType(),

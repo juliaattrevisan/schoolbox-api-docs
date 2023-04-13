@@ -79,7 +79,7 @@ if ($groupHandler->getPermission($_POST['homepageId']) < UserAccess::ACCESS_WRIT
             foreach ($allEvents as $currentEvent) {
                 $this->setVar(
                     array(
-                        'EVENT_NAME' => $currentEvent['name'],
+                        'EVENT_NAME' => \Scrub::text($currentEvent['name']),
                         'EVENT_STATUS' => $currentEvent['status'],
                         'EVENT_ERROR' => $currentEvent['error'],
                     )

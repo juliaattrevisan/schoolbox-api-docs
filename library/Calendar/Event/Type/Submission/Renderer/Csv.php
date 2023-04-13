@@ -27,7 +27,7 @@ class Csv extends Base
             $this->getEvent()->getEndTime()->getTimeOnly(),
             $this->getEvent()->getAllday(),
             $this->getEvent()->getTitle(),
-            $this->getEvent()->getDetail(),
+            \Scrub::html($this->getEvent()->getDetail()),
             '',
             $this->getEvent()->getEventType(),
             $this->getEvent()->getPublishDate() !== null
