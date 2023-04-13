@@ -1362,7 +1362,7 @@ class Controller extends Base
      * SVA
      * svaForumReplies.csv
      */
-    public function svaForumReplies()
+    public function svaForumRepliesViews()
     {
         $database = FolderMapper::getInstance()->getDatabase();
         $statement = $database->prepare("
