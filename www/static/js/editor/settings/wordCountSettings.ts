@@ -38,6 +38,7 @@ function getCharacterElement() {
  */
 function getLimitWarningElement(config: EditorConfig) {
     const limitWarningElement = document.createElement("div");
+    limitWarningElement.setAttribute("data-charLimitWarning", "");
     limitWarningElement.classList.add("ck-word-count__limit-warning");
     limitWarningElement.innerHTML = `<b>Warning:</b> The limit of ${config.maxCharCount} Characters has been reached. Please reduce the content to below the limit to ensure save.`;
     limitWarningElement.style.display = "none";
@@ -61,9 +62,8 @@ function updateWordCount(
     if (config.maxCharCount === -1) {
         return;
     }
-    const characterCountElement = wordCountContainer.querySelector(".ck-word-count__characters") as HTMLDivElement;
-    const limitWarningElement = wordCountContainer.querySelector(".ck-word-count__limit-warning") as HTMLDivElement;
-    editor.plugins.get("WordCount").on("update", () => {
+
+    const onUpdateText = function () {
         const currentCharacterLength = editor.getData().length;
         characterCountElement.innerText = `Characters: ${currentCharacterLength}`;
         if (config.maxCharCount !== undefined && currentCharacterLength > config.maxCharCount) {
@@ -85,7 +85,13 @@ function updateWordCount(
             }
             wordCountContainer.setAttribute("data-maxCharCountExceededAtLastCheck", "0");
         }
-    });
+    };
+
+    const characterCountElement = wordCountContainer.querySelector(".ck-word-count__characters") as HTMLDivElement;
+    const limitWarningElement = wordCountContainer.querySelector(".ck-word-count__limit-warning") as HTMLDivElement;
+    editor.plugins.get("WordCount").on("update", onUpdateText);
+
+    onUpdateText(); // Run once initially in case max char count already exceeded due to content loaded from database.
 }
 
 /**

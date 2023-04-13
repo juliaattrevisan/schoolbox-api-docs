@@ -168,9 +168,13 @@
         el.addEventListener(
             "EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED",
             function () {
-                const input = document.querySelector('input[type=submit]');
-                input.disabled = false;
-                input.setAttribute('value', 'Save');
+                // Only enable save button if no char limit warnings are showing on any ckeditor field.
+                // NOTE: ':visible' selector only works in jQuery.
+                if ($("[data-charLimitWarning]:visible").length === 0) {
+                    const input = document.querySelector('input[type=submit]');
+                    input.disabled = false;
+                    input.setAttribute('value', 'Save');
+                }
             }
         );
     });
