@@ -157,8 +157,7 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
                     // MySQL Query execution was interrupted - "70100"
                     // MsSQL Query timeout expired = "HYT00" and message indicates QUERY timeout rather than a LOGIN timeout (they share the same code)
                     ($e instanceof \PDOException && ($e->getCode() === "70100" || ($e->getCode() === "HYT00" && str_contains($e->getMessage(), "Query timeout")))) ||
-                    (
-                        $e instanceof \Alaress\Database\Exception &&
+                    ($e instanceof \Alaress\Database\Exception &&
                         $e->getPrevious() instanceof \PDOException &&
                         ($e->getPrevious()->getCode() === "70100" || ($e->getPrevious()->getCode() === "HYT00" && str_contains($e->getPrevious()->getMessage(), "Query timeout")))
                     )
@@ -187,12 +186,12 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
                     // use the document_root to get a Schoolbox-relative file in which the error occurred
                     $cause = substr($error['file'], \strlen($_SERVER['DOCUMENT_ROOT']) - 4);
                     switch ($cause) {
-                        // certain queries in the reports can return too much data to fit under the memory limit
+                            // certain queries in the reports can return too much data to fit under the memory limit
                         case '/library/Report/Login.php':
                         case '/library/Report/Activity.php':
                             $info = "The report you tried to run has returned too much data. Please press 'Back' and refine your report filter parameters.";
                             break;
-                        // if it's not somewhere we expect to find an error, just be generic about it
+                            // if it's not somewhere we expect to find an error, just be generic about it
                         default:
                             break;
                     }
@@ -454,7 +453,7 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
             $output .= "<li>" . htmlentities("Error: {$args['error']['message']}. (Further details have been logged.)") . "</li>";
         }
 
-        $output .= '</ul>';
+        $output .= '</ul><a href="/">Return to home page</a> | <a href="javascript:history.back()">Go back</a>';
 
         http_response_code($code);
         echo $output;
@@ -546,6 +545,6 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
         // Should not be required because the DI user is fetched from the
         // session, anyway.
         // (This would die when the container was locked, anyway)
-//        $this->di->set('user', $user);
+        //        $this->di->set('user', $user);
     }
 }
