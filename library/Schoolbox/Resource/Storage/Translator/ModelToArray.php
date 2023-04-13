@@ -73,6 +73,7 @@ class ModelToArray
             $size = null;
         }
         return [
+            'name'   => $storage->getBasename(),
             'hash'   => $storage->getHash(),
             'mime'   => $storage->getMime(),
             'type'   => $type,

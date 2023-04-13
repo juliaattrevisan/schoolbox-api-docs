@@ -756,7 +756,6 @@ WHERE
         }
 
         // Load submissions, and thus their files
-        // TODO add filename to file translator?
         if (!empty($studentSubmissionIds)) {
             /** @var iterable<Submission\Submission> $studentSubmissions */
             $studentSubmissions = $this->submissionMapper->findByColumn('id', $studentSubmissionIds);
