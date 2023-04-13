@@ -154,8 +154,8 @@ class ClassResults
 
         foreach ($sortedSpecificationIds as $sortedSpecificationId) {
             foreach ($assessmentTuples as $implementationId => $specificationId) {
-                // Only add this implementation to the result set if it actually
-                // is in the list of assessments that are due within this term.
+                /* Only add this implementation to the result set if it has published marks
+                 */
                 if ($specificationId === $sortedSpecificationId && isset($assessmentMarks[$implementationId])) {
                     $sortedTuples[$implementationId] = $sortedSpecificationId;
 
@@ -254,10 +254,12 @@ class ClassResults
          * so we can ASSUME something here about the sequence of $assessment
          */
         foreach ($this->assessments as $assessment) {
+            /* Skip assessments which haven't got any published marks yet
+             */
             if (!key_exists($assessment->getId(), $this->tuples)) {
-                // this assessment is not for cohort
                 continue;
             }
+
             $specificationId = $this->tuples[$assessment->getId()];
 
             /* Remember the unique titles of each $assessment we encountered, for highcharts
