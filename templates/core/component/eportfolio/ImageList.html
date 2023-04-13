@@ -20,16 +20,15 @@
                             </li>
                         </ul>
                         <!-- END dropzone -->
-                        <ul class="img-gallery" data-dz-container data-image-lightbox>
+                        <ul class="img-gallery" data-dz-container data-image-gallery>
                             <!-- BEGIN list_item -->
-                            <li href="/cms/myImage.php?id={IMAGE_ID}&key=eportfolioImageGalleryLarge">
-                                <a>
-                                    <img src="/cms/myImage.php?id={IMAGE_ID}&key=eportfolioImageGalleryThumbnail" alt="{IMAGE_DESCRIPTION}">
+                            <li>
+                                <a href="/cms/myImage.php?id={IMAGE_ID}&key=eportfolioImageGalleryLarge" rel="lightbox[eportfolio-{COMPONENT_INSTANCE_ID}]" style="height:{IMAGE_HEIGHT}px; width:{IMAGE_WIDTH}px;" title='{IMAGE_DESCRIPTION}'>
+                                    <img src="/cms/myImage.php?id={IMAGE_ID}&key=eportfolioImageGalleryThumbnail" alt="{IMAGE_DESCRIPTION}" />
                                 </a>
                             </li>
                             <!-- END list_item -->
                         </ul>
-                        <script src="{CDN_PREFIX}/js/bundle/imageLightboxInit.js?v={SITE_VERSION}"></script>
                     </div>
                 </div>
 
@@ -71,3 +70,6 @@
         </div>
     </div>
 </div>
+
+
+
