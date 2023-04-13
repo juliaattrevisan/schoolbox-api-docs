@@ -235,19 +235,6 @@
     text-transform: uppercase;
 }
 
-/* News File List
- */
-.news-post {
-    #article-attachments {
-        /* Do a bit of acrobatics to make this padding sane
-         */
-        .img-gallery > li {
-            margin-top: 1rem;
-            margin-bottom: 0;
-        }
-    }
-}
-
 .article-files {
     margin-top: 1rem;
 }
