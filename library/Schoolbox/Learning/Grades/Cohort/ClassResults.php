@@ -256,7 +256,7 @@ class ClassResults
         foreach ($this->assessments as $assessment) {
             /* Skip assessments which haven't got any published marks yet
              */
-            if (!key_exists($assessment->getId(), $this->tuples)) {
+            if (!array_key_exists($assessment->getId(), $this->tuples)) {
                 continue;
             }
 
