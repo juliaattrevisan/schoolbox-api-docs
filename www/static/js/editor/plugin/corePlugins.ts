@@ -13,6 +13,7 @@ import BlockQuote from "@ckeditor/ckeditor5-block-quote/src/blockquote";
 import GeneralHtmlSupport from "@ckeditor/ckeditor5-html-support/src/generalhtmlsupport";
 import Legacy from "@js/editor/plugin/legacy/Legacy";
 import Notifcation from "@ckeditor/ckeditor5-ui/src/notification/notification";
+import PasteFromOffice from "@ckeditor/ckeditor5-paste-from-office/src/pastefromoffice";
 
 /**
  * All the core plugins
@@ -32,5 +33,6 @@ export function getCorePlugins() {
         GeneralHtmlSupport,
         Legacy,
         Notifcation,
+        PasteFromOffice,
     ];
 }
