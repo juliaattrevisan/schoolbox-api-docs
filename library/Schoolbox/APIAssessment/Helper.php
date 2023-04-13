@@ -764,7 +764,6 @@ WHERE
                 $studentId    = $studentSubmission->getOwner()->getId();
                 $participationItems[$assessmentId][$studentId]['response']['files'] = $studentSubmission
                     ->getFiles()
-                    ->map(fn (Submission\SingleFile\Model $file) => $file->getStorage())
                     ->map($this->storageTranslator)
                     ->reindex();
             }

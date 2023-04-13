@@ -11,7 +11,7 @@ namespace Schoolbox\Resource\Storage\Translator;
 
 use League\Flysystem\UnableToReadFile;
 use Schoolbox\Cdn\PrefixGenerator;
-use Schoolbox\Resource\Storage\Model;
+use Schoolbox\Resource\Storage\IStorage;
 
 /**
  * Translator for translating a storage object model into an array, ready for
@@ -35,10 +35,10 @@ class ModelToArray
     }
 
     /**
-     * @param Model $storage
+     * @param IStorage $storage
      * @return array
      */
-    public function __invoke(Model $storage): array
+    public function __invoke(IStorage $storage): array
     {
         // This may have different links depending on what kind of file it is
         $type  = null;
