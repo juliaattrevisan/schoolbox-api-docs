@@ -93,7 +93,7 @@ export function getImageSettings() {
  * @returns { string } - the html with the data attribute added
  */
 export function addFullWidthAttributes(textarea: HTMLTextAreaElement) {
-    var tempDiv = document.createElement("div");
+    const tempDiv = document.createElement("div");
     tempDiv.innerHTML = textarea.value;
     const images = tempDiv.querySelectorAll("img");
     images.forEach((image) => {

@@ -1,7 +1,8 @@
 import { EditorEvent } from "@js/editor/event/editorEvent";
 import { EditorConfig } from "@js/editor/types/editorTypes";
-import { surroundUnsurroundedTokens } from "@js/editor/settings/tokensSettings";
+import { addRelToNewTabLinks } from "@js/editor/settings/linkSettings";
 import { addFullWidthAttributes } from "@js/editor/settings/imageSettings";
+import { surroundUnsurroundedTokens } from "@js/editor/settings/tokensSettings";
 
 /**
  * This function is called when the editor is created, it checks the data and manipulates as required
@@ -10,6 +11,8 @@ import { addFullWidthAttributes } from "@js/editor/settings/imageSettings";
  * @param { EditorConfig } config - the config to use when creating the editor
  */
 export function initCheckData(textarea: HTMLTextAreaElement, config: EditorConfig) {
+    // Add the rel attribute to any links that have the target attribute set to _blank
+    textarea.innerHTML = addRelToNewTabLinks(textarea);
     // Add the data-schoolboxresource-fullwidth attribute to any images that have the class full-width
     textarea.innerHTML = addFullWidthAttributes(textarea);
     /**
