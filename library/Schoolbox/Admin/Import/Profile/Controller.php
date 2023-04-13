@@ -178,7 +178,7 @@ class Controller extends Base
         } else {
             /* Process attachment specifically
              */
-            if ($this->getRequest()->post['attachment']) {
+            if ($this->getRequest()->post['attachment'] ?? false) {
                 $attachment = $collectorFactory->build($this->getRequest()->post['attachment'])->getAll();
 
                 try {
@@ -223,7 +223,7 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportProfile/log.twig', [
             'allBreadcrumbs' => $this->navigation->buildBreadcrumbs($this->getRouter()),
             'allNavigation' => $this->navigation->buildNavigation($this->getRouter(), 'adminImportProfile')->getAllNodes(),
-            'attachment' => $this->getRequest()->post['attachment'],
+            'attachment' => $this->getRequest()->post['attachment'] ?? null,
             'errors' => $errors,
             'logs' => $logs,
             'file' => $this->getRequest()->post['file'],
