@@ -156,7 +156,7 @@ class ClassResults
             foreach ($assessmentTuples as $implementationId => $specificationId) {
                 /* Only add this implementation to the result set if it has published marks
                  */
-                if ($specificationId === $sortedSpecificationId && isset($assessmentMarks[$implementationId])) {
+                if ($specificationId === $sortedSpecificationId && !empty($assessmentMarks[$implementationId])) {
                     $sortedTuples[$implementationId] = $sortedSpecificationId;
 
                     /* Stack it up in the same order
@@ -254,13 +254,20 @@ class ClassResults
          * so we can ASSUME something here about the sequence of $assessment
          */
         foreach ($this->assessments as $assessment) {
-            /* Skip assessments which haven't got any published marks yet
+            /* Skip assessment specs whose descendent assessments haven't got any published marks yet
              */
-            if (!array_key_exists($assessment->getId(), $this->tuples)) {
+            if (!in_array($assessment->getSpecificationAssessment()->getId(), array_values($this->tuples), false)) {
                 continue;
             }
 
-            $specificationId = $this->tuples[$assessment->getId()];
+            /* Note: a spec could have descendent assessments with published marks,
+             * e.g. from another homepage/course import,
+             * but this $assessment is not one of them
+             *
+             * You can't rely on $this->tuples to have enough information in that
+             * use case, but you can get the assessment spec id in a different way
+             */
+            $specificationId = $assessment->getSpecificationAssessment()->getId();
 
             /* Remember the unique titles of each $assessment we encountered, for highcharts
              */
