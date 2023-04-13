@@ -62,8 +62,8 @@ const activityItems: Ref<ActivityItem[]> = ref([]); // list of recent activity i
 const hasSubmissions = computed(() => activityItems.value.some(item => item.type === 'response' && item.submitted));
 // has an event of type 'feedback'
 const hasFeedback = computed(() => activityItems.value.some(item => item.type === 'feedback'));
-// has an event of type 'draft feedback'
-const hasDraftFeedback = computed(() => activityItems.value.some(item => item.type === 'feedback' && item.published == false));
+// has an event of type 'feedback' and feedback.published === false
+const hasDraftFeedback = computed(() => activityItems.value.some(item => item.type === 'feedback' && item.published === false));
 // is the user excluded from the assessment
 const isExcluded = ref(false);
 const isActivityEmpty = computed(() => activityItems.value.length === 0);
