@@ -12,7 +12,7 @@ export function getFontSettings() {
                 "Comic Sans, Comic Sans MS, Chalkboard, ChalkboardSE-Regular, sans-serif",
                 "Courier New, Courier, monospace",
                 "Georgia, serif",
-                "Lucida Sans Unicode, Lucida Grande, sans-serif",
+                "Lucida Sans Unicode, Lucida Grande, Helvetica Neue, sans-serif",
                 "Tahoma, Geneva, sans-serif",
                 "Times New Roman, Times, serif",
                 "Trebuchet MS, Helvetica, sans-serif",
