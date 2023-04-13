@@ -111,6 +111,8 @@ export default {
     mounted() {
         this.$emit("on-pop-out-mounted", this.$refs.innerContainer.clientHeight); //to ensure the parent container is tall enough to display the entire pop out
         this.isActive = false;
+        // As vue loads the template after foundation has been initialised, we need to reinitialise the tooltips
+        $(document).foundation('tooltip', 'reflow');
     },
 
     methods: {
