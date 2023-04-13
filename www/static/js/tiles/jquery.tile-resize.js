@@ -3,43 +3,72 @@
  * Resizes the title within grid tiles based on the width of the tile.
  *
  * Settings:
- * * minSize, maxSize: the font size bounds for the title
+ * * minFontSize, maxFontSize: the font size bounds for the title
  *                     Defaults to a range of 1-6 em
- * * unit:             the unit minSize, maxSize and getSize are measured in.
+ * * unit:             the unit minFontSize, maxFontSize and getSize are measured in.
  *                     Defaults to em.
- * * getSize:          a callback for retrieving the font size
+ * * getFontSize:      a callback for retrieving the font size
  *                     Defaults to width of the tile in px, / 120
  * * titleSelector:    a selector for getting the title from the tile.
  *                     Defaults to ".title"
  */
 (function ($) {
-    $.fn.tileResize = function (options) {
-        var defaults = {
-            minSize: 1,
-            maxSize: 6,
-            unit: "em",
-            getSize: function (tile, settings) {
-                return tile.width() / 120;
+    $.fn.resizeTileTitle = function (options) {
+        const defaults = {
+            minFontSize: 1,
+            maxFontSize: 6,
+            unit: "rem",
+            /**
+             * Override this function if you want the font size in a unit other than 'rem'.
+             */
+            getFontSize: function (tile, settings) {
+                const tileWidth = tile.width();
+
+                if (tileWidth === 0) {
+                    // Jquery could not calculate tile width, so we cannot calculate font size.
+                    // This happens when the tile has been collapsed (when css 'display' is 'none').
+                    return null;
+                }
+
+                return tileWidth / 120; // Units 'rem'.
             },
             titleSelector: ".title",
         };
-        var settings = $.extend({}, defaults, options);
+        const settings = $.extend({}, defaults, options);
         $(this).each(function () {
-            var tile = $(this);
-            var tileTitle = tile.find(settings.titleSelector);
-            var width = Math.max(settings.minSize, Math.min(settings.getSize(tile, settings), settings.maxSize));
+            const tile = $(this);
+            const tileTitle = tile.find(settings.titleSelector);
+
+            let fontSize = settings.getFontSize(tile, settings);
+
+            if (fontSize === null) {
+                // If we could not calculate the fontSize, there is nothing more we can do.
+                // To work around the problem of the fontSize not being calculable when the tile is collapsed, this
+                // function should be run when the tile is no longer hidden (after the expand event).
+                // An event handler for this purpose is set up in library/Schoolbox/Tile/templates/sub/tile.twig.
+                return;
+            }
+
+            if (fontSize < settings.minFontSize) {
+                fontSize = settings.minFontSize;
+            }
+
+            if (fontSize > settings.maxFontSize) {
+                fontSize = settings.maxFontSize;
+            }
+
             tileTitle.css({
-                fontSize: String(width) + settings.unit,
-                padding: String(width / 4) + settings.unit,
+                fontSize: String(fontSize) + settings.unit,
+                padding: String(fontSize / 4) + settings.unit,
             });
 
             // If the title is taller than the tile:
             // reduce the tile's top and bottom padding so it fits.
-            var titleHeight = tileTitle.outerHeight();
-            var tileHeight = tile.outerHeight();
+            const titleHeight = tileTitle.outerHeight();
+            const tileHeight = tile.outerHeight();
             if (titleHeight > tileHeight) {
-                var heightDifference = tileHeight - tileTitle.height();
-                var newPadding = String(heightDifference / 2) + "px";
+                const heightDifference = tileHeight - tileTitle.height();
+                const newPadding = String(heightDifference / 2) + "px";
                 tileTitle.css({
                     paddingTop: newPadding,
                     paddingBottom: newPadding,
