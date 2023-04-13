@@ -39,6 +39,7 @@ import { getTokensSettings } from "@js/editor/settings/tokensSettings";
 import { getWordCountSettings } from "@js/editor/settings/wordCountSettings";
 import { getHTMLSupportSettings } from "@js/editor/settings/htmlSupportSettings";
 import { EditorConfig } from "@js/editor/types/editorTypes";
+import Eqneditor5 from "@js/editor/plugin/eqnEditor/eqneditor5";
 import Resource from "@js/editor/plugin/resource/Resource";
 import Blank from "@js/editor/plugin/blank/Blank";
 
@@ -75,6 +76,7 @@ export function getConfig(config: EditorConfig) {
             FindAndReplace,
             SourceEditing,
             WordCount,
+            Eqneditor5,
             Resource,
             Blank,
         ],
