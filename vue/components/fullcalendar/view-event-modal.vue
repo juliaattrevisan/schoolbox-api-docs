@@ -67,6 +67,8 @@ export default {
         returnUrl: {},
     },
 
+    emits: ["eventModified"],
+
     data() {
         return {
             payload: INITIAL_PAYLOAD,
@@ -364,6 +366,7 @@ export default {
                         text: "Saved.",
                         css: "success",
                     });
+                    this.$emit("eventModified", responseData);
                 } else {
                     toast.toastTimeout({
                         text: "Unable to update task. " + responseData.message,
