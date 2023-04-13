@@ -13,14 +13,7 @@
          */
         $('[data-course-parent-selector]').on('click', function (e) {
             e.preventDefault();
-
-            $.magnificPopup.open({
-                showCloseBtn: false,
-                items: {
-                    src: "<div class='preview loader'></div>",
-                    type: 'inline'
-                }
-            });
+            document.dispatchEvent(new Event("OVERLAY_LOADER_SHOW"));
 
             let $selector = $(this),
                 target = $selector.data('source'),
@@ -48,7 +41,7 @@
             });
 
             $(document).on('opened.fndtn.reveal', '[data-reveal]', function () {
-                $.magnificPopup.close();
+                document.dispatchEvent(new Event("OVERLAY_LOADER_HIDE"));
             });
         });
     })
@@ -66,4 +59,3 @@
    {{ courseSpec ? courseSpec.folder.parent.name : '(Click to select)' }}
 </a>
 <input class="hide" name="parent" id="parent" value="{{ courseSpec ? courseSpec.folder.parent.id : '' }}" />
-

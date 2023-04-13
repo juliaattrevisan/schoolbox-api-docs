@@ -112,30 +112,6 @@ $(function () {
         $(this).css({ top: $(window).scrollTop() + modalTop + "px" });
     });
 
-    // Set up lightboxes globally, group galleries by lightbox relation.
-    var lightboxGroups = {};
-
-    $("a[rel^='lightbox']").each(function () {
-        var rel = $(this).attr("rel");
-
-        if (!lightboxGroups[rel]) {
-            lightboxGroups[rel] = [];
-        }
-
-        lightboxGroups[rel].push(this);
-    });
-
-    $.each(lightboxGroups, function (i, v) {
-        $(v).magnificPopup({
-            type: "image",
-            removalDelay: 300,
-            mainClass: "mfp-fade",
-            gallery: {
-                enabled: true,
-            },
-        });
-    });
-
     /**
      * Hack into Phpdebugbar to add a twig templates button
      */
@@ -229,6 +205,28 @@ $(function () {
     $(window).resize(function () {
         this.clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(updateTopNavItems, 100);
+    });
+
+    // Full screen loader overlay
+    document.addEventListener("OVERLAY_LOADER_SHOW", function (e) {
+        const existingLoader = document.querySelector("[data-loader-overlay]");
+
+        if (!existingLoader) {
+            const overlayLoaderHTML = `
+            <div data-loader-overlay class="loader-overlay">
+                <div class="preview loader"></div>
+            </div>`;
+
+            document.body.insertAdjacentHTML("beforeend", overlayLoaderHTML);
+        }
+    });
+
+    document.addEventListener("OVERLAY_LOADER_HIDE", function (e) {
+        const existingLoader = document.querySelector("[data-loader-overlay]");
+
+        if (existingLoader) {
+            existingLoader.remove();
+        }
     });
 });
 

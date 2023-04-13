@@ -83,9 +83,6 @@ module.exports = {
             "./www/static/js/socialstream/browser/browser.js",
             "./node_modules/dropzone/dist/dropzone.js",
 
-            // Magnific Popup Lightbox
-            "./node_modules/magnific-popup/dist/jquery.magnific-popup.js",
-
             // Notifier
             "./www/static/js/notifications/jquery.notifier.js",
 
@@ -100,6 +97,9 @@ module.exports = {
 
             // Image/File previewing
             "./www/static/js/preview/preview.js",
+
+            // Image Lightbox
+            "./www/static/js/image-lightbox/imageLightboxInit.ts",
 
             // Course selector
             "./www/static/js/course/jquery.course-selector.js",

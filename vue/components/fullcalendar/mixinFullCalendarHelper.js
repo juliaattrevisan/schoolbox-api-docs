@@ -16,21 +16,12 @@ export default {
          *                            false once they are finished.
          */
         fullCalendarHelper_onLoading(isLoading) {
-            // TODO find a non-jQuery dependent way to do this
             if (isLoading === true) {
                 // this.$refs.toast.activate('Loading...');
-                this.jQuery.magnificPopup.open({
-                    showCloseBtn: false,
-                    closeOnBgClick: false,
-                    enableEscapeKey: false,
-                    items: {
-                        src: "<div class='preview loader'></div>",
-                        type: "inline",
-                    },
-                });
+                document.dispatchEvent(new Event("OVERLAY_LOADER_SHOW"));
             } else {
                 // this.$refs.toast.timeout('Done', true, 3000, 2000);
-                this.jQuery.magnificPopup.close();
+                document.dispatchEvent(new Event("OVERLAY_LOADER_HIDE"));
             }
         },
 

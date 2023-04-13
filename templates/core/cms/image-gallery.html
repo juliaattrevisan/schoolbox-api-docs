@@ -11,7 +11,9 @@
 				</li>
 				<!-- END image_gallery -->
 			</ul>
-            <script src="{CDN_PREFIX}/js/bundle/imageLightboxInit.js?v={SITE_VERSION}"></script>
+            <script>
+                if (window.sbProps.lightGalleryInit) { window.sbProps.lightGalleryInit(); }
+            </script>
 		</section>
 	</div>
 </div>

@@ -98,7 +98,7 @@
 
                 /* Lightboxed attachments are found using this key
                  */
-                lightboxKey: "socialstream-" + options.instanceId + "-lightbox",
+                lightboxKey: "lightbox[socialstream-" + options.instanceId + "]",
 
                 /* Container div for a loading graphic or message
                  */
@@ -204,15 +204,6 @@
                 /* Clear out any loading div indicators
                  */
                 removeLoaderGifs();
-
-                /* Lightbox everything!
-                 * But only the images in a particular socialstream thread
-                 */
-                $j("a[rel='" + config.lightboxKey + "']").magnificPopup({
-                    type: "image",
-                    removalDelay: 300,
-                    mainClass: "mfp-fade",
-                });
 
                 config.element
                     .find("[data-socialstream-delete]")

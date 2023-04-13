@@ -18,22 +18,11 @@
      # Can probably split these attachedFiles further, but nobody's really sure
      #}
     {% if article.getImages|length %}
-        <script>
-            $(function() {
-                $('[data-image-gallery={{ identifier }}] li').magnificPopup({
-                    delegate: 'a',
-                    type: 'image',
-                    gallery: {
-                        enabled:true
-                    }
-                });
-            });
-        </script>
-        <ul class="img-gallery" data-image-gallery="{{ identifier }}">
+        <ul class="img-gallery" data-image-lightbox="lightbox[{{ identifier }}]">
             {% for file in article.getImages %}
                 <li>
                     <a href="/storage/image.php?hash={{ file.hash }}&size=maxsize" rel="lightbox[{{ identifier }}]" title="{{ file.filename }}">
-                        <img src="/storage/image.php?hash={{ file.hash }}&size=square128" title="{{ file.filename }}" style="width: 128px">
+                        <img src="/storage/image.php?hash={{ file.hash }}&size=square128" style="width: 128px">
                     </a>
                 </li>
             {% endfor %}

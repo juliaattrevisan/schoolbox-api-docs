@@ -20,15 +20,18 @@
                             </li>
                         </ul>
                         <!-- END dropzone -->
-                        <ul class="img-gallery" data-dz-container data-image-gallery>
+                        <ul class="img-gallery" data-dz-container data-image-lightbox="lightbox[eportfolio-{COMPONENT_INSTANCE_ID}]">
                             <!-- BEGIN list_item -->
-                            <li>
-                                <a href="/cms/myImage.php?id={IMAGE_ID}&key=eportfolioImageGalleryLarge" rel="lightbox[eportfolio-{COMPONENT_INSTANCE_ID}]" style="height:{IMAGE_HEIGHT}px; width:{IMAGE_WIDTH}px;" title='{IMAGE_DESCRIPTION}'>
-                                    <img src="/cms/myImage.php?id={IMAGE_ID}&key=eportfolioImageGalleryThumbnail" alt="{IMAGE_DESCRIPTION}" />
+                            <li style="height:{IMAGE_HEIGHT}px; width:{IMAGE_WIDTH}px;">
+                                <a href="/cms/myImage.php?id={IMAGE_ID}&key=eportfolioImageGalleryLarge" rel="lightbox[eportfolio-{COMPONENT_INSTANCE_ID}]" title='{IMAGE_DESCRIPTION}'>
+                                    <img src="/cms/myImage.php?id={IMAGE_ID}&key=eportfolioImageGalleryThumbnail"alt="{IMAGE_DESCRIPTION}"/>
                                 </a>
                             </li>
                             <!-- END list_item -->
                         </ul>
+                        <script>
+                            if (window.sbProps.lightGalleryInit) { window.sbProps.lightGalleryInit(); }
+                        </script>
                     </div>
                 </div>
 
@@ -70,6 +73,3 @@
         </div>
     </div>
 </div>
-
-
-
