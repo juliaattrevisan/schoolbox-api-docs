@@ -325,13 +325,19 @@ class ClassResults
         ];
 
         foreach ($normMarks as $specificationId => $dataSet) {
+            /* Skip assessments which haven't got any published marks yet
+             */
+            if (!isset($graphAssessments[$specificationId])) {
+                continue;
+            }
+
             /* The hover info thingy on the highcharts
              */
             $statistics['graphInfo'][] = $graphInfo[$specificationId] ?? null;
 
             /* Yank the name for this specification id
              */
-            $statistics['graphAssessments'][] = $graphAssessments[$specificationId] ?? null;
+            $statistics['graphAssessments'][] = $graphAssessments[$specificationId];
 
             /* Calculate a five-point summary for each assessment spec, consisting of all the grades
              * given to all the participants
