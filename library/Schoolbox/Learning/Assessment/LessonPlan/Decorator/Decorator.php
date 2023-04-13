@@ -71,7 +71,7 @@ class Decorator implements DecoratorInterface
          * We need to remember where a Lesson Plan Field came from,
          * and also which Lesson Plan Template was used
          */
-        $lessonPlanTemplate = $lessonPlanTemplateMapper->findById($this->lessonPlanTemplateId);
+        $lessonPlanTemplate = $lessonPlanTemplateMapper->findOneByColumn('id', $this->lessonPlanTemplateId, ['deleted' => true]);
 
         $assessment->setLessonPlanTemplate($lessonPlanTemplate);
 
