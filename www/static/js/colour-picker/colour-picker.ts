@@ -35,7 +35,7 @@ document.addEventListener("colourPickerInitialize", (e) => {
     }
 
     // If value is of format "ffffff" then append "#" to correct HEX format, otherwise leave as is
-    if (targetEl.value && targetEl.value[0] !== "#" && targetEl.value.length === 6) {
+    if (targetEl.value && targetEl.value[0] !== "#" && [3, 6, 8].includes(targetEl.value.length)) {
         targetEl.value = `#${targetEl.value}`;
     }
 
