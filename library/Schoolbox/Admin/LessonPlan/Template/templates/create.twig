@@ -37,38 +37,40 @@
                         <ul id="fields" class="information-list sortable ui-sortable lesson-plan-template-fields" data-sortable data-list>
                             {% if lessonPlanTemplate is not null %}
                                 {% for field in lessonPlanTemplate.fields %}
-                                <li>
-                                    <!-- See further down the file for why we use section here -->
-                                    <section data-template-section>
-                                        <div class="s-topbar" data-topbar>
-                                            <div class="grip ui-sortable-handle">
-                                            </div>
-                                            <div class="s-name-display" data-name-display>{{ field.title }}</div>
-                                            <nav>
-                                                <a class="button icon-delete" data-delete></a>
-                                            </nav>
-                                        </div>
-                                        <div class="s-field-contents">
-                                            <div>
-                                                <div class="s-title-row">
-                                                    <div class="s-field-title">
-                                                        <label for="field-title-{{ field.id }}" class="required">Field Title</label>
-                                                        <input type="text" id="field-title-{{ field.id }}" name="field[{{ field.id }}][title]" data-field-title maxlength="255" value="{{ field.title }}" />
+                                    {% if not field.isDeleted %}
+                                        <li>
+                                            <!-- See further down the file for why we use section here -->
+                                            <section data-template-section>
+                                                <div class="s-topbar" data-topbar>
+                                                    <div class="grip ui-sortable-handle">
                                                     </div>
-                                                    <div class="s-field-visibility">
-                                                        <input type="hidden" name="field-visibility[{{ field.id }}]" value="off" />
-                                                        <input id="field-new-visibility-{{ field.id }}" name="field[{{ field.id }}][visibility]" type="checkbox" {% if field.visibility == studentRole %}checked="checked"{% endif %}/>
-                                                        <label for="field-new-visibility-{{ field.id }}" class="checkbox-label">Field visible to students?</label>
+                                                    <div class="s-name-display" data-name-display>{{ field.title }}</div>
+                                                    <nav>
+                                                        <a class="button icon-delete" data-delete></a>
+                                                    </nav>
+                                                </div>
+                                                <div class="s-field-contents">
+                                                    <div>
+                                                        <div class="s-title-row">
+                                                            <div class="s-field-title">
+                                                                <label for="field-title-{{ field.id }}" class="required">Field Title</label>
+                                                                <input type="text" id="field-title-{{ field.id }}" name="field[{{ field.id }}][title]" data-field-title maxlength="255" value="{{ field.title }}" />
+                                                            </div>
+                                                            <div class="s-field-visibility">
+                                                                <input type="hidden" name="field-visibility[{{ field.id }}]" value="off" />
+                                                                <input id="field-new-visibility-{{ field.id }}" name="field[{{ field.id }}][visibility]" type="checkbox" {% if field.visibility == studentRole %}checked="checked"{% endif %}/>
+                                                                <label for="field-new-visibility-{{ field.id }}" class="checkbox-label">Field visible to students?</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <label for="field-body-{{ field.id }}">Body</label>
+                                                        <textarea id="field-body-{{ field.id }}" name="field[{{ field.id }}][body]" rows="5">{{  field.body }}</textarea>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div>
-                                                <label for="field-body-{{ field.id }}">Body</label>
-                                                <textarea id="field-body-{{ field.id }}" name="field[{{ field.id }}][body]" rows="5">{{  field.body }}</textarea>
-                                            </div>
-                                        </div>
-                                    </section>
-                                </li>
+                                            </section>
+                                        </li>
+                                    {% endif %}
                                 {% endfor %}
                             {% endif %}
                         </ul>
