@@ -17,7 +17,7 @@ import { insertWordCount } from "@js/editor/settings/wordCountSettings";
 function addToGlobalScope(editor: Editor, sourceElement: HTMLElement) {
     if (sourceElement.id) {
         window.sbProps.editors[sourceElement.id] = editor;
-    } else if (sourceElement.name) {
+    } else if ((sourceElement as HTMLTextAreaElement).name) {
         window.sbProps.editors[sourceElement.name] = editor;
     }
 }
