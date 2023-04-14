@@ -656,6 +656,7 @@ class Controller extends Base
                         'checkbox'  =>  true,
                         'width'     => 1,
                         'default'   => false,
+                        'tooltipPosition' => 'right',
                     ],
                     'staffOrInstructorVisibleOnly' => [
                         'caption'   => 'Visible to Staff & Instructors only',
@@ -663,6 +664,7 @@ class Controller extends Base
                         'checkbox'  => true,
                         'width'     => 2,
                         'default'   => false,
+                        'tooltipPosition' => 'right',
                     ],
                     'name'          => [
                         'caption'   => 'Name',
@@ -823,6 +825,7 @@ class Controller extends Base
                         'mandatory' => true,
                         'width'     => 2,
                         'tooltip'   => 'This is the pastoral type under which this sub-type will appear.',
+                        'tooltipPosition' => 'right',
                     ],
                     'name'          => [
                         'caption'   => 'Name',
@@ -1010,6 +1013,7 @@ class Controller extends Base
                     'lookup'    => $luGradeList,
                     'width'     => 2,
                     'mandatory' => false,
+                    'tooltipPosition' => 'right'
                 ],
                 'displayOptions' => [
                     'caption'             => 'Display Options',
