@@ -59,7 +59,7 @@ export default class Eqneditor5 extends Plugin {
             const view = new ButtonView(locale);
 
             view.set({
-                label: editor.t("Eqneditor 5"),
+                label: editor.t("Insert Equation"),
                 icon: fxIcon,
                 tooltip: true,
             });
