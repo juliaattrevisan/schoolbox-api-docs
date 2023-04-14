@@ -12,3 +12,10 @@
 **/
 
 $cdn-prefix: "../../";
+@import "www/static/css/core/base/_colors";
+@import "www/static/css/core/base/_variables";
+@import "www/static/css/core/base/_settings";
+@import "www/static/css/core/base/_typography";
+
+@import "www/static/css/core/ui/blockquote";
+@import "www/static/css/core/components/editor/custom-styles";
