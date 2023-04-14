@@ -48,12 +48,13 @@ function getLimitWarningElement(config: EditorConfig) {
 /**
  * To display the warning when the character limit has been reached
  *
+ * @param { HTMLElement } sourceElement - the sourceElement the CKEditor has replaced
  * @param { Editor } editor - the CKEditor instance
  * @param { EditorConfig } config - the CKEditor config object
  * @param { HTMLDivElement } wordCountContainer - the word count container
  */
 function updateWordCount(
-    textarea: HTMLTextAreaElement,
+    sourceElement: HTMLElement,
     editor: Editor,
     config: EditorConfig,
     wordCountContainer: HTMLDivElement
@@ -72,7 +73,7 @@ function updateWordCount(
             if (!config.showWordCount) {
                 wordCountContainer.style.display = "flex";
             }
-            textarea.dispatchEvent(new CustomEvent(EditorEvent.EDITOR__MAX_CHAR_COUNT_EXCEEDED));
+            sourceElement.dispatchEvent(new CustomEvent(EditorEvent.EDITOR__MAX_CHAR_COUNT_EXCEEDED));
             wordCountContainer.setAttribute("data-maxCharCountExceededAtLastCheck", "1");
         } else {
             characterCountElement.style.display = "none";
@@ -81,7 +82,7 @@ function updateWordCount(
                 wordCountContainer.style.display = "none";
             }
             if (wordCountContainer.getAttribute("data-maxCharCountExceededAtLastCheck") === "1") {
-                textarea.dispatchEvent(new CustomEvent(EditorEvent.EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED));
+                sourceElement.dispatchEvent(new CustomEvent(EditorEvent.EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED));
             }
             wordCountContainer.setAttribute("data-maxCharCountExceededAtLastCheck", "0");
         }
@@ -99,13 +100,13 @@ function updateWordCount(
  * Its assumed this method is called once the editor has been created,
  * so editorTextArea.nextSibling will be the newly created editor instance
  *
- * @param { HTMLTextAreaElement } textarea - the textarea the CKEditor has replaced
+ * @param { HTMLElement } sourceElement - the sourceElement the CKEditor has replaced
  * @param { Editor } editor - the CKEditor instance
  * @param { EditorConfig } config - the CKEditor config object
  */
-export function insertWordCount(textarea: HTMLTextAreaElement, editor: Editor, config: EditorConfig) {
+export function insertWordCount(sourceElement: HTMLElement, editor: Editor, config: EditorConfig) {
     const wordCountContainer = editor.plugins.get("WordCount").wordCountContainer as HTMLDivElement;
-    insertElementAfter(textarea.nextSibling, wordCountContainer);
+    insertElementAfter(sourceElement.nextSibling, wordCountContainer);
     insertElementAfter(wordCountContainer.lastChild, getCharacterElement());
     insertElementAfter(wordCountContainer.lastChild, getLimitWarningElement(config));
     if (config.showWordCount) {
@@ -113,5 +114,5 @@ export function insertWordCount(textarea: HTMLTextAreaElement, editor: Editor, c
     } else {
         wordCountContainer.style.display = "none";
     }
-    updateWordCount(textarea, editor, config, wordCountContainer);
+    updateWordCount(sourceElement, editor, config, wordCountContainer);
 }
