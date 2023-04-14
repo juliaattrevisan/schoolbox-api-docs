@@ -25,7 +25,7 @@ class IsAwaitingPublication extends ArticleAttribute
     {
         $article = $this->findArticleInParams($params);
 
-        if ($article->isAwaitingPublication()) {
+        if (!$article->isAwaitingPublication()) {
             throw new Unauthorized("Article {$article->getId()} is not awaiting publication");
         }
     }
