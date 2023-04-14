@@ -12,13 +12,13 @@ import { insertWordCount } from "@js/editor/settings/wordCountSettings";
  * in other twig files etc
  *
  * @param { Editor } editor - the CKEditor instance
- * @param { HTMLTextAreaElement } textarea - the textarea the CKEditor will replace
+ * @param { HTMLElement } sourceElement - the sourceElement the CKEditor will replace
  */
-function addToGlobalScope(editor: Editor, textarea: HTMLTextAreaElement) {
-    if (textarea.id) {
-        window.sbProps.editors[textarea.id] = editor;
-    } else if (textarea.name) {
-        window.sbProps.editors[textarea.name] = editor;
+function addToGlobalScope(editor: Editor, sourceElement: HTMLElement) {
+    if (sourceElement.id) {
+        window.sbProps.editors[sourceElement.id] = editor;
+    } else if (sourceElement.name) {
+        window.sbProps.editors[sourceElement.name] = editor;
     }
 }
 
@@ -112,13 +112,13 @@ async function attachInspector(editor: Editor) {
 /**
  * Add in any additional setup required and then dispatch that the editor is ready
  *
- * @param { HTMLTextAreaElement } textarea - the textarea the CKEditor will replace
+ * @param { HTMLElement } sourceElement - the sourceElement the CKEditor will replace
  * @param { Editor } editor - the CKEditor instance
  * @param { EditorConfig } config - the CKEditor config object
  */
-export async function modifyEditor(textarea: HTMLTextAreaElement, editor: Editor, config: EditorConfig) {
-    addToGlobalScope(editor, textarea);
-    insertWordCount(textarea, editor, config);
+export async function modifyEditor(sourceElement: HTMLElement, editor: Editor, config: EditorConfig) {
+    addToGlobalScope(editor, sourceElement);
+    insertWordCount(sourceElement, editor, config);
     disableAutoMedia(editor, config);
     removeValidation();
     await addIframelyEmbed(config, editor);

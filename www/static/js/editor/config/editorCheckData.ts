@@ -7,22 +7,22 @@ import { surroundUnsurroundedTokens } from "@js/editor/settings/tokensSettings";
 /**
  * This function is called when the editor is created, it checks the data and manipulates as required
  *
- * @param { HTMLTextAreaElement } textarea - the textarea the CKEditor will replace
+ * @param { HTMLElement } sourceElement - the sourceElement the CKEditor will replace
  * @param { EditorConfig } config - the config to use when creating the editor
  */
-export function initCheckData(textarea: HTMLTextAreaElement, config: EditorConfig) {
+export function initCheckData(sourceElement: HTMLElement, config: EditorConfig) {
     // Add the rel attribute to any links that have the target attribute set to _blank
-    textarea.innerHTML = addRelToNewTabLinks(textarea);
+    sourceElement.innerHTML = addRelToNewTabLinks(sourceElement);
     // Add the data-schoolboxresource-fullwidth attribute to any images that have the class full-width
-    textarea.innerHTML = addFullWidthAttributes(textarea);
+    sourceElement.innerHTML = addFullWidthAttributes(sourceElement);
     /**
      * This is called when an editor is created, it checks the data for any tokens that need to be surrounded
      * and then adds an event listener to allow pages to run the same check when they need to
      */
     if (config.hasTokens) {
-        textarea.innerHTML = surroundUnsurroundedTokens(textarea.innerHTML, config);
+        sourceElement.innerHTML = surroundUnsurroundedTokens(sourceElement.innerHTML, config);
     }
-    textarea.addEventListener(EditorEvent.EDITOR__CHECK_DATA, onEditorCheckData);
+    sourceElement.addEventListener(EditorEvent.EDITOR__CHECK_DATA, onEditorCheckData);
 }
 
 /**
