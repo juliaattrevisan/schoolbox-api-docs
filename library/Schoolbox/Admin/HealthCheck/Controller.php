@@ -139,7 +139,7 @@ class Controller extends Base
                     break;
                 case 'sva':
                     /**
-                     * list of reports for sva
+                     * list of reports for sva reports
                      */
                     $this->taskDHelper->addSource('', 'svaMonthlyLogins');
                     $this->taskDHelper->addSource('', 'svaNewsArticleViews');
@@ -157,6 +157,22 @@ class Controller extends Base
                     $this->taskDHelper->addSource('', 'svaHomepageViewsForRrrHubSchoolsPage');
                     $this->taskDHelper->addSource('', 'svaForumThreadsViews');
                     $this->taskDHelper->addSource('', 'svaForumRepliesViews');
+                    break;
+                case 'implementation':
+                    /**
+                     * list of reports for implementation reports
+                     */
+                    $this->taskDHelper->addSource('', 'implementationServicePermissions');
+                    $this->taskDHelper->addSource('', 'implementationRoleList');
+                    $this->taskDHelper->addSource('', 'implementationCampusList');
+                    $this->taskDHelper->addSource('', 'implementationHouseList');
+                    $this->taskDHelper->addSource('', 'implementationYearLevels');
+                    $this->taskDHelper->addSource('', 'implementationNewsTopics');
+                    $this->taskDHelper->addSource('', 'implementationCalendarEventTypes');
+                    $this->taskDHelper->addSource('', 'implementationNotificationSettings');
+                    // TODO: $this->taskDHelper->addSource('', 'implementationTopMenuReport');
+                    $this->taskDHelper->addSource('', 'implementationSideMenuReport');
+                    $this->taskDHelper->addSource('', 'implementationAcademicPeriods');
                     break;
                 default:
                     throw new SchoolboxException("Report '{$report}' Does not exist.");
