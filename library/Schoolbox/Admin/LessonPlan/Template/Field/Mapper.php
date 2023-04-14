@@ -57,7 +57,7 @@ class Mapper extends \Schoolbox\Mapper
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('lessonPlanTemplate', 'lpt')}
             FROM {$this->getTable()}
-            INNER JOIN {$this->getJoinSql('lessonPlanTemplate', '', 'lpt')}
+            INNER JOIN {$this->getJoinSql('lessonPlanTemplate', '', 'lpt', true)}
         ";
     }
 

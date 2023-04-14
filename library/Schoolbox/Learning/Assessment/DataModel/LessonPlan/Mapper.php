@@ -100,12 +100,12 @@ class Mapper extends \Schoolbox\Mapper
                 {$this->getJoinColumnString('assessmentModel', 'assessmentModel')}
             FROM {$this->getTable()}
             INNER JOIN {$this->getJoinSql('assessmentModel', '', 'assessmentModel')}
-            INNER JOIN {$this->getJoinSql('lessonPlanTemplate', '', 'lessonPlanTemplate', true)} 
+            INNER JOIN {$this->getJoinSql('lessonPlanTemplate', '', 'lessonPlanTemplate', true)}
             INNER JOIN {$this->getJoinSql('createdBy', '', 'createdBy', true)}
             INNER JOIN {$this->getJoinSql('updatedBy', '', 'updatedBy', true)}
             LEFT JOIN {$this->getJoinSql('deletedBy', '', 'deletedBy', true)}
             LEFT JOIN {$this->getJoinSql('lessonPlanField', '', 'lessonPlanField')}
-            LEFT JOIN {$this->getJoinSql('lessonPlanField.lessonPlanTemplateField', 'lessonPlanField', 'lessonPlanTemplateField')}
+            LEFT JOIN {$this->getJoinSql('lessonPlanField.lessonPlanTemplateField', 'lessonPlanField', 'lessonPlanTemplateField', true)}
         ";
 
         return $selectString;
