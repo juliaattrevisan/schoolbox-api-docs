@@ -64,12 +64,16 @@ class Postman
                 continue;
             }
 
+            $topic = "INFO.$routeKey";
             try {
-                $topic = "INFO.$routeKey";
-                $this->broker->publish(Instance::jsonUnserialize($json, $topic), [$topic], $instance->getTTL());
+                $serializable = Instance::jsonUnserialize($json, $topic);
             } catch (\InvalidArgumentException $e) {
+                // message could not be unserialized, therefore cannot be delivered
                 $this->log->notice('Broken message, was unable to json_decode', ['char' => '?']);
+                continue;
             }
+
+            $this->broker->publish($serializable, [$topic], $instance->getTTL());
 
             if ($instance->isActionRetractSingle()) {
                 $this->log->info("Retracting a message from '$routeKey'", ['char' => '<']);

@@ -64,6 +64,14 @@ class Connector extends AMQPConnector
      */
     protected function getConnection(): AbstractConnection
     {
+        // If the connection is disconnected:
+        // just close the connection and recreate.
+        if ($this->conn && !$this->conn->isConnected()) {
+            $this->closeConnection();
+            $this->conn = null;
+        }
+
+        // Connection doesn't exist: create it
         if (!$this->conn) {
             $this->conn = AMQPStreamConnection::create_connection(
                 [
@@ -93,7 +101,11 @@ class Connector extends AMQPConnector
     public function closeConnection(): self
     {
         if ($this->conn) {
-            $this->conn->close();
+            try {
+                $this->conn->close();
+            } catch (\Exception) {
+                // ignore errors raised when attempting to close the connection
+            }
             $this->conn = null;
         }
         return $this;

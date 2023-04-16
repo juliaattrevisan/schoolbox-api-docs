@@ -138,11 +138,28 @@ abstract class AMQPConnector implements AMQPInterface
         // can't use null as a key
         $idkey = $id ?: '_';
 
-        if (!(isset($this->channels[$idkey]) && $this->channels[$idkey] instanceof AMQPChannel)) {
-            $this->channels[$idkey] = $this->getConnection()->channel($id);
+        // Recreate the channel if it's there and disconnected.
+        // This could happen if the channel was created for a connection which
+        // has since been disconnected?
+        $channel = $this->channels[$idkey] ?? null;
+        if ($channel) {
+            $connected = $channel->getConnection() && $channel->getConnection()->isConnected();
+            if (!$connected) {
+                try {
+                    $channel->close();
+                } catch (\Exception) {
+                    // ignore errors raised when attempting to close the channel
+                }
+                unset($channel);
+                $channel = null;
+            }
+        }
+
+        if (!$channel instanceof AMQPChannel) {
+            $channel = $this->getConnection()->channel($id);
 
             // automatically declares the primary exchange
-            $this->channels[$idkey]->exchange_declare(
+            $channel->exchange_declare(
                 $this->getPrimaryExchange()->getName(),
                 $this->getPrimaryExchange()->getType(),
                 $this->passive,
@@ -150,6 +167,7 @@ abstract class AMQPConnector implements AMQPInterface
                 $this->autoDelete,
                 $this->internal
             );
+            $this->channels[$idkey] = $channel;
         }
         return $this->channels[$idkey];
     }
