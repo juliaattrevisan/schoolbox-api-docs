@@ -35,8 +35,9 @@ export default {
                     <span :class="`${field.mandatory ? 'required-with-tip' : ''}`">{{ field.caption }}</span>
                     <span
                         v-if="field.tooltip"
-                        :class="`hint has-tip tip-${field.tooltipPosition ? field.tooltipPosition : 'top'}`"
+                        :class="`hint has-tip tip-${field.tooltipPosition ? field.tooltipPosition : 'left'}`"
                         data-tooltip
+                        data-width="300"
                         :title="field.tooltip"
                         >?</span
                     >
