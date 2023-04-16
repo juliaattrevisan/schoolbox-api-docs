@@ -35,12 +35,15 @@ export function getLinkSettings() {
  * This is required so the CKEditor 4 / CKeditor 5 'open in new tab' UI are kept consistent
  * As the rel attribute previously wasn't allowed in CKEditor 4, we can be sure that it won't exist in any existing data
  *
- * @param { HTMLElement } element - the element the CKEditor will replace
+ * @param { HTMLElement } sourceElement - the sourceElement the CKEditor will replace
  * @returns { string } - the html with the data attribute added
  */
-export function addRelToNewTabLinks(element: HTMLElement) {
+export function addRelToNewTabLinks(sourceElement: HTMLElement) {
     const parser = new DOMParser();
-    const value = (element as HTMLTextAreaElement).value ? (element as HTMLTextAreaElement).value : element.innerHTML;
+    // if the sourceElement is a textarea, use .value as .innerHTML will return HTML as escaped text
+    const value = (sourceElement as HTMLTextAreaElement).value
+        ? (sourceElement as HTMLTextAreaElement).value
+        : sourceElement.innerHTML;
     const tempHTML = parser.parseFromString(value, "text/html");
     const links = tempHTML.body.querySelectorAll("a");
     links.forEach((link) => {

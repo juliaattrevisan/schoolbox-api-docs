@@ -1,7 +1,7 @@
 /**
  * Returns the settings for the Images
  *
- * @todo - there's currently an issue with preserving extra attributes on the imageBlock element
+ * @todo - there's currently an issue with preserving extra attributes on the imageBlock sourceElement
  * as imageInline appears to work fine, all images are currently set to imageInline, so all imageBlock
  * related functionality is currently disabled
  * @returns { object } - the image settings
@@ -89,12 +89,15 @@ export function getImageSettings() {
  * This is so any images marked full width in CKEditor 4 are also marked full width in CKEditor 5,
  * so the full width UI is accruate
  *
- * @param { HTMLElement } element - the element the CKEditor will replace
+ * @param { HTMLElement } sourceElement - the sourceElement the CKEditor will replace
  * @returns { string } - the html with the data attribute added
  */
-export function addFullWidthAttributes(element: HTMLElement) {
+export function addFullWidthAttributes(sourceElement: HTMLElement) {
     const parser = new DOMParser();
-    const value = (element as HTMLTextAreaElement).value ? (element as HTMLTextAreaElement).value : element.innerHTML;
+    // if the sourceElement is a textarea, use .value as .innerHTML will return HTML as escaped text
+    const value = (sourceElement as HTMLTextAreaElement).value
+        ? (sourceElement as HTMLTextAreaElement).value
+        : sourceElement.innerHTML;
     const tempHTML = parser.parseFromString(value, "text/html");
     const images = tempHTML.body.querySelectorAll("img");
     images.forEach((image) => {
