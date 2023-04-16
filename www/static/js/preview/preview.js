@@ -63,6 +63,12 @@
                         $.get(url, function (response) {
                             document.dispatchEvent(new Event("OVERLAY_LOADER_HIDE"));
 
+                            // if response.fragment is null, use custom preview and show an error
+                            if (response.fragment === null) {
+                                response.type = "custom";
+                                response.fragment = "There was a problem loading the preview, this file may have been deleted."
+                            }
+
                             if (response.type == "redirect") {
                                 window.location.href = response.fragment;
                             } else if (response.type == "image") {
