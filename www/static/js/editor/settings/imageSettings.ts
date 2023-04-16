@@ -1,7 +1,7 @@
 /**
  * Returns the settings for the Images
  *
- * @todo - there's currently an issue with preserving extra attributes on the imageBlock sourceElement
+ * @todo - there's currently an issue with preserving extra attributes on the imageBlock element
  * as imageInline appears to work fine, all images are currently set to imageInline, so all imageBlock
  * related functionality is currently disabled
  * @returns { object } - the image settings
