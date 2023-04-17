@@ -20,6 +20,5 @@ tour:
                   <p>The class markbook now features a pop-out menu on every cell.  Use this to get insights into recent activity, view work, provide feedback and publish results. This also provides a quick way to exclude a student from multiple assessments.</p>
                   <h3>Badge Evidence</h3>
                   <p>Following setting badges as goals for your students, they can submit evidence of achievement to the goal.  Allowing you to quickly review if a student has demonstrated the capability before you award the badge.</p>
-                  <p><a href='/help/sso/send?returnUrl=/homepage/3343'>Find out more via our release notes.</a><br />"
-                  # TODO: Update URL in line above when release notes are available.
+                  <p><a href='/help/sso/send?returnUrl=/homepage/3695'>Find out more via our release notes.</a><br />"
         class: introjs-newsmodal
