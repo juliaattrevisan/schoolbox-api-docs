@@ -20,7 +20,6 @@ export function getToolbar(config: EditorConfig) {
             "italic",
             "underline",
             "strikethrough",
-            "blockQuote",
             "removeFormat",
             "|",
             "link",

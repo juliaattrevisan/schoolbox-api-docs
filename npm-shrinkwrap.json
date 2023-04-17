@@ -5,7 +5,6 @@
     "requires": true,
     "packages": {
         "": {
-            "name": "schoolbox",
             "version": "23.0.0",
             "license": "UNLICENSED",
             "dependencies": {
@@ -26,6 +25,7 @@
                 "@ckeditor/ckeditor5-media-embed": "^36.0.1",
                 "@ckeditor/ckeditor5-mention": "^36.0.1",
                 "@ckeditor/ckeditor5-paragraph": "^36.0.1",
+                "@ckeditor/ckeditor5-paste-from-office": "^36.0.1",
                 "@ckeditor/ckeditor5-remove-format": "^36.0.1",
                 "@ckeditor/ckeditor5-source-editing": "^36.0.1",
                 "@ckeditor/ckeditor5-special-characters": "^36.0.1",
@@ -2855,6 +2855,19 @@
                 "@ckeditor/ckeditor5-core": "^36.0.1",
                 "@ckeditor/ckeditor5-ui": "^36.0.1",
                 "@ckeditor/ckeditor5-utils": "^36.0.1"
+            },
+            "engines": {
+                "node": ">=14.0.0",
+                "npm": ">=5.7.1"
+            }
+        },
+        "node_modules/@ckeditor/ckeditor5-paste-from-office": {
+            "version": "36.0.1",
+            "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-paste-from-office/-/ckeditor5-paste-from-office-36.0.1.tgz",
+            "integrity": "sha512-JG3Ex/0mQ94E6coU16/CpnjikadCLebRLKXKYQyK/Wag7MbkKh8jgzpnZTC4Br4HvpQORfx7eC475BWF927FeQ==",
+            "license": "GPL-2.0-or-later",
+            "dependencies": {
+                "ckeditor5": "^36.0.1"
             },
             "engines": {
                 "node": ">=14.0.0",
@@ -44883,6 +44896,14 @@
                 "@ckeditor/ckeditor5-utils": "^36.0.1"
             }
         },
+        "@ckeditor/ckeditor5-paste-from-office": {
+            "version": "36.0.1",
+            "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-paste-from-office/-/ckeditor5-paste-from-office-36.0.1.tgz",
+            "integrity": "sha512-JG3Ex/0mQ94E6coU16/CpnjikadCLebRLKXKYQyK/Wag7MbkKh8jgzpnZTC4Br4HvpQORfx7eC475BWF927FeQ==",
+            "requires": {
+                "ckeditor5": "^36.0.1"
+            }
+        },
         "@ckeditor/ckeditor5-remove-format": {
             "version": "36.0.1",
             "resolved": "https://registry.npmjs.org/@ckeditor/ckeditor5-remove-format/-/ckeditor5-remove-format-36.0.1.tgz",
@@ -58023,8 +58044,7 @@
                 "global": "^4.4.0",
                 "m3u8-parser": "^6.0.0",
                 "mpd-parser": "^1.0.1",
-                "mux.js": "6.2.0",
-                "video.js": "^7 || ^8"
+                "mux.js": "6.2.0"
             }
         },
         "@videojs/vhs-utils": {
