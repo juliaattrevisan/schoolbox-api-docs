@@ -27,17 +27,19 @@
             <input id="title" type="text" name="title" maxlength="255" value="{% if assessment.id %}{{ assessment.title }}{% endif %}" required />
         </div>
     </div>
-</fieldset>
 
-{# Assessment dates; basically shanked from another assessment type's create.twig
- # You have to manually do it every time you add a new assessment type. Only implementations
- # can have dates, not specifications.
- #
- # TODO What is the ordering of this form - do the dates come before or after the Lesson Plan Fields?
- #}
-{% if context.baseContext is not unitSpecification %}
-    {% include '@learningAssessment/fragments/dates.twig' %}
-{% endif %}
+    {# Assessment dates; basically shanked from another assessment type's create.twig
+     # You have to manually do it every time you add a new assessment type. Only implementations
+     # can have dates, not specifications.
+     #
+     # TODO What is the ordering of this form - do the dates come before or after the Lesson Plan Fields?
+    #}
+    {% import "@learningAssessment/fragments/macro/date.twig" as dateForm %}
+
+    {% if context.baseContext is not unitSpecification %}
+        {{ dateForm.dateField('Lesson',     'due',     assessment.dueAt,     '#publishDate', '') }}
+    {% endif %}
+</fieldset>
 
 {% if assessment.id %}
     {# Update a Lesson Plan. The fields' data already exist as Lesson Plan Fields, but we
@@ -103,7 +105,7 @@
  #}
 <fieldset>
     <div class="row">
-        <div class="small-12 columns">
+        <div class="small-12 medium-3 columns">
             <input type="hidden" name="lessonPlanVisibility" value="staff" />
 
             <label for="lessonPlanVisibility" class="inline-block">Visible to students <span class="hint has-tip tip-top" title="If on, students will be able to see this lesson plan and its contents" data-tooltip>?</span></label>
@@ -127,6 +129,11 @@
                     <span>Off</span>
                 </label>
             </div>
+        </div>
+        <div class="small-12 medium-9 columns">
+            {% if context.baseContext is not unitSpecification %}
+                {{ dateForm.dateField('Publish', 'publish', assessment.publishAt, '',             '#dueDate') }}
+            {% endif %}
         </div>
     </div>
 </fieldset>
