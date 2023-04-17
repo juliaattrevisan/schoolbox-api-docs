@@ -170,8 +170,8 @@ class Controller extends Base
                     $this->taskDHelper->addSource('', 'implementationNewsTopics');
                     $this->taskDHelper->addSource('', 'implementationCalendarEventTypes');
                     $this->taskDHelper->addSource('', 'implementationNotificationSettings');
-//                    // TODO: $this->taskDHelper->addSource('', 'implementationTopMenuReport');
-//                    $this->taskDHelper->addSource('', 'implementationSideMenuReport');
+                    // TODO: $this->taskDHelper->addSource('', 'implementationTopMenuReport');
+                    $this->taskDHelper->addSource('', 'implementationSideMenuReport');
 //                    $this->taskDHelper->addSource('', 'implementationAcademicPeriods');
                     break;
                 default:
@@ -1626,5 +1626,36 @@ class Controller extends Base
         $statement->execute();
         $help = new Helper();
         $help->queryToCSV($statement, 'implementationNotificationSettings.csv');
+    }
+    /**
+     * IMPLEMENTATION
+     * implementationSideMenuReport.csv
+     */
+    public function implementationSideMenuReport()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+          mss.section as 'Real Name',
+          IF(mss.title != '', mss.title,
+            CASE
+                WHEN mss.section = 'menu' THEN (select value from config where name = 'title')
+                WHEN mss.section = 'subjects' THEN 'My Subjects'
+                WHEN mss.section = 'children' THEN 'My Students'
+                WHEN mss.section = 'groups' THEN 'My Favorite Groups'
+                WHEN mss.section = 'bookmarks' THEN 'My Links'
+            END
+          ) as 'Label Name',
+            CASE
+                WHEN mss.visible = '0' THEN 'Hidden'
+                WHEN mss.visible = '1' THEN 'Visible'
+                ELSE 'N/A'
+            END AS 'Visibility'
+        FROM
+          menu_side_section mss;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'implementationSideMenuReport.csv');
     }
 }
