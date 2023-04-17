@@ -1,0 +1,18 @@
+tour:
+  title: '23.0 Release'
+  description: 'Introduce staff to the new features of the 23.0 release'
+  roles:
+    - staff
+  trigger:
+    urlRegex: '^/$'
+    selector: body
+    event: tourReady
+  steps:
+    - step:
+        title: What's New
+        type: modal
+        content: "<img src='{CDN_PREFIX}/images/tour/23_0_release.png' style='width:100%;margin-bottom:16px;'>
+                  <h3>New Rich Text Editor</h3>
+                  <p>The editor used throughout the system has been updated with a simpler interface and more powerful functions. Easily drag and drop images, embed videos, files and tables. Improved styling options to bring some improved look and feel to your content.</p>
+                  <p><a href='/help/sso/send?returnUrl=/homepage/3695'>Find out more via our release notes.</a><br/>"
+        class: introjs-newsmodal
