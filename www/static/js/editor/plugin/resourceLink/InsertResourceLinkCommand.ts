@@ -124,7 +124,6 @@ export default class InsertResourceLinkCommand extends Command {
                     status = message.data[0].status;
                 }
                 if (status === "success") {
-                    window.removeEventListener("message", this.messageBinding);
                     this.getResourceInfo(message.data[0].hash as string);
                 } else {
                     // Unknown status: assume error and do nothing, as the modal already shows the error
