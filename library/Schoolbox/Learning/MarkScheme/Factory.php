@@ -293,7 +293,7 @@ class Factory
                 $gradeGroup = $project->getGradeGroup();
                 if ($gradeGroup && $gradeGroup->getGradeLevels() === null) {
                     $mapper = Group\Mapper::getInstance();
-                    $project->setGradeGroup($mapper->findById($gradeGroup->getId()));
+                    $project->setGradeGroup($mapper->findByIdWithFallback($gradeGroup->getId()));
                 }
                 return new LetterGrade($project->getGradeGroup());
             default:
