@@ -27,27 +27,29 @@
             <input id="title" type="text" name="title" maxlength="255" value="{% if assessment.id %}{{ assessment.title }}{% endif %}" required />
         </div>
     </div>
-</fieldset>
 
-{# Assessment dates; basically shanked from another assessment type's create.twig
- # You have to manually do it every time you add a new assessment type. Only implementations
- # can have dates, not specifications.
- #
- # TODO What is the ordering of this form - do the dates come before or after the Lesson Plan Fields?
- #}
-{% if context.baseContext is not unitSpecification %}
-    {% include '@learningAssessment/fragments/dates.twig' %}
-{% endif %}
+    {# Assessment dates; basically shanked from another assessment type's create.twig
+     # You have to manually do it every time you add a new assessment type. Only implementations
+     # can have dates, not specifications.
+     #
+     # TODO What is the ordering of this form - do the dates come before or after the Lesson Plan Fields?
+    #}
+    {% import "@learningAssessment/fragments/macro/date.twig" as dateForm %}
+
+    {% if context.baseContext is not unitSpecification %}
+        {{ dateForm.dateField('Lesson',     'due',     assessment.dueAt,     '#publishDate', '') }}
+    {% endif %}
+</fieldset>
 
 {% if assessment.id %}
     {# Update a Lesson Plan. The fields' data already exist as Lesson Plan Fields, but we
      # need to remember the Lesson Plan Template from which they spawned.
      #}
-    {% for field in lessonPlanMeta.fields %}
-        <fieldset>
+    <fieldset>
+        {% for field in lessonPlanMeta.fields %}
             <div class="row">
                 <div class="small-12 columns">
-                    <h2>{{ field.title }}</h2>
+                    <label>{{ field.title }}</label>
                     {% if lessonPlanMeta.consts.student != field.visibility %}<p class="meta"><span class="icon-view-hollow"></span>This field is not visible to students</p>{% endif %}
 
                     {# The Lesson Plan Template field which is related to this Lesson Plan Field
@@ -58,20 +60,19 @@
                     <textarea id="field-body-{{ field.id }}" name="field[{{ field.id }}][body]" data-cke>{{ field.body }}</textarea>
                 </div>
             </div>
-        </fieldset>
-    {% endfor %}
+        {% endfor %}
+    </fieldset>
 {% else %}
     {# Create a new Lesson Plan. The fields are derived from the Lesson Plan Template's fields
      # but they won't have any Lesson Plan Field identifiers at this point.
      #}
-    {% for field in lessonPlanMeta.template.fields %}
-        {% if not field.isDeleted %}
-            {% set newFieldIdentifier = lessonPlanMeta.newKeyword ~ loop.index %}
-
-            <fieldset>
+    <fieldset>
+        {% for field in lessonPlanMeta.template.fields %}
+            {% if not field.isDeleted %}
+                {% set newFieldIdentifier = lessonPlanMeta.newKeyword ~ loop.index %}
                 <div class="row">
                     <div class="small-12 columns">
-                        <h2>{{ field.title }}</h2>
+                        <label>{{ field.title }}</label>
                         {% if lessonPlanMeta.consts.student != field.visibility %}<p class="meta"><span class="icon-view-hollow"></span>This field is not visible to students</p>{% endif %}
 
                         {# The Lesson Plan Template field which is related to this Lesson Plan Field
@@ -82,28 +83,29 @@
                         <textarea id="field-body-{{ newFieldIdentifier }}" name="field[{{ newFieldIdentifier }}][body]" data-cke>{{ field.body }}</textarea>
                     </div>
                 </div>
-            </fieldset>
-        {% endif %}
-    {% endfor %}
+            {% endif %}
+        {% endfor %}
+    </fieldset>
 {% endif %}
 
 {# Attach random files to this Lesson Plan
  # It implicitly constructs an attachments[] POST key which contains
  # all the hashes of the files you uploaded via the Mr Matt's Modal
  #}
-<div class="row">
-    <div class="small-12 columns">
-        <label>Attach Files</label>
-        {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
-    </div>
-</div>
-
-{# Toggle for deciding whether this Lesson Plan is visible to students
- # or if it's restricted to staff eyes only
- #}
 <fieldset>
     <div class="row">
         <div class="small-12 columns">
+            <label>Attach Files</label>
+            {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+        </div>
+    </div>
+
+    {# Toggle for deciding whether this Lesson Plan is visible to students
+     # or if it's restricted to staff eyes only
+     #}
+
+    <div class="row">
+        <div class="small-12 medium-3 columns">
             <input type="hidden" name="lessonPlanVisibility" value="staff" />
 
             <label for="lessonPlanVisibility" class="inline-block">Visible to students <span class="hint has-tip tip-top" title="If on, students will be able to see this lesson plan and its contents" data-tooltip>?</span></label>
@@ -127,6 +129,11 @@
                     <span>Off</span>
                 </label>
             </div>
+        </div>
+        <div class="small-12 medium-9 columns">
+            {% if context.baseContext is not unitSpecification %}
+                {{ dateForm.dateField('Publish', 'publish', assessment.publishAt, '',             '#dueDate') }}
+            {% endif %}
         </div>
     </div>
 </fieldset>
