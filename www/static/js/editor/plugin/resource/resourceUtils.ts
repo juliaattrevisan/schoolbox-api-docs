@@ -66,7 +66,7 @@ export type Resource = {
         | ResourceType.FOLDER
         | ResourceType.DOCUMENT
         | ResourceType.OTHER;
-    id?: string;
+    id?: string; // id will only be availalbe on an already existing resource
 };
 
 /**
@@ -103,7 +103,8 @@ function getImageAttributes(resource: Resource, config: EditorConfig) {
  * @returns { string } - the video src
  */
 function getVideoSrc(resource: Resource, config: EditorConfig) {
-    return getURL(`/cms/sendVideo.php?id=${resource.hash}&type=${resource.filesystem}`, config);
+    const resourceId = resource.id ? resource.id : resource.hash;
+    return getURL(`/cms/sendVideo.php?id=${resourceId}&type=${resource.filesystem}`, config);
 }
 
 /**
@@ -114,8 +115,9 @@ function getVideoSrc(resource: Resource, config: EditorConfig) {
  * @returns { string } - the video thumbnail src
  */
 function getVideoThumb(resource: Resource, config: EditorConfig) {
+    const resourceId = resource.id ? resource.id : resource.hash;
     const filesystemWithReplaces = resource.filesystem.replace("browse", "sbfs").replace("store", "storage");
-    return getURL(`/cms/videoThumb.php?size=poster&id=${resource.hash}&type=${filesystemWithReplaces}`, config);
+    return getURL(`/cms/videoThumb.php?size=poster&id=${resourceId}&type=${filesystemWithReplaces}`, config);
 }
 
 /**
@@ -149,7 +151,8 @@ function getVideoAttributes(resource: Resource, config: EditorConfig) {
  * @returns { string } - the audio src
  */
 function getAudioSrc(resource: Resource, config: EditorConfig) {
-    return getURL(`/cms/sendVideo.php?id=${resource.hash}&type=${resource.filesystem}`, config);
+    const resourceId = resource.id ? resource.id : resource.hash;
+    return getURL(`/cms/sendVideo.php?id=${resourceId}&type=${resource.filesystem}`, config);
 }
 
 /**

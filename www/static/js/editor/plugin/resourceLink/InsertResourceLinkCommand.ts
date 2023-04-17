@@ -88,7 +88,7 @@ export default class InsertResourceLinkCommand extends Command {
      */
     async getResourceInfo(hash: string) {
         try {
-            const response = await fetch(`/editor/nodeInfo.php?identifier=${hash}`, {
+            const response = await fetch(`/editor/nodeInfo.php?identifier=${encodeURIComponent(hash)}`, {
                 headers: {
                     "Content-Type": "application/json",
                 },
