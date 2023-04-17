@@ -16,6 +16,7 @@ declare global {
             lightGalleryInit: Function;
             lightGalleries: { [key: string]: any };
             imageLightboxLicenseKey: string;
+            imageSlideshows: { [key: string]: any };
         };
     }
 }
