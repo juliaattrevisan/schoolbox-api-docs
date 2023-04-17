@@ -83,8 +83,8 @@
          # TODO Arguably Lesson Plan's modifyTot should be a subclass of this modifyTot?
          #}
         {% if assessment is lessonPlan and hasStudentView is defined and hasStudentView %}
-            <li class="separator" data-has-student-view-separator>You are in Teacher View</li>
             {% if assessment.visibility == 'student' %}
+                <li class="separator" data-has-student-view-separator>You are in Teacher View</li>
                 <li><a class="icon-view" data-has-student-view="staff">Switch to Student View</a></li>
 
                 <script>
@@ -142,8 +142,6 @@
                         });
                     });
                 </script>
-            {% else %}
-            <li><a class="disabled" disabled>This lesson plan is not visible to students.</a></li>
             {% endif %}
         {% endif %}
     </ul>
