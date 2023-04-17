@@ -148,9 +148,9 @@ function exclude(excludeRoute: string, hasActivity: boolean) {
         // has some kind of activity.. prompt for exclusion
         $(this).confirmDialog({
             text:
-                '<p>The following student(s) have submissions and/or feedback for this assessment:</p><br/><p>Exclusion from this assessment will remove access to these submissions and/or feedback. Proceed?</p>',
+                '<p>The student has submissions and/or feedback for this assessment</p><p>Exclusion from this assessment will remove access to these submissions and/or feedback. Proceed?</p>',
             format: "html",
-            confirmLabel: 'Delete',
+            confirmLabel: 'Yes',
             confirmEvent: function () {
                 onMenuItemSelected(excludeRoute, 'exclude')
             }
