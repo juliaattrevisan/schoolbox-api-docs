@@ -169,7 +169,7 @@ class Controller extends Base
                     $this->taskDHelper->addSource('', 'implementationYearLevels');
                     $this->taskDHelper->addSource('', 'implementationNewsTopics');
                     $this->taskDHelper->addSource('', 'implementationCalendarEventTypes');
-//                    $this->taskDHelper->addSource('', 'implementationNotificationSettings');
+                    $this->taskDHelper->addSource('', 'implementationNotificationSettings');
 //                    // TODO: $this->taskDHelper->addSource('', 'implementationTopMenuReport');
 //                    $this->taskDHelper->addSource('', 'implementationSideMenuReport');
 //                    $this->taskDHelper->addSource('', 'implementationAcademicPeriods');
@@ -1595,5 +1595,36 @@ class Controller extends Base
         $statement->execute();
         $help = new Helper();
         $help->queryToCSV($statement, 'implementationCalendarEventTypes.csv');
+    }
+    /**
+     * IMPLEMENTATION
+     * implementationNotificationSettings.csv
+     */
+    public function implementationNotificationSettings()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            g.name as 'Role',
+            role_type as 'Role Type',
+            ms.description as 'Notification',
+            mrp.mask as 'Allowed',
+            mrp.role_default as 'Defaults'
+        FROM
+            msg_route_perm mrp
+        LEFT JOIN
+            groups g on g.id = mrp.role_id
+        LEFT JOIN
+            msg_source ms on ms.id = mrp.msg_source_id
+        WHERE
+            g.deleted_at is NULL
+        AND
+            mrp.msg_source_id in (34,35,36,37,38,39,40,41,42,49,50,51,52,53)
+        ORDER BY
+            ms.description,g.id;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'implementationNotificationSettings.csv');
     }
 }
