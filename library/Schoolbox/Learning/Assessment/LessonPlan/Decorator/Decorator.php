@@ -91,7 +91,13 @@ class Decorator implements DecoratorInterface
              *  resulting in this field going missing, due to multiplayer schoolbox. Is this
              *  something that happens often enough to safeguard further, and in what manner?
              */
-            if (str_contains($fieldId, self::NEW_KEYWORD)) {
+
+            /* When you're creating a new Lesson Plan,
+             * or when you're relocating an existing one (essentially identical)
+             */
+            $existingField = $assessment->getFields()?->getBy('id', $fieldId);
+
+            if (null === $existingField || str_contains($fieldId, self::NEW_KEYWORD)) {
                 /* This is a new field, so we need to remember from whence it came and all
                  * the details associated with its originating Lesson Plan Template Field
                  */

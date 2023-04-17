@@ -653,10 +653,12 @@ class ListController extends Web\Controller\Base
             // Clear assessment if the context is changed
             $relocatedContext   = $assessment ? $this->getRelocatedContext($assessment, $postData['locationId'] ?? '') : '';
             $originalAssessment = null;
+
             if ($relocatedContext) {
                 $postData['context'] = $relocatedContext;
                 $originalAssessment  = $assessment;
                 $assessment          = null;
+
             }
 
             /* Decide whether we have to invalidate project_result cache

@@ -348,7 +348,7 @@ class Factory
         /* Some facts about Course Managed Fields
          */
         $courseManagedFields = new CourseManagedFields($this->creator, $assessment);
-
+;
         if ($assessment instanceof Project) {
             $decorator = new ProjectDecorator(
                 $this->getMarkType(),

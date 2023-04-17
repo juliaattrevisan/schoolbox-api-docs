@@ -136,6 +136,13 @@
             {% endif %}
         </div>
     </div>
+
+    {# ----------------------------------------------------------- #}
+    {# Assessment Location #}
+    {# ----------------------------------------------------------- #}
+    {% if canRelocate %}
+        {% include '@learningAssessment/fragments/assessmentLocation.twig' %}
+    {% endif %}
 </fieldset>
 
 {# Curriculum Codes
