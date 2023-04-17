@@ -72,7 +72,7 @@ class Module extends BaseModule
         $this->register('GET', '/audit/implementationHouseList', 'implementationHouseList', $isAlaress);
         $this->register('GET', '/audit/implementationYearLevels', 'implementationYearLevels', $isAlaress);
         $this->register('GET', '/audit/implementationNewsTopics', 'implementationNewsTopics', $isAlaress);
-//        $this->register('GET', '/audit/implementationCalendarEventTypes', 'implementationCalendarEventTypes', $isAlaress);
+        $this->register('GET', '/audit/implementationCalendarEventTypes', 'implementationCalendarEventTypes', $isAlaress);
 //        $this->register('GET', '/audit/implementationNotificationSettings', 'implementationNotificationSettings', $isAlaress);
 //        // TODO: $this->register('GET', '/audit/implementationTopMenuReport', 'implementationCalendarEventTypes', $isAlaress);
 //        $this->register('GET', '/audit/implementationSideMenuReport', 'implementationSideMenuReport', $isAlaress);

@@ -168,7 +168,7 @@ class Controller extends Base
                     $this->taskDHelper->addSource('', 'implementationHouseList');
                     $this->taskDHelper->addSource('', 'implementationYearLevels');
                     $this->taskDHelper->addSource('', 'implementationNewsTopics');
-//                    $this->taskDHelper->addSource('', 'implementationCalendarEventTypes');
+                    $this->taskDHelper->addSource('', 'implementationCalendarEventTypes');
 //                    $this->taskDHelper->addSource('', 'implementationNotificationSettings');
 //                    // TODO: $this->taskDHelper->addSource('', 'implementationTopMenuReport');
 //                    $this->taskDHelper->addSource('', 'implementationSideMenuReport');
@@ -1561,21 +1561,39 @@ class Controller extends Base
         $database = FolderMapper::getInstance()->getDatabase();
         $statement = $database->prepare("
         SELECT
-            lyl.NAME AS 'Year Level',
-            Count(u.id) AS 'User Count'
+            NAME AS 'Topic Name'
         FROM
-            lu_year_level lyl
-        LEFT JOIN
-            user u ON lyl.id = u.year_id
+            newsTopic
         WHERE
-            lyl.deleted_at IS NULL
-        AND
-            u.deleted_at IS NULL
-        GROUP BY
-            lyl.NAME;
+            deleted_at IS NULL
+        ORDER BY
+            sequence;
         ");
         $statement->execute();
         $help = new Helper();
         $help->queryToCSV($statement, 'implementationNewsTopics.csv');
+    }
+    /**
+     * IMPLEMENTATION
+     * implementationCalendarEventTypes.csv
+     */
+    public function implementationCalendarEventTypes()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+                eventTypeID as 'ID',
+                eventType as 'Event',
+                eventColour as 'Event Colour'
+        FROM
+                luEventType
+        WHERE
+                deleted_at is NULL
+        ORDER BY
+                sequence ASC;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'implementationCalendarEventTypes.csv');
     }
 }
