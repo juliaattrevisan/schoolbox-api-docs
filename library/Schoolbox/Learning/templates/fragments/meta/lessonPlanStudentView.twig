@@ -8,5 +8,9 @@
  # @param \Schoolbox\User $student
  #}
 {% if assessment is lessonPlan and USER.role.isStaff %}
-    <li data-has-student-view-meta></li>
+    {% if assessment.visibility == 'student' %}
+        <li data-has-student-view-meta></li>
+    {% else %}
+        <li class="icon-view-hollow">This lesson plan is not visible to students.</li>
+    {% endif %}
 {% endif %}
