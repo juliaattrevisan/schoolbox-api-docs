@@ -1474,4 +1474,30 @@ class Controller extends Base
         $help = new Helper();
         $help->queryToCSV($statement, 'implementationRoleList.csv');
     }
+    /**
+     * IMPLEMENTATION
+     * implementationCampusList.csv
+     */
+    public function implementationCampusList()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            c.NAME   AS 'Campus Name',
+            Count(u.id) AS 'User Count'
+        FROM
+            luCampus c
+        JOIN
+            userCampus uc ON c.id = uc.campus
+        JOIN
+            user u ON uc.uid = u.id
+        WHERE
+            u.deleted_at IS NULL
+        GROUP BY
+            c.NAME;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'implementationCampusList.csv');
+    }
 }
