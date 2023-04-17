@@ -1,6 +1,6 @@
 /* Admin area; list of Fields in a Lesson Plan Template
  */
-.lesson-plan-template-fields {
+.lpt-fields {
     &.s-is-dragging {
         .ui-sortable-helper {
             height: 2.5rem !important;
@@ -31,9 +31,9 @@
         }
 
         border: 1px solid var(--body-background);
-        margin-bottom: 1rem;
         margin-left: 0;
         margin-right: 0;
+        margin-bottom: 1rem;
         position: relative;
 
         &:last-child {
@@ -163,21 +163,43 @@
 /**
  * Styles specifically for the Lesson Plan Template previews
  */
-.lpt-preview {
-    li {
+.lpt-preview,
+.lp-display {
+    > li {
         border-bottom: 1px solid $gainsboro;
+
+        // Necessary to fight layers of padding / inherited rules
+        margin-left: -1rem;
+        margin-right: -1rem;
+
+        // Necessary to split off to fight other highly-specific rules being inherited
+        &.not-visible-students:last-child {
+            border-bottom: 1px solid $gainsboro;
+        }
 
         p.meta {
             font-weight: 600;
         }
 
-        &:first-child {
-            border-top: 1px solid $gainsboro;
+        &.not-visible-students {
+            background-color: $vapor;
         }
     }
+}
 
-    .not-visible-students {
-        background-color: $vapor;
+.lpt-preview {
+    li:first-child {
+        border-top: 1px solid $gainsboro;
+    }
+}
+
+.lp-display {
+    padding: 1rem;
+    padding-bottom: 0;
+
+    li.not-visible-students {
+        border-left: 1px solid $gainsboro;
+        border-right: 1px solid $gainsboro;
     }
 }
 
@@ -188,7 +210,6 @@
  */
 .lpt-preview-header {
     padding-bottom: 1rem;
-    ///border-bottom: 1px solid #ddd;
 }
 
 .information-list.lpt-preview li {
