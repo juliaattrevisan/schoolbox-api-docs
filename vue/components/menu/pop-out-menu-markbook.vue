@@ -162,6 +162,24 @@ function exclude(excludeRoute: string, hasActivity: boolean) {
 }
 
 /**
+ * hack to refresh the markbook
+ * clone from `library/Schoolbox/Filter/templates/panel.twig to trigger the js on-click function
+ *         // Listen for clicks on the submit button
+ *         $submitButton.on('click', function(event){
+ *             event.preventDefault();
+ *             updateOriginalSelections();
+ *             fetchReport();
+ *             return false; // don't bubble
+ *         });
+ */
+function reloadMarkbook() {
+    // close the popout
+    isSelected.value = false;
+    // reload the markbook
+    document.getElementById('submit_button').click();
+}
+
+/**
  * Get the latest routes to display within the popout
  *
  * @param { Routes } newRoutes - the routes linked to the selection
@@ -370,6 +388,8 @@ async function onMenuItemSelected(target: string, action: string|null = null) {
         hasLoadError.value = true;
     } finally {
         isLoading.value = false;
+        //trigger a markbook reload
+        reloadMarkbook();
     }
 }
 </script>
