@@ -150,6 +150,14 @@ export function getHTMLSupportSettings() {
                         usemap: true,
                     },
                 },
+                // "<code>"
+                {
+                    name: "code",
+                },
+                // "<tt>"
+                {
+                    name: "tt",
+                },
             ],
         },
     };

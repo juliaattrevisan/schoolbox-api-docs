@@ -83,3 +83,27 @@ export function getImageSettings() {
         },
     };
 }
+
+/**
+ * Add the data-schoolboxresource-fullwidth attribute to any images that have the class full-width
+ * This is so any images marked full width in CKEditor 4 are also marked full width in CKEditor 5,
+ * so the full width UI is accruate
+ *
+ * @param { HTMLElement } sourceElement - the sourceElement the CKEditor will replace
+ * @returns { string } - the html with the data attribute added
+ */
+export function addFullWidthAttributes(sourceElement: HTMLElement) {
+    const parser = new DOMParser();
+    // if the sourceElement is a textarea, use .value as .innerHTML will return HTML as escaped text
+    const value = (sourceElement as HTMLTextAreaElement).value
+        ? (sourceElement as HTMLTextAreaElement).value
+        : sourceElement.innerHTML;
+    const tempHTML = parser.parseFromString(value, "text/html");
+    const images = tempHTML.body.querySelectorAll("img");
+    images.forEach((image) => {
+        if (image.classList.contains("full-width")) {
+            image.setAttribute("data-schoolboxresource-fullwidth", "true");
+        }
+    });
+    return tempHTML.body.innerHTML;
+}

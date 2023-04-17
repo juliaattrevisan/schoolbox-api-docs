@@ -14,17 +14,17 @@ import "@js/editor/styles/editor.css"; // to overwrite some of the styles
 /**
  * Add in any additional setup required and then dispatch that the editor is ready
  *
- * @param { HTMLTextAreaElement } textarea - the textarea the CKEditor will replace
+ * @param { HTMLElement } sourceElement - the sourceElement the CKEditor will replace
  * @param { Editor } editor - the CKEditor instance
  * @param { EditorConfig } config - the CKEditor config object
  */
-async function onCreated(textarea: HTMLTextAreaElement, editor: Editor, config: EditorConfig) {
-    await modifyEditor(textarea, editor, config);
-    textarea.dispatchEvent(
+async function onCreated(sourceElement: HTMLElement, editor: Editor, config: EditorConfig) {
+    await modifyEditor(sourceElement, editor, config);
+    sourceElement.dispatchEvent(
         new CustomEvent(EditorEvent.EDITOR__CREATED, {
             detail: {
                 editor,
-                textarea,
+                sourceElement,
             },
         })
     );
@@ -47,14 +47,14 @@ function addDefaultConfig(config: EditorConfig) {
 /**
  * create the ckeditor instance
  *
- * @param { HTMLTextAreaElement } textarea - the textarea the CKEditor will replace
+ * @param { HTMLElement } sourceElement - the sourceElement the CKEditor will replace
  * @param { EditorConfig } config - the config to use when creating the editor
  */
-function create(textarea: HTMLTextAreaElement, config: EditorConfig) {
+function create(sourceElement: HTMLElement, config: EditorConfig) {
     addDefaultConfig(config);
-    ClassicEditor.create(textarea, getConfig(config))
+    ClassicEditor.create(sourceElement, getConfig(config))
         .then((editor) => {
-            onCreated(textarea, editor, config);
+            onCreated(sourceElement, editor, config);
         })
         .catch((error) => {
             console.error(error.stack);
@@ -71,9 +71,9 @@ function onCreate(event: CustomEvent) {
     const { targetElements } = config;
     targetElements.forEach((targetElement) => {
         // assume that each targetElement could contain multiple instances
-        document.querySelectorAll(targetElement).forEach((textarea) => {
-            initCheckData(textarea as HTMLTextAreaElement, config);
-            create(textarea as HTMLTextAreaElement, config);
+        document.querySelectorAll(targetElement).forEach((sourceElement) => {
+            initCheckData(sourceElement as HTMLElement, config);
+            create(sourceElement as HTMLElement, config);
         });
     });
 }
