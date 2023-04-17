@@ -47,7 +47,7 @@ export function addRelToNewTabLinks(sourceElement: HTMLElement) {
     const tempHTML = parser.parseFromString(value, "text/html");
     const links = tempHTML.body.querySelectorAll("a");
     links.forEach((link) => {
-        if (link.getAttribute("target") === "_blank") {
+        if (link.getAttribute("target") === "_blank" && link.getAttribute("rel") === null) {
             link.setAttribute("rel", "noopener noreferrer");
         }
     });
