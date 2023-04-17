@@ -163,7 +163,7 @@ function exclude(excludeRoute: string, hasActivity: boolean) {
 
 /**
  * hack to refresh the markbook
- * clone from `library/Schoolbox/Filter/templates/panel.twig to trigger the js on-click function
+ * clone from `library/Schoolbox/Filter/templates/panel.twig` to trigger the js on-click function
  *         // Listen for clicks on the submit button
  *         $submitButton.on('click', function(event){
  *             event.preventDefault();
