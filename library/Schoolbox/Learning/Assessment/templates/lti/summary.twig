@@ -18,6 +18,7 @@
     {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessment.id, assessment: assessment}) %}
     {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}) %}
     {% include '@learningAssessment/fragments/modifyTot.twig' with {
+        assessment: assessment,
         gradeRoute: false,
         viewRoute: viewRoute,
         modifyRoute: modifyRoute,
