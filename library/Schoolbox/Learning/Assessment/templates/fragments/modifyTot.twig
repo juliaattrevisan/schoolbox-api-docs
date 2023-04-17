@@ -84,7 +84,7 @@
          #}
         {% if hasStudentView is defined and hasStudentView %}
             <li class="separator" data-has-student-view-separator>You are in Student View</li>
-            <li><a class="icon-view" data-has-student-view="student">Switch to Teacher View</a></li>
+            <li><a class="icon-view" data-has-student-view="staff">Switch to Student View</a></li>
 
             <script>
                 $(function() {
@@ -130,7 +130,7 @@
                     /* Update the meta only when you're toggling views,
                      * so students see an authentic representation
                      */
-                    lessonPlanStudentView($(this));
+                    lessonPlanStaffView($(this));
 
                     $('[data-has-student-view]').on('click', function() {
                         if ($(this).attr('data-has-student-view') == 'staff') {
