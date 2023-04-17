@@ -15,7 +15,7 @@ namespace Schoolbox\Learning\Assessment\Summator;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
-use Schoolbox\Learning\Assessment\Task\Model as Task;
+use Schoolbox\Learning\Assessment\LessonPlan;
 use Schoolbox\User;
 
 abstract class AbstractSummator implements ISummator
@@ -77,6 +77,12 @@ abstract class AbstractSummator implements ISummator
              * those two steps, you'd not encounter this.
              */
             if ($currentAssessable->isDeleted()) {
+                continue;
+            }
+
+            /* Ignore Lesson Plan instances
+             */
+            if ($currentAssessable instanceof LessonPlan\Model) {
                 continue;
             }
 

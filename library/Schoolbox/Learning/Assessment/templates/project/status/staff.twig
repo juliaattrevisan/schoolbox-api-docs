@@ -155,7 +155,7 @@ Data:
                                         {% if assessable.getDueAt %}
                                         <p class="meta">
                                             {{ dueDate.forAssessment(assessable) }}
-                                            {% if assessable.getDueAt %}
+                                            {% if assessable is not lessonPlan %}
                                                 <span class="pipe meta"><span class="{{ urgency.marks(completionGradient ?? '') }}">{{ stats.countParticipants - stats.countResponseRequired }}/{{ stats.countParticipants }} students completed</span></span>
                                             {% endif %}
                                         </p>

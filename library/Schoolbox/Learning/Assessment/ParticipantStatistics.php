@@ -19,7 +19,6 @@ use Schoolbox\GenericCollection;
  */
 class ParticipantStatistics
 {
-
     /** @var Participant */
     private $participant;
 
@@ -81,7 +80,7 @@ class ParticipantStatistics
             $this->cacheCountAssessments = 0;
             $user                        = $this->participant->getUser();
             foreach ($this->assessmentAndDescendants as $assessable) {
-                if (!$assessable instanceof Project && $assessable->isParticipant($user)) {
+                if (!$assessable instanceof Project && !$assessable instanceof LessonPlan\Model && $assessable->isParticipant($user)) {
                     // Ignore projects and assessments where the user is not participating
                     $this->cacheCountAssessments++;
                 }
@@ -100,7 +99,7 @@ class ParticipantStatistics
             $this->cacheCountResponseRequired = 0;
             $user                             = $this->participant->getUser();
             foreach ($this->assessmentAndDescendants as $assessable) {
-                if ($assessable instanceof Project) {
+                if ($assessable instanceof Project || $assessable instanceof LessonPlan\Model) {
                     continue;
                 }
                 $subParticipant = $assessable->getParticipantIfExtant($user);
@@ -122,7 +121,7 @@ class ParticipantStatistics
             $this->cacheCountFeedbackRequired = 0;
             $user                             = $this->participant->getUser();
             foreach ($this->assessmentAndDescendants as $assessable) {
-                if ($assessable instanceof Project) {
+                if ($assessable instanceof Project || $assessable instanceof LessonPlan\Model) {
                     continue;
                 }
                 $subParticipant = $assessable->getParticipantIfExtant($user);
@@ -144,7 +143,7 @@ class ParticipantStatistics
             $this->cacheCountReviewComplete = 0;
             $user                           = $this->participant->getUser();
             foreach ($this->assessmentAndDescendants as $assessable) {
-                if ($assessable instanceof Project) {
+                if ($assessable instanceof Project || $assessable instanceof LessonPlan\Model) {
                     continue;
                 }
                 $subParticipant = $assessable->getParticipantIfExtant($user);
