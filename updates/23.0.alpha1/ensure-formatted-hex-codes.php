@@ -129,44 +129,51 @@ $app = new class extends CliTool\App
         $dbc = $this->getDatabaseInternal();
 
         foreach ($colourFields as $table => $tableConfig) {
-            $updatedAmt = 0;
             // Get all necessary rows in the table
             $rows = $dbc->executeQuery(
                 'SELECT ' . $tableConfig['primary_key'] . ', ' . implode(', ', $tableConfig['fields']) . ' FROM ' . $table . ' ' . ($tableConfig['restriction'] ?? '')
             )->fetchAll();
 
-            // Loop through each row and update the HEX codes in each field
-            foreach ($rows as $row) {
-                foreach ($tableConfig['fields'] as $field) {
+            foreach ($tableConfig['fields'] as $field) {
+                $updatedAmt = 0;
+
+                // Loop through each row and update the HEX codes in each field
+                foreach ($rows as $row) {
                     // Check if the value is empty
                     if (empty($row[$field])) {
+                        $this->getLogger()->debug(sprintf(
+                            '  Skipped %s.%s identifier %s because it is empty',
+                            $table,
+                            $field,
+                            $row[$tableConfig['primary_key']]
+                        ));
                         continue;
                     }
 
                     // If the value already has a hash, skip it
-                    if (substr($row[$field], 0, 1) === '#') {
+                    if (str_starts_with($row[$field], '#')) {
                         continue;
                     }
 
-                    // Check if the value is a HEX code (6 or 8 characters, without a hash)
-                    if (!preg_match('/^[0-9a-fA-F]{6,8}$/', $row[$field])) {
+                    // Check if the value is a HEX code (3, 6, or 8 characters, without a hash)
+                    if (!preg_match('/^(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/', $row[$field])) {
                         continue;
                     }
 
-                    $updatedAmt += 1;
+                    $updatedAmt++;
 
                     $dbc->executeQuery(
                         'UPDATE ' . $table . ' SET ' . $field . ' = :value WHERE ' . $tableConfig['primary_key'] . ' = :id',
                         ['id' => $row[$tableConfig['primary_key']], 'value' => '#' . $row[$field]]
                     );
                 }
-            }
 
-            $updatedAmtTotal += $updatedAmt;
-            if ($updatedAmt > 0) {
-                $this->getLogger()->info("Updated " . $updatedAmt . " HEX codes in " . $table . " table.");
-            } else {
-                $this->getLogger()->info("No HEX codes to update in " . $table . " table.");
+                $updatedAmtTotal += $updatedAmt;
+                if ($updatedAmt > 0) {
+                    $this->getLogger()->info("Updated " . $table . "." . $field . " - " . $updatedAmt . " HEX codes replaced");
+                } else {
+                    $this->getLogger()->info("No HEX codes to update in " . $table . "." . $field . "");
+                }
             }
         }
 
