@@ -138,6 +138,28 @@ const viewStatusText = computed(() => {
     return "View Attempts";
 });
 
+/**
+ * Exclude route.
+ * Checks if the student has any feedback or submissions, if they do not, then it just excludes. else will prompt
+ */
+function exclude(excludeRoute: string, hasActivity: boolean) {
+    // does the user have work?
+    if (hasActivity) {
+        // has some kind of activity.. prompt for exclusion
+        $(this).confirmDialog({
+            text:
+                '<p>The following student(s) have submissions and/or feedback for this assessment:</p><br/><p>Exclusion from this assessment will remove access to these submissions and/or feedback. Proceed?</p>',
+            format: "html",
+            confirmLabel: 'Delete',
+            confirmEvent: function () {
+                onMenuItemSelected(excludeRoute, 'exclude')
+            }
+        });
+    } else {
+        // no work or feedback
+        onMenuItemSelected(excludeRoute, 'exclude')
+    }
+}
 
 /**
  * Get the latest routes to display within the popout
@@ -425,7 +447,7 @@ async function onMenuItemSelected(target: string, action: string|null = null) {
                 </pop-out-menu-item>
                 <pop-out-menu-item v-else-if="'Project' !== assessmentType"
                     :class="{ 'is-disabled': isExcluded }"
-                    @selected="onMenuItemSelected(routes.excludeRoute, 'exclude')"
+                    @selected="exclude(routes.excludeRoute, (hasSubmissions || hasFeedback))"
                 >
                     Exclude Student
                 </pop-out-menu-item>
