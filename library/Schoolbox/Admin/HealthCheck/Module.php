@@ -69,7 +69,7 @@ class Module extends BaseModule
         $this->register('GET', '/audit/implementationServicePermissions', 'implementationServicePermissions', $isAlaress);
         $this->register('GET', '/audit/implementationRoleList', 'implementationRoleList', $isAlaress);
         $this->register('GET', '/audit/implementationCampusList', 'implementationCampusList', $isAlaress);
-//        $this->register('GET', '/audit/implementationHouseList', 'implementationHouseList', $isAlaress);
+        $this->register('GET', '/audit/implementationHouseList', 'implementationHouseList', $isAlaress);
 //        $this->register('GET', '/audit/implementationYearLevels', 'implementationYearLevels', $isAlaress);
 //        $this->register('GET', '/audit/implementationNewsTopics', 'implementationNewsTopics', $isAlaress);
 //        $this->register('GET', '/audit/implementationCalendarEventTypes', 'implementationCalendarEventTypes', $isAlaress);

@@ -164,8 +164,8 @@ class Controller extends Base
                      */
                     $this->taskDHelper->addSource('', 'implementationServicePermissions');
                     $this->taskDHelper->addSource('', 'implementationRoleList');
-//                    $this->taskDHelper->addSource('', 'implementationCampusList');
-//                    $this->taskDHelper->addSource('', 'implementationHouseList');
+                    $this->taskDHelper->addSource('', 'implementationCampusList');
+                    $this->taskDHelper->addSource('', 'implementationHouseList');
 //                    $this->taskDHelper->addSource('', 'implementationYearLevels');
 //                    $this->taskDHelper->addSource('', 'implementationNewsTopics');
 //                    $this->taskDHelper->addSource('', 'implementationCalendarEventTypes');
@@ -1499,5 +1499,31 @@ class Controller extends Base
         $statement->execute();
         $help = new Helper();
         $help->queryToCSV($statement, 'implementationCampusList.csv');
+    }
+    /**
+     * IMPLEMENTATION
+     * implementationHouseList.csv
+     */
+    public function implementationHouseList()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            h.house AS 'House Level',
+            Count(u.id) AS 'User Count'
+        FROM
+            house h
+        LEFT JOIN
+            user u ON h.id = u.house
+        WHERE
+            h.deleted_at IS NULL
+        AND
+            u.deleted_at IS NULL
+        GROUP BY
+            h.house;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'implementationHouseList.csv');
     }
 }
