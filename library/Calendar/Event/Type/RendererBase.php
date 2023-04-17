@@ -70,7 +70,12 @@ abstract class RendererBase implements RendererInterface
     public function getRouteIfAuthorized($name, array $params = [])
     {
         if ($this->authorizer->isPathAuthorizedForUser($name, $params, $this->viewer)) {
-            return $this->router->generate($name, $params);
+            try {
+                return $this->router->generate($name, $params);
+            } catch (\Aura\Router\Exception\RouteNotFound $e) {
+                // the route does not exist, the module may not be enabled?
+                return false;
+            }
         }
         return false;
     }
