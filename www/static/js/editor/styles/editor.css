@@ -18,6 +18,8 @@
     --ck-color-mention-text: #222222;
     /* make a little longer, only seen in the Link plugin for Link URL */
     --ck-input-width: 19rem;
+    /* to sit above the side menus */
+    --ck-z-modal: 1003;
 }
 
 .ck.ck-editor {
