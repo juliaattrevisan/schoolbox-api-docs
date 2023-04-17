@@ -67,16 +67,16 @@ class Module extends BaseModule
         $this->register('GET', '/audit/svaForumRepliesViews', 'svaForumRepliesViews', $isAlaress);
         // Implementation Status Review Reports
         $this->register('GET', '/audit/implementationServicePermissions', 'implementationServicePermissions', $isAlaress);
-        $this->register('GET', '/audit/implementationRoleList', 'implementationRoleList', $isAlaress);
-        $this->register('GET', '/audit/implementationCampusList', 'implementationCampusList', $isAlaress);
-        $this->register('GET', '/audit/implementationHouseList', 'implementationHouseList', $isAlaress);
-        $this->register('GET', '/audit/implementationYearLevels', 'implementationYearLevels', $isAlaress);
-        $this->register('GET', '/audit/implementationNewsTopics', 'implementationNewsTopics', $isAlaress);
-        $this->register('GET', '/audit/implementationCalendarEventTypes', 'implementationCalendarEventTypes', $isAlaress);
-        $this->register('GET', '/audit/implementationNotificationSettings', 'implementationNotificationSettings', $isAlaress);
-        // TODO: $this->register('GET', '/audit/implementationTopMenuReport', 'implementationCalendarEventTypes', $isAlaress);
-        $this->register('GET', '/audit/implementationSideMenuReport', 'implementationSideMenuReport', $isAlaress);
-        $this->register('GET', '/audit/implementationAcademicPeriods', 'implementationAcademicPeriods', $isAlaress);
+//        $this->register('GET', '/audit/implementationRoleList', 'implementationRoleList', $isAlaress);
+//        $this->register('GET', '/audit/implementationCampusList', 'implementationCampusList', $isAlaress);
+//        $this->register('GET', '/audit/implementationHouseList', 'implementationHouseList', $isAlaress);
+//        $this->register('GET', '/audit/implementationYearLevels', 'implementationYearLevels', $isAlaress);
+//        $this->register('GET', '/audit/implementationNewsTopics', 'implementationNewsTopics', $isAlaress);
+//        $this->register('GET', '/audit/implementationCalendarEventTypes', 'implementationCalendarEventTypes', $isAlaress);
+//        $this->register('GET', '/audit/implementationNotificationSettings', 'implementationNotificationSettings', $isAlaress);
+//        // TODO: $this->register('GET', '/audit/implementationTopMenuReport', 'implementationCalendarEventTypes', $isAlaress);
+//        $this->register('GET', '/audit/implementationSideMenuReport', 'implementationSideMenuReport', $isAlaress);
+//        $this->register('GET', '/audit/implementationAcademicPeriods', 'implementationAcademicPeriods', $isAlaress);
     }
 
     /**

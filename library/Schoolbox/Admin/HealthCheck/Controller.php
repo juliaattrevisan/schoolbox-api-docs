@@ -163,16 +163,16 @@ class Controller extends Base
                      * list of reports for implementation reports
                      */
                     $this->taskDHelper->addSource('', 'implementationServicePermissions');
-                    $this->taskDHelper->addSource('', 'implementationRoleList');
-                    $this->taskDHelper->addSource('', 'implementationCampusList');
-                    $this->taskDHelper->addSource('', 'implementationHouseList');
-                    $this->taskDHelper->addSource('', 'implementationYearLevels');
-                    $this->taskDHelper->addSource('', 'implementationNewsTopics');
-                    $this->taskDHelper->addSource('', 'implementationCalendarEventTypes');
-                    $this->taskDHelper->addSource('', 'implementationNotificationSettings');
-                    // TODO: $this->taskDHelper->addSource('', 'implementationTopMenuReport');
-                    $this->taskDHelper->addSource('', 'implementationSideMenuReport');
-                    $this->taskDHelper->addSource('', 'implementationAcademicPeriods');
+//                    $this->taskDHelper->addSource('', 'implementationRoleList');
+//                    $this->taskDHelper->addSource('', 'implementationCampusList');
+//                    $this->taskDHelper->addSource('', 'implementationHouseList');
+//                    $this->taskDHelper->addSource('', 'implementationYearLevels');
+//                    $this->taskDHelper->addSource('', 'implementationNewsTopics');
+//                    $this->taskDHelper->addSource('', 'implementationCalendarEventTypes');
+//                    $this->taskDHelper->addSource('', 'implementationNotificationSettings');
+//                    // TODO: $this->taskDHelper->addSource('', 'implementationTopMenuReport');
+//                    $this->taskDHelper->addSource('', 'implementationSideMenuReport');
+//                    $this->taskDHelper->addSource('', 'implementationAcademicPeriods');
                     break;
                 default:
                     throw new SchoolboxException("Report '{$report}' Does not exist.");
@@ -1396,14 +1396,56 @@ class Controller extends Base
         ORDER BY
             ft.threadID,ft.date;
         ");
-        // ===============================================================================================
-        // ============= TO DO: ADD 'Social Stream Posts (per month, per page)' Here =====================
-        // ===============================================================================================
         $statement->execute();
         $help = new Helper();
         $help->queryToCSV($statement, 'svaForumReplies.csv');
     }
     // ===============================================================================================
+    // ============= TO DO: ADD 'Social Stream Posts (per month, per page)' Here =====================
+    // ===============================================================================================
+
+    // ===============================================================================================
     // ==================================== END SVA REPORTS ==========================================
     // ===============================================================================================
+
+    // ===============================================================================================
+    // ============================== START IMPLEMENTATION REPORTS ===================================
+    // ===============================================================================================
+
+    /**
+     * IMPLEMENTATION
+     * implementationServicePermissions.csv
+     */
+    public function implementationServicePermissions()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            ls.NAME AS 'Service Type',
+            group_concat(concat(u.firstname,' ',u.lastname,' (',u.id,')')) AS 'Users'
+        FROM
+            lu_service ls
+        LEFT JOIN
+            userAccess ua on ls.id = ua.service
+        LEFT JOIN
+            user u on ua.uid = u.id and u.deleted_at is NULL
+        WHERE
+            NOT ls.name = 'Homepage'
+        GROUP BY
+            ls.name
+        UNION
+        SELECT
+            'Superusers' as 'Service Type',
+            group_concat(concat(u.firstname,' ',u.lastname,' (',u.id,')')) AS 'Users'
+        FROM
+            superusers s
+        LEFT JOIN
+            user u ON s.id = u.id
+        WHERE
+            u.deleted_at IS NULL;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'implementationServicePermissions.csv');
+    }
 }
