@@ -92,7 +92,7 @@ export function getToolbar(config: EditorConfig) {
             {
                 label: "Other",
                 icon: "threeVerticalDots",
-                items: ["specialCharacters", "horizontalLine", "findAndReplace", "sourceEditing"],
+                items: ["specialCharacters", "eqneditor5Button", "horizontalLine", "findAndReplace", "sourceEditing"],
             },
         ];
     }
