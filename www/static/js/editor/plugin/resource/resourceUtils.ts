@@ -66,7 +66,7 @@ export type Resource = {
         | ResourceType.FOLDER
         | ResourceType.DOCUMENT
         | ResourceType.OTHER;
-    id?: string;
+    id?: string; // id will only be availalbe on an already existing resource
 };
 
 /**
