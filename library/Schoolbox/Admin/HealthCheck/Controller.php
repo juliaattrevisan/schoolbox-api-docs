@@ -163,7 +163,7 @@ class Controller extends Base
                      * list of reports for implementation reports
                      */
                     $this->taskDHelper->addSource('', 'implementationServicePermissions');
-//                    $this->taskDHelper->addSource('', 'implementationRoleList');
+                    $this->taskDHelper->addSource('', 'implementationRoleList');
 //                    $this->taskDHelper->addSource('', 'implementationCampusList');
 //                    $this->taskDHelper->addSource('', 'implementationHouseList');
 //                    $this->taskDHelper->addSource('', 'implementationYearLevels');
@@ -1447,5 +1447,31 @@ class Controller extends Base
         $statement->execute();
         $help = new Helper();
         $help->queryToCSV($statement, 'implementationServicePermissions.csv');
+    }
+    /**
+     * IMPLEMENTATION
+     * implementationRoleList.csv
+     */
+    public function implementationRoleList()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            g.NAME   AS 'Role Name',
+            Count(u.id) AS 'User Count'
+        FROM
+            groups g
+        LEFT JOIN
+            user u ON g.id = u.group_id
+        WHERE
+            u.deleted_at IS NULL
+        AND
+            g.deleted_at IS NULL
+        GROUP BY
+            g.NAME;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'implementationRoleList.csv');
     }
 }
