@@ -172,7 +172,7 @@ class Controller extends Base
                     $this->taskDHelper->addSource('', 'implementationNotificationSettings');
                     // TODO: $this->taskDHelper->addSource('', 'implementationTopMenuReport');
                     $this->taskDHelper->addSource('', 'implementationSideMenuReport');
-//                    $this->taskDHelper->addSource('', 'implementationAcademicPeriods');
+                    $this->taskDHelper->addSource('', 'implementationAcademicPeriods');
                     break;
                 default:
                     throw new SchoolboxException("Report '{$report}' Does not exist.");
@@ -1657,5 +1657,30 @@ class Controller extends Base
         $statement->execute();
         $help = new Helper();
         $help->queryToCSV($statement, 'implementationSideMenuReport.csv');
+    }
+    /**
+     * IMPLEMENTATION
+     * implementationAcademicPeriods.csv
+     */
+    public function implementationAcademicPeriods()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            title as 'Academic Period Name',
+            coalesce(lyl.name,'') as 'Year Level?',
+            start as 'Start Date',
+            display_finish 'End Date',
+            IF(archived, 'Yes', 'No') as 'Archived?'
+        FROM
+            term t
+        LEFT JOIN
+            term_year_level tyl on t.id = tyl.term_id
+        LEFT JOIN
+            lu_year_level lyl on tyl.year_level_id = lyl.id;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'implementationAcademicPeriods.csv');
     }
 }

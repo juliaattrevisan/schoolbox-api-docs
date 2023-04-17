@@ -76,7 +76,7 @@ class Module extends BaseModule
         $this->register('GET', '/audit/implementationNotificationSettings', 'implementationNotificationSettings', $isAlaress);
         // TODO: $this->register('GET', '/audit/implementationTopMenuReport', 'implementationCalendarEventTypes', $isAlaress);
         $this->register('GET', '/audit/implementationSideMenuReport', 'implementationSideMenuReport', $isAlaress);
-//        $this->register('GET', '/audit/implementationAcademicPeriods', 'implementationAcademicPeriods', $isAlaress);
+        $this->register('GET', '/audit/implementationAcademicPeriods', 'implementationAcademicPeriods', $isAlaress);
     }
 
     /**
