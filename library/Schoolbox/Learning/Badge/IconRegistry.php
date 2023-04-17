@@ -123,6 +123,10 @@ class IconRegistry
             'name' => 'Weather',
             'files' => [],
         ],
+        'ibbadge' => [
+            'name' => 'IB Badge Images',
+            'files' => [],
+        ]
     ];
 
 
