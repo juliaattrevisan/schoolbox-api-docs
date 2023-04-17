@@ -25,7 +25,9 @@
     </div>
 
     {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}) %}
+
     {% include '@learningAssessment/fragments/modifyTot.twig' with {
+        assessment: assessment,
         gradeRoute: false,
         viewRoute: null,
         modifyRoute: modifyRoute,
@@ -45,13 +47,19 @@
              #}
             {% import '@learningAssessment/lessonPlan/summary/renderFields.twig' as renderFields %}
 
-            {# Forcibly render the student view by default, for everyone#}
             {{ renderFields.renderFields(assessment, 'student') }}
 
             {# Optionally provide a student view if you're an instructor #}
             {% if isInstructor %}
                 {{ renderFields.renderFields(assessment, 'staff') }}
+
+                <script>
+                    $(function() {
+                        $('#lessonPlan-staff').show();
+                    });
+                </script>
             {% else %}
+                {# Forcibly render the student view #}
                 <script>
                     $(function() {
                         $('#lessonPlan-student').show();
