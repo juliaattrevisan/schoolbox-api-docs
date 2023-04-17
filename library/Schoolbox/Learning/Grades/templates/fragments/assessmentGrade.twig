@@ -4,11 +4,6 @@
  # Params:
  # * assessment:  IAssessable - The assessment object
  # * student:     User        - The user record for the student
- #
- # @param bool $includeLessonPlans  Decide whether to include lesson plans in this fragment.
- # This fragment is shared among the Grades page (where Lesson Plans are hidden) and the Project
- # Summary screen, where Lesson Plans are visible. These usages are mutually exclusive though
- # they share the same twig template, necessitating this arbitrary bool
  #}
 {% import '@learning/macro/dueDate.twig' as dueDate %}
 {% import '@learning/macro/urgency.twig' as urgency %}
@@ -19,67 +14,65 @@
 {# Lesson Plans do not appear in the Grades page
  # cos nothing to do about Responses or Feedbacks
  #}
-{% if includeLessonPlans or assessment is not lessonPlan %}
-    <div class="flex-grade">
-        <div class="small-12 card columns">
-            {% set summaryRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {
-                assessmentId: assessment.id,
-                assessment:   assessment,
-                studentId:    student.id,
-                student:      student
-            }) %}
-            {% if summaryRoute %}
-                <a href="{{ summaryRoute }}{{ returnUrlSuffix is defined ? returnUrlSuffix : '' }}">
-                    <span class="{{ icon.renderClass(assessment) }}"></span>
-                    <p>{{ assessment.title }}
-                        {% if participant and USER.role.isStaff and not participant.plan.isDynamic %}
-                            <span class="individualisation has-tip tip-top" data-tooltip title="{{ participant.plan.name}} ({{ participant.plan.duedate.short}})">i</span>
-                        {% endif %}
-                    </p>
-                </a>
-            {% else %}
+<div class="flex-grade">
+    <div class="small-12 card columns">
+        {% set summaryRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {
+            assessmentId: assessment.id,
+            assessment:   assessment,
+            studentId:    student.id,
+            student:      student
+        }) %}
+        {% if summaryRoute %}
+            <a href="{{ summaryRoute }}{{ returnUrlSuffix is defined ? returnUrlSuffix : '' }}">
                 <span class="{{ icon.renderClass(assessment) }}"></span>
-                <p>{{ assessment.title }}</p>
-            {% endif %}
-            <p>
-                {% include '@learningAssessment/fragments/statusLine.twig' with {
-                    assessable: assessment,
-                    student:    student
-                } only %}
-                <span class="{{ participant ? 'pipe' : '' }} meta">{{ assessment.typeName }}</span>
-                <span class="pipe meta">{{ dueDate.dueDate(assessment, student) }}</span>
-                {% if assessment is quiz and summaryRoute and participant and participant.allResponses | length %}
-                <span class="pipe meta">
-                    <a href="{{ summaryRoute }}" title="View Attempts">View Attempts</a>
-                </span>
-                {% endif %}
-            </p>
-        </div>
-
-        {% if participant and assessment.isFeedbackVisibleToUser(USER) %}
-            {% set grade = participant.humanReadableMark(true) %}
-            {% if assessment is task %}
-                {% include '@learningAssessment/fragments/progressTick.twig' with {
-                    assessment: assessment,
-                    student:    student
-                } only %}
-            {% elseif grade %}
-                <div class="grade {{ urgency.marks(participant.normalisedMark(true)) }}-bg">
-                    <span>{{ grade }}</span>
-                </div>
-            {% endif %}
+                <p>{{ assessment.title }}
+                    {% if participant and USER.role.isStaff and not participant.plan.isDynamic %}
+                        <span class="individualisation has-tip tip-top" data-tooltip title="{{ participant.plan.name}} ({{ participant.plan.duedate.short}})">i</span>
+                    {% endif %}
+                </p>
+            </a>
+        {% else %}
+            <span class="{{ icon.renderClass(assessment) }}"></span>
+            <p>{{ assessment.title }}</p>
         {% endif %}
+        <p>
+            {% include '@learningAssessment/fragments/statusLine.twig' with {
+                assessable: assessment,
+                student:    student
+            } only %}
+            <span class="{{ participant ? 'pipe' : '' }} meta">{{ assessment.typeName }}</span>
+            <span class="pipe meta">{{ dueDate.dueDate(assessment, student) }}</span>
+            {% if assessment is quiz and summaryRoute and participant and participant.allResponses | length %}
+            <span class="pipe meta">
+                <a href="{{ summaryRoute }}" title="View Attempts">View Attempts</a>
+            </span>
+            {% endif %}
+        </p>
     </div>
+
     {% if participant and assessment.isFeedbackVisibleToUser(USER) %}
-        {% set feedback = participant.findAuthoritativeVisibleFeedback(USER) %}
-        {% if feedback and feedback.comment   %}
-            <div class="content">
-                <blockquote>{{ feedback.comment | linkify | nl2br }}</blockquote>
-                {% if assessment is dueWork and (assessment.useRubric or feedback.allFiles | length) and summaryRoute %}
-                    <a href="{{ summaryRoute }}{{ returnUrlSuffix is defined ? returnUrlSuffix : '' }}">
-                        View assessment details</a>
-                {% endif %}
+        {% set grade = participant.humanReadableMark(true) %}
+        {% if assessment is task %}
+            {% include '@learningAssessment/fragments/progressTick.twig' with {
+                assessment: assessment,
+                student:    student
+            } only %}
+        {% elseif grade %}
+            <div class="grade {{ urgency.marks(participant.normalisedMark(true)) }}-bg">
+                <span>{{ grade }}</span>
             </div>
         {% endif %}
+    {% endif %}
+</div>
+{% if participant and assessment.isFeedbackVisibleToUser(USER) %}
+    {% set feedback = participant.findAuthoritativeVisibleFeedback(USER) %}
+    {% if feedback and feedback.comment   %}
+        <div class="content">
+            <blockquote>{{ feedback.comment | linkify | nl2br }}</blockquote>
+            {% if assessment is dueWork and (assessment.useRubric or feedback.allFiles | length) and summaryRoute %}
+                <a href="{{ summaryRoute }}{{ returnUrlSuffix is defined ? returnUrlSuffix : '' }}">
+                    View assessment details</a>
+            {% endif %}
+        </div>
     {% endif %}
 {% endif %}
