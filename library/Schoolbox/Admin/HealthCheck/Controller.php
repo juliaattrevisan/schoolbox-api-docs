@@ -167,7 +167,7 @@ class Controller extends Base
                     $this->taskDHelper->addSource('', 'implementationCampusList');
                     $this->taskDHelper->addSource('', 'implementationHouseList');
                     $this->taskDHelper->addSource('', 'implementationYearLevels');
-//                    $this->taskDHelper->addSource('', 'implementationNewsTopics');
+                    $this->taskDHelper->addSource('', 'implementationNewsTopics');
 //                    $this->taskDHelper->addSource('', 'implementationCalendarEventTypes');
 //                    $this->taskDHelper->addSource('', 'implementationNotificationSettings');
 //                    // TODO: $this->taskDHelper->addSource('', 'implementationTopMenuReport');
@@ -1551,5 +1551,31 @@ class Controller extends Base
         $statement->execute();
         $help = new Helper();
         $help->queryToCSV($statement, 'implementationYearLevels.csv');
+    }
+    /**
+     * IMPLEMENTATION
+     * implementationNewsTopics.csv
+     */
+    public function implementationNewsTopics()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            lyl.NAME AS 'Year Level',
+            Count(u.id) AS 'User Count'
+        FROM
+            lu_year_level lyl
+        LEFT JOIN
+            user u ON lyl.id = u.year_id
+        WHERE
+            lyl.deleted_at IS NULL
+        AND
+            u.deleted_at IS NULL
+        GROUP BY
+            lyl.NAME;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'implementationNewsTopics.csv');
     }
 }
