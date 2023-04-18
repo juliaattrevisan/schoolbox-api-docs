@@ -150,6 +150,8 @@ const viewStatusText = computed(() => {
 function excludeCheck() {
     // does the user have work?
     if (hasSubmissions.value || hasFeedback.value) {
+        // close the popout
+        isSelected.value = false;
         // has some kind of activity.. prompt for exclusion
         excludeModalEl.value.open();
     } else {
