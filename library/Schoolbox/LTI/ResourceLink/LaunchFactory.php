@@ -14,7 +14,6 @@ use OAT\Library\Lti1p3Ags\Service\Score\ScoreServiceInterface;
 use OAT\Library\Lti1p3Core\Message\Launch\Builder\PlatformOriginatingLaunchBuilder;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\AgsClaim;
-use OAT\Library\Lti1p3Core\Message\Payload\Claim\LaunchPresentationClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\MessagePayloadClaimInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\NrpsClaim;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
@@ -177,7 +176,7 @@ class LaunchFactory
         $additionalClaims[] = $contextClaim;
 
         // PlatformInstanceClaim: talk about the Schoolbox instance
-        $platformInstanceClaim = (new PlatformInstanceClaimFactory($this->instance))->build();
+        $platformInstanceClaim = (new PlatformInstanceClaimFactory($this->instance, $baseUrl))->build();
         $additionalClaims[]    = $platformInstanceClaim;
 
         // LaunchPresentationClaim:

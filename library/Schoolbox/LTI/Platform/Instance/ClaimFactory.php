@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\LTI\Platform\Instance;
 
-use Schoolbox\Url\Uri;
+use Psr\Http\Message\UriInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\PlatformInstanceClaim;
 use Schoolbox\Instance;
 
@@ -19,18 +19,13 @@ use Schoolbox\Instance;
 class ClaimFactory
 {
     /**
-     * Instance data repository.
-     */
-    private Instance $instance;
-
-    /**
      * Constructor
      *
-     * @param Instance $instance
+     * @param Instance     $instance Instance data repository.
+     * @param UriInterface $baseUrl  Base URL for this instance.
      */
-    public function __construct(Instance $instance)
+    public function __construct(private Instance $instance, private UriInterface $baseUrl)
     {
-        $this->instance = $instance;
     }
 
     /**
@@ -40,15 +35,12 @@ class ClaimFactory
      */
     public function build(): PlatformInstanceClaim
     {
-        // TODO base URL should be constructable from instance
-        $host    = trim("{$this->instance->getHostname()}.{$this->instance->getDomain()}", '. ');
-        $baseUrl = (new Uri())->withScheme('https')->withHost($host);
         return new PlatformInstanceClaim(
             $this->instance->getId(),
             null,
             null,
             null,
-            (string)$baseUrl,
+            $this->baseUrl->__toString(),
             $this->instance::APPLICATION_NAME,
             $this->instance->getVersion(),
         );
