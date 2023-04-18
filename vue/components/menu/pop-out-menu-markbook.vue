@@ -150,8 +150,6 @@ const viewStatusText = computed(() => {
 function excludeCheck() {
     // does the user have work?
     if (hasSubmissions.value || hasFeedback.value) {
-        // close the popout
-        isSelected.value = false;
         // has some kind of activity.. prompt for exclusion
         excludeModalEl.value.open();
     } else {
@@ -569,5 +567,12 @@ async function onMenuItemSelected(target: string, action: string|null = null) {
             display: flex;
         }
     }
+}
+// Additions to fix the exclude additional reveal-model
+.reveal-modal-bg {
+    z-index: 100002;
+}
+.reveal-modal {
+    z-index: 100003;
 }
 </style>
