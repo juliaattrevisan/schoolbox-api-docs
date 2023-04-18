@@ -16,6 +16,9 @@ use Schoolbox\Learning\Assessment\Lti\Model;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
 
+/**
+ * Factory for claims about the launch of the resource link.
+ */
 class ClaimFactory
 {
     /**
