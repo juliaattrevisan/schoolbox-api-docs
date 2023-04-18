@@ -30,6 +30,7 @@ class Module extends BaseModule
     {
         $this->register('GET', '/send', 'sendTokenToHelp', new IsLoggedIn());
         $this->register('GET', '/receive', 'receiveTokenFromInstance');
+        $this->register('GET', '/jwks', 'getJwks');
     }
 
 
