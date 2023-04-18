@@ -25,6 +25,7 @@ use Schoolbox\LTI\Context\Folder\ClaimFactory as FolderClaimFactory;
 use Schoolbox\LTI\Context\Folder\Codec as FolderCodec;
 use Schoolbox\LTI\Custom\ClaimFactory as CustomClaimFactory;
 use Schoolbox\LTI\Platform\Instance\ClaimFactory as PlatformInstanceClaimFactory;
+use Schoolbox\LTI\Platform\LaunchPresentation\ClaimFactory as LaunchPresentationClaimFactory;
 use Schoolbox\LTI\ResourceLink\Assessment\ClaimFactory as AssessmentClaimFactory;
 use Schoolbox\LTI\ResourceLink\Assessment\Codec as AssessmentCodec;
 use Schoolbox\LTI\Role\ClaimFactory as RoleClaimFactory;
@@ -181,20 +182,9 @@ class LaunchFactory
 
         // LaunchPresentationClaim:
         // talk about how the resource link will be presented
-        $additionalClaims[] = new LaunchPresentationClaim(
-            $assessment->getLtiTool()->getTarget(),
-            (string)$height,
-            null,
-            $this->access->isInstructor($actingUser, $assessment->getBaseContext()->getFolder())
-                ? $this->router->generate(
-                    'learningAssessment.getLaunchAssessmentAsInstructorReturn',
-                    ['assessmentId' => $assessment->getId()]
-                )
-                : $this->router->generate(
-                    'learningAssessment.getLaunchAssessmentAsStudentReturn',
-                    ['assessmentId' => $assessment->getId(), 'studentId' => $actingUser->getId(),]
-                )
-        );
+        $launchPresentationClaim = (new LaunchPresentationClaimFactory($this->access, $this->instance, $this->router))
+            ->buildForAssessmentAndUser($assessment, $actingUser, $height);
+        $additionalClaims[]      = $launchPresentationClaim;
 
         // Role-scope mentor claims:
         // for parents, this might be their kids
