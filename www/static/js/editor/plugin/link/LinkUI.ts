@@ -351,6 +351,7 @@ export default class LinkUI extends Plugin {
     _checkForModal() {
         if (this.editor.sourceElement.closest("[data-reveal]")) {
             this._balloon._view.element.style.zIndex = "1010";
+            this._balloon._view.element.setAttribute("data-baloon-editor-id", this.editor.id);
         }
     }
 

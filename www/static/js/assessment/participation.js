@@ -670,16 +670,33 @@
             close_on_background_click: false,
             opened: function () {
                 if ($participantCustomiseModal.hasClass("toback")) {
+                    // so the participant customise modal and link balloon is behind the modal bkg
                     $participantCustomiseModal.css("z-index", "1001");
+                    updateLinkBalloonDepth("1002");
                 } else {
                     $participantCustomiseModal.css("z-index", "10000");
                 }
             },
             closed: function () {
                 $participantCustomiseModal.attr("modal-status", "closed");
-                $participantCustomiseModal.css("z-index", "1001");
+                // so the participant customise modal and link balloon is back in front of the modal bkg
+                $participantCustomiseModal.css("z-index", "1004");
+                updateLinkBalloonDepth("1010");
             },
         });
+    }
+
+    /**
+     * When a resource modal is opened, we need to ensure the link baloon is also updated so
+     * it sits behind  the resource modal
+     */
+    function updateLinkBalloonDepth(depth) {
+        const linkBalloon = document.querySelector(
+            `[data-baloon-editor-id="${window.sbProps.editors["plan-desc"].id}"]`
+        );
+        if (linkBalloon) {
+            linkBalloon.style.zIndex = depth;
+        }
     }
 
     /**
