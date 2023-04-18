@@ -380,6 +380,11 @@ export default class LinkUI extends Plugin {
         // https://github.com/ckeditor/ckeditor5-link/issues/78
         // https://github.com/ckeditor/ckeditor5-link/issues/123
         this.formView.urlInputView.fieldView.element.value = linkCommand.value || "";
+
+        // if the editor is inside a reveal modal, we need to make sure the balloon is on top of the modal
+        if (editor.sourceElement.closest("[data-reveal]")) {
+            this._balloon._view.element.style.zIndex = "1010";
+        }
     }
 
     /**
