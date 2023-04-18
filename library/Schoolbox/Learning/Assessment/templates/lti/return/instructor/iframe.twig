@@ -1,30 +1,39 @@
 {# Need basic styles for iframe content #}
-
-
-<div class="row">
-    <div class="small-12 island">
-        <h1>{{ assessment.title }} &ndash; Marking Complete</h1>
-        {% if errorMessage %}
-            <div data-alert="" class="alert-box alert">
-                {{ errorMessage }}
-                <a href="#" class="close">×</a>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ assessment.title }} &ndash; Marking Complete</title>
+    {% include 'include/skin.twig' with { config: config } only %}
+</head>
+<body>
+<div id="container">
+    <div id="content">
+        <div class="row">
+            <div class="small-12 island">
+                <h1>{{ assessment.title }} &ndash; Marking Complete</h1>
+                {% if errorMessage %}
+                    <div data-alert="" class="alert-box alert">
+                        {{ errorMessage }}
+                    </div>
+                {% elseif message %}
+                    <div data-alert="" class="alert-box success">
+                        {{ message }}
+                    </div>
+                {% endif %}
             </div>
-        {% elseif message %}
-            <div data-alert="" class="alert-box success">
-                {{ message }}
-                <a href="#" class="close">×</a>
+        </div>
+
+        <div class="row">
+            <div class="small-12 island">
+                <section class="content">
+                    <p>You may now return to the status page.</p>
+                </section>
+                <ul class="flex-list buttons">
+                    <li><a class="submit" target="_parent" href="{{ returnUrl }}">Return</a></li>
+                </ul>
             </div>
-        {% endif %}
+        </div>
     </div>
 </div>
-
-<div class="row">
-    <div class="small-12 island">
-        <section class="content">
-            <p>You may now return to the status page.</p>
-        </section>
-        <ul class="flex-list buttons">
-            <li><a class="submit" target="_parent" href="{{ returnUrl }}">Return</a></li>
-        </ul>
-    </div>
-</div>
+</body>
+</html>
