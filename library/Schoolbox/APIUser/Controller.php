@@ -396,6 +396,13 @@ class Controller extends Base
         $updatedUser = $this->userMapper->findById($model->getId());
         $apiGroups = $this->groupsHelper->getCurrentGroups($updatedUser);
         $groupsArr = $apiGroups->map(new ModelToArray());
+
+        // Convert from Collection to Array, and drop keys.  Keys are dropped because the key data is also contained in
+        // the array elements, and to ensure that the JSON container will be an array instead of an object.
+        // E.g. We want    JSON like this: [{id: 123, ...}, {id: 456, ...}]
+        //      instead of JSON like this: {123: {id: 123, ...}, 456: {id: 456, ...}}
+        $groupsArr->reindex();
+
         /**
          * build the whole thing
          */
@@ -448,6 +455,12 @@ class Controller extends Base
         foreach ($users as $user) {
             $apiGroups = $this->groupsHelper->getCurrentGroups($user);
             $groupsArr = $apiGroups->map(new ModelToArray());
+
+            // Convert from Collection to Array, and drop keys.  Keys are dropped because the key data is also contained in
+            // the array elements, and to ensure that the JSON container will be an array instead of an object.
+            // E.g. We want    JSON like this: [{id: 123, ...}, {id: 456, ...}]
+            //      instead of JSON like this: {123: {id: 123, ...}, 456: {id: 456, ...}}
+            $groupsArr->reindex();
 
             /**
              * build the whole thing
