@@ -135,6 +135,7 @@ export async function modifyEditor(sourceElement: HTMLElement, editor: Editor, c
     insertWordCount(sourceElement, editor, config);
     disableAutoMedia(editor, config);
     removeValidation();
+    checkForModal(editor);
     await addIframelyEmbed(config, editor);
     await attachInspector(editor);
 }
