@@ -798,6 +798,8 @@ class ImportFactory
             $assessmentSpec = new QuizAssessment();
         } elseif ($row['stk.id']) {
             $assessmentSpec = new TaskAssessment();
+        } elseif ($row['slt.id']) {
+            $assessmentSpec = new LtiAssessment();
         } elseif ($row['specLessonPlan.id']) {
             /* There's a secret sequential dependency here. Project Ids can be set at the same
              * time as Lesson Plan Ids, Due Work Ids, etc. If this assignation occurs after
@@ -811,8 +813,6 @@ class ImportFactory
             $assessmentSpec = new LessonPlan();
         } elseif ($row['spr.id']) {
             $assessmentSpec = new Project();
-        } elseif ($row['slt.id']) {
-            $assessmentSpec = new LtiAssessment();
         } else {
             throw new InvalidDataStateException("Broken data detected. Unknown assessment type. id: {$row['sa.id']}");
         }
