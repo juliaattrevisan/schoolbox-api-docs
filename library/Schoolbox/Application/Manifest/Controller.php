@@ -10,30 +10,15 @@ namespace Schoolbox\Application\Manifest;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Cdn\PrefixGenerator;
-use Schoolbox\MobileApp\ServiceMapper;
 
 class Controller extends Base
 {
     /**
-     * @var ServiceMapper
-     */
-    private $serviceMapper;
-
-    /**
-     * Maps notification providers to application stores they are available in
-     * https://github.com/w3c/manifest/wiki/Platforms
-     * @var array
-     */
-    private $relatedAppsMap = ['APNS' => 'itunes', 'GCM' => 'play', 'Digistorm' => 'digistorm'];
-
-    /**
      * Controller constructor.
      *
-     * @param ServiceMapper $serviceMapper
      */
-    public function __construct(ServiceMapper $serviceMapper)
+    public function __construct()
     {
-        $this->serviceMapper = $serviceMapper;
     }
 
 
@@ -42,7 +27,6 @@ class Controller extends Base
      * @api   GET /manifest
      * @since 23.0
      *
-     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function getManifest(): void
     {
@@ -147,25 +131,6 @@ class Controller extends Base
                 ],
             ],
         ];
-
-        $serviceList = $this->serviceMapper->findAll();
-
-        if (count($serviceList)) {
-            $manifest['prefer_related_applications'] = true;
-            foreach ($serviceList as $application) {
-                $url = '';
-
-                if ($application->getProviderName() === 'GCM') {
-                    $url = 'https://play.google.com/store/apps/details?id=' . $application->getAppIdentifier();
-                }
-
-                $manifest['related_applications'][] = [
-                    'platform' => $this->relatedAppsMap[$application->getProviderName()],
-                    'url'       => $url,
-                    'id'        => $application->getAppIdentifier(),
-                ];
-            }
-        }
 
         // Don't store to the history
         $this->setAllowBackToTheFuture(false);
