@@ -210,7 +210,15 @@
                             {% if not participant or participant.isExcluded %} excluded
                             {% endif %} student-grade-cell"
                             data-assessment="{{ assessment.id }}"
-                            {% if (assessment.getDefaultTypeName != 'Task') and ((assessment.getDefaultTypeName == 'Project') and (participant and not participant.isExcluded)) %}
+                            {% if
+                                assessment.getDefaultTypeName == 'Due Work'
+                            or
+                                assessment.getDefaultTypeName == 'Quiz'
+                            or
+                                assessment.getDefaultTypeName == '3rd Party Assessment'
+                            or
+                                (assessment.getDefaultTypeName == 'Project' and (participant and not participant.isExcluded))
+                            %}
                             data-pop-out-menu
                             {% endif %}
                             data-assessment-type="{{ assessment.getDefaultTypeName }}"
