@@ -15,12 +15,14 @@
         <ul class="information-list lpt-preview">
             {% for field in lessonPlanTemplate.fields %}
                 <li class="content {% if 'student' != field.visibility %} not-visible-students {% endif %}">
-                    <div class="lpt-preview-area-header">
                         {% if 'student' != field.visibility %}
+                        <div class="lpt-preview-area-header">
                             <p class="meta"><span class="icon-view-hollow"></span>This field is not visible to students</p>
-                        {% endif %}
+                            <h2>{{ field.title }}</h2>
+                        </div>
+                        {% else %}
                         <h2>{{ field.title }}</h2>
-                    </div>
+                        {% endif %}
                     <article>
                         {{ field.body|purify }}
                     </article>
