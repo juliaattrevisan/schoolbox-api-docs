@@ -174,7 +174,11 @@ export function setStylesOnElement(element, styles) {
 export function injectScript(src) {
     return new Promise((resolve, reject) => {
         const script = document.createElement("script");
-        script.addEventListener("load", resolve);
+        script.setAttribute("data-is-loaded", "false");
+        script.addEventListener("load", () => {
+            script.setAttribute("data-is-loaded", "true");
+            resolve();
+        });
         script.addEventListener("error", (e) => reject(e.error));
         script.src = src;
         document.head.appendChild(script);
@@ -231,4 +235,27 @@ export async function getLoadedHTML(htmlString) {
  */
 export function isScriptAdded(src) {
     return Boolean(document.querySelector(`script[src="${src}"]`));
+}
+
+/**
+ * Returns the script element
+ *
+ * @param { String }
+ *
+ * @returns { HTMLScriptElement }
+ */
+export function getScriptElement(src) {
+    return document.querySelector(`script[src="${src}"]`);
+}
+
+/**
+ * Returns true if the script has been loaded
+ *
+ * @param { String }
+ *
+ * @returns { Boolean }
+ */
+export function isScriptLoaded(src) {
+    const scriptElement = document.querySelector(`script[src="${src}"]`);
+    return scriptElement && scriptElement.getAttribute("data-is-loaded") === "true";
 }

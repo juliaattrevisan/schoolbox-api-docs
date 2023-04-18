@@ -4,7 +4,7 @@
 
 import type { Editor } from "@ckeditor/ckeditor5-core";
 import { EditorConfig, EditorToolbar } from "@js/editor/types/editorTypes";
-import { injectScript, isScriptAdded } from "@js/util/domUtils";
+import { injectScript, isScriptAdded, isScriptLoaded, getScriptElement } from "@js/util/domUtils";
 import { insertWordCount } from "@js/editor/settings/wordCountSettings";
 
 /**
@@ -51,6 +51,41 @@ function removeValidation() {
 }
 
 /**
+ * Once the iFramely script has loaded, we can add in the event listener
+ *
+ * @param { Editor } editor - the CKEditor instance
+ */
+function onIframelyLoaded(editor: Editor) {
+    /**
+     * Track copy/paste to add an extra undo step if the link fails to unfurl
+     */
+    let isCopied = false;
+    editor.editing.view.document.on("clipboardInput", (event, data) => {
+        isCopied = true;
+    });
+    /**
+     * If the link fails to unfurl and be presented in the editor as an embed,
+     * we should pull out the embed attempt and just add a link to the failed url instead
+     * See https://iframely.com/docs/embedjs - "Act when unfurling fails" for further details
+     * We can use the undo tool to undo the embed action
+     */
+    window.iframely.on("cancel", (url: string) => {
+        // there can be multiple editors on a page, so need to ensure we have the right editor, as each will listen for the dispatch event
+        if (editor.editing.view.hasDomSelection) {
+            // the first undo removed the media embed
+            editor.execute("undo");
+            // and if copy/paste undo again removes the copied text added to the editor
+            if (isCopied) {
+                editor.execute("undo");
+                isCopied = false;
+            }
+            // and finally add the link
+            editor.execute("link", url);
+        }
+    });
+}
+
+/**
  * Add the iFramely embed code in order for iframe embeds to work
  * For more info: https://iframely.com/docs/ckeditor
  *
@@ -62,34 +97,13 @@ async function addIframelyEmbed(config: EditorConfig, editor: Editor) {
         const script = "//cdn.iframe.ly/embed.js?cancel=0";
         if (!isScriptAdded(script)) {
             await injectScript(script);
+            onIframelyLoaded(editor);
+        } else if (!isScriptLoaded(script)) {
+            const scriptElement = getScriptElement(script) as HTMLScriptElement;
+            scriptElement.addEventListener("load", () => onIframelyLoaded(editor));
+        } else {
+            onIframelyLoaded(editor);
         }
-        /**
-         * Track copy/paste to add an extra undo step if the link fails to unfurl
-         */
-        let isCopied = false;
-        editor.editing.view.document.on("clipboardInput", (event, data) => {
-            isCopied = true;
-        });
-        /**
-         * If the link fails to unfurl and be presented in the editor as an embed,
-         * we should pull out the embed attempt and just add a link to the failed url instead
-         * See https://iframely.com/docs/embedjs - "Act when unfurling fails" for further details
-         * We can use the undo tool to undo the embed action
-         */
-        window.iframely.on("cancel", (url: string) => {
-            // there can be multiple editors on a page, so need to ensure we have the right editor, as each will listen for the dispatch event
-            if (editor.editing.view.hasDomSelection) {
-                // the first undo removed the media embed
-                editor.execute("undo");
-                // and if copy/paste undo again removes the copied text added to the editor
-                if (isCopied) {
-                    editor.execute("undo");
-                    isCopied = false;
-                }
-                // and finally add the link
-                editor.execute("link", url);
-            }
-        });
     }
 }
 
