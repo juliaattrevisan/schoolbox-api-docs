@@ -51,6 +51,29 @@ function removeValidation() {
 }
 
 /**
+ * if the editor is inside a reveal modal, we need to make sure
+ * the balloon is on top of the modal, otherwise it will be hidden underneath
+ *
+ * @param { Editor } editor - the CKEditor instance
+ */
+function checkForModal(editor: Editor) {
+    // a modal is typically set to 1005, so we need to be higher than that
+    const zIndex = "1010";
+    if (editor.sourceElement.closest("[data-reveal]")) {
+        const contextualBalloon = editor.plugins.get("ContextualBalloon");
+        // fired when the balloon is shown or hidden by any UI
+        contextualBalloon.on("change:visibleView", (eventInfo, name, value) => {
+            const balloonElement = value?.element.parentElement.parentElement.parentElement;
+            if (balloonElement && balloonElement.style.zIndex !== zIndex) {
+                balloonElement.style.zIndex = zIndex;
+                // we also need to add the editor id to the balloon so we can potentially access it later
+                balloonElement.setAttribute("data-baloon-editor-id", editor.id);
+            }
+        });
+    }
+}
+
+/**
  * Once the iFramely script has loaded, we can add in the event listener
  *
  * @param { Editor } editor - the CKEditor instance

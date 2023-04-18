@@ -687,8 +687,10 @@
     }
 
     /**
-     * When a resource modal is opened, we need to ensure the link baloon is also updated so
-     * it sits behind  the resource modal
+     * When a resource modal is opened, we need to ensure the
+     * link baloon is also updated so it sits behind  the resource modal
+     * We target the specific link balloon by its editor id as there
+     * can be multiple editors on a page
      */
     function updateLinkBalloonDepth(depth) {
         const linkBalloon = document.querySelector(
