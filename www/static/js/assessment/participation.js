@@ -406,7 +406,6 @@
                 new CustomEvent("EDITOR__CREATE", {
                     detail: {
                         targetElements: ["#plan-desc"],
-                        toolbar: "simple",
                     },
                 })
             );
