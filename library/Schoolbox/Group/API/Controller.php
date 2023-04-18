@@ -72,7 +72,7 @@ class Controller extends Base
         // the array elements, and to ensure that the JSON container will be an array instead of an object.
         // E.g. We want    JSON like this: [{id: 123, ...}, {id: 456, ...}]
         //      instead of JSON like this: {123: {id: 123, ...}, 456: {id: 456, ...}}
-        $output = array_values($output->getAll());
+        $output->reindex();
 
         $this->response->content->set(
             $this->buildJsonOutput(
