@@ -12,6 +12,7 @@ import SmallCard from "../card/small-card.vue";
 import PopOutMenuItem from "./pop-out-menu-item.vue";
 import PopOutMenuDivider from "./pop-out-menu-divider.vue";
 import UserPhoto from "../userPhoto/user-photo.vue";
+import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 
 /**
  * an activity linked to the selected mark book item
@@ -76,6 +77,10 @@ const routes: Ref<Routes> = ref({
     historyRoute: "",
 });
 const markbookElement = ref<HTMLDivElement | null>(null);
+
+// Exclude confirm, popout
+const excludeModalEl = ref(null);
+
 
 /**
  * Middleware are optional modifiers you can provide to floating-ui. Things that determine how
@@ -142,23 +147,30 @@ const viewStatusText = computed(() => {
  * Exclude route.
  * Checks if the student has any feedback or submissions, if they do not, then it just excludes. else will prompt
  */
-function exclude(excludeRoute: string, hasActivity: boolean) {
+function excludeCheck() {
     // does the user have work?
-    if (hasActivity) {
+    if (hasSubmissions.value || hasFeedback.value) {
         // has some kind of activity.. prompt for exclusion
-        $(this).confirmDialog({
-            text:
-                '<p>The student has submissions and/or feedback for this assessment</p><p>Exclusion from this assessment will remove access to these submissions and/or feedback. Proceed?</p>',
-            format: "html",
-            confirmLabel: 'Yes',
-            confirmEvent: function () {
-                onMenuItemSelected(excludeRoute, 'exclude')
-            }
-        });
+        excludeModalEl.value.open();
     } else {
         // no work or feedback
-        onMenuItemSelected(excludeRoute, 'exclude')
+        onMenuItemSelected(routes.value.excludeRoute, 'exclude');
     }
+}
+
+/**
+ * actually exclude the student from the assessment
+ */
+function exclude() {
+    closeExclude();
+    onMenuItemSelected(routes.value.excludeRoute, 'exclude');
+}
+
+/**
+ * close the exclude modal function
+ */
+function closeExclude() {
+    excludeModalEl.value.close();
 }
 
 /**
@@ -467,7 +479,7 @@ async function onMenuItemSelected(target: string, action: string|null = null) {
                 </pop-out-menu-item>
                 <pop-out-menu-item v-else-if="'Project' !== assessmentType"
                     :class="{ 'is-disabled': isExcluded }"
-                    @selected="exclude(routes.excludeRoute, (hasSubmissions || hasFeedback))"
+                    @selected="excludeCheck()"
                 >
                     Exclude Student
                 </pop-out-menu-item>
@@ -479,6 +491,31 @@ async function onMenuItemSelected(target: string, action: string|null = null) {
                 </pop-out-menu-item>
             </div>
         </div>
+        <reveal-modal ref="excludeModalEl">
+            <h2>Please confirm</h2>
+            <p>The student has submissions and/or feedback for this assessment</p>
+            <p>Exclusion from this assessment will remove access to these submissions and/or feedback. Proceed?</p>
+            <ul class="flex-list buttons">
+                <li>
+                    <button
+                        @click.prevent="exclude()"
+                        class="button submit"
+                        id="excludeStudent-exclude-button"
+                    >
+                        Yes
+                    </button>
+                </li>
+                <li>
+                    <button
+                        @click.prevent="closeExclude()"
+                        class="button"
+                        id="excludeStudent-cancel-button"
+                    >
+                        Cancel
+                    </button>
+                </li>
+            </ul>
+        </reveal-modal>
     </pop-out>
 </template>
 
