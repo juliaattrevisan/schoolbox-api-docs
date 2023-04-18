@@ -8,17 +8,6 @@ import { injectScript, isScriptAdded, isScriptLoaded, getScriptElement } from "@
 import { insertWordCount } from "@js/editor/settings/wordCountSettings";
 
 /**
- * Add the editor id to the source element so it can be accessed
- * potentially in other twig/js files etc
- *
- * @param { Editor } editor - the CKEditor instance
- * @param { HTMLElement } sourceElement - the sourceElement the CKEditor will replace
- */
-function addEditorId(editor: Editor, sourceElement: HTMLElement) {
-    sourceElement.setAttribute("data-editor-id", editor.id);
-}
-
-/**
  * Add the editor to the global scope so it can be accessed
  * in other twig files etc
  *
@@ -142,7 +131,6 @@ async function attachInspector(editor: Editor) {
  * @param { EditorConfig } config - the CKEditor config object
  */
 export async function modifyEditor(sourceElement: HTMLElement, editor: Editor, config: EditorConfig) {
-    addEditorId(editor, sourceElement);
     addToGlobalScope(editor, sourceElement);
     insertWordCount(sourceElement, editor, config);
     disableAutoMedia(editor, config);
