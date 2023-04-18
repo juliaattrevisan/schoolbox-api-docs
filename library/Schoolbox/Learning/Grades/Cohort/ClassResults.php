@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Grades\Cohort;
 
+use Alaress\Database\Predicate\InvalidColumnException;
 use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Analytics\BoxPlot\Summary;
@@ -25,7 +26,6 @@ use Schoolbox\User;
  */
 class ClassResults
 {
-
     /**
      * @var bool
      */
@@ -99,12 +99,9 @@ class ClassResults
      * The resultant assessments' order is then made the same as the input's order.
      *
      * @return array
-     * @throws \DomainException
-     * @throws \InvalidArgumentException
-     * @throws \LogicException
+     * @throws InvalidColumnException
      * @throws \PDOException
-     * @throws \Schoolbox\Mapper\DefinitionException
-     * @throws \UnexpectedValueException
+     * @throws \UnderflowException
      */
     private function getCohortAssessmentSet(): array
     {
@@ -154,9 +151,9 @@ class ClassResults
 
         foreach ($sortedSpecificationIds as $sortedSpecificationId) {
             foreach ($assessmentTuples as $implementationId => $specificationId) {
-                // Only add this implementation to the result set if it actually
-                // is in the list of assessments that are due within this term.
-                if ($specificationId === $sortedSpecificationId && isset($assessmentMarks[$implementationId])) {
+                /* Only add this implementation to the result set if it has published marks
+                 */
+                if ($specificationId === $sortedSpecificationId && !empty($assessmentMarks[$implementationId])) {
                     $sortedTuples[$implementationId] = $sortedSpecificationId;
 
                     /* Stack it up in the same order
@@ -253,12 +250,23 @@ class ClassResults
          * $assessments and $this->assessments are ordered similarly, by same specification id
          * so we can ASSUME something here about the sequence of $assessment
          */
+        $specsWithPublishedMarks = array_values($this->tuples);
+
         foreach ($this->assessments as $assessment) {
-            if (!key_exists($assessment->getId(), $this->tuples)) {
-                // this assessment is not for cohort
+            /* Skip assessment specs whose descendent assessments haven't got any published marks yet
+             */
+            if (!in_array($assessment->getSpecificationAssessment()->getId(), $specsWithPublishedMarks, false)) {
                 continue;
             }
-            $specificationId = $this->tuples[$assessment->getId()];
+
+            /* Note: a spec could have descendent assessments with published marks,
+             * e.g. from another homepage/course import,
+             * but this $assessment is not one of them
+             *
+             * You can't rely on $this->tuples to have enough information in that
+             * use case, but you can get the assessment spec id in a different way
+             */
+            $specificationId = $assessment->getSpecificationAssessment()->getId();
 
             /* Remember the unique titles of each $assessment we encountered, for highcharts
              */
@@ -323,13 +331,19 @@ class ClassResults
         ];
 
         foreach ($normMarks as $specificationId => $dataSet) {
+            /* Skip assessments which haven't got any published marks yet
+             */
+            if (!isset($graphAssessments[$specificationId])) {
+                continue;
+            }
+
             /* The hover info thingy on the highcharts
              */
             $statistics['graphInfo'][] = $graphInfo[$specificationId] ?? null;
 
             /* Yank the name for this specification id
              */
-            $statistics['graphAssessments'][] = $graphAssessments[$specificationId] ?? null;
+            $statistics['graphAssessments'][] = $graphAssessments[$specificationId];
 
             /* Calculate a five-point summary for each assessment spec, consisting of all the grades
              * given to all the participants
