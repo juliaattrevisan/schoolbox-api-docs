@@ -275,7 +275,9 @@ export default {
                 text: "Updating invitation...",
             });
 
-            fetch(request)
+            fetch(endpoint, {
+                method: 'POST'
+            })
                 .then((response) => {
                     if (response.ok) {
                         return response.json();
@@ -428,13 +430,7 @@ export default {
             /* Asynchronously fetch attendance payload
              * This will update the modal in realtime when it's ready
              */
-            let request = {
-                url: ENDPOINTS.payloadPath(this.eventExtendedProps.eventId),
-                method: "get",
-                responseType: "json",
-            };
-
-            fetch(request)
+            fetch(ENDPOINTS.payloadPath(this.eventExtendedProps.eventId))
                 .then((response) => {
                     if (response.ok) {
                         return response.json();
