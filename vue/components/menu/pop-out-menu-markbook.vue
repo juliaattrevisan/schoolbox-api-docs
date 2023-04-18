@@ -62,6 +62,8 @@ const activityItems: Ref<ActivityItem[]> = ref([]); // list of recent activity i
 const hasSubmissions = computed(() => activityItems.value.some(item => item.type === 'response' && item.submitted));
 // has an event of type 'feedback'
 const hasFeedback = computed(() => activityItems.value.some(item => item.type === 'feedback'));
+// has an event of type 'feedback' and feedback.published === false
+const hasDraftFeedback = computed(() => activityItems.value.some(item => item.type === 'feedback' && item.published === false));
 // is the user excluded from the assessment
 const isExcluded = ref(false);
 const isActivityEmpty = computed(() => activityItems.value.length === 0);
@@ -411,7 +413,7 @@ async function onMenuItemSelected(target: string, action: string|null = null) {
                         Review Submission
                     </pop-out-menu-item>
                     <pop-out-menu-item
-                        :class="{ 'is-disabled': !routes.publishRoute || isActivityEmpty || !hasFeedback }"
+                        :class="{ 'is-disabled': !routes.publishRoute || isActivityEmpty || !hasDraftFeedback }"
                         @selected="onMenuItemSelected(routes.publishRoute, 'publish')"
                     >
                         Publish Feedback
