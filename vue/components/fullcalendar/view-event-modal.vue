@@ -265,12 +265,6 @@ export default {
              */
             self.isTransacting = true;
 
-            let request = {
-                url: endpoint,
-                method: "post",
-                responseType: "json",
-            };
-
             toast.toastActivate({
                 text: "Updating invitation...",
             });
