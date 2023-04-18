@@ -189,18 +189,52 @@
 }
 
 .lpt-preview {
-    li:first-child {
+    margin-bottom: 1rem;
+
+    & > li:first-child {
         border-top: 1px solid $gainsboro;
     }
 }
 
 .lp-display {
-    padding: 1rem;
-    padding-bottom: 0;
+    padding: 0 1rem;
 
-    li.not-visible-students {
+    // Fight a global 'information-list' rule.
+    > li:first-child {
+        padding-top: 1rem;
+    }
+
+    > li.not-visible-students {
         border-left: 1px solid $gainsboro;
         border-right: 1px solid $gainsboro;
+
+        &:first-child {
+            border-top: 1px solid $gainsboro;
+        }
+    }
+}
+
+.lpt-preview-area-header,
+.lp-area-header {
+    display: flex;
+    flex-direction: row-reverse;
+
+    h2 {
+        flex: 1;
+        margin-right: 2rem;
+    }
+
+    .meta {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+}
+
+@media #{$medium-down} {
+    .lpt-preview-area-header,
+    .lp-area-header {
+        flex-direction: column;
     }
 }
 
@@ -213,6 +247,6 @@
     padding-bottom: 1rem;
 }
 
-.information-list.lpt-preview li {
+.information-list.lpt-preview > li {
     padding: 1rem;
 }
