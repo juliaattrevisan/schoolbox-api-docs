@@ -1,0 +1,30 @@
+{# Need basic styles for iframe content #}
+
+<h1>{{ assessment.title }} &mdash; Marking Complete</h1>
+
+<div class="row">
+    <div class="small-12 island">
+        {% if errorMessage %}
+            <div data-alert="" class="alert-box alert">
+                {{ errorMessage }}
+                <a href="#" class="close">×</a>
+            </div>
+        {% elseif message %}
+            <div data-alert="" class="alert-box success">
+                {{ message }}
+                <a href="#" class="close">×</a>
+            </div>
+        {% endif %}
+        <p>
+            You may now return to the status page.
+        </p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 column">
+        <ul class="flex-list buttons">
+            <li><a class="submit" target="_parent" href="{{ returnUrl }}">Return</a></li>
+        </ul>
+    </div>
+</div>

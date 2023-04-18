@@ -427,11 +427,45 @@ class Controller extends Assessment\Controller
      */
     public function getLaunchAssessmentAsInstructorReturn(Model $assessment): void
     {
-        // iframe launch: show as a link back to the status page
-        // (or return URL if set), target: _parent
+        $statusUrl = $this->getRouteIfAuthorized(
+            'learningAssessment.getStatus',
+            [
+                'assessmentId' => $assessment->getId(),
+                'assessment'   => $assessment,
+            ]
+        );
+        $tool      = $assessment->getLtiTool();
+        $params    = [
+            'assessment'   => $assessment,
+            'message'      => $this->request->query->get('lti_msg'),
+            'errorMessage' => $this->request->query->get('lti_errormsg'),
+            'returnUrl'    => $this->request->query->get(Assessment\Redirect::RETURN_URL, $statusUrl),
+            'breadcrumbs'  => $this->getBakery()
+                ->produceFromAssessment($assessment, $this->getUser())
+                ->add([$assessment->getTitle(), $statusUrl])
+        ];
 
-        // new window launch: button closes window,
-        // also could go back to return URL
+        // Instead consider using a path param? (iframe/window)
+        if ($tool->isTargetIframe()) {
+            // iframe launch: show as a link back to the status page
+            // (or return URL if set), target: _parent
+            $this->response->content->set(
+                $this->buildUnthemedHtmlOutput(
+                    '@learningAssessment/lti/return/instructor/iframe.twig',
+                    $params,
+                )
+            );
+        } else {
+            // new window launch: button closes window,
+            // also could go back to return URL
+            $this->response->content->set(
+                $this->buildHtmlOutput(
+                    '@learningAssessment/lti/return/instructor/window.twig',
+                    $params,
+                )
+            );
+        }
+
     }
 
     /**

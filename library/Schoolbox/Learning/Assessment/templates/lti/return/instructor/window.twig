@@ -1,0 +1,33 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+
+{{ bread.crumbsArray(breadcrumbs) }}
+
+<h1>{{ assessment.title }} &mdash; Marking Complete</h1>
+
+<div class="row">
+    <div class="small-12 island">
+        {% if errorMessage %}
+            <div data-alert="" class="alert-box alert">
+                {{ errorMessage }}
+                <a href="#" class="close">×</a>
+            </div>
+        {% elseif message %}
+            <div data-alert="" class="alert-box success">
+                {{ message }}
+                <a href="#" class="close">×</a>
+            </div>
+        {% endif %}
+        <p>
+            You may now either return to the status page, or close this tab.
+        </p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 column">
+        <ul class="flex-list buttons">
+            <li><a class="submit" href="{{ returnUrl }}">Return</a></li>
+            <li><a href="{{ returnUrl }}">Close</a></li>
+        </ul>
+    </div>
+</div>
