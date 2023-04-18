@@ -12,7 +12,6 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Twig\Error\LoaderError;
-use Schoolbox\MobileApp\ServiceMapper;
 
 class Module extends BaseModule
 {
@@ -47,8 +46,6 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
-        return new Controller(
-            $this->getMapperFactory()->get(ServiceMapper::class)
-        );
+        return new Controller();
     }
 }
