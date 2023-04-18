@@ -189,6 +189,14 @@ function reloadMarkbook() {
     isSelected.value = false;
     // reload the markbook
     document.getElementById('submit_button').click();
+
+    /**
+     * disable the markbook popout
+     */
+    const elements = document.querySelectorAll('[data-pop-out-menu]');
+    elements.forEach((cell) => {
+        delete cell.dataset.popOutMenu;
+    });
 }
 
 /**
