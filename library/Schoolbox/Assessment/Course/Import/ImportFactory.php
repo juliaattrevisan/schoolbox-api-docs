@@ -163,7 +163,7 @@ class ImportFactory
             LEFT JOIN task stk ON stk.assessment_id = sa.id
             LEFT JOIN project spr ON spr.assessment_id = sa.id
             LEFT JOIN lti_assessment slt ON slt.assessment_id = sa.id
-            LEFT JOIN lesson_plan specLessonPlan ON specLessonPlan.assessment_id = sa.id 
+            LEFT JOIN lesson_plan specLessonPlan ON specLessonPlan.assessment_id = sa.id
         ";
 
         $pb = new Builder($this->database->getQuoter(), '');
@@ -330,7 +330,7 @@ class ImportFactory
             LEFT JOIN task stk                            ON stk.assessment_id = sa.id
             LEFT JOIN project spr                         ON spr.assessment_id = sa.id
             LEFT JOIN lti_assessment slt                  ON slt.assessment_id = sa.id
-            LEFT JOIN lesson_plan specLessonPlan          ON specLessonPlan.assessment_id = sa.id 
+            LEFT JOIN lesson_plan specLessonPlan          ON specLessonPlan.assessment_id = sa.id
             LEFT JOIN ($innerQuery1) `t1`                 ON `t1`.`sa.id` = sa.id
             LEFT JOIN assessment ia                       ON `t1`.`ia.id` = ia.id
             LEFT JOIN submission_box idw                  ON idw.assessment_id = ia.id
@@ -798,12 +798,21 @@ class ImportFactory
             $assessmentSpec = new QuizAssessment();
         } elseif ($row['stk.id']) {
             $assessmentSpec = new TaskAssessment();
+        } elseif ($row['specLessonPlan.id']) {
+            /* There's a secret sequential dependency here. Project Ids can be set at the same
+             * time as Lesson Plan Ids, Due Work Ids, etc. If this assignation occurs after
+             * the project detection
+             *
+             * elseif ($row['spr.id'])
+             *
+             * you'll get the wrong assessment type hydrated (e.g. a Lesson Plan gets hydrated
+             * as a Project). Not sure if this was by design or by accident.
+             */
+            $assessmentSpec = new LessonPlan();
         } elseif ($row['spr.id']) {
             $assessmentSpec = new Project();
         } elseif ($row['slt.id']) {
             $assessmentSpec = new LtiAssessment();
-        } elseif ($row['specLessonPlan.id']) {
-            $assessmentSpec = new LessonPlan();
         } else {
             throw new InvalidDataStateException("Broken data detected. Unknown assessment type. id: {$row['sa.id']}");
         }
