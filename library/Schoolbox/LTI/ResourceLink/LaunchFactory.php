@@ -184,6 +184,16 @@ class LaunchFactory
         $additionalClaims[] = new LaunchPresentationClaim(
             $assessment->getLtiTool()->getTarget(),
             (string)$height,
+            null,
+            $this->access->isInstructor($actingUser, $assessment->getBaseContext()->getFolder())
+                ? $this->router->generate(
+                    'learningAssessment.getLaunchAssessmentAsInstructorReturn',
+                    ['assessmentId' => $assessment->getId()]
+                )
+                : $this->router->generate(
+                    'learningAssessment.getLaunchAssessmentAsStudentReturn',
+                    ['assessmentId' => $assessment->getId(), 'studentId' => $actingUser->getId(),]
+                )
         );
 
         // Role-scope mentor claims:

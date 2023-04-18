@@ -413,6 +413,28 @@ class Controller extends Assessment\Controller
     }
 
     /**
+     * Displays the return page for after the instructor has finished with the
+     * LTI assessment's status page within the LTI tool.
+     *
+     * This is intended to be used as the return URL for the resource link
+     * launch.
+     *
+     * @api   GET /learning/assessments/:assessmentId/lti/launch/instructor/return
+     * @since 23.0.0
+     *
+     * @param Model $assessment
+     * @return void
+     */
+    public function getLaunchAssessmentAsInstructorReturn(Model $assessment): void
+    {
+        // iframe launch: show as a link back to the status page
+        // (or return URL if set), target: _parent
+
+        // new window launch: button closes window,
+        // also could go back to return URL
+    }
+
+    /**
      * Opens a page which launches the LTI assessment's resource link, within
      * the context of a student.
      * (This should be the student's create response page for the assessment
@@ -485,6 +507,29 @@ class Controller extends Assessment\Controller
                 ['message' => $message]
             )
         );
+    }
+
+    /**
+     * Displays the return page for after the student has finished with the LTI
+     * assessment status page within the LTI tool.
+     *
+     * This is intended to be used as the return URL for the resource link
+     * launch for students.
+     *
+     * @api   GET /learning/assessments/:assessmentId/lti/launch/student/:studentId/return
+     * @since 23.0.0
+     *
+     * @param Model $assessment
+     * @param User  $student
+     * @return void
+     */
+    public function getLaunchAssessmentAsStudentReturn(Model $assessment, User $student): void
+    {
+        // iframe launch: show as a link back to the status page
+        // (or return URL if set), target: _parent
+
+        // new window launch: button closes window,
+        // also could go back to return URL
     }
 
     /**
