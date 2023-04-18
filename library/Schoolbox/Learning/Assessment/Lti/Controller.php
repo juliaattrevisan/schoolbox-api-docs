@@ -419,13 +419,14 @@ class Controller extends Assessment\Controller
      * This is intended to be used as the return URL for the resource link
      * launch.
      *
-     * @api   GET /learning/assessments/:assessmentId/lti/launch/instructor/return
+     * @api   GET /learning/assessments/:assessmentId/lti/launch/instructor/return/:target
      * @since 23.0.0
      *
-     * @param Model $assessment
+     * @param Model  $assessment
+     * @param string $target
      * @return void
      */
-    public function getLaunchAssessmentAsInstructorReturn(Model $assessment): void
+    public function getLaunchAssessmentAsInstructorReturn(Model $assessment, string $target): void
     {
         $statusUrl = $this->getRouteIfAuthorized(
             'learningAssessment.getStatus',
@@ -434,7 +435,6 @@ class Controller extends Assessment\Controller
                 'assessment'   => $assessment,
             ]
         );
-        $tool      = $assessment->getLtiTool();
         $params    = [
             'assessment'   => $assessment,
             'message'      => $this->request->query->get('lti_msg'),
@@ -445,17 +445,7 @@ class Controller extends Assessment\Controller
                 ->add([$assessment->getTitle(), $statusUrl])
         ];
 
-        // Instead consider using a path param? (iframe/window)
-        if ($tool->isTargetIframe()) {
-            // iframe launch: show as a link back to the status page
-            // (or return URL if set), target: _parent
-            $this->response->content->set(
-                $this->buildUnthemedHtmlOutput(
-                    '@learningAssessment/lti/return/instructor/iframe.twig',
-                    $params,
-                )
-            );
-        } else {
+        if ($target === LtiTool\Model::TARGET_WINDOW) {
             // new window launch: button closes window,
             // also could go back to return URL
             $this->response->content->set(
@@ -464,8 +454,16 @@ class Controller extends Assessment\Controller
                     $params,
                 )
             );
+        } else {
+            // iframe launch: show as a link back to the status page
+            // (or return URL if set), target: _parent
+            $this->response->content->set(
+                $this->buildUnthemedHtmlOutput(
+                    '@learningAssessment/lti/return/instructor/iframe.twig',
+                    $params,
+                )
+            );
         }
-
     }
 
     /**
@@ -550,14 +548,15 @@ class Controller extends Assessment\Controller
      * This is intended to be used as the return URL for the resource link
      * launch for students.
      *
-     * @api   GET /learning/assessments/:assessmentId/lti/launch/student/:studentId/return
+     * @api   GET /learning/assessments/:assessmentId/lti/launch/student/:studentId/return/:target
      * @since 23.0.0
      *
-     * @param Model $assessment
-     * @param User  $student
+     * @param Model  $assessment
+     * @param User   $student
+     * @param string $target
      * @return void
      */
-    public function getLaunchAssessmentAsStudentReturn(Model $assessment, User $student): void
+    public function getLaunchAssessmentAsStudentReturn(Model $assessment, User $student, string $target): void
     {
         // iframe launch: show as a link back to the status page
         // (or return URL if set), target: _parent

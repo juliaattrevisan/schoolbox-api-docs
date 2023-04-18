@@ -53,11 +53,18 @@ class ClaimFactory
         $returnUrl = $this->access->isInstructor($user, $assessment->getBaseContext()->getFolder())
             ? $this->router->generate(
                 'learningAssessment.getLaunchAssessmentAsInstructorReturn',
-                ['assessmentId' => $assessment->getId()]
+                [
+                    'assessmentId' => $assessment->getId(),
+                    'target'       => $assessment->getLtiTool()->getTarget(),
+                ]
             )
             : $this->router->generate(
                 'learningAssessment.getLaunchAssessmentAsStudentReturn',
-                ['assessmentId' => $assessment->getId(), 'studentId' => $user->getId(),]
+                [
+                    'assessmentId' => $assessment->getId(),
+                    'studentId'    => $user->getId(),
+                    'target'       => $assessment->getLtiTool()->getTarget(),
+                ]
             );
         return new LaunchPresentationClaim(
             $assessment->getLtiTool()->getTarget(),

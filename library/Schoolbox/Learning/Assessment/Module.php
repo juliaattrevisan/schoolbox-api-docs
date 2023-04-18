@@ -241,14 +241,14 @@ class Module extends BaseModule
         // * window: redirect to launch
         $this->register(
             self::METHOD_GET,
-            "$assRoute/lti/launch/instructor/return",
+            "$assRoute/lti/launch/instructor/return/{target}",
             'getLaunchAssessmentAsInstructorReturn',
             $canViewStatus,
             $preloadAssessment,
         );
         $this->register(
             self::METHOD_GET,
-            "$assRoute/lti/launch/student/$studentParam/return",
+            "$assRoute/lti/launch/student/$studentParam/return/{target}",
             'getLaunchAssessmentAsStudentReturn',
             $canSubmit,
             $preloadParticipant,
