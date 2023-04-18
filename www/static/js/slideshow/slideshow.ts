@@ -26,7 +26,6 @@ const swiperDefaults = {
 // Prevent creating multiple event listeners
 if (window.sbProps.imageSlideshows === undefined) {
     window.sbProps.imageSlideshows = [];
-    window.addEventListener('resize', delayedRefreshSwipers);
 
     document.addEventListener('swiperInitialize', (e) => {
         const swiperEl = e.detail.target;
@@ -47,41 +46,8 @@ if (window.sbProps.imageSlideshows === undefined) {
         const swiper = new Swiper(swiperEl, options);
 
         window.sbProps.imageSlideshows.push(swiper);
-
-        // Ensure autoplay is enabled for every slideshow on the page
-        // For some reason, creating a new swiper will disable autoplay on all other slideshows on the page
-        // As well as this, when the window resizes only one swiper will continue to autoplay
-        // These both seem to be bugs with SwiperJS, so we have to put the fix here for now
-        //      Issue created for resizing: https://github.com/nolimits4web/swiper/issues/6590
-        //
-        // We need to wait a moment for the new slideshow to be created before re-enabling autoplay
-        setTimeout(delayedRefreshSwipers, 1000);
     });
 }
-
-
-// To prevent running tons of refreshes as the window is resized,
-// we should wait until the browser has stopped resizing before refreshing the slideshows
-// to do this, we'll wait 1 second after the last resize event before refreshing
-let resizeTimer: any;
-function delayedRefreshSwipers() {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(refreshSwipers, 1000);
-}
-
-// There are some bugs with SwiperJS that lead to autoplay being disabled on some slideshows
-// This is used to ensure autoplay is enabled for every slideshow on the page
-function refreshSwipers() {
-    if (window.sbProps.imageSlideshows === undefined) { return; }
-
-    window.sbProps.imageSlideshows.forEach((slideshow) => {
-        if (slideshow.autoplay.paused) {
-            slideshow.autoplay.start();
-            slideshow.autoplay.resume();
-        }
-    });
-}
-
 
 // Merge two objects together and return the result
 // This function will merge nested objects recursively, such that properties inside nested objects will be merged

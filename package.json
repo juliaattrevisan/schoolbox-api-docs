@@ -71,7 +71,7 @@
         "qrcode.vue": "~3.3.3",
         "qs": "~6.10.3",
         "strtotime": "~1.0.0",
-        "swiper": "^9.2.2",
+        "swiper": "^9.2.3",
         "tinycolor2": "~1.5.2",
         "ts-ebml": "~2.0.2",
         "v-tables-3-select-rows": "~0.4.9",
