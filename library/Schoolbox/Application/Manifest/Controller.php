@@ -24,7 +24,7 @@ class Controller extends Base
      * https://github.com/w3c/manifest/wiki/Platforms
      * @var array
      */
-    private $relatedAppsMap = ['APNS' => 'itunes', 'GCM' => 'play'];
+    private $relatedAppsMap = ['APNS' => 'itunes', 'GCM' => 'play', 'Digistorm' => 'digistorm'];
 
     /**
      * Controller constructor.
