@@ -674,13 +674,13 @@
                     $participantCustomiseModal.css("z-index", "1001");
                     updateLinkBalloonDepth("1002");
                 } else {
-                    $participantCustomiseModal.css("z-index", "10000");
+                    $participantCustomiseModal.css("z-index", "1005");
                 }
             },
             closed: function () {
                 $participantCustomiseModal.attr("modal-status", "closed");
                 // so the participant customise modal and link balloon is back in front of the modal bkg
-                $participantCustomiseModal.css("z-index", "1004");
+                $participantCustomiseModal.css("z-index", "1005");
                 updateLinkBalloonDepth("1010");
             },
         });
