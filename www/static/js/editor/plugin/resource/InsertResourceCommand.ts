@@ -5,7 +5,6 @@
 import Command from "@ckeditor/ckeditor5-core/src/command";
 import { addResource } from "./resourceUtils";
 import type { Resource } from "./resourceUtils";
-import type { EditorConfig } from "@js/editor/types/editorTypes";
 
 export default class InsertResourceCommand extends Command {
     messageBinding; // as .bind() returns a new function object, we need to store it in a variable
@@ -15,9 +14,6 @@ export default class InsertResourceCommand extends Command {
      */
     execute() {
         this.diplayModal();
-        this.messageBinding = this.onResourceReturned.bind(this);
-        window.removeEventListener("message", this.messageBinding);
-        window.addEventListener("message", this.messageBinding);
     }
 
     /**
@@ -38,7 +34,7 @@ export default class InsertResourceCommand extends Command {
          */
         const defaultFolderSelector = $("#categoryID").val() ? $("#categoryID").val() : 0;
         /**
-         * Fire of the jQuery plugin to display the resource modal
+         * Fire off the jQuery plugin to display the resource modal
          */
         $.fn.schoolboxResource({
             allowedFilesystems: "files",
@@ -47,6 +43,13 @@ export default class InsertResourceCommand extends Command {
             useFolder: false,
             defaultFolderSelector,
             fileBrowserCategoryId: this.editor.config.get("sbConfig").fileBrowserCategoryId,
+            onBeforeOpen: () => {
+                this.messageBinding = this.onResourceReturned.bind(this);
+                window.addEventListener("message", this.messageBinding);
+            },
+            onModalClosed: () => {
+                window.removeEventListener("message", this.messageBinding);
+            },
         });
     }
 
@@ -90,7 +93,6 @@ export default class InsertResourceCommand extends Command {
         }
         if (message.data !== undefined) {
             if (0 in message.data) {
-                window.removeEventListener("message", this.messageBinding);
                 // for each resource returned, get the resource info and insert it into the editor
                 const resources = message.data.filter((resource) => resource.hash !== undefined);
                 resources.forEach((resource) => {

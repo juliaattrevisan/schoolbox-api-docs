@@ -27,11 +27,7 @@ export default class InsertResourceLinkCommand extends Command {
      * display the resource modal and listen for if a resource is returned
      */
     execute() {
-        this.set("isOn", true);
         this.displayModal();
-        this.messageBinding = this.onResourceReturned.bind(this);
-        window.removeEventListener("message", this.messageBinding);
-        window.addEventListener("message", this.messageBinding);
     }
 
     /**
@@ -54,9 +50,15 @@ export default class InsertResourceLinkCommand extends Command {
             allowedFilesystems: "link",
             allowedFiles: null,
             fileBrowserCategoryId: this.editor.config.get("sbConfig").fileBrowserCategoryId,
+            onBeforeOpen: () => {
+                this.set("isOn", true);
+                this.messageBinding = this.onResourceReturned.bind(this);
+                window.addEventListener("message", this.messageBinding);
+            },
             onModalClosed: () => {
                 // Once the modal is completely closed, the LinkUI can be closed again
                 this.set("isOn", false);
+                window.removeEventListener("message", this.messageBinding);
             },
         });
     }
@@ -122,7 +124,6 @@ export default class InsertResourceLinkCommand extends Command {
                     status = message.data[0].status;
                 }
                 if (status === "success") {
-                    window.removeEventListener("message", this.messageBinding);
                     this.getResourceInfo(message.data[0].hash as string);
                 } else {
                     // Unknown status: assume error and do nothing, as the modal already shows the error
