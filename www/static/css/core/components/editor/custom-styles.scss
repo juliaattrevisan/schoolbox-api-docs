@@ -64,7 +64,7 @@ article {
     /**
      *  Because we have the potential to be displaying an unordered list in content and it'll
      *  be contained *within* a list itself, the list marker style is displaying incorrectly.
-     *  Here we replicate the ck-editor internal rules.
+     *  Here we replicate the ck-editor internal rules...
     **/
     ul {
         list-style-type: disc;
@@ -72,6 +72,20 @@ article {
             list-style-type: circle;
             ul {
                 list-style-type: square;
+            }
+        }
+    }
+
+    // Do the same thing as above but with <ol> elements...
+    ol ol {
+        list-style-type: lower-latin;
+        ol {
+            list-style-type: lower-roman;
+            ol {
+                list-style-type: upper-latin;
+                ol {
+                    list-style-type: upper-roman;
+                }
             }
         }
     }
