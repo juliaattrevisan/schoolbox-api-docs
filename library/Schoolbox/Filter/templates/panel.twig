@@ -34,7 +34,7 @@ Usage:
         var $interactionContainer= $filterPanel.find('[data-interaction-container]');
         var $panelComponents     = $filterPanel.find('[data-component]');
         var $appliedFilters      = $filterPanel.find('[data-applied-filters]');
-        var $submitButton        = $('#submit_button');
+        var $submitButton        = $('#submit_button'); // using this ID in `vue/components/menu/pop-out-menu-markbook.vue`
         var $optionInputs        = $filterPanel.find('input[type=checkbox], input[type=hidden], input[type=text], select');
         var $toast               = $('[data-relation="submit-label"]');
         var $serverErrorFeedback = $filterPanel.find('#server_error_feedback');
@@ -63,6 +63,7 @@ Usage:
         // ============== Event Handlers
 
         // Listen for clicks on the submit button
+        // relying on this click listener in `vue/components/menu/pop-out-menu-markbook.vue` to reload the markbook content
         $submitButton.on('click', function(event){
             event.preventDefault();
             updateOriginalSelections();

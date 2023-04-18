@@ -12,6 +12,7 @@ import SmallCard from "../card/small-card.vue";
 import PopOutMenuItem from "./pop-out-menu-item.vue";
 import PopOutMenuDivider from "./pop-out-menu-divider.vue";
 import UserPhoto from "../userPhoto/user-photo.vue";
+import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 
 /**
  * an activity linked to the selected mark book item
@@ -79,6 +80,10 @@ const routes: Ref<Routes> = ref({
 });
 const markbookElement = ref<HTMLDivElement | null>(null);
 
+// Exclude confirm, popout
+const excludeModalEl = ref(null);
+
+
 /**
  * Middleware are optional modifiers you can provide to floating-ui. Things that determine how
  * a floating item should flip, shift itself or rotate to prevent overflowing a parent container.
@@ -140,6 +145,61 @@ const viewStatusText = computed(() => {
     return "View Attempts";
 });
 
+/**
+ * Exclude route.
+ * Checks if the student has any feedback or submissions, if they do not, then it just excludes. else will prompt
+ */
+function excludeCheck() {
+    // does the user have work?
+    if (hasSubmissions.value || hasFeedback.value) {
+        // has some kind of activity.. prompt for exclusion
+        excludeModalEl.value.open();
+    } else {
+        // no work or feedback
+        onMenuItemSelected(routes.value.excludeRoute, 'exclude');
+    }
+}
+
+/**
+ * actually exclude the student from the assessment
+ */
+function exclude() {
+    closeExclude();
+    onMenuItemSelected(routes.value.excludeRoute, 'exclude');
+}
+
+/**
+ * close the exclude modal function
+ */
+function closeExclude() {
+    excludeModalEl.value.close();
+}
+
+/**
+ * hack to refresh the markbook
+ * clone from `library/Schoolbox/Filter/templates/panel.twig` to trigger the js on-click function
+ *         // Listen for clicks on the submit button
+ *         $submitButton.on('click', function(event){
+ *             event.preventDefault();
+ *             updateOriginalSelections();
+ *             fetchReport();
+ *             return false; // don't bubble
+ *         });
+ */
+function reloadMarkbook() {
+    // close the popout
+    isSelected.value = false;
+    // reload the markbook
+    document.getElementById('submit_button').click();
+
+    /**
+     * disable the markbook popout
+     */
+    const elements = document.querySelectorAll('[data-pop-out-menu]');
+    elements.forEach((cell) => {
+        delete cell.dataset.popOutMenu;
+    });
+}
 
 /**
  * Get the latest routes to display within the popout
@@ -350,6 +410,8 @@ async function onMenuItemSelected(target: string, action: string|null = null) {
         hasLoadError.value = true;
     } finally {
         isLoading.value = false;
+        //trigger a markbook reload
+        reloadMarkbook();
     }
 }
 </script>
@@ -427,7 +489,7 @@ async function onMenuItemSelected(target: string, action: string|null = null) {
                 </pop-out-menu-item>
                 <pop-out-menu-item v-else-if="'Project' !== assessmentType"
                     :class="{ 'is-disabled': isExcluded }"
-                    @selected="onMenuItemSelected(routes.excludeRoute, 'exclude')"
+                    @selected="excludeCheck()"
                 >
                     Exclude Student
                 </pop-out-menu-item>
@@ -439,6 +501,31 @@ async function onMenuItemSelected(target: string, action: string|null = null) {
                 </pop-out-menu-item>
             </div>
         </div>
+        <reveal-modal ref="excludeModalEl">
+            <h2>Please confirm</h2>
+            <p>The student has submissions and/or feedback for this assessment</p>
+            <p>Exclusion from this assessment will remove access to these submissions and/or feedback. Proceed?</p>
+            <ul class="flex-list buttons">
+                <li>
+                    <button
+                        @click.prevent="exclude()"
+                        class="button submit"
+                        id="excludeStudent-exclude-button"
+                    >
+                        Yes
+                    </button>
+                </li>
+                <li>
+                    <button
+                        @click.prevent="closeExclude()"
+                        class="button"
+                        id="excludeStudent-cancel-button"
+                    >
+                        Cancel
+                    </button>
+                </li>
+            </ul>
+        </reveal-modal>
     </pop-out>
 </template>
 
@@ -490,5 +577,12 @@ async function onMenuItemSelected(target: string, action: string|null = null) {
             display: flex;
         }
     }
+}
+// Additions to fix the exclude additional reveal-model
+.reveal-modal-bg {
+    z-index: 100002;
+}
+.reveal-modal {
+    z-index: 100003;
 }
 </style>
