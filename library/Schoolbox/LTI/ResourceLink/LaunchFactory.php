@@ -181,7 +181,7 @@ class LaunchFactory
 
         // LaunchPresentationClaim:
         // talk about how the resource link will be presented
-        $launchPresentationClaim = (new LaunchPresentationClaimFactory($this->access, $this->instance, $this->router))
+        $launchPresentationClaim = (new LaunchPresentationClaimFactory($this->access, $baseUrl, $this->router))
             ->buildForAssessmentAndUser($assessment, $actingUser, $height);
         $additionalClaims[]      = $launchPresentationClaim;
 

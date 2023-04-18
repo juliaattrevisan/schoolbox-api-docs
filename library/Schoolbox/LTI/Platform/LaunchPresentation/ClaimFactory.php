@@ -11,7 +11,7 @@ namespace Schoolbox\LTI\Platform\LaunchPresentation;
 
 use Aura\Router\Router;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\LaunchPresentationClaim;
-use Schoolbox\Instance;
+use Psr\Http\Message\UriInterface;
 use Schoolbox\Learning\Assessment\Lti\Model;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
@@ -21,13 +21,13 @@ class ClaimFactory
     /**
      * Constructor
      *
-     * @param Access   $access   Used to determine whether a given user has instructor access to an assessment's folder.
-     * @param Instance $instance Instance data, used to determine a fully-qualified domain name.
-     * @param Router   $router   Used to build a path to a return URL.
+     * @param Access       $access   Used to determine whether a user has instructor access to an assessment's folder.
+     * @param UriInterface $baseUrl  Base URL for this instance.
+     * @param Router       $router   Used to build a path to a return URL.
      */
     public function __construct(
         private Access $access,
-        private Instance $instance,
+        private UriInterface $baseUrl,
         private Router $router,
     ) {
     }
@@ -47,19 +47,20 @@ class ClaimFactory
      */
     public function buildForAssessmentAndUser(Model $assessment, User $user, ?int $height): LaunchPresentationClaim
     {
+        $returnUrl = $this->access->isInstructor($user, $assessment->getBaseContext()->getFolder())
+            ? $this->router->generate(
+                'learningAssessment.getLaunchAssessmentAsInstructorReturn',
+                ['assessmentId' => $assessment->getId()]
+            )
+            : $this->router->generate(
+                'learningAssessment.getLaunchAssessmentAsStudentReturn',
+                ['assessmentId' => $assessment->getId(), 'studentId' => $user->getId(),]
+            );
         return new LaunchPresentationClaim(
             $assessment->getLtiTool()->getTarget(),
             isset($height) ? (string)$height : null,
             null,
-            $this->access->isInstructor($user, $assessment->getBaseContext()->getFolder())
-                ? $this->router->generate(
-                    'learningAssessment.getLaunchAssessmentAsInstructorReturn',
-                    ['assessmentId' => $assessment->getId()]
-                )
-                : $this->router->generate(
-                    'learningAssessment.getLaunchAssessmentAsStudentReturn',
-                    ['assessmentId' => $assessment->getId(), 'studentId' => $user->getId(),]
-                )
+            $this->baseUrl->withPath($returnUrl)->__toString(),
         );
     }
 
