@@ -1,6 +1,6 @@
 /* Admin area; list of Fields in a Lesson Plan Template
  */
-.lesson-plan-template-fields {
+.lpt-fields {
     &.s-is-dragging {
         .ui-sortable-helper {
             height: 2.5rem !important;
@@ -25,15 +25,15 @@
         padding: 0;
     }
 
-    & li {
+    & > li {
         &:first-child {
             padding: 0;
         }
 
         border: 1px solid var(--body-background);
-        margin-bottom: 1rem;
         margin-left: 0;
         margin-right: 0;
+        margin-bottom: 1rem;
         position: relative;
 
         &:last-child {
@@ -160,6 +160,84 @@
     }
 }
 
+/**
+ * Styles specifically for the Lesson Plan Template previews or for displaying
+ * the contents of Lesson Plans on a page.
+ */
+.lpt-preview,
+.lp-display {
+    > li {
+        border-bottom: 1px solid $gainsboro;
+
+        // Necessary to fight layers of padding / inherited rules
+        margin-left: -1rem;
+        margin-right: -1rem;
+
+        // Necessary to split off to fight other highly-specific rules being inherited
+        &.not-visible-students:last-child {
+            border-bottom: 1px solid $gainsboro;
+        }
+
+        p.meta {
+            font-weight: 600;
+        }
+
+        &.not-visible-students {
+            background-color: $vapor;
+        }
+    }
+}
+
+.lpt-preview {
+    margin-bottom: 1rem;
+
+    & > li:first-child {
+        border-top: 1px solid $gainsboro;
+    }
+}
+
+.lp-display {
+    padding: 0 1rem;
+
+    // Fight a global 'information-list' rule.
+    > li:first-child {
+        padding-top: 1rem;
+    }
+
+    > li.not-visible-students {
+        border-left: 1px solid $gainsboro;
+        border-right: 1px solid $gainsboro;
+
+        &:first-child {
+            border-top: 1px solid $gainsboro;
+        }
+    }
+}
+
+.lpt-preview-area-header,
+.lp-area-header {
+    display: flex;
+    flex-direction: row-reverse;
+
+    h2 {
+        flex: 1;
+        margin-right: 2rem;
+    }
+
+    .meta {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+}
+
+@media #{$medium-down} {
+    .lpt-preview-area-header,
+    .lp-area-header {
+        flex-direction: column;
+    }
+}
+
 /* Create Lesson Plan for the usual user
  *
  * There's a list where you can preview the contents of an LPT
@@ -167,9 +245,8 @@
  */
 .lpt-preview-header {
     padding-bottom: 1rem;
-    border-bottom: 1px solid #ddd;
 }
 
-.information-list.lpt-preview li {
-    padding: 1rem 0 1rem 0;
+.information-list.lpt-preview > li {
+    padding: 1rem;
 }

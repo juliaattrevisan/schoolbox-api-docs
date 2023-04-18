@@ -8,19 +8,25 @@
     <div id="lpt-preview-{{ lessonPlanTemplate.id }}" class="reveal-modal" data-reveal>
         <h1 class="no-margin lpt-preview-header">{{ lessonPlanTemplate.title }}</h1>
 
+        {##
+         #  Use divs instead of ul so if you have a nested list element in content it
+         #  doesn't display with the wrong indentation / styles
+        ##}
         <ul class="information-list lpt-preview">
             {% for field in lessonPlanTemplate.fields %}
-                {% if not field.isDeleted %}
-                    <li class="content">
-                        <h2>{{ field.title }}</h2>
-
+                <li class="content {% if 'student' != field.visibility %} not-visible-students {% endif %}">
                         {% if 'student' != field.visibility %}
+                        <div class="lpt-preview-area-header">
                             <p class="meta"><span class="icon-view-hollow"></span>This field is not visible to students</p>
+                            <h2>{{ field.title }}</h2>
+                        </div>
+                        {% else %}
+                        <h2>{{ field.title }}</h2>
                         {% endif %}
-
-                        <article>{{ field.body|purify }}</article>
-                    </li>
-                {% endif %}
+                    <article>
+                        {{ field.body|purify }}
+                    </article>
+                </li>
             {% endfor %}
         </ul>
 

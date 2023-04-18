@@ -262,3 +262,8 @@
 .ck.ck-content figure {
     margin-top: 0 !important;
 }
+
+/* Match our styles for first child <ul>s */
+.ck.ck-content ul {
+    margin-bottom: 0.75rem;
+}
