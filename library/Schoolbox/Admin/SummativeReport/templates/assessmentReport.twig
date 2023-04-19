@@ -8,8 +8,12 @@
  # @param bool $showRubrics
  # @param bool $showComments
  # @param IAssessable $assessment
+ # @param array $graph // cohort graph array
  #}
 
+<div>
+    {{ graph|json_encode() }}
+</div>
 {# Rubric grid is optional and spans full width of the page
  # so you can't throw it in .feedback-assessment
  #}

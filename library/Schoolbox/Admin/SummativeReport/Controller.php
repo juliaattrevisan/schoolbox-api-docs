@@ -26,6 +26,8 @@ use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
+use Schoolbox\Learning\Grades\Cohort\ClassResults;
+use Schoolbox\Learning\Grades\Cohort\ValidUseCohortMarks;
 use Schoolbox\Learning\Grades\Helper;
 use Schoolbox\Learning\MarkScheme\Factory;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -799,6 +801,31 @@ class Controller extends ConfigController
                 $classAssessments = $gradeHelper->filterAssessments($viewer, $assessments, $classWorkTypes);
             }
         }
+        /* If the config option lms_cohort_comparison is set,
+         * instantiate a new CohortMarks instance
+         *
+         * Otherwise use the default Markbook instance
+         *
+         * These markbook instances provide the five-point summary for the graphs
+         */
+        $allGraphs = [];
+
+        foreach ($markbooks as $folderId => $markbook) {
+            $graph = [];
+            $folder = $folders->getBy('id', $folderId);
+            if ((new ValidUseCohortMarks())->isSatisfiedBy($this->getConfigLoader()->get('lms_cohort_comparison'), $folder)) {
+                $graph = (new ClassResults(
+                    $this->getConfigLoader()->get('grade_gradient_enable'),
+                    $this->assessmentMapperProxy,
+                    $markbook->getAssessments(),
+                    $this->getUser(),
+                    $term,
+                ))->collate($viewer);
+            } else {
+                $graph = $gradeHelper->buildGraph($markbook, $viewer);
+            }
+            $allGraphs[$folderId] = $graph;
+        }
 
         $classAssessmentFeedbacks = $this->collateFeedbacks($classAssessments, $student, $viewer, (bool)$optionsPayload['class']['rubrics']);
 
@@ -813,6 +840,7 @@ class Controller extends ConfigController
             'summaryAssessmentFeedbacks' => $summaryAssessmentFeedbacks,
             'classAssessmentFeedbacks'   => $classAssessmentFeedbacks,
             'report'                     => $report,
+            'allGraphs'                      => $allGraphs,
             'showSummary'                => (bool)$optionsPayload['summary']['active'],
             'summaryHeading'             => trim((string)$optionsPayload['summary']['heading']),
             'showSummaryOverallGrade'    => (bool)$optionsPayload['summary']['overallGrade'],

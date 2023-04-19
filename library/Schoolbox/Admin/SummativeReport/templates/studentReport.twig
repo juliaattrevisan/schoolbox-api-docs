@@ -479,7 +479,8 @@
                             showGrades: showSummaryGrades,
                             showComments: showSummaryComments,
                             showRubrics: showSummaryRubrics,
-                            page: 'subject-summary'
+                            page: 'subject-summary',
+                            graph: null
                         } only %}
                 {% endfor %}
             {% endif %}
@@ -520,7 +521,8 @@
                             showGrades: showClassGrades,
                             showComments: showClassComments,
                             showRubrics: showClassRubrics,
-                            page: 'subject'
+                            page: 'subject',
+                            graph: allGraphs[folder.id]
                         } only %}
                 {% endfor %}
             {% endif %}

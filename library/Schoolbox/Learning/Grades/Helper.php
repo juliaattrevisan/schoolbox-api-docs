@@ -153,4 +153,108 @@ class Helper
         }
         return $workTypeAssessmentsByFolder;
     }
+
+    /**
+     * Builds an array of data used by twig to render the assessment box-and-whiskers graph
+     *
+     * @param Markbook $markbook
+     * @param User     $viewee
+     * @return mixed[][] $graph
+     * @var string     $graph ['info']         json encoded    // TODO Replace w/ object
+     * @var string     $graph ['assessments']  json encoded
+     * @var string     $graph ['data']         json encoded
+     * @var string     $graph ['scatter']      json encoded
+     */
+    public function buildGraph(Markbook $markbook, User $viewee): array
+    {
+        // Get the data for the graph
+        $graphInfo        = [];
+        $graphAssessments = [];
+        $graphData        = [];
+        $graphScatter     = [];
+
+
+        $statistics = $markbook->getAssessmentStatistics();
+
+        foreach ($markbook->getAssessments() as $assessment) {
+            if ($assessment->isFeedbackVisibleToUser($this->getUser()) && $assessment->getMarkScheme()->isQuantitative()) {
+                $graphAssessments[] = $assessment->getTitle();
+
+                $participant = $assessment->getParticipantIfExtant($viewee);
+
+                $graphScatterValue = null;
+                $graphInfoValue = [];
+                if ($participant) {
+                    // Set graph marker for student
+                    $normalisedMark = $participant->getNormalisedMark(true);
+                    if (null !== $normalisedMark) {
+                        $graphScatterValue = (float)$normalisedMark;
+                    }
+
+                    // Set graph info value for modal
+                    $comment  = null;
+                    $feedback = $participant->findAuthoritativeVisibleFeedback($this->getUser());
+                    if ($feedback) {
+                        $comment = $feedback->getComment();
+                    }
+                    $humanReadableMark = $participant->getHumanReadableMark(true);
+                    if (isset($humanReadableMark) || isset($comment)) {
+                        $graphInfoValue = [
+                            'displayMark'  => $humanReadableMark,
+                            'gradientMark' => $this->getConfigLoader()->get('grade_gradient_enable') ? (int)($normalisedMark / 10) : 'none',
+                            'info'         => $comment ?? '',
+                        ];
+                    }
+                }
+                $graphScatter[] = $graphScatterValue;
+                $graphInfo[] = $graphInfoValue;
+
+                // Set box plot values
+                $hasStats = $statistics[$assessment->getId()]['count'] > 0;
+                if ($hasStats) {
+                    $graphData[] = [
+                        // Minimum
+                        [
+                            'info'  => null,
+                            'uid'   => null,
+                            'value' => $statistics[$assessment->getId()]['minNormalized'],
+                        ],
+                        // 1st Quartile
+                        [
+                            'info'  => null,
+                            'uid'   => null,
+                            'value' => $statistics[$assessment->getId()]['quartile1'],
+                        ],
+                        // Median
+                        [
+                            'info'  => null,
+                            'uid'   => null,
+                            'value' => $statistics[$assessment->getId()]['quartile2'],
+                        ],
+                        // 3rd Quartile
+                        [
+                            'info'  => null,
+                            'uid'   => null,
+                            'value' => $statistics[$assessment->getId()]['quartile3'],
+                        ],
+                        // Maximum
+                        [
+                            'info'  => null,
+                            'uid'   => null,
+                            'value' => $statistics[$assessment->getId()]['maxNormalized'],
+                        ],
+                    ];
+                } else {
+                    $graphData[] = [];
+                }
+            }
+        }
+
+        return [
+            'info'        => json_encode($graphInfo),
+            'assessments' => json_encode($graphAssessments),
+            'data'        => json_encode($graphData),
+            'scatter'     => json_encode($graphScatter),
+        ];
+    }
 }
