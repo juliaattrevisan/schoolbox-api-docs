@@ -30,6 +30,7 @@ class ModelToArrayTest extends TestCase
         yield 'empty fields' => [
             new Model(),
             [
+                'name'   => '.',
                 'hash'   => null,
                 'mime'   => '',
                 'type'   => null,
@@ -40,6 +41,7 @@ class ModelToArrayTest extends TestCase
 
         yield 'document' => [
             (new Model())
+                ->setBasename('document.docx')
                 ->setMimetype(
                     (new Mimetype())
                         ->setMime('document/ms-word')
@@ -48,6 +50,7 @@ class ModelToArrayTest extends TestCase
                 ->setHash('1234567890')
                 ->setSize(12345),
             [
+                'name'   => 'document.docx',
                 'hash'   => '1234567890',
                 'mime'   => 'document/ms-word',
                 'type'   => 'document',
@@ -61,6 +64,7 @@ class ModelToArrayTest extends TestCase
 
         yield 'image' => [
             (new Model())
+                ->setBasename('image.png')
                 ->setMimetype(
                     (new Mimetype())
                         ->setMime('image/png')
@@ -69,6 +73,7 @@ class ModelToArrayTest extends TestCase
                 ->setHash('999000')
                 ->setSize(432166),
             [
+                'name'   => 'image.png',
                 'hash'   => '999000',
                 'mime'   => 'image/png',
                 'type'   => 'image',
@@ -83,6 +88,7 @@ class ModelToArrayTest extends TestCase
 
         yield 'audio' => [
             (new Model())
+                ->setBasename('audio.mp4')
                 ->setMimetype(
                     (new Mimetype())
                         ->setMime('audio/mp4')
@@ -91,6 +97,7 @@ class ModelToArrayTest extends TestCase
                 ->setHash('54321')
                 ->setSize(1_000_000),
             [
+                'name'   => 'audio.mp4',
                 'hash'   => '54321',
                 'mime'   => 'audio/mp4',
                 'type'   => 'audio',
@@ -105,6 +112,7 @@ class ModelToArrayTest extends TestCase
 
         yield 'video' => [
             (new Model())
+                ->setBasename('video.mp4')
                 ->setMimetype(
                     (new Mimetype())
                         ->setMime('video/mp4')
@@ -113,6 +121,7 @@ class ModelToArrayTest extends TestCase
                 ->setHash('333')
                 ->setSize(2_000_000),
             [
+                'name'   => 'video.mp4',
                 'hash'   => '333',
                 'mime'   => 'video/mp4',
                 'type'   => 'video',
