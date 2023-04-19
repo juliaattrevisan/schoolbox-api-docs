@@ -77,6 +77,11 @@ blockquote {
     }
 }
 
+// Override user style sheet / browser default p top margin
+blockquote > p {
+    margin-top: 0;
+}
+
 /* Make last child in quote block not have bottom margin */
 blockquote > p:last-child,
 blockquote > figure:last-child,

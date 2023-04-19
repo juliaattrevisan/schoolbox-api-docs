@@ -13,9 +13,17 @@
 
 $cdn-prefix: "../../";
 @import "www/static/css/core/base/_colors";
+@import "www/static/css/core/base/font-faces";
 @import "www/static/css/core/base/_variables";
-@import "www/static/css/core/base/_settings";
-@import "www/static/css/core/base/_typography";
+@import "www/static/css/core/base/mixins";
+@import "www/static/css/core/base/functions";
+@import "www/static/css/core/base/settings";
+@import "www/static/css/core/base/global";
+@import "www/static/css/core/base/typography";
 
+/**
+ * The parts that are actually relevant to having our styles displayed.
+**/
+@import "www/static/css/core/ui/icons";
 @import "www/static/css/core/ui/blockquote";
 @import "www/static/css/core/components/editor/custom-styles";
