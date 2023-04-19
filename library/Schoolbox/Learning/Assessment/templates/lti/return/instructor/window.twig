@@ -26,7 +26,21 @@
         </section>
         <ul class="flex-list buttons">
             <li><a class="submit" href="{{ returnUrl }}">Return</a></li>
-            <li><a href="{{ returnUrl }}">Close</a></li>
+            <li><a data-action="close" href="#">Close</a></li>
         </ul>
     </div>
 </div>
+
+<script type="text/javascript">
+    document.addEventListener(
+        'DOMContentLoaded',
+        function () {
+            document.querySelectorAll('a[data-action=close]').forEach(
+                (link) => link.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    window.close();
+                })
+            )
+        }
+    )
+</script>
