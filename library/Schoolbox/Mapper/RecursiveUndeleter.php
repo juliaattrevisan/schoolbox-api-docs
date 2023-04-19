@@ -166,6 +166,7 @@ class RecursiveUndeleter
             SubmissionBoxMapper::class,
             TaskMapper::class,
             Project\Mapper::class,
+            Assessment\LessonPlan\Mapper::class,
         ],
         UnitImpl\Mapper::class              => [
             Assessment\Mapper::class => 'v_ui.course_unit_implementation_id',
@@ -192,6 +193,10 @@ class RecursiveUndeleter
         Task\CompletionMapper::class        => [],
         Project\Mapper::class               => [
             Assessment\Mapper::class => 'v_pa.project_id',
+        ],
+        Assessment\LessonPlan\Mapper::class => [
+            Assessment\LessonPlan\File\Mapper::class  => 'lesson_plan_id',
+            Assessment\LessonPlan\Field\Mapper::class => 'lesson_plan_id',
         ],
         QuizSection\Mapper::class           => [
             QuizQuestion\Mapper::class => 'section_id',
