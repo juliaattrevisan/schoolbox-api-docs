@@ -38,8 +38,9 @@ export default {
             case "video":
                 this.player = new this.MediaElementPlayer(this.$el, {
                     // If 'stretching' is set to 'auto', the video will not resize as the window resizes.
-                    // Setting 'stretching' to 'none' paradoxically allows stretching to occur.
-                    // Note that unless the height of the container is explicitly set, the height will end up as zero.
+                    // Setting 'stretching' to 'none' paradoxically allows stretching (resizing) to occur.
+                    // Note that with 'stretching' set to 'none', unless the height of the container is explicitly set
+                    // (as it is set below), the height of the video will end up as zero.
                     stretching: "none",
                 });
 
