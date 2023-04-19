@@ -467,6 +467,21 @@ class Controller extends Assessment\Controller
     }
 
     /**
+     * POST alias for `getLaunchAssessmentAsInstructorReturn`.
+     *
+     * @api   POST /learning/assessments/:assessmentId/lti/launch/instructor/return/:target
+     * @since 23.0.0
+     *
+     * @param Model  $assessment
+     * @param string $target
+     * @return void
+     */
+    public function postLaunchAssessmentAsInstructorReturn(Model $assessment, string $target): void
+    {
+        $this->getLaunchAssessmentAsInstructorReturn($assessment, $target);
+    }
+
+    /**
      * Opens a page which launches the LTI assessment's resource link, within
      * the context of a student.
      * (This should be the student's create response page for the assessment
@@ -597,6 +612,22 @@ class Controller extends Assessment\Controller
                 )
             );
         }
+    }
+
+    /**
+     * POST alias for `getLaunchAssessmentAsStudentReturn`.
+     *
+     * @api   POST /learning/assessments/:assessmentId/lti/launch/student/:studentId/return/:target
+     * @since 23.0.0
+     *
+     * @param Model  $assessment
+     * @param User   $student
+     * @param string $target
+     * @return void
+     */
+    public function postLaunchAssessmentAsStudentReturn(Model $assessment, User $student, string $target): void
+    {
+        $this->getLaunchAssessmentAsStudentReturn($assessment, $student, $target);
     }
 
     /**

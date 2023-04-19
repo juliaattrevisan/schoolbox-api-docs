@@ -253,6 +253,20 @@ class Module extends BaseModule
             $canSubmit,
             $preloadParticipant,
         );
+        $this->register(
+            self::METHOD_POST,
+            "$assRoute/lti/launch/instructor/return/{target}",
+            'postLaunchAssessmentAsInstructorReturn',
+            $canViewStatus,
+            $preloadAssessment,
+        );
+        $this->register(
+            self::METHOD_POST,
+            "$assRoute/lti/launch/student/$studentParam/return/{target}",
+            'postLaunchAssessmentAsStudentReturn',
+            $canSubmit,
+            $preloadParticipant,
+        );
 
         // Easy access participation endpoint
         // include user in assessment
