@@ -1,3 +1,10 @@
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/main.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.all-work.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/highchartsMore.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/reportCardBoxplot.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/learninganalytics/schoolboxTheme.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/eportfolio/jquery.eportfolio.js?v={{ config.site_version }}"></script>
+
 <style>
 
     /* Vaguely analogous to A4 dimensions so you can preview in browser
@@ -479,8 +486,7 @@
                             showGrades: showSummaryGrades,
                             showComments: showSummaryComments,
                             showRubrics: showSummaryRubrics,
-                            page: 'subject-summary',
-                            graph: null
+                            page: 'subject-summary'
                         } only %}
                 {% endfor %}
             {% endif %}
@@ -511,6 +517,7 @@
                     </div>
                 {% endif %}
             </div>
+                {% include '@learningGrades/fragments/graph.twig' with {graph: allGraphs[folder.id]} only %}
 
                 {% for assessment in classAssessments[folder.id] %}
                     {% include '@adminSummativeReport/assessmentReport.twig' with
@@ -521,8 +528,7 @@
                             showGrades: showClassGrades,
                             showComments: showClassComments,
                             showRubrics: showClassRubrics,
-                            page: 'subject',
-                            graph: allGraphs[folder.id]
+                            page: 'subject'
                         } only %}
                 {% endfor %}
             {% endif %}
