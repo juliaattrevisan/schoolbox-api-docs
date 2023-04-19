@@ -25,22 +25,7 @@
             <p>You may now either return to the status page, or close this tab.</p>
         </section>
         <ul class="flex-list buttons">
-            <li><a class="submit" href="{{ returnUrl }}">Return</a></li>
-            <li><a data-action="close" href="#">Close</a></li>
+            <li><a class="submit" target="_parent" href="{{ returnUrl }}">Return</a></li>
         </ul>
     </div>
 </div>
-
-<script type="text/javascript">
-    document.addEventListener(
-        'DOMContentLoaded',
-        function () {
-            document.querySelectorAll('a[data-action=close]').forEach(
-                (link) => link.addEventListener('click', (event) => {
-                    event.preventDefault();
-                    window.close();
-                })
-            )
-        }
-    )
-</script>
