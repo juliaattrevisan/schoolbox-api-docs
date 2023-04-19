@@ -809,22 +809,23 @@ class Controller extends ConfigController
          * These markbook instances provide the five-point summary for the graphs
          */
         $allGraphs = [];
-
-        foreach ($markbooks as $folderId => $markbook) {
-            $graph = [];
-            $folder = $folders->getBy('id', $folderId);
-            if ((new ValidUseCohortMarks())->isSatisfiedBy($this->getConfigLoader()->get('lms_cohort_comparison'), $folder)) {
-                $graph = (new ClassResults(
-                    $this->getConfigLoader()->get('grade_gradient_enable'),
-                    $this->assessmentMapperProxy,
-                    $markbook->getAssessments(),
-                    $this->getUser(),
-                    $term,
-                ))->collate($viewer);
-            } else {
-                $graph = $gradeHelper->buildGraph($markbook, $student, $viewer, $this->getConfigLoader()->get('grade_gradient_enable'));
+        if ($optionsPayload['class']['cohort']) {
+            foreach ($markbooks as $folderId => $markbook) {
+                $graph  = [];
+                $folder = $folders->getBy('id', $folderId);
+                if ((new ValidUseCohortMarks())->isSatisfiedBy($this->getConfigLoader()->get('lms_cohort_comparison'), $folder)) {
+                    $graph = (new ClassResults(
+                        $this->getConfigLoader()->get('grade_gradient_enable'),
+                        $this->assessmentMapperProxy,
+                        $markbook->getAssessments(),
+                        $this->getUser(),
+                        $term,
+                    ))->collate($viewer);
+                } else {
+                    $graph = $gradeHelper->buildGraph($markbook, $student, $viewer, $this->getConfigLoader()->get('grade_gradient_enable'));
+                }
+                $allGraphs[$folderId] = $graph;
             }
-            $allGraphs[$folderId] = $graph;
         }
 
         $classAssessmentFeedbacks = $this->collateFeedbacks($classAssessments, $student, $viewer, (bool)$optionsPayload['class']['rubrics']);

@@ -517,7 +517,9 @@
                     </div>
                 {% endif %}
             </div>
-                {% include '@learningGrades/fragments/graph.twig' with {graph: allGraphs[folder.id], graphId: folder.id } only %}
+                {% if allGraphs[folder.id] is defined %}
+                    {% include '@learningGrades/fragments/graph.twig' with {graph: allGraphs[folder.id], graphId: folder.id } only %}
+                {% endif %}
 
                 {% for assessment in classAssessments[folder.id] %}
                     {% include '@adminSummativeReport/assessmentReport.twig' with
