@@ -558,11 +558,45 @@ class Controller extends Assessment\Controller
      */
     public function getLaunchAssessmentAsStudentReturn(Model $assessment, User $student, string $target): void
     {
-        // iframe launch: show as a link back to the status page
-        // (or return URL if set), target: _parent
+        $classPageUrl = '/homepage/' . $assessment->getBaseContext()->getFolder()->getId();
+        $statusUrl    = $this->getRouteIfAuthorized(
+            'learningAssessment.getSummary',
+            [
+                'assessmentId' => $assessment->getId(),
+                'assessment'   => $assessment,
+                'studentId'    => $student->getId(),
+                'student'      => $student,
+            ],
+        );
+        $params       = [
+            'assessment'   => $assessment,
+            'message'      => $this->request->query->get('lti_msg'),
+            'errorMessage' => $this->request->query->get('lti_errormsg'),
+            'returnUrl'    => $this->request->query->get(Assessment\Redirect::RETURN_URL, $classPageUrl),
+            'breadcrumbs'  => $this->getBakery()
+                                   ->produceFromAssessment($assessment, $this->getUser())
+                                   ->add([$assessment->getTitle(), $statusUrl])
+        ];
 
-        // new window launch: button closes window,
-        // also could go back to return URL
+        if ($target === LtiTool\Model::TARGET_WINDOW) {
+            // new window launch: button closes window,
+            // also could go back to return URL
+            $this->response->content->set(
+                $this->buildHtmlOutput(
+                    '@learningAssessment/lti/return/student/window.twig',
+                    $params,
+                )
+            );
+        } else {
+            // iframe launch: show as a link back to the status page
+            // (or return URL if set), target: _parent
+            $this->response->content->set(
+                $this->buildUnthemedHtmlOutput(
+                    '@learningAssessment/lti/return/student/iframe.twig',
+                    $params,
+                )
+            );
+        }
     }
 
     /**
