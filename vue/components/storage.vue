@@ -56,14 +56,14 @@ export default {
                     // bounds of the container.
                     $(container).find(".mejs__poster").attr("style", "");
 
-                    // Ensure the video dimensions match the container dimensions both when the video is playing.
+                    // Ensure the video dimensions match the container dimensions when the video is playing.
                     // Documentation: https://github.com/mediaelement/mediaelement/blob/master/docs/usage.md
                     this.player.setPlayerSize(containerW, containerH);
 
-                    // Ensure the video container adjusts in size correctly as the window size changes.
-                    // If this function is removed, downsizing the window from a large size will cause a horizontal
-                    // scrollbar to appear on the video container, and when upsizing the window from a small size, the
-                    // video will remain small as the space around it grows.
+                    // Ensure the video container adjusts in size correctly as the window size changes (both when it
+                    // is playing and not playing).  If this function is removed, downsizing the window from a large
+                    // size will cause a horizontal scrollbar to appear on the video container, and when upsizing the
+                    // window from a small size, the video will remain small as the surrounding space grows.
                     const closurePlayer = this.player;
                     const aspectRatio = containerW / containerH;
                     $(window).resize(function () {
