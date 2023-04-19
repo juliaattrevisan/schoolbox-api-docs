@@ -36,7 +36,7 @@
             {% for key, data in tabs %}
                 {% if key == 'graph' %}
                     <div class="content {% if key == selectedTab %}active{% endif %}" id="{{ key }}">
-                        {% include '@learningGrades/fragments/graph.twig' with {graph: graph} only %}
+                        {% include '@learningGrades/fragments/graph.twig' with {graph: graph, graphId: 'subject-graph'} only %}
                     </div>
                 {% else %}
                     <div class="content {% if key == selectedTab %}active{% endif %}" id="{{ key }}">
