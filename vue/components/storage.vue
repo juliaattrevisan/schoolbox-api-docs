@@ -38,9 +38,14 @@ export default {
             case "video":
                 this.player = new this.MediaElementPlayer(this.$el, {
                     // If 'stretching' is set to 'auto', the video will not resize as the window resizes.
-                    // Setting 'stretching' to 'none' paradoxically allows stretching (resizing) to occur.
+                    // If 'stretching' is set to 'responsive', we cannot enforce our desired maximum height, as the
+                    // aspect ratio of the container will always match the aspect ratio of the video.  This is a shame,
+                    // because if we used the 'responsive' mode, we wouldn't have to set up a 'resize' event handler.
+                    // To get the resizing and container aspect ratio to work as we desire, we must set 'stretching' to
+                    // 'none', and create our own 'resize' event handler.
                     // Note that with 'stretching' set to 'none', unless the height of the container is explicitly set
                     // (as it is set below), the height of the video will end up as zero.
+                    // See: https://github.com/mediaelement/mediaelement/blob/master/docs/api.md
                     stretching: "none",
                 });
 
