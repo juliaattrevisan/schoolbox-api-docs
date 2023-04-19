@@ -67,7 +67,8 @@ export default {
                     this.player.setPlayerSize(containerW, containerH);
 
                     // Ensure the video container adjusts in size correctly as the window size changes (both when it
-                    // is playing and not playing).  If this function is removed:
+                    // is playing and not playing).
+                    // If this function is removed (with the MediaElementPlayer 'stretching' option remaining as 'none'):
                     //  * downsizing the window from a large size will cause a horizontal scrollbar to appear on the
                     //    video container
                     //  * when upsizing the window from a small size, the video will remain small as the surrounding
