@@ -388,7 +388,7 @@ class Controller extends Base
                     $this->access,
                     $markSchemeFactory
                 );
-                $graph = $gradeHelper->buildGraph($filteredMarkbook, $viewee);
+                $graph = $gradeHelper->buildGraph($filteredMarkbook, $viewee, $this->getUser(), $this->getConfigLoader()->get('grade_gradient_enable'));
             }
         }
 

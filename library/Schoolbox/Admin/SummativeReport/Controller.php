@@ -822,7 +822,7 @@ class Controller extends ConfigController
                     $term,
                 ))->collate($viewer);
             } else {
-                $graph = $gradeHelper->buildGraph($markbook, $viewer);
+                $graph = $gradeHelper->buildGraph($markbook, $student, $viewer, $this->getConfigLoader()->get('grade_gradient_enable'));
             }
             $allGraphs[$folderId] = $graph;
         }

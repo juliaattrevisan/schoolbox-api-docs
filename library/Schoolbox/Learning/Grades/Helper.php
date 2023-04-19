@@ -158,14 +158,13 @@ class Helper
      * Builds an array of data used by twig to render the assessment box-and-whiskers graph
      *
      * @param Markbook $markbook
-     * @param User     $viewee
-     * @return mixed[][] $graph
-     * @var string     $graph ['info']         json encoded    // TODO Replace w/ object
-     * @var string     $graph ['assessments']  json encoded
-     * @var string     $graph ['data']         json encoded
-     * @var string     $graph ['scatter']      json encoded
+     * @param User     $viewee        // studnet / learner
+     * @param User     $viewer        // user viewing the graph
+     * @param Boolean  $gradeGradient config.grade_gradient_enable
+     *
+     * @return array{info: string, assessments: string, data: string, scatter: string}
      */
-    public function buildGraph(Markbook $markbook, User $viewee): array
+    public function buildGraph(Markbook $markbook, User $viewee, User $viewer, bool $gradeGradient): array
     {
         // Get the data for the graph
         $graphInfo        = [];
@@ -177,7 +176,7 @@ class Helper
         $statistics = $markbook->getAssessmentStatistics();
 
         foreach ($markbook->getAssessments() as $assessment) {
-            if ($assessment->isFeedbackVisibleToUser($this->getUser()) && $assessment->getMarkScheme()->isQuantitative()) {
+            if ($assessment->isFeedbackVisibleToUser($viewer) && $assessment->getMarkScheme()->isQuantitative()) {
                 $graphAssessments[] = $assessment->getTitle();
 
                 $participant = $assessment->getParticipantIfExtant($viewee);
@@ -193,7 +192,7 @@ class Helper
 
                     // Set graph info value for modal
                     $comment  = null;
-                    $feedback = $participant->findAuthoritativeVisibleFeedback($this->getUser());
+                    $feedback = $participant->findAuthoritativeVisibleFeedback($viewer);
                     if ($feedback) {
                         $comment = $feedback->getComment();
                     }
@@ -201,7 +200,7 @@ class Helper
                     if (isset($humanReadableMark) || isset($comment)) {
                         $graphInfoValue = [
                             'displayMark'  => $humanReadableMark,
-                            'gradientMark' => $this->getConfigLoader()->get('grade_gradient_enable') ? (int)($normalisedMark / 10) : 'none',
+                            'gradientMark' => $gradeGradient ? (int)($normalisedMark / 10) : 'none',
                             'info'         => $comment ?? '',
                         ];
                     }
