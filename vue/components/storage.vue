@@ -36,19 +36,48 @@ export default {
                 break;
 
             case "video":
-                this.player = new this.MediaElementPlayer(this.$el);
+                this.player = new this.MediaElementPlayer(this.$el, {
+                    // If 'stretching' is set to 'auto', the video will not resize as the window resizes.
+                    // Setting 'stretching' to 'none' paradoxically allows stretching to occur.
+                    // Note that unless the height of the container is explicitly set, the height will end up as zero.
+                    stretching: "none",
+                });
 
                 let container = this.$el.closest(".mejs__container");
                 if (container) {
-                    // The two lines below:
-                    //  * Ensure the video dimensions match the container dimensions both when the video is initially
-                    //    displayed and when it is playing.
-                    //  * Ensure the video poster fills the container with the correct aspect ratio, and has black bars
-                    //    added on the top/bottom or sides if necessary instead of having a hidden part overflow the
-                    //    bounds of the container.
-                    // Documentation: https://github.com/mediaelement/mediaelement/blob/master/docs/usage.md
-                    this.player.setPlayerSize($(container).width(), $(container).height());
+                    const $container = $(container);
+                    const containerMaxH = 385;
+                    $container.css("height", containerMaxH + "px");
+                    const containerH = $container.height();
+                    const containerW = $container.width();
+
+                    // Ensure the video poster fills the container with the correct aspect ratio, and has black bars
+                    // added on the top/bottom or sides if necessary instead of having a hidden part overflow the
+                    // bounds of the container.
                     $(container).find(".mejs__poster").attr("style", "");
+
+                    // Ensure the video dimensions match the container dimensions both when the video is playing.
+                    // Documentation: https://github.com/mediaelement/mediaelement/blob/master/docs/usage.md
+                    this.player.setPlayerSize(containerW, containerH);
+
+                    // Ensure the video container adjusts in size correctly as the window size changes.
+                    // If this function is removed, downsizing the window from a large size will cause a horizontal
+                    // scrollbar to appear on the video container, and when upsizing the window from a small size, the
+                    // video will remain small as the space around it grows.
+                    const closurePlayer = this.player;
+                    const aspectRatio = containerW / containerH;
+                    $(window).resize(function () {
+                        $container.css("width", "auto");
+                        const containerW = $container.width();
+                        let containerH = Math.round(containerW / aspectRatio);
+
+                        if (containerH > containerMaxH) {
+                            containerH = containerMaxH;
+                        }
+
+                        $container.css("height", containerH + "px");
+                        closurePlayer.setPlayerSize(containerW, containerH);
+                    });
                 }
                 break;
 
