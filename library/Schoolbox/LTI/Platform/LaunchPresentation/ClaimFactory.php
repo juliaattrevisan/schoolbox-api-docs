@@ -73,5 +73,4 @@ class ClaimFactory
             $this->baseUrl->withPath($returnUrl)->__toString(),
         );
     }
-
 }
