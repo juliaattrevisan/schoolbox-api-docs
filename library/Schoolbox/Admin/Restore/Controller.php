@@ -15,8 +15,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\RecursiveUndeleter;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
-use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
-use Schoolbox\Learning\Assessment\DataModel\Model as Assessment;
+use Schoolbox\Learning\Assessment;
 
 class Controller extends Base
 {
@@ -31,28 +30,15 @@ class Controller extends Base
     public const RESTORE_WINDOW = '120';
 
     /**
-     * @var AssessmentMapper
-     */
-    private $assessmentMapper;
-
-    /**
-     * @var FolderMapper
-     */
-    private $folderMapper;
-
-
-    /**
      * Controller constructor.
      *
-     * @param FolderMapper       $folderMapper
-     * @param AssessmentMapper   $assessmentMapper
+     * @param FolderMapper                $folderMapper
+     * @param Assessment\DataModel\Mapper $assessmentMapper
      */
     public function __construct(
-        FolderMapper $folderMapper,
-        AssessmentMapper $assessmentMapper
+        private FolderMapper $folderMapper,
+        private Assessment\DataModel\Mapper $assessmentMapper
     ) {
-        $this->folderMapper = $folderMapper;
-        $this->assessmentMapper = $assessmentMapper;
     }
 
     /**
@@ -79,7 +65,7 @@ class Controller extends Base
         $deletedAssessments = $this->assessmentMapper->findByPredicates($assessmentpb->betweenDates('deleted_at', $start, $end), ['deleted' => true, 'order' => ['deleted_at' => 'DESC']]);
 
         // Filter assessments where the context is deleted, these cannot be restored
-        $deletedAssessments = $deletedAssessments->filter(function (Assessment $node) {
+        $deletedAssessments = $deletedAssessments->filter(function (Assessment\DataModel\Model $node) {
             return !$node->getAssessmentContext()->isDeleted();
         });
 
@@ -89,12 +75,12 @@ class Controller extends Base
             'deletedFolders'     => $deletedFolders,
             'deletedAssessments' => $deletedAssessments,
             'assessmentTypes'    => [
-                'dueWork'    => \Schoolbox\Learning\Assessment\DueWork\Model::getDefaultTypeName(),
-                'quiz'       => \Schoolbox\Learning\Assessment\Quiz\Model::getDefaultTypeName(),
-                'task'       => \Schoolbox\Learning\Assessment\Task\Model::getDefaultTypeName(),
-                'project'    => \Schoolbox\Learning\Assessment\Project::getDefaultTypeName(),
-                'lti'        => \Schoolbox\Learning\Assessment\Lti\Model::getDefaultTypeName(),
-                'lessonPlan' => \Schoolbox\Learning\Assessment\LessonPlan\Model::getDefaultTypeName(),
+                'dueWork'    => Assessment\DueWork\Model::getDefaultTypeName(),
+                'quiz'       => Assessment\Quiz\Model::getDefaultTypeName(),
+                'task'       => Assessment\Task\Model::getDefaultTypeName(),
+                'project'    => Assessment\Project::getDefaultTypeName(),
+                'lti'        => Assessment\Lti\Model::getDefaultTypeName(),
+                'lessonPlan' => Assessment\LessonPlan\Model::getDefaultTypeName(),
             ],
         ]));
     }
