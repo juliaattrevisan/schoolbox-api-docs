@@ -198,6 +198,8 @@ class RecursiveUndeleter
             Assessment\LessonPlan\File\Mapper::class  => 'lesson_plan_id',
             Assessment\LessonPlan\Field\Mapper::class => 'lesson_plan_id',
         ],
+        Assessment\LessonPlan\File\Mapper::class  => [],
+        Assessment\LessonPlan\Field\Mapper::class => [],
         QuizSection\Mapper::class           => [
             QuizQuestion\Mapper::class => 'section_id',
         ],
