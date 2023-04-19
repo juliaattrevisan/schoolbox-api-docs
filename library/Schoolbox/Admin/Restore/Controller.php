@@ -84,10 +84,18 @@ class Controller extends Base
         });
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@restore/index.twig', [
-            'pageCurrent' => $this->router->generate('restore.getIndex'),
-            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('restore.getIndex')),
-            'deletedFolders' => $deletedFolders,
+            'pageCurrent'        => $this->router->generate('restore.getIndex'),
+            'allBreadcrumbs'     => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('restore.getIndex')),
+            'deletedFolders'     => $deletedFolders,
             'deletedAssessments' => $deletedAssessments,
+            'assessmentTypes'    => [
+                'dueWork'    => \Schoolbox\Learning\Assessment\DueWork\Model::getDefaultTypeName(),
+                'quiz'       => \Schoolbox\Learning\Assessment\Quiz\Model::getDefaultTypeName(),
+                'task'       => \Schoolbox\Learning\Assessment\Task\Model::getDefaultTypeName(),
+                'project'    => \Schoolbox\Learning\Assessment\Project::getDefaultTypeName(),
+                'lti'        => \Schoolbox\Learning\Assessment\Lti\Model::getDefaultTypeName(),
+                'lessonPlan' => \Schoolbox\Learning\Assessment\LessonPlan\Model::getDefaultTypeName(),
+            ],
         ]));
     }
 

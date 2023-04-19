@@ -125,17 +125,24 @@
                         <tbody>
                         {% for assessment in deletedAssessments %}
                         <tr>
-
                             <td>{{ assessment.title }}</td>
-                            <td>    {% if assessment.hasProject %}
-                                    Project
+                            <td>
+                                {% set assessmentType = '' %}
+                                {% if assessment.hasProject %}
+                                    {% set assessmentType = assessmentTypes.project %}
                                 {% elseif assessment.hasTask %}
-                                    Task
+                                    {% set assessmentType = assessmentTypes.task %}
                                 {% elseif assessment.hasQuiz %}
-                                    Quiz
+                                    {% set assessmentType = assessmentTypes.quiz %}
                                 {% elseif assessment.hasDueWork %}
-                                    Due Work
-                                {% endif %}</td>
+                                    {% set assessmentType = assessmentTypes.dueWork %}
+                                {% elseif assessment.hasLtiAssessment %}
+                                    {% set assessmentType = assessmentTypes.lti %}
+                                {% elseif assessment.hasLessonPlan %}
+                                    {% set assessmentType = assessmentTypes.lessonPlan %}
+                                {% endif %}
+                                {{ assessmentType }}
+                            </td>
                             <td>{{ assessment.assessmentContext.folder.nameWithCodes }}</td>
                             <td>{{ assessment.deletedAt.long }}</td>
                             <td><span><a data-restore-assessment="{{ assessment.id }}" href="#" class="icon-upload" title="Restore"></a></span></td>
