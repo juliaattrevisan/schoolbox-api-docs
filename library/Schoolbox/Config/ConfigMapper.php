@@ -216,6 +216,7 @@ class ConfigMapper extends Mapper
     public const NAME_GROUP_STAFF_ONLY = 'group_staff_only';
 
     public const NAME_NAME_FORMAT = 'name_format';
+    public const NAME_INSTANCE_REGISTRY_URL = 'instance_registry_url';
 
     /**
      * Skin Config Fields

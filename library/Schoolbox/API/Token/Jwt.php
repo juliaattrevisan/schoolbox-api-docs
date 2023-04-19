@@ -96,11 +96,13 @@ class Jwt
         );
         return [
             'keys' => [
-                'kty' => "RSA",
-                'n'   => rtrim(strtr(base64_encode($key['rsa']['n']), '+/', '-_'), '='),
-                'e'   => rtrim(strtr(base64_encode($key['rsa']['e']), '+/', '-_'), '='),
-                'kid' => self::KEY_ID,
-                'alg' => self::SIGNING_ALGORITHM,
+                [
+                    'kty' => "RSA",
+                    'n'   => rtrim(strtr(base64_encode($key['rsa']['n']), '+/', '-_'), '='),
+                    'e'   => rtrim(strtr(base64_encode($key['rsa']['e']), '+/', '-_'), '='),
+                    'kid' => self::KEY_ID,
+                    'alg' => self::SIGNING_ALGORITHM,
+                ],
             ],
         ];
     }

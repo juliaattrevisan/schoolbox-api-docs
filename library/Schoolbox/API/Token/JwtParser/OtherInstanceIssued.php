@@ -9,12 +9,13 @@ declare(strict_types=1);
 
 namespace Schoolbox\API\Token\JwtParser;
 
-use Firebase\JWT\Key;
+use Firebase\JWT\JWK;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Help\InstanceRegistry\Mapper as InstanceRegistryMapper;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -67,17 +68,27 @@ class OtherInstanceIssued extends Base
         // the JWT can be verified.
         $unverifiedClaims = $this->decodeWithoutVerification($jwt);
         $instanceId       = $unverifiedClaims[self::CLAIM_INSTANCE_ID];
+        $client           = new Client();
         try {
-            $instanceDetails = $this->instanceRegistryMapper->findByInstanceId($instanceId);
-        } catch (MapperException $e) {
-            throw new Exception\Rejected(sprintf('Instance "%s" not registered', $instanceId), 0, $e);
+            $response = json_decode(
+                $client->get(
+                    $this->config->get(ConfigMapper::NAME_INSTANCE_REGISTRY_URL) . '/api/instances/' . $instanceId . "/jwks?toInstance=" . INSTANCE_ID
+                )
+                       ->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR
+            );
+            $jwks = json_decode($client->get($response['url'])->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
+        } catch (GuzzleException| \JsonException $e) {
+            throw new Exception\Rejected(
+                sprintf('Unable to retrieve instance details for instance ID "%s"', $instanceId),
+            );
         }
 
         // Verify the payload
         $claims = $this->decode(
             $jwt,
-            new Key($instanceDetails->getJwtPublicKey(), Jwt::SIGNING_ALGORITHM),
+            JWK::parseKeySet($jwks),
             (int)$this->config->get(ConfigMapper::NAME_JWT_LEEWAY),
+            [Jwt::SIGNING_ALGORITHM]
         );
 
         // Now the JWT is decoded and verified:
