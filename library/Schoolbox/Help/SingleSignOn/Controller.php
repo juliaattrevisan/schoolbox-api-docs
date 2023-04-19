@@ -117,8 +117,8 @@ class Controller extends Base
      */
     public function getJwks(): void
     {
-       $key = $this->tokenBuilder->getJwks();
-       $this->response->content->set($this->buildJsonOutput($key));
+        $key = $this->tokenBuilder->getJwks();
+        $this->response->content->set($this->buildJsonOutput($key));
     }
 
     /**

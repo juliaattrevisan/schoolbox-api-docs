@@ -80,7 +80,6 @@ use Schoolbox\External\Connector\Offline\Base\Sync as OfflineSync;
 use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Filter;
 use Schoolbox\Gotenberg\Client as GotenbergClient;
-use Schoolbox\Help\InstanceRegistry\Mapper as InstanceRegistryMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Instance;
 use Schoolbox\L10n\Mapper as L10nMapper;
@@ -1804,9 +1803,8 @@ abstract class Kernel
                     $httpClient             = $di->get('httpClient');
                     $userMapper             = $mapperFactory->get(UserMapper::class);
                     $tokenMapper            = $mapperFactory->get(TokenMapper::class);
-                    $instanceRegistryMapper = $mapperFactory->get(InstanceRegistryMapper::class);
                     return new JwtParser\Composite(
-                        new JwtParser\OtherInstanceIssued($userMapper, $instanceRegistryMapper, $config),
+                        new JwtParser\OtherInstanceIssued($userMapper, $config),
                         new JwtParser\SelfIssued($userMapper, $tokenMapper, $config),
                         new JwtParser\OauthProviderIssued($userMapper, $config, $httpClient),
                     );

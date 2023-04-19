@@ -26,7 +26,6 @@ use Schoolbox\Database\Factory as SchoolboxDatabaseFactory;
 use Alaress\Database\Factory as AlaressDatabaseFactory;
 use Alaress\Redis;
 use Schoolbox\File\MimetypeMapper;
-use Schoolbox\Help\InstanceRegistry\Mapper as InstanceRegistryMapper;
 use Schoolbox\Instance;
 use Schoolbox\Mapper;
 use Schoolbox\MapperFactory;
@@ -299,9 +298,8 @@ class Kernel extends WebKernelAbstract
                     $httpClient             = $di->get('httpClient');
                     $userMapper             = $mapperFactory->get(UserMapper::class);
                     $tokenMapper            = $mapperFactory->get(TokenMapper::class);
-                    $instanceRegistryMapper = $mapperFactory->get(InstanceRegistryMapper::class);
                     return new JwtParser\Composite(
-                        new JwtParser\OtherInstanceIssued($userMapper, $instanceRegistryMapper, $config),
+                        new JwtParser\OtherInstanceIssued($userMapper, $config),
                         new JwtParser\SelfIssued($userMapper, $tokenMapper, $config),
                         new JwtParser\OauthProviderIssued($userMapper, $config, $httpClient),
                     );
