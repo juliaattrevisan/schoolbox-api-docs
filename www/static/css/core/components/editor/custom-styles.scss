@@ -45,6 +45,9 @@ article {
     }
 
     table {
+        // Prevent table cells splitting, such as in the summative report...
+        border-collapse: collapse;
+        border-spacing: 0;
         margin-bottom: 1rem;
 
         th {
