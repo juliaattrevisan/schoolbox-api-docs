@@ -34,6 +34,7 @@ export function getImageSettings() {
             //     "resizeImage",
             //     "fullWidth",
             // ],
+            resizeUnit: "px",
             insert: {
                 type: "inline",
             },
@@ -43,26 +44,26 @@ export function getImageSettings() {
                     value: null,
                     icon: "original",
                 },
-                {
-                    name: "resizeImage:25",
-                    value: "25",
-                    icon: "medium",
-                },
-                {
-                    name: "resizeImage:50",
-                    value: "50",
-                    icon: "medium",
-                },
-                {
-                    name: "resizeImage:75",
-                    value: "75",
-                    icon: "large",
-                },
-                {
-                    name: "resizeImage:100",
-                    value: "100",
-                    icon: "large",
-                },
+                // {
+                //     name: "resizeImage:25",
+                //     value: "25",
+                //     icon: "medium",
+                // },
+                // {
+                //     name: "resizeImage:50",
+                //     value: "50",
+                //     icon: "medium",
+                // },
+                // {
+                //     name: "resizeImage:75",
+                //     value: "75",
+                //     icon: "large",
+                // },
+                // {
+                //     name: "resizeImage:100",
+                //     value: "100",
+                //     icon: "large",
+                // },
             ],
             styles: {
                 /**

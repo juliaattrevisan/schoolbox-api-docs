@@ -213,6 +213,12 @@
                  */
                 if ($(element).hasClass("full-width")) {
                     $(element).mediaelementplayer();
+                } else if ($(element).hasClass("image_resized")) {
+                    // console.warn($(element)[0]);
+                    console.warn($(element).parent("[data-schoolboxmedia-replacement-container]").attr("style"));
+                    $(element).mediaelementplayer({
+                        videoWidth: "50%",
+                    });
                 } else {
                     /* Video dimensions exceed the container's maxwidth setting for some reason
                      * https://github.com/mediaelement/mediaelement/issues/42
