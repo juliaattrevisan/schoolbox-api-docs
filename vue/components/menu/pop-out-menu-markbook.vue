@@ -503,7 +503,7 @@ async function onMenuItemSelected(target: string, action: string|null = null) {
         </div>
         <reveal-modal ref="excludeModalEl">
             <h2>Please confirm</h2>
-            <p>The student has submissions and/or feedback for this assessment</p>
+            <p>The student has submissions and/or feedback for this assessment.</p>
             <p>Exclusion from this assessment will remove access to these submissions and/or feedback. Proceed?</p>
             <ul class="flex-list buttons">
                 <li>
