@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Clipboard\Cli;
 
 use Schoolbox\Application\CliTool;
+use Schoolbox\Clipboard;
 
 /**
  * Encapsulated cli tool
@@ -163,20 +164,20 @@ HELP;
 
         /* Mappers
          */
-        $importLogMapper = \Schoolbox\Clipboard\Log\Mapper::getInstance();
+        $importLogMapper = Clipboard\Log\Mapper::getInstance();
 
         /* Each Clipboard Import gets its own run id
          */
-        $runId = (new \Schoolbox\Clipboard\Log\Guid())->generate();
+        $runId = (new Clipboard\Log\Guid())->generate();
 
         if ($this->getOpt(self::OPT_LONG_PARTIAL)) {
-            $scriptName = \Schoolbox\Clipboard\Log\Model::PARTIAL_SCRIPT_NAME;
+            $scriptName = Clipboard\Log\Model::PARTIAL_SCRIPT_NAME;
         } else {
-            $scriptName = \Schoolbox\Clipboard\Log\Model::FULL_SCRIPT_NAME;
+            $scriptName = Clipboard\Log\Model::FULL_SCRIPT_NAME;
         }
 
         try {
-            $composites = (new \Schoolbox\Clipboard\Factory(
+            $composites = (new Clipboard\Factory(
                 $this->getLogger(),
                 $this->perform(),
                 $lock,
