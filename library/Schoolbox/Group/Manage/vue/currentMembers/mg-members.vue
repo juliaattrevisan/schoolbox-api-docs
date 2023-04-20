@@ -39,6 +39,7 @@ const tableOptions = {
     //options for vue-tables-2: https://matanya.gitbook.io/vue-tables-2/options-api
     alwaysShowPerPageSelect: true,
     columnsClasses: {
+        name: "name-td ",
         accessType: "access-td ", //to specify a width
     },
     customFilters: [
@@ -299,9 +300,13 @@ function updateSelectedMembers() {
     margin-bottom: 0; //to put the manage-group-filters.vue up closer to the search input
 }
 
+.VueTables__table .name-td {
+    max-width: 100px; //prevent horizontal scrollbar, text does not limit itself to 100px but instead treats overflow properly until reaching 100px
+}
+
 .VueTables__table .access-td {
     padding-left: 0; //bring it inline with the right side border
-    width: 25rem; //keep the edit icon on the right side
+    width: 7.5rem; //keep the edit icon on the right side
     min-width: 7.5rem; //ensure the column is always wide enough
 }
 
