@@ -49,6 +49,8 @@ class Team implements IStrategy
 
 
     /**
+     * Constructor.
+     *
      * @param LoggerInterface                          $log
      * @param bool                                     $perform
      * @param bool                                     $partial
@@ -63,6 +65,7 @@ class Team implements IStrategy
      * @param \Schoolbox\Fixtures\Coach\Mapper         $coachMapper
      * @param \Schoolbox\Fixtures\Team\Coach\Mapper    $teamCoachMapper
      * @param UserMapper                               $userMapper
+     * @param \Schoolbox\Clipboard\Log\Mapper          $importLogMapper
      */
     public function __construct(
         private LoggerInterface $log,
@@ -78,7 +81,8 @@ class Team implements IStrategy
         private \Schoolbox\Fixtures\Team\Position\Mapper $teamPositionMapper,
         private \Schoolbox\Fixtures\Coach\Mapper $coachMapper,
         private \Schoolbox\Fixtures\Team\Coach\Mapper $teamCoachMapper,
-        private \Schoolbox\UserMapper $userMapper
+        private \Schoolbox\UserMapper $userMapper,
+        private \Schoolbox\Clipboard\Log\Mapper $importLogMapper
     ) {
         $this->divisionCodec = new Codec\Division();
     }
@@ -156,7 +160,7 @@ class Team implements IStrategy
              * Spawn an optional dependency
              */
             if ($this->partial) {
-                $updatedAfter = \Schoolbox\Clipboard\Log\Mapper::getInstance()->findNextPartialDate()->toIso8601String();
+                $updatedAfter = $this->importLogMapper->findNextPartialDate()->toIso8601String();
                 $updatedBefore = \Alaress_Date_Format::now()->toIso8601String();
 
                 $this->log->info(sprintf(

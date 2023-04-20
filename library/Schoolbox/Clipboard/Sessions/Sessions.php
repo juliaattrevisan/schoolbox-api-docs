@@ -133,6 +133,7 @@ class Sessions implements IStrategy
      * @param Mapper                             $venueMapper
      * @param \Schoolbox\Fixtures\Matchup\Mapper $matchupMapper
      * @param \Schoolbox\Fixtures\Result\Mapper  $resultMapper
+     * @param \Schoolbox\Clipboard\Log\Mapper    $importLogMapper
      */
     public function __construct(
         private LoggerInterface $log,
@@ -145,7 +146,8 @@ class Sessions implements IStrategy
         private Person $userLookup,
         private \Schoolbox\Fixtures\Venue\Mapper $venueMapper,
         private \Schoolbox\Fixtures\Matchup\Mapper $matchupMapper,
-        private \Schoolbox\Fixtures\Result\Mapper $resultMapper
+        private \Schoolbox\Fixtures\Result\Mapper $resultMapper,
+        private \Schoolbox\Clipboard\Log\Mapper $importLogMapper
     ) {
         $this->divisionCodec = new \Schoolbox\Clipboard\Hierarchy\Codec\Division();
     }
@@ -230,7 +232,7 @@ class Sessions implements IStrategy
              * Spawn an optional dependency
              */
             if ($this->partial) {
-                $updatedAfter = \Schoolbox\Clipboard\Log\Mapper::getInstance()->findNextPartialDate()->toIso8601String();
+                $updatedAfter = $this->importLogMapper->findNextPartialDate()->toIso8601String();
                 $updatedBefore = \Alaress_Date_Format::now()->toIso8601String();
 
                 $this->log->info(sprintf(

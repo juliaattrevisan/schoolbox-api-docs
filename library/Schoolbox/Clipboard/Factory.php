@@ -21,46 +21,6 @@ use Symfony\Component\Lock\LockInterface;
 class Factory
 {
     /**
-     * @var LoggerInterface
-     */
-    private LoggerInterface $log;
-
-
-    /**
-     * @var bool
-     */
-    private bool $perform;
-
-
-    /**
-     * @var LockInterface
-     */
-    private LockInterface $lock;
-
-
-    /**
-     * Clipboard host url, from the config var
-     *
-     * @var string
-     */
-    private string $host;
-
-
-    /**
-     * Clipboard authentication token, from the config var
-     *
-     * @var string
-     */
-    private string $token;
-
-
-    /**
-     * @var string
-     */
-    private string $timezone;
-
-
-    /**
      * @param LoggerInterface $log
      * @param bool            $perform
      * @param LockInterface   $lock
@@ -69,19 +29,13 @@ class Factory
      * @param string          $timezone
      */
     public function __construct(
-        LoggerInterface $log,
-        bool $perform,
-        LockInterface $lock,
-        string $host,
-        string $token,
-        string $timezone
+        private LoggerInterface $log,
+        private bool $perform,
+        private LockInterface $lock,
+        private string $host,
+        private string $token,
+        private string $timezone
     ) {
-        $this->log = $log;
-        $this->perform = $perform;
-        $this->lock = $lock;
-        $this->host = $host;
-        $this->token = $token;
-        $this->timezone = $timezone;
     }
 
 
@@ -133,6 +87,7 @@ class Factory
         $userMapper = \Schoolbox\UserMapper::getInstance();
         $coachMapper = \Schoolbox\Fixtures\Coach\Mapper::getInstance();
         $teamCoachMapper = \Schoolbox\Fixtures\Team\Coach\Mapper::getInstance();
+        $importLogMapper = \Schoolbox\Clipboard\Log\Mapper::getInstance();
 
         /* Set up a local cache for (sport, division, team) tuples
          */
@@ -186,7 +141,8 @@ class Factory
                 $teamPositionMapper,
                 $coachMapper,
                 $teamCoachMapper,
-                $userMapper
+                $userMapper,
+                $importLogMapper
             ))
             ->add(new Hierarchy\Cleanup(
                 $this->log,
@@ -234,7 +190,8 @@ class Factory
                 $userLookup,
                 $venueMapper,
                 $matchupMapper,
-                $resultMapper
+                $resultMapper,
+                $importLogMapper
             ))
             ->add(new Sessions\Cleanup(
                 $this->log,
