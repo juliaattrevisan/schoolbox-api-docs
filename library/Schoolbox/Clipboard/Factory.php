@@ -159,8 +159,8 @@ class Factory
             $bus->add(new Hierarchy\Prepare(
                 $this->log,
                 $this->perform,
-                $this->lock,
                 $partial,
+                $this->lock,
                 $seasonMapper,
                 $sportMapper,
                 $positionMapper,
@@ -175,8 +175,8 @@ class Factory
             ->add(new Hierarchy\Team(
                 $this->log,
                 $this->perform,
-                $this->lock,
                 $partial,
+                $this->lock,
                 $api,
                 $membership,
                 $registry,
@@ -191,8 +191,8 @@ class Factory
             ->add(new Hierarchy\Cleanup(
                 $this->log,
                 $this->perform,
-                $this->lock,
                 $partial,
+                $this->lock,
                 $seasonMapper,
                 $sportMapper,
                 $positionMapper,
@@ -218,16 +218,16 @@ class Factory
             $bus->add(new Sessions\Prepare(
                 $this->log,
                 $this->perform,
-                $this->lock,
                 $partial,
+                $this->lock,
                 $matchupMapper,
                 $resultMapper
             ))
             ->add(new Sessions\Sessions(
                 $this->log,
                 $this->perform,
-                $this->lock,
                 $partial,
+                $this->lock,
                 $api,
                 $this->timezone,
                 $registry,
@@ -239,8 +239,8 @@ class Factory
             ->add(new Sessions\Cleanup(
                 $this->log,
                 $this->perform,
-                $this->lock,
                 $partial,
+                $this->lock,
                 $matchupMapper,
                 $resultMapper
             ));
