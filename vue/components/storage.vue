@@ -38,28 +38,25 @@ export default {
             case "video":
                 this.player = new this.MediaElementPlayer(this.$el, {
                     // If 'stretching' is set to 'auto', the video will not resize as the window resizes.
-                    // If 'stretching' is set to 'responsive', we cannot enforce our desired maximum height, as the
+                    // If 'stretching' is set to 'responsive', we cannot enforce our desired aspect ratio, as the
                     // aspect ratio of the container will always match the aspect ratio of the video.  This is a shame,
                     // because if we used the 'responsive' mode, we wouldn't have to set up a 'resize' event handler,
                     // and resizing would be less janky.
-                    //    The reason we want to enforce a maximum height is that if we did not do this, videos recorded
-                    // in portrait aspect ratio would take up lots of vertical space, and even be too tall for some
-                    // small screens.
                     //    To get the resizing and container aspect ratio to work as we desire, we must set 'stretching'
                     // to 'none', and create our own 'resize' event handler.
-                    // Note that with 'stretching' set to 'none', unless the height of the container is explicitly set
-                    // (as it is set below), the height of the video will end up as zero.
                     // See: https://github.com/mediaelement/mediaelement/blob/master/docs/api.md
                     stretching: "none",
                 });
 
                 let container = this.$el.closest(".mejs__container");
                 if (container) {
+                    // The aspect ratio for the video container is fixed for all videos and all screen sizes.  This is
+                    // done so that portrait videos do not take up too much vertical space.  This ratio is calculated
+                    // from the default height and width of the container when the MediaPlayer 'stretching'
+                    // option is set to 'auto'.
+                    const aspectRatio = 684 / 385;
+
                     const $container = $(container);
-                    const containerMaxH = 385;
-                    $container.css("height", containerMaxH + "px");
-                    const containerH = $container.height();
-                    const containerW = $container.width();
 
                     // Ensure the video poster fills the container with the correct aspect ratio, and has black bars
                     // added on the top/bottom or sides if necessary instead of having a hidden part overflow the
@@ -68,6 +65,8 @@ export default {
 
                     // Ensure the video dimensions match the container dimensions when the video is playing.
                     // Documentation: https://github.com/mediaelement/mediaelement/blob/master/docs/usage.md
+                    const containerW = $container.width();
+                    const containerH = containerW / aspectRatio;
                     this.player.setPlayerSize(containerW, containerH);
 
                     // Ensure the video container adjusts in size correctly as the window size changes (both when it
@@ -79,15 +78,10 @@ export default {
                     //    space grows
                     //  * The video content size will not change as the window grows/shrinks.
                     const closurePlayer = this.player;
-                    const aspectRatio = containerW / containerH;
                     $(window).resize(function () {
                         $container.css("width", "auto");
                         const containerW = $container.width();
                         let containerH = Math.round(containerW / aspectRatio);
-
-                        if (containerH > containerMaxH) {
-                            containerH = containerMaxH;
-                        }
 
                         $container.css("height", containerH + "px");
                         closurePlayer.setPlayerSize(containerW, containerH);
