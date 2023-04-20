@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Clipboard\Sessions;
 
+use Alaress\Database\Predicate\InvalidColumnException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Clipboard\Hierarchy\Lookup\Person;
 use Schoolbox\Clipboard\Hierarchy\Registry;
@@ -17,6 +18,8 @@ use Schoolbox\Clipboard\IStrategy;
 use Schoolbox\Fixtures\Venue\Mapper;
 use Schoolbox\Fixtures\Venue\Model;
 use Schoolbox\Mapper\Exception;
+use Symfony\Component\Lock\Exception\LockAcquiringException;
+use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\LockInterface;
 
 /**
@@ -150,12 +153,12 @@ class Sessions implements IStrategy
 
     /**
      * @return void
+     * @throws Exception
+     * @throws InvalidColumnException
      * @throws \InvalidArgumentException
      * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
-     * @throws \Symfony\Component\Lock\Exception\LockAcquiringException
-     * @throws \Symfony\Component\Lock\Exception\LockConflictedException
+     * @throws LockAcquiringException
+     * @throws LockConflictedException
      * @throws \UnexpectedValueException
      */
     public function import(): void
@@ -205,7 +208,7 @@ class Sessions implements IStrategy
         while ($nextUrl && (null === $lastPage || $currentPage <= $lastPage) && $currentPage < self::MAX_CALLS) {
             $this->lock->refresh();
 
-            $sessions = $this->api->retrieve('GET', $endpoint, [
+            $args = [
                 'includeTeams' => 'true',
                 'includeRoundName' => 'true',
                 'includeStatuses' => ['confirmed'],
@@ -221,7 +224,26 @@ class Sessions implements IStrategy
                  */
                 'page' => $currentPage,
                 'pageLength' => self::NUM_PER_PAGE
-            ]);
+            ];
+
+            /* In Partial Mode, specify two additional datetimes
+             * Spawn an optional dependency
+             */
+            if ($this->partial) {
+                $updatedAfter = \Schoolbox\Clipboard\Log\Mapper::getInstance()->findNextPartialDate()->toIso8601String();
+                $updatedBefore = \Alaress_Date_Format::now()->toIso8601String();
+
+                $this->log->info(sprintf(
+                    'Obtaining partial updates for Sessions updated between %s and %s',
+                    $updatedAfter,
+                    $updatedBefore
+                ));
+
+                $args['updatedAfter'] = $updatedAfter;
+                $args['updatedBefore'] = $updatedBefore;
+            }
+
+            $sessions = $this->api->retrieve('GET', $endpoint, $args);
 
             /* Store metadata for custom fields: their types and their labels
              * This is to make their contents presentable in the frontend by

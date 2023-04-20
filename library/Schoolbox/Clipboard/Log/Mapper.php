@@ -93,13 +93,32 @@ class Mapper extends \Schoolbox\Mapper
 
 
     /**
-     * Fetches the most recently completed log, used to determine the start timestamp
-     * when importing in Partial mode. This mode always spans the tuple
-     * (last import time, current time)
+     * This is used to determine the next Parial Mode start timestamp
+     * This mode always spans the tuple (last import time, current time)
      *
      * First Usage.
      * If the clipboard import has never run, the table will be empty;
      * this method returns null and should be interpreted as "start of day"
+     *
+     * @return \Alaress_Date_Format
+     * @throws InvalidColumnException
+     */
+    public function findNextPartialDate(): \Alaress_Date_Format
+    {
+        $lastRunLog = $this->findLastCompleted();
+
+        /* Never run? Presume start of today
+         */
+        if (null === $lastRunLog) {
+            return \Alaress_Date_Format::now()->startOfDay();
+        }
+
+        return $lastRunLog->getFinishAt();
+    }
+
+
+    /**
+     * Fetches the most recently completed log
      *
      * @return Model|null
      * @throws InvalidColumnException
@@ -110,6 +129,7 @@ class Mapper extends \Schoolbox\Mapper
          * Broken imports won't have a finish_at
          */
         $pb = $this->getPredicateBuilder()
+            ->equals('status', Model::STATUS_COMPLETE)
             ->notNull('finish_at');
 
         return $this->findByPredicates($pb, [

@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Clipboard\Hierarchy;
 
+use Alaress\Database\Predicate\InvalidColumnException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Clipboard\Hierarchy\Lookup\Person;
 use Schoolbox\Clipboard\IApi;
@@ -91,6 +92,7 @@ class Team implements IStrategy
      * @throws Exception
      * @throws LockAcquiringException
      * @throws LockConflictedException
+     * @throws InvalidColumnException
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
@@ -140,7 +142,7 @@ class Team implements IStrategy
         while ($nextUrl && (null === $lastPage || $currentPage <= $lastPage) && $currentPage < self::MAX_CALLS) {
             $this->lock->refresh();
 
-            $teams = $this->api->retrieve('GET', $endpoint, [
+            $args = [
                 'includePositions' => 'true',
                 'includeStudents' => $includeStudents,
                 'includeStaff' => $includeStaff,
@@ -148,7 +150,26 @@ class Team implements IStrategy
                  */
                 'page' => $currentPage,
                 'pageLength' => self::NUM_PER_PAGE
-            ]);
+            ];
+
+            /* In Partial Mode, specify two additional datetimes
+             * Spawn an optional dependency
+             */
+            if ($this->partial) {
+                $updatedAfter = \Schoolbox\Clipboard\Log\Mapper::getInstance()->findNextPartialDate()->toIso8601String();
+                $updatedBefore = \Alaress_Date_Format::now()->toIso8601String();
+
+                $this->log->info(sprintf(
+                    'Obtaining partial updates for Teams updated between %s and %s',
+                    $updatedAfter,
+                    $updatedBefore
+                ));
+
+                $args['updatedAfter'] = $updatedAfter;
+                $args['updatedBefore'] = $updatedBefore;
+            }
+
+            $teams = $this->api->retrieve('GET', $endpoint, $args);
 
             foreach ($teams['data'] as $teamData) {
                 $this->lock->refresh();
