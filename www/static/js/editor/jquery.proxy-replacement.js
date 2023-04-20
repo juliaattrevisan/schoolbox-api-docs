@@ -221,7 +221,6 @@
                      *
                      * So I guess we can set it manually and explicitly here
                      */
-                    console.warn($(element).attr("width"));
                     $(element).mediaelementplayer({
                         videoWidth: $(element).attr("width"),
                         videoHeight: $(element).attr("height"),
