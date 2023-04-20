@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Resource\Browser;
 
+use Enqueue\Consumption\Exception\InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
@@ -535,10 +536,10 @@ abstract class AbstractTreeBuilder
     /**
      * Filter a collection of files to a certain mime type or multiple mime types
      * @param Collection $files
-     * @param string $mimes MIME types allowed (comma delimited) (e.g. 'image/jpeg', 'image/*', 'image/*,audio/*')
+     * @param string     $mimes MIME types allowed (comma delimited) (e.g. 'image/jpeg', 'image/*', 'image/*, audio/*')
      * @return Collection
      */
-    protected function filterMime($files, $mimes)
+    protected function filterMime(Collection $files, string $mimes): Collection
     {
         // Check if the mime filter passed is a wildcard
         if ($mimes != '*/*') {
@@ -547,13 +548,22 @@ abstract class AbstractTreeBuilder
             // Split allowed mime types
             $allowedMimes = explode(',', $mimes);
 
+            // First filter the $allowedMime strings and reject any that do not consist of two parts separated by a '/'.
+            $allowedMimes = array_filter(
+                $allowedMimes,
+                static function ($mime) {
+                    return (substr_count($mime, '/') === 1); // One separator implies two parts.
+                }
+            );
+
             // Iterate all files in the collection
             /** @var \Schoolbox\Resource\File\Model $file */
             foreach ($files as $file) {
                 if (method_exists($file, 'getMime')) {
                     $match = true;
 
-                    // Split the current file mime type into two parts
+                    // Split the current file mime type into two parts.
+                    // The mime type string will always have two parts, because of the array_filter() call above.
                     $fileMimeParts = explode("/", $file->getMime());
 
                     // Loop through each mime type allowed
@@ -563,7 +573,7 @@ abstract class AbstractTreeBuilder
 
                         // Loop twice and check both parts against each other
                         for ($i = 0; $i < 2; $i++) {
-                            // If current filter is wildcard, dont need to test
+                            // If current filter is wildcard, don't need to test
                             if ($allowedMimeParts[$i] != '*') {
                                 if (strtolower($fileMimeParts[$i] != strtolower($allowedMimeParts[$i]))) {
                                     $match = false;
