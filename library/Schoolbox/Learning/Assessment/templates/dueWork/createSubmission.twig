@@ -230,7 +230,7 @@ Data:
                      * https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent
                      * For example if we just submit a single image, they'll be no textContent
                      * and the submission will fail.
-                     * So we add a <p>&nbsp;</p> at the end of the editor's content
+                     * So we just add a new line: <p>&nbsp;</p> at the end of the editor's content
                      */
                     const editor = window.sbProps.editors['editor-body'];
                     const document = new DOMParser().parseFromString(editor.getData(), "text/html");
@@ -238,6 +238,7 @@ Data:
                     if (textContent.length === 0) {
                         editor.execute("enter");
                     }
+                    // prevent any further editing while submitting
                     editor.enableReadOnlyMode('editor-body');
                 }
                 // Disable draft autosaving
