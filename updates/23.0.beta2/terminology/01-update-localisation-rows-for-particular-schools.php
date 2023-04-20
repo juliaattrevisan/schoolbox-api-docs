@@ -216,14 +216,12 @@ HELP;
         foreach ($valueByKeyByTerm as $term => $valueByKey) {
             $statement = $dbc->executeQuery(
                 "UPDATE localisation SET
-                title=:title,
                 singular_form=:singularForm,
                 plural_form=:pluralForm,
                 capitalise_first=:capitaliseFirst,
                 indefinite_article=:indefiniteArticle
                 WHERE term=:term",
                 [
-                    'title' => $valueByKey['title'],
                     'singularForm' => $valueByKey['singular_form'],
                     'pluralForm' => $valueByKey['plural_form'],
                     'capitaliseFirst' => $valueByKey['capitalise_first'],
