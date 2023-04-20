@@ -116,6 +116,16 @@ Import Clipboard Sessions into schoolbox Matchups. This also depends on the exis
 
 Usage: php importer.php --sessions [--perform]
 
+---
+
+Partial Updates. You can import microchanges (updates, adds) by using the --partial flag.
+This obtains changes between two timestamps: the last time the importer ran in --partial mode
+and the current time. 
+
+TODO: Clipboard are still working on providing information about the nature of the updates
+so we can facilitate deletions in similar manner.
+
+
 
 HELP;
             exit;
@@ -147,7 +157,7 @@ HELP;
                 $lock,
                 (string)$this->getConfig()->get('clipboard_endpoint_host'),
                 (string)$this->getConfig()->get('clipboard_endpoint_token'),
-                (string)$this->getCOnfig()->get('date_timezone')
+                (string)$this->getConfig()->get('date_timezone')
             ))->produce(
                 $this->getOpt(self::OPT_LONG_MEMBERSHIP),
                 $this->getOpt(self::OPT_LONG_SESSIONS),
