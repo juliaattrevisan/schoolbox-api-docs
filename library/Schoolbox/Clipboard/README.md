@@ -49,3 +49,31 @@ Typically you'll want everything. To do it you can combine the flags:
 `php /usr/share/schoolbox/clipboard/importer.php --membership --sessions --perform -vvv`
 
 This is the command specified in the crontab. Alternatively you can import partially, as described in the preceding sections.
+
+## 4. Partial Updates
+
+This mode utilises `updatedBefore` and `updatedAfter` args in the two endpoints for Teams and Sessions. Partial Updates will cause Clipboard to filter their result set to Teams and Sessions that were updated or added between these two timestamps, allowing us to have a higher frequency of import.
+
+To do it, simply supply `--partial` as a flag.
+
+`php /usr/share/schoolbox/clipboard/importer.php --membership --sessions --partial --perform -vvv`
+
+In the Clipboard logs, you'll see a message like this when it's in Partial Update mode:
+
+`Obtaining partial updates for Teams updated between 2023-04-20T18:10:11+10:00 and 2023-04-20T18:34:41+10:00`
+
+### 4.1 Import Log
+
+`clipboard_import_log`, like its SUDS counterpart, remembers all the times an import runs; importantly, it knows about the last successful import. 
+
+This row's `finish_at` is used as the `updatedAfter` arg described above. `updatedBefore` is always the current datetime. This results in a Partial Update to fetch data that changed between now and the most recent successful run.
+
+> If the importer has never run before, `updatedAfter` defaults to the start of the current day.
+
+There is currently no user interface to see the contents of clipboard_import_log, but it functions identically to `sis_import_log`.
+
+### 4.2 Deletions
+
+Clipboard currently doesn't have a mechanism by which to detect when data was deleted in Clipboard. In this circumstance, the deleted thing won't come out of their API endpoints so we won't know about it.
+
+For now, Partial Updates mode should run in conjunction with the full import to address this.
