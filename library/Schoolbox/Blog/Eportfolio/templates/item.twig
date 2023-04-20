@@ -64,7 +64,7 @@
                 {{ record.getBody | purify }}
 
                 {% if images | length > 0 %}
-                    {% include '@blog/sub/imageGallery.twig' with {images: images} %}
+                    {% include '@blog/sub/imageGallery.twig' with {blogId: record.getId, images: images} %}
                 {% endif %}
             </article>
         </section>

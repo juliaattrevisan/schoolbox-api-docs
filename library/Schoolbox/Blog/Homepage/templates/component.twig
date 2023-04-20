@@ -83,7 +83,7 @@
                 <article>
                     {{ blog.getBody | purify }}
                     {% if blogImages[blog.getId] | length > 0 %}
-                        {% include '@blog/sub/imageGallery.twig' with {images: blogImages[blog.getId()]} %}
+                        {% include '@blog/sub/imageGallery.twig' with {blogId: blog.getId, images: blogImages[blog.getId()]} %}
                     {% endif %}
                     {% if blogComments[blog.getId] | length > 0 %}
                     <a id="commentCount-{{ blog.getId }}" data-interaction="showcomments" class="article-read-more" data-numcomments="{{ blogComments[blog.getId] | length }}">

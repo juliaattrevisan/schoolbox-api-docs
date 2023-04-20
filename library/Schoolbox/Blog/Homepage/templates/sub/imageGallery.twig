@@ -1,7 +1,7 @@
-<ul class="img-gallery" data-image-lightbox="lightbox">
+<ul class="img-gallery" data-image-lightbox="lightbox[blog-{{ blogId }}]">
     {% for image in images %}
         <li>
-            <a href="/storage/image.php?size=maxsize&hash={{ image.hash }}" title="" rel="lightbox">
+            <a href="/storage/image.php?size=maxsize&hash={{ image.hash }}" title="" rel="lightbox[blog-{{ blogId }}]">
                 <img src="/storage/image.php?size=square128&hash={{ image.hash }}" alt="" style="width: 128px">
             </a>
         </li>
