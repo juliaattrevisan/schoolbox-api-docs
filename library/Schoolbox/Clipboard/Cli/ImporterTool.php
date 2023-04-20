@@ -161,6 +161,20 @@ HELP;
 
         $this->getLogger()->info('Clipboard to Schoolbox Fixtures Hierarchy synchronisation.');
 
+        /* Mappers
+         */
+        $importLogMapper = \Schoolbox\Clipboard\Log\Mapper::getInstance();
+
+        /* Each Clipboard Import gets its own run id
+         */
+        $runId = (new \Schoolbox\Clipboard\Log\Guid())->generate();
+
+        if ($this->getOpt(self::OPT_LONG_PARTIAL)) {
+            $scriptName = \Schoolbox\Clipboard\Log\Model::PARTIAL_SCRIPT_NAME;
+        } else {
+            $scriptName = \Schoolbox\Clipboard\Log\Model::FULL_SCRIPT_NAME;
+        }
+
         try {
             $composites = (new \Schoolbox\Clipboard\Factory(
                 $this->getLogger(),
@@ -175,10 +189,21 @@ HELP;
                 $this->getOpt(self::OPT_LONG_PARTIAL),
             );
         } catch (\DomainException $e) {
+            /* Specifically log when you couldn't produce the recipe, then leave
+             * Anything could have caused that, so you might as well log it
+             * then throw it back out
+             */
+            $importLog = $importLogMapper->start($runId, $scriptName);
+            $importLogMapper->error($importLog, $e->getMessage());
+
             $this->getLogger()->warning($e->getMessage());
 
             return;
         }
+
+        /* Always log the start of the run
+         */
+        $importLog = $importLogMapper->start($runId, $scriptName);
 
         foreach ($composites as $composite) {
             $composite->import();
@@ -190,6 +215,18 @@ HELP;
 
             $lock->refresh();
         }
+
+        /* Augment the Factory's recipe with the finisher
+         *
+         * This way you don't have to remember doing it in every factory;
+         * you literally cannot forget to do it. It'll only log the finish
+         * if you didn't crash somewhere in the process
+         */
+        $importLogMapper->finish($importLog);
+
+        /* Trim away ancient logs
+         */
+        $importLogMapper->prune();
 
         /* Only commit changes in Perform mode
          */
