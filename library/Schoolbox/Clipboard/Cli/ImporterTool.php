@@ -166,6 +166,10 @@ HELP;
          */
         $importLogMapper = Clipboard\Log\Mapper::getInstance();
 
+        /* phpstannis
+         */
+        $importLog = null;
+
         /* Each Clipboard Import gets its own run id
          */
         $runId = (new Clipboard\Log\Guid())->generate();

@@ -135,7 +135,7 @@ class Mapper extends \Schoolbox\Mapper
         return $this->findByPredicates($pb, [
             'order' => [
                 'finish_at' => 'desc'
-            ]])?->first();
+            ]])->first();
     }
 
 
