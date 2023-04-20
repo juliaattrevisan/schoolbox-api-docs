@@ -93,7 +93,7 @@ class Mapper extends \Schoolbox\Mapper
 
 
     /**
-     * This is used to determine the next Parial Mode start timestamp
+     * This is used to determine the next Partial Mode start timestamp
      * This mode always spans the tuple (last import time, current time)
      *
      * First Usage.
