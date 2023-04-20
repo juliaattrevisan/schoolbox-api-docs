@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Clipboard;
 
+use GuzzleHttp\Exception\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\GenericCollection;
 use Symfony\Component\Lock\LockInterface;
@@ -88,14 +89,18 @@ class Factory
      * Produce the individual parts that together, import the fullness
      * of the clipboard Hierarchy
      *
+     * Partial Mode: $partial beign true superpositions partial data from endpoints
+     * without purging existing data entirely like we normally wodl
+     *
      * @param bool $membership
      * @param bool $sessions
+     * @param bool $partial
      * @return GenericCollection
      * @throws \DomainException
-     * @throws \GuzzleHttp\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      * @throws \UnexpectedValueException
      */
-    public function produce(bool $membership, bool $sessions): GenericCollection
+    public function produce(bool $membership, bool $sessions, bool $partial): GenericCollection
     {
         /* Check the required pieces existed
          */
@@ -126,7 +131,6 @@ class Factory
         $teamPositionMapper = \Schoolbox\Fixtures\Team\Position\Mapper::getInstance();
         $divisionUserMapper = \Schoolbox\Fixtures\Division\User\Mapper::getInstance();
         $userMapper = \Schoolbox\UserMapper::getInstance();
-        $teamCoachMapper = \Schoolbox\Fixtures\Team\Coach\Mapper::getInstance();
         $coachMapper = \Schoolbox\Fixtures\Coach\Mapper::getInstance();
         $teamCoachMapper = \Schoolbox\Fixtures\Team\Coach\Mapper::getInstance();
 
@@ -156,6 +160,7 @@ class Factory
                 $this->log,
                 $this->perform,
                 $this->lock,
+                $partial,
                 $seasonMapper,
                 $sportMapper,
                 $positionMapper,
@@ -171,6 +176,7 @@ class Factory
                 $this->log,
                 $this->perform,
                 $this->lock,
+                $partial,
                 $api,
                 $membership,
                 $registry,
@@ -186,6 +192,7 @@ class Factory
                 $this->log,
                 $this->perform,
                 $this->lock,
+                $partial,
                 $seasonMapper,
                 $sportMapper,
                 $positionMapper,
@@ -212,6 +219,7 @@ class Factory
                 $this->log,
                 $this->perform,
                 $this->lock,
+                $partial,
                 $matchupMapper,
                 $resultMapper
             ))
@@ -219,6 +227,7 @@ class Factory
                 $this->log,
                 $this->perform,
                 $this->lock,
+                $partial,
                 $api,
                 $this->timezone,
                 $registry,
@@ -231,6 +240,7 @@ class Factory
                 $this->log,
                 $this->perform,
                 $this->lock,
+                $partial,
                 $matchupMapper,
                 $resultMapper
             ));

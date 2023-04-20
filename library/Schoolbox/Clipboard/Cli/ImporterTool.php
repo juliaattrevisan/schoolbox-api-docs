@@ -55,6 +55,16 @@ class ImporterTool extends CliTool\App
 
 
     /**
+     * --partial
+     *
+     * Setting this flag enables Partial Update mode which lets you get changes
+     * between two timestamps (automatically calculated) instead o replacing the
+     * full population like it usually does
+     */
+    private const OPT_LONG_PARTIAL = 'partial';
+
+
+    /**
      * Lock ttl (seconds)
      *
      * Reserves this amount for every iteration,
@@ -73,6 +83,7 @@ class ImporterTool extends CliTool\App
             self::OPT_LONG_INSTANCE,
             self::OPT_LONG_MEMBERSHIP,
             self::OPT_LONG_SESSIONS,
+            self::OPT_LONG_PARTIAL
         ];
     }
 
@@ -161,6 +172,7 @@ HELP;
             ))->produce(
                 $this->getOpt(self::OPT_LONG_MEMBERSHIP),
                 $this->getOpt(self::OPT_LONG_SESSIONS),
+                $this->getOpt(self::OPT_LONG_PARTIAL),
             );
         } catch (\DomainException $e) {
             $this->getLogger()->warning($e->getMessage());
