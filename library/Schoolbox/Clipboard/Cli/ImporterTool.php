@@ -59,7 +59,7 @@ class ImporterTool extends CliTool\App
      * --partial
      *
      * Setting this flag enables Partial Update mode which lets you get changes
-     * between two timestamps (automatically calculated) instead o replacing the
+     * between two timestamps (automatically calculated) instead of replacing the
      * full population like it usually does
      */
     private const OPT_LONG_PARTIAL = 'partial';
