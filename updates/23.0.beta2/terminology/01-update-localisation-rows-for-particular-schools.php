@@ -182,7 +182,7 @@ HELP;
                 ];
                 break;
 
-            case 'shallcc':
+            case 'shalcc':
                 $valueByKeyByTerm['tutorGroup'] = [
                     'title' => 'PC Group',
                     'singular_form' => 'PC Group',
