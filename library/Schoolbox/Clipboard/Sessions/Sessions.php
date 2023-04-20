@@ -14,6 +14,7 @@ use Schoolbox\Clipboard\Hierarchy\Lookup\Person;
 use Schoolbox\Clipboard\Hierarchy\Registry;
 use Schoolbox\Clipboard\IApi;
 use Schoolbox\Clipboard\IStrategy;
+use Schoolbox\Fixtures\Venue\Mapper;
 use Schoolbox\Fixtures\Venue\Model;
 use Schoolbox\Mapper\Exception;
 use Symfony\Component\Lock\LockInterface;
@@ -110,66 +111,6 @@ class Sessions implements IStrategy
 
 
     /**
-     * @var LoggerInterface
-     */
-    private LoggerInterface $log;
-
-
-    /**
-     * @var bool
-     */
-    private bool $perform;
-
-
-    /**
-     * @var LockInterface
-     */
-    private LockInterface $lock;
-
-
-    /**
-     * @var IApi
-     */
-    private IApi $api;
-
-
-    /**
-     * @var string
-     */
-    private string $timezone;
-
-
-    /**
-     * @var Registry
-     */
-    private Registry $registry;
-
-
-    /**
-     * @var Person
-     */
-    private \Schoolbox\Clipboard\Hierarchy\Lookup\Person $userLookup;
-
-
-    /**
-     * @var \Schoolbox\Fixtures\Venue\Mapper
-     */
-    private \Schoolbox\Fixtures\Venue\Mapper $venueMapper;
-
-
-    /**
-     * @var \Schoolbox\Fixtures\Matchup\Mapper
-     */
-    private \Schoolbox\Fixtures\Matchup\Mapper $matchupMapper;
-
-
-    /**
-     * @var \Schoolbox\Fixtures\Result\Mapper
-     */
-    private \Schoolbox\Fixtures\Result\Mapper $resultMapper;
-
-
-    /**
      * @var \Schoolbox\Clipboard\Hierarchy\Codec\Division
      */
     private \Schoolbox\Clipboard\Hierarchy\Codec\Division $divisionCodec;
@@ -178,39 +119,31 @@ class Sessions implements IStrategy
     /**
      * Constructor.
      *
-     * @param LoggerInterface                       $log
-     * @param bool                                  $perform
-     * @param LockInterface                         $lock
-     * @param IApi                                  $api
-     * @param string                                $timezone
-     * @param Registry                              $registry
-     * @param Person                                $userLookup
-     * @param \Schoolbox\Fixtures\Venue\Mapper      $venueMapper
-     * @param \Schoolbox\Fixtures\Matchup\Mapper    $matchupMapper
-     * @param \Schoolbox\Fixtures\Result\Mapper     $resultMapper
+     * @param LoggerInterface                    $log
+     * @param bool                               $perform
+     * @param bool                               $partial
+     * @param LockInterface                      $lock
+     * @param IApi                               $api
+     * @param string                             $timezone
+     * @param Registry                           $registry
+     * @param Person                             $userLookup
+     * @param Mapper                             $venueMapper
+     * @param \Schoolbox\Fixtures\Matchup\Mapper $matchupMapper
+     * @param \Schoolbox\Fixtures\Result\Mapper  $resultMapper
      */
     public function __construct(
-        LoggerInterface $log,
-        bool $perform,
-        LockInterface $lock,
-        IApi $api,
-        string $timezone,
-        Registry $registry,
-        Person $userLookup,
-        \Schoolbox\Fixtures\Venue\Mapper $venueMapper,
-        \Schoolbox\Fixtures\Matchup\Mapper $matchupMapper,
-        \Schoolbox\Fixtures\Result\Mapper $resultMapper
+        private LoggerInterface $log,
+        private bool $perform,
+        private bool $partial,
+        private LockInterface $lock,
+        private IApi $api,
+        private string $timezone,
+        private Registry $registry,
+        private Person $userLookup,
+        private \Schoolbox\Fixtures\Venue\Mapper $venueMapper,
+        private \Schoolbox\Fixtures\Matchup\Mapper $matchupMapper,
+        private \Schoolbox\Fixtures\Result\Mapper $resultMapper
     ) {
-        $this->log = $log;
-        $this->perform = $perform;
-        $this->lock = $lock;
-        $this->api = $api;
-        $this->timezone = $timezone;
-        $this->registry = $registry;
-        $this->userLookup = $userLookup;
-        $this->venueMapper = $venueMapper;
-        $this->matchupMapper = $matchupMapper;
-        $this->resultMapper = $resultMapper;
         $this->divisionCodec = new \Schoolbox\Clipboard\Hierarchy\Codec\Division();
     }
 
@@ -257,7 +190,7 @@ class Sessions implements IStrategy
          * Force them to give me more datums
          */
         $startDateTime = \Alaress_Date_Format::now()->addMonths(self::FROM)->getDatabaseDate();
-        $endDateTime =  \Alaress_Date_Format::now()->addMonths(self::TO)->getDatabaseDate();
+        $endDateTime = \Alaress_Date_Format::now()->addMonths(self::TO)->getDatabaseDate();
 
         /* Bash through paginated data
          */

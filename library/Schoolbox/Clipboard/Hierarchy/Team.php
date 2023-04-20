@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Clipboard\Hierarchy;
 
-use Alaress\Database\Predicate\InvalidColumnException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Clipboard\Hierarchy\Lookup\Person;
 use Schoolbox\Clipboard\IApi;
@@ -43,84 +42,6 @@ class Team implements IStrategy
 
 
     /**
-     * @var LoggerInterface
-     */
-    private LoggerInterface $log;
-
-
-    /**
-     * @var bool
-     */
-    private bool $perform;
-
-
-    /**
-     * @var LockInterface
-     */
-    private LockInterface $lock;
-
-
-    /**
-     * @var IApi
-     */
-    private IApi $api;
-
-
-    /**
-     * @var bool
-     */
-    private bool $membership;
-
-
-    /**
-     * @var Registry
-     */
-    private Registry $registry;
-
-
-    /**
-     * @var Person
-     */
-    private Lookup\Person $userLookup;
-
-
-    /**
-     * @var \Schoolbox\Fixtures\Division\User\Mapper
-     */
-    private \Schoolbox\Fixtures\Division\User\Mapper $divisionUserMapper;
-
-
-    /**
-     * @var \Schoolbox\Fixtures\Team\Player\Mapper
-     */
-    private \Schoolbox\Fixtures\Team\Player\Mapper $teamPlayerMapper;
-
-
-    /**
-     * @var \Schoolbox\Fixtures\Team\Position\Mapper
-     */
-    private \Schoolbox\Fixtures\Team\Position\Mapper $teamPositionMapper;
-
-
-    /**
-     * @var \Schoolbox\Fixtures\Coach\Mapper
-     */
-    private \Schoolbox\Fixtures\Coach\Mapper $coachMapper;
-
-
-    /**
-     * @var \Schoolbox\Fixtures\Team\Coach\Mapper
-     */
-    private \Schoolbox\Fixtures\Team\Coach\Mapper $teamCoachMapper;
-
-
-    /**
-     * @var \Schoolbox\UserMapper
-     */
-    private \Schoolbox\UserMapper $userMapper;
-
-
-    /**
      * @var Codec\Division
      */
     private Codec\Division $divisionCodec;
@@ -129,6 +50,7 @@ class Team implements IStrategy
     /**
      * @param LoggerInterface                          $log
      * @param bool                                     $perform
+     * @param bool                                     $partial
      * @param LockInterface                            $lock
      * @param IApi                                     $api
      * @param bool                                     $membership
@@ -142,33 +64,21 @@ class Team implements IStrategy
      * @param UserMapper                               $userMapper
      */
     public function __construct(
-        LoggerInterface $log,
-        bool $perform,
-        LockInterface $lock,
-        IApi $api,
-        bool $membership,
-        Registry $registry,
-        Lookup\Person $userLookup,
-        \Schoolbox\Fixtures\Division\User\Mapper $divisionUserMapper,
-        \Schoolbox\Fixtures\Team\Player\Mapper $teamPlayerMapper,
-        \Schoolbox\Fixtures\Team\Position\Mapper $teamPositionMapper,
-        \Schoolbox\Fixtures\Coach\Mapper $coachMapper,
-        \Schoolbox\Fixtures\Team\Coach\Mapper $teamCoachMapper,
-        \Schoolbox\UserMapper $userMapper
+        private LoggerInterface $log,
+        private bool $perform,
+        private bool $partial,
+        private LockInterface $lock,
+        private IApi $api,
+        private bool $membership,
+        private Registry $registry,
+        private Lookup\Person $userLookup,
+        private \Schoolbox\Fixtures\Division\User\Mapper $divisionUserMapper,
+        private \Schoolbox\Fixtures\Team\Player\Mapper $teamPlayerMapper,
+        private \Schoolbox\Fixtures\Team\Position\Mapper $teamPositionMapper,
+        private \Schoolbox\Fixtures\Coach\Mapper $coachMapper,
+        private \Schoolbox\Fixtures\Team\Coach\Mapper $teamCoachMapper,
+        private \Schoolbox\UserMapper $userMapper
     ) {
-        $this->log = $log;
-        $this->perform = $perform;
-        $this->lock = $lock;
-        $this->api = $api;
-        $this->membership = $membership;
-        $this->registry = $registry;
-        $this->userLookup = $userLookup;
-        $this->divisionUserMapper = $divisionUserMapper;
-        $this->teamPlayerMapper = $teamPlayerMapper;
-        $this->teamPositionMapper = $teamPositionMapper;
-        $this->coachMapper = $coachMapper;
-        $this->teamCoachMapper = $teamCoachMapper;
-        $this->userMapper = $userMapper;
         $this->divisionCodec = new Codec\Division();
     }
 
