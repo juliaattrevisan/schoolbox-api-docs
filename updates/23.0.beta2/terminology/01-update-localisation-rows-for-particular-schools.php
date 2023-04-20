@@ -62,7 +62,6 @@ HELP;
         switch (strtolower($schoolCode)) {
             case 'cccl':
                 $valueByKeyByTerm['tutorGroup'] = [
-                    'title' => 'NESA Number',
                     'singular_form' => 'NESA number',
                     'plural_form' => 'NESA numbers',
                     'capitalise_first' => 1,
@@ -72,7 +71,6 @@ HELP;
 
             case 'dsfg':
                 $valueByKeyByTerm['headOfHouse'] = [
-                    'title' => 'Staff House Leader',
                     'singular_form' => 'Staff House Leader',
                     'plural_form' => 'Staff House Leaders',
                     'capitalise_first' => 1,
@@ -82,7 +80,6 @@ HELP;
 
             case 'ec':
                 $valueByKeyByTerm['tutor'] = [
-                    'title' => 'Mentor',
                     'singular_form' => 'Mentor',
                     'plural_form' => 'Mentors',
                     'capitalise_first' => 1,
@@ -92,14 +89,12 @@ HELP;
 
             case 'fct':
                 $valueByKeyByTerm['tutor'] = [
-                    'title' => 'Holme Group Teacher',
                     'singular_form' => 'Holme Group Teacher',
                     'plural_form' => 'Holme Group Teachers',
                     'capitalise_first' => 1,
                     'indefinite_article' => 'a'
                 ];
                 $valueByKeyByTerm['tutorGroup'] = [
-                    'title' => 'Holme Group',
                     'singular_form' => 'Holme Group',
                     'plural_form' => 'Holme Groups',
                     'capitalise_first' => 1,
@@ -109,14 +104,12 @@ HELP;
 
             case 'kgsl':
                 $valueByKeyByTerm['yearLevelCoordinator'] = [
-                    'title' => 'Head of Year',
                     'singular_form' => 'Head of Year',
                     'plural_form' => 'Heads of Years',
                     'capitalise_first' => 1,
                     'indefinite_article' => 'a'
                 ];
                 $valueByKeyByTerm['tutorGroup'] = [
-                    'title' => 'Dean of Wellbeing',
                     'singular_form' => 'Dean of Wellbeing',
                     'plural_form' => 'Deans of Wellbeing',
                     'capitalise_first' => 1,
@@ -126,28 +119,24 @@ HELP;
 
             case 'lk':
                 $valueByKeyByTerm['tutor'] = [
-                    'title' => 'Academic Care Coordinator',
                     'singular_form' => 'Academic Care Coordinator',
                     'plural_form' => 'Academic Care Coordinators',
                     'capitalise_first' => 1,
                     'indefinite_article' => 'an'
                 ];
                 $valueByKeyByTerm['yearLevelCoordinator'] = [
-                    'title' => 'Year Wellbeing Coordinator',
                     'singular_form' => 'Year Wellbeing Coordinator',
                     'plural_form' => 'Year Wellbeing Coordinators',
                     'capitalise_first' => 1,
                     'indefinite_article' => 'a'
                 ];
                 $valueByKeyByTerm['headOfHouse'] = [
-                    'title' => 'House Academic Care Coordinator',
                     'singular_form' => 'House Academic Care Coordinator',
                     'plural_form' => 'House Academic Care Coordinators',
                     'capitalise_first' => 1,
                     'indefinite_article' => 'a'
                 ];
                 $valueByKeyByTerm['tutorGroup'] = [
-                    'title' => 'Circle Class',
                     'singular_form' => 'Circle Class',
                     'plural_form' => 'Circle Classes',
                     'capitalise_first' => 1,
@@ -157,14 +146,12 @@ HELP;
 
             case 'newic':
                 $valueByKeyByTerm['tutor'] = [
-                    'title' => 'Mentor',
                     'singular_form' => 'Mentor',
                     'plural_form' => 'Mentors',
                     'capitalise_first' => 1,
                     'indefinite_article' => 'a'
                 ];
                 $valueByKeyByTerm['tutorGroup'] = [
-                    'title' => 'Mentor Group',
                     'singular_form' => 'Mentor Group',
                     'plural_form' => 'Mentor Groups',
                     'capitalise_first' => 1,
@@ -174,7 +161,6 @@ HELP;
 
             case 'scg':
                 $valueByKeyByTerm['tutor'] = [
-                    'title' => 'Learning Mentor',
                     'singular_form' => 'Learning Mentor',
                     'plural_form' => 'Learning Mentors',
                     'capitalise_first' => 1,
@@ -184,7 +170,6 @@ HELP;
 
             case 'shalcc':
                 $valueByKeyByTerm['tutorGroup'] = [
-                    'title' => 'PC Group',
                     'singular_form' => 'PC Group',
                     'plural_form' => 'PC Groups',
                     'capitalise_first' => 1,
@@ -194,14 +179,12 @@ HELP;
 
             case 'wsl':
                 $valueByKeyByTerm['tutor'] = [
-                    'title' => 'Connect Teacher',
                     'singular_form' => 'Connect Teacher',
                     'plural_form' => 'Connect Teachers',
                     'capitalise_first' => 1,
                     'indefinite_article' => 'a'
                 ];
                 $valueByKeyByTerm['tutorGroup'] = [
-                    'title' => 'Connect Group',
                     'singular_form' => 'Connect Group',
                     'plural_form' => 'Connect Groups',
                     'capitalise_first' => 1,
@@ -231,17 +214,17 @@ HELP;
             );
 
             $nRowsAffected = $statement->rowCount();
-            $title = $valueByKey['title'];
+            $termValue = $valueByKey['singular_form'];
 
             switch ($nRowsAffected) {
                 case 0:
-                    $logger->info("No rows affected when trying to update '$term' to '$title'.  Probably already updated.\n");
+                    $logger->info("No rows affected when trying to update '$term' to '$termValue'.  Probably already updated.\n");
                     break;
                 case 1:
-                    $logger->info("Updated '$term' to '$title'.");
+                    $logger->info("Updated '$term' to '$termValue'.");
                     break;
                 default:
-                    $logger->info("Updated '$term' to '$title', but multiple rows affected.  Not good.\n");
+                    $logger->info("Updated '$term' to '$termValue', but multiple rows affected.  Not good.\n");
                     break;
             }
         }
