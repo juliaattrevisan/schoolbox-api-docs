@@ -812,8 +812,10 @@ class Controller extends ConfigController
         if ($optionsPayload['class']['cohort']) {
             foreach ($markbooks as $folderId => $markbook) {
                 $graph  = [];
+                $graphType = '';
                 $folder = $folders->getBy('id', $folderId);
                 if ((new ValidUseCohortMarks())->isSatisfiedBy($this->getConfigLoader()->get('lms_cohort_comparison'), $folder)) {
+                    $graphType = 'cohort';
                     $graph = (new ClassResults(
                         $this->getConfigLoader()->get('grade_gradient_enable'),
                         $this->assessmentMapperProxy,
@@ -822,9 +824,13 @@ class Controller extends ConfigController
                         $term,
                     ))->collate($viewer);
                 } else {
+                    $graphType = 'cohort';
                     $graph = $gradeHelper->buildGraph($markbook, $student, $viewer, $this->getConfigLoader()->get('grade_gradient_enable'));
                 }
-                $allGraphs[$folderId] = $graph;
+                $allGraphs[$folderId] = [
+                    'graph' => $graph,
+                    'type'  => $graphType,
+                ];
             }
         }
 
