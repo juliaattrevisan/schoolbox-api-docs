@@ -57,7 +57,7 @@
                      # create and update phases in mapperProxy->save()
                      #}
                     <input type="hidden" name="field[{{ field.id }}][template]" value="{{ field.lessonPlanTemplateField.id }}" />
-                    <textarea id="field-body-{{ field.id }}" name="field[{{ field.id }}][body]" data-cke>{{ field.body }}</textarea>
+                    <textarea id="field-body-{{ field.id }}" name="field[{{ field.id }}][body]" data-ckeditor>{{ field.body }}</textarea>
                 </div>
             </div>
         {% endfor %}
@@ -80,7 +80,7 @@
                          # create and update phases in mapperProxy->save()
                          #}
                         <input type="hidden" name="field[{{ newFieldIdentifier }}][template]" value="{{ field.id }}" />
-                        <textarea id="field-body-{{ newFieldIdentifier }}" name="field[{{ newFieldIdentifier }}][body]" data-cke>{{ field.body }}</textarea>
+                        <textarea id="field-body-{{ newFieldIdentifier }}" name="field[{{ newFieldIdentifier }}][body]" data-ckeditor>{{ field.body }}</textarea>
                     </div>
                 </div>
             {% endif %}
@@ -167,7 +167,7 @@
      */
     document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
         detail: {
-            targetElements: ['[data-cke]'],
+            targetElements: ['[data-ckeditor]'],
             fileBrowserCategoryId: {{ context.baseContext.folder.id ?? 0 }},
         }
     }));

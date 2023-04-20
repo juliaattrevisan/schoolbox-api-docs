@@ -72,6 +72,22 @@ function onCreate(event: CustomEvent) {
     targetElements.forEach((targetElement) => {
         // assume that each targetElement could contain multiple instances
         document.querySelectorAll(targetElement).forEach((sourceElement) => {
+            // Sometimes the targetElement selector may match elements that are not intended for a CKEditor,
+            // for example, if "[data-cke]" is used, it will match the CKEditor <style> element,
+            // this results in a sanitized style element, breaking various editor styles.
+            //
+            // To solve this, we check that the element is within the set of allowed CKEditor elements
+            const allowedElements = [
+                "TEXTAREA",
+                "DIV",
+                "ARTICLE",
+            ]
+            if (!allowedElements.includes(sourceElement.tagName.toUpperCase())) {
+                console.warn(`CKEditor: Element "${sourceElement.tagName}" is not allowed to be replaced by CKEditor.`
+                             + ` Targeted element by selector "${targetElement}":`, sourceElement);
+                return;
+            }
+
             initCheckData(sourceElement as HTMLElement, config);
             create(sourceElement as HTMLElement, config);
         });
