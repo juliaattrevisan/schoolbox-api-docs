@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Clipboard\Log;
 
+use Alaress\Database\Predicate\InvalidColumnException;
 use Schoolbox\GenericCollection;
 
 /**
@@ -88,6 +89,33 @@ class Mapper extends \Schoolbox\Mapper
         }
 
         return $stack;
+    }
+
+
+    /**
+     * Fetches the most recently completed log, used to determine the start timestamp
+     * when importing in Partial mode. This mode always spans the tuple
+     * (last import time, current time)
+     *
+     * First Usage.
+     * If the clipboard import has never run, the table will be empty;
+     * this method returns null and should be interpreted as "start of day"
+     *
+     * @return Model|null
+     * @throws InvalidColumnException
+     */
+    public function findLastCompleted(): ?Model
+    {
+        /* Find the import that most recently successfully completed
+         * Broken imports won't have a finish_at
+         */
+        $pb = $this->getPredicateBuilder()
+            ->notNull('finish_at');
+
+        return $this->findByPredicates($pb, [
+            'order' => [
+                'finish_at' => 'desc'
+            ]])?->first();
     }
 
 
