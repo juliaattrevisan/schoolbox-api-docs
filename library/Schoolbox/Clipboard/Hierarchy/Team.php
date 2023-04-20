@@ -157,7 +157,6 @@ class Team implements IStrategy
             ];
 
             /* In Partial Mode, specify two additional datetimes
-             * Spawn an optional dependency
              */
             if ($this->partial) {
                 $updatedAfter = $this->importLogMapper->findNextPartialDate()->toIso8601String();
