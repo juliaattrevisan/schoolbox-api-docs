@@ -77,15 +77,16 @@
                 {% if blogImages[blog.getId] | length > 0 %}
                     {% include '@blog/sub/imageGallery.twig' with {images: blogImages[blog.getId()]} %}
                 {% endif %}
+                <div>
+                    {% if blogComments[blog.getId] | length > 0 %}
+                        <a id="commentCount-{{ blog.getId }}" data-interaction="showcomments" class="article-read-more" data-numcomments="{{ blogComments[blog.getId] | length }}">
+                            Show Comments ({{ blogComments[blog.getId] | length }})
+                        </a>
+                        <span class="pipe meta"></span>
+                    {% endif %}
 
-                {% if blogComments[blog.getId] | length > 0 %}
-                    <a id="commentCount-{{ blog.getId }}" data-interaction="showcomments" class="article-read-more" data-numcomments="{{ blogComments[blog.getId] | length }}">
-                        Show Comments ({{ blogComments[blog.getId] | length }})
-                    </a>
-                    <span class="pipe meta"></span>
-                {% endif %}
-
-                <a data-toggle="commentform-{{ blog.getId }}" class='article-read-more'>Add comment</a>
+                    <a data-toggle="commentform-{{ blog.getId }}" class='article-read-more'>Add comment</a>
+                </div>
             </article>
             <div class="discussion">
                 <ul class="information-list" id="blogComment_{{ blog.getId }}">
