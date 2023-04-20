@@ -158,7 +158,9 @@ article {
     &-sticky-note,
     &-construction,
     &-code-block {
-        //max-width: fit-content;
+        // Make our background colours / properties appear when printed.
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
         word-break: break-word;
     }
 

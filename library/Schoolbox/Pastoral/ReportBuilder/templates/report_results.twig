@@ -1,5 +1,6 @@
 {% import '@pastoral/macros/profile.twig' as profile %}
 
+<link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/core/schoolbox-ck-content.css?v={{ config.site_version }}"/>
 <ul class="breadcrumb hide-on-print">
     <li><a href="{{ routeLookup('pastoral.getIndex') }}">{{ locale.pastoralCare.proper }}</a></li>
     <li><a href="{{ routeLookup('pastoralReportBuilder.getIndex') }}">Reports</a></li>
