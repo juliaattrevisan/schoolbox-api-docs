@@ -14,7 +14,6 @@ namespace Schoolbox\Clipboard\Log;
  */
 class Guid
 {
-
     /**
      * Generate a microsofty style guid
      *
