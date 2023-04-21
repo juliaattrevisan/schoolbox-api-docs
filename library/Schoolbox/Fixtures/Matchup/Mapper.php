@@ -63,6 +63,7 @@ class Mapper extends BaseMapper
         $this->joins('home_school_id', SchoolMapper::class, 'id', null, null, 'homeSchool', 'home_school');
         $this->joins('away_school_id', SchoolMapper::class, 'id', null, null, 'awaySchool', 'away_school');
         $this->uses('notes', self::TYPE_STRING);
+        $this->uses('external_id', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);

@@ -231,7 +231,7 @@ class Sessions implements IStrategy
             /* In Partial Mode, specify two additional datetimes
              */
             if ($this->partial) {
-                $updatedAfter = $this->importLogMapper->findNextPartialDate()->toIso8601String();
+                $updatedAfter = $this->importLogMapper->findNextPartialDate()->addHours(-11)->toIso8601String();
                 $updatedBefore = \Alaress_Date_Format::now()->toIso8601String();
 
                 $this->log->info(sprintf(
@@ -352,15 +352,10 @@ class Sessions implements IStrategy
                     /* See if this matchup exists by taking the bestest guess,
                      * then update its Notes in case it changed somehow in Clipboard
                      */
+                    $matchId = $session['id'];
+
                     try {
-                        $matchup = $this->matchupMapper->findOneByColumnList([
-                            'name' => $matchupName,
-                            'division_id' => $division->getId(),
-                            'season_id' => $season->getId(),
-                            'home_team_id' => $team->getId(),
-                            'start_at' => $startAt->getDatabase(),
-                            'finish_at' => $finishAt->getDatabase(),
-                        ]);
+                        $matchup = $this->matchupMapper->findOneByColumn('external_id', $matchId);
 
                         $this->log->debug(sprintf(
                             'Updating matchup %s on %s, at venue %s',
@@ -368,23 +363,37 @@ class Sessions implements IStrategy
                             $matchup->getStartAt()->getDatabase(),
                             null === $matchup->getVenue() ? self::UNSPECIFIED_LOCATION : $matchup->getVenue()->getName()
                         ));
-                    } catch (\Schoolbox\Mapper\Exception $e) {
-                        $matchup = $this->matchupMapper->createModel()
-                            ->setName($matchupName)
-                            ->setSeason($season)
-                            ->setDivision($division)
-                            ->setVenue($venue)
-                            ->setHomeTeam($team)
-                            ->setStartAt($startAt)
-                            ->setFinishAt($finishAt);
 
-                        $this->log->debug(sprintf(
-                            'Creating matchup %s on %s, at venue %s',
-                            $matchup->getDisplayName(),
-                            $matchup->getStartAt()->getDatabase(),
-                            null === $matchup->getVenue() ? self::UNSPECIFIED_LOCATION : $matchup->getVenue()->getName()
-                        ));
+                        $action = 'Updating';
+                    } catch (\Schoolbox\Mapper\Exception $e) {
+                        $action = 'Creating';
+
+                        $matchup = $this->matchupMapper->createModel()
+                            ->setExternalId((string)$matchId);
                     }
+
+                    /* You just can't tell what might have caused this to appear here
+                     *
+                     * TODO: Perhaps do a more surgical diff to avoid the SUDS-like
+                     *  indexing problem when we change too many columns, but Clipboard
+                     *  data is a far smaller footprint than SUDS
+                     */
+                    $matchup
+                        ->setName($matchupName)
+                        ->setSeason($season)
+                        ->setDivision($division)
+                        ->setVenue($venue)
+                        ->setHomeTeam($team)
+                        ->setStartAt($startAt)
+                        ->setFinishAt($finishAt);
+
+                    $this->log->debug(sprintf(
+                        '%s matchup %s on %s, at venue %s',
+                        $action,
+                        $matchup->getDisplayName(),
+                        $matchup->getStartAt()->getDatabase(),
+                        null === $matchup->getVenue() ? self::UNSPECIFIED_LOCATION : $matchup->getVenue()->getName()
+                    ));
 
                     /* Event description contains some data that could be updated in Clipboard,
                      * forcing us to update the $notes every time. We can't skip over matchups

@@ -27,3 +27,6 @@ ALTER TABLE `sportsfixtures_team`
 
 ALTER TABLE `sportsfixtures_position`
     ADD COLUMN `external_id` VARCHAR(255) NULL DEFAULT NULL AFTER `name`;
+
+ALTER TABLE `sportsfixtures_match`
+    ADD COLUMN `external_id` VARCHAR(255) NULL DEFAULT NULL AFTER `notes`;
