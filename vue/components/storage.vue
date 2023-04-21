@@ -51,10 +51,8 @@ export default {
                 let container = this.$el.closest(".mejs__container");
                 if (container) {
                     // The aspect ratio for the video container is fixed for all videos and all screen sizes.  This is
-                    // done so that portrait videos do not take up too much vertical space.  This ratio is calculated
-                    // from the default height and width of the container when the MediaPlayer 'stretching'
-                    // option is set to 'auto'.
-                    const aspectRatio = 684 / 385;
+                    // done so that portrait videos do not take up too much vertical space.
+                    const aspectRatio = 16 / 9;
 
                     const $container = $(container);
 
@@ -86,6 +84,8 @@ export default {
                         $container.css("height", containerH + "px");
                         closurePlayer.setPlayerSize(containerW, containerH);
                     });
+                } else {
+                    console.info("storage.vue - Not container");
                 }
                 break;
 
