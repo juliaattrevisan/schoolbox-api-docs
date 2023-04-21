@@ -482,6 +482,20 @@ class Registry
                     $position->getName(),
                     $sport->getName()
                 ));
+
+                /* Detect renames
+                 */
+                if ($positionName !== $position->getName()) {
+                    $this->log->debug(sprintf(
+                        'Renaming existing position %s (%s) to %s in sport %s',
+                        $position->getName(),
+                        $position->getExternalId(),
+                        $positionName,
+                        $sport->getName()
+                    ));
+
+                    $position->setName($positionName);
+                }
             } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
                 /* Resurrect it from a previously soft-deleted state
                  * if it was previously imported from clipboard,
