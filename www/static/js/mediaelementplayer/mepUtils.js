@@ -1,17 +1,24 @@
 /**
  * Return a config object with default Schoolbox options set.
+ *
+ * Usage:
+ *    import * as mepUtils from 'mepUtils.js';
+ *    let mePlayer = new MediaElementPlayer(htmlElement, mepUtils.getConfig());
  */
-export function getMediaElementPlayerConfig(overrideValueByKey) {
+export function getConfig(overrideValueByKey) {
     let config = {
-        // If 'stretching' is set to 'auto', the video will not resize as the window resizes.
-        // If 'stretching' is set to 'responsive', we cannot enforce our desired aspect ratio, as the
-        // aspect ratio of the container will always match the aspect ratio of the video.  This is a shame,
-        // because if we used the 'responsive' mode, we wouldn't have to set up a 'resize' event handler,
-        // and resizing would be less janky.
-        //    To get the resizing and container aspect ratio to work as we desire, we must set 'stretching'
-        // to 'none', and create our own 'resize' event handler.
-        // See: https://github.com/mediaelement/mediaelement/blob/master/docs/api.md
+        /**
+         * If 'stretching' is set to 'auto', the video will not resize as the window resizes.
+         * If 'stretching' is set to 'responsive', we cannot enforce our desired aspect ratio, as the
+         * aspect ratio of the container will always match the aspect ratio of the video.  This is a shame,
+         * because if we used the 'responsive' mode, we wouldn't have to set up a 'resize' event handler,
+         * and resizing would be less janky.
+         *    To get the resizing and container aspect ratio to work as we desire, we must set 'stretching'
+         * to 'none', and create our own 'resize' event handler.
+         * See: https://github.com/mediaelement/mediaelement/blob/master/docs/api.md
+         */
         stretching: "none",
+
         /**
          * @param media - the <mediaelementwrapper> DOM node (contains the <video> node)
          * @param node - the <video> DOM node
@@ -63,7 +70,6 @@ export function getMediaElementPlayerConfig(overrideValueByKey) {
     if (overrideValueByKey !== undefined) {
         config = Object.assign(config, overrideValueByKey);
     }
-    console.info("config: ", config);
 
     return config;
 }
