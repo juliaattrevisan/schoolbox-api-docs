@@ -218,9 +218,23 @@ class Registry
                 $sport = $this->sportMapper->findOneByColumn('external_id', $teamActivityId);
 
                 $this->log->debug(sprintf(
-                    'Reusing existing sport %s',
-                    $sport->getName()
+                    'Reusing existing sport %s (%s)',
+                    $sport->getName(),
+                    $sport->getExternalId()
                 ));
+
+                /* Detect renames
+                 */
+                if ($sportName !== $sport->getName()) {
+                    $this->log->debug(sprintf(
+                    'Renaming existing sport %s (%s) to %s',
+                        $sport->getName(),
+                        $sport->getExternalId(),
+                        $sportName
+                    ));
+
+                    $sport->setName($sportName);
+                }
             } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
                 /* Resurrect it from a previously soft-deleted state
                  * if it was previously imported from clipboard,
