@@ -303,6 +303,20 @@ class Registry
                     $division->getName(),
                     $sport->getName()
                 ));
+
+                /* Detect renames
+                 */
+                if ($divisionName !== $division->getName()) {
+                    $this->log->debug(sprintf(
+                    'Renaming existing division %s (%s) to %s in sport %s',
+                        $division->getName(),
+                        $division->getExternalId(),
+                        $divisionName,
+                        $sport->getName()
+                    ));
+
+                    $division->setName($divisionName);
+                }
             } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
                 /* Resurrect it from a previously soft-deleted state
                  * if it was previously imported from clipboard,
