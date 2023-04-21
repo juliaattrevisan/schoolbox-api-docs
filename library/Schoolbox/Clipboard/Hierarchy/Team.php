@@ -188,13 +188,24 @@ class Team implements IStrategy
 
                 /* Division identifiers
                  */
+                $teamCategoryId = $teamData['category']['id'] ?? '';
                 $teamCategory = $teamData['category']['name'] ?? '';
+                $teamSubcategoryId = $teamData['subcategory']['id'] ?? '';
                 $teamSubcategory = $teamData['subcategory']['name'] ?? '';
 
                 /* Team identifiers
                  */
                 $teamId = (int)$teamData['id'];
                 $teamName = $teamData['name'];
+
+                /* Assemble a proxy representation of a "division" which is an amalgamation
+                 * of Clipboard categories' and Clipboard subcategories' ids. This is synonymous
+                 * with encoding a division name, just with ids, and results in same format.
+                 *
+                 * Division external id defaults to the activity name when both category and
+                 * subcategory weren't specified.
+                 */
+                $divisionId = $this->divisionCodec->encode((string)$teamCategoryId, (string)$teamSubcategoryId, $teamActivity);
 
                 /* Try to manufacture a division title
                  */
@@ -214,7 +225,7 @@ class Team implements IStrategy
 
                 /* Try to spawn a corresponding Division instance
                  */
-                $division = $this->registry->recallDivision($season, $teamActivityId, $sport, $divisionName);
+                $division = $this->registry->recallDivision($season, $teamActivityId, $sport, $divisionId, $divisionName);
 
                 /* Try to spawn a corresponding Team instance
                  * $teamId is used later to figure out who vs who, when importing Matchups
