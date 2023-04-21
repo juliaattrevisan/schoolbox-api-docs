@@ -38,7 +38,7 @@
                                             <div class="card small-12">
                                                 {% set createRoute = routeLookup('learningAssessment.getCreateAssessmentForm', { contextType: contextType, contextId: context.id, context: context }) ~ '?lpt=' ~ recentLessonPlanTemplate.id ~ '&type=' ~ lessonPlanMeta.type ~ '&returnUrl=' ~ returnUrl %}
 
-                                                <a href="{{ createRoute }}"><h3>{{ recentLessonPlanTemplate.title }}</h3></a>
+                                                <a data-reveal-id="lpt-preview-{{ recentLessonPlanTemplate.id }}" title="Preview this template"><h3>{{ recentLessonPlanTemplate.title }}</h3></a>
                                                 <p class="meta">
                                                     Last modified by
                                                     {% if recentLessonPlanTemplate.updatedBy.deleted %}
@@ -52,7 +52,7 @@
                                             </div>
                                         </div>
                                         <nav>
-                                            <a class="icon-view" data-reveal-id="lpt-preview-{{ recentLessonPlanTemplate.id }}"></a>
+                                            <a class="icon-next" href="{{ createRoute }}" title="Use this template"></a>
                                         </nav>
                                     </li>
                                 {% endfor %}
@@ -82,7 +82,7 @@
                                             <div class="card small-12">
                                                 {% set createRoute = routeLookup('learningAssessment.getCreateAssessmentForm', { contextType: contextType, contextId: context.id, context: context }) ~ '?lpt=' ~ lessonPlanTemplate.id ~ '&type=' ~ lessonPlanMeta.type ~ '&returnUrl=' ~ returnUrl %}
 
-                                                <a href="{{ createRoute }}"><h3>{{ lessonPlanTemplate.title }}</h3></a>
+                                                <a data-reveal-id="lpt-preview-{{ lessonPlanTemplate.id }}" title="Preview this template"><h3>{{ lessonPlanTemplate.title }}</h3></a>
                                                 <p class="meta">
                                                     Last modified by
                                                     {% if lessonPlanTemplate.updatedBy.deleted %}
@@ -96,7 +96,7 @@
                                             </div>
                                         </div>
                                         <nav>
-                                            <a class="icon-view" data-reveal-id="lpt-preview-{{ lessonPlanTemplate.id }}"></a>
+                                            <a class="icon-next" href="{{ createRoute }}" title="Use this template"></a>
                                         </nav>
                                     </li>
                                 {% endfor %}
@@ -112,8 +112,7 @@
                 <div class="empty-state">
                     <i class="icon-lesson-plan"></i>
                     <p>
-                        There are no available lesson plan templates. If you expect to find some here, please contact
-                        a user with administration privileges at your school for assistance.
+                        There are no available lesson plan templates. Please contact a Superuser at your school if you wish to use Lesson Plans, as you will require a template
                     </p>
                 </div>
             </div>
