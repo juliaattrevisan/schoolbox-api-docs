@@ -1,3 +1,5 @@
+-- Remember when imports ran
+
 CREATE TABLE `clipboard_import_log` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `run_id` VARCHAR(255) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NOT NULL,
@@ -12,3 +14,16 @@ CREATE TABLE `clipboard_import_log` (
     DEFAULT CHARACTER SET = utf8mb4
     COLLATE = utf8mb4_unicode_ci;
 
+-- Record external ids (clipboard ids) of stuff that could be renamed
+
+ALTER TABLE `sportsfixtures_sport`
+    ADD COLUMN `external_id` VARCHAR(255) NULL DEFAULT NULL AFTER `url`;
+
+ALTER TABLE `sportsfixtures_division`
+    ADD COLUMN `external_id` VARCHAR(255) NULL DEFAULT NULL AFTER `url`;
+
+ALTER TABLE `sportsfixtures_team`
+    ADD COLUMN `external_id` VARCHAR(255) NULL DEFAULT NULL AFTER `url`;
+
+ALTER TABLE `sportsfixtures_position`
+    ADD COLUMN `external_id` VARCHAR(255) NULL DEFAULT NULL AFTER `name`;

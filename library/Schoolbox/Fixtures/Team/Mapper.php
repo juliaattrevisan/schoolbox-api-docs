@@ -41,6 +41,7 @@ class Mapper extends BaseMapper
         $this->joins('division_id', Division\Mapper::class, 'id', null, null, 'division', 'division');
         $this->uses('name', self::TYPE_STRING);
         $this->uses('url', self::TYPE_STRING);
+        $this->uses('external_id', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
