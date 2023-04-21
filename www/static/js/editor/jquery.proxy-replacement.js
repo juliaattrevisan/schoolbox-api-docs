@@ -209,10 +209,6 @@
         $(selector)
             .find("[data-schoolboxmedia-replacement]")
             .each(function (index, element) {
-                // The aspect ratio for the video container is fixed for all videos and all screen sizes.  This is
-                // done so that portrait videos do not take up too much vertical space.
-                const aspectRatio = 16 / 9;
-
                 $(element).mediaelementplayer({
                     // If 'stretching' is set to 'auto', the video will not resize as the window resizes.
                     // If 'stretching' is set to 'responsive', we cannot enforce our desired aspect ratio, as the
@@ -224,6 +220,10 @@
                     // See: https://github.com/mediaelement/mediaelement/blob/master/docs/api.md
                     stretching: "none",
                     success: function (media, node, instance) {
+                        // The aspect ratio for the video container is fixed for all videos and all screen sizes.  This is
+                        // done so that portrait videos do not take up too much vertical space.
+                        const aspectRatio = 16 / 9;
+
                         let container = $(node).closest(".mejs__container");
 
                         if (container) {
