@@ -211,7 +211,7 @@ import * as mepUtils from "/www/static/js/mediaelementplayer/mepUtils.js";
         $(selector)
             .find("[data-schoolboxmedia-replacement]")
             .each(function (index, element) {
-                $(element).mediaelementplayer(mepUtils.getConfig());
+                $(element).mediaelementplayer(mepUtils.getConfigForVideo());
             });
     };
 })(jQuery);

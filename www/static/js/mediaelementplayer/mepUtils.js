@@ -5,7 +5,7 @@
  *    import * as mepUtils from 'mepUtils.js';
  *    let mePlayer = new MediaElementPlayer(htmlElement, mepUtils.getConfig());
  */
-export function getConfig(overrideValueByKey) {
+export function getConfigForVideo(overrideValueByKey) {
     let config = {
         /**
          * If 'stretching' is set to 'auto', the video will not resize as the window resizes.

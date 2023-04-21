@@ -37,7 +37,7 @@ export default {
                 break;
 
             case "video":
-                this.player = new this.MediaElementPlayer(this.$el, mepUtils.getConfig());
+                this.player = new this.MediaElementPlayer(this.$el, mepUtils.getConfigForVideo());
                 break;
 
             default:
