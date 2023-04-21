@@ -145,7 +145,8 @@ async function addSearchNote() {
     const searchNote = document.createElement("p");
     searchNote.classList.add("meta");
     searchNote.style.marginTop = "0.25rem";
-    searchNote.innerText = "The Group can be searched by name, " + store.yearLevelLabel + ", house, campus, role or access.";
+    searchNote.innerText =
+        "The group can be searched by name, " + store.yearLevelLabel + ", house, campus, role or access.";
     const searchInput = document.querySelector(".VueTables__search__input"); //safe to assume only one, despite class selection
     searchInput.parentElement.appendChild(searchNote);
 }
