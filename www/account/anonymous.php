@@ -1,6 +1,7 @@
 <?php
 
 use Schoolbox\Auth\Remember\Remember;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
@@ -9,17 +10,32 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 $page = $kernel->get('sitePage');
 
 $internalUrl = $_GET['page'] ?: '/';
-if (Config::get('login_anonymous') && !$_SESSION['user']) {
-    $anonymousUsername = Config::get('login_anonymous');
-    $session           = new \Session();
-    $session->create($anonymousUsername);
+$url = new Url($internalUrl);
 
-    // Remember the anonymous login
-    /** @var Remember $rememberer */
-    $rememberer = $kernel->get('session.rememberer');
-    $rememberer->rememberUsername($anonymousUsername, Remember::DEFAULT_EXPIRY);
+// if feature is not enabled, error
+if (Config::get('login_anonymous')) {
+// Only allow redirects to this site's URLs
+    if ($url->isLocalUrl()) {
+        //if no user session exists, create it
+        if (!$_SESSION['user']) {
+            $anonymousUsername = Config::get('login_anonymous');
+            $session           = new \Session();
+            $session->create($anonymousUsername);
 
-    $page->localRedir($internalUrl);
+            // Remember the anonymous login
+            /** @var Remember $rememberer */
+            $rememberer = $kernel->get('session.rememberer');
+            $rememberer->rememberUsername($anonymousUsername, Remember::DEFAULT_EXPIRY);
+
+            $page->localRedir($internalUrl);
+        } else {
+            //user has a session, just redirect
+            $page->localRedir($internalUrl);
+        }
+    } else {
+        // invalid redirect url supplied, throwing errors
+        throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+    }
 } else {
-    $page->localRedir($internalUrl);
+    throw new \Schoolbox\Mapper\Exception\NotFound();
 }
