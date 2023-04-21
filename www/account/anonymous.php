@@ -9,7 +9,7 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 /** @var SitePage $page */
 $page = $kernel->get('sitePage');
 
-$internalUrl = $_GET['page'] ?: '/';
+$internalUrl = $_GET['page'] ?? '/';
 $url = new Url($internalUrl);
 
 // if feature is not enabled, error
