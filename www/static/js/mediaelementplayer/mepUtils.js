@@ -30,21 +30,21 @@ export function getConfigForVideo(overrideValueByKey) {
             const aspectRatio = 16 / 9;
 
             // This is the container for all mejs nodes (including <mediaelementwrapper>).
-            const $container = $(node).closest(".mejs__container");
+            const container = node.closest(".mejs__container");
 
-            if ($(node).hasClass("full-width")) {
-                $(node).css("width", "100%");
-                $container.css("height", Math.round($container.width() / aspectRatio) + "px");
+            if (node.classList.contains("full-width")) {
+                node.style.width = "100%";
+                container.style.height = Math.round(container.getBoundingClientRect().width / aspectRatio) + "px";
             }
 
             // Ensure the video poster fills the container with the correct aspect ratio, and has black bars
             // added on the top/bottom or sides if necessary instead of having a hidden part overflow the
             // bounds of the container.
-            $container.find(".mejs__poster").attr("style", "");
+            const div = container.querySelector(".mejs__poster").removeAttribute("style");
 
             // Ensure the video dimensions match the container dimensions when the video is playing.
             // Documentation: https://github.com/mediaelement/mediaelement/blob/master/docs/usage.md
-            const containerW = $container.width();
+            const containerW = container.getBoundingClientRect().width;
             const containerH = containerW / aspectRatio;
             instance.setPlayerSize(containerW, containerH);
 
@@ -56,12 +56,12 @@ export function getConfigForVideo(overrideValueByKey) {
             //  * when upsizing the window from a small size, the video will remain small as the surrounding
             //    space grows
             //  * The video content size will not change as the window grows/shrinks.
-            $(window).resize(function () {
-                $container.css("width", "auto");
-                const containerW = $container.width();
+            window.addEventListener("resize", function () {
+                container.style.width = "auto";
+                const containerW = container.getBoundingClientRect().width;
                 const containerH = Math.round(containerW / aspectRatio);
 
-                $container.css("height", containerH + "px");
+                container.style.height = containerH + "px";
                 instance.setPlayerSize(containerW, containerH);
             });
         },
