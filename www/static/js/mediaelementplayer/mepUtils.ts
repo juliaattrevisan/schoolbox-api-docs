@@ -5,7 +5,7 @@
  *    import * as mepUtils from 'mepUtils.js';
  *    let mePlayer = new MediaElementPlayer(htmlElement, mepUtils.getConfig());
  */
-export function getConfigForVideo(overrideValueByKey) {
+export function getConfigForVideo(overrideValueByKey: object) {
     let config = {
         /**
          * If 'stretching' is set to 'auto', the video will not resize as the window resizes.
@@ -24,13 +24,17 @@ export function getConfigForVideo(overrideValueByKey) {
          * @param node - the <video> DOM node
          * @param instance - the relevant instance of MediaElementPlayer
          */
-        success: function (media, node, instance) {
+        success: function (media: HTMLElement, node: HTMLElement, instance: MediaElementPlayer) {
             // The aspect ratio for the video container is fixed for all videos and all screen sizes.  This is
             // done so that portrait videos do not take up too much vertical space.
             const aspectRatio = 16 / 9;
 
             // This is the container for all mejs nodes (including <mediaelementwrapper>).
-            const container = node.closest(".mejs__container");
+            const container = node.closest(".mejs__container") as HTMLElement;
+
+            if (container === null) {
+                return;
+            }
 
             if (node.classList.contains("full-width")) {
                 node.style.width = "100%";
@@ -40,7 +44,10 @@ export function getConfigForVideo(overrideValueByKey) {
             // Ensure the video poster fills the container with the correct aspect ratio, and has black bars
             // added on the top/bottom or sides if necessary instead of having a hidden part overflow the
             // bounds of the container.
-            const div = container.querySelector(".mejs__poster").removeAttribute("style");
+            const poster = container.querySelector(".mejs__poster");
+            if (poster !== null) {
+                poster.removeAttribute("style");
+            }
 
             // Ensure the video dimensions match the container dimensions when the video is playing.
             // Documentation: https://github.com/mediaelement/mediaelement/blob/master/docs/usage.md

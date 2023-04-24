@@ -1,4 +1,4 @@
-import { getConfigForVideo } from "@js/mediaelementplayer/mepUtils.js";
+import { getConfigForVideo } from "@js/mediaelementplayer/mepUtils.ts";
 
 (function () {
     /**
