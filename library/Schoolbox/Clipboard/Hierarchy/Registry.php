@@ -42,7 +42,6 @@ use Schoolbox\Mapper\Exception;
  */
 class Registry
 {
-
     /**
      * @var LoggerInterface
      */
@@ -227,7 +226,7 @@ class Registry
                  */
                 if ($sportName !== $sport->getName()) {
                     $this->log->debug(sprintf(
-                    'Renaming existing sport %s (%s) to %s',
+                        'Renaming existing sport %s (%s) to %s',
                         $sport->getName(),
                         $sport->getExternalId(),
                         $sportName
@@ -322,7 +321,7 @@ class Registry
                  */
                 if ($divisionName !== $division->getName()) {
                     $this->log->debug(sprintf(
-                    'Renaming existing division %s (%s) to %s in sport %s',
+                        'Renaming existing division %s (%s) to %s in sport %s',
                         $division->getName(),
                         $division->getExternalId(),
                         $divisionName,

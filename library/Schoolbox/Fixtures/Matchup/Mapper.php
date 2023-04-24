@@ -42,14 +42,13 @@ use Schoolbox\Collection;
  */
 class Mapper extends BaseMapper
 {
-
     /**
      * Setup mapping
      */
     protected function mapping()
     {
         $this->hasTable('sportsfixtures_match');
-        $this->hasModel(Model::class);
+        $this->hasModel(Matchup::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('division_id', DivisionMapper::class, 'id', null, null, 'division', 'division');
