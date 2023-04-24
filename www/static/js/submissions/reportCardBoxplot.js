@@ -71,6 +71,8 @@
             },
 
             tooltip: {
+                // Add our tooltip options if we pass any through
+                ...options.tooltip,
                 useHTML: true,
             },
 

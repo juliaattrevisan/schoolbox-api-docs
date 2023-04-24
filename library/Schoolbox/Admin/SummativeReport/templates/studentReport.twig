@@ -365,6 +365,19 @@
         white-space: pre-wrap;
     }
 
+    /* Styles relating to the chart specifically. */
+    .summative-chart-data-label {
+
+    }
+
+    .summative-chart-type {
+        font-weight: 600;
+    }
+
+    .summative-chart-type::first-letter {
+        text-transform: uppercase;
+    }
+
     /* Apply measured margins to report. You can adjust those to suit
      * tested printouts to ensure you don't print over edges and stuff
      */
@@ -518,8 +531,8 @@
                 {% endif %}
             </div>
                 {% if allGraphs[folder.id] is defined %}
-                    <div>{{ allGraphs[folder.id].type }}</div>
-                    {% include '@learningGrades/fragments/graph.twig' with {graph: allGraphs[folder.id].graph, graphId: folder.id } only %}
+                    <p class="summative-chart-type">{{ allGraphs[folder.id].type }} distribution</p>
+                    {% include '@learningGrades/fragments/summativeGraph.twig' with {graph: allGraphs[folder.id].graph, graphId: folder.id } only %}
                 {% endif %}
 
                 {% for assessment in classAssessments[folder.id] %}
