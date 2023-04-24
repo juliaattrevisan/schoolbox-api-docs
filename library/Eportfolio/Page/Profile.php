@@ -196,19 +196,30 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
             $assessments = $this->getAssessments($allShowcasedItems);
         }
 
+        $assessmentsWithResponsesOrFeedbackCount = 0;
+
         if ($allShowcasedItems->count() && $assessments->count()) {
             foreach ($allShowcasedItems as $currentShowcasedItem) {
                 $currentBox = $currentShowcasedItem->getSubmissionBox();
                 /** @var IAssessable|null $assessment */
                 $assessment  = $assessments->getOffset($currentBox->getAssessmentId());
+
                 // if box's assessment is deleted, it's not included in $assessments
                 if (!$assessment) {
                     continue;
                 }
+
+                if ($assessment->getCountResponses() === 0 && $assessment->getCountFeedbacks() === 0) {
+                    continue;
+                }
+
                 $participant = $assessment->getParticipantIfExtant($this->user);
                 if (!$participant) {
                     continue;
                 }
+
+                ++$assessmentsWithResponsesOrFeedbackCount;
+
                 /** @var Response|null $latestSubmission */
                 $latestSubmission = $participant->findMostRecentSubmittedResponse();
                 /** @var Feedback|null $latestReturn */
@@ -271,18 +282,22 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
                 $this->getPage()->setVar('submission_file_list_block', '');
             }
 
-            if (
-                $this->getUser()->getId() == $this->getCurrentUser()->getId()
-                && Config::get(ConfigMapper::NAME_GRADES_ENABLED)
-            ) {
-                $this->getPage()->parse('edit_showcase_work_block', 'edit_showcase_work');
-            } else {
-                $this->getPage()->setVar('edit_showcase_work_block');
-            }
+            if ($assessmentsWithResponsesOrFeedbackCount > 0) {
+                if (
+                    $this->getUser()->getId() == $this->getCurrentUser()->getId()
+                    && Config::get(ConfigMapper::NAME_GRADES_ENABLED)
+                ) {
+                    $this->getPage()->parse('edit_showcase_work_block', 'edit_showcase_work');
+                } else {
+                    $this->getPage()->setVar('edit_showcase_work_block');
+                }
 
-            $this->getPage()->parse('has_showcased_work_block', 'has_showcased_work');
-            $this->getPage()->setVar('no_showcased_work_block', '');
-        } else {
+                $this->getPage()->parse('has_showcased_work_block', 'has_showcased_work');
+                $this->getPage()->setVar('no_showcased_work_block', '');
+            }
+        }
+
+        if ($assessmentsWithResponsesOrFeedbackCount === 0) {
             $this->getPage()->parse('no_showcased_work_block', 'no_showcased_work');
             $this->getPage()->setVar('has_showcased_work_block', '');
             $this->getPage()->setVar('showcase_page_block', '');
