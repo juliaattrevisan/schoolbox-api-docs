@@ -8,7 +8,7 @@
  */
 
 import filesize from "filesize";
-import * as mepUtils from "/www/static/js/mediaelementplayer/mepUtils.js";
+import { getConfigForVideo } from "@js/mediaelementplayer/mepUtils.js";
 
 export default {
     name: "storage",
@@ -37,7 +37,7 @@ export default {
                 break;
 
             case "video":
-                this.player = new this.MediaElementPlayer(this.$el, mepUtils.getConfigForVideo());
+                this.player = new this.MediaElementPlayer(this.$el, getConfigForVideo());
                 break;
 
             default:
