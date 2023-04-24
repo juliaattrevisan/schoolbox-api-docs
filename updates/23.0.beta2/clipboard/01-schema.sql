@@ -31,6 +31,9 @@ ALTER TABLE `sportsfixtures_position`
 ALTER TABLE `sportsfixtures_match`
     ADD COLUMN `external_id` VARCHAR(255) NULL DEFAULT NULL AFTER `notes`;
 
+ALTER TABLE `sportsfixtures_venue`
+    ADD COLUMN `external_id` VARCHAR(255) NULL DEFAULT NULL AFTER `address`;
+
 -- Indexes
 
 ALTER TABLE `clipboard_import_log`
@@ -51,3 +54,5 @@ ALTER TABLE `sportsfixtures_sport`
 ALTER TABLE `sportsfixtures_team`
     ADD INDEX `external_id_idx` (`external_id` ASC);
 
+ALTER TABLE `sportsfixtures_venue`
+    ADD INDEX `external_id_idx` (`external_id` ASC);

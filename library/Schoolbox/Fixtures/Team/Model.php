@@ -10,7 +10,6 @@
 
 namespace Schoolbox\Fixtures\Team;
 
-use Alaress_Date_Format;
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;

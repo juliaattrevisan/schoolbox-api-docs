@@ -37,6 +37,17 @@ class Model implements ISoftDeletable, ValueLabelInterface
     /** @var string $address*/
     private $address;
 
+
+    /**
+     * The external identifier in the third party system
+     * e.g. a Clipboard identifier, so we know where our
+     * data came from
+     *
+     * @var string|null
+     */
+    private ?string $externalId = null;
+
+
     /**
      * {@inheritdoc}
      *
@@ -123,5 +134,25 @@ class Model implements ISoftDeletable, ValueLabelInterface
     public function getAddress()
     {
         return $this->address;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getExternalId(): ?string
+    {
+        return $this->externalId;
+    }
+
+
+    /**
+     * @param string|null $externalId
+     * @return $this
+     */
+    public function setExternalId(?string $externalId): self
+    {
+        $this->externalId = $externalId;
+        return $this;
     }
 }

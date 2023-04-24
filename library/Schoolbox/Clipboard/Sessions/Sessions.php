@@ -553,6 +553,7 @@ class Sessions implements IStrategy
          * Sometimes it is, sometimes it isn't
          */
         $venueData = [
+            'external_id' => trim((string)$locationData['id']),
             'name' => trim((string)$locationData['name']),
             'address' => trim((string)$locationData['address']),
             'latitude' => trim((string)($locationData['latitude'] ?? null)),
@@ -563,10 +564,11 @@ class Sessions implements IStrategy
          * reusing an existing one if possible
          */
         try {
-            $venue = $this->venueMapper->findOneByColumn('name', $venueData['name']);
+            $venue = $this->venueMapper->findOneByColumn('external_id', $venueData['external_id']);
         } catch (\Schoolbox\Mapper\Exception $e) {
             $venue = $this->venueMapper->createModel()
-                ->setName($venueData['name']);
+                ->setName($venueData['name'])
+                ->setExternalId($venueData['external_id']);
         }
 
         /* Update existing address to whatever it now is, in case:
