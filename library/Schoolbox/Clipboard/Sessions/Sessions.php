@@ -11,6 +11,7 @@ namespace Schoolbox\Clipboard\Sessions;
 
 use Alaress\Database\Predicate\InvalidColumnException;
 use Psr\Log\LoggerInterface;
+use Schoolbox\Clipboard\Hierarchy\Codec\Division;
 use Schoolbox\Clipboard\Hierarchy\Lookup\Person;
 use Schoolbox\Clipboard\Hierarchy\Registry;
 use Schoolbox\Clipboard\IApi;
@@ -114,9 +115,9 @@ class Sessions implements IStrategy
 
 
     /**
-     * @var \Schoolbox\Clipboard\Hierarchy\Codec\Division
+     * @var Division
      */
-    private \Schoolbox\Clipboard\Hierarchy\Codec\Division $divisionCodec;
+    private Division $divisionCodec;
 
 
     /**
@@ -149,7 +150,7 @@ class Sessions implements IStrategy
         private \Schoolbox\Fixtures\Result\Mapper $resultMapper,
         private \Schoolbox\Clipboard\Log\Mapper $importLogMapper
     ) {
-        $this->divisionCodec = new \Schoolbox\Clipboard\Hierarchy\Codec\Division();
+        $this->divisionCodec = new Division();
     }
 
 
@@ -491,11 +492,10 @@ class Sessions implements IStrategy
                          * if one doesn't already exist for this matchup and team
                          */
                         try {
-                            $result = $this->resultMapper
-                                ->findOneByColumnList([
-                                    'match_id' => $matchup->getId(),
-                                    'team_id' => $team->getId()
-                                ]);
+                            $result = $this->resultMapper->findOneByColumnList([
+                                'match_id' => $matchup->getId(),
+                                'team_id' => $team->getId()
+                            ]);
                         } catch (\Schoolbox\Mapper\Exception $e) {
                             $result = $this->resultMapper->createModel()
                                 ->setMatchup($matchup)
