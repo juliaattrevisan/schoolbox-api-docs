@@ -196,7 +196,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
             $assessments = $this->getAssessments($allShowcasedItems);
         }
 
-        $assessmentsWithResponsesOrFeedbackCount = 0;
+        $assessmentsToShowcaseCount = 0;
 
         if ($allShowcasedItems->count() && $assessments->count()) {
             foreach ($allShowcasedItems as $currentShowcasedItem) {
@@ -218,7 +218,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
                     continue;
                 }
 
-                ++$assessmentsWithResponsesOrFeedbackCount;
+                ++$assessmentsToShowcaseCount;
 
                 /** @var Response|null $latestSubmission */
                 $latestSubmission = $participant->findMostRecentSubmittedResponse();
@@ -282,7 +282,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
                 $this->getPage()->setVar('submission_file_list_block', '');
             }
 
-            if ($assessmentsWithResponsesOrFeedbackCount > 0) {
+            if ($assessmentsToShowcaseCount > 0) {
                 if (
                     $this->getUser()->getId() == $this->getCurrentUser()->getId()
                     && Config::get(ConfigMapper::NAME_GRADES_ENABLED)
@@ -297,7 +297,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
             }
         }
 
-        if ($assessmentsWithResponsesOrFeedbackCount === 0) {
+        if ($assessmentsToShowcaseCount === 0) {
             $this->getPage()->parse('no_showcased_work_block', 'no_showcased_work');
             $this->getPage()->setVar('has_showcased_work_block', '');
             $this->getPage()->setVar('showcase_page_block', '');
