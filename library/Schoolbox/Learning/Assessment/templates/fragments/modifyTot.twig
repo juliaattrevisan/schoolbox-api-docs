@@ -35,7 +35,7 @@
             <li>
                 {# Allow unpublish even if the assessment has no responses or feedback
                  # This is so that the user can tell whether the assessment is in a 'publish automatically if any
-                 # response is recieved' state, and remove it from this state by unpublishing.
+                 # response is received' state, and remove it from this state by unpublishing.
                  #}
                 {% if isShowcased %}
                     {% if USER.id == student.id %}
