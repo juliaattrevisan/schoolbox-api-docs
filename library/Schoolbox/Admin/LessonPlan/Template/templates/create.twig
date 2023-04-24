@@ -218,6 +218,12 @@
                 }
             }));
 
+            /* Add event listener for ckeditor char count
+             */
+            let el = document.querySelector('[id=' + bodyId + ']');
+
+            applyCharCountListener(el, '#save-button');
+
             /* Postincrement in preparation for another new row
              */
             fieldCount++;
@@ -261,26 +267,7 @@
     });
 
     document.querySelectorAll('[id^=field-body-]').forEach((el) => {
-        el.addEventListener(
-            "EDITOR__MAX_CHAR_COUNT_EXCEEDED",
-            function () {
-                const input = document.querySelector('#save-button');
-                input.disabled = true;
-                input.setAttribute('value', 'Save (disabled because maximum character count exceeded)');
-            }
-        );
-        el.addEventListener(
-            "EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED",
-            function () {
-                // Only enable save button if no char limit warnings are showing on any ckeditor field.
-                // NOTE: ':visible' selector only works in jQuery.
-                if ($("[data-charLimitExceeded]:visible").length === 0) {
-                    const input = document.querySelector('#save-button');
-                    input.disabled = false;
-                    input.setAttribute('value', 'Save');
-                }
-            }
-        );
+        applyCharCountListener(el, '#save-button');
     });
 
     /* Spawn multiple ckeditors for fields which already existed
@@ -296,4 +283,42 @@
             ]
         }
     }));
+
+
+    /**
+     * Applies a maximum char count detection to disable the Save button,
+     * otherwise it tries to save more than is allowed; save the user from
+     * this error screen
+     *
+     * @param el
+     * @param saveButton string  A save button's id string, e.g. '#save-button'
+     */
+    function applyCharCountListener(el, saveButton) {
+        el.addEventListener(
+            "EDITOR__MAX_CHAR_COUNT_EXCEEDED",
+            function () {
+                const input = document.querySelector(saveButton);
+                input.disabled = true;
+                input.setAttribute('value', 'Save (disabled because maximum character count exceeded)');
+            }
+        );
+        el.addEventListener(
+            "EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED",
+            function () {
+                // Only enable save button if no char limit warnings are showing on any ckeditor field.
+                // NOTE: ':visible' selector only works in jQuery.
+
+                /* But why wouldn't you check data-maxcharcountexceededatlastcheck=1 instead?
+                 * The existence of any ckeditor field in this configuration means there's at
+                 * least one ckeditor exceeding the limit the last time it was checked? Then
+                 * you wouldn't need any jquery shenanigans?
+                 */
+                if ($("[data-charLimitExceeded]:visible").length === 0) {
+                    const input = document.querySelector(saveButton);
+                    input.disabled = false;
+                    input.setAttribute('value', 'Save');
+                }
+            }
+        );
+    }
 </script>
