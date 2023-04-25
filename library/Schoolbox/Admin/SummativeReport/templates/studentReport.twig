@@ -477,6 +477,11 @@
         {% endif %}
 
         {% for folder in folders %}
+            {% if allGraphs['summary'][folder.id] is defined %}
+                 <p class="summative-chart-type">{{ allGraphs['summary'][folder.id].type }} distribution</p>
+                {% include '@learningGrades/fragments/summativeGraph.twig' with {graph: allGraphs['summary'][folder.id].graph, graphId: folder.id } only %}
+            {% endif %}
+
             {% set studentGrade = markbooks[folder.id].studentStatistics[student.id] %}
             {% set weightedMean = studentGrade.weightedMean %}
             <div class="folder-title">
@@ -530,9 +535,9 @@
                     </div>
                 {% endif %}
             </div>
-                {% if allGraphs[folder.id] is defined %}
-                    <p class="summative-chart-type">{{ allGraphs[folder.id].type }} distribution</p>
-                    {% include '@learningGrades/fragments/summativeGraph.twig' with {graph: allGraphs[folder.id].graph, graphId: folder.id } only %}
+                {% if allGraphs['class'][folder.id] is defined %}
+                    <p class="summative-chart-type">{{ allGraphs['class'][folder.id].type }} distribution</p>
+                    {% include '@learningGrades/fragments/summativeGraph.twig' with {graph: allGraphs['class'][folder.id].graph, graphId: folder.id } only %}
                 {% endif %}
 
                 {% for assessment in classAssessments[folder.id] %}

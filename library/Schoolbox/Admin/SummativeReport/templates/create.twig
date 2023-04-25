@@ -375,6 +375,11 @@
                             <input id="report-summary-show-overall-grade" name="summary[overallGrade]" type="checkbox" value="1" {% if options.summary.overallGrade ?? false %}checked="checked"{% endif %} />
                             <label for="report-summary-show-overall-grade" class="checkbox-label">Show overall grade</label>
                         </div>
+                        <div class="small-12 columns">
+                            <input name="summary[cohort]" type="hidden" value="0" />
+                            <input id="report-summary-show-cohort" name="summary[cohort]" type="checkbox" value="1" {% if options.summary.cohort ?? false %}checked="checked"{% endif %} />
+                            <label for="report-summary-show-cohort" class="checkbox-label">Show cohort/class results</label>
+                        </div>
                     </fieldset>
                     <fieldset class="content">
                         <legend>Assessment Options</legend>

@@ -808,7 +808,36 @@ class Controller extends ConfigController
          *
          * These markbook instances provide the five-point summary for the graphs
          */
-        $allGraphs = [];
+        $allGraphs = [
+            'summary' => [],
+            'class' => []
+        ];
+
+        if($optionsPayload['summary']['cohort']){
+            foreach ($markbooks as $folderId => $markbook) {
+                $graph  = [];
+                $graphType = '';
+                $folder = $folders->getBy('id', $folderId);
+                if ((new ValidUseCohortMarks())->isSatisfiedBy($this->getConfigLoader()->get('lms_cohort_comparison'), $folder)) {
+                    $graphType = 'cohort';
+                    $graph = (new ClassResults(
+                        $this->getConfigLoader()->get('grade_gradient_enable'),
+                        $this->assessmentMapperProxy,
+                        $markbook->getAssessments(),
+                        $this->getUser(),
+                        $term,
+                    ))->collate($viewer);
+                } else {
+                    $graphType = 'cohort';
+                    $graph = $gradeHelper->buildGraph($markbook, $student, $viewer, $this->getConfigLoader()->get('grade_gradient_enable'));
+                }
+                $allGraphs['summary'][$folderId] = [
+                    'graph' => $graph,
+                    'type'  => $graphType,
+                ];
+            }
+        }
+
         if ($optionsPayload['class']['cohort']) {
             foreach ($markbooks as $folderId => $markbook) {
                 $graph  = [];
@@ -827,12 +856,13 @@ class Controller extends ConfigController
                     $graphType = 'cohort';
                     $graph = $gradeHelper->buildGraph($markbook, $student, $viewer, $this->getConfigLoader()->get('grade_gradient_enable'));
                 }
-                $allGraphs[$folderId] = [
+                $allGraphs['class'][$folderId] = [
                     'graph' => $graph,
                     'type'  => $graphType,
                 ];
             }
         }
+
 
         $classAssessmentFeedbacks = $this->collateFeedbacks($classAssessments, $student, $viewer, (bool)$optionsPayload['class']['rubrics']);
 
@@ -847,7 +877,7 @@ class Controller extends ConfigController
             'summaryAssessmentFeedbacks' => $summaryAssessmentFeedbacks,
             'classAssessmentFeedbacks'   => $classAssessmentFeedbacks,
             'report'                     => $report,
-            'allGraphs'                      => $allGraphs,
+            'allGraphs'                  => $allGraphs,
             'showSummary'                => (bool)$optionsPayload['summary']['active'],
             'summaryHeading'             => trim((string)$optionsPayload['summary']['heading']),
             'showSummaryOverallGrade'    => (bool)$optionsPayload['summary']['overallGrade'],
