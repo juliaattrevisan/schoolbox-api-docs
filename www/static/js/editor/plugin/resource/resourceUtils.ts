@@ -133,12 +133,13 @@ function getVideoAttributes(resource: Resource, config: EditorConfig) {
     return {
         src: thumbnail,
         alt: resource.name,
+        width: "640px",
         "data-schoolboxresource-type": resource.type,
         "data-schoolboxresource-filesystem": resource.filesystem,
         "data-schoolboxresource-thumbnail": thumbnail,
         "data-schoolboxresource-source": getVideoSrc(resource, config),
-        "data-schoolboxresource-width": 512,
-        "data-schoolboxresource-height": 288,
+        "data-schoolboxresource-width": 640,
+        "data-schoolboxresource-height": 360,
         "data-schoolboxresource-fullwidth": "false",
     };
 }

@@ -9,8 +9,7 @@
 
 import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
 import InsertResourceCommand from "./InsertResourceCommand";
-import { getExtraAttributes } from "./resourceUtils";
-
+import { ResourceType, getExtraAttributes } from "./resourceUtils";
 export default class ResourceEditing extends Plugin {
     /**
      * Runs on startup, defines the schema and converters
@@ -18,6 +17,7 @@ export default class ResourceEditing extends Plugin {
     init() {
         this.updateSchema();
         this.defineConverters();
+        this.onImageResized();
         this.editor.commands.add("insertResource", new InsertResourceCommand(this.editor));
     }
 
@@ -85,6 +85,37 @@ export default class ResourceEditing extends Plugin {
                     key: attribute,
                 },
             });
+        });
+    }
+
+    /**
+     * When an image has been resized, we need to check if the image is linked to a video resource.
+     * If it is we need to update the width and height custom attributes to match the new size.
+     * This is so when the video is actually displayed, it's width/height is what's been set in the editor.
+     * (If the image has been marked as full-width, these attributes will be ignored)
+     */
+    onImageResized() {
+        const editor = this.editor;
+        const model = editor.model;
+        const imageUtils = editor.plugins.get("ImageUtils");
+        const resizeImageCommand = editor.commands.get("resizeImage");
+        resizeImageCommand.on("execute", (eventInfo) => {
+            const imageElement = imageUtils.getClosestSelectedImageElement(model.document.selection);
+            if (
+                imageElement.hasAttribute("data-schoolboxresource-type") &&
+                imageElement.getAttribute("data-schoolboxresource-type") === ResourceType.VIDEO
+            ) {
+                model.change((writer) => {
+                    const width = eventInfo.source.value?.width || 640;
+                    writer.setAttributes(
+                        {
+                            "data-schoolboxresource-width": parseInt(width),
+                            "data-schoolboxresource-height": parseInt(width) * (9 / 16),
+                        },
+                        imageElement
+                    );
+                });
+            }
         });
     }
 }
