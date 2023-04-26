@@ -813,7 +813,7 @@ class Controller extends ConfigController
             'class' => []
         ];
 
-        if($optionsPayload['summary']['cohort']){
+        if ($optionsPayload['summary']['cohort']) {
             foreach ($markbooks as $folderId => $markbook) {
                 $graph  = [];
                 $graphType = '';
