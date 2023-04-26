@@ -132,7 +132,7 @@ HELP;
         $marker = null;
 
         try {
-            while ($row = $assessmentStatement->fetch()) {
+            foreach ($assessmentStatement->fetchAll() as $row) {
                 $this->refreshLock($lock);
 
                 $project = $assessmentMapperProxy->findByIdForReview($row['assessment_id']);
