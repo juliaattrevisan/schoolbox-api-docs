@@ -113,7 +113,7 @@ HELP;
          * Let's get out of here
          */
         if ($assessmentStatement->rowCount() === 0) {
-            $this->getLogger()->info('No projects found; exiting');
+            $this->getLogger()->info('No project implementations found; exiting');
             return;
         }
 
