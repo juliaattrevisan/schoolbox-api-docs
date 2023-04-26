@@ -97,13 +97,16 @@ HELP;
         $this->getLogger()->info('Seeding project result cache');
 
         /* Find all the project ids that we must consider
+         * (Only get Implementations, never Specifications)
          */
         $assessmentStatement = $this->getDatabaseInternal()->executeQuery("
             SELECT a.id
             FROM   assessment a
             INNER JOIN project p ON a.id = p.assessment_id
+            LEFT  JOIN assessment_course_unit_specification acus ON a.id = acus.assessment_id
             WHERE p.deleted_at IS NULL
             AND   a.deleted_at IS NULL
+            AND   acus.course_unit_specification_id IS NULL
         ");
 
         /* This instance has no living projects to deal with.
