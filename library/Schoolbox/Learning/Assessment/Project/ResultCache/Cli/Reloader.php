@@ -100,7 +100,7 @@ HELP;
          * (Only get Implementations, never Specifications)
          */
         $assessmentStatement = $this->getDatabaseInternal()->executeQuery("
-            SELECT a.id
+            SELECT a.id AS assessment_id
             FROM   assessment a
             INNER JOIN project p ON a.id = p.assessment_id
             LEFT  JOIN assessment_course_unit_specification acus ON a.id = acus.assessment_id
