@@ -813,54 +813,31 @@ class Controller extends ConfigController
             'class' => []
         ];
 
+        $lmsCohortComparison = $this->getConfigLoader()->get('lms_cohort_comparison');
+        $gradientEnable = $this->getConfigLoader()->get('grade_gradient_enable');
+
         if ($optionsPayload['summary']['cohort']) {
-            foreach ($markbooks as $folderId => $markbook) {
-                $graph  = [];
-                $graphType = '';
-                $folder = $folders->getBy('id', $folderId);
-                if ((new ValidUseCohortMarks())->isSatisfiedBy($this->getConfigLoader()->get('lms_cohort_comparison'), $folder)) {
-                    $graphType = 'cohort';
-                    $graph = (new ClassResults(
-                        $this->getConfigLoader()->get('grade_gradient_enable'),
-                        $this->assessmentMapperProxy,
-                        $markbook->getAssessments(),
-                        $this->getUser(),
-                        $term,
-                    ))->collate($viewer);
-                } else {
-                    $graphType = 'cohort';
-                    $graph = $gradeHelper->buildGraph($markbook, $student, $viewer, $this->getConfigLoader()->get('grade_gradient_enable'));
-                }
-                $allGraphs['summary'][$folderId] = [
-                    'graph' => $graph,
-                    'type'  => $graphType,
-                ];
-            }
+            $allGraphs['summary'] = $this->generateCohortGraph(
+                $markbooks,
+                $folders,
+                $lmsCohortComparison,
+                $gradientEnable,
+                $student,
+                $viewer,
+                $term
+            );
         }
 
         if ($optionsPayload['class']['cohort']) {
-            foreach ($markbooks as $folderId => $markbook) {
-                $graph  = [];
-                $graphType = '';
-                $folder = $folders->getBy('id', $folderId);
-                if ((new ValidUseCohortMarks())->isSatisfiedBy($this->getConfigLoader()->get('lms_cohort_comparison'), $folder)) {
-                    $graphType = 'cohort';
-                    $graph = (new ClassResults(
-                        $this->getConfigLoader()->get('grade_gradient_enable'),
-                        $this->assessmentMapperProxy,
-                        $markbook->getAssessments(),
-                        $this->getUser(),
-                        $term,
-                    ))->collate($viewer);
-                } else {
-                    $graphType = 'cohort';
-                    $graph = $gradeHelper->buildGraph($markbook, $student, $viewer, $this->getConfigLoader()->get('grade_gradient_enable'));
-                }
-                $allGraphs['class'][$folderId] = [
-                    'graph' => $graph,
-                    'type'  => $graphType,
-                ];
-            }
+            $allGraphs['class'] = $this->generateCohortGraph(
+                $markbooks,
+                $folders,
+                $lmsCohortComparison,
+                $gradientEnable,
+                $student,
+                $viewer,
+                $term
+            );
         }
 
 
@@ -977,5 +954,45 @@ class Controller extends ConfigController
             //redirect user to report preview
             $this->getResponse()->redirect->to($reports[0]['url']);
         }
+    }
+
+    /**
+     *
+     */
+    private function generateCohortGraph(
+        Collection $markbooks,
+        Collection $folders,
+        bool $lmsCohortComparison,
+        bool $gradientEnable,
+        User $student,
+        User $viewer,
+        $term
+    ) {
+        $allGraphs = [];
+
+        foreach ($markbooks as $folderId => $markbook) {
+            $graph  = [];
+            $graphType = '';
+            $folder = $folders->getBy('id', $folderId);
+            if ((new ValidUseCohortMarks())->isSatisfiedBy($lmsCohortComparison, $folder)) {
+                $graphType = 'cohort';
+                $graph = (new ClassResults(
+                    $gradientEnable,
+                    $this->assessmentMapperProxy,
+                    $markbook->getAssessments(),
+                    $this->getUser(),
+                    $term,
+                ))->collate($viewer);
+            } else {
+                $graphType = 'cohort';
+                $graph = $gradeHelper->buildGraph($markbook, $student, $viewer, $gradientEnable);
+            }
+            $allGraphs[$folderId] = [
+                'graph' => $graph,
+                'type'  => $graphType,
+            ];
+        }
+
+        return $allGraphs;
     }
 }
