@@ -478,8 +478,8 @@
 
         {% for folder in folders %}
             {% if allGraphs['summary'][folder.id] is defined %}
-                 <p class="summative-chart-type">{{ allGraphs['summary'][folder.id].type }} distribution</p>
-                {% include '@learningGrades/fragments/summativeGraph.twig' with {graph: allGraphs['summary'][folder.id].graph, graphId: folder.id } only %}
+                <p class="summative-chart-type">{{ allGraphs['summary'][folder.id].type }} distribution</p>
+                {% include '@learningGrades/fragments/summativeGraph.twig' with { graph: allGraphs['summary'][folder.id].graph, graphId: 'summary_' ~ folder.id } only %}
             {% endif %}
 
             {% set studentGrade = markbooks[folder.id].studentStatistics[student.id] %}
@@ -537,7 +537,7 @@
             </div>
                 {% if allGraphs['class'][folder.id] is defined %}
                     <p class="summative-chart-type">{{ allGraphs['class'][folder.id].type }} distribution</p>
-                    {% include '@learningGrades/fragments/summativeGraph.twig' with {graph: allGraphs['class'][folder.id].graph, graphId: folder.id } only %}
+                    {% include '@learningGrades/fragments/summativeGraph.twig' with { graph: allGraphs['class'][folder.id].graph, graphId: 'class_' ~ folder.id } only %}
                 {% endif %}
 
                 {% for assessment in classAssessments[folder.id] %}
