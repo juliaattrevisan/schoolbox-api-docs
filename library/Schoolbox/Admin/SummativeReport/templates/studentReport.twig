@@ -1,3 +1,10 @@
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/main.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.all-work.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/highchartsMore.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/reportCardBoxplot.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/learninganalytics/schoolboxTheme.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/eportfolio/jquery.eportfolio.js?v={{ config.site_version }}"></script>
+
 <style>
 
     /* Vaguely analogous to A4 dimensions so you can preview in browser
@@ -358,6 +365,27 @@
         white-space: pre-wrap;
     }
 
+    .summative-graph-container {
+        padding-left: 1rem;
+    }
+
+    .summative-graph-type,
+    .summary-subtitle {
+        font-weight: 600;
+        padding-left: 2rem;
+    }
+
+    /* Padding is inconsistent between the summary area and class area.
+       as we're on a merge deadline, here's a quick fix. */
+    .folder-title.class-page + .summative-graph-type {
+        padding-left: 1rem;
+    }
+
+    /* Make the first letter uppercase... */
+    .summative-graph-type::first-letter {
+        text-transform: uppercase;
+    }
+
     /* Apply measured margins to report. You can adjust those to suit
      * tested printouts to ensure you don't print over edges and stuff
      */
@@ -468,6 +496,13 @@
                 <p class="grade">{{ weightedMean ?? '' }}</p>
                 {% endif %}
             </div>
+
+            {% if allGraphs['summary'][folder.id] is defined %}
+                <p class="summative-graph-type">{{ allGraphs['summary'][folder.id].type }} distribution</p>
+                {% include '@learningGrades/fragments/summativeGraph.twig' with { graph: allGraphs['summary'][folder.id].graph, graphId: 'summary_' ~ folder.id } only %}
+                <p class="summative-graph-type">Results</p>
+            {% endif %}
+
             {% if (summaryAssessments[folder.id] ?? [])| length %}
                 {% for assessment in summaryAssessments[folder.id] %}
                     {% set participant = assessment ? assessment.participantIfExtant(student) : null %}
@@ -510,7 +545,10 @@
                     </div>
                 {% endif %}
             </div>
-
+                {% if allGraphs['class'][folder.id] is defined %}
+                    <p class="summative-graph-type">{{ allGraphs['class'][folder.id].type }} distribution</p>
+                    {% include '@learningGrades/fragments/summativeGraph.twig' with { graph: allGraphs['class'][folder.id].graph, graphId: 'class_' ~ folder.id } only %}
+                {% endif %}
                 {% for assessment in classAssessments[folder.id] %}
                     {% include '@adminSummativeReport/assessmentReport.twig' with
                         {

@@ -4886,16 +4886,6 @@ parameters:
 			path: library/Schoolbox/Learning/Grades/AssessmentComparator.php
 
 		-
-			message: "#^Method Schoolbox\\\\Learning\\\\Grades\\\\Controller\\:\\:buildGraph\\(\\) should return array\\<array\\> but returns array\\<string, string\\|false\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Grades/Controller.php
-
-		-
-			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Grades/Controller.php
-
-		-
 			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/InlineGrader/Kami/Connector.php

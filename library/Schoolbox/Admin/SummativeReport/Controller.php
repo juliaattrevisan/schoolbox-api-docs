@@ -17,15 +17,17 @@ use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Assessment\Term;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
+use Schoolbox\Learning\Grades\Cohort\ClassResults;
+use Schoolbox\Learning\Grades\Cohort\ValidUseCohortMarks;
 use Schoolbox\Learning\Grades\Helper;
 use Schoolbox\Learning\MarkScheme\Factory;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -33,6 +35,7 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\TaskDaemon\Producer;
@@ -799,6 +802,47 @@ class Controller extends ConfigController
                 $classAssessments = $gradeHelper->filterAssessments($viewer, $assessments, $classWorkTypes);
             }
         }
+        /* If the config option lms_cohort_comparison is set,
+         * instantiate a new CohortMarks instance
+         *
+         * Otherwise use the default Markbook instance
+         *
+         * These markbook instances provide the five-point summary for the graphs
+         */
+        $allGraphs = [
+            'summary' => [],
+            'class' => []
+        ];
+
+        $lmsCohortComparison = $this->getConfigLoader()->get('lms_cohort_comparison');
+        $gradientEnable = $this->getConfigLoader()->get('grade_gradient_enable');
+
+        if ($optionsPayload['summary']['cohort']) {
+            $allGraphs['summary'] = $this->generateCohortGraph(
+                $markbooks,
+                $folders,
+                $lmsCohortComparison,
+                $gradientEnable,
+                $student,
+                $viewer,
+                $term,
+                $gradeHelper
+            );
+        }
+
+        if ($optionsPayload['class']['cohort']) {
+            $allGraphs['class'] = $this->generateCohortGraph(
+                $markbooks,
+                $folders,
+                $lmsCohortComparison,
+                $gradientEnable,
+                $student,
+                $viewer,
+                $term,
+                $gradeHelper
+            );
+        }
+
 
         $classAssessmentFeedbacks = $this->collateFeedbacks($classAssessments, $student, $viewer, (bool)$optionsPayload['class']['rubrics']);
 
@@ -813,6 +857,7 @@ class Controller extends ConfigController
             'summaryAssessmentFeedbacks' => $summaryAssessmentFeedbacks,
             'classAssessmentFeedbacks'   => $classAssessmentFeedbacks,
             'report'                     => $report,
+            'allGraphs'                  => $allGraphs,
             'showSummary'                => (bool)$optionsPayload['summary']['active'],
             'summaryHeading'             => trim((string)$optionsPayload['summary']['heading']),
             'showSummaryOverallGrade'    => (bool)$optionsPayload['summary']['overallGrade'],
@@ -912,5 +957,58 @@ class Controller extends ConfigController
             //redirect user to report preview
             $this->getResponse()->redirect->to($reports[0]['url']);
         }
+    }
+
+    /**
+     *  Refactored into a local function that generates the relevant data to then be sent into
+     *  the summativeGraph.twig file. It was refactored to dedupe code above. Takes in
+     *  lmsCohortComparison and gradientEnable to prevent successive unnecessary db calls.
+     *
+     *  @param Collection $markbooks
+     *  @param Collection $folders
+     *  @param bool $lmsCohortComparison
+     *  @param bool $gradientEnable
+     *  @param User $student
+     *  @param User $viewer
+     *  @param Term\Model $term
+     *  @param Helper $gradeHelper
+     */
+    private function generateCohortGraph(
+        Collection $markbooks,
+        Collection $folders,
+        bool $lmsCohortComparison,
+        bool $gradientEnable,
+        User $student,
+        User $viewer,
+        Term\Model $term,
+        Helper $gradeHelper
+    ) {
+        $allGraphs = [];
+
+        foreach ($markbooks as $folderId => $markbook) {
+            $graph  = [];
+            $graphType = '';
+            /** @var Folder\Model $folder */
+            $folder = $folders->getBy('id', $folderId);
+            if ((new ValidUseCohortMarks())->isSatisfiedBy($lmsCohortComparison, $folder)) {
+                $graphType = 'cohort';
+                $graph = (new ClassResults(
+                    $gradientEnable,
+                    $this->assessmentMapperProxy,
+                    $markbook->getAssessments(),
+                    $this->getUser(),
+                    $term,
+                ))->collate($viewer);
+            } else {
+                $graphType = 'class';
+                $graph = $gradeHelper->buildGraph($markbook, $student, $viewer, $gradientEnable);
+            }
+            $allGraphs[$folderId] = [
+                'graph' => $graph,
+                'type'  => $graphType,
+            ];
+        }
+
+        return $allGraphs;
     }
 }
