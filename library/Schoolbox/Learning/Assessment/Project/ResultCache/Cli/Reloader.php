@@ -165,7 +165,7 @@ HELP;
                  */
                 $participants = $project->getAllParticipants();
 
-                foreach ($participants as $userId => $participant) {
+                foreach ($participants as $participant) {
                     $this->refreshLock($lock);
 
                     $user = $participant->getUser();
