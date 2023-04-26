@@ -366,15 +366,17 @@
     }
 
     /* Styles relating to the chart specifically. */
-    .summative-chart-data-label {
-
+    .summative-graph-container {
+        padding-left: 1rem;
     }
 
-    .summative-chart-type {
+    .summative-graph-type {
         font-weight: 600;
+        padding-left: 2rem;
     }
 
-    .summative-chart-type::first-letter {
+    /* Make the first letter uppercase... */
+    .summative-graph-type::first-letter {
         text-transform: uppercase;
     }
 
@@ -478,7 +480,7 @@
 
         {% for folder in folders %}
             {% if allGraphs['summary'][folder.id] is defined %}
-                <p class="summative-chart-type">{{ allGraphs['summary'][folder.id].type }} distribution</p>
+                <p class="summative-graph-type">{{ allGraphs['summary'][folder.id].type }} distribution</p>
                 {% include '@learningGrades/fragments/summativeGraph.twig' with { graph: allGraphs['summary'][folder.id].graph, graphId: 'summary_' ~ folder.id } only %}
             {% endif %}
 
@@ -536,7 +538,7 @@
                 {% endif %}
             </div>
                 {% if allGraphs['class'][folder.id] is defined %}
-                    <p class="summative-chart-type">{{ allGraphs['class'][folder.id].type }} distribution</p>
+                    <p class="summative-graph-type">{{ allGraphs['class'][folder.id].type }} distribution</p>
                     {% include '@learningGrades/fragments/summativeGraph.twig' with { graph: allGraphs['class'][folder.id].graph, graphId: 'class_' ~ folder.id } only %}
                 {% endif %}
 
