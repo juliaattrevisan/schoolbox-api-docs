@@ -699,6 +699,18 @@ abstract class AbstractAssessment implements IAssessable
 
 
     /**
+     * Returns the number of interactions in this assessment.
+     * An interaction is the generic word we use for "responses or feedbacks"
+     * @param bool $includeDrafts
+     * @return int
+     */
+    public function getCountInteractions(bool $includeDrafts = false): int
+    {
+        return $this->getCountResponses($includeDrafts) + $this->getCountFeedbacks($includeDrafts);
+    }
+
+
+    /**
      * @inheritdoc
      * @throws InsufficientHydrationException
      */

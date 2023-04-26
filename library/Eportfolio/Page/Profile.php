@@ -209,7 +209,10 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
                     continue;
                 }
 
-                if ($assessment->getCountResponses() === 0 && $assessment->getCountFeedbacks() === 0) {
+                /* No interactions - there aren't any feedbacks nor responses
+                 * Hide those from the ui
+                 */
+                if (0 === $assessment->getCountInteractions()) {
                     continue;
                 }
 

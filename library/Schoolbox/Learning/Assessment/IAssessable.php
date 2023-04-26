@@ -496,6 +496,15 @@ interface IAssessable extends ISoftDeletable
 
 
     /**
+     * Returns the number of interactions in this assessment.
+     * An interaction is the generic word we use for "responses or feedbacks"
+     * @param bool $includeDrafts
+     * @return int
+     */
+    public function getCountInteractions(bool $includeDrafts = false): int;
+
+
+    /**
      * Returns whether this assessment should only visible to staff and instructors
      *
      * @return bool

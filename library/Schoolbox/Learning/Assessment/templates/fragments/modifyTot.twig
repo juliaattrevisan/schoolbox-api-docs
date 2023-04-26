@@ -13,7 +13,7 @@
  # @param array         $externalRedirectUrl    A third party redirect url/application name tuple (url, name)
  # @param bool          $hasStudentView         For Lesson Plan specifically, where a toggle shows student/staff views of a Lesson Plan
  #}
-{% if gradeRoute or viewRoute or modifyRoute or (canShowcase is defined and canShowcase) or (externalRedirectUrl is defined and externalRedirectUrl) or (hasStudentView is defined and hasStudentView) %}
+{% if gradeRoute or viewRoute or modifyRoute or (canShowcase is defined and canShowcase and assessment.getCountInteractions) or (externalRedirectUrl is defined and externalRedirectUrl) or (hasStudentView is defined and hasStudentView) %}
     <nav>
         {% if externalRedirectUrl is defined and externalRedirectUrl %}
             <a href="{{ externalRedirectUrl.url }}" class="icon-view alert" title="{{ externalRedirectUrl.name }}"></a>
@@ -45,7 +45,7 @@
                     {% endif %}
                 {# Allow publish only if the assessment has responses or feedback
                  #}
-                {% elseif assessment.getCountResponses > 0 or assessment.getCountFeedbacks > 0 %}
+                {% elseif assessment.getCountInteractions %}
                     {# Decide if you're publishing to your own eportfolio
                      # or if you're publishing on behalf of a student to *their* eportfolio
                      #}
