@@ -125,7 +125,9 @@ HELP;
             SELECT p.assessment_id
             FROM project p
             INNER JOIN assessment_specification_implementation asi ON p.assessment_id = asi.implementation_assessment_id
+            INNER JOIN assessment                              a   ON p.assessment_id = a.id
             WHERE p.deleted_at IS NULL
+            AND   a.deleted_at IS NULL
         ");
 
         /* I need this assessment mapper cache because of all the
