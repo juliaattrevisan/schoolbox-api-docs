@@ -1000,7 +1000,7 @@ class Controller extends ConfigController
                     $term,
                 ))->collate($viewer);
             } else {
-                $graphType = 'cohort';
+                $graphType = 'class';
                 $graph = $gradeHelper->buildGraph($markbook, $student, $viewer, $gradientEnable);
             }
             $allGraphs[$folderId] = [
