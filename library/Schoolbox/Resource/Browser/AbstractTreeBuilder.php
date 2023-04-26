@@ -536,7 +536,9 @@ abstract class AbstractTreeBuilder
     /**
      * Filter a collection of files to a certain mime type or multiple mime types
      * @param Collection $files
-     * @param string     $mimes MIME types allowed (comma delimited) (e.g. 'image/jpeg', 'image/*', 'image/*, audio/*')
+     * @param string     $mimes MIME types allowed (comma delimited) (e.g. 'image/jpeg', 'image/*', 'image/*', 'audio/*')
+     *                          Note MIME types are expected to contain exactly one '/'.  Any that do not meet this
+     *                          requirement will be ignored by this function.
      * @return Collection
      */
     protected function filterMime(Collection $files, string $mimes): Collection
@@ -552,7 +554,8 @@ abstract class AbstractTreeBuilder
             $allowedMimes = array_filter(
                 $allowedMimes,
                 static function ($mime) {
-                    return (substr_count($mime, '/') === 1); // One separator implies two parts.
+                    // Check that $mime contains exactly one '/' character, implying exactly two parts.
+                    return (substr_count($mime, '/') === 1);
                 }
             );
 
