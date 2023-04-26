@@ -365,14 +365,20 @@
         white-space: pre-wrap;
     }
 
-    /* Styles relating to the chart specifically. */
     .summative-graph-container {
         padding-left: 1rem;
     }
 
-    .summative-graph-type {
+    .summative-graph-type,
+    .summary-subtitle {
         font-weight: 600;
         padding-left: 2rem;
+    }
+
+    /* Padding is inconsistent between the summary area and class area.
+       as we're on a merge deadline, here's a quick fix. */
+    .folder-title.class-page + .summative-graph-type {
+        padding-left: 1rem;
     }
 
     /* Make the first letter uppercase... */
@@ -479,11 +485,6 @@
         {% endif %}
 
         {% for folder in folders %}
-            {% if allGraphs['summary'][folder.id] is defined %}
-                <p class="summative-graph-type">{{ allGraphs['summary'][folder.id].type }} distribution</p>
-                {% include '@learningGrades/fragments/summativeGraph.twig' with { graph: allGraphs['summary'][folder.id].graph, graphId: 'summary_' ~ folder.id } only %}
-            {% endif %}
-
             {% set studentGrade = markbooks[folder.id].studentStatistics[student.id] %}
             {% set weightedMean = studentGrade.weightedMean %}
             <div class="folder-title">
@@ -495,6 +496,13 @@
                 <p class="grade">{{ weightedMean ?? '' }}</p>
                 {% endif %}
             </div>
+
+            {% if allGraphs['summary'][folder.id] is defined %}
+                <p class="summative-graph-type">{{ allGraphs['summary'][folder.id].type }} distribution</p>
+                {% include '@learningGrades/fragments/summativeGraph.twig' with { graph: allGraphs['summary'][folder.id].graph, graphId: 'summary_' ~ folder.id } only %}
+                <p class="summative-graph-type">Results</p>
+            {% endif %}
+
             {% if (summaryAssessments[folder.id] ?? [])| length %}
                 {% for assessment in summaryAssessments[folder.id] %}
                     {% set participant = assessment ? assessment.participantIfExtant(student) : null %}
@@ -541,7 +549,6 @@
                     <p class="summative-graph-type">{{ allGraphs['class'][folder.id].type }} distribution</p>
                     {% include '@learningGrades/fragments/summativeGraph.twig' with { graph: allGraphs['class'][folder.id].graph, graphId: 'class_' ~ folder.id } only %}
                 {% endif %}
-
                 {% for assessment in classAssessments[folder.id] %}
                     {% include '@adminSummativeReport/assessmentReport.twig' with
                         {
