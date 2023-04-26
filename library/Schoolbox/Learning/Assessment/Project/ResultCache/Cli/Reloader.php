@@ -122,12 +122,14 @@ HELP;
          * (Only get Implementations, never Specifications)
          */
         $assessmentStatement = $this->getDatabaseInternal()->executeQuery("
-            SELECT p.assessment_id
-            FROM project p
-            INNER JOIN assessment_specification_implementation asi ON p.assessment_id = asi.implementation_assessment_id
-            INNER JOIN assessment                              a   ON p.assessment_id = a.id
-            WHERE p.deleted_at IS NULL
-            AND   a.deleted_at IS NULL
+            SELECT var.assessment_id
+            FROM   v_assessment_relation var
+            INNER JOIN assessment a ON var.assessment_id = a.id
+            INNER JOIN project    p ON a.id              = p.assessment_id
+            WHERE p.deleted_at                     IS NULL
+            AND   a.deleted_at                     IS NULL
+            AND   var.course_specification_id      IS NULL
+            AND   var.course_unit_specification_id IS NULL
         ");
 
         /* I need this assessment mapper cache because of all the
