@@ -136,6 +136,16 @@ HELP;
                 $this->refreshLock($lock);
 
                 $project = $assessmentMapperProxy->findByIdForReview($row['assessment_id']);
+                if (!$project->isImplementation()) {
+                    $this->getLogger()->info(
+                        sprintf(
+                            'Project %s (%s) is not an implementation, and thus has no participants - skipping',
+                            $project->getTitle(),
+                            $project->getId()
+                        )
+                    );
+                    continue;
+                }
 
                 $this->getLogger()->info(sprintf(
                     'Examining project %s (%s)',
