@@ -97,44 +97,22 @@ HELP;
         $this->getLogger()->info('Seeding project result cache');
 
         /* Find all the project ids that we must consider
-         *
-         * If there are no projects to manage, just exit early
          */
-        $assessmentCountStatement = $this->getDatabaseInternal()->executeQuery("
-            SELECT COUNT(*) AS num
-            FROM   v_assessment_relation var
-            INNER JOIN assessment a ON var.assessment_id = a.id
-            INNER JOIN project    p ON a.id              = p.assessment_id
-            WHERE p.deleted_at                     IS NULL
-            AND   a.deleted_at                     IS NULL
-            AND   var.course_specification_id      IS NULL
-            AND   var.course_unit_specification_id IS NULL
+        $assessmentStatement = $this->getDatabaseInternal()->executeQuery("
+            SELECT a.id
+            FROM   assessment a
+            INNER JOIN project p ON a.id = p.assessment_id
+            WHERE p.deleted_at IS NULL
+            AND   a.deleted_at IS NULL
         ");
-
-        $assessmentCount = (int)$assessmentCountStatement->fetchColumn();
 
         /* This instance has no living projects to deal with.
          * Let's get out of here
          */
-        if ($assessmentCount === 0) {
-            $this->getLogger()->info('No project implementations found; exiting');
-
+        if ($assessmentStatement->rowCount() === 0) {
+            $this->getLogger()->info('No projects found; exiting');
             return;
         }
-
-        /* Otherwise let's dig
-         * (Only get Implementations, never Specifications)
-         */
-        $assessmentStatement = $this->getDatabaseInternal()->executeQuery("
-            SELECT var.assessment_id
-            FROM   v_assessment_relation var
-            INNER JOIN assessment a ON var.assessment_id = a.id
-            INNER JOIN project    p ON a.id              = p.assessment_id
-            WHERE p.deleted_at                     IS NULL
-            AND   a.deleted_at                     IS NULL
-            AND   var.course_specification_id      IS NULL
-            AND   var.course_unit_specification_id IS NULL
-        ");
 
         /* I need this assessment mapper cache because of all the
          * participation insanity that we have manufactured
