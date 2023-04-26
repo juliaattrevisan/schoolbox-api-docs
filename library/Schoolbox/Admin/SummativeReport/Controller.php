@@ -960,7 +960,18 @@ class Controller extends ConfigController
     }
 
     /**
+     *  Refactored into a local function that generates the relevant data to then be sent into
+     *  the summativeGraph.twig file. It was refactored to dedupe code above. Takes in
+     *  lmsCohortComparison and gradientEnable to prevent successive unnecessary db calls.
      *
+     *  @param Collection $markbooks
+     *  @param Collection $folders
+     *  @param bool $lmsCohortComparison
+     *  @param bool $gradientEnable
+     *  @param User $student
+     *  @param User $viewer
+     *  @param Term\Model $term
+     *  @param Helper $gradeHelper
      */
     private function generateCohortGraph(
         Collection $markbooks,
