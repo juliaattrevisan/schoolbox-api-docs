@@ -33,13 +33,19 @@
          #}
         {% if canShowcase %}
             <li>
+                {# Allow unpublish even if the assessment has no responses or feedback
+                 # This is so that the user can tell whether the assessment is in a 'publish automatically if any
+                 # response is received' state, and remove it from this state by unpublishing.
+                 #}
                 {% if isShowcased %}
                     {% if USER.id == student.id %}
                         <a class="icon-showcase" data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0" data-publish-state='0' title="Remove from ePortfolio">Remove from ePortfolio</a>
                     {% else %}
                         <a class="icon-showcase" data-publish-to-eportfolio="{{ assessment.id }}" data-publish-status="0" data-publish-state='0' title="Remove from {{ student.givenName }}'s ePortfolio">Remove from {{ student.givenName }}'s ePortfolio</a>
                     {% endif %}
-                {% else %}
+                {# Allow publish only if the assessment has responses or feedback
+                 #}
+                {% elseif assessment.getCountResponses > 0 or assessment.getCountFeedbacks > 0 %}
                     {# Decide if you're publishing to your own eportfolio
                      # or if you're publishing on behalf of a student to *their* eportfolio
                      #}
