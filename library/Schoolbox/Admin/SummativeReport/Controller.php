@@ -17,10 +17,10 @@ use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Assessment\Term;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
@@ -35,6 +35,7 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\TaskDaemon\Producer;
@@ -824,7 +825,8 @@ class Controller extends ConfigController
                 $gradientEnable,
                 $student,
                 $viewer,
-                $term
+                $term,
+                $gradeHelper
             );
         }
 
@@ -836,7 +838,8 @@ class Controller extends ConfigController
                 $gradientEnable,
                 $student,
                 $viewer,
-                $term
+                $term,
+                $gradeHelper
             );
         }
 
@@ -966,13 +969,15 @@ class Controller extends ConfigController
         bool $gradientEnable,
         User $student,
         User $viewer,
-        $term
+        Term\Model $term,
+        Helper $gradeHelper
     ) {
         $allGraphs = [];
 
         foreach ($markbooks as $folderId => $markbook) {
             $graph  = [];
             $graphType = '';
+            /** @var Folder\Model $folder */
             $folder = $folders->getBy('id', $folderId);
             if ((new ValidUseCohortMarks())->isSatisfiedBy($lmsCohortComparison, $folder)) {
                 $graphType = 'cohort';
