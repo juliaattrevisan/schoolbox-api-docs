@@ -97,44 +97,25 @@ HELP;
         $this->getLogger()->info('Seeding project result cache');
 
         /* Find all the project ids that we must consider
-         *
-         * If there are no projects to manage, just exit early
+         * (Only get Implementations, never Specifications)
          */
-        $assessmentCountStatement = $this->getDatabaseInternal()->executeQuery("
-            SELECT COUNT(*) AS num
-            FROM   v_assessment_relation var
-            INNER JOIN assessment a ON var.assessment_id = a.id
-            INNER JOIN project    p ON a.id              = p.assessment_id
-            WHERE p.deleted_at                     IS NULL
-            AND   a.deleted_at                     IS NULL
-            AND   var.course_specification_id      IS NULL
-            AND   var.course_unit_specification_id IS NULL
+        $assessmentStatement = $this->getDatabaseInternal()->executeQuery("
+            SELECT a.id AS assessment_id
+            FROM   assessment a
+            INNER JOIN project p ON a.id = p.assessment_id
+            LEFT  JOIN assessment_course_unit_specification acus ON a.id = acus.assessment_id
+            WHERE p.deleted_at IS NULL
+            AND   a.deleted_at IS NULL
+            AND   acus.course_unit_specification_id IS NULL
         ");
-
-        $assessmentCount = (int)$assessmentCountStatement->fetchColumn();
 
         /* This instance has no living projects to deal with.
          * Let's get out of here
          */
-        if ($assessmentCount === 0) {
+        if ($assessmentStatement->rowCount() === 0) {
             $this->getLogger()->info('No project implementations found; exiting');
-
             return;
         }
-
-        /* Otherwise let's dig
-         * (Only get Implementations, never Specifications)
-         */
-        $assessmentStatement = $this->getDatabaseInternal()->executeQuery("
-            SELECT var.assessment_id
-            FROM   v_assessment_relation var
-            INNER JOIN assessment a ON var.assessment_id = a.id
-            INNER JOIN project    p ON a.id              = p.assessment_id
-            WHERE p.deleted_at                     IS NULL
-            AND   a.deleted_at                     IS NULL
-            AND   var.course_specification_id      IS NULL
-            AND   var.course_unit_specification_id IS NULL
-        ");
 
         /* I need this assessment mapper cache because of all the
          * participation insanity that we have manufactured
@@ -154,10 +135,20 @@ HELP;
         $marker = null;
 
         try {
-            while ($row = $assessmentStatement->fetch()) {
+            foreach ($assessmentStatement->fetchAll() as $row) {
                 $this->refreshLock($lock);
 
                 $project = $assessmentMapperProxy->findByIdForReview($row['assessment_id']);
+                if (!$project->isImplementation()) {
+                    $this->getLogger()->info(
+                        sprintf(
+                            'Project %s (%s) is not an implementation, and thus has no participants - skipping',
+                            $project->getTitle(),
+                            $project->getId()
+                        )
+                    );
+                    continue;
+                }
 
                 $this->getLogger()->info(sprintf(
                     'Examining project %s (%s)',
@@ -174,7 +165,7 @@ HELP;
                  */
                 $participants = $project->getAllParticipants();
 
-                foreach ($participants as $userId => $participant) {
+                foreach ($participants as $participant) {
                     $this->refreshLock($lock);
 
                     $user = $participant->getUser();
@@ -234,6 +225,9 @@ HELP;
                         ));
                     }
                 }
+
+                // Clean up?
+                unset($participants, $project, $participant, $user, $outcome);
             }
         } catch (\Alaress\Lock\LockRefreshException $e) {
             /* Lock TTL expired; just leave politely
