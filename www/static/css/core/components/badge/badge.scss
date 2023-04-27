@@ -22,11 +22,6 @@
         margin: 0 1rem 1rem 0;
         max-width: 250px;
 
-        &:last-child,
-        &:only-child {
-            margin: 0 0 1rem 0;
-        }
-
         .card-feature-image {
             background-color: $vapor;
             position: relative;
