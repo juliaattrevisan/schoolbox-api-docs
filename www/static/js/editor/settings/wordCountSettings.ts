@@ -37,13 +37,12 @@ function getCharacterElement() {
  * @returns { HTMLDivElement } - the limit warning element
  */
 function getLimitWarningElement(config: EditorConfig) {
-    const limitExceededElement = document.createElement('span');
-    limitExceededElement.setAttribute("data-charLimitExceeded", "");
+    const limitExceededElement = document.createElement("span");
     limitExceededElement.classList.add("ck-word-count__limit-exceeded");
-    limitExceededElement.innerHTML = '<b>Warning:</b> The character limit has been reached. Please reduce the content to below the limit to ensure save.';
+    limitExceededElement.innerHTML =
+        "<b>Warning:</b> The character limit has been reached. Please reduce the content to below the limit to ensure save.";
 
     const limitWarningElement = document.createElement("div");
-    limitWarningElement.setAttribute("data-charLimitWarning", "");
     limitWarningElement.classList.add("ck-word-count__limit-warning");
     limitWarningElement.append(limitExceededElement);
     limitWarningElement.style.display = "none";
@@ -74,7 +73,7 @@ function updateWordCount(
     const textEncoder = new TextEncoder();
     const onUpdateText = function () {
         if (config.maxCharCount !== undefined && config.maxCharCount > 0) {
-            const currentByteLength            = textEncoder.encode(editor.getData()).length,
+            const currentByteLength = textEncoder.encode(editor.getData()).length,
                 currentProportionOfMaxLength = currentByteLength / config.maxCharCount,
                 currentPercentageOfMaxLength = (currentProportionOfMaxLength * 100).toFixed(2);
             characterCountElement.innerText = `Size: ${currentPercentageOfMaxLength}% of limit`;
@@ -97,17 +96,23 @@ function updateWordCount(
                 }
             }
 
-            //
             if (currentProportionOfMaxLength > 1) {
-                limitExceededElement.style.display = 'inline';
+                limitExceededElement.style.display = "inline";
                 sourceElement.dispatchEvent(new CustomEvent(EditorEvent.EDITOR__MAX_CHAR_COUNT_EXCEEDED));
                 wordCountContainer.setAttribute("data-maxCharCountExceededAtLastCheck", "1");
             } else {
-                limitExceededElement.style.display = 'none';
-                if (wordCountContainer.getAttribute("data-maxCharCountExceededAtLastCheck") === "1") {
+                limitExceededElement.style.display = "none";
+
+                // Remember the previous value of data-maxCharCountExceededAtLastCheck before updating the value.
+                // (We have just re-run the check, and found the max char count is no longer exceeded).
+                const prevValue = wordCountContainer.getAttribute("data-maxCharCountExceededAtLastCheck");
+
+                // Update the value of data-maxCharCountExceededAtLastCheck before firing the no-longer-exceeded event.
+                wordCountContainer.setAttribute("data-maxCharCountExceededAtLastCheck", "0");
+
+                if (prevValue === "1") {
                     sourceElement.dispatchEvent(new CustomEvent(EditorEvent.EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED));
                 }
-                wordCountContainer.setAttribute("data-maxCharCountExceededAtLastCheck", "0");
             }
         }
     };
