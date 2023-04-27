@@ -238,11 +238,9 @@ Data:
                     if (textContent.length === 0) {
                         const selectionRange = editor.model.document.selection.getFirstRange();
                         const selectedElement = selectionRange.start.nodeAfter || selectionRange.end.nodeBefore;
-                        if (selectedElement && selectedElement.is("element")) {
-                            editor.execute("insertParagraph", {
-                                position: editor.model.createPositionAfter(selectedElement),
-                            });
-                        }
+                        editor.execute("insertParagraph", {
+                            position: editor.model.createPositionAfter(selectedElement),
+                        });
                     }
                     // prevent any further editing while submitting
                     editor.enableReadOnlyMode('editor-body');
