@@ -345,4 +345,14 @@ function updateSelectedMembers() {
         background-color: white;
     }
 }
+
+// Make moderation buttons inline on mobile
+@media only screen and (max-width: 800px) {
+    .VueTables__table .access-td .flex-list {
+        display: block;
+    }
+    .VueTables__table .access-td {
+        max-width: 8rem;
+    }
+}
 </style>
