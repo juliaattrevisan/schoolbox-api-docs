@@ -30,8 +30,6 @@
             return retString;
         };
 
-        console.log('BEFORE => ', chartData);
-
         // Format the data points to include dataLabels for print display
         chartData = chartData.map((data, i) => {
             return {
@@ -49,8 +47,6 @@
                 y: data,
             };
         });
-
-        console.log('AFTER => ', chartData);
 
         /**
          *  Boxplots for each Task in the Unit
