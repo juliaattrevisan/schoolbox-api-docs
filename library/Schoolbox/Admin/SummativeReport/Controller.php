@@ -21,6 +21,7 @@ use Schoolbox\Assessment\Term;
 use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
@@ -775,7 +776,7 @@ class Controller extends ConfigController
 
         /* Find the assessments that fulfil $summaryWorkTypes requirements
          */
-        $summaryAssessments = new Collection();
+        $summaryAssessments = new GenericCollection(IAssessable::class);
 
         if (\count($optionsPayload['summary']['workType'])) {
             $summaryWorkTypes = $this->workTypeMapper->findByColumn('id', $optionsPayload['summary']['workType']);
@@ -792,7 +793,7 @@ class Controller extends ConfigController
 
         /* Find the assessments that fulfil $classWorkTypes requirements
          */
-        $classAssessments = new Collection();
+        $classAssessments = new GenericCollection(IAssessable::class);
 
         if (\count($optionsPayload['class']['workType'])) {
             $classWorkTypes = $this->workTypeMapper->findByColumn('id', $optionsPayload['class']['workType']);
@@ -825,6 +826,10 @@ class Controller extends ConfigController
 
         if ($optionsPayload['summary']['cohort']) {
             foreach ($folders as $folder) {
+                // if the folder is empty, then don't attempt to generate a graph for it
+                if (!isset($summaryAssessments[$folder->getId()])) {
+                    continue;
+                }
                 // for each folder build and work with that markbook and assessments
                 $filteredMarkbook     = (new Markbook($summaryAssessments[$folder->getId()], $overallMarkScheme, $this->getUser()))
                     ->sortAssessables(new AssessmentComparator($viewer));
@@ -844,6 +849,10 @@ class Controller extends ConfigController
 
         if ($optionsPayload['class']['cohort']) {
             foreach ($folders as $folder) {
+                // if the folder is empty, then don't attempt to generate a graph for it
+                if (!isset($summaryAssessments[$folder->getId()])) {
+                    continue;
+                }
                 // for each folder build and work with that markbook and assessments
                 $filteredMarkbook   = (new Markbook($classAssessments[$folder->getId()], $overallMarkScheme, $this->getUser()))->sortAssessables(new AssessmentComparator($viewer));
                 $allGraphs['class'][$folder->getId()] = $this->generateCohortGraph(
