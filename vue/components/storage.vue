@@ -8,6 +8,7 @@
  */
 
 import filesize from "filesize";
+import { getConfigForVideo } from "@js/mediaelementplayer/mepUtils.ts";
 
 export default {
     name: "storage",
@@ -36,20 +37,7 @@ export default {
                 break;
 
             case "video":
-                this.player = new this.MediaElementPlayer(this.$el);
-
-                let container = this.$el.closest(".mejs__container");
-                if (container) {
-                    // The two lines below:
-                    //  * Ensure the video dimensions match the container dimensions both when the video is initially
-                    //    displayed and when it is playing.
-                    //  * Ensure the video poster fills the container with the correct aspect ratio, and has black bars
-                    //    added on the top/bottom or sides if necessary instead of having a hidden part overflow the
-                    //    bounds of the container.
-                    // Documentation: https://github.com/mediaelement/mediaelement/blob/master/docs/usage.md
-                    this.player.setPlayerSize($(container).width(), $(container).height());
-                    $(container).find(".mejs__poster").attr("style", "");
-                }
+                this.player = new this.MediaElementPlayer(this.$el, getConfigForVideo());
                 break;
 
             default:

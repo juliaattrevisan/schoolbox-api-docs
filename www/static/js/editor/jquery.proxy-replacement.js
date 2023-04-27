@@ -1,3 +1,5 @@
+import { getConfigForVideo } from "@js/mediaelementplayer/mepUtils.ts";
+
 (function () {
     /**
      * Replace all placeholders with html elements
@@ -153,7 +155,7 @@
         var type = params["type"];
         var maxwidth = width + "px;";
 
-        if (fullwidth == "true") {
+        if (fullwidth === "true") {
             maxwidth = "100%";
         }
 
@@ -209,23 +211,7 @@
         $(selector)
             .find("[data-schoolboxmedia-replacement]")
             .each(function (index, element) {
-                /* Use the natural rendering mechanism when full-width class is present
-                 */
-                if ($(element).hasClass("full-width")) {
-                    $(element).mediaelementplayer();
-                } else {
-                    /* Video dimensions exceed the container's maxwidth setting for some reason
-                     * https://github.com/mediaelement/mediaelement/issues/42
-                     *
-                     * This was also encountered in storage.vue:46 in mounted()
-                     *
-                     * So I guess we can set it manually and explicitly here
-                     */
-                    $(element).mediaelementplayer({
-                        videoWidth: $(element).attr("width"),
-                        videoHeight: $(element).attr("height"),
-                    });
-                }
+                $(element).mediaelementplayer(getConfigForVideo());
             });
     };
 })(jQuery);
