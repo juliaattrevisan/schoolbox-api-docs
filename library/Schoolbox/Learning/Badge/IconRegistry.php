@@ -40,7 +40,6 @@ namespace Schoolbox\Learning\Badge;
  */
 class IconRegistry
 {
-
     /**
      * Each struct represents this info:
      *
@@ -123,6 +122,10 @@ class IconRegistry
             'name' => 'Weather',
             'files' => [],
         ],
+        'behaviours' => [
+            'name' => 'Learner Behaviours',
+            'files' => [],
+        ]
     ];
 
 
