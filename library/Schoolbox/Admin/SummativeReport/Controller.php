@@ -988,8 +988,12 @@ class Controller extends ConfigController
         foreach ($markbooks as $folderId => $markbook) {
             $graph  = [];
             $graphType = '';
-            /** @var Folder\Model $folder */
+            /** @var null|Folder\Model $folder */
             $folder = $folders->getBy('id', $folderId);
+            // If folder has no assessments / doesn't exist, then don't use it
+            if (null === $folder) {
+                continue;
+            }
             if ((new ValidUseCohortMarks())->isSatisfiedBy($lmsCohortComparison, $folder)) {
                 $graphType = 'cohort';
                 $graph = (new ClassResults(
