@@ -225,6 +225,9 @@ HELP;
                         ));
                     }
                 }
+
+                // Clean up?
+                unset($participants, $project, $participant, $user, $outcome);
             }
         } catch (\Alaress\Lock\LockRefreshException $e) {
             /* Lock TTL expired; just leave politely
