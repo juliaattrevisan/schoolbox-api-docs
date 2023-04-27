@@ -232,7 +232,7 @@ class Sessions implements IStrategy
             /* In Partial Mode, specify two additional datetimes
              */
             if ($this->partial) {
-                $updatedAfter = $this->importLogMapper->findNextPartialDate()->addHours(-11)->toIso8601String();
+                $updatedAfter = $this->importLogMapper->findNextPartialDate()->toIso8601String();
                 $updatedBefore = \Alaress_Date_Format::now()->toIso8601String();
 
                 $this->log->info(sprintf(
