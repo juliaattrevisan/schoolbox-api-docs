@@ -12,9 +12,9 @@
     $(function() {
 
         var infoArray = {{ graph.info | purify }};
-        var chartData = {{ graph.scatter | purify }};
+        var graphData = {{ graph.scatter | purify }};
 
-        const formatChartTooltip = (template, infoArrayIndex) => {
+        const formatGraphLabel = (template, infoArrayIndex) => {
             var retString = template;
 
             if (infoArray[infoArrayIndex].displayMark !== null) {
@@ -31,15 +31,15 @@
         };
 
         // Format the data points to include dataLabels for print display
-        chartData = chartData.map((data, i) => {
+        graphData = graphData.map((data, i) => {
             return {
                 dataLabels: {
                     enabled: true,
                     useHTML: true,
                     formatter: function () {
                         if (infoArray[i] && infoArray[i]?.displayMark){
-                            const template = `<div class="summative-chart-data-label">{DISPLAYMARK}</div>`;
-                            return formatChartTooltip(template, i);
+                            const template = `<div class="summative-graph-data-label">{DISPLAYMARK}</div>`;
+                            return formatGraphLabel(template, i);
                         }
                         return '';
                     }
@@ -79,7 +79,7 @@
                     marker: {
                         radius: 6
                     },
-                    data: chartData,
+                    data: graphData,
                 }
             ],
             // Tooltips aren't necessary in print media
