@@ -237,13 +237,11 @@ Data:
                     const textContent = document.body.textContent.trim();
                     if (textContent.length === 0) {
                         const selectionRange = editor.model.document.selection.getFirstRange();
-                        if (selectionRange) {
-                            const selectedElement = selectionRange.start.nodeAfter || selectionRange.end.nodeBefore;
-                            if (selectedElement && selectedElement.is("element")) {
-                                editor.execute("insertParagraph", {
-                                    position: editor.model.createPositionAfter(selectedElement),
-                                });
-                            }
+                        const selectedElement = selectionRange.start.nodeAfter || selectionRange.end.nodeBefore;
+                        if (selectedElement && selectedElement.is("element")) {
+                            editor.execute("insertParagraph", {
+                                position: editor.model.createPositionAfter(selectedElement),
+                            });
                         }
                     }
                     // prevent any further editing while submitting
