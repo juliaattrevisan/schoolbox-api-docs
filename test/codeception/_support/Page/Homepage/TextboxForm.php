@@ -116,7 +116,7 @@ class TextboxForm
     public function save(): self
     {
         $this->tester->scrollTo(['css' => 'div[class=component-container\ Schoolbox_Resource_Textbox_Component_Homepage_Controller]']);
-        $element = Locator::contains('div.component-action section button', 'Modify');
+        $element = Locator::contains('div.component-action section button', 'Save');
         $this->tester->waitForElementVisible($element, 5);
         $this->tester->click($element);
         return $this;

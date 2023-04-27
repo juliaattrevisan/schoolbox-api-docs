@@ -45,7 +45,7 @@ class TextboxCest
      */
     public function beforeSuite(AcceptanceTester $i): void
     {
-        $i->amGoingTo("update delete_at for the news article so it does not impact the news tests");
+        $i->amGoingTo("update delete_at for the textbox (folder table) so it does not impact the news tests");
         $i->updateInDatabase('folder', ['deleted_at' => "2022-01-15 11:22:34"], ['name like' => "Test TextBox Homepage%"]);
     }
 
