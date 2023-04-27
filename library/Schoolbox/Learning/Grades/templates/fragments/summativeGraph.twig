@@ -12,7 +12,45 @@
     $(function() {
 
         var infoArray = {{ graph.info | purify }};
-        const chartData = {{ graph.scatter | purify }};
+        var chartData = {{ graph.scatter | purify }};
+
+        const formatChartTooltip = (template, infoArrayIndex) => {
+            var retString = template;
+
+            if (infoArray[infoArrayIndex].displayMark !== null) {
+                retString = retString.replace(/{DISPLAYMARK}/, infoArray[infoArrayIndex].displayMark);
+                retString = retString.replace(/{GRADIENTMARK}/, infoArray[infoArrayIndex].gradientMark);
+            }
+            else {
+                retString = retString.replace(/{DISPLAYMARK}/, '');
+                retString = retString.replace(/{GRADIENTMARK}/, '');
+            }
+            retString = retString.replace(/{INFO}/, infoArray[infoArrayIndex].info);
+
+            return retString;
+        };
+
+        console.log('BEFORE => ', chartData);
+
+        // Format the data points to include dataLabels for print display
+        chartData = chartData.map((data, i) => {
+            return {
+                dataLabels: {
+                    enabled: true,
+                    useHTML: true,
+                    formatter: function () {
+                        if (infoArray[i] && infoArray[i]?.displayMark){
+                            const template = `<div class="summative-chart-data-label">{DISPLAYMARK}</div>`;
+                            return formatChartTooltip(template, i);
+                        }
+                        return '';
+                    }
+                },
+                y: data,
+            };
+        });
+
+        console.log('AFTER => ', chartData);
 
         /**
          *  Boxplots for each Task in the Unit
