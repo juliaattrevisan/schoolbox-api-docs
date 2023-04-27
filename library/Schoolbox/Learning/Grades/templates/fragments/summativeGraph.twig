@@ -14,22 +14,6 @@
         var infoArray = {{ graph.info | purify }};
         const chartData = {{ graph.scatter | purify }};
 
-        const formatChartTooltip = (template, infoArrayIndex) => {
-            var retString = template;
-
-            if (infoArray[infoArrayIndex].displayMark !== null) {
-                retString = retString.replace(/{DISPLAYMARK}/, infoArray[infoArrayIndex].displayMark);
-                retString = retString.replace(/{GRADIENTMARK}/, infoArray[infoArrayIndex].gradientMark);
-            }
-            else {
-                retString = retString.replace(/{DISPLAYMARK}/, '');
-                retString = retString.replace(/{GRADIENTMARK}/, '');
-            }
-            retString = retString.replace(/{INFO}/, infoArray[infoArrayIndex].info);
-
-            return retString;
-        };
-
         /**
          *  Boxplots for each Task in the Unit
          */
