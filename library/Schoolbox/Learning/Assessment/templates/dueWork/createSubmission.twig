@@ -236,7 +236,15 @@ Data:
                     const document = new DOMParser().parseFromString(editor.getData(), "text/html");
                     const textContent = document.body.textContent.trim();
                     if (textContent.length === 0) {
-                        editor.execute("enter");
+                        const selectionRange = editor.model.document.selection.getFirstRange();
+                        if (selectionRange) {
+                            const selectedElement = selectionRange.start.nodeAfter || selectionRange.end.nodeBefore;
+                            if (selectedElement && selectedElement.is("element")) {
+                                editor.execute("insertParagraph", {
+                                    position: editor.model.createPositionAfter(selectedElement),
+                                });
+                            }
+                        }
                     }
                     // prevent any further editing while submitting
                     editor.enableReadOnlyMode('editor-body');
