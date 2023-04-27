@@ -146,7 +146,8 @@ async function addSearchNote() {
     const searchNote = document.createElement("p");
     searchNote.classList.add("meta");
     searchNote.style.marginTop = "0.25rem";
-    searchNote.innerText = "The Group can be searched by name, " + store.yearLevelLabel + ", house, campus, role or access.";
+    searchNote.innerText =
+        "The Group can be searched by name, " + store.yearLevelLabel + ", house, campus, role or access.";
     const searchInput = document.querySelector(".VueTables__search__input"); //safe to assume only one, despite class selection
     searchInput.parentElement.appendChild(searchNote);
 }
@@ -300,13 +301,13 @@ function updateSelectedMembers() {
     margin-bottom: 0; //to put the manage-group-filters.vue up closer to the search input
 }
 
-.VueTables__table .name-td {
-    max-width: 100px; //prevent horizontal scrollbar, text does not limit itself to 100px but instead treats overflow properly until reaching 100px
+.VueTables__table .name-td .meta {
+    white-space: normal; // to allow the meta to wrap, which prevents the chance of horizontal scrolling in the table
 }
 
 .VueTables__table .access-td {
     padding-left: 0; //bring it inline with the right side border
-    width: 7.5rem; //keep the edit icon on the right side
+    width: 25rem; //keep the edit icon on the right side
     min-width: 7.5rem; //ensure the column is always wide enough
 }
 
