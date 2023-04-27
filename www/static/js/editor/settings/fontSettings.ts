@@ -19,5 +19,30 @@ export function getFontSettings() {
                 "Verdana, Geneva, sans-serif",
             ],
         },
+        fontSize: {
+            options: [
+                {
+                    title: "Tiny",
+                    model: "0.625rem",
+                },
+                {
+                    title: "Small",
+                    model: "0.75rem",
+                },
+                "default",
+                {
+                    title: "Large",
+                    model: "1rem",
+                },
+                {
+                    title: "Larger",
+                    model: "1.0625rem",
+                },
+                {
+                    title: "Largest",
+                    model: "1.125rem",
+                },
+            ],
+        },
     };
 }
