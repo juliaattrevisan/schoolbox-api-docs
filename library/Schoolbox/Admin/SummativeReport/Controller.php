@@ -26,9 +26,11 @@ use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
+use Schoolbox\Learning\Grades\AssessmentComparator;
 use Schoolbox\Learning\Grades\Cohort\ClassResults;
 use Schoolbox\Learning\Grades\Cohort\ValidUseCohortMarks;
 use Schoolbox\Learning\Grades\Helper;
+use Schoolbox\Learning\Markbook\Markbook;
 use Schoolbox\Learning\MarkScheme\Factory;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
@@ -817,30 +819,45 @@ class Controller extends ConfigController
         $lmsCohortComparison = $this->getConfigLoader()->get('lms_cohort_comparison');
         $gradientEnable = $this->getConfigLoader()->get('grade_gradient_enable');
 
+        // Let markbook calculate the statistics
+        $markSchemeFactory = new Factory($this->getConfigLoader());
+        $overallMarkScheme = $markSchemeFactory->spawnForFolder(null, $this->getUser()->getRole()->isStaff());
+
         if ($optionsPayload['summary']['cohort']) {
-            $allGraphs['summary'] = $this->generateCohortGraph(
-                $markbooks,
-                $folders,
-                $lmsCohortComparison,
-                $gradientEnable,
-                $student,
-                $viewer,
-                $term,
-                $gradeHelper
-            );
+            foreach ($folders as $folder) {
+                // for each folder build and work with that markbook and assessments
+                $filteredMarkbook     = (new Markbook($summaryAssessments[$folder->getId()], $overallMarkScheme, $this->getUser()))
+                    ->sortAssessables(new AssessmentComparator($viewer));
+                $allGraphs['summary'][$folder->getId()] = $this->generateCohortGraph(
+                    $summaryAssessments[$folder->getId()],
+                    $folder,
+                    $filteredMarkbook,
+                    $lmsCohortComparison,
+                    $gradientEnable,
+                    $student,
+                    $viewer,
+                    $term,
+                    $gradeHelper
+                );
+            }
         }
 
         if ($optionsPayload['class']['cohort']) {
-            $allGraphs['class'] = $this->generateCohortGraph(
-                $markbooks,
-                $folders,
-                $lmsCohortComparison,
-                $gradientEnable,
-                $student,
-                $viewer,
-                $term,
-                $gradeHelper
-            );
+            foreach ($folders as $folder) {
+                // for each folder build and work with that markbook and assessments
+                $filteredMarkbook   = (new Markbook($classAssessments[$folder->getId()], $overallMarkScheme, $this->getUser()))->sortAssessables(new AssessmentComparator($viewer));
+                $allGraphs['class'][$folder->getId()] = $this->generateCohortGraph(
+                    $classAssessments[$folder->getId()],
+                    $folder,
+                    $filteredMarkbook,
+                    $lmsCohortComparison,
+                    $gradientEnable,
+                    $student,
+                    $viewer,
+                    $term,
+                    $gradeHelper
+                );
+            }
         }
 
 
@@ -960,22 +977,25 @@ class Controller extends ConfigController
     }
 
     /**
-     *  Refactored into a local function that generates the relevant data to then be sent into
-     *  the summativeGraph.twig file. It was refactored to dedupe code above. Takes in
-     *  lmsCohortComparison and gradientEnable to prevent successive unnecessary db calls.
+     *  Generate standard cohort graph similar to the grades page
      *
-     *  @param Collection $markbooks
-     *  @param Collection $folders
-     *  @param bool $lmsCohortComparison
-     *  @param bool $gradientEnable
-     *  @param User $student
-     *  @param User $viewer
-     *  @param Term\Model $term
-     *  @param Helper $gradeHelper
+     * @param Collection    $assessments
+     * @param Folder\Model  $folder
+     * @param Markbook      $filteredMarkbook
+     * @param bool          $lmsCohortComparison
+     * @param bool          $gradientEnable
+     * @param User          $student
+     * @param User          $viewer
+     * @param Term\Model    $term
+     * @param Helper        $gradeHelper
+     *
+     * @return array{graph: array, type: string}
+     * @throws \JsonException
      */
     private function generateCohortGraph(
-        Collection $markbooks,
-        Collection $folders,
+        Collection $assessments,
+        Folder\Model $folder,
+        Markbook $filteredMarkbook,
         bool $lmsCohortComparison,
         bool $gradientEnable,
         User $student,
@@ -983,36 +1003,22 @@ class Controller extends ConfigController
         Term\Model $term,
         Helper $gradeHelper
     ) {
-        $allGraphs = [];
-
-        foreach ($markbooks as $folderId => $markbook) {
-            $graph  = [];
-            $graphType = '';
-            /** @var null|Folder\Model $folder */
-            $folder = $folders->getBy('id', $folderId);
-            // If folder has no assessments / doesn't exist, then don't use it
-            if (null === $folder) {
-                continue;
-            }
-            if ((new ValidUseCohortMarks())->isSatisfiedBy($lmsCohortComparison, $folder)) {
-                $graphType = 'cohort';
-                $graph = (new ClassResults(
-                    $gradientEnable,
-                    $this->assessmentMapperProxy,
-                    $markbook->getAssessments(),
-                    $this->getUser(),
-                    $term,
-                ))->collate($viewer);
-            } else {
-                $graphType = 'class';
-                $graph = $gradeHelper->buildGraph($markbook, $student, $viewer, $gradientEnable);
-            }
-            $allGraphs[$folderId] = [
-                'graph' => $graph,
-                'type'  => $graphType,
-            ];
+        if ((new ValidUseCohortMarks())->isSatisfiedBy($lmsCohortComparison, $folder)) {
+            $graphType = 'cohort';
+            $graph = (new ClassResults(
+                $gradientEnable,
+                $this->assessmentMapperProxy,
+                $assessments,
+                $this->getUser(),
+                $term,
+            ))->collate($viewer);
+        } else {
+            $graphType = 'class';
+            $graph = $gradeHelper->buildGraph($filteredMarkbook, $student, $viewer, $gradientEnable);
         }
-
-        return $allGraphs;
+        return [
+            'graph' => $graph,
+            'type'  => $graphType,
+        ];
     }
 }

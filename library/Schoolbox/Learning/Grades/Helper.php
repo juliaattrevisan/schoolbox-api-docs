@@ -136,7 +136,7 @@ class Helper
         $workTypeAssessmentsByFolder = new Collection();
 
         foreach ($assessments as $folderId => $folderAssessments) {
-            $workTypeAssessments = new Collection();
+            $workTypeAssessments = new GenericCollection(IAssessable::class);
             foreach ($folderAssessments as $folderAssessment) {
                 if (
                     ($folderAssessment instanceof Project || $folderAssessment instanceof DueWork || $folderAssessment instanceof Quiz || $folderAssessment instanceof Lti) &&
