@@ -88,11 +88,12 @@ class CalendarEventAttendanceCest
      */
     private function testPost(\ApiTester $i, \Schoolbox\User $user, bool $canInvite)
     {
-        $staffInvitee    = $i->createTestUser('invitee-staff-' . time(), Role::STAFF, false);
-        $studentInvitee  = $i->createTestUser('invitee-student-' . time(), Role::STUDENT, false);
-        $parentInvitee   = $i->createTestUser('invitee-parent-' . time(), Role::PARENT, false);
-        $staffNonInvitee = $i->createTestUser('non-invitee-staff-' . time(), Role::STAFF, false);
-        $staffDecline    = $i->createTestUser('invitee-staff-decline-' . time(), Role::STAFF, false);
+        $uniqid          = uniqid((string)mt_rand(), true);
+        $staffInvitee    = $i->createTestUser("invitee-staff-$uniqid", Role::STAFF, false);
+        $studentInvitee  = $i->createTestUser("invitee-student-$uniqid", Role::STUDENT, false);
+        $parentInvitee   = $i->createTestUser("invitee-parent-$uniqid", Role::PARENT, false);
+        $staffNonInvitee = $i->createTestUser("non-invitee-staff-$uniqid", Role::STAFF, false);
+        $staffDecline    = $i->createTestUser("invitee-staff-decline-$uniqid", Role::STAFF, false);
 
         $data = [
             'guests' => implode(',', [
