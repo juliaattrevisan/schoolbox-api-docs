@@ -40,7 +40,6 @@ namespace Schoolbox\Learning\Badge;
  */
 class IconRegistry
 {
-
     /**
      * Each struct represents this info:
      *
