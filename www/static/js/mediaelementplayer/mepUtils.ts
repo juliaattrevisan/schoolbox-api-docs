@@ -2,8 +2,8 @@
  * Return a config object with default Schoolbox options set.
  *
  * Usage:
- *    import * as mepUtils from 'mepUtils.js';
- *    let mePlayer = new MediaElementPlayer(htmlElement, mepUtils.getConfig());
+ *    import { getConfigForVideo } from "@js/mediaelementplayer/mepUtils";
+ *    const player = new MediaElementPlayer(el, getConfigForVideo());
  */
 export function getConfigForVideo(overrideValueByKey: object) {
     let config = {
