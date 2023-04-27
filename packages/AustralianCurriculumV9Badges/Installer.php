@@ -34,7 +34,7 @@ class Installer implements IPackageInstall
             $badge = $badgeMapper->createModel();
             $badge->setName($row['Title']);
             $badge->setBody('<p>' . $row['Description'] . '</p>');
-            $badge->setIcon('/images/badges' . $row['Image']);
+            $badge->setIcon('/images/badges/education/' . $row['Image']);
             $badge->setCategory($badgeCategoryLocator->locate($row['Category'], $user));
             $badge->setAchievementExpiry(Badge\Model::EXPIRY_NEVER);
             $badge->setGoalExpiry(Badge\Model::EXPIRY_NEVER);
