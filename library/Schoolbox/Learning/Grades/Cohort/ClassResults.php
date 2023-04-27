@@ -253,6 +253,14 @@ class ClassResults
         $specsWithPublishedMarks = array_values($this->tuples);
 
         foreach ($this->assessments as $assessment) {
+            /* Skip assessments which weren't spawned from a course
+             * $assessment could be a homepage-specific assessment because this data set
+             * also informs the markbook. We have to skip them as we go.
+             */
+            if (null === $assessment->getSpecificationAssessment()) {
+                continue;
+            }
+
             /* Skip assessment specs whose descendent assessments haven't got any published marks yet
              */
             if (!in_array($assessment->getSpecificationAssessment()->getId(), $specsWithPublishedMarks, false)) {
