@@ -41,7 +41,19 @@ class Installer
             if (!$installer instanceof IPackageInstall) {
                 throw $this->errorMapper->generateException(ErrorMapper::ERROR_PROCESSING, null, "Package class not found");
             }
-
+            /**
+             * Check for package requirements
+             */
+            if (!empty($class::REQUIRED_PACKAGES)) {
+                foreach ($class::REQUIRED_PACKAGES as $reqPackage) {
+                    /** @var Package\Model $tmp */
+                    $tmp = $this->packageMapper->findOneByColumn('location', $reqPackage);
+                    // check if the package is installed
+                    if (!$tmp->isInstalled()) {
+                        throw $this->errorMapper->generateException(ErrorMapper::ERROR_PROCESSING, null, sprintf("Package: %s not installed", $tmp->getTitle()));
+                    }
+                }
+            }
             //set the package as installed, to stop multiple calls...
             $package->setInstalled(true);
             $this->packageMapper->save($package);
