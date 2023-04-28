@@ -39,6 +39,7 @@ const tableOptions = {
     //options for vue-tables-2: https://matanya.gitbook.io/vue-tables-2/options-api
     alwaysShowPerPageSelect: true,
     columnsClasses: {
+        name: "name-td ",
         accessType: "access-td ", //to specify a width
     },
     customFilters: [
@@ -300,6 +301,10 @@ function updateSelectedMembers() {
     margin-bottom: 0; //to put the manage-group-filters.vue up closer to the search input
 }
 
+.VueTables__table .name-td .meta {
+    white-space: normal; // to allow the meta to wrap, which prevents the chance of horizontal scrolling in the table
+}
+
 .VueTables__table .access-td {
     padding-left: 0; //bring it inline with the right side border
     width: 25rem; //keep the edit icon on the right side
@@ -338,6 +343,16 @@ function updateSelectedMembers() {
     }
     100% {
         background-color: white;
+    }
+}
+
+// Make moderation buttons inline on mobile
+@media only screen and (max-width: 800px) {
+    .VueTables__table .access-td .flex-list {
+        display: block;
+    }
+    .VueTables__table .access-td {
+        max-width: 8rem;
     }
 }
 </style>
