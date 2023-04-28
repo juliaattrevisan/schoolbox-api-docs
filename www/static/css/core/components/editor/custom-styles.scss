@@ -52,6 +52,9 @@ article {
 
         th {
             background-color: rgba(0, 0, 0, 0.05);
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+
             p {
                 font-weight: 600;
             }
@@ -62,6 +65,7 @@ article {
         td {
             border: 1px solid rgb(179, 179, 179);
             padding: 0.4em;
+            word-break: break-word;
             vertical-align: middle;
         }
     }
