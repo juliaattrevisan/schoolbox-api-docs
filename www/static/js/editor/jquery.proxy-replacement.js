@@ -113,27 +113,7 @@ import { getConfigForVideo } from "@js/mediaelementplayer/mepUtils.ts";
         var e = $(element);
 
         return {
-            // Always set 'style' to blank.
-            // If we set style to ((e.attr("style") !== undefined)? e.attr("style") : ""), then if the video has been
-            // resized to something other than 'original' or 'full-width' (using the CKEditor edit mode), the dimensions
-            // will be passed on here, and then the dimensions of the video will not be constrained by the available
-            // space.  Leaving 'style' blank here gives us the exact behaviour we want.  The video will be shown in the
-            // dimensions saved in the CKeditor edit mode if possible, otherwise in the maximum dimensions allowed by the
-            // container.
-            // To see the alternative behaviour that style: '' avoids:
-            //  1. Set style to ((e.attr("style") !== undefined)? e.attr("style") : "") in the line below this comment.
-            //  2. Embed a video in a CKEditor text field.
-            //  3. Edit the CKEditor text field, and click on the video.  Increase the size of the video by dragging its
-            //     corner.  Set the width of the video to more than 640 pixels.
-            //  4. Save the text CKEditor field, and return to the non-edit view of the document.
-            //  5. Decrease the width of your browser window to its minimum, and reload the page.
-            //  Expected undesired behaviour:
-            //     The video will be too big for the available space, so some of it will be hidden, and scroll bars
-            //     will appear on the video's container.
-            //  Desired behaviour (observed when style is set to blank):
-            //     The video dimensions will be constrained by the available space, and no scroll bars will appear.
-            style: "",
-
+            style: e.attr("style") !== undefined ? e.attr("style") : "",
             width: e.attr("data-schoolboxresource-width") !== undefined ? e.attr("data-schoolboxresource-width") : "",
             height:
                 e.attr("data-schoolboxresource-height") !== undefined ? e.attr("data-schoolboxresource-height") : "",
@@ -232,7 +212,27 @@ import { getConfigForVideo } from "@js/mediaelementplayer/mepUtils.ts";
         $(selector)
             .find("[data-schoolboxmedia-replacement]")
             .each(function (index, element) {
-                $(element).mediaelementplayer(getConfigForVideo());
+                const $element = $(element);
+
+                // Override height and width set directly on the [data-schoolboxmedia-replacement-container] to 'auto'.
+                // This is necessary to avoid a problem that would otherwise occur when the size of embedded CKEditor
+                // videos has been set to something other than 'original' or 'full-width'.
+                //
+                // To demonstrate the purpose of this fix:
+                //  1. Embed a video in a CKEditor text field.
+                //  2. Edit the CKEditor text field, and click on the video.  Increase the size of the video by dragging its
+                //     corner.  Set the width of the video to more than 640 pixels.
+                //  3. Save the text CKEditor field, and return to the non-edit view of the document.
+                //  4. Decrease the width of your browser window to its minimum, and reload the page.
+                //     Expected behaviour:
+                //      * The video dimensions will be constrained by the available space, and no scroll bars will appear.
+                //  5. Now comment out the line below, and refresh the page.
+                //     Expected undesired behaviour:
+                //      * The video will be too big for the available space, so some of it will be hidden, and scroll bars
+                //        will appear on the video's container.
+                $element.closest("[data-schoolboxmedia-replacement-container]").css({ width: "auto", height: "auto" });
+
+                $element.mediaelementplayer(getConfigForVideo());
             });
     };
 })(jQuery);
