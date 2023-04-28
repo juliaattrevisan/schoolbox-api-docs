@@ -77,9 +77,9 @@ export function getHTMLSupportSettings() {
                         border: true,
                     },
                 },
-                // "div(*);"
+                // "Allow class and style on all div, p, a, h2, h3, h4 elements"
                 {
-                    name: "div",
+                    name: /^(div|p|a|h2|h3|h4)$/,
                     classes: true,
                     styles: true,
                 },
