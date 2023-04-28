@@ -8,32 +8,46 @@
 namespace Schoolbox\APIAssessment;
 
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission;
 use Schoolbox\GenericCollection;
 use Alaress\Database\Predicate\Builder;
 use PDO;
 use Schoolbox\Learning\Assessment\AssessmentType;
+use Schoolbox\Resource\Storage;
 use Schoolbox\YearLevel\Mapper as YearLevelMapper;
 use Schoolbox\YearLevel\Model as YearLevelModel;
 
 class Helper
 {
     /**
+     * Cache for list of year levels
+     *
      * @var GenericCollection | YearLevelModel[] | null
      */
     protected ?GenericCollection $yearLevels = null;
 
-    protected YearLevelMapper $mapper;
-
+    /**
+     * Cache for already looked-up folder codes
+     *
+     * @var array|null
+     */
     protected ?array $folderCodes = null;
 
     /**
-     * YearLevel Mapper is being used to get the collection of year levels,
-     * and provide the database interface for building specific queries
-     * @param YearLevelMapper $mapper
+     * Constructor
+     *
+     * @param YearLevelMapper                 $mapper            Used to get the collection of year levels, and allow
+     *                                                           direct DB access
+     * @param Submission\SubmissionMapper     $submissionMapper  Used to fetch student submissions, and thus attached
+     *                                                           files
+     * @param Storage\Translator\ModelToArray $storageTranslator Used to translate student submission files into a
+     *                                                           standard array format
      */
-    public function __construct(YearLevelMapper $mapper)
-    {
-        $this->mapper = $mapper;
+    public function __construct(
+        private YearLevelMapper $mapper,
+        private Submission\SubmissionMapper $submissionMapper,
+        private Storage\Translator\ModelToArray $storageTranslator,
+    ) {
     }
 
     /**
@@ -79,10 +93,6 @@ class Helper
          * build the whole thing
          */
         foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
-            $weighted = false;
-            if ('0.00' !== $row['weight']) {
-                $weighted = true;
-            }
             $yearLevel = null;
             /**
              * check if folder has yearlevels?
@@ -124,7 +134,6 @@ class Helper
                     'folder'           => $folder,
                     'subjectCode'      => $row['subjectCode'],
                     'project'          => $project,
-                    'weighted'         => $weighted,
                     'weight'           => (float)$row['weight'],
                     'dueDate'          => \Alaress_Date_Format::newDatabaseDate($row['due_date'])->toRfc3339String(),
                     'rubric'           => $rubric,
@@ -136,10 +145,10 @@ class Helper
         if (empty($output)) {
             return [];
         }
-        //get feedback items
-        $feedbacks = $this->getAssessmentFeedback(array_keys($output));
-        foreach ($feedbacks as $assessmentID => $feedback) {
-            $output[$assessmentID]['participants'] = array_values($feedback);
+        //get participation (feedback + responses)
+        $participationItemsByAssessment = $this->getAssessmentParticipation(array_keys($output));
+        foreach ($participationItemsByAssessment as $assessmentID => $participationItems) {
+            $output[$assessmentID]['participants'] = array_values($participationItems);
         }
         return array_values($output);
     }
@@ -366,188 +375,402 @@ WHERE
     * @param array $assessmentIds
     * @return array
     */
-    private function getAssessmentFeedback(array $assessmentIds): array
+    private function getAssessmentParticipation(array $assessmentIds): array
     {
-        $bindings = Builder::getBindings($assessmentIds, 'ids');
-        $statement = $this->mapper->getDatabase()->query("
-        (select `sb`.`assessment_id` AS `assessment_id`,
-        'submission_return'  AS `feedback_table`,
-        max(`sr1`.`id`)      AS `feedback_id`,
-        `sr1`.`owner`        AS `student_id`,
-        `sr1`.`published_at` AS `completionDate`,
-        `sr1`.`comment`      AS `comment`,
-        `sr1`.`mark`         AS `mark`,
-        `sr1`.`norm_mark`    AS `norm_mark`,
-        `student`.`title` as `studentTitle`,
-        `student`.`firstname` as `studentFirstname`,
-        `student`.`preferred_name` as `studentPreferredName`,
-        `student`.`lastname` as `studentLastname`,
-        `student`.`synergy_id` as `studentExternalId`,
-        `staff`.`id` as `staffId`,
-        `staff`.`title` as `staffTitle`,
-        `staff`.`firstname` as `staffFirstname`,
-        `staff`.`preferred_name` as `staffPreferredName`,
-        `staff`.`lastname` as `staffLastname`,
-        `staff`.`synergy_id` as `staffExternalId`
- from ((`submission_return` `sr1`
-     join `submission_box` `sb` on (`sr1`.`box_id` = `sb`.`id`))
-     left join `submission_return` `sr2` on (
-                 `sr1`.`box_id` = `sr2`.`box_id`
-             and `sr1`.`owner` = `sr2`.`owner`
-             and `sr1`.`review_route` = `sr2`.`review_route`
-             and `sr2`.`published_at` is not null
-             and `sr2`.`deleted_at` is null
-             and `sr1`.`published_at` < `sr2`.`published_at`)
-     LEFT JOIN `user` `student` on `sr1`.`owner` = `student`.`id`
-     LEFT JOIN `user` `staff` on `sr1`.`marker` = `staff`.`id`)
- where `sr1`.`published_at` is not null
-   and `sr1`.`deleted_at` is null
-   and `sr2`.`id` is null
-   and `sr1`.`review_route` = 'instructor'
-   and `sb`.`assessment_id` in ({$bindings->getPlaceholder()})
- group by `sb`.`assessment_id`, `sr1`.`owner`, `sr1`.`review_route`, `sr1`.`published_at`)
-union
-(select `ass`.`assessment_id`   AS `assessment_id`,
-        'assess_attempt'        AS `feedback_table`,
-        max(`aa1`.`attempt_id`) AS `feedback_id`,
-        `aa1`.`user_id`         AS `student_id`,
-        `aa1`.`reviewed_at`     AS `completionDate`,
-        null                    AS `comment`,
-        `aa1`.`mark`            AS `mark`,
-        (`aa1`.`mark` / `aa1`.`max_mark` * 100)    AS `norm_mark`,
-        `student`.`title` as `studentTitle`,
-        `student`.`firstname` as `studentFirstname`,
-        `student`.`preferred_name` as `studentPreferredName`,
-        `student`.`lastname` as `studentLastname`,
-        `student`.`synergy_id` as `studentExternalId`,
-        `staff`.`id` as `staffId`,
-        `staff`.`title` as `staffTitle`,
-        `staff`.`firstname` as `staffFirstname`,
-        `staff`.`preferred_name` as `staffPreferredName`,
-        `staff`.`lastname` as `staffLastname`,
-        `staff`.`synergy_id` as `staffExternalId`
- from ((`assess_attempt` `aa1`
-     join `assess` `ass` on (`aa1`.`assess_id` = `ass`.`assess_id`))
-     left join `assess_attempt` `aa2` on (
-                 `aa1`.`assess_id` = `aa2`.`assess_id`
-             and `aa1`.`user_id` = `aa2`.`user_id`
-             and `aa2`.`reviewed_at` is not null
-             and `aa2`.`deleted_at` is null
-             and `aa1`.`reviewed_at` < `aa2`.`reviewed_at`)
-     LEFT JOIN `user` `student` on `aa1`.`user_id` = `student`.`id`
-     LEFT JOIN `user` `staff` on `aa1`.`reviewer_id` = `staff`.`id`)
- where `aa1`.`reviewed_at` is not null
-   and `aa1`.`deleted_at` is null
-   and `aa2`.`attempt_id` is null
-   and `ass`.`assessment_id` is not null
-   and `ass`.`assessment_id` in ({$bindings->getPlaceholder()})
- group by `ass`.`assessment_id`, `aa1`.`user_id`, `aa1`.`reviewed_at`)
-union
-(select `t`.`assessment_id`     AS `assessment_id`,
-        'task_completion'       AS `feedback_table`,
-        max(`tc1`.`id`)         AS `feedback_id`,
-        `tc1`.`student_id`      AS `student_id`,
-        `tc1`.`completion_date` AS `completionDate`,
-        null                    AS `comment`,
-        null                    AS `mark`,
-        null                    AS `norm_mark`,
-        `student`.`title` as `studentTitle`,
-        `student`.`firstname` as `studentFirstname`,
-        `student`.`preferred_name` as `studentPreferredName`,
-        `student`.`lastname` as `studentLastname`,
-        `student`.`synergy_id` as `studentExternalId`,
-        `staff`.`id` as `staffId`,
-        `staff`.`title` as `staffTitle`,
-        `staff`.`firstname` as `staffFirstname`,
-        `staff`.`preferred_name` as `staffPreferredName`,
-        `staff`.`lastname` as `staffLastname`,
-        `staff`.`synergy_id` as `staffExternalId`
- from ((`task_completion` `tc1`
-     join `task` `t` on (`tc1`.`task_id` = `t`.`id`))
-     left join `task_completion` `tc2` on (
-                 `tc1`.`task_id` = `tc2`.`task_id`
-             and `tc1`.`student_id` = `tc2`.`student_id`
-             and `tc1`.`completion_status` = `tc2`.`completion_status`
-             and `tc2`.`deleted_at` is null
-             and `tc1`.`completion_date` < `tc2`.`completion_date`)
-     LEFT JOIN `user` `student` on `tc1`.`student_id` = `student`.`id`
-     LEFT JOIN `user` `staff` on `tc1`.`marking_user_id` = `staff`.`id`)
- where `tc1`.`completion_date` is not null
-   and `tc1`.`deleted_at` is null
-   and `tc2`.`id` is null
-   and `tc1`.`completion_status` = 3
-   and `t`.`assessment_id` in ({$bindings->getPlaceholder()})
- group by `t`.`assessment_id`, `tc1`.`student_id`, `tc1`.`completion_date`)
-union
-(select `la`.`assessment_id`   AS `assessment_id`,
-        'lti_assessment_score' AS `feedback_table`,
-        max(`sc1`.`id`)        AS `feedback_id`,
-        `sc1`.`student_id`     AS `student_id`,
-        `sc1`.`created_at`     AS `completionDate`,
-        `sc1`.`comment`        AS `comment`,
-        `sc1`.`score_given`            AS `mark`,
-        (`sc1`.`score_given` / `sc1`.`score_maximum` * 100)    AS `norm_mark`,
-        `student`.`title` as `studentTitle`,
-        `student`.`firstname` as `studentFirstname`,
-        `student`.`preferred_name` as `studentPreferredName`,
-        `student`.`lastname` as `studentLastname`,
-        `student`.`synergy_id` as `studentExternalId`,
-        `staff`.`id` as `staffId`,
-        `staff`.`title` as `staffTitle`,
-        `staff`.`firstname` as `staffFirstname`,
-        `staff`.`preferred_name` as `staffPreferredName`,
-        `staff`.`lastname` as `staffLastname`,
-        `staff`.`synergy_id` as `staffExternalId`
- from ((`lti_assessment_score` `sc1`
-     join `lti_assessment` `la` on (`sc1`.`lti_assessment_id` = `la`.`id`))
-     left join `lti_assessment_score` `sc2` on (
-                 `sc1`.`lti_assessment_id` = `sc2`.`lti_assessment_id`
-             and `sc1`.`student_id` = `sc2`.`student_id`
-             and `sc2`.`created_at` is not null
-             and `sc2`.`deleted_at` is null
-             and `sc1`.`created_at` < `sc2`.`created_at`)
-     LEFT JOIN `user` `student` on `sc1`.`student_id` = `student`.`id`
-     LEFT JOIN `user` `staff` on `sc1`.`marking_user_id` = `staff`.`id`)
- where `sc1`.`created_at` is not null
-   and `sc1`.`deleted_at` is null
-   and `sc1`.`is_feedback` = 1
-   and `sc2`.`id` is null
-and `la`.`assessment_id` in ({$bindings->getPlaceholder()})
- group by `la`.`assessment_id`, `sc1`.`student_id`, `sc1`.`created_at`)
-order by `assessment_id`, `student_id`;
-            ", $bindings->getParams());
+        // May need to redo this completely.
+        // Don't be too clever: just fetch all feedback/responses, and plug in
+        // rubric where needed.
+        $bindings          = Builder::getBindings($assessmentIds, 'ids');
+        $participantFields = '
+            `participant`.`id`             as `participant_id`,
+            `participant`.`title`          as `participant_title`,
+            `participant`.`firstname`      as `participant_first_name`,
+            `participant`.`preferred_name` as `participant_preferred_name`,
+            `participant`.`lastname`       as `participant_last_name`,
+            `participant`.`synergy_id`     as `participant_external_id`
+        ';
+        $reviewerFields    = '
+            `reviewer`.`id`             as `reviewer_id`,
+            `reviewer`.`title`          as `reviewer_title`,
+            `reviewer`.`firstname`      as `reviewer_first_name`,
+            `reviewer`.`preferred_name` as `reviewer_preferred_name`,
+            `reviewer`.`lastname`       as `reviewer_last_name`,
+            `reviewer`.`synergy_id`     as `reviewer_external_id`
+        ';
+        $feedbackQueries = [
+            <<<DUEWORK
+            select
+                `sb`.`assessment_id` AS `assessment_id`,
+                'submission_return'  AS `feedback_table`,
+                max(`sr1`.`id`)      AS `feedback_id`,
+                `sr1`.`published_at` AS `completion_date`,
+                `sr1`.`comment`      AS `comment`,
+                `sr1`.`mark`         AS `mark`,
+                `sr1`.`norm_mark`    AS `norm_mark`,
+                $participantFields,
+                $reviewerFields
+            from (
+                (`submission_return` `sr1` join `submission_box` `sb` on (`sr1`.`box_id` = `sb`.`id`))
+                left join `submission_return` `sr2` on (
+                    `sr1`.`box_id` = `sr2`.`box_id`
+                    and `sr1`.`owner` = `sr2`.`owner`
+                    and `sr1`.`review_route` = `sr2`.`review_route`
+                    and `sr2`.`published_at` is not null
+                    and `sr2`.`deleted_at` is null
+                    and `sr1`.`published_at` < `sr2`.`published_at`
+                )
+                LEFT JOIN `user` `participant` on `sr1`.`owner`  = `participant`.`id`
+                LEFT JOIN `user` `reviewer`    on `sr1`.`marker` = `reviewer`.`id`
+            )
+            where `sr1`.`published_at` is not null
+              and `sr1`.`deleted_at` is null
+              and `sr2`.`id` is null
+              and `sr1`.`review_route` = 'instructor'
+              and `sb`.`assessment_id` in ({$bindings->getPlaceholder()})
+            group by `sb`.`assessment_id`, `sr1`.`owner`, `sr1`.`review_route`, `sr1`.`published_at`
+            DUEWORK,
+            <<<QUIZ
+            select
+                `ass`.`assessment_id`                   AS `assessment_id`,
+                'assess_attempt'                        AS `feedback_table`,
+                max(`aa1`.`attempt_id`)                 AS `feedback_id`,
+                `aa1`.`reviewed_at`                     AS `completion_date`,
+                null                                    AS `comment`,
+                `aa1`.`mark`                            AS `mark`,
+                (`aa1`.`mark` / `aa1`.`max_mark` * 100) AS `norm_mark`,
+                $participantFields,
+                $reviewerFields
+            from (
+                (`assess_attempt` `aa1` join `assess` `ass` on (`aa1`.`assess_id` = `ass`.`assess_id`))
+                left join `assess_attempt` `aa2` on (
+                    `aa1`.`assess_id` = `aa2`.`assess_id`
+                    and `aa1`.`user_id` = `aa2`.`user_id`
+                    and `aa2`.`reviewed_at` is not null
+                    and `aa2`.`deleted_at` is null
+                    and `aa1`.`reviewed_at` < `aa2`.`reviewed_at`
+                )
+                LEFT JOIN `user` `participant` on `aa1`.`user_id`     = `participant`.`id`
+                LEFT JOIN `user` `reviewer`    on `aa1`.`reviewer_id` = `reviewer`.`id`
+            )
+            where `aa1`.`reviewed_at` is not null
+              and `aa1`.`deleted_at` is null
+              and `aa2`.`attempt_id` is null
+              and `ass`.`assessment_id` is not null
+              and `ass`.`assessment_id` in ({$bindings->getPlaceholder()})
+            group by `ass`.`assessment_id`, `aa1`.`user_id`, `aa1`.`reviewed_at`
+            QUIZ,
+            <<<TASK
+            select
+                `t`.`assessment_id`     AS `assessment_id`,
+                'task_completion'       AS `feedback_table`,
+                max(`tc1`.`id`)         AS `feedback_id`,
+                `tc1`.`completion_date` AS `completion_date`,
+                null                    AS `comment`,
+                null                    AS `mark`,
+                null                    AS `norm_mark`,
+                $participantFields,
+                $reviewerFields
+            from (
+                (`task_completion` `tc1` join `task` `t` on (`tc1`.`task_id` = `t`.`id`))
+                left join `task_completion` `tc2` on (
+                    `tc1`.`task_id` = `tc2`.`task_id`
+                    and `tc1`.`student_id` = `tc2`.`student_id`
+                    and `tc1`.`completion_status` = `tc2`.`completion_status`
+                    and `tc2`.`deleted_at` is null
+                    and `tc1`.`completion_date` < `tc2`.`completion_date`
+                )
+                LEFT JOIN `user` `participant` on `tc1`.`student_id`      = `participant`.`id`
+                LEFT JOIN `user` `reviewer`    on `tc1`.`marking_user_id` = `reviewer`.`id`
+            )
+            where `tc1`.`completion_date` is not null
+              and `tc1`.`deleted_at` is null
+              and `tc2`.`id` is null
+              and `tc1`.`completion_status` = 3
+              and `t`.`assessment_id` in ({$bindings->getPlaceholder()})
+            group by `t`.`assessment_id`, `tc1`.`student_id`, `tc1`.`completion_date`
+            TASK,
+            <<<LTI
+            select
+                `la`.`assessment_id`                                AS `assessment_id`,
+                'lti_assessment_score'                              AS `feedback_table`,
+                max(`sc1`.`id`)                                     AS `feedback_id`,
+                `sc1`.`created_at`                                  AS `completion_date`,
+                `sc1`.`comment`                                     AS `comment`,
+                `sc1`.`score_given`                                 AS `mark`,
+                (`sc1`.`score_given` / `sc1`.`score_maximum` * 100) AS `norm_mark`,
+                $participantFields,
+                $reviewerFields
+            from (
+                (`lti_assessment_score` `sc1` join `lti_assessment` `la` on (`sc1`.`lti_assessment_id` = `la`.`id`))
+                left join `lti_assessment_score` `sc2` on (
+                    `sc1`.`lti_assessment_id` = `sc2`.`lti_assessment_id`
+                    and `sc1`.`student_id` = `sc2`.`student_id`
+                    and `sc2`.`deleted_at` is null
+                    and `sc1`.`created_at` < `sc2`.`created_at`)
+                LEFT JOIN `user` `participant` on `sc1`.`student_id`      = `participant`.`id`
+                LEFT JOIN `user` `reviewer`    on `sc1`.`marking_user_id` = `reviewer`.`id`
+            )
+            where `sc1`.`deleted_at` is null
+              and `sc1`.`is_feedback` = 1
+              and `sc2`.`id` is null
+              and `la`.`assessment_id` in ({$bindings->getPlaceholder()})
+            group by `la`.`assessment_id`, `sc1`.`student_id`, `sc1`.`created_at`
+            LTI,
+        ];
+
+        $statement = $this->mapper->getDatabase()->query(
+            '(' . implode(') union (', $feedbackQueries) . ') order by `assessment_id`, `participant_id`',
+            $bindings->getParams(),
+        );
         $statement->execute();
-        $feedbackItems = [];
+        $participationItems = [];
         foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
-            if (!isset($feedbackItems[$row['assessment_id']])) {
-                $feedbackItems[$row['assessment_id']] = [];
+            if (!isset($participationItems[$row['assessment_id']])) {
+                $participationItems[$row['assessment_id']] = [];
             }
             $rubric = $this->getRubricFeedback($row['assessment_id'], $row['feedback_id']);
-            $feedbackItems[$row['assessment_id']][$row['student_id']] = [
-                'learner'        => [
-                    'id'            => $row['student_id'],
-                    'title'         => $row['studentTitle'],
-                    'firstName'     => $row['studentFirstname'],
-                    'preferredName' => $row['studentPreferredName'],
-                    'lastName'      => $row['studentLastname'],
-                    'externalId'    => $row['studentExternalId'],
-                ],
+
+            // Feedback fields are duplicated in the base key of the feedback
+            // item, as well as in "feedback".
+            $feedbackFields = [
                 'mark'           => $row['mark'],
                 'normalisedMark' => $row['norm_mark'],
                 'comment'        => $row['comment'],
-                'date'           => (new \Alaress_Date_Format($row['completionDate'], \Alaress_Date_Format::DATABASE_FORMAT))->toIso8601String(),
+                'date'           => (new \Alaress_Date_Format($row['completion_date'], \Alaress_Date_Format::DATABASE_FORMAT))->toIso8601String(),
                 'instructor'     => [
-                    'id'            => $row['staffId'],
-                    'title'         => $row['staffTitle'],
-                    'firstName'     => $row['staffFirstname'],
-                    'preferredName' => $row['staffPreferredName'],
-                    'lastName'      => $row['staffLastname'],
-                    'externalId'    => $row['staffExternalId'],
+                    'id'            => $row['reviewer_id'],
+                    'title'         => $row['reviewer_title'],
+                    'firstName'     => $row['reviewer_first_name'],
+                    'preferredName' => $row['reviewer_preferred_name'],
+                    'lastName'      => $row['reviewer_last_name'],
+                    'externalId'    => $row['reviewer_external_id'],
                 ],
                 'rubric'         => $rubric,
             ];
+
+            // Add learner details
+            $participationItems[$row['assessment_id']][$row['participant_id']]['learner'] ??= [
+                'id'            => $row['participant_id'],
+                'title'         => $row['participant_title'],
+                'firstName'     => $row['participant_first_name'],
+                'preferredName' => $row['participant_preferred_name'],
+                'lastName'      => $row['participant_last_name'],
+                'externalId'    => $row['participant_external_id'],
+            ];
+
+            // Add feedback details
+            $participationItems[$row['assessment_id']][$row['participant_id']]['feedback'] = [
+                'id' => $row['feedback_id'],
+            ] + $feedbackFields;
+
+            // Add feedback details in a deprecated place
+            $participationItems[$row['assessment_id']][$row['participant_id']] += $feedbackFields;
+
+            // Add empty response if nothing there
+            $participationItems[$row['assessment_id']][$row['participant_id']]['response'] ??= null;
         }
-        return $feedbackItems;
+        $statement->closeCursor();
+
+
+        // Also fetch most recent response for this item
+        // Format:
+        // "id": 10,
+        // "date": "2022-01-30T21:00:00.000Z",
+        // "mark": "B",
+        // "normalisedMark": "30",
+        // "rubric": {...},
+        // "files": [
+        //     {`standard files object`}
+        // ]
+        $submitterFields    = '
+            `submitter`.`id`             as `submitter_id`,
+            `submitter`.`title`          as `submitter_title`,
+            `submitter`.`firstname`      as `submitter_first_name`,
+            `submitter`.`preferred_name` as `submitter_preferred_name`,
+            `submitter`.`lastname`       as `submitter_last_name`,
+            `submitter`.`synergy_id`     as `submitter_external_id`
+        ';
+        $responseQueries = [
+            <<<DUEWORK
+            select
+                `sb`.`assessment_id` AS `assessment_id`,
+                'student_submission' AS `response_table`,
+                max(ss1.`id`)        AS `response_id`,
+                ss1.`submitted_at`   AS `completion_date`,
+                null                 AS `comment`,
+                null                 AS `mark`,
+                null                 AS `norm_mark`,
+                $participantFields,
+                $submitterFields
+            from (
+                (`student_submission` ss1 join `submission_box` `sb` on (ss1.`box_id` = `sb`.`id`))
+                left join `student_submission` ss2 on (
+                    ss1.`box_id` = ss2.`box_id`
+                    and ss1.`owner` = ss2.`owner`
+                    and ss2.`submitted_at` is not null
+                    and ss2.`deleted_at` is null
+                    and ss1.`submitted_at` < ss2.`submitted_at`
+                )
+                LEFT JOIN `user` `participant` on ss1.`owner`        = `participant`.`id`
+                LEFT JOIN `user` `submitter`   on ss1.`submitted_by` = `submitter`.`id`
+            )
+            where ss1.`submitted_at` is not null
+              and ss1.`deleted_at` is null
+              and ss2.`id` is null
+              and `sb`.`assessment_id` in ({$bindings->getPlaceholder()})
+            group by `sb`.`assessment_id`, ss1.`owner`, ss1.`submitted_at`
+            DUEWORK,
+            <<<QUIZ
+            select
+                `ass`.`assessment_id`                   AS `assessment_id`,
+                'assess_attempt'                        AS `response_table`,
+                max(`aa1`.`attempt_id`)                 AS `response_id`,
+                `aa1`.`finish`                          AS `completion_date`,
+                null                                    AS `comment`,
+                `aa1`.`mark`                            AS `mark`,
+                (`aa1`.`mark` / `aa1`.`max_mark` * 100) AS `norm_mark`,
+                $participantFields,
+                $submitterFields
+            from (
+                (`assess_attempt` `aa1` join `assess` `ass` on (`aa1`.`assess_id` = `ass`.`assess_id`))
+                left join `assess_attempt` `aa2` on (
+                    `aa1`.`assess_id` = `aa2`.`assess_id`
+                    and `aa1`.`user_id` = `aa2`.`user_id`
+                    and `aa2`.`finish` is not null
+                    and `aa2`.`deleted_at` is null
+                    and `aa1`.`finish` < `aa2`.`finish`
+                )
+                -- Submitting user is always the same as the participant:
+                -- teachers can't submit on behalf of a student
+                LEFT JOIN `user` `participant` on `aa1`.`user_id` = `participant`.`id`
+                LEFT JOIN `user` `submitter`   on `aa1`.`user_id` = `submitter`.`id`
+            )
+            where `aa1`.`finish` is not null
+              and `aa1`.`deleted_at` is null
+              and `aa2`.`attempt_id` is null
+              and `ass`.`assessment_id` is not null
+              and `ass`.`assessment_id` in ({$bindings->getPlaceholder()})
+            group by `ass`.`assessment_id`, `aa1`.`user_id`, `aa1`.`reviewed_at`
+            QUIZ,
+            <<<TASK
+            select
+                `t`.`assessment_id`     AS `assessment_id`,
+                'task_completion'       AS `response_table`,
+                max(`tc1`.`id`)         AS `response_id`,
+                `tc1`.`completion_date` AS `completion_date`,
+                null                    AS `comment`,
+                null                    AS `mark`,
+                null                    AS `norm_mark`,
+                $participantFields,
+                $submitterFields
+            from (
+                (`task_completion` `tc1` join `task` `t` on (`tc1`.`task_id` = `t`.`id`))
+                left join `task_completion` `tc2` on (
+                    `tc1`.`task_id` = `tc2`.`task_id`
+                    and `tc1`.`student_id` = `tc2`.`student_id`
+                    and `tc1`.`completion_status` = `tc2`.`completion_status`
+                    and `tc2`.`deleted_at` is null
+                    and `tc1`.`completion_date` < `tc2`.`completion_date`
+                )
+                LEFT JOIN `user` `participant` on `tc1`.`student_id`      = `participant`.`id`
+                LEFT JOIN `user` `submitter`   on `tc1`.`marking_user_id` = `submitter`.`id`
+            )
+            where `tc1`.`completion_date` is not null
+              and `tc1`.`deleted_at` is null
+              and `tc2`.`id` is null
+              and `tc1`.`completion_status` = 2
+              and `t`.`assessment_id` in ({$bindings->getPlaceholder()})
+            group by `t`.`assessment_id`, `tc1`.`student_id`, `tc1`.`completion_date`
+            TASK,
+            <<<LTI
+            select
+                `la`.`assessment_id`                                AS `assessment_id`,
+                'lti_assessment_score'                              AS `response_table`,
+                max(`sc1`.`id`)                                     AS `response_id`,
+                `sc1`.`created_at`                                  AS `completion_date`,
+                `sc1`.`comment`                                     AS `comment`,
+                `sc1`.`score_given`                                 AS `mark`,
+                (`sc1`.`score_given` / `sc1`.`score_maximum` * 100) AS `norm_mark`,
+                $participantFields,
+                $submitterFields
+            from (
+                (`lti_assessment_score` `sc1` join `lti_assessment` `la` on (`sc1`.`lti_assessment_id` = `la`.`id`))
+                left join `lti_assessment_score` `sc2` on (
+                    `sc1`.`lti_assessment_id` = `sc2`.`lti_assessment_id`
+                    and `sc1`.`student_id` = `sc2`.`student_id`
+                    and `sc2`.`deleted_at` is null
+                    and `sc1`.`created_at` < `sc2`.`created_at`)
+                LEFT JOIN `user` `participant` on `sc1`.`student_id`      = `participant`.`id`
+                LEFT JOIN `user` `submitter`   on `sc1`.`marking_user_id` = `submitter`.`id`
+            )
+            where `sc1`.`deleted_at` is null
+              and `sc1`.`is_feedback` = 1
+              and `sc2`.`id` is null
+              and `la`.`assessment_id` in ({$bindings->getPlaceholder()})
+            group by `la`.`assessment_id`, `sc1`.`student_id`, `sc1`.`created_at`
+            LTI,
+        ];
+
+        $responseStatement = $this->mapper->getDatabase()->query(
+            '(' . implode(') union (', $responseQueries) . ') order by `assessment_id`, `participant_id`',
+            $bindings->getParams(),
+        );
+        $responseStatement->execute();
+        $studentSubmissionIds = [];
+        $responseRows = $responseStatement->fetchAll();
+        foreach ($responseRows as $row) {
+            // Add learner details
+            $participationItems[$row['assessment_id']][$row['participant_id']]['learner'] ??= [
+                'id'            => $row['participant_id'],
+                'title'         => $row['participant_title'],
+                'firstName'     => $row['participant_first_name'],
+                'preferredName' => $row['participant_preferred_name'],
+                'lastName'      => $row['participant_last_name'],
+                'externalId'    => $row['participant_external_id'],
+            ];
+
+            // Add response details
+            $participationItems[$row['assessment_id']][$row['participant_id']]['response'] = [
+                'id'        => $row['response_id'],
+                'date'      => (new \Alaress_Date_Format($row['completion_date'], \Alaress_Date_Format::DATABASE_FORMAT))->toIso8601String(),
+                'submitter' => [
+                    'id'            => $row['submitter_id'],
+                    'title'         => $row['submitter_title'],
+                    'firstName'     => $row['submitter_first_name'],
+                    'preferredName' => $row['submitter_preferred_name'],
+                    'lastName'      => $row['submitter_last_name'],
+                    'externalId'    => $row['submitter_external_id'],
+                ],
+                'files'     => null,
+            ];
+
+            // Track files (due work responses only):
+            // these will be fetched in a later query
+            if ($row['response_table'] === 'student_submission') {
+                $participationItems[$row['assessment_id']][$row['participant_id']]['response']['files'] = [];
+                $studentSubmissionIds[] = $row['response_id'];
+            }
+
+            // Add empty feedback if nothing there
+            $participationItems[$row['assessment_id']][$row['participant_id']]['feedback'] ??= null;
+        }
+
+        // Load submissions, and thus their files
+        if (!empty($studentSubmissionIds)) {
+            /** @var iterable<Submission\Submission> $studentSubmissions */
+            $studentSubmissions = $this->submissionMapper->findByColumn('id', $studentSubmissionIds);
+            foreach ($studentSubmissions as $studentSubmission) {
+                $assessmentId = $studentSubmission->getSubmissionBox()->getAssessmentModel()->getId();
+                $studentId    = $studentSubmission->getOwner()->getId();
+                $participationItems[$assessmentId][$studentId]['response']['files'] = $studentSubmission
+                    ->getFiles()
+                    ->map($this->storageTranslator)
+                    ->reindex();
+            }
+        }
+
+
+        return $participationItems;
     }
 
     /**

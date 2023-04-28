@@ -13,22 +13,16 @@ namespace Schoolbox\APIAssessment;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Alaress\Web\Controller\Base;
 use Crell\ApiProblem\ApiProblem;
-use Schoolbox\YearLevel\Mapper;
 
 class Controller extends Base
 {
-    protected Helper $assessmentHelper;
-    protected Mapper $dbMapper;
-
     /**
-     * Controller constructor.
+     * Constructor
      *
+     * @param Helper $assessmentHelper Helper class for looking up assessments
      */
-
-    public function __construct(Mapper $mapper)
+    public function __construct(private Helper $assessmentHelper)
     {
-        $this->assessmentHelper = new Helper($mapper);
-        $this->dbMapper = $mapper;
     }
 
     /**
