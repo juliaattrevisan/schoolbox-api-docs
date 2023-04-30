@@ -210,6 +210,9 @@ class Mapper extends BaseMapper implements IExceptionGenerator
      */
     public const ERROR_CLIPBOARD_UNAVAILABLE = 231;
 
+    public const ERROR_INSTALLATION_FAILED = 232;
+
+
     /**
      * Setup mapping
      */

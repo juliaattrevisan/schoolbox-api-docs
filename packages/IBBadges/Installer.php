@@ -20,6 +20,10 @@ class Installer implements IPackageInstall
      */
     private const SOURCE_FILE = 'badge.csv';
 
+    /**
+     * list of packages this depends on existing in the system
+     */
+    public const REQUIRED_PACKAGES = ['IBProgramme', 'IBMYPProgramme'];
 
     /**
      * Install rows from badge.csv under the presumption that an instance's Year Levels

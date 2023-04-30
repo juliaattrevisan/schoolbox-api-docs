@@ -12,6 +12,11 @@ use Schoolbox\User;
  */
 class Installer implements IPackageInstall
 {
+    /**
+     * list of packages this depends on existing in the system
+     */
+    public const REQUIRED_PACKAGES = [];
+
     private const SOURCE_FILE = 'curriculum.csv';
 
     /**

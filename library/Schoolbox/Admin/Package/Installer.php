@@ -39,9 +39,25 @@ class Installer
             $class = '\\' . $package->getLocation() . '\\Installer';
             $installer = new $class();
             if (!$installer instanceof IPackageInstall) {
-                throw $this->errorMapper->generateException(ErrorMapper::ERROR_PROCESSING, null, "Package class not found");
+                throw $this->errorMapper->generateException(ErrorMapper::ERROR_INSTALLATION_FAILED, null, "Package installer not found");
             }
-
+            /**
+             * Check for package requirements
+             */
+            if (!empty($class::REQUIRED_PACKAGES)) {
+                foreach ($class::REQUIRED_PACKAGES as $reqPackage) {
+                    /** @var Package\Model $tmp */
+                    $tmp = $this->packageMapper->findOneByColumn('location', $reqPackage);
+                    // check if the package is installed
+                    if (!$tmp->isInstalled()) {
+                        throw $this->errorMapper->generateException(
+                            ErrorMapper::ERROR_INSTALLATION_FAILED,
+                            null,
+                            sprintf("This package depends on %s, please install that first", $tmp->getTitle())
+                        );
+                    }
+                }
+            }
             //set the package as installed, to stop multiple calls...
             $package->setInstalled(true);
             $this->packageMapper->save($package);
@@ -57,14 +73,11 @@ class Installer
                 $package->setInstalled(false);
                 $this->packageMapper->save($package);
 
-                throw $this->errorMapper->generateException(ErrorMapper::ERROR_PROCESSING, $e, sprintf(
-                    'Unable to install package, rolling back - %s',
-                    $e->getMessage()
-                ));
+                throw $this->errorMapper->generateException(ErrorMapper::ERROR_INSTALLATION_FAILED, $e, $e->getMessage());
             }
             $db->commit();
         } else {
-            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PROCESSING, null, "Package is already installed.");
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_INSTALLATION_FAILED, null, "Package is already installed.");
         }
     }
 }
