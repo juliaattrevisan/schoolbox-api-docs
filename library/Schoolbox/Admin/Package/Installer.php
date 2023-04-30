@@ -50,7 +50,11 @@ class Installer
                     $tmp = $this->packageMapper->findOneByColumn('location', $reqPackage);
                     // check if the package is installed
                     if (!$tmp->isInstalled()) {
-                        throw $this->errorMapper->generateException(ErrorMapper::ERROR_PROCESSING, null, sprintf("Package: %s not installed", $tmp->getTitle()));
+                        throw $this->errorMapper->generateException(
+                            ErrorMapper::ERROR_PROCESSING,
+                            null,
+                            sprintf("This package depends on %s, please install that first", $tmp->getTitle())
+                        );
                     }
                 }
             }
