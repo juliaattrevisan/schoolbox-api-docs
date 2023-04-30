@@ -39,7 +39,7 @@ class Installer
             $class = '\\' . $package->getLocation() . '\\Installer';
             $installer = new $class();
             if (!$installer instanceof IPackageInstall) {
-                throw $this->errorMapper->generateException(ErrorMapper::ERROR_INSTALLATION_FAILED, null, "Package class not found");
+                throw $this->errorMapper->generateException(ErrorMapper::ERROR_INSTALLATION_FAILED, null, "Package installer not found");
             }
             /**
              * Check for package requirements
@@ -73,10 +73,7 @@ class Installer
                 $package->setInstalled(false);
                 $this->packageMapper->save($package);
 
-                throw $this->errorMapper->generateException(ErrorMapper::ERROR_INSTALLATION_FAILED, $e, sprintf(
-                    'Unable to install package, rolling back - %s',
-                    $e->getMessage()
-                ));
+                throw $this->errorMapper->generateException(ErrorMapper::ERROR_INSTALLATION_FAILED, $e, $e->getMessage());
             }
             $db->commit();
         } else {
