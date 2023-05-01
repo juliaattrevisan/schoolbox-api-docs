@@ -83,10 +83,12 @@ class Helper
             ->findAllByStudentBetweenDates($viewee, false, $term->getStart(), $term->getActualFinish(), [], $displayFolderIds)
             ->filter(function (IAssessable $a) use ($viewee) {
                 return $a->isPublished($viewee) && $a->isParticipant($viewee);
-            })
+            });
+        $assessmentsPerFolder = $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessmentsPerFolder, null, false, false)
             ->groupByCallback(function (IAssessable $assessment) {
                 return $assessment->getBaseContext()->getFolder()->getId();
             });
+
 
         // Load Teachers
         foreach ($folders as $folder) {
