@@ -109,6 +109,8 @@ class External_Schoolbox_User implements External_UserInterface
                           alert_legal AS CourtOrderType,
                           boarding_status AS StudentBoarder,
                           alert_comment AS Comment,
+                          year_level_coordinator_id AS YearLevelCoordID,
+                          year_level_coordinator_name AS StudentYearLevelCoordinator,
                           '' AS StudentEnrolmentDate,
                           '' AS StudentLeavingDate,
                           '' AS ParentsSeparatedFlag,
