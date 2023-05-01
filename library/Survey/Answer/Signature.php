@@ -263,7 +263,7 @@ class Survey_Answer_Signature extends Evaluation_Answer_Signature
 
         $page->setVar(
             array(
-                'CONFIGURATION_MANDATORY' => $config->mandatory ? 'required' : '',
+                'CONFIGURATION_MANDATORY' => ($config->mandatory ?? false) ? 'required' : '',
             )
         );
     }

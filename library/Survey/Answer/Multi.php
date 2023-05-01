@@ -77,7 +77,7 @@ class Survey_Answer_Multi extends Evaluation_Answer_Multi
         $config = json_decode($question['config']);
 
         $page->setVar(array(
-            'CONFIGURATION_MANDATORY' => $config->mandatory ? 'required' : '',
+            'CONFIGURATION_MANDATORY' => ($config->mandatory ?? false) ? 'required' : '',
         ));
     }
 }
