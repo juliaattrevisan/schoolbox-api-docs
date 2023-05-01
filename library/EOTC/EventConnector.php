@@ -20,7 +20,6 @@ use Schoolbox\User;
 
 class EventConnector extends EventMapper
 {
-
     /**
      * The user we're getting EOTC events for
      *

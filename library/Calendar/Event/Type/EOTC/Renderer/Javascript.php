@@ -14,7 +14,6 @@ namespace Calendar\Event\Type\EOTC\Renderer;
 
 class Javascript extends Base
 {
-
     /**
      * Visitor
      *
