@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright   Copyright 2023, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -30,7 +31,8 @@ class ConfigurationFactory extends \OAT\Library\Lti1p3Core\Security\Jwt\Configur
             return new Builder(
                 new JoseEncoder(),
                 new ChainedFormatter(
-                    new UnifyAudience(), new UnixTimestampDates()
+                    new UnifyAudience(),
+                    new UnixTimestampDates()
                 )
             );
         };
