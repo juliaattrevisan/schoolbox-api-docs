@@ -11,11 +11,11 @@
 <script type="text/javascript">
     $(function() {
 
-        var infoArray = {{ graph.info | purify }};
-        const chartData = {{ graph.scatter | purify }};
+        let infoArray = {{ graph.info | purify }};
+        let graphData = {{ graph.scatter | purify }};
 
-        const formatChartTooltip = (template, infoArrayIndex) => {
-            var retString = template;
+        const formatGraphLabel = (template, infoArrayIndex) => {
+            let retString = template;
 
             if (infoArray[infoArrayIndex].displayMark !== null) {
                 retString = retString.replace(/{DISPLAYMARK}/, infoArray[infoArrayIndex].displayMark);
@@ -29,6 +29,24 @@
 
             return retString;
         };
+
+        // Format the data points to include dataLabels for print display
+        graphData = graphData.map((data, i) => {
+            return {
+                dataLabels: {
+                    enabled: true,
+                    useHTML: true,
+                    formatter: function () {
+                        if (infoArray[i] && infoArray[i]?.displayMark){
+                            const template = `<div class="summative-graph-data-label">{DISPLAYMARK}</div>`;
+                            return formatGraphLabel(template, i);
+                        }
+                        return '';
+                    }
+                },
+                y: data,
+            };
+        });
 
         /**
          *  Boxplots for each Task in the Unit
@@ -61,7 +79,7 @@
                     marker: {
                         radius: 6
                     },
-                    data: chartData,
+                    data: graphData,
                 }
             ],
             // Tooltips aren't necessary in print media
