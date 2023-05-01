@@ -14,12 +14,14 @@ use Component_ControllerAbstract;
 use JsonException;
 use League\OAuth2\Server\ResourceServer;
 use OAT\Library\Lti1p3Core\Message\Launch\Builder\LtiResourceLinkLaunchRequestBuilder;
+use OAT\Library\Lti1p3Core\Message\Payload\Builder\MessagePayloadBuilder;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\LaunchPresentationClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\MessagePayloadClaimInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\NrpsClaim;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLink;
 use OAT\Library\Lti1p3Core\Resource\LtiResourceLink\LtiResourceLinkInterface;
+use OAT\Library\Lti1p3Core\Security\Jwt\Builder\Builder as JwtBuilder;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\AccessTokenRepository;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Validator\RequestAccessTokenValidator;
 use OAT\Library\Lti1p3DeepLinking\Message\Launch\Builder\DeepLinkingLaunchRequestBuilder;
@@ -224,7 +226,10 @@ class Controller extends BaseController
             false,
         );
 
-        $builder = new DeepLinkingLaunchRequestBuilder();
+        $builder = new DeepLinkingLaunchRequestBuilder(
+            new MessagePayloadBuilder(null, new JwtBuilder(new ConfigurationFactory()))
+        );
+
         $message = $builder->buildDeepLinkingLaunchRequest(
             $deepLinkingSettings,
             $repository,
