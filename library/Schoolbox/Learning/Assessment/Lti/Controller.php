@@ -460,9 +460,9 @@ class Controller extends Assessment\Controller
                 ->add([$assessment->getTitle(), $statusUrl])
         ];
 
+        // Launches:
+        // should automatically redirect, but contain a button if they do not
         if ($target === LtiTool\Model::TARGET_WINDOW) {
-            // new window launch: redirect back to return URL
-            // (return URL should support message and error message)
             $this->response->content->set(
                 $this->buildHtmlOutput(
                     '@learningAssessment/lti/return/instructor/window.twig',
@@ -470,8 +470,6 @@ class Controller extends Assessment\Controller
                 )
             );
         } else {
-            // new window launch: set location of parent back to return URL
-            // (return URL should support message and error message)
             $this->response->content->set(
                 $this->buildUnthemedHtmlOutput(
                     '@learningAssessment/lti/return/instructor/iframe.twig',
@@ -616,9 +614,9 @@ class Controller extends Assessment\Controller
                 ->add([$assessment->getTitle(), $summaryUrl])
         ];
 
+        // Launches:
+        // should automatically redirect, but contain a button if they do not
         if ($target === LtiTool\Model::TARGET_WINDOW) {
-            // new window launch: button closes window,
-            // also could go back to return URL
             $this->response->content->set(
                 $this->buildHtmlOutput(
                     '@learningAssessment/lti/return/student/window.twig',
@@ -626,8 +624,6 @@ class Controller extends Assessment\Controller
                 )
             );
         } else {
-            // iframe launch: show as a link back to the status page
-            // (or return URL if set), target: _parent
             $this->response->content->set(
                 $this->buildUnthemedHtmlOutput(
                     '@learningAssessment/lti/return/student/iframe.twig',
