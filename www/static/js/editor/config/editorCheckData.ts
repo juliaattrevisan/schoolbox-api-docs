@@ -54,17 +54,16 @@ export function initCheckData(sourceElement: HTMLElement, config: EditorConfig) 
 /**
  * This function can be called by other pages to run the surroundUnsurroundedTokens function on the editor,
  * this might happen if a page has changed the data in the form with .setData and needs to re-run the function
- * It's currently only called within the Manage Pastoral Care Record Settings page, where it only needs to check
- * for tokens when a pasotral type change is triggered.
+ * It's currently only called within the Add Pastoral Record page, where it only needs to check
+ * for tokens when a pastoral type or sub-type change is triggered.
  *
  * @param { CustomEvent } event - the custom event
  */
 function onEditorCheckData(event: CustomEvent) {
     const editor = window.sbProps.editors[event.target.id || event.target.name];
     if (editor.config.get("sbConfig").hasTokens) {
-        editor.setData(
-            surroundUnsurroundedTokens(getSourceElementHTML(editor.sourceElement), editor.config.get("sbConfig"))
-                .innerHTML
-        );
+        const parser = new DOMParser();
+        const sourceElementHTML = parser.parseFromString(editor.getData(), "text/html").body;
+        editor.setData(surroundUnsurroundedTokens(sourceElementHTML, editor.config.get("sbConfig")).innerHTML);
     }
 }
