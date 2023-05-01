@@ -55,7 +55,8 @@ if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
         'QUESTION_CATEGORY' => Scrub::text($category['name']),
     ));
     $allQuestions = $questionBankHandler->getContents($this->arg[0]);
-/* Iterate and show
+
+    /* Iterate and show
      */
     if (is_array($allQuestions) && count($allQuestions)) {
         $factory = new Survey_Factory();
@@ -67,9 +68,9 @@ if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
                 'MARKS' => $currentQuestion['marks'],
                 'answers_block' => '',
             ));
-        //
-                    // Need to be able to create a question and answer for this question
-                    // Otherwise, it can't be added to the survey.
+
+            // Need to be able to create a question and answer for this question
+            // Otherwise, it can't be added to the survey.
             if ($factory->isQuestionTypeAvailable($currentQuestion['type_id'])) {
                 $this->parse('select_question_block', 'select_question');
                 $this->setVar('missing_class_block', '');
@@ -82,13 +83,18 @@ if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
                 $answerList = unserialize($currentQuestion['answer']);
                 if (is_array($answerList)) {
                     foreach ($answerList as $answer) {
-        /* Matching pairs uses a different property than
-                               * multiple choice
-                               */
+                        /* Matching pairs uses a different property than
+                         * multiple choice
+                         */
                         if ($currentQuestion['type_id'] == $questionBankHandler::MATCHING_PAIRS_TYPE_ID) {
                             $this->setVar('ANSWER_DESCRIPTION', Scrub::text($answer->answerLeft . ' - ' . $answer->answerRight));
+                        } elseif ((int)$currentQuestion['type_id'] === $questionBankHandler::PREFERENCE_TYPE_ID) {
+                            /* This was historically encoded wrongly into answerRight instead of description, I guess
+                             * Maybe the Matching Pairs question type was cloned but improperly repurposed.
+                             */
+                            $this->setVar('ANSWER_DESCRIPTION', Scrub::text($answer->answerRight));
                         } else {
-                                $this->setVar('ANSWER_DESCRIPTION', Scrub::text($answer->description));
+                            $this->setVar('ANSWER_DESCRIPTION', Scrub::text($answer->description));
                         }
                         $this->parse('answers_block', 'answers', true);
                     }
@@ -108,7 +114,7 @@ if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
              */
             $this->parse('show_delete_block', 'show_delete');
             $this->parse('question_block', 'question', true);
-        /* Clear children after parsing out the parent
+            /* Clear children after parsing out the parent
              */
             $this->setVar(array(
                 'show_delete_block' => ''
@@ -116,7 +122,7 @@ if (is_numeric($this->arg[0]) && ($this->arg[0] > 0)) {
         }
 
         $this->parse('category_selected_block', 'category_selected');
-/* Hide submit button if we aren't adding contents to a section
+        /* Hide submit button if we aren't adding contents to a section
          */
         if (is_numeric($this->arg[2])) {
             $this->parse('show_submit_block', 'show_submit');

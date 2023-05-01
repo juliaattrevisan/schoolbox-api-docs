@@ -29,6 +29,16 @@ abstract class Evaluation_Question_Bank extends DeprecatedModel
      */
     public const CLOZE_EXERCISE_TYPE_ID = 3;
 
+
+    /**
+     * The type_id of the Preferences question type
+     * (it gets special treatment in some places)
+     *
+     * This is also known as Ranking, in the ui.
+     */
+    public const PREFERENCE_TYPE_ID = 17;
+
+
     /**
      * @var string
      */
