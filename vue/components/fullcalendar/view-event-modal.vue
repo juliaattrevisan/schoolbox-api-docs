@@ -871,8 +871,8 @@ export default {
                 </meta-item>
 
                 <!-- EOTC metadata -->
+                <meta-item class="icon-teacher" v-if="eventExtendedProps.eotc.isEOTC">Assigned Staff: {{eventExtendedProps.eotc.numStaff}}</meta-item>
                 <meta-item class="icon-staff-students" v-if="eventExtendedProps.eotc.isEOTC">Students: {{eventExtendedProps.eotc.numStudents}}</meta-item>
-                <meta-item class="icon-teacher" v-if="eventExtendedProps.eotc.isEOTC">Staff: {{eventExtendedProps.eotc.numStaff}}</meta-item>
             </meta-list>
             <article>
                 <span v-html="eventExtendedProps.detail"></span>
