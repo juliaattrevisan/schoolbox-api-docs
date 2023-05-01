@@ -1,13 +1,37 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <title>{{ assessment.title }} &ndash; Attempt Complete</title>
-    {% autoescape 'js' %}
-        <script type="text/javascript">
-            document.addEventListener('DOMContentLoaded', () => window.parent.location.href = '{{ returnUrl }}')
-        </script>
-    {% endautoescape %}
-</head>
-<body>
-</body>
-</html>
+{% import 'sub/breadcrumbs.twig' as bread %}
+
+{{ bread.crumbsArray(breadcrumbs) }}
+
+<div class="row">
+    <div class="small-12 island">
+        <h1>{{ assessment.title }} &ndash; Attempt Complete</h1>
+        {% if errorMessage %}
+            <div data-alert="" class="alert-box alert">
+                {{ errorMessage }}
+                <a href="#" class="close">×</a>
+            </div>
+        {% elseif message %}
+            <div data-alert="" class="alert-box success">
+                {{ message }}
+                <a href="#" class="close">×</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <section class="content">
+            <p>You may now either return to the class page, or close this tab.</p>
+        </section>
+        <ul class="flex-list buttons">
+            <li><a class="submit" target="_parent" href="{{ returnUrl }}">Return</a></li>
+        </ul>
+    </div>
+</div>
+
+{% autoescape 'js' %}
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', () => window.parent.location.href = '{{ returnUrl }}')
+    </script>
+{% endautoescape %}
