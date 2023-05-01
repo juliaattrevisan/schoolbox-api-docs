@@ -6648,7 +6648,7 @@ parameters:
 			path: library/Component/Dashboard/JuniorTimetableController.php
 		-
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getLessonPlanTemplate\\(\\)\\.$#"
-			count: 3
+			count: 1
 			path: library/Schoolbox/Learning/Assessment/DataModel/Translator/LessonPlan.php
 		-
 			message: "#^Call to an undefined method Schoolbox\\\\Learning\\\\Assessment\\\\IAssessable\\:\\:getCreatedBy\\(\\)\\.$#"
