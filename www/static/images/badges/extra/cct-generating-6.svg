@@ -29,10 +29,6 @@
    <path clip-rule="nonzero" d="M 37 26 L 42.183594 26 L 42.183594 28 L 37 28 Z M 37 26 "/>
   </clipPath>
  </defs>
- <g clip-path="url(#dde09d1805)">
-  <path d="M 0 0 L 58.5 0 L 58.5 58.5 L 0 58.5 Z M 0 0 " fill="#ffffff" fill-opacity="1" fill-rule="nonzero"/>
-  <path d="M 0 0 L 58.5 0 L 58.5 58.5 L 0 58.5 Z M 0 0 " fill="#ffffff" fill-opacity="1" fill-rule="nonzero"/>
- </g>
  <g clip-path="url(#63a59d8dc8)">
   <g clip-path="url(#de130b2f4f)">
    <path d="M 3.1875 3.1875 L 55.3125 3.1875 L 55.3125 55.3125 L 3.1875 55.3125 Z M 3.1875 3.1875 " fill="#fa4a47" fill-opacity="1" fill-rule="nonzero"/>

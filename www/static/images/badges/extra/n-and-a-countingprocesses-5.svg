@@ -487,11 +487,6 @@
    <path clip-rule="nonzero" d="M 23.304688 19.382812 C 23.304688 20.105469 22.71875 20.691406 21.996094 20.691406 C 21.277344 20.691406 20.691406 20.105469 20.691406 19.382812 C 20.691406 18.664062 21.277344 18.078125 21.996094 18.078125 C 22.71875 18.078125 23.304688 18.664062 23.304688 19.382812 "/>
   </clipPath>
  </defs>
- <g clip-path="url(#d2895d9bfb)">
-  <path d="M 0 0 L 58.5 0 L 58.5 322.5 L 0 322.5 Z M 0 0 " fill="#ffffff" fill-opacity="1" fill-rule="nonzero"/>
-  <path d="M 0 0 L 58.5 0 L 58.5 58.5 L 0 58.5 Z M 0 0 " fill="#ffffff" fill-opacity="1" fill-rule="nonzero"/>
-  <path d="M 0 0 L 58.5 0 L 58.5 58.5 L 0 58.5 Z M 0 0 " fill="#ffffff" fill-opacity="1" fill-rule="nonzero"/>
- </g>
  <g clip-path="url(#5d000733c2)">
   <g clip-path="url(#de6afefe86)">
    <path d="M 3.1875 3.1875 L 55.3125 3.1875 L 55.3125 55.3125 L 3.1875 55.3125 Z M 3.1875 3.1875 " fill="#66aad7" fill-opacity="1" fill-rule="nonzero"/>
