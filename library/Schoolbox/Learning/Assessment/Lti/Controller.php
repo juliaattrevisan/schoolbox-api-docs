@@ -446,17 +446,18 @@ class Controller extends Assessment\Controller
         ];
 
         if ($target === LtiTool\Model::TARGET_WINDOW) {
-            // new window launch: button closes window,
-            // also could go back to return URL
+            // new window launch: redirect back to return URL
+            // (return URL should support message and error message)
+            // NOTE: there may be no difference between iframe and window target
             $this->response->content->set(
-                $this->buildHtmlOutput(
+                $this->buildUnthemedHtmlOutput(
                     '@learningAssessment/lti/return/instructor/window.twig',
                     $params,
                 )
             );
         } else {
-            // iframe launch: show as a link back to the status page
-            // (or return URL if set), target: _parent
+            // new window launch: set location of parent back to return URL
+            // (return URL should support message and error message)
             $this->response->content->set(
                 $this->buildUnthemedHtmlOutput(
                     '@learningAssessment/lti/return/instructor/iframe.twig',
@@ -597,7 +598,7 @@ class Controller extends Assessment\Controller
             // new window launch: button closes window,
             // also could go back to return URL
             $this->response->content->set(
-                $this->buildHtmlOutput(
+                $this->buildUnthemedHtmlOutput(
                     '@learningAssessment/lti/return/student/window.twig',
                     $params,
                 )
