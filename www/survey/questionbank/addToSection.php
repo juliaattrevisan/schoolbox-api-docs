@@ -64,7 +64,8 @@ if (!empty($_POST) && is_numeric($_POST['section_id'])) {
                 'type_id' => $questionBank['type_id'],
                 'sequence' => $questionHandler->getNextSequence($sectionId),
                 'marks' => $questionBank['marks'],
-                'question' => $questionBank['question']
+                'question' => $questionBank['question'],
+                'config' => $questionBank['config']
             ]);
 
             $answerId = $answerHandler->create([
