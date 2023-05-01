@@ -437,8 +437,8 @@ class Controller extends Assessment\Controller
         );
         $params    = [
             'assessment'   => $assessment,
-            'message'      => $this->request->query->get('lti_msg'),
-            'errorMessage' => $this->request->query->get('lti_errormsg'),
+            'message'      => strip_tags($this->request->query->get('lti_msg')),
+            'errorMessage' => strip_tags($this->request->query->get('lti_errormsg')),
             'returnUrl'    => $this->request->query->get(Assessment\Redirect::RETURN_URL, $statusUrl),
             'breadcrumbs'  => $this->getBakery()
                 ->produceFromAssessment($assessment, $this->getUser())
