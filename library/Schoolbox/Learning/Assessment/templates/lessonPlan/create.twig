@@ -60,7 +60,7 @@
                      # Because of the swamp you need to know both since the same function fulfils
                      # create and update phases in mapperProxy->save()
                      #}
-                    <input type="hidden" name="field[{{ field.id }}][template]" value="{{ field.lessonPlanTemplateField.id }}" />
+                    <input type="hidden" name="field[{{ field.id }}][template]" value="{{ field.lessonPlanTemplateField }}" />
                     <textarea id="field-body-{{ field.id }}" name="field[{{ field.id }}][body]" data-ckeditor>{{ field.body }}</textarea>
                 </div>
             </div>

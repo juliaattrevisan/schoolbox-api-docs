@@ -112,7 +112,7 @@ class LessonPlan implements IAssessmentTypeTranslator
          */
         if (null !== $domainObject->getFields()) {
             foreach ($domainObject->getFields() as $lessonPlanField) {
-                $lessonPlanTemplateFieldId = $lessonPlanField->getLessonPlanTemplateField()->getId();
+                $lessonPlanTemplateFieldId = $lessonPlanField->getLessonPlanTemplateField();
 
                 /* Updating a Lesson Plan means we shouldn't use CreateModel() to populate this Field set
                  * otherwise it spawns new ones everywhere
@@ -200,7 +200,7 @@ class LessonPlan implements IAssessmentTypeTranslator
              * to facilitate preloads. Such preloads might be incomplete.
              */
             foreach ($dataModel->getFields() as $lessonPlanField) {
-                $lessonPlanTemplateFieldId = $lessonPlanField->getLessonPlanTemplateField()->getId();
+                $lessonPlanTemplateFieldId = $lessonPlanField->getLessonPlanTemplateField();
 
                 $field = $lessonPlanFieldMapper->createModel()
                     ->setId($lessonPlanField->getId())
