@@ -658,7 +658,6 @@ class ListController extends Web\Controller\Base
                 $postData['context'] = $relocatedContext;
                 $originalAssessment  = $assessment;
                 $assessment          = null;
-
             }
 
             /* Decide whether we have to invalidate project_result cache
