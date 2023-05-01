@@ -11,7 +11,6 @@ namespace Schoolbox\Fixtures\Position;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
-use Alaress_Date_Format;
 use Schoolbox\Fixtures\Sport\Model as Sport;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 
@@ -37,6 +36,15 @@ class Model implements ISoftDeletable, \JsonSerializable
 
     /** @var string */
     protected $name;
+
+    /**
+     * The external identifier in the third party system
+     * e.g. a Clipboard identifier, so we know where our
+     * data came from
+     *
+     * @var string|null
+     */
+    private ?string $externalId = null;
 
     /**
      * Model constructor.
@@ -112,5 +120,25 @@ class Model implements ISoftDeletable, \JsonSerializable
             'id'   => $this->getId(),
             'name' => $this->getName(),
         ];
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getExternalId(): ?string
+    {
+        return $this->externalId;
+    }
+
+
+    /**
+     * @param string|null $externalId
+     * @return $this
+     */
+    public function setExternalId(?string $externalId): self
+    {
+        $this->externalId = $externalId;
+        return $this;
     }
 }

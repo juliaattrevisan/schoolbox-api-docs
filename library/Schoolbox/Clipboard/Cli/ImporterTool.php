@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Clipboard\Cli;
 
 use Schoolbox\Application\CliTool;
+use Schoolbox\Clipboard;
 
 /**
  * Encapsulated cli tool
@@ -55,6 +56,16 @@ class ImporterTool extends CliTool\App
 
 
     /**
+     * --partial
+     *
+     * Setting this flag enables Partial Update mode which lets you get changes
+     * between two timestamps (automatically calculated) instead of replacing the
+     * full population like it usually does
+     */
+    private const OPT_LONG_PARTIAL = 'partial';
+
+
+    /**
      * Lock ttl (seconds)
      *
      * Reserves this amount for every iteration,
@@ -73,6 +84,7 @@ class ImporterTool extends CliTool\App
             self::OPT_LONG_INSTANCE,
             self::OPT_LONG_MEMBERSHIP,
             self::OPT_LONG_SESSIONS,
+            self::OPT_LONG_PARTIAL
         ];
     }
 
@@ -116,6 +128,16 @@ Import Clipboard Sessions into schoolbox Matchups. This also depends on the exis
 
 Usage: php importer.php --sessions [--perform]
 
+---
+
+Partial Updates. You can import microchanges (updates, adds) by using the --partial flag.
+This obtains changes between two timestamps: the last time the importer ran in --partial mode
+and the current time. 
+
+TODO: Clipboard are still working on providing information about the nature of the updates
+so we can facilitate deletions in similar manner.
+
+
 
 HELP;
             exit;
@@ -140,22 +162,56 @@ HELP;
 
         $this->getLogger()->info('Clipboard to Schoolbox Fixtures Hierarchy synchronisation.');
 
+        /* Mappers
+         */
+        $importLogMapper = Clipboard\Log\Mapper::getInstance();
+
+        /* phpstannis
+         */
+        $importLog = null;
+
+        /* Each Clipboard Import gets its own run id
+         */
+        $runId = (new Clipboard\Log\Guid())->generate();
+
+        if ($this->getOpt(self::OPT_LONG_PARTIAL)) {
+            $scriptName = Clipboard\Log\Model::PARTIAL_SCRIPT_NAME;
+        } else {
+            $scriptName = Clipboard\Log\Model::FULL_SCRIPT_NAME;
+        }
+
         try {
-            $composites = (new \Schoolbox\Clipboard\Factory(
+            $composites = (new Clipboard\Factory(
                 $this->getLogger(),
                 $this->perform(),
                 $lock,
                 (string)$this->getConfig()->get('clipboard_endpoint_host'),
                 (string)$this->getConfig()->get('clipboard_endpoint_token'),
-                (string)$this->getCOnfig()->get('date_timezone')
+                (string)$this->getConfig()->get('date_timezone')
             ))->produce(
                 $this->getOpt(self::OPT_LONG_MEMBERSHIP),
                 $this->getOpt(self::OPT_LONG_SESSIONS),
+                $this->getOpt(self::OPT_LONG_PARTIAL),
             );
         } catch (\DomainException $e) {
+            /* Specifically log when you couldn't produce the recipe, then leave
+             * Anything could have caused that, so you might as well log it
+             * then throw it back out
+             */
+            if ($this->perform()) {
+                $importLog = $importLogMapper->start($runId, $scriptName);
+                $importLogMapper->error($importLog, $e->getMessage());
+            }
+
             $this->getLogger()->warning($e->getMessage());
 
             return;
+        }
+
+        /* Always log the start of the run
+         */
+        if ($this->perform()) {
+            $importLog = $importLogMapper->start($runId, $scriptName);
         }
 
         foreach ($composites as $composite) {
@@ -167,6 +223,20 @@ HELP;
             ));
 
             $lock->refresh();
+        }
+
+        if ($this->perform()) {
+            /* Augment the Factory's recipe with the finisher
+             *
+             * This way you don't have to remember doing it in every factory;
+             * you literally cannot forget to do it. It'll only log the finish
+             * if you didn't crash somewhere in the process
+             */
+            $importLogMapper->finish($importLog);
+
+            /* Trim away ancient logs
+             */
+            $importLogMapper->prune();
         }
 
         /* Only commit changes in Perform mode

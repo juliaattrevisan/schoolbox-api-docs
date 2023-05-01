@@ -39,6 +39,7 @@ class Mapper extends BaseMapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('name', self::TYPE_STRING);
         $this->uses('url', self::TYPE_STRING);
+        $this->uses('external_id', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
@@ -63,7 +64,7 @@ class Mapper extends BaseMapper
     protected function getSelectString()
     {
         return "
-            SELECT {$this->getColumnString()}, 
+            SELECT {$this->getColumnString()},
                    {$this->getJoinColumnString('positions', 'p')}
         ";
     }

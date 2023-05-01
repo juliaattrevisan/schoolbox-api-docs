@@ -10,7 +10,6 @@
 
 namespace Schoolbox\Fixtures\Team;
 
-use Alaress_Date_Format;
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
@@ -38,6 +37,15 @@ class Model implements ISoftDeletable, ValueLabelInterface
 
     /** @var string */
     protected $url;
+
+    /**
+     * The external identifier in the third party system
+     * e.g. a Clipboard identifier, so we know where our
+     * data came from
+     *
+     * @var string|null
+     */
+    private ?string $externalId = null;
 
     /**
      * Players within the team.
@@ -190,6 +198,26 @@ class Model implements ISoftDeletable, ValueLabelInterface
     public function setCoaches($coaches)
     {
         $this->coaches = $coaches;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getExternalId(): ?string
+    {
+        return $this->externalId;
+    }
+
+
+    /**
+     * @param string|null $externalId
+     * @return $this
+     */
+    public function setExternalId(?string $externalId): self
+    {
+        $this->externalId = $externalId;
         return $this;
     }
 }

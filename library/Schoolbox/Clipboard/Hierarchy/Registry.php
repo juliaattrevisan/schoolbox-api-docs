@@ -11,6 +11,7 @@ namespace Schoolbox\Clipboard\Hierarchy;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\Fixtures\Season\Model;
+use Schoolbox\Mapper\Exception;
 
 /**
  * Remember an arbitrary $data array via a string $key
@@ -41,7 +42,6 @@ use Schoolbox\Fixtures\Season\Model;
  */
 class Registry
 {
-
     /**
      * @var LoggerInterface
      */
@@ -214,12 +214,26 @@ class Registry
                  * deleted from clipboard when this import ran,
                  * but reappeared again before this orphaned data was completely removed
                  */
-                $sport = $this->sportMapper->findOneByColumn('name', $sportName);
+                $sport = $this->sportMapper->findOneByColumn('external_id', $teamActivityId);
 
                 $this->log->debug(sprintf(
-                    'Reusing existing sport %s',
-                    $sport->getName()
+                    'Reusing existing sport %s (%s)',
+                    $sport->getName(),
+                    $sport->getExternalId()
                 ));
+
+                /* Detect renames
+                 */
+                if ($sportName !== $sport->getName()) {
+                    $this->log->debug(sprintf(
+                        'Renaming existing sport %s (%s) to %s',
+                        $sport->getName(),
+                        $sport->getExternalId(),
+                        $sportName
+                    ));
+
+                    $sport->setName($sportName);
+                }
             } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
                 /* Resurrect it from a previously soft-deleted state
                  * if it was previously imported from clipboard,
@@ -236,7 +250,8 @@ class Registry
                 ));
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $sport = $this->sportMapper->createModel()
-                    ->setName($sportName);
+                    ->setName($sportName)
+                    ->setExternalId((string)$teamActivityId);
 
                 $this->log->debug(sprintf(
                     'Creating new sport %s',
@@ -275,22 +290,24 @@ class Registry
      * @param Model                           $season
      * @param int                             $teamActivityId
      * @param \Schoolbox\Fixtures\Sport\Model $sport
+     * @param string                          $divisionId
      * @param string                          $divisionName
      * @return \Schoolbox\Fixtures\Division\Model
      * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws Exception
      * @throws \UnexpectedValueException
      */
     public function recallDivision(
         \Schoolbox\Fixtures\Season\Model $season,
         int $teamActivityId,
         \Schoolbox\Fixtures\Sport\Model $sport,
+        string $divisionId,
         string $divisionName
     ): \Schoolbox\Fixtures\Division\Model {
         if (!isset($this->lookup[$teamActivityId]['divisions'][$divisionName])) {
             try {
                 $division = $this->divisionMapper->findOneByColumnList([
-                    'name' => $divisionName,
+                    'external_id' => $divisionId,
                     'sport_id' => $sport->getId()
                 ]);
 
@@ -299,6 +316,20 @@ class Registry
                     $division->getName(),
                     $sport->getName()
                 ));
+
+                /* Detect renames
+                 */
+                if ($divisionName !== $division->getName()) {
+                    $this->log->debug(sprintf(
+                        'Renaming existing division %s (%s) to %s in sport %s',
+                        $division->getName(),
+                        $division->getExternalId(),
+                        $divisionName,
+                        $sport->getName()
+                    ));
+
+                    $division->setName($divisionName);
+                }
             } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
                 /* Resurrect it from a previously soft-deleted state
                  * if it was previously imported from clipboard,
@@ -318,7 +349,8 @@ class Registry
                 $division = $this->divisionMapper->createModel()
                     ->setName($divisionName)
                     ->setSeason($season)
-                    ->setSport($sport);
+                    ->setSport($sport)
+                    ->setExternalId($divisionId);
 
                 $this->log->debug(sprintf(
                     'Creating new division %s in sport %s',
@@ -367,15 +399,30 @@ class Registry
         if (!isset($this->lookup[$teamActivityId]['divisions'][$division->getName()]['teams'][$teamId])) {
             try {
                 $team = $this->teamMapper->findOneByColumnList([
-                    'name' => $teamName,
+                    'external_id' => $teamId,
                     'division_id' => $division->getId()
                 ]);
 
                 $this->log->debug(sprintf(
-                    'Reusing existing team %s in division %s',
+                    'Reusing existing team %s (%s) in division %s',
                     $team->getName(),
+                    $team->getExternalId(),
                     $division->getName()
                 ));
+
+                /* Detect renames
+                 */
+                if ($teamName !== $team->getName()) {
+                    $this->log->debug(sprintf(
+                        'Renaming existing team %s (%s) to %s in division %s',
+                        $team->getName(),
+                        $team->getExternalId(),
+                        $teamName,
+                        $division->getName()
+                    ));
+
+                    $team->setName($teamName);
+                }
             } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
                 /* Resurrect it from a previously soft-deleted state
                  * if it was previously imported from clipboard,
@@ -387,18 +434,21 @@ class Registry
                 $team->setDeletedAt(null);
 
                 $this->log->debug(sprintf(
-                    'Resurrecting previously-deleted team %s in division %s',
+                    'Resurrecting previously-deleted team %s (%s) in division %s',
                     $team->getName(),
+                    $team->getExternalId(),
                     $division->getName()
                 ));
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $team = $this->teamMapper->createModel()
                     ->setName($teamName)
-                    ->setDivision($division);
+                    ->setDivision($division)
+                    ->setExternalId((string)$teamId);
 
                 $this->log->debug(sprintf(
-                    'Creating new team %s in division %s',
+                    'Creating new team %s (%s) in division %s',
                     $team->getName(),
+                    $team->getExternalId(),
                     $division->getName()
                 ));
             }
@@ -436,7 +486,7 @@ class Registry
         if (!isset($this->lookup[$teamActivityId]['positions'][$positionId])) {
             try {
                 $position = $this->positionMapper->findOneByColumnList([
-                    'name' => $positionName,
+                    'external_id' => $positionId,
                     'sport_id' => $sport->getId()
                 ]);
 
@@ -445,6 +495,20 @@ class Registry
                     $position->getName(),
                     $sport->getName()
                 ));
+
+                /* Detect renames
+                 */
+                if ($positionName !== $position->getName()) {
+                    $this->log->debug(sprintf(
+                        'Renaming existing position %s (%s) to %s in sport %s',
+                        $position->getName(),
+                        $position->getExternalId(),
+                        $positionName,
+                        $sport->getName()
+                    ));
+
+                    $position->setName($positionName);
+                }
             } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
                 /* Resurrect it from a previously soft-deleted state
                  * if it was previously imported from clipboard,
@@ -463,7 +527,8 @@ class Registry
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $position = $this->positionMapper->createModel()
                     ->setName($positionName)
-                    ->setSport($sport);
+                    ->setSport($sport)
+                    ->setExternalId((string)$positionId);
 
                 $this->log->debug(sprintf(
                     'Creating new position %s in sport %s',

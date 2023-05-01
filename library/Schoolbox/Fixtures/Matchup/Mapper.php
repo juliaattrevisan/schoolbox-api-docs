@@ -42,14 +42,13 @@ use Schoolbox\Collection;
  */
 class Mapper extends BaseMapper
 {
-
     /**
      * Setup mapping
      */
     protected function mapping()
     {
         $this->hasTable('sportsfixtures_match');
-        $this->hasModel(Model::class);
+        $this->hasModel(Matchup::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('division_id', DivisionMapper::class, 'id', null, null, 'division', 'division');
@@ -63,6 +62,7 @@ class Mapper extends BaseMapper
         $this->joins('home_school_id', SchoolMapper::class, 'id', null, null, 'homeSchool', 'home_school');
         $this->joins('away_school_id', SchoolMapper::class, 'id', null, null, 'awaySchool', 'away_school');
         $this->uses('notes', self::TYPE_STRING);
+        $this->uses('external_id', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);

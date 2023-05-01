@@ -43,92 +43,17 @@ class Team implements IStrategy
 
 
     /**
-     * @var LoggerInterface
-     */
-    private LoggerInterface $log;
-
-
-    /**
-     * @var bool
-     */
-    private bool $perform;
-
-
-    /**
-     * @var LockInterface
-     */
-    private LockInterface $lock;
-
-
-    /**
-     * @var IApi
-     */
-    private IApi $api;
-
-
-    /**
-     * @var bool
-     */
-    private bool $membership;
-
-
-    /**
-     * @var Registry
-     */
-    private Registry $registry;
-
-
-    /**
-     * @var Person
-     */
-    private Lookup\Person $userLookup;
-
-
-    /**
-     * @var \Schoolbox\Fixtures\Division\User\Mapper
-     */
-    private \Schoolbox\Fixtures\Division\User\Mapper $divisionUserMapper;
-
-
-    /**
-     * @var \Schoolbox\Fixtures\Team\Player\Mapper
-     */
-    private \Schoolbox\Fixtures\Team\Player\Mapper $teamPlayerMapper;
-
-
-    /**
-     * @var \Schoolbox\Fixtures\Team\Position\Mapper
-     */
-    private \Schoolbox\Fixtures\Team\Position\Mapper $teamPositionMapper;
-
-
-    /**
-     * @var \Schoolbox\Fixtures\Coach\Mapper
-     */
-    private \Schoolbox\Fixtures\Coach\Mapper $coachMapper;
-
-
-    /**
-     * @var \Schoolbox\Fixtures\Team\Coach\Mapper
-     */
-    private \Schoolbox\Fixtures\Team\Coach\Mapper $teamCoachMapper;
-
-
-    /**
-     * @var \Schoolbox\UserMapper
-     */
-    private \Schoolbox\UserMapper $userMapper;
-
-
-    /**
      * @var Codec\Division
      */
     private Codec\Division $divisionCodec;
 
 
     /**
+     * Constructor.
+     *
      * @param LoggerInterface                          $log
      * @param bool                                     $perform
+     * @param bool                                     $partial
      * @param LockInterface                            $lock
      * @param IApi                                     $api
      * @param bool                                     $membership
@@ -140,35 +65,25 @@ class Team implements IStrategy
      * @param \Schoolbox\Fixtures\Coach\Mapper         $coachMapper
      * @param \Schoolbox\Fixtures\Team\Coach\Mapper    $teamCoachMapper
      * @param UserMapper                               $userMapper
+     * @param \Schoolbox\Clipboard\Log\Mapper          $importLogMapper
      */
     public function __construct(
-        LoggerInterface $log,
-        bool $perform,
-        LockInterface $lock,
-        IApi $api,
-        bool $membership,
-        Registry $registry,
-        Lookup\Person $userLookup,
-        \Schoolbox\Fixtures\Division\User\Mapper $divisionUserMapper,
-        \Schoolbox\Fixtures\Team\Player\Mapper $teamPlayerMapper,
-        \Schoolbox\Fixtures\Team\Position\Mapper $teamPositionMapper,
-        \Schoolbox\Fixtures\Coach\Mapper $coachMapper,
-        \Schoolbox\Fixtures\Team\Coach\Mapper $teamCoachMapper,
-        \Schoolbox\UserMapper $userMapper
+        private LoggerInterface $log,
+        private bool $perform,
+        private bool $partial,
+        private LockInterface $lock,
+        private IApi $api,
+        private bool $membership,
+        private Registry $registry,
+        private Lookup\Person $userLookup,
+        private \Schoolbox\Fixtures\Division\User\Mapper $divisionUserMapper,
+        private \Schoolbox\Fixtures\Team\Player\Mapper $teamPlayerMapper,
+        private \Schoolbox\Fixtures\Team\Position\Mapper $teamPositionMapper,
+        private \Schoolbox\Fixtures\Coach\Mapper $coachMapper,
+        private \Schoolbox\Fixtures\Team\Coach\Mapper $teamCoachMapper,
+        private \Schoolbox\UserMapper $userMapper,
+        private \Schoolbox\Clipboard\Log\Mapper $importLogMapper
     ) {
-        $this->log = $log;
-        $this->perform = $perform;
-        $this->lock = $lock;
-        $this->api = $api;
-        $this->membership = $membership;
-        $this->registry = $registry;
-        $this->userLookup = $userLookup;
-        $this->divisionUserMapper = $divisionUserMapper;
-        $this->teamPlayerMapper = $teamPlayerMapper;
-        $this->teamPositionMapper = $teamPositionMapper;
-        $this->coachMapper = $coachMapper;
-        $this->teamCoachMapper = $teamCoachMapper;
-        $this->userMapper = $userMapper;
         $this->divisionCodec = new Codec\Division();
     }
 
@@ -181,6 +96,7 @@ class Team implements IStrategy
      * @throws Exception
      * @throws LockAcquiringException
      * @throws LockConflictedException
+     * @throws InvalidColumnException
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
@@ -230,7 +146,7 @@ class Team implements IStrategy
         while ($nextUrl && (null === $lastPage || $currentPage <= $lastPage) && $currentPage < self::MAX_CALLS) {
             $this->lock->refresh();
 
-            $teams = $this->api->retrieve('GET', $endpoint, [
+            $args = [
                 'includePositions' => 'true',
                 'includeStudents' => $includeStudents,
                 'includeStaff' => $includeStaff,
@@ -238,7 +154,25 @@ class Team implements IStrategy
                  */
                 'page' => $currentPage,
                 'pageLength' => self::NUM_PER_PAGE
-            ]);
+            ];
+
+            /* In Partial Mode, specify two additional datetimes
+             */
+            if ($this->partial) {
+                $updatedAfter = $this->importLogMapper->findNextPartialDate()->toIso8601String();
+                $updatedBefore = \Alaress_Date_Format::now()->toIso8601String();
+
+                $this->log->info(sprintf(
+                    'Obtaining partial updates for Teams updated between %s and %s',
+                    $updatedAfter,
+                    $updatedBefore
+                ));
+
+                $args['updatedAfter'] = $updatedAfter;
+                $args['updatedBefore'] = $updatedBefore;
+            }
+
+            $teams = $this->api->retrieve('GET', $endpoint, $args);
 
             foreach ($teams['data'] as $teamData) {
                 $this->lock->refresh();
@@ -254,13 +188,24 @@ class Team implements IStrategy
 
                 /* Division identifiers
                  */
+                $teamCategoryId = $teamData['category']['id'] ?? '';
                 $teamCategory = $teamData['category']['name'] ?? '';
+                $teamSubcategoryId = $teamData['subcategory']['id'] ?? '';
                 $teamSubcategory = $teamData['subcategory']['name'] ?? '';
 
                 /* Team identifiers
                  */
                 $teamId = (int)$teamData['id'];
                 $teamName = $teamData['name'];
+
+                /* Assemble a proxy representation of a "division" which is an amalgamation
+                 * of Clipboard categories' and Clipboard subcategories' ids. This is synonymous
+                 * with encoding a division name, just with ids, and results in same format.
+                 *
+                 * Division external id defaults to the activity name when both category and
+                 * subcategory weren't specified.
+                 */
+                $divisionId = $this->divisionCodec->encode((string)$teamCategoryId, (string)$teamSubcategoryId, $teamActivity);
 
                 /* Try to manufacture a division title
                  */
@@ -280,7 +225,7 @@ class Team implements IStrategy
 
                 /* Try to spawn a corresponding Division instance
                  */
-                $division = $this->registry->recallDivision($season, $teamActivityId, $sport, $divisionName);
+                $division = $this->registry->recallDivision($season, $teamActivityId, $sport, $divisionId, $divisionName);
 
                 /* Try to spawn a corresponding Team instance
                  * $teamId is used later to figure out who vs who, when importing Matchups

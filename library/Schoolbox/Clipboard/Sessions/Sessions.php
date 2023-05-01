@@ -9,13 +9,18 @@ declare(strict_types=1);
 
 namespace Schoolbox\Clipboard\Sessions;
 
+use Alaress\Database\Predicate\InvalidColumnException;
 use Psr\Log\LoggerInterface;
+use Schoolbox\Clipboard\Hierarchy\Codec\Division;
 use Schoolbox\Clipboard\Hierarchy\Lookup\Person;
 use Schoolbox\Clipboard\Hierarchy\Registry;
 use Schoolbox\Clipboard\IApi;
 use Schoolbox\Clipboard\IStrategy;
+use Schoolbox\Fixtures\Venue\Mapper;
 use Schoolbox\Fixtures\Venue\Model;
 use Schoolbox\Mapper\Exception;
+use Symfony\Component\Lock\Exception\LockAcquiringException;
+use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\LockInterface;
 
 /**
@@ -110,119 +115,53 @@ class Sessions implements IStrategy
 
 
     /**
-     * @var LoggerInterface
+     * @var Division
      */
-    private LoggerInterface $log;
-
-
-    /**
-     * @var bool
-     */
-    private bool $perform;
-
-
-    /**
-     * @var LockInterface
-     */
-    private LockInterface $lock;
-
-
-    /**
-     * @var IApi
-     */
-    private IApi $api;
-
-
-    /**
-     * @var string
-     */
-    private string $timezone;
-
-
-    /**
-     * @var Registry
-     */
-    private Registry $registry;
-
-
-    /**
-     * @var Person
-     */
-    private \Schoolbox\Clipboard\Hierarchy\Lookup\Person $userLookup;
-
-
-    /**
-     * @var \Schoolbox\Fixtures\Venue\Mapper
-     */
-    private \Schoolbox\Fixtures\Venue\Mapper $venueMapper;
-
-
-    /**
-     * @var \Schoolbox\Fixtures\Matchup\Mapper
-     */
-    private \Schoolbox\Fixtures\Matchup\Mapper $matchupMapper;
-
-
-    /**
-     * @var \Schoolbox\Fixtures\Result\Mapper
-     */
-    private \Schoolbox\Fixtures\Result\Mapper $resultMapper;
-
-
-    /**
-     * @var \Schoolbox\Clipboard\Hierarchy\Codec\Division
-     */
-    private \Schoolbox\Clipboard\Hierarchy\Codec\Division $divisionCodec;
+    private Division $divisionCodec;
 
 
     /**
      * Constructor.
      *
-     * @param LoggerInterface                       $log
-     * @param bool                                  $perform
-     * @param LockInterface                         $lock
-     * @param IApi                                  $api
-     * @param string                                $timezone
-     * @param Registry                              $registry
-     * @param Person                                $userLookup
-     * @param \Schoolbox\Fixtures\Venue\Mapper      $venueMapper
-     * @param \Schoolbox\Fixtures\Matchup\Mapper    $matchupMapper
-     * @param \Schoolbox\Fixtures\Result\Mapper     $resultMapper
+     * @param LoggerInterface                    $log
+     * @param bool                               $perform
+     * @param bool                               $partial
+     * @param LockInterface                      $lock
+     * @param IApi                               $api
+     * @param string                             $timezone
+     * @param Registry                           $registry
+     * @param Person                             $userLookup
+     * @param Mapper                             $venueMapper
+     * @param \Schoolbox\Fixtures\Matchup\Mapper $matchupMapper
+     * @param \Schoolbox\Fixtures\Result\Mapper  $resultMapper
+     * @param \Schoolbox\Clipboard\Log\Mapper    $importLogMapper
      */
     public function __construct(
-        LoggerInterface $log,
-        bool $perform,
-        LockInterface $lock,
-        IApi $api,
-        string $timezone,
-        Registry $registry,
-        Person $userLookup,
-        \Schoolbox\Fixtures\Venue\Mapper $venueMapper,
-        \Schoolbox\Fixtures\Matchup\Mapper $matchupMapper,
-        \Schoolbox\Fixtures\Result\Mapper $resultMapper
+        private LoggerInterface $log,
+        private bool $perform,
+        private bool $partial,
+        private LockInterface $lock,
+        private IApi $api,
+        private string $timezone,
+        private Registry $registry,
+        private Person $userLookup,
+        private \Schoolbox\Fixtures\Venue\Mapper $venueMapper,
+        private \Schoolbox\Fixtures\Matchup\Mapper $matchupMapper,
+        private \Schoolbox\Fixtures\Result\Mapper $resultMapper,
+        private \Schoolbox\Clipboard\Log\Mapper $importLogMapper
     ) {
-        $this->log = $log;
-        $this->perform = $perform;
-        $this->lock = $lock;
-        $this->api = $api;
-        $this->timezone = $timezone;
-        $this->registry = $registry;
-        $this->userLookup = $userLookup;
-        $this->venueMapper = $venueMapper;
-        $this->matchupMapper = $matchupMapper;
-        $this->resultMapper = $resultMapper;
-        $this->divisionCodec = new \Schoolbox\Clipboard\Hierarchy\Codec\Division();
+        $this->divisionCodec = new Division();
     }
 
 
     /**
      * @return void
+     * @throws Exception
+     * @throws InvalidColumnException
      * @throws \InvalidArgumentException
      * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
-     * @throws \Symfony\Component\Lock\Exception\LockAcquiringException
-     * @throws \Symfony\Component\Lock\Exception\LockConflictedException
+     * @throws LockAcquiringException
+     * @throws LockConflictedException
      * @throws \UnexpectedValueException
      */
     public function import(): void
@@ -257,7 +196,7 @@ class Sessions implements IStrategy
          * Force them to give me more datums
          */
         $startDateTime = \Alaress_Date_Format::now()->addMonths(self::FROM)->getDatabaseDate();
-        $endDateTime =  \Alaress_Date_Format::now()->addMonths(self::TO)->getDatabaseDate();
+        $endDateTime = \Alaress_Date_Format::now()->addMonths(self::TO)->getDatabaseDate();
 
         /* Bash through paginated data
          */
@@ -272,7 +211,7 @@ class Sessions implements IStrategy
         while ($nextUrl && (null === $lastPage || $currentPage <= $lastPage) && $currentPage < self::MAX_CALLS) {
             $this->lock->refresh();
 
-            $sessions = $this->api->retrieve('GET', $endpoint, [
+            $args = [
                 'includeTeams' => 'true',
                 'includeRoundName' => 'true',
                 'includeStatuses' => ['confirmed'],
@@ -288,7 +227,25 @@ class Sessions implements IStrategy
                  */
                 'page' => $currentPage,
                 'pageLength' => self::NUM_PER_PAGE
-            ]);
+            ];
+
+            /* In Partial Mode, specify two additional datetimes
+             */
+            if ($this->partial) {
+                $updatedAfter = $this->importLogMapper->findNextPartialDate()->toIso8601String();
+                $updatedBefore = \Alaress_Date_Format::now()->toIso8601String();
+
+                $this->log->info(sprintf(
+                    'Obtaining partial updates for Sessions updated between %s and %s',
+                    $updatedAfter,
+                    $updatedBefore
+                ));
+
+                $args['updatedAfter'] = $updatedAfter;
+                $args['updatedBefore'] = $updatedBefore;
+            }
+
+            $sessions = $this->api->retrieve('GET', $endpoint, $args);
 
             /* Store metadata for custom fields: their types and their labels
              * This is to make their contents presentable in the frontend by
@@ -313,13 +270,24 @@ class Sessions implements IStrategy
                 foreach ($session['teams'] as $teamData) {
                     /* Division identifiers
                      */
+                    $teamCategoryId = $teamData['category']['id'] ?? '';
                     $teamCategory = $teamData['category']['name'] ?? '';
+                    $teamSubcategoryId = $teamData['subcategory']['id'] ?? '';
                     $teamSubcategory = $teamData['subcategory']['name'] ?? '';
 
                     /* Team identifiers
                      */
                     $teamId = (int)$teamData['id'];
                     $teamName = $teamData['name'];
+
+                    /* Assemble a proxy representation of a "division" which is an amalgamation
+                     * of Clipboard categories' and Clipboard subcategories' ids. This is synonymous
+                     * with encoding a division name, just with ids, and results in same format.
+                     *
+                     * Division external id defaults to the activity name when both category and
+                     * subcategory weren't specified.
+                     */
+                    $divisionId = $this->divisionCodec->encode((string)$teamCategoryId, (string)$teamSubcategoryId, $teamActivity);
 
                     /* Try to manufacture a division title
                      */
@@ -339,7 +307,7 @@ class Sessions implements IStrategy
 
                     /* Try to spawn a corresponding Division instance
                      */
-                    $division = $this->registry->recallDivision($season, $teamActivityId, $sport, $divisionName);
+                    $division = $this->registry->recallDivision($season, $teamActivityId, $sport, $divisionId, $divisionName);
 
                     /* Try to spawn a corresponding Team instance
                      * $teamId is used later to figure out who vs who, when importing Matchups
@@ -385,15 +353,10 @@ class Sessions implements IStrategy
                     /* See if this matchup exists by taking the bestest guess,
                      * then update its Notes in case it changed somehow in Clipboard
                      */
+                    $matchId = $session['id'];
+
                     try {
-                        $matchup = $this->matchupMapper->findOneByColumnList([
-                            'name' => $matchupName,
-                            'division_id' => $division->getId(),
-                            'season_id' => $season->getId(),
-                            'home_team_id' => $team->getId(),
-                            'start_at' => $startAt->getDatabase(),
-                            'finish_at' => $finishAt->getDatabase(),
-                        ]);
+                        $matchup = $this->matchupMapper->findOneByColumn('external_id', $matchId);
 
                         $this->log->debug(sprintf(
                             'Updating matchup %s on %s, at venue %s',
@@ -401,23 +364,37 @@ class Sessions implements IStrategy
                             $matchup->getStartAt()->getDatabase(),
                             null === $matchup->getVenue() ? self::UNSPECIFIED_LOCATION : $matchup->getVenue()->getName()
                         ));
-                    } catch (\Schoolbox\Mapper\Exception $e) {
-                        $matchup = $this->matchupMapper->createModel()
-                            ->setName($matchupName)
-                            ->setSeason($season)
-                            ->setDivision($division)
-                            ->setVenue($venue)
-                            ->setHomeTeam($team)
-                            ->setStartAt($startAt)
-                            ->setFinishAt($finishAt);
 
-                        $this->log->debug(sprintf(
-                            'Creating matchup %s on %s, at venue %s',
-                            $matchup->getDisplayName(),
-                            $matchup->getStartAt()->getDatabase(),
-                            null === $matchup->getVenue() ? self::UNSPECIFIED_LOCATION : $matchup->getVenue()->getName()
-                        ));
+                        $action = 'Updating';
+                    } catch (\Schoolbox\Mapper\Exception $e) {
+                        $action = 'Creating';
+
+                        $matchup = $this->matchupMapper->createModel()
+                            ->setExternalId((string)$matchId);
                     }
+
+                    /* You just can't tell what might have caused this to appear here
+                     *
+                     * TODO: Perhaps do a more surgical diff to avoid the SUDS-like
+                     *  indexing problem when we change too many columns, but Clipboard
+                     *  data is a far smaller footprint than SUDS
+                     */
+                    $matchup
+                        ->setName($matchupName)
+                        ->setSeason($season)
+                        ->setDivision($division)
+                        ->setVenue($venue)
+                        ->setHomeTeam($team)
+                        ->setStartAt($startAt)
+                        ->setFinishAt($finishAt);
+
+                    $this->log->debug(sprintf(
+                        '%s matchup %s on %s, at venue %s',
+                        $action,
+                        $matchup->getDisplayName(),
+                        $matchup->getStartAt()->getDatabase(),
+                        null === $matchup->getVenue() ? self::UNSPECIFIED_LOCATION : $matchup->getVenue()->getName()
+                    ));
 
                     /* Event description contains some data that could be updated in Clipboard,
                      * forcing us to update the $notes every time. We can't skip over matchups
@@ -515,11 +492,10 @@ class Sessions implements IStrategy
                          * if one doesn't already exist for this matchup and team
                          */
                         try {
-                            $result = $this->resultMapper
-                                ->findOneByColumnList([
-                                    'match_id' => $matchup->getId(),
-                                    'team_id' => $team->getId()
-                                ]);
+                            $result = $this->resultMapper->findOneByColumnList([
+                                'match_id' => $matchup->getId(),
+                                'team_id' => $team->getId()
+                            ]);
                         } catch (\Schoolbox\Mapper\Exception $e) {
                             $result = $this->resultMapper->createModel()
                                 ->setMatchup($matchup)
@@ -577,6 +553,7 @@ class Sessions implements IStrategy
          * Sometimes it is, sometimes it isn't
          */
         $venueData = [
+            'external_id' => trim((string)$locationData['id']),
             'name' => trim((string)$locationData['name']),
             'address' => trim((string)$locationData['address']),
             'latitude' => trim((string)($locationData['latitude'] ?? null)),
@@ -587,10 +564,11 @@ class Sessions implements IStrategy
          * reusing an existing one if possible
          */
         try {
-            $venue = $this->venueMapper->findOneByColumn('name', $venueData['name']);
+            $venue = $this->venueMapper->findOneByColumn('external_id', $venueData['external_id']);
         } catch (\Schoolbox\Mapper\Exception $e) {
             $venue = $this->venueMapper->createModel()
-                ->setName($venueData['name']);
+                ->setName($venueData['name'])
+                ->setExternalId($venueData['external_id']);
         }
 
         /* Update existing address to whatever it now is, in case:

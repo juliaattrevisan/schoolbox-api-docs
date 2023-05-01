@@ -42,6 +42,17 @@ class Model implements ISoftDeletable
     /** @var string */
     protected $url;
 
+
+    /**
+     * The external identifier in the third party system
+     * e.g. a Clipboard identifier, so we know where our
+     * data came from
+     *
+     * @var string|null
+     */
+    private ?string $externalId = null;
+
+
     /**
      * The teams in this division.
      *
@@ -240,6 +251,26 @@ class Model implements ISoftDeletable
     public function setPlayers($players)
     {
         $this->players = $players;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getExternalId(): ?string
+    {
+        return $this->externalId;
+    }
+
+
+    /**
+     * @param string|null $externalId
+     * @return $this
+     */
+    public function setExternalId(?string $externalId): self
+    {
+        $this->externalId = $externalId;
         return $this;
     }
 }

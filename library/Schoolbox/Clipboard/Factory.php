@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Clipboard;
 
+use GuzzleHttp\Exception\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\GenericCollection;
 use Symfony\Component\Lock\LockInterface;
@@ -20,46 +21,6 @@ use Symfony\Component\Lock\LockInterface;
 class Factory
 {
     /**
-     * @var LoggerInterface
-     */
-    private LoggerInterface $log;
-
-
-    /**
-     * @var bool
-     */
-    private bool $perform;
-
-
-    /**
-     * @var LockInterface
-     */
-    private LockInterface $lock;
-
-
-    /**
-     * Clipboard host url, from the config var
-     *
-     * @var string
-     */
-    private string $host;
-
-
-    /**
-     * Clipboard authentication token, from the config var
-     *
-     * @var string
-     */
-    private string $token;
-
-
-    /**
-     * @var string
-     */
-    private string $timezone;
-
-
-    /**
      * @param LoggerInterface $log
      * @param bool            $perform
      * @param LockInterface   $lock
@@ -68,19 +29,13 @@ class Factory
      * @param string          $timezone
      */
     public function __construct(
-        LoggerInterface $log,
-        bool $perform,
-        LockInterface $lock,
-        string $host,
-        string $token,
-        string $timezone
+        private LoggerInterface $log,
+        private bool $perform,
+        private LockInterface $lock,
+        private string $host,
+        private string $token,
+        private string $timezone
     ) {
-        $this->log = $log;
-        $this->perform = $perform;
-        $this->lock = $lock;
-        $this->host = $host;
-        $this->token = $token;
-        $this->timezone = $timezone;
     }
 
 
@@ -88,14 +43,18 @@ class Factory
      * Produce the individual parts that together, import the fullness
      * of the clipboard Hierarchy
      *
+     * Partial Mode: $partial beign true superpositions partial data from endpoints
+     * without purging existing data entirely like we normally wodl
+     *
      * @param bool $membership
      * @param bool $sessions
+     * @param bool $partial
      * @return GenericCollection
      * @throws \DomainException
-     * @throws \GuzzleHttp\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      * @throws \UnexpectedValueException
      */
-    public function produce(bool $membership, bool $sessions): GenericCollection
+    public function produce(bool $membership, bool $sessions, bool $partial): GenericCollection
     {
         /* Check the required pieces existed
          */
@@ -126,9 +85,9 @@ class Factory
         $teamPositionMapper = \Schoolbox\Fixtures\Team\Position\Mapper::getInstance();
         $divisionUserMapper = \Schoolbox\Fixtures\Division\User\Mapper::getInstance();
         $userMapper = \Schoolbox\UserMapper::getInstance();
-        $teamCoachMapper = \Schoolbox\Fixtures\Team\Coach\Mapper::getInstance();
         $coachMapper = \Schoolbox\Fixtures\Coach\Mapper::getInstance();
         $teamCoachMapper = \Schoolbox\Fixtures\Team\Coach\Mapper::getInstance();
+        $importLogMapper = \Schoolbox\Clipboard\Log\Mapper::getInstance();
 
         /* Set up a local cache for (sport, division, team) tuples
          */
@@ -155,6 +114,7 @@ class Factory
             $bus->add(new Hierarchy\Prepare(
                 $this->log,
                 $this->perform,
+                $partial,
                 $this->lock,
                 $seasonMapper,
                 $sportMapper,
@@ -170,6 +130,7 @@ class Factory
             ->add(new Hierarchy\Team(
                 $this->log,
                 $this->perform,
+                $partial,
                 $this->lock,
                 $api,
                 $membership,
@@ -180,11 +141,13 @@ class Factory
                 $teamPositionMapper,
                 $coachMapper,
                 $teamCoachMapper,
-                $userMapper
+                $userMapper,
+                $importLogMapper
             ))
             ->add(new Hierarchy\Cleanup(
                 $this->log,
                 $this->perform,
+                $partial,
                 $this->lock,
                 $seasonMapper,
                 $sportMapper,
@@ -211,6 +174,7 @@ class Factory
             $bus->add(new Sessions\Prepare(
                 $this->log,
                 $this->perform,
+                $partial,
                 $this->lock,
                 $matchupMapper,
                 $resultMapper
@@ -218,6 +182,7 @@ class Factory
             ->add(new Sessions\Sessions(
                 $this->log,
                 $this->perform,
+                $partial,
                 $this->lock,
                 $api,
                 $this->timezone,
@@ -225,11 +190,13 @@ class Factory
                 $userLookup,
                 $venueMapper,
                 $matchupMapper,
-                $resultMapper
+                $resultMapper,
+                $importLogMapper
             ))
             ->add(new Sessions\Cleanup(
                 $this->log,
                 $this->perform,
+                $partial,
                 $this->lock,
                 $matchupMapper,
                 $resultMapper
