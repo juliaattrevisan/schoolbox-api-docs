@@ -168,6 +168,11 @@ export default {
                     isTask: this.fullCalendarHelper_isTask(event),
                     completed: metadata?.completed,
                 },
+                eotc: {
+                    isEOTC: data?.custom?.numStudents !== undefined && data?.custom?.numStaff !== undefined,
+                    numStudents: data?.custom?.numStudents,
+                    numStaff: data?.custom?.numStaff,
+                },
                 links: {
                     view: data?.custom?.moreDetailsLink,
                     modify: modifyLink,
@@ -863,6 +868,14 @@ export default {
                         <template v-else>places</template>
                         remaining)
                     </template>
+                </meta-item>
+
+                <!-- EOTC metadata -->
+                <meta-item class="icon-staff-students" v-if="eventExtendedProps.eotc.isEOTC">
+                    Students: {{eventExtendedProps.eotc.numStudents}}
+                </meta-item>
+                <meta-item class="icon-teacher" v-if="eventExtendedProps.eotc.isEOTC">
+                    Staff: {{eventExtendedProps.eotc.numStaff}}
                 </meta-item>
             </meta-list>
             <article>
