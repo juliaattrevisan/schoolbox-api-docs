@@ -67,17 +67,17 @@ class Decorator implements DecoratorInterface
         $lessonPlanFieldMapper = LessonPlanFieldMapper::getInstance();
         $lessonPlanTemplateMapper = LessonPlanTemplateMapper::getInstance();
 
+        $assessment->setLessonPlanTemplate($this->lessonPlanTemplateId);
+
+        /* Decide whether students can see this Lesson Plan
+         */
+        $assessment->setVisibility($this->lessonPlanVisibility);
+
         /* Hydrate all the template's fields too
          * We need to remember where a Lesson Plan Field came from,
          * and also which Lesson Plan Template was used
          */
         $lessonPlanTemplate = $lessonPlanTemplateMapper->findOneByColumn('id', $this->lessonPlanTemplateId, ['deleted' => true]);
-
-        $assessment->setLessonPlanTemplate($lessonPlanTemplate);
-
-        /* Decide whether students can see this Lesson Plan
-         */
-        $assessment->setVisibility($this->lessonPlanVisibility);
 
         /* Convert each Lesson Plan Template Field into a Lesson Plan Field
          * along with any customisations provided by the user
@@ -104,7 +104,7 @@ class Decorator implements DecoratorInterface
                 $lessonPlanTemplateField = $lessonPlanTemplate->getFields()->getBy('id', $field['template']);
 
                 $updatedField = $lessonPlanFieldMapper->createModel()
-                    ->setLessonPlanTemplateField($lessonPlanTemplate->getFields()->getBy('id', $field['template']))
+                    ->setLessonPlanTemplateField($lessonPlanTemplateField->getId())
                     ->setTitle($lessonPlanTemplateField->getTitle())
                     ->setVisibility($lessonPlanTemplateField->getVisibility())
                     ->setSequence($lessonPlanTemplateField->getSequence());

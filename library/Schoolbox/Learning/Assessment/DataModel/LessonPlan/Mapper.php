@@ -35,7 +35,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasTable('lesson_plan');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->joins('lesson_plan_template_id', \Schoolbox\Admin\LessonPlan\Template\Mapper::class, 'id', null, null, 'lessonPlanTemplate', 'lessonPlanTemplate');
+        $this->uses('lesson_plan_template_id', self::TYPE_INTEGER, null, 'lessonPlanTemplate');
         $this->uses('visibility', self::TYPE_STRING);
         $this->joins('created_by', UserMapper::class, 'id', null, null, 'createdBy', 'createdBy');
         $this->joins('updated_by', UserMapper::class, 'id', null, null, 'updatedBy', 'updatedBy');
@@ -94,18 +94,14 @@ class Mapper extends \Schoolbox\Mapper
                 {$this->getJoinColumnString('createdBy', 'createdBy')},
                 {$this->getJoinColumnString('updatedBy', 'updatedBy')},
                 {$this->getJoinColumnString('deletedBy', 'deletedBy')},
-                {$this->getJoinColumnString('lessonPlanTemplate', 'lessonPlanTemplate')},
                 {$this->getJoinColumnString('lessonPlanField', 'lessonPlanField')},
-                {$this->getJoinColumnString('lessonPlanField.lessonPlanTemplateField', 'lessonPlanTemplateField')},
                 {$this->getJoinColumnString('assessmentModel', 'assessmentModel')}
             FROM {$this->getTable()}
             INNER JOIN {$this->getJoinSql('assessmentModel', '', 'assessmentModel', true)}
-            INNER JOIN {$this->getJoinSql('lessonPlanTemplate', '', 'lessonPlanTemplate', true)}
             INNER JOIN {$this->getJoinSql('createdBy', '', 'createdBy', true)}
             INNER JOIN {$this->getJoinSql('updatedBy', '', 'updatedBy', true)}
             LEFT JOIN {$this->getJoinSql('deletedBy', '', 'deletedBy', true)}
             LEFT JOIN {$this->getJoinSql('lessonPlanField', '', 'lessonPlanField')}
-            LEFT JOIN {$this->getJoinSql('lessonPlanField.lessonPlanTemplateField', 'lessonPlanField', 'lessonPlanTemplateField', true)}
         ";
 
         return $selectString;
@@ -124,8 +120,6 @@ class Mapper extends \Schoolbox\Mapper
     protected function hydrateSelect(PDOStatement $statement): Model|GenericCollection
     {
         $fieldMapper = $this->getJoinMapper('lessonPlanField');
-        $templateMapper = $this->getJoinMapper('lessonPlanTemplate');
-        $templateFieldMapper = $this->getJoinMapper('lessonPlanField.lessonPlanTemplateField');
 
         /** @var Model[] $lessonPlans */
         $lessonPlans = [];
@@ -135,16 +129,6 @@ class Mapper extends \Schoolbox\Mapper
                 /** @var Model|null $lessonPlan */
                 $lessonPlan = $this->hydrate($row);
                 $lessonPlan->setFields($fieldMapper->createCollection());
-
-                /* Prepare its template as well
-                 */
-                /** @var \Schoolbox\Admin\LessonPlan\Template\Model|null $template */
-                $template = $templateMapper->hydrate($row, 'lessonPlanTemplate', 'lessonPlanTemplate');
-                $template->setFields($templateFieldMapper->createCollection());
-
-                /* Slap in a Template that's ready to receive Template Fields
-                 */
-                $lessonPlan->setLessonPlanTemplate($template);
 
                 /* Bolt on the IAssessable instance
                  */
@@ -188,21 +172,7 @@ class Mapper extends \Schoolbox\Mapper
 
             if ($lessonPlanField instanceof Field\Model) {
                 $lessonPlans[$row['id']]->addField($lessonPlanField);
-
-                /* Hydrate and supply the original Lesson Plan Template Field
-                 */
-                /** @var \Schoolbox\Admin\LessonPlan\Template\Field\Model $lessonPlanTemplateField */
-                $lessonPlanTemplateField = $templateFieldMapper->hydrate($row, 'lessonPlanTemplateField', 'lessonPlanTemplateField');
-                $lessonPlanField->setLessonPlanTemplateField($lessonPlanTemplateField);
-
-                /* Reference it in the Lesson Plan Template Fields as well
-                 */
-                $lessonPlans[$row['id']]->getLessonPlanTemplate()->addField($lessonPlanTemplateField);
             }
-
-            /* TODO: Augment with attached files
-             */
-            // $lessonPlans[$row['id']]->setAttachments($this->getJoinMapper('files')->findByColumn('lesson_plan_id', $lessonPlans[$row['id']]->getId()));
         }
 
         /* Sort sequentially
@@ -233,6 +203,8 @@ class Mapper extends \Schoolbox\Mapper
      */
     public function saveFields(Model $lessonPlan): void
     {
+        /* TODO This might not work once we delink joins
+         */
         $this->cascadeJoin('lessonPlanField', ['lesson_plan_id' => $lessonPlan->getId()], $lessonPlan->getFields());
     }
 

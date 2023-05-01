@@ -320,12 +320,14 @@ abstract class Controller extends ListController implements IAssessmentControlle
             } else {
                 /* Customise the selected LPT
                  */
-                $data['lessonPlanMeta']['template'] = $this->lessonPlanTemplateMapper->findById((int)$templateId);
+                $lessonPlanTemplate = $this->lessonPlanTemplateMapper->findById((int)$templateId);
+
+                $data['lessonPlanMeta']['template'] = $lessonPlanTemplate->getId();
 
                 /* Field list contains the ones from the Lesson Plan Template when creating
-                 * WHen updating, it's actually fields from the Lesson Plan instance itself
+                 * When updating, it's actually fields from the Lesson Plan instance itself
                  */
-                $data['lessonPlanMeta']['fields'] = [];
+                $data['lessonPlanMeta']['fields'] = $lessonPlanTemplate->getFields();
 
                 if ($this->getRequest()->isXhr()) {
                     $content = $this->buildUnthemedHtmlOutput(sprintf(

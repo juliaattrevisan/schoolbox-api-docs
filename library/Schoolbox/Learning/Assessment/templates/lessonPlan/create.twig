@@ -18,7 +18,7 @@
  #     modify them; but another workflow shows you the Lesson Plan Fields that you had previously
  #     spawned and altered
  #}
-<input type="hidden" name="lessonPlanTemplateId" value="{{ lessonPlanMeta.template.id }}" />
+<input type="hidden" name="lessonPlanTemplateId" value="{{ lessonPlanMeta.template }}" />
 
 <fieldset>
     <div class="row">
@@ -60,7 +60,7 @@
                      # Because of the swamp you need to know both since the same function fulfils
                      # create and update phases in mapperProxy->save()
                      #}
-                    <input type="hidden" name="field[{{ field.id }}][template]" value="{{ field.lessonPlanTemplateField.id }}" />
+                    <input type="hidden" name="field[{{ field.id }}][template]" value="{{ field.lessonPlanTemplateField }}" />
                     <textarea id="field-body-{{ field.id }}" name="field[{{ field.id }}][body]" data-ckeditor>{{ field.body }}</textarea>
                 </div>
             </div>
@@ -71,7 +71,7 @@
      # but they won't have any Lesson Plan Field identifiers at this point.
      #}
     <fieldset>
-        {% for field in lessonPlanMeta.template.fields %}
+        {% for field in lessonPlanMeta.fields %}
             {% if not field.isDeleted %}
                 {% set newFieldIdentifier = lessonPlanMeta.newKeyword ~ loop.index %}
                 <div class="row">
