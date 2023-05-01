@@ -7,21 +7,6 @@
 {% block content %}
     <div class="row">
         <div class="small-12 island">
-            <h1>{{ assessment.title }} &ndash; Marking Complete</h1>
-            {% if errorMessage %}
-                <div data-alert="" class="alert-box alert">
-                    {{ errorMessage }}
-                </div>
-            {% elseif message %}
-                <div data-alert="" class="alert-box success">
-                    {{ message }}
-                </div>
-            {% endif %}
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="small-12 island">
             <section class="content">
                 <p>You may now return to the status page.</p>
             </section>
