@@ -33,17 +33,17 @@ export function getTokensSettings(config: EditorConfig) {
  * with CKE5, tokens are now surrounded by a span element with a data-mention attribute
  * this function was added to help migrate text from CKE4 to CKE5, it will surround any tokens that are not already surrounded by a data-mention attribute
  *
- * @param { string } str - the string to surround the tokens in
+ * @param { HTMLElement } sourceElementHTML - the sourceElement content as HTML
  * @param { EditorConfig } config - the config to use when creating the editor
- * @returns { string } - the string with the tokens surrounded by the span element
+ * @returns { HTMLElement } - the html with the tokens surrounded by the span element
  */
-export function surroundUnsurroundedTokens(str: string, config: EditorConfig): string {
+export function surroundUnsurroundedTokens(sourceElementHTML: HTMLElement, config: EditorConfig): HTMLElement {
     const tokens = config.tokenList ? config.tokenList : DEFAULT_TOKENS;
 
     // Regular expression for matching existing mentions
     const mentionRegex = /<span class="mention" data-mention="(\w+)"\/?>/g;
 
-    let formattedStr = str;
+    let formattedStr = sourceElementHTML.innerHTML;
     tokens.forEach((token) => {
         // Regular expression for matching the token, exclude tokens that are already surrounded by a data-mention
         const tokenRegex = new RegExp(`(?<!data-mention=")\\${token}`, "g");
@@ -82,6 +82,6 @@ export function surroundUnsurroundedTokens(str: string, config: EditorConfig): s
         tempStr += formattedStr.slice(lastIndex);
         formattedStr = tempStr;
     });
-
-    return formattedStr;
+    sourceElementHTML.innerHTML = formattedStr;
+    return sourceElementHTML;
 }

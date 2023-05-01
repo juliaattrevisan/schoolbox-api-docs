@@ -36,17 +36,11 @@ export function getLinkSettings() {
  * As the rel attribute previously wasn't allowed in CKEditor 4, we can be sure that it won't exist in any existing data
  * We also check for 'noreferrer noopener' as twigs 'purify' method converts 'noopener noreferrer' to 'noreferrer noopener'
  *
- * @param { HTMLElement } sourceElement - the sourceElement the CKEditor will replace
- * @returns { string } - the html with the data attribute added
+ * @param { HTMLElement } sourceElementHTML - the sourceElement content as HTML
+ * @returns { HTMLElement } - the sourceElement content as HTML with the rel attribute added to any links that have the target attribute set to _blank
  */
-export function addRelToNewTabLinks(sourceElement: HTMLElement) {
-    const parser = new DOMParser();
-    // if the sourceElement is a textarea, use .value as .innerHTML will return HTML as escaped text
-    const value = (sourceElement as HTMLTextAreaElement).value
-        ? (sourceElement as HTMLTextAreaElement).value
-        : sourceElement.innerHTML;
-    const tempHTML = parser.parseFromString(value, "text/html");
-    const links = tempHTML.body.querySelectorAll("a");
+export function addRelToNewTabLinks(sourceElementHTML: HTMLElement) {
+    const links = sourceElementHTML.querySelectorAll("a");
     links.forEach((link) => {
         if (
             (link.getAttribute("target") === "_blank" && link.getAttribute("rel") === null) ||
@@ -55,5 +49,5 @@ export function addRelToNewTabLinks(sourceElement: HTMLElement) {
             link.setAttribute("rel", "noopener noreferrer");
         }
     });
-    return tempHTML.body.innerHTML;
+    return sourceElementHTML;
 }

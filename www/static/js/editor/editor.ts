@@ -77,17 +77,15 @@ function onCreate(event: CustomEvent) {
             // this results in a sanitized style element, breaking various editor styles.
             //
             // To solve this, we check that the element is within the set of allowed CKEditor elements
-            const allowedElements = [
-                "TEXTAREA",
-                "DIV",
-                "ARTICLE",
-            ]
+            const allowedElements = ["TEXTAREA", "DIV", "ARTICLE"];
             if (!allowedElements.includes(sourceElement.tagName.toUpperCase())) {
-                console.warn(`CKEditor: Element "${sourceElement.tagName}" is not allowed to be replaced by CKEditor.`
-                             + ` Targeted element by selector "${targetElement}":`, sourceElement);
+                console.warn(
+                    `CKEditor: Element "${sourceElement.tagName}" is not allowed to be replaced by CKEditor.` +
+                        ` Targeted element by selector "${targetElement}":`,
+                    sourceElement
+                );
                 return;
             }
-
             initCheckData(sourceElement as HTMLElement, config);
             create(sourceElement as HTMLElement, config);
         });
