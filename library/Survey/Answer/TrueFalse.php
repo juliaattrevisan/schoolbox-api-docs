@@ -73,7 +73,7 @@ class Survey_Answer_TrueFalse extends Evaluation_Answer_TrueFalse
         $config = json_decode($question['config']);
 
         $page->setVar(array(
-            'CONFIGURATION_MANDATORY' => $config->mandatory ? 'required' : '',
+            'CONFIGURATION_MANDATORY' => ($config->mandatory ?? false) ? 'required' : '',
         ));
     }
 }
