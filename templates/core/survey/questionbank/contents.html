@@ -163,10 +163,34 @@
                     </li>
                     <!-- END question -->
                 </ul>
+
+                <div id='errors' class="content"></div>
             </section>
 
             <!-- BEGIN show_submit -->
-            <input type='submit' class='expand' value='Copy selected questions to Survey' />
+            <script>
+                $(function() {
+                    /* Only enable button when you've selected at least one thingo
+                     */
+                    $('#questionBankForm').alaressValidate({
+                        rules: {
+                            'question_bank_id[]': {
+                                required: true,
+                                minlength: 1
+                            },
+                        },
+                        messages: {
+                            'question_bank_id[]': {
+                                'required': 'Please choose at least one question to copy.'
+                            }
+                        },
+                        errorPlacement: function(error, element) {
+                            error.appendTo($('#errors'));
+                        }
+                    });
+                });
+            </script>
+            <input type='submit' value='Copy selected questions to Survey' />
             <!-- END show_submit -->
         </form>
         <!-- END category_selected -->
