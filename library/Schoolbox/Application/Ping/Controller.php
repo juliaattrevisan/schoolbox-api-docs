@@ -39,6 +39,6 @@ class Controller extends Base
             $this->getResponse()->status->setCode(500);
             return;
         }
-        $this->getResponse()->status->setCode(201);
+        $this->getResponse()->status->setCode(200);
     }
 }
