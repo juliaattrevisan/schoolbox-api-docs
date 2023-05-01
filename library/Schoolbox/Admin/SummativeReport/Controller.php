@@ -831,6 +831,7 @@ class Controller extends ConfigController
                 }
                 // for each folder build and work with that markbook and assessments
                 $overallMarkScheme = $markSchemeFactory->spawnForFolder($folder, $this->getUser()->getRole()->isStaff());
+                //markbooks need to be spawned again for each folder, as summary could have a different collection of worktypes to class
                 $filteredMarkbook     = (new Markbook($summaryAssessments[$folder->getId()], $overallMarkScheme, $this->getUser()))
                     ->sortAssessables(new AssessmentComparator($viewer));
                 $allGraphs['summary'][$folder->getId()] = $this->generateCohortGraph(
@@ -855,6 +856,7 @@ class Controller extends ConfigController
                 }
                 // for each folder build and work with that markbook and assessments
                 $overallMarkScheme = $markSchemeFactory->spawnForFolder($folder, $this->getUser()->getRole()->isStaff());
+                //markbooks need to be spawned again for each folder, as class could have a different collection of worktypes to summary
                 $filteredMarkbook   = (new Markbook($classAssessments[$folder->getId()], $overallMarkScheme, $this->getUser()))->sortAssessables(new AssessmentComparator($viewer));
                 $allGraphs['class'][$folder->getId()] = $this->generateCohortGraph(
                     $classAssessments[$folder->getId()],
