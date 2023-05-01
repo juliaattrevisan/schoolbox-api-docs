@@ -113,7 +113,6 @@ class LessonPlan implements IAssessmentTypeTranslator
         if (null !== $domainObject->getFields()) {
             foreach ($domainObject->getFields() as $lessonPlanField) {
                 $lessonPlanTemplateFieldId = $lessonPlanField->getLessonPlanTemplateField()->getId();
-                $lessonPlanTemplateField   = $domainObject->getLessonPlanTemplate()->getFields()->getBy('id', $lessonPlanTemplateFieldId);
 
                 /* Updating a Lesson Plan means we shouldn't use CreateModel() to populate this Field set
                  * otherwise it spawns new ones everywhere
@@ -121,7 +120,7 @@ class LessonPlan implements IAssessmentTypeTranslator
                 $field = $lessonPlanFieldMapper->createModel()
                     ->setId($lessonPlanField->getId())
                     ->setLessonPlan($dataModel)
-                    ->setLessonPlanTemplateField($lessonPlanTemplateField)
+                    ->setLessonPlanTemplateField($lessonPlanTemplateFieldId)
                     ->setTitle($lessonPlanField->getTitle())
                     ->setBody($lessonPlanField->getBody())
                     ->setVisibility($lessonPlanField->getVisibility())
@@ -202,12 +201,11 @@ class LessonPlan implements IAssessmentTypeTranslator
              */
             foreach ($dataModel->getFields() as $lessonPlanField) {
                 $lessonPlanTemplateFieldId = $lessonPlanField->getLessonPlanTemplateField()->getId();
-                $lessonPlanTemplateField   = $domainObject->getLessonPlanTemplate()->getFields()->getBy('id', $lessonPlanTemplateFieldId);
 
                 $field = $lessonPlanFieldMapper->createModel()
                     ->setId($lessonPlanField->getId())
                     ->setLessonPlan($dataModel)
-                    ->setLessonPlanTemplateField($lessonPlanTemplateField)
+                    ->setLessonPlanTemplateField($lessonPlanTemplateFieldId)
                     ->setTitle($lessonPlanField->getTitle())
                     ->setBody($lessonPlanField->getBody())
                     ->setVisibility($lessonPlanField->getVisibility())

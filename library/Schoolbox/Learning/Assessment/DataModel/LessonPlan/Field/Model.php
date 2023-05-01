@@ -34,7 +34,7 @@ class Model implements ISoftDeletable
     /**
      * A Lesson Plan Template Field from which this instance originates
      */
-    private ?LessonPlanTemplateField $lessonPlanTemplateField = null;
+    private ?int $lessonPlanTemplateField = null;
 
 
     /**
@@ -90,19 +90,19 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return LessonPlanTemplateField|null
+     * @return int|null
      */
-    public function getLessonPlanTemplateField(): ?LessonPlanTemplateField
+    public function getLessonPlanTemplateField(): ?int
     {
         return $this->lessonPlanTemplateField;
     }
 
 
     /**
-     * @param LessonPlanTemplateField|null $lessonPlanTemplateField
+     * @param int|null $lessonPlanTemplateField
      * @return Model
      */
-    public function setLessonPlanTemplateField(?LessonPlanTemplateField $lessonPlanTemplateField): self
+    public function setLessonPlanTemplateField(?int $lessonPlanTemplateField): self
     {
         $this->lessonPlanTemplateField = $lessonPlanTemplateField;
         return $this;

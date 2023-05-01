@@ -25,9 +25,9 @@ class Model implements IAssessableDataModel, ISoftDeletable
     use AssessmentModelTrait;
 
     /**
-     * @var \Schoolbox\Admin\LessonPlan\Template\Model|null
+     * @var int|null
      */
-    private ?\Schoolbox\Admin\LessonPlan\Template\Model $lessonPlanTemplate = null;
+    private ?int $lessonPlanTemplate = null;
 
 
     /**
@@ -89,19 +89,19 @@ class Model implements IAssessableDataModel, ISoftDeletable
 
 
     /**
-     * @return \Schoolbox\Admin\LessonPlan\Template\Model|null
+     * @return int|null
      */
-    public function getLessonPlanTemplate(): ?\Schoolbox\Admin\LessonPlan\Template\Model
+    public function getLessonPlanTemplate(): ?int
     {
         return $this->lessonPlanTemplate;
     }
 
 
     /**
-     * @param \Schoolbox\Admin\LessonPlan\Template\Model|null $lessonPlanTemplate
+     * @param int|null $lessonPlanTemplate
      * @return $this
      */
-    public function setLessonPlanTemplate(?\Schoolbox\Admin\LessonPlan\Template\Model $lessonPlanTemplate): self
+    public function setLessonPlanTemplate(?int $lessonPlanTemplate): self
     {
         $this->lessonPlanTemplate = $lessonPlanTemplate;
         return $this;
