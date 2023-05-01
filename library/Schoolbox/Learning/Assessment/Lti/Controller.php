@@ -38,6 +38,7 @@ use Schoolbox\LTI\Provider as LtiTool;
 use Schoolbox\LTI\ResourceLink\LaunchFactory;
 use Schoolbox\LTI\User\Codec as UserCodec;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Url\Uri;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -428,21 +429,24 @@ class Controller extends Assessment\Controller
      */
     public function getLaunchAssessmentAsInstructorReturn(Model $assessment, string $target): void
     {
-        $statusUrl = $this->getRouteIfAuthorized(
-            'learningAssessment.getStatus',
-            [
-                'assessmentId' => $assessment->getId(),
-                'assessment'   => $assessment,
-            ]
+        $returnUrl = new Uri(
+            $this->request->query->get(Assessment\Redirect::RETURN_URL)
+            ?? $this->getRouteIfAuthorized(
+                'learningAssessment.getStatus',
+                [
+                    'assessmentId' => $assessment->getId(),
+                    'assessment'   => $assessment,
+                ]
+            )
         );
-        $params    = [
-            'assessment'   => $assessment,
+        $returnUrl = $returnUrl->appendQueryParameters([
             'message'      => strip_tags($this->request->query->get('lti_msg') ?? ''),
             'errorMessage' => strip_tags($this->request->query->get('lti_errormsg') ?? ''),
-            'returnUrl'    => $this->request->query->get(Assessment\Redirect::RETURN_URL, $statusUrl),
-            'breadcrumbs'  => $this->getBakery()
-                ->produceFromAssessment($assessment, $this->getUser())
-                ->add([$assessment->getTitle(), $statusUrl])
+        ]);
+
+        $params    = [
+            'assessment' => $assessment,
+            'returnUrl'  => $returnUrl->__toString(),
         ];
 
         if ($target === LtiTool\Model::TARGET_WINDOW) {
@@ -574,24 +578,18 @@ class Controller extends Assessment\Controller
      */
     public function getLaunchAssessmentAsStudentReturn(Model $assessment, User $student, string $target): void
     {
-        $classPageUrl = '/homepage/' . $assessment->getBaseContext()->getFolder()->getId();
-        $statusUrl    = $this->getRouteIfAuthorized(
-            'learningAssessment.getSummary',
-            [
-                'assessmentId' => $assessment->getId(),
-                'assessment'   => $assessment,
-                'studentId'    => $student->getId(),
-                'student'      => $student,
-            ],
+        $returnUrl = new Uri(
+            $this->request->query->get(Assessment\Redirect::RETURN_URL)
+            ?? ('/homepage/' . $assessment->getBaseContext()->getFolder()->getId())
         );
-        $params       = [
-            'assessment'   => $assessment,
+        $returnUrl = $returnUrl->appendQueryParameters([
             'message'      => strip_tags($this->request->query->get('lti_msg') ?? ''),
             'errorMessage' => strip_tags($this->request->query->get('lti_errormsg') ?? ''),
-            'returnUrl'    => $this->request->query->get(Assessment\Redirect::RETURN_URL, $classPageUrl),
-            'breadcrumbs'  => $this->getBakery()
-                                   ->produceFromAssessment($assessment, $this->getUser())
-                                   ->add([$assessment->getTitle(), $statusUrl])
+        ]);
+
+        $params    = [
+            'assessment' => $assessment,
+            'returnUrl'  => $returnUrl->__toString(),
         ];
 
         if ($target === LtiTool\Model::TARGET_WINDOW) {
