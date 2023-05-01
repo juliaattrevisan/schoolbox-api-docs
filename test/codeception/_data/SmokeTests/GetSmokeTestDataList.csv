@@ -138,6 +138,10 @@ Admin,"Setup grades",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/grade
 Admin,"Setup grades",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/grades,401
 Admin,"Setup grades",Student,https://vagrant.dev.schoolbox.cloud/adminv2/grades,401
 Admin,"Setup grades",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/grades,401
+Admin,"Lesson Plan Templates",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/lesson-plan/template,200
+Admin,"Lesson Plan Templates",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/lesson-plan/template,401
+Admin,"Lesson Plan Templates",Student,https://vagrant.dev.schoolbox.cloud/adminv2/lesson-plan/template,401
+Admin,"Lesson Plan Templates",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/lesson-plan/template,401
 Admin,"LMS LMS Policy",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/setting/LMS%20Policy,200
 Admin,"LMS LMS Policy",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/setting/LMS%20Policy,401
 Admin,"LMS LMS Policy",Student,https://vagrant.dev.schoolbox.cloud/adminv2/setting/LMS%20Policy,401
@@ -702,6 +706,10 @@ LMS,"Create quiz",Superuser,https://vagrant.dev.schoolbox.cloud/learning/unitspe
 LMS,"Create quiz",Teacher,https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?type=quiz&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1,200
 LMS,"Create quiz",Student,https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?type=quiz&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1,401
 LMS,"Create quiz",Parent,https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?type=quiz&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1,401
+LMS,Create lesson plan,Superuser,https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?lpt=3&type=lessonPlan&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1,200
+LMS,Create lesson plan,Teacher,https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?lpt=3&type=lessonPlan&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1,200
+LMS,Create lesson plan,Student,https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?lpt=3&type=lessonPlan&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1,401
+LMS,Create lesson plan,Parent,https://vagrant.dev.schoolbox.cloud/learning/unitspecs/5/assessments/new?lpt=3&type=lessonPlan&returnUrl=L2NvdXJzZS9tb2RpZnkvMiM1,401
 LMS,"View due work",Superuser,https://vagrant.dev.schoolbox.cloud/learning/due,200
 LMS,"View due work",Teacher,https://vagrant.dev.schoolbox.cloud/learning/due,200
 LMS,"View due work",Student,https://vagrant.dev.schoolbox.cloud/learning/due,200
