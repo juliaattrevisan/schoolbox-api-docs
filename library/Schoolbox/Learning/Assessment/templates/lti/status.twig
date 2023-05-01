@@ -22,6 +22,20 @@
 {% set labelPending    = 'Self-Assessed' %}
 {% set labelReviewed   = 'Teacher-Assessed' %}
 
+{% block messages %}
+    {% if (errorMessage ?? '') != '' %}
+        <div data-alert="" class="alert-box alert">
+            {{ errorMessage }}
+            <a href="#" class="close">×</a>
+        </div>
+    {% elseif (message ?? '') != '' %}
+        <div data-alert="" class="alert-box success">
+            {{ message }}
+            <a href="#" class="close">×</a>
+        </div>
+    {% endif %}
+{% endblock messages %}
+
 {% block headerOptions %}
     <li>
         {# Launch link depends on whether the tool opens in an iframe or not #}

@@ -191,6 +191,8 @@ class Controller extends Assessment\Controller
                     'assessment'  => $assessment,
                     'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())
                                                        ->add([ $assessment->getTitle(), '' ]),
+                    'message'      => strip_tags($this->request->query->get('lti_msg', '')),
+                    'errorMessage' => strip_tags($this->request->query->get('lti_errormsg', '')),
                 ],
                 "Status of {$assessment->getTitle()}",
                 'submission'
@@ -440,8 +442,8 @@ class Controller extends Assessment\Controller
             )
         );
         $returnUrl = $returnUrl->appendQueryParameters([
-            'message'      => strip_tags($this->request->query->get('lti_msg') ?? ''),
-            'errorMessage' => strip_tags($this->request->query->get('lti_errormsg') ?? ''),
+            'lti_msg'      => $this->request->query->get('lti_msg', ''),
+            'lti_errormsg' => $this->request->query->get('lti_errormsg', ''),
         ]);
 
         $params    = [
@@ -583,8 +585,8 @@ class Controller extends Assessment\Controller
             ?? ('/homepage/' . $assessment->getBaseContext()->getFolder()->getId())
         );
         $returnUrl = $returnUrl->appendQueryParameters([
-            'message'      => strip_tags($this->request->query->get('lti_msg') ?? ''),
-            'errorMessage' => strip_tags($this->request->query->get('lti_errormsg') ?? ''),
+            'lti_msg'      => $this->request->query->get('lti_msg', ''),
+            'lti_errormsg' => $this->request->query->get('lti_errormsg', ''),
         ]);
 
         $params    = [
