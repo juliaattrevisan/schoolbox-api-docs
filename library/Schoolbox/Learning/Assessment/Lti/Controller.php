@@ -443,10 +443,14 @@ class Controller extends Assessment\Controller
                 ]
             )
         );
-        $returnUrl = $returnUrl->appendQueryParameters([
-            'lti_msg'      => $this->request->query->get('lti_msg', ''),
-            'lti_errormsg' => $this->request->query->get('lti_errormsg', ''),
-        ]);
+        $returnUrl = $returnUrl->appendQueryParameters(
+            array_filter(
+                [
+                    'lti_msg'      => $this->request->query->get('lti_msg', ''),
+                    'lti_errormsg' => $this->request->query->get('lti_errormsg', ''),
+                ]
+            )
+        );
 
         $params    = [
             'assessment' => $assessment,
@@ -586,10 +590,14 @@ class Controller extends Assessment\Controller
             $this->request->query->get(Assessment\Redirect::RETURN_URL)
             ?? ('/homepage/' . $assessment->getBaseContext()->getFolder()->getId())
         );
-        $returnUrl = $returnUrl->appendQueryParameters([
-            'lti_msg'      => $this->request->query->get('lti_msg', ''),
-            'lti_errormsg' => $this->request->query->get('lti_errormsg', ''),
-        ]);
+        $returnUrl = $returnUrl->appendQueryParameters(
+            array_filter(
+                [
+                    'lti_msg'      => $this->request->query->get('lti_msg', ''),
+                    'lti_errormsg' => $this->request->query->get('lti_errormsg', ''),
+                ]
+            )
+        );
 
         $params    = [
             'assessment' => $assessment,
