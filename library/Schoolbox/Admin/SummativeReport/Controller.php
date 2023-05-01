@@ -822,7 +822,6 @@ class Controller extends ConfigController
 
         // Let markbook calculate the statistics
         $markSchemeFactory = new Factory($this->getConfigLoader());
-        $overallMarkScheme = $markSchemeFactory->spawnForFolder(null, $this->getUser()->getRole()->isStaff());
 
         if ($optionsPayload['summary']['cohort']) {
             foreach ($folders as $folder) {
@@ -831,6 +830,8 @@ class Controller extends ConfigController
                     continue;
                 }
                 // for each folder build and work with that markbook and assessments
+                $overallMarkScheme = $markSchemeFactory->spawnForFolder($folder, $this->getUser()->getRole()->isStaff());
+                //markbooks need to be spawned again for each folder, as summary could have a different collection of worktypes to class
                 $filteredMarkbook     = (new Markbook($summaryAssessments[$folder->getId()], $overallMarkScheme, $this->getUser()))
                     ->sortAssessables(new AssessmentComparator($viewer));
                 $allGraphs['summary'][$folder->getId()] = $this->generateCohortGraph(
@@ -850,10 +851,12 @@ class Controller extends ConfigController
         if ($optionsPayload['class']['cohort']) {
             foreach ($folders as $folder) {
                 // if the folder is empty, then don't attempt to generate a graph for it
-                if (!isset($summaryAssessments[$folder->getId()])) {
+                if (!isset($classAssessments[$folder->getId()])) {
                     continue;
                 }
                 // for each folder build and work with that markbook and assessments
+                $overallMarkScheme = $markSchemeFactory->spawnForFolder($folder, $this->getUser()->getRole()->isStaff());
+                //markbooks need to be spawned again for each folder, as class could have a different collection of worktypes to summary
                 $filteredMarkbook   = (new Markbook($classAssessments[$folder->getId()], $overallMarkScheme, $this->getUser()))->sortAssessables(new AssessmentComparator($viewer));
                 $allGraphs['class'][$folder->getId()] = $this->generateCohortGraph(
                     $classAssessments[$folder->getId()],
