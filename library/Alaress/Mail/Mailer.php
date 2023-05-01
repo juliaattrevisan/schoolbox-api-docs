@@ -50,7 +50,7 @@ class Mailer
     /**
      * List of headers that are added to the email that is sent.
      */
-    protected array $headers;
+    protected array $headers = [];
 
     protected LoggerInterface $log;
     protected IConfigLoader $config;
@@ -85,10 +85,6 @@ class Mailer
         // setup default from
         $this->systemFrom = new Address($this->config->get(ConfigMapper::NAME_MAIL_FROM_ADDRESS), $this->config->get(ConfigMapper::NAME_MAIL_FROM_NAME));
         $this->setFrom($this->systemFrom);
-
-        // setup header
-        $this->headers['MessageID'] = '<' . md5(time()) . '@alaressmailer>';
-
         $this->setTo($to);
         $this->setSubject($subject);
 
@@ -442,7 +438,7 @@ class Mailer
             (new DkimOptions())
                 ->bodyCanon('relaxed')
                 ->headerCanon('relaxed')
-                ->headersToIgnore(['message-id', 'date', 'mime-version', 'messageid'])
+                ->headersToIgnore(['message-id', 'date', 'mime-version'])
                 ->toArray()
         );
     }
