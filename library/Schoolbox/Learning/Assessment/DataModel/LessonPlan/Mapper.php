@@ -94,7 +94,7 @@ class Mapper extends \Schoolbox\Mapper
                 {$this->getJoinColumnString('createdBy', 'createdBy')},
                 {$this->getJoinColumnString('updatedBy', 'updatedBy')},
                 {$this->getJoinColumnString('deletedBy', 'deletedBy')},
-                {$this->getJoinColumnString('lessonPlanField', 'lessonPlanField')}
+                {$this->getJoinColumnString('lessonPlanField', 'lessonPlanField')},
                 {$this->getJoinColumnString('assessmentModel', 'assessmentModel')}
             FROM {$this->getTable()}
             INNER JOIN {$this->getJoinSql('assessmentModel', '', 'assessmentModel', true)}

@@ -1282,11 +1282,6 @@ class Mapper extends BaseMapper
          */
         $lessonPlanFieldMapper = LessonPlan\Field\Mapper::getInstance();
 
-        /* Fetch all the Lesson Plan Template + Lesson Plan Template Fields too
-         * (Fields need to know about their Template Fields)
-         */
-        $lessonPlanTemplateMapper = \Schoolbox\Admin\LessonPlan\Template\Mapper::getInstance();
-
         /* Collate and group all the Lesson Plan Fields by the Lesson Plan id to which they belong
          */
         $fields = $lessonPlanFieldMapper->findByColumn('lesson_plan_id', $lessonPlanIds, [
@@ -1299,26 +1294,13 @@ class Mapper extends BaseMapper
                 }
             );
 
-        /* Collate and group all the Lesson Plan Templates by the Lesson Plan id to which they belong
-         */
-        $templateIds = [];
-
-        foreach ($modelList as $model) {
-            if ($model->getSubObject() instanceof LessonPlan\Model) {
-                $templateIds[] = $model->getLessonPlan()->getLessonPlanTemplate()->getId();
-            }
-        }
-
-        $templates = $lessonPlanTemplateMapper->findByColumn('id', $templateIds, ['deleted' => true])->indexBy('id');
-
         /* Assign Lesson Plan Fields and Lesson Plan Templates to each instance of a Lesson Plan
          * This is used when grabbing stuff out of the db via the custom query elsewhere in this
          * class so you have to do all these microhydrations manually
          */
         foreach ($modelList as $model) {
             if ($model->getSubObject() instanceof LessonPlan\Model) {
-                $model->getLessonPlan()->setFields($fields->getOffset($model->getLessonPlan()->getId()))
-                    ->setLessonPlanTemplate($templates->getOffset($model->getLessonPlan()->getLessonPlanTemplate()->getId()));
+                $model->getLessonPlan()->setFields($fields->getOffset($model->getLessonPlan()->getId()));
             }
         }
 
