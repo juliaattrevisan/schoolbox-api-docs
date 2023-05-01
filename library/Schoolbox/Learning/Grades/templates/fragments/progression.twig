@@ -43,22 +43,34 @@
                             valueSuffix: '',
                             hideDelay: 0,
                             formatter: function() {
-                                var template =
+                                let template =
                                         '<div style="width:250px!important;overflow:auto;white-space:normal !important;">' +
                                         '<h2>{NAME}</h2>' +
-                                        '<p><b>{LEVEL}</b></br>' +
-                                        '{DESCRIPTOR}</p>' +
+                                        '{CONTENT}' +
                                         '</div>';
 
                                 /* Concatenate everything
                                  */
                                 if (typeof this.points[0].x !== 'undefined') {
-                                    var tooltipContent = template;
+                                    let tooltipContent = template;
+                                    let desc = this.points[0].point.desc ?? ''
+                                    let level = this.points[0].point.level ?? '';
+                                    let content = '';
+
+                                    /* Decorate with more html
+                                     */
+                                    if ('' !== level) {
+                                        level = '<b>' + level + '</b><br />';
+                                    }
+
+                                    /* Something to show
+                                     */
+                                    if ('' !== level || '' !== desc) {
+                                        content = '<p>' + level + desc + '</p>';
+                                    }
 
                                     tooltipContent = tooltipContent.replace(/{NAME}/, this.points[0].x);
-                                    tooltipContent = tooltipContent.replace(/{DESCRIPTOR}/, this.points[0].point.desc);
-                                    tooltipContent = tooltipContent.replace(/{LEVEL}/, this.points[0].point.level);
-
+                                    tooltipContent = tooltipContent.replace(/{CONTENT}/, content);
 
                                     return tooltipContent;
                                 }
