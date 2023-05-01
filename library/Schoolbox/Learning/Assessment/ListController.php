@@ -935,6 +935,9 @@ class ListController extends Web\Controller\Base
         $partitionHelper = new ParticipationHelper($this->participantDataSource, $this->userMapper);
         try {
             $partitionHelper->include($assessment, $student->getId());
+            // Update project mark as the excluded assessment may affect the project result
+            (new \Schoolbox\Learning\Assessment\Project\ResultCache\ResultCache($this->projectResultCacheMapper))
+                ->refresh($this->getAssessmentMapper(), $assessment, $student);
             $this->getResponse()->status->setCode(201);
         } catch (MapperException $e) {
             $problem = new ApiProblem($e->getMessage());
@@ -959,6 +962,11 @@ class ListController extends Web\Controller\Base
         $partitionHelper = new ParticipationHelper($this->participantDataSource, $this->userMapper);
         try {
             $partitionHelper->exclude($assessment, $student->getId());
+
+            // Update project mark as the excluded assessment may affect the project result
+            (new \Schoolbox\Learning\Assessment\Project\ResultCache\ResultCache($this->projectResultCacheMapper))
+                ->refresh($this->getAssessmentMapper(), $assessment, $student);
+
             $this->getResponse()->status->setCode(201);
         } catch (MapperException $e) {
             $problem = new ApiProblem($e->getMessage());
