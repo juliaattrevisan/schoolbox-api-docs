@@ -47,11 +47,13 @@ class AcceptanceTester extends Actor
     {
         $this->login('alaress', 'alaress');
     }
+
     /**
      * Login to Schoolbox
      *
      * @param $username
      * @param $password
+     * @throws Exception
      */
     public function login($username, $password)
     {
@@ -72,9 +74,12 @@ class AcceptanceTester extends Actor
         $i->amOnPage('/');
 
         $i->saveSessionSnapshot($snapshotName);
+        $i->skipWhatsNewTour();
     }
+
     /**
      * Impersonate Coles (sales data)
+     * @throws Exception
      */
     public function impersonateTeacher()
     {
@@ -83,6 +88,7 @@ class AcceptanceTester extends Actor
         $i->click('Mr Jack Coles');
         $i->deleteSessionSnapshot('Mr Jack Coles');
         $i->deleteSessionSnapshot('login:alaress');
+        $i->skipWhatsNewTour();
     }
 
     /**
@@ -102,6 +108,7 @@ class AcceptanceTester extends Actor
         $i->click($fullname, '#switch-user');
         $i->deleteSessionSnapshot($fullname);
         $i->deleteSessionSnapshot('login:alaress');
+        $i->skipWhatsNewTour();
     }
 
     /**
@@ -120,6 +127,7 @@ class AcceptanceTester extends Actor
         $i->click($fullname, '#switch-user');
         $i->deleteSessionSnapshot($fullname);
         $i->deleteSessionSnapshot('login:alaress');
+        $i->skipWhatsNewTour();
     }
 
     /**
@@ -139,6 +147,7 @@ class AcceptanceTester extends Actor
         $i->waitForText($fullname, 5);
         $i->deleteSessionSnapshot($fullname);
         $i->deleteSessionSnapshot('login:alaress');
+        $i->skipWhatsNewTour();
     }
 
     /**
@@ -252,5 +261,17 @@ class AcceptanceTester extends Actor
         $this->scrollTo($selector);
         $this->waitForElementVisible($selector, 5);
         $this->click($selector);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function skipWhatsNewTour(): void
+    {
+        try {
+            $this->seeElement('div.introjs-tooltipbuttons a');
+            $this->click('Finish');
+        } catch (Exception $e) {
+        }
     }
 }

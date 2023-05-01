@@ -81,6 +81,7 @@ class CreateFolder
      */
     public function clickCreateFolderButton(): void
     {
+        $this->tester->amGoingTo("click create folder button");
         $this->tester->click(self::CREATE_FOLDER_BUTTON);
     }
 }
