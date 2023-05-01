@@ -250,13 +250,15 @@ class Controller extends Assessment\Controller
                 '@learningAssessment/lti/summary.twig',
                 [
                     'lastViews'    => $lastView->getTwigViews($assessment, $student, $this->getAccess()->isInstructor($this->getUser(), $assessment->getBaseContext()->getFolder())),
-                    'breadcrumbs' => $this->bakery->produceFromAssessment($assessment, $this->getUser())
-                                                  ->add([ $assessment->getTitle(), '' ]),
-                    'assessment'  => $assessment,
-                    'participant' => $participant,
-                    'student'     => $student,
-                    'timeline'    => $timeline,
-                    'returnUrl'   => $this->request->query->get(Assessment\Redirect::RETURN_URL),
+                    'breadcrumbs'  => $this->bakery->produceFromAssessment($assessment, $this->getUser())
+                                                   ->add([ $assessment->getTitle(), '' ]),
+                    'assessment'   => $assessment,
+                    'participant'  => $participant,
+                    'student'      => $student,
+                    'timeline'     => $timeline,
+                    'returnUrl'    => $this->request->query->get(Assessment\Redirect::RETURN_URL),
+                    'message'      => strip_tags($this->request->query->get('lti_msg', '')),
+                    'errorMessage' => strip_tags($this->request->query->get('lti_errormsg', '')),
                 ],
                 "Status of {$assessment->getTitle()}",
                 'submission'

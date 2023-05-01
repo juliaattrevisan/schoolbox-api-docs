@@ -23,17 +23,10 @@
 {% set labelReviewed   = 'Teacher-Assessed' %}
 
 {% block messages %}
-    {% if (errorMessage ?? '') != '' %}
-        <div data-alert="" class="alert-box alert">
-            {{ errorMessage }}
-            <a href="#" class="close">×</a>
-        </div>
-    {% elseif (message ?? '') != '' %}
-        <div data-alert="" class="alert-box success">
-            {{ message }}
-            <a href="#" class="close">×</a>
-        </div>
-    {% endif %}
+    {% include '@learningAssessment/fragments/lti/messages.twig' with {
+        errorMessage: errorMessage ?? '',
+        message: message ?? '',
+    } only %}
 {% endblock messages %}
 
 {% block headerOptions %}
