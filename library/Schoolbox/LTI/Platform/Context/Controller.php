@@ -338,7 +338,6 @@ class Controller extends BaseController
 
         // Claim about the platform instance
         $platformInstanceClaim = (new PlatformInstanceClaimFactory($this->instance))->build();
-        $platformInstanceClaim->normalize();
 
         // Claim about folder memberships
         $nrpsClaim = new NrpsClaim(
@@ -350,7 +349,6 @@ class Controller extends BaseController
                     )
                 )
         );
-        $nrpsClaim->normalize();
 
         $claims = [$contextClaim, $platformInstanceClaim, $nrpsClaim];
 
