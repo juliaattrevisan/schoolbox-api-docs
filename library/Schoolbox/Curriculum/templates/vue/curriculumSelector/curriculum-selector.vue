@@ -108,6 +108,6 @@ function onSelectedNodeModalClosed() {
         <cs-search-results />
         <resize-observer @notify="onContainerResize" />
     </div>
-    <cs-modal />
+    <cs-modal v-if="store.hasLoadedOk" />
     <selected-node-modal :node="selectedNodesStore.activeNode" @closed="onSelectedNodeModalClosed" />
 </template>

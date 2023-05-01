@@ -55,7 +55,7 @@ export const useViewNodesStore = defineStore("mcViewNodes", () => {
             const nodeAtDepth: Node = findById(nodesStore.nodes.children as Node[], id) as Node;
             currentBreadcrumbs.push({ id, name: nodeAtDepth.name, depth: index + 1 });
         });
-        // we return an empty array if there's no selections yet, otherwise we pull out the latest as it represents the node we are currently on (not one we need to move back to)
+        // we return an empty array if there's no selections yet, otherwise return the breadcrumbs
         return currentBreadcrumbs.length === 0 ? [] : currentBreadcrumbs;
     });
 
