@@ -169,7 +169,7 @@ export default {
                     completed: metadata?.completed,
                 },
                 eotc: {
-                    isEOTC: data?.custom?.numStudents !== undefined && data?.custom?.numStaff !== undefined,
+                    isEOTC: this.fullCalendarHelper_isEOTC(event),
                     numStudents: data?.custom?.numStudents,
                     numStaff: data?.custom?.numStaff,
                 },
