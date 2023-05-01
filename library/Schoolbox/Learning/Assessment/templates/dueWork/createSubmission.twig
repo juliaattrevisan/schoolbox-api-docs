@@ -224,7 +224,8 @@ Data:
                     .val(submittingText);
                 // Make the form's inputs readonly (NOT disabled)
                 $form.find('input, select, textarea').prop('readonly', true);
-                if (acceptsOnline) {
+                // check the editor content if we accept online submissions and the "submitted in person" checkbox is not checked
+                if (acceptsOnline && !$form.find('#editor-submittedInPerson').prop('checked')) {
                     /**
                      * In order to submit, we need to ensure there's some textContent:
                      * https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent
