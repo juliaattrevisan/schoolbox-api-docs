@@ -20,19 +20,28 @@ function getSourceElementHTML(sourceElement: HTMLElement) {
 }
 
 /**
+ * Run through any checks required on the data before it's loaded into the editor
+ *
+ * @param { HTMLElement } sourceElement - the sourceElement the CKEditor will replace
+ * @param { EditorConfig } config - the config to use when creating the editor
+ * @returns { HTMLElement } - the sourceElement content as HTML
+ */
+function runChecks(sourceElement: HTMLElement, config: EditorConfig) {
+    let sourceElementHTML = getSourceElementHTML(sourceElement);
+    sourceElementHTML = addRelToNewTabLinks(sourceElementHTML);
+    sourceElementHTML = addFullWidthAttributes(sourceElementHTML);
+    sourceElementHTML = surroundUnsurroundedTokens(sourceElementHTML, config);
+    return sourceElementHTML;
+}
+
+/**
  * This function is called when the editor is created, it checks the data and manipulates as required
  *
  * @param { HTMLElement } sourceElement - the sourceElement the CKEditor will replace
  * @param { EditorConfig } config - the config to use when creating the editor
  */
 export function initCheckData(sourceElement: HTMLElement, config: EditorConfig) {
-    let sourceElementHTML = getSourceElementHTML(sourceElement);
-    // Add the rel attribute to any links that have the target attribute set to _blank
-    sourceElementHTML = addRelToNewTabLinks(sourceElementHTML);
-    // Add the data-schoolboxresource-fullwidth attribute to any images that have the class full-width
-    sourceElementHTML = addFullWidthAttributes(sourceElementHTML);
-    // Checks the data for any tokens that need to be surrounded
-    sourceElementHTML = surroundUnsurroundedTokens(sourceElementHTML, config);
+    const sourceElementHTML = runChecks(sourceElement, config);
     sourceElement.innerHTML = sourceElementHTML.innerHTML;
     // ensure both .innerHTML and .value are kept consistent
     if ((sourceElement as HTMLTextAreaElement).value) {
@@ -45,6 +54,8 @@ export function initCheckData(sourceElement: HTMLElement, config: EditorConfig) 
 /**
  * This function can be called by other pages to run the surroundUnsurroundedTokens function on the editor,
  * this might happen if a page has changed the data in the form with .setData and needs to re-run the function
+ * It's currently only called within the Manage Pastoral Care Record Settings page, where it only needs to check
+ * for tokens when a pasotral type change is triggered.
  *
  * @param { CustomEvent } event - the custom event
  */
