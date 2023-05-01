@@ -3,7 +3,7 @@ import { EditorConfig } from "@js/editor/types/editorTypes";
 import { addRelToNewTabLinks } from "@js/editor/settings/linkSettings";
 import { addFullWidthAttributes } from "@js/editor/settings/imageSettings";
 import { addFullWidthStyle, addAlignLeftStyle } from "@js/editor/settings/tableSettings";
-import { surroundUnsurroundedTokens } from "@js/editor/settings/tokensSettings";
+import { surroundUnsurroundedTokens, fixListedHeadings } from "@js/editor/settings/tokensSettings";
 
 /**
  * Parse the content as HTML so we can run .querySelectorAll etc on it
@@ -50,6 +50,10 @@ export function initCheckData(sourceElement: HTMLElement, config: EditorConfig) 
     if ((sourceElement as HTMLTextAreaElement).value) {
         (sourceElement as HTMLTextAreaElement).value = sourceElementHTML.innerHTML;
     }
+
+    // Ensure headings inside lists are wrapped in tags CKEditor will accept
+    sourceElement.innerHTML = fixListedHeadings(sourceElement.value || sourceElement.innerHTML);
+
     // Adds an event listener to allow pages to run the same check when they need to
     sourceElement.addEventListener(EditorEvent.EDITOR__CHECK_DATA, onEditorCheckData);
 }
@@ -69,4 +73,5 @@ function onEditorCheckData(event: CustomEvent) {
         const sourceElementHTML = parser.parseFromString(editor.getData(), "text/html").body;
         editor.setData(surroundUnsurroundedTokens(sourceElementHTML, editor.config.get("sbConfig")).innerHTML);
     }
+    editor.setData(fixListedHeadings(editor.getData()));
 }
