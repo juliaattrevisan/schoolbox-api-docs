@@ -433,15 +433,15 @@ class Controller extends Assessment\Controller
      */
     public function getLaunchAssessmentAsInstructorReturn(Model $assessment, string $target): void
     {
+        $statusUrl = $this->getRouteIfAuthorized(
+            'learningAssessment.getStatus',
+            [
+                'assessmentId' => $assessment->getId(),
+                'assessment'   => $assessment,
+            ],
+        );
         $returnUrl = new Uri(
-            $this->request->query->get(Assessment\Redirect::RETURN_URL)
-            ?? $this->getRouteIfAuthorized(
-                'learningAssessment.getStatus',
-                [
-                    'assessmentId' => $assessment->getId(),
-                    'assessment'   => $assessment,
-                ]
-            )
+            $this->request->query->get(Assessment\Redirect::RETURN_URL, $statusUrl),
         );
         $returnUrl = $returnUrl->appendQueryParameters(
             array_filter(
@@ -453,16 +453,18 @@ class Controller extends Assessment\Controller
         );
 
         $params    = [
-            'assessment' => $assessment,
-            'returnUrl'  => $returnUrl->__toString(),
+            'assessment'  => $assessment,
+            'returnUrl'   => $returnUrl->__toString(),
+            'breadcrumbs' => $this->getBakery()
+                ->produceFromAssessment($assessment, $this->getUser())
+                ->add([$assessment->getTitle(), $statusUrl])
         ];
 
         if ($target === LtiTool\Model::TARGET_WINDOW) {
             // new window launch: redirect back to return URL
             // (return URL should support message and error message)
-            // NOTE: there may be no difference between iframe and window target
             $this->response->content->set(
-                $this->buildUnthemedHtmlOutput(
+                $this->buildHtmlOutput(
                     '@learningAssessment/lti/return/instructor/window.twig',
                     $params,
                 )
@@ -586,11 +588,18 @@ class Controller extends Assessment\Controller
      */
     public function getLaunchAssessmentAsStudentReturn(Model $assessment, User $student, string $target): void
     {
-        $returnUrl = new Uri(
-            $this->request->query->get(Assessment\Redirect::RETURN_URL)
-            ?? ('/homepage/' . $assessment->getBaseContext()->getFolder()->getId())
+        $summaryUrl = $this->getRouteIfAuthorized(
+            'learningAssessment.getSummary',
+            [
+                'assessmentId' => $assessment->getId(),
+                'assessment'   => $assessment,
+                'studentId'    => $student->getId(),
+                'student'      => $student,
+            ],
         );
-        $returnUrl = $returnUrl->appendQueryParameters(
+
+        $returnUrl  = new Uri($this->request->query->get(Assessment\Redirect::RETURN_URL, $summaryUrl));
+        $returnUrl  = $returnUrl->appendQueryParameters(
             array_filter(
                 [
                     'lti_msg'      => $this->request->query->get('lti_msg', ''),
@@ -600,15 +609,18 @@ class Controller extends Assessment\Controller
         );
 
         $params    = [
-            'assessment' => $assessment,
-            'returnUrl'  => $returnUrl->__toString(),
+            'assessment'  => $assessment,
+            'returnUrl'   => $returnUrl->__toString(),
+            'breadcrumbs' => $this->getBakery()
+                ->produceFromAssessment($assessment, $this->getUser())
+                ->add([$assessment->getTitle(), $summaryUrl])
         ];
 
         if ($target === LtiTool\Model::TARGET_WINDOW) {
             // new window launch: button closes window,
             // also could go back to return URL
             $this->response->content->set(
-                $this->buildUnthemedHtmlOutput(
+                $this->buildHtmlOutput(
                     '@learningAssessment/lti/return/student/window.twig',
                     $params,
                 )
