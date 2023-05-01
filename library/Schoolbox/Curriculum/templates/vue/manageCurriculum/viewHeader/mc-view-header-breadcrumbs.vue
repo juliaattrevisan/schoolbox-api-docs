@@ -24,10 +24,11 @@ const viewNodesStore = useViewNodesStore();
     <div class="small-12 columns">
         <TransitionGroup name="list" class="breadcrumb" tag="ul">
             <mc-view-header-breadcrumb
-                v-for="breadcrumb in viewNodesStore.breadcrumbs"
+                v-for="(breadcrumb, index) in viewNodesStore.breadcrumbs"
                 :key="breadcrumb.id"
                 :breadcrumb="breadcrumb"
                 :is-disabled="props.isDisabled"
+                :is-last="index === viewNodesStore.breadcrumbs.length - 1"
             />
         </TransitionGroup>
     </div>
