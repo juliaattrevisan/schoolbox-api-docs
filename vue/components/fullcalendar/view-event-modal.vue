@@ -270,7 +270,7 @@ export default {
             });
 
             fetch(endpoint, {
-                method: 'POST'
+                method: "POST",
             })
                 .then((response) => {
                     if (response.ok) {
@@ -359,7 +359,7 @@ export default {
                     self.event.setProp("title", responseData?.title);
                     self.$refs.modal.close();
                     toast.toastTimeout({
-                        text: "Saved.",
+                        text: "Saved",
                         css: "success",
                     });
                     this.$emit("eventModified", responseData);
