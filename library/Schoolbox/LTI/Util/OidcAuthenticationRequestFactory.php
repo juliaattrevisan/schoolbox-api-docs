@@ -14,8 +14,10 @@ use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Builder\MessagePayloadBuilder;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
+use OAT\Library\Lti1p3Core\Security\Jwt\Builder\Builder as JwtBuilder;
 use OAT\Library\Lti1p3Core\Security\Oidc\OidcAuthenticator;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
+use Schoolbox\LTI\Platform\Context\ConfigurationFactory;
 
 /**
  * Factory for OIDC authentication requests.
@@ -65,12 +67,15 @@ class OidcAuthenticationRequestFactory
             $nonce = null;
         }
 
+        $messagePayloadBuilder = new MessagePayloadBuilder(
+            isset($nonce) ? new NoncePassthrough((string)$nonce) : null,
+            new JwtBuilder(new ConfigurationFactory())
+        );
+
         return (new OidcAuthenticator(
             $this->registrationRepository,
             $this->userAuthenticator,
-            new MessagePayloadBuilder(
-                isset($nonce) ? new NoncePassthrough((string)$nonce) : null,
-            ),
+            $messagePayloadBuilder
         ))->authenticate((new ServerRequestFactory())->build($request));
     }
 }
