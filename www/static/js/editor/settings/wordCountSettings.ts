@@ -40,7 +40,7 @@ function getLimitWarningElement(config: EditorConfig) {
     const limitExceededElement = document.createElement("span");
     limitExceededElement.classList.add("ck-word-count__limit-exceeded");
     limitExceededElement.innerHTML =
-        "<b>Warning:</b> The character limit has been reached. Please reduce the content to below the limit to ensure save.";
+        "<b>Warning:</b> The content storage limit has been exceeded.  Please remove some content before saving.";
 
     const limitWarningElement = document.createElement("div");
     limitWarningElement.classList.add("ck-word-count__limit-warning");
