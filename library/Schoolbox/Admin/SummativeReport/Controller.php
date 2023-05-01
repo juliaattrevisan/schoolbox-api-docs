@@ -822,7 +822,6 @@ class Controller extends ConfigController
 
         // Let markbook calculate the statistics
         $markSchemeFactory = new Factory($this->getConfigLoader());
-        $overallMarkScheme = $markSchemeFactory->spawnForFolder(null, $this->getUser()->getRole()->isStaff());
 
         if ($optionsPayload['summary']['cohort']) {
             foreach ($folders as $folder) {
@@ -831,6 +830,7 @@ class Controller extends ConfigController
                     continue;
                 }
                 // for each folder build and work with that markbook and assessments
+                $overallMarkScheme = $markSchemeFactory->spawnForFolder($folder, $this->getUser()->getRole()->isStaff());
                 $filteredMarkbook     = (new Markbook($summaryAssessments[$folder->getId()], $overallMarkScheme, $this->getUser()))
                     ->sortAssessables(new AssessmentComparator($viewer));
                 $allGraphs['summary'][$folder->getId()] = $this->generateCohortGraph(
@@ -854,6 +854,7 @@ class Controller extends ConfigController
                     continue;
                 }
                 // for each folder build and work with that markbook and assessments
+                $overallMarkScheme = $markSchemeFactory->spawnForFolder($folder, $this->getUser()->getRole()->isStaff());
                 $filteredMarkbook   = (new Markbook($classAssessments[$folder->getId()], $overallMarkScheme, $this->getUser()))->sortAssessables(new AssessmentComparator($viewer));
                 $allGraphs['class'][$folder->getId()] = $this->generateCohortGraph(
                     $classAssessments[$folder->getId()],
