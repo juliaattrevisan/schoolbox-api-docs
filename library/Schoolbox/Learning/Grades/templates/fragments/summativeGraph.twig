@@ -11,11 +11,11 @@
 <script type="text/javascript">
     $(function() {
 
-        var infoArray = {{ graph.info | purify }};
-        var graphData = {{ graph.scatter | purify }};
+        let infoArray = {{ graph.info | purify }};
+        let graphData = {{ graph.scatter | purify }};
 
         const formatGraphLabel = (template, infoArrayIndex) => {
-            var retString = template;
+            let retString = template;
 
             if (infoArray[infoArrayIndex].displayMark !== null) {
                 retString = retString.replace(/{DISPLAYMARK}/, infoArray[infoArrayIndex].displayMark);
