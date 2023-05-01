@@ -146,6 +146,7 @@ import { getConfigForVideo } from "@js/mediaelementplayer/mepUtils.ts";
         var params = $.fn.schoolboxResource_GetParams(element);
 
         var style = params["style"];
+
         var width = params["width"];
         var height = params["height"];
         var thumbnail = params["thumbnail"];
@@ -211,7 +212,27 @@ import { getConfigForVideo } from "@js/mediaelementplayer/mepUtils.ts";
         $(selector)
             .find("[data-schoolboxmedia-replacement]")
             .each(function (index, element) {
-                $(element).mediaelementplayer(getConfigForVideo());
+                const $element = $(element);
+
+                // Override height and width set directly on the [data-schoolboxmedia-replacement-container] to 'auto'.
+                // This is necessary to avoid a problem that would otherwise occur when the size of embedded CKEditor
+                // videos has been set to something other than 'original' or 'full-width'.
+                //
+                // To demonstrate the purpose of this fix:
+                //  1. Embed a video in a CKEditor text field.
+                //  2. Edit the CKEditor text field, and click on the video.  Increase the size of the video by dragging its
+                //     corner.  Set the width of the video to more than 640 pixels.
+                //  3. Save the text CKEditor field, and return to the non-edit view of the document.
+                //  4. Decrease the width of your browser window to its minimum, and reload the page.
+                //     Expected behaviour:
+                //      * The video dimensions will be constrained by the available space, and no scroll bars will appear.
+                //  5. Now comment out the line below, and refresh the page.
+                //     Expected undesired behaviour:
+                //      * The video will be too big for the available space, so some of it will be hidden, and scroll bars
+                //        will appear on the video's container.
+                $element.closest("[data-schoolboxmedia-replacement-container]").css({ width: "auto", height: "auto" });
+
+                $element.mediaelementplayer(getConfigForVideo());
             });
     };
 })(jQuery);
