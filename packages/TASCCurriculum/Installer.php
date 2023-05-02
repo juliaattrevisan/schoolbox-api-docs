@@ -9,4 +9,13 @@ use Schoolbox\Admin\Package;
  */
 class Installer extends Package\Base implements Package\IPackageInstall
 {
+    /**
+     * @inheritdoc
+     */
+    protected array $requiredPackages = [];
+
+    /**
+     * @inheritdoc
+     */
+    protected string $sourceFile = 'curriculum.csv';
 }

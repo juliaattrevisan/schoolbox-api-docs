@@ -11,10 +11,15 @@ class Base
 {
     /**
      * list of packages this depends on existing in the system
+     * @var array
      */
-    public const REQUIRED_PACKAGES = [];
+    protected array $requiredPackages = [];
 
-    private const SOURCE_FILE = 'curriculum.csv';
+    /**
+     * the curriculum csv file
+     * @var string
+     */
+    protected string $sourceFile = 'curriculum.csv';
 
     /**
      * Constructor.
@@ -29,13 +34,30 @@ class Base
         }
     }
 
+    /**
+     * Return the list of the packages this package depends on
+     * @return array
+     */
+    public function getRequiredPackages(): array
+    {
+        return $this->requiredPackages;
+    }
+
+    /**
+     * Generic function to install the package
+     *
+     * @param User $user
+     * @return void
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Resource\Exception
+     */
     public function install(User $user): void
     {
-        if (!(is_file($this->path  . '/' . self::SOURCE_FILE) && is_readable($this->path  . '/' . self::SOURCE_FILE))) {
-            throw new \RuntimeException('Package source file not found: ' . $this->path  . '/' . self::SOURCE_FILE);
+        if (!(is_file($this->path  . '/' . $this->sourceFile) && is_readable($this->path  . '/' . $this->sourceFile))) {
+            throw new \RuntimeException('Package source file not found: ' . $this->path  . '/' . $this->sourceFile);
         }
 
-        $csv = new CsvReader($this->path  . '/' . self::SOURCE_FILE);
+        $csv = new CsvReader($this->path  . '/' . $this->sourceFile);
         $csv->setLoadFromFirst(true);
         $parentLookup     = [];
 

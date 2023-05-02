@@ -37,6 +37,7 @@ class Installer
     {
         if (!$package->isInstalled()) {
             include(SITE_root . '/packages/' . $package->getLocation() . '/Installer.php');
+            /** @var Base $class **/
             $class = '\\' . $package->getLocation() . '\\Installer';
             $installer = new $class(SITE_root . '/packages/' . $package->getLocation());
             if (!$installer instanceof IPackageInstall) {
@@ -45,8 +46,8 @@ class Installer
             /**
              * Check for package requirements
              */
-            if (!empty($class::REQUIRED_PACKAGES)) {
-                foreach ($class::REQUIRED_PACKAGES as $reqPackage) {
+            if (!empty($installer->getRequiredPackages())) {
+                foreach ($installer->getRequiredPackages() as $reqPackage) {
                     /** @var Package\Model $tmp */
                     $tmp = $this->packageMapper->findOneByColumn('location', $reqPackage);
                     // check if the package is installed
