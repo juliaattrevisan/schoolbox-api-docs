@@ -48,8 +48,6 @@ function initToggleButtons(component) {
     const toggleButton = component.querySelector(BUTTON_SELECTOR);
     toggleButton.addEventListener("click", (event) => {
         event.preventDefault();
-        const buttonRotation = isOpen(component) ? 0 : 90;
-        gsap.to(toggleButton, { rotation: buttonRotation, transformOrigin: "20px 20px", duration: ANIMATE_SPEED });
         isOpen(component) ? close(component) : open(component);
     });
     const emptyStateToggleButtons = component.querySelectorAll(`${BUTTON_SELECTOR}.empty-edit`);
@@ -58,6 +56,20 @@ function initToggleButtons(component) {
             event.preventDefault();
             isOpen(component) ? close(component) : open(component);
         });
+    });
+}
+
+/**
+ * Animate the toggle button
+ *
+ * @param { Element }
+ */
+function animateToggleButton(component) {
+    const toggleButton = component.querySelector(BUTTON_SELECTOR);
+    gsap.to(toggleButton, {
+        rotation: isOpen(component) ? 90 : 0,
+        transformOrigin: "20px 20px",
+        duration: ANIMATE_SPEED,
     });
 }
 
@@ -85,6 +97,7 @@ function open(component) {
     const panel = component.querySelector(PANEL_SELECTOR);
     slideDown(panel, ANIMATE_SPEED);
     closeRemovePanel(component);
+    animateToggleButton(component);
 }
 
 /**
@@ -111,6 +124,7 @@ export async function close(component) {
     const toggleButton = component.querySelector(BUTTON_SELECTOR);
     toggleButton.setAttribute(STATE_ATTRIBUTE, "closed");
     const panel = component.querySelector(PANEL_SELECTOR);
+    animateToggleButton(component);
     await slideUp(panel, ANIMATE_SPEED);
 }
 
