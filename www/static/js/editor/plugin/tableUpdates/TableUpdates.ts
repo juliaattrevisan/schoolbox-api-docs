@@ -5,7 +5,7 @@
 
 import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
 
-export default class TableClass extends Plugin {
+export default class TableUpdates extends Plugin {
     /**
      * As tables are "downcast" from the model, the "insert:table" event is fired for each
      * When this happens we ensure that we select the correct table element and add the class.
