@@ -46,7 +46,7 @@ class Factory
      * @throws DomainException
      * @throws InvalidArgumentException if $url is not a string
      */
-    public function urlFragment($encodedUrl): array
+    public function urlFragment(string $encodedUrl): array
     {
         /* Distill a url from an encapsulating structure, if necessary
          */

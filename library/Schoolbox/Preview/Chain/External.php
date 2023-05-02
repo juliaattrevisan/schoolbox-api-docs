@@ -24,13 +24,12 @@ use Schoolbox\Preview\Chain\Strategy\External\Redirect;
  */
 class External extends Base
 {
-
     /**
      * Constructor
      *
      * @param string $url
      */
-    public function __construct($url)
+    public function __construct(string $url)
     {
         $decodedUrl = urldecode($url);
 

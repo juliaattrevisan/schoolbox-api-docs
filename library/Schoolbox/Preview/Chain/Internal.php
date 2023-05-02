@@ -9,7 +9,6 @@
 namespace Schoolbox\Preview\Chain;
 
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper as DueWorkResponseFileMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as DueWorkResponseFile;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Preview\Chain\Strategy\Internal\Image;
 use Schoolbox\Preview\Chain\Strategy\Internal\Media;
