@@ -18,7 +18,7 @@ export default {
     },
 
     methods: {
-        ...mapActions(useAdminListStore, ["updateSequence", "deleteRowCancelled", "isValidated"]),
+        ...mapActions(useAdminListStore, ["updateSequence", "deleteRowCancelled", "isValidated", "closePopUp"]),
 
         /**
          * Save all data
@@ -62,6 +62,7 @@ export default {
                     //to avoid animating any newly inserted rows in onBeforeEnter
                     this.saveRows_isProcessing = false;
                     this.saveRows_saveStatus = "Save";
+                    this.closePopUp();
                 });
             }
         },
