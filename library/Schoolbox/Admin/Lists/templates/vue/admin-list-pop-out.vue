@@ -245,6 +245,11 @@ export default {
     font-size: 1.5rem;
 }
 
+.close-button[disabled] {
+    background-color: transparent;
+    color: inherit;
+}
+
 .save-button {
     width: 100%;
 }
