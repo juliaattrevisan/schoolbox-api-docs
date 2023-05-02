@@ -109,10 +109,18 @@ export default {
     },
 
     mounted() {
+        // Add event listener for click events on the document to trigger closing the pop out
+        document.addEventListener("click", this.handleClickOutside);
+
         this.$emit("on-pop-out-mounted", this.$refs.innerContainer.clientHeight); //to ensure the parent container is tall enough to display the entire pop out
         this.isActive = false;
         // As vue loads the template after foundation has been initialised, we need to reinitialise the tooltips
         $(document).foundation('tooltip', 'reflow');
+    },
+
+    beforeUnmount() {
+        // Remove the event listener when the component is unmounted
+        document.removeEventListener("click", this.handleClickOutside);
     },
 
     methods: {
@@ -167,6 +175,22 @@ export default {
          */
         onCloseSelected() {
             this.closePopUp();
+        },
+
+        /**
+         * Handle click events on the document
+         * @param {MouseEvent} event The click event
+         */
+        handleClickOutside(event) {
+            const container = this.$refs.innerContainer;
+            if (
+                container &&
+                !container.contains(event.target) &&
+                !event.target.classList.contains("update-button")
+            ) {
+                // Clicked outside the "outer-container", call onCloseSelected method
+                this.onCloseSelected();
+            }
         },
     },
 };
