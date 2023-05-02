@@ -11,8 +11,11 @@ case "$TEST_SUITE" in
     api)
       TEST_ARGS="api"
       ;;
+    ci)
+      TEST_ARGS="smoketests,api"
+      ;;
     *)
-      echo "{smoketests|acceptance|api}"
+      echo "{smoketests|acceptance|api|ci}"
       exit 1
 esac
 

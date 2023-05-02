@@ -2,4 +2,4 @@
 
 filepath=`readlink -f $0`;
 fullpath=${filepath%/*}
-"$fullpath"/codecept-run.sh acceptance
+"$fullpath"/codeception-run.sh acceptance
