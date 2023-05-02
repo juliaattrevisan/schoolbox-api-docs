@@ -32,11 +32,7 @@ abstract class Base
      */
     protected function testNext(): ?array
     {
-        if ($this->getNext()) {
-            return $this->getNext()->test();
-        }
-
-        return null;
+        return $this->getNext()?->test();
     }
 
 
