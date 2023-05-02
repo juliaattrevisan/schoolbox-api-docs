@@ -25,6 +25,22 @@
  *  Basically replicate the CKEditor styles over to our own content;
 **/
 article {
+    /**
+     *  If the last element within an article is a floating element, it will break out
+     *  of the article and not be cleared by elements beneath it. This pseudo element
+     *  fixes this by adding a clear:both; beneath it in article.
+     *
+     *  This can be fixed by adding overflow-y: auto; to the article tag, but I was worried
+     *  that because of how many areas articles appear in this could cause some vertical
+     *  scroll bars to appear where they shouldn't, so this seemed 'safer', even though
+     *  it's gross.
+    */
+    &::after {
+        clear: both;
+        content: "";
+        display: block;
+    }
+
     // Clobber rules inheriting from article rules elsewhere.
     & > figure:first-child {
         margin-top: 1rem;
@@ -40,8 +56,19 @@ article {
         clear: both;
     }
 
-    figure {
+    figure.media {
         margin: auto auto 1rem auto;
+    }
+
+    figure.table {
+        /*
+            Without fit-content, any tables that haven't had their width modified (and thus
+            are missing an inline style with a width percent) won't centre align properly as
+            figure expands to cover the entire width of the container, preventing margin:auto
+            from working.
+        */
+        width: fit-content;
+        margin: auto;
     }
 
     table {
