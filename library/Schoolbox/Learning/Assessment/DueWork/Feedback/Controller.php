@@ -462,6 +462,10 @@ class Controller extends Base
 
         $this->getFeedbackDataSource()->save($feedback);
 
+        // Update project mark as the published feedback may affect the project cache
+        (new \Schoolbox\Learning\Assessment\Project\ResultCache\ResultCache($this->projectResultCacheMapper))
+            ->refresh($this->assessmentDataSource, $assessment, $student);
+
         $data = [
             'success' => true,
             'message' => 'OK',
