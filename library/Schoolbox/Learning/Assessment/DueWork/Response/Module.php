@@ -436,6 +436,16 @@ class Module extends BaseModule
     }
 
 
+    /**
+     * Preload a due work response file from the participant in `$params`.
+     *
+     * The response file's ID will be in `fileId`.
+     *
+     * @param array $params
+     * @return array
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     */
     private function preloadResponseFile(array $params): array
     {
         // Must have a file ID
