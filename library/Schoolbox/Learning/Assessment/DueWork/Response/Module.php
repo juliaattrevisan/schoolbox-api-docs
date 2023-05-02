@@ -149,6 +149,16 @@ class Module extends BaseModule
         );
         $this->register('GET', '/kami/{kamiId:\d+}', 'getKamiView', $canAccessKami, $preloadKami);
         $this->register('GET', '/kami/{kamiId:\d+}' . '/export', 'getKamiExport', $canExportKami, $preloadKami);
+
+        // View for an individual response file
+        $this->register(
+            self::METHOD_GET,
+            $participantPattern . '/responses/{responseId:\d+}/files/{fileId:\d+}',
+            'getResponseFile',
+            // TODO replace with can view file permission
+            null,
+            fn (array $params) => $this->preloadResponseFile($params),
+        );
     }
 
 
@@ -409,6 +419,30 @@ class Module extends BaseModule
             'response' => $response,
             'participant' => $participant
         ];
+    }
+
+
+    private function preloadResponseFile(array $params): array
+    {
+        // Must have a file ID
+        $fileId = $params['fileId'] ?? null;
+        if (!isset($fileId)) {
+            throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
+        // Preload participant and response, then extract file from response
+        $addedParams = $this->preloadParticipant($params);
+        $response    = $addedParams['response'] ?? null;
+        if (!$response instanceof Model) {
+            throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
+        }
+        $file = $response->getAllFiles()->filterBy('id', $params['fileId'])->first();
+        if (!$file) {
+            throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
+        // Add response file params
+        return $addedParams + ['file' => $file];
     }
 
     /**

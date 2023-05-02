@@ -35,7 +35,6 @@ use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Learning\Turnitin;
 use Schoolbox\Learning\Turnitin\Exception\BadEndpoint;
 use Schoolbox\Learning\Turnitin\Exception\Credentials;
-use Schoolbox\Learning\Turnitin\Helper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\User;
@@ -546,6 +545,27 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningDueWorkResponse/plagscan/contents.twig', $data));
     }
 
+    /**
+     * Fetches and displays a single response file, if it is an editable-inline
+     * HTML file.
+     *
+     * @api   GET /learning/assessments/:assessmentId/:studentId/responses/:responseId/files/:fileId
+     * @since 23.0.0
+     *
+     * @param DueWork        $assessment
+     * @param User           $student
+     * @param Model          $response
+     * @param SubmissionFile $file
+     * @return void
+     */
+    public function getResponseFile(
+        DueWork $assessment,
+        User $student,
+        Model $response,
+        SubmissionFile $file,
+    ): void {
+        return;
+    }
 
     /**
      * Determine the URL via which the current user may view a TII report.
