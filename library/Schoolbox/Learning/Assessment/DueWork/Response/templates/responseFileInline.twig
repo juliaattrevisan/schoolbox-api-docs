@@ -5,7 +5,13 @@
 {% endblock title %}
 
 {% block content %}
-    <article>
-        {{ fileContent | purify }}
-    </article>
+    <div class="row">
+        <div class="small-12 island">
+            <section class="content">
+                <article>
+                    {{ fileContent | purify }}
+                </article>
+            </section>
+        </div>
+    </div>
 {% endblock content %}
