@@ -175,7 +175,6 @@ export default {
 <template>
     <div class="outer-container" :style="`display: ${isActive ? 'block' : 'none'};`">
         <div class="inner-container checklist" ref="innerContainer">
-            <h4>{{ selectedRow.name }} {{ headerField.caption }}</h4>
             <button
                 href="#close-pop-out"
                 class="close-button icon-close"
