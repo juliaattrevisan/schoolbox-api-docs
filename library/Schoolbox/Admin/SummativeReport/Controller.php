@@ -26,6 +26,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\Grades\AssessmentComparator;
 use Schoolbox\Learning\Grades\Cohort\ClassResults;
@@ -873,6 +874,8 @@ class Controller extends ConfigController
         }
 
 
+        $projectMarks = $this->getProject($assessments, $student);
+
         $classAssessmentFeedbacks = $this->collateFeedbacks($classAssessments, $student, $viewer, (bool)$optionsPayload['class']['rubrics']);
 
         /* Build it
@@ -885,6 +888,7 @@ class Controller extends ConfigController
             'classAssessments'           => $classAssessments,
             'summaryAssessmentFeedbacks' => $summaryAssessmentFeedbacks,
             'classAssessmentFeedbacks'   => $classAssessmentFeedbacks,
+            'projectMarks'               => $projectMarks,
             'report'                     => $report,
             'allGraphs'                  => $allGraphs,
             'showSummary'                => (bool)$optionsPayload['summary']['active'],
@@ -1032,5 +1036,31 @@ class Controller extends ConfigController
             'graph' => $graph,
             'type'  => $graphType,
         ];
+    }
+
+    /**
+     * Get project results
+     */
+    private function getProject(Collection $assessments, User $student)
+    {
+        $projectMapper = \Schoolbox\Learning\Assessment\Project\ResultCache\Mapper::getInstance();
+
+        $projectMarks = new Collection();
+        foreach ($assessments as $folderId => $folderAssessments) {
+            foreach ($folderAssessments as $assessment) {
+                if ($assessment instanceof Project) {
+                    try {
+                        $mark = $projectMapper->findOneByColumnList([
+                                                                        'project_id' => $assessment->getId(),
+                                                                        'user_id'    => $student->getId(),
+                                                                    ]);
+                    } catch (MapperException $e) {
+                        continue;
+                    }
+                    $projectMarks->setOffset($assessment->getId(), $mark);
+                }
+            }
+        }
+        return $projectMarks;
     }
 }
