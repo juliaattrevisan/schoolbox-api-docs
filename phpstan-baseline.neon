@@ -1461,11 +1461,6 @@ parameters:
 			path: library/Eportfolio/Page/Instance.php
 
 		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Eportfolio/Page/Showcase.php
-
-		-
 			message: "#^Property Eportfolio\\\\Template\\:\\:\\$rightColumnWidth \\(float\\) does not accept string\\.$#"
 			count: 1
 			path: library/Eportfolio/Template.php
