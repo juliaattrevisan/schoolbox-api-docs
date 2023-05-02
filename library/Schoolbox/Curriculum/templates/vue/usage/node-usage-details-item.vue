@@ -97,11 +97,12 @@ function onSelect() {
     background-color: #f6f6f6;
     flex: 0 0 60px;
     height: 60px;
-    padding: 1rem;
+    padding: 0.75rem;
     position: relative;
-    // remove the padding from the icon
+    // move the icon more into the centre
     &:before {
-        padding: 0;
+        line-height: 1.25;
+        padding: 0 0 0 0.5rem;
     }
 }
 
