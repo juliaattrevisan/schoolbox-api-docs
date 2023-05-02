@@ -95,7 +95,7 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
 
             foreach ($allShowcasedItems as $currentShowcasedItem) {
                 $currentBox = $currentShowcasedItem->getSubmissionBox();
-                /** @var IAssessable $assessment */
+                /** @var IAssessable|null $assessment */
                 $assessment  = $assessments->getOffset($currentBox->getAssessmentId());
                 // if box's assessment is deleted, it's not included in $assessments
                 if (!$assessment) {
@@ -187,7 +187,11 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
 
                         /* Show returned work information (if available)
                          */
-                        if ($return !== null && $assessment->isFeedbackVisibleToUser($currentUser)) {
+                        if (
+                            $return !== null
+                            && $assessment->isFeedbackVisibleToUser($currentUser)
+                            && ($assessment->getMarkType()->getSlug() !== Schoolbox\Assessment\Component\SubmissionBox\MarkType::SLUG_NONE)
+                        ) {
                             $this->getPage()->setVar(
                                 [
                                     'SHOWCASED_WORK_RETURNED_MARK'     => $return->getHumanReadableMark(),
