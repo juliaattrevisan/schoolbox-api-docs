@@ -575,7 +575,15 @@ class Controller extends Base
         }
 
         // Otherwise: render it in an iframe with styling
-        return;
+        $this->response->content->set(
+            $this->buildUnthemedHtmlOutput(
+                '@learningDueWorkResponse/responseFile.twig',
+                [
+                    'file'        => $file,
+                    'fileContent' => $this->filesystemProxy->read($file),
+                ],
+            )
+        );
     }
 
     /**
