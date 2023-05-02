@@ -31,6 +31,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseMapperProxy;
 use Schoolbox\Learning\Assessment\Visibility;
+use Schoolbox\Learning\Authorizer\Rule\AssessmentNotDeleted;
 use Schoolbox\Learning\Authorizer\Rule\CanViewAssessable;
 use Schoolbox\Learning\Authorizer\Rule\ParentCanViewFeedback;
 use Schoolbox\Learning\Authorizer\Rule\StudentCanViewFeedback;
@@ -151,14 +152,26 @@ class Module extends BaseModule
         $this->register('GET', '/kami/{kamiId:\d+}', 'getKamiView', $canAccessKami, $preloadKami);
         $this->register('GET', '/kami/{kamiId:\d+}' . '/export', 'getKamiExport', $canExportKami, $preloadKami);
 
+        // This rule is a simplified version of the rule from
+        // `\Schoolbox\Learning\Assessment\Module::buildAuthRuleCanViewSummary`,
+        // without its special cases for:
+        // * staff viewing their own summary page (SA-5769)
+        // * excluded students (SA-13045)
+        // Both these cases are irrelevant, as they won't have response files.
+        $hasResponseFileAccess = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new AssessmentNotDeleted(),
+            new CanViewAssessable(new Visibility($this->getMapperFactory()->get(Access::class))),
+        );
+        $preloadResponseFile   = fn (array $params) => $this->preloadResponseFile($params);
+
         // View for an individual response file
         $this->register(
             self::METHOD_GET,
             $participantPattern . '/responses/{responseId:\d+}/files/{fileId:\d+}',
             'getResponseFile',
-            // TODO replace with can view file permission
-            null,
-            fn (array $params) => $this->preloadResponseFile($params),
+            $hasResponseFileAccess,
+            $preloadResponseFile,
         );
     }
 
