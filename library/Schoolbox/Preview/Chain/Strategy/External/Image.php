@@ -28,9 +28,9 @@ class Image extends Base
     /**
      * Test the Content-Types
      *
-     * @return array
+     * @return array|null
      */
-    public function test()
+    public function test(): ?array
     {
         if (preg_match($this->getExtensions(), $this->getUrl())) {
             return [

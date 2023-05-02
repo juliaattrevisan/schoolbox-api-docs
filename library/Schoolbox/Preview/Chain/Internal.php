@@ -99,7 +99,7 @@ class Internal extends Base
      * Get the hash out of a storage url
      *
      * @param  Uri $url
-     * @return string
+     * @return string|null
      */
     private function isStorage(Uri $url): ?string
     {
@@ -117,7 +117,7 @@ class Internal extends Base
      * Get the id from a send URL
      *
      * @param  Uri $url
-     * @return string
+     * @return string|null
      */
     private function isSend(Uri $url): ?string
     {
@@ -152,7 +152,7 @@ class Internal extends Base
      * @param string $url
      * @param Storage\IStorage $item
      */
-    private function processStorage(string $url, $item): void
+    private function processStorage(string $url, Storage\IStorage $item): void
     {
         $this->start([
             new Image($url, $item),

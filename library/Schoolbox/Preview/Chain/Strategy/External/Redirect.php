@@ -18,9 +18,9 @@ class Redirect extends Base
      *
      * Just redirect to the location via twig
      *
-     * @return array
+     * @return array|null
      */
-    public function test()
+    public function test(): ?array
     {
         return [
             'type' => 'redirect',

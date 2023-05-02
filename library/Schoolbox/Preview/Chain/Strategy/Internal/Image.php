@@ -18,9 +18,9 @@ class Image extends Base
     /**
      * Image files
      *
-     * @return mixed
+     * @return array|null
      */
-    public function test()
+    public function test(): ?array
     {
         if ($this->item->getMimetype()->isImage()) {
             //set the original url by default, if everything fails, fallback to the original.

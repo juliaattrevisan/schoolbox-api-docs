@@ -17,7 +17,6 @@ namespace Schoolbox\Preview\Chain\Strategy;
  */
 abstract class Base
 {
-
     /**
      * Next in the chain
      *
@@ -31,7 +30,7 @@ abstract class Base
      *
      * @return array|null
      */
-    protected function testNext()
+    protected function testNext(): ?array
     {
         if ($this->getNext()) {
             return $this->getNext()->test();
@@ -44,9 +43,9 @@ abstract class Base
     /**
      * Each subclass must execute this method
      *
-     * @return mixed
+     * @return array|null
      */
-    abstract public function test();
+    abstract public function test(): ?array;
 
 
     /* Getters/Setters

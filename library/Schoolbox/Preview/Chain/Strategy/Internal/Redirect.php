@@ -16,9 +16,9 @@ class Redirect extends Base
     /**
      * Base case
      *
-     * @return mixed
+     * @return array|null
      */
-    public function test()
+    public function test(): ?array
     {
         return [
             'type' => 'redirect',

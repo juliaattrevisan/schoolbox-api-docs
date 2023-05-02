@@ -27,9 +27,9 @@ class IFrame extends Base
     /**
      * IFrameable content
      *
-     * @return string
+     * @return array|null
      */
-    public function test()
+    public function test(): ?array
     {
         if ($this->item->getMimetype()->getInline() && in_array($this->item->getExtension(), $this->getContentTypes())) {
             return [
