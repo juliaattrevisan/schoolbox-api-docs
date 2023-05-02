@@ -150,7 +150,7 @@ class Internal extends Base
      * Process Storage file analysis
      *
      * @param string $url
-     * @param Storage\Model|File\Model $item
+     * @param Storage\IStorage $item
      */
     private function processStorage(string $url, $item): void
     {

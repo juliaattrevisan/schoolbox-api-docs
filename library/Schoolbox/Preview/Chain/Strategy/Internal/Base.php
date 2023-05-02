@@ -25,25 +25,25 @@ abstract class Base extends StrategyBase
      *
      * @var string
      */
-    protected $url = '';
+    protected string $url = '';
 
 
     /**
      * A storage model to test
      * A link model to test
      *
-     * @var Storage\Model|File\Model
+     * @var Storage\IStorage
      */
-    protected $item;
+    protected Storage\IStorage $item;
 
 
     /**
      * Constructor
      *
      * @param string $url
-     * @param Storage\Model|File\Model $item
+     * @param Storage\IStorage $item
      */
-    public function __construct($url, $item)
+    public function __construct(string $url, Storage\IStorage $item)
     {
         $this->setUrl($url);
         $this->setItem($item);
@@ -78,7 +78,7 @@ abstract class Base extends StrategyBase
     /**
      * Set item
      *
-     * @param Storage\Model|File\Model $item
+     * @param Storage\IStorage $item
      */
     protected function setItem($item)
     {
@@ -89,7 +89,7 @@ abstract class Base extends StrategyBase
     /**
      * Get item
      *
-     * @return Storage\Model|File\Model
+     * @return Storage\IStorage
      */
     protected function getItem()
     {
