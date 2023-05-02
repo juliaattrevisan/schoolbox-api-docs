@@ -70,9 +70,11 @@ class Internal extends Base
                 //noop
             }
         } else {
-            /* Just redirect straight there
+            /* Just redirect straight there, or iframe if the iframe handler
+             * allows it
              */
             $this->start([
+                new IFrame($url, null),
                 new Redirect($url, null),
             ]);
         }
