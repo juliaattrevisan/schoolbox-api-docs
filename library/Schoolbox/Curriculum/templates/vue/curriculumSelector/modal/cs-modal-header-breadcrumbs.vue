@@ -23,10 +23,11 @@ const modalViewNodesStore = useModalViewNodesStore();
 <template>
     <TransitionGroup name="list" class="breadcrumb" tag="ul">
         <cs-modal-header-breadcrumb
-            v-for="breadcrumb in modalViewNodesStore.breadcrumbs"
+            v-for="(breadcrumb, index) in modalViewNodesStore.breadcrumbs"
             :key="breadcrumb.id"
             :breadcrumb="breadcrumb"
             :is-disabled="props.isDisabled"
+            :is-last="index === modalViewNodesStore.breadcrumbs.length - 1"
         />
     </TransitionGroup>
 </template>

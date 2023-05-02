@@ -11,6 +11,7 @@ import type { Breadcrumb } from "@schoolboxCurriculum/types/Breadcrumb";
 interface Props {
     breadcrumb: Breadcrumb; // the relevant breadcrumb
     isDisabled: boolean; // to disable certain events when editing is taking place
+    isLast: boolean; // to indicate the last breadcrumb
 }
 
 const props = defineProps<Props>();
@@ -26,8 +27,8 @@ function onSelected() {
 </script>
 
 <template>
-    <li>
-        <span v-if="props.isDisabled">
+    <li :class="{ active: props.isLast }">
+        <span v-if="props.isDisabled || props.isLast">
             {{ shortenLength(props.breadcrumb.name as string, maxNameLength) }}
         </span>
         <a

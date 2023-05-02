@@ -47,8 +47,8 @@ export const useModalViewNodesStore = defineStore(`csModalViewNodes`, {
                 const nodeAtDepth = findById(nodesStore.nodes.children, id);
                 breadcrumbs.push({ id: id, name: nodeAtDepth.name, depth: index + 1 });
             });
-            //we return an empty array if there's no selections yet, otherwise we pull out the latest as it represents the node we are currently on (not one we need to move back to)
-            return breadcrumbs.length === 0 ? [] : breadcrumbs.slice(0, -1);
+            //we return an empty array if there's no selections yet, otherwise return the breadcrumbs
+            return breadcrumbs.length === 0 ? [] : breadcrumbs;
         },
 
         /**

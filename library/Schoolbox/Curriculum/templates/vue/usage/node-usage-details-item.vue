@@ -54,7 +54,7 @@ function onSelect() {
             @click="onSelect"
         >
             <div class="usage__container">
-                <div v-if="props.usage.discriminator === ActivityTypes.BADGE" class="usage__badge-container">
+                <div v-if="props.usage.discriminator === ActivityTypes.BADGE" class="usage__icon-container">
                     <badge-image :badge="props.usage.object" css="badge"></badge-image>
                 </div>
                 <div v-else :class="`usage__icon-container ${usageIcon} size-24`"></div>
@@ -89,30 +89,19 @@ function onSelect() {
 }
 
 .usage__container {
-    // flex needs to occur in a container within .usage as the transition elements require display: inline-block
     display: flex;
     height: 100%;
 }
 
 .usage__icon-container {
     background-color: #f6f6f6;
-    flex: 0 0 50px;
-    padding: 1rem;
+    flex: 0 0 60px;
+    padding: 0.75rem;
     position: relative;
+    // move the icon more into the centre
     &:before {
-        padding: 0;
-    }
-}
-
-:deep(.usage__badge-container) {
-    //v-deep is used so can target the img succesfully
-    position: relative;
-    flex: 0 0 50px;
-    padding: 0.25rem 0.5rem;
-    background-color: #f6f6f6;
-    img {
-        width: 40px;
-        height: auto;
+        line-height: 1.25;
+        padding: 0 0 0 0.5rem;
     }
 }
 
