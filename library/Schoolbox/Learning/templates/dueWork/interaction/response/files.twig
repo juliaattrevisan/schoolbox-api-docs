@@ -1,7 +1,24 @@
 <li class="actions-small-1">
     <div class="list-item">
         <div class="card attachment small-12">
-            <a href="/storage/fetch.php?hash={{ currentFile.hash }}" title="{{ currentFile.filename }}" data-plugin="preview">
+            {% if currentFile.editableInline %}
+                {% set previewHref = routeLookupIfAuthorized(
+                    'learningDueWorkResponse.getResponseFile',
+                    {
+                        assessment: assessment,
+                        assessmentId: assessment.id,
+                        student: participant.user,
+                        studentId: participant.user.id,
+                        response: response,
+                        responseId: response.id,
+                        file: currentFile,
+                        fileId: currentFile.id,
+                    }
+                ) %}
+            {% else %}
+                {% set previewHref = '/storage/fetch.php?hash=' ~ currentFile.hash %}
+            {% endif %}
+            <a href="{{ previewHref }}" title="{{ currentFile.filename }}" data-plugin="preview">
                 <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" />
                 <p>{{ currentFile.filename }}</p>
             </a>
