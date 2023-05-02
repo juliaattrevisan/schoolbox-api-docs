@@ -8,7 +8,6 @@
  # @param bool $showRubrics
  # @param bool $showComments
  # @param IAssessable $assessment
- # @param ResultCache $projectMark
  #}
 
 {# Rubric grid is optional and spans full width of the page
@@ -38,19 +37,10 @@
                 {% set grade = feedback.humanReadableMark ?? '' %}
                 {% if assessment is project %}
                     {% set participant = assessment.allParticipants[student.id] %}
-{#                    {% set grade = assessment.humanReadableMark(participant, true) %}#}
+                    {% set grade = assessment.humanReadableMark(participant, true) %}
                 {% endif %}
                 {% if showGrades and grade %}
                     <p class="grade">{{ grade }}</p>
-                {% endif %}
-
-                {# Was this really how we did it?
-                 # I could have sworn there was a real way to determine an assessment's class
-                 # rather than this random loose comparison
-                 #}
-                {% if assessment is project %}
-                    {% set participant = assessment.allParticipants[student.id] %}
-                    <h6>{{ assessment.humanReadableMark(participant, true) }}</h6>
                 {% endif %}
             </div>
         {% endif %}
