@@ -69,16 +69,17 @@ function initFormData() {
  * Listen for form data changes to show the save button straight away on a change
  */
 function initFormChangeListeners() {
-    document.querySelectorAll('[data-html-editor]').forEach((el) => {
+    document.querySelectorAll("[data-html-editor]").forEach((el) => {
         el.addEventListener("EDITOR__CREATED", onEditorCreated);
-    })
+    });
 
     function onEditorCreated(event) {
         const editor = event.detail.editor;
-        editor.model.document.on("change:data",
+        editor.model.document.on(
+            "change:data",
             debounce((changeEvent) => {
                 //update the linked <textarea>, which doesn't update until form save otherwise
-                event.detail.textarea.textContent = editor.getData();
+                event.detail.sourceElement.textContent = editor.getData();
                 onFormDataChange();
             }, 350)
         );

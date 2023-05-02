@@ -45,7 +45,7 @@
 
         function onEditorCreated(event) {
             editorIdsToLoad = editorIdsToLoad.filter(function (item) {
-                return item !== event.detail.textarea.id;
+                return item !== event.detail.sourceElement.id;
             });
 
             if (editorIdsToLoad.length === 0) {
