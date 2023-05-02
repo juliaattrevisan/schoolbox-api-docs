@@ -21,7 +21,6 @@ use Schoolbox\ResourceBooking\Booking\Mapper;
 
 class CanModerateBooking implements Rule\IAuthorizationRule
 {
-
     /**
      * @var Mapper
      */
@@ -43,7 +42,8 @@ class CanModerateBooking implements Rule\IAuthorizationRule
         if ($user instanceof User) {
             if ($params['item'] instanceof Model) {
                 // search for item
-                foreach ($params['item']->getResource()->getModeratorList() as $moderator) {
+                $moderators = $params['item']->getResource()->getModeratorList() ?? [];
+                foreach ($moderators as $moderator) {
                     if ($moderator->getId() == $user->getId()) {
                         return;
                     }
