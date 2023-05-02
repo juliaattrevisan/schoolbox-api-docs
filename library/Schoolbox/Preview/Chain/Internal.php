@@ -8,6 +8,8 @@
 
 namespace Schoolbox\Preview\Chain;
 
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper as DueWorkResponseFileMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as DueWorkResponseFile;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Preview\Chain\Strategy\Internal\Image;
 use Schoolbox\Preview\Chain\Strategy\Internal\Media;
@@ -39,6 +41,12 @@ class Internal extends Base
 
 
     /**
+     * Pattern for due work response file regexps
+     */
+    private const URL_DUE_WORK_RESPONSE_FILE_REGEXP = '`^/learning/assessments/\\d+/\\d+/responses/\\d+/files/(\\d+)`';
+
+
+    /**
      * Constructor
      *
      * @param string $url
@@ -54,6 +62,7 @@ class Internal extends Base
         /* $item can be one of:
          * Schoolbox\Resource\Storage\Model
          * Schoolbox\Resource\File\Model
+         * Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model
          */
         if ($hash = $this->isStorage($uriObject)) {
             try {
@@ -65,6 +74,13 @@ class Internal extends Base
         } elseif ($id = $this->isSend($uriObject)) {
             try {
                 $item = File\Mapper::getInstance()->findById($id);
+                $this->processStorage($url, $item);
+            } catch (Exception $e) {
+                //noop
+            }
+        } elseif ($id = $this->isDueWorkResponseFile($uriObject)) {
+            try {
+                $item = DueWorkResponseFileMapper::getInstance()->findById($id);
                 $this->processStorage($url, $item);
             } catch (Exception $e) {
                 //noop
@@ -111,6 +127,21 @@ class Internal extends Base
             return $query['id'];
         }
 
+        return null;
+    }
+
+
+    /**
+     * Get the ID from a due work response file URL.
+     *
+     * @param Uri $uri
+     * @return string|null
+     */
+    private function isDueWorkResponseFile(Uri $uri): ?string
+    {
+        if (preg_match(self::URL_DUE_WORK_RESPONSE_FILE_REGEXP, $uri->getPath(), $matches)) {
+            return $matches[1];
+        }
         return null;
     }
 
