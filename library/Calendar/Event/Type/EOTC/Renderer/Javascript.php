@@ -14,7 +14,6 @@ namespace Calendar\Event\Type\EOTC\Renderer;
 
 class Javascript extends Base
 {
-
     /**
      * Visitor
      *
@@ -138,6 +137,9 @@ class Javascript extends Base
                 ],
                 'custom'     => [
                     'modifyLink' => '/modules/eotc/manage/modify?eventID=' . $this->getEvent()->getEventId(),
+                    'isEOTC' => true,
+                    'numStudents' => $this->getEvent()->getCustom()['numStudents'],
+                    'numStaff' => $this->getEvent()->getCustom()['numStaff'],
                 ],
             ],
         ];

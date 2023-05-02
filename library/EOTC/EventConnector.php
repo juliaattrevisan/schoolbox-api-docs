@@ -20,7 +20,6 @@ use Schoolbox\User;
 
 class EventConnector extends EventMapper
 {
-
     /**
      * The user we're getting EOTC events for
      *
@@ -401,7 +400,7 @@ class EventConnector extends EventMapper
                 /* Augment title with student counts
                  * students + staff + 1 TIC
                  */
-                $event->setTitle("{$eventItem->getTitle()} ({$row['numStudents']},{$row['numStaff']})");
+                $event->setTitle($eventItem->getTitle());
 
                 $event->setAccess($eventItem->getAccess());
                 $event->setEventType($eventItem->getType()->getType());
@@ -424,6 +423,8 @@ class EventConnector extends EventMapper
                 /* Custom data
                  */
                 $event->setCustom([
+                    'numStudents' => $row['numStudents'],
+                    'numStaff' => $row['numStaff'],
                     'approved' => $eventItem->getMetadata()->getStatus()->isApproved()
                 ]);
 

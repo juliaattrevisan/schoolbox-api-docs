@@ -74,6 +74,17 @@ export default {
             return event?.extendedProps?.data?.meta?.variant === EVENT_VARIANTS.TASK;
         },
 
+
+        /**
+         * Is the given event an EOTC event or not? This affects how it's rendered.
+         *
+         * @param {object} event
+         * @return {boolean}
+         */
+        fullCalendarHelper_isEOTC(event) {
+            return event?.extendedProps?.data?.custom?.isEOTC === true;
+        },
+
         /**
          * Helper function to get the difference between two dates.
          * @param start
