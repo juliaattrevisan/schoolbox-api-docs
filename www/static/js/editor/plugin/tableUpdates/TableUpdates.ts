@@ -1,18 +1,27 @@
 /**
- * Add a custom class to all tables so we can adjust their styles
- * in both the ckeditor and display view
+ * Custom tweaks to the ckeditor table plugin, primarily to bring some CKEditor5 bevaviour
+ * back inline with CKEditor4, which our users are used to.
  */
 
 import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
 
 export default class TableUpdates extends Plugin {
     /**
+     * Run when the plugin is initialized
+     */
+    init() {
+        this.addCustomClass();
+    }
+
+    /**
+     * Add a custom class to all tables so we can adjust their styles
+     * in both the ckeditor and display view
      * As tables are "downcast" from the model, the "insert:table" event is fired for each
      * When this happens we ensure that we select the correct table element and add the class.
      * This solution is based on downcastTableResizedClass from:
      * https://github.com/ckeditor/ckeditor5/blob/92602e6fcf109c957cba2e764588906c726e2e6a/packages/ckeditor5-table/src/tablecolumnresize/converters.ts
      */
-    init() {
+    addCustomClass() {
         this.editor.conversion.for("downcast").add((dispatcher) => {
             dispatcher.on(
                 "insert:table",
