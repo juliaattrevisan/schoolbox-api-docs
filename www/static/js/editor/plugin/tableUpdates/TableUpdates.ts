@@ -39,4 +39,16 @@ export default class TableUpdates extends Plugin {
             );
         });
     }
+
+    /**
+     * Make newly created 100% width by default
+     */
+    addFullWidth() {
+        const insertTableCommand = this.editor.commands.get("insertTable");
+        insertTableCommand.on("execute", () => {
+            this.editor.execute("tableWidth", {
+                value: "100%",
+            });
+        });
+    }
 }
