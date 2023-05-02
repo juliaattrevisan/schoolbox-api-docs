@@ -22,7 +22,7 @@ class Redirect extends Base
     {
         return [
             'type' => 'redirect',
-            'src' => $this->getUrl(),
+            'src' => $this->url,
         ];
     }
 }
