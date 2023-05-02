@@ -189,8 +189,8 @@ Data:
          */
         document.getElementById("editor-body").addEventListener("EDITOR__CREATED", onDefaultEditorCreated);
         function onDefaultEditorCreated(event) {
-            initAutosave(event.detail.textarea);
-            autosavePresubmit(event.detail.textarea);
+            initAutosave(event.detail.sourceElement);
+            autosavePresubmit(event.detail.sourceElement);
         }
 
         document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
