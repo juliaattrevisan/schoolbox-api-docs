@@ -20,9 +20,9 @@ abstract class Base
     /**
      * Next in the chain
      *
-     * @var Base
+     * @var Base|null
      */
-    protected $next;
+    protected ?Base $next = null;
 
 
     /**
@@ -54,9 +54,9 @@ abstract class Base
     /**
      * Set next
      *
-     * @param Base $next
+     * @param Base|null $next
      */
-    public function setNext($next)
+    public function setNext(?Base $next): void
     {
         $this->next = $next;
     }
@@ -65,9 +65,9 @@ abstract class Base
     /**
      * Get next
      *
-     * @return Base
+     * @return Base|null
      */
-    public function getNext()
+    public function getNext(): ?Base
     {
         return $this->next;
     }
