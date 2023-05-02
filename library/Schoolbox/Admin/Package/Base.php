@@ -1,8 +1,10 @@
 <?php
 
-namespace Admin\Package;
+namespace Schoolbox\Admin\Package;
 
 use Alaress\Csv\Reader as CsvReader;
+use Schoolbox\Curriculum\Node;
+use Schoolbox\Curriculum\Node\Mapper;
 use Schoolbox\User;
 
 class Base
@@ -14,26 +16,38 @@ class Base
 
     private const SOURCE_FILE = 'curriculum.csv';
 
+    /**
+     * Constructor.
+     *
+     * @param string      $path // Path to the installer file and csv
+     * @param Mapper|null $curriculumMapper // Spawn this class with a mapper, or it will do it for you... either way one is needed
+     */
+    public function __construct(private string $path, private ?Node\Mapper $curriculumMapper = null)
+    {
+        if (null === $this->curriculumMapper) {
+            $this->curriculumMapper = Node\Mapper::getInstance();
+        }
+    }
+
     public function install(User $user): void
     {
-        if (!(is_file(__DIR__ . '/' . self::SOURCE_FILE) && is_readable(__DIR__ . '/' . self::SOURCE_FILE))) {
-            throw new \RuntimeException('Package source file not found: ' . __DIR__ . '/' . self::SOURCE_FILE);
+        if (!(is_file($this->path  . '/' . self::SOURCE_FILE) && is_readable($this->path  . '/' . self::SOURCE_FILE))) {
+            throw new \RuntimeException('Package source file not found: ' . $this->path  . '/' . self::SOURCE_FILE);
         }
 
-        $csv = new CsvReader(__DIR__ . '/' . self::SOURCE_FILE);
+        $csv = new CsvReader($this->path  . '/' . self::SOURCE_FILE);
         $csv->setLoadFromFirst(true);
-        $curriculumMapper = Node\Mapper::getInstance();
         $parentLookup     = [];
 
         foreach ($csv as $row) {
-            $node = $curriculumMapper->createModel();
+            $node = $this->curriculumMapper->createModel();
             $node->setParent($row['curriculum_node_parent_id'] ? $parentLookup[$row['curriculum_node_parent_id']] : null);
             $node->setName($row['name']);
             $node->setDescription($row['description']);
             $node->setCode(trim($row['code']));
             $node->setOrder($row['order']);
 
-            $curriculumMapper->save($node);
+            $this->curriculumMapper->save($node);
 
             //Store the inserted ID so we can link children to it
             $parentLookup[$row['id']] = $node;
