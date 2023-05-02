@@ -569,12 +569,20 @@ class Controller extends Base
         if (!$file->getEditableInline()) {
             $this->response->redirect->permanentRedirect(
                 (new Uri('/storage/fetch.php'))
-                    ->appendQueryParameters(['hash' => $file->getHash()])
+                    ->appendQueryParameters($this->request->query->getArrayCopy())
                     ->__toString()
             );
         }
 
-        // Otherwise: render it in an iframe with styling
+        // Otherwise: render it in Twig, and output as an attachment if either:
+        // * the HTML mimetype is openable inline
+        // * the `save` query string param exists
+        if (!$file->getMimetype()->getInline() || $this->request->query->get('save')) {
+            $this->response->headers->set(
+                'Content-Disposition',
+                sprintf('attachment; filename="%s"', $file->getBasename()),
+            );
+        }
         $this->response->content->set(
             $this->buildUnthemedHtmlOutput(
                 '@learningDueWorkResponse/responseFile.twig',
