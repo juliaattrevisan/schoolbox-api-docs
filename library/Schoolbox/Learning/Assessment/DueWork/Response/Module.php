@@ -17,6 +17,7 @@ use Alaress\Web\Controller\Base;
 use OutOfBoundsException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Error;
@@ -437,7 +438,7 @@ class Module extends BaseModule
             throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
         }
         $file = $response->getAllFiles()->filterBy('id', $params['fileId'])->first();
-        if (!$file) {
+        if (!$file instanceof SubmissionFile) {
             throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
         }
 

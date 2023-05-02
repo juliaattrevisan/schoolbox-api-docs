@@ -37,6 +37,7 @@ use Schoolbox\Learning\Turnitin\Exception\BadEndpoint;
 use Schoolbox\Learning\Turnitin\Exception\Credentials;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Storage\FilesystemProxy;
+use Schoolbox\Url\Uri;
 use Schoolbox\User;
 
 class Controller extends Base
@@ -564,6 +565,16 @@ class Controller extends Base
         Model $response,
         SubmissionFile $file,
     ): void {
+        // Is this file not editable inline? Just show in storage
+        if (!$file->getEditableInline()) {
+            $this->response->redirect->permanentRedirect(
+                (new Uri('/storage/fetch.php'))
+                    ->appendQueryParameters(['hash' => $file->getHash()])
+                    ->__toString()
+            );
+        }
+
+        // Otherwise: render it in an iframe with styling
         return;
     }
 
