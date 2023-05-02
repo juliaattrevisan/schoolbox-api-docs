@@ -206,7 +206,7 @@ export default {
                     >
                 </li>
             </ul>
-            <button @click.prevent="saveRows_onSaveSelected" class="save-button">
+            <button @click.prevent="saveRows_onSaveSelected" class="save-button" type="submit">
                 {{ saveRows_saveStatus }} {{ headerField.caption }}
             </button>
         </div>
