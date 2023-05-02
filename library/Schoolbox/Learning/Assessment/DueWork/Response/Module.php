@@ -169,7 +169,7 @@ class Module extends BaseModule
         $this->register(
             self::METHOD_GET,
             $participantPattern . '/responses/{responseId:\d+}/files/{fileId:\d+}',
-            'getResponseFile',
+            'getResponseFileInline',
             $hasResponseFileAccess,
             $preloadResponseFile,
         );

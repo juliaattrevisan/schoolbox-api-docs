@@ -550,21 +550,17 @@ class Controller extends Base
      * Fetches and displays a single response file, if it is an editable-inline
      * HTML file.
      *
+     * (Permission checks have already been done on the participant and response
+     *  preloaded from the path.)
+     *
      * @api   GET /learning/assessments/:assessmentId/:studentId/responses/:responseId/files/:fileId
      * @since 23.0.0
      *
-     * @param DueWork        $assessment
-     * @param User           $student
-     * @param Model          $response
      * @param SubmissionFile $file
      * @return void
      */
-    public function getResponseFile(
-        DueWork $assessment,
-        User $student,
-        Model $response,
-        SubmissionFile $file,
-    ): void {
+    public function getResponseFileInline(SubmissionFile $file): void
+    {
         // Is this file not editable inline? Just show in storage
         if (!$file->getEditableInline()) {
             $this->response->redirect->permanentRedirect(
@@ -585,7 +581,7 @@ class Controller extends Base
         }
         $this->response->content->set(
             $this->buildUnthemedHtmlOutput(
-                '@learningDueWorkResponse/responseFile.twig',
+                '@learningDueWorkResponse/responseFileInline.twig',
                 [
                     'file'        => $file,
                     'fileContent' => $this->filesystemProxy->read($file),

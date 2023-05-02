@@ -1,7 +1,7 @@
 <li class="actions-small-1">
     {% if currentFile.editableInline %}
         {% set previewHref = routeLookupIfAuthorized(
-            'learningDueWorkResponse.getResponseFile',
+            'learningDueWorkResponse.getResponseFileInline',
             {
                 assessment: assessment,
                 assessmentId: assessment.id,
