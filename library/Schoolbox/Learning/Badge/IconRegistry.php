@@ -125,7 +125,12 @@ class IconRegistry
         'behaviours' => [
             'name' => 'Learner Behaviours',
             'files' => [],
-        ]
+        ],
+// Hidden folder for extra AusCurricV9 badge icons, these should be used by badges, but not selectable by users
+//        'extra' => [
+//            'name' => 'Extra Hidden Icons',
+//            'files' => [],
+//        ]
     ];
 
 
