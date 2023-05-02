@@ -6,7 +6,7 @@
  * related functionality is currently disabled
  */
 
-import Image from "@ckeditor/ckeditor5-image/src/image";
+import ImageInline from "@ckeditor/ckeditor5-image/src/imageinline";
 import ImageToolbar from "@ckeditor/ckeditor5-image/src/imagetoolbar";
 // import ImageCaption from "@ckeditor/ckeditor5-image/src/imagecaption";
 import ImageStyle from "@ckeditor/ckeditor5-image/src/imagestyle";
@@ -21,5 +21,5 @@ import FullWidth from "@js/editor/plugin/fullWidth/FullWidth";
  */
 export function getImagePlugins() {
     // return [Image, ImageToolbar, ImageCaption, ImageStyle, ImageResize, LinkImage, ImageInsert, FullWidth];
-    return [Image, ImageToolbar, ImageStyle, ImageResize, LinkImage, FullWidth];
+    return [ImageInline, ImageToolbar, ImageStyle, ImageResize, LinkImage, FullWidth];
 }
