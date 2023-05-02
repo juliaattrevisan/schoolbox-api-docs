@@ -34,11 +34,8 @@
         </div>
         {% if feedback or (assessment is project) %}
             <div>
-                {% set grade = feedback.humanReadableMark ?? '' %}
-                {% if assessment is project %}
-                    {% set participant = assessment.allParticipants[student.id] %}
-                    {% set grade = assessment.humanReadableMark(participant, true) %}
-                {% endif %}
+                {% set participant = assessment.allParticipants[student.id] %}
+                {% set grade = assessment.humanReadableMark(participant, true) %}
                 {% if showGrades and grade %}
                     <p class="grade">{{ grade }}</p>
                 {% endif %}
