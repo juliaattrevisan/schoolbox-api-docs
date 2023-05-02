@@ -14,13 +14,6 @@ use Schoolbox\Config\ConfigMapper;
 class Controller extends Base
 {
     /**
-     * Controller constructor.
-     *
-     */
-    public function __construct()
-    {}
-
-    /**
      * Schoolbox Ping, confirm the system is functioning
      * @api   GET /ping
      * @since 23.0
@@ -30,7 +23,6 @@ class Controller extends Base
     {
         // check if system dead, these connections are required for schoolbox to function
         try {
-            $db = ConfigMapper::getInstance();
             $storage = Redis::getStorageClientInstance();
             $storage->ping();
             $cache = Redis::getCacheClientInstance();
