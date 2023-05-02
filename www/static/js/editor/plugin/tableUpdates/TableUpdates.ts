@@ -11,6 +11,7 @@ export default class TableUpdates extends Plugin {
      */
     init() {
         this.addCustomClass();
+        this.addDefaultProperties();
     }
 
     /**
@@ -41,13 +42,25 @@ export default class TableUpdates extends Plugin {
     }
 
     /**
-     * Make newly created 100% width by default
+     * Add the following properties as default to newly created tables
      */
-    addFullWidth() {
+    addDefaultProperties() {
         const insertTableCommand = this.editor.commands.get("insertTable");
         insertTableCommand.on("execute", () => {
             this.editor.execute("tableWidth", {
                 value: "100%",
+            });
+            this.editor.execute("tableAlignment", {
+                value: "left",
+            });
+            this.editor.execute("tableBorderStyle", {
+                value: "solid",
+            });
+            this.editor.execute("tableBorderWidth", {
+                value: "1px",
+            });
+            this.editor.execute("tableBorderColor", {
+                value: "#b3b3b3",
             });
         });
     }
