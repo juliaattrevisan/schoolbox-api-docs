@@ -6,6 +6,7 @@
 import { gsap } from "gsap/all";
 import { slideDown, slideUp } from "@js/util/animateUtils";
 import { EXISTING_COMPONENT_SELECTOR, UPDATE_URL, getComponentID } from "../updateHomepage";
+import { close as closeSettingsPanel } from "./updateComponentsSettings";
 import UpdateHomepageEvents from "../updateHomepageEvents";
 
 const ANIMATE_SPEED = 0.3;
@@ -76,6 +77,7 @@ function open(component) {
     toggleButton.setAttribute(STATE_ATTRIBUTE, "opened");
     const panel = component.querySelector(PANEL_SELECTOR);
     slideDown(panel, ANIMATE_SPEED);
+    closeSettingsPanel(component);
 }
 
 /**
@@ -83,7 +85,7 @@ function open(component) {
  *
  * @param { Element }
  */
-async function close(component) {
+export async function close(component) {
     const toggleButton = component.querySelector(BUTTON_SELECTOR);
     toggleButton.setAttribute(STATE_ATTRIBUTE, "closed");
     const panel = component.querySelector(PANEL_SELECTOR);
