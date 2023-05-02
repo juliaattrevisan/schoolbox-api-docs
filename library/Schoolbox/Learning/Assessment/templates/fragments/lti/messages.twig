@@ -1,0 +1,22 @@
+{##
+ # Displays any messages passed from the LTI tool in the return URL: see
+ # http://www.imsglobal.org/spec/lti/v1p3/#launch-presentation-claim for more
+ # details.
+ #
+ # Parameters:
+ # - errorMessage: <string> an error message from the LTI tool, as passed in the
+ #                  `lti_errormsg` query string param
+ # - message:      <string> an info message from the LTI tool, as passed in the
+ #                 `lti_msg` query string param
+ #}
+{% if (errorMessage ?? '') != '' %}
+    <div data-alert="" class="alert-box alert">
+        {{ errorMessage }}
+        <a href="#" class="close">×</a>
+    </div>
+{% elseif (message ?? '') != '' %}
+    <div data-alert="" class="alert-box success">
+        {{ message }}
+        <a href="#" class="close">×</a>
+    </div>
+{% endif %}

@@ -14,7 +14,6 @@ use OAT\Library\Lti1p3Ags\Service\Score\ScoreServiceInterface;
 use OAT\Library\Lti1p3Core\Message\Launch\Builder\PlatformOriginatingLaunchBuilder;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\AgsClaim;
-use OAT\Library\Lti1p3Core\Message\Payload\Claim\LaunchPresentationClaim;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\MessagePayloadClaimInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Claim\NrpsClaim;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
@@ -25,6 +24,7 @@ use Schoolbox\LTI\Context\Folder\ClaimFactory as FolderClaimFactory;
 use Schoolbox\LTI\Context\Folder\Codec as FolderCodec;
 use Schoolbox\LTI\Custom\ClaimFactory as CustomClaimFactory;
 use Schoolbox\LTI\Platform\Instance\ClaimFactory as PlatformInstanceClaimFactory;
+use Schoolbox\LTI\Platform\LaunchPresentation\ClaimFactory as LaunchPresentationClaimFactory;
 use Schoolbox\LTI\ResourceLink\Assessment\ClaimFactory as AssessmentClaimFactory;
 use Schoolbox\LTI\ResourceLink\Assessment\Codec as AssessmentCodec;
 use Schoolbox\LTI\Role\ClaimFactory as RoleClaimFactory;
@@ -176,15 +176,14 @@ class LaunchFactory
         $additionalClaims[] = $contextClaim;
 
         // PlatformInstanceClaim: talk about the Schoolbox instance
-        $platformInstanceClaim = (new PlatformInstanceClaimFactory($this->instance))->build();
+        $platformInstanceClaim = (new PlatformInstanceClaimFactory($this->instance, $baseUrl))->build();
         $additionalClaims[]    = $platformInstanceClaim;
 
         // LaunchPresentationClaim:
         // talk about how the resource link will be presented
-        $additionalClaims[] = new LaunchPresentationClaim(
-            $assessment->getLtiTool()->getTarget(),
-            (string)$height,
-        );
+        $launchPresentationClaim = (new LaunchPresentationClaimFactory($this->access, $baseUrl, $this->router))
+            ->buildForAssessmentAndUser($assessment, $actingUser, $height);
+        $additionalClaims[]      = $launchPresentationClaim;
 
         // Role-scope mentor claims:
         // for parents, this might be their kids

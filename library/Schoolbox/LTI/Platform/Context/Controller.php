@@ -337,7 +337,7 @@ class Controller extends BaseController
         $contextClaim        = $contextClaimFactory->buildForFolder($folder);
 
         // Claim about the platform instance
-        $platformInstanceClaim = (new PlatformInstanceClaimFactory($this->instance))->build();
+        $platformInstanceClaim = (new PlatformInstanceClaimFactory($this->instance, $baseUrl))->build();
 
         // Claim about folder memberships
         $nrpsClaim = new NrpsClaim(

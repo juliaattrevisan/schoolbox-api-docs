@@ -1,0 +1,26 @@
+{##
+ # Base template intended for iframes which retain the instance's base styles.
+ #}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}{% endblock title %}</title>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="Content-Language" content="en-au" />
+    <meta name="author" content="Schoolbox Pty Ltd"/>
+    <meta name="application-name" content="{{ config.school_name }}" />
+    <meta name="application-name" content="{{ config.title }}">
+
+    {% include 'include/skin.twig' with { config: config } only %}
+</head>
+
+<body>
+<div id="container no-pad">
+    <div id="content">
+        {% block content %}
+        {% endblock content %}
+    </div>
+</div>
+</body>
+</html>

@@ -236,6 +236,38 @@ class Module extends BaseModule
             $preloadParticipant,
         );
 
+        // LTI assessment return URLs
+        // * iframe: open launch in an iframe
+        // * window: redirect to launch
+        $this->register(
+            self::METHOD_GET,
+            "$assRoute/lti/launch/instructor/return/{target}",
+            'getLaunchAssessmentAsInstructorReturn',
+            $canViewStatus,
+            $preloadAssessment,
+        );
+        $this->register(
+            self::METHOD_GET,
+            "$assRoute/lti/launch/student/$studentParam/return/{target}",
+            'getLaunchAssessmentAsStudentReturn',
+            $canSubmit,
+            $preloadParticipant,
+        );
+        $this->register(
+            self::METHOD_POST,
+            "$assRoute/lti/launch/instructor/return/{target}",
+            'postLaunchAssessmentAsInstructorReturn',
+            $canViewStatus,
+            $preloadAssessment,
+        );
+        $this->register(
+            self::METHOD_POST,
+            "$assRoute/lti/launch/student/$studentParam/return/{target}",
+            'postLaunchAssessmentAsStudentReturn',
+            $canSubmit,
+            $preloadParticipant,
+        );
+
         // Easy access participation endpoint
         // include user in assessment
         $this->register('POST', "$assRoute/$studentParam/include", 'postInclude', $canModify, $preloadParticipant);

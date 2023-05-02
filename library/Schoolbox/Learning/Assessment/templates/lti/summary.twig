@@ -15,6 +15,14 @@
             lastViews: lastViews
         } only %}
     </div>
+
+    <div class="small-12 columns">
+        {% include '@learningAssessment/fragments/lti/messages.twig' with {
+            errorMessage: errorMessage ?? '',
+            message: message ?? '',
+        } only %}
+    </div>
+
     {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessment.id, assessment: assessment}) %}
     {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment}) %}
     {% include '@learningAssessment/fragments/modifyTot.twig' with {
