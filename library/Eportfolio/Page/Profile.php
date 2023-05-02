@@ -265,7 +265,11 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
 
                 /* Show returned work information (if available)
                  */
-                if ($latestReturn && $assessment->isFeedbackVisibleToUser($this->getCurrentUser())) {
+                if (
+                    $latestReturn
+                    && $assessment->isFeedbackVisibleToUser($this->getCurrentUser())
+                    && ($assessment->getMarkType()->getSlug() !== Schoolbox\Assessment\Component\SubmissionBox\MarkType::SLUG_NONE)
+                ) {
                     $mark = $latestReturn->getHumanReadableMark();
                     $this->getPage()->setVar([
                         'SHOWCASED_WORK_RETURNED_MARK'     => $mark,
