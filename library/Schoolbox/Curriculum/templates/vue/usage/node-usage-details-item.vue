@@ -84,8 +84,7 @@ function onSelect() {
 .usage {
     border: 1px solid #ededed;
     padding: 0;
-    min-width: 160px;
-    max-width: 220px;
+    width: 220px;
 }
 
 .usage__container {
