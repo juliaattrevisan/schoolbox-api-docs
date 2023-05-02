@@ -14,6 +14,9 @@
     <meta name="application-name" content="{{ config.title }}">
 
     {% include 'include/skin.twig' with { config: config } only %}
+
+    {% block customHead %}
+    {% endblock customHead %}
 </head>
 
 <body>

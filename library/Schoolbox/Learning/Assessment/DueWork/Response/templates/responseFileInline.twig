@@ -4,9 +4,20 @@
     {{ file.basename }}
 {% endblock title %}
 
+{% block customHead %}
+    <style>
+        body {
+            background-color: white;
+        }
+        #container {
+            padding-top: 0;
+        }
+    </style>
+{% endblock customHead %}
+
 {% block content %}
     <div class="row">
-        <div class="small-12 island">
+        <div class="small-12 island no-pad">
             <section class="content">
                 <article>
                     {{ fileContent | purify }}
