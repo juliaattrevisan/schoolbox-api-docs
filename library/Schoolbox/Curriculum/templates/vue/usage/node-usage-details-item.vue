@@ -96,7 +96,6 @@ function onSelect() {
 .usage__icon-container {
     background-color: #f6f6f6;
     flex: 0 0 60px;
-    height: 60px;
     padding: 0.75rem;
     position: relative;
     // move the icon more into the centre
