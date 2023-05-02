@@ -50,6 +50,9 @@ export default class TableUpdates extends Plugin {
             this.editor.execute("tableWidth", {
                 value: "100%",
             });
+            this.editor.execute("tableAlignment", {
+                value: "left",
+            });
         });
     }
 }

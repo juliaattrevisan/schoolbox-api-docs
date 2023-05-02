@@ -2,7 +2,7 @@ import { EditorEvent } from "@js/editor/event/editorEvent";
 import { EditorConfig } from "@js/editor/types/editorTypes";
 import { addRelToNewTabLinks } from "@js/editor/settings/linkSettings";
 import { addFullWidthAttributes } from "@js/editor/settings/imageSettings";
-import { addFullWidthStyle } from "@js/editor/settings/tableSettings";
+import { addFullWidthStyle, addAlignLeftStyle } from "@js/editor/settings/tableSettings";
 import { surroundUnsurroundedTokens } from "@js/editor/settings/tokensSettings";
 
 /**
@@ -32,6 +32,7 @@ function runChecks(sourceElement: HTMLElement, config: EditorConfig) {
     sourceElementHTML = addRelToNewTabLinks(sourceElementHTML);
     sourceElementHTML = addFullWidthAttributes(sourceElementHTML);
     sourceElementHTML = addFullWidthStyle(sourceElementHTML);
+    sourceElementHTML = addAlignLeftStyle(sourceElementHTML);
     sourceElementHTML = surroundUnsurroundedTokens(sourceElementHTML, config);
     return sourceElementHTML;
 }

@@ -27,3 +27,19 @@ export function addFullWidthStyle(sourceElementHTML: HTMLElement) {
     });
     return sourceElementHTML;
 }
+
+/**
+ * When the table isn't aligned, it should be left aligned by default
+ *
+ * @param { HTMLElement } sourceElementHTML - the sourceElement content as HTML
+ * @returns { HTMLElement } -
+ */
+export function addAlignLeftStyle(sourceElementHTML: HTMLElement) {
+    const tables = sourceElementHTML.querySelectorAll("table");
+    tables.forEach((table) => {
+        if (table.style.float === "") {
+            table.style.float = "left";
+        }
+    });
+    return sourceElementHTML;
+}
