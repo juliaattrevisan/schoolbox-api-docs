@@ -1066,19 +1066,13 @@ class Report
         $cohortUnitImpls = $this->findCohortUnitImpls($courseSpec);
         $assessables     = $this->assessmentMapperProxy->findAllByIds($this->findAssessmentIds($cohortUnitImpls, $workTypeIds, $attributes, $semesterFrom, $semesterTo));
         $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessables);
+
+        // Add the base assessment into the assessment's unit implementation:
+        // for some reason it's not there yet.
         foreach ($assessables as $assessable) {
             $unitImpl       = $assessable->getBaseContext();
             $baseAssessable = $assessable->getBaseAssessable();
-
-            // This line looks suspicious, due to the removal of the mapper
-            // cache in SA-1951.
-            // However, it still works: I believe the assessment mapper proxy
-            // still caches the unit implementations.
-            // In other words: `$cohortUnitImpls[$unitImpl->getId()]` is the
-            // same object as `$unitImpl`, and updating the `$cohortUnitImpls`
-            // copy updates `$unitImpl`, thus updating `$assessable`'s unit
-            // implementation.
-            $cohortUnitImpls[$unitImpl->getId()]->getAssessables()[$baseAssessable->getId()] = $baseAssessable;
+            $unitImpl->getAssessables()[$baseAssessable->getId()] = $baseAssessable;
         }
         return $assessables;
     }
