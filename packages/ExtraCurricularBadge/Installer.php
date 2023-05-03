@@ -7,7 +7,7 @@ use Schoolbox\Admin\Package;
 /**
  * Script for installing a badge CSV file into the badge table
  */
-class Installer extends Package\BaseBadges implements Package\IPackageInstall
+class Installer extends Package\BaseBadges
 {
     /**
      * @inheritdoc

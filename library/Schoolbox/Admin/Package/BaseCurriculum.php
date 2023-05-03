@@ -7,7 +7,7 @@ use Schoolbox\Curriculum\Node;
 use Schoolbox\Curriculum\Node\Mapper;
 use Schoolbox\User;
 
-abstract class BaseCurriculum
+abstract class BaseCurriculum implements IPackageInstall
 {
     /**
      * list of packages this depends on existing in the system

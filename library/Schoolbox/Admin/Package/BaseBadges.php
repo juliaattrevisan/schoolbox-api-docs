@@ -10,7 +10,7 @@ use Schoolbox\Learning\Badge\Category\Mapper as BadgeCategoryMapper;
 use Schoolbox\User;
 use Schoolbox\YearLevel\Mapper as YearLevelMapper;
 
-abstract class BaseBadges
+abstract class BaseBadges implements IPackageInstall
 {
     /**
      * list of packages this depends on existing in the system

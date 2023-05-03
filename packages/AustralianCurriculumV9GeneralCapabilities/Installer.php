@@ -14,7 +14,7 @@ use Schoolbox\User;
 /**
  * Script for installing a curriculum CSV file into the curriculum_node table
  */
-class Installer extends Package\BaseCurriculum implements Package\IPackageInstall
+class Installer extends Package\BaseCurriculum
 {
     /**
      * @inheritdoc
