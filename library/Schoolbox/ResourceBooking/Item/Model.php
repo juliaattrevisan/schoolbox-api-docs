@@ -332,7 +332,7 @@ class Model implements ISoftDeletable, JsonSerializable
     }
 
     /**
-     * @param  Collection|User[] $moderatorList
+     * @param  Collection|User[]|null $moderatorList
      * @return $this
      */
     public function setModeratorList($moderatorList)
@@ -342,7 +342,7 @@ class Model implements ISoftDeletable, JsonSerializable
     }
 
     /**
-     * @return Collection|User[]
+     * @return Collection|User[]|null
      */
     public function getModeratorList()
     {
