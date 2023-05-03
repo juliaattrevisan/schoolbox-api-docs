@@ -286,6 +286,13 @@ export default {
                 // Reload resources here too
                 this.calendarApi.refetchResources();
 
+                // For FullCalendar to correctly render the event colour for time-based events,
+                // the event must have a `display` property set to `block`, rather then the default of 'auto'
+                // This appears to relate to https://github.com/fullcalendar/fullcalendar/issues/5533
+                response.data.forEach((e) => {
+                    e.display = "block"
+                });
+
                 // Filter out events which don't start
                 successCallback(response.data.filter((v) => "start" in v));
             });
