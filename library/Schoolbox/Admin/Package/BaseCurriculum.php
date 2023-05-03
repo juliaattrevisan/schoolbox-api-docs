@@ -80,4 +80,12 @@ abstract class BaseCurriculum
             $parentLookup[$row['id']] = $node;
         }
     }
+
+    /**
+     * @return Mapper
+     */
+    public function getCurriculumMapper(): Mapper
+    {
+        return $this->curriculumMapper;
+    }
 }

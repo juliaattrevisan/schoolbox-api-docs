@@ -7,26 +7,19 @@
 
 namespace AustralianCurriculumV9GeneralCapabilities;
 
-use Schoolbox\Admin\Package\IPackageInstall;
-use Schoolbox\Curriculum\Node;
+use Schoolbox\Admin\Package;
 use Alaress\Csv\Reader as CsvReader;
 use Schoolbox\User;
 
 /**
  * Script for installing a curriculum CSV file into the curriculum_node table
  */
-class Installer implements IPackageInstall
+class Installer extends Package\BaseCurriculum implements Package\IPackageInstall
 {
     /**
-     * list of packages this depends on existing in the system
+     * @inheritdoc
      */
-    public const REQUIRED_PACKAGES = [];
-
-    /**
-     * CSV file from which to load
-     */
-    private const SOURCE_FILE = 'v9generalcapabilities.csv';
-
+    protected string $sourceFile = __DIR__ . '/v9generalcapabilities.csv';
 
     /**
      * Install the contents of the source file into the db
@@ -41,12 +34,10 @@ class Installer implements IPackageInstall
      */
     public function install(User $user): void
     {
-        $path = __DIR__ . '/' . self::SOURCE_FILE;
-
-        if (!(is_file($path) && is_readable($path))) {
+        if (!(is_file($this->sourceFile) && is_readable($this->sourceFile))) {
             throw new \RuntimeException(sprintf(
                 'Package source file not found: %s',
-                $path
+                $this->sourceFile
             ));
         }
 
@@ -54,15 +45,14 @@ class Installer implements IPackageInstall
          * causing random exceptions and failures. You can solve it with this
          * cheap test.php
          *
-         * new \Alaress_Probe(strip_tags(file_get_contents($path)));
+         * new \Alaress_Probe(strip_tags(file_get_contents($this->sourceFile)));
          *
          * Alternatively we can cleanse it, then write to disk for CsvReader to
-         * load from the specified $path...
+         * load from the specified $this->sourceFile...
          *
          * ...but it'd be better to feed it functional data instead, from the outset
          */
-        $csv = (new CsvReader($path))->setLoadFromFirst(true);
-        $curriculumMapper = Node\Mapper::getInstance();
+        $csv = (new CsvReader($this->sourceFile))->setLoadFromFirst(true);
         $parentLookup = [];
         /**
          * on occasion node parents will be edited or created after the node was created (in the original export...)
@@ -76,7 +66,7 @@ class Installer implements IPackageInstall
          * Hence the specific check for !== 'NULL'
          */
         foreach ($csv as $row) {
-            $node = $curriculumMapper->createModel();
+            $node = $this->getCurriculumMapper()->createModel();
             //check if parent exists? if missing then save these details so we can go back later
             if (isset($parentLookup[$row['curriculum_node_parent_id']])) {
                 $node->setParent($row['curriculum_node_parent_id'] ? $parentLookup[$row['curriculum_node_parent_id']] : null);
@@ -90,7 +80,7 @@ class Installer implements IPackageInstall
                 ->setCode(trim($row['code']))
                 ->setOrder($row['order']);
 
-            $curriculumMapper->save($node);
+            $this->getCurriculumMapper()->save($node);
 
             // Store the inserted ID so we can link children to it
             $parentLookup[$row['id']] = $node;
@@ -100,7 +90,7 @@ class Installer implements IPackageInstall
         foreach ($missingParents as $orphan) {
             if (isset($parentLookup[$orphan['parentID']])) {
                 $orphan['node']->setParent($orphan['parentID'] ? $parentLookup[$orphan['parentID']] : null);
-                $curriculumMapper->save($orphan['node']);
+                $this->getCurriculumMapper()->save($orphan['node']);
             }
         }
     }
