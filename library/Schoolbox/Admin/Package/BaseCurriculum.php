@@ -7,7 +7,7 @@ use Schoolbox\Curriculum\Node;
 use Schoolbox\Curriculum\Node\Mapper;
 use Schoolbox\User;
 
-class Base
+class BaseCurriculum
 {
     /**
      * list of packages this depends on existing in the system
@@ -19,15 +19,14 @@ class Base
      * the curriculum csv file
      * @var string
      */
-    protected string $sourceFile = 'curriculum.csv';
+    protected string $sourceFile = __DIR__ . '/exampleFile.csv';
 
     /**
      * Constructor.
      *
-     * @param string      $path // Path to the installer file and csv
      * @param Mapper|null $curriculumMapper // Spawn this class with a mapper, or it will do it for you... either way one is needed
      */
-    public function __construct(private string $path, private ?Node\Mapper $curriculumMapper = null)
+    public function __construct(private ?Node\Mapper $curriculumMapper = null)
     {
         if (null === $this->curriculumMapper) {
             $this->curriculumMapper = Node\Mapper::getInstance();
@@ -53,11 +52,11 @@ class Base
      */
     public function install(User $user): void
     {
-        if (!(is_file($this->path  . '/' . $this->sourceFile) && is_readable($this->path  . '/' . $this->sourceFile))) {
-            throw new \RuntimeException('Package source file not found: ' . $this->path  . '/' . $this->sourceFile);
+        if (!(is_file($this->sourceFile) && is_readable($this->sourceFile))) {
+            throw new \RuntimeException('Package source file not found: ' . $this->sourceFile);
         }
 
-        $csv = new CsvReader($this->path  . '/' . $this->sourceFile);
+        $csv = new CsvReader($this->sourceFile);
         $csv->setLoadFromFirst(true);
         $parentLookup     = [];
 

@@ -37,9 +37,9 @@ class Installer
     {
         if (!$package->isInstalled()) {
             include(SITE_root . '/packages/' . $package->getLocation() . '/Installer.php');
-            /** @var Base $class **/
             $class = '\\' . $package->getLocation() . '\\Installer';
-            $installer = new $class(SITE_root . '/packages/' . $package->getLocation());
+            /** @var IPackageInstall $installer **/
+            $installer = new $class();
             if (!$installer instanceof IPackageInstall) {
                 throw $this->errorMapper->generateException(ErrorMapper::ERROR_INSTALLATION_FAILED, null, "Package installer not found");
             }
