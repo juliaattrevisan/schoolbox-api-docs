@@ -127,6 +127,25 @@ article {
     }
 }
 
+/**
+ *  Rule specific to showing CKEditor content when being printed
+**/
+@media print {
+    article {
+        /*
+         *  When printing tables inside articles make sure they don't expand beyond
+         *  the bounds of the page (max-width). This also removes a horizontal scroll
+         *  bar that was appearing in some locations. Prevent tables breaking if possible.
+        **/
+        figure,
+        table {
+            break-inside: avoid;
+            max-width: 100%;
+            page-break-inside: avoid;
+        }
+    }
+}
+
 /*  CKEditor5 custom styles */
 /*  These have been declared out here as including them in the editor.css
  *  file prevents the styles from being used elsewhere as that style sheet
