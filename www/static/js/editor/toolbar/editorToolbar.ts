@@ -47,31 +47,6 @@ export function getToolbar(config: EditorConfig) {
             "numberedList",
             "bulletedList",
         ];
-    } else if (config.toolbar === EditorToolbar.PRINT) {
-        items = [
-            "bold",
-            "italic",
-            "underline",
-            "strikethrough",
-            "blockQuote",
-            "fontColor",
-            "fontBackgroundColor",
-            "removeFormat",
-            "|",
-            "alignment",
-            "|",
-            "style",
-            "|",
-            "heading",
-            "|",
-            "link",
-            "|",
-            "resource",
-            "insertTable",
-            "|",
-            "numberedList",
-            "bulletedList",
-        ];
     } else {
         items = [
             "bold",

@@ -19,7 +19,15 @@
         document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
             detail: {
                 targetElements: ['#report-introduction'],
-                toolbar: "print"
+                //toolbar: "print"
+                removeFromToolbar: [
+                    'subscript',
+                    'superscript',
+                    'style',
+                    'mediaEmbed',
+                    'emoji',
+                    'eqneditor5Button'
+                ]
             },
         }));
 
