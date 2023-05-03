@@ -144,7 +144,7 @@ class StudentAttributes
         $this->isHistorical   = $reportDate->lt($now);
         $this->reportDate     = $reportDate;
 
-        $userYear = $user->getYear() ? $user->getYear()->getName() : null;
+        $userYear = $yearLevelOverride ?? $user->getYear()?->getName();
 
         $this->calculateDerivedAttributes($config, (int)$userYear, $reportDate, $now);
     }
