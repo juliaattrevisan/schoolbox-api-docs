@@ -52,7 +52,8 @@ class StudentAttributes
     /**
      * Is this an IB student?
      *
-     * TODO consider removing: this appears to be unused
+     * @deprecated Consider removing: this appears to be unused now the report's
+     *             scope has been reduced.
      *
      * @var bool
      */
@@ -228,6 +229,9 @@ class StudentAttributes
 
 
     /**
+     * @deprecated Consider removing: this appears to be unused now the report's
+     *             scope has been reduced.
+     *
      * @return bool
      */
     public function isIb(): bool
