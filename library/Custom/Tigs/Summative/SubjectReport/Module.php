@@ -166,7 +166,14 @@ class Module extends Alaress\Module\Module
                         throw new InvalidPath("User must be a student. Found '{$student->getRole()->getType()}'");
                     }
                     try {
-                        $attributes = new StudentAttributes($this->getConfig(), $student, null, $params['reportDate'] ?? null);
+                        $attributes = new StudentAttributes(
+                            $this->getConfig(),
+                            $student,
+                            null,
+                            $params['reportDate'] ?? null,
+                            null,
+                            $params['folder']->getYearLevels()?->first()?->getName(),
+                        );
                     } catch (InvalidArgumentException $e) {
                         throw new InvalidPath("Student attributes appear invalid", 0, $e);
                     }
@@ -223,7 +230,14 @@ class Module extends Alaress\Module\Module
     private function isUserEnrolledInFolder(User $user, User $currentUser, Folder\Model $folder, ?string $reportDate): bool
     {
         try {
-            $attributes = new StudentAttributes($this->getConfig(), $user, null, $reportDate);
+            $attributes = new StudentAttributes(
+                $this->getConfig(),
+                $user,
+                null,
+                $reportDate,
+                null,
+                $folder->getYearLevels()?->first()?->getName(),
+            );
         } catch (InvalidArgumentException $e) {
             throw new InvalidPath("Cannot parse 'reportDate' url fragment as date time. Found: {$reportDate}", 0, $e);
         }
