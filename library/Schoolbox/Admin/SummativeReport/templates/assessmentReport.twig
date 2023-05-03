@@ -32,20 +32,12 @@
                 </div>
             {% endif %}
         </div>
-        {% if feedback %}
+        {% if feedback or (assessment is project) %}
             <div>
-                {% set grade = feedback.humanReadableMark %}
+                {% set participant = assessment.allParticipants[student.id] %}
+                {% set grade = assessment.humanReadableMark(participant, true) %}
                 {% if showGrades and grade %}
                     <p class="grade">{{ grade }}</p>
-                {% endif %}
-
-                {# Was this really how we did it?
-                 # I could have sworn there was a real way to determine an assessment's class
-                 # rather than this random loose comparison
-                 #}
-                {% if assessment.familyName == 'project' %}
-                    {% set participant = assessment.allParticipants[student.id] %}
-                    <h6>{{ assessment.humanReadableMark(participant, true) }}</h6>
                 {% endif %}
             </div>
         {% endif %}
