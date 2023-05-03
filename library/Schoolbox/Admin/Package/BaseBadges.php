@@ -94,18 +94,19 @@ abstract class BaseBadges
             /* Decide which year levels to associate with this badge
              */
             $yearList = $this->yearLevelMapper->createCollection();
-
-            foreach (explode(',', $row['Year']) as $year) {
-                try {
-                    $yearObject = $this->yearLevelMapper->findOneByColumn(YearLevelMapper::COL_NAME, $year);
-                    $yearList->add($yearObject);
-                } catch (\Schoolbox\Mapper\Exception $e) {
-                    //retry but this time with the word 'Year ' in front.
+            if (isset($row['Year'])) {
+                foreach (explode(',', $row['Year']) as $year) {
                     try {
-                        $yearObject = $this->yearLevelMapper->findOneByColumn(YearLevelMapper::COL_NAME, 'Year ' . $year);
+                        $yearObject = $this->yearLevelMapper->findOneByColumn(YearLevelMapper::COL_NAME, $year);
                         $yearList->add($yearObject);
                     } catch (\Schoolbox\Mapper\Exception $e) {
-                        //noop
+                        //retry but this time with the word 'Year ' in front.
+                        try {
+                            $yearObject = $this->yearLevelMapper->findOneByColumn(YearLevelMapper::COL_NAME, 'Year ' . $year);
+                            $yearList->add($yearObject);
+                        } catch (\Schoolbox\Mapper\Exception $e) {
+                            //noop
+                        }
                     }
                 }
             }
@@ -133,11 +134,15 @@ abstract class BaseBadges
                                  ->setAchievementExpiry(Badge\Model::EXPIRY_NEVER)
                                  ->setGoalExpiry(Badge\Model::EXPIRY_NEVER)
                                  ->setAllowAsGoal((bool)$row['Goal'])
-                                 ->setYearLevels($yearList)
                                  ->setCurriculumNodes($nodeCollection)
                                  ->setCreatedBy($user)
                                  ->setUpdatedBy($user)
                                  ->setAnimate(true);
+
+            // If there are year levels, then add them
+            if ($yearList->count()) {
+                $badge->setYearLevels($yearList);
+            }
 
             $this->badgeMapper->save($badge);
         }
