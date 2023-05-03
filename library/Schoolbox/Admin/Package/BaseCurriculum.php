@@ -22,6 +22,13 @@ abstract class BaseCurriculum implements IPackageInstall
     private const NULL_STRING = 'NULL';
 
     /**
+     * A list of (csv row id, model id) tuples
+     *
+     * @var array
+     */
+    private array $parentLookup = [];
+
+    /**
      * list of packages this depends on existing in the system
      * @var array
      */
