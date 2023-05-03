@@ -65,19 +65,39 @@ abstract class BaseCurriculum implements IPackageInstall
         $csv = new CsvReader($this->sourceFile);
         $csv->setLoadFromFirst(true);
         $parentLookup     = [];
+        /**
+         * on occasion node parents will be edited or created after the node was created (in the original export...)
+         * This will help fix those relationships...
+         * {'node' = curricNode, 'parentID' = id of the parent object}
+         */
+        $missingParents = [];
 
         foreach ($csv as $row) {
             $node = $this->curriculumMapper->createModel();
-            $node->setParent($row['curriculum_node_parent_id'] ? $parentLookup[$row['curriculum_node_parent_id']] : null);
             $node->setName($row['name']);
             $node->setDescription($row['description']);
             $node->setCode(trim($row['code']));
             $node->setOrder($row['order']);
 
+            if (isset($parentLookup[$row['curriculum_node_parent_id']])) {
+                $node->setParent($row['curriculum_node_parent_id'] ? $parentLookup[$row['curriculum_node_parent_id']] : null);
+            } else {
+                $node->setParent(null);
+                $missingParents[] = ['node' => $node, 'parentID' => $row['curriculum_node_parent_id'] ];
+            }
+
             $this->curriculumMapper->save($node);
 
             //Store the inserted ID so we can link children to it
             $parentLookup[$row['id']] = $node;
+        }
+
+        // fix for parents that were added later in the csv
+        foreach ($missingParents as $orphan) {
+            if (isset($parentLookup[$orphan['parentID']])) {
+                $orphan['node']->setParent($orphan['parentID'] ? $parentLookup[$orphan['parentID']] : null);
+                $this->getCurriculumMapper()->save($orphan['node']);
+            }
         }
     }
 
