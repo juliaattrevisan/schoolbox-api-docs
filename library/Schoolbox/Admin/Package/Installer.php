@@ -2,6 +2,7 @@
 
 namespace Schoolbox\Admin\Package;
 
+use ErrorException;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Admin\Package;
 use Schoolbox\User;
@@ -64,6 +65,12 @@ class Installer
 
             $db = $this->packageMapper->getDatabase();
             $db->beginTransaction();
+
+            // Install custom error handler here:
+            // it mirrors the CLI context's error handler, which raises
+            // exceptions on errors or notices.
+            // Restore the previous handler once done.
+            $previousErrorHandler = $this->installErrorHandler();
             try {
                 $installer->install($user);
             } catch (\Throwable $e) {
@@ -74,10 +81,47 @@ class Installer
                 $this->packageMapper->save($package);
 
                 throw $this->errorMapper->generateException(ErrorMapper::ERROR_INSTALLATION_FAILED, $e, $e->getMessage());
+            } finally {
+                set_error_handler($previousErrorHandler);
             }
             $db->commit();
         } else {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INSTALLATION_FAILED, null, "Package is already installed.");
         }
+    }
+
+    /**
+     * Installs an error handler which raises an `ErrorException` on receiving
+     * a warning or notice. (This mimics the CLI context's error handler.)
+     *
+     * @return callable|null ($errNum: int, $errStr: string, $errFile: string, $errLine: int)
+     *                       The previous error handler, for re-installation
+     *                       once the import is complete.
+     * @noinspection PhpDocMissingThrowsInspection - this method doesn't throw
+     *               an exception, but the new error handler might.
+     */
+    private function installErrorHandler(): ?callable
+    {
+        $errorHandler = set_error_handler(null);
+        set_error_handler(
+            static function ($errNum, $errStr, $errFile, $errLine) use ($errorHandler) {
+                // Ignore this error if it isn't reported
+                if (!(error_reporting() & $errNum)) {
+                    return;
+                }
+
+                // Notices and warnings: raise an error exception
+                if (in_array($errNum, [E_NOTICE, E_USER_NOTICE, E_WARNING, E_USER_WARNING])) {
+                    /** @noinspection PhpUnhandledExceptionInspection */
+                    throw new ErrorException($errStr, 0, $errNum, $errFile, $errLine);
+                }
+
+                // Fall back to the previous error handler
+                if (is_callable($errorHandler)) {
+                    $errorHandler($errNum, $errStr, $errFile, $errLine);
+                }
+            }
+        );
+        return $errorHandler;
     }
 }
