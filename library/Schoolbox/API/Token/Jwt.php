@@ -83,27 +83,4 @@ class Jwt
             self::KEY_ID
         );
     }
-
-    /**
-     * Generates a JWKS array for this Schoolbox instance.
-     *
-     * @return array
-     */
-    public function getJwks(): array
-    {
-        $key = openssl_pkey_get_details(
-            openssl_pkey_get_public($this->config->get(ConfigMapper::NAME_JWT_PUBLIC_KEY))
-        );
-        return [
-            'keys' => [
-                [
-                    'kty' => "RSA",
-                    'n'   => rtrim(strtr(base64_encode($key['rsa']['n']), '+/', '-_'), '='),
-                    'e'   => rtrim(strtr(base64_encode($key['rsa']['e']), '+/', '-_'), '='),
-                    'kid' => self::KEY_ID,
-                    'alg' => self::SIGNING_ALGORITHM,
-                ],
-            ],
-        ];
-    }
 }
