@@ -18,5 +18,4 @@ class Installer extends Package\BaseCurriculum implements Package\IPackageInstal
      * @inheritdoc
      */
     protected string $sourceFile = __DIR__ . '/curriculum.csv';
-
 }

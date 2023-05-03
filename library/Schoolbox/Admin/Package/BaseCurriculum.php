@@ -7,7 +7,7 @@ use Schoolbox\Curriculum\Node;
 use Schoolbox\Curriculum\Node\Mapper;
 use Schoolbox\User;
 
-class BaseCurriculum
+abstract class BaseCurriculum
 {
     /**
      * list of packages this depends on existing in the system
@@ -16,7 +16,13 @@ class BaseCurriculum
     protected array $requiredPackages = [];
 
     /**
-     * the curriculum csv file
+     * the path for the curriculum csv file
+     *
+     * requires to be overloaded
+     * will require the __DIR__ in the package directory, or the absolute path
+     * __DIR__ is the directory of the file who contains __DIR__
+     * .ie this BaseCurriculum file __DIR__ is `/usr/share/schoolbox/library/Schoolbox/Admin/Package/`
+     *
      * @var string
      */
     protected string $sourceFile = __DIR__ . '/exampleFile.csv';
