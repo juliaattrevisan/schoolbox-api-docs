@@ -4,7 +4,6 @@ namespace IBBadges;
 
 use Schoolbox\Admin\Package;
 
-
 /**
  * Script for installing a badge CSV file into the badge table
  */
