@@ -94,12 +94,19 @@ class StudentAttributes
 
 
     /**
-     * @param IConfigLoader $config
-     * @param User          $user
-     * @param string|null   $ibFlag
-     * @param string|null   $reportDateOverride
-     * @param string|null   $nowOverride            Overrides system time to enable consistent unit tests around deriving a user's year level.
-     *                                              eg $reportYearLevel = $currentYearLevel - $nowYear + $reportYear
+     * @param IConfigLoader $config             Config data store
+     * @param User          $user               The student to generate the report for.
+     * @param string|null   $ibFlag             Is `$user` an IB student?
+     * @param string|null   $reportDateOverride If provided: generate a report with data from this date or earlier,
+     *                                          instead of now.
+     *                                          The school may wish to generate a report with data only from a date in
+     *                                          the past?
+     * @param string|null   $nowOverride        Overrides system time to enable consistent unit tests around deriving a user's year level.
+     *                                          e.g. $reportYearLevel = $currentYearLevel - $nowYear + $reportYear
+     * @param string|null   $yearLevelOverride  If provided: use this year level to derive attributes instead of the
+     *                                          student's.
+     *                                          It's possible for a student to attempt a class for a different year
+     *                                          level (e.g. a year 10 student attempting a year 11 subject).
      * @throws InvalidArgumentException
      */
     public function __construct(
@@ -107,7 +114,8 @@ class StudentAttributes
         User $user,
         ?string $ibFlag = null,
         ?string $reportDateOverride = null,
-        ?string $nowOverride = null
+        ?string $nowOverride = null,
+        ?string $yearLevelOverride = null,
     ) {
         $reportDate = $reportDateOverride
             ? new Alaress_Date_Format(strtotime($reportDateOverride), Alaress_Date_Format::TIMESTAMP)
