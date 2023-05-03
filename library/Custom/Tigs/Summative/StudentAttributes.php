@@ -49,7 +49,13 @@ class StudentAttributes
      */
     private $yearLevel;
 
-    /** @var bool */
+    /**
+     * Is this an IB student?
+     *
+     * TODO consider removing: this appears to be unused
+     *
+     * @var bool
+     */
     private $isIb;
 
     /** @var int */
