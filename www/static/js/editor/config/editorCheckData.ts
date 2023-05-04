@@ -33,6 +33,7 @@ function runChecks(sourceElement: HTMLElement, config: EditorConfig) {
     sourceElementHTML = addFullWidthAttributes(sourceElementHTML);
     sourceElementHTML = addFullWidthStyle(sourceElementHTML);
     sourceElementHTML = addAlignLeftStyle(sourceElementHTML);
+    sourceElementHTML = fixListedHeadings(sourceElementHTML);
     sourceElementHTML = surroundUnsurroundedTokens(sourceElementHTML, config);
     return sourceElementHTML;
 }
@@ -50,9 +51,6 @@ export function initCheckData(sourceElement: HTMLElement, config: EditorConfig) 
     if ((sourceElement as HTMLTextAreaElement).value) {
         (sourceElement as HTMLTextAreaElement).value = sourceElementHTML.innerHTML;
     }
-
-    // Ensure headings inside lists are wrapped in tags CKEditor will accept
-    sourceElement.innerHTML = fixListedHeadings(sourceElement.value || sourceElement.innerHTML);
 
     // Adds an event listener to allow pages to run the same check when they need to
     sourceElement.addEventListener(EditorEvent.EDITOR__CHECK_DATA, onEditorCheckData);
