@@ -827,7 +827,7 @@ class Report
      * @param CourseSpec\Model  $courseSpec
      * @param User              $student
      * @param string|null       $roleTypeOverride
-     * @return array|string[]|null
+     * @return array|null
      * @throws MapperException
      * @throws RouteNotFound
      */
