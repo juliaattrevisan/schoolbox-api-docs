@@ -5,6 +5,10 @@
 
 $blockquote-cite-font-color: scale-color($header-font-color, $lightness: 23%);
 blockquote {
+    // Make grey background appear when printed
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+
     background-color: $vapor;
     border-#{$default-float}: 6px solid $base;
     font-size: rem-calc(($base-font-size - 3));

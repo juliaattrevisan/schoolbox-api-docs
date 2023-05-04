@@ -56,6 +56,13 @@ article {
         clear: both;
     }
 
+    // Make background / highlight colours appear when printed
+    span,
+    p {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
     /* Add bottom margin to media embeds */
     figure.media {
         margin: auto auto 1rem auto;
