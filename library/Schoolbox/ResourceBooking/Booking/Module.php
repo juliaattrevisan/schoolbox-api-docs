@@ -98,6 +98,7 @@ class Module extends BaseModule
         // a moderator of a booked item can do this.
         $isItemModeratorRule = new Auth\CanModerateBooking();
         $isItemModeratorRule->setMapper($this->getMapper());
+        $isItemModeratorRule->setItemMapper($this->getItemMapper());
         $manageBookingRule = new Rule\Any($baseManageRule, $isItemModeratorRule);
 
         // Create booking:
