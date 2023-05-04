@@ -35,7 +35,9 @@ function runChecks(sourceElement: HTMLElement, config: EditorConfig) {
     sourceElementHTML = addFullWidthStyle(sourceElementHTML);
     sourceElementHTML = addAlignLeftStyle(sourceElementHTML);
     sourceElementHTML = fixListedHeadings(sourceElementHTML);
+    if (config.hasTokens) {
         sourceElementHTML = surroundUnsurroundedTokens(sourceElementHTML, config);
+    }
     return sourceElementHTML;
 }
 
@@ -70,7 +72,7 @@ function onEditorCheckData(event: CustomEvent) {
     if (editor.config.get("sbConfig").hasTokens) {
         const parser = new DOMParser();
         const sourceElementHTML = parser.parseFromString(editor.getData(), "text/html").body;
-        editor.setData(surroundUnsurroundedTokens(sourceElementHTML, editor.config.get("sbConfig")).innerHTML);
+
+        editor.setData(runChecks(sourceElementHTML, editor.config.get("sbConfig")).innerHTML);
     }
-    editor.setData(fixListedHeadings(editor.getData()));
 }
