@@ -561,6 +561,10 @@ class Controller extends Base
      */
     public function getResponseFileInline(SubmissionFile $file): void
     {
+        // Disallow BTTF for this place:
+        // otherwise, it's possible to BTTF back to a download or iframe view
+        $this->setAllowBackToTheFuture(false);
+
         // Is this file not editable inline? Just show in storage
         if (!$file->getEditableInline()) {
             $this->response->redirect->permanentRedirect(
