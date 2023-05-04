@@ -18,6 +18,7 @@
         let editorIdsToLoad = ["#body_public", "#body_private"];
         document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
             detail: {
+                maxCharCount: 16777215, // MySQL storage limit for `mediumtext` field.
                 targetElements: editorIdsToLoad,
                 hasTokens: true,
             }
