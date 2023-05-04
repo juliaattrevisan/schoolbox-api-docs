@@ -175,12 +175,12 @@
 }
 
 /**
- * Customise the iframely sizing
- * Not sure we want to use this yet - can we customise the size of the iframe?
+ * Customise the iframely sizing,
+ * ensuring iframes added with CKEditor4 are full width
  */
-/* .ck.ck-editor .media {
-    max-width: 500px;
-} */
+.ck.ck-editor .html-object-embed {
+    width: 100%;
+}
 
 /* Reset the stacking context, otherwise some custom styles break because of z-index rules.
  * Read more - https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Positioning/Understanding_z_index/The_stacking_context
