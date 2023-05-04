@@ -9,7 +9,8 @@
         document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
             detail: {
                 targetElements: ['#body'],
-            }
+                maxCharCount: 16777215 // MySQL storage limit for `mediumtext` field.
+            },
         }));
 
         $('#blogForm').alaressValidate();
@@ -40,7 +41,7 @@
     <li><a href="/eportfolio/{{ pageOwner.id }}/{{ page.getPageId }}">{{ page.getPageTitle }}</a></li>
     <li class="active"><span>{% if record is defined %}Modify{% else %}Post{% endif %} Blog</span></li>
 </ul>
-
+HELLO
 <div class="actions-small-1 row">
     <div class="list-item">
         <div class="small-12 column">
