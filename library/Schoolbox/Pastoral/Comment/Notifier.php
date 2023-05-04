@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Pastoral\Comment;
 
 use Alaress\Async\Notification\Instance\Builder;
+use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Monolog\Logger;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
@@ -22,6 +23,8 @@ use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Access\Model as PastoralAccess;
 use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
 use Schoolbox\Pastoral\NotifierHelper;
+use Schoolbox\Pastoral\Report\Mapper as PastoralReportMapper;
+use Schoolbox\Pastoral\Report\Model as Report;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
@@ -38,27 +41,32 @@ class Notifier extends AbstractModuleNotifier
 {
     const TRIGGER_CREATED = 'created';
     const TRIGGER_UPDATED = 'updated';
+    const TRIGGER_ADDED_TO_REPORT = 'addedToReport';
 
     /** @var Mapper */
     protected $mapper;
 
     /** @var PastoralAccessMapper $pastoralAccessMapper */
-    protected $pastoralAccessMapper;
+    protected PastoralAccessMapper $pastoralAccessMapper;
 
     /** @var PastoralGroupMapper $pastoralGroupMapper */
-    protected $pastoralGroupMapper;
+    protected PastoralGroupMapper $pastoralGroupMapper;
 
     /** @var PastoralMapper $pastoralMapper */
-    protected $pastoralMapper;
+    protected PastoralMapper $pastoralMapper;
+
+    protected PastoralReportMapper $pastoralReportMapper;
+
+    protected AccessLevelCensor $accessLevelCensor;
 
     /** @var RoleMapper $roleMapper */
-    protected $roleMapper;
+    protected RoleMapper $roleMapper;
 
     /** @var UserMapper $userMapper */
-    protected $userMapper;
+    protected UserMapper$userMapper;
 
     /** @var RosettaStone $l10n */
-    protected $l10n;
+    protected RosettaStone $l10n;
 
     /**
      * @inheritDoc
@@ -75,6 +83,14 @@ class Notifier extends AbstractModuleNotifier
 
         if (empty($dependencies["pastoralGroupMapper"])) {
             $dependencies["pastoralGroupMapper"] = PastoralGroupMapper::getInstance();
+        }
+
+        if (empty($dependencies["pastoralReportMapper"])) {
+            $dependencies["pastoralReportMapper"] = PastoralReportMapper::getInstance();
+        }
+
+        if (empty($dependencies["accessLevelCensor"])) {
+            $dependencies["accessLevelCensor"] = new AccessLevelCensor();
         }
 
         if (empty($dependencies["roleMapper"])) {
@@ -117,8 +133,7 @@ class Notifier extends AbstractModuleNotifier
         }
 
         // Create the message
-        $hash = $model->getPanel();
-        $href = "/pastoral/student/{$pastoral->getStudent()->getId()}/record/{$pastoral->getId()}#{$hash}";
+        $href = NotifierHelper::getRecordHref($pastoral, $model);
 
         $builder = new Builder();
         $builder->setTitle("A :pastoralcare comment has been {$method}")
@@ -138,7 +153,7 @@ class Notifier extends AbstractModuleNotifier
 
         /** @var Collection|PastoralAccess[] $accessRecords */
         $accessRecords = $this->pastoralAccessMapper->findByColumn("pastoral_id", $pastoral->getId());
-        $targetUsers   = (new NotifierHelper($this->userMapper, $this->pastoralGroupMapper, $this->log))
+        $targetUsers   = (new NotifierHelper($this->userMapper, $this->pastoralGroupMapper, $this->accessLevelCensor, $this->log))
             ->buildTargetUsers(
                 $accessRecords,
                 $model->getPrivate(),
@@ -152,10 +167,9 @@ class Notifier extends AbstractModuleNotifier
         // Also send to owner of the record
         $targetUsers[$pastoral->getOwner()->getId()] = $pastoral->getOwner();
 
-        $accessLevelCensor = new AccessLevelCensor();
         foreach ($targetUsers as $userId => $user) {
             // make sure that multiple conditions allow user to access this record
-            if ($accessLevelCensor->getAccessLevel($pastoral, $user) === PastoralAccessMapper::ACCESS_DENY) {
+            if ($this->accessLevelCensor->getAccessLevel($pastoral, $user) === PastoralAccessMapper::ACCESS_DENY) {
                 continue;
             }
             $envelope->targetToUser($userId, $message);
@@ -181,6 +195,7 @@ class Notifier extends AbstractModuleNotifier
         switch ($bundle->getMethod()) {
             case BaseMapper::METHOD_CREATE:
                 $bundle->attach(self::TRIGGER_CREATED, self::IMMEDIATELY);
+                $bundle->attach(self::TRIGGER_ADDED_TO_REPORT, self::IMMEDIATELY);
                 break;
             case BaseMapper::METHOD_UPDATE:
                 $bundle->attach(self::TRIGGER_UPDATED, self::IMMEDIATELY);
@@ -210,6 +225,59 @@ class Notifier extends AbstractModuleNotifier
     public function notifyUpdated(Model $model, User $effector, $diff = []): Envelope
     {
         return $this->buildMessage($model, self::TRIGGER_UPDATED);
+    }
+
+    /**
+     * @param Model      $model
+     * @param User       $effector
+     * @param array|null $diff
+     * @return Envelope
+     */
+    public function notifyAddedToReport(Model $model, User $effector, ?array $diff = []): Envelope
+    {
+        $envelope = new Envelope();
+
+        // Get hydrated pastoral record
+        try {
+            $model = $this->hydrate($model);
+            $pastoral = $model->getPastoral();
+        } catch (MapperException $e) {
+            $this->log->error("Error: Unable to send pastoral comment addedToReport notification. {$e->getMessage()}", ['exception' => $e]);
+            return $envelope;
+        }
+
+        // Create the message
+        $recordHref = NotifierHelper::getRecordHref($pastoral, $model);
+        $recordName   = $this->l10n->translate('pastoral') . ' record';
+        $messageTitle = "A new comment has been added to :record in :report";
+
+        $reports = $this->pastoralReportMapper->findForRecord($pastoral, true);
+        $this->log->debug(count($reports) . " reports found for pastoral {$pastoral->getId()}");
+        $this->log->debug("Report ids: " . implode(',', $reports->getPropertyValues('id')));
+
+        /** @var Report $report */
+        foreach ($reports as $report) {
+            $reportHref = NotifierHelper::getReportHref($report);
+            $builder    = new Builder();
+            $builder->setTitle($messageTitle)
+                    ->setParam('record', new Param($recordName, $recordHref, ParameterInterface::STACKING_REPLACE))
+                    ->setParam('report', new Param($report->getName(), $reportHref, ParameterInterface::STACKING_REPLACE))
+                    ->setIcon($this->getUserIcon($effector))
+                    ->setHref($reportHref)
+                    ->setNamespace($this->getSlug())
+                    ->setSeverity(Logger::ERROR)
+                    ->setTimestamp($model->getUpdatedAt()->getUnixTimeStamp())
+                    ->addTopic(sprintf("pastoral_comment.%s.%s.%s.%s", $model->getId(), $pastoral->getId(), $report->getId(), self::TRIGGER_ADDED_TO_REPORT));
+
+            $message     = $builder->build();
+            $targetUsers = (new NotifierHelper($this->userMapper, $this->pastoralGroupMapper, $this->accessLevelCensor, $this->log))
+                ->findUsersForRecordAndReport($pastoral, $report, $model->getPrivate() ? PastoralAccessMapper::ACCESS_PRIVATE : PastoralAccessMapper::ACCESS_PUBLIC);
+            foreach ($targetUsers as $userId => $user) {
+                $envelope->targetToUser($userId, $message);
+            }
+        }
+
+        return $envelope;
     }
 
     /**
@@ -261,6 +329,30 @@ class Notifier extends AbstractModuleNotifier
     }
 
     /**
+     * @param PastoralReportMapper $pastoralReportMapper
+     *
+     * @return static
+     */
+    public function setPastoralReportMapper(PastoralReportMapper $pastoralReportMapper): self
+    {
+        $this->pastoralReportMapper = $pastoralReportMapper;
+
+        return $this;
+    }
+
+    /**
+     * @param AccessLevelCensor $accessLevelCensor
+     *
+     * @return self
+     */
+    public function setAccessLevelCensor(AccessLevelCensor $accessLevelCensor): self
+    {
+        $this->accessLevelCensor = $accessLevelCensor;
+
+        return $this;
+    }
+
+    /**
      * @param RoleMapper $roleMapper
      *
      * @return self|$this
@@ -301,5 +393,26 @@ class Notifier extends AbstractModuleNotifier
         $this->l10n = $l10n;
 
         return $this;
+    }
+
+    /**
+     * @param Model $model
+     * @return Model
+     * @throws MapperException
+     */
+    protected function hydrate($model)
+    {
+        $pastoral = $this->pastoralMapper->findById($model->getPastoral()->getId());
+        $student  = $this->userMapper->findById($pastoral->getStudent()->getId());
+        /* Load relationships into $student,
+         * for `\Schoolbox\Pastoral\NotifierHelper::buildTargetUsersForRole`
+         * which is called by `\Schoolbox\Pastoral\NotifierHelper::buildTargetUsers`
+         * as that requires these to be loaded for `$student->getParents()` and `$student->getTeacherCollection()`
+         */
+        $this->externalUser->loadParents([$student]);
+        $this->externalUser->loadTeachers([$student]);
+        $pastoral->setStudent($student);
+        $model->setPastoral($pastoral);
+        return $model;
     }
 }
