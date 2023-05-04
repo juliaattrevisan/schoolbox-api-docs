@@ -1074,6 +1074,22 @@ class Report
             $baseAssessable = $assessable->getBaseAssessable();
             $unitImpl->getAssessables()[$baseAssessable->getId()] = $baseAssessable;
         }
+
+        // Also load unit impls into the course spec:
+        // this place _was_ affected by the mapper cache change: if unit impls
+        // aren't manually loaded into the course spec, middle year / HSC
+        // assessment tasks don't display.
+        foreach ($cohortUnitImpls as $unitImpl) {
+            $unitSpec   = $unitImpl->getSpecification();
+            $courseImpl = $unitImpl->getCourse();
+            if (!$courseSpec->getCourseImplementations()->offsetExists($courseImpl->getId())) {
+                $courseSpec->getCourseImplementations()->offsetSet($courseImpl->getId(), $courseImpl);
+            }
+            if (!$courseSpec->getUnits()->offsetExists($unitSpec->getId())) {
+                $courseSpec->getUnits()->offsetSet($unitSpec->getId(), $unitSpec);
+            }
+        }
+
         return $assessables;
     }
 
