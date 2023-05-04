@@ -175,7 +175,7 @@
                 countSpacesAsChars: true,
                 countHTML: true,
                 maxWordCount: -1, // Maximum allowed Word Count, -1 is default for unlimited
-                maxCharCount: 65000,
+                maxCharCount: window.sbProps.MAX_BYTES_MYSQL_TEXT,
             },
             ...overrideConfig,
         };
