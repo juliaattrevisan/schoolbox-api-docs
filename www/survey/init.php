@@ -84,7 +84,11 @@ $attempt = $attemptHandler->getLatestResumableForUser($survey['assess_id'], $use
  * Otherwise start a new attempt if there is a limit
  */
 if (!$attempt) {
-    if (($survey['max_attempts'] > 0) && ($numAttempts + 1 > $survey['max_attempts'])) {
+    if (
+        $survey['max_attempts'] > 0 &&
+        $numAttempts + 1 > $survey['max_attempts'] &&
+        !$_SESSION['user']->getRole()->isStaff() // The max_attempts limit does not apply to staff, so they can preview the survey as many times as they like.
+    ) {
         /* Clear and exit when you attempt to make more than is allowed
          */
         error(146);
