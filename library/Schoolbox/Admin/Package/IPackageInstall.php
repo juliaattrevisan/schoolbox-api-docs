@@ -23,4 +23,10 @@ interface IPackageInstall
      * @param User $user
      */
     public function install(User $user): void;
+
+    /**
+     * Return the list of the packages this package depends on
+     * @return array
+     */
+    public function getRequiredPackages(): array;
 }
