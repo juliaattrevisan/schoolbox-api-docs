@@ -31,7 +31,6 @@ use function array_merge;
 
 class Controller extends Web\Controller\Base
 {
-
     /** @var External_UserInterface */
     private $externalUser;
 
