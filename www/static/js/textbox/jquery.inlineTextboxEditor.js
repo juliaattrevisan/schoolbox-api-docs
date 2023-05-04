@@ -1,4 +1,5 @@
 (function ($) {
+    console.info("jquery.inlineTextboxEditor.js");
     /**
      * Inline textbox editor constructor.
      *
@@ -218,6 +219,7 @@
         document.dispatchEvent(
             new CustomEvent("EDITOR__CREATE", {
                 detail: {
+                    maxCharCount: 16777215, // MySQL storage limit for `mediumtext` field.
                     targetElements: ["#" + editorInstanceId],
                     fileBrowserCategoryId: self.fileBrowserCategoryId,
                 },
@@ -251,25 +253,27 @@
                 // We grab the new content from the server, as the server may have modified the content in some way.
                 // for example, the content will be run through the HTML purifier and iframely, which may change the content.
                 $.ajax(`/textbox/${textboxId}`, {
-                    method: "GET"
+                    method: "GET",
                 })
-                .done(function (data) {
-                    const parser = new DOMParser();
-                    const textBoxDoc = parser.parseFromString(data, "text/html");
-                    self.editorInstance.html(textBoxDoc.querySelector(".content article").innerHTML);
+                    .done(function (data) {
+                        const parser = new DOMParser();
+                        const textBoxDoc = parser.parseFromString(data, "text/html");
+                        self.editorInstance.html(textBoxDoc.querySelector(".content article").innerHTML);
 
-                    self.switchState(self.states.clean);
-                    self.element.trigger("inlineTextboxEditor.editorDestroy", [self]);
-                    self.element.trigger("inlineTextboxEditor.save", [self]);
-                })
-                .fail(function () {
-                    self.editorInstance.parent().html(`
+                        self.switchState(self.states.clean);
+                        self.element.trigger("inlineTextboxEditor.editorDestroy", [self]);
+                        self.element.trigger("inlineTextboxEditor.save", [self]);
+                    })
+                    .fail(function () {
+                        self.editorInstance.parent().html(`
                         <div class="alert-box alert">
                             Sorry, we are currently unable to load the text box content.
-                            <a href="#${self.editorInstance.attr("id")}" onclick="location.reload()">Click here to refresh the page</a>
+                            <a href="#${self.editorInstance.attr(
+                                "id"
+                            )}" onclick="location.reload()">Click here to refresh the page</a>
                             to try again and contact your support if the problem persists.
                         </div>`);
-                });
+                    });
 
                 // When the editor is destroyed and replaced with html content, the browser can scroll the view to a random point in the page.
                 // This could be quite confusing for the user, the best solution to this is to bring the action buttons back into view after the editor is destroyed.
