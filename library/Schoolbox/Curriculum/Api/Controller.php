@@ -85,7 +85,7 @@ class Controller extends Base
                 $this->request->query->getBool('enabled'),
             );
 
-            $resultsForAllKeywords = $resultsForAllKeywords->merge($resultsForKeyword);
+            $resultsForAllKeywords = $resultsForAllKeywords->mergeUnique($resultsForKeyword, 'id');
         }
 
         Node\Mapper::sortNodes($resultsForAllKeywords, 0);
