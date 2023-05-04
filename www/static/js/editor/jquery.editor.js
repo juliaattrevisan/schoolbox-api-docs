@@ -175,7 +175,7 @@
                 countSpacesAsChars: true,
                 countHTML: true,
                 maxWordCount: -1, // Maximum allowed Word Count, -1 is default for unlimited
-                maxCharCount: 65000,
+                maxCharCount: 65_535, // Storage limit in bytes for MySQL `text` field.
             },
             ...overrideConfig,
         };
