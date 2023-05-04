@@ -16,10 +16,8 @@ class IFrame extends Base
 {
     /**
      * Content Types for this strategy
-     *
-     * @var array
      */
-    private $contentTypes = [
+    private const CONTENT_TYPES = [
         'html', 'htm', 'txt', 'swf',
     ];
 
@@ -30,7 +28,7 @@ class IFrame extends Base
      */
     public function test(): ?array
     {
-        if ($this->item->getMimetype()->getInline() && in_array($this->item->getExtension(), $this->getContentTypes())) {
+        if ($this->item->getMimetype()->getInline() && in_array($this->item->getExtension(), self::CONTENT_TYPES)) {
             return [
                 'type' => 'iframe',
                 'src' => $this->url,
@@ -38,28 +36,5 @@ class IFrame extends Base
         }
 
         return $this->testNext();
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * Set content types
-     *
-     * @param array $contentTypes
-     */
-    private function setContentTypes($contentTypes)
-    {
-        $this->contentTypes = $contentTypes;
-    }
-
-    /**
-     * Get content types
-     *
-     * @return array
-     */
-    private function getContentTypes()
-    {
-        return $this->contentTypes;
     }
 }
