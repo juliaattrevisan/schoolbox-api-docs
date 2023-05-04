@@ -8,6 +8,20 @@ export function getTableSettings() {
         table: {
             // the table controls provided: https://ckeditor.com/docs/ckeditor5/latest/features/table.html
             contentToolbar: ["tableColumn", "tableRow", "mergeTableCells", "tableProperties", "tableCellProperties"],
+            tableProperties: {
+                defaultProperties: {
+                    borderStyle: "solid",
+                    borderColor: "#b3b3b3",
+                    borderWidth: "1px",
+                },
+            },
+            tableCellProperties: {
+                defaultProperties: {
+                    borderStyle: "solid",
+                    borderColor: "#b3b3b3",
+                    borderWidth: "1px",
+                },
+            },
         },
     };
 }

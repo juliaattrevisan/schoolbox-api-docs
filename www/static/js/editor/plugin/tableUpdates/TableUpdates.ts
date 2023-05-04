@@ -19,21 +19,30 @@ export default class TableUpdates extends Plugin {
     addDefaultProperties() {
         const insertTableCommand = this.editor.commands.get("insertTable");
         insertTableCommand.on("execute", () => {
-            this.editor.execute("tableWidth", {
-                value: "100%",
-            });
-            this.editor.execute("tableAlignment", {
-                value: "left",
-            });
-            this.editor.execute("tableBorderStyle", {
-                value: "solid",
-            });
-            this.editor.execute("tableBorderWidth", {
-                value: "1px",
-            });
-            this.editor.execute("tableBorderColor", {
-                value: "#b3b3b3",
-            });
+            // this.editor.execute("tableWidth", {
+            //     value: "100%",
+            // });
+            // this.editor.execute("tableAlignment", {
+            //     value: "left",
+            // });
+            // this.editor.execute("tableBorderStyle", {
+            //     value: "solid",
+            // });
+            // this.editor.execute("tableBorderWidth", {
+            //     value: "1px",
+            // });
+            // this.editor.execute("tableBorderColor", {
+            //     value: "#b3b3b3",
+            // });
+            // this.editor.execute("tableCellBorderStyle", {
+            //     value: "solid",
+            // });
+            // this.editor.execute("tableCellBorderWidth", {
+            //     value: "1px",
+            // });
+            // this.editor.execute("tableCellBorderColor", {
+            //     value: "#b3b3b3",
+            // });
         });
     }
 }
