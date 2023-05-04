@@ -29,23 +29,6 @@ export function getTokensSettings(config: EditorConfig) {
 }
 
 /**
- * CKEditor5 does not allow headings to exit within <li> elements, this wraps any heading/pre elements within lists
- * in a <span> or <tt> element to mimic the behaviour of CKEditor4
- *
- * @param { HTMLElement } sourceElementHTML - the sourceElement content as HTML
- * @returns { HTMLElement } - the html with the listed headings wrapped in a span element
- */
-export function fixListedHeadings(sourceElementHTML: HTMLElement): string {
-    let str = sourceElementHTML.innerHTML;
-    str = str.replace(/<li>\s*<h2>(.*?)<\/h2>\s*<\/li>/gi, '<li><span style="font-size:1.125rem">$1</span></li>');
-    str = str.replace(/<li>\s*<h3>(.*?)<\/h3>\s*<\/li>/gi, '<li><span style="font-size:1.0625rem;">$1</span></li>');
-    str = str.replace(/<li>\s*<h4>(.*?)<\/h4>\s*<\/li>/gi, '<li><span style="font-size:1rem;">$1</span></li>');
-    str = str.replace(/<li>\s*<pre>(.*?)<\/pre>\s*<\/li>/gi, '<li><tt class="">$1</tt></li>');
-    sourceElementHTML.innerHTML = str;
-    return sourceElementHTML;
-}
-
-/**
  * CKEditor5 provides special formatting around tokens, previously with CKE4, tokens were not surrounded with any other element,
  * with CKE5, tokens are now surrounded by a span element with a data-mention attribute
  * this function was added to help migrate text from CKE4 to CKE5, it will surround any tokens that are not already surrounded by a data-mention attribute

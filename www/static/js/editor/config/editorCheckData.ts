@@ -3,7 +3,8 @@ import { EditorConfig } from "@js/editor/types/editorTypes";
 import { addRelToNewTabLinks } from "@js/editor/settings/linkSettings";
 import { addFullWidthAttributes } from "@js/editor/settings/imageSettings";
 import { addFullWidthStyle, addAlignLeftStyle } from "@js/editor/settings/tableSettings";
-import { surroundUnsurroundedTokens, fixListedHeadings } from "@js/editor/settings/tokensSettings";
+import { surroundUnsurroundedTokens } from "@js/editor/settings/tokensSettings";
+import { fixListedHeadings } from "@js/editor/settings/headingSettings";
 
 /**
  * Parse the content as HTML so we can run .querySelectorAll etc on it
@@ -34,7 +35,7 @@ function runChecks(sourceElement: HTMLElement, config: EditorConfig) {
     sourceElementHTML = addFullWidthStyle(sourceElementHTML);
     sourceElementHTML = addAlignLeftStyle(sourceElementHTML);
     sourceElementHTML = fixListedHeadings(sourceElementHTML);
-    sourceElementHTML = surroundUnsurroundedTokens(sourceElementHTML, config);
+        sourceElementHTML = surroundUnsurroundedTokens(sourceElementHTML, config);
     return sourceElementHTML;
 }
 
