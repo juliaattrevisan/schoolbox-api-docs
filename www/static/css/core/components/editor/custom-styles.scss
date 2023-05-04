@@ -57,9 +57,15 @@ article {
         tr th,
         tr,
         td {
-            border: 1px solid rgb(179, 179, 179);
             padding: 0.4em;
             vertical-align: middle;
+        }
+        /**
+         * remove the 1px bottom border added to all tables, so if the user sets the table
+         * to have no border, it will actually have no border
+         */
+        td {
+            border-bottom: none;
         }
     }
 
