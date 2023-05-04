@@ -25,6 +25,7 @@ class Image extends Base
         if ($this->item->getMimetype()->isImage()) {
             //set the original url by default, if everything fails, fallback to the original.
             $src = $this->url;
+
             /**
              * on occasion there are `data-plugin="preview"` urls that are just the default `/send.php` which returns the original file
              * this does not work for HEIC files, as most browsers are unable to preview this file format.
