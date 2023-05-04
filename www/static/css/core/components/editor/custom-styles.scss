@@ -77,11 +77,18 @@ article {
         border-collapse: collapse;
         border-spacing: 0;
         margin-bottom: 1rem;
+        // Make sure tables entirely fill the figure, aka what actually determines their width
+        width: 100%;
 
         th {
             background-color: rgba(0, 0, 0, 0.05);
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
+            /**
+             *  Override browser default styling to provide cross-browser consistency. A user can
+             *  select to override this within the editor anyway.
+            **/
+            text-align: left;
 
             p {
                 font-weight: 600;
