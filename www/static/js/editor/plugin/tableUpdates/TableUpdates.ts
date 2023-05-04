@@ -53,6 +53,15 @@ export default class TableUpdates extends Plugin {
             this.editor.execute("tableAlignment", {
                 value: "left",
             });
+            this.editor.execute("tableBorderStyle", {
+                value: "solid",
+            });
+            this.editor.execute("tableBorderWidth", {
+                value: "1px",
+            });
+            this.editor.execute("tableBorderColor", {
+                value: "#b3b3b3",
+            });
         });
     }
 }
