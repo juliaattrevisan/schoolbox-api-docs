@@ -21,7 +21,6 @@ use Schoolbox\Preview\Registry\Decoder\LinkRedir;
  */
 class Factory
 {
-
     /**
      * @var Translator
      */

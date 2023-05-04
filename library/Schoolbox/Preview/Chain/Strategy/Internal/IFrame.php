@@ -14,7 +14,6 @@ namespace Schoolbox\Preview\Chain\Strategy\Internal;
 
 class IFrame extends Base
 {
-
     /**
      * Content Types for this strategy
      *

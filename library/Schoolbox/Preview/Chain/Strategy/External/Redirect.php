@@ -12,7 +12,6 @@ namespace Schoolbox\Preview\Chain\Strategy\External;
 
 class Redirect extends Base
 {
-
     /**
      * Base case
      *

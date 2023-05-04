@@ -12,7 +12,6 @@ namespace Schoolbox\Preview\Chain\Strategy\External;
 
 class Image extends Base
 {
-
     /**
      * A list of all the file extensions checked here
      *

@@ -14,7 +14,6 @@ use Embera\Embera;
 
 class Embed extends Base
 {
-
     /**
      * Test the oEmbed capability
      * http://www.oembed.com/

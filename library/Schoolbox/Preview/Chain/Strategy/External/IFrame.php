@@ -14,7 +14,6 @@ namespace Schoolbox\Preview\Chain\Strategy\External;
 
 class IFrame extends Base
 {
-
     /**
      * Test the Content-Types
      *
