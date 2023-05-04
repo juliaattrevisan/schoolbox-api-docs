@@ -39,8 +39,8 @@ use Alaress\Async\Notification\Parameter\Param;
 
 class Notifier extends AbstractModuleNotifier
 {
-    const TRIGGER_CREATED = 'created';
-    const TRIGGER_UPDATED = 'updated';
+    const TRIGGER_CREATED         = 'created';
+    const TRIGGER_UPDATED         = 'updated';
     const TRIGGER_ADDED_TO_REPORT = 'addedToReport';
 
     /** @var Mapper */
@@ -63,7 +63,7 @@ class Notifier extends AbstractModuleNotifier
     protected RoleMapper $roleMapper;
 
     /** @var UserMapper $userMapper */
-    protected UserMapper$userMapper;
+    protected UserMapper $userMapper;
 
     /** @var RosettaStone $l10n */
     protected RosettaStone $l10n;
@@ -102,7 +102,7 @@ class Notifier extends AbstractModuleNotifier
         }
 
         if (empty($dependencies["l10n"])) {
-            $stoneFactory = new RosettaStoneFactory();
+            $stoneFactory         = new RosettaStoneFactory();
             $dependencies["l10n"] = $stoneFactory->build(L10nMapper::getInstance());
         }
 
@@ -110,7 +110,7 @@ class Notifier extends AbstractModuleNotifier
     }
 
     /**
-     * @param Model $model
+     * @param Model  $model
      * @param string $method
      *
      * @return Envelope
@@ -137,12 +137,12 @@ class Notifier extends AbstractModuleNotifier
 
         $builder = new Builder();
         $builder->setTitle("A :pastoralcare comment has been {$method}")
-            ->setParam('pastoralcare', new Param($this->l10n->translate('pastoralCare'), $href))
-            ->setIcon($this->getUserIcon($owner))
-            ->setHref($href)
-            ->setNamespace($this->getSlug())
-            ->setSeverity(Logger::ERROR)
-            ->addTopic("pastoral_comment.{$model->getId()}.{$method}");
+                ->setParam('pastoralcare', new Param($this->l10n->translate('pastoralCare'), $href))
+                ->setIcon($this->getUserIcon($owner))
+                ->setHref($href)
+                ->setNamespace($this->getSlug())
+                ->setSeverity(Logger::ERROR)
+                ->addTopic("pastoral_comment.{$model->getId()}.{$method}");
 
         $message = $builder->build();
 
@@ -239,7 +239,7 @@ class Notifier extends AbstractModuleNotifier
 
         // Get hydrated pastoral record
         try {
-            $model = $this->hydrate($model);
+            $model    = $this->hydrate($model);
             $pastoral = $model->getPastoral();
         } catch (MapperException $e) {
             $this->log->error("Error: Unable to send pastoral comment addedToReport notification. {$e->getMessage()}", ['exception' => $e]);
@@ -247,7 +247,7 @@ class Notifier extends AbstractModuleNotifier
         }
 
         // Create the message
-        $recordHref = NotifierHelper::getRecordHref($pastoral, $model);
+        $recordHref   = NotifierHelper::getRecordHref($pastoral, $model);
         $recordName   = $this->l10n->translate('pastoral') . ' record';
         $messageTitle = "A new comment has been added to :record in :report";
 
