@@ -2,7 +2,7 @@
 <script type="text/javascript" src="{CDN_PREFIX}/js/bundle/editor.js?v={SITE_VERSION}"></script>
 <script type="text/javascript">
     $(function () {
-        const maxCharCount = 16777215; // MySQL storage limit for `mediumtext` field.
+        const maxCharCount = window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT;
         document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
             detail: {
                 maxCharCount: maxCharCount,

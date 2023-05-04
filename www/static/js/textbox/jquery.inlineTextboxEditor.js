@@ -219,7 +219,7 @@
         document.dispatchEvent(
             new CustomEvent("EDITOR__CREATE", {
                 detail: {
-                    maxCharCount: 16777215, // MySQL storage limit for `mediumtext` field.
+                    maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
                     targetElements: ["#" + editorInstanceId],
                     fileBrowserCategoryId: self.fileBrowserCategoryId,
                 },
