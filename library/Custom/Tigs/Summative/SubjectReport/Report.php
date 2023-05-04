@@ -818,6 +818,19 @@ class Report
     }
 
 
+    /**
+     * Build data for the "Learning Profile" component on the subject report.
+     *
+     * @param Folder\Model      $folder
+     * @param StudentAttributes $attributes
+     * @param GenericCollection $unitSpecs
+     * @param CourseSpec\Model  $courseSpec
+     * @param User              $student
+     * @param string|null       $roleTypeOverride
+     * @return array|string[]|null
+     * @throws MapperException
+     * @throws RouteNotFound
+     */
     private function buildLearningProfileData(
         Folder\Model $folder,
         StudentAttributes $attributes,
