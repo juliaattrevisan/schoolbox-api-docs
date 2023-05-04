@@ -2,9 +2,10 @@
 <script type="text/javascript" src="{CDN_PREFIX}/js/bundle/editor.js?v={SITE_VERSION}"></script>
 <script type="text/javascript">
     $(function () {
+        const maxCharCount = 16777215; // MySQL storage limit for `mediumtext` field.
         document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
             detail: {
-                maxCharCount: 16777215, // MySQL storage limit for `mediumtext` field.
+                maxCharCount: maxCharCount,
                 targetElements: ['#body'],
                 fileBrowserCategoryId: '{CATEGORY_ID}',
             }
@@ -12,7 +13,7 @@
 
         jQuery.validator.addMethod("textMaxLength", function () {
             let bodyData = window.sbProps.editors['body'].getData();
-            return bodyData.length < 65535;
+            return bodyData.length < maxCharCount;
         }, jQuery.validator.format("Message is too long."));
         $('form[data-validatable]').alaressValidate({
             ignore: false,
