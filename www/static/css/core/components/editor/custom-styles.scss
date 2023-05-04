@@ -62,12 +62,12 @@ article {
     }
 
     figure.table {
-        /*
-            Without fit-content, any tables that haven't had their width modified (and thus
-            are missing an inline style with a width percent) won't centre align properly as
-            figure expands to cover the entire width of the container, preventing margin:auto
-            from working.
-        */
+        /**
+         *  Without fit-content, any tables that haven't had their width modified (and thus
+         *  are missing an inline style with a width percent) won't centre align properly as
+         *  figure expands to cover the entire width of the container, preventing margin:auto
+         *  from working.
+        **/
         width: fit-content;
         margin: auto;
     }
