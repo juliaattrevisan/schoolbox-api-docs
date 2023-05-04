@@ -145,9 +145,15 @@ class StudentAttributes
         $this->isHistorical   = $reportDate->lt($now);
         $this->reportDate     = $reportDate;
 
-        $userYear = $yearLevelOverride ?? $user->getYear()?->getName();
+        $userYear = $user->getYear()?->getName();
 
-        $this->calculateDerivedAttributes($config, (int)$userYear, $reportDate, $now);
+        $this->calculateDerivedAttributes(
+            $config,
+            (int)$userYear,
+            isset($yearLevelOverride) ? (int)$yearLevelOverride : null,
+            $reportDate,
+            $now,
+        );
     }
 
 
@@ -431,17 +437,19 @@ class StudentAttributes
      *
      * @param IConfigLoader       $config
      * @param int                 $currentYearLevel
+     * @param int|null            $yearLevelOverride
      * @param Alaress_Date_Format $reportDate
      * @param Alaress_Date_Format $now
-     * @throws InvalidArgumentException
+     * @return void
      */
     private function calculateDerivedAttributes(
         IConfigLoader $config,
         int $currentYearLevel,
+        ?int $yearLevelOverride,
         Alaress_Date_Format $reportDate,
         Alaress_Date_Format $now
     ): void {
-        $this->yearLevel                = $this->deriveUserYearLevel($config, $currentYearLevel, $reportDate, $now);
+        $this->yearLevel                = $yearLevelOverride ?? $this->deriveUserYearLevel($config, $currentYearLevel, $reportDate, $now);
         $this->term                     = $this->deriveTerm($config, $reportDate);
         $this->curriculumYearLevel      = $this->deriveCurriculumYearLevel($this->yearLevel, $this->term);
         $this->curriculumSemester       = $this->deriveCurriculumSemester($this->yearLevel, $this->term);
