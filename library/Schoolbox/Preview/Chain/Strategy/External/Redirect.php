@@ -12,15 +12,14 @@ namespace Schoolbox\Preview\Chain\Strategy\External;
 
 class Redirect extends Base
 {
-
     /**
      * Base case
      *
      * Just redirect to the location via twig
      *
-     * @return array
+     * @return array|null
      */
-    public function test()
+    public function test(): ?array
     {
         return [
             'type' => 'redirect',

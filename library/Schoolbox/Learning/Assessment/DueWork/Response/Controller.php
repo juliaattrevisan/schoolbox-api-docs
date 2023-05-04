@@ -35,9 +35,9 @@ use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Learning\Turnitin;
 use Schoolbox\Learning\Turnitin\Exception\BadEndpoint;
 use Schoolbox\Learning\Turnitin\Exception\Credentials;
-use Schoolbox\Learning\Turnitin\Helper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Storage\FilesystemProxy;
+use Schoolbox\Url\Uri;
 use Schoolbox\User;
 
 class Controller extends Base
@@ -546,6 +546,53 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningDueWorkResponse/plagscan/contents.twig', $data));
     }
 
+    /**
+     * Fetches and displays a single response file, if it is an editable-inline
+     * HTML file.
+     *
+     * (Permission checks have already been done on the participant and response
+     *  preloaded from the path.)
+     *
+     * @api   GET /learning/assessments/:assessmentId/:studentId/responses/:responseId/files/:fileId
+     * @since 23.0.0
+     *
+     * @param SubmissionFile $file
+     * @return void
+     */
+    public function getResponseFileInline(SubmissionFile $file): void
+    {
+        // Disallow BTTF for this place:
+        // otherwise, it's possible to BTTF back to a download or iframe view
+        $this->setAllowBackToTheFuture(false);
+
+        // Is this file not editable inline? Just show in storage
+        if (!$file->getEditableInline()) {
+            $this->response->redirect->permanentRedirect(
+                (new Uri('/storage/fetch.php'))
+                    ->appendQueryParameters($this->request->query->getArrayCopy())
+                    ->__toString()
+            );
+        }
+
+        // Otherwise: render it in Twig, and output as an attachment if either:
+        // * the HTML mimetype is openable inline
+        // * the `save` query string param exists
+        if (!$file->getMimetype()->getInline() || $this->request->query->get('save')) {
+            $this->response->headers->set(
+                'Content-Disposition',
+                sprintf('attachment; filename="%s"', $file->getBasename()),
+            );
+        }
+        $this->response->content->set(
+            $this->buildUnthemedHtmlOutput(
+                '@learningDueWorkResponse/responseFileInline.twig',
+                [
+                    'file'        => $file,
+                    'fileContent' => $this->filesystemProxy->read($file),
+                ],
+            )
+        );
+    }
 
     /**
      * Determine the URL via which the current user may view a TII report.

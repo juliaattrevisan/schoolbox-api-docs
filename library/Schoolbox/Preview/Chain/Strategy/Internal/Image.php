@@ -18,13 +18,14 @@ class Image extends Base
     /**
      * Image files
      *
-     * @return mixed
+     * @return array|null
      */
-    public function test()
+    public function test(): ?array
     {
-        if ($this->getItem()->getMimetype()->isImage()) {
+        if ($this->item->getMimetype()->isImage()) {
             //set the original url by default, if everything fails, fallback to the original.
-            $src = $this->getUrl();
+            $src = $this->url;
+
             /**
              * on occasion there are `data-plugin="preview"` urls that are just the default `/send.php` which returns the original file
              * this does not work for HEIC files, as most browsers are unable to preview this file format.
@@ -34,10 +35,10 @@ class Image extends Base
              * where if the user is requesting based on the id, we should forward them to cms/image as that accepts an id
              * and will complete permission checks for that object.
              */
-            if ($this->getItem() instanceof Storage\Model) {
-                $src = "/storage/image.php?hash={$this->getItem()->getHash()}";
-            } elseif ($this->getItem() instanceof File\Model) {
-                $src = "/cms/image.php?id={$this->getItem()->getId()}&height=2048&width=2048";
+            if ($this->item instanceof Storage\Model) {
+                $src = "/storage/image.php?hash={$this->item->getHash()}";
+            } elseif ($this->item instanceof File\Model) {
+                $src = "/cms/image.php?id={$this->item->getId()}&height=2048&width=2048";
             }
 
             return [

@@ -1,7 +1,26 @@
 <li class="actions-small-1">
+    {% if currentFile.editableInline %}
+        {% set previewHref = routeLookupIfAuthorized(
+            'learningDueWorkResponse.getResponseFileInline',
+            {
+                assessment: assessment,
+                assessmentId: assessment.id,
+                student: participant.user,
+                studentId: participant.user.id,
+                response: response,
+                responseId: response.id,
+                file: currentFile,
+                fileId: currentFile.id,
+            }
+        ) %}
+        {% set downloadHref = previewHref ~ '?save=true' %}
+    {% else %}
+        {% set previewHref = '/storage/fetch.php?hash=' ~ currentFile.hash %}
+        {% set downloadHref = previewHref ~ '&save=true' %}
+    {% endif %}
     <div class="list-item">
         <div class="card attachment small-12">
-            <a href="/storage/fetch.php?hash={{ currentFile.hash }}" title="{{ currentFile.filename }}" data-plugin="preview">
+            <a href="{{ previewHref }}" title="{{ currentFile.filename }}" data-plugin="preview">
                 <img src="/ajax/mime/{{ currentFile.mime }}" alt="Preview" />
                 <p>{{ currentFile.filename }}</p>
             </a>
@@ -15,7 +34,7 @@
         </div>
     </div>
     <nav>
-        <a href="/storage/fetch.php?hash={{ currentFile.hash }}&save=true" class='icon-download' title="Download"></a>
+        <a href="{{ downloadHref }}" class='icon-download' title="Download"></a>
     </nav>
 </li>
 

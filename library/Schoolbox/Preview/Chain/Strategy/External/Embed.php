@@ -14,14 +14,13 @@ use Embera\Embera;
 
 class Embed extends Base
 {
-
     /**
      * Test the oEmbed capability
      * http://www.oembed.com/
      *
-     * @return array
+     * @return array|null
      */
-    public function test()
+    public function test(): ?array
     {
         $embera = new Embera();
         $embedCode = $embera->autoEmbed($this->getUrl());

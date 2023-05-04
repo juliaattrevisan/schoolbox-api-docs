@@ -17,6 +17,7 @@ use Alaress\Web\Controller\Base;
 use OutOfBoundsException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Error;
@@ -30,6 +31,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseMapperProxy;
 use Schoolbox\Learning\Assessment\Visibility;
+use Schoolbox\Learning\Authorizer\Rule\AssessmentNotDeleted;
 use Schoolbox\Learning\Authorizer\Rule\CanViewAssessable;
 use Schoolbox\Learning\Authorizer\Rule\ParentCanViewFeedback;
 use Schoolbox\Learning\Authorizer\Rule\StudentCanViewFeedback;
@@ -149,6 +151,28 @@ class Module extends BaseModule
         );
         $this->register('GET', '/kami/{kamiId:\d+}', 'getKamiView', $canAccessKami, $preloadKami);
         $this->register('GET', '/kami/{kamiId:\d+}' . '/export', 'getKamiExport', $canExportKami, $preloadKami);
+
+        // This rule is a simplified version of the rule from
+        // `\Schoolbox\Learning\Assessment\Module::buildAuthRuleCanViewSummary`,
+        // without its special cases for:
+        // * staff viewing their own summary page (SA-5769)
+        // * excluded students (SA-13045)
+        // Both these cases are irrelevant, as they won't have response files.
+        $hasResponseFileAccess = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new AssessmentNotDeleted(),
+            new CanViewAssessable(new Visibility($this->getMapperFactory()->get(Access::class))),
+        );
+        $preloadResponseFile   = fn (array $params) => $this->preloadResponseFile($params);
+
+        // View for an individual response file
+        $this->register(
+            self::METHOD_GET,
+            $participantPattern . '/responses/{responseId:\d+}/files/{fileId:\d+}',
+            'getResponseFileInline',
+            $hasResponseFileAccess,
+            $preloadResponseFile,
+        );
     }
 
 
@@ -409,6 +433,40 @@ class Module extends BaseModule
             'response' => $response,
             'participant' => $participant
         ];
+    }
+
+
+    /**
+     * Preload a due work response file from the participant in `$params`.
+     *
+     * The response file's ID will be in `fileId`.
+     *
+     * @param array $params
+     * @return array
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     */
+    private function preloadResponseFile(array $params): array
+    {
+        // Must have a file ID
+        $fileId = $params['fileId'] ?? null;
+        if (!isset($fileId)) {
+            throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
+        // Preload participant and response, then extract file from response
+        $addedParams = $this->preloadParticipant($params);
+        $response    = $addedParams['response'] ?? null;
+        if (!$response instanceof Model) {
+            throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
+        }
+        $file = $response->getAllFiles()->filterBy('id', $params['fileId'])->first();
+        if (!$file instanceof SubmissionFile) {
+            throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
+        // Add response file params
+        return $addedParams + ['file' => $file];
     }
 
     /**

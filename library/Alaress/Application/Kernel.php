@@ -168,6 +168,7 @@ use Schoolbox\TaskDaemon\Request\DownloadPages\MessageFactory as DownloadPagesMe
 use Schoolbox\TaskDaemon\Request\MessageFactory;
 use Schoolbox\Tour\Mapper as TourMapper;
 use Schoolbox\Tour\Step\Mapper as StepMapper;
+use Schoolbox\Url\Factory as UrlFactory;
 use Schoolbox\User\Token\Mapper as TokenMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\Version\Version;
@@ -1088,6 +1089,10 @@ abstract class Kernel
                     /** @var PrefixGenerator $cdnPrefixGenerator */
                     $cdnPrefixGenerator = $di->get('cdnPrefixGenerator');
                     $twig->addGlobal('CDN_PREFIX', $cdnPrefixGenerator->generate());
+
+                    // All Twig templates should have access to the base URL
+                    $baseUrl = (new UrlFactory($config))->buildFullyQualified();
+                    $twig->addGlobal('BASE_URL', $baseUrl);
 
                     // Global access to returnUrl vars
                     $encodedUrl = Redirect::encode(RequestUriParser::parseUrlPath($_SERVER));

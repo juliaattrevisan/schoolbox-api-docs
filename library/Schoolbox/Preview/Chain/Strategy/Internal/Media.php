@@ -17,9 +17,9 @@ class Media extends Base
     /**
      * Audio/visual files
      *
-     * @return mixed
+     * @return array|null
      */
-    public function test()
+    public function test(): ?array
     {
         if ($this->item instanceof \Schoolbox\Resource\File\Model) {
             $type = 'sbfs';

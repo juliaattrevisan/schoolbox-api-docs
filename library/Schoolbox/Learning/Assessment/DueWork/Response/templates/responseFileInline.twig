@@ -1,0 +1,25 @@
+{% extends 'include/styledIframe.twig' %}
+
+{% block title %}
+    {{ file.basename }}
+{% endblock title %}
+
+{% block customHead %}
+    <style>
+        body {
+            background-color: white;
+        }
+    </style>
+{% endblock customHead %}
+
+{% block content %}
+    <div class="row">
+        <div class="small-12 island no-pad">
+            <section class="content">
+                <article>
+                    {{ fileContent | purify }}
+                </article>
+            </section>
+        </div>
+    </div>
+{% endblock content %}

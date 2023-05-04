@@ -12,17 +12,16 @@ namespace Schoolbox\Preview\Chain\Strategy\Internal;
 
 class Redirect extends Base
 {
-
     /**
      * Base case
      *
-     * @return mixed
+     * @return array|null
      */
-    public function test()
+    public function test(): ?array
     {
         return [
             'type' => 'redirect',
-            'src' => $this->getUrl(),
+            'src' => $this->url,
         ];
     }
 }

@@ -9,7 +9,6 @@
 namespace Schoolbox\Preview\Chain\Strategy\Internal;
 
 use Schoolbox\Preview\Chain\Strategy\Base as StrategyBase;
-use Schoolbox\Resource\File;
 use Schoolbox\Resource\Storage;
 
 /**
@@ -19,80 +18,13 @@ use Schoolbox\Resource\Storage;
  */
 abstract class Base extends StrategyBase
 {
-
-    /**
-     * The url to test
-     *
-     * @var string
-     */
-    protected $url = '';
-
-
-    /**
-     * A storage model to test
-     * A link model to test
-     *
-     * @var Storage\Model|File\Model
-     */
-    protected $item;
-
-
     /**
      * Constructor
      *
-     * @param string $url
-     * @param Storage\Model|File\Model $item
+     * @param string                $url  A URL to test.
+     * @param Storage\IStorage|null $item A storage model to test, if any.
      */
-    public function __construct($url, $item)
+    public function __construct(protected string $url, protected ?Storage\IStorage $item)
     {
-        $this->setUrl($url);
-        $this->setItem($item);
-    }
-
-
-    /* Getters/Setters
-     */
-
-    /**
-     * Set url
-     *
-     * @param string $url
-     */
-    protected function setUrl($url)
-    {
-        $this->url = $url;
-    }
-
-
-    /**
-     * Get url
-     *
-     * @return string
-     */
-    protected function getUrl()
-    {
-        return $this->url;
-    }
-
-
-    /**
-     * Set item
-     *
-     * @param Storage\Model|File\Model $item
-     */
-    protected function setItem($item)
-    {
-        $this->item = $item;
-    }
-
-
-    /**
-     * Get item
-     *
-     * @return Storage\Model|File\Model
-     */
-    protected function getItem()
-    {
-        return $this->item;
     }
 }
