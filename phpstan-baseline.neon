@@ -5366,11 +5366,6 @@ parameters:
 			path: library/Schoolbox/Picker/DateTime/Module.php
 
 		-
-			message: "#^Method Schoolbox\\\\Preview\\\\Chain\\\\Strategy\\\\Internal\\\\IFrame\\:\\:setContentTypes\\(\\) is unused\\.$#"
-			count: 1
-			path: library/Schoolbox/Preview/Chain/Strategy/Internal/IFrame.php
-
-		-
 			message: "#^Variable \\$pd in PHPDoc tag @var does not exist\\.$#"
 			count: 1
 			path: library/Schoolbox/ProfessionalDevelopment/Repository.php
