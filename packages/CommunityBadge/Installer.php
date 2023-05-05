@@ -12,7 +12,7 @@ class Installer extends Package\BaseBadges
     /**
      * @inheritdoc
      */
-    protected array $requiredPackages = ['AusGeneralCapabilities'];
+    protected array $requiredPackages = [];
 
     /**
      * @inheritdoc
