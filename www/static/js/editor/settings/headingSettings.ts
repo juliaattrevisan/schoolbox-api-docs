@@ -19,18 +19,48 @@ export function getHeadingSettings() {
 }
 
 /**
- * CKEditor5 does not allow headings to exit within <li> elements, this wraps any heading/pre elements within lists
+ * Replace the heading elements with a span with the relevant font size
+ *
+ * @param { HTMLLIElement } listItem - the list item to replace the element in
+ * @param { string } existingTag - the tag to replace
+ * @param { string } newTag - the tag to replace with
+ * @param { string } fontSize - the font size to set on the new element
+ */
+function replaceElement(listItem: HTMLLIElement, existingTag: string, newTag: string, fontSize = "") {
+    const existingElement = listItem.querySelector(existingTag) as HTMLElement;
+    const newElement = document.createElement(newTag);
+    if (newTag === "tt") {
+        // we add this dummy class so CKEditor recognises the tt element and assigns the text style in the toolbar drop down
+        newElement.setAttribute("class", "");
+    } else {
+        newElement.style.fontSize = fontSize;
+    }
+    newElement.innerHTML = existingElement.innerHTML;
+    listItem.replaceChild(newElement, existingElement);
+}
+
+/**
+ * CKEditor5 does not allow headings to exist within <li> elements, this wraps any heading/pre elements within lists
  * in a <span> or <tt> element to mimic the behaviour of CKEditor4
  *
  * @param { HTMLElement } sourceElementHTML - the sourceElement content as HTML
  * @returns { HTMLElement } - the html with the listed headings wrapped in a span element
  */
 export function fixListedHeadings(sourceElementHTML: HTMLElement): HTMLElement {
-    let str = sourceElementHTML.innerHTML;
-    str = str.replace(/<li>\s*<h2>(.*?)<\/h2>\s*<\/li>/gi, '<li><span style="font-size:1.125rem">$1</span></li>');
-    str = str.replace(/<li>\s*<h3>(.*?)<\/h3>\s*<\/li>/gi, '<li><span style="font-size:1.0625rem;">$1</span></li>');
-    str = str.replace(/<li>\s*<h4>(.*?)<\/h4>\s*<\/li>/gi, '<li><span style="font-size:1rem;">$1</span></li>');
-    str = str.replace(/<li>\s*<pre>(.*?)<\/pre>\s*<\/li>/gi, '<li><tt class="">$1</tt></li>');
-    sourceElementHTML.innerHTML = str;
+    const listItems = sourceElementHTML.querySelectorAll("li");
+    listItems.forEach((listItem) => {
+        if (listItem.querySelector("h2")) {
+            replaceElement(listItem, "h2", "span", "1.125rem");
+        }
+        if (listItem.querySelector("h3")) {
+            replaceElement(listItem, "h3", "span", "1.0625rem");
+        }
+        if (listItem.querySelector("h4")) {
+            replaceElement(listItem, "h4", "span", "1rem");
+        }
+        if (listItem.querySelector("pre")) {
+            replaceElement(listItem, "pre", "tt");
+        }
+    });
     return sourceElementHTML;
 }
