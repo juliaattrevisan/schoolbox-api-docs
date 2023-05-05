@@ -599,16 +599,18 @@ export default {
          */
         eventDelete(efficacy) {
             this.$refs.eventDeleteModal.close();
-            let data = {
+            // Ensure we are sending standard POST data, NOT a JSON encoded string
+            let data = new URLSearchParams({
                 id: this.eventExtendedProps.eventId,
                 action: "Delete",
                 efficacy: efficacy,
-            };
+            });
+
             fetch(this.eventExtendedProps.links.delete, {
                 method: "POST",
-                body: JSON.stringify(data),
+                body: data.toString(),
                 headers: {
-                    "Content-Type": "application/json",
+                    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
                 },
             })
                 .then((response) => {
