@@ -637,17 +637,17 @@ export default {
          */
         bookingDelete(efficacy) {
             this.$refs.bookingDeleteModal.close();
-            let data = {
+            let data = new URLSearchParams({
                     efficacy: efficacy,
-                },
+                }),
                 cancelActionUrl = this.eventExtendedProps.booking.actions.find(
                     (action) => action.action === "cancel"
                 ).href;
             fetch(cancelActionUrl, {
                 method: "POST",
-                body: JSON.stringify(data),
+                body: data.toString(),
                 headers: {
-                    "Content-Type": "application/json",
+                    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
                 },
             })
                 .then((response) => {
