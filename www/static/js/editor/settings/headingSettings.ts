@@ -19,7 +19,7 @@ export function getHeadingSettings() {
 }
 
 /**
- * Replace the heading elements with a span with the relevant font size
+ * Replace the heading/pre elements with a span/tt
  *
  * @param { HTMLLIElement } listItem - the list item to replace the element in
  * @param { string } existingTag - the tag to replace
@@ -30,7 +30,7 @@ function replaceElement(listItem: HTMLLIElement, existingTag: string, newTag: st
     const existingElement = listItem.querySelector(existingTag) as HTMLElement;
     const newElement = document.createElement(newTag);
     if (newTag === "tt") {
-        // we add this dummy class so CKEditor recognises the tt element and assigns the text style in the toolbar drop down
+        // we add this dummy class so CKEditor recognises the tt element and assigns the 'Typewriter' style in the toolbar drop down
         newElement.setAttribute("class", "");
     } else {
         newElement.style.fontSize = fontSize;
