@@ -37,7 +37,6 @@
              * These correspond to a series of data and their respective
              * five-point summaries
              */
-
             allAssessments: {{ graph.assessments | purify }},
             /* All the raw data
              */
@@ -53,8 +52,12 @@
                         radius: 6
                     },
                     data: graphData,
+                    // Disable mouse interactivity
+                    enableMouseTracking: false,
                 }
             ],
+            // We're printing, disable animations
+            initialAnimation: false,
             // Tooltips aren't necessary in print media
             tooltip: {
                 enabled: false
