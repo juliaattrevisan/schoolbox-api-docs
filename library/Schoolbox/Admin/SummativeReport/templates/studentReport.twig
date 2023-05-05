@@ -5,7 +5,15 @@
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/learninganalytics/schoolboxTheme.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/eportfolio/jquery.eportfolio.js?v={{ config.site_version }}"></script>
 
+<link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/core/schoolbox-ck-content.css?v={{ config.site_version }}"/>
 <style>
+    /**
+     *  Why .summative-content?
+     *  Inside this report we include CK editor content and custom font and text styles.
+     *  Without encapsulating these to within their specific areas, they leak and fight each
+     *  other, causing inconsistency between how the content is shown on the page. Any text
+     *  styles need to be wrapped up to prevent this, hence the .summative-content tag.
+    **/
 
     /* Vaguely analogous to A4 dimensions so you can preview in browser
      * otherwise the pdf print wraps in a different place, throwing your judgement
@@ -17,38 +25,44 @@
 
     /* Typography
      */
-    h1, h2, h3, h4, h5, h6 {
+    .summative-content h1,
+    .summative-content h2,
+    .summative-content h3,
+    .summative-content h4,
+    .summative-content h5,
+    .summative-content h6 {
         color: black;
+        font-weight: 700;
         margin: 0;
         padding: 0;
     }
 
-    h1 {
+    .summative-content h1 {
         font-size: 2.45rem;
         margin-bottom: 0.25rem;
     }
 
-    h2 {
+    .summative-content h2 {
         font-size: 1.75rem;
     }
 
-    h3 {
+    .summative-content h3 {
         font-size: 1.5rem;
     }
 
-    h4 {
+    .summative-content h4 {
         font-size: 1.3rem;
     }
 
-    h5 {
+    .summative-content h5 {
         font-size: 1.15rem;
     }
 
-    h6 {
+    .summative-content h6 {
         font-size: 1rem;
     }
 
-    p {
+    .summative-content p {
         color: black;
         line-height: 1.5rem;
     }
@@ -62,7 +76,7 @@
 
     /* Make background colours print
      */
-    body {
+    body .summative-content{
         -webkit-print-color-adjust: exact !important;
         font-family: Arial, sans-serif;
         font-style: normal;
@@ -155,7 +169,7 @@
     /* These appear the name of the assessment and the comment
      * as little subtitle sort of things
      */
-    .worktype {
+    .summative-content .worktype {
         color: grey;
         font-size: 0.75rem;
         font-style: italic;
@@ -231,6 +245,10 @@
         padding: 0 0 0.5rem 0;
     }
 
+    .summary {
+        margin-bottom: 1rem;
+    }
+
     /* Reduce the bottom margin in the Summary area
      * because we don't have the wrapping block here
      */
@@ -282,7 +300,7 @@
     /* Rubric table
      * This is the only table element we render here
      */
-    table.rb {
+    .summative-content table.rb {
         border-collapse: collapse;
         table-layout: fixed;
         width: 100%;
@@ -291,7 +309,9 @@
 
     /* Headings were oddly grey by intent but black we go
      */
-    th p {
+    .summative-content th p {
+        font-weight: 700;
+        margin-bottom: 0;
         padding-left: 0.25rem;
         text-align: left;
         word-wrap: break-word;
@@ -332,7 +352,7 @@
         border-left: 2px solid black !important;
     }
 
-    th.rb-final-summary {
+    .summative-content th.rb-final-summary {
         padding: 0.5rem;
     }
 
@@ -367,6 +387,11 @@
 
     .summative-graph-container {
         padding-left: 1rem;
+    }
+
+    .summative-graph-type {
+        font-size: 1rem;
+        margin-top: 1rem;
     }
 
     .summative-graph-type,
@@ -442,10 +467,9 @@
 
     {{ customReportStyle ?? '' }}
 </style>
-<link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/core/schoolbox-ck-content.css?v={{ config.site_version }}"/>
 
 <div class="summative-report">
-    <div class="header-content">
+    <div class="header-content summative-content">
         <div class="left">
             <h1>{{ report.title }}</h1>
             <h2 class="school-name">{{ config.school_name }}</h2>
@@ -455,7 +479,7 @@
         {% endif %}
     </div>
 
-    <div class="card">
+    <div class="card summative-content">
         {% if student.portrait %}
         <img src="/portrait.php?id={{ student.id }}&amp;size=square64" alt="{{ student.fullName }}" />
         {% endif %}
@@ -480,7 +504,7 @@
 
     {# Summary #}
     {% if showSummary %}
-    <div class="summary">
+    <div class="summary summative-content">
         {% if summaryHeading|length %}
             <h3>{{ summaryHeading }}</h3>
         {% endif %}
@@ -530,7 +554,7 @@
             {% if (classAssessments[folder.id] ?? [])| length %}
             {% set studentGrade = markbooks[folder.id].studentStatistics[student.id] %}
             {% set weightedMean = studentGrade.weightedMean %}
-            <div class="folder-title class-page">
+            <div class="folder-title class-page summative-content">
                 <div class="left">
                     <h4>{{ folder.title }}</h4>
                     {% for teacher in folder.teachers %}
@@ -550,6 +574,7 @@
                     <p class="summative-graph-type">{{ allGraphs['class'][folder.id].type }} distribution</p>
                     {% include '@learningGrades/fragments/summativeGraph.twig' with { graph: allGraphs['class'][folder.id].graph, graphId: 'class_' ~ folder.id } only %}
                 {% endif %}
+            <div class="summative-content">
                 {% for assessment in classAssessments[folder.id] %}
                     {% include '@adminSummativeReport/assessmentReport.twig' with
                         {
@@ -563,6 +588,7 @@
                         } only %}
                 {% endfor %}
             {% endif %}
+            </div>
         {% endfor %}
     {% endif %}
 </div>
