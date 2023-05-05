@@ -674,17 +674,17 @@ export default {
          */
         bookingApprove(efficacy) {
             this.$refs.bookingApproveSeriesModal.close();
-            let data = {
+            let data = new URLSearchParams({
                     efficacy: efficacy,
-                },
+                }),
                 approveActionUrl = this.eventExtendedProps.booking.actions.find(
                     (action) => action.action === "approve"
                 ).href;
             fetch(approveActionUrl, {
                 method: "POST",
-                body: JSON.stringify(data),
+                body: data.toString(),
                 headers: {
-                    "Content-Type": "application/json",
+                    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
                 },
             })
                 .then((response) => {
@@ -711,17 +711,17 @@ export default {
          */
         bookingReject(efficacy) {
             this.$refs.bookingRejectSeriesModal.close();
-            let data = {
+            let data = new URLSearchParams({
                     efficacy: efficacy,
-                },
+                }),
                 rejectActionUrl = this.eventExtendedProps.booking.actions.find(
                     (action) => action.action === "reject"
                 ).href;
             fetch(rejectActionUrl, {
                 method: "POST",
-                body: JSON.stringify(data),
+                body: data.toString(),
                 headers: {
-                    "Content-Type": "application/json",
+                    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
                 },
             })
                 .then((response) => {
