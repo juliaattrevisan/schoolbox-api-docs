@@ -21,7 +21,7 @@ class UrlPaginator implements IUrlPaginator
      *
      * @var string
      */
-    protected $url;
+    protected string $url = '';
 
     /**
      * The query parameter that refers to the page name.
