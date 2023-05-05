@@ -98,6 +98,7 @@ abstract class SubmissionAbstract
             // should be only one
             return $assessmentWithParticipants;
         }
+        $this->log->warning('Failed to load participant: loadParticipantsIntoAssessmentCollection did not return any assessment.');
         return null;
     }
 
