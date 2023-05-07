@@ -12,6 +12,7 @@
             allAssessments: [],
             allData: [],
             additionalSeries: [],
+            initialAnimation: true,
 
             /* Format of outlier data
              */
@@ -57,6 +58,13 @@
 
             xAxis: {
                 categories: options.allAssessments,
+            },
+
+            plotOptions: {
+                series: {
+                    // Optionally disable initial animations
+                    animation: options.hasOwnProperty("initialAnimation") ? options.initialAnimation : true,
+                },
             },
 
             yAxis: {

@@ -14,36 +14,9 @@
         let infoArray = {{ graph.info | purify }};
         let graphData = {{ graph.scatter | purify }};
 
-        const formatGraphLabel = (template, infoArrayIndex) => {
-            let retString = template;
-
-            if (infoArray[infoArrayIndex].displayMark !== null) {
-                retString = retString.replace(/{DISPLAYMARK}/, infoArray[infoArrayIndex].displayMark);
-                retString = retString.replace(/{GRADIENTMARK}/, infoArray[infoArrayIndex].gradientMark);
-            }
-            else {
-                retString = retString.replace(/{DISPLAYMARK}/, '');
-                retString = retString.replace(/{GRADIENTMARK}/, '');
-            }
-            retString = retString.replace(/{INFO}/, infoArray[infoArrayIndex].info);
-
-            return retString;
-        };
-
         // Format the data points to include dataLabels for print display
         graphData = graphData.map((data, i) => {
             return {
-                dataLabels: {
-                    enabled: true,
-                    useHTML: true,
-                    formatter: function () {
-                        if (infoArray[i] && infoArray[i]?.displayMark){
-                            const template = `<div class="summative-graph-data-label">{DISPLAYMARK}</div>`;
-                            return formatGraphLabel(template, i);
-                        }
-                        return '';
-                    }
-                },
                 y: data,
             };
         });
@@ -64,7 +37,6 @@
              * These correspond to a series of data and their respective
              * five-point summaries
              */
-
             allAssessments: {{ graph.assessments | purify }},
             /* All the raw data
              */
@@ -80,8 +52,12 @@
                         radius: 6
                     },
                     data: graphData,
+                    // Disable mouse interactivity
+                    enableMouseTracking: false,
                 }
             ],
+            // We're printing, disable animations
+            initialAnimation: false,
             // Tooltips aren't necessary in print media
             tooltip: {
                 enabled: false
