@@ -251,7 +251,7 @@ class ResultCache
              * If $student is not a participant, or deleted, etc.
              * just exit without doing anything
              */
-           $this->persist($project, $student, null);
+            $this->persist($project, $student, null);
         } else {
             /* Update everyone associated with this assessment
              */

@@ -4626,11 +4626,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/IResponse.php
 
 		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Participant/ParticipationHelper.php
-
-		-
 			message: "#^Variable \\$sortedAssessments in PHPDoc tag @var does not exist\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/ListController.php

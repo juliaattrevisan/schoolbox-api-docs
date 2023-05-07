@@ -99,9 +99,11 @@ class ParticipationHelper
         }
 
         // excluded
-        if ($existingParticipation
+        if (
+            $existingParticipation
             && $existingParticipation->isExcluded()
-            && $existingParticipation->getPlan()->getId() === $userPlan->getId()) {
+            && $existingParticipation->getPlan()->getId() === $userPlan->getId()
+        ) {
             // nothing changed
             return;
         }
