@@ -235,8 +235,8 @@ class InteractionIntegrityChecker
     {
         foreach ($assessment->getPlans() as $plan) {
             foreach ($plan->getParticipants() as $participant) {
-                // TODO A-4539 fix unreliable hydration type bug
                 if ($participant->getUser()->getId() == $student->getId()) {
+                    $participant->setPlan($plan);
                     return $participant;
                 }
             }

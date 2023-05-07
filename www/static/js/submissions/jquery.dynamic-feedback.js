@@ -199,6 +199,10 @@
 
                 publishFeedback(this);
             });
+            $(':input[name="resubmissionRequired"]').on('change', function (e) {
+              e.preventDefault();
+              publishFeedback(this);
+            });
         }
 
         /**
@@ -281,7 +285,9 @@
                     $actionBar.attr("data-published", "");
 
                     toast.call($participant, config.publishedText, true, false);
-                    config.onPublishCallback(participantId, response.success, response.message, response.id);
+                    if (!resubmissionRequired) {
+                        config.onPublishCallback(participantId, response.success, response.message, response.id);
+                    }
                 })
                 .fail(function (xhr) {
                     toast.call($participant, xhr.responseText, false, false);
@@ -312,6 +318,8 @@
                 commentBoxTimeouts[commentId] = window.setTimeout(function () {
                     onFeedbackChanged.apply($input);
                 }, config.timeoutDurationMs);
+            } else if ($input.attr("name") === "resubmissionRequired") {
+                return;
             } else {
                 // No point in using a timeout unless it's a comment box - save immediately
                 onFeedbackChanged.apply($input);
