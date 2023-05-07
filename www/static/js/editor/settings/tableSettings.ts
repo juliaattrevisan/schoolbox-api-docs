@@ -8,20 +8,6 @@ export function getTableSettings() {
         table: {
             // the table controls provided: https://ckeditor.com/docs/ckeditor5/latest/features/table.html
             contentToolbar: ["tableColumn", "tableRow", "mergeTableCells", "tableProperties", "tableCellProperties"],
-            tableProperties: {
-                defaultProperties: {
-                    borderStyle: "solid",
-                    borderColor: "#b3b3b3",
-                    borderWidth: "1px",
-                },
-            },
-            tableCellProperties: {
-                defaultProperties: {
-                    borderStyle: "solid",
-                    borderColor: "#b3b3b3",
-                    borderWidth: "1px",
-                },
-            },
         },
     };
 }
@@ -53,6 +39,18 @@ export function addAlignLeftStyle(sourceElementHTML: HTMLElement) {
     tables.forEach((table) => {
         if (table.style.float === "") {
             table.style.float = "left";
+        }
+        // CKEditor4 tables use the now deprecated align attribute
+        if (table.align !== "") {
+            table.style.float = table.align;
+        }
+        // CKEditor5 tables use the parent figure element to align the table
+        if (
+            table.parentNode &&
+            table.parentNode.nodeName.toLowerCase() === "figure" &&
+            (table.parentNode as HTMLElement).style.float === ""
+        ) {
+            (table.parentNode as HTMLElement).style.float = "left";
         }
     });
     return sourceElementHTML;

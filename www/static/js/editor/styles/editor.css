@@ -267,15 +267,3 @@
 .ck.ck-content ul {
     margin-bottom: 0.75rem;
 }
-
-.ck-content .table table {
-    border-style: solid;
-    border-color: "#b3b3b3";
-    border-width: 1px;
-}
-
-.ck-content .table table td {
-    border-style: solid;
-    border-color: "#b3b3b3";
-    border-width: 1px;
-}
