@@ -20,7 +20,6 @@ class Classes
     private const IMPORT_COLUMNS = [
         'Name' => 'name',
         'Class Code' => 'code',
-        'Description' => 'description',
     ];
 
 
@@ -54,7 +53,7 @@ class Classes
         /* SUDS Timetable records
          */
         $statement = $this->mapper->getDatabase()->prepare("
-            SELECT * 
+            SELECT *
             FROM {$this->mapper->getTable()}
             ORDER BY name
         ");
