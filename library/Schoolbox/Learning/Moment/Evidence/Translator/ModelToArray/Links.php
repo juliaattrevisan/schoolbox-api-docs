@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray;
 
-use Schoolbox\Api\Translator\AbstractLinks;
+use Schoolbox\API\Translator\AbstractLinks;
 use Schoolbox\Learning\Moment\Evidence;
 
 /**

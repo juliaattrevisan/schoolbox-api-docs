@@ -683,7 +683,7 @@ class ListController extends Web\Controller\Base
             //    - any plans UPDATED by this method will be ID INDEXED
             $plans = $this->savePlanData($assessment, $postData['plans'] ?? []);
 
-            (new Participant\ParticipationHelper($this->participantDataSource, $this->getUserMapper()))->saveParticipationData($assessment, $plans, $postData['participant-include'] ?? [], $postData['participant-plan'] ?? []);
+            $this->saveParticipationData($assessment, $plans, $postData['participant-include'] ?? [], $postData['participant-plan'] ?? []);
         } catch (\Exception $e) {
             $db->rollback();
             // cast
@@ -709,6 +709,31 @@ class ListController extends Web\Controller\Base
         return $transactionSummary;
     }
 
+    /**
+     * @param IAssessable                  $assessment
+     * @param GenericCollection<PlanModel> $plans
+     * @param array                        $inclusionFlags  userId => 0 ... excluded, 1 ... included
+     * @param array                        $userPlanIndices userId => planId
+     * @throws MapperException
+     */
+    private function saveParticipationData(IAssessable $assessment, GenericCollection $plans, array $inclusionFlags, array $userPlanIndices): void
+    {
+        $assessmentDataModel = $this->assessmentMapper->translateToDataModel($assessment);
+        $participationHelper = (new Participant\ParticipationHelper($assessmentDataModel, $this->participantDataSource, $this->getUserMapper()));
+        // plans are saved; persistipation
+        foreach ($inclusionFlags as $userId => $userIncluded) {
+            /** @var PlanModel|null $userPlan */
+            $userPlan = $plans[$userPlanIndices[$userId]];
+            if ($userIncluded) {
+                if (!$userPlan) {
+                    throw new DomainException("User {$userId} was assigned index {$userPlanIndices[$userId]}, but there's no plan with that index (valid plan indices were " . json_encode($plans->keys()) . ')');
+                }
+                $participationHelper->include($userId, $userPlan);
+            } else {
+                $participationHelper->exclude($userId, $userPlan);
+            }
+        }
+    }
 
     /**
      * The return of this method will be a UNION of all plans that exist for the given assessment ID
@@ -931,9 +956,10 @@ class ListController extends Web\Controller\Base
      */
     public function postInclude(IAssessable $assessment, User $student): void
     {
-        $partitionHelper = new ParticipationHelper($this->participantDataSource, $this->userMapper);
+        $assessmentDataModel = $this->assessmentMapper->translateToDataModel($assessment);
+        $partitionHelper = new ParticipationHelper($assessmentDataModel, $this->participantDataSource, $this->userMapper);
         try {
-            $partitionHelper->include($assessment, $student->getId());
+            $partitionHelper->include($student->getId(), null);
             // Update project mark as the excluded assessment may affect the project result
             (new \Schoolbox\Learning\Assessment\Project\ResultCache\ResultCache($this->projectResultCacheMapper))
                 ->refresh($this->getAssessmentMapper(), $assessment, $student);
@@ -958,9 +984,10 @@ class ListController extends Web\Controller\Base
      */
     public function postExclude(IAssessable $assessment, User $student): void
     {
-        $partitionHelper = new ParticipationHelper($this->participantDataSource, $this->userMapper);
+        $assessmentDataModel = $this->assessmentMapper->translateToDataModel($assessment);
+        $partitionHelper = new ParticipationHelper($assessmentDataModel, $this->participantDataSource, $this->userMapper);
         try {
-            $partitionHelper->exclude($assessment, $student->getId());
+            $partitionHelper->exclude($student->getId(), null);
 
             // Update project mark as the excluded assessment may affect the project result
             (new \Schoolbox\Learning\Assessment\Project\ResultCache\ResultCache($this->projectResultCacheMapper))

@@ -8,7 +8,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\APIAssessment;
+namespace Schoolbox\Learning\Assessment\API;
 
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Alaress\Web\Controller\Base;

@@ -5,7 +5,7 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Schoolbox\APIAssessment;
+namespace Schoolbox\Learning\Assessment\API;
 
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
@@ -22,7 +22,7 @@ class Helper
     /**
      * Cache for list of year levels
      *
-     * @var GenericCollection | YearLevelModel[] | null
+     * @var GenericCollection<YearLevelModel> | null
      */
     protected ?GenericCollection $yearLevels = null;
 
@@ -107,29 +107,31 @@ class Helper
                     ];
                 }
             }
-            $folder = [
-                'id' => $row['folderId'],
+            $folderId = (int)$row['folderId'];
+            $folder   = [
+                'id' => $folderId,
                 'name' => $row['folderName'],
-                'code' => $this->getFolderCode($row['folderId']),
+                'code' => $this->getFolderCode($folderId),
                 'yearLevel' => $yearLevel,
             ];
-            $project = null;
+            $project  = null;
             if (null !== $row['project']) {
                 $project = [
-                    'id' => $row['project'],
+                    'id' => (int)$row['project'],
                 ];
             }
             //get the rubric for the assessment
-            $rubric = $this->getRubric($row['id']);
-            if (!isset($output[$row['id']])) {
-                $output[$row['id']] = [
-                    'id'               => $row['id'],
+            $assessmentId = (int)$row['id'];
+            $rubric       = $this->getRubric($assessmentId);
+            if (!isset($output[$assessmentId])) {
+                $output[$assessmentId] = [
+                    'id'               => $assessmentId,
                     'title'            => $row['title'],
                     'assessmentType'   => $row['assessmentType'],
                     'commonAssessment' => (bool)$row['commonAssessment'],
                     'workType'         => [
                         'name' => $row['workTypeName'],
-                        'id'   => $row['workTypeId']
+                        'id'   => (int)$row['workTypeId']
                     ],
                     'folder'           => $folder,
                     'subjectCode'      => $row['subjectCode'],
@@ -516,6 +518,25 @@ WHERE
               and `la`.`assessment_id` in ({$bindings->getPlaceholder()})
             group by `la`.`assessment_id`, `sc1`.`student_id`, `sc1`.`created_at`
             LTI,
+            <<<PROJECT
+            select
+                `pr`.`assessment_id` AS `assessment_id`,
+                'project_result'     AS `feedback_table`,
+                `prr`.`id`           AS `feedback_id`,
+                `prr`.`updated_at`   AS `completion_date`,
+                ''                   AS `comment`,
+                `prr`.`mark`         AS `mark`,
+                `prr`.`norm_mark`    AS `norm_mark`,
+                $participantFields,
+                $reviewerFields
+            from `project_result` `prr` join `project` `pr` on (`prr`.`project_id` = `pr`.`assessment_id`)
+                LEFT JOIN `user` `participant` on `prr`.`user_id`  = `participant`.`id`
+                LEFT JOIN `user` `reviewer`    on `prr`.`marker_id` = `reviewer`.`id`
+            where
+              `prr`.`deleted_at` is null
+              and `prr`.`norm_mark` is not null
+              and `pr`.`assessment_id` in ({$bindings->getPlaceholder()})
+            PROJECT,
         ];
 
         $statement = $this->mapper->getDatabase()->query(
@@ -525,32 +546,34 @@ WHERE
         $statement->execute();
         $participationItems = [];
         foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
-            if (!isset($participationItems[$row['assessment_id']])) {
-                $participationItems[$row['assessment_id']] = [];
+            $rowAssessmentId = (int)$row['assessment_id'];
+            $rowParticipantId = (int)$row['participant_id'];
+            if (!isset($participationItems[$rowAssessmentId])) {
+                $participationItems[$rowAssessmentId] = [];
             }
-            $rubric = $this->getRubricFeedback($row['assessment_id'], $row['feedback_id']);
+            $rubric = $this->getRubricFeedback($rowAssessmentId, $row['feedback_id']);
 
             // Feedback fields are duplicated in the base key of the feedback
             // item, as well as in "feedback".
             $feedbackFields = [
                 'mark'           => $row['mark'],
-                'normalisedMark' => $row['norm_mark'],
+                'normalisedMark' => (float)$row['norm_mark'],
                 'comment'        => $row['comment'],
                 'date'           => (new \Alaress_Date_Format($row['completion_date'], \Alaress_Date_Format::DATABASE_FORMAT))->toIso8601String(),
-                'instructor'     => [
-                    'id'            => $row['reviewer_id'],
+                'instructor'     => $row['reviewer_id'] ? [
+                    'id'            => (int)$row['reviewer_id'],
                     'title'         => $row['reviewer_title'],
                     'firstName'     => $row['reviewer_first_name'],
                     'preferredName' => $row['reviewer_preferred_name'],
                     'lastName'      => $row['reviewer_last_name'],
                     'externalId'    => $row['reviewer_external_id'],
-                ],
+                ] : null,
                 'rubric'         => $rubric,
             ];
 
             // Add learner details
-            $participationItems[$row['assessment_id']][$row['participant_id']]['learner'] ??= [
-                'id'            => $row['participant_id'],
+            $participationItems[$rowAssessmentId][$rowParticipantId]['learner'] ??= [
+                'id'            => $rowParticipantId,
                 'title'         => $row['participant_title'],
                 'firstName'     => $row['participant_first_name'],
                 'preferredName' => $row['participant_preferred_name'],
@@ -559,15 +582,15 @@ WHERE
             ];
 
             // Add feedback details
-            $participationItems[$row['assessment_id']][$row['participant_id']]['feedback'] = [
-                'id' => $row['feedback_id'],
+            $participationItems[$rowAssessmentId][$rowParticipantId]['feedback'] = [
+                'id' => (int)$row['feedback_id'],
             ] + $feedbackFields;
 
             // Add feedback details in a deprecated place
-            $participationItems[$row['assessment_id']][$row['participant_id']] += $feedbackFields;
+            $participationItems[$rowAssessmentId][$rowParticipantId] += $feedbackFields;
 
             // Add empty response if nothing there
-            $participationItems[$row['assessment_id']][$row['participant_id']]['response'] ??= null;
+            $participationItems[$rowAssessmentId][$rowParticipantId]['response'] ??= null;
         }
         $statement->closeCursor();
 
@@ -720,8 +743,10 @@ WHERE
         $responseRows = $responseStatement->fetchAll();
         foreach ($responseRows as $row) {
             // Add learner details
-            $participationItems[$row['assessment_id']][$row['participant_id']]['learner'] ??= [
-                'id'            => $row['participant_id'],
+            $rowAssessmentId = (int)$row['assessment_id'];
+            $rowParticipantId = (int)$row['participant_id'];
+            $participationItems[$rowAssessmentId][$rowParticipantId]['learner'] ??= [
+                'id'            => $rowParticipantId,
                 'title'         => $row['participant_title'],
                 'firstName'     => $row['participant_first_name'],
                 'preferredName' => $row['participant_preferred_name'],
@@ -730,7 +755,7 @@ WHERE
             ];
 
             // Add response details
-            $participationItems[$row['assessment_id']][$row['participant_id']]['response'] = [
+            $participationItems[$rowAssessmentId][$rowParticipantId]['response'] = [
                 'id'        => $row['response_id'],
                 'date'      => (new \Alaress_Date_Format($row['completion_date'], \Alaress_Date_Format::DATABASE_FORMAT))->toIso8601String(),
                 'submitter' => [
@@ -747,12 +772,12 @@ WHERE
             // Track files (due work responses only):
             // these will be fetched in a later query
             if ($row['response_table'] === 'student_submission') {
-                $participationItems[$row['assessment_id']][$row['participant_id']]['response']['files'] = [];
+                $participationItems[$rowAssessmentId][$rowParticipantId]['response']['files'] = [];
                 $studentSubmissionIds[] = $row['response_id'];
             }
 
             // Add empty feedback if nothing there
-            $participationItems[$row['assessment_id']][$row['participant_id']]['feedback'] ??= null;
+            $participationItems[$rowAssessmentId][$rowParticipantId]['feedback'] ??= null;
         }
 
         // Load submissions, and thus their files

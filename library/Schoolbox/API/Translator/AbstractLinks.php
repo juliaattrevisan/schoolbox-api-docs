@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Api\Translator;
+namespace Schoolbox\API\Translator;
 
 use Alaress\Authorizer\Authorizer;
 use Aura\Router\Router;

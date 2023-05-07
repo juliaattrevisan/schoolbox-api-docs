@@ -1,14 +1,20 @@
 <?php
 
+/**
+ * @copyright Copyright 2023, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
+declare(strict_types=1);
+
 namespace Schoolbox\Learning\Assessment\Participant;
 
 use DomainException;
 use Schoolbox\Assessment\Participant\Model as ParticipantModel;
-use Schoolbox\Assessment\Participant\Plan\Model;
 use Schoolbox\Assessment\Participant\Plan\Model as PlanModel;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentDataModel;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
@@ -18,50 +24,22 @@ class ParticipationHelper
     /**
      * @var Collection<GenericCollection>|null $existingParticipationPerUser
      */
-    private $existingParticipationPerUser;
+    private ?Collection $existingParticipationPerUser = null;
 
-    public function __construct(private DataSource $participantDataSource, private UserMapper $userMapper)
+    public function __construct(private AssessmentDataModel $assessment, private DataSource $participantDataSource, private UserMapper $userMapper)
     {
     }
 
-    /**
-     * @param GenericCollection|PlanModel[] $plans
-     * @param array                         $inclusionFlags  userId => 0 ... excluded, 1 ... included
-     * @param array                         $userPlanIndices userId => planId
-     * @throws MapperException
-     */
-    public function saveParticipationData(IAssessable $assessment, GenericCollection $plans, array $inclusionFlags, array $userPlanIndices): void
-    {
-        $participantMapper = $this->participantDataSource->getParticipantMapper();
-
-        // plans are saved; persistipation
-        foreach ($inclusionFlags as $userId => $userIncluded) {
-            /** @var ParticipantModel|null $existingParticipation */
-            $existingParticipation = $this->getExistingParticipation($assessment, $userId);
-            /** @var PlanModel $userPlan */
-            $userPlan = $plans[$userPlanIndices[$userId]];
-            if ($userIncluded) {
-                if (!$userPlan) {
-                    throw new DomainException("User {$userId} was assigned index {$userPlanIndices[$userId]}, but there's no plan with that index (valid plan indices were " . json_encode($plans->keys()) . ')');
-                }
-
-                $this->include($assessment, $userId, $userPlan);
-            } else {
-                $this->exclude($assessment, $userId, $userPlan);
-            }
-        }
-    }
     /**
      * Gets existing participations, indexed using (user id, plan id) tuples
      *
-     * @param IAssessable       $assessment
-     * @param int               $userId
+     * @param int $userId
      * @return ParticipantModel|null
      * @throws DomainException
      * @throws DefinitionException
      * @throws \PDOException
      */
-    private function getExistingParticipation(IAssessable $assessment, int $userId): ?ParticipantModel
+    private function getExistingParticipation(int $userId): ?ParticipantModel
     {
         // If haven't got participation data, get it
         if (!$this->existingParticipationPerUser) {
@@ -73,7 +51,7 @@ class ParticipationHelper
              * has a plan in a given assessment; you cannot trust the GenericCollection
              * $plans to contain the source of truth
              */
-            $planIds = $participantMapper->findAssignedPlans($assessment->getId());
+            $planIds = $participantMapper->findAssignedPlans($this->assessment->getId());
 
             /* Shank it into the same struct so we can find out which plan
              * was given to a particular user
@@ -105,27 +83,31 @@ class ParticipationHelper
     }
 
     /**
-     * @param IAssessable $assessment
-     * @param int         $userId
+     * @param int            $userId
+     * @param PlanModel|null $userPlan
      * @return void
      * @throws MapperException
      */
-    public function exclude(IAssessable $assessment, int $userId, PlanModel|null $plan = null): void
+    public function exclude(int $userId, ?PlanModel $userPlan): void
     {
         $participantMapper = $this->participantDataSource->getParticipantMapper();
         /** @var ParticipantModel|null $existingParticipation */
-        $existingParticipation = $this->getExistingParticipation($assessment, $userId);
-        /** @var PlanModel $userPlan */
-        $userPlan = $plan ?: $this->getPlans($assessment->getId())[$assessment->getId()];
+        $existingParticipation = $this->getExistingParticipation($userId);
+
+        if (!$userPlan) {
+            $userPlan = $this->getDynamicPlan();
+        }
 
         // excluded
-        if ($existingParticipation && $existingParticipation->isExcluded() && $existingParticipation->getPlan()->getId() === $userPlan->getId()) {
+        if ($existingParticipation
+            && $existingParticipation->isExcluded()
+            && $existingParticipation->getPlan()->getId() === $userPlan->getId()) {
             // nothing changed
             return;
         }
         if ($existingParticipation) {
             if (!$existingParticipation->isExcluded()) {
-                $participantMapper->softDeleteResponsesAndFeedbacks($existingParticipation);
+                $participantMapper->softDeleteResponsesAndFeedbacks($existingParticipation, $this->assessment);
             }
             $participantMapper->delete($existingParticipation);
         }
@@ -139,18 +121,19 @@ class ParticipationHelper
     }
 
     /**
-     * @param IAssessable $assessment
-     * @param int         $userId
+     * @param int            $userId
+     * @param PlanModel|null $userPlan
      * @return void
      * @throws MapperException
      */
-    public function include(IAssessable $assessment, int $userId, PlanModel|null $plan = null): void
+    public function include(int $userId, ?PlanModel $userPlan): void
     {
         $participantMapper = $this->participantDataSource->getParticipantMapper();
         /** @var ParticipantModel|null $existingParticipation */
-        $existingParticipation = $this->getExistingParticipation($assessment, $userId);
-        /** @var PlanModel $userPlan */
-        $userPlan = $plan ?: $this->getPlans($assessment->getId())[$assessment->getId()];
+        $existingParticipation = $this->getExistingParticipation($userId);
+        if (!$userPlan) {
+            $userPlan = $this->getDynamicPlan();
+        }
 
         // generate a record if there is ALREADY existing participation, OR the plan is NOT dynamic
         if (!$existingParticipation && $userPlan->isDynamic()) {
@@ -164,11 +147,10 @@ class ParticipationHelper
 
         // delete existing participation
         if ($existingParticipation) {
-            $restoredCount             = 0;
             $keepExistingParticipation = false;
 
             if ($existingParticipation->isExcluded()) {
-                $restoredCount = $participantMapper->restoreResponsesAndFeedbacks($existingParticipation);
+                $restoredCount = $participantMapper->restoreResponsesAndFeedbacks($existingParticipation, $this->assessment);
                 // if new plan is dynamic and if recovered responses and feedbacks exist, keep the participant data
                 if ($userPlan->isDynamic() && $restoredCount > 0) {
                     $existingParticipation->setExcludedAt(null);
@@ -192,16 +174,12 @@ class ParticipationHelper
     }
 
     /**
-     * @param int $assessmentId
-     * @return GenericCollection
+     * @return PlanModel
+     * @throws MapperException
      */
-    private function getPlans(int $assessmentId): GenericCollection
+    private function getDynamicPlan(): PlanModel
     {
-        $planMap = $this->participantDataSource->getPlanMapper();
-
-        // preload the plans list with the dyna-plan
-        return $planMap->findByColumnList(['assessment_id' => $assessmentId ])->indexByCallback(function (Model $model) {
-            return $model->getAssessment()->getId();
-        });
+        $planMapper = $this->participantDataSource->getPlanMapper();
+        return $planMapper->findOneByColumnList(['assessment_id' => $this->assessment->getId(), 'is_dynamic' => true]);
     }
 }

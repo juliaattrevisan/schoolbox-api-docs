@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\Translator;
 
-use Schoolbox\Api\Translator\AbstractLinks;
+use Schoolbox\API\Translator\AbstractLinks;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\User;
 
