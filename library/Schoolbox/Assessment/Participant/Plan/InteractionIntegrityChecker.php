@@ -25,7 +25,6 @@ use InvalidArgumentException;
  */
 class InteractionIntegrityChecker
 {
-
     /**
      * @var Mapper
      */
