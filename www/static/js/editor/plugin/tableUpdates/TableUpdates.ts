@@ -10,12 +10,24 @@ export default class TableUpdates extends Plugin {
      * Run when the plugin is initialized
      */
     init() {
+        this.updateSchema();
         this.addCustomClass();
         this.addDefaultProperties();
     }
 
     /**
-     * Add a custom class to all tables so we can adjust their styles
+     * Add the additional is new attribute to the schema so we can add .sb-ck-table-new on new tables only
+     * https://ckeditor.com/docs/ckeditor5/latest/api/module_engine_model_schema-Schema.html
+     * Otherwise the attributes will be stripped out when the editor is loaded
+     */
+    updateSchema() {
+        this.editor.model.schema.extend("table", {
+            allowAttributes: ["isNew"],
+        });
+    }
+
+    /**
+     * Add a custom class to newly created table so we can adjust their styles
      * in both the ckeditor and display view
      * As tables are "downcast" from the model, the "insert:table" event is fired for each
      * When this happens we ensure that we select the correct table element and add the class.
@@ -33,8 +45,9 @@ export default class TableUpdates extends Plugin {
                     const viewTable = viewElement.is("element", "table")
                         ? viewElement
                         : Array.from(viewElement.getChildren()).find((viewChild) => viewChild.is("element", "table"));
-
-                    viewWriter.addClass("sb-ck-table", viewTable);
+                    if (modelTable.hasAttribute("isNew")) {
+                        viewWriter.addClass("sb-ck-table-new", viewTable);
+                    }
                 },
                 { priority: "low" }
             );
@@ -47,7 +60,6 @@ export default class TableUpdates extends Plugin {
     addDefaultProperties() {
         const insertTableCommand = this.editor.commands.get("insertTable");
         insertTableCommand.on("execute", () => {
-            debugger;
             this.editor.execute("tableWidth", {
                 value: "100%",
             });
@@ -77,6 +89,8 @@ export default class TableUpdates extends Plugin {
                 .map((row) => Array.from(row.getChildren()).filter((cell) => cell.name === "tableCell"))
                 .flat();
             this.editor.model.change((writer) => {
+                // add the isNew attribute to the table so we can add .sb-ck-table to the table in the downcast
+                writer.setAttribute("isNew", "true", table);
                 cellElements.forEach((cell) => {
                     writer.setAttribute("tableCellBorderStyle", "solid", cell);
                     writer.setAttribute("tableCellBorderWidth", "1px", cell);
