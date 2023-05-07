@@ -4,6 +4,7 @@ import { addRelToNewTabLinks } from "@js/editor/settings/linkSettings";
 import { addFullWidthAttributes } from "@js/editor/settings/imageSettings";
 import { addFullWidthStyle, addAlignLeftStyle } from "@js/editor/settings/tableSettings";
 import { surroundUnsurroundedTokens } from "@js/editor/settings/tokensSettings";
+import { fixListedHeadings } from "@js/editor/settings/headingSettings";
 
 /**
  * Parse the content as HTML so we can run .querySelectorAll etc on it
@@ -33,7 +34,10 @@ function runChecks(sourceElement: HTMLElement, config: EditorConfig) {
     sourceElementHTML = addFullWidthAttributes(sourceElementHTML);
     sourceElementHTML = addFullWidthStyle(sourceElementHTML);
     sourceElementHTML = addAlignLeftStyle(sourceElementHTML);
-    sourceElementHTML = surroundUnsurroundedTokens(sourceElementHTML, config);
+    sourceElementHTML = fixListedHeadings(sourceElementHTML);
+    if (config.hasTokens) {
+        sourceElementHTML = surroundUnsurroundedTokens(sourceElementHTML, config);
+    }
     return sourceElementHTML;
 }
 
@@ -50,6 +54,7 @@ export function initCheckData(sourceElement: HTMLElement, config: EditorConfig) 
     if ((sourceElement as HTMLTextAreaElement).value) {
         (sourceElement as HTMLTextAreaElement).value = sourceElementHTML.innerHTML;
     }
+
     // Adds an event listener to allow pages to run the same check when they need to
     sourceElement.addEventListener(EditorEvent.EDITOR__CHECK_DATA, onEditorCheckData);
 }
@@ -67,6 +72,7 @@ function onEditorCheckData(event: CustomEvent) {
     if (editor.config.get("sbConfig").hasTokens) {
         const parser = new DOMParser();
         const sourceElementHTML = parser.parseFromString(editor.getData(), "text/html").body;
-        editor.setData(surroundUnsurroundedTokens(sourceElementHTML, editor.config.get("sbConfig")).innerHTML);
+
+        editor.setData(runChecks(sourceElementHTML, editor.config.get("sbConfig")).innerHTML);
     }
 }
