@@ -206,28 +206,6 @@ $(function () {
         this.clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(updateTopNavItems, 100);
     });
-
-    // Full screen loader overlay
-    document.addEventListener("OVERLAY_LOADER_SHOW", function (e) {
-        const existingLoader = document.querySelector("[data-loader-overlay]");
-
-        if (!existingLoader) {
-            const overlayLoaderHTML = `
-            <div data-loader-overlay class="loader-overlay">
-                <div class="preview loader"></div>
-            </div>`;
-
-            document.body.insertAdjacentHTML("beforeend", overlayLoaderHTML);
-        }
-    });
-
-    document.addEventListener("OVERLAY_LOADER_HIDE", function (e) {
-        const existingLoader = document.querySelector("[data-loader-overlay]");
-
-        if (existingLoader) {
-            existingLoader.remove();
-        }
-    });
 });
 
 /**
@@ -243,3 +221,29 @@ function humanFileSize(size, base) {
     const i = size === 0 ? 0 : Math.floor(Math.log(size) / Math.log(base));
     return (size / Math.pow(base, i)).toFixed(2) * 1 + " " + ["B", "kB", "MB", "GB", "TB"][i];
 }
+
+/**
+ * Show a loader overlay over the entire page when
+ * document.dispatchEvent(new Event("OVERLAY_LOADER_SHOW")); is called
+ */
+document.addEventListener("OVERLAY_LOADER_SHOW", function (e) {
+    const existingLoader = document.querySelector("[data-loader-overlay]");
+    if (!existingLoader) {
+        const overlayLoaderHTML = `
+        <div data-loader-overlay class="loader-overlay">
+            <div class="preview loader"></div>
+        </div>`;
+        document.body.insertAdjacentHTML("beforeend", overlayLoaderHTML);
+    }
+});
+
+/**
+ * Hide the entire page loader when
+ * document.dispatchEvent(new Event("OVERLAY_LOADER_HIDE")); is called
+ */
+document.addEventListener("OVERLAY_LOADER_HIDE", function (e) {
+    const existingLoader = document.querySelector("[data-loader-overlay]");
+    if (existingLoader) {
+        existingLoader.remove();
+    }
+});
