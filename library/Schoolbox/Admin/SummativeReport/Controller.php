@@ -1022,9 +1022,9 @@ class Controller extends ConfigController
                 $gradientEnable,
                 $this->assessmentMapperProxy,
                 $assessments,
-                $this->getUser(),
+                $viewer,
                 $term,
-            ))->collate($viewer);
+            ))->collate($student);
         } else {
             $graphType = 'class';
             $graph = $gradeHelper->buildGraph($filteredMarkbook, $student, $viewer, $gradientEnable);
