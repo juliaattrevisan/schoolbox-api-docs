@@ -15,7 +15,6 @@ use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Monolog\Logger;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
@@ -129,11 +128,7 @@ class Notifier extends AbstractModuleNotifier
 
         // Get hydrated pastoral record
         try {
-            $pastoral = $this->mapper->findById($model->getId());
-            $student  = $this->userMapper->findById($pastoral->getStudent()->getId());
-            $this->externalUser->loadParents([$student]);
-            $this->externalUser->loadTeachers([$student]);
-            $pastoral->setStudent($student);
+            $pastoral = $this->hydrate($model);
         } catch (MapperException $e) {
             $this->log->error("Error: Unable to send pastoral comment {$method} notification. {$e->getMessage()}", ['exception' => $e]);
             return $envelope;
@@ -141,7 +136,7 @@ class Notifier extends AbstractModuleNotifier
 
         // Get the kids teachers
         // Create the message
-        $href     = "/pastoral/student/{$pastoral->getStudent()->getId()}/record/{$pastoral->getId()}";
+        $href     = NotifierHelper::getRecordHref($pastoral, null);
         $severity = $pastoral->getSeverity()
             ? sprintf('%s %s', strtolower($pastoral->getSeverity()->getName()), $this->l10n->translate('severity'))
             : '';
@@ -175,11 +170,11 @@ class Notifier extends AbstractModuleNotifier
 
         /** @var Collection|PastoralAccess[] $accessRecords */
         $accessRecords = $this->pastoralAccessMapper->findByColumn("pastoral_id", $pastoral->getId());
-        $targetUsers   = (new NotifierHelper($this->userMapper, $this->pastoralGroupMapper, $this->log))
+        $targetUsers   = (new NotifierHelper($this->userMapper, $this->pastoralGroupMapper, $this->accessLevelCensor, $this->log))
             ->buildTargetUsers(
                 $accessRecords,
                 $privateChangeOnly,
-                $student,
+                $pastoral->getStudent(),
                 $parentAccessEnabled,
                 $studentAccessEnabled,
                 'pastoral',
@@ -266,23 +261,14 @@ class Notifier extends AbstractModuleNotifier
 
         // Get hydrated pastoral record
         try {
-            $pastoral = $this->mapper->findById($model->getId());
-            $student  = $this->userMapper->findById($pastoral->getStudent()->getId());
-            /* Load relationships into $student,
-             * for `\Schoolbox\Pastoral\NotifierHelper::buildTargetUsersForRole`
-             * which is called by `\Schoolbox\Pastoral\NotifierHelper::buildTargetUsers`
-             * as that requires these to be loaded for `$student->getParents()` and `$student->getTeacherCollection()`
-             */
-            $this->externalUser->loadParents([$student]);
-            $this->externalUser->loadTeachers([$student]);
-            $pastoral->setStudent($student);
+            $pastoral = $this->hydrate($model);
         } catch (MapperException $e) {
             $this->log->error("Error: Unable to send pastoral addedToReport notification. {$e->getMessage()}", ['exception' => $e]);
             return $envelope;
         }
 
         // Create the message
-        $recordHref   = sprintf("/pastoral/student/%s/record/%s", $pastoral->getStudent()->getId(), $pastoral->getId());
+        $recordHref   = NotifierHelper::getRecordHref($pastoral, null);
         $recordName   = $this->l10n->translate('pastoral') . ' record';
         $messageTitle = "A new :record has been added to :report";
 
@@ -292,7 +278,7 @@ class Notifier extends AbstractModuleNotifier
 
         /** @var Report $report */
         foreach ($reports as $report) {
-            $reportHref = sprintf("/pastoral/report/results/%d", $report->getId());
+            $reportHref = NotifierHelper::getReportHref($report);
             $builder    = new Builder();
             $builder->setTitle($messageTitle)
                     ->setParam('record', new Param($recordName, $recordHref, ParameterInterface::STACKING_REPLACE))
@@ -305,7 +291,8 @@ class Notifier extends AbstractModuleNotifier
                     ->addTopic(sprintf("pastoral.%s.%s.%s", $pastoral->getId(), $report->getId(), self::TRIGGER_ADDED_TO_REPORT));
 
             $message     = $builder->build();
-            $targetUsers = $this->findUsersForRecordAndReport($pastoral, $report);
+            $targetUsers = (new NotifierHelper($this->userMapper, $this->pastoralGroupMapper, $this->accessLevelCensor, $this->log))
+                ->findUsersForRecordAndReport($pastoral, $report, PastoralAccessMapper::ACCESS_PUBLIC);
             foreach ($targetUsers as $userId => $user) {
                 $envelope->targetToUser($userId, $message);
             }
@@ -410,46 +397,22 @@ class Notifier extends AbstractModuleNotifier
     }
 
     /**
-     * @param Model  $pastoral
-     * @param Report $report
-     * @return GenericCollection
+     * @param Model $model
+     * @return object|Model
+     * @throws MapperException
      */
-    private function findUsersForRecordAndReport(Model $pastoral, Report $report): GenericCollection
+    protected function hydrate($model)
     {
-        $targetUsers = $this->userMapper->createCollection();
-        // target users are the report owner and report members
-        $reportUserIds   = $report->getUserIds(\Schoolbox\Pastoral\Report\Access\Model::READ);
-        $reportUserIds[] = $report->getOwner()->getId();
-        // check access for this pastoral record for each of the users, and add to targetUsers
-        foreach ($reportUserIds as $reportUserId) {
-            // if already exists, continue
-            if ($targetUsers->offsetExists($reportUserId)) {
-                continue;
-            }
-            // if owner of the record, add the user to target
-            if ($pastoral->getOwner()->getId() === $reportUserId) {
-                $targetUsers->offsetSet($pastoral->getOwner()->getId(), $pastoral->getOwner());
-                continue;
-            }
-            try {
-                $reportUser = $this->userMapper->findById($reportUserId);
-            } catch (MapperException $e) {
-                continue;
-            }
-            // if the user is moderator and the report is not limited to involved, add the user
-            if ($this->accessLevelCensor->isPastoralModerator($reportUser) && !$report->getInvolved()) {
-                $targetUsers->offsetSet($reportUser->getId(), $reportUser);
-                continue;
-            }
-            // check role and permission
-            if (!$reportUser->getRole()->getAccessPastoral() || !$reportUser->getRole()->isStaff()) {
-                continue;
-            }
-            // check actual access level
-            if ($this->accessLevelCensor->getRawAccessLevel($pastoral, $reportUser) > PastoralAccessMapper::ACCESS_DENY) {
-                $targetUsers->offsetSet($reportUser->getId(), $reportUser);
-            }
-        }
-        return $targetUsers;
+        $pastoral = $this->mapper->findById($model->getId());
+        $student  = $this->userMapper->findById($pastoral->getStudent()->getId());
+        /* Load relationships into $student,
+         * for `\Schoolbox\Pastoral\NotifierHelper::buildTargetUsersForRole`
+         * which is called by `\Schoolbox\Pastoral\NotifierHelper::buildTargetUsers`
+         * as that requires these to be loaded for `$student->getParents()` and `$student->getTeacherCollection()`
+         */
+        $this->externalUser->loadParents([$student]);
+        $this->externalUser->loadTeachers([$student]);
+        $pastoral->setStudent($student);
+        return $pastoral;
     }
 }

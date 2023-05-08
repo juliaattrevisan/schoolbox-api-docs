@@ -10,12 +10,15 @@ declare(strict_types=1);
 namespace Schoolbox\Pastoral;
 
 use Psr\Log\LoggerInterface;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Access\Model as PastoralAccess;
+use Schoolbox\Pastoral\Comment\Model as Comment;
 use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
 use Schoolbox\Pastoral\Group\Member\Model as PastoralGroupMember;
 use Schoolbox\Pastoral\Group\Model as PastoralGroup;
+use Schoolbox\Pastoral\Report\Model as Report;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -26,12 +29,6 @@ use Schoolbox\UserMapper;
  */
 class NotifierHelper
 {
-    private UserMapper $userMapper;
-
-    private PastoralGroupMapper $pastoralGroupMapper;
-
-    private LoggerInterface $log;
-
     /**
      * Constructor
      *
@@ -40,13 +37,34 @@ class NotifierHelper
      * @param LoggerInterface     $log
      */
     public function __construct(
-        UserMapper $userMapper,
-        PastoralGroupMapper $pastoralGroupMapper,
-        LoggerInterface $log
+        private UserMapper $userMapper,
+        private PastoralGroupMapper $pastoralGroupMapper,
+        private AccessLevelCensor $accessLevelCensor,
+        private LoggerInterface $log
     ) {
-        $this->userMapper          = $userMapper;
-        $this->pastoralGroupMapper = $pastoralGroupMapper;
-        $this->log                 = $log;
+    }
+
+    /**
+     * @param Model        $pastoral
+     * @param Comment|null $comment
+     * @return string
+     */
+    public static function getRecordHref(Model $pastoral, ?Comment $comment): string
+    {
+        $recordHref = sprintf("/pastoral/student/%s/record/%s", $pastoral->getStudent()->getId(), $pastoral->getId());
+        if ($comment) {
+            $recordHref .= '#' . $comment->getPanel();
+        }
+        return $recordHref;
+    }
+
+    /**
+     * @param Report $report
+     * @return string
+     */
+    public static function getReportHref(Report $report): string
+    {
+        return sprintf("/pastoral/report/results/%d", $report->getId());
     }
 
     /**
@@ -285,6 +303,51 @@ class NotifierHelper
             || ($user->getRole()->isStudent() && $studentAccessEnabled)
         ) {
             $targetUsers[$userId] = $user;
+        }
+        return $targetUsers;
+    }
+
+    /**
+     * @param Model  $pastoral
+     * @param Report $report
+     * @param int<1,2> $accessLevel least required level
+     * @return GenericCollection
+     */
+    public function findUsersForRecordAndReport(Model $pastoral, Report $report, int $accessLevel): GenericCollection
+    {
+        $targetUsers = $this->userMapper->createCollection();
+        // target users are the report owner and report members
+        $reportUserIds   = $report->getUserIds(\Schoolbox\Pastoral\Report\Access\Model::READ);
+        $reportUserIds[] = $report->getOwner()->getId();
+        // check access for this pastoral record for each of the users, and add to targetUsers
+        foreach ($reportUserIds as $reportUserId) {
+            // if already exists, continue
+            if ($targetUsers->offsetExists($reportUserId)) {
+                continue;
+            }
+            // if owner of the record, add the user to target
+            if ($pastoral->getOwner()->getId() === $reportUserId) {
+                $targetUsers->offsetSet($pastoral->getOwner()->getId(), $pastoral->getOwner());
+                continue;
+            }
+            try {
+                $reportUser = $this->userMapper->findById($reportUserId);
+            } catch (MapperException $e) {
+                continue;
+            }
+            // if the user is moderator and the report is not limited to involved, add the user
+            if ($this->accessLevelCensor->isPastoralModerator($reportUser) && !$report->getInvolved()) {
+                $targetUsers->offsetSet($reportUser->getId(), $reportUser);
+                continue;
+            }
+            // check role and permission
+            if (!$reportUser->getRole()->getAccessPastoral() || !$reportUser->getRole()->isStaff()) {
+                continue;
+            }
+            // check actual access level
+            if ($this->accessLevelCensor->getRawAccessLevel($pastoral, $reportUser) >= $accessLevel) {
+                $targetUsers->offsetSet($reportUser->getId(), $reportUser);
+            }
         }
         return $targetUsers;
     }
