@@ -7,9 +7,11 @@
 
 namespace Helper;
 
+use Alaress\Module\Cache\Rebuilder;
 use Codeception\Exception\ModuleException;
 use Codeception\Module\Db;
 use Codeception\TestInterface;
+use Psr\Log\NullLogger;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\Application\CliTool\Kernel;
 use Schoolbox\Assessment\Component\SubmissionBox;
@@ -18,6 +20,7 @@ use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Curriculum\Node\Model as Node;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
@@ -116,6 +119,12 @@ class Api extends \Codeception\Module
             $app,
             [Kernel::OPTION_ERRORS => E_ALL]
         );
+        /** @var Rebuilder $cacheBuilder */
+        $cacheBuilder = $this->cliKernel->get('moduleCache.rebuilder');
+        $cacheBuilder
+            ->setLogger(new NullLogger())
+            ->rebuild($this->cliKernel->get('config')->get(ConfigMapper::NAME_SITE_SCHOOL_CODE));
+
         $this->userMapper   = UserMapper::getInstance();
         $this->folderMapper = FolderMapper::getInstance();
         $this->roleMapper   = RoleMapper::getInstance();
