@@ -261,33 +261,33 @@ class Queue extends ResourceVideo
         // Setup
         // ------------------------------------------------------------------------------------------------------------
 
-        $filenameSource                     = $this->getLocalFilename($this->getStorage());
-        $filenameTranscodeVideo             = $this->getTempFilename($this->getStorage()->getHash(), "mp4");
-        $filenameTranscodeThumbnail         = $this->getTempFilename($this->getStorage()->getHash() . '-thumbnail', "jpg");
-        $filenameTranscodePoster            = $this->getTempFilename($this->getStorage()->getHash() . '-poster', "jpg");
-        $filenameTranscodePosterLetterboxed = $this->getTempFilename($this->getStorage()->getHash() . '-poster_letterboxed', "jpg");
+        $filenameSource                   = $this->getLocalFilename($this->getStorage());
+        $filenameTranscodeVideo           = $this->getTempFilename($this->getStorage()->getHash(), "mp4");
+        $filenameTranscodeThumbnail       = $this->getTempFilename($this->getStorage()->getHash() . '-thumbnail', "jpg");
+        $filenameTranscodePoster          = $this->getTempFilename($this->getStorage()->getHash() . '-poster', "jpg");
+        $filenameTranscodePosterLetterbox = $this->getTempFilename($this->getStorage()->getHash() . '-poster_letterbox', "jpg");
 
         // Remember all the temporary files we create so when we error out or finish we can unlink them
 
         $this->temporaryFiles[] = $filenameTranscodeVideo;
         $this->temporaryFiles[] = $filenameTranscodeThumbnail;
         $this->temporaryFiles[] = $filenameTranscodePoster;
-        $this->temporaryFiles[] = $filenameTranscodePosterLetterboxed;
+        $this->temporaryFiles[] = $filenameTranscodePosterLetterbox;
 
         // Get parameters
 
         $cpus = (int)shell_exec('nproc');
-        $commandMediaInformation                   = $this->getCommandMediaInformation();
-        $commandTranscode                          = $this->getCommandTranscode();
-        $strictMode                                = " -strict -2 ";
-        $videoBitrateEscaped                       = escapeshellarg("{$this->videoBitrate}k");
-        $audioBitrateEscaped                       = escapeshellarg("{$this->audioBitrate}k");
-        $processTimeoutEscaped                     = escapeshellarg($this->processTimeout * $cpus);
-        $filenameTranscodeVideoEscaped             = escapeshellarg($filenameTranscodeVideo);
-        $filenameTranscodeThumbnailEscaped         = escapeshellarg($filenameTranscodeThumbnail);
-        $filenameTranscodePosterEscaped            = escapeshellarg($filenameTranscodePoster);
-        $filenameTranscodePosterLetterboxedEscaped = escapeshellarg($filenameTranscodePosterLetterboxed);
-        $filenameSourceEscaped                     = escapeshellarg($filenameSource);
+        $commandMediaInformation                 = $this->getCommandMediaInformation();
+        $commandTranscode                        = $this->getCommandTranscode();
+        $strictMode                              = " -strict -2 ";
+        $videoBitrateEscaped                     = escapeshellarg("{$this->videoBitrate}k");
+        $audioBitrateEscaped                     = escapeshellarg("{$this->audioBitrate}k");
+        $processTimeoutEscaped                   = escapeshellarg($this->processTimeout * $cpus);
+        $filenameTranscodeVideoEscaped           = escapeshellarg($filenameTranscodeVideo);
+        $filenameTranscodeThumbnailEscaped       = escapeshellarg($filenameTranscodeThumbnail);
+        $filenameTranscodePosterEscaped          = escapeshellarg($filenameTranscodePoster);
+        $filenameTranscodePosterLetterboxEscaped = escapeshellarg($filenameTranscodePosterLetterbox);
+        $filenameSourceEscaped                   = escapeshellarg($filenameSource);
 
         // ------------------------------------------------------------------------------------------------------------
         // Get video metadata
@@ -398,9 +398,9 @@ class Queue extends ResourceVideo
             $this->uploadPreviewImage($filesystem, $filenameTranscodePoster, $this->getPosterPath());
 
 
-            // Create poster (letterboxed)
+            // Create poster (letterbox)
 
-            $posterLetterboxedCommandline =
+            $posterLetterboxCommandline =
                 "nice {$commandTranscode} " .
                 ' -y' .
                 ' -nostats' .
@@ -408,21 +408,21 @@ class Queue extends ResourceVideo
                 " -i {$filenameSourceEscaped}" .
                 ' -max_muxing_queue_size 1024' .
                 ' -f image2 ' .
-                " -ss {$thumbnailSecondsEscaped}" . // TODO: This should be $posterLetterboxedSecondsEscaped.
+                " -ss {$thumbnailSecondsEscaped}" . // TODO: This should be $posterLetterboxSecondsEscaped.
                 ' -vf "scale=640:360:force_original_aspect_ratio=decrease,pad=640:360:-1:-1:color=black"' .
                 ' -frames:v 1' .
-                " {$filenameTranscodePosterLetterboxedEscaped}" .
+                " {$filenameTranscodePosterLetterboxEscaped}" .
                 ' 2>&1';
 
-            $this->executeCommand($posterLetterboxedCommandline);
-            $this->log("Video poster (letterboxed) generated");
+            $this->executeCommand($posterLetterboxCommandline);
+            $this->log("Video poster (letterbox) generated");
 
-            // Upload poster (letterboxed) to storage
+            // Upload poster (letterbox) to storage
 
-            $this->log("Uploading video poster (letterboxed)");
-            $this->uploadPreviewImage($filesystem, $filenameTranscodePosterLetterboxed, $this->getPosterLetterboxPath());
+            $this->log("Uploading video poster (letterbox)");
+            $this->uploadPreviewImage($filesystem, $filenameTranscodePosterLetterbox, $this->getPosterLetterboxPath());
         } else {
-            $this->log("Skipping thumbnail and poster and poster (letterboxed) generation");
+            $this->log("Skipping thumbnail and poster and poster (letterbox) generation");
         }
 
         return true;
