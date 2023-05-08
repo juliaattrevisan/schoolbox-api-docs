@@ -12,10 +12,5 @@ class Installer extends Package\BaseBadges
     /**
      * @inheritdoc
      */
-    protected array $requiredPackages = ['AusGeneralCapabilities'];
-
-    /**
-     * @inheritdoc
-     */
     protected string $sourceFile = __DIR__ . '/badge.csv';
 }
