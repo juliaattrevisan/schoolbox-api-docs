@@ -246,6 +246,7 @@ export default {
                     document.dispatchEvent(
                         new CustomEvent(EditorEvent.EDITOR__CREATE, {
                             detail: {
+                                maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
                                 targetElements: [`#${this.id}`],
                                 fileBrowserCategoryId: self.folderId,
                             },
