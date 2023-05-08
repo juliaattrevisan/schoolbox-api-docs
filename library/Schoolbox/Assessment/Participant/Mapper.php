@@ -13,8 +13,6 @@ use PDOStatement;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\Task\CompletionMapper;
-use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
-use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\LTI\Assessment\Model as LTIAssessment;
 use Schoolbox\GenericCollection;
@@ -108,6 +106,10 @@ class Mapper extends BaseMapper
      */
     public function softDeleteResponsesAndFeedbacks(Model $participant, \Schoolbox\Learning\Assessment\DataModel\Model $assessment): void
     {
+        if ($participant->getPlan()->getAssessment()->getId() !== $assessment->getId()) {
+            // should not happen
+            return;
+        }
         if ($assessment->getDueWork() instanceof SubmissionBox) {
             // delete submission return
             $returnMapper = SubmissionBox\ReturnedWorkMapper::getInstance();
@@ -165,6 +167,10 @@ class Mapper extends BaseMapper
      */
     public function restoreResponsesAndFeedbacks(Model $participant, \Schoolbox\Learning\Assessment\DataModel\Model $assessment): int
     {
+        if ($participant->getPlan()->getAssessment()->getId() !== $assessment->getId()) {
+            // should not happen
+            return 0;
+        }
         $excludedAt = $participant->getExcludedAt();
 
         if ($assessment->getDueWork() instanceof SubmissionBox) {

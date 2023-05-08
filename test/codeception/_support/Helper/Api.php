@@ -129,7 +129,7 @@ class Api extends \Codeception\Module
         $this->folderMapper = FolderMapper::getInstance();
         $this->roleMapper   = RoleMapper::getInstance();
         try {
-            $classFolder = $this->folderMapper->findByCode('DEMO1');
+            $classFolder = $this->folderMapper->findByCode('DEMO2');
         } catch (\Exception $e) {
             $classFolder = $this->folderMapper->findByCode('9ENGA');
         }
