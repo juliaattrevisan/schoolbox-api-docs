@@ -10,6 +10,7 @@ export function removeParagraphsInLists(sourceElementHTML: HTMLElement): HTMLEle
     listItems.forEach((listItem) => {
         if (listItem.querySelector("p")) {
             const paragraphs = listItem.getElementsByTagName("p");
+            // first insert a <br> tag after each <p> tag
             for (let i = 0; i < paragraphs.length; i += 1) {
                 const p = paragraphs[i];
                 if (i < paragraphs.length - 1) {
@@ -17,6 +18,7 @@ export function removeParagraphsInLists(sourceElementHTML: HTMLElement): HTMLEle
                     listItem.insertBefore(br, p.nextSibling);
                 }
             }
+            // then strip the <p> tags
             for (let i = paragraphs.length - 1; i >= 0; i -= 1) {
                 const p = paragraphs[i];
                 while (p.firstChild) {
