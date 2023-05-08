@@ -120,7 +120,7 @@ class Api extends \Codeception\Module
         $this->folderMapper = FolderMapper::getInstance();
         $this->roleMapper   = RoleMapper::getInstance();
         try {
-            $classFolder = $this->folderMapper->findByCode('DEMO1');
+            $classFolder = $this->folderMapper->findByCode('DEMO2');
         } catch (\Exception $e) {
             $classFolder = $this->folderMapper->findByCode('9ENGA');
         }
@@ -661,5 +661,25 @@ class Api extends \Codeception\Module
     public function getMaxValue(string $tableName, string $column): mixed
     {
         return $this->getDbModule()->grabFromDatabase($tableName, "max($column)");
+    }
+
+    /**
+     * @return IAssessable|null
+     * @throws ModuleException
+     */
+    public function getExistingAssessment(): ?IAssessable
+    {
+        $db            = $this->getDbModule();
+        $assessmentIds = $db->grabColumnFromDatabase('submission_box', 'assessment_id', []);
+        foreach ($assessmentIds as $assessmentId) {
+            try {
+                $assessment = $this->assessmentDataSource->findById($assessmentId);
+                if ($assessment->getContext()->isImplementationContext()) {
+                    return $assessment;
+                }
+            } catch (MapperException $e) {
+            }
+        }
+        return null;
     }
 }

@@ -101,12 +101,15 @@ class Mapper extends BaseMapper
     /**
      * Soft deletes all responses and feedbacks for the specified participant
      *
-     * @param Model $participant
+     * @param Model                                          $participant
+     * @param \Schoolbox\Learning\Assessment\DataModel\Model $assessment
      */
-    public function softDeleteResponsesAndFeedbacks(Model $participant): void
+    public function softDeleteResponsesAndFeedbacks(Model $participant, \Schoolbox\Learning\Assessment\DataModel\Model $assessment): void
     {
-        $assessment = $participant->getPlan()->getAssessment();
-
+        if ($participant->getPlan()->getAssessment()->getId() !== $assessment->getId()) {
+            // should not happen
+            return;
+        }
         if ($assessment->getDueWork() instanceof SubmissionBox) {
             // delete submission return
             $returnMapper = SubmissionBox\ReturnedWorkMapper::getInstance();
@@ -158,12 +161,16 @@ class Mapper extends BaseMapper
 
     /**
      * Restore soft-deleted responses and feedbacks
-     * @param Model $participant
+     * @param Model                                          $participant
+     * @param \Schoolbox\Learning\Assessment\DataModel\Model $assessment
      * @return int a count of restored data
      */
-    public function restoreResponsesAndFeedbacks(Model $participant): int
+    public function restoreResponsesAndFeedbacks(Model $participant, \Schoolbox\Learning\Assessment\DataModel\Model $assessment): int
     {
-        $assessment = $participant->getPlan()->getAssessment();
+        if ($participant->getPlan()->getAssessment()->getId() !== $assessment->getId()) {
+            // should not happen
+            return 0;
+        }
         $excludedAt = $participant->getExcludedAt();
 
         if ($assessment->getDueWork() instanceof SubmissionBox) {

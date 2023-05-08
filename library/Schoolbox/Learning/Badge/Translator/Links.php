@@ -11,7 +11,7 @@ namespace Schoolbox\Learning\Badge\Translator;
 
 use Alaress\Authorizer\Authorizer;
 use Aura\Router\Router;
-use Schoolbox\Api\Translator\AbstractLinks;
+use Schoolbox\API\Translator\AbstractLinks;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Learning\Badge;
 use Schoolbox\User;

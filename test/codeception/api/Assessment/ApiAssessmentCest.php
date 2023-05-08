@@ -7,9 +7,10 @@
 
 declare(strict_types=1);
 
-namespace API;
+namespace Test\Api;
 
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use ApiTester;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 
@@ -21,49 +22,58 @@ class ApiAssessmentCest
 {
     private Folder $folder;
 
-    private DueWork $dueWork;
+    private IAssessable $dueWork;
 
-    public function _before(\ApiTester $i)
+    public function _before(ApiTester $i)
     {
-        $this->folder = $i->getFolder();
-        $this->dueWork = $i->createDueWork($this->folder, 10);
+        // rely on an existing assessment for now
+        $this->dueWork = $i->getExistingAssessment();
+        $this->folder = $this->dueWork->getBaseContext()->getFolder();
     }
 
+    /**
+     * @param ApiTester $i
+     * @return void
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    public function run(ApiTester $i)
+    {
+        $users = $i->getUsers();
+        /** @var User $user */
+        foreach ($users as $user) {
+            $this->testGet($i, $user);
+        }
+    }
 
     /**
      * Get a list of assessments
-     * @param \ApiTester $i
+     * @param ApiTester $i
+     * @param User      $user
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    public function testGet(\ApiTester $i)
+    private function testGet(ApiTester $i, User $user)
     {
-        $users = $i->getUsers();
-
-
-        /** @var User $user */
-        foreach ($users as $user) {
-            $i->switchUser($user);
-
-            foreach ($this->filterData() as $filterData) {
-                $data = [
-                    'filter' => json_encode($filterData['filter']),
-                    'limit' => 7
-                ];
-                $i->sendGet('/api/assessment', $data);
-                if ($user->isSuperuser()) {
-                    if ($filterData['valid']) {
-                        $i->seeResponseCodeIs(200);
-                    } else {
-                        $i->seeResponseCodeIs(400);
-                        $i->comment(implode('', $i->grabDataFromResponseByJsonPath('$.title')));
-                        continue;
-                    }
-                    $dataCount = count($i->grabDataFromResponseByJsonPath('$.data')[0]);
-                    $i->comment("{$dataCount} retrieved.");
-                    $count = $i->grabDataFromResponseByJsonPath('$.metadata.count');
-                    $i->comment("{$count[0]} found.");
+        $i->switchUser($user);
+        foreach ($this->filterData() as $filterData) {
+            $data = [
+                'filter' => json_encode($filterData['filter']),
+                'limit'  => 7,
+            ];
+            $i->sendGet('/api/assessment', $data);
+            if ($user->isSuperuser()) {
+                if ($filterData['valid']) {
+                    $i->seeResponseCodeIs(200);
                 } else {
-                    $i->seeResponseCodeIs(401);
+                    $i->seeResponseCodeIs(400);
+                    $i->comment(implode('', $i->grabDataFromResponseByJsonPath('$.title')));
+                    continue;
                 }
+                $dataCount = count($i->grabDataFromResponseByJsonPath('$.data')[0]);
+                $i->comment("{$dataCount} retrieved.");
+                $count = $i->grabDataFromResponseByJsonPath('$.metadata.count');
+                $i->comment("{$count[0]} found.");
+            } else {
+                $i->seeResponseCodeIs(401);
             }
         }
     }

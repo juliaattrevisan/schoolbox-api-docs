@@ -128,18 +128,25 @@ class ResultCache
     {
         $participant = $project->getParticipantIfExtant($user);
 
-        /* No participant? No trabajo
-         */
-        if (null === $participant) {
-            return null;
-        }
-
         /* See if an existing record exists for this (project, user) tuple
          *
          * If there is, update it with the new values
          * Otherwise, spawn a new record for them
          */
-        $model = $this->retrieve($project, $participant->getUser());
+        $model = $this->retrieve($project, $user);
+
+        /* No participant? No trabajo
+         */
+        if (null === $participant && null === $model) {
+            return null;
+        }
+
+        /* Delete cache, if exists for no participant user
+         */
+        if (null === $participant) {
+            $this->mapper->delete($model);
+            return null;
+        }
 
         if (null === $model) {
             $model = $this->mapper->createModel()
@@ -244,11 +251,7 @@ class ResultCache
              * If $student is not a participant, or deleted, etc.
              * just exit without doing anything
              */
-            $participant = $project->getParticipantIfExtant($student);
-
-            if ($participant) {
-                $this->persist($project, $participant->getUser(), null);
-            }
+            $this->persist($project, $student, null);
         } else {
             /* Update everyone associated with this assessment
              */
