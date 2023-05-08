@@ -199,7 +199,7 @@
 
                 publishFeedback(this);
             });
-            $(':input[name="resubmissionRequired"]').on('change', function (e) {
+            $(config.assessmentList).on('change', ':input[name="resubmissionRequired"]', function (e) {
               e.preventDefault();
               publishFeedback(this);
             });
