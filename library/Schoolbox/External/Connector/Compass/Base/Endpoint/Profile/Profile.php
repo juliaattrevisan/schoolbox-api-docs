@@ -192,14 +192,6 @@ class Profile implements IStrategy
 
 
     /**
-     * A list of portrait urls, because compass falls apart
-     *
-     * @var array
-     */
-    private array $urls = [];
-
-
-    /**
      * Profile constructor.
      *
      * @param ValidStrats                     $validStrats
@@ -289,13 +281,6 @@ class Profile implements IStrategy
 
             $this->importStaff();
         }
-
-//        $this->log->info('Accessing portrait urls directly');
-//
-//        foreach ($this->urls as $url) {
-//            $this->log->info($url);
-//            file_get_contents($url);
-//        }
     }
 
 
@@ -1254,8 +1239,6 @@ class Profile implements IStrategy
 
             return;
         }
-
-        $this->urls[] = $url;
 
         /* Fetch data from the url specified
          */
