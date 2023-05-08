@@ -246,6 +246,7 @@ export default {
                     document.dispatchEvent(
                         new CustomEvent(EditorEvent.EDITOR__CREATE, {
                             detail: {
+                                maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
                                 targetElements: [`#${this.id}`],
                                 fileBrowserCategoryId: self.folderId,
                             },
@@ -449,7 +450,7 @@ export default {
                         <li v-if="usage.deleted !== true" :key="index">
                             <div class="actions-small-1">
                                 <div
-                                    :class="{ expander: true, 'icon-up-arrow': Boolean(usage.textbox.id) }"
+                                    :class="{ expander: true, 'icon-up-arrow': !Boolean(usage.textbox.id) }"
                                     :data-collapser="'collapser-textbox-' + String(index)"
                                 ></div>
                                 <div class="list-item">
