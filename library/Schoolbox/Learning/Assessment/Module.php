@@ -964,7 +964,11 @@ class Module extends BaseModule
     /**
      * To view a summary page requires:
      * - assessment not soft-deleted
-     * - current user is staff|instructor or can see participation,
+     * - current user can view the assessment
+     * - either:
+     *   - the current user is an instructor, and viewing their own summary, or:
+     *   - the current user may see the participation of the student who is the
+     *     subject of the summary
      *
      * @return Rule\IAuthorizationRule
      * @throws InvalidArgumentException If required route param not found
@@ -976,14 +980,15 @@ class Module extends BaseModule
             new AssessmentNotDeleted(),
             new CanViewAssessable(new Visibility($this->getAccess())),
             new Rule\Any(
-                // Instructor/staff viewing assessment details, on their own summary page
+                // Instructor/staff viewing their own summary page
                 new Rule\All(
                     $this->buildAuthRuleHasInstructorAccess(),
                     new Rule\IsUser('studentId')
                 ),
-                //check second, if the viewing user is admin, and the student is excluded, both this and the above rule fail.
-                //but we want to see the nice response from this one "User {studentID} is excluded from this assessment"
-                // Normal participants (whether explicit or dynamic participants)
+                // Normal participants (whether explicit or dynamic):
+                // Check after instructor check, so that the summary can show a
+                // polite "User {studentID} is excluded from this assessment"
+                // message.
                 new CanSeeParticipation($this->getAccess(), $this->getConfig()->get('restrict_student_submissions'))
             )
         );

@@ -32,6 +32,7 @@ use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseMapperProxy;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Authorizer\Rule\AssessmentNotDeleted;
+use Schoolbox\Learning\Authorizer\Rule\CanSeeParticipation;
 use Schoolbox\Learning\Authorizer\Rule\CanViewAssessable;
 use Schoolbox\Learning\Authorizer\Rule\ParentCanViewFeedback;
 use Schoolbox\Learning\Authorizer\Rule\StudentCanViewFeedback;
@@ -154,14 +155,15 @@ class Module extends BaseModule
 
         // This rule is a simplified version of the rule from
         // `\Schoolbox\Learning\Assessment\Module::buildAuthRuleCanViewSummary`,
-        // without its special cases for:
-        // * staff viewing their own summary page (SA-5769)
-        // * excluded students (SA-13045)
-        // Both these cases are irrelevant, as they won't have response files.
+        // without its special case for staff viewing their own summary page
+        // (SA-5769): this case is irrelevant, as staff won't have a response
+        // to view files for.
+        $access                = $this->getMapperFactory()->get(Access::class);
         $hasResponseFileAccess = new Rule\All(
             new Rule\IsLoggedIn(),
             new AssessmentNotDeleted(),
-            new CanViewAssessable(new Visibility($this->getMapperFactory()->get(Access::class))),
+            new CanViewAssessable(new Visibility($access)),
+            new CanSeeParticipation($access, $this->getConfig()->get('restrict_student_submissions')),
         );
         $preloadResponseFile   = fn (array $params) => $this->preloadResponseFile($params);
 
