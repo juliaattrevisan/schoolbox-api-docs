@@ -1,0 +1,29 @@
+/**
+ *  The main purpose of this file is to wrap up all of the rules that may
+ *  apply when viewing content created from CKEditor - the reason this file
+ *  specifically exists though is because we have some areas (such as PDF
+ *  exports from Gotenberg) that don't naturally pull across these styles,
+ *  meaning that the content looks weird when it's exported from Schoolbox
+ *
+ *  Encapsulating it all within a single .css file means we...
+ *  a) can add these styles inside the relevant files in a single line
+ *  b) don't need to copy paste / duplicate our code, so we...
+ *  c) have a much easier time when updating / maintaining the classes
+**/
+
+$cdn-prefix: "../../";
+@import "www/static/css/core/base/_colors";
+@import "www/static/css/core/base/font-faces";
+@import "www/static/css/core/base/_variables";
+@import "www/static/css/core/base/mixins";
+@import "www/static/css/core/base/functions";
+@import "www/static/css/core/base/settings";
+@import "www/static/css/core/base/global";
+@import "www/static/css/core/base/typography";
+
+/**
+ * The parts that are actually relevant to having our styles displayed.
+**/
+@import "www/static/css/core/ui/icons";
+@import "www/static/css/core/ui/blockquote";
+@import "www/static/css/core/components/editor/custom-styles";

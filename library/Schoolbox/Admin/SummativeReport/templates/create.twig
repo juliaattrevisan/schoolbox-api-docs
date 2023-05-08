@@ -18,8 +18,16 @@
          */
         document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
             detail: {
-                targetElements: ['#report-introduction']
-            }
+                targetElements: ['#report-introduction'],
+                removeFromToolbar: [
+                    'subscript',
+                    'superscript',
+                    'style',
+                    'mediaEmbed',
+                    'emoji',
+                    'eqneditor5Button'
+                ]
+            },
         }));
 
         $('#summative-report-form').alaressValidate({

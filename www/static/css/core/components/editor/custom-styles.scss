@@ -25,6 +25,22 @@
  *  Basically replicate the CKEditor styles over to our own content;
 **/
 article {
+    /**
+     *  If the last element within an article is a floating element, it will break out
+     *  of the article and not be cleared by elements beneath it. This pseudo element
+     *  fixes this by adding a clear:both; beneath it in article.
+     *
+     *  This can be fixed by adding overflow-y: auto; to the article tag, but I was worried
+     *  that because of how many areas articles appear in this could cause some vertical
+     *  scroll bars to appear where they shouldn't, so this seemed 'safer', even though
+     *  it's gross.
+    */
+    &::after {
+        clear: both;
+        content: "";
+        display: block;
+    }
+
     // Clobber rules inheriting from article rules elsewhere.
     & > figure:first-child {
         margin-top: 1rem;
@@ -40,15 +56,47 @@ article {
         clear: both;
     }
 
-    figure {
+    // Make background / highlight colours appear when printed
+    span,
+    p {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    /* Add bottom margin to media embeds */
+    figure.media {
         margin: auto auto 1rem auto;
     }
 
+    figure.table {
+        /**
+         *  Without fit-content, any tables that haven't had their width modified (and thus
+         *  are missing an inline style with a width percent) won't centre align properly as
+         *  figure expands to cover the entire width of the container, preventing margin:auto
+         *  from working.
+        **/
+        width: fit-content;
+        margin: auto;
+    }
+
     table {
+        // Prevent table cells splitting, such as in the summative report...
+        border-collapse: collapse;
+        border-spacing: 0;
         margin-bottom: 1rem;
+        // Make sure tables entirely fill the figure, aka what actually determines their width
+        width: 100%;
 
         th {
             background-color: rgba(0, 0, 0, 0.05);
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            /**
+             *  Override browser default styling to provide cross-browser consistency. A user can
+             *  select to override this within the editor anyway.
+            **/
+            text-align: left;
+
             p {
                 font-weight: 600;
             }
@@ -58,6 +106,7 @@ article {
         tr,
         td {
             padding: 0.4em;
+            word-break: break-word;
             vertical-align: middle;
         }
         /**
@@ -95,6 +144,25 @@ article {
                     list-style-type: upper-roman;
                 }
             }
+        }
+    }
+}
+
+/**
+ *  Rule specific to showing CKEditor content when being printed
+**/
+@media print {
+    article {
+        /*
+         *  When printing tables inside articles make sure they don't expand beyond
+         *  the bounds of the page (max-width). This also removes a horizontal scroll
+         *  bar that was appearing in some locations. Prevent tables breaking if possible.
+        **/
+        figure,
+        table {
+            break-inside: avoid;
+            max-width: 100%;
+            page-break-inside: avoid;
         }
     }
 }
@@ -161,7 +229,9 @@ article {
     &-sticky-note,
     &-construction,
     &-code-block {
-        //max-width: fit-content;
+        // Make our background colours / properties appear when printed.
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
         word-break: break-word;
     }
 
@@ -355,7 +425,7 @@ article {
                 var(--ck-custom-white) 20px
             );
             content: "";
-            height: 0.75rem;
+            height: 0.5rem;
             position: absolute;
             width: 100%;
         }
