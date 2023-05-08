@@ -31,12 +31,14 @@ $prefixGenerator = $kernel->get('cdnPrefixGenerator');
 $type = $_GET['type'];
 $id   = $_GET['id'];
 
-// If no size was specified, assume thumbnail else poster
-if (strlen($_GET['size'] ?? '') === 0) {
-    $size = ResourceVideo::THUMBNAIL;
-} else {
-    $size = ResourceVideo::POSTER;
+if (
+    !array_key_exists('size', $_GET) ||
+    !in_array($_GET['size'], [ResourceVideo::POSTER, ResourceVideo::POSTER, 'poster_letterbox'], true)
+) {
+    $_GET['size'] = ResourceVideo::THUMBNAIL;
 }
+
+$size = $_GET['size'];
 
 // TODO: Destroy these shenanigans
 
@@ -85,10 +87,18 @@ if (isset($type, $id)) {
         try {
             // Try to find a video record with associated poster and thumbnail links
 
-            if ($size === ResourceVideo::POSTER) {
-                $imageFilename = $videoQueue->getPosterPath();
-            } else {
-                $imageFilename = $videoQueue->getThumbnailPath();
+            switch ($size) {
+                case ResourceVideo::POSTER:
+                    $imageFilename = $videoQueue->getPosterPath();
+                    break;
+                case ResourceVideo::THUMBNAIL:
+                    $imageFilename = $videoQueue->getThumbnailPath();
+                    break;
+                case ResourceVideo::POSTER_LETTERBOX:
+                    $imageFilename = $videoQueue->getPosterLetterboxPath();
+                    break;
+                default:
+                    throw new InvalidArgumentException("Unknown size parameter '$size'.");
             }
 
             /** @var Filesystem $filesystem */

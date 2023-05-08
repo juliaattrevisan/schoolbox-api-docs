@@ -44,6 +44,8 @@ class ResourceVideo
     /** @const string POSTER Location of poster for compressed video */
     public const POSTER = 'poster';
 
+    public const POSTER_LETTERBOX = 'poster_letterbox';
+
     /**
      * Creates object and sets up sub-objects.
      */
@@ -228,6 +230,11 @@ class ResourceVideo
     public function getPosterPath()
     {
         return $this->getTransformPath(self::POSTER);
+    }
+
+    public function getPosterLetterboxPath()
+    {
+        return $this->getTransformPath(self::POSTER_LETTERBOX);
     }
 
     /**
