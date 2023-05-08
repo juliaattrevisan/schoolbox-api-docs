@@ -24,13 +24,13 @@ config:
   external_pastoral: {hide: false}
   pastoral_external_delete: {hide: false}
   external_pastoral_upload: {hide: false}
-  pastoral_upload_timeout: {hide: false}
+  pastoral_upload_timeout: {hide: true} # This should stay hidden
   pastoral_severity: {hide: false}
   pastoral_individual_access: {hide: false}
   pastoral_parent_access: {hide: false}
   pastoral_student_access: {hide: false}
-  pastoral_page_size: {hide: false}
-  pastoral_page_visible: {hide: false}
+  pastoral_page_size: {hide: true} # This should stay hidden
+  pastoral_page_visible: {hide: true} # This should stay hidden
   pastoral_create_tag_enable: {hide: false}
   pastoral_flag_count_period: {hide: false}
   pastoral_action_enable: {hide: false}
