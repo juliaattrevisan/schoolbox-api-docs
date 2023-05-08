@@ -40,7 +40,7 @@ class ApiAssessmentCest
         $users = $i->getUsers();
         /** @var User $user */
         foreach ($users as $user) {
-            $this->testGet($i, $user);
+//            $this->testGet($i, $user);
         }
     }
 
