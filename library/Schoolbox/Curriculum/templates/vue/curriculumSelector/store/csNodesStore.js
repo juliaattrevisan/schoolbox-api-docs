@@ -63,12 +63,11 @@ export const useNodesStore = defineStore(`csNodes`, {
                     setIsStoringNodes();
                     // otherwise load them from the api
                     await this.loadRemote();
+                    store.isLoading = false;
                 }
             } catch (error) {
                 console.warn(error);
                 store.hasLoadError = true; // show the load error display state
-            } finally {
-                store.isLoading = false; // otherwise show the tree
             }
         },
 
@@ -82,6 +81,7 @@ export const useNodesStore = defineStore(`csNodes`, {
                 const modalViewNodesStore = useModalViewNodesStore();
                 modalViewNodesStore.setSelected(modalViewNodesStore.currentDepth + 1, singleCurriculumId);
             }
+            useStore().isLoading = false;
         },
 
         /**
