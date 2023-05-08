@@ -74,7 +74,6 @@ export default {
             return event?.extendedProps?.data?.meta?.variant === EVENT_VARIANTS.TASK;
         },
 
-
         /**
          * Is the given event an EOTC event or not? This affects how it's rendered.
          *
