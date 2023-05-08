@@ -69,7 +69,7 @@ UPDATE config SET description="If toggled to 'ON', allows staff to email housema
 UPDATE config SET description="If toggled to 'ON', students will be able to create events in the calendar and invite other users in the system to these events." WHERE name="calendar_student_can_invite";
 UPDATE config SET description="If toggled to 'ON', parents will be able to upload learning moments on behalf of their own children." WHERE name="evidence_parent_create";
 UPDATE config SET description="If toggled to 'ON', staff will see a link to online help in their profile menu. Once selected, staff will be automatically signed in to Schoolbox Help if they have a Help account. (You can also add this manually to the top or side menus, by adding a menu item with URL '/help/sso/send')." WHERE name="show_schoolbox_help_link";
-UPDATE config SET description="If toggled to ON, parents will be able to comment on learning moments of their own children." WHERE name="evidence_parent_comment";
+UPDATE config SET description="If toggled to 'ON', parents will be able to comment on learning moments of their own children." WHERE name="evidence_parent_comment";
 UPDATE config SET description="If toggled to 'ON', staff will be able to email tutors of a class." WHERE name="email_tutors";
 UPDATE config SET description="If toggled to 'ON', image location data will be removed from images on upload." WHERE name="remove_image_location_data";
 UPDATE config SET description="Select your preferred layout for the timetable. If you have varying periods times per day, we recommend the calendar view as it is more flexible." WHERE name="timetable_view";
