@@ -187,6 +187,7 @@
                                 $(function () {
                                     document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
                                         detail : {
+                                            maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
                                             targetElements: ["#template", "#templatePrivate"],
                                             hasTokens: true
                                         }
