@@ -7,11 +7,9 @@
 
 namespace Helper;
 
-use Alaress\Module\Cache\Rebuilder;
 use Codeception\Exception\ModuleException;
 use Codeception\Module\Db;
 use Codeception\TestInterface;
-use Psr\Log\NullLogger;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\Application\CliTool\Kernel;
 use Schoolbox\Assessment\Component\SubmissionBox;
@@ -20,7 +18,6 @@ use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Curriculum\Node\Model as Node;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
@@ -119,12 +116,6 @@ class Api extends \Codeception\Module
             $app,
             [Kernel::OPTION_ERRORS => E_ALL]
         );
-        /** @var Rebuilder $cacheBuilder */
-        $cacheBuilder = $this->cliKernel->get('moduleCache.rebuilder');
-        $cacheBuilder
-            ->setLogger(new NullLogger())
-            ->rebuild($this->cliKernel->get('config')->get(ConfigMapper::NAME_SITE_SCHOOL_CODE));
-
         $this->userMapper   = UserMapper::getInstance();
         $this->folderMapper = FolderMapper::getInstance();
         $this->roleMapper   = RoleMapper::getInstance();
@@ -670,5 +661,25 @@ class Api extends \Codeception\Module
     public function getMaxValue(string $tableName, string $column): mixed
     {
         return $this->getDbModule()->grabFromDatabase($tableName, "max($column)");
+    }
+
+    /**
+     * @return IAssessable|null
+     * @throws ModuleException
+     */
+    public function getExistingAssessment(): ?IAssessable
+    {
+        $db            = $this->getDbModule();
+        $assessmentIds = $db->grabColumnFromDatabase('submission_box', 'assessment_id', []);
+        foreach ($assessmentIds as $assessmentId) {
+            try {
+                $assessment = $this->assessmentDataSource->findById($assessmentId);
+                if ($assessment->getContext()->isImplementationContext()) {
+                    return $assessment;
+                }
+            } catch (MapperException $e) {
+            }
+        }
+        return null;
     }
 }

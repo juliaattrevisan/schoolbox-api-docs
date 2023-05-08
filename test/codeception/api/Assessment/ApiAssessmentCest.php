@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Test\Api;
 
 use ApiTester;
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 
@@ -22,12 +22,13 @@ class ApiAssessmentCest
 {
     private Folder $folder;
 
-    private DueWork $dueWork;
+    private IAssessable $dueWork;
 
     public function _before(ApiTester $i)
     {
-        $this->folder  = $i->getFolder();
-        $this->dueWork = $i->createDueWork($this->folder, 10);
+        // rely on an existing assessment for now
+        $this->dueWork = $i->getExistingAssessment();
+        $this->folder = $this->dueWork->getBaseContext()->getFolder();
     }
 
     /**
@@ -40,7 +41,7 @@ class ApiAssessmentCest
         $users = $i->getUsers();
         /** @var User $user */
         foreach ($users as $user) {
-//            $this->testGet($i, $user);
+            $this->testGet($i, $user);
         }
     }
 
