@@ -1252,7 +1252,7 @@ class Profile implements IStrategy
             } catch (\Exception $e) {
                 $this->log->warning(sprintf(
                     'Could not obtain profile picture %s time(s): %s',
-                    $fails+1,
+                    $fails + 1,
                     $e->getMessage()
                 ));
 
