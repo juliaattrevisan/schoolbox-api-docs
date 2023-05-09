@@ -82,3 +82,24 @@ export function addFullWidthAttributes(sourceElementHTML: HTMLElement) {
     });
     return sourceElementHTML;
 }
+
+/**
+ * The height style property was added to video thumbnails in CKEditor 4, however in CKEditor 5
+ * it interferes with the resize widget and can create display issues if the thumbnail is resized.
+ *
+ * @param { HTMLElement } sourceElementHTML - the sourceElement content as HTML
+ * @returns { HTMLElement } - the sourceElement content as HTML with the height style property removed from any video thumbnails
+ */
+export function removeHeightFromVideoThumbs(sourceElementHTML: HTMLElement) {
+    const images = sourceElementHTML.querySelectorAll("img");
+    images.forEach((image) => {
+        if (
+            image.hasAttribute("data-schoolboxresource-type") &&
+            image.getAttribute("data-schoolboxresource-type") === "video" &&
+            image.style.height !== ""
+        ) {
+            image.style.height = "";
+        }
+    });
+    return sourceElementHTML;
+}
