@@ -86,7 +86,6 @@ if (isset($type, $id)) {
 
         try {
             // Try to find a video record with associated poster and thumbnail links
-
             switch ($size) {
                 case ResourceVideo::POSTER:
                     $imageFilename = $videoQueue->getPosterPath();
@@ -154,6 +153,15 @@ if (isset($type, $id)) {
             // If anything else goes wrong, fall through to sad mountain
         }
     }
+}
+
+if ($size === ResourceVideo::POSTER_LETTERBOX) {
+    // First try falling back on the non-letterbox poster image.
+    // This is for the situation where a poster_letterbox is requested for a video for which no poster_letterbox was
+    // generated.  When poster_letterbox was introduced, we decided not to generate poster_letterbox images for all
+    // already uploaded videos.  Therefore, videos will exist that do not have poster_letterbox images.
+    $prefixGenerator->redirectTemporary("/../cms/videoThumb.php?size=poster&id=$id&type=$type");
+    die;
 }
 
 // Fallthrough for if something went wrong
