@@ -532,9 +532,7 @@
             </div>
 
             {% if allGraphs['summary'][folder.id] is defined %}
-                <p class="summative-graph-type">{{ allGraphs['summary'][folder.id].type }} distribution</p>
-                {% include '@learningGrades/fragments/summativeGraph.twig' with { graph: allGraphs['summary'][folder.id].graph, graphId: 'summary_' ~ folder.id } only %}
-                <p class="summative-graph-type">Results</p>
+                {% include '@learningGrades/fragments/summativeGraph.twig' with { graph: allGraphs['summary'][folder.id].graph, graphId: 'summary_' ~ folder.id, folderType: allGraphs['summary'][folder.id].type, location: 'summary' } only %}
             {% endif %}
 
             {% if (summaryAssessments[folder.id] ?? [])| length %}
@@ -580,8 +578,7 @@
                 {% endif %}
             </div>
                 {% if allGraphs['class'][folder.id] is defined %}
-                    <p class="summative-graph-type">{{ allGraphs['class'][folder.id].type }} distribution</p>
-                    {% include '@learningGrades/fragments/summativeGraph.twig' with { graph: allGraphs['class'][folder.id].graph, graphId: 'class_' ~ folder.id } only %}
+                    {% include '@learningGrades/fragments/summativeGraph.twig' with { graph: allGraphs['class'][folder.id].graph, graphId: 'class_' ~ folder.id, folderType: allGraphs['summary'][folder.id].type, location: 'class' } only %}
                 {% endif %}
             <div class="summative-content">
                 {% for assessment in classAssessments[folder.id] %}
