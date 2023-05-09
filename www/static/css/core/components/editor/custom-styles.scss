@@ -456,3 +456,27 @@ p.sb-ck-code-block {
     position: relative;
     tab-size: 4;
 }
+
+/**
+ *  Skin config logic for the editor. Why is it out here? Because
+ *  we need to use things like css-darken and we can't do that in
+ *  a .css file, so some of the rules are here.
+**/
+
+.ck.ck-content.ck-editor__editable.ck-focused {
+    // editor.css is loaded in after our file, so we need to use !important...
+    border: 1px solid css-darken($form-border-color, 15%) !important;
+}
+
+td.ck-editor__editable.ck-editor__nested-editable_focused {
+    background-color: css-lighten($form-border-color, 25%) !important;
+    outline: 1px solid css-darken($form-border-color, 15%) !important;
+}
+
+.ck.ck-dropdown__panel_se ul .ck.ck-button:hover {
+    border: 1px solid css-darken($form-border-color, 15%) !important;
+}
+
+.ck.ck-dropdown__panel_se ul .ck.ck-button.ck-on {
+    outline: 3px solid css-darken($form-border-color, 15%);
+}

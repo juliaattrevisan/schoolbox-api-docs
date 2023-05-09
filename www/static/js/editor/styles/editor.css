@@ -267,3 +267,56 @@
 .ck.ck-content ul {
     margin-bottom: 0.75rem;
 }
+
+/**
+ *  Skin config logic... so to speak.
+**/
+.ck.ck-button {
+    cursor: pointer;
+}
+
+.ck.ck-button.ck-on[aria-pressed="true"],
+.ck.ck-button.ck-on[aria-pressed="true"]:hover,
+.ck.ck-button.ck-on[aria-expanded="true"],
+.ck.ck-button.ck-on[aria-expanded="true"]:hover {
+    background-color: var(--content-ui-selected);
+    color: var(--content-interactive-foreground);
+
+    /* background-color: var(--content-ui-selected);
+    color: var(--content-interactive-foreground); */
+}
+
+.ck.ck-button:hover {
+    border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.ck.ck-button.ck-insert-table-dropdown-grid-box.ck-on {
+    background-color: var(--content-ui-selected);
+    border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.ck.ck-button.ck-insert-table-dropdown-grid-box.ck-on,
+.ck.ck-button.ck-insert-table-dropdown-grid-box.ck-on:hover {
+    background-color: var(--content-ui-selected);
+    border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.ck.ck-button.ck-insert-table-dropdown-grid-box.ck-on:hover {
+    filter: brightness(135%);
+}
+
+.ck.ck-dropdown__panel_se ul .ck.ck-button.ck-on,
+.ck.ck-dropdown__panel_se ul .ck.ck-button.ck-on:hover {
+    background-color: var(--content-ui-selected);
+    color: var(--content-ui-foreground);
+}
+
+/* .ck.ck-button.ck-on[aria-pressed="true"],
+.ck.ck-button.ck-on[aria-pressed="true"]:hover {
+    background-color: rgba(0, 0, 0, 0.08);
+    color: #000000;
+}
+
+.ck.ck-button:hover {
+    border: 1px solid rgba(0, 0, 0, 0.15);
+} */
