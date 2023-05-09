@@ -128,3 +128,20 @@ function onSlideUpComplete(element, paddingTop, paddingBottom) {
     element.removeAttribute(PADDING_TOP_ATTRIBUTE);
     element.removeAttribute(PADDING_BOTTOM_ATTRIBUTE);
 }
+
+
+/**
+ * Animate the rotation of an element
+ *
+ * @param element { DOMElement }
+ * @param rotation { Number }
+ * @param transformOrigin { String }
+ * @param duration { Number } in seconds
+ */
+export function animateRotation(element, rotation, transformOrigin, duration) {
+    return gsap.to(element, {
+        rotation: rotation,
+        transformOrigin: transformOrigin,
+        duration: duration,
+    });
+}

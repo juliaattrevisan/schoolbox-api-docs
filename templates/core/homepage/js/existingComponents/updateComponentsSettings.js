@@ -4,14 +4,18 @@
  */
 
 import { gsap } from "gsap/all";
-import { slideDown, slideUp } from "@js/util/animateUtils";
+import { slideDown, slideUp, animateRotation } from "@js/util/animateUtils";
 import { getLoadedHTML } from "@js/util/domUtils";
 import { EXISTING_COMPONENT_SELECTOR, UPDATE_URL } from "../updateHomepage";
 import { close as closeRemovePanel } from "./removeComponents";
 import UpdateHomepageEvents from "../updateHomepageEvents";
 import { updateRemovedComponent } from "./removeComponents";
 
+const ANIMATE_CLOSED_POSITION = 0;
+const ANIMATE_OPEN_POSITION = 90;
+const ANIMATE_ORIGIN = "20px 20px";
 const ANIMATE_SPEED = 0.3;
+
 const BUTTON_SELECTOR = '[data-target="settings"]';
 const PANEL_SELECTOR = '[data-component-panel="settings"]';
 const STATE_ATTRIBUTE = "data-state"; //can be 'opened' or 'closed'
@@ -60,20 +64,6 @@ function initToggleButtons(component) {
 }
 
 /**
- * Animate the toggle button
- *
- * @param { Element }
- */
-function animateToggleButton(component) {
-    const toggleButton = component.querySelector(BUTTON_SELECTOR);
-    gsap.to(toggleButton, {
-        rotation: isOpen(component) ? 90 : 0,
-        transformOrigin: "20px 20px",
-        duration: ANIMATE_SPEED,
-    });
-}
-
-/**
  * Determine the state of the settings panel
  *
  * @param { Element }
@@ -94,10 +84,10 @@ function open(component) {
     const toggleButton = component.querySelector(BUTTON_SELECTOR);
     toggleButton.setAttribute(STATE_ATTRIBUTE, "opened");
     toggleButton.setAttribute(QUERY_STRING_ATTRIBUTE, getQueryString(component));
+    animateRotation(toggleButton, ANIMATE_OPEN_POSITION, ANIMATE_ORIGIN, ANIMATE_SPEED);
     const panel = component.querySelector(PANEL_SELECTOR);
     slideDown(panel, ANIMATE_SPEED);
     closeRemovePanel(component);
-    animateToggleButton(component);
 }
 
 /**
@@ -123,8 +113,8 @@ function getQueryString(component) {
 export async function close(component) {
     const toggleButton = component.querySelector(BUTTON_SELECTOR);
     toggleButton.setAttribute(STATE_ATTRIBUTE, "closed");
+    animateRotation(toggleButton, ANIMATE_CLOSED_POSITION, ANIMATE_ORIGIN, ANIMATE_SPEED);
     const panel = component.querySelector(PANEL_SELECTOR);
-    animateToggleButton(component);
     await slideUp(panel, ANIMATE_SPEED);
 }
 

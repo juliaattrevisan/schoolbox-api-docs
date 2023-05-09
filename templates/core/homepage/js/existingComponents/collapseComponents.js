@@ -3,14 +3,17 @@
  *
  */
 
-import { gsap } from "gsap/all";
-import { slideDown, slideUp } from "@js/util/animateUtils";
+import { slideDown, slideUp, animateRotation } from "@js/util/animateUtils";
 import { EXISTING_COMPONENT_SELECTOR } from "../updateHomepage";
 import UpdateHomepageEvents from "../updateHomepageEvents";
 
+const ANIMATE_CLOSED_POSITION = 180;
+const ANIMATE_OPEN_POSITION = 0;
+const ANIMATE_ORIGIN = "20px 20px";
+const ANIMATE_SPEED = 0.4;
+
 const PANEL_SELECTOR = '[data-collapsable="true"]';
 const BUTTON_SELECTOR = '[data-collapser="true"]';
-const ANIMATE_SPEED = 0.4; //the speed of animations
 
 /**
  * Set up all components and listen for newly added ones
@@ -56,7 +59,7 @@ export function isOpen(component) {
  */
 export async function open(component) {
     const collapseButton = component.querySelector(BUTTON_SELECTOR);
-    gsap.to(collapseButton, { rotation: 0, transformOrigin: "20px 20px", duration: ANIMATE_SPEED });
+    animateRotation(collapseButton, ANIMATE_OPEN_POSITION, ANIMATE_ORIGIN, ANIMATE_SPEED)
     const collapsePanel = component.querySelector(PANEL_SELECTOR);
     collapsePanel.setAttribute("data-collapse-state", "uncollapsed");
     collapsePanel.dispatchEvent(new CustomEvent("expandStart.collapsable"));
@@ -71,7 +74,7 @@ export async function open(component) {
  */
 export async function close(component) {
     const collapseButton = component.querySelector(BUTTON_SELECTOR);
-    gsap.to(collapseButton, { rotation: 180, transformOrigin: "20px 20px", duration: ANIMATE_SPEED });
+    animateRotation(collapseButton, ANIMATE_CLOSED_POSITION, ANIMATE_ORIGIN, ANIMATE_SPEED);
     const collapsePanel = component.querySelector(PANEL_SELECTOR);
     collapsePanel.setAttribute("data-collapse-state", "collapsed");
     collapsePanel.dispatchEvent(new CustomEvent("collapseStart.collapsable"));
