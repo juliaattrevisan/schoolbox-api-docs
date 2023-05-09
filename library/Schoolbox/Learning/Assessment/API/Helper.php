@@ -524,7 +524,7 @@ WHERE
                 'project_result'     AS `feedback_table`,
                 `prr`.`id`           AS `feedback_id`,
                 `prr`.`updated_at`   AS `completion_date`,
-                ''                   AS `comment`,
+                null                 AS `comment`,
                 `prr`.`mark`         AS `mark`,
                 `prr`.`norm_mark`    AS `norm_mark`,
                 $participantFields,
