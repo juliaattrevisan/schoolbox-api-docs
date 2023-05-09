@@ -215,7 +215,7 @@ export default {
             },
             scrollTime: this.config.dateDisplayFormats.calendarStartTime,
             eventDidMount: this.eventRender,
-            defaultTimedEventDuration: "00:00:00",
+            defaultTimedEventDuration: "00:01:00",
             resources: this.resources,
             firstDay: "1",
             initialDate: this.termStartDate,

@@ -116,7 +116,7 @@ export default {
             initialView: "dayGridMonth",
             scrollTime: this.config.dateDisplayFormats.calendarStartTime,
             eventDidMount: this.fullCalendarHelper_eventRender,
-            defaultTimedEventDuration: "00:00:00",
+            defaultTimedEventDuration: "00:01:00",
             events: this.events,
             loading: this.fullCalendarHelper_onLoading,
             eventClick: this.onEventClick,
