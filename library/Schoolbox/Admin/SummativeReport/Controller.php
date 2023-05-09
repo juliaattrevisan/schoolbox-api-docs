@@ -825,7 +825,7 @@ class Controller extends ConfigController
         $markSchemeFactory = new Factory($this->getConfigLoader());
 
         // If the student does not have Comparitave graphs enabled for them, do not show the graph
-        if ($student->getDisplayGradeGraph()) {
+        if ($student->getDisplayGradeGraph() || $viewer->getRole()->isStaff()) {
             if ($optionsPayload['summary']['cohort']) {
                 foreach ($folders as $folder) {
                     // if the folder is empty, then don't attempt to generate a graph for it
