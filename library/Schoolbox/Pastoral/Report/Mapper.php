@@ -379,10 +379,10 @@ class Mapper extends BaseMapper
                 // if this record has both completed and pending, this should appear regardless of report's action status setting
                 if ($hasPendingAction && !$hasCompletedAction) {
                     // must not appear on completed only report
-                    $wheres[] = sprintf("(`action_status` != '%s')", Model::ACTION_STATUS_COMPLETED);
+                    $wheres[] = sprintf("(`action_status` IS NULL OR `action_status` != '%s')", Model::ACTION_STATUS_COMPLETED);
                 } elseif (!$hasPendingAction && $hasCompletedAction) {
                     // must not appear on pending only report
-                    $wheres[] = sprintf("(`action_status` != '%s')", Model::ACTION_STATUS_PENDING);
+                    $wheres[] = sprintf("(`action_status` IS NULL OR `action_status` != '%s')", Model::ACTION_STATUS_PENDING);
                 }
             }
         }
