@@ -38,7 +38,7 @@ export function addFullWidthStyle(sourceElementHTML: HTMLElement) {
 export function addAlignLeftStyle(sourceElementHTML: HTMLElement) {
     const tables = sourceElementHTML.querySelectorAll("table");
     tables.forEach((table) => {
-        if (table.align !== "") {
+        if (table.align !== "" && !table.parent.hasAttribute("data-is-ckeditor5-table")) {
             table.style.float = table.align;
         }
     });
