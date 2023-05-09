@@ -350,7 +350,8 @@ class Queue extends ResourceVideo
         if ($this->getDuration() > 0) {
             // Create thumbnail
 
-            $thumbnailSecondsEscaped = escapeshellarg(round(($this->getDuration() / 3), 2));
+            // This is the time at which to extract from the video the image that will become the thumbnail or poster.
+            $imageExtractionSecondsEscaped = escapeshellarg(round(($this->getDuration() / 3), 2));
 
             $thumbnailCommandline =
                 "nice {$commandTranscode}" .
@@ -360,7 +361,7 @@ class Queue extends ResourceVideo
                 " -i {$filenameSourceEscaped}" .
                 ' -max_muxing_queue_size 1024' .
                 ' -f image2 ' .
-                " -ss {$thumbnailSecondsEscaped}" .
+                " -ss {$imageExtractionSecondsEscaped}" .
                 " -vf {$videoMetadata["thumbScale"]}crop=64:64" .
                 ' -frames:v 1' .
                 " {$filenameTranscodeThumbnailEscaped}" .
@@ -384,7 +385,7 @@ class Queue extends ResourceVideo
                 " -i {$filenameSourceEscaped}" .
                 ' -max_muxing_queue_size 1024' .
                 ' -f image2 ' .
-                " -ss {$thumbnailSecondsEscaped}" . // TODO: This should be $posterSecondsEscaped.
+                " -ss {$imageExtractionSecondsEscaped}" .
                 ' -frames:v 1' .
                 " {$filenameTranscodePosterEscaped}" .
                 ' 2>&1';
@@ -408,7 +409,7 @@ class Queue extends ResourceVideo
                 " -i {$filenameSourceEscaped}" .
                 ' -max_muxing_queue_size 1024' .
                 ' -f image2 ' .
-                " -ss {$thumbnailSecondsEscaped}" . // TODO: This should be $posterLetterboxSecondsEscaped.
+                " -ss {$imageExtractionSecondsEscaped}" .
                 ' -vf "scale=640:360:force_original_aspect_ratio=decrease,pad=640:360:-1:-1:color=black"' .
                 ' -frames:v 1' .
                 " {$filenameTranscodePosterLetterboxEscaped}" .
