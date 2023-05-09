@@ -824,52 +824,55 @@ class Controller extends ConfigController
         // Let markbook calculate the statistics
         $markSchemeFactory = new Factory($this->getConfigLoader());
 
-        if ($optionsPayload['summary']['cohort']) {
-            foreach ($folders as $folder) {
-                // if the folder is empty, then don't attempt to generate a graph for it
-                if (!isset($summaryAssessments[$folder->getId()])) {
-                    continue;
+        // If the student does not have Comparitave graphs enabled for them, do not show the graph
+        if ($student->getDisplayGradeGraph() || $viewer->getRole()->isStaff()) {
+            if ($optionsPayload['summary']['cohort']) {
+                foreach ($folders as $folder) {
+                    // if the folder is empty, then don't attempt to generate a graph for it
+                    if (!isset($summaryAssessments[$folder->getId()])) {
+                        continue;
+                    }
+                    // for each folder build and work with that markbook and assessments
+                    $overallMarkScheme = $markSchemeFactory->spawnForFolder($folder, $this->getUser()->getRole()->isStaff());
+                    //markbooks need to be spawned again for each folder, as summary could have a different collection of worktypes to class
+                    $filteredMarkbook                       = (new Markbook($summaryAssessments[$folder->getId()], $overallMarkScheme, $this->getUser()))
+                        ->sortAssessables(new AssessmentComparator($viewer));
+                    $allGraphs['summary'][$folder->getId()] = $this->generateCohortGraph(
+                        $summaryAssessments[$folder->getId()],
+                        $folder,
+                        $filteredMarkbook,
+                        $lmsCohortComparison,
+                        $gradientEnable,
+                        $student,
+                        $viewer,
+                        $term,
+                        $gradeHelper
+                    );
                 }
-                // for each folder build and work with that markbook and assessments
-                $overallMarkScheme = $markSchemeFactory->spawnForFolder($folder, $this->getUser()->getRole()->isStaff());
-                //markbooks need to be spawned again for each folder, as summary could have a different collection of worktypes to class
-                $filteredMarkbook     = (new Markbook($summaryAssessments[$folder->getId()], $overallMarkScheme, $this->getUser()))
-                    ->sortAssessables(new AssessmentComparator($viewer));
-                $allGraphs['summary'][$folder->getId()] = $this->generateCohortGraph(
-                    $summaryAssessments[$folder->getId()],
-                    $folder,
-                    $filteredMarkbook,
-                    $lmsCohortComparison,
-                    $gradientEnable,
-                    $student,
-                    $viewer,
-                    $term,
-                    $gradeHelper
-                );
             }
-        }
 
-        if ($optionsPayload['class']['cohort']) {
-            foreach ($folders as $folder) {
-                // if the folder is empty, then don't attempt to generate a graph for it
-                if (!isset($classAssessments[$folder->getId()])) {
-                    continue;
+            if ($optionsPayload['class']['cohort']) {
+                foreach ($folders as $folder) {
+                    // if the folder is empty, then don't attempt to generate a graph for it
+                    if (!isset($classAssessments[$folder->getId()])) {
+                        continue;
+                    }
+                    // for each folder build and work with that markbook and assessments
+                    $overallMarkScheme = $markSchemeFactory->spawnForFolder($folder, $this->getUser()->getRole()->isStaff());
+                    //markbooks need to be spawned again for each folder, as class could have a different collection of worktypes to summary
+                    $filteredMarkbook                     = (new Markbook($classAssessments[$folder->getId()], $overallMarkScheme, $this->getUser()))->sortAssessables(new AssessmentComparator($viewer));
+                    $allGraphs['class'][$folder->getId()] = $this->generateCohortGraph(
+                        $classAssessments[$folder->getId()],
+                        $folder,
+                        $filteredMarkbook,
+                        $lmsCohortComparison,
+                        $gradientEnable,
+                        $student,
+                        $viewer,
+                        $term,
+                        $gradeHelper
+                    );
                 }
-                // for each folder build and work with that markbook and assessments
-                $overallMarkScheme = $markSchemeFactory->spawnForFolder($folder, $this->getUser()->getRole()->isStaff());
-                //markbooks need to be spawned again for each folder, as class could have a different collection of worktypes to summary
-                $filteredMarkbook   = (new Markbook($classAssessments[$folder->getId()], $overallMarkScheme, $this->getUser()))->sortAssessables(new AssessmentComparator($viewer));
-                $allGraphs['class'][$folder->getId()] = $this->generateCohortGraph(
-                    $classAssessments[$folder->getId()],
-                    $folder,
-                    $filteredMarkbook,
-                    $lmsCohortComparison,
-                    $gradientEnable,
-                    $student,
-                    $viewer,
-                    $term,
-                    $gradeHelper
-                );
             }
         }
 
