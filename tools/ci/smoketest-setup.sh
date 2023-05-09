@@ -102,19 +102,17 @@ echo 'started mariadb'
 use_redis_persistent_instance_sql="UPDATE config c1 SET c1.value=(SELECT c2.value FROM config c2 WHERE c2.name='redis_url') WHERE c1.name = 'redis_ephemeral_url';"
 mariadb schoolbox -e "$use_redis_persistent_instance_sql"
 
-# Manually set default collation
-mariadb -e "ALTER DATABASE schoolbox COLLATE = 'utf8mb4_unicode_ci';"
-
-# Set data dirs in config table + run upgrade scripts
+# Set data dirs in config table + run upgrade + schema repair scripts
 cd tools || exit 1
 ./module/refresh-cache.php
 ./generate-dir-sql-dynamically.sh $instance_data_dir | mariadb schoolbox
 ./set-plan.php --plan=elite
 ./build-sql-update.sh
 ./update-sql-nocheck.sh
+./schema/charset.php --perform
 echo "enabling summative report exporter"
 mariadb schoolbox -e "UPDATE config SET value='1',editable='true' WHERE name = 'summative_report_enabled';"
-/usr/share/schoolbox/tools/module/refresh-cache.php
+./module/refresh-cache.php
 
 # Force the persistent instance again
 mariadb schoolbox -e "$use_redis_persistent_instance_sql"
