@@ -6,11 +6,14 @@
 import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
 
 export default class TableUpdates extends Plugin {
+    isCK5Attribute = "data-is-ckeditor5-table";
+
     /**
      * Run when the plugin is initialized
      */
     init() {
         this.updateSchema();
+        this.defineConverters();
         this.addCustomClass();
         this.addDefaultProperties();
     }
@@ -22,7 +25,35 @@ export default class TableUpdates extends Plugin {
      */
     updateSchema() {
         this.editor.model.schema.extend("table", {
-            allowAttributes: ["isNew"],
+            allowAttributes: [this.isCK5Attribute],
+        });
+    }
+
+    /**
+     * Define the converters for the extra attributes, so that they are translated from the model to the view (downcast) and vice versa (upcast)
+     * https://ckeditor.com/docs/ckeditor5/latest/api/module_engine_conversion_conversion-Conversion.html
+     */
+    defineConverters() {
+        const conversion = this.editor.conversion;
+        conversion.for("downcast").attributeToAttribute({
+            model: {
+                name: "table",
+                key: this.isCK5Attribute,
+            },
+            view: {
+                name: "table",
+                key: this.isCK5Attribute,
+            },
+        });
+        conversion.for("upcast").attributeToAttribute({
+            view: {
+                name: /^(table|figure)$/,
+                key: this.isCK5Attribute,
+            },
+            model: {
+                name: "table",
+                key: this.isCK5Attribute,
+            },
         });
     }
 
@@ -45,7 +76,7 @@ export default class TableUpdates extends Plugin {
                     const viewTable = viewElement.is("element", "table")
                         ? viewElement
                         : Array.from(viewElement.getChildren()).find((viewChild) => viewChild.is("element", "table"));
-                    if (modelTable.hasAttribute("isNew")) {
+                    if (modelTable.hasAttribute(this.isCK5Attribute)) {
                         viewWriter.addClass("sb-ck-table", viewTable);
                     }
                 },
@@ -90,7 +121,7 @@ export default class TableUpdates extends Plugin {
                 .flat();
             this.editor.model.change((writer) => {
                 // add the isNew attribute to the table so we can add .sb-ck-table to the table in the downcast
-                writer.setAttribute("isNew", "true", table);
+                writer.setAttribute(this.isCK5Attribute, "true", table);
                 cellElements.forEach((cell) => {
                     writer.setAttribute("tableCellBorderStyle", "solid", cell);
                     writer.setAttribute("tableCellBorderWidth", "1px", cell);
