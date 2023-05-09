@@ -1,0 +1,2171 @@
+@charset "UTF-8";
+/**
+ *  The main purpose of this file is to wrap up all of the rules that may
+ *  apply when viewing content created from CKEditor - the reason this file
+ *  specifically exists though is because we have some areas (such as PDF
+ *  exports from Gotenberg) that don't naturally pull across these styles,
+ *  meaning that the content looks weird when it's exported from Schoolbox
+ *
+ *  Encapsulating it all within a single .css file means we...
+ *  a) can add these styles inside the relevant files in a single line
+ *  b) don't need to copy paste / duplicate our code, so we...
+ *  c) have a much easier time when updating / maintaining the classes
+**/
+/*
+    The various colours used within Schoolbox,
+    primarily set by Foundation with some custom edits
+*/
+.white {
+    background-color: #ffffff;
+}
+
+.ghost {
+    background-color: #fafafa;
+}
+
+.snow {
+    background-color: #f9f9f9;
+}
+
+.vapor {
+    background-color: #f6f6f6;
+}
+
+.white-smoke {
+    background-color: #f5f5f5;
+}
+
+.silver {
+    background-color: #efefef;
+}
+
+.smoke {
+    background-color: #eeeeee;
+}
+
+.gainsboro {
+    background-color: #dddddd;
+}
+
+.iron {
+    background-color: #cccccc;
+}
+
+.base {
+    background-color: #aaaaaa;
+}
+
+.aluminum {
+    background-color: #999999;
+}
+
+.jumbo {
+    background-color: #888888;
+}
+
+.monsoon {
+    background-color: #777777;
+}
+
+.steel {
+    background-color: #666666;
+}
+
+.charcoal {
+    background-color: #555555;
+}
+
+.tuatara {
+    background-color: #444444;
+}
+
+.oil {
+    background-color: #333333;
+}
+
+.jet {
+    background-color: #222222;
+}
+
+.black {
+    background-color: #000000;
+}
+
+.alert {
+    color: #fa4a47;
+}
+
+.success {
+    color: #4fa74f;
+}
+
+.warning {
+    color: #ff7d00;
+}
+
+/*
+    Adds the schoolbox font for later reference
+*/
+@font-face {
+    font-family: "schoolbox";
+    src: url("../..//fonts/schoolbox.ttf?xfi7p6") format("truetype"), url("../..//fonts/schoolbox.woff?xfi7p6") format("woff"), url("../..//fonts/schoolbox.svg?xfi7p6#schoolbox") format("svg");
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: "LibreBarcode39";
+    src: url("../..//fonts/LibreBarcode39-Regular.ttf");
+    font-weight: normal;
+    font-style: normal;
+}
+.barcode-39 {
+    font-family: LibreBarcode39;
+    width: 100%;
+    font-size: 100px;
+    line-height: 100px;
+}
+
+/*
+    Default Schoolbox variables
+    These will be overridden by skin values
+*/
+/*****************************
+ Refined Colour Application
+ (these are Skin Builder vars)
+ ****************************/
+/*****************************
+ Contrasts to skin color vars above
+ (this replaces usages of calc-text-color function, which works only with colors
+  known at SASS compilation time)
+ ****************************/
+/*****************************
+ Colors derived from configured skin colors, and their contrasts
+ ****************************/
+/*****************************
+ Constants
+ ****************************/
+/* A specific var for input element borders
+ * By default this is connected to the skin builder var
+ * but if for some reason you need different border colours
+ * you can choose that here
+ */
+/* Action-list specific colouring:
+ * Hover colour for action-list rows
+ * Hover colour for the action button in the action-list row
+ */
+/*
+    Various handy mixins that are referenced throughout the rest of the styles
+*/
+/* Button Dimensions
+ */
+/*
+    Various handy functions that are referenced throughout the rest of the styles
+*/
+/**
+ * Adds a percentage of white to a CSS color var.
+ *
+ * Expects that $colorVar is a `var(--name)` value, and that
+ * `var(--name-{r,g,b,a})` variables are defined.
+ */
+/**
+ * Lightens a CSS color var.
+ *
+ * Expects that $colorVar is a `var(--name)` value, and that
+ * `var(--name-{h,s,l,a})` variables are defined.
+ */
+/**
+ * Darkens a CSS color var.
+ *
+ * Expects that $colorVar is a `var(--name)` value, and that
+ * `var(--name-{h,s,l,a})` variables are defined.
+ */
+/**
+ * Partial port of SASS `adjust-color`: works only for the HSL and A channels.
+ *
+ * Expects that $colorVar is a `var(--name)` value, and that
+ * `var(--name-{h,s,l,a})` variables are defined.
+ *
+ * @see https://sass-lang.com/documentation/modules/color#adjust
+ */
+/**
+ * Partial port of SASS `scale-color`: works only for the HSL and A channels.
+ *
+ * Expects that $colorVar is a `var(--name)` value, and that
+ * `var(--name-{h,s,l,a})` variables are defined.
+ *
+ * @see https://sass-lang.com/documentation/modules/color#scale
+ */
+/**
+ * Partial port of SASS `change-color`: works only for the HSL and A channels.
+ *
+ * Expects that $colorVar is a `var(--name)` value, and that
+ * `var(--name-{h,s,l,a})` variables are defined.
+ *
+ * @see https://sass-lang.com/documentation/modules/color#change
+ */
+/**
+ * Helper function for scaling the value of a channel var.
+ */
+/**
+ * Asserts that $colorVar is a CSS color var declaration:
+ * * starts with `var(--`
+ * * ends with `)`
+ */
+/**
+ * Retrieves a map of the HSL+RGB+A vars for `$colorVar`.
+ */
+/*
+    Foundation specific $settings 
+*/
+/* 0, 640px */
+/*  641px,  950px */
+/*  951px, 1024px */
+/*  951px, 1440px */
+/* 1441px, 1920px */
+/* 1921px, ...    */
+/*
+    The following global styles is a combination of: 
+    1. A CSS reset from: https://www.joshwcomeau.com/css/custom-css-reset/
+    2. Foundations own overrides
+    3. Our own specific tweaks
+
+    We had previously used normalize (github.com/necolas/normalize.css) 
+    But it hasn't been updated in over five years and browsers have moved
+    on quite a bit since then. Addtionally, Foundation itself pretty
+    aggresively sets everything to how it sees fit. 
+
+    Moving forward I've tried to tidy up such global overrides as much as possible. 
+    This is so as we update our UI components, we can minimise the legacy that 
+    gets in the way and hopefully make it easier for new components to exist
+    in the existing setup.
+*/
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+html,
+body {
+    font-size: 16px;
+    height: 100%;
+}
+
+body {
+    background: var(--body-background);
+    color: #333333;
+    cursor: auto;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Droid Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 1.5;
+    padding: 0;
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+    background-color: var(--accent-foreground);
+    color: var(--accent-background);
+}
+
+:disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+img {
+    display: inline-block;
+    height: auto;
+    max-width: 100%;
+    vertical-align: middle;
+}
+
+img[src=""] {
+    display: none;
+}
+
+picture,
+video,
+canvas {
+    display: block;
+    max-width: 100%;
+}
+
+#map_canvas img,
+#map_canvas embed,
+#map_canvas object,
+.map_canvas img,
+.map_canvas embed,
+.map_canvas object,
+.mqa-display img,
+.mqa-display embed,
+.mqa-display object {
+    max-width: none !important;
+}
+
+textarea {
+    height: auto;
+    min-height: 50px;
+}
+
+select {
+    width: 100%;
+}
+
+time {
+    white-space: nowrap;
+}
+
+/*
+    All the general type settings, including for print styles
+*/
+a {
+    color: var(--content-ui-foreground);
+    line-height: inherit;
+    text-decoration: none;
+    transition: all 0.15s linear;
+}
+a:hover {
+    cursor: pointer;
+}
+a:hover, a:focus {
+    color: var(--content-ui-foreground);
+}
+a img {
+    border: none;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    overflow-wrap: break-word;
+}
+
+p {
+    font-family: inherit;
+    font-size: 0.8125rem;
+    font-weight: 400;
+    line-height: 1.6;
+    margin-bottom: 0.75rem;
+    text-rendering: auto;
+}
+p.lead {
+    font-size: 1.03125rem;
+    line-height: 1.6;
+}
+@media only print, screen and (max-width: 40em) {
+    p {
+        margin-bottom: 0.5rem;
+    }
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: #222222;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Droid Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 1.4;
+    margin-bottom: 1rem;
+    text-rendering: auto;
+}
+h1 small,
+h2 small,
+h3 small,
+h4 small,
+h5 small,
+h6 small {
+    color: #6f6f6f;
+    font-size: 0.75rem;
+    line-height: 0;
+}
+h1.mini,
+h2.mini,
+h3.mini,
+h4.mini,
+h5.mini,
+h6.mini {
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+    margin-top: 0.3rem;
+}
+a h1,
+a h2,
+a h3,
+a h4,
+a h5,
+a h6 {
+    color: inherit;
+}
+@media only print, screen and (min-width:40.0625em) {
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        line-height: 1.4;
+    }
+}
+
+h1 {
+    color: var(--body-foreground-h1);
+    font-size: 1.25rem;
+}
+@media only print, screen and (min-width:40.0625em) {
+    h1 {
+        font-size: 1.75rem;
+    }
+}
+
+h2 {
+    font-size: 1.125rem;
+}
+
+h3 {
+    font-size: 1.0625rem;
+}
+
+h4 {
+    font-size: 1rem;
+}
+
+h5 {
+    font-size: 0.9375rem;
+}
+
+h6 {
+    font-size: 0.875rem;
+}
+
+.subheader, h1.mini,
+h2.mini,
+h3.mini,
+h4.mini,
+h5.mini,
+h6.mini {
+    color: var(--body-foreground);
+    font-weight: 400;
+    line-height: 1.4;
+    margin-bottom: 0.5rem;
+    margin-top: 0.625rem;
+    text-transform: uppercase;
+}
+
+hr {
+    border: solid #dddddd;
+    border-width: 1px 0 0;
+    clear: both;
+    height: 0;
+    margin: 1rem 0 0.9375rem;
+}
+
+em,
+i {
+    font-style: italic;
+    line-height: inherit;
+}
+
+strong,
+b {
+    font-weight: 700;
+    line-height: inherit;
+}
+
+small {
+    font-size: 0.75rem;
+    line-height: inherit;
+}
+
+code {
+    background-color: var(--accent-background);
+    border-color: var(--accent-foreground);
+    border-style: solid;
+    border-width: 1px;
+    color: var(--accent-foreground);
+    font-family: Consolas, "Liberation Mono", "Droid Mono", Courier, monospace;
+    font-weight: 400;
+    padding: 0.125rem 0.3125rem 0.0625rem;
+}
+
+pre {
+    overflow: auto;
+}
+
+ul,
+ol,
+dl {
+    font-family: inherit;
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    list-style-position: outside;
+    margin-bottom: 0.75rem;
+}
+
+ul {
+    margin-left: 1.1rem;
+}
+
+ul li ul,
+ul li ol {
+    margin-left: 1.25rem;
+    margin-bottom: 0;
+}
+ul.square li ul, ul.circle li ul, ul.disc li ul {
+    list-style: inherit;
+}
+ul.square {
+    list-style-type: square;
+    margin-left: 1.1rem;
+}
+ul.circle {
+    list-style-type: circle;
+    margin-left: 1.1rem;
+}
+ul.disc {
+    list-style-type: disc;
+    margin-left: 1.1rem;
+}
+
+ol {
+    margin-left: 1.4rem;
+}
+ol li ul,
+ol li ol {
+    margin-left: 1.25rem;
+    margin-bottom: 0;
+}
+
+.no-bullet {
+    list-style-type: none;
+    margin-left: 0;
+}
+.no-bullet li ul,
+.no-bullet li ol {
+    list-style: none;
+    margin-left: 1.25rem;
+    margin-bottom: 0;
+}
+
+dl dt {
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+}
+dl dd {
+    margin-bottom: 0.75rem;
+}
+
+abbr,
+acronym {
+    color: #333333;
+    cursor: help;
+    font-size: 90%;
+    text-transform: uppercase;
+}
+
+abbr {
+    text-transform: none;
+}
+abbr[title] {
+    border-bottom: 1px dotted #dddddd;
+}
+
+.vcard {
+    border: 1px solid #dddddd;
+    display: inline-block;
+    margin: 0 0 1.25rem 0;
+    padding: 0.625rem 0.75rem;
+}
+.vcard li {
+    display: block;
+    margin: 0;
+}
+.vcard .fn {
+    font-size: 0.9375rem;
+    font-weight: 700;
+}
+
+.vevent .summary {
+    font-weight: 700;
+}
+.vevent abbr {
+    border: none;
+    cursor: default;
+    font-weight: bold;
+    padding: 0 0.0625rem;
+    text-decoration: none;
+}
+
+.meta {
+    color: var(--body-foreground);
+    font-size: 0.8125rem;
+    font-style: italic;
+    margin: 0 0 0.375rem 0;
+}
+.meta.title {
+    color: #000000 !important;
+    font-style: normal;
+    font-weight: bold;
+}
+.meta.pipe {
+    margin: 0;
+}
+.meta.pipe:before {
+    content: "|";
+    font-style: normal;
+    margin: 0 0.35rem;
+}
+
+.meta.inline {
+    margin: 0 0 0 0.375rem;
+}
+
+.meta.inline-container {
+    display: inline-block;
+}
+
+.strike,
+.del {
+    text-decoration: line-through;
+}
+.strike[disabled],
+.del[disabled] {
+    color: #999999;
+}
+
+.desc {
+    margin-bottom: 0.8125rem;
+}
+
+.info:not(.card) {
+    color: #a0d3e8;
+}
+
+.noselect {
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.text-left {
+    text-align: left !important;
+}
+
+.text-right {
+    text-align: right !important;
+}
+
+.text-center {
+    text-align: center !important;
+}
+
+.text-justify {
+    text-align: justify !important;
+}
+
+/*
+* Print styles.
+*
+* Inlined to avoid required HTTP connection: www.phpied.com/delay-loading-your-print-css/
+* Credit to Paul Irish and HTML5 Boilerplate (html5boilerplate.com)
+*/
+@media print {
+    * {
+        box-shadow: none !important;
+        text-shadow: none !important;
+    }
+    a,
+    a:visited {
+        text-decoration: underline;
+    }
+    a[href]:after {
+        content: " (" attr(href) ")";
+    }
+    abbr[title]:after {
+        content: " (" attr(title) ")";
+    }
+    .ir a:after,
+    a[href^="javascript:"]:after,
+    a[href^="#"]:after {
+        content: "";
+    }
+    pre,
+    blockquote {
+        border: 1px solid #999999;
+        page-break-inside: avoid;
+    }
+    thead {
+        display: table-header-group;
+    }
+    tr,
+    img {
+        page-break-inside: avoid;
+    }
+    img {
+        max-width: 100% !important;
+    }
+    @page {
+        margin: 0.34in;
+    }
+    p,
+    h2,
+    h3 {
+        orphans: 3;
+        widows: 3;
+    }
+    h2,
+    h3 {
+        page-break-after: avoid;
+    }
+    a[href*="/"]:after,
+    a[href*="/"]:visited:after {
+        content: normal;
+    }
+}
+/**
+ * The parts that are actually relevant to having our styles displayed.
+**/
+/*
+    All the icons contained within Schoolbox
+    See: https://vagrant.dev.schoolbox.cloud/pantry/icons to
+    view the entire list
+*/
+[class^=icon-],
+[class*=" icon-"] {
+    color: var(--body-foreground);
+}
+[class^=icon-]:before,
+[class*=" icon-"]:before {
+    speak: none;
+    font-family: "schoolbox";
+    font-size: 1rem;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    padding-right: 10px;
+    /* Better Font Rendering =========== */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.icon [class^=icon-]:before,
+.icon [class*=" icon-"]:before {
+    text-align: center;
+    width: 100%;
+    font-size: 20px;
+}
+
+.no-text:before {
+    padding-right: 0 !important;
+    float: right;
+}
+
+.size-8:before {
+    font-size: 0.5rem;
+    line-height: 0.5rem;
+}
+
+.size-24:before {
+    font-size: 1.5rem;
+    line-height: 1.5rem;
+}
+
+.size-32:before {
+    font-size: 2rem;
+    line-height: 2rem;
+}
+
+.size-48:before {
+    font-size: 3rem;
+    line-height: 3rem;
+}
+
+.size-64:before {
+    font-size: 4rem;
+    line-height: 4rem;
+}
+
+.icon-add:before,
+.icon-plus:before {
+    content: "\e600";
+    font-family: "schoolbox";
+}
+
+.icon-advanced-list:before {
+    content: "\e601";
+    font-family: "schoolbox";
+}
+
+.icon-alert:before {
+    content: "\e602";
+    font-family: "schoolbox";
+}
+
+.icon-anchor:before {
+    content: "\e603";
+    font-family: "schoolbox";
+}
+
+.icon-approve:before,
+.icon-tick:before {
+    content: "\e604";
+    font-family: "schoolbox";
+}
+
+.icon-archive:before {
+    content: "\e902";
+    font-family: "schoolbox";
+}
+
+.icon-attach:before {
+    content: "\e605";
+    font-family: "schoolbox";
+}
+
+.icon-audio:before {
+    content: "\e606";
+    font-family: "schoolbox";
+}
+
+.icon-badge:before {
+    content: "\e91d";
+    font-family: "schoolbox";
+}
+
+.icon-boarder-leave:before {
+    content: "\e607";
+    font-family: "schoolbox";
+}
+
+.icon-breadcrumbs:before {
+    content: "\e608";
+    font-family: "schoolbox";
+}
+
+.icon-canvas-lms:before {
+    content: "\e917";
+    font-family: "schoolbox";
+}
+
+.icon-calendar:before {
+    content: "\e609";
+    font-family: "schoolbox";
+}
+
+.icon-camera:before {
+    content: "\e65c";
+    font-family: "schoolbox";
+}
+
+.icon-chat:before {
+    content: "\e60a";
+    font-family: "schoolbox";
+}
+
+.icon-class-list:before {
+    content: "\e60b";
+    font-family: "schoolbox";
+}
+
+.icon-click-view:before {
+    content: "\e60c";
+    font-family: "schoolbox";
+}
+
+.icon-clipboard:before {
+    content: "\e929";
+    font-family: "schoolbox";
+}
+
+.icon-close:before,
+.icon-cancel:before,
+.icon-x:before {
+    content: "\e60d";
+    font-family: "schoolbox";
+}
+
+.icon-collab-docs:before {
+    content: "\e60e";
+    font-family: "schoolbox";
+}
+
+.icon-collapse:before,
+.icon-minus:before {
+    content: "\e60f";
+    font-family: "schoolbox";
+}
+
+.icon-comment:before,
+.icon-blog:before {
+    content: "\e610";
+    font-family: "schoolbox";
+}
+
+.icon-components:before {
+    content: "\e611";
+    font-family: "schoolbox";
+}
+
+.icon-copy:before {
+    content: "\e612";
+    font-family: "schoolbox";
+}
+
+.icon-countdown:before {
+    content: "\e613";
+    font-family: "schoolbox";
+}
+
+.icon-course-builder:before,
+.icon-course:before {
+    content: "\e614";
+    font-family: "schoolbox";
+}
+
+.icon-course-outline:before {
+    content: "\e615";
+    font-family: "schoolbox";
+}
+
+.icon-criteria:before {
+    content: "\e616";
+    font-family: "schoolbox";
+}
+
+.icon-curriculum:before {
+    content: "\e617";
+    font-family: "schoolbox";
+}
+
+.icon-curriculum-details:before {
+    content: "\e618";
+    font-family: "schoolbox";
+}
+
+.icon-danger:before {
+    content: "\e619";
+    font-family: "schoolbox";
+}
+
+.icon-day-view:before {
+    content: "\e61a";
+    font-family: "schoolbox";
+}
+
+.icon-delete:before,
+.icon-bin:before {
+    content: "\e61b";
+    font-family: "schoolbox";
+}
+
+.icon-directory:before {
+    content: "\e61c";
+    font-family: "schoolbox";
+}
+
+.icon-division:before {
+    content: "\e904";
+    font-family: "schoolbox";
+}
+
+.icon-document:before {
+    content: "\e61d";
+    font-family: "schoolbox";
+}
+
+.icon-dollar:before {
+    content: "\e91b";
+    font-family: "schoolbox";
+}
+
+.icon-download:before {
+    content: "\e61e";
+    font-family: "schoolbox";
+}
+
+.icon-drag-drop:before {
+    content: "\e61f";
+    font-family: "schoolbox";
+}
+
+.icon-drop-box:before {
+    content: "\e620";
+    font-family: "schoolbox";
+}
+
+.icon-dropdown:before,
+.icon-sort-down:before {
+    content: "\e621";
+    font-family: "schoolbox";
+}
+
+.icon-due-work:before,
+.icon-submissions:before,
+.icon-import:before {
+    content: "\e622";
+    font-family: "schoolbox";
+}
+
+.icon-edit-columns:before {
+    content: "\e623";
+    font-family: "schoolbox";
+}
+
+.icon-education-maintenance:before {
+    content: "\e90e";
+    font-family: "schoolbox";
+}
+
+.icon-email:before,
+.icon-mail:before {
+    content: "\e624";
+    font-family: "schoolbox";
+}
+
+.icon-eng-second-lang:before {
+    content: "\e90f";
+    font-family: "schoolbox";
+}
+
+.icon-eportfolio:before {
+    content: "\e625";
+    font-family: "schoolbox";
+}
+
+.icon-equals:before {
+    content: "\e626";
+    font-family: "schoolbox";
+}
+
+.icon-export:before {
+    content: "\e627";
+    font-family: "schoolbox";
+}
+
+.icon-external-link:before {
+    content: "\e921";
+    font-family: "schoolbox";
+}
+
+.external:after {
+    content: "\e922";
+    font-family: "schoolbox";
+    font-size: 10px;
+    padding-left: 6px;
+    padding-right: 0;
+}
+
+.icon-favourite:before,
+.icon-star:before {
+    content: "\e628";
+    font-family: "schoolbox";
+}
+
+.icon-favourite-hollow:before {
+    content: "\e912";
+    font-family: "schoolbox";
+}
+
+.icon-files:before {
+    content: "\e629";
+    font-family: "schoolbox";
+}
+
+.icon-filter:before {
+    content: "\e62a";
+    font-family: "schoolbox";
+}
+
+.icon-folder:before {
+    content: "\e62b";
+    font-family: "schoolbox";
+}
+
+.icon-forms:before {
+    content: "\e62c";
+    font-family: "schoolbox";
+}
+
+.icon-forum:before {
+    content: "\e62d";
+    font-family: "schoolbox";
+}
+
+.icon-geosnapshot:before {
+    content: "\e91e";
+    font-family: "schoolbox";
+}
+
+.icon-goal:before {
+    content: "\e919";
+    font-family: "schoolbox";
+}
+
+.icon-google-drive:before {
+    content: "\e62e";
+    font-family: "schoolbox";
+}
+
+.icon-grip:before {
+    content: "\e62f";
+    font-family: "schoolbox";
+}
+
+.icon-players:before,
+.icon-group:before,
+.icon-team:before {
+    content: "\e630";
+    font-family: "schoolbox";
+}
+
+.icon-group-managers:before {
+    content: "\e631";
+    font-family: "schoolbox";
+}
+
+.icon-help:before,
+.icon-questionmark:before {
+    content: "\e632";
+    font-family: "schoolbox";
+}
+
+.icon-hidden:before,
+.icon-eye-hollow:before,
+.icon-view-hollow:before {
+    content: "\e925";
+    font-family: "schoolbox";
+}
+
+.icon-history:before {
+    content: "\e633";
+    font-family: "schoolbox";
+}
+
+.icon-home:before,
+.icon-house:before {
+    content: "\e634";
+    font-family: "schoolbox";
+}
+
+.icon-homepagefeed:before {
+    content: "\e635";
+    font-family: "schoolbox";
+}
+
+.icon-image:before {
+    content: "\e636";
+    font-family: "schoolbox";
+}
+
+.icon-image-gallery:before {
+    content: "\e637";
+    font-family: "schoolbox";
+}
+
+.icon-image-slideshow:before,
+.icon-play:before {
+    content: "\e638";
+    font-family: "schoolbox";
+}
+
+.icon-info:before {
+    content: "\e639";
+    font-family: "schoolbox";
+}
+
+.icon-international-baccalaureate:before {
+    content: "\e914";
+    font-family: "schoolbox";
+}
+
+.icon-integration-student:before {
+    content: "\e910";
+    font-family: "schoolbox";
+}
+
+.icon-international-student:before {
+    content: "\e911";
+    font-family: "schoolbox";
+}
+
+.icon-lesson-plan:before {
+    content: "\e92c";
+    font-family: "schoolbox";
+}
+
+.icon-link:before {
+    content: "\e63a";
+    font-family: "schoolbox";
+}
+
+.icon-live-marks:before {
+    content: "\e927";
+    font-family: "schoolbox";
+}
+
+.icon-itineraryitem:before,
+.icon-list:before {
+    content: "\e63b";
+    font-family: "schoolbox";
+}
+
+.icon-list-view:before {
+    content: "\e63c";
+    font-family: "schoolbox";
+}
+
+.icon-location:before,
+.icon-venue:before {
+    content: "\e63d";
+    font-family: "schoolbox";
+}
+
+.icon-locked:before,
+.icon-padlock:before {
+    content: "\e63e";
+    font-family: "schoolbox";
+}
+
+.icon-logout:before {
+    content: "\e63f";
+    font-family: "schoolbox";
+}
+
+.icon-lti:before {
+    content: "\e90d";
+    font-family: "schoolbox";
+}
+
+.icon-match:before {
+    content: "\e903";
+    font-family: "schoolbox";
+}
+
+.icon-medical:before {
+    content: "\e928";
+    font-family: "schoolbox";
+}
+
+.icon-menu:before,
+.icon-hamburger:before {
+    content: "\e640";
+    font-family: "schoolbox";
+}
+
+.icon-microsoft-teams:before {
+    content: "\e916";
+    font-family: "schoolbox";
+}
+
+.icon-mic:before {
+    content: "\e641";
+    font-family: "schoolbox";
+}
+
+.icon-mic-muted:before {
+    content: "\e642";
+    font-family: "schoolbox";
+}
+
+.icon-mic-recording:before {
+    content: "\e643";
+    font-family: "schoolbox";
+}
+
+.icon-mobile:before {
+    content: "\e644";
+    font-family: "schoolbox";
+}
+
+.icon-modify:before,
+.icon-pen:before {
+    content: "\e645";
+    font-family: "schoolbox";
+}
+
+.icon-month-view:before {
+    content: "\e646";
+    font-family: "schoolbox";
+}
+
+.icon-more:before,
+.icon-overflow:before {
+    content: "\e647";
+    font-family: "schoolbox";
+}
+
+.icon-mute:before {
+    content: "\e648";
+    font-family: "schoolbox";
+}
+
+.icon-network:before {
+    content: "\e649";
+    font-family: "schoolbox";
+}
+
+.icon-news:before {
+    content: "\e64a";
+    font-family: "schoolbox";
+}
+
+.icon-next:before,
+.icon-goto:before {
+    content: "\e64b";
+    font-family: "schoolbox";
+}
+
+.icon-notifications:before,
+.icon-bell:before {
+    content: "\e64c";
+    font-family: "schoolbox";
+}
+
+.icon-notifications-hollow:before,
+.icon-bell-hollow:before {
+    content: "\e924";
+    font-family: "schoolbox";
+}
+
+.icon-office-365:before {
+    content: "\e64e";
+    font-family: "schoolbox";
+}
+
+.icon-open:before {
+    content: "\e64f";
+    font-family: "schoolbox";
+}
+
+.icon-pause:before {
+    content: "\e650";
+    font-family: "schoolbox";
+}
+
+.icon-phone:before {
+    content: "\e651";
+    font-family: "schoolbox";
+}
+
+.icon-pin-hollow:before {
+    content: "\e915";
+    font-family: "schoolbox";
+}
+
+.icon-pin:before {
+    content: "\e913";
+    font-family: "schoolbox";
+}
+
+.icon-pinterest:before {
+    content: "\e652";
+    font-family: "schoolbox";
+}
+
+.icon-podcast:before {
+    content: "\e653";
+    font-family: "schoolbox";
+}
+
+.icon-poll:before {
+    content: "\e654";
+    font-family: "schoolbox";
+}
+
+.icon-position:before {
+    content: "\e905";
+    font-family: "schoolbox";
+}
+
+.icon-previous:before {
+    content: "\e655";
+    font-family: "schoolbox";
+}
+
+.icon-print:before {
+    content: "\e656";
+    font-family: "schoolbox";
+}
+
+.icon-project:before {
+    content: "\e90c";
+    font-family: "schoolbox";
+}
+
+.icon-result:before,
+.icon-progress:before,
+.icon-report:before {
+    content: "\e657";
+    font-family: "schoolbox";
+}
+
+.icon-quiz:before {
+    content: "\e658";
+    font-family: "schoolbox";
+}
+
+.icon-random-image:before {
+    content: "\e659";
+    font-family: "schoolbox";
+}
+
+.icon-refresh:before {
+    content: "\e65a";
+    font-family: "schoolbox";
+}
+
+.icon-reply:before {
+    content: "\e65b";
+    font-family: "schoolbox";
+}
+
+.icon-resource-booking:before {
+    content: "\e65c";
+    font-family: "schoolbox";
+}
+
+.icon-rss:before {
+    content: "\e65d";
+    font-family: "schoolbox";
+}
+
+.icon-icons:before {
+    content: "\e65e";
+    font-family: "schoolbox";
+}
+
+.icon-schoolbox:before {
+    content: "\e65f";
+    font-family: "schoolbox";
+}
+
+.icon-screen-capture:before {
+    content: "\e920";
+    font-family: "schoolbox";
+}
+
+.icon-search:before {
+    content: "\e660";
+    font-family: "schoolbox";
+}
+
+.icon-settings:before,
+.icon-cog:before {
+    content: "\e661";
+    font-family: "schoolbox";
+}
+
+.icon-share:before {
+    content: "\e918";
+    font-family: "schoolbox";
+}
+
+.icon-achievement:before,
+.icon-showcase:before,
+.icon-trophy:before {
+    content: "\e662";
+    font-family: "schoolbox";
+}
+
+.icon-shuffle:before {
+    content: "\e663";
+    font-family: "schoolbox";
+}
+
+.icon-social-stream:before {
+    content: "\e664";
+    font-family: "schoolbox";
+}
+
+.icon-sort-up:before {
+    content: "\e91f";
+    font-family: "schoolbox";
+}
+
+.icon-sport:before,
+.icon-ball:before {
+    content: "\e665";
+    font-family: "schoolbox";
+}
+
+.icon-staff:before,
+.icon-users:before,
+.icon-pastoral:before {
+    content: "\e666";
+    font-family: "schoolbox";
+}
+
+.icon-player:before,
+.icon-staff-students:before,
+.icon-user:before {
+    content: "\e667";
+    font-family: "schoolbox";
+}
+
+.icon-surveys:before {
+    content: "\e668";
+    font-family: "schoolbox";
+}
+
+.icon-synergetic:before {
+    content: "\e669";
+    font-family: "schoolbox";
+}
+
+.icon-task:before {
+    content: "\e66a";
+    font-family: "schoolbox";
+}
+
+.icon-teacher:before,
+.icon-graduate:before {
+    content: "\e66b";
+    font-family: "schoolbox";
+}
+
+.icon-textbox:before {
+    content: "\e66c";
+    font-family: "schoolbox";
+}
+
+.icon-tiles:before {
+    content: "\e66d";
+    font-family: "schoolbox";
+}
+
+.icon-timetable:before,
+.icon-clock:before {
+    content: "\e66e";
+    font-family: "schoolbox";
+}
+
+.icon-time-value:before,
+.icon-hourglass:before {
+    content: "\e66f";
+    font-family: "schoolbox";
+}
+
+.icon-twitter:before {
+    content: "\e670";
+    font-family: "schoolbox";
+}
+
+.icon-undo:before {
+    content: "\e671";
+    font-family: "schoolbox";
+}
+
+.icon-unlocked:before {
+    content: "\e672";
+    font-family: "schoolbox";
+}
+
+.icon-up-arrow:before {
+    content: "\e900";
+    font-family: "schoolbox";
+}
+
+.icon-down-arrow:before {
+    content: "\e901";
+    font-family: "schoolbox";
+}
+
+.icon-unit:before {
+    content: "\e90b";
+    font-family: "schoolbox";
+}
+
+.icon-up-down:before,
+.icon-sortable:before {
+    content: "\e800";
+    font-family: "schoolbox";
+}
+
+.icon-upload:before {
+    content: "\e673";
+    font-family: "schoolbox";
+}
+
+.icon-video:before {
+    content: "\e674";
+    font-family: "schoolbox";
+}
+
+.icon-video-error:before {
+    content: "\e91a";
+    font-family: "schoolbox";
+}
+
+.icon-view:before,
+.icon-eye:before {
+    content: "\e675";
+    font-family: "schoolbox";
+}
+
+.icon-weather:before,
+.icon-mostly-cloudy:before {
+    content: "\e906";
+    font-family: "schoolbox";
+}
+
+.icon-thunder:before,
+.icon-storm:before {
+    content: "\e909";
+    font-family: "schoolbox";
+}
+
+.icon-rain:before {
+    content: "\e90a";
+    font-family: "schoolbox";
+}
+
+.icon-cloud:before,
+.icon-cloudy:before {
+    content: "\e907";
+    font-family: "schoolbox";
+}
+
+.icon-clear:before,
+.icon-sunny:before {
+    content: "\e908";
+    font-family: "schoolbox";
+}
+
+.icon-week-view:before {
+    content: "\e677";
+    font-family: "schoolbox";
+}
+
+.icon-wiki:before {
+    content: "\e678";
+    font-family: "schoolbox";
+}
+
+.icon-withdraw-achievement:before {
+    content: "\e91c";
+    font-family: "schoolbox";
+}
+
+.icon-wolfram-alpha:before {
+    content: "\e64d";
+    font-family: "schoolbox";
+}
+
+.icon-intellischool:before {
+    content: "\e926";
+    font-family: "schoolbox";
+}
+
+.icon-engage-logo:before {
+    content: "\e92a";
+    font-family: "schoolbox";
+}
+
+.icon-reach-logo:before {
+    content: "\e92b";
+    font-family: "schoolbox";
+}
+
+/**
+ *  Unify all the blockquote style in one file instead of spreading them across
+ *  multiple areas.
+**/
+blockquote {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    background-color: #f6f6f6;
+    border-left: 6px solid #aaaaaa;
+    font-size: 0.8125rem;
+    margin: 0 0 0.75rem;
+    /*  Necessary to encase floating elements within a blockquote (tables).
+        Otherwise, they end up floating outside the table...*/
+    overflow: hidden;
+    padding: 0.5625rem 1.25rem 0.5625rem 1.1875rem;
+}
+blockquote:before {
+    color: #aaaaaa;
+    content: "“";
+    font-family: Georgia, serif;
+    font-size: 4rem;
+    line-height: 0.1rem;
+    margin-right: 0.4rem;
+    vertical-align: -2rem;
+}
+blockquote cite {
+    color: #555555;
+    display: block;
+    font-size: 0.8125rem;
+}
+blockquote cite:before {
+    content: "— ";
+}
+blockquote cite a,
+blockquote cite a:visited {
+    color: #555555;
+}
+blockquote p {
+    display: inline;
+    font-style: italic;
+    word-wrap: break-word;
+}
+
+blockquote,
+blockquote p {
+    color: #6f6f6f;
+    line-height: 1.6;
+}
+
+/**
+ *  Custom block quote styles so that paragraph tags behave like paragraph
+ *  tags but still wrap properly around the " mark
+**/
+blockquote {
+    border-left: 6px solid #aaaaaa !important;
+    position: relative;
+    padding-left: 2.5rem !important;
+}
+blockquote:before {
+    font-size: 3.5rem;
+    font-style: normal;
+    height: 3rem;
+    left: 0.5rem;
+    line-height: normal;
+    position: absolute;
+    top: 0;
+    vertical-align: middle;
+}
+blockquote p {
+    display: block;
+}
+blockquote figure,
+blockquote table {
+    font-style: initial;
+}
+
+blockquote > p {
+    margin-top: 0;
+}
+
+/* Make last child in quote block not have bottom margin */
+blockquote > p:last-child,
+blockquote > figure:last-child,
+blockquote > img:last-child,
+blockquote > table:last-child {
+    margin-bottom: 0;
+}
+
+@media only print, screen and (max-width: 40em) {
+    blockquote {
+        padding-left: 1rem !important;
+    }
+    blockquote:before {
+        display: none;
+    }
+}
+/* Yellow box
+ */
+.highlighted-note {
+    background-color: #ffffb5;
+    padding: 0.75rem;
+    display: block;
+}
+
+.cke_editable {
+    margin: 0;
+    /* Anchor elements display a little flag
+     */
+}
+.cke_editable a[id] {
+    padding-left: 16px;
+    margin-left: 4px;
+    background-image: url("../..//js/ckeditor/plugins/schoolboxanchor/anchor.png");
+    background-repeat: no-repeat;
+    background-position: 0 0;
+}
+
+/**
+ *  Rules specific for content being displayed that has been created within CKEditor.
+ *  Basically replicate the CKEditor styles over to our own content;
+**/
+article {
+    /**
+     *  If the last element within an article is a floating element, it will break out
+     *  of the article and not be cleared by elements beneath it. This pseudo element
+     *  fixes this by adding a clear:both; beneath it in article.
+     *
+     *  This can be fixed by adding overflow-y: auto; to the article tag, but I was worried
+     *  that because of how many areas articles appear in this could cause some vertical
+     *  scroll bars to appear where they shouldn't, so this seemed 'safer', even though
+     *  it's gross.
+    */
+    /* Add bottom margin to media embeds */
+    /**
+     *  Because we have the potential to be displaying an unordered list in content and it'll
+     *  be contained *within* a list itself, the list marker style is displaying incorrectly.
+     *  Here we replicate the ck-editor internal rules...
+    **/
+}
+article::after {
+    clear: both;
+    content: "";
+    display: block;
+}
+article > figure:first-child {
+    margin-top: 1rem;
+}
+article a,
+article blockquote,
+article div,
+article figure,
+article img,
+article p,
+article table {
+    clear: both;
+}
+article span,
+article p {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+article figure.media {
+    margin: auto auto 1rem auto;
+}
+article figure.table {
+    /**
+     *  Without fit-content, any tables that haven't had their width modified (and thus
+     *  are missing an inline style with a width percent) won't centre align properly as
+     *  figure expands to cover the entire width of the container, preventing margin:auto
+     *  from working.
+    **/
+    width: fit-content;
+    margin: auto;
+}
+article table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin-bottom: 1rem;
+    width: 100%;
+    /**
+     * remove the 1px bottom border added to all tables, so if the user sets the table
+     * to have no border, it will actually have no border
+     */
+}
+article table th {
+    background-color: rgba(0, 0, 0, 0.05);
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    /**
+     *  Override browser default styling to provide cross-browser consistency. A user can
+     *  select to override this within the editor anyway.
+    **/
+    text-align: left;
+}
+article table th p {
+    font-weight: 600;
+}
+article table tr th,
+article table tr,
+article table td {
+    padding: 0.4em;
+    word-break: break-word;
+    vertical-align: middle;
+}
+article table td {
+    border-bottom: none;
+}
+article ul {
+    list-style-type: disc;
+}
+article ul ul {
+    list-style-type: circle;
+}
+article ul ul ul {
+    list-style-type: square;
+}
+article ol ol {
+    list-style-type: lower-latin;
+}
+article ol ol ol {
+    list-style-type: lower-roman;
+}
+article ol ol ol ol {
+    list-style-type: upper-latin;
+}
+article ol ol ol ol ol {
+    list-style-type: upper-roman;
+}
+
+/**
+ *  Rule specific to showing CKEditor content when being printed
+**/
+@media print {
+    article {
+        /*
+         *  When printing tables inside articles make sure they don't expand beyond
+         *  the bounds of the page (max-width). This also removes a horizontal scroll
+         *  bar that was appearing in some locations. Prevent tables breaking if possible.
+        **/
+    }
+    article figure,
+    article table {
+        break-inside: avoid;
+        max-width: 100%;
+        page-break-inside: avoid;
+    }
+}
+/*  CKEditor5 custom styles */
+/*  These have been declared out here as including them in the editor.css
+ *  file prevents the styles from being used elsewhere as that style sheet
+ *  is not imported unless a CKEditor5 area is set up on a page.
+ *  I added some colour custom properties as I spoke to James and he said
+ *  none of these should respond to skin config.
+ *
+ *  TODO - Replace our colour definitions with custom properties when they're
+ *  implemented in the platform (aka use globally accessible custom properties,
+ *  don't have them defined in this file.)
+ */
+:root {
+    --ck-custom-blue: #0068b3;
+    --ck-custom-red: #fa4a47;
+    --ck-custom-green: #4fa74f;
+    --ck-custom-yellow: #e4b144;
+    /* Yellow text has horrible readability on a white background, so darken it. */
+    --ck-custom-yellow-text: #b58d36;
+    --ck-custom-orange: #ff7045;
+    --ck-custom-sticky-bg: #ffdf8d;
+    --ck-custom-sticky-text: #3d2b26;
+    --ck-custom-code-bg: #272822;
+    --ck-custom-grey: #888888;
+    --ck-custom-white: #ffffff;
+    --ck-custom-black: #000000;
+    --ck-custom-shadow: rgba(0, 0, 0, 0.15);
+    --ck-custom-shadow-white: rgba(255, 255, 255, 0.15);
+}
+
+/**
+ *  CKEditor custom font sizes - they exist internally inside an editor.css file
+ *  but that file isn't imported onto a page unless you explicitly import it or
+ *  there's a CKEditor instance on the page.
+**/
+.text-tiny {
+    font-size: 0.7em;
+}
+
+.text-small {
+    font-size: 0.85em;
+}
+
+.text-big {
+    font-size: 1.4em;
+}
+
+.text-huge {
+    font-size: 1.8em;
+}
+
+.sb-ck {
+    /* Applies to all custom styles. */
+    /* Banner */
+    /* Callout */
+    /*  Previously these styles used two classes - a base 'ck-s-callout' class
+     *  and then a '--modifier' class to apply anything unique to that particular style.
+     *  This caused an issue when an end user accidentally added two callout styles at
+     *  the same time and then removed one of them, CKEditor5 would also remove that base
+     *  class even though the remaining style still required it.
+     *
+     *  The code is split out like this to prevent that error from occurring
+     *  so that now there's only a single class applied to the styles.
+     */
+    /* Sticky note */
+    /* Construction */
+}
+.sb-ck-banner, .sb-ck-callout--info, .sb-ck-callout--warning, .sb-ck-callout--success, .sb-ck-callout-target, .sb-ck-callout--question, .sb-ck-sticky-note, .sb-ck-construction, .sb-ck-code-block {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    word-break: break-word;
+}
+.sb-ck-banner {
+    background-color: var(--ck-custom-blue);
+    box-shadow: 0px 5px 5px 0px var(--ck-custom-shadow);
+    color: var(--ck-custom-white);
+    display: block;
+    margin: 1rem auto 2rem auto !important;
+    padding: 1rem;
+    position: relative;
+    width: calc(100% - 4em);
+}
+.sb-ck-banner::selection, .sb-ck-banner *::selection {
+    background-color: var(--ck-custom-white);
+    color: var(--ck-custom-blue);
+}
+.sb-ck-banner::before, .sb-ck-banner::after {
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    bottom: -24px;
+    content: "";
+    display: block;
+    height: 3rem;
+    position: absolute;
+    width: 2.5rem;
+}
+.sb-ck-banner::before {
+    background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB2aWV3Qm94PSIxNDUuOTI1IDExNS41NjYgNDIuNTAzIDQyLjM5MSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8ZyBzdHlsZT0iIiB0cmFuc2Zvcm09Im1hdHJpeCgtMS4wMDEwMTUsIDAsIDAsIDEuMDEyMDA1LCAzMzAuODMxMzYsIDQuNjY1NzkyKSI+CiAgICA8cGF0aCBkPSJNIDE1Ni43MTkgMTA5LjYxOCBMIDE4NC43MTkgMTA5LjU4NSBMIDE2NC4xODggMTMwLjM1MiBMIDE4NC43MTkgMTUxLjQ3MyBMIDE0Mi4zNjIgMTUxLjQ3MyBMIDE0Mi4zMzQgMTMwLjA3MyBMIDE1Ni43MTkgMTMwLjA3MyBMIDE1Ni43MTkgMTA5LjYxOCBaIiBzdHlsZT0iZmlsbDogcmdiKDYsIDc4LCAxMjkpOyIvPgogICAgPHBhdGggZD0iTSAtMTQyLjI1OSAtMTUwLjU1MyBMIC0xNDIuMjU5IC0xMzAuMTA2IEwgLTE1Ni44MTIgLTEzMC4xMDYgTCAtMTQyLjI1OSAtMTUwLjU1MyBaIiBzdHlsZT0iZmlsbC1vcGFjaXR5OiAwLjM7IiB0cmFuc2Zvcm09Im1hdHJpeCgtMSwgMCwgMCwgLTEsIDAsIDApIi8+CiAgICA8cGF0aCBkPSJNIDE0Mi4zMzQgMTMwLjA3MyBMIDE0Mi4zMDQgMTI3LjA1MyBMIDE1My43MjIgMTI3LjA1MyBMIDE1My43MjIgMTA5LjYyNCBMIDE1Ni44MTkgMTA5LjYxOCBMIDE1Ni44MTkgMTMwLjE3MiBMIDE0Mi4zMzQgMTMwLjE3MiBMIDE0Mi4zMzQgMTMwLjA3MyBaIiBzdHlsZT0iZmlsbDogcmdiKDAsIDEwNCwgMTc5KTsiLz4KICA8L2c+Cjwvc3ZnPg==");
+    left: -26px;
+}
+.sb-ck-banner::after {
+    background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB2aWV3Qm94PSIxNDUuOTI1IDExNS41NjYgNDIuNTAzIDQyLjM5MSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8ZyBzdHlsZT0iIiB0cmFuc2Zvcm09Im1hdHJpeCgxLjAwMTAxNSwgMCwgMCwgMS4wMTIwMDUsIDMuNTIxNDg1LCA0LjY2NTc5MikiPgogICAgPHBhdGggZD0iTSAxNTYuNzE5IDEwOS42MTggTCAxODQuNzE5IDEwOS41ODUgTCAxNjQuMTg4IDEzMC4zNTIgTCAxODQuNzE5IDE1MS40NzMgTCAxNDIuMzYyIDE1MS40NzMgTCAxNDIuMzM0IDEzMC4wNzMgTCAxNTYuNzE5IDEzMC4wNzMgTCAxNTYuNzE5IDEwOS42MTggWiIgc3R5bGU9ImZpbGw6IHJnYig2LCA3OCwgMTI5KTsiLz4KICAgIDxwYXRoIGQ9Ik0gLTE0Mi4yNTkgLTE1MC41NTMgTCAtMTQyLjI1OSAtMTMwLjEwNiBMIC0xNTYuODEyIC0xMzAuMTA2IEwgLTE0Mi4yNTkgLTE1MC41NTMgWiIgc3R5bGU9ImZpbGwtb3BhY2l0eTogMC4zOyIgdHJhbnNmb3JtPSJtYXRyaXgoLTEsIDAsIDAsIC0xLCAwLCAwKSIvPgogICAgPHBhdGggZD0iTSAxNDIuMzM0IDEzMC4wNzMgTCAxNDIuMzA0IDEyNy4wNTMgTCAxNTMuNzIyIDEyNy4wNTMgTCAxNTMuNzIyIDEwOS42MjQgTCAxNTYuODE5IDEwOS42MTggTCAxNTYuODE5IDEzMC4xNzIgTCAxNDIuMzM0IDEzMC4xNzIgTCAxNDIuMzM0IDEzMC4wNzMgWiIgc3R5bGU9ImZpbGw6IHJnYigwLCAxMDQsIDE3OSk7Ii8+CiAgPC9nPgo8L3N2Zz4=");
+    right: -26px;
+}
+.sb-ck-callout--info, .sb-ck-callout--warning, .sb-ck-callout--success, .sb-ck-callout--target, .sb-ck-callout--question {
+    background-color: white;
+    border: 1px solid var(--ck-custom-grey);
+    border-radius: 0.25rem;
+    box-shadow: 0px 5px 5px 0px var(--ck-custom-shadow);
+    color: var(--ck-custom-grey);
+    display: block;
+    overflow: hidden;
+    padding: 1em 1em 1em 4rem;
+    position: relative;
+}
+.sb-ck-callout--info::before, .sb-ck-callout--warning::before, .sb-ck-callout--success::before, .sb-ck-callout--target::before, .sb-ck-callout--question::before {
+    align-items: center;
+    background-color: var(--ck-custom-grey);
+    color: var(--ck-custom-white);
+    display: flex;
+    font-family: "schoolbox";
+    font-size: 1.25rem;
+    font-weight: 400;
+    height: 100%;
+    justify-content: center;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 3rem;
+}
+.sb-ck-callout--info {
+    border-color: var(--ck-custom-blue);
+    color: var(--ck-custom-blue);
+}
+.sb-ck-callout--info::before {
+    background-color: var(--ck-custom-blue);
+    content: "\e639";
+}
+.sb-ck-callout--warning {
+    border-color: var(--ck-custom-red);
+    color: var(--ck-custom-red);
+}
+.sb-ck-callout--warning::before {
+    background-color: var(--ck-custom-red);
+    content: "\e602";
+}
+.sb-ck-callout--success {
+    border-color: var(--ck-custom-green);
+    color: var(--ck-custom-green);
+}
+.sb-ck-callout--success::before {
+    background-color: var(--ck-custom-green);
+    content: "\e604";
+}
+.sb-ck-callout--target {
+    border-color: var(--ck-custom-yellow);
+    color: var(--ck-custom-yellow-text);
+}
+.sb-ck-callout--target::before {
+    background-color: var(--ck-custom-yellow);
+    content: "\e919";
+}
+.sb-ck-callout--question::before {
+    content: "\e632";
+}
+.sb-ck-sticky-note {
+    background-color: var(--ck-custom-sticky-bg);
+    background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB2aWV3Qm94PSIzNDcuNjUzIDEyNC4zNjMgMzMuMzQ5IDMxLjQ0NiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB4PSIzNDcuNjUzIiB5PSIxMjQuMzYzIiB3aWR0aD0iMzMuMzQ5IiBoZWlnaHQ9IjMxLjQ0NiIgc3R5bGU9ImZpbGwtb3BhY2l0eTogMC4wNzsiLz4KPC9zdmc+Cg==");
+    background-position: top;
+    background-repeat: repeat-x;
+    background-size: 1rem;
+    color: var(--ck-custom-sticky-text);
+    display: block;
+    margin-top: 1rem !important;
+    max-width: 100%;
+    padding: 1.5rem 1rem 1rem 1rem;
+    position: relative;
+    width: -moz-fit-content;
+    width: fit-content;
+}
+.sb-ck-sticky-note::before {
+    color: var(--ck-custom-red);
+    content: "\e913";
+    font-family: "schoolbox";
+    font-size: 24px;
+    left: calc(50% - 0.5em);
+    position: absolute;
+    top: -20px;
+}
+.sb-ck-sticky-note::after {
+    background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB2aWV3Qm94PSIxNTEuODQ1IDE1Ni4zMDYgMTgxLjE5MiAxODEuMzI0IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOmJ4PSJodHRwczovL2JveHktc3ZnLmNvbSI+CiAgPHBhdGggZD0iTSAzMzMuMDM3IDE1Ni4zMDYgTCAzMzMuMDM3IDMzNy40NzggTCAxNTEuODY1IDMzNy40NzggTCAzMzMuMDM3IDE1Ni4zMDYgWiIgc3R5bGU9ImZpbGw6IHJnYigyNTUsIDI1NSwgMjU1KTsiIGJ4OnNoYXBlPSJ0cmlhbmdsZSAxNTEuODY1IDE1Ni4zMDYgMTgxLjE3MiAxODEuMTcyIDEgMCAxQGQzYjJkNjY5Ii8+CiAgPHBhdGggZD0iTSAtMTUxLjg0NSAtMzM3LjYzIEwgLTE1MS44NDUgLTE1Ni40NTggTCAtMzMzLjAxNyAtMTU2LjQ1OCBMIC0xNTEuODQ1IC0zMzcuNjMgWiIgc3R5bGU9ImZpbGwtb3BhY2l0eTogMC4wNzsiIHRyYW5zZm9ybT0ibWF0cml4KC0xLCAwLCAwLCAtMSwgMCwgMCkiIGJ4OnNoYXBlPSJ0cmlhbmdsZSAtMzMzLjAxNyAtMzM3LjYzIDE4MS4xNzIgMTgxLjE3MiAxIDAgMUA5MWZkMjhjMSIvPgo8L3N2Zz4K");
+    background-repeat: no-repeat;
+    background-size: cover;
+    bottom: 0;
+    content: "";
+    height: 18px;
+    position: absolute;
+    right: 0;
+    width: 18px;
+}
+.sb-ck-construction {
+    background-color: var(--ck-custom-orange);
+    border: 1px solid var(--ck-custom-orange);
+    box-shadow: 0px 5px 5px 0px var(--ck-custom-shadow);
+    color: var(--ck-custom-white);
+    padding: 1rem;
+    position: relative;
+}
+.sb-ck-construction::before, .sb-ck-construction::after {
+    background: repeating-linear-gradient(45deg, var(--ck-custom-orange), var(--ck-custom-orange) 10px, var(--ck-custom-white) 10px, var(--ck-custom-white) 20px);
+    content: "";
+    height: 0.5rem;
+    position: absolute;
+    width: 100%;
+}
+.sb-ck-construction::before {
+    left: 0;
+    top: 0;
+}
+.sb-ck-construction::after {
+    bottom: 0;
+    left: 0;
+}
+
+/* Code block styling */
+p.sb-ck-code-block {
+    background-color: var(--ck-custom-code-bg);
+    border: none;
+    border-radius: 0.25rem;
+    color: var(--ck-custom-white);
+    display: block;
+    font-family: monospace;
+    font-weight: 400;
+    padding: 1rem;
+    position: relative;
+    tab-size: 4;
+}

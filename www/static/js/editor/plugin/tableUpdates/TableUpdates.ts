@@ -16,7 +16,7 @@ export default class TableUpdates extends Plugin {
     }
 
     /**
-     * Add the additional is new attribute to the schema so we can add .sb-ck-table-new on new tables only
+     * Add the additional is new attribute to the schema so we can add .sb-ck-table on new tables only
      * https://ckeditor.com/docs/ckeditor5/latest/api/module_engine_model_schema-Schema.html
      * Otherwise the attributes will be stripped out when the editor is loaded
      */
@@ -46,7 +46,7 @@ export default class TableUpdates extends Plugin {
                         ? viewElement
                         : Array.from(viewElement.getChildren()).find((viewChild) => viewChild.is("element", "table"));
                     if (modelTable.hasAttribute("isNew")) {
-                        viewWriter.addClass("sb-ck-table-new", viewTable);
+                        viewWriter.addClass("sb-ck-table", viewTable);
                     }
                 },
                 { priority: "low" }
