@@ -33,7 +33,7 @@ $id   = $_GET['id'];
 
 if (
     !array_key_exists('size', $_GET) ||
-    !in_array($_GET['size'], [ResourceVideo::POSTER, ResourceVideo::POSTER, 'poster_letterbox'], true)
+    !in_array($_GET['size'], [ResourceVideo::POSTER, ResourceVideo::POSTER, ResourceVideo::POSTER_LETTERBOX], true)
 ) {
     $_GET['size'] = ResourceVideo::THUMBNAIL;
 }
