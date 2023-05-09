@@ -5,6 +5,7 @@ import { addFullWidthAttributes } from "@js/editor/settings/imageSettings";
 import { addFullWidthStyle, addAlignLeftStyle } from "@js/editor/settings/tableSettings";
 import { surroundUnsurroundedTokens } from "@js/editor/settings/tokensSettings";
 import { fixListedHeadings } from "@js/editor/settings/headingSettings";
+import { removeParagraphsInLists } from "@js/editor/settings/listSettings";
 
 /**
  * Parse the content as HTML so we can run .querySelectorAll etc on it
@@ -35,6 +36,7 @@ function runChecks(sourceElement: HTMLElement, config: EditorConfig) {
     sourceElementHTML = addFullWidthStyle(sourceElementHTML);
     sourceElementHTML = addAlignLeftStyle(sourceElementHTML);
     sourceElementHTML = fixListedHeadings(sourceElementHTML);
+    sourceElementHTML = removeParagraphsInLists(sourceElementHTML);
     if (config.hasTokens) {
         sourceElementHTML = surroundUnsurroundedTokens(sourceElementHTML, config);
     }
