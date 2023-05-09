@@ -109,13 +109,14 @@ article {
             word-break: break-word;
             vertical-align: middle;
         }
-        /**
-         * remove the 1px bottom border added to all tables, so if the user sets the table
-         * to have no border, it will actually have no border
-         */
-        td {
-            border-bottom: none;
-        }
+    }
+
+    /**
+    * remove the 1px bottom border added to all tables, so if the user sets the table
+    * to have no border, it will actually have no border
+    */
+    .sb-ck-table td {
+        border-bottom: none;
     }
 
     /**

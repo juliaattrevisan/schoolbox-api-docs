@@ -335,7 +335,8 @@ class Scrub
                     'Flow',
                     false
                 );
-
+                // figure element, attribute is added to new tables (with CKEditor5 assigning table attributes to parent figure element)
+                $def->addAttribute('figure', 'data-is-ckeditor5-table', 'Text');
 
                 //
                 // Definition of customised elements, copied directly out of modules.

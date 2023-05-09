@@ -29,7 +29,8 @@ export function addFullWidthStyle(sourceElementHTML: HTMLElement) {
 }
 
 /**
- * When the table isn't aligned, it should be left aligned by default
+ * CKEditor4 tables use the now deprecated align attribute,
+ * so we need to add the float style to the table as an alternative
  *
  * @param { HTMLElement } sourceElementHTML - the sourceElement content as HTML
  * @returns { HTMLElement } -
@@ -37,8 +38,8 @@ export function addFullWidthStyle(sourceElementHTML: HTMLElement) {
 export function addAlignLeftStyle(sourceElementHTML: HTMLElement) {
     const tables = sourceElementHTML.querySelectorAll("table");
     tables.forEach((table) => {
-        if (table.style.float === "") {
-            table.style.float = "left";
+        if (table.align !== "" && !table.parent.hasAttribute("data-is-ckeditor5-table")) {
+            table.style.float = table.align;
         }
     });
     return sourceElementHTML;
