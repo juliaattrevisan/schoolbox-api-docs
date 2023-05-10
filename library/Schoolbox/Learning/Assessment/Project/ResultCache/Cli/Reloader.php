@@ -41,12 +41,22 @@ class Reloader extends CliTool\App
 
 
     /**
+     * --first-id=FIRST_ID
+     *
+     * If this is provided: only attempt to reload project results for project
+     * IDs which are equal to or greater than this ID.
+     */
+    private const OPT_LONG_FIRST_ID = 'first-id:';
+
+
+    /**
      * @inheritdoc
      */
     public function getLongOpts(): array
     {
         return [
             self::OPT_LONG_HELP,
+            self::OPT_LONG_FIRST_ID,
         ];
     }
 
@@ -64,8 +74,13 @@ Project Result Cache Reloader
 This populates the records for project_result, which is where project marks
 are stored after they're derived from their constituent assessments.
 
-Every project that exists in project_assessment will get re-derived and
-stored into this caching table for rapid retrievals later.
+If the --first-id option is provided: only projects with an ID equal to or
+greater than this value will be derived: otherwise, every project that exists in
+project_assessment will get re-derived and stored into this caching table for
+rapid retrievals later.
+
+(You may use the --first-id option to resume population of project_result, if
+this tool failed partway through.)
 
 User ids and assessment ids are shown in brackets.
 
@@ -76,7 +91,7 @@ and won't be persisted until --perform is specified.
 * This tool won't delete records from project_result
 * Non-participant users are ignored though you shouldn't encounter this
 
-Usage: projectResultCacheReload.php [--perform]
+Usage: projectResultCacheReload.php [--perform] [--first-id=FIRST_ID]
 
 
 HELP;
@@ -134,11 +149,26 @@ HELP;
          */
         $marker = null;
 
+        // First ID to process, if it was provided: otherwise, default to 1
+        $firstId = $this->getOptAsInt(self::OPT_LONG_FIRST_ID, 1);
+
         try {
             foreach ($assessmentStatement->fetchAll() as $row) {
                 $this->refreshLock($lock);
 
-                $project = $assessmentMapperProxy->findByIdForReview($row['assessment_id']);
+                $projectId = $row['assessment_id'];
+                if ($projectId < $firstId) {
+                    $this->getLogger()->debug(
+                        sprintf(
+                            'Project with ID #%s is below the first ID option #%d - skipping',
+                            $projectId,
+                            $firstId,
+                        )
+                    );
+                    continue;
+                }
+
+                $project = $assessmentMapperProxy->findByIdForReview($projectId);
                 if (!$project->isImplementation()) {
                     $this->getLogger()->info(
                         sprintf(
