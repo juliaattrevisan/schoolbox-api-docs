@@ -578,7 +578,7 @@
                 {% endif %}
             </div>
                 {% if allGraphs['class'][folder.id] is defined %}
-                    {% include '@learningGrades/fragments/summativeGraph.twig' with { graph: allGraphs['class'][folder.id].graph, graphId: 'class_' ~ folder.id, folderType: allGraphs['summary'][folder.id].type, location: 'class' } only %}
+                    {% include '@learningGrades/fragments/summativeGraph.twig' with { graph: allGraphs['class'][folder.id].graph, graphId: 'class_' ~ folder.id, folderType: allGraphs['class'][folder.id].type, location: 'class' } only %}
                 {% endif %}
             <div class="summative-content">
                 {% for assessment in classAssessments[folder.id] %}
