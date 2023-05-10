@@ -60,7 +60,7 @@ class Helper
         $assessments = $this->searchForAssessments(['assessmentId' => $assessmentId], 0, 0);
 
         if (count($assessments) === 0) {
-            throw new ExceptionNotFound;
+            throw new ExceptionNotFound();
         }
 
         return $assessments[0];
