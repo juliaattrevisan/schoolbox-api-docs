@@ -132,17 +132,34 @@ export default {
         open() {
             this.isActive = true;
             gsap.to(this.$refs.innerContainer, { right: 0, duration: 0.4 });
-            this.checkInView();
+            this.adjustPosition();
         },
 
         /**
-         * Ensure the pop out does not appear above the current viewport
+         * Adjust the position of the component based on the selected row's position
          */
-        checkInView() {
+        adjustPosition() {
             this.$nextTick(() => {
-                if (this.$refs.innerContainer.getBoundingClientRect().y < 0) {
-                    //if it's less than 0 the top will be out of view
-                    this.$refs.innerContainer.style.top = `${-this.$refs.innerContainer.getBoundingClientRect().y}px`; //so move it down how much it's out of view
+                const currentRow = this.$el.parentNode.querySelector('.list-item-container[data-row-id="' + this.selectedRow.id + '"]');
+                if (currentRow) {
+                    const tableRect = this.$el.parentNode.getBoundingClientRect();
+                    const rowRect = currentRow.getBoundingClientRect();
+                    const componentRect = this.$refs.innerContainer.getBoundingClientRect();
+
+                    // The top of the popout, in relation to the top of the table
+                    let newTop = rowRect.top - componentRect.y - componentRect.height;
+
+                    // If the top of the table is out of view, ensure that the pop out locks
+                    // itself to the top of the screen so it doesn't go out of view
+                    if (tableRect.top < 0 && tableRect.top < -newTop) {
+                        // Add 5px to create a small gap between the top of the screen and the popout
+                        newTop = tableRect.top * -1 + 5;
+                    }
+
+                    // Make sure the pop out can't go above the top of the table
+                    if (newTop > 0) {
+                        this.$refs.innerContainer.style.top = `${newTop}px`;
+                    }
                 }
             });
         },
@@ -156,7 +173,7 @@ export default {
                 duration: 0.3,
                 onComplete: () => {
                     this.isActive = false;
-                    this.$refs.innerContainer.style.top = "0px"; //set back to 0, checkInView() can always update on another open
+                    this.$refs.innerContainer.style.top = "0px"; //set back to 0, adjustPosition() can always update on another open
                 },
             });
         },
