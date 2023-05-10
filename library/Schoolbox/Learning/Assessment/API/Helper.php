@@ -203,66 +203,77 @@ class Helper
         $folderCodes = [];
         $folderIds = [];
 
-        $select = "SELECT
-    assessment.id,
-    assessment.title,
-    assessment.weight,
-    assessment.course_managed as commonAssessment,
-    lu_work_type.name as `workTypeName`,
-    lu_work_type.id as `workTypeId`,
-    assessment.due_date,
-    v_assessment_relation.folder_id as `folderId`,
-    COALESCE(
-            if(task.id, 'Task', null),
-            if(assess.assessment_id, 'Quiz', null),
-            if(lti_assessment.assessment_id, 'LTI', null),
-            if(submission_box.id, 'DueWork', null),
-            if(project.id, 'Project', null),
-            if(lesson_plan.id, 'Lesson Plan', null)
-        ) as `assessmentType`,
-    folder.name as `folderName`,
-    (SELECT course_specification.subject_code from course_specification
-                                              join course_implementation on (course_implementation.course_specification_id = course_specification.id and
-                                                                             v_assessment_relation.course_implementation_id = course_implementation.id)
-                                              ) as `subjectCode`,
-    (SELECT group_concat(id) from lu_year_level
-                                      LEFT JOIN folder_year_level on folder_year_level.year_level_id= lu_year_level.id
-     where folder_year_level.folder_id = v_assessment_relation.folder_id) as `yearLevelId`,
-    markTypeTable.hr_name AS markType,
-        projectParent.assessment_id as `project`
-    ";
+        $select = (
+            "SELECT
+             assessment.id,
+             assessment.title,
+             assessment.weight,
+             assessment.course_managed AS commonAssessment,
+             lu_work_type.name AS `workTypeName`,
+             lu_work_type.id AS `workTypeId`,
+             assessment.due_date,
+             v_assessment_relation.folder_id AS `folderId`,
+             COALESCE(
+                 IF(task.id, 'Task', NULL),
+                 IF(assess.assessment_id, 'Quiz', NULL),
+                 IF(lti_assessment.assessment_id, 'LTI', NULL),
+                 IF(submission_box.id, 'DueWork', NULL),
+                 IF(project.id, 'Project', NULL),
+                 IF(lesson_plan.id, 'Lesson Plan', NULL)
+             ) AS `assessmentType`,
+             folder.name AS `folderName`,
+             (
+                 SELECT course_specification.subject_code
+                 FROM course_specification
+                 JOIN course_implementation ON (
+                    course_implementation.course_specification_id = course_specification.id AND
+                    v_assessment_relation.course_implementation_id = course_implementation.id
+                 )
+             ) AS `subjectCode`,
+             (
+                 SELECT GROUP_CONCAT(id)
+                 FROM lu_year_level
+                 LEFT JOIN folder_year_level ON folder_year_level.year_level_id = lu_year_level.id
+                 WHERE folder_year_level.folder_id = v_assessment_relation.folder_id
+             ) AS `yearLevelId`,
+             markTypeTable.hr_name AS markType,
+             projectParent.assessment_id AS `project`
+             "
+        );
 
-        $from = "FROM v_assessment_relation
-         JOIN assessment on v_assessment_relation.assessment_id = assessment.id
-         LEFT JOIN lu_work_type on assessment.work_type_id = lu_work_type.id
-         LEFT JOIN task on assessment.id = task.assessment_id
-         LEFT JOIN assess on assessment.id = assess.assessment_id
-         LEFT JOIN lti_assessment on assessment.id = lti_assessment.assessment_id
-         LEFT JOIN project on assessment.id = project.assessment_id
-         LEFT JOIN submission_box ON assessment.id = submission_box.assessment_id
-         LEFT JOIN folder on v_assessment_relation.folder_id = folder.id
-
-         LEFT JOIN submission_mark_type as markTypeTable ON submission_box.mark_type = markTypeTable.mark_type_id
-
-        LEFT JOIN project projectParent on projectParent.id = v_assessment_relation.project_assessment_id
-        LEFT JOIN lesson_plan ON assessment.id = lesson_plan.assessment_id
-";
-        $where = "
-WHERE
-    assessment.deleted_at is null
-";
+        $from = (
+            "FROM v_assessment_relation
+             JOIN assessment ON v_assessment_relation.assessment_id = assessment.id
+             LEFT JOIN lu_work_type ON assessment.work_type_id = lu_work_type.id
+             LEFT JOIN task ON assessment.id = task.assessment_id
+             LEFT JOIN assess ON assessment.id = assess.assessment_id
+             LEFT JOIN lti_assessment ON assessment.id = lti_assessment.assessment_id
+             LEFT JOIN project ON assessment.id = project.assessment_id
+             LEFT JOIN submission_box ON assessment.id = submission_box.assessment_id
+             LEFT JOIN folder ON v_assessment_relation.folder_id = folder.id
+             LEFT JOIN submission_mark_type AS markTypeTable ON submission_box.mark_type = markTypeTable.mark_type_id
+             LEFT JOIN project projectParent ON projectParent.id = v_assessment_relation.project_assessment_id
+             LEFT JOIN lesson_plan ON assessment.id = lesson_plan.assessment_id
+             "
+        );
+        $where = (
+            "WHERE assessment.deleted_at is null
+            "
+        );
         if (array_key_exists('assessmentId', $filter)) {
             $where .= " AND v_assessment_relation.assessment_id = :assessmentId ";
             $params['assessmentId'] = $filter['assessmentId'];
         }
         if (array_key_exists('assessmentType', $filter)) {
-            $where .= " AND COALESCE(
-            if(task.id, 'Task', null),
-            if(assess.assessment_id, 'Quiz', null),
-            if(lti_assessment.assessment_id, 'LTI', null),
-            if(submission_box.id, 'DueWork', null),
-            if(project.id, 'Project', null)
-        ) = :assessmentType ";
+            $where .= (
+                " AND COALESCE(
+                    IF(task.id, 'Task', NULL),
+                    IF(assess.assessment_id, 'Quiz', NULL),
+                    IF(lti_assessment.assessment_id, 'LTI', NULL),
+                    IF(submission_box.id, 'DueWork', NULL),
+                    IF(project.id, 'Project', NULL)
+                 ) = :assessmentType "
+            );
             $params['assessmentType'] = $filter['assessmentType'];
         }
         if (array_key_exists('folder', $filter)) {
