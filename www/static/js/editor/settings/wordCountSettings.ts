@@ -167,6 +167,7 @@ function addListenersForDisablingSubmitButton(ckeditorSourceEl: HTMLElement) {
         // No submit button found, so do nothing.
         return;
     }
+
     ckeditorSourceEl.addEventListener("EDITOR__MAX_CHAR_COUNT_EXCEEDED", function () {
         submitButton.disabled = true;
         submitButton.setAttribute("value", "Save (disabled because content storage limit exceeded)");
