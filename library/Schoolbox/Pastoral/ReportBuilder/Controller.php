@@ -28,6 +28,7 @@ use Schoolbox\Pastoral\Model as PastoralRecord;
 use Schoolbox\Pastoral\Report\Access\Mapper as ReportAccessMapper;
 use Schoolbox\Pastoral\Report\Access\Model as ReportAccess;
 use Schoolbox\Pastoral\Report\Dashboard\Mapper as PastoralReportDashboardMapper;
+use Schoolbox\Pastoral\Report\Dashboard\Model as PastoralReportDashboard;
 use Schoolbox\Pastoral\Report\Mapper as PastoralReportMapper;
 use Schoolbox\Pastoral\Report\Model as PastoralReport;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
@@ -244,7 +245,7 @@ class Controller extends Base
         try {
             $this->pastoralReportDashboardMapper->findOneByColumnList(
                 [
-                    'user_id'   => $report->getOwner()->getId(),
+                    'user_id'   => $this->getUser()->getId(),
                     'report_id' => $report->getId(),
                 ]
             );
@@ -696,6 +697,7 @@ class Controller extends Base
         try {
             // Check if the report is already on the dashboard
 
+            /** @var PastoralReportDashboard $pastoralReportDashboard */
             $pastoralReportDashboard = $this->pastoralReportDashboardMapper->findOneByColumnList(
                 [
                     'user_id'   => $this->getUser()->getId(),
@@ -709,10 +711,14 @@ class Controller extends Base
                 // Report was being displayed on dashboard, delete it
 
                 $this->pastoralReportDashboardMapper->delete($pastoralReportDashboard);
-                $result = 'Removed from dashboard';
+                return 'Removed from dashboard';
             } else {
-                $result = 'No action, already on dashboard';
+                return 'No action, already on dashboard';
             }
+        } catch (MapperException\Deleted $e) {
+            $pastoralReportDashboard = $e->getDeletedObject();
+            $this->pastoralReportDashboardMapper->restoreSoftDeleted($pastoralReportDashboard);
+            return 'Added to dashboard';
         } catch (MapperException $e) {
             // Report wasn't on the dashboard already, check if we need to add it
 
@@ -723,13 +729,11 @@ class Controller extends Base
                 $pastoralReportDashboard->setUser($this->getUser());
                 $pastoralReportDashboard->setReport($report);
                 $this->pastoralReportDashboardMapper->save($pastoralReportDashboard);
-                $result = 'Added to dashboard';
+                return 'Added to dashboard';
             } else {
-                $result = 'No action, already not on dashboard';
+                return 'No action, already not on dashboard';
             }
         }
-
-        return $result;
     }
 
     /**
