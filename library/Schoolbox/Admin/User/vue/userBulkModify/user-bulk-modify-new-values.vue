@@ -5,6 +5,7 @@
  */
 
 import RevealModal from "@schoolboxVue/components/reveal-modal";
+const MAX_LENGTH = 5000; //the maximum amount of users to process at once
 
 export default {
     components: {
@@ -68,6 +69,7 @@ export default {
             updateFieldsOriginal: {}, //to reset to original values once an update is complete
             isProcessing: false,
             hasUpdated: false,
+            processed: 0
         };
     },
 
@@ -104,12 +106,15 @@ export default {
          */
         async onUpdateUsersSelected() {
             try {
+                let response, responseData = [];
                 this.isProcessing = true;
-                const response = await fetch(this.srcUserModify, {
-                    method: "POST",
-                    body: this.getUpdateUsersFormData(),
-                });
-                const responseData = await response.json();
+                while (this.processed < this.selectedRows.length) {
+                    response = await fetch(this.srcUserModify, {
+                        method: "POST",
+                        body: this.getUpdateUsersFormData(),
+                    });
+                    responseData.push(await response.json());
+                }
                 this.checkUpdateResponse(response, responseData);
             } catch (error) {
                 console.warn(error);
@@ -128,7 +133,8 @@ export default {
          * @returns { FormData }
          */
         getUpdateUsersFormData() {
-            const usersToModifyIDList = this.selectedRows.map((row) => row.id);
+            const usersToModifyIDList = this.selectedRows.map((row) => row.id).slice(this.processed, this.processed + MAX_LENGTH);
+            this.processed += MAX_LENGTH;
             const formData = new FormData();
             usersToModifyIDList.forEach((item) => {
                 formData.append("users[]", item);
