@@ -8,6 +8,7 @@
 namespace Schoolbox\Learning\Assessment\API;
 
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
+use Schoolbox\Application\Exception\NotFound as ExceptionNotFound;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
 use Schoolbox\GenericCollection;
 use Alaress\Database\Predicate\Builder;
@@ -52,11 +53,17 @@ class Helper
 
     /**
      * @param string $assessmentId
-     * @return array
+     * @return array|null
      */
-    public function getAssessment(string $assessmentId): array
+    public function getAssessment(string $assessmentId): array | null
     {
-        return $this->searchForAssessments(['assessmentId' => $assessmentId], 0, 0)[0];
+        $assessments = $this->searchForAssessments(['assessmentId' => $assessmentId], 0, 0);
+
+        if (count($assessments) === 0) {
+            throw new ExceptionNotFound;
+        }
+
+        return $assessments[0];
     }
 
     /**
