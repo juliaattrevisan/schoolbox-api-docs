@@ -80,6 +80,22 @@ class Profile implements IStrategy
 
 
     /**
+     * Number of seconds to take a nap before retrying a failed endpoint
+     *
+     * Sometimes endpoints fail for no obvious reason and trying again seems
+     * to work - instead of doing it manually, try insisting programmatically
+     * waiting NAP_TIMEOUT seconds between each attempt
+     */
+    private const NAP_TIMEOUT = 3;
+
+
+    /**
+     * Number of attempts to retry fetching a portrait url before skipping it
+     */
+    private const NUM_RETRY = 3;
+
+
+    /**
      * @var ValidStrats
      */
     private ValidStrats $validStrats;
@@ -1226,7 +1242,42 @@ class Profile implements IStrategy
 
         /* Fetch data from the url specified
          */
-        $image = file_get_contents($url);
+        $image = null;
+        $fails = 0;
+
+        while ($fails < self::NUM_RETRY) {
+            try {
+                $image = file_get_contents($url);
+                break;
+            } catch (\Exception $e) {
+                $this->log->warning(sprintf(
+                    'Could not obtain profile picture %s time(s): %s',
+                    $fails + 1,
+                    $e->getMessage()
+                ));
+
+                /* Take a nap
+                 */
+                sleep(self::NAP_TIMEOUT);
+            }
+
+            /* Increment counter and try again
+             */
+            $fails++;
+        }
+
+        /* Died after too many retries; log it, leave it
+         */
+        if (self::NUM_RETRY === $fails) {
+            $this->log->warning(sprintf(
+                'Profile picture: could not obtain profile picture for %s %s (%s) after multiple retries; skipping',
+                $baseProfile->getFirstname(),
+                $baseProfile->getLastname(),
+                $baseProfile->getExternalId()
+            ));
+
+            return;
+        }
 
         if (!$image) {
             $this->log->debug(sprintf(
