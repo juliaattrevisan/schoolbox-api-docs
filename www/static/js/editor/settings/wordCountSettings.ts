@@ -117,6 +117,8 @@ function updateWordCount(
         }
     };
 
+    addListenersForDisablingSubmitButton(sourceElement);
+
     editor.plugins.get("WordCount").on("update", onUpdateText);
 
     onUpdateText(); // Run once initially in case max char count already exceeded due to content loaded from database.
@@ -142,4 +144,39 @@ export function insertWordCount(sourceElement: HTMLElement, editor: Editor, conf
         wordCountContainer.style.display = "none";
     }
     updateWordCount(sourceElement, editor, config, wordCountContainer);
+}
+
+/**
+ * Add event listeners for the EDITOR__MAX_CHAR_COUNT_EXCEEDED and EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED events.
+ * When the max char count has been exceeded on the ckeditorSourceEl, disable the form's submit button.
+ * When the max char count is no longer exceeded on all ckeditor source elements in the form, re-enable the submit button.
+ *
+ * @param ckeditorSourceEl
+ */
+function addListenersForDisablingSubmitButton(ckeditorSourceEl: HTMLElement) {
+    const containingForm = ckeditorSourceEl.closest("form");
+
+    if (containingForm === null) {
+        // No containing form, so do nothing.
+        return;
+    }
+
+    const submitButton = containingForm.querySelector("input[type=submit]");
+
+    if (submitButton === null) {
+        // No submit button found, so do nothing.
+        return;
+    }
+    ckeditorSourceEl.addEventListener("EDITOR__MAX_CHAR_COUNT_EXCEEDED", function () {
+        submitButton.disabled = true;
+        submitButton.setAttribute("value", "Save (disabled because content storage limit exceeded)");
+    });
+
+    ckeditorSourceEl.addEventListener("EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED", function () {
+        // Only enable save button if no max. character count has been exceeded on any ckeditor field in the form.
+        if (containingForm.querySelectorAll('[data-maxCharCountExceededAtLastCheck="1"]').length === 0) {
+            submitButton.disabled = false;
+            submitButton.setAttribute("value", "Save");
+        }
+    });
 }
