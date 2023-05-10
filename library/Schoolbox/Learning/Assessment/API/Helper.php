@@ -217,7 +217,8 @@ class Helper
             if(assess.assessment_id, 'Quiz', null),
             if(lti_assessment.assessment_id, 'LTI', null),
             if(submission_box.id, 'DueWork', null),
-            if(project.id, 'Project', null)
+            if(project.id, 'Project', null),
+            if(lesson_plan.id, 'Lesson Plan', null)
         ) as `assessmentType`,
     folder.name as `folderName`,
     (SELECT course_specification.subject_code from course_specification
@@ -244,6 +245,7 @@ class Helper
          LEFT JOIN submission_mark_type as markTypeTable ON submission_box.mark_type = markTypeTable.mark_type_id
 
         LEFT JOIN project projectParent on projectParent.id = v_assessment_relation.project_assessment_id
+        LEFT JOIN lesson_plan ON assessment.id = lesson_plan.assessment_id
 ";
         $where = "
 WHERE
