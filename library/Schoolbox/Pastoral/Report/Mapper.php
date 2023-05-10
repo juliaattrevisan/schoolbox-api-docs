@@ -360,7 +360,8 @@ class Mapper extends BaseMapper
         // Action
         if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
             if ($pastoral->getRecordActions()->count() === 0) {
-                $wheres[] = "(`actions` IS NULL OR `include_records_without_action` = 1)";
+                // If this record does not have any action, do not return report which action status is not any
+                $wheres[] = "((`actions` IS NULL AND `action_status` IS NULL) OR `include_records_without_action` = 1)";
             } else {
                 $actionWheres       = [];
                 $hasCompletedAction = false;
@@ -375,7 +376,8 @@ class Mapper extends BaseMapper
                     $actionWheres[]         = "CONCAT(',', `actions`, ',') LIKE :actionLike$i";
                     $params["actionLike$i"] = "%,{$action->getAction()->getId()},%";
                 }
-                $wheres[] = sprintf("(`actions` IS NULL OR %s)", implode(' OR ', $actionWheres));
+                // If this record has actions, do not return reports with only No Action is selected
+                $wheres[] = sprintf("((`actions` IS NULL AND `include_records_without_action` = 0) OR %s)", implode(' OR ', $actionWheres));
                 // if this record has both completed and pending, this should appear regardless of report's action status setting
                 if ($hasPendingAction && !$hasCompletedAction) {
                     // must not appear on completed only report
