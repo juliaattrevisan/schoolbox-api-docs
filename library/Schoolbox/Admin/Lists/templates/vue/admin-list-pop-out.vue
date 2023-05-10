@@ -28,6 +28,7 @@ export default {
     data() {
         return {
             isActive: true,
+            originalSelectedRow: {},
         };
     },
 
@@ -124,12 +125,15 @@ export default {
     },
 
     methods: {
-        ...mapActions(useAdminListStore, ["closePopUp"]),
+        ...mapActions(useAdminListStore, ["closePopUp", "updateSelectedRow"]),
 
         /**
          * Animate the view on
          */
         open() {
+            // Store the original selected row so we can revert back to it if the user cancels
+            this.originalSelectedRow = JSON.parse(JSON.stringify(this.selectedRow));
+
             this.isActive = true;
             gsap.to(this.$refs.innerContainer, { right: 0, duration: 0.4 });
             this.adjustPosition();
@@ -195,6 +199,16 @@ export default {
         },
 
         /**
+         * Discard changes and close the pop out
+         */
+        onDiscardChangesSelected() {
+            for (const [key, value] of Object.entries(this.originalSelectedRow)) {
+                this.selectedRow[key] = value;
+            }
+            this.closePopUp();
+        },
+
+        /**
          * Handle click events on the document
          * @param {MouseEvent} event The click event
          */
@@ -205,8 +219,8 @@ export default {
                 !container.contains(event.target) &&
                 !event.target.classList.contains("update-button")
             ) {
-                // Clicked outside the "outer-container", call onCloseSelected method
-                this.onCloseSelected();
+                // Clicked outside the "outer-container", discard changes and close the pop out
+                this.onDiscardChangesSelected();
             }
         },
     },
@@ -219,9 +233,9 @@ export default {
             <button
                 href="#close-pop-out"
                 class="close-button icon-close"
-                @click.prevent="onCloseSelected"
+                @click.prevent="onDiscardChangesSelected"
                 :disabled="saveRows_isProcessing"
-                title="close pop out"
+                title="Discard Changes"
             ></button>
             <ul class="option-list" data-option-list>
                 <li v-if="canShowSelectAllCheckbox" style="margin-bottom: 5px">
