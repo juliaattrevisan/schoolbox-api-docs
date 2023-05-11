@@ -219,7 +219,7 @@ class Helper
                  IF(lti_assessment.assessment_id, 'LTI', NULL),
                  IF(submission_box.id, 'DueWork', NULL),
                  IF(project.id, 'Project', NULL),
-                 IF(lesson_plan.id, 'Lesson Plan', NULL)
+                 IF(lesson_plan.id, 'LessonPlan', NULL)
              ) AS `assessmentType`,
              folder.name AS `folderName`,
              (
