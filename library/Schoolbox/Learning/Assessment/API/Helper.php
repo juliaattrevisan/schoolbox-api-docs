@@ -214,12 +214,12 @@ class Helper
              assessment.due_date,
              v_assessment_relation.folder_id AS `folderId`,
              COALESCE(
-                 IF(task.id, 'Task', NULL),
-                 IF(assess.assessment_id, 'Quiz', NULL),
+                 IF(task.id, 'task', NULL),
+                 IF(assess.assessment_id, 'quiz', NULL),
                  IF(lti_assessment.assessment_id, 'LTI', NULL),
-                 IF(submission_box.id, 'DueWork', NULL),
-                 IF(project.id, 'Project', NULL),
-                 IF(lesson_plan.id, 'LessonPlan', NULL)
+                 IF(submission_box.id, 'dueWork', NULL),
+                 IF(project.id, 'project', NULL),
+                 IF(lesson_plan.id, 'lessonPlan', NULL)
              ) AS `assessmentType`,
              folder.name AS `folderName`,
              (
