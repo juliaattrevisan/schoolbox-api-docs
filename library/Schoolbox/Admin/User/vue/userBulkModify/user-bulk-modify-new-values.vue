@@ -148,6 +148,7 @@ export default {
          * @returns { FormData }
          */
         getUpdateUsersFormData() {
+            // limit each fetch to MAX_LENGTH users
             const usersToModifyIDList = this.selectedRows
                 .map((row) => row.id)
                 .slice(this.processed, this.processed + MAX_LENGTH);
@@ -192,7 +193,6 @@ export default {
             const responsesStatuses = responses.map((response) => response.status); // grab the returned status of each response
             if (responsesOk) {
                 // successful response
-                hasDataError = false;
                 logData = await this.getLogData(responses);
             } else if (!responsesOk && responsesStatuses.includes(501)) {
                 // otherwise check for 501 error
