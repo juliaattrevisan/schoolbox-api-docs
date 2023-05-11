@@ -103,23 +103,32 @@ export default {
         },
 
         /**
+         * Retrieve all the fetches to be made
+         *
+         * @returns { Array } - array of fetches
+         */
+        getFetches() {
+            const fetchList = [];
+            const repeat = Math.ceil(this.selectedRows.length / MAX_LENGTH);
+            for (let i = 0; i < repeat; i += 1) {
+                fetchList.push(
+                    fetch(this.srcUserModify, {
+                        method: "POST",
+                        body: this.getUpdateUsersFormData(),
+                    })
+                );
+            }
+            return fetchList;
+        },
+
+        /**
          * Update the selected users
          */
         async onUpdateUsersSelected() {
             try {
                 this.onCloseSelected();
-                const fetchList = [];
-                const repeat = Math.ceil(this.selectedRows.length / MAX_LENGTH);
-                for (let i = 0; i < repeat; i += 1) {
-                    fetchList.push(
-                        fetch(this.srcUserModify, {
-                            method: "POST",
-                            body: this.getUpdateUsersFormData(),
-                        })
-                    );
-                }
                 this.isProcessing = true;
-                const responses = await Promise.all(fetchList);
+                const responses = await Promise.all(this.getFetches());
                 this.checkUpdateResponse(responses);
             } catch (error) {
                 console.warn(error);
@@ -154,6 +163,24 @@ export default {
         },
 
         /**
+         * As we are using Promise.all to fetch the data, we need to
+         * join the responses together and remove any duplicate log lines
+         * that may have been returned
+         *
+         * @param { Array } responses - the responses from the fetches
+         * @returns { string } - the log data
+         */
+        async getLogData(responses) {
+            const responseDataPromises = responses.map((response) => response.json());
+            const responseData = await Promise.all(responseDataPromises);
+            let logData = responseData.join(""); // join all the responses together
+            logData = logData.split("\n"); // split the responses by new lines
+            logData = [...new Set(logData)]; // remove any duplicate responses
+            logData = logData.map((item) => `${item}\n`); // add the new line back in
+            return logData.join(""); // join the responses back together
+        },
+
+        /**
          * Check for any issues in the returned update
          *
          * @param { Object }
@@ -161,24 +188,17 @@ export default {
         async checkUpdateResponse(responses) {
             let logData;
             let hasDataError = false;
-            let responseData;
             const responsesOk = responses.every((response) => response.ok); // check if all responses were successful
             const responsesStatuses = responses.map((response) => response.status); // grab the returned status of each response
             if (responsesOk) {
                 // successful response
-                const responseDataPromises = responses.map((response) => response.json());
-                const responseData = await Promise.all(responseDataPromises);
                 hasDataError = false;
-                let allResponseData = responseData.join(""); // join all the responses together
-                allResponseData = allResponseData.split("\n"); // split the responses by new lines
-                allResponseData = [...new Set(allResponseData)]; // remove any duplicate responses
-                allResponseData = allResponseData.map((item) => `${item}\n`); // add the new line back in
-                logData = allResponseData.join(""); // join the responses back together
+                logData = await this.getLogData(responses);
             } else if (!responsesOk && responsesStatuses.includes(501)) {
                 // otherwise check for 501 error
                 hasDataError = true;
                 const firstRelevantResponse = responses.find((response) => response.status === 501);
-                responseData = await firstRelevantResponse.json();
+                const responseData = await firstRelevantResponse.json();
                 logData = [responseData.title]; // which comes in with an error message
             } else {
                 hasDataError = true;
