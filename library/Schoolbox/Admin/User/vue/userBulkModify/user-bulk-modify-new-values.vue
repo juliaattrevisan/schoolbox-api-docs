@@ -5,8 +5,7 @@
  */
 
 import RevealModal from "@schoolboxVue/components/reveal-modal";
-// TODO: TODO: change this back to 1000
-const MAX_LENGTH = 10; //the maximum amount of users to process at once
+const MAX_LENGTH = 5000; //the maximum number of users to process at once
 
 export default {
     components: {
@@ -129,7 +128,7 @@ export default {
                 this.onCloseSelected();
                 this.isProcessing = true;
                 const responses = await Promise.all(this.getFetches());
-                this.checkUpdateResponse(responses);
+                await this.checkUpdateResponse(responses);
             } catch (error) {
                 console.warn(error);
                 this.isProcessing = false;
@@ -164,47 +163,30 @@ export default {
         },
 
         /**
-         * As we are using Promise.all to fetch the data, we need to
-         * join the responses together and remove any duplicate log lines
-         * that may have been returned
-         *
-         * @param { Array } responses - the responses from the fetches
-         * @returns { string } - the log data
-         */
-        async getLogData(responses) {
-            const responseDataPromises = responses.map((response) => response.json());
-            const responseData = await Promise.all(responseDataPromises);
-            let logData = responseData.join(""); // join all the responses together
-            logData = logData.split("\n"); // split the responses by new lines
-            logData = [...new Set(logData)]; // remove any duplicate responses
-            logData = logData.map((item) => `${item}\n`); // add the new line back in
-            return logData.join(""); // join the responses back together
-        },
-
-        /**
          * Check for any issues in the returned update
          *
          * @param { Object }
          */
         async checkUpdateResponse(responses) {
-            let logData;
             let hasDataError = false;
             const responsesOk = responses.every((response) => response.ok); // check if all responses were successful
             const responsesStatuses = responses.map((response) => response.status); // grab the returned status of each response
+            const responseDataPromises = responses.map((response) => response.json());
+            const responseData = await Promise.all(responseDataPromises);
+            let logData = responseData.join(""); // join the responses together;
             if (responsesOk) {
                 // successful response
-                logData = await this.getLogData(responses);
             } else if (!responsesOk && responsesStatuses.includes(501)) {
                 // otherwise check for 501 error
                 hasDataError = true;
                 const firstRelevantResponse = responses.find((response) => response.status === 501);
                 const responseData = await firstRelevantResponse.json();
-                logData = [responseData.title]; // which comes in with an error message
+                logData = responseData.title + logData; // which comes in with an error message
             } else {
                 hasDataError = true;
-                logData = [
-                    "Sorry, an unknown error has occurred. Please contact your IT support if the problem persists.",
-                ];
+                logData =
+                    "Sorry, an unknown error has occurred. Please contact your IT support if the problem persists." + logData
+                ;
             }
             // close this modal before opening the log modal...
             this.$emit("log", { logData, hasDataError });

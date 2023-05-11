@@ -10,6 +10,7 @@ import UserBulkModifyLog from "@schoolboxVue/components/log-modal";
 import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer";
 import footerUI from "@schoolboxVue/components/vueTables2/mixinFooterUI";
 import RevealModal from "@schoolboxVue/components/reveal-modal";
+const MAX_LENGTH = 5000; //the maximum number of users to process at once
 
 export default {
     components: {
@@ -328,25 +329,40 @@ export default {
         },
 
         /**
-         * Delete the selected users
+         * Retrieve all the fetches to be made
+         *
+         * @returns { Array } - array of fetches
          */
-        async onConfirmDeleteUsersSelected() {
+        getFetches() {
             const usersToModifyIDList = this.selectedRows.map((row) => row.id);
             const formData = new FormData();
             usersToModifyIDList.forEach((item) => {
                 formData.append("users[]", item);
             });
+            const fetchList = [];
+            const repeat = Math.ceil(usersToModifyIDList.length / MAX_LENGTH);
+            for (let i = 0; i < repeat; i += 1) {
+                fetchList.push(
+                    fetch(this.srcUserDelete, {
+                        headers: {
+                            Accept: "application/json",
+                        },
+                        method: "POST",
+                        body: formData,
+                    })
+                );
+            }
+            return fetchList;
+        },
+
+        /**
+         * Delete the selected users
+         */
+        async onConfirmDeleteUsersSelected() {
             try {
                 this.isProcessing = true;
-                const response = await fetch(this.srcUserDelete, {
-                    headers: {
-                        Accept: "application/json",
-                    },
-                    method: "POST",
-                    body: formData,
-                });
-                const responseData = await response.json();
-                this.checkUpdateResponse(response, responseData);
+                const responses = await Promise.all(this.getFetches());
+                await this.checkUpdateResponse(responses);
                 this.$refs.deleteModal.close();
             } catch (error) {
                 console.warn(error);
@@ -381,27 +397,36 @@ export default {
          * Check for any issues in the returned update
          *
          * @param { Object }
-         * @param { Object }
          */
-        checkUpdateResponse(response, responseData) {
-            if (response.ok) {
+        async checkUpdateResponse(responses) {
+            // check if all responses were successful
+            const responsesOk = responses.every((response) => response.ok);
+            // grab the returned status of each response
+            const responsesStatuses = responses.map((response) => response.status);
+            const responseDataPromises = responses.map((response) => response.json());
+            const responseData = await Promise.all(responseDataPromises);
+            this.logData = responseData.join(""); // join the responses together;
+            if (responsesOk) {
                 //successful response
                 this.hasDataError = false;
-                this.logData = responseData;
                 this.rows = this.getUpdatedRowsAfterUserDeletion();
                 this.clearRows();
                 this.$refs.table.resetSelectedRows();
-            } else if (!response.ok && response.status === 501) {
+            } else if (!responsesOk && responsesStatuses.includes(501)) {
                 //otherwise check for 501 error
                 this.hasDataError = true;
-                this.logData = [responseData.title]; //which comes in with an error message
+                const firstRelevantResponse = responses.find((response) => response.status === 501);
+                const responseData = await firstRelevantResponse.json();
+                this.logData = [responseData.title + this.logData]; //which comes in with an error message
             } else {
                 this.hasDataError = true;
                 this.logData = [
                     "Sorry, an unknown error has occurred. Please contact your IT support if the problem persists.",
                 ];
+                const firstRelevantResponse = responses.find((response) => response.status === 501);
+                const responseData = await firstRelevantResponse.json();
                 if (responseData.title !== undefined) {
-                    this.logData = [responseData.title];
+                    this.logData = [responseData.title + this.logData];
                 }
             }
         },
