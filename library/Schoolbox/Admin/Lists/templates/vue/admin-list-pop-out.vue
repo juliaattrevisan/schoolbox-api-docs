@@ -213,6 +213,14 @@ export default {
          * @param {MouseEvent} event The click event
          */
         handleClickOutside(event) {
+            // Disable the event if the pop out is saving
+            if (this.saveRows_isProcessing) {
+                return;
+            }
+            // Disable the event if the pop out is not active
+            if (!this.isActive) {
+                return;
+            }
             const container = this.$refs.innerContainer;
             if (
                 container &&
