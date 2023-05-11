@@ -9,7 +9,7 @@ import RevealModal from "@schoolboxVue/components/reveal-modal";
  * the maximum number of users to process at once
  * we still need to keep this high enough, so that it doesn't lock database
  */
-const MAX_LENGTH = 1000;
+const MAX_LENGTH = 5000;
 
 export default {
     components: {
