@@ -128,6 +128,7 @@ export default {
                 this.hasUpdated = true;
                 this.isProcessing = false;
                 this.updateFields = Object.assign({}, this.updateFieldsOriginal); //reset to original values
+                this.processed = 0; // reset the processed count
                 this.$emit("updated");
             }
         },
@@ -168,7 +169,11 @@ export default {
                 const responseDataPromises = responses.map((response) => response.json());
                 const responseData = await Promise.all(responseDataPromises);
                 hasDataError = false;
-                logData = responseData.join("\n");
+                let allResponseData = responseData.join(""); // join all the responses together
+                allResponseData = allResponseData.split("\n"); // split the responses by new lines
+                allResponseData = [...new Set(allResponseData)]; // remove any duplicate responses
+                allResponseData = allResponseData.map((item) => `${item}\n`); // add the new line back in
+                logData = allResponseData.join(""); // join the responses back together
             } else if (!responsesOk && responsesStatuses.includes(501)) {
                 // otherwise check for 501 error
                 hasDataError = true;
