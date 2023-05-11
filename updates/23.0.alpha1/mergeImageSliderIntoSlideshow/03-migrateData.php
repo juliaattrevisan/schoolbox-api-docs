@@ -29,12 +29,12 @@ $app = new class extends CliTool\App
             'SELECT id FROM component_instance WHERE component_definition_id = :component_definition_id_old',
             ['component_definition_id_old' => $componentDefinitionIdOld]
         )->fetchAll();
-        $this->getLogger()->info("  Found " . count($oldInstances) . " instances to migrate\n");
-        $this->getLogger()->info("    - Old component ID: " . $componentDefinitionIdOld . "\n");
-        $this->getLogger()->info("    - New component ID: " . $componentDefinitionIdNew . "\n\n");
+        $this->getLogger()->info("  Found " . count($oldInstances) . " instances to migrate");
+        $this->getLogger()->info("    - Old component ID: " . $componentDefinitionIdOld);
+        $this->getLogger()->info("    - New component ID: " . $componentDefinitionIdNew);
 
         foreach ($oldInstances as $oldInstance) {
-            $this->getLogger()->info("  Migrating slider " . $oldInstance['id'] . "...\n");
+            $this->getLogger()->info("  Migrating slider " . $oldInstance['id'] . "...");
 
             // Update each instance to use the ID for the image scroller (slideshow) component
             $this->getLogger()->info("    - Updating component_definition_id to " . $componentDefinitionIdNew . "...");
@@ -42,7 +42,7 @@ $app = new class extends CliTool\App
                 'UPDATE component_instance SET component_definition_id = :component_definition_id_new WHERE id = :id',
                 ['id' => $oldInstance['id'], 'component_definition_id_new' => $componentDefinitionIdNew]
             );
-            $this->getLogger()->info(" done.\n");
+            $this->getLogger()->info(" done.");
 
             // Update old configs to reference the component_config_definition_id for image scroller not image slider
             $this->getLogger()->info("    - Updating component_config_definition_id for old configs...");
@@ -68,7 +68,7 @@ $app = new class extends CliTool\App
                     ]
                 );
             }
-            $this->getLogger()->info(" done.\n");
+            $this->getLogger()->info(" done.");
 
             // Create new configs - these were not present in the old image slider
             $this->getLogger()->info("    - Creating new configs to sync with image slideshow...");
@@ -97,17 +97,17 @@ $app = new class extends CliTool\App
                     ]
                 );
             }
-            $this->getLogger()->info(". done.\n");
+            $this->getLogger()->info(". done.");
         }
 
-        $this->getLogger()->info("  Deleting old image slider configs...\n");
+        $this->getLogger()->info("  Deleting old image slider configs...");
         // Delete old config definitions for image slider, as these are no longer used
         $this->getLogger()->info("    - Old config definitions...");
         $dbc->executeQuery(
             'DELETE FROM component_config_definition WHERE component_definition_id = :component_definition_id_old',
             ['component_definition_id_old' => $componentDefinitionIdOld]
         );
-        $this->getLogger()->info(" removed.\n");
+        $this->getLogger()->info(" removed.");
 
         // Delete old component definition for image slider, as this is no longer used
         $this->getLogger()->info("    - Old component definition...");
@@ -115,8 +115,8 @@ $app = new class extends CliTool\App
             'DELETE FROM component_definition WHERE id = :component_definition_id_old',
             ['component_definition_id_old' => $componentDefinitionIdOld]
         );
-        $this->getLogger()->info(" removed.\n");
-        $this->getLogger()->info("\nDone. Finished migrating " . count($oldInstances) . " image slider instances\n\n");
+        $this->getLogger()->info(" removed.");
+        $this->getLogger()->info("Done. Finished migrating " . count($oldInstances) . " image slider instances");
     }
 };
 
