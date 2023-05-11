@@ -100,24 +100,22 @@ $app = new class extends CliTool\App
             $this->getLogger()->info(". done.\n");
         }
 
-        foreach ($oldInstances as $oldInstance) {
-            $this->getLogger()->info("  Deleting old image slider configs for " . $oldInstance['id'] . "...\n");
-            // Delete old config definitions for image slider, as these are no longer used
-            $this->getLogger()->info("    - Old config definitions...");
-            $dbc->executeQuery(
-                'DELETE FROM component_config_definition WHERE component_definition_id = :component_definition_id_old',
-                ['component_definition_id_old' => $componentDefinitionIdOld]
-            );
-            $this->getLogger()->info(" removed.\n");
+        $this->getLogger()->info("  Deleting old image slider configs...\n");
+        // Delete old config definitions for image slider, as these are no longer used
+        $this->getLogger()->info("    - Old config definitions...");
+        $dbc->executeQuery(
+            'DELETE FROM component_config_definition WHERE component_definition_id = :component_definition_id_old',
+            ['component_definition_id_old' => $componentDefinitionIdOld]
+        );
+        $this->getLogger()->info(" removed.\n");
 
-            // Delete old component definition for image slider, as this is no longer used
-            $this->getLogger()->info("    - Old component definition...");
-            $dbc->executeQuery(
-                'DELETE FROM component_definition WHERE id = :component_definition_id_old',
-                ['component_definition_id_old' => $componentDefinitionIdOld]
-            );
-            $this->getLogger()->info(" removed.\n");
-        }
+        // Delete old component definition for image slider, as this is no longer used
+        $this->getLogger()->info("    - Old component definition...");
+        $dbc->executeQuery(
+            'DELETE FROM component_definition WHERE id = :component_definition_id_old',
+            ['component_definition_id_old' => $componentDefinitionIdOld]
+        );
+        $this->getLogger()->info(" removed.\n");
         $this->getLogger()->info("\nDone. Finished migrating " . count($oldInstances) . " image slider instances\n\n");
     }
 };
