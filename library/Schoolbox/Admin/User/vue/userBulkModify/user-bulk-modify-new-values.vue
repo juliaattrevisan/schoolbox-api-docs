@@ -5,7 +5,8 @@
  */
 
 import RevealModal from "@schoolboxVue/components/reveal-modal";
-const MAX_LENGTH = 5000; //the maximum amount of users to process at once
+// TODO: TODO: change this back to 1000
+const MAX_LENGTH = 10; //the maximum amount of users to process at once
 
 export default {
     components: {
@@ -106,16 +107,28 @@ export default {
          */
         async onUpdateUsersSelected() {
             try {
-                let response, responseData = [];
-                this.isProcessing = true;
-                while (this.processed < this.selectedRows.length) {
-                    response = await fetch(this.srcUserModify, {
-                        method: "POST",
-                        body: this.getUpdateUsersFormData(),
-                    });
-                    responseData.push(await response.json());
+                let fetchList = [];
+                const repeat = Math.ceil(this.selectedRows.length / MAX_LENGTH);
+                this.onCloseSelected();
+                for (let i = 0; i < repeat; i++) {
+                    fetchList.push(
+                        fetch(this.srcUserModify, {
+                            method: "POST",
+                            body: this.getUpdateUsersFormData(),
+                        })
+                            .then((response) => response.json())
+                        // .then((data) => {
+                        //     this.$emit("log", { data });
+                        // })
+                    );
                 }
-                this.checkUpdateResponse(response, responseData);
+                this.isProcessing = true;
+                const responses = await Promise.all(fetchList);
+                // console.log(responses);
+                responses.forEach((data) => {
+                    this.$emit("log", {data});
+//                    this.checkUpdateResponse(response, response.json());
+                });
             } catch (error) {
                 console.warn(error);
                 this.isProcessing = false;
@@ -169,7 +182,6 @@ export default {
                 ];
             }
             //close this modal before opening the log modal...
-            this.onCloseSelected();
             this.$emit("log", { logData, hasDataError });
         },
 
