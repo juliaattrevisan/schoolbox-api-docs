@@ -70,7 +70,7 @@ export default {
             updateFieldsOriginal: {}, //to reset to original values once an update is complete
             isProcessing: false,
             hasUpdated: false,
-            processed: 0
+            processed: 0,
         };
     },
 
@@ -107,28 +107,20 @@ export default {
          */
         async onUpdateUsersSelected() {
             try {
-                let fetchList = [];
-                const repeat = Math.ceil(this.selectedRows.length / MAX_LENGTH);
                 this.onCloseSelected();
-                for (let i = 0; i < repeat; i++) {
+                const fetchList = [];
+                const repeat = Math.ceil(this.selectedRows.length / MAX_LENGTH);
+                for (let i = 0; i < repeat; i += 1) {
                     fetchList.push(
                         fetch(this.srcUserModify, {
                             method: "POST",
                             body: this.getUpdateUsersFormData(),
                         })
-                            .then((response) => response.json())
-                        // .then((data) => {
-                        //     this.$emit("log", { data });
-                        // })
                     );
                 }
                 this.isProcessing = true;
                 const responses = await Promise.all(fetchList);
-                // console.log(responses);
-                responses.forEach((data) => {
-                    this.$emit("log", {data});
-//                    this.checkUpdateResponse(response, response.json());
-                });
+                this.checkUpdateResponse(responses);
             } catch (error) {
                 console.warn(error);
                 this.isProcessing = false;
@@ -146,7 +138,9 @@ export default {
          * @returns { FormData }
          */
         getUpdateUsersFormData() {
-            const usersToModifyIDList = this.selectedRows.map((row) => row.id).slice(this.processed, this.processed + MAX_LENGTH);
+            const usersToModifyIDList = this.selectedRows
+                .map((row) => row.id)
+                .slice(this.processed, this.processed + MAX_LENGTH);
             this.processed += MAX_LENGTH;
             const formData = new FormData();
             usersToModifyIDList.forEach((item) => {
@@ -162,26 +156,32 @@ export default {
          * Check for any issues in the returned update
          *
          * @param { Object }
-         * @param { Object }
          */
-        checkUpdateResponse(response, responseData) {
-            let logData,
+        async checkUpdateResponse(responses) {
+            let logData;
+            let hasDataError = false;
+            let responseData;
+            const responsesOk = responses.every((response) => response.ok); // check if all responses were successful
+            const responsesStatuses = responses.map((response) => response.status); // grab the returned status of each response
+            if (responsesOk) {
+                // successful response
+                const responseDataPromises = responses.map((response) => response.json());
+                const responseData = await Promise.all(responseDataPromises);
                 hasDataError = false;
-            if (response.ok) {
-                //successful response
-                hasDataError = false;
-                logData = responseData;
-            } else if (!response.ok && response.status === 501) {
-                //otherwise check for 501 error
+                logData = responseData.join("\n");
+            } else if (!responsesOk && responsesStatuses.includes(501)) {
+                // otherwise check for 501 error
                 hasDataError = true;
-                logData = [responseData.title]; //which comes in with an error message
+                const firstRelevantResponse = responses.find((response) => response.status === 501);
+                responseData = await firstRelevantResponse.json();
+                logData = [responseData.title]; // which comes in with an error message
             } else {
                 hasDataError = true;
                 logData = [
                     "Sorry, an unknown error has occurred. Please contact your IT support if the problem persists.",
                 ];
             }
-            //close this modal before opening the log modal...
+            // close this modal before opening the log modal...
             this.$emit("log", { logData, hasDataError });
         },
 
