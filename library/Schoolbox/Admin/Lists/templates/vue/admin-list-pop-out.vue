@@ -269,7 +269,12 @@ export default {
                     >
                 </li>
             </ul>
-            <button @click.prevent="saveRows_onSaveSelected" class="save-button" type="submit">
+            <button
+                class="save-button"
+                type="submit"
+                @click.prevent="saveRows_onSaveSelected"
+                :disabled="saveRows_isProcessing"
+                >
                 {{ saveRows_saveStatus }} {{ headerField.caption }}
             </button>
         </div>
