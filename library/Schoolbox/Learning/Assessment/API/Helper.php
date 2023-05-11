@@ -267,11 +267,12 @@ class Helper
         if (array_key_exists('assessmentType', $filter)) {
             $where .= (
                 " AND COALESCE(
-                    IF(task.id, 'Task', NULL),
-                    IF(assess.assessment_id, 'Quiz', NULL),
+                    IF(task.id, 'task', NULL),
+                    IF(assess.assessment_id, 'quiz', NULL),
                     IF(lti_assessment.assessment_id, 'LTI', NULL),
-                    IF(submission_box.id, 'DueWork', NULL),
-                    IF(project.id, 'Project', NULL)
+                    IF(submission_box.id, 'dueWork', NULL),
+                    IF(project.id, 'project', NULL),
+                    IF(lesson_plan.id, 'lessonPlan', NULL)
                  ) = :assessmentType "
             );
             $params['assessmentType'] = $filter['assessmentType'];
@@ -1076,6 +1077,7 @@ class Helper
                 AssessmentType::TYPE_LTI_ASSESSMENT,
                 AssessmentType::TYPE_DUE_WORK,
                 AssessmentType::TYPE_PROJECT,
+                AssessmentType::TYPE_LESSON_PLAN
             ],
         ];
         $dateFields    = [
