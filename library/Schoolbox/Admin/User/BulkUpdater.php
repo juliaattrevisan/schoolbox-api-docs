@@ -266,6 +266,10 @@ class BulkUpdater
                     $statements['campus']['insert']['statement']->execute();
                     break;
                 } catch (\PDOException $e) {
+                    if ($i === 2) {
+                        // giving up
+                        throw $e;
+                    }
                     sleep(3);
                 }
             }
