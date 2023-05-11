@@ -135,15 +135,25 @@ class Helper
                     'id'               => $assessmentId,
                     'title'            => $row['title'],
                     'assessmentType'   => $row['assessmentType'],
-                    'commonAssessment' => (bool)$row['commonAssessment'],
-                    'workType'         => [
-                        'name' => $row['workTypeName'],
-                        'id'   => (int)$row['workTypeId']
-                    ],
+                    'commonAssessment' => (
+                        // Common assessment is not applicable to lesson plans.
+                        ($row['assessmentType'] === 'lessonPlan') ? null : (bool)$row['commonAssessment']
+                    ),
+                    'workType'         => (
+                        ($row['workTypeId'] === null) ?
+                        null :
+                        [
+                            'name' => $row['workTypeName'],
+                            'id'   => (int)$row['workTypeId']
+                        ]
+                    ),
                     'folder'           => $folder,
                     'subjectCode'      => $row['subjectCode'],
                     'project'          => $project,
-                    'weight'           => (float)$row['weight'],
+                    'weight'           => (
+                        // Weight is not applicable to lesson plans.
+                        ($row['assessmentType'] === 'lessonPlan') ? null : (float)$row['weight']
+                    ),
                     'dueDate'          => \Alaress_Date_Format::newDatabaseDate($row['due_date'])->toRfc3339String(),
                     'rubric'           => $rubric,
                     'participants'     => null,
