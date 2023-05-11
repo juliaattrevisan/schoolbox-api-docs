@@ -10,7 +10,12 @@ import UserBulkModifyLog from "@schoolboxVue/components/log-modal";
 import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer";
 import footerUI from "@schoolboxVue/components/vueTables2/mixinFooterUI";
 import RevealModal from "@schoolboxVue/components/reveal-modal";
-const MAX_LENGTH = 5000; //the maximum number of users to process at once
+
+/**
+ * the maximum number of users to process at once
+ * we still need to keep this high enough, so that it doesn't lock database
+ */
+const MAX_LENGTH = 5000;
 
 export default {
     components: {
@@ -362,7 +367,7 @@ export default {
             try {
                 this.isProcessing = true;
                 const responses = await Promise.all(this.getFetches());
-                await this.checkUpdateResponse(responses);
+                await this.checkDeleteResponse(responses);
                 this.$refs.deleteModal.close();
             } catch (error) {
                 console.warn(error);
@@ -398,12 +403,11 @@ export default {
          *
          * @param { Object }
          */
-        async checkUpdateResponse(responses) {
+        async checkDeleteResponse(responses) {
             // check if all responses were successful
             const responsesOk = responses.every((response) => response.ok);
-            // grab the returned status of each response
-            const responsesStatuses = responses.map((response) => response.status);
             const responseDataPromises = responses.map((response) => response.json());
+            // Get all response data anyway
             const responseData = await Promise.all(responseDataPromises);
             this.logData = responseData.join(""); // join the responses together;
             if (responsesOk) {
@@ -412,21 +416,15 @@ export default {
                 this.rows = this.getUpdatedRowsAfterUserDeletion();
                 this.clearRows();
                 this.$refs.table.resetSelectedRows();
-            } else if (!responsesOk && responsesStatuses.includes(501)) {
-                //otherwise check for 501 error
-                this.hasDataError = true;
-                const firstRelevantResponse = responses.find((response) => response.status === 501);
-                const responseData = await firstRelevantResponse.json();
-                this.logData = [responseData.title + this.logData]; //which comes in with an error message
             } else {
                 this.hasDataError = true;
                 this.logData = [
                     "Sorry, an unknown error has occurred. Please contact your IT support if the problem persists.",
                 ];
-                const firstRelevantResponse = responses.find((response) => response.status === 501);
+                const firstRelevantResponse = responses.find((response) => response.status !== 200);
                 const responseData = await firstRelevantResponse.json();
                 if (responseData.title !== undefined) {
-                    this.logData = [responseData.title + this.logData];
+                    this.logData = [responseData.title];
                 }
             }
         },

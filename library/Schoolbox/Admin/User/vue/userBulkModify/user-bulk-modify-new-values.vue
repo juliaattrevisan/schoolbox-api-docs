@@ -5,7 +5,11 @@
  */
 
 import RevealModal from "@schoolboxVue/components/reveal-modal";
-const MAX_LENGTH = 5000; //the maximum number of users to process at once
+/**
+ * the maximum number of users to process at once
+ * we still need to keep this high enough, so that it doesn't lock database
+ */
+const MAX_LENGTH = 1000;
 
 export default {
     components: {
@@ -168,28 +172,24 @@ export default {
          * @param { Object }
          */
         async checkUpdateResponse(responses) {
-            let hasDataError = false;
+            let logData, hasDataError = false;
             const responsesOk = responses.every((response) => response.ok); // check if all responses were successful
-            const responsesStatuses = responses.map((response) => response.status); // grab the returned status of each response
-            const responseDataPromises = responses.map((response) => response.json());
-            const responseData = await Promise.all(responseDataPromises);
-            let logData = responseData.join(""); // join the responses together;
             if (responsesOk) {
                 // successful response
-            } else if (!responsesOk && responsesStatuses.includes(501)) {
-                // otherwise check for 501 error
-                hasDataError = true;
-                const firstRelevantResponse = responses.find((response) => response.status === 501);
-                const responseData = await firstRelevantResponse.json();
-                logData = responseData.title + logData; // which comes in with an error message
+                const responseDataPromises = responses.map((response) => response.json());
+                // wait for all responses anyway
+                const responseData = await Promise.all(responseDataPromises);
+                logData = responseData.join(""); // join the responses together;
             } else {
                 hasDataError = true;
-                logData =
-                    "Sorry, an unknown error has occurred. Please contact your IT support if the problem persists." + logData
-                ;
+                logData = [
+                    "Sorry, an unknown error has occurred. Please contact your IT support if the problem persists.",
+                ];
+                this.$emit("log", {logData, hasDataError});
+                const responseDataPromises = responses.map((response) => response.json());
+                // wait for all responses anyway, so that we can check detail of the failure
+                await Promise.all(responseDataPromises);
             }
-            // close this modal before opening the log modal...
-            this.$emit("log", { logData, hasDataError });
         },
 
         /**
