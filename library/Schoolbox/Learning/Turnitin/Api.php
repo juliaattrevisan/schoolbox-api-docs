@@ -222,7 +222,7 @@ class Api
         /* Bad endpoint
          * but turnitin sometimes hides error messages inside $result anyway
          */
-        if (404 === $result->getStatusCode()) {
+        if (in_array($result->getStatusCode(), [400, 404])) {
             $info = json_decode($result->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
 
             /* An error message might be found in either info[error] or info[message]
