@@ -111,6 +111,9 @@ HELP;
 
         $this->getLogger()->info('Seeding project result cache');
 
+        // First ID to process, if it was provided: otherwise, default to 1
+        $firstId = $this->getOptAsInt(self::OPT_LONG_FIRST_ID, 1);
+
         /* Find all the project ids that we must consider
          * (Only get Implementations, never Specifications)
          */
@@ -122,7 +125,9 @@ HELP;
             WHERE p.deleted_at IS NULL
             AND   a.deleted_at IS NULL
             AND   acus.course_unit_specification_id IS NULL
-        ");
+            AND a.id >= :firstId
+            ORDER BY a.id
+        ", ['firstId' => $firstId]);
 
         /* This instance has no living projects to deal with.
          * Let's get out of here
@@ -149,26 +154,11 @@ HELP;
          */
         $marker = null;
 
-        // First ID to process, if it was provided: otherwise, default to 1
-        $firstId = $this->getOptAsInt(self::OPT_LONG_FIRST_ID, 1);
-
         try {
             foreach ($assessmentStatement->fetchAll() as $row) {
                 $this->refreshLock($lock);
 
-                $projectId = $row['assessment_id'];
-                if ($projectId < $firstId) {
-                    $this->getLogger()->debug(
-                        sprintf(
-                            'Project with ID #%s is below the first ID option #%d - skipping',
-                            $projectId,
-                            $firstId,
-                        )
-                    );
-                    continue;
-                }
-
-                $project = $assessmentMapperProxy->findByIdForReview($projectId);
+                $project = $assessmentMapperProxy->findByIdForReview($row['assessment_id']);
                 if (!$project->isImplementation()) {
                     $this->getLogger()->info(
                         sprintf(
