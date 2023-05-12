@@ -180,6 +180,7 @@ export default {
                 // wait for all responses anyway
                 const responseData = await Promise.all(responseDataPromises);
                 logData = responseData.join(""); // join the responses together;
+                this.$emit("log", {logData, hasDataError});
             } else {
                 hasDataError = true;
                 logData = [
