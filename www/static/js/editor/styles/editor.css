@@ -21,12 +21,11 @@
     /* to sit above the side menus */
     --ck-z-modal: 1003;
 
-    --sb-ck-hover: #e8e8e8;
-    --sb-ck-active-grey: #e8e8e8;
     --sb-ck-active: #cae3fa;
-    --sb-ck-active-list-border: #809fc0;
+    --sb-ck-active-grey: #e8e8e8;
+    --sb-ck-active-highlight: #daedff;
     --sb-ck-hover-outline: #c8c8c8;
-    --sb-ck-input-disabled: #bbbbbb;
+    --sb-ck-disabled: #dddddd;
     --sb-ck-icon-colour: rgb(51, 51, 51);
 
     /* Overrides */
@@ -39,9 +38,9 @@
     --ck-color-button-on-hover-background: var(--sb-ck-active);
     --ck-color-button-on-color: var(--sb-ck-icon-colour);
     --ck-color-list-button-on-background: var(--sb-ck-active-grey);
-    --ck-color-list-button-on-text: var(--sb-ck-icon-color);
+    --ck-color-list-button-on-text: var(--sb-ck-icon-colour);
     --ck-color-input-background: white;
-    --ck-color-input-disabled-background: var(--sb-ck-input-disabled);
+    --ck-color-input-disabled-background: var(--sb-ck-disabled);
     --ck-color-list-button-hover-background: var(--sb-ck-active-grey);
     --ck-color-list-button-on-background-focus: var(--sb-ck-active-grey);
 }
@@ -280,53 +279,39 @@
  *  resource modal
 **/
 
-.ck.ck-button {
+.ck.ck-button:not([aria-disabled="true"]) {
     cursor: pointer;
 }
 
-.ck-body-wrapper .ck button.ck-button-resource-link {
+.ck.ck-button[aria-disabled="true"] {
+    pointer-events: none;
+}
+
+.ck-body-wrapper .ck button.ck-button-resource-link,
+.ck.ck-dropdown button.ck-button-action,
+.ck.ck-find-and-replace-form__replace > button.ck-button {
     margin-left: var(--ck-spacing-large);
     min-width: 4rem;
-    background-color: var(--ck-color-button-action-background);
-    color: white;
-    /* background-color: var(--ck-color-button-on-active-background);
-    color: var(--ck-color-button-on-color); */
+    background-color: var(--sb-ck-active);
+    color: var(--sb-ck-icon-colour);
+}
+
+.ck.ck-find-and-replace-form__find > button.ck-button[aria-disabled="true"],
+.ck.ck-find-and-replace-form__replace > button.ck-button[aria-disabled="true"] {
+    background-color: var(--sb-ck-disabled);
 }
 
 .ck-body-wrapper .ck button.ck-button-resource-link:hover,
-.ck-body-wrapper .ck button.ck-button-resource-link:active {
-    background-color: var(--ck-color-button-action-active-background);
-    /* color: white;
-    background-color: var(--ck-color-button-on-color); */
+.ck-body-wrapper .ck button.ck-button-resource-link:active,
+.ck.ck-dropdown button.ck-button-action:hover,
+.ck.ck-dropdown button.ck-button-action:active {
+    background-color: var(--sb-ck-active-highlight);
+    color: var(--sb-ck-icon-colour);
 }
-
-/* .ck.ck-toolbar button.ck.ck-button.ck-on {
-    background-color: var(--sb-ck-active);
-    color: var(--sb-ck-icon-color);
-}
-
-.ck.ck-toolbar button.ck.ck-button.ck-on:hover {
-    background-color: var(--sb-ck-active);
-} */
 
 .ck.ck-toolbar button.ck.ck-button.ck-dropdown__button.ck-on {
     background-color: var(--sb-ck-active-grey);
 }
-
-/*
-.ck.ck-toolbar button.ck.ck-button:hover {
-    background-color: var(--sb-ck-hover);
-}
-
-.ck.ck-dropdown__panel ul .ck.ck-button_with-text.ck-on {
-    background-color: var(--sb-ck-active-grey) !important;
-    color: black;
-}
-
-.ck.ck-dropdown__panel ul .ck.ck-button_with-text.ck-on:hover {
-    background-color: var(--sb-ck-hover);
-}
-*/
 
 /* The style panel requires stronger highlighting of options that are
 turned on */
@@ -334,14 +319,18 @@ turned on */
     border: 1px solid #0d65ff;
 }
 
-/* .ck.ck-dropdown__panel .ck.ck-button_with-text.ck-on .ck.ck-button__label {
-    background-color: var(--sb-ck-active-grey);
-} */
-
-/* Make inputs in the toolbar have a white backgrounds when focused */
+/* Make inputs in the toolbar have a white backgrounds when empty / focused */
+.ck.ck-dropdown__panel input.ck.ck-input,
+.ck.ck-balloon-panel input.ck.ck-input,
 .ck.ck-dropdown__panel input.ck.ck-input:focus,
 .ck.ck-balloon-panel input.ck.ck-input:focus {
     background-color: white;
+}
+
+/* Styling disabled inputs */
+.ck.ck-editor input.ck.ck-input:read-only {
+    background-color: var(--sb-ck-disabled);
+    pointer-events: none;
 }
 
 .ck.ck-dropdown__panel button.ck-insert-table-dropdown-grid-box.ck-on {
@@ -350,5 +339,5 @@ turned on */
 }
 
 .ck.ck-editor__main .ck-source-editing-area textarea:focus {
-    background-color: var(--sb-ck-active-grey) !important;
+    background-color: var(--sb-ck-active) !important;
 }
