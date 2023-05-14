@@ -247,12 +247,13 @@ export default {
                         id="select-all"
                         type="checkbox"
                         :checked="isAllCheckboxesSelected"
+                        :disabled="saveRows_isProcessing"
                         @change="onSelectAllSelected"
                     />
                     <label for="select-all">Select All</label>
                 </li>
                 <li v-for="(field, index) in changePopOutFields" :key="index">
-                    <input :id="field.caption" type="checkbox" v-model="selectedRow[field.id]" />
+                    <input :id="field.caption" type="checkbox" v-model="selectedRow[field.id]" :disabled="saveRows_isProcessing" />
                     <label :for="field.caption"
                         >{{ field.caption
                         }}<span
