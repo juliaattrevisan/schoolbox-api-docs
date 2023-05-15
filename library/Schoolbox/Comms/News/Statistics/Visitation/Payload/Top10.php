@@ -10,6 +10,10 @@ declare(strict_types=1);
 namespace Schoolbox\Comms\News\Statistics\Visitation\Payload;
 
 use Schoolbox\Comms\News;
+use Schoolbox\Comms\News\Model;
+use Schoolbox\Comms\News\Statistics\Mapper;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\UserMapper;
 
 /**
  * Class Top10
@@ -18,34 +22,28 @@ use Schoolbox\Comms\News;
  */
 class Top10
 {
-
-    /**
-     * @var News\Statistics\Mapper
-     */
-    private $statisticsMapper;
-
-
     /**
      * Top10 constructor.
      *
-     * @param News\Statistics\Mapper $statisticsMapper
+     * @param Mapper     $statisticsMapper
+     * @param UserMapper $userMapper
      */
-    public function __construct(News\Statistics\Mapper $statisticsMapper)
+    public function __construct(private News\Statistics\Mapper $statisticsMapper, private \Schoolbox\UserMapper $userMapper)
     {
-        $this->statisticsMapper = $statisticsMapper;
     }
 
 
     /**
      * Generate visitor payload data for $article
      *
-     * @param News\Model $article
+     * @param Model $article
      * @return array
+     * @throws \InvalidArgumentException
      * @throws \PDOException
+     * @throws Exception
      */
     public function generate(News\Model $article): array
     {
-
         /* The user ids who visited at least once
          *
          * Users can have multiple records per article if their referrers are different so we can't
@@ -54,7 +52,7 @@ class Top10
         $statement = $this->statisticsMapper->getDatabase()->prepare("
             SELECT
                 s1.user_id, s1.occurs_at,
-                u.title, u.firstname, u.lastname,
+                u.title, u.firstname, u.preferred_name, u.lastname,
                 r.`name` AS `role`
             FROM {$this->statisticsMapper->getTable()} s1
             LEFT JOIN {$this->statisticsMapper->getTable()} s2
@@ -78,6 +76,10 @@ class Top10
         foreach ($statement as $stat) {
             $date = new \Alaress_Date_Format($stat['occurs_at'], \Alaress_Date_Format::DATABASE_FORMAT);
 
+            /* Get access to formatName(), which only exists in a User instance
+             */
+            $user = $this->userMapper->hydrate($stat);
+
             $visitors[] = [
                 'id' => $stat['user_id'],
                 'occursAt' => [
@@ -88,7 +90,7 @@ class Top10
                 'title' => $stat['title'],
                 'firstname' => $stat['firstname'],
                 'lastname' => $stat['lastname'],
-                'fullname' => trim("{$stat['title']} {$stat['firstname']} {$stat['lastname']}"),
+                'fullname' => $user->formatName(),
                 'role' => $stat['role']
             ];
         }

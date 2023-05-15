@@ -20,25 +20,6 @@ use Schoolbox\UserMapper;
  */
 class Full
 {
-
-    /**
-     * @var News\Statistics\Mapper
-     */
-    private $statisticsMapper;
-
-
-    /**
-     * @var UserResolver
-     */
-    private $userResolver;
-
-
-    /**
-     * @var UserMapper
-     */
-    private $userMapper;
-
-
     /**
      * Top10 constructor.
      *
@@ -47,13 +28,10 @@ class Full
      * @param UserMapper             $userMapper
      */
     public function __construct(
-        News\Statistics\Mapper $statisticsMapper,
-        UserResolver $userResolver,
-        UserMapper $userMapper
+        private News\Statistics\Mapper $statisticsMapper,
+        private UserResolver $userResolver,
+        private UserMapper $userMapper
     ) {
-        $this->statisticsMapper = $statisticsMapper;
-        $this->userResolver = $userResolver;
-        $this->userMapper = $userMapper;
     }
 
 
@@ -82,7 +60,7 @@ class Full
         $statement = $this->statisticsMapper->getDatabase()->prepare("
             SELECT
                 s1.user_id, s1.occurs_at,
-                u.title, u.firstname, u.lastname,
+                u.title, u.firstname, u.preferred_name, u.lastname,
                 r.`name` AS `role`
             FROM {$this->statisticsMapper->getTable()} s1
             LEFT JOIN {$this->statisticsMapper->getTable()} s2
@@ -105,6 +83,10 @@ class Full
         foreach ($statement as $stat) {
             $date = new \Alaress_Date_Format($stat['occurs_at'], \Alaress_Date_Format::DATABASE_FORMAT);
 
+            /* Get access to formatName(), which only exists in a User instance
+             */
+            $user = $this->userMapper->hydrate($stat);
+
             $visitors[$stat['user_id']] = [
                 'id' => $stat['user_id'],
                 'occursAt' => [
@@ -115,7 +97,7 @@ class Full
                 'title' => $stat['title'],
                 'firstname' => $stat['firstname'],
                 'lastname' => $stat['lastname'],
-                'fullname' => trim("{$stat['title']} {$stat['firstname']} {$stat['lastname']}"),
+                'fullname' => $user->formatName(),
                 'role' => $stat['role']
             ];
         }
@@ -138,18 +120,18 @@ class Full
          * Shank it in
          */
         $tempIds = implode(',', array_map('\intval', array_diff($currentlyAudiencedIds, array_keys($visitors))));
+
         if (empty($tempIds)) {
             $tempUsers = [];
         } else {
             $tempUsers = $this->userMapper->getDatabase()->prepare("
                 SELECT
-                    u.id, u.title, u.firstname, u.lastname,
+                    u.id, u.title, u.firstname, u.preferred_name, u.lastname,
                     r.`name` AS `role`
                 FROM {$this->userMapper->getTable()} u
                 LEFT JOIN `groups` r ON u.group_id = r.id
                 WHERE u.id IN ({$tempIds})
             ");
-
 
             $tempUsers->execute();
         }
@@ -160,6 +142,10 @@ class Full
         $users = [];
 
         foreach ($tempUsers as $tempUser) {
+            /* Get access to formatName(), which only exists in a User instance
+             */
+            $user = $this->userMapper->hydrate($tempUser);
+
             $users[$tempUser['id']] = [
                 'id' => $tempUser['id'],
                 'occursAt' => [
@@ -170,7 +156,7 @@ class Full
                 'title' => $tempUser['title'],
                 'firstname' => $tempUser['firstname'],
                 'lastname' => $tempUser['lastname'],
-                'fullname' => trim("{$tempUser['title']} {$tempUser['firstname']} {$tempUser['lastname']}"),
+                'fullname' => $user->formatName(),
                 'role' => $tempUser['role']
             ];
         }
