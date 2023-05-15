@@ -1,12 +1,5 @@
 <?php
 
-
-### update instances that were deny in puppet
-//UPDATE config SET value = '1' WHERE lower(site_school_code) in ('sthprt', 'glacc', 'spgs', 'scc', 'scc-old', 'wgs', 'tc', 'skc', 'geegrs');
-
-
-# SQL commands targeting particular schools.  These will have to be modified somehow to make them work as intended.
-
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
@@ -48,7 +41,7 @@ HELP;
         $logger = $this->getLogger();
 
         try {
-            $schoolCode       = $dbc->executeQuery("SELECT value FROM config WHERE name='site_school_code'")->fetch();
+            $schoolCode       = $dbc->executeQuery("SELECT value FROM config WHERE name='site_school_code'")->fetch()['value'];
         } catch (Exception $e) {
             $logger->info("Could not find school code.  Stopping.\n");
             die;
@@ -57,8 +50,9 @@ HELP;
         // set setting for schools that had the option set in puppet
         $disable = ['sthprt', 'glacc', 'spgs', 'scc', 'scc-old', 'wgs', 'tc', 'skc'];
 
-        $logger->info("Found school code '$schoolCode'.\n");
+        $logger->info("Found school code '$schoolCode'");
         if (in_array($schoolCode, $disable)) {
+            $logger->info("Disabling web crawlers for school");
             $statement = $dbc->executeQuery(
                 "UPDATE config SET
                   value = '0'
