@@ -179,11 +179,14 @@ Data:
                         {{ unitSpec.title }} {% if assessmentTitle %} - {{ assessmentTitle }}{% endif %}
                     {%- endset -%}
 
-                    {% set unitRoute = middleYearsTaskMarks.data[unitSpecId].link ?? hscTaskMarks.data[unitSpecId].link ?? '' %}
-                    {% if unitRoute %}
-                        <h2 class="subheader"><a href="{{ unitRoute }}"><span class="icon-link linked-unit-heading"></span>{{ unitSpecTitle }}</a></h2>
-                    {% else %}
-                        <h2 class="subheader">{{ unitSpecTitle }}</h2>
+                    {% set error = middleYearsTaskMarks.data[unitSpecId].error ?? hscTaskMarks.data[unitSpecId].error ?? null %}
+                    {% if (not error) or showErrors %}
+                        {% set unitRoute = middleYearsTaskMarks.data[unitSpecId].link ?? hscTaskMarks.data[unitSpecId].link ?? '' %}
+                        {% if unitRoute %}
+                            <h2 class="subheader"><a href="{{ unitRoute }}"><span class="icon-link linked-unit-heading"></span>{{ unitSpecTitle }}</a></h2>
+                        {% else %}
+                            <h2 class="subheader">{{ unitSpecTitle }}</h2>
+                        {% endif %}
                     {% endif %}
                 </div>
 

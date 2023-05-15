@@ -10,10 +10,10 @@
 #}
 
 <div class="task-marks-wrap">
-    <h3 class="subheader">Task Marks (%)</h3>
     {% if error|default(null) %}
         {% if showErrors %}<div data-alert {{ dataAttributeError }} class="alert-box alert">{{ error|raw }}</div>{% endif %}
     {% else %}
+        <h3 class="subheader">Task Marks (%)</h3>
         <div class="scrollable">
             <table>
                 <tbody>
