@@ -134,7 +134,7 @@ class Helper
                     'assessmentType'   => $row['assessmentType'],
                     'commonAssessment' => (
                         // Common assessment is only applicable to 'dueWork'.
-                        ($row['assessmentType'] === 'dueWork') ? (bool)$row['commonAssessment']: null
+                        ($row['assessmentType'] === 'dueWork') ? (bool)$row['commonAssessment'] : null
                     ),
                     'workType'         => (
                         (null === $row['workTypeId']) ?
@@ -160,7 +160,7 @@ class Helper
                     'rubric'           => $this->getRubric($assessmentId),
                     'participants'     => (
                         // Participants is not applicable to 'lessonPlan'.
-                        ($row['assessmentType'] === 'lessonPlan') ? null: []
+                        ($row['assessmentType'] === 'lessonPlan') ? null : []
                     )
                 ];
             }
