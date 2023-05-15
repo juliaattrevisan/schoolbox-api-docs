@@ -64,6 +64,7 @@ class OtherInstanceIssued extends Base
         // Look up the instance in the registry, and get its public key so that
         // the JWT can be verified.
         $unverifiedClaims = $this->decodeWithoutVerification($jwt);
+        $headers          = $this->decodeHeaders($jwt);
         $instanceId       = $unverifiedClaims[self::CLAIM_INSTANCE_ID];
         $client           = new Client();
         try {
@@ -84,10 +85,20 @@ class OtherInstanceIssued extends Base
             );
         }
 
+        $keySet = JWK::parseKeySet($jwks);
+        if (!isset($headers['kid'])) {
+            if (count($keySet) !== 1) {
+                throw new Exception\Rejected(
+                    sprintf('Instance "%s" has %d keys in its JWKS, but the JWT does not specify a "kid" claim', $instanceId, count($keySet)),
+                );
+            }
+            $keySet = $keySet[Jwt::KEY_ID];
+        }
+
         // Verify the payload
         $claims = $this->decode(
             $jwt,
-            JWK::parseKeySet($jwks),
+            $keySet,
             (int)$this->config->get(ConfigMapper::NAME_JWT_LEEWAY),
             [Jwt::SIGNING_ALGORITHM]
         );

@@ -26,6 +26,12 @@ abstract class Base implements IParser
      * @var array<string, array>
      */
     private array $decodeWithoutVerificationResults;
+    /**
+     * Cached results from `$this->decodeHeaders`.
+     *
+     * @var array <string, array>
+     */
+    private array $decodeHeadersResults;
 
     /**
      * Decodes a JWT, and verifies that the JWT has been signed appropriately
@@ -96,5 +102,33 @@ abstract class Base implements IParser
             }
         }
         return $this->decodeWithoutVerificationResults[$jwt];
+    }
+
+    /**
+     * Decodes a JWT's header without verifying that the JWT is valid.
+     *
+     * @param string $jwt The JWT to parse.
+     * @return array The header within the JWT.
+     * @throws Exception\Unparseable JWT doesn't contain a header, payload and
+     *                               signature segment, or is not parseable for
+     *                               any other reason
+     *                               (e.g. a segment is invalid JSON).
+     */
+    protected function decodeHeaders(string $jwt): array
+    {
+        if (!isset($this->decodeHeadersResults[$jwt])) {
+            $parts = explode('.', $jwt);
+            if (count($parts) !== 3) {
+                throw new Exception\Unparseable('JWT must contain a header, payload and signature');
+            }
+            [$header,] = $parts;
+            try {
+                $this->decodeHeadersResults[$jwt]
+                    = (array)JwtLibrary\JWT::jsonDecode(JwtLibrary\JWT::urlsafeB64Decode($header));
+            } catch (DomainException $e) {
+                throw new Exception\Unparseable('JWT could not be parsed: ' . $e->getMessage(), $e->getCode(), $e);
+            }
+        }
+        return $this->decodeHeadersResults[$jwt];
     }
 }
