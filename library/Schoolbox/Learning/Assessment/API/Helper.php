@@ -158,7 +158,10 @@ class Helper
                     ),
                     'dueDate'          => \Alaress_Date_Format::newDatabaseDate($row['due_date'])->toRfc3339String(),
                     'rubric'           => $this->getRubric($assessmentId),
-                    'participants'     => null,
+                    'participants'     => (
+                        // Participants is not applicable to 'lessonPlan'.
+                        ($row['assessmentType'] === 'lessonPlan') ? null: []
+                    )
                 ];
             }
         }
