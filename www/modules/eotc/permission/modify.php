@@ -51,7 +51,7 @@ $this->setVar('STAFF_GROUP_TYPE_IDS', implode(';', $groupHandler->getStaffGroupT
 $userMapper            = UserMapper::getInstance();
 $eventPermissionMapper = EventPermissionMapper::getInstance();
 
-if (is_numeric($this->arg[0])) {
+if (\count($this->arg) && is_numeric($this->arg[0])) {
     try {
         /** @var User $user */
         $user = $userMapper->findById($this->arg[0]);
