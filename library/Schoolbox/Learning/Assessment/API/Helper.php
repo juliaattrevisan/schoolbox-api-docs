@@ -133,8 +133,8 @@ class Helper
                     'title'            => $row['title'],
                     'assessmentType'   => $row['assessmentType'],
                     'commonAssessment' => (
-                        // Common assessment is not applicable to lesson plans.
-                        ($row['assessmentType'] === 'lessonPlan') ? null : (bool)$row['commonAssessment']
+                        // Common assessment is only applicable to 'dueWork'.
+                        ($row['assessmentType'] === 'dueWork') ? (bool)$row['commonAssessment']: null
                     ),
                     'workType'         => (
                         (null === $row['workTypeId']) ?
@@ -153,8 +153,8 @@ class Helper
                     'subjectCode'      => $row['subjectCode'],
                     'project'          => (null === $row['project']) ? null : ['id' => (int)$row['project']],
                     'weight'           => (
-                        // Weight is not applicable to lesson plans.
-                        ($row['assessmentType'] === 'lessonPlan') ? null : (float)$row['weight']
+                        // Weight is not applicable to 'lessonPlan' and 'task'.
+                        (in_array($row['assessmentType'], ['lessonPlan', 'task'])) ? null : (float)$row['weight']
                     ),
                     'dueDate'          => \Alaress_Date_Format::newDatabaseDate($row['due_date'])->toRfc3339String(),
                     'rubric'           => $this->getRubric($assessmentId),
