@@ -126,7 +126,7 @@ class Controller extends Base
 
             /* Recent Visitors to this article
              */
-            'recentVisitors' => (new Visitation\Payload\Top10($this->statisticsMapper))->generate($article)
+            'recentVisitors' => (new Visitation\Payload\Top10($this->statisticsMapper, $this->userMapper))->generate($article)
         ])->setTitle("Statistics for {$article->getTitle()}"));
     }
 
