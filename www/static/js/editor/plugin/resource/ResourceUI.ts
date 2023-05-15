@@ -55,10 +55,19 @@ export default class ResourceUI extends Plugin {
      * This sits below the bottom of the editor and shows the progress of each resource.
      */
     addUploadContainer() {
-        this.uploadContainer = document.createElement("div");
-        this.uploadContainer.classList.add("dropzone-wrap", "sb-ck-resource-upload-container");
-        this.checkUploadContainer();
-        insertElementAfter(this.editor.sourceElement, this.uploadContainer);
+        const uploadContainerAttribute = "data-resource-upload-container";
+        const uploadContainer = (this.editor.sourceElement.parentElement as HTMLElement).querySelector(
+            `[${uploadContainerAttribute}]`
+        );
+        if (uploadContainer === null) {
+            this.uploadContainer = document.createElement("div");
+            this.uploadContainer.setAttribute(uploadContainerAttribute, "");
+            this.uploadContainer.classList.add("dropzone-wrap", "sb-ck-resource-upload-container");
+            this.checkUploadContainer();
+            insertElementAfter(this.editor.sourceElement as HTMLElement, this.uploadContainer);
+        } else {
+            this.uploadContainer = uploadContainer as HTMLDivElement;
+        }
     }
 
     /**
