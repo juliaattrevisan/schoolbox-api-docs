@@ -28,7 +28,7 @@ class IsLoggedIn implements IAuthorizationRule
         // True:  skip to next item in chain
         // False: break chain with request that redirects somewhere
         // These rules should define what to do on failure too.
-        if (!($user instanceof User && $user->getId() && !$user->isDeleted() && $user->getEnabled())) {
+        if (!($user instanceof User && $user->getId())) {
             throw new Unauthenticated();
         }
     }

@@ -282,7 +282,7 @@ class Kernel extends WebKernelAbstract
             // * if user session is timed out or not
             /** @var \Schoolbox\User $user */
             $user = $session->getAuthUser();
-            if ($session->isAuthSessionAlive($user)) {
+            if ($session->isAuthSessionAlive()) {
                 $session->updateLastTime();
             }
         }
