@@ -162,13 +162,13 @@ foreach ($availableUsers as $user) {
 
     /** @var \EOTC\EventPermission $currentPermission */
     foreach ($userPermissions as $currentPermission) {
-        if ($currentPermission->getCampus() && !in_array($currentPermission->getCampus()->getName(), $campusNames)) {
+        if ($currentPermission->getCampus() && !in_array($currentPermission->getCampus()->getName(), $campusNames, true)) {
             $campusNames[] = $currentPermission->getCampus()->getName();
         }
-        if ($currentPermission->getAllowed() && !in_array($currentPermission->getStatus()->getName(), $allowedStatuses)) {
+        if ($currentPermission->getAllowed() && !in_array($currentPermission->getStatus()->getName(), $allowedStatuses, true)) {
             $allowedStatuses[] = $currentPermission->getStatus()->getName();
         }
-        if ($currentPermission->getSubscribed() && !in_array($currentPermission->getStatus()->getName(), $subscriptions)) {
+        if ($currentPermission->getSubscribed() && !in_array($currentPermission->getStatus()->getName(), $subscriptions, true)) {
             $subscriptions[] = $currentPermission->getStatus()->getName();
         }
     }
