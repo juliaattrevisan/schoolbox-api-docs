@@ -115,7 +115,7 @@ class Controller extends Base
             foreach ($postData['field'] as $fieldId => $fieldData) {
                 /* Determine visibility setting, translating ui bool into schema's enum
                  */
-                $visibility = 'on' === $fieldData['visibility'] ? Role::STUDENT : Role::STAFF;
+                $visibility = 'on' === ($fieldData['visibility'] ?? 'off') ? Role::STUDENT : Role::STAFF;
 
                 /* Update all the pieces
                  * This is the Create endpoint so we can presume new models are always required
@@ -194,7 +194,7 @@ class Controller extends Base
             foreach ($postData['field'] as $fieldId => $fieldData) {
                 /* Determine visibility setting, translating ui bool into schema's enum
                  */
-                $visibility = 'on' === $fieldData['visibility'] ? Role::STUDENT : Role::STAFF;
+                $visibility = 'on' === ($fieldData['visibility'] ?? 'off') ? Role::STUDENT : Role::STAFF;
 
                 /* This is either a new row that was spawned by user,
                  * or it's a pre-existing row we can get from $lessonPlanTemplate
