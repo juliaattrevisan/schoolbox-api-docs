@@ -44,6 +44,9 @@
     --ck-color-input-disabled-background: var(--sb-ck-disabled);
     --ck-color-list-button-hover-background: var(--sb-ck-active-grey);
     --ck-color-list-button-on-background-focus: var(--sb-ck-active-grey);
+
+    --ck-color-switch-button-on-background: var(--sb-ck-active);
+    --ck-color-switch-button-on-hover-background: var(--sb-ck-active);
 }
 
 .ck.ck-editor {
@@ -278,6 +281,13 @@
  *  The below styles apply some sort of custom styling to the CK Editor toolbar itself.
  *  This is the custom button to the right of the Link URL that allows you to open our
  *  resource modal
+ *
+ *  A lot of these changes strip CKEditor's colours back into a more neutral colour
+ *  range. I tried getting a skin-config friendly version of CKEditor to work, but there
+ *  were too many variables between schools and I couldn't try to resolve it before the
+ *  fact with a SASS function because every config colour is, at its core, a CSS custom
+ *  property. SASS has no access to custom properties as it's a preprocessor and custom
+ *  property values aren't resolved until runtime.
 **/
 
 .ck.ck-button:not([aria-disabled="true"]) {
@@ -286,6 +296,10 @@
 
 .ck.ck-button[aria-disabled="true"] {
     pointer-events: none;
+}
+
+.ck.ck-switchbutton[aria-pressed="true"] .ck.ck-button__toggle {
+    border: 1px solid rgb(0, 0, 0, 0.1);
 }
 
 .ck-body-wrapper .ck button.ck-button-resource-link,
@@ -330,15 +344,22 @@ turned on */
 
 /* Styling disabled inputs */
 .ck.ck-editor input.ck.ck-input:read-only {
+    border-color: rgb(0, 0, 0, 0.05);
     background-color: var(--sb-ck-disabled);
     pointer-events: none;
 }
 
+/* Styling the drop down grid buttons */
 .ck.ck-dropdown__panel button.ck-insert-table-dropdown-grid-box.ck-on {
     background-color: var(--sb-ck-active-grey) !important;
     border: 1px solid var(--sb-ck-hover-outline);
 }
 
+/* Make the textarea background colour when viewing in source a lighter colour */
+.ck.ck-editor__main .ck-source-editing-area textarea:hover {
+    background-color: var(--sb-ck-active-grey) !important;
+}
+
 .ck.ck-editor__main .ck-source-editing-area textarea:focus {
-    background-color: var(--sb-ck-active) !important;
+    background-color: var(--sb-ck-active-grey) !important;
 }
