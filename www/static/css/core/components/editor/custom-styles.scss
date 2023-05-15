@@ -469,9 +469,3 @@ p.sb-ck-code-block {
     // editor.css is loaded in after our file, so we need to use !important...
     border: 1px solid css-darken($form-border-color, 15%) !important;
 }
-
-/*
-td.ck-editor__editable.ck-editor__nested-editable_focused {
-    background-color: css-lighten($form-border-color, 20%) !important;
-    outline: 1px solid css-darken($form-border-color, 15%) !important;
-} */
