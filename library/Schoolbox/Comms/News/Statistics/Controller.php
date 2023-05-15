@@ -9,9 +9,12 @@
 namespace Schoolbox\Comms\News\Statistics;
 
 use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Audience\UserResolver;
+use Schoolbox\Comms\News\Model;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\UserMapper;
 
 /**
@@ -21,71 +24,39 @@ use Schoolbox\UserMapper;
  */
 class Controller extends Base
 {
-
-    /**
-     * @var IConnector
-     */
-    private $database;
-
-
-    /**
-     * @var Mapper
-     */
-    private $statisticsMapper;
-
-
-    /**
-     * @var Cumulative\Mapper
-     */
-    private $statisticsCumulativeMapper;
-
-
-    /**
-     * @var UserResolver
-     */
-    private $userResolver;
-
-
-    /**
-     * @var UserMapper
-     */
-    private $userMapper;
-
-
     /**
      * Controller constructor.
      *
-     * @param IConnector        $databaseInternal
+     * @param IConnector        $database
      * @param Mapper            $statisticsMapper
      * @param Cumulative\Mapper $statisticsCumulativeMapper
      * @param UserResolver      $userResolver
      * @param UserMapper        $userMapper
      */
     public function __construct(
-        IConnector $databaseInternal,
-        Mapper $statisticsMapper,
-        Cumulative\Mapper $statisticsCumulativeMapper,
-        UserResolver $userResolver,
-        UserMapper $userMapper
+        private IConnector $database,
+        private Mapper $statisticsMapper,
+        private Cumulative\Mapper $statisticsCumulativeMapper,
+        private UserResolver $userResolver,
+        private UserMapper $userMapper
     ) {
-        $this->database = $databaseInternal;
-        $this->statisticsMapper = $statisticsMapper;
-        $this->statisticsCumulativeMapper = $statisticsCumulativeMapper;
-        $this->userResolver = $userResolver;
-        $this->userMapper = $userMapper;
     }
 
 
     /**
      * Statistical overview for $article
      *
+     * @param Model $article
+     * @throws Exception
+     * @throws \Alaress\Database\Exception
+     * @throws InvalidColumnException
+     * @throws \InvalidArgumentException
+     * @throws \LogicException
+     * @throws \PDOException
+     * @throws \UnderflowException
+     * @throws \UnexpectedValueException
      * @api GET /news/statistics/{articleId}
      *
-     * @param News\Model $article
-     * @throws \Alaress\Database\Exception
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
-     * @throws \PDOException
      */
     public function getOverview(News\Model $article): void
     {
@@ -155,7 +126,6 @@ class Controller extends Base
 
     /**
      * @param News\Model $article
-     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
      */
     public function getVisitation(News\Model $article): void
     {
@@ -168,12 +138,14 @@ class Controller extends Base
     /**
      * Get the most recent 10 visitors to $article
      *
-     * @param News\Model $article
+     * @param Model $article
+     * @throws \InvalidArgumentException
      * @throws \PDOException
+     * @throws Exception
      */
     public function getTop10(News\Model $article): void
     {
-        $payload = (new Visitation\Payload\Top10($this->statisticsMapper))
+        $payload = (new Visitation\Payload\Top10($this->statisticsMapper, $this->userMapper))
             ->generate($article);
 
         $this->getResponse()->content->set($this->buildJsonOutput($payload));
