@@ -27,21 +27,16 @@ class Controller extends Base
      */
     public function getRobots(): void
     {
-        $robotAllow = "
-            User-Agent: *
-            Allow: /
-            ";
-        $robotDeny = "
-            User-Agent: *
-            Disallow: /
-            ";
+        $robotAllow = "User-Agent: *\nAllow: /\n";
+        $robotDeny = "User-Agent: *\nDisallow: /\n";
+
+        $this->getResponse()->headers->set('Content-Type', 'text/plain; charset=utf-8');
 
         // Are we blocking web crawlers, or allowing them?
         if ($this->config->get('web_crawlers_enabled')) {
-            echo $robotAllow;
+            $this->getResponse()->content->set($this->buildFileOutputFromString($robotAllow));
         } else {
-            echo $robotDeny;
+            $this->getResponse()->content->set($this->buildFileOutputFromString($robotDeny));
         }
-        die();
     }
 }
