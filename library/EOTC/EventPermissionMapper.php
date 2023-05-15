@@ -13,7 +13,6 @@
 namespace EOTC;
 
 use Schoolbox\CampusMapper;
-use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\User;
@@ -21,7 +20,6 @@ use Schoolbox\UserMapper;
 
 class EventPermissionMapper extends BaseMapper
 {
-
     /**
      * Mapping
      */
@@ -64,6 +62,16 @@ class EventPermissionMapper extends BaseMapper
                 LEFT JOIN {$this->getJoinSql('status', '', 's')}
                 ";
     }
+
+
+    /**
+     * @inheritDoc
+     */
+    protected function hydrateSelect(\PDOStatement $statement)
+    {
+        return $this->hydrateWithCampusAndStatus($statement);
+    }
+
 
     /**
      * Delete all the permissions for a user

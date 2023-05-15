@@ -51,7 +51,7 @@ $this->setVar('STAFF_GROUP_TYPE_IDS', implode(';', $groupHandler->getStaffGroupT
 $userMapper            = UserMapper::getInstance();
 $eventPermissionMapper = EventPermissionMapper::getInstance();
 
-if (is_numeric($this->arg[0])) {
+if (\count($this->arg) && is_numeric($this->arg[0])) {
     try {
         /** @var User $user */
         $user = $userMapper->findById($this->arg[0]);
@@ -162,13 +162,13 @@ foreach ($availableUsers as $user) {
 
     /** @var \EOTC\EventPermission $currentPermission */
     foreach ($userPermissions as $currentPermission) {
-        if ($currentPermission->getCampus() && !in_array($currentPermission->getCampus()->getName(), $campusNames)) {
+        if ($currentPermission->getCampus() && !in_array($currentPermission->getCampus()->getName(), $campusNames, true)) {
             $campusNames[] = $currentPermission->getCampus()->getName();
         }
-        if ($currentPermission->getAllowed() && !in_array($currentPermission->getStatus()->getName(), $allowedStatuses)) {
+        if ($currentPermission->getAllowed() && !in_array($currentPermission->getStatus()->getName(), $allowedStatuses, true)) {
             $allowedStatuses[] = $currentPermission->getStatus()->getName();
         }
-        if ($currentPermission->getSubscribed() && !in_array($currentPermission->getStatus()->getName(), $subscriptions)) {
+        if ($currentPermission->getSubscribed() && !in_array($currentPermission->getStatus()->getName(), $subscriptions, true)) {
             $subscriptions[] = $currentPermission->getStatus()->getName();
         }
     }
