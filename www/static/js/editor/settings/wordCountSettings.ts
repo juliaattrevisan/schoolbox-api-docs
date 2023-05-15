@@ -161,7 +161,12 @@ function addListenersForDisablingSubmitButton(ckeditorSourceEl: HTMLElement) {
         return;
     }
 
-    const submitButton = containingForm.querySelector("input[type=submit]");
+    let submitButton = containingForm.querySelector("input[type=submit]");
+
+    if (submitButton === null) {
+        // Search for button of type 'submit'.
+        submitButton = containingForm.querySelector("button[type=submit]");
+    }
 
     if (submitButton === null) {
         // No submit button found, so do nothing.
