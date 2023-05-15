@@ -14,7 +14,7 @@ INSERT INTO config (
     module
 ) VALUES (
              'web_crawlers_enabled',
-             '1',
+             (SELECT if(value='prod', '1', '0') from config where name = 'site_type'),
              'Allow Web Crawlers',
              'When set to ‘ON’, search engine web crawlers will be able to indexing the site',
              (SELECT id FROM lu_config_field WHERE field = 'boolean'),
