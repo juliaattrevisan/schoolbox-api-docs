@@ -15,6 +15,7 @@ namespace Alaress\Session;
 use Aura\Session\Session as BaseSession;
 use Schoolbox\User;
 use Schoolbox\IConfigLoader;
+use Schoolbox\UserMapper;
 
 class Session extends BaseSession
 {
@@ -33,6 +34,12 @@ class Session extends BaseSession
      */
     protected $requestTime;
 
+
+    /**
+     * Store whether the current session is alive for this request, to avoid fetching DB multiple times
+     * @var bool|null
+     */
+    private ?bool $sessionAlive = null;
 
     /**
      * Session constructor.
@@ -80,9 +87,9 @@ class Session extends BaseSession
      */
     public function getAuthUser()
     {
-        $user = null;
-        if ($this->isAuthSessionAlive()) {
-            $user = $this->getSegment(null)->get('user');
+        $user = $this->getSegment(null)->get('user');
+        if (!$this->isAuthSessionAlive($user)) {
+            $user = null;
         }
         return ($user instanceof User) ? $user : new User();
     }
@@ -125,21 +132,35 @@ class Session extends BaseSession
      * Is the current user authentication session alive (does it exist, and has
      * it not expired?)
      *
+     * @param $user
      * @return bool
      */
-    public function isAuthSessionAlive()
+    public function isAuthSessionAlive($user): bool
     {
-        $authSession   = $this->getSegment(null);
+        if ($this->sessionAlive !== null) {
+            return $this->sessionAlive;
+        };
+
+        if ($user instanceof User) {
+            $query = UserMapper::getInstance()->getDatabase()->query('SELECT count(1) FROM `user` WHERE `username` = :username AND `deleted_at` IS NULL AND `enabled` = 1', ['username' => $user->getUsername()]);
+            if (!$query->fetchColumn()) {
+                unset($_SESSION['user']);
+                $this->sessionAlive = false;
+            }
+        }
+
+        $authSession = $this->getSegment(null);
 
         if ($authSession->get('remember')) {
-            return true;
+            $this->sessionAlive = true;
         } else {
-            $lastTime      = $authSession->get('lasttime');
-            $sessionLength = $this->getConfig()->get('session_length');
+            $lastTime      = (int)$authSession->get('lasttime');
+            $sessionLength = (int)$this->getConfig()->get('session_length');
 
             // Session timed out: don't get the user.
-            return (!($lastTime + $sessionLength < $this->getRequestTime()));
+            $this->sessionAlive = (!($lastTime + $sessionLength < $this->getRequestTime()));
         }
+        return $this->sessionAlive;
     }
 
     /**

@@ -13,7 +13,7 @@ use Predis\Collection\Iterator\Keyspace;
 use Predis\ClientInterface;
 use Schoolbox\Realtime\Pipe\PipeManager;
 
-require_once __DIR__ . '/../conf/core/require.php';
+require_once __DIR__ . '/../../conf/core/require.php';
 
 /**
  * Deletes all user sessions from Redis.

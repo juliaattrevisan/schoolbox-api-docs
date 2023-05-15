@@ -313,6 +313,9 @@ class SitePage extends Page
         $sessionUser       = $_SESSION['user'] ?? null;
         $sessionExpired    = !isset($_SESSION['lasttime'])
             || (int)($_SESSION['lasttime'] + $this->config->get('session_length')) < time();
+//        if ($sessionUser instanceof User) {
+//            $sessionHandler->create($sessionUser->getUsername());
+//        }
         $sessionIpMismatch = $this->config->get('track_ip') && ($_SESSION['ip'] ?? '') !== Session::getIP();
         if (!$sessionUser instanceof User || $sessionExpired || $sessionIpMismatch) {
             // Catch users with the remember me cookie
