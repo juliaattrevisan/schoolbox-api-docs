@@ -21,6 +21,7 @@
     /* to sit above the side menus */
     --ck-z-modal: 1003;
 
+    /* The colours that are referenced in the overrides below */
     --sb-ck-active: #cae3fa;
     --sb-ck-active-grey: #e8e8e8;
     --sb-ck-active-highlight: #daedff;
@@ -28,7 +29,7 @@
     --sb-ck-disabled: #dddddd;
     --sb-ck-icon-colour: rgb(51, 51, 51);
 
-    /* Overrides */
+    /* Overrides of default CK colours */
     --ck-color-button-default-hover-background: var(--sb-ck-active-grey);
     --ck-color-button-default-active-background: var(--sb-ck-active-grey);
     --ck-color-button-on-hover-background: var(--sb-ck-active-grey);
