@@ -224,8 +224,8 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 
     /* Collections of ids
      */
-    $event->setCampusCollection(new Collection($_POST['campus']));
-    $event->setRoleCollection(new Collection($_POST['role']));
+    $event->setCampusCollection(new Collection($_POST['campus'] ?? []));
+    $event->setRoleCollection(new Collection($_POST['role'] ?? []));
 
     /* Store metadata
      */
