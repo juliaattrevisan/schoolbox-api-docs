@@ -30,7 +30,10 @@
 {% endapply %}
 {% endmacro %}
 
-{% if currentFile.turnitin %}
+{# Similarity Check needs to be enabled and a turnitin record
+ # needs to exist, to show you the turnitin metadata
+ #}
+{% if assessment.similarityCheckEnabled and currentFile.turnitin %}
 <p class="meta">
     {# Only provide links to turnitin reports which generated
      # Historical Turnitin records won't have a report
