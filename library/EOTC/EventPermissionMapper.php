@@ -69,12 +69,6 @@ class EventPermissionMapper extends BaseMapper
 
     /**
      * @inheritDoc
-     *
-     * @param array $row
-     * @param       $alias
-     * @param       $callback
-     * @return GenericCollection
-     * @throws \DebugBar\DebugBarException
      */
     protected function hydrateSelect(\PDOStatement $statement)
     {
