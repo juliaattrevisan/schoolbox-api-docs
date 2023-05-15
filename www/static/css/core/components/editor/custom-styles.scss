@@ -1,3 +1,5 @@
+@use "sass:color";
+
 /* Yellow box
  */
 .highlighted-note {
@@ -468,16 +470,8 @@ p.sb-ck-code-block {
     border: 1px solid css-darken($form-border-color, 15%) !important;
 }
 
+/*
 td.ck-editor__editable.ck-editor__nested-editable_focused {
     background-color: css-lighten($form-border-color, 20%) !important;
     outline: 1px solid css-darken($form-border-color, 15%) !important;
-}
-
-.ck.ck-dropdown__panel_se ul .ck.ck-button:hover {
-    border: 1px solid css-darken($form-border-color, 15%) !important;
-}
-
-.ck.ck-dropdown__panel_se ul .ck.ck-button.ck-on,
-.ck.ck-input.ck-input-text:focus {
-    outline: 3px solid css-lighten($form-border-color, 20%) !important;
-}
+} */

@@ -20,6 +20,30 @@
     --ck-input-width: 19rem;
     /* to sit above the side menus */
     --ck-z-modal: 1003;
+
+    --sb-ck-hover: #e8e8e8;
+    --sb-ck-active-grey: #e8e8e8;
+    --sb-ck-active: #cae3fa;
+    --sb-ck-active-list-border: #809fc0;
+    --sb-ck-hover-outline: #c8c8c8;
+    --sb-ck-input-disabled: #bbbbbb;
+    --sb-ck-icon-colour: rgb(51, 51, 51);
+
+    /* Overrides */
+    --ck-color-button-default-hover-background: var(--sb-ck-active-grey);
+    --ck-color-button-default-active-background: var(--sb-ck-active-grey);
+    --ck-color-button-on-hover-background: var(--sb-ck-active-grey);
+    --ck-color-base-active: var(--sb-ck-active-grey);
+    --ck-color-base-active-focus: var(--sb-ck-active-grey);
+    --ck-color-button-on-background: var(--sb-ck-active);
+    --ck-color-button-on-hover-background: var(--sb-ck-active);
+    --ck-color-button-on-color: var(--sb-ck-icon-colour);
+    --ck-color-list-button-on-background: var(--sb-ck-active-grey);
+    --ck-color-list-button-on-text: var(--sb-ck-icon-color);
+    --ck-color-input-background: white;
+    --ck-color-input-disabled-background: var(--sb-ck-input-disabled);
+    --ck-color-list-button-hover-background: var(--sb-ck-active-grey);
+    --ck-color-list-button-on-background-focus: var(--sb-ck-active-grey);
 }
 
 .ck.ck-editor {
@@ -205,24 +229,6 @@
 }
 
 /**
- *  The below styles apply some sort of custom styling to the CK Editor toolbar itself.
- *  This is the custom button to the right of the Link URL that allows you to open our
- *  resource modal
-**/
-.ck-body-wrapper .ck button.ck-button-resource-link {
-    margin-left: var(--ck-spacing-large);
-    min-width: 4rem;
-    background-color: var(--ck-color-button-on-active-background);
-    color: var(--ck-color-button-on-color);
-}
-
-.ck-body-wrapper .ck button.ck-button-resource-link:hover,
-.ck-body-wrapper .ck button.ck-button-resource-link:active {
-    color: white;
-    background-color: var(--ck-color-button-on-color);
-}
-
-/**
  *  The below styles only apply to content when viewed within the editor - this spot
  *  is pretty much exclusive to resolving bugs with how CKEditor changes things
  *  while being edited and to bring it closer to what the display will look like.
@@ -269,54 +275,80 @@
 }
 
 /**
- *  Skin config logic... so to speak.
+ *  The below styles apply some sort of custom styling to the CK Editor toolbar itself.
+ *  This is the custom button to the right of the Link URL that allows you to open our
+ *  resource modal
 **/
+
 .ck.ck-button {
     cursor: pointer;
 }
 
-.ck.ck-button.ck-on[aria-pressed="true"],
-.ck.ck-button.ck-on[aria-pressed="true"]:hover,
-.ck.ck-button.ck-on[aria-expanded="true"],
-.ck.ck-button.ck-on[aria-expanded="true"]:hover {
-    background-color: var(--content-ui-selected);
-    color: var(--content-interactive-foreground);
-
-    /* background-color: var(--content-ui-selected);
-    color: var(--content-interactive-foreground); */
+.ck-body-wrapper .ck button.ck-button-resource-link {
+    margin-left: var(--ck-spacing-large);
+    min-width: 4rem;
+    background-color: var(--ck-color-button-action-background);
+    color: white;
+    /* background-color: var(--ck-color-button-on-active-background);
+    color: var(--ck-color-button-on-color); */
 }
 
-.ck.ck-button:hover {
-    border: 1px solid rgba(0, 0, 0, 0.15);
+.ck-body-wrapper .ck button.ck-button-resource-link:hover,
+.ck-body-wrapper .ck button.ck-button-resource-link:active {
+    background-color: var(--ck-color-button-action-active-background);
+    /* color: white;
+    background-color: var(--ck-color-button-on-color); */
 }
 
-.ck.ck-button.ck-insert-table-dropdown-grid-box.ck-on {
-    background-color: var(--content-ui-selected);
-    border: 1px solid rgba(0, 0, 0, 0.15);
+/* .ck.ck-toolbar button.ck.ck-button.ck-on {
+    background-color: var(--sb-ck-active);
+    color: var(--sb-ck-icon-color);
 }
 
-.ck.ck-button.ck-insert-table-dropdown-grid-box.ck-on,
-.ck.ck-button.ck-insert-table-dropdown-grid-box.ck-on:hover {
-    background-color: var(--content-ui-selected);
-    border: 1px solid rgba(0, 0, 0, 0.15);
-}
-
-.ck.ck-button.ck-insert-table-dropdown-grid-box.ck-on:hover {
-    filter: brightness(135%);
-}
-
-.ck.ck-dropdown__panel_se ul .ck.ck-button.ck-on,
-.ck.ck-dropdown__panel_se ul .ck.ck-button.ck-on:hover {
-    background-color: var(--content-ui-selected);
-    color: var(--content-ui-foreground);
-}
-
-/* .ck.ck-button.ck-on[aria-pressed="true"],
-.ck.ck-button.ck-on[aria-pressed="true"]:hover {
-    background-color: rgba(0, 0, 0, 0.08);
-    color: #000000;
-}
-
-.ck.ck-button:hover {
-    border: 1px solid rgba(0, 0, 0, 0.15);
+.ck.ck-toolbar button.ck.ck-button.ck-on:hover {
+    background-color: var(--sb-ck-active);
 } */
+
+.ck.ck-toolbar button.ck.ck-button.ck-dropdown__button.ck-on {
+    background-color: var(--sb-ck-active-grey);
+}
+
+/*
+.ck.ck-toolbar button.ck.ck-button:hover {
+    background-color: var(--sb-ck-hover);
+}
+
+.ck.ck-dropdown__panel ul .ck.ck-button_with-text.ck-on {
+    background-color: var(--sb-ck-active-grey) !important;
+    color: black;
+}
+
+.ck.ck-dropdown__panel ul .ck.ck-button_with-text.ck-on:hover {
+    background-color: var(--sb-ck-hover);
+}
+*/
+
+/* The style panel requires stronger highlighting of options that are
+turned on */
+.ck.ck-dropdown__panel .ck-style-panel .ck.ck-button_with-text.ck-on {
+    border: 1px solid #0d65ff;
+}
+
+/* .ck.ck-dropdown__panel .ck.ck-button_with-text.ck-on .ck.ck-button__label {
+    background-color: var(--sb-ck-active-grey);
+} */
+
+/* Make inputs in the toolbar have a white backgrounds when focused */
+.ck.ck-dropdown__panel input.ck.ck-input:focus,
+.ck.ck-balloon-panel input.ck.ck-input:focus {
+    background-color: white;
+}
+
+.ck.ck-dropdown__panel button.ck-insert-table-dropdown-grid-box.ck-on {
+    background-color: var(--sb-ck-active-grey) !important;
+    border: 1px solid var(--sb-ck-hover-outline);
+}
+
+.ck.ck-editor__main .ck-source-editing-area textarea:focus {
+    background-color: var(--sb-ck-active-grey) !important;
+}
