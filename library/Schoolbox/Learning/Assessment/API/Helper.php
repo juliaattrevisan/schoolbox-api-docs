@@ -81,26 +81,35 @@ class Helper
         if (0 !== $cursor) {
             $query .= " AND assessment.id > :cursor ";
         }
+
         $query .= "ORDER BY assessment.id";
+
         if (0 !== $limit) {
             $query .= " LIMIT :limit";
         }
+
         $statement = $this->mapper->getDatabase()->prepare($query);
+
         if (0 !== $limit) {
             $statement->bindValue('limit', $limit, PDO::PARAM_INT);
         }
+
         if (0 !== $cursor) {
             $statement->bindValue('cursor', $cursor, PDO::PARAM_INT);
         }
+
         foreach ($params as $label => $value) {
             $statement->bindValue($label, $value);
         }
+
         $statement->execute();
+
         /**
          * build the whole thing
          */
         foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
             $yearLevel = null;
+
             /**
              * check if folder has yearlevels?
              */
@@ -114,22 +123,10 @@ class Helper
                     ];
                 }
             }
-            $folderId = (int)$row['folderId'];
-            $folder   = [
-                'id' => $folderId,
-                'name' => $row['folderName'],
-                'code' => $this->getFolderCode($folderId),
-                'yearLevel' => $yearLevel,
-            ];
-            $project  = null;
-            if (null !== $row['project']) {
-                $project = [
-                    'id' => (int)$row['project'],
-                ];
-            }
-            //get the rubric for the assessment
+
+            $folderId     = (int)$row['folderId'];
             $assessmentId = (int)$row['id'];
-            $rubric       = $this->getRubric($assessmentId);
+
             if (!isset($output[$assessmentId])) {
                 $output[$assessmentId] = [
                     'id'               => $assessmentId,
@@ -140,35 +137,43 @@ class Helper
                         ($row['assessmentType'] === 'lessonPlan') ? null : (bool)$row['commonAssessment']
                     ),
                     'workType'         => (
-                        ($row['workTypeId'] === null) ?
+                        (null === $row['workTypeId']) ?
                         null :
                         [
                             'name' => $row['workTypeName'],
                             'id'   => (int)$row['workTypeId']
                         ]
                     ),
-                    'folder'           => $folder,
+                    'folder'           => [
+                        'id'        => $folderId,
+                        'name'      => $row['folderName'],
+                        'code'      => $this->getFolderCode($folderId),
+                        'yearLevel' => $yearLevel,
+                    ],
                     'subjectCode'      => $row['subjectCode'],
-                    'project'          => $project,
+                    'project'          => (null === $row['project']) ? null : ['id' => (int)$row['project']],
                     'weight'           => (
                         // Weight is not applicable to lesson plans.
                         ($row['assessmentType'] === 'lessonPlan') ? null : (float)$row['weight']
                     ),
                     'dueDate'          => \Alaress_Date_Format::newDatabaseDate($row['due_date'])->toRfc3339String(),
-                    'rubric'           => $rubric,
+                    'rubric'           => $this->getRubric($assessmentId),
                     'participants'     => null,
                 ];
             }
         }
-        //if there are no assessments, return empty string. This is a valid query and should return 200.
+
+        // If there are no assessments, return empty string. This is a valid query and should return 200.
         if (empty($output)) {
             return [];
         }
-        //get participation (feedback + responses)
+
+        // Get participation (feedback + responses)
         $participationItemsByAssessment = $this->getAssessmentParticipation(array_keys($output));
         foreach ($participationItemsByAssessment as $assessmentID => $participationItems) {
             $output[$assessmentID]['participants'] = array_values($participationItems);
         }
+
         return array_values($output);
     }
 
@@ -403,8 +408,8 @@ class Helper
     }
 
     /**
-    * give this an array of assessment id's and it will get all the assessment feedback items,
-    * and return a nice array of them all indexed by the assessment ID
+    * Give this an array of assessment ids, and it will get all the assessment feedback items,
+    * and return a nice array of them all indexed by the assessment ID.
     * @param array $assessmentIds
     * @return array
     */
