@@ -15,6 +15,7 @@ use HouseMapper;
 use HouseResidentialMapper;
 use PDOStatement;
 use Predis\ClientInterface;
+use Predis\Collection\Iterator\Keyspace;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox;
@@ -22,6 +23,7 @@ use Schoolbox\Calendar\Util\ViewNameMapping;
 use Schoolbox\External\Connector\ICommunityPortal;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
+use Schoolbox\Realtime\Pipe\PipeManager;
 use Schoolbox\Resource\Search\Results;
 use Schoolbox\Resource\Storage;
 use UnexpectedValueException;
@@ -157,6 +159,7 @@ class UserMapper extends Mapper
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateSuperuserStatus']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'addUsernameToCache']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateCommunityPortalPassword']);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'deleteSession']);
 
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'blockAlaressUserDeletion']);
 
@@ -165,6 +168,8 @@ class UserMapper extends Mapper
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deletePastoralAudiences']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteNotificationQueue']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteToken']);
+        $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'deleteSession']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteSession']);
 
         $this->registerCallback(
             self::CALLBACK_POSTSOFTDELETE,
@@ -809,6 +814,59 @@ class UserMapper extends Mapper
         }
     }
 
+    /**
+     * Delete remember me and session from Redis for deleted/deactivated user
+     *
+     * @param User $user
+     * @param User $prevUser
+     * @return void
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function deleteSession(User $user, User $prevUser)
+    {
+        // delete session, only if the user is deleted or disabled just now
+        if (!$user->isDeleted() && ($user->getEnabled() || !$prevUser->getEnabled())) {
+            return;
+        }
+        /** @var ClientInterface $redis */
+        $redis = $this->getDi()->get('redis.storage');
+
+        // remember me
+        $search = new Keyspace($redis, sprintf(\Schoolbox\Auth\Remember\Redis::REDIS_KEY_FORMAT, '*', '*'));
+        foreach ($search as $key) {
+            $username = (string)$redis->get($key);
+            if ($username === $user->getUsername()) {
+                $redis->del($key);
+                // do not break, as there can be multiple entries
+            }
+        }
+
+        // session
+        $search = new Keyspace($redis, PipeManager::REDIS_SESSION_PREFIX . '*');
+        // Decode the session data.
+        // Unfortunately a session must be started in order to do this:
+        // Save current session
+        $mySession = $_SESSION;
+
+        session_start();
+        foreach ($search as $key) {
+            $redisSession = $redis->get($key);
+            if (!$redisSession) {
+                continue;
+            }
+            session_decode($redisSession);
+            /** @var User $redisSessionUser */
+            $redisSessionUser = $_SESSION['user'] ?? null;
+            if ($redisSessionUser->getId() === $user->getId()) {
+                $redis->del($key);
+                // do not break, as there can be multiple entries
+            }
+        }
+        session_unset();
+        // restore session
+        $_SESSION = $mySession;
+    }
 
     /**
      * Post-softDelete callback to delete redis queues for this user

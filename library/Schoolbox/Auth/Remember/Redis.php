@@ -21,7 +21,7 @@ class Redis
     /**
      * The format of the Redis key in which to store the username.
      */
-    private const REDIS_KEY_FORMAT = 'remember:%s:%s';
+    public const REDIS_KEY_FORMAT = 'remember:%s:%s';
 
     /**
      * The instance ID of the current instance: required for namespacing the
