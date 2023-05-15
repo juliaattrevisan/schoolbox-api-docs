@@ -9,12 +9,12 @@ declare(strict_types=1);
 
 namespace Schoolbox\API\Token\JwtParser;
 
-use Firebase\JWT\Key;
+use Firebase\JWT\JWK;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Help\InstanceRegistry\Mapper as InstanceRegistryMapper;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -39,12 +39,10 @@ class OtherInstanceIssued extends Base
      *
      * @param UserMapper             $userMapper             Mapper for retrieving users once the user in the JWT is
      *                                                       identified.
-     * @param InstanceRegistryMapper $instanceRegistryMapper Mapper for retrieving an instance's JWT public key.
      * @param IConfigLoader          $config                 Standard configuration store.
      */
     public function __construct(
         private UserMapper $userMapper,
-        private InstanceRegistryMapper $instanceRegistryMapper,
         private IConfigLoader $config,
     ) {
     }
@@ -66,18 +64,43 @@ class OtherInstanceIssued extends Base
         // Look up the instance in the registry, and get its public key so that
         // the JWT can be verified.
         $unverifiedClaims = $this->decodeWithoutVerification($jwt);
+        $headers          = $this->decodeHeaders($jwt);
         $instanceId       = $unverifiedClaims[self::CLAIM_INSTANCE_ID];
+        $client           = new Client();
         try {
-            $instanceDetails = $this->instanceRegistryMapper->findByInstanceId($instanceId);
-        } catch (MapperException $e) {
-            throw new Exception\Rejected(sprintf('Instance "%s" not registered', $instanceId), 0, $e);
+            $response = json_decode(
+                $client->get(
+                    $this->config->get(ConfigMapper::NAME_INSTANCE_REGISTRY_URL) . '/api/instances/' . $instanceId . "/jwks?toInstance=" . INSTANCE_ID
+                )
+                       ->getBody()
+                       ->getContents(),
+                true,
+                512,
+                JSON_THROW_ON_ERROR
+            );
+            $jwks = json_decode($client->get($response['url'])->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
+        } catch (GuzzleException | \JsonException $e) {
+            throw new Exception\Rejected(
+                sprintf('Unable to retrieve instance details for instance ID "%s"', $instanceId),
+            );
+        }
+
+        $keySet = JWK::parseKeySet($jwks);
+        if (!isset($headers['kid'])) {
+            if (count($keySet) !== 1) {
+                throw new Exception\Rejected(
+                    sprintf('Instance "%s" has %d keys in its JWKS, but the JWT does not specify a "kid" claim', $instanceId, count($keySet)),
+                );
+            }
+            $keySet = $keySet[Jwt::KEY_ID];
         }
 
         // Verify the payload
         $claims = $this->decode(
             $jwt,
-            new Key($instanceDetails->getJwtPublicKey(), Jwt::SIGNING_ALGORITHM),
+            $keySet,
             (int)$this->config->get(ConfigMapper::NAME_JWT_LEEWAY),
+            [Jwt::SIGNING_ALGORITHM]
         );
 
         // Now the JWT is decoded and verified:

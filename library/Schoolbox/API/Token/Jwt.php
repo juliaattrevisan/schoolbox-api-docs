@@ -26,6 +26,7 @@ class Jwt
      * Signing algorithm for JWTs.
      */
     public const SIGNING_ALGORITHM = 'RS256';
+    public const KEY_ID            = 'schoolbox';
 
 
     /**
@@ -78,7 +79,8 @@ class Jwt
         return JwtLibrary::encode(
             array_merge($claims, $additionalClaims),
             $this->config->get(ConfigMapper::NAME_JWT_PRIVATE_KEY),
-            self::SIGNING_ALGORITHM
+            self::SIGNING_ALGORITHM,
+            self::KEY_ID
         );
     }
 }

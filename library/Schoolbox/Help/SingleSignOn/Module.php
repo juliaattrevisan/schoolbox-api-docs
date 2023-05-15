@@ -13,8 +13,6 @@ use Alaress\Authorizer\Rule\IsLoggedIn;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Authenticator;
-use Schoolbox\Help\InstanceRegistry\Mapper as InstanceRegistryMapper;
-use Schoolbox\UserMapper;
 
 /**
  * Module for SSO endpoints
