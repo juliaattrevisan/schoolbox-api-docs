@@ -22,7 +22,6 @@ use Schoolbox\UserMapper;
 
 class EventPermissionMapper extends BaseMapper
 {
-
     /**
      * Mapping
      */
