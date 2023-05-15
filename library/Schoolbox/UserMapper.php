@@ -818,15 +818,15 @@ class UserMapper extends Mapper
      * Delete remember me and session from Redis for deleted/deactivated user
      *
      * @param User $user
-     * @param User $prevUser
+     * @param User|null $prevUser
      * @return void
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public function deleteSession(User $user, User $prevUser)
+    public function deleteSession(User $user, ?User $prevUser)
     {
         // delete session, only if the user is deleted or disabled just now
-        if (!$user->isDeleted() && ($user->getEnabled() || !$prevUser->getEnabled())) {
+        if (!$user->isDeleted() && ($user->getEnabled() || !$prevUser || !$prevUser->getEnabled())) {
             return;
         }
         /** @var ClientInterface $redis */
