@@ -13,12 +13,6 @@ use Schoolbox\IConfigLoader;
 class Controller extends Base
 {
     /**
-     *
-     */
-    public function __construct(private IConfigLoader $config)
-    {
-    }
-    /**
      * :robot: endpoint for search engine to hit and confirm if we are allowing them access to index / scrape the instance./
      *
      * @api   GET /robots.txt
@@ -32,8 +26,8 @@ class Controller extends Base
 
         $this->getResponse()->headers->set('Content-Type', 'text/plain; charset=utf-8');
 
-        // Are we blocking web crawlers, or allowing them?
-        if ($this->config->get('web_crawlers_enabled')) {
+        // Are we blocking web crawlers, or allowing them? if not Prod, always block
+        if ($this->getConfigLoader()->get('web_crawlers_enabled') && ('prod' === $this->getConfigLoader()->get('site_type'))) {
             $this->getResponse()->content->set($this->buildFileOutputFromString($robotAllow));
         } else {
             $this->getResponse()->content->set($this->buildFileOutputFromString($robotDeny));
