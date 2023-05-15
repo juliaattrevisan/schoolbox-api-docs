@@ -13,10 +13,8 @@
 namespace EOTC;
 
 use Schoolbox\CampusMapper;
-use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\Mapper\Exception;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
