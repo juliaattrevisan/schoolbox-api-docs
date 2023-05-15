@@ -138,6 +138,7 @@ Data:
                         {% endif %}
                         {% set deleteRoute = routeLookupIfAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessable.id, assessment: assessable}) %}
                         {% set hasActions = statusRoute or modifyRoute or deleteRoute %}
+                        {% set similarityReportRoute = routeLookupIfAuthorized('learningAssessment.getSimilarityReport', {assessmentId: assessable.id, assessment: assessable}) %}
 
                         <li data-assessment="{{ assessable.id }}" data-assessment-title="{{ assessable.title }}">
                             <div{% if hasActions %} class="actions-small-1"{% endif %}>
@@ -168,6 +169,7 @@ Data:
                                     </nav>
                                     <ul data-dropdown-content class="f-dropdown" id="project-options{{ assessable.id }}">
                                         {% if statusRoute %}<li><a href="{{ statusRoute }}" class="icon-progress">View Status</a></li>{% endif %}
+                                        {% if similarityReportRoute %}<li><a class="icon-due-work" href="{{ similarityReportRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Similarity Report</a></li>{% endif %}
                                         {% if exportRoute %}<li><a href="{{ exportRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-export">Export to Classes</a></li>{% endif %}
                                         {% if modifyRoute %}<li><a href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-modify">Modify</a></li>{% endif %}
                                         {% if deleteRoute %}<li><a href="{{ deleteRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="icon-delete" data-delete="{{ assessable.id }}">Delete</a></li>{% endif %}
