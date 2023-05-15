@@ -81,7 +81,7 @@ $app = new class extends CliTool\App {
                 continue;
             }
             session_decode($redisSession);
-            /** @var User $user */
+            /** @var User|null $user */
             $user = $_SESSION['user'] ?? null;
             if (!$user) {
                 $this->getLogger()->warning('Deleting empty key: ' . $key);
