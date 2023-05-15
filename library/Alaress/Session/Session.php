@@ -82,7 +82,7 @@ class Session extends BaseSession
     {
         $user = null;
         if ($this->isAuthSessionAlive()) {
-        $user = $this->getSegment(null)->get('user');
+            $user = $this->getSegment(null)->get('user');
         }
         return ($user instanceof User) ? $user : new User();
     }
@@ -129,7 +129,7 @@ class Session extends BaseSession
      */
     public function isAuthSessionAlive()
     {
-        $authSession = $this->getSegment(null);
+        $authSession   = $this->getSegment(null);
 
         if ($authSession->get('remember')) {
             return true;
