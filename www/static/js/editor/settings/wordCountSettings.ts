@@ -148,8 +148,13 @@ export function insertWordCount(sourceElement: HTMLElement, editor: Editor, conf
 
 /**
  * Add event listeners for the EDITOR__MAX_CHAR_COUNT_EXCEEDED and EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED events.
- * When the max char count has been exceeded on the ckeditorSourceEl, disable the form's submit button.
- * When the max char count is no longer exceeded on all ckeditor source elements in the form, re-enable the submit button.
+ * When the max char count has been exceeded on the ckeditorSourceEl, disable the form's submit button(s).
+ * When the max char count is no longer exceeded on all ckeditor source elements in the form, re-enable the submit button(s).
+ *
+ * Some testing URLS (sales data):
+ *  * https://vagrant.dev.schoolbox.cloud/adminv2/summative-report/create (single submit <input>)
+ *  * https://vagrant.dev.schoolbox.cloud/news/34/update (single submit <button>)
+ *  * https://vagrant.dev.schoolbox.cloud/news/87/update (multiple submit <button>s)
  *
  * @param ckeditorSourceEl
  */
