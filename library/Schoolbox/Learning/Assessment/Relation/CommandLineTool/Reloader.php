@@ -152,7 +152,7 @@ class Reloader extends App
 
         if ($insertCount !== $deleteCount) {
             $this->getLogger()->warning(
-                'Delete and insert counts do not match: mv_assessment_relation needs to be reviewed.'
+                'Delete and insert counts do not match: recommend running report `./tools/assessment/relations-report.php` for further diagnosis.'
             );
         }
     }
