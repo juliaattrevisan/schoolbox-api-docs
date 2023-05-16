@@ -6,7 +6,7 @@ import { wrapTokens } from "../tokensSettings";
 
 beforeEach(() => {});
 
-test("single token", () => {
+test("wraps single token", () => {
     const testString = `<p>[firstname] did very well.</p>`;
     const config = { tokenList: ["[firstname]"] };
     const divElement = document.createElement("div");
@@ -15,7 +15,7 @@ test("single token", () => {
     expect(wrapTokens(divElement, config).innerHTML).toBe(expected);
 });
 
-test("multiple of the same token", () => {
+test("wraps multiple of the same token", () => {
     const testString = `<p>[firstname] did very well. You should be proud of [firstname].</p>`;
     const config = { tokenList: ["[firstname]"] };
     const divElement = document.createElement("div");
@@ -24,7 +24,7 @@ test("multiple of the same token", () => {
     expect(wrapTokens(divElement, config).innerHTML).toBe(expected);
 });
 
-test("various different tokens", () => {
+test("wraps various different tokens", () => {
     const testString = `
     <table>
         <tr>
@@ -71,10 +71,10 @@ test("does not wrap already wrapped tokens", () => {
 });
 
 test("only wraps tokens not already wrapped", () => {
-    const testString = `<p>[firstname] did very well. You should be proud of <span class="mention" data-mention="[lastname]">[lastname]</span>.</p>`;
+    const testString = `<p>[firstname] did very well. You should be very proud of [firstname] <span class="mention" data-mention="[lastname]">[lastname]</span>.</p>`;
     const config = { tokenList: ["[firstname]", "[lastname]"] };
     const divElement = document.createElement("div");
     divElement.innerHTML = testString;
-    const expected = `<p><span class="mention" data-mention="[firstname]">[firstname]</span> did very well. You should be proud of <span class="mention" data-mention="[lastname]">[lastname]</span>.</p>`;
+    const expected = `<p><span class="mention" data-mention="[firstname]">[firstname]</span> did very well. You should be very proud of <span class="mention" data-mention="[firstname]">[firstname]</span> <span class="mention" data-mention="[lastname]">[lastname]</span>.</p>`;
     expect(wrapTokens(divElement, config).innerHTML).toBe(expected);
 });
