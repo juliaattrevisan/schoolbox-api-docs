@@ -1,6 +1,6 @@
 -- Create table and its indices
 CREATE TABLE `mv_assessment_relation` (
-    `assessment_id` INT UNSIGNED NOT NULL,
+    `assessment_id` INT UNSIGNED NOT NULL UNIQUE,
     `folder_id` INT UNSIGNED NOT NULL,
     `project_assessment_id` INT UNSIGNED DEFAULT NULL,
     `course_implementation_id` INT UNSIGNED DEFAULT NULL,

@@ -1,7 +1,7 @@
 -- Creation of an assessment directly within a folder
 CREATE OR REPLACE TRIGGER mv_assessment_relation_assessment_folder
     AFTER INSERT ON assessment_folder FOR EACH ROW
-    INSERT INTO mv_assessment_relation (
+    REPLACE INTO mv_assessment_relation (
         assessment_id,
         folder_id
     ) VALUES (
@@ -12,7 +12,7 @@ CREATE OR REPLACE TRIGGER mv_assessment_relation_assessment_folder
 -- Creation of an assessment in a course implementation
 CREATE OR REPLACE TRIGGER mv_assessment_relation_assessment_course_unit_implementation
     AFTER INSERT ON assessment_course_unit_implementation FOR EACH ROW
-    INSERT INTO mv_assessment_relation (
+    REPLACE INTO mv_assessment_relation (
         assessment_id,
         folder_id,
         course_implementation_id,
@@ -30,7 +30,7 @@ CREATE OR REPLACE TRIGGER mv_assessment_relation_assessment_course_unit_implemen
 -- Creation of an assessment in a course specification
 CREATE OR REPLACE TRIGGER mv_assessment_relation_assessment_course_unit_specification
     AFTER INSERT ON assessment_course_unit_specification FOR EACH ROW
-    INSERT INTO mv_assessment_relation (
+    REPLACE INTO mv_assessment_relation (
         assessment_id,
         folder_id,
         course_specification_id,
@@ -48,7 +48,7 @@ CREATE OR REPLACE TRIGGER mv_assessment_relation_assessment_course_unit_specific
 -- Creation of an assessment in a project which is directly within a folder
 CREATE OR REPLACE TRIGGER mv_assessment_relation_project_folder
     AFTER INSERT ON project_assessment FOR EACH ROW
-    INSERT INTO mv_assessment_relation (
+    REPLACE INTO mv_assessment_relation (
         assessment_id,
         folder_id,
         project_assessment_id
@@ -64,7 +64,7 @@ CREATE OR REPLACE TRIGGER mv_assessment_relation_project_folder
 -- Creation of an assessment in a project which is in a course implementation
 CREATE OR REPLACE TRIGGER mv_assessment_relation_project_course_unit_implementation
     AFTER INSERT ON project_assessment FOR EACH ROW
-    INSERT INTO mv_assessment_relation (
+    REPLACE INTO mv_assessment_relation (
         assessment_id,
         folder_id,
         project_assessment_id,
@@ -86,7 +86,7 @@ CREATE OR REPLACE TRIGGER mv_assessment_relation_project_course_unit_implementat
 -- Creation of an assessment in a project which is in a course specification
 CREATE OR REPLACE TRIGGER mv_assessment_relation_project_course_unit_specification
     AFTER INSERT ON project_assessment FOR EACH ROW
-    INSERT INTO mv_assessment_relation (
+    REPLACE INTO mv_assessment_relation (
         assessment_id,
         folder_id,
         project_assessment_id,
