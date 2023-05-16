@@ -16,12 +16,17 @@ use Schoolbox\Application\CliTool\App;
  * Tool for reporting on the consistency of the data within the assessment
  * relation materialized view `mv_assessment_relation`.
  *
- * Examines the contents of the
+ * Examines the contents of the materialized view, and compares those contents
+ * to the data which populates it.
  */
 class Reporter extends App
 {
     /**
-     * @return void
+     * @inheritdoc
+     *
+     * @return never-return exit `CliKernelAbstract::EXIT_STATUS_APP_ERROR` if
+     *                      there's a data issue detected, otherwise exits with
+     *                      `CliKernelAbstract::EXIT_STATUS_OK`
      */
     public function run(): void
     {

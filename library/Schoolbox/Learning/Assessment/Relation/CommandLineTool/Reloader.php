@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\Relation\CommandLineTool;
 
+use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool\App;
 
 /**
@@ -106,7 +107,11 @@ class Reloader extends App
     ";
 
     /**
-     * @return void
+     * @inheritdoc
+     *
+     * @return never-return exit `CliKernelAbstract::EXIT_STATUS_APP_ERROR` if
+     *                      there's a data issue detected, otherwise exits with
+     *                      `CliKernelAbstract::EXIT_STATUS_OK`
      */
     public function run(): void
     {
@@ -154,6 +159,8 @@ class Reloader extends App
             $this->getLogger()->warning(
                 'Delete and insert counts do not match: recommend running report `./tools/assessment/relations-report.php` for further diagnosis.'
             );
+            exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
         }
+        exit(CliKernelAbstract::EXIT_STATUS_OK);
     }
 }
