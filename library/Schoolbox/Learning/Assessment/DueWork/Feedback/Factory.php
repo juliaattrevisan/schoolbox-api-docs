@@ -158,7 +158,12 @@ class Factory
             /** @var DueWorkFeedback $feedback */
             $feedback = $this->dueWorkFeedbackDataSource->createModel($this->participant->getAssessable())
                 ->setReviewee($this->participant->getUser())
-                ->setCreatedAt(\Alaress_Date_Format::now());
+                ->setCreatedAt(\Alaress_Date_Format::now())
+                /* $reviewer is the creator of the feedback
+                 * $publishedBy is the publisher of the feedback
+                 * We'll never know who might have altered the feedback in between
+                 */
+                ->setReviewer($this->currentUser);
             $this->participant->getAllFeedbacks()->add($feedback);
 
             // copy attachments over from the previous feedback.
@@ -177,10 +182,13 @@ class Factory
         // mutate model found, and save
         /** @var DueWorkFeedback $feedback */
         $feedback
-            ->setReviewer($this->currentUser)
             ->setReviewRoute($this->reviewRoute)
             ->setUpdatedAt(\Alaress_Date_Format::now())
             ->setComment($this->comment)
+            /* Remember who last touched it,
+             * presuming they're about to publish it
+             */
+            ->setPublishedBy($this->currentUser->getId())
             ->setResubmissionRequired($this->resubmissionRequired);
 
         if ($this->mark !== null && $this->mark !== '') {

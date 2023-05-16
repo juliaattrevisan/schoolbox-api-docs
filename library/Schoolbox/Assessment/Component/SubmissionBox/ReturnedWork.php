@@ -113,7 +113,7 @@ class ReturnedWork implements ISoftDeletable
      *
      * @var null|int
      */
-    private ?int $publishedBy;
+    private ?int $publishedBy = null;
 
 
     /**

@@ -62,7 +62,7 @@ class Model extends AbstractFeedback implements ISelfAssessableFeedback
      *
      * @var null|int
      */
-    private ?int $publishedBy;
+    private ?int $publishedBy = null;
 
 
     /**
