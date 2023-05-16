@@ -21,7 +21,6 @@ use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\User;
 use Schoolbox\Learning\Assessment\Participant;
-use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkResponse;
 use Schoolbox\Learning\Assessment\Feedback\SubSource\DueWork as DueWorkFeedbackDataSource;
 use Schoolbox\Learning\DueWork\StateMapper;
