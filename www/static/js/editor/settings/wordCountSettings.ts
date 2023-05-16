@@ -213,7 +213,7 @@ function changeButtonText(buttonElem: HTMLElement, newText: string) {
     const buttonTagName = buttonElem.tagName.toLowerCase();
 
     switch (buttonTagName) {
-        case "submit":
+        case "input":
             buttonElem.setAttribute("value", newText);
             break;
         case "button":
