@@ -11,17 +11,19 @@ INSERT INTO config (
     editable,
     hidden,
     required,
-    module
+    module,
+    sequence
 ) VALUES (
              'web_crawlers_enabled',
-             (SELECT if(value='prod', '1', '0') from config where name = 'site_type'),
+             (SELECT if(cs.value='prod', '1', '0') from config cs where cs.name = 'site_type'),
              'Allow Web Crawlers',
              'When set to ‘ON’, search engine web crawlers will be able to indexing the site',
              (SELECT id FROM lu_config_field WHERE field = 'boolean'),
              '',
-             (SELECT id FROM lu_config_type WHERE type = 'Modules'),
+             (SELECT id FROM lu_config_type WHERE type = 'Site'),
              'true',
              'false',
              'false',
-             'settings'
+             'settings',
+             (SELECT MAX(sequence) + 1 FROM config c WHERE `module` = 'settings' AND type_id = (SELECT id FROM lu_config_type WHERE `type` = 'Site'))
          );
