@@ -22,7 +22,7 @@ class Reloader extends App
      *
      * (This mirrors the CREATE VIEW statement for `v_assessment_relation`.)
      */
-    private const SELECT_ASSESSMENT_RELATION_SQL = "
+    public const SELECT_ASSESSMENT_RELATION_SQL = "
         select `a`.`id` AS `assessment_id`,
                `f`.`id` AS `folder_id`,
                NULL     AS `project_assessment_id`,
@@ -124,7 +124,7 @@ class Reloader extends App
         } else {
             $deleteCountQuery = $db->prepareQuery('SELECT COUNT(*) FROM mv_assessment_relation');
             $deleteCountQuery->execute();
-            $deleteCount = $deleteCountQuery->fetchColumn();
+            $deleteCount = (int)$deleteCountQuery->fetchColumn();
             $this->getLogger()->notice(
                 sprintf('Would have deleted %d mv_assessment_relation records', $deleteCount)
             );
