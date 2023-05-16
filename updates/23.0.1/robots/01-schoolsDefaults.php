@@ -48,7 +48,7 @@ HELP;
         }
 
         // set setting for schools that had the option set in puppet
-        $disable = ['sthprt', 'glacc', 'spgs', 'scc', 'scc-old', 'wgs', 'tc', 'skc'];
+        $disable = ['sthprt', 'glacc'];
 
         $logger->info("Found school code '$schoolCode'");
         if (in_array($schoolCode, $disable)) {
