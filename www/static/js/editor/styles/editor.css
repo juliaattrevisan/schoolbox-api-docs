@@ -25,8 +25,8 @@
     --sb-ck-active: #cae3fa;
     --sb-ck-active-grey: #e8e8e8;
     --sb-ck-active-highlight: #daedff;
-    --sb-ck-hover-outline: #c8c8c8;
     --sb-ck-disabled: #dddddd;
+    --sb-ck-button-grid-border: #bbbbbb;
     --sb-ck-icon-colour: rgb(51, 51, 51);
 
     /* Overrides of default CK colours */
@@ -352,7 +352,11 @@ turned on */
 /* Styling the drop down grid buttons */
 .ck.ck-dropdown__panel button.ck-insert-table-dropdown-grid-box.ck-on {
     background-color: var(--sb-ck-active-grey) !important;
-    border: 1px solid var(--sb-ck-hover-outline);
+    border: 1px solid var(--sb-ck-button-grid-border);
+}
+
+.ck.ck-dropdown__panel button.ck-insert-table-dropdown-grid-box.ck-off {
+    border: 1px solid var(--sb-ck-button-grid-border);
 }
 
 /* Make the textarea background colour when viewing in source a lighter colour */
