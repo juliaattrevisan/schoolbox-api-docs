@@ -240,6 +240,10 @@ truncateTables() {
     mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "TRUNCATE mobile_app_registry";
 }
 
+webCrawlerOff() {
+    mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='0' WHERE name='web_crawlers_enabled'";
+}
+
 liveCheck() {
   echo "Checking site_type of instance being restored to..."
 
@@ -853,6 +857,7 @@ if [ "$destination_site_type" = 'dev' ]; then
 	setsqlconfig;
 	setdebugstacktrace;
 	truncateTables;
+	webCrawlerOff;
 fi
 if [ "$destination_site_type" = 'stg' ]; then
 	titleprefix='[Staging]';
@@ -861,6 +866,7 @@ if [ "$destination_site_type" = 'stg' ]; then
 	setsqlconfig;
 	setdebugstacktrace;
 	truncateTables;
+	webCrawlerOff;
 fi
 
 # Truncate storage_transform table if it is a DB only sync
