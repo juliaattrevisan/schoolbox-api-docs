@@ -267,3 +267,9 @@
 .ck.ck-content ul {
     margin-bottom: 0.75rem;
 }
+
+/* Ensure images don't stretch beyond the boundaries of the table cells */
+.ck.ck-editor__editable td .image-inline img,
+.ck.ck-editor__editable th .image-inline img {
+    max-width: 100%;
+}
