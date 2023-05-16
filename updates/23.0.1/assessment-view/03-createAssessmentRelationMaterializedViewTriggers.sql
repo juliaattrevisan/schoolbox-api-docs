@@ -4,11 +4,10 @@ CREATE OR REPLACE TRIGGER mv_assessment_relation_assessment_folder
     INSERT INTO mv_assessment_relation (
         assessment_id,
         folder_id
-    )
-    SELECT
+    ) VALUES (
         NEW.assessment_id,
         NEW.folder_id
-    FROM NEW;
+    );
 
 -- Creation of an assessment in a course implementation
 CREATE OR REPLACE TRIGGER mv_assessment_relation_assessment_course_unit_implementation
@@ -24,9 +23,9 @@ CREATE OR REPLACE TRIGGER mv_assessment_relation_assessment_course_unit_implemen
         ci.folder_id,
         ci.id,
         NEW.course_unit_implementation_id
-    FROM NEW
-    JOIN course_unit_implementation cui ON NEW.course_unit_implementation_id = cui.id
-    JOIN course_implementation ci ON cui.course_implementation_id = ci.id;
+    FROM course_unit_implementation cui
+    JOIN course_implementation ci ON cui.course_implementation_id = ci.id
+    WHERE NEW.course_unit_implementation_id = cui.id;
 
 -- Creation of an assessment in a course specification
 CREATE OR REPLACE TRIGGER mv_assessment_relation_assessment_course_unit_specification
@@ -42,9 +41,9 @@ CREATE OR REPLACE TRIGGER mv_assessment_relation_assessment_course_unit_specific
         cs.folder_id,
         cs.id,
         NEW.course_unit_specification_id
-    FROM NEW
-    JOIN course_unit_specification cus ON NEW.course_unit_specification_id = cus.id
-    JOIN course_specification cs ON cus.course_specification_id = cs.id;
+    FROM course_unit_specification cus
+    JOIN course_specification cs ON cus.course_specification_id = cs.id
+    WHERE NEW.course_unit_specification_id = cus.id;
 
 -- Creation of an assessment in a project which is directly within a folder
 CREATE OR REPLACE TRIGGER mv_assessment_relation_project_folder
@@ -58,9 +57,9 @@ CREATE OR REPLACE TRIGGER mv_assessment_relation_project_folder
         NEW.assessment_id,
         af.folder_id,
         NEW.project_id
-    FROM NEW
-    JOIN project p ON NEW.project_id = p.id
-    JOIN assessment_folder af ON p.assessment_id = af.assessment_id;
+    FROM project p
+    JOIN assessment_folder af ON p.assessment_id = af.assessment_id
+    WHERE NEW.project_id = p.id;
 
 -- Creation of an assessment in a project which is in a course implementation
 CREATE OR REPLACE TRIGGER mv_assessment_relation_project_course_unit_implementation
@@ -78,11 +77,11 @@ CREATE OR REPLACE TRIGGER mv_assessment_relation_project_course_unit_implementat
         NEW.project_id,
         ci.id,
         cui.id
-    FROM NEW
-    JOIN project p ON NEW.project_id = p.id
+    FROM project p
     JOIN assessment_course_unit_implementation acui ON p.assessment_id = acui.assessment_id
     JOIN course_unit_implementation cui ON acui.course_unit_implementation_id = cui.id
-    JOIN course_implementation ci ON cui.course_implementation_id = ci.id;
+    JOIN course_implementation ci ON cui.course_implementation_id = ci.id
+    WHERE NEW.project_id = p.id;
 
 -- Creation of an assessment in a project which is in a course specification
 CREATE OR REPLACE TRIGGER mv_assessment_relation_project_course_unit_specification
@@ -100,8 +99,8 @@ CREATE OR REPLACE TRIGGER mv_assessment_relation_project_course_unit_specificati
         NEW.project_id,
         cs.id,
         cus.id
-    FROM NEW
-    JOIN project p ON NEW.project_id = p.id
+    FROM project p
     JOIN assessment_course_unit_specification acus ON p.assessment_id = acus.assessment_id
     JOIN course_unit_specification cus ON acus.course_unit_specification_id = cus.id
-    JOIN course_specification cs ON cus.course_specification_id = cs.id;
+    JOIN course_specification cs ON cus.course_specification_id = cs.id
+    WHERE NEW.project_id = p.id;
