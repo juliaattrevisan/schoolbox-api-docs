@@ -31,7 +31,6 @@ use function array_merge;
 
 class Controller extends Web\Controller\Base
 {
-
     /** @var External_UserInterface */
     private $externalUser;
 
@@ -126,7 +125,9 @@ class Controller extends Web\Controller\Base
             $this->getConfigLoader(),
             $user,
             $this->externalUser->getStudent($user->getExternalId())['StudentIBFlag'],
-            $reportDate
+            $reportDate,
+            null,
+            $folder->getYearLevels()?->first()?->getName(),
         );
 
         $roleTypeOverride = $this->request->query->get('role-type');

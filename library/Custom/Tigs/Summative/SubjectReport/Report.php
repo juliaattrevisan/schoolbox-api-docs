@@ -818,6 +818,19 @@ class Report
     }
 
 
+    /**
+     * Build data for the "Learning Profile" component on the subject report.
+     *
+     * @param Folder\Model      $folder
+     * @param StudentAttributes $attributes
+     * @param GenericCollection $unitSpecs
+     * @param CourseSpec\Model  $courseSpec
+     * @param User              $student
+     * @param string|null       $roleTypeOverride
+     * @return array|null
+     * @throws MapperException
+     * @throws RouteNotFound
+     */
     private function buildLearningProfileData(
         Folder\Model $folder,
         StudentAttributes $attributes,
@@ -1063,16 +1076,33 @@ class Report
         int $semesterTo
     ): GenericCollection {
         // Find relevant assessments and participation and insert into units
-        // TODO this really relies upon the assessment cache,
-        //      and is bound to fail due to SA-1951
         $cohortUnitImpls = $this->findCohortUnitImpls($courseSpec);
         $assessables     = $this->assessmentMapperProxy->findAllByIds($this->findAssessmentIds($cohortUnitImpls, $workTypeIds, $attributes, $semesterFrom, $semesterTo));
         $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessables);
+
+        // Add the base assessment into the assessment's unit implementation:
+        // for some reason it's not there yet.
         foreach ($assessables as $assessable) {
-            $unitImpl                                                                        = $assessable->getBaseContext();
-            $baseAssessable                                                                  = $assessable->getBaseAssessable();
-            $cohortUnitImpls[$unitImpl->getId()]->getAssessables()[$baseAssessable->getId()] = $baseAssessable;
+            $unitImpl       = $assessable->getBaseContext();
+            $baseAssessable = $assessable->getBaseAssessable();
+            $unitImpl->getAssessables()[$baseAssessable->getId()] = $baseAssessable;
         }
+
+        // Also load unit impls into the course spec:
+        // this place _was_ affected by the mapper cache change: if unit impls
+        // aren't manually loaded into the course spec, middle year / HSC
+        // assessment tasks don't display.
+        foreach ($cohortUnitImpls as $unitImpl) {
+            $unitSpec   = $unitImpl->getSpecification();
+            $courseImpl = $unitImpl->getCourse();
+            if (!$courseSpec->getCourseImplementations()->offsetExists($courseImpl->getId())) {
+                $courseSpec->getCourseImplementations()->offsetSet($courseImpl->getId(), $courseImpl);
+            }
+            if (!$courseSpec->getUnits()->offsetExists($unitSpec->getId())) {
+                $courseSpec->getUnits()->offsetSet($unitSpec->getId(), $unitSpec);
+            }
+        }
+
         return $assessables;
     }
 

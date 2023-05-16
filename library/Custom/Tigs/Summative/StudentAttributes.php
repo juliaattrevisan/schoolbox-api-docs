@@ -49,7 +49,14 @@ class StudentAttributes
      */
     private $yearLevel;
 
-    /** @var bool */
+    /**
+     * Is this an IB student?
+     *
+     * @deprecated Consider removing: this appears to be unused now the report's
+     *             scope has been reduced.
+     *
+     * @var bool
+     */
     private $isIb;
 
     /** @var int */
@@ -94,12 +101,19 @@ class StudentAttributes
 
 
     /**
-     * @param IConfigLoader $config
-     * @param User          $user
-     * @param string|null   $ibFlag
-     * @param string|null   $reportDateOverride
-     * @param string|null   $nowOverride            Overrides system time to enable consistent unit tests around deriving a user's year level.
-     *                                              eg $reportYearLevel = $currentYearLevel - $nowYear + $reportYear
+     * @param IConfigLoader $config             Config data store
+     * @param User          $user               The student to generate the report for.
+     * @param string|null   $ibFlag             Is `$user` an IB student?
+     * @param string|null   $reportDateOverride If provided: generate a report with data from this date or earlier,
+     *                                          instead of now.
+     *                                          The school may wish to generate a report with data only from a date in
+     *                                          the past?
+     * @param string|null   $nowOverride        Overrides system time to enable consistent unit tests around deriving a user's year level.
+     *                                          e.g. $reportYearLevel = $currentYearLevel - $nowYear + $reportYear
+     * @param string|null   $yearLevelOverride  If provided: use this year level to derive attributes instead of the
+     *                                          student's.
+     *                                          It's possible for a student to attempt a class for a different year
+     *                                          level (e.g. a year 10 student attempting a year 11 subject).
      * @throws InvalidArgumentException
      */
     public function __construct(
@@ -107,7 +121,8 @@ class StudentAttributes
         User $user,
         ?string $ibFlag = null,
         ?string $reportDateOverride = null,
-        ?string $nowOverride = null
+        ?string $nowOverride = null,
+        ?string $yearLevelOverride = null,
     ) {
         $reportDate = $reportDateOverride
             ? new Alaress_Date_Format(strtotime($reportDateOverride), Alaress_Date_Format::TIMESTAMP)
@@ -130,9 +145,15 @@ class StudentAttributes
         $this->isHistorical   = $reportDate->lt($now);
         $this->reportDate     = $reportDate;
 
-        $userYear = $user->getYear() ? $user->getYear()->getName() : null;
+        $userYear = $user->getYear()?->getName();
 
-        $this->calculateDerivedAttributes($config, (int)$userYear, $reportDate, $now);
+        $this->calculateDerivedAttributes(
+            $config,
+            (int)$userYear,
+            isset($yearLevelOverride) ? (int)$yearLevelOverride : null,
+            $reportDate,
+            $now,
+        );
     }
 
 
@@ -214,6 +235,9 @@ class StudentAttributes
 
 
     /**
+     * @deprecated Consider removing: this appears to be unused now the report's
+     *             scope has been reduced.
+     *
      * @return bool
      */
     public function isIb(): bool
@@ -413,17 +437,19 @@ class StudentAttributes
      *
      * @param IConfigLoader       $config
      * @param int                 $currentYearLevel
+     * @param int|null            $yearLevelOverride
      * @param Alaress_Date_Format $reportDate
      * @param Alaress_Date_Format $now
-     * @throws InvalidArgumentException
+     * @return void
      */
     private function calculateDerivedAttributes(
         IConfigLoader $config,
         int $currentYearLevel,
+        ?int $yearLevelOverride,
         Alaress_Date_Format $reportDate,
         Alaress_Date_Format $now
     ): void {
-        $this->yearLevel                = $this->deriveUserYearLevel($config, $currentYearLevel, $reportDate, $now);
+        $this->yearLevel                = $yearLevelOverride ?? $this->deriveUserYearLevel($config, $currentYearLevel, $reportDate, $now);
         $this->term                     = $this->deriveTerm($config, $reportDate);
         $this->curriculumYearLevel      = $this->deriveCurriculumYearLevel($this->yearLevel, $this->term);
         $this->curriculumSemester       = $this->deriveCurriculumSemester($this->yearLevel, $this->term);
