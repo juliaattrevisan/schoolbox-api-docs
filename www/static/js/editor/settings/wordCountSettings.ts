@@ -161,46 +161,51 @@ function addListenersForDisablingSubmitButton(ckeditorSourceEl: HTMLElement) {
         return;
     }
 
-    // First search for input of type 'submit'.
-    // The 'maybeButton' may be a button, or may be null.
-    let maybeButton: HTMLElement | null = containingForm.querySelector("input[type=submit]");
-    let buttonTextOriginal: string | null = null;
+    const submitButtons = containingForm.querySelectorAll("input[type=submit], button[type=submit]");
 
-    if (maybeButton !== null) {
-        buttonTextOriginal = maybeButton.getAttribute("value");
-    } else {
-        // As a fallback, search for button of type 'submit'.
-        maybeButton = containingForm.querySelector("button[type=submit]");
+    for (let button of submitButtons) {
+        // Now we know we have a button, assign it to a const.
+        const submitButton: Element = button;
+        const buttonTextOriginal: string = getButtonText(submitButton);
 
-        if (maybeButton !== null) {
-            buttonTextOriginal = maybeButton.innerHTML;
-        }
-    }
-
-    if (maybeButton === null) {
-        // No submit button found, so do nothing.
-        return;
-    }
-
-    // Now we know we have a button, assign it to a const.
-    const submitButton: HTMLElement = maybeButton;
-
-    console.info("submitButtonTextOriginal: ", buttonTextOriginal);
-
-    ckeditorSourceEl.addEventListener("EDITOR__MAX_CHAR_COUNT_EXCEEDED", function () {
-        // @ts-ignore
-        submitButton.disabled = true;
-        changeButtonText(submitButton, buttonTextOriginal + " (disabled because content storage limit exceeded)");
-    });
-
-    ckeditorSourceEl.addEventListener("EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED", function () {
-        // Only enable save button if no max. character count has been exceeded on any ckeditor field in the form.
-        if (containingForm.querySelectorAll('[data-maxCharCountExceededAtLastCheck="1"]').length === 0) {
+        ckeditorSourceEl.addEventListener("EDITOR__MAX_CHAR_COUNT_EXCEEDED", function () {
             // @ts-ignore
-            submitButton.disabled = false;
-            changeButtonText(submitButton, buttonTextOriginal ?? "");
-        }
-    });
+            submitButton.disabled = true;
+            changeButtonText(submitButton, buttonTextOriginal + " (disabled because content storage limit exceeded)");
+        });
+
+        ckeditorSourceEl.addEventListener("EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED", function () {
+            // Only enable save button if no max. character count has been exceeded on any ckeditor field in the form.
+            if (containingForm.querySelectorAll('[data-maxCharCountExceededAtLastCheck="1"]').length === 0) {
+                // @ts-ignore
+                submitButton.disabled = false;
+                changeButtonText(submitButton, buttonTextOriginal);
+            }
+        });
+    }
+}
+
+/**
+ * Return the button text for buttons that are <input> or <button>.
+ *
+ * @param buttonElem HTMLElement
+ */
+function getButtonText(buttonElem: Element) {
+    const buttonTagName = buttonElem.tagName.toLowerCase();
+    let buttonText = null;
+
+    switch (buttonTagName) {
+        case "input":
+            buttonText = buttonElem.getAttribute("value");
+            break;
+        case "button":
+            buttonText = buttonElem.innerHTML;
+            break;
+        default:
+            throw "Unsupported button tag name '" + buttonTagName + "'.";
+    }
+
+    return buttonText ?? "";
 }
 
 /**
@@ -209,7 +214,7 @@ function addListenersForDisablingSubmitButton(ckeditorSourceEl: HTMLElement) {
  * @param buttonElem HTMLElement
  * @param newText String
  */
-function changeButtonText(buttonElem: HTMLElement, newText: string) {
+function changeButtonText(buttonElem: Element, newText: string) {
     const buttonTagName = buttonElem.tagName.toLowerCase();
 
     switch (buttonTagName) {
