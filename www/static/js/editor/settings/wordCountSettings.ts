@@ -156,6 +156,11 @@ export function insertWordCount(sourceElement: HTMLElement, editor: Editor, conf
  *  * https://vagrant.dev.schoolbox.cloud/news/34/update (single submit <button>)
  *  * https://vagrant.dev.schoolbox.cloud/news/87/update (multiple submit <button>s)
  *
+ *  This function is not intended to handle every possible configuration of CKEditor fields inside forms.  If this
+ *  function does not disable/enable the submit form button in a specific case, it may be best to handle that case
+ *  separately.  See for example the special case handling of the EDITOR__MAX_CHAR_COUNT_EXCEEDED and
+ *  EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED events in vue/components/ckeditor/add-comment-input.vue.
+ *
  * @param ckeditorSourceEl
  */
 function addListenersForDisablingSubmitButton(ckeditorSourceEl: HTMLElement) {
@@ -163,6 +168,9 @@ function addListenersForDisablingSubmitButton(ckeditorSourceEl: HTMLElement) {
 
     if (containingForm === null) {
         // No containing form, so do nothing.
+        console.info(
+            "No containing form, so not adding event listeners for disabling/enabling submit button for CKEditor field."
+        );
         return;
     }
 
