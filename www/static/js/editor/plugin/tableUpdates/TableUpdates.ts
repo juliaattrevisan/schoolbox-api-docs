@@ -16,6 +16,7 @@ export default class TableUpdates extends Plugin {
         this.defineConverters();
         this.addCustomClass();
         this.addDefaultProperties();
+        this.markAlignedTables();
     }
 
     /**
@@ -127,6 +128,21 @@ export default class TableUpdates extends Plugin {
                     writer.setAttribute("tableCellBorderWidth", "1px", cell);
                     writer.setAttribute("tableCellBorderColor", "#b3b3b3", cell);
                 });
+            });
+        });
+    }
+
+    /**
+     * Add the isNew attribute to a table when the tableAlignment command is executed
+     * This is so an old table created in CKEditor4 can still be centre aligned if desired
+     */
+    markAlignedTables() {
+        const tableAlignmentCommand = this.editor.commands.get("tableAlignment");
+        tableAlignmentCommand.on("execute", () => {
+            const selection = this.editor.model.document.selection;
+            const table = selection.getFirstPosition().findAncestor("table");
+            this.editor.model.change((writer) => {
+                writer.setAttribute(this.isCK5Attribute, "true", table);
             });
         });
     }
