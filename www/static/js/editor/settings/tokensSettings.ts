@@ -3,8 +3,10 @@
  */
 
 import { EditorConfig } from "@js/editor/types/editorTypes";
+import { replaceAllStringSections, StringSection } from "@js/util/stringUtils";
 
 const DEFAULT_TOKENS = ["[firstname]", "[preferredname]", "[surname]", "[fullname]", "[house]", "[year]"];
+
 /**
  * If tokens are enabled, return the tokens settings
  *
@@ -29,6 +31,62 @@ export function getTokensSettings(config: EditorConfig) {
 }
 
 /**
+ * Wraps a token in a span element with a data-mention attribute
+ *
+ * @param { string } sourceElementContent - the sourceElement content as HTML
+ * @param { string } token - the token to wrap
+ * @returns { string } - the updated content with the token wrapped in a span element
+ */
+function wrapToken(sourceElementContent: string, token: string): string {
+    let currentIndex = sourceElementContent.indexOf(token);
+
+    // if there's no matches return the original content
+    if (currentIndex === -1) {
+        return sourceElementContent;
+    }
+
+    // find all the indexes of the token
+    let indexes = [];
+    while (currentIndex !== -1) {
+        indexes.push(currentIndex);
+        currentIndex = sourceElementContent.indexOf(token, currentIndex + 1);
+    }
+
+    const mentionAttribute = `data-mention="`;
+    const openSpanTag = `<span class="mention" ${mentionAttribute}${token}">`;
+    const closeSpanTag = `</span>`;
+    const wholeSpanTag = `${openSpanTag}${token}${closeSpanTag}`;
+
+    // filter out any indexes that are already within a span tag
+    indexes = indexes.filter((index) => {
+        let startIndex = index - openSpanTag.length;
+        if (startIndex > 0 && sourceElementContent.substring(startIndex, index) === openSpanTag) {
+            return false;
+        }
+        startIndex = index - mentionAttribute.length;
+        if (startIndex > 0 && sourceElementContent.substring(startIndex, index) === mentionAttribute) {
+            return false;
+        }
+        return true;
+    });
+
+    // if all found are already with a span tag, return the original content
+    if (indexes.length === 0) {
+        return sourceElementContent;
+    }
+
+    // otherwise get the start and end indexes of the sections to replace
+    const sectionsToReplace: StringSection[] = indexes.map((index) => {
+        return { startIndex: index, endIndex: index + token.length - 1 };
+    });
+
+    // and replace them with the whole span tag
+    const updatedContent = replaceAllStringSections(sectionsToReplace, sourceElementContent, wholeSpanTag);
+
+    return updatedContent;
+}
+
+/**
  * CKEditor5 provides special formatting around tokens, previously with CKE4, tokens were not surrounded with any other element,
  * with CKE5, tokens are now surrounded by a span element with a data-mention attribute
  * this function was added to help migrate text from CKE4 to CKE5, it will surround any tokens that are not already surrounded by a data-mention attribute
@@ -39,49 +97,10 @@ export function getTokensSettings(config: EditorConfig) {
  */
 export function surroundUnsurroundedTokens(sourceElementHTML: HTMLElement, config: EditorConfig): HTMLElement {
     const tokens = config.tokenList ? config.tokenList : DEFAULT_TOKENS;
-
-    // Regular expression for matching existing mentions
-    const mentionRegex = /<span class="mention" data-mention="(\w+)"\/?>/g;
-
-    let formattedStr = sourceElementHTML.innerHTML;
+    let updatedContent = sourceElementHTML.innerHTML;
     tokens.forEach((token) => {
-        // Regular expression for matching the token, exclude tokens that are already surrounded by a data-mention
-        const tokenRegex = new RegExp(`(?<!data-mention=")\\${token}`, "g");
-        let match;
-        let lastIndex = 0;
-        let tempStr = "";
-
-        // Search for and replace all instances of the token in the formatted string
-        while (true) {
-            match = tokenRegex.exec(formattedStr);
-            if (match === null) {
-                break;
-            }
-
-            // Append any unmodified text between the last match and the current match
-            tempStr += formattedStr.slice(lastIndex, match.index);
-
-            // Check if the token is already surrounded by a mention
-            const mentionMatch = mentionRegex.exec(tempStr.slice(match.index - 50, match.index));
-            if (!mentionMatch || mentionMatch[1] !== token.slice(1, -1)) {
-                // If the token is not already surrounded by a mention, add the mention tags
-                tempStr += `<span class="mention" data-mention="${token.slice(1, -1)}">`;
-                tempStr += match[0];
-                tempStr += `</span>`;
-            } else {
-                // If the token is already surrounded by a mention, use the existing tags
-                tempStr += match[0];
-            }
-
-            // Update the lastIndex variable to continue searching after the current match
-            lastIndex = tokenRegex.lastIndex;
-        }
-
-        // Append any remaining unmodified text after the last match and update the formatted string
-        //  to the version with the current token surrounded by mention tags
-        tempStr += formattedStr.slice(lastIndex);
-        formattedStr = tempStr;
+        updatedContent = wrapToken(updatedContent, token);
     });
-    sourceElementHTML.innerHTML = formattedStr;
+    sourceElementHTML.innerHTML = updatedContent;
     return sourceElementHTML;
 }
