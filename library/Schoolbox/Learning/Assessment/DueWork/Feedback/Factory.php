@@ -17,6 +17,8 @@ use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\Feedback\FileDecorator;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
 use Schoolbox\Learning\Assessment\IFeedback;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\User;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
@@ -142,13 +144,15 @@ class Factory
         $this->response                  = $response;
     }
 
+
     /**
      * Produce a DueWork Feedback with the assorted details in it
      * such as mark, comment, publish, authors and attachments
      *
      * @return DueWorkFeedback
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws Exception
+     * @throws Deleted
+     * @throws \UnexpectedValueException
      */
     public function produce(): DueWorkFeedback
     {
@@ -164,6 +168,7 @@ class Factory
                  * We'll never know who might have altered the feedback in between
                  */
                 ->setReviewer($this->currentUser);
+
             $this->participant->getAllFeedbacks()->add($feedback);
 
             // copy attachments over from the previous feedback.
@@ -194,7 +199,6 @@ class Factory
         if ($this->mark !== null && $this->mark !== '') {
             // mark defined and non-empty
             try {
-                /** @var IMarkScheme $scheme */
                 $scheme = $this->participant->getAssessable()->getMarkScheme();
 
                 // verify normalisation, then sanitise the output
