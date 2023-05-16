@@ -31,7 +31,7 @@ export function getTokensSettings(config: EditorConfig) {
 }
 
 /**
- * Wraps a token in a span element with a data-mention attribute
+ * Wraps a token in a span element if it isn't already wrapped
  *
  * @param { string } sourceElementContent - the sourceElement content as HTML
  * @param { string } token - the token to wrap
@@ -46,7 +46,7 @@ function wrapToken(sourceElementContent: string, token: string): string {
     }
 
     // find all the indexes of the token
-    let indexes = [];
+    const indexes = [];
     while (currentIndex !== -1) {
         indexes.push(currentIndex);
         currentIndex = sourceElementContent.indexOf(token, currentIndex + 1);
@@ -58,7 +58,7 @@ function wrapToken(sourceElementContent: string, token: string): string {
     const wholeSpanTag = `${openSpanTag}${token}${closeSpanTag}`;
 
     // filter out any indexes that are already within a span tag
-    indexes = indexes.filter((index) => {
+    const indexesNotWrapped = indexes.filter((index) => {
         let startIndex = index - openSpanTag.length;
         if (startIndex > 0 && sourceElementContent.substring(startIndex, index) === openSpanTag) {
             return false;
@@ -71,16 +71,16 @@ function wrapToken(sourceElementContent: string, token: string): string {
     });
 
     // if all found are already with a span tag, return the original content
-    if (indexes.length === 0) {
+    if (indexesNotWrapped.length === 0) {
         return sourceElementContent;
     }
 
-    // otherwise get the start and end indexes of the sections to replace
+    // otherwise get the start and end indexes of the section to replace
     const sectionsToReplace: StringSection[] = indexes.map((index) => {
         return { startIndex: index, endIndex: index + token.length - 1 };
     });
 
-    // and replace them with the whole span tag
+    // and replace each with the whole span tag
     const updatedContent = replaceAllStringSections(sectionsToReplace, sourceElementContent, wholeSpanTag);
 
     return updatedContent;
@@ -95,7 +95,7 @@ function wrapToken(sourceElementContent: string, token: string): string {
  * @param { EditorConfig } config - the config to use when creating the editor
  * @returns { HTMLElement } - the html with the tokens surrounded by the span element
  */
-export function surroundUnsurroundedTokens(sourceElementHTML: HTMLElement, config: EditorConfig): HTMLElement {
+export function wrapTokens(sourceElementHTML: HTMLElement, config: EditorConfig): HTMLElement {
     const tokens = config.tokenList ? config.tokenList : DEFAULT_TOKENS;
     let updatedContent = sourceElementHTML.innerHTML;
     tokens.forEach((token) => {

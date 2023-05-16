@@ -3,7 +3,7 @@ import { EditorConfig } from "@js/editor/types/editorTypes";
 import { addRelToNewTabLinks } from "@js/editor/settings/linkSettings";
 import { addFullWidthAttributes, removeHeightFromVideoThumbs } from "@js/editor/settings/imageSettings";
 import { addFullWidthStyle, addAlignLeftStyle } from "@js/editor/settings/tableSettings";
-import { surroundUnsurroundedTokens } from "@js/editor/settings/tokensSettings";
+import { wrapTokens } from "@js/editor/settings/tokensSettings";
 import { fixListedHeadings } from "@js/editor/settings/headingSettings";
 import { removeParagraphsInLists } from "@js/editor/settings/listSettings";
 
@@ -39,7 +39,7 @@ function runChecks(sourceElement: HTMLElement, config: EditorConfig) {
     sourceElementHTML = fixListedHeadings(sourceElementHTML);
     sourceElementHTML = removeParagraphsInLists(sourceElementHTML);
     if (config.hasTokens) {
-        sourceElementHTML = surroundUnsurroundedTokens(sourceElementHTML, config);
+        sourceElementHTML = wrapTokens(sourceElementHTML, config);
     }
     return sourceElementHTML;
 }
@@ -63,7 +63,7 @@ export function initCheckData(sourceElement: HTMLElement, config: EditorConfig) 
 }
 
 /**
- * This function can be called by other pages to run the surroundUnsurroundedTokens function on the editor,
+ * This function can be called by other pages to run the wrapTokens function on the editor,
  * this might happen if a page has changed the data in the form with .setData and needs to re-run the function
  * It's currently only called within the Add Pastoral Record page, where it only needs to check
  * for tokens when a pastoral type or sub-type change is triggered.
