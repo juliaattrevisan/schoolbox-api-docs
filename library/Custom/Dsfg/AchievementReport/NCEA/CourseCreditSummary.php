@@ -118,6 +118,7 @@ class CourseCreditSummary extends Base
                          * No achievements for N, V, Y, Z but their attempts should still
                          * be summated (ie. you tried and didn't get an achievement)
                          */
+                        $finalStack['courses'][$courseName]['letters'][$letter] ??= 0;
                         $finalStack['courses'][$courseName]['letters'][$letter] += $current['EnteredCredits'];
                         $finalStack['courses'][$courseName]['attempted'] += $current['EnteredCredits'];
 
