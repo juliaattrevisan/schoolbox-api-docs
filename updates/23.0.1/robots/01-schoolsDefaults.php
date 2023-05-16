@@ -49,6 +49,8 @@ HELP;
 
         // set setting for schools that had the option set in puppet
         $disable = ['sthprt', 'glacc'];
+        // Sanitize the schoolcode, I don't trust it to actually be lowercase... they aren't always lowercase...
+        $schoolCode = strtolower($schoolCode);
 
         $logger->info("Found school code '$schoolCode'");
         if (in_array($schoolCode, $disable)) {
