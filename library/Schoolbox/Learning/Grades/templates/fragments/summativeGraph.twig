@@ -17,8 +17,6 @@
         let allData = {{ graph.data | purify }};
         let assessments = {{ graph.assessments | purify }};
 
-        let styles = ""
-
         /**
          *  Reformat the data into an object, then check for results. If we don't have results,
          *  filter out the data as we don't want to display it.
