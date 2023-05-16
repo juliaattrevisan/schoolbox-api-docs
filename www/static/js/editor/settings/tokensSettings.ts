@@ -46,7 +46,7 @@ function wrapToken(sourceElementContent: string, token: string): string {
     }
 
     // find all the indexes of the token
-    const indexes = [];
+    const indexes: number[] = [];
     while (currentIndex !== -1) {
         indexes.push(currentIndex);
         currentIndex = sourceElementContent.indexOf(token, currentIndex + 1);
@@ -75,13 +75,13 @@ function wrapToken(sourceElementContent: string, token: string): string {
         return sourceElementContent;
     }
 
-    // otherwise get the start and end indexes of the section to replace
-    const sectionsToReplace: StringSection[] = indexes.map((index) => {
+    // otherwise get the start and end indexes of the sections to replace
+    const sectionsToReplace: StringSection[] = indexesNotWrapped.map((index) => {
         return { startIndex: index, endIndex: index + token.length - 1 };
     });
 
     // and replace each with the whole span tag
-    const updatedContent = replaceAllStringSections(sectionsToReplace, sourceElementContent, wholeSpanTag);
+    const updatedContent: string = replaceAllStringSections(sectionsToReplace, sourceElementContent, wholeSpanTag);
 
     return updatedContent;
 }
