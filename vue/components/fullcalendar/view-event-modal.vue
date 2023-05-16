@@ -873,8 +873,12 @@ export default {
                 </meta-item>
 
                 <!-- EOTC metadata -->
-                <meta-item class="icon-teacher" v-if="eventExtendedProps.eotc.isEOTC">Assigned Staff: {{eventExtendedProps.eotc.numStaff}}</meta-item>
-                <meta-item class="icon-staff-students" v-if="eventExtendedProps.eotc.isEOTC">Students: {{eventExtendedProps.eotc.numStudents}}</meta-item>
+                <meta-item class="icon-teacher" v-if="eventExtendedProps.eotc.isEOTC"
+                    >Assigned Staff: {{ eventExtendedProps.eotc.numStaff }}</meta-item
+                >
+                <meta-item class="icon-staff-students" v-if="eventExtendedProps.eotc.isEOTC"
+                    >Students: {{ eventExtendedProps.eotc.numStudents }}</meta-item
+                >
             </meta-list>
             <article>
                 <span v-html="eventExtendedProps.detail"></span>
@@ -923,6 +927,7 @@ export default {
                                             accepted: this.isAccepted(
                                                 eventExtendedProps.attendance.payload.currentUser.status
                                             ),
+                                            disabled: this.isTransacting,
                                         }"
                                         data-rsvp="accept"
                                         >Yes</a
@@ -934,6 +939,7 @@ export default {
                                         @click.prevent="rsvpDecline"
                                         :class="{
                                             button: true,
+                                            disabled: this.isTransacting,
                                             declined: this.isDeclined(
                                                 eventExtendedProps.attendance.payload.currentUser.status
                                             ),
