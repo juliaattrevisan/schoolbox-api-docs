@@ -21,7 +21,7 @@ class Controller extends Base
      */
     public function getRobots(): void
     {
-        $robotAllow = "User-Agent: *\nAllow: /\n";
+        $robotAllow = "User-Agent: *\nAllow: /\nDisallow: /feedback\nDisallow: /passwordReset\n";
         $robotDeny = "User-Agent: *\nDisallow: /\n";
 
         $this->getResponse()->headers->set('Content-Type', 'text/plain; charset=utf-8');
