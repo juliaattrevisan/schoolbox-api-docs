@@ -25,7 +25,7 @@ readonly PRESERVED_CONFIG=(
   "amqp_user" "amqp_pass" "amqp_vhost"
 
   # Redis Config
-  "redis_ephemeral_url" "redis_url"
+  "redis_ephemeral_url" "redis_url" "taskd_redis_url"
 
   # External DB Config
   "external_db_host" "external_db_user" "external_db_passwd" "external_db_db" "external_portal"
