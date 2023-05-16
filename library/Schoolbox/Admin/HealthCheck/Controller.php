@@ -67,8 +67,8 @@ class Controller extends Base
      */
     public function getAudit()
     {
-        //list of queries to run, if the request does not include one of these, error out.
-        $validReports = ['assessment', 'uxui', 'user', 'lms', 'community'];
+        // Reports to be included in "all" reports
+        $allReports = ['assessment', 'uxui', 'user', 'lms', 'community'];
         $query = $this->getRequest()->query->get('report');
         if ('' === trim((string)$query)) {
             //if no value was handed, just assume the user was after everything
@@ -79,7 +79,7 @@ class Controller extends Base
         $reports = explode(',', $query);
         //if query is 'all' lets add all options in
         if ('all' === $query) {
-            $reports = $validReports;
+            $reports = $allReports;
         }
         //loop through all reports and build the sources / routes for all of them.
         foreach ($reports as $report) {
@@ -137,6 +137,27 @@ class Controller extends Base
                     $this->taskDHelper->addSource('community', 'parentNewsNotifications');
                     $this->taskDHelper->addSource('community', 'homepageTemplates');
                     break;
+                case 'sva':
+                    /**
+                     * list of reports for sva
+                     */
+                    $this->taskDHelper->addSource('', 'svaMonthlyLogins');
+                    $this->taskDHelper->addSource('', 'svaNewsArticleViews');
+                    $this->taskDHelper->addSource('', 'svaNewsArticleViewsPerRolePerArticle');
+                    $this->taskDHelper->addSource('', 'svaNewsArticleViewsPerMonthBySKC');
+                    $this->taskDHelper->addSource('', 'svaNewsArticleViewsPerMonthByActiveAlumni');
+                    $this->taskDHelper->addSource('', 'svaNewsCreatedBySVATeam');
+                    $this->taskDHelper->addSource('', 'svaHomepageViewsByKSC');
+                    $this->taskDHelper->addSource('', 'svaHomepageViewsByAllPerRolePerMonth');
+                    $this->taskDHelper->addSource('', 'svaHomepageViewsForCommunityForumsPage');
+                    $this->taskDHelper->addSource('', 'svaHomepageViewsForOpportunitiesPage');
+                    $this->taskDHelper->addSource('', 'svaHomepageViewsForProfessionalReadingPage');
+                    $this->taskDHelper->addSource('', 'svaHomepageViewsForEvaluationPage');
+                    $this->taskDHelper->addSource('', 'svaHomepageViewsForActiveAlumniPage');
+                    $this->taskDHelper->addSource('', 'svaHomepageViewsForRrrHubSchoolsPage');
+                    $this->taskDHelper->addSource('', 'svaForumThreadsViews');
+                    $this->taskDHelper->addSource('', 'svaForumRepliesViews');
+                    break;
                 default:
                     throw new SchoolboxException("Report '{$report}' Does not exist.");
             }
@@ -163,7 +184,7 @@ class Controller extends Base
                 name ASC; ");
         $statement->execute();
         $help = new Helper();
-        $help->queryToCSV($statement, 'HomepageTempates.csv');
+        $help->queryToCSV($statement, 'HomepageTemplates.csv');
     }
 
     /**
@@ -860,4 +881,513 @@ class Controller extends Base
         $help = new Helper();
         $help->queryToCSV($statement, 'parentNewsNotifications.csv');
     }
+
+    // ===============================================================================================
+    // ==================================== START SVA REPORTS ========================================
+    // ===============================================================================================
+
+    /**
+     * SVA
+     * svaMonthlyLogins.csv
+     */
+    public function svaMonthlyLogins()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+          ll.username as 'Username',
+          g.name as 'Role',
+          concat((MONTHNAME(ll.date)),' ',(YEAR(ll.date))) AS Month,
+          count(*) as 'Login Count'
+        FROM
+          login_log ll
+        JOIN
+          user u on ll.username = u.username
+        JOIN
+          groups g on u.group_id = g.id and not g.id in (2,9)
+        GROUP BY
+          username,month
+        ORDER BY
+          ll.username,month;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'svaMonthlyLogins.csv');
+    }
+
+    /**
+     * SVA
+     * svaNewsArticleViews.csv
+     */
+    public function svaNewsArticleViews()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            cnas.article_id as 'News ID',
+            cna.title as 'News Title',
+            count(*) as 'Total Views',
+            cna.publish_at as 'Publish Date'
+        FROM
+            comms_news_article_statistics cnas
+        LEFT JOIN
+            comms_news_article cna on cnas.article_id = cna.id
+        WHERE
+            cnas.deleted_at is NULL
+        group by
+            article_id;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'svaNewsArticleViews.csv');
+    }
+    /**
+     * SVA
+     * svaNewsArticleViewsPerRolePerArticle.csv
+     */
+    public function svaNewsArticleViewsPerRolePerArticle()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            article_id as 'News ID',
+            cna.title as 'News Title',
+            coalesce((SELECT
+            group_concat(nt.name)
+        FROM
+            newsTopic nt
+        JOIN
+            comms_news_article_topic cnat on nt.newsTopicID = cnat.topic_id
+        WHERE
+            cnat.article_id = cna.id),'No Topic Listed') as 'Topics',
+            g.name as 'Role',
+            count(*) as 'Total Views',
+            cna.publish_at as 'Publish Date'
+        FROM
+            comms_news_article_statistics cnas
+        JOIN
+            groups g on cnas.role_id = g.id and not g.id in (2,9)
+        JOIN
+            comms_news_article cna on cnas.article_id = cna.id
+        GROUP BY
+            article_id,role_id;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'svaNewsArticleViewsPerRolePerArticle.csv');
+    }
+    /**
+     * SVA
+     * svaNewsArticleViewsPerMonthBySKC.csv
+     */
+    public function svaNewsArticleViewsPerMonthBySKC()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            article_id as 'News ID',
+            cna.title as 'News Title',
+            coalesce((SELECT
+            group_concat(nt.name)
+        FROM
+            newsTopic nt
+        JOIN
+            comms_news_article_topic cnat on nt.newsTopicID = cnat.topic_id
+        WHERE
+            cnat.article_id = cna.id),'No Topic Listed') as 'Topics',
+            concat((MONTHNAME(cnas.created_at)),' ',(YEAR(cnas.created_at))) AS Month,
+            count(DISTINCT user_id) as 'View Count',
+            cna.publish_at as 'Publish Date'
+        FROM
+            comms_news_article_statistics cnas
+        JOIN
+            user u on cnas.user_id = u.id
+        JOIN
+            comms_news_article cna on cnas.article_id = cna.id
+        WHERE
+            u.group_id = '5'
+        GROUP BY
+            cnas.article_id, month;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'svaNewsArticleViewsPerMonthBySKC.csv');
+    }
+    /**
+     * SVA
+     * svaNewsArticleViewsPerMonthByActiveAlumni.csv
+     */
+    public function svaNewsArticleViewsPerMonthByActiveAlumni()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            article_id as 'News ID',
+            cna.title as 'News Title',
+            coalesce((SELECT
+            group_concat(nt.name)
+        FROM
+            newsTopic nt
+        JOIN
+            comms_news_article_topic cnat on nt.newsTopicID = cnat.topic_id
+        WHERE
+            cnat.article_id = cna.id),'No Topic Listed') as 'Topics',
+            concat((MONTHNAME(cnas.created_at)),' ',(YEAR(cnas.created_at))) AS Month,
+            count(DISTINCT user_id) as 'View Count',
+            cna.publish_at as 'Publish Date'
+        FROM
+            comms_news_article_statistics cnas
+        JOIN
+            user u on cnas.user_id = u.id
+        JOIN
+            comms_news_article cna on cnas.article_id = cna.id
+        WHERE
+            u.group_id = '12'
+        group by
+            cnas.article_id, month;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'svaNewsArticleViewsPerMonthByActiveAlumni.csv');
+    }
+    // ===============================================================================================
+    // =================== TO DO: ADD 'News Article Views (Specific)' Here ===========================
+    // ===============================================================================================
+    /**
+     * SVA
+     * svaNewsCreatedBySVATeam.csv
+     */
+    public function svaNewsCreatedBySVATeam()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            concat((MONTHNAME(cna.created_at)),' ',(YEAR(cna.created_at))) AS Month,
+            concat(u.firstname,' ',u.lastname,' (',u.id,')') as 'Author',
+            count(*) as 'Create Count'
+        FROM
+            comms_news_article cna
+        JOIN
+            user u on cna.author_id = u.id
+        WHERE
+            author_id in (4,13,111,110,5,6)
+        GROUP BY
+            author_id,month
+        ORDER BY
+            cna.created_at;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'svaNewsCreatedBySVATeam.csv');
+    }
+    /**
+     * SVA
+     * svaHomepageViewsByKSC.csv
+     */
+    public function svaHomepageViewsByKSC()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            concat((MONTHNAME(hv.date)),' ',(YEAR(hv.date))) AS Month,
+            f.name as 'Homepage',
+            g.name as 'Role',
+            SUM(hv.hitcount) as 'Sum Hitcount'
+        FROM
+            homepage_visits hv
+        JOIN
+            groups g on hv.user_group_id = g.id and not g.id in (2,9)
+        JOIN
+            folder f on hv.category_id = f.id
+        WHERE
+            hv.user_group_id = '5'
+        GROUP BY
+            concat((MONTHNAME(hv.date)),' ',(YEAR(hv.date))),hv.user_group_id,hv.category_id
+        ORDER BY
+            hv.date,hv.category_id,hv.user_group_id;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'svaHomepageViewsByKSC.csv');
+    }
+    /**
+     * SVA
+     * svaHomepageViewsByAllPerRolePerMonth.csv
+     */
+    public function svaHomepageViewsByAllPerRolePerMonth()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            concat((MONTHNAME(hv.date)),' ',(YEAR(hv.date))) AS Month,
+            f.name as 'Homepage',
+            g.name as 'Role',
+            SUM(hv.hitcount) as 'Sum Hitcount'
+        FROM
+            homepage_visits hv
+        JOIN
+            groups g on hv.user_group_id = g.id and not g.id in (2,9)
+        JOIN
+            folder f on hv.category_id = f.id
+        GROUP BY
+            concat((MONTHNAME(hv.date)),' ',(YEAR(hv.date))),hv.user_group_id,hv.category_id
+        ORDER BY
+            hv.date,hv.category_id,hv.user_group_id;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'svaHomepageViewsByAllPerRolePerMonth.csv');
+    }
+    // ===============================================================================================
+    // ====================== TO DO: ADD 'Homepage views per user' Here ==============================
+    // ===============================================================================================
+    /**
+     * SVA
+     * svaHomepageViewsForCommunityForumsPage.csv
+     */
+    public function svaHomepageViewsForCommunityForumsPage()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            concat((MONTHNAME(hv.date)),' ',(YEAR(hv.date))) AS Month,
+            f.name as 'Homepage',
+            g.name as 'Role',
+            SUM(hv.hitcount) as 'Sum Hitcount'
+        FROM
+            homepage_visits hv
+        JOIN
+            groups g on hv.user_group_id = g.id and not g.id in (2,9)
+        JOIN
+            folder f on hv.category_id = f.id
+        WHERE
+            hv.category_id = '831'
+        GROUP BY
+            concat((MONTHNAME(hv.date)),' ',(YEAR(hv.date))),hv.user_group_id,hv.category_id
+        ORDER BY
+            hv.date,hv.category_id,hv.user_group_id;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'svaHomepageViewsForCommunityForumsPage.csv');
+    }
+    /**
+     * SVA
+     * svaHomepageViewsForOpportunitiesPage.csv
+     */
+    public function svaHomepageViewsForOpportunitiesPage()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            concat((MONTHNAME(hv.date)),' ',(YEAR(hv.date))) AS Month,
+            f.name as 'Homepage',
+            g.name as 'Role',
+            SUM(hv.hitcount) as 'Sum Hitcount'
+        FROM
+            homepage_visits hv
+        JOIN
+            groups g on hv.user_group_id = g.id and not g.id in (2,9)
+        JOIN
+            folder f on hv.category_id = f.id
+        WHERE
+            hv.category_id = '18'
+        GROUP BY
+            concat((MONTHNAME(hv.date)),' ',(YEAR(hv.date))),hv.user_group_id,hv.category_id
+        ORDER BY
+            hv.date,hv.category_id,hv.user_group_id;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'svaHomepageViewsForOpportunitiesPage.csv');
+    }
+    /**
+     * SVA
+     * svaHomepageViewsForProfessionalReadingPage.csv
+     */
+    public function svaHomepageViewsForProfessionalReadingPage()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            g.name as 'Role',
+            concat(f.name,' (',f.id,')') as 'Homepage',
+            concat((MONTHNAME(hv.date)),' ',(YEAR(hv.date))) AS Month,
+            SUM(hv.hitcount) as 'Sum Hitcount'
+        FROM
+            homepage_visits hv
+        JOIN
+            groups g on hv.user_group_id = g.id and not g.id in (2,9)
+        JOIN
+            folder f on hv.category_id = f.id
+        WHERE
+            (
+            f.id = 676
+            OR
+            f.parent = 676
+            )
+        GROUP BY
+            concat((MONTHNAME(hv.date)),' ',(YEAR(hv.date))),hv.user_group_id,hv.category_id
+        ORDER BY
+            hv.user_group_id,hv.category_id,hv.date;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'svaHomepageViewsForProfessionalReadingPage.csv');
+    }
+    /**
+     * SVA
+     * svaHomepageViewsForEvaluationPage.csv
+     */
+    public function svaHomepageViewsForEvaluationPage()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            concat((MONTHNAME(hv.date)),' ',(YEAR(hv.date))) AS Month,
+            f.name as 'Homepage',
+            g.name as 'Role',
+            SUM(hv.hitcount) as 'Sum Hitcount'
+        FROM
+            homepage_visits hv
+        JOIN
+            groups g on hv.user_group_id = g.id and not g.id in (2,9)
+        JOIN
+            folder f on hv.category_id = f.id
+        WHERE
+            hv.category_id = '14'
+        GROUP BY
+            concat((MONTHNAME(hv.date)),' ',(YEAR(hv.date))),hv.user_group_id,hv.category_id
+        ORDER BY
+            hv.date,hv.category_id,hv.user_group_id;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'svaHomepageViewsForEvaluationPage.csv');
+    }
+    /**
+     * SVA
+     * svaHomepageViewsForActiveAlumniPage.csv
+     */
+    public function svaHomepageViewsForActiveAlumniPage()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            g.name as 'Role',
+            concat(f.name,' (',f.id,')') as 'Homepage',
+            concat((MONTHNAME(hv.date)),' ',(YEAR(hv.date))) AS Month,
+            SUM(hv.hitcount) as 'Sum Hitcount'
+        FROM
+            homepage_visits hv
+        JOIN
+            groups g on hv.user_group_id = g.id and not g.id in (2,9)
+        JOIN
+            folder f on hv.category_id = f.id
+        WHERE
+            (
+            f.id = 382
+            OR
+            f.parent = 382
+            )
+        GROUP BY
+            concat((MONTHNAME(hv.date)),' ',(YEAR(hv.date))),hv.user_group_id,hv.category_id
+        ORDER BY
+            hv.user_group_id,hv.category_id,hv.date;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'svaHomepageViewsForActiveAlumniPage.csv');
+    }
+    /**
+     * SVA
+     * svaHomepageViewsForRrrHubSchoolsPage.csv
+     */
+    public function svaHomepageViewsForRrrHubSchoolsPage()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            g.name as 'Role',
+            concat(f.name,' (',f.id,')') as 'Homepage',
+            concat((MONTHNAME(hv.date)),' ',(YEAR(hv.date))) AS Month,
+            SUM(hv.hitcount) as 'Sum Hitcount'
+        FROM
+            homepage_visits hv
+        JOIN
+            groups g on hv.user_group_id = g.id and not g.id in (2,9)
+        JOIN
+            folder f on hv.category_id = f.id
+        WHERE
+            (
+            f.id = 383
+            OR
+            f.parent = 383
+            )
+        GROUP BY
+            concat((MONTHNAME(hv.date)),' ',(YEAR(hv.date))),hv.user_group_id,hv.category_id
+        ORDER BY
+            hv.user_group_id,hv.category_id,hv.date;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'svaHomepageViewsForRrrHubSchoolsPage.csv');
+    }
+    /**
+     * SVA
+     * svaForumThreadsViews.csv
+     */
+    public function svaForumThreadsViews()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            concat(f.name,' (',f.id,')') as 'Homepage',
+            concat((MONTHNAME(ft.date)),' ',(YEAR(ft.date))) AS Month,
+            count(*) as 'Forum Thread Count'
+        FROM
+            forumThread ft
+        JOIN
+            folder f on ft.categoryID = f.id
+        GROUP BY
+            f.name,month(ft.date)
+        ORDER BY
+            f.name,ft.date;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'svaForumThreadsViews.csv');
+    }
+    /**
+     * SVA
+     * svaForumReplies.csv
+     */
+    public function svaForumRepliesViews()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            ft.threadID as 'Thread ID',
+            ft.title as 'Thread Name',
+            concat((MONTHNAME(fp.date)),' ',(YEAR(fp.date))) AS Month,
+            count(*) as 'Forum Reply Count'
+        FROM
+            forumPost fp
+        JOIN
+            forumThread ft on fp.threadID = ft.threadID
+        GROUP BY
+            ft.title,month(fp.date)
+        ORDER BY
+            ft.threadID,ft.date;
+        ");
+        // ===============================================================================================
+        // ============= TO DO: ADD 'Social Stream Posts (per month, per page)' Here =====================
+        // ===============================================================================================
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'svaForumReplies.csv');
+    }
+    // ===============================================================================================
+    // ==================================== END SVA REPORTS ==========================================
+    // ===============================================================================================
 }
