@@ -39,7 +39,6 @@ use UnexpectedValueException;
  */
 class ReturnedWorkMapper extends Schoolbox\Mapper
 {
-
     /**
      * @var Participant\Plan\InteractionIntegrityChecker
      */
