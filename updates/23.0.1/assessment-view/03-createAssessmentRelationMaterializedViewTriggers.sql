@@ -1,5 +1,5 @@
 -- Creation of an assessment directly within a folder
-CREATE TRIGGER mv_assessment_relation_assessment_folder
+CREATE OR REPLACE TRIGGER mv_assessment_relation_assessment_folder
     AFTER INSERT ON assessment_folder FOR EACH ROW
     INSERT INTO mv_assessment_relation (
         assessment_id,
@@ -11,7 +11,7 @@ CREATE TRIGGER mv_assessment_relation_assessment_folder
     FROM NEW;
 
 -- Creation of an assessment in a course implementation
-CREATE TRIGGER mv_assessment_relation_assessment_course_unit_implementation
+CREATE OR REPLACE TRIGGER mv_assessment_relation_assessment_course_unit_implementation
     AFTER INSERT ON assessment_course_unit_implementation FOR EACH ROW
     INSERT INTO mv_assessment_relation (
         assessment_id,
@@ -29,7 +29,7 @@ CREATE TRIGGER mv_assessment_relation_assessment_course_unit_implementation
     JOIN course_implementation ci ON cui.course_implementation_id = ci.id;
 
 -- Creation of an assessment in a course specification
-CREATE TRIGGER mv_assessment_relation_assessment_course_unit_specification
+CREATE OR REPLACE TRIGGER mv_assessment_relation_assessment_course_unit_specification
     AFTER INSERT ON assessment_course_unit_specification FOR EACH ROW
     INSERT INTO mv_assessment_relation (
         assessment_id,
@@ -47,7 +47,7 @@ CREATE TRIGGER mv_assessment_relation_assessment_course_unit_specification
     JOIN course_specification cs ON cus.course_specification_id = cs.id;
 
 -- Creation of an assessment in a project which is directly within a folder
-CREATE TRIGGER mv_assessment_relation_project_folder
+CREATE OR REPLACE TRIGGER mv_assessment_relation_project_folder
     AFTER INSERT ON project_assessment FOR EACH ROW
     INSERT INTO mv_assessment_relation (
         assessment_id,
@@ -63,7 +63,7 @@ CREATE TRIGGER mv_assessment_relation_project_folder
     JOIN assessment_folder af ON p.assessment_id = af.assessment_id;
 
 -- Creation of an assessment in a project which is in a course implementation
-CREATE TRIGGER mv_assessment_relation_project_course_unit_implementation
+CREATE OR REPLACE TRIGGER mv_assessment_relation_project_course_unit_implementation
     AFTER INSERT ON project_assessment FOR EACH ROW
     INSERT INTO mv_assessment_relation (
         assessment_id,
@@ -85,7 +85,7 @@ CREATE TRIGGER mv_assessment_relation_project_course_unit_implementation
     JOIN course_implementation ci ON cui.course_implementation_id = ci.id;
 
 -- Creation of an assessment in a project which is in a course specification
-CREATE TRIGGER mv_assessment_relation_project_course_unit_specification
+CREATE OR REPLACE TRIGGER mv_assessment_relation_project_course_unit_specification
     AFTER INSERT ON project_assessment FOR EACH ROW
     INSERT INTO mv_assessment_relation (
         assessment_id,
