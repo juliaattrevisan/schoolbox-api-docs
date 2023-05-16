@@ -11,9 +11,8 @@
     <meta name="application-name" content="{{ config.school_name }}" />
     {#
     # if we are not allowing search engine to crawl the system, then stop them
-    # If we aren't prod, then always block them
     #}
-    {% if (not config.web_crawlers_enabled) or (config.site_type is not same as("prod")) %}
+    {% if not config.web_crawlers_enabled %}
         <meta name="robots" content="noindex">
     {% endif %}
     <link rel="manifest" href="/manifest">
