@@ -65,13 +65,7 @@
                             headerFormat: '',
                             borderColor: '#000000',
                             pointFormatter: function () {
-                                /* Basic template for each outlier
-                                */
-                                /*var template =
-                                    '<div style="width:200px!important;overflow:auto;white-space:normal !important;">' +
-                                    '<div class="grade gradient-{GRADIENTMARK}"><span>{DISPLAYMARK}</span></div>' +
-                                    '<p class="comment">{INFO}</p>' +
-                                    '</div>'; */
+
                                 /* Concatenate everything
                                 */
 
@@ -85,26 +79,12 @@
                                         gradientMark = mergedData[this.x].displayValues.gradientMark;
                                     }
 
+                                    // Interpolate values into tooltip template string
                                     let tooltipContent =
                                     `<div style="width:200px!important;overflow:auto;white-space:normal !important;">
                                         <div class="grade gradient-${gradientMark}"><span>${displayMark}</span></div>
                                         <p class="comment">${info}</p>
                                     </div>`;
-
-
-
-                                    /* if (typeof infoIndex[this.x].displayMark !== 'undefined') {
-                                    var tooltipContent = template;
-
-                                    if (infoIndex[this.x].displayMark !== null) {
-                                        tooltipContent = tooltipContent.replace(/{DISPLAYMARK}/, infoIndex[this.x].displayMark);
-                                        tooltipContent = tooltipContent.replace(/{GRADIENTMARK}/, infoIndex[this.x].gradientMark);
-                                    }
-                                    else {
-                                        tooltipContent = tooltipContent.replace(/{DISPLAYMARK}/, '');
-                                        tooltipContent = tooltipContent.replace(/{GRADIENTMARK}/, '');
-                                    }
-                                    tooltipContent = tooltipContent.replace(/{INFO}/, infoIndex[this.x].info);
 
                                     /* Show tooltip
                                     */
