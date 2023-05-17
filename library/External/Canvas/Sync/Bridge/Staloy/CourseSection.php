@@ -145,9 +145,10 @@ class CourseSection extends \External\Canvas\Sync\Bridge\CourseSection
      *
      * @param string $sisSourceId
      * @param string $year
+     * @param string|null $termSisSourceId
      * @return string|null
      */
-    public function parseSubjectCodeFromSisSourceId(string $sisSourceId, string $year): ?string
+    public function parseSubjectCodeFromSisSourceId(string $sisSourceId, string $year, ?string $termSisSourceId): ?string
     {
         // Parse subject code (exact match only, no fuzzy fall back for now)
         if (preg_match("/^Y\d{4}C(.+)$/", $sisSourceId, $canonicalSubjectMatch)) {

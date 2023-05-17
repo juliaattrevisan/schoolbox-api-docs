@@ -437,7 +437,7 @@ class CourseSection
             $this->sisSourceIdToYearAndFolderCodeMap[$sisSourceId] = null;
 
             $year        = $noYear ? '' : $this->parseYearFromSisSourceId($sisSourceId, $sisSource['term_name']) ?? '';
-            $subjectCode = $this->parseSubjectCodeFromSisSourceId($sisSourceId, $year);
+            $subjectCode = $this->parseSubjectCodeFromSisSourceId($sisSourceId, $year, $sisSource['term_sis_id']);
             if ($subjectCode === null) {
                 $regexNotMatch[] = $sisSourceId;
                 continue;
@@ -497,7 +497,7 @@ class CourseSection
         $pb          = $this->courseBridge->getCanvasCoursesToImport();
         $whereClause = $pb->getWhere()[0];
         $sql         = "
-            SELECT cs.sis_source_id, term.name as term_name
+            SELECT cs.sis_source_id, term.name as term_name, term.sis_source_id as term_sis_id
             FROM course_dim c
             JOIN course_section_dim cs ON cs.course_id = c.id
             JOIN enrollment_term_dim term ON term.id = c.enrollment_term_id
@@ -526,11 +526,12 @@ class CourseSection
     /**
      * Attempt to parse a Subject Code from a sisSourceId
      *
-     * @param string $sisSourceId
-     * @param string $year
+     * @param string      $sisSourceId
+     * @param string      $year
+     * @param string|null $termSisSourceId
      * @return string|null
      */
-    public function parseSubjectCodeFromSisSourceId(string $sisSourceId, string $year): ?string
+    public function parseSubjectCodeFromSisSourceId(string $sisSourceId, string $year, ?string $termSisSourceId): ?string
     {
         return $sisSourceId;
     }

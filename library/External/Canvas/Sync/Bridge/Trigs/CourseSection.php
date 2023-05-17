@@ -14,12 +14,16 @@ class CourseSection extends \External\Canvas\Sync\Bridge\CourseSection
     /**
      * TRIGS has SIS ids within canvas with _2022, this means when stripping the year from the code
      * we are still left with _. This is to remove the _ allowing the codes to match.
+     * @param string|null $termSisSourceId
      * @inheritDoc
      */
-    public function parseSubjectCodeFromSisSourceId(string $sisSourceId, string $year): ?string
+    public function parseSubjectCodeFromSisSourceId(string $sisSourceId, string $year, ?string $termSisSourceId): ?string
     {
-        if (empty($year)) {
+        if (empty($year) && empty($termSisSourceId)) {
             return $sisSourceId;
+        }
+        if (!empty($termSisSourceId)) {
+            return str_replace("_$termSisSourceId", '', $sisSourceId);
         }
         return str_replace("_$year", '', $sisSourceId);
     }
