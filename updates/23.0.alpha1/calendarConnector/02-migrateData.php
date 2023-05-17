@@ -142,7 +142,7 @@ function convertConfigObjectToJson(Calendar_Api_Config_Connector_Abstract $confi
     }
 
     try {
-        $configJson = json_encode($configArray,JSON_THROW_ON_ERROR);
+        $configJson = json_encode($configArray, JSON_THROW_ON_ERROR);
     } catch (JsonException) {
         return false;
     }
