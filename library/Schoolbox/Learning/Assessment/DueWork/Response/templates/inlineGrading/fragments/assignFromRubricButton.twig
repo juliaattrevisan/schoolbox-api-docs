@@ -190,15 +190,14 @@
         $rb.on('change', 'select[data-rubric-descriptor]', updateAll);
 
         // Update input val on:
-        // * checking (but not unchecking) a descriptor,
+        // * checking and/or unchecking a descriptor,
         // * changing a descriptor's mark value
         // but only if it has a value (0 counts as a value)
         $rb.on('change', ':checkbox[data-rubric-descriptor]', function () {
-            if (this.checked) {
-                let value = $(this).attr('data-value');
-                if (value !== '') {
-                    updateAll();
-                }
+            let value = $(this).attr('data-value');
+
+            if (value !== '') {
+                updateAll();
             }
         });
     });
