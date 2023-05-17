@@ -104,6 +104,17 @@
                 "rgb(255, 255, 255)",
             ]
         }
+
+
+        // When showing colour swatches, we only want the first 3 unique colours from skin config as well as the constant colours,
+        // if there are less than 3 unique colours, we'll use the first 3 colours but bias towards the unique colours
+        const uniqueSkinColours = [...new Set(window.sbProps.colourDefaults["skin"])];
+        const chosenSkinColours =
+            uniqueSkinColours.length > 3
+                ? uniqueSkinColours.slice(0, 3)
+                : [...uniqueSkinColours, ...window.sbProps.colourDefaults["skin"]].slice(0, 3);
+
+        window.sbProps.colourDefaults["swatches"] = [...chosenSkinColours, ...window.sbProps.colourDefaults["constant"]];
     </script>
     {% endautoescape %}
 
