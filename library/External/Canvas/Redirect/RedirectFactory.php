@@ -28,7 +28,6 @@ class RedirectFactory
 
     public function produce(): ?AbstractRedirect
     {
-        $this->siteSchoolCode = 'trigs';
         $className = sprintf('Custom\\%s\\Redirect', ucfirst(strtolower($this->siteSchoolCode)));
         if (class_exists($className)) {
             return new $className(
