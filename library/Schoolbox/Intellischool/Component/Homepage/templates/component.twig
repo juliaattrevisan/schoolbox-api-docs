@@ -14,38 +14,10 @@
     </form>
     <iframe style="min-height:200px;overflow: hidden;" name="intellischoolIframe" id="intellischoolIframe">
     </iframe>
+    <script src="{{ CDN_PREFIX }}/js/bundle/intellischools.js" type="text/javascript"></script>
     <script type="text/javascript">
-        /**
-         * Decide if url is an allowed domain
-         * Whitelist allowed domains
-         *
-         * @param url
-         */
-        function isAllowed(url) {
-            /* Test new domains
-             */
-            if (url.match(/^https:\/\/(.*)intellischool\.app$/) != null) {
-                return true;
-            }
-
-            /* If that's not allowed, test the old domains
-             * (These old domains will eventually be phased out at some point)
-             */
-            if ([
-                "https://analytics.intellischool.cloud",
-                "https://analytics.intellischool.xyz",
-                "https://analytics.intellischool.dev"
-            ].includes(url)) {
-                return true;
-            }
-
-            /* Everything else get out
-             */
-            return false;
-        }
-
         window.addEventListener("message", event => {
-            if (!isAllowed(event.origin.toString())) {
+            if (!schoolboxIntellischools.isAllowed(event.origin.toString())) {
                 return;
             }
 
