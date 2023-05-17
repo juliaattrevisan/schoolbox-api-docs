@@ -49,6 +49,9 @@ export function useDescriptionEditor($initialValue: string, $ckeditorInstance: s
                     detail: {
                         targetElements: [`#${ckeditorInstance}`],
                         toolbar: "simple",
+                        maxCharCountSubmitButtons: [
+                            document.querySelector("button.submit[id=submit-button-for-" + ckeditorInstance + "]"),
+                        ],
                     },
                 })
             );

@@ -117,7 +117,23 @@ function updateWordCount(
         }
     };
 
-    addListenersForDisablingSubmitButton(sourceElement);
+    let containingForm: HTMLFormElement | null;
+    let submitButtons: HTMLElement[];
+
+    if (config.maxCharCountSubmitButtons && config.maxCharCountSubmitButtons.length > 0) {
+        containingForm = null;
+        submitButtons = config.maxCharCountSubmitButtons;
+    } else {
+        containingForm = sourceElement.closest("form");
+        submitButtons =
+            containingForm === null
+                ? []
+                : Array.from(containingForm.querySelectorAll("input[type=submit], button[type=submit]"));
+    }
+
+    if (submitButtons.length > 0) {
+        addListenersForDisablingSubmitButtons(sourceElement, containingForm, Array.from(submitButtons));
+    }
 
     editor.plugins.get("WordCount").on("update", onUpdateText);
 
@@ -155,6 +171,7 @@ export function insertWordCount(sourceElement: HTMLElement, editor: Editor, conf
  *  * https://vagrant.dev.schoolbox.cloud/adminv2/summative-report/create (single submit <input>)
  *  * https://vagrant.dev.schoolbox.cloud/news/34/update (single submit <button>)
  *  * https://vagrant.dev.schoolbox.cloud/news/87/update (multiple submit <button>s)
+ *  * https://vagrant.dev.schoolbox.cloud/curriculum (config.maxCharCountSubmitButtons used)
  *
  *  This function is not intended to handle every possible configuration of CKEditor fields inside forms.  If this
  *  function does not disable/enable the submit form button in a specific case, it may be best to handle that case
@@ -162,20 +179,14 @@ export function insertWordCount(sourceElement: HTMLElement, editor: Editor, conf
  *  EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED events in vue/components/ckeditor/add-comment-input.vue.
  *
  * @param ckeditorSourceEl
+ * @param containingForm
+ * @param submitButtons
  */
-function addListenersForDisablingSubmitButton(ckeditorSourceEl: HTMLElement) {
-    const containingForm = ckeditorSourceEl.closest("form");
-
-    if (containingForm === null) {
-        // No containing form, so do nothing.
-        console.info(
-            "No containing form, so not adding event listeners for disabling/enabling submit button for CKEditor field."
-        );
-        return;
-    }
-
-    const submitButtons = containingForm.querySelectorAll("input[type=submit], button[type=submit]");
-
+function addListenersForDisablingSubmitButtons(
+    ckeditorSourceEl: HTMLElement,
+    containingForm: HTMLFormElement | null,
+    submitButtons: Array<HTMLElement>
+) {
     for (let button of submitButtons) {
         // Now we know we have a button, assign it to a const.
         const submitButton: Element = button;
@@ -188,8 +199,14 @@ function addListenersForDisablingSubmitButton(ckeditorSourceEl: HTMLElement) {
         });
 
         ckeditorSourceEl.addEventListener("EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED", function () {
-            // Only enable save button if no max. character count has been exceeded on any ckeditor field in the form.
-            if (containingForm.querySelectorAll('[data-maxCharCountExceededAtLastCheck="1"]').length === 0) {
+            if (containingForm !== null) {
+                // Only enable save button if no max. character count has been exceeded on any ckeditor field in the form.
+                if (containingForm.querySelectorAll('[data-maxCharCountExceededAtLastCheck="1"]').length === 0) {
+                    // @ts-ignore
+                    submitButton.disabled = false;
+                    changeButtonText(submitButton, buttonTextOriginal);
+                }
+            } else {
                 // @ts-ignore
                 submitButton.disabled = false;
                 changeButtonText(submitButton, buttonTextOriginal);
