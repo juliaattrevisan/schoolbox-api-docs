@@ -7,24 +7,38 @@
             <iframe style="min-height:200px;overflow: hidden;" name="intellischoolIframe" id="intellischoolIframe">
             </iframe>
             <script type="text/javascript">
-                window.addEventListener("message", event => {
-                    let url = event.origin.toString();
-
+                /**
+                 * Decide if url is an allowed domain
+                 * Whitelist allowed domains
+                 *
+                 * @param url
+                 */
+                function isAllowed(url) {
                     /* Test new domains
                      */
-                    let allowed = url.match(/^https:\/\/(.*)intellischool\.app$/) != null;
+                    if (url.match(/^https:\/\/(.*)intellischool\.app$/) != null) {
+                        return true;
+                    }
 
                     /* If that's not allowed, test the old domains
                      * (These old domains will eventually be phased out at some point)
                      */
-                    if (!allowed) {
-                        if (![
-                            "https://analytics.intellischool.cloud",
-                            "https://analytics.intellischool.xyz",
-                            "https://analytics.intellischool.dev"
-                        ].includes(url)) {
-                            return;
-                        }
+                    if ([
+                        "https://analytics.intellischool.cloud",
+                        "https://analytics.intellischool.xyz",
+                        "https://analytics.intellischool.dev"
+                    ].includes(url)) {
+                        return true;
+                    }
+
+                    /* Everything else get out
+                     */
+                    return false;
+                }
+
+                window.addEventListener("message", event => {
+                    if (!isAllowed(event.origin.toString())) {
+                        return;
                     }
 
                     // Act on the event
