@@ -43,15 +43,20 @@ export function useDescriptionEditor($initialValue: string, $ckeditorInstance: s
             if (!isScriptAdded(ckeditorScript)) {
                 await injectScript(ckeditorScript);
             }
+
+            let submitButton = document.querySelector("button.submit[data-submit-button-for=" + ckeditorInstance + "]");
+
+            if (submitButton === null) {
+                console.error("Could not find submit button for CKEditor '" + ckeditorInstance + "' field.");
+            }
+
             document.getElementById(ckeditorInstance).addEventListener("EDITOR__CREATED", onEditorCreated);
             document.dispatchEvent(
                 new CustomEvent("EDITOR__CREATE", {
                     detail: {
                         targetElements: [`#${ckeditorInstance}`],
                         toolbar: "simple",
-                        maxCharCountSubmitButtons: [
-                            document.querySelector("button.submit[id=submit-button-for-" + ckeditorInstance + "]"),
-                        ],
+                        maxCharCountSubmitButtons: [submitButton],
                     },
                 })
             );

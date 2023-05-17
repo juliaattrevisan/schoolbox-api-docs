@@ -121,6 +121,7 @@ const isAddDisabled = window.Vue.computed(() => {
                             <li>
                                 <button
                                     class="button icon-add submit"
+                                    :data-submit-button-for="ckeditorInstance"
                                     data-test-add-curriculum
                                     :disabled="isAddDisabled"
                                     @click.prevent="onAddSubsectionSelected"
