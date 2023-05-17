@@ -259,20 +259,8 @@ class BulkUpdater
             /* Updating a user's campus
              */
             $statements['campus']['delete']['statement']->execute($statements['campus']['delete']['params']);
-            // Only this insert may cause SQLSTATE[40001]: Serialization failure: 1213 Deadlock found
-            // When requested asynchronously, try 3 times
-            for ($i = 0; $i < 3; $i++) {
-                try {
-                    $statements['campus']['insert']['statement']->execute();
-                    break;
-                } catch (\PDOException $e) {
-                    if ($i === 2) {
-                        // giving up
-                        throw $e;
-                    }
-                    sleep(3);
-                }
-            }
+            $statements['campus']['insert']['statement']->execute();
+            $updated = true;
 
             /* Log the users we brutally updated en-masse
              */
