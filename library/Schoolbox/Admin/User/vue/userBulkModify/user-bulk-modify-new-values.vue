@@ -106,33 +106,23 @@ export default {
         },
 
         /**
-         * Retrieve all the fetches to be made
-         *
-         * @returns { Array } - array of fetches
-         */
-        getFetches() {
-            const fetchList = [];
-            const repeat = Math.ceil(this.selectedRows.length / MAX_LENGTH);
-            for (let i = 0; i < repeat; i += 1) {
-                fetchList.push(
-                    fetch(this.srcUserModify, {
-                        method: "POST",
-                        body: this.getUpdateUsersFormData(),
-                    })
-                );
-            }
-            return fetchList;
-        },
-
-        /**
          * Update the selected users
          */
         async onUpdateUsersSelected() {
             try {
                 this.onCloseSelected();
                 this.isProcessing = true;
-                const responses = await Promise.all(this.getFetches());
-                await this.checkUpdateResponse(responses);
+                let response, responses = [], responsesOk = true;
+                const repeat = Math.ceil(this.selectedRows.length / MAX_LENGTH);
+                for (let i = 0; i < repeat; i += 1) {
+                    response = await fetch(this.srcUserModify, {
+                        method: "POST",
+                        body: this.getUpdateUsersFormData(),
+                    });
+                    responsesOk = responsesOk && response.ok;
+                    responses.push(await response.json());
+                }
+                this.checkUpdateResponse(responses, responsesOk);
             } catch (error) {
                 console.warn(error);
                 this.isProcessing = false;
@@ -169,28 +159,20 @@ export default {
         /**
          * Check for any issues in the returned update
          *
-         * @param { Object }
+         * @param responses
+         * @param responsesOk
          */
-        async checkUpdateResponse(responses) {
-            let logData, hasDataError = false;
-            const responsesOk = responses.every((response) => response.ok); // check if all responses were successful
+        checkUpdateResponse(responses, responsesOk) {
+            let logData, hasDataError = !responsesOk;
             if (responsesOk) {
-                // successful response
-                const responseDataPromises = responses.map((response) => response.json());
-                // wait for all responses anyway
-                const responseData = await Promise.all(responseDataPromises);
-                logData = responseData.join(""); // join the responses together;
-                this.$emit("log", {logData, hasDataError});
+                logData = responses.join(""); // join the responses together;
             } else {
-                hasDataError = true;
+                let errors = responses.map((response) => response['title'] ?? "");
                 logData = [
-                    "Sorry, an unknown error has occurred. Please contact your IT support if the problem persists.",
+                    errors.join("\n"),
                 ];
-                this.$emit("log", {logData, hasDataError});
-                const responseDataPromises = responses.map((response) => response.json());
-                // wait for all responses anyway, so that we can check detail of the failure
-                await Promise.all(responseDataPromises);
             }
+            this.$emit("log", {logData, hasDataError});
         },
 
         /**

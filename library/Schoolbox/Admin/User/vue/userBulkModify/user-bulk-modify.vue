@@ -334,40 +334,31 @@ export default {
         },
 
         /**
-         * Retrieve all the fetches to be made
-         *
-         * @returns { Array } - array of fetches
-         */
-        getFetches() {
-            const usersToModifyIDList = this.selectedRows.map((row) => row.id);
-            const formData = new FormData();
-            usersToModifyIDList.forEach((item) => {
-                formData.append("users[]", item);
-            });
-            const fetchList = [];
-            const repeat = Math.ceil(usersToModifyIDList.length / MAX_LENGTH);
-            for (let i = 0; i < repeat; i += 1) {
-                fetchList.push(
-                    fetch(this.srcUserDelete, {
-                        headers: {
-                            Accept: "application/json",
-                        },
-                        method: "POST",
-                        body: formData,
-                    })
-                );
-            }
-            return fetchList;
-        },
-
-        /**
          * Delete the selected users
          */
         async onConfirmDeleteUsersSelected() {
             try {
                 this.isProcessing = true;
-                const responses = await Promise.all(this.getFetches());
-                await this.checkDeleteResponse(responses);
+                const usersToModifyIDList = this.selectedRows.map((row) => row.id);
+                const formData = new FormData();
+                usersToModifyIDList.forEach((item) => {
+                    formData.append("users[]", item);
+                });
+                let response, responses = [], responsesOk = true;
+                const repeat = Math.ceil(usersToModifyIDList.length / MAX_LENGTH);
+                for (let i = 0; i < repeat; i += 1) {
+                      response = await fetch(this.srcUserDelete, {
+                            headers: {
+                                Accept: "application/json",
+                            },
+                            method: "POST",
+                            body: formData,
+                        });
+                    responsesOk = responsesOk && response.ok;
+                    responses.push(await response.json());
+                }
+
+                this.checkDeleteResponse(responses, responsesOk);
                 this.$refs.deleteModal.close();
             } catch (error) {
                 console.warn(error);
@@ -401,31 +392,23 @@ export default {
         /**
          * Check for any issues in the returned update
          *
-         * @param { Object }
+         * @param responses
+         * @param responsesOk
          */
-        async checkDeleteResponse(responses) {
-            // check if all responses were successful
-            const responsesOk = responses.every((response) => response.ok);
-            const responseDataPromises = responses.map((response) => response.json());
-            // Get all response data anyway
-            const responseData = await Promise.all(responseDataPromises);
-            this.logData = responseData.join(""); // join the responses together;
+        checkDeleteResponse(responses, responsesOk) {
             if (responsesOk) {
                 //successful response
+                this.logData = responses.join("");
                 this.hasDataError = false;
                 this.rows = this.getUpdatedRowsAfterUserDeletion();
                 this.clearRows();
                 this.$refs.table.resetSelectedRows();
             } else {
                 this.hasDataError = true;
+                let errors = responses.map((response) => response['title'] ?? "");
                 this.logData = [
-                    "Sorry, an unknown error has occurred. Please contact your IT support if the problem persists.",
+                    errors.join("\n"),
                 ];
-                const firstRelevantResponse = responses.find((response) => response.status !== 200);
-                const responseData = await firstRelevantResponse.json();
-                if (responseData.title !== undefined) {
-                    this.logData = [responseData.title];
-                }
             }
         },
 
