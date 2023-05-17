@@ -160,7 +160,7 @@ if ($size === ResourceVideo::POSTER_LETTERBOX) {
     // This is for the situation where a poster_letterbox is requested for a video for which no poster_letterbox was
     // generated.  When poster_letterbox was introduced, we decided not to generate poster_letterbox images for all
     // already uploaded videos.  Therefore, videos will exist that do not have poster_letterbox images.
-    $prefixGenerator->redirectTemporary("/../cms/videoThumb.php?size=poster&id=$id&type=$type");
+    $prefixGenerator->redirectPermanent("/../cms/videoThumb.php?size=poster&id=$id&type=$type");
     die;
 }
 
