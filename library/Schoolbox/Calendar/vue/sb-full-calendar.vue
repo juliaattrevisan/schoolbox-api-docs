@@ -190,6 +190,7 @@ export default {
             ],
             eventDidMount: this.eventRender,
             viewDidMount: this.viewDidMount,
+            defaultTimedEventDuration: "00:01:00",
             loading: this.fullCalendarHelper_onLoading,
             dateClick: this.onDateClick,
             eventClick: this.onEventClick,
