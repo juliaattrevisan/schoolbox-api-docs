@@ -141,12 +141,6 @@ $app = new class extends CliTool\App
                 foreach ($rows as $row) {
                     // Check if the value is empty
                     if (empty($row[$field])) {
-                        $this->getLogger()->debug(sprintf(
-                            '  Skipped %s.%s identifier %s because it is empty',
-                            $table,
-                            $field,
-                            $row[$tableConfig['primary_key']]
-                        ));
                         continue;
                     }
 
