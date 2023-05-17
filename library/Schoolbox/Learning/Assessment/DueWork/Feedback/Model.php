@@ -55,6 +55,17 @@ class Model extends AbstractFeedback implements ISelfAssessableFeedback
 
 
     /**
+     * The id of the feedback's publisher, which isn't necessarily
+     * the same person as the $reviewer. Currently this is an id,
+     * but the naming allows you to hydrate it one day without
+     * needing to change heaps of usages
+     *
+     * @var null|int
+     */
+    private ?int $publishedBy = null;
+
+
+    /**
      * Model constructor.
      */
     public function __construct()
@@ -136,6 +147,7 @@ class Model extends AbstractFeedback implements ISelfAssessableFeedback
         return $this->allFiles;
     }
 
+
     /**
      * @param Collection|ReturnedWork\SingleFile\Model[] $allFiles
      * @return self
@@ -165,7 +177,6 @@ class Model extends AbstractFeedback implements ISelfAssessableFeedback
         $this->resubmissionRequired = $resubmissionRequired;
         return $this;
     }
-
 
 
     /**
@@ -204,6 +215,26 @@ class Model extends AbstractFeedback implements ISelfAssessableFeedback
     public function setRubricMarkedGrid(MarkedGrid $rubricMarkedGrid): self
     {
         $this->rubricMarkedGrid = $rubricMarkedGrid;
+        return $this;
+    }
+
+
+    /**
+     * @return null|int
+     */
+    public function getPublishedBy(): ?int
+    {
+        return $this->publishedBy;
+    }
+
+
+    /**
+     * @param null|int $publishedBy
+     * @return $this
+     */
+    public function setPublishedBy(?int $publishedBy): self
+    {
+        $this->publishedBy = $publishedBy;
         return $this;
     }
 
