@@ -76,6 +76,14 @@ function onCancelSelected() {
  * @returns { Boolean }
  */
 const isAddDisabled = window.Vue.computed(() => {
+    let addButton = document.querySelector("button.submit[data-submit-button-for=" + ckeditorInstance.value + "]");
+
+    // If the button text contains 'disabled', then the button must remain disabled.
+    // The 'disabled' text is added by wordCountSettings.ts in response to the content storage limit being exceeded.
+    if (addButton !== null && addButton.innerHTML.includes("disabled")) {
+        return true;
+    }
+
     if (typeof addCurriculumStore.curriculum.name === "string") {
         return addCurriculumStore.curriculum?.name.trim().length === 0 || addCurriculumStore.isProcessing;
     }

@@ -92,6 +92,14 @@ function onCancelSelected() {
  * @returns { boolean }
  */
 const isUpdateDisabled = window.Vue.computed(() => {
+    let updateButton = document.querySelector("button.submit[data-submit-button-for=" + ckeditorInstance.value + "]");
+
+    // If the button text contains 'disabled', then the button must remain disabled.
+    // The 'disabled' text is added by wordCountSettings.ts in response to the content storage limit being exceeded.
+    if (updateButton !== null && updateButton.innerHTML.includes("disabled")) {
+        return true;
+    }
+
     return updateNodeStore.activeNodeCopy.name.trim().length === 0 || updateNodeStore.isProcessing;
 });
 </script>
@@ -133,6 +141,7 @@ const isUpdateDisabled = window.Vue.computed(() => {
                         <li>
                             <button
                                 class="button icon-modify submit"
+                                :data-submit-button-for="ckeditorInstance"
                                 :disabled="isUpdateDisabled"
                                 data-test-update-node
                                 @click.prevent="onUpdateSelected"
