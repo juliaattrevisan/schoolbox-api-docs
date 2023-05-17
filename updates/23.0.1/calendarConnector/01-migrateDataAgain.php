@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This script is a copy of updates/23.0.alpha1/calendarConnector/02-migrateData.php (the fixed version - fixed in SA-15683).
  * This script needs to be run again in 23.0.1 because some schools have already been upgraded beyond 23.0.alpha1 (and
