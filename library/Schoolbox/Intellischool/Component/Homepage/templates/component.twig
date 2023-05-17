@@ -16,14 +16,25 @@
     </iframe>
     <script type="text/javascript">
         window.addEventListener("message", event => {
-            // Check that the event is from a trusted source
-            if (![
-                "https://analytics.intellischool.cloud",
-                "https://analytics.intellischool.xyz",
-                "https://analytics.intellischool.dev"
-            ].includes(event.origin)
-            )
-                return;
+            let url = event.origin.toString();
+
+            /* Test new domains
+             */
+            let allowed = url.match(/^https:\/\/(.*)intellischool\.app$/) != null;
+
+            /* If that's not allowed, test the old domains
+             * (These old domains will eventually be phased out at some point)
+             */
+            if (!allowed) {
+                if (![
+                    "https://analytics.intellischool.cloud",
+                    "https://analytics.intellischool.xyz",
+                    "https://analytics.intellischool.dev"
+                ].includes(url)) {
+                    return;
+                }
+            }
+
             // Act on the event
             if (event.data && event.data.intellischool && typeof(event.data.intellischool) === "object")  {
                 switch (event.data.intellischool.action)

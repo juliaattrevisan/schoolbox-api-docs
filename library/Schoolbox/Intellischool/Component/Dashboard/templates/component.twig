@@ -12,7 +12,7 @@
 
                     /* Test new domains
                      */
-                    let allowed = url.match(/https:\/\/(.*)intellischool\.app/) != null;
+                    let allowed = url.match(/^https:\/\/(.*)intellischool\.app$/) != null;
 
                     /* If that's not allowed, test the old domains
                      * (These old domains will eventually be phased out at some point)
