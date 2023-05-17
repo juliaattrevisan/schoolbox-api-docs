@@ -36,6 +36,9 @@ Fix groupIds and campusIds JSON data in schoolbox.calendar_connector.config.
 This script will update schoolbox.calendar_connector.config so that JSON keys previously named 'campus' will be renamed
 to 'campusIds', and keys previously named 'groups' will be renamed to 'groupIds'.
 
+The 'campus' and 'groups' keys were incorrectly created by updates/23.0.alpha1/calendarConnector/02-migrateData.php
+(SA-14746).
+
 Usage: php replace_serialized_calendar_config_with_json.php
 
 HELP;
