@@ -60,7 +60,7 @@ $masonry-drop-background: $input-focus-bg-color;
 
 // Padding when dropping a component onto the page before it is ajaxed in
 #component-layout {
-    .pending {
+    .pending[data-component-palette] {
         margin-bottom: 2rem;
     }
     .column-right {
