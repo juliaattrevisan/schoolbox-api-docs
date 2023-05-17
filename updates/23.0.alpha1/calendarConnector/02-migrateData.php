@@ -133,8 +133,8 @@ function convertConfigObjectToJson(Calendar_Api_Config_Connector_Abstract $confi
         case Calendar_Api_Config_Connector_Vcal::class:
             $configArray['url']           = $config->getUrl();
             $configArray['authorization'] = $config->getAuthorization();
-            $configArray['campus']        = $config->getCampusIds();
-            $configArray['groups']        = $config->getGroupIds();
+            $configArray['campusIds']     = $config->getCampusIds();
+            $configArray['groupIds']      = $config->getGroupIds();
             break;
 
         default:
