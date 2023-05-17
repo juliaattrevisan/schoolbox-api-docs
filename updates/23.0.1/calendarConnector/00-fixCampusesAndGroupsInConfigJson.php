@@ -51,39 +51,48 @@ HELP;
         $rows = $dbc->executeQuery('SELECT id, config FROM calendar_connector')->fetchAll();
         echo 'done.  Found ' . count($rows) . " rows.\n\n";
 
-        echo "For each row in calendar_connector, updating `config` JSON data.\n";
+        echo "For each row in calendar_connector, updating `config` JSON data if required.\n";
         echo "(changing 'campus' to 'campusIds', and 'groups' to 'groupIds')\n";
+        $nRowsUpdated = 0;
         foreach ($rows as $row) {
             $configOldJson = $row['config'];
             $configOld = json_decode($configOldJson, true, 512, JSON_THROW_ON_ERROR);
             $configNew = [];
 
+            $updateRequired = false;
+
             foreach ($configOld as $key => $value) {
                 if ($key === 'groups') {
                     $key = 'groupIds';
+                    $updateRequired = true;
                 }
 
                 if ($key === 'campus') {
                     $key = 'campusIds';
+                    $updateRequired = true;
                 }
 
                 $configNew[$key] = $value;
             }
 
-            $configNewJson = json_encode($configNew, JSON_THROW_ON_ERROR);
+            if ($updateRequired) {
+                $configNewJson = json_encode($configNew, JSON_THROW_ON_ERROR);
 
-            printf(" * id: %3s, strlen(configOld): %4d, strlen(configNew): %4d\n", $row['id'], strlen($configOldJson), strlen($configNewJson));
+                printf(" * id: %3s, strlen(configOld): %4d, strlen(configNew): %4d\n", $row['id'], strlen($configOldJson), strlen($configNewJson));
 
-            $query = (
-                "UPDATE calendar_connector
-                 SET config=:configNewJson
-                 WHERE id=:id"
-            );
-            $statement = $dbc->prepareQuery($query, ['id' => $row['id'], 'configNewJson' => $configNewJson]);
-            $statement->execute();
+                $query = (
+                    "UPDATE calendar_connector
+                     SET config=:configNewJson
+                     WHERE id=:id"
+                );
+                $statement = $dbc->prepareQuery($query, ['id' => $row['id'], 'configNewJson' => $configNewJson]);
+                $statement->execute();
+
+                ++$nRowsUpdated;
+            }
         }
 
-        echo "\nDone.  " . count($rows) . " rows updated.\n";
+        echo "\nDone.  $nRowsUpdated row(s) updated.\n";
     }
 
     /**
