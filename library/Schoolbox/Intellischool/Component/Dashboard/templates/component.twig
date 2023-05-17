@@ -8,6 +8,40 @@
             </iframe>
             <script type="text/javascript">
                 window.addEventListener("message", event => {
+                    console.log(event);
+                    let urls = [
+                        'https://myschool.intellischool.app',
+                        'https://my-school.intellischool.app',
+                        'https://myschool33.intellischool.app',
+                        'https://56-my.school.intellischool.app',
+                        'https://analytics.intellischool.app',
+                        'https://intellischool.app',
+                        'https://schoolbox',
+                        'bongo',
+                    ];
+
+                    for (let i = 0; i < urls.length; i++) {
+                        let url = urls[i];
+
+                        /* Test new domains
+                         */
+                        let allowed = url.match(/https:\/\/(.*)intellischool\.app/) != null;
+                        console.log(url, allowed);
+
+                        (index):906 https://myschool.intellischool.app true
+                        17:17:44.799 (index):906 https://my-school.intellischool.app true
+                        17:17:44.799 (index):906 https://myschool33.intellischool.app true
+                        17:17:44.799 (index):906 https://56-my.school.intellischool.app true
+                        17:17:44.799 (index):906 https://analytics.intellischool.app true
+                        17:17:44.799 (index):906 https://intellischool.app true
+                        17:17:44.799 (index):906 bongo false
+                        17:17:44.799 (index):906 https://schoolbox false
+
+                        /* If that's not allowed, test the old domains
+                         * These old domains will eventually go away at some point
+                         */
+                    }
+
                     // Check that the event is from a trusted source
                     if (![
                         "https://analytics.intellischool.cloud",
@@ -39,3 +73,4 @@
         </div>
     </div>
 </div>
+
