@@ -5,6 +5,11 @@
  */
 
 import RevealModal from "@schoolboxVue/components/reveal-modal";
+/**
+ * the maximum number of users to process at once
+ * we still need to keep this high enough, so that it doesn't lock database
+ */
+const MAX_LENGTH = 5000;
 
 export default {
     components: {
@@ -68,6 +73,7 @@ export default {
             updateFieldsOriginal: {}, //to reset to original values once an update is complete
             isProcessing: false,
             hasUpdated: false,
+            processed: 0,
         };
     },
 
@@ -104,13 +110,19 @@ export default {
          */
         async onUpdateUsersSelected() {
             try {
+                this.onCloseSelected();
                 this.isProcessing = true;
-                const response = await fetch(this.srcUserModify, {
-                    method: "POST",
-                    body: this.getUpdateUsersFormData(),
-                });
-                const responseData = await response.json();
-                this.checkUpdateResponse(response, responseData);
+                let response, responses = [], responsesOk = true;
+                const repeat = Math.ceil(this.selectedRows.length / MAX_LENGTH);
+                for (let i = 0; i < repeat; i += 1) {
+                    response = await fetch(this.srcUserModify, {
+                        method: "POST",
+                        body: this.getUpdateUsersFormData(),
+                    });
+                    responsesOk = responsesOk && response.ok;
+                    responses.push(await response.json());
+                }
+                this.checkUpdateResponse(responses, responsesOk);
             } catch (error) {
                 console.warn(error);
                 this.isProcessing = false;
@@ -118,6 +130,7 @@ export default {
                 this.hasUpdated = true;
                 this.isProcessing = false;
                 this.updateFields = Object.assign({}, this.updateFieldsOriginal); //reset to original values
+                this.processed = 0; // reset the processed count
                 this.$emit("updated");
             }
         },
@@ -128,7 +141,11 @@ export default {
          * @returns { FormData }
          */
         getUpdateUsersFormData() {
-            const usersToModifyIDList = this.selectedRows.map((row) => row.id);
+            // limit each fetch to MAX_LENGTH users
+            const usersToModifyIDList = this.selectedRows
+                .map((row) => row.id)
+                .slice(this.processed, this.processed + MAX_LENGTH);
+            this.processed += MAX_LENGTH;
             const formData = new FormData();
             usersToModifyIDList.forEach((item) => {
                 formData.append("users[]", item);
@@ -142,29 +159,20 @@ export default {
         /**
          * Check for any issues in the returned update
          *
-         * @param { Object }
-         * @param { Object }
+         * @param responses
+         * @param responsesOk
          */
-        checkUpdateResponse(response, responseData) {
-            let logData,
-                hasDataError = false;
-            if (response.ok) {
-                //successful response
-                hasDataError = false;
-                logData = responseData;
-            } else if (!response.ok && response.status === 501) {
-                //otherwise check for 501 error
-                hasDataError = true;
-                logData = [responseData.title]; //which comes in with an error message
+        checkUpdateResponse(responses, responsesOk) {
+            let logData, hasDataError = !responsesOk;
+            if (responsesOk) {
+                logData = responses.join(""); // join the responses together;
             } else {
-                hasDataError = true;
+                let errors = responses.map((response) => response['title'] ?? "");
                 logData = [
-                    "Sorry, an unknown error has occurred. Please contact your IT support if the problem persists.",
+                    errors.join("\n"),
                 ];
             }
-            //close this modal before opening the log modal...
-            this.onCloseSelected();
-            this.$emit("log", { logData, hasDataError });
+            this.$emit("log", {logData, hasDataError});
         },
 
         /**

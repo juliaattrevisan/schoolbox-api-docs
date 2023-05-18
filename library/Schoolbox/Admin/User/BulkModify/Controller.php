@@ -159,7 +159,7 @@ class Controller extends Base
         $this->extendExecutionTime();
 
         $message = "{$this->getUser()->getFullname()} ({$this->getUser()->getId()}) started a user bulk modify";
-        $this->userBulkMapper->log($message);
+        $this->userBulkMapper->log($message, false);
 
         try {
             $modified = (new BulkUpdater(
@@ -214,7 +214,7 @@ class Controller extends Base
 
         $this->extendExecutionTime();
         $message = "{$this->getUser()->getFullname()} ({$this->getUser()->getId()}) started a user bulk delete";
-        $this->userBulkMapper->log($message);
+        $this->userBulkMapper->log($message, false);
 
 
         $userCollection = $this->userBulkMapper->findByColumn('id', $userIds);

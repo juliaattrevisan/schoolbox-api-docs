@@ -171,7 +171,7 @@ class UserBulkMapper extends UserMapper
     {
         $result = $this->delete($userCollection);
         foreach ($userCollection as $user) {
-            $this->log("{$this->getSessionUser()->getFullName()} ({$this->getSessionUser()->getId()}) deleted user {$user->getFullName()} ({$user->getId()})");
+            $this->log("{$this->getSessionUser()->getFullName()} ({$this->getSessionUser()->getId()}) deleted user {$user->getFullName()} ({$user->getId()})", true);
         }
         return $result;
     }
@@ -181,11 +181,14 @@ class UserBulkMapper extends UserMapper
      * Log to file
      *
      * @param string $message
+     * @param bool   $output
      */
-    public function log($message)
+    public function log(string $message, bool $output)
     {
         $this->logger->info($message);
-        $this->outputMessage .= $message . "\n";
+        if ($output) {
+            $this->outputMessage .= $message . "\n";
+        }
     }
 
     /* Getters/Setters

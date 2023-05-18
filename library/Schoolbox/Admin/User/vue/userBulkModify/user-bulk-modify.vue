@@ -11,6 +11,12 @@ import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer";
 import footerUI from "@schoolboxVue/components/vueTables2/mixinFooterUI";
 import RevealModal from "@schoolboxVue/components/reveal-modal";
 
+/**
+ * the maximum number of users to process at once
+ * we still need to keep this high enough, so that it doesn't lock database
+ */
+const MAX_LENGTH = 5000;
+
 export default {
     components: {
         UserBulkModifyFilters,
@@ -331,22 +337,28 @@ export default {
          * Delete the selected users
          */
         async onConfirmDeleteUsersSelected() {
-            const usersToModifyIDList = this.selectedRows.map((row) => row.id);
-            const formData = new FormData();
-            usersToModifyIDList.forEach((item) => {
-                formData.append("users[]", item);
-            });
             try {
                 this.isProcessing = true;
-                const response = await fetch(this.srcUserDelete, {
-                    headers: {
-                        Accept: "application/json",
-                    },
-                    method: "POST",
-                    body: formData,
+                const usersToModifyIDList = this.selectedRows.map((row) => row.id);
+                const formData = new FormData();
+                usersToModifyIDList.forEach((item) => {
+                    formData.append("users[]", item);
                 });
-                const responseData = await response.json();
-                this.checkUpdateResponse(response, responseData);
+                let response, responses = [], responsesOk = true;
+                const repeat = Math.ceil(usersToModifyIDList.length / MAX_LENGTH);
+                for (let i = 0; i < repeat; i += 1) {
+                      response = await fetch(this.srcUserDelete, {
+                            headers: {
+                                Accept: "application/json",
+                            },
+                            method: "POST",
+                            body: formData,
+                        });
+                    responsesOk = responsesOk && response.ok;
+                    responses.push(await response.json());
+                }
+
+                this.checkDeleteResponse(responses, responsesOk);
                 this.$refs.deleteModal.close();
             } catch (error) {
                 console.warn(error);
@@ -380,29 +392,23 @@ export default {
         /**
          * Check for any issues in the returned update
          *
-         * @param { Object }
-         * @param { Object }
+         * @param responses
+         * @param responsesOk
          */
-        checkUpdateResponse(response, responseData) {
-            if (response.ok) {
+        checkDeleteResponse(responses, responsesOk) {
+            if (responsesOk) {
                 //successful response
+                this.logData = responses.join("");
                 this.hasDataError = false;
-                this.logData = responseData;
                 this.rows = this.getUpdatedRowsAfterUserDeletion();
                 this.clearRows();
                 this.$refs.table.resetSelectedRows();
-            } else if (!response.ok && response.status === 501) {
-                //otherwise check for 501 error
-                this.hasDataError = true;
-                this.logData = [responseData.title]; //which comes in with an error message
             } else {
                 this.hasDataError = true;
+                let errors = responses.map((response) => response['title'] ?? "");
                 this.logData = [
-                    "Sorry, an unknown error has occurred. Please contact your IT support if the problem persists.",
+                    errors.join("\n"),
                 ];
-                if (responseData.title !== undefined) {
-                    this.logData = [responseData.title];
-                }
             }
         },
 
