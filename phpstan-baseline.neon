@@ -4871,11 +4871,6 @@ parameters:
 			path: library/Schoolbox/Learning/Course/DataModel/Specification/Unit/Model.php
 
 		-
-			message: "#^Ternary operator condition is always true\\.$#"
-			count: 2
-			path: library/Schoolbox/Learning/Grades/AssessmentComparator.php
-
-		-
 			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/InlineGrader/Kami/Connector.php
