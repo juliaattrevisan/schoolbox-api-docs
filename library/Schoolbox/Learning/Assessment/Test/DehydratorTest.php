@@ -17,6 +17,7 @@ use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 
 /**
@@ -687,6 +688,7 @@ class DehydratorTest extends TestCase
     private function getTestAssessment(): DueWork
     {
         $dueWork = (new DueWork())
+            ->setContext((new Folder())->setId(1))
             ->setId(1)
             ->setAcceptsMultiple()
             ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_NONE)
