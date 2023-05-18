@@ -14,16 +14,13 @@
     </form>
     <iframe style="min-height:200px;overflow: hidden;" name="intellischoolIframe" id="intellischoolIframe">
     </iframe>
+    <script src="{{ CDN_PREFIX }}/js/bundle/intellischools.js" type="text/javascript"></script>
     <script type="text/javascript">
         window.addEventListener("message", event => {
-            // Check that the event is from a trusted source
-            if (![
-                "https://analytics.intellischool.cloud",
-                "https://analytics.intellischool.xyz",
-                "https://analytics.intellischool.dev"
-            ].includes(event.origin)
-            )
+            if (!schoolboxIntellischools.isAllowed(event.origin.toString())) {
                 return;
+            }
+
             // Act on the event
             if (event.data && event.data.intellischool && typeof(event.data.intellischool) === "object")  {
                 switch (event.data.intellischool.action)
