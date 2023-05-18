@@ -125,10 +125,12 @@ class Dehydrator
         foreach ($assessment->getPlans() as $plan) {
             $dehydratedPlan = $this->internalDehydratePlan($plan);
             $dehydrated['plan'][$plan->getId()] = $dehydratedPlan;
-            foreach ($plan->getParticipants() as $participant) {
-                $dehydratedParticipant         = $this->internalDehydrateParticipant($participant);
-                $dehydratedParticipant['user'] = $this->internalDehydrateUser($participant->getUser());
-                $dehydrated['participants'][$participant->getUser()->getId()] = $dehydratedParticipant;
+            if ($assessment->isImplementation()) {
+                foreach ($plan->getParticipants() as $participant) {
+                    $dehydratedParticipant         = $this->internalDehydrateParticipant($participant);
+                    $dehydratedParticipant['user'] = $this->internalDehydrateUser($participant->getUser());
+                    $dehydrated['participants'][$participant->getUser()->getId()] = $dehydratedParticipant;
+                }
             }
         }
         return $dehydrated;

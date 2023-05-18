@@ -9,7 +9,9 @@
     {% include '@learning/fragments/meta/curriculumCodes.twig' %}
     <li class="icon-time-value" title="Allowed Time">Allowed time:
         <time>
-            {% if assessment.durationUnlimited %}
+            {% if assessment.isSpecification %}
+                You cannot attempt course assessments
+            {% elseif assessment.durationUnlimited %}
                 Unlimited
             {% else %}
                 {{ duration.secondsToHoursAndMinutes(assessment.duration) }}
