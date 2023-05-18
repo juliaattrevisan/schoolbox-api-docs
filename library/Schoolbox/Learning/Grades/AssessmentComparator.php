@@ -19,9 +19,8 @@ use UnexpectedValueException;
  */
 class AssessmentComparator extends SortForMarkbook
 {
-
     /** @var User */
-    private $student;
+    private User $student;
 
 
     /**
@@ -46,9 +45,6 @@ class AssessmentComparator extends SortForMarkbook
         $leftParticipant  = $left->getParticipant($this->student);
         $rightParticipant = $right->getParticipant($this->student);
 
-        $leftDate  = $leftParticipant ? $leftParticipant->getDueDate() : $left->getDueAt();
-        $rightDate = $rightParticipant ? $rightParticipant->getDueDate() : $right->getDueAt();
-
-        return $leftDate->compare($rightDate);
+        return $leftParticipant->getDueDate()->compare($rightParticipant->getDueDate());
     }
 }
