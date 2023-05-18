@@ -46,13 +46,14 @@ HELP;
         }
 
         $dbc = $this->getDatabaseInternal();
+        $logger = $this->getLogger();
 
-        echo 'Getting calendar_connector Vcal rows...';
+        $logger->info('Getting calendar_connector Vcal rows...');
         $rows = $dbc->executeQuery('SELECT id, config FROM calendar_connector WHERE connector_class="Vcal"')->fetchAll();
-        echo 'done.  Found ' . count($rows) . " rows.\n\n";
+        $logger->info('done.  Found ' . count($rows) . " rows.\n\n");
 
-        echo "For each row in calendar_connector, updating `config` JSON data if required.\n";
-        echo "(changing 'campus' to 'campusIds', and 'groups' to 'groupIds')\n";
+        $logger->info("For each row in calendar_connector, updating `config` JSON data if required.\n");
+        $logger->info("(changing 'campus' to 'campusIds', and 'groups' to 'groupIds')\n");
         $nRowsUpdated = 0;
         foreach ($rows as $row) {
             $configOldJson = $row['config'];
@@ -78,7 +79,12 @@ HELP;
             if ($updateRequired) {
                 $configNewJson = json_encode($configNew, JSON_THROW_ON_ERROR);
 
-                printf(" * id: %3s, strlen(configOld): %4d, strlen(configNew): %4d\n", $row['id'], strlen($configOldJson), strlen($configNewJson));
+                $this->getLogger()->info(
+                    "ID: {$row['id']}\n" .
+                    "OLD JSON: $configOldJson\n" .
+                    "NEW JSON: $configNewJson\n" .
+                    "---\n"
+                );
 
                 $query = (
                     "UPDATE calendar_connector
@@ -92,7 +98,7 @@ HELP;
             }
         }
 
-        echo "\nDone.  $nRowsUpdated row(s) updated.\n";
+        $logger->info("Done.  $nRowsUpdated row(s) updated.\n");
     }
 
     /**
@@ -104,5 +110,12 @@ HELP;
     }
 };
 
+/* OPTION_ERRORS => E_ALL causes all notices and errors to fatally crash your script
+ *
+ * You should generally try to fix those, even though in some special cases php will throw notices
+ * for its own expected behaviours which will inadvertently cause this to fail
+ */
+$options = [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
+
 /** @noinspection PhpUnhandledExceptionInspection */
-(new Schoolbox\Application\CliTool\Kernel($app))->runApp();
+(new Schoolbox\Application\CliTool\Kernel($app, $options))->runApp();
