@@ -47,8 +47,8 @@ HELP;
 
         $dbc = $this->getDatabaseInternal();
 
-        echo 'Getting calendar_connector rows...';
-        $rows = $dbc->executeQuery('SELECT id, config FROM calendar_connector')->fetchAll();
+        echo 'Getting calendar_connector Vcal rows...';
+        $rows = $dbc->executeQuery('SELECT id, config FROM calendar_connector WHERE connector_class="Vcal"')->fetchAll();
         echo 'done.  Found ' . count($rows) . " rows.\n\n";
 
         echo "For each row in calendar_connector, updating `config` JSON data if required.\n";
