@@ -24,6 +24,33 @@ function getSkinColours() {
 }
 
 /**
+ * Default swatches for font, font background, and table color pickers
+ */
+export const defaultSwatches = [
+    ...window.sbProps.colourDefaults.swatches.map((swatch: string) => {
+        return {
+            color: swatch,
+            label: swatch,
+            hasBorder: true
+        }
+    }),
+    ...[
+        {
+            color: 'hsl(0, 0%, 30%)',
+            label: 'hsl(0, 0%, 30%)'
+        },
+        {
+            color: 'hsl(0, 0%, 60%)',
+            label: 'hsl(0, 0%, 60%)'
+        },
+        {
+            color: 'hsl(0, 0%, 90%)',
+            label: 'hsl(0, 0%, 90%)'
+        },
+    ]
+];
+
+/**
  * Return the default colors
  *
  * @returns { Array } - refer to https://ckeditor.com/docs/ckeditor5/latest/features/font.html#specifying-available-colors

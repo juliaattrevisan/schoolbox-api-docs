@@ -1,26 +1,4 @@
-const defaultSwatches = [
-    ...window.sbProps.colourDefaults.swatches.map((swatch: string) => {
-        return {
-            color: swatch,
-            label: swatch,
-            hasBorder: true
-        }
-    }),
-    ...[
-        {
-            color: 'hsl(0, 0%, 30%)',
-            label: 'hsl(0, 0%, 30%)'
-        },
-        {
-            color: 'hsl(0, 0%, 60%)',
-            label: 'hsl(0, 0%, 60%)'
-        },
-        {
-            color: 'hsl(0, 0%, 90%)',
-            label: 'hsl(0, 0%, 90%)'
-        },
-    ]
-];
+import { defaultSwatches } from "./colourSettings";
 
 /**
  * Returns the settings for the font options
