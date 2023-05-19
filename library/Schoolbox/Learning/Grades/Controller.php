@@ -325,9 +325,13 @@ class Controller extends Base
         // * all staff (always)
         // * students (if the config var is on, and their personal grade average setting is on)
         // We no longer show the grade graph at all if there's no comparative grades.
-        $canSeeGraph           =
+        $hasPermissionsAndSettings =
             ($this->getUser()->getRole()->isStaff() || $this->access->isInstructor($this->getUser(), $subject))
             || ($viewee->getDisplayGradeGraph() && $this->isTabEnabled('graph', $subject));
+
+        $hasDataToShow = false;
+
+
         $canSeeRubricGrade     = $this->isTabEnabled('descriptors', $subject);
         $canSeeCapabilityGrade = $this->isTabEnabled('capabilities', $subject);
         $canSeeProgression     = $this->isTabEnabled('progression', $subject);
@@ -336,7 +340,7 @@ class Controller extends Base
 
         // Need to load other participants if we can see graph to get assessment mark statistics
         $assessments = $this
-            ->findByFiltersWithParticipants($filters, $viewee, $canSeeGraph)
+            ->findByFiltersWithParticipants($filters, $viewee, $hasPermissionsAndSettings)
             ->filter(function (IAssessable $a) use ($visibility) {
                 $viewer = $this->getUser();
                 if ($visibility->isVisibleToUser($a, $viewer, true)) {
@@ -371,7 +375,7 @@ class Controller extends Base
         $graph = [];
         $isCohort = false;
 
-        if ($canSeeGraph) {
+        if ($hasPermissionsAndSettings) {
             if ((new ValidUseCohortMarks())->isSatisfiedBy($this->getConfigLoader()->get('lms_cohort_comparison'), $subject)) {
                 $isCohort = true;
                 $graph = (new ClassResults(
@@ -390,7 +394,39 @@ class Controller extends Base
                 );
                 $graph = $gradeHelper->buildGraph($filteredMarkbook, $viewee, $this->getUser(), $this->getConfigLoader()->get('grade_gradient_enable'));
             }
+
+            // return [
+            //     'info'        => json_encode($graphInfo),
+            //     'assessments' => json_encode($graphAssessments),
+            //     'data'        => json_encode($graphData),
+            //     'scatter'     => json_encode($graphScatter),
+            // ];
+
+            //if $graph has nothing to render
+            //skip rendering the ui
+
+            /* Check if the student has any results/grades and if not, don't show the tab / graph */
+            /* If a student didn't have any meaningful results, don't render the graph
+             * Having a set of data points being all null means you didn't get any results for your assessments
+             * That's why we array_filter first
+             */
+            $decodedResults = json_decode($graph['scatter']);
+            $hasDataToShow = false;
+
+            if (null !== $decodedResults) {
+                $hasDataToShow = count(array_filter($decodedResults, function ($item){
+                    return $item !== null;
+                })) > 0;
+            }
         }
+
+        /* The Cohort Results graph is visible when two conditions are met:
+         * you have the corresponding permissions and your shit is turn on;
+         * AND that you have data to actually render
+         *
+         * You need both for the graph and tabs to actually display
+         */
+        $canSeeGraph = $hasPermissionsAndSettings && $hasDataToShow;
 
         /* Get Rubric Data for display */
         $longitudinalRubric   = [];
