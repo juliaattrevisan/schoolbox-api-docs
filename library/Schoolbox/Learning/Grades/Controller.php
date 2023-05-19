@@ -328,9 +328,7 @@ class Controller extends Base
         $hasPermissionsAndSettings =
             ($this->getUser()->getRole()->isStaff() || $this->access->isInstructor($this->getUser(), $subject))
             || ($viewee->getDisplayGradeGraph() && $this->isTabEnabled('graph', $subject));
-
         $hasDataToShow = false;
-
 
         $canSeeRubricGrade     = $this->isTabEnabled('descriptors', $subject);
         $canSeeCapabilityGrade = $this->isTabEnabled('capabilities', $subject);
@@ -414,7 +412,7 @@ class Controller extends Base
             $hasDataToShow = false;
 
             if (null !== $decodedResults) {
-                $hasDataToShow = count(array_filter($decodedResults, function ($item){
+                $hasDataToShow = count(array_filter($decodedResults, function ($item) {
                     return $item !== null;
                 })) > 0;
             }
