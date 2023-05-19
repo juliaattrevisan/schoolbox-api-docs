@@ -25,26 +25,24 @@
     --sb-ck-active: #cae3fa;
     --sb-ck-active-grey: #e8e8e8;
     --sb-ck-active-highlight: #daedff;
-    --sb-ck-disabled: #dddddd;
     --sb-ck-button-grid-border: #bbbbbb;
+    --sb-ck-disabled: #dddddd;
     --sb-ck-icon-colour: rgb(51, 51, 51);
 
     /* Overrides of default CK colours */
-    --ck-color-button-default-hover-background: var(--sb-ck-active-grey);
-    --ck-color-button-default-active-background: var(--sb-ck-active-grey);
-    --ck-color-button-on-hover-background: var(--sb-ck-active-grey);
     --ck-color-base-active: var(--sb-ck-active-grey);
     --ck-color-base-active-focus: var(--sb-ck-active-grey);
+    --ck-color-button-default-hover-background: var(--sb-ck-active-grey);
+    --ck-color-button-default-active-background: var(--sb-ck-active-grey);
     --ck-color-button-on-background: var(--sb-ck-active);
-    --ck-color-button-on-hover-background: var(--sb-ck-active);
     --ck-color-button-on-color: var(--sb-ck-icon-colour);
-    --ck-color-list-button-on-background: var(--sb-ck-active-grey);
-    --ck-color-list-button-on-text: var(--sb-ck-icon-colour);
+    --ck-color-button-on-hover-background: var(--sb-ck-active);
     --ck-color-input-background: white;
     --ck-color-input-disabled-background: var(--sb-ck-disabled);
     --ck-color-list-button-hover-background: var(--sb-ck-active-grey);
+    --ck-color-list-button-on-background: var(--sb-ck-active-grey);
+    --ck-color-list-button-on-text: var(--sb-ck-icon-colour);
     --ck-color-list-button-on-background-focus: var(--sb-ck-active-grey);
-
     --ck-color-switch-button-on-background: var(--sb-ck-active);
     --ck-color-switch-button-on-hover-background: var(--sb-ck-active);
 }
@@ -305,10 +303,10 @@
 .ck-body-wrapper .ck button.ck-button-resource-link,
 .ck.ck-dropdown button.ck-button-action,
 .ck.ck-find-and-replace-form__replace > button.ck-button {
-    margin-left: var(--ck-spacing-large);
-    min-width: 4rem;
     background-color: var(--sb-ck-active);
     color: var(--sb-ck-icon-colour);
+    margin-left: var(--ck-spacing-large);
+    min-width: 4rem;
 }
 
 .ck.ck-find-and-replace-form__find > button.ck-button[aria-disabled="true"],
