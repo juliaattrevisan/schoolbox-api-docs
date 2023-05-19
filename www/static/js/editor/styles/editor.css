@@ -20,6 +20,31 @@
     --ck-input-width: 19rem;
     /* to sit above the side menus */
     --ck-z-modal: 1003;
+
+    /* The colours that are referenced in the overrides below */
+    --sb-ck-active: #cae3fa;
+    --sb-ck-active-grey: #e8e8e8;
+    --sb-ck-active-highlight: #daedff;
+    --sb-ck-button-grid-border: #bbbbbb;
+    --sb-ck-disabled: #dddddd;
+    --sb-ck-icon-colour: rgb(51, 51, 51);
+
+    /* Overrides of default CK colours */
+    --ck-color-base-active: var(--sb-ck-active-grey);
+    --ck-color-base-active-focus: var(--sb-ck-active-grey);
+    --ck-color-button-default-hover-background: var(--sb-ck-active-grey);
+    --ck-color-button-default-active-background: var(--sb-ck-active-grey);
+    --ck-color-button-on-background: var(--sb-ck-active);
+    --ck-color-button-on-color: var(--sb-ck-icon-colour);
+    --ck-color-button-on-hover-background: var(--sb-ck-active);
+    --ck-color-input-background: white;
+    --ck-color-input-disabled-background: var(--sb-ck-disabled);
+    --ck-color-list-button-hover-background: var(--sb-ck-active-grey);
+    --ck-color-list-button-on-background: var(--sb-ck-active-grey);
+    --ck-color-list-button-on-text: var(--sb-ck-icon-colour);
+    --ck-color-list-button-on-background-focus: var(--sb-ck-active-grey);
+    --ck-color-switch-button-on-background: var(--sb-ck-active);
+    --ck-color-switch-button-on-hover-background: var(--sb-ck-active);
 }
 
 .ck.ck-editor {
@@ -205,24 +230,6 @@
 }
 
 /**
- *  The below styles apply some sort of custom styling to the CK Editor toolbar itself.
- *  This is the custom button to the right of the Link URL that allows you to open our
- *  resource modal
-**/
-.ck-body-wrapper .ck button.ck-button-resource-link {
-    margin-left: var(--ck-spacing-large);
-    min-width: 4rem;
-    background-color: var(--ck-color-button-on-active-background);
-    color: var(--ck-color-button-on-color);
-}
-
-.ck-body-wrapper .ck button.ck-button-resource-link:hover,
-.ck-body-wrapper .ck button.ck-button-resource-link:active {
-    color: white;
-    background-color: var(--ck-color-button-on-color);
-}
-
-/**
  *  The below styles only apply to content when viewed within the editor - this spot
  *  is pretty much exclusive to resolving bugs with how CKEditor changes things
  *  while being edited and to bring it closer to what the display will look like.
@@ -266,4 +273,95 @@
 /* Match our styles for first child <ul>s */
 .ck.ck-content ul {
     margin-bottom: 0.75rem;
+}
+
+/**
+ *  The below styles apply some sort of custom styling to the CK Editor toolbar itself.
+ *  This is the custom button to the right of the Link URL that allows you to open our
+ *  resource modal
+ *
+ *  A lot of these changes strip CKEditor's colours back into a more neutral colour
+ *  range. I tried getting a skin-config friendly version of CKEditor to work, but there
+ *  were too many variables between schools and I couldn't try to resolve it before the
+ *  fact with a SASS function because every config colour is, at its core, a CSS custom
+ *  property. SASS has no access to custom properties as it's a preprocessor and custom
+ *  property values aren't resolved until runtime.
+**/
+
+.ck.ck-button:not([aria-disabled="true"]) {
+    cursor: pointer;
+}
+
+.ck.ck-button[aria-disabled="true"] {
+    pointer-events: none;
+}
+
+.ck.ck-switchbutton[aria-pressed="true"] .ck.ck-button__toggle {
+    border: 1px solid rgb(0, 0, 0, 0.1);
+}
+
+.ck-body-wrapper .ck button.ck-button-resource-link,
+.ck.ck-dropdown button.ck-button-action,
+.ck.ck-find-and-replace-form__replace > button.ck-button {
+    background-color: var(--sb-ck-active);
+    color: var(--sb-ck-icon-colour);
+    margin-left: var(--ck-spacing-large);
+    min-width: 4rem;
+}
+
+.ck.ck-find-and-replace-form__find > button.ck-button[aria-disabled="true"],
+.ck.ck-find-and-replace-form__replace > button.ck-button[aria-disabled="true"] {
+    background-color: var(--sb-ck-disabled);
+}
+
+.ck-body-wrapper .ck button.ck-button-resource-link:hover,
+.ck-body-wrapper .ck button.ck-button-resource-link:active,
+.ck.ck-dropdown button.ck-button-action:hover,
+.ck.ck-dropdown button.ck-button-action:active {
+    background-color: var(--sb-ck-active-highlight);
+    color: var(--sb-ck-icon-colour);
+}
+
+.ck.ck-toolbar button.ck.ck-button.ck-dropdown__button.ck-on {
+    background-color: var(--sb-ck-active-grey);
+}
+
+/* The style panel requires stronger highlighting of options that are
+turned on */
+.ck.ck-dropdown__panel .ck-style-panel .ck.ck-button_with-text.ck-on {
+    border: 1px solid #0d65ff;
+}
+
+/* Make inputs in the toolbar have a white backgrounds when empty / focused */
+.ck.ck-dropdown__panel input.ck.ck-input,
+.ck.ck-balloon-panel input.ck.ck-input,
+.ck.ck-dropdown__panel input.ck.ck-input:focus,
+.ck.ck-balloon-panel input.ck.ck-input:focus {
+    background-color: white;
+}
+
+/* Styling disabled inputs */
+.ck.ck-editor input.ck.ck-input:read-only {
+    border-color: rgb(0, 0, 0, 0.05);
+    background-color: var(--sb-ck-disabled);
+    pointer-events: none;
+}
+
+/* Styling the drop down grid buttons */
+.ck.ck-dropdown__panel button.ck-insert-table-dropdown-grid-box.ck-on {
+    background-color: var(--sb-ck-active-grey) !important;
+    border: 1px solid var(--sb-ck-button-grid-border);
+}
+
+.ck.ck-dropdown__panel button.ck-insert-table-dropdown-grid-box.ck-off {
+    border: 1px solid var(--sb-ck-button-grid-border);
+}
+
+/* Make the textarea background colour when viewing in source a lighter colour */
+.ck.ck-editor__main .ck-source-editing-area textarea:hover {
+    background-color: var(--sb-ck-active-grey) !important;
+}
+
+.ck.ck-editor__main .ck-source-editing-area textarea:focus {
+    background-color: var(--sb-ck-active-grey) !important;
 }
