@@ -50,10 +50,10 @@ HELP;
 
         $logger->info('Getting calendar_connector Vcal rows...');
         $rows = $dbc->executeQuery('SELECT id, config FROM calendar_connector WHERE connector_class="Vcal"')->fetchAll();
-        $logger->info('done.  Found ' . count($rows) . " rows.\n\n");
+        $logger->info('Found ' . count($rows) . " rows.");
 
-        $logger->info("For each row in calendar_connector, updating `config` JSON data if required.\n");
-        $logger->info("(changing 'campus' to 'campusIds', and 'groups' to 'groupIds')\n");
+        $logger->info("For each row in calendar_connector, updating `config` JSON data if required.");
+        $logger->info("(changing 'campus' to 'campusIds', and 'groups' to 'groupIds')");
         $nRowsUpdated = 0;
         foreach ($rows as $row) {
             $configOldJson = $row['config'];
@@ -79,12 +79,10 @@ HELP;
             if ($updateRequired) {
                 $configNewJson = json_encode($configNew, JSON_THROW_ON_ERROR);
 
-                $this->getLogger()->info(
-                    "ID: {$row['id']}\n" .
-                    "OLD JSON: $configOldJson\n" .
-                    "NEW JSON: $configNewJson\n" .
-                    "---\n"
-                );
+                $logger->debug("ID: {$row['id']}");
+                $logger->debug("OLD JSON: $configOldJson");
+                $logger->debug("NEW JSON: $configNewJson");
+                $logger->debug("---");
 
                 $query = (
                     "UPDATE calendar_connector
@@ -98,7 +96,7 @@ HELP;
             }
         }
 
-        $logger->info("Done.  $nRowsUpdated row(s) updated.\n");
+        $logger->info("Done.  $nRowsUpdated row(s) updated.");
     }
 
     /**
