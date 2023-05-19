@@ -79,9 +79,13 @@ HELP;
             if ($updateRequired) {
                 $configNewJson = json_encode($configNew, JSON_THROW_ON_ERROR);
 
+                $configOldForLog = $configOld;
+                $configNewForLog = $configNew;
+                unset($configOldForLog['authorization'], $configNewForLog['authorization']);
+
                 $logger->debug("ID: {$row['id']}");
-                $logger->debug("OLD JSON: $configOldJson");
-                $logger->debug("NEW JSON: $configNewJson");
+                $logger->debug("OLD JSON: " . json_encode($configOldForLog));
+                $logger->debug("NEW JSON: " . json_encode($configNewForLog));
                 $logger->debug("---");
 
                 $query = (
