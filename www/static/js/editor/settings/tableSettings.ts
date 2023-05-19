@@ -1,3 +1,5 @@
+import { defaultSwatches } from "./colourSettings";
+
 /**
  * Returns the settings for the tables
  *
@@ -8,6 +10,16 @@ export function getTableSettings() {
         table: {
             // the table controls provided: https://ckeditor.com/docs/ckeditor5/latest/features/table.html
             contentToolbar: ["tableColumn", "tableRow", "mergeTableCells", "tableProperties", "tableCellProperties"],
+
+            tableProperties: {
+                borderColors: defaultSwatches,
+                backgroundColors: defaultSwatches,
+            },
+
+            tableCellProperties: {
+                borderColors: defaultSwatches,
+                backgroundColors: defaultSwatches,
+            },
         },
     };
 }
