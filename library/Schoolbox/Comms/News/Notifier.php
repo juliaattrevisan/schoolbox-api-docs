@@ -179,6 +179,16 @@ class Notifier extends AbstractModuleNotifier
         $diff     = $bundle->getEvent()->getDiff();
         $previous = $this->buildPrevious($article, $diff);
 
+        // Workaround until SA-15686 is merged:
+        // if previous featured image was null and current isn't,
+        // set previous to null
+        if (isset($diff['featureImage'])) {
+            $oldFeatureImage = $diff['featureImage'][1] ?? null;
+            if (!isset($oldFeatureImage)) {
+                $previous->setFeatureImage(null);
+            }
+        }
+
         /**
          * Draft or no-change
          */
