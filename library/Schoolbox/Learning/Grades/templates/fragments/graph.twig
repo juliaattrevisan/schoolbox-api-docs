@@ -8,82 +8,104 @@
 
 <script type="text/javascript">
     $(function() {
+        // Gather the data sets
+        let infoIndex = {{ graph.info | purify }};
+        let graphData = {{ graph.scatter | purify }};
+        let allData = {{ graph.data | purify }};
+        let assessments = {{ graph.assessments | purify }};
 
-        var infoIndex = {{ graph.info | purify }};
         /**
-         *  Boxplots for each Task in the Unit
-         */
-        $.fn.reportCardBoxplotRender({
-            element: '#{{ graphId }}',
-            /* Title of the graph
-             */
-            title: '',
-            /* Orientation of the box plots
-             */
-            orientation: 'vertical',
-            /* A list of all the assessment names that are being graphed
-             * These correspond to a series of data and their respective
-             * five-point summaries
-             */
+         *  Reformat the data into an object, then check for results. If we don't have results,
+         *  filter out the data as we don't want to display it.
+        **/
+        let mergedData = graphData.map((item, i) => {
+            return {
+                graphData: item,
+                allData: allData[i] || null,
+                assessment: assessments[i] || null,
+                displayValues: infoIndex[i] || null,
+            }
+        }).filter(item => item.graphData != null);
 
-            allAssessments: {{ graph.assessments | purify }},
-            /* All the raw data
-             */
-            allData: $.fn.reportCardBoxplotCalculateAllSeriesData({{ graph.data | purify }}),
-            /* You
-             */
-            additionalSeries: [
-                {
-                    type: 'scatter',
-                    name: 'You',
-                    color: 'rgb(255, 87, 87)',
-                    marker: {
-                        radius: 6
-                    },
-                    data: {{ graph.scatter | purify }},
-                    tooltip: {
-                        headerFormat: '',
-                        borderColor: '#000000',
-                        pointFormatter: function () {
-                            /* Basic template for each outlier
-                             */
-                            var template =
-                                '<div style="width:200px!important;overflow:auto;white-space:normal !important;">' +
-                                '<div class="grade gradient-{GRADIENTMARK}"><span>{DISPLAYMARK}</span></div>' +
-                                '<p class="comment">{INFO}</p>' +
-                                '</div>';
-                            /* Concatenate everything
-                             */
-                            if (typeof infoIndex[this.x].displayMark !== 'undefined') {
-                                var tooltipContent = template;
+        if( mergedData.length > 0 ) {
 
-                                if (infoIndex[this.x].displayMark !== null) {
-                                    tooltipContent = tooltipContent.replace(/{DISPLAYMARK}/, infoIndex[this.x].displayMark);
-                                    tooltipContent = tooltipContent.replace(/{GRADIENTMARK}/, infoIndex[this.x].gradientMark);
+            /**
+            *  Boxplots for each Task in the Unit
+            */
+            $.fn.reportCardBoxplotRender({
+                element: '#{{ graphId }}',
+                /* Title of the graph
+                */
+                title: '',
+                /* Orientation of the box plots
+                */
+                orientation: 'vertical',
+                /* A list of all the assessment names that are being graphed
+                * These correspond to a series of data and their respective
+                * five-point summaries
+                */
+
+                allAssessments: mergedData.map(item => item.assessment),
+                /* All the raw data
+                */
+                allData: $.fn.reportCardBoxplotCalculateAllSeriesData(mergedData.map(item => item.allData)),
+                /* You
+                */
+                additionalSeries: [
+                    {
+                        type: 'scatter',
+                        name: 'You',
+                        color: 'rgb(255, 87, 87)',
+                        marker: {
+                            radius: 6
+                        },
+                        data: mergedData.map(item => item.graphData),
+                        tooltip: {
+                            headerFormat: '',
+                            borderColor: '#000000',
+                            pointFormatter: function () {
+
+                                /* Concatenate everything
+                                */
+
+                                if( typeof mergedData[this.x].displayValues !== 'undefined' ){
+                                    let displayMark = '';
+                                    let gradientMark = '';
+                                    let info = mergedData[this.x].displayValues.info;
+
+                                    if(mergedData[this.x].displayValues.displayMark !== null) {
+                                        displayMark = mergedData[this.x].displayValues.displayMark;
+                                        gradientMark = mergedData[this.x].displayValues.gradientMark;
+                                    }
+
+                                    // Interpolate values into tooltip template string
+                                    let tooltipContent =
+                                    `<div style="width:200px!important;overflow:auto;white-space:normal !important;">
+                                        <div class="grade gradient-${gradientMark}"><span>${displayMark}</span></div>
+                                        <p class="comment">${info}</p>
+                                    </div>`;
+
+                                    /* Show tooltip
+                                    */
+                                    $('.highcharts-tooltip').show();
+
+                                    return tooltipContent;
                                 }
                                 else {
-                                    tooltipContent = tooltipContent.replace(/{DISPLAYMARK}/, '');
-                                    tooltipContent = tooltipContent.replace(/{GRADIENTMARK}/, '');
+
+                                    /* Hide tooltip when no data
+                                    */
+                                    $('.highcharts-tooltip').hide();
                                 }
-                                tooltipContent = tooltipContent.replace(/{INFO}/, infoIndex[this.x].info);
-
-                                /* Show tooltip
-                                 */
-                                $('.highcharts-tooltip').show();
-
-                                return tooltipContent;
-                            }
-                            else {
-
-                                /* Hide tooltip when no data
-                                 */
-                                $('.highcharts-tooltip').hide();
                             }
                         }
                     }
-                }
-            ]
-        });
+                ]
+            });
+        }
+        else {
+            //Add logic for zero state here.
+        }
     });
 </script>
 

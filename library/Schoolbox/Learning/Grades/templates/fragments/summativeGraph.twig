@@ -6,70 +6,86 @@
     Usage:
         graph: Grades\Graph
         graphId: the div element ID so we can render multiple entries and not have issues...
+        folderType: the type of comparison (class or cohort) we're making
 #}
 
 <script type="text/javascript">
     $(function() {
 
-        let infoArray = {{ graph.info | purify }};
+        // Gather the data sets
         let graphData = {{ graph.scatter | purify }};
-
-        // Format the data points to include dataLabels for print display
-        graphData = graphData.map((data, i) => {
-            return {
-                y: data,
-            };
-        });
+        let allData = {{ graph.data | purify }};
+        let assessments = {{ graph.assessments | purify }};
 
         /**
-         *  Boxplots for each Task in the Unit
-         */
-
-        $.fn.reportCardBoxplotRender({
-            element: '#{{ graphId }}',
-            /* Title of the graph
-             */
-            title: '',
-            /* Orientation of the box plots
-             */
-            orientation: 'vertical',
-            /* A list of all the assessment names that are being graphed
-             * These correspond to a series of data and their respective
-             * five-point summaries
-             */
-            allAssessments: {{ graph.assessments | purify }},
-            /* All the raw data
-             */
-            allData: $.fn.reportCardBoxplotCalculateAllSeriesData({{ graph.data | purify }}),
-            /* You
-             */
-            additionalSeries: [
-                {
-                    type: 'scatter',
-                    name: 'You',
-                    color: 'rgb(255, 87, 87)',
-                    marker: {
-                        radius: 6
-                    },
-                    data: graphData,
-                    // Disable mouse interactivity
-                    enableMouseTracking: false,
-                }
-            ],
-            // We're printing, disable animations
-            initialAnimation: false,
-            // Tooltips aren't necessary in print media
-            tooltip: {
-                enabled: false
+         *  Reformat the data into an object, then check for results. If we don't have results,
+         *  filter out the data as we don't want to display it.
+        **/
+        let mergedData = graphData.map((item, i) => {
+            return {
+                graphData: item,
+                allData: allData[i] || null,
+                assessment: assessments[i] || null
             }
-        });
+        }).filter(item => item.graphData != null);
+
+        if( mergedData.length > 0 ) {
+            /**
+             *  Boxplots for each Task in the Unit
+            **/
+
+            $.fn.reportCardBoxplotRender({
+                element: '#{{ graphId }}',
+                /* Title of the graph
+                */
+                title: '',
+                /* Orientation of the box plots
+                */
+                orientation: 'vertical',
+                /* A list of all the assessment names that are being graphed
+                * These correspond to a series of data and their respective
+                * five-point summaries
+                */
+                allAssessments: mergedData.map(item => item.assessment),
+                /* All the raw data
+                */
+                allData: $.fn.reportCardBoxplotCalculateAllSeriesData(mergedData.map(item => item.allData)),
+                /* You
+                */
+                additionalSeries: [
+                    {
+                        type: 'scatter',
+                        name: 'You',
+                        color: 'rgb(255, 87, 87)',
+                        marker: {
+                            radius: 6
+                        },
+                        data: mergedData.map(item => item.graphData),
+                        // Disable mouse interactivity
+                        enableMouseTracking: false,
+                    }
+                ],
+                // We're printing, disable animations
+                initialAnimation: false,
+                // Tooltips aren't necessary in print media
+                tooltip: {
+                    enabled: false
+                }
+            });
+        } else {
+            document.querySelector('#chart_row_{{ graphId }}').style.display = 'none';
+        }
     });
 </script>
 
-<div class="row">
-    <div class="small-12 island">
-        <section class="content summative-graph-container">
-            <div id="{{ graphId }}"></div>
-        </section>
-    </div>
+<div class="row" id="chart_row_{{ graphId }}">
+    <p class="summative-graph-type">{{ folderType }} distribution</p>
+        <div class="small-12 island">
+            <section class="content summative-graph-container">
+                <div id="{{ graphId }}"></div>
+            </section>
+        </div>
+    {% if location == 'summary' %}
+        <p class="summative-graph-type">Results</p>
+    {% endif %}
 </div>
