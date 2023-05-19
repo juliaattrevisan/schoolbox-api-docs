@@ -106,7 +106,13 @@ class AssessmentAudit
         unit_spec_folder.name as unitSpecName,
         unit_imp_folder.name as unitImpName,
         COALESCE(course_spec_folder.name, course_imp_spec_folder.name) as courseName,
-        COALESCE(course_specification.subject_code, course_imp_spec.subject_code)  as 'subjectCode'
+        COALESCE(course_specification.subject_code, course_imp_spec.subject_code)  as 'subjectCode',
+        # Have any of the parents been deleted that we require to view the assessment...
+        if(COALESCE(assessment.deleted_at, course_specification.deleted_at,
+        course_implementation.deleted_at, course_unit_specification.deleted_at,
+        course_unit_implementation.deleted_at, unit_spec_folder.deleted_at,
+        unit_imp_folder.deleted_at, course_imp_spec_folder.deleted_at,
+        course_spec_folder.deleted_at), true, false) as 'parentDeleted'
 
         FROM v_assessment_relation
         JOIN assessment ON assessment_id = assessment.id
@@ -136,7 +142,7 @@ class AssessmentAudit
         //build the csv
         $rowHeadings = ['AssessmentId', 'AssessmentTitle', 'FolderId', 'FolderName', 'PageYearLevel', 'ClassCode', 'CourseFolderId', 'CourseName', 'SubjectCode',
                         'UnitFolderId', 'UnitName', 'WorkType', 'CommonAssessment', 'AcceptOnlineSubmissions', 'SimilarityCheck', 'MarkType',
-                        'MarkGradingSchemeScale', 'Rubric', 'CapabilityMarkType', 'CapabilityGradingSchemeScale', 'Weight', 'SpecificationImplementation', 'PublishDate', 'DueDate', 'SelfReviewability', 'MarkVisibility'];
+                        'MarkGradingSchemeScale', 'Rubric', 'CapabilityMarkType', 'CapabilityGradingSchemeScale', 'Weight', 'SpecificationImplementation', 'PublishDate', 'DueDate', 'SelfReviewability', 'MarkVisibility', 'ParentObjectDeleted'];
 
         //run the sql, if it fails, let it error without breaking the csv file
         $statement->execute();
@@ -223,6 +229,7 @@ class AssessmentAudit
                 $row['dueDate'],
                 $row['selfReviewability'],
                 SubmissionBox::MARK_VISIBILITY_STRINGS[$row['markVisibility']],
+                $row['parentDeleted']
             ]);
         }
 
