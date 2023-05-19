@@ -39,7 +39,7 @@ to 'campusIds', and keys previously named 'groups' will be renamed to 'groupIds'
 The 'campus' and 'groups' keys were incorrectly created by updates/23.0.alpha1/calendarConnector/02-migrateData.php
 (SA-14746).
 
-Usage: php replace_serialized_calendar_config_with_json.php
+Usage: php 00-fixCampusesAndGroupsInConfigJson.php
 
 HELP;
             exit;
