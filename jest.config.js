@@ -8,7 +8,7 @@ module.exports = {
         "^@js(.*)$": "<rootDir>/www/static/js$1",
         "^.+\\.(css|scss)$": "<rootDir>/jest-cssStub.js",
     },
-    roots: ["<rootDir>/library/", "<rootDir>/templates/", "<rootDir>/vue/"], // A list of paths to directories that Jest should use to search for files in.
+    roots: ["<rootDir>/library/", "<rootDir>/templates/", "<rootDir>/vue/", "<rootDir>/www/"], // A list of paths to directories that Jest should use to search for files in.
     setupFilesAfterEnv: ["<rootDir>/jest-setup.js"], // file to run on every jest test
     snapshotSerializers: [
         // A list of paths to snapshot serializer modules Jest should use for snapshot testing.

@@ -26,7 +26,6 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\Grades\AssessmentComparator;
 use Schoolbox\Learning\Grades\Cohort\ClassResults;
@@ -836,7 +835,7 @@ class Controller extends ConfigController
                     $overallMarkScheme = $markSchemeFactory->spawnForFolder($folder, $this->getUser()->getRole()->isStaff());
                     //markbooks need to be spawned again for each folder, as summary could have a different collection of worktypes to class
                     $filteredMarkbook                       = (new Markbook($summaryAssessments[$folder->getId()], $overallMarkScheme, $this->getUser()))
-                        ->sortAssessables(new AssessmentComparator($viewer));
+                        ->sortAssessables(new AssessmentComparator($student));
                     $allGraphs['summary'][$folder->getId()] = $this->generateCohortGraph(
                         $summaryAssessments[$folder->getId()],
                         $folder,
@@ -860,7 +859,7 @@ class Controller extends ConfigController
                     // for each folder build and work with that markbook and assessments
                     $overallMarkScheme = $markSchemeFactory->spawnForFolder($folder, $this->getUser()->getRole()->isStaff());
                     //markbooks need to be spawned again for each folder, as class could have a different collection of worktypes to summary
-                    $filteredMarkbook                     = (new Markbook($classAssessments[$folder->getId()], $overallMarkScheme, $this->getUser()))->sortAssessables(new AssessmentComparator($viewer));
+                    $filteredMarkbook                     = (new Markbook($classAssessments[$folder->getId()], $overallMarkScheme, $this->getUser()))->sortAssessables(new AssessmentComparator($student));
                     $allGraphs['class'][$folder->getId()] = $this->generateCohortGraph(
                         $classAssessments[$folder->getId()],
                         $folder,

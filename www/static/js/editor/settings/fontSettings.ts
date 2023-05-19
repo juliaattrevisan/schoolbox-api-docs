@@ -1,3 +1,5 @@
+import { defaultSwatches } from "./colourSettings";
+
 /**
  * Returns the settings for the font options
  *
@@ -43,6 +45,12 @@ export function getFontSettings() {
                     model: "1.125rem",
                 },
             ],
+        },
+        fontColor: {
+            colors: defaultSwatches
+        },
+        fontBackgroundColor: {
+            colors: defaultSwatches
         },
     };
 }

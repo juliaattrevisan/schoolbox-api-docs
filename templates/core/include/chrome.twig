@@ -8,7 +8,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta http-equiv="Content-Language" content="en-au" />
     <meta name="author" content="Schoolbox Pty Ltd"/>
-    <meta name="application-name" content="{{ config.school_name }}" />
+    {% if not config.web_crawlers_enabled %}<meta name="robots" content="noindex">{% endif %}
     <link rel="manifest" href="/manifest">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -104,6 +104,17 @@
                 "rgb(255, 255, 255)",
             ]
         }
+
+
+        // When showing colour swatches, we only want the first 3 unique colours from skin config as well as the constant colours,
+        // if there are less than 3 unique colours, we'll use the first 3 colours but bias towards the unique colours
+        const uniqueSkinColours = [...new Set(window.sbProps.colourDefaults["skin"])];
+        const chosenSkinColours =
+            uniqueSkinColours.length > 3
+                ? uniqueSkinColours.slice(0, 3)
+                : [...uniqueSkinColours, ...window.sbProps.colourDefaults["skin"]].slice(0, 3);
+
+        window.sbProps.colourDefaults["swatches"] = [...chosenSkinColours, ...window.sbProps.colourDefaults["constant"]];
     </script>
     {% endautoescape %}
 

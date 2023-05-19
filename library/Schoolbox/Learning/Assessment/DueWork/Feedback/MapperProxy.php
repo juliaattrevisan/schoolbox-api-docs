@@ -112,6 +112,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setResubmissionRequired($submissionReturn->getResubmissionRequired())
                 ->setCreatedAt($submissionReturn->getCreatedAt())
                 ->setUpdatedAt($submissionReturn->getUpdatedAt())
+                ->setPublishedBy($submissionReturn->getPublishedBy())
                 ->setPublishedAt($submissionReturn->getPublishedAt())
                 ->setDeletedAt($submissionReturn->getDeletedAt());
 
@@ -163,6 +164,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
                 ->setResubmissionRequired($domainObject->getResubmissionRequired())
                 ->setCreatedAt($domainObject->getCreatedAt())
                 ->setUpdatedAt($domainObject->getUpdatedAt())
+                ->setPublishedBy($domainObject->getPublishedBy())
                 ->setPublishedAt($domainObject->getPublishedAt())
                 ->setDeletedAt($domainObject->getDeletedAt());
 

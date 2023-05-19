@@ -50,7 +50,7 @@ if (count($userIds) === 0) {
 
 if (isset($_POST['updateUsers'])) {
     $message = "{$_SESSION['user']->getFullname()} ({$_SESSION['user']->getId()}) started a user bulk modify";
-    $userMapper->log($message);
+    $userMapper->log($message, true);
 
     $modified = (new \Schoolbox\Admin\User\BulkUpdater(
         $_SESSION['user'],
@@ -85,7 +85,7 @@ try {
     $cache = $this->getDi()->get('subscriptionCache');
     $cache->cacheUsers(INSTANCE_ID, $userIds);
 } catch (\RuntimeException | NotFoundExceptionInterface | ContainerExceptionInterface $e) {
-    $userMapper->log($e->getMessage());
+    $userMapper->log($e->getMessage(), true);
 }
 
 /* Show some confirmation stuff

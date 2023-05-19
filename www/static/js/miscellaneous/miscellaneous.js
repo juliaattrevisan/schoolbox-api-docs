@@ -27,7 +27,9 @@ $(function () {
     $.fn.schoolboxResource_ProxyReplacement("#content");
 
     // Notifications dock/undock
-    $("#right-menu-dock").on("click", function () {
+    $("#right-menu-dock").on("click", function (event) {
+        event.preventDefault();
+
         var dockState = $(this).data("dock-state");
 
         // Adjust classes
@@ -54,7 +56,9 @@ $(function () {
     });
 
     // Left menu dock/undock
-    $("#left-menu-dock").on("click", function () {
+    $("#left-menu-dock").on("click", function (event) {
+        event.preventDefault();
+
         var dockState = $(this).data("dock-state");
 
         // Adjust classes

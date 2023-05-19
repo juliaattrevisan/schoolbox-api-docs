@@ -24,5 +24,6 @@ class Application extends ModuleLoader
         $this->loadModule($di, Schoolbox\Application\Policy\Module::class, '/policy');
         $this->loadModule($di, Schoolbox\Application\Manifest\Module::class, '/');
         $this->loadModule($di, Schoolbox\Application\Ping\Module::class, '/');
+        $this->loadModule($di, Schoolbox\Application\Robots\Module::class, '/');
     }
 }

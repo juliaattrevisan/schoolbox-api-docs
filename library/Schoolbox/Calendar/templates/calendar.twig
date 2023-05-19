@@ -45,6 +45,7 @@
         defaultView:        anchorView || '{{ calendarView }}',
         dateDisplayFormats: dateDisplayFormats,
         exportOptions:      {{ exportOptions | json_encode | raw }},
+        defaultTimedEventDuration: "00:01:00",
         translations:       {
             eotc: {
                 proper: '{{ locale.eotc.proper }}'

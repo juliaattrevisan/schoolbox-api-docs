@@ -290,7 +290,7 @@ class BulkUpdater
         $messages = array_values(array_unique($messages));
 
         foreach ($messages as $message) {
-            $this->userBulkMapper->log($message);
+            $this->userBulkMapper->log($message, true);
         }
 
         /* If user data was changed (either scalars or campus assignations)

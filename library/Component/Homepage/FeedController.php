@@ -35,7 +35,7 @@ class Component_Homepage_FeedController extends Component_Homepage_ControllerAbs
             $this->getConfigLoader(),
             $this->getContext()->getId(),
             $this->getUser(),
-            $this->getConfig('size')
+            (int)$this->getConfig('size')
         );
         return true;
     }

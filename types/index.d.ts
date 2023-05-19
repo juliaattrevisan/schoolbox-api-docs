@@ -17,6 +17,7 @@ declare global {
             lightGalleries: { [key: string]: any };
             imageLightboxLicenseKey: string;
             imageSlideshows: { [key: string]: any };
+            colourDefaults: { [key: string]: any };
         };
     }
 }

@@ -7,7 +7,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta http-equiv="Content-Language" content="en-au" />
 <meta name="author" content="Schoolbox Pty Ltd"/>
-<meta name="application-name" content="{{ config.school_name }}" />
+{% if not config.web_crawlers_enabled %}<meta name="robots" content="noindex">{% endif %}
 <link rel="manifest" href="/manifest">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">

@@ -279,6 +279,7 @@ class Notifier extends AbstractModuleNotifier
                     && (($previous->getTitle() !== $article->getTitle())
                         || ($previous->getBlurb() !== $article->getBlurb())
                         || ($previous->getBody() !== $article->getBody())
+                        || ($previous->getFeatureImage()?->getHash() !== $article->getFeatureImage()?->getHash())
                         || (!($previous->getSticky()) && $article->getSticky())
                     )
                 ) {

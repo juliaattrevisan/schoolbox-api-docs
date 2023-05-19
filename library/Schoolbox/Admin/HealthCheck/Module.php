@@ -48,6 +48,23 @@ class Module extends BaseModule
         // Common Audits
         $this->register('GET', '/audit/homepageTemplates', 'homepageTemplates', $isAlaress);
         $this->register('GET', '/audit/resourceBrowser', 'resourceBrowser', $isAlaress);
+        // SVA REPORTS
+        $this->register('GET', '/audit/svaMonthlyLogins', 'svaMonthlyLogins', $isAlaress);
+        $this->register('GET', '/audit/svaNewsArticleViews', 'svaNewsArticleViews', $isAlaress);
+        $this->register('GET', '/audit/svaNewsArticleViewsPerRolePerArticle', 'svaNewsArticleViewsPerRolePerArticle', $isAlaress);
+        $this->register('GET', '/audit/svaNewsArticleViewsPerMonthBySKC', 'svaNewsArticleViewsPerMonthBySKC', $isAlaress);
+        $this->register('GET', '/audit/svaNewsArticleViewsPerMonthByActiveAlumni', 'svaNewsArticleViewsPerMonthByActiveAlumni', $isAlaress);
+        $this->register('GET', '/audit/svaNewsCreatedBySVATeam', 'svaNewsCreatedBySVATeam', $isAlaress);
+        $this->register('GET', '/audit/svaHomepageViewsByKSC', 'svaHomepageViewsByKSC', $isAlaress);
+        $this->register('GET', '/audit/svaHomepageViewsByAllPerRolePerMonth', 'svaHomepageViewsByAllPerRolePerMonth', $isAlaress);
+        $this->register('GET', '/audit/svaHomepageViewsForCommunityForumsPage', 'svaHomepageViewsForCommunityForumsPage', $isAlaress);
+        $this->register('GET', '/audit/svaHomepageViewsForOpportunitiesPage', 'svaHomepageViewsForOpportunitiesPage', $isAlaress);
+        $this->register('GET', '/audit/svaHomepageViewsForProfessionalReadingPage', 'svaHomepageViewsForProfessionalReadingPage', $isAlaress);
+        $this->register('GET', '/audit/svaHomepageViewsForEvaluationPage', 'svaHomepageViewsForEvaluationPage', $isAlaress);
+        $this->register('GET', '/audit/svaHomepageViewsForActiveAlumniPage', 'svaHomepageViewsForActiveAlumniPage', $isAlaress);
+        $this->register('GET', '/audit/svaHomepageViewsForRrrHubSchoolsPage', 'svaHomepageViewsForRrrHubSchoolsPage', $isAlaress);
+        $this->register('GET', '/audit/svaForumThreadsViews', 'svaForumThreadsViews', $isAlaress);
+        $this->register('GET', '/audit/svaForumRepliesViews', 'svaForumRepliesViews', $isAlaress);
     }
 
     /**

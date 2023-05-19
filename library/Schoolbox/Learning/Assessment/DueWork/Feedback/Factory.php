@@ -17,9 +17,10 @@ use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\Feedback\FileDecorator;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
 use Schoolbox\Learning\Assessment\IFeedback;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\User;
 use Schoolbox\Learning\Assessment\Participant;
-use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkResponse;
 use Schoolbox\Learning\Assessment\Feedback\SubSource\DueWork as DueWorkFeedbackDataSource;
 use Schoolbox\Learning\DueWork\StateMapper;
@@ -142,13 +143,15 @@ class Factory
         $this->response                  = $response;
     }
 
+
     /**
      * Produce a DueWork Feedback with the assorted details in it
      * such as mark, comment, publish, authors and attachments
      *
      * @return DueWorkFeedback
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws Exception
+     * @throws Deleted
+     * @throws \UnexpectedValueException
      */
     public function produce(): DueWorkFeedback
     {
@@ -158,7 +161,13 @@ class Factory
             /** @var DueWorkFeedback $feedback */
             $feedback = $this->dueWorkFeedbackDataSource->createModel($this->participant->getAssessable())
                 ->setReviewee($this->participant->getUser())
-                ->setCreatedAt(\Alaress_Date_Format::now());
+                ->setCreatedAt(\Alaress_Date_Format::now())
+                /* $reviewer is the creator of the feedback
+                 * $publishedBy is the publisher of the feedback
+                 * We'll never know who might have altered the feedback in between
+                 */
+                ->setReviewer($this->currentUser);
+
             $this->participant->getAllFeedbacks()->add($feedback);
 
             // copy attachments over from the previous feedback.
@@ -177,16 +186,18 @@ class Factory
         // mutate model found, and save
         /** @var DueWorkFeedback $feedback */
         $feedback
-            ->setReviewer($this->currentUser)
             ->setReviewRoute($this->reviewRoute)
             ->setUpdatedAt(\Alaress_Date_Format::now())
             ->setComment($this->comment)
+            /* Remember who last touched it,
+             * presuming they're about to publish it
+             */
+            ->setPublishedBy($this->currentUser->getId())
             ->setResubmissionRequired($this->resubmissionRequired);
 
         if ($this->mark !== null && $this->mark !== '') {
             // mark defined and non-empty
             try {
-                /** @var IMarkScheme $scheme */
                 $scheme = $this->participant->getAssessable()->getMarkScheme();
 
                 // verify normalisation, then sanitise the output
