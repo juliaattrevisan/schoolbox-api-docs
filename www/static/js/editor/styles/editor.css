@@ -275,6 +275,12 @@
     margin-bottom: 0.75rem;
 }
 
+/* Ensure images don't stretch beyond the boundaries of the table cells */
+.ck.ck-editor__editable td .image-inline img,
+.ck.ck-editor__editable th .image-inline img {
+    max-width: 100%;
+}
+
 /**
  *  The below styles apply some sort of custom styling to the CK Editor toolbar itself.
  *  This is the custom button to the right of the Link URL that allows you to open our
