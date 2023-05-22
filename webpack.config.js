@@ -458,13 +458,12 @@ module.exports = {
         ],
     },
     externals: {
-        react: "Vue",
+        vue: "Vue",
     },
     cache: true,
     resolve: {
         // https://webpack.js.org/configuration/resolve/
         alias: {
-            vue$: "vue/dist/vue.esm-bundler.js",
             "@schoolboxLibrary": path.resolve(__dirname, "library/Schoolbox"),
             "@schoolboxCalendarEvent": path.resolve(__dirname, "library/Schoolbox/Calendar/Event/templates/vue"),
             "@schoolboxCommsNews": path.resolve(__dirname, "library/Schoolbox/Comms/News"),
