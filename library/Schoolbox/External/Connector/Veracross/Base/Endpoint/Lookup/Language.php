@@ -29,7 +29,8 @@ class Language
 
 
     /**
-     * Language record might reference a language that doesn't exist in lookups
+     * Records might reference a language that doesn't exist in lookups
+     *
      * Replace with a generic "Unknown" for now, as it's not apparent that
      * this happens in a Prod Veracross; their sandbox api has a bunch of fixer
      * scripts disabled for whatever reason, and there's a bunch of schools
