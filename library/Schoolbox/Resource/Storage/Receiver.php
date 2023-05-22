@@ -15,7 +15,6 @@ use League\Flysystem\Filesystem;
 use Schoolbox\File\Exception as FileException;
 use Schoolbox\File\Mimetype;
 use Schoolbox\File\MimetypeMapper;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Storage\Sanitizer\ISanitizer;
 use Schoolbox\User;
 
@@ -24,6 +23,12 @@ use Schoolbox\User;
  */
 class Receiver implements IReceiver
 {
+    /**
+     * The maximum number of days in which a file may expire, and be allowed to
+     * bypass the maximum file size restriction.
+     */
+    private const MAX_DAYS_ALLOWED_FOR_TEMP_FILE_BYPASS = 15;
+
     /**
      * Constructor
      *
@@ -186,14 +191,25 @@ class Receiver implements IReceiver
         }
 
         // Assert: Acceptable size
-        if ($fileMime->getActualMaxFileSize() < $fileSize) {
-            throw new FileException(
-                sprintf(
-                    "This file exceeds the file size restriction of %s. %s",
-                    Alaress_Byte_Format::bytesToString($fileMime->getActualMaxFileSize()),
-                    $errorSuffix,
-                ),
-            );
+        // (bypass if this file is due to expire within a reasonable time frame)
+        $fileExpiry = $storage->getExpiryAt();
+        $assertSize = true;
+        if ($fileExpiry) {
+            $latestAllowedExpiry = Alaress_Date_Format::now()->addDays(self::MAX_DAYS_ALLOWED_FOR_TEMP_FILE_BYPASS);
+            if ($fileExpiry->lte($latestAllowedExpiry)) {
+                $assertSize = false;
+            }
+        }
+        if ($assertSize) {
+            if ($fileMime->getActualMaxFileSize() < $fileSize) {
+                throw new FileException(
+                    sprintf(
+                        "This file exceeds the file size restriction of %s. %s",
+                        Alaress_Byte_Format::bytesToString($fileMime->getActualMaxFileSize()),
+                        $errorSuffix,
+                    ),
+                );
+            }
         }
     }
 }
