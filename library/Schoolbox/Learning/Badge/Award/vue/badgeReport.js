@@ -1,7 +1,7 @@
 import { createApp } from "vue";
 import BadgeReport from "./badge-report";
 
-createApp({
+window.Vue.createApp({
     components: {
         BadgeReport,
     },

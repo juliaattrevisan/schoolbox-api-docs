@@ -1,7 +1,7 @@
 import { createApp } from "vue";
 import ManageGroups from "./manage-groups";
 
-createApp({
+window.Vue.createApp({
     components: {
         ManageGroups,
     },

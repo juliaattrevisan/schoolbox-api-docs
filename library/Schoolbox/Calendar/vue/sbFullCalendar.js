@@ -1,7 +1,7 @@
 import { createApp } from "vue";
 import SbFullCalendar from "./sb-full-calendar";
 
-createApp({
+window.Vue.createApp({
     components: {
         SbFullCalendar,
     },

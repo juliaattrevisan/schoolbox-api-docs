@@ -3,7 +3,7 @@ import SimilarityReport from "./similarity-report";
 import SimilarityReportNoResults from "./similarity-report-no-results";
 import { ClientTable } from "v-tables-3-select-rows";
 
-const app = createApp({
+const app = window.Vue.createApp({
     components: {
         SimilarityReport,
     },

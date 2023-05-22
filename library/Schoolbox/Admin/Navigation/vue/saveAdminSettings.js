@@ -1,7 +1,7 @@
 import { createApp } from "vue";
 import SaveAdminSettings from "./save-admin-settings";
 
-createApp({
+window.Vue.createApp({
     components: {
         SaveAdminSettings,
     },

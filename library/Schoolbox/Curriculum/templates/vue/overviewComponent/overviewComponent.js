@@ -8,7 +8,7 @@ overviewComponents.forEach((overviewComponent) => {
      *  Ensure each Vue component is only initiated once
      */
     if (!overviewComponent.hasAttribute("data-loaded")) {
-        createApp({
+        window.Vue.createApp({
             components: {
                 OverviewComponent,
             },

@@ -1,7 +1,7 @@
 import { createApp } from "vue";
 import EvidenceDetail from "./evidence-detail";
 
-createApp({
+window.Vue.createApp({
     components: {
         EvidenceDetail,
     },

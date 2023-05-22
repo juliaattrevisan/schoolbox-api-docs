@@ -3,7 +3,7 @@ import ManageGroup from "./manage-group";
 import { ClientTable } from "v-tables-3-select-rows";
 import { createPinia } from "pinia";
 
-createApp({
+window.Vue.createApp({
     components: {
         ManageGroup,
     },

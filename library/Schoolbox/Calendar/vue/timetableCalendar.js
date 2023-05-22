@@ -1,7 +1,7 @@
 import { createApp } from "vue";
 import TimetableCalendar from "./timetable-calendar";
 
-createApp({
+window.Vue.createApp({
     components: {
         TimetableCalendar,
     },

@@ -1,7 +1,7 @@
 import { createApp } from "vue";
 import AwardWithEvidenceBadgeList from "./award-with-evidence-badge-list";
 
-createApp({
+window.Vue.createApp({
     components: {
         AwardWithEvidenceBadgeList,
     },

@@ -1,7 +1,7 @@
 import { createApp } from "vue";
 import ArticleList from "./article-list";
 
-createApp({
+window.Vue.createApp({
     components: {
         ArticleList,
     },

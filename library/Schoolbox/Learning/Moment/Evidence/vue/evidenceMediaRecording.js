@@ -1,7 +1,7 @@
 import { createApp } from "vue";
 import EvidenceMediaRecording from "./evidence-media-recording";
 
-createApp({
+window.Vue.createApp({
     components: {
         EvidenceMediaRecording,
     },

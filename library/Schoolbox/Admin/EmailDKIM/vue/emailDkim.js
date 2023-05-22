@@ -2,7 +2,7 @@ import { createApp } from "vue";
 import EmailDkim from "./email-dkim";
 import { ClientTable } from "v-tables-3-select-rows";
 
-createApp({
+window.Vue.createApp({
     components: {
         EmailDkim,
     },
