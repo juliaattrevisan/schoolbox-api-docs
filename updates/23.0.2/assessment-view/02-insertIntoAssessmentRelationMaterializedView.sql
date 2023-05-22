@@ -42,7 +42,7 @@ from ((((`assessment` `a`
     join `assessment_course_unit_specification` `acus` on (`a`.`id` = `acus`.`assessment_id`))
     join `course_unit_specification` `cus` on (`acus`.`course_unit_specification_id` = `cus`.`id`))
     join `course_specification` `cs` on (`cus`.`course_specification_id` = `cs`.`id`))
-    join `folder` `f` on (`cs`.`folder_id` = `f`.`id`));
+    join `folder` `f` on (`cus`.`folder_id` = `f`.`id`));
 
 -- Assessments in a project in a folder
 REPLACE INTO mv_assessment_relation
@@ -91,5 +91,5 @@ from ((((((`assessment` `a`
     join `assessment_course_unit_specification` `acus` on (`p`.`assessment_id` = `acus`.`assessment_id`))
     join `course_unit_specification` `cus` on (`acus`.`course_unit_specification_id` = `cus`.`id`))
     join `course_specification` `cs` on (`cus`.`course_specification_id` = `cs`.`id`))
-    join `folder` `f` on (`cs`.`folder_id` = `f`.`id`))
+    join `folder` `f` on (`cus`.`folder_id` = `f`.`id`))
 order by `assessment_id`;
