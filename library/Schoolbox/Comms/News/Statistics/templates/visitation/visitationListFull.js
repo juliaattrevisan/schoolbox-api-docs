@@ -1,4 +1,3 @@
-import { createApp } from "vue";
 import VisitationListFull from "./visitation-list-full";
 import { ClientTable } from "v-tables-3-select-rows";
 

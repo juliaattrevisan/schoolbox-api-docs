@@ -1,4 +1,3 @@
-import { createApp } from "vue";
 import ActivityFeed from "../../Moment/Evidence/vue/feed";
 import GoalFeed from "../../Badge/Award/vue/goal-feed";
 import AchievementFeed from "../../Badge/Award/vue/achievement-feed";

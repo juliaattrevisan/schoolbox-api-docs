@@ -1,4 +1,3 @@
-import { createApp } from "vue";
 import EvidenceDetail from "./evidence-detail";
 
 window.Vue.createApp({

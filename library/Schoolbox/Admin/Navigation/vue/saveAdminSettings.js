@@ -1,4 +1,3 @@
-import { createApp } from "vue";
 import SaveAdminSettings from "./save-admin-settings";
 
 window.Vue.createApp({

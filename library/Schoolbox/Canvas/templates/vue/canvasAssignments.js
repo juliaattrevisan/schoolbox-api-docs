@@ -1,4 +1,3 @@
-import { createApp } from "vue";
 import CanvasAssignments from "./canvas-assignments";
 
 window.Vue.createApp({

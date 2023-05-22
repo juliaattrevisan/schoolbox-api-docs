@@ -1,4 +1,3 @@
-import { createApp } from "vue";
 import AssessmentCalendar from "./assessment-calendar";
 
 window.Vue.createApp({

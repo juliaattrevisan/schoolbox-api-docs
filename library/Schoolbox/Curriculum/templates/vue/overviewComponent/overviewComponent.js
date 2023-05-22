@@ -1,4 +1,3 @@
-import { createApp } from "vue";
 import OverviewComponent from "./overview-component";
 
 const overviewComponents = document.querySelectorAll("[data-overview-component]");

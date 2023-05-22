@@ -1,4 +1,3 @@
-import { createApp } from "vue";
 import ArticleList from "./article-list";
 
 window.Vue.createApp({
