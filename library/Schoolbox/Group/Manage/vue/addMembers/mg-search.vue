@@ -32,7 +32,7 @@ const inputPlaceholder = window.Vue.computed(() => {
 /**
  * add relevant keyboard and mouse events
  */
-onMounted(() => {
+window.Vue.onMounted(() => {
     document.addEventListener("keyup", onKeyUp);
     document.addEventListener("click", onMouseClick);
 });

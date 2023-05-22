@@ -12,7 +12,7 @@ import RevealModal from "@schoolboxVue/components/reveal-modal";
 import NodeDetails from "@schoolboxCurriculum/vue/node-details";
 import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
 
-onMounted(() => {
+window.Vue.onMounted(() => {
     findNodeLinks();
 });
 

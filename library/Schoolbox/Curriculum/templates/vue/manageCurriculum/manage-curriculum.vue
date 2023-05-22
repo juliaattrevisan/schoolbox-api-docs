@@ -77,7 +77,7 @@ function initHistoryListener() {
 /**
  * Start loading the curriculum data
  */
-onMounted(async () => {
+window.Vue.onMounted(async () => {
     await store.init(props.dataEndpoint, props.isReadOnly, props.uiLimit, toastEl);
     if (store.hasId) {
         initErrorListener();

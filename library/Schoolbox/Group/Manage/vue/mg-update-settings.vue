@@ -16,7 +16,7 @@ const updateModalEl = window.Vue.ref(null);
  * we want to force the setting of the Access on the group
  * straight away if it's not already set
  */
-onMounted(() => {
+window.Vue.onMounted(() => {
     if (settingsStore.isAccessNotSet) {
         settingsStore.isPromptOpen = true;
         let href = window.location.href;

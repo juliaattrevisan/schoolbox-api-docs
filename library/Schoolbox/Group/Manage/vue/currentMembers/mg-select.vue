@@ -18,7 +18,7 @@ const removeMembersStore = useRemoveMembersStore(); //to remove selectedMembers
 const isShiftKeySelected = window.Vue.ref(false);
 const shiftSelectNoteEl = window.Vue.ref(null);
 
-onMounted(() => {
+window.Vue.onMounted(() => {
     initShiftKeyDetection();
 });
 

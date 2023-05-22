@@ -47,12 +47,12 @@ const modalViewNodesStore = useModalViewNodesStore();
 const modalActiveNodeStore = useModalActiveNodeStore();
 const modalSearchStore = useModalSearchStore();
 const modalNodeUsageStore = useModalNodeUsageStore();
-const viewNodeEl = ref(null); //to animate the node
+const viewNodeEl = window.Vue.ref(null); //to animate the node
 
 /**
  * to animate on the node
  */
-onMounted(() => {
+window.Vue.onMounted(() => {
     if (props.depth === 0) {
         //we only need to animate the first node, as the rest are contained within
         animateOn();

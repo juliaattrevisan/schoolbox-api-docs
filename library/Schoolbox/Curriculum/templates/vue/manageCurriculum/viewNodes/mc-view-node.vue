@@ -41,9 +41,9 @@ const nodeUsageStore = useNodeUsageStore();
 const addSubsectionStore = useAddSubsectionStore();
 const updateNodeStore = useUpdateNodeStore();
 const searchStore = useSearchStore();
-const viewNodeEl = ref(null); // to animate the node
-const isNew = ref(false); // to highlight if the node has just been added
-const justUpdated = ref(false); // to highlight if the node has just been updated
+const viewNodeEl = window.Vue.ref(null); // to animate the node
+const isNew = window.Vue.ref(false); // to highlight if the node has just been added
+const justUpdated = window.Vue.ref(false); // to highlight if the node has just been updated
 
 /**
  * Consider whether we are currently only showing enabled nodes
@@ -93,7 +93,7 @@ async function displayAnimation(change: Ref<boolean>) {
  * a new subsection or entirely new curriculum and animating
  */
 
-onMounted(async () => {
+window.Vue.onMounted(async () => {
     if (showNode.value && props.depth === 0) {
         // we only need to animate the first node, as the rest are contained within
         animateOn();

@@ -12,7 +12,7 @@ import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 const store = useStore();
 const selectedNodesStore = useSelectedNodesStore();
 const deleteNodesStore = useDeleteNodesStore();
-const modalEl = ref(null);
+const modalEl = window.Vue.ref(null);
 
 /**
  * to open the modal when requested

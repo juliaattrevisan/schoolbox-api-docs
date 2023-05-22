@@ -39,7 +39,7 @@ const currentFormDataValues = window.Vue.ref("");
  */
 const showSaveButton = window.Vue.computed(() => hasFormDataChange.value || isAtBottomOfPage.value);
 
-onMounted(() => {
+window.Vue.onMounted(() => {
     initIntersectionObserver();
     initFormData();
     initFormChangeListeners();

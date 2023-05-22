@@ -15,9 +15,9 @@ import CsModalNodes from "./cs-modal-nodes.vue";
 import CsModalFooter from "./cs-modal-footer.vue";
 
 const modalStore = useModalStore();
-const isNextSelected = ref(false); // to move to the next modal if a badge usage is selected
+const isNextSelected = window.Vue.ref(false); // to move to the next modal if a badge usage is selected
 const modalNodeUsageStore = useModalNodeUsageStore();
-const selectedNodeDetails = ref(getEmptyNode());
+const selectedNodeDetails = window.Vue.ref(getEmptyNode());
 
 /**
  * to show the selected badge that has been selected in a linked usage
