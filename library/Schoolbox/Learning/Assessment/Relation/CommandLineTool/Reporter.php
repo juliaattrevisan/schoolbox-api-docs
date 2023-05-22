@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\Relation\CommandLineTool;
 
+use Alaress\Diff\Differ;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool\App;
 
@@ -80,6 +81,7 @@ class Reporter extends App
 
         // Report on differences
         $differentRows = [];
+        $differ        = new Differ();
         foreach ($actualData as $assessmentId => $actualAssessmentData) {
             $expectedAssessmentData = $expectedData[$assessmentId] ?? null;
             if (!isset($expectedAssessmentData)) {
@@ -89,10 +91,11 @@ class Reporter extends App
                 $differentRows[] = $assessmentId;
                 $logger->debug(
                     sprintf(
-                        'Assessment %d does not match: expected %s, actual %s',
+                        "Assessment %d does not match:\nexpected: %s\nactual: %s\ndiff: %s",
                         $assessmentId,
                         json_encode($expectedAssessmentData),
                         json_encode($actualAssessmentData),
+                        json_encode($differ->diff($expectedAssessmentData, $actualAssessmentData))
                     )
                 );
             }
