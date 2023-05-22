@@ -642,7 +642,6 @@ class Session
                                 $subject['id'] = $result->getId();
                                 $subject['name'] = $result->getName();
                                 $subject['perm'] = $this->access->getFolderAccess($user, $result->getId());
-                                ;
                                 $subject['code'] = $result->getMatchedCode();
                                 $_SESSION['subjects'][] = $subject;
 
