@@ -1501,14 +1501,20 @@ class Mapper extends BaseMapper
                 :courseUnitSpecificationId
             )
         ');
-        $params = [
+
+        // Impl and spec come from project context if there is one:
+        // otherwise, directly from assessment
+        $contextProject     = $assessment->getContextProject();
+        $unitImplementation = ($contextProject ?? $assessment)->getContextUnitImplementation();
+        $unitSpecification  = ($contextProject ?? $assessment)->getContextUnitSpecification();
+        $params             = [
             'assessmentId'               => $assessment->getId(),
             'folderId'                   => $assessment->getAssessmentContext()->getFolder()->getId(),
-            'projectAssessmentId'        => $assessment->getContextProject()?->getId(),
-            'courseImplementationId'     => $assessment->getContextUnitImplementation()?->getCourse()?->getId(),
-            'courseUnitImplementationId' => $assessment->getContextUnitImplementation()?->getId(),
-            'courseSpecificationId'      => $assessment->getContextUnitSpecification()?->getCourse()?->getId(),
-            'courseUnitSpecificationId'  => $assessment->getContextUnitSpecification()?->getId(),
+            'projectAssessmentId'        => $contextProject?->getId(),
+            'courseImplementationId'     => $unitImplementation?->getCourse()?->getId(),
+            'courseUnitImplementationId' => $unitImplementation?->getId(),
+            'courseSpecificationId'      => $unitSpecification?->getCourse()?->getId(),
+            'courseUnitSpecificationId'  => $unitSpecification?->getId(),
         ];
         $updateQuery->execute($params);
         return true;
