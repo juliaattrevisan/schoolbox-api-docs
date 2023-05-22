@@ -106,7 +106,6 @@ class Receiver
         private string $logDir,
         private \Schoolbox\External\Connector\Log\Mapper $importLogMapper,
         private \Schoolbox\Resource\Storage\Mapper $storageMapper
-
     ) {
         /* (configured in admin) A csv list of event types that should be ignored
          * and a default event type that should be attributed to a liss event
