@@ -1,3 +1,12 @@
+-- Push down all the other configs in this area
+-- Create a hole in config
+
+UPDATE config c
+    INNER JOIN lu_config_type lct on c.type_id = lct.id
+SET c.sequence = c.sequence + 1
+WHERE lct.type = 'External DB'
+  AND c.sequence > (SELECT c2.sequence FROM config c2 WHERE c2.name='external_liss_teacher_identifier' LIMIT 1);
+
 -- Add the choice to activate logging to brownhole storage
 -- This is a user-selectable field, for now, so schools can decide
 -- when they enable it and when they don't
