@@ -12,7 +12,7 @@ import MgSearchResults from "./mg-search-results.vue";
 
 const addMembersStore = useAddMembersStore();
 const searchStore = useSearchStore();
-const searchEl = ref(null);
+const searchEl = window.Vue.ref(null);
 
 /**
  * Update the input place holder text depending on the currentFromSelect

@@ -94,11 +94,11 @@ const props = defineProps({
     yearLevelLabel: {
         type: String,
         required: true,
-    }
+    },
 });
 
 const store = useStore();
-const toastEl = ref(null);
+const toastEl = window.Vue.ref(null);
 
 /**
  * set the endpoints here, and the stores can just reference the object
@@ -123,7 +123,7 @@ onMounted(() => {
     store.groupStaffOnly = props.groupStaffOnly;
     // NOTE: Endpoints.SEND_EMAIL will be blank if the route is not authorised for the user
     store.emailEnabled = props.emailEnabled && Endpoints.SEND_EMAIL;
-    store.yearLevelLabel = props.yearLevelLabel
+    store.yearLevelLabel = props.yearLevelLabel;
     checkForStorybook();
     store.loadData();
 });

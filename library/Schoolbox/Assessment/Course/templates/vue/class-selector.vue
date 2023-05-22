@@ -58,9 +58,9 @@ const props = defineProps({
  *
  ****************************************************************/
 
-const isLoading = ref(true);
-const hasLoadError = ref(false);
-const classes = ref([]); //all the classes data
+const isLoading = window.Vue.ref(true);
+const hasLoadError = window.Vue.ref(false);
+const classes = window.Vue.ref([]); //all the classes data
 
 /**
  * a class has already been previously selected, so the class-selector is not enabled
@@ -146,12 +146,12 @@ async function loadClassList() {
  *
  ****************************************************************/
 
-const query = ref(""); //the search string to match against
-const queryInputEl = ref(null);
+const query = window.Vue.ref(""); //the search string to match against
+const queryInputEl = window.Vue.ref(null);
 const minQueryLength = 1; //should be able to search for just '3', if we want all of Grade 3
 const CAPPED_RESULTS_LENGTH = 100; //the maximum amount of results to show
-const isResultsCapped = ref(false); //to show a 'refine your search' note
-const resultsNotShownCount = ref(0); //a total of the results not visible in the list
+const isResultsCapped = window.Vue.ref(false); //to show a 'refine your search' note
+const resultsNotShownCount = window.Vue.ref(0); //a total of the results not visible in the list
 
 /**
  * the search string broken into words, to search for each word
@@ -262,7 +262,7 @@ function onEnterKeySelected() {
     clearInput();
 }
 
-const classSelectorEl = ref(null);
+const classSelectorEl = window.Vue.ref(null);
 
 /**
  * to be able to close the search results
@@ -289,7 +289,7 @@ function clearInput() {
  *
  ****************************************************************/
 
-const selectedClasses = ref([]); //the classes currently selected
+const selectedClasses = window.Vue.ref([]); //the classes currently selected
 
 /**
  * determine display of elements based on whether any classes are selected

@@ -31,8 +31,8 @@ const props = defineProps({
     },
 });
 
-const selectedNode = ref(getEmptyNode());
-const nodeModalEl = ref(null);
+const selectedNode = window.Vue.ref(getEmptyNode());
+const nodeModalEl = window.Vue.ref(null);
 
 /**
  * whether only a single badge is selected, in which case we can
@@ -63,8 +63,8 @@ function onCodeSelected(node) {
     nodeModalEl.value.open();
 }
 
-const currentBadge = ref(null);
-const isBadgeModalOpen = ref(false);
+const currentBadge = window.Vue.ref(null);
+const isBadgeModalOpen = window.Vue.ref(false);
 
 /**
  * Opens a modal window for viewing this badge's full details.

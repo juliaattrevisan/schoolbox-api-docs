@@ -10,7 +10,7 @@ import CsSelectedNode from "./cs-selected-node.vue";
 
 const store = useStore();
 const selectedNodesStore = useSelectedNodesStore();
-const selectEl = ref(null);
+const selectEl = window.Vue.ref(null);
 
 /**
  * to listen for any clears of the selected codes from outside the Vue app

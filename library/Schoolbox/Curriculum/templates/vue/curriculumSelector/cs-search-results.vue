@@ -11,8 +11,8 @@ import CsSelectAllSearchResults from "./cs-select-all-search-results.vue";
 import CsSearchResult from "./cs-search-result.vue";
 
 const searchStore = useSearchStore();
-const searchResultsContainerEl = ref(null);
-const searchResultsEl = ref(null);
+const searchResultsContainerEl = window.Vue.ref(null);
+const searchResultsEl = window.Vue.ref(null);
 
 /**
  * show select all option for adding / removing codes only if there's

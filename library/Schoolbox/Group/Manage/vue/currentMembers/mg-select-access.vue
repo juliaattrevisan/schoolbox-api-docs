@@ -14,8 +14,8 @@ const store = useStore(); //to disable buttons on processing
 const membersStore = useMembersStore(); //to keep track of selectedMembers
 const updateMembersStore = useUpdateMembersStore(); //to update member access
 const rejectMembersStore = useRejectMembersStore(); //to reject the selected members
-const areAllSelectedOnWaitingList = ref(false); //to determine whether we can show the approve membership button if all selected are awaiting membership
-const changeMemberAccess = ref(""); //to bulk update members access rights
+const areAllSelectedOnWaitingList = window.Vue.ref(false); //to determine whether we can show the approve membership button if all selected are awaiting membership
+const changeMemberAccess = window.Vue.ref(""); //to bulk update members access rights
 
 /**
  * if all selected members are on the waiting list we should show for bulk approval

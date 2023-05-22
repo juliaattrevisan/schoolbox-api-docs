@@ -20,7 +20,7 @@ const props = defineProps({
 });
 
 const store = useStore();
-const isProcessing = ref(false); //so only the just selected member is active
+const isProcessing = window.Vue.ref(false); //so only the just selected member is active
 
 /*****************************************************************
  *
