@@ -22,7 +22,6 @@ use UnexpectedValueException;
 use PDO;
 use PDOException;
 use PDOStatement;
-use Psr\Log\NullLogger;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
@@ -1365,6 +1364,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 SELECT DISTINCT c.id
                 FROM {$this->getTable()} c
                 INNER JOIN userAccess a ON c.id = a.sid AND a.service = :service AND a.uid = :user
+                JOIN {$this->getJoinSql('groups', 'c', 'g')}
                 LEFT JOIN {$this->getJoinSql('homepages', 'c', 'h')}
                 WHERE c.deleted_at IS NULL
             "
@@ -1376,9 +1376,9 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 {$this->getJoinColumnString('groups', 'g')}
             FROM {$this->getTable()} c
             INNER JOIN userAccess a ON c.id = a.sid AND a.service = :service AND a.uid = :user
+            JOIN {$this->getJoinSql('groups', 'c', 'g')}
             LEFT JOIN {$this->getJoinSql('codes', 'c', 'cc')}
             LEFT JOIN {$this->getJoinSql('homepages', 'c', 'h')}
-            LEFT JOIN {$this->getJoinSql('groups', 'c', 'g')}
             WHERE c.deleted_at IS NULL
         ";
         if ($exactAccess) {
