@@ -1504,10 +1504,15 @@ class Mapper extends BaseMapper
 
         // Impl and spec come from project context if there is one:
         // otherwise, directly from assessment
-        $contextProject     = $assessment->getContextProject();
-        $unitImplementation = ($contextProject ?? $assessment)->getContextUnitImplementation();
-        $unitSpecification  = ($contextProject ?? $assessment)->getContextUnitSpecification();
-        $params             = [
+        $contextProject = $assessment->getContextProject();
+        if ($contextProject) {
+            $unitImplementation = $contextProject->getAssessmentModel()->getContextUnitImplementation();
+            $unitSpecification  = $contextProject->getAssessmentModel()->getContextUnitSpecification();
+        } else {
+            $unitImplementation = $assessment->getContextUnitImplementation();
+            $unitSpecification  = $assessment->getContextUnitSpecification();
+        }
+        $params = [
             'assessmentId'               => $assessment->getId(),
             'folderId'                   => $assessment->getAssessmentContext()->getFolder()->getId(),
             'projectAssessmentId'        => $contextProject?->getId(),
