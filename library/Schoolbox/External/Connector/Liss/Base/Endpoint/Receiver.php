@@ -82,16 +82,17 @@ class Receiver
     /**
      * Constructor.
      *
-     * @param int                                      $externalEnable  Whether the external db was enabled
-     * @param string                                   $externalType  Whether the external db is the "schoolbox" connector or something else (it only works with "schoolbox" connector)
-     * @param string                                   $username  LISS username, as per config
-     * @param string                                   $password  LISS password, as per config
-     * @param string                                   $exclusionList  A csv list of event types that we should skip
-     * @param string                                   $defaultType  A string denoting an arbitrary event type that we attribute when the supplied type is non-meaningful
-     * @param string                                   $teacherIdentifier  Decide whether to use teacherIds or teacherCodes; configured in admin
-     * @param string                                   $logDir  Path to a local log file
-     * @param \Schoolbox\External\Connector\Log\Mapper $importLogMapper  Log the import in the suds control panel
-     * @param \Schoolbox\Resource\Storage\Mapper       $storageMapper
+     * @param int                                      $externalEnable    Whether the external db was enabled
+     * @param string                                   $externalType      Whether the external db is the "schoolbox" connector or something else (it only works with "schoolbox" connector)
+     * @param string                                   $username          LISS username, as per config
+     * @param string                                   $password          LISS password, as per config
+     * @param string                                   $exclusionList     A csv list of event types that we should skip
+     * @param string                                   $defaultType       A string denoting an arbitrary event type that we attribute when the supplied type is non-meaningful
+     * @param string                                   $teacherIdentifier Decide whether to use teacherIds or teacherCodes; configured in admin
+     * @param bool                                     $storageLogging    Decide whether to log actul liss payloads to local brownhole storage
+     * @param string                                   $logDir            Path to a local log file
+     * @param \Schoolbox\External\Connector\Log\Mapper $importLogMapper   Log the import in the suds control panel
+     * @param \Schoolbox\Resource\Storage\Mapper       $storageMapper     Log liss payloads to a brownhole record
      */
     public function __construct(
         private int $externalEnable,
@@ -101,6 +102,7 @@ class Receiver
         private string $exclusionList,
         private string $defaultType,
         private string $teacherIdentifier,
+        private bool $storageLogging,
         private string $logDir,
         private \Schoolbox\External\Connector\Log\Mapper $importLogMapper,
         private \Schoolbox\Resource\Storage\Mapper $storageMapper
@@ -210,7 +212,9 @@ class Receiver
         /* Cache locally whatever liss sent to us
          * This allows you to replay locally
          */
-        (new PayloadCache($this->storageMapper))->cache($message);
+        if ($this->storageLogging) {
+            (new PayloadCache($this->storageMapper))->cache($message);
+        }
 
         /* This is the equivalent of a combined Scheduler.php and Factory.php
          * since the liss receiver immediately processes upon receiving data
