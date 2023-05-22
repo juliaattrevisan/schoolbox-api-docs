@@ -25,19 +25,23 @@ use Schoolbox\File\Mimetype;
 class ValidUploadableFile extends BaseSpecification
 {
     /**
-     * The maximum number of days in which a file may expire, and be allowed to
-     * bypass the maximum file size restriction.
+     * Constructor
      *
-     * Set to 15 currently, as most temp file upload locations set an expiry two
-     * weeks into the future.
+     * @param int                 $filesize       The size of the file being uploaded: not yet a property of the file.
+     * @param Alaress_Date_Format $latestTempDate The latest possible expiry date at which the file being uploaded is
+     *                                            considered a temp file, and thus bypasses size validation.
      */
-    private const MAX_DAYS_ALLOWED_FOR_TEMP_FILE_BYPASS = 15;
+    public function __construct(
+        private int $filesize,
+        private Alaress_Date_Format $latestTempDate,
+    ) {
+    }
 
     /**
      * Validate that `$candidate` is uploadable:
      * * it must have a mimetype
      * * its mimetype must be allowed
-     * * if it has no expiry, or an expiry more than 15 days into the future:
+     * * if it has no expiry, or an expiry after `$this->latestTempDate`:
      *   its size must not be greater than the mimetype's max allowable size
      *
      * @param Model $candidate
@@ -71,13 +75,12 @@ class ValidUploadableFile extends BaseSpecification
         $fileExpiry = $candidate->getExpiryAt();
         $assertSize = true;
         if ($fileExpiry) {
-            $latestAllowedExpiry = Alaress_Date_Format::now()->addDays(self::MAX_DAYS_ALLOWED_FOR_TEMP_FILE_BYPASS);
-            if ($fileExpiry->lte($latestAllowedExpiry)) {
+            if ($fileExpiry->lte($this->latestTempDate)) {
                 $assertSize = false;
             }
         }
         if ($assertSize) {
-            if ($fileMime->getActualMaxFileSize() < $candidate->getSize()) {
+            if ($fileMime->getActualMaxFileSize() < $this->filesize) {
                 throw new FileException(
                     sprintf(
                         "This file exceeds the file size restriction of %s. %s",
