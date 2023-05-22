@@ -9,9 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Liss\Base\Endpoint;
 
-use Alaress\Lumberjack\Logger;
+use Alaress\IDatabase;
 use PhpXmlRpc\Request;
-use Psr\Log\LoggerInterface;
 
 /**
  * Cache a pushed payload locally
@@ -19,30 +18,12 @@ use Psr\Log\LoggerInterface;
 class PayloadCache
 {
     /**
-     * Save payloads here
-     */
-    private const LOG_FILE = 'liss_payloads.log';
-
-
-    /**
-     * @var LoggerInterface
-     */
-    private LoggerInterface $log;
-
-
-    /**
      * Constructor.
+     *
+     * @param IDatabase $database
      */
-    public function __construct()
+    public function __construct(private IDatabase $database)
     {
-        $path = sprintf(
-            '%s/%s',
-            \Schoolbox\Config\Loader::getInstance()->get('logs_dir'),
-            self::LOG_FILE
-        );
-
-        $logFile   = fopen($path, 'a');
-        $this->log = new Logger($logFile, $logFile, \Monolog\Logger::DEBUG, [], true);
     }
 
 
@@ -63,6 +44,11 @@ class PayloadCache
             '{' => "\n{"
         ]);
 
-        $this->log->debug($payload);
+        $now = \Alaress_Date_Format::now()->getDatabase();
+
+        $this->database->query("
+            INSERT INTO log (data, created_at)
+            VALUES (\"{$payload}\", \"{$now}\")
+        ");
     }
 }
