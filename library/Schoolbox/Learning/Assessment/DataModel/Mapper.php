@@ -1504,7 +1504,7 @@ class Mapper extends BaseMapper
         $params = [
             'assessmentId'               => $assessment->getId(),
             'folderId'                   => $assessment->getAssessmentContext()->getFolder()->getId(),
-            'projectAssessmentId'        => $assessment->getProject()?->getId(),
+            'projectAssessmentId'        => $assessment->getContextProject()?->getId(),
             'courseImplementationId'     => $assessment->getContextUnitImplementation()?->getCourse()?->getId(),
             'courseUnitImplementationId' => $assessment->getContextUnitImplementation()?->getId(),
             'courseSpecificationId'      => $assessment->getContextUnitSpecification()?->getCourse()?->getId(),
