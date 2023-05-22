@@ -213,6 +213,8 @@ class Receiver
          * This allows you to replay locally
          */
         if ($this->storageLogging) {
+            $this->log()->debug('Logging LISS payload to local storage');
+
             (new PayloadCache($this->storageMapper))->cache($message);
         }
 
