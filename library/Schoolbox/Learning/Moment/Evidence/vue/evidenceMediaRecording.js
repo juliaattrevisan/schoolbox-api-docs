@@ -1,4 +1,3 @@
-import { createApp } from "vue";
 import EvidenceMediaRecording from "./evidence-media-recording";
 
 window.Vue.createApp({

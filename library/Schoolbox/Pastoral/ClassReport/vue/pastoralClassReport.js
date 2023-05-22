@@ -1,4 +1,3 @@
-import { createApp } from "vue";
 import PastoralClassReport from "./pastoral-class-report.vue";
 
 window.Vue.createApp({

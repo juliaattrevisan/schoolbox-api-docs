@@ -1,4 +1,3 @@
-import { createApp } from "vue";
 import ClassList from "./class-list";
 
 window.Vue.createApp({

@@ -1,4 +1,3 @@
-import { createApp } from "vue";
 import ManageCurriculum from "./manage-curriculum";
 import { createPinia } from "pinia";
 window.Vue.createApp({

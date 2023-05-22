@@ -1,4 +1,3 @@
-import { createApp } from "vue";
 import ViewAllFiles from "./view-all-files";
 import { ClientTable } from "v-tables-3-select-rows";
 

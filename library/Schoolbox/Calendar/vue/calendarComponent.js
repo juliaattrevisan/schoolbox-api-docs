@@ -1,4 +1,3 @@
-import { createApp } from "vue";
 import CalendarComponent from "./calendar-component.vue";
 
 const calendars = document.querySelectorAll('[id^="calendar-"]');

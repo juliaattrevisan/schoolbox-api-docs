@@ -1,4 +1,3 @@
-import { createApp } from "vue";
 import BadgeListForm from "./badge-list-form";
 
 window.Vue.createApp({

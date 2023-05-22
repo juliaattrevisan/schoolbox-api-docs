@@ -1,4 +1,3 @@
-import { createApp } from "vue";
 import StaleUsersReport from "./stale-users-report";
 import { ClientTable } from "v-tables-3-select-rows";
 

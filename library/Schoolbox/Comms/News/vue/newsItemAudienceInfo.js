@@ -1,4 +1,3 @@
-import { createApp } from "vue";
 import NewsItemAudienceInfo from "./news-item-audience-info";
 
 window.Vue.createApp({

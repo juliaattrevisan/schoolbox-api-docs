@@ -1,4 +1,3 @@
-import { createApp } from "vue";
 import NewsRssLink from "./news-rss-link";
 
 window.Vue.createApp({
