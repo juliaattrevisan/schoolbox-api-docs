@@ -66,7 +66,7 @@ settingsStore.$onAction(({ name, after, onError }) => {
  *
  * @returns { String }
  */
-const updateButtonText = computed(() => (settingsStore.isProcessing ? "Updating..." : "Update"));
+const updateButtonText = window.Vue.computed(() => (settingsStore.isProcessing ? "Updating..." : "Update"));
 
 /**
  * to prevent the user from moving away from the modal while
@@ -74,7 +74,7 @@ const updateButtonText = computed(() => (settingsStore.isProcessing ? "Updating.
  *
  * @returns { Boolean }
  */
-const isUpdateModalDisabled = computed(() => settingsStore.isProcessing);
+const isUpdateModalDisabled = window.Vue.computed(() => settingsStore.isProcessing);
 
 /**
  * to close the modal

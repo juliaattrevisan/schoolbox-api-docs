@@ -40,7 +40,7 @@ watch(
  *
  * @returns { String }
  */
-const appproveButtonText = computed(() => {
+const appproveButtonText = window.Vue.computed(() => {
     if (areAllSelectedOnWaitingList.value && updateMembersStore.isSelectedProcessing) {
         return "Approving...";
     } else {
@@ -87,7 +87,7 @@ updateMembersStore.$onAction(({ name, after, onError }) => {
  *
  * @returns { String }
  */
-const rejectButtonText = computed(() => {
+const rejectButtonText = window.Vue.computed(() => {
     if (areAllSelectedOnWaitingList.value && rejectMembersStore.isSelectedProcessing) {
         return "Rejecting...";
     } else {

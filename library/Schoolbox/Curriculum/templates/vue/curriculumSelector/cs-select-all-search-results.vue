@@ -17,7 +17,7 @@ const selectedNodesStore = useSelectedNodesStore();
  *
  * @returns { Boolean }
  */
-const isAllResultsSelected = computed(() => {
+const isAllResultsSelected = window.Vue.computed(() => {
     if (selectedNodesStore.nodes.length > 0) {
         const alreadySelectedNodes = searchStore.results.filter((resultItem) => {
             return selectedNodesStore.nodes.some((node) => resultItem.id === node.id);
@@ -34,7 +34,7 @@ const isAllResultsSelected = computed(() => {
  *
  * @returns { Boolean }
  */
-const isSomeResultsSelected = computed(() => {
+const isSomeResultsSelected = window.Vue.computed(() => {
     if (selectedNodesStore.nodes.length > 0) {
         const alreadySelectedNodes = searchStore.results.filter((resultItem) => {
             return selectedNodesStore.nodes.some((node) => resultItem.id === node.id);
@@ -52,7 +52,7 @@ const isSomeResultsSelected = computed(() => {
  *
  * @returns { Boolean }
  */
-const isChecked = computed(() => (isAllResultsSelected.value ? true : false));
+const isChecked = window.Vue.computed(() => (isAllResultsSelected.value ? true : false));
 
 /**
  * toggle all depending on current check status

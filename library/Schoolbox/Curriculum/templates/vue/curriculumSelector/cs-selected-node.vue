@@ -33,7 +33,7 @@ const selectedNodesStore = useSelectedNodesStore();
  *
  * @returns { boolean }
  */
-const isDisabled = computed(() => selectedNodesStore.isLoading);
+const isDisabled = window.Vue.computed(() => selectedNodesStore.isLoading);
 
 /**
  * To open a modal that shows further info on the selected node

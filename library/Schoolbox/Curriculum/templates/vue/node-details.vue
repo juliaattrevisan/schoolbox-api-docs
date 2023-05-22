@@ -67,7 +67,7 @@ async function load() {
  *
  * @returns { String }
  */
-const title = computed(() => {
+const title = window.Vue.computed(() => {
     if (node.value?.code && node.value.code !== "") {
         return `[${node.value.code}] ${node.value.name}`;
     } else {
@@ -80,7 +80,7 @@ const title = computed(() => {
  *
  * @returns { String }
  */
-const breadcrumbs = computed(() => {
+const breadcrumbs = window.Vue.computed(() => {
     if (node.value?.breadcrumbs.length > 0) {
         const justNames = node.value.breadcrumbs.map((breadcrumb) => breadcrumb.name);
         return justNames.join(" > ");

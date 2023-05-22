@@ -63,7 +63,7 @@ async function redirect() {
  *
  * @returns { String }
  */
-const disbandButtonText = computed(() => (disbandStore.isProcessing ? "Disbanding..." : "Yes"));
+const disbandButtonText = window.Vue.computed(() => (disbandStore.isProcessing ? "Disbanding..." : "Yes"));
 
 /**
  * to prevent the user from moving away from the modal while
@@ -72,7 +72,7 @@ const disbandButtonText = computed(() => (disbandStore.isProcessing ? "Disbandin
  *
  * @returns { Boolean }
  */
-const isCloseModalDisabled = computed(() => disbandStore.isProcessing || hasDisbanded.value);
+const isCloseModalDisabled = window.Vue.computed(() => disbandStore.isProcessing || hasDisbanded.value);
 
 /**
  * to close the modal

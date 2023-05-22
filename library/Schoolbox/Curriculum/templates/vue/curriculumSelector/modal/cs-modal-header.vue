@@ -18,7 +18,7 @@ const nodesStore = useNodesStore();
  *
  * @returns { boolean }
  */
-const isDisabled = computed(() => modalNodeUsageStore.isOpen || nodesStore.isLoading);
+const isDisabled = window.Vue.computed(() => modalNodeUsageStore.isOpen || nodesStore.isLoading);
 </script>
 
 <template>

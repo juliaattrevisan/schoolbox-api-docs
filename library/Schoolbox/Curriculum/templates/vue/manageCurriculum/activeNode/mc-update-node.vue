@@ -28,14 +28,14 @@ const updateNodeStore = useUpdateNodeStore();
  *
  * @returns { number }
  */
-const marginLeft = computed(() => `calc(${props.depth * 2}rem)`);
+const marginLeft = window.Vue.computed(() => `calc(${props.depth * 2}rem)`);
 
 /**
  * Store a reference to the ckeditor used for the description
  *
  * @returns { string }
  */
-const ckeditorInstance = computed(() => `description-${activeNodeStore.node.id}`);
+const ckeditorInstance = window.Vue.computed(() => `description-${activeNodeStore.node.id}`);
 
 /**
  * Use a customised ckeditor for the description field
@@ -55,7 +55,7 @@ watch(descriptionField, (newValue) => {
  *
  * @returns { string }
  */
-const updateButtonText = computed(() => (updateNodeStore.isProcessing ? "Updating..." : "Update"));
+const updateButtonText = window.Vue.computed(() => (updateNodeStore.isProcessing ? "Updating..." : "Update"));
 
 /**
  * submit save
@@ -92,7 +92,7 @@ function onCancelSelected() {
  *
  * @returns { boolean }
  */
-const isUpdateDisabled = computed(() => {
+const isUpdateDisabled = window.Vue.computed(() => {
     return updateNodeStore.activeNodeCopy.name.trim().length === 0 || updateNodeStore.isProcessing;
 });
 </script>

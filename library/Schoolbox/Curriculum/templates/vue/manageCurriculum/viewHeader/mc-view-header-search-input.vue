@@ -26,14 +26,14 @@ const searchStore = useSearchStore();
  *
  * @returns { Boolean }
  */
-const isDisabled = computed(() => !viewNodesStore.isActive || props.isDisabled);
+const isDisabled = window.Vue.computed(() => !viewNodesStore.isActive || props.isDisabled);
 
 /**
  * Only enable search once a first node is selected
  *
  * @returns { String }
  */
-const placeholder = computed(() => {
+const placeholder = window.Vue.computed(() => {
     if (!viewNodesStore.isActive) {
         return "Expand a curriculum to enable search...";
     } else {

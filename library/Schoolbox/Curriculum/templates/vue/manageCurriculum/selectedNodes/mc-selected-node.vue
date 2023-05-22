@@ -33,14 +33,14 @@ const selectedNodesStore = useSelectedNodesStore();
  *
  * @returns { boolean }
  */
-const isDisabled = computed(() => selectedNodesStore.isLoading);
+const isDisabled = window.Vue.computed(() => selectedNodesStore.isLoading);
 
 /**
  * Add in the code if it's available otherwise just show the title
  *
  * @returns { String }
  */
-const title = computed(() => {
+const title = window.Vue.computed(() => {
     if (props.node.code && props.node.code !== "") {
         return `${props.node.code}`;
     } else {

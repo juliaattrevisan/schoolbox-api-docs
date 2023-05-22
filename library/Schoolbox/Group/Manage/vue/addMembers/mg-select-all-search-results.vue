@@ -15,7 +15,7 @@ const searchStore = useSearchStore();
  *
  * @returns { Boolean }
  */
-const isAllResultsSelected = computed(() => {
+const isAllResultsSelected = window.Vue.computed(() => {
     if (searchStore.selectedResults.length > 0) {
         const alreadySelectedResults = searchStore.filteredResults.filter((resultItem) => {
             return searchStore.selectedResults.some((selectionItem) => resultItem.id === selectionItem.id);
@@ -32,7 +32,7 @@ const isAllResultsSelected = computed(() => {
  *
  * @returns { Boolean }
  */
-const isSomeResultsSelected = computed(() => {
+const isSomeResultsSelected = window.Vue.computed(() => {
     if (searchStore.selectedResults.length > 0) {
         const alreadySelectedResults = searchStore.filteredResults.filter((resultItem) => {
             return searchStore.selectedResults.some((selectionItem) => resultItem.id === selectionItem.id);
@@ -51,7 +51,7 @@ const isSomeResultsSelected = computed(() => {
  *
  * @returns { Boolean }
  */
-const isChecked = computed(() => (isAllResultsSelected.value ? true : false));
+const isChecked = window.Vue.computed(() => (isAllResultsSelected.value ? true : false));
 
 /**
  * Add or remove all current search results

@@ -68,7 +68,7 @@ const classes = ref([]); //all the classes data
  *
  * @returns { Boolean }
  */
-const hasPreviouslySelectedClass = computed(() => {
+const hasPreviouslySelectedClass = window.Vue.computed(() => {
     return props.previouslySelectedClass.id !== undefined;
 });
 
@@ -77,7 +77,7 @@ const hasPreviouslySelectedClass = computed(() => {
  *
  * @returns { Boolean }
  */
-const isClassSelectorActive = computed(() => {
+const isClassSelectorActive = window.Vue.computed(() => {
     return props.previouslySelectedClass.id === undefined;
 });
 
@@ -86,7 +86,7 @@ const isClassSelectorActive = computed(() => {
  *
  * @returns { String }
  */
-const inputPlaceholder = computed(() => {
+const inputPlaceholder = window.Vue.computed(() => {
     if (isLoading.value) {
         return "Loading classes, please wait...";
     } else if (hasLoadError.value) {
@@ -158,7 +158,7 @@ const resultsNotShownCount = ref(0); //a total of the results not visible in the
  *
  * @returns { Array } the search string broken into single words
  */
-const queryWordList = computed(() => {
+const queryWordList = window.Vue.computed(() => {
     const queryTrimmed = query.value.trim(); //remove any front or back white space
     const re = /\s*(?:,|$)\s*/; //adapted from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/split#removing_spaces_from_a_string
     const commaSeparated = queryTrimmed.split(re) ?? []; //split the string into a comma separated list
@@ -171,7 +171,7 @@ const queryWordList = computed(() => {
  *
  * @returns { Array } all relevant search results, once we've reached the minQueryLength
  */
-const results = computed(() => {
+const results = window.Vue.computed(() => {
     isResultsCapped.value = false;
     if (query.value.length < minQueryLength) {
         return [];
@@ -197,7 +197,7 @@ const results = computed(() => {
  *
  * @returns { Boolean }
  */
-const showSelectAll = computed(() => {
+const showSelectAll = window.Vue.computed(() => {
     return results.value.length > 1;
 });
 
@@ -296,7 +296,7 @@ const selectedClasses = ref([]); //the classes currently selected
  *
  * @returns { Boolean } all relevant search results, once we've reached the minQueryLength
  */
-const hasSelectedClasses = computed(() => {
+const hasSelectedClasses = window.Vue.computed(() => {
     return selectedClasses.value.length > 0;
 });
 
@@ -305,7 +305,7 @@ const hasSelectedClasses = computed(() => {
  *
  * @returns { String }
  */
-const selectedClassIds = computed(() => {
+const selectedClassIds = window.Vue.computed(() => {
     const selectedClassIdList = selectedClasses.value.map((selectedClasss) => selectedClasss.id);
     return selectedClassIdList.join(",");
 });
@@ -343,7 +343,7 @@ function toggleResult(toggledClass) {
  *
  * @returns { Boolean }
  */
-const isAllResultsSelected = computed(() => {
+const isAllResultsSelected = window.Vue.computed(() => {
     if (selectedClasses.value.length > 0) {
         const alreadySelectedClasses = results.value.filter((resultItem) => resultItem.isSelected); //check if the class is in the list already
         return alreadySelectedClasses.length === results.value.length ? true : false;
@@ -357,7 +357,7 @@ const isAllResultsSelected = computed(() => {
  *
  * @returns { Boolean }
  */
-const isSomeResultsSelected = computed(() => {
+const isSomeResultsSelected = window.Vue.computed(() => {
     if (selectedClasses.value.length > 0) {
         const alreadySelectedClasses = results.value.filter((resultItem) => resultItem.isSelected); //check if the class is in the list already
         return alreadySelectedClasses.length >= 1 && alreadySelectedClasses.length !== results.value.length

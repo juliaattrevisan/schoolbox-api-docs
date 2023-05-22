@@ -54,7 +54,7 @@ removeMembersStore.$onAction(({ name, after, onError }) => {
  *
  * @returns { String }
  */
-const removeButtonText = computed(() => (removeMembersStore.isProcessing ? "Removing..." : "Yes"));
+const removeButtonText = window.Vue.computed(() => (removeMembersStore.isProcessing ? "Removing..." : "Yes"));
 
 /**
  * to prevent the user from moving away from the modal while
@@ -62,7 +62,7 @@ const removeButtonText = computed(() => (removeMembersStore.isProcessing ? "Remo
  *
  * @returns { Boolean }
  */
-const isCloseModalDisabled = computed(() => removeMembersStore.isProcessing);
+const isCloseModalDisabled = window.Vue.computed(() => removeMembersStore.isProcessing);
 
 /**
  * to close the modal

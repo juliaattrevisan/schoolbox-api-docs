@@ -36,7 +36,7 @@ const updateMembersStore = useUpdateMembersStore();
  *
  * @returns { String }
  */
-const approveButtonText = computed(() =>
+const approveButtonText = window.Vue.computed(() =>
     updateMembersStore.isProcessing && isProcessing.value ? "Approving..." : "Approve"
 );
 
@@ -93,7 +93,7 @@ const rejectMembersStore = useRejectMembersStore();
  *
  * @returns { String }
  */
-const rejectButtonText = computed(() =>
+const rejectButtonText = window.Vue.computed(() =>
     rejectMembersStore.isProcessing && isProcessing.value ? "Rejecting..." : "Reject"
 );
 

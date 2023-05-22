@@ -37,7 +37,7 @@ const currentFormDataValues = ref("");
  * Only show the save button if there's a form data change
  * or the bottom of the page is visible
  */
-const showSaveButton = computed(() => hasFormDataChange.value || isAtBottomOfPage.value);
+const showSaveButton = window.Vue.computed(() => hasFormDataChange.value || isAtBottomOfPage.value);
 
 onMounted(() => {
     initIntersectionObserver();

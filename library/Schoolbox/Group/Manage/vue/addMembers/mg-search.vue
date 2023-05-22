@@ -19,7 +19,7 @@ const searchEl = ref(null);
  *
  * @returns { String }
  */
-const inputPlaceholder = computed(() => {
+const inputPlaceholder = window.Vue.computed(() => {
     const placeholderOptions = {
         [FromTypes.NAME]: "Search users...",
         [FromTypes.GROUP]: "Search groups...",

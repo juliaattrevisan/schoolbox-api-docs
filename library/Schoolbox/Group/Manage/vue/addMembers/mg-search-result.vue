@@ -27,7 +27,7 @@ const props = defineProps({
  *
  * @returns { HTML }
  */
-const highlightNameSearch = computed(() => highlightSearchInElement(props.result.name));
+const highlightNameSearch = window.Vue.computed(() => highlightSearchInElement(props.result.name));
 
 /**
  * To highlight where the search string matches within the settings result
@@ -51,7 +51,7 @@ function highlightSearchInElement(toHighlight) {
  *
  * @returns { Boolean }
  */
-const isSelected = computed(() => {
+const isSelected = window.Vue.computed(() => {
     return searchStore.selectedResults.some((selectedItem) => props.result.id === selectedItem.id);
 });
 

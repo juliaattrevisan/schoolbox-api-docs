@@ -31,7 +31,7 @@ onMounted(() => {
  *
  * @returns { String }
  */
-const ids = computed(() => {
+const ids = window.Vue.computed(() => {
     return selectedNodesStore.nodesIds.join(",");
 });
 

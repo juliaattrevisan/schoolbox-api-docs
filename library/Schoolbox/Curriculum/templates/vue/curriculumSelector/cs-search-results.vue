@@ -20,7 +20,7 @@ const searchResultsEl = ref(null);
  *
  * @returns { Boolean }
  */
-const showSelectAll = computed(() => {
+const showSelectAll = window.Vue.computed(() => {
     return searchStore.filteredResults.length > 1;
 });
 

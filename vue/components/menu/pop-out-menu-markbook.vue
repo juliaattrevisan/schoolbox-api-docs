@@ -6,7 +6,7 @@
 
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import type { Ref } from "vue";
-import { useFloating, autoUpdate, flip, shift, offset} from '@floating-ui/vue';
+import { useFloating, autoUpdate, flip, shift, offset } from "@floating-ui/vue";
 import PopOut from "../popOut/pop-out.vue";
 import SmallCard from "../card/small-card.vue";
 import PopOutMenuItem from "./pop-out-menu-item.vue";
@@ -31,7 +31,6 @@ type ActivityItem = {
     submitted?: boolean;
     submittedOnTime?: boolean;
     published?: boolean;
-
 };
 
 /**
@@ -51,24 +50,28 @@ type Routes = {
 // FloatingUI specific, declared here as showPopOut relies on one of these values existing.
 const popOutElement = ref<HTMLDivElement | null>(null);
 const referenceElement = ref<HTMLDivElement | null>(null);
-const assessmentType = ref('');
+const assessmentType = ref("");
 
 const isLoading = ref(false);
 const isSelected = ref(false);
 const hasLoadError = ref(false);
-const showPopOut = computed(() => isSelected.value );
+const showPopOut = window.Vue.computed(() => isSelected.value);
 const isExpanded = ref(false); // is recent activity expanded
 const activityItems: Ref<ActivityItem[]> = ref([]); // list of recent activity items to display
 // has an event of type 'response' and response.submitted === true;
-const hasSubmissions = computed(() => activityItems.value.some(item => item.type === 'response' && item.submitted));
+const hasSubmissions = window.Vue.computed(() =>
+    activityItems.value.some((item) => item.type === "response" && item.submitted)
+);
 // has an event of type 'feedback'
-const hasFeedback = computed(() => activityItems.value.some(item => item.type === 'feedback'));
+const hasFeedback = window.Vue.computed(() => activityItems.value.some((item) => item.type === "feedback"));
 // has an event of type 'feedback' and feedback.published === false
-const hasDraftFeedback = computed(() => activityItems.value.some(item => item.type === 'feedback' && item.published === false));
+const hasDraftFeedback = window.Vue.computed(() =>
+    activityItems.value.some((item) => item.type === "feedback" && item.published === false)
+);
 // is the user excluded from the assessment
 const isExcluded = ref(false);
-const isActivityEmpty = computed(() => activityItems.value.length === 0);
-const isExpansionDisabled = computed(() => activityItems.value.length === 1);
+const isActivityEmpty = window.Vue.computed(() => activityItems.value.length === 0);
+const isExpansionDisabled = window.Vue.computed(() => activityItems.value.length === 1);
 const routes: Ref<Routes> = ref({
     dataEndpoint: "",
     updateRoute: "",
@@ -83,22 +86,21 @@ const markbookElement = ref<HTMLDivElement | null>(null);
 // Exclude confirm, popout
 const excludeModalEl = ref(null);
 
-
 /**
  * Middleware are optional modifiers you can provide to floating-ui. Things that determine how
  * a floating item should flip, shift itself or rotate to prevent overflowing a parent container.
  */
 const { x, y, strategy } = useFloating(referenceElement, popOutElement, {
-    placement: 'right-start',
+    placement: "right-start",
     middleware: [
         offset({
-            mainAxis: 4
+            mainAxis: 4,
         }),
         flip({
-            crossAxis: false
+            crossAxis: false,
         }),
         shift({
-            padding: 16
+            padding: 16,
         }),
     ],
     whileElementsMounted: autoUpdate,
@@ -110,7 +112,7 @@ const { x, y, strategy } = useFloating(referenceElement, popOutElement, {
  *  /why/ is it disabled? Helps users answer the question of why
  *  the activity they're expecting to see might not be there.
  */
-const viewAllText = computed(() => {
+const viewAllText = window.Vue.computed(() => {
     if (('Task' === assessmentType.value) || ('Project' === assessmentType.value)) {
         return "";
     }
@@ -132,14 +134,14 @@ const viewAllText = computed(() => {
 /**
  * Used to determine the text shown for the view status link / menu
  */
-const viewStatusText = computed(() => {
-    if ('Due Work' === assessmentType.value) {
+const viewStatusText = window.Vue.computed(() => {
+    if ("Due Work" === assessmentType.value) {
         return "Submission History";
     }
-    if ('Task' === assessmentType.value) {
+    if ("Task" === assessmentType.value) {
         return "Student View";
     }
-    if ('Project' === assessmentType.value) {
+    if ("Project" === assessmentType.value) {
         return "View Progress";
     }
     return "View Attempts";
@@ -156,7 +158,7 @@ function excludeCheck() {
         excludeModalEl.value.open();
     } else {
         // no work or feedback
-        onMenuItemSelected(routes.value.excludeRoute, 'exclude');
+        onMenuItemSelected(routes.value.excludeRoute, "exclude");
     }
 }
 
@@ -165,7 +167,7 @@ function excludeCheck() {
  */
 function exclude() {
     closeExclude();
-    onMenuItemSelected(routes.value.excludeRoute, 'exclude');
+    onMenuItemSelected(routes.value.excludeRoute, "exclude");
 }
 
 /**
@@ -190,12 +192,12 @@ function reloadMarkbook() {
     closePopOut();
 
     // reload the markbook
-    document.getElementById('submit_button').click();
+    document.getElementById("submit_button").click();
 
     /**
      * disable the markbook popout
      */
-    const elements = document.querySelectorAll('[data-pop-out-menu]');
+    const elements = document.querySelectorAll("[data-pop-out-menu]");
     elements.forEach((cell) => {
         delete cell.dataset.popOutMenu;
     });
@@ -253,14 +255,14 @@ async function getActivity() {
  */
 async function onPopOutSelected(event: CustomEvent) {
     // Make sure we're not reloading a menu we already have open.
-    if(referenceElement.value !== event.detail.target){
+    if (referenceElement.value !== event.detail.target) {
         routes.value = updateRoutes(event.detail.routes as Routes);
         isSelected.value = true;
         isExpanded.value = false;
         isExcluded.value = "true" === event.detail.isExcluded; //make bool from string issues....
         assessmentType.value = event.detail.assessmentType;
         referenceElement.value = event.detail.target;
-        if (('Task' === assessmentType.value) || ('Project' === assessmentType.value)) {
+        if ('Due Work' !== assessmentType.value) {
             hasLoadError.value = false;
             isLoading.value = false;
             activityItems.value = [];
@@ -277,15 +279,14 @@ async function onPopOutSelected(event: CustomEvent) {
  * @param { event } event - the mouse event
  */
 function onMouseClick(event: Event) {
-    if (showPopOut.value
-        && markbookElement.value !== null
-        && !markbookElement.value.contains(event.target)
-        && referenceElement.value !== event.target
-    ){
+    if (
+        showPopOut.value &&
+        markbookElement.value !== null &&
+        !markbookElement.value.contains(event.target) &&
+        referenceElement.value !== event.target
+    ) {
         // Prevent the pop out from closing if the exclude modal is open and the click is within the modal.
-        if (excludeModalEl.value !== null
-            && excludeModalEl.value.modal[0].contains(event.target)
-        ) {
+        if (excludeModalEl.value !== null && excludeModalEl.value.modal[0].contains(event.target)) {
             return;
         }
 
@@ -299,7 +300,7 @@ function onMouseClick(event: Event) {
 function closePopOut() {
     isSelected.value = false;
     // Clear out any selected states.
-    referenceElement.value?.classList.remove('is-selected');
+    referenceElement.value?.classList.remove("is-selected");
     referenceElement.value = null;
 }
 
@@ -331,26 +332,25 @@ onUnmounted(() => {
  * @returns { string } - the string to return
  */
 function getAction(item: ActivityItem): string {
-
     // If we have a response, we have to consider additional scenarios.
-    if (item.type === 'response' && item.submitted && item.submittedOnTime) {
-        return 'submitted on time';
-    };
-    if (item.type === 'response' && item.submitted && !item.submittedOnTime) {
-        return 'submitted late';
+    if (item.type === "response" && item.submitted && item.submittedOnTime) {
+        return "submitted on time";
     }
-    if (item.type === 'response') {
-        return 'drafted a response';
+    if (item.type === "response" && item.submitted && !item.submittedOnTime) {
+        return "submitted late";
     }
-    if (item.type === 'view') {
-        return 'viewed the assessment';
+    if (item.type === "response") {
+        return "drafted a response";
     }
-    if (item.type === 'feedback') {
-        return `${item.published ? 'published' : 'drafted'} feedback`;
+    if (item.type === "view") {
+        return "viewed the assessment";
+    }
+    if (item.type === "feedback") {
+        return `${item.published ? "published" : "drafted"} feedback`;
     }
 
     // At least return blank as we're expeceted to return something
-    return '';
+    return "";
 }
 
 /**
@@ -370,13 +370,12 @@ function toggleExclusion() {
     // update the data location in html, so if you click back in it doesn't break...
     const element = referenceElement.value;
     if (element) {
-        element.classList.toggle('excluded');
-        const currentValue = element.getAttribute('data-is-excluded');
-        const newValue = currentValue === 'true' ? 'false' : 'true';
-        element.setAttribute('data-is-excluded', newValue);
+        element.classList.toggle("excluded");
+        const currentValue = element.getAttribute("data-is-excluded");
+        const newValue = currentValue === "true" ? "false" : "true";
+        element.setAttribute("data-is-excluded", newValue);
     }
 }
-
 
 /**
  * Navigate to a new page
@@ -384,11 +383,11 @@ function toggleExclusion() {
  * @param { string } target - The URL we want to navigate to.
  * @param { string } action - Should we redirect, or do a specific action? (exclude,publish)
  */
-async function onMenuItemSelected(target: string, action: string|null = null) {
+async function onMenuItemSelected(target: string, action: string | null = null) {
     // No specific action, just redirect
     if (null === action) {
         // we should append the returnUrl, for all calls, so we can get back to the markbook on save.
-        let returnUrl = '?returnUrl=' + btoa(window.location.pathname);
+        let returnUrl = "?returnUrl=" + btoa(window.location.pathname);
         window.location.href = target + returnUrl;
         return;
     }
@@ -397,7 +396,7 @@ async function onMenuItemSelected(target: string, action: string|null = null) {
     try {
         isLoading.value = true;
         const response = await fetch(target, {
-            method: 'POST',
+            method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 Accept: "application/json",
@@ -407,12 +406,12 @@ async function onMenuItemSelected(target: string, action: string|null = null) {
             hasLoadError.value = false;
 
             //if action is exclude then toggle the exclusion UI
-            if ('exclude' === action) {
+            if ("exclude" === action) {
                 toggleExclusion();
             }
 
             // If including student reload the activity list
-            if ('Due Work' === assessmentType.value) {
+            if ("Due Work" === assessmentType.value) {
                 await getActivity();
             } else {
                 activityItems.value = [];
@@ -436,8 +435,8 @@ async function onMenuItemSelected(target: string, action: string|null = null) {
         ref="popOutElement"
         :style="{
             position: strategy,
-            top: `${ y ?? 0 }px`,
-            left: `${ x ?? 0 }px`,
+            top: `${y ?? 0}px`,
+            left: `${x ?? 0}px`,
         }"
     >
         <div v-if="hasLoadError">
@@ -460,9 +459,7 @@ async function onMenuItemSelected(target: string, action: string|null = null) {
                         :size="32"
                     ></user-photo>
                     <div class="c-card__details">
-                        <div class="c-card__text">
-                            {{ activityItem.effector.name }} {{ getAction(activityItem) }}
-                        </div>
+                        <div class="c-card__text">{{ activityItem.effector.name }} {{ getAction(activityItem) }}</div>
                         <div class="c-card__subtext">{{ activityItem.date.short }}</div>
                     </div>
                 </small-card>
@@ -476,9 +473,10 @@ async function onMenuItemSelected(target: string, action: string|null = null) {
                     {{ viewAllText }}
                 </pop-out-menu-item>
                 </template>
-                <template v-if="'Due Work' === assessmentType & !isExcluded">
+                <template v-if="('Due Work' === assessmentType) & !isExcluded">
                 <pop-out-menu-divider />
-                    <pop-out-menu-item v-if="!isExcluded"
+                    <pop-out-menu-item
+                        v-if="!isExcluded"
                         :class="{ 'is-disabled': !routes.updateRoute }"
                         @selected="onMenuItemSelected(routes.updateRoute)"
                     >
@@ -497,20 +495,26 @@ async function onMenuItemSelected(target: string, action: string|null = null) {
                         Publish Feedback
                     </pop-out-menu-item>
                 </template>
-                <pop-out-menu-item v-if="isExcluded"
-                                   :class="{ 'is-disabled': !isExcluded }"
-                                   @selected="onMenuItemSelected(routes.includeRoute, 'exclude')"
+                <pop-out-menu-item
+                    v-if="isExcluded"
+                    :class="{ 'is-disabled': !isExcluded }"
+                    @selected="onMenuItemSelected(routes.includeRoute, 'exclude')"
                 >
                     Include Student
                 </pop-out-menu-item>
-                <pop-out-menu-item v-else-if="'Project' !== assessmentType"
+                <pop-out-menu-item
+                    v-else-if="'Project' !== assessmentType"
                     :class="{ 'is-disabled': isExcluded }"
                     @selected="excludeCheck()"
                 >
                     Exclude Student
                 </pop-out-menu-item>
-                <pop-out-menu-item v-if="!isExcluded"
-                    :class="{ 'is-disabled': !routes.historyRoute || isExcluded || (isActivityEmpty && 'Due Work' === assessmentType) }"
+                <pop-out-menu-item
+                    v-if="!isExcluded"
+                    :class="{
+                        'is-disabled':
+                            !routes.historyRoute || isExcluded || (isActivityEmpty && 'Due Work' === assessmentType),
+                    }"
                     @selected="onMenuItemSelected(routes.historyRoute)"
                 >
                     {{ viewStatusText }}
@@ -523,20 +527,12 @@ async function onMenuItemSelected(target: string, action: string|null = null) {
             <p>Exclusion from this assessment will remove access to these submissions and/or feedback. Proceed?</p>
             <ul class="flex-list buttons">
                 <li>
-                    <button
-                        @click.prevent="exclude()"
-                        class="button submit"
-                        id="excludeStudent-exclude-button"
-                    >
+                    <button @click.prevent="exclude()" class="button submit" id="excludeStudent-exclude-button">
                         Yes
                     </button>
                 </li>
                 <li>
-                    <button
-                        @click.prevent="closeExclude()"
-                        class="button"
-                        id="excludeStudent-cancel-button"
-                    >
+                    <button @click.prevent="closeExclude()" class="button" id="excludeStudent-cancel-button">
                         Cancel
                     </button>
                 </li>
@@ -550,13 +546,13 @@ async function onMenuItemSelected(target: string, action: string|null = null) {
     white-space: normal;
     width: 16rem;
 
-    &__loader{
+    &__loader {
         width: 12rem;
     }
 }
 
 // Locally scoped class specifically for the error warning message
-.s-warning-message{
+.s-warning-message {
     max-width: 16rem;
 
     // Allow pointer events on a disabled parent container.

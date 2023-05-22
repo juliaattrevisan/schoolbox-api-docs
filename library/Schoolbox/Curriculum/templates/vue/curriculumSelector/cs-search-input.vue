@@ -28,7 +28,7 @@ const props = defineProps({
  *
  * @returns { String }
  */
-const inputPlaceholder = computed(() => {
+const inputPlaceholder = window.Vue.computed(() => {
     if (store.isLoading) {
         return "Loading Curriculum Codes...";
     } else if (store.hasLoadError) {
