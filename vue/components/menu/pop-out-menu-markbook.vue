@@ -50,14 +50,14 @@ type Routes = {
 // FloatingUI specific, declared here as showPopOut relies on one of these values existing.
 const popOutElement = ref<HTMLDivElement | null>(null);
 const referenceElement = ref<HTMLDivElement | null>(null);
-const assessmentType = ref("");
+const assessmentType = window.Vue.ref("");
 
-const isLoading = ref(false);
-const isSelected = ref(false);
-const hasLoadError = ref(false);
+const isLoading = window.Vue.ref(false);
+const isSelected = window.Vue.ref(false);
+const hasLoadError = window.Vue.ref(false);
 const showPopOut = window.Vue.computed(() => isSelected.value);
-const isExpanded = ref(false); // is recent activity expanded
-const activityItems: Ref<ActivityItem[]> = ref([]); // list of recent activity items to display
+const isExpanded = window.Vue.ref(false); // is recent activity expanded
+const activityItems: Ref<ActivityItem[]> = window.Vue.ref([]); // list of recent activity items to display
 // has an event of type 'response' and response.submitted === true;
 const hasSubmissions = window.Vue.computed(() =>
     activityItems.value.some((item) => item.type === "response" && item.submitted)
@@ -69,10 +69,10 @@ const hasDraftFeedback = window.Vue.computed(() =>
     activityItems.value.some((item) => item.type === "feedback" && item.published === false)
 );
 // is the user excluded from the assessment
-const isExcluded = ref(false);
+const isExcluded = window.Vue.ref(false);
 const isActivityEmpty = window.Vue.computed(() => activityItems.value.length === 0);
 const isExpansionDisabled = window.Vue.computed(() => activityItems.value.length === 1);
-const routes: Ref<Routes> = ref({
+const routes: Ref<Routes> = window.Vue.ref({
     dataEndpoint: "",
     updateRoute: "",
     reviewRoute: "",
@@ -84,7 +84,7 @@ const routes: Ref<Routes> = ref({
 const markbookElement = ref<HTMLDivElement | null>(null);
 
 // Exclude confirm, popout
-const excludeModalEl = ref(null);
+const excludeModalEl = window.Vue.ref(null);
 
 /**
  * Middleware are optional modifiers you can provide to floating-ui. Things that determine how

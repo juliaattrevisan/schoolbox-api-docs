@@ -21,8 +21,8 @@ const props = defineProps({
     },
 });
 
-const selectedNode = ref(getEmptyNode());
-const modalEl = ref(null);
+const selectedNode = window.Vue.ref(getEmptyNode());
+const modalEl = window.Vue.ref(null);
 
 /**
  * to open up the details modal

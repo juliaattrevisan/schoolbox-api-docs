@@ -16,8 +16,8 @@ onMounted(() => {
     findNodeLinks();
 });
 
-const selectedNode = ref(getEmptyNode());
-const modalEl = ref(null);
+const selectedNode = window.Vue.ref(getEmptyNode());
+const modalEl = window.Vue.ref(null);
 
 /**
  * find any links on the page that should open the details modal

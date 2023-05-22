@@ -15,8 +15,8 @@ import Endpoints from "../mgEndpoints";
 const store = useStore(); //to disable butons on processing
 const membersStore = useMembersStore(); //to keep track of selectedMembers
 const removeMembersStore = useRemoveMembersStore(); //to remove selectedMembers
-const isShiftKeySelected = ref(false);
-const shiftSelectNoteEl = ref(null);
+const isShiftKeySelected = window.Vue.ref(false);
+const shiftSelectNoteEl = window.Vue.ref(null);
 
 onMounted(() => {
     initShiftKeyDetection();

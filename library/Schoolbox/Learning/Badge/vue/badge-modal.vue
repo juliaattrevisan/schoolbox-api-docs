@@ -28,8 +28,8 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["closed"]);
-const isNextSelected = ref(false);
-const selectedNodeDetails = ref(getEmptyNode());
+const isNextSelected = window.Vue.ref(false);
+const selectedNodeDetails = window.Vue.ref(getEmptyNode());
 
 /**
  * a code has been selected in the detail modal

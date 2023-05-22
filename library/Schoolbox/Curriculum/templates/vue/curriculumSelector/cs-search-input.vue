@@ -12,7 +12,7 @@ import { useSearchStore, DEBOUNCE_AMOUNT } from "./store/csSearchStore";
 const store = useStore();
 const modalStore = useModalStore();
 const searchStore = useSearchStore();
-const queryInputEl = ref(null); //to deterch if the search input is currently active
+const queryInputEl = window.Vue.ref(null); //to deterch if the search input is currently active
 
 const props = defineProps({
     /**

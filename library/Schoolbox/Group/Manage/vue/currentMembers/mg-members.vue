@@ -22,7 +22,7 @@ import AccessTypes from "./mgAccessTypes";
 
 const membersStore = useMembersStore();
 const store = useStore();
-const tableEl = ref(null);
+const tableEl = window.Vue.ref(null);
 const tableColumns = [
     "name",
     "firstName",

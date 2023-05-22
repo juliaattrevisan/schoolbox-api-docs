@@ -68,7 +68,7 @@ const props = defineProps({
 
 const store = useStore();
 const selectedNodesStore = useSelectedNodesStore();
-const curriculumSelectorEl = ref(null);
+const curriculumSelectorEl = window.Vue.ref(null);
 
 /**
  * Start loading the curriculum data

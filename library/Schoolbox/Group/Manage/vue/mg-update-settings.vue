@@ -10,7 +10,7 @@ import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 
 const store = useStore();
 const settingsStore = useSettingsStore();
-const updateModalEl = ref(null);
+const updateModalEl = window.Vue.ref(null);
 
 /**
  * we want to force the setting of the Access on the group

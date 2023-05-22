@@ -16,10 +16,10 @@ const props = defineProps({
     },
 });
 
-const isActive = ref(false);
-const node = ref(null);
-const isLoading = ref(true);
-const hasLoadError = ref(false);
+const isActive = window.Vue.ref(false);
+const node = window.Vue.ref(null);
+const isLoading = window.Vue.ref(true);
+const hasLoadError = window.Vue.ref(false);
 
 /**
  * when there's a new node, we should load all the details to display

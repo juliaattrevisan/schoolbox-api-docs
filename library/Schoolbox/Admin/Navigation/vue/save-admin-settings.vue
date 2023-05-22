@@ -27,11 +27,11 @@ const props = defineProps({
     },
 });
 
-const saveContainer = ref(null);
-const hasFormDataChange = ref(false);
-const isAtBottomOfPage = ref(false);
-const initialFormDataValues = ref("");
-const currentFormDataValues = ref("");
+const saveContainer = window.Vue.ref(null);
+const hasFormDataChange = window.Vue.ref(false);
+const isAtBottomOfPage = window.Vue.ref(false);
+const initialFormDataValues = window.Vue.ref("");
+const currentFormDataValues = window.Vue.ref("");
 
 /**
  * Only show the save button if there's a form data change

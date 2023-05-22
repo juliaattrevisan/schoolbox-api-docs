@@ -8,7 +8,7 @@ import { useSelectedNodesStore } from "./store/mcSelectedNodesStore";
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 
 const selectedNodesStore = useSelectedNodesStore();
-const modalEl = ref(null);
+const modalEl = window.Vue.ref(null);
 
 /**
  * to open the modal when requested

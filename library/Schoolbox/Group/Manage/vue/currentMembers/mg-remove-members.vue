@@ -12,7 +12,7 @@ import { useMembersStore } from "../store/mgMembersStore";
 const store = useStore();
 const removeMembersStore = useRemoveMembersStore();
 const membersStore = useMembersStore(); //to keep track of selectedMembers
-const removeModalEl = ref(null);
+const removeModalEl = window.Vue.ref(null);
 
 /**
  * to open the modal when requested

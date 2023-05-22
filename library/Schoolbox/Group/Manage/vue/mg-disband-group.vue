@@ -11,8 +11,8 @@ import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 
 const store = useStore();
 const disbandStore = useDisbandStore();
-const removeModalEl = ref(null);
-const hasDisbanded = ref(false); //to toggle the successful disband note
+const removeModalEl = window.Vue.ref(null);
+const hasDisbanded = window.Vue.ref(false); //to toggle the successful disband note
 
 /**
  * to open the modal when requested

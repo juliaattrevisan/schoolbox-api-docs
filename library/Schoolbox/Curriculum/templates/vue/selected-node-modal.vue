@@ -19,7 +19,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["closed"]);
-const modalEl = ref(null);
+const modalEl = window.Vue.ref(null);
 
 /**
  * to open the modal when requested

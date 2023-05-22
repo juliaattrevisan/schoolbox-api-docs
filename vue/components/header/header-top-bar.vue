@@ -39,12 +39,12 @@ function onContainerResize() {
     updateTopNavItems();
 }
 
-const menuData = ref(topMenuData);
-const topBar = ref(null);
-const primary = ref(null);
+const menuData = window.Vue.ref(topMenuData);
+const topBar = window.Vue.ref(null);
+const primary = window.Vue.ref(null);
 let primaryMenuItems;
 let primaryMenuItemsMaxXPos;
-const secondary = ref(null);
+const secondary = window.Vue.ref(null);
 
 /**
  * Show/hide top nav items based on space available

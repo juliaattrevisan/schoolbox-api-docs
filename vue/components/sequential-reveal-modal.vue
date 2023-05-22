@@ -65,8 +65,8 @@ const props = defineProps({
 
 const emit = defineEmits(["closed", "nextOpened", "previousOpened"]);
 const uuid = generateUUID();
-const elementId = ref(`reveal-modal-${uuid}`);
-const sequenceIndex = ref(1); // to help track the current sequence index independent of the prop
+const elementId = window.Vue.ref(`reveal-modal-${uuid}`);
+const sequenceIndex = window.Vue.ref(1); // to help track the current sequence index independent of the prop
 let $modal;
 
 /**
