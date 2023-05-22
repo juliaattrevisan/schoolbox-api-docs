@@ -175,6 +175,7 @@ class Mapper extends BaseMapper
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateOpenSpan']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'createDynamicPlanIfNew']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'validateDatePresence']);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateAssessmentRelationView']);
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteQuiz']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteTask']);
@@ -1465,6 +1466,51 @@ class Mapper extends BaseMapper
                 throw new \InvalidArgumentException(sprintf('Implementation assessments must have a %s date', $type));
             }
         }
+        return true;
+    }
+
+
+    /**
+     * Update the materialized view table `mv_assessment_relation`.
+     *
+     * This will be more fragile than updating with table-level triggers, but
+     * has the advantage of containing all updates within the application to be
+     * debugged there.
+     *
+     * @param Model $assessment
+     * @return bool
+     */
+    protected function updateAssessmentRelationView(Model $assessment): bool
+    {
+        $updateQuery = $this->database->prepare('
+            REPLACE INTO mv_assessment_relation (
+                assessment_id,
+                folder_id,
+                project_assessment_id,
+                course_implementation_id,
+                course_unit_implementation_id,
+                course_specification_id,
+                course_unit_specification_id
+            ) VALUES (
+                :assessmentId,
+                :folderId,
+                :projectAssessmentId,
+                :courseImplementationId,
+                :courseUnitImplementationId,
+                :courseSpecificationId,
+                :courseUnitSpecificationId
+            )
+        ');
+        $params = [
+            'assessmentId'               => $assessment->getId(),
+            'folderId'                   => $assessment->getContextFolder()->getId(),
+            'projectAssessmentId'        => $assessment->getProject()?->getId(),
+            'courseImplementationId'     => $assessment->getContextUnitImplementation()?->getCourse()?->getId(),
+            'courseUnitImplementationId' => $assessment->getContextUnitImplementation()?->getId(),
+            'courseSpecificationId'      => $assessment->getContextUnitSpecification()?->getCourse()?->getId(),
+            'courseUnitSpecificationId'  => $assessment->getContextUnitSpecification()?->getId(),
+        ];
+        $updateQuery->execute($params);
         return true;
     }
 
