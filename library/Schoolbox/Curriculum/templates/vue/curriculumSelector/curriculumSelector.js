@@ -1,4 +1,3 @@
-import { createApp } from "vue";
 import CurriculumSelector from "./curriculum-selector";
 import { createPinia } from "pinia";
 
@@ -12,7 +11,7 @@ curriculumSelectorObjs.forEach((curriculumSelectorObj) => {
      * that as a flag
      */
     if (!curriculumSelectorObj.hasAttribute("data-loaded")) {
-        createApp({
+        Vue.createApp({
             components: {
                 CurriculumSelector,
             },

@@ -158,11 +158,11 @@ module.exports = {
         },
 
         // Libraries
-        // intellischools: "./www/static/js/intellischools/schoolboxIntellischools.js",
-        // clipboard: "./www/static/js/clipboard/clipboard.js",
-        // strtotime: "./www/static/js/alaress-datetime-picker/strtotime.js",
-        // highcharts: "./www/static/js/vendors/highcharts/highcharts.js",
-        // highchartsMore: "./www/static/js/vendors/highcharts/highchartsMore.js",
+        intellischools: "./www/static/js/intellischools/schoolboxIntellischools.js",
+        clipboard: "./www/static/js/clipboard/clipboard.js",
+        strtotime: "./www/static/js/alaress-datetime-picker/strtotime.js",
+        highcharts: "./www/static/js/vendors/highcharts/highcharts.js",
+        highchartsMore: "./www/static/js/vendors/highcharts/highchartsMore.js",
 
         // Search Bar
         searchBar: "./vue/components/searchBar/searchBar.js",
