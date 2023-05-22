@@ -81,7 +81,7 @@ class Reporter extends App
 
         // Report on differences
         $differentRows = [];
-        $differ        = new Differ();
+        $differ        = new Differ('expected', 'actual');
         foreach ($actualData as $assessmentId => $actualAssessmentData) {
             $expectedAssessmentData = $expectedData[$assessmentId] ?? null;
             if (!isset($expectedAssessmentData)) {
