@@ -132,15 +132,16 @@ class Receiver
     /**
      * Constructor.
      *
-     * @param int    $externalEnable
-     * @param string $externalType
-     * @param string $username
-     * @param string $password
-     * @param string $exclusions
-     * @param string $defaultType
-     * @param string $teacherIdentifier
-     * @param string $logDir
-     * @param Mapper $importLogMapper
+     * @param int                                $externalEnable
+     * @param string                             $externalType
+     * @param string                             $username
+     * @param string                             $password
+     * @param string                             $exclusions
+     * @param string                             $defaultType
+     * @param string                             $teacherIdentifier
+     * @param string                             $logDir
+     * @param Mapper                             $importLogMapper
+     * @param \Schoolbox\Resource\Storage\Mapper $storageMapper
      */
     public function __construct(
         int $externalEnable,
@@ -151,7 +152,9 @@ class Receiver
         string $defaultType,
         string $teacherIdentifier,
         string $logDir,
-        \Schoolbox\External\Connector\Log\Mapper $importLogMapper
+        \Schoolbox\External\Connector\Log\Mapper $importLogMapper,
+        private \Schoolbox\Resource\Storage\Mapper $storageMapper
+
     ) {
         $this->externalEnable = $externalEnable;
         $this->externalType = $externalType;
@@ -266,7 +269,7 @@ class Receiver
         /* Cache locally whatever liss sent to us
          * This allows you to replay locally
          */
-        (new PayloadCache(\Schoolbox\Resource\Storage\Mapper::getInstance()))->cache($message);
+        (new PayloadCache($this->storageMapper))->cache($message);
 
         /* This is the equivalent of a combined Scheduler.php and Factory.php
          * since the liss receiver immediately processes upon receiving data

@@ -23,7 +23,8 @@ $liss = new Receiver(
     $config->get('external_liss_default_event_type'),
     $config->get('external_liss_teacher_identifier'),
     $config->get('logs_dir'),
-    \Schoolbox\External\Connector\Log\Mapper::getInstance()
+    \Schoolbox\External\Connector\Log\Mapper::getInstance(),
+    \Schoolbox\Resource\Storage\Mapper::getInstance()
 );
 
 $log = $liss->log();
