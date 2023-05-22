@@ -17,7 +17,7 @@ interface Props {
 const props = defineProps<Props>();
 const activeNodeStore = useActiveNodeStore();
 const nodeUsageStore = useNodeUsageStore();
-const isBadgeModalOpen = ref(false); // whether the modal to display the badge details is open
+const isBadgeModalOpen = window.Vue.ref(false); // whether the modal to display the badge details is open
 const currentBadge = ref<BadgeUsageObject | null>(null); // the badge to display in the modal when a badge usage is selected
 
 /**

@@ -14,7 +14,7 @@ import McViewNode from "./mc-view-node.vue";
 const nodesStore = useNodesStore();
 const viewNodesStore = useViewNodesStore();
 const searchStore = useSearchStore();
-const depth = ref(0); // to increment each time we go down the node tree to visually indicate children
+const depth = window.Vue.ref(0); // to increment each time we go down the node tree to visually indicate children
 const nodesContainerEl = ref<HTMLDivElement | null>(null); // to scroll back to top on any selection change
 
 /**
@@ -47,11 +47,7 @@ watch(
         <div v-else-if="searchStore.hasNoResults" class="empty-state-flex-centered">
             <i class="icon-curriculum"></i>
             <p>No Curriculum matches your current search.</p>
-            <button
-                title="Clear the current search"
-                data-test-clear-search
-                @click.prevent="onClearSearchSelected"
-            >
+            <button title="Clear the current search" data-test-clear-search @click.prevent="onClearSearchSelected">
                 Clear search
             </button>
         </div>

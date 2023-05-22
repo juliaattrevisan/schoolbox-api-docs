@@ -96,7 +96,7 @@ const inputPlaceholder = window.Vue.computed(() => {
     }
 });
 
-onMounted(() => {
+window.Vue.onMounted(() => {
     if (hasPreviouslySelectedClass.value) {
         //when this is set, the class-selector is disabled from a parent outside this Vue component
         addPreviouslySelectedClass();
@@ -225,7 +225,7 @@ function searchForName(classItem) {
  *
  ****************************************************************/
 
-onMounted(() => {
+window.Vue.onMounted(() => {
     initKeyboardEvents();
     initMouseEvents();
 });

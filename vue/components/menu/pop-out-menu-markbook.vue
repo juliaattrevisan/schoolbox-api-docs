@@ -308,7 +308,7 @@ function closePopOut() {
  * Listen for selections to display the pop out as well as
  * any mouse clicks so we can close the pop out when suitable
  */
-onMounted(() => {
+window.Vue.onMounted(() => {
     /**
      * Start listening for selection events
      * Currenty dispatched from library/Schoolbox/Learning/Markbook/templates/markbookOuter.twig

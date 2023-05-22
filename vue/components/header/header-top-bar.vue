@@ -22,7 +22,7 @@ const props = defineProps({
     },
 });
 
-onMounted(() => {
+window.Vue.onMounted(() => {
     primaryMenuItems = Array.from(primary.value.querySelectorAll("li")); //get all the list menu list items
     primaryMenuItems.splice(0, 2); //remove the side menu button and the logo
     primaryMenuItemsMaxXPos = primaryMenuItems.map(

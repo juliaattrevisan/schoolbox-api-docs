@@ -117,7 +117,7 @@ onBeforeMount(() => {
 /**
  * Start loading the group data
  */
-onMounted(() => {
+window.Vue.onMounted(() => {
     store.toastEl = toastEl;
     store.showSetting = props.showSetting === "1";
     store.groupStaffOnly = props.groupStaffOnly;

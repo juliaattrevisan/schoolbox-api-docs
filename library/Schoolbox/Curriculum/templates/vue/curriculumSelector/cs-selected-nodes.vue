@@ -15,7 +15,7 @@ const selectEl = window.Vue.ref(null);
 /**
  * to listen for any clears of the selected codes from outside the Vue app
  */
-onMounted(() => {
+window.Vue.onMounted(() => {
     document.addEventListener("SEARCH_SELECT__UPDATE_SELECTION", (event) => {
         if (selectEl.value.getAttribute("id") === event.detail.elementId) {
             //just in case there are multiple on the page

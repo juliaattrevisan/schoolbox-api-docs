@@ -73,7 +73,7 @@ const curriculumSelectorEl = window.Vue.ref(null);
 /**
  * Start loading the curriculum data
  */
-onMounted(() => {
+window.Vue.onMounted(() => {
     store.init(props);
     checkContainerWidth();
 });
