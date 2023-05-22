@@ -266,7 +266,7 @@ class Receiver
         /* Cache locally whatever liss sent to us
          * This allows you to replay locally
          */
-        (new PayloadCache($this->importLogMapper->getDatabase()))->cache($message);
+        (new PayloadCache(\Schoolbox\Resource\Storage\Mapper::getInstance()))->cache($message);
 
         /* This is the equivalent of a combined Scheduler.php and Factory.php
          * since the liss receiver immediately processes upon receiving data
