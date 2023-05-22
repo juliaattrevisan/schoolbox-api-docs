@@ -1,7 +1,7 @@
 import { createApp } from "vue";
 import AdminGrades from "./admin-grades";
 
-createApp({
+window.Vue.createApp({
     components: {
         AdminGrades,
     },

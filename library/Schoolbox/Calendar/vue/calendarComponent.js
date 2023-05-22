@@ -14,7 +14,7 @@ calendars.forEach((calendar) => {
      * that as a flag
      */
     if (!calendar.hasAttribute("data-loaded")) {
-        createApp({
+        window.Vue.createApp({
             components: {
                 CalendarComponent,
             },

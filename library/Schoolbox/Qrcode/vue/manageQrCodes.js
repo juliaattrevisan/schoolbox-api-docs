@@ -1,7 +1,7 @@
 import { createApp } from "vue";
 import ManageQrCodes from "./manage-qr-codes";
 
-createApp({
+window.Vue.createApp({
     components: {
         ManageQrCodes,
     },

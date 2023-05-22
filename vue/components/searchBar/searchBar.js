@@ -1,6 +1,6 @@
 import SearchBar from "./search-bar";
 
-Vue.createApp({
+window.Vue.createApp({
     components: {
         SearchBar,
     },

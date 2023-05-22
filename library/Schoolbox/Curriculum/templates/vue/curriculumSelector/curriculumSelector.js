@@ -11,7 +11,7 @@ curriculumSelectorObjs.forEach((curriculumSelectorObj) => {
      * that as a flag
      */
     if (!curriculumSelectorObj.hasAttribute("data-loaded")) {
-        Vue.createApp({
+        window.Vue.createApp({
             components: {
                 CurriculumSelector,
             },

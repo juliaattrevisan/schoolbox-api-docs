@@ -1,7 +1,7 @@
 import { createApp } from "vue";
 import TextboxList from "./textbox-list";
 
-createApp({
+window.Vue.createApp({
     components: {
         TextboxList,
     },
