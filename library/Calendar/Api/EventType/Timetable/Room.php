@@ -171,7 +171,7 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
                 $userExternalId = $room['StaffID'];
                 if (!(array_key_exists($userExternalId, $userList))) {
                     try {
-                        $userList[$userExternalId] = UserMapper::getInstance()->findByExternalId(\Schoolbox\Role::STAFF);
+                        $userList[$userExternalId] = UserMapper::getInstance()->findByExternalId($userExternalId, \Schoolbox\Role::STAFF);
                     } catch (Schoolbox\Mapper\Exception $e) {
                         $userList[$userExternalId] = null;
                     }

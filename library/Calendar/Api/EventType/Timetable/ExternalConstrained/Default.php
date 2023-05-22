@@ -356,7 +356,7 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
                     if (!empty($staffId)) {
                         // Don't load more than once
                         if (!array_key_exists($staffId, $timetableStaff)) {
-                            $timetableStaff[$staffId] = UserMapper::getInstance()->findByExternalId(\Schoolbox\Role::STAFF);
+                            $timetableStaff[$staffId] = UserMapper::getInstance()->findByExternalId($staffId, \Schoolbox\Role::STAFF);
                         }
                     } else {
                         $timetableStaff[$staffId] = null;
