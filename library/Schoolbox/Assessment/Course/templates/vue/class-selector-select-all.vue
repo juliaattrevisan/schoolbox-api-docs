@@ -30,7 +30,7 @@ const props = defineProps({
  *
  * @returns { Boolean }
  */
-const isChecked = computed(() => {
+const isChecked = window.Vue.computed(() => {
     return props.isAllResultsSelected ? true : false;
 });
 

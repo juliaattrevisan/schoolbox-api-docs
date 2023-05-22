@@ -20,7 +20,7 @@ const selectedNodesStore = useSelectedNodesStore();
  *
  * @returns { boolean } whether the checkbox should be disabled
  */
-const isDisabled = computed(() => {
+const isDisabled = window.Vue.computed(() => {
     return selectedNodesStore.childNodesIds.includes(props.node.id) || props.isActive;
 });
 
@@ -29,7 +29,7 @@ const isDisabled = computed(() => {
  *
  * @returns { boolean }
  */
-const isChecked = computed(() => {
+const isChecked = window.Vue.computed(() => {
     return (
         selectedNodesStore.nodesIds.includes(props.node.id) || selectedNodesStore.childNodesIds.includes(props.node.id)
     );

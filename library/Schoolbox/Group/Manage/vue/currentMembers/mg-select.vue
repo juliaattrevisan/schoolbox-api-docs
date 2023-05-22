@@ -56,7 +56,7 @@ watch(
  *
  * @returns { String }
  */
-const selectedMembersCountWithRowName = computed(() => {
+const selectedMembersCountWithRowName = window.Vue.computed(() => {
     if (membersStore.selectedMembersCount === 0) {
         return `No Members`;
     } else {

@@ -54,7 +54,7 @@ deleteNodesStore.$onAction(({ name, after, onError }) => {
  *
  * @returns { String }
  */
-const deleteButtonText = computed(() => (deleteNodesStore.isProcessing ? "Deleting..." : "Yes"));
+const deleteButtonText = window.Vue.computed(() => (deleteNodesStore.isProcessing ? "Deleting..." : "Yes"));
 
 /**
  * to prevent the user from moving away from the modal while
@@ -62,7 +62,7 @@ const deleteButtonText = computed(() => (deleteNodesStore.isProcessing ? "Deleti
  *
  * @returns { Boolean }
  */
-const isModalDisabled = computed(() => deleteNodesStore.isProcessing);
+const isModalDisabled = window.Vue.computed(() => deleteNodesStore.isProcessing);
 
 /**
  * to close the modal

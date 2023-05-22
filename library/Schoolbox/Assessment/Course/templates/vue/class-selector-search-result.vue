@@ -43,7 +43,7 @@ const props = defineProps({
     },
 });
 
-const highlightTitleSearch = computed(() => {
+const highlightTitleSearch = window.Vue.computed(() => {
     return highlightSearchInElement(props.result.name);
 });
 
@@ -70,7 +70,7 @@ function highlightSearchInElement(toHighlight) {
  *
  * @returns { Boolean }
  */
-const isChecked = computed(() => {
+const isChecked = window.Vue.computed(() => {
     return props.result.isSelected;
 });
 

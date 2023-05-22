@@ -16,7 +16,7 @@ const addCurriculumStore = useAddCurriculumStore();
  *
  * @returns { String }
  */
-const ckeditorInstance = computed(() => `new-curriculum`);
+const ckeditorInstance = window.Vue.computed(() => `new-curriculum`);
 
 /**
  * Use a customised ckeditor for the description field
@@ -39,7 +39,7 @@ watch(descriptionField, (newValue: string) => {
  *
  * @returns { String }
  */
-const addButtonText = computed(() => (addCurriculumStore.isProcessing ? "Adding..." : "Add"));
+const addButtonText = window.Vue.computed(() => (addCurriculumStore.isProcessing ? "Adding..." : "Add"));
 
 /**
  * submit save
@@ -76,7 +76,7 @@ function onCancelSelected() {
  *
  * @returns { Boolean }
  */
-const isAddDisabled = computed(() => {
+const isAddDisabled = window.Vue.computed(() => {
     if (typeof addCurriculumStore.curriculum.name === "string") {
         return addCurriculumStore.curriculum?.name.trim().length === 0 || addCurriculumStore.isProcessing;
     }

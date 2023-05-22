@@ -40,7 +40,7 @@ const nodeModalEl = ref(null);
  *
  * @returns { boolean }
  */
-const isSingleBadge = computed(() => {
+const isSingleBadge = window.Vue.computed(() => {
     return Object.values(props.badges).length == 1;
 });
 
@@ -49,7 +49,7 @@ const isSingleBadge = computed(() => {
  *
  * @returns { object }
  */
-const singleBadge = computed(() => {
+const singleBadge = window.Vue.computed(() => {
     return Object.values(props.badges)[0];
 });
 

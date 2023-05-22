@@ -27,7 +27,7 @@ watch(
  *
  * @returns { String }
  */
-const title = computed(() => {
+const title = window.Vue.computed(() => {
     if (selectedNodesStore.activeNode?.code && selectedNodesStore.activeNode.code !== "") {
         return `[${selectedNodesStore.activeNode.code}] ${selectedNodesStore.activeNode.name}`;
     } else {
@@ -40,7 +40,7 @@ const title = computed(() => {
  *
  * @returns { String }
  */
-const breadcrumbs = computed(() => {
+const breadcrumbs = window.Vue.computed(() => {
     if (selectedNodesStore.activeNode?.breadcrumbs.length > 0) {
         const justNames = selectedNodesStore.activeNode.breadcrumbs.map((breadcrumb) => breadcrumb.name);
         return justNames.join(" > ");

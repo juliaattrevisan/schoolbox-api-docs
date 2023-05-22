@@ -25,7 +25,7 @@ const emit = defineEmits(["select"]);
  *
  * @returns { number }
  */
-const marginLeft = computed(() => `calc(${props.depth * 2}rem)`);
+const marginLeft = window.Vue.computed(() => `calc(${props.depth * 2}rem)`);
 
 /**
  * Reload the page to try loading again
@@ -39,7 +39,7 @@ function onRefreshSelected() {
  *
  * @returns { boolean }
  */
-const hasUsage = computed(() => {
+const hasUsage = window.Vue.computed(() => {
     return props.node.usage && props.node.usage.length > 0;
 });
 
@@ -57,7 +57,7 @@ type ActiveUsageType = {
  *
  * @returns { Array }
  */
-const activeUsages = computed(() => {
+const activeUsages = window.Vue.computed(() => {
     const usages: ActiveUsageType[] = [];
     if (props.node._usageCounts.course > 0) {
         usages.push({

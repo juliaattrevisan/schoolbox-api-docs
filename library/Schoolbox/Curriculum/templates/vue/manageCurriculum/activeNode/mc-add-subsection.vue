@@ -28,14 +28,14 @@ const addSubsectionStore = useAddSubsectionStore();
  *
  * @returns { Number }
  */
-const marginLeft = computed(() => `calc(${props.depth * 2}rem)`);
+const marginLeft = window.Vue.computed(() => `calc(${props.depth * 2}rem)`);
 
 /**
  * Store a reference to the ckeditor used for the description
  *
  * @returns { String }
  */
-const ckeditorInstance = computed(() => `description-${activeNodeStore.node.id}`);
+const ckeditorInstance = window.Vue.computed(() => `description-${activeNodeStore.node.id}`);
 
 /**
  * Use a customised ckeditor for the description field
@@ -55,7 +55,7 @@ watch(descriptionField, (newValue) => {
  *
  * @returns { String }
  */
-const addButtonText = computed(() => (addSubsectionStore.isProcessing ? "Adding..." : "Add"));
+const addButtonText = window.Vue.computed(() => (addSubsectionStore.isProcessing ? "Adding..." : "Add"));
 
 /**
  * submit save
@@ -92,7 +92,7 @@ function onCancelSelected() {
  *
  * @returns { Boolean }
  */
-const isAddDisabled = computed(() => {
+const isAddDisabled = window.Vue.computed(() => {
     return addSubsectionStore.subsection.name.trim().length === 0 || addSubsectionStore.isProcessing;
 });
 </script>

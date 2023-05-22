@@ -51,7 +51,7 @@ const justUpdated = ref(false); // to highlight if the node has just been update
  *
  * @returns { boolean }
  */
-const showNode = computed(() => {
+const showNode = window.Vue.computed(() => {
     if (!viewNodesStore.showDisabled && !props.node.enabled) {
         return false;
     }
@@ -129,14 +129,14 @@ useUpdateNodeStore().$onAction(({ name, after }) => {
  *
  * @returns { number }
  */
-const marginLeft = computed(() => `calc(${props.depth * 2}rem)`);
+const marginLeft = window.Vue.computed(() => `calc(${props.depth * 2}rem)`);
 
 /**
  * To better highlight the current top level node from its children
  *
  * @returns { string }
  */
-const borderBottomColour = computed(() => {
+const borderBottomColour = window.Vue.computed(() => {
     if (searchStore.isActive || props.depth !== 0) {
         return `var(--body-background)`;
     }
@@ -148,70 +148,76 @@ const borderBottomColour = computed(() => {
  *
  * @returns { boolean }
  */
-const isViewing = computed(() => nodeUsageStore.isOpen && activeNodeStore.node.id === props.node.id);
+const isViewing = window.Vue.computed(() => nodeUsageStore.isOpen && activeNodeStore.node.id === props.node.id);
 
 /**
  * If there's another node being viewed
  *
  * @returns { boolean }
  */
-const isViewingAnother = computed(() => nodeUsageStore.isOpen && activeNodeStore.node.id !== props.node.id);
+const isViewingAnother = window.Vue.computed(() => nodeUsageStore.isOpen && activeNodeStore.node.id !== props.node.id);
 
 /**
  * If this is the active node being updated
  *
  * @returns { boolean }
  */
-const isUpdating = computed(() => updateNodeStore.isOpen && activeNodeStore.node.id === props.node.id);
+const isUpdating = window.Vue.computed(() => updateNodeStore.isOpen && activeNodeStore.node.id === props.node.id);
 
 /**
  * If there's another node being updated
  *
  * @returns { boolean }
  */
-const isUpdatingAnother = computed(() => updateNodeStore.isOpen && activeNodeStore.node.id !== props.node.id);
+const isUpdatingAnother = window.Vue.computed(
+    () => updateNodeStore.isOpen && activeNodeStore.node.id !== props.node.id
+);
 
 /**
  * If this is the active node being added to
  *
  * @returns { boolean }
  */
-const isAdding = computed(() => addSubsectionStore.isOpen && activeNodeStore.node.id === props.node.id);
+const isAdding = window.Vue.computed(() => addSubsectionStore.isOpen && activeNodeStore.node.id === props.node.id);
 
 /**
  * If there's another node being added to
  *
  * @returns { boolean }
  */
-const isAddingAnother = computed(() => addSubsectionStore.isOpen && activeNodeStore.node.id !== props.node.id);
+const isAddingAnother = window.Vue.computed(
+    () => addSubsectionStore.isOpen && activeNodeStore.node.id !== props.node.id
+);
 
 /**
  * If this is the active node being viewed, updated or added to
  *
  * @returns { boolean }
  */
-const isActive = computed(() => isViewing.value || isUpdating.value || isAdding.value);
+const isActive = window.Vue.computed(() => isViewing.value || isUpdating.value || isAdding.value);
 
 /**
  * To determine whether we need to display further child nodes within this node
  *
  * @returns { boolean }
  */
-const showChildren = computed(() => props.node.children && props.node.children.length > 0 && props.depth + 1 < 2);
+const showChildren = window.Vue.computed(
+    () => props.node.children && props.node.children.length > 0 && props.depth + 1 < 2
+);
 
 /**
  * If there's a code available, which means it can be added to the name
  *
  * @returns { boolean }
  */
-const hasCode = computed(() => props.node.code && props.node.code !== "");
+const hasCode = window.Vue.computed(() => props.node.code && props.node.code !== "");
 
 /**
  * Add in the code if it's available otherwise just show the title
  *
  * @returns { string }
  */
-const title = computed(() =>
+const title = window.Vue.computed(() =>
     hasCode.value ? `[${props.node.code as string}] ${props.node.name}` : `${props.node.name}`
 );
 
@@ -221,7 +227,7 @@ const title = computed(() =>
  *
  * @returns { boolean }
  */
-const showActions = computed(() => !store.isReadOnly && props.node.id !== UNSET_ID && !searchStore.isActive);
+const showActions = window.Vue.computed(() => !store.isReadOnly && props.node.id !== UNSET_ID && !searchStore.isActive);
 
 /**
  * Whether the usage should be displayed, shouldn't be if we are at the root level node,
@@ -229,7 +235,7 @@ const showActions = computed(() => !store.isReadOnly && props.node.id !== UNSET_
  *
  * @returns { boolean }
  */
-const showUsage = computed(() => props.node.id !== UNSET_ID);
+const showUsage = window.Vue.computed(() => props.node.id !== UNSET_ID);
 </script>
 
 <template>
