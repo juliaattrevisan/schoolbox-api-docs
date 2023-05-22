@@ -98,18 +98,8 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
             if (\is_array($child['subjects'])) {
                 foreach ($child['subjects'] as $subject) {
                     if ($subject['perm'] >= UserAccess::ACCESS_READ) {
-                        // TODO This is a master fix, so we can't break existing sessions.
-                        // TODO We'll need to provide fallback in case this array key does not exist.
-                        // TODO Remove this in 19.1
-                        $matchedCode = $subject['matchedCode'] ?? null;
-                        if ($matchedCode) {
-                            $folderCode = $matchedCode;
-                        } else {
-                            $folder = $this->getFolderMapper()->findForCampusAndClass($subject['campusCode'] ?? '', $subject['code']);
-                            $folderCode = $folder ? $folder->getMatchedCode() : '';
-                        }
                         $this->setVar("STUDENT_SUBJECT_NAME", Scrub::text($subject['name']));
-                        $this->setVar("STUDENT_SUBJECT_CODE", urlencode(urlencode($folderCode)));
+                        $this->setVar("STUDENT_SUBJECT_CODE", urlencode(urlencode($subject['matchedCode'])));
                         $this->parse("subject_item", "subject_block", true);
                     }
                 }
