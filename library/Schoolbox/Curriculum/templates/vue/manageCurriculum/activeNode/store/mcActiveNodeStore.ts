@@ -8,7 +8,6 @@
  * which is used to bulk enable or delete MULTIPLE nodes
  */
 
-import { ref, computed } from "vue";
 import { defineStore } from "pinia";
 import { useNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/mcNodesStore";
 import { UNSET_ID, getEmptyNode, sortNodes } from "@schoolboxCurriculum/js/nodeUtils";
@@ -16,21 +15,21 @@ import { useViewNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/vie
 import type { Node, NodeToUpdate } from "@schoolboxCurriculum/types/Node";
 
 export const useActiveNodeStore = defineStore("mcActiveNode", () => {
-    const node = ref<Node>(getEmptyNode()); // the currently selected node
+    const node = window.Vue.ref<Node>(getEmptyNode()); // the currently selected node
 
     /**
      * To show further info on a selected node
      *
      * @returns { boolean }
      */
-    const isActive = computed(() => node.value.id !== UNSET_ID);
+    const isActive = window.Vue.computed(() => node.value.id !== UNSET_ID);
 
     /**
      * Add in the code if it's available otherwise just show the title
      *
      * @returns { string }
      */
-    const title = computed(() => {
+    const title = window.Vue.computed(() => {
         if (node.value.id === UNSET_ID) {
             return "";
         }

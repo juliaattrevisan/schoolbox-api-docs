@@ -2,14 +2,13 @@
  * Enable/disable the currently selected nodes
  */
 
-import { ref } from "vue";
 import { defineStore } from "pinia";
 import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/selectedNodes/store/mcSelectedNodesStore";
 
 export const useEnableNodesStore = defineStore("mcEnableNodes", () => {
-    const isProcessing = ref(false);
-    const isOpen = ref(false); // to notify that the prompt is opened / closed
-    const enabled = ref(false); // to set what enabled status the current selection is being set to
+    const isProcessing = window.Vue.ref(false);
+    const isOpen = window.Vue.ref(false); // to notify that the prompt is opened / closed
+    const enabled = window.Vue.ref(false); // to set what enabled status the current selection is being set to
 
     /**
      * to display a prompt to confirm a node enabled change

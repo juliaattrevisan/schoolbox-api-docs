@@ -2,7 +2,6 @@
  * Stores all the curriculum codes and determines display of nodes
  */
 
-import { ref, computed } from "vue";
 import { defineStore } from "pinia";
 import {
     UNSET_ID,
@@ -19,17 +18,17 @@ import type { Node } from "@schoolboxCurriculum/types/Node";
 import type { Breadcrumb } from "@schoolboxCurriculum/types/Breadcrumb";
 
 export const useNodesStore = defineStore("mcNodes", () => {
-    const nodes = ref<Node>(getEmptyNode()); // all the nodes currently loaded
-    const isLoading = ref(false); // to display loading note
-    const hasLoadError = ref(false); // to display loading error
-    const isLoadingAllChildren = ref(false); // to distinguish when we are traversing through multiple trees
+    const nodes = window.Vue.ref<Node>(getEmptyNode()); // all the nodes currently loaded
+    const isLoading = window.Vue.ref(false); // to display loading note
+    const hasLoadError = window.Vue.ref(false); // to display loading error
+    const isLoadingAllChildren = window.Vue.ref(false); // to distinguish when we are traversing through multiple trees
 
     /**
      * If there's only no Curriculum, display an empty state
      *
      * @returns { boolean }
      */
-    const hasNoCurriculum = computed(() => nodes.value?.children && nodes.value.children.length === 0);
+    const hasNoCurriculum = window.Vue.computed(() => nodes.value?.children && nodes.value.children.length === 0);
 
     /**
      * If there's only one curriculum, we can select it
@@ -37,7 +36,7 @@ export const useNodesStore = defineStore("mcNodes", () => {
      *
      * @returns { boolean }
      */
-    const hasSingleCurriculum = computed(() => nodes.value?.children && nodes.value?.children.length === 1);
+    const hasSingleCurriculum = window.Vue.computed(() => nodes.value?.children && nodes.value?.children.length === 1);
 
     /**
      * Update the nodes when a change has occured, either from the initial load or adding or deleting them

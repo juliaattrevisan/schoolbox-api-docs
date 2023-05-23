@@ -3,7 +3,6 @@
  * those filtered by both <select> and also the search <input>
  */
 
-import { ref, computed } from "vue";
 import { defineStore } from "pinia";
 import { useNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/mcNodesStore";
 import { useSearchStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/mcSearchStore";
@@ -25,25 +24,25 @@ type PopState = {
 };
 
 export const useViewNodesStore = defineStore("mcViewNodes", () => {
-    const idList = ref<number[]>([]); // ids of the selected nodes
-    const currentDepth = ref(0); // track how far down the tree we are
-    const currentDirection = ref(DIRECTION.FORWARDS); // which direction we are currently travelling in the tree
-    const showDisabled = ref(true); // whether only enabled nodes should appear
-    const isBrowserAction = ref(false); // whether the current action is a browser action (backward or forward press)
+    const idList = window.Vue.ref<number[]>([]); // ids of the selected nodes
+    const currentDepth = window.Vue.ref(0); // track how far down the tree we are
+    const currentDirection = window.Vue.ref(DIRECTION.FORWARDS); // which direction we are currently travelling in the tree
+    const showDisabled = window.Vue.ref(true); // whether only enabled nodes should appear
+    const isBrowserAction = window.Vue.ref(false); // whether the current action is a browser action (backward or forward press)
 
     /**
      * Can now use the search input when we have selected at least one node
      *
      * @returns { boolean }
      */
-    const isActive = computed(() => idList.value.length > 0);
+    const isActive = window.Vue.computed(() => idList.value.length > 0);
 
     /**
      * to traverse back through the nodes via breadcrumbs
      *
      * @returns { Array }
      */
-    const breadcrumbs = computed(() => {
+    const breadcrumbs = window.Vue.computed(() => {
         const currentBreadcrumbs: Breadcrumb[] = [];
         const nodesStore = useNodesStore();
         if (!nodesStore.hasSingleCurriculum) {
@@ -64,7 +63,7 @@ export const useViewNodesStore = defineStore("mcViewNodes", () => {
      *
      * @returns { Node }
      */
-    const current = computed(() => {
+    const current = window.Vue.computed(() => {
         const nodesStore = useNodesStore();
         if (idList.value.length > 0) {
             // grab the current latest selection
@@ -80,7 +79,7 @@ export const useViewNodesStore = defineStore("mcViewNodes", () => {
      *
      * @returns { Node[] }
      */
-    const nodes = computed<Node[]>(() => {
+    const nodes = window.Vue.computed<Node[]>(() => {
         const searchStore = useSearchStore();
         if (searchStore.isActive) {
             return searchStore.results;

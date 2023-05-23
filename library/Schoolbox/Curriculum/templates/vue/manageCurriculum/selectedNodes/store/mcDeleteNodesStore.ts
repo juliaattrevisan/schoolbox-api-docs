@@ -2,14 +2,13 @@
  * Delete the currently selected nodes
  */
 
-import { ref } from "vue";
 import { defineStore } from "pinia";
 import { capitalizeFirstLetter } from "@js/util/stringUtils";
 import { useSelectedNodesStore } from "./mcSelectedNodesStore";
 
 export const useDeleteNodesStore = defineStore("mcDeleteNodes", () => {
-    const isProcessing = ref(false);
-    const isOpen = ref(false); // to notify that the prompt is opened / closed
+    const isProcessing = window.Vue.ref(false);
+    const isOpen = window.Vue.ref(false); // to notify that the prompt is opened / closed
 
     /**
      * to display a prompt to confirm a node removal
