@@ -82,7 +82,7 @@ window.Vue.onMounted(() => {
  * so can respond to dimenion changes if required
  */
 async function checkContainerWidth() {
-    await nextTick();
+    await window.Vue.nextTick();
     store.updateContainerWidth(curriculumSelectorEl.value.offsetWidth);
 }
 

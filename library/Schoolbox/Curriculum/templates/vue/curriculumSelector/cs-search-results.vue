@@ -30,7 +30,7 @@ const showSelectAll = window.Vue.computed(() => {
 window.Vue.watch(
     () => searchStore.filteredResults,
     () => {
-        nextTick(() => {
+        window.Vue.nextTick(() => {
             const targetHeight = searchResultsEl.value.offsetHeight;
             gsap.to(searchResultsContainerEl.value, {
                 duration: 0.3,

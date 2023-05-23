@@ -142,7 +142,7 @@ async function onLoaded() {
  * options is always available and are visible on mobile
  */
 async function addSearchNote() {
-    await nextTick(); //ensure the dom is updated
+    await window.Vue.nextTick(); //ensure the dom is updated
     const searchNote = document.createElement("p");
     searchNote.classList.add("meta");
     searchNote.style.marginTop = "0.25rem";

@@ -32,7 +32,7 @@ window.Vue.watch(
  * ensure the jelly tot menu works,
  */
 async function initFoundation() {
-    await nextTick();
+    await window.Vue.nextTick();
     $(document).foundation();
 }
 

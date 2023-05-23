@@ -30,7 +30,7 @@ const showSelectAll = window.Vue.computed(() => {
 window.Vue.watch(
     () => searchStore.isLoading,
     () => {
-        nextTick(() => animate());
+        window.Vue.nextTick(() => animate());
     }
 );
 
@@ -40,7 +40,7 @@ window.Vue.watch(
 window.Vue.watch(
     () => searchStore.filteredResults,
     () => {
-        nextTick(() => animate());
+        window.Vue.nextTick(() => animate());
     }
 );
 
