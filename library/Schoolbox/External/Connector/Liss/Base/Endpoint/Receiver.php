@@ -89,10 +89,10 @@ class Receiver
      * @param string                                   $exclusionList     A csv list of event types that we should skip
      * @param string                                   $defaultType       A string denoting an arbitrary event type that we attribute when the supplied type is non-meaningful
      * @param string                                   $teacherIdentifier Decide whether to use teacherIds or teacherCodes; configured in admin
-     * @param bool                                     $storageLogging    Decide whether to log actul liss payloads to local brownhole storage
+     * @param bool                                     $storageLogging    Decide whether to log actul liss payloads to local file storage
      * @param string                                   $logDir            Path to a local log file
      * @param \Schoolbox\External\Connector\Log\Mapper $importLogMapper   Log the import in the suds control panel
-     * @param \Schoolbox\Resource\Storage\Mapper       $storageMapper     Log liss payloads to a brownhole record
+     * @param \Schoolbox\Resource\Storage\Mapper       $storageMapper     Log liss payloads to a local file storage record
      */
     public function __construct(
         private int $externalEnable,
