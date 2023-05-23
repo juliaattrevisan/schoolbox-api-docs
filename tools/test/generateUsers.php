@@ -12,7 +12,7 @@ use Schoolbox\Application\CliTool;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
 
-require __DIR__ . '/../conf/core/require.php';
+require __DIR__ . '/../../conf/core/require.php';
 
 $app = new class extends CliTool\App {
     private const NUM_RECORDS = 20000;
