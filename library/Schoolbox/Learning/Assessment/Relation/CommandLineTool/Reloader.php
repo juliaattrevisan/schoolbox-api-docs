@@ -119,13 +119,14 @@ class Reloader extends App
 
         // Delete
         if ($this->perform()) {
-            $this->getLogger()->notice('Deleting from mv_assessment_relation...');
             $deleteQuery = $db->prepareQuery('DELETE FROM mv_assessment_relation');
             $deleteQuery->execute();
             $deleteCount = $deleteQuery->rowCount();
-            $this->getLogger()->notice(
-                sprintf('Deleted %d mv_assessment_relation records', $deleteCount)
-            );
+            if ($deleteCount > 0) {
+                $this->getLogger()->notice(
+                    sprintf('Deleted %d mv_assessment_relation records', $deleteCount)
+                );
+            }
         } else {
             $deleteCountQuery = $db->prepareQuery('SELECT COUNT(*) FROM mv_assessment_relation');
             $deleteCountQuery->execute();
@@ -137,7 +138,7 @@ class Reloader extends App
 
         // Re-insert
         if ($this->perform()) {
-            $this->getLogger()->notice('Re-inserting into mv_assessment_relation...');
+            $this->getLogger()->notice('Inserting into mv_assessment_relation...');
             $insertQuery = $db->prepareQuery(
                 'SET STATEMENT max_statement_time=0 FOR INSERT INTO mv_assessment_relation '
                 . self::SELECT_ASSESSMENT_RELATION_SQL,
@@ -159,7 +160,11 @@ class Reloader extends App
             );
         }
 
-        if ($insertCount !== $deleteCount) {
+        // Raise a warning, if:
+        // the insert and delete count don't match, and the table wasn't empty
+        // (if the table was empty, this was an initial load of assessment
+        //  relation data)
+        if ($deleteCount > 0 && $insertCount !== $deleteCount) {
             $this->getLogger()->warning(
                 'Delete and insert counts do not match: recommend running report `./tools/assessment/relations-report.php` for further diagnosis.'
             );
