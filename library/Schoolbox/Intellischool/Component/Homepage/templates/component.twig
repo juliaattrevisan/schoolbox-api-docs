@@ -14,7 +14,7 @@
     </form>
     <iframe style="min-height:200px;overflow: hidden;" name="intellischoolIframe" id="intellischoolIframe">
     </iframe>
-    <script src="{{ CDN_PREFIX }}/js/bundle/intellischools.js" type="text/javascript"></script>
+    <script src="{{ CDN_PREFIX }}/js/bundle/intellischools.js?v={{ config.site_version }}" type="text/javascript"></script>
     <script type="text/javascript">
         window.addEventListener("message", event => {
             if (!schoolboxIntellischools.isAllowed(event.origin.toString())) {
