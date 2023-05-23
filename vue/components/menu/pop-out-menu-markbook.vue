@@ -320,7 +320,7 @@ window.Vue.onMounted(() => {
 /**
  * Remove the added listeners
  */
-onUnmounted(() => {
+window.Vue.onUnmounted(() => {
     document.removeEventListener("pop-out-menu-markbook__selected", onPopOutSelected);
     document.removeEventListener("click", onMouseClick);
 });

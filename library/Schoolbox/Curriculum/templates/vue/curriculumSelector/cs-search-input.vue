@@ -50,7 +50,7 @@ window.Vue.onMounted(() => {
 /**
  * remove relevant keyboard and mouse events
  */
-onUnmounted(() => {
+window.Vue.onUnmounted(() => {
     document.removeEventListener("keydown", onKeyDown);
     document.removeEventListener("keyup", onKeyUp);
     document.removeEventListener("click", onMouseClick);
