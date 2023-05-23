@@ -23,6 +23,28 @@ use Schoolbox\Application\CliTool\App;
 class Reporter extends App
 {
     /**
+     * Help options
+     */
+    private const OPT_SHORT_HELP = 'h';
+    private const OPT_LONG_HELP  = 'help';
+
+    /**
+     * @inheritdoc
+     */
+    public function getShortOpts(): array
+    {
+        return [self::OPT_SHORT_HELP];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getLongOpts(): array
+    {
+        return [self::OPT_LONG_HELP];
+    }
+
+    /**
      * @inheritdoc
      *
      * @return never-return exit `CliKernelAbstract::EXIT_STATUS_APP_ERROR` if
@@ -31,6 +53,12 @@ class Reporter extends App
      */
     public function run(): void
     {
+        // Help output
+        if ($this->getOpt(self::OPT_SHORT_HELP) || $this->getOpt(self::OPT_LONG_HELP)) {
+            $this->outputHelp();
+            exit(CliKernelAbstract::EXIT_STATUS_OK);
+        }
+
         $db           = $this->getDatabaseInternal();
         $logger       = $this->getLogger();
         $hasDataIssue = false;
@@ -118,5 +146,46 @@ class Reporter extends App
 
         // Raise error code if there was any data difference
         exit($hasDataIssue ? CliKernelAbstract::EXIT_STATUS_APP_ERROR : CliKernelAbstract::EXIT_STATUS_OK);
+    }
+
+    /**
+     * Output help text
+     *
+     * @return void
+     */
+    private function outputHelp(): void
+    {
+        $file   = $this->getToolFilename();
+        $green  = self::COLOUR_GREEN;
+        $white  = self::COLOUR_WHITE;
+        $yellow = self::COLOUR_YELLOW;
+        echo <<<HELP
+
+{$white}NAME:
+    Assessment Relations Reporter
+
+SYNOPSIS:
+    $green{$file} {$yellow}[OPTION]...$white
+
+DESCRIPTION
+    This tool reports on assessment relations, as stored in the
+    `mv_assessment_relation` table.
+
+    If the number of expected and actual assessment relations do not match,
+    there is likely to be a data issue: this tool will report on the differences
+    between the expected and actual data.
+
+OPTIONS
+    $yellow-h, --help$white
+        Output this help text and exit.
+
+    $yellow-v, -vv, -vvv$white
+        Control verbosity.
+
+        If run with -vvv, this will report on the exact differences between the
+        expected and actual data.
+
+
+HELP;
     }
 }

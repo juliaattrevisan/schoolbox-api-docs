@@ -19,6 +19,12 @@ use Schoolbox\Application\CliTool\App;
 class Reloader extends App
 {
     /**
+     * Help options
+     */
+    private const OPT_SHORT_HELP = 'h';
+    private const OPT_LONG_HELP  = 'help';
+
+    /**
      * SQL for selecting all assessment relations.
      *
      * (This mirrors the CREATE VIEW statement for `v_assessment_relation`.)
@@ -108,6 +114,22 @@ class Reloader extends App
 
     /**
      * @inheritdoc
+     */
+    public function getShortOpts(): array
+    {
+        return [self::OPT_SHORT_HELP];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getLongOpts(): array
+    {
+        return [self::OPT_LONG_HELP];
+    }
+
+    /**
+     * @inheritdoc
      *
      * @return never-return exit `CliKernelAbstract::EXIT_STATUS_APP_ERROR` if
      *                      there's a data issue detected, otherwise exits with
@@ -115,6 +137,12 @@ class Reloader extends App
      */
     public function run(): void
     {
+        // Help output
+        if ($this->getOpt(self::OPT_SHORT_HELP) || $this->getOpt(self::OPT_LONG_HELP)) {
+            $this->outputHelp();
+            exit(CliKernelAbstract::EXIT_STATUS_OK);
+        }
+
         $db = $this->getDatabaseInternal();
 
         // Delete
@@ -171,5 +199,48 @@ class Reloader extends App
             exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
         }
         exit(CliKernelAbstract::EXIT_STATUS_OK);
+    }
+
+    /**
+     * Output help text
+     *
+     * @return void
+     */
+    private function outputHelp(): void
+    {
+        $file   = $this->getToolFilename();
+        $green  = self::COLOUR_GREEN;
+        $white  = self::COLOUR_WHITE;
+        $yellow = self::COLOUR_YELLOW;
+        echo <<<HELP
+
+{$white}NAME:
+    Assessment Relations Reloader
+
+SYNOPSIS:
+    $green{$file} {$yellow}[OPTION]...$white
+
+DESCRIPTION
+    This tool reloads assessment relations, as stored in the
+    `mv_assessment_relation` table.
+
+    If the number of deleted and inserted assessment relations do not match,
+    then there may be a data issue: this tool will suggest to run the reporting
+    tool `./tools/assessment/relations-report.php` for further diagnosis (and
+    raise an error code)
+
+OPTIONS
+    $yellow-h, --help$white
+        Output this help text and exit.
+
+    $yellow-v, -vv, -vvv$white
+        Control verbosity.
+
+    $yellow-p, --perform$white
+        Actually perform the reload: otherwise, only output how many results
+        would be deleted and inserted.
+
+
+HELP;
     }
 }
