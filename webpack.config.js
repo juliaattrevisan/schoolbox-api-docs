@@ -458,7 +458,7 @@ module.exports = {
         ],
     },
     externals: {
-        vue: "Vue",
+        vue: "Vue", // as Vue is loaded seperately via a <script> tag, we need to notify webpack that it is available globally, so any .vue files will still bundle as expected
     },
     cache: true,
     resolve: {
