@@ -287,6 +287,9 @@ class Controller extends Base\Base
      * @var int|null $_POST ['unit'][]['unit_impl_id']
      * @var string   $_POST ['unit'][]['open_date']
      * @var string   $_POST ['unit'][]['close_date']
+     *
+     * @throws Base\Exception
+     * @throws MapperException
      */
     public function postUnits()
     {
@@ -346,12 +349,12 @@ class Controller extends Base\Base
         $unitDefaultDueDates = new Collection();
 
         try {
-            $importingUnitSpecIds = [];
+            $countImportedUnits = 0;
 
             foreach ($units as $idx => $unit) {
                 if (isset($unit['import'])) {
+                    $countImportedUnits++;
                     $unitSpecId = $unit['unit_spec_id'];
-                    $importingUnitSpecIds[] = (int)$unitSpecId;
 
                     $openDate  = \Alaress_Date_Format::newLocalShort($unit['open_date']);
                     $closeDate = \Alaress_Date_Format::newLocalShort($unit['close_date']);
@@ -377,7 +380,7 @@ class Controller extends Base\Base
             }
 
             // Ensure at least one unit was selected for import
-            if (empty($importingUnitSpecIds)) {
+            if (!$countImportedUnits) {
                 $this->sendError('You must select at least one unit to import');
                 return;
             }
@@ -390,7 +393,6 @@ class Controller extends Base\Base
         $countImportedUnits = 0;
 
         $unitImpls = $this->unitImplementationMapper->createCollection();
-        $unitSpecs = $this->unitSpecificationMapper->findByColumn('id', $importingUnitSpecIds, ['deleted' => true])->indexBy('id');
         foreach ($units as $unit) {
             if (isset($unit['import'])) {
                 // Are we modifying an already imported Unit?
@@ -400,7 +402,7 @@ class Controller extends Base\Base
 
                 // ID will be null if UnitSpec not yet imported
                 $unitImpl = $this->unitImplementationMapper->createModel($unit['unit_impl_id']);
-                $unitSpec = $unitSpecs->offsetGet((int)$unit['unit_spec_id']);
+                $unitSpec = $this->unitSpecificationMapper->createModel($unit['unit_spec_id']);
                 $unitImpl->setSpecification($unitSpec);
                 $unitImpl->setOpenDate($unit['open_date']);
                 $unitImpl->setDueDate($unit['close_date']);

@@ -194,6 +194,12 @@ class ImportFactory
             }
         }
 
+        // Populating folder names which are missed in the steps above and not in unitSpecDBCache.
+        $emptyUnitSpecIds = array_diff(array_keys($unitSpecCache), array_keys($unitSpecDBCache));
+        if (!empty($emptyUnitSpecIds)) {
+            $this->loadSpecFolders($emptyUnitSpecIds, $unitSpecCache);
+        }
+
         // No AssessmentImpl to AssessmentSpec mapping (this is a new import)
         $assessmentSpecs = $this->loadProjectSpecAssessables($assessmentSpecs, []);
         $dto             = new DataTransferObject(false, [], $unitImpls, $assessmentSpecs, $assessmentImpls, $assessmentPairs, $defaultDueTime);
@@ -441,6 +447,12 @@ class ImportFactory
                     }
                 }
             }
+        }
+
+        // Populating folder names which are missed in the steps above.
+        $emptyUnitSpecIds = array_diff(array_keys($unitSpecCache), array_keys($unitSpecDBCache));
+        if (!empty($emptyUnitSpecIds)) {
+            $this->loadSpecFolders($emptyUnitSpecIds, $unitSpecCache);
         }
 
         $assessmentImplToSpecMap = $this->getAssessmentImplToSpecMap($unitImplIds);
@@ -1244,5 +1256,33 @@ class ImportFactory
         $config        = $compInstance->getConfigArray();
         $componentName = $config['componentname']['value'] ?: $config['componentname']['defaultValue'];
         return $componentName;
+    }
+
+    /**
+     * Add folder name to unit specs so that we can render this on course import page.
+     * @param array $emptyUnitSpecIds
+     * @param array $unitSpecCache
+     * @return void
+     */
+    private function loadSpecFolders(array $emptyUnitSpecIds, array $unitSpecCache): void
+    {
+        if (empty($emptyUnitSpecIds)) {
+            return;
+        }
+        $emptyUnitsBindings = Builder::getBindings($emptyUnitSpecIds, 'us');
+        $folderQuery        = "SELECT `folder`.`id` AS `folder_id`,
+                                      `folder`.`name` AS `folder_name`,
+                                      `course_unit_specification`.`id` AS `spec_id`
+                               FROM   `folder` JOIN `course_unit_specification`
+                                      ON `course_unit_specification`.`folder_id` = `folder`.`id`
+                               WHERE  `course_unit_specification`.`id` IN ({$emptyUnitsBindings->getPlaceholder()})";
+        $folderStatement    = $this->database->query($folderQuery, $emptyUnitsBindings->getParams());
+        $rows               = $folderStatement->fetchAll(\PDO::FETCH_ASSOC);
+        foreach ($rows as $row) {
+            $unitSpecId = $row['spec_id'];
+            $folder     = new Folder();
+            $folder->setName($row['folder_name']);
+            $unitSpecCache[$unitSpecId]->setFolder($folder);
+        }
     }
 }
