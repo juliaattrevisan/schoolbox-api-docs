@@ -27,12 +27,10 @@ class ValidUploadableFile extends BaseSpecification
     /**
      * Constructor
      *
-     * @param int                 $filesize       The size of the file being uploaded: not yet a property of the file.
      * @param Alaress_Date_Format $latestTempDate The latest possible expiry date at which the file being uploaded is
      *                                            considered a temp file, and thus bypasses size validation.
      */
     public function __construct(
-        private int $filesize,
         private Alaress_Date_Format $latestTempDate,
     ) {
     }
@@ -80,7 +78,7 @@ class ValidUploadableFile extends BaseSpecification
             }
         }
         if ($assertSize) {
-            if ($fileMime->getActualMaxFileSize() < $this->filesize) {
+            if ($fileMime->getActualMaxFileSize() < $candidate->getSize()) {
                 throw new FileException(
                     sprintf(
                         "This file exceeds the file size restriction of %s. %s",

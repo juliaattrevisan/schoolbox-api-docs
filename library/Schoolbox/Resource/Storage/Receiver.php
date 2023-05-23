@@ -110,6 +110,7 @@ class Receiver implements IReceiver
         // Find the location within the filesystem where the temp file lives.
         // TODO: Find a way to remove the need for this truncation
         $tempLocationInFilesystem = str_replace(sys_get_temp_dir(), '', $tempLocation);
+        $storage->setSize($this->tempFilesystem->fileSize($tempLocationInFilesystem));
 
         try {
             $storage->setMimetype($this->mimetypeMapper->getByFilename($basename));
@@ -126,7 +127,6 @@ class Receiver implements IReceiver
         }
         if ($requireSafety) {
             $validator = new ValidUploadableFile(
-                $this->tempFilesystem->fileSize($tempLocationInFilesystem),
                 Alaress_Date_Format::now()->addDays(self::MAX_DAYS_ALLOWED_FOR_TEMP_FILE_BYPASS),
             );
             $validator->isSatisfiedBy($storage);
