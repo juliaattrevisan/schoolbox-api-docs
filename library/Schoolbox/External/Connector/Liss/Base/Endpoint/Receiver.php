@@ -17,7 +17,6 @@ use PhpXmlRpc\Server;
 use PhpXmlRpc\Value;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
-use Schoolbox\External\Connector\Log\Mapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception;
 
@@ -49,70 +48,27 @@ class Receiver
      */
     private const AUTHENTICATION_FAILED = 'Authentication failed; check username/password/schoolCode in your instance.';
 
+
     /**
      * LISS Protocol Version
      * @see https://liss.net.au/docs/common/authentication/
      */
     private const LISS_VERSION = 10000;
 
+
     /**
      * Name of agent (i.e. us)
      */
     private const AGENT_NAME = 'Schoolbox';
 
-    /**
-     * Whether the external db was enabled
-     *
-     * @var int
-     */
-    private int $externalEnable;
-
 
     /**
-     * Whether the external db is the "schoolbox" connector
-     * or something else (it only works with "schoolbox" connector)
-     *
-     * @var string
-     */
-    private string $externalType;
-
-
-    /**
-     * @var string
-     */
-    private string $username;
-
-
-    /**
-     * @var string
-     */
-    private string $password;
-
-
-    /**
-     * A csv list of event types that we should skip
+     * A list of event types that we should skip,
+     * derived from a csv
      *
      * @var array
      */
     private array $exclusions;
-
-
-    /**
-     * A string denoting an arbitrary event type that we attribute
-     * when the supplied type is non-meaningful
-     *
-     * @var string
-     */
-    private string $defaultType;
-
-
-    /**
-     * Decide whether to use teacherIds or teacherCodes
-     * Configured in admin
-     *
-     * @var string
-     */
-    private string $teacherIdentifier;
 
 
     /**
@@ -124,46 +80,40 @@ class Receiver
 
 
     /**
-     * @var \Schoolbox\External\Connector\Log\Mapper
-     */
-    private \Schoolbox\External\Connector\Log\Mapper $importLogMapper;
-
-
-    /**
      * Constructor.
      *
-     * @param int    $externalEnable
-     * @param string $externalType
-     * @param string $username
-     * @param string $password
-     * @param string $exclusions
-     * @param string $defaultType
-     * @param string $teacherIdentifier
-     * @param string $logDir
-     * @param Mapper $importLogMapper
+     * @param int                                      $externalEnable    Whether the external db was enabled
+     * @param string                                   $externalType      Whether the external db is the "schoolbox" connector or something else (it only works with "schoolbox" connector)
+     * @param string                                   $username          LISS username, as per config
+     * @param string                                   $password          LISS password, as per config
+     * @param string                                   $exclusionList     A csv list of event types that we should skip
+     * @param string                                   $defaultType       A string denoting an arbitrary event type that we attribute when the supplied type is non-meaningful
+     * @param string                                   $teacherIdentifier Decide whether to use teacherIds or teacherCodes; configured in admin
+     * @param bool                                     $storageLogging    Decide whether to log actual liss payloads to local file storage
+     * @param string                                   $logDir            Path to a local log file
+     * @param \Schoolbox\External\Connector\Log\Mapper $importLogMapper   Log the import in the suds control panel
+     * @param \Schoolbox\Resource\Storage\Mapper       $storageMapper     Log liss payloads to a local file storage record
      */
     public function __construct(
-        int $externalEnable,
-        string $externalType,
-        string $username,
-        string $password,
-        string $exclusions,
-        string $defaultType,
-        string $teacherIdentifier,
-        string $logDir,
-        \Schoolbox\External\Connector\Log\Mapper $importLogMapper
+        private int $externalEnable,
+        private string $externalType,
+        private string $username,
+        private string $password,
+        private string $exclusionList,
+        private string $defaultType,
+        private string $teacherIdentifier,
+        private bool $storageLogging,
+        private string $logDir,
+        private \Schoolbox\User $superuser,
+        private \Schoolbox\External\Connector\Log\Mapper $importLogMapper,
+        private \Schoolbox\Resource\Storage\Mapper $storageMapper
     ) {
-        $this->externalEnable = $externalEnable;
-        $this->externalType = $externalType;
-        $this->username = $username;
-        $this->password = $password;
-
         /* (configured in admin) A csv list of event types that should be ignored
          * and a default event type that should be attributed to a liss event
          * when it didn't specify a type (note that it will be possible that you
          * can specify a default event type this is also excluded)
          */
-        $this->exclusions = array_map('trim', explode(',', $exclusions));
+        $this->exclusions = array_map('trim', explode(',', $this->exclusionList));
         $this->defaultType = trim($defaultType);
         $this->teacherIdentifier = trim($teacherIdentifier);
 
@@ -172,17 +122,13 @@ class Receiver
          */
         $logFile = fopen(sprintf(
             '%s/%s',
-            $logDir,
+            $this->logDir,
             self::LOG_FILE
         ), 'ab');
 
         /* TODO Reset this log level to INFO once we are safely on the way
          */
         $this->log = new Logger($logFile, $logFile, \Monolog\Logger::DEBUG, [], true);
-
-        /* Log the import in the suds control panel
-         */
-        $this->importLogMapper = $importLogMapper;
     }
 
 
@@ -266,7 +212,11 @@ class Receiver
         /* Cache locally whatever liss sent to us
          * This allows you to replay locally
          */
-//        (new PayloadCache())->cache($message);
+        if ($this->storageLogging) {
+            $this->log()->debug('Logging LISS payload to local storage');
+
+            (new PayloadCache($this->storageMapper))->cache($this->superuser, $message);
+        }
 
         /* This is the equivalent of a combined Scheduler.php and Factory.php
          * since the liss receiver immediately processes upon receiving data
@@ -380,11 +330,10 @@ class Receiver
      */
     public function hello(Request $message): Response
     {
-        $message = new Value([
+        return new Response(new Value([
             'SIS'         => new Value(self::AGENT_NAME, Value::$xmlrpcString),
             'LissVersion' => new Value(self::LISS_VERSION, Value::$xmlrpcInt),
-        ], Value::$xmlrpcStruct);
-        return new Response($message);
+        ], Value::$xmlrpcStruct));
     }
 
 
