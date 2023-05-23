@@ -104,6 +104,7 @@ class Receiver
         private string $teacherIdentifier,
         private bool $storageLogging,
         private string $logDir,
+        private \Schoolbox\User $superuser,
         private \Schoolbox\External\Connector\Log\Mapper $importLogMapper,
         private \Schoolbox\Resource\Storage\Mapper $storageMapper
     ) {
@@ -214,7 +215,7 @@ class Receiver
         if ($this->storageLogging) {
             $this->log()->debug('Logging LISS payload to local storage');
 
-            (new PayloadCache($this->storageMapper))->cache($message);
+            (new PayloadCache($this->storageMapper))->cache($this->superuser, $message);
         }
 
         /* This is the equivalent of a combined Scheduler.php and Factory.php

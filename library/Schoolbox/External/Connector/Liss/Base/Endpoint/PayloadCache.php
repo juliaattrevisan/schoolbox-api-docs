@@ -12,6 +12,7 @@ namespace Schoolbox\External\Connector\Liss\Base\Endpoint;
 use PhpXmlRpc\Request;
 use Schoolbox\Resource\Storage\Mapper;
 use Schoolbox\Resource\Storage\Model;
+use Schoolbox\User;
 
 /**
  * Cache a pushed payload locally
@@ -29,21 +30,17 @@ class PayloadCache
 
 
     /**
+     * $superuser allows the storage mapper to bypass the normal
+     * file restrictions such as size, mimetype, etc.
+     *
+     * @param User    $superuser
      * @param Request $message
      * @return Model
      * @throws \JsonException
      */
-    public function cache(Request $message): \Schoolbox\Resource\Storage\Model
+    public function cache(\Schoolbox\User $superuser, Request $message): \Schoolbox\Resource\Storage\Model
     {
-        $payload = json_encode($message, JSON_THROW_ON_ERROR);
-
-        /* Not a parser or reformatter
-         * Just a thing that helps you inspect on the cli
-         */
-        $payload = strtr($payload, [
-            '}' => "}\n",
-            '{' => "\n{"
-        ]);
+        $payload = json_encode($message, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT);
 
         $now = \Alaress_Date_Format::now();
         $expiryAt = \Alaress_Date_Format::now()->addWeeks(1);
@@ -53,6 +50,6 @@ class PayloadCache
             $now->getDatabase()
         );
 
-        return $this->storageMapper->acceptStream($filename, $payload, false, $expiryAt);
+        return $this->storageMapper->acceptStream($filename, $payload, false, $expiryAt, $superuser);
     }
 }

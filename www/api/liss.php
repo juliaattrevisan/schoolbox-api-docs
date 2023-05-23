@@ -14,6 +14,8 @@ require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 $config = $kernel->get('config');
 
+$superuser = \Schoolbox\UserMapper::getInstance()->findByUsername(\Schoolbox\UserMapper::USERNAME_ALARESS_ADMIN);
+
 $liss = new Receiver(
     (int)$config->get('external_enable'),
     $config->get('external_type'),
@@ -24,6 +26,7 @@ $liss = new Receiver(
     $config->get('external_liss_teacher_identifier'),
     (bool)$config->get('external_liss_storage_logging'),
     $config->get('logs_dir'),
+    $superuser,
     \Schoolbox\External\Connector\Log\Mapper::getInstance(),
     \Schoolbox\Resource\Storage\Mapper::getInstance()
 );
