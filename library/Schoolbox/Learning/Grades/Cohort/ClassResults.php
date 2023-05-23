@@ -59,7 +59,7 @@ class ClassResults
     /**
      * @var array
      */
-    private $tuples;
+    private array $tuples = [];
 
 
     /**
