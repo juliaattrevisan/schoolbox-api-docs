@@ -8,7 +8,7 @@
         <form id="iframeForm" method="post" action="{{ ltiEndpoint }}" target="iframe">
             <input type="hidden" name="id_token" value="{{ jwt }}">
         </form>
-        <script src="{{ CDN_PREFIX }}/js/bundle/intellischools.js" type="text/javascript"></script>
+        <script src="{{ CDN_PREFIX }}/js/bundle/intellischools.js?v={{ config.site_version }}" type="text/javascript"></script>
         <script type="text/javascript">
             window.addEventListener("message", event => {
                 if (!schoolboxIntellischools.isAllowed(event.origin.toString())) {
