@@ -23,15 +23,6 @@ use Schoolbox\User;
 class Receiver implements IReceiver
 {
     /**
-     * The maximum number of days in which a file may expire, and be allowed to
-     * bypass the maximum file size restriction.
-     *
-     * Set to 15 currently, as most temp file upload locations set an expiry two
-     * weeks into the future.
-     */
-    private const MAX_DAYS_ALLOWED_FOR_TEMP_FILE_BYPASS = 15;
-
-    /**
      * Constructor
      *
      * @param Mapper            $storageMapper          Mapper for persisting the database record for storage objects.
@@ -126,9 +117,7 @@ class Receiver implements IReceiver
             $requireSafety = false;
         }
         if ($requireSafety) {
-            $validator = new ValidUploadableFile(
-                Alaress_Date_Format::now()->addDays(self::MAX_DAYS_ALLOWED_FOR_TEMP_FILE_BYPASS),
-            );
+            $validator = new ValidUploadableFile();
             $validator->isSatisfiedBy($storage);
         } elseif (!$storage->getMimetype() instanceof Mimetype) {
             // For superusers only, we allow an unknown mimetype

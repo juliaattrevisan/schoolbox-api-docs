@@ -25,21 +25,19 @@ use Schoolbox\File\Mimetype;
 class ValidUploadableFile extends BaseSpecification
 {
     /**
-     * Constructor
+     * The maximum number of days in which a file may expire, and be allowed to
+     * bypass the maximum file size restriction.
      *
-     * @param Alaress_Date_Format $latestTempDate The latest possible expiry date at which the file being uploaded is
-     *                                            considered a temp file, and thus bypasses size validation.
+     * Set to 15 currently, as most temp file upload locations set an expiry two
+     * weeks into the future.
      */
-    public function __construct(
-        private Alaress_Date_Format $latestTempDate,
-    ) {
-    }
+    private const MAX_DAYS_ALLOWED_FOR_TEMP_FILE_BYPASS = 15;
 
     /**
      * Validate that `$candidate` is uploadable:
      * * it must have a mimetype
      * * its mimetype must be allowed
-     * * if it has no expiry, or an expiry after `$this->latestTempDate`:
+     * * if it has no expiry, or an expiry after 15 days from now:
      *   its size must not be greater than the mimetype's max allowable size
      *
      * @param Model $candidate
@@ -73,7 +71,8 @@ class ValidUploadableFile extends BaseSpecification
         $fileExpiry = $candidate->getExpiryAt();
         $assertSize = true;
         if ($fileExpiry) {
-            if ($fileExpiry->lte($this->latestTempDate)) {
+            $latestTempDate = Alaress_Date_Format::now()->addDays(self::MAX_DAYS_ALLOWED_FOR_TEMP_FILE_BYPASS);
+            if ($fileExpiry->lte($latestTempDate)) {
                 $assertSize = false;
             }
         }
