@@ -37,7 +37,10 @@ class Reporter extends App
 
         // Collect expected rows
         $logger->notice('Fetching expected mv_assessment_relation data...');
-        $selectExpectedDataQuery = $db->prepareQuery(Reloader::SELECT_ASSESSMENT_RELATION_SQL);
+        $selectExpectedDataQuery = $db->prepareQuery(
+            'SET STATEMENT max_statement_time=0 FOR '
+            . Reloader::SELECT_ASSESSMENT_RELATION_SQL,
+        );
         $selectExpectedDataQuery->execute();
         $expectedData = $selectExpectedDataQuery->fetchRowArray('assessment_id');
         $logger->info(sprintf('Fetched expected data: %d rows', count($expectedData)));

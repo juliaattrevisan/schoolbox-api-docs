@@ -139,7 +139,8 @@ class Reloader extends App
         if ($this->perform()) {
             $this->getLogger()->notice('Re-inserting into mv_assessment_relation...');
             $insertQuery = $db->prepareQuery(
-                'INSERT INTO mv_assessment_relation ' . self::SELECT_ASSESSMENT_RELATION_SQL
+                'SET STATEMENT max_statement_time=0 FOR INSERT INTO mv_assessment_relation '
+                . self::SELECT_ASSESSMENT_RELATION_SQL,
             );
             $insertQuery->execute();
             $insertCount = $insertQuery->rowCount();
@@ -147,7 +148,10 @@ class Reloader extends App
                 sprintf('Inserted %d mv_assessment_relation records', $insertCount)
             );
         } else {
-            $selectQuery = $db->prepareQuery(self::SELECT_ASSESSMENT_RELATION_SQL);
+            $selectQuery = $db->prepareQuery(
+                'SET STATEMENT max_statement_time=0 FOR '
+                . self::SELECT_ASSESSMENT_RELATION_SQL,
+            );
             $selectQuery->execute();
             $insertCount = $selectQuery->rowCount();
             $this->getLogger()->notice(

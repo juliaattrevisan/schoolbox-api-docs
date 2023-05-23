@@ -1,6 +1,9 @@
 -- Copy the view's statement directly into a REPLACE statement, thus maintaining
 -- unique assessment IDs as much as I can.
 
+-- First set max statement time here: this could take a while
+SET MAX_STATEMENT_TIME=0;
+
 -- Assessments directly in a folder
 REPLACE INTO mv_assessment_relation
 select `a`.`id` AS `assessment_id`,
