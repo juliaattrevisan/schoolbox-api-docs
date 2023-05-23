@@ -47,8 +47,8 @@ type Routes = {
 };
 
 // FloatingUI specific, declared here as showPopOut relies on one of these values existing.
-const popOutElement = ref<HTMLDivElement | null>(null);
-const referenceElement = ref<HTMLDivElement | null>(null);
+const popOutElement = window.Vue.ref<HTMLDivElement | null>(null);
+const referenceElement = window.Vue.ref<HTMLDivElement | null>(null);
 const assessmentType = window.Vue.ref("");
 
 const isLoading = window.Vue.ref(false);
@@ -80,7 +80,7 @@ const routes: Ref<Routes> = window.Vue.ref({
     includeRoute: "",
     historyRoute: "",
 });
-const markbookElement = ref<HTMLDivElement | null>(null);
+const markbookElement = window.Vue.ref<HTMLDivElement | null>(null);
 
 // Exclude confirm, popout
 const excludeModalEl = window.Vue.ref(null);

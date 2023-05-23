@@ -2,7 +2,6 @@
  * Handles the store to disband the group
  */
 
-import { ref } from "vue";
 import { defineStore } from "pinia";
 import { useActiveNodeStore } from "@schoolboxCurriculum/vue/manageCurriculum/activeNode/store/mcActiveNodeStore";
 import type { Node, NodeToUpdate } from "@schoolboxCurriculum/types/Node";
@@ -36,9 +35,9 @@ function getFormData(node: NodeToUpdate) {
 }
 
 export const useUpdateNodeStore = defineStore("mcUpdateNode", () => {
-    const isProcessing = ref(false);
-    const isOpen = ref(false); // to notify that the prompt is opened / closed
-    const activeNodeCopy = ref<NodeToUpdate>({ name: "", description: null, code: null }); // hold a copy of the changes, only update once we confirm the changes
+    const isProcessing = window.Vue.ref(false);
+    const isOpen = window.Vue.ref(false); // to notify that the prompt is opened / closed
+    const activeNodeCopy = window.Vue.ref<NodeToUpdate>({ name: "", description: null, code: null }); // hold a copy of the changes, only update once we confirm the changes
 
     /**
      * to display a prompt to update a nodes details

@@ -6,7 +6,6 @@
  * It's linked specifically to description as we are removing embed media buttons which is currently specific just to these description fields
  */
 
-import { ref, onMounted } from "vue";
 import { isScriptAdded, injectScript } from "@js/util/domUtils";
 
 /**
@@ -17,7 +16,7 @@ import { isScriptAdded, injectScript } from "@js/util/domUtils";
  * @returns { string } - the initial value
  */
 export function useDescriptionEditor($initialValue: string, $ckeditorInstance: string) {
-    const initialValue = ref($initialValue);
+    const initialValue = window.Vue.ref($initialValue);
     const ckeditorInstance = $ckeditorInstance;
 
     /**
@@ -30,7 +29,7 @@ export function useDescriptionEditor($initialValue: string, $ckeditorInstance: s
             editor.setData(initialValue.value); // set the initial data
         }
 
-        editor.model.document.on("change:data",() => {
+        editor.model.document.on("change:data", () => {
             initialValue.value = editor.getData() as string;
         });
     }
@@ -49,7 +48,7 @@ export function useDescriptionEditor($initialValue: string, $ckeditorInstance: s
                 new CustomEvent("EDITOR__CREATE", {
                     detail: {
                         targetElements: [`#${ckeditorInstance}`],
-                        toolbar: "simple"
+                        toolbar: "simple",
                     },
                 })
             );
@@ -61,7 +60,7 @@ export function useDescriptionEditor($initialValue: string, $ckeditorInstance: s
     /**
      * to load the ckeditor when ready
      */
-    onMounted(() => {
+    window.Vue.onMounted(() => {
         loadCKEditor();
     });
 

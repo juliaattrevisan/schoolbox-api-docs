@@ -6,7 +6,6 @@
  * which is used to update or add a subsection to a SINGLE node.
  */
 
-import { ref, computed } from "vue";
 import { defineStore } from "pinia";
 import { useNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/mcNodesStore";
 import { UNSET_ID, findById, getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
@@ -14,59 +13,59 @@ import { useEnableNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/s
 import type { Node } from "@schoolboxCurriculum/types/Node";
 
 export const useSelectedNodesStore = defineStore("mcSelectedNodes", () => {
-    const nodes = ref<Node[]>([]); // the currently selected nodes
-    const childNodes = ref<Node[]>([]); // any children of currently selected nodes
-    const activeNode = ref(getEmptyNode()); // to show extra info on a selected code in a modal
-    const hasDisabledChildNodes = ref(false);
+    const nodes = window.Vue.ref<Node[]>([]); // the currently selected nodes
+    const childNodes = window.Vue.ref<Node[]>([]); // any children of currently selected nodes
+    const activeNode = window.Vue.ref(getEmptyNode()); // to show extra info on a selected code in a modal
+    const hasDisabledChildNodes = window.Vue.ref(false);
 
     /**
      * Do we have any selected nodes?
      *
      * @returns { boolean }
      */
-    const hasNoNodes = computed(() => nodes.value.length === 0);
+    const hasNoNodes = window.Vue.computed(() => nodes.value.length === 0);
 
     /**
      * Do we have any selected nodes?
      *
      * @returns { boolean }
      */
-    const hasNodes = computed(() => nodes.value.length > 0);
+    const hasNodes = window.Vue.computed(() => nodes.value.length > 0);
 
     /**
      * Number of nodes
      *
      * @returns { number }
      */
-    const count = computed(() => nodes.value.length);
+    const count = window.Vue.computed(() => nodes.value.length);
 
     /**
      * Return the single or plural depending on node selection
      *
      * @returns { string }
      */
-    const singleOrPlural = computed(() => (count.value > 1 ? "nodes" : "node"));
+    const singleOrPlural = window.Vue.computed(() => (count.value > 1 ? "nodes" : "node"));
 
     /**
      * just return an array of ids, used to compare if a node is selected or not
      *
      * @returns { number[] }
      */
-    const nodesIds = computed(() => nodes.value.map((node) => node.id));
+    const nodesIds = window.Vue.computed(() => nodes.value.map((node) => node.id));
 
     /**
      * just return an array of ids, used to compare if a node is selected or not
      *
      * @returns { number[] }
      */
-    const childNodesIds = computed(() => childNodes.value.map((node) => node.id));
+    const childNodesIds = window.Vue.computed(() => childNodes.value.map((node) => node.id));
 
     /**
      * check if all nodes are enabled so we can just show the disable button
      *
      * @returns { boolean }
      */
-    const allNodesEnabled = computed(() => {
+    const allNodesEnabled = window.Vue.computed(() => {
         if (hasNodes.value) {
             const enabledNodes = nodes.value.filter((node) => node.enabled);
             return enabledNodes.length === nodes.value.length;
@@ -80,7 +79,7 @@ export const useSelectedNodesStore = defineStore("mcSelectedNodes", () => {
      *
      * @returns { boolean }
      */
-    const allNodesDisabled = computed(() => {
+    const allNodesDisabled = window.Vue.computed(() => {
         if (hasNodes.value) {
             const enabledNodes = nodes.value.filter((node) => !node.enabled);
             const nodesStore = useNodesStore();
@@ -104,7 +103,7 @@ export const useSelectedNodesStore = defineStore("mcSelectedNodes", () => {
      *
      * @returns { boolean }
      */
-    const hasActiveNode = computed(() => activeNode.value.id !== UNSET_ID);
+    const hasActiveNode = window.Vue.computed(() => activeNode.value.id !== UNSET_ID);
 
     /**
      * we need to check if a new parent has been selected of any existing children,

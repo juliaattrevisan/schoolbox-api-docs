@@ -46,7 +46,7 @@ const props = defineProps({
 
 const store = useStore();
 const selectedNodesStore = useSelectedNodesStore();
-const toastEl = ref<Toast | null>(null);
+const toastEl = window.Vue.ref<Toast | null>(null);
 
 /**
  * Display an error if we cant find the node id that we jump to straight on page load

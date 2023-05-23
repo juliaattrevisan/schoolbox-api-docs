@@ -14,7 +14,7 @@ const nodesStore = useNodesStore();
 const viewNodesStore = useViewNodesStore();
 const searchStore = useSearchStore();
 const depth = window.Vue.ref(0); // to increment each time we go down the node tree to visually indicate children
-const nodesContainerEl = ref<HTMLDivElement | null>(null); // to scroll back to top on any selection change
+const nodesContainerEl = window.Vue.ref<HTMLDivElement | null>(null); // to scroll back to top on any selection change
 
 /**
  * Clear the current search query

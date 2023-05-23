@@ -7,13 +7,12 @@
  * within the modal, and csSelectedNodesStore outside the modal
  */
 
-import { ref } from "vue";
 import { defineStore } from "pinia";
 import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
 import type { Node } from "@schoolboxCurriculum/types/Node";
 
 export const useModalActiveNodeStore = defineStore("mcModalActiveNode", () => {
-    const node = ref<Node>(getEmptyNode()); // the currently selected node
+    const node = window.Vue.ref<Node>(getEmptyNode()); // the currently selected node
 
     /**
      * set the node to perform an action on

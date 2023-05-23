@@ -2,7 +2,6 @@
  * Add a new curriculum
  */
 
-import { ref } from "vue";
 import { defineStore } from "pinia";
 import { useStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/manageCurriculumStore";
 import { useNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/mcNodesStore";
@@ -39,10 +38,10 @@ function getFormData(node: Partial<Node>) {
 }
 
 export const useAddCurriculumStore = defineStore("mcAddCurriculum", () => {
-    const isProcessing = ref(false);
-    const isOpen = ref(false); // to notify that the prompt is opened / closed
-    const curriculum = ref<Partial<Node>>(getCurriculum());
-    const id = ref(UNSET_ID); // the id of the last updated node
+    const isProcessing = window.Vue.ref(false);
+    const isOpen = window.Vue.ref(false); // to notify that the prompt is opened / closed
+    const curriculum = window.Vue.ref<Partial<Node>>(getCurriculum());
+    const id = window.Vue.ref(UNSET_ID); // the id of the last updated node
 
     /**
      * to display a prompt to add a curriculum

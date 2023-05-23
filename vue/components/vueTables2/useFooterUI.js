@@ -7,14 +7,12 @@
  *
  */
 
-import { nextTick } from "vue";
-
 /**
  * To adjust the UI display,
  * putting everything down the bottom right
  */
 export async function updateFooterUI() {
-    await nextTick(); //to ensure the footer is available in the DOM
+    await window.Vue.nextTick(); //to ensure the footer is available in the DOM
     pushUIIntoFooterSlot();
 }
 
