@@ -134,10 +134,10 @@ $cdn-prefix: "../..";
 @import "components/eotc/eotc";
 
 // CK Editor
-@import "components/editor/editor";
 @import "components/editor/custom-styles";
-@import "components/editor/mejs";
-@import "components/editor/inline";
+
+// Media Element JS
+@import "components/mejs/mejs";
 
 //Course Builder
 @import "components/course-builder/course-builder";
