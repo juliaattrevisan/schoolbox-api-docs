@@ -139,7 +139,7 @@ class Controller extends Base
                     break;
                 case 'sva':
                     /**
-                     * list of reports for sva
+                     * list of reports for sva reports
                      */
                     $this->taskDHelper->addSource('', 'svaMonthlyLogins');
                     $this->taskDHelper->addSource('', 'svaNewsArticleViews');
@@ -157,6 +157,22 @@ class Controller extends Base
                     $this->taskDHelper->addSource('', 'svaHomepageViewsForRrrHubSchoolsPage');
                     $this->taskDHelper->addSource('', 'svaForumThreadsViews');
                     $this->taskDHelper->addSource('', 'svaForumRepliesViews');
+                    break;
+                case 'implementation':
+                    /**
+                     * list of reports for implementation reports
+                     */
+                    $this->taskDHelper->addSource('', 'implementationServicePermissions');
+                    $this->taskDHelper->addSource('', 'implementationRoleList');
+                    $this->taskDHelper->addSource('', 'implementationCampusList');
+                    $this->taskDHelper->addSource('', 'implementationHouseList');
+                    $this->taskDHelper->addSource('', 'implementationYearLevels');
+                    $this->taskDHelper->addSource('', 'implementationNewsTopics');
+                    $this->taskDHelper->addSource('', 'implementationCalendarEventTypes');
+                    $this->taskDHelper->addSource('', 'implementationNotificationSettings');
+                    // TODO: $this->taskDHelper->addSource('', 'implementationTopMenuReport');
+                    $this->taskDHelper->addSource('', 'implementationSideMenuReport');
+                    $this->taskDHelper->addSource('', 'implementationAcademicPeriods');
                     break;
                 default:
                     throw new SchoolboxException("Report '{$report}' Does not exist.");
@@ -1380,14 +1396,291 @@ class Controller extends Base
         ORDER BY
             ft.threadID,ft.date;
         ");
-        // ===============================================================================================
-        // ============= TO DO: ADD 'Social Stream Posts (per month, per page)' Here =====================
-        // ===============================================================================================
         $statement->execute();
         $help = new Helper();
         $help->queryToCSV($statement, 'svaForumReplies.csv');
     }
     // ===============================================================================================
+    // ============= TO DO: ADD 'Social Stream Posts (per month, per page)' Here =====================
+    // ===============================================================================================
+
+    // ===============================================================================================
     // ==================================== END SVA REPORTS ==========================================
     // ===============================================================================================
+
+    // ===============================================================================================
+    // ============================== START IMPLEMENTATION REPORTS ===================================
+    // ===============================================================================================
+
+    /**
+     * IMPLEMENTATION
+     * implementationServicePermissions.csv
+     */
+    public function implementationServicePermissions()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            ls.NAME AS 'Service Type',
+            group_concat(concat(u.firstname,' ',u.lastname,' (',u.id,')')) AS 'Users'
+        FROM
+            lu_service ls
+        LEFT JOIN
+            userAccess ua on ls.id = ua.service
+        LEFT JOIN
+            user u on ua.uid = u.id and u.deleted_at is NULL
+        WHERE
+            NOT ls.name = 'Homepage'
+        GROUP BY
+            ls.name
+        UNION
+        SELECT
+            'Superusers' as 'Service Type',
+            group_concat(concat(u.firstname,' ',u.lastname,' (',u.id,')')) AS 'Users'
+        FROM
+            superusers s
+        LEFT JOIN
+            user u ON s.id = u.id
+        WHERE
+            u.deleted_at IS NULL;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'implementationServicePermissions.csv');
+    }
+    /**
+     * IMPLEMENTATION
+     * implementationRoleList.csv
+     */
+    public function implementationRoleList()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            g.NAME   AS 'Role Name',
+            Count(u.id) AS 'User Count'
+        FROM
+            groups g
+        LEFT JOIN
+            user u ON g.id = u.group_id
+        WHERE
+            u.deleted_at IS NULL
+        AND
+            g.deleted_at IS NULL
+        GROUP BY
+            g.NAME;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'implementationRoleList.csv');
+    }
+    /**
+     * IMPLEMENTATION
+     * implementationCampusList.csv
+     */
+    public function implementationCampusList()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            c.NAME   AS 'Campus Name',
+            Count(u.id) AS 'User Count'
+        FROM
+            luCampus c
+        JOIN
+            userCampus uc ON c.id = uc.campus
+        JOIN
+            user u ON uc.uid = u.id
+        WHERE
+            u.deleted_at IS NULL
+        GROUP BY
+            c.NAME;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'implementationCampusList.csv');
+    }
+    /**
+     * IMPLEMENTATION
+     * implementationHouseList.csv
+     */
+    public function implementationHouseList()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            h.house AS 'House Level',
+            Count(u.id) AS 'User Count'
+        FROM
+            house h
+        LEFT JOIN
+            user u ON h.id = u.house
+        WHERE
+            h.deleted_at IS NULL
+        AND
+            u.deleted_at IS NULL
+        GROUP BY
+            h.house;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'implementationHouseList.csv');
+    }
+    /**
+     * IMPLEMENTATION
+     * implementationYearLevels.csv
+     */
+    public function implementationYearLevels()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            lyl.NAME AS 'Year Level',
+            Count(u.id) AS 'User Count'
+        FROM
+            lu_year_level lyl
+        LEFT JOIN
+            user u ON lyl.id = u.year_id
+        WHERE
+            lyl.deleted_at IS NULL
+        AND
+            u.deleted_at IS NULL
+        GROUP BY
+            lyl.NAME;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'implementationYearLevels.csv');
+    }
+    /**
+     * IMPLEMENTATION
+     * implementationNewsTopics.csv
+     */
+    public function implementationNewsTopics()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            NAME AS 'Topic Name'
+        FROM
+            newsTopic
+        WHERE
+            deleted_at IS NULL
+        ORDER BY
+            sequence;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'implementationNewsTopics.csv');
+    }
+    /**
+     * IMPLEMENTATION
+     * implementationCalendarEventTypes.csv
+     */
+    public function implementationCalendarEventTypes()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+                eventTypeID as 'ID',
+                eventType as 'Event',
+                eventColour as 'Event Colour'
+        FROM
+                luEventType
+        WHERE
+                deleted_at is NULL
+        ORDER BY
+                sequence ASC;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'implementationCalendarEventTypes.csv');
+    }
+    /**
+     * IMPLEMENTATION
+     * implementationNotificationSettings.csv
+     */
+    public function implementationNotificationSettings()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            g.name as 'Role',
+            role_type as 'Role Type',
+            ms.description as 'Notification',
+            mrp.mask as 'Allowed',
+            mrp.role_default as 'Defaults'
+        FROM
+            msg_route_perm mrp
+        LEFT JOIN
+            groups g on g.id = mrp.role_id
+        LEFT JOIN
+            msg_source ms on ms.id = mrp.msg_source_id
+        WHERE
+            g.deleted_at is NULL
+        AND
+            mrp.msg_source_id in (34,35,36,37,38,39,40,41,42,49,50,51,52,53)
+        ORDER BY
+            ms.description,g.id;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'implementationNotificationSettings.csv');
+    }
+    /**
+     * IMPLEMENTATION
+     * implementationSideMenuReport.csv
+     */
+    public function implementationSideMenuReport()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+          mss.section as 'Real Name',
+          IF(mss.title != '', mss.title,
+            CASE
+                WHEN mss.section = 'menu' THEN (select value from config where name = 'title')
+                WHEN mss.section = 'subjects' THEN 'My Subjects'
+                WHEN mss.section = 'children' THEN 'My Students'
+                WHEN mss.section = 'groups' THEN 'My Favorite Groups'
+                WHEN mss.section = 'bookmarks' THEN 'My Links'
+            END
+          ) as 'Label Name',
+            CASE
+                WHEN mss.visible = '0' THEN 'Hidden'
+                WHEN mss.visible = '1' THEN 'Visible'
+                ELSE 'N/A'
+            END AS 'Visibility'
+        FROM
+          menu_side_section mss;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'implementationSideMenuReport.csv');
+    }
+    /**
+     * IMPLEMENTATION
+     * implementationAcademicPeriods.csv
+     */
+    public function implementationAcademicPeriods()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            title as 'Academic Period Name',
+            coalesce(lyl.name,'') as 'Year Level?',
+            start as 'Start Date',
+            display_finish 'End Date',
+            IF(archived, 'Yes', 'No') as 'Archived?'
+        FROM
+            term t
+        LEFT JOIN
+            term_year_level tyl on t.id = tyl.term_id
+        LEFT JOIN
+            lu_year_level lyl on tyl.year_level_id = lyl.id;
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'implementationAcademicPeriods.csv');
+    }
 }
