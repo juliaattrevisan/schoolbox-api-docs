@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Resource\Storage\Test;
 
+use Alaress_Date_Format;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\File\Mimetype;
 use Schoolbox\Resource\Storage\Model;
@@ -50,8 +51,20 @@ class ValidUploadableFileTest extends TestCase
             ->setMimetype($standardMimetype);
 
         yield 'file under size limit, no expiry' => [
-            new ValidUploadableFile(1_000, \Alaress_Date_Format::now()),
+            new ValidUploadableFile(1_000, Alaress_Date_Format::now()),
             $standardFile,
+        ];
+        yield 'file under size limit, expiry before latest temp date' => [
+            new ValidUploadableFile(1_000_000, Alaress_Date_Format::now()->addDays(1)),
+            (clone $standardFile)->setExpiryAt(Alaress_Date_Format::now()->addDays(1)),
+        ];
+        yield 'file under size limit, expiry after latest temp date' => [
+            new ValidUploadableFile(1_000_000, Alaress_Date_Format::now()->addDays(1)),
+            (clone $standardFile)->setExpiryAt(Alaress_Date_Format::now()->addDays(2)),
+        ];
+        yield 'file over size limit, expiry before latest temp date' => [
+            new ValidUploadableFile(1_000_001, Alaress_Date_Format::now()->addDays(1)),
+            (clone $standardFile)->setExpiryAt(Alaress_Date_Format::now()->addDays(1)),
         ];
     }
 }
