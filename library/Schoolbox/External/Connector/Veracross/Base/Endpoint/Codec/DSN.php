@@ -61,7 +61,7 @@ class DSN implements IDSN
 
         /* Check that each module comes with the expected number of key-value pairs
          *
-         * original dsn string + \count(expected_tuple) = 1 + 2 = 3
+         * original dsn string + \count(expected_tuple) = 1 + 3 = 4
          */
         if (count($matches) !== count(self::EXPECTED_TUPLE) + 1) {
             throw new DomainException('Veracross API DSN: could not decode; missing some credentials.');

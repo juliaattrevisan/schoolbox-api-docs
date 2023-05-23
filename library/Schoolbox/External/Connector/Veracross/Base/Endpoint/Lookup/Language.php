@@ -29,6 +29,17 @@ class Language
 
 
     /**
+     * Records might reference a language that doesn't exist in lookups
+     *
+     * Replace with a generic "Unknown" for now, as it's not apparent that
+     * this happens in a Prod Veracross; their sandbox api has a bunch of fixer
+     * scripts disabled for whatever reason, and there's a bunch of schools
+     * in this area mangling content
+     */
+    private const UNKNOWN_DESCRIPTION = 'Unknown';
+
+
+    /**
      * Remember the output we might have previously generated
      *
      * @var array|null
@@ -75,7 +86,7 @@ class Language
                 foreach ($page['data'] as $record) {
                     /* Overwrite with lookupped values
                      */
-                    $language = $valueLists['language'][$record['language']];
+                    $language = $valueLists['language'][$record['language']] ?? self::UNKNOWN_DESCRIPTION;
 
                     /* Everyone is not a native speaker until otherwise decided
                      */
