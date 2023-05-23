@@ -319,7 +319,7 @@ class CliAssessmentMigrator extends App
                 cuf.name     AS unit_name,
                 a.title      AS assessment_name,
                 cs.folder_id AS course_folder_id
-            FROM v_assessment_relation var
+            FROM mv_assessment_relation var
             INNER JOIN course_specification      cs  ON var.course_specification_id      = cs.id
             INNER JOIN folder                    cf  ON cs.folder_id                     = cf.id
             INNER JOIN course_unit_specification cus ON var.course_unit_specification_id = cus.id
@@ -395,7 +395,7 @@ class CliAssessmentMigrator extends App
                 f.id   AS class_folder_id,
                 f.name AS class_folder_name,
                 COALESCE(GROUP_CONCAT(DISTINCT fc.code ORDER BY fc.code SEPARATOR ','), '') AS folder_codes
-            FROM v_assessment_relation var
+            FROM mv_assessment_relation var
             INNER JOIN folder                                  f   ON var.folder_id     = f.id
             LEFT  JOIN folder_code                             fc  ON f.id              = fc.folder_id AND fc.deleted_at IS NULL
             INNER JOIN assessment                              a   ON var.assessment_id = a.id
