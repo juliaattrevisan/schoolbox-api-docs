@@ -583,9 +583,6 @@ class Session
                                     $subject['id']   = $cat->getId();
                                     $subject['name'] = $cat->getName();
                                     $subject['perm'] = $this->access->getFolderAccess($user, $cat->getId());
-                                    // TODO Lawn mow student subjects and parent children subjects to have same format and semantics.
-                                    // TODO Currently, a student's $subject['code'] is the SB folder code,
-                                    // TODO whereas a parent's child $subject['code'] is the SIS code.
                                     $subject['matchedCode'] = $cat->getMatchedCode();
                                     $subjects[]      = $subject;
                                     $subjectIDList[] = $cat->getId(); //dont dupe ids in this list
