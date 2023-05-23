@@ -74,11 +74,16 @@ class ValidUploadableFileTest extends TestCase
      * @covers \Schoolbox\Resource\Storage\ValidUploadableFile::isSatisfiedBy
      * @param ValidUploadableFile $validator
      * @param Model               $file
+     * @param string              $errorPattern
      * @return void
      */
-    public function testIsSatisfiedByInvalidCase(ValidUploadableFile $validator, Model $file)
-    {
+    public function testIsSatisfiedByInvalidCase(
+        ValidUploadableFile $validator,
+        Model $file,
+        string $errorPattern,
+    ) {
         $this->expectException(FileException::class);
+        $this->expectExceptionMessageMatches($errorPattern);
         $validator->isSatisfiedBy($file);
     }
 
@@ -100,27 +105,32 @@ class ValidUploadableFileTest extends TestCase
         yield 'file has no mimetype' => [
             new ValidUploadableFile(1_000, Alaress_Date_Format::now()),
             $standardFile,
+            '/^this file has no detectable type/i',
         ];
         yield 'file mimetype is not enabled' => [
             new ValidUploadableFile(1_000, Alaress_Date_Format::now()),
             (clone $standardFile)
                 ->setMimetype((clone $standardMimetype)->setEnable(false)),
+            '/^this file is not a valid file type/i',
         ];
         yield 'file mimetype is deleted' => [
             new ValidUploadableFile(1_000, Alaress_Date_Format::now()),
             (clone $standardFile)
                 ->setMimetype((clone $standardMimetype)->setDeleted(true)),
+            '/^this file is not a valid file type/i',
         ];
         yield 'file over size limit, no expiry' => [
             new ValidUploadableFile(1_000_001, Alaress_Date_Format::now()),
             (clone $standardFile)
                 ->setMimetype($standardMimetype),
+            '/^this file exceeds the file size restriction/i',
         ];
         yield 'file over size limit, expiry after latest temp date' => [
             new ValidUploadableFile(1_000_001, Alaress_Date_Format::now()->addDays(1)),
             (clone $standardFile)
                 ->setMimetype($standardMimetype)
                 ->setExpiryAt(Alaress_Date_Format::now()->addDays(2)),
+            '/^this file exceeds the file size restriction/i',
         ];
     }
 }
