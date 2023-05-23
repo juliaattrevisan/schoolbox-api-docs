@@ -17,7 +17,6 @@ use Schoolbox\UserMapper;
  */
 class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calendar_Api_EventType_Abstract
 {
-
     /**
      * @var External_Timetable
      */
