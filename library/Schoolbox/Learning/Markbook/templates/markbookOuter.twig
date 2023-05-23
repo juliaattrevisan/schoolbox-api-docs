@@ -176,11 +176,14 @@
                 options.fixedColumns = { leftColumns: 1 };
             }
 
-            $('[data-mark-sheet]').DataTable(options);
+            const table = $('[data-mark-sheet]').DataTable(options);
 
             /* Controls for Averages and Dynamic updates for input fields
              */
             $('[data-mark-sheet]').marksheetAverages();
+
+            // Table rows have changed, let DataTables know so it can correctly change the column widths
+            table.rows().invalidate().draw();
 
             // Formally disable setting of averages (they have been gone for a while)
             // $('[data-mark-sheet]').marksheetInputs();
