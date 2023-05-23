@@ -24,7 +24,7 @@ const modalEl = window.Vue.ref(null);
 /**
  * to open the modal when requested
  */
-watch(
+window.Vue.watch(
     () => props.node,
     (newNode) => {
         if (newNode.id !== UNSET_ID) {

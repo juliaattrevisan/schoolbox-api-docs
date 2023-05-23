@@ -29,7 +29,7 @@ window.Vue.onMounted(() => {
 /**
  * to open the modal when requested
  */
-watch(
+window.Vue.watch(
     () => settingsStore.isPromptOpen,
     (newIsOpen) => {
         newIsOpen ? updateModalEl.value.open() : updateModalEl.value.close();

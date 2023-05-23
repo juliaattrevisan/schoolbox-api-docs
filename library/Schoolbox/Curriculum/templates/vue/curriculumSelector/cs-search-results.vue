@@ -27,7 +27,7 @@ const showSelectAll = window.Vue.computed(() => {
 /**
  * to slide up and down the search results
  */
-watch(
+window.Vue.watch(
     () => searchStore.filteredResults,
     () => {
         nextTick(() => {
@@ -66,7 +66,7 @@ watch(
 
 <style lang="scss" scoped>
 .search-results-container {
-    height: 0; //will animate the results within with the watch() above
+    height: 0; //will animate the results within with the window.Vue.watch() above
     position: relative;
     overflow: hidden;
 }

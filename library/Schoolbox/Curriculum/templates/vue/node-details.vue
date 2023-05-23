@@ -24,7 +24,7 @@ const hasLoadError = window.Vue.ref(false);
 /**
  * when there's a new node, we should load all the details to display
  */
-watch(
+window.Vue.watch(
     () => props.node,
     (newNode) => {
         if (newNode.id === UNSET_ID) {

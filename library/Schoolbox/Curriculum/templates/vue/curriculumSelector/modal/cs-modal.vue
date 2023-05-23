@@ -23,7 +23,7 @@ const selectedNodeDetails = window.Vue.ref(getEmptyNode());
  * to show the selected badge that has been selected in a linked usage
  * from cs-modal-node-usage-details
  */
-watch(
+window.Vue.watch(
     () => modalStore.selectedBadge,
     (newValue, oldValue) => {
         if (newValue && newValue !== oldValue) {

@@ -19,7 +19,7 @@ const disbandStore = useDisbandStore();
 /**
  * listen for hasLoadedOk so we can check whether we need to initiation foundation
  */
-watch(
+window.Vue.watch(
     () => store.hasLoadedOk,
     (hasLoadedOk) => {
         if (hasLoadedOk) {

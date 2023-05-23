@@ -44,7 +44,7 @@ const placeholder = window.Vue.computed(() => {
 /**
  * start searching once the search is active, watching the query string for input
  */
-watch(
+window.Vue.watch(
     () => modalSearchStore.query,
     () => {
         if (modalSearchStore.isActive) {

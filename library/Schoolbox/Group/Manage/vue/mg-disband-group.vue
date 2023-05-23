@@ -17,7 +17,7 @@ const hasDisbanded = window.Vue.ref(false); //to toggle the successful disband n
 /**
  * to open the modal when requested
  */
-watch(
+window.Vue.watch(
     () => disbandStore.isPromptOpen,
     (newIsOpen) => {
         newIsOpen ? removeModalEl.value.open() : removeModalEl.value.close();

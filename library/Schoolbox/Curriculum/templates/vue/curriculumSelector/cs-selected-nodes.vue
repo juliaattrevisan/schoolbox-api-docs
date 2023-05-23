@@ -41,7 +41,7 @@ const ids = window.Vue.computed(() => {
  * except when the <select> is first displayed in the DOM.
  * We listen for this in library/Schoolbox/Filter/templates/panel.twig
  */
-watch(
+window.Vue.watch(
     () => selectedNodesStore.nodesIds,
     () => {
         nextTick(() => {

@@ -13,7 +13,7 @@ const modalEl = window.Vue.ref(null);
 /**
  * to open the modal when requested
  */
-watch(
+window.Vue.watch(
     () => selectedNodesStore.hasActiveNode,
     (hasActiveNode) => {
         if (hasActiveNode) {
