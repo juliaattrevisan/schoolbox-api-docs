@@ -100,8 +100,8 @@ class SingleAssessmentScoreRepository implements ScoreRepositoryInterface
         if (!$participant) {
             throw new OutOfBoundsException(
                 sprintf(
-                    'User with username "%s" is not a participant of assessment #%d',
-                    $student->getUsername(),
+                    'User id "%d" is not a participant of assessment #%d',
+                    $student->getId(),
                     $this->ltiAssessment->getId(),
                 )
             );
@@ -109,8 +109,8 @@ class SingleAssessmentScoreRepository implements ScoreRepositoryInterface
         if ($participant->isExcluded()) {
             throw new OutOfBoundsException(
                 sprintf(
-                    'User with username "%s" has been excluded from assessment #%d',
-                    $student->getUsername(),
+                    'User id "%d" has been excluded from assessment #%d',
+                    $student->getId(),
                     $this->ltiAssessment->getId(),
                 )
             );
@@ -145,8 +145,8 @@ class SingleAssessmentScoreRepository implements ScoreRepositoryInterface
         if ($previousLtiScore && $previousLtiScore->getSubmittedAt()->gte($ltiScore->getSubmittedAt())) {
             throw new OutOfBoundsException(
                 sprintf(
-                    'User with username "%s" has a more recent score for assessment #%d',
-                    $student->getUsername(),
+                    'User id "%s" has a more recent score for assessment #%d',
+                    $student->getId(),
                     $this->ltiAssessment->getId(),
                 )
             );
