@@ -6,7 +6,6 @@
  */
 
 use League\Flysystem\FilesystemException;
-use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Notifactory;
@@ -642,7 +641,6 @@ class Session
                                 $subject['id'] = $result->getId();
                                 $subject['name'] = $result->getName();
                                 $subject['perm'] = $this->access->getFolderAccess($user, $result->getId());
-                                ;
                                 $subject['code'] = $result->getMatchedCode();
                                 $_SESSION['subjects'][] = $subject;
 
