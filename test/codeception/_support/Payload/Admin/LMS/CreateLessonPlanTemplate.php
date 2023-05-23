@@ -10,13 +10,13 @@ namespace Payload\Admin\LMS;
 use Payload\Pastoral\FormTrait;
 use Payload\PostTrait;
 
-class LessonPlanTemplate extends \Payload\Request
+class CreateLessonPlanTemplate extends \Payload\Request
 {
     use PostTrait;
     use FormTrait;
 
     /**
-     * create a lesson plan template
+     * create a lesson plan template by passing the lesson plan name and lesson fields details
      * @param string $lessonPlanTemplateName
      * @param string $fieldName
      * @param string $visibility

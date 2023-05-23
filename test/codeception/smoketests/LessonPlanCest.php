@@ -8,7 +8,8 @@
 namespace SmokeTests;
 
 use IntegrationTester;
-use Payload\Admin\LMS\LessonPlanTemplate;
+use Payload\Admin\LMS\CreateLessonPlanTemplate;
+use Payload\Admin\LMS\DeleteLessonPlanTemplate;
 
 class LessonPlanCest
 {
@@ -37,10 +38,11 @@ class LessonPlanCest
 
         $lessons = array(
             array(1, 'Field 1' . $timestamp, 'on', 'Body ' . $timestamp),
-            array(2, 'Field 2' . $timestamp, 'off', 'Body 2 ' . $timestamp)
+            array(2, 'Field 2' . $timestamp, 'on', 'Body 2 ' . $timestamp),
+            array(3, 'Field 3' . $timestamp, 'off', 'Body 3 ' . $timestamp)
         );
 
-        $lessonPlanTemplateCreate = new LessonPlanTemplate(
+        $lessonPlanTemplateCreate = new CreateLessonPlanTemplate(
             'Lesson Plan Template ' . $timestamp,
             $lessons
         );
@@ -50,5 +52,35 @@ class LessonPlanCest
 
         #THEN
         $i->seeResponseCodeIs(303);
+    }
+
+    public function deleteLessonPlanTemplate(IntegrationTester $i): void
+    {
+        #GIVEN
+        $timestamp  = time();
+        $lessonPlanTemplateTitle = 'Lesson Plan Template to be deleted' . $timestamp;
+
+        $lessons = array(
+            array(1, 'Field 1' . $timestamp, 'on', 'Body ' . $timestamp),
+            array(2, 'Field 2' . $timestamp, 'on', 'Body 2 ' . $timestamp),
+            array(3, 'Field 3' . $timestamp, 'off', 'Body 3 ' . $timestamp)
+        );
+
+        $lessonPlanTemplateCreate = new CreateLessonPlanTemplate(
+            $lessonPlanTemplateTitle,
+            $lessons
+        );
+
+
+//        #WHEN
+//        /** delete the lesson plan template
+//         */
+//        #WHEN
+//        $lessonPlanTemplateDelete = new DeleteLessonPlanTemplate($lessonPlan->getId());
+//        $i->amGoingTo('Send request to delete a badge');
+//        $i->sendRequest($lessonPlanTemplateDelete);
+//
+//        #THEN
+//        $i->seeResponseCodeIs(200);
     }
 }
