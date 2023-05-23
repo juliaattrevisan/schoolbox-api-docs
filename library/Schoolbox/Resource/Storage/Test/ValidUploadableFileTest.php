@@ -24,15 +24,14 @@ class ValidUploadableFileTest extends TestCase
     /**
      * @dataProvider getTestIsSatisfiedByValidCaseData
      * @covers \Schoolbox\Resource\Storage\ValidUploadableFile::isSatisfiedBy
-     * @param ValidUploadableFile $validator
-     * @param Model               $file
+     * @param Model $file
      * @return void
      * @noinspection PhpDocMissingThrowsInspection this should never throw
      */
-    public function testIsSatisfiedByValidCase(ValidUploadableFile $validator, Model $file)
+    public function testIsSatisfiedByValidCase(Model $file)
     {
         /** @noinspection PhpUnhandledExceptionInspection this should never throw */
-        $this->assertTrue($validator->isSatisfiedBy($file));
+        $this->assertTrue((new ValidUploadableFile())->isSatisfiedBy($file));
     }
 
     /**
@@ -53,45 +52,39 @@ class ValidUploadableFileTest extends TestCase
             ->setSize(1_000);
 
         yield 'file under size limit, no expiry' => [
-            new ValidUploadableFile(Alaress_Date_Format::now()),
             $standardFile,
         ];
         yield 'file under size limit, expiry before latest temp date' => [
-            new ValidUploadableFile(Alaress_Date_Format::now()->addDays(1)),
             (clone $standardFile)
                 ->setSize(1_000_000)
-                ->setExpiryAt(Alaress_Date_Format::now()->addDays(1)),
+                ->setExpiryAt(Alaress_Date_Format::now()->addDays(15)),
         ];
         yield 'file under size limit, expiry after latest temp date' => [
-            new ValidUploadableFile(Alaress_Date_Format::now()->addDays(1)),
             (clone $standardFile)
                 ->setSize(1_000_000)
-                ->setExpiryAt(Alaress_Date_Format::now()->addDays(2)),
+                ->setExpiryAt(Alaress_Date_Format::now()->addDays(15)->addSeconds(1)),
         ];
         yield 'file over size limit, expiry before latest temp date' => [
-            new ValidUploadableFile(Alaress_Date_Format::now()->addDays(1)),
             (clone $standardFile)
                 ->setSize(1_000_001)
-                ->setExpiryAt(Alaress_Date_Format::now()->addDays(1)),
+                ->setExpiryAt(Alaress_Date_Format::now()->addDays(15)),
         ];
     }
 
     /**
      * @dataProvider getTestIsSatisfiedByInvalidCaseData
      * @covers \Schoolbox\Resource\Storage\ValidUploadableFile::isSatisfiedBy
-     * @param ValidUploadableFile $validator
-     * @param Model               $file
-     * @param string              $errorPattern
+     * @param Model  $file
+     * @param string $errorPattern
      * @return void
      */
     public function testIsSatisfiedByInvalidCase(
-        ValidUploadableFile $validator,
         Model $file,
         string $errorPattern,
     ) {
         $this->expectException(FileException::class);
         $this->expectExceptionMessageMatches($errorPattern);
-        $validator->isSatisfiedBy($file);
+        ((new ValidUploadableFile())->isSatisfiedBy($file));
     }
 
     /**
@@ -111,35 +104,30 @@ class ValidUploadableFileTest extends TestCase
             ->setSize(1_000);
 
         yield 'file has no mimetype' => [
-            new ValidUploadableFile(Alaress_Date_Format::now()),
             $standardFile,
             '/^this file has no detectable type/i',
         ];
         yield 'file mimetype is not enabled' => [
-            new ValidUploadableFile(Alaress_Date_Format::now()),
             (clone $standardFile)
                 ->setMimetype((clone $standardMimetype)->setEnable(false)),
             '/^this file is not a valid file type/i',
         ];
         yield 'file mimetype is deleted' => [
-            new ValidUploadableFile(Alaress_Date_Format::now()),
             (clone $standardFile)
                 ->setMimetype((clone $standardMimetype)->setDeleted(true)),
             '/^this file is not a valid file type/i',
         ];
         yield 'file over size limit, no expiry' => [
-            new ValidUploadableFile(Alaress_Date_Format::now()),
             (clone $standardFile)
                 ->setMimetype($standardMimetype)
                 ->setSize(1_000_001),
             '/^this file exceeds the file size restriction/i',
         ];
         yield 'file over size limit, expiry after latest temp date' => [
-            new ValidUploadableFile(Alaress_Date_Format::now()->addDays(1)),
             (clone $standardFile)
                 ->setMimetype($standardMimetype)
                 ->setSize(1_000_001)
-                ->setExpiryAt(Alaress_Date_Format::now()->addDays(2)),
+                ->setExpiryAt(Alaress_Date_Format::now()->addDays(15)->addSeconds(1)),
             '/^this file exceeds the file size restriction/i',
         ];
     }
