@@ -49,23 +49,30 @@ class ValidUploadableFileTest extends TestCase
             ->setDeleted(false);
         $standardFile = (new Model())
             ->setExpiryAt(null)
-            ->setMimetype($standardMimetype);
+            ->setMimetype($standardMimetype)
+            ->setSize(1_000);
 
         yield 'file under size limit, no expiry' => [
-            new ValidUploadableFile(1_000, Alaress_Date_Format::now()),
+            new ValidUploadableFile(Alaress_Date_Format::now()),
             $standardFile,
         ];
         yield 'file under size limit, expiry before latest temp date' => [
-            new ValidUploadableFile(1_000_000, Alaress_Date_Format::now()->addDays(1)),
-            (clone $standardFile)->setExpiryAt(Alaress_Date_Format::now()->addDays(1)),
+            new ValidUploadableFile(Alaress_Date_Format::now()->addDays(1)),
+            (clone $standardFile)
+                ->setSize(1_000_000)
+                ->setExpiryAt(Alaress_Date_Format::now()->addDays(1)),
         ];
         yield 'file under size limit, expiry after latest temp date' => [
-            new ValidUploadableFile(1_000_000, Alaress_Date_Format::now()->addDays(1)),
-            (clone $standardFile)->setExpiryAt(Alaress_Date_Format::now()->addDays(2)),
+            new ValidUploadableFile(Alaress_Date_Format::now()->addDays(1)),
+            (clone $standardFile)
+                ->setSize(1_000_000)
+                ->setExpiryAt(Alaress_Date_Format::now()->addDays(2)),
         ];
         yield 'file over size limit, expiry before latest temp date' => [
-            new ValidUploadableFile(1_000_001, Alaress_Date_Format::now()->addDays(1)),
-            (clone $standardFile)->setExpiryAt(Alaress_Date_Format::now()->addDays(1)),
+            new ValidUploadableFile(Alaress_Date_Format::now()->addDays(1)),
+            (clone $standardFile)
+                ->setSize(1_000_001)
+                ->setExpiryAt(Alaress_Date_Format::now()->addDays(1)),
         ];
     }
 
@@ -100,35 +107,38 @@ class ValidUploadableFileTest extends TestCase
             ->setEnable(true)
             ->setDeleted(false);
         $standardFile = (new Model())
-            ->setExpiryAt(null);
+            ->setExpiryAt(null)
+            ->setSize(1_000);
 
         yield 'file has no mimetype' => [
-            new ValidUploadableFile(1_000, Alaress_Date_Format::now()),
+            new ValidUploadableFile(Alaress_Date_Format::now()),
             $standardFile,
             '/^this file has no detectable type/i',
         ];
         yield 'file mimetype is not enabled' => [
-            new ValidUploadableFile(1_000, Alaress_Date_Format::now()),
+            new ValidUploadableFile(Alaress_Date_Format::now()),
             (clone $standardFile)
                 ->setMimetype((clone $standardMimetype)->setEnable(false)),
             '/^this file is not a valid file type/i',
         ];
         yield 'file mimetype is deleted' => [
-            new ValidUploadableFile(1_000, Alaress_Date_Format::now()),
+            new ValidUploadableFile(Alaress_Date_Format::now()),
             (clone $standardFile)
                 ->setMimetype((clone $standardMimetype)->setDeleted(true)),
             '/^this file is not a valid file type/i',
         ];
         yield 'file over size limit, no expiry' => [
-            new ValidUploadableFile(1_000_001, Alaress_Date_Format::now()),
+            new ValidUploadableFile(Alaress_Date_Format::now()),
             (clone $standardFile)
-                ->setMimetype($standardMimetype),
+                ->setMimetype($standardMimetype)
+                ->setSize(1_000_001),
             '/^this file exceeds the file size restriction/i',
         ];
         yield 'file over size limit, expiry after latest temp date' => [
-            new ValidUploadableFile(1_000_001, Alaress_Date_Format::now()->addDays(1)),
+            new ValidUploadableFile(Alaress_Date_Format::now()->addDays(1)),
             (clone $standardFile)
                 ->setMimetype($standardMimetype)
+                ->setSize(1_000_001)
                 ->setExpiryAt(Alaress_Date_Format::now()->addDays(2)),
             '/^this file exceeds the file size restriction/i',
         ];
