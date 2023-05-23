@@ -478,7 +478,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     /**
      * Set group
      *
-     * @param \Schoolbox\Resource\Group $group
+     * @param null|\Schoolbox\Resource\Group $group
      * @return $this
      */
     public function setGroup($group)

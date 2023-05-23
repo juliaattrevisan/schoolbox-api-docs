@@ -34,6 +34,7 @@ use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Group;
 use Schoolbox\Role;
 use Schoolbox\User;
 use UnexpectedValueException;
@@ -1157,6 +1158,12 @@ class AccessTest extends TestCase
                 ->setId($id)
                 ->setName("Folder $id")
                 ->setInherit($inherit);
+            $group  = (new Group())
+                ->setType(Group::PRIVATE_GROUP)
+                ->setNotificationDisabled(true)
+                ->setForceFollow(false)
+                ->setFolder($folder);
+            $folder->setGroup($group);
             $tree->addElement($folder);
         }
 
@@ -1328,7 +1335,12 @@ class AccessTest extends TestCase
         /** @var Folder\Model $folder */
         foreach ($folderTree->toFlatArray() as $folder) {
             // Ensure all folder code collections are set
-            $folder->setCodes($folder->getCodes() ?? Folder\Code\Model::createCollection());
+            if ($folder->getCodes()) {
+                // if setting code, unset group to test access based on code
+                $folder->setCodes($folder->getCodes())->setGroup(null);
+            } else {
+                $folder->setCodes(Folder\Code\Model::createCollection());
+            }
         }
 
         foreach ($folderCodeData as [$folderId, $code]) {
