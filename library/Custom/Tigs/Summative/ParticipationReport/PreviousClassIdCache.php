@@ -30,7 +30,6 @@ use Schoolbox\User;
  */
 class PreviousClassIdCache
 {
-
     /**
      * @var Folder\Mapper
      */
