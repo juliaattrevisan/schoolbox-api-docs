@@ -5,11 +5,13 @@ const CACHE_NAME = "static-cache-v1";
 const FILES_TO_CACHE = ["/manifest/offline", "{{ CDN_PREFIX }}/images/core/fail-whale.png"];
 
 self.addEventListener("install", (evt) => {
-    {% if debug %}console.log("[ServiceWorker] Install"); {% endif %}
+    {% if debug %}console.log("[ServiceWorker] Install");{% endif %}
+
     // CODELAB: Precache static resources here.
     evt.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
-            console.log("[ServiceWorker] Pre-caching offline page");
+            {% if debug %}console.log("[ServiceWorker] Pre-caching offline page");{% endif %}
+
             return cache.addAll(FILES_TO_CACHE);
         })
     );
@@ -18,6 +20,7 @@ self.addEventListener("install", (evt) => {
 
 self.addEventListener("activate", (evt) => {
     {% if debug %}console.log("[ServiceWorker] Activate");{% endif %}
+
     // CODELAB: Remove previous cached data from disk.
     evt.waitUntil(
         caches.keys().then((keyList) => {
@@ -25,6 +28,7 @@ self.addEventListener("activate", (evt) => {
                 keyList.map((key) => {
                     if (key !== CACHE_NAME) {
                         {% if debug %}console.log("[ServiceWorker] Removing old cache", key);{% endif %}
+
                         return caches.delete(key);
                     }
                 })
