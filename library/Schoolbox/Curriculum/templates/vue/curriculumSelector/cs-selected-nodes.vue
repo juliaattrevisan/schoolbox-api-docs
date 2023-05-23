@@ -44,7 +44,7 @@ const ids = window.Vue.computed(() => {
 window.Vue.watch(
     () => selectedNodesStore.nodesIds,
     () => {
-        nextTick(() => {
+        window.Vue.nextTick(() => {
             //nextTick to ensure the dom has updated so we can access with the latest changes
             const event = new Event("change");
             selectEl.value.dispatchEvent(event);

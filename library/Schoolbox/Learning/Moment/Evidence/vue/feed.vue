@@ -81,12 +81,12 @@ export default {
             // NOTE: event.state will be null unless the state has been saved using history.pushState().
             this.setSelectedTagAndFiltersToMatchState(event.state);
 
-            await nextTick(); // Wait for Vue to sync checkboxes to match this.selectedFilters (due to 'v-model' attribute on relevant HTML input).
+            await this.$nextTick(); // Wait for Vue to sync checkboxes to match this.selectedFilters (due to 'v-model' attribute on relevant HTML input).
             this.onChangeFilters(this.selectedTag, false);
         };
 
         this.setSelectedTagAndFiltersToMatchState(this.getFiltersStateFromUrl());
-        await nextTick(); // Wait for Vue to sync checkboxes to match this.selectedFilters (due to 'v-model' attribute on relevant HTML input).
+        await this.$nextTick(); // Wait for Vue to sync checkboxes to match this.selectedFilters (due to 'v-model' attribute on relevant HTML input).
         this.onChangeFilters(this.selectedTag, false);
     },
     methods: {
