@@ -45,7 +45,7 @@ const descriptionField = useDescriptionEditor(addSubsectionStore.subsection.desc
 /**
  * And watch for changes on this field so we can update the description in the store
  */
-watch(descriptionField, (newValue) => {
+window.Vue.watch(descriptionField, (newValue) => {
     addSubsectionStore.subsection.description = newValue;
 });
 

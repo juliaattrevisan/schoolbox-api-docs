@@ -72,7 +72,7 @@ let $modal;
 /**
  * to open the first modal in sequence
  */
-watch(
+window.Vue.watch(
     () => props.isOpen,
     (isOpen) => {
         if (isOpen) {
@@ -89,7 +89,7 @@ watch(
 /**
  * to move to the next modal in sequence
  */
-watch(
+window.Vue.watch(
     () => props.isNextSelected,
     (isNextSelected) => {
         if (isNextSelected) {

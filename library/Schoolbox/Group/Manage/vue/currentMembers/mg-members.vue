@@ -171,7 +171,7 @@ function onRowSelected(currentSelection) {
  * ensure the table selection is also cleared when 'Clear Selection' is selected
  * or when the selected members have been removed
  */
-watch(
+window.Vue.watch(
     () => membersStore.selectedMembers,
     (newSelectedMembers, oldSelectedMembers) => {
         if (newSelectedMembers.length === 0 && oldSelectedMembers.length > 0) {
@@ -190,7 +190,7 @@ watch(
 /**
  * to update the table display based on the selected filters change
  */
-watch(
+window.Vue.watch(
     () => membersStore.selectedFilters,
     (newSelectedFilters, oldSelectedFilters) => {
         let selectedFilter = []; //to membersStore the filter that has been toggled

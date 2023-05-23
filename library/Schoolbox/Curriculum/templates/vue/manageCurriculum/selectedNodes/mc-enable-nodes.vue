@@ -17,7 +17,7 @@ const modalEl = window.Vue.ref(null);
 /**
  * to open the modal when requested
  */
-watch(
+window.Vue.watch(
     () => enableNodesStore.isOpen,
     (isOpen) => {
         isOpen ? modalEl.value.open() : modalEl.value.close();

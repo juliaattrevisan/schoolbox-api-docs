@@ -28,7 +28,7 @@ function onClearSearchSelected() {
  * to scroll back to top on any selection change, otherwise the
  * scroll may be at the bottom on change, which is a bit odd
  */
-watch(
+window.Vue.watch(
     () => modalViewNodesStore.nodes,
     () => {
         if (nodesContainerEl.value) {

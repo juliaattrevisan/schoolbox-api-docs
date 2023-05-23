@@ -20,7 +20,7 @@ const changeMemberAccess = window.Vue.ref(""); //to bulk update members access r
 /**
  * if all selected members are on the waiting list we should show for bulk approval
  */
-watch(
+window.Vue.watch(
     () => membersStore.selectedMembers,
     () => {
         if (

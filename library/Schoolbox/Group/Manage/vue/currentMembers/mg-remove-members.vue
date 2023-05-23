@@ -17,7 +17,7 @@ const removeModalEl = window.Vue.ref(null);
 /**
  * to open the modal when requested
  */
-watch(
+window.Vue.watch(
     () => removeMembersStore.isPromptOpen,
     (newIsOpen) => {
         newIsOpen ? removeModalEl.value.open() : removeModalEl.value.close();

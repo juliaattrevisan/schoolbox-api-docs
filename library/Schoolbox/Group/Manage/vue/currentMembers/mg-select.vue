@@ -41,7 +41,7 @@ function initShiftKeyDetection() {
 /**
  * remove the note once a selection with shift key down has been detected
  */
-watch(
+window.Vue.watch(
     () => membersStore.selectedMembers,
     () => {
         if (membersStore.selectedMembers.length > 1 && isShiftKeySelected.value) {
