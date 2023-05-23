@@ -104,4 +104,7 @@ MAILTO="support@schoolbox.com.au"
 # System Usage re calculate usage Nightly 5:26am
 26 5 * * * www-data php /usr/share/schoolbox/tools/storage/usageCache.php >> /var/log/schoolbox/storage-usageCache.log 2>&1
 
+# Reload assessment relations - every day, sometime between 23:00 and 23:30?
+0 23 * * * www-data	/usr/local/bin/jitter 1800 php /usr/share/schoolbox/tools/assessment/reload-relations.php -p >> /var/log/schoolbox/reload-relations.log 2>&1
+
 # End of file - do not delete
