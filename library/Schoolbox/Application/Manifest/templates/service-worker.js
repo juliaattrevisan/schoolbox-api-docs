@@ -36,7 +36,6 @@ self.addEventListener("activate", (evt) => {
 });
 
 self.addEventListener("fetch", (evt) => {
-    {% if debug %}console.log("[ServiceWorker] Fetch", evt.request.url);{% endif %}
     // CODELAB: Add fetch event handler here.
     if (evt.request.mode !== "navigate") {
         // Not a page navigation, bail.
