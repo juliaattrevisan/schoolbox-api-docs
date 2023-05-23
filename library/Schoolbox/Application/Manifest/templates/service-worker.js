@@ -5,7 +5,7 @@ const CACHE_NAME = "static-cache-v1";
 const FILES_TO_CACHE = ["/manifest/offline", "{{ CDN_PREFIX }}/images/core/fail-whale.png"];
 
 self.addEventListener("install", (evt) => {
-    console.log("[ServiceWorker] Install");
+    {% if debug %}console.log("[ServiceWorker] Install"); {% endif %}
     // CODELAB: Precache static resources here.
     evt.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
@@ -17,14 +17,14 @@ self.addEventListener("install", (evt) => {
 });
 
 self.addEventListener("activate", (evt) => {
-    console.log("[ServiceWorker] Activate");
+    {% if debug %}console.log("[ServiceWorker] Activate");{% endif %}
     // CODELAB: Remove previous cached data from disk.
     evt.waitUntil(
         caches.keys().then((keyList) => {
             return Promise.all(
                 keyList.map((key) => {
                     if (key !== CACHE_NAME) {
-                        console.log("[ServiceWorker] Removing old cache", key);
+                        {% if debug %}console.log("[ServiceWorker] Removing old cache", key);{% endif %}
                         return caches.delete(key);
                     }
                 })
@@ -36,7 +36,7 @@ self.addEventListener("activate", (evt) => {
 });
 
 self.addEventListener("fetch", (evt) => {
-    console.log("[ServiceWorker] Fetch", evt.request.url);
+    {% if debug %}console.log("[ServiceWorker] Fetch", evt.request.url);{% endif %}
     // CODELAB: Add fetch event handler here.
     if (evt.request.mode !== "navigate") {
         // Not a page navigation, bail.
