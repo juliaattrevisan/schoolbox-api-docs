@@ -4,7 +4,6 @@
  * will also highlight any matches in the current search query when search is active
  */
 
-import { computed } from "vue";
 import { escapeRegExp } from "@js/util/jsUtils";
 import { useNodesStore } from "../store/mcNodesStore";
 import { useViewNodesStore } from "./store/mcViewNodesStore";

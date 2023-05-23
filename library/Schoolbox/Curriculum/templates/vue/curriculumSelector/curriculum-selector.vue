@@ -3,7 +3,6 @@
  * To select Curriculum Nodes to assign to something like a Due Work
  */
 
-import { ref, onMounted, nextTick } from "vue";
 import { ResizeObserver } from "vue3-resize";
 import "vue3-resize/dist/vue3-resize.css";
 import { useStore } from "./store/curriculumSelectorStore";

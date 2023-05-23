@@ -3,7 +3,6 @@
  * Add members to the group
  */
 
-import { computed } from "vue";
 import { useStore } from "../store/manageGroupStore";
 import { useAddMembersStore } from "../store/mgAddMembersStore";
 import { useSearchStore } from "../store/mgSearchStore";

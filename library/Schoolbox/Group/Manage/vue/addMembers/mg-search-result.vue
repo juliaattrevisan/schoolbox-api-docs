@@ -3,7 +3,6 @@
  * A single search result that be selected / unselected with a checkbox status
  */
 
-import { computed } from "vue";
 import { escapeRegExp } from "@js/util/jsUtils";
 import { useSearchStore } from "../store/mgSearchStore";
 

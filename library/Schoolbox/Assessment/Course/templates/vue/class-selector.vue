@@ -5,7 +5,6 @@
  * Classes can also be manually entered, with pressing enter adding matched results
  */
 
-import { ref, computed, onMounted } from "vue";
 import ClassSelectorSelectAll from "./class-selector-select-all";
 import ClassSelectorSearchResult from "./class-selector-search-result";
 import ClassSelectorSelectedClass from "./class-selector-selected-class";

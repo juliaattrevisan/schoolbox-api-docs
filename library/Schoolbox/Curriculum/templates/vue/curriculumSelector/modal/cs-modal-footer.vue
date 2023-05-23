@@ -3,7 +3,6 @@
  * To cancel or confirm the current node selection
  */
 
-import { computed } from "vue";
 import { useModalStore } from "../store/csModalStore";
 import { useSelectedNodesStore } from "../store/csSelectedNodesStore";
 import { useModalSelectedNodesStore } from "../store/csModalSelectedNodesStore";

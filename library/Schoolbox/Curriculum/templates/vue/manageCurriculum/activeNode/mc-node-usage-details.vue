@@ -3,7 +3,6 @@
  * to view a nodes description and all the places the node is used
  */
 
-import { ref } from "vue";
 import type { BadgeUsageObject, Usage } from "@schoolboxCurriculum/types/Node";
 import NodeUsageDetails from "@schoolboxCurriculum/vue/usage/node-usage-details.vue";
 import BadgeModal from "@schoolboxBadge/vue/badge-modal";

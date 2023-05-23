@@ -3,7 +3,6 @@
  * to be able to update a nodes name, code and description
  */
 
-import { computed, watch } from "vue";
 import { useStore } from "../store/manageCurriculumStore";
 import { useActiveNodeStore } from "./store/mcActiveNodeStore";
 import { useUpdateNodeStore } from "./store/mcUpdateNodeStore";

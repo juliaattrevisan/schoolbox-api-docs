@@ -4,7 +4,6 @@
  * From here curriclum codes can be selected for further travesal or editing
  */
 
-import { ref, watch } from "vue";
 import { useNodesStore } from "../store/mcNodesStore";
 import { useViewNodesStore } from "./store/mcViewNodesStore";
 import { useSearchStore } from "../store/mcSearchStore";

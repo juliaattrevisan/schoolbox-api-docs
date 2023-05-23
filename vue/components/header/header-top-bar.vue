@@ -3,7 +3,6 @@
  * Top bar that contains most navigation elements and toggles the side menu and notifications
  */
 
-import { ref, computed, onMounted } from "vue";
 import { ResizeObserver } from "vue3-resize";
 import "vue3-resize/dist/vue3-resize.css";
 import debounce from "lodash/debounce";

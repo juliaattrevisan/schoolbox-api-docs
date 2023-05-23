@@ -3,7 +3,6 @@
  * To display a single activity linked to a node
  */
 
-import { computed } from "vue";
 import type {
     Usage,
     CourseUsageObject,

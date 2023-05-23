@@ -4,7 +4,6 @@
  * further details revealed via a modal
  */
 
-import { computed } from "vue";
 import { shortenLength } from "@js/util/stringUtils";
 import { useSelectedNodesStore } from "./store/mcSelectedNodesStore";
 

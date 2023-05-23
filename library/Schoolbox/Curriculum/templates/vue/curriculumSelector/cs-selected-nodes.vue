@@ -3,7 +3,6 @@
  * To list all the currently selected Curriculum codes
  */
 
-import { ref, computed, watch, nextTick, onMounted } from "vue";
 import { useStore } from "./store/curriculumSelectorStore";
 import { useSelectedNodesStore } from "./store/csSelectedNodesStore";
 import CsSelectedNode from "./cs-selected-node.vue";

@@ -3,7 +3,6 @@
  * To search for codes or select the browse button to open the modal
  */
 
-import { ref, watch, computed, onMounted, onUnmounted } from "vue";
 import debounce from "lodash/debounce";
 import { useStore } from "./store/curriculumSelectorStore";
 import { useModalStore } from "./store/csModalStore";

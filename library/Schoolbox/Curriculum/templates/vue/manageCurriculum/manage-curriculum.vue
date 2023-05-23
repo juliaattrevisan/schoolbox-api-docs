@@ -4,7 +4,6 @@
  * CRUD individual nodes
  */
 
-import { ref, onMounted } from "vue";
 import { useStore } from "./store/manageCurriculumStore";
 import { useNodesStore } from "./store/mcNodesStore";
 import { useSelectedNodesStore } from "./selectedNodes/store/mcSelectedNodesStore";

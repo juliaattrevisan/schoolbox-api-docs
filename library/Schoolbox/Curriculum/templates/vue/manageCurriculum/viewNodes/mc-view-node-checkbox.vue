@@ -3,7 +3,6 @@
  * To be able to enable/disable or delete a node
  */
 
-import { computed } from "vue";
 import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/selectedNodes/store/mcSelectedNodesStore";
 import type { Node } from "@schoolboxCurriculum/types/Node";
 

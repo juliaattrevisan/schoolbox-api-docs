@@ -4,7 +4,6 @@
  * providing various group wide tools
  */
 
-import { watch, nextTick } from "vue";
 import { useStore } from "./store/manageGroupStore";
 import { useMembersStore } from "./store/mgMembersStore";
 import { useSettingsStore } from "./store/mgSettingsStore";

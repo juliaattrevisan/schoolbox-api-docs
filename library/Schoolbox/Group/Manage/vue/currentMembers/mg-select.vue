@@ -4,7 +4,6 @@
  * on the members currently selected
  */
 
-import { ref, computed, watch, onMounted } from "vue";
 import { useStore } from "../store/manageGroupStore";
 import { useMembersStore } from "../store/mgMembersStore";
 import { useRemoveMembersStore } from "../store/mgRemoveMembersStore";

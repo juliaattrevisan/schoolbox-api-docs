@@ -3,7 +3,6 @@
  * to select a node within the current modal session
  */
 
-import { computed } from "vue";
 import { generateUUID } from "@js/util/jsUtils";
 import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 import { useModalSelectedNodesStore } from "../store/csModalSelectedNodesStore";

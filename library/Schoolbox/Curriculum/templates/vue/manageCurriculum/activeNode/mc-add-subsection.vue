@@ -4,7 +4,6 @@
  */
 
 import { useStore } from "../store/manageCurriculumStore";
-import { computed, watch } from "vue";
 import { useActiveNodeStore } from "./store/mcActiveNodeStore";
 import { useAddSubsectionStore } from "./store/mcAddSubsectionStore";
 import { useDescriptionEditor } from "../composable/useDescriptionEditor";

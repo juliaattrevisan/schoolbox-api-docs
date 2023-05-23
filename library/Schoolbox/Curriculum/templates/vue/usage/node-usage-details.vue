@@ -3,7 +3,6 @@
  * to view a nodes description and all the activities the node is linked to in the curriculum
  */
 
-import { computed } from "vue";
 import type { Node, Usage } from "@schoolboxCurriculum/types/Node";
 import { ActivityTypes } from "@schoolboxCurriculum/types/Node";
 import { getSpecificUsages } from "@schoolboxCurriculum/js/nodeUtils";

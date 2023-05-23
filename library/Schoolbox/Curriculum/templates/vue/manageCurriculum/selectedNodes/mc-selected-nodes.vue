@@ -4,7 +4,6 @@
  * on the members currently selected
  */
 
-import { computed } from "vue";
 import { useSelectedNodesStore } from "./store/mcSelectedNodesStore";
 import { useDeleteNodesStore } from "./store/mcDeleteNodesStore";
 import { useEnableNodesStore } from "./store/mcEnableNodesStore";

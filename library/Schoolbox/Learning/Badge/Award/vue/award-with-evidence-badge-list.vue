@@ -5,7 +5,6 @@
  *
  */
 
-import { ref, computed } from "vue";
 import BadgeDetail from "../../vue/badgeDetail.vue";
 import BadgeImage from "../../vue/badge-image.vue";
 import BadgeModal from "../../vue/badge-modal.vue";

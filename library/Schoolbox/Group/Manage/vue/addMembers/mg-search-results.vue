@@ -4,7 +4,6 @@
  * button to easily add/remove all search results
  */
 
-import { ref, computed, watch, nextTick } from "vue";
 import { gsap } from "gsap/all";
 import { useSearchStore } from "../store/mgSearchStore";
 import MgSelectAllSearchResults from "./mg-select-all-search-results.vue";

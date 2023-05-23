@@ -3,7 +3,6 @@
  * displays further info in a modal on a curriculm node that's been selected
  */
 
-import { ref, watch } from "vue";
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import NodeDetails from "@schoolboxCurriculum/vue/node-details";
 import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";

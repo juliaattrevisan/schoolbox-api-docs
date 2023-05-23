@@ -3,7 +3,6 @@
  * To be able to remove selected members from the group
  */
 
-import { ref, computed, watch } from "vue";
 import { useStore } from "../store/manageGroupStore";
 import { useRemoveMembersStore } from "../store/mgRemoveMembersStore";
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";

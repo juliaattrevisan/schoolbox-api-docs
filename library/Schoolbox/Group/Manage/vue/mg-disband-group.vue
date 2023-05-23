@@ -3,7 +3,6 @@
  * To be able to remove selected members from the group
  */
 
-import { ref, computed, watch } from "vue";
 import { timeout } from "@js/util/jsUtils";
 import { useStore } from "./store/manageGroupStore";
 import { useDisbandStore } from "./store/mgDisbandStore";

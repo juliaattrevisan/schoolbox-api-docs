@@ -4,7 +4,6 @@
  * and add subsections or update the details on
  */
 
-import { ref, computed, onMounted } from "vue";
 import type { Ref } from "vue";
 import { gsap } from "gsap/all";
 import { timeout } from "@js/util/jsUtils";

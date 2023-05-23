@@ -4,7 +4,6 @@
  * as provide quick links to futher actions
  */
 
-import { ref, computed, onMounted, onUnmounted } from "vue";
 import type { Ref } from "vue";
 import { useFloating, autoUpdate, flip, shift, offset } from "@floating-ui/vue";
 import PopOut from "../popOut/pop-out.vue";
