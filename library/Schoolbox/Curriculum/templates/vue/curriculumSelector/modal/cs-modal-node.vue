@@ -4,7 +4,6 @@
  * or to CRUD via the actions
  */
 
-import { ref, computed, onMounted } from "vue";
 import { gsap } from "gsap/all";
 import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/transitions";
 import { useModalViewNodesStore, DIRECTION } from "../store/csModalViewNodesStore";

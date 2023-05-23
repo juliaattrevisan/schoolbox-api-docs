@@ -3,7 +3,6 @@
  * All the functionality to be able to manage a group
  */
 
-import { ref, onBeforeMount, onMounted } from "vue";
 import Endpoints from "./mgEndpoints";
 import { useStore } from "./store/manageGroupStore";
 import { useMembersStore } from "./store/mgMembersStore";

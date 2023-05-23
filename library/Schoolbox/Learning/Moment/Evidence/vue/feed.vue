@@ -12,7 +12,6 @@ import foundationMixin from "@schoolboxVue/components/foundation-mixin";
 import userProfileConstants from "../../../vue/user-profile/constants";
 import cdnPrefixMixin from "@schoolboxVue/components/cdn-prefix-mixin";
 import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
-import { nextTick } from "vue";
 
 export default {
     components: {

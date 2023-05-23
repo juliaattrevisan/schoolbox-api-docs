@@ -4,7 +4,6 @@
  * multiple search results at once
  */
 
-import { computed } from "vue";
 import { useSearchStore } from "../store/mgSearchStore";
 
 const searchStore = useSearchStore();

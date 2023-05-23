@@ -3,7 +3,6 @@
  * The header containing the breadcrumbs and search input
  */
 
-import { computed } from "vue";
 import { useNodeUsageStore } from "../activeNode/store/mcNodeUsageStore";
 import { useUpdateNodeStore } from "../activeNode/store/mcUpdateNodeStore";
 import { useAddSubsectionStore } from "../activeNode/store/mcAddSubsectionStore";

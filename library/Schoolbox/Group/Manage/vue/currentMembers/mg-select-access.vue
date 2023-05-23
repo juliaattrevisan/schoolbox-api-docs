@@ -3,7 +3,6 @@
  * Bulk update the currently selected members access rights
  */
 
-import { ref, watch, computed } from "vue";
 import { useStore } from "../store/manageGroupStore";
 import { useMembersStore } from "../store/mgMembersStore";
 import { useUpdateMembersStore } from "../store/mgUpdateMembersStore";

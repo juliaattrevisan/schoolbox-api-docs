@@ -4,7 +4,6 @@
  * then a selected curriculum code details
  */
 
-import { ref } from "vue";
 import SequentialRevealModal from "@schoolboxVue/components/sequential-reveal-modal.vue";
 import NodeDetails from "@schoolboxCurriculum/vue/node-details.vue";
 import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";

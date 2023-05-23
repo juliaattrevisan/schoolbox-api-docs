@@ -3,7 +3,6 @@
  * Display the group members in a table display
  */
 
-import { ref, watch, nextTick } from "vue";
 import { EventBus } from "v-tables-3-select-rows";
 import { useMembersStore } from "../store/mgMembersStore";
 import { useStore } from "../store/manageGroupStore";

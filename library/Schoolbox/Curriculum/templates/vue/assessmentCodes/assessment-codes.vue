@@ -5,7 +5,6 @@
  * currently handled in other Vue files
  */
 
-import { ref } from "vue";
 import CodesList from "@schoolboxCurriculum/vue/codes-list";
 import RevealModal from "@schoolboxVue/components/reveal-modal";
 import NodeDetails from "@schoolboxCurriculum/vue/node-details";

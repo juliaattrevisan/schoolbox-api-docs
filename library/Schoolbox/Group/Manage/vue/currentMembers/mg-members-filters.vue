@@ -3,7 +3,6 @@
  * So we can easily filter group members by access type
  */
 
-import { computed } from "vue";
 import filterTypes from "./mgAccessTypes";
 import { useMembersStore } from "../store/mgMembersStore";
 

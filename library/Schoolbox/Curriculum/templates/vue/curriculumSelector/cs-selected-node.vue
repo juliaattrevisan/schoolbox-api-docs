@@ -4,7 +4,6 @@
  * further details revealed via a modal
  */
 
-import { computed } from "vue";
 import { useStore } from "./store/curriculumSelectorStore";
 import { useSelectedNodesStore } from "./store/csSelectedNodesStore";
 

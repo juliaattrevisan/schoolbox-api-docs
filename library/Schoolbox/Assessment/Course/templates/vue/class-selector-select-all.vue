@@ -6,8 +6,6 @@
  * results currently shown
  */
 
-import { computed } from "vue";
-
 const emit = defineEmits(["select-all"]);
 
 const props = defineProps({

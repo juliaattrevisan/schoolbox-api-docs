@@ -7,7 +7,6 @@
  * however this whole component is ripe for a re-do, so more could be added in the near future
  */
 
-import { ref, onMounted } from "vue";
 import RevealModal from "@schoolboxVue/components/reveal-modal";
 import NodeDetails from "@schoolboxCurriculum/vue/node-details";
 import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";

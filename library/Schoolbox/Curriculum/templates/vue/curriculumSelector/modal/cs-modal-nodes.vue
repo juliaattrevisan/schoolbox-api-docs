@@ -4,7 +4,6 @@
  * From here curriclum nodes can be selected
  */
 
-import { ref, watch } from "vue";
 import { useModalViewNodesStore } from "../store/csModalViewNodesStore";
 import { useNodesStore } from "../store/csNodesStore";
 import { useModalSearchStore } from "../store/csModalSearchStore";

@@ -3,7 +3,6 @@
  * The modal that's used to help select curriculum
  */
 
-import { ref, watch } from "vue";
 import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
 import SequentialRevealModal from "@schoolboxVue/components/sequential-reveal-modal.vue";
 import BadgeDetail from "@schoolboxBadge/vue/badgeDetail.vue";

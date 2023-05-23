@@ -3,7 +3,6 @@
  * to show further info in a modal on a code that's been selected
  */
 
-import { ref, computed, watch } from "vue";
 import { useSelectedNodesStore } from "./store/mcSelectedNodesStore";
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 

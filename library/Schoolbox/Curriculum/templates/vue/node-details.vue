@@ -3,7 +3,6 @@
  * To view all details including breadcrumbs and description on a curriculum node
  */
 
-import { ref, computed, watch } from "vue";
 import { getBreadcrumbs, UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 
 const props = defineProps({

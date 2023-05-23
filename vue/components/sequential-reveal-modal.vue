@@ -10,7 +10,6 @@
  * But to add more would just be a case of adding more slots in the template.
  */
 
-import { ref, watch } from "vue";
 import { generateUUID } from "@js/util/jsUtils";
 
 const props = defineProps({

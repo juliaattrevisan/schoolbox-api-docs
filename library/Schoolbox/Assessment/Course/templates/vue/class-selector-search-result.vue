@@ -6,7 +6,6 @@
  * results currently shown
  */
 
-import { computed } from "vue";
 import { escapeRegExp } from "@js/util/jsUtils";
 
 const emit = defineEmits(["select"]);

@@ -3,7 +3,6 @@
  * To be able to enabled a node on confirmation
  */
 
-import { ref, computed, watch } from "vue";
 import { useStore } from "../store/manageCurriculumStore";
 import { useSelectedNodesStore } from "./store/mcSelectedNodesStore";
 import { useEnableNodesStore } from "./store/mcEnableNodesStore";

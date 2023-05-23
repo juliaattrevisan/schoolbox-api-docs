@@ -3,7 +3,6 @@
  * To search the currently selected curriculum node
  */
 
-import { computed, watch } from "vue";
 import debounce from "lodash/debounce";
 import { useViewNodesStore } from "../viewNodes/store/mcViewNodesStore";
 import { useSearchStore, DEBOUNCE_AMOUNT } from "../store/mcSearchStore";

@@ -3,7 +3,6 @@
  * to show further info in a modal on a code that's been selected
  */
 
-import { computed, watch } from "vue";
 import { useStore } from "./store/manageCurriculumStore";
 import { useAddCurriculumStore } from "./store/mcAddCurriculumStore";
 import { useDescriptionEditor } from "./composable/useDescriptionEditor";

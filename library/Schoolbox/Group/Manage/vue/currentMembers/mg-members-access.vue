@@ -3,7 +3,6 @@
  * To view and update each members status
  */
 
-import { ref, computed } from "vue";
 import { useStore } from "../store/manageGroupStore";
 import { useUpdateMembersStore } from "../store/mgUpdateMembersStore";
 import { useRejectMembersStore } from "../store/mgRejectMembersStore";
