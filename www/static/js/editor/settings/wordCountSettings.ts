@@ -176,11 +176,11 @@ export function insertWordCount(sourceElement: HTMLElement, editor: Editor, conf
  *  This function is not intended to handle every possible configuration of CKEditor fields inside forms.  If this
  *  function does not disable/enable the submit form button in a specific case, it may be best to handle that case
  *  separately.  See for example the special case handling of the EDITOR__MAX_CHAR_COUNT_EXCEEDED and
- *  EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED events in vue/components/ckeditor/add-comment-input.vue.
+ *  EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED events in vue/components/ckeditor/add-comment-input.vue./**
  *
- * @param ckeditorSourceEl
- * @param containingForm
- * @param submitButtons
+ * @param { HTMLElement } ckeditorSourceEl
+ * @param { HTMLFormElement } containingForm
+ * @param { Array<HTMLElement> } submitButtons
  */
 function addListenersForDisablingSubmitButtons(
     ckeditorSourceEl: HTMLElement,
@@ -216,7 +216,7 @@ function addListenersForDisablingSubmitButtons(
 /**
  * Return the button text for buttons that are <input> or <button>.
  *
- * @param buttonElem HTMLElement
+ * @param { Element } buttonElem
  */
 function getButtonText(buttonElem: Element) {
     const buttonTagName = buttonElem.tagName.toLowerCase();
@@ -239,9 +239,9 @@ function getButtonText(buttonElem: Element) {
 /**
  * Change button text for buttons that are <input> or <button>.
  *
- * @param buttonElem HTMLElement
- * @param disabled Boolean
- * @param newText String
+ * @param { HTMLElement } buttonElem
+ * @param { Boolean } maxCharCountExceeded
+ * @param { String } newText
  */
 function changeButtonState(buttonElem: HTMLElement, maxCharCountExceeded: Boolean, newText: string) {
     const buttonTagName = buttonElem.tagName.toLowerCase();
