@@ -13,7 +13,7 @@ use Schoolbox\Application\CliTool;
 require_once __DIR__ . '/../../conf/core/require.php';
 
 /**
- * Inserting missing userGroup
+ * This script is to fix Fixture component pointing to deleted team after V23.0 upgrade
  */
 $app = new class extends CliTool\App {
     /**
@@ -43,6 +43,7 @@ $app = new class extends CliTool\App {
             exit();
         }
 
+        // get all teams currently assigned to fixture component and external_id is not set
         $query = "
             SELECT `component_config_instance`.`id` AS `config_id`,
                    `sportsfixtures_team`.`id` AS `team_id`,
@@ -61,7 +62,7 @@ $app = new class extends CliTool\App {
         $statement = $this->getDatabaseInternal()->executeQuery($query, ['componentConfigDefinitionId' => $componentConfigDefinitionId]);
         $rows      = $statement->fetchAll();
 
-        // Try without querying division
+        // find newly imported team with the same name and the same division name
         $findTeamQuery = '
                 SELECT `sportsfixtures_team`.`id` AS `team_id`,
                        `sportsfixtures_division`.`name` AS `division_name`
