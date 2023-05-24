@@ -34,7 +34,7 @@ const marginLeft = window.Vue.computed(() => `calc(${props.depth * 2}rem)`);
  *
  * @returns { String }
  */
-const ckeditorInstance = window.Vue.computed(() => `description-${activeNodeStore.node.id}`);
+const ckeditorIdAttr = window.Vue.computed(() => `description-${activeNodeStore.node.id}`);
 
 const addButton = ref<HTMLButtonElement | null>(null);
 
@@ -56,7 +56,7 @@ const isAddDisabled = window.Vue.computed(() => {
         return true;
     }
 
-    return addSubsectionStore.subsection.name.trim().length === 0 || addSubsectionStore.isProcessing;
+    return addSubsectionStore.subsection.name?.trim().length === 0 || addSubsectionStore.isProcessing;
 });
 
 /**
@@ -64,7 +64,7 @@ const isAddDisabled = window.Vue.computed(() => {
  */
 const descriptionField = useDescriptionEditor(
     addSubsectionStore.subsection?.description as string,
-    ckeditorInstance.value,
+    ckeditorIdAttr.value,
     addButton,
     isAddDisabled
 );
@@ -128,7 +128,7 @@ function onCancelSelected() {
                 </div>
                 <div class="small-12 columns">
                     <label for="description">Description</label>
-                    <textarea :id="ckeditorInstance" rows="6"></textarea>
+                    <textarea :id="ckeditorIdAttr" rows="6"></textarea>
                 </div>
                 <div class="small-12 columns">
                     <ul class="flex-list">
@@ -144,7 +144,7 @@ function onCancelSelected() {
                         <li>
                             <button
                                 class="button icon-add submit"
-                                :data-submit-button-for="ckeditorInstance"
+                                :data-submit-button-for="ckeditorIdAttr"
                                 ref="addButton"
                                 data-test-add-subsection
                                 :disabled="isAddDisabled"

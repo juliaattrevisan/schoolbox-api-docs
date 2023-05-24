@@ -34,7 +34,7 @@ const marginLeft = window.Vue.computed(() => `calc(${props.depth * 2}rem)`);
  *
  * @returns { string }
  */
-const ckeditorInstance = window.Vue.computed(() => `description-${activeNodeStore.node.id}`);
+const ckeditorIdAttr = window.Vue.computed(() => `description-${activeNodeStore.node.id}`);
 
 const updateButton = ref<HTMLButtonElement | null>(null);
 
@@ -67,7 +67,7 @@ const isUpdateDisabled = window.Vue.computed(() => {
  */
 const descriptionField = useDescriptionEditor(
     updateNodeStore.activeNodeCopy?.description as string,
-    ckeditorInstance.value,
+    ckeditorIdAttr.value,
     updateButton,
     isUpdateDisabled
 );
@@ -131,7 +131,7 @@ function onCancelSelected() {
                 </div>
                 <div class="small-12 columns">
                     <label for="description">Description</label>
-                    <textarea :id="ckeditorInstance" rows="6"></textarea>
+                    <textarea :id="ckeditorIdAttr" rows="6"></textarea>
                 </div>
                 <div class="small-12 columns">
                     <ul class="flex-list">
@@ -147,7 +147,7 @@ function onCancelSelected() {
                         <li>
                             <button
                                 class="button icon-modify submit"
-                                :data-submit-button-for="ckeditorInstance"
+                                :data-submit-button-for="ckeditorIdAttr"
                                 :disabled="isUpdateDisabled"
                                 ref="updateButton"
                                 data-test-update-node
