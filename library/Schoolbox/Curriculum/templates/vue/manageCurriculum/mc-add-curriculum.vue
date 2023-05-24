@@ -32,6 +32,8 @@ window.Vue.watch(descriptionField, (newValue: string) => {
     addCurriculumStore.curriculum.description = newValue;
 });
 
+const addButton = ref<HTMLButtonElement | null>(null);
+
 /**
  * To instantly notify the user that the subsection is being added
  * by updating the button text
@@ -76,11 +78,9 @@ function onCancelSelected() {
  * @returns { Boolean }
  */
 const isAddDisabled = window.Vue.computed(() => {
-    let addButton = document.querySelector("button.submit[data-submit-button-for=" + ckeditorInstance.value + "]");
-
     // If the button text contains 'disabled', then the button must remain disabled.
     // The 'disabled' text is added by wordCountSettings.ts in response to the content storage limit being exceeded.
-    if (addButton !== null && addButton.innerHTML.includes("disabled")) {
+    if (addButton.value !== null && addButton.value.innerHTML.includes("disabled")) {
         return true;
     }
 
@@ -130,6 +130,7 @@ const isAddDisabled = window.Vue.computed(() => {
                                 <button
                                     class="button icon-add submit"
                                     :data-submit-button-for="ckeditorInstance"
+                                    ref="addButton"
                                     data-test-add-curriculum
                                     :disabled="isAddDisabled"
                                     @click.prevent="onAddSubsectionSelected"
