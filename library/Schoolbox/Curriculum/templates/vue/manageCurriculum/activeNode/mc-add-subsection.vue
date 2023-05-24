@@ -94,9 +94,7 @@ function onCancelSelected() {
  * @returns { Boolean }
  */
 const isAddDisabled = window.Vue.computed(() => {
-    // If the button text contains 'disabled', then the button must remain disabled.
-    // The 'disabled' text is added by wordCountSettings.ts in response to the content storage limit being exceeded.
-    if (addButton.value !== null && addButton.value.innerHTML.includes("disabled")) {
+    if (addButton.value !== null && addButton.value.hasAttribute("data-ckEditorMaxCharCountExceededAtLastCheck")) {
         return true;
     }
 

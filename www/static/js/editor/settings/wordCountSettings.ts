@@ -193,23 +193,21 @@ function addListenersForDisablingSubmitButtons(
         const buttonTextOriginal: string = getButtonText(submitButton);
 
         ckeditorSourceEl.addEventListener("EDITOR__MAX_CHAR_COUNT_EXCEEDED", function () {
-            // @ts-ignore
-            submitButton.disabled = true;
-            changeButtonText(submitButton, buttonTextOriginal + " (disabled because content storage limit exceeded)");
+            changeButtonState(
+                submitButton,
+                true,
+                buttonTextOriginal + " (disabled because content storage limit exceeded)"
+            );
         });
 
         ckeditorSourceEl.addEventListener("EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED", function () {
             if (containingForm !== null) {
                 // Only enable save button if no max. character count has been exceeded on any ckeditor field in the form.
                 if (containingForm.querySelectorAll('[data-maxCharCountExceededAtLastCheck="1"]').length === 0) {
-                    // @ts-ignore
-                    submitButton.disabled = false;
-                    changeButtonText(submitButton, buttonTextOriginal);
+                    changeButtonState(submitButton, false, buttonTextOriginal);
                 }
             } else {
-                // @ts-ignore
-                submitButton.disabled = false;
-                changeButtonText(submitButton, buttonTextOriginal);
+                changeButtonState(submitButton, false, buttonTextOriginal);
             }
         });
     }
@@ -242,9 +240,10 @@ function getButtonText(buttonElem: Element) {
  * Change button text for buttons that are <input> or <button>.
  *
  * @param buttonElem HTMLElement
+ * @param disabled Boolean
  * @param newText String
  */
-function changeButtonText(buttonElem: Element, newText: string) {
+function changeButtonState(buttonElem: HTMLElement, maxCharCountExceeded: Boolean, newText: string) {
     const buttonTagName = buttonElem.tagName.toLowerCase();
 
     switch (buttonTagName) {
@@ -256,5 +255,14 @@ function changeButtonText(buttonElem: Element, newText: string) {
             break;
         default:
             throw "Unsupported button tag name '" + buttonTagName + "'.";
+    }
+
+    // @ts-ignore
+    buttonElem.disabled = maxCharCountExceeded;
+
+    if (maxCharCountExceeded) {
+        buttonElem.setAttribute("data-ckEditorMaxCharCountExceededAtLastCheck", "");
+    } else {
+        buttonElem.removeAttribute("data-ckEditorMaxCharCountExceededAtLastCheck");
     }
 }
