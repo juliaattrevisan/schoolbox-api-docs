@@ -14,12 +14,14 @@ import { isScriptAdded, injectScript } from "@js/util/domUtils";
  * @param { string } $initialValue - the initial string value to input into the ckeditor
  * @param { string } ckeditorSelector - the selector to target the CKEditor
  * @param { Ref<HTMLButtonElement> } submitButton
+ * @param { Ref<Boolean> } submitButtonShouldBeDisabledRef
  * @returns { string } - the initial value
  */
 export function useDescriptionEditor(
     $initialValue: string,
     ckeditorSelector: string,
-    submitButton: Ref<HTMLButtonElement | null>
+    submitButton: Ref<HTMLButtonElement | null>,
+    submitButtonShouldBeDisabledRef: { value: boolean }
 ) {
     const initialValue = window.Vue.ref($initialValue);
 
@@ -35,6 +37,17 @@ export function useDescriptionEditor(
 
         editor.model.document.on("change:data", () => {
             initialValue.value = editor.getData() as string;
+        });
+
+        const ckeditorElem = document.getElementById(ckeditorSelector) as HTMLElement;
+
+        // If the max. char count is no longer exceeded, whether the submit button should be disabled depends on other
+        // factors specific to the page hosting the submit button (like for example whether the name field is empty).
+        // Those 'other factors' determine the value of the submitButtonShouldBeDisabledRef parameter.
+        ckeditorElem.addEventListener("EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED", () => {
+            if (submitButton.value !== null) {
+                submitButton.value.disabled = submitButtonShouldBeDisabledRef.value;
+            }
         });
     }
 

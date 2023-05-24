@@ -28,18 +28,35 @@ const addButton = ref<HTMLButtonElement | null>(null);
 const addButtonText = window.Vue.computed(() => (addCurriculumStore.isProcessing ? "Adding..." : "Add"));
 
 /**
+ * Only enable the button once the conditions are met
+ *
+ * @returns { Boolean }
+ */
+const isAddDisabled = window.Vue.computed(() => {
+    if (addButton.value !== null && addButton.value.hasAttribute("data-ckEditorMaxCharCountExceededAtLastCheck")) {
+        return true;
+    }
+
+    if (typeof addCurriculumStore.curriculum.name === "string") {
+        return addCurriculumStore.curriculum?.name.trim().length === 0 || addCurriculumStore.isProcessing;
+    }
+    return false;
+});
+
+/**
  * Use a customised ckeditor for the description field
  */
-const descriptionField = useDescriptionEditor(
+const descriptionFieldValue = useDescriptionEditor(
     addCurriculumStore.curriculum?.description as string,
-    ckeditorInstance.value,
-    addButton
+    ckeditorIdAttr.value,
+    addButton,
+    isAddDisabled
 );
 
 /**
  * And watch for changes on this field, so we can update the description in the store
  */
-window.Vue.watch(descriptionField, (newValue: string) => {
+window.Vue.watch(descriptionFieldValue, (newValue: string) => {
     addCurriculumStore.curriculum.description = newValue;
 });
 
@@ -72,22 +89,6 @@ addCurriculumStore.$onAction(({ name, after, onError }) => {
 function onCancelSelected() {
     addCurriculumStore.cancel();
 }
-
-/**
- * Only enable the button once the conditions are met
- *
- * @returns { Boolean }
- */
-const isAddDisabled = window.Vue.computed(() => {
-    if (addButton.value !== null && addButton.value.hasAttribute("data-ckEditorMaxCharCountExceededAtLastCheck")) {
-        return true;
-    }
-
-    if (typeof addCurriculumStore.curriculum.name === "string") {
-        return addCurriculumStore.curriculum?.name.trim().length === 0 || addCurriculumStore.isProcessing;
-    }
-    return false;
-});
 </script>
 
 <template>
@@ -112,7 +113,7 @@ const isAddDisabled = window.Vue.computed(() => {
                     </div>
                     <div class="small-12 columns">
                         <label for="description">Description</label>
-                        <textarea :id="ckeditorInstance" rows="6"></textarea>
+                        <textarea :id="ckeditorIdAttr" rows="6"></textarea>
                     </div>
                     <div class="small-12 columns">
                         <ul class="flex-list">
@@ -128,7 +129,7 @@ const isAddDisabled = window.Vue.computed(() => {
                             <li>
                                 <button
                                     class="button icon-add submit"
-                                    :data-submit-button-for="ckeditorInstance"
+                                    :data-submit-button-for="ckeditorIdAttr"
                                     ref="addButton"
                                     data-test-add-curriculum
                                     :disabled="isAddDisabled"

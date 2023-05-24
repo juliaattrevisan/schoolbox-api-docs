@@ -47,12 +47,29 @@ const updateButton = ref<HTMLButtonElement | null>(null);
 const updateButtonText = window.Vue.computed(() => (updateNodeStore.isProcessing ? "Updating..." : "Update"));
 
 /**
+ * Only enable the button once the conditions are met
+ *
+ * @returns { boolean }
+ */
+const isUpdateDisabled = window.Vue.computed(() => {
+    if (
+        updateButton.value !== null &&
+        updateButton.value.hasAttribute("data-ckEditorMaxCharCountExceededAtLastCheck")
+    ) {
+        return true;
+    }
+
+    return updateNodeStore.activeNodeCopy.name.trim().length === 0 || updateNodeStore.isProcessing;
+});
+
+/**
  * Use a customised ckeditor for the description field
  */
 const descriptionField = useDescriptionEditor(
     updateNodeStore.activeNodeCopy?.description as string,
     ckeditorInstance.value,
-    updateButton
+    updateButton,
+    isUpdateDisabled
 );
 
 /**
@@ -91,22 +108,6 @@ updateNodeStore.$onAction(({ name, after, onError }) => {
 function onCancelSelected() {
     updateNodeStore.cancel();
 }
-
-/**
- * Only enable the button once the conditions are met
- *
- * @returns { boolean }
- */
-const isUpdateDisabled = window.Vue.computed(() => {
-    if (
-        updateButton.value !== null &&
-        updateButton.value.hasAttribute("data-ckEditorMaxCharCountExceededAtLastCheck")
-    ) {
-        return true;
-    }
-
-    return updateNodeStore.activeNodeCopy.name.trim().length === 0 || updateNodeStore.isProcessing;
-});
 </script>
 
 <template>

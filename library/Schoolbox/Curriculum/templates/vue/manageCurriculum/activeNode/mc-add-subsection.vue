@@ -47,12 +47,26 @@ const addButton = ref<HTMLButtonElement | null>(null);
 const addButtonText = window.Vue.computed(() => (addSubsectionStore.isProcessing ? "Adding..." : "Add"));
 
 /**
+ * Only enable the button once the conditions are met
+ *
+ * @returns { Boolean }
+ */
+const isAddDisabled = window.Vue.computed(() => {
+    if (addButton.value !== null && addButton.value.hasAttribute("data-ckEditorMaxCharCountExceededAtLastCheck")) {
+        return true;
+    }
+
+    return addSubsectionStore.subsection.name.trim().length === 0 || addSubsectionStore.isProcessing;
+});
+
+/**
  * Use a customised ckeditor for the description field
  */
 const descriptionField = useDescriptionEditor(
     addSubsectionStore.subsection?.description as string,
     ckeditorInstance.value,
-    addButton
+    addButton,
+    isAddDisabled
 );
 
 /**
@@ -91,19 +105,6 @@ addSubsectionStore.$onAction(({ name, after, onError }) => {
 function onCancelSelected() {
     addSubsectionStore.cancel();
 }
-
-/**
- * Only enable the button once the conditions are met
- *
- * @returns { Boolean }
- */
-const isAddDisabled = window.Vue.computed(() => {
-    if (addButton.value !== null && addButton.value.hasAttribute("data-ckEditorMaxCharCountExceededAtLastCheck")) {
-        return true;
-    }
-
-    return addSubsectionStore.subsection.name.trim().length === 0 || addSubsectionStore.isProcessing;
-});
 </script>
 
 <template>
