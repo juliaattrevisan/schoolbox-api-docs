@@ -48,6 +48,8 @@ window.Vue.watch(descriptionField, (newValue) => {
     updateNodeStore.activeNodeCopy.description = newValue;
 });
 
+const updateButton = ref<HTMLButtonElement | null>(null);
+
 /**
  * To instantly notify the user that the node is being updated
  * by updating the button text
@@ -92,11 +94,10 @@ function onCancelSelected() {
  * @returns { boolean }
  */
 const isUpdateDisabled = window.Vue.computed(() => {
-    let updateButton = document.querySelector("button.submit[data-submit-button-for=" + ckeditorInstance.value + "]");
-
-    // If the button text contains 'disabled', then the button must remain disabled.
-    // The 'disabled' text is added by wordCountSettings.ts in response to the content storage limit being exceeded.
-    if (updateButton !== null && updateButton.innerHTML.includes("disabled")) {
+    if (
+        updateButton.value !== null &&
+        updateButton.value.hasAttribute("data-ckEditorMaxCharCountExceededAtLastCheck")
+    ) {
         return true;
     }
 
@@ -143,6 +144,7 @@ const isUpdateDisabled = window.Vue.computed(() => {
                                 class="button icon-modify submit"
                                 :data-submit-button-for="ckeditorInstance"
                                 :disabled="isUpdateDisabled"
+                                ref="updateButton"
                                 data-test-update-node
                                 @click.prevent="onUpdateSelected"
                             >
