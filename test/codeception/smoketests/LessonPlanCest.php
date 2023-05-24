@@ -8,8 +8,9 @@
 namespace SmokeTests;
 
 use IntegrationTester;
-use Payload\Admin\LMS\CreateLessonPlanTemplate;
-use Payload\Admin\LMS\DeleteLessonPlanTemplate;
+use Payload\Admin\LMS\LessonPlanTemplate\CreateLessonPlanTemplate;
+use Payload\Admin\LMS\LessonPlanTemplate\DeleteLessonPlanTemplate;
+use Payload\Admin\LMS\LessonPlanTemplate\ModifyLessonPlanTemplate;
 
 class LessonPlanCest
 {
@@ -25,9 +26,8 @@ class LessonPlanCest
     }
 
     /**
-     * Creates an assessment using a curl payload
+     * Creates a lesson plan template using a curl payload
      *
-     * Fires off creation of a group homepage folder.
      *
      * @param IntegrationTester $i
      */
@@ -54,6 +54,75 @@ class LessonPlanCest
         $i->seeResponseCodeIs(303);
     }
 
+    /**
+     * Update a lesson plan template using a curl payload
+     *
+     *
+     * @param IntegrationTester $i
+     */
+    public function updateLessonPlanTemplate(IntegrationTester $i): void
+    {
+        #GIVEN
+        $timestamp  = time();
+        $lessonPlanTemplateTitle = 'Lesson Plan Template to be updated ' . $timestamp;
+        $lessonPlanFieldName1 = 'Field 1' . $timestamp;
+        $lessonPlanFieldName2 = 'Field 2' . $timestamp;
+        $lessonPlanFieldName3 = 'Field 3' . $timestamp;
+
+        $lessons = array(
+            array(1, $lessonPlanFieldName1, 'off', 'Body ' . $timestamp),
+            array(2, $lessonPlanFieldName2, 'off', 'Body 2 ' . $timestamp),
+            array(3, $lessonPlanFieldName3, 'off', 'Body 3 ' . $timestamp)
+        );
+
+        $lessonPlanTemplateCreate = new CreateLessonPlanTemplate(
+            $lessonPlanTemplateTitle,
+            $lessons
+        );
+
+        $i->sendRequest($lessonPlanTemplateCreate);
+        $i->seeResponseCodeIs(303);
+        $lessonPlanName = $i->grabLessonPlanTemplateByTitle($lessonPlanTemplateTitle);
+        $lessonPlanFieldName1 = $i->grabLessonPlanTemplateFieldByTitle($lessonPlanFieldName1);
+        $lessonPlanFieldName2 = $i->grabLessonPlanTemplateFieldByTitle($lessonPlanFieldName2);
+        $lessonPlanFieldName3 = $i->grabLessonPlanTemplateFieldByTitle($lessonPlanFieldName3);
+        $lessonPlanTemplateId = $lessonPlanName->getId();
+        $lessonPlanFieldName1Id = $lessonPlanFieldName1->getId();
+        $lessonPlanFieldName2Id = $lessonPlanFieldName2->getId();
+        $lessonPlanFieldName3Id = $lessonPlanFieldName3->getId();
+        dump($lessonPlanFieldName1Id);
+        dump($lessonPlanFieldName2Id);
+        dump($lessonPlanFieldName3Id);
+
+        #WHEN
+
+        $lessonPlanTemplateNewTitle = 'Lesson Plan Template to be updated test ' . $timestamp;
+
+        $lessons = array(
+            array($lessonPlanFieldName1Id, 'Field 1 updated' . $timestamp, 'on', 'Body updated' . $timestamp),
+            array($lessonPlanFieldName2Id, 'Field 2 updated' . $timestamp, 'on', 'Body 2 updated' . $timestamp),
+            array($lessonPlanFieldName3Id, 'Field 3 updated' . $timestamp, 'on', 'Body 3 updated' . $timestamp)
+        );
+
+        $lessonPlanTemplateUpdate = new ModifyLessonPlanTemplate(
+            $lessonPlanTemplateNewTitle,
+            $lessonPlanTemplateId,
+            $lessons
+        );
+
+        #WHEN
+        $i->sendRequest($lessonPlanTemplateUpdate);
+
+        #THEN
+        $i->seeResponseCodeIs(303);
+    }
+
+    /**
+     * Delete a lesson plan template using a curl payload
+     *
+     *
+     * @param IntegrationTester $i
+     */
     public function deleteLessonPlanTemplate(IntegrationTester $i): void
     {
         #GIVEN
@@ -70,17 +139,20 @@ class LessonPlanCest
             $lessonPlanTemplateTitle,
             $lessons
         );
+        $i->sendRequest($lessonPlanTemplateCreate);
+        $i->seeResponseCodeIs(303);
+        $lessonPlanName = $i->grabLessonPlanTemplateByTitle($lessonPlanTemplateTitle);
 
 
-//        #WHEN
-//        /** delete the lesson plan template
-//         */
-//        #WHEN
-//        $lessonPlanTemplateDelete = new DeleteLessonPlanTemplate($lessonPlan->getId());
-//        $i->amGoingTo('Send request to delete a badge');
-//        $i->sendRequest($lessonPlanTemplateDelete);
-//
-//        #THEN
-//        $i->seeResponseCodeIs(200);
+        #WHEN
+       /** delete the lesson plan template
+        */
+        #WHEN
+        $lessonPlanTemplateDelete = new DeleteLessonPlanTemplate($lessonPlanName->getId());
+        $i->amGoingTo('Send request to delete a badge');
+        $i->sendRequest($lessonPlanTemplateDelete);
+
+      #THEN
+        $i->seeResponseCodeIs(200);
     }
 }

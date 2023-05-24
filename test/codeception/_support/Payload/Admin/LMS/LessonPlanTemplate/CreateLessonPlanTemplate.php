@@ -5,15 +5,13 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Payload\Admin\LMS;
+namespace Payload\Admin\LMS\LessonPlanTemplate;
 
-use Payload\Pastoral\FormTrait;
 use Payload\PostTrait;
 
 class CreateLessonPlanTemplate extends \Payload\Request
 {
     use PostTrait;
-    use FormTrait;
 
     /**
      * create a lesson plan template by passing the lesson plan name and lesson fields details

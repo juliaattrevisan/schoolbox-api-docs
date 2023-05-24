@@ -1,22 +1,29 @@
 <?php
 
-namespace Payload\Admin\LMS;
+/**
+ * @copyright Copyright 2023, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
 
-use Payload\DeleteTrait;
-use Payload\Pastoral\FormTrait;
+namespace Payload\Admin\LMS\LessonPlanTemplate;
+
+use Payload\PostTrait;
 
 class DeleteLessonPlanTemplate extends \Payload\Request
 {
-    use DeleteTrait;
-    use FormTrait;
-    private int $badgeId;
+    use PostTrait;
 
+    private int $lessonPanTemplateId;
+
+    /**
+     * @param int $lessonPanTemplateId
+     * This function deletes a lesson plan template by passing its id
+     */
     public function __construct(int $lessonPanTemplateId)
     {
 
         $this->lessonPanTemplateId = $lessonPanTemplateId;
         $this->setReferer("/adminv2/lesson-plan/template");
-//        $this->setHeader('content-type','application/json');
     }
 
 
