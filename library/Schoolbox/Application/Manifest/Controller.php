@@ -167,6 +167,6 @@ class Controller extends Base
         // Don't store to the history
         $this->setAllowBackToTheFuture(false);
         $this->getResponse()->headers->set('Content-Type', 'application/javascript');
-        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@manifest/service-worker.js', []));
+        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@manifest/service-worker.js', ['debug' => (bool)$this->getConfigLoader()->get('debug_mode')]));
     }
 }
