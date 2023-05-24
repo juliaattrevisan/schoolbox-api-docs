@@ -189,7 +189,7 @@ function addListenersForDisablingSubmitButtons(
 ) {
     for (let button of submitButtons) {
         // Now we know we have a button, assign it to a const.
-        const submitButton: Element = button;
+        const submitButton: HTMLElement = button;
         const buttonTextOriginal: string = getButtonText(submitButton);
 
         ckeditorSourceEl.addEventListener("EDITOR__MAX_CHAR_COUNT_EXCEEDED", function () {
