@@ -356,7 +356,10 @@ class Sessions implements IStrategy
                     $matchId = $session['id'];
 
                     try {
-                        $matchup = $this->matchupMapper->findOneByColumn('external_id', $matchId);
+                        $matchup = $this->matchupMapper->findOneByColumnList([
+                            'external_id' => $matchId,
+                            'home_team_id' => $team->getId()
+                        ]);
 
                         $this->log->debug(sprintf(
                             'Updating matchup %s on %s, at venue %s',
@@ -370,7 +373,8 @@ class Sessions implements IStrategy
                         $action = 'Creating';
 
                         $matchup = $this->matchupMapper->createModel()
-                            ->setExternalId((string)$matchId);
+                            ->setExternalId((string)$matchId)
+                            ->setHomeTeam($team);
                     }
 
                     /* You just can't tell what might have caused this to appear here
@@ -384,7 +388,6 @@ class Sessions implements IStrategy
                         ->setSeason($season)
                         ->setDivision($division)
                         ->setVenue($venue)
-                        ->setHomeTeam($team)
                         ->setStartAt($startAt)
                         ->setFinishAt($finishAt);
 
