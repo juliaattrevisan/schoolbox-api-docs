@@ -15,7 +15,11 @@ import { isScriptAdded, injectScript } from "@js/util/domUtils";
  * @param { string } $ckeditorInstance - the selector to target the CKEditor
  * @returns { string } - the initial value
  */
-export function useDescriptionEditor($initialValue: string, $ckeditorInstance: string) {
+export function useDescriptionEditor(
+    $initialValue: string,
+    $ckeditorInstance: string,
+    submitButton: Ref<HTMLButtonElement | null>
+) {
     const initialValue = window.Vue.ref($initialValue);
     const ckeditorInstance = $ckeditorInstance;
 
@@ -44,9 +48,7 @@ export function useDescriptionEditor($initialValue: string, $ckeditorInstance: s
                 await injectScript(ckeditorScript);
             }
 
-            let submitButton = document.querySelector("button.submit[data-submit-button-for=" + ckeditorInstance + "]");
-
-            if (submitButton === null) {
+            if (submitButton.value === null) {
                 console.error("Could not find submit button for CKEditor '" + ckeditorInstance + "' field.");
             }
 
@@ -56,7 +58,7 @@ export function useDescriptionEditor($initialValue: string, $ckeditorInstance: s
                     detail: {
                         targetElements: [`#${ckeditorInstance}`],
                         toolbar: "simple",
-                        maxCharCountSubmitButtons: [submitButton],
+                        maxCharCountSubmitButtons: [submitButton.value],
                     },
                 })
             );

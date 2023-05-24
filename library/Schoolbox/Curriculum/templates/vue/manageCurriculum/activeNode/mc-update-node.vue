@@ -36,18 +36,6 @@ const marginLeft = window.Vue.computed(() => `calc(${props.depth * 2}rem)`);
  */
 const ckeditorInstance = window.Vue.computed(() => `description-${activeNodeStore.node.id}`);
 
-/**
- * Use a customised ckeditor for the description field
- */
-const descriptionField = useDescriptionEditor(updateNodeStore.activeNodeCopy.description, ckeditorInstance.value);
-
-/**
- * And watch for changes on this field so we can update the description in the store
- */
-window.Vue.watch(descriptionField, (newValue) => {
-    updateNodeStore.activeNodeCopy.description = newValue;
-});
-
 const updateButton = ref<HTMLButtonElement | null>(null);
 
 /**
@@ -57,6 +45,22 @@ const updateButton = ref<HTMLButtonElement | null>(null);
  * @returns { string }
  */
 const updateButtonText = window.Vue.computed(() => (updateNodeStore.isProcessing ? "Updating..." : "Update"));
+
+/**
+ * Use a customised ckeditor for the description field
+ */
+const descriptionField = useDescriptionEditor(
+    updateNodeStore.activeNodeCopy.description,
+    ckeditorInstance.value,
+    updateButton
+);
+
+/**
+ * And watch for changes on this field so we can update the description in the store
+ */
+window.Vue.watch(descriptionField, (newValue) => {
+    updateNodeStore.activeNodeCopy.description = newValue;
+});
 
 /**
  * submit save

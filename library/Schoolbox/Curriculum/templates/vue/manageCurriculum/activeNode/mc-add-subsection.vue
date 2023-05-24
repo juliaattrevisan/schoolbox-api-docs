@@ -36,18 +36,6 @@ const marginLeft = window.Vue.computed(() => `calc(${props.depth * 2}rem)`);
  */
 const ckeditorInstance = window.Vue.computed(() => `description-${activeNodeStore.node.id}`);
 
-/**
- * Use a customised ckeditor for the description field
- */
-const descriptionField = useDescriptionEditor(addSubsectionStore.subsection.description, ckeditorInstance.value);
-
-/**
- * And watch for changes on this field so we can update the description in the store
- */
-window.Vue.watch(descriptionField, (newValue) => {
-    addSubsectionStore.subsection.description = newValue;
-});
-
 const addButton = ref<HTMLButtonElement | null>(null);
 
 /**
@@ -57,6 +45,22 @@ const addButton = ref<HTMLButtonElement | null>(null);
  * @returns { String }
  */
 const addButtonText = window.Vue.computed(() => (addSubsectionStore.isProcessing ? "Adding..." : "Add"));
+
+/**
+ * Use a customised ckeditor for the description field
+ */
+const descriptionField = useDescriptionEditor(
+    addSubsectionStore.subsection.description,
+    ckeditorInstance.value,
+    addButton
+);
+
+/**
+ * And watch for changes on this field so we can update the description in the store
+ */
+window.Vue.watch(descriptionField, (newValue) => {
+    addSubsectionStore.subsection.description = newValue;
+});
 
 /**
  * submit save

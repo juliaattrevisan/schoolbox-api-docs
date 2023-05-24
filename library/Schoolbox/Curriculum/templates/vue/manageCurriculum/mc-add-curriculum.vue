@@ -17,21 +17,6 @@ const addCurriculumStore = useAddCurriculumStore();
  */
 const ckeditorInstance = window.Vue.computed(() => `new-curriculum`);
 
-/**
- * Use a customised ckeditor for the description field
- */
-const descriptionField = useDescriptionEditor(
-    addCurriculumStore.curriculum?.description as string,
-    ckeditorInstance.value
-);
-
-/**
- * And watch for changes on this field so we can update the description in the store
- */
-window.Vue.watch(descriptionField, (newValue: string) => {
-    addCurriculumStore.curriculum.description = newValue;
-});
-
 const addButton = ref<HTMLButtonElement | null>(null);
 
 /**
@@ -41,6 +26,22 @@ const addButton = ref<HTMLButtonElement | null>(null);
  * @returns { String }
  */
 const addButtonText = window.Vue.computed(() => (addCurriculumStore.isProcessing ? "Adding..." : "Add"));
+
+/**
+ * Use a customised ckeditor for the description field
+ */
+const descriptionField = useDescriptionEditor(
+    addCurriculumStore.curriculum?.description as string,
+    ckeditorInstance.value,
+    addButton
+);
+
+/**
+ * And watch for changes on this field so we can update the description in the store
+ */
+window.Vue.watch(descriptionField, (newValue: string) => {
+    addCurriculumStore.curriculum.description = newValue;
+});
 
 /**
  * submit save
