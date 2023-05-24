@@ -165,6 +165,7 @@ function excludeCheck() {
  */
 function exclude() {
     closeExclude();
+    closePopOut();
     onMenuItemSelected(routes.value.excludeRoute, 'exclude');
 }
 
@@ -173,9 +174,6 @@ function exclude() {
  */
 function closeExclude() {
     excludeModalEl.value.close();
-
-    // Also close the popout
-    closePopOut();
 }
 
 /**
