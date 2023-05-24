@@ -165,7 +165,6 @@ function excludeCheck() {
  */
 function exclude() {
     closeExclude();
-    closePopOut();
     onMenuItemSelected(routes.value.excludeRoute, 'exclude');
 }
 
@@ -188,8 +187,8 @@ function closeExclude() {
  *         });
  */
 function reloadMarkbook() {
-    // close the popout
-    isSelected.value = false;
+    closePopOut();
+
     // reload the markbook
     document.getElementById('submit_button').click();
 
