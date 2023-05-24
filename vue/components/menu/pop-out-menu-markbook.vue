@@ -187,8 +187,8 @@ function closeExclude() {
  *         });
  */
 function reloadMarkbook() {
-    // close the popout
-    isSelected.value = false;
+    closePopOut();
+
     // reload the markbook
     document.getElementById('submit_button').click();
 
@@ -282,11 +282,25 @@ function onMouseClick(event: Event) {
         && !markbookElement.value.contains(event.target)
         && referenceElement.value !== event.target
     ){
-        isSelected.value = false;
-        // Clear out any selected states.
-        referenceElement.value?.classList.remove('is-selected');
-        referenceElement.value = null;
+        // Prevent the pop out from closing if the exclude modal is open and the click is within the modal.
+        if (excludeModalEl.value !== null
+            && excludeModalEl.value.modal[0].contains(event.target)
+        ) {
+            return;
+        }
+
+        closePopOut();
     }
+}
+
+/**
+ * Close the pop out
+ */
+function closePopOut() {
+    isSelected.value = false;
+    // Clear out any selected states.
+    referenceElement.value?.classList.remove('is-selected');
+    referenceElement.value = null;
 }
 
 /**
