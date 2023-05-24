@@ -257,7 +257,6 @@ function changeButtonState(buttonElem: HTMLElement, maxCharCountExceeded: Boolea
             throw "Unsupported button tag name '" + buttonTagName + "'.";
     }
 
-    // @ts-ignore
     buttonElem.disabled = maxCharCountExceeded;
 
     if (maxCharCountExceeded) {
