@@ -50,7 +50,7 @@ const addButtonText = window.Vue.computed(() => (addSubsectionStore.isProcessing
  * Use a customised ckeditor for the description field
  */
 const descriptionField = useDescriptionEditor(
-    addSubsectionStore.subsection.description,
+    addSubsectionStore.subsection?.description as string,
     ckeditorInstance.value,
     addButton
 );
