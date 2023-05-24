@@ -117,7 +117,7 @@ function getVideoSrc(resource: Resource, config: EditorConfig) {
 function getVideoThumb(resource: Resource, config: EditorConfig) {
     const resourceId = resource.id ? resource.id : resource.hash;
     const filesystemWithReplaces = resource.filesystem.replace("browse", "sbfs").replace("store", "storage");
-    return getURL(`/cms/videoThumb.php?size=poster&id=${resourceId}&type=${filesystemWithReplaces}`, config);
+    return getURL(`/cms/videoThumb.php?size=poster_letterbox&id=${resourceId}&type=${filesystemWithReplaces}`, config);
 }
 
 /**

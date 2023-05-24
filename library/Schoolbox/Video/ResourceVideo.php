@@ -44,6 +44,8 @@ class ResourceVideo
     /** @const string POSTER Location of poster for compressed video */
     public const POSTER = 'poster';
 
+    public const POSTER_LETTERBOX = 'poster_letterbox';
+
     /**
      * Creates object and sets up sub-objects.
      */
@@ -221,8 +223,12 @@ class ResourceVideo
     }
 
     /**
-     * Returns the path of the storage objects poster for the transcoded video
-     * Note this will only exist if the object is a video and it has been transcoded so test before use
+     * Returns the path of the storage objects poster image for the transcoded
+     * video.
+     *
+     * Note this will only exist if the object is a video and it has been
+     * transcoded, so test before use.
+     *
      * @return string
      */
     public function getPosterPath()
@@ -231,8 +237,26 @@ class ResourceVideo
     }
 
     /**
-     * Returns the path of the storage objects thumbnail for the transcoded video
-     * Note this will only exist if the object is a video and it has been transcoded so test before use
+     * Returns the path of the storage object's letterboxed poster image for the
+     * transcoded video.
+     *
+     * Note this will only exist if the object is a video and it has been
+     * transcoded _after_ SA-15531 is merged, so test before use.
+     *
+     * @return string
+     */
+    public function getPosterLetterboxPath()
+    {
+        return $this->getTransformPath(self::POSTER_LETTERBOX);
+    }
+
+    /**
+     * Returns the path of the storage objects thumbnail image for the
+     * transcoded video.
+     *
+     * Note this will only exist if the object is a video and it has been
+     * transcoded, so test before use.
+     *
      * @return string
      */
     public function getThumbnailPath()

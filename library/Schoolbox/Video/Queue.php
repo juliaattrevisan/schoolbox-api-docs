@@ -261,30 +261,33 @@ class Queue extends ResourceVideo
         // Setup
         // ------------------------------------------------------------------------------------------------------------
 
-        $filenameSource             = $this->getLocalFilename($this->getStorage());
-        $filenameTranscodeVideo     = $this->getTempFilename($this->getStorage()->getHash(), "mp4");
-        $filenameTranscodeThumbnail = $this->getTempFilename($this->getStorage()->getHash() . '-thumbnail', "jpg");
-        $filenameTranscodePoster    = $this->getTempFilename($this->getStorage()->getHash() . '-poster', "jpg");
+        $filenameSource                   = $this->getLocalFilename($this->getStorage());
+        $filenameTranscodeVideo           = $this->getTempFilename($this->getStorage()->getHash(), "mp4");
+        $filenameTranscodeThumbnail       = $this->getTempFilename($this->getStorage()->getHash() . '-thumbnail', "jpg");
+        $filenameTranscodePoster          = $this->getTempFilename($this->getStorage()->getHash() . '-poster', "jpg");
+        $filenameTranscodePosterLetterbox = $this->getTempFilename($this->getStorage()->getHash() . '-poster_letterbox', "jpg");
 
         // Remember all the temporary files we create so when we error out or finish we can unlink them
 
         $this->temporaryFiles[] = $filenameTranscodeVideo;
         $this->temporaryFiles[] = $filenameTranscodeThumbnail;
         $this->temporaryFiles[] = $filenameTranscodePoster;
+        $this->temporaryFiles[] = $filenameTranscodePosterLetterbox;
 
         // Get parameters
 
         $cpus = (int)shell_exec('nproc');
-        $commandMediaInformation           = $this->getCommandMediaInformation();
-        $commandTranscode                  = $this->getCommandTranscode();
-        $strictMode                        = " -strict -2 ";
-        $videoBitrateEscaped               = escapeshellarg("{$this->videoBitrate}k");
-        $audioBitrateEscaped               = escapeshellarg("{$this->audioBitrate}k");
-        $processTimeoutEscaped             = escapeshellarg($this->processTimeout * $cpus);
-        $filenameTranscodeVideoEscaped     = escapeshellarg($filenameTranscodeVideo);
-        $filenameTranscodeThumbnailEscaped = escapeshellarg($filenameTranscodeThumbnail);
-        $filenameTranscodePosterEscaped    = escapeshellarg($filenameTranscodePoster);
-        $filenameSourceEscaped             = escapeshellarg($filenameSource);
+        $commandMediaInformation                 = $this->getCommandMediaInformation();
+        $commandTranscode                        = $this->getCommandTranscode();
+        $strictMode                              = " -strict -2 ";
+        $videoBitrateEscaped                     = escapeshellarg("{$this->videoBitrate}k");
+        $audioBitrateEscaped                     = escapeshellarg("{$this->audioBitrate}k");
+        $processTimeoutEscaped                   = escapeshellarg($this->processTimeout * $cpus);
+        $filenameTranscodeVideoEscaped           = escapeshellarg($filenameTranscodeVideo);
+        $filenameTranscodeThumbnailEscaped       = escapeshellarg($filenameTranscodeThumbnail);
+        $filenameTranscodePosterEscaped          = escapeshellarg($filenameTranscodePoster);
+        $filenameTranscodePosterLetterboxEscaped = escapeshellarg($filenameTranscodePosterLetterbox);
+        $filenameSourceEscaped                   = escapeshellarg($filenameSource);
 
         // ------------------------------------------------------------------------------------------------------------
         // Get video metadata
@@ -347,7 +350,8 @@ class Queue extends ResourceVideo
         if ($this->getDuration() > 0) {
             // Create thumbnail
 
-            $thumbnailSecondsEscaped = escapeshellarg(round(($this->getDuration() / 3), 2));
+            // This is the time at which to extract from the video the image that will become the thumbnail or poster.
+            $imageExtractionSecondsEscaped = escapeshellarg(round(($this->getDuration() / 3), 2));
 
             $thumbnailCommandline =
                 "nice {$commandTranscode}" .
@@ -357,7 +361,7 @@ class Queue extends ResourceVideo
                 " -i {$filenameSourceEscaped}" .
                 ' -max_muxing_queue_size 1024' .
                 ' -f image2 ' .
-                " -ss {$thumbnailSecondsEscaped}" .
+                " -ss {$imageExtractionSecondsEscaped}" .
                 " -vf {$videoMetadata["thumbScale"]}crop=64:64" .
                 ' -frames:v 1' .
                 " {$filenameTranscodeThumbnailEscaped}" .
@@ -381,7 +385,7 @@ class Queue extends ResourceVideo
                 " -i {$filenameSourceEscaped}" .
                 ' -max_muxing_queue_size 1024' .
                 ' -f image2 ' .
-                " -ss {$thumbnailSecondsEscaped}" .
+                " -ss {$imageExtractionSecondsEscaped}" .
                 ' -frames:v 1' .
                 " {$filenameTranscodePosterEscaped}" .
                 ' 2>&1';
@@ -393,8 +397,33 @@ class Queue extends ResourceVideo
 
             $this->log("Uploading video poster");
             $this->uploadPreviewImage($filesystem, $filenameTranscodePoster, $this->getPosterPath());
+
+
+            // Create poster (letterbox)
+
+            $posterLetterboxCommandline =
+                "nice {$commandTranscode} " .
+                ' -y' .
+                ' -nostats' .
+                ' -hide_banner' .
+                " -i {$filenameSourceEscaped}" .
+                ' -max_muxing_queue_size 1024' .
+                ' -f image2 ' .
+                " -ss {$imageExtractionSecondsEscaped}" .
+                ' -vf "scale=640:360:force_original_aspect_ratio=decrease,pad=640:360:-1:-1:color=black"' .
+                ' -frames:v 1' .
+                " {$filenameTranscodePosterLetterboxEscaped}" .
+                ' 2>&1';
+
+            $this->executeCommand($posterLetterboxCommandline);
+            $this->log("Video poster (letterbox) generated");
+
+            // Upload poster (letterbox) to storage
+
+            $this->log("Uploading video poster (letterbox)");
+            $this->uploadPreviewImage($filesystem, $filenameTranscodePosterLetterbox, $this->getPosterLetterboxPath());
         } else {
-            $this->log("Skipping thumbnail and poster generation");
+            $this->log("Skipping thumbnail and poster and poster (letterbox) generation");
         }
 
         return true;
