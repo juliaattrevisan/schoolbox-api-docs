@@ -171,7 +171,9 @@ export function insertWordCount(sourceElement: HTMLElement, editor: Editor, conf
  *  * https://vagrant.dev.schoolbox.cloud/adminv2/summative-report/create (single submit <input>)
  *  * https://vagrant.dev.schoolbox.cloud/news/34/update (single submit <button>)
  *  * https://vagrant.dev.schoolbox.cloud/news/87/update (multiple submit <button>s)
- *  * https://vagrant.dev.schoolbox.cloud/curriculum (config.maxCharCountSubmitButtons used)
+ *  * https://vagrant.dev.schoolbox.cloud/curriculum (
+ *       config.maxCharCountSubmitButtons used and a EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED event listener used
+ *    )
  *
  *  This function is not intended to handle every possible configuration of CKEditor fields inside forms.  If this
  *  function does not disable/enable the submit form button in a specific case, it may be best to handle that case
