@@ -50,13 +50,13 @@ const updateButtonText = window.Vue.computed(() => (updateNodeStore.isProcessing
  * Use a customised ckeditor for the description field
  */
 const descriptionField = useDescriptionEditor(
-    updateNodeStore.activeNodeCopy.description,
+    updateNodeStore.activeNodeCopy.description === null ? "" : updateNodeStore.activeNodeCopy.description,
     ckeditorInstance.value,
     updateButton
 );
 
 /**
- * And watch for changes on this field so we can update the description in the store
+ * And watch for changes on this field, so we can update the description in the store
  */
 window.Vue.watch(descriptionField, (newValue) => {
     updateNodeStore.activeNodeCopy.description = newValue;

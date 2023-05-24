@@ -37,7 +37,7 @@ const descriptionField = useDescriptionEditor(
 );
 
 /**
- * And watch for changes on this field so we can update the description in the store
+ * And watch for changes on this field, so we can update the description in the store
  */
 window.Vue.watch(descriptionField, (newValue: string) => {
     addCurriculumStore.curriculum.description = newValue;

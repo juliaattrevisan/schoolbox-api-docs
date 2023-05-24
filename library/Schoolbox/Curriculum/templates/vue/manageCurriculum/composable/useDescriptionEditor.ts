@@ -1,5 +1,5 @@
 /**
- * Loads and display the ckeditor, and once loaded prefil the initialValue if it's available
+ * Loads and display the ckeditor, and once loaded prefill the initialValue if it's available
  * This setup uses https://vuejs.org/guide/reusability/composables.html, a Vue 3 alternative to mixins
  *
  * We currently use this for the description in add curriculum, add subsection and update an existing node
@@ -12,16 +12,16 @@ import { isScriptAdded, injectScript } from "@js/util/domUtils";
  * Initialise the composable
  *
  * @param { string } $initialValue - the initial string value to input into the ckeditor
- * @param { string } $ckeditorInstance - the selector to target the CKEditor
+ * @param { string } ckeditorSelector - the selector to target the CKEditor
+ * @param { Ref<HTMLButtonElement> } submitButton
  * @returns { string } - the initial value
  */
 export function useDescriptionEditor(
     $initialValue: string,
-    $ckeditorInstance: string,
+    ckeditorSelector: string,
     submitButton: Ref<HTMLButtonElement | null>
 ) {
     const initialValue = window.Vue.ref($initialValue);
-    const ckeditorInstance = $ckeditorInstance;
 
     /**
      * When a new editor is created
@@ -49,14 +49,17 @@ export function useDescriptionEditor(
             }
 
             if (submitButton.value === null) {
-                console.error("Could not find submit button for CKEditor '" + ckeditorInstance + "' field.");
+                console.error("Could not find submit button for CKEditor '" + ckeditorSelector + "' field.");
             }
 
-            document.getElementById(ckeditorInstance).addEventListener("EDITOR__CREATED", onEditorCreated);
+            const ckeditorElem = document.getElementById(ckeditorSelector) as HTMLElement;
+
+            ckeditorElem.addEventListener("EDITOR__CREATED", onEditorCreated);
+
             document.dispatchEvent(
                 new CustomEvent("EDITOR__CREATE", {
                     detail: {
-                        targetElements: [`#${ckeditorInstance}`],
+                        targetElements: [`#${ckeditorSelector}`],
                         toolbar: "simple",
                         maxCharCountSubmitButtons: [submitButton.value],
                     },

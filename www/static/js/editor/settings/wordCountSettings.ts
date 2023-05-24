@@ -11,7 +11,7 @@ import { EditorEvent } from "@js/editor/event/editorEvent";
 export function getWordCountSettings() {
     return {
         wordCount: {
-            // we handle character so we can count html as well to more accurately count
+            // we handle character, so we can count html as well to more accurately count
             displayCharacters: false,
         },
     };
