@@ -10,6 +10,7 @@ namespace SmokeTests;
 use IntegrationTester;
 use Payload\Admin\LMS\LessonPlanTemplate\CreateLessonPlanTemplate;
 use Payload\Admin\LMS\LessonPlanTemplate\DeleteLessonPlanTemplate;
+use Payload\Admin\LMS\LessonPlanTemplate\EnableDisableLessonPlanTemplate;
 use Payload\Admin\LMS\LessonPlanTemplate\ModifyLessonPlanTemplate;
 
 class LessonPlanCest
@@ -35,23 +36,35 @@ class LessonPlanCest
     {
         #GIVEN
         $timestamp  = time();
+        $lessonPlanTemplateTitle = 'Lesson Plan Template ' . $timestamp;
+        $timestamp  = time();
 
         $lessons = array(
-            array(1, 'Field 1' . $timestamp, 'on', 'Body ' . $timestamp),
-            array(2, 'Field 2' . $timestamp, 'on', 'Body 2 ' . $timestamp),
-            array(3, 'Field 3' . $timestamp, 'off', 'Body 3 ' . $timestamp)
+            array(1, 'Field 1 ' . $timestamp, 'on', 'Body ' . $timestamp),
+            array(2, 'Field 2 ' . $timestamp, 'on', 'Body 2 ' . $timestamp),
+            array(3, 'Field 3 ' . $timestamp, 'off', 'Body 3 ' . $timestamp)
         );
 
         $lessonPlanTemplateCreate = new CreateLessonPlanTemplate(
-            'Lesson Plan Template ' . $timestamp,
+            $lessonPlanTemplateTitle,
             $lessons
         );
 
         #WHEN
+        $i->amGoingTo('Send request to create a lesson plan template');
         $i->sendRequest($lessonPlanTemplateCreate);
+        $lessonPlanName = $i->grabLessonPlanTemplateByTitle($lessonPlanTemplateTitle);
 
         #THEN
         $i->seeResponseCodeIs(303);
+
+        #WHEN
+        $disableEnableLessonPlanTemplate = new EnableDisableLessonPlanTemplate($lessonPlanName->getId());
+        $i->amGoingTo('Send request to disable a lesson plan template');
+        $i->sendRequest($disableEnableLessonPlanTemplate);
+
+        #THEN
+        $i->seeResponseCodeIs(200);
     }
 
     /**
@@ -65,9 +78,9 @@ class LessonPlanCest
         #GIVEN
         $timestamp  = time();
         $lessonPlanTemplateTitle = 'Lesson Plan Template to be updated ' . $timestamp;
-        $lessonPlanFieldName1 = 'Field 1' . $timestamp;
-        $lessonPlanFieldName2 = 'Field 2' . $timestamp;
-        $lessonPlanFieldName3 = 'Field 3' . $timestamp;
+        $lessonPlanFieldName1 = 'Field 1 to be updated' . $timestamp;
+        $lessonPlanFieldName2 = 'Field 2 to be updated' . $timestamp;
+        $lessonPlanFieldName3 = 'Field 3 to be updated' . $timestamp;
 
         $lessons = array(
             array(1, $lessonPlanFieldName1, 'off', 'Body ' . $timestamp),
@@ -80,28 +93,23 @@ class LessonPlanCest
             $lessons
         );
 
+        $i->amGoingTo('Send request to create a lesson plan template');
         $i->sendRequest($lessonPlanTemplateCreate);
         $i->seeResponseCodeIs(303);
         $lessonPlanName = $i->grabLessonPlanTemplateByTitle($lessonPlanTemplateTitle);
         $lessonPlanFieldName1 = $i->grabLessonPlanTemplateFieldByTitle($lessonPlanFieldName1);
         $lessonPlanFieldName2 = $i->grabLessonPlanTemplateFieldByTitle($lessonPlanFieldName2);
-        $lessonPlanFieldName3 = $i->grabLessonPlanTemplateFieldByTitle($lessonPlanFieldName3);
         $lessonPlanTemplateId = $lessonPlanName->getId();
         $lessonPlanFieldName1Id = $lessonPlanFieldName1->getId();
         $lessonPlanFieldName2Id = $lessonPlanFieldName2->getId();
-        $lessonPlanFieldName3Id = $lessonPlanFieldName3->getId();
-        dump($lessonPlanFieldName1Id);
-        dump($lessonPlanFieldName2Id);
-        dump($lessonPlanFieldName3Id);
 
         #WHEN
 
         $lessonPlanTemplateNewTitle = 'Lesson Plan Template to be updated test ' . $timestamp;
 
         $lessons = array(
-            array($lessonPlanFieldName1Id, 'Field 1 updated' . $timestamp, 'on', 'Body updated' . $timestamp),
-            array($lessonPlanFieldName2Id, 'Field 2 updated' . $timestamp, 'on', 'Body 2 updated' . $timestamp),
-            array($lessonPlanFieldName3Id, 'Field 3 updated' . $timestamp, 'on', 'Body 3 updated' . $timestamp)
+            array($lessonPlanFieldName1Id, 'Field 1 updated ' . $timestamp, 'on', 'Body updated ' . $timestamp),
+            array($lessonPlanFieldName2Id, 'Field 2 updated ' . $timestamp, 'on', 'Body 2 updated ' . $timestamp),
         );
 
         $lessonPlanTemplateUpdate = new ModifyLessonPlanTemplate(
@@ -111,6 +119,7 @@ class LessonPlanCest
         );
 
         #WHEN
+        $i->amGoingTo('Send request to update a lesson plan template');
         $i->sendRequest($lessonPlanTemplateUpdate);
 
         #THEN
@@ -127,29 +136,26 @@ class LessonPlanCest
     {
         #GIVEN
         $timestamp  = time();
-        $lessonPlanTemplateTitle = 'Lesson Plan Template to be deleted' . $timestamp;
+        $lessonPlanTemplateTitle = 'Lesson Plan Template to be deleted ' . $timestamp;
 
         $lessons = array(
-            array(1, 'Field 1' . $timestamp, 'on', 'Body ' . $timestamp),
-            array(2, 'Field 2' . $timestamp, 'on', 'Body 2 ' . $timestamp),
-            array(3, 'Field 3' . $timestamp, 'off', 'Body 3 ' . $timestamp)
+            array(1, 'Field 1 ' . $timestamp, 'on', 'Body ' . $timestamp),
+            array(2, 'Field 2 ' . $timestamp, 'on', 'Body 2 ' . $timestamp),
+            array(3, 'Field 3 ' . $timestamp, 'off', 'Body 3 ' . $timestamp)
         );
 
         $lessonPlanTemplateCreate = new CreateLessonPlanTemplate(
             $lessonPlanTemplateTitle,
             $lessons
         );
+        $i->amGoingTo('Send request to create a lesson plan template');
         $i->sendRequest($lessonPlanTemplateCreate);
         $i->seeResponseCodeIs(303);
         $lessonPlanName = $i->grabLessonPlanTemplateByTitle($lessonPlanTemplateTitle);
 
-
-        #WHEN
-       /** delete the lesson plan template
-        */
         #WHEN
         $lessonPlanTemplateDelete = new DeleteLessonPlanTemplate($lessonPlanName->getId());
-        $i->amGoingTo('Send request to delete a badge');
+        $i->amGoingTo('Send request to delete a lesson plan template');
         $i->sendRequest($lessonPlanTemplateDelete);
 
       #THEN
