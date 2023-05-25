@@ -292,7 +292,7 @@ class CliImporter extends CliTool\App
             if ($tableGzFile === '..' || $tableGzFile === '.') {
                 continue;
             }
-            // Table file name format should be <table name>.<index>.gz or <table name>.gz
+            // Table file name format should be <table name>.<index>.gz
             $tableFileParts = explode('.', $tableGzFile);
             if (count($tableFileParts) === 3) {
                 // <table name>.<index>.gz
@@ -302,14 +302,6 @@ class CliImporter extends CliTool\App
                     continue;
                 }
                 $tableFile = "$tempDir/$tableName.$index";
-            } elseif (count($tableFileParts) === 2) {
-                // <table name>.gz
-                $tableName = $tableFileParts[0];
-                $index     = null;
-                if (!in_array($tableName, self::TABLES_TO_IMPORT)) {
-                    continue;
-                }
-                $tableFile = "$tempDir/$tableName";
             } else {
                 continue;
             }
