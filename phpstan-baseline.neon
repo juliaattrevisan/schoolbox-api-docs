@@ -1151,46 +1151,6 @@ parameters:
 			path: library/Database.php
 
 		-
-			message: "#^Constructor of class DeprecatedDatabase has an unused parameter \\$db\\.$#"
-			count: 1
-			path: library/DeprecatedDatabase.php
-
-		-
-			message: "#^Constructor of class DeprecatedDatabase has an unused parameter \\$debug\\.$#"
-			count: 1
-			path: library/DeprecatedDatabase.php
-
-		-
-			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
-			count: 2
-			path: library/DeprecatedDatabase.php
-
-		-
-			message: "#^Method DeprecatedDatabase\\:\\:changeDb\\(\\) should return bool but return statement is missing\\.$#"
-			count: 1
-			path: library/DeprecatedDatabase.php
-
-		-
-			message: "#^Method DeprecatedDatabase\\:\\:close\\(\\) should return bool but return statement is missing\\.$#"
-			count: 1
-			path: library/DeprecatedDatabase.php
-
-		-
-			message: "#^Method DeprecatedDatabase\\:\\:serialize\\(\\) should return string but returns null\\.$#"
-			count: 1
-			path: library/DeprecatedDatabase.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/DeprecatedDatabase.php
-
-		-
-			message: "#^Static property DeprecatedDatabase\\:\\:\\$instance \\(DeprecatedDatabase\\) does not accept default value of type false\\.$#"
-			count: 1
-			path: library/DeprecatedDatabase.php
-
-		-
 			message: "#^Method EOTC\\\\ActivityLog\\\\Log\\:\\:getId\\(\\) should return string but returns int\\.$#"
 			count: 1
 			path: library/EOTC/ActivityLog/Log.php
