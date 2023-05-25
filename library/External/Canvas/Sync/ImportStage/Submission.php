@@ -253,6 +253,7 @@ class Submission extends SubmissionAbstract
                  ->setNormalizedMark($normMark)
                  ->setCreatedAt($feedbackTime)
                  ->setPublishedAt($feedbackTime)
+                 ->setPublishedBy($reviewer->getId())
                  ->setUpdatedAt($feedbackTime);
 
         /* Cannot use mappers here to save because:
