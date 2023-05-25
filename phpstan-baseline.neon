@@ -1191,11 +1191,6 @@ parameters:
 			path: library/DeprecatedDatabase.php
 
 		-
-			message: "#^Variable \\$subquery might not be defined\\.$#"
-			count: 1
-			path: library/DeprecatedModel.php
-
-		-
 			message: "#^Method EOTC\\\\ActivityLog\\\\Log\\:\\:getId\\(\\) should return string but returns int\\.$#"
 			count: 1
 			path: library/EOTC/ActivityLog/Log.php
@@ -1934,11 +1929,6 @@ parameters:
 			message: "#^Property Group\\:\\:\\$userNotifier \\(Schoolbox\\\\UserNotifier\\) in empty\\(\\) is not falsy\\.$#"
 			count: 1
 			path: library/Group.php
-
-		-
-			message: "#^Method Homepage\\:\\:removeAllComponentsFromHomepage\\(\\) invoked with 1 parameter, 0 required\\.$#"
-			count: 1
-			path: library/Homepage.php
 
 		-
 			message: "#^Parameter \\#3 \\$previous \\(null\\) of method HouseMapper\\:\\:raiseNotification\\(\\) should be compatible with parameter \\$previous \\(object\\) of method Schoolbox\\\\Mapper\\:\\:raiseNotification\\(\\)$#"
