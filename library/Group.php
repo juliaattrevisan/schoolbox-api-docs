@@ -165,7 +165,7 @@ class Group extends DeprecatedModel
     public function groupExists($relationID)
     {
         $query = "SELECT cid FROM userGroups WHERE cid = $relationID";
-        $result = $this->db->getRow($query);
+        $result = $this->db->query($query)->fetch();
         if ($result['cid']) {
             return true;
         } else {

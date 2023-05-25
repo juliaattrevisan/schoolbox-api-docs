@@ -195,7 +195,7 @@ abstract class Evaluation_Attempt extends DeprecatedModel
                   AND deleted_at IS NULL
                   ORDER BY start DESC";
 
-        return $this->db->getRow($query);
+        return $this->db->query($query)->fetch();
     }
 
     /**
@@ -218,7 +218,7 @@ abstract class Evaluation_Attempt extends DeprecatedModel
             ORDER BY {$this->_table}.start DESC
         ";
 
-        return $this->db->getRow($query);
+        return $this->db->query($query)->fetch();
     }
 
     /**
@@ -241,7 +241,7 @@ abstract class Evaluation_Attempt extends DeprecatedModel
             AND {$this->_table}.finish IS NULL
         ";
 
-        if ($this->db->getRow($query)) {
+        if ($this->db->query($query)->fetch()) {
             return true;
         }
 
@@ -334,6 +334,6 @@ abstract class Evaluation_Attempt extends DeprecatedModel
             WHERE assess_attempt.attempt_id = " . $this->db->smartQuote($attempt_id) . "
         ";
 
-        return $this->db->getRow($query);
+        return $this->db->query($query)->fetch();
     }
 }

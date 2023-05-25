@@ -15,7 +15,7 @@ class Poll extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
     {
         $query = "SELECT *, UNIX_TIMESTAMP(close) close FROM " . $this->_table .
             " WHERE " . $this->_index . " = '{$this->db->quote($pollID)}'";
-        return $this->db->getRow($query);
+        return $this->db->query($query)->fetch();
     }
 
     public function getAllByCategory($folder_id)

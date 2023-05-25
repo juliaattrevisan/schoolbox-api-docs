@@ -46,7 +46,7 @@ abstract class Evaluation_Response extends DeprecatedModel
                   WHERE attempt_id = " . $this->db->smartQuote($attempt_id) . "
                   AND question_id = " . $this->db->smartQuote($question_id);
 
-        return $this->db->getRow($query);
+        return $this->db->query($query)->fetch();
     }
 
     /**
@@ -246,7 +246,7 @@ abstract class Evaluation_Response extends DeprecatedModel
             AND question_id = " . $this->db->smartQuote($question_id) . "
             AND assess_response.deleted_at IS NULL";
 
-        return $this->db->getRow($query);
+        return $this->db->query($query)->fetch();
     }
 
     /**

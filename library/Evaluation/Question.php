@@ -118,7 +118,7 @@ abstract class Evaluation_Question extends DeprecatedModel
                   FROM assess_luQuestionType
                   WHERE type_id = " . $this->db->smartQuote($type_id);
 
-        return $this->db->getRow($query);
+        return $this->db->query($query)->fetch();
     }
 
 

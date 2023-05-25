@@ -104,7 +104,7 @@ class FileType extends DeprecatedModel
             LIMIT 1
         ";
 
-        $mimeType = $this->db->getRow($query);
+        $mimeType = $this->db->query($query)->fetch();
 
         return $mimeType['iconFile'];
     }

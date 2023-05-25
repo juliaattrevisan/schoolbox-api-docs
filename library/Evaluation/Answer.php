@@ -168,7 +168,7 @@ abstract class Evaluation_Answer extends DeprecatedModel
                  FROM {$this->_table}
                  WHERE question_id = '$question_id'";
 
-        return $this->db->getRow($query);
+        return $this->db->query($query)->fetch();
     }
 
     /**
@@ -184,7 +184,7 @@ abstract class Evaluation_Answer extends DeprecatedModel
                   FROM {$this->_table}
                   WHERE question_id = '$question_id'";
 
-        return $this->db->getRow($query);
+        return $this->db->query($query)->fetch();
     }
 
     /**

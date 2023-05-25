@@ -77,7 +77,7 @@ abstract class Evaluation_Section extends DeprecatedModel
                   ORDER BY sequence
                   LIMIT 1";
 
-        return $this->db->getRow($query);
+        return $this->db->query($query)->fetch();
     }
 
     /**
@@ -97,7 +97,7 @@ abstract class Evaluation_Section extends DeprecatedModel
                   ORDER BY sequence DESC
                   LIMIT 1";
 
-        return $this->db->getRow($query);
+        return $this->db->query($query)->fetch();
     }
 
     /**

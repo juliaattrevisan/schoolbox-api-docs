@@ -52,7 +52,7 @@ class User extends DeprecatedModel
                     LEFT JOIN lu_year_level ON user.year_id = lu_year_level.id
                 WHERE user.id = '" . $this->db->quote($id) . "'
                 AND user.deleted_at IS NULL";
-        return $this->db->getRow($query);
+        return $this->db->query($query)->fetch();
     }
 
     public function getByUsername($username)
@@ -66,7 +66,7 @@ class User extends DeprecatedModel
                     LEFT JOIN lu_year_level lyl ON user.year_id = lyl.id
                 WHERE user.username = " . $this->db->smartQuote($username) . "
                 AND user.deleted_at IS NULL";
-        return $this->db->getRow($query);
+        return $this->db->query($query)->fetch();
     }
 
     public function getSuperusers()
@@ -105,7 +105,7 @@ class User extends DeprecatedModel
                     LEFT JOIN lu_year_level lyl ON user.year_id = lyl.id
                 WHERE user.synergy_id = '$sid'
                 AND user.deleted_at IS NULL";
-        return $this->db->getRow($query);
+        return $this->db->query($query)->fetch();
     }
 
 

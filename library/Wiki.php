@@ -63,7 +63,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 
         $query .= "ORDER BY r.created DESC LIMIT 1";
 
-        return $this->db->getRow($query);
+        return $this->db->query($query)->fetch();
     }
 
 
@@ -343,6 +343,6 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 
         $query .= "ORDER BY r.created DESC LIMIT 1";
 
-        return $this->db->getRow($query);
+        return $this->db->query($query)->fetch();
     }
 }

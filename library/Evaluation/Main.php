@@ -110,7 +110,7 @@ abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHo
                   FROM {$this->_table}
                   WHERE {$this->_index} = " . $this->db->smartQuote($assess_id);
 
-        return $this->db->getRow($query);
+        return $this->db->query($query)->fetch();
     }
 
     /**
