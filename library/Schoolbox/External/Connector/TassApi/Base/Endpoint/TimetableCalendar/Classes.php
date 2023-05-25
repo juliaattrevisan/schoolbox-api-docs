@@ -145,7 +145,7 @@ class Classes implements IStrategy
     /**
      * A caching mechanism to prevent dupe events
      *
-     * $eventEntries[$classCode][$startDate][$finishDate][$room] = $event
+     * $eventEntries[$classCode][$room][$startDate][$finishDate] = $event
      *
      * @var array
      */
@@ -161,7 +161,7 @@ class Classes implements IStrategy
     /**
      * A caching mechanism to prevent dupe CLEAR overrides actions
      *
-     * $overridesEntries[$classCode][$startDate][$finishDate] = true
+     * $overridesEntries[$classCode][$room][$startDate][$finishDate] = true
      *
      * @var array
      */
