@@ -13,8 +13,8 @@ use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool\App;
 
 /**
- * Tool for reloading the data within the assessment relation materialized view
- * `mv_assessment_relation`.
+ * Tool for reloading the data within the assessment relation cache table
+ * `assessment_relation`.
  */
 class Reloader extends App
 {
@@ -147,34 +147,34 @@ class Reloader extends App
 
         // Delete
         if ($this->perform()) {
-            $deleteQuery = $db->prepareQuery('DELETE FROM mv_assessment_relation');
+            $deleteQuery = $db->prepareQuery('DELETE FROM assessment_relation');
             $deleteQuery->execute();
             $deleteCount = $deleteQuery->rowCount();
             if ($deleteCount > 0) {
                 $this->getLogger()->notice(
-                    sprintf('Deleted %d mv_assessment_relation records', $deleteCount)
+                    sprintf('Deleted %d assessment_relation records', $deleteCount)
                 );
             }
         } else {
-            $deleteCountQuery = $db->prepareQuery('SELECT COUNT(*) FROM mv_assessment_relation');
+            $deleteCountQuery = $db->prepareQuery('SELECT COUNT(*) FROM assessment_relation');
             $deleteCountQuery->execute();
             $deleteCount = (int)$deleteCountQuery->fetchColumn();
             $this->getLogger()->notice(
-                sprintf('Would have deleted %d mv_assessment_relation records', $deleteCount)
+                sprintf('Would have deleted %d assessment_relation records', $deleteCount)
             );
         }
 
         // Re-insert
         if ($this->perform()) {
-            $this->getLogger()->notice('Inserting into mv_assessment_relation...');
+            $this->getLogger()->notice('Inserting into assessment_relation...');
             $insertQuery = $db->prepareQuery(
-                'SET STATEMENT max_statement_time=0 FOR INSERT INTO mv_assessment_relation '
+                'SET STATEMENT max_statement_time=0 FOR INSERT INTO assessment_relation '
                 . self::SELECT_ASSESSMENT_RELATION_SQL,
             );
             $insertQuery->execute();
             $insertCount = $insertQuery->rowCount();
             $this->getLogger()->notice(
-                sprintf('Inserted %d mv_assessment_relation records', $insertCount)
+                sprintf('Inserted %d assessment_relation records', $insertCount)
             );
         } else {
             $selectQuery = $db->prepareQuery(
@@ -184,7 +184,7 @@ class Reloader extends App
             $selectQuery->execute();
             $insertCount = $selectQuery->rowCount();
             $this->getLogger()->notice(
-                sprintf('Would have inserted %d mv_assessment_relation records', $insertCount)
+                sprintf('Would have inserted %d assessment_relation records', $insertCount)
             );
         }
 
@@ -222,7 +222,7 @@ SYNOPSIS:
 
 DESCRIPTION
     This tool reloads assessment relations, as stored in the
-    `mv_assessment_relation` table.
+    `assessment_relation` table.
 
     If the number of deleted and inserted assessment relations do not match,
     then there may be a data issue: this tool will suggest to run the reporting

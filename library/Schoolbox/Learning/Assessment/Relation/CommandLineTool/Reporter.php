@@ -15,7 +15,7 @@ use Schoolbox\Application\CliTool\App;
 
 /**
  * Tool for reporting on the consistency of the data within the assessment
- * relation materialized view `mv_assessment_relation`.
+ * relation cache table `assessment_relation`.
  *
  * Examines the contents of the materialized view, and compares those contents
  * to the data which populates it.
@@ -64,7 +64,7 @@ class Reporter extends App
         $hasDataIssue = false;
 
         // Collect expected rows
-        $logger->notice('Fetching expected mv_assessment_relation data...');
+        $logger->notice('Fetching expected assessment_relation data...');
         $selectExpectedDataQuery = $db->prepareQuery(
             'SET STATEMENT max_statement_time=0 FOR '
             . Reloader::SELECT_ASSESSMENT_RELATION_SQL,
@@ -74,8 +74,8 @@ class Reporter extends App
         $logger->info(sprintf('Fetched expected data: %d rows', count($expectedData)));
 
         // Collect actual rows
-        $logger->info('Fetching actual mv_assessment_relation data...');
-        $selectActualDataQuery = $db->prepareQuery('SELECT * FROM mv_assessment_relation');
+        $logger->info('Fetching actual assessment_relation data...');
+        $selectActualDataQuery = $db->prepareQuery('SELECT * FROM assessment_relation');
         $selectActualDataQuery->execute();
         $actualData = $selectActualDataQuery->fetchRowArray('assessment_id');
         $logger->info(sprintf('Fetched actual data: %d rows', count($actualData)));
@@ -169,7 +169,7 @@ SYNOPSIS:
 
 DESCRIPTION
     This tool reports on assessment relations, as stored in the
-    `mv_assessment_relation` table.
+    `assessment_relation` table.
 
     If the number of expected and actual assessment relations do not match,
     there is likely to be a data issue: this tool will report on the differences

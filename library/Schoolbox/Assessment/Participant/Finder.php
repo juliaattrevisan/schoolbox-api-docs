@@ -90,7 +90,7 @@ class Finder
                     a.due_date,
                     f.name AS folderName,
                     a.title AS assessmentTitle
-                FROM mv_assessment_relation var
+                FROM assessment_relation var
                 INNER JOIN assessment a              ON var.assessment_id = a.id
                 INNER JOIN folder f                  ON var.folder_id     = f.id
                 WHERE a.deleted_at IS NULL

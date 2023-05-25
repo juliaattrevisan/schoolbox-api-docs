@@ -1471,10 +1471,14 @@ class Mapper extends BaseMapper
 
 
     /**
-     * Update the materialized view table `mv_assessment_relation`.
+     * Update the assessment relation cache table `assessment_relation`: this
+     * cache table is an application-level implementation of the materialized
+     * view concept (https://en.wikipedia.org/wiki/Materialized_view), which is
+     * not currently supported by MariaDB.
      *
-     * This will be more fragile than updating with table-level triggers, but
-     * has the advantage of containing all updates within the application to be
+     * Updating the cache table in the application will be more fragile than
+     * updating with post-insert triggers, but will have the advantage of
+     * containing all updates within the application so that they may be
      * debugged there.
      *
      * @param Model $assessment
@@ -1483,7 +1487,7 @@ class Mapper extends BaseMapper
     protected function updateAssessmentRelationView(Model $assessment): bool
     {
         $updateQuery = $this->database->prepare('
-            REPLACE INTO mv_assessment_relation (
+            REPLACE INTO assessment_relation (
                 assessment_id,
                 folder_id,
                 project_assessment_id,

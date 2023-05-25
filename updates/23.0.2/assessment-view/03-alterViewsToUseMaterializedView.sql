@@ -13,7 +13,7 @@ select `a`.`id`                                          AS `assessment_id`,
        coalesce(`pp`.`close_date`, `a`.`close_date`)     AS `close_date`,
        `p`.`excluded_at`                                 AS `excluded_at`
 from (((`assessment` `a`
-    join `mv_assessment_relation` `var` on (
+    join `assessment_relation` `var` on (
         `a`.`id` = `var`.`assessment_id`
         and `var`.`course_specification_id` is null
         and `var`.`course_unit_specification_id` is null

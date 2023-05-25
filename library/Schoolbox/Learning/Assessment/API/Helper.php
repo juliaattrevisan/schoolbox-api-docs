@@ -230,7 +230,7 @@ class Helper
              lu_work_type.name AS `workTypeName`,
              lu_work_type.id AS `workTypeId`,
              assessment.due_date,
-             mv_assessment_relation.folder_id AS `folderId`,
+             assessment_relation.folder_id AS `folderId`,
              COALESCE(
                  IF(task.id, 'task', NULL),
                  IF(assess.assessment_id, 'quiz', NULL),
@@ -245,14 +245,14 @@ class Helper
                  FROM course_specification
                  JOIN course_implementation ON (
                     course_implementation.course_specification_id = course_specification.id AND
-                    mv_assessment_relation.course_implementation_id = course_implementation.id
+                    assessment_relation.course_implementation_id = course_implementation.id
                  )
              ) AS `subjectCode`,
              (
                  SELECT GROUP_CONCAT(id)
                  FROM lu_year_level
                  LEFT JOIN folder_year_level ON folder_year_level.year_level_id = lu_year_level.id
-                 WHERE folder_year_level.folder_id = mv_assessment_relation.folder_id
+                 WHERE folder_year_level.folder_id = assessment_relation.folder_id
              ) AS `yearLevelId`,
              markTypeTable.hr_name AS markType,
              projectParent.assessment_id AS `project`
@@ -260,17 +260,17 @@ class Helper
         );
 
         $from = (
-            "FROM mv_assessment_relation
-             JOIN assessment ON mv_assessment_relation.assessment_id = assessment.id
+            "FROM assessment_relation
+             JOIN assessment ON assessment_relation.assessment_id = assessment.id
              LEFT JOIN lu_work_type ON assessment.work_type_id = lu_work_type.id
              LEFT JOIN task ON assessment.id = task.assessment_id
              LEFT JOIN assess ON assessment.id = assess.assessment_id
              LEFT JOIN lti_assessment ON assessment.id = lti_assessment.assessment_id
              LEFT JOIN project ON assessment.id = project.assessment_id
              LEFT JOIN submission_box ON assessment.id = submission_box.assessment_id
-             LEFT JOIN folder ON mv_assessment_relation.folder_id = folder.id
+             LEFT JOIN folder ON assessment_relation.folder_id = folder.id
              LEFT JOIN submission_mark_type AS markTypeTable ON submission_box.mark_type = markTypeTable.mark_type_id
-             LEFT JOIN project projectParent ON projectParent.id = mv_assessment_relation.project_assessment_id
+             LEFT JOIN project projectParent ON projectParent.id = assessment_relation.project_assessment_id
              LEFT JOIN lesson_plan ON assessment.id = lesson_plan.assessment_id
              "
         );
@@ -279,7 +279,7 @@ class Helper
             "
         );
         if (array_key_exists('assessmentId', $filter)) {
-            $where .= " AND mv_assessment_relation.assessment_id = :assessmentId ";
+            $where .= " AND assessment_relation.assessment_id = :assessmentId ";
             $params['assessmentId'] = $filter['assessmentId'];
         }
         if (array_key_exists('assessmentType', $filter)) {
@@ -352,11 +352,11 @@ class Helper
             if (array_key_exists('id', $filter['yearLevel'])) {
                 $where .= " AND folder_year_level.year_level_id = :yearLevelId ";
                 $params['yearLevelId'] = $filter['yearLevel']['id'];
-                $from .= "JOIN folder_year_level on folder_year_level.folder_id = mv_assessment_relation.folder_id";
+                $from .= "JOIN folder_year_level on folder_year_level.folder_id = assessment_relation.folder_id";
             } elseif (array_key_exists('name', $filter['yearLevel'])) {
                 $where .= " AND lu_year_level.name = :yearLevelName ";
                 $params['yearLevelName'] = $filter['yearLevel']['name'];
-                $from .= "JOIN folder_year_level on folder_year_level.folder_id = mv_assessment_relation.folder_id
+                $from .= "JOIN folder_year_level on folder_year_level.folder_id = assessment_relation.folder_id
                 JOIN lu_year_level on folder_year_level.year_level_id= lu_year_level.id";
             }
         }
@@ -388,7 +388,7 @@ class Helper
             if (!empty($folderCodes)) {
                 $folderCodesBindings = Builder::getBindings($folderCodes, 'codes');
                 $where .= " folder_code.code in ({$folderCodesBindings->getPlaceholder()}) ";
-                $from .= " JOIN folder_code on (mv_assessment_relation.folder_id = folder_code.folder_id and folder_code.deleted_at is NULL) ";
+                $from .= " JOIN folder_code on (assessment_relation.folder_id = folder_code.folder_id and folder_code.deleted_at is NULL) ";
                 $params = array_merge($params, $folderCodesBindings->getParams());
             }
             $where .= " ) ";
@@ -397,7 +397,7 @@ class Helper
         if (array_key_exists('subjectCode', $filter)) {
             $subjectCodesBindings = Builder::getBindings($filter['subjectCode'], 'codes');
 
-            $from .= " JOIN course_implementation on mv_assessment_relation.course_implementation_id = course_implementation.id
+            $from .= " JOIN course_implementation on assessment_relation.course_implementation_id = course_implementation.id
                 JOIN course_specification on (course_implementation.course_specification_id = course_specification.id and
                 course_specification.subject_code in ({$subjectCodesBindings->getPlaceholder()}))
             ";

@@ -15,8 +15,8 @@ use Schoolbox\Learning\Assessment\Relation\CommandLineTool\Reloader;
 require_once __DIR__ . '/../../conf/core/require.php';
 
 /**
- * Reload the assessment relation materialized view `mv_assessment_relation`,
- * based on the definition of the view `v_assessment_relation`.
+ * Reload the assessment relation cache table `assessment_relation`, based on
+ * the definition of the view `v_assessment_relation`.
  */
 
 $app     = new Reloader();
