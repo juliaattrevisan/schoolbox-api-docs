@@ -15,7 +15,7 @@ const addCurriculumStore = useAddCurriculumStore();
  *
  * @returns { String }
  */
-const ckeditorInstance = window.Vue.computed(() => `new-curriculum`);
+const ckeditorIdAttr = `new-curriculum`;
 
 const addButton = ref<HTMLButtonElement | null>(null);
 
@@ -48,7 +48,7 @@ const isAddDisabled = window.Vue.computed(() => {
  */
 const descriptionFieldValue = useDescriptionEditor(
     addCurriculumStore.curriculum?.description as string,
-    ckeditorIdAttr.value,
+    ckeditorIdAttr,
     addButton,
     isAddDisabled
 );
