@@ -12,13 +12,10 @@ use Schoolbox\UserMapper;
  */
 class Eportfolio
 {
-
     /**
-     * An instance of dbManager
-     *
-     * @var DeprecatedDatabase|null
+     * A database connection
      */
-    private $db = null;
+    private Database $db;
 
     /**
      * The current user id
@@ -72,7 +69,7 @@ class Eportfolio
      */
     public function __construct($userId, $pageId)
     {
-        $this->setDb(DeprecatedDatabase::getInstance());
+        $this->db = Database::getInstance();
         $this->setUserId($userId);
         $this->setPageId($pageId);
 
@@ -179,13 +176,13 @@ class Eportfolio
     {
         $allTemplates = [];
 
-        $query = "
-			SELECT id, name
-			FROM {$this->getContext()}Template
-			ORDER BY id
-		";
+        $query = $this->db->query("
+            SELECT id, name
+            FROM {$this->db->getQuoter()->quoteIdentifier($this->getContext() . 'Template')}
+            ORDER BY id
+        ");
 
-        $result = $this->getDb()->getAll($query);
+        $result = $query->fetchAll();
 
         /* Do some transpositionary reflex
          */
@@ -319,18 +316,20 @@ class Eportfolio
      */
     public function createEportfolioFromTemplate($pageTitle, $templateID)
     {
-        $userId     = $this->db->quote($this->getUserId());
-        $templateID = $this->db->quote($templateID);
+        $userId = $this->getUserId();
 
         /* Retrieve template data
          */
-        $query = "
-			SELECT id AS template, left_column_width, right_column_width
-			FROM {$this->getContext()}Template
-			WHERE id = '{$templateID}'
-		";
+        $query = $this->db->query(
+            "
+                SELECT id AS template, left_column_width, right_column_width
+                FROM {$this->db->getQuoter()->quoteIdentifier($this->getContext() . 'Template')}
+                WHERE id = ?
+            ",
+            [$templateID]
+        );
 
-        $tpl = $this->db->getRow($query);
+        $tpl = $query->fetch();
 
         /* Compile an eportfolioConfig record
          */
@@ -340,8 +339,6 @@ class Eportfolio
             'template'           => $templateID,
             'left_column_width'  => $tpl['left_column_width'],
             'right_column_width' => $tpl['right_column_width'],
-            'created_at'         => 'NOW()',
-            'updated_at'         => 'NOW()',
         ];
 
         foreach (['top', 'left', 'right'] as $position) {
@@ -355,12 +352,57 @@ class Eportfolio
 
         /* Insert it
          */
-        $this->db->insert($this->getContext() . '_page', $eportfolioConfig);
+        $query = $this->db->query(
+            "
+                INSERT INTO {$this->db->getQuoter()->quoteIdentifier($this->getContext() . '_page')} (
+                    uid,
+                    page_title,
+                    template,
+                    left_column_width,
+                    right_column_width,
+                    created_at,
+                    updated_at,
+                    top_head_font,
+                    top_head_bg,
+                    top_font,
+                    top_bg_primary,
+                    left_head_font,
+                    left_head_bg,
+                    left_font,
+                    left_bg_primary,
+                    right_head_font,
+                    right_head_bg,
+                    right_font,
+                    right_bg_primary
+                ) VALUES (
+                    :uid,
+                    :page_title,
+                    :template,
+                    :left_column_width,
+                    :right_column_width,
+                    NOW(),
+                    NOW(),
+                    :top_head_font,
+                    :top_head_bg,
+                    :top_font,
+                    :top_bg_primary,
+                    :left_head_font,
+                    :left_head_bg,
+                    :left_font,
+                    :left_bg_primary,
+                    :right_head_font,
+                    :right_head_bg,
+                    :right_font,
+                    :right_bg_primary
+                )
+            ",
+            $eportfolioConfig,
+        );
 
         /* Remember the page that was just created, because we'll apply
          * permissions to it after it gets created
          */
-        $this->setPageId($this->db->insertID());
+        $this->setPageId($this->db->lastInsertId());
 
         // retrieve, rearrange and reinsert the componentry
         $cim       = Component_InstanceMapper::getInstance();
@@ -473,27 +515,25 @@ class Eportfolio
     {
 
         $query = "
-			UPDATE {$this->getContext()}_page
-			SET
-		";
+            UPDATE {$this->db->getQuoter()->quoteIdentifier($this->getContext() . '_page')}
+            SET
+        ";
 
-        $stack = [];
+        $stack  = [];
+        $params = [];
 
         foreach ($listColor as $key => $color) {
-            $key = str_replace('font_primary', 'font', $key);
-            $field = $this->db->quote($key);
-            $value = $this->db->quote($color);
-
-            $stack[] = "`{$field}` = '{$value}'";
+            $key      = str_replace('font_primary', 'font', $key);
+            $field    = $this->db->getQuoter()->quoteIdentifier($key);
+            $params[] = $color;
+            $stack[]  = "`{$field}` = ?";
         }
 
         $query .= implode(',', $stack);
+        $query .= " WHERE page_id = ?";
+        $params[] = $this->getPageId();
 
-        $query .= "
-			WHERE page_id = {$this->getPageId()}
-		";
-
-        return $this->db->query($query);
+        return $this->db->query($query, $params);
     }
 
     /**
@@ -503,41 +543,27 @@ class Eportfolio
      */
     public function savePageTemplate($template)
     {
-        $query = "
-			SELECT uid
-			FROM {$this->getContext()}_page
-			WHERE uid = '{$this->getUserId()}'
-		";
+        $pageTable = $this->db->getQuoter()->quoteIdentifier($this->getContext() . '_page');
+        $query = $this->db->query(
+            "
+                SELECT uid
+                FROM $pageTable
+                WHERE uid = ?
+            ",
+            [$this->getUserId()]
+        );
 
-        $this->db->query($query);
-
-        if ($row = $this->db->getNextArray()) {
-            $query = "UPDATE {$this->getContext()}_page SET template = '$template' WHERE uid = '{$this->getUserId()}'";
+        if ($query->rowCount() > 0) {
+            $query = "UPDATE $pageTable SET template = '$template' WHERE uid = '{$this->getUserId()}'";
         } else {
-            $query = "INSERT INTO {$this->getContext()}_page (uid, template) VALUES ('{$this->getUserID()}', '$template')";
+            $query = "INSERT INTO $pageTable (template, uid) VALUES (?, ?)";
         }
 
-        $this->db->query($query);
+        $this->db->query($query, [$template, $this->getUserId()]);
     }
 
     /* Getters/Setters
      */
-
-    /**
-     * @param \DeprecatedDatabase|null $db
-     */
-    private function setDb($db)
-    {
-        $this->db = $db;
-    }
-
-    /**
-     * @return \DeprecatedDatabase|null
-     */
-    private function getDb()
-    {
-        return $this->db;
-    }
 
     /**
      * Set user id
