@@ -64,7 +64,7 @@ class Poll extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
         }
 
         $query = "SELECT count(*) FROM pollLog WHERE poll_id = '{$this->db->quote($pollID)}' $cutoff AND user_id = '{$this->db->quote($_SESSION['id'])}'";
-        $vote  = $this->db->getOne($query);
+        $vote  = $this->db->query($query)->fetchColumn();
 
         if ($vote > 0) {
             return true;
@@ -75,7 +75,7 @@ class Poll extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
     public function open($pollID)
     {
         $query = "SELECT count(*) FROM poll WHERE id = '{$this->db->quote($pollID)}' AND close > NOW()";
-        $vote  = $this->db->getOne($query);
+        $vote  = $this->db->query($query)->fetchColumn();
         if ($vote > 0) {
             return true;
         }

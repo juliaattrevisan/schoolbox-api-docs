@@ -181,7 +181,7 @@ class Assess_Main extends Evaluation_Main
                     WHERE ass.assess_id = " . $this->db->smartQuote($assess_id) . "
                     AND assm.close_date > NOW()";
 
-        $result = $this->db->getOne($query);
+        $result = $this->db->query($query)->fetchColumn();
 
         if (!$result) {
             return true;

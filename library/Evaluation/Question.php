@@ -81,7 +81,7 @@ abstract class Evaluation_Question extends DeprecatedModel
                   WHERE section_id = " . $this->db->smartQuote($section_id) . "
                   AND deleted_at IS NULL";
 
-        $sequence = $this->db->getOne($query);
+        $sequence = $this->db->query($query)->fetchColumn();
 
         if ($sequence) {
             return $sequence;
@@ -216,7 +216,7 @@ abstract class Evaluation_Question extends DeprecatedModel
                   AND assess_section.deleted_at IS NULL
                   AND assess.assess_id = " . $this->db->smartQuote($assess_id);
 
-        return $this->db->getOne($query);
+        return $this->db->query($query)->fetchColumn();
     }
 
     /**

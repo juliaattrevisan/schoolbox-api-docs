@@ -327,7 +327,7 @@ abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHo
                   WHERE assess_id = " . $this->db->smartQuote($assess_id) . "
                   AND user_id = " . $this->db->smartQuote($uid);
 
-        return $this->db->getOne($query);
+        return $this->db->query($query)->fetchColumn();
     }
 
     /**
@@ -378,7 +378,7 @@ abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHo
                   WHERE assess_id = " . $this->db->smartQuote($assess_id) . "
                   AND finish > NOW()";
 
-        $result = $this->db->getOne($query);
+        $result = $this->db->query($query)->fetchColumn();
 
         if (!$result) {
             return true;
@@ -400,7 +400,7 @@ abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHo
                   WHERE assess_id = " . $this->db->smartQuote($assess_id) . "
                   AND deleted_at IS NULL";
 
-        $result = $this->db->getOne($query);
+        $result = $this->db->query($query)->fetchColumn();
 
         if (!$result) {
             return true;
@@ -438,7 +438,7 @@ abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHo
                   FROM {$this->_table}
                   WHERE assess_id = " . $this->db->smartQuote($assess_id);
 
-        return $this->getAvailabilityType() == $this->db->getOne($query);
+        return $this->getAvailabilityType() == $this->db->query($query)->fetchColumn();
     }
 
     /**

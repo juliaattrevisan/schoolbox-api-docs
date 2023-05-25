@@ -215,7 +215,7 @@ class User extends DeprecatedModel
         // retreive count
         $count_query = "SELECT COUNT(*) FROM `user` LEFT JOIN `groups` ON `user`.group_id = `groups`.id WHERE $wherePart";
 
-        $count       = $this->db->getOne($count_query);
+        $count       = $this->db->query($count_query)->fetchColumn();
         return $this->db->query($query)->fetchAll();
     }
 
@@ -274,7 +274,7 @@ class User extends DeprecatedModel
                                     OR username = '$keyword'
                                 )
                                 $wherePart";
-        $count       = $this->db->getOne($count_query);
+        $count       = $this->db->query($count_query)->fetchColumn();
         return $this->db->query($query)->fetchAll();
     }
 

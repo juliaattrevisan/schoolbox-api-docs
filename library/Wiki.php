@@ -35,7 +35,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
     {
         $query = 'SELECT latestRevision FROM ' . $this->_table . " WHERE wikiID = '{$this->db->quote($wikiID)}'";
 
-        $latestRevisionID = $this->db->getOne($query);
+        $latestRevisionID = $this->db->query($query)->fetchColumn();
 
         return $this->getByID($wikiID, $latestRevisionID);
     }
@@ -276,7 +276,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
                             AND `deleted` = 'false'
             ";
 
-        $count = $this->db->getOne($count_query);
+        $count = $this->db->query($count_query)->fetchColumn();
 
         return $this->db->query($query)->fetchAll();
     }

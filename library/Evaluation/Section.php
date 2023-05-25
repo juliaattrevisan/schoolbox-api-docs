@@ -51,7 +51,7 @@ abstract class Evaluation_Section extends DeprecatedModel
                   WHERE assess_id = " . $this->db->smartQuote($assess_id) . "
                   AND deleted_at IS NULL";
 
-        $sequence = $this->db->getOne($query);
+        $sequence = $this->db->query($query)->fetchColumn();
 
         if ($sequence) {
             return $sequence;
@@ -234,8 +234,8 @@ abstract class Evaluation_Section extends DeprecatedModel
             $numResponses .= " AND assess_response.response != 'N;'";
             $numResponses .= " AND assess_response.response != ''";
 
-            $currentSection['numQuestions'] = $this->db->getOne($numQuestions);
-            $currentSection['numResponses'] = $this->db->getOne($numResponses);
+            $currentSection['numQuestions'] = $this->db->query($numQuestions)->fetchColumn();
+            $currentSection['numResponses'] = $this->db->query($numResponses)->fetchColumn();
 
             if ($currentSection['numQuestions'] > 0) {
                 $currentSection['percentageComplete'] = round(100 * $currentSection['numResponses'] / $currentSection['numQuestions']);
@@ -288,7 +288,7 @@ abstract class Evaluation_Section extends DeprecatedModel
                   WHERE section_id = " . $this->db->smartQuote($section_id) . "
                   AND deleted_at IS NULL";
 
-        $result = $this->db->getOne($query);
+        $result = $this->db->query($query)->fetchColumn();
 
         if (!$result) {
             return true;

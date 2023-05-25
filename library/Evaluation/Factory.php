@@ -119,7 +119,7 @@ abstract class Evaluation_Factory extends DeprecatedModel
                   FROM assess_luQuestionType
                   WHERE type_id = " . $this->db->smartQuote($type_id);
 
-        return $this->db->getOne($query);
+        return $this->db->query($query)->fetchColumn();
     }
 
     /**
@@ -134,7 +134,7 @@ abstract class Evaluation_Factory extends DeprecatedModel
                   FROM assess_luQuestionType
                   WHERE type_id = " . $this->db->smartQuote($type_id);
 
-        return $this->db->getOne($query);
+        return $this->db->query($query)->fetchColumn();
     }
 
     /**
@@ -149,7 +149,7 @@ abstract class Evaluation_Factory extends DeprecatedModel
                   FROM assess_luQuestionType
                   WHERE type_id = " . $this->db->smartQuote($type_id);
 
-        return $this->db->getOne($query);
+        return $this->db->query($query)->fetchColumn();
     }
 
     /**

@@ -113,7 +113,7 @@ class Group extends DeprecatedModel
     public function getGroupType($groupID)
     {
         $query = "SELECT group_type FROM `groups` WHERE id = \"{$groupID}\"";
-        return $this->db->getOne($query);
+        return $this->db->query($query)->fetchColumn();
     }
 
     /**
@@ -380,7 +380,7 @@ class Group extends DeprecatedModel
             ORDER BY `type` DESC LIMIT 1
         ";
 
-        $permission = $this->db->getOne($query);
+        $permission = $this->db->query($query)->fetchColumn();
         $permission = (int)$permission;
 
         // allow staff write access to UserAccess::SERVICE_NEWS by default except at shore...
@@ -520,7 +520,7 @@ class Group extends DeprecatedModel
 			AND userAccess.sid = folder.id
 			AND folder.deleted_at IS NULL
 			AND folder.id = '$cid'";
-        return $this->db->getOne($query);
+        return $this->db->query($query)->fetchColumn();
     }
 
     public function involvedInSubject($code, $userId = null)
@@ -668,7 +668,7 @@ class Group extends DeprecatedModel
     public function getGroupName($groupID)
     {
         $query = "SELECT name FROM `groups` WHERE id = \"{$groupID}\"";
-        return $this->db->getOne($query);
+        return $this->db->query($query)->fetchColumn();
     }
 
     /**

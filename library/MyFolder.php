@@ -56,7 +56,7 @@ class MyFolder extends DeprecatedModel
     public function getParent($id)
     {
         $query = "SELECT parent FROM " . $this->_table . " WHERE id = " . (int)$id;
-        return $this->db->getOne($query);
+        return $this->db->query($query)->fetchColumn();
     }
 
 
@@ -143,7 +143,7 @@ class MyFolder extends DeprecatedModel
                   WHERE parent = {$this->db->quote($folderID)}
                   LIMIT 1";
 
-        return $this->db->getOne($query);
+        return $this->db->query($query)->fetchColumn();
     }
 
 

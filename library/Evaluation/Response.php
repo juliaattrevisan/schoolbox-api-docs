@@ -165,7 +165,7 @@ abstract class Evaluation_Response extends DeprecatedModel
                   AND assess_question.deleted_at IS NULL
                   AND automarked_already = 'true'";
 
-        return $this->db->getOne($query);
+        return $this->db->query($query)->fetchColumn();
     }
 
     /**
@@ -186,7 +186,7 @@ abstract class Evaluation_Response extends DeprecatedModel
                   AND assess_question.deleted_at IS NULL
                   AND (automarked_already = 'false' OR automarked_already IS NULL)";
 
-        return $this->db->getOne($query);
+        return $this->db->query($query)->fetchColumn();
     }
 
     /**
@@ -206,7 +206,7 @@ abstract class Evaluation_Response extends DeprecatedModel
                   AND assess_question.deleted_at IS NULL
                   AND (automarked_already = 'false' OR automarked_already IS NULL)";
 
-        $value = $this->db->getOne($query);
+        $value = $this->db->query($query)->fetchColumn();
 
         if ($value) {
             return $value;

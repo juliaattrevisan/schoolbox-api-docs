@@ -255,7 +255,7 @@ class ThreadMapper extends Mapper implements FeedableMapperInterface, IHomepageC
     {
         /** replacement for forumHandler->hasForum the code:
          *
-         * ```$result = $this->db->getOne($query);
+         * ```$result = $this->db->query($query)->fetchColumn();
          * if (isset($result)) {
          * return true;
          * }

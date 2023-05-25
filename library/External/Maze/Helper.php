@@ -74,7 +74,7 @@ class External_Maze_Helper
                           TT.TTKEY = TH.TT12KEY OR
                           TT.TTKEY = TH.TT13KEY
                   WHERE TH.THKEY = '{$this->getCurrentTHKEY()}'";
-        return $this->db->getOne($query);
+        return $this->db->query($query)->fetchColumn();
     }
 
     /**
@@ -126,7 +126,7 @@ class External_Maze_Helper
 			ORDER BY TH.CALENDAR_END01,TH.CALENDAR_END02,TH.CALENDAR_END03,TH.CALENDAR_END04 ASC
 		";
 
-        $value = $this->db->getOne($query);
+        $value = $this->db->query($query)->fetchColumn();
         if ($value === false) {
             return '';
         }
