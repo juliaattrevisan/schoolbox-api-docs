@@ -133,7 +133,8 @@
     "config": {
         "allow-plugins": {
             "dealerdirect/phpcodesniffer-composer-installer": true,
-            "ramsey/composer-repl": true
+            "ramsey/composer-repl": true,
+            "php-http/discovery": true
         }
     }
 }
