@@ -5,6 +5,12 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
+/**
+ * Homepage activity dashboard component.
+ *
+ * @deprecated Notifications exist
+ */
 class Component_Dashboard_HomepageNewsController extends Component_Dashboard_ControllerAbstract
 {
     /** @var array $feedList */
