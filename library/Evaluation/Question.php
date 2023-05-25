@@ -103,7 +103,7 @@ abstract class Evaluation_Question extends DeprecatedModel
                   OR availability = 'assess'
                   ORDER BY type_id";
 
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 
     /**
@@ -149,7 +149,7 @@ abstract class Evaluation_Question extends DeprecatedModel
             ORDER BY assess_section.sequence, assess_question.sequence
         ";
 
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 
     /**
@@ -166,7 +166,7 @@ abstract class Evaluation_Question extends DeprecatedModel
                   AND deleted_at IS NULL
                   ORDER BY sequence";
 
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 
     /**
@@ -246,8 +246,8 @@ abstract class Evaluation_Question extends DeprecatedModel
                     UPDATE {$this->_table}
                     JOIN assess_section on assess_section.section_id = {$this->_table}.section_id
                     SET {$this->_table}.sequence = {$sequence}
-                    WHERE question_id = {$currentId} 
-                    AND {$this->_table}.section_id = {$sectionId} 
+                    WHERE question_id = {$currentId}
+                    AND {$this->_table}.section_id = {$sectionId}
                     AND assess_id = {$quizId}
                     AND {$this->_table}.deleted_at IS NULL
                 ");

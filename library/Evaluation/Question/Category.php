@@ -40,7 +40,7 @@ abstract class Evaluation_Question_Category extends DeprecatedModel
                   AND parent_id = " . $this->db->smartQuote($parent_id) . "
                   ORDER BY name";
 
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 
     /**
@@ -65,7 +65,7 @@ abstract class Evaluation_Question_Category extends DeprecatedModel
                   GROUP BY question_category_id
                   ORDER BY name";
 
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 
     /**

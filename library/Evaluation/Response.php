@@ -74,7 +74,7 @@ abstract class Evaluation_Response extends DeprecatedModel
                   AND automated_marking = 'true'
                   AND (automarked_already = 'false' OR automarked_already IS NULL)";
 
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 
     /**
@@ -119,7 +119,7 @@ abstract class Evaluation_Response extends DeprecatedModel
                   AND deleted_at IS NULL
                   ORDER BY sequence";
 
-        $allQuestions = $this->db->getAll($query) ?: [];
+        $allQuestions = $this->db->query($query)->fetchAll() ?: [];
 
         /* Optionally randomise
          */
@@ -258,6 +258,6 @@ abstract class Evaluation_Response extends DeprecatedModel
     public function getResponsesToQuestion($question_id)
     {
         $query = "SELECT * FROM assess_response WHERE question_id = " . $this->db->smartQuote($question_id) . " AND deleted_at IS NULL";
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 }

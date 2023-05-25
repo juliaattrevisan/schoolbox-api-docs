@@ -69,7 +69,7 @@ class Group extends DeprecatedModel
 				   FROM userGroups
 				  WHERE cid = '{$categoryId}' AND type >= '" . \Schoolbox\Resource\Group::MODERATED_GROUP . "'";
 
-        $result = $this->db->getAll($query);
+        $result = $this->db->query($query)->fetchAll();
 
         /* If there are results, they are already subscribed
            */
@@ -92,7 +92,7 @@ class Group extends DeprecatedModel
     {
         $query = "SELECT id FROM `groups` WHERE group_type = \"{$name}\"";
 
-        $allIds = $this->db->getAll($query);
+        $allIds = $this->db->query($query)->fetchAll();
 
         $ids = array();
 
@@ -159,7 +159,7 @@ class Group extends DeprecatedModel
     public function getAllUserAccess($uid)
     {
         $query = "SELECT service, lu_service.name, sid, type FROM userAccess JOIN lu_service ON service=lu_service.id WHERE uid='$uid'";
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 
     public function groupExists($relationID)

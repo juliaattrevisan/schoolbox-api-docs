@@ -74,7 +74,7 @@ class User extends DeprecatedModel
         $query = "SELECT user.id uid, title, firstname, preferred_name, lastname, username, local_email, alt_email
                 FROM superusers JOIN user ON superusers.id = user.id
                 WHERE user.deleted_at IS NULL";
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 
     public function getUserCampus($id)
@@ -216,7 +216,7 @@ class User extends DeprecatedModel
         $count_query = "SELECT COUNT(*) FROM `user` LEFT JOIN `groups` ON `user`.group_id = `groups`.id WHERE $wherePart";
 
         $count       = $this->db->getOne($count_query);
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 
 
@@ -275,7 +275,7 @@ class User extends DeprecatedModel
                                 )
                                 $wherePart";
         $count       = $this->db->getOne($count_query);
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 
     /**
@@ -372,13 +372,13 @@ class User extends DeprecatedModel
         if (is_numeric($limit)) {
             $query .= " LIMIT $limit";
         }
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 
     public function getCampusList()
     {
         $query = "SELECT * FROM luCampus WHERE luCampus.deleted_at IS NULL ORDER BY sequence";
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 
     public function getGroupList()
@@ -386,7 +386,7 @@ class User extends DeprecatedModel
         $query = "SELECT * FROM `groups`
                   WHERE deleted_at IS NULL
                   ORDER BY name";
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 
     public function getUserActivity($uid, $limit = 10)
@@ -399,7 +399,7 @@ class User extends DeprecatedModel
                     WHERE user = $uid
                     ORDER BY time DESC
                     LIMIT 0,$limit";
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 
     /**
@@ -412,7 +412,7 @@ class User extends DeprecatedModel
         $query = "SELECT date, ip, login FROM login_log WHERE username like "
             . $this->db->smartQuote($username)
             . " ORDER BY date DESC LIMIT 0,$limit";
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 
     /**
@@ -439,7 +439,7 @@ class User extends DeprecatedModel
                         AND synergy_id > 0
                         AND user.deleted_at IS NULL";
         }
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 
     /**

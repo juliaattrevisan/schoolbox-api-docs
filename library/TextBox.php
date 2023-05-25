@@ -14,7 +14,7 @@ class TextBox extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
     function getAllByCategory($categoryID)
     {
         $query = "SELECT * FROM " . $this->_table . " WHERE categoryID = $categoryID AND deleted = 'false' ORDER BY heading";
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 
     function getCurrent($categoryID)
@@ -72,6 +72,6 @@ class TextBox extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
                   ORDER BY $sort_by $sort_dir
                   LIMIT $offset, $limit";
 
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 }

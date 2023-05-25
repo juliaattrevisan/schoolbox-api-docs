@@ -60,7 +60,7 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 
         $query .= " ORDER BY time ASC";
 
-        $logs = $this->db->getAll($query);
+        $logs = $this->db->query($query)->fetchAll();
 
         if (!empty($logs)) {
             $userHandler = new User();
@@ -155,7 +155,7 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
             AND chat_poll.time >= '{$this->db->quote($time->format('Y-m-d H:i:s'))}'
         ";
 
-        $users = $this->db->getAll($query);
+        $users = $this->db->query($query)->fetchAll();
 
         if (!empty($users)) {
             $userHandler = new User();
@@ -278,6 +278,6 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
             $query .= " LIMIT $index, $limit";
         }
 
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 }

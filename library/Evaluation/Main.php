@@ -95,7 +95,7 @@ abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHo
             $query .= " LIMIT $limit";
         }
 
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 
     /**
@@ -136,7 +136,7 @@ abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHo
             GROUP BY assess_section.section_id
         ";
 
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 
     /**
@@ -252,7 +252,7 @@ abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHo
                   AND assess_section.deleted_at IS NULL
                   ORDER BY sectionSequence, questionSequence";
 
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 
     /**

@@ -79,7 +79,7 @@ class Assess_Main extends Evaluation_Main
             $query .= " LIMIT $limit";
         }
 
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 
     /**
@@ -92,7 +92,7 @@ class Assess_Main extends Evaluation_Main
     {
         $query = "SELECT assess_id FROM assess WHERE category_id = '{$category_id}' AND availability = 'assess'";
 
-        $allAssess = $this->db->getAll($query);
+        $allAssess = $this->db->query($query)->fetchAll();
 
         if (is_array($allAssess) && count($allAssess)) {
             /* Get a list of questions and answers to softdelete

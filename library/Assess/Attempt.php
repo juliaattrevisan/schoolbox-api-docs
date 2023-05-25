@@ -43,7 +43,7 @@ class Assess_Attempt extends Evaluation_Attempt
             ORDER BY u.lastname ASC, u.chosen_name ASC, u.id ASC
         ";
 
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 
     /**
@@ -66,7 +66,7 @@ class Assess_Attempt extends Evaluation_Attempt
             ORDER BY user_id, `start` DESC
         ";
         $results = [];
-        $rows = $this->db->getAll($query);
+        $rows = $this->db->query($query)->fetchAll();
         if (!$rows) {
             return [];
         }

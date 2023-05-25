@@ -85,7 +85,7 @@ abstract class Evaluation_Attempt extends DeprecatedModel
                   AND assess_response.deleted_at IS NULL
                   GROUP BY assess_attempt.attempt_id";
 
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 
 
@@ -115,7 +115,7 @@ abstract class Evaluation_Attempt extends DeprecatedModel
                   AND assess_response.deleted_at IS NULL
                   GROUP BY assess_attempt.attempt_id";
 
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 
     /**
@@ -145,7 +145,7 @@ abstract class Evaluation_Attempt extends DeprecatedModel
                   AND assess_attempt.deleted_at IS NULL
                   GROUP BY assess_attempt.attempt_id";
 
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 
     /**

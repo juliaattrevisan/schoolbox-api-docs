@@ -61,7 +61,7 @@ class Calendar extends DeprecatedModel
 			AND ea.status = {$status}
 		";
 
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 
     /**
@@ -111,7 +111,7 @@ class Calendar extends DeprecatedModel
             WHERE ea.event_id = '{$eventId}'
         ";
 
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 
     public function getAttendance($attendanceId)
@@ -123,7 +123,7 @@ class Calendar extends DeprecatedModel
             LIMIT 1
         ";
 
-        return $this->db->getRow($query);
+        return $this->db->query($query)->fetch();
     }
 
     public function getAttendanceByEventAndUser($eventId, $userId)
@@ -136,7 +136,7 @@ class Calendar extends DeprecatedModel
             LIMIT 1
         ";
 
-        return $this->db->getRow($query);
+        return $this->db->query($query)->fetch();
     }
 
     public function updateAttendance($attendance)
@@ -160,7 +160,7 @@ class Calendar extends DeprecatedModel
             //build cache of colours on first call
             $query  = "SELECT eventTypeID, eventColour FROM luEventType";
             $result = $this->db->query($query);
-            while ($row = $this->db->getNextArray($result)) {
+            foreach ($result as $row) {
                 $this->colourSet[$row['eventTypeID']] = $row['eventColour'];
             }
         }
@@ -252,7 +252,7 @@ class Calendar extends DeprecatedModel
     public function getTypeList()
     {
         $query = "SELECT eventTypeID, eventType, eventColour FROM luEventType WHERE deleted_at IS NULL ORDER BY sequence ASC";
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 
 
@@ -277,7 +277,7 @@ class Calendar extends DeprecatedModel
 			WHERE e.{$this->_index} = $eventID
 		";
 
-        return $this->db->getRow($query);
+        return $this->db->query($query)->fetch();
     }
 
     public function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'diff', $sort_dir = 'desc')
@@ -389,8 +389,8 @@ class Calendar extends DeprecatedModel
             AND ( start_datetime >= DATE_SUB(NOW(), INTERVAL 6 MONTH) AND start_datetime <= DATE_ADD(NOW(), INTERVAL 18 MONTH) )
         ";
 
-        $events = $this->db->getAll($event_query);
-        $count  = $this->db->getOne($count_query);
+        $events = $this->db->query($event_query)->fetchAll();
+        $count  = $this->db->query($count_query)->fetchColumn();
 
         return $events;
     }
@@ -626,7 +626,7 @@ class Calendar extends DeprecatedModel
             EventModel::ACCESS_CAMPUS
         );
 
-        $allEvents = $this->db->getAll($query);
+        $allEvents = $this->db->query($query)->fetchAll();
 
         /* Standardised output
          */
@@ -713,7 +713,7 @@ class Calendar extends DeprecatedModel
         $output = [];
         $query  = "SELECT role_id FROM event_role WHERE event_id = " . intval($eventID);
         $result = $this->db->query($query);
-        while ($event = $this->db->getNextArray($result)) {
+        foreach ($result as $event) {
             $output[] = $event['group_id'];
         }
         return $output;
@@ -731,7 +731,7 @@ class Calendar extends DeprecatedModel
         $output = [];
         $query  = "SELECT campus_id FROM event_campus WHERE event_id = " . intval($eventID);
         $result = $this->db->query($query);
-        while ($event = $this->db->getNextArray($result)) {
+        foreach ($result as $event) {
             $output[] = $event['campus_id'];
         }
         return $output;
@@ -752,7 +752,7 @@ class Calendar extends DeprecatedModel
                     WHERE event_id = {$eventId}
                     AND folder.deleted_at IS NULL";
         $result = $this->db->query($query);
-        while ($event = $this->db->getNextArray($result)) {
+        foreach ($result as $event) {
             $output[] = $event['folder_id'];
         }
         return $output;

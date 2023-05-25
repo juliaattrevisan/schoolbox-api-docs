@@ -137,7 +137,7 @@ abstract class Evaluation_Section extends DeprecatedModel
 
         $query .= " ORDER BY sectionSequence, assess_question.sequence";
 
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 
     /**
@@ -171,7 +171,7 @@ abstract class Evaluation_Section extends DeprecatedModel
                   AND assess_question.deleted_at IS NULL
                   ORDER BY IF(assess_section.random = '1', assess_response.response_id, assess_question.sequence)";
 
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 
     /**
@@ -188,7 +188,7 @@ abstract class Evaluation_Section extends DeprecatedModel
                   AND deleted_at IS NULL
                   ORDER BY sequence";
 
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 
     /**

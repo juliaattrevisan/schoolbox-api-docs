@@ -60,8 +60,8 @@ class Blog extends DeprecatedModel
                                 AND `blog`.`deleted_at` IS NULL
             ";
 
-        $count = $this->db->getOne($count_query);
+        $count = $this->db->query($count_query)->fetchColumn();
 
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 }

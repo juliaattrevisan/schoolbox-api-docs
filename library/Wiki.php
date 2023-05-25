@@ -79,7 +79,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
                   LEFT JOIN user u ON u.id = r.userID
                   WHERE wikiID = '{$this->db->quote($wikiID)}'
                   ORDER BY r.created DESC";
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 
 
@@ -118,7 +118,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
             $query .= " LIMIT {$this->db->quote($limit)}";
         }
 
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 
 
@@ -278,7 +278,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 
         $count = $this->db->getOne($count_query);
 
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 
 
