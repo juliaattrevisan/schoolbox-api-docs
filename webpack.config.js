@@ -266,11 +266,6 @@ module.exports = {
         countdown: "./www/static/js/countdown/countdown.ts", // For countdown component on homepage
         evaluation: "./www/static/js/countdown/evaluation.ts", // For quiz evaluation countdown
 
-        //Sass
-        core: "./www/static/css/core/core.scss",
-        schoolboxCkStyles: "./www/static/css/core/schoolbox-ck-content.scss",
-        // editor: "./www/static/css/core/editor.scss",
-
         // Slideshow
         slideshow: "./www/static/js/slideshow/slideshow.ts",
 
@@ -283,6 +278,10 @@ module.exports = {
 
         // Markbook Pop Out
         popOutMenuMarkbook: "./vue/components/menu/popOutMenuMarkbook.js",
+
+        //Sass
+        core: "./www/static/css/core/core.scss",
+        schoolboxCkStyles: "./www/static/css/core/schoolbox-ck-content.scss",
     },
     output: {
         path: path.resolve(__dirname, "www/static/js/bundle"),
