@@ -6,6 +6,7 @@ use Calendar\Event\Collection;
 use Calendar\Event\Type\Timetable\Event;
 use Schoolbox\User;
 use Schoolbox\IConfigLoader;
+use Schoolbox\UserMapper;
 
 /**
  * Event type that represents events from the external timetable handler.
@@ -16,7 +17,6 @@ use Schoolbox\IConfigLoader;
  */
 class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calendar_Api_EventType_Abstract
 {
-
     /**
      * @var External_Timetable
      */
@@ -355,10 +355,7 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
                     if (!empty($staffId)) {
                         // Don't load more than once
                         if (!array_key_exists($staffId, $timetableStaff)) {
-                            $timetableStaff[$staffId] = \Schoolbox\UserMapper::getInstance()->findOneByColumn(
-                                'synergy_id',
-                                $period['staffID']
-                            );
+                            $timetableStaff[$staffId] = UserMapper::getInstance()->findByExternalId($staffId, \Schoolbox\Role::STAFF);
                         }
                     } else {
                         $timetableStaff[$staffId] = null;

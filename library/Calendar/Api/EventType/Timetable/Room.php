@@ -5,6 +5,7 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Calendar\Event\Collection;
 use Calendar\Event\Type\Timetable\Event;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 /**
  * Event type that represents events for a room.
@@ -170,10 +171,7 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
                 $userExternalId = $room['StaffID'];
                 if (!(array_key_exists($userExternalId, $userList))) {
                     try {
-                        $userList[$userExternalId] = Schoolbox\UserMapper::getInstance()->findOneByColumn(
-                            'synergy_id',
-                            $userExternalId
-                        );
+                        $userList[$userExternalId] = UserMapper::getInstance()->findByExternalId($userExternalId, \Schoolbox\Role::STAFF);
                     } catch (Schoolbox\Mapper\Exception $e) {
                         $userList[$userExternalId] = null;
                     }
