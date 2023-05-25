@@ -76,7 +76,7 @@ class Mapper extends \Schoolbox\Mapper
             INNER JOIN {$this->getJoinSql('createdBy', '', 'createdBy', true)}
             INNER JOIN {$this->getJoinSql('updatedBy', '', 'updatedBy', true)}
             LEFT JOIN {$this->getJoinSql('deletedBy', '', 'deletedBy', true)}
-            LEFT JOIN {$this->getJoinSql('field', '', 'field', true)}
+            LEFT JOIN {$this->getJoinSql('field', '', 'field')}
         ";
     }
 
