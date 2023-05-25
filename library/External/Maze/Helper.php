@@ -126,7 +126,7 @@ class External_Maze_Helper
 			ORDER BY TH.CALENDAR_END01,TH.CALENDAR_END02,TH.CALENDAR_END03,TH.CALENDAR_END04 ASC
 		";
 
-        $value = $this->db->query($query)->fetchColumn();
+        $value = $this->db->getOne($query);
         if ($value === false) {
             return '';
         }

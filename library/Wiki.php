@@ -256,7 +256,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
                         WHERE (`perms`.cid OR `userAccess`.sid)
                             AND MATCH(`heading`,`body`) AGAINST ('$keyword')
                             AND deleted = 'false'
-                        ORDER BY {$this->db->quoteIdentifier($sort_by)} $sort_dir
+                        ORDER BY {$this->db->getQuoter()->quoteIdentifier($sort_by)} $sort_dir
                         LIMIT $offset, $limit;
             ";
 

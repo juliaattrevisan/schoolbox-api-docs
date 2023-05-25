@@ -81,9 +81,10 @@ class User extends DeprecatedModel
     {
         $campusList  = array();
         $campusquery = "SELECT campus FROM userCampus WHERE uid = '$id'";
-        $this->db->query($campusquery);
-        if ($this->db->countRows() > 0) {
-            while ($campus = $this->db->getNextArray()) {
+        $query = $this->db->query($campusquery);
+
+        if ($query->rowCount() > 0) {
+            foreach ($query as $campus) {
                 if ($campus['campus']) {
                     $campusList[] = $campus['campus'];
                 }
@@ -183,7 +184,7 @@ class User extends DeprecatedModel
                 OR preferred_name LIKE '%1\$s'
                 OR lastname LIKE '%1\$s'
                 OR username LIKE '%1\$s' ",
-                $this->db->quote('%' . $this->db->escapeForLike($keyword) . '%')
+                $this->db->quote('%' . $this->db->getQuoter()->escapeForLike($keyword)) . '%')
             );
         }
         $wherePart .= ') AND user.deleted_at IS NULL';
@@ -322,15 +323,15 @@ class User extends DeprecatedModel
                 // TODO account for preferred name:
                 //      alternately remove and replace with API search
                 if (preg_match('/([[:alpha:]\'"]+) ([[:alpha:]\'"]+)/', $keyword, $name)) {
-                    $firstName = $this->db->escapeForLike($name[1]);
-                    $lastName  = $this->db->escapeForLike($name[2]);
+                    $firstName = $this->db->getQuoter()->escapeForLike($name[1]);
+                    $lastName  = $this->db->getQuoter()->escapeForLike($name[2]);
                     $query .= "(
                         ( firstname like '%{$firstName}%' and lastname like '%{$lastName}%' )
                         or
                         ( preferred_name like '%{$firstName}%' and lastname like '%{$lastName}%' )
                     )";
                 } else {
-                    $param = $this->db->escapeForLike($keyword);
+                    $param = $this->db->getQuoter()->escapeForLike($keyword);
                     $query .= "(
                         firstname like '%$param%'
                         or preferred_name like '%$param%'

@@ -73,7 +73,7 @@ class Group extends DeprecatedModel
 
         /* If there are results, they are already subscribed
            */
-        if ($result && count($result)) {
+        if (count($result)) {
             return true;
         }
 
@@ -201,9 +201,9 @@ class Group extends DeprecatedModel
     public function isUser($relationID, $userID)
     {
         $query = "SELECT uid FROM userAccess WHERE service = '" . $this->_service . "' AND sid = '$relationID' AND uid = '$userID'";
-        $this->db->query($query);
+        $query = $this->db->query($query);
 
-        if ($this->db->countRows() > 0) {
+        if ($query->rowCount() > 0) {
             return true;
         } else {
             return false;
@@ -651,8 +651,8 @@ class Group extends DeprecatedModel
             $exclude_part
         ";
 
-        $this->db->query($query);
-        while ($result = $this->db->getNextArray()) {
+        $query = $this->db->query($query);
+        foreach ($query as $result) {
             $catList[] = $result;
         }
 
