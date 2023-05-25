@@ -8,6 +8,11 @@
 use Schoolbox\Resource\Folder;
 use Schoolbox\Permission\Access\Access;
 
+/**
+ * Feed of all events occurring on a user's homepages.
+ *
+ * @deprecated use `\Schoolbox\Feed\StandardFeed`
+ */
 class Feed
 {
     /** @var Schoolbox\User */
@@ -20,7 +25,7 @@ class Feed
 
 
     /**
-     * @deprecated use \Schoolbox\Feed
+     * @deprecated use `\Schoolbox\Feed\StandardFeed`
      * @param Schoolbox\User $user
      */
     public function __construct(DeprecatedDatabase $db, Schoolbox\User $user)
@@ -30,7 +35,7 @@ class Feed
     }
 
     /**
-     * @deprecated use \Schoolbox\Feed::aggregate()
+     * @deprecated use `\Schoolbox\Feed\StandardFeed`
      * @param int $folderId
      * @param int $limit
      * @return array
