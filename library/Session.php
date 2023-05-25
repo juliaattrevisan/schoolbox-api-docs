@@ -18,6 +18,7 @@ use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\User;
+use User\Logger\Mapper as LoginLogMapper;
 
 class Session
 {
@@ -33,10 +34,6 @@ class Session
      * @var Access
      */
     private $access;
-    /**
-     * @var DeprecatedDatabase
-     */
-    private $db;
 
     /**
      * @param Access|null $access
@@ -44,7 +41,6 @@ class Session
      */
     public function __construct(Access $access = null)
     {
-        $this->db     = DeprecatedDatabase::getInstance();
         $this->access = $access ?? Access::getInstance();
     }
 
@@ -250,18 +246,16 @@ class Session
             $notif->notice("Login failure for " . $user->getUsername(), $notifFailureParams);
             throw new SchoolboxAccessDeniedException();
         }
+
         // Store password as hash for DAV authentication later
-        $save = [
-            'username' => $username,
-            'hash'     => md5($username . ':' . Config::get('site_school_code') . ':' . $password),
-        ];
+        $user->setHash(md5($username . ':' . Config::get('site_school_code') . ':' . $password));
 
         // ensure a key is set on login
         if (!$user->getKey()) {
-            $save['key'] = substr(md5(uniqid() . time()), 0, 25);
+            $user->setKey(substr(md5(uniqid() . time()), 0, 25));
         }
 
-        $this->db->update('user', 'username', $save);
+        $userMapper->save($user);
         return $user;
     }
 
@@ -505,19 +499,16 @@ class Session
     {
         // Function to check that host isnt brute forceing the login
         // Returns true if too many logins false if ok
-        $ip          = Session::getIP();
-        $graceperiod = Alaress_Date_Format::now()->addSeconds(0 - Config::get('login_grace'));
+        $ip             = Session::getIP();
+        $graceperiod    = Alaress_Date_Format::now()->addSeconds(0 - Config::get('login_grace'));
+        $loginLogMapper = LoginLogMapper::getInstance();
+        $pb             = $loginLogMapper->getPredicateBuilder()
+            ->equals('ip', $ip)
+            ->isFalse('login')
+            ->greaterThan('date', $graceperiod->getUsingFormat(Alaress_Date_Format::DATABASE_FORMAT));
+        $loginLogCount  = $loginLogMapper->countByPredicates($pb);
 
-        $query = "
-            SELECT id
-            FROM login_log
-            WHERE ip    = '{$this->db->quote($ip)}'
-            AND   login = '0'
-            AND   date  > '{$this->db->quote($graceperiod->getUsingFormat(Alaress_Date_Format::DATABASE_FORMAT))}'
-        ";
-        $this->db->query($query);
-
-        if ($this->db->countRows() < Config::get('login_allowed')) {
+        if ($loginLogCount < Config::get('login_allowed')) {
             return false;
         } else {
             return true;
