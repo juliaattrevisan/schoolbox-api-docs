@@ -49,9 +49,9 @@ class AllowedFile extends DeprecatedModel
 
         $query = "SELECT mime FROM allowedFileExtension afe
                         JOIN allowedFileTypes aft ON afe.fileTypeID = aft.fileTypeID
-                        WHERE extension = {$this->db->smartQuote($extension)} AND enable = 'true'";
+                        WHERE extension = ? AND enable = 'true'";
 
-        if (!$this->db->getOne($query)) {
+        if (!$this->db->query($query, [$extension])->fetchColumn()) {
             return [
                 'code'    => 11,
                 'message' => "Your file, with the extension '$extension'",
@@ -73,8 +73,8 @@ class AllowedFile extends DeprecatedModel
 			SELECT max_file_size
 			FROM allowedFileExtension afe
 			INNER JOIN allowedFileTypes aft ON afe.fileTypeID = aft.fileTypeID
-			WHERE extension = {$this->db->smartQuote($this->getExtension($filename))} AND enable = 'true'";
-        $size  = $this->db->getOne($query);
+			WHERE extension = ? AND enable = 'true'";
+        $size  = $this->db->query($query, [$this->getExtension($filename)])->fetchColumn();
         return ($size > 0) ? $size : Config::get('max_file_size');
     }
 
@@ -136,7 +136,7 @@ class AllowedFile extends DeprecatedModel
             $query .= " ORDER BY `$order`";
         }
 
-        return $this->db->getAll($query);
+        return $this->db->query($query)->fetchAll();
     }
 
     public function getIconList()

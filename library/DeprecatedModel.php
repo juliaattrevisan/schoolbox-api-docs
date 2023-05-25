@@ -12,17 +12,17 @@ require_once(dirname(__FILE__) . '/../www/conf/conf.php');
  */
 class DeprecatedModel
 {
+    protected $_table;
+    protected $_index;
 
-    var $_table;
-    var $_index;
-    /** @var DeprecatedDatabase */
-    var $db;
+    /** @var Database */
+    protected Database $db;
     /**
      * @deprecated
      */
     public function __construct()
     {
-        $this->db = DeprecatedDatabase::getInstance();
+        $this->db = Database::getInstance();
     }
 
     /**
