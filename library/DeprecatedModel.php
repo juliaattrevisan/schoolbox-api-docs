@@ -82,72 +82,18 @@ class DeprecatedModel
 
     /**
      * @deprecated
-     * @param string $field
-     * @param mixed  $id
-     * @param string $orderBy
-     * @param string $orderDir
-     * @return array|bool
-     */
-    public function getAllByField($field, $id, $orderBy = "", $orderDir = "")
-    {
-        $query = "	SELECT *
-					FROM `" . $this->_table . "` WHERE `" . $field . "` = " . $this->db->smartQuote($id);
-        if ($orderBy != "") {
-            $query .= " ORDER BY $orderBy $orderDir";
-        }
-
-        return $this->db->getAll($query);
-    }
-
-    /**
-     * @deprecated
      * @param string $order
      * @return array|bool
      */
     public function getAll($order = '')
     {
-        $query = "SELECT * FROM `" . $this->_table . "`";
+        $quoter = $this->db->getQuoter();
+        $query  = "SELECT * FROM {$quoter->quoteIdentifier($this->_table)}";
         if ($order) {
-            $query .= " ORDER BY `$order`";
+            $query .= " ORDER BY {$quoter->quoteIdentifier($order)}";
         }
 
-        return $this->db->getAll($query);
-    }
-
-    /**
-     * @deprecated
-     * @param string $name
-     * @return mixed
-     */
-    public function getIDByName($name)
-    {
-        $query = "SELECT `" . $this->_index . "` FROM `" . $this->_table . "` WHERE name = '$name'";
-        $row = $this->db->getRow($query);
-        return $row[$this->_index];
-    }
-
-    /**
-     * Get all the rows matching multiple key/value pairs
-     *
-     * @deprecated
-     * @param mixed $fields
-     * @return array|bool
-     */
-    public function getAllByFields($fields, $type = 'AND')
-    {
-        if (is_array($fields)) {
-            $query = "SELECT *
-					  FROM {$this->_table}
-					  WHERE ";
-            foreach ($fields as $key => $value) {
-                $subquery[] = "$key = \"$value\" ";
-            }
-
-            $query .= implode(" $type ", $subquery);
-            return $this->db->getAll($query);
-        }
-
-        return false;
+        return $this->db->query($query)->fetchAll();
     }
 
     /**
@@ -167,7 +113,15 @@ class DeprecatedModel
      */
     public function delete($id)
     {
-        return $this->db->delete($this->_table, $this->_index, $id);
+        $quoter = $this->db->getQuoter();
+        $this->db->query(
+            "
+                DELETE FROM {$quoter->quoteIdentifier($this->_table)}
+                WHERE {$quoter->quoteIdentifier($this->_index)} = ?
+            ",
+            [$id],
+        );
+        return true;
     }
 
     /**
