@@ -44,7 +44,7 @@ export function useDescriptionEditor(
         // If the max. char count is no longer exceeded, whether the submit button should be disabled depends on other
         // factors specific to the page hosting the submit button (like for example whether the name field is empty).
         // Those 'other factors' determine the value of the submitButtonShouldBeDisabledRef parameter.
-        ckeditorElem.addEventListener("EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED", () => {
+        ckeditorElem.addEventListener(EditorEvent.EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED, () => {
             if (submitButton.value !== null) {
                 submitButton.value.disabled = submitButtonShouldBeDisabledRef.value;
             }
@@ -67,10 +67,10 @@ export function useDescriptionEditor(
 
             const ckeditorElem = document.getElementById(ckeditorSelector) as HTMLElement;
 
-            ckeditorElem.addEventListener("EDITOR__CREATED", onEditorCreated);
+            ckeditorElem.addEventListener(EditorEvent.EDITOR__CREATED, onEditorCreated);
 
             document.dispatchEvent(
-                new CustomEvent("EDITOR__CREATE", {
+                new CustomEvent(EditorEvent.EDITOR__CREATE, {
                     detail: {
                         targetElements: [`#${ckeditorSelector}`],
                         toolbar: "simple",

@@ -1,7 +1,7 @@
 import type { Editor } from "@ckeditor/ckeditor5-core";
 import { EditorConfig } from "@js/editor/types/editorTypes";
-import { insertElementAfter } from "@js/util/domUtils";
 import { EditorEvent } from "@js/editor/event/editorEvent";
+import { insertElementAfter } from "@js/util/domUtils";
 
 /**
  * Returns the settings for the word count plugin
@@ -194,7 +194,7 @@ function addListenersForDisablingSubmitButtons(
         const submitButton: HTMLElement = button;
         const buttonTextOriginal: string = getButtonText(submitButton);
 
-        ckeditorSourceEl.addEventListener("EDITOR__MAX_CHAR_COUNT_EXCEEDED", function () {
+        ckeditorSourceEl.addEventListener(EditorEvent.EDITOR__MAX_CHAR_COUNT_EXCEEDED, function () {
             changeButtonState(
                 submitButton,
                 true,
@@ -202,7 +202,7 @@ function addListenersForDisablingSubmitButtons(
             );
         });
 
-        ckeditorSourceEl.addEventListener("EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED", function () {
+        ckeditorSourceEl.addEventListener(EditorEvent.EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED, function () {
             if (containingForm !== null) {
                 // Only enable save button if no max. character count has been exceeded on any ckeditor field in the form.
                 if (containingForm.querySelectorAll('[data-maxCharCountExceededAtLastCheck="1"]').length === 0) {
