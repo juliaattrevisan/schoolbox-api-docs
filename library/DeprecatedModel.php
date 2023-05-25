@@ -32,9 +32,12 @@ class DeprecatedModel
      */
     public function getByID($id)
     {
-        $query = "	SELECT *
-					FROM `" . $this->_table . "` WHERE `" . $this->_index . "` =  " . $this->db->smartQuote($id);
-        return $this->db->getRow($query);
+        $quoter = $this->db->getQuoter();
+        $query  = "
+            SELECT * FROM {$quoter->quoteIdentifier($this->_table)}
+            WHERE {$quoter->quoteIdentifier($this->_index)} = ?
+        ";
+        return $this->db->query($query, [$id])->fetch();
     }
 
     /**
@@ -45,9 +48,12 @@ class DeprecatedModel
      */
     public function getByField($field, $id)
     {
-        $query = "	SELECT *
-					FROM `" . $this->_table . "` WHERE `" . $field . "` = " . $this->db->smartQuote($id);
-        return $this->db->getRow($query);
+        $quoter = $this->db->getQuoter();
+        $query  = "
+            SELECT * FROM {$quoter->quoteIdentifier($this->_table)}
+            WHERE {$quoter->quoteIdentifier($field)} = ?
+        ";
+        return $this->db->query($query, [$id])->fetch();
     }
 
     /**
@@ -58,7 +64,9 @@ class DeprecatedModel
      */
     public function getByArray($fieldList, $termOp = 'AND')
     {
-        $query = "SELECT * FROM `" . $this->_table . "` WHERE ";
+        $quoter = $this->db->getQuoter();
+        $query  = "SELECT * FROM {$quoter->quoteIdentifier($this->_table)} WHERE ";
+        $params = [];
         if (is_array($fieldList)) {
             if ($termOp == 'AND') {
                 $query .= '1 = 1';
@@ -67,14 +75,11 @@ class DeprecatedModel
             }
 
             foreach ($fieldList as $field => $value) {
-                if (is_numeric($value)) {
-                    $query .= " $termOp `$field` = " . $this->db->smartQuote($value);
-                } else {
-                    $query .= " $termOp `$field` like " . $this->db->smartQuote($value);
-                }
+                $query .= " $termOp {$quoter->quoteIdentifier($field)} = ?";
+                $params[] = $value;
             }
 
-            return $this->db->getAll($query);
+            return $this->db->query($query, $params)->fetchAll();
         } else {
             return false;
         }
