@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a93f7d9791c20d49e4229ee00283a0d4",
+    "content-hash": "72a9bb0d5723bf5db08d70d89e230f79",
     "packages": [
         {
             "name": "0x46616c6b/etherpad-lite-client",
@@ -2696,12 +2696,12 @@
             "source": {
                 "type": "git",
                 "url": "git@github.com:intelliscl/sdk-php.git",
-                "reference": "0d14a54b1550a8087412d94733e27610741a26e6"
+                "reference": "974ee202ec0675ecd1ab4c0b23895526955c251b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/intelliscl/sdk-php/zipball/0d14a54b1550a8087412d94733e27610741a26e6",
-                "reference": "0d14a54b1550a8087412d94733e27610741a26e6",
+                "url": "https://api.github.com/repos/intelliscl/sdk-php/zipball/974ee202ec0675ecd1ab4c0b23895526955c251b",
+                "reference": "974ee202ec0675ecd1ab4c0b23895526955c251b",
                 "shasum": ""
             },
             "require": {
