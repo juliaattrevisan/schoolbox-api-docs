@@ -232,7 +232,7 @@ class Submission extends SubmissionAbstract
                 && $existingFeedback->getMarker()->getId() === $reviewer->getId()
                 && (string)$existingFeedback->getComment() === (string)$canvasSubmission['comment']
                 && (string)$existingFeedback->getHumanReadableMark() === (string)$readableMark
-                && (float)$existingFeedback->getNormalizedMark() === (float)$normMark
+                && (abs((float)$existingFeedback->getNormalizedMark() - (float)$normMark) < 0.0001)
             ) {
                 $this->log->debug(sprintf('Feedback already exists : submission_return_id:%s', $existingFeedback->getId()));
                 return $existingFeedback;

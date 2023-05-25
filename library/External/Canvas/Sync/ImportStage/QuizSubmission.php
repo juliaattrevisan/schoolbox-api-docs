@@ -241,7 +241,7 @@ class QuizSubmission extends SubmissionAbstract
                 $response
                 && $attempt->getUser()->getId() === $reviewee->getId()
                 && $attempt->getReviewer()->getId() === $reviewer->getId()
-                && $response->getMark() === (float)$normMark
+                && (abs($response->getMark() - (float)$normMark) < 0.0001)
                 && (string)$response->getComment() === (string)$canvasSubmission['comment']
             ) {
                 $this->log->debug(sprintf('Feedback already exists for attempt: [%s]', $attempt->getId()));
