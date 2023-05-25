@@ -1091,6 +1091,13 @@ class Profile implements IStrategy
 
         foreach ($staffs as $staff) {
             $externalId = trim((string)$staff['teacher_code']);
+
+            /* Only import data for externalIds in $watchlist, if provided
+             */
+            if (!(new Watchlist())->isOnWatchlist($externalId, $this->watchlist)) {
+                continue;
+            }
+
             $building = '';
             $campusName = '';
             $category = $staff['category'];
