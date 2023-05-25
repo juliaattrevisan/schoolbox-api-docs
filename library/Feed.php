@@ -240,8 +240,7 @@ class Feed
      */
     public function getOnlineAssessments($folderIds, $limit): array
     {
-
-        $where = $this->getFilterFromCategoryId($folderIds);
+        [$where, $params] = $this->buildPlaceholdersAndParams($folderIds);
 
         // Apply SIVO filter
         if ($this->user->getRole()->isStaff()) {
@@ -256,33 +255,39 @@ class Feed
                     $foldersWithWriteAccess[] = $folderId;
                 }
             }
-            $sivoClause = \count($foldersWithWriteAccess) ? " OR assess.category_id IN (" . \implode(',', $foldersWithWriteAccess) . ')' : '';
+            if (count($foldersWithWriteAccess) > 0) {
+                $sivoClause = " OR assess.category_id IN ("
+                    . Builder::getArrayPlaceholders($foldersWithWriteAccess, 'writeFolderId')
+                    . ')';
+                $params += Builder::getArrayParameters($foldersWithWriteAccess, 'writeFolderId');
+            } else {
+                $sivoClause = '';
+            }
         }
 
-        $query = "
-          SELECT
-              assess.assess_id, assess.title AS heading, UNIX_TIMESTAMP(assess.start) as start,
-              u.title, u.firstname, u.preferred_name, u.lastname, u.id AS uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at',
-              c.name as cat_name, c.id as cat_id
-          FROM assess
-          JOIN assessment a on assess.assessment_id = a.id
-          LEFT JOIN lu_work_type lwt ON lwt.id = a.work_type_id
-          LEFT JOIN user u ON assess.user_id = u.id
-          LEFT JOIN folder c ON c.id = assess.category_id
-          WHERE assess.category_id $where
-          AND assess.start < NOW()
-          AND assess.deleted_at IS NULL
-          AND assess.availability = 'assess'
-          AND (COALESCE(lwt.staff_or_instructor_visible_only, FALSE) = FALSE {$sivoClause})
-          ORDER BY assess.created_at DESC LIMIT 0, $limit
-        ";
-
-        $this->db->query($query);
+        $query = $this->db->prepare("
+            SELECT
+                assess.assess_id, assess.title AS heading, UNIX_TIMESTAMP(assess.start) as start,
+                u.title, u.firstname, u.preferred_name, u.lastname, u.id AS uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at',
+                c.name as cat_name, c.id as cat_id
+            FROM assess
+            JOIN assessment a on assess.assessment_id = a.id
+            LEFT JOIN lu_work_type lwt ON lwt.id = a.work_type_id
+            LEFT JOIN user u ON assess.user_id = u.id
+            LEFT JOIN folder c ON c.id = assess.category_id
+            WHERE assess.category_id IN {$where}
+            AND assess.start < NOW()
+            AND assess.deleted_at IS NULL
+            AND assess.availability = 'assess'
+            AND (COALESCE(lwt.staff_or_instructor_visible_only, FALSE) = FALSE {$sivoClause})
+            ORDER BY assess.created_at DESC LIMIT 0, :limit
+        ");
+        $this->executeWithLimit($query, $params, $limit);
 
         $userHandler = new User();
 
         $onlineAssessments = [];
-        while ($row = $this->db->getNextArray()) {
+        foreach ($query as $row) {
             $onlineAssessments[] = [
                 'date'        => $row['start'],
                 'type'        => 'icon-quiz',
