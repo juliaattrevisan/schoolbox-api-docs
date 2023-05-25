@@ -18,7 +18,7 @@ use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\User;
-use User\Logger\Mapper as LoginLogMapper;
+use Schoolbox\User\Log\Mapper as LoginLogMapper;
 
 class Session
 {
