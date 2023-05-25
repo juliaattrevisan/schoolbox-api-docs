@@ -707,14 +707,15 @@ class Classes implements IStrategy
                         /* Save it and remember what we saw in case we need to reuse this later
                          */
                         $this->log->info(sprintf(
-                            '%s timetable event %s %s - %s, %s, %s-%s',
+                            '%s timetable event %s %s - %s, %s, %s-%s, occurring in location %s',
                             $logPrefix,
                             $event->getTitle(),
                             $event->getCode(),
                             $event->getDay(),
                             $event->getPeriod(),
                             $event->getStartAt()->getDatabase(),
-                            $event->getFinishAt()->getDatabase()
+                            $event->getFinishAt()->getDatabase(),
+                            $event->getLocation()
                         ));
 
                         /* Weird shim
