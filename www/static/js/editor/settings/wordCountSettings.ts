@@ -242,10 +242,10 @@ function getButtonText(buttonElem: Element) {
  * Change button text for buttons that are <input> or <button>.
  *
  * @param { HTMLElement } buttonElem
- * @param { Boolean } maxCharCountExceeded
- * @param { String } newText
+ * @param { boolean } maxCharCountExceeded
+ * @param { string } newText
  */
-function changeButtonState(buttonElem: HTMLElement, maxCharCountExceeded: Boolean, newText: string) {
+function changeButtonState(buttonElem: HTMLElement, maxCharCountExceeded: boolean, newText: string) {
     const buttonTagName = buttonElem.tagName.toLowerCase();
 
     switch (buttonTagName) {
@@ -259,7 +259,7 @@ function changeButtonState(buttonElem: HTMLElement, maxCharCountExceeded: Boolea
             throw "Unsupported button tag name '" + buttonTagName + "'.";
     }
 
-    buttonElem.disabled = maxCharCountExceeded;
+    (buttonElem as HTMLInputElement | HTMLButtonElement).disabled = maxCharCountExceeded;
 
     if (maxCharCountExceeded) {
         buttonElem.setAttribute("data-ckEditorMaxCharCountExceededAtLastCheck", "");
