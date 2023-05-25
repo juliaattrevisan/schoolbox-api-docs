@@ -639,11 +639,6 @@ class Classes implements IStrategy
                         $classCode
                     );
 
-                    if ($classCode == '-DUTY-A' && \in_array($room, ['CAW1', 'TUC'])) {
-                        print_r($subject);
-//                        sleep(5);
-                    }
-
                     /* Try to find an event that already exists
                      * If it already exists, just continue; it's already been made
                      * Otherwise create a new one
