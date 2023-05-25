@@ -145,7 +145,7 @@ class Classes implements IStrategy
     /**
      * A caching mechanism to prevent dupe events
      *
-     * $eventEntries[$classCode][$startDate][$finishDate] = $event
+     * $eventEntries[$classCode][$startDate][$finishDate][$room] = $event
      *
      * @var array
      */
@@ -639,6 +639,11 @@ class Classes implements IStrategy
                         $classCode
                     );
 
+                    if ($classCode == '-DUTY-A' && \in_array($room, ['CAW1', 'TUC'])) {
+                        print_r($subject);
+//                        sleep(5);
+                    }
+
                     /* Try to find an event that already exists
                      * If it already exists, just continue; it's already been made
                      * Otherwise create a new one
@@ -646,7 +651,7 @@ class Classes implements IStrategy
                      * (Since we are processing each student sequentially there is
                      * potential for dupe events to spawn unnecessarily)
                      */
-                    if (isset($this->eventEntries[$classCode][$startAt->getDatabase()][$finishAt->getDatabase()])) {
+                    if (isset($this->eventEntries[$classCode][$room][$startAt->getDatabase()][$finishAt->getDatabase()])) {
                         $this->log->debug(sprintf(
                             'Reusing existing timetable event %s %s on %s %s (%s-%s)',
                             $title,
@@ -657,7 +662,7 @@ class Classes implements IStrategy
                             $finishAt->getDatabase()
                         ));
 
-                        $event = $this->eventEntries[$classCode][$startAt->getDatabase()][$finishAt->getDatabase()];
+                        $event = $this->eventEntries[$classCode][$room][$startAt->getDatabase()][$finishAt->getDatabase()];
                     } else {
                         /* Try to get an event corresponding to this lesson's (code/start/finish) tuple
                          * in an attempt to recycle an existing event, slowing the propagation of
@@ -666,6 +671,7 @@ class Classes implements IStrategy
                         try {
                             $oldEvent = $this->eventMapper->findOneByColumnList([
                                 'code' => $classCode,
+                                'location' => $room,
                                 'start_at' => $startAt->getDatabase(),
                                 'finish_at' => $finishAt->getDatabase(),
                                 'classification' => \Schoolbox\External\Event\Model::CLASSIFICATION_TIMETABLE,
@@ -737,7 +743,7 @@ class Classes implements IStrategy
 
                         /* Remember we did this
                          */
-                        $this->eventEntries[$classCode][$startAt->getDatabase()][$finishAt->getDatabase()] = $event;
+                        $this->eventEntries[$classCode][$room][$startAt->getDatabase()][$finishAt->getDatabase()] = $event;
                     }
 
                     /* Save sis_class record
@@ -881,7 +887,7 @@ class Classes implements IStrategy
         /* If we haven't already CLEAR_STAFF'd this event instance, do so
          * Then proceed to add the guy
          */
-        if (!isset($this->overridesEntries[$event->getCode()][$event->getStartAt()->getDatabase()][$event->getFinishAt()->getDatabase()])) {
+        if (!isset($this->overridesEntries[$event->getCode()][$event->getLocation()][$event->getStartAt()->getDatabase()][$event->getFinishAt()->getDatabase()])) {
             /* Clear all other staff out first
              *
              * For specific teaching, execute CLEAR_STAFF to disregard the usual guy
@@ -900,7 +906,7 @@ class Classes implements IStrategy
 
             /* Remember we did this
              */
-            $this->overridesEntries[$event->getCode()][$event->getStartAt()->getDatabase()][$event->getFinishAt()->getDatabase()] = true;
+            $this->overridesEntries[$event->getCode()][$event->getLocation()][$event->getStartAt()->getDatabase()][$event->getFinishAt()->getDatabase()] = true;
         }
 
         /* We use the Overrides system to specify a particular person's involvement
