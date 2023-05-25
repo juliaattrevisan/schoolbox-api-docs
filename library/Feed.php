@@ -108,10 +108,7 @@ class Feed
             return [];
         }
 
-        $where  = Builder::getArrayPlaceholders($folderId, 'folderId');
-        $params = Builder::getArrayParameters($folderId, 'folderId');
-        $params['limit'] = $limit;
-
+        [$where, $params] = $this->buildPlaceholdersAndParams($folderId);
         $query = $this->db->prepare(
             "
                 SELECT
@@ -140,11 +137,7 @@ class Feed
                 ORDER BY f.submitted DESC LIMIT 0, :limit
             "
         );
-        foreach ($params as $param => $value) {
-            $query->bindValue($param, $value);
-        }
-        $query->bindValue('limit', $limit, PDO::PARAM_INT);
-        $query->execute();
+        $this->executeWithLimit($query, $params, $limit);
 
         $userHandler = new User();
 
@@ -611,5 +604,38 @@ class Feed
         return null === $row['u.deleted_at']
             ? sprintf('<a href="/search/user/%s">%s</a>', $userId, $userHandler->formatName($row))
             : $userHandler->formatName($row);
+    }
+
+    /**
+     * Builds a set of placeholders and params for use in one of this class'
+     * queries.
+     *
+     * @param array $folderIds
+     * @return array{string, array<string, int>}
+     */
+    private function buildPlaceholdersAndParams(array $folderIds): array
+    {
+        $placeholders = Builder::getArrayPlaceholders($folderIds, 'folderId');
+        $params       = Builder::getArrayParameters($folderIds, 'folderId');
+        return [$placeholders, $params];
+    }
+
+    /**
+     * Executes `$query` with `$params` and `$limit`.
+     *
+     * Assumes `$query` has a placeholder `:limit`.
+     *
+     * @param PDOStatement $query
+     * @param array        $params
+     * @param int          $limit
+     * @return void
+     */
+    private function executeWithLimit(PDOStatement $query, array $params, int $limit): void
+    {
+        foreach ($params as $param => $value) {
+            $query->bindValue($param, $value);
+        }
+        $query->bindValue('limit', $limit, PDO::PARAM_INT);
+        $query->execute();
     }
 }
