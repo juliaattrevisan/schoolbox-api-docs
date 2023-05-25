@@ -53,11 +53,11 @@ class Eportfolio_Page_Create extends Eportfolio_Page_Abstract
     {
         $allTemplates = $this->getEportfolioHandler()->fetchAllTemplates();
 
-        if (is_array($allTemplates) && count($allTemplates)) {
-            foreach ($allTemplates as $id => $name) {
+        if (count($allTemplates) > 0) {
+            foreach ($allTemplates as $template) {
                 $this->getPage()->setVar(array(
-                    'PAGE_TEMPLATE_ID' => $id,
-                    'PAGE_TEMPLATE_NAME' => $name,
+                    'PAGE_TEMPLATE_ID' => $template->getId(),
+                    'PAGE_TEMPLATE_NAME' => $template->getName(),
                 ));
 
                 $this->getPage()->parse('page_template_list_block', 'page_template_list', true);
