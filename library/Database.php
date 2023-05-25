@@ -466,4 +466,147 @@ class Database implements IDatabase, Serializable
     {
         $this->connect(SQL_dsn, SQL_user, SQL_passwd, array('debug' => DebugBar::isEnabled()));
     }
+
+
+    /// Methods copied from DeprecatedDatabase: will be removed in this PR ///
+
+
+    /**
+     * Quote variable to make safe for sql use
+     *
+     * @deprecated
+     *
+     * @param $value
+     *
+     * @return string
+     */
+    public function smartQuote($value)
+    {
+        $mysqlFuncs = array(
+            'NULL',
+            'NOW()',
+        );
+
+        /* If any non-digits found, assume string. But this might not work for float
+         * or double values, or exponential representations.
+         */
+        // Quote if not integer or special
+        if (!in_array($value, $mysqlFuncs)) {
+            $value = $this->quote($value);
+        }
+
+        return $value;
+    }
+
+    /**
+     * Inserts an array into table (does all proper security checks to ensure safe)
+     *
+     * @deprecated use \Schoolbox\Mapper::save()
+     *
+     * @param $table
+     * @param $array
+     *
+     * @return bool
+     */
+    public function insert($table, $array)
+    {
+        if (!($table && is_array($array))) {
+            return false;
+        }
+
+        $names  = '';
+        $values = '';
+
+        foreach ($array as $key => $value) {
+            $name = '`' . $key . '`' . ',';
+            if (!is_array($value)) {
+                $names .= $name;
+                $values .= $this->smartQuote($value) . ',';
+            } elseif (isset($value['function'])) {
+                $names .= $name;
+                $values .= $value['function'] . '(' . $this->smartQuote($value['value']) . '),';
+            }
+        }
+        $names  = substr($names, 0, -1);
+        $values = substr($values, 0, -1);
+
+        $query = "INSERT INTO `$table` ($names) VALUES ($values)";
+        $this->query($query);
+        return true;
+    }
+
+    /**
+     * Updates a row
+     *
+     * @deprecated use \Schoolbox\Mapper::save()
+     *
+     * @param $table
+     * @param $identifier
+     * @param $array
+     *
+     * @return bool
+     */
+    public function update($table, $identifier, $array)
+    {
+        if (!$table) {
+            return false;
+        }
+
+        if (is_array($identifier)) {
+            foreach ($identifier as $ident) {
+                if (!$array[$ident]) {
+                    return false;
+                }
+            }
+        } else {
+            if (!$array[$identifier]) {
+                return false;
+            }
+
+            $identifier = array($identifier);
+        }
+
+        $set = '';
+        foreach ($array as $key => $value) {
+            if (!in_array($key, $identifier)) {
+                if (!is_array($value)) {
+                    $set .= '`' . $key . '`=' . $this->smartQuote($value) . ',';
+                } elseif (isset($value['function'])) {
+                    $set .= '`' . $key . '`=' . $value['function'] . '(' . $this->smartQuote($value['value']) . '),';
+                }
+            }
+        }
+        $set   = substr($set, 0, -1);
+        $query = "UPDATE `$table` SET $set WHERE 1=1";
+
+        foreach ($identifier as $ident) {
+            $query .= " AND `$ident`= " . $this->smartQuote($array[$ident]);
+        }
+
+        $this->query($query);
+        return true;
+    }
+
+    /**
+     * @deprecated use \Schoolbox\Mapper::delete()
+     *
+     * @param $table
+     * @param $identifier
+     * @param $value
+     *
+     * @return bool
+     */
+    public function delete($table, $identifier, $value)
+    {
+        $query = "DELETE FROM `$table` WHERE 1 != 1 ";
+        if (is_array($value)) {
+            foreach ($value as $item) {
+                $query .= " OR `$identifier` =  " . $this->smartQuote($value);
+            }
+        } else {
+            $query .= "OR `$identifier` =  " . $this->smartQuote($value);
+        }
+        $this->query($query);
+        return true;
+    }
 }
