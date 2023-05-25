@@ -137,6 +137,6 @@ class DeprecatedModel
     public function create($object)
     {
         $this->db->insert($this->_table, $object);
-        return $this->db->insertID();
+        return $this->db->lastInsertId();
     }
 }

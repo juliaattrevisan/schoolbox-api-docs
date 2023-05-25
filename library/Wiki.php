@@ -142,7 +142,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
         $data['created'] = 'NOW()';
         $data['userID'] = $_SESSION['id'];
         $this->db->insert($this->_revisionTable, $data);
-        return $this->db->insertID();
+        return $this->db->lastInsertId();
     }
 
 

@@ -153,9 +153,9 @@ class Assess_Main extends Evaluation_Main
      */
     public function getAssessmentType()
     {
-        return $this->db->getOne(
+        return $this->db->query(
             "SELECT name FROM lu_work_type WHERE id = " . $this->db->smartQuote(self::ONLINE_ASSESSMENT_TYPE_ID)
-        );
+        )->fetchColumn();
     }
 
     /**
