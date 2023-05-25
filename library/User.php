@@ -184,8 +184,7 @@ class User extends DeprecatedModel
                 OR preferred_name LIKE '%1\$s'
                 OR lastname LIKE '%1\$s'
                 OR username LIKE '%1\$s' ",
-                $this->db->quote('%' . $this->db->getQuoter()->escapeForLike($keyword)) . '%'
-            )
+                $this->db->quote('%' . $this->db->getQuoter()->escapeForLike($keyword) . '%')
             );
         }
         $wherePart .= ') AND user.deleted_at IS NULL';
