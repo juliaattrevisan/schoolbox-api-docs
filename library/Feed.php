@@ -5,6 +5,7 @@
  * @link      https://schoolbox.com.au/
  */
 
+use Alaress\Database\Predicate\Builder;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Permission\Access\Access;
 
@@ -15,23 +16,16 @@ use Schoolbox\Permission\Access\Access;
  */
 class Feed
 {
-    /** @var Schoolbox\User */
-    private $user;
-
     /**
-     * @var DeprecatedDatabase
-     */
-    private $db;
-
-
-    /**
+     * Constructor
+     *
      * @deprecated use `\Schoolbox\Feed\StandardFeed`
-     * @param Schoolbox\User $user
+     *
+     * @param Database        $db   A database connection
+     * @param \Schoolbox\User $user The user to generate the feed for
      */
-    public function __construct(DeprecatedDatabase $db, Schoolbox\User $user)
+    public function __construct(private Database $db, private Schoolbox\User $user)
     {
-        $this->db   = $db;
-        $this->user = $user;
     }
 
     /**
@@ -110,25 +104,51 @@ class Feed
     public function getFiles($folderId, $limit)
     {
         $file = [];
+        if (empty($folderId)) {
+            return [];
+        }
 
-        $where = $this->getFilterFromCategoryId($folderId);
+        $where  = Builder::getArrayPlaceholders($folderId, 'folderId');
+        $params = Builder::getArrayParameters($folderId, 'folderId');
+        $params['limit'] = $limit;
 
-        $query = "SELECT f.id, u.firstname, u.preferred_name, u.lastname, u.title, u.id as uid, synergy_id as external_id, u.deleted_at as 'u.deleted_at', UNIX_TIMESTAMP(f.submitted) submitted, f.description as name, realname,
-						af.description as type, inline, c.name as cat_name, c.id as cat_id
-				  FROM file f
-				  LEFT JOIN storage s on f.hash = s.hash
-				  LEFT JOIN allowedFileExtension afe ON s.ext = afe.extension
-				  LEFT JOIN allowedFileTypes af ON afe.extension = af.fileTypeID
-				  LEFT JOIN user u ON u.id = f.owner
-				  LEFT JOIN folder c ON c.id = f.category
-				  WHERE f.category $where AND f.hidden = 0 AND f.deleted_at IS NULL
-				  ORDER BY f.submitted DESC LIMIT 0, $limit";
-
-        $this->db->query($query);
+        $query = $this->db->prepare(
+            "
+                SELECT
+                    f.id,
+                    u.firstname,
+                    u.preferred_name,
+                    u.lastname,
+                    u.title,
+                    u.id as uid,
+                    synergy_id as external_id,
+                    u.deleted_at as 'u.deleted_at',
+                    UNIX_TIMESTAMP(f.submitted) submitted,
+                    f.description as name,
+                    realname,
+                    af.description as type,
+                    inline,
+                    c.name as cat_name,
+                    c.id as cat_id
+                FROM file f
+                LEFT JOIN storage s on f.hash = s.hash
+                LEFT JOIN allowedFileExtension afe ON s.ext = afe.extension
+                LEFT JOIN allowedFileTypes af ON afe.extension = af.fileTypeID
+                LEFT JOIN user u ON u.id = f.owner
+                LEFT JOIN folder c ON c.id = f.category
+                WHERE f.category IN {$where} AND f.hidden = 0 AND f.deleted_at IS NULL
+                ORDER BY f.submitted DESC LIMIT 0, :limit
+            "
+        );
+        foreach ($params as $param => $value) {
+            $query->bindValue($param, $value);
+        }
+        $query->bindValue('limit', $limit, PDO::PARAM_INT);
+        $query->execute();
 
         $userHandler = new User();
 
-        while ($row = $this->db->getNextArray()) {
+        foreach ($query as $row) {
             $link = null;
             if ($row['realname'] != '') {
                 $url  = '<a href="/send.php?id=' . $row['id'] . '" rel="external">' . Scrub::text($row['name']) . '</a>';
