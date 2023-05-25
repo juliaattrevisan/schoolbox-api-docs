@@ -9,7 +9,6 @@
  */
 class Eportfolio_Page_Create extends Eportfolio_Page_Abstract
 {
-
     /*** The template file to use
      *
      * @var string

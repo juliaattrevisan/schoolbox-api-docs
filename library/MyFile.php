@@ -9,7 +9,6 @@ use Schoolbox\Notif\Notifactory;
  */
 class MyFile extends DeprecatedModel
 {
-
     /**
      * @var int
      */

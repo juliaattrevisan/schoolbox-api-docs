@@ -42,7 +42,6 @@ use Schoolbox\Permission\Access\UserAccess;
 
 abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 {
-
     /**
      * This represents a particular work type for quiz
      * It's being phased out though

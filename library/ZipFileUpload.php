@@ -17,7 +17,6 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 
 class ZipFileUpload extends DeprecatedModel
 {
-
     /**
      * Temporary location
      *

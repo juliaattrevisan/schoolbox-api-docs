@@ -12,7 +12,6 @@
  */
 abstract class Evaluation_Factory extends DeprecatedModel
 {
-
     /**
      * @var string
      */

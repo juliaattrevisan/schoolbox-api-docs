@@ -8,7 +8,6 @@ use Schoolbox\Notif\Notifactory;
  */
 class MyFolder extends DeprecatedModel
 {
-
     /**
      * @var int
      */

@@ -12,7 +12,6 @@
  */
 class Assess_Question extends Evaluation_Question
 {
-
     public function __construct()
     {
         parent::__construct();

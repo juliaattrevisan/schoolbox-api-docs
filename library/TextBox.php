@@ -2,7 +2,6 @@
 
 class TextBox extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 {
-
     function __construct()
     {
         $this->_table = 'textBox';

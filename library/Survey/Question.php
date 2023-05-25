@@ -12,9 +12,6 @@
  */
 class Survey_Question extends Evaluation_Question
 {
-
-
-
     /**
      * Constructor
      */
