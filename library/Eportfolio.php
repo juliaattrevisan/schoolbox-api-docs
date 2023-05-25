@@ -16,11 +16,6 @@ use Schoolbox\UserMapper;
 class Eportfolio
 {
     /**
-     * A database connection
-     */
-    private Database $db;
-
-    /**
      * The current user id
      *
      * @var int
@@ -65,9 +60,9 @@ class Eportfolio
     private TemplateMapper $templateMapper;
 
     /**
-     * @var array;
+     * @var GenericCollection|Template[];
      */
-    private array $allTemplates;
+    private GenericCollection $allTemplates;
 
     /**
      * Constructor
@@ -77,7 +72,6 @@ class Eportfolio
      */
     public function __construct($userId, $pageId)
     {
-        $this->db = Database::getInstance();
         $this->setUserId($userId);
         $this->setPageId($pageId);
 
@@ -197,7 +191,7 @@ class Eportfolio
         if (!isset($this->allTemplates)) {
             $this->allTemplates = $this->fetchAllTemplates();
         }
-        return $this->allTemplates[$id];
+        return $this->allTemplates->getBy('id', $id)->getName();
     }
 
     /**
@@ -315,30 +309,30 @@ class Eportfolio
 
         /* Compile an eportfolioConfig record
          */
-        $eportfolioConfig = $this->pageMapper->createModel();
-        $eportfolioConfig->setOwner($this->userMapper->createModel($userId));
-        $eportfolioConfig->setPageTitle($pageTitle);
-        $eportfolioConfig->setTemplate($templateID);
-        $eportfolioConfig->setLeftColumnWidth($template->getLeftColumnWidth());
-        $eportfolioConfig->setRightColumnWidth($template->getRightColumnWidth());
-        $eportfolioConfig->setTopHeadFont(Config::get('homepage_colour_head_font'));
-        $eportfolioConfig->setTopHeadBg(Config::get('homepage_colour_head_bg'));
-        $eportfolioConfig->setTopFont(Config::get('homepage_colour_font'));
-        $eportfolioConfig->setTopBgPrimary(Config::get('homepage_colour_bg_primary'));
-        $eportfolioConfig->setLeftHeadFont(Config::get('homepage_colour_head_font'));
-        $eportfolioConfig->setLeftHeadBg(Config::get('homepage_colour_head_bg'));
-        $eportfolioConfig->setLeftFont(Config::get('homepage_colour_font'));
-        $eportfolioConfig->setLeftBgPrimary(Config::get('homepage_colour_bg_primary'));
-        $eportfolioConfig->setRightHeadFont(Config::get('homepage_colour_head_font'));
-        $eportfolioConfig->setRightHeadBg(Config::get('homepage_colour_head_bg'));
-        $eportfolioConfig->setRightFont(Config::get('homepage_colour_font'));
-        $eportfolioConfig->setRightBgPrimary(Config::get('homepage_colour_bg_primary'));
-        $this->pageMapper->save($eportfolioConfig);
+        $page = $this->pageMapper->createModel();
+        $page->setOwner($this->userMapper->createModel($userId));
+        $page->setPageTitle($pageTitle);
+        $page->setTemplate($templateID);
+        $page->setLeftColumnWidth($template->getLeftColumnWidth());
+        $page->setRightColumnWidth($template->getRightColumnWidth());
+        $page->setTopHeadFont(Config::get('homepage_colour_head_font'));
+        $page->setTopHeadBg(Config::get('homepage_colour_head_bg'));
+        $page->setTopFont(Config::get('homepage_colour_font'));
+        $page->setTopBgPrimary(Config::get('homepage_colour_bg_primary'));
+        $page->setLeftHeadFont(Config::get('homepage_colour_head_font'));
+        $page->setLeftHeadBg(Config::get('homepage_colour_head_bg'));
+        $page->setLeftFont(Config::get('homepage_colour_font'));
+        $page->setLeftBgPrimary(Config::get('homepage_colour_bg_primary'));
+        $page->setRightHeadFont(Config::get('homepage_colour_head_font'));
+        $page->setRightHeadBg(Config::get('homepage_colour_head_bg'));
+        $page->setRightFont(Config::get('homepage_colour_font'));
+        $page->setRightBgPrimary(Config::get('homepage_colour_bg_primary'));
+        $this->pageMapper->save($page);
 
         /* Remember the page that was just created, because we'll apply
          * permissions to it after it gets created
          */
-        $this->setPageId($eportfolioConfig->getPageId());
+        $this->setPageId($page->getPageId());
 
         // retrieve, rearrange and reinsert the componentry
         $cim       = Component_InstanceMapper::getInstance();
@@ -445,30 +439,24 @@ class Eportfolio
      * Save colours for individual pages
      *
      * @param array $listColor
-     * @return PDOStatement
+     * @return void
      */
     public function saveDisplayProperties($listColor)
     {
-        $query = "
-            UPDATE {$this->db->getQuoter()->quoteIdentifier($this->getContext() . '_page')}
-            SET
-        ";
-
-        $stack  = [];
-        $params = [];
-
-        foreach ($listColor as $key => $color) {
-            $key      = str_replace('font_primary', 'font', $key);
-            $field    = $this->db->getQuoter()->quoteIdentifier($key);
-            $params[] = $color;
-            $stack[]  = "`{$field}` = ?";
-        }
-
-        $query .= implode(',', $stack);
-        $query .= " WHERE page_id = ?";
-        $params[] = $this->getPageId();
-
-        return $this->db->query($query, $params);
+        $page = $this->pageMapper->findById($this->getPageId());
+        $page->setTopHeadFont($listColor['top_head_font']);
+        $page->setTopHeadBg($listColor['top_head_bg']);
+        $page->setTopFont($listColor['top_font_primary']);
+        $page->setTopBgPrimary($listColor['top_bg_primary']);
+        $page->setLeftHeadFont($listColor['left_head_font']);
+        $page->setLeftHeadBg($listColor['left_head_bg']);
+        $page->setLeftFont($listColor['left_font_primary']);
+        $page->setLeftBgPrimary($listColor['left_bg_primary']);
+        $page->setRightHeadFont($listColor['right_head_font']);
+        $page->setRightHeadBg($listColor['right_head_bg']);
+        $page->setRightFont($listColor['right_font_primary']);
+        $page->setRightBgPrimary($listColor['right_bg_primary']);
+        $this->pageMapper->save($page);
     }
 
     /* Getters/Setters
