@@ -9,13 +9,11 @@ declare(strict_types=1);
 
 namespace Schoolbox\Resource\Storage;
 
-use Alaress_Byte_Format;
 use Alaress_Date_Format;
 use League\Flysystem\Filesystem;
 use Schoolbox\File\Exception as FileException;
 use Schoolbox\File\Mimetype;
 use Schoolbox\File\MimetypeMapper;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Storage\Sanitizer\ISanitizer;
 use Schoolbox\User;
 
@@ -90,9 +88,10 @@ class Receiver implements IReceiver
     ): Model {
         $storage = $this->storageMapper->createModel();
 
-        // Set file type metadata
+        // Set file type metadata and expiry
         $storage->setFilename(mb_pathinfo($basename, PATHINFO_FILENAME));
         $storage->setExtension(mb_pathinfo($basename, PATHINFO_EXTENSION));
+        $storage->setExpiryAt($expiryAt);
 
         //if filename is longer than the db limit, error out here
         if (Mapper::FILENAME_MAX_LENGTH <= \strlen($storage->getFilename())) {
@@ -102,6 +101,7 @@ class Receiver implements IReceiver
         // Find the location within the filesystem where the temp file lives.
         // TODO: Find a way to remove the need for this truncation
         $tempLocationInFilesystem = str_replace(sys_get_temp_dir(), '', $tempLocation);
+        $storage->setSize($this->tempFilesystem->fileSize($tempLocationInFilesystem));
 
         try {
             $storage->setMimetype($this->mimetypeMapper->getByFilename($basename));
@@ -117,7 +117,8 @@ class Receiver implements IReceiver
             $requireSafety = false;
         }
         if ($requireSafety) {
-            $this->assertStorageUploadable($storage, $this->tempFilesystem->fileSize($tempLocationInFilesystem));
+            $validator = new ValidUploadableFile();
+            $validator->isSatisfiedBy($storage);
         } elseif (!$storage->getMimetype() instanceof Mimetype) {
             // For superusers only, we allow an unknown mimetype
             $storage->setMimetype($this->mimetypeMapper->getUnknownMime());
@@ -144,56 +145,8 @@ class Receiver implements IReceiver
             );
         }
 
-        $storage->setExpiryAt($expiryAt);
-
         $this->storageMapper->save($storage);
 
         return $storage;
-    }
-
-    /**
-     * Safety check that a file may be uploaded; checks that:
-     * * the file has a recognised and allowed mimetype
-     * * the file is not larger than the file's allowed size
-     *
-     * Skipped if the receiver is run in a CLI (where there is no user context),
-     * or the current user is a superuser.
-     *
-     * @param Model $storage
-     * @param int   $fileSize The size of the file which would be uploaded
-     *
-     * @throws FileException if the file isn't uploadable for any reason
-     */
-    private function assertStorageUploadable(Model $storage, int $fileSize): void
-    {
-        $fileMime    = $storage->getMimetype();
-        $errorSuffix = "Try a different file or contact your IT administrator.";
-
-        // Assert: Mime set
-        if (!$fileMime instanceof Mimetype) {
-            throw new FileException(
-                "This file has no detectable type. {$errorSuffix}",
-                FileException::CODE_MIMETYPE_NOT_FOUND
-            );
-        }
-
-        // Assert: Mime type allowed
-        if (!$fileMime->isEnabled() || $fileMime->isDeleted()) {
-            throw new FileException(
-                "This file is not a valid file type. {$errorSuffix}",
-                FileException::CODE_MIMETYPE_NOT_ALLOWED
-            );
-        }
-
-        // Assert: Acceptable size
-        if ($fileMime->getActualMaxFileSize() < $fileSize) {
-            throw new FileException(
-                sprintf(
-                    "This file exceeds the file size restriction of %s. %s",
-                    Alaress_Byte_Format::bytesToString($fileMime->getActualMaxFileSize()),
-                    $errorSuffix,
-                ),
-            );
-        }
     }
 }
