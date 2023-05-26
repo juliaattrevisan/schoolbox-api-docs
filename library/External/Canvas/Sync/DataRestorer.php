@@ -113,7 +113,8 @@ class DataRestorer
      */
     public function restoreTableData(string $tableName, string $tableFile, bool $truncateTable): void
     {
-        // truncate only if this is the first data for the table
+        // truncate table only when requested
+        // this should be true, when loading data to this table for the first time
         if ($truncateTable) {
             $sql = "TRUNCATE {$this->canvasDbName}.{$tableName}";
             $this->executeIfPersisting($sql);

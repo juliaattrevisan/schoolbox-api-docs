@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Custom\Trigs;
 
 use External\Canvas\Redirect\AbstractRedirect;
-use Schoolbox\Resource\Folder\Model as Folder;
 
 /**
  * Canvas redirect for Trigs
@@ -18,33 +17,12 @@ use Schoolbox\Resource\Folder\Model as Folder;
 class Redirect extends AbstractRedirect
 {
     /**
-     * @param Folder $folder
-     * @param Folder $parentFolder
-     * @return int|null
+     * Canvas course id is <folder_code>_<parent_folder_code>
      */
-    public function getCanvasCourseId(Folder $folder, Folder $parentFolder): ?int
-    {
-        $courseCode = sprintf(
-            '%s_%s',
-            $folder->getCodeString(),
-            $parentFolder->getCodeString()
-        );
-        /* Find out if $folderCode exists in canvas as a course identifier
-         * Only care about the states "claimed" and "available", according to the cox
-         */
-        $query = "
-            SELECT canvas_id
-            FROM course_dim
-            WHERE sis_source_id = :courseCode
-            AND workflow_state IN ('claimed', 'available')
-        ";
+    protected string $courseIdFormat = '%s_%s';
 
-        $statement = $this->canvasDb->build()->prepareQuery($query);
-
-        $statement->execute(['courseCode' => $courseCode]);
-
-        $row = $statement->fetch();
-
-        return $row ? (int)$row['canvas_id'] : null;
-    }
+    /**
+     * The column used to find canvas course in course_dim table
+     */
+    protected string $courseCodeColumn = "sis_source_id";
 }

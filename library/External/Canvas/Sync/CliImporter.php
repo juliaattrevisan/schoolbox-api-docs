@@ -287,6 +287,7 @@ class CliImporter extends CliTool\App
             exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
         }
 
+        // Which table are already seen (i.e. truncated)
         $truncatedTables = [];
         foreach ($tableGzFiles as $tableGzFile) {
             if ($tableGzFile === '..' || $tableGzFile === '.') {

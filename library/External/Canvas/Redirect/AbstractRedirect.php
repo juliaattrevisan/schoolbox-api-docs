@@ -25,6 +25,16 @@ use Schoolbox\Resource\Folder\Model as Folder;
 class AbstractRedirect
 {
     /**
+     * Canvas course id is <folder_code><parent_folder_code>
+     */
+    protected string $courseIdFormat = '%s%s';
+
+    /**
+     * The column used to find canvas course in course_dim table
+     */
+    protected string $courseCodeColumn = "code";
+
+    /**
      * The host url for canvas instance at this school
      * Typically found in config.canvas_url
      *
@@ -129,7 +139,7 @@ class AbstractRedirect
     public function getCanvasCourseId(Folder $folder, Folder $parentFolder): ?int
     {
         $courseCode = sprintf(
-            '%s%s',
+            $this->courseIdFormat,
             $folder->getCodeString(),
             $parentFolder->getCodeString()
         );
@@ -140,7 +150,7 @@ class AbstractRedirect
         $query = "
             SELECT canvas_id
             FROM course_dim
-            WHERE code = :courseCode
+            WHERE {$this->courseCodeColumn} = :courseCode
             AND workflow_state IN ('claimed', 'available')
         ";
 

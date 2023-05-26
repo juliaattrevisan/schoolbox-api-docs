@@ -26,10 +26,18 @@ class RedirectFactory
     ) {
     }
 
+    /**
+     * Return an instance of a redirect class, unique per school,
+     * because everyone has their own naming convention which affects the redirect url.
+     * If a school is using canvas but doesn't have its own redirect class, their redirect will silently not work.
+     * @return AbstractRedirect|null
+     */
     public function produce(): ?AbstractRedirect
     {
         $className = sprintf('Custom\\%s\\Redirect', ucfirst(strtolower($this->siteSchoolCode)));
         if (class_exists($className)) {
+            // TRIGS and NEWIC are using this
+            /** @var \Custom\Trigs\Redirect|\Custom\Newic\Redirect $className */
             return new $className(
                 trim($this->canvasUrl),
                 $this->canvasDb,
