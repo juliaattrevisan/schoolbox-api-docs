@@ -33,21 +33,21 @@
 
     {% if tour.data is defined and not user.impersonated %}
     {% autoescape 'js' %}
-    <script type="text/javascript">
+    <script>
         window.tourData = {{ tour.data|json_encode|raw }};
     </script>
     {% endautoescape %}
     {% endif %}
-    <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/vue/vue.global.prod.js?v={{ config.site_version }}"></script>
-    <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/main.js?v={{ config.site_version }}"></script>
-    <script type="text/javascript" src="{{ CDN_PREFIX }}/js/fullcalendar/schoolbox-fullcalendar.min.js?v={{ config.site_version }}"></script>
-    <script type="text/javascript" src="/service-worker.js?v={{ config.site_version }}"></script>
+    <script src="{{ CDN_PREFIX }}/js/vendors/vue/vue.global.prod.js?v={{ config.site_version }}"></script>
+    <script src="{{ CDN_PREFIX }}/js/bundle/main.js?v={{ config.site_version }}"></script>
+    <script src="{{ CDN_PREFIX }}/js/fullcalendar/schoolbox-fullcalendar.min.js?v={{ config.site_version }}"></script>
+    <script src="/service-worker.js?v={{ config.site_version }}"></script>
 
     <script src="{{ CDN_PREFIX }}/js/browser/browser-redirect.js?v={{ config.site_version }}"></script>
     <script async charset="utf-8" src="//cdn.iframe.ly/embed.js?api_key=94aa8fc28ac1089a2dfb28" crossorigin></script>
 
     {% autoescape 'js' %}
-    <script type="text/javascript">
+    <script>
 
         // Date formats (global variable)
         window.siteLocation = "{{ config.site_school_code }}";
