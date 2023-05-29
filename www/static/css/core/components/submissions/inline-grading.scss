@@ -9,6 +9,8 @@
 /* Indicate which file you're currently viewing
  */
 .inline-grader-filelist {
+    margin-bottom: 1rem;
+
     li.inline-grader-file {
         background-color: $white;
         &.selected {
