@@ -9,7 +9,6 @@
 
 namespace Schoolbox\WebDav\Rules;
 
-use Alaress\Rules\Condition;
 use Alaress\Rules\TokenizedRuleset;
 use Schoolbox\User;
 
@@ -103,7 +102,7 @@ class Ruleset extends TokenizedRuleset
 
 
     /**
-     * @return Rule[]
+     * @return array<Rule>
      */
     public function getRules()
     {

@@ -6066,11 +6066,6 @@ parameters:
 			path: library/Schoolbox/Sync/Grammar/Ruleset.php
 
 		-
-			message: "#^Method Schoolbox\\\\Sync\\\\Grammar\\\\Ruleset\\:\\:getRulesBySequence\\(\\) should return array\\<Schoolbox\\\\Sync\\\\Grammar\\\\Rule\\> but returns array\\<int, Alaress\\\\Rules\\\\Rule\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/Sync/Grammar/Ruleset.php
-
-		-
 			message: "#^Unreachable statement \\- code above always terminates\\.$#"
 			count: 1
 			path: library/Schoolbox/Sync/Grammar/Test/UserRulesetTest.php
@@ -6277,11 +6272,6 @@ parameters:
 
 		-
 			message: "#^Call to function is_array\\(\\) with Alaress\\\\Rules\\\\Lang\\\\Construct\\|string will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/WebDav/Rules/Ruleset.php
-
-		-
-			message: "#^Method Schoolbox\\\\WebDav\\\\Rules\\\\Ruleset\\:\\:getRules\\(\\) should return array\\<Schoolbox\\\\WebDav\\\\Rules\\\\Rule\\> but returns array\\<int, Alaress\\\\Rules\\\\Rule\\>\\.$#"
 			count: 1
 			path: library/Schoolbox/WebDav/Rules/Ruleset.php
 

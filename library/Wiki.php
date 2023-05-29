@@ -158,6 +158,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
     {
         $coreFields = array('categoryID', 'locked', 'slug');
 
+        $coreData = null;
         foreach ($coreFields as $field) {
             if ($data[$field]) {
                 $coreData[$field] = $data[$field];

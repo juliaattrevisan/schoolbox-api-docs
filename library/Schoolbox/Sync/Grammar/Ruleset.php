@@ -319,7 +319,7 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
 
 
     /**
-     * @return Rule[]
+     * @return array<Rule>
      */
     public function getRulesBySequence()
     {

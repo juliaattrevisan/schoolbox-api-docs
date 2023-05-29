@@ -70,7 +70,7 @@ class NodeFactory
      */
     protected function buildNode($label, $nodeId, $mimeFilter = null, $tenant = null, $oAuthToken = null)
     {
-        if (isset($this->loaders[$label]) && is_callable($this->loaders[$label])) {
+        if (is_callable($this->loaders[$label] ?? null)) {
             $node = call_user_func($this->loaders[$label], $nodeId, $mimeFilter, $tenant, $oAuthToken);
             if ($node instanceof NodeInterface) {
                 return $node;
