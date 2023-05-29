@@ -133,8 +133,10 @@ Data:
                         {% set statusRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: assessable.id, assessment: assessable}) %}
                         {% if assessable is quiz %}
                             {% set modifyRoute = routeLookupIfAuthorized('learningQuiz.getQuizSummary', {assessmentId: assessable.id, assessment: assessable}) %}
+                            {% set viewRoute = (assessment.baseContext is unitSpecification) ? modifyRoute : routeLookupIfAuthorized('learningAssessment.getSummary', {assessmentId: assessable.id, assessment: assessable, studentId: USER.id, student: USER}) %}
                         {% else %}
                             {% set modifyRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessable.id, assessment: assessable}) %}
+                            {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {assessmentId: assessable.id, assessment: assessable, studentId: USER.id, student: USER}) %}
                         {% endif %}
                         {% set deleteRoute = routeLookupIfAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessable.id, assessment: assessable}) %}
                         {% set hasActions = statusRoute or modifyRoute or deleteRoute %}
@@ -145,7 +147,6 @@ Data:
                                 <div class="grip"></div>
                                 <div class="list-item">
                                     <div class="compact card small-12 wrap-down">
-                                        {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {assessmentId: assessable.id, assessment: assessable, studentId: USER.id, student: USER}) %}
                                         {% if viewRoute %}
                                         <a href="{{ viewRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">
                                         {% endif %}
