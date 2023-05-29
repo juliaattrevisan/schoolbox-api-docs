@@ -111,9 +111,16 @@
             <div class="small-12 columns">
                 <div class="empty-state">
                     <i class="icon-lesson-plan"></i>
-                    <p>
-                        There are no available lesson plan templates. Please contact a Superuser at your school if you wish to use Lesson Plans, as you will require a template
-                    </p>
+                    {% if USER.isSuperuser %}
+                        <p>
+                            No lesson plan templates have been created.
+                            <a href="{{ routeLookup('adminLessonPlanTemplate.getCreate') }}">Click here</a> to build a lesson plan template.
+                        </p>
+                    {% else %}
+                        <p>
+                            There are no available lesson plan templates. Please contact a Superuser at your school if you wish to use Lesson Plans, as you will require a template
+                        </p>
+                    {% endif %}
                 </div>
             </div>
         </div>
