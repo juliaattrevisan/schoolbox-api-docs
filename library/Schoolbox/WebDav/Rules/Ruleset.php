@@ -11,7 +11,11 @@ namespace Schoolbox\WebDav\Rules;
 
 use Alaress\Rules\TokenizedRuleset;
 use Schoolbox\User;
+use SplObjectStorage;
 
+/**
+ * @property SplObjectStorage<Rule> $rules
+ */
 class Ruleset extends TokenizedRuleset
 {
     /** @var Tokenizer */

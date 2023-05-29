@@ -15,11 +15,13 @@ use Schoolbox\Mapper;
 use Schoolbox\Sync\Effect\Fragment\Lookup;
 use Schoolbox\Sync\Hydrator\HydratorInterface;
 use Schoolbox\User as InternalUser;
+use SplObjectStorage;
 
 /**
  * Class Ruleset
  *
  * @package Schoolbox\Sync\Grammar
+ * @property SplObjectStorage<Rule> $rules
  */
 class Ruleset extends TokenizedRuleset implements HydratorInterface
 {
