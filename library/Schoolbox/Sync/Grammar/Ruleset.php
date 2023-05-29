@@ -306,7 +306,7 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
      * Compatibility method, defaults to sequence
      *
      * @param bool $byPrecedence
-     * @return Rule[]
+     * @return array<Rule>
      */
     public function getRules($byPrecedence = false)
     {
@@ -335,7 +335,7 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
 
 
     /**
-     * @return Rule[]
+     * @return array<Rule>
      */
     public function getRulesByPrecedence()
     {
