@@ -733,8 +733,8 @@
 
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader" id="image-slider">Image Slider (Swiper)</h2>
-        <div class="swiper" id="pantry-imageslider">
+        <h2 class="subheader" id="image-slideshow">Image Slideshow</h2>
+        <div class="swiper" id="pantry-imageslideshow">
             <div class="swiper-wrapper">
                 <div class="swiper-slide">
                     <img src="https://source.unsplash.com/Cwyp10YmDRw/1440x280" loading="lazy" />
@@ -758,7 +758,7 @@
             document.dispatchEvent(
                 new CustomEvent("swiperInitialize", {
                     detail: {
-                        target: document.getElementById("pantry-imageslider"),
+                        target: document.getElementById("pantry-imageslideshow"),
                         options: {},
                     },
                 })

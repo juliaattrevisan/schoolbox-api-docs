@@ -177,7 +177,7 @@
         <div class="row">
             <div class="small-12 island">
                 <h2 class="subheader">Recent Photos</h2>
-                <div class="swiper" id="profile-imageslider">
+                <div class="swiper" id="profile-imageslideshow">
                     <div class="swiper-wrapper">
                     <!-- BEGIN recent_photo -->'
                         <div class="swiper-slide">
@@ -195,7 +195,7 @@
                     document.dispatchEvent(
                         new CustomEvent("swiperInitialize", {
                             detail: {
-                                target: document.getElementById("profile-imageslider"),
+                                target: document.getElementById("profile-imageslideshow"),
                                 options: {},
                             },
                         })

@@ -45,12 +45,12 @@ $swipe-color-hover: $steel;
         height: auto;
         min-height: 5rem;
 
-        // For dashboard slider, image fills space and maintains aspect ratio
+        // For dashboard slideshow, image fills space and maintains aspect ratio
         img {
             width: 100%;
         }
 
-        // Constrain size of slider for slideshow components to minimise image size effects on page
+        // Constrain size of slideshow for slideshow components to minimise image size effects on page
         .square {
             @include swiper-constrain(100%);
         }

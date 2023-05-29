@@ -68,7 +68,7 @@
             <!-- END empty_state -->
 
             <!-- BEGIN has_images -->
-            <section class="imageslider-container">
+            <section class="imageslideshow-container">
                 <!-- BEGIN source_folder_deleted -->
                 {SOURCE_FOLDER_UNAVAILABLE}
                 <!-- END source_folder_deleted -->
@@ -76,7 +76,7 @@
                 <!-- BEGIN source_folder_exists -->
                 <div class="dropzone-wrap no-margin">
                     <form class="dropzone overlay" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post" data-accepts="image"></form>
-                    <div class="swiper" id="component{COMPONENT_INSTANCE_ID}-imageslider">
+                    <div class="swiper" id="component{COMPONENT_INSTANCE_ID}-imageslideshow">
                         <div class="swiper-wrapper">
                             <!-- BEGIN image_scroller -->
                             <div class="swiper-slide">
@@ -154,7 +154,7 @@
                                 document.dispatchEvent(
                                     new CustomEvent("swiperInitialize", {
                                         detail : {
-                                            target: document.getElementById("component{COMPONENT_INSTANCE_ID}-imageslider"),
+                                            target: document.getElementById("component{COMPONENT_INSTANCE_ID}-imageslideshow"),
                                             options: Object.assign({
                                                 initialSlide: {COMPONENT_RANDOM_SLIDE},
                                                 autoplay: {

@@ -7,7 +7,7 @@
 
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 columns">
-            <div class="swiper" id="component{COMPONENT_INSTANCE_ID}-imageslider">
+            <div class="swiper" id="component{COMPONENT_INSTANCE_ID}-imageslideshow">
                 <div class="swiper-wrapper">
                     <!-- BEGIN image_scroller -->
                     <div class="swiper-slide">
@@ -86,7 +86,7 @@
             document.dispatchEvent(
                 new CustomEvent("swiperInitialize", {
                     detail : {
-                        target: document.getElementById("component{COMPONENT_INSTANCE_ID}-imageslider"),
+                        target: document.getElementById("component{COMPONENT_INSTANCE_ID}-imageslideshow"),
                         options: Object.assign({
                             initialSlide: {COMPONENT_RANDOM_SLIDE},
                             autoplay: {
