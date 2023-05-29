@@ -111,7 +111,7 @@ const { x, y, strategy } = useFloating(referenceElement, popOutElement, {
  *  the activity they're expecting to see might not be there.
  */
 const viewAllText = computed(() => {
-    if ('Due Work' !== assessmentType.value) {
+    if (('Task' === assessmentType.value) || ('Project' === assessmentType.value)) {
         return "";
     }
     if (isExcluded.value) {
