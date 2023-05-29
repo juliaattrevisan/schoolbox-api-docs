@@ -282,34 +282,18 @@ abstract class Base implements ITranslator
     /**
      * Helper for setting a field on the model.
      *
-     * This helper is tolerant of `TypeError` errors when setting the model's
-     * field value: it will instead raise a `E_USER_WARNING` and leave the field
-     * value as it was.
-     *
-     * TODO consider whether to actually be lenient of type errors here.
-     *      I can see a case for not silently ignoring values that are of an
-     *      invalid type.
+     * This helper was once tolerant of `TypeError` errors when setting the
+     * model's field value: it no longer is, and will raise a `TypeError`.
      *
      * @param object $model
      * @param string $modelFieldSetter
      * @param mixed  $value
      * @return object
+     * @throws TypeError if `$value` is not valid for `$model`'s attribute
+     *                   referenced by `$modelFieldSetter`
      */
     private function setFieldOnModel(object $model, string $modelFieldSetter, $value): object
     {
-        try {
-            return $model->$modelFieldSetter($value);
-        } catch (TypeError $e) {
-            trigger_error(
-                sprintf(
-                    'Attempting to call "%s::%s" with invalid parameter of type "%s": skipping',
-                    get_class($model),
-                    $modelFieldSetter,
-                    (is_object($value) ? get_class($value) : gettype($value))
-                ),
-                E_USER_WARNING
-            );
-            return $model;
-        }
+        return $model->$modelFieldSetter($value);
     }
 }

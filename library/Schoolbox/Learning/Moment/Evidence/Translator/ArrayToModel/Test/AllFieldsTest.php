@@ -11,6 +11,7 @@ namespace Schoolbox\Learning\Moment\Evidence\Translator\ArrayToModel\Test;
 
 use Alaress_Date_Format;
 use DateTimeZone;
+use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Discussion\Thread\Model as DiscussionThread;
@@ -436,6 +437,7 @@ class AllFieldsTest extends TestCase
      */
     public function testInvokeUpdateInvalidValues(array $input, Model $existing, Model $expected): void
     {
+        $this->expectException(InvalidArgumentException::class);
         $converter = $this->createConverterIfNull();
 
         /** @noinspection PhpUnhandledExceptionInspection */

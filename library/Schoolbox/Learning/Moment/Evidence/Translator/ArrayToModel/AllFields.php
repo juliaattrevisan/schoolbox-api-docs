@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Moment\Evidence\Translator\ArrayToModel;
 
 use Alaress_Date_Format;
+use InvalidArgumentException;
 use Schoolbox\API\Translator\ArrayToModel\Base;
 use Schoolbox\Curriculum\Node\Model as CurriculumNode;
 use Schoolbox\Discussion\Thread\Model as DiscussionThread;
@@ -53,8 +54,10 @@ class AllFields extends Base
      * @param object|Evidence\Model|null $model If provided, update this model;
      *                                   otherwise create a new one
      * @return object|Evidence\Model
-     * @throws ResourceException if the collector factory can't find the file
-     *                                   that was uploaded
+     * @throws ResourceException        if the collector factory can't find the
+     *                                  file that was uploaded
+     * @throws InvalidArgumentException if attempting to set creator or
+     *                                  recipient to null
      */
     public function __invoke(array $json, ?object $model = null): object
     {
@@ -111,11 +114,7 @@ class AllFields extends Base
                     $model->setCreator((new User())->setId($json['creator']['id']));
                 }
             } else {
-                // raise a warning, but continue
-                trigger_error(
-                    'Attempting to set evidence creator to invalid null value: skipping',
-                    E_USER_WARNING
-                );
+                throw new InvalidArgumentException('Attempting to set evidence creator to invalid null value');
             }
         }
 
@@ -139,10 +138,7 @@ class AllFields extends Base
                     $model->setRecipient((new User())->setId($json['recipient']['id']));
                 }
             } else {
-                trigger_error(
-                    'Attempting to set evidence recipient to invalid null value: skipping',
-                    E_USER_WARNING
-                );
+                throw new InvalidArgumentException('Attempting to set evidence recipient to invalid null value');
             }
         }
 

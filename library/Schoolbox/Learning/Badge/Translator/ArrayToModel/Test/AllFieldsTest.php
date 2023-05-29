@@ -20,6 +20,7 @@ use Schoolbox\Resource\Attachment\Collector\Collector;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\User;
+use TypeError;
 
 /**
  * Tests for converting from an array to model representation of badges.
@@ -496,6 +497,7 @@ class AllFieldsTest extends TestCase
      */
     public function testInvokeUpdateInvalidValues(array $input, Model $existing, Model $expected): void
     {
+        $this->expectException(TypeError::class);
         $converter = $this->createConverterIfNull();
 
         /** @noinspection PhpUnhandledExceptionInspection */
