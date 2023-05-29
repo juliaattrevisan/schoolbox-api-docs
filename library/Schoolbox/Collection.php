@@ -373,7 +373,10 @@ class Collection implements ICollection, Serializable, ArrayAccess
      * Gets values for the given model property in the collection.
      *
      * @param string $property
-     * @return mixed[]|array
+     * @return array
+     * @throws InvalidArgumentException if any item in `$this` can't have
+     *                                  the getter method for `$property` called
+     *                                  upon it
      */
     public function getPropertyValues(string $property): array
     {
@@ -384,13 +387,12 @@ class Collection implements ICollection, Serializable, ArrayAccess
             if (is_callable($method)) {
                 $parts[] = $method();
             } else {
-                trigger_error(
+                throw new InvalidArgumentException(
                     sprintf(
                         'Method "%s" is not callable on %s',
                         $methodName,
                         (is_object($item) ? get_class($item) : 'non-object'),
-                    ),
-                    E_USER_WARNING
+                    )
                 );
             }
         }
