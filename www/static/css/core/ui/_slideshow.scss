@@ -1,5 +1,9 @@
 //
-// Image Slider (Swiper)
+// Image Slideshow Styles
+// Used by /www/static/js/slideshow/slideshow.ts
+//
+// "swiper" is the name of the library used to create the image slideshows
+// and hence the CSS must target it via "swiper" instead of "slideshow"
 //
 $swipe-color: $iron;
 $swipe-color-hover: $steel;

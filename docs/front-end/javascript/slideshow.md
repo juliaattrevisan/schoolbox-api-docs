@@ -2,7 +2,7 @@
 
 Used for all image slideshows on Schoolbox.
 
-This is a wrapper around the image slider plugin we use - [Swiper](https://swiperjs.com/), with lazy loading and other preferred settings set by default.
+This is a wrapper around the image slideshow plugin we use - [Swiper](https://swiperjs.com/), with lazy loading and other preferred settings set by default.
 
 ## Initialising
 
@@ -40,7 +40,7 @@ document.dispatchEvent(
 ````
 
 ## Styles
-Styles can be found in `www/static/css/foundation/ui/_slider.scss`.
+Styles can be found in `www/static/css/foundation/ui/__slideshow_.scss`.
 
 ## Parameters
 You can send any of the options Swiper takes, see the [Swiper docs](https://swiperjs.com/swiper-api#parameters) for the list of Swiper parameters.
