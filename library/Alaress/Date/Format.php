@@ -521,19 +521,18 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
      * @param int    $hour     The hour in 12 hour time
      * @param string $meridiem The associated meridiem: "AM" or "PM"
      *
-     * @return int|null The hour, or null if calculation failed.
-     *                  Note this can return int(0) - you need to check whether
-     *                  the result isset(), a !empty() or truthy check is not
-     *                  sufficient.
+     * @return int The hour.
+     *             Note this can return int(0) - you need to check whether the
+     *             result isset(), a !empty() or truthy check is not sufficient.
+     * @throws InvalidArgumentException if hour was not between 1 and 12
+     * @throws InvalidArgumentException if meridiem was neither AM or PM
      */
     protected function calculate24HourFrom12Hour($hour, $meridiem)
     {
         if ($hour < 1 || $hour > 12) {
-            trigger_error(
-                sprintf('hour "%s" must be between 1 and 12', $hour),
-                E_USER_WARNING
+            throw new InvalidArgumentException(
+                sprintf('hour "%s" must be between 1 and 12', $hour)
             );
-            return null;
         }
         switch (strtoupper($meridiem)) {
             case self::AM:
@@ -558,11 +557,9 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
                 break;
             default:
                 // meridiem is wrong
-                trigger_error(
-                    sprintf('meridiem "%s" must be "AM" or "PM"', $meridiem),
-                    E_USER_WARNING
+                throw new InvalidArgumentException(
+                    sprintf('meridiem "%s" must be "AM" or "PM"', $meridiem)
                 );
-                return null;
         }
         return $adjustedHour;
     }
@@ -676,17 +673,12 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
      * @param int    $sec
      * @param string $meridiem
      * @return $this
+     * @throws InvalidArgumentException if hour was not between 1 and 12
+     * @throws InvalidArgumentException if meridiem was neither AM or PM
      */
     public function set12HourTime($hour, $min, $sec, $meridiem)
     {
         $adjustedHour = $this->calculate24HourFrom12Hour($hour, $meridiem);
-        if (!isset($adjustedHour)) {
-            trigger_error(
-                'either hour or meridiem was invalid - not adjusting time',
-                E_USER_WARNING
-            );
-            return $this;
-        }
         $this->getDateTimeObject()->setTime($adjustedHour, $min, $sec);
         return $this;
     }
