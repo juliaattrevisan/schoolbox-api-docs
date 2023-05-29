@@ -803,12 +803,12 @@ class DataSource
 
         $searchResults = $filteredRecords->indexBy('id')->keys();
 
-        // Record the search results that were returned by the search by imploding their IDs down into CSV
+        /* Remember everyone's search terms, but not the records that matched
+         */
         if (count($searchResults)) {
             $auditRecord = $this->pastoralAuditMapper->createModel()
                                                      ->setUser($currentUser)
-                                                     ->setSearch(mb_substr($search, 0, 255))
-                                                     ->setSearchResult(implode(',', $searchResults));
+                                                     ->setSearch(mb_substr($search, 0, 255));
             $this->pastoralAuditMapper->save($auditRecord);
         }
         return $filteredRecords;
