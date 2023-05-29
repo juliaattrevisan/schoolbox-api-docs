@@ -468,12 +468,14 @@ async function onMenuItemSelected(target: string, action: string|null = null) {
                 </small-card>
             </div>
             <div class="c-pop-out-menu__options">
+                <template v-if="'Project' !== assessmentType">
                 <pop-out-menu-item
                     :class="{ 'is-disabled': isExpansionDisabled || isActivityEmpty }"
                     @selected="onToggleSelected()"
                 >
                     {{ viewAllText }}
                 </pop-out-menu-item>
+                </template>
                 <template v-if="'Due Work' === assessmentType & !isExcluded">
                 <pop-out-menu-divider />
                     <pop-out-menu-item v-if="!isExcluded"
