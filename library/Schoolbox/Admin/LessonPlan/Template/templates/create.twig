@@ -14,6 +14,18 @@
 
 <script>
     $(function() {
+        /**
+         *  Mandate at least one field existing at all times
+         */
+        function refreshDeletes() {
+            if ($('#fields').find('li').length === 1) {
+                $('#fields li [data-delete]').first().addClass('hide');
+            } else {
+                $('#fields li [data-delete]').removeClass('hide');
+            }
+        }
+
+
         let fieldCount = 1;
 
         // Set up draggable menu
@@ -43,7 +55,6 @@
                 document.querySelector('#fields').classList.remove('s-is-dragging');
             }
         });
-
 
         $('#add-field').on('click', function() {
             /* Make a clone
@@ -107,6 +118,10 @@
             /* Postincrement in preparation for another new row
              */
             fieldCount++;
+
+            /* Mandate at least one field existing at all times
+             */
+            refreshDeletes();
         });
 
         /* A dynamic mix-it-up of fields that already exist
@@ -141,9 +156,17 @@
                 text: 'Are you sure you want to delete this field?',
                 confirmEvent: function() {
                     $(element).parents('li').remove();
+
+                    /* Mandate at least one field existing at all times
+                     */
+                    refreshDeletes();
                 }
             });
         });
+
+        /* Mandate at least one field existing at all times
+         */
+        refreshDeletes();
     });
 
     document.querySelectorAll('[id^=field-body-]').forEach((el) => {
