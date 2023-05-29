@@ -201,13 +201,11 @@ function addListenersForDisablingSubmitButtons(
         const buttonTextOriginal: string = getButtonText(submitButton);
 
         ckeditorSourceEl.addEventListener(EditorEvent.EDITOR__MAX_CHAR_COUNT_EXCEEDED, function () {
-            console.info("wordCountSettings.ts onMaxCharCountExceeded() e");
             changeButtonState(
                 submitButton,
                 true,
                 buttonTextOriginal + " (disabled because content storage limit exceeded)"
             );
-            console.info("wordCountSettings.ts onMaxCharCountExceeded() x");
         });
 
         ckeditorSourceEl.addEventListener(EditorEvent.EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED, function () {
@@ -254,7 +252,6 @@ function getButtonText(buttonElem: Element) {
  * @param { string } newText
  */
 function changeButtonState(buttonElem: HTMLElement, maxCharCountExceeded: boolean, newText: string) {
-    console.info("wordCountSettings.ts changeButtonState() e");
     const buttonTagName = buttonElem.tagName.toLowerCase();
 
     switch (buttonTagName) {
@@ -262,7 +259,6 @@ function changeButtonState(buttonElem: HTMLElement, maxCharCountExceeded: boolea
             buttonElem.setAttribute("value", newText);
             break;
         case "button":
-            console.info("wordCountSettings.ts changeButtonState() button");
             buttonElem.innerHTML = newText;
             break;
         default:
@@ -276,5 +272,4 @@ function changeButtonState(buttonElem: HTMLElement, maxCharCountExceeded: boolea
     } else {
         buttonElem.removeAttribute("data-ckEditorMaxCharCountExceededAtLastCheck");
     }
-    console.info("wordCountSettings.ts changeButtonState() x");
 }
