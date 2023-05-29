@@ -13,7 +13,6 @@ namespace Config\Modules;
 use Psr\Container\ContainerInterface;
 use Schoolbox\Curriculum\Api\Module as ApiModule;
 use Schoolbox\Curriculum\Api\Usage\Module as ApiUsageModule;
-use Schoolbox\Curriculum\Import\Module as ImportModule;
 use Schoolbox\Curriculum\Module;
 
 class Curriculum implements ModuleConfigInterface
@@ -25,9 +24,6 @@ class Curriculum implements ModuleConfigInterface
     {
         $module = new Module($di);
         $module->registerModule('/curriculum');
-
-        $importModule = new ImportModule($di);
-        $importModule->registerModule('/curriculum/import');
 
         $apiModule = new ApiModule($di);
         $apiModule->registerModule('/api/curriculum');

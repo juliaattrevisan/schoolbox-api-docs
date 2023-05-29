@@ -52,7 +52,6 @@ function onCreateNewSelected() {
                         title="Create a new Curriculum"
                         >Create a new Curriculum</a
                     >
-                    <a href="/curriculum/import" title="Import Curriculum">Import Curriculum</a>
                 </template>
             </div>
             <section v-else>
