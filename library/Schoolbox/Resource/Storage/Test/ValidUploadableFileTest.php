@@ -22,6 +22,15 @@ use Schoolbox\Resource\Storage\ValidUploadableFile;
 class ValidUploadableFileTest extends TestCase
 {
     /**
+     * Constant base time: required for test environment, as
+     * `Alaress_Date_Format::now()` doesn't return a consistent time in test run
+     * contexts.
+     *
+     * @var Alaress_Date_Format|null
+     */
+    private ?Alaress_Date_Format $baseTime = null;
+
+    /**
      * @dataProvider getTestIsSatisfiedByValidCaseData
      * @covers \Schoolbox\Resource\Storage\ValidUploadableFile::isSatisfiedBy
      * @param Model $file
@@ -31,7 +40,7 @@ class ValidUploadableFileTest extends TestCase
     public function testIsSatisfiedByValidCase(Model $file)
     {
         /** @noinspection PhpUnhandledExceptionInspection this should never throw */
-        $this->assertTrue((new ValidUploadableFile())->isSatisfiedBy($file));
+        $this->assertTrue((new ValidUploadableFile($this->createBaseTime()))->isSatisfiedBy($file));
     }
 
     /**
@@ -57,17 +66,17 @@ class ValidUploadableFileTest extends TestCase
         yield 'file under size limit, expiry before latest temp date' => [
             (clone $standardFile)
                 ->setSize(1_000_000)
-                ->setExpiryAt(Alaress_Date_Format::now()->addDays(15)),
+                ->setExpiryAt($this->createBaseTime()->addDays(15)),
         ];
         yield 'file under size limit, expiry after latest temp date' => [
             (clone $standardFile)
                 ->setSize(1_000_000)
-                ->setExpiryAt(Alaress_Date_Format::now()->addDays(15)->addSeconds(1)),
+                ->setExpiryAt($this->createBaseTime()->addDays(15)->addSeconds(1)),
         ];
         yield 'file over size limit, expiry before latest temp date' => [
             (clone $standardFile)
                 ->setSize(1_000_001)
-                ->setExpiryAt(Alaress_Date_Format::now()->addDays(15)),
+                ->setExpiryAt($this->createBaseTime()->addDays(15)),
         ];
     }
 
@@ -84,7 +93,7 @@ class ValidUploadableFileTest extends TestCase
     ) {
         $this->expectException(FileException::class);
         $this->expectExceptionMessageMatches($errorPattern);
-        ((new ValidUploadableFile())->isSatisfiedBy($file));
+        ((new ValidUploadableFile($this->createBaseTime()))->isSatisfiedBy($file));
     }
 
     /**
@@ -127,8 +136,19 @@ class ValidUploadableFileTest extends TestCase
             (clone $standardFile)
                 ->setMimetype($standardMimetype)
                 ->setSize(1_000_001)
-                ->setExpiryAt(Alaress_Date_Format::now()->addDays(15)->addSeconds(1)),
+                ->setExpiryAt($this->createBaseTime()->addDays(15)->addSeconds(1)),
             '/^this file exceeds the file size restriction/i',
         ];
+    }
+
+    /**
+     * Create a base time object, if this test doesn't have one already.
+     *
+     * @return Alaress_Date_Format
+     */
+    private function createBaseTime(): Alaress_Date_Format
+    {
+        $this->baseTime ??= Alaress_Date_Format::now();
+        return (clone $this->baseTime);
     }
 }

@@ -117,7 +117,7 @@ class Receiver implements IReceiver
             $requireSafety = false;
         }
         if ($requireSafety) {
-            $validator = new ValidUploadableFile();
+            $validator = new ValidUploadableFile(Alaress_Date_Format::now());
             $validator->isSatisfiedBy($storage);
         } elseif (!$storage->getMimetype() instanceof Mimetype) {
             // For superusers only, we allow an unknown mimetype
