@@ -324,10 +324,6 @@ $masonry-drop-background: $input-focus-bg-color;
     @extend .icon-image-gallery;
     color: $icon-color-image-gallery;
 }
-.icon-masonry-Component_Dashboard_ImageSliderController:before {
-    @extend .icon-image-slideshow;
-    color: $icon-color-image-slideshow;
-}
 .icon-masonry-Component_Dashboard_NewsController:before {
     @extend .icon-news;
     color: $icon-color-news;
