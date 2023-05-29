@@ -295,4 +295,27 @@ class SchoolboxCli extends \Codeception\Module
     {
         return \Schoolbox\Learning\Moment\Evidence\Mapper::getInstance()->findOneByColumn('body', $body);
     }
+
+    /**
+     * Returns the lesson plan template based on its title.
+     *
+     * @param string $title
+     * @return \Schoolbox\Admin\LessonPlan\Template\Model;
+     */
+    public function grabLessonPlanTemplateByTitle(?string $title): \Schoolbox\Admin\LessonPlan\Template\Model
+    {
+        return \Schoolbox\Admin\LessonPlan\Template\Mapper::getInstance()->findOneByColumn('title', $title);
+    }
+
+
+    /**
+     * Returns the lesson plan template field based on its title
+     *
+     * @param string $title
+     * @return \Schoolbox\Admin\LessonPlan\Template\Field\Model;
+     */
+    public function grabLessonPlanTemplateFieldByTitle(?string $title): \Schoolbox\Admin\LessonPlan\Template\Field\Model
+    {
+        return \Schoolbox\Admin\LessonPlan\Template\Field\Mapper::getInstance()->findOneByColumn('title', $title);
+    }
 }
