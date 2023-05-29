@@ -350,18 +350,9 @@ class Controller extends Base
 
         $pastoralAuditMapper = PastoralAuditMapper::getInstance();
 
-        $searchResults = [];
-
-        // Get the record ID of each record displayed on the page to the user
-
-        foreach ($records as $result) {
-            $searchResults[] = $result->getId();
-        }
-
         $auditRecord = $pastoralAuditMapper->createModel();
         $auditRecord->setUser($this->getUser());
         $auditRecord->setReportId($report->getId());
-        $auditRecord->setSearchResult(implode(',', $searchResults));
         $pastoralAuditMapper->save($auditRecord);
 
         $showSeverity   = $this->getConfigLoader()->get('pastoral_severity');
