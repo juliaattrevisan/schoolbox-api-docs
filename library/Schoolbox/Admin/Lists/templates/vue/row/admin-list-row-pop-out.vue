@@ -84,7 +84,7 @@ export default {
          * For example if there's 'Role Type' like in Lists > Roles, we would hide all fields if 'Guest' was selected
          */
         enableChangePopOutWatcher() {
-            this.$window.Vue.watch(`row.${this.headerField.changePopOut}`, (newValue) => {
+            this.$watch(`row.${this.headerField.changePopOut}`, (newValue) => {
                 const changePopOutOptions = this.headerField.changePopOutOptions[newValue]; //the list of options available based on the selection of 'changePopOut'
                 this.updatePopOut(changePopOutOptions);
             });
