@@ -138,21 +138,19 @@
         });
     </script>
 
-    {% if lessonPlanTemplates.all|length %}
-        {# submit button is only available if any of the following are true:
-         #   * a template is selected
-         #   * you're in a Part 2 of mage, because in that one particular mage usage Part 1 was the selection screen
+    {# submit button is only available if any of the following are true:
+     #   * a template is selected
+     #   * you're in a Part 2 of mage, because in that one particular mage usage Part 1 was the selection screen
+     #}
+    {% if lessonPlanMeta.template %}
+        {{ mage.submitRow(actionLabel ?? 'Create', 'part-2', 'end') }}
+    {% elseif lessonPlanMeta.mageAsync %}
+        {# Don't provide a Create button at the bottom; users must choose a template,
+         # not submit a form, in this Selection step. They have to do it by clicking
+         # the title or Use Template via the modal.
          #}
-        {% if lessonPlanMeta.template %}
+        <div class="hide">
             {{ mage.submitRow(actionLabel ?? 'Create', 'part-2', 'end') }}
-        {% elseif lessonPlanMeta.mageAsync %}
-            {# Don't provide a Create button at the bottom; users must choose a template,
-             # not submit a form, in this Selection step. They have to do it by clicking
-             # the title or Use Template via the modal.
-             #}
-            <div class="hide">
-                {{ mage.submitRow(actionLabel ?? 'Create', 'part-2', 'end') }}
-            </div>
-        {% endif %}
+        </div>
     {% endif %}
 </fieldset>
