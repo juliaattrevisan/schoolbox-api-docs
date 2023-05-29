@@ -1441,11 +1441,6 @@ parameters:
 			path: library/Eportfolio.php
 
 		-
-			message: "#^Method Eportfolio\\\\Page\\:\\:getPermissions\\(\\) should return iterable\\<Eportfolio\\\\Permission\\>&Schoolbox\\\\Collection but returns array\\<Eportfolio\\\\Permission\\>\\|\\(iterable\\<Eportfolio\\\\Permission\\>&Schoolbox\\\\GenericCollection\\)\\.$#"
-			count: 1
-			path: library/Eportfolio/Page.php
-
-		-
 			message: "#^Method Eportfolio_Page_Instance\\:\\:getColours\\(\\) should return array but returns null\\.$#"
 			count: 1
 			path: library/Eportfolio/Page/Instance.php
@@ -1599,26 +1594,6 @@ parameters:
 			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Evaluation/Question/Category.php
-
-		-
-			message: "#^Method External_AscTimetables_Translator_Enrolment\\:\\:translateXmlToArray\\(\\) should return iterable\\<array\\>&Iterator but returns array\\<int, array\\<string, mixed\\>\\>\\.$#"
-			count: 1
-			path: library/External/AscTimetables/Translator/Enrolment.php
-
-		-
-			message: "#^Return type \\(iterable\\<array\\>&Iterator\\) of method External_AscTimetables_Translator_Enrolment\\:\\:translateXmlToArray\\(\\) should be compatible with return type \\(array\\<array\\>\\) of method External_AscTimetables_Translator_Base\\:\\:translateXmlToArray\\(\\)$#"
-			count: 1
-			path: library/External/AscTimetables/Translator/Enrolment.php
-
-		-
-			message: "#^Method External_AscTimetables_Translator_Timetable\\:\\:translateXmlToArray\\(\\) should return iterable\\<array\\>&Iterator but returns array\\<int, array\\<string, mixed\\>\\>\\.$#"
-			count: 1
-			path: library/External/AscTimetables/Translator/Timetable.php
-
-		-
-			message: "#^Return type \\(iterable\\<array\\>&Iterator\\) of method External_AscTimetables_Translator_Timetable\\:\\:translateXmlToArray\\(\\) should be compatible with return type \\(array\\<array\\>\\) of method External_AscTimetables_Translator_Base\\:\\:translateXmlToArray\\(\\)$#"
-			count: 1
-			path: library/External/AscTimetables/Translator/Timetable.php
 
 		-
 			message: "#^Static method External\\\\Canvas\\\\Sync\\\\Bridge\\\\Account\\:\\:canvasIdPrefix\\(\\) is unused\\.$#"
