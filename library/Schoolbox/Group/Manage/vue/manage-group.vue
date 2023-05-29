@@ -103,7 +103,7 @@ const toastEl = window.Vue.ref(null);
  * set the endpoints here, and the stores can just reference the object
  * rather than having to pass them through as props as these values wont change
  */
-onBeforeMount(() => {
+window.Vue.onBeforeMount(() => {
     Endpoints.GROUP_DATA = props.groupDataEndpoint;
     Endpoints.REMOVE_MEMBERS = props.removeMembersEndpoint;
     Endpoints.UPDATE_MEMBERS = props.updateMembersEndpoint;
