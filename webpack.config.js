@@ -5,22 +5,6 @@ const RemoveEmptyScriptsPlugin = require("webpack-remove-empty-scripts"); // htt
 const { styles } = require("@ckeditor/ckeditor5-dev-utils"); // https://www.npmjs.com/package/@ckeditor/ckeditor5-dev-utils
 const MergeIntoSingleFilePlugin = require("webpack-merge-and-include-globally"); // https://www.npmjs.com/package/webpack-merge-and-include-globally
 
-const babelOptions = {
-    presets: [
-        [
-            "@babel/preset-env",
-            {
-                targets: {
-                    browsers: [">0.25%", "not dead", "not op_mini all", "not ie 11"],
-                },
-                useBuiltIns: "usage",
-                corejs: 3,
-            },
-        ],
-    ],
-    plugins: ["@babel/plugin-proposal-optional-chaining"],
-};
-
 module.exports = {
     entry: {
         // https://webpack.js.org/configuration/entry-context/
@@ -266,21 +250,9 @@ module.exports = {
                 },
             },
             {
-                test: /\.js$/,
-                exclude: /node_modules/,
-                use: {
-                    loader: "babel-loader", // to transpile JS code to ensure everything is compatiable with all targeted browsers
-                    options: babelOptions,
-                },
-            },
-            {
                 test: /\.ts(x?)$/, // typescript uses the same babel setup as JS files, but also uses ts-loader to convert the ts to js
                 exclude: /node_modules/,
                 use: [
-                    {
-                        loader: "babel-loader",
-                        options: babelOptions,
-                    },
                     {
                         loader: "ts-loader",
                         options: {
