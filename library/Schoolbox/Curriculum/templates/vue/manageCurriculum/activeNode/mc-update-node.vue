@@ -118,15 +118,15 @@ function onCancelSelected() {
                         <label for="name" class="required">Name</label>
                         <input
                             id="name"
-                            v-model="updateNodeStore.activeNodeCopy.name"
-                            type="text"
                             maxlength="2048"
                             required
+                            type="text"
+                            v-model="updateNodeStore.activeNodeCopy.name"
                         />
                     </div>
                     <div class="small-12 columns">
                         <label for="code">Code</label>
-                        <input id="code" v-model="updateNodeStore.activeNodeCopy.code" type="text" maxlength="64" />
+                        <input type="text" id="code" v-model="updateNodeStore.activeNodeCopy.code" maxlength="64" />
                     </div>
                     <div class="small-12 columns">
                         <label for="description">Description</label>
@@ -136,21 +136,21 @@ function onCancelSelected() {
                         <ul class="flex-list">
                             <li>
                                 <button
-                                    class="button icon-close"
                                     :disabled="updateNodeStore.isProcessing"
                                     @click.prevent="onCancelSelected"
+                                    class="button icon-close"
                                 >
                                     Cancel
                                 </button>
                             </li>
                             <li>
                                 <button
-                                    class="button icon-modify submit"
                                     :data-submit-button-for="ckeditorIdAttr"
                                     :disabled="isUpdateDisabled"
-                                    ref="updateButton"
-                                    data-test-update-node
                                     @click.prevent="onUpdateSelected"
+                                    class="button icon-modify submit"
+                                    data-test-update-node
+                                    ref="updateButton"
                                 >
                                     {{ updateButtonText }}
                                 </button>

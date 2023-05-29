@@ -117,11 +117,11 @@ function onCancelSelected() {
                     <div class="small-12 columns">
                         <label for="name" class="required">Name</label>
                         <input
-                            type="text"
                             id="name"
-                            v-model="addSubsectionStore.subsection.name"
                             maxlength="2048"
                             required
+                            type="text"
+                            v-model="addSubsectionStore.subsection.name"
                         />
                     </div>
                     <div class="small-12 columns">
@@ -136,21 +136,21 @@ function onCancelSelected() {
                         <ul class="flex-list">
                             <li>
                                 <button
-                                    class="button icon-close"
                                     :disabled="addSubsectionStore.isProcessing"
                                     @click.prevent="onCancelSelected"
+                                    class="button icon-close"
                                 >
                                     Cancel
                                 </button>
                             </li>
                             <li>
                                 <button
-                                    class="button icon-add submit"
                                     :data-submit-button-for="ckeditorIdAttr"
-                                    ref="addButton"
-                                    data-test-add-subsection
                                     :disabled="isAddDisabled"
                                     @click.prevent="onAddSubsectionSelected"
+                                    class="button icon-add submit"
+                                    data-test-add-subsection
+                                    ref="addButton"
                                 >
                                     {{ addButtonText }}
                                 </button>
