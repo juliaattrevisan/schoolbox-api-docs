@@ -117,22 +117,26 @@ function updateWordCount(
         }
     };
 
-    let containingForm: HTMLFormElement | null;
-    let submitButtons: HTMLElement[];
+    if (config.maxCharCountAddDefaultEventListeners) {
+        let containingForm: HTMLFormElement | null;
+        let submitButtons: HTMLElement[];
 
-    if (config.maxCharCountSubmitButtons && config.maxCharCountSubmitButtons.length > 0) {
-        containingForm = null;
-        submitButtons = config.maxCharCountSubmitButtons;
-    } else {
-        containingForm = sourceElement.closest("form");
-        submitButtons =
-            containingForm === null
-                ? []
-                : Array.from(containingForm.querySelectorAll("input[type=submit], button[type=submit]"));
-    }
+        if (config.maxCharCountSubmitButtons && config.maxCharCountSubmitButtons.length > 0) {
+            containingForm = null;
+            submitButtons = config.maxCharCountSubmitButtons;
+        } else {
+            containingForm = sourceElement.closest("form");
+            submitButtons =
+                containingForm === null
+                    ? []
+                    : Array.from(containingForm.querySelectorAll("input[type=submit], button[type=submit]"));
+        }
 
-    if (submitButtons.length > 0) {
-        addListenersForDisablingSubmitButtons(sourceElement, containingForm, Array.from(submitButtons));
+        if (submitButtons.length > 0) {
+            addListenersForDisablingSubmitButtons(sourceElement, containingForm, Array.from(submitButtons));
+        } else {
+            console.error("No submit buttons found for CKEditor field, so could not add default event listeners.");
+        }
     }
 
     editor.plugins.get("WordCount").on("update", onUpdateText);
@@ -172,7 +176,9 @@ export function insertWordCount(sourceElement: HTMLElement, editor: Editor, conf
  *  * https://vagrant.dev.schoolbox.cloud/news/34/update (single submit <button>)
  *  * https://vagrant.dev.schoolbox.cloud/news/87/update (multiple submit <button>s)
  *  * https://vagrant.dev.schoolbox.cloud/curriculum (
- *       config.maxCharCountSubmitButtons used and a EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED event listener used
+ *       Vue example using config.maxCharCountAddDefaultEventListeners: false
+ *       (The default event listeners directly manipulate the DOM, and in Vue land that should be avoided
+ *        https://www.danvega.dev/blog/2019/04/18/tips-for-vue-developers-avoid-directly-manipulating-the-dom/)
  *    )
  *
  *  This function is not intended to handle every possible configuration of CKEditor fields inside forms.  If this
@@ -195,11 +201,13 @@ function addListenersForDisablingSubmitButtons(
         const buttonTextOriginal: string = getButtonText(submitButton);
 
         ckeditorSourceEl.addEventListener(EditorEvent.EDITOR__MAX_CHAR_COUNT_EXCEEDED, function () {
+            console.info("wordCountSettings.ts onMaxCharCountExceeded() e");
             changeButtonState(
                 submitButton,
                 true,
                 buttonTextOriginal + " (disabled because content storage limit exceeded)"
             );
+            console.info("wordCountSettings.ts onMaxCharCountExceeded() x");
         });
 
         ckeditorSourceEl.addEventListener(EditorEvent.EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED, function () {
@@ -246,6 +254,7 @@ function getButtonText(buttonElem: Element) {
  * @param { string } newText
  */
 function changeButtonState(buttonElem: HTMLElement, maxCharCountExceeded: boolean, newText: string) {
+    console.info("wordCountSettings.ts changeButtonState() e");
     const buttonTagName = buttonElem.tagName.toLowerCase();
 
     switch (buttonTagName) {
@@ -253,6 +262,7 @@ function changeButtonState(buttonElem: HTMLElement, maxCharCountExceeded: boolea
             buttonElem.setAttribute("value", newText);
             break;
         case "button":
+            console.info("wordCountSettings.ts changeButtonState() button");
             buttonElem.innerHTML = newText;
             break;
         default:
@@ -266,4 +276,5 @@ function changeButtonState(buttonElem: HTMLElement, maxCharCountExceeded: boolea
     } else {
         buttonElem.removeAttribute("data-ckEditorMaxCharCountExceededAtLastCheck");
     }
+    console.info("wordCountSettings.ts changeButtonState() x");
 }
