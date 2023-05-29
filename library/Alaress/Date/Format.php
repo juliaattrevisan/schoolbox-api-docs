@@ -575,13 +575,6 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     public function set12Hour($hour, $meridiem)
     {
         $adjustedHour = $this->calculate24HourFrom12Hour($hour, $meridiem);
-        if (!isset($adjustedHour)) {
-            trigger_error(
-                'either hour or meridiem was invalid - not adjusting time',
-                E_USER_WARNING
-            );
-            return $this;
-        }
         return $this->setHour($adjustedHour);
     }
 
