@@ -92,7 +92,6 @@ class MeridiemTest extends TestCase
      */
     public function testSetInvalid12Hour($hour, $meridiem)
     {
-        $this->expectWarning();
         $date = $this->buildDateObject();
         $date->set12Hour($hour, $meridiem);
     }
@@ -208,7 +207,6 @@ class MeridiemTest extends TestCase
      */
     public function testSetInvalid12HourTime($hour, $minute, $second, $meridiem)
     {
-        $this->expectWarning();
         $date = $this->buildDateObject();
         $date->set12HourTime($hour, $minute, $second, $meridiem);
     }

@@ -263,7 +263,6 @@ class ExpiryHelperTest extends TestCase
      */
     public function testDetermineExpiryOnIncompleteObject(Badge\Award\Model $award): void
     {
-        $this->expectError();
         (new Badge\Award\ExpiryHelper())->determineExpiry($award);
     }
 

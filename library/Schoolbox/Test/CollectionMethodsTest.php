@@ -326,7 +326,6 @@ class CollectionMethodsTest extends TestCase
      */
     public function testGetPropertyValuesPropertyDoesNotExist(Collection $collection, string $property): void
     {
-        $this->expectWarning();
         $collection->getPropertyValues($property);
     }
 

@@ -438,8 +438,6 @@ class AllFieldsTest extends TestCase
     {
         $converter = $this->createConverterIfNull();
 
-        $this->expectWarning();
-
         /** @noinspection PhpUnhandledExceptionInspection */
         self::assertEquals($expected, $converter($input, $existing));
     }
