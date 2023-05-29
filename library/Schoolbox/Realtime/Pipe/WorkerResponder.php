@@ -13,7 +13,6 @@ use Schoolbox\Realtime\ProcessException;
 
 class WorkerResponder
 {
-
     const PROC = './worker.php';
     const ERR_LOG = "/tmp/error-output.txt";
     const CWD  = null;

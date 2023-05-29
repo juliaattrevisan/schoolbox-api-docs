@@ -15,7 +15,6 @@ use Schoolbox\Resource\Browser\Office365\Tenant;
 
 class NodeFactory
 {
-
     const STORE  = 'store';
     const SBFS   = 'browse';
     const MYFILE = 'myfile';
