@@ -1008,45 +1008,6 @@ class Profile implements IStrategy
          */
     }
 
-
-    /**
-     * Takes an array of roles, collects all their role_code values and returns them as a csv
-     * The csv will be trimmed, deduped, stringified, sorted
-     *
-     * UPS will then need to take this collapsed set of values and work its magic on them
-     *
-     * @param array $roles
-     * @return string
-     */
-    private function findRoleCodes(array $roles): string
-    {
-        $stack = [];
-
-        foreach ($roles['data'] as $role) {
-            $val = trim((string)$role['role_code']);
-
-            $stack[$val] = $val;
-        }
-
-        /* Ditch the keys
-         */
-        $stack = array_values($stack);
-
-        /* Filter out all the empty strings, null values
-         * Use a custom callback so 0 is a valid outcome
-         */
-        $stack = array_filter($stack, static function ($val) {
-            return '' !== $val;
-        });
-
-        /* That was a partial reimplementation of FirstMeaningfulValue
-         */
-        sort($stack);
-
-        return implode(', ', $stack);
-    }
-
-
     /**
      * Find the name of a Wonde Group, corresponding to a given $groupType
      *

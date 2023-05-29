@@ -2436,11 +2436,6 @@ parameters:
 			path: library/Schoolbox/Calendar/Event.php
 
 		-
-			message: "#^Property Schoolbox\\\\Calendar\\\\Event\\:\\:\\$campusCollection \\(iterable\\<Schoolbox\\\\Campus\\>&Schoolbox\\\\Collection\\) does not accept iterable\\<int\\|Schoolbox\\\\Calendar\\\\Relation\\\\Campus\\|Schoolbox\\\\Campus\\>&Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/Calendar/Event.php
-
-		-
 			message: "#^Property Schoolbox\\\\Calendar\\\\Event\\:\\:\\$roleCollection \\(iterable\\<Schoolbox\\\\Role\\>&Schoolbox\\\\Collection\\) does not accept iterable\\<Schoolbox\\\\Calendar\\\\Relation\\\\Role\\>&Schoolbox\\\\Collection\\.$#"
 			count: 1
 			path: library/Schoolbox/Calendar/Event.php
@@ -2574,11 +2569,6 @@ parameters:
 			message: "#^Strict comparison using \\=\\=\\= between HouseResidential and null will always evaluate to false\\.$#"
 			count: 1
 			path: library/Schoolbox/Comms/News/Audience/Segment/Strategy/ResHouse.php
-
-		-
-			message: "#^Method Schoolbox\\\\Comms\\\\News\\\\Audience\\\\Segment\\\\Strategy\\\\Role\\:\\:getValues\\(\\) should return array\\<string\\|null\\> but returns array\\<int, int\\|null\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Audience/Segment/Strategy/Role.php
 
 		-
 			message: "#^Ternary operator condition is always true\\.$#"
