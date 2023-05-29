@@ -28,7 +28,7 @@ class ValidUploadableFileTest extends TestCase
      *
      * @var Alaress_Date_Format|null
      */
-    private ?Alaress_Date_Format $baseTime = null;
+    private static ?Alaress_Date_Format $baseTime = null;
 
     /**
      * @dataProvider getTestIsSatisfiedByValidCaseData
@@ -148,7 +148,7 @@ class ValidUploadableFileTest extends TestCase
      */
     private function createBaseTime(): Alaress_Date_Format
     {
-        $this->baseTime ??= Alaress_Date_Format::now();
-        return (clone $this->baseTime);
+        self::$baseTime ??= Alaress_Date_Format::now();
+        return (clone self::$baseTime);
     }
 }
