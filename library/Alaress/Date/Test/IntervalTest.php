@@ -13,12 +13,10 @@ namespace Alaress\Date\Test;
 use Alaress\Date\Interval;
 use DateInterval;
 use DateTime;
-use PHPUnit\Framework\Error\Warning;
 use PHPUnit\Framework\TestCase;
 
 class IntervalTest extends TestCase
 {
-
     /**
      * @return array
      */

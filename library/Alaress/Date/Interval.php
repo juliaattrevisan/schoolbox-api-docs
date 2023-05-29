@@ -1,11 +1,6 @@
 <?php
 
 /**
- * A date interval class which handles remainders more effectively than
- * DateInterval.
- *
- * It is always created from a number of seconds.
- *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -17,9 +12,16 @@ use DateTime;
 use DateInterval;
 use JsonSerializable;
 
+/**
+ * A date interval class which handles remainders more effectively than
+ * DateInterval.
+ *
+ * It is always created from a number of seconds.
+ *
+ * @deprecated use inbuilt DateInterval class instead
+ */
 class Interval implements JsonSerializable
 {
-
     /**
      * Number of seconds in the interval.
      *
@@ -58,11 +60,13 @@ class Interval implements JsonSerializable
     {
         $seconds = 0;
         if ($interval->y) {
-            trigger_error('DateInterval contains y: assuming 365 days', E_USER_WARNING);
+            // This previously raised a warning:
+            // however, PHPUnit refuses to listen for warnings anymore
             $seconds += ($interval->y * 365 * 24 * 60 * 60);
         }
         if ($interval->m) {
-            trigger_error('DateInterval contains m: assuming 30 days', E_USER_WARNING);
+            // This previously raised a warning:
+            // however, PHPUnit refuses to listen for warnings anymore
             $seconds += ($interval->m * 30 * 24 * 60 * 60);
         }
         if ($interval->d) {
