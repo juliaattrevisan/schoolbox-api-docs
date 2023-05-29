@@ -14,14 +14,14 @@ import { isScriptAdded, injectScript } from "@js/util/domUtils";
  * @param { string } $initialValue - the initial string value to input into the ckeditor
  * @param { string } ckeditorSelector - the selector to target the CKEditor
  * @param { Ref<HTMLButtonElement> } submitButton
- * @param { Ref<Boolean> } submitButtonShouldBeDisabledRef
+ * @param { Ref<boolean> } isMaxCharCountExceeded
  * @returns { string } - the initial value
  */
 export function useDescriptionEditor(
     $initialValue: string,
     ckeditorSelector: string,
     submitButton: Ref<HTMLButtonElement | null>,
-    submitButtonShouldBeDisabledRef: { value: boolean }
+    isMaxCharCountExceeded: Ref<boolean>
 ) {
     const initialValue = window.Vue.ref($initialValue);
 
@@ -40,13 +40,22 @@ export function useDescriptionEditor(
         });
 
         const ckeditorElem = document.getElementById(ckeditorSelector) as HTMLElement;
+        const submitButtonTextOriginal = submitButton.value === null ? "" : submitButton.value.innerHTML;
 
-        // If the max. char count is no longer exceeded, whether the submit button should be disabled depends on other
-        // factors specific to the page hosting the submit button (like for example whether the name field is empty).
-        // Those 'other factors' determine the value of the submitButtonShouldBeDisabledRef parameter.
+        // Override default event listener from wordCountSettings.ts because that function manipulates DOM directly, which messes up Vue reactivity.
+        ckeditorElem.addEventListener(EditorEvent.EDITOR__MAX_CHAR_COUNT_EXCEEDED, () => {
+            if (submitButton.value !== null) {
+                submitButton.value.innerHTML =
+                    submitButtonTextOriginal + " (disabled because content storage limit exceeded)";
+                isMaxCharCountExceeded.value = true;
+            }
+        });
+
+        // Override default event listener from wordCountSettings.ts because that function manipulates DOM directly, which messes up Vue reactivity.
         ckeditorElem.addEventListener(EditorEvent.EDITOR__MAX_CHAR_COUNT_NO_LONGER_EXCEEDED, () => {
             if (submitButton.value !== null) {
-                submitButton.value.disabled = submitButtonShouldBeDisabledRef.value;
+                submitButton.value.innerHTML = submitButtonTextOriginal;
+                isMaxCharCountExceeded.value = false;
             }
         });
     }
@@ -74,7 +83,7 @@ export function useDescriptionEditor(
                     detail: {
                         targetElements: [`#${ckeditorSelector}`],
                         toolbar: "simple",
-                        maxCharCountSubmitButtons: [submitButton.value],
+                        maxCharCountAddDefaultEventListeners: false,
                     },
                 })
             );

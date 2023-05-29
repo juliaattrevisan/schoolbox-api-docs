@@ -18,6 +18,7 @@ const addCurriculumStore = useAddCurriculumStore();
 const ckeditorIdAttr = `new-curriculum`;
 
 const addButton = ref<HTMLButtonElement | null>(null);
+let isMaxCharCountExceeded = ref<boolean>(false);
 
 /**
  * To instantly notify the user that the subsection is being added
@@ -33,14 +34,11 @@ const addButtonText = window.Vue.computed(() => (addCurriculumStore.isProcessing
  * @returns { Boolean }
  */
 const isAddDisabled = window.Vue.computed(() => {
-    if (addButton.value !== null && addButton.value.hasAttribute("data-ckEditorMaxCharCountExceededAtLastCheck")) {
-        return true;
-    }
-
-    if (typeof addCurriculumStore.curriculum.name === "string") {
-        return addCurriculumStore.curriculum?.name.trim().length === 0 || addCurriculumStore.isProcessing;
-    }
-    return false;
+    return (
+        isMaxCharCountExceeded.value ||
+        addCurriculumStore.curriculum.name?.trim().length === 0 ||
+        addCurriculumStore.isProcessing
+    );
 });
 
 /**
@@ -50,7 +48,7 @@ const descriptionFieldValue = useDescriptionEditor(
     addCurriculumStore.curriculum?.description as string,
     ckeditorIdAttr,
     addButton,
-    isAddDisabled
+    isMaxCharCountExceeded
 );
 
 /**
@@ -95,52 +93,54 @@ function onCancelSelected() {
     <div class="row">
         <div class="small-12 island">
             <section>
-                <fieldset class="content">
-                    <legend>Add new Curriculum</legend>
-                    <div class="small-12 columns">
-                        <label for="name" class="required">Name</label>
-                        <input
-                            type="text"
-                            id="name"
-                            v-model="addCurriculumStore.curriculum.name"
-                            maxlength="2048"
-                            required
-                        />
-                    </div>
-                    <div class="small-12 columns">
-                        <label for="code">Code</label>
-                        <input type="text" id="code" v-model="addCurriculumStore.curriculum.code" maxlength="64" />
-                    </div>
-                    <div class="small-12 columns">
-                        <label for="description">Description</label>
-                        <textarea :id="ckeditorIdAttr" rows="6"></textarea>
-                    </div>
-                    <div class="small-12 columns">
-                        <ul class="flex-list">
-                            <li>
-                                <button
-                                    class="button icon-close"
-                                    :disabled="addCurriculumStore.isProcessing"
-                                    @click.prevent="onCancelSelected"
-                                >
-                                    Cancel
-                                </button>
-                            </li>
-                            <li>
-                                <button
-                                    class="button icon-add submit"
-                                    :data-submit-button-for="ckeditorIdAttr"
-                                    ref="addButton"
-                                    data-test-add-curriculum
-                                    :disabled="isAddDisabled"
-                                    @click.prevent="onAddSubsectionSelected"
-                                >
-                                    {{ addButtonText }}
-                                </button>
-                            </li>
-                        </ul>
-                    </div>
-                </fieldset>
+                <form>
+                    <fieldset class="content">
+                        <legend>Add new Curriculum</legend>
+                        <div class="small-12 columns">
+                            <label for="name" class="required">Name</label>
+                            <input
+                                type="text"
+                                id="name"
+                                v-model="addCurriculumStore.curriculum.name"
+                                maxlength="2048"
+                                required
+                            />
+                        </div>
+                        <div class="small-12 columns">
+                            <label for="code">Code</label>
+                            <input type="text" id="code" v-model="addCurriculumStore.curriculum.code" maxlength="64" />
+                        </div>
+                        <div class="small-12 columns">
+                            <label for="description">Description</label>
+                            <textarea :id="ckeditorIdAttr" rows="6"></textarea>
+                        </div>
+                        <div class="small-12 columns">
+                            <ul class="flex-list">
+                                <li>
+                                    <button
+                                        class="button icon-close"
+                                        :disabled="addCurriculumStore.isProcessing"
+                                        @click.prevent="onCancelSelected"
+                                    >
+                                        Cancel
+                                    </button>
+                                </li>
+                                <li>
+                                    <button
+                                        class="button icon-add submit"
+                                        :data-submit-button-for="ckeditorIdAttr"
+                                        ref="addButton"
+                                        data-test-add-curriculum
+                                        :disabled="isAddDisabled"
+                                        @click.prevent="onAddSubsectionSelected"
+                                    >
+                                        {{ addButtonText }}
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                    </fieldset>
+                </form>
             </section>
         </div>
     </div>

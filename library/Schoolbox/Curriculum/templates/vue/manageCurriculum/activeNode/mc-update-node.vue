@@ -37,6 +37,7 @@ const marginLeft = window.Vue.computed(() => `calc(${props.depth * 2}rem)`);
 const ckeditorIdAttr = window.Vue.computed(() => `description-${activeNodeStore.node.id}`);
 
 const updateButton = ref<HTMLButtonElement | null>(null);
+let isMaxCharCountExceeded = ref<boolean>(false);
 
 /**
  * To instantly notify the user that the node is being updated
@@ -52,14 +53,11 @@ const updateButtonText = window.Vue.computed(() => (updateNodeStore.isProcessing
  * @returns { boolean }
  */
 const isUpdateDisabled = window.Vue.computed(() => {
-    if (
-        updateButton.value !== null &&
-        updateButton.value.hasAttribute("data-ckEditorMaxCharCountExceededAtLastCheck")
-    ) {
-        return true;
-    }
-
-    return updateNodeStore.activeNodeCopy.name.trim().length === 0 || updateNodeStore.isProcessing;
+    return (
+        isMaxCharCountExceeded.value ||
+        updateNodeStore.activeNodeCopy.name.trim().length === 0 ||
+        updateNodeStore.isProcessing
+    );
 });
 
 /**
@@ -69,7 +67,7 @@ const descriptionField = useDescriptionEditor(
     updateNodeStore.activeNodeCopy?.description as string,
     ckeditorIdAttr.value,
     updateButton,
-    isUpdateDisabled
+    isMaxCharCountExceeded
 );
 
 /**
@@ -113,52 +111,54 @@ function onCancelSelected() {
 <template>
     <div class="node-container" :style="{ marginLeft: marginLeft }">
         <section>
-            <fieldset class="content">
-                <legend class="title">Update</legend>
-                <div class="small-12 columns">
-                    <label for="name" class="required">Name</label>
-                    <input
-                        id="name"
-                        v-model="updateNodeStore.activeNodeCopy.name"
-                        type="text"
-                        maxlength="2048"
-                        required
-                    />
-                </div>
-                <div class="small-12 columns">
-                    <label for="code">Code</label>
-                    <input id="code" v-model="updateNodeStore.activeNodeCopy.code" type="text" maxlength="64" />
-                </div>
-                <div class="small-12 columns">
-                    <label for="description">Description</label>
-                    <textarea :id="ckeditorIdAttr" rows="6"></textarea>
-                </div>
-                <div class="small-12 columns">
-                    <ul class="flex-list">
-                        <li>
-                            <button
-                                class="button icon-close"
-                                :disabled="updateNodeStore.isProcessing"
-                                @click.prevent="onCancelSelected"
-                            >
-                                Cancel
-                            </button>
-                        </li>
-                        <li>
-                            <button
-                                class="button icon-modify submit"
-                                :data-submit-button-for="ckeditorIdAttr"
-                                :disabled="isUpdateDisabled"
-                                ref="updateButton"
-                                data-test-update-node
-                                @click.prevent="onUpdateSelected"
-                            >
-                                {{ updateButtonText }}
-                            </button>
-                        </li>
-                    </ul>
-                </div>
-            </fieldset>
+            <form>
+                <fieldset class="content">
+                    <legend class="title">Update</legend>
+                    <div class="small-12 columns">
+                        <label for="name" class="required">Name</label>
+                        <input
+                            id="name"
+                            v-model="updateNodeStore.activeNodeCopy.name"
+                            type="text"
+                            maxlength="2048"
+                            required
+                        />
+                    </div>
+                    <div class="small-12 columns">
+                        <label for="code">Code</label>
+                        <input id="code" v-model="updateNodeStore.activeNodeCopy.code" type="text" maxlength="64" />
+                    </div>
+                    <div class="small-12 columns">
+                        <label for="description">Description</label>
+                        <textarea :id="ckeditorIdAttr" rows="6"></textarea>
+                    </div>
+                    <div class="small-12 columns">
+                        <ul class="flex-list">
+                            <li>
+                                <button
+                                    class="button icon-close"
+                                    :disabled="updateNodeStore.isProcessing"
+                                    @click.prevent="onCancelSelected"
+                                >
+                                    Cancel
+                                </button>
+                            </li>
+                            <li>
+                                <button
+                                    class="button icon-modify submit"
+                                    :data-submit-button-for="ckeditorIdAttr"
+                                    :disabled="isUpdateDisabled"
+                                    ref="updateButton"
+                                    data-test-update-node
+                                    @click.prevent="onUpdateSelected"
+                                >
+                                    {{ updateButtonText }}
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                </fieldset>
+            </form>
         </section>
     </div>
 </template>
