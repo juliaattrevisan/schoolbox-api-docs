@@ -797,15 +797,9 @@ class DataSource
             $currentUser
         );
 
-        // --------------------------------------------------------------------------------------------------------
-        // Keep a record of all searches performed by users, and what results were displayed
-        // --------------------------------------------------------------------------------------------------------
-
-        $searchResults = $filteredRecords->indexBy('id')->keys();
-
         /* Remember everyone's search terms, but not the records that matched
          */
-        if (count($searchResults)) {
+        if ($filteredRecords->count()) {
             $auditRecord = $this->pastoralAuditMapper->createModel()
                                                      ->setUser($currentUser)
                                                      ->setSearch(mb_substr($search, 0, 255));
