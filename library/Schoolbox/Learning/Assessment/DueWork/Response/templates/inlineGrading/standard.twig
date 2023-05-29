@@ -91,7 +91,7 @@ Usage:
 {% endblock %}
 
 <div class="row">
-    <div class="small-12 xxlarge-6 columns">
+    <div class="small-12 xlarge-6 columns">
         {# A preview of the file currently selected #}
         {% block responseFilePreview %}
             {% if response and file %}
@@ -104,7 +104,7 @@ Usage:
             {% endif %}
         {% endblock %}
     </div>
-    <div class="small-12 xxlarge-6 columns">
+    <div class="small-12 xlarge-6 columns">
         {# A list of files in the current response #}
         {% block responseFileList %}
             {% include '@learningDueWorkResponse/inlineGrading/fragments/responseFileList.twig' with {
