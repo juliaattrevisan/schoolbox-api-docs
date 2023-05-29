@@ -120,9 +120,14 @@ class Controller extends BaseController
 
         $notImported = $assessmentImpls->filter(function (IAssessable $assessmentImpl) {
             return null === $assessmentImpl->getId();
+        })->sortByCallback(static function(IAssessable $a, IAssessable $b) {
+            return strnatcasecmp($a->getBaseContext()->getFolder()->getTitle(), $b->getBaseContext()->getFolder()->getTitle());
         });
+
         $imported    = $assessmentImpls->filter(function (IAssessable $assessmentImpl) {
             return $assessmentImpl->getId();
+        })->sortByCallback(static function(IAssessable $a, IAssessable $b) {
+            return strnatcasecmp($a->getBaseContext()->getFolder()->getTitle(), $b->getBaseContext()->getFolder()->getTitle());
         });
 
         // Find interactions with imported assessments
