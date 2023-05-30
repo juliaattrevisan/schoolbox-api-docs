@@ -19,7 +19,6 @@ use EOTC\Event;
 
 class Collection extends \Schoolbox\Collection
 {
-
     /**
      * A list of ids that have already been processed
      *
@@ -128,16 +127,6 @@ class Collection extends \Schoolbox\Collection
 
     /* Getters/Setters
      */
-
-    /**
-     * Set processed series ids
-     *
-     * @param array $processedSeriesIds
-     */
-    private function setProcessedSeriesIds($processedSeriesIds)
-    {
-        $this->processedSeriesIds = $processedSeriesIds;
-    }
 
     /**
      * Get processed series ids

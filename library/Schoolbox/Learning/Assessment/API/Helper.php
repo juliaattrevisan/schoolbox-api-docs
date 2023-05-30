@@ -1144,28 +1144,26 @@ class Helper
             }
             // date
             if (isset($dateFields[$filterName])) {
-                if (is_array($dateFields[$filterName])) {
-                    if (!is_array($filterValue)) {
-                        throw new SchoolboxException("Filter $filterName must be an array.");
-                    }
-                    foreach ($dateFields[$filterName] as $fieldAttribute) {
-                        if (!isset($filterValue[$fieldAttribute])) {
-                            continue;
-                        }
-                        if (!is_string($filterValue[$fieldAttribute])) {
-                            throw new SchoolboxException("Filter $filterName - $fieldAttribute must be a string.");
-                        }
-                        try {
-                            $date = new \Alaress_Date_Format($filterValue[$fieldAttribute], [
-                                DATE_RFC3339,
-                                DATE_RFC3339_EXTENDED,
-                            ]);
-                        } catch (\Exception $e) {
-                            throw new SchoolboxException("Failed to parse date from $filterName - {$filterValue[$fieldAttribute]}.");
-                        }
-                    }
-                    $found = true;
+                if (!is_array($filterValue)) {
+                    throw new SchoolboxException("Filter $filterName must be an array.");
                 }
+                foreach ($dateFields[$filterName] as $fieldAttribute) {
+                    if (!isset($filterValue[$fieldAttribute])) {
+                        continue;
+                    }
+                    if (!is_string($filterValue[$fieldAttribute])) {
+                        throw new SchoolboxException("Filter $filterName - $fieldAttribute must be a string.");
+                    }
+                    try {
+                        $date = new \Alaress_Date_Format($filterValue[$fieldAttribute], [
+                            DATE_RFC3339,
+                            DATE_RFC3339_EXTENDED,
+                        ]);
+                    } catch (\Exception $e) {
+                        throw new SchoolboxException("Failed to parse date from $filterName - {$filterValue[$fieldAttribute]}.");
+                    }
+                }
+                $found = true;
             }
             // enum
             if (isset($enumFields[$filterName])) {

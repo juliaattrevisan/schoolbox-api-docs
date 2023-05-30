@@ -801,7 +801,7 @@ class External_Maze_User implements External_UserInterface
                     ";
                 }
 
-                if ($queryPhoto) {
+                if ($queryPhoto !== false) {
                     $photo = $this->getDb()->getRow($queryPhoto)['Photo'] ?? null;
 
                     if (!$photo) {

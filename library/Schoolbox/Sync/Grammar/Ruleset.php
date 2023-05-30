@@ -15,11 +15,13 @@ use Schoolbox\Mapper;
 use Schoolbox\Sync\Effect\Fragment\Lookup;
 use Schoolbox\Sync\Hydrator\HydratorInterface;
 use Schoolbox\User as InternalUser;
+use SplObjectStorage;
 
 /**
  * Class Ruleset
  *
  * @package Schoolbox\Sync\Grammar
+ * @property SplObjectStorage<Rule> $rules
  */
 class Ruleset extends TokenizedRuleset implements HydratorInterface
 {
@@ -306,7 +308,7 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
      * Compatibility method, defaults to sequence
      *
      * @param bool $byPrecedence
-     * @return Rule[]
+     * @return array<Rule>
      */
     public function getRules($byPrecedence = false)
     {
@@ -319,7 +321,7 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
 
 
     /**
-     * @return Rule[]
+     * @return array<Rule>
      */
     public function getRulesBySequence()
     {
@@ -335,7 +337,7 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
 
 
     /**
-     * @return Rule[]
+     * @return array<Rule>
      */
     public function getRulesByPrecedence()
     {

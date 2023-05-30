@@ -1441,11 +1441,6 @@ parameters:
 			path: library/Eportfolio.php
 
 		-
-			message: "#^Method Eportfolio\\\\Page\\:\\:getPermissions\\(\\) should return iterable\\<Eportfolio\\\\Permission\\>&Schoolbox\\\\Collection but returns array\\<Eportfolio\\\\Permission\\>\\|\\(iterable\\<Eportfolio\\\\Permission\\>&Schoolbox\\\\GenericCollection\\)\\.$#"
-			count: 1
-			path: library/Eportfolio/Page.php
-
-		-
 			message: "#^Method Eportfolio_Page_Instance\\:\\:getColours\\(\\) should return array but returns null\\.$#"
 			count: 1
 			path: library/Eportfolio/Page/Instance.php
@@ -1599,26 +1594,6 @@ parameters:
 			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Evaluation/Question/Category.php
-
-		-
-			message: "#^Method External_AscTimetables_Translator_Enrolment\\:\\:translateXmlToArray\\(\\) should return iterable\\<array\\>&Iterator but returns array\\<int, array\\<string, mixed\\>\\>\\.$#"
-			count: 1
-			path: library/External/AscTimetables/Translator/Enrolment.php
-
-		-
-			message: "#^Return type \\(iterable\\<array\\>&Iterator\\) of method External_AscTimetables_Translator_Enrolment\\:\\:translateXmlToArray\\(\\) should be compatible with return type \\(array\\<array\\>\\) of method External_AscTimetables_Translator_Base\\:\\:translateXmlToArray\\(\\)$#"
-			count: 1
-			path: library/External/AscTimetables/Translator/Enrolment.php
-
-		-
-			message: "#^Method External_AscTimetables_Translator_Timetable\\:\\:translateXmlToArray\\(\\) should return iterable\\<array\\>&Iterator but returns array\\<int, array\\<string, mixed\\>\\>\\.$#"
-			count: 1
-			path: library/External/AscTimetables/Translator/Timetable.php
-
-		-
-			message: "#^Return type \\(iterable\\<array\\>&Iterator\\) of method External_AscTimetables_Translator_Timetable\\:\\:translateXmlToArray\\(\\) should be compatible with return type \\(array\\<array\\>\\) of method External_AscTimetables_Translator_Base\\:\\:translateXmlToArray\\(\\)$#"
-			count: 1
-			path: library/External/AscTimetables/Translator/Timetable.php
 
 		-
 			message: "#^Static method External\\\\Canvas\\\\Sync\\\\Bridge\\\\Account\\:\\:canvasIdPrefix\\(\\) is unused\\.$#"
@@ -2461,11 +2436,6 @@ parameters:
 			path: library/Schoolbox/Calendar/Event.php
 
 		-
-			message: "#^Property Schoolbox\\\\Calendar\\\\Event\\:\\:\\$campusCollection \\(iterable\\<Schoolbox\\\\Campus\\>&Schoolbox\\\\Collection\\) does not accept iterable\\<int\\|Schoolbox\\\\Calendar\\\\Relation\\\\Campus\\|Schoolbox\\\\Campus\\>&Schoolbox\\\\Collection\\.$#"
-			count: 1
-			path: library/Schoolbox/Calendar/Event.php
-
-		-
 			message: "#^Property Schoolbox\\\\Calendar\\\\Event\\:\\:\\$roleCollection \\(iterable\\<Schoolbox\\\\Role\\>&Schoolbox\\\\Collection\\) does not accept iterable\\<Schoolbox\\\\Calendar\\\\Relation\\\\Role\\>&Schoolbox\\\\Collection\\.$#"
 			count: 1
 			path: library/Schoolbox/Calendar/Event.php
@@ -2599,11 +2569,6 @@ parameters:
 			message: "#^Strict comparison using \\=\\=\\= between HouseResidential and null will always evaluate to false\\.$#"
 			count: 1
 			path: library/Schoolbox/Comms/News/Audience/Segment/Strategy/ResHouse.php
-
-		-
-			message: "#^Method Schoolbox\\\\Comms\\\\News\\\\Audience\\\\Segment\\\\Strategy\\\\Role\\:\\:getValues\\(\\) should return array\\<string\\|null\\> but returns array\\<int, int\\|null\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Audience/Segment/Strategy/Role.php
 
 		-
 			message: "#^Ternary operator condition is always true\\.$#"
@@ -6096,16 +6061,6 @@ parameters:
 			path: library/Schoolbox/Sync/Grammar/Ruleset.php
 
 		-
-			message: "#^Method Schoolbox\\\\Sync\\\\Grammar\\\\Ruleset\\:\\:getRulesByPrecedence\\(\\) should return array\\<Schoolbox\\\\Sync\\\\Grammar\\\\Rule\\> but returns array\\<int, Alaress\\\\Rules\\\\Rule\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/Sync/Grammar/Ruleset.php
-
-		-
-			message: "#^Method Schoolbox\\\\Sync\\\\Grammar\\\\Ruleset\\:\\:getRulesBySequence\\(\\) should return array\\<Schoolbox\\\\Sync\\\\Grammar\\\\Rule\\> but returns array\\<int, Alaress\\\\Rules\\\\Rule\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/Sync/Grammar/Ruleset.php
-
-		-
 			message: "#^Unreachable statement \\- code above always terminates\\.$#"
 			count: 1
 			path: library/Schoolbox/Sync/Grammar/Test/UserRulesetTest.php
@@ -6316,11 +6271,6 @@ parameters:
 			path: library/Schoolbox/WebDav/Rules/Ruleset.php
 
 		-
-			message: "#^Method Schoolbox\\\\WebDav\\\\Rules\\\\Ruleset\\:\\:getRules\\(\\) should return array\\<Schoolbox\\\\WebDav\\\\Rules\\\\Rule\\> but returns array\\<int, Alaress\\\\Rules\\\\Rule\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/WebDav/Rules/Ruleset.php
-
-		-
 			message: "#^Property Schoolbox\\\\WebDav\\\\SubjectServer\\\\Server\\:\\:\\$user \\(Schoolbox\\\\User\\) in isset\\(\\) is not nullable\\.$#"
 			count: 1
 			path: library/Schoolbox/WebDav/SubjectServer/Server.php
@@ -6467,11 +6417,6 @@ parameters:
 
 		-
 			message: "#^Return type \\(void\\) of method Wiki\\:\\:update\\(\\) should be compatible with return type \\(bool\\) of method DeprecatedModel\\:\\:update\\(\\)$#"
-			count: 1
-			path: library/Wiki.php
-
-		-
-			message: "#^Variable \\$coreData might not be defined\\.$#"
 			count: 1
 			path: library/Wiki.php
 

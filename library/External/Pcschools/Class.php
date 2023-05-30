@@ -131,17 +131,6 @@ class External_Pcschools_Class implements External_ClassInterface
     }
 
     /**
-     * @param  IConnector $database
-     *
-     * @return $this
-     */
-    private function setDatabase($database)
-    {
-        $this->database = $database;
-        return $this;
-    }
-
-    /**
      * @return array
      */
     public function findClassTypes(): array

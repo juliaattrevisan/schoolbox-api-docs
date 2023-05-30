@@ -86,7 +86,6 @@ class InstanceRegistryIssued extends Base
                 $jwt,
                 JWK::parseKeySet($jwk),
                 (int)$this->config->get(ConfigMapper::NAME_JWT_LEEWAY),
-                [Jwt::SIGNING_ALGORITHM]
             )
         ) {
             return $this->userMapper->findByUsername(UserMapper::USERNAME_ALARESS_ADMIN);

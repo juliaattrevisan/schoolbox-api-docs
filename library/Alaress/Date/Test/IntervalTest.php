@@ -13,12 +13,10 @@ namespace Alaress\Date\Test;
 use Alaress\Date\Interval;
 use DateInterval;
 use DateTime;
-use PHPUnit\Framework\Error\Warning;
 use PHPUnit\Framework\TestCase;
 
 class IntervalTest extends TestCase
 {
-
     /**
      * @return array
      */
@@ -234,6 +232,8 @@ class IntervalTest extends TestCase
         return [
             [new DateInterval('PT6H8M30S'), 22110],
             [new DateInterval('P3D'), 259200],
+            [new DateInterval('P1M'), 30 * 24 * 60 * 60],
+            [new DateInterval('P1Y'), 365 * 24 * 60 * 60],
         ];
     }
 
@@ -243,20 +243,6 @@ class IntervalTest extends TestCase
     public function testCreateFromDateInterval(DateInterval $interval, $secondTotal)
     {
         $this->assertSame($secondTotal, Interval::createFromDateInterval($interval)->getSecondTotal());
-    }
-
-    public function testCreateFromDateIntervalWarningOnMonth()
-    {
-        $this->expectWarning();
-        $interval = Interval::createFromDateInterval(new DateInterval('P1M'));
-        $this->assertSame(30, $interval->getDayTotal());
-    }
-
-    public function testCreateFromDateIntervalWarningOnYear()
-    {
-        $this->expectWarning();
-        $interval = Interval::createFromDateInterval(new DateInterval('P1Y'));
-        $this->assertSame(365, $interval->getDayTotal());
     }
 
     /**

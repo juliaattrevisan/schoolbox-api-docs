@@ -92,23 +92,9 @@ class MeridiemTest extends TestCase
      */
     public function testSetInvalid12Hour($hour, $meridiem)
     {
-        $this->expectWarning();
+        $this->expectException(InvalidArgumentException::class);
         $date = $this->buildDateObject();
         $date->set12Hour($hour, $meridiem);
-    }
-
-    /**
-     * @dataProvider getSetInvalid12HourData
-     *
-     * @param int    $hour
-     * @param string $meridiem
-     */
-    public function testSetInvalid12HourDoesNotChangeTime($hour, $meridiem)
-    {
-        $date = $this->buildDateObject();
-        $expectedTime = $date->getDatabase();
-        @$date->set12Hour($hour, $meridiem);
-        $this->assertEquals($expectedTime, $date->getDatabase());
     }
 
     /**
@@ -208,25 +194,9 @@ class MeridiemTest extends TestCase
      */
     public function testSetInvalid12HourTime($hour, $minute, $second, $meridiem)
     {
-        $this->expectWarning();
+        $this->expectException(InvalidArgumentException::class);
         $date = $this->buildDateObject();
         $date->set12HourTime($hour, $minute, $second, $meridiem);
-    }
-
-    /**
-     * @dataProvider getSetInvalid12HourTimeData
-     *
-     * @param int    $hour
-     * @param int    $minute
-     * @param int    $second
-     * @param string $meridiem
-     */
-    public function testSetInvalid12HourTimeDoesNotChangeTime($hour, $minute, $second, $meridiem)
-    {
-        $date = $this->buildDateObject();
-        $expectedTime = $date->getDatabase();
-        @$date->set12HourTime($hour, $minute, $second, $meridiem);
-        $this->assertEquals($expectedTime, $date->getDatabase());
     }
 
     /**

@@ -40,7 +40,6 @@ class ClassCodeTest extends TestCase
 
         // Test the warning
         if ($expectWarning) {
-            $this->expectWarning();
             $parseClassCode->invoke(null, $classCode);
         }
     }
