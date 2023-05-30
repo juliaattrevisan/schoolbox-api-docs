@@ -13,11 +13,9 @@ use Alaress\Async\Queue\Composite;
 use Alaress\Async\Queue\QueueInterface;
 use Alaress\Redis;
 use Predis\ClientInterface;
-use Serializable;
 
-class ListFactory implements IListFactory, Serializable
+class ListFactory implements IListFactory
 {
-
     /** @var string */
     private $instanceId;
 
@@ -106,28 +104,38 @@ class ListFactory implements IListFactory, Serializable
 
 
     /**
-     * String representation of object, or null
+     * Array representation of object
      *
-     * @return string
+     * @return array
      */
-    public function serialize()
+    public function __serialize(): array
     {
-        return $this->instanceId;
+        return [
+            'instanceId' => $this->instanceId
+        ];
     }
 
 
     /**
-     * Constructs the object from the serial string given
+     * Constructs the object
      *
-     * TODO remove serialize/unserialize methods?
-     *
-     * @param string $serialized
+     * @param string|array $serialized Prior to 23.1 `serialize` always returned
+     *                                 a string, now it returns an array.
+     *                                 Need to handle both cases.
+     * @return void
      */
-    public function unserialize($serialized)
+    public function __unserialize(string|array $serialized): void
     {
-        $this->instanceId = $serialized;
+        // AFAICT `$this->instanceId` will always just be the INSTANCE_ID const:
+        // attempt to hydrate it anyway.
+        if (is_string($serialized)) {
+            $this->instanceId = $serialized;
+        } else {
+            $this->instanceId = $serialized['instanceId'];
+        }
 
         // Messages are stored in the persistent Redis instance
-        $this->redis = Redis::getStorageClientInstance(); // TODO IoC
+        // TODO IoC
+        $this->redis = Redis::getStorageClientInstance();
     }
 }
