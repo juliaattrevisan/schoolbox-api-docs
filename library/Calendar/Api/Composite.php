@@ -41,7 +41,7 @@ class Calendar_Api_Composite implements Calendar_Api_EventType_Interface
         $result = new GenericCollection(EventInterface::class);
 
         foreach ($this->api as $currentApi) {
-            $result->merge($currentApi->getEvents($startTimestamp, $endTimestamp, $allowedEventTypes));
+            $result = $result->merge($currentApi->getEvents($startTimestamp, $endTimestamp, $allowedEventTypes));
         }
 
         // TODO implement in GenericCollection
@@ -61,7 +61,7 @@ class Calendar_Api_Composite implements Calendar_Api_EventType_Interface
         $result = new GenericCollection(EventInterface::class);
 
         foreach ($this->api as $currentApi) {
-            $result->merge($currentApi->getEvent($eventId));
+            $result = $result->merge($currentApi->getEvent($eventId));
         }
 
         return $result->first();

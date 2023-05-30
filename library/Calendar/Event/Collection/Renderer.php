@@ -99,7 +99,7 @@ class Renderer
     {
         $eventList = $this->api->getEvents($this->startTimestamp, $this->endTimestamp, $allowedEventTypes);
 
-        $this->allEvents->merge($eventList);
+        $this->allEvents = $this->allEvents->merge($eventList);
 
         /* Sort all the events in order of time
          */
