@@ -57,7 +57,7 @@ use function array_keys;
 use function array_map;
 use function count;
 
-abstract class Mapper implements IMapper, Serializable
+abstract class Mapper implements IMapper
 {
     /**
      * Represents a boolean data type.
@@ -4079,24 +4079,23 @@ abstract class Mapper implements IMapper, Serializable
     }
 
     /**
-     * String representation of object
+     * Array representation of object
      *
-     * @return string the string representation of the object or null
+     * @return array
      */
-    public function serialize()
+    public function __serialize(): array
     {
-        // we don't need to serialize anything other than the name of the class
-        return '';
+        return [];
     }
 
     /**
      * Constructs the object
      *
-     * @param string $serialized
+     * @param array $serialized
      *
      * @return void
      */
-    public function unserialize($serialized)
+    public function __unserialize(array $serialized): void
     {
         // don't need to do anything but run the constructor
         $this->__construct();
