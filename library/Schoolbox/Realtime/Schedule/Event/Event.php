@@ -15,11 +15,9 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Mapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Serializable;
 
-class Event implements CrudEventInterface, Serializable, JsonSerializable
+class Event implements CrudEventInterface, JsonSerializable
 {
-
     /** @var User */
     protected $effector;
 
@@ -119,45 +117,42 @@ class Event implements CrudEventInterface, Serializable, JsonSerializable
 
 
     /**
-     * String representation of object
+     * Array representation of object
      *
      * @throws Mapper\Exception
-     * @return string the string representation of the object or null
+     * @return array
      */
-    public function serialize()
+    public function __serialize(): array
     {
-        return serialize($this->jsonSerialize());
+        return $this->jsonSerialize();
     }
 
 
     /**
      * Constructs the object
      *
-     * @param string $serialized The string representation of the object.
+     * @param array $serialized
      * @throws Mapper\Exception
      * @throws RuntimeException
      * @return void
      */
-    public function unserialize($serialized)
+    public function __unserialize(array $serialized): void
     {
-        $array = unserialize($serialized);
-
         // urgh. more safety checks
-        if (!class_exists($array['o']['c'])) {
+        if (!class_exists($serialized['o']['c'])) {
             throw new RuntimeException("Could not unserialize non-existent mapper");
         }
 
-        $this->effector = UserMapper::getInstance()->hydrate($array['u']);
-        $this->action   = $array['a'];
-        $this->mapper   = $array['o']['c']::getInstance();
+        $this->effector = UserMapper::getInstance()->hydrate($serialized['u']);
+        $this->action   = $serialized['a'];
+        $this->mapper   = $serialized['o']['c']::getInstance();
 
         // The hydrate cache must be invalidated for this object,
         // because this object could have already been hydrated in this request.
-        $this->mapper->invalidateHydrateCache($array['o']['i']);
+        $this->mapper->invalidateHydrateCache($serialized['o']['i']);
 
-        $this->object = $this->hydrate($array['o']['i'], $this->mapper);
-
-        $this->diff     = $array['d'];
+        $this->object = $this->hydrate($serialized['o']['i'], $this->mapper);
+        $this->diff   = $serialized['d'];
     }
 
 
