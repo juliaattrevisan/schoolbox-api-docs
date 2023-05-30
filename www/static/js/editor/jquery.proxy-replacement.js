@@ -235,24 +235,20 @@ import { getConfigForVideo } from "@js/mediaelementplayer/mepUtils.ts";
                 const $componentDiv = $element.closest("[data-collapsable]");
                 const componentDiv = $componentDiv.length > 0 ? $componentDiv[0] : null;
 
-                if (componentDiv === null) {
-                    // The video is not inside a component.
-                    $element.mediaelementplayer(getConfigForVideo());
-                } else {
-                    // The video is inside a component that might be collapsed (eg. on homepage).
+                if (componentDiv !== null && componentDiv.getAttribute("data-collapse-state") === "collapsed") {
+                    // The video is inside a component that is currently collapsed (eg. on homepage).
+                    // A mediaelementplayer cannot be initialised on a hidden <video> element, so we must wait until it becomes visible.
 
-                    if (componentDiv.getAttribute("data-collapse-state") === "uncollapsed") {
+                    const onExpandStarted = () => {
                         $element.mediaelementplayer(getConfigForVideo());
-                    } else {
-                        const onExpandStarted = () => {
-                            $element.mediaelementplayer(getConfigForVideo());
-                            // This event listener only needs to be run on the first event, so remove it now that its work is done.
-                            componentDiv.removeEventListener("expandStarted.collapsable", onExpandStarted);
-                        };
+                        // This event listener only needs to be run on the first event, so remove it now that its work is done.
+                        componentDiv.removeEventListener("expandStarted.collapsable", onExpandStarted);
+                    };
 
-                        // Add event listener for when the component becomes visible.
-                        componentDiv.addEventListener("expandStarted.collapsable", onExpandStarted);
-                    }
+                    // Add event listener for when the component becomes visible.
+                    componentDiv.addEventListener("expandStarted.collapsable", onExpandStarted);
+                } else {
+                    $element.mediaelementplayer(getConfigForVideo());
                 }
             });
     };
