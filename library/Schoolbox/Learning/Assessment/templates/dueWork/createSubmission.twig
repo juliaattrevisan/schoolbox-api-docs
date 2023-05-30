@@ -120,7 +120,7 @@ Data:
                 error: function (response) {
                     let temp = $.parseJSON(response.responseText);
                     $formSaveLabel.toastTimeout({
-                        text: 'Error: ' + temp.message,
+                        text: 'Saving failed',
                         css: 'alert'
                     });
                 },
