@@ -18,16 +18,21 @@ use Schoolbox\Collection;
 class Base implements \JsonSerializable
 {
     /**
-     * @var Collection
+     * Should never be an array, but may have been serialized as one so need to
+     * handle this case for now.
+     *
+     * @var Collection|array
      */
-    protected $data;
+    protected Collection|array $data;
 
     /**
      * @return Collection
      */
     public function getData(): Collection
     {
-        return $this->data;
+        return $this->data instanceof Collection
+            ? $this->data
+            : new Collection($this->data);
     }
 
     /**
@@ -35,6 +40,6 @@ class Base implements \JsonSerializable
      */
     public function jsonSerialize(): Collection
     {
-        return $this->data;
+        return $this->getData();
     }
 }

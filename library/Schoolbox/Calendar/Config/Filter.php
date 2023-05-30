@@ -67,12 +67,12 @@ class Filter extends Base
     public function generate(Collection $campuses, Collection $groups, Collection $eventTypes, Collection $sourceLists): self
     {
         if ($this->filters) {
-            $this->data = [
+            $this->data = new Collection([
                 self::GROUP     => $this->filters[self::GROUP]     ?? [],
                 self::CAMPUS    => $this->filters[self::CAMPUS]    ?? [],
                 self::EVENTTYPE => $this->filters[self::EVENTTYPE] ?? [],
                 self::SOURCE    => $this->filters[self::SOURCE]    ?? [],
-            ];
+            ]);
         } else {
             foreach ($campuses as $campus) {
                 $this->data[self::CAMPUS][] = $campus['id'];
