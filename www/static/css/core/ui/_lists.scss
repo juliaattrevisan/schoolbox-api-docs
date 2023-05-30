@@ -169,7 +169,7 @@ $inline-list-default-float-list-margin: rem-calc($base-font-size);
     }
     > li {
         @extend %information-li;
-        > &:first-child {
+        &:first-child {
             padding-top: 0;
         }
         &:last-child {
