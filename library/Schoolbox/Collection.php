@@ -111,7 +111,7 @@ class Collection implements ICollection, Serializable, ArrayAccess
      *
      * @return $this
      */
-    public function offsetSet($offset, $value): self
+    public function offsetSet(mixed $offset, mixed $value): self
     {
         if (!isset($offset)) {
             $this->stack[] = $value;
@@ -128,7 +128,7 @@ class Collection implements ICollection, Serializable, ArrayAccess
      *
      * @return mixed
      */
-    public function offsetGet($offset)
+    public function offsetGet(mixed $offset): mixed
     {
         return $this->stack[$offset] ?? null;
     }
@@ -140,7 +140,7 @@ class Collection implements ICollection, Serializable, ArrayAccess
      *
      * @return bool
      */
-    public function offsetExists($offset): bool
+    public function offsetExists(mixed $offset): bool
     {
         return isset($this->stack[$offset]);
     }
@@ -152,7 +152,7 @@ class Collection implements ICollection, Serializable, ArrayAccess
      *
      * @return $this
      */
-    public function offsetUnset($offset): self
+    public function offsetUnset(mixed $offset): self
     {
         unset($this->stack[$offset]);
         return $this;
