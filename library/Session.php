@@ -121,7 +121,12 @@ class Session
             $_SESSION['key']                = $user->getKey();
             $_SESSION['lasttime']           = time();
             $_SESSION['username']           = $user->getUsername();
-            $_SESSION['password']           = $_POST['password'] ?? null;
+            if (
+                Config::get(\Schoolbox\Config\ConfigMapper::NAME_EXTERNAL_TYPE) === \External\IConnector::EXTERNAL_TYPE_SYNERGETIC
+                && !empty(Config::get('external_portal'))
+            ) {
+                $_SESSION['password'] = $_POST['password'] ?? null;
+            }
             $_SESSION['ip']                 = $ip;
 
             // add mobile session data
