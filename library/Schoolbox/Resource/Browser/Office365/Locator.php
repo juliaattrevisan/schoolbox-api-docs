@@ -204,12 +204,13 @@ class Locator implements Resource\File\ILocator, Resource\Folder\ILocator, Fetch
         }
 
         $folder = Resource\Folder\Mapper::getInstance()->createModel();
-
         $folder->setId($item['id']);
         $folder->setName($item['name']);
 
+        /* Not every node has a parent; null coalesce to system root, I guess
+         */
         $parent = Resource\Folder\Mapper::getInstance()->createModel();
-        $parent->setId($item['parentReference']['id']);
+        $parent->setId($item['parentReference']['id'] ?? \Schoolbox\Resource\Folder\IFolder::ROOT_ID);
 
         $folder->setParent($parent);
 
